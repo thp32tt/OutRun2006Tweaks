@@ -15,6 +15,32 @@ enum class GameNativeReadbackFence : std::uint8_t { Complete, Pending, Failed };
 // A failed Map leaves the staging slot quarantined until the owning D3D9
 // device Reset; WAS_STILL_DRAWING stays busy but is not an error.
 enum class GameNativeReadbackMap : std::uint8_t { Ready, Pending, Failed };
+// Source-owned GPU staging copy, independent from the next game Present.
+// Late menu/car/race Maps use these captured bytes, not current output size.
+struct GameNativeReadbackCopyStamp {
+    std::uint32_t width{}, height{};
+    std::uint64_t generation{};
+    [[nodiscard]] static constexpr GameNativeReadbackCopyStamp capture(
+        std::uint32_t w, std::uint32_t h, std::uint64_t g) noexcept {
+        return {w, h, g};
+    }
+    [[nodiscard]] constexpr bool valid() const noexcept {
+        return width && height && generation &&
+            width <= (std::numeric_limits<std::uint32_t>::max)() / 4u;
+    }
+    [[nodiscard]] constexpr bool matches(
+        std::uint32_t w, std::uint32_t h, std::uint64_t g) const noexcept {
+        return valid() && width == w && height == h && generation == g;
+    }
+    [[nodiscard]] constexpr bool map_pitch_valid(std::uint32_t pitch) const noexcept {
+        return valid() && pitch >= width * 4u;
+    }
+};
+static_assert(GameNativeReadbackCopyStamp::capture(3440,1440,9).matches(3440,1440,9));
+static_assert(!GameNativeReadbackCopyStamp::capture(3440,1440,9).matches(1920,1080,9));
+static_assert(!GameNativeReadbackCopyStamp::capture(3440,1440,9).matches(3440,1440,10));
+static_assert(GameNativeReadbackCopyStamp::capture(3440,1440,9).map_pitch_valid(13824));
+static_assert(!GameNativeReadbackCopyStamp::capture(3440,1440,9).map_pitch_valid(13000));
 struct GameNativeFramePublication {
     [[nodiscard]] static constexpr GameNativeReadbackFence classify_fence(
         std::int32_t result) noexcept {

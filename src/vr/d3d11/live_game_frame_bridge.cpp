@@ -1275,6 +1275,7 @@ struct ReadbackSlot {
     // on a later Present, without ever uploading that stale game image.
     bool mapPending = false;
     bool completeFullFrame = false;
+    GameNativeReadbackCopyStamp copyStamp{};
     GameReadbackProvenance provenance{};
 };
 struct LiveSm3Pipeline {
@@ -1837,6 +1838,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
         item.mapPending = false;
+        item.copyStamp = {};
     }
     s.readSlot = s.writeSlot = 0;
     s.previousOutput = {};
@@ -8711,8 +8713,12 @@ void before_game_present(IDirect3DDevice9* game,
                                 static_cast<std::int32_t>(staleStatus),
                                 static_cast<std::int32_t>(DXGI_ERROR_WAS_STILL_DRAWING),
                                 staleMap.pData != nullptr,
-                                prior.completeFullFrame ? s.nativeWidth : kWidth,
+                                prior.copyStamp.width,
                                 staleMap.RowPitch);
+                            // Stale Map belongs to its original GPU allocation.
+                            if (staleResult == GameNativeReadbackMap::Ready &&
+                                !prior.copyStamp.map_pitch_valid(staleMap.RowPitch))
+                                staleResult = GameNativeReadbackMap::Failed;
                             if (staleResult == GameNativeReadbackMap::Ready) {
                                 ctx->Unmap(prior.staging.Get(), 0);
                                 prior.mapPending = false;
@@ -8755,6 +8761,8 @@ void before_game_present(IDirect3DDevice9* game,
                         next.provenance = {s.presents, s.sourceDrawsThisFrame};
                         next.mapPending = false;
                         next.completeFullFrame = true;
+                        next.copyStamp = GameNativeReadbackCopyStamp::capture(
+                            surfaceWidth, surfaceHeight, s.outputGeneration);
                         next.provenance.sourceDevice = presentDevice;
                         next.provenance.outputGeneration = s.outputGeneration;
                         ctx->End(next.fence.Get());
@@ -8809,6 +8817,8 @@ void before_game_present(IDirect3DDevice9* game,
                                      !oldest.provenance.same_device(presentDevice) ||
                                       oldest.completeFullFrame != fullMode ||
                                      !oldest.provenance.same_output(s.outputGeneration) ||
+                                     !oldest.copyStamp.matches(
+                                         surfaceWidth, surfaceHeight, s.outputGeneration) ||
                                      !outputWritable ||
                                      s.sourceGameDevice != presentDevice)) {
                     // A late native frame cannot overwrite a newer menu/race Present.
@@ -8823,7 +8833,7 @@ void before_game_present(IDirect3DDevice9* game,
                     auto mapResult = GameNativeFramePublication::classify_map(
                         static_cast<std::int32_t>(mapStatus),
                         static_cast<std::int32_t>(DXGI_ERROR_WAS_STILL_DRAWING),
-                        mapped.pData != nullptr, surfaceWidth, mapped.RowPitch);
+                        mapped.pData != nullptr, oldest.copyStamp.width, mapped.RowPitch);
                     // The same-Present EVENT is complete, yet a nonblocking
                     // CPU staging Map can still return WAS_STILL_DRAWING.
                     // Give ONLY this freshly queued full game frame a bounded
@@ -8850,7 +8860,7 @@ void before_game_present(IDirect3DDevice9* game,
                                 mapResult = GameNativeFramePublication::classify_map(
                                     static_cast<std::int32_t>(mapStatus),
                                     static_cast<std::int32_t>(DXGI_ERROR_WAS_STILL_DRAWING),
-                                    mapped.pData != nullptr, surfaceWidth, mapped.RowPitch);
+                                    mapped.pData != nullptr, oldest.copyStamp.width, mapped.RowPitch);
                                 if (mapResult != GameNativeReadbackMap::Pending) break;
                                 if (!QueryPerformanceCounter(&nowMap) ||
                                     nowMap.QuadPart < startedMap.QuadPart) break;
@@ -8867,8 +8877,7 @@ void before_game_present(IDirect3DDevice9* game,
                         // difference probe; scanning the entire game image
                         // adds unnecessary CPU work to gamepad frame pacing.
                         const bool sourcePitchValid =
-                            GameNativeFramePublication::valid_readback_pitch(
-                                surfaceWidth, mapped.RowPitch);
+                            oldest.copyStamp.map_pitch_valid(mapped.RowPitch);
                         if (!sourcePitchValid) ++s.failed;
                         UINT changedPixels = 0u;
                         if (sourcePitchValid && !fullMode) {
@@ -9119,6 +9128,8 @@ void before_game_present(IDirect3DDevice9* game,
                     next.provenance = {s.presents, s.sourceDrawsThisFrame};
                     next.mapPending = false;
                     next.completeFullFrame = fullMode;
+                    next.copyStamp = GameNativeReadbackCopyStamp::capture(
+                        surfaceWidth, surfaceHeight, s.outputGeneration);
                     next.provenance.sourceDevice = presentDevice;
                     next.provenance.outputGeneration = s.outputGeneration;
                     ctx->End(next.fence.Get());
@@ -9220,6 +9231,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
         item.mapPending = false;
+        item.copyStamp = {};
         item.provenance = {};
     }
     s.readSlot = s.writeSlot = 0;
