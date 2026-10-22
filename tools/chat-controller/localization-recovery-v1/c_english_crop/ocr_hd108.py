@@ -32,7 +32,14 @@ def digest(path):
 # change to OCR/safety policy. No silent endless re-scanning of exhausted inputs.
 POLICY_VERSION = "hd108-coverage-v4-20261021-12strategy-parallel"
 EDGE_REVIEW_VERSION = "edge-safe-expand-v2-20261021-progressive"
+LEGACY_PIXEL_RECOVERY_VERSION = "master255-decoded-pixel-equal-v1-20261022"
 EDGE_STAGES = ((.55,.30),(.90,.50),(1.40,.80),(2.00,1.20))
+LEGACY_POSITION_SUFFIXES = ("TOP","SECOND","BIG","SMALL","LEFT","RIGHT","UPPER","LOWER","TITLE","LABEL")
+LEGACY_HOME = Path("/home/chatgpt-runner2")
+LEGACY_ALLOWED_ROOTS = (
+ LEGACY_HOME/"work/c_salvage_text_roi/source_full_20261012",
+ LEGACY_HOME/"work/c_salvage_text_roi/additional_originals_20261016",
+)
 
 
 def _row_phrases(row):
@@ -68,6 +75,201 @@ def _coverage(row, out_root=OUT):
  covered=_covered_codes(row,out_root)
  unresolved={k:v for k,v in phrases.items() if k not in covered}
  return phrases,covered,unresolved
+
+
+def _legacy_phrase_for_item(item):
+ item_id=item.get("id")
+ if not isinstance(item_id,str) or "-" not in item_id:
+  return None,None
+ q=item_id.split("-",1)[0].upper()
+ if not re.fullmatch(r"Q[0-9]{3}",q):
+  return None,None
+ phrases=ocr.approved_phrases(q)
+ tail=ocr.norm(item_id.split("-",1)[1])
+ if tail in phrases:
+  return q,phrases[tail]
+ for suffix in LEGACY_POSITION_SUFFIXES:
+  if tail.endswith(suffix):
+   base=tail[:-len(suffix)]
+   if base in phrases:
+    return q,phrases[base]
+ return q,None
+
+
+def _legacy_source_path(item):
+ raw=item.get("source_path")
+ if not isinstance(raw,str) or not raw or Path(raw).is_absolute():
+  return None
+ full=(LEGACY_HOME/raw).resolve()
+ if full.is_symlink() or not full.is_file():
+  return None
+ for allowed in LEGACY_ALLOWED_ROOTS:
+  try:
+   if full.is_relative_to(allowed.resolve()):
+    return full
+  except (OSError,ValueError):
+   continue
+ return None
+
+
+def recover_legacy_pixel_equal(rows,max_new=1000,src_root=SRC,out_root=OUT):
+ """Recover reviewed native crops from MASTER_255 only after decoded RGBA proof.
+
+ MASTER file-byte SHA differs from the current canonical PNGs because some
+ sources were re-encoded. Coordinates are reusable only when the old source
+ decodes pixel-identically to one current verified HD source, or to its exact
+ vertical flip. Phrase binding is restricted to exact official normalized text
+ encoded in the legacy item id (plus a small positional-suffix allowlist).
+ """
+ receipt_path=REPORT/"legacy_pixel_recovery_v1.json"
+ try:
+  prior=json.loads(receipt_path.read_text(encoding="utf-8"))
+  if prior.get("version")==LEGACY_PIXEL_RECOVERY_VERSION and prior.get("status")=="LEGACY_PIXEL_RECOVERY_COMPLETE":
+   return prior
+ except (OSError,ValueError,TypeError):
+  pass
+
+ archive=json.loads(discover.MASTER.read_text(encoding="utf-8"))
+ items=archive.get("items",[])
+ if len(items)!=255:
+  raise ValueError("MASTER_255_ARCHIVE_CHANGED")
+ by_q={}
+ for row in rows:
+  m=re.match(r"^(Q[0-9]{3})_",row.get("png_filename",""))
+  if m:
+   by_q.setdefault(m.group(1),[]).append(row)
+ grouped={}
+ for item in items:
+  q,phrase=_legacy_phrase_for_item(item)
+  old=_legacy_source_path(item)
+  if q and phrase and old is not None:
+   grouped.setdefault((q,str(old)),[]).append((item,phrase))
+
+ result={"status":"LEGACY_PIXEL_RECOVERY_RUNNING",
+         "version":LEGACY_PIXEL_RECOVERY_VERSION,
+         "master_items":len(items),"eligible_groups":len(grouped),
+         "pixel_equal_groups":0,"pixel_flipy_groups":0,
+         "mapped_items":0,"recovered":0,"duplicates":0,
+         "edge_review_crops":0,"held":0,"details":[]}
+ for (q,old_name),mapped in sorted(grouped.items()):
+  old=Path(old_name)
+  try:
+   with Image.open(old) as im:
+    if im.format!="PNG":
+     raise ValueError("LEGACY_SOURCE_NOT_PNG")
+    legacy=im.convert("RGBA")
+   matched=None
+   for row in by_q.get(q,[]):
+    src=src_root/row["png_filename"]
+    if (not src.is_file() or src.is_symlink() or
+        src.stat().st_size!=int(row["png_size_bytes"]) or
+        digest(src)!=row["png_sha256"]):
+     continue
+    with Image.open(src) as im:
+     if im.format!="PNG" or im.mode!="RGBA" or im.size!=(int(row["width"]),int(row["height"])):
+      continue
+     current=im.copy()
+    if legacy.size!=current.size:
+     continue
+    if legacy.tobytes()==current.tobytes():
+     matched=(row,current,"EXACT_RGBA")
+     result["pixel_equal_groups"]+=1
+     break
+    if legacy.transpose(Image.Transpose.FLIP_TOP_BOTTOM).tobytes()==current.tobytes():
+     matched=(row,current,"FLIPY_RGBA")
+     result["pixel_flipy_groups"]+=1
+     break
+   if matched is None:
+    continue
+   row,current,relation=matched
+   sourceout=out_root/Path(row["png_filename"]).stem
+   existing=[]
+   if sourceout.is_dir():
+    for saved in sourceout.glob("*/manifest.json"):
+     try:
+      j=json.loads(saved.read_text(encoding="utf-8"))
+      if (j.get("source_sha256")==row["png_sha256"] and
+          isinstance(j.get("english"),str) and
+          isinstance(j.get("bbox_xyxy"),list) and len(j["bbox_xyxy"])==4):
+       existing.append((ocr.norm(j["english"]),j["bbox_xyxy"]))
+     except (OSError,ValueError,TypeError):
+      pass
+   group_new=0
+   for item,phrase in mapped:
+    result["mapped_items"]+=1
+    box=item.get("bbox_xyxy")
+    if not (isinstance(box,list) and len(box)==4 and all(type(v) is int for v in box)):
+     result["held"]+=1
+     continue
+    x0,y0,x1,y1=box
+    if relation=="FLIPY_RGBA":
+     box=[x0,current.height-y1,x1,current.height-y0]
+    else:
+     box=list(box)
+    if not (0<=box[0]<box[2]<=current.width and 0<=box[1]<box[3]<=current.height):
+     result["held"]+=1
+     continue
+    code=ocr.norm(phrase)
+    if any(old_code==code and discover.overlap(box,old_box)>.80
+           for old_code,old_box in existing):
+     result["duplicates"]+=1
+     continue
+    if result["recovered"]>=max_new:
+     raise RuntimeError("LEGACY_PIXEL_RECOVERY_LIMIT_HIT")
+    bad=ocr.margin_check(current,box)
+    if bad and bad!="ALPHA_TOUCHES_CROP_BORDER_REVIEW":
+     result["held"]+=1
+     continue
+    label=hashlib.sha256((row["png_filename"]+phrase+str(box)+
+                          LEGACY_PIXEL_RECOVERY_VERSION).encode()).hexdigest()[:16]
+    target=sourceout/label
+    if target.exists():
+     result["duplicates"]+=1
+     continue
+    target.mkdir(parents=True,exist_ok=False)
+    cropped=current.crop(tuple(box))
+    outfile=target/"english_original_native_crop.png"
+    cropped.save(outfile,format="PNG")
+    with Image.open(outfile) as proof:
+     if proof.mode!=cropped.mode or proof.size!=cropped.size or proof.tobytes()!=cropped.tobytes():
+      raise ValueError("LEGACY_RECOVERY_CROP_ROUNDTRIP_MISMATCH")
+    manifest={
+      "status":"CROP_TEST_ONLY_REVIEW_REQUIRED",
+      "source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+      "source_png":row["png_filename"],"source_sha256":row["png_sha256"],
+      "reference_dds_path":row["source_dds_path"],
+      "reference_dds_sha256":row["dds_sha256"],
+      "independent_DDS_pixel_equality":"NOT_TESTED_FOR_THIS_PNG",
+      "queue_indexes":row["queue_indexes"],"english":phrase,
+      "ocr_confidence":None,"bbox_xyxy":box,
+      "source_dimensions":[int(row["width"]),int(row["height"])],
+      "crop_dimensions":list(cropped.size),"crop_sha256":digest(outfile),
+      "edge_warning":bad if bad else None,
+      "human_review_required":True,"runtime_validation":"UNTESTED",
+      "old_split_tiles_used":False,"A_B":"STOPPED_UNTOUCHED",
+      "legacy_pixel_recovery_version":LEGACY_PIXEL_RECOVERY_VERSION,
+      "legacy_master_id":item.get("id"),
+      "legacy_source_path":item.get("source_path"),
+      "legacy_current_decoded_pixel_relation":relation,
+      "legacy_current_decoded_pixel_equality":True,
+    }
+    discover.save_json_atomic(target/"manifest.json",manifest)
+    existing.append((code,box))
+    result["recovered"]+=1
+    group_new+=1
+    if bad:
+     result["edge_review_crops"]+=1
+   result["details"].append({"q":q,"current_source":row["png_filename"],
+                             "legacy_source":str(old),"relation":relation,
+                             "mapped":len(mapped),"recovered":group_new})
+  except Exception as e:
+   result["held"]+=1
+   result["details"].append({"q":q,"legacy_source":str(old),
+                             "status":"HOLD","reason":type(e).__name__+":"+str(e)[:180]})
+ result["status"]="LEGACY_PIXEL_RECOVERY_COMPLETE"
+ REPORT.mkdir(parents=True,exist_ok=True)
+ discover.save_json_atomic(receipt_path,result)
+ return result
 
 
 def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
@@ -237,6 +439,7 @@ def scan(max_sources=4,max_new=1000):
  rows.sort(key=lambda r:r["png_filename"])
  REPORT.mkdir(parents=True,exist_ok=True)
  OUT.mkdir(parents=True,exist_ok=True)
+ legacy_recovery=recover_legacy_pixel_equal(rows,max_new=max_new,src_root=SRC,out_root=OUT)
  done_dir=REPORT/"processed_v3"
  done_dir.mkdir(parents=True,exist_ok=True)
 
@@ -272,8 +475,12 @@ def scan(max_sources=4,max_new=1000):
          "reviewed_phrase_total":total_phrase_count,
          "located_phrase_count":located_phrase_count,
          "selected":[r["png_filename"] for _,r in selected],
-         "scanned":0,"matched":0,"new_crops":0,"duplicates":0,
-         "held":0,"edge_review_crops":0,"details":[]}
+         "scanned":0,"matched":0,
+         "new_crops":int(legacy_recovery.get("recovered",0)),
+         "legacy_recovered":int(legacy_recovery.get("recovered",0)),
+         "duplicates":0,"held":0,
+         "edge_review_crops":int(legacy_recovery.get("edge_review_crops",0)),
+         "details":[]}
  if not selected:
   result["status"]="HD108_CROP_COVERAGE_COMPLETE"
   result["pending_sources_after"]=0
