@@ -58,7 +58,8 @@ def check(b,s,r,cmd):
     assert "./tools/Build-OutRunPCFast.ps1 -ExpectedSha $expectedSha" in workflow
     for token in ("PC FAST SOURCE GRAPH VERIFIED", "PC FAST COMPILED R26 DLL SHA256", "PC Fast WRONG CHECKOUT", "R26HUD-PC-FAST-v3-EXACT-SHA"):
         assert token in b, ("PC Fast exact source guard missing", token)
-    assert workflow.count("runs-on: [self-hosted, Windows, X64, outrun-pc]") == 1
+    assert workflow.count("runs-on: windows-2022") == 1, "PC Fast must build on the verified GitHub-hosted Windows runner"
+    assert "runs-on: [self-hosted, Windows, X64, outrun-pc]" not in workflow
     assert "contains(github.event.head_commit.message, '[pc-build]')" in workflow
     return True
 check(build,selector,runner,start)

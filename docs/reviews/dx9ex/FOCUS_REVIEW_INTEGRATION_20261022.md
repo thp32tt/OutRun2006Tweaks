@@ -39,3 +39,8 @@
 - Exact-SHA DX9Ex Active #39725616738 passes SkyGlow, R26 F11, and scoped R57 ordinal signed-W, then fails on an inherited cockpit test requiring `ComputeCarAnchoredSeatPose`.
 - Existing current `src/hooks_graphics.cpp::VRDriverSeatCameraPose` contains direct Quest3 evidence: absolute car-origin anchor placed the eye inside the model, so active mode intentionally uses `ComputeStableSeatPose(nativePos/nativeLook, optional car axes,...)` and last-valid hold. Driver seat game source remains untouched.
 - Update verifier to check active native-camera anchor and retained fallback with five negative mutations; keep inactive car-origin helper presence for diagnostics without forcing it into active FOCUS/HMD behavior. No new headset test performed here.
+
+## PC Fast hosted runner verifier correction
+
+- The exact-SHA Active policy run #39725969487 progressed past SkyGlow/F11/rank/cockpit and failed the inherited `verify_vr_pc_fast_package_contract.py` requirement for self-hosted `outrun-pc` runner.
+- Actual current `.github/workflows/vr-pc-fast-build.yml` uses GitHub-hosted `windows-2022`, SHA-pinned checkout and active `[pc-build]` dispatch. Correct the stale runner assertion without touching the workflow, source, executable or six package regression mutations. Do not claim test PASS before final-run evidence. Quest3 HMD UNTESTED.
