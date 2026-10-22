@@ -936,6 +936,9 @@ namespace OutRunVRStereo
             R30SkyGlow.glowWidth = 0;
             R30SkyGlow.glowHeight = 0;
             R30SkyGlow.factor = 0;
+            // A reallocated reduced texture no longer owns the old pre-HUD
+            // scene. An epoch stamp alone must not authorize sampling it.
+            R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;
         }
 
         bool R30CompilePixelShader(IDirect3DDevice9* device,
@@ -1257,6 +1260,17 @@ namespace OutRunVRStereo
 
             if (!R30EnsureSkyGlowResources(device))
                 return false;
+
+            // Ensure may recreate both reduced eye textures after the first
+            // pre-HUD capture (SkyGlow factor/eye extent changed mid-Present).
+            // Once a screen producer has drawn, copying the live backbuffer
+            // would bloom HUD/+TIME/F11. Skip only this optional glow pass.
+            if (R30SkyGlowScreenDrawEpoch == PresentEpoch &&
+                R30SkyGlowSceneCaptureEpoch != PresentEpoch)
+            {
+                ++R30SkyGlowUiCaptureSkips;
+                return true;
+            }
 
             IDirect3DStateBlock9* stateBlock = nullptr;
             IDirect3DSurface9* savedRt = nullptr;

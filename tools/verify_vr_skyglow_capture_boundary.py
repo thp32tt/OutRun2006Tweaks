@@ -76,3 +76,59 @@ for mutated in bad_variants:
         continue
     raise AssertionError("R84 pre-HUD SkyGlow mutation escaped")
 print("PASS R84 main SkyGlow screen-only cutoff and three negative mutations; HMD UNTESTED")
+
+
+# Default PC Fast R26+HUD must match the already bounded R84
+# SkyGlow capture/resource-generation invariant. Source-level contract only:
+# no claim that a mid-Present reconfiguration occurred on Quest3.
+def check_r26_generation(renderer: str) -> None:
+    release = renderer.split("void R30ReleaseSkyGlowResources() noexcept", 1)[1].split(
+        "bool R30CompilePixelShader(", 1)[0]
+    present = renderer.split("bool R30ApplyStereoSkyGlow(", 1)[1].split(
+        "ULONGLONG R30LastTelemetryMs", 1)[0]
+    invalidation = "R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;"
+    assert release.count(invalidation) == 1, "resource rebuild retained an old capture epoch"
+    ensure = "if (!R30EnsureSkyGlowResources(device))"
+    assert present.count(ensure) == 1
+    guard = ("if (R30SkyGlowScreenDrawEpoch == PresentEpoch &&\n"
+             "                R30SkyGlowSceneCaptureEpoch != PresentEpoch)")
+    assert present.count(guard) == 1, "missing mid-epoch capture-generation veto"
+    assert (present.index("if (R30SkyGlowSceneCaptureEpoch != PresentEpoch &&") <
+            present.index(ensure) < present.index(guard) <
+            present.index("device->CreateStateBlock(")), "check must follow resource ensure before GPU work"
+    veto = present.split(guard, 1)[1].split("IDirect3DStateBlock9* stateBlock", 1)[0]
+    assert "++R30SkyGlowUiCaptureSkips;" in veto
+    assert "return true;" in veto, "optional bloom should fail closed without poisoning stereo"
+    capture = renderer.split("bool R30CaptureSkyGlowSceneBeforeHud(", 1)[1].split(
+        "bool R30ApplyStereoSkyGlow(", 1)[0]
+    assert "if (ok)\n                R30SkyGlowSceneCaptureEpoch = PresentEpoch;" in capture
+    assert "R30SkyGlowScreenDrawEpoch = PresentEpoch;" in capture
+    assert "R30CaptureSkyGlowSceneBeforeHud(device);" in capture
+    assert "R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;" in renderer, "Reset boundary preserved"
+
+check_r26_generation(source)
+generation_mutations = [
+    ("drop resource lifetime invalidation",
+     source.replace(
+        "            R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;\n        }\n\n        bool R30CompilePixelShader",
+        "        }\n\n        bool R30CompilePixelShader", 1)),
+    ("drop after-Ensure veto",
+     source.replace(
+        "if (R30SkyGlowScreenDrawEpoch == PresentEpoch &&\n"
+        "                R30SkyGlowSceneCaptureEpoch != PresentEpoch)",
+        "if (false)", 1)),
+    ("accept stale capture generation",
+     source.replace(
+        "R30SkyGlowSceneCaptureEpoch != PresentEpoch)\n"
+        "            {\n                ++R30SkyGlowUiCaptureSkips;",
+        "R30SkyGlowSceneCaptureEpoch == PresentEpoch)\n"
+        "            {\n                ++R30SkyGlowUiCaptureSkips;", 1)),
+]
+for label, mutation in generation_mutations:
+    assert mutation != source, f"mutation fixture missing: {label}"
+    try:
+        check_r26_generation(mutation)
+    except (AssertionError, IndexError, ValueError):
+        continue
+    raise AssertionError(f"R26 capture-generation mutation escaped: {label}")
+print("PASS R26+HUD SkyGlow capture/reallocation fail-closed and 3 negative mutations; HMD UNTESTED")
