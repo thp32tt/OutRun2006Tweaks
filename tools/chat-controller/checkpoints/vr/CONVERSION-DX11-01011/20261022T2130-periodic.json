@@ -54,7 +54,7 @@
     "feature_branch": "feature/dx11-01011-gate-repair-20261022",
     "feature_base_sha": "9f6ba50240a8cbc1e00787ce9b57e5cb45a92364",
     "feature_last_head": "1e832f56afc0898ceb3bcee236b06de5779b811d",
-    "stage": "VALIDATING",
+    "stage": "C6_RESULT",
     "source_repair_commit": "0f6f7f46b68804c06f512ca706190742557e7952",
     "ci_dispatch_commit": "1e832f56afc0898ceb3bcee236b06de5779b811d",
     "failed_original_run_id": 39778877597,
@@ -67,19 +67,24 @@
       "source graph and 00957 V12 expectations",
       "existing mandatory five workflow push coverage for feature SHA"
     ],
-    "ci_status": "TARGET_EXACT_SHA_PENDING_BACKEND_SMOKE_AND_HUD",
+    "ci_status": "ALL_FIVE_MATERIAL_EXACT_SHA_SUCCESS; C6_DOC_ONLY_NEW_SHA_CI_RUNNING",
     "remaining": [
-      "Confirm exact 2da592a3 Backend Gate and HUD workflow full conclusions (other mandatory gates PASS)",
-      "Confirm exact-SHA diagnostic/artifact bundle validity; runtime UNTESTED",
-      "Write C6 for material target without duplicate source commit only after mandatory gates fully conclude",
-      "Deduplicate RUN_KEY in AI_SCOREBOARD.md; no score for duplicated repair"
+      "Check new C6 docs-only HEAD workflows; validated material remains 2da592a3",
+      "No duplicate target promotion/feature reimplementation/score increment",
+      "Real Quest3 VDXR gameplay and actual visible frame UNTESTED"
     ],
     "runtime_validation": "UNTESTED",
-    "target_promotion": "NOT_REQUIRED_ALREADY_COMMITTED_BY_PRIOR_ROLLOVER",
+    "target_promotion": "NOT_REQUIRED_PREVIOUS_ROLLOVER_COMMIT_ALREADY_TARGET",
     "score_change": 0,
-    "target_head": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+    "target_head": "5f0c2ebefabdc327c60f7bffdb79a0b13377b456",
     "target_material_commit": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
     "identical_repair_tree_sha": "218b265af0de72dd89395658d533610d60cea2e4",
-    "ownership_concurrency": "Previous rollout committed equivalent source fix to TARGET_BRANCH after initial 9f6b snapshot, before feature branch repair. Target and feature repair commits have byte-identical Git trees. DO NOT promote duplicate feature branch or award duplicate score."
+    "ownership_concurrency": "Previous rollout committed equivalent source fix to TARGET_BRANCH after initial 9f6b snapshot, before feature branch repair. Target and feature repair commits have byte-identical Git trees. DO NOT promote duplicate feature branch or award duplicate score.",
+    "validation_bearing_result_sha": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+    "source_tree_sha": "218b265af0de72dd89395658d533610d60cea2e4",
+    "c6_result_commit": "5f0c2ebefabdc327c60f7bffdb79a0b13377b456",
+    "scoreboard_latest_ai2": 1895,
+    "scoreboard_run_key": "CONVERSION-DX11-01011",
+    "score_already_recorded": true
   }
 }
