@@ -47,6 +47,7 @@
 #include "native_game_source_mutation.hpp"
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_frame_publication.hpp"
+#include "native_game_live_shader_cache.hpp"
 #include "native_game_gpu_handoff.hpp"
 #include "native_game_gpu_output_preserve.hpp"
 #include "native_game_shared_desktop.hpp"
@@ -1291,13 +1292,19 @@ struct LiveSm3Pipeline {
     unsigned alphaCompare{};
     std::vector<DWORD> vertexTokens, pixelTokens;
     std::vector<D3DVERTEXELEMENT9> declaration;
+    std::uint64_t lastUse{}; // Last successfully admitted game shader draw.
+};
+struct LiveSm3BlendEntry {
+    ComPtr<ID3D11BlendState> state;
+    std::uint64_t lastUse{}; // Shared LRU timeline with shader programs.
 };
 struct State {
     std::mutex mutex;
     // Shader bytecode+declaration keyed cache is bound to this backend's
     // exact D3D11 device lifetime, and discarded on source Reset.
     std::unordered_map<std::uint64_t, LiveSm3Pipeline> liveSm3Pipelines;
-    std::unordered_map<std::uint64_t, ComPtr<ID3D11BlendState>> liveSm3BlendStates;
+    std::unordered_map<std::uint64_t, LiveSm3BlendEntry> liveSm3BlendStates;
+    std::uint64_t liveSm3UseOrdinal{};
     // Non-owning identity only: reset at every Present/Reset. Never retain a
     // game D3D9 COM object or mix different device Draw calls in one GPU batch.
     std::uintptr_t sourceGameDevice = 0u;
@@ -1821,6 +1828,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.fullGameVertexCapacity = s.fullGameIndexCapacity = 0u;
     s.liveSm3Pipelines.clear();
     s.liveSm3BlendStates.clear();
+    s.liveSm3UseOrdinal = 0u;
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
@@ -5284,15 +5292,22 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         const auto blendKey = sm3_live_blend_key(extendedDesc);
         auto found = s.liveSm3BlendStates.find(blendKey);
         if (found == s.liveSm3BlendStates.end()) {
-            if (s.liveSm3BlendStates.size() >= 64u) return false;
             D3D11_BLEND_DESC desc{};
             desc.RenderTarget[0] = extendedDesc;
             ComPtr<ID3D11BlendState> created;
             if (FAILED(device->CreateBlendState(&desc, created.GetAddressOf())) ||
                 !created) return false;
-            found = s.liveSm3BlendStates.emplace(blendKey, std::move(created)).first;
+            // Create successfully BEFORE retiring a working game blend.
+            // The current D3D11 context retains any already-bound COM state.
+            if (!LiveGameShaderCacheReplacement::retire_oldest_if_full(
+                    s.liveSm3BlendStates, 64u)) return false;
+            LiveSm3BlendEntry entry{};
+            entry.state = std::move(created);
+            found = s.liveSm3BlendStates.emplace(
+                blendKey, std::move(entry)).first;
         }
-        extendedBlend = found->second.Get();
+        found->second.lastUse = ++s.liveSm3UseOrdinal;
+        extendedBlend = found->second.state.Get();
         if (!extendedBlend) return false;
     }
     rejectionStage = 7u;
@@ -5301,8 +5316,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     if (!key) return false;
     auto it = s.liveSm3Pipelines.find(key);
     if (it == s.liveSm3Pipelines.end()) {
-        // Bound the number of compiled game programs per device/Reset.
-        if (s.liveSm3Pipelines.size() >= 64u) return false;
+        // Keep shader residents bounded while allowing new menu/car/race
+        // shader-declaration combinations beyond the first 64 seen.
         LiveSm3Pipeline pipeline{};
         if (!compile_native_live_sm3_program(
                 device, vertexEvidence, pixelEvidence, alphaFunc, pipeline.program))
@@ -5366,6 +5381,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         pipeline.vertexTokens = vertexEvidence.tokens;
         pipeline.pixelTokens = pixelEvidence.tokens;
         pipeline.declaration = declaration;
+        // Do not evict a working SM3 program on a compile/input-layout/
+        // constant-buffer creation failure. Successful GPU commands retain
+        // their D3D11 COM references even after cache retirement.
+        if (!LiveGameShaderCacheReplacement::retire_oldest_if_full(
+                s.liveSm3Pipelines, 64u)) return false;
         it = s.liveSm3Pipelines.emplace(key, std::move(pipeline)).first;
     }
     auto& pipeline = it->second;
@@ -5379,6 +5399,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         std::memcmp(pipeline.declaration.data(), declaration.data(),
                     declaration.size() * sizeof(D3DVERTEXELEMENT9)) != 0)
         return false;
+    pipeline.lastUse = ++s.liveSm3UseOrdinal;
     // Bind the same native depth family as fixed-function menu/race Draws,
     // including write-disabled comparison and reversed/equality modes.
     // All resources/states must exist before mutating the current GPU frame.
@@ -9288,6 +9309,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.fullGameVertexCapacity = s.fullGameIndexCapacity = 0u;
     s.liveSm3Pipelines.clear();
     s.liveSm3BlendStates.clear();
+    s.liveSm3UseOrdinal = 0u;
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
 }
