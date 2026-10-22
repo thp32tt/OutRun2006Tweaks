@@ -45,5 +45,37 @@
     "do_not_duplicate": true,
     "runtime_validation": "UNTESTED unless real HMD tested",
     "note": "A periodic controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved"
+  },
+  "assistant_continuation": {
+    "event_id": "CONVERSION-DX11-01011-E003",
+    "event_type": "rollover",
+    "attempted_count_unchanged": 2,
+    "feature_id": "DX11:LIVE_SM3_MASKED_CHANNEL_GAME_DRAW",
+    "feature_branch": "feature/dx11-01011-gate-repair-20261022",
+    "feature_base_sha": "9f6ba50240a8cbc1e00787ce9b57e5cb45a92364",
+    "feature_last_head": "1e832f56afc0898ceb3bcee236b06de5779b811d",
+    "stage": "VALIDATING",
+    "source_repair_commit": "0f6f7f46b68804c06f512ca706190742557e7952",
+    "ci_dispatch_commit": "1e832f56afc0898ceb3bcee236b06de5779b811d",
+    "failed_original_run_id": 39778877597,
+    "observed_failures": [
+      "R283 V11 graph/test expectations after V12 materializer bump",
+      "SM3 unary switch case initializer crossed other case labels"
+    ],
+    "repairs": [
+      "C++ block scope for case group",
+      "source graph and 00957 V12 expectations",
+      "existing mandatory five workflow push coverage for feature SHA"
+    ],
+    "ci_status": "PENDING",
+    "remaining": [
+      "Confirm 5 exact-SHA mandatory workflow conclusions and feature artifacts",
+      "Repair any new errors on same TASK_ID",
+      "After PASS, confirm target behind=0 and promote with expected_sha, force=false",
+      "Complete C6 only after success"
+    ],
+    "runtime_validation": "UNTESTED",
+    "target_promotion": "NOT_YET",
+    "score_change": 0
   }
 }
