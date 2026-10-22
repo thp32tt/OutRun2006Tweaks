@@ -63,6 +63,8 @@ services:
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       # New tasks: :00, :20 and :40 KST, once per lane per window.
       SCHEDULE_MINUTES: "0,20,40"
+      # DX9Ex C review production and scheduled rollover: only at :00 KST.
+      DX9EX_SCHEDULE_MINUTES: "0"
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"

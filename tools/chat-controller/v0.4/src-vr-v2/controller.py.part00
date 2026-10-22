@@ -110,6 +110,10 @@ PRODUCTION_COUNTER_MODE = os.getenv("PRODUCTION_COUNTER_MODE", "lane").strip().l
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
+# DX9Ex review starts only at :00 KST. DX11 retains the common cadence.
+DX9EX_SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("DX9EX_SCHEDULE_MINUTES", "0").split(",") if x.strip()})
+if not DX9EX_SCHEDULE_MINUTES or any(minute < 0 or minute > 59 for minute in DX9EX_SCHEDULE_MINUTES):
+    raise ValueError("DX9EX_SCHEDULE_MINUTES must contain minutes in 0..59")
 # Restrict VR queue production starts to configured KST wall-clock minutes.
 VR_SCHEDULED_DISPATCH_ENABLED = (CONTROLLER_MODE == "conversion" and
     os.getenv("VR_SCHEDULED_DISPATCH_ENABLED", "false").lower() == "true")
@@ -332,6 +336,7 @@ runtime = {
     "start_url": BASE_URL,
     "novnc_public_url": NOVNC_PUBLIC_URL or None,
     "schedule_minutes": SCHEDULE_MINUTES,
+    "dx9ex_schedule_minutes": DX9EX_SCHEDULE_MINUTES,
     "status": "starting",
     "last_tick": None,
     "queue_loop_heartbeat_at": None,
