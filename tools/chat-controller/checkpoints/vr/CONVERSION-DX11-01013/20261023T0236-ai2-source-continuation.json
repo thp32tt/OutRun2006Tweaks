@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "kind": "vr_ai_source_checkpoint",
+  "created_at_kst": "2026-10-23T02:36:00+09:00",
+  "task_id": "CONVERSION-DX11-01013",
+  "production_id": "CONVERSION-DX11-01013",
+  "rollover_event_from_user": "CONVERSION-DX11-01013-E001",
+  "attempt": "1/3",
+  "chat_rollover": 8,
+  "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+  "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+  "feature_stage": "SOURCE_IMPLEMENTATION_IN_PROGRESS",
+  "target_branch": "vr-dx11-native-r71",
+  "target_base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "prior_feature_sha": "6c243526e75f8db2aa2a28bd2dbf00f9f90c72a1",
+  "material_source_sha": "f5f31afe7e27b1366e5e27cb9e6e66979ecbabd1",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp"
+  ],
+  "source_fix": "Real-game shader GetFunction VS/PS transactional snapshots, byte length stabilization, catch allocation/token exceptions in noexcept; fails closed to original DX9Ex Draw rather than terminate.",
+  "source_diff_verified": true,
+  "source_validation": {
+    "status": "PENDING_EXACT_SHA_CI",
+    "static_verification": "GitHub commit diff confirms 1 C++ file, real source changes, authentic parent feature HEAD.",
+    "targeted_portable": "NOT_RUN_WINDOWS_D3D9_REQUIRED",
+    "exact_sha": "f5f31afe7e27b1366e5e27cb9e6e66979ecbabd1",
+    "workflow_run_ids": {
+      "DX11 Fast": 39824068941,
+      "Backend Conversion Gate": 39824068970,
+      "Windows Build": 39824068900,
+      "OpenXR VR architecture": 39824068944,
+      "HUD Inspector": 39824068888
+    }
+  },
+  "feature_ready": false,
+  "target_promoted": false,
+  "runtime_validation": "UNTESTED",
+  "game_native_draw_count": "UNTESTED",
+  "game_native_published_frame_count": "UNTESTED",
+  "remaining_acceptance_items": [
+    "Use actual game VS/PS and rejection-stage runtime logs to fix next evidenced blocker to eligible_state_draws>0 and native_draws>0",
+    "Prove full source-contiguous native menu/car/race Draw -> native full-resolution published frames",
+    "Complete distinct game-camera left/right native GPU eyes and OpenXR ACK/fence transport evidence",
+    "Keep R175 00477 owner boundary untouched and original DX9Ex draw/input/FFB fallback",
+    "Obtain all 5 mandatory PASS results for final integrated exact SHA and bundle artifacts",
+    "Require proof before FEATURE_READY, behind=0 target promotion, and C6"
+  ],
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Inspect actual live shader-bound game Draw counters/rejection stage after integrated exact-SHA CI, repair first causal source/compiler/upload blocker; do not spin off WARP or readiness guard task.",
+  "score_change": 0,
+  "note": "Rollovers do not increase ATTEMPT. Saved checkpoint is controller-branch evidence, not FEATURE_READY. Do not duplicate this committed source correction or mark hardware observed."
+}
