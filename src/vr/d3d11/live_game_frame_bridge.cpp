@@ -5,6 +5,7 @@
 #include "live_game_cull_state.hpp"
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_table_fog.hpp"
+#include "live_game_sm3_user_clip.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_sm3_stream_assembly.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
@@ -1291,8 +1292,10 @@ struct LiveSm3Pipeline {
     ComPtr<ID3D11Buffer> pixelIntegers;
     ComPtr<ID3D11Buffer> alphaReference;
     ComPtr<ID3D11Buffer> tableZFogConstants;
+    ComPtr<ID3D11Buffer> userClipConstants;
     unsigned alphaCompare{};
     bool tableZFog{};
+    bool userClip{};
     std::vector<DWORD> vertexTokens, pixelTokens;
     std::vector<D3DVERTEXELEMENT9> declaration;
     std::uint64_t lastUse{}; // Last successfully admitted game shader draw.
@@ -4708,7 +4711,7 @@ std::uint64_t live_sm3_pipeline_identity(
     const ProgrammableShaderFunctionSourceEvidence& vertex,
     const ProgrammableShaderFunctionSourceEvidence& pixel,
     const std::vector<D3DVERTEXELEMENT9>& declaration,
-    unsigned alphaCompare, bool packedFloat4, bool tableZFog) noexcept {
+    unsigned alphaCompare, bool packedFloat4, bool tableZFog, bool userClip) noexcept {
     if (!vertex.exact() || !pixel.exact() || declaration.empty() ||
         alphaCompare > 8u) return 0u;
     std::uint64_t h = 1469598103934665603ull;
@@ -4729,6 +4732,7 @@ std::uint64_t live_sm3_pipeline_identity(
     // instancing and ordinary IA input; never reuse the wrong layout.
     hashBytes(&packedFloat4, sizeof(packedFloat4));
     hashBytes(&tableZFog, sizeof(tableZFog));
+    hashBytes(&userClip, sizeof(userClip));
     return h != 0u ? h : 1u;
 }
 
@@ -4923,7 +4927,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     rejectionStage = 1u;
     DWORD blend = TRUE, alpha = TRUE, stencil = TRUE, depth = TRUE;
-    DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, fill = 0u;
+    DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, clipping = FALSE, fill = 0u;
     DWORD colorMask = 0u, cull = 0u, srgbWrite = TRUE;
     DWORD srcBlend = 0u, dstBlend = 0u, blendOp = 0u, separateAlpha = TRUE;
     DWORD srcBlendAlpha = 0u, dstBlendAlpha = 0u, blendOpAlpha = 0u;
@@ -4937,6 +4941,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         FAILED(game->GetRenderState(D3DRS_FOGENABLE, &fog)) ||
         FAILED(game->GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)) ||
         FAILED(game->GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)) ||
+        FAILED(game->GetRenderState(D3DRS_CLIPPING, &clipping)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fill)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cull)) ||
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
@@ -4977,9 +4982,34 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         }
     }
-    if (clipPlanes != 0u) {
-        ++s.liveSm3StateRejectReasons[2]; // user clip-plane unsupported
+    // The native rasterizer always performs homogeneous clipping. Source
+    // CLIPPING=FALSE cannot be silently treated as ordinary D3D11 clipping.
+    if (clipping != TRUE) {
+        ++s.liveSm3StateRejectReasons[2];
         return false;
+    }
+    NativeSm3UserClip userClip{};
+    if (clipPlanes != 0u) {
+        D3DCAPS9 clipCaps{};
+        std::array<std::array<float, 4>, 6> planes{};
+        if ((clipPlanes & ~0x3fu) != 0u ||
+            FAILED(game->GetDeviceCaps(&clipCaps))) {
+            ++s.liveSm3StateRejectReasons[2];
+            return false;
+        }
+        for (DWORD slot = 0u; slot < 6u; ++slot) {
+            if ((clipPlanes & (1u << slot)) == 0u) continue;
+            if (slot >= clipCaps.MaxUserClipPlanes ||
+                FAILED(game->GetClipPlane(slot, planes[slot].data()))) {
+                ++s.liveSm3StateRejectReasons[2];
+                return false;
+            }
+        }
+        if (!native_sm3_user_clip_admission(
+                clipPlanes, clipCaps.MaxUserClipPlanes, planes, userClip)) {
+            ++s.liveSm3StateRejectReasons[2];
+            return false;
+        }
     }
     if (fill != D3DFILL_SOLID) {
         ++s.liveSm3StateRejectReasons[3]; // wire/point raster unsupported
@@ -5346,7 +5376,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     rejectionStage = 7u;
     const auto key = live_sm3_pipeline_identity(
         vertexEvidence, pixelEvidence, declaration, alphaFunc, repack,
-        tableZFog.enabled);
+        tableZFog.enabled, userClip.active);
     if (!key) return false;
     auto it = s.liveSm3Pipelines.find(key);
     if (it == s.liveSm3Pipelines.end()) {
@@ -5355,7 +5385,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         LiveSm3Pipeline pipeline{};
         if (!compile_native_live_sm3_program(
                 device, vertexEvidence, pixelEvidence, alphaFunc, pipeline.program,
-                tableZFog.enabled))
+                tableZFog.enabled, userClip.active))
             return false;
         if (FAILED(device->CreateInputLayout(
                 input.data(), static_cast<UINT>(input.size()),
@@ -5421,8 +5451,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                            pipeline.tableZFogConstants.GetAddressOf())))
                 return false;
         }
+        if (userClip.active) {
+            D3D11_BUFFER_DESC clipDesc{};
+            clipDesc.ByteWidth = 32u * sizeof(float);
+            clipDesc.Usage = D3D11_USAGE_DEFAULT;
+            clipDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+            if (FAILED(device->CreateBuffer(
+                    &clipDesc, nullptr, pipeline.userClipConstants.GetAddressOf())))
+                return false;
+        }
         pipeline.alphaCompare = alphaFunc;
         pipeline.tableZFog = tableZFog.enabled;
+        pipeline.userClip = userClip.active;
         pipeline.vertexTokens = vertexEvidence.tokens;
         pipeline.pixelTokens = pixelEvidence.tokens;
         pipeline.declaration = declaration;
@@ -5438,7 +5478,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // different live game draw.
     if (pipeline.alphaCompare != alphaFunc ||
         pipeline.tableZFog != tableZFog.enabled ||
+        pipeline.userClip != userClip.active ||
         (tableZFog.enabled && !pipeline.tableZFogConstants) ||
+        (userClip.active && !pipeline.userClipConstants) ||
         (alphaFunc != 0u && !pipeline.alphaReference) ||
         pipeline.vertexTokens != vertexEvidence.tokens ||
         pipeline.pixelTokens != pixelEvidence.tokens ||
@@ -5738,6 +5780,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     ID3D11Buffer* fogBuffer = pipeline.tableZFogConstants.Get();
     context->PSSetConstantBuffers(4u, 1u, &fogBuffer);
+    if (userClip.active)
+        context->UpdateSubresource(pipeline.userClipConstants.Get(),
+                                   0u, nullptr, userClip.constants.data(), 0u, 0u);
+    ID3D11Buffer* clipBuffer = pipeline.userClipConstants.Get();
+    context->VSSetConstantBuffers(4u, 1u, &clipBuffer);
     ID3D11Buffer* alphaBuffer = pipeline.alphaReference.Get();
     context->PSSetConstantBuffers(1u, 1u, &alphaBuffer);
     ID3D11Buffer* vsConstants = pipeline.vertexConstants.Get();

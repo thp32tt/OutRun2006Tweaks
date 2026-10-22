@@ -4812,7 +4812,8 @@ struct NativeLiveSm3Program {
     const ProgrammableShaderFunctionSourceEvidence& vertexSource,
     const ProgrammableShaderFunctionSourceEvidence& pixelSource,
     unsigned alphaCompare,
-    NativeLiveSm3Program& output, bool tableZFog = false) noexcept;
+    NativeLiveSm3Program& output, bool tableZFog = false,
+    bool userClip = false) noexcept;
 
 class NativeBackend final {
     // White-box WARP fixture validates transactional COM ownership without
