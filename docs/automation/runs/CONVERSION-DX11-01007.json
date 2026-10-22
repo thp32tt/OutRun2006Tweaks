@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01007",
+  "production_id": "CONVERSION-DX11-01007",
+  "event_id": "CONVERSION-DX11-01007-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01007",
+  "work_key": "DX11:LIVE_GAME_SM3_PIXEL_ODEPTH_NATIVE_DSV",
+  "feature_id": "DX11:LIVE_GAME_SM3_PIXEL_ODEPTH_NATIVE_DSV",
+  "classification": "A",
+  "work_class": "integration",
+  "milestone_id": "full_resolution_native_game_frame",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "1a5eafbf4cc64c2592999c184337d31a178c6e52",
+  "material_result_sha": "d084322d29856ad29e5368160e403ad147ac4211",
+  "validation_bearing_result_sha": "d084322d29856ad29e5368160e403ad147ac4211",
+  "result_sha": "d084322d29856ad29e5368160e403ad147ac4211",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "score_change": 1,
+  "summary": "Implemented native D3D11 SM3 real-game pixel oDepth.x -> SV_Depth alongside independent color output and source-authenticated writable DSV for original programmable D3D9 Draw/DrawIndexed. Conditional/malformed depth, absent or write-disabled source Z, unsupported alpha test/fog remain fail-closed with original D3D9 game drawing/gamepad/FFB. All five GitHub Actions succeed on one exact material SHA; runtime game and Quest3/VDXR HMD not performed.",
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_depth_output.hpp",
+    "tools/dx11_live_sm3_depth_01007.cpp",
+    "tools/test_dx11_live_sm3_depth_01007.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_GAME_SM3_PIXEL_ODEPTH_NATIVE_DSV",
+    "goal": "Preserve game-authored D3D9 programmable pixel depth output in native D3D11 Draw/DrawIndexed instead of rejecting every oDepth frame, while forbidding unsafe native promotion and keeping game input/DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "source_oDepth_native_gpu_depth",
+        "category": "end_to_end_behavior",
+        "behavior_area": "source_SM3_pixel_shader_native_HLSL_GPU_DSV",
+        "expected_behavior": "Decode genuine source oDepth.x with independent fully written COLOROUT; emit native PS SV_Depth on genuine native Draw/DrawIndexed using source and native depth ownership."
+      },
+      {
+        "id": "original_game_depth_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "unsupported_D3D9_depth_gamepad_FFB",
+        "expected_behavior": "Fail closed for malformed/predicated/flow depth, missing/nonwritable Z, non-proven fog/alpha while leaving original D3D9 source Draw and input authoritative."
+      },
+      {
+        "id": "same_SHA_ci",
+        "category": "integrated_validation",
+        "behavior_area": "portable_CXX_structural_GitHub_actions",
+        "expected_behavior": "Portable positive/negative C++ tests, native live source-to-HLSL-to-GPU structural check, all five exact-SHA mandatory Actions SUCCESS."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_oDepth_native_gpu_depth": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_backend.hpp"
+      ],
+      "runtime_validation": "UNTESTED"
+    },
+    "original_game_depth_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_sm3_depth_output.hpp",
+        "tools/dx11_live_sm3_depth_01007.cpp",
+        "tools/test_dx11_live_sm3_depth_01007.py"
+      ],
+      "runtime_validation": "UNTESTED"
+    },
+    "same_SHA_ci": {
+      "status": "PASS_EXACT_SHA",
+      "validation_bearing_result_sha": "d084322d29856ad29e5368160e403ad147ac4211",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_live_sm3_depth_01007.py"
+      ],
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Authentic D3D9 programmable SM3 oDepth source -> HLSL PS color+SV_Depth outputs",
+      "Live depth state + native DSV admission -> real guarded native GPU Draw/DrawIndexed -> original D3D9Ex fallback"
+    ],
+    "batch_components": [
+      "Native C++ SM3 shader parser/translation and D3D11 shader object",
+      "Real-game bridge native DSV validation + positive/negative C++ and CI wiring"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native C++/GPU source and five exact-SHA Gates PASS (actual game pixels UNTESTED)",
+      "negative_regression": "Malformed conditional depth and unsupported game states keep D3D9 Draw/input fallback",
+      "component_integration": "Real shader source -> native SV_Depth output -> writable owned DSV -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SM3_PIXEL_ODEPTH_NATIVE_DSV"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED; REAL_GAME_NATIVE_PIXEL_AND_HMD_UNTESTED",
+    "activation_guard_and_fallback": "Opt-in only, guarded and fail-closed, original D3D9Ex renderer/input/FFB authoritative."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "material_source_commit": "d084322d29856ad29e5368160e403ad147ac4211",
+    "validation_bearing_exact_sha": "d084322d29856ad29e5368160e403ad147ac4211",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39758389265,
+        "conclusion": "success",
+        "sha": "d084322d29856ad29e5368160e403ad147ac4211"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39758389162,
+        "conclusion": "success",
+        "sha": "d084322d29856ad29e5368160e403ad147ac4211"
+      },
+      {
+        "name": "Build",
+        "run_id": 39758389409,
+        "conclusion": "success",
+        "sha": "d084322d29856ad29e5368160e403ad147ac4211"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39758389182,
+        "conclusion": "success",
+        "sha": "d084322d29856ad29e5368160e403ad147ac4211"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39758389262,
+        "conclusion": "success",
+        "sha": "d084322d29856ad29e5368160e403ad147ac4211"
+      }
+    ],
+    "optional_isolated_warp": {
+      "run_id": 39758389252,
+      "conclusion": "success",
+      "sha": "d084322d29856ad29e5368160e403ad147ac4211"
+    }
+  },
+  "RUNTIME_VALIDATION_NOTES": "No OutRun real game, gamepad, Quest3/VDXR hardware or 72Hz performance session performed. Full contiguous native menu/car/race frame and stereo promotion NOT proven.",
+  "next_implementation_action": "Continue independently owned unfinished full menu->car->race programmable Draw coverage and native L/R OpenXR path; do not restart 01007 or treat oDepth translation as complete game renderer."
+}
