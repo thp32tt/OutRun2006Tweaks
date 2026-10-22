@@ -944,8 +944,18 @@ bool build_r283_sm3_mov_shader_source(
                 opcode = NativeSm3ArithmeticOpcode::Reciprocal; sourceCount = 1u; break;
             case D3DSIO_RSQ:
                 opcode = NativeSm3ArithmeticOpcode::ReciprocalSquareRoot; sourceCount = 1u; break;
+            case D3DSIO_EXPP:
+                // vs_3_0 EXPP has the same scalar 2^x result as EXP,
+                // with a weaker precision guarantee. Full exp2 is safe.
+                if (!vertexStage) return false;
+                opcode = NativeSm3ArithmeticOpcode::Exponential2; sourceCount = 1u; break;
             case D3DSIO_EXP:
                 opcode = NativeSm3ArithmeticOpcode::Exponential2; sourceCount = 1u; break;
+            case D3DSIO_LOGP:
+                // vs_3_0 LOGP is scalar log2(abs(x)); full-precision LOG
+                // already handles zero's D3D9 -FLT_MAX result.
+                if (!vertexStage) return false;
+                opcode = NativeSm3ArithmeticOpcode::Logarithm2; sourceCount = 1u; break;
             case D3DSIO_LOG:
                 opcode = NativeSm3ArithmeticOpcode::Logarithm2; sourceCount = 1u; break;
             case D3DSIO_POW:
