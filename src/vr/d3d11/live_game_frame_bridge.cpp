@@ -5099,7 +5099,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                const void* bytes, UINT stride, UINT vertexCount,
                                const std::uint32_t* indices, UINT indexCount,
                                std::uint64_t sourceOrdinal,
-                               const NativeGameAdditionalStreams* extra) noexcept {
+                               const NativeGameAdditionalStreams* extra,
+                               const ComPtr<IDirect3DVertexShader9>& vertexShader,
+                               const ComPtr<IDirect3DPixelShader9>& pixelShader) noexcept {
     // Preserve exact one-bucket cause evidence through every early return and
     // exception, without changing the game's D3D9 Draw or controller input.
     unsigned rejectionStage = 0u;
@@ -5421,13 +5423,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                        static_cast<LONG>(r), static_cast<LONG>(b)};
     }
     rejectionStage = 5u;
-    ComPtr<IDirect3DVertexShader9> vertexShader;
-    ComPtr<IDirect3DPixelShader9> pixelShader;
+    // Reuse the exact COM shader pair captured at the game Draw observer.
+    // A second query could compile a different pair than the source ordinal.
     ComPtr<IDirect3DVertexDeclaration9> sourceDecl;
-    if (FAILED(game->GetVertexShader(vertexShader.GetAddressOf())) ||
-        FAILED(game->GetPixelShader(pixelShader.GetAddressOf())) ||
+    if (!vertexShader || !pixelShader ||
         FAILED(game->GetVertexDeclaration(sourceDecl.GetAddressOf())) ||
-        !vertexShader || !pixelShader || !sourceDecl) return false;
+        !sourceDecl) return false;
     UINT count = MAXD3DDECLLENGTH;
     std::vector<D3DVERTEXELEMENT9> declaration(count);
     if (FAILED(sourceDecl->GetDeclaration(declaration.data(), &count)) ||
@@ -7350,12 +7351,19 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         if (fullMode) {
             ComPtr<IDirect3DVertexShader9> liveVs;
             ComPtr<IDirect3DPixelShader9> livePs;
-            if (SUCCEEDED(game->GetVertexShader(liveVs.GetAddressOf())) &&
-                SUCCEEDED(game->GetPixelShader(livePs.GetAddressOf())) &&
-                (liveVs || livePs)) {
+            const HRESULT vertexQuery = game->GetVertexShader(liveVs.GetAddressOf());
+            const HRESULT pixelQuery = game->GetPixelShader(livePs.GetAddressOf());
+            // An unknown source shader state is NOT fixed function. Never
+            // fabricate FVF pixels after a D3D9 COM query failure.
+            if (FAILED(vertexQuery) || FAILED(pixelQuery)) {
+                s.frameBatch.abort();
+                ++s.failed;
+                return;
+            }
+            if (liveVs || livePs) {
                 if (!submit_live_sm3_game_draw(
                         s, game, type, expectedElements, bytes, stride, vertexCount,
-                        indices, indexCount, sourceOrdinal, extra)) {
+                        indices, indexCount, sourceOrdinal, extra, liveVs, livePs)) {
                     s.frameBatch.abort();
                     ++s.failed;
                 }

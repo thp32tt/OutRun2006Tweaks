@@ -23,8 +23,8 @@ for condition in (
     "liveBatch.accepts_source_draw(", "s.preDrawFills.count != 0u",
     "GetVertexDeclaration(", "GetVertexShaderConstantF(",
     "GetPixelShaderConstantF(", "capture_live_sm3_sampler(",
-    "mirror_texture(", "CreateInputLayout(", "GetVertexShader(",
-    "GetPixelShader(", "context->Draw(", "context->DrawIndexed(",
+    "mirror_texture(", "CreateInputLayout(", "vertexShader.Get()",
+    "pixelShader.Get()", "context->Draw(", "context->DrawIndexed(",
     "context->PSSetShaderResources(0u, 16u,", "context->PSSetSamplers(0u, 16u,",
     "context->VSSetConstantBuffers(", "context->PSSetConstantBuffers(",
     "liveBatch.succeeded(", "liveBatch.record_source_draw(sourceOrdinal)",
@@ -60,6 +60,22 @@ for rejection in (
     "pipeline.vertexTokens != vertexEvidence.tokens",
 ):
     check(rejection in source, "missing fail-closed source/state rejection: " + rejection)
+
+# A real Draw must use the same VS/PS COM identities for routing and native
+# compiler materialization. Query failure must not fall back to fabricated FVF.
+observer = bridge.split("void observe(IDirect3DDevice9* game,", 1)[1].split(
+    "D3DVIEWPORT9 vp{}", 1)[0]
+check("const HRESULT vertexQuery = game->GetVertexShader(liveVs.GetAddressOf());" in observer and
+      "const HRESULT pixelQuery = game->GetPixelShader(livePs.GetAddressOf());" in observer and
+      "if (FAILED(vertexQuery) || FAILED(pixelQuery))" in observer and
+      "s.frameBatch.abort();" in observer and
+      "sourceOrdinal, extra, liveVs, livePs)" in observer,
+      "failed source shader COM query must not submit a fabricated FVF Draw")
+check("const ComPtr<IDirect3DVertexShader9>& vertexShader" in bridge and
+      "const ComPtr<IDirect3DPixelShader9>& pixelShader" in bridge and
+      "game->GetVertexShader(" not in source and
+      "game->GetPixelShader(" not in source,
+      "native SM3 source shader was re-queried after source-ordinal capture")
 
 # 01004: D3D9 menu/car/race shader identities can exceed the 64-resident
 # budget. The OLD unconditional >=64 rejection was a native-frame starvation
