@@ -10,6 +10,7 @@ on:
       - feature/dx11-00973-live-cube-rt-game-frame
       - feature/dx11-00974-live-cube-color-frame
       - feature/dx11-00975-live-sm3-volume-frame
+      - feature/dx11-01013-live-sm3-game-frame
     paths:
       - 'src/vr/d3d11/**'
       - 'src/vr/d3d9/stereo_renderer_r30.cpp'
