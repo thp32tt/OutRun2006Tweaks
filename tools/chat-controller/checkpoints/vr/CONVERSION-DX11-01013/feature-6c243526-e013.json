@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "kind": "assistant_feature_material_checkpoint",
+  "task_id": "CONVERSION-DX11-01013",
+  "production_id": "CONVERSION-DX11-01013",
+  "event_id": "CONVERSION-DX11-01013-E013",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+  "feature_stage": "SOURCE_IMPLEMENTATION_IN_PROGRESS",
+  "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "feature_last_head": "6c243526e75f8db2aa2a28bd2dbf00f9f90c72a1",
+  "game_material_source_sha": "e8cce7b55fd000c0f31106a13b2161f37388d7c3",
+  "new_material_ci_repair_sha": "6c243526e75f8db2aa2a28bd2dbf00f9f90c72a1",
+  "material_changed_files": [
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/vr-openxr.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/outrun-exe-hud-inspector.yml"
+  ],
+  "reason": "01013 feature branch was absent from Backend/OpenXR push filters and backend DX11 acceptance if-guards; Build/HUD same-ref cancellation caused prior 01013 exact SHA runs to cancel. Fixed only on existing feature branch; preserved existing code and DX9Ex fail-closed opt-in.",
+  "validation": {
+    "source_repair_sha": "6c243526e75f8db2aa2a28bd2dbf00f9f90c72a1",
+    "dx11_fast": {
+      "run_id": 39819589276,
+      "status": "PASS_EXACT_SHA"
+    },
+    "windows_build": {
+      "run_id": 39819589396,
+      "status": "IN_PROGRESS_AS_LAST_CHECKED"
+    },
+    "hud_inspector": {
+      "run_id": 39819589513,
+      "status": "IN_PROGRESS_AS_LAST_CHECKED"
+    },
+    "backend_conversion_gate": {
+      "run_id": 39819589532,
+      "status": "IN_PROGRESS_AS_LAST_CHECKED"
+    },
+    "openxr": {
+      "run_id": 39819589509,
+      "status": "IN_PROGRESS_AS_LAST_CHECKED"
+    }
+  },
+  "remaining_acceptance_items": [
+    "Complete exact-SHA remaining four Windows/OpenXR gates; fix only actual CI failures",
+    "Respect unreleased R175 TEXCOORD6 color parity 00477 ownership; no duplicate code",
+    "Observe real-game Draw/DrawIndexed eligible_state_draws>0 and native_draws>0, then published full-size native menu/car/race frames>0 with no unsupported source gaps",
+    "Verify independent left/right eye source images and GPU consumer ACK/fence in Quest3 VDXR",
+    "Prove untranslatable source/state fallback and input/FFB preserved",
+    "Only after integrated acceptance and five PASS + artifact evidence compare behind=0 and fast-forward target with expected SHA"
+  ],
+  "next_action": "Inspect exact 6c243526 remaining four Action conclusions/job failures. If failed, repair same TASK_ID on feature and rerun mandatory exact-SHA gates; otherwise continue real D3D9 Draw -> D3D11 full game-size visible frame implementation and collect actual game runtime evidence before FEATURE_READY. Never call Fast PASS playable-game proof.",
+  "feature_ready": false,
+  "target_promoted": false,
+  "runtime_validation": "UNTESTED",
+  "score_change": 0
+}
