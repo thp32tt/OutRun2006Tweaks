@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01013",
   "production_id": "CONVERSION-DX11-01013",
-  "event_id": "CONVERSION-DX11-01013-E005",
+  "event_id": "CONVERSION-DX11-01013-E009",
   "event_type": "rollover",
   "lane": "DX11",
   "attempt": "1/3",
@@ -13,20 +13,23 @@
   "work_key": "DX11:R175_UNBLOCK_OR_FIRST_VISIBLE_GAME_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
-  "material_source_sha": "ce03d84dd51218dd3396dc9e11a830d8cb6f9d30",
+  "material_source_sha": "afd55ef95d291192a41e8f9836c5ad24ba2b3b8f",
   "source_implementation": {
-    "status": "CHECKPOINT_TARGETED_COMPILE_PASS",
-    "implementation_scope": "Native Draw/DrawIndexed authentic D3D9 SM3 VS/PS instruction translation",
+    "status": "CHECKPOINT_LOCAL_PORTABLE_NOP_PROBE_PASS",
+    "implementation_scope": "Original real-game SM3 VS/PS stage arithmetic (NRM/LOG/RCP/RSQ), legal no-payload NOP translation and live native Draw stream integration (INCOMPLETE)",
     "changed_files": [
       "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
       "src/vr/d3d11/native_backend.cpp",
-      "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
+      "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+      "src/vr/d3d11/native_sm3_nop.hpp",
+      "tools/dx11_sm3_nop_probe_01013.cpp"
     ],
     "behaviors": [
       "NRM source xyz denominator normalized into every game-written xyzw destination component; source.w provenance enforced for w writes, zero reciprocal norm saturates FLT_MAX",
       "LOG(0) preserves D3D9 negative FLT_MAX instead of HLSL -INF",
       "Original D3D9 renderer, fail-closed opt-in activation and input/FFB fallback unchanged",
-      "Live real-game native SM3 VS3 RCP/RSQ zero returns FLT_MAX while PS3 retains infinity; pass authentic shader stage through native_backend.cpp into shared scalar shader codegen and regress both paths."
+      "Live real-game native SM3 VS3 RCP/RSQ zero returns FLT_MAX while PS3 retains infinity; pass authentic shader stage through native_backend.cpp into shared scalar shader codegen and regress both paths.",
+      "The existing native_backend.cpp real D3D9 SM3 instruction-stream decoder now accepts exact zero-payload D3DSIO_NOP without changing register state/flow/Draw order and rejects predicated/reserved-bit/operand NOP; opt-in original DX9Ex fallback unchanged."
     ],
     "observed_native_game_draw_count": "UNTESTED",
     "observed_native_published_frame_count": "UNTESTED"
@@ -45,8 +48,8 @@
     "note": "Non-Windows portable probe only; production native_backend.cpp Windows build not yet executed."
   },
   "ci": {
-    "status": "NOT_COMPLETE_NO_FEATURE_READY",
-    "note": "Do not run five mandatory exact-SHA workflows until cohesive live game full-frame feature is ready. This feature branch may have separate Fast smoke, which does not complete acceptance."
+    "status": "PARTIAL_FEATURE_FAST_SUCCESS",
+    "note": "Exact source SHA afd55ef95d291192a41e8f9836c5ad24ba2b3b8f DX11 Fast Structural Checks run 39809262755 SUCCESS; Build run 39809262712 and HUD Inspector 39809262858 pending at checkpoint. Five mandatory integrated feature CI and game output acceptance not complete."
   },
   "remaining_acceptance_items": [
     "Resolve live R175 TEXCOORD6 color parity only with 00477 owner release; do not duplicate owner work",
@@ -57,24 +60,26 @@
     "Complete five mandatory exact-SHA Actions and artifacts before compare behind=0 safe target promotion"
   ],
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "real_game_draw_blocker": "Current native full game image/coverage not observed on hardware. Portable stage-specific RCP/RSQ codegen fix compiled and passed; Windows exact-SHA workflows/runtime remain pending.",
-  "next_implementation_action": "On 01013 feature branch, diagnose real game full frame coverage and live native SM3 Draw early-return bucket; implement first missing real shader/state path (never duplicate 00477). Preserve opt-in fail-closed DX9Ex. Finish exact-SHA five-Gate and FEATURE_READY only after acceptance.",
+  "real_game_draw_blocker": "No actual game/HMD launch on source SHA: eligible_state_draws, native_draws and published full native menu/race frames all UNTESTED. Zero-payload SM3 NOP acceptance is implemented but actual game usage not yet demonstrated; next focus actual real shader/state rejection evidence.",
+  "next_implementation_action": "Continue real-game early-rejection diagnosis from authentic Draw counters and game source-state capture; implement the next confirmed missing SM3 shader/state or visible full-frame bridge path, without touching 00477 R175 TEXCOORD6 owner; preserve original D3D9 fallback. Verify native_draws>0 and published real frames before FEATURE_READY.",
   "feature_ready": false,
   "target_promoted": false,
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "status": "IN_PROGRESS",
   "checkpoint": "C2_IMPLEMENT",
-  "notes": "Recovery E005, ATTEMPT 1/3. Material ce03d84 has N100 portable source-probe PASS; real gameplay/HMD UNTESTED. Dev strategy+feature contract added to repair actual Fast Gate allocation validation; feature not READY.",
-  "chat_rollovers": 3,
-  "previous_material_source_sha": "9ecf5cf96ac167cb0ff2d3d38e7298614498e31f",
+  "notes": "Rollover E009 ATTEMPT 1/3. New material source afd55ef95d291192a41e8f9836c5ad24ba2b3b8f authentic game SM3 NOP admission and portable test PASS; Fast source SHA success, final integration and all real-game/HMD work pending. Original R175 00477 owner not changed. No feature ready and no score award.",
+  "chat_rollovers": 5,
+  "previous_material_source_sha": "ce03d84dd51218dd3396dc9e11a830d8cb6f9d30",
   "work_class": "integration",
   "classification": "A",
   "changed_files": [
     "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
     "src/vr/d3d11/native_backend.cpp",
     "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
-    "docs/automation/runs/CONVERSION-DX11-01013.json"
+    "docs/automation/runs/CONVERSION-DX11-01013.json",
+    "src/vr/d3d11/native_sm3_nop.hpp",
+    "tools/dx11_sm3_nop_probe_01013.cpp"
   ],
   "development_strategy": {
     "work_class": "integration",
@@ -132,6 +137,19 @@
       }
     ]
   },
-  "automation_validation": "PENDING_EXACT_SHA",
-  "full_dx11_renderer_complete": false
+  "automation_validation": "PENDING_FINAL_EXACT_SHA_FIVE_GATES",
+  "full_dx11_renderer_complete": false,
+  "targeted_validation_latest": {
+    "status": "PASS",
+    "executor": "ChatGPT local x86_64 g++17 isolated exact-layout C++ unit (NOT Windows native_backend.cpp compilation)",
+    "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_nop_probe_01013.cpp -o /tmp/dx11_01013/nop_probe_exact_layout && /tmp/dx11_01013/nop_probe_exact_layout",
+    "compiled_and_executed": true,
+    "evidence_paths": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_nop.hpp",
+      "tools/dx11_sm3_nop_probe_01013.cpp"
+    ],
+    "windows_build_validation": "PENDING_GITHUB_ACTIONS",
+    "runtime_validation": "UNTESTED"
+  }
 }
