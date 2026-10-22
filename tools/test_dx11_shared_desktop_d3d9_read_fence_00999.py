@@ -15,7 +15,10 @@ def correct(s: str) -> bool:
         return False
     part = s[start:end]
     init = part.find("ex->CreateQuery(D3DQUERYTYPE_EVENT,")
-    fence = part.find("if (d3d9ReadPending_)")
+    fence = part.find("if (d3d9ReadPending_)", init)
+    # The 01000 generation-change path has its own earlier GPU retirement.
+    # This legacy same-generation regression must still exercise the read
+    # fence AFTER creation of the new allocation, before CopyResource.
     read = part.find("d3d9ReadFence_->GetData(", fence)
     d3d11_copy = part.find("context->CopyResource(source_.Get(), readySource)")
     failure = part.find("if (FAILED(game->StretchRect(\n                    sharedSurface.Get()")
@@ -58,6 +61,13 @@ for token in (
     "d3d9ReadFence_->Issue(D3DISSUE_END)",
     "backups_[i].Get(), nullptr, backbuffer,",
 ):
-    mutant = source.replace(token, "/* dropped consumer sync */", 1)
+    # Mutate the SAME-GENERATION consumer read fence, not the earlier
+    # cross-generation retirement branch introduced in 01000. Both paths
+    # remain independently covered by destructive source checks.
+    start = source.find("ex->CreateQuery(D3DQUERYTYPE_EVENT,")
+    index = source.find(token, start)
+    assert start >= 0 and index >= 0, token
+    mutant = (source[:index] + "/* dropped consumer sync */" +
+              source[index + len(token):])
     assert mutant != source and not correct(mutant), token
 print("PASS: D3D9Ex read fence, bounded fallback, rollback and reset")
