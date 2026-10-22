@@ -599,15 +599,26 @@ constexpr bool sm3_live_blend_regression() noexcept {
         b.BlendOp != D3D11_BLEND_OP_MAX ||
         b.BlendOpAlpha != D3D11_BLEND_OP_MAX) return false;
     const auto saved = b;
-    return !sm3_live_blend_desc(0xdeadbeefu, D3DBLEND_ONE,
-                D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) &&
-           !sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
-                0xffffffffu, false, 0u, 0u, 0u, b) &&
-           !sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
-                D3DBLENDOP_ADD, true, D3DBLEND_SRCCOLOR,
-                D3DBLEND_ONE, D3DBLENDOP_ADD, b) &&
-           saved.SrcBlend == b.SrcBlend &&
-           saved.SrcBlendAlpha == b.SrcBlendAlpha;
+    // Invalid game state must fail closed without modifying the last valid
+    // output. Independent-alpha SRCCOLOR is now a *valid* alias, so do not
+    // confuse its acceptance with the still-invalid SRCALPHASAT case.
+    if (sm3_live_blend_desc(0xdeadbeefu, D3DBLEND_ONE,
+            D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) ||
+        sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
+            0xffffffffu, false, 0u, 0u, 0u, b) ||
+        sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
+            D3DBLENDOP_ADD, true, D3DBLEND_SRCALPHASAT,
+            D3DBLEND_ONE, D3DBLENDOP_ADD, b) ||
+        saved.SrcBlend != b.SrcBlend ||
+        saved.SrcBlendAlpha != b.SrcBlendAlpha)
+        return false;
+    return sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
+               D3DBLENDOP_ADD, true, D3DBLEND_SRCCOLOR,
+               D3DBLEND_ONE, D3DBLENDOP_ADD, b) &&
+           b.SrcBlend == D3D11_BLEND_ONE &&
+           b.DestBlend == D3D11_BLEND_ONE &&
+           b.SrcBlendAlpha == D3D11_BLEND_SRC_ALPHA &&
+           b.DestBlendAlpha == D3D11_BLEND_ONE;
 }
 static_assert(sm3_live_blend_regression(),
               "Game RGB/independent alpha OM translation must fail closed");
