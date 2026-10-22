@@ -10,13 +10,13 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00996",
   "work_key": "DX11:MAIN_GAME_CLIPPED_TARGET_Z_STENCIL_NATIVE_GPU",
   "feature_id": "DX11_NATIVE_LIVE_MAIN_CLIPPED_TARGET_Z_STENCIL_FRAME_CONTINUITY",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_EXACT_SHA_GATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_head": "0fe89ac5f51eed6c61d4e8ec70689adc9cdca373",
   "material_result_sha": "245a9b8b081a20ed7aca4020c8e3c14576bb3843",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "4b91a60a7a9fba87bb1e0fb162a91d8569673639",
   "result_sha": "245a9b8b081a20ed7aca4020c8e3c14576bb3843",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "hmd_test_performed": false,
@@ -25,7 +25,7 @@
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "score_change": 0,
-  "summary": "00996 material C++ 245a9b8b fixes game-authoritative post-Draw cropped TARGET|STENCIL, Z|STENCIL, TARGET|Z|STENCIL native full-frame continuity with bounded D3D11.0 and D3D11.1 GPU updates. Canonical main Z/S owner, native D32 ownership and source regions gate every mutation; D3D9 original Clear/FFB/gamepad/SkyGlow/DX9Ex fallback remain authoritative. Exact-SHA five GitHub Actions pending; game/Quest3 untested.",
+  "summary": "00996 material C++ 245a9b8b fixes game-authoritative post-Draw cropped TARGET|STENCIL, Z|STENCIL, TARGET|Z|STENCIL native full-frame continuity with bounded D3D11.0 and D3D11.1 GPU updates. Canonical main Z/S owner, native D32 ownership and source regions gate every mutation; D3D9 original Clear/FFB/gamepad/SkyGlow/DX9Ex fallback remain authoritative. All five mandatory GitHub Actions SUCCESS on exact SHA 4b91a60a7a9fba87bb1e0fb162a91d8569673639; game/Quest3 runtime UNTESTED.",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_main_stencil_clear.hpp",
@@ -97,26 +97,52 @@
     "activation_guard_and_fallback": "Opt-in full native diagnostics only; fail closed on unknown stencil dependencies, source device/RT or D32 mismatch. Game-original D3D9 Draw/Present/input/FFB and DX9Ex fallback unaffected."
   },
   "ci": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
     "material_source_commit": "245a9b8b081a20ed7aca4020c8e3c14576bb3843",
     "required": [
-      "DX11 Fast Structural Checks",
-      "Backend Conversion Gate",
-      "Build",
-      "OpenXR VR architecture",
-      "OutRun EXE HUD Inspector CI"
-    ]
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39707561215,
+        "conclusion": "success",
+        "sha": "4b91a60a7a9fba87bb1e0fb162a91d8569673639"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39707561224,
+        "conclusion": "success",
+        "sha": "4b91a60a7a9fba87bb1e0fb162a91d8569673639"
+      },
+      {
+        "name": "Build",
+        "run_id": 39707561245,
+        "conclusion": "success",
+        "sha": "4b91a60a7a9fba87bb1e0fb162a91d8569673639"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39707561230,
+        "conclusion": "success",
+        "sha": "4b91a60a7a9fba87bb1e0fb162a91d8569673639"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39707561234,
+        "conclusion": "success",
+        "sha": "4b91a60a7a9fba87bb1e0fb162a91d8569673639"
+      }
+    ],
+    "validation_bearing_exact_sha": "4b91a60a7a9fba87bb1e0fb162a91d8569673639"
   },
   "pipeline": {
     "C0_RECOVER": "PASS remote GitHub 00995 terminal and owner HEAD",
     "C1_REVIEW": "PASS missing main clipped stencil-combined source Clear continuity",
     "C2_IMPLEMENT": "SOURCE_COMMITTED 245a9b8b081a20ed7aca4020c8e3c14576bb3843",
-    "C3_VALIDATE": "PENDING five exact-SHA GitHub Actions",
-    "C4_COMMIT": "Material commit linked, final validation-bearing SHA upon record publication",
-    "C5_PACKAGE": "NOT_REQUIRED; Quest3 runtime unavailable",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C3_VALIDATE": "PASS_EXACT_SHA: all five mandatory GitHub Actions push workflows SUCCESS on 4b91a60a7a9fba87bb1e0fb162a91d8569673639; runtime UNTESTED.",
+    "C4_COMMIT": "PASS material source 245a9b8b081a20ed7aca4020c8e3c14576bb3843; validation-bearing exact SHA 4b91a60a7a9fba87bb1e0fb162a91d8569673639; C6 bookkeeping [skip ci] only, no new build/CI.",
+    "C5_PACKAGE": "NOT_REQUIRED; game/Quest3 runtime unavailable; user deploys independently.",
+    "C6_STATE": "PASS_EXACT_SHA; COMPLETE_BUILD_VERIFIED; HMD and gameplay runtime UNTESTED; prior blocker TERMINAL_STATUS_NOT_COMPLETE resolved."
   },
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "feature_stage": "SOURCE_IMPLEMENTED_NEEDS_CI_AND_RUNTIME"
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST"
 }
