@@ -1,0 +1,402 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T1815KST-SHA8",
+  "timestamp_kst": "2026-10-22T18:20:23.983381+09:00",
+  "role": "C1",
+  "branch": "korean-localization-recovery-20260928",
+  "source_of_candidates": "N100 work/image-src/text_roi_batches/candidate_outputs/A,B",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "scope": "Independent lightweight QA of 8 distinct newly persisted A/B Korean PNG candidates, no production queue consumption, no ImageGen",
+  "summary": {
+    "reviewed": 8,
+    "previously_reviewed_sha_excluded": 391,
+    "available_unreviewed_at_inventory": 67,
+    "source_sha_matches_manifest": 8,
+    "candidate_sha_matches_export": 8,
+    "candidate_png_rgba": 8,
+    "readable_and_approved_korean_text": 8,
+    "source_single_phrase_roi": 0,
+    "canvas_dimensions_match": 0,
+    "c1_final_pass": 0,
+    "hold_or_fail_source_roi": 8,
+    "dds_generated": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "n100_metrics": "work/c1_20261022_1815/metrics.json",
+    "n100_comparisons": [
+      "work/c1_20261022_1815/compare_1.jpg",
+      "work/c1_20261022_1815/compare_2.jpg",
+      "work/c1_20261022_1815/compare_3.jpg",
+      "work/c1_20261022_1815/compare_4.jpg"
+    ],
+    "data_provenance": "N100 persisted byte SHA-256, source mapping manifest, export receipts, manual visual review of generated 2-up contact sheets"
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "ordinal": 194,
+      "source_file": "Q097_ba81b81a13e85d54_source.png",
+      "candidate_file": "Q097_ba81b81a13e85d54_source_k.png",
+      "english": "NORMAL",
+      "approved_korean": "일반",
+      "candidate_sha256": "8128d2daa7901d13af4d94de10fe2020c1a58f155f2e9ae6a4e79d1d78366613",
+      "source_sha256": "16568e406e9fec35f29149fa39c5102e59987131c009e33f3541c825f21f9b53",
+      "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "source_dimensions": [
+        899,
+        510
+      ],
+      "candidate_dimensions": [
+        1672,
+        941
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        561,
+        169,
+        1425,
+        714
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "korean_text_readable": true,
+      "approved_translation_matches_visible_korean": true,
+      "translation_length_difference_ignored": true,
+      "canvas_size_changed": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_PROTECTED_ART_MULTILABEL",
+      "reason": "Source NORMAL appears with TUNED/RANDOM buttons, controller/steering imagery and panels; only the Korean lettering is isolated. Original protected art cannot be used as direct single-phrase ROI.",
+      "full_c1_pass": false,
+      "composition_placement": "UNTESTED_NO_PIXEL_ALIGNED_SINGLE_PHRASE_ROI"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "ordinal": 195,
+      "source_file": "Q097_9046d2c60a4714be_source.png",
+      "candidate_file": "Q097_9046d2c60a4714be_source_k.png",
+      "english": "Automatic",
+      "approved_korean": "자동",
+      "candidate_sha256": "a5d6e3e4e97afd6ea981dd28fbc45be4c04cf5467b7bed05795609bf5f254e9d",
+      "source_sha256": "740e0f50451a80f7fa2972ad6d5774b5ae1ace705381be3025725e473c22a394",
+      "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "source_dimensions": [
+        967,
+        534
+      ],
+      "candidate_dimensions": [
+        1672,
+        941
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        25,
+        137,
+        1562,
+        837
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "korean_text_readable": true,
+      "approved_translation_matches_visible_korean": true,
+      "translation_length_difference_ignored": true,
+      "canvas_size_changed": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "reason": "Automatic is in a source containing 288GTO, Testarossa, F40, device/control artwork and a yellow panel; not a single phrase ROI.",
+      "full_c1_pass": false,
+      "composition_placement": "UNTESTED_NO_PIXEL_ALIGNED_SINGLE_PHRASE_ROI"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "ordinal": 196,
+      "source_file": "Q097_03f281f5bc62e168_source.png",
+      "candidate_file": "Q097_03f281f5bc62e168_source_k.png",
+      "english": "RANDOM",
+      "approved_korean": "무작위",
+      "candidate_sha256": "eb924369c9b0ccf46b24a925e6cb91d9bb88781c362400eae306c67f8342a5b4",
+      "source_sha256": "033f79a67fe8f5fb1b27b3860d2fecd0f8c6ed1ec4d9b285df0212d3410d0d37",
+      "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "source_dimensions": [
+        610,
+        445
+      ],
+      "candidate_dimensions": [
+        1448,
+        1086
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        376,
+        120,
+        1299,
+        697
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "korean_text_readable": true,
+      "approved_translation_matches_visible_korean": true,
+      "translation_length_difference_ignored": true,
+      "canvas_size_changed": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "reason": "RANDOM shares source crop with partial NORMAL panel, game-controller art, question-mark icon and bottom controls.",
+      "full_c1_pass": false,
+      "composition_placement": "UNTESTED_NO_PIXEL_ALIGNED_SINGLE_PHRASE_ROI"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "ordinal": 197,
+      "source_file": "Q161_6b26e2d669ced156_source.png",
+      "candidate_file": "Q161_6b26e2d669ced156_source_k.png",
+      "english": "LIBRA",
+      "approved_korean": "천칭자리",
+      "candidate_sha256": "133bfc5e2fc5cf29a49026a43c2234218bbd9f8a9d601e8e65092a13121d02aa",
+      "source_sha256": "e7bbb7a2dffb810b881c9ef3cb508e9c666c43c033e0e3e47f480e390ed34feb",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_dimensions": [
+        829,
+        190
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        73,
+        138,
+        1056,
+        587
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "korean_text_readable": true,
+      "approved_translation_matches_visible_korean": true,
+      "translation_length_difference_ignored": true,
+      "canvas_size_changed": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "reason": "LIBRA source contains GEMINI and SAGITTARIUS labels in the same crop; one-to-one mapping to a unique isolated English phrase is not established.",
+      "full_c1_pass": false,
+      "composition_placement": "UNTESTED_NO_PIXEL_ALIGNED_SINGLE_PHRASE_ROI"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "ordinal": 198,
+      "source_file": "Q161_72168a7e71342541_source.png",
+      "candidate_file": "Q161_72168a7e71342541_source_k.png",
+      "english": "AUSTRALIA",
+      "approved_korean": "호주",
+      "candidate_sha256": "26e47fd71513a65bf624f685c4bb447befa4e086da8a1496cd08b9590808e498",
+      "source_sha256": "e25f3995b71801a17799e4fa23408d240c4fc4e4bf854798efefd72a34e9c0e6",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_dimensions": [
+        666,
+        204
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        162,
+        134,
+        1533,
+        652
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "korean_text_readable": true,
+      "approved_translation_matches_visible_korean": true,
+      "translation_length_difference_ignored": true,
+      "canvas_size_changed": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "reason": "AUSTRALIA source also contains BELGIUM. Output 호주 alone is readable, but multi-label source must be recropped.",
+      "full_c1_pass": false,
+      "composition_placement": "UNTESTED_NO_PIXEL_ALIGNED_SINGLE_PHRASE_ROI"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0053-1DBF9F13",
+      "ordinal": 250,
+      "source_file": "Q212_423e0cb72a1eed98_source.png",
+      "candidate_file": "Q212_423e0cb72a1eed98_source_k.png",
+      "english": "SELECT PHOTO",
+      "approved_korean": "사진 선택",
+      "candidate_sha256": "c8db2f87d212db1b79d1506949f1d15c4cc1384c55055271cdf56df59cee23df",
+      "source_sha256": "3b569aa423d4ad043cccfaa47271ab9c9939b742b2d894a0f21efb32f18a0660",
+      "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_dimensions": [
+        865,
+        352
+      ],
+      "candidate_dimensions": [
+        1966,
+        800
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        0,
+        6,
+        1908,
+        766
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "korean_text_readable": true,
+      "approved_translation_matches_visible_korean": true,
+      "translation_length_difference_ignored": true,
+      "canvas_size_changed": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "reason": "SELECT PHOTO source contains SELECT NATIONALITY, SELECT STAR SIGN, partial ENTER NAME and a horizontal border.",
+      "full_c1_pass": false,
+      "composition_placement": "UNTESTED_NO_PIXEL_ALIGNED_SINGLE_PHRASE_ROI"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0053-1DBF9F13",
+      "ordinal": 251,
+      "source_file": "Q212_14e0c3ca6091ecd4_source.png",
+      "candidate_file": "Q212_14e0c3ca6091ecd4_source_k.png",
+      "english": "DONE",
+      "approved_korean": "완료",
+      "candidate_sha256": "7daa73967ab86a0dd281173ceebc89123c3efcb38bd18879d948967308003676",
+      "source_sha256": "db0905c06d73d1844d5232fd4697617129b2b01f1a58fe4429c5a6c18bb4c358",
+      "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_dimensions": [
+        574,
+        275
+      ],
+      "candidate_dimensions": [
+        1812,
+        868
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        97,
+        35,
+        1612,
+        832
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "korean_text_readable": true,
+      "approved_translation_matches_visible_korean": true,
+      "translation_length_difference_ignored": true,
+      "canvas_size_changed": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_PROTECTED_ART_MULTILABEL",
+      "reason": "DONE source also contains VERDE MUGELLO and a grey graphic/plate element.",
+      "full_c1_pass": false,
+      "composition_placement": "UNTESTED_NO_PIXEL_ALIGNED_SINGLE_PHRASE_ROI"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0053-1DBF9F13",
+      "ordinal": 252,
+      "source_file": "Q212_291338bdd2742333_source.png",
+      "candidate_file": "Q212_291338bdd2742333_source_k.png",
+      "english": "SELECT NATIONALITY",
+      "approved_korean": "국적 선택",
+      "candidate_sha256": "fff4de31a9cb641658bf405e6b05806a097db01869187f7af04c3dba4f54d23f",
+      "source_sha256": "3281371c0fd9ea3a45646630bd9a9875e3ee24dc2a04393dbb2262a178e7587f",
+      "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_dimensions": [
+        1114,
+        301
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        61,
+        7,
+        2061,
+        686
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "korean_text_readable": true,
+      "approved_translation_matches_visible_korean": true,
+      "translation_length_difference_ignored": true,
+      "canvas_size_changed": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "reason": "SELECT NATIONALITY source includes ENTER NAME, SELECT PHOTO and a horizontal border; isolated original target ROI is not provided.",
+      "full_c1_pass": false,
+      "composition_placement": "UNTESTED_NO_PIXEL_ALIGNED_SINGLE_PHRASE_ROI"
+    }
+  ],
+  "restrictions": [
+    "No ImageGen called",
+    "No A/B queue consumed",
+    "No DDS composed or deployed",
+    "No C2/C3 approval",
+    "No user in-game PASS claimed",
+    "No VR/FFB/DX11/DXVK changes",
+    "Not a new QA grade for any previously reviewed SHA"
+  ]
+}
