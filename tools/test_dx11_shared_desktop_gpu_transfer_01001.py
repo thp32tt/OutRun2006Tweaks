@@ -15,6 +15,12 @@ def correct(s):
     if min(start, end) < 0:
         return False
     part = s[start:end]
+    # The reset() method clears pending_ before the real transfer. Restrict
+    # ordinal assertions to the live GPU-copy block, not class initialization.
+    transfer = part.find("ScopedNativeGameGpuTransferInputs shaderInputs(")
+    if transfer < 0:
+        return False
+    part = part[transfer:]
     tokens = (
         "ScopedNativeGameGpuTransferInputs shaderInputs(context, source_.Get());",
         "ScopedNativeGameGpuTransferOutputs scopedOutputs(context);",
