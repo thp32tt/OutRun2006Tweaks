@@ -1,0 +1,529 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1445KST-NEW-SHA8",
+  "inspected_kst": "2026-10-22 14:45–14:55 KST",
+  "policy_branch": "korean-localization-recovery-20260928",
+  "scope": "C1 independent lightweight QA on 8 previously unreviewed A/B generated transparent Korean PNGs, no ImageGen/queue consumption",
+  "historical_reviewed_sha_before": 351,
+  "unreviewed_count_at_inventory": 17,
+  "reviewed_count": 8,
+  "summary": {
+    "pass_png_text_only_pending_dimensional_placement": 2,
+    "fail_source_roi_protected_art": 2,
+    "fail_source_roi_target_absent": 3,
+    "fail_source_roi_multilabel": 1,
+    "generated_png_rgba_with_alpha": 8,
+    "candidate_sha_matches_export": 8,
+    "original_sha_matches_manifest": 8,
+    "dimensions_differ_from_original": 8,
+    "full_c1_placement_signoff": 0
+  },
+  "evidence": {
+    "inventory_N100": "work/c1_20261022_1445_inventory_result.json",
+    "metrics_N100": "work/c1_20261022_1445_metrics.json",
+    "comparison_contact_sheets_N100": [
+      "work/c1_20261022_1445_A-src.png",
+      "work/c1_20261022_1445_A-k.png",
+      "work/c1_20261022_1445_B-src.png",
+      "work/c1_20261022_1445_B-k.png"
+    ]
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0029-30F91456-R1",
+      "candidate_file": "Q057_fab4d146403b0244_source_k.png",
+      "candidate_sha256": "8e02a679f5428c493febcd7592e8cce9ce0beccc45f6fde45e8855a776df0b36",
+      "source_file": "Q057_fab4d146403b0244_source.png",
+      "source_sha256": "933e5758d9fa915c364db52f796934cb049cad2377d4cfee4305d6137c9b129f",
+      "manifest_english": "Total Rank",
+      "approved_korean": "종합 랭크",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1020,
+          380
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1020,
+          380
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 179185,
+        "sha256": "933e5758d9fa915c364db52f796934cb049cad2377d4cfee4305d6137c9b129f"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2054,
+          765
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          278,
+          78,
+          1745,
+          708
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 238667,
+        "sha256": "8e02a679f5428c493febcd7592e8cce9ce0beccc45f6fde45e8855a776df0b36"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readable": "READABLE_BUT_SOURCE_INVALID",
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_PROTECTED_ART",
+      "visual_reason": "Source contains orange burst/star background and large nontext artwork with Total Rank, not a lettering-only source ROI; must re-crop text and preserve decorative art.",
+      "output_dimension_change_requires_rework": true,
+      "actual_ui_safe_region_confirmed": false,
+      "final_dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0030-8A878854",
+      "candidate_file": "Q095_70955fb41be5a394_source_k.png",
+      "candidate_sha256": "e699cff0826b663778fbfe2c8f45bd57375c059834f58cfad7c8443e1653fd82",
+      "source_file": "Q095_70955fb41be5a394_source.png",
+      "source_sha256": "6383cfb653776073f7ffc46d17bb62d03348e467340f34c6d662d56e8d697932",
+      "manifest_english": "RANDOM",
+      "approved_korean": "무작위",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          610,
+          261
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          117,
+          92,
+          464,
+          261
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 19815,
+        "sha256": "6383cfb653776073f7ffc46d17bb62d03348e467340f34c6d662d56e8d697932"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1917,
+          820
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          39,
+          17,
+          1830,
+          764
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 614966,
+        "sha256": "e699cff0826b663778fbfe2c8f45bd57375c059834f58cfad7c8443e1653fd82"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readable": "READABLE_BUT_SOURCE_INVALID",
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_PROTECTED_ART",
+      "visual_reason": "Source contains RANDOM plus blue framed question-mark icon and surrounding UI; protected frame/icon not isolated.",
+      "output_dimension_change_requires_rework": true,
+      "actual_ui_safe_region_confirmed": false,
+      "final_dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0030-8A878854",
+      "candidate_file": "Q051_80bcc9147dafefa0_source_k.png",
+      "candidate_sha256": "923aab65c53e6c4f357561047115fda0699d5c26fbb59e348766bb20d5c24f99",
+      "source_file": "Q051_80bcc9147dafefa0_source.png",
+      "source_sha256": "8e23ee0c0a18788e5003048feb818f939d3b26afa066ca2ae8b0dae8c48156ad",
+      "manifest_english": "Drift!",
+      "approved_korean": "드리프트!",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          630,
+          304
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          135,
+          53,
+          486,
+          217
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 45345,
+        "sha256": "8e23ee0c0a18788e5003048feb818f939d3b26afa066ca2ae8b0dae8c48156ad"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1805,
+          871
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          57,
+          23,
+          1735,
+          871
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 637238,
+        "sha256": "923aab65c53e6c4f357561047115fda0699d5c26fbb59e348766bb20d5c24f99"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readable": "YES",
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "Drift! -> 드리프트! is legible and matched; original isolated glyph. Output canvas 1805x871 versus 630x304 source: no UV/cell placement proof. Bottom boundary only alpha=1 artifacts, not hard clipping proof.",
+      "output_dimension_change_requires_rework": true,
+      "actual_ui_safe_region_confirmed": false,
+      "final_dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0030-8A878854",
+      "candidate_file": "Q051_077c03c739fd1bdf_source_k.png",
+      "candidate_sha256": "31cb021071489c0f5061df8f02bb168d2a43b00dc3d21373e329a2c01e400ff1",
+      "source_file": "Q051_077c03c739fd1bdf_source.png",
+      "source_sha256": "0b76e73f094fa9969c9c1cb7530ab22a86e90446fbacb682959ef1df260b120d",
+      "manifest_english": "CREATE ACCOUNT",
+      "approved_korean": "계정 만들기",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1254,
+          130
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          67,
+          27,
+          885,
+          117
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 34702,
+        "sha256": "0b76e73f094fa9969c9c1cb7530ab22a86e90446fbacb682959ef1df260b120d"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          152,
+          37,
+          2080,
+          609
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 372081,
+        "sha256": "31cb021071489c0f5061df8f02bb168d2a43b00dc3d21373e329a2c01e400ff1"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readable": "YES",
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "CREATE ACCOUNT -> 계정 만들기 is legible and matched; isolated source lettering. Output canvas 2172x724 versus 1254x130 source: placement/native transform unverified.",
+      "output_dimension_change_requires_rework": true,
+      "actual_ui_safe_region_confirmed": false,
+      "final_dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0043-49CDDC2B-R1",
+      "candidate_file": "Q051_8cdb9d244cd8d757_source_k.png",
+      "candidate_sha256": "5e72c24e933ddee0770b34410e37fafd54f8fab6f5f9c778fb7fc0148ce7b5e1",
+      "source_file": "Q051_8cdb9d244cd8d757_source.png",
+      "source_sha256": "cbe2999f360b4a8d942fb48cda380f398bd55da5c45c5adcc2ebde337a91586b",
+      "manifest_english": "SOUNDTRACK",
+      "approved_korean": "사운드트랙",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          690,
+          209
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          4,
+          690,
+          209
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 12283,
+        "sha256": "cbe2999f360b4a8d942fb48cda380f398bd55da5c45c5adcc2ebde337a91586b"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          176,
+          39,
+          2039,
+          674
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 503054,
+        "sha256": "5e72c24e933ddee0770b34410e37fafd54f8fab6f5f9c778fb7fc0148ce7b5e1"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readable": "READABLE_BUT_SOURCE_INVALID",
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_TARGET_ABSENT",
+      "visual_reason": "Verified source crop is gray UI panel and colored blocks; SOUNDTRACK lettering is absent.",
+      "output_dimension_change_requires_rework": true,
+      "actual_ui_safe_region_confirmed": false,
+      "final_dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0044-881A0AFD",
+      "candidate_file": "Q051_17cc55180a097d10_source_k.png",
+      "candidate_sha256": "a889fca0f07b9b37533c335a7a82fae6f01ab1355c83817c3bff3e4b76794e19",
+      "source_file": "Q051_17cc55180a097d10_source.png",
+      "source_sha256": "f874d846167c5f5c4eb542bed76e36175d983873dcec1a2df52bd05aa8bcfe05",
+      "manifest_english": "REGISTER NEW ACCOUNT",
+      "approved_korean": "새 계정 등록",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1115,
+          205
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          1,
+          1115,
+          205
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 16389,
+        "sha256": "f874d846167c5f5c4eb542bed76e36175d983873dcec1a2df52bd05aa8bcfe05"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          256,
+          19,
+          2106,
+          650
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 508651,
+        "sha256": "a889fca0f07b9b37533c335a7a82fae6f01ab1355c83817c3bff3e4b76794e19"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readable": "READABLE_BUT_SOURCE_INVALID",
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_TARGET_ABSENT",
+      "visual_reason": "Verified source crop is gray/white rectangular UI strips; REGISTER NEW ACCOUNT lettering is absent.",
+      "output_dimension_change_requires_rework": true,
+      "actual_ui_safe_region_confirmed": false,
+      "final_dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0044-881A0AFD",
+      "candidate_file": "Q051_5bdd087c34ea3f4e_source_k.png",
+      "candidate_sha256": "74057cb1a401d9b269d045f47bd2742b63fb87b27e17d7ae4975a67d363486ee",
+      "source_file": "Q051_5bdd087c34ea3f4e_source.png",
+      "source_sha256": "5f4bf9f61bf020cc269421e0844dee88508395e6dea29a7cd4ce87ba24b76d42",
+      "manifest_english": "GOAL",
+      "approved_korean": "골",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          774,
+          570
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          3,
+          0,
+          774,
+          570
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 195860,
+        "sha256": "5f4bf9f61bf020cc269421e0844dee88508395e6dea29a7cd4ce87ba24b76d42"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1448,
+          1086
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          225,
+          88,
+          1225,
+          821
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 180460,
+        "sha256": "74057cb1a401d9b269d045f47bd2742b63fb87b27e17d7ae4975a67d363486ee"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readable": "READABLE_BUT_SOURCE_INVALID",
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "visual_reason": "Source contains Total Time, Lap Time, GOAL and other stage labels/icons in one composite crop; not a single GOAL lettering ROI.",
+      "output_dimension_change_requires_rework": true,
+      "actual_ui_safe_region_confirmed": false,
+      "final_dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0044-881A0AFD",
+      "candidate_file": "Q051_e50f972c9ab405c8_source_k.png",
+      "candidate_sha256": "11a115063d410d53dbcea0050565ac8d2c42b085c59c654a3da184f79f110337",
+      "source_file": "Q051_e50f972c9ab405c8_source.png",
+      "source_sha256": "b5b1a3dec010e7c12c1d15c99f6149d214b69ae849b9ba4d1b981736a0437029",
+      "manifest_english": "DELETE ACCOUNT",
+      "approved_korean": "계정 삭제",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1021,
+          391
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          6,
+          1021,
+          391
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 101583,
+        "sha256": "b5b1a3dec010e7c12c1d15c99f6149d214b69ae849b9ba4d1b981736a0437029"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2048,
+          768
+        ],
+        "alpha_extrema": [
+          0,
+          254
+        ],
+        "alpha_bbox": [
+          165,
+          39,
+          1920,
+          743
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 1019683,
+        "sha256": "11a115063d410d53dbcea0050565ac8d2c42b085c59c654a3da184f79f110337"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readable": "READABLE_BUT_SOURCE_INVALID",
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_TARGET_ABSENT",
+      "visual_reason": "Source shows Total Time, Lap Time, GOAL and surrounding UI, but DELETE ACCOUNT text is absent.",
+      "output_dimension_change_requires_rework": true,
+      "actual_ui_safe_region_confirmed": false,
+      "final_dds_approval": false,
+      "c2_c3_ingame_pass": false
+    }
+  ],
+  "conclusion": "6 source/ROI failures, 2 readable lettering PNG-only passes but production dimensional/placement hold. Source hash agreement does not prove label correctness or protected-art isolation. Re-crop SHA-bound phrase-only original English ROI before new production on failed sources; do not rerun against invalid original crop. All 8 need original native target placement proof before DDS consideration.",
+  "limits": {
+    "imagegen_invoked": false,
+    "ab_queues_consumed": false,
+    "dds_created_or_deployed": false,
+    "c2_c3_pass": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changed": false
+  }
+}
