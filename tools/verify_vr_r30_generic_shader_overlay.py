@@ -43,7 +43,36 @@ def check(code, h):
     assert "e.writtenScope == RenderScope::ScreenOverlay2D" in h
 
 assert "R30ScreenSpaceKind::ScreenOverlay2D" in safe
-assert "R30BuildHudPlaneCoefficients(state, true)" in safe
+# R26+HUD F11 is an external overlay and intentionally uses a distinct
+# smaller plane; game-produced ScreenOverlay2D still uses gameplay scale.
+# An old static assertion hardcoded "true" and rejected the correct
+# runtime ownership split before reaching the 1000-case C++ smoke gate.
+def check_safe_f11_scale(s):
+    expected = ("const bool externalF11 =\n"
+                "                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0 &&\n"
+                "                    semanticOverlay2D;\n"
+                "                if (!R30BuildHudPlaneCoefficients(state, !externalF11))")
+    assert s.count(expected) == 1, "F11 and game HUD scales must have distinct ownership"
+    assert "R30PlaneScaleForOwner(scaleX, gameplayHudOwner)" in s
+    assert "R30PlaneScaleForOwner(scaleY, gameplayHudOwner)" in s
+    assert 'static_assert(R30PlaneScaleForOwner(0.55f, true) == 0.55f' in s
+    assert 'static_assert(R30PlaneScaleForOwner(0.55f, false) == 0.65f' in s
+    return expected
+
+owner_proof = check_safe_f11_scale(safe)
+for old_piece, new_piece in (
+    ("!externalF11", "true"),
+    ("ExternalOverlaySemanticDepth != 0", "true"),
+    ("semanticOverlay2D;", "false;"),
+):
+    bad = safe.replace(owner_proof, owner_proof.replace(old_piece, new_piece, 1), 1)
+    assert bad != safe, "R26 F11 mutation fixture missing"
+    try:
+        check_safe_f11_scale(bad)
+    except (AssertionError, ValueError):
+        continue
+    raise AssertionError(f"R26 F11 plane-scale mutation escaped: {old_piece}")
+
 check(current,proof)
 assert "for (int i = 0; i < 1000; ++i)" in test
 assert "'outrun-vr-hud-original-wvp-smoke.exe'," in workflow

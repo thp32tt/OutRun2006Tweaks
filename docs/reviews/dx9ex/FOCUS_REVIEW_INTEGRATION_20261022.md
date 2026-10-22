@@ -13,3 +13,10 @@
 - BASELINE_PROTECTED=0cff83cf509c2acd6f3391b3a46c4dec1403a0d9; COMPARATOR_ONLY=aab9e02bcb2ad2e6253840e6267e5c5ad5040854.
 - CI_PLAN=source-change exact-SHA DX9Ex Active / PC Fast / Domain and changed-area static checks, report actual status rather than declaring success before CI; no CI skip directive.
 - RUNTIME_VALIDATION=UNTESTED; Quest 3/VDXR image quality and 72Hz performance remain not proven by GitHub Actions.
+
+## Validation follow-up — inherited R26 F11 assertion repaired
+
+- SOURCE_COMMIT=ab5a4c64c060cedf20a52a4603cfea97150ae82b; first exact-SHA DX9Ex Active run #39724302083 failed in policy at `tools/verify_vr_r30_generic_shader_overlay.py:46`, asserting hardcoded `R30BuildHudPlaneCoefficients(state, true)`.
+- Proven pre-existing: original pre-source-change parent `fbe315721c91d0fb4d15e4ed23edf945ccd5b0ac` already uses `R30BuildHudPlaneCoefficients(state, !externalF11)`, which selects the intended external-F11-only smaller plane while retaining gameplay HUD scale. The failing verifier script itself was not touched by initial SkyGlow patch.
+- ACTION=update stale invariant to require the exact `ExternalOverlaySemanticDepth && semanticOverlay2D` decision and `!externalF11` invocation, plus three destructive negative mutations. No runtime/C++ edit during this follow-up. Do not treat static repair as headset validation.
+- NEXT=rerun exact-SHA DX9Ex Active/PC Fast/Full Source/HUD/Domain gates on final integration SHA, record observed status only. RUNTIME_VALIDATION=UNTESTED.
