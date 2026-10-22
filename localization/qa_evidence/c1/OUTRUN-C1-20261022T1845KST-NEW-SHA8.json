@@ -1,0 +1,475 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T1845KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T18:51:16.818704+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before": "3a25591f29c794a9c0741e8268b2158e165a6b44",
+  "role": "C1",
+  "mode": "independent_lightweight_QA_only",
+  "evidence_origin": "N100 persisted candidate and source bytes plus manual review of 4 native source/output contact sheets",
+  "execution_backend": "GitHub read/write; N100 required candidate/source file inspection; deterministic Pillow per-image metrics",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_selection": "New exports B-0054 and A-0041; post-18:15 production receipts; SHA-unique and not included in prior C1 run 18:15.",
+  "summary": {
+    "reviewed": 8,
+    "source_sha_matches_manifest": 8,
+    "candidate_sha_matches_local_completion_and_export": 8,
+    "candidate_png_rgba": 8,
+    "approved_mapping_and_korean_readability": 8,
+    "single_phrase_roi": 5,
+    "multilabel_source_roi": 3,
+    "canvas_dimensions_match": 0,
+    "hold_native_ui_placement": 5,
+    "fail_source_roi": 3,
+    "c1_final_pass": 0,
+    "dds_generated": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "metrics_n100": "work/c1_20261022_1845/metrics.json",
+    "contact_sheets_n100": [
+      "work/c1_20261022_1845/compare_1.jpg",
+      "work/c1_20261022_1845/compare_2.jpg",
+      "work/c1_20261022_1845/compare_3.jpg",
+      "work/c1_20261022_1845/compare_4.jpg"
+    ],
+    "producer_completion_n100": [
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-B-0054-4A087786.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0041-1B495950.json"
+    ],
+    "note": "C1 did not invoke ImageGen, consume A/B queue, compose DDS, deploy, or alter VR/FFB/DX11/DXVK."
+  },
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0054-4A087786",
+      "ordinal": 255,
+      "source_file": "Q140_5e770cc5a4a1bd14_source.png",
+      "candidate_file": "Q140_5e770cc5a4a1bd14_source_k.png",
+      "english": "SELECT MODE",
+      "approved_korean": "모드 선택",
+      "source_sha256": "10626c7ca98a332a4ce0c77e35612b459af1469c3f7e518a804a15b447b35fab",
+      "candidate_sha256": "1ef84581069997592c4551d2b784e330de3e83e87b4bdbc6a74e3dc809fdf8eb",
+      "source_dds_sha256": "2735d0dc7873226085a37b19ccb5c57b6b4e589186cb74ff8d61502234084d4f",
+      "source_bbox_xyxy": [
+        0,
+        574,
+        849,
+        702
+      ],
+      "source_dimensions": [
+        1698,
+        256
+      ],
+      "candidate_dimensions": [
+        2036,
+        772
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        25,
+        17,
+        1950,
+        720
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "독립 시각검수: SELECT MODE 원문은 단일 문구이고 모드 선택 결과 한글 자소·받침 판독 가능. 글자/효과 외 불필요한 프레임 관찰되지 않음. 원본 1698x256 대비 출력 2036x772이므로 native 좌표/UV 안전영역 검증 불가.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0054-4A087786",
+      "ordinal": 256,
+      "source_file": "Q140_587b218d890485f8_source.png",
+      "candidate_file": "Q140_587b218d890485f8_source_k.png",
+      "english": "SHOWROOM",
+      "approved_korean": "쇼룸",
+      "source_sha256": "5bcc51c6fa67fc40ece00f57a8c9bdbc911d1bb117d63d129051a64e4a5d0306",
+      "candidate_sha256": "d266363f538fc712e012a0d7f010d0d24b4f5fef964095464e470c6d387343ed",
+      "source_dds_sha256": "2735d0dc7873226085a37b19ccb5c57b6b4e589186cb74ff8d61502234084d4f",
+      "source_bbox_xyxy": [
+        0,
+        417,
+        685,
+        541
+      ],
+      "source_dimensions": [
+        1370,
+        248
+      ],
+      "candidate_dimensions": [
+        1908,
+        824
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        113,
+        84,
+        1555,
+        808
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "독립 시각검수: SHOWROOM→쇼룸 정상. 단일 영문 문구 ROI 및 투명 글자 후보 확인. 원본 1370x248 대비 출력 1908x824이므로 배치 미검증.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0054-4A087786",
+      "ordinal": 257,
+      "source_file": "Q140_466c7fe5a72f8abf_source.png",
+      "candidate_file": "Q140_466c7fe5a72f8abf_source_k.png",
+      "english": "SELECT RACE",
+      "approved_korean": "레이스 선택",
+      "source_sha256": "b12ec074f995039df46f8d5cdff9f0f447ee3d549f8dce3af12422e818187615",
+      "candidate_sha256": "c08a9c1690c830ac6ee47367fd7c4b2032f1bd50691a129619e53f438aa8b09e",
+      "source_dds_sha256": "2735d0dc7873226085a37b19ccb5c57b6b4e589186cb74ff8d61502234084d4f",
+      "source_bbox_xyxy": [
+        0,
+        734,
+        827,
+        862
+      ],
+      "source_dimensions": [
+        1654,
+        256
+      ],
+      "candidate_dimensions": [
+        1983,
+        793
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        57,
+        81,
+        1961,
+        680
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "독립 시각검수: SELECT RACE→레이스 선택 정상. 단일 영문 문구 ROI 및 투명 글자 후보 확인. 출력 캔버스 변경으로 실제 위치 검증 보류.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0054-4A087786",
+      "ordinal": 258,
+      "source_file": "Q140_6d9319af92f82393_source.png",
+      "candidate_file": "Q140_6d9319af92f82393_source_k.png",
+      "english": "SELECT STAGE",
+      "approved_korean": "스테이지 선택",
+      "source_sha256": "62d6ee2866c44327ef29a5fd6ed6f8b446ce49394c713aad77d66e2d05085a3e",
+      "candidate_sha256": "f6e79edee554e3277d3422899eef486219f482a9e1a409fdc6c1bcae859d2903",
+      "source_dds_sha256": "2735d0dc7873226085a37b19ccb5c57b6b4e589186cb74ff8d61502234084d4f",
+      "source_bbox_xyxy": [
+        0,
+        890,
+        874,
+        1018
+      ],
+      "source_dimensions": [
+        1748,
+        256
+      ],
+      "candidate_dimensions": [
+        2071,
+        759
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        23,
+        55,
+        2017,
+        646
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "독립 시각검수: SELECT STAGE→스테이지 선택 정상. 단일 영문 문구 ROI 및 투명 글자 후보 확인. 출력 캔버스 변경으로 실제 위치 검증 보류.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0054-4A087786",
+      "ordinal": 259,
+      "source_file": "Q140_4b487384b43b7237_source.png",
+      "candidate_file": "Q140_4b487384b43b7237_source_k.png",
+      "english": "SELECT MODE",
+      "approved_korean": "모드 선택",
+      "source_sha256": "10626c7ca98a332a4ce0c77e35612b459af1469c3f7e518a804a15b447b35fab",
+      "candidate_sha256": "cd5e24cc10e9cbc9b2a2d04e2cf7e8a7cb80ba970909d875fae2bde448f26927",
+      "source_dds_sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_bbox_xyxy": [
+        0,
+        574,
+        849,
+        702
+      ],
+      "source_dimensions": [
+        1698,
+        256
+      ],
+      "candidate_dimensions": [
+        2035,
+        773
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        161,
+        17,
+        1871,
+        719
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "독립 시각검수: SELECT MODE→모드 선택 정상. 단일 영문 문구 ROI 및 투명 글자 후보 확인. 출력 캔버스 변경으로 실제 위치 검증 보류.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0041-1B495950",
+      "ordinal": 199,
+      "source_file": "Q161_29dfe698b1f2ee7c_source.png",
+      "candidate_file": "Q161_29dfe698b1f2ee7c_source_k.png",
+      "english": "BRITAIN",
+      "approved_korean": "영국",
+      "source_sha256": "7b51e6a6ba07be83716dabb15d6704cfa5f348bcb0ec3f928145e25e31d4c30f",
+      "candidate_sha256": "df836c482a222ff7d644168395b206f1916e68a71aa264371f9b8aae6d82593c",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_bbox_xyxy": [
+        587,
+        895,
+        1416,
+        1085
+      ],
+      "source_dimensions": [
+        829,
+        190
+      ],
+      "candidate_dimensions": [
+        1550,
+        1015
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        49,
+        37,
+        1191,
+        942
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "qa_reason": "원본 ROI는 BRITAIN 외 AUSTRIA, CHINA가 같은 이미지에 있음. 입력당 단일 문구 원칙 위반, 한글 영국만 출력. 캔버스 변경 및 원래 BRITAIN 위치 검증 불가.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0041-1B495950",
+      "ordinal": 200,
+      "source_file": "Q161_3935ff67daceaf17_source.png",
+      "candidate_file": "Q161_3935ff67daceaf17_source_k.png",
+      "english": "CAPRICORN",
+      "approved_korean": "염소자리",
+      "source_sha256": "9688f5992170afe72e596dfe9fd285c7b36df1b3ed576932f6ec7023417d2ab6",
+      "candidate_sha256": "f1fdb6f874956e1610a09794784c6ce0699e6491f2e63b34040a5d67a33e57de",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_bbox_xyxy": [
+        0,
+        1661,
+        662,
+        1857
+      ],
+      "source_dimensions": [
+        662,
+        196
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        15,
+        93,
+        1177,
+        595
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "qa_reason": "원본 ROI에 CAPRICORN 외 ARIES, LEO 포함. 입력당 단일 문구 원칙 위반. 염소자리 번역은 맞지만 캔버스/안전영역 배치 미검증.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0041-1B495950",
+      "ordinal": 201,
+      "source_file": "Q161_42f038b9fa20580e_source.png",
+      "candidate_file": "Q161_42f038b9fa20580e_source_k.png",
+      "english": "ARIES",
+      "approved_korean": "양자리",
+      "source_sha256": "79db83376a3e44f67eedb3fd41a13580835e9c06d0f09ad1e98aa0b798ae2db8",
+      "candidate_sha256": "3dffa68222abdb6b8a4430daa526819cf4810c93f0442cc340d2c10081f82ad0",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_bbox_xyxy": [
+        0,
+        1598,
+        662,
+        1794
+      ],
+      "source_dimensions": [
+        662,
+        196
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        32,
+        52,
+        2104,
+        628
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "qa_reason": "원본 ROI에 ARIES 외 THAILAND, CAPRICORN 포함. 입력당 단일 문구 원칙 위반. 양자리 번역은 맞지만 캔버스/안전영역 배치 미검증.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    }
+  ]
+}
