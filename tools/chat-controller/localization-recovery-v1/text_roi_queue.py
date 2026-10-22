@@ -482,6 +482,109 @@ def _library_confirmed(root, active):
         return False,"PROJECT_LIBRARY_EVIDENCE_INVALID"
 
 
+_TASK_TURN_PRESENT_JS = r"""task=>{
+  const markers=['BATCH_ID='+task,'UPLOAD_TASK_ID='+task];
+  const hasTask=n=>!!n&&markers.some(m=>((n.innerText||n.textContent||'').includes(m)));
+  const direct=[...document.querySelectorAll(
+    '[data-markdown-text-tone="user-message"],[data-message-author-role="user"],'+
+    '[data-testid="conversation-turn-user"],[data-testid*="user-message"]'
+  )].find(hasTask);
+  if(direct)return true;
+  return [...document.querySelectorAll(
+    '[data-turn-key],[data-chatgpt-search-unit-key],[data-content-search-unit-key],article'
+  )].some(hasTask);
+}"""
+
+_RESULT_PROBE_JS = r"""async ({task,expected})=>{
+  if(location.hostname!=='chatgpt.com'|| !location.pathname.includes('/c/'))return{error:'NOT_CHAT'};
+  const markers=['BATCH_ID='+task,'UPLOAD_TASK_ID='+task];
+  const hasTask=n=>!!n&&markers.some(m=>((n.innerText||n.textContent||'').includes(m)));
+  const direct=[...document.querySelectorAll(
+    '[data-markdown-text-tone="user-message"],[data-message-author-role="user"],'+
+    '[data-testid="conversation-turn-user"],[data-testid*="user-message"]'
+  )].find(hasTask);
+  let turn=null;
+  if(direct){
+    turn=direct.closest('[data-turn-key]')||
+         direct.closest('[data-chatgpt-search-unit-key]')||
+         direct.closest('[data-content-search-unit-key]')||
+         direct.closest('article')||direct.parentElement;
+  }
+  if(!turn){
+    const candidates=[...document.querySelectorAll(
+      '[data-turn-key],[data-chatgpt-search-unit-key],[data-content-search-unit-key],article'
+    )].filter(hasTask);
+    if(candidates.length){
+      candidates.sort((a,b)=>a.querySelectorAll('*').length-b.querySelectorAll('*').length);
+      turn=candidates[0];
+    }
+  }
+  if(!turn)return{error:'USER_TURN_MISSING'};
+  const scopes=[turn];
+  let p=turn.parentElement;
+  for(let i=0;i<3&&p;i++,p=p.parentElement){
+    if(hasTask(p))scopes.push(p);
+  }
+  const buttonScope=scopes.find(s=>s.querySelector('button[aria-label^="Show generated image "]'))||turn;
+  const buttons=[...buttonScope.querySelectorAll('button[aria-label^="Show generated image "]')];
+  if(buttons.length){
+    const items=buttons.map(b=>{
+      const m=(b.getAttribute('aria-label')||'').match(/^Show generated image ([1-9][0-9]*)$/);
+      const img=b.querySelector('img');
+      return m&&img?{index:Number(m[1]),src:img.currentSrc||img.src}:null;
+    });
+    if(items.some(x=>!x))return{error:'BROKEN_IMAGE_SELECTOR'};
+    items.sort((a,b)=>a.index-b.index);
+    if(items.some((x,i)=>x.index!==i+1))return{error:'NONCONSECUTIVE_GENERATED_IMAGES'};
+    const sources=[...new Set(items.map(x=>x.src))];
+    if(sources.length!==items.length)return{error:'DUPLICATED_IMAGE_PREVIEWS'};
+    const checks=await Promise.all(sources.map(async url=>{
+      if(!url||!url.startsWith('blob:'))return false;
+      try{
+        const res=await fetch(url);
+        if(!res.ok)return false;
+        const blob=await res.blob();
+        return blob.size>100&&blob.size<=30000000&&blob.type.startsWith('image/');
+      }catch(e){return false;}
+    }));
+    if(checks.some(ok=>!ok))return{error:'IMAGE_BLOB_NOT_READY'};
+    return {count:sources.length,expected,
+            busy:!!buttonScope.querySelector('[data-talvt-turn-state="in_progress"]'),
+            verified_by:'CAROUSEL_DISTINCT_IMAGE_BLOBS',error:null};
+  }
+  const previewScope=scopes.find(s=>s.querySelector('[data-testid="generated-image-preview"] img[alt^="Generated image"]'))||turn;
+  const full=[...previewScope.querySelectorAll('[data-testid="generated-image-preview"] img[alt^="Generated image"]')]
+    .filter(i=>i.complete&&i.naturalWidth>0&&i.naturalHeight>0&&!!i.getClientRects().length);
+  const sources=[...new Set(full.map(i=>i.currentSrc||i.src))];
+  return{count:sources.length,expected,
+         busy:!!previewScope.querySelector('[data-talvt-turn-state="in_progress"]'),
+         verified_by:'SINGLE_VISIBLE_PREVIEW_FALLBACK',error:null};
+}"""
+
+async def _probe_imagegen_result(page, task, expected):
+    try:
+        return await page.evaluate(_RESULT_PROBE_JS, {"task":task,"expected":expected})
+    except Exception:
+        return {"error":"RESULT_UI_NOT_VERIFIED"}
+
+
+async def _recover_task_turn(page, task):
+    """Wait for lazy conversation rendering, then reload once before declaring loss."""
+    for attempt in range(2):
+        try:
+            await page.wait_for_function(_TASK_TURN_PRESENT_JS,arg=task,timeout=12000)
+            return True
+        except Exception:
+            if attempt:
+                break
+            try:
+                await page.reload(wait_until="domcontentloaded",timeout=45000)
+                await page.wait_for_timeout(1200)
+            except Exception:
+                pass
+    return False
+
+
 async def export_unapproved_k_candidates(page, active, root):
     """Copy generated browser images into deterministic _k.png local filenames.
 
@@ -503,14 +606,37 @@ async def export_unapproved_k_candidates(page, active, root):
                 raise ValueError("EXISTING_CANDIDATE_HASH_CHANGED")
         return "EXISTING_CANDIDATES_VERIFIED"
     entries=await page.evaluate(r"""task=>{
-      const text=[...document.querySelectorAll('[data-markdown-text-tone="user-message"]')]
-       .find(n=>((n.innerText||'').includes('BATCH_ID='+task)||(n.innerText||'').includes('UPLOAD_TASK_ID='+task)));
-      const turn=text?.closest('[data-turn-key]');
+      const markers=['BATCH_ID='+task,'UPLOAD_TASK_ID='+task];
+      const hasTask=n=>!!n&&markers.some(m=>((n.innerText||n.textContent||'').includes(m)));
+      const direct=[...document.querySelectorAll(
+        '[data-markdown-text-tone="user-message"],[data-message-author-role="user"],'+
+        '[data-testid="conversation-turn-user"],[data-testid*="user-message"]'
+      )].find(hasTask);
+      let turn=null;
+      if(direct){
+        turn=direct.closest('[data-turn-key]')||
+             direct.closest('[data-chatgpt-search-unit-key]')||
+             direct.closest('[data-content-search-unit-key]')||
+             direct.closest('article')||direct.parentElement;
+      }
+      if(!turn){
+        const candidates=[...document.querySelectorAll(
+          '[data-turn-key],[data-chatgpt-search-unit-key],[data-content-search-unit-key],article'
+        )].filter(hasTask);
+        if(candidates.length){
+          candidates.sort((a,b)=>a.querySelectorAll('*').length-b.querySelectorAll('*').length);
+          turn=candidates[0];
+        }
+      }
       if(!turn)return[];
       // ChatGPT renders N generated images as ONE large preview plus N image
       // selector buttons. The button thumbnail blobs contain the distinct
       // full-resolution images; never count the preview itself as a second image.
-      const selectors=[...turn.querySelectorAll('button[aria-label^="Show generated image "]')];
+      const scopes=[turn];
+      let p=turn.parentElement;
+      for(let i=0;i<3&&p;i++,p=p.parentElement){if(hasTask(p))scopes.push(p);}
+      const imageScope=scopes.find(s=>s.querySelector('button[aria-label^="Show generated image "]'))||turn;
+      const selectors=[...imageScope.querySelectorAll('button[aria-label^="Show generated image "]')];
       if(selectors.length){
         const listed=selectors.map(button=>{
           const label=button.getAttribute('aria-label')||'';
@@ -524,7 +650,8 @@ async def export_unapproved_k_candidates(page, active, root):
         if(listed.some((it,i)=>it.index!==i+1))return[];
         return listed;
       }
-      return [...turn.querySelectorAll('[data-testid="generated-image-preview"] img[alt^="Generated image"]')]
+      const fallbackScope=scopes.find(s=>s.querySelector('[data-testid="generated-image-preview"] img[alt^="Generated image"]'))||turn;
+      return [...fallbackScope.querySelectorAll('[data-testid="generated-image-preview"] img[alt^="Generated image"]')]
        .filter(x=>x.complete&&x.naturalWidth>0&&x.naturalHeight>0)
        .map((x,i)=>({index:i+1,src:x.currentSrc||x.src,width:x.naturalWidth,height:x.naturalHeight}));
     }""",active["task_id"])
@@ -644,48 +771,18 @@ async def inspect_slot(role, page, root="/data/imagegen"):
                 return False, "ACTIVE_CHAT_REOPEN_FAILED:" + type(exc).__name__
             if _chat_conversation_id(page.url) != target_chat:
                 return False, "ACTIVE_CHAT_REOPEN_MISMATCH"
-        try:
-            result=await page.evaluate(r"""async ({task,expected})=>{
-          if(location.hostname!=='chatgpt.com'|| !location.pathname.includes('/c/'))return{error:'NOT_CHAT'};
-          const usr=[...document.querySelectorAll('[data-markdown-text-tone="user-message"]')]
-            .find(n=>((n.innerText||'').includes('BATCH_ID='+task)||(n.innerText||'').includes('UPLOAD_TASK_ID='+task)));
-          const turn=usr?.closest('[data-turn-key]');
-          if(!turn)return{error:'USER_TURN_MISSING'};
-          const buttons=[...turn.querySelectorAll('button[aria-label^="Show generated image "]')];
-          if(buttons.length){
-            const items=buttons.map(b=>{
-              const m=(b.getAttribute('aria-label')||'').match(/^Show generated image ([1-9][0-9]*)$/);
-              const img=b.querySelector('img');
-              return m&&img?{index:Number(m[1]),src:img.currentSrc||img.src}:null;
-            });
-            if(items.some(x=>!x))return{error:'BROKEN_IMAGE_SELECTOR'};
-            items.sort((a,b)=>a.index-b.index);
-            if(items.some((x,i)=>x.index!==i+1))return{error:'NONCONSECUTIVE_GENERATED_IMAGES'};
-            const sources=[...new Set(items.map(x=>x.src))];
-            if(sources.length!==items.length)return{error:'DUPLICATED_IMAGE_PREVIEWS'};
-            // A thumbnail may have naturalWidth=0 until selected. Fetch its
-            // blob instead; this confirms a real, distinct generated image.
-            const checks=await Promise.all(sources.map(async url=>{
-              if(!url||!url.startsWith('blob:'))return false;
-              try{
-                const res=await fetch(url);
-                if(!res.ok)return false;
-                const blob=await res.blob();
-                return blob.size>100&&blob.size<=30000000&&blob.type.startsWith('image/');
-              }catch(e){return false;}
-            }));
-            if(checks.some(ok=>!ok))return{error:'IMAGE_BLOB_NOT_READY'};
-            return {count:sources.length,expected,busy:!!turn.querySelector('[data-talvt-turn-state="in_progress"]'),
-                    verified_by:'CAROUSEL_DISTINCT_IMAGE_BLOBS',error:null};
-          }
-          const full=[...turn.querySelectorAll('[data-testid="generated-image-preview"] img[alt^="Generated image"]')]
-            .filter(i=>i.complete&&i.naturalWidth>0&&i.naturalHeight>0&&!!i.getClientRects().length);
-          const sources=[...new Set(full.map(i=>i.currentSrc||i.src))];
-          return{count:sources.length,expected,busy:!!turn.querySelector('[data-talvt-turn-state="in_progress"]'),
-                 verified_by:'SINGLE_VISIBLE_PREVIEW_FALLBACK',error:null};
-        }""",{"task":task,"expected":expected})
-        except Exception:
-            return False, "IMAGEGEN_RESULT_UI_NOT_VERIFIED"
+        result=await _probe_imagegen_result(page,task,expected)
+        if result.get("error")=="USER_TURN_MISSING":
+            if await _recover_task_turn(page,task):
+                result=await _probe_imagegen_result(page,task,expected)
+        if result.get("error")=="USER_TURN_MISSING":
+            if expected==5:
+                retried,msg=_retry_same_five(
+                    st,active,root,"IMAGEGEN_USER_TURN_MISSING",observed=None)
+                if retried:
+                    return True,msg
+                return False,msg
+            return False,"IMAGEGEN_USER_TURN_MISSING"
         if result.get("error"):
             return False, "IMAGEGEN_"+result["error"]
         if result.get("busy"):
