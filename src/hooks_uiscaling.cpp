@@ -411,6 +411,64 @@ class UIScaling : public Hook
     // verified ABI-safe wrapper exists: minidumps EIP 0x97C5F / 0x97E75.
     static constexpr int ResultTextUnsafeReturnRva = 0x97C57;
 
+    // 2026-10-23: r4dius/outrun2-decomp independently reconstructs
+    // sub_4B9200 as text_4b9200(text, x, y, step): it emits the result
+    // string one glyph at a time.  The old parent CALL+5 midhooks crashed
+    // because legal branches can land inside those five-byte detours.
+    // Hook the FUNCTION ENTRY instead.  SafetyHook's inline trampoline
+    // preserves the original E8 return address, so only the 19 canonical
+    // GOAL callers are promoted to ScreenHud; +TIME's 4973C0/4974E0
+    // callers and every unrelated text user pass through unchanged.
+    static inline SafetyHookInline ResultTextB9200InlineHook{};
+    static void __cdecl ResultTextB9200_dest(
+        const char* text, std::uint32_t x,
+        std::uint32_t y, std::uint32_t step)
+    {
+        const auto base =
+            reinterpret_cast<std::uintptr_t>(Module::exe_ptr(0));
+        const auto caller =
+            reinterpret_cast<std::uintptr_t>(_ReturnAddress());
+        const bool exactGoalParent =
+            Settings::VREnabled &&
+            Game::current_mode &&
+            *Game::current_mode == GameState::STATE_GOAL &&
+            !OutRunVR::GameSemantic::QueueRenderActive() &&
+            OutRunVR::GoalResult::IsOriginalB9200ParentReturn(
+                base, caller);
+
+        if (!exactGoalParent)
+        {
+            ResultTextB9200InlineHook.call<void>(text, x, y, step);
+            return;
+        }
+
+        // The previous D3DX texture batch belongs to the previous producer.
+        // Split it before changing semantic ownership, keep the complete
+        // 4B9200 string under one exact source token, then submit that batch
+        // before restoring its caller.  This avoids late GPU submission
+        // losing the original 0x97xxx parent from the call stack.
+        FlushD3DXBeforeDirectGoalSource();
+        {
+            OutRunVR::GameSemantic::ScopedExactProducerSemantic owner(
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                nullptr, true,
+                OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
+            ResultTextB9200InlineHook.call<void>(text, x, y, step);
+            FlushD3DXAtDirectGoalSourceExit();
+        }
+
+        if (Settings::VRTelemetry)
+        {
+            static thread_local std::uint64_t hits = 0;
+            const auto n = ++hits;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR P0 GOAL B9200 ENTRY: exactParent=1 calls={} "
+                    "callerRva=0x{:X} scope=SCREEN_HUD",
+                    n, caller - base);
+        }
+    }
+
     // REA-proven original graph parents: background + progress fill + glyphs.
     // The existing inner 0x2D200 hooks cover only the two fill calls.
     static constexpr int ResultProgressFullParentCallA = 0x98924;
@@ -3034,6 +3092,18 @@ public:
             "calls unmodified, all rva+5 midhooks disabled "
             "(minidump EIPs 0x97C5F and 0x97E75); "
             "stock result graph preserved, stereo correction still pending");
+
+        // Safe replacement for the retired CALL+5 hooks: the original
+        // sub_4B9200 entry is intercepted once, then the unmodified return
+        // address identifies only the canonical result callers.
+        ResultTextB9200InlineHook = safetyhook::create_inline(
+            Module::exe_ptr(0xB9200), ResultTextB9200_dest);
+        if (ResultTextB9200InlineHook)
+            spdlog::info(
+                "VR P0 GOAL B9200: function-entry exact-parent ScreenHud wrapper installed");
+        else
+            spdlog::error(
+                "VR P0 GOAL B9200: function-entry wrapper unavailable; stock result text retained");
 
 		// The two GOAL CALLs are adjacent, so preserve the original function
 		// signatures and redirect only their individually proven E8 edges.
