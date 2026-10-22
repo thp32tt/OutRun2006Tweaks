@@ -1,0 +1,59 @@
+# CONVERSION-DX9EX-01410 — type-1 masked animation source to physical GPU/eye provenance (REVIEW_ONLY)
+
+- DATE=2026-10-22 KST; TASK_ID=CONVERSION-DX9EX-01410; PRODUCTION_ID=CONVERSION-DX9EX-01410; EVENT_ID=CONVERSION-DX9EX-01410-E001; EVENT_TYPE=dispatch; ATTEMPT=1/3; LANE=DX9EX.
+- TARGET_BRANCH=vr-d3d9ex-focus; SOURCE_HEAD=76bf8c20b89cc8b51fc2e8c6e2717ebe79391465; SOURCE_SSOT=CONNECTED_GITHUB_PINNED; PREVIOUS_REVIEW=docs/reviews/dx9ex/automation/CONVERSION-DX9EX-01409.md; PREVIOUS_RESULT_SHA=76bf8c20b89cc8b51fc2e8c6e2717ebe79391465.
+- DX9EX_REVIEW_ONLY=ON; CODE_CHANGE=NO; PATCH_APPLIED=NO; BUILD_GATE=NOT_REQUIRED_DOCS_ONLY; BUILD=NOT_RUN; CI=NOT_RUN; CI_SKIP=NONE; GAME_RUN=NOT_RUN; GPU_CAPTURE=NOT_RUN; NEW_DISASSEMBLY=NO; QUEST3_VDXR=NOT_RUN; N100_DRIVE=NOT_USED; RUNTIME_VALIDATION=UNTESTED.
+- DEFAULT_R26_PLUS_HUD_BASELINE=0cff83cf509c2acd6f3391b3a46c4dec1403a0d9 (UNCHANGED); R84_RESULT_HUD_CANDIDATE=aab9e02bcb2ad2e6253840e6267e5c5ad5040854 (COMPARISON_ONLY, NOT_HMD_PASS); R84_AUTO_PROMOTION=NO; B9200_POST_CALL_PLUS5_HOOK=FORBIDDEN.
+
+## REVIEW_SCOPE
+
+This is distinct from #01409 R23 menu cache geometry epoch, #01408 classic SBS clipped-recovery crop, and earlier generic D3DX batch epochs. Follow original type-1 animation masked/composite 0x42A800 and put_sprite_ex2 mask owner through producer -> SpriteNode/semantic/queue epoch -> physical API (DIP, DP, DPUP or DIPUP, not inferred from alpha) -> default R26+HUD R30/R62 versus optional R84 R33/R30/R29 -> L/R eye attachments and restore -> R7 completed SBS/DirectGPU Present -> active R23 desktop/direct capture and OpenXR xrEndFrame. Check masked selector/+TIME/result source-to-eye proof, not a previously documented general menu issue.
+
+## EVIDENCE — pinned GitHub source, checked-in historical REA, no new disassembly
+
+1. docs/research/REA_ORIGINAL_SPRITE_GPU_FOUR_PATHS_20261018.md:20-43 proves original 0x42D710 queues type-1 unmasked 0x42A3A0 versus type-1 masked 0x42A800 when node[0x18] & 0x40000 is set; type-0 D3DX goes via 0x42A0A0 and flagged type-0 direct UP via 0x42C0F0. 36 indirect queue calls remain unresolved. docs/research/REA_R84_EXACT_DIRECT_EVIDENCE_20261018.md:8-26 reports **85 unresolved indirect calls inside 0x42A800**. These facts identify a distinct original source branch, NOT the eventual physical D3D9 Draw API or HMD pixels.
+2. docs/research/OUTRUN_ORIGINAL_SPRITE_PIPELINE_ANALYSIS_20261018.md:6-21,31-50: type-1 0x429530 -> 0x428A10 -> 0x429460 -> 0x429350 -> 0x428BD0 -> 0x42D0C0 -> 0x42DD50, distinct from type-0 clip. The 0x4C50A0 partial queue consumption may precede a full 0x449050/0x42D710 pass. Queue nodes are reusable; node pointer alone is not a lifetime-stable original GPU owner. +TIME/selector can have animation and clip parts in independent physical submissions.
+3. src/hooks_textures.cpp:1017-1111,1117-1189: TagDirectVrSpriteNodes observes queue append; put_sprite_ex2_dest treats maskId independently before tagging; put_sprite_ex is a separate source family. This is not proof of 0x42A800 reaching one particular final Draw API or of both eyes. Never broaden a Source/ProducerToken on DDS alpha alone.
+4. src/vr/game/render_semantics.hpp:1296-1432 captures producer, effective scope, queue node/epoch and queued state at a physical primitive. DeniesGenericWorldFallback prevents an uncertain 2D producer from borrowing cached road WVP. The physical command does NOT by itself prove which unresolved 0x42A800 indirect callee emitted a given GPU primitive.
+5. **Default R26+HUD:** src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp:5231-5414 R62TryFixedFunctionSpriteIndexed accepts exact source-corroborated DrawIndexedPrimitive(TRIANGLELIST), FVF 0x142, current null VS, backbuffer/pose and bilateral stereo resources, not arbitrary masked animation. Lines 5480-5629 route DIP/DPUP/DIPUP separately, and 4052-4228 bounds-check indexed UP source windows/rebasing. UP routes try XYZRHW/screen-space and guarded R29 instead of becoming R62 DIP merely due to texture alpha. So an R62 DIP success counter cannot certify unclassified 0x42A800 descendants.
+6. **R84 optional comparison only:** src/vr/d3d9/stereo_renderer_r33.cpp:249-291,1561-1710,1904-1978,1981-2121 guards actual game/backbuffer/StateBlock raster, consumes a physical semantic, then routes the four D3D9 APIs independently through exact fixed-function owners, XYZRHW or original/R29 fail-closed. src/vr/game/universal_draw_trace.hpp:241-337 has per-API route and eye counters, but an aggregate counter, or absence of R33 eye evidence, does not prove mono/dual-eye behavior for an identified original masked child. AGENTS.md latest 2026-10-20 override and docs/DX9EX_OPTICAL_ROUTE_PROBE_POLICY_20261020.md establish R26+HUD as default; R84_TEST is NOT auto-promoted.
+7. **Eye/state:** src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp:3935-4049 executes original left draw, switches to right RT/depth/viewport, draws right and RestoreRightPassState; a right failure poisons the frame. src/vr/d3d9/stereo_renderer_r33.cpp:299-318,435-520 caches stencil-write flags and checks right-depth/stencil readiness. This provides genuine safe fallback, but does not establish exact masked child alpha/test/scissor/stencil capture or bilateral GPU pixel parity without a physical fingerprint. A left HRESULT returned after a poisoned right frame is a previously reviewed separate behavior, not claimed new here.
+8. **Presentation:** src/vr/d3d9/stereo_renderer_r7.inc:1491-1515,1629-1744 composites classic SBS with state restoration and publishes only completed stereo frames. vrhost/CMakeLists.txt:42-46 selects active vrhost/src/main_r23.cpp. Its capture/selection/projection/theater chain at 1018-1319,1516-1912,3441-3555 consumes completed game output and submits an OpenXR layer; host submission success does not certify that a particular type-1 masked GPU primitive reached both eyes.
+9. **Evidence limits:** #01409 already examined cache geometry, and historical REA already recorded the 85 unknown calls. This task adds a distinct source-branch versus per-API eye-coverage cross-check; no new physical API identity, current same-build masked producer trace, same-frame Quest3/HMD image, GPU capture or p95/p99 measurement exists.
+
+## ORDERED STATIC SIMULATION (conditional, not executed)
+
+| Boundary | What is proven vs still open |
+| --- | --- |
+| Original source | Mask flag selects 0x42A800 rather than 0x42A3A0; clip and animation can coexist. Indirect callee/GPU API from the mask function is unproven. |
+| Semantic and queue | Per-consumption queue epoch and reusable node determine effective semantic. A valid source token cannot establish final physical API, deferred D3DX Flush/End, or a one-node/one-GPU-draw mapping. |
+| Physical GPU | Exact DIP/FVF142 and source evidence may enter R62; DPUP/DIPUP are separate XYZRHW or original fallback; DP/shader draws have separate gates. Current REA does not classify every 0x42A800 physical descendant into these mutually distinct routes. |
+| Left/right/restore | With valid stereo proof, an eye pair is drawn under guarded RT/depth/viewport and restored; without proof one original draw may be intentionally preserved. Unknown route is NOT automatically a visible bug. |
+| Present/OpenXR | R7/host consume the resulting completed game frame; they cannot infer a specific mask descendant's two-eye quality from a successful XR frame or R62 aggregate alone. |
+
+## NEW_FINDING
+
+- NEW_FINDING=TYPE1_MASKED_COMPOSITE_PHYSICAL_GPU_API_TO_EYE_PROVENANCE_COVERAGE_GAP.
+- CLASS=SOURCE_CONFIRMED_BRANCH_AND_ROUTE_NON_EQUIVALENCE; MASKED_EXACT_GPU_API=UNKNOWN; HMD_SCREEN_DEFECT=UNPROVEN; PERF_IMPACT=UNMEASURED.
+- CONFIRMED: Original 0x42A800 type-1 mask/composite differs from type-0 D3DX and unmasked type-1, while R62 fixed-function DIP and R30/R33 UP/other routes have different eligibility and eye evidence. Historical unresolved mask calls mean it is invalid to infer all mask children reach binocular R62 based on one fixed-function DIP success. This is an **evidence/provenance coverage gap**, not a newly observed rendering failure.
+- HYPOTHESIS_ONLY: A specific masked selector, animated result or +TIME child could choose one unchanged original draw, a different physical Draw API or mismatched scissor/alpha and exhibit white/transparent, single-eye or doubled artifacts. Such a hypothesis requires exact-source HMD reproduction; nothing here says it occurs.
+- FALSIFICATION: On exact original EXE and game/host SHAs, correlate original mask flag and parent call/source serial, queue generation/node/epoch, each native DIP/DP/DPUP/DIPUP, VS/PS/FVF, texture, blend/alpha-test/scissor/stencil, L/R RT/depth/draw/restore HRESULT, game Present and host xrEndFrame identity. Disprove the suspected stereo issue if all identified mask descendants either use proven matching two-eye paths or are intentionally mono and the visual symptom does not follow the masked source. A screenshot or aggregate Draw success without physical ancestry cannot close this test.
+
+## PATCH_CANDIDATE_ONLY — NO IMPLEMENTATION
+
+- PATCH_CANDIDATE_ONLY=BOUNDED_TYPE1_MASK_PARENT_TO_PHYSICAL_API_EYE_FINGERPRINT; APPLY=NO; CODE_CHANGE=NO.
+- Future separately authorized passive instrumentation candidate: src/hooks_textures.cpp::put_sprite_ex2_dest/TagDirectVrSpriteNodes:1017-1189 and src/vr/game/render_semantics.hpp::CapturePhysicalDrawCommand:1296-1432 — correlate originating type-1 mask source serial with live queue generation/epoch. Do not use node pointer alone or add risky B9200 post-CALL/+5 hooks.
+- src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp::R30TryXyzrhwPrimitiveUP/R30TryXyzrhwIndexedPrimitiveUP/R62TryFixedFunctionSpriteIndexed/Draw*DestR30:4052-4228,5231-5629 — bounded per-fingerprint logging of physical API, source and left/right native HRESULT, scissor/depth/projection restore under default R26+HUD.
+- src/vr/d3d9/stereo_renderer_r33.cpp::R33GuardStereoRasterState/R33Dispatch/Draw*DestR33:249-291,1561-1710,1904-2121 plus src/vr/game/universal_draw_trace.hpp:241-337 — R84_TEST comparison only; preserve one original draw when proof fails, never promote the R84 renderer by automation.
+- src/vr/d3d9/stereo_renderer_r7.inc:1491-1515,1629-1744 and vrhost/src/main_r23.cpp:1018-1319,3441-3555 — correlate game completion with host source selection/OpenXR frame; cap logging and prohibit per-frame full-size readbacks. No optical patch until same-build Quest3/VDXR observation confirms its particular producer.
+
+## REGRESSION_RISK
+
+- REGRESSION_RISK=NONE_FOR_DOCS_ONLY; FUTURE_PROBE_RISK=MODERATE; FUTURE_ROUTE_CHANGE_RISK=HIGH.
+- Preserve R26+HUD baseline, R84 comparison-only, 6th/6 and +TIME animations and numerals, GOAL/result alpha, mask ownership/selector, separate Calc3D2D vehicle rank, sky/lens/F11/ESC, D3DX queue epoch and source resolution, viewport/UV/XR eye extent/nonzero eye cant, R30/R62 RT/depth/stencil/scissor/projection restore, R7/host fail-closed Present, 72Hz frame pacing and performance measured only with frame traces. Never rewrite production C++/HLSL/CMake/workflows/config or widen arbitrary alpha into ScreenHud.
+
+## GITHUB_RECORD / AUTOMATION_VALIDATION / NEXT_REVIEW
+
+- GITHUB_RECORD=docs/reviews/dx9ex/automation/CONVERSION-DX9EX-01410.md; EXPECTED_DIFF=ONLY_THIS_NEW_MD; EXACT_MARKER=[AUTO:CONVERSION-DX9EX-01410].
+- AUTOMATION_VALIDATION=STATIC_SOURCE_REVIEW_COMPLETE; DOCS_ONLY_PATH_AND_REMOTE_READBACK=VERIFY_AFTER_COMMIT; BUILD_GATE=NOT_REQUIRED_DOCS_ONLY; CI_SKIP=NONE; CODE_CHANGE=NO; RUNTIME_VALIDATION=UNTESTED.
+- NEXT_REVIEW=Independently audit default R26+HUD original +TIME six E8 CALLs and GOAL/result numeric glyph against physical D3DX Flush/UP batch and per-eye submission; isolate clip-node versus animation-node GPU ancestry. Do not redo 0x42A800 API ambiguity or #01409 menu cache.
