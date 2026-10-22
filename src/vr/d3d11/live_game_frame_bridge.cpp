@@ -6,6 +6,7 @@
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_table_fog.hpp"
 #include "live_game_sm3_user_clip.hpp"
+#include "live_game_sm3_depth_output.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_sm3_stream_assembly.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
@@ -5474,6 +5475,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         it = s.liveSm3Pipelines.emplace(key, std::move(pipeline)).first;
     }
     auto& pipeline = it->second;
+    // An SM3 depth-output shader needs real, writable game Z provenance.
+    if (pipeline.program.pixelWritesDepth &&
+        !native_sm3_depth_target(liveDepth.enabled, liveDepth.writeEnabled,
+                                  true, alpha != FALSE, tableZFog.enabled))
+        return false;
     // A hash collision may never reuse shaders or a declaration from a
     // different live game draw.
     if (pipeline.alphaCompare != alphaFunc ||
@@ -5832,6 +5838,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         liveBatch.consume_depth_clear();
     }
     context->OMSetDepthStencilState(liveDepthState, 0u);
+    // Validate the actual native DSV before issuing oDepth GPU writes.
+    if (pipeline.program.pixelWritesDepth &&
+        !native_sm3_depth_target(liveDepth.enabled, liveDepth.writeEnabled,
+                                  s.diagnosticDepthView.Get() != nullptr,
+                                  alpha != FALSE, tableZFog.enabled))
+        return false;
     ID3D11BlendState* liveBlend = nullptr;
     switch (nativeBlend) {
     case LiveSm3Blend::disabled: break;

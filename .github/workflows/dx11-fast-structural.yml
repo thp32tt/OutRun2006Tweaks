@@ -410,6 +410,7 @@ jobs:
           python tools/test_dx11_live_shader_cache_01004.py
           python tools/test_dx11_live_sm3_table_zfog_01005.py
           python tools/test_dx11_live_sm3_user_clip_01006.py
+          python tools/test_dx11_live_sm3_depth_01007.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_shader_cache_01004.cpp -o /tmp/dx11_live_shader_cache_01004 && /tmp/dx11_live_shader_cache_01004
           # 01003 source-stamped GPU staging through native menu/car/race Present.
           python tools/test_dx11_readback_copy_01003.py
