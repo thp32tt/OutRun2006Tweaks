@@ -14,6 +14,7 @@
 #include "native_sm3_predicate_flow.hpp"
 #include "native_sm3_predicated_instruction.hpp"
 #include "native_sm3_destination_output.hpp"
+#include "native_sm3_aux_color_output.hpp"
 #include "live_game_sm3_alpha_test.hpp"
 #include "live_game_sm3_table_fog.hpp"
 #include "live_game_sm3_user_clip.hpp"
@@ -418,6 +419,10 @@ bool build_r283_sm3_mov_shader_source(
         std::array<unsigned, 32> tempWritten{};
         std::array<bool, 32> tempUsed{};
         std::array<unsigned, 16> outputWritten{};
+        // D3D9 ps_3_0 may author oC1..oC3 even when the game's MRT
+        // attachments are absent or COLORWRITEENABLE1..3 are all zero.
+        // Compile those instructions into isolated locals, never native RTVs.
+        std::array<bool, 4> ignoredMrtOutputUsed{};
         bool depthWritten = false;
         std::array<bool, 256> defPresent{};
         std::array<std::array<std::uint32_t, 4>, 256> defBits{};
@@ -1150,8 +1155,14 @@ bool build_r283_sm3_mov_shader_source(
                     return false;
             } else if (!vertexStage &&
                        op.destinationType == D3DSPR_COLOROUT &&
-                       op.destinationRegister == 0u) {
-                // Pixel color output is an implicit SM3 register.
+                       (op.destinationRegister == 0u ||
+                        native_sm3_aux_color_destination(
+                            vertexStage, op.destinationRegister, mask))) {
+                // D3D9 oC0 feeds native SV_Target0. oC1..oC3 are genuine
+                // game instructions but cannot be exposed as native MRT
+                // writes: the live draw admits only inert extra targets.
+                if (op.destinationRegister != 0u)
+                    ignoredMrtOutputUsed[op.destinationRegister] = true;
             } else if (!vertexStage &&
                        op.destinationType == D3DSPR_DEPTHOUT &&
                        native_sm3_depth_destination(
@@ -1418,9 +1429,9 @@ bool build_r283_sm3_mov_shader_source(
                     native_sm3_predicated_write_mask(
                         outputWritten[op.destinationRegister], mask, op.predicated);
             else if (op.destinationType == D3DSPR_COLOROUT)
-                outputWritten[0] =
+                outputWritten[op.destinationRegister] =
                     native_sm3_predicated_write_mask(
-                        outputWritten[0], mask, op.predicated);
+                        outputWritten[op.destinationRegister], mask, op.predicated);
             // oDepth is not evidence of fully written COLOROUT.
             if (op.signScratch) {
                 for (const UINT scratch : op.signTemps)
@@ -1517,6 +1528,10 @@ bool build_r283_sm3_mov_shader_source(
             translated += "float4 main(R283Input input) : SV_Target0 {\n"
                           "    float4 r283_color = float4(0, 0, 0, 0);\n";
         }
+        // Auxiliary oC writes are parsed and translated, not silently
+        // skipped. They have no D3D11 MRT binding: only the game's exact
+        // write-disabled/absent attachments permit this draw to proceed.
+        append_native_sm3_ignored_mrt_locals(translated, ignoredMrtOutputUsed);
         if (predicateUsed)
             translated += "    bool r283_p0 = false;\n";
         for (UINT reg = 0u; reg < tempUsed.size(); ++reg)
@@ -1570,7 +1585,10 @@ bool build_r283_sm3_mov_shader_source(
                 dest = "output.r" + std::to_string(op.destinationRegister);
             else if (op.destinationType == D3DSPR_DEPTHOUT)
                 dest = "r283_depth";
-            else dest = "r283_color";
+            else if (op.destinationType == D3DSPR_COLOROUT)
+                dest = op.destinationRegister == 0u ? "r283_color" :
+                    "r283_oC" + std::to_string(op.destinationRegister);
+            else return false;
             if (op.predicated &&
                 !append_native_sm3_predicated_begin(
                     translated, op.negatePredicate))
