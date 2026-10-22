@@ -12,14 +12,14 @@
   "feature_id": "DX11:LIVE_SM3_AUXILIARY_MRT_PIXEL_SHADER_DRAW",
   "work_class": "integration",
   "classification": "A",
-  "status": "CI_PENDING",
-  "checkpoint": "C4_MATERIAL_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_head": "c1f80700ad5d0c0734eccf8493920a2f94eb82cd",
   "material_result_sha": "10b44a71c5cb96be20008baaf914379630e3368e",
-  "validation_bearing_result_sha": null,
-  "result_sha": "10b44a71c5cb96be20008baaf914379630e3368e",
-  "AUTOMATION_VALIDATION": "PENDING_REPAIR",
-  "automation_validation": "PENDING_REPAIR",
+  "validation_bearing_result_sha": "a6b4145ddb31a1d3b53d8e552715591e46aca9b2",
+  "result_sha": "a6b4145ddb31a1d3b53d8e552715591e46aca9b2",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
   "runtime_validation": "UNTESTED",
   "gameplay_test_performed": false,
@@ -30,8 +30,8 @@
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "source_implementation_time_ratio": "UNMEASURED",
-  "score_change": 0,
-  "summary": "Real ps_3_0 game shader oC1..oC3 auxiliary target writes formerly rejected in native HLSL compiler. Translate those source instructions into isolated local pixel registers, keep oC0 sole SV_Target0, and admit only when the source game's existing MRT1..3 bindings are absent or completely write-masked. Native D3D11 GPU Draw/DrawIndexed, original D3D9Ex rendering/input/FFB fallback, and exact source order preserved. Positive and negative native C++ tests wired into DX11 Fast. CI pending after material commit; original 01010 SHA failed early due pre-existing 01009 latest-run policy record missing development_strategy. This same-task repair records the complete 01010 development_strategy and awaits exact-SHA five Gates. Real game and Quest3 HMD UNTESTED.",
+  "score_change": 1,
+  "summary": "Real ps_3_0 game shader oC1..oC3 auxiliary target writes formerly rejected in native HLSL compiler. Translate those source instructions into isolated local pixel registers, keep oC0 sole SV_Target0, and admit only when the source game's existing MRT1..3 bindings are absent or completely write-masked. Native D3D11 GPU Draw/DrawIndexed, original D3D9Ex rendering/input/FFB fallback, and exact source order preserved. Positive and negative native C++ tests wired into DX11 Fast. Material SHA failed early in policy because older 01009 latest-run record omitted development_strategy; same-task repair added the complete 01010 strategy on a new SHA. All five mandatory Actions SUCCESS on the validation-bearing SHA. Source/CI build verified only; actual gameplay and Quest3/VDXR still UNTESTED. Real game and Quest3 HMD UNTESTED.",
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
@@ -45,7 +45,7 @@
       "Real native D3D9 game MRT binding and guarded D3D11 output, portable C++ positive/negative regression, existing exact-SHA Actions integration"
     ],
     "acceptance_proof": {
-      "positive_probe": "Compiler accepts game shader oC1..oC3 arithmetic as local HLSL alongside actual oC0 and emits real opt-in GPU Draw source; C++/CI verification pending",
+      "positive_probe": "Portable C++ and source integration regressions passed in DX11 Fast Gate and five exact-SHA GitHub workflows; real gameplay pixels remain UNTESTED",
       "negative_regression": "Invalid oC4, vertex oC1, malformed register masks and writable/unknown extra game targets reject native conversion and retain D3D9Ex Draw/input",
       "component_integration": "Intercepted ps_3_0 -> generated HLSL auxiliary locals + SV_Target0 -> real MRT provenance -> native Draw/DrawIndexed/Present"
     },
@@ -53,7 +53,7 @@
       "DX11:LIVE_SM3_AUXILIARY_MRT_PIXEL_SHADER_DRAW"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_CHANGE_COMMITTED_CI_PENDING; ACTUAL_MENU_VEHICLE_RACE_PIXEL_COVERAGE_AND_HMD_UNTESTED",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_AT_EXACT_SHA; ACTUAL_MENU_VEHICLE_RACE_PIXEL_COVERAGE_AND_HMD_UNTESTED",
     "activation_guard_and_fallback": "Game-native path remains opt-in only; strict source RT1..3 inertness, no implicit shader channel initialization, original DX9Ex/gamepad/FFB/SkyGlow unchanged.",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
@@ -94,32 +94,73 @@
   ],
   "acceptance_results": {
     "authentic_sm3_aux_output_native_draw": {
-      "status": "PENDING_EXACT_SHA",
-      "runtime_validation": "UNTESTED"
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_aux_color_output.hpp"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_aux_mrt_01010.py; GitHub Actions 5 mandatory Gates exact SHA a6b4145ddb31a1d3b53d8e552715591e46aca9b2"
     },
     "extra_mrt_writes_fallback": {
-      "status": "PENDING_EXACT_SHA",
-      "runtime_validation": "UNTESTED"
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_live_sm3_aux_mrt_01010.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_aux_mrt_01010.py; GitHub Actions 5 mandatory Gates exact SHA a6b4145ddb31a1d3b53d8e552715591e46aca9b2"
     },
     "exact_sha_five_gate_and_cpp": {
-      "status": "PENDING_EXACT_SHA",
-      "runtime_validation": "UNTESTED"
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tools/test_dx11_live_sm3_aux_mrt_01010.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_aux_mrt_01010.py; GitHub Actions 5 mandatory Gates exact SHA a6b4145ddb31a1d3b53d8e552715591e46aca9b2"
     }
   },
   "ci": {
-    "status": "FAIL_POLICY_LATEST_RUN_01009_NO_DEVELOPMENT_STRATEGY_REPAIR_01010",
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
     "material_source_commit": "10b44a71c5cb96be20008baaf914379630e3368e",
-    "validation_bearing_exact_sha": null,
+    "validation_bearing_exact_sha": "a6b4145ddb31a1d3b53d8e552715591e46aca9b2",
     "failed_on_sha": "10b44a71c5cb96be20008baaf914379630e3368e",
     "reason": "Legacy 01009 run record lacked development_strategy; latest-run policy validation stopped before source tests; 01010 record supplies complete required strategy without modifying prior validated C++ source.",
     "required": [
-      "DX11 Fast Structural Checks",
-      "Backend Conversion Gate",
-      "Build",
-      "OpenXR VR architecture",
-      "OutRun EXE HUD Inspector CI"
-    ]
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39773990571,
+        "conclusion": "success",
+        "sha": "a6b4145ddb31a1d3b53d8e552715591e46aca9b2"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39773990572,
+        "conclusion": "success",
+        "sha": "a6b4145ddb31a1d3b53d8e552715591e46aca9b2"
+      },
+      {
+        "name": "Build",
+        "run_id": 39773990490,
+        "conclusion": "success",
+        "sha": "a6b4145ddb31a1d3b53d8e552715591e46aca9b2"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39773990500,
+        "conclusion": "success",
+        "sha": "a6b4145ddb31a1d3b53d8e552715591e46aca9b2"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39773990579,
+        "conclusion": "success",
+        "sha": "a6b4145ddb31a1d3b53d8e552715591e46aca9b2"
+      }
+    ],
+    "optional_redundant_runs": "All same-SHA workflow duplicates completed SUCCESS or optional VR PC Fast Test Build SKIPPED; no forced rerun of previous passing SHA"
   },
-  "RUNTIME_VALIDATION_NOTES": "No actual OutRun game/Quest3/VDXR/HMD/menu/car/race observations; no screen evidence. NEED_HMD_TEST after exact source SHA verified.",
-  "next_implementation_action": "Finish current feature Gate repair on the SAME 01010 ID, then only if exact-SHA 5/5 PASS record separated C6 result; runtime remains UNTESTED. Continue larger native menu-to-race Draw coverage and L/R OpenXR without DXVK development."
+  "RUNTIME_VALIDATION_NOTES": "NO_REAL_GAME_TEST; NO_GAMEPAD_SESSION; NO_QUEST3_VDXR; NATIVE_GAME_DRAW_COUNT=UNTESTED; NATIVE_PUBLISHED_FRAME_COUNT=UNTESTED; RUNTIME_VALIDATION=UNTESTED. CI cannot prove actual native game pixels or stereo playability.",
+  "next_implementation_action": "Next independent non-conflicting feature after 01010 terminal: continue native full-frame menu/car/race source GPU coverage and distinct L/R OpenXR producer/consumer; measured actual runtime remains NEED_HMD_TEST; DXVK frozen."
 }
