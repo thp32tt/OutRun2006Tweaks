@@ -2652,10 +2652,12 @@ require('CorroboratesProjectedScreenEffect', r30, 'exact lens WVP ownership guar
 require('exactSceneEffect', r30, 'SceneEffect/lens ownership admission')
 require_order(
     r30,
-    'lens ownership must be semantic before WVP classification',
+    'lens ownership must be semantic before dedicated fusion / scene WVP classification',
     'const bool semanticProjectedScreen',
+    'if (semanticProjectedScreen)',
+    'return R30ScreenSpaceKind::ProjectedScreenEffect2D;',
     'if (!semanticHud && !semanticWorld && !semanticSceneEffect',
-    'if (semanticProjectedScreen || semanticSceneEffect)',
+    'if (semanticSceneEffect)',
     'R44GetOwnedRawOverlayWvp(rawWvp)',
     'R44ClassifyOwnedOverlayMatrix(rawWvp)',
 )
@@ -3188,9 +3190,9 @@ for label, corrupt in (
         raise SystemExit('P0 original HUD c64 mutation survived: ' + label)
 
 
-# The original EXE+0xCABE lens/Clr_SceneEffect owns two shader variants:
-# flat lens is classified as PerspectiveHud, spatial effect WorldBillboard.
-# Neither may accidentally inherit only ScreenHud's recovery gate.
+# Exact EXE+0xCABE is a centre-eye projected screen effect and gets the
+# HMD-proven R69 zero-disparity fusion path. Other Clr_SceneEffect variants
+# retain flat/spatial WVP classification. All paths require original raw c64.
 def check_exact_scene_effect_raw_wvp(source):
     scope = function_body(source, 'bool R30ExactSceneEffectScope(')
     require('RenderScope::SceneEffect', scope,
@@ -3212,24 +3214,36 @@ def check_exact_scene_effect_raw_wvp(source):
     classifier = function_body(source,
                                 'R30ScreenSpaceKind R30ClassifyScreenSpacePass(')
     require_order(
-        classifier, 'scene producer classifies only on original game WVP',
-        'if (semanticProjectedScreen || semanticSceneEffect)',
+        classifier, 'CABE fusion precedes generic SceneEffect WVP classification',
+        'if (semanticProjectedScreen)',
+        'return R30ScreenSpaceKind::ProjectedScreenEffect2D;',
+        'if (semanticSceneEffect)',
         'if (!R44GetOwnedRawOverlayWvp(rawWvp) &&',
         '!R30GetExtendedRawWvpForExactSceneEffect(rawWvp))',
         'R44ClassifyOwnedOverlayMatrix(rawWvp)'
     )
     eye = function_body(source, 'bool R30BuildScreenSpaceEyeConstants(')
+    projected = eye[eye.index(
+        'R30ScreenSpaceKind::ProjectedScreenEffect2D)'):]
+    require_order(
+        projected, 'CABE fusion uses bounded original game WVP before eye copy',
+        'if (!R44GetOwnedRawOverlayWvp(original) &&',
+        '!R30GetExtendedRawWvpForExactSceneEffect(original))',
+        'if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)',
+        'std::memcpy(eyeConstants[0], &stockT',
+        'std::memcpy(eyeConstants[1], &stockT'
+    )
     fallback = eye[eye.index('if (!R44GetOwnedRawOverlayWvp(original))'):]
     require_order(
-        fallback, 'both flat and spatial lens use original game WVP',
+        fallback, 'flat/spatial SceneEffect retains original game WVP fallback',
         'if (!R30GetExtendedRawWvpForExactHud(original) &&',
         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'else if (R30ExactSceneEffectScope())',
         'if (!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'GetVertexShaderConstantF('
     )
-    if fallback.count('R30GetExtendedRawWvpForExactSceneEffect(original)') != 2:
-        raise SystemExit('P0 exact SceneEffect flat/spatial coverage mismatch')
+    if fallback.count('R30GetExtendedRawWvpForExactSceneEffect(original)') != 3:
+        raise SystemExit('P0 exact SceneEffect/CABE raw-WVP coverage mismatch')
 
 check_exact_scene_effect_raw_wvp(r30)
 for label, mutant in (
