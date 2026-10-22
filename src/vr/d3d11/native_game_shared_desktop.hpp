@@ -29,12 +29,14 @@ public:
         source_.Reset();
         resolvedSource_.Reset();
         fence_.Reset();
+        d3d9ReadFence_.Reset();
         shared9_.Reset();
         game9Ex_.Reset();
         device11_.Reset();
         width_ = height_ = 0;
         generation_ = 0;
         pending_ = false;
+        d3d9ReadPending_ = false;
         faulted_ = false;
     }
 
@@ -172,6 +174,15 @@ public:
                 reset();
                 return false;
             }
+            // D3D11 completion only proves that the shared allocation was
+            // written. D3D9Ex may still be reading it for StretchRect. A
+            // separate D3D9 EVENT fences that consumption before the next
+            // menu/car/race frame overwrites the same shared allocation.
+            if (FAILED(ex->CreateQuery(D3DQUERYTYPE_EVENT,
+                    d3d9ReadFence_.GetAddressOf())) || !d3d9ReadFence_) {
+                reset();
+                return false;
+            }
             D3D11_QUERY_DESC query{};
             query.Query = D3D11_QUERY_EVENT;
             if (FAILED(device->CreateQuery(
@@ -185,7 +196,21 @@ public:
             height_ = height;
             generation_ = generation;
         }
-        if (faulted_ || !source_ || !fence_) return false;
+        if (faulted_ || !source_ || !fence_ || !d3d9ReadFence_) return false;
+        // A successful D3D11 copy and D3D9 StretchRect HRESULT do not
+        // establish that the D3D9 GPU is finished reading the shared pixels.
+        // Poll without waiting; an unfinished read keeps the original D3D9
+        // Present and input/FFB authoritative for this frame.
+        if (d3d9ReadPending_) {
+            const HRESULT readDone = d3d9ReadFence_->GetData(
+                nullptr, 0u, D3DGETDATA_FLUSH);
+            if (readDone == S_FALSE) return false;
+            if (readDone != S_OK) {
+                faulted_ = true;
+                return false;
+            }
+            d3d9ReadPending_ = false;
+        }
 
         // Never overwrite an allocation while an earlier asynchronous
         // D3D11 CopyResource is still in flight. Old frames are discarded,
@@ -344,9 +369,29 @@ public:
                         restored = false;
                 }
                 if (!restored) faulted_ = true;
+                // Even a failed D3D9 StretchRect may have queued a GPU read
+                // of the shared texture. Fence it after rollback commands
+                // before permitting any later D3D11 write to that memory.
+                if (SUCCEEDED(d3d9ReadFence_->Issue(D3DISSUE_END)))
+                    d3d9ReadPending_ = true;
+                else faulted_ = true;
                 return false;
             }
         }
+        // Consumer-side acknowledgment: never reuse a shared GPU frame
+        // until D3D9Ex completes ALL source reads for the current Present.
+        if (FAILED(d3d9ReadFence_->Issue(D3DISSUE_END))) {
+            // An unfenced native Present cannot be called successful. Restore
+            // the game's complete original tiles before disabling the bridge.
+            for (std::uint32_t i = 0u; i < regionCount; ++i)
+                if (FAILED(game->StretchRect(
+                        backups_[i].Get(), nullptr, backbuffer,
+                        &visibleRegions[i], D3DTEXF_NONE)))
+                    faulted_ = true;
+            faulted_ = true;
+            return false;
+        }
+        d3d9ReadPending_ = true;
         return true;
     }
 private:
@@ -360,11 +405,13 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Texture2D> resolvedSource_;
     Microsoft::WRL::ComPtr<IDirect3DTexture9> shared9_;
     Microsoft::WRL::ComPtr<ID3D11Query> fence_;
+    Microsoft::WRL::ComPtr<IDirect3DQuery9> d3d9ReadFence_;
     Microsoft::WRL::ComPtr<IDirect3DDevice9Ex> game9Ex_;
     Microsoft::WRL::ComPtr<ID3D11Device> device11_;
     std::uint32_t width_ = 0, height_ = 0;
     std::uint64_t generation_ = 0;
     bool pending_ = false;
+    bool d3d9ReadPending_ = false;
     bool faulted_ = false;
 };
 } // namespace outrun::vr::dx11::live_game_frame
