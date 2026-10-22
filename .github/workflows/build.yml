@@ -7,7 +7,9 @@ on:
 
 concurrency:
   group: build-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Preserve running exact-SHA Build/HUD evidence for DX11 01013.
+  # Other branches retain existing same-ref newer-push cancellation.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/feature/dx11-01013-live-sm3-game-frame' }}
 
 jobs:
   build:
@@ -24,7 +26,7 @@ jobs:
           submodules: recursive
 
       - name: Verify exact pushed DX11 source checkout
-        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame' || github.ref_name == 'feature/dx11-00970-live-game-rt-frame' || github.ref_name == 'feature/dx11-00973-live-cube-rt-game-frame' || github.ref_name == 'feature/dx11-00974-live-cube-color-frame')
+        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame' || github.ref_name == 'feature/dx11-00970-live-game-rt-frame' || github.ref_name == 'feature/dx11-00973-live-cube-rt-game-frame' || github.ref_name == 'feature/dx11-00974-live-cube-color-frame' || github.ref_name == 'feature/dx11-01013-live-sm3-game-frame')
         shell: pwsh
         run: |
           $actual = (git rev-parse HEAD).Trim()
