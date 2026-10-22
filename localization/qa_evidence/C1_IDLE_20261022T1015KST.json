@@ -1,0 +1,50 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1015KST-SHA-RECHECK",
+  "lane": "C1",
+  "status": "IDLE",
+  "checked_at_kst": "2026-10-22T10:19:18+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before": "9b0e900c30725c2a83d7e763537d28b0d4744ec8",
+  "policy_files_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_inventory": {
+    "root": "/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "export_evidence_files": 66,
+    "exported_candidate_records": 313,
+    "unique_actual_sha256": 313,
+    "prior_qa_report_and_metric_files": 53,
+    "historical_reviewed_sha256": 318,
+    "new_unreviewed_sha256": 0,
+    "export_sha_mismatch": 0,
+    "missing_candidate_or_source": 0,
+    "inventory_script": "work/c1_20261022_1015_inventory.py",
+    "script_sha256": "b53be1a955912695959305d43195d41b2d011aedbb22ec2606b96f6f29dee62d",
+    "inventory_result": "work/c1_20261022_1015_inventory_result.json",
+    "result_sha256": "b052945f4dc147b0035c13497d9ee8fae408c5e0f006cd9edb89485558995d74"
+  },
+  "qa_actions": {
+    "new_visual_reviews": 0,
+    "pass": 0,
+    "fail": 0,
+    "imagegen_calls": 0,
+    "ab_queue_consumed": 0,
+    "new_dds": 0,
+    "new_c2_c3_or_ingame_approvals": 0
+  },
+  "policy_note": "Do not FAIL purely because Korean text width or glyph size is less than English; only actual pixel/legibility/safety defects govern any future review.",
+  "reason": "SHA-audited exported local A/B PNG and deduplicated against historical C1 reports: all 313 candidates already reviewed. No eligible new SHA.",
+  "scope_limit": "Only candidates present in producer export evidence and corresponding local files; does not certify other uninventoried artifacts.",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "score_reason": "Status recheck/IDLE evidence is not newly accepted QA output; no repeat scoring for already reviewed candidates.",
+  "out_of_scope_untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
