@@ -7,6 +7,8 @@ on:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
       - 'src/hooks_uiscaling.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'tools/verify_vr_r26_result_hud_pose.py'
       - 'src/vr/settings.cpp'
       - 'vrhost/**'
       - 'CMakeLists.txt'
