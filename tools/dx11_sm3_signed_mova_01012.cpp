@@ -46,15 +46,15 @@ int main() {
     std::array<std::string, 4> rows{};
     bool live = false;
     assert(native_sm3_relative_matrix_references(
-        255u, 3u, 256u, true, -3, false, 0, 0, 0,
+        253u, 3u, 256u, true, -3, false, 0, 0, 0,
         localDef, limits, rows, live));
-    assert(live && rows[0] == "r283_c[252]" &&
-           rows[1] == "r283_c[253]" && rows[2] == "r283_c[254]");
-    localDef[253] = true;
+    assert(live && rows[0] == "r283_c[250]" &&
+           rows[1] == "r283_c[251]" && rows[2] == "r283_c[252]");
+    localDef[251] = true;
     assert(native_sm3_relative_matrix_references(
-        255u, 3u, 256u, true, -3, false, 0, 0, 0,
+        253u, 3u, 256u, true, -3, false, 0, 0, 0,
         localDef, limits, rows, live));
-    assert(rows[1] == "r283_def253");
+    assert(rows[1] == "r283_def251");
     assert(!native_sm3_relative_matrix_references(
         1u, 3u, 256u, true, -3, false, 0, 0, 0,
         localDef, limits, rows, live));
