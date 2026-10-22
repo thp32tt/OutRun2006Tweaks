@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "task_id": "CONVERSION-DX11-01013",
+  "production_id": "CONVERSION-DX11-01013",
+  "event_id": "CONVERSION-DX11-01013-E005",
+  "event_type": "rollover_continuation",
+  "attempt": "1/3",
+  "chat_rollover": 12,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+  "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+  "feature_stage": "SOURCE_IMPLEMENTATION_IN_PROGRESS",
+  "feature_ready": false,
+  "restored_target_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "restored_feature_sha": "b3b1839f9025eb044771149a08f8c7f01a9c7641",
+  "material_source_sha": "8195436ac36d5289d94f0f5802c26ba746473364",
+  "material_commits": [
+    "2361181ed27bc5b30562611e51037b4710a5cb43",
+    "a196181cfb6947348722cd99206efa8659f3f74e",
+    "5ad2b35031979f488a1a99e0c9bde1bfd3d5f4c9",
+    "8195436ac36d5289d94f0f5802c26ba746473364"
+  ],
+  "changed_paths": [
+    "src/vr/d3d11/live_game_sm3_composite.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_sm3_effective_blend_01013.cpp",
+    "tools/test_dx11_live_sm3_blend_factor_00966.py"
+  ],
+  "result": "Actual game-authored SM3 Draw/DrawIndexed OM color-mask support: nonwritten RGB/independent-alpha blending treated as neutral, written channel validated; dynamic BLENDFACTOR read gated by COLORWRITEENABLE. Original D3D9/DX9Ex output/input/FFB unaffected.",
+  "targeted_validation": {
+    "status": "PASS",
+    "exact_sha": "8195436ac36d5289d94f0f5802c26ba746473364",
+    "workflow": "DX11 Fast Structural Checks",
+    "run_id": 39846529847,
+    "conclusion": "success",
+    "validation_commands": [
+      "python tools/test_dx11_live_sm3_blend_factor_00966.py",
+      "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_effective_blend_01013.cpp -o /tmp/dx11_sm3_effective_blend_01013 && /tmp/dx11_sm3_effective_blend_01013"
+    ]
+  },
+  "full_ci": {
+    "status": "PENDING",
+    "head_sha": "8195436ac36d5289d94f0f5802c26ba746473364",
+    "runs": {
+      "DX11 Fast Structural Checks": 39846529847,
+      "Backend Conversion Gate": 39846529823,
+      "Build": 39846529849,
+      "OpenXR VR architecture": 39846529841,
+      "OutRun EXE HUD Inspector CI": 39846529948
+    }
+  },
+  "prior_fast_failure": {
+    "sha": "a196181cfb6947348722cd99206efa8659f3f74e",
+    "run_id": 39846205812,
+    "cause": "old Python contract expected call without colorMask",
+    "repair_sha": "8195436ac36d5289d94f0f5802c26ba746473364"
+  },
+  "r175_owner": "CONVERSION-DX11-00477 complete; TEXCOORD6 no duplicate changes",
+  "remaining_acceptance_items": [
+    "Full exact-SHA five-gate final evidence and bundles",
+    "Actual game eligible_state_draws/native_draws/native full-frame publication positive matching source SHA",
+    "Complete menu->vehicle selection->sustained race native Draw ordinal coverage",
+    "Distinct actual native L/R eye and OpenXR GPU handoff verified; Quest3/VDXR hardware session"
+  ],
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "No authentic game launch/logs at current SHA; cannot assert native Draw/Present despite static CI.",
+  "next_implementation_action": "Read latest exact-SHA mandatory CI and repair only any evidenced failure. For live runtime acceptance, capture SM3 stage rejection/native draw publication counters, fix first supported actual game draw blocker and preserve fallback.",
+  "runtime_validation": "UNTESTED",
+  "target_promoted": false,
+  "score_change": 0,
+  "score_ssot_observed_ai2": 1907,
+  "marker": "[AUTO:CONVERSION-DX11-01013]"
+}
