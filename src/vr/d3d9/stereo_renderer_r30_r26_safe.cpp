@@ -3161,7 +3161,7 @@ namespace OutRunVRStereo
                   (R30ExternalImGuiStereoDraws - 1)) == 0))
                 spdlog::info(
                     "VR F11 SOURCE-ASPECT PROBE: hits={} game={}x{} "
-                    "viewport={},{},{},{} mode=FOV_ONLY_SCREEN2D "
+                    "viewport={},{},{},{} mode={} "
                     "scissorL={},{},{},{} scissorR={},{},{},{} "
                     "leftHr=0x{:08X} rightHr=0x{:08X}",
                     R30ExternalImGuiStereoDraws,
