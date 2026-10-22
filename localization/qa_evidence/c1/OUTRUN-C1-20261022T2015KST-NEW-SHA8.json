@@ -1,0 +1,470 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T2015KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T20:20:04.270231+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "mode": "independent_lightweight_QA_only",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_selection": "Five SHA distinct candidates from B-0057, three SHA distinct candidates from A-0043. Subsequent to existing B-0056/A-0042 C1 19:45 evidence. No A/B queue consumption.",
+  "summary": {
+    "reviewed": 8,
+    "source_sha_matches_manifest": 8,
+    "candidate_sha_matches_completion_and_export": 8,
+    "png_rgba": 8,
+    "approved_mapping_readable": 8,
+    "single_phrase_roi": 8,
+    "generated_canvas_differs_from_original": 8,
+    "hold_native_ui_placement": 8,
+    "c1_final_pass": 0,
+    "dds_generated": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "n100_metrics": "work/c1_20261022_2015/metrics.json",
+    "n100_contact_sheets": [
+      "work/c1_20261022_2015/compare_1.jpg",
+      "work/c1_20261022_2015/compare_2.jpg",
+      "work/c1_20261022_2015/compare_3.jpg",
+      "work/c1_20261022_2015/compare_4.jpg"
+    ],
+    "n100_producer_completion": [
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-B-0057-4DD889F4.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0043-9AD57F60.json"
+    ],
+    "remarks": "Independent SHA-bound C1 QA only. All candidate pixel preview comparisons reviewed. Source English/candidate Korean mappings are from production manifest. No ImageGen invocation, queue mutation, final DDS, C2/C3/ingame approval or deployment. Output canvas mismatch is HOLD requiring native ROI rescale/anchor verification, not automatic glyph-size FAIL."
+  },
+  "records": [
+    {
+      "index": 1,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_file": "Q147_a3d11ea18b6985f3_source.png",
+      "candidate_file": "Q147_a3d11ea18b6985f3_source_k.png",
+      "english": "CLOUDY HIGHLAND",
+      "approved_korean": "클라우디 하이랜드",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_bbox_xyxy": [
+        0,
+        362,
+        697,
+        449
+      ],
+      "source_sha256": "a74476204093f04c8a949f03aee6cd2b8b67baf886021c732eca7516771eed4b",
+      "candidate_sha256": "b5f83cf6d73521fff0b60e663425241d02117b93538b4a0d5debc6c64db6a092",
+      "source_dimensions": [
+        1394,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        42,
+        51,
+        2133,
+        628
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_single_phrase_roi": true,
+      "visual_mapping_and_hangul_readable": true,
+      "visual_unwanted_frame_or_english_remnant": false,
+      "text_length_difference_ignored": true,
+      "source_ui_native_placement_verified": false,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "CLOUDY HIGHLAND → 클라우디 하이랜드. One phrase; visible Korean readable with no obvious protected-art/frame/English-remnant issue, but generated canvas 2172×724 versus source 1394×174. Native ROI restoration/UI cell bounds and original UV anchor unverified.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "index": 2,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_file": "Q154_063fc310b20287c3_source.png",
+      "candidate_file": "Q154_063fc310b20287c3_source_k.png",
+      "english": "MULTIPLAYER",
+      "approved_korean": "멀티플레이",
+      "source_dds_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "source_bbox_xyxy": [
+        0,
+        180,
+        1285,
+        370
+      ],
+      "source_sha256": "0184977d93cb0370f312c013b11649214953457896a8e2a9f6b55346b4403476",
+      "candidate_sha256": "5c5de0aead9bed2d16576200359ae0dcaa70806f61930b79d0b9c50152f80373",
+      "source_dimensions": [
+        1285,
+        190
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        0,
+        0,
+        2156,
+        667
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_single_phrase_roi": true,
+      "visual_mapping_and_hangul_readable": true,
+      "visual_unwanted_frame_or_english_remnant": false,
+      "text_length_difference_ignored": true,
+      "source_ui_native_placement_verified": false,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "MULTIPLAYER → 멀티플레이. One phrase; visible Korean readable with no obvious protected-art/frame/English-remnant issue, but generated canvas 2172×724 versus source 1285×190. Native ROI restoration/UI cell bounds and original UV anchor unverified.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "index": 3,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_file": "Q159_b8b786b1a621508b_source.png",
+      "candidate_file": "Q159_b8b786b1a621508b_source_k.png",
+      "english": "LEGEND",
+      "approved_korean": "레전드",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_bbox_xyxy": [
+        0,
+        675,
+        317,
+        762
+      ],
+      "source_sha256": "42517bcd840b9af6b5696262af88d45503285a14d4382a08689864502d3e8b62",
+      "candidate_sha256": "97c85f8abbed489cea4ba07608c782cdfcd95b6ad18702beaaf713c6216c28f4",
+      "source_dimensions": [
+        634,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        272,
+        25,
+        1893,
+        644
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_single_phrase_roi": true,
+      "visual_mapping_and_hangul_readable": true,
+      "visual_unwanted_frame_or_english_remnant": false,
+      "text_length_difference_ignored": true,
+      "source_ui_native_placement_verified": false,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "LEGEND → 레전드. One phrase; visible Korean readable with no obvious protected-art/frame/English-remnant issue, but generated canvas 2172×724 versus source 634×174. Native ROI restoration/UI cell bounds and original UV anchor unverified.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "index": 4,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_file": "Q159_b660ad663d40011f_source.png",
+      "candidate_file": "Q159_b660ad663d40011f_source_k.png",
+      "english": "CANYON",
+      "approved_korean": "캐니언",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_bbox_xyxy": [
+        0,
+        411,
+        319,
+        498
+      ],
+      "source_sha256": "9db5a23f7eb72f11768723733d51e4713207bd875f5545930cc8b0d97833c9d9",
+      "candidate_sha256": "2f71ec9d9ff94962ceb66509d23f2cb1cfd1fe03f0f8c075125d97ae3ef234c8",
+      "source_dimensions": [
+        638,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        406,
+        54,
+        1772,
+        682
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_single_phrase_roi": true,
+      "visual_mapping_and_hangul_readable": true,
+      "visual_unwanted_frame_or_english_remnant": false,
+      "text_length_difference_ignored": true,
+      "source_ui_native_placement_verified": false,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "CANYON → 캐니언. One phrase; visible Korean readable with no obvious protected-art/frame/English-remnant issue, but generated canvas 2172×724 versus source 638×174. Native ROI restoration/UI cell bounds and original UV anchor unverified.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "index": 5,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_file": "Q163_ff950df7f6bfd086_source.png",
+      "candidate_file": "Q163_ff950df7f6bfd086_source_k.png",
+      "english": "Imperial Avenue",
+      "approved_korean": "임페리얼 애비뉴",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        986,
+        438,
+        1068
+      ],
+      "source_sha256": "566ac2c50a4f55abc4c746b35003e6684222386e8107df9f3e4a4cdc1855ba7a",
+      "candidate_sha256": "3bc69b9670e92551b555681d4987ceac9804eef0929f5e6ea1793d03911ef324",
+      "source_dimensions": [
+        876,
+        164
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        0,
+        22,
+        2126,
+        668
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_single_phrase_roi": true,
+      "visual_mapping_and_hangul_readable": true,
+      "visual_unwanted_frame_or_english_remnant": false,
+      "text_length_difference_ignored": true,
+      "source_ui_native_placement_verified": false,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "Imperial Avenue → 임페리얼 애비뉴. One phrase; visible Korean readable with no obvious protected-art/frame/English-remnant issue, but generated canvas 2172×724 versus source 876×164. Native ROI restoration/UI cell bounds and original UV anchor unverified.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "index": 6,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0043-9AD57F60",
+      "source_file": "Q147_9f204243ab7cfbc1_source.png",
+      "candidate_file": "Q147_9f204243ab7cfbc1_source_k.png",
+      "english": "DEEP LAKE",
+      "approved_korean": "딥 레이크",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_bbox_xyxy": [
+        0,
+        455,
+        422,
+        539
+      ],
+      "source_sha256": "ec6945bbaed2b4c56d0c43e0cfee591832ea67c734067e7ffc9424cde3368c83",
+      "candidate_sha256": "9c37fab646a45481d4f2f1f0f15fd6ee47247432731df7e11070a852ef3b4d51",
+      "source_dimensions": [
+        844,
+        168
+      ],
+      "candidate_dimensions": [
+        1774,
+        887
+      ],
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        150,
+        219,
+        1621,
+        749
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_single_phrase_roi": true,
+      "visual_mapping_and_hangul_readable": true,
+      "visual_unwanted_frame_or_english_remnant": false,
+      "text_length_difference_ignored": true,
+      "source_ui_native_placement_verified": false,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "DEEP LAKE → 딥 레이크. One phrase; visible Korean readable with no obvious protected-art/frame/English-remnant issue, but generated canvas 1774×887 versus source 844×168. Native ROI restoration/UI cell bounds and original UV anchor unverified.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "index": 7,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0043-9AD57F60",
+      "source_file": "Q159_8d365831c4b0e1c2_source.png",
+      "candidate_file": "Q159_8d365831c4b0e1c2_source_k.png",
+      "english": "BAY AREA",
+      "approved_korean": "베이 에어리어",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_bbox_xyxy": [
+        0,
+        324,
+        380,
+        408
+      ],
+      "source_sha256": "79bb1b3f594b4ef91ef83edfcef766563eb215bcf106cbd9d4e1545c9b3f1fff",
+      "candidate_sha256": "7f6270c88553abe676bd027afa5d478cc92d1d770308482989a54204bddc9b8b",
+      "source_dimensions": [
+        760,
+        168
+      ],
+      "candidate_dimensions": [
+        2119,
+        742
+      ],
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        35,
+        8,
+        2103,
+        643
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_single_phrase_roi": true,
+      "visual_mapping_and_hangul_readable": true,
+      "visual_unwanted_frame_or_english_remnant": false,
+      "text_length_difference_ignored": true,
+      "source_ui_native_placement_verified": false,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "BAY AREA → 베이 에어리어. One phrase; visible Korean readable with no obvious protected-art/frame/English-remnant issue, but generated canvas 2119×742 versus source 760×168. Native ROI restoration/UI cell bounds and original UV anchor unverified.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "index": 8,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0043-9AD57F60",
+      "source_file": "Q159_3498574c6edbab95_source.png",
+      "candidate_file": "Q159_3498574c6edbab95_source_k.png",
+      "english": "FLORAL VILLAGE",
+      "approved_korean": "플로럴 빌리지",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_bbox_xyxy": [
+        0,
+        502,
+        640,
+        589
+      ],
+      "source_sha256": "41f9ef716412379b99bf4a15320d509ea7712aee04ad723e3befbab0a9f74bef",
+      "candidate_sha256": "f6653fa6e2a4c02221076830bddf2a3058615eb6dc94fff852d7d3e8dd6e7c9c",
+      "source_dimensions": [
+        1280,
+        174
+      ],
+      "candidate_dimensions": [
+        1983,
+        793
+      ],
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        53,
+        99,
+        1884,
+        753
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_single_phrase_roi": true,
+      "visual_mapping_and_hangul_readable": true,
+      "visual_unwanted_frame_or_english_remnant": false,
+      "text_length_difference_ignored": true,
+      "source_ui_native_placement_verified": false,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "FLORAL VILLAGE → 플로럴 빌리지. One phrase; visible Korean readable with no obvious protected-art/frame/English-remnant issue, but generated canvas 1983×793 versus source 1280×174. Native ROI restoration/UI cell bounds and original UV anchor unverified.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    }
+  ]
+}
