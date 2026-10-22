@@ -2282,7 +2282,7 @@ private:
     context->Draw(3u, 0u);
     return true;
 }
- } // namespace
+} // namespace
 
 bool native_game_raster_partial_backbuffer_color_clear(
     ID3D11DeviceContext* context, ID3D11RenderTargetView* target,
