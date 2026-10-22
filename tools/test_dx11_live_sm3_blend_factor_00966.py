@@ -34,7 +34,13 @@ require("0xdeadbeefu")            # Unknown factors still fail-closed
 # from a WARP fixture, cached initial value, or fabricated blend constant.
 game = src[src.index("bool submit_live_sm3_game_draw("):
            src.index("// A successful R9 RT0 switch")]
-require("const bool usesBlendFactor = blend != FALSE", game)
+require("const bool usesBlendFactor = live_sm3_needs_dynamic_blend_factor(", game)
+require("live_sm3_effective_dest_factor(sc, dc)", desc)
+portable = (root / "src/vr/d3d11/live_game_sm3_composite.hpp").read_text()
+require("live_sm3_effective_dest_factor(", portable)
+require("!live_sm3_needs_dynamic_blend_factor(", portable)
+require("true, 12u, 14u, true, 14u, 2u", portable)
+
 require("sm3_live_uses_blend_factor(srcBlendAlpha)", game)
 require("sm3_live_uses_blend_factor(dstBlendAlpha)", game)
 require("FAILED(game->GetRenderState(D3DRS_BLENDFACTOR, &gameBlendFactor))", game)

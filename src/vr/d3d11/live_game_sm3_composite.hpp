@@ -31,6 +31,32 @@ enum class LiveSm3Blend : std::uint8_t {
     return LiveSm3Blend::unsupported;
 }
 
+// D3D9 BOTH* source factors override the stored D3DRS_DESTBLEND.
+// This portable dependency is shared by real-game state admission and
+// the native D3D11 output-merger descriptor. Values are SDK-asserted there.
+[[nodiscard]] constexpr std::uint32_t live_sm3_effective_dest_factor(
+    std::uint32_t src, std::uint32_t dst) noexcept {
+    return src == 12u ? 6u : src == 13u ? 5u : dst;
+}
+[[nodiscard]] constexpr bool live_sm3_needs_dynamic_blend_factor(
+    bool enabled, std::uint32_t src, std::uint32_t dst, bool separateAlpha,
+    std::uint32_t alphaSrc, std::uint32_t alphaDst) noexcept {
+    constexpr auto needs = [](std::uint32_t f) constexpr noexcept {
+        return f == 14u || f == 15u;
+    };
+    return enabled && (needs(src) ||
+        needs(live_sm3_effective_dest_factor(src, dst)) ||
+        (separateAlpha && (needs(alphaSrc) || needs(alphaDst))));
+}
+static_assert(live_sm3_effective_dest_factor(12u, 14u) == 6u &&
+              live_sm3_effective_dest_factor(13u, 15u) == 5u &&
+              live_sm3_effective_dest_factor(2u, 14u) == 14u);
+static_assert(!live_sm3_needs_dynamic_blend_factor(true, 12u, 14u, false, 0u, 0u) &&
+              !live_sm3_needs_dynamic_blend_factor(true, 13u, 15u, false, 0u, 0u) &&
+              live_sm3_needs_dynamic_blend_factor(true, 12u, 14u, true, 14u, 2u) &&
+              live_sm3_needs_dynamic_blend_factor(true, 2u, 14u, false, 0u, 0u) &&
+              !live_sm3_needs_dynamic_blend_factor(false, 14u, 15u, true, 14u, 15u));
+
 static_assert(live_sm3_blend(false, 0, 0, 0, false) ==
               LiveSm3Blend::disabled);
 static_assert(live_sm3_blend(true, 5, 6, 1, false) ==

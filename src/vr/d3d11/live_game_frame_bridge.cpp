@@ -249,6 +249,10 @@ constexpr bool native_game_separate_alpha_contract() noexcept {
 static_assert(native_game_separate_alpha_contract(),
               "Live D3D9 independent alpha OM/fallback regression");
 
+static_assert(D3DBLEND_BOTHSRCALPHA == 12 && D3DBLEND_BOTHINVSRCALPHA == 13 &&
+              D3DBLEND_BLENDFACTOR == 14 && D3DBLEND_INVBLENDFACTOR == 15,
+              "Live D3D9 BOTH*/BLENDFACTOR codes must match the SDK");
+
 // Live programmable D3D9 color and independent-alpha factors map to a
 // per-game-Draw D3D11 output-merger state. No guessed blend constants or
 // dual-source/factor modes: anything not representable falls back to D3D9.
@@ -326,8 +330,7 @@ constexpr bool sm3_live_blend_desc(
     const bool bothInvSrc = sc == D3DBLEND_BOTHINVSRCALPHA;
     const DWORD rgbSrc = bothSrc ? D3DBLEND_SRCALPHA :
                          bothInvSrc ? D3DBLEND_INVSRCALPHA : sc;
-    const DWORD rgbDst = bothSrc ? D3DBLEND_INVSRCALPHA :
-                         bothInvSrc ? D3DBLEND_SRCALPHA : dc;
+    const DWORD rgbDst = live_sm3_effective_dest_factor(sc, dc);
     // D3D11 has no destination SRC_ALPHA_SAT. Reject malformed
     // destination or independent-alpha saturation instead of trying to
     // create an invalid BlendState or altering the original D3D9 Draw.
@@ -5224,12 +5227,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // and BlendState. Query its *current* ARGB value for every source Draw
     // only if one of the active color/independent-alpha factors consumes it.
     // Failed source queries cannot silently use an all-zero factor.
-    const bool usesBlendFactor = blend != FALSE &&
-        (sm3_live_uses_blend_factor(srcBlend) ||
-         sm3_live_uses_blend_factor(dstBlend) ||
-         (separateAlpha != FALSE &&
-          (sm3_live_uses_blend_factor(srcBlendAlpha) ||
-           sm3_live_uses_blend_factor(dstBlendAlpha))));
+    // BOTH* overrides the game's stored destination blend factor. Only
+    // query dynamic source state when the effective RGB or independent alpha
+    // GPU equation consumes it; an ignored stale destination cannot veto Draw.
+    const bool usesBlendFactor = live_sm3_needs_dynamic_blend_factor(
+        blend != FALSE, srcBlend, dstBlend, separateAlpha != FALSE,
+        srcBlendAlpha, dstBlendAlpha);
     DWORD gameBlendFactor = 0u;
     if (usesBlendFactor &&
         FAILED(game->GetRenderState(D3DRS_BLENDFACTOR, &gameBlendFactor)))
