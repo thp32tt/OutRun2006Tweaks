@@ -39,10 +39,11 @@ enum class NativeSm3ArithmeticOpcode {
     case NativeSm3ArithmeticOpcode::ReciprocalSquareRoot:
     case NativeSm3ArithmeticOpcode::Exponential2:
     case NativeSm3ArithmeticOpcode::Logarithm2:
+        return sourceIndex == 0u ? 1u : 0u;
     case NativeSm3ArithmeticOpcode::Normalize3:
-        return sourceIndex == 0u
-            ? (opcode == NativeSm3ArithmeticOpcode::Normalize3 ? 7u : 1u)
-            : 0u;
+        // D3D9 NRM divides xyzw by the length of xyz, not only xyz.
+        // A shader writing w must have initialized its actual source w.
+        return sourceIndex == 0u ? (7u | (destinationMask & 8u)) : 0u;
     case NativeSm3ArithmeticOpcode::Add:
     case NativeSm3ArithmeticOpcode::Subtract:
     case NativeSm3ArithmeticOpcode::Multiply:
@@ -158,6 +159,7 @@ inline bool append_native_sm3_arithmetic(
         return value + ")";
     };
     std::string expression;
+    std::string prelude;
     switch (opcode) {
     case NativeSm3ArithmeticOpcode::Move:
         if (!validSources(1u)) return false;
@@ -176,16 +178,27 @@ inline bool append_native_sm3_arithmetic(
             opcode == NativeSm3ArithmeticOpcode::Reciprocal ? "(1.0f / " + x + ")" :
             opcode == NativeSm3ArithmeticOpcode::ReciprocalSquareRoot ? "rsqrt(abs(" + x + "))" :
             opcode == NativeSm3ArithmeticOpcode::Exponential2 ? "exp2(" + x + ")" :
-            "log2(abs(" + x + "))";
+            // D3D9 LOG(0) is -FLT_MAX; SM4 HLSL log2(0) is -INF.
+            "(abs(" + x + ") == 0.0f ? -3.402823466e+38f : log2(abs(" + x + ")))";
         expression = "float4(" + scalar + ", " + scalar + ", " +
                      scalar + ", " + scalar + ")";
         break;
     }
     case NativeSm3ArithmeticOpcode::Normalize3: {
-        if (!validSources(1u) || (mask & 8u)) return false;
-        // SM3 nrm writes xyz; the undefined w lane must not be fabricated.
-        expression = "float4(normalize((" + sources[0] +
-                     ").xyz), 0.0f)";
+        if (!validSources(1u)) return false;
+        // Real D3D9 NRM reads xyz for its denominator but writes every
+        // selected xyzw lane. W comes from src.w, never a fabricated zero.
+        const auto source = "(" + sources[0] + ")";
+        const auto normSquared = "dot(" + source + ".xyz, " + source + ".xyz)";
+        const auto scale = "r283_nrm_scale_" + std::to_string(ordinal);
+        // D3D9 uses FLT_MAX for the reciprocal length of a zero vector.
+        prelude = "    float " + scale + " = (" + normSquared +
+            " != 0.0f ? rsqrt(" + normSquared +
+            ") : 3.402823466e+38f);\n";
+        expression = emitMaskedLanes([&](char lane) {
+            return "(" + source + "." + std::string(1u, lane) +
+                   " * " + scale + ")";
+        });
         break;
     }
     case NativeSm3ArithmeticOpcode::Absolute:
@@ -381,6 +394,7 @@ inline bool append_native_sm3_arithmetic(
         return false;
     }
     const auto temporary = "r283_value_" + std::to_string(ordinal);
+    translated += prelude;
     translated += "    float4 " + temporary + " = " + expression + ";\n";
     std::string lanes;
     const char xyzw[] = "xyzw";
