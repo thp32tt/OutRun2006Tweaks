@@ -2866,12 +2866,17 @@ public:
 			Module::exe_ptr(0xBAD20), RankMarkerSub_dest);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
-        // Quest3 field regression 2026-10-22: the experimental
-        // DX11-native rival route leaves the rival marker on the stock 2D
-        // projection. Restore the previously HMD-proven R26 exact projector
-        // independently from the now-correct ordinal rank path.
-        Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
-            Calc3D2D_RivalExactCall, Memory::HookType::Call);
+        // The rival marker was already HMD-correct before the ordinal rank
+        // recovery work. Keep the DX11-equivalent stock BB6F0 projector when
+        // RivalDx11NativeRoute=true (the shipped/default policy), and retain
+        // the R26 exact projector only as an explicit A/B fallback.
+        if (!Settings::VRRivalDx11NativeRoute.get())
+            Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
+                Calc3D2D_RivalExactCall, Memory::HookType::Call);
+        else
+            spdlog::info(
+                "VR RIVAL NATIVE: stock BB6F0 projector retained; "
+                "ordinal rank projected-marker hooks remain independent");
 		for (int addr : RankMarkerSubScreenHudCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), RankMarkerSubSemanticDest,
@@ -2901,12 +2906,10 @@ public:
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite,
 				Memory::HookType::Call);
-        Memory::VP::InjectHook(
-            Module::exe_ptr(RivalMarker_SpraniCall),
-            RivalMarker_sprani, Memory::HookType::Call);
-        spdlog::info(
-            "VR RIVAL RESTORED: exact BB6F0 Calc3D2D + BB796 projected "
-            "sprani path active; ordinal rank DX11 reference unchanged");
+        if (!Settings::VRRivalDx11NativeRoute.get())
+            Memory::VP::InjectHook(
+                Module::exe_ptr(RivalMarker_SpraniCall),
+                RivalMarker_sprani, Memory::HookType::Call);
 		for (int addr : TextGlyph_PutSpriteCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), TextGlyph_putSprite,
