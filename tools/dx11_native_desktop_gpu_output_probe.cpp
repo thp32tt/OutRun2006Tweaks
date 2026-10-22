@@ -135,30 +135,30 @@ static bool run_probe() {
     {
         ScopedNativeGameGpuTransferInputs inputs(context.Get(), dest.Get());
         ScopedNativeGameGpuTransferOutputs outputs(context.Get());
-        ID3D11ShaderResourceView *vs = nullptr, *ps = nullptr, *cs = nullptr, *other = nullptr;
-        context->VSGetShaderResources(5u, 1u, &vs);
-        context->PSGetShaderResources(7u, 1u, &ps);
-        context->CSGetShaderResources(3u, 1u, &cs);
-        context->PSGetShaderResources(1u, 1u, &other);
-        detachedInputs = !vs && !ps && !cs && other == otherRead.Get();
-        if (vs) vs->Release();
-        if (ps) ps->Release();
-        if (cs) cs->Release();
-        if (other) other->Release();
+        ID3D11ShaderResourceView *inputVS = nullptr, *inputPS = nullptr, *inputCS = nullptr, *inputOther = nullptr;
+        context->VSGetShaderResources(5u, 1u, &inputVS);
+        context->PSGetShaderResources(7u, 1u, &inputPS);
+        context->CSGetShaderResources(3u, 1u, &inputCS);
+        context->PSGetShaderResources(1u, 1u, &inputOther);
+        detachedInputs = !inputVS && !inputPS && !inputCS && inputOther == otherRead.Get();
+        if (inputVS) inputVS->Release();
+        if (inputPS) inputPS->Release();
+        if (inputCS) inputCS->Release();
+        if (inputOther) inputOther->Release();
         context->CopySubresourceRegion(
             dest.Get(), 0u, 8u, 8u, 0u, source.Get(), 0u, &smallRegion);
     }
-    ID3D11ShaderResourceView *vs = nullptr, *ps = nullptr, *cs = nullptr, *other = nullptr;
-    context->VSGetShaderResources(5u, 1u, &vs);
-    context->PSGetShaderResources(7u, 1u, &ps);
-    context->CSGetShaderResources(3u, 1u, &cs);
-    context->PSGetShaderResources(1u, 1u, &other);
-    const bool restoredInputs = vs == destRead.Get() && ps == destRead.Get() &&
-                                cs == destRead.Get() && other == otherRead.Get();
-    if (vs) vs->Release();
-    if (ps) ps->Release();
-    if (cs) cs->Release();
-    if (other) other->Release();
+    ID3D11ShaderResourceView *inputVS = nullptr, *inputPS = nullptr, *inputCS = nullptr, *inputOther = nullptr;
+    context->VSGetShaderResources(5u, 1u, &inputVS);
+    context->PSGetShaderResources(7u, 1u, &inputPS);
+    context->CSGetShaderResources(3u, 1u, &inputCS);
+    context->PSGetShaderResources(1u, 1u, &inputOther);
+    const bool restoredInputs = inputVS == destRead.Get() && inputPS == destRead.Get() &&
+                                inputCS == destRead.Get() && inputOther == otherRead.Get();
+    if (inputVS) inputVS->Release();
+    if (inputPS) inputPS->Release();
+    if (inputCS) inputCS->Release();
+    if (inputOther) inputOther->Release();
     ID3D11RenderTargetView* afterCopy[2]{};
     ID3D11UnorderedAccessView* afterPS = nullptr;
     ID3D11UnorderedAccessView* afterCS = nullptr;
