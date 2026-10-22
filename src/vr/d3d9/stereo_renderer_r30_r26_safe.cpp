@@ -1801,6 +1801,7 @@ namespace OutRunVRStereo
             Hud2D,
             PerspectiveHud,
             ScreenOverlay2D,
+            ProjectedScreenEffect2D,
             WorldBillboard,
             ProjectedWorldMarker2D
         };
@@ -2279,6 +2280,14 @@ namespace OutRunVRStereo
                     : R30ScreenSpaceKind::None;
             }
 
+            // R69: the exact CABE lens producer has already converted its
+            // world anchor to centre-eye screen coordinates through Calc3D2D.
+            // Treat it as its own screen-effect class so it can be fused at the
+            // same centre-eye placement in both HMD eyes. Do not route it
+            // through WorldBillboard/PerspectiveHud and apply head/IPD twice.
+            if (semanticProjectedScreen)
+                return R30ScreenSpaceKind::ProjectedScreenEffect2D;
+
             // Generic queue membership is not an exact named HUD or
             // world producer, but R51's *accepted* ScreenOverlay2D VS
             // route also enters R30BuildScreenSpaceEyeConstants' finite,
@@ -2306,7 +2315,7 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ClassifyProjectionSignature(
                     projection[11], projection[15]);
 
-            if (semanticProjectedScreen || semanticSceneEffect)
+            if (semanticSceneEffect)
             {
                 // P0: EXE+0xCABE is the exact lens producer. SceneEffect remains
                 // the original-mod scope for other screen effects. Both routes
@@ -4648,6 +4657,7 @@ namespace OutRunVRStereo
                 screenKind == R30ScreenSpaceKind::Hud2D ||
                 screenKind == R30ScreenSpaceKind::WorldBillboard ||
                 screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D ||
+                screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D ||
                 screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
             {
                 // R44: glyph/billboard batches commonly reuse one game c64 for
@@ -4662,6 +4672,17 @@ namespace OutRunVRStereo
                 if (exactCentre)
                 {
                     if (!R30GetExactLensCentreRawWvp(original))
+                        return false;
+                }
+                else if (screenKind ==
+                    R30ScreenSpaceKind::ProjectedScreenEffect2D)
+                {
+                    // Exact CABE is screen-projected by the game before this
+                    // draw. Preserve only an original game WVP with bounded
+                    // exact SceneEffect/CABE provenance; never borrow the live
+                    // c64 after a previous eye has injected head correction.
+                    if (!R44GetOwnedRawOverlayWvp(original) &&
+                        !R30GetExtendedRawWvpForExactSceneEffect(original))
                         return false;
                 }
                 else if (!R44GetOwnedRawOverlayWvp(original))
@@ -4763,6 +4784,27 @@ namespace OutRunVRStereo
             if (!MatrixFinite(baseProjection) ||
                 !InvertMatrix(baseProjection, inverseBaseProjection))
                 return false;
+
+            if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                // R69 HMD-proven DX11 behavior: CABE's Calc3D2D result is
+                // already a centre-eye screen position. Independent L/R world
+                // reprojection makes the flare split into two images. Submit
+                // the same original centre-eye WVP to both eye render targets;
+                // the eye surfaces still remain separate, but this effect gets
+                // zero binocular disparity and fuses into one visible flare.
+                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
+                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
+                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
+                static bool firstFlareMonoFusionLogged = false;
+                if (!firstFlareMonoFusionLogged)
+                {
+                    firstFlareMonoFusionLogged = true;
+                    spdlog::info(
+                        "VR R69 FLARE FUSION: exact Calc3D2D centre-eye WVP copied identically to L/R; per-eye flare reprojection disabled");
+                }
+                return true;
+            }
 
             if (screenKind ==
                 R30ScreenSpaceKind::ProjectedWorldMarker2D)
@@ -5029,6 +5071,13 @@ namespace OutRunVRStereo
                         semanticScope))
                     return E_NOTIMPL;
             }
+            else if (screenKind ==
+                R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                if (semanticScope != OutRunVR::GameSemantic::RenderScope::
+                        ProjectedScreenEffect2D)
+                    return E_NOTIMPL;
+            }
             else if (!OutRunVR::GameSemantic::CorroboratesHud(
                          semanticScope) && !exactSceneEffect)
             {
@@ -5183,6 +5232,16 @@ namespace OutRunVRStereo
                     "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
                     R30HudAspectCompensation(stereo));
+            }
+            if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
+            {
+                static bool firstProjectedScreenEffectLogged = false;
+                if (!firstProjectedScreenEffectLogged)
+                {
+                    firstProjectedScreenEffectLogged = true;
+                    spdlog::info(
+                        "VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes");
+                }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
                 !R30FirstFlatPerspectiveLogged)
@@ -5791,4 +5850,3 @@ namespace OutRunVRStereo
             VRR26HudSafeCompareMarkerHook::instance;
     }
 }
-
