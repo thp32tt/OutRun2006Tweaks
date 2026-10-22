@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "dx11_feature_source_checkpoint",
+  "captured_at_kst": "2026-10-23T03:49:02+09:00",
+  "task_id": "CONVERSION-DX11-01013",
+  "production_id": "CONVERSION-DX11-01013",
+  "requested_event_id": "CONVERSION-DX11-01013-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+  "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+  "feature_stage": "SOURCE_IMPLEMENTATION_IN_PROGRESS",
+  "target_branch": "vr-dx11-native-r71",
+  "target_base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "feature_head": "3aad0b2a5125c1e09a8762c2471d8f98abc94de4",
+  "material_source_commit": "c6bf84bc439e2663517bc5463824afa1c4f4397c",
+  "same_task_source_regression_repair": "3aad0b2a5125c1e09a8762c2471d8f98abc94de4",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_live_sm3_blend_factor_00966.py"
+  ],
+  "implementation": "Real intercepted D3D9 shader-bound Draw/DrawIndexed now maps SRCALPHASAT RGB/alpha and BOTH* source-implied destination factors to native D3D11 OM. Reject malformed destination/independent saturation and unknown factors; original DX9Ex rendering/input/FFB retained.",
+  "validation_command": "GitHub Actions exact-SHA DX11 Fast Structural Checks (39834693347), Backend Conversion Gate (39834693275), Build (39834693445), OpenXR VR architecture (39834693224), OutRun EXE HUD Inspector CI (39834693272); Python static source regression tools/test_dx11_live_sm3_blend_factor_00966.py",
+  "validated_at_checkpoint": {
+    "fast": "SUCCESS",
+    "backend": "PENDING",
+    "build": "PENDING",
+    "openxr": "IN_PROGRESS",
+    "hud": "PENDING"
+  },
+  "runtime_validation": "UNTESTED",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "remaining_acceptance_items": [
+    "Capture authentic game native shader rejection counters and fix evidenced next shader/state/source gap",
+    "Prove actual menu/car/race real D3D9 Draw/DrawIndexed → D3D11 Draw → contiguous full-screen visible frame with source ordinal coverage",
+    "Preserve fail-closed DX9Ex input/FFB and opt-in, exclude overlapping R175 00477 lease",
+    "Validate distinct real left/right frame and OpenXR fence/ACK with Quest3 HMD",
+    "Complete all five exact-SHA required Actions + artifact verification before FEATURE_READY and compare/expected_sha target promotion"
+  ],
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "After exact-SHA CI, reproduce actual game liveSm3RejectStages and frame counters; implement only next evidence-backed missing live D3D9 source state, shader, Draw and visible publication path. Do not promote until real full-frame acceptance.",
+  "feature_ready": false,
+  "target_promoted": false,
+  "score_change": 0
+}
