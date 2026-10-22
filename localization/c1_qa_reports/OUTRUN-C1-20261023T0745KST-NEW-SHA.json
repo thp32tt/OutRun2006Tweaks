@@ -1,0 +1,364 @@
+{
+  "schema": "outrun-c1-independent-light-qa-v1",
+  "run_key": "OUTRUN-C1-20261023T0745KST-NEW-SHA",
+  "qa_at_kst": "2026-10-23T07:46:45.226507+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "INDEPENDENT_STATIC_C1_ONLY_NO_DDS_APPROVAL",
+  "source": "N100 A/B verified source PNG, production manifest, sent receipts, export evidence, and independent visual comparison sheets",
+  "prior_sha_history_count": 471,
+  "candidate_count": 8,
+  "unique_new_sha_count": 8,
+  "duplicate_sha_count": 0,
+  "role_counts": {
+    "A": 4,
+    "B": 4
+  },
+  "result_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "checks": {
+    "source_manifest_sha_match": "8/8",
+    "source_sent_sha_match": "8/8",
+    "candidate_export_sha_match": "8/8",
+    "candidate_rgba_png": "8/8",
+    "visual_readability_and_approved_mapping": "8/8",
+    "source_candidate_dimension_equal": "0/8",
+    "native_ui_cell_safety": "UNVERIFIED_8/8",
+    "runtime_validation": "UNTESTED",
+    "dds_final_compose": "NOT_PERFORMED"
+  },
+  "evidence": {
+    "N100_metric_path": "work/C1_QA_20261023_0745_metrics.json",
+    "N100_A_comparison": "work/C1_QA_20261023_0745_A_pairs.jpg",
+    "N100_B_comparison": "work/C1_QA_20261023_0745_B_pairs.jpg",
+    "N100_check_script": "work/C1_QA_20261023_0745_check.py"
+  },
+  "reviewed": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0045-ADCD7793-R1",
+      "ordinal": 222,
+      "english": "National Park",
+      "approved_korean": "내셔널 파크",
+      "source_file": "Q163_4a3c7391ebdcf794_source.png",
+      "candidate_file": "Q163_4a3c7391ebdcf794_source_k.png",
+      "source_sha256": "015c4d0cf776c8c60eb05b793933f2699caacae6912629b3d383ab0111507fba",
+      "candidate_sha256": "1e168ce36601d159dbe357e32f13b9a2ae3e11adb59e85b251d2fc350297b7fc",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1468,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 native 출력 글자 가독성/글자형 확인. 그러나 원본 PNG와 생성 PNG의 캔버스 크기/비율이 달라 원본 HD UI 셀 복귀 때 좌표·크기·안전영역 및 보호 아트 간섭을 검증하지 못함. 문장 전체 폭 차이는 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0045-ADCD7793-R1",
+      "ordinal": 221,
+      "english": "Coniferous Forest",
+      "approved_korean": "코니퍼러스 포레스트",
+      "source_file": "Q163_e58994a1ae262943_source.png",
+      "candidate_file": "Q163_e58994a1ae262943_source_k.png",
+      "source_sha256": "e3bddfc7fb6a9bd1f2196365fec97683a46b253558f79fdef8d0337f9b0affc4",
+      "candidate_sha256": "797dbf634be8321bd22ace216ac0bbe1394e368d8aa282413e426b57e46f4aa1",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1856,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 native 출력 글자 가독성/글자형 확인. 그러나 원본 PNG와 생성 PNG의 캔버스 크기/비율이 달라 원본 HD UI 셀 복귀 때 좌표·크기·안전영역 및 보호 아트 간섭을 검증하지 못함. 문장 전체 폭 차이는 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0045-ADCD7793-R1",
+      "ordinal": 220,
+      "english": "Snow Mountain",
+      "approved_korean": "스노 마운틴",
+      "source_file": "Q163_e08f1080f8c0cc78_source.png",
+      "candidate_file": "Q163_e08f1080f8c0cc78_source_k.png",
+      "source_sha256": "88c9628a00f1d10719ff2819383c083436ef1d0b31f09a9f9402ff025afeae66",
+      "candidate_sha256": "9526415f3d6851e4fd86ff10892c04c5f655b7190cca49ead51fe3e6a9a75a21",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1672,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 native 출력 글자 가독성/글자형 확인. 그러나 원본 PNG와 생성 PNG의 캔버스 크기/비율이 달라 원본 HD UI 셀 복귀 때 좌표·크기·안전영역 및 보호 아트 간섭을 검증하지 못함. 문장 전체 폭 차이는 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0045-ADCD7793-R1",
+      "ordinal": 219,
+      "english": "Castle Wall",
+      "approved_korean": "캐슬 월",
+      "source_file": "Q163_914fa94078cc01f5_source.png",
+      "candidate_file": "Q163_914fa94078cc01f5_source_k.png",
+      "source_sha256": "69b8c4920b1fa9ac17fa05a1336246c8785017878f1b3b33fe67e760799f019d",
+      "candidate_sha256": "b229e3d3729c7608ece9e38f6d2654c56864ca8183541ef029edf5078b359d04",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1196,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 native 출력 글자 가독성/글자형 확인. 그러나 원본 PNG와 생성 PNG의 캔버스 크기/비율이 달라 원본 HD UI 셀 복귀 때 좌표·크기·안전영역 및 보호 아트 간섭을 검증하지 못함. 문장 전체 폭 차이는 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "ordinal": 278,
+      "english": "Palm Beach",
+      "approved_korean": "팜 비치",
+      "source_file": "Q163_43248f3a746f1773_source.png",
+      "candidate_file": "Q163_43248f3a746f1773_source_k.png",
+      "source_sha256": "95174274ae7ff0a51f98804a9bdd352085694597f5da35fa76202c0a3801edfd",
+      "candidate_sha256": "c5a44e09562a894efd93d165f1e114144da4d1ecc344517ecb8473c7accea9c9",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1288,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 native 출력 글자 가독성/글자형 확인. 그러나 원본 PNG와 생성 PNG의 캔버스 크기/비율이 달라 원본 HD UI 셀 복귀 때 좌표·크기·안전영역 및 보호 아트 간섭을 검증하지 못함. 문장 전체 폭 차이는 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "ordinal": 277,
+      "english": "Giant Statues",
+      "approved_korean": "자이언트 스태추스",
+      "source_file": "Q163_d6cd89bd6812b620_source.png",
+      "candidate_file": "Q163_d6cd89bd6812b620_source_k.png",
+      "source_sha256": "c00d333fca96bff54ac653e3ba9542b4593729e7d79c627e2cd79b5ab8657f88",
+      "candidate_sha256": "59ffd6b3c7b196ce7e0e65abdda9833d6a548b4ed9b6595cbf913b8b65e18f44",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1464,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 native 출력 글자 가독성/글자형 확인. 그러나 원본 PNG와 생성 PNG의 캔버스 크기/비율이 달라 원본 HD UI 셀 복귀 때 좌표·크기·안전영역 및 보호 아트 간섭을 검증하지 못함. 문장 전체 폭 차이는 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "ordinal": 276,
+      "english": "Deep Lake",
+      "approved_korean": "딥 레이크",
+      "source_file": "Q163_df77a32a516afc6f_source.png",
+      "candidate_file": "Q163_df77a32a516afc6f_source_k.png",
+      "source_sha256": "1934f4a240054a72dda1871237a6bf38e878bb4ac3771b48941c2c8b780181da",
+      "candidate_sha256": "284d4443df84f62a69b48c0856ab855aabb939cfdfb42fb564811dd3f0f4309b",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        562,
+        164
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 native 출력 글자 가독성/글자형 확인. 그러나 원본 PNG와 생성 PNG의 캔버스 크기/비율이 달라 원본 HD UI 셀 복귀 때 좌표·크기·안전영역 및 보호 아트 간섭을 검증하지 못함. 문장 전체 폭 차이는 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "ordinal": 275,
+      "english": "Ghost Forest",
+      "approved_korean": "고스트 포레스트",
+      "source_file": "Q163_0aa095493de9c0a5_source.png",
+      "candidate_file": "Q163_0aa095493de9c0a5_source_k.png",
+      "source_sha256": "2809885e31992415456d1e435bf61ec33f46cea6ac44d47780a0dac6f5077591",
+      "candidate_sha256": "701f7be912cd5e1fab9f851d00be56b70d6130c6207e59ac795c553b155c2233",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1344,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 native 출력 글자 가독성/글자형 확인. 그러나 원본 PNG와 생성 PNG의 캔버스 크기/비율이 달라 원본 HD UI 셀 복귀 때 좌표·크기·안전영역 및 보호 아트 간섭을 검증하지 못함. 문장 전체 폭 차이는 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    }
+  ],
+  "imagegen_invoked": false,
+  "ab_queue_consumed": false,
+  "final_dds_written": false,
+  "final_deployment": false,
+  "runtime_validation": "UNTESTED",
+  "excluded_scopes": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "dedup_policy": "SAME_SHA_OR_RUN_KEY_MUST_NOT_REVIEW_OR_SCORE_TWICE"
+}
