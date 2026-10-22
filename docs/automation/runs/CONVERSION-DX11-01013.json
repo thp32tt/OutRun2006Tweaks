@@ -65,7 +65,73 @@
   "score_change": 0,
   "status": "IN_PROGRESS",
   "checkpoint": "C2_IMPLEMENT",
-  "notes": "No claim of game playable, native frames or HMD pass. E003 is rollover, ATTEMPT held at 1/3.",
+  "notes": "Recovery E005, ATTEMPT 1/3. Material ce03d84 has N100 portable source-probe PASS; real gameplay/HMD UNTESTED. Dev strategy+feature contract added to repair actual Fast Gate allocation validation; feature not READY.",
   "chat_rollovers": 3,
-  "previous_material_source_sha": "9ecf5cf96ac167cb0ff2d3d38e7298614498e31f"
+  "previous_material_source_sha": "9ecf5cf96ac167cb0ff2d3d38e7298614498e31f",
+  "work_class": "integration",
+  "classification": "A",
+  "changed_files": [
+    "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01013.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Authentic OutRun D3D9 SM3 VS/PS shader tokens and vertex index/constant sampler source -> stage-correct HLSL / native D3D11 shader materialization",
+      "Game-authored D3D9 Draw/DrawIndexed intercepted with true vertex and pixel resources -> native D3D11 GPU Draw into full game-size color/depth frame",
+      "Ordered visible frame publication and independent native stereo eye handoff; all unproven source ordinals reject native publication and retain D3D9 input/FFB"
+    ],
+    "batch_components": [
+      "Stage-specific real SM3 GPU shader RCP/RSQ and NRM/LOG correctness in C++ backend + codegen",
+      "Portable C++ positive/negative true shader stage regression and native source graph guards",
+      "Remaining full scene native frame/Present/left-right release and exact-SHA Actions integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "N100 g++ C++17 codegen compile/probe exit 0 for vertex-stage zero RCP/RSQ FLT_MAX and independent pixel-stage non-finite zero source behavior; menu/race actual frame not observed",
+      "negative_regression": "PS shader path never inherits VS-only saturation and source non-zero maintains original scalar expression; DX9Ex non-opt-in and unsupported-source fallback preserved",
+      "component_integration": "Real game native_backend.cpp shader stage passed into the common SM3 emitter; live_game_frame_bridge.cpp Draw/DrawIndexed and real game-sized target path exists but game pixel publication unproven"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "NOT_YET_OBSERVED: require real game native Draw/DrawIndexed, eligible_state_draws>0, published full native menu/car/race frames>0, independent left/right and exact-SHA full gates before FEATURE_READY",
+    "activation_guard_and_fallback": "Diagnostic opt-in only; preserve native fail-closed unsupported state rejection, original DX9Ex game render/input/FFB and no false all-game ownership",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+    "goal": "Integrate original OutRun 2006 live D3D9 SM3 game draw with native D3D11 shaders, full-sized visible menu/car/race frames, verified fallback and complete exact-SHA gate evidence.",
+    "acceptance_items": [
+      {
+        "id": "real_game_full_frame_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_native_gpu_draw_and_visible_frame",
+        "expected_behavior": "Real game-authored D3D9 Draw/DrawIndexed preserves SM3 shader semantics and renders ordered visible full native game frames across menu, vehicle selection and race"
+      },
+      {
+        "id": "dx9ex_fallback_safety",
+        "category": "fallback_regression",
+        "behavior_area": "unsupported_gpu_state_and_game_input_ffb",
+        "expected_behavior": "All partial/untranslatable source ordinals prevent native full-frame publication and preserve original DX9Ex render, controller and FFB"
+      },
+      {
+        "id": "native_frame_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "game_screen_native_gpu_ci_and_stereo_transport",
+        "expected_behavior": "Integrated exact-SHA Windows compile, five mandatory GitHub Actions and bundles validate real game image path prior to behind-zero fast-forward promotion"
+      }
+    ]
+  },
+  "automation_validation": "PENDING_EXACT_SHA",
+  "full_dx11_renderer_complete": false
 }
