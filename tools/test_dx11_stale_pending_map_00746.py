@@ -52,7 +52,8 @@ def integrated(source: str) -> bool:
 assert integrated(SRC), "pending full-frame Map must not recycle staging before Map/Unmap"
 for old, new in (
     ("if (prior.mapPending)", "if (false)"),
-    ("staleResult == GameNativeReadbackMap::Ready", "staleResult != GameNativeReadbackMap::Pending"),
+    ("if (staleResult == GameNativeReadbackMap::Ready) {",
+     "if (staleResult != GameNativeReadbackMap::Pending) {"),
     ("prior.mapPending = false;", "prior.mapPending = true;"),
     ("prior.quarantined = true;", "prior.busy = false;"),
     ("oldest.mapPending = true;", "oldest.busy = false;"),
