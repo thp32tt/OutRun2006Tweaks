@@ -19,6 +19,67 @@ spec.loader.exec_module(mod)
 
 
 class EdgeReviewTests(unittest.TestCase):
+    def test_legacy_master_crop_recovers_only_after_decoded_pixel_equality(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            legacy_root=root/"legacy"; src=root/"src"; out=root/"out"; report=root/"report"
+            legacy_root.mkdir(); src.mkdir(); out.mkdir(); report.mkdir()
+            name="Q051_TEST.png"
+            current=Image.new("RGBA",(120,70),(0,0,0,0))
+            draw=ImageDraw.Draw(current)
+            draw.rectangle([28,24,88,44],fill=(255,255,255,255))
+            current.save(src/name,compress_level=1)
+            old=legacy_root/"q051_old.png"
+            current.save(old,compress_level=9)
+            self.assertNotEqual(hashlib.sha256((src/name).read_bytes()).hexdigest(),
+                                hashlib.sha256(old.read_bytes()).hexdigest())
+
+            items=[{
+                "id":"Q051-PLAY",
+                "source_path":"legacy/q051_old.png",
+                "bbox_xyxy":[18,16,98,52],
+            }]
+            items.extend({"id":f"BAD-{i}"} for i in range(254))
+            master=root/"master.json"
+            master.write_text(json.dumps({"items":items}),encoding="utf-8")
+            row={
+                "png_filename":name,
+                "png_sha256":hashlib.sha256((src/name).read_bytes()).hexdigest(),
+                "png_size_bytes":str((src/name).stat().st_size),
+                "width":"120","height":"70","queue_indexes":"051",
+                "source_dds_path":"textures/Q051.dds",
+                "dds_sha256":"a"*64,
+            }
+
+            old_master=mod.discover.MASTER
+            old_report=mod.REPORT
+            old_home=mod.LEGACY_HOME
+            old_roots=mod.LEGACY_ALLOWED_ROOTS
+            old_phrases=mod.ocr.approved_phrases
+            try:
+                mod.discover.MASTER=master
+                mod.REPORT=report
+                mod.LEGACY_HOME=root
+                mod.LEGACY_ALLOWED_ROOTS=(legacy_root,)
+                mod.ocr.approved_phrases=lambda q:{"PLAY":"PLAY"} if q=="Q051" else {}
+                result=mod.recover_legacy_pixel_equal([row],max_new=10,src_root=src,out_root=out)
+                self.assertEqual(result["recovered"],1)
+                self.assertEqual(result["pixel_equal_groups"],1)
+                manifests=list(out.glob("Q051_TEST/*/manifest.json"))
+                self.assertEqual(len(manifests),1)
+                recovered=json.loads(manifests[0].read_text())
+                self.assertEqual(recovered["english"],"PLAY")
+                self.assertEqual(recovered["bbox_xyxy"],[18,16,98,52])
+                self.assertTrue(recovered["legacy_current_decoded_pixel_equality"])
+                self.assertEqual(recovered["legacy_current_decoded_pixel_relation"],"EXACT_RGBA")
+                self.assertFalse(recovered["old_split_tiles_used"])
+            finally:
+                mod.discover.MASTER=old_master
+                mod.REPORT=old_report
+                mod.LEGACY_HOME=old_home
+                mod.LEGACY_ALLOWED_ROOTS=old_roots
+                mod.ocr.approved_phrases=old_phrases
+
     def test_warning_crop_can_be_rescued_by_safe_expansion(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
