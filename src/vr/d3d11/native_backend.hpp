@@ -4796,6 +4796,8 @@ struct NativeLiveSm3Program {
     bool pixelBooleans{};
     bool pixelWritesDepth{}; // Real D3D9 oDepth.x -> native SV_Depth.
     bool pixelDepthOnly{}; // Genuine shadow/occlusion shader without oC0.
+    // Exact unconditionally written D3D9 SM3 oC0 lanes for native OM output.
+    std::uint8_t pixelWrittenColorMask{};
     // Stage-specific D3D9 device i# registers actually used by live REP.
     std::uint16_t vertexIntegerMask{};
     std::uint16_t pixelIntegerMask{};

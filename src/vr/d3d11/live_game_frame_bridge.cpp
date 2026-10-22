@@ -7,6 +7,7 @@
 #include "live_game_sm3_table_fog.hpp"
 #include "live_game_sm3_user_clip.hpp"
 #include "live_game_sm3_depth_output.hpp"
+#include "live_game_sm3_partial_color.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_sm3_stream_assembly.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
@@ -5475,6 +5476,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         it = s.liveSm3Pipelines.emplace(key, std::move(pipeline)).first;
     }
     auto& pipeline = it->second;
+    // Accept actual RGB-only fades and alpha-only game HUD composites only
+    // when the current D3D9 RT0 mask excludes EVERY uninitialized shader
+    // output channel. Never invent alpha for a real D3D9 ALPHATEST Draw.
+    if (!native_sm3_partial_color_draw_allowed(
+            colorMask, pipeline.program.pixelWrittenColorMask,
+            pipeline.program.pixelWritesDepth, alpha != FALSE)) return false;
     // A real depth-only SM3 shadow/occlusion pass must have color writes
     // disabled in the game's own RT0 state. It is not a zero-color draw.
     if (pipeline.program.pixelDepthOnly &&
