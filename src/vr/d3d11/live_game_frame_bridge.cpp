@@ -4,6 +4,7 @@
 #include "live_game_depth_state.hpp"
 #include "live_game_cull_state.hpp"
 #include "live_game_sm3_composite.hpp"
+#include "live_game_sm3_table_fog.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_sm3_stream_assembly.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
@@ -1289,7 +1290,9 @@ struct LiveSm3Pipeline {
     ComPtr<ID3D11Buffer> vertexIntegers;
     ComPtr<ID3D11Buffer> pixelIntegers;
     ComPtr<ID3D11Buffer> alphaReference;
+    ComPtr<ID3D11Buffer> tableZFogConstants;
     unsigned alphaCompare{};
+    bool tableZFog{};
     std::vector<DWORD> vertexTokens, pixelTokens;
     std::vector<D3DVERTEXELEMENT9> declaration;
     std::uint64_t lastUse{}; // Last successfully admitted game shader draw.
@@ -4705,7 +4708,7 @@ std::uint64_t live_sm3_pipeline_identity(
     const ProgrammableShaderFunctionSourceEvidence& vertex,
     const ProgrammableShaderFunctionSourceEvidence& pixel,
     const std::vector<D3DVERTEXELEMENT9>& declaration,
-    unsigned alphaCompare, bool packedFloat4) noexcept {
+    unsigned alphaCompare, bool packedFloat4, bool tableZFog) noexcept {
     if (!vertex.exact() || !pixel.exact() || declaration.empty() ||
         alphaCompare > 8u) return 0u;
     std::uint64_t h = 1469598103934665603ull;
@@ -4725,6 +4728,7 @@ std::uint64_t live_sm3_pipeline_identity(
     // The same live SM3 shader/declaration can alternate packed
     // instancing and ordinary IA input; never reuse the wrong layout.
     hashBytes(&packedFloat4, sizeof(packedFloat4));
+    hashBytes(&tableZFog, sizeof(tableZFog));
     return h != 0u ? h : 1u;
 }
 
@@ -4940,9 +4944,38 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         ++s.liveSm3StateRejectReasons[0]; // COM viewport/state query failure
         return false;
     }
+    NativeSm3TableFog tableZFog{};
     if (fog != FALSE) {
-        ++s.liveSm3StateRejectReasons[1]; // DX9 fog still enabled
-        return false;
+        // Preserve the game's actual post-pixel-shader table fog where the
+        // rasterizer guarantees Z fog. All other fog remains DX9Ex-owned.
+        DWORD tableMode = 0xffffffffu, vertexMode = 0xffffffffu;
+        DWORD rangeFog = TRUE, fogColor = 0u;
+        DWORD fogStartBits = 0u, fogEndBits = 0u, fogDensityBits = 0u;
+        D3DCAPS9 fogCaps{};
+        if (FAILED(game->GetRenderState(D3DRS_FOGTABLEMODE, &tableMode)) ||
+            FAILED(game->GetRenderState(D3DRS_FOGVERTEXMODE, &vertexMode)) ||
+            FAILED(game->GetRenderState(D3DRS_RANGEFOGENABLE, &rangeFog)) ||
+            FAILED(game->GetRenderState(D3DRS_FOGCOLOR, &fogColor)) ||
+            FAILED(game->GetRenderState(D3DRS_FOGSTART, &fogStartBits)) ||
+            FAILED(game->GetRenderState(D3DRS_FOGEND, &fogEndBits)) ||
+            FAILED(game->GetRenderState(D3DRS_FOGDENSITY, &fogDensityBits)) ||
+            FAILED(game->GetDeviceCaps(&fogCaps))) {
+            ++s.liveSm3StateRejectReasons[1];
+            return false;
+        }
+        float fogStart = 0.0f, fogEnd = 0.0f, fogDensity = 0.0f;
+        std::memcpy(&fogStart, &fogStartBits, sizeof(float));
+        std::memcpy(&fogEnd, &fogEndBits, sizeof(float));
+        std::memcpy(&fogDensity, &fogDensityBits, sizeof(float));
+        if (!native_sm3_table_zfog_admission(
+                true, tableMode, vertexMode, rangeFog != FALSE,
+                srgbWrite != FALSE,
+                (fogCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
+                (fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
+                fogColor, fogStart, fogEnd, fogDensity, tableZFog)) {
+            ++s.liveSm3StateRejectReasons[1];
+            return false;
+        }
     }
     if (clipPlanes != 0u) {
         ++s.liveSm3StateRejectReasons[2]; // user clip-plane unsupported
@@ -5312,7 +5345,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     rejectionStage = 7u;
     const auto key = live_sm3_pipeline_identity(
-        vertexEvidence, pixelEvidence, declaration, alphaFunc, repack);
+        vertexEvidence, pixelEvidence, declaration, alphaFunc, repack,
+        tableZFog.enabled);
     if (!key) return false;
     auto it = s.liveSm3Pipelines.find(key);
     if (it == s.liveSm3Pipelines.end()) {
@@ -5320,7 +5354,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         // shader-declaration combinations beyond the first 64 seen.
         LiveSm3Pipeline pipeline{};
         if (!compile_native_live_sm3_program(
-                device, vertexEvidence, pixelEvidence, alphaFunc, pipeline.program))
+                device, vertexEvidence, pixelEvidence, alphaFunc, pipeline.program,
+                tableZFog.enabled))
             return false;
         if (FAILED(device->CreateInputLayout(
                 input.data(), static_cast<UINT>(input.size()),
@@ -5377,7 +5412,17 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                            pipeline.alphaReference.GetAddressOf())))
                 return false;
         }
+        if (tableZFog.enabled) {
+            D3D11_BUFFER_DESC fogDesc{};
+            fogDesc.ByteWidth = 8u * sizeof(float);
+            fogDesc.Usage = D3D11_USAGE_DEFAULT;
+            fogDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+            if (FAILED(device->CreateBuffer(&fogDesc, nullptr,
+                           pipeline.tableZFogConstants.GetAddressOf())))
+                return false;
+        }
         pipeline.alphaCompare = alphaFunc;
+        pipeline.tableZFog = tableZFog.enabled;
         pipeline.vertexTokens = vertexEvidence.tokens;
         pipeline.pixelTokens = pixelEvidence.tokens;
         pipeline.declaration = declaration;
@@ -5392,6 +5437,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // A hash collision may never reuse shaders or a declaration from a
     // different live game draw.
     if (pipeline.alphaCompare != alphaFunc ||
+        pipeline.tableZFog != tableZFog.enabled ||
+        (tableZFog.enabled && !pipeline.tableZFogConstants) ||
         (alphaFunc != 0u && !pipeline.alphaReference) ||
         pipeline.vertexTokens != vertexEvidence.tokens ||
         pipeline.pixelTokens != pixelEvidence.tokens ||
@@ -5680,6 +5727,17 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         context->UpdateSubresource(pipeline.alphaReference.Get(), 0u, nullptr,
                                    reference.data(), 0u, 0u);
     }
+    if (tableZFog.enabled) {
+        const std::array<float, 8> fogPayload{{
+            tableZFog.rgba[0], tableZFog.rgba[1],
+            tableZFog.rgba[2], tableZFog.rgba[3],
+            tableZFog.controls[0], tableZFog.controls[1],
+            tableZFog.controls[2], tableZFog.controls[3]}};
+        context->UpdateSubresource(pipeline.tableZFogConstants.Get(),
+                                   0u, nullptr, fogPayload.data(), 0u, 0u);
+    }
+    ID3D11Buffer* fogBuffer = pipeline.tableZFogConstants.Get();
+    context->PSSetConstantBuffers(4u, 1u, &fogBuffer);
     ID3D11Buffer* alphaBuffer = pipeline.alphaReference.Get();
     context->PSSetConstantBuffers(1u, 1u, &alphaBuffer);
     ID3D11Buffer* vsConstants = pipeline.vertexConstants.Get();

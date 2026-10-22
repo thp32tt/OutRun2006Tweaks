@@ -15,6 +15,7 @@
 #include "native_sm3_predicated_instruction.hpp"
 #include "native_sm3_destination_output.hpp"
 #include "live_game_sm3_alpha_test.hpp"
+#include "live_game_sm3_table_fog.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
 #include "state_translation.hpp"
@@ -2117,7 +2118,7 @@ bool compile_native_live_sm3_program(
     const ProgrammableShaderFunctionSourceEvidence& vertexSource,
     const ProgrammableShaderFunctionSourceEvidence& pixelSource,
     unsigned alphaCompare,
-    NativeLiveSm3Program& output) noexcept {
+    NativeLiveSm3Program& output, bool tableZFog) noexcept {
     output = {};
     if (!device || !vertexSource.exact() || !pixelSource.exact() ||
         alphaCompare > 8u)
@@ -2129,7 +2130,8 @@ bool compile_native_live_sm3_program(
                 vertexSource, true, vertexHlsl, &vertexIndexedLimits) ||
             !build_r283_sm3_mov_shader_source(
                 pixelSource, false, pixelHlsl, &pixelIndexedLimits) ||
-            !append_native_sm3_alpha_test(pixelHlsl, alphaCompare))
+            !append_native_sm3_alpha_test(pixelHlsl, alphaCompare) ||
+            !append_native_sm3_table_zfog(pixelHlsl, tableZFog))
             return false;
         Microsoft::WRL::ComPtr<ID3DBlob> vertexDxbc, pixelDxbc;
         if (!compile_shader_source(vertexHlsl, "live_sm3_vs", "vs_4_0", vertexDxbc) ||
