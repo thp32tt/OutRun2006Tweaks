@@ -26,3 +26,10 @@
 - The initial exact-SHA HUD Inspector run #39724302173 failed in `verify_vr_visual_composition_p0.py` because `function_body` selected the forward declaration of `R30ConfigureXyzrhwWorldEffect` and then parsed `R30PrepareXyzrhwState`, where route=1u is intentionally absent. The real R30Configure definition already contains the 1u diagnostic call before this task's runtime source modification.
 - Update the verifier to explicitly seek the second `R30ConfigureXyzrhwWorldEffect` occurrence (actual definition) for route=1u, preserving the other two route checks and all three deliberate trace-removal mutation controls. This changes no in-game trace, GPU draw, F11 scale or runtime C++.
 - RUNTIME_VALIDATION=UNTESTED; a new exact-SHA test run is still required to claim validation success.
+
+## Projected ordinal signed-W regression contract aligned
+
+- Exact-SHA DX9Ex Active run #39725228034 passed the SkyGlow R26 generation mutations and the corrected R26 F11 route verifier, then stopped at `tools/verify_vr_projected_marker_anchor.py` with an inherited global positive-W-only assertion.
+- Existing `R57ProjectViewPoint` (unchanged by this integration) admits `fabs(clipW)` solely if `Settings::VRRankDx11ProducerReference.get() && marker.exactOrdinalEyeCant`; all other projected world/rival anchors retain `clipW <= 1.0e-6f` rejection.
+- Replace the stale universal assertion with a **stronger scoped** verifier and five negative source mutations: general-world signed-W admission, exact-ordinal bypass, DX11-setting bypass, lost signed-ordinal fallback, and skipped nonfinite guard. Do not modify optical production code, rival route or static baseline.
+- This corrects only the source/test contract; runtime Quest3/VDXR, ordinal depth and eye cant remain UNTESTED.

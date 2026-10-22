@@ -545,36 +545,63 @@ for label, changed in (
     else:
         fail("Sumo projected-marker semantic negative control escaped: " + label)
 
-# Exact projected world markers must only project points in front of the
-# camera. R44's spatial-billboard gate already uses positive clip W. The
-# historical fabs(W) condition accepted negative/behind-eye coordinates.
+# Default world/rival/projected marks MUST reject clip-W <= 0. The
+# historical DX11 R57 ordinal comparison intentionally admits signed W only
+# when both the explicit DX11 producer-reference setting and an exact original
+# ordinal marker are present. The prior test ignored that gated exception.
 def require_front_facing_projected_marker(source: str) -> None:
     project = function_body(source, "bool R57ProjectViewPoint(")
-    required = "clipW <= 1.0e-6f"
-    valid = project.find(required)
-    perspective = project.find("!std::isfinite(clipW)")
-    divide = project.find("ndcX = clipX / clipW;")
-    if min(valid, perspective, divide) < 0 or not (
-        perspective < valid < divide
-    ) or "std::fabs(clipW)" in project:
-        fail("R57 per-eye rank/rival projection must reject negative/zero clip W")
+    tokens = (
+        "!std::isfinite(clipX)",
+        "!std::isfinite(clipY)",
+        "!std::isfinite(clipW)",
+        "const bool dx11OrdinalClipW =",
+        "Settings::VRRankDx11ProducerReference.get() &&",
+        "marker.exactOrdinalEyeCant;",
+        "(dx11OrdinalClipW",
+        "? std::fabs(clipW) <= 1.0e-6f",
+        ": clipW <= 1.0e-6f",
+        "ndcX = clipX / clipW;",
+    )
+    for token in tokens:
+        if project.count(token) != 1:
+            fail("R57 ordinal-only signed-W exception must stay bounded: " + token)
+    if not (project.index("const bool dx11OrdinalClipW =") <
+            project.index("!std::isfinite(clipW)", project.index("const bool dx11OrdinalClipW =")) <
+            project.index("(dx11OrdinalClipW") <
+            project.index("ndcX = clipX / clipW;")):
+        fail("R57 reject invalid clip W before per-eye perspective divide")
+    if project.index("marker.exactOrdinalEyeCant;") > project.index("(dx11OrdinalClipW"):
+        fail("R57 source provenance must precede signed-W branch")
 
 
 require_front_facing_projected_marker(r30)
-# Two distinct deliberate regressions; no repeated static cycles.
-for original, replacement in (
-    ("clipW <= 1.0e-6f", "std::fabs(clipW) <= 1.0e-6f"),
-    ("clipW <= 1.0e-6f", "clipW < -1.0e-6f"),
+# Mutations must reject: a global signed-W world path, removed exact source
+# proof, removal of DX11 opt-in, and loss of signed ordinal compatibility.
+for label, original, replacement in (
+    ("global signed-world", ": clipW <= 1.0e-6f",
+     ": std::fabs(clipW) <= 1.0e-6f"),
+    ("ordinal provenance bypass", "marker.exactOrdinalEyeCant;",
+     "true;"),
+    ("DX11 opt-in bypass", "Settings::VRRankDx11ProducerReference.get() &&",
+     "true &&"),
+    ("DX11 ordinal mode disabled", "? std::fabs(clipW) <= 1.0e-6f",
+     "? clipW <= 1.0e-6f"),
+    ("invalid W accepted", "!std::isfinite(clipW)",
+     "false"),
 ):
-    mutated = r30.replace(original, replacement, 1)
-    if mutated == r30:
-        fail("projected-marker negative-W mutation did not modify source")
+    project = function_body(r30, "bool R57ProjectViewPoint(")
+    if original not in project:
+        fail("projected-marker negative mutation fixture missing: " + label)
+    changed = r30.replace(project, project.replace(original, replacement, 1), 1)
+    if changed == r30:
+        fail("projected-marker negative mutation did not modify source: " + label)
     try:
-        require_front_facing_projected_marker(mutated)
+        require_front_facing_projected_marker(changed)
     except SystemExit:
         pass
     else:
-        fail("projected-marker negative-W mutant escaped the verifier")
+        fail("projected-marker signed-W negative mutation escaped: " + label)
 
 # R30 must classify only the explicit projected semantic and then reproject the
 # recovered view-space anchor through the latched head+per-eye OpenXR transform.
