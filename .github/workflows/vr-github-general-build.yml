@@ -1,0 +1,155 @@
+name: VR GitHub General Test Build
+
+on:
+  push:
+    branches: [ vr-d3d9ex-focus ]
+    paths:
+      - '.github/workflows/vr-github-general-build.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - name: Mark build pending
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $body=@{
+            state='pending'
+            context='vr-github-general-build'
+            description='GitHub-hosted clean R26+HUD build running'
+            target_url="$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+          } | ConvertTo-Json
+          Invoke-RestMethod -Method Post -Headers @{
+            Authorization="Bearer $env:GH_TOKEN"
+            Accept='application/vnd.github+json'
+            'X-GitHub-Api-Version'='2022-11-28'
+          } -Uri "$env:GITHUB_API_URL/repos/$env:GITHUB_REPOSITORY/statuses/$env:GITHUB_SHA" -Body $body -ContentType 'application/json'
+
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          clean: true
+          fetch-depth: 1
+
+      - name: Configure clean R26+HUD Win32 game
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          $flags=@(
+            '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF',
+            '-DOUTRUN_VR_R26_HUD_COMPARE=ON',
+            '-DOUTRUN_VR_C1_COMPARE=OFF',
+            '-DOUTRUN_VR_C2_COMPARE=OFF',
+            '-DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=OFF',
+            '-DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=OFF',
+            '-DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=OFF',
+            '-DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=OFF'
+          )
+          cmake -S . -B build-general/game -G "Visual Studio 17 2022" -A Win32 @flags
+          if($LASTEXITCODE -ne 0){throw 'game configure failed'}
+          foreach($p in @(
+            'build-general/game/_deps/safetyhook-build/src/safetyhook.vcxproj',
+            'build-general/game/_deps/zydis-build/Zydis.vcxproj',
+            'build-general/game/_deps/zydis-build/zycore/Zycore.vcxproj')) {
+            if(!(Test-Path $p)){throw "missing dependency project $p"}
+            $t=Get-Content $p -Raw
+            if($t -notmatch '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR'){
+              $t=$t -replace 'ZYCORE_STATIC_BUILD','_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD'
+              Set-Content $p $t
+            }
+          }
+          $sdl=@(
+            'build-general/game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.cpp',
+            'build-general/game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c'
+          ) | Where-Object {Test-Path $_} | Select-Object -First 1
+          if(!$sdl){throw 'SDL GameInput source missing'}
+          Set-Content $sdl ''
+          $cfg='build-general/game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h'
+          (Get-Content $cfg -Raw) -replace '#define SDL_JOYSTICK_GAMEINPUT 1','/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content $cfg
+
+      - name: Build Win32 game DLL
+        shell: pwsh
+        run: |
+          cmake --build build-general/game --config Release --target outrun2006tweaks --parallel 4
+          if($LASTEXITCODE -ne 0){throw 'game build failed'}
+
+      - name: Configure and build x64 OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-general/host -G "Visual Studio 17 2022" -A x64
+          if($LASTEXITCODE -ne 0){throw 'host configure failed'}
+          cmake --build build-general/host --config Release --target outrun-vr-host --parallel 4
+          if($LASTEXITCODE -ne 0){throw 'host build failed'}
+
+      - name: Package test ZIP
+        shell: pwsh
+        run: |
+          $pkg='build-general/package'
+          $backend=Join-Path $pkg 'backends/d3d9'
+          New-Item -ItemType Directory -Force $backend | Out-Null
+          $dlls=@(Get-ChildItem build-general/game -Recurse -File -Filter dinput8.dll | Where-Object {$_.FullName -match '\\bin\\'})
+          if($dlls.Count -ne 1){throw "expected one dinput8.dll, found $($dlls.Count)"}
+          $dll=$dlls[0]
+          $bytes=[IO.File]::ReadAllBytes($dll.FullName)
+          if($bytes.Length -lt 1000000 -or $bytes[0] -ne 0x4d -or $bytes[1] -ne 0x5a){throw 'invalid game DLL'}
+          $ascii=[Text.Encoding]::ASCII.GetString($bytes)
+          if(!$ascii.Contains('VR R26+HUD SAFE TEST:')){throw 'R26+HUD marker missing'}
+          $host='build-general/host/bin/outrun-vr-host.exe'
+          if(!(Test-Path $host)){throw 'OpenXR host missing'}
+          Copy-Item $dll.FullName (Join-Path $backend 'dinput8.dll')
+          Copy-Item $host (Join-Path $backend 'outrun-vr-host.exe')
+          Copy-Item OutRun2006Tweaks.ini $pkg
+          Copy-Item OutRun2006Tweaks.lods.ini $pkg
+          foreach($f in @(
+            'OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1',
+            'Run-OutRunVRTest.ps1','Run-OutRunVRTest.cmd',
+            'Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd',
+            'Analyze-OutRunVRSession.ps1',
+            'OutRunVR-Backend-Selector.ps1','OutRunVR-Backend-Selector.cmd',
+            'OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd',
+            'analyze_outrun_assets.py')) {
+            if(Test-Path "tools/$f"){Copy-Item "tools/$f" $pkg}
+          }
+          $env:GITHUB_SHA | Set-Content (Join-Path $backend 'SOURCE_SHA.txt') -Encoding ascii
+          'ACTIVE_R26_R43_R44' | Set-Content (Join-Path $backend 'VARIANT_ID.txt') -Encoding ascii
+          'GITHUB_HOSTED_GENERAL_CLEAN' | Set-Content (Join-Path $pkg 'BUILD_CLASS.txt') -Encoding ascii
+          $zip="build-general/OutRun2_VR_GITHUB_GENERAL_$env:GITHUB_SHA.zip"
+          Compress-Archive -Path "$pkg/*" -DestinationPath $zip -Force
+          "GENERAL_ZIP=$zip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Upload test ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-GITHUB-GENERAL-${{ github.sha }}
+          path: ${{ env.GENERAL_ZIP }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Mark build result
+        if: always()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          $state=if($env:JOB_STATUS -eq 'success'){'success'}else{'failure'}
+          $desc=if($state -eq 'success'){'GitHub-hosted clean R26+HUD build succeeded'}else{'GitHub-hosted clean R26+HUD build failed'}
+          $body=@{
+            state=$state
+            context='vr-github-general-build'
+            description=$desc
+            target_url="$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+          } | ConvertTo-Json
+          Invoke-RestMethod -Method Post -Headers @{
+            Authorization="Bearer $env:GH_TOKEN"
+            Accept='application/vnd.github+json'
+            'X-GitHub-Api-Version'='2022-11-28'
+          } -Uri "$env:GITHUB_API_URL/repos/$env:GITHUB_REPOSITORY/statuses/$env:GITHUB_SHA" -Body $body -ContentType 'application/json'
