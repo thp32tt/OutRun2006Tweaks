@@ -3,6 +3,7 @@
 #include "pipeline_translation.hpp"
 #include "native_sm3_arithmetic_codegen.hpp"
 #include "native_sm3_trig_sign_opcode.hpp"
+#include "native_sm3_nop.hpp"
 #include "native_sm3_constant_codegen.hpp"
 #include "native_sm3_texture_codegen.hpp"
 #include "native_sm3_fragment_codegen.hpp"
@@ -560,6 +561,17 @@ bool build_r283_sm3_mov_shader_source(
                 instruction.opcode == static_cast<DWORD>(D3DSIO_DEFB) ||
                 instruction.opcode == static_cast<DWORD>(D3DSIO_DEFI))
                 continue;
+            // NOP is a legal real-game SM3 instruction, not an unknown
+            // executable GPU operation. Admit only its exact zero-payload
+            // encoding. Source registers, flow state and native Draw order
+            // are unchanged; reserved bits or operands fail closed.
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_NOP)) {
+                if (!native_sm3_nop_admissible(
+                        instruction.instructionToken,
+                        instruction.operandTokens.size()))
+                    return false;
+                continue;
+            }
             // Real game shader a0.x address assignment. Only a shader-owned
             // immutable DEF literal permits safe constant folding across
             // DrawIndexed: unknown per-vertex inputs can exceed the VS/PS
