@@ -10,14 +10,14 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00992",
   "feature_id": "DX11_NATIVE_LIVE_SM3_INSTANCED_GAME_GEOMETRY",
   "work_key": "DX11:LIVE_SM3_NATIVE_INSTANCED_DRAW",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_head": "341f573b219fca248716446f989dd95bf7350b15",
   "material_result_sha": "cc029bf12213fed9d444442ae174f015710378ba",
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32",
+  "result_sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "code_change": "YES",
@@ -28,7 +28,7 @@
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "score_change": 0,
-  "summary": "Actual live D3D9 programmable indexed instancing with secondary instance-rate source streams now expands shader-visible FLOAT4 vertex attributes, isolates native IA pipeline identity and emits separate full-size native GPU Draw/DrawIndexed per source instance. Original D3D9Ex renderer/input/FFB/SkyGlow stays authoritative, DXVK frozen. Candidate source SHA cc029bf triggered mandatory Fast/Backend Gate failures ONLY because --check-latest referenced prior 00991 missing the newer visible_frame_acceptance field; this durable 00992 source-stage run record resolves the current-task metadata selection without changing gates or historical source. Windows/Quest3 runtime not asserted.",
+  "summary": "Real source implementation: game-origin D3D9 SM3 SetStreamSourceFreq indexed instancing expands per-vertex and per-instance data to native D3D11 FLOAT4 IA and issues separate GPU Draw/DrawIndexed per source instance, including source topology and shader cache identity. Four causal CI repairs retained negative test contracts without disabling gates. Exactly validated final source+test SHA 3dc9be07ce31a2f243a7e95fde8ec20b78528f32 with unchanged mandatory DX11 Fast/Backend/Windows/OpenXR/HUD 5/5 success. BUILD_VERIFIED only: full playable renderer, real OutRun menu/car/race frames, gamepad, Quest3/VDXR HMD and actual native draw/frame counters still UNTESTED. Original D3D9Ex/input/FFB/SkyGlow unchanged; DXVK frozen.",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
@@ -92,20 +92,71 @@
     "activation_guard_and_fallback": "Opt-in DX11 mirror only; original D3D9 Draw HRESULT, gamepad/FFB and SkyGlow unchanged, invalid snapshot/frequency/layout fallback fails closed."
   },
   "ci": {
-    "status": "RUNNING_CAUSAL_METADATA_REPAIR",
-    "first_material_sha": "cc029bf12213fed9d444442ae174f015710378ba",
-    "confirmed_failure": {
-      "fast_run_id": 39695134497,
-      "backend_run_id": 39695134439,
-      "reason": "Gate --check-latest selects prior 00991 lacking visible_frame_acceptance; 00992 source task run file not yet present."
-    },
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32",
     "required": [
-      "DX11 Fast Structural Checks",
-      "Backend Conversion Gate",
-      "Build",
-      "OpenXR VR architecture",
-      "OutRun EXE HUD Inspector CI"
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39696406606,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39696406499,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      },
+      {
+        "name": "Build",
+        "run_id": 39696413171,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39696413248,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39696413259,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      }
+    ],
+    "optional_skipped": [
+      {
+        "name": "VR PC Fast Test Build",
+        "run_id": 39696406520,
+        "conclusion": "skipped",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      }
+    ],
+    "material_source_commit": "cc029bf12213fed9d444442ae174f015710378ba",
+    "causal_ci_repairs": [
+      "31fa9e922f7bfbda1ef2e7035d96d1ea2820f65e",
+      "cabbadc26aacff390c1ce62ec97a3003917ee841",
+      "bd6a59934c0a03ad5d3ddec304a87762f892f320",
+      "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
     ]
   },
-  "next_action": "Await/check single required five-Gate suite on repair SHA; if real compile/test fails, repair under same TASK_ID. Runtime HMD/desktop tests separate; preserve native score 0 while pending."
+  "next_action": "Controller may select independent playable-native DX11 work; Quest3/VDXR real game HMD test on this feature NEED_HMD_TEST. Same TASK_ID repeat, C6 and CI repair must not earn extra points.",
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "c6_code_change": "NO",
+  "acceptance_results": {
+    "live_d3d9_instanced_gpu_draw": "PASS_EXACT_SHA_SOURCE_AND_BUILD",
+    "topology_boundary_fallback": "PASS_EXACT_SHA",
+    "packed_stream_tests_ci": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: source HEAD 341f573b; existing 00991 C6 distinct; owner/work_key scoped to SM3 native instanced game Draw.",
+    "C1_REVIEW": "PASS: D3D9 INDEXEDDATA and INSTANCEDATA multi-stream frequency unsupported in current native shader-bound Draw.",
+    "C2_IMPLEMENT": "PASS: real SM3 native instanced C++ IA/DX11 GPU Draw changes, packed stream assembly, 2 focused tests in material commit cc029bf1.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: five unchanged mandatory GitHub Actions success on 3dc9be07ce31a2f243a7e95fde8ec20b78528f32; Windows native Build and portable negative/source tests pass; HMD/game untested.",
+    "C4_COMMIT": "PASS: cc029bf material source, 31fa9e current acceptance record, cabbadc+bd6a+3dc9 causal CI fixtures/negative assertions, all marker [AUTO:CONVERSION-DX11-00992] without CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: Quest3 runtime/artifact not validated; no deployment falsely declared.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED, final validated SHA 3dc9be07ce31a2f243a7e95fde8ec20b78528f32, RUNTIME_VALIDATION=UNTESTED, SCORE_CHANGE=0 in checkpoint (separate scoreboard)."
+  }
 }
