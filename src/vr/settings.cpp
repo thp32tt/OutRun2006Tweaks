@@ -50,10 +50,10 @@ namespace Settings
     // per-eye render extent are independent. Never hard-code the primary
     // monitor's current pixels into Game::screen_resolution after game config.
     // A paired VR RenderWidth/RenderHeight is still an explicit game override.
-    Setting<bool> VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,
-        "Opt-in only: Quest3 2026-10-20 showed a portrait XR eye extent 2496x2688 corrupting the original game/menu layout. Default false preserves the original configured landscape game source, and XR eyes remain separately allocated. When enabled, use one VR 3D/2D menu render source. If the VDXR/OpenXR eye size is available BEFORE the original game graphics initialization, select it for both the D3D9Ex source and the game's scaled 2D menu. 640x480 logical UI coordinates remain independent. Never change the source at CreateDevice after the UI scale was calculated. When unavailable, keep the configured game resolution. Manual RenderWidth/Height and -width/-height win. Restart required." };
-    Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", true,
-        "Follow the game's configured resolution for VR source and UI when UnifiedEyeMenuSource is disabled. In unified mode, a ready XR eye extent sets ONE shared game/menu source before UI scale initialization; -width/-height or paired VR manual source settings take precedence. Restart required." };
+    Setting<bool> VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", true,
+        "Quest3/VDXR default: select the VDXR/OpenXR recommended eye extent before original graphics/UI initialization so the D3D9Ex source no longer follows the desktop resolution. Current menu containment keeps the original 640x480 logical UI independent from physical source pixels. Manual RenderWidth/Height and -width/-height still win. Restart required." };
+    Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", false,
+        "Compatibility fallback only. When enabled, keep the configured game/desktop resolution as the VR source. Default off so VDXR/OpenXR recommended eye resolution is preferred; -width/-height or paired VR manual source settings take precedence. Restart required." };
     Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
         "At launch, match the actual VDXR/OpenXR allocated per-eye render extent (not desktop or 2x eye width). "
         "Manual RenderWidth/RenderHeight take precedence; when host startup fails, use existing game resolution." };
