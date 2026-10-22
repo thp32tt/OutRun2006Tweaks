@@ -1,0 +1,364 @@
+{
+  "schema": "outrun-c1-independent-light-qa-v1",
+  "run_key": "OUTRUN-C1-20261023T0715KST-NEW-SHA",
+  "qa_at_kst": "2026-10-23T07:17:53.274015+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "INDEPENDENT_STATIC_C1_ONLY_NO_DDS_APPROVAL",
+  "source": "N100 A/B verified source PNG, production manifest, sent receipts, export evidence, candidate outputs, and independent visual comparison sheets",
+  "prior_sha_history_count": 463,
+  "candidate_count": 8,
+  "unique_new_sha_count": 8,
+  "duplicate_sha_count": 0,
+  "role_counts": {
+    "A": 4,
+    "B": 4
+  },
+  "result_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "checks": {
+    "source_manifest_sha_match": "8/8",
+    "source_sent_sha_match": "8/8",
+    "candidate_export_sha_match": "8/8",
+    "candidate_rgba_png": "8/8",
+    "visual_readability_and_approved_mapping": "8/8",
+    "source_candidate_dimension_equal": "0/8",
+    "native_ui_cell_safety": "UNVERIFIED_8/8",
+    "runtime_validation": "UNTESTED",
+    "dds_final_compose": "NOT_PERFORMED"
+  },
+  "evidence": {
+    "N100_metric_path": "work/C1_QA_20261023_0715_metrics.json",
+    "N100_A_comparison": "work/C1_QA_20261023_0715_A_pairs.jpg",
+    "N100_B_comparison": "work/C1_QA_20261023_0715_B_pairs.jpg",
+    "N100_check_script": "work/C1_QA_20261023_0715_check.py"
+  },
+  "reviewed": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0046-50B235EB",
+      "ordinal": 226,
+      "english": "MILKY WAY",
+      "approved_korean": "밀키 웨이",
+      "source_file": "Q173_324cd13f4935bf10_source.png",
+      "candidate_file": "Q173_324cd13f4935bf10_source_k.png",
+      "source_sha256": "62eaabd6458b7f18a0385e972a7fd0f1750dbb0a07205f36ca45f6749132cee7",
+      "candidate_sha256": "231c517d9082df42258f581ae8df9e52f415853ff2113a3b3f45ef03d1d0efdd",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_png_dimensions": [
+        1086,
+        198
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 투명 글자 레이어 후보. 그러나 원본 PNG와 생성 PNG의 크기가 달라 원본 HD UI 셀 복귀 시 합성 크기/좌표/안전영역·보호 아트 불침범을 검증하지 못함. 문장 전체 폭 차이는 불합격 근거로 사용하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0046-50B235EB",
+      "ordinal": 225,
+      "english": "GHOST FOREST",
+      "approved_korean": "고스트 포레스트",
+      "source_file": "Q173_7c7f4928b3047dbc_source.png",
+      "candidate_file": "Q173_7c7f4928b3047dbc_source_k.png",
+      "source_sha256": "118a91cda975aaf64c69d9013a15bdd6f063d11962e637ed0fbae08a0d3f2686",
+      "candidate_sha256": "cc800ff8e54f1f7d89f6a97912c62728a74a572b58297b69060736b38d5de178",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_png_dimensions": [
+        1386,
+        212
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 투명 글자 레이어 후보. 그러나 원본 PNG와 생성 PNG의 크기가 달라 원본 HD UI 셀 복귀 시 합성 크기/좌표/안전영역·보호 아트 불침범을 검증하지 못함. 문장 전체 폭 차이는 불합격 근거로 사용하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0046-50B235EB",
+      "ordinal": 224,
+      "english": "Casino Town",
+      "approved_korean": "카지노 타운",
+      "source_file": "Q163_c70e8fb032d1e989_source.png",
+      "candidate_file": "Q163_c70e8fb032d1e989_source_k.png",
+      "source_sha256": "7af4fe67ad870216fe8f2a2fa2ff3b5bc8ba5f92cb1725700b793ba37ba46b1e",
+      "candidate_sha256": "474014e27d9d5c5897adf554d7b76a05b1e7ffb72e37be6780f86e09eafba42f",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1320,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 투명 글자 레이어 후보. 그러나 원본 PNG와 생성 PNG의 크기가 달라 원본 HD UI 셀 복귀 시 합성 크기/좌표/안전영역·보호 아트 불침범을 검증하지 못함. 문장 전체 폭 차이는 불합격 근거로 사용하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0045-ADCD7793-R1",
+      "ordinal": 223,
+      "english": "Lost City",
+      "approved_korean": "로스트 시티",
+      "source_file": "Q163_df8383f30730c7ef_source.png",
+      "candidate_file": "Q163_df8383f30730c7ef_source_k.png",
+      "source_sha256": "986b1940c5e4efe142ef6001174df7269c609421a7f314cceb082ce4a2bb3e3f",
+      "candidate_sha256": "e76658d9610bfdc3623eff7c41ca4167f1e0e60e261145164ba0230c6352f626",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        500,
+        164
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 투명 글자 레이어 후보. 그러나 원본 PNG와 생성 PNG의 크기가 달라 원본 HD UI 셀 복귀 시 합성 크기/좌표/안전영역·보호 아트 불침범을 검증하지 못함. 문장 전체 폭 차이는 불합격 근거로 사용하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "ordinal": 282,
+      "english": "Metropolis",
+      "approved_korean": "메트로폴리스",
+      "source_file": "Q163_c50d03fd79443de4_source.png",
+      "candidate_file": "Q163_c50d03fd79443de4_source_k.png",
+      "source_sha256": "b33b5f4663e99c2f8795fa104d0198749427131f722362f24606ff697034f0af",
+      "candidate_sha256": "da898da11e3f8d78d52952dbedfbfffe853f5c4e4e651ffa17d12828829b8792",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        586,
+        164
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 투명 글자 레이어 후보. 그러나 원본 PNG와 생성 PNG의 크기가 달라 원본 HD UI 셀 복귀 시 합성 크기/좌표/안전영역·보호 아트 불침범을 검증하지 못함. 문장 전체 폭 차이는 불합격 근거로 사용하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "ordinal": 281,
+      "english": "Floral Village",
+      "approved_korean": "플로럴 빌리지",
+      "source_file": "Q163_e3caf6e7a4db7ae6_source.png",
+      "candidate_file": "Q163_e3caf6e7a4db7ae6_source_k.png",
+      "source_sha256": "37bcfef91fbb27a1ac4000bd720b8e0ff90956483a925f996df73c1f3d1868c1",
+      "candidate_sha256": "16edd85b977b873217b46f82c63cf8550cdc30b87493f7d48166f6204fb366ad",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        704,
+        164
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 투명 글자 레이어 후보. 그러나 원본 PNG와 생성 PNG의 크기가 달라 원본 HD UI 셀 복귀 시 합성 크기/좌표/안전영역·보호 아트 불침범을 검증하지 못함. 문장 전체 폭 차이는 불합격 근거로 사용하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "ordinal": 280,
+      "english": "Industrial Complex",
+      "approved_korean": "인더스트리얼 컴플렉스",
+      "source_file": "Q163_ae3bfa9b6542258f_source.png",
+      "candidate_file": "Q163_ae3bfa9b6542258f_source_k.png",
+      "source_sha256": "471348ebd714405c3c6af7b0959b744e9141a09d8aff77503d54572346649433",
+      "candidate_sha256": "4116e041233b30742fb81247035ea4a28d3a85ffb9b60d8e344e3cc8e1eea5b5",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1010,
+        162
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 투명 글자 레이어 후보. 그러나 원본 PNG와 생성 PNG의 크기가 달라 원본 HD UI 셀 복귀 시 합성 크기/좌표/안전영역·보호 아트 불침범을 검증하지 못함. 문장 전체 폭 차이는 불합격 근거로 사용하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "ordinal": 279,
+      "english": "Skyscrapers",
+      "approved_korean": "스카이스크레이퍼스",
+      "source_file": "Q163_3f93af0b14a910a5_source.png",
+      "candidate_file": "Q163_3f93af0b14a910a5_source_k.png",
+      "source_sha256": "2456a9c02d5b8ce952291062767056d7857e4fa9fd753882d33f9088296e4403",
+      "candidate_sha256": "3226208b7d917dbd16f40cc28cd203d957b7a9fe1251af0fad5b04de9a4c73a3",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        650,
+        164
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 원문과 승인 한글 문구는 시각상 일치하며 투명 글자 레이어 후보. 그러나 원본 PNG와 생성 PNG의 크기가 달라 원본 HD UI 셀 복귀 시 합성 크기/좌표/안전영역·보호 아트 불침범을 검증하지 못함. 문장 전체 폭 차이는 불합격 근거로 사용하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    }
+  ],
+  "imagegen_invoked": false,
+  "ab_queue_consumed": false,
+  "final_dds_written": false,
+  "final_deployment": false,
+  "runtime_validation": "UNTESTED",
+  "excluded_scopes": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "dedup_policy": "SAME_SHA_OR_RUN_KEY_MUST_NOT_REVIEW_OR_SCORE_TWICE"
+}
