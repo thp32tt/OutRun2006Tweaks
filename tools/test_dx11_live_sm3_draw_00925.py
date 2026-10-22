@@ -61,11 +61,11 @@ for rejection in (
 ):
     check(rejection in source, "missing fail-closed source/state rejection: " + rejection)
 
-// 01004: D3D9 menu/car/race shader identities can exceed the 64-resident
-// budget. The OLD unconditional >=64 rejection was a native-frame starvation
-// bug; replacement must stay bounded and never discard a good resident until
-// GPU shader/input/CB creation succeeded. Verify actual sequencing AND that
-// a destructive removal of either cache's eviction is detected.
+# 01004: D3D9 menu/car/race shader identities can exceed the 64-resident
+# budget. The OLD unconditional >=64 rejection was a native-frame starvation
+# bug; replacement must stay bounded and never discard a good resident until
+# GPU shader/input/CB creation succeeded. Verify actual sequencing AND that
+# a destructive removal of either cache's eviction is detected.
 cache_header = (ROOT / "src/vr/d3d11/native_game_live_shader_cache.hpp").read_text()
 check("if (residentLimit == 0u) return false;" in cache_header and
       "if (cache.size() < residentLimit) return true;" in cache_header and
