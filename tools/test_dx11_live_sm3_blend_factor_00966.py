@@ -35,7 +35,6 @@ require("0xdeadbeefu")            # Unknown factors still fail-closed
 game = src[src.index("bool submit_live_sm3_game_draw("):
            src.index("// A successful R9 RT0 switch")]
 require("const bool usesBlendFactor = live_sm3_needs_dynamic_blend_factor(", game)
-require("live_sm3_effective_dest_factor(sc, dc)", desc)
 portable = (root / "src/vr/d3d11/live_game_sm3_composite.hpp").read_text()
 require("live_sm3_effective_dest_factor(", portable)
 require("!live_sm3_needs_dynamic_blend_factor(", portable)
@@ -58,6 +57,7 @@ factor = src.split("constexpr bool sm3_live_factor(", 1)[1].split(
     "constexpr bool sm3_live_blend_op(", 1)[0]
 desc = src.split("constexpr bool sm3_live_blend_desc(", 1)[1].split(
     "constexpr bool sm3_live_legacy_source_blend_regression()", 1)[0]
+require("const DWORD rgbDst = live_sm3_effective_dest_factor(sc, dc);", desc)
 for token in (
     "case D3DBLEND_SRCALPHASAT:",
     "D3D11_BLEND_SRC_ALPHA_SAT",
@@ -68,8 +68,6 @@ for token in (
 for token in (
     "sc == D3DBLEND_BOTHSRCALPHA",
     "sc == D3DBLEND_BOTHINVSRCALPHA",
-    "bothSrc ? D3DBLEND_INVSRCALPHA",
-    "bothInvSrc ? D3DBLEND_SRCALPHA",
     "dc == D3DBLEND_SRCALPHASAT",
     "da == D3DBLEND_SRCALPHASAT",
     "sm3_live_factor(rgbSrc, false",
