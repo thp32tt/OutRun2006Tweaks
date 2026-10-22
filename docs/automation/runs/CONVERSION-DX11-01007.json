@@ -74,7 +74,8 @@
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d11/native_backend.hpp"
       ],
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "validation_command": "python tools/test_dx11_live_sm3_depth_01007.py (portable SM3 parser/HLSL/native Draw wiring)"
     },
     "original_game_depth_fallback": {
       "status": "PASS_BUILD",
@@ -83,7 +84,8 @@
         "tools/dx11_live_sm3_depth_01007.cpp",
         "tools/test_dx11_live_sm3_depth_01007.py"
       ],
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "validation_command": "python tools/test_dx11_live_sm3_depth_01007.py (negative source Z/alpha/fog + original Draw fallback)"
     },
     "same_SHA_ci": {
       "status": "PASS_EXACT_SHA",
@@ -92,7 +94,8 @@
         ".github/workflows/dx11-fast-structural.yml",
         "tools/test_dx11_live_sm3_depth_01007.py"
       ],
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "validation_command": "GitHub Actions DX11 Fast #39758389265; Backend #39758389162; Build #39758389409; OpenXR #39758389182; HUD #39758389262 at d084322d29856ad29e5368160e403ad147ac4211"
     }
   },
   "development_strategy": {
@@ -117,7 +120,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED; REAL_GAME_NATIVE_PIXEL_AND_HMD_UNTESTED",
-    "activation_guard_and_fallback": "Opt-in only, guarded and fail-closed, original D3D9Ex renderer/input/FFB authoritative."
+    "activation_guard_and_fallback": "Opt-in only, guarded and fail-closed, original D3D9Ex renderer/input/FFB authoritative.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "ci": {
     "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
