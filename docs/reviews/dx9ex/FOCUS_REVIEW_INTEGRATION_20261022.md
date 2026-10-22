@@ -33,3 +33,9 @@
 - Existing `R57ProjectViewPoint` (unchanged by this integration) admits `fabs(clipW)` solely if `Settings::VRRankDx11ProducerReference.get() && marker.exactOrdinalEyeCant`; all other projected world/rival anchors retain `clipW <= 1.0e-6f` rejection.
 - Replace the stale universal assertion with a **stronger scoped** verifier and five negative source mutations: general-world signed-W admission, exact-ordinal bypass, DX11-setting bypass, lost signed-ordinal fallback, and skipped nonfinite guard. Do not modify optical production code, rival route or static baseline.
 - This corrects only the source/test contract; runtime Quest3/VDXR, ordinal depth and eye cant remain UNTESTED.
+
+## Cockpit camera verifier aligned to 2026-10-22 user runtime evidence
+
+- Exact-SHA DX9Ex Active #39725616738 passes SkyGlow, R26 F11, and scoped R57 ordinal signed-W, then fails on an inherited cockpit test requiring `ComputeCarAnchoredSeatPose`.
+- Existing current `src/hooks_graphics.cpp::VRDriverSeatCameraPose` contains direct Quest3 evidence: absolute car-origin anchor placed the eye inside the model, so active mode intentionally uses `ComputeStableSeatPose(nativePos/nativeLook, optional car axes,...)` and last-valid hold. Driver seat game source remains untouched.
+- Update verifier to check active native-camera anchor and retained fallback with five negative mutations; keep inactive car-origin helper presence for diagnostics without forcing it into active FOCUS/HMD behavior. No new headset test performed here.
