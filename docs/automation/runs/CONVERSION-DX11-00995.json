@@ -10,13 +10,13 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00995",
   "work_key": "DX11:LIVE_GAME_CLIPPED_Z_ONLY_GPU_REPLAY",
   "feature_id": "DX11_NATIVE_LIVE_CLIPPED_Z_ONLY_FRAME_CONTINUITY",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_EXACT_SHA_GATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_head": "463adac72bc59632902dcbb770b4f8ef9aff3734",
   "material_result_sha": "28e433bd7110705deca02ae014bfa9701505d96b",
-  "validation_bearing_result_sha": null,
-  "result_sha": "28e433bd7110705deca02ae014bfa9701505d96b",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "24d8f8679b5c6b8fad4605895a9b159e11565d07",
+  "result_sha": "24d8f8679b5c6b8fad4605895a9b159e11565d07",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "hmd_test_performed": false,
@@ -25,7 +25,7 @@
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "score_change": 0,
-  "summary": "Actual C++ live game D3D9 viewport-clipped Z-only Clear replay now uses owned D3D11.0 GPU depth raster when D3D11.1 ClearView unavailable, and preserves source game color, native Draw order, original D3D9 gamepad/input/FFB/SkyGlow and DX9Ex fallback. Shared reusable depth raster validates D32, array, sample count, resource extent and context device; paired TARGET|Z uses same adapter. Source and focused positive/negative regressions added to Fast. No game or HMD test, source-graph/Windows CI pending.",
+  "summary": "00995 material C++/regression 28e433bd7110705deca02ae014bfa9701505d96b completes native D3D11.0 original game partial Z-only clipped Clear GPU adapter after game Draw, reusing D32 depth raster across combined TARGET|Z, with scoped IA/OM restore, input/FFB/DX9Ex fallback. Final integrated exact-SHA 24d8f8679b5c6b8fad4605895a9b159e11565d07 mandatory Fast/Backend/Build/OpenXR/HUD 5/5 GitHub Actions SUCCESS. Actual OutRun menu/car/race pixels, native draws and Quest3/VDXR not tested; do not promote gameplay renderer.",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_stereo_submission.cpp",
@@ -60,9 +60,32 @@
     ]
   },
   "acceptance_results": {
-    "live_partial_depth_gpu": "PENDING_EXACT_SHA",
-    "canonical_depth_fallback": "PENDING_EXACT_SHA",
-    "exact_sha_integration": "PENDING_EXACT_SHA"
+    "live_partial_depth_gpu": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/test_dx11_partial_depth_gpu_00995.py"
+      ],
+      "validation_command": "Fast structural and Windows Build exact SHA 24d8f8679b5c6b8fad4605895a9b159e11565d07; no real-game run"
+    },
+    "canonical_depth_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_source_mutation.hpp",
+        "tools/dx11_partial_depth_gpu_00995.cpp"
+      ],
+      "validation_command": "Positive and six negative live owner/depth admission cases included in Fast exact SHA 24d8f8679b5c6b8fad4605895a9b159e11565d07"
+    },
+    "exact_sha_integration": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-00995.json"
+      ],
+      "validation_command": "Five required workflow successes exact SHA 24d8f8679b5c6b8fad4605895a9b159e11565d07"
+    }
   },
   "development_strategy": {
     "work_class": "integration",
@@ -93,30 +116,56 @@
       "DX11:FULL_RESOLUTION_GAME_FRAME"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_NEEDS_CI_AND_RUNTIME: actual OutRun menu/car/race, native count and Quest3 pixel proof UNTESTED.",
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST: original game source has not been observed rendering menu/car/race with this exact SHA; Quest3/VDXR and gamepad remain UNTESTED.",
     "activation_guard_and_fallback": "Game source Clear HRESULT, DX9Ex renderer, gamepad, FFB, SkyGlow preserved under opt-in; any unsupported native depth path aborts."
   },
   "ci": {
-    "status": "PENDING_EXACT_SHA",
-    "source_commit": "28e433bd7110705deca02ae014bfa9701505d96b",
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "24d8f8679b5c6b8fad4605895a9b159e11565d07",
+    "material_source_commit": "28e433bd7110705deca02ae014bfa9701505d96b",
     "required": [
-      "DX11 Fast Structural Checks",
-      "Backend Conversion Gate",
-      "Build",
-      "OpenXR VR architecture",
-      "OutRun EXE HUD Inspector CI"
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39703965428,
+        "conclusion": "success",
+        "sha": "24d8f8679b5c6b8fad4605895a9b159e11565d07"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39703965412,
+        "conclusion": "success",
+        "sha": "24d8f8679b5c6b8fad4605895a9b159e11565d07"
+      },
+      {
+        "name": "Build",
+        "run_id": 39703965450,
+        "conclusion": "success",
+        "sha": "24d8f8679b5c6b8fad4605895a9b159e11565d07"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39703965593,
+        "conclusion": "success",
+        "sha": "24d8f8679b5c6b8fad4605895a9b159e11565d07"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39703965359,
+        "conclusion": "success",
+        "sha": "24d8f8679b5c6b8fad4605895a9b159e11565d07"
+      }
     ]
   },
   "pipeline": {
-    "C0_RECOVER": "DONE verified remote head 463adac and 00994 terminal 5/5 PASS",
-    "C1_REVIEW": "DONE found D3D11.0 game partial Z-only Clear always aborts",
-    "C2_IMPLEMENT": "DONE source and focused tests at material 28e433bd7110705deca02ae014bfa9701505d96b",
-    "C3_VALIDATE": "PENDING GitHub mandatory five exact-SHA Gates",
-    "C4_COMMIT": "PENDING final published ref with linked material commit",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_GATE"
+    "C0_RECOVER": "PASS remote GitHub source and 00994 terminal prior HEAD.",
+    "C1_REVIEW": "PASS D3D11.0 native live Z-only partial Clear missing route.",
+    "C2_IMPLEMENT": "PASS actual C++ source and scoped regressions 28e433bd7110705deca02ae014bfa9701505d96b",
+    "C3_VALIDATE": "PASS_EXACT_SHA all five mandatory GitHub Actions SUCCESS on 24d8f8679b5c6b8fad4605895a9b159e11565d07; runtime UNTESTED.",
+    "C4_COMMIT": "PASS material source 28e433bd7110705deca02ae014bfa9701505d96b; linked prevalidation task record 24d8f8679b5c6b8fad4605895a9b159e11565d07; neither has CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED; deploy and real-game test by user.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST; docs-only checkpoint after five exact-SHA PASS."
   },
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
   "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST"
 }
