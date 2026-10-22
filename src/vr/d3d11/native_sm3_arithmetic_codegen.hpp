@@ -191,7 +191,7 @@ inline bool append_native_sm3_arithmetic(
     case NativeSm3ArithmeticOpcode::Absolute:
     case NativeSm3ArithmeticOpcode::Fraction:
     case NativeSm3ArithmeticOpcode::DerivativeX:
-    case NativeSm3ArithmeticOpcode::DerivativeY:
+    case NativeSm3ArithmeticOpcode::DerivativeY: {
         if (!validSources(1u)) return false;
         const char* operation =
             opcode == NativeSm3ArithmeticOpcode::Absolute ? "abs(" :
@@ -204,6 +204,7 @@ inline bool append_native_sm3_arithmetic(
                     ")." + std::string(1, lane) + ")";
             });
         break;
+    }
     case NativeSm3ArithmeticOpcode::Add:
     case NativeSm3ArithmeticOpcode::Subtract:
     case NativeSm3ArithmeticOpcode::Multiply:
