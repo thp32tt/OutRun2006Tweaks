@@ -70,14 +70,16 @@
         "src/vr/d3d11/native_game_gpu_output_preserve.hpp",
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "tools/dx11_native_desktop_gpu_output_probe.cpp"
-      ]
+      ],
+      "validation_command": "WARP tools/dx11_native_desktop_gpu_output_probe.cpp (isolated WARP run 39713789280, exact SHA 8ae4b79b60e3bea0185dcafea658a99055ce0a0c)"
     },
     "preserve_original_fallback_and_outputs": {
       "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "tools/test_dx11_game_surface_copy_00886.py"
-      ]
+      ],
+      "validation_command": "python tools/test_dx11_game_surface_copy_00886.py (DX11 Fast run 39713789318, exact SHA 8ae4b79b60e3bea0185dcafea658a99055ce0a0c)"
     },
     "gpu_pixels_and_exact_sha_ci": {
       "status": "PASS_EXACT_SHA",
@@ -85,7 +87,8 @@
         "tools/dx11_native_desktop_gpu_output_probe.cpp",
         "tools/test_dx11_game_surface_copy_00886.py"
       ],
-      "validation_commit": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
+      "validation_commit": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c",
+      "validation_command": "Five required GitHub Actions: DX11 Fast 39713789318, Backend Conversion 39713789274, Windows Build 39713789261, OpenXR 39713794530, HUD Inspector 39713794463 on SHA 8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
     }
   },
   "validation_runs": {
