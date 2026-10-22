@@ -1,0 +1,297 @@
+{
+  "schema": "outrun-c1-independent-light-qa-v1",
+  "run_key": "OUTRUN-C1-20261023T0545KST-NEW-SHA",
+  "qa_at_kst": "2026-10-23T05:46:59.871734+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "INDEPENDENT_STATIC_C1_ONLY_NO_DDS_APPROVAL",
+  "source": "N100 A/B export_evidence + candidate_outputs + production_manifest + sent",
+  "prior_sha_history_count": 439,
+  "candidate_count": 8,
+  "unique_new_sha_count": 8,
+  "duplicate_sha_count": 0,
+  "role_counts": {
+    "A": 4,
+    "B": 4
+  },
+  "result_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "checks": {
+    "source_manifest_sha_match": "8/8",
+    "source_sent_sha_match": "8/8",
+    "candidate_export_sha_match": "8/8",
+    "candidate_rgba_png": "8/8",
+    "visual_readability_and_approved_mapping": "8/8",
+    "native_ui_cell_safety": "UNVERIFIED",
+    "runtime_validation": "UNTESTED",
+    "dds_final_compose": "NOT_PERFORMED"
+  },
+  "evidence": {
+    "N100_metric_path": "work/C1_QA_20261023_0545_metrics.json",
+    "N100_A_comparison": "work/C1_QA_20261023_0545_A_pairs.jpg",
+    "N100_B_comparison": "work/C1_QA_20261023_0545_B_pairs.jpg",
+    "N100_check_script": "work/C1_QA_20261023_0545_check.py"
+  },
+  "reviewed": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "ordinal": 238,
+      "source_file": "Q222_6d7d3bc7c20f6f78_source.png",
+      "candidate_file": "Q222_6d7d3bc7c20f6f78_source_k.png",
+      "english": "OutRun Mode / 15 C.",
+      "approved_korean": "아웃런 모드 / 15코스",
+      "source_sha256": "a5782b2ee82a4200b66da8cda5946782a0a03313192496a9ae3448df7aff6c11",
+      "candidate_sha256": "05a7834adf17b81e1376019b3aee349231dd112264bb3627690c1719691cf1fb",
+      "source_dds_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+      "source_png_dimensions": [
+        1130,
+        148
+      ],
+      "candidate_png_dimensions": [
+        2162,
+        727
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "output_mode": "RGBA",
+      "output_format": "PNG",
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD_UI_SAFE_AREA_NOT_PROVEN",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "reason": "VISUAL_TEXT_MATCH; HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; PNG_PIXEL_DIMENSIONS_DIFFER_FROM_SOURCE"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "ordinal": 237,
+      "source_file": "Q220_d4d009ec388f8ac8_source.png",
+      "candidate_file": "Q220_d4d009ec388f8ac8_source_k.png",
+      "english": "COAST 2 COAST",
+      "approved_korean": "코스트 2 코스트",
+      "source_sha256": "af3df0388f83ebf16c4378e5a24e06594aaf664c248ca9171aa6baff2a92ef17",
+      "candidate_sha256": "8860ce4bc15af371cb1de1ba28be7e0f4fac137353cff91dcf172538679ebae2",
+      "source_dds_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "source_png_dimensions": [
+        1298,
+        176
+      ],
+      "candidate_png_dimensions": [
+        2063,
+        762
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "output_mode": "RGBA",
+      "output_format": "PNG",
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD_UI_SAFE_AREA_NOT_PROVEN",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "reason": "VISUAL_TEXT_MATCH; HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; PNG_PIXEL_DIMENSIONS_DIFFER_FROM_SOURCE"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "ordinal": 236,
+      "source_file": "Q215_9994d0de202e2540_source.png",
+      "candidate_file": "Q215_9994d0de202e2540_source_k.png",
+      "english": "GOAL A",
+      "approved_korean": "골 A",
+      "source_sha256": "39ffda9a16126763a2dea1ae8d4d8d6daf5c1289354dcf5b170e170db1acaef1",
+      "candidate_sha256": "1ee748290d2dad12a46093d591924f5a99404c3dbab9f02f2d07d2201a45b86e",
+      "source_dds_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+      "source_png_dimensions": [
+        792,
+        304
+      ],
+      "candidate_png_dimensions": [
+        1870,
+        841
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "output_mode": "RGBA",
+      "output_format": "PNG",
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD_UI_SAFE_AREA_NOT_PROVEN",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "reason": "VISUAL_TEXT_MATCH; HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; PNG_PIXEL_DIMENSIONS_DIFFER_FROM_SOURCE"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "ordinal": 235,
+      "source_file": "Q159_c19ac35d17040b51_source.png",
+      "candidate_file": "Q159_c19ac35d17040b51_source_k.png",
+      "english": "SKYSCRAPERS",
+      "approved_korean": "스카이스크레이퍼스",
+      "source_sha256": "105828abe0a26b81daf2254e941f0d09123a9ef881817bdba4f7605fb855f34d",
+      "candidate_sha256": "425910e5f3c7fecdf51448f9e80354ce9048b6cfc0f438879434800151549bdd",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_png_dimensions": [
+        725,
+        277
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "output_mode": "RGBA",
+      "output_format": "PNG",
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD_UI_SAFE_AREA_NOT_PROVEN",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "reason": "VISUAL_TEXT_MATCH; HOLD_SOURCE_MULTIPHRASE_ROI(MILKY_WAY/SKYSCRAPERS/WATERFALLS); NATIVE_FIT_UNVERIFIED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "ordinal": 294,
+      "source_file": "Q154_e8a897312260427b_source.png",
+      "candidate_file": "Q154_e8a897312260427b_source_k.png",
+      "english": "CREATE NEW LICENSE",
+      "approved_korean": "새 라이선스 만들기",
+      "source_sha256": "15d162dd7a9635e563830343631b3f41fe9dc336f62a0385d1623096d51d36b1",
+      "candidate_sha256": "43174ad2a5caacf901c428ddc71de70367b7c203ab4f0f7393b18b672ed333db",
+      "source_dds_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "source_png_dimensions": [
+        2396,
+        663
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "output_mode": "RGBA",
+      "output_format": "PNG",
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD_UI_SAFE_AREA_NOT_PROVEN",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "reason": "VISUAL_TEXT_MATCH; HOLD_SOURCE_MULTILABEL_AND_PROTECTED_CAR_BACKGROUND; NATIVE_FIT_UNVERIFIED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "ordinal": 293,
+      "source_file": "Q147_950cead26227b48b_source.png",
+      "candidate_file": "Q147_950cead26227b48b_source_k.png",
+      "english": "ALPINE",
+      "approved_korean": "알파인",
+      "source_sha256": "2fc4d21c7b3e66d9035ecd0e295456db78ae0064c965898a1f9486e6b8c5c7c0",
+      "candidate_sha256": "9e59cd3699de5626d2ab0ea51a40277fa319972a3d9ca37b0da7ae1984be6556",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_png_dimensions": [
+        473,
+        289
+      ],
+      "candidate_png_dimensions": [
+        1604,
+        980
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "output_mode": "RGBA",
+      "output_format": "PNG",
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD_UI_SAFE_AREA_NOT_PROVEN",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "reason": "VISUAL_TEXT_MATCH; HOLD_SOURCE_MULTIPHRASE_ROI(ALPINE/CAPE_WAY); NATIVE_FIT_UNVERIFIED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "ordinal": 292,
+      "source_file": "Q205_3d441997a445bf84_source.png",
+      "candidate_file": "Q205_3d441997a445bf84_source_k.png",
+      "english": "LOCAL MIXED",
+      "approved_korean": "로컬 혼합",
+      "source_sha256": "06b48d63e43e0278c4dc445c83139ee10d6f366aa1b7c62453b6e4d74faec057",
+      "candidate_sha256": "e091f386b26f71d67278c79a9d1e5eae5a507a4aeb6163def24f716666f9aa48",
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "source_png_dimensions": [
+        1380,
+        256
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "output_mode": "RGBA",
+      "output_format": "PNG",
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD_UI_SAFE_AREA_NOT_PROVEN",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "reason": "VISUAL_TEXT_MATCH; HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; PNG_PIXEL_DIMENSIONS_DIFFER_FROM_SOURCE"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "ordinal": 291,
+      "source_file": "Q205_fd37c94b1d0ba52a_source.png",
+      "candidate_file": "Q205_fd37c94b1d0ba52a_source_k.png",
+      "english": "LOCAL MIXED",
+      "approved_korean": "로컬 혼합",
+      "source_sha256": "06b48d63e43e0278c4dc445c83139ee10d6f366aa1b7c62453b6e4d74faec057",
+      "candidate_sha256": "68c44e39815e652d8962dab41dfd956e6ec48c394db1ba7c5c83a29bbc74b6b7",
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "source_png_dimensions": [
+        1380,
+        256
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "output_mode": "RGBA",
+      "output_format": "PNG",
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD_UI_SAFE_AREA_NOT_PROVEN",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "reason": "VISUAL_TEXT_MATCH; HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; PNG_PIXEL_DIMENSIONS_DIFFER_FROM_SOURCE"
+    }
+  ],
+  "restrictions": {
+    "imagegen_calls": 0,
+    "producer_queues_consumed": 0,
+    "dds_writes": 0,
+    "legacy_c2_signoffs": 0,
+    "c3_signoffs": 0,
+    "ingame_pass": 0,
+    "deployments": 0
+  },
+  "note": "C1 visual recognition alone does not approve placement. Different output pixel dimensions are not an automatic fail, but no verified source-cell fitting/composition evidence was available. No cosmetic underfill failure was assigned."
+}
