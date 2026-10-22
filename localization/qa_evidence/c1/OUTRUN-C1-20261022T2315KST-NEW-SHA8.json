@@ -1,0 +1,539 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T2315KST-NEW-SHA8",
+  "role": "C1",
+  "mode": "independent_lightweight_qa_only",
+  "timestamp_kst": "2026-10-22T23:20:01.713451+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "selection": "A-0048 last 2 files (previous 22:45 inspected only first 3), B-0063-R1 first/all 5, A-0049 first 1; all SHA distinct from 22:45 8 files.",
+  "summary": {
+    "reviewed": 8,
+    "unique_candidate_sha": 8,
+    "source_file_sha256_verified": 8,
+    "candidate_export_sha256_verified": 8,
+    "rgba_png": 8,
+    "legible_korean": 8,
+    "extra_background_or_english_residue_found": 0,
+    "source_roi_clipped_or_multi_label_fail": 2,
+    "c1_final_pass": 0,
+    "c1_final_fail": 2,
+    "c1_final_hold": 6,
+    "dds_created": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "n100_metrics": "work/C1_QA_20261022_2315/metrics.json",
+    "n100_visual_pairs": "work/C1_QA_20261022_2315/pair_01.jpg ~ pair_08.jpg",
+    "source_root": "work/image-src/text_roi_batches/inputs",
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "production_manifest": "work/image-src/text_roi_batches/production_manifest.json"
+  },
+  "records": [
+    {
+      "id": "Q220_d4d009ec388f8ac8",
+      "role": "A",
+      "batch": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "candidate_file": "Q220_d4d009ec388f8ac8_source_k.png",
+      "source_file": "Q220_d4d009ec388f8ac8_source.png",
+      "english": "COAST 2 COAST",
+      "approved_korean": "코스트 2 코스트",
+      "source_png_sha256": "af3df0388f83ebf16c4378e5a24e06594aaf664c248ca9171aa6baff2a92ef17",
+      "candidate_png_sha256": "8860ce4bc15af371cb1de1ba28be7e0f4fac137353cff91dcf172538679ebae2",
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "source_dimensions": [
+        1298,
+        176
+      ],
+      "candidate_dimensions": [
+        2063,
+        762
+      ],
+      "source_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "candidate_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "source_bbox": [
+        36,
+        19,
+        1257,
+        157
+      ],
+      "candidate_bbox": [
+        47,
+        89,
+        2027,
+        720
+      ],
+      "source_dds_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "source_xyxy": [
+        0,
+        254,
+        649,
+        342
+      ],
+      "source_format": "PNG",
+      "output_format": "PNG",
+      "output_mode": "RGBA",
+      "lettering_legible": true,
+      "english_residue_or_extra_frame_found": false,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "한글 코스트 2 코스트 가독성/번역 일치, 출력 크기가 원문 ROI와 다르므로 네이티브 UI 안전 배치 미검증."
+    },
+    {
+      "id": "Q222_6d7d3bc7c20f6f78",
+      "role": "A",
+      "batch": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "candidate_file": "Q222_6d7d3bc7c20f6f78_source_k.png",
+      "source_file": "Q222_6d7d3bc7c20f6f78_source.png",
+      "english": "OutRun Mode / 15 C.",
+      "approved_korean": "아웃런 모드 / 15코스",
+      "source_png_sha256": "a5782b2ee82a4200b66da8cda5946782a0a03313192496a9ae3448df7aff6c11",
+      "candidate_png_sha256": "05a7834adf17b81e1376019b3aee349231dd112264bb3627690c1719691cf1fb",
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "source_dimensions": [
+        1130,
+        148
+      ],
+      "candidate_dimensions": [
+        2162,
+        727
+      ],
+      "source_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "candidate_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "source_bbox": [
+        8,
+        19,
+        1100,
+        133
+      ],
+      "candidate_bbox": [
+        27,
+        106,
+        2069,
+        620
+      ],
+      "source_dds_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+      "source_xyxy": [
+        0,
+        1974,
+        565,
+        2048
+      ],
+      "source_format": "PNG",
+      "output_format": "PNG",
+      "output_mode": "RGBA",
+      "lettering_legible": true,
+      "english_residue_or_extra_frame_found": false,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "아웃런 모드 / 15코스 가독성 및 승인 문구 일치, 네이티브 크기 복원·위치 검증 필요."
+    },
+    {
+      "id": "Q226_13649d18fb677dcd",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "candidate_file": "Q226_13649d18fb677dcd_source_k.png",
+      "source_file": "Q226_13649d18fb677dcd_source.png",
+      "english": "GOAL B",
+      "approved_korean": "골 B",
+      "source_png_sha256": "5634d7ad5c187e031045aa9740a46905bbaaa05839dd73e33ae3ffdffbee43ed",
+      "candidate_png_sha256": "e9a30aa6d4ecbeac0a53d0080053cfae7fa42c4445db5ad02232902ba888e287",
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "source_dimensions": [
+        556,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "candidate_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "source_bbox": [
+        5,
+        17,
+        518,
+        155
+      ],
+      "candidate_bbox": [
+        379,
+        84,
+        1800,
+        724
+      ],
+      "source_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "source_xyxy": [
+        0,
+        159,
+        278,
+        246
+      ],
+      "source_format": "PNG",
+      "output_format": "PNG",
+      "output_mode": "RGBA",
+      "lettering_legible": true,
+      "english_residue_or_extra_frame_found": false,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "골 B 가독성 및 매핑 적합, 출력 해상도 상이해 게임 원본 위치/인접 아트 미검증."
+    },
+    {
+      "id": "Q226_289a6e483d329b1c",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "candidate_file": "Q226_289a6e483d329b1c_source_k.png",
+      "source_file": "Q226_289a6e483d329b1c_source.png",
+      "english": "GOAL D",
+      "approved_korean": "골 D",
+      "source_png_sha256": "70ffd61d8cf49459defba147a984dc36018698928788fda6615c6a677fe11ccf",
+      "candidate_png_sha256": "fb161addeea53ad3aec08477d97b2162060c6481865309eb598ca2603dfcf0a6",
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "source_dimensions": [
+        554,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "candidate_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "source_bbox": [
+        5,
+        17,
+        517,
+        155
+      ],
+      "candidate_bbox": [
+        516,
+        21,
+        1722,
+        684
+      ],
+      "source_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "source_xyxy": [
+        0,
+        251,
+        277,
+        338
+      ],
+      "source_format": "PNG",
+      "output_format": "PNG",
+      "output_mode": "RGBA",
+      "lettering_legible": true,
+      "english_residue_or_extra_frame_found": false,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "골 D 가독성 및 매핑 적합, 출력 해상도 상이해 게임 원본 위치/인접 아트 미검증."
+    },
+    {
+      "id": "Q227_dd022552c0f0635b",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "candidate_file": "Q227_dd022552c0f0635b_source_k.png",
+      "source_file": "Q227_dd022552c0f0635b_source.png",
+      "english": "INTERMEDIATE",
+      "approved_korean": "중급",
+      "source_png_sha256": "ce668cc0a357c1ca6cdf22eee173dc41711212c901ff45762854f2f02531f221",
+      "candidate_png_sha256": "825321af89f5d2adfae9fa3b6778c5be6a3e8932775178028c86e789dc3dc42d",
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "source_dimensions": [
+        1400,
+        188
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "candidate_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "source_bbox": [
+        9,
+        18,
+        1357,
+        170
+      ],
+      "candidate_bbox": [
+        579,
+        51,
+        2068,
+        698
+      ],
+      "source_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "source_xyxy": [
+        0,
+        410,
+        700,
+        504
+      ],
+      "source_format": "PNG",
+      "output_format": "PNG",
+      "output_mode": "RGBA",
+      "lettering_legible": true,
+      "english_residue_or_extra_frame_found": false,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "중급 가독성 및 INTERMEDIATE 번역 일치, 원본 ROI를 실제 셀로 안전 합성한 증거 없음."
+    },
+    {
+      "id": "Q173_0f6a916768736fb3",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "candidate_file": "Q173_0f6a916768736fb3_source_k.png",
+      "source_file": "Q173_0f6a916768736fb3_source.png",
+      "english": "JUNGLE",
+      "approved_korean": "정글",
+      "source_png_sha256": "03e716b839e2374be50079b6772b20cda5868e200730a7acc4b5bff1285340a8",
+      "candidate_png_sha256": "410e2e0c43996ae41d8b33f61bb3c3c1a76be5bf2201e0ba7b163e6d08f7b6c0",
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "source_dimensions": [
+        589,
+        357
+      ],
+      "candidate_dimensions": [
+        1619,
+        971
+      ],
+      "source_alpha_border_gt8": {
+        "left": 0,
+        "right": 24,
+        "top": 311,
+        "bottom": 194
+      },
+      "candidate_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "source_bbox": [
+        1,
+        0,
+        589,
+        357
+      ],
+      "candidate_bbox": [
+        0,
+        21,
+        1521,
+        925
+      ],
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_xyxy": [
+        0,
+        1148,
+        589,
+        1505
+      ],
+      "source_format": "PNG",
+      "output_format": "PNG",
+      "output_mode": "RGBA",
+      "lettering_legible": true,
+      "english_residue_or_extra_frame_found": false,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "c1_status": "FAIL_SOURCE_ROI_MULTILABEL_TRUNCATED",
+      "notes": "JUNGLE 원본 ROI 안에 GIANT STAT..., ICE SCAPE, JUNGLE, LEGEND, LOST CITY 등 다수 영문이 포함되며 원본 위아래/오른쪽에 잘린 글자 존재(alpha border top311 bottom194 right24). 단일 문구 소스 조건 위반. 생성 정글 자체는 읽힘."
+    },
+    {
+      "id": "Q230_67f79e2fc9e342c0",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "candidate_file": "Q230_67f79e2fc9e342c0_source_k.png",
+      "source_file": "Q230_67f79e2fc9e342c0_source.png",
+      "english": "COURSES",
+      "approved_korean": "코스",
+      "source_png_sha256": "efee17bdb748b4d249bf90e371f5417d08ff6f91eee4d19ecd6857708fa4b26f",
+      "candidate_png_sha256": "62023a7d49eb003393a2e6486654faf874df9e02e766d1e6a5c212b038e4b429",
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "source_dimensions": [
+        1192,
+        304
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_alpha_border_gt8": {
+        "left": 126,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "candidate_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "source_bbox": [
+        0,
+        39,
+        1129,
+        265
+      ],
+      "candidate_bbox": [
+        371,
+        29,
+        1658,
+        672
+      ],
+      "source_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_xyxy": [
+        0,
+        316,
+        298,
+        392
+      ],
+      "source_format": "PNG",
+      "output_format": "PNG",
+      "output_mode": "RGBA",
+      "lettering_legible": true,
+      "english_residue_or_extra_frame_found": false,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "c1_status": "FAIL_SOURCE_ROI_LEFT_CLIPPED",
+      "notes": "COURSES 영문 소스의 왼쪽 경계에 alpha>8 픽셀 126개 존재, C 글리프가 잘린 크롭. 코스 한글 자체는 읽히나 검증된 단일 원문 ROI 입력 조건 위반."
+    },
+    {
+      "id": "Q226_dd0a561787921ccb",
+      "role": "A",
+      "batch": "OUTRUN-ROI-A-0049-4F973D86",
+      "candidate_file": "Q226_dd0a561787921ccb_source_k.png",
+      "source_file": "Q226_dd0a561787921ccb_source.png",
+      "english": "GOAL",
+      "approved_korean": "골",
+      "source_png_sha256": "6678503f07a0b24b9c9e76e3532cc78b532ea9c29c98050e74655852d5483f46",
+      "candidate_png_sha256": "c7ee59f0ab14584a1347f8391c543d4efadb832a4dde6b44cb8a8b1e3c771301",
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "source_dimensions": [
+        432,
+        174
+      ],
+      "candidate_dimensions": [
+        1976,
+        796
+      ],
+      "source_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "candidate_alpha_border_gt8": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "source_bbox": [
+        5,
+        17,
+        394,
+        155
+      ],
+      "candidate_bbox": [
+        0,
+        0,
+        1376,
+        755
+      ],
+      "source_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "source_xyxy": [
+        0,
+        75,
+        216,
+        162
+      ],
+      "source_format": "PNG",
+      "output_format": "PNG",
+      "output_mode": "RGBA",
+      "lettering_legible": true,
+      "english_residue_or_extra_frame_found": false,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "골 가독성 및 GOAL 매핑 적합, 출력 원문 ROI 크기 불일치 및 알파 약한 가장자리 잔광(alpha>8 접촉은 없음), 실제 UI 배치 미검증."
+    }
+  ],
+  "reviewed_against_head": "1284a31fdc2dea815fe97e917b9a1aa4bd5cad3b"
+}
