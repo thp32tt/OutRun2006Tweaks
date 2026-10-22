@@ -19,7 +19,8 @@ $performance = Get-OutRunVRTestProfile -Name PERFORMANCE
 $cockpit = Get-OutRunVRTestProfile -Name COCKPIT_PARTICLES
 
 Assert-True (Has-Argument $cockpit '-DriverSeatView=true') 'G_COCKPIT must activate the gameplay driver-seat camera'
-Assert-True (Has-Argument $cockpit '-DriverSeatCarSpaceBasis=true') 'G_COCKPIT must activate car-space seat test'
+Assert-True (Has-Argument $cockpit '-DriverSeatCarSpaceBasis=false') 'G_COCKPIT must keep the HMD-proven safe native-camera seat basis'
+Assert-True (Has-Argument $cockpit '-DriverSeatVehicleScale=1.0') 'G_COCKPIT must keep the player vehicle at stock scale after the HMD occlusion report'
 Assert-True (Has-Argument $cockpit '-DriverSeatFullCar=true') 'G_COCKPIT must keep full car visible'
 Assert-True (Has-Argument $cockpit '-DriverSeatHideDriver=true') 'G_COCKPIT must preserve verified driver-only suppression'
 Assert-True ($cockpit.Environment.OUTRUN_VR_R30_PARTICLE_VB -eq '1') 'G_COCKPIT must opt in to R30 dual-eye WorldParticle VB path'
@@ -68,7 +69,7 @@ foreach($profile in @($control,$correctness,$performance)) {
 
 Assert-True (Has-Argument $control '-DirectGpuOnly=false') 'CONTROL must keep DirectGPU optional for A/B isolation'
 Assert-True (Has-Argument $performance '-DirectGpuOnly=false') 'PERFORMANCE must keep fallback transport available for explicit performance comparison'
-Assert-True (Has-Argument $correctness '-DirectGpuOnly=true') 'CORRECTNESS must use the runtime-proven DirectGPU visual owner'
+Assert-True (Has-Argument $correctness '-DirectGpuOnly=false') 'CORRECTNESS must prefer DirectGPU while retaining the proven fallback when D3D9Ex promotion is unavailable'
 Assert-True (Has-Argument $correctness '-CullingUnionFov=false') 'CORRECTNESS must keep union-FOV projection mutation disabled'
 Assert-True (Has-Argument $control '-FramerateLimit=60') 'CONTROL must remain conservative 60 Hz comparison'
 Assert-True ($control.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -eq '0') 'CONTROL must not enable performance experiments'
