@@ -1,0 +1,472 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T1945KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T19:48:40.130893+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "mode": "independent_lightweight_QA_only",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_selection": "B-0056 five files and A-0042 remaining ordinals 205-207 (exclude A-0042 ordinal 204 already reviewed at 19:16). Eight distinct candidate SHA256. No queue consumption.",
+  "summary": {
+    "reviewed": 8,
+    "source_sha_matches_manifest": 8,
+    "candidate_sha_matches_local_completion_and_export": 8,
+    "candidate_png_rgba": 8,
+    "approved_mapping_and_visible_hangul_readability": 8,
+    "single_phrase_roi": 5,
+    "multilabel_or_protected_source_roi": 3,
+    "canvas_dimensions_match": 0,
+    "hold_native_ui_placement": 5,
+    "fail_source_roi": 3,
+    "c1_final_pass": 0,
+    "dds_generated": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "metrics_n100": "work/c1_20261022_1945/metrics.json",
+    "contact_sheets_n100": [
+      "work/c1_20261022_1945/compare_1.jpg",
+      "work/c1_20261022_1945/compare_2.jpg",
+      "work/c1_20261022_1945/compare_3.jpg",
+      "work/c1_20261022_1945/compare_4.jpg"
+    ],
+    "producer_completion_n100": [
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-B-0056-49EF3F1B.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0042-8FEDC08C.json"
+    ],
+    "remarks": "Inspection only; no ImageGen, A/B queue consumption, DDS creation, C2/C3/game pass or deployment. Shorter Korean sentence not used for FAIL. Candidate transparent RGBA verified, final UI anchoring unproven."
+  },
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0056-49EF3F1B",
+      "ordinal": 265,
+      "source_file": "Q140_a069cf1df56d7388_source.png",
+      "candidate_file": "Q140_a069cf1df56d7388_source_k.png",
+      "english": "SELECT RACE",
+      "approved_korean": "레이스 선택",
+      "source_dds_sha256": "53c30fcce6578e411ccd7b5aafb29f5d1c4c09121cb84047576011f4a627cc39",
+      "source_bbox_xyxy": [
+        0,
+        734,
+        827,
+        862
+      ],
+      "source_sha256": "b12ec074f995039df46f8d5cdff9f0f447ee3d549f8dce3af12422e818187615",
+      "candidate_sha256": "ce8bb4a51ce01d43d43b8e361ad1fa3b455f466cbe93d665fa05d474f880a66b",
+      "source_dimensions": [
+        1654,
+        256
+      ],
+      "candidate_dimensions": [
+        2020,
+        779
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        119,
+        0,
+        1910,
+        698
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "visible_approved_hangul_legible": true,
+      "text_length_difference_ignored": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "SELECT RACE→레이스 선택. 원본은 단일 영문 문구, 한글 자소·가독성 문제 없음. 출력 2020×779 / 원본 1654×256. Native ROI 좌표·UV 안전영역 및 크기 재검증 전 승인 보류.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0056-49EF3F1B",
+      "ordinal": 266,
+      "source_file": "Q140_810d33f6a864dcc3_source.png",
+      "candidate_file": "Q140_810d33f6a864dcc3_source_k.png",
+      "english": "SHOWROOM",
+      "approved_korean": "쇼룸",
+      "source_dds_sha256": "53c30fcce6578e411ccd7b5aafb29f5d1c4c09121cb84047576011f4a627cc39",
+      "source_bbox_xyxy": [
+        0,
+        417,
+        685,
+        541
+      ],
+      "source_sha256": "5bcc51c6fa67fc40ece00f57a8c9bdbc911d1bb117d63d129051a64e4a5d0306",
+      "candidate_sha256": "fcb649a848db7fb8f85b504a16d0f42f4e867235d3bd119426c08245cd062de0",
+      "source_dimensions": [
+        1370,
+        248
+      ],
+      "candidate_dimensions": [
+        1962,
+        801
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        524,
+        45,
+        1667,
+        786
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "visible_approved_hangul_legible": true,
+      "text_length_difference_ignored": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "SHOWROOM→쇼룸. 단일 원문 문구와 번역 일치·가독성 정상. 출력 1962×801 / 원본 1370×248. Native ROI 일대일 복귀/안전영역 미검증.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0056-49EF3F1B",
+      "ordinal": 267,
+      "source_file": "Q147_d247498948a01b43_source.png",
+      "candidate_file": "Q147_d247498948a01b43_source_k.png",
+      "english": "TULIP GARDEN",
+      "approved_korean": "튤립 가든",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_bbox_xyxy": [
+        0,
+        800,
+        523,
+        886
+      ],
+      "source_sha256": "ba05c0b1023d619c2eef069f6c4a8268be0804d6e9171f975acc2732db4dd554",
+      "candidate_sha256": "22867b636431ddebddb8cc89d3aef3ca61380c787eb38e40df9c11188f6a5b9f",
+      "source_dimensions": [
+        1046,
+        172
+      ],
+      "candidate_dimensions": [
+        1847,
+        851
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        0,
+        89,
+        1829,
+        741
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "visible_approved_hangul_legible": true,
+      "text_length_difference_ignored": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "TULIP GARDEN→튤립 가든. 단일 원문 문구·가독성 정상. 출력 1847×851 / 원본 1046×172. 출력 텍스트 스케일/원본 UV 앵커 검증 보류.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0056-49EF3F1B",
+      "ordinal": 268,
+      "source_file": "Q147_11745d63e0125933_source.png",
+      "candidate_file": "Q147_11745d63e0125933_source_k.png",
+      "english": "INDUSTRIAL COMPLEX",
+      "approved_korean": "인더스트리얼 컴플렉스",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_bbox_xyxy": [
+        0,
+        624,
+        810,
+        709
+      ],
+      "source_sha256": "0bc262d19c60554de25951e7a664bb9ab0bc66e743ce3acd68736b3676c1f104",
+      "candidate_sha256": "10827a7074c0398b1e51cc5e5af34eafeefbebfcebe07c2772a8e33af278590a",
+      "source_dimensions": [
+        1620,
+        170
+      ],
+      "candidate_dimensions": [
+        2072,
+        759
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        23,
+        47,
+        2052,
+        670
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "visible_approved_hangul_legible": true,
+      "text_length_difference_ignored": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "INDUSTRIAL COMPLEX→인더스트리얼 컴플렉스. 번역·가독성 정상. 출력 2072×759 / 원본 1620×170으로 원본 앵커·인접 UI 셀 침범 여부 입증되지 않음.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0056-49EF3F1B",
+      "ordinal": 269,
+      "source_file": "Q147_929182370cce50b0_source.png",
+      "candidate_file": "Q147_929182370cce50b0_source_k.png",
+      "english": "GHOST FOREST",
+      "approved_korean": "고스트 포레스트",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_bbox_xyxy": [
+        0,
+        539,
+        538,
+        625
+      ],
+      "source_sha256": "bcc59be24e2123e87f2c2ac146c693269659e33b1222d955ef43d2d13365f3a5",
+      "candidate_sha256": "04e42382633ea43d2030dcdb6cfccf2e4e6cd57ab39b2ea0aa24e9409058ce36",
+      "source_dimensions": [
+        1076,
+        172
+      ],
+      "candidate_dimensions": [
+        2059,
+        764
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        81,
+        72,
+        2027,
+        642
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "visible_approved_hangul_legible": true,
+      "text_length_difference_ignored": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "GHOST FOREST→고스트 포레스트. 한글 글자·효과 인식 가능, 단일 영문 문구. 출력 2059×764 / 원본 1076×172. 실제 원본 영역 배치 검증 전 보류.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0042-8FEDC08C",
+      "ordinal": 205,
+      "source_file": "Q161_296f622bed3245f4_source.png",
+      "candidate_file": "Q161_296f622bed3245f4_source_k.png",
+      "english": "SOUTH KOREA",
+      "approved_korean": "대한민국",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_bbox_xyxy": [
+        0,
+        1405,
+        662,
+        1601
+      ],
+      "source_sha256": "993e7b0f09d12798038b914613ba7cce349e008755848a597b64f4607a40dbf9",
+      "candidate_sha256": "e56d1dbb5f55f931336685b4c7ea80d166b7ca0d38d21bae54b100c12b2112b6",
+      "source_dimensions": [
+        662,
+        196
+      ],
+      "candidate_dimensions": [
+        2138,
+        736
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        0,
+        0,
+        2116,
+        673
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "visible_approved_hangul_legible": true,
+      "text_length_difference_ignored": true,
+      "qa_verdict": "FAIL_SOURCE_MULTILABEL_ROI",
+      "qa_reason": "SOUTH KOREA→대한민국. 실제 원본 ROI 안에 OTHER, SOUTH KOREA, SWEDEN 세 줄이 포함되어 한 문구 단위 입력 조건 위반. C 크롭 재작업 필요. 출력 또한 2138×736 / 원본 662×196.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0042-8FEDC08C",
+      "ordinal": 206,
+      "source_file": "Q161_3b5295459e4be3d2_source.png",
+      "candidate_file": "Q161_3b5295459e4be3d2_source_k.png",
+      "english": "TAURUS",
+      "approved_korean": "황소자리",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_bbox_xyxy": [
+        583,
+        1917,
+        1420,
+        2048
+      ],
+      "source_sha256": "fcd9858c2bd7fc2dd8e648bcc98528fef098c52c52a318d028f03d838754bac0",
+      "candidate_sha256": "3082d0396476fde60ef4c7d36743887932e2b1c78ebd3951c70d85e3206c0643",
+      "source_dimensions": [
+        1674,
+        262
+      ],
+      "candidate_dimensions": [
+        2025,
+        777
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        31,
+        64,
+        1408,
+        726
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "visible_approved_hangul_legible": true,
+      "text_length_difference_ignored": true,
+      "qa_verdict": "FAIL_SOURCE_MULTILABEL_ROI",
+      "qa_reason": "TAURUS→황소자리. 실제 원본 ROI에 SAGITTARIUS 및 TAURUS 둘 다 들어 있음. 단일 문구 crop 위반, C 크롭 재작업 필요. 출력 2025×777 / 원본 1674×262.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0042-8FEDC08C",
+      "ordinal": 207,
+      "source_file": "Q212_d44a4c79a86fa848_source.png",
+      "candidate_file": "Q212_d44a4c79a86fa848_source_k.png",
+      "english": "COAST 2 COAST",
+      "approved_korean": "코스트 2 코스트",
+      "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_bbox_xyxy": [
+        0,
+        714,
+        1860,
+        1383
+      ],
+      "source_sha256": "19773d44e92ce6b922a8c2de1ed68c35ac06e68aef165a8565c7047eff019e29",
+      "candidate_sha256": "a628d5c73cc25a00f7230bcbb0e686f0775f326abe772cc8eb5d298cd4038dab",
+      "source_dimensions": [
+        1860,
+        669
+      ],
+      "candidate_dimensions": [
+        2089,
+        753
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        57,
+        108,
+        2063,
+        681
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "visible_approved_hangul_legible": true,
+      "text_length_difference_ignored": true,
+      "qa_verdict": "FAIL_SOURCE_MULTILABEL_AND_PROTECTED_UI",
+      "qa_reason": "COAST 2 COAST→코스트 2 코스트. 원본 ROI는 SELECT PHOTO, SELECT STAR SIGN, COAST 2 COAST, SHOWROOM, HEART ATTACK, 컨트롤 UI/아이콘까지 혼합된 메뉴 아틀라스. 단일 영문 레이블/보호 아트 분리 위반; 배경·영문 잔상·다른 라벨 침범 없이 자동 대체 불가. 출력 2089×753 / 원본 1860×669.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    }
+  ]
+}
