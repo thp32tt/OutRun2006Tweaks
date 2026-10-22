@@ -1,0 +1,480 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T2045KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T20:49:55.926760+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "mode": "independent_lightweight_QA_only",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_selection": "Five newly completed B-0058 candidates and three newly completed A-0044-R1 candidates, distinct filenames/SHA256 and not covered by previous 20:15 C1 record. Producer queues unchanged.",
+  "summary": {
+    "reviewed": 8,
+    "source_sha_matches_manifest": 8,
+    "candidate_sha_matches_completion_and_export": 8,
+    "png_rgba": 8,
+    "approved_mapping_readable": 8,
+    "single_phrase_roi": 8,
+    "unwanted_frame_or_english_remnant": 0,
+    "generated_canvas_differs_from_original": 8,
+    "hold_native_ui_placement": 8,
+    "c1_final_pass": 0,
+    "c1_final_fail": 0,
+    "dds_generated": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "n100_metrics": "work/c1_20261022_2045/metrics.json",
+    "n100_contact_sheets": [
+      "work/c1_20261022_2045/compare_1.jpg",
+      "work/c1_20261022_2045/compare_2.jpg",
+      "work/c1_20261022_2045/compare_3.jpg",
+      "work/c1_20261022_2045/compare_4.jpg"
+    ],
+    "n100_local_completion": [
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-B-0058-C44121E6.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0044-D66C018D-R1.json"
+    ],
+    "remarks": "Independent SHA-bound visual C1 QA. Original font flat dark sans versus generated embossed dark outlines is cosmetic variance, not a standalone hard fail under current policy. No source canvas/UV-placement transform was independently verified, so all results HOLD rather than PASS. No ImageGen, A/B queue mutation, new DDS, C2/C3/ingame approval or deployment."
+  },
+  "records": [
+    {
+      "index": 1,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "source_file": "Q163_0aa095493de9c0a5_source.png",
+      "candidate_file": "Q163_0aa095493de9c0a5_source_k.png",
+      "english": "Ghost Forest",
+      "approved_korean": "고스트 포레스트",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        756,
+        336,
+        828
+      ],
+      "source_sha256": "2809885e31992415456d1e435bf61ec33f46cea6ac44d47780a0dac6f5077591",
+      "candidate_sha256": "701f7be912cd5e1fab9f851d00be56b70d6130c6207e59ac795c553b155c2233",
+      "source_dimensions": [
+        1344,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        53,
+        47,
+        2128,
+        579
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2045/compare_1.jpg",
+      "notes": "Actual source/candidate pair visually compared in checkerboard alpha overlay. Readable approved Korean and no observed English remnant. Candidate's generated canvas differs from source ROI: cannot infer native UI fit without verified transform. Different text width or merely smaller glyph is not FAIL."
+    },
+    {
+      "index": 2,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "source_file": "Q163_df77a32a516afc6f_source.png",
+      "candidate_file": "Q163_df77a32a516afc6f_source_k.png",
+      "english": "Deep Lake",
+      "approved_korean": "딥 레이크",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        528,
+        281,
+        610
+      ],
+      "source_sha256": "1934f4a240054a72dda1871237a6bf38e878bb4ac3771b48941c2c8b780181da",
+      "candidate_sha256": "284d4443df84f62a69b48c0856ab855aabb939cfdfb42fb564811dd3f0f4309b",
+      "source_dimensions": [
+        562,
+        164
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        81,
+        7,
+        2134,
+        681
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2045/compare_1.jpg",
+      "notes": "Actual source/candidate pair visually compared in checkerboard alpha overlay. Readable approved Korean and no observed English remnant. Candidate's generated canvas differs from source ROI: cannot infer native UI fit without verified transform. Different text width or merely smaller glyph is not FAIL."
+    },
+    {
+      "index": 3,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "source_file": "Q163_d6cd89bd6812b620_source.png",
+      "candidate_file": "Q163_d6cd89bd6812b620_source_k.png",
+      "english": "Giant Statues",
+      "approved_korean": "자이언트 스태추스",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        836,
+        366,
+        908
+      ],
+      "source_sha256": "c00d333fca96bff54ac653e3ba9542b4593729e7d79c627e2cd79b5ab8657f88",
+      "candidate_sha256": "59ffd6b3c7b196ce7e0e65abdda9833d6a548b4ed9b6595cbf913b8b65e18f44",
+      "source_dimensions": [
+        1464,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        17,
+        48,
+        2122,
+        668
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2045/compare_2.jpg",
+      "notes": "Actual source/candidate pair visually compared in checkerboard alpha overlay. Readable approved Korean and no observed English remnant. Candidate's generated canvas differs from source ROI: cannot infer native UI fit without verified transform. Different text width or merely smaller glyph is not FAIL."
+    },
+    {
+      "index": 4,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "source_file": "Q163_43248f3a746f1773_source.png",
+      "candidate_file": "Q163_43248f3a746f1773_source_k.png",
+      "english": "Palm Beach",
+      "approved_korean": "팜 비치",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1593,
+        322,
+        1665
+      ],
+      "source_sha256": "95174274ae7ff0a51f98804a9bdd352085694597f5da35fa76202c0a3801edfd",
+      "candidate_sha256": "c5a44e09562a894efd93d165f1e114144da4d1ecc344517ecb8473c7accea9c9",
+      "source_dimensions": [
+        1288,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        403,
+        59,
+        1770,
+        644
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2045/compare_2.jpg",
+      "notes": "Actual source/candidate pair visually compared in checkerboard alpha overlay. Readable approved Korean and no observed English remnant. Candidate's generated canvas differs from source ROI: cannot infer native UI fit without verified transform. Different text width or merely smaller glyph is not FAIL."
+    },
+    {
+      "index": 5,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0058-C44121E6",
+      "source_file": "Q163_3f93af0b14a910a5_source.png",
+      "candidate_file": "Q163_3f93af0b14a910a5_source_k.png",
+      "english": "Skyscrapers",
+      "approved_korean": "스카이스크레이퍼스",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1670,
+        325,
+        1752
+      ],
+      "source_sha256": "2456a9c02d5b8ce952291062767056d7857e4fa9fd753882d33f9088296e4403",
+      "candidate_sha256": "3226208b7d917dbd16f40cc28cd203d957b7a9fe1251af0fad5b04de9a4c73a3",
+      "source_dimensions": [
+        650,
+        164
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        33,
+        23,
+        2130,
+        698
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2045/compare_3.jpg",
+      "notes": "Actual source/candidate pair visually compared in checkerboard alpha overlay. Readable approved Korean and no observed English remnant. Candidate's generated canvas differs from source ROI: cannot infer native UI fit without verified transform. Different text width or merely smaller glyph is not FAIL."
+    },
+    {
+      "index": 6,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0044-D66C018D-R1",
+      "source_file": "Q163_472431b63b268d17_source.png",
+      "candidate_file": "Q163_472431b63b268d17_source_k.png",
+      "english": "Ice Scape",
+      "approved_korean": "아이스스케이프",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        910,
+        269,
+        992
+      ],
+      "source_sha256": "9356388c6647633583d716455a45644ede818f6fb7db1c03ec984ec89eccf946",
+      "candidate_sha256": "f96fc505e2215e3ce1266fc22c27a3c764689ef11cc15de4224ecaf0cc69caad",
+      "source_dimensions": [
+        538,
+        164
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        62,
+        19,
+        2104,
+        581
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2045/compare_3.jpg",
+      "notes": "Actual source/candidate pair visually compared in checkerboard alpha overlay. Readable approved Korean and no observed English remnant. Candidate's generated canvas differs from source ROI: cannot infer native UI fit without verified transform. Different text width or merely smaller glyph is not FAIL."
+    },
+    {
+      "index": 7,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0044-D66C018D-R1",
+      "source_file": "Q163_c3976cc81f3d362b_source.png",
+      "candidate_file": "Q163_c3976cc81f3d362b_source_k.png",
+      "english": "Sunny Beach",
+      "approved_korean": "서니 비치",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1820,
+        356,
+        1902
+      ],
+      "source_sha256": "8905ac8225c8c57b5fe369805915b4667922b3f8f3b5e17c891e9ae1c9f531b7",
+      "candidate_sha256": "f46c85df58657fb9491ea010ca82ce16a7cf9053c134ad662b1deae88ed8dc09",
+      "source_dimensions": [
+        712,
+        164
+      ],
+      "candidate_dimensions": [
+        2170,
+        725
+      ],
+      "candidate_alpha_bbox": [
+        227,
+        44,
+        1987,
+        578
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2045/compare_4.jpg",
+      "notes": "Actual source/candidate pair visually compared in checkerboard alpha overlay. Readable approved Korean and no observed English remnant. Candidate's generated canvas differs from source ROI: cannot infer native UI fit without verified transform. Different text width or merely smaller glyph is not FAIL."
+    },
+    {
+      "index": 8,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0044-D66C018D-R1",
+      "source_file": "Q163_16cd04ef2c1f2106_source.png",
+      "candidate_file": "Q163_16cd04ef2c1f2106_source_k.png",
+      "english": "Tulip Garden",
+      "approved_korean": "튤립 가든",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1897,
+        343,
+        1979
+      ],
+      "source_sha256": "52c84e4026e55a747d893d081360716c2e05b9f227bdb944a3e70263f5bc8b8e",
+      "candidate_sha256": "499e15b7d940cec28e5432fbb5238130cee65901041a5ee631d3170f94dd47e9",
+      "source_dimensions": [
+        686,
+        164
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        150,
+        39,
+        1984,
+        611
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2045/compare_4.jpg",
+      "notes": "Actual source/candidate pair visually compared in checkerboard alpha overlay. Readable approved Korean and no observed English remnant. Candidate's generated canvas differs from source ROI: cannot infer native UI fit without verified transform. Different text width or merely smaller glyph is not FAIL."
+    }
+  ]
+}
