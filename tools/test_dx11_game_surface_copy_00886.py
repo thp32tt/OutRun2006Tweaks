@@ -8,6 +8,7 @@ root = Path(__file__).resolve().parents[1]
 bridge = (root / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text(encoding="utf-8")
 hooks = (root / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
 region = (root / "src/vr/d3d11/native_game_surface_copy_region.hpp").read_text(encoding="utf-8")
+gpu_outputs = (root / "src/vr/d3d11/native_game_gpu_output_preserve.hpp").read_text(encoding="utf-8")
 
 
 def linked(b, h, r):
@@ -42,12 +43,23 @@ def linked(b, h, r):
         "desc.Format == D3DFMT_X8R8G8B8",
         "dst[x] = 0xffu;",
         "context->UpdateSubresource(s.surfaceReplayScratch.Get()",
-        "context->OMSetRenderTargets(0u, nullptr, nullptr);",
+        "ScopedNativeGameGpuTransferOutputs outputs(context);",
         "context->CopySubresourceRegion(",
         "s.backend.color_texture(), 0u, region.left, region.top, 0u,",
-        "context->OMSetRenderTargets(1u, &oldColor, oldDepth);",
+        "if (FAILED(device->GetDeviceRemovedReason())) return false;",
         "++s.surfaceReplayCount;",
-    )) and all(token in upd for token in (
+    )) and (
+        '#include "native_game_gpu_output_preserve.hpp"' in b
+        and "OMGetRenderTargets(1u, &oldColor" not in replay
+        and "OMSetRenderTargets(1u, &oldColor" not in replay
+        and replay.index("ScopedNativeGameGpuTransferOutputs outputs(context);")
+            < replay.index("context->CopySubresourceRegion(")
+        and all(token in gpu_outputs for token in (
+            "OMGetRenderTargets(", "OMGetRenderTargetsAndUnorderedAccessViews(",
+            "CSGetUnorderedAccessViews(", "CSSetUnorderedAccessViews(",
+            "OMSetRenderTargetsAndUnorderedAccessViews(", "keepCounters",
+        ))
+    ) and all(token in upd for token in (
         "R30UpdateSurfaceHook.stdcall<HRESULT>(",
         "GameNativeSurfaceCopyRegion::update_surface(",
         "preserve_game_surface_copy(device, destination, &rect, hr)",
@@ -82,8 +94,9 @@ for token in (
     "game->GetRenderTargetData(",
     "s.frameBatch.publishable(s.pending)",
     "actualIdentity.Get() != backbufferIdentity.Get()",
-    "context->OMSetRenderTargets(0u, nullptr, nullptr);",
+    "ScopedNativeGameGpuTransferOutputs outputs(context);",
     "context->CopySubresourceRegion(",
+    "if (FAILED(device->GetDeviceRemovedReason())) return false;",
     "s.surfaceReplayReadback->UnlockRect()",
     "++s.surfaceReplayCount;",
 ):

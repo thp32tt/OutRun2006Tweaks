@@ -107,10 +107,51 @@ static bool run_probe() {
         pixel[2] == 255u && pixel[3] == 255u;
     context->Unmap(readable.Get(), 0u);
     std::fputs("00900 WARP: pixel Map/Unmap passed\n", stderr);
+    // Reproduce an in-frame game destination update: copy INTO the still
+    // RTV-bound native color target, not just FROM it. A single RT0 restore
+    // would lose MRT1, PS UAV2 and CS UAV0 after the copy.
+    ComPtr<ID3D11RenderTargetView> fillView;
+    if (FAILED(device->CreateRenderTargetView(dest.Get(), nullptr, &fillView)))
+        return false;
+    const float green[] = {0.f, 1.f, 0.f, 1.f};
+    context->ClearRenderTargetView(fillView.Get(), green);
+    const D3D11_BOX smallRegion{0u, 0u, 0u, 16u, 16u, 1u};
+    {
+        ScopedNativeGameGpuTransferOutputs outputs(context.Get());
+        context->CopySubresourceRegion(
+            source.Get(), 0u, 8u, 8u, 0u, dest.Get(), 0u, &smallRegion);
+    }
+    ID3D11RenderTargetView* afterCopy[2]{};
+    ID3D11UnorderedAccessView* afterPS = nullptr;
+    ID3D11UnorderedAccessView* afterCS = nullptr;
+    context->OMGetRenderTargetsAndUnorderedAccessViews(
+        2u, afterCopy, nullptr, 2u, 1u, &afterPS);
+    context->CSGetUnorderedAccessViews(0u, 1u, &afterCS);
+    const bool destinationOutputsPreserved =
+        afterCopy[0] == first.Get() && afterCopy[1] == second.Get() &&
+        afterPS == psUav.Get() && afterCS == csUav.Get();
+    for (auto* rt : afterCopy) if (rt) rt->Release();
+    if (afterPS) afterPS->Release();
+    if (afterCS) afterCS->Release();
+    {
+        ScopedNativeGameGpuTransferOutputs outputs(context.Get());
+        context->CopyResource(readable.Get(), source.Get());
+    }
+    D3D11_MAPPED_SUBRESOURCE changed{};
+    if (FAILED(context->Map(readable.Get(), 0u, D3D11_MAP_READ, 0u, &changed)))
+        return false;
+    const auto* base = static_cast<const unsigned char*>(changed.pData);
+    const auto* greenPixel = base
+        ? base + 8u * changed.RowPitch + 8u * 4u : nullptr;
+    const bool regionCopied = greenPixel &&
+        base[0] == 0u && base[1] == 0u && base[2] == 255u &&
+        greenPixel[0] == 0u && greenPixel[1] == 255u &&
+        greenPixel[2] == 0u && greenPixel[3] == 255u;
+    context->Unmap(readable.Get(), 0u);
     context->OMSetRenderTargets(0u, nullptr, nullptr);
     ID3D11UnorderedAccessView* unbound = nullptr;
     context->CSSetUnorderedAccessViews(0u, 1u, &unbound, nullptr);
-    return preserved && copied;
+    return preserved && copied && destinationOutputsPreserved && regionCopied;
 }
 int main() {
     const bool passed = run_probe();

@@ -48,6 +48,7 @@
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_gpu_handoff.hpp"
+#include "native_game_gpu_output_preserve.hpp"
 #include "native_game_shared_desktop.hpp"
 #include "native_game_cpu_upload_transaction.hpp"
 #include "native_game_shared_desktop_admission.hpp"
@@ -7453,19 +7454,20 @@ bool preserve_game_surface_copy(
         context->UpdateSubresource(s.surfaceReplayScratch.Get(), 0u,
             nullptr, s.surfaceReplayPixels.data(),
             static_cast<UINT>(rowBytes), 0u);
-        // A D3D11 RTV cannot remain a writable output while it is the
-        // destination of CopySubresourceRegion. Restore its native Z/OM
-        // bindings so the next real game Draw retains depth chronology.
-        ID3D11RenderTargetView* oldColor = nullptr;
-        ID3D11DepthStencilView* oldDepth = nullptr;
-        context->OMGetRenderTargets(1u, &oldColor, &oldDepth);
-        context->OMSetRenderTargets(0u, nullptr, nullptr);
-        context->CopySubresourceRegion(
-            s.backend.color_texture(), 0u, region.left, region.top, 0u,
-            s.surfaceReplayScratch.Get(), 0u, nullptr);
-        context->OMSetRenderTargets(1u, &oldColor, oldDepth);
-        if (oldColor) oldColor->Release();
-        if (oldDepth) oldDepth->Release();
+        // The real game can leave sparse MRT attachments, pixel UAVs and
+        // compute UAVs alive across a post-Draw UpdateSurface/StretchRect.
+        // OMSetRenderTargets(1) would silently discard these bindings and
+        // corrupt subsequent native menu/vehicle/race Draws. Detach ALL
+        // writable GPU outputs during the copy and restore the exact
+        // attachments and append/consume counters on scope exit.
+        {
+            ScopedNativeGameGpuTransferOutputs outputs(context);
+            context->CopySubresourceRegion(
+                s.backend.color_texture(), 0u, region.left, region.top, 0u,
+                s.surfaceReplayScratch.Get(), 0u, nullptr);
+        }
+        // D3D11 copy has no HRESULT; do not publish a removed-device frame.
+        if (FAILED(device->GetDeviceRemovedReason())) return false;
         ++s.surfaceReplayCount;
         if (completingCpuWrite) s.cpuSurfaceReplay.reset();
         // Neither a CPU readback nor its D3D11 GPU copy counts as a native
