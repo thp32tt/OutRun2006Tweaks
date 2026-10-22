@@ -2,6 +2,7 @@
 #include "native_game_eye_pair_sources.hpp"
 #include "native_game_postpass_replay.hpp"
 #include "native_game_om_slots.hpp"
+#include "native_game_gpu_output_preserve.hpp"
 
 #include <dxgi.h>
 
@@ -550,6 +551,17 @@ namespace outrun::vr::dx11
                 if (depth) depth->Release();
             }
         } sourceOutputs{context};
+
+        // The host's previously displayed shared eyes can remain shader inputs
+        // on this immediate context. Copy/Resolve may write those physical
+        // resources: temporarily detach only aliasing game VS/PS/GS/HS/DS/CS
+        // SRVs and restore every unrelated input before the next Draw.
+        // Keep this scope *inside* the source OM/UAV detachment so restoring
+        // the original game outputs cannot silently discard shader bindings.
+        live_game_frame::ScopedNativeGameGpuTransferInputs leftInputs(
+            context, entry.eye[0].Get());
+        live_game_frame::ScopedNativeGameGpuTransferInputs rightInputs(
+            context, entry.eye[1].Get());
 
         // All rejection paths precede both GPU commands. After this point
         // a failed fence arm must quarantine, not cancel/reissue, the slot:

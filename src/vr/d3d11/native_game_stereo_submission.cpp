@@ -6,6 +6,7 @@
 #include "native_game_partial_color_format.hpp"
 #include "native_game_stretch_source.hpp"
 #include "native_game_stereo_draw_evidence.hpp"
+#include "native_game_gpu_output_preserve.hpp"
 #include "native_game_raster_topology.hpp"
 #include <limits>
 #include <cmath>
@@ -1706,6 +1707,11 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     {
         ScopedNativePostpassOutputs restore{context_};
         context_->OMSetRenderTargets(0u, nullptr, nullptr);
+        // The native eye is writable here even if a preceding game shader
+        // still samples its old pixels. Preserve and temporarily detach only
+        // destination-aliasing shader SRVs across this real GPU color transfer.
+        live_game_frame::ScopedNativeGameGpuTransferInputs eyeCopyInputs(
+            context_, eyeColor.Get());
         if (needsResolve) {
             context_->ResolveSubresource(
                 fullResolve ? eyeColor.Get() : resolved.Get(),
@@ -2581,6 +2587,11 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     ScopedNativePostpassOutputs outputs(context_);
     context_->OMSetRenderTargets(0u, nullptr, nullptr);
     if (sampled.Get() != source) {
+        // The cached shader-readable game postpass destination may still be
+        // sampled by a prior native Draw. Avoid retaining a writable SRV alias
+        // during the Copy/Resolve; its original bindings survive this transfer.
+        live_game_frame::ScopedNativeGameGpuTransferInputs sampledCopyInputs(
+            context_, sampled.Get());
         // Subresource 0 of EACH array slice is the camera's full-sized
         // color. This also handles multisampled color and multi-mip
         // RTV-only postpasses without ever copying unrelated eye pixels.
