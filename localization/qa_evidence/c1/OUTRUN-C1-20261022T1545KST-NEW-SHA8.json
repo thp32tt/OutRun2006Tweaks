@@ -1,0 +1,940 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1545KST-NEW-SHA8",
+  "branch": "korean-localization-recovery-20260928",
+  "date_kst": "2026-10-22T15:50:12.369302+09:00",
+  "scope": "Independent C1 QA only, 8 previously unreviewed N100 A/B ImageGen PNGs, no queue consumption",
+  "previously_reviewed_unique_candidate_shas": 367,
+  "exported_candidate_records": 388,
+  "pending_unique_at_inventory": 26,
+  "selected_count": 8,
+  "summary": {
+    "pass_png_text_only_pending_native_placement": 4,
+    "fail_source_roi_multi_label_composite": 4,
+    "rgba_png_alpha_verified": 8,
+    "source_and_candidate_sha256_verified": 8,
+    "original_source_and_output_dimensions_differ": 8,
+    "meaningful_alpha_edge_clipping": 0,
+    "full_native_placement_approved": 0
+  },
+  "evidence_n100": [
+    "work/c1_20261022_1545_inventory_result.json",
+    "work/c1_20261022_1545_contact.jpg"
+  ],
+  "image_generation_called": false,
+  "AB_queue_consumed": false,
+  "DDS_final_compose": false,
+  "C2_C3_ingame_pass": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "protected_projects_unchanged": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "candidate_file": "Q161_b6a048101dacac92_source_k.png",
+      "candidate_sha256": "d40908b6d925a38d8633efa77725ba077f7b04469973a129d8aa49f3ad43ccd7",
+      "source_file": "Q161_b6a048101dacac92_source.png",
+      "source_sha256": "6619da4bd8be5822a92707eedb68e00d2f375be97caa7fb5fee6bae7002ca166",
+      "manifest_english": "GERMANY",
+      "approved_korean": "독일",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1092,
+          116
+        ],
+        "alpha_bbox": [
+          5,
+          3,
+          591,
+          114
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 44291,
+        "sha256": "6619da4bd8be5822a92707eedb68e00d2f375be97caa7fb5fee6bae7002ca166"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          67,
+          253,
+          1067,
+          610
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 136393,
+        "sha256": "d40908b6d925a38d8633efa77725ba077f7b04469973a129d8aa49f3ad43ccd7"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "source_roi_single_phrase": true,
+      "meaningful_alpha_boundary_clear": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "단일 영어 국가명 ROI에서 승인 번역 '독일' 식별. 한글 획·받침 가독, 알파 가장자리 절단/다른 배경 요소 없음. 출력 크기 상이해 실제 UV 미확인.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "candidate_file": "Q161_092816d9210fd402_source_k.png",
+      "candidate_sha256": "e4950a8ba7a0e32ffe4f032491588c9f1c947d741129d500262b4a6b60610007",
+      "source_file": "Q161_092816d9210fd402_source.png",
+      "source_sha256": "8dfc4b783fedc67ed56202cfe91af79fe3e57258c29d6ff9ac27b5663f713dcc",
+      "manifest_english": "NORTH KOREA",
+      "approved_korean": "북한",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1092,
+          120
+        ],
+        "alpha_bbox": [
+          7,
+          7,
+          813,
+          118
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 50920,
+        "sha256": "8dfc4b783fedc67ed56202cfe91af79fe3e57258c29d6ff9ac27b5663f713dcc"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          41,
+          138,
+          528,
+          555
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 141003,
+        "sha256": "e4950a8ba7a0e32ffe4f032491588c9f1c947d741129d500262b4a6b60610007"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "source_roi_single_phrase": true,
+      "meaningful_alpha_boundary_clear": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "단일 영어 국가명 ROI에서 승인 번역 '북한' 식별. 글자층 판독 가능하며 보호 아트 재생성 없음. 원래 UI 배치 미확인.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "candidate_file": "Q161_563039872fa7181e_source_k.png",
+      "candidate_sha256": "d50aa9a92864fa4f209a7f90251e8a895aad7d19fd55365431589359be5c803f",
+      "source_file": "Q161_563039872fa7181e_source.png",
+      "source_sha256": "2cf4945db2d1d4f22660f9fea418cdc21c1d81039856155c3089ff3633c38673",
+      "manifest_english": "PISCES",
+      "approved_korean": "물고기자리",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1092,
+          120
+        ],
+        "alpha_bbox": [
+          7,
+          7,
+          423,
+          118
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 36254,
+        "sha256": "2cf4945db2d1d4f22660f9fea418cdc21c1d81039856155c3089ff3633c38673"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          73,
+          104,
+          1209,
+          579
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 258473,
+        "sha256": "d50aa9a92864fa4f209a7f90251e8a895aad7d19fd55365431589359be5c803f"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "source_roi_single_phrase": true,
+      "meaningful_alpha_boundary_clear": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "단일 별자리 레이블 ROI에서 승인 번역 '물고기자리' 식별. 낱글자 읽힘, 배경 패널 없음. 배치 미검증.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "candidate_file": "Q161_79406ebfad3d5500_source_k.png",
+      "candidate_sha256": "8e74f8624e3fc7cac0555a10fd3bcf2727a418b61156fc2ad741aa89987e2642",
+      "source_file": "Q161_79406ebfad3d5500_source.png",
+      "source_sha256": "8f4d7b577e49fd4ed9668b086aea85a2b816a3c73f8cdacdae2e83def1a18d0e",
+      "manifest_english": "AUSTRIA",
+      "approved_korean": "오스트리아",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1210,
+          116
+        ],
+        "alpha_bbox": [
+          32,
+          3,
+          547,
+          114
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 34637,
+        "sha256": "8f4d7b577e49fd4ed9668b086aea85a2b816a3c73f8cdacdae2e83def1a18d0e"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          25,
+          152,
+          1138,
+          555
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 225118,
+        "sha256": "8e74f8624e3fc7cac0555a10fd3bcf2727a418b61156fc2ad741aa89987e2642"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "source_roi_single_phrase": true,
+      "meaningful_alpha_boundary_clear": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "단일 영어 국가명 ROI에서 승인 번역 '오스트리아' 식별. 글자와 테두리 판독 가능, 출력 규격 차이 보류.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0044-881A0AFD",
+      "candidate_file": "Q051_0f50d9f098ed0341_source_k.png",
+      "candidate_sha256": "a525e692d1391c8f25455268d1e9d16aba5655c8a455347d5b408ad46d9736dc",
+      "source_file": "Q051_0f50d9f098ed0341_source.png",
+      "source_sha256": "00f5d0c5d50ba1c28c059a8d5f9f6893cbbf7127f3d1aca097f055478809c9d0",
+      "manifest_english": "Legend",
+      "approved_korean": "레전드",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1213,
+          584
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1213,
+          584
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 957,
+            "8": 957,
+            "32": 957,
+            "128": 957
+          },
+          "bottom": {
+            "1": 385,
+            "8": 175,
+            "32": 168,
+            "128": 55
+          },
+          "left": {
+            "1": 146,
+            "8": 146,
+            "32": 146,
+            "128": 146
+          },
+          "right": {
+            "1": 213,
+            "8": 212,
+            "32": 212,
+            "128": 209
+          }
+        },
+        "size_bytes": 136826,
+        "sha256": "00f5d0c5d50ba1c28c059a8d5f9f6893cbbf7127f3d1aca097f055478809c9d0"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1808,
+          870
+        ],
+        "alpha_bbox": [
+          579,
+          164,
+          1233,
+          570
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 177664,
+        "sha256": "a525e692d1391c8f25455268d1e9d16aba5655c8a455347d5b408ad46d9736dc"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "meaningful_alpha_boundary_clear": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "'Legend'가 포함된 원본 ROI에 Stage Lap, Floral Village, Giant Statue, Beat that car!, LOGIN TO ACCOUNT 등 여러 레이블·아이콘이 함께 존재. 단일 문구 원본 아님; 출력 글자 '레전드' 자체는 판독됨.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0044-881A0AFD",
+      "candidate_file": "Q051_c5c1e87d053a9081_source_k.png",
+      "candidate_sha256": "fc77280ed73d6ef43568162db8eaab8e763669f2f832f6dc85483dca5a13d18a",
+      "source_file": "Q051_c5c1e87d053a9081_source.png",
+      "source_sha256": "35f697e44bd335eae354715101c2059ecb699717ef7fe6c27d3476e28a21827b",
+      "manifest_english": "Floral Village",
+      "approved_korean": "플로럴 빌리지",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1171,
+          612
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1171,
+          612
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 1043,
+            "8": 1043,
+            "32": 1043,
+            "128": 1043
+          },
+          "bottom": {
+            "1": 429,
+            "8": 392,
+            "32": 389,
+            "128": 288
+          },
+          "left": {
+            "1": 310,
+            "8": 282,
+            "32": 282,
+            "128": 282
+          },
+          "right": {
+            "1": 319,
+            "8": 302,
+            "32": 298,
+            "128": 287
+          }
+        },
+        "size_bytes": 108625,
+        "sha256": "35f697e44bd335eae354715101c2059ecb699717ef7fe6c27d3476e28a21827b"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1735,
+          907
+        ],
+        "alpha_bbox": [
+          111,
+          153,
+          1687,
+          759
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 305477,
+        "sha256": "fc77280ed73d6ef43568162db8eaab8e763669f2f832f6dc85483dca5a13d18a"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "meaningful_alpha_boundary_clear": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "'Floral Village'가 포함된 원본 ROI에 Canyon, Stage Lap, Legend 등 타 레이블/아이콘 포함. 단일 문구 ROI 조건 위반; 출력 '플로럴 빌리지' 자체는 판독됨.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "candidate_file": "Q051_4a8f479dbea83acf_source_k.png",
+      "candidate_sha256": "ba6a1fda38a85e1196d4eadeace8d30b1647a9e016a23cef210225511f9a3641",
+      "source_file": "Q051_4a8f479dbea83acf_source.png",
+      "source_sha256": "e29ac413f761c53b93cfd3975fd6fa64477e32ce0c16dd8651c54cf8687c5512",
+      "manifest_english": "ACCOUNT PASSWORD:",
+      "approved_korean": "계정 비밀번호:",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          722,
+          233
+        ],
+        "alpha_bbox": [
+          1,
+          0,
+          722,
+          233
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 721,
+            "8": 721,
+            "32": 721,
+            "128": 720
+          },
+          "bottom": {
+            "1": 206,
+            "8": 205,
+            "32": 201,
+            "128": 191
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 20,
+            "8": 20,
+            "32": 20,
+            "128": 20
+          }
+        },
+        "size_bytes": 16860,
+        "sha256": "e29ac413f761c53b93cfd3975fd6fa64477e32ce0c16dd8651c54cf8687c5512"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          88,
+          9,
+          2158,
+          708
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 814253,
+        "sha256": "ba6a1fda38a85e1196d4eadeace8d30b1647a9e016a23cef210225511f9a3641"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "meaningful_alpha_boundary_clear": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "'ACCOUNT PASSWORD:' 원본에 ACCOUNT NAME, CURSING OR LEWDNESS, 색상 띠 등 인접 텍스트/아트 혼입. 출력 '계정 비밀번호:'는 읽히지만 1문구 출처 아님.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "candidate_file": "Q053_f640292a13c14a76_source_k.png",
+      "candidate_sha256": "6368785dfb51cb29c61f60ff3953fbfce70dbcf3f73f0107559ce31273808d63",
+      "source_file": "Q053_f640292a13c14a76_source.png",
+      "source_sha256": "152c35267f9a361f2dd95062465e156a06ea3133e16798951069535ef9420944",
+      "manifest_english": "QUESTION",
+      "approved_korean": "문제",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2560,
+          986
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          2560,
+          986
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 305,
+            "8": 305,
+            "32": 305,
+            "128": 303
+          },
+          "bottom": {
+            "1": 1871,
+            "8": 1832,
+            "32": 1805,
+            "128": 1734
+          },
+          "left": {
+            "1": 986,
+            "8": 986,
+            "32": 986,
+            "128": 986
+          },
+          "right": {
+            "1": 708,
+            "8": 685,
+            "32": 668,
+            "128": 619
+          }
+        },
+        "size_bytes": 734051,
+        "sha256": "152c35267f9a361f2dd95062465e156a06ea3133e16798951069535ef9420944"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2021,
+          778
+        ],
+        "alpha_bbox": [
+          225,
+          52,
+          1803,
+          681
+        ],
+        "alpha_extrema": [
+          0,
+          254
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 634278,
+        "sha256": "6368785dfb51cb29c61f60ff3953fbfce70dbcf3f73f0107559ce31273808d63"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "meaningful_alpha_boundary_clear": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "'QUESTION' 원본에 END, ANSWER, 여러 UI 아트/양 아이콘 포함. 출력 '문제'는 읽히지만 독립 문구 원본 조건을 위반함.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    }
+  ]
+}
