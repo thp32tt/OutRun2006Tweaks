@@ -692,10 +692,16 @@ async def inspect_slot(role, page, root="/data/imagegen"):
             return False, "IMAGEGEN_STILL_RUNNING"
         if result.get("count") != expected:
             observed=result.get("count")
-            if (expected == 5 and isinstance(observed,int) and
-                0 < observed < expected):
+            # Five-image production is fail-closed but self-healing. A turn may
+            # expose too few OR too many generated selectors after a UI retry/
+            # carousel duplication. Never guess which five belong to the five
+            # source ROIs: quarantine the ambiguous turn and restage the exact
+            # same ordinals under a new task id.
+            if (expected == 5 and isinstance(observed,int) and observed > 0):
+                reason=("IMAGEGEN_INCOMPLETE_FIVE" if observed < expected
+                        else "IMAGEGEN_AMBIGUOUS_EXTRA_FIVE")
                 retried,msg=_retry_same_five(
-                    st,active,root,"IMAGEGEN_INCOMPLETE_FIVE",observed=observed)
+                    st,active,root,reason,observed=observed)
                 if retried:
                     return True,msg
                 return False,msg
