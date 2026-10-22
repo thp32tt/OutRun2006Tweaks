@@ -52,6 +52,11 @@ def linked(b, h, r):
         '#include "native_game_gpu_output_preserve.hpp"' in b
         and "OMGetRenderTargets(1u, &oldColor" not in replay
         and "OMSetRenderTargets(1u, &oldColor" not in replay
+        # An earlier device-loss guard already existed before UpdateSubresource.
+        # Require a SECOND one after the GPU copy; replacing the earlier one
+        # does not prove that a failed native copy is vetoed before publish.
+        and replay.rfind("if (FAILED(device->GetDeviceRemovedReason())) return false;")
+            > replay.index("context->CopySubresourceRegion(")
         and replay.index("ScopedNativeGameGpuTransferOutputs outputs(context);")
             < replay.index("context->CopySubresourceRegion(")
         and all(token in gpu_outputs for token in (
@@ -96,7 +101,7 @@ for token in (
     "actualIdentity.Get() != backbufferIdentity.Get()",
     "ScopedNativeGameGpuTransferOutputs outputs(context);",
     "context->CopySubresourceRegion(",
-    "if (FAILED(device->GetDeviceRemovedReason())) return false;",
+    "if (FAILED(device->GetDeviceRemovedReason())) return false;\n        ++s.surfaceReplayCount;",
     "s.surfaceReplayReadback->UnlockRect()",
     "++s.surfaceReplayCount;",
 ):
