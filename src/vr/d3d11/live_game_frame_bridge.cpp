@@ -4852,12 +4852,32 @@ bool live_sm3_shader_bytes(IDirect3DVertexShader9* vertexShader,
         FAILED(pixelShader->GetFunction(nullptr, &pb)) ||
         vb < 8u || pb < 8u || vb > (1u << 20u) || pb > (1u << 20u) ||
         (vb % 4u) != 0u || (pb % 4u) != 0u) return false;
-    std::vector<DWORD> v(vb / 4u), p(pb / 4u);
-    if (FAILED(vertexShader->GetFunction(v.data(), &vb)) ||
-        FAILED(pixelShader->GetFunction(p.data(), &pb))) return false;
-    vertex = capture_programmable_shader_function_source_evidence(v.data(), vb, true);
-    pixel = capture_programmable_shader_function_source_evidence(p.data(), pb, false);
-    return vertex.exact() && pixel.exact();
+    // A live game Draw can arrive while the process is under memory
+    // pressure. GetFunction snapshots and shader-token validation allocate:
+    // do not let an exception escape this noexcept hook into the original
+    // game's Draw/Present/input path. Reject the native mirror instead.
+    try {
+        const UINT vertexBytes = vb, pixelBytes = pb;
+        std::vector<DWORD> v(vertexBytes / 4u), p(pixelBytes / 4u);
+        if (FAILED(vertexShader->GetFunction(v.data(), &vb)) ||
+            FAILED(pixelShader->GetFunction(p.data(), &pb)) ||
+            vb != vertexBytes || pb != pixelBytes)
+            return false;
+        // Commit both stage snapshots together. An invalid pixel shader may
+        // never leave a newly accepted VS paired with old PS evidence.
+        auto capturedVertex =
+            capture_programmable_shader_function_source_evidence(v.data(), vb, true);
+        auto capturedPixel =
+            capture_programmable_shader_function_source_evidence(p.data(), pb, false);
+        if (!capturedVertex.exact() || !capturedPixel.exact())
+            return false;
+        vertex = std::move(capturedVertex);
+        pixel = std::move(capturedPixel);
+        return true;
+    } catch (...) {
+        // Native diagnostic fails closed; original DX9Ex game Draw survives.
+        return false;
+    }
 }
 
 // The real-game VB/IB upload routines are defined below this SM3 caller.
