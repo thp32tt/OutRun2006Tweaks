@@ -8709,7 +8709,7 @@ void before_game_present(IDirect3DDevice9* game,
                             const HRESULT staleStatus = ctx->Map(
                                 prior.staging.Get(), 0, D3D11_MAP_READ,
                                 D3D11_MAP_FLAG_DO_NOT_WAIT, &staleMap);
-                            const auto staleResult = GameNativeFramePublication::classify_map(
+                            auto staleResult = GameNativeFramePublication::classify_map(
                                 static_cast<std::int32_t>(staleStatus),
                                 static_cast<std::int32_t>(DXGI_ERROR_WAS_STILL_DRAWING),
                                 staleMap.pData != nullptr,
