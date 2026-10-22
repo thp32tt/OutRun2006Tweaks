@@ -56,10 +56,43 @@ for rejection in (
     "++s.liveSm3StateRejectReasons[6];",
     "++s.liveSm3StateRejectReasons[7];",
     "if (nativeIndices[i] >= vertexCount) return false;",
-    "if (s.liveSm3Pipelines.size() >= 64u) return false;",
+    "LiveGameShaderCacheReplacement::retire_oldest_if_full(",
     "pipeline.vertexTokens != vertexEvidence.tokens",
 ):
     check(rejection in source, "missing fail-closed source/state rejection: " + rejection)
+
+// 01004: D3D9 menu/car/race shader identities can exceed the 64-resident
+// budget. The OLD unconditional >=64 rejection was a native-frame starvation
+// bug; replacement must stay bounded and never discard a good resident until
+// GPU shader/input/CB creation succeeded. Verify actual sequencing AND that
+// a destructive removal of either cache's eviction is detected.
+cache_header = (ROOT / "src/vr/d3d11/native_game_live_shader_cache.hpp").read_text()
+check("if (residentLimit == 0u) return false;" in cache_header and
+      "if (cache.size() < residentLimit) return true;" in cache_header and
+      "cache.erase(oldest);" in cache_header,
+      "native game cache eviction lost its bounded fail-closed contract")
+shader_path = source.partition("const auto key = live_sm3_pipeline_identity")[2].partition(
+    "auto& pipeline = it->second;")[0]
+check(shader_path and
+      shader_path.index("compile_native_live_sm3_program(") <
+      shader_path.index("LiveGameShaderCacheReplacement::retire_oldest_if_full(") <
+      shader_path.index("liveSm3Pipelines.emplace("),
+      "unproven cache eviction before real D3D11 shader resource creation")
+blend_path = source.partition("const auto blendKey = sm3_live_blend_key")[2].partition(
+    "rejectionStage = 7u")[0]
+check(blend_path and
+      blend_path.index("CreateBlendState(") <
+      blend_path.index("LiveGameShaderCacheReplacement::retire_oldest_if_full(") <
+      blend_path.index("liveSm3BlendStates.emplace("),
+      "unproven D3D11 blend eviction before replacement creation")
+check("if (s.liveSm3Pipelines.size() >= 64u) return false;" not in source and
+      "if (s.liveSm3BlendStates.size() >= 64u) return false;" not in source,
+      "live source still rejects a legitimate 65th game shader or blend")
+for field in ("liveSm3Pipelines", "liveSm3BlendStates"):
+    fragment = shader_path if field == "liveSm3Pipelines" else blend_path
+    call = "LiveGameShaderCacheReplacement::retire_oldest_if_full("
+    check(call in fragment and call not in fragment.replace(call, "", 1),
+          "destructive cache eviction removal did not invalidate: " + field)
 
 # A valid source sRGB write is now natively encoded via a typed sRGB
 # RTV sharing the same color surface; invalid enum/missing view is fail-closed.
