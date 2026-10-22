@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T2145KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T21:49:40.238655+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "mode": "independent_lightweight_qa_only",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "selection": "5 completed B-0060 + 3 completed A-0046 outputs. Unique SHA256 across this batch and no repeats against 20:15, 20:45, 21:15 C1 reports (24 previous hashes).",
+  "summary": {
+    "reviewed": 8,
+    "sha_verified": 8,
+    "rgba_png": 8,
+    "approved_translation_readable": 8,
+    "no_unwanted_frame_or_english_residue": 8,
+    "source_canvas_matches_output": 0,
+    "hold_native_safe_placement": 8,
+    "c1_final_pass": 0,
+    "c1_final_fail": 0,
+    "created_dds": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "game_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "metrics": "work/c1_20261022_2145/metrics.json",
+    "contact_sheets": [
+      "work/c1_20261022_2145/compare_1.jpg",
+      "work/c1_20261022_2145/compare_2.jpg",
+      "work/c1_20261022_2145/compare_3.jpg",
+      "work/c1_20261022_2145/compare_4.jpg"
+    ],
+    "local_completion": [
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-B-0060-F61B986B.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0046-50B235EB.json"
+    ],
+    "notes": "Source and output canvas dimensions differ for all eight. Static lettering preview does not prove a deterministic UV/UI-safe original-coordinate placement. HOLD rather than falsely failing based only on shorter Korean wording or claiming game approval."
+  },
+  "records": [
+    {
+      "index": 1,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "source_file": "Q163_84ffa9b0cceb2281_source.png",
+      "candidate_file": "Q163_84ffa9b0cceb2281_source_k.png",
+      "english": "Desert",
+      "approved_korean": "데저트",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        609,
+        182,
+        679
+      ],
+      "source_sha256": "84abf3246040fbc86bc2b226988e54d37e66d4bedc843335ced927605b898fd7",
+      "candidate_sha256": "26a459aa6a04163b04d7a5678330565308970427f1c9a955abf413d834865e83",
+      "source_dimensions": [
+        728,
+        280
+      ],
+      "candidate_dimensions": [
+        2048,
+        768
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        0,
+        2026,
+        744
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2145/compare_1.jpg",
+      "visual_notes": "데저트: 승인 한글 정확·읽기 가능. 원본의 평면 글씨에 비해 입체 외곽선이 강하므로 스타일 차이 메모. 안전 배치 미검증."
+    },
+    {
+      "index": 2,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "source_file": "Q173_f2e05596354e1da6_source.png",
+      "candidate_file": "Q173_f2e05596354e1da6_source_k.png",
+      "english": "INDUSTRIAL COMPLEX",
+      "approved_korean": "인더스트리얼 컴플렉스",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_bbox_xyxy": [
+        0,
+        221,
+        1044,
+        327
+      ],
+      "source_sha256": "bca11c476ec87206601e9f3e82dfcea3fe72ef46df1a70626ff4d8edf580d2e6",
+      "candidate_sha256": "c50e140198d2949e7f63e02afce815ebea1d89910dd6c0f1e94c58569b1f4391",
+      "source_dimensions": [
+        1044,
+        106
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        45,
+        45,
+        2140,
+        692
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2145/compare_1.jpg",
+      "visual_notes": "인더스트리얼 컴플렉스: 승인 문구 일치, 음절 획·받침 식별 가능. 별도 배경/영문 잔상 미관찰. 안전 배치 미검증."
+    },
+    {
+      "index": 3,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "source_file": "Q173_f836dac7e61ba985_source.png",
+      "candidate_file": "Q173_f836dac7e61ba985_source_k.png",
+      "english": "BIG FOREST",
+      "approved_korean": "빅 포레스트",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_bbox_xyxy": [
+        0,
+        701,
+        539,
+        807
+      ],
+      "source_sha256": "336937f1481a8f206200adc6be4661bb4b9380785cabfc4f5f078afde60cf9d5",
+      "candidate_sha256": "4762845b5eb0d3d2a7559010693a2dd18a8b65bcc79ad1b8fcd996f89100b87f",
+      "source_dimensions": [
+        1078,
+        212
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        23,
+        9,
+        2132,
+        626
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2145/compare_2.jpg",
+      "visual_notes": "빅 포레스트: 승인 문구 일치, 글자 잘림·잔상 미관찰. 안전 배치 미검증."
+    },
+    {
+      "index": 4,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "source_file": "Q173_132c378997161a88_source.png",
+      "candidate_file": "Q173_132c378997161a88_source_k.png",
+      "english": "PALM BEACH",
+      "approved_korean": "팜 비치",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_bbox_xyxy": [
+        0,
+        414,
+        600,
+        519
+      ],
+      "source_sha256": "228ee646e61c4e48f80c02a87ccd7da7d05736dea7c09207e4311aee4ec04c6d",
+      "candidate_sha256": "052fc90e00e2ba039e69a5fd1990081025914a06d603e2bb9f5b26267293182c",
+      "source_dimensions": [
+        1200,
+        210
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        242,
+        24,
+        2110,
+        691
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2145/compare_2.jpg",
+      "visual_notes": "팜 비치: 승인 문구 일치, 각 글자 판독 가능. 안전 배치 미검증."
+    },
+    {
+      "index": 5,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "source_file": "Q173_bd23bf09836a129d_source.png",
+      "candidate_file": "Q173_bd23bf09836a129d_source_k.png",
+      "english": "METROPOLIS",
+      "approved_korean": "메트로폴리스",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_bbox_xyxy": [
+        0,
+        317,
+        598,
+        423
+      ],
+      "source_sha256": "6da725802b610a8484c9f178e37943b26f9eeeb433e8636296523455eda8aae1",
+      "candidate_sha256": "c2bc16380b20ff1c4dc8bfc15fda4fdfd32db8b1c14b5ec623a1bb1cf774734c",
+      "source_dimensions": [
+        1196,
+        212
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        57,
+        3,
+        2136,
+        660
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2145/compare_3.jpg",
+      "visual_notes": "메트로폴리스: 승인 문구 일치, 자소 식별 가능. 안전 배치 미검증."
+    },
+    {
+      "index": 6,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0046-50B235EB",
+      "source_file": "Q163_c70e8fb032d1e989_source.png",
+      "candidate_file": "Q163_c70e8fb032d1e989_source_k.png",
+      "english": "Casino Town",
+      "approved_korean": "카지노 타운",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        304,
+        330,
+        376
+      ],
+      "source_sha256": "7af4fe67ad870216fe8f2a2fa2ff3b5bc8ba5f92cb1725700b793ba37ba46b1e",
+      "candidate_sha256": "474014e27d9d5c5897adf554d7b76a05b1e7ffb72e37be6780f86e09eafba42f",
+      "source_dimensions": [
+        1320,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        176,
+        41,
+        2126,
+        626
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2145/compare_3.jpg",
+      "visual_notes": "카지노 타운: 승인 문구 일치, 가독성 확인. 안전 배치 미검증."
+    },
+    {
+      "index": 7,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0046-50B235EB",
+      "source_file": "Q173_7c7f4928b3047dbc_source.png",
+      "candidate_file": "Q173_7c7f4928b3047dbc_source_k.png",
+      "english": "GHOST FOREST",
+      "approved_korean": "고스트 포레스트",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_bbox_xyxy": [
+        0,
+        29,
+        693,
+        135
+      ],
+      "source_sha256": "118a91cda975aaf64c69d9013a15bdd6f063d11962e637ed0fbae08a0d3f2686",
+      "candidate_sha256": "cc800ff8e54f1f7d89f6a97912c62728a74a572b58297b69060736b38d5de178",
+      "source_dimensions": [
+        1386,
+        212
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        57,
+        19,
+        2132,
+        625
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2145/compare_4.jpg",
+      "visual_notes": "고스트 포레스트: 승인 문구 일치, 잔상/프레임 미관찰. 안전 배치 미검증."
+    },
+    {
+      "index": 8,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0046-50B235EB",
+      "source_file": "Q173_324cd13f4935bf10_source.png",
+      "candidate_file": "Q173_324cd13f4935bf10_source_k.png",
+      "english": "MILKY WAY",
+      "approved_korean": "밀키 웨이",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_bbox_xyxy": [
+        0,
+        1569,
+        543,
+        1668
+      ],
+      "source_sha256": "62eaabd6458b7f18a0385e972a7fd0f1750dbb0a07205f36ca45f6749132cee7",
+      "candidate_sha256": "231c517d9082df42258f581ae8df9e52f415853ff2113a3b3f45ef03d1d0efdd",
+      "source_dimensions": [
+        1086,
+        198
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        154,
+        9,
+        1989,
+        652
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2145/compare_4.jpg",
+      "visual_notes": "밀키 웨이: 승인 문구 일치, 글자 및 내부 공간 판독 가능. 안전 배치 미검증."
+    }
+  ]
+}
