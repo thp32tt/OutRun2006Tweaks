@@ -1,0 +1,616 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261023T0215KST-A0054-B0069-SHA8",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "checked_at_kst": "2026-10-23T02:22:06.469344+09:00",
+  "operation": "independent_lightweight_QA_existing_A_B_PNG_no_generation",
+  "scope": "A-0054 first 4 candidate outputs and B-0069 first 4 candidate outputs, 8 unique SHA no producer queue mutation",
+  "summary": {
+    "reviewed": 8,
+    "unique_candidate_sha": 8,
+    "previous_reviewed_sha_history": 383,
+    "duplicate_sha": 0,
+    "source_sent_sha_verified": 8,
+    "source_manifest_sha_verified": 8,
+    "candidate_export_sha_verified": 8,
+    "verified_png_rgba": 8,
+    "alpha_touching_outer_border": 0,
+    "visually_legible_and_mapping_match": 8,
+    "source_roi_multilabel_fail": 3,
+    "c1_pass": 0,
+    "c1_fail": 3,
+    "c1_hold": 5,
+    "hold_native_ui_placement": 5,
+    "imagegen_calls": 0,
+    "queue_consumed": 0,
+    "dds_written": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "metric_report": "work/C1_QA_20261023_0215_metrics.json",
+    "visual_sheets": [
+      "work/C1_QA_20261023_0215_A_pairs.jpg",
+      "work/C1_QA_20261023_0215_B_pairs.jpg",
+      "work/C1_QA_20261023_0215_Bsources_white.jpg"
+    ],
+    "verification_script": "work/C1_QA_20261023_0215_verify.py",
+    "manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence": "work/image-src/text_roi_batches/export_evidence",
+    "note": "Visual sheets and source/candidate PNG stored on N100; not committed as binary attachments"
+  },
+  "records": [
+    {
+      "role": "A",
+      "task": "OUTRUN-ROI-A-0054-125A7586",
+      "source_file": "Q173_3fe461d0394cc97e_source.png",
+      "candidate_file": "Q173_3fe461d0394cc97e_source_k.png",
+      "english": "WATERFALLS",
+      "approved_korean": "워터폴스",
+      "original_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_sha256": "9f8259ded55deaf3fc79480eb0efddd6b9341af48afe58792c8199baf6a1346d",
+      "candidate_sha256": "46617cca84301c22527f3ea511b32b6dff2655ab189a023c104aae0b4223e139",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          810,
+          217
+        ],
+        "alpha_bbox": [
+          2,
+          0,
+          637,
+          211
+        ],
+        "visible_alpha_pixels": 57955,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          439,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          21,
+          2154,
+          628
+        ],
+        "visible_alpha_pixels": 602771,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 1,
+      "visually_observed_korean": "워터폴스",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_CONTACT_SHEET",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "source_roi_isolation": "FAIL_MULTI_TEXT_AND_ART_CONTEXT",
+      "ui_native_cell_placement": "UNVERIFIED",
+      "protected_art_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "FAIL",
+      "reason_code": "SOURCE_ROI_MULTILABEL_TOP_CROP",
+      "reason": "Input ROI includes SUNNY BEACH and an additional clipped upper text line alongside WATERFALLS. Target Korean lettering is legible; source one-phrase isolation fails."
+    },
+    {
+      "role": "A",
+      "task": "OUTRUN-ROI-A-0054-125A7586",
+      "source_file": "Q054_7244e49cf24251a6_source.png",
+      "candidate_file": "Q054_7244e49cf24251a6_source_k.png",
+      "english": "Keep control!",
+      "approved_korean": "차량을 제어하세요!",
+      "original_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "source_sha256": "5e4f49186cd026931513a8a507be7e9d420353c7db37a67e27dca5b8a8a4ddfb",
+      "candidate_sha256": "b4caed182d1a6208a08efeb990a476942c786e9b1863435428ef22b7695c55dd",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1069,
+          405
+        ],
+        "alpha_bbox": [
+          0,
+          35,
+          1069,
+          405
+        ],
+        "visible_alpha_pixels": 146485,
+        "edge_alpha_pixels": [
+          260,
+          156,
+          0,
+          803
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2038,
+          772
+        ],
+        "alpha_bbox": [
+          47,
+          85,
+          2004,
+          698
+        ],
+        "visible_alpha_pixels": 395560,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 2,
+      "visually_observed_korean": "차량을 제어하세요!",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_CONTACT_SHEET",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "source_roi_isolation": "FAIL_MULTI_TEXT_AND_ART_CONTEXT",
+      "ui_native_cell_placement": "UNVERIFIED",
+      "protected_art_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "FAIL",
+      "reason_code": "SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "reason": "Input ROI includes Hit the boost!, Count Blue Cars!, vehicle graphics besides Keep control!. Output itself is Korean lettering-only, but one-phrase source ROI preflight fails."
+    },
+    {
+      "role": "A",
+      "task": "OUTRUN-ROI-A-0054-125A7586",
+      "source_file": "Q054_0ba9d51e6b3e10fc_source.png",
+      "candidate_file": "Q054_0ba9d51e6b3e10fc_source_k.png",
+      "english": "Count Green Cars!",
+      "approved_korean": "초록색 차를 세세요!",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "source_sha256": "95b48a04f539480737d81723e55583ebcdd3f055ba3f9235fc6584d1182d3e77",
+      "candidate_sha256": "73a9f7bb96f4e19e4f8a36ea9822d7000055bf1dbfb4ae16e2d2de04ca5edeb1",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          940,
+          417
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          940,
+          417
+        ],
+        "visible_alpha_pixels": 164362,
+        "edge_alpha_pixels": [
+          0,
+          196,
+          522,
+          260
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1883,
+          835
+        ],
+        "alpha_bbox": [
+          0,
+          149,
+          1845,
+          811
+        ],
+        "visible_alpha_pixels": 316220,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 3,
+      "visually_observed_korean": "초록색 차를 세세요!",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_CONTACT_SHEET",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "source_roi_isolation": "FAIL_MULTI_TEXT_AND_ART_CONTEXT",
+      "ui_native_cell_placement": "UNVERIFIED",
+      "protected_art_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "FAIL",
+      "reason_code": "SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "reason": "Input ROI includes Match the total!, Count the gifts!, car icons and adjacent text besides Count Green Cars!. Output text itself matches mapping; input source is not phrase-isolated."
+    },
+    {
+      "role": "A",
+      "task": "OUTRUN-ROI-A-0054-125A7586",
+      "source_file": "Q055_dd5213d64f53d429_source.png",
+      "candidate_file": "Q055_dd5213d64f53d429_source_k.png",
+      "english": "NEXT ROUND",
+      "approved_korean": "다음 라운드",
+      "original_dds_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+      "source_sha256": "59d4d1576000a7777910e268c5062fb5d5c25d554f89d35bca2ddf2a0e4ea38f",
+      "candidate_sha256": "37aeae784aae07566d00806465c6acda993b71cd39c233a57192ebe193c15f7f",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1448,
+          256
+        ],
+        "alpha_bbox": [
+          1,
+          105,
+          1090,
+          248
+        ],
+        "visible_alpha_pixels": 114485,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          49,
+          19,
+          2051,
+          708
+        ],
+        "visible_alpha_pixels": 566105,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 4,
+      "visually_observed_korean": "다음 라운드",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_CONTACT_SHEET",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "source_roi_isolation": "NOT_FAILED_BY_OBSERVATION",
+      "ui_native_cell_placement": "UNVERIFIED",
+      "protected_art_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason_code": "GENERATOR_OUTPUT_RESIZED_NATIVE_UI_PLACEMENT_UNVERIFIED",
+      "reason": "Korean lettering is readable and mapped; generated canvas differs from native ROI and no protected-pixel/native-cell placement proof is available."
+    },
+    {
+      "role": "B",
+      "task": "OUTRUN-ROI-B-0069-44428066",
+      "source_file": "Q198_cedc78211c3e35af_source.png",
+      "candidate_file": "Q198_cedc78211c3e35af_source_k.png",
+      "english": "= RANDOM PLAY =",
+      "approved_korean": "- 무작위 재생 -",
+      "original_dds_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+      "source_sha256": "235f93b3ca8db6d979db45d909d31197095536152fe83ed531614b2d232f0f5f",
+      "candidate_sha256": "5b16951a7ab8e4019364f2559b1a51001949e4c79306fb6b18e529062e13396c",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1074,
+          152
+        ],
+        "alpha_bbox": [
+          26,
+          19,
+          1043,
+          133
+        ],
+        "visible_alpha_pixels": 50874,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          89,
+          49,
+          2142,
+          696
+        ],
+        "visible_alpha_pixels": 366438,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 5,
+      "visually_observed_korean": "- 무작위 재생 -",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_CONTACT_SHEET",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "source_roi_isolation": "NOT_FAILED_BY_OBSERVATION",
+      "ui_native_cell_placement": "UNVERIFIED",
+      "protected_art_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason_code": "GENERATOR_OUTPUT_RESIZED_NATIVE_UI_PLACEMENT_UNVERIFIED",
+      "reason": "Korean lettering is readable and mapped; generated canvas differs from native ROI and no protected-pixel/native-cell placement proof is available."
+    },
+    {
+      "role": "B",
+      "task": "OUTRUN-ROI-B-0069-44428066",
+      "source_file": "Q205_76580dc038ea7387_source.png",
+      "candidate_file": "Q205_76580dc038ea7387_source_k.png",
+      "english": "CONGRATULATIONS!",
+      "approved_korean": "축하합니다!",
+      "original_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "source_sha256": "85156b3b60892d204ae0a9ca77380ccc7554c66ae0629a8fe2520e5bd11015a2",
+      "candidate_sha256": "0010dcd12fa462c671d54671369166d4a902f830b394e570711f96442c883a84",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1488,
+          160
+        ],
+        "alpha_bbox": [
+          29,
+          19,
+          1453,
+          141
+        ],
+        "visible_alpha_pixels": 80153,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          33,
+          23,
+          2106,
+          696
+        ],
+        "visible_alpha_pixels": 451395,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 6,
+      "visually_observed_korean": "축하합니다!",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_CONTACT_SHEET",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "source_roi_isolation": "NOT_FAILED_BY_OBSERVATION",
+      "ui_native_cell_placement": "UNVERIFIED",
+      "protected_art_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason_code": "GENERATOR_OUTPUT_RESIZED_NATIVE_UI_PLACEMENT_UNVERIFIED",
+      "reason": "Korean lettering is readable and mapped; original black text becomes visible on white compositing; native-cell placement remains unverified."
+    },
+    {
+      "role": "B",
+      "task": "OUTRUN-ROI-B-0069-44428066",
+      "source_file": "Q205_9eec7f0cbb4ce1ac_source.png",
+      "candidate_file": "Q205_9eec7f0cbb4ce1ac_source_k.png",
+      "english": "CONGRATULATIONS!",
+      "approved_korean": "축하합니다!",
+      "original_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "source_sha256": "85156b3b60892d204ae0a9ca77380ccc7554c66ae0629a8fe2520e5bd11015a2",
+      "candidate_sha256": "75c81d607440a53636cf2782b2d0c4867cf0cb5f40f5167405a027a38ca30f58",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1488,
+          160
+        ],
+        "alpha_bbox": [
+          29,
+          19,
+          1453,
+          141
+        ],
+        "visible_alpha_pixels": 80153,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          315,
+          39,
+          2116,
+          692
+        ],
+        "visible_alpha_pixels": 415197,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 7,
+      "visually_observed_korean": "축하합니다!",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_CONTACT_SHEET",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "source_roi_isolation": "NOT_FAILED_BY_OBSERVATION",
+      "ui_native_cell_placement": "UNVERIFIED",
+      "protected_art_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason_code": "GENERATOR_OUTPUT_RESIZED_NATIVE_UI_PLACEMENT_UNVERIFIED",
+      "reason": "Korean lettering is readable and mapped; original black text becomes visible on white compositing; native-cell placement remains unverified."
+    },
+    {
+      "role": "B",
+      "task": "OUTRUN-ROI-B-0069-44428066",
+      "source_file": "Q205_d84ad9dcc54a20c0_source.png",
+      "candidate_file": "Q205_d84ad9dcc54a20c0_source_k.png",
+      "english": "CONGRATULATIONS!",
+      "approved_korean": "축하합니다!",
+      "original_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "source_sha256": "85156b3b60892d204ae0a9ca77380ccc7554c66ae0629a8fe2520e5bd11015a2",
+      "candidate_sha256": "35fb333f1f3039941cceefc8740c05946950255c9ed86644cbabf1d10d32d135",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1488,
+          160
+        ],
+        "alpha_bbox": [
+          29,
+          19,
+          1453,
+          141
+        ],
+        "visible_alpha_pixels": 80153,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          95,
+          7,
+          2134,
+          708
+        ],
+        "visible_alpha_pixels": 479828,
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 8,
+      "visually_observed_korean": "축하합니다!",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_CONTACT_SHEET",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "source_roi_isolation": "NOT_FAILED_BY_OBSERVATION",
+      "ui_native_cell_placement": "UNVERIFIED",
+      "protected_art_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason_code": "GENERATOR_OUTPUT_RESIZED_NATIVE_UI_PLACEMENT_UNVERIFIED",
+      "reason": "Korean lettering is readable and mapped; original black text becomes visible on white compositing; native-cell placement remains unverified."
+    }
+  ]
+}
