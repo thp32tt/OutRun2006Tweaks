@@ -9,7 +9,7 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01001",
   "work_key": "DX11:SHARED_DESKTOP_SHADER_INPUT_AND_REMOVED_DEVICE_FALLBACK",
-  "feature_id": null,
+  "feature_id": "DX11:SHARED_DESKTOP_SHADER_INPUT_AND_REMOVED_DEVICE_FALLBACK",
   "work_class": "integration",
   "milestone_id": "full_resolution_native_game_frame",
   "status": "COMPLETE_BUILD_VERIFIED",
@@ -45,7 +45,7 @@
     "tools/test_dx11_shared_desktop_gpu_transfer_01001.py"
   ],
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:SHARED_DESKTOP_SHADER_INPUT_AND_REMOVED_DEVICE_FALLBACK",
     "source": "RECONSTRUCTED_FROM_GITHUB_MATERIAL_AND_EXACT_SHA_GATES; RUN_RECORD_NOT_FOUND",
     "goal": "Preserve real native menu/car/race full-size D3D11->D3D9Ex GPU desktop Copy/Resolve shader inputs and reject a removed D3D11 producer before writing original D3D9 backbuffer, maintaining input/FFB fallback.",
     "acceptance_items": [
