@@ -3907,6 +3907,104 @@ private:
         const auto command = CapturePhysicalDrawCommand();
         const auto scope = command.scope;
         const auto source = command.producer;
+
+        // Targeted 2026-10-22 HMD evidence: the exhaustive trace proved the
+        // visible +TIME/result failures reach physical D3DX draws with no exact
+        // producer. Capture only NEW executable call-stack signatures for those
+        // unowned 2D submissions. This is intentionally bounded so the next
+        // debug run produces kilobytes/megabytes, not another 16 GiB log.
+        if (Settings::VREnabled &&
+            source == ProducerToken::None &&
+            (scope == RenderScope::ScreenOverlay2D ||
+             scope == RenderScope::ScreenHud ||
+             scope == RenderScope::None))
+        {
+            void* rawFrames[16]{};
+            const USHORT rawCount = RtlCaptureStackBackTrace(
+                0, static_cast<DWORD>(std::size(rawFrames)), rawFrames, nullptr);
+            const auto exeBase = reinterpret_cast<std::uintptr_t>(
+                GetModuleHandleW(nullptr));
+            std::uintptr_t exeEnd = exeBase;
+            if (exeBase)
+            {
+                const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(exeBase);
+                if (dos->e_magic == IMAGE_DOS_SIGNATURE)
+                {
+                    const auto* nt = reinterpret_cast<const IMAGE_NT_HEADERS*>(
+                        exeBase + static_cast<std::uintptr_t>(dos->e_lfanew));
+                    if (nt->Signature == IMAGE_NT_SIGNATURE)
+                        exeEnd = exeBase + nt->OptionalHeader.SizeOfImage;
+                }
+            }
+
+            std::uintptr_t rva[6]{};
+            unsigned rvaCount = 0;
+            std::uint64_t signature = 1469598103934665603ull;
+            for (USHORT i = 0; i < rawCount && rvaCount < std::size(rva); ++i)
+            {
+                const auto address =
+                    reinterpret_cast<std::uintptr_t>(rawFrames[i]);
+                if (!exeBase || address < exeBase || address >= exeEnd)
+                    continue;
+                const auto value = address - exeBase;
+                rva[rvaCount++] = value;
+                signature ^= static_cast<std::uint64_t>(value);
+                signature *= 1099511628211ull;
+            }
+
+            if (rvaCount)
+            {
+                static std::array<std::atomic<std::uint64_t>, 256>
+                    UnownedD3DXStackSignatures{};
+                bool known = false;
+                bool recorded = false;
+                for (auto& slot : UnownedD3DXStackSignatures)
+                {
+                    auto value = slot.load(std::memory_order_acquire);
+                    if (value == signature)
+                    {
+                        known = true;
+                        break;
+                    }
+                    if (value == 0)
+                    {
+                        std::uint64_t expected = 0;
+                        if (slot.compare_exchange_strong(
+                                expected, signature,
+                                std::memory_order_acq_rel,
+                                std::memory_order_acquire))
+                        {
+                            recorded = true;
+                            break;
+                        }
+                        if (expected == signature)
+                        {
+                            known = true;
+                            break;
+                        }
+                    }
+                }
+                if (!known && recorded)
+                {
+                    const int gameState = Game::current_mode
+                        ? static_cast<int>(*Game::current_mode) : -1;
+                    const int gameMode = Game::game_mode ? *Game::game_mode : -1;
+                    spdlog::info(
+                        "VR TARGET UNOWNED_D3DX_STACK: state={} mode={} "
+                        "scope={} queued={} texture={} rect={},{},{},{} "
+                        "pos={:.3f},{:.3f},{:.3f} exeRva="
+                        "{:X}>{:X}>{:X}>{:X}>{:X}>{:X}",
+                        gameState, gameMode, Name(scope), command.queued,
+                        static_cast<const void*>(texture),
+                        rect ? rect->left : 0, rect ? rect->top : 0,
+                        rect ? rect->right : 0, rect ? rect->bottom : 0,
+                        pos ? pos->x : 0.0f, pos ? pos->y : 0.0f,
+                        pos ? pos->z : 0.0f,
+                        rva[0], rva[1], rva[2],
+                        rva[3], rva[4], rva[5]);
+                }
+            }
+        }
         // Prove the original 19 E8 parent stack at CPU Draw, before D3DX
         // defers its GPU submission. Never inherit a queued node identity.
         // An unowned original caller already passed the expensive stack
