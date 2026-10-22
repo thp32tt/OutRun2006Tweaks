@@ -1,0 +1,476 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T0417KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T04:20:22.132960+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "roles": [
+    "A",
+    "B"
+  ],
+  "review_type": "NEW_SHA_ONLY_NO_AB_QUEUE_CONSUMPTION",
+  "history_sha_count": 415,
+  "counts": {
+    "total": 8,
+    "pass": 0,
+    "fail": 3,
+    "hold": 5
+  },
+  "verification": {
+    "candidate_sha_unique": 8,
+    "source_manifest_sent_export": "8/8",
+    "candidate_rgba_png": "8/8",
+    "candidate_edge_gt8_pixels_zero": "8/8",
+    "previously_reviewed_sha": "0/8"
+  },
+  "qa_comparison": {
+    "A": "work/C1_QA_20261023_0417_A_pairs.jpg",
+    "B": "work/C1_QA_20261023_0417_B_pairs.jpg",
+    "metrics": "work/C1_QA_20261023_0417_metrics.json"
+  },
+  "policy": "NO_FAIL_ON_SHORTER_KOREAN_LINE_OR_MINOR_GLYPH_SIZE_DIFFERENCE",
+  "forbidden_changes": "NO_IMAGEGEN_NO_QUEUE_CONSUMPTION_NO_DDS_NO_C2_C3_NO_INGAME_PASS_NO_DEPLOY",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "reviews": [
+    {
+      "role": "A",
+      "batch": 52,
+      "task_id": "OUTRUN-ROI-A-0052-91DAEA2D",
+      "source_ordinal": 258,
+      "english": "Alpine",
+      "approved_korean": "알파인",
+      "source_file": "Q128_2b49aae6232f5694_source.png",
+      "source_sha256": "ccee338579a0df496b59035f578e8896bb58075ad1c23c94e3ca5d79d5c20eee",
+      "original_dds_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+      "source_dimensions": [
+        368,
+        164
+      ],
+      "source_alpha_bbox": [
+        6,
+        19,
+        334,
+        145
+      ],
+      "source_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "candidate_file": "Q128_2b49aae6232f5694_source_k.png",
+      "candidate_sha256": "22c58615adbb302966934f515c4d5ccc27f67dad945b96347c8fb69d2cb5e997",
+      "candidate_dimensions": [
+        1879,
+        837
+      ],
+      "candidate_alpha_bbox": [
+        133,
+        54,
+        1763,
+        753
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "image_format": "PNG",
+      "mode": "RGBA",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "단일 Alpine 원문 대비 한글 '알파인'은 읽히며 매핑도 일치한다. 신규 결과의 UI 배치/효과 크기와 안전영역 복귀가 미검증이므로 승인 보류."
+    },
+    {
+      "role": "A",
+      "batch": 51,
+      "task_id": "OUTRUN-ROI-A-0051-CFF07DFD",
+      "source_ordinal": 253,
+      "english": "CONTINUE",
+      "approved_korean": "계속하기",
+      "source_file": "Q043_13b77386522c01e1_source.png",
+      "source_sha256": "3e160670f35a14e2e8a0272d846e61fa55d10db8152970a2168f3ae07d13b2e0",
+      "original_dds_sha256": "1fa47bdb02c6c8eb1a74b9cf700e2b7d24f70ec2fa2262d843618bd505ec771c",
+      "source_dimensions": [
+        767,
+        329
+      ],
+      "source_alpha_bbox": [
+        4,
+        121,
+        767,
+        329
+      ],
+      "source_edge_alpha_pixels": [
+        0,
+        105,
+        0,
+        573
+      ],
+      "candidate_file": "Q043_13b77386522c01e1_source_k.png",
+      "candidate_sha256": "c8630de2e102709075745e22e3865cde270bf432d2dbabad307163ca3f95ec14",
+      "candidate_dimensions": [
+        1914,
+        821
+      ],
+      "candidate_alpha_bbox": [
+        28,
+        29,
+        1876,
+        765
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "image_format": "PNG",
+      "mode": "RGBA",
+      "C1_status": "FAIL",
+      "C1_reason_code": "FAIL_SOURCE_MULTI_PHRASE_AND_CROP",
+      "C1_observation": "CONTINUE 원본 하단에 다른 대형 'REPE...' 텍스트가 잘린 채 동시 포함됨. 문구별 독립 영문 ROI 조건을 충족하지 못함."
+    },
+    {
+      "role": "A",
+      "batch": 50,
+      "task_id": "OUTRUN-ROI-A-0050-1749D28E",
+      "source_ordinal": 248,
+      "english": "CREATE GAME",
+      "approved_korean": "게임 만들기",
+      "source_file": "Q237_7b024c76b18aa697_source.png",
+      "source_sha256": "5eab2a7e8f4c32ad8ef37cf638bd3a747d43a2e6f86c0c806c4b25471117530c",
+      "original_dds_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_dimensions": [
+        1294,
+        193
+      ],
+      "source_alpha_bbox": [
+        17,
+        24,
+        1243,
+        169
+      ],
+      "source_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "candidate_file": "Q237_7b024c76b18aa697_source_k.png",
+      "candidate_sha256": "24e632ac40a9869573417c4371f3fcc5074c6df3eb5fee3fe1b81d77584845ce",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        77,
+        55,
+        2136,
+        624
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "image_format": "PNG",
+      "mode": "RGBA",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'게임 만들기'는 명확하고 매핑이 정확하다. 원본 1294x193→출력 2172x724, 원본 UI 셀/보호 픽셀 복귀가 확인되지 않음. 폭/문장 길이 차이 자체는 실패 아님."
+    },
+    {
+      "role": "A",
+      "batch": 50,
+      "task_id": "OUTRUN-ROI-A-0050-1749D28E",
+      "source_ordinal": 247,
+      "english": "Specify what gametype you'd like to play!",
+      "approved_korean": "플레이할 게임 유형을 설정하세요!",
+      "source_file": "Q237_3f2ab4dc4b599724_source.png",
+      "source_sha256": "ae28d05fc33d9a26ec0bdd213809478b7187dbeda7257f94772a3325750f7431",
+      "original_dds_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_dimensions": [
+        1279,
+        89
+      ],
+      "source_alpha_bbox": [
+        0,
+        0,
+        1263,
+        87
+      ],
+      "source_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "candidate_file": "Q237_3f2ab4dc4b599724_source_k.png",
+      "candidate_sha256": "151b2ac362bce3f2f82f6a9f6ad26b47f0638ab2e8ce308f652a61744e589a05",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        33,
+        101,
+        2152,
+        547
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "image_format": "PNG",
+      "mode": "RGBA",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_SOURCE_BORDER_AND_UI_CELL_REVIEW",
+      "C1_observation": "'플레이할 게임 유형을 설정하세요!' 읽기·매핑 정상. 원본 alpha bbox가 상/좌 경계 접촉하며 입력 1279x89와 출력 2172x724 차이가 큼. 원본 문구 크롭 여백 및 실배치 안전영역 추가 검증 필요."
+    },
+    {
+      "role": "B",
+      "batch": 64,
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_ordinal": 306,
+      "english": "JOIN GAME",
+      "approved_korean": "게임 참가",
+      "source_file": "Q232_be9630b94d548555_source.png",
+      "source_sha256": "95e70ad059e0f382f4a581ffe4d164e495c76d37bcbb279e1147fe9bc4b6e1f8",
+      "original_dds_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "source_dimensions": [
+        878,
+        174
+      ],
+      "source_alpha_bbox": [
+        23,
+        19,
+        840,
+        155
+      ],
+      "source_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "candidate_file": "Q232_be9630b94d548555_source_k.png",
+      "candidate_sha256": "8d13a67f5fc8f473336f8726feae57ab9cbc52fe7f4a5d5200dfceb2da14fa8a",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        134,
+        15,
+        1957,
+        628
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "image_format": "PNG",
+      "mode": "RGBA",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'게임 참가' 읽기·매핑 정상, 프레임/영문 잔상은 보이지 않음. 원본 UI 셀 복귀·보호 아트 배치 미검증."
+    },
+    {
+      "role": "B",
+      "batch": 64,
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_ordinal": 305,
+      "english": "BONUS MATERIAL",
+      "approved_korean": "보너스 자료",
+      "source_file": "Q230_a93f095ef375989d_source.png",
+      "source_sha256": "e51621c9f1b9a62ed72a13d99a4574d3e94652c86682129dbac642ded27dad75",
+      "original_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_dimensions": [
+        1108,
+        152
+      ],
+      "source_alpha_bbox": [
+        3,
+        19,
+        1077,
+        133
+      ],
+      "source_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "candidate_file": "Q230_a93f095ef375989d_source_k.png",
+      "candidate_sha256": "73d13f729eebb575e866d961772be4cd48f66050e722a0a2c10341c58e44d590",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        65,
+        7,
+        2035,
+        565
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "image_format": "PNG",
+      "mode": "RGBA",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'보너스 자료' 읽기·매핑 정상, 흰색 서체로 보이나 원래 UI 셀에 들어가는지 미검증."
+    },
+    {
+      "role": "B",
+      "batch": 63,
+      "task_id": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "source_ordinal": 304,
+      "english": "COURSES",
+      "approved_korean": "코스",
+      "source_file": "Q230_67f79e2fc9e342c0_source.png",
+      "source_sha256": "efee17bdb748b4d249bf90e371f5417d08ff6f91eee4d19ecd6857708fa4b26f",
+      "original_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_dimensions": [
+        1192,
+        304
+      ],
+      "source_alpha_bbox": [
+        0,
+        39,
+        1129,
+        265
+      ],
+      "source_edge_alpha_pixels": [
+        126,
+        0,
+        0,
+        0
+      ],
+      "candidate_file": "Q230_67f79e2fc9e342c0_source_k.png",
+      "candidate_sha256": "62023a7d49eb003393a2e6486654faf874df9e02e766d1e6a5c212b038e4b429",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        371,
+        29,
+        1658,
+        672
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "image_format": "PNG",
+      "mode": "RGBA",
+      "C1_status": "FAIL",
+      "C1_reason_code": "FAIL_SOURCE_LEFT_EDGE_CROPPED",
+      "C1_observation": "COURSES 원본의 첫 글자 C가 좌측 크롭 경계에 걸려 있으며 왼쪽 alpha edge >8 픽셀이 126개. 독립 원본 ROI 문자 잘림 위험으로 반려."
+    },
+    {
+      "role": "B",
+      "batch": 63,
+      "task_id": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "source_ordinal": 303,
+      "english": "JUNGLE",
+      "approved_korean": "정글",
+      "source_file": "Q173_0f6a916768736fb3_source.png",
+      "source_sha256": "03e716b839e2374be50079b6772b20cda5868e200730a7acc4b5bff1285340a8",
+      "original_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_dimensions": [
+        589,
+        357
+      ],
+      "source_alpha_bbox": [
+        1,
+        0,
+        589,
+        357
+      ],
+      "source_edge_alpha_pixels": [
+        0,
+        24,
+        311,
+        194
+      ],
+      "candidate_file": "Q173_0f6a916768736fb3_source_k.png",
+      "candidate_sha256": "410e2e0c43996ae41d8b33f61bb3c3c1a76be5bf2201e0ba7b163e6d08f7b6c0",
+      "candidate_dimensions": [
+        1619,
+        971
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        21,
+        1521,
+        925
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "image_format": "PNG",
+      "mode": "RGBA",
+      "C1_status": "FAIL",
+      "C1_reason_code": "FAIL_SOURCE_MULTI_PHRASE_AND_CROP",
+      "C1_observation": "JUNGLE 원본에 GIANT STATUE / ICE SCAPE / LEGEND / LOST CITY 등 타 문구가 같이 있고 상/우/하 경계에도 원문이 잘림. 단일 문구 ROI 아님."
+    }
+  ]
+}
