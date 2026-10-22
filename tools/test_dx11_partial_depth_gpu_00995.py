@@ -9,7 +9,7 @@ source=bridge[bridge.index("bool observe_game_depth_clear("):]
 adapter="native_game_raster_partial_backbuffer_depth_clear("
 assert adapter in source and adapter in gpu and adapter in hdr
 for condition in ("const bool partialDepth = clearZ && !coversDepth;",
-                  "if (clearStencil || !continuingFullNativeDraw",
+                  "if (!continuingFullNativeDraw",
                   "native_game_partial_depth_ready(s, game, bbDesc.Width, bbDesc.Height)",
                   "GameNativeSourceMutation::classify_target_clear_rect(",
                   "if (used == 0u) return true;",

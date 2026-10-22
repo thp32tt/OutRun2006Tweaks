@@ -399,6 +399,9 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_primitive_span_probe.cpp -o /tmp/dx11_primitive_00644 && /tmp/dx11_primitive_00644
       - name: Verify source graph and dormant runtime activation
         run: |
+          # 00996 main TARGET|Z|STENCIL clipped D3D9 Clear -> native D3D11 GPU.
+          python tools/test_dx11_game_clipped_stencil_gpu_00996.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_clipped_stencil_gpu_00996.cpp -o /tmp/dx11_stencil_00996 && /tmp/dx11_stencil_00996
           # 00995 real game clipped Z-only Clear on native D3D11.0 GPU.
           python tools/test_dx11_partial_depth_gpu_00995.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_partial_depth_gpu_00995.cpp -o /tmp/dx11_partial_z_00995 && /tmp/dx11_partial_z_00995

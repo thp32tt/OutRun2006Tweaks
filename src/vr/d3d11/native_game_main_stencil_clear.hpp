@@ -22,5 +22,19 @@ struct GameNativeMainStencilClear {
         return nativeFullFrame && originalMainColorSeed &&
                sameMainDepthStencil && fullClearCoverage && nativeBatchOpen;
     }
+
+    // A clipped main TARGET/Z/STENCIL Clear is stencil-neutral to admitted
+    // native Draws (whose stencil test and writes are disabled). The caller
+    // must FIRST prove a live Draw, canonical main depth owner, bounded game
+    // rectangles and an owned native D32 depth view. This never permits an
+    // unknown stencil-dependent geometry Draw or foreign depth attachment.
+    [[nodiscard]] static constexpr bool may_ignore_cropped(
+        bool nativeFullFrame, bool originalMainColorSeed,
+        bool sameMainDepthStencil, bool liveNativeDraw,
+        bool boundedSourceRects, bool ownedNativeDepthReady) noexcept {
+        return nativeFullFrame && originalMainColorSeed &&
+               sameMainDepthStencil && liveNativeDraw &&
+               boundedSourceRects && ownedNativeDepthReady;
+    }
 };
 } // namespace outrun::vr::dx11::live_game_frame

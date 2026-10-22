@@ -7644,9 +7644,14 @@ bool preserve_game_partial_target_clear(
     // region may update RTV and the live depth-only DSV; unproved Z writes
     // must not leave half of a combined color/depth Clear applied.
     const bool clearZ = (flags & D3DCLEAR_ZBUFFER) != 0u;
+    const bool clearStencil = (flags & D3DCLEAR_STENCIL) != 0u;
+    // The real source game may combine a clipped TARGET and Z clear with
+    // STENCIL. Stencil is neutral only for our stencil-disabled native Draws;
+    // canonical depth ownership is checked before replaying any GPU pixels.
     if (!diagnostic_enabled() || !env_full_game_opt_in() || !game ||
-        (flags != D3DCLEAR_TARGET &&
-         flags != (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER)) ||
+        (flags & D3DCLEAR_TARGET) == 0u ||
+        (flags & ~(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
+                   D3DCLEAR_STENCIL)) != 0u ||
         (clearZ && !(z >= 0.0f && z <= 1.0f)) ||
         count > GameNativeSourceMutation::kMaxPartialTargetClearRects ||
         (count != 0u && !rects)) return false;
@@ -7728,7 +7733,21 @@ bool preserve_game_partial_target_clear(
         // before changing even the color RTV of a combined TARGET|Z Clear.
         const bool nativeDepthReady = !clearZ || native_game_partial_depth_ready(
             s, game, backbufferDesc.Width, backbufferDesc.Height);
-        if (!nativeDepthReady) return false;
+        // Even a stencil-only cropped TARGET Clear must prove the current
+        // source-game main Z/S and the live native D32 owner. Otherwise a
+        // later native Draw could consume an unmirrored stencil dependency.
+        const bool nativeStencilDepthReady = !clearStencil ||
+            native_game_partial_depth_ready(
+                s, game, backbufferDesc.Width, backbufferDesc.Height);
+        const bool canonicalStencilClear = !clearStencil ||
+            GameNativeMainStencilClear::may_ignore_cropped(
+                true, sameBackbuffer, nativeStencilDepthReady,
+                s.pending && !s.frameBatch.stopped &&
+                    s.frameBatch.submitted != 0u,
+                true /* all rectangles were validated before GPU replay */,
+                nativeStencilDepthReady && ready);
+        if (!nativeDepthReady || !nativeStencilDepthReady ||
+            !canonicalStencilClear) return false;
         // An entirely off-viewport successful D3D9 Clear wrote neither
         // color nor Z. Retain the native frame and exact Draw ordinals.
         if (nativeRegionCount == 0u) return true;
@@ -8000,19 +8019,31 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         if (!sameMainDepthStencil ||
             (clearZ && !compatibleCoverage && !partialDepth))
             return false;
-        if (clearStencil &&
-            !GameNativeMainStencilClear::may_ignore(
-                true, s.clearColor.matches(owner,
-                    reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get())),
-                sameMainDepthStencil, compatibleCoverage,
-                !s.frameBatch.stopped))
-            return false;
+        if (clearStencil) {
+            const bool seededMainColor = s.clearColor.matches(
+                owner, reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()));
+            // Whole-main stencil semantics remain unchanged. For clipped
+            // Z|STENCIL, the stencil portion is neutral only when the exact
+            // source Z rects can be mirrored on an owned live native D32.
+            const bool wholeStencilSafe = GameNativeMainStencilClear::may_ignore(
+                true, seededMainColor, sameMainDepthStencil,
+                compatibleCoverage, !s.frameBatch.stopped);
+            const bool clippedStencilSafe = partialDepth &&
+                GameNativeMainStencilClear::may_ignore_cropped(
+                    true, seededMainColor, sameMainDepthStencil,
+                    continuingFullNativeDraw,
+                    count <= GameNativeSourceMutation::kMaxPartialTargetClearRects &&
+                        (count == 0u || rects != nullptr),
+                    native_game_partial_depth_ready(
+                        s, game, bbDesc.Width, bbDesc.Height));
+            if (!wholeStencilSafe && !clippedStencilSafe) return false;
+        }
         // Game-authored partial Z Clears must preserve untouched menu/race
         // depth: D3D11.1 ClearView or bounded D3D11.0 depth-only GPU Draw,
         // never whole-DSV ClearDepthStencilView. Validate canonical main Z,
         // live native D32 view and every rectangle before any GPU mutation.
         if (partialDepth) {
-            if (clearStencil || !continuingFullNativeDraw ||
+            if (!continuingFullNativeDraw ||
                 !GameNativeSourceMutation::mirrors_partial_depth_clear(
                     env_full_game_opt_in(), sameMainDepthStencil,
                     s.pending && !s.frameBatch.stopped &&
