@@ -12,9 +12,9 @@ int main() {
     const std::array<std::string, 3> sources{
         "input.r0.xyzw", "r283_t0.yxwz", "-(input.r1.xyzw)"};
     const auto emit = [&](NativeSm3ArithmeticOpcode op,
-                          unsigned mask, unsigned count) {
+                          unsigned mask, unsigned count, bool vertexStage = true) {
         return append_native_sm3_arithmetic(out, op, "output.r0",
-                                            mask, sources, count, 1u);
+                                            mask, sources, count, 1u, vertexStage);
     };
     assert(emit(NativeSm3ArithmeticOpcode::Move, 15u, 1u));
     assert(emit(NativeSm3ArithmeticOpcode::Add, 3u, 2u));
@@ -53,6 +53,29 @@ int main() {
     assert(out.find("sin(((input.r0.xyzw).x))") != std::string::npos);
     assert(out.find("sign(input.r0.xyzw)") != std::string::npos);
     assert(out.find("ddy((input.r0.xyzw).z)") != std::string::npos);
+    // Actual D3D9 VS and PS share opcodes but not zero RCP/RSQ results.
+    // The native live compiler must carry its true shader stage through
+    // every game-authored Draw, never substitute a finite PS result.
+    std::string vertexZero, pixelZero;
+    assert(append_native_sm3_arithmetic(vertexZero,
+        NativeSm3ArithmeticOpcode::Reciprocal, "output.r0", 15u,
+        sources, 1u, 31u, true));
+    assert(append_native_sm3_arithmetic(pixelZero,
+        NativeSm3ArithmeticOpcode::Reciprocal, "output.r0", 15u,
+        sources, 1u, 31u, false));
+    assert(vertexZero.find("== 0.0f ? 3.402823466e+38f") != std::string::npos);
+    assert(pixelZero.find("== 0.0f ? 3.402823466e+38f") == std::string::npos);
+    vertexZero.clear(); pixelZero.clear();
+    assert(append_native_sm3_arithmetic(vertexZero,
+        NativeSm3ArithmeticOpcode::ReciprocalSquareRoot, "output.r0", 15u,
+        sources, 1u, 32u, true));
+    assert(append_native_sm3_arithmetic(pixelZero,
+        NativeSm3ArithmeticOpcode::ReciprocalSquareRoot, "output.r0", 15u,
+        sources, 1u, 32u, false));
+    assert(vertexZero.find("== 0.0f ? 3.402823466e+38f") != std::string::npos);
+    assert(pixelZero.find("== 0.0f ? 3.402823466e+38f") == std::string::npos);
+    assert(vertexZero.find("rsqrt(abs(") != std::string::npos);
+    assert(pixelZero.find("rsqrt(abs(") != std::string::npos);
     assert(out.find("rsqrt(abs(") != std::string::npos);
     assert(out.find("exp2(") != std::string::npos);
     assert(out.find("log2(abs(") != std::string::npos);
@@ -64,7 +87,7 @@ int main() {
     // Masked xyz translation never reads an unwritten physical w.
     std::string xyzOnly;
     assert(append_native_sm3_arithmetic(xyzOnly, NativeSm3ArithmeticOpcode::Normalize3,
-                                        "output.r0", 7u, sources, 1u, 13u));
+                                        "output.r0", 7u, sources, 1u, 13u, true));
     assert(xyzOnly.find("(input.r0.xyzw).w *") == std::string::npos);
     assert(xyzOnly.find("output.r0.xyz = r283_value_13.xyz;") != std::string::npos);
     assert(out.find("cross((input.r0.xyzw).xyz") != std::string::npos);

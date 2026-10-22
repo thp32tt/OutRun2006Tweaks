@@ -1627,7 +1627,8 @@ bool build_r283_sm3_mov_shader_source(
                            translated, op.opcode, dest, op.destinationMask,
                            std::array<std::string, 3>{
                                op.sources[0], op.sources[1], op.sources[2]},
-                           op.sourceCount, static_cast<unsigned>(i)))
+                           op.sourceCount, static_cast<unsigned>(i),
+                           vertexStage))
                 return false;
             // D3D9 applies destination shift, then saturate to the actual
             // written channels. Keep this inside the real SETP predicate

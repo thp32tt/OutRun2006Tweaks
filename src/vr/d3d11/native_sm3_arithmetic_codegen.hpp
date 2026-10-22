@@ -137,7 +137,7 @@ inline bool append_native_sm3_arithmetic(
     std::string& translated, NativeSm3ArithmeticOpcode opcode,
     const std::string& destination, unsigned mask,
     const std::array<std::string, 3>& sources,
-    unsigned sourceCount, unsigned ordinal) {
+    unsigned sourceCount, unsigned ordinal, bool vertexStage) {
     if (destination.empty() || (mask & ~0x0fu) || mask == 0u)
         return false;
     const auto validSources = [&](unsigned expected) {
@@ -174,11 +174,22 @@ inline bool append_native_sm3_arithmetic(
     case NativeSm3ArithmeticOpcode::Logarithm2: {
         if (!validSources(1u)) return false;
         const auto x = "((" + sources[0] + ").x)";
+        // D3D9 vs_3_0 RCP/RSQ use FLT_MAX for a zero scalar.
+        // ps_3_0 specifies infinity instead. This codegen handles both
+        // real game shader stages; do not contaminate PS zero semantics.
+        const auto vsFiniteZero = [&](const std::string& expression) {
+            return vertexStage
+                ? "(" + x + " == 0.0f ? 3.402823466e+38f : " + expression + ")"
+                : expression;
+        };
         const std::string scalar =
-            opcode == NativeSm3ArithmeticOpcode::Reciprocal ? "(1.0f / " + x + ")" :
-            opcode == NativeSm3ArithmeticOpcode::ReciprocalSquareRoot ? "rsqrt(abs(" + x + "))" :
-            opcode == NativeSm3ArithmeticOpcode::Exponential2 ? "exp2(" + x + ")" :
-            // D3D9 LOG(0) is -FLT_MAX; SM4 HLSL log2(0) is -INF.
+            opcode == NativeSm3ArithmeticOpcode::Reciprocal
+                ? vsFiniteZero("(1.0f / " + x + ")") :
+            opcode == NativeSm3ArithmeticOpcode::ReciprocalSquareRoot
+                ? vsFiniteZero("rsqrt(abs(" + x + "))") :
+            opcode == NativeSm3ArithmeticOpcode::Exponential2
+                ? "exp2(" + x + ")" :
+            // Both D3D9 stages define LOG(0) as -FLT_MAX, not HLSL -INF.
             "(abs(" + x + ") == 0.0f ? -3.402823466e+38f : log2(abs(" + x + ")))";
         expression = "float4(" + scalar + ", " + scalar + ", " +
                      scalar + ", " + scalar + ")";
