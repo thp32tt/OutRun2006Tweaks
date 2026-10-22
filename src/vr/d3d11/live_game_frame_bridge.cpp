@@ -5475,6 +5475,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         it = s.liveSm3Pipelines.emplace(key, std::move(pipeline)).first;
     }
     auto& pipeline = it->second;
+    // A real depth-only SM3 shadow/occlusion pass must have color writes
+    // disabled in the game's own RT0 state. It is not a zero-color draw.
+    if (pipeline.program.pixelDepthOnly &&
+        !native_sm3_depth_only_pass(
+            true, pipeline.program.pixelWritesDepth, colorMask,
+            liveDepth.enabled, liveDepth.writeEnabled, true,
+            alpha != FALSE, tableZFog.enabled))
+        return false;
     // An SM3 depth-output shader needs real, writable game Z provenance.
     if (pipeline.program.pixelWritesDepth &&
         !native_sm3_depth_target(liveDepth.enabled, liveDepth.writeEnabled,
@@ -5839,6 +5847,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     context->OMSetDepthStencilState(liveDepthState, 0u);
     // Validate the actual native DSV before issuing oDepth GPU writes.
+    if (pipeline.program.pixelDepthOnly &&
+        !native_sm3_depth_only_pass(
+            true, pipeline.program.pixelWritesDepth, colorMask,
+            liveDepth.enabled, liveDepth.writeEnabled,
+            s.diagnosticDepthView.Get() != nullptr,
+            alpha != FALSE, tableZFog.enabled)) return false;
     if (pipeline.program.pixelWritesDepth &&
         !native_sm3_depth_target(liveDepth.enabled, liveDepth.writeEnabled,
                                   s.diagnosticDepthView.Get() != nullptr,

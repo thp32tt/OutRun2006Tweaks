@@ -318,9 +318,11 @@ bool build_r283_sm3_mov_shader_source(
     bool vertexStage,
     std::string& translated,
     std::array<std::uint16_t, 16>* dynamicRelativeLimits = nullptr,
-    bool* writesDepth = nullptr) noexcept {
+    bool* writesDepth = nullptr,
+    bool* writesColor = nullptr) noexcept {
     translated.clear();
     if (writesDepth) *writesDepth = false;
+    if (writesColor) *writesColor = false;
     try {
         if (!evidence.exact() ||
             evidence.vertexStage != vertexStage ||
@@ -1434,7 +1436,10 @@ bool build_r283_sm3_mov_shader_source(
                         outputDeclaredMasks[output.registerIndex],
                         outputWritten[output.registerIndex]))
                     return false;
-        } else if (outputWritten[0] != 0x0fu) {
+        } else if (outputWritten[0] != 0x0fu &&
+                   !(depthWritten && outputWritten[0] == 0u)) {
+            // No fabricated pixel color: depth-only shadow/occlusion passes
+            // require real oDepth, zero RGB/alpha writes, and an owned DSV.
             return false;
         }
         // Conditional oDepth could leave SV_Depth undefined or alias a
@@ -1495,6 +1500,10 @@ bool build_r283_sm3_mov_shader_source(
             }
             translated += "};\nR283Output main(R283Input input) {\n"
                           "    R283Output output = (R283Output)0;\n";
+        } else if (depthWritten && outputWritten[0] == 0u) {
+            // Depth-only game shaders never write a synthetic SV_Target0.
+            translated += "float main(R283Input input) : SV_Depth {\n"
+                          "    float4 r283_depth = float4(0, 0, 0, 0);\n";
         } else if (depthWritten) {
             translated +=
                 "struct R283PixelOutput { float4 color : SV_Target0; float depth : SV_Depth; };\n"
@@ -1607,6 +1616,8 @@ bool build_r283_sm3_mov_shader_source(
                 append_native_sm3_predicated_end(translated);
         }
         if (vertexStage) translated += "    return output;\n}\n";
+        else if (depthWritten && outputWritten[0] == 0u)
+            translated += "    return r283_depth.x;\n}\n";
         else if (depthWritten)
             translated +=
                 "    R283PixelOutput r283_out;\n"
@@ -1617,6 +1628,7 @@ bool build_r283_sm3_mov_shader_source(
         if (translated.empty()) return false;
         if (dynamicRelativeLimits) *dynamicRelativeLimits = indexedLoopLimits;
         if (writesDepth) *writesDepth = depthWritten;
+        if (writesColor) *writesColor = !vertexStage && outputWritten[0] == 0x0fu;
         return true;
     } catch (...) {
         translated.clear();
@@ -2159,12 +2171,12 @@ bool compile_native_live_sm3_program(
     try {
         std::string vertexHlsl, pixelHlsl;
         std::array<std::uint16_t, 16> vertexIndexedLimits{}, pixelIndexedLimits{};
-        bool pixelWritesDepth = false;
+        bool pixelWritesDepth = false, pixelWritesColor = false;
         if (!build_r283_sm3_mov_shader_source(
                 vertexSource, true, vertexHlsl, &vertexIndexedLimits) ||
             !build_r283_sm3_mov_shader_source(
                 pixelSource, false, pixelHlsl, &pixelIndexedLimits,
-                 &pixelWritesDepth) ||
+                 &pixelWritesDepth, &pixelWritesColor) ||
              (pixelWritesDepth && (alphaCompare != 0u || tableZFog)) ||
             !append_native_sm3_alpha_test(pixelHlsl, alphaCompare) ||
             !append_native_sm3_table_zfog(pixelHlsl, tableZFog) ||
@@ -2179,6 +2191,7 @@ bool compile_native_live_sm3_program(
         // VS sampler ownership is independent of the pixel-stage resource.
         NativeLiveSm3Program candidate{};
         candidate.pixelWritesDepth = pixelWritesDepth;
+        candidate.pixelDepthOnly = pixelWritesDepth && !pixelWritesColor;
         candidate.vertexLoopIndexedConstantEnd = vertexIndexedLimits;
         candidate.pixelLoopIndexedConstantEnd = pixelIndexedLimits;
         if (FAILED(device->CreateVertexShader(
