@@ -385,7 +385,12 @@ constexpr bool sm3_live_legacy_source_blend_regression() noexcept {
            !sm3_live_blend_desc(
                0xdeadbeefu, D3DBLEND_ONE, D3DBLENDOP_ADD,
                false, 0u, 0u, 0u, b) &&
-           sm3_live_blend_key(b) == sm3_live_blend_key(saved);
+           b.SrcBlend == saved.SrcBlend &&
+           b.DestBlend == saved.DestBlend &&
+           b.SrcBlendAlpha == saved.SrcBlendAlpha &&
+           b.DestBlendAlpha == saved.DestBlendAlpha &&
+           b.BlendOp == saved.BlendOp &&
+           b.BlendOpAlpha == saved.BlendOpAlpha;
 }
 static_assert(sm3_live_legacy_source_blend_regression(),
               "Live game D3D9 SRCALPHASAT/BOTH* native OM/fallback regression");

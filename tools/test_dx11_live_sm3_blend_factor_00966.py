@@ -73,5 +73,5 @@ for token in (
 require("static_assert(sm3_live_legacy_source_blend_regression()", src)
 require("D3DBLEND_BOTHINVSRCALPHA, D3DBLEND_ZERO, D3DBLENDOP_ADD", src)
 require("b.BlendOpAlpha != D3D11_BLEND_OP_MAX", src)
-require("sm3_live_blend_key(b) == sm3_live_blend_key(saved)", src)
+require("b.BlendOpAlpha == saved.BlendOpAlpha", src)
 print("PASS source: actual shader-bound Draw blend factor/alpha/native OM/fail-closed; runtime UNTESTED")
