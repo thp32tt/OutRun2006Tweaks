@@ -1,0 +1,622 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T2347KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T23:54:16.298214+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "mode": "independent_lightweight_qa_only",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "selection": "A-0049 indices 1-4 (0 already QA at 23:15) and B-0064-R1 indices 0-3; distinct SHA-256 from previous inspected candidates.",
+  "summary": {
+    "reviewed": 8,
+    "unique_candidate_sha": 8,
+    "source_manifest_and_sent_sha_verified": 8,
+    "local_and_export_candidate_sha_verified": 8,
+    "source_png_rgba": 8,
+    "candidate_png_rgba": 8,
+    "mapping_legible": 8,
+    "visible_english_residue_or_extra_background": 0,
+    "source_roi_hard_clip_detected": 0,
+    "c1_final_pass": 0,
+    "c1_final_fail": 0,
+    "c1_final_hold": 8,
+    "hold_reason": "NATIVE_UI_CELL_UV_SAFE_AREA_UNVERIFIED_AND_CANDIDATE_CANVAS_MISMATCH",
+    "dds_created": 0,
+    "queue_consumed": 0,
+    "imagegen_called": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "n100_metrics": "work/C1_QA_20261022_2347/metrics.json",
+    "n100_visual_pairs": "work/C1_QA_20261022_2347/pair_01.jpg ~ pair_08.jpg",
+    "source_root": "work/image-src/text_roi_batches/inputs",
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "translation_manifest": "work/image-src/text_roi_batches/production_manifest.json"
+  },
+  "records": [
+    {
+      "ordinal": 1,
+      "id": "Q227_0e93c7db2af67ef4",
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0049-4F973D86",
+      "source_file": "Q227_0e93c7db2af67ef4_source.png",
+      "candidate_file": "Q227_0e93c7db2af67ef4_source_k.png",
+      "english": "PROFESSIONAL",
+      "approved_korean": "프로",
+      "source_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "source_xyxy": [
+        0,
+        600,
+        701,
+        698
+      ],
+      "source_png_sha256": "84bb3162b50e6664051efff09b7018f4c3aaa6b005bc8ab905171083b41ea165",
+      "candidate_png_sha256": "68dc18767922963c78537804436d0c80a71672473cc20985390050f35e8f9e07",
+      "source_manifest_sha_verified": true,
+      "source_sent_sha_verified": true,
+      "candidate_local_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1402,
+          196
+        ],
+        "alpha_bbox": [
+          2,
+          17,
+          1355,
+          177
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          152,
+          0,
+          1675,
+          674
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "visual_korean_legible": true,
+      "visual_translation_mapping_match": true,
+      "visible_english_residue": false,
+      "visible_unwanted_frame_or_background": false,
+      "source_roi_glyph_cut_detected": false,
+      "minor_length_difference_ignored": true,
+      "native_original_cell_placement": "UNVERIFIED",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "Independent EN-vs-KR visual inspection: readable mapped Hangul; no apparent residual Latin text or filled frame; saved candidate differs from native source ROI resolution. No verified full-atlas placement; cannot certify native cell/UV margin, collision or final DDS."
+    },
+    {
+      "ordinal": 2,
+      "id": "Q227_827e4561afbd5fc1",
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0049-4F973D86",
+      "source_file": "Q227_827e4561afbd5fc1_source.png",
+      "candidate_file": "Q227_827e4561afbd5fc1_source_k.png",
+      "english": "OUTRUN",
+      "approved_korean": "아웃런",
+      "source_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "source_xyxy": [
+        0,
+        500,
+        388,
+        598
+      ],
+      "source_png_sha256": "67173e409f0c05644756af0ca4cf159b5d31fe375b1c4c45643dbfd6f71fa52e",
+      "candidate_png_sha256": "d57b67838027993dbecb753ba5bc92abde308fbba924e62353bb67e402302f53",
+      "source_manifest_sha_verified": true,
+      "source_sent_sha_verified": true,
+      "candidate_local_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          776,
+          196
+        ],
+        "alpha_bbox": [
+          5,
+          19,
+          729,
+          177
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          67,
+          94,
+          1897,
+          676
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "visual_korean_legible": true,
+      "visual_translation_mapping_match": true,
+      "visible_english_residue": false,
+      "visible_unwanted_frame_or_background": false,
+      "source_roi_glyph_cut_detected": false,
+      "minor_length_difference_ignored": true,
+      "native_original_cell_placement": "UNVERIFIED",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "Independent EN-vs-KR visual inspection: readable mapped Hangul; no apparent residual Latin text or filled frame; saved candidate differs from native source ROI resolution. No verified full-atlas placement; cannot certify native cell/UV margin, collision or final DDS."
+    },
+    {
+      "ordinal": 3,
+      "id": "Q227_591050b866fc7e75",
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0049-4F973D86",
+      "source_file": "Q227_591050b866fc7e75_source.png",
+      "candidate_file": "Q227_591050b866fc7e75_source_k.png",
+      "english": "CASTLE WALL",
+      "approved_korean": "캐슬 월",
+      "source_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "source_xyxy": [
+        0,
+        975,
+        662,
+        1080
+      ],
+      "source_png_sha256": "bb1c52c6dc2b4e6d1c2151b9111e0deb44a2cd6b040a575be51b683c5efbb166",
+      "candidate_png_sha256": "66ef80645ed383fa4a07fa8924f1bccea235f833be6a4f9f26caa8d7d7143b5f",
+      "source_manifest_sha_verified": true,
+      "source_sent_sha_verified": true,
+      "candidate_local_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1324,
+          210
+        ],
+        "alpha_bbox": [
+          12,
+          19,
+          1273,
+          189
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          190,
+          9,
+          2110,
+          724
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "visual_korean_legible": true,
+      "visual_translation_mapping_match": true,
+      "visible_english_residue": false,
+      "visible_unwanted_frame_or_background": false,
+      "source_roi_glyph_cut_detected": false,
+      "minor_length_difference_ignored": true,
+      "native_original_cell_placement": "UNVERIFIED",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "Independent EN-vs-KR visual inspection: readable mapped Hangul; no apparent residual Latin text or filled frame; saved candidate differs from native source ROI resolution. No verified full-atlas placement; cannot certify native cell/UV margin, collision or final DDS."
+    },
+    {
+      "ordinal": 4,
+      "id": "Q230_1a8d3644a0dfc2f3",
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0049-4F973D86",
+      "source_file": "Q230_1a8d3644a0dfc2f3_source.png",
+      "candidate_file": "Q230_1a8d3644a0dfc2f3_source_k.png",
+      "english": "GAME MODES",
+      "approved_korean": "게임 모드",
+      "source_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_xyxy": [
+        0,
+        392,
+        426,
+        468
+      ],
+      "source_png_sha256": "4ba5d9d34c995c48447afccdf93d802075e7a52cd29c445b5bd4ce46d196211c",
+      "candidate_png_sha256": "b048fc80464f72ba248867ed2a739f26819c73983a67f825677a53064b567e65",
+      "source_manifest_sha_verified": true,
+      "source_sent_sha_verified": true,
+      "candidate_local_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1704,
+          304
+        ],
+        "alpha_bbox": [
+          7,
+          39,
+          1641,
+          265
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          138,
+          25,
+          1920,
+          698
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "visual_korean_legible": true,
+      "visual_translation_mapping_match": true,
+      "visible_english_residue": false,
+      "visible_unwanted_frame_or_background": false,
+      "source_roi_glyph_cut_detected": false,
+      "minor_length_difference_ignored": true,
+      "native_original_cell_placement": "UNVERIFIED",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "Independent EN-vs-KR visual inspection: readable mapped Hangul; no apparent residual Latin text or filled frame; saved candidate differs from native source ROI resolution. No verified full-atlas placement; cannot certify native cell/UV margin, collision or final DDS."
+    },
+    {
+      "ordinal": 5,
+      "id": "Q230_a93f095ef375989d",
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_file": "Q230_a93f095ef375989d_source.png",
+      "candidate_file": "Q230_a93f095ef375989d_source_k.png",
+      "english": "BONUS MATERIAL",
+      "approved_korean": "보너스 자료",
+      "source_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_xyxy": [
+        0,
+        240,
+        554,
+        316
+      ],
+      "source_png_sha256": "e51621c9f1b9a62ed72a13d99a4574d3e94652c86682129dbac642ded27dad75",
+      "candidate_png_sha256": "73d13f729eebb575e866d961772be4cd48f66050e722a0a2c10341c58e44d590",
+      "source_manifest_sha_verified": true,
+      "source_sent_sha_verified": true,
+      "candidate_local_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1108,
+          152
+        ],
+        "alpha_bbox": [
+          3,
+          19,
+          1077,
+          133
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          65,
+          7,
+          2035,
+          565
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "visual_korean_legible": true,
+      "visual_translation_mapping_match": true,
+      "visible_english_residue": false,
+      "visible_unwanted_frame_or_background": false,
+      "source_roi_glyph_cut_detected": false,
+      "minor_length_difference_ignored": true,
+      "native_original_cell_placement": "UNVERIFIED",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "Independent EN-vs-KR visual inspection: readable mapped Hangul; no apparent residual Latin text or filled frame; saved candidate differs from native source ROI resolution. No verified full-atlas placement; cannot certify native cell/UV margin, collision or final DDS."
+    },
+    {
+      "ordinal": 6,
+      "id": "Q232_be9630b94d548555",
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_file": "Q232_be9630b94d548555_source.png",
+      "candidate_file": "Q232_be9630b94d548555_source_k.png",
+      "english": "JOIN GAME",
+      "approved_korean": "게임 참가",
+      "source_dds_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "source_xyxy": [
+        0,
+        275,
+        439,
+        362
+      ],
+      "source_png_sha256": "95e70ad059e0f382f4a581ffe4d164e495c76d37bcbb279e1147fe9bc4b6e1f8",
+      "candidate_png_sha256": "8d13a67f5fc8f473336f8726feae57ab9cbc52fe7f4a5d5200dfceb2da14fa8a",
+      "source_manifest_sha_verified": true,
+      "source_sent_sha_verified": true,
+      "candidate_local_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          878,
+          174
+        ],
+        "alpha_bbox": [
+          23,
+          19,
+          840,
+          155
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          134,
+          15,
+          1957,
+          628
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "visual_korean_legible": true,
+      "visual_translation_mapping_match": true,
+      "visible_english_residue": false,
+      "visible_unwanted_frame_or_background": false,
+      "source_roi_glyph_cut_detected": false,
+      "minor_length_difference_ignored": true,
+      "native_original_cell_placement": "UNVERIFIED",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "Independent EN-vs-KR visual inspection: readable mapped Hangul; no apparent residual Latin text or filled frame; saved candidate differs from native source ROI resolution. No verified full-atlas placement; cannot certify native cell/UV margin, collision or final DDS."
+    },
+    {
+      "ordinal": 7,
+      "id": "Q237_f3a4a8eda36c453d",
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_file": "Q237_f3a4a8eda36c453d_source.png",
+      "candidate_file": "Q237_f3a4a8eda36c453d_source_k.png",
+      "english": "CUSTOM GAME",
+      "approved_korean": "커스텀 게임",
+      "source_dds_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_xyxy": [
+        0,
+        851,
+        542,
+        938
+      ],
+      "source_png_sha256": "4917cf2b559296af2f2e63cf4ba73cd89d63efe8f0d3998029b59329c889c07a",
+      "candidate_png_sha256": "4f9323bccd32542e6ee81f782b7427026b0e058c2b260e5e7b0ee7365c15405b",
+      "source_manifest_sha_verified": true,
+      "source_sent_sha_verified": true,
+      "candidate_local_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1084,
+          174
+        ],
+        "alpha_bbox": [
+          20,
+          19,
+          1046,
+          155
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          85,
+          23,
+          2096,
+          658
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "visual_korean_legible": true,
+      "visual_translation_mapping_match": true,
+      "visible_english_residue": false,
+      "visible_unwanted_frame_or_background": false,
+      "source_roi_glyph_cut_detected": false,
+      "minor_length_difference_ignored": true,
+      "native_original_cell_placement": "UNVERIFIED",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "Independent EN-vs-KR visual inspection: readable mapped Hangul; no apparent residual Latin text or filled frame; saved candidate differs from native source ROI resolution. No verified full-atlas placement; cannot certify native cell/UV margin, collision or final DDS."
+    },
+    {
+      "ordinal": 8,
+      "id": "Q237_2e956f29f0903fe6",
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_file": "Q237_2e956f29f0903fe6_source.png",
+      "candidate_file": "Q237_2e956f29f0903fe6_source_k.png",
+      "english": "CREATE GAME",
+      "approved_korean": "게임 만들기",
+      "source_dds_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_xyxy": [
+        0,
+        763,
+        557,
+        850
+      ],
+      "source_png_sha256": "05892006f54d11e3f0dfa163ed57e7d0699e905184edd4bb0de4ababf077edd8",
+      "candidate_png_sha256": "3a6ba2741be4f54418232af7e690dbb6944eee7de9e25c2b4200db342c53b516",
+      "source_manifest_sha_verified": true,
+      "source_sent_sha_verified": true,
+      "candidate_local_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1114,
+          174
+        ],
+        "alpha_bbox": [
+          24,
+          19,
+          1076,
+          155
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          57,
+          9,
+          2088,
+          592
+        ],
+        "border_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "visual_korean_legible": true,
+      "visual_translation_mapping_match": true,
+      "visible_english_residue": false,
+      "visible_unwanted_frame_or_background": false,
+      "source_roi_glyph_cut_detected": false,
+      "minor_length_difference_ignored": true,
+      "native_original_cell_placement": "UNVERIFIED",
+      "c1_status": "HOLD_NATIVE_SAFE_AREA_UNVERIFIED",
+      "notes": "Independent EN-vs-KR visual inspection: readable mapped Hangul; no apparent residual Latin text or filled frame; saved candidate differs from native source ROI resolution. No verified full-atlas placement; cannot certify native cell/UV margin, collision or final DDS."
+    }
+  ]
+}
