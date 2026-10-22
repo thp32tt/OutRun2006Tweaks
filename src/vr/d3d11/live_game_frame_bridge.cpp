@@ -210,6 +210,9 @@ constexpr bool native_game_separate_alpha(
     case D3DBLENDOP_ADD: operation = D3D11_BLEND_OP_ADD; break;
     case D3DBLENDOP_SUBTRACT: operation = D3D11_BLEND_OP_SUBTRACT; break;
     case D3DBLENDOP_REVSUBTRACT: operation = D3D11_BLEND_OP_REV_SUBTRACT; break;
+    // MIN/MAX combine authentic game source and destination components.
+    case D3DBLENDOP_MIN: operation = D3D11_BLEND_OP_MIN; break;
+    case D3DBLENDOP_MAX: operation = D3D11_BLEND_OP_MAX; break;
     default: return false;
     }
     src = s; dst = d; op = operation;
@@ -226,13 +229,19 @@ constexpr bool native_game_separate_alpha_contract() noexcept {
             D3DBLENDOP_REVSUBTRACT, src, dst, op) ||
         src != D3D11_BLEND_SRC_ALPHA || dst != D3D11_BLEND_DEST_ALPHA ||
         op != D3D11_BLEND_OP_REV_SUBTRACT) return false;
+    if (!native_game_separate_alpha(
+            D3DBLEND_ONE, D3DBLEND_ZERO, D3DBLENDOP_MIN, src, dst, op) ||
+        op != D3D11_BLEND_OP_MIN ||
+        !native_game_separate_alpha(
+            D3DBLEND_ZERO, D3DBLEND_ONE, D3DBLENDOP_MAX, src, dst, op) ||
+        op != D3D11_BLEND_OP_MAX) return false;
     const auto oldSrc = src;
     const auto oldDst = dst;
     const auto oldOp = op;
     return !native_game_separate_alpha(D3DBLEND_SRCALPHASAT, D3DBLEND_ONE,
                 D3DBLENDOP_ADD, src, dst, op) &&
            !native_game_separate_alpha(D3DBLEND_ONE, D3DBLEND_ONE,
-                D3DBLENDOP_MIN, src, dst, op) &&
+                0xffffffffu, src, dst, op) &&
            !native_game_separate_alpha(D3DBLEND_BLENDFACTOR, D3DBLEND_ONE,
                 D3DBLENDOP_ADD, src, dst, op) &&
            src == oldSrc && dst == oldDst && op == oldOp;
@@ -291,6 +300,10 @@ constexpr bool sm3_live_blend_op(DWORD f, D3D11_BLEND_OP& out) noexcept {
     case D3DBLENDOP_ADD: out = D3D11_BLEND_OP_ADD; return true;
     case D3DBLENDOP_SUBTRACT: out = D3D11_BLEND_OP_SUBTRACT; return true;
     case D3DBLENDOP_REVSUBTRACT: out = D3D11_BLEND_OP_REV_SUBTRACT; return true;
+    // Enable D3D9 game extrema in the actual shader-bound D3D11 OM.
+    // Independent alpha may choose the other operation per source Draw.
+    case D3DBLENDOP_MIN: out = D3D11_BLEND_OP_MIN; return true;
+    case D3DBLENDOP_MAX: out = D3D11_BLEND_OP_MAX; return true;
     default: return false;
     }
 }
@@ -412,11 +425,21 @@ constexpr bool sm3_live_blend_regression() noexcept {
         b.SrcBlendAlpha != D3D11_BLEND_BLEND_FACTOR ||
         b.DestBlendAlpha != D3D11_BLEND_INV_BLEND_FACTOR)
         return false;
+    if (!sm3_live_blend_desc(
+            D3DBLEND_ONE, D3DBLEND_ZERO, D3DBLENDOP_MIN,
+            true, D3DBLEND_ZERO, D3DBLEND_ONE, D3DBLENDOP_MAX, b) ||
+        b.BlendOp != D3D11_BLEND_OP_MIN ||
+        b.BlendOpAlpha != D3D11_BLEND_OP_MAX ||
+        !sm3_live_blend_desc(
+            D3DBLEND_ONE, D3DBLEND_ZERO, D3DBLENDOP_MAX,
+            false, 0u, 0u, 0u, b) ||
+        b.BlendOp != D3D11_BLEND_OP_MAX ||
+        b.BlendOpAlpha != D3D11_BLEND_OP_MAX) return false;
     const auto saved = b;
     return !sm3_live_blend_desc(0xdeadbeefu, D3DBLEND_ONE,
                 D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) &&
            !sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
-                D3DBLENDOP_MIN, false, 0u, 0u, 0u, b) &&
+                0xffffffffu, false, 0u, 0u, 0u, b) &&
            !sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
                 D3DBLENDOP_ADD, true, D3DBLEND_SRCCOLOR,
                 D3DBLEND_ONE, D3DBLENDOP_ADD, b) &&
