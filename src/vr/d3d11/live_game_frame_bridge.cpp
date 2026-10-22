@@ -406,10 +406,24 @@ constexpr bool sm3_live_masked_blend_desc(
     DWORD sa, DWORD da, DWORD oa, D3D11_RENDER_TARGET_BLEND_DESC& out) noexcept {
     if ((writeMask & ~0x0fu) != 0u) return false;
     D3D11_RENDER_TARGET_BLEND_DESC b{};
-    if (enabled) {
-        if (!sm3_live_blend_desc(sc, dc, oc, separate, sa, da, oa, b))
+    if (enabled && writeMask != 0u) {
+        // An RGB-only game Draw may carry a stale, unsupported independent
+        // alpha equation; likewise an independent alpha-only Draw can carry
+        // irrelevant RGB blend factors. Those equations write no pixels and
+        // must not abort a valid source-ordinal native frame. Never loosen
+        // translation of a channel which is actually written.
+        const bool writesRgb = (writeMask & 0x07u) != 0u;
+        const bool writesAlpha = (writeMask & 0x08u) != 0u;
+        const bool consumesRgbFactors = writesRgb || (writesAlpha && !separate);
+        if (!sm3_live_blend_desc(
+                consumesRgbFactors ? sc : D3DBLEND_ONE,
+                consumesRgbFactors ? dc : D3DBLEND_ZERO,
+                consumesRgbFactors ? oc : D3DBLENDOP_ADD,
+                separate && writesAlpha, sa, da, oa, b))
             return false;
     } else {
+        // Depth-only source Draws with RT0 writes disabled do not consume
+        // any blend equation, including invalid ignored legacy states.
         b.BlendEnable = FALSE;
         b.SrcBlend = D3D11_BLEND_ONE;
         b.DestBlend = D3D11_BLEND_ZERO;
@@ -463,6 +477,35 @@ constexpr bool sm3_live_masked_blend_regression() noexcept {
         b.DestBlend != D3D11_BLEND_INV_BLEND_FACTOR ||
         b.SrcBlendAlpha != D3D11_BLEND_BLEND_FACTOR ||
         b.DestBlendAlpha != D3D11_BLEND_INV_BLEND_FACTOR)
+        return false;
+    // An unsupported *unwritten* blend side cannot poison a valid RGB-
+    // only or independent alpha-only game Draw. The exact same invalid
+    // inputs must still fail closed when the corresponding lane is written.
+    if (!sm3_live_masked_blend_desc(
+            true, 0x07u, D3DBLEND_ONE, D3DBLEND_ZERO,
+            D3DBLENDOP_ADD, true, 0xdeadbeefu, 0xdeadbeefu,
+            0xdeadbeefu, b) ||
+        b.BlendEnable != TRUE ||
+        b.RenderTargetWriteMask != 0x07u ||
+        !sm3_live_masked_blend_desc(
+            true, 0x08u, 0xdeadbeefu, 0xdeadbeefu,
+            0xdeadbeefu, true, D3DBLEND_ONE, D3DBLEND_ZERO,
+            D3DBLENDOP_ADD, b) ||
+        b.SrcBlendAlpha != D3D11_BLEND_ONE ||
+        b.DestBlendAlpha != D3D11_BLEND_ZERO ||
+        !sm3_live_masked_blend_desc(
+            true, 0x00u, 0xdeadbeefu, 0xdeadbeefu,
+            0xdeadbeefu, true, 0xdeadbeefu, 0xdeadbeefu,
+            0xdeadbeefu, b) ||
+        b.BlendEnable != FALSE ||
+        sm3_live_masked_blend_desc(
+            true, 0x0fu, D3DBLEND_ONE, D3DBLEND_ZERO,
+            D3DBLENDOP_ADD, true, 0xdeadbeefu, 0xdeadbeefu,
+            0xdeadbeefu, b) ||
+        sm3_live_masked_blend_desc(
+            true, 0x08u, 0xdeadbeefu, 0xdeadbeefu,
+            0xdeadbeefu, false, D3DBLEND_ONE, D3DBLEND_ZERO,
+            D3DBLENDOP_ADD, b))
         return false;
     const auto saved = b;
     return !sm3_live_masked_blend_desc(
@@ -5232,7 +5275,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // GPU equation consumes it; an ignored stale destination cannot veto Draw.
     const bool usesBlendFactor = live_sm3_needs_dynamic_blend_factor(
         blend != FALSE, srcBlend, dstBlend, separateAlpha != FALSE,
-        srcBlendAlpha, dstBlendAlpha);
+        srcBlendAlpha, dstBlendAlpha, colorMask);
     DWORD gameBlendFactor = 0u;
     if (usesBlendFactor &&
         FAILED(game->GetRenderState(D3DRS_BLENDFACTOR, &gameBlendFactor)))
