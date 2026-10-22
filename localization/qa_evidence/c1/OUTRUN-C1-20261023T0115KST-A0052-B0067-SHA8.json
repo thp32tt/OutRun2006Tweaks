@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261023T0115KST-A0052-B0067-SHA8",
+  "slot_label_kst": "2026-10-23T01:15:00+09:00",
+  "note": "Slot label is a scheduled role label; not an asserted exact execution timestamp.",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "operation": "independent_lightweight_qa_on_existing_AB_local_png_only",
+  "source_contracts": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "selection": "8 distinct candidate SHA: A-0052 indices 0..3 and B-0067 indices 0..3, none in immediately preceding 23:47/00:15/00:45 C1 reports. A/B queue unchanged.",
+  "summary": {
+    "reviewed": 8,
+    "unique_candidate_sha": 8,
+    "source_sent_sha_verified": 8,
+    "candidate_export_sha_verified": 8,
+    "candidate_png_rgba": 8,
+    "candidate_alpha_border_gt8_touches": 0,
+    "approved_mapping_legible": 8,
+    "final_c1_pass": 0,
+    "final_c1_fail": 0,
+    "final_c1_hold": 8,
+    "hold_native_ui_placement_unknown": 8,
+    "hold_multi_label_source_context": 2,
+    "producer_rework_dimensions_existing": 8,
+    "imagegen_called": 0,
+    "queue_consumed": 0,
+    "dds_created": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "n100_metrics": "work/C1_QA_20261023_0115_metrics.json",
+    "n100_source_candidate_sheets": [
+      "work/C1_QA_20261023_0115_A_pairs.jpg",
+      "work/C1_QA_20261023_0115_B_pairs.jpg"
+    ],
+    "source_root": "work/image-src/text_roi_batches/inputs",
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "approved_mapping": "work/image-src/text_roi_batches/production_manifest.json",
+    "generator_export": "work/image-src/text_roi_batches/export_evidence"
+  },
+  "records": [
+    {
+      "ordinal": 1,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0052-91DAEA2D",
+      "source_id": "Q049_0c45ba7ff561045e",
+      "source_file": "Q049_0c45ba7ff561045e_source.png",
+      "candidate_file": "Q049_0c45ba7ff561045e_source_k.png",
+      "english": "Double!",
+      "approved_korean": "더블!",
+      "visually_observed_korean": "더블!",
+      "source_dds_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+      "source_png_sha256": "b79ebf09a7a34460c1060adab1636858c9922e3e574823924f5031c96834feb4",
+      "candidate_png_sha256": "8ead3cd87b1c9a20a7b142a902e5b2070c9b7600e96ce221c27baadef9a33eb2",
+      "source_sent_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          788,
+          454
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          788,
+          449
+        ],
+        "border_alpha_gt8": {
+          "left": 16,
+          "right": 367,
+          "top": 595,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1652,
+          952
+        ],
+        "alpha_bbox": [
+          33,
+          82,
+          1631,
+          928
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "producer_status_unchanged": "REWORK_DIMENSIONS",
+      "c1_status": "HOLD",
+      "reason": "한글 단독 문구는 읽히고 매핑 일치. 원본 ROI에 2P/1P·하트·다른 문구가 함께 존재하며 출력 캔버스 1652×952가 원본 788×454와 달라 실제 UI 안전영역 복귀 배치를 확인할 수 없음.",
+      "text_length_difference_ignored": true,
+      "unwanted_background_or_english_residue": "NOT_VISIBLE_IN_REVIEW",
+      "native_ui_cell_collision": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "ordinal": 2,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0052-91DAEA2D",
+      "source_id": "Q054_0c4af91114577f10",
+      "source_file": "Q054_0c4af91114577f10_source.png",
+      "candidate_file": "Q054_0c4af91114577f10_source_k.png",
+      "english": "Count Green Cars!",
+      "approved_korean": "초록색 차를 세세요!",
+      "visually_observed_korean": "초록색 차를 세세요!",
+      "source_dds_sha256": "68ae256333e45edf6504169f33dcd93c41855bbd3d86f2212f298b2c3a98ee67",
+      "source_png_sha256": "95b48a04f539480737d81723e55583ebcdd3f055ba3f9235fc6584d1182d3e77",
+      "candidate_png_sha256": "83df8a77595cde39ca57d6e8ff44333afc9b5525ef4297b2c80b4738675aefb2",
+      "source_sent_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          940,
+          417
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          940,
+          417
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 196,
+          "top": 522,
+          "bottom": 260
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1883,
+          835
+        ],
+        "alpha_bbox": [
+          33,
+          97,
+          1839,
+          765
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "producer_status_unchanged": "REWORK_DIMENSIONS",
+      "c1_status": "HOLD",
+      "reason": "한글 단독 문구는 읽히고 매핑 일치. 원본 ROI에 여러 영어 지시문·자동차 아트가 함께 들어 있으며 원본 상하단/오른쪽 일부가 경계에 닿음. 별도 원본 좌표 및 복귀 배치 확인 전 보류.",
+      "text_length_difference_ignored": true,
+      "unwanted_background_or_english_residue": "NOT_VISIBLE_IN_REVIEW",
+      "native_ui_cell_collision": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "ordinal": 3,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0052-91DAEA2D",
+      "source_id": "Q128_c254b8125821eca7",
+      "source_file": "Q128_c254b8125821eca7_source.png",
+      "candidate_file": "Q128_c254b8125821eca7_source_k.png",
+      "english": "Cape Way",
+      "approved_korean": "케이프 웨이",
+      "visually_observed_korean": "케이프 웨이",
+      "source_dds_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+      "source_png_sha256": "dfc8b312b9b67a8c547d7ba776f56b8f8fe44dcfff801178db7dfb65ce5c3ed9",
+      "candidate_png_sha256": "08fec3cd01c2b6e4a9d4b7c99db54db518226674cbd1a0319859c9b21991aa5f",
+      "source_sent_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1108,
+          292
+        ],
+        "alpha_bbox": [
+          15,
+          35,
+          1041,
+          285
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          31,
+          17,
+          2156,
+          676
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "producer_status_unchanged": "REWORK_DIMENSIONS",
+      "c1_status": "HOLD",
+      "reason": "한글 자소·번역 매핑은 육안 판독 범위에서 일치. 후보는 원본과 크기가 다르며 원본 HD UI 셀/UV 안전영역에 복귀 배치해 충돌·보호 아트 침범 여부를 검증하지 못해 보류.",
+      "text_length_difference_ignored": true,
+      "unwanted_background_or_english_residue": "NOT_VISIBLE_IN_REVIEW",
+      "native_ui_cell_collision": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "ordinal": 4,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0052-91DAEA2D",
+      "source_id": "Q128_d57bcd38dd583b9e",
+      "source_file": "Q128_d57bcd38dd583b9e_source.png",
+      "candidate_file": "Q128_d57bcd38dd583b9e_source_k.png",
+      "english": "Canyon",
+      "approved_korean": "캐니언",
+      "visually_observed_korean": "캐니언",
+      "source_dds_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+      "source_png_sha256": "e2fbe3daf3d134d4221eb2f1eb2642db2d707cfa84fd94b7e03ffa3ebb2c533c",
+      "candidate_png_sha256": "5a59acfa5b209759b29d207f02e51a6722ed02657557321219b19894e49962b6",
+      "source_sent_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          420,
+          162
+        ],
+        "alpha_bbox": [
+          7,
+          17,
+          386,
+          143
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2019,
+          779
+        ],
+        "alpha_bbox": [
+          51,
+          1,
+          2011,
+          763
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "producer_status_unchanged": "REWORK_DIMENSIONS",
+      "c1_status": "HOLD",
+      "reason": "한글 자소·번역 매핑은 육안 판독 범위에서 일치. 후보는 원본과 크기가 다르며 원본 HD UI 셀/UV 안전영역에 복귀 배치해 충돌·보호 아트 침범 여부를 검증하지 못해 보류.",
+      "text_length_difference_ignored": true,
+      "unwanted_background_or_english_residue": "NOT_VISIBLE_IN_REVIEW",
+      "native_ui_cell_collision": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "ordinal": 5,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0067-4F6545A7",
+      "source_id": "Q128_bcfc7b75fe02f595",
+      "source_file": "Q128_bcfc7b75fe02f595_source.png",
+      "candidate_file": "Q128_bcfc7b75fe02f595_source_k.png",
+      "english": "Big Forest",
+      "approved_korean": "빅 포레스트",
+      "visually_observed_korean": "빅 포레스트",
+      "source_dds_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+      "source_png_sha256": "22cb086d22854cfa5e3407e07636e222472be453d7b1a917c7fb69d1e77ad9ee",
+      "candidate_png_sha256": "2870a7703414c4139ff24cf3108c44a998dce40c576e50ffce7d3fc39de6f1c5",
+      "source_sent_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          552,
+          164
+        ],
+        "alpha_bbox": [
+          7,
+          19,
+          517,
+          145
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          2090,
+          636
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "producer_status_unchanged": "REWORK_DIMENSIONS",
+      "c1_status": "HOLD",
+      "reason": "한글 자소·번역 매핑은 육안 판독 범위에서 일치. 후보는 원본과 크기가 다르며 원본 HD UI 셀/UV 안전영역에 복귀 배치해 충돌·보호 아트 침범 여부를 검증하지 못해 보류.",
+      "text_length_difference_ignored": true,
+      "unwanted_background_or_english_residue": "NOT_VISIBLE_IN_REVIEW",
+      "native_ui_cell_collision": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "ordinal": 6,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0067-4F6545A7",
+      "source_id": "Q130_3c9b625961e685e9",
+      "source_file": "Q130_3c9b625961e685e9_source.png",
+      "candidate_file": "Q130_3c9b625961e685e9_source_k.png",
+      "english": "MIX 2 COURSE",
+      "approved_korean": "믹스 2 코스",
+      "visually_observed_korean": "믹스 2 코스",
+      "source_dds_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+      "source_png_sha256": "635466b540e63ec0f828e7f6caae7317b35adc98fc4c3dd81b53e141b6083da0",
+      "candidate_png_sha256": "dc4e9330c62258a5880e3de487f1bb93d5398e739c19a2eb9e0a4ab7df73b44f",
+      "source_sent_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1272,
+          192
+        ],
+        "alpha_bbox": [
+          13,
+          19,
+          1229,
+          173
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          258,
+          0,
+          1927,
+          595
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "producer_status_unchanged": "REWORK_DIMENSIONS",
+      "c1_status": "HOLD",
+      "reason": "한글 자소·번역 매핑은 육안 판독 범위에서 일치. 후보는 원본과 크기가 다르며 원본 HD UI 셀/UV 안전영역에 복귀 배치해 충돌·보호 아트 침범 여부를 검증하지 못해 보류.",
+      "text_length_difference_ignored": true,
+      "unwanted_background_or_english_residue": "NOT_VISIBLE_IN_REVIEW",
+      "native_ui_cell_collision": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "ordinal": 7,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0067-4F6545A7",
+      "source_id": "Q139_b23b2a42de81e73c",
+      "source_file": "Q139_b23b2a42de81e73c_source.png",
+      "candidate_file": "Q139_b23b2a42de81e73c_source_k.png",
+      "english": "NORMAL",
+      "approved_korean": "일반",
+      "visually_observed_korean": "일반",
+      "source_dds_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+      "source_png_sha256": "531150f7bedc6b5b555a8109c8b6ec76ddcd2e81783e95710bb1de4e28f09261",
+      "candidate_png_sha256": "b0fba56557f05e033929d369120a2017173437fb98c20e8310968d72b4bdac57",
+      "source_sent_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          840,
+          216
+        ],
+        "alpha_bbox": [
+          63,
+          35,
+          777,
+          197
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          622,
+          22,
+          1612,
+          642
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "producer_status_unchanged": "REWORK_DIMENSIONS",
+      "c1_status": "HOLD",
+      "reason": "한글 자소·번역 매핑은 육안 판독 범위에서 일치. 후보는 원본과 크기가 다르며 원본 HD UI 셀/UV 안전영역에 복귀 배치해 충돌·보호 아트 침범 여부를 검증하지 못해 보류.",
+      "text_length_difference_ignored": true,
+      "unwanted_background_or_english_residue": "NOT_VISIBLE_IN_REVIEW",
+      "native_ui_cell_collision": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "ordinal": 8,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0067-4F6545A7",
+      "source_id": "Q140_7f614ff9fa5eeacb",
+      "source_file": "Q140_7f614ff9fa5eeacb_source.png",
+      "candidate_file": "Q140_7f614ff9fa5eeacb_source_k.png",
+      "english": "SELECT RACE",
+      "approved_korean": "레이스 선택",
+      "visually_observed_korean": "레이스 선택",
+      "source_dds_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+      "source_png_sha256": "b12ec074f995039df46f8d5cdff9f0f447ee3d549f8dce3af12422e818187615",
+      "candidate_png_sha256": "ea676ac1e1ccf72f4b61af4d5e7ff9e3a55887c2c7e32c6bb109118e7e5e6950",
+      "source_sent_sha_verified": true,
+      "candidate_export_sha_verified": true,
+      "source": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          1654,
+          256
+        ],
+        "alpha_bbox": [
+          21,
+          26,
+          1591,
+          231
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "candidate": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          136,
+          126,
+          2088,
+          667
+        ],
+        "border_alpha_gt8": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0
+        }
+      },
+      "producer_status_unchanged": "REWORK_DIMENSIONS",
+      "c1_status": "HOLD",
+      "reason": "한글 자소·번역 매핑은 육안 판독 범위에서 일치. 후보는 원본과 크기가 다르며 원본 HD UI 셀/UV 안전영역에 복귀 배치해 충돌·보호 아트 침범 여부를 검증하지 못해 보류.",
+      "text_length_difference_ignored": true,
+      "unwanted_background_or_english_residue": "NOT_VISIBLE_IN_REVIEW",
+      "native_ui_cell_collision": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
