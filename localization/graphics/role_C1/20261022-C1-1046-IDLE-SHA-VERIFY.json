@@ -1,0 +1,49 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1046KST-SHA-VERIFY",
+  "checked_at_kst": "2026-10-22T10:48:12.261260+09:00",
+  "role": "C1",
+  "mode": "independent_lightweight_qa_only",
+  "status": "IDLE",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_paths": {
+    "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+    "export_evidence": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-*.json",
+    "existing_c1_qa": "work/c1_batch_*/{report,metrics}.json",
+    "production_manifest": "work/image-src/text_roi_batches/production_manifest.json"
+  },
+  "execution_backend": "N100_MCP_sole_location_of_runtime_candidate_png",
+  "sha256_inventory": {
+    "candidate_png_files_by_role": {
+      "A": 139,
+      "B": 174
+    },
+    "unique_exported_candidate_sha": 313,
+    "already_reviewed_unique_sha": 318,
+    "new_unreviewed_unique_sha": 0,
+    "qa_report_files": 53,
+    "export_evidence_files": 66,
+    "exported_records": 313,
+    "sha_mismatch": 0,
+    "missing": 0,
+    "unexported_candidate_png": 0,
+    "qa_log_read_errors": 0
+  },
+  "quality_decisions": {
+    "new_pass": 0,
+    "new_fail": 0,
+    "new_hold": 0,
+    "same_sha_rereview": false
+  },
+  "constraints": {
+    "image_generation": false,
+    "producer_queue_consumption": false,
+    "dds_final_composition": false,
+    "c2_c3_ingame_pass": false,
+    "vr_ffb_dx11_dxvk_modified": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "competition_scoring": {
+    "reason": "No new unique candidate QA outcome; status verification is +0",
+    "delta": 0
+  }
+}
