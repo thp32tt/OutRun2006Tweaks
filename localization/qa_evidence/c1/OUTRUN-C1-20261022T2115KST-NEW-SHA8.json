@@ -1,0 +1,480 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T2115KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T21:19:36.835323+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "mode": "independent_lightweight_QA_only",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_selection": "Five newly completed B-0059 candidates and three A-0045-R1 candidates, unique SHA256, checked against 20:15 and 20:45 C1 SHA lists. Producer queues not consumed or modified.",
+  "summary": {
+    "reviewed": 8,
+    "source_sha_matches_manifest": 8,
+    "candidate_sha_matches_completion_and_export": 8,
+    "png_rgba": 8,
+    "approved_mapping_readable": 8,
+    "single_phrase_roi": 8,
+    "unwanted_frame_or_english_remnant": 0,
+    "generated_canvas_differs_from_original": 8,
+    "hold_native_ui_placement": 8,
+    "c1_final_pass": 0,
+    "c1_final_fail": 0,
+    "dds_generated": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "n100_metrics": "work/c1_20261022_2115/metrics.json",
+    "n100_contact_sheets": [
+      "work/c1_20261022_2115/compare_1.jpg",
+      "work/c1_20261022_2115/compare_2.jpg",
+      "work/c1_20261022_2115/compare_3.jpg",
+      "work/c1_20261022_2115/compare_4.jpg"
+    ],
+    "n100_local_completion": [
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-B-0059-CB6F5DCB.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0045-ADCD7793-R1.json"
+    ],
+    "remarks": "Eight actual source/candidate SHA-pinned checks and four independent visual comparisons. Generated canvas differs from native ROI in all eight; no deterministic source-coordinate proof; therefore HOLD and no official C1 PASS. Slight style/slant variance not a sole FAIL. No ImageGen, A/B queue mutation, new DDS, C2/C3/game signoff or deployment."
+  },
+  "records": [
+    {
+      "index": 1,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "source_file": "Q163_ae3bfa9b6542258f_source.png",
+      "candidate_file": "Q163_ae3bfa9b6542258f_source_k.png",
+      "english": "Industrial Complex",
+      "approved_korean": "인더스트리얼 컴플렉스",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1065,
+        505,
+        1146
+      ],
+      "source_sha256": "471348ebd714405c3c6af7b0959b744e9141a09d8aff77503d54572346649433",
+      "candidate_sha256": "4116e041233b30742fb81247035ea4a28d3a85ffb9b60d8e344e3cc8e1eea5b5",
+      "source_dimensions": [
+        1010,
+        162
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        45,
+        101,
+        2138,
+        563
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2115/compare_1.jpg",
+      "notes": "Independently compared English and Korean ROI at visual scale on checkerboard. Readable approved Korean, no observed clipped glyphs, unrelated frames, or English residual in the candidate. Output size differs from source, so no verified native coordinate fit/UI safe-area signoff; text being shorter does not imply FAIL."
+    },
+    {
+      "index": 2,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "source_file": "Q163_e3caf6e7a4db7ae6_source.png",
+      "candidate_file": "Q163_e3caf6e7a4db7ae6_source_k.png",
+      "english": "Floral Village",
+      "approved_korean": "플로럴 빌리지",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        681,
+        352,
+        763
+      ],
+      "source_sha256": "37bcfef91fbb27a1ac4000bd720b8e0ff90956483a925f996df73c1f3d1868c1",
+      "candidate_sha256": "16edd85b977b873217b46f82c63cf8550cdc30b87493f7d48166f6204fb366ad",
+      "source_dimensions": [
+        704,
+        164
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        33,
+        17,
+        2116,
+        611
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2115/compare_1.jpg",
+      "notes": "Independently compared English and Korean ROI at visual scale on checkerboard. Readable approved Korean, no observed clipped glyphs, unrelated frames, or English residual in the candidate. Output size differs from source, so no verified native coordinate fit/UI safe-area signoff; text being shorter does not imply FAIL."
+    },
+    {
+      "index": 3,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "source_file": "Q163_c50d03fd79443de4_source.png",
+      "candidate_file": "Q163_c50d03fd79443de4_source_k.png",
+      "english": "Metropolis",
+      "approved_korean": "메트로폴리스",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1368,
+        293,
+        1450
+      ],
+      "source_sha256": "b33b5f4663e99c2f8795fa104d0198749427131f722362f24606ff697034f0af",
+      "candidate_sha256": "da898da11e3f8d78d52952dbedfbfffe853f5c4e4e651ffa17d12828829b8792",
+      "source_dimensions": [
+        586,
+        164
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        43,
+        17,
+        2154,
+        684
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2115/compare_2.jpg",
+      "notes": "Independently compared English and Korean ROI at visual scale on checkerboard. Readable approved Korean, no observed clipped glyphs, unrelated frames, or English residual in the candidate. Output size differs from source, so no verified native coordinate fit/UI safe-area signoff; text being shorter does not imply FAIL."
+    },
+    {
+      "index": 4,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "source_file": "Q163_390660df779f3446_source.png",
+      "candidate_file": "Q163_390660df779f3446_source_k.png",
+      "english": "Waterfalls",
+      "approved_korean": "워터폴스",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1976,
+        287,
+        2048
+      ],
+      "source_sha256": "645f8c67b3ac4d46ee8f146be2704d1056f03bf5742701d3b59d3c66f7f6ee44",
+      "candidate_sha256": "e63e11491d16ec20b18fba1a42196c02ebf0ada7d2cb4b81663e14028bf2e2f3",
+      "source_dimensions": [
+        1148,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        201,
+        2,
+        1911,
+        668
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2115/compare_2.jpg",
+      "notes": "Independently compared English and Korean ROI at visual scale on checkerboard. Readable approved Korean, no observed clipped glyphs, unrelated frames, or English residual in the candidate. Output size differs from source, so no verified native coordinate fit/UI safe-area signoff; text being shorter does not imply FAIL."
+    },
+    {
+      "index": 5,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "source_file": "Q163_b8830c18229c838e_source.png",
+      "candidate_file": "Q163_b8830c18229c838e_source_k.png",
+      "english": "Jungle",
+      "approved_korean": "정글",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1138,
+        191,
+        1220
+      ],
+      "source_sha256": "29662851916690d8499da7a6d3e0fedd4b08a14c6717e957f7dcbc2821cff914",
+      "candidate_sha256": "d75de571f2e7b3fe48244663cb48de7d198662229193e97a58548dd719f6f50d",
+      "source_dimensions": [
+        382,
+        164
+      ],
+      "candidate_dimensions": [
+        1914,
+        822
+      ],
+      "candidate_alpha_bbox": [
+        210,
+        0,
+        1797,
+        758
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2115/compare_3.jpg",
+      "notes": "Independently compared English and Korean ROI at visual scale on checkerboard. Readable approved Korean, no observed clipped glyphs, unrelated frames, or English residual in the candidate. Output size differs from source, so no verified native coordinate fit/UI safe-area signoff; text being shorter does not imply FAIL."
+    },
+    {
+      "index": 6,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0045-ADCD7793-R1",
+      "source_file": "Q163_914fa94078cc01f5_source.png",
+      "candidate_file": "Q163_914fa94078cc01f5_source_k.png",
+      "english": "Castle Wall",
+      "approved_korean": "캐슬 월",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        228,
+        299,
+        300
+      ],
+      "source_sha256": "69b8c4920b1fa9ac17fa05a1336246c8785017878f1b3b33fe67e760799f019d",
+      "candidate_sha256": "b229e3d3729c7608ece9e38f6d2654c56864ca8183541ef029edf5078b359d04",
+      "source_dimensions": [
+        1196,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        258,
+        9,
+        1959,
+        650
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2115/compare_3.jpg",
+      "notes": "Independently compared English and Korean ROI at visual scale on checkerboard. Readable approved Korean, no observed clipped glyphs, unrelated frames, or English residual in the candidate. Output size differs from source, so no verified native coordinate fit/UI safe-area signoff; text being shorter does not imply FAIL."
+    },
+    {
+      "index": 7,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0045-ADCD7793-R1",
+      "source_file": "Q163_e08f1080f8c0cc78_source.png",
+      "candidate_file": "Q163_e08f1080f8c0cc78_source_k.png",
+      "english": "Snow Mountain",
+      "approved_korean": "스노 마운틴",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        1745,
+        418,
+        1817
+      ],
+      "source_sha256": "88c9628a00f1d10719ff2819383c083436ef1d0b31f09a9f9402ff025afeae66",
+      "candidate_sha256": "9526415f3d6851e4fd86ff10892c04c5f655b7190cca49ead51fe3e6a9a75a21",
+      "source_dimensions": [
+        1672,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        7,
+        2150,
+        660
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2115/compare_4.jpg",
+      "notes": "Independently compared English and Korean ROI at visual scale on checkerboard. Readable approved Korean, no observed clipped glyphs, unrelated frames, or English residual in the candidate. Output size differs from source, so no verified native coordinate fit/UI safe-area signoff; text being shorter does not imply FAIL."
+    },
+    {
+      "index": 8,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0045-ADCD7793-R1",
+      "source_file": "Q163_e58994a1ae262943_source.png",
+      "candidate_file": "Q163_e58994a1ae262943_source_k.png",
+      "english": "Coniferous Forest",
+      "approved_korean": "코니퍼러스 포레스트",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_bbox_xyxy": [
+        0,
+        452,
+        464,
+        524
+      ],
+      "source_sha256": "e3bddfc7fb6a9bd1f2196365fec97683a46b253558f79fdef8d0337f9b0affc4",
+      "candidate_sha256": "797dbf634be8321bd22ace216ac0bbe1394e368d8aa282413e426b57e46f4aa1",
+      "source_dimensions": [
+        1856,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        44,
+        85,
+        2134,
+        593
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_sha_verified": true,
+      "candidate_png_mode": "RGBA",
+      "candidate_format": "PNG",
+      "visual_source_single_phrase_roi": true,
+      "visual_korean_mapping_and_legibility": true,
+      "visual_no_unwanted_frame_or_english_remnant": true,
+      "canvas_matches_native_roi": false,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "source_safe_placement": "HOLD_NATIVE_SIZE_AND_UI_CELL",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "evidence_contact_sheet": "work/c1_20261022_2115/compare_4.jpg",
+      "notes": "Independently compared English and Korean ROI at visual scale on checkerboard. Readable approved Korean, no observed clipped glyphs, unrelated frames, or English residual in the candidate. Output size differs from source, so no verified native coordinate fit/UI safe-area signoff; text being shorter does not imply FAIL."
+    }
+  ]
+}
