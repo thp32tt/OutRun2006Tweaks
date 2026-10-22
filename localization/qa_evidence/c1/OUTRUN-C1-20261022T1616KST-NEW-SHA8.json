@@ -1,0 +1,948 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1616KST-NEW-SHA8",
+  "branch": "korean-localization-recovery-20260928",
+  "date_kst": "2026-10-22T16:19:33.670590+09:00",
+  "scope": "Independent C1 QA of 8 new candidate SHA256; no ImageGen, no A/B queue consumption",
+  "previously_reviewed_unique_candidate_shas": 375,
+  "exported_candidate_records": 398,
+  "pending_unique_at_inventory": 28,
+  "selected_count": 8,
+  "summary": {
+    "pass_png_text_only_pending_native_placement": 2,
+    "fail_source_roi_multi_label_composite": 6,
+    "png_rgba_and_source_candidate_sha_verified": 8,
+    "source_output_dimensions_differ": 8,
+    "meaningful_alpha_edge_clipping": 0,
+    "full_native_placement_approved": 0
+  },
+  "evidence_n100": [
+    "work/c1_20261022_1616_inventory_result.json",
+    "work/c1_20261022_1616_contact.jpg"
+  ],
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0033-CED46FBE",
+      "candidate_file": "Q161_c06f8ed4980fa2ef_source_k.png",
+      "candidate_sha256": "677bac8e27b8c344f17da4df3109b2f1cc83b4d56487d12d8335dfabf15e7a44",
+      "source_file": "Q161_c06f8ed4980fa2ef_source.png",
+      "source_sha256": "5251b1c25a967a57e14d6628788fb7418b8982b8fe0a3e6260ced5c3ffa2f595",
+      "manifest_english": "CHINA",
+      "approved_korean": "중국",
+      "source_output_sha_binding_pass": true,
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1210,
+          120
+        ],
+        "alpha_bbox": [
+          31,
+          5,
+          405,
+          117
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 26019,
+        "sha256": "5251b1c25a967a57e14d6628788fb7418b8982b8fe0a3e6260ced5c3ffa2f595"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          62,
+          85,
+          1321,
+          619
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 156398,
+        "sha256": "677bac8e27b8c344f17da4df3109b2f1cc83b4d56487d12d8335dfabf15e7a44"
+      },
+      "korean_text_visually_matches_mapping": true,
+      "source_roi_single_phrase": true,
+      "candidate_png_rgba": true,
+      "alpha_edge_critical_clipping": false,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "CHINA→중국. 단일 영문 ROI이며 한글 두 글자 판독 가능; 프레임/배경/오자/출력 경계 절단 없음. 캔버스 크기 변경으로 네이티브 배치 보류.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0033-CED46FBE",
+      "candidate_file": "Q161_c0a1f3822a379fc0_source_k.png",
+      "candidate_sha256": "e3dd8e07daaef08e9d35934e183d70940254c30daec4c8d4494585912f0a2360",
+      "source_file": "Q161_c0a1f3822a379fc0_source.png",
+      "source_sha256": "08642f93061644befd86930be8edf54516558311b99bff12369e7fddc3358392",
+      "manifest_english": "OTHER",
+      "approved_korean": "기타",
+      "source_output_sha_binding_pass": true,
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1092,
+          116
+        ],
+        "alpha_bbox": [
+          5,
+          3,
+          393,
+          114
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 20854,
+        "sha256": "08642f93061644befd86930be8edf54516558311b99bff12369e7fddc3358392"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          72,
+          200,
+          1981,
+          684
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 155954,
+        "sha256": "e3dd8e07daaef08e9d35934e183d70940254c30daec4c8d4494585912f0a2360"
+      },
+      "korean_text_visually_matches_mapping": true,
+      "source_roi_single_phrase": true,
+      "candidate_png_rgba": true,
+      "alpha_edge_critical_clipping": false,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "OTHER→기타. 단일 영문 ROI이며 출력 기울기·획·글자 식별 양호; 불필요한 도형 없음. 캔버스 크기 변경으로 배치 보류.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0033-CED46FBE",
+      "candidate_file": "Q051_61abf0cd9b10209a_source_k.png",
+      "candidate_sha256": "0dbfe67e00ec15690a62680128292adea4c0efe3df23f8c0670346cb6531acaa",
+      "source_file": "Q051_61abf0cd9b10209a_source.png",
+      "source_sha256": "2e5ae1dda5d268d36368108e88a21e92da280b3b38668a0dcfc7903a625a2f0c",
+      "manifest_english": "Lost City",
+      "approved_korean": "로스트 시티",
+      "source_output_sha_binding_pass": true,
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1260,
+          629
+        ],
+        "alpha_bbox": [
+          0,
+          15,
+          1260,
+          629
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 815,
+            "8": 814,
+            "32": 813,
+            "128": 809
+          },
+          "left": {
+            "1": 431,
+            "8": 416,
+            "32": 403,
+            "128": 370
+          },
+          "right": {
+            "1": 219,
+            "8": 219,
+            "32": 219,
+            "128": 217
+          }
+        },
+        "size_bytes": 212122,
+        "sha256": "2e5ae1dda5d268d36368108e88a21e92da280b3b38668a0dcfc7903a625a2f0c"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1774,
+          887
+        ],
+        "alpha_bbox": [
+          0,
+          160,
+          1750,
+          820
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 8,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 341926,
+        "sha256": "0dbfe67e00ec15690a62680128292adea4c0efe3df23f8c0670346cb6531acaa"
+      },
+      "korean_text_visually_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "candidate_png_rgba": true,
+      "alpha_edge_critical_clipping": false,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "Lost City 원본 ROI에 Time/Hearts/Score/여러 지명·아이콘이 동시 포함되어 단일 문구 ROI 조건 위반. 출력 '로스트 시티' 자체는 읽히지만 원본 provenance 단계에서 FAIL.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0033-CED46FBE",
+      "candidate_file": "Q051_3b76b083eacec5d1_source_k.png",
+      "candidate_sha256": "40ea029d2ad81aca8ad89b144719d41144ce9010dc182e577621e64f5a0bd761",
+      "source_file": "Q051_3b76b083eacec5d1_source.png",
+      "source_sha256": "cb25a3d072d47d2832c75c7ffb37b64f087bfb6a1a741d732a446b572bf64ffc",
+      "manifest_english": "Lap",
+      "approved_korean": "랩",
+      "source_output_sha_binding_pass": true,
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          777,
+          488
+        ],
+        "alpha_bbox": [
+          0,
+          22,
+          777,
+          488
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 606,
+            "8": 603,
+            "32": 600,
+            "128": 596
+          },
+          "left": {
+            "1": 189,
+            "8": 189,
+            "32": 140,
+            "128": 139
+          },
+          "right": {
+            "1": 119,
+            "8": 113,
+            "32": 113,
+            "128": 107
+          }
+        },
+        "size_bytes": 41777,
+        "sha256": "cb25a3d072d47d2832c75c7ffb37b64f087bfb6a1a741d732a446b572bf64ffc"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1536,
+          1024
+        ],
+        "alpha_bbox": [
+          375,
+          111,
+          1210,
+          904
+        ],
+        "alpha_extrema": [
+          0,
+          254
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 758702,
+        "sha256": "40ea029d2ad81aca8ad89b144719d41144ce9010dc182e577621e64f5a0bd761"
+      },
+      "korean_text_visually_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "candidate_png_rgba": true,
+      "alpha_edge_critical_clipping": false,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "Lap 원본 ROI에 타이머·라인·Goal·다른 글자/도형이 동시 포함됨. 출력 '랩'은 읽히지만 단일 영문 ROI 위반으로 FAIL.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "candidate_file": "Q053_0aa372dc301c2d95_source_k.png",
+      "candidate_sha256": "d7674de47f666d96688a5015955b97ea8f4f3330080ad62604c629b9ff13377c",
+      "source_file": "Q053_0aa372dc301c2d95_source.png",
+      "source_sha256": "3c93fba63b488f5d91a617a795f15236c5a8f1f63f19d6aaa3ac5ba3772a37eb",
+      "manifest_english": "See the sights!",
+      "approved_korean": "명소를 구경하세요!",
+      "source_output_sha_binding_pass": true,
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1178,
+          485
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1178,
+          475
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 773,
+            "8": 770,
+            "32": 764,
+            "128": 681
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 347,
+            "8": 318,
+            "32": 300,
+            "128": 265
+          },
+          "right": {
+            "1": 192,
+            "8": 190,
+            "32": 187,
+            "128": 181
+          }
+        },
+        "size_bytes": 248191,
+        "sha256": "3c93fba63b488f5d91a617a795f15236c5a8f1f63f19d6aaa3ac5ba3772a37eb"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1954,
+          805
+        ],
+        "alpha_bbox": [
+          89,
+          52,
+          1900,
+          756
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 655431,
+        "sha256": "d7674de47f666d96688a5015955b97ea8f4f3330080ad62604c629b9ff13377c"
+      },
+      "korean_text_visually_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "candidate_png_rgba": true,
+      "alpha_edge_critical_clipping": false,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "See the sights! 원본에 Hit the ducks!, 숫자, 아이콘 및 다른 글자가 함께 들어 있음. 한글은 판독 가능하지만 단일 원문 ROI 위반.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "candidate_file": "Q053_f49faacd5079ee02_source_k.png",
+      "candidate_sha256": "9769e3965e2f128b854d2f2968c02b732dfd76236b8f02138a6b6955ca55a986",
+      "source_file": "Q053_f49faacd5079ee02_source.png",
+      "source_sha256": "d3751afb02d554b73cbf6c5be630e111133edeac8850de949fd28357ad1799c5",
+      "manifest_english": "END",
+      "approved_korean": "종료",
+      "source_output_sha_binding_pass": true,
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2140,
+          1105
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          2140,
+          1105
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 1169,
+            "8": 1157,
+            "32": 1137,
+            "128": 937
+          },
+          "bottom": {
+            "1": 255,
+            "8": 255,
+            "32": 255,
+            "128": 253
+          },
+          "left": {
+            "1": 1105,
+            "8": 1105,
+            "32": 1105,
+            "128": 1105
+          },
+          "right": {
+            "1": 485,
+            "8": 481,
+            "32": 471,
+            "128": 446
+          }
+        },
+        "size_bytes": 658142,
+        "sha256": "d3751afb02d554b73cbf6c5be630e111133edeac8850de949fd28357ad1799c5"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1745,
+          901
+        ],
+        "alpha_bbox": [
+          191,
+          19,
+          1595,
+          901
+        ],
+        "alpha_extrema": [
+          0,
+          254
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 8,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 378397,
+        "sha256": "9769e3965e2f128b854d2f2968c02b732dfd76236b8f02138a6b6955ca55a986"
+      },
+      "korean_text_visually_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "candidate_png_rgba": true,
+      "alpha_edge_critical_clipping": false,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "END 원본에 QUESTION, 점수, 아이콘 등 복수 UI 문구·보호 아트가 혼입. 출력 '종료' 정확하나 source ROI 분리 실패.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "candidate_file": "Q054_0074f14b2888ca4a_source_k.png",
+      "candidate_sha256": "2fcd42b9313d6001223197c221c9712fdb305191b431efbe71b6424a00422e19",
+      "source_file": "Q054_0074f14b2888ca4a_source.png",
+      "source_sha256": "ca8d040ae710cfd28e8e36e40cdccfcbf5c17275fd1d11344474442346ea5509",
+      "manifest_english": "Honk the horn!",
+      "approved_korean": "경적을 울리세요!",
+      "source_output_sha_binding_pass": true,
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1192,
+          412
+        ],
+        "alpha_bbox": [
+          0,
+          35,
+          1192,
+          412
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 785,
+            "8": 785,
+            "32": 780,
+            "128": 766
+          },
+          "left": {
+            "1": 200,
+            "8": 200,
+            "32": 199,
+            "128": 198
+          },
+          "right": {
+            "1": 131,
+            "8": 130,
+            "32": 129,
+            "128": 121
+          }
+        },
+        "size_bytes": 253391,
+        "sha256": "ca8d040ae710cfd28e8e36e40cdccfcbf5c17275fd1d11344474442346ea5509"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2133,
+          737
+        ],
+        "alpha_bbox": [
+          187,
+          17,
+          2055,
+          625
+        ],
+        "alpha_extrema": [
+          0,
+          254
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 510497,
+        "sha256": "2fcd42b9313d6001223197c221c9712fdb305191b431efbe71b6424a00422e19"
+      },
+      "korean_text_visually_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "candidate_png_rgba": true,
+      "alpha_edge_critical_clipping": false,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "Honk the horn! 원본에 Hold the line!, 차/게임 패드 아이콘 등 혼입. 출력 '경적을 울리세요!' 정확하나 source ROI 분리 실패.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0046-F93DBD36",
+      "candidate_file": "Q054_e2cd7bfba6d55b27_source_k.png",
+      "candidate_sha256": "e4070cbd40e57b1cba7cf8ba302f87015b818e9604e7148ecfe461fccad57f18",
+      "source_file": "Q054_e2cd7bfba6d55b27_source.png",
+      "source_sha256": "5ff7806f3c12dee6950588e51204f00be67f0f29396b1b374a573e658b3a9bd5",
+      "manifest_english": "Run through green!",
+      "approved_korean": "초록색을 통과하세요!",
+      "source_output_sha_binding_pass": true,
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1133,
+          408
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1133,
+          408
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 8,
+            "8": 5,
+            "32": 3,
+            "128": 0
+          },
+          "bottom": {
+            "1": 505,
+            "8": 505,
+            "32": 488,
+            "128": 464
+          },
+          "left": {
+            "1": 170,
+            "8": 170,
+            "32": 166,
+            "128": 163
+          },
+          "right": {
+            "1": 88,
+            "8": 88,
+            "32": 88,
+            "128": 87
+          }
+        },
+        "size_bytes": 164159,
+        "sha256": "5ff7806f3c12dee6950588e51204f00be67f0f29396b1b374a573e658b3a9bd5"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2089,
+          753
+        ],
+        "alpha_bbox": [
+          33,
+          71,
+          2039,
+          713
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "size_bytes": 520912,
+        "sha256": "e4070cbd40e57b1cba7cf8ba302f87015b818e9604e7148ecfe461fccad57f18"
+      },
+      "korean_text_visually_matches_mapping": true,
+      "source_roi_single_phrase": false,
+      "candidate_png_rgba": true,
+      "alpha_edge_critical_clipping": false,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTI_LABEL_COMPOSITE",
+      "visual_reason": "Run through green! 원본에 Count Red Cars!, 다른 문구 및 아이콘 혼입. 출력 '초록색을 통과하세요!' 정확하나 source ROI 분리 실패.",
+      "source_output_same_dimensions": false,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    }
+  ],
+  "no_duplicates": true,
+  "image_generation_called": false,
+  "AB_queue_consumed": false,
+  "DDS_final_compose": false,
+  "C2_C3_ingame_pass": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "protected_projects_unchanged": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
