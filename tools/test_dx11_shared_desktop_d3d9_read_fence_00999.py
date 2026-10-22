@@ -40,6 +40,9 @@ def correct(s: str) -> bool:
         "Microsoft::WRL::ComPtr<IDirect3DQuery9> d3d9ReadFence_;",
         "bool d3d9ReadPending_ = false;",
     )) and (
+        # A generation switch adds an earlier FLUSH; the original steady
+        # consumer read must retain its OWN FLUSH before D3D11 reuse.
+        "D3DGETDATA_FLUSH" in part[fence:d3d11_copy] and
         part.find("d3d9ReadPending_ = false;", read) < d3d11_copy
     ) and (
         # The failure path must also issue a consumer fence after rollback.
