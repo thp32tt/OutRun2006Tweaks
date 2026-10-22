@@ -260,7 +260,8 @@ function Get-OutRunVRTestProfile {
                     '-DisableDesktopVsync=true',
                     '-DriverSeatView=true',
                     '-DriverSeatNativeMode=1',
-                    '-DriverSeatCarSpaceBasis=true',
+                    '-DriverSeatCarSpaceBasis=false',
+                    '-DriverSeatVehicleScale=1.0',
                     '-DriverSeatFullCar=true',
                     '-DriverSeatHideDriver=true'
                 ) + $visualSafeVr
