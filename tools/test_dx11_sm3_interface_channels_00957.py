@@ -21,7 +21,7 @@ for required in (
 ):
     assert required in backend, required
 assert "semantic.writeMask != D3DSP_WRITEMASK_ALL" not in backend
-assert "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V12" in backend
+assert "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V13" in backend
 assert "dx11_sm3_interface_channels_probe_00957.cpp" in workflow
 assert "test_dx11_sm3_interface_channels_00957.py" in workflow
 print("SM3 DCL vertex semantics, partial-lane read and write provenance wired; HMD UNTESTED")
