@@ -285,6 +285,10 @@ public:
         // Exact caller output state is restored before fence and D3D9Ex
         // Present, including early failures creating a resolve intermediate.
         {
+        // Native menu/car/race shaders may still sample the copy destination.
+        // Suspend only aliased VS/PS/GS/HS/DS/CS SRVs, leaving unrelated
+        // gameplay textures bound. OM/compute outputs are restored first.
+        ScopedNativeGameGpuTransferInputs shaderInputs(context, source_.Get());
         ScopedNativeGameGpuTransferOutputs scopedOutputs(context);
         ID3D11Texture2D* readySource = source;
         if (transfer == NativeSharedDesktopSourceTransfer::Resolve) {
@@ -358,6 +362,13 @@ public:
             return false;
         }
         pending_ = false;
+        // Copy/Resolve return void. A completed EVENT must not authorize
+        // importing pixels from a removed D3D11 producer into the original
+        // D3D9 game backbuffer; preserve game Present and input/FFB instead.
+        if (FAILED(device->GetDeviceRemovedReason())) {
+            faulted_ = true;
+            return false;
+        }
         Microsoft::WRL::ComPtr<IDirect3DSurface9> sharedSurface;
         if (FAILED(shared9_->GetSurfaceLevel(
                 0, sharedSurface.GetAddressOf())) || !sharedSurface)
