@@ -38,15 +38,24 @@ enum class LiveSm3Blend : std::uint8_t {
     std::uint32_t src, std::uint32_t dst) noexcept {
     return src == 12u ? 6u : src == 13u ? 5u : dst;
 }
+// Only a channel actually written by the game's RT0 mask can consume the
+// dynamic OM constant. Independent alpha is ignored for RGB-only Draws;
+// RGB factors are still the alpha factors when separate alpha is disabled.
 [[nodiscard]] constexpr bool live_sm3_needs_dynamic_blend_factor(
     bool enabled, std::uint32_t src, std::uint32_t dst, bool separateAlpha,
-    std::uint32_t alphaSrc, std::uint32_t alphaDst) noexcept {
+    std::uint32_t alphaSrc, std::uint32_t alphaDst,
+    std::uint32_t colorWriteMask = 0x0fu) noexcept {
     constexpr auto needs = [](std::uint32_t f) constexpr noexcept {
         return f == 14u || f == 15u;
     };
-    return enabled && (needs(src) ||
-        needs(live_sm3_effective_dest_factor(src, dst)) ||
-        (separateAlpha && (needs(alphaSrc) || needs(alphaDst))));
+    if (!enabled || (colorWriteMask & ~0x0fu) != 0u) return false;
+    const bool rgbNeeds = needs(src) ||
+        needs(live_sm3_effective_dest_factor(src, dst));
+    return (((colorWriteMask & 0x07u) != 0u) && rgbNeeds) ||
+        (((colorWriteMask & 0x08u) != 0u) &&
+         (separateAlpha
+              ? (needs(alphaSrc) || needs(alphaDst))
+              : rgbNeeds));
 }
 static_assert(live_sm3_effective_dest_factor(12u, 14u) == 6u &&
               live_sm3_effective_dest_factor(13u, 15u) == 5u &&
@@ -56,6 +65,17 @@ static_assert(!live_sm3_needs_dynamic_blend_factor(true, 12u, 14u, false, 0u, 0u
               live_sm3_needs_dynamic_blend_factor(true, 12u, 14u, true, 14u, 2u) &&
               live_sm3_needs_dynamic_blend_factor(true, 2u, 14u, false, 0u, 0u) &&
               !live_sm3_needs_dynamic_blend_factor(false, 14u, 15u, true, 14u, 15u));
+static_assert(!live_sm3_needs_dynamic_blend_factor(
+                  true, 2u, 2u, true, 14u, 15u, 0x07u) &&
+              live_sm3_needs_dynamic_blend_factor(
+                  true, 2u, 2u, true, 14u, 15u, 0x08u) &&
+              !live_sm3_needs_dynamic_blend_factor(
+                  true, 14u, 2u, true, 2u, 2u, 0x08u) &&
+              live_sm3_needs_dynamic_blend_factor(
+                  true, 14u, 2u, false, 2u, 2u, 0x08u) &&
+              !live_sm3_needs_dynamic_blend_factor(
+                  true, 14u, 15u, true, 14u, 15u, 0x00u),
+              "RT0 channel mask must gate actual dynamic blend dependencies");
 
 static_assert(live_sm3_blend(false, 0, 0, 0, false) ==
               LiveSm3Blend::disabled);
