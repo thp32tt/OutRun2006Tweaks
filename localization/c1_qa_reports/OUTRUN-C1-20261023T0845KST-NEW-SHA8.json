@@ -1,0 +1,571 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T0845KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T08:47:06.776935+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "prior_sha_history_count": 487,
+  "counts": {
+    "total": 8,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "source_and_sha_verification": {
+    "distinct_new_candidate_sha256": 8,
+    "source_manifest_match": 8,
+    "source_sent_match": 8,
+    "candidate_export_match": 8,
+    "RGBA_PNG": 8
+  },
+  "qa_comparison": {
+    "A": "N100:work/C1_QA_20261023_0845_A_pairs.jpg",
+    "B": "N100:work/C1_QA_20261023_0845_B_pairs.jpg",
+    "metrics": "N100:work/C1_QA_20261023_0845_metrics.json"
+  },
+  "review_scope": "N100 original and generated unapproved PNG; visual glyph+mapping only; no C2/C3/game/DDS/native UI cell proof",
+  "notes": [
+    "All candidate PNG alpha modes RGBA; alpha_edge_pixels threshold (>8) checked on original outermost rows/columns; does not certify protected source pixel isolation.",
+    "Producer pairing uses output-order evidence; independent visual text matching was performed against production manifest, but native UI cell placement remains unproven.",
+    "Korean text length/width reduction is never by itself a failure. Visible glyphs readable in static comparison.",
+    "HOLD is not approval. RUNTIME_VALIDATION=UNTESTED. No generation/queue consumption/DDS deploy."
+  ],
+  "reviews": [
+    {
+      "role": "A",
+      "batch": 44,
+      "task_id": "OUTRUN-ROI-A-0044-D66C018D-R1",
+      "source_ordinal": 214,
+      "source_file": "Q163_472431b63b268d17_source.png",
+      "candidate_file": "Q163_472431b63b268d17_source_k.png",
+      "english": "Ice Scape",
+      "approved_korean": "아이스스케이프",
+      "original_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_sha256": "9356388c6647633583d716455a45644ede818f6fb7db1c03ec984ec89eccf946",
+      "candidate_sha256": "f96fc505e2215e3ce1266fc22c27a3c764689ef11cc15de4224ecaf0cc69caad",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          538,
+          164
+        ],
+        "alpha_bbox": [
+          6,
+          19,
+          504,
+          145
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          62,
+          19,
+          2104,
+          581
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'아이스스케이프' 글리프·매핑 판독 가능. 생성물 원본보다 큰 별도 텍스트 레이어; native UI cell 조정·좌표 증빙 없음.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "batch": 43,
+      "task_id": "OUTRUN-ROI-A-0043-9AD57F60",
+      "source_ordinal": 213,
+      "source_file": "Q159_17fa7dfb066752db_source.png",
+      "candidate_file": "Q159_17fa7dfb066752db_source_k.png",
+      "english": "MILKY WAY",
+      "approved_korean": "밀키 웨이",
+      "original_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_sha256": "e91271b3a4c7f36c995378a170500a310ad8f59ad5b2dc403219f479dd936a17",
+      "candidate_sha256": "6b2fa86e0598ee1de833082c09f058444cbecc959e5c113420902a440932b63e",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          876,
+          168
+        ],
+        "alpha_bbox": [
+          9,
+          19,
+          841,
+          149
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2025,
+          777
+        ],
+        "alpha_bbox": [
+          0,
+          5,
+          1993,
+          678
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'밀키 웨이' 표기·띄어쓰기 확인. 외곽선과 내부 공간 판독 가능. ROI/native UI 안전영역 미검증.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "batch": 43,
+      "task_id": "OUTRUN-ROI-A-0043-9AD57F60",
+      "source_ordinal": 212,
+      "source_file": "Q159_a6f886d36ad0155d_source.png",
+      "candidate_file": "Q159_a6f886d36ad0155d_source_k.png",
+      "english": "SUNNY BEACH",
+      "approved_korean": "서니 비치",
+      "original_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_sha256": "93d63dbd0480f90b504d64ebb820d0bea7afe5d3c4ff1774f2c05ca88e595cd1",
+      "candidate_sha256": "285b1f28f137e39099a134b519b673934d969e24c21291b4545f947f7aaf4bc1",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1164,
+          166
+        ],
+        "alpha_bbox": [
+          39,
+          19,
+          1123,
+          157
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2048,
+          768
+        ],
+        "alpha_bbox": [
+          81,
+          79,
+          1884,
+          656
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'서니 비치' 자소·받침 확인. 가독성 양호. 큰 투명 텍스트 레이어 복원 전 안전영역 미검증.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "batch": 43,
+      "task_id": "OUTRUN-ROI-A-0043-9AD57F60",
+      "source_ordinal": 211,
+      "source_file": "Q159_3498574c6edbab95_source.png",
+      "candidate_file": "Q159_3498574c6edbab95_source_k.png",
+      "english": "FLORAL VILLAGE",
+      "approved_korean": "플로럴 빌리지",
+      "original_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_sha256": "41f9ef716412379b99bf4a15320d509ea7712aee04ad723e3befbab0a9f74bef",
+      "candidate_sha256": "f6653fa6e2a4c02221076830bddf2a3058615eb6dc94fff852d7d3e8dd6e7c9c",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1280,
+          174
+        ],
+        "alpha_bbox": [
+          5,
+          17,
+          1241,
+          155
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1983,
+          793
+        ],
+        "alpha_bbox": [
+          53,
+          99,
+          1884,
+          753
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'플로럴 빌리지' 글리프와 번역 확인. 구획 대비 후보 치수 불일치; cell 보호아트 검증 불가.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "batch": 57,
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_ordinal": 270,
+      "source_file": "Q147_a3d11ea18b6985f3_source.png",
+      "candidate_file": "Q147_a3d11ea18b6985f3_source_k.png",
+      "english": "CLOUDY HIGHLAND",
+      "approved_korean": "클라우디 하이랜드",
+      "original_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_sha256": "a74476204093f04c8a949f03aee6cd2b8b67baf886021c732eca7516771eed4b",
+      "candidate_sha256": "b5f83cf6d73521fff0b60e663425241d02117b93538b4a0d5debc6c64db6a092",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1394,
+          174
+        ],
+        "alpha_bbox": [
+          2,
+          17,
+          1355,
+          157
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          42,
+          51,
+          2133,
+          628
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'클라우디 하이랜드' 한글 자소/매핑 확인. 원본과 생성물 크기 달라 원래 UI 위치·영역 판단 보류.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "batch": 56,
+      "task_id": "OUTRUN-ROI-B-0056-49EF3F1B",
+      "source_ordinal": 269,
+      "source_file": "Q147_929182370cce50b0_source.png",
+      "candidate_file": "Q147_929182370cce50b0_source_k.png",
+      "english": "GHOST FOREST",
+      "approved_korean": "고스트 포레스트",
+      "original_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_sha256": "bcc59be24e2123e87f2c2ac146c693269659e33b1222d955ef43d2d13365f3a5",
+      "candidate_sha256": "04e42382633ea43d2030dcdb6cfccf2e4e6cd57ab39b2ea0aa24e9409058ce36",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1076,
+          172
+        ],
+        "alpha_bbox": [
+          17,
+          19,
+          1039,
+          153
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2059,
+          764
+        ],
+        "alpha_bbox": [
+          81,
+          72,
+          2027,
+          642
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'고스트 포레스트' 표기·가독성 확인. 경사형 효과 존재하나 실제 소스 UI 기울기/위계 및 안전영역 검증 전 보류.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "batch": 56,
+      "task_id": "OUTRUN-ROI-B-0056-49EF3F1B",
+      "source_ordinal": 268,
+      "source_file": "Q147_11745d63e0125933_source.png",
+      "candidate_file": "Q147_11745d63e0125933_source_k.png",
+      "english": "INDUSTRIAL COMPLEX",
+      "approved_korean": "인더스트리얼 컴플렉스",
+      "original_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_sha256": "0bc262d19c60554de25951e7a664bb9ab0bc66e743ce3acd68736b3676c1f104",
+      "candidate_sha256": "10827a7074c0398b1e51cc5e5af34eafeefbebfcebe07c2772a8e33af278590a",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1620,
+          170
+        ],
+        "alpha_bbox": [
+          11,
+          18,
+          1585,
+          153
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2072,
+          759
+        ],
+        "alpha_bbox": [
+          23,
+          47,
+          2052,
+          670
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'인더스트리얼 컴플렉스' 판독 가능. 기울기형 처리와 외곽선은 식별되나 native cell/보호영역 검증 불가.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "batch": 56,
+      "task_id": "OUTRUN-ROI-B-0056-49EF3F1B",
+      "source_ordinal": 267,
+      "source_file": "Q147_d247498948a01b43_source.png",
+      "candidate_file": "Q147_d247498948a01b43_source_k.png",
+      "english": "TULIP GARDEN",
+      "approved_korean": "튤립 가든",
+      "original_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_sha256": "ba05c0b1023d619c2eef069f6c4a8268be0804d6e9171f975acc2732db4dd554",
+      "candidate_sha256": "22867b636431ddebddb8cc89d3aef3ca61380c787eb38e40df9c11188f6a5b9f",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1046,
+          172
+        ],
+        "alpha_bbox": [
+          2,
+          18,
+          1008,
+          153
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1847,
+          851
+        ],
+        "alpha_bbox": [
+          0,
+          89,
+          1829,
+          741
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'튤립 가든' 표기·자소 확인. 생성물 전반 크기/외곽선 차이 있으며 원본 좌표 재배치 후 안정성 미검증.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    }
+  ]
+}
