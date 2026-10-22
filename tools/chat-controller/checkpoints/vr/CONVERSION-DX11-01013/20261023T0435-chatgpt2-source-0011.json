@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "post_rollover_material_development",
+  "recorded_context": "CONVERSION-DX11-01013-E004 rollover continuation; no ATTEMPT increment",
+  "task_id": "CONVERSION-DX11-01013",
+  "production_id": "CONVERSION-DX11-01013",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01013",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+  "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+  "feature_stage": "SOURCE_IMPLEMENTATION_IN_PROGRESS",
+  "feature_contract": {
+    "goal": "Real original game D3D9 Draw/DrawIndexed -> native D3D11 GPU Draw -> complete menu/vehicle/race full-resolution visible frame, distinct native stereo and validated safe fallback",
+    "acceptance_results": [
+      {
+        "id": "real_game_full_frame_draw",
+        "status": "INCOMPLETE",
+        "evidence": "No actual OutRun game launch matching feature SHA"
+      },
+      {
+        "id": "dx9ex_fallback_safety",
+        "status": "SOURCE_GUARDED_PENDING_HARDWARE",
+        "evidence": "Explicit opt-in and fail-closed original D3D9 render/input/FFB preserved"
+      },
+      {
+        "id": "native_frame_exact_sha_gates",
+        "status": "IN_PROGRESS",
+        "evidence": "Latest 5 Actions triggered on exact source SHA"
+      }
+    ]
+  },
+  "target_branch": "vr-dx11-native-r71",
+  "target_sha_at_recovery": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "feature_last_head": "b3b1839f9025eb044771149a08f8c7f01a9c7641",
+  "material_source_sha": "492f279a013d40918692ea7b35865cd4683ea75c",
+  "same_task_ci_repairs": [
+    "bc9463320b9e12a6b8b4b99f859d21f4380d3098",
+    "b3b1839f9025eb044771149a08f8c7f01a9c7641"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_composite.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_sm3_effective_blend_01013.cpp",
+    "tools/test_dx11_live_sm3_blend_factor_00966.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "source_change": "Live D3D9 SM3 BOTH* blending now normalizes effective destination factor consistently for native D3D11 OM and source game BLENDFACTOR query; preserve separate alpha dynamic factor dependency.",
+  "ci": {
+    "source_sha": "b3b1839f9025eb044771149a08f8c7f01a9c7641",
+    "state": "PENDING_EXACT_SHA_RESULTS",
+    "fast_run_id": 39841244881,
+    "backend_run_id": 39841245035,
+    "build_run_id": 39841245109,
+    "hud_run_id": 39841244900,
+    "openxr_run_id": 39841244874,
+    "prior_ci_failure": {
+      "source_sha": "bc9463320b9e12a6b8b4b99f859d21f4380d3098",
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 39840727136,
+      "reason": "Python regression NameError: desc referenced before definition; corrected in latest same-TASK_ID CI repair"
+    }
+  },
+  "compare": {
+    "ahead_by": 19,
+    "behind_by": 0,
+    "checked_against": "vr-dx11-native-r71"
+  },
+  "remaining_acceptance_items": [
+    "Confirm latest exact-SHA 5 mandatory Actions and artifact bundles; repair actual failures on this TASK_ID",
+    "Capture live source rejection stage/eligible_state_draws/native_draws/published complete full-resolution frames in one actual game launch, source SHA matched",
+    "Fix authentic Draw/DrawIndexed shader/resource/frame-publication gap identified in game evidence, not a synthetic GPU probe",
+    "Observe menu to vehicle selection to sustained race source-ordinal coverage, preserving fail-closed DX9Ex/input/FFB",
+    "Integrate distinct real native left/right D3D11 game views with OpenXR handoff fence, source generation and ACK",
+    "Quest3/VDXR native stereo gameplay visual and input/hardware validation (UNTESTED)",
+    "Only after full feature contract and exact-SHA gates: GitHub compare behind=0 and safe expected_sha force=false target promotion"
+  ],
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "First inspect failing latest CI if any and repair only causal failure. Otherwise obtain real game runtime counters liveSm3RejectStages and source ordinal/issued/visible native frame counters with opt-in, fix first evidenced Draw->native full frame blocker. Do not rework completed R175/00477 owner. Do not promote or declare FEATURE_READY based on portable GPU probes alone.",
+  "runtime_validation": "UNTESTED",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "feature_ready": false,
+  "target_promoted": false,
+  "score_change": 0,
+  "status": "IN_PROGRESS"
+}
