@@ -1,0 +1,598 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1216KST-NEW-BATCH-B-SHA8",
+  "prior_reviewed_sha": 318,
+  "total_unreviewed_before": 10,
+  "count": 8,
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0038-2AEF9941",
+      "ordinal": 175,
+      "candidate_file": "Q051_d72cf690999e697d_source_k.png",
+      "source_file": "Q051_d72cf690999e697d_source.png",
+      "candidate_sha256": "940783f9c0b524feaaa36150f11810b948e6ad276675b9bc9b3775bd7be8cb2d",
+      "source_sha256": "3a72e5ffa2579d64755795ba13eacae1b5a922093e677b7f77792c72bd40a243",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Lap Time",
+      "approved_korean": "랩 타임",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        1032,
+        246
+      ],
+      "dimensions": [
+        2180,
+        721
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        251,
+        67,
+        1821,
+        701
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘랩 타임’ 표기와 승인 매핑 일치, 두 음절·받침과 황색 이탤릭 획이 식별됨. 출력에 영문 잔상·UI 프레임이 보이지 않음.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1216/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0038-2AEF9941",
+      "ordinal": 176,
+      "candidate_file": "Q051_7b24e891599aae3f_source_k.png",
+      "source_file": "Q051_7b24e891599aae3f_source.png",
+      "candidate_sha256": "4ad7bcfde604b40f750951262580011670b47447fcd7f0591aa9de1049bf6968",
+      "source_sha256": "41b56e28f7d2f58e1d0f7d4b8d3837c1fb62f35ac9f287782e2f2904be574f48",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "ACCOUNT NAME:",
+      "approved_korean": "계정 이름:",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        1828,
+        280
+      ],
+      "dimensions": [
+        2149,
+        731
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        38,
+        92,
+        1470,
+        601
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘계정 이름:’ 표기와 승인 매핑 일치, 각 받침과 콜론이 명료함. 문자만 존재하고 원본 영어 잔상 없음.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1216/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0038-2AEF9941",
+      "ordinal": 177,
+      "candidate_file": "Q051_432c5c0c016ce3cb_source_k.png",
+      "source_file": "Q051_432c5c0c016ce3cb_source.png",
+      "candidate_sha256": "a2d93a05970b68d7a02c879275c36eacb73d32086e7e261b4ce888bdf9ab9bc8",
+      "source_sha256": "296820097a5a83599ea67a35a585bb26af821f43b3d786fde9fa27f87256dfd4",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "DON'T SIGN-IN",
+      "approved_korean": "로그인 안 함",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        1828,
+        308
+      ],
+      "dimensions": [
+        2168,
+        725
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        29,
+        54,
+        1478,
+        626
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘로그인 안 함’ 표기와 승인 매핑 일치, 음절·조사 및 받침 가독성 양호. 영어/별도 테두리 박스 미발견.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1216/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0038-2AEF9941",
+      "ordinal": 178,
+      "candidate_file": "Q051_e7b2239e5e609ef0_source_k.png",
+      "source_file": "Q051_e7b2239e5e609ef0_source.png",
+      "candidate_sha256": "46a0d9455d3153556d42f4c8b95e2a6482e496c8bb9b3a10a58100b739096de1",
+      "source_sha256": "2c6cea9c42fc5ff7578bd887d932b38709d9cb48f5fd4d6f215d65342a185da0",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "GOOD ATTITUDE",
+      "approved_korean": "좋은 태도",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        1204,
+        138
+      ],
+      "dimensions": [
+        2063,
+        762
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        178,
+        98,
+        1251,
+        606
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘좋은 태도’ 표기와 승인 매핑 일치, 획·내부 공간과 받침 가독성 양호. 다른 UI 아트가 결과 내 보이지 않음.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1216/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0038-2AEF9941",
+      "ordinal": 179,
+      "candidate_file": "Q051_8c7e0d3b87bc8a0b_source_k.png",
+      "source_file": "Q051_8c7e0d3b87bc8a0b_source.png",
+      "candidate_sha256": "b85f86db4e32d97a1f3f80d6d7a03e592a69767d182c9c71a6bf1c28eb1ab9af",
+      "source_sha256": "4daefff771cf265d74c8478786b838aadefdbf7ebee666d78c639ce5b66570a0",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "ACCOUNTS:",
+      "approved_korean": "계정:",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        1608,
+        260
+      ],
+      "dimensions": [
+        2180,
+        721
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        41,
+        244,
+        828,
+        602
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘계정:’ 표기와 승인 매핑 일치, 짧은 문구를 영문 폭에 억지로 맞추지 않았으며 가독성 양호.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1216/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0039-CC3FE18A",
+      "ordinal": 180,
+      "candidate_file": "Q051_d101fcb97f3d640e_source_k.png",
+      "source_file": "Q051_d101fcb97f3d640e_source.png",
+      "candidate_sha256": "9d6b241f2915a173b6d01faf722f0488e40c83e097d282a68cca5b3ca39b30ce",
+      "source_sha256": "53d4c7f4a505f39b30fc38952d11d913ed82f0986f967ccc698afaa2a109e9b1",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "CURSING OR LEWDNESS",
+      "approved_korean": "욕설 또는 음란 표현",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        1322,
+        148
+      ],
+      "dimensions": [
+        2170,
+        725
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        27,
+        69,
+        2148,
+        669
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘욕설 또는 음란 표현’ 표기와 승인 매핑 일치, 음절·받침 전체 식별 가능, 문구 양 끝 프레임/잘림 없음.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1216/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0039-CC3FE18A",
+      "ordinal": 181,
+      "candidate_file": "Q051_600f745bebc803a5_source_k.png",
+      "source_file": "Q051_600f745bebc803a5_source.png",
+      "candidate_sha256": "b90f71ed55565f1bd907cbe1bb3b8e70181d5200a00936e3c616aa01270d7553",
+      "source_sha256": "643fbb722ede849333123d49a0002044a20067c95ed327ee59ac6fffc9a1cf02",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "THREATS OR HARASSMENT",
+      "approved_korean": "협박 또는 괴롭힘",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        1400,
+        156
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        79,
+        71,
+        2102,
+        648
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘협박 또는 괴롭힘’ 표기와 승인 매핑 일치, 음절·받침 식별 가능, 출력 PNG 영역에서 글자 효과 잘림 미발견.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1216/compare_4.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0039-CC3FE18A",
+      "ordinal": 182,
+      "candidate_file": "Q051_7c2e96e66b11229c_source_k.png",
+      "source_file": "Q051_7c2e96e66b11229c_source.png",
+      "candidate_sha256": "7a4e06eb07e476cc1f265d9f17647ac91605fd816ca2735c8f121992dee7292b",
+      "source_sha256": "baa22dc44558d2f878063c919e7b7a4896b18697d57ad5887d443d3b564d6d74",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "LOGIN:",
+      "approved_korean": "로그인:",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        1080,
+        232
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        148,
+        41,
+        1917,
+        644
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘로그인:’ 표기와 승인 매핑 일치, 받침과 콜론 명료, 영문/비문자 아트가 보이지 않음.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1216/compare_4.jpg"
+    }
+  ],
+  "qa_date_kst": "2026-10-22 12:20 KST",
+  "qa_scope": "C1_INDEPENDENT_LOCAL_PNG_TEXT_ONLY",
+  "summary": {
+    "new_sha_reviewed": 8,
+    "visual_text_only_pass": 8,
+    "visual_text_only_fail": 0,
+    "unreviewed_at_snapshot_before": 10,
+    "unreviewed_at_snapshot_after": 2,
+    "export_source_sha_verified": 8,
+    "rgba_png_verified": 8,
+    "edge_alpha_nonzero_count": 0,
+    "producer_dimension_rework_preserved": 8,
+    "source_bbox_placement_tested": false,
+    "source_alpha_placement_tested": false,
+    "final_dds_approved": false,
+    "c2_c3_game_approved": false,
+    "runtime_validation": "UNTESTED",
+    "production_queue_modified": false,
+    "imagegen_invoked": false,
+    "branch": "korean-localization-recovery-20260928",
+    "caution": "PASS_PNG_TEXT_ONLY does NOT override REWORK_DIMENSIONS; source canvas sizes differ and native UI-cell fit, safe-area, protected art, DDS and ingame are not approved. The remaining 2 new SHA from snapshot were not inspected in this C1 batch."
+  }
+}
