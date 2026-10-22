@@ -395,7 +395,8 @@ class VRV2DX9ExTests(unittest.TestCase):
             'save_queue_state': lambda q: saved_states.append(q['active_by_lane']['A'].copy()),
             'write_runtime': lambda **kw: None,
             'datetime': datetime, 'TZ': ZoneInfo('Asia/Seoul'),
-            'VR_CHECKPOINT_ENABLED': True, 'BrowserContext': object,
+            'VR_CHECKPOINT_ENABLED': True, 'VR_SCHEDULED_DISPATCH_ENABLED': False,
+            'BrowserContext': object,
         }
         exec(compile(ast.Module(body=[node], type_ignores=[]), '<hard-ceiling>', 'exec'), env)
         a = {'task_id': 'CONVERSION-DX11-00478', 'attempt': 1, 'phase': 'WAIT_CHAT',

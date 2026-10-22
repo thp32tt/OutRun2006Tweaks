@@ -14,7 +14,7 @@ def due(enabled=True):
     tree = ast.parse(SOURCE)
     fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
               and n.name == "vr_scheduled_dispatch_due")
-    ns = {"VR_SCHEDULED_DISPATCH_ENABLED": enabled, "SCHEDULE_MINUTES": [0, 20, 40]}
+    ns = {"VR_SCHEDULED_DISPATCH_ENABLED": enabled, "SCHEDULE_MINUTES": [0, 20, 40], "datetime": datetime}
     exec(compile(ast.Module(body=[fn], type_ignores=[]), "<schedule>", "exec"), ns)
     return ns["vr_scheduled_dispatch_due"]
 

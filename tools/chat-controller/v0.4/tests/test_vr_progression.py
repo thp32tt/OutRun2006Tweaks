@@ -23,7 +23,7 @@ def functions():
     tree.body = [ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0)] + [
         x for x in tree.body if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef)) and (x.name.startswith(('vr_', 'github_feature_', 'conversion_')) or x.name in {'refresh_wait_actions_task_binding', '_parse_iso', 'finalize_dx9ex_review_only_result'})]
     ns = dict(re=re, json=json, datetime=datetime, TZ=timezone.utc, base64=base64, urllib=urllib,
-              DX9EX_REVIEW_ONLY=False)
+              DX9EX_REVIEW_ONLY=False, VR_SCHEDULED_DISPATCH_ENABLED=False)
     exec(compile(ast.fix_missing_locations(tree), '<controller>', 'exec'), ns)
     return ns
 
