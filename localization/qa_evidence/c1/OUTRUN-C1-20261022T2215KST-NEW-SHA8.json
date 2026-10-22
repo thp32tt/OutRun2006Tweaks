@@ -1,0 +1,481 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T2215KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T22:20:22.447283+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "mode": "independent_lightweight_qa_only",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "selection": "B-0061 first 5 + A-0047 first 3 saved PNG. Unique output SHA within batch, no overlap with previous 21:45 B-0060/A-0046 evidence.",
+  "summary": {
+    "reviewed": 8,
+    "unique_candidate_sha": 8,
+    "source_sha_verified": 8,
+    "candidate_sha_verified": 8,
+    "export_sha_verified": 8,
+    "rgba_png": 8,
+    "visually_mapping_legible": 8,
+    "no_visible_english_residue_or_overlay_frame": 8,
+    "matched_native_canvas": 0,
+    "safe_placement_holds": 8,
+    "c1_final_pass": 0,
+    "c1_final_fail": 0,
+    "new_dds": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "game_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "metrics": "work/c1_20261022_2215/metrics.json",
+    "contact_sheets": [
+      "work/c1_20261022_2215/compare_1.jpg",
+      "work/c1_20261022_2215/compare_2.jpg",
+      "work/c1_20261022_2215/compare_3.jpg",
+      "work/c1_20261022_2215/compare_4.jpg"
+    ],
+    "local_completion": [
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-B-0061-CF3C01DE.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0047-CB45FED2.json"
+    ]
+  },
+  "records": [
+    {
+      "index": 1,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "source_file": "Q188_90461d9c57f8e527_source.png",
+      "candidate_file": "Q188_90461d9c57f8e527_source_k.png",
+      "english": "Drive against the Ghost Cars and go for the course records!",
+      "approved_korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+      "source_dds_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "source_bbox_xyxy": [
+        0,
+        1891,
+        1736,
+        1980
+      ],
+      "source_sha256": "e1b108e2e7b975b4ad087d6ca28b075dde2128a16d0521c87ce2e531d8df444e",
+      "candidate_sha256": "a6b12149e9f796dd57bc777d6f7461066a30919d511c2511af72e9d5874c6758",
+      "source_dimensions": [
+        1736,
+        89
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        29,
+        69,
+        2149,
+        698
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2215/compare_1.jpg",
+      "visual_notes": "단일 행의 회색 평면 영문 → 빨간 기울임 2행 한글로 변형. 승인 번역·획 판독은 가능하나 행 재배치·색상·안전영역을 별도 합성 검증해야 함."
+    },
+    {
+      "index": 2,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "source_file": "Q205_fd37c94b1d0ba52a_source.png",
+      "candidate_file": "Q205_fd37c94b1d0ba52a_source_k.png",
+      "english": "LOCAL MIXED",
+      "approved_korean": "로컬 혼합",
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "source_bbox_xyxy": [
+        0,
+        285,
+        345,
+        349
+      ],
+      "source_sha256": "06b48d63e43e0278c4dc445c83139ee10d6f366aa1b7c62453b6e4d74faec057",
+      "candidate_sha256": "68c44e39815e652d8962dab41dfd956e6ec48c394db1ba7c5c83a29bbc74b6b7",
+      "source_dimensions": [
+        1380,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        114,
+        8,
+        2084,
+        674
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2215/compare_1.jpg",
+      "visual_notes": "로컬 혼합 정확·판독 가능. 배경 없는 글자/효과만 보임. 원본 좌표 환원 미검증."
+    },
+    {
+      "index": 3,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "source_file": "Q205_3d441997a445bf84_source.png",
+      "candidate_file": "Q205_3d441997a445bf84_source_k.png",
+      "english": "LOCAL MIXED",
+      "approved_korean": "로컬 혼합",
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "source_bbox_xyxy": [
+        0,
+        285,
+        345,
+        349
+      ],
+      "source_sha256": "06b48d63e43e0278c4dc445c83139ee10d6f366aa1b7c62453b6e4d74faec057",
+      "candidate_sha256": "e091f386b26f71d67278c79a9d1e5eae5a507a4aeb6163def24f716666f9aa48",
+      "source_dimensions": [
+        1380,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        232,
+        103,
+        1845,
+        690
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2215/compare_2.jpg",
+      "visual_notes": "로컬 혼합 정확·판독 가능. 동일 문구이지만 별개 source DDS/후보 SHA. 안전영역 미검증."
+    },
+    {
+      "index": 4,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "source_file": "Q147_950cead26227b48b_source.png",
+      "candidate_file": "Q147_950cead26227b48b_source_k.png",
+      "english": "ALPINE",
+      "approved_korean": "알파인",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_bbox_xyxy": [
+        0,
+        81,
+        473,
+        370
+      ],
+      "source_sha256": "2fc4d21c7b3e66d9035ecd0e295456db78ae0064c965898a1f9486e6b8c5c7c0",
+      "candidate_sha256": "9e59cd3699de5626d2ab0ea51a40277fa319972a3d9ca37b0da7ae1984be6556",
+      "source_dimensions": [
+        473,
+        289
+      ],
+      "candidate_dimensions": [
+        1604,
+        980
+      ],
+      "candidate_alpha_bbox": [
+        76,
+        103,
+        1560,
+        908
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2215/compare_2.jpg",
+      "visual_notes": "알파인 정확·판독 가능. 원본 ROI에 별도 CAPE WAY 문구와 가로선도 포함됨. 다른 보호 텍스트/아트의 비침범 여부 합성 검증 필요."
+    },
+    {
+      "index": 5,
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "source_file": "Q154_e8a897312260427b_source.png",
+      "candidate_file": "Q154_e8a897312260427b_source_k.png",
+      "english": "CREATE NEW LICENSE",
+      "approved_korean": "새 라이선스 만들기",
+      "source_dds_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "source_bbox_xyxy": [
+        0,
+        290,
+        2396,
+        953
+      ],
+      "source_sha256": "15d162dd7a9635e563830343631b3f41fe9dc336f62a0385d1623096d51d36b1",
+      "candidate_sha256": "43174ad2a5caacf901c428ddc71de70367b7c203ab4f0f7393b18b672ed333db",
+      "source_dimensions": [
+        2396,
+        663
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        50,
+        9,
+        2122,
+        696
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2215/compare_3.jpg",
+      "visual_notes": "새 라이선스 만들기 정확·판독 가능. 원본 ROI에 여러 영문 메뉴 문구와 차량 이미지가 혼재하여 개별 텍스트 대상 안전영역 확인 불가."
+    },
+    {
+      "index": 6,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0047-CB45FED2",
+      "source_file": "Q201_f8bf2aedd605e317_source.png",
+      "candidate_file": "Q201_f8bf2aedd605e317_source_k.png",
+      "english": "CLOUDY HIGHLAND",
+      "approved_korean": "클라우디 하이랜드",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "source_bbox_xyxy": [
+        0,
+        1114,
+        1081,
+        1237
+      ],
+      "source_sha256": "314b3d17ed89322cbb7f57ee912ab34706f84a0244d4f81937abe98e8a848f73",
+      "candidate_sha256": "8e6787d0ebf1c21d897c3958ee421e7200486b45b01ccb9f6374af7607651abb",
+      "source_dimensions": [
+        1081,
+        123
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        49,
+        55,
+        2122,
+        622
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2215/compare_3.jpg",
+      "visual_notes": "클라우디 하이랜드 정확·획 판독 가능. 원본 단일 행 대비 생성물 크기·스타일 변동, 배치 미검증."
+    },
+    {
+      "index": 7,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0047-CB45FED2",
+      "source_file": "Q205_ce38edd320033b27_source.png",
+      "candidate_file": "Q205_ce38edd320033b27_source_k.png",
+      "english": "LOCAL MIXED",
+      "approved_korean": "로컬 혼합",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "source_bbox_xyxy": [
+        0,
+        285,
+        345,
+        349
+      ],
+      "source_sha256": "e17ce13ae763d0ecc7c8d524a8b1b606b8ca83fb97f5507b3b4ed48c03e1ec73",
+      "candidate_sha256": "a007ff6e7e76f61eb5d8902e9b15fd78dd3ace229e400f43bb775180c2f1fa32",
+      "source_dimensions": [
+        1380,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        130,
+        21,
+        2037,
+        638
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2215/compare_4.jpg",
+      "visual_notes": "로컬 혼합 정확·판독 가능. 생성 PNG가 원본보다 큼. 안전영역 미검증."
+    },
+    {
+      "index": 8,
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0047-CB45FED2",
+      "source_file": "Q205_046fcc0daca43f81_source.png",
+      "candidate_file": "Q205_046fcc0daca43f81_source_k.png",
+      "english": "LOCAL MIXED",
+      "approved_korean": "로컬 혼합",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "source_bbox_xyxy": [
+        0,
+        285,
+        345,
+        349
+      ],
+      "source_sha256": "06b48d63e43e0278c4dc445c83139ee10d6f366aa1b7c62453b6e4d74faec057",
+      "candidate_sha256": "46006a904e67faca68dd4db3d3e93f0b9eda07f362fe26ea6f1ec5bec5d79ac2",
+      "source_dimensions": [
+        1380,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        218,
+        17,
+        1852,
+        690
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "candidate_sha_verified": true,
+      "export_sha_verified": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "canvas_matches_native_roi": false,
+      "visual_translation_legible": true,
+      "visual_english_residual_or_frame_detected": false,
+      "per_glyph_size_and_readability": "PASS_STATIC_PREVIEW",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNVERIFIED_DIFFERENT_CANVAS",
+      "native_safe_placement": "HOLD_NO_NATIVE_UI_COMPOSITION_PROOF",
+      "c1_final_status": "HOLD_SAFE_PLACEMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "contact_sheet": "work/c1_20261022_2215/compare_4.jpg",
+      "visual_notes": "로컬 혼합 정확·판독 가능. 다른 task의 같은 영문 source pixels이지만 출력 SHA는 독립. 안전영역 미검증."
+    }
+  ]
+}
