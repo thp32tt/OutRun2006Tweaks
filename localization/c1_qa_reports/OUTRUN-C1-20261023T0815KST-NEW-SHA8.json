@@ -1,0 +1,570 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T0815KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T08:17:38.290644+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "prior_sha_history_count": 479,
+  "counts": {
+    "total": 8,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "source_and_sha_verification": {
+    "distinct_new_candidate_sha256": 8,
+    "source_manifest_match": 8,
+    "source_sent_match": 8,
+    "candidate_export_match": 8,
+    "RGBA_PNG": 8
+  },
+  "qa_comparison": {
+    "A": "N100:work/C1_QA_20261023_0815_A_pairs.jpg",
+    "B": "N100:work/C1_QA_20261023_0815_B_pairs.jpg",
+    "metrics": "N100:work/C1_QA_20261023_0815_metrics.json"
+  },
+  "review_scope": "A/B unapproved candidate PNG only; static independent visual inspection of N100 comparison sheets; no DDS, UI-cell compose or game validation",
+  "reviews": [
+    {
+      "role": "A",
+      "batch": 44,
+      "task_id": "OUTRUN-ROI-A-0044-D66C018D-R1",
+      "source_ordinal": 218,
+      "source_file": "Q163_43e0a9554a851699_source.png",
+      "candidate_file": "Q163_43e0a9554a851699_source_k.png",
+      "english": "Legend",
+      "approved_korean": "레전드",
+      "original_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_sha256": "f1168ce887b33dfcd7d8072a77f35d99444a216bf99e68e3d03023020cb66e04",
+      "candidate_sha256": "bf15a81090ba49b4e7b58b630cefb8ba3c8b4ab93b82e4eb667d5faa02872e31",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          414,
+          164
+        ],
+        "alpha_bbox": [
+          7,
+          19,
+          381,
+          145
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          81,
+          6,
+          1810,
+          684
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "레전드 표기·자소 판독 가능. 원본 414×164 대비 후보 2172×724; 실제 UI 셀 좌표/축소/보호영역 검증 전 HOLD.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "batch": 44,
+      "task_id": "OUTRUN-ROI-A-0044-D66C018D-R1",
+      "source_ordinal": 217,
+      "source_file": "Q163_df45be057de595e6_source.png",
+      "candidate_file": "Q163_df45be057de595e6_source_k.png",
+      "english": "Milky Way",
+      "approved_korean": "밀키 웨이",
+      "original_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_sha256": "f9c6639ac3e6755759a91c083be45162a654aa7b66ae06daba30f7a045670ea6",
+      "candidate_sha256": "9d0d3d0f4c20c5308de52f658f19267ecfcd6a5928c07a752b801a4c639c1206",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          574,
+          164
+        ],
+        "alpha_bbox": [
+          7,
+          19,
+          541,
+          145
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2007,
+          784
+        ],
+        "alpha_bbox": [
+          117,
+          91,
+          1946,
+          760
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "밀키 웨이 표기 정상, 후보 하단 효과 포함. 원본 574×164 대비 후보 2007×784; 원래 셀 안전영역 미검증 HOLD.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "batch": 44,
+      "task_id": "OUTRUN-ROI-A-0044-D66C018D-R1",
+      "source_ordinal": 216,
+      "source_file": "Q163_16cd04ef2c1f2106_source.png",
+      "candidate_file": "Q163_16cd04ef2c1f2106_source_k.png",
+      "english": "Tulip Garden",
+      "approved_korean": "튤립 가든",
+      "original_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_sha256": "52c84e4026e55a747d893d081360716c2e05b9f227bdb944a3e70263f5bc8b8e",
+      "candidate_sha256": "499e15b7d940cec28e5432fbb5238130cee65901041a5ee631d3170f94dd47e9",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          686,
+          164
+        ],
+        "alpha_bbox": [
+          6,
+          19,
+          652,
+          145
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          150,
+          39,
+          1984,
+          611
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "튤립 가든 표기 정상, 글자 가독성 충분. 원본 686×164 대비 후보 2172×724 및 스타일 차이; 원래 셀 적용 결과 미확인 HOLD.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "batch": 44,
+      "task_id": "OUTRUN-ROI-A-0044-D66C018D-R1",
+      "source_ordinal": 215,
+      "source_file": "Q163_c3976cc81f3d362b_source.png",
+      "candidate_file": "Q163_c3976cc81f3d362b_source_k.png",
+      "english": "Sunny Beach",
+      "approved_korean": "서니 비치",
+      "original_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_sha256": "8905ac8225c8c57b5fe369805915b4667922b3f8f3b5e17c891e9ae1c9f531b7",
+      "candidate_sha256": "f46c85df58657fb9491ea010ca82ce16a7cf9053c134ad662b1deae88ed8dc09",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          712,
+          164
+        ],
+        "alpha_bbox": [
+          2,
+          19,
+          677,
+          145
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2170,
+          725
+        ],
+        "alpha_bbox": [
+          227,
+          44,
+          1987,
+          578
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "서니 비치 표기 정상. 원본 712×164 대비 후보 2170×725; 원래 UI 셀 복귀/보호 영역 미검증 HOLD.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "batch": 57,
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_ordinal": 274,
+      "source_file": "Q163_ff950df7f6bfd086_source.png",
+      "candidate_file": "Q163_ff950df7f6bfd086_source_k.png",
+      "english": "Imperial Avenue",
+      "approved_korean": "임페리얼 애비뉴",
+      "original_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_sha256": "566ac2c50a4f55abc4c746b35003e6684222386e8107df9f3e4a4cdc1855ba7a",
+      "candidate_sha256": "3bc69b9670e92551b555681d4987ceac9804eef0929f5e6ea1793d03911ef324",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          876,
+          164
+        ],
+        "alpha_bbox": [
+          6,
+          19,
+          842,
+          145
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          22,
+          2126,
+          668
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "임페리얼 애비뉴 매핑·자소 정상. 원본 876×164 대비 후보 2172×724; 안전영역 미검증 HOLD.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "batch": 57,
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_ordinal": 273,
+      "source_file": "Q159_b660ad663d40011f_source.png",
+      "candidate_file": "Q159_b660ad663d40011f_source_k.png",
+      "english": "CANYON",
+      "approved_korean": "캐니언",
+      "original_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_sha256": "9db5a23f7eb72f11768723733d51e4713207bd875f5545930cc8b0d97833c9d9",
+      "candidate_sha256": "2f71ec9d9ff94962ceb66509d23f2cb1cfd1fe03f0f8c075125d97ae3ef234c8",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          638,
+          174
+        ],
+        "alpha_bbox": [
+          7,
+          17,
+          600,
+          155
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          406,
+          54,
+          1772,
+          682
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "캐니언 표기 정상, 한글 짧음은 결함 아님. 원본 638×174 대비 후보 2172×724; 보호 아트 간섭 미검증 HOLD.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "batch": 57,
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_ordinal": 272,
+      "source_file": "Q159_b8b786b1a621508b_source.png",
+      "candidate_file": "Q159_b8b786b1a621508b_source_k.png",
+      "english": "LEGEND",
+      "approved_korean": "레전드",
+      "original_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_sha256": "42517bcd840b9af6b5696262af88d45503285a14d4382a08689864502d3e8b62",
+      "candidate_sha256": "97c85f8abbed489cea4ba07608c782cdfcd95b6ad18702beaaf713c6216c28f4",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          634,
+          174
+        ],
+        "alpha_bbox": [
+          5,
+          17,
+          597,
+          155
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          272,
+          25,
+          1893,
+          644
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "레전드 표기 정상. 원본 634×174 대비 후보 2172×724; 원본 셀 경계 및 효과 크기 복귀 미검증 HOLD.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "batch": 57,
+      "task_id": "OUTRUN-ROI-B-0057-4DD889F4",
+      "source_ordinal": 271,
+      "source_file": "Q154_063fc310b20287c3_source.png",
+      "candidate_file": "Q154_063fc310b20287c3_source_k.png",
+      "english": "MULTIPLAYER",
+      "approved_korean": "멀티플레이",
+      "original_dds_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "source_sha256": "0184977d93cb0370f312c013b11649214953457896a8e2a9f6b55346b4403476",
+      "candidate_sha256": "5c5de0aead9bed2d16576200359ae0dcaa70806f61930b79d0b9c50152f80373",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1285,
+          190
+        ],
+        "alpha_bbox": [
+          15,
+          23,
+          1235,
+          167
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          2156,
+          667
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_AND_HIGHLIGHT_COLOR_UNVERIFIED",
+      "C1_observation": "멀티플레이 표기 정상이나 영문 원본의 강조 빨간색이 후보에서는 어두운 금속색으로 바뀜. 원본 1285×190 대비 후보 2172×724; 강조 의미·보호 픽셀·UI 셀 검증 전 HOLD.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    }
+  ],
+  "imagegen_invoked": false,
+  "ab_queue_consumed": false,
+  "dds_written": false,
+  "c2_c3_pass_claimed": false,
+  "runtime_validation": "UNTESTED",
+  "deployed": false,
+  "excluded_scopes": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "score_dedup": "ONE_NEW_RUN_KEY_NO_RETRY_OR_SAME_SHA_CREDIT"
+}
