@@ -9,6 +9,7 @@ on:
       - feature/dx11-00970-live-game-rt-frame
       - feature/dx11-00973-live-cube-rt-game-frame
       - feature/dx11-00974-live-cube-color-frame
+      - feature/dx11-01011-gate-repair-20261022
       - feature/dx11-00975-live-sm3-volume-frame
     paths:
       - 'src/vr/d3d11/**'
