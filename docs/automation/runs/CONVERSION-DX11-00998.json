@@ -60,7 +60,8 @@
         "behavior_area": "Win32_WARP_copy_and_full_required_gate",
         "expected_behavior": "WARP proves changed destination color and restored shader inputs/outputs with source negative regression and five mandatory exact-SHA Actions passes."
       }
-    ]
+    ],
+    "goal": "Preserve native D3D11 gameplay shader resource aliases across real D3D9 post-draw GPU surface copy while maintaining complete MRT/UAV output state and untouched original input/fallback."
   },
   "acceptance_results": {
     "native_shader_input_alias_restore": {
@@ -119,5 +120,37 @@
       "sha": "8ae4b79b60e3bea0185dcafea658a99055ce0a0c"
     }
   },
-  "next_implementation_action": "Continue native menu->car->race source frames, game-authored VS/PS Draw/DrawIndexed and GPU OpenXR eye transport; obtain separate matching in-game/Quest3 evidence before gameplay promotion."
+  "next_implementation_action": "Continue native menu->car->race source frames, game-authored VS/PS Draw/DrawIndexed and GPU OpenXR eye transport; obtain separate matching in-game/Quest3 evidence before gameplay promotion.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Intercept original game D3D9 UpdateSurface and StretchRect after Draw into native full-resolution game frame",
+      "Detach only aliased VS/PS/GS/HS/DS/CS SRVs and preserve all MRT and PS/CS UAV bindings while writing native GPU color",
+      "Restore complete shader-input and output state before later game Draw/DrawIndexed and guarded frame publication"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "Real native game D3D11 GPU copy destination shader-input owner preservation in live_game_frame_bridge and native_game_gpu_output_preserve",
+      "Win32 WARP GPU-pixel SRV/MRT/UAV preservation test and Python postdraw source-negative regression",
+      "Causal build repair at exact validated 8ae4b79b for probe-local name collisions without altering required checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact 8ae4b79b isolated WARP readback verifies green destination, red copied tile and preserved aliasing SRV/restored MRT/PS and CS UAVs.",
+      "negative_regression": "Native shader input aliases detach only on destination match; unrelated SRVs and failed D3D9 copy preserve original DX9Ex game Present, input and FFB.",
+      "component_integration": "R30 intercepted D3D9 surface postpass -> live_game_frame_bridge staging -> scoped shader input and OM/UAV preservation -> D3D11 native color CopySubresourceRegion -> subsequent guarded Draw."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SURFACE_COPY_SHADER_INPUT_BINDING_CONTINUITY",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED. Exact SHA 8ae4b79b has 5/5 required GitHub Actions PASS; no real menu/car/race or Quest3 game evidence.",
+    "activation_guard_and_fallback": "Only opt-in and proven D3D9 copy to owned complete native color; device loss or unsupported source abort native publication, original D3D9 input, FFB, SkyGlow and fallback unchanged."
+  }
 }
