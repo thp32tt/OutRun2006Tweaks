@@ -1,0 +1,35 @@
+{
+  "schema": "c1_independent_qa_idle_v1",
+  "run_key": "OUTRUN-C1-20261022T1145KST-SHA-VERIFY",
+  "checked_at_kst": "2026-10-22T11:47:18.485379+09:00",
+  "status": "IDLE",
+  "producer_roles": [
+    "A",
+    "B"
+  ],
+  "evidence_source": "N100 /home/chatgpt-runner2/work/c1_20261022_1145_inventory_result.json",
+  "counts": {
+    "A_candidate_png_files": 139,
+    "B_candidate_png_files": 174,
+    "export_evidence_files": 66,
+    "exported_candidate_records": 313,
+    "unique_actual_candidate_sha": 313,
+    "historical_reviewed_sha": 318,
+    "new_unreviewed_unique_sha": 0,
+    "sha_mismatch": 0,
+    "missing_files": 0,
+    "unexported_candidate_png": 0,
+    "qa_log_parse_errors": 0
+  },
+  "qa_actions": {
+    "new_pass": 0,
+    "new_fail": 0,
+    "repeated_sha_qa": 0,
+    "imagegen_calls": 0,
+    "queue_consumption": 0,
+    "dds_deployment": 0,
+    "game_pass": 0
+  },
+  "runtime_validation": "UNTESTED",
+  "notes": "No new A/B output SHA remains to review. Existing QA statuses unchanged. No C2/C3 approval or in-game pass claimed."
+}
