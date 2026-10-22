@@ -107,10 +107,10 @@ jobs:
           if($bytes.Length -lt 1000000 -or $bytes[0] -ne 0x4d -or $bytes[1] -ne 0x5a){throw 'invalid game DLL'}
           $ascii=[Text.Encoding]::ASCII.GetString($bytes)
           if(!$ascii.Contains('VR R26+HUD SAFE TEST:')){throw 'R26+HUD marker missing'}
-          $host='build-general/host/bin/outrun-vr-host.exe'
-          if(!(Test-Path $host)){throw 'OpenXR host missing'}
+          $hostExe='build-general/host/bin/outrun-vr-host.exe'
+          if(!(Test-Path $hostExe)){throw 'OpenXR host missing'}
           Copy-Item $dll.FullName (Join-Path $backend 'dinput8.dll')
-          Copy-Item $host (Join-Path $backend 'outrun-vr-host.exe')
+          Copy-Item $hostExe (Join-Path $backend 'outrun-vr-host.exe')
           Copy-Item OutRun2006Tweaks.ini $pkg
           Copy-Item OutRun2006Tweaks.lods.ini $pkg
           foreach($f in @(
