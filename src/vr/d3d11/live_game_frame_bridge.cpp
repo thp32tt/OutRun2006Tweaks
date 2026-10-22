@@ -278,7 +278,14 @@ static_assert(sm3_live_blend_factor_rgba(0xff000000u)[0] == 0.0f &&
               "Live game D3D9 blend factor ARGB -> native OM RGBA regression");
 constexpr bool sm3_live_factor(DWORD f, bool alpha, bool independent,
                               D3D11_BLEND& out) noexcept {
+    // A separate-alpha D3D9 blend factor consumes the alpha component
+    // of SRCCOLOR/DESTCOLOR, not their RGB channels. D3D11 does not
+    // allow *_COLOR in the independent alpha factors, but its *_ALPHA
+    // factors encode these four exact aliases. Keep SRCALPHASAT/BOTH*
+    // rejected for unsupported independent alpha encodings.
     if (independent && f != D3DBLEND_ZERO && f != D3DBLEND_ONE &&
+        f != D3DBLEND_SRCCOLOR && f != D3DBLEND_INVSRCCOLOR &&
+        f != D3DBLEND_DESTCOLOR && f != D3DBLEND_INVDESTCOLOR &&
         f != D3DBLEND_SRCALPHA && f != D3DBLEND_INVSRCALPHA &&
         f != D3DBLEND_DESTALPHA && f != D3DBLEND_INVDESTALPHA &&
         !sm3_live_uses_blend_factor(f)) return false;
@@ -519,6 +526,44 @@ constexpr bool sm3_live_masked_blend_regression() noexcept {
 }
 static_assert(sm3_live_masked_blend_regression(),
               "Live D3D9 SM3 RGB/alpha write masks must map to exact D3D11 OM");
+
+// A shader-bound live game Draw can use COLOR factors in independent
+// alpha render states. Their alpha channels are identical to *_ALPHA,
+// and they must be accepted even when stale RGB factors are unsupported.
+// Conversely, unknown or SRCALPHASAT independent alpha remains rejected.
+constexpr bool sm3_live_independent_alpha_color_alias_regression() noexcept {
+    D3D11_RENDER_TARGET_BLEND_DESC b{};
+    if (!sm3_live_masked_blend_desc(
+            true, 0x08u, 0xdeadbeefu, 0xdeadbeefu, 0xdeadbeefu,
+            true, D3DBLEND_SRCCOLOR, D3DBLEND_INVDESTCOLOR,
+            D3DBLENDOP_ADD, b) ||
+        b.SrcBlendAlpha != D3D11_BLEND_SRC_ALPHA ||
+        b.DestBlendAlpha != D3D11_BLEND_INV_DEST_ALPHA ||
+        b.RenderTargetWriteMask != 0x08u)
+        return false;
+    if (!sm3_live_masked_blend_desc(
+            true, 0x0fu, D3DBLEND_ONE, D3DBLEND_ZERO, D3DBLENDOP_ADD,
+            true, D3DBLEND_DESTCOLOR, D3DBLEND_INVSRCCOLOR,
+            D3DBLENDOP_SUBTRACT, b) ||
+        b.SrcBlendAlpha != D3D11_BLEND_DEST_ALPHA ||
+        b.DestBlendAlpha != D3D11_BLEND_INV_SRC_ALPHA ||
+        b.BlendOpAlpha != D3D11_BLEND_OP_SUBTRACT)
+        return false;
+    const auto known = b;
+    return !sm3_live_masked_blend_desc(
+                true, 0x08u, D3DBLEND_ONE, D3DBLEND_ZERO,
+                D3DBLENDOP_ADD, true, D3DBLEND_SRCALPHASAT,
+                D3DBLEND_ONE, D3DBLENDOP_ADD, b) &&
+           !sm3_live_masked_blend_desc(
+                true, 0x08u, D3DBLEND_ONE, D3DBLEND_ZERO,
+                D3DBLENDOP_ADD, true, 0xdeadbeefu,
+                D3DBLEND_ONE, D3DBLENDOP_ADD, b) &&
+           b.SrcBlendAlpha == known.SrcBlendAlpha &&
+           b.DestBlendAlpha == known.DestBlendAlpha &&
+           b.BlendOpAlpha == known.BlendOpAlpha;
+}
+static_assert(sm3_live_independent_alpha_color_alias_regression(),
+              "Real game SM3 independent alpha COLOR aliases/fallback");
 
 constexpr bool sm3_live_blend_regression() noexcept {
     D3D11_RENDER_TARGET_BLEND_DESC b{};
