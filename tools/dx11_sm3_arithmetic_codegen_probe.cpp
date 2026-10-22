@@ -46,11 +46,11 @@ int main() {
     assert(emit(NativeSm3ArithmeticOpcode::Sign, 15u, 3u));
     assert(emit(NativeSm3ArithmeticOpcode::DerivativeX, 3u, 1u));
     assert(emit(NativeSm3ArithmeticOpcode::DerivativeY, 12u, 1u));
-    assert(out.find("ddx(input.r0.xyzw)") != std::string::npos);
+    assert(out.find("ddx((input.r0.xyzw).x)") != std::string::npos);
     assert(out.find("cos(((input.r0.xyzw).x))") != std::string::npos);
     assert(out.find("sin(((input.r0.xyzw).x))") != std::string::npos);
     assert(out.find("sign(input.r0.xyzw)") != std::string::npos);
-    assert(out.find("ddy(input.r0.xyzw)") != std::string::npos);
+    assert(out.find("ddy((input.r0.xyzw).z)") != std::string::npos);
     assert(out.find("rsqrt(abs(") != std::string::npos);
     assert(out.find("exp2(") != std::string::npos);
     assert(out.find("log2(abs(") != std::string::npos);
@@ -66,7 +66,7 @@ int main() {
     assert(out.find("dot((input.r0.xyzw).xyzw, (r283_t0.yxwz).xyzw)") !=
            std::string::npos);
     assert(out.find("abs(input.r0.xyzw)") != std::string::npos);
-    assert(out.find("frac(input.r0.xyzw)") != std::string::npos);
+    assert(out.find("frac((input.r0.xyzw).x)") != std::string::npos);
     assert(out.find("(input.r0.xyzw).x < (r283_t0.yxwz).x ? 1.0f : 0.0f") != std::string::npos);
     assert(out.find("(input.r0.xyzw).x >= (r283_t0.yxwz).x ? 1.0f : 0.0f") != std::string::npos);
     assert(out.find("(input.r0.xyzw).x >= 0.0f ? (r283_t0.yxwz).x : (-(input.r1.xyzw)).x") != std::string::npos);

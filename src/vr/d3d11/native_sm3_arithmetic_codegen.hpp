@@ -145,11 +145,27 @@ inline bool append_native_sm3_arithmetic(
             if (sources[i].empty()) return false;
         return true;
     };
+    // D3D9 masks read only the destination's live vector lanes for
+    // component-wise operations. Do not generate HLSL reads of unwritten
+    // TEMP channels simply because an intermediate is a float4.
+    const auto emitMaskedLanes = [&](const auto& scalar) {
+        std::string value = "float4(";
+        for (unsigned lane = 0u; lane < 4u; ++lane) {
+            if (lane) value += ", ";
+            value += (mask & (1u << lane)) != 0u
+                ? scalar("xyzw"[lane]) : "0.0f";
+        }
+        return value + ")";
+    };
     std::string expression;
     switch (opcode) {
     case NativeSm3ArithmeticOpcode::Move:
         if (!validSources(1u)) return false;
-        expression = sources[0]; break;
+        expression = mask == 15u ? sources[0] :
+            emitMaskedLanes([&](char lane) {
+                return "(" + sources[0] + ")." + std::string(1, lane);
+            });
+        break;
     case NativeSm3ArithmeticOpcode::Reciprocal:
     case NativeSm3ArithmeticOpcode::ReciprocalSquareRoot:
     case NativeSm3ArithmeticOpcode::Exponential2:
@@ -177,19 +193,39 @@ inline bool append_native_sm3_arithmetic(
     case NativeSm3ArithmeticOpcode::DerivativeX:
     case NativeSm3ArithmeticOpcode::DerivativeY:
         if (!validSources(1u)) return false;
-        expression = std::string(
+        const char* operation =
             opcode == NativeSm3ArithmeticOpcode::Absolute ? "abs(" :
             opcode == NativeSm3ArithmeticOpcode::Fraction ? "frac(" :
-            opcode == NativeSm3ArithmeticOpcode::DerivativeX ? "ddx(" : "ddy(") +
-            sources[0] + ")"; break;
+            opcode == NativeSm3ArithmeticOpcode::DerivativeX ? "ddx(" : "ddy(";
+        expression = mask == 15u
+            ? std::string(operation) + sources[0] + ")"
+            : emitMaskedLanes([&](char lane) {
+                return std::string(operation) + "(" + sources[0] +
+                    ")." + std::string(1, lane) + ")";
+            });
+        break;
     case NativeSm3ArithmeticOpcode::Add:
     case NativeSm3ArithmeticOpcode::Subtract:
     case NativeSm3ArithmeticOpcode::Multiply:
     case NativeSm3ArithmeticOpcode::Minimum:
     case NativeSm3ArithmeticOpcode::Maximum:
         if (!validSources(2u)) return false;
-        if (opcode == NativeSm3ArithmeticOpcode::Minimum ||
-            opcode == NativeSm3ArithmeticOpcode::Maximum)
+        if (mask != 15u) {
+            expression = emitMaskedLanes([&](char lane) {
+                const auto a = "(" + sources[0] + ")." + std::string(1, lane);
+                const auto b = "(" + sources[1] + ")." + std::string(1, lane);
+                if (opcode == NativeSm3ArithmeticOpcode::Minimum ||
+                    opcode == NativeSm3ArithmeticOpcode::Maximum)
+                    return std::string(
+                        opcode == NativeSm3ArithmeticOpcode::Minimum ? "min(" : "max(") +
+                        a + ", " + b + ")";
+                const char* operation =
+                    opcode == NativeSm3ArithmeticOpcode::Add ? " + " :
+                    opcode == NativeSm3ArithmeticOpcode::Subtract ? " - " : " * ";
+                return "(" + a + operation + b + ")";
+            });
+        } else if (opcode == NativeSm3ArithmeticOpcode::Minimum ||
+                   opcode == NativeSm3ArithmeticOpcode::Maximum)
             expression = std::string(
                 opcode == NativeSm3ArithmeticOpcode::Minimum ? "min(" : "max(") +
                 sources[0] + ", " + sources[1] + ")";
@@ -202,14 +238,27 @@ inline bool append_native_sm3_arithmetic(
         break;
     case NativeSm3ArithmeticOpcode::MultiplyAdd:
         if (!validSources(3u)) return false;
-        expression = "((" + sources[0] + " * " + sources[1] +
-                     ") + " + sources[2] + ")";
+        expression = mask == 15u
+            ? "((" + sources[0] + " * " + sources[1] + ") + " + sources[2] + ")"
+            : emitMaskedLanes([&](char lane) {
+                const auto c = std::string(1, lane);
+                return "(((" + sources[0] + ")." + c + " * (" +
+                    sources[1] + ")." + c + ") + (" + sources[2] +
+                    ")." + c + ")";
+            });
         break;
     case NativeSm3ArithmeticOpcode::LinearInterpolate:
         if (!validSources(3u)) return false;
-        expression = "((" + sources[0] + " * " + sources[1] +
-                     ") + ((1.0f - (" + sources[0] + ")) * " +
-                     sources[2] + "))";
+        expression = mask == 15u
+            ? "((" + sources[0] + " * " + sources[1] +
+                  ") + ((1.0f - (" + sources[0] + ")) * " + sources[2] + "))"
+            : emitMaskedLanes([&](char lane) {
+                const auto c = std::string(1, lane);
+                const auto a = "(" + sources[0] + ")." + c;
+                return "((" + a + " * (" + sources[1] + ")." + c +
+                    ") + ((1.0f - " + a + ") * (" +
+                    sources[2] + ")." + c + "))";
+            });
         break;
     case NativeSm3ArithmeticOpcode::Power: {
         if (!validSources(2u)) return false;
@@ -244,7 +293,11 @@ inline bool append_native_sm3_arithmetic(
     case NativeSm3ArithmeticOpcode::Sign:
         // SGN's two additional operands are TEMP scratch outputs.
         if (!validSources(3u)) return false;
-        expression = "sign(" + sources[0] + ")";
+        expression = mask == 15u ? "sign(" + sources[0] + ")" :
+            emitMaskedLanes([&](char lane) {
+                return "sign((" + sources[0] + ")." +
+                    std::string(1, lane) + ")";
+            });
         break;
     case NativeSm3ArithmeticOpcode::Lighting: {
         if (!validSources(1u)) return false;
@@ -280,6 +333,10 @@ inline bool append_native_sm3_arithmetic(
         constexpr char lanes[] = "xyzw";
         for (unsigned lane = 0; lane < 4u; ++lane) {
             if (lane) expression += ", ";
+            if ((mask & (1u << lane)) == 0u) {
+                expression += "0.0f";
+                continue;
+            }
             const char component = lanes[lane];
             expression += "((" + sources[0] + ")." + component +
                 (opcode == NativeSm3ArithmeticOpcode::SetLessThan
@@ -295,6 +352,10 @@ inline bool append_native_sm3_arithmetic(
         constexpr char lanes[] = "xyzw";
         for (unsigned lane = 0; lane < 4u; ++lane) {
             if (lane) expression += ", ";
+            if ((mask & (1u << lane)) == 0u) {
+                expression += "0.0f";
+                continue;
+            }
             const char component = lanes[lane];
             expression += "((" + sources[0] + ")." + component +
                 " >= 0.0f ? (" + sources[1] + ")." + component +
