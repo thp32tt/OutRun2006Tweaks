@@ -89,6 +89,16 @@ for token in (
     "sm3_live_factor(rgbDst, false",
 ):
     require(token, desc)
+# Independent-alpha COLOR factors are legal game states: the alpha
+# channel of SRCCOLOR/DESTCOLOR maps to D3D11 SRC_ALPHA/DEST_ALPHA.
+# Rejecting the valid aliases would poison an otherwise eligible menu Draw.
+require("f != D3DBLEND_SRCCOLOR && f != D3DBLEND_INVSRCCOLOR", factor)
+require("f != D3DBLEND_DESTCOLOR && f != D3DBLEND_INVDESTCOLOR", factor)
+require("static_assert(sm3_live_independent_alpha_color_alias_regression()", src)
+require("true, 0x08u, 0xdeadbeefu, 0xdeadbeefu, 0xdeadbeefu", src)
+require("true, D3DBLEND_SRCCOLOR, D3DBLEND_INVDESTCOLOR", src)
+require("true, D3DBLEND_DESTCOLOR, D3DBLEND_INVSRCCOLOR", src)
+require("D3DBLEND_SRCALPHASAT,", src)
 require("static_assert(sm3_live_legacy_source_blend_regression()", src)
 require("D3DBLEND_BOTHINVSRCALPHA, D3DBLEND_ZERO, D3DBLENDOP_ADD", src)
 require("b.BlendOpAlpha != D3D11_BLEND_OP_MAX", src)
