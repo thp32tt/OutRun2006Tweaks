@@ -8,10 +8,10 @@ using namespace outrun::vr::dx11;
 int main() {
     const std::array<std::string, 3> sources{
         "r283_t0.xyzw", "r283_t1.xyzw", "r283_t2.xyzw"};
-    const auto emit = [&](NativeSm3ArithmeticOpcode opcode, unsigned mask, unsigned count) {
+    const auto emit = [&](NativeSm3ArithmeticOpcode opcode, unsigned mask, unsigned count, bool vertexStage = true) {
         std::string out;
         const bool admitted = append_native_sm3_arithmetic(
-            out, opcode, "r283_color", mask, sources, count, 19u);
+            out, opcode, "r283_color", mask, sources, count, 19u, vertexStage);
         assert(admitted);
         assert(out.find("r283_color.") != std::string::npos);
         return out;
@@ -33,7 +33,7 @@ int main() {
     const auto minval = emit(NativeSm3ArithmeticOpcode::Minimum, 1u, 2u);
     assert(minval.find("min((r283_t0.xyzw).x, (r283_t1.xyzw).x)") != std::string::npos);
     assert(minval.find("(r283_t0.xyzw).y") == std::string::npos);
-    const auto ddx = emit(NativeSm3ArithmeticOpcode::DerivativeX, 2u, 1u);
+    const auto ddx = emit(NativeSm3ArithmeticOpcode::DerivativeX, 2u, 1u, false);
     assert(ddx.find("ddx((r283_t0.xyzw).y)") != std::string::npos);
     assert(ddx.find("ddx((r283_t0.xyzw).x)") == std::string::npos);
     const auto lrp = emit(NativeSm3ArithmeticOpcode::LinearInterpolate, 4u, 3u);
@@ -48,6 +48,6 @@ int main() {
     assert(dp3.find("dot((r283_t0.xyzw).xyz") != std::string::npos);
     std::string invalid = "untouched";
     assert(!append_native_sm3_arithmetic(invalid, NativeSm3ArithmeticOpcode::Move,
-                                          "r283_color", 0u, sources, 1u, 19u));
+                                          "r283_color", 0u, sources, 1u, 19u, true));
     assert(invalid == "untouched");
 }

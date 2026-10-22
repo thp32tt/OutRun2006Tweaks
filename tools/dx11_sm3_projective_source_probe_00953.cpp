@@ -24,7 +24,7 @@ int main() {
     std::string shader;
     assert(append_native_sm3_arithmetic(
         shader, NativeSm3ArithmeticOpcode::Multiply, "r283_t0", 0x03u,
-        std::array<std::string, 3>{dz, dw, {}}, 2u, 0u));
+        std::array<std::string, 3>{dz, dw, {}}, 2u, 0u, true));
     assert(shader.find("r283_t0.xy =") != std::string::npos);
     assert(shader.find(".zzzz") != std::string::npos);
     assert(shader.find(".wwww") != std::string::npos);
