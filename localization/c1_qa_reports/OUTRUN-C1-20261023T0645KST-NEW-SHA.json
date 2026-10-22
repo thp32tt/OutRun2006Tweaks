@@ -1,0 +1,359 @@
+{
+  "schema": "outrun-c1-independent-light-qa-v1",
+  "run_key": "OUTRUN-C1-20261023T0645KST-NEW-SHA",
+  "qa_at_kst": "2026-10-23T06:47:34.102500+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "INDEPENDENT_STATIC_C1_ONLY_NO_DDS_APPROVAL",
+  "source": "N100 A/B source PNG production manifest, sent receipts, export evidence, candidate outputs and visual comparison sheets",
+  "prior_sha_history_count": 455,
+  "candidate_count": 8,
+  "unique_new_sha_count": 8,
+  "duplicate_sha_count": 0,
+  "role_counts": {
+    "A": 4,
+    "B": 4
+  },
+  "result_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "checks": {
+    "source_manifest_sha_match": "8/8",
+    "source_sent_sha_match": "8/8",
+    "candidate_export_sha_match": "8/8",
+    "candidate_rgba_png": "8/8",
+    "visual_readability_and_approved_mapping": "8/8",
+    "native_ui_cell_safety": "UNVERIFIED_8/8",
+    "Jungle_layout": "VERTICAL_STACK_VS_SINGLE_LINE_HOLD",
+    "runtime_validation": "UNTESTED",
+    "dds_final_compose": "NOT_PERFORMED"
+  },
+  "evidence": {
+    "N100_metric_path": "work/C1_QA_20261023_0645_metrics.json",
+    "N100_A_comparison": "work/C1_QA_20261023_0645_A_pairs.jpg",
+    "N100_B_comparison": "work/C1_QA_20261023_0645_B_pairs.jpg",
+    "N100_check_script": "work/C1_QA_20261023_0645_check.py"
+  },
+  "reviewed": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0047-CB45FED2",
+      "ordinal": 230,
+      "english": "LOCAL MIXED",
+      "approved_korean": "로컬 혼합",
+      "source_file": "Q205_ce38edd320033b27_source.png",
+      "candidate_file": "Q205_ce38edd320033b27_source_k.png",
+      "source_sha256": "e17ce13ae763d0ecc7c8d524a8b1b606b8ca83fb97f5507b3b4ed48c03e1ec73",
+      "candidate_sha256": "a007ff6e7e76f61eb5d8902e9b15fd78dd3ace229e400f43bb775180c2f1fa32",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "source_png_dimensions": [
+        1380,
+        256
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 정본 '로컬 혼합' 가독·매핑은 시각상 일치. 그러나 입력 1380×256 대비 후보 2172×724 및 원본 UI 셀 복원 좌표/유효 크롭 영역 미확인. 출력 PNG만으로 합성 안전영역·보호 픽셀 검증 불가.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0047-CB45FED2",
+      "ordinal": 229,
+      "english": "CLOUDY HIGHLAND",
+      "approved_korean": "클라우디 하이랜드",
+      "source_file": "Q201_f8bf2aedd605e317_source.png",
+      "candidate_file": "Q201_f8bf2aedd605e317_source_k.png",
+      "source_sha256": "314b3d17ed89322cbb7f57ee912ab34706f84a0244d4f81937abe98e8a848f73",
+      "candidate_sha256": "8e6787d0ebf1c21d897c3958ee421e7200486b45b01ccb9f6374af7607651abb",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "source_png_dimensions": [
+        1081,
+        123
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 정본 '클라우디 하이랜드' 읽힘. 입력 1081×123 대비 후보 2172×724, UI 셀 마스크/좌표·스케일 적합성 증거 없음. 길이/글자 크기 차이만으로 FAIL 아님.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0046-50B235EB",
+      "ordinal": 228,
+      "english": "IMPERIAL AVENUE",
+      "approved_korean": "임페리얼 애비뉴",
+      "source_file": "Q173_9c2afed5e703ce6f_source.png",
+      "candidate_file": "Q173_9c2afed5e703ce6f_source_k.png",
+      "source_sha256": "ee44b2b386d8edc65b5915d6aaa027e79cc943269edab00b0501221822ca28d8",
+      "candidate_sha256": "ede9a684009cc043441679afdc3bc8c792d8a2eb1bff77b2c9541aea7de3ed52",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_png_dimensions": [
+        1742,
+        206
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 정본 '임페리얼 애비뉴' 읽힘. 입력 1742×206 대비 후보 2172×724, 원본 한 줄 UI 안전영역·인접 아트와의 독립적 겹침 검증 미완료.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0046-50B235EB",
+      "ordinal": 227,
+      "english": "LEGEND",
+      "approved_korean": "레전드",
+      "source_file": "Q173_a3fee10ab3398102_source.png",
+      "candidate_file": "Q173_a3fee10ab3398102_source_k.png",
+      "source_sha256": "452545165743587a30f81709e8dd3742aa5f33221c4ba7dd47ad8d7ea02500b4",
+      "candidate_sha256": "a1d97814e43ffda97478d9bedb7da580a0e20eb44f46f80e3ebb9336b6ee5687",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_png_dimensions": [
+        776,
+        210
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 정본 '레전드' 읽힘. 입력 776×210 대비 후보 2172×724, 눈에 띄는 오탈자는 없으나 네이티브 복원 좌표와 보호 픽셀 비교 불가. 글줄이 짧다는 이유의 반려는 금지.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "ordinal": 286,
+      "english": "INDUSTRIAL COMPLEX",
+      "approved_korean": "인더스트리얼 컴플렉스",
+      "source_file": "Q173_f2e05596354e1da6_source.png",
+      "candidate_file": "Q173_f2e05596354e1da6_source_k.png",
+      "source_sha256": "bca11c476ec87206601e9f3e82dfcea3fe72ef46df1a70626ff4d8edf580d2e6",
+      "candidate_sha256": "c50e140198d2949e7f63e02afce815ebea1d89910dd6c0f1e94c58569b1f4391",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_png_dimensions": [
+        1044,
+        106
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 정본 '인더스트리얼 컴플렉스' 가독. 입력 1044×106 대비 후보 2172×724, 가로 1열 한글이 네이티브 UI 셀·보호 아트에 실제 안착하는지 검증 자료 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "ordinal": 285,
+      "english": "Desert",
+      "approved_korean": "데저트",
+      "source_file": "Q163_84ffa9b0cceb2281_source.png",
+      "candidate_file": "Q163_84ffa9b0cceb2281_source_k.png",
+      "source_sha256": "84abf3246040fbc86bc2b226988e54d37e66d4bedc843335ced927605b898fd7",
+      "candidate_sha256": "26a459aa6a04163b04d7a5678330565308970427f1c9a955abf413d834865e83",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        728,
+        280
+      ],
+      "candidate_png_dimensions": [
+        2048,
+        768
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 정본 '데저트' 가독. 후보 RGBA이고 alpha edge>8 0이나 미세 alpha bbox 좌측 접촉(x=0); 눈에 보이는 잘림이라고 단정 불가. 입력 728×280 대비 후보 2048×768, 원본 셀 미검증.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "ordinal": 284,
+      "english": "Jungle",
+      "approved_korean": "정글",
+      "source_file": "Q163_b8830c18229c838e_source.png",
+      "candidate_file": "Q163_b8830c18229c838e_source_k.png",
+      "source_sha256": "29662851916690d8499da7a6d3e0fedd4b08a14c6717e957f7dcbc2821cff914",
+      "candidate_sha256": "d75de571f2e7b3fe48244663cb48de7d198662229193e97a58548dd719f6f50d",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        382,
+        164
+      ],
+      "candidate_png_dimensions": [
+        1914,
+        822
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 정본 '정글' 문자 자체 가독. 그러나 원본 Jungle 단일 가로줄과 달리 후보가 2단 수직 배열; 실제 UI 셀 안착/원본 시각 위계·인접 아트 침범 여부 입증 전 HOLD. 단순 폭/폰트크기 차이 때문에 FAIL하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0059-CB6F5DCB",
+      "ordinal": 283,
+      "english": "Waterfalls",
+      "approved_korean": "워터폴스",
+      "source_file": "Q163_390660df779f3446_source.png",
+      "candidate_file": "Q163_390660df779f3446_source_k.png",
+      "source_sha256": "645f8c67b3ac4d46ee8f146be2704d1056f03bf5742701d3b59d3c66f7f6ee44",
+      "candidate_sha256": "e63e11491d16ec20b18fba1a42196c02ebf0ada7d2cb4b81663e14028bf2e2f3",
+      "source_dds_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_png_dimensions": [
+        1148,
+        288
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "approved_mapping": "VISUALLY_MATCHES",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "reason": "HOLD_NATIVE_UI_CELL_NOT_VERIFIED: 정본 '워터폴스' 가독. 입력 1148×288 대비 후보 2172×724로 크롭 면적과 다름. 원본 레이어/UI 셀의 실제 합성 범위·글자 효과 경계 비교 미확인.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "C2_C3_runtime_approval": "NOT_ASSERTED"
+    }
+  ],
+  "restrictions": {
+    "imagegen_calls": 0,
+    "A_B_queue_consumption": 0,
+    "final_DDS_deploy": false,
+    "C2_C3_or_user_game_PASS": false,
+    "VR_FFB_DX11_DXVK_changes": false
+  }
+}
