@@ -399,6 +399,9 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_primitive_span_probe.cpp -o /tmp/dx11_primitive_00644 && /tmp/dx11_primitive_00644
       - name: Verify source graph and dormant runtime activation
         run: |
+          # 00993 native game ColorFill/partial TARGET GPU fallback on D3D11.0.
+          python tools/test_dx11_partial_color_fallback_00993.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_partial_color_fallback_00993.cpp -o /tmp/dx11_partial_color_00993 && /tmp/dx11_partial_color_00993
           # 00992 game-origin D3D9 indexed instancing reaches native SM3
           # IA/Draw without merging line/strip/fan boundaries across instances.
           python tools/test_dx11_live_sm3_instancing_00992.py

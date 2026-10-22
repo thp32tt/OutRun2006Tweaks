@@ -2282,7 +2282,19 @@ private:
     context->Draw(3u, 0u);
     return true;
 }
-} // namespace
+ } // namespace
+
+bool native_game_raster_partial_backbuffer_color_clear(
+    ID3D11DeviceContext* context, ID3D11RenderTargetView* target,
+    std::uint32_t width, std::uint32_t height,
+    const D3D11_RECT& region, const float (&rgba)[4]) noexcept {
+    // The same GPU path already replays authored cropped TARGET clears into
+    // distinct native stereo eyes. Check the actual RTV format first: it
+    // cannot assume an arbitrary HDR, typeless or MSAA source is writable.
+    return native_game_partial_color_shader_rtv(context, target) &&
+           raster_partial_eye_color_clear(
+               context, target, width, height, region, rgba);
+}
 
 // A real game post-process StretchRect is not a CopySubresourceRegion: the
 // source and destination spans can differ. Rasterize the genuine GPU color

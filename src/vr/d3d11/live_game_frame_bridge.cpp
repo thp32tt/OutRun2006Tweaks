@@ -61,6 +61,8 @@
 #include "native_game_masked_draw.hpp"
 #include "native_game_fragment_reject.hpp"
 #include "native_game_scissor_clip.hpp"
+#include "native_game_stereo_submission.hpp"
+#include "native_game_partial_color_replay.hpp"
 #include "native_game_offscreen_pass.hpp"
 #include "native_game_inert_stencil_mrt.hpp"
 #include "native_game_srgb_draw.hpp"
@@ -7731,9 +7733,14 @@ bool preserve_game_partial_target_clear(
         // color nor Z. Retain the native frame and exact Draw ordinals.
         if (nativeRegionCount == 0u) return true;
         ComPtr<ID3D11DeviceContext1> ctx1;
-        if (FAILED(s.backend.context()->QueryInterface(
-                IID_PPV_ARGS(ctx1.GetAddressOf()))) || !ctx1)
-            return false; // D3D11.0: leave original D3D9 and input intact.
+        const bool hasClearView = SUCCEEDED(s.backend.context()->QueryInterface(
+                IID_PPV_ARGS(ctx1.GetAddressOf()))) && ctx1;
+        // When TARGET and Z are coupled, rejecting the native replay is
+        // mandatory unless both color and depth can be replayed identically.
+        // D3D11.0's color-only GPU raster must NEVER drop the depth mutation.
+        if (partial_game_color_replay_route(
+                hasClearView, !clearZ, true) ==
+            PartialColorReplayRoute::reject) return false;
         constexpr float scale = 1.0f / 255.0f;
         const float rgba[4] = {
             float((color >> 16) & 255u) * scale,
@@ -7742,8 +7749,21 @@ bool preserve_game_partial_target_clear(
             backbufferDesc.Format == D3DFMT_X8R8G8B8 ? 1.0f :
                 float((color >> 24) & 255u) * scale
         };
-        ctx1->ClearView(s.backend.color_rtv(), rgba, regions.data(),
-                        nativeRegionCount);
+        if (hasClearView) {
+            ctx1->ClearView(s.backend.color_rtv(), rgba, regions.data(),
+                            nativeRegionCount);
+        } else {
+            // D3D11.0 fallback uses exact source rectangles and restores
+            // every live pipeline binding after each non-evidence GPU Draw.
+            // Any failed rectangle vetoes this native frame; the original
+            // successful D3D9 Clear and game input remain authoritative.
+            for (UINT i = 0u; i < nativeRegionCount; ++i)
+                if (!native_game_raster_partial_backbuffer_color_clear(
+                        s.backend.context(), s.backend.color_rtv(),
+                        backbufferDesc.Width, backbufferDesc.Height,
+                        regions[i], rgba))
+                    return false;
+        }
         if (clearZ) {
             // D32_FLOAT has no stencil component, which is required for
             // ClearView's depth-rectangle support. Preserve all other Z.
@@ -7828,9 +7848,11 @@ bool preserve_game_color_fill(
                         desc.Width, desc.Height)))
                 return false;
             ComPtr<ID3D11DeviceContext1> context1;
-            if (FAILED(s.backend.context()->QueryInterface(
-                    IID_PPV_ARGS(context1.GetAddressOf()))) || !context1)
-                return false;
+            const bool hasClearView = SUCCEEDED(s.backend.context()->QueryInterface(
+                    IID_PPV_ARGS(context1.GetAddressOf()))) && context1;
+            if (partial_game_color_replay_route(
+                    hasClearView, true, true) ==
+                PartialColorReplayRoute::reject) return false;
             constexpr float scale = 1.0f / 255.0f;
             const float rgba[4] = {
                 float((color >> 16) & 255u) * scale,
@@ -7842,7 +7864,13 @@ bool preserve_game_color_fill(
             const D3D11_RECT nativeRect{
                 static_cast<LONG>(clipped.left), static_cast<LONG>(clipped.top),
                 static_cast<LONG>(clipped.right), static_cast<LONG>(clipped.bottom)};
-            context1->ClearView(s.backend.color_rtv(), rgba, &nativeRect, 1u);
+            if (hasClearView) {
+                context1->ClearView(s.backend.color_rtv(), rgba, &nativeRect, 1u);
+            } else if (!native_game_raster_partial_backbuffer_color_clear(
+                           s.backend.context(), s.backend.color_rtv(),
+                           desc.Width, desc.Height, nativeRect, rgba)) {
+                return false;
+            }
             // A partial ColorFill is not a new whole-frame clear baseline.
             // Keep the original full Clear seed, depth and Draw ordinals.
             return true;

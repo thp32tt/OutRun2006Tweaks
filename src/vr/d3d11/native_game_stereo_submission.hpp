@@ -9,6 +9,14 @@ namespace outrun::vr::dx11 {
 
 struct NativeGameEyePartialTargetClear;
 
+// Replay an original game-authored partial backbuffer color write on D3D11.0.
+// Uses the already owned native-eye raster path with full IA/OM/shader restore.
+// This is a Clear/ColorFill mutation, never native game Draw evidence.
+[[nodiscard]] bool native_game_raster_partial_backbuffer_color_clear(
+    ID3D11DeviceContext* context, ID3D11RenderTargetView* target,
+    std::uint32_t width, std::uint32_t height,
+    const D3D11_RECT& region, const float (&rgba)[4]) noexcept;
+
 // Renderer-side source evidence must be recorded AFTER this eye's native game
 // D3D11 draw commands, rather than fabricated at frame submission time.
 // Submit real D3D11 game-eye geometry commands on the immediate context.
