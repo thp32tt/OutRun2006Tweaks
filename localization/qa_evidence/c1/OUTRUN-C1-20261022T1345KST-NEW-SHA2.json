@@ -1,0 +1,122 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1345KST-NEW-SHA2",
+  "checked_at_kst": "2026-10-22T13:48:11.381753+09:00",
+  "source_branch": "korean-localization-recovery-20260928",
+  "previous_asset_head": "b9179c1a0b3308c7b9dd69a57ee4dc3afd0d064e",
+  "review_scope": "C1 independent QA of two unreviewed SHA-distinct B-produced candidate PNGs saved on N100",
+  "previous_reviewed_sha": 341,
+  "unreviewed_before": 2,
+  "reviewed_count": 2,
+  "summary": {
+    "fail_source_roi_mapping": 2,
+    "pass_korean_text_readability_only": 2,
+    "producer_dimension_rework_retained": 2,
+    "source_and_export_sha_checks_passed": 2,
+    "unreviewed_after_this_batch_at_inventory_time": 0
+  },
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0042-6BA2F0A0",
+      "candidate_file": "Q051_a12debc77e462078_source_k.png",
+      "candidate_sha256": "0905d26c44343bdd52b223066687d7498da554e15e124892c0371d05862d0d9c",
+      "source_file": "Q051_a12debc77e462078_source.png",
+      "source_sha256": "26620023f51b9894a340a644303f246a28a8adffbe02b137233f53fe1b9f3cf7",
+      "manifest_english": "ENTER ACCOUNT NAME:",
+      "approved_korean": "계정 이름 입력:",
+      "input_roi_dimensions": [
+        854,
+        264
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_alpha_extrema": [
+        0,
+        255
+      ],
+      "candidate_alpha_bbox": [
+        16,
+        101,
+        1450,
+        652
+      ],
+      "export_sha_match": true,
+      "manifest_source_sha_match": true,
+      "korean_text_readability": "PASS",
+      "transparency_and_edge_clipping": "PASS_CANDIDATE_ONLY",
+      "original_english_visible_in_roi": false,
+      "c1_verdict": "FAIL_SOURCE_ROI_MAPPING",
+      "source_visual_reason": "입력 ROI(854×264)에는 확인 가능한 ‘ENTER ACCOUNT NAME:’ 영문이 없고, 회색 영역과 하단 흰색/적색 UI 경계만 존재함. 후보의 ‘계정 이름 입력:’ 한글 획은 읽히지만 원본 ROI와 문구 대응/안전영역 검증 불가.",
+      "producer_status": "REWORK_DIMENSIONS_PRESERVED",
+      "text_length_difference_ignored": true,
+      "safe_region_placement": "UNTESTED_SOURCE_ROI_INVALID",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": {
+        "source": "work/image-src/text_roi_batches/inputs/Q051_a12debc77e462078_source.png",
+        "candidate": "work/image-src/text_roi_batches/candidate_outputs/B/Q051_a12debc77e462078_source_k.png"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0042-6BA2F0A0",
+      "candidate_file": "Q051_4f4aac3336cde097_source_k.png",
+      "candidate_sha256": "8507e835e2d45e5cf47cced545ce96b07625a47cfea170ef357518d4f96e81e8",
+      "source_file": "Q051_4f4aac3336cde097_source.png",
+      "source_sha256": "b85b5c4abd4f3b98bfc9b67219e72b45fe7d2b71d5168aa374a01c448aace7cd",
+      "manifest_english": "DELETE ACCOUNT",
+      "approved_korean": "계정 삭제",
+      "input_roi_dimensions": [
+        868,
+        292
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_alpha_extrema": [
+        0,
+        255
+      ],
+      "candidate_alpha_bbox": [
+        49,
+        32,
+        1897,
+        620
+      ],
+      "export_sha_match": true,
+      "manifest_source_sha_match": true,
+      "korean_text_readability": "PASS",
+      "transparency_and_edge_clipping": "PASS_CANDIDATE_ONLY",
+      "original_english_visible_in_roi": false,
+      "c1_verdict": "FAIL_SOURCE_ROI_MAPPING",
+      "source_visual_reason": "입력 ROI(868×292)에는 ‘Shift : Player Only Mode Entry’ 일부와 다른 UI 조각이 보이며 ‘DELETE ACCOUNT’ 영문은 확인되지 않음. 후보의 ‘계정 삭제’는 읽히지만 승인 대상 원문 ROI가 아님.",
+      "producer_status": "REWORK_DIMENSIONS_PRESERVED",
+      "text_length_difference_ignored": true,
+      "safe_region_placement": "UNTESTED_SOURCE_ROI_INVALID",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": {
+        "source": "work/image-src/text_roi_batches/inputs/Q051_4f4aac3336cde097_source.png",
+        "candidate": "work/image-src/text_roi_batches/candidate_outputs/B/Q051_4f4aac3336cde097_source_k.png"
+      }
+    }
+  ],
+  "conclusion": "Source SHA provenance matches the manifest bytes, but pixel content in source ROI does not contain the manifest English target. A SHA match does not prove correct English annotation. Both C1 candidates FAIL source/approved-translation identity gate. This does not reclassify prior SHA QA or consume producer queues. Do not approve DDS or game.",
+  "limits": {
+    "imagegen_invoked": false,
+    "producer_queue_consumed": false,
+    "automatic_dds_write": false,
+    "final_deployment": false,
+    "c2_c3_pass": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
