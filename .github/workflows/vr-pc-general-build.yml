@@ -10,6 +10,9 @@ concurrency:
   group: outrun-pc-general-build
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: [self-hosted, Windows, X64, outrun-pc]
@@ -138,3 +141,30 @@ jobs:
           path: out/pc-general/OutRun2_VR_PC_GENERAL_*.zip
           if-no-files-found: error
           retention-days: 7
+
+      - name: Record general build result
+        if: always()
+        shell: pwsh
+        run: |
+          $zip=Get-ChildItem out/pc-general -Filter 'OutRun2_VR_PC_GENERAL_*.zip' -File -ErrorAction SilentlyContinue | Select-Object -First 1
+          $state=if($zip){'SUCCESS'}else{'FAILURE'}
+          $detail=@(
+            "STATE=$state",
+            "SOURCE_SHA=$env:GITHUB_SHA",
+            "RUN_ID=$env:GITHUB_RUN_ID",
+            "RUN_ATTEMPT=$env:GITHUB_RUN_ATTEMPT",
+            "RUNNER_NAME=$env:RUNNER_NAME",
+            "RUNNER_OS=$env:RUNNER_OS",
+            "BUILD_CLASS=PC_GENERAL_CLEAN_BUILD"
+          )
+          git config user.name 'outrun-pc-builder'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin vr-d3d9ex-focus
+          git checkout -B vr-d3d9ex-focus origin/vr-d3d9ex-focus
+          New-Item -ItemType Directory -Force docs/build-status | Out-Null
+          $detail | Set-Content docs/build-status/PC_GENERAL_LATEST.txt -Encoding utf8
+          git add docs/build-status/PC_GENERAL_LATEST.txt
+          git commit -m "build(dx9ex): record PC general build $state [$env:GITHUB_RUN_ID]"
+          if ($LASTEXITCODE -ne 0) { throw 'status commit failed' }
+          git push origin HEAD:vr-d3d9ex-focus
+          if ($LASTEXITCODE -ne 0) { throw 'status push failed' }
