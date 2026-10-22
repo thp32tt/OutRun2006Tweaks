@@ -1,0 +1,366 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T0345KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T03:47:28.083223+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_producer_roles": [
+    "A",
+    "B"
+  ],
+  "review_type": "NEW_SHA_ONLY_NO_QUEUE_CONSUMPTION",
+  "reviewed_sha_history_count": 407,
+  "unique_candidate_shas": 8,
+  "counts": {
+    "total": 8,
+    "pass": 0,
+    "fail": 3,
+    "hold": 5
+  },
+  "verified": {
+    "sha_matches_sent_manifest_export": "8/8",
+    "png_rgba": "8/8",
+    "duplicate_shas": "0/8",
+    "alpha_edge_candidate_pixels": "0/8"
+  },
+  "comparison_evidence": {
+    "candidate_vs_source_contact_sheets_on_N100": [
+      "work/C1_QA_20261023_0345_A_pairs.jpg",
+      "work/C1_QA_20261023_0345_B_pairs.jpg"
+    ],
+    "local_metrics": "work/C1_QA_20261023_0345_metrics.json"
+  },
+  "outputs": "NO_NEW_IMAGEGEN_NO_AB_QUEUE_CONSUMPTION_NO_DDS_NO_C2_C3_NO_RUNTIME_PASS",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "source_bbox_policy": "LANGUAGE_LENGTH_DIFFERENCE_NOT_FAIL",
+  "reviews": [
+    {
+      "role": "A",
+      "batch": 55,
+      "task_id": "OUTRUN-ROI-A-0055-5F35C05E",
+      "source_ordinal": 270,
+      "english": "You got this item",
+      "approved_korean": "이 아이템을 획득했습니다",
+      "source_file": "Q205_28b78cfb71a52497_source.png",
+      "source_sha256": "b9b3896de9e831269fe30a4a4952184a492bfcf54ea254f9cfffb787a12b0c2a",
+      "original_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "source_dimensions": [
+        956,
+        160
+      ],
+      "candidate_file": "Q205_28b78cfb71a52497_source_k.png",
+      "candidate_sha256": "da1fb8c1651aa3babcf6002adc39e3c7a0d5ce073aca662a4e38386227f63c59",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        47,
+        60,
+        2119,
+        660
+      ],
+      "candidate_alpha_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "Translation is readable and appears correct, but 956x160 original ROI vs 2172x724 output; placement in original UI cell and major source-to-output lettering style change are not verified."
+    },
+    {
+      "role": "A",
+      "batch": 55,
+      "task_id": "OUTRUN-ROI-A-0055-5F35C05E",
+      "source_ordinal": 269,
+      "english": "SNOW MOUNTAIN",
+      "approved_korean": "스노 마운틴",
+      "source_file": "Q173_4b313a1eb9b2f21d_source.png",
+      "source_sha256": "870c5d618580c8ff9e0fa736c892ab4b8116f17e2a4ef9e6dc30098659106053",
+      "original_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_dimensions": [
+        1008,
+        360
+      ],
+      "candidate_file": "Q173_4b313a1eb9b2f21d_source_k.png",
+      "candidate_sha256": "03d5d5b16d64dff7fcd4ff13217ad234f1974c9b8dcc27767e2b139d851cfe9c",
+      "candidate_dimensions": [
+        2098,
+        749
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        63,
+        45,
+        2032,
+        637
+      ],
+      "candidate_alpha_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "C1_status": "FAIL",
+      "C1_reason_code": "FAIL_SOURCE_NOT_SINGLE_PHRASE",
+      "C1_observation": "English source contains METROPOLIS, PALM BEACH, SNOW MOUNTAIN and TULIP GARDEN rather than one isolated phrase; source alpha intersects left/top/bottom border."
+    },
+    {
+      "role": "A",
+      "batch": 54,
+      "task_id": "OUTRUN-ROI-A-0054-125A7586",
+      "source_ordinal": 268,
+      "english": "SUNNY BEACH",
+      "approved_korean": "서니 비치",
+      "source_file": "Q173_a085b1172a900763_source.png",
+      "source_sha256": "291221c8ff1916d067326c98940a40b37bc8b7caed3b9a0155fb936e7675f4f6",
+      "original_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_dimensions": [
+        866,
+        326
+      ],
+      "candidate_file": "Q173_a085b1172a900763_source_k.png",
+      "candidate_sha256": "5f09b7f2ebac433140be18c43a5718687b5167cf2c027055035d4b5d4a88d9b9",
+      "candidate_dimensions": [
+        2043,
+        770
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        146,
+        23,
+        1892,
+        674
+      ],
+      "candidate_alpha_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "C1_status": "FAIL",
+      "C1_reason_code": "FAIL_SOURCE_NOT_SINGLE_PHRASE",
+      "C1_observation": "English source contains NATIONAL PARK, SKYSCRAPERS, SUNNY BEACH and WATERFALLS rather than one isolated phrase; source alpha intersects top border."
+    },
+    {
+      "role": "A",
+      "batch": 53,
+      "task_id": "OUTRUN-ROI-A-0053-85C4F819",
+      "source_ordinal": 263,
+      "english": "SHOWROOM",
+      "approved_korean": "쇼룸",
+      "source_file": "Q140_e11e13b1aa29c7c7_source.png",
+      "source_sha256": "5bcc51c6fa67fc40ece00f57a8c9bdbc911d1bb117d63d129051a64e4a5d0306",
+      "original_dds_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+      "source_dimensions": [
+        1370,
+        248
+      ],
+      "candidate_file": "Q140_e11e13b1aa29c7c7_source_k.png",
+      "candidate_sha256": "4508c7f72872ed27652c584e83bb81b7c69f93578dada02922d5da21e7567bb1",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        606,
+        39,
+        1579,
+        654
+      ],
+      "candidate_alpha_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "Readable 쇼룸 in transparent PNG, but original UI cell restoration/position and scale are unverified (1370x248 vs 2172x724)."
+    },
+    {
+      "role": "B",
+      "batch": 65,
+      "task_id": "OUTRUN-ROI-B-0065-1C1FB658",
+      "source_ordinal": 310,
+      "english": "PAUSE MENU",
+      "approved_korean": "일시정지 / 메뉴",
+      "source_file": "Q046_1c32c8310a619ea2_source.png",
+      "source_sha256": "5dce4b6ee0f923e26de80ce9049bce243c1165c2f337279c91bdad5ad8effde4",
+      "original_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "source_dimensions": [
+        498,
+        262
+      ],
+      "candidate_file": "Q046_1c32c8310a619ea2_source_k.png",
+      "candidate_sha256": "2f69360f29bedde10900aade5649a835cbcf68c95aa27a528d5c22c45e82dd56",
+      "candidate_dimensions": [
+        2041,
+        771
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        39,
+        11,
+        2019,
+        759
+      ],
+      "candidate_alpha_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "C1_status": "FAIL",
+      "C1_reason_code": "FAIL_EXTRA_TEXT_AND_APPROVED_MAPPING",
+      "C1_observation": "Candidate includes unrelated/duplicate 양을 세세요! twice and 계속하기 twice alongside 일시정지 메뉴, while approved mapping is 일시정지 / 메뉴. Single-phrase-only output violated."
+    },
+    {
+      "role": "B",
+      "batch": 64,
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_ordinal": 309,
+      "english": "CUSTOM GAME",
+      "approved_korean": "커스텀 게임",
+      "source_file": "Q237_ba05487fa85b4b5b_source.png",
+      "source_sha256": "e05399cbcdd2ca4a8a66f055647d9519a24340d20d93e6b3957281421139c0c9",
+      "original_dds_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_dimensions": [
+        1311,
+        178
+      ],
+      "candidate_file": "Q237_ba05487fa85b4b5b_source_k.png",
+      "candidate_sha256": "7fac09fd411bdd0d1d83a505c672ce6dada7d45d6f88d2ea5f603c80ef96f766",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        138,
+        39,
+        2150,
+        684
+      ],
+      "candidate_alpha_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "Readable correct red 커스텀 게임 with transparent PNG, but original UI cell restoration/position and scale unverified (1311x178 vs 2172x724)."
+    },
+    {
+      "role": "B",
+      "batch": 64,
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_ordinal": 308,
+      "english": "CREATE GAME",
+      "approved_korean": "게임 만들기",
+      "source_file": "Q237_2e956f29f0903fe6_source.png",
+      "source_sha256": "05892006f54d11e3f0dfa163ed57e7d0699e905184edd4bb0de4ababf077edd8",
+      "original_dds_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_dimensions": [
+        1114,
+        174
+      ],
+      "candidate_file": "Q237_2e956f29f0903fe6_source_k.png",
+      "candidate_sha256": "3a6ba2741be4f54418232af7e690dbb6944eee7de9e25c2b4200db342c53b516",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        57,
+        9,
+        2088,
+        592
+      ],
+      "candidate_alpha_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "Readable correct 게임 만들기 with transparent PNG, but original UI cell restoration/position and scale unverified (1114x174 vs 2172x724)."
+    },
+    {
+      "role": "B",
+      "batch": 64,
+      "task_id": "OUTRUN-ROI-B-0064-D233C87F-R1",
+      "source_ordinal": 307,
+      "english": "CUSTOM GAME",
+      "approved_korean": "커스텀 게임",
+      "source_file": "Q237_f3a4a8eda36c453d_source.png",
+      "source_sha256": "4917cf2b559296af2f2e63cf4ba73cd89d63efe8f0d3998029b59329c889c07a",
+      "original_dds_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_dimensions": [
+        1084,
+        174
+      ],
+      "candidate_file": "Q237_f3a4a8eda36c453d_source_k.png",
+      "candidate_sha256": "4f9323bccd32542e6ee81f782b7427026b0e058c2b260e5e7b0ee7365c15405b",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_alpha_bbox": [
+        85,
+        23,
+        2096,
+        658
+      ],
+      "candidate_alpha_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "Readable correct 커스텀 게임 with transparent PNG, but original UI cell restoration/position and scale unverified (1084x174 vs 2172x724)."
+    }
+  ]
+}
