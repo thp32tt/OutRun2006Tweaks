@@ -98,6 +98,12 @@ services:
         bind:
           create_host_path: false
       - type: bind
+        source: /home/chatgpt-runner2/work/c_salvage_text_roi/additional_originals_20261016
+        target: /home/chatgpt-runner2/work/c_salvage_text_roi/additional_originals_20261016
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
         source: /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json
         target: /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json
         read_only: true
