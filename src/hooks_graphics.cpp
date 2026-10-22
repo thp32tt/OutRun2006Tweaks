@@ -617,6 +617,13 @@ class VRLensFlareProjected2D : public Hook
     inline static thread_local OutRunVR::GameSemantic::ProducerToken
         LensCentreSavedProducer = OutRunVR::GameSemantic::ProducerToken::None;
     inline static thread_local std::uint64_t LensCentreSavedEpoch = 0;
+    // r4dius/outrun2-decomp race_course_passes.cpp proves 0x570008 is
+    // emitted twice per visible sun-flare sequence: first as a normal outer
+    // child at +0.16*spread, then after the queue flush at along=-0.003,
+    // size=1.5 as the near-centre glow. C993/0x570002 cannot suppress it.
+    inline static thread_local std::uint64_t LensFlareSequence = 0;
+    inline static thread_local std::uint64_t LensOuter570008Sequence = 0;
+    inline static thread_local unsigned LensOuter570008Ordinal = 0;
 
     static void LensCentreEnter(safetyhook::Context&)
     {
@@ -671,6 +678,37 @@ class VRLensFlareProjected2D : public Hook
 	static void __cdecl DrawObjectAlphaProjected(
 		int objectId, float alpha, void* work, int flags)
 	{
+        // Decomp-backed centre-glow fix: keep the first 0x570008 outer flare
+        // and suppress only the second 0x570008 from the same sun sequence.
+        // Desktop and unrelated 0x570008 draws are untouched.
+        if (Settings::VREnabled && objectId == 0x570008 &&
+            LensFlareSequence != 0)
+        {
+            if (LensOuter570008Sequence != LensFlareSequence)
+            {
+                LensOuter570008Sequence = LensFlareSequence;
+                LensOuter570008Ordinal = 0;
+            }
+            const unsigned ordinal = ++LensOuter570008Ordinal;
+            if (ordinal == 2)
+            {
+                if (Settings::VRTelemetry)
+                {
+                    static std::atomic<std::uint64_t> hidden{ 0 };
+                    const auto n = hidden.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 8 || (n & (n - 1)) == 0)
+                        spdlog::info(
+                            "VR LENS DECOMP CENTER GLOW HIDDEN: "
+                            "id=0x{:X} ordinal={} sequence={} hits={} "
+                            "(first 0x570008 outer child preserved)",
+                            static_cast<unsigned>(objectId), ordinal,
+                            LensFlareSequence, n);
+                }
+                return;
+            }
+        }
+
         // One original 0xCABE call occurs for each source effect object,
         // rather than each of the 4-5 visible flare discs being one surface.
         // Capture bounded per-object evidence to identify the centre-only
@@ -723,6 +761,17 @@ class VRLensFlareProjected2D : public Hook
     static void __cdecl DrawObjectAlphaCentre(
         int objectId, float alpha, void* work, int flags)
     {
+        // Begin one exact sun-flare sequence before any optional C993
+        // suppression. The following C9A0 path emits 0x570008 twice.
+        if (Settings::VREnabled &&
+            static_cast<unsigned>(objectId) == 0x570002u)
+        {
+            if (++LensFlareSequence == 0)
+                ++LensFlareSequence;
+            LensOuter570008Sequence = LensFlareSequence;
+            LensOuter570008Ordinal = 0;
+        }
+
         // Retain the existing A/B switch for the disc only. It is no longer
         // used as the optical fix: the real fix below keeps the complete
         // original centre family in one projected-screen coordinate space.
