@@ -46,4 +46,17 @@ int main() {
     assert(logpGuard.find("if (!vertexStage) return false;") != std::string::npos);
     assert(exppGuard.find("NativeSm3ArithmeticOpcode::Exponential2") != std::string::npos);
     assert(logpGuard.find("NativeSm3ArithmeticOpcode::Logarithm2") != std::string::npos);
+    // A native opcode case is insufficient when R266 source-register role
+    // decoding rejects it first. Guard the genuine upstream shader path.
+    std::ifstream decoderFile("src/vr/d3d11/pipeline_translation.cpp");
+    assert(decoderFile);
+    const std::string decoder((std::istreambuf_iterator<char>(decoderFile)),
+                               std::istreambuf_iterator<char>());
+    const auto decodedExpp = decoder.find("case D3DSIO_EXPP:");
+    const auto decodedLogp = decoder.find("case D3DSIO_LOGP:");
+    assert(decodedExpp != std::string::npos && decodedLogp != std::string::npos);
+    const auto sourcePlan = decoder.substr(decodedExpp,
+        decoder.find("case D3DSIO_ADD:", decodedLogp) - decodedExpp);
+    assert(sourcePlan.find("vertexStage && shaderMajor == 3u") != std::string::npos);
+    assert(sourcePlan.find("PlanKind::Registers, 1u, 1u") != std::string::npos);
 }

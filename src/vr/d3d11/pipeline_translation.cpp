@@ -1670,6 +1670,16 @@ namespace outrun::vr::dx11
             case D3DSIO_DSY:
                 return { PlanKind::Registers, 1u, 1u };
 
+            case D3DSIO_EXPP:
+            case D3DSIO_LOGP:
+                // The live native owner translates these legacy partial-
+                // precision opcodes only for authentic vs_3_0 source. R266
+                // must admit the same operand roles or source compilation
+                // stops before the real D3D11 Draw shader materializer.
+                return vertexStage && shaderMajor == 3u
+                    ? OpcodePlan{PlanKind::Registers, 1u, 1u}
+                    : OpcodePlan{};
+
             case D3DSIO_ADD:
             case D3DSIO_SUB:
             case D3DSIO_MUL:
