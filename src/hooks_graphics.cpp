@@ -693,41 +693,39 @@ class VRLensFlareProjected2D : public Hook
 		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
 	}
 
-    // Unlike the outer halo discs at 0xCABE, the central 0x570002 sun
-    // travels through sub_40C980 and its independent 0xC993 E8 call to
-    // DrawObjectAlpha_Internal. The old D3A5 scope only marked the parent
-    // lifetime; nested SceneEffect and the actual draw can overwrite it.
-    // Own THIS one actual draw, not the shared object renderer or the
-    // four already-correct surrounding discs. Matching the EXE's existing
-    // 0xCABE call signature preserves the original arguments and alpha.
+    // Original sun pass decomp (r4dius/outrun2-decomp,
+    // race_course_passes.cpp::sun_flare_40cbc0) shows that sub_40C980/C993
+    // is NOT exclusive to 0x570002. The screen-space sun stack also draws
+    // 0x570010, 0x57000F and 0x570006 through the same wrapper while the
+    // camera +0x1C0 screen matrix is active. Treating only 0x570002 as a
+    // WorldBillboard splits one visual sun into different binocular spaces.
+    // Keep this exact C993 callsite narrow by object id; other C993 callers
+    // retain the original path.
+    static constexpr bool IsProjectedSunScreenObject(int objectId) noexcept
+    {
+        switch (objectId)
+        {
+        case 0x570002: // visible sun disc
+        case 0x570006: // central glow
+        case 0x57000F: // far sun object
+        case 0x570010: // visible/occlusion companion
+            return true;
+        default:
+            return false;
+        }
+    }
+    static_assert(IsProjectedSunScreenObject(0x570002));
+    static_assert(IsProjectedSunScreenObject(0x570006));
+    static_assert(IsProjectedSunScreenObject(0x57000F));
+    static_assert(IsProjectedSunScreenObject(0x570010));
+    static_assert(!IsProjectedSunScreenObject(0x57000E));
+
     static void __cdecl DrawObjectAlphaCentre(
         int objectId, float alpha, void* work, int flags)
     {
-        // D3A5 owns the 0x570002 central world sun. Previously its actual
-        // C993 DrawObjectAlpha call replaced this world owner with the flat
-        // projected screen-effect layer, defeating finite per-eye stereo.
-        // Match BOTH the active original parent and its exact sun object.
-        // Desktop, partial parent-hook install and all outer CABE rings retain
-        // their original raster classification and one game Draw call.
-        const auto centreScope =
-            Settings::VREnabled && LensCentreDepth != 0 &&
-            LensCentreOwnerDepth == LensCentreDepth &&
-            !OutRunVR::GameSemantic::QueueRenderActive() &&
-            objectId == 0x570002
-            ? OutRunVR::GameSemantic::RenderScope::WorldBillboard
-            : OutRunVR::GameSemantic::RenderScope::None;
-        // HMD-confirmed 2026-10-20: this exact C993 centre appears twice
-        // and head-follows even while the outer CABE rings remain distinct.
-        // Until a same-call/pose/raw-WVP proof permits per-eye rendering,
-        // remove this ONE source draw, not a whole SceneEffect or sun/sky
-        // producer. A user setting can restore it for comparison. Desktop
-        // and unknown C993 objects always execute their original draw.
-        // Quest3 2026-10-20: C993's central point remained doubled even
-        // with LensFlareCentreEnabled=false. A transient D3A5 scope or
-        // queue state must NOT bypass the suppression of this precisely
-        // identified C993 object. This skips only original object 0x570002
-        // in VR, not other C993 objects, CABE halos, sky, or desktop.
-        // It is a temporary optical workaround, not a corrected stereo WVP.
+        // Retain the existing A/B switch for the disc only. It is no longer
+        // used as the optical fix: the real fix below keeps the complete
+        // original centre family in one projected-screen coordinate space.
         if (Settings::VREnabled && objectId == 0x570002 &&
             !Settings::VRLensFlareCentreEnabled.get())
         {
@@ -739,52 +737,47 @@ class VRLensFlareProjected2D : public Hook
                 if (n <= 8 || (n & (n - 1)) == 0)
                     spdlog::info(
                         "VR LENS C993 CENTER HIDDEN: count={} "
-                        "parent={} owner={} queue={} (CABE intact)",
+                        "parent={} owner={} queue={} (screen-family intact)",
                         n, LensCentreDepth, LensCentreOwnerDepth,
                         OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
             }
             return;
         }
-        // The previously-hidden C993 sun now executes in the main profile.
-        // Observe this original CALL and parent state so a later per-eye
-        // WVP trace can distinguish a second original sun from CABE halos.
-        if (Settings::VREnabled && Settings::VRTelemetry &&
-            objectId == 0x570002)
+
+        const bool projectedSun =
+            Settings::VREnabled &&
+            !OutRunVR::GameSemantic::QueueRenderActive() &&
+            IsProjectedSunScreenObject(objectId);
+        if (!projectedSun)
+        {
+            Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
+            return;
+        }
+
+        if (Settings::VRTelemetry)
         {
             static std::atomic<std::uint64_t> draws{ 0 };
             const auto n = draws.fetch_add(1, std::memory_order_relaxed) + 1;
-            if (n <= 8 || (n & (n - 1)) == 0)
+            if (n <= 24 || (n & (n - 1)) == 0)
                 spdlog::info(
-                    "VR SUN C993 ORIGINAL DRAW: hits={} worldOwner={} "
-                    "parent={} nestedOwner={} queue={} requestedVisible={}",
-                    n,
-                    centreScope ==
-                        OutRunVR::GameSemantic::RenderScope::WorldBillboard,
-                    LensCentreDepth, LensCentreOwnerDepth,
-                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
-                    Settings::VRLensFlareCentreEnabled.get() ? 1 : 0);
+                    "VR SUN C993 SCREEN FAMILY: id=0x{:06X} hits={} "
+                    "parent={} owner={} queue=0 mode=PROJECTED_SCREEN_EFFECT_2D",
+                    static_cast<unsigned>(objectId), n,
+                    LensCentreDepth, LensCentreOwnerDepth);
         }
-        // An unrelated one-shot producer (for example an earlier queued
-        // HUD/world draw) must not replace this exact C993 centre draw.
-        // Keep its token intact for the original later owner, and leave all
-        // C993 desktop/non-centre calls unchanged when centreScope is None.
+
+        // The original pass already projected these four objects through the
+        // camera screen matrix. Mirror the HMD-proven R69 CABE treatment:
+        // preserve the raw game WVP and submit the same centre-eye placement
+        // to both eye targets (zero binocular disparity). Explicitly clear the
+        // D3A5 LensFlareCentre token inside this draw so C993 cannot fall back
+        // into the old WorldBillboard/raw-c64 route.
         OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
-            centreScope, nullptr, true,
-            centreScope != OutRunVR::GameSemantic::RenderScope::None
-                ? OutRunVR::GameSemantic::ProducerToken::LensFlareCentre
-                : OutRunVR::GameSemantic::ProducerToken::None);
-        // The exact token is one-shot. Retain the centre's world scope for
-        // ALL nested GPU draws, then restore the previous SceneEffect owner.
-        // When this is not our centre, preserve the original caller scope.
-        OutRunVR::GameSemantic::ScopedRenderSemantic centreDrawScope(
-            centreScope != OutRunVR::GameSemantic::RenderScope::None
-                ? centreScope : OutRunVR::GameSemantic::CurrentScope);
-        // The original alpha renderer may enter nested SceneEffect helpers
-        // between c64 upload and GPU Draw. Keep this precise C993 source
-        // authoritative until its synchronous original draw returns.
-        // No CABE ring, queued SpriteNode, desktop or external UI is affected.
-        OutRunVR::GameSemantic::ScopedExactLensCentreGpuDraw centreGpuOwner(
-            centreScope != OutRunVR::GameSemantic::RenderScope::None);
+            OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D,
+            nullptr, true,
+            OutRunVR::GameSemantic::ProducerToken::None);
+        OutRunVR::GameSemantic::ScopedRenderSemantic sunDrawScope(
+            OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
     }
 
