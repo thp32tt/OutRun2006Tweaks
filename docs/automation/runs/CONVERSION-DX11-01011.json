@@ -2,23 +2,23 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01011",
   "production_id": "CONVERSION-DX11-01011",
-  "event_id": "CONVERSION-DX11-01011-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-01011-E003",
+  "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01011",
   "work_key": "DX11:LIVE_SM3_MASKED_CHANNEL_GAME_DRAW",
   "feature_id": "DX11:LIVE_SM3_MASKED_CHANNEL_GAME_DRAW",
   "work_class": "integration",
   "classification": "A",
-  "status": "CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_head": "80e3741cd13b68a59848c7a9ef5e7890e08b4bb4",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
-  "AUTOMATION_VALIDATION": "PENDING",
+  "material_result_sha": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+  "validation_bearing_result_sha": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
@@ -94,16 +94,89 @@
     "docs/automation/runs/CONVERSION-DX11-01011.json"
   ],
   "ci": {
-    "status": "PENDING",
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "exact_sha": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
     "required_workflows": [
-      "DX11 Fast Structural Checks",
-      "Backend Conversion Gate",
-      "Build",
-      "OpenXR VR architecture",
-      "OutRun EXE HUD Inspector CI"
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39779815777,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815777"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39779815949,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815949"
+      },
+      {
+        "name": "Build",
+        "run_id": 39779815757,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815757"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39779815741,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815741"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39779815797,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815797"
+      }
+    ],
+    "artifacts": [
+      "backend-autovalidated-2da592a3558d6399ac8019be0b9f77ed3620dd28",
+      "outrun2006tweaks-2da592a3558d6399ac8019be0b9f77ed3620dd28",
+      "feature-dx11-first-game-frame-2da592a3558d6399ac8019be0b9f77ed3620dd28"
     ]
   },
   "next_source_file": "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
   "real_game_draw_blocker": "Actual per-channel game GPU coverage not yet measured; this batch removes unnecessary unwritten lane reads",
-  "next_implementation_action": "Check targeted source compile and exact-SHA five CI results. If failure, repair under 01011 and revalidate; HMD UNTESTED."
+  "next_implementation_action": "Check targeted source compile and exact-SHA five CI results. If failure, repair under 01011 and revalidate; HMD UNTESTED.",
+  "feature_stage": "COMPLETE_BUILD_VERIFIED",
+  "feature_branch": "feature/dx11-01011-gate-repair-20261022",
+  "target_promotion": "NOT_REQUIRED_PRIOR_ROLLOVER_COMMITTED_IDENTICAL_SOURCE",
+  "result_source_tree_sha": "218b265af0de72dd89395658d533610d60cea2e4",
+  "acceptance_results": {
+    "partial_vector_arithmetic_native_codegen": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_live_sm3_masked_channels_01011.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_masked_channels_01011.py; GitHub Actions 5 mandatory Gates exact SHA 2da592a3558d6399ac8019be0b9f77ed3620dd28"
+    },
+    "safe_fallback_and_full_register": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+        "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+        "tools/test_dx11_sm3_interface_channels_00957.py"
+      ],
+      "validation_command": "python tools/test_dx11_sm3_interface_channels_00957.py; python tools/test_dx11_live_sm3_masked_channels_01011.py; GitHub Actions exact SHA 2da592a3558d6399ac8019be0b9f77ed3620dd28"
+    },
+    "exact_sha_build_validation": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tools/verify_dx11_source_graph.py",
+        ".github/workflows/dx11-fast-structural.yml",
+        "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp"
+      ],
+      "validation_command": "python tools/verify_dx11_source_graph.py; GitHub Actions 5 mandatory Gates exact SHA 2da592a3558d6399ac8019be0b9f77ed3620dd28"
+    }
+  },
+  "hardware_notes": "No real OutRun game rendering, first visible native frame, Quest3/VDXR or input/FFB hardware validation performed; remains UNTESTED. Material SHA exact CI PASS is structural/build evidence only."
 }
