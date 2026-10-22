@@ -113,13 +113,15 @@ inline bool native_sm3_relative_matrix_references(
     std::array<std::string, 4>& references, bool& readsLive) {
     readsLive = false;
     if (rows < 2u || rows > 4u || limit == 0u || limit > 256u ||
-        base >= limit || rows > limit - base ||
+        base >= limit ||
+        (!fromStaticAddress && rows > limit - base) ||
         (fromStaticAddress && dynamicLoop))
         return false;
     unsigned dynamicExclusive = 0u;
     if (fromStaticAddress) {
-        if (staticAddress < 0 ||
-            static_cast<unsigned>(staticAddress) > limit - base - rows)
+        const auto first = static_cast<long long>(base) + staticAddress;
+        const auto last = first + static_cast<long long>(rows) - 1;
+        if (first < 0 || last >= static_cast<long long>(limit))
             return false;
     } else if (dynamicLoop) {
         if (loopRegister >= loopExclusiveLimits.size())
@@ -145,7 +147,7 @@ inline bool native_sm3_relative_matrix_references(
         if (fromStaticAddress) {
             unsigned index = 0u;
             if (!native_sm3_static_address_const_index(
-                    base + row, static_cast<unsigned>(staticAddress),
+                    base + row, staticAddress,
                     limit, index) ||
                 !native_sm3_const_reference(
                     index, limit, defPresent[index], next[row]))

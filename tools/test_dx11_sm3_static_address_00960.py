@@ -10,7 +10,7 @@ assert "D3DSIO_MOVA" in source and "D3DSPR_ADDR" in source
 assert "defBits[srcReg][srcSwizzle & 3u]" in source
 assert "native_sm3_static_mova_address(" in source
 assert "native_sm3_static_address_const_index(" in source
-assert "staticAddressIndex < 0" in source
+assert "staticAddressReady" in source
 assert "defPresent[index]" in source and "liveConstantsUsed = true" in source
 assert "native_sm3_const_reference(" in source
 assert "native_sm3_live_loop_indexed_bounds_valid(" in bridge

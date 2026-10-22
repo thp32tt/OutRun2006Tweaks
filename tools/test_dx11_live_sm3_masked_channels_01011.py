@@ -15,7 +15,7 @@ def require(ok, message):
         raise SystemExit("01011 masked SM3 game draw FAIL: " + message)
 require("emitMaskedLanes" in shader and "mask & (1u << lane)" in shader,
         "game shader masked scalar source emission")
-require("R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V12" in backend,
+require("R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V13" in backend,
         "invalidate prior HLSL cache identity")
 compiler = backend.split("bool build_r283_sm3_mov_shader_source(", 1)[1].split(
     "bool r283_dxbc_payload(", 1)[0]

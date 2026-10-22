@@ -277,14 +277,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V12";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V13";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V12";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V13";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -450,7 +450,8 @@ bool build_r283_sm3_mov_shader_source(
         std::array<std::uint16_t, 16> indexedLoopLimits{};
         // a0.x from an exact shader-local DEF/MOVA is safe to resolve on
         // the CPU. Vertex-dependent MOVA stays on the D3D9 game renderer.
-        int staticAddressIndex = -1;
+        int staticAddressIndex = 0;
+        bool staticAddressReady = false;
         bool predicateUsed = false;
         const unsigned constantLimit = vertexStage ? 256u : 224u;
         // DEF is a shader-local register override, not an upload from the
@@ -564,7 +565,8 @@ bool build_r283_sm3_mov_shader_source(
             // DrawIndexed: unknown per-vertex inputs can exceed the VS/PS
             // native c-register bank and must never be clipped silently.
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_MOVA)) {
-                if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
+                if (!vertexStage ||
+                    (instruction.instructionToken & 0xf0ff0000u) != 0u ||
                     instruction.operandTokens.size() != 2u ||
                     operations.size() >= kMaxOps ||
                     !structuredFlow.empty())
@@ -587,11 +589,12 @@ bool build_r283_sm3_mov_shader_source(
                     (src & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
                     srcReg >= constantLimit || !defPresent[srcReg])
                     return false;
-                unsigned address = 0u;
+                int address = 0;
                 if (!native_sm3_static_mova_address(
                         defBits[srcReg][srcSwizzle & 3u], modifier, address))
                     return false;
-                staticAddressIndex = static_cast<int>(address);
+                staticAddressIndex = address;
+                staticAddressReady = true;
                 continue;
             }
             // SM3 scalar float-compare branches can change menu/race shader
@@ -1187,7 +1190,7 @@ bool build_r283_sm3_mov_shader_source(
                 if (relative) {
                     if (operandCursor >= instruction.operandTokens.size() -
                                              (sourcePredicated ? 1u : 0u) ||
-                        (loopRanges.empty() && staticAddressIndex < 0))
+                        (loopRanges.empty() && !staticAddressReady))
                         return false;
                     const DWORD address = instruction.operandTokens[operandCursor++];
                     const unsigned addrSwizzle =
@@ -1201,7 +1204,7 @@ bool build_r283_sm3_mov_shader_source(
                         (addrSwizzle != 0u && addrSwizzle != 0xe4u))
                         return false;
                     staticAddress = r283_decode_register_type(address) == D3DSPR_ADDR;
-                    if (staticAddress ? staticAddressIndex < 0 : loopRanges.empty())
+                    if (staticAddress ? !staticAddressReady : loopRanges.empty())
                         return false;
                 }
                 const auto kind = r283_decode_register_type(token);
@@ -1333,7 +1336,7 @@ bool build_r283_sm3_mov_shader_source(
                     if (relative && staticAddress) {
                         unsigned index = 0u;
                         if (!native_sm3_static_address_const_index(
-                                reg, static_cast<unsigned>(staticAddressIndex),
+                                reg, staticAddressIndex,
                                 constantLimit, index) ||
                             !native_sm3_const_reference(
                                 index, constantLimit, defPresent[index], value))
