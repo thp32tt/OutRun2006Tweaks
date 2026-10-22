@@ -67,15 +67,19 @@
       "source graph and 00957 V12 expectations",
       "existing mandatory five workflow push coverage for feature SHA"
     ],
-    "ci_status": "PENDING",
+    "ci_status": "TARGET_EXACT_SHA_PENDING_BACKEND_SMOKE_AND_HUD",
     "remaining": [
-      "Confirm 5 exact-SHA mandatory workflow conclusions and feature artifacts",
-      "Repair any new errors on same TASK_ID",
-      "After PASS, confirm target behind=0 and promote with expected_sha, force=false",
-      "Complete C6 only after success"
+      "Confirm exact 2da592a3 Backend Gate and HUD workflow full conclusions (other mandatory gates PASS)",
+      "Confirm exact-SHA diagnostic/artifact bundle validity; runtime UNTESTED",
+      "Write C6 for material target without duplicate source commit only after mandatory gates fully conclude",
+      "Deduplicate RUN_KEY in AI_SCOREBOARD.md; no score for duplicated repair"
     ],
     "runtime_validation": "UNTESTED",
-    "target_promotion": "NOT_YET",
-    "score_change": 0
+    "target_promotion": "NOT_REQUIRED_ALREADY_COMMITTED_BY_PRIOR_ROLLOVER",
+    "score_change": 0,
+    "target_head": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+    "target_material_commit": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+    "identical_repair_tree_sha": "218b265af0de72dd89395658d533610d60cea2e4",
+    "ownership_concurrency": "Previous rollout committed equivalent source fix to TARGET_BRANCH after initial 9f6b snapshot, before feature branch repair. Target and feature repair commits have byte-identical Git trees. DO NOT promote duplicate feature branch or award duplicate score."
   }
 }
