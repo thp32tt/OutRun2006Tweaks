@@ -23,7 +23,7 @@ BASE=discover.BASE
 SOURCE=discover.SRC
 AUDIT=BASE/"auto_discovery"
 TESS_TIMEOUT=95
-OCR_STRATEGY_COUNT=12
+OCR_STRATEGY_COUNT=18
 
 def norm(t):
     return "".join(ch for ch in str(t).upper() if ch.isalnum())
@@ -66,21 +66,50 @@ def approved_phrases(q):
     return trans
 
 def ocr_words(image, strategy=0, languages="eng"):
-    """Run one deterministic OCR strategy; repeated coverage scans rotate strategies."""
+    """Run one deterministic OCR strategy; repeated coverage scans rotate strategies.
+
+    Styled atlas text frequently disappears in luminance. Recovery strategies
+    therefore inspect alpha and individual RGB channels as well as grayscale,
+    with native/2x and PSM variants interleaved so a source does not spend many
+    cycles repeating the same failed visual representation.
+    """
     strategy=int(strategy)%OCR_STRATEGY_COUNT
-    # Alternate native and 2x recovery immediately instead of spending the
-    # first six attempts repeating only native-resolution OCR.
-    variant=(0,6,1,7,2,8,3,9,4,10,5,11)[strategy]
     rgba=image.convert("RGBA")
-    composed=Image.alpha_composite(Image.new("RGBA",rgba.size,"black"),rgba).convert("L")
-    base_strategy=variant%6
-    scale=2 if variant>=6 else 1
-    psm=(11,6,12,11,6,12)[base_strategy]
-    if base_strategy < 3:
-        prepared=ImageOps.autocontrast(ImageOps.invert(composed))
+    # source, invert, scale, psm, threshold
+    plans=(
+      ("L",True,1,11,False),
+      ("A",True,2,11,False),
+      ("R",True,2,11,False),
+      ("G",True,2,11,False),
+      ("B",True,2,11,False),
+      ("L",True,2,6,False),
+      ("L",False,2,11,False),
+      ("A",True,2,6,False),
+      ("L",True,2,11,True),
+      ("R",True,2,11,True),
+      ("G",True,2,11,True),
+      ("B",True,2,11,True),
+      ("L",True,1,6,False),
+      ("L",True,1,12,False),
+      ("L",False,1,11,False),
+      ("A",True,1,11,False),
+      ("L",False,2,12,False),
+      ("L",True,2,12,False),
+    )
+    source,invert,scale,psm,threshold=plans[strategy]
+    if source=="L":
+        channel=Image.alpha_composite(Image.new("RGBA",rgba.size,"black"),rgba).convert("L")
     else:
-        # Some outlined/dark UI text is read better without polarity inversion.
-        prepared=ImageOps.autocontrast(composed)
+        channel=rgba.getchannel(source)
+    prepared=ImageOps.autocontrast(channel)
+    if threshold:
+        arr=np.asarray(prepared,dtype=np.uint8)
+        lo=float(np.percentile(arr,35))
+        hi=float(np.percentile(arr,82))
+        cut=int(max(32,min(224,(lo+hi)/2)))
+        prepared=prepared.point(lambda p: 255 if p>=cut else 0)
+    if invert:
+        prepared=ImageOps.invert(prepared)
     if scale==2:
         prepared=prepared.resize((prepared.width*2,prepared.height*2),Image.Resampling.LANCZOS)
     with tempfile.TemporaryDirectory(prefix="outrun-ocr-") as td:
@@ -91,6 +120,7 @@ def ocr_words(image, strategy=0, languages="eng"):
                            capture_output=True,text=True,timeout=TESS_TIMEOUT,env=env)
     if run.returncode: raise RuntimeError("TESSERACT_ERROR:"+run.stderr[-500:])
     groups={}
+    all_words=[]
     for row in csv.DictReader(io.StringIO(run.stdout),delimiter="\t"):
         if row.get("level")!="5" or not row.get("text","").strip():continue
         try:
@@ -103,11 +133,37 @@ def ocr_words(image, strategy=0, languages="eng"):
                 x1=(x+w+1)//2; y1=(y+h+1)//2
             else:
                 x0,y0,x1,y1=x,y,x+w,y+h
+            word={"word":txt,"confidence":conf,"bbox":[x0,y0,x1,y1]}
             line=(row["page_num"],row["block_num"],row["par_num"],row["line_num"])
-            groups.setdefault(line,[]).append({"word":txt,"confidence":conf,"bbox":[x0,y0,x1,y1]})
+            groups.setdefault(line,[]).append(word)
+            all_words.append(word)
         except (ValueError,KeyError,TypeError):continue
-    return list(groups.values())
 
+    # Sparse-text PSMs often assign adjacent words to separate blocks/lines.
+    # Reconstruct visual lines by vertical overlap, then let exact reviewed
+    # phrase matching decide whether a merged sequence is admissible.
+    visual=[]
+    for word in sorted(all_words,key=lambda w:((w["bbox"][1]+w["bbox"][3])/2,w["bbox"][0])):
+        x0,y0,x1,y1=word["bbox"]; cy=(y0+y1)/2; h=max(1,y1-y0)
+        best=None; best_delta=None
+        for line in visual:
+            ly0=min(w["bbox"][1] for w in line); ly1=max(w["bbox"][3] for w in line)
+            lcy=(ly0+ly1)/2; lh=max(1,ly1-ly0)
+            delta=abs(cy-lcy)
+            if delta<=.55*max(h,lh) and (best_delta is None or delta<best_delta):
+                best=line; best_delta=delta
+        if best is None:
+            visual.append([word])
+        else:
+            best.append(word)
+    native=[sorted(line,key=lambda w:w["bbox"][0]) for line in groups.values()]
+    merged=[sorted(line,key=lambda w:w["bbox"][0]) for line in visual if len(line)>1]
+    seen=set(); result=[]
+    for line in native+merged:
+        sig=tuple((w["word"],*w["bbox"]) for w in line)
+        if sig in seen:continue
+        seen.add(sig); result.append(line)
+    return result
 def margin_check(im,box):
     a=np.asarray(im.getchannel("A").crop(tuple(box)),dtype=np.uint8)
     if a.size==0 or (a>20).sum()<16:return "EMPTY_ORIGINAL_ALPHA"
@@ -133,9 +189,13 @@ def opaque_context_border(im,box,threshold=.88):
 def unique_regions(words,phrasemap,w,h,allow_fuzzy=False):
     raw=[]
     keys=list(phrasemap)
+    max_phrase_words=max(
+        [9]+[len(re.findall(r"[A-Za-z0-9]+",searchable_phrase(v)))+2
+             for v in phrasemap.values()])
+    max_phrase_words=min(32,max_phrase_words)
     for line in words:
         for begin in range(len(line)):
-            for end in range(begin+1,min(begin+10,len(line)+1)):
+            for end in range(begin+1,min(begin+max_phrase_words+1,len(line)+1)):
                 ws=line[begin:end]
                 code=norm(" ".join(x["word"] for x in ws))
                 matched=code if code in phrasemap else None
@@ -158,9 +218,14 @@ def unique_regions(words,phrasemap,w,h,allow_fuzzy=False):
                 avg=sum(x["confidence"] for x in ws)/len(ws)
                 if mode=="EXACT" and len(matched)<4:
                     min_required,avg_required=92,95
+                elif mode=="EXACT" and len(matched)>=8:
+                    # An exact normalized official phrase is strong evidence;
+                    # stylized outlines often depress one Tesseract word score.
+                    min_required,avg_required=62,76
+                elif mode=="EXACT":
+                    min_required,avg_required=76,84
                 else:
-                    min_required=83 if mode=="EXACT" else 86
-                    avg_required=88 if mode=="EXACT" else 91
+                    min_required,avg_required=74,84
                 if conf<min_required or avg<avg_required:continue
                 x0=min(x["bbox"][0] for x in ws)
                 y0=min(x["bbox"][1] for x in ws)
@@ -170,7 +235,8 @@ def unique_regions(words,phrasemap,w,h,allow_fuzzy=False):
                 pady=max(12,int((y1-y0)*.17))
                 padx=max(18,int((y1-y0)*.36))
                 box=[max(0,x0-padx),max(0,y0-pady),min(w,x1+padx),min(h,y1+pady)]
-                if box[0]==0 or box[1]==0 or box[2]>=w or box[3]>=h:continue
+                # Do not discard frame-touching text here. The downstream
+                # margin/edge-review path records and progressively expands it.
                 if box[2]-box[0]<28 or box[3]-box[1]<20:continue
                 raw.append({"english":phrasemap[matched],"bbox_xyxy":box,
                             "ocr_exact_normalized":matched,"ocr_text":" ".join(x["word"] for x in ws),
