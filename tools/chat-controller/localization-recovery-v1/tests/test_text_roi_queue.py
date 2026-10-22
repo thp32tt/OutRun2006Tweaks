@@ -334,6 +334,63 @@ class TextRoiQueueTests(unittest.TestCase):
         self.assertEqual(st["quarantined"][-1]["observed_generated_images"],6)
         self.assertEqual(st["quarantined"][-1]["retry_reason"],"IMAGEGEN_AMBIGUOUS_EXTRA_FIVE")
 
+    def test_missing_user_turn_reloads_then_restages_same_five(self):
+        items=[]
+        for i in range(5):
+            name=f"Q205_MissingTurn_{i}.png"
+            path=self.image_path.with_name(name)
+            Image.new("RGBA",(96+i,38),(0,0,0,0)).save(path)
+            items.append({
+                **self.item,
+                "id":f"Q205_MissingTurn_{i}",
+                "role":"A",
+                "queue_index":"205",
+                "imagegen_input_png":name,
+                "imagegen_input_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+                "english":f"English {i}",
+                "korean":f"한글 {i}",
+            })
+        self.write_manifest(items)
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        old_task=binding["task_id"]
+        text_roi_queue.stage_submission("A",old_task,self.root)
+        target="https://chatgpt.com/c/missing-user-turn"
+        text_roi_queue.record_chat_url("A",old_task,target,self.root)
+        sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
+        (sent/f"A_{old_task}.json").write_text(json.dumps({
+            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+            "task_id":old_task,"role":"A",
+            "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
+        }),encoding="utf-8")
+
+        class Page:
+            def __init__(self):
+                self.url=target
+                self.reloads=0
+                self.probes=0
+            async def evaluate(self,*args,**kwargs):
+                self.probes+=1
+                return {"error":"USER_TURN_MISSING"}
+            async def wait_for_function(self,*args,**kwargs):
+                raise TimeoutError("lazy turn never rendered")
+            async def reload(self,**kwargs):
+                self.reloads+=1
+            async def wait_for_timeout(self,*args,**kwargs):
+                return None
+
+        page=Page()
+        can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",page,self.root))
+        self.assertTrue(can_continue)
+        self.assertEqual(status,"FIVE_IMAGE_BATCH_RETRY_STAGED")
+        self.assertEqual(page.reloads,1)
+        st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
+        self.assertEqual(st["active"]["task_id"],old_task+"-R1")
+        self.assertEqual(st["active"]["ordinals"],[1,2,3,4,5])
+        self.assertEqual(st["next_ordinal"],1)
+        self.assertEqual(st["completed_files"],0)
+        self.assertEqual(st["quarantined"][-1]["retry_reason"],"IMAGEGEN_USER_TURN_MISSING")
+
     def test_current_prompt_uses_batch_id_binding(self):
         binding,error=text_roi_queue.next_binding("A",self.root)
         self.assertIsNone(error)
