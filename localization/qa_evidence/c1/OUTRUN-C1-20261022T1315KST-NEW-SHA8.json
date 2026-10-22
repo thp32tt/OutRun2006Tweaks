@@ -1,0 +1,454 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1315KST-NEW-SHA8",
+  "checked_at_kst": "2026-10-22T13:18:01.315102+09:00",
+  "policy_branch": "korean-localization-recovery-20260928",
+  "prior_reviewed_sha": 333,
+  "total_unreviewed_before": 10,
+  "count": 8,
+  "unique_candidate_sha": 8,
+  "qa_summary": {
+    "pass_png_text_only": 8,
+    "fail_png_text_only": 0,
+    "producer_dimension_rework_preserved": 8,
+    "rgba_verified": 8,
+    "export_sha_mismatches": 0,
+    "source_manifest_sha_mismatches": 0,
+    "unreviewed_after_this_batch": 2
+  },
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0041-CF172756",
+      "ordinal": 190,
+      "candidate_file": "Q161_a0f1b3a49edfa829_source_k.png",
+      "source_file": "Q161_a0f1b3a49edfa829_source.png",
+      "candidate_sha256": "67b9c6cab741296de4b784068238c179d7defd65546b20f03c2d7e993d331d51",
+      "source_sha256": "2457ec972795ad773cac244e27c26e19cf8d8700ca751c548664d2f1ac507c80",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "LEO",
+      "approved_korean": "사자자리",
+      "original_dimensions": [
+        1092,
+        120
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        43,
+        69,
+        2013,
+        587
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘사자자리’ 네 음절이 읽히며 가짜 자소·영문 잔상·별도 프레임 없음. 원문 LEO와 승인 번역 일치.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1315/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0041-CF172756",
+      "ordinal": 191,
+      "candidate_file": "Q161_69ceaa6d71a93a6c_source_k.png",
+      "source_file": "Q161_69ceaa6d71a93a6c_source.png",
+      "candidate_sha256": "c1caea3287bf9ea5e54c8ea80aaa23b0001cf5ab301267c68a109f21801e3314",
+      "source_sha256": "0296d475c69aabe01d3f21d1737380ed1887cb8273b6b424948803cc47ef6339",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "MEXICO",
+      "approved_korean": "멕시코",
+      "original_dimensions": [
+        1092,
+        120
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        30,
+        141,
+        879,
+        571
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘멕시코’ 세 음절·받침 및 어두운 금속 윤곽 정상 식별. 원문 MEXICO와 승인 번역 일치.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1315/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0041-CF172756",
+      "ordinal": 192,
+      "candidate_file": "Q161_eea1bc2c7446635e_source_k.png",
+      "source_file": "Q161_eea1bc2c7446635e_source.png",
+      "candidate_sha256": "c1417156c0862abf7001de4334c89967ebf5e9bbea4ca3425d1cbdbcd5ebb097",
+      "source_sha256": "acb3be92b71fcb149d95f5a17f2e8f8c769c968317a57d46665bba968a12eada",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "USA",
+      "approved_korean": "미국",
+      "original_dimensions": [
+        1210,
+        120
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        38,
+        157,
+        568,
+        511
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘미국’ 두 음절의 구조·받침이 명료함. 원문 USA와 승인 번역 일치.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1315/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0041-CF172756",
+      "ordinal": 193,
+      "candidate_file": "Q161_73e0b73011bd08af_source_k.png",
+      "source_file": "Q161_73e0b73011bd08af_source.png",
+      "candidate_sha256": "cb1ba633a966e9f1e6d7ac5672163043dcbd2fd9e4beb9004b000aa945626273",
+      "source_sha256": "f68f9eba2428fa499106ea152eea8aeaa336beddb5537df005a473e44bfddb1d",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "SAGITTARIUS",
+      "approved_korean": "사수자리",
+      "original_dimensions": [
+        1210,
+        116
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        57,
+        87,
+        1768,
+        611
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘사수자리’ 네 음절 및 이탤릭 윤곽이 읽힘. 원문 SAGITTARIUS와 승인 번역 일치.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1315/compare_4.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0041-CF172756",
+      "ordinal": 194,
+      "candidate_file": "Q161_fa1031c933ff857b_source_k.png",
+      "source_file": "Q161_fa1031c933ff857b_source.png",
+      "candidate_sha256": "2cf08a8eabd33b96abf34a2d7daaa0870d11fdd43046d953658055821c740e91",
+      "source_sha256": "74d8dfe0a64c96a4ad697b8a4f3111042794ba55c929e1ed9b11826bc6793e82",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "DENMARK",
+      "approved_korean": "덴마크",
+      "original_dimensions": [
+        1092,
+        112
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        35,
+        69,
+        1691,
+        636
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘덴마크’ 네 음절의 받침과 끝 글자 구조가 읽힘. 원문 DENMARK와 승인 번역 일치.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1315/compare_5.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0042-6BA2F0A0",
+      "ordinal": 195,
+      "candidate_file": "Q161_8b1637261d98ebb1_source_k.png",
+      "source_file": "Q161_8b1637261d98ebb1_source.png",
+      "candidate_sha256": "d5bff5c04e962e1f48769537bb0d799dfbc3594c32ab7f78a5ed6d7d1f422886",
+      "source_sha256": "e323f822768286709b6b57edb54c5cbb2e3074528a5b53e88f48b49cba8962ac",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "FRANCE",
+      "approved_korean": "프랑스",
+      "original_dimensions": [
+        1210,
+        116
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        33,
+        103,
+        801,
+        579
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘프랑스’ 세 음절 및 받침이 식별됨. 원문 FRANCE와 승인 번역 일치.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1315/compare_6.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0042-6BA2F0A0",
+      "ordinal": 196,
+      "candidate_file": "Q161_c8218cd6556c2d83_source_k.png",
+      "source_file": "Q161_c8218cd6556c2d83_source.png",
+      "candidate_sha256": "946c0fbe685fa18c01ba4c0328edb64914ca35dac2b4c3daa6148b41c56d63bc",
+      "source_sha256": "bf9148b1cc448dbd84805d4597f1ed9d09797cb85f6ef93cf4efc245b2bf0220",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "BELGIUM",
+      "approved_korean": "벨기에",
+      "original_dimensions": [
+        1092,
+        116
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        23,
+        93,
+        1468,
+        619
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘벨기에’ 세 음절이 명료하며 원문 BELGIUM과 매핑 일치. 영어 잔상·배경 프레임 없음.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1315/compare_7.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0042-6BA2F0A0",
+      "ordinal": 197,
+      "candidate_file": "Q212_a2eee0f2755cb5d3_source_k.png",
+      "source_file": "Q212_a2eee0f2755cb5d3_source.png",
+      "candidate_sha256": "de71a1a06fd8c63e5985d0f6cb3e65fb10e78fcbaae4de647cd0600461068042",
+      "source_sha256": "db5b7c2628edf16416280f3924a698c7e004166566ccbde63364d4f278e8cc45",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "HEART ATTACK",
+      "approved_korean": "하트 어택",
+      "original_dimensions": [
+        1374,
+        178
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        22,
+        101,
+        1549,
+        625
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘하트 어택’ 두 어절의 획, 윤곽 및 붉은 강조 효과가 읽힘. 원문 HEART ATTACK과 승인 번역 일치.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1315/compare_8.jpg"
+    }
+  ],
+  "scope_statement": "C1 independently checked saved A/B Korean candidate PNG pixels against source and approved mapping; no ImageGen, A/B queue consumption, UI-cell composition, native DDS, C2/C3 or in-game approval. Source ROI/candidate dimensions differ for each PNG, so producer REWORK_DIMENSIONS remains open.",
+  "status": "C1_PNG_TEXT_QA_RECORDED_PRODUCER_REWORK_DIMENSIONS"
+}
