@@ -2296,6 +2296,39 @@ bool native_game_raster_partial_backbuffer_color_clear(
                context, target, width, height, region, rgba);
 }
 
+// An original D3D9 combined partial TARGET|Z mutates BOTH the main color
+// and depth surfaces. D3D11.0 lacks ClearView; keep the two bounded GPU
+// raster operations in one fail-closed source timeline. No native Draw count.
+bool native_game_raster_partial_backbuffer_target_depth_clear(
+    ID3D11DeviceContext* context, ID3D11RenderTargetView* color,
+    ID3D11DepthStencilView* depthView, std::uint32_t width,
+    std::uint32_t height, const D3D11_RECT& region,
+    const float (&rgba)[4], float z) noexcept {
+    if (!context || !color || !depthView || !(z >= 0.f && z <= 1.f) ||
+        !native_game_partial_color_shader_rtv(context, color))
+        return false;
+    D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+    depthView->GetDesc(&dsvDesc);
+    // Preserve actual D32-only non-MSAA depth semantics. No guessed
+    // stencil/typeless or READ_ONLY_DEPTH clear and no foreign-device RTV.
+    if (dsvDesc.Format != DXGI_FORMAT_D32_FLOAT ||
+        dsvDesc.ViewDimension != D3D11_DSV_DIMENSION_TEXTURE2D ||
+        (dsvDesc.Flags & D3D11_DSV_READ_ONLY_DEPTH) != 0u)
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice, depthDevice;
+    context->GetDevice(contextDevice.GetAddressOf());
+    depthView->GetDevice(depthDevice.GetAddressOf());
+    if (!contextDevice || contextDevice.Get() != depthDevice.Get())
+        return false;
+    // The game D3D9 operation has already succeeded. Should either native
+    // shader path fail, its caller aborts native publication and the DX9Ex
+    // game pixels, original HRESULT and controls stay authoritative.
+    return raster_partial_eye_color_clear(
+               context, color, width, height, region, rgba) &&
+           raster_partial_eye_depth_clear(
+               context, depthView, width, height, region, z, 0u, true, false);
+}
+
 // A real game post-process StretchRect is not a CopySubresourceRegion: the
 // source and destination spans can differ. Rasterize the genuine GPU color
 // through point/linear filtering in a bounded eye viewport. This operation

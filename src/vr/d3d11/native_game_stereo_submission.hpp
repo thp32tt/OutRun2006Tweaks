@@ -9,6 +9,15 @@ namespace outrun::vr::dx11 {
 
 struct NativeGameEyePartialTargetClear;
 
+// Replays BOTH regions of a successful original D3D9 partial TARGET|Z
+// Clear onto the owned native mono color RTV and D32 depth-only DSV.
+ // A failed GPU replay vetoes the native frame; never fabricate Draw evidence.
+[[nodiscard]] bool native_game_raster_partial_backbuffer_target_depth_clear(
+    ID3D11DeviceContext* context, ID3D11RenderTargetView* color,
+    ID3D11DepthStencilView* depthView, std::uint32_t width,
+    std::uint32_t height, const D3D11_RECT& region,
+    const float (&rgba)[4], float z) noexcept;
+
 // Replay an original game-authored partial backbuffer color write on D3D11.0.
 // Uses the already owned native-eye raster path with full IA/OM/shader restore.
 // This is a Clear/ColorFill mutation, never native game Draw evidence.

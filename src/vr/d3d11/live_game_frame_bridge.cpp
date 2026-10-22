@@ -7726,9 +7726,9 @@ bool preserve_game_partial_target_clear(
         }
         // Check the D3D9 main Z owner, extents and native D32 attachment
         // before changing even the color RTV of a combined TARGET|Z Clear.
-        if (clearZ && !native_game_partial_depth_ready(
-                s, game, backbufferDesc.Width, backbufferDesc.Height))
-            return false;
+        const bool nativeDepthReady = !clearZ || native_game_partial_depth_ready(
+            s, game, backbufferDesc.Width, backbufferDesc.Height);
+        if (!nativeDepthReady) return false;
         // An entirely off-viewport successful D3D9 Clear wrote neither
         // color nor Z. Retain the native frame and exact Draw ordinals.
         if (nativeRegionCount == 0u) return true;
@@ -7738,9 +7738,11 @@ bool preserve_game_partial_target_clear(
         // When TARGET and Z are coupled, rejecting the native replay is
         // mandatory unless both color and depth can be replayed identically.
         // D3D11.0's color-only GPU raster must NEVER drop the depth mutation.
+        const bool pairedDepthRaster = partial_game_paired_target_depth_raster(
+            hasClearView, clearZ, ready, nativeDepthReady);
         if (partial_game_color_replay_route(
                 hasClearView, !clearZ, true) ==
-            PartialColorReplayRoute::reject) return false;
+            PartialColorReplayRoute::reject && !pairedDepthRaster) return false;
         constexpr float scale = 1.0f / 255.0f;
         const float rgba[4] = {
             float((color >> 16) & 255u) * scale,
@@ -7752,11 +7754,20 @@ bool preserve_game_partial_target_clear(
         if (hasClearView) {
             ctx1->ClearView(s.backend.color_rtv(), rgba, regions.data(),
                             nativeRegionCount);
+        } else if (pairedDepthRaster) {
+            // Original TARGET|Z Clear succeeds atomically on D3D9. Replay
+            // both mutations in order for each region, never a color-only
+            // approximation. Any native failure retires this candidate.
+            for (UINT i = 0u; i < nativeRegionCount; ++i)
+                if (!native_game_raster_partial_backbuffer_target_depth_clear(
+                        s.backend.context(), s.backend.color_rtv(),
+                        s.diagnosticDepthView.Get(),
+                        backbufferDesc.Width, backbufferDesc.Height,
+                        regions[i], rgba, z))
+                    return false;
         } else {
-            // D3D11.0 fallback uses exact source rectangles and restores
-            // every live pipeline binding after each non-evidence GPU Draw.
-            // Any failed rectangle vetoes this native frame; the original
-            // successful D3D9 Clear and game input remain authoritative.
+            // D3D11.0 color-only fallback: exact source rectangles, with
+            // every immediate-context binding restored after shader Draw.
             for (UINT i = 0u; i < nativeRegionCount; ++i)
                 if (!native_game_raster_partial_backbuffer_color_clear(
                         s.backend.context(), s.backend.color_rtv(),
@@ -7764,7 +7775,7 @@ bool preserve_game_partial_target_clear(
                         regions[i], rgba))
                     return false;
         }
-        if (clearZ) {
+        if (clearZ && hasClearView) {
             // D32_FLOAT has no stencil component, which is required for
             // ClearView's depth-rectangle support. Preserve all other Z.
             const float depthValue[4] = {z, 0.0f, 0.0f, 0.0f};
