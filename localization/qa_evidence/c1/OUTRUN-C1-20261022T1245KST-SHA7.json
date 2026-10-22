@@ -1,0 +1,399 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1245KST-NEW-SHA7",
+  "checked_at_kst": "2026-10-22T12:47:16.279572+09:00",
+  "policy_branch": "korean-localization-recovery-20260928",
+  "prior_reviewed_sha": 326,
+  "total_unreviewed_before": 7,
+  "count": 7,
+  "unique_candidate_sha": 7,
+  "qa_summary": {
+    "pass_png_text_only": 7,
+    "fail_png_text_only": 0,
+    "producer_dimension_rework_preserved": 7,
+    "rgba_verified": 7,
+    "export_sha_mismatches": 0,
+    "source_manifest_sha_mismatches": 0
+  },
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0039-CC3FE18A",
+      "ordinal": 183,
+      "candidate_file": "Q051_dcb17b73f904a244_source_k.png",
+      "source_file": "Q051_dcb17b73f904a244_source.png",
+      "candidate_sha256": "31e6daf40eab4aadd8122d6db9fb6d5261dce0c5fd29e00776ffb368dc160c26",
+      "source_sha256": "3dd486e6d5b3112320755b126edde134bd187dbe2f2c30c1c05897b8abc6a8f4",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "GREAT SESSION",
+      "approved_korean": "즐거운 경기",
+      "original_dimensions": [
+        1146,
+        164
+      ],
+      "dimensions": [
+        2170,
+        725
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        49,
+        71,
+        1957,
+        651
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘즐거운 경기’ 문구 완전하고 먹색 금속 효과·문자 구조가 읽힘. 원문 GREAT SESSION과 매핑 일치.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1245/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0039-CC3FE18A",
+      "ordinal": 184,
+      "candidate_file": "Q051_b80012a3c1d363f7_source_k.png",
+      "source_file": "Q051_b80012a3c1d363f7_source.png",
+      "candidate_sha256": "4558e611105b7547b7de29eb63ea97cf35ca563b827d45d98d3be32215105d29",
+      "source_sha256": "b96947d4beb0ca20b3f1b284b2de2cba8a0c98a667a774e5277e957913ffc17d",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Beat that car!",
+      "approved_korean": "저 차를 이기세요!",
+      "original_dimensions": [
+        1212,
+        304
+      ],
+      "dimensions": [
+        2168,
+        725
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        57,
+        29,
+        2136,
+        725
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 1
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘저 차를 이기세요!’ 문구 및 느낌표 식별, 원문 강조 효과와 대체로 일치. 흰 윤곽의 경미한 픽셀 잡음은 미관 허용.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1245/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0040-9F077515",
+      "ordinal": 185,
+      "candidate_file": "Q051_1381fab4eb86867c_source_k.png",
+      "source_file": "Q051_1381fab4eb86867c_source.png",
+      "candidate_sha256": "2b2a311ef9e7c9833f89df20eea3db7d0f4cb4066c40dcd74bd90d51975404a2",
+      "source_sha256": "9d53d971187c36b36f67e66e225e324fb5e9c7ebf44ee68530da113290549f78",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Total Time",
+      "approved_korean": "총 시간",
+      "original_dimensions": [
+        960,
+        254
+      ],
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        31,
+        61,
+        1236,
+        1230
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘총 시간’ 음절·받침과 좌측 기울기 식별. 원문 TOTAL TIME보다 짧은 전체 폭은 반려 사유가 아님.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1245/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0040-9F077515",
+      "ordinal": 186,
+      "candidate_file": "Q053_732cf17bbf64e75b_source_k.png",
+      "source_file": "Q053_732cf17bbf64e75b_source.png",
+      "candidate_sha256": "2e5e3421b8eff619e7df5826620623ff4d38ee21df750ec79c46d0aeb1f98028",
+      "source_sha256": "a77d22c8098948ca778470d0ff969f5f192cfc901caac8e2550b75c8cc9f7058",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "START",
+      "approved_korean": "시작",
+      "original_dimensions": [
+        980,
+        290
+      ],
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox": [
+        0,
+        17,
+        1245,
+        1254
+      ],
+      "edge_alpha_max": {
+        "left": 1,
+        "right": 0,
+        "top": 0,
+        "bottom": 1
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘시작’ 2음절 완전하고 녹색 광택·글자 윤곽 식별. 주변 효과 가장자리의 극미량 반투명 픽셀 존재.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1245/compare_4.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0040-9F077515",
+      "ordinal": 187,
+      "candidate_file": "Q061_1c6dfc102ba43c9c_source_k.png",
+      "source_file": "Q061_1c6dfc102ba43c9c_source.png",
+      "candidate_sha256": "d1af8ecc489574d003c2903b4c058782ad9f873cf6a098ce84449726df889122",
+      "source_sha256": "d2ffe4f144f19e412c3291db36849177a939e5b12e950ac584f89d18fe773a32",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "NEXT STAGE",
+      "approved_korean": "다음 스테이지",
+      "original_dimensions": [
+        1064,
+        312
+      ],
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        43,
+        47,
+        1238,
+        1228
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘다음 스테이지’ 글자 구조·어절·우측 경사 식별. 별도 UI 배경 미발견.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1245/compare_5.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0040-9F077515",
+      "ordinal": 188,
+      "candidate_file": "Q094_30ba7b07ed998559_source_k.png",
+      "source_file": "Q094_30ba7b07ed998559_source.png",
+      "candidate_sha256": "25d11814a9fd57e098dd2ac8e0c9cf51df6146df611ffce52fe03adc3b48a5db",
+      "source_sha256": "a5c13e91002e9ad9b8da493d740359f9255d3cf587519257df69370545c0c679",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Special Course",
+      "approved_korean": "스페셜 코스",
+      "original_dimensions": [
+        880,
+        237
+      ],
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        39,
+        1232,
+        1230
+      ],
+      "edge_alpha_max": {
+        "left": 1,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘스페셜 코스’ 표기·획·받침 명료, 황색/청색 윤곽 유지. 아주 약한 외곽선 잡음.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1245/compare_6.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0040-9F077515",
+      "ordinal": 189,
+      "candidate_file": "Q104_01e25aa25a681d26_source_k.png",
+      "source_file": "Q104_01e25aa25a681d26_source.png",
+      "candidate_sha256": "adb42264e5efca13af5ec9429eb9f1de5c5250e01f58a0398a6f224863c97898",
+      "source_sha256": "43b1fe18f2cb9d1bc34b34be10cc6a26c6e932c0c9efbe906c0039bef60be9d6",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "OutRun Mode",
+      "approved_korean": "아웃런 모드",
+      "original_dimensions": [
+        1114,
+        256
+      ],
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        49,
+        101,
+        1223,
+        1090
+      ],
+      "edge_alpha_max": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘아웃런 모드’ 표기·음절·황금색/주황색 효과 식별. 별도 프레임·원문 잔상 없음.",
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_NATIVE_UI_COMPOSITION",
+      "production_dimension_gate": "REWORK_DIMENSIONS_PRESERVED",
+      "c1_png_text_only_pass": true,
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_1245/compare_7.jpg"
+    }
+  ],
+  "scope_statement": "C1 independently checks stored A/B Korean candidate PNG bytes and source mapping; no native UI-cell layout, final DDS, C2/C3, runtime or in-game approval. Non-native candidate dimensions retain producer REWORK_DIMENSIONS even where text-only QA passes. No ImageGen invocation; A/B queues unchanged.",
+  "status": "C1_PNG_TEXT_QA_RECORDED_PRODUCER_REWORK_DIMENSIONS"
+}
