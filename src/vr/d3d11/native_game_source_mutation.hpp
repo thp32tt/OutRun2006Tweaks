@@ -69,9 +69,9 @@ struct GameNativeSourceMutation {
     }
 
     // Only a live full-frame Draw with matching canonical Z and an allocated
-    // depth-only D32 native DSV may replay clipped D3D9 Z rectangles. Unlike
-    // ClearDepthStencilView, D3D11.1 ClearView accepts bounded rectangles on
-    // depth-only resources. Missing depth/owner/context must preserve DX9Ex.
+    // depth-only D32 native DSV may replay clipped source-game Z rectangles.
+    // D3D11.1 ClearView or the owned D3D11.0 GPU raster updates exact pixels.
+    // Missing depth/owner/context always preserves DX9Ex.
     [[nodiscard]] static constexpr bool mirrors_partial_depth_clear(
         bool full, bool sameMainDepth, bool activeBatch,
         bool nativeDepthReady, bool d32DepthView, bool context1Ready) noexcept {

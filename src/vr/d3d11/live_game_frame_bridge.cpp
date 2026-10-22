@@ -8007,11 +8007,10 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                 sameMainDepthStencil, compatibleCoverage,
                 !s.frameBatch.stopped))
             return false;
-        // D3D9 supports viewport-scissored Z Clears during a live menu/race
-        // frame. D3D11 ClearDepthStencilView would erase *all* prior depth:
-        // use D3D11.1 ClearView on our D32_FLOAT-only DSV instead. Verify
-        // every rectangle before mutating the GPU. No native depth owner or
-        // D3D11.0-only context means unchanged DX9Ex and batch retirement.
+        // Game-authored partial Z Clears must preserve untouched menu/race
+        // depth: D3D11.1 ClearView or bounded D3D11.0 depth-only GPU Draw,
+        // never whole-DSV ClearDepthStencilView. Validate canonical main Z,
+        // live native D32 view and every rectangle before any GPU mutation.
         if (partialDepth) {
             if (clearStencil || !continuingFullNativeDraw ||
                 !GameNativeSourceMutation::mirrors_partial_depth_clear(
@@ -8049,13 +8048,23 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
             }
             if (used == 0u) return true;
             ComPtr<ID3D11DeviceContext1> context1;
-            if (FAILED(s.backend.context()->QueryInterface(
-                    IID_PPV_ARGS(context1.GetAddressOf()))) || !context1)
-                return false;
-            const float depthValue[4] = {z, 0.0f, 0.0f, 0.0f};
-            context1->ClearView(s.diagnosticDepthView.Get(), depthValue,
-                                regions.data(), used);
-            return true; // Keep RTV, previously drawn Z and source ordinals.
+            const bool hasClearView = SUCCEEDED(
+                s.backend.context()->QueryInterface(
+                    IID_PPV_ARGS(context1.GetAddressOf()))) && context1;
+            if (hasClearView) {
+                const float depthValue[4] = {z, 0.0f, 0.0f, 0.0f};
+                context1->ClearView(s.diagnosticDepthView.Get(), depthValue,
+                                    regions.data(), used);
+            } else {
+                // Preserve the original game Clear order on 11.0. Any
+                // unsupported GPU write retires native output, not DX9Ex.
+                for (std::uint32_t i = 0u; i < used; ++i)
+                    if (!native_game_raster_partial_backbuffer_depth_clear(
+                            s.backend.context(), s.diagnosticDepthView.Get(),
+                            bbDesc.Width, bbDesc.Height, regions[i], z))
+                        return false;
+            }
+            return true; // Keep RTV, unaffected Z and native Draw ordinals.
         }
         // Prove the same canonical D3D9 backbuffer/color Clear before
         // admitting a separate full Z Clear with zero native game Draws.

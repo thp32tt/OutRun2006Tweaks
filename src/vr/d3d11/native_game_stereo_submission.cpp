@@ -2296,6 +2296,42 @@ bool native_game_raster_partial_backbuffer_color_clear(
                context, target, width, height, region, rgba);
 }
 
+// Replay a game-authoritative clipped Z-only Clear into the native mono
+// depth attachment, including D3D11.0 without ClearView. Reject foreign,
+// read-only, non-D32, multisampled or mismatched resources before GPU work.
+// The original D3D9 game and input are unaffected by a native failure.
+bool native_game_raster_partial_backbuffer_depth_clear(
+    ID3D11DeviceContext* context, ID3D11DepthStencilView* depthView,
+    std::uint32_t width, std::uint32_t height,
+    const D3D11_RECT& region, float z) noexcept {
+    if (!context || !depthView || !width || !height ||
+        !std::isfinite(z) || z < 0.f || z > 1.f) return false;
+    D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+    depthView->GetDesc(&dsvDesc);
+    if (dsvDesc.Format != DXGI_FORMAT_D32_FLOAT ||
+        dsvDesc.ViewDimension != D3D11_DSV_DIMENSION_TEXTURE2D ||
+        dsvDesc.Texture2D.MipSlice != 0u ||
+        (dsvDesc.Flags & D3D11_DSV_READ_ONLY_DEPTH) != 0u)
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> owner, sourceDevice;
+    context->GetDevice(owner.GetAddressOf());
+    depthView->GetDevice(sourceDevice.GetAddressOf());
+    if (!owner || owner.Get() != sourceDevice.Get()) return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    depthView->GetResource(resource.GetAddressOf());
+    if (!resource || FAILED(resource.As(&texture)) || !texture)
+        return false;
+    D3D11_TEXTURE2D_DESC textureDesc{};
+    texture->GetDesc(&textureDesc);
+    if (textureDesc.Width != width || textureDesc.Height != height ||
+        textureDesc.SampleDesc.Count != 1u || textureDesc.ArraySize != 1u)
+        return false;
+    // Scoped IA/OM/shader restore; this clear cannot count as a game Draw.
+    return raster_partial_eye_depth_clear(
+        context, depthView, width, height, region, z, 0u, true, false);
+}
+
 // An original D3D9 combined partial TARGET|Z mutates BOTH the main color
 // and depth surfaces. D3D11.0 lacks ClearView; keep the two bounded GPU
 // raster operations in one fail-closed source timeline. No native Draw count.
@@ -2325,8 +2361,8 @@ bool native_game_raster_partial_backbuffer_target_depth_clear(
     // game pixels, original HRESULT and controls stay authoritative.
     return raster_partial_eye_color_clear(
                context, color, width, height, region, rgba) &&
-           raster_partial_eye_depth_clear(
-               context, depthView, width, height, region, z, 0u, true, false);
+           native_game_raster_partial_backbuffer_depth_clear(
+               context, depthView, width, height, region, z);
 }
 
 // A real game post-process StretchRect is not a CopySubresourceRegion: the
