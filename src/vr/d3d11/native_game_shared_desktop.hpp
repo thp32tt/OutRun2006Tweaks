@@ -138,10 +138,56 @@ public:
                 __uuidof(IDirect3DDevice9Ex),
                 reinterpret_cast<void**>(ex.GetAddressOf()))) || !ex)
             return false;
-        if (!shared9_ || device11_.Get() != device ||
+        const bool allocationChanged =
+            !shared9_ || device11_.Get() != device ||
             game9Ex_.Get() != ex.Get() ||
             width_ != width || height_ != height ||
-            generation_ != generation) {
+            generation_ != generation;
+        if (allocationChanged) {
+            // Menu, vehicle and race changes can replace this allocation
+            // while the previous frame still has GPU users on both APIs.
+            // Keep the original D3D9 Present/input/FFB until both retire.
+            if (shared9_) {
+                if (faulted_) return false;
+                if (d3d9ReadPending_) {
+                    if (!d3d9ReadFence_) {
+                        faulted_ = true;
+                        return false;
+                    }
+                    const HRESULT consumerDone = d3d9ReadFence_->GetData(
+                        nullptr, 0u, D3DGETDATA_FLUSH);
+                    if (consumerDone == S_FALSE) return false;
+                    if (consumerDone != S_OK) {
+                        faulted_ = true;
+                        return false;
+                    }
+                    d3d9ReadPending_ = false;
+                }
+                if (pending_) {
+                    // The incoming context may belong to a different device.
+                    // Complete the copy using the OLD producer's own context.
+                    if (!device11_ || !fence_) {
+                        faulted_ = true;
+                        return false;
+                    }
+                    Microsoft::WRL::ComPtr<ID3D11DeviceContext> previousContext;
+                    device11_->GetImmediateContext(
+                        previousContext.GetAddressOf());
+                    if (!previousContext) {
+                        faulted_ = true;
+                        return false;
+                    }
+                    const HRESULT producerDone = previousContext->GetData(
+                        fence_.Get(), nullptr, 0,
+                        D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                    if (producerDone == S_FALSE) return false;
+                    if (producerDone != S_OK) {
+                        faulted_ = true;
+                        return false;
+                    }
+                    pending_ = false;
+                }
+            }
             reset();
             D3D11_TEXTURE2D_DESC shared{};
             shared.Width = width;
