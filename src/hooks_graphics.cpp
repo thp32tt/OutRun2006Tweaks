@@ -176,19 +176,25 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
         return false;
 
     const auto& m = player->matrix_B0;
-    const OutRunVR::DriverSeatCamera::Vec3 carOrigin{
-        m._41, m._42, m._43
-    };
     const OutRunVR::DriverSeatCamera::CarAxes axes{
         {m._31, m._32, m._33},
         {m._21, m._22, m._23}
     };
+    const auto& nativePos = camera->cam_pos_F8;
+    const auto& nativeLook = camera->look_pos_104;
 
-    // Standalone Quest owns the cockpit independently from the stock PC
-    // camera. Mirror that contract: once gameplay owns DriverSeatView, build
-    // the seat directly from the player-car transform. If the interpolated
-    // render matrix is invalid for one frame, hold the last valid cockpit pose
-    // instead of exposing the bumper camera and producing a visible zoom pulse.
+    // Runtime Quest3 evidence on 2026-10-22 proved the absolute car-origin
+    // anchor placed the eye deep inside the player model:
+    //   car origin=(3.5,0,-16) + offsets(-1.35,-0.32,+0.65)
+    //   -> seat=(2.15,0.65,-16.32)
+    // and the full vehicle then filled the HMD. The published settings have
+    // always described these offsets relative to the native bumper/in-car
+    // camera, not relative to matrix_B0 translation. Restore that contract.
+    //
+    // VRDriverSeatCarSpaceBasis still optionally uses the player-car axes for
+    // offset orientation, but the absolute anchor remains the native camera.
+    // If one interpolated pose is invalid, retain the last valid pair so the
+    // previous zoom-oscillation fix remains intact.
     static thread_local bool hasLastValidPose = false;
     static thread_local OutRunVR::DriverSeatCamera::Vec3 lastPosition{};
     static thread_local OutRunVR::DriverSeatCamera::Vec3 lastLook{};
@@ -201,12 +207,16 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     }
 
     OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
-    if (OutRunVR::DriverSeatCamera::ComputeCarAnchoredSeatPose(
-            carOrigin, axes,
+    bool usedCarSpace = false;
+    if (OutRunVR::DriverSeatCamera::ComputeStableSeatPose(
+            {nativePos.x, nativePos.y, nativePos.z},
+            {nativeLook.x, nativeLook.y, nativeLook.z},
+            Settings::VRDriverSeatCarSpaceBasis,
+            axes,
             Settings::VRDriverSeatForward.get(),
             Settings::VRDriverSeatRight.get(),
             Settings::VRDriverSeatUp.get(),
-            newPos, newLook))
+            newPos, newLook, &usedCarSpace))
     {
         lastPosition = newPos;
         lastLook = newLook;
