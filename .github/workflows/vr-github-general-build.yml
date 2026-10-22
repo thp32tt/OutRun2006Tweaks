@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
+      - 'src/hooks_uiscaling.cpp'
       - 'src/vr/settings.cpp'
       - 'vrhost/**'
       - 'CMakeLists.txt'
