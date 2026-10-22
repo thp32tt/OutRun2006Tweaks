@@ -1,0 +1,598 @@
+{
+  "run_key": "OUTRUN-C1-20261023T0315KST-A4-B4-NEW-SHA8",
+  "checked_at_kst": "2026-10-23T03:18:02.033029+09:00",
+  "reviewed_sha_history_count": 399,
+  "new_unique_count": 8,
+  "records": [
+    {
+      "role": "A",
+      "batch": 56,
+      "task": "OUTRUN-ROI-A-0056-3C52F2F4",
+      "source_file": "Q137_64b521c49c33d01a_source.png",
+      "candidate_file": "Q137_64b521c49c33d01a_source_k.png",
+      "source_ordinal": 274,
+      "english": "MANUAL",
+      "approved_korean": "수동",
+      "original_dds_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "source_sha256": "103f56996d4520129a180d4fc7c499b6e26f42af19812f648f01ebed1b63f0cd",
+      "candidate_sha256": "5baaf1fa33e70415c93be0981897de5340a91d5038021998d392ad1618e100f1",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          868,
+          582
+        ],
+        "alpha_bbox": [
+          1,
+          67,
+          868,
+          582
+        ],
+        "edge_alpha_pixels": [
+          0,
+          285,
+          0,
+          866
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1531,
+          1027
+        ],
+        "alpha_bbox": [
+          44,
+          57,
+          1171,
+          730
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "수동",
+      "translation_match": "PASS_TARGET_TEXT_PRESENT_VISUAL",
+      "glyph_legibility": "PASS_TARGET_TEXT_VISUAL",
+      "source_roi_isolation": "FAIL",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "FAIL",
+      "c1_reason_code": "SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "c1_reason": "원본 MANUAL ROI 안에 SELECT TRANSMISSION, 두 개의 MANUAL, 잘린 옆 레이블, 패널/테두리 아트가 함께 들어 있어 검증된 단일 문구 입력 조건 위반. 생성된 수동 글자 자체는 읽힘."
+    },
+    {
+      "role": "A",
+      "batch": 55,
+      "task": "OUTRUN-ROI-A-0055-5F35C05E",
+      "source_file": "Q205_6ef92dce290af897_source.png",
+      "candidate_file": "Q205_6ef92dce290af897_source_k.png",
+      "source_ordinal": 273,
+      "english": "CONGRATULATIONS!",
+      "approved_korean": "축하합니다!",
+      "original_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "source_sha256": "85156b3b60892d204ae0a9ca77380ccc7554c66ae0629a8fe2520e5bd11015a2",
+      "candidate_sha256": "c732f5a552c4ddd201bbc5fd3049a69bfe8744a79a8b1e4beaab33938dad4ce5",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1488,
+          160
+        ],
+        "alpha_bbox": [
+          29,
+          19,
+          1453,
+          141
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          23,
+          2128,
+          700
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "축하합니다!",
+      "translation_match": "PASS_TARGET_TEXT_PRESENT_VISUAL",
+      "glyph_legibility": "PASS_TARGET_TEXT_VISUAL",
+      "source_roi_isolation": "SOURCE_TARGET_VISIBLE",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "HOLD",
+      "c1_reason_code": "CANVAS_SCALE_AND_UI_PLACEMENT_UNVERIFIED",
+      "c1_reason": "축하합니다! 읽힘, 잔상·추가 레이블 식별 안 됨. 출력 2172x724와 원본 1488x160 불일치, 실제 UI셀 좌표/합성 검증 없어 정식 PASS 불가."
+    },
+    {
+      "role": "A",
+      "batch": 55,
+      "task": "OUTRUN-ROI-A-0055-5F35C05E",
+      "source_file": "Q205_7316bffaeed9564b_source.png",
+      "candidate_file": "Q205_7316bffaeed9564b_source_k.png",
+      "source_ordinal": 272,
+      "english": "You got this item",
+      "approved_korean": "이 아이템을 획득했습니다",
+      "original_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "source_sha256": "b9b3896de9e831269fe30a4a4952184a492bfcf54ea254f9cfffb787a12b0c2a",
+      "candidate_sha256": "8c8c3f6581df2d12c068df387be40fe42b2182a8d367fb8b56793c92d84784b8",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          956,
+          160
+        ],
+        "alpha_bbox": [
+          17,
+          19,
+          921,
+          141
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          27,
+          59,
+          2155,
+          668
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "이 아이템을 획득했습니다",
+      "translation_match": "PASS_TARGET_TEXT_PRESENT_VISUAL",
+      "glyph_legibility": "PASS_TARGET_TEXT_VISUAL",
+      "source_roi_isolation": "SOURCE_TARGET_VISIBLE",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "HOLD",
+      "c1_reason_code": "CANVAS_SCALE_AND_UI_PLACEMENT_UNVERIFIED",
+      "c1_reason": "이 아이템을 획득했습니다 읽힘, 추가 문구 식별 안 됨. 출력 2172x724와 원본 956x160 불일치, 실제 UI 안전영역/합성 미검증."
+    },
+    {
+      "role": "A",
+      "batch": 55,
+      "task": "OUTRUN-ROI-A-0055-5F35C05E",
+      "source_file": "Q205_e430b295b9f0aaa2_source.png",
+      "candidate_file": "Q205_e430b295b9f0aaa2_source_k.png",
+      "source_ordinal": 271,
+      "english": "You got this item",
+      "approved_korean": "이 아이템을 획득했습니다",
+      "original_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "source_sha256": "b9b3896de9e831269fe30a4a4952184a492bfcf54ea254f9cfffb787a12b0c2a",
+      "candidate_sha256": "ae62b9278255697b7c81e2f2129b04b1a6902f4500ecd4ca29aa3e05b96a3c8f",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          956,
+          160
+        ],
+        "alpha_bbox": [
+          17,
+          19,
+          921,
+          141
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          66,
+          71,
+          2124,
+          690
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "이 아이템을 획득했습니다",
+      "translation_match": "PASS_TARGET_TEXT_PRESENT_VISUAL",
+      "glyph_legibility": "PASS_TARGET_TEXT_VISUAL",
+      "source_roi_isolation": "SOURCE_TARGET_VISIBLE",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "HOLD",
+      "c1_reason_code": "CANVAS_SCALE_AND_UI_PLACEMENT_UNVERIFIED",
+      "c1_reason": "이 아이템을 획득했습니다 읽힘, 추가 문구 식별 안 됨. 출력 2172x724와 원본 956x160 불일치, 실제 UI 안전영역/합성 미검증."
+    },
+    {
+      "role": "B",
+      "batch": 65,
+      "task": "OUTRUN-ROI-B-0065-1C1FB658",
+      "source_file": "Q043_66e0a8f354d61848_source.png",
+      "candidate_file": "Q043_66e0a8f354d61848_source_k.png",
+      "source_ordinal": 314,
+      "english": "CONTINUE",
+      "approved_korean": "계속하기",
+      "original_dds_sha256": "6fe91b81c15ea740ae3d54d10b4479a7ac1bd554942c51ab9483d9e2ea53a011",
+      "source_sha256": "3e160670f35a14e2e8a0272d846e61fa55d10db8152970a2168f3ae07d13b2e0",
+      "candidate_sha256": "2f0118580c077fc050c550a5009dbfd99d8fddefce8a2584dd025e2684abf63a",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          767,
+          329
+        ],
+        "alpha_bbox": [
+          4,
+          121,
+          767,
+          329
+        ],
+        "edge_alpha_pixels": [
+          0,
+          105,
+          0,
+          573
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1774,
+          887
+        ],
+        "alpha_bbox": [
+          0,
+          7,
+          1774,
+          887
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "계속하기",
+      "translation_match": "PASS_TARGET_TEXT_PRESENT_VISUAL",
+      "glyph_legibility": "PASS_TARGET_TEXT_VISUAL",
+      "source_roi_isolation": "SOURCE_TARGET_VISIBLE",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "FAIL",
+      "c1_reason_code": "UNRELATED_TEXT_AND_DUPLICATE_LABELS",
+      "c1_reason": "요구된 계속하기 외에 일시정지 메뉴 및 양을 세세요! 2개와 계속하기 중복이 생성됨. 단일 문구 투명 레이어 조건 위반."
+    },
+    {
+      "role": "B",
+      "batch": 65,
+      "task": "OUTRUN-ROI-B-0065-1C1FB658",
+      "source_file": "Q043_604294f7b6503241_source.png",
+      "candidate_file": "Q043_604294f7b6503241_source_k.png",
+      "source_ordinal": 313,
+      "english": "CONTINUE",
+      "approved_korean": "계속하기",
+      "original_dds_sha256": "fb7bb0dc0842547cb52d5d9290d21c009149400e4ec2ec17322da0c411f7f2bc",
+      "source_sha256": "3e160670f35a14e2e8a0272d846e61fa55d10db8152970a2168f3ae07d13b2e0",
+      "candidate_sha256": "59533f82ddb14c184a240967fabf8fb1f3fffcccdc8de7fa399ad5ee1cfbac84",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          767,
+          329
+        ],
+        "alpha_bbox": [
+          4,
+          121,
+          767,
+          329
+        ],
+        "edge_alpha_pixels": [
+          0,
+          105,
+          0,
+          573
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1730,
+          909
+        ],
+        "alpha_bbox": [
+          0,
+          35,
+          1703,
+          879
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "계속하기",
+      "translation_match": "PASS_TARGET_TEXT_PRESENT_VISUAL",
+      "glyph_legibility": "PASS_TARGET_TEXT_VISUAL",
+      "source_roi_isolation": "SOURCE_TARGET_VISIBLE",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "FAIL",
+      "c1_reason_code": "UNRELATED_TEXT_AND_DUPLICATE_LABELS",
+      "c1_reason": "요구된 계속하기 외에 일시정지 메뉴 및 양을 세세요! 2개와 계속하기 중복이 생성됨. 단일 문구 투명 레이어 조건 위반."
+    },
+    {
+      "role": "B",
+      "batch": 65,
+      "task": "OUTRUN-ROI-B-0065-1C1FB658",
+      "source_file": "Q054_374e893b42dd4172_source.png",
+      "candidate_file": "Q054_374e893b42dd4172_source_k.png",
+      "source_ordinal": 312,
+      "english": "Count the sheep!",
+      "approved_korean": "양을 세세요!",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "source_sha256": "3392882067356b52eca47c354aefa3e46ce557d889ec15a09dfdd08ab6593118",
+      "candidate_sha256": "6114311ab71892b3a3f6192a34b58ac675b757f3098b2e510bd1abffd0e7c506",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1258,
+          230
+        ],
+        "alpha_bbox": [
+          55,
+          21,
+          1202,
+          210
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2170,
+          725
+        ],
+        "alpha_bbox": [
+          45,
+          15,
+          2146,
+          707
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "양을 세세요!",
+      "translation_match": "PASS_TARGET_TEXT_PRESENT_VISUAL",
+      "glyph_legibility": "PASS_TARGET_TEXT_VISUAL",
+      "source_roi_isolation": "SOURCE_TARGET_VISIBLE",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "FAIL",
+      "c1_reason_code": "UNRELATED_TEXT_AND_DUPLICATE_LABELS",
+      "c1_reason": "요구된 양을 세세요! 외에 일시정지 메뉴, 계속하기 2개 및 양을 세세요! 중복이 생성됨. 단일 문구 투명 레이어 조건 위반."
+    },
+    {
+      "role": "B",
+      "batch": 65,
+      "task": "OUTRUN-ROI-B-0065-1C1FB658",
+      "source_file": "Q054_a3a8a4bdf2509340_source.png",
+      "candidate_file": "Q054_a3a8a4bdf2509340_source_k.png",
+      "source_ordinal": 311,
+      "english": "Count the sheep!",
+      "approved_korean": "양을 세세요!",
+      "original_dds_sha256": "68ae256333e45edf6504169f33dcd93c41855bbd3d86f2212f298b2c3a98ee67",
+      "source_sha256": "3392882067356b52eca47c354aefa3e46ce557d889ec15a09dfdd08ab6593118",
+      "candidate_sha256": "a05c4b911052551fb9517c818db014f318cc1c50af79b84c10e65905f2566255",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1258,
+          230
+        ],
+        "alpha_bbox": [
+          55,
+          21,
+          1202,
+          210
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1635,
+          962
+        ],
+        "alpha_bbox": [
+          60,
+          16,
+          1599,
+          948
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "양을 세세요!",
+      "translation_match": "PASS_TARGET_TEXT_PRESENT_VISUAL",
+      "glyph_legibility": "PASS_TARGET_TEXT_VISUAL",
+      "source_roi_isolation": "SOURCE_TARGET_VISIBLE",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "FAIL",
+      "c1_reason_code": "UNRELATED_TEXT_AND_DUPLICATE_LABELS",
+      "c1_reason": "요구된 양을 세세요! 외에 일시정지 메뉴, 계속하기 2개 및 양을 세세요! 중복이 생성됨. 단일 문구 투명 레이어 조건 위반."
+    }
+  ],
+  "schema_version": 1,
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "scope": "8 unique PNG SHA: A-0055/0056 and B-0065; no queue mutation",
+  "operation": "INDEPENDENT_LIGHTWEIGHT_QA_NO_IMAGEGEN",
+  "summary": {
+    "reviewed": 8,
+    "new_unique_candidate_sha": 8,
+    "previously_reviewed_sha_history": 399,
+    "duplicate_sha": 0,
+    "sha_pinned_source_sent": 8,
+    "source_manifest_sha_verified": 8,
+    "candidate_export_sha_verified": 8,
+    "png_rgba_with_transparency": 8,
+    "clear_output_alpha_border": 8,
+    "target_text_visually_legible": 8,
+    "c1_pass": 0,
+    "c1_fail": 5,
+    "c1_hold": 3,
+    "imagegen_calls": 0,
+    "producer_queue_consumed": 0,
+    "dds_written": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "evidence": {
+    "metrics_n100": "work/C1_QA_20261023_0315_metrics.json",
+    "script_n100": "work/C1_QA_20261023_0315_check.py",
+    "image_sheets_n100": [
+      "work/C1_QA_20261023_0315_A_pairs.jpg",
+      "work/C1_QA_20261023_0315_B_pairs.jpg"
+    ],
+    "note": "Images stored on N100; reviewer compared images side by side. Source input and candidate provenance SHA-pinned. No native-game UI cell reintegration proof; generated dimensions differ from input."
+  },
+  "policy": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md and docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md; Korean overall width/length alone not FAIL; no fake C2/C3/runtime signoffs."
+}
