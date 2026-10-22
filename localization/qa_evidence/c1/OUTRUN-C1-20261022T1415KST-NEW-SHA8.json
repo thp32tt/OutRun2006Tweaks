@@ -1,0 +1,555 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1415KST-NEW-SHA8",
+  "inspected_kst": "2026-10-22T14:17:22.622818+09:00",
+  "policy_branch": "korean-localization-recovery-20260928",
+  "previous_asset_head": "25bac9194c36c8d3f2db1e86130deb76f648e0c0",
+  "source_contracts": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "scope": "C1 independent lightweight QA of 8 SHA-distinct A/B generated Korean transparent candidates, compare source pixels with canonical English/Korean manifest",
+  "historical_reviewed_before": 343,
+  "unreviewed_unique_before": 10,
+  "reviewed_count": 8,
+  "summary": {
+    "fail_source_roi_target_absent": 3,
+    "fail_source_roi_clipped": 1,
+    "fail_source_roi_target_mismatch": 1,
+    "fail_source_roi_multilabel": 3,
+    "korean_candidate_text_readable_only": 8,
+    "candidate_png_rgba_with_transparency": 8,
+    "source_export_sha_valid": 8,
+    "remaining_at_inventory_time": 2
+  },
+  "evidence": {
+    "comparison_contact_sheet_A_N100": "work/c1_20261022_1415_A_compare.png",
+    "comparison_contact_sheet_B_N100": "work/c1_20261022_1415_B_compare.png",
+    "metrics_N100": "work/c1_20261022_1415_metrics.json",
+    "inventory_N100": "work/c1_20261022_1415_inventory_result.json"
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0029-30F91456-R1",
+      "candidate_file": "Q205_c00f88a7a87e6e19_source_k.png",
+      "candidate_sha256": "44a51bed17c39684bf565386b0a6aafd7f029dfadf9452bda13485d89fea0b62",
+      "source_file": "Q205_c00f88a7a87e6e19_source.png",
+      "source_sha256": "40c8c5ef055d5f8b3850c63fe7e6a28fd1adfe3f61e9484f1ecefbbd17590a49",
+      "manifest_english": "LOCAL MT",
+      "approved_korean": "로컬 MT",
+      "source_png": {
+        "format": "PNG",
+        "size": [
+          527,
+          216
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          88,
+          527,
+          203
+        ],
+        "touches_canvas_border": true,
+        "bytes": 7679,
+        "sha256": "40c8c5ef055d5f8b3850c63fe7e6a28fd1adfe3f61e9484f1ecefbbd17590a49"
+      },
+      "candidate_png": {
+        "format": "PNG",
+        "size": [
+          1959,
+          803
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          470,
+          23,
+          1648,
+          723
+        ],
+        "touches_canvas_border": false,
+        "bytes": 236455,
+        "sha256": "44a51bed17c39684bf565386b0a6aafd7f029dfadf9452bda13485d89fea0b62"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readability": "PASS_TEXT_ONLY",
+      "translation_map_string_matches_visible_candidate": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_TARGET_ABSENT",
+      "source_visual_reason": "원본 ROI에는 회색 UI 패널과 노란 블록만 보이며 'LOCAL MT' 영문 표지가 없다.",
+      "safe_region_placement": "UNVERIFIED_INVALID_OR_MULTI_LABEL_SOURCE_ROI",
+      "candidate_border_review": "NO_ALPHA_CANVAS_EDGE_TOUCH",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0029-30F91456-R1",
+      "candidate_file": "Q231_97037da5143f6af6_source_k.png",
+      "candidate_sha256": "a87395af8cfbc01671703d0b78bd41c7ac7bcbef7261145e614ac32dfb4f78a2",
+      "source_file": "Q231_97037da5143f6af6_source.png",
+      "source_sha256": "98f848dc83b2151002d3d685a26bd8f23d01e8ecc4adda2010318e2fd08832ca",
+      "manifest_english": "Join or Create a LAN game of OutRun!",
+      "approved_korean": "아웃런 LAN 게임에 참가하거나 만드세요!",
+      "source_png": {
+        "format": "PNG",
+        "size": [
+          2038,
+          178
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          19,
+          2006,
+          160
+        ],
+        "touches_canvas_border": true,
+        "bytes": 84594,
+        "sha256": "98f848dc83b2151002d3d685a26bd8f23d01e8ecc4adda2010318e2fd08832ca"
+      },
+      "candidate_png": {
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          36,
+          158,
+          2147,
+          668
+        ],
+        "touches_canvas_border": false,
+        "bytes": 399586,
+        "sha256": "a87395af8cfbc01671703d0b78bd41c7ac7bcbef7261145e614ac32dfb4f78a2"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readability": "PASS_TEXT_ONLY",
+      "translation_map_string_matches_visible_candidate": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_CLIPPED",
+      "source_visual_reason": "원본 문구의 앞부분 'Join'이 잘리고 'or Create a LAN game of OutRun!'만 보인다. 원문 한 줄이 온전한 문구 ROI가 아니다.",
+      "safe_region_placement": "UNVERIFIED_INVALID_OR_MULTI_LABEL_SOURCE_ROI",
+      "candidate_border_review": "NO_ALPHA_CANVAS_EDGE_TOUCH",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0029-30F91456-R1",
+      "candidate_file": "Q237_8d751d1618424e2f_source_k.png",
+      "candidate_sha256": "ccdf3421090a1c04bbc039ca81677a21faa091d2f067cda42580aa92a4a61209",
+      "source_file": "Q237_8d751d1618424e2f_source.png",
+      "source_sha256": "7a0f3d59c23e938aee9022ee868cfe22f4f85997f65dafc256bf6e790c43ecf9",
+      "manifest_english": "QUICK GAME",
+      "approved_korean": "빠른 게임",
+      "source_png": {
+        "format": "PNG",
+        "size": [
+          781,
+          301
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          781,
+          301
+        ],
+        "touches_canvas_border": true,
+        "bytes": 57722,
+        "sha256": "7a0f3d59c23e938aee9022ee868cfe22f4f85997f65dafc256bf6e790c43ecf9"
+      },
+      "candidate_png": {
+        "format": "PNG",
+        "size": [
+          2020,
+          779
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          507,
+          85,
+          1900,
+          682
+        ],
+        "touches_canvas_border": false,
+        "bytes": 325784,
+        "sha256": "ccdf3421090a1c04bbc039ca81677a21faa091d2f067cda42580aa92a4a61209"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readability": "PASS_TEXT_ONLY",
+      "translation_map_string_matches_visible_candidate": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_TARGET_MISMATCH",
+      "source_visual_reason": "원본 ROI에는 'Jump into a quick game of OutRun'의 일부 및 다른 줄 조각이 보여, 독립 UI 레이블 'QUICK GAME'에 대응하지 않는다.",
+      "safe_region_placement": "UNVERIFIED_INVALID_OR_MULTI_LABEL_SOURCE_ROI",
+      "candidate_border_review": "NO_ALPHA_CANVAS_EDGE_TOUCH",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0029-30F91456-R1",
+      "candidate_file": "Q188_d944420df3e4c66d_source_k.png",
+      "candidate_sha256": "3cc6d1f51451bc7e00b82649038ed3c7782cc02309d2b4ab09d363625900e77a",
+      "source_file": "Q188_d944420df3e4c66d_source.png",
+      "source_sha256": "7ede9d6a62fd684af63209177312dbfa803e7c83dbc2f7455943209036f529c7",
+      "manifest_english": "Buy your OutRun items here!",
+      "approved_korean": "여기서 아웃런 아이템을 구매하세요!",
+      "source_png": {
+        "format": "PNG",
+        "size": [
+          988,
+          231
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          6,
+          82,
+          848,
+          149
+        ],
+        "touches_canvas_border": false,
+        "bytes": 9779,
+        "sha256": "7ede9d6a62fd684af63209177312dbfa803e7c83dbc2f7455943209036f529c7"
+      },
+      "candidate_png": {
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          41,
+          85,
+          2158,
+          650
+        ],
+        "touches_canvas_border": false,
+        "bytes": 620874,
+        "sha256": "3cc6d1f51451bc7e00b82649038ed3c7782cc02309d2b4ab09d363625900e77a"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readability": "PASS_TEXT_ONLY",
+      "translation_map_string_matches_visible_candidate": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_TARGET_ABSENT",
+      "source_visual_reason": "원본은 단색 회색 패널이며 'Buy your OutRun items here!' 영문이 없다.",
+      "safe_region_placement": "UNVERIFIED_INVALID_OR_MULTI_LABEL_SOURCE_ROI",
+      "candidate_border_review": "NO_ALPHA_CANVAS_EDGE_TOUCH",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0043-49CDDC2B-R1",
+      "candidate_file": "Q051_3c6c6eae646bcdf4_source_k.png",
+      "candidate_sha256": "226fa8a8a04d04bbbae51730100bf59c6c97307216bb16a4f23afc84b7b8cfaa",
+      "source_file": "Q051_3c6c6eae646bcdf4_source.png",
+      "source_sha256": "c0725751a3b4c04e811817f85ce1945d39977ccfc836c488e506b26f0df2d861",
+      "manifest_english": "Hearts",
+      "approved_korean": "하트",
+      "source_png": {
+        "format": "PNG",
+        "size": [
+          759,
+          391
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          759,
+          391
+        ],
+        "touches_canvas_border": true,
+        "bytes": 92861,
+        "sha256": "c0725751a3b4c04e811817f85ce1945d39977ccfc836c488e506b26f0df2d861"
+      },
+      "candidate_png": {
+        "format": "PNG",
+        "size": [
+          1747,
+          900
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          23,
+          1659,
+          896
+        ],
+        "touches_canvas_border": true,
+        "bytes": 559943,
+        "sha256": "226fa8a8a04d04bbbae51730100bf59c6c97307216bb16a4f23afc84b7b8cfaa"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readability": "PASS_TEXT_ONLY",
+      "translation_map_string_matches_visible_candidate": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "source_visual_reason": "원본에는 'Hearts Score', 'Lap Time', 'Start' 및 주변 UI가 함께 보이며 독립 문구 'Hearts' 단위로 격리되지 않았다. 원본의 스코어 항목을 하트 단독 항목으로 바꾸는 오매핑 위험.",
+      "safe_region_placement": "UNVERIFIED_INVALID_OR_MULTI_LABEL_SOURCE_ROI",
+      "candidate_border_review": "SOURCE_FAIL_WITH_ALPHA_CANVAS_EDGE_REVIEW",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0043-49CDDC2B-R1",
+      "candidate_file": "Q051_0d236d0d79a87905_source_k.png",
+      "candidate_sha256": "ef460d6a7e5233e6da8d46903b7185cd617fc99a2c763f5d8ab61c2c496102e1",
+      "source_file": "Q051_0d236d0d79a87905_source.png",
+      "source_sha256": "26f64faeceb1ec47836cf3b41e50a0317f341b249120caff7d2f2fa31fed5c86",
+      "manifest_english": "ENTER XBOX PASSCODE",
+      "approved_korean": "XBOX 패스코드 입력",
+      "source_png": {
+        "format": "PNG",
+        "size": [
+          1660,
+          374
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          4,
+          1660,
+          374
+        ],
+        "touches_canvas_border": true,
+        "bytes": 97301,
+        "sha256": "26f64faeceb1ec47836cf3b41e50a0317f341b249120caff7d2f2fa31fed5c86"
+      },
+      "candidate_png": {
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          47,
+          55,
+          2145,
+          658
+        ],
+        "touches_canvas_border": false,
+        "bytes": 454775,
+        "sha256": "ef460d6a7e5233e6da8d46903b7185cd617fc99a2c763f5d8ab61c2c496102e1"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readability": "PASS_TEXT_ONLY",
+      "translation_map_string_matches_visible_candidate": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_TARGET_ABSENT",
+      "source_visual_reason": "원본에는 'Lap Time', 'Hearts Score', 'Brake', 'YOU'가 보일 뿐 'ENTER XBOX PASSCODE' 영문이 보이지 않는다.",
+      "safe_region_placement": "UNVERIFIED_INVALID_OR_MULTI_LABEL_SOURCE_ROI",
+      "candidate_border_review": "NO_ALPHA_CANVAS_EDGE_TOUCH",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0043-49CDDC2B-R1",
+      "candidate_file": "Q051_f01182fe06b7411b_source_k.png",
+      "candidate_sha256": "0202adcac2e40320bcdcd7ca449c08ccf529f2a4a799588af0d7fb1b43b2de4f",
+      "source_file": "Q051_f01182fe06b7411b_source.png",
+      "source_sha256": "d8a1cae8a3debdd6894bf43a6eb972c88301dc1c430f5b5060276c965d1bfe5e",
+      "manifest_english": "Canyon",
+      "approved_korean": "캐니언",
+      "source_png": {
+        "format": "PNG",
+        "size": [
+          1220,
+          615
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          10,
+          1220,
+          615
+        ],
+        "touches_canvas_border": true,
+        "bytes": 139874,
+        "sha256": "d8a1cae8a3debdd6894bf43a6eb972c88301dc1c430f5b5060276c965d1bfe5e"
+      },
+      "candidate_png": {
+        "format": "PNG",
+        "size": [
+          1766,
+          891
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          52,
+          1666,
+          840
+        ],
+        "touches_canvas_border": true,
+        "bytes": 479615,
+        "sha256": "0202adcac2e40320bcdcd7ca449c08ccf529f2a4a799588af0d7fb1b43b2de4f"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readability": "PASS_TEXT_ONLY",
+      "translation_map_string_matches_visible_candidate": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "source_visual_reason": "원본에는 'Canyon' 표기와 함께 Lost City, Milky Way, Floral Village, 기타 단계/아이콘/타임라인이 함께 있어 단일 'Canyon' 텍스트 ROI가 아니다.",
+      "safe_region_placement": "UNVERIFIED_INVALID_OR_MULTI_LABEL_SOURCE_ROI",
+      "candidate_border_review": "SOURCE_FAIL_WITH_ALPHA_CANVAS_EDGE_REVIEW",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0043-49CDDC2B-R1",
+      "candidate_file": "Q051_5fe9f37cbcc4b9fc_source_k.png",
+      "candidate_sha256": "9c7d9f5ed959b0fce5744f83a86e99455084d8aaed1da51dc6904a27a3eac0f4",
+      "source_file": "Q051_5fe9f37cbcc4b9fc_source.png",
+      "source_sha256": "95037da9a8c30d212d5ad8ca09ffcfe842271763001de760ed03cec9d8ccb229",
+      "manifest_english": "Skyscrapers",
+      "approved_korean": "스카이스크레이퍼스",
+      "source_png": {
+        "format": "PNG",
+        "size": [
+          962,
+          519
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          962,
+          519
+        ],
+        "touches_canvas_border": true,
+        "bytes": 98871,
+        "sha256": "95037da9a8c30d212d5ad8ca09ffcfe842271763001de760ed03cec9d8ccb229"
+      },
+      "candidate_png": {
+        "format": "PNG",
+        "size": [
+          1707,
+          921
+        ],
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          126,
+          1677,
+          760
+        ],
+        "touches_canvas_border": true,
+        "bytes": 338942,
+        "sha256": "9c7d9f5ed959b0fce5744f83a86e99455084d8aaed1da51dc6904a27a3eac0f4"
+      },
+      "source_and_export_sha_verified": true,
+      "korean_text_readability": "PASS_TEXT_ONLY",
+      "translation_map_string_matches_visible_candidate": true,
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL",
+      "source_visual_reason": "원본에는 'Skyscrapers' 표기와 함께 Lost City, Milky Way, Slipstream the cars 등 다수 UI 문구와 아이콘이 함께 있어 단일 'Skyscrapers' 텍스트 ROI가 아니다.",
+      "safe_region_placement": "UNVERIFIED_INVALID_OR_MULTI_LABEL_SOURCE_ROI",
+      "candidate_border_review": "SOURCE_FAIL_WITH_ALPHA_CANVAS_EDGE_REVIEW",
+      "final_approval": false,
+      "new_dds": false,
+      "c2_c3_pass": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "conclusion": "8/8 candidates are not C1-approved because their actual verified original ROI pixels either lack the annotated English phrase, are clipped or include multiple distinct labels/adjacent protected elements. SHA verifies exact bytes, not annotation correctness. Korean candidate text is visually readable but does not rescue source-provenance/placement. Do not issue ImageGen reruns against the same bad source ROI; regenerate/review native original-HD phrase crop and canonical annotation first.",
+  "limits": {
+    "imagegen_invoked": false,
+    "ab_production_queue_consumed": false,
+    "automatic_dds_write": false,
+    "final_deployment": false,
+    "c2_c3_pass": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_untouched": true
+  }
+}
