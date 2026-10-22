@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T1715KST-NEW-SHA8",
+  "inspected_at_kst": "2026-10-22T17:20:05.425841+09:00",
+  "scope": "C1 independent lightweight QA only; no generation or A/B queue consumption",
+  "source_branch": "korean-localization-recovery-20260928",
+  "dedup": "Eight source/candidate SHA pairs absent from 16:45 QA GitHub report and older local QA SHA evidence; no repeated SHA review",
+  "summary": {
+    "reviewed": 8,
+    "source_roi_contains_multiple_labels_or_protected_art": 8,
+    "hold_full_c1": 8,
+    "full_c1_pass": 0,
+    "candidate_png_rgba_sha_verified": 8,
+    "source_sha_verified": 8,
+    "candidate_canvas_mismatch": 8,
+    "alpha_border_gt8_touch": 0
+  },
+  "observations": "Visually compared eight real English source crops against their eight Korean candidates in N100 contact sheets; target Korean text visible and readable but source crops are composite multi-label UI fragments, not isolated lettering. Dimensions differ between source and generated PNG. No proven native UI cell placement or protected artwork clearance. Do not treat HOLD as C1, DDS, C2/C3 or in-game PASS.",
+  "n100_evidence": {
+    "metrics": "work/c1_20261022_1715_metrics.json",
+    "contact_sheets": [
+      "work/c1_20261022_1715_compare_1.jpg",
+      "work/c1_20261022_1715_compare_2.jpg"
+    ]
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "dds_written": false,
+  "game_deployed": false,
+  "vr_ffb_dx11_dxvk_modified": false,
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0035-31D5C0FB-R1",
+      "candidate_file": "Q051_ed33f286a9061dc7_source_k.png",
+      "candidate_sha256": "c3687178e8e842f324a3c790c7e0266ce9086296b0f113eeb1ab4fecaa980c54",
+      "source_file": "Q051_ed33f286a9061dc7_source.png",
+      "source_sha256": "1b60e5b123610b5ca6c993750380d4614c2e80db6e0ee8628cd65cd4330b77d2",
+      "english": "TOP Ghost Car!!",
+      "approved_korean": "최고 고스트 카!!",
+      "candidate_png_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1994,
+        788
+      ],
+      "source_dimensions": [
+        1442,
+        570
+      ],
+      "candidate_alpha_bbox": [
+        36,
+        9,
+        1980,
+        738
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "export_sha_verified": true,
+      "manifest_source_sha_verified": true,
+      "visible_korean_mapping_match": "PASS_READABLE_TARGET_PRESENT",
+      "source_roi_isolated_text": false,
+      "placement_safety_confirmed": false,
+      "full_c1_verdict": "HOLD_SOURCE_MULTILABEL_AND_UV_UNVERIFIED",
+      "visual_reason": "Source includes Total Time, Lap Time, Hearts, GOAL, stage labels and colored UI; target TOP Ghost Car!! is present but not isolated.",
+      "canvas_size_changed": true,
+      "text_length_difference_ignored": true,
+      "c2_c3_or_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0035-31D5C0FB-R1",
+      "candidate_file": "Q051_9f5f0cdbc888863f_source_k.png",
+      "candidate_sha256": "92e7e8620981160c2952ac99042185a2712d39e9ac5f8d0e164ab24dc9321541",
+      "source_file": "Q051_9f5f0cdbc888863f_source.png",
+      "source_sha256": "48b72b5b3a07e862b20b1bccb6a6f25d2dd2faf7e7fcb3c60f87ee79c5c619c9",
+      "english": "Milky Way",
+      "approved_korean": "밀키 웨이",
+      "candidate_png_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1762,
+        892
+      ],
+      "source_dimensions": [
+        1098,
+        556
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        54,
+        1692,
+        858
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "export_sha_verified": true,
+      "manifest_source_sha_verified": true,
+      "visible_korean_mapping_match": "PASS_READABLE_TARGET_PRESENT",
+      "source_roi_isolated_text": false,
+      "placement_safety_confirmed": false,
+      "full_c1_verdict": "HOLD_SOURCE_MULTILABEL_AND_UV_UNVERIFIED",
+      "visual_reason": "Source includes Lost City, Canyon, Floral Village, Drift! and protected icons; target Milky Way is present but not isolated.",
+      "canvas_size_changed": true,
+      "text_length_difference_ignored": true,
+      "c2_c3_or_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0035-31D5C0FB-R1",
+      "candidate_file": "Q051_5f6146d71aa9b692_source_k.png",
+      "candidate_sha256": "a8cd77a8125643997e8a1b2068c1012d21934a847db935840263f63ec60334cb",
+      "source_file": "Q051_5f6146d71aa9b692_source.png",
+      "source_sha256": "84b960066e37133aeb6e96470602b19d1a258e7a1d29c462a69444fc09583be9",
+      "english": "Giant Statues",
+      "approved_korean": "자이언트 스태추스",
+      "candidate_png_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1759,
+        894
+      ],
+      "source_dimensions": [
+        1228,
+        624
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        44,
+        1737,
+        894
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "export_sha_verified": true,
+      "manifest_source_sha_verified": true,
+      "visible_korean_mapping_match": "PASS_READABLE_TARGET_PRESENT",
+      "source_roi_isolated_text": false,
+      "placement_safety_confirmed": false,
+      "full_c1_verdict": "HOLD_SOURCE_MULTILABEL_AND_UV_UNVERIFIED",
+      "visual_reason": "Source includes Leader, Legend, Jungle, icons and decorative panels; target Giant Statues is present but not isolated.",
+      "canvas_size_changed": true,
+      "text_length_difference_ignored": true,
+      "c2_c3_or_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0046-F93DBD36",
+      "candidate_file": "Q054_d67657602f8a9656_source_k.png",
+      "candidate_sha256": "daf8c9a8900db0dd5240d8e57987ecb62559293553286aae5247b967c30e7150",
+      "source_file": "Q054_d67657602f8a9656_source.png",
+      "source_sha256": "933072867d5b0584846db895df6e61a23926eff99d528a73bb220780f31969c1",
+      "english": "Keep control!",
+      "approved_korean": "차량을 제어하세요!",
+      "candidate_png_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2118,
+        742
+      ],
+      "source_dimensions": [
+        1107,
+        388
+      ],
+      "candidate_alpha_bbox": [
+        85,
+        54,
+        1928,
+        708
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "export_sha_verified": true,
+      "manifest_source_sha_verified": true,
+      "visible_korean_mapping_match": "PASS_READABLE_TARGET_PRESENT",
+      "source_roi_isolated_text": false,
+      "placement_safety_confirmed": false,
+      "full_c1_verdict": "HOLD_SOURCE_MULTILABEL_AND_UV_UNVERIFIED",
+      "visual_reason": "Source includes Hit the boost!, Count Blue Cars! and vehicle icons; target Keep control! is present but not isolated.",
+      "canvas_size_changed": true,
+      "text_length_difference_ignored": true,
+      "c2_c3_or_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0046-F93DBD36",
+      "candidate_file": "Q054_8c67f9e4490894e8_source_k.png",
+      "candidate_sha256": "ac160008afd4f84d56f97aa16a649bfb14d7acd186f1f0247652192268e1c81d",
+      "source_file": "Q054_8c67f9e4490894e8_source.png",
+      "source_sha256": "7ab2cf3c47cd3e3f90f3ff848f4658318eb3cb70638cb68126464b95426b7c67",
+      "english": "Count Blue Cars!",
+      "approved_korean": "파란색 차를 세세요!",
+      "candidate_png_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2081,
+        755
+      ],
+      "source_dimensions": [
+        1298,
+        471
+      ],
+      "candidate_alpha_bbox": [
+        33,
+        55,
+        1905,
+        699
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "export_sha_verified": true,
+      "manifest_source_sha_verified": true,
+      "visible_korean_mapping_match": "PASS_READABLE_TARGET_PRESENT",
+      "source_roi_isolated_text": false,
+      "placement_safety_confirmed": false,
+      "full_c1_verdict": "HOLD_SOURCE_MULTILABEL_AND_UV_UNVERIFIED",
+      "visual_reason": "Source includes Keep control!, vehicle artwork and instructions below; target Count Blue Cars! is present but not isolated.",
+      "canvas_size_changed": true,
+      "text_length_difference_ignored": true,
+      "c2_c3_or_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0046-F93DBD36",
+      "candidate_file": "Q054_bbf628c3b3604a8a_source_k.png",
+      "candidate_sha256": "280f168f6eba78e5d4a151753593f1f2aee5c68d48139eb32f67af7001db8afa",
+      "source_file": "Q054_bbf628c3b3604a8a_source.png",
+      "source_sha256": "44eccc69306f5512c48d3a1fe7a5c3b74b5fe5de2aa564408865f61f192170aa",
+      "english": "Do the math!",
+      "approved_korean": "계산하세요!",
+      "candidate_png_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2091,
+        752
+      ],
+      "source_dimensions": [
+        1087,
+        391
+      ],
+      "candidate_alpha_bbox": [
+        128,
+        42,
+        1924,
+        696
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "export_sha_verified": true,
+      "manifest_source_sha_verified": true,
+      "visible_korean_mapping_match": "PASS_READABLE_TARGET_PRESENT",
+      "source_roi_isolated_text": false,
+      "placement_safety_confirmed": false,
+      "full_c1_verdict": "HOLD_SOURCE_MULTILABEL_AND_UV_UNVERIFIED",
+      "visual_reason": "Source includes Count the sheep!, Esc key, other UI; target Do the math! is present but not isolated.",
+      "canvas_size_changed": true,
+      "text_length_difference_ignored": true,
+      "c2_c3_or_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0046-F93DBD36",
+      "candidate_file": "Q054_100607ee8c2c885a_source_k.png",
+      "candidate_sha256": "eafbc92362797fa5d96631a62d155434e984a4031dc0bae7f1a2f4e4baf1333e",
+      "source_file": "Q054_100607ee8c2c885a_source.png",
+      "source_sha256": "311a45f16ab18835033b4d033e36b3c2d4449ad1a92eb2b89a4eb91c31de4033",
+      "english": "Count Red Cars!",
+      "approved_korean": "빨간색 차를 세세요!",
+      "candidate_png_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2103,
+        748
+      ],
+      "source_dimensions": [
+        1172,
+        417
+      ],
+      "candidate_alpha_bbox": [
+        19,
+        54,
+        2013,
+        681
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "export_sha_verified": true,
+      "manifest_source_sha_verified": true,
+      "visible_korean_mapping_match": "PASS_READABLE_TARGET_PRESENT",
+      "source_roi_isolated_text": false,
+      "placement_safety_confirmed": false,
+      "full_c1_verdict": "HOLD_SOURCE_MULTILABEL_AND_UV_UNVERIFIED",
+      "visual_reason": "Source includes Count the sheep!, F1 key, Run through green!; target Count Red Cars! is present but not isolated.",
+      "canvas_size_changed": true,
+      "text_length_difference_ignored": true,
+      "c2_c3_or_ingame_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0047-264BFE67",
+      "candidate_file": "Q057_72a9ac1dcacdd95e_source_k.png",
+      "candidate_sha256": "6bb474a852f5cede942895117e66baf710f3d72800d57eb670a55346cf66ce03",
+      "source_file": "Q057_72a9ac1dcacdd95e_source.png",
+      "source_sha256": "c0fc1ba3db8f1f18c0cd906e20f37e0b4ea82a83844b73645f71e6624701a19f",
+      "english": "SPECIAL REQUEST",
+      "approved_korean": "스페셜 요청",
+      "candidate_png_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1843,
+        598
+      ],
+      "candidate_alpha_bbox": [
+        138,
+        19,
+        2124,
+        704
+      ],
+      "candidate_alpha_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "export_sha_verified": true,
+      "manifest_source_sha_verified": true,
+      "visible_korean_mapping_match": "PASS_READABLE_TARGET_PRESENT",
+      "source_roi_isolated_text": false,
+      "placement_safety_confirmed": false,
+      "full_c1_verdict": "HOLD_SOURCE_MULTILABEL_AND_UV_UNVERIFIED",
+      "visual_reason": "Source includes STORING ONLINE RECORD..., ALBERTO, MISSION and protected decorative content; SPECIAL REQUEST is present but not isolated.",
+      "canvas_size_changed": true,
+      "text_length_difference_ignored": true,
+      "c2_c3_or_ingame_pass": false
+    }
+  ]
+}
