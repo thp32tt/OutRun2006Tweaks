@@ -291,6 +291,12 @@ constexpr bool sm3_live_factor(DWORD f, bool alpha, bool independent,
     case D3DBLEND_INVDESTCOLOR: out = alpha ? D3D11_BLEND_INV_DEST_ALPHA : D3D11_BLEND_INV_DEST_COLOR; break;
     case D3DBLEND_BLENDFACTOR: out = D3D11_BLEND_BLEND_FACTOR; break;
     case D3DBLEND_INVBLENDFACTOR: out = D3D11_BLEND_INV_BLEND_FACTOR; break;
+    // D3D9 SRCALPHASAT uses min(As, 1-Ad) for RGB but ONE for alpha.
+    // D3D11 permits SRC_ALPHA_SAT only as a *source RGB* factor.
+    case D3DBLEND_SRCALPHASAT:
+        if (independent) return false;
+        out = alpha ? D3D11_BLEND_ONE : D3D11_BLEND_SRC_ALPHA_SAT;
+        break;
     default: return false;
     }
     return true;
@@ -313,16 +319,77 @@ constexpr bool sm3_live_blend_desc(
     D3D11_RENDER_TARGET_BLEND_DESC b{};
     b.BlendEnable = TRUE;
     b.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-    if (!sm3_live_factor(sc, false, false, b.SrcBlend) ||
-        !sm3_live_factor(dc, false, false, b.DestBlend) ||
+    // D3D9 BOTH* source enums override D3DRS_DESTBLEND. The real
+    // shader-bound game Draw must not reject them or borrow the stale
+    // destination factor when submitting its native D3D11 OM state.
+    const bool bothSrc = sc == D3DBLEND_BOTHSRCALPHA;
+    const bool bothInvSrc = sc == D3DBLEND_BOTHINVSRCALPHA;
+    const DWORD rgbSrc = bothSrc ? D3DBLEND_SRCALPHA :
+                         bothInvSrc ? D3DBLEND_INVSRCALPHA : sc;
+    const DWORD rgbDst = bothSrc ? D3DBLEND_INVSRCALPHA :
+                         bothInvSrc ? D3DBLEND_SRCALPHA : dc;
+    // D3D11 has no destination SRC_ALPHA_SAT. Reject malformed
+    // destination or independent-alpha saturation instead of trying to
+    // create an invalid BlendState or altering the original D3D9 Draw.
+    if ((!bothSrc && !bothInvSrc && dc == D3DBLEND_SRCALPHASAT) ||
+        (separate && (sa == D3DBLEND_SRCALPHASAT ||
+                      da == D3DBLEND_SRCALPHASAT)))
+        return false;
+    if (!sm3_live_factor(rgbSrc, false, false, b.SrcBlend) ||
+        !sm3_live_factor(rgbDst, false, false, b.DestBlend) ||
         !sm3_live_blend_op(oc, b.BlendOp) ||
-        !sm3_live_factor(separate ? sa : sc, true, separate, b.SrcBlendAlpha) ||
-        !sm3_live_factor(separate ? da : dc, true, separate, b.DestBlendAlpha) ||
+        !sm3_live_factor(separate ? sa : rgbSrc, true, separate, b.SrcBlendAlpha) ||
+        !sm3_live_factor(separate ? da : rgbDst, true, separate, b.DestBlendAlpha) ||
         !sm3_live_blend_op(separate ? oa : oc, b.BlendOpAlpha))
         return false;
     out = b;
     return true;
 }
+// Real D3D9 source-alpha-saturated and BOTH* blends reach the same live
+// Draw/DrawIndexed GPU OM as the other shader-bound game blending families.
+constexpr bool sm3_live_legacy_source_blend_regression() noexcept {
+    D3D11_RENDER_TARGET_BLEND_DESC b{};
+    if (!sm3_live_blend_desc(
+            D3DBLEND_SRCALPHASAT, D3DBLEND_ONE, D3DBLENDOP_ADD,
+            false, 0u, 0u, 0u, b) ||
+        b.SrcBlend != D3D11_BLEND_SRC_ALPHA_SAT ||
+        b.DestBlend != D3D11_BLEND_ONE ||
+        b.SrcBlendAlpha != D3D11_BLEND_ONE ||
+        b.DestBlendAlpha != D3D11_BLEND_ONE)
+        return false;
+    if (!sm3_live_blend_desc(
+            D3DBLEND_BOTHSRCALPHA, D3DBLEND_ZERO, D3DBLENDOP_ADD,
+            false, 0u, 0u, 0u, b) ||
+        b.SrcBlend != D3D11_BLEND_SRC_ALPHA ||
+        b.DestBlend != D3D11_BLEND_INV_SRC_ALPHA ||
+        b.SrcBlendAlpha != D3D11_BLEND_SRC_ALPHA ||
+        b.DestBlendAlpha != D3D11_BLEND_INV_SRC_ALPHA)
+        return false;
+    if (!sm3_live_blend_desc(
+            D3DBLEND_BOTHINVSRCALPHA, D3DBLEND_ZERO, D3DBLENDOP_ADD,
+            true, D3DBLEND_ONE, D3DBLEND_ZERO, D3DBLENDOP_MAX, b) ||
+        b.SrcBlend != D3D11_BLEND_INV_SRC_ALPHA ||
+        b.DestBlend != D3D11_BLEND_SRC_ALPHA ||
+        b.SrcBlendAlpha != D3D11_BLEND_ONE ||
+        b.DestBlendAlpha != D3D11_BLEND_ZERO ||
+        b.BlendOpAlpha != D3D11_BLEND_OP_MAX)
+        return false;
+    const auto saved = b;
+    return !sm3_live_blend_desc(
+               D3DBLEND_ONE, D3DBLEND_SRCALPHASAT, D3DBLENDOP_ADD,
+               false, 0u, 0u, 0u, b) &&
+           !sm3_live_blend_desc(
+               D3DBLEND_ONE, D3DBLEND_ONE, D3DBLENDOP_ADD,
+               true, D3DBLEND_SRCALPHASAT, D3DBLEND_ONE,
+               D3DBLENDOP_ADD, b) &&
+           !sm3_live_blend_desc(
+               0xdeadbeefu, D3DBLEND_ONE, D3DBLENDOP_ADD,
+               false, 0u, 0u, 0u, b) &&
+           sm3_live_blend_key(b) == sm3_live_blend_key(saved);
+}
+static_assert(sm3_live_legacy_source_blend_regression(),
+              "Live game D3D9 SRCALPHASAT/BOTH* native OM/fallback regression");
+
 // Real game SM3 Draw can update RGB only, alpha only, or depth only.
 // Preserve D3D9 RT0 channel writes across native D3D11 OM and Reset.
 constexpr bool sm3_live_masked_blend_desc(
