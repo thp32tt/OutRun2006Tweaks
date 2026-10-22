@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T1745KST-SHA8",
+  "timestamp_kst": "2026-10-22T17:52:29.246967+09:00",
+  "role": "C1",
+  "branch": "korean-localization-recovery-20260928",
+  "source_of_candidates": "N100 work/image-src/text_roi_batches/candidate_outputs/B",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "REWORK_SOURCE_ROI",
+  "summary": {
+    "reviewed": 8,
+    "all_candidate_source_sha_match": 8,
+    "all_candidate_png_rgba": 8,
+    "korean_text_mapping_and_legibility_pass": 8,
+    "critical_canvas_alpha_border_clip_detected": 0,
+    "source_is_single_text_roi": 0,
+    "full_C1_pass": 0,
+    "new_dds": 0,
+    "actual_ingame_pass": 0
+  },
+  "scope_notes": "Output lettering content passes on visible standalone preview; fail relates to source ROI containing multiple phrases/protected art and nonidentical dimensions without proven UI placement. No A/B queue consumption. Translation width underfill ignored as a failure criterion.",
+  "evidence": {
+    "local_metrics": "work/c1_20261022_1745_metrics.json",
+    "comparison_1": "work/c1_20261022_1745_compare_1.jpg",
+    "comparison_2": "work/c1_20261022_1745_compare_2.jpg"
+  },
+  "records": [
+    {
+      "task_id": "OUTRUN-ROI-B-0047-264BFE67",
+      "role": "B",
+      "candidate_file": "Q057_b80de910021f24ee_source_k.png",
+      "candidate_sha256": "c5b42adc024687c6159707f9bb81ef3202cddb27ef10f0682d9d174a60a40cf2",
+      "source_file": "Q057_b80de910021f24ee_source.png",
+      "source_sha256": "b13ea60885b0e723f92b4f41dc2f068aaf122e8d792218b24dc16f473eb822c8",
+      "english": "Hit the ghost!",
+      "approved_korean": "고스트를 맞히세요!",
+      "candidate_file_sha_verified": true,
+      "source_file_sha_verified": true,
+      "source_canvas": [
+        1178,
+        499
+      ],
+      "output_canvas": [
+        1927,
+        816
+      ],
+      "output_png_rgba": true,
+      "output_alpha_bbox": [
+        97,
+        119,
+        1847,
+        678
+      ],
+      "output_alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_content_verdict": "PASS_KOREAN_TEXT_ONLY",
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "visual_evidence": "원본에 Goal·EXIT·다른 문구·차량·하트 HUD가 함께 포함됨",
+      "output_canvas_changed": true,
+      "ui_safe_region": "UNVERIFIED",
+      "requires_action": "RE_CROP_NATIVE_SINGLE_PHRASE_FROM_VERIFIED_FULL_HD_SOURCE_AND_RECHECK_KOREAN_LAYER_PLACEMENT",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_game_pass": false
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0047-264BFE67",
+      "role": "B",
+      "candidate_file": "Q057_5c2c079536f9417a_source_k.png",
+      "candidate_sha256": "8f6ff2501012bc3cdd90133de9996ba584ca22e70e65aa63ba3838deb4a3c686",
+      "source_file": "Q057_5c2c079536f9417a_source.png",
+      "source_sha256": "afdc22fecec7315b103e8ef5b1a7aa3834937c14896a46fd4f043c449dcca6e5",
+      "english": "Hearts",
+      "approved_korean": "하트",
+      "candidate_file_sha_verified": true,
+      "source_file_sha_verified": true,
+      "source_canvas": [
+        906,
+        270
+      ],
+      "output_canvas": [
+        2172,
+        724
+      ],
+      "output_png_rgba": true,
+      "output_alpha_bbox": [
+        554,
+        18,
+        1919,
+        700
+      ],
+      "output_alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_content_verdict": "PASS_KOREAN_TEXT_ONLY",
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "visual_evidence": "원본에 하트 아이콘과 다른 UI 레이블·장식 문구가 함께 포함됨",
+      "output_canvas_changed": true,
+      "ui_safe_region": "UNVERIFIED",
+      "requires_action": "RE_CROP_NATIVE_SINGLE_PHRASE_FROM_VERIFIED_FULL_HD_SOURCE_AND_RECHECK_KOREAN_LAYER_PLACEMENT",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_game_pass": false
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0047-264BFE67",
+      "role": "B",
+      "candidate_file": "Q057_195e848a6da814e9_source_k.png",
+      "candidate_sha256": "3958b7d76ed22666505275f7978e78a160a9ce3a35505cdc0596a945bc196a75",
+      "source_file": "Q057_195e848a6da814e9_source.png",
+      "source_sha256": "6af71f470c7ce5ceff871bf17ef91a8ec93a96179a2cd5d201b5b8b6ec3cb87c",
+      "english": "MISSION FAILED!",
+      "approved_korean": "미션 실패!",
+      "candidate_file_sha_verified": true,
+      "source_file_sha_verified": true,
+      "source_canvas": [
+        3326,
+        1921
+      ],
+      "output_canvas": [
+        1650,
+        953
+      ],
+      "output_png_rgba": true,
+      "output_alpha_bbox": [
+        0,
+        193,
+        1632,
+        832
+      ],
+      "output_alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_content_verdict": "PASS_KOREAN_TEXT_ONLY",
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "visual_evidence": "원본이 복수 레이블과 UI 장식이 포함된 전체 아틀라스임",
+      "output_canvas_changed": true,
+      "ui_safe_region": "UNVERIFIED",
+      "requires_action": "RE_CROP_NATIVE_SINGLE_PHRASE_FROM_VERIFIED_FULL_HD_SOURCE_AND_RECHECK_KOREAN_LAYER_PLACEMENT",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_game_pass": false
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0047-264BFE67",
+      "role": "B",
+      "candidate_file": "Q061_7c72919f43df94b9_source_k.png",
+      "candidate_sha256": "13fa97f917b3c149e5de4f93a346ef4c601070595db82bec258f4c984709bc46",
+      "source_file": "Q061_7c72919f43df94b9_source.png",
+      "source_sha256": "0119916a80731a835c852d7d91481e1d47e784a9a7df1e2fa68e87ed8e9b3914",
+      "english": "Run through blue!",
+      "approved_korean": "파란색을 통과하세요!",
+      "candidate_file_sha_verified": true,
+      "source_file_sha_verified": true,
+      "source_canvas": [
+        1116,
+        513
+      ],
+      "output_canvas": [
+        1850,
+        850
+      ],
+      "output_png_rgba": true,
+      "output_alpha_bbox": [
+        33,
+        73,
+        1784,
+        770
+      ],
+      "output_alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_content_verdict": "PASS_KOREAN_TEXT_ONLY",
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "visual_evidence": "원본에 차량·배경·다른 미션 문구·버튼 영역이 함께 포함됨",
+      "output_canvas_changed": true,
+      "ui_safe_region": "UNVERIFIED",
+      "requires_action": "RE_CROP_NATIVE_SINGLE_PHRASE_FROM_VERIFIED_FULL_HD_SOURCE_AND_RECHECK_KOREAN_LAYER_PLACEMENT",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_game_pass": false
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0048-A1F9D054",
+      "role": "B",
+      "candidate_file": "Q061_ff5ea58817f04868_source_k.png",
+      "candidate_sha256": "6d77706a2ec1924a1289f4a7cc1192da67fadceaa4a904ee45b7695c154c14c6",
+      "source_file": "Q061_ff5ea58817f04868_source.png",
+      "source_sha256": "23fe3651f8db84b3e528c80f18bdaac04921c59176a5cc51aeb07713c276f833",
+      "english": "Catch the Heart!",
+      "approved_korean": "하트를 잡으세요!",
+      "candidate_file_sha_verified": true,
+      "source_file_sha_verified": true,
+      "source_canvas": [
+        1099,
+        513
+      ],
+      "output_canvas": [
+        1836,
+        857
+      ],
+      "output_png_rgba": true,
+      "output_alpha_bbox": [
+        25,
+        101,
+        1802,
+        760
+      ],
+      "output_alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_content_verdict": "PASS_KOREAN_TEXT_ONLY",
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "visual_evidence": "원본에 차량·순위/버튼 UI·다른 미션 문구가 함께 포함됨",
+      "output_canvas_changed": true,
+      "ui_safe_region": "UNVERIFIED",
+      "requires_action": "RE_CROP_NATIVE_SINGLE_PHRASE_FROM_VERIFIED_FULL_HD_SOURCE_AND_RECHECK_KOREAN_LAYER_PLACEMENT",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_game_pass": false
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0048-A1F9D054",
+      "role": "B",
+      "candidate_file": "Q061_66dfaa7e327e0c62_source_k.png",
+      "candidate_sha256": "080eceb6109cb09ab067fb0ebbdac4daaf9d8452985ba26036872009063bfa99",
+      "source_file": "Q061_66dfaa7e327e0c62_source.png",
+      "source_sha256": "06c5150b7f47ae2bf0975e70e401a0b285cba64debf65d24fdc99b0de05efadd",
+      "english": "RED",
+      "approved_korean": "빨강",
+      "candidate_file_sha_verified": true,
+      "source_file_sha_verified": true,
+      "source_canvas": [
+        1012,
+        570
+      ],
+      "output_canvas": [
+        1671,
+        941
+      ],
+      "output_png_rgba": true,
+      "output_alpha_bbox": [
+        150,
+        82,
+        1567,
+        919
+      ],
+      "output_alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_content_verdict": "PASS_KOREAN_TEXT_ONLY",
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "visual_evidence": "원본에 BLUE·차량·다른 미션 문구·순위 UI가 함께 포함됨",
+      "output_canvas_changed": true,
+      "ui_safe_region": "UNVERIFIED",
+      "requires_action": "RE_CROP_NATIVE_SINGLE_PHRASE_FROM_VERIFIED_FULL_HD_SOURCE_AND_RECHECK_KOREAN_LAYER_PLACEMENT",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_game_pass": false
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0048-A1F9D054",
+      "role": "B",
+      "candidate_file": "Q061_fd78c902dc83b019_source_k.png",
+      "candidate_sha256": "0eb81dfae3e9647e2da7cb5f797f3b48b5c4826652c7a210175609434f2e3c85",
+      "source_file": "Q061_fd78c902dc83b019_source.png",
+      "source_sha256": "18e5c667ddb97a0f9026bbdc908243f46e31e9b15725e6a2c851f417082063be",
+      "english": "STAGE BONUS",
+      "approved_korean": "스테이지 보너스",
+      "candidate_file_sha_verified": true,
+      "source_file_sha_verified": true,
+      "source_canvas": [
+        606,
+        570
+      ],
+      "output_canvas": [
+        1293,
+        1216
+      ],
+      "output_png_rgba": true,
+      "output_alpha_bbox": [
+        36,
+        343,
+        1263,
+        970
+      ],
+      "output_alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_content_verdict": "PASS_KOREAN_TEXT_ONLY",
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "visual_evidence": "원본에 Drift!/GET!!/Beat that car! 및 컬러 UI 박스가 함께 포함됨",
+      "output_canvas_changed": true,
+      "ui_safe_region": "UNVERIFIED",
+      "requires_action": "RE_CROP_NATIVE_SINGLE_PHRASE_FROM_VERIFIED_FULL_HD_SOURCE_AND_RECHECK_KOREAN_LAYER_PLACEMENT",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_game_pass": false
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0048-A1F9D054",
+      "role": "B",
+      "candidate_file": "Q061_709f706348a901d0_source_k.png",
+      "candidate_sha256": "ccde800fa08a5c31b84d2e47c4d8417feac3d798357b44c8d8d014a3e9300b6a",
+      "source_file": "Q061_709f706348a901d0_source.png",
+      "source_sha256": "fabda9849e82a72fd192ac5271f0a5b2b04d5598ee9d5856d30cda5874b1dd4a",
+      "english": "Beat that car!",
+      "approved_korean": "저 차를 이기세요!",
+      "candidate_file_sha_verified": true,
+      "source_file_sha_verified": true,
+      "source_canvas": [
+        1092,
+        513
+      ],
+      "output_canvas": [
+        1829,
+        860
+      ],
+      "output_png_rgba": true,
+      "output_alpha_bbox": [
+        41,
+        137,
+        1807,
+        834
+      ],
+      "output_alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_content_verdict": "PASS_KOREAN_TEXT_ONLY",
+      "c1_verdict": "FAIL_SOURCE_ROI_MULTILABEL_PROTECTED_ART",
+      "visual_evidence": "원본에 RED/BLUE·차량·다른 미션 문구·순위 UI가 함께 포함됨",
+      "output_canvas_changed": true,
+      "ui_safe_region": "UNVERIFIED",
+      "requires_action": "RE_CROP_NATIVE_SINGLE_PHRASE_FROM_VERIFIED_FULL_HD_SOURCE_AND_RECHECK_KOREAN_LAYER_PLACEMENT",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_game_pass": false
+    }
+  ],
+  "idempotency": {
+    "source_reviews_excluded": [
+      "OUTRUN-C1-20261022T1645KST-NEW-SHA8",
+      "OUTRUN-C1-20261022T1715KST-NEW-SHA8"
+    ],
+    "same_sha_recheck_is_not_new_work": true
+  }
+}
