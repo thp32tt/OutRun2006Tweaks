@@ -9,12 +9,12 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01003",
   "work_key": "DX11:SOURCE_OWNED_FULL_GAME_READBACK_COPY_GENERATION",
-  "feature_id": null,
+  "feature_id": "DX11:SOURCE_OWNED_FULL_GAME_READBACK_COPY_GENERATION",
   "work_class": "integration",
   "milestone_id": "full_resolution_native_game_frame",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
-  "recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "recovery_reason": "RUN_RECORD_NOT_FOUND; REQUIRED_CI_CAUSAL_METADATA_REPAIR_ON_01004",
   "source_head": "00b94b657f2ae2b0837e33f3945ef8eed644a05b",
   "material_result_sha": "52382b770e14f2e9ae52f89016b7557cd1453150",
   "causal_ci_repair_shas": [
@@ -53,7 +53,7 @@
     "src/vr/d3d11/live_game_frame_bridge.cpp"
   ],
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:SOURCE_OWNED_FULL_GAME_READBACK_COPY_GENERATION",
     "source": "RECONSTRUCTED_FROM_GITHUB_MATERIAL_AND_EXACT_SHA_CI; ORIGINAL_RUN_RECORD_NOT_FOUND",
     "goal": "Bind native full-size game menu/car/race D3D11 GPU readback staging copies to their original width, height and output generation, rejecting stale Map pitch or cross-frame mismatches before publishing into the original D3D9Ex Present, without changing fallback or asserting HMD functionality.",
     "acceptance_items": [
@@ -163,5 +163,43 @@
   "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
   "real_game_draw_blocker": "NATIVE_GAME_OUTPUT_AND_HMD_RUNTIME_NOT_VERIFIED",
   "next_implementation_action": "No implementation in C6. Separately validate native menu/car/race staging publication and Quest3/VDXR runtime before claiming end-to-end completion.",
-  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp"
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Original intercepted D3D9 game Draw/DrawIndexed -> native full-resolution D3D11 GPU color source -> current Present-owned staging CopyResource",
+      "Captured GPU CopyResource output dimensions/generation -> D3D11 EVENT and bounded same-Present Map pitch validation -> original D3D9Ex backbuffer upload or guarded GPU sink",
+      "Unmatched generation, invalid Map or unsuccessful D3D9 update -> quarantine native publication while retaining original game rendering/input/FFB"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "Native GPU staging source-time dimensions and generation: src/vr/d3d11/live_game_frame_bridge.cpp",
+      "Readback copy identity and same-output pitch guard: src/vr/d3d11/native_game_frame_publication.hpp",
+      "Positive/negative regression tools/dx11_game_readback_copy_01003.cpp and tools/test_dx11_readback_copy_01003.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Historical 01003 exact-SHA five required GitHub Actions SUCCESS on 90b4dea44bd791dd8460e9a796142d8e446365f1; this provenance repair does not rerun or change that prior SHA.",
+      "negative_regression": "Source-owned copy generation/pitch mismatch and stale queued Map cases rejected by original 01003 destructive regression and C++ readback probe.",
+      "component_integration": "Native D3D11 real-game GPU copy source -> staging fence/Map -> same-Present D3D9 desktop delivery with fail-closed legacy output."
+    },
+    "conflict_keys": [
+      "DX11:SOURCE_OWNED_FULL_GAME_READBACK_COPY_GENERATION",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED; native menu/car/race pixels, gamepad, Quest3 and VDXR RUNTIME_VALIDATION=UNTESTED; no runtime playable claim.",
+    "activation_guard_and_fallback": "No unconditional native draw activation or XR promotion; keep original DX9Ex Draw/Present, D3D9 input/FFB and SkyGlow authoritative on failure."
+  },
+  "c6_ci_metadata_repair": {
+    "linked_task_id": "CONVERSION-DX11-01004",
+    "reason": "01004 required DX11 Fast and Backend exact-SHA gates failed preflight because recovered 01003 lacked mandatory development_strategy and feature_id; historical 01003 material and validated exact-SHA unchanged.",
+    "original_01003_validation_sha": "90b4dea44bd791dd8460e9a796142d8e446365f1",
+    "new_independent_score": 0
+  }
 }
