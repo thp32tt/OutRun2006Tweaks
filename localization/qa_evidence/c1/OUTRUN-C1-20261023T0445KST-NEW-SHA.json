@@ -1,0 +1,428 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T0445KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T04:48:15.749435+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "roles": [
+    "A",
+    "B"
+  ],
+  "review_type": "NEW_SHA_ONLY_NO_AB_QUEUE_CONSUMPTION",
+  "history_sha_count": 423,
+  "counts": {
+    "total": 8,
+    "pass": 0,
+    "fail": 2,
+    "hold": 6
+  },
+  "verification": {
+    "candidate_sha_unique": 8,
+    "source_manifest_sent_export": "8/8",
+    "candidate_rgba_png": "8/8",
+    "candidate_edge_gt8_pixels_zero": "8/8",
+    "previously_reviewed_sha": "0/8"
+  },
+  "qa_comparison": {
+    "A": "N100:work/C1_QA_20261023_0445_A_pairs.jpg",
+    "B": "N100:work/C1_QA_20261023_0445_B_pairs.jpg",
+    "metrics": "N100:work/C1_QA_20261023_0445_metrics.json"
+  },
+  "policy": "NO_FAIL_ON_SHORTER_KOREAN_LINE_OR_MINOR_GLYPH_SIZE_DIFFERENCE",
+  "forbidden_changes": "NO_IMAGEGEN_NO_QUEUE_CONSUMPTION_NO_DDS_NO_C2_C3_NO_INGAME_PASS_NO_DEPLOY",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "reviews": [
+    {
+      "role": "A",
+      "batch": 50,
+      "task_id": "OUTRUN-ROI-A-0050-1749D28E",
+      "source_ordinal": 246,
+      "english": "Create a game and invite your friends!",
+      "approved_korean": "게임을 만들고 친구를 초대하세요!",
+      "source_file": "Q237_b615750944be6209_source.png",
+      "source_sha256": "17888b5902a2004aee6cd8597f5f57b0c4a6ca642c225cd532915db66c756b81",
+      "original_dds_sha256": "570fff6b71962f56b2f3d09993191a18989a80420b1963c4cccd1620b192907a",
+      "source_dimensions": [
+        1176,
+        89
+      ],
+      "source_alpha_bbox": [
+        8,
+        8,
+        1160,
+        78
+      ],
+      "candidate_file": "Q237_b615750944be6209_source_k.png",
+      "candidate_sha256": "c51e967749da018173cb5f1f7adbc9d350f83325c1b76650d1c85de5bea20a6d",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        30,
+        149,
+        2154,
+        585
+      ],
+      "candidate_edge_alpha_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "mode": "RGBA",
+      "image_format": "PNG",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "한글 '게임을 만들고 친구를 초대하세요!'는 정본과 일치하고 읽기 가능. 입력 1176x89/후보 2172x724의 합성 시 원본 UI 셀 및 보호 픽셀 안전영역을 확인하지 못해 보류."
+    },
+    {
+      "role": "A",
+      "batch": 50,
+      "task_id": "OUTRUN-ROI-A-0050-1749D28E",
+      "source_ordinal": 245,
+      "english": "Create a game and invite your friends!",
+      "approved_korean": "게임을 만들고 친구를 초대하세요!",
+      "source_file": "Q232_3c668d24f7f8a39e_source.png",
+      "source_sha256": "db4f3e31929f90ccffa577dcfc6739a4fa3185ccbacf5f594b5657d4642593c6",
+      "original_dds_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "source_dimensions": [
+        1136,
+        89
+      ],
+      "source_alpha_bbox": [
+        7,
+        8,
+        1120,
+        78
+      ],
+      "candidate_file": "Q232_3c668d24f7f8a39e_source_k.png",
+      "candidate_sha256": "283013947ba0b5370724b3942c2783d34b4719f3c273f0f72cfe25bfb27fed11",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        282,
+        172,
+        2023,
+        644
+      ],
+      "candidate_edge_alpha_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "mode": "RGBA",
+      "image_format": "PNG",
+      "C1_status": "FAIL",
+      "C1_reason_code": "FAIL_APPROVED_TRANSLATION_MISMATCH",
+      "C1_observation": "영문 'Create a game and invite your friends!'의 승인 한글은 '게임을 만들고 친구를 초대하세요!'이나 실제 후보에는 '게임 참가'가 생성됨. 다른 문구 오생성."
+    },
+    {
+      "role": "A",
+      "batch": 50,
+      "task_id": "OUTRUN-ROI-A-0050-1749D28E",
+      "source_ordinal": 244,
+      "english": "JOIN GAME",
+      "approved_korean": "게임 참가",
+      "source_file": "Q232_10d42dadc204599d_source.png",
+      "source_sha256": "db006ec1028fe522b203941b3ce60a2689f6a3336d89bc514cd39fd710877668",
+      "original_dds_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "source_dimensions": [
+        1030,
+        174
+      ],
+      "source_alpha_bbox": [
+        9,
+        24,
+        979,
+        169
+      ],
+      "candidate_file": "Q232_10d42dadc204599d_source_k.png",
+      "candidate_sha256": "dd6886af8a238cfe00d41275041aef76a59fe607287da9c2595ee24b20ddeed0",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        69,
+        2171,
+        542
+      ],
+      "candidate_edge_alpha_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "mode": "RGBA",
+      "image_format": "PNG",
+      "C1_status": "FAIL",
+      "C1_reason_code": "FAIL_APPROVED_TRANSLATION_MISMATCH",
+      "C1_observation": "영문 'JOIN GAME'의 승인 한글은 '게임 참가'이나 실제 후보에는 '게임을 만들고 친구를 초대하세요!'가 생성됨. 다른 문구 오생성."
+    },
+    {
+      "role": "A",
+      "batch": 49,
+      "task_id": "OUTRUN-ROI-A-0049-4F973D86",
+      "source_ordinal": 243,
+      "english": "GAME MODES",
+      "approved_korean": "게임 모드",
+      "source_file": "Q230_1a8d3644a0dfc2f3_source.png",
+      "source_sha256": "4ba5d9d34c995c48447afccdf93d802075e7a52cd29c445b5bd4ce46d196211c",
+      "original_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_dimensions": [
+        1704,
+        304
+      ],
+      "source_alpha_bbox": [
+        7,
+        39,
+        1641,
+        265
+      ],
+      "candidate_file": "Q230_1a8d3644a0dfc2f3_source_k.png",
+      "candidate_sha256": "b048fc80464f72ba248867ed2a739f26819c73983a67f825677a53064b567e65",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        138,
+        25,
+        1920,
+        698
+      ],
+      "candidate_edge_alpha_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "mode": "RGBA",
+      "image_format": "PNG",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'게임 모드'는 정확하고 가독성 정상. 후보 2172x724를 원문 ROI 1704x304에 복귀하는 스케일·배치와 실제 UI 셀 보호 영역은 검증되지 않아 보류."
+    },
+    {
+      "role": "B",
+      "batch": 63,
+      "task_id": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "source_ordinal": 302,
+      "english": "INTERMEDIATE",
+      "approved_korean": "중급",
+      "source_file": "Q227_dd022552c0f0635b_source.png",
+      "source_sha256": "ce668cc0a357c1ca6cdf22eee173dc41711212c901ff45762854f2f02531f221",
+      "original_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "source_dimensions": [
+        1400,
+        188
+      ],
+      "source_alpha_bbox": [
+        9,
+        18,
+        1357,
+        170
+      ],
+      "candidate_file": "Q227_dd022552c0f0635b_source_k.png",
+      "candidate_sha256": "825321af89f5d2adfae9fa3b6778c5be6a3e8932775178028c86e789dc3dc42d",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        579,
+        51,
+        2068,
+        698
+      ],
+      "candidate_edge_alpha_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "mode": "RGBA",
+      "image_format": "PNG",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'중급' 표기·음절·그림자 정상. 입력 1400x188 대비 후보 2172x724, 본 UI 영역과 주변 아트 간 충돌 검증 전 보류."
+    },
+    {
+      "role": "B",
+      "batch": 63,
+      "task_id": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "source_ordinal": 301,
+      "english": "GOAL D",
+      "approved_korean": "골 D",
+      "source_file": "Q226_289a6e483d329b1c_source.png",
+      "source_sha256": "70ffd61d8cf49459defba147a984dc36018698928788fda6615c6a677fe11ccf",
+      "original_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "source_dimensions": [
+        554,
+        174
+      ],
+      "source_alpha_bbox": [
+        5,
+        17,
+        517,
+        155
+      ],
+      "candidate_file": "Q226_289a6e483d329b1c_source_k.png",
+      "candidate_sha256": "fb161addeea53ad3aec08477d97b2162060c6481865309eb598ca2603dfcf0a6",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        516,
+        21,
+        1722,
+        684
+      ],
+      "candidate_edge_alpha_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "mode": "RGBA",
+      "image_format": "PNG",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'골 D' 표기·매핑은 정상. 한글 폭 차이를 실패로 판단하지 않음. 실제 UI 셀 배치 및 보호 아트 검증 전 보류."
+    },
+    {
+      "role": "B",
+      "batch": 63,
+      "task_id": "OUTRUN-ROI-B-0063-FA58CDBF-R1",
+      "source_ordinal": 300,
+      "english": "GOAL B",
+      "approved_korean": "골 B",
+      "source_file": "Q226_13649d18fb677dcd_source.png",
+      "source_sha256": "5634d7ad5c187e031045aa9740a46905bbaaa05839dd73e33ae3ffdffbee43ed",
+      "original_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "source_dimensions": [
+        556,
+        174
+      ],
+      "source_alpha_bbox": [
+        5,
+        17,
+        518,
+        155
+      ],
+      "candidate_file": "Q226_13649d18fb677dcd_source_k.png",
+      "candidate_sha256": "e9a30aa6d4ecbeac0a53d0080053cfae7fa42c4445db5ad02232902ba888e287",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        379,
+        84,
+        1800,
+        724
+      ],
+      "candidate_edge_alpha_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "mode": "RGBA",
+      "image_format": "PNG",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'골 B' 표기·매핑 정상. 후보 alpha bbox가 이미지 하단 y=724에 도달하나 경계 강도>8 픽셀은 0; 잠재 하단 미세 클리핑/실배치 확인 필요로 보류."
+    },
+    {
+      "role": "B",
+      "batch": 62,
+      "task_id": "OUTRUN-ROI-B-0062-A2E81382-R1",
+      "source_ordinal": 299,
+      "english": "OutRun 1986",
+      "approved_korean": "아웃런 1986",
+      "source_file": "Q222_1afd6ab62902ee9e_source.png",
+      "source_sha256": "27122e601d845610793782bd99f9f2b6fd0b3d5200439124c9439316b3827b0b",
+      "original_dds_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+      "source_dimensions": [
+        1400,
+        272
+      ],
+      "source_alpha_bbox": [
+        7,
+        39,
+        1341,
+        233
+      ],
+      "candidate_file": "Q222_1afd6ab62902ee9e_source_k.png",
+      "candidate_sha256": "abf0d8430f6dc1641f5d202c94cb33006cbd5a5cc7eb3d9402806b706d43c8b4",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_alpha_bbox": [
+        25,
+        65,
+        2086,
+        700
+      ],
+      "candidate_edge_alpha_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "mode": "RGBA",
+      "image_format": "PNG",
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "'아웃런 1986' 표기 및 승인 매핑 정상. 어두운 원본 계열 색상은 단독 실패 아님. 실제 UI 셀 안전영역/복귀 스케일 확인 전 보류."
+    }
+  ]
+}
