@@ -1,0 +1,476 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T1916KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T19:22:28.012247+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before": "4b83ac4edda3dac69169a52ce1deef2a01c98214",
+  "role": "C1",
+  "mode": "independent_lightweight_QA_only",
+  "evidence_origin": "N100 persisted A/B candidate PNG/source bytes plus independently observed 4 two-pair visual source/output comparison sheets",
+  "execution_backend": "GitHub read/write; N100 targeted SHA256 and native PNG visual metrics",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_selection": "B-0055 5, A-0041 remaining 2 (ordinals 202-203) and A-0042 first 1 (ordinal 204); not covered by immediately preceding 18:45 C1 report; exactly 8 distinct actual candidate SHA256.",
+  "summary": {
+    "reviewed": 8,
+    "source_sha_matches_manifest": 8,
+    "candidate_sha_matches_local_completion_and_export": 8,
+    "candidate_png_rgba": 8,
+    "approved_mapping_and_korean_readability": 8,
+    "single_phrase_roi": 5,
+    "multilabel_source_roi": 3,
+    "canvas_dimensions_match": 0,
+    "hold_native_ui_placement": 5,
+    "fail_source_roi": 3,
+    "c1_final_pass": 0,
+    "dds_generated": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "metrics_n100": "work/c1_20261022_1916/metrics.json",
+    "contact_sheets_n100": [
+      "work/c1_20261022_1916/compare_1.jpg",
+      "work/c1_20261022_1916/compare_2.jpg",
+      "work/c1_20261022_1916/compare_3.jpg",
+      "work/c1_20261022_1916/compare_4.jpg"
+    ],
+    "producer_completion_n100": [
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-B-0055-63F37671.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0041-1B495950.json",
+      "work/image-src/text_roi_batches/local_completion/OUTRUN-ROI-A-0042-8FEDC08C.json"
+    ],
+    "note": "C1 performed no ImageGen, A/B queue consumption, DDS composition or game deployment. No C2/C3/runtime PASS. Small Korean line width was never treated as a defect."
+  },
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0055-63F37671",
+      "ordinal": 260,
+      "source_file": "Q140_3632f2ce8be745cc_source.png",
+      "candidate_file": "Q140_3632f2ce8be745cc_source_k.png",
+      "english": "SELECT RACE",
+      "approved_korean": "레이스 선택",
+      "source_sha256": "b12ec074f995039df46f8d5cdff9f0f447ee3d549f8dce3af12422e818187615",
+      "candidate_sha256": "756efea5dcdad8219f93e7905a36948acb61f53f30b22a88d77c2a72c05a86e0",
+      "source_dds_sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_bbox_xyxy": [
+        0,
+        734,
+        827,
+        862
+      ],
+      "source_dimensions": [
+        1654,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        178,
+        65,
+        2021,
+        628
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "SELECT RACE→레이스 선택: 자소·받침 판독 정상, 원문 단일 문구. 출력 2172×724는 원본 1654×256과 달라 네이티브 위치·UV 안전영역 검증 전 HOLD.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0055-63F37671",
+      "ordinal": 261,
+      "source_file": "Q140_45491bc18fadf334_source.png",
+      "candidate_file": "Q140_45491bc18fadf334_source_k.png",
+      "english": "SELECT STAGE",
+      "approved_korean": "스테이지 선택",
+      "source_sha256": "62d6ee2866c44327ef29a5fd6ed6f8b446ce49394c713aad77d66e2d05085a3e",
+      "candidate_sha256": "d721a0b808118adf7af2301f7fc282c27ce4c78190e23cb6b2bc1b045b6f33f2",
+      "source_dds_sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_bbox_xyxy": [
+        0,
+        890,
+        874,
+        1018
+      ],
+      "source_dimensions": [
+        1748,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        57,
+        9,
+        2076,
+        624
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "SELECT STAGE→스테이지 선택: 자소 판독 정상, 단일 문구. 출력 2172×724 vs 원본 1748×256, 배치 검증 전 HOLD.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0055-63F37671",
+      "ordinal": 262,
+      "source_file": "Q140_4094bf4a7746445d_source.png",
+      "candidate_file": "Q140_4094bf4a7746445d_source_k.png",
+      "english": "SHOWROOM",
+      "approved_korean": "쇼룸",
+      "source_sha256": "5bcc51c6fa67fc40ece00f57a8c9bdbc911d1bb117d63d129051a64e4a5d0306",
+      "candidate_sha256": "79595577f7340b87c856ffb1d47d81fbffecbd3110ed98e767e0037efb4fb5d0",
+      "source_dds_sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_bbox_xyxy": [
+        0,
+        417,
+        685,
+        541
+      ],
+      "source_dimensions": [
+        1370,
+        248
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        49,
+        25,
+        1553,
+        636
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "SHOWROOM→쇼룸: 오탈자/가짜 자소 관찰되지 않음, 단일 문구. 출력 2172×724 vs 원본 1370×248, 배치 검증 전 HOLD.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0055-63F37671",
+      "ordinal": 263,
+      "source_file": "Q140_88d5ae34cbed88a3_source.png",
+      "candidate_file": "Q140_88d5ae34cbed88a3_source_k.png",
+      "english": "SELECT STAGE",
+      "approved_korean": "스테이지 선택",
+      "source_sha256": "62d6ee2866c44327ef29a5fd6ed6f8b446ce49394c713aad77d66e2d05085a3e",
+      "candidate_sha256": "1c2f303ffe5dbf3d9100faa87c5012f9e5de21bc4c5def5aef39b3135e0dc581",
+      "source_dds_sha256": "53c30fcce6578e411ccd7b5aafb29f5d1c4c09121cb84047576011f4a627cc39",
+      "source_bbox_xyxy": [
+        0,
+        890,
+        874,
+        1018
+      ],
+      "source_dimensions": [
+        1748,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        182,
+        39,
+        2142,
+        643
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "SELECT STAGE→스테이지 선택: 읽기·문구 일치, 원본 단일 문구. 출력 2172×724 vs 원본 1748×256, 배치 검증 전 HOLD.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0055-63F37671",
+      "ordinal": 264,
+      "source_file": "Q140_fcafe4a610214ae2_source.png",
+      "candidate_file": "Q140_fcafe4a610214ae2_source_k.png",
+      "english": "SELECT MODE",
+      "approved_korean": "모드 선택",
+      "source_sha256": "10626c7ca98a332a4ce0c77e35612b459af1469c3f7e518a804a15b447b35fab",
+      "candidate_sha256": "d76b5e55abc0929246ddf6b6352699d59b5ecfd0828d0baf14db5b5fe634a136",
+      "source_dds_sha256": "53c30fcce6578e411ccd7b5aafb29f5d1c4c09121cb84047576011f4a627cc39",
+      "source_bbox_xyxy": [
+        0,
+        574,
+        849,
+        702
+      ],
+      "source_dimensions": [
+        1698,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        397,
+        19,
+        1850,
+        644
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": true,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "HOLD_NATIVE_UI_PLACEMENT_UNTESTED",
+      "qa_reason": "SELECT MODE→모드 선택: 문구·한글 자소 정상, 원본 단일 문구. 출력 2172×724 vs 원본 1698×256, 배치 검증 전 HOLD.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0041-1B495950",
+      "ordinal": 202,
+      "source_file": "Q161_2477321b0942c89b_source.png",
+      "candidate_file": "Q161_2477321b0942c89b_source_k.png",
+      "english": "CANADA",
+      "approved_korean": "캐나다",
+      "source_sha256": "4d414be604254191ee294e681a79bb084927297368671a8a046e5f6ca3f6883b",
+      "candidate_sha256": "fa7004827f1eb6d38639483385a1d05a7cf42480a2fc140825445dcb0b6738c8",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_bbox_xyxy": [
+        0,
+        893,
+        662,
+        1089
+      ],
+      "source_dimensions": [
+        662,
+        196
+      ],
+      "candidate_dimensions": [
+        2122,
+        741
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        126,
+        101,
+        1764,
+        604
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "FAIL_SOURCE_MULTILABEL_ROI",
+      "qa_reason": "CANADA→캐나다: 원본 ROI 내부에 BELGIUM/CANADA/DENMARK 3개 문구가 함께 존재. 한 문구 ROI 조건 위반, 영문 단일 레이블 좌표/안전영역 결속 불가. C crop 재작업 필요.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0041-1B495950",
+      "ordinal": 203,
+      "source_file": "Q161_5d82b5fcd656adda_source.png",
+      "candidate_file": "Q161_5d82b5fcd656adda_source_k.png",
+      "english": "THAILAND",
+      "approved_korean": "태국",
+      "source_sha256": "d4fb76ff25877061b8f37ee28191cfc4efb9f269a61a1fbebdfe39c4017d80ea",
+      "candidate_sha256": "e726fbeceb05c4725e2c7aa81207c62fb91bddb9fe3d5278d363edc4f9c6b121",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_bbox_xyxy": [
+        0,
+        1536,
+        658,
+        1726
+      ],
+      "source_dimensions": [
+        658,
+        190
+      ],
+      "candidate_dimensions": [
+        1920,
+        819
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        78,
+        275,
+        1162,
+        794
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "FAIL_SOURCE_MULTILABEL_ROI",
+      "qa_reason": "THAILAND→태국: 원본 ROI 내부에 SWEDEN/THAILAND/ARIES 3개 문구가 함께 존재. 단일 문구 ROI 조건 위반, 소스 경계 재크롭 필요.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0042-8FEDC08C",
+      "ordinal": 204,
+      "source_file": "Q161_1feedeb0bc9341cc_source.png",
+      "candidate_file": "Q161_1feedeb0bc9341cc_source_k.png",
+      "english": "VIRGO",
+      "approved_korean": "처녀자리",
+      "source_sha256": "b48e32e02d619e99c6c2f67092f7440a3c394582813574de3bf391682c501136",
+      "candidate_sha256": "91cfbbe372add84a434d2d57b5ec3e63331e1459307745aba7def724cb2d5c09",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_bbox_xyxy": [
+        0,
+        1917,
+        662,
+        2048
+      ],
+      "source_dimensions": [
+        1324,
+        262
+      ],
+      "candidate_dimensions": [
+        1875,
+        839
+      ],
+      "source_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        15,
+        168,
+        1687,
+        736
+      ],
+      "candidate_border_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_sha_verified": true,
+      "export_sha_verified": true,
+      "translation_length_difference_ignored": true,
+      "canvas_change": true,
+      "source_single_phrase_roi": false,
+      "expected_korean_visible_readable": true,
+      "qa_verdict": "FAIL_SOURCE_MULTILABEL_ROI",
+      "qa_reason": "VIRGO→처녀자리: 원본 ROI 내부에 SCORPIO/VIRGO가 함께 존재. 단일 문구 ROI 조건 위반, 소스 경계 재크롭 필요.",
+      "full_c1_pass": false,
+      "c2_pass": false,
+      "c3_pass": false,
+      "game_pass": false
+    }
+  ]
+}
