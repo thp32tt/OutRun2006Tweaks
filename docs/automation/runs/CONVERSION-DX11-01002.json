@@ -169,16 +169,17 @@
     "note": "Initial required Gate failure at material SHA was inherited 01001 feature_id=null; repaired as same-task metadata on validation SHA. No repeated PASS SHA requested."
   },
   "pipeline": {
-    "C0_RECOVER": "PASS: exact target branch HEAD and missing 01001 JSON confirmed, reason RUN_RECORD_NOT_FOUND.",
-    "C1_REVIEW": "PASS: source material, causal regression repair and exact-SHA successful five-Gate evidence verified from GitHub.",
-    "C2_IMPLEMENT": "ALREADY_DONE at 2411a1f5e30501cd336a2fb5b518ed5d5b5af2fe; no source changes in C6.",
-    "C3_VALIDATE": "PASS 5/5 required Actions at 9f79dd8d5e01c07a0cd405cbbc6b53de429becd1; no new workflow dispatch or rerun; runtime UNTESTED.",
-    "C4_COMMIT": "ALREADY_DONE material 2411a1f5e30501cd336a2fb5b518ed5d5b5af2fe and causal CI repair 9f79dd8d5e01c07a0cd405cbbc6b53de429becd1; no CI skip on validation-bearing commits.",
+    "C0_RECOVER": "PASS: 01002 run record originally missing (RUN_RECORD_NOT_FOUND); reconstructed from GitHub material b4772826 and validation-bearing c782af20.",
+    "C1_REVIEW": "PASS: 01002 stereo eye/camera/stretch source integration and destructive regression identified; inherited 01001 null feature ID caused the initial same-task exact-SHA Gate failure.",
+    "C2_IMPLEMENT": "ALREADY_DONE at material b4772826cf266663617d7dd4d5e85347984eb920; no source changes in C6.",
+    "C3_VALIDATE": "PASS: five required Actions at exact c782af20b548654347260dcdb58316d686ac4b35 (DX11 Fast 39730387092, Backend 39730387193, Build 39730390978, OpenXR 39730390973, HUD 39730390960); no CI rerun. Quest3/game runtime UNTESTED.",
+    "C4_COMMIT": "ALREADY_DONE material b4772826cf266663617d7dd4d5e85347984eb920 and inherited-01001 causal CI record repair c782af20b548654347260dcdb58316d686ac4b35; C6 is separate docs-only [skip ci], not a new validation-bearing SHA.",
     "C5_PACKAGE": "NOT_REQUIRED; deployment and Quest3/VDXR real-game testing are user-controlled.",
     "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA recorded in docs-only [skip ci] bookkeeping commit."
   },
   "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
   "next_implementation_action": "Continue native menu->vehicle->race D3D9 shader-bound Draw/DrawIndexed translation, frame coverage and native OpenXR submission, preserving fail-closed D3D9Ex fallback; gather exact-SHA live game draw/publication telemetry when a game session is available.",
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "real_game_draw_blocker": "LATEST_01002_SOURCE_RUNTIME_NATIVE_GAME_DRAW_AND_PUBLISHED_FRAME_COUNTS_UNTESTED"
+  "real_game_draw_blocker": "LATEST_01002_SOURCE_RUNTIME_NATIVE_GAME_DRAW_AND_PUBLISHED_FRAME_COUNTS_UNTESTED",
+  "recovery_reason": "RUN_RECORD_NOT_FOUND"
 }
