@@ -1,0 +1,387 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1645KST-NEW-SHA8",
+  "date_kst": "2026-10-22",
+  "lane": "C1",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "Independent QA of eight previously unreviewed SHA256 from A/B N100 export evidence; not a production lane",
+  "source_policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "preflight": {
+    "n100_inventory": "work/c1_20261022_1645_inventory_result.json",
+    "n100_metrics": "work/c1_20261022_1645_metrics.json",
+    "n100_visual_comparison": [
+      "work/c1_20261022_1645_contact_1.jpg",
+      "work/c1_20261022_1645_contact_2.jpg"
+    ],
+    "dedup_sources": [
+      "work/c1_batch_*/report.json",
+      "work/c1_batch_*/metrics.json",
+      "localization/qa_evidence/c1/OUTRUN-C1-20261022T1216KST-SHA8.json through OUTRUN-C1-20261022T1616KST-NEW-SHA8.json"
+    ],
+    "exported_candidate_records_at_inventory": 408,
+    "sha_records_selected": 8,
+    "export_missing": 0,
+    "source_export_sha_mismatch": 0
+  },
+  "summary": {
+    "reviewed": 8,
+    "pass_full_c1": 0,
+    "fail_source_multilabel_only": 7,
+    "fail_mapping_missing_slash_and_source_multilabel": 1,
+    "output_png_rgba_and_sha_pass": 8,
+    "meaningful_alpha_crop_border_clip": 0,
+    "source_output_canvas_mismatch": 8,
+    "ingame_or_dds_approval": 0
+  },
+  "review_principles": "No width/shorter-phrase failure; observe native Hangul legibility and hard-stop source contamination/mapping omission. Matching lettering in an invalid multi-label source does not promote to C1 PASS.",
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0033-CED46FBE",
+      "candidate_file": "Q051_5f136db6b9702700_source_k.png",
+      "candidate_sha256": "1c32eb725d48cc58f3bb6455c5fc2184de04cb233c67c8bec6d1a343754141d3",
+      "source_file": "Q051_5f136db6b9702700_source.png",
+      "source_sha256": "5b56e5d83ce0a4602dd17a63de94e3855d501023c579afb7d1932f7cee080a49",
+      "source_english": "Casino Town",
+      "approved_korean": "카지노 타운",
+      "observed_korean": "카지노 타운",
+      "sha256_source_and_export_verified": true,
+      "format": "RGBA",
+      "output_canvas": [
+        1774,
+        887
+      ],
+      "source_canvas": [
+        1227,
+        629
+      ],
+      "canvas_size_changed": true,
+      "candidate_alpha_bbox": [
+        82,
+        67,
+        1657,
+        847
+      ],
+      "alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "output_readable_text_layer": true,
+      "source_one_phrase_only": false,
+      "source_contains_multiple_phrases_or_ui_art": true,
+      "translation_exact_match": true,
+      "verdict": "FAIL_SOURCE_ROI_MULTILABEL_COMPOSITE",
+      "reason": "원본에 Total Time, GOAL, Casino Town 외 다른 문구와 아이콘이 함께 포함됨. 생성 한글 '카지노 타운'은 읽히지만 독립 단일문구 ROI 아님.",
+      "native_uv_placement": "HOLD_NOT_VERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0034-2ABF9094",
+      "candidate_file": "Q051_416002fd46b637ab_source_k.png",
+      "candidate_sha256": "dce151d7814eb1268f9a3ca2363068ebc8f8906a2f14d8fb26d2baec5ab493a1",
+      "source_file": "Q051_416002fd46b637ab_source.png",
+      "source_sha256": "beff90b12e21b3da15aca71cb3e6347287be384836bdaf4c6c0b6710f470fe8b",
+      "source_english": "SIGN IN",
+      "approved_korean": "로그인",
+      "observed_korean": "로그인",
+      "sha256_source_and_export_verified": true,
+      "format": "RGBA",
+      "output_canvas": [
+        1612,
+        975
+      ],
+      "source_canvas": [
+        506,
+        306
+      ],
+      "canvas_size_changed": true,
+      "candidate_alpha_bbox": [
+        57,
+        196,
+        1525,
+        959
+      ],
+      "alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "output_readable_text_layer": true,
+      "source_one_phrase_only": false,
+      "source_contains_multiple_phrases_or_ui_art": true,
+      "translation_exact_match": true,
+      "verdict": "FAIL_SOURCE_ROI_MULTILABEL_COMPOSITE",
+      "reason": "원본에 ENTER ACCOUNT NAME, DON'T SIGN-IN, DELETE ACCOUNT가 함께 포함됨. 생성 '로그인' 글자층은 읽힘.",
+      "native_uv_placement": "HOLD_NOT_VERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0034-2ABF9094",
+      "candidate_file": "Q051_0968fb55c061777e_source_k.png",
+      "candidate_sha256": "7b2304e0991f317c18527ca6e27461a0393fbd64bd034243cd59f12662bd62bb",
+      "source_file": "Q051_0968fb55c061777e_source.png",
+      "source_sha256": "db7e62fc4c31996d62e0e6d4a4b3944cf7890b13f5b378984c7c15fc67b535ac",
+      "source_english": "Total Rank",
+      "approved_korean": "종합 랭크",
+      "observed_korean": "종합 랭크",
+      "sha256_source_and_export_verified": true,
+      "format": "RGBA",
+      "output_canvas": [
+        1913,
+        822
+      ],
+      "source_canvas": [
+        1464,
+        629
+      ],
+      "canvas_size_changed": true,
+      "candidate_alpha_bbox": [
+        0,
+        84,
+        1889,
+        788
+      ],
+      "alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "output_readable_text_layer": true,
+      "source_one_phrase_only": false,
+      "source_contains_multiple_phrases_or_ui_art": true,
+      "translation_exact_match": true,
+      "verdict": "FAIL_SOURCE_ROI_MULTILABEL_COMPOSITE",
+      "reason": "원본에 GOAL, Ice Scape, Casino Town, Skyscrapers, Total Rank 등 문구와 아이콘이 함께 포함됨. 생성 '종합 랭크'는 읽힘.",
+      "native_uv_placement": "HOLD_NOT_VERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0034-2ABF9094",
+      "candidate_file": "Q051_fcd1960dbe7d2922_source_k.png",
+      "candidate_sha256": "c87dfb8358af648cda4fc05abc49bd59c206e621b00e32225d977eb99ee6a30e",
+      "source_file": "Q051_fcd1960dbe7d2922_source.png",
+      "source_sha256": "a53fd31fa7a50be450c88849225d767f0cfbeef427d7eac35310d7fbd639078f",
+      "source_english": "Jungle",
+      "approved_korean": "정글",
+      "observed_korean": "정글",
+      "sha256_source_and_export_verified": true,
+      "format": "RGBA",
+      "output_canvas": [
+        1724,
+        912
+      ],
+      "source_canvas": [
+        1130,
+        598
+      ],
+      "canvas_size_changed": true,
+      "candidate_alpha_bbox": [
+        492,
+        167,
+        1382,
+        808
+      ],
+      "alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "output_readable_text_layer": true,
+      "source_one_phrase_only": false,
+      "source_contains_multiple_phrases_or_ui_art": true,
+      "translation_exact_match": true,
+      "verdict": "FAIL_SOURCE_ROI_MULTILABEL_COMPOSITE",
+      "reason": "원본에 Leader, Giant Statues, Jungle, Score, 차량/표지 아이콘이 함께 포함됨. 생성 '정글'은 읽힘.",
+      "native_uv_placement": "HOLD_NOT_VERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0034-2ABF9094",
+      "candidate_file": "Q051_d182ab06baaed210_source_k.png",
+      "candidate_sha256": "c300d7688bb955bcfbdf7ff37d807549dfbf5b9f519795863bb92f604076dffd",
+      "source_file": "Q051_d182ab06baaed210_source.png",
+      "source_sha256": "793689572ef0e3cd77357bec0b6eaf8f311763c4f8c9fd7d494031f71f3862f0",
+      "source_english": "EXIT OUTRUN PLUS",
+      "approved_korean": "아웃런 플러스 종료",
+      "observed_korean": "아웃런 플러스 종료",
+      "sha256_source_and_export_verified": true,
+      "format": "RGBA",
+      "output_canvas": [
+        2172,
+        724
+      ],
+      "source_canvas": [
+        888,
+        247
+      ],
+      "canvas_size_changed": true,
+      "candidate_alpha_bbox": [
+        56,
+        71,
+        2126,
+        690
+      ],
+      "alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "output_readable_text_layer": true,
+      "source_one_phrase_only": false,
+      "source_contains_multiple_phrases_or_ui_art": true,
+      "translation_exact_match": true,
+      "verdict": "FAIL_SOURCE_ROI_MULTILABEL_COMPOSITE",
+      "reason": "원본에 EXIT OUTRUN PLUS 외 ACCOUNTS와 CHEATING 및 상단 노란 UI 바 포함. 생성 '아웃런 플러스 종료'는 읽힘.",
+      "native_uv_placement": "HOLD_NOT_VERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0034-2ABF9094",
+      "candidate_file": "Q051_f4fd8c0c51f8f567_source_k.png",
+      "candidate_sha256": "42b424d2c6c7842fee31a8e4ebdf65592355033c654a6c26ab7741cab9c59df7",
+      "source_file": "Q051_f4fd8c0c51f8f567_source.png",
+      "source_sha256": "e11283a02f6befdbd7356037907067143064792d2215824b1bfbd3483e80c356",
+      "source_english": "OFFENSIVE MESSAGE",
+      "approved_korean": "모욕적 메시지",
+      "observed_korean": "모욕적 메시지",
+      "sha256_source_and_export_verified": true,
+      "format": "RGBA",
+      "output_canvas": [
+        2172,
+        724
+      ],
+      "source_canvas": [
+        873,
+        250
+      ],
+      "canvas_size_changed": true,
+      "candidate_alpha_bbox": [
+        58,
+        154,
+        2132,
+        708
+      ],
+      "alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "output_readable_text_layer": true,
+      "source_one_phrase_only": false,
+      "source_contains_multiple_phrases_or_ui_art": true,
+      "translation_exact_match": true,
+      "verdict": "FAIL_SOURCE_ROI_MULTILABEL_COMPOSITE",
+      "reason": "원본에 CHEATING, OFFENSIVE MESSAGE, GREAT SESSION과 다른 문구 포함. 생성 '모욕적 메시지'는 읽힘.",
+      "native_uv_placement": "HOLD_NOT_VERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0035-31D5C0FB-R1",
+      "candidate_file": "Q051_9953bbddf2606524_source_k.png",
+      "candidate_sha256": "ad9dbbd26a1bc7783cfe2bbab0724b97411f82f3f36df1bb23009c051e77b43c",
+      "source_file": "Q051_9953bbddf2606524_source.png",
+      "source_sha256": "1acdba3ca28d55eba0421ada86eda51fdad7f1d78a0a5f77cc77c2d3292cd3c7",
+      "source_english": "LOAD / SAVE",
+      "approved_korean": "불러오기 / 저장",
+      "observed_korean": "불러오기 저장",
+      "sha256_source_and_export_verified": true,
+      "format": "RGBA",
+      "output_canvas": [
+        2172,
+        724
+      ],
+      "source_canvas": [
+        646,
+        207
+      ],
+      "canvas_size_changed": true,
+      "candidate_alpha_bbox": [
+        57,
+        38,
+        2150,
+        674
+      ],
+      "alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "output_readable_text_layer": true,
+      "source_one_phrase_only": false,
+      "source_contains_multiple_phrases_or_ui_art": true,
+      "translation_exact_match": false,
+      "verdict": "FAIL_MAPPING_MISSING_SLASH_AND_SOURCE_ROI_MULTILABEL",
+      "reason": "원본에 SOUNDTRACK, LOAD / SAVE, LOGIN과 UI 강조 바가 함께 포함되고, 결과가 '불러오기 저장'으로 표시되어 승인 문구 '불러오기 / 저장'의 슬래시가 누락됨.",
+      "native_uv_placement": "HOLD_NOT_VERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0035-31D5C0FB-R1",
+      "candidate_file": "Q051_b3a3a8ac8802c4db_source_k.png",
+      "candidate_sha256": "d8f5c53650a1ed83b24691179d3a39270e2193937108a3c6cc01ddf7d2c62249",
+      "source_file": "Q051_b3a3a8ac8802c4db_source.png",
+      "source_sha256": "237c799aa37f154064a6cfb881285470e52895111ee4db9b1a7b48e21b677946",
+      "source_english": "Ice Scape",
+      "approved_korean": "아이스스케이프",
+      "observed_korean": "아이스스케이프",
+      "sha256_source_and_export_verified": true,
+      "format": "RGBA",
+      "output_canvas": [
+        1523,
+        1033
+      ],
+      "source_canvas": [
+        907,
+        615
+      ],
+      "canvas_size_changed": true,
+      "candidate_alpha_bbox": [
+        32,
+        80,
+        1508,
+        975
+      ],
+      "alpha_edge_gt8": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "output_readable_text_layer": true,
+      "source_one_phrase_only": false,
+      "source_contains_multiple_phrases_or_ui_art": true,
+      "translation_exact_match": true,
+      "verdict": "FAIL_SOURCE_ROI_MULTILABEL_COMPOSITE",
+      "reason": "원본에 Total Time, GOAL, Casino Town, Total Rank, Ice Scape와 아이콘 등이 함께 포함됨. 생성 '아이스스케이프'는 읽힘.",
+      "native_uv_placement": "HOLD_NOT_VERIFIED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "restrictions": {
+    "no_imagegen": true,
+    "no_ab_queue_consumption": true,
+    "no_dds_generation": true,
+    "no_auto_deploy": true,
+    "no_c2_c3_ingame_pass": true,
+    "no_vr_ffb_dx11_dxvk_modification": true,
+    "runtime_validation": "UNTESTED"
+  }
+}
