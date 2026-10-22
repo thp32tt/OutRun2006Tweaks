@@ -1,0 +1,436 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T2245KST-NEW-SHA8",
+  "timestamp_kst": "2026-10-22T22:57:00+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "reviewed_against_head": "edb260aea143920329e80215fdb5ca4c3cf8be56",
+  "role": "C1",
+  "mode": "independent_lightweight_qa_only",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "selection": "B-0062 R1 all five, A-0048 first three. New region IDs and candidate SHA disjoint from immediately prior B-0061+A-0047 22:15 evidence.",
+  "summary": {
+    "reviewed": 8,
+    "unique_candidate_sha": 8,
+    "source_file_sha256_verified": 8,
+    "candidate_file_sha256_export_verified": 8,
+    "rgba_png": 8,
+    "transparent_alpha_corner_verified": 8,
+    "visually_legible_korean": 8,
+    "static_english_residue_or_extra_frame_found": 0,
+    "source_reference_mismatch_fail": 1,
+    "source_multi_label_holds": 3,
+    "native_ui_safe_placement_holds": 7,
+    "c1_final_pass": 0,
+    "c1_final_fail": 1,
+    "c1_final_hold": 7,
+    "new_dds": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "candidate_output_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "input_root": "work/image-src/text_roi_batches/inputs",
+    "export_evidence": [
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0062-A2E81382-R1.json",
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0048-FEBDE02F.json"
+    ],
+    "n100_local_metrics": "work/C1_QA_20261022_2245_metrics.json",
+    "n100_original_contact_sheet": "work/C1_QA_20261022_2245_originals.jpg",
+    "n100_candidate_contact_sheet": "work/C1_QA_20261022_2245_candidates.jpg",
+    "source_provenance": "work/image-src/text_roi_batches/production_manifest.json"
+  },
+  "records": [
+    {
+      "id": "Q154_fec84edfb3865d45",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0062-A2E81382-R1",
+      "ordinal": 295,
+      "english": "MULTIPLAYER",
+      "korean": "멀티플레이",
+      "source_sha256": "83f4bf1438a3ed1afad40267cbdf025b38f5869b87a782a81a03d25a290fe3f8",
+      "source_sha_match": true,
+      "output_sha256": "dac69e96f87f46bc3b284f12b548e7a0be1547c5dfbc560c6fedd77f9520dc21",
+      "export_sha_match": true,
+      "input_dimensions": [
+        899,
+        184
+      ],
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_ratio": 0.438881,
+      "alpha_opaque_ratio": 0.000913,
+      "alpha_bbox": [
+        0,
+        37,
+        2081,
+        554
+      ],
+      "alpha_corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_file": "Q154_fec84edfb3865d45_source.png",
+      "candidate_file": "Q154_fec84edfb3865d45_source_k.png",
+      "file_format": "PNG",
+      "file_mode": "RGBA",
+      "candidate_sha_unique_in_run": true,
+      "static_korean_legible": true,
+      "static_no_unwanted_background_frame_or_english_residue": true,
+      "source_frame_visual_issue": "ENGLISH_TARGET_ABSENT",
+      "alpha_opaque_canvas_corners_zero": true,
+      "canvas_matches_source": false,
+      "text_length_difference_ignored": true,
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "final_c1_status": "FAIL_SOURCE_REFERENCE_MISMATCH",
+      "notes": "원본 크롭에 승인 영문 MULTIPLAYER가 보이지 않고 빨간 천/회색 배경 패널만 표시. 해당 후보를 이 원문에 매칭한 근거가 없어 C1 반려. 한글 문구 자체는 읽힘."
+    },
+    {
+      "id": "Q159_4b22b1948e72262a",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0062-A2E81382-R1",
+      "ordinal": 296,
+      "english": "ICE SCAPE",
+      "korean": "아이스스케이프",
+      "source_sha256": "22ddbbca017b81219d762bde437bdb73d3b635a773806a662db0d8a458a8b7f9",
+      "source_sha_match": true,
+      "output_sha256": "02b9499112300b7df230401490cde1af268d3652140e567e47dca2d3e03bbfb6",
+      "export_sha_match": true,
+      "input_dimensions": [
+        582,
+        298
+      ],
+      "output_dimensions": [
+        1774,
+        887
+      ],
+      "alpha_nonzero_ratio": 0.252412,
+      "alpha_opaque_ratio": 0.001215,
+      "alpha_bbox": [
+        53,
+        154,
+        1744,
+        790
+      ],
+      "alpha_corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_file": "Q159_4b22b1948e72262a_source.png",
+      "candidate_file": "Q159_4b22b1948e72262a_source_k.png",
+      "file_format": "PNG",
+      "file_mode": "RGBA",
+      "candidate_sha_unique_in_run": true,
+      "static_korean_legible": true,
+      "static_no_unwanted_background_frame_or_english_residue": true,
+      "source_frame_visual_issue": "MULTIPLE_ENGLISH_LABELS",
+      "alpha_opaque_canvas_corners_zero": true,
+      "canvas_matches_source": false,
+      "text_length_difference_ignored": true,
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "final_c1_status": "HOLD_MULTI_LABEL_SOURCE_AND_NATIVE_PLACEMENT",
+      "notes": "영문 ROI에 FLORAL VILLAGE·ICE SCAPE·LEGEND가 함께 표시됨. 아이스스케이프는 가독성·매핑 적합하나 단일 레이블 추출/비침범 입증 불가."
+    },
+    {
+      "id": "Q220_3f55ddbfc8b3e699",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0062-A2E81382-R1",
+      "ordinal": 297,
+      "english": "TIME ATTACK",
+      "korean": "타임 어택",
+      "source_sha256": "4eab2a6865266bb4b1e95511d2299735e0a4328732e9dbdbac010177195dd897",
+      "source_sha_match": true,
+      "output_sha256": "459a4a62a307020fec384971f3b6758fff443945fa6b3e9fdb27a3bf318fd3c3",
+      "export_sha_match": true,
+      "input_dimensions": [
+        1060,
+        172
+      ],
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_ratio": 0.354642,
+      "alpha_opaque_ratio": 0.001036,
+      "alpha_bbox": [
+        0,
+        9,
+        2063,
+        603
+      ],
+      "alpha_corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_file": "Q220_3f55ddbfc8b3e699_source.png",
+      "candidate_file": "Q220_3f55ddbfc8b3e699_source_k.png",
+      "file_format": "PNG",
+      "file_mode": "RGBA",
+      "candidate_sha_unique_in_run": true,
+      "static_korean_legible": true,
+      "static_no_unwanted_background_frame_or_english_residue": true,
+      "source_frame_visual_issue": "NONE_OBSERVED",
+      "alpha_opaque_canvas_corners_zero": true,
+      "canvas_matches_source": false,
+      "text_length_difference_ignored": true,
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "final_c1_status": "HOLD_NATIVE_SAFE_PLACEMENT",
+      "notes": "타임 어택 정확·가독성 적합, 영문 글자영역보다 캔버스가 확대되어 원본 실제 UI 셀로 환원한 비침범/잘림 검증 불가."
+    },
+    {
+      "id": "Q220_d468894858ea64ae",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0062-A2E81382-R1",
+      "ordinal": 298,
+      "english": "REMOVE FRIEND",
+      "korean": "친구 삭제",
+      "source_sha256": "928129e31c31b683107972874549c82dbcc93eb0f68d64c738238ccb5db09dbc",
+      "source_sha_match": true,
+      "output_sha256": "b2fa38612d29af07f836cb5f75c223ff44e17bd7b827cb6dce6f34fe23d75e98",
+      "export_sha_match": true,
+      "input_dimensions": [
+        1652,
+        248
+      ],
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_ratio": 0.229387,
+      "alpha_opaque_ratio": 0.001651,
+      "alpha_bbox": [
+        272,
+        71,
+        1802,
+        635
+      ],
+      "alpha_corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_file": "Q220_d468894858ea64ae_source.png",
+      "candidate_file": "Q220_d468894858ea64ae_source_k.png",
+      "file_format": "PNG",
+      "file_mode": "RGBA",
+      "candidate_sha_unique_in_run": true,
+      "static_korean_legible": true,
+      "static_no_unwanted_background_frame_or_english_residue": true,
+      "source_frame_visual_issue": "NONE_OBSERVED",
+      "alpha_opaque_canvas_corners_zero": true,
+      "canvas_matches_source": false,
+      "text_length_difference_ignored": true,
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "final_c1_status": "HOLD_NATIVE_SAFE_PLACEMENT",
+      "notes": "친구 삭제 정확·가독성 적합, 원본과 캔버스 상이. 안전영역 검증 필요."
+    },
+    {
+      "id": "Q222_1afd6ab62902ee9e",
+      "role": "B",
+      "batch": "OUTRUN-ROI-B-0062-A2E81382-R1",
+      "ordinal": 299,
+      "english": "OutRun 1986",
+      "korean": "아웃런 1986",
+      "source_sha256": "27122e601d845610793782bd99f9f2b6fd0b3d5200439124c9439316b3827b0b",
+      "source_sha_match": true,
+      "output_sha256": "abf0d8430f6dc1641f5d202c94cb33006cbd5a5cc7eb3d9402806b706d43c8b4",
+      "export_sha_match": true,
+      "input_dimensions": [
+        1400,
+        272
+      ],
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_ratio": 0.333267,
+      "alpha_opaque_ratio": 0.002068,
+      "alpha_bbox": [
+        25,
+        65,
+        2086,
+        700
+      ],
+      "alpha_corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_file": "Q222_1afd6ab62902ee9e_source.png",
+      "candidate_file": "Q222_1afd6ab62902ee9e_source_k.png",
+      "file_format": "PNG",
+      "file_mode": "RGBA",
+      "candidate_sha_unique_in_run": true,
+      "static_korean_legible": true,
+      "static_no_unwanted_background_frame_or_english_residue": true,
+      "source_frame_visual_issue": "NONE_OBSERVED",
+      "alpha_opaque_canvas_corners_zero": true,
+      "canvas_matches_source": false,
+      "text_length_difference_ignored": true,
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "final_c1_status": "HOLD_NATIVE_SAFE_PLACEMENT",
+      "notes": "아웃런 1986 정확·가독성 적합. 원래 UI 문자영역에 맞춘 투명 레이어 배치 증빙 필요."
+    },
+    {
+      "id": "Q159_b241de633b0dbc61",
+      "role": "A",
+      "batch": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "ordinal": 234,
+      "english": "WATERFALLS",
+      "korean": "워터폴스",
+      "source_sha256": "800d319d2c1310bcb91012155eb7195051295e72aa8150a73f0efea6ab358f7d",
+      "source_sha_match": true,
+      "output_sha256": "eeaf42528df9ce93105dd309916322eedbf156cc8918777a90183ce68124e0ef",
+      "export_sha_match": true,
+      "input_dimensions": [
+        672,
+        189
+      ],
+      "output_dimensions": [
+        2158,
+        729
+      ],
+      "alpha_nonzero_ratio": 0.427832,
+      "alpha_opaque_ratio": 0.000678,
+      "alpha_bbox": [
+        0,
+        0,
+        1852,
+        624
+      ],
+      "alpha_corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_file": "Q159_b241de633b0dbc61_source.png",
+      "candidate_file": "Q159_b241de633b0dbc61_source_k.png",
+      "file_format": "PNG",
+      "file_mode": "RGBA",
+      "candidate_sha_unique_in_run": true,
+      "static_korean_legible": true,
+      "static_no_unwanted_background_frame_or_english_residue": true,
+      "source_frame_visual_issue": "MULTIPLE_ENGLISH_LABELS",
+      "alpha_opaque_canvas_corners_zero": true,
+      "canvas_matches_source": false,
+      "text_length_difference_ignored": true,
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "final_c1_status": "HOLD_MULTI_LABEL_SOURCE_AND_NATIVE_PLACEMENT",
+      "notes": "영문 ROI에 SKYSCRAPERS·WATERFALLS가 함께 보임. 출력 워터폴스 가독성 적합하나 타 문구 보호 및 원위치 검증 불가. 좌측 효과 경계에 약한 alpha 잔존, 강한 불투명 접촉은 없음."
+    },
+    {
+      "id": "Q159_c19ac35d17040b51",
+      "role": "A",
+      "batch": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "ordinal": 235,
+      "english": "SKYSCRAPERS",
+      "korean": "스카이스크레이퍼스",
+      "source_sha256": "105828abe0a26b81daf2254e941f0d09123a9ef881817bdba4f7605fb855f34d",
+      "source_sha_match": true,
+      "output_sha256": "425910e5f3c7fecdf51448f9e80354ce9048b6cfc0f438879434800151549bdd",
+      "export_sha_match": true,
+      "input_dimensions": [
+        725,
+        277
+      ],
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_ratio": 0.37822,
+      "alpha_opaque_ratio": 0.001459,
+      "alpha_bbox": [
+        15,
+        79,
+        2172,
+        692
+      ],
+      "alpha_corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_file": "Q159_c19ac35d17040b51_source.png",
+      "candidate_file": "Q159_c19ac35d17040b51_source_k.png",
+      "file_format": "PNG",
+      "file_mode": "RGBA",
+      "candidate_sha_unique_in_run": true,
+      "static_korean_legible": true,
+      "static_no_unwanted_background_frame_or_english_residue": true,
+      "source_frame_visual_issue": "MULTIPLE_ENGLISH_LABELS",
+      "alpha_opaque_canvas_corners_zero": true,
+      "canvas_matches_source": false,
+      "text_length_difference_ignored": true,
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "final_c1_status": "HOLD_MULTI_LABEL_SOURCE_AND_NATIVE_PLACEMENT",
+      "notes": "영문 ROI에 MILKY WAY·SKYSCRAPERS·WATERFALLS가 함께 표시됨. 출력 스카이스크레이퍼스는 읽히나 다른 문자 보호와 정위치 미확인."
+    },
+    {
+      "id": "Q215_9994d0de202e2540",
+      "role": "A",
+      "batch": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "ordinal": 236,
+      "english": "GOAL A",
+      "korean": "골 A",
+      "source_sha256": "39ffda9a16126763a2dea1ae8d4d8d6daf5c1289354dcf5b170e170db1acaef1",
+      "source_sha_match": true,
+      "output_sha256": "1ee748290d2dad12a46093d591924f5a99404c3dbab9f02f2d07d2201a45b86e",
+      "export_sha_match": true,
+      "input_dimensions": [
+        792,
+        304
+      ],
+      "output_dimensions": [
+        1870,
+        841
+      ],
+      "alpha_nonzero_ratio": 0.305955,
+      "alpha_opaque_ratio": 0.001172,
+      "alpha_bbox": [
+        383,
+        47,
+        1465,
+        811
+      ],
+      "alpha_corners": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source_file": "Q215_9994d0de202e2540_source.png",
+      "candidate_file": "Q215_9994d0de202e2540_source_k.png",
+      "file_format": "PNG",
+      "file_mode": "RGBA",
+      "candidate_sha_unique_in_run": true,
+      "static_korean_legible": true,
+      "static_no_unwanted_background_frame_or_english_residue": true,
+      "source_frame_visual_issue": "NONE_OBSERVED",
+      "alpha_opaque_canvas_corners_zero": true,
+      "canvas_matches_source": false,
+      "text_length_difference_ignored": true,
+      "native_safe_placement": "UNVERIFIED_NO_NATIVE_COMPOSITION",
+      "final_c1_status": "HOLD_NATIVE_SAFE_PLACEMENT",
+      "notes": "골 A 정확·가독성 적합. 기존 GOAL A 대비 캔버스 확대로 좌표/크기 역매핑 및 안전영역 검증 필요."
+    }
+  ],
+  "restrictions": "No ImageGen, no A/B queue consumption, no DDS composition, no C2/C3/user game PASS, no deployment, no VR/FFB/DX11/DXVK change. Candidate letter size/overall width differences alone not FAIL."
+}
