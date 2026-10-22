@@ -1,0 +1,345 @@
+{
+  "schema": "outrun-c1-independent-light-qa-v1",
+  "run_key": "OUTRUN-C1-20261023T0615KST-NEW-SHA",
+  "qa_at_kst": "2026-10-23T06:17:19.514323+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "INDEPENDENT_STATIC_C1_ONLY_NO_DDS_APPROVAL",
+  "source": "N100 A/B source PNG production manifest, sent receipts, export evidence, candidate outputs and visual comparison sheets",
+  "prior_sha_history_count": 447,
+  "candidate_count": 8,
+  "unique_new_sha_count": 8,
+  "duplicate_sha_count": 0,
+  "role_counts": {
+    "A": 4,
+    "B": 4
+  },
+  "result_counts": {
+    "PASS": 0,
+    "FAIL": 1,
+    "HOLD": 7
+  },
+  "checks": {
+    "source_manifest_sha_match": "8/8",
+    "source_sent_sha_match": "8/8",
+    "candidate_export_sha_match": "8/8",
+    "candidate_rgba_png": "8/8",
+    "visual_readability_and_approved_mapping": "8/8",
+    "edge_clip_left": "1/8 FAIL",
+    "native_ui_cell_safety": "UNVERIFIED_8/8",
+    "runtime_validation": "UNTESTED",
+    "dds_final_compose": "NOT_PERFORMED"
+  },
+  "evidence": {
+    "N100_metric_path": "work/C1_QA_20261023_0615_metrics.json",
+    "N100_A_comparison": "work/C1_QA_20261023_0615_A_pairs.jpg",
+    "N100_B_comparison": "work/C1_QA_20261023_0615_B_pairs.jpg",
+    "N100_check_script": "work/C1_QA_20261023_0615_check.py"
+  },
+  "reviewed": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0048-FEBDE02F",
+      "ordinal": 234,
+      "english": "WATERFALLS",
+      "approved_korean": "워터폴스",
+      "source_file": "Q159_b241de633b0dbc61_source.png",
+      "candidate_file": "Q159_b241de633b0dbc61_source_k.png",
+      "source_sha256": "800d319d2c1310bcb91012155eb7195051295e72aa8150a73f0efea6ab358f7d",
+      "candidate_sha256": "eeaf42528df9ce93105dd309916322eedbf156cc8918777a90183ce68124e0ef",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_png_dimensions": [
+        672,
+        189
+      ],
+      "candidate_png_dimensions": [
+        2158,
+        729
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        39,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "FAIL",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "FAIL_IMAGE_EDGE_LEFT",
+      "reason": "FAIL_LEFT_EDGE_ALPHA_CLIP: candidate alpha touches x=0 with 39 opaque/visible (>8) pixels; nonzero alpha is cut at canvas boundary; source ROI additionally contains adjacent SKYSCRAPERS heading. Needs a new edge-safe candidate and isolated native ROI.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0047-CB45FED2",
+      "ordinal": 233,
+      "english": "CAPE WAY",
+      "approved_korean": "케이프 웨이",
+      "source_file": "Q147_43ce699117b7c714_source.png",
+      "candidate_file": "Q147_43ce699117b7c714_source_k.png",
+      "source_sha256": "ca15a5d5904e2c4734140d532ff07c56b286cae6a676728813f5967eb569d5dd",
+      "candidate_sha256": "5fa466367d8b61e437df0e4e4a58ef4892da965cb7d47bc84a45c697811d5a95",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_png_dimensions": [
+        573,
+        298
+      ],
+      "candidate_png_dimensions": [
+        1739,
+        904
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD",
+      "reason": "HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; source ROI also includes ALPINE and a clipped CLOUDY HIGHLANDS line. Hangul glyphs readable, no observed output border cut.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0047-CB45FED2",
+      "ordinal": 232,
+      "english": "PALM BEACH",
+      "approved_korean": "팜 비치",
+      "source_file": "Q147_10a245ded1a9654f_source.png",
+      "candidate_file": "Q147_10a245ded1a9654f_source_k.png",
+      "source_sha256": "592161f15ed4983a231c5dd40223fd7b665293b7bee0f190f4edb50b4aca1da8",
+      "candidate_sha256": "09b60e31fba4341ed25ebdbb0cd7df56558bc66c7bd42e2597c3214b83fda5b9",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "source_png_dimensions": [
+        629,
+        289
+      ],
+      "candidate_png_dimensions": [
+        1850,
+        850
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD",
+      "reason": "HOLD_NATIVE_UI_CELL_FIT_AND_PROTECTED_ART_UNVERIFIED; source ROI includes INDUSTRIAL COMPLEX, PALM BEACH, TULIP GARDEN and bottom art/plate pixels. Hangul legible.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0047-CB45FED2",
+      "ordinal": 231,
+      "english": "LOCAL MIXED",
+      "approved_korean": "로컬 혼합",
+      "source_file": "Q205_046fcc0daca43f81_source.png",
+      "candidate_file": "Q205_046fcc0daca43f81_source_k.png",
+      "source_sha256": "06b48d63e43e0278c4dc445c83139ee10d6f366aa1b7c62453b6e4d74faec057",
+      "candidate_sha256": "46006a904e67faca68dd4db3d3e93f0b9eda07f362fe26ea6f1ec5bec5d79ac2",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "source_png_dimensions": [
+        1380,
+        256
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD",
+      "reason": "HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; correctly readable Korean text, output raster dimensions differ from source.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0061-CF3C01DE",
+      "ordinal": 290,
+      "english": "Drive against the Ghost Cars and go for the course records!",
+      "approved_korean": "고스트 카와 달리며 코스 기록에 도전하세요!",
+      "source_file": "Q188_90461d9c57f8e527_source.png",
+      "candidate_file": "Q188_90461d9c57f8e527_source_k.png",
+      "source_sha256": "e1b108e2e7b975b4ad087d6ca28b075dde2128a16d0521c87ce2e531d8df444e",
+      "candidate_sha256": "a6b12149e9f796dd57bc777d6f7461066a30919d511c2511af72e9d5874c6758",
+      "source_dds_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "source_png_dimensions": [
+        1736,
+        89
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD",
+      "reason": "HOLD_NATIVE_SINGLE_LINE_TO_TWO_LINE_FIT_UNVERIFIED; source is a one-line instruction but candidate is two lines and output raster is much taller, requires exact UI cell checks. Translation is readable and matches approved mapping.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "ordinal": 289,
+      "english": "METROPOLIS",
+      "approved_korean": "메트로폴리스",
+      "source_file": "Q173_bd23bf09836a129d_source.png",
+      "candidate_file": "Q173_bd23bf09836a129d_source_k.png",
+      "source_sha256": "6da725802b610a8484c9f178e37943b26f9eeeb433e8636296523455eda8aae1",
+      "candidate_sha256": "c2bc16380b20ff1c4dc8bfc15fda4fdfd32db8b1c14b5ec623a1bb1cf774734c",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_png_dimensions": [
+        1196,
+        212
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD",
+      "reason": "HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; Hangul readable and no observed output edge clipping.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "ordinal": 288,
+      "english": "PALM BEACH",
+      "approved_korean": "팜 비치",
+      "source_file": "Q173_132c378997161a88_source.png",
+      "candidate_file": "Q173_132c378997161a88_source_k.png",
+      "source_sha256": "228ee646e61c4e48f80c02a87ccd7da7d05736dea7c09207e4311aee4ec04c6d",
+      "candidate_sha256": "052fc90e00e2ba039e69a5fd1990081025914a06d603e2bb9f5b26267293182c",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_png_dimensions": [
+        1200,
+        210
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD",
+      "reason": "HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; Hangul readable and no observed output edge clipping.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0060-F61B986B",
+      "ordinal": 287,
+      "english": "BIG FOREST",
+      "approved_korean": "빅 포레스트",
+      "source_file": "Q173_f836dac7e61ba985_source.png",
+      "candidate_file": "Q173_f836dac7e61ba985_source_k.png",
+      "source_sha256": "336937f1481a8f206200adc6be4661bb4b9380785cabfc4f5f078afde60cf9d5",
+      "candidate_sha256": "4762845b5eb0d3d2a7559010693a2dd18a8b65bcc79ad1b8fcd996f89100b87f",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_png_dimensions": [
+        1078,
+        212
+      ],
+      "candidate_png_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "candidate_edge_alpha_pixels_lrtb": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "static_qa_status": "HOLD",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "source_bbox_containment": "HOLD",
+      "reason": "HOLD_NATIVE_UI_CELL_FIT_UNVERIFIED; Hangul readable and no observed output edge clipping.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    }
+  ],
+  "non_actions": [
+    "NO_IMAGEGEN",
+    "NO_A_B_QUEUE_CONSUMPTION",
+    "NO_NEW_DDS",
+    "NO_C2_C3_OR_INGAME_PASS",
+    "NO_AUTOMATIC_DEPLOY",
+    "NO_VR_FFB_DX11_DXVK_CHANGES"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
