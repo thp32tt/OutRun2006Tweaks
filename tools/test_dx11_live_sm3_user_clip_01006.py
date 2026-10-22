@@ -15,7 +15,7 @@ def require(condition, reason):
         raise SystemExit("DX11 real SM3 user clip FAIL: " + reason)
 for token in ("D3DRS_CLIPPLANEENABLE", "D3DRS_CLIPPING", "GetClipPlane(",
               "MaxUserClipPlanes", "native_sm3_user_clip_admission(",
-              "clip.active", "pipeline.userClipConstants",
+              "userClip.active", "pipeline.userClipConstants",
               "context->VSSetConstantBuffers(4u, 1u, &clipBuffer)",
               "context->DrawIndexed(", "context->Draw("):
     require(token in sm3, "game-owned plane to native Draw disconnected: " + token)

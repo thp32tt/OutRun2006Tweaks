@@ -71,7 +71,8 @@
         "src/vr/d3d11/native_backend.cpp",
         "src/vr/d3d11/live_game_sm3_table_fog.hpp"
       ],
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "validation_command": "python tools/test_dx11_live_sm3_table_zfog_01005.py in DX11 Fast run 39748222650 SUCCESS, exact 01005 source SHA b55bd1b2a9f6171828e6093b28d40abf12c7728a; static/portable C++ and HLSL integration only; game/HMD UNTESTED"
     },
     "original_game_fallback_and_negative_fog_admission": {
       "status": "PASS_BUILD",
@@ -79,7 +80,8 @@
         "tools/dx11_live_sm3_table_zfog_01005.cpp",
         "tools/test_dx11_live_sm3_table_zfog_01005.py"
       ],
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "validation_command": "python tools/test_dx11_live_sm3_table_zfog_01005.py; DX11 Fast run 39748222650 SUCCESS at b55bd1b2a9f6171828e6093b28d40abf12c7728a; negative state tests and guarded fallback source; gamepad/FFB runtime UNTESTED"
     },
     "exact_SHA_positive_negative_and_five_Gates": {
       "status": "PASS_EXACT_SHA",
@@ -87,7 +89,8 @@
         ".github/workflows/dx11-fast-structural.yml",
         "tools/test_dx11_live_sm3_table_zfog_01005.py"
       ],
-      "validation_bearing_result_sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a"
+      "validation_bearing_result_sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a",
+      "validation_command": "GitHub Actions at 01005 exact SHA b55bd1b2a9f6171828e6093b28d40abf12c7728a: DX11 Fast 39748222650, Backend 39748222708, Build 39748222643, OpenXR 39748222654, HUD 39748229041 all SUCCESS; no rerun, game/HMD UNTESTED"
     }
   },
   "development_strategy": {
@@ -115,7 +118,12 @@
       "DX11:FULL_RESOLUTION_GAME_FRAME"
     ],
     "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY_REAL_GAME_PIXELS_AND_QUEST3_UNTESTED",
-    "activation_guard_and_fallback": "Full game opt-in retained; unproven or invalid game fog remains on unmodified original D3D9 Ex Draw/Present/input/FFB."
+    "activation_guard_and_fallback": "Full game opt-in retained; unproven or invalid game fog remains on unmodified original D3D9 Ex Draw/Present/input/FFB.",
+    "acceptance_proof": {
+      "positive_probe": "Authentic programmable D3D9 SM3 Draw/DrawIndexed Z-table fog state translates to D3D11 PS RGB table-fog via per-draw b4 constants; python tools/test_dx11_live_sm3_table_zfog_01005.py and C++ regression in DX11 Fast run 39748222650 succeeded at source SHA b55bd1b2a9f6171828e6093b28d40abf12c7728a. Actual game pixels UNTESTED.",
+      "negative_regression": "Negative native_sm3_table_zfog_admission cases reject unsupported WFOG/vertex/range fog, sRGB and malformed mode/density/coefficients and preserve DX9Ex fallback; bounded source/C++ tests passed in DX11 Fast 39748222650; gameplay/FFB runtime UNTESTED.",
+      "component_integration": "src/vr/d3d11/live_game_frame_bridge.cpp connects intercepted D3D9 render state to native_backend.cpp pixel shader generation, fog-specific shader cache identity and D3D11 PS constant slot b4 preceding Draw/DrawIndexed; five required same-SHA GitHub Actions succeeded for 01005; full renderer not runtime-verified."
+    }
   },
   "ci": {
     "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
