@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01013",
   "production_id": "CONVERSION-DX11-01013",
-  "event_id": "CONVERSION-DX11-01013-E003",
+  "event_id": "CONVERSION-DX11-01013-E005",
   "event_type": "rollover",
   "lane": "DX11",
   "attempt": "1/3",
@@ -13,53 +13,59 @@
   "work_key": "DX11:R175_UNBLOCK_OR_FIRST_VISIBLE_GAME_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
-  "material_source_sha": "9ecf5cf96ac167cb0ff2d3d38e7298614498e31f",
+  "material_source_sha": "ce03d84dd51218dd3396dc9e11a830d8cb6f9d30",
   "source_implementation": {
     "status": "CHECKPOINT_TARGETED_COMPILE_PASS",
     "implementation_scope": "Native Draw/DrawIndexed authentic D3D9 SM3 VS/PS instruction translation",
     "changed_files": [
       "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+      "src/vr/d3d11/native_backend.cpp",
       "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
     ],
     "behaviors": [
       "NRM source xyz denominator normalized into every game-written xyzw destination component; source.w provenance enforced for w writes, zero reciprocal norm saturates FLT_MAX",
       "LOG(0) preserves D3D9 negative FLT_MAX instead of HLSL -INF",
-      "Original D3D9 renderer, fail-closed opt-in activation and input/FFB fallback unchanged"
+      "Original D3D9 renderer, fail-closed opt-in activation and input/FFB fallback unchanged",
+      "Live real-game native SM3 VS3 RCP/RSQ zero returns FLT_MAX while PS3 retains infinity; pass authentic shader stage through native_backend.cpp into shared scalar shader codegen and regress both paths."
     ],
     "observed_native_game_draw_count": "UNTESTED",
     "observed_native_published_frame_count": "UNTESTED"
   },
   "targeted_validation": {
     "status": "PASS",
-    "executor": "N100 lightweight isolated g++ compile, using exact feature branch GitHub-fetched sources",
-    "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_arithmetic_codegen_probe.cpp -o /tmp/dx11_01013_sm3_arithmetic && /tmp/dx11_01013_sm3_arithmetic",
+    "executor": "N100 lightweight isolated C++17 g++ compile+run, source text transferred from authenticated GitHub feature",
+    "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_arithmetic_codegen_probe.cpp -o sm3_probe && ./sm3_probe",
     "compile_exit": 0,
     "probe_exit": 0,
     "evidence_paths": [
       "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+      "src/vr/d3d11/native_backend.cpp",
       "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
-    ]
+    ],
+    "note": "Non-Windows portable probe only; production native_backend.cpp Windows build not yet executed."
   },
   "ci": {
     "status": "NOT_COMPLETE_NO_FEATURE_READY",
-    "note": "Entire five-workflow exact-SHA gate postponed until complete cohesive real-game-frame feature. DX11 Fast feature branch whitelist addition ensures actual future Fast validation; no weakening of any existing gate."
+    "note": "Do not run five mandatory exact-SHA workflows until cohesive live game full-frame feature is ready. This feature branch may have separate Fast smoke, which does not complete acceptance."
   },
   "remaining_acceptance_items": [
-    "Verify R175 game live TEXCOORD6 color parity in real game (00477 WARP-only parity already passed; owner did not overlap)",
-    "D3D9 real game Draw/DrawIndexed -> D3D11 actual native shader VB/IB/texture/depth/blend -> contiguous full native color frame output",
-    "Actual game launch shows eligible_state_draws>0, native_draws>0, published native full game frames>0 on a single exact source SHA",
-    "Menu -> vehicle selection -> sustained race complete source-ordinal coverage with proven fail-closed fallback and no unsupported scene gaps",
-    "Separate left/right real native game image production -> OpenXR consumer fence/ACK and real Quest3/VDXR test",
-    "Five mandatory Actions at final exact SHA and artifacts inspected before target fast-forward"
+    "Resolve live R175 TEXCOORD6 color parity only with 00477 owner release; do not duplicate owner work",
+    "Integrate and verify continuous real-game D3D9 Draw/DrawIndexed -> native GPU frame without unsupported scene gap",
+    "Launch game and prove eligible_state_draws>0, native_draws>0 and published full native frames>0 on exact integrated SHA",
+    "Menu, vehicle selection, sustained race source-ordinal coverage and fail-closed D3D9 fallback",
+    "Distinct left/right real native images, OpenXR consumer fence/ACK and Quest3/VDXR hardware validation",
+    "Complete five mandatory exact-SHA Actions and artifacts before compare behind=0 safe target promotion"
   ],
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "real_game_draw_blocker": "Native full game frame/coverage and real runtime Draw/Publish evidence not yet proven. Continue integration, not independent WARP probes.",
-  "next_implementation_action": "Finish original game full-frame Draw/Present native source coverage, diagnose live game shader/state rejection on exact game launch without weakening fallback, close real missing code path; run final exact-SHA five Gates only when feature acceptance complete",
+  "real_game_draw_blocker": "Current native full game image/coverage not observed on hardware. Portable stage-specific RCP/RSQ codegen fix compiled and passed; Windows exact-SHA workflows/runtime remain pending.",
+  "next_implementation_action": "On 01013 feature branch, diagnose real game full frame coverage and live native SM3 Draw early-return bucket; implement first missing real shader/state path (never duplicate 00477). Preserve opt-in fail-closed DX9Ex. Finish exact-SHA five-Gate and FEATURE_READY only after acceptance.",
   "feature_ready": false,
   "target_promoted": false,
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "status": "IN_PROGRESS",
   "checkpoint": "C2_IMPLEMENT",
-  "notes": "No claim of game playable, native frames or HMD pass. E003 is rollover, ATTEMPT held at 1/3."
+  "notes": "No claim of game playable, native frames or HMD pass. E003 is rollover, ATTEMPT held at 1/3.",
+  "chat_rollovers": 3,
+  "previous_material_source_sha": "9ecf5cf96ac167cb0ff2d3d38e7298614498e31f"
 }
