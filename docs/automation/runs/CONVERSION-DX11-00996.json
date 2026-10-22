@@ -59,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "main_clipped_stencil_live_replay": "PENDING_EXACT_SHA",
-    "owner_clip_fallback": "PENDING_EXACT_SHA",
-    "exact_sha_integrated_ci": "PENDING_EXACT_SHA"
+    "main_clipped_stencil_live_replay": "PASS_BUILD",
+    "owner_clip_fallback": "PASS_BUILD",
+    "exact_sha_integrated_ci": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
