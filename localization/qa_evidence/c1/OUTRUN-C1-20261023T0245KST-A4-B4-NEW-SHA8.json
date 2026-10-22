@@ -1,0 +1,598 @@
+{
+  "run_key": "OUTRUN-C1-20261023T0245KST-A4-B4-NEW-SHA8",
+  "checked_at_kst": "2026-10-23T02:48:53.920736+09:00",
+  "reviewed_sha_history_count": 391,
+  "new_unique_count": 8,
+  "records": [
+    {
+      "role": "A",
+      "batch": 56,
+      "task": "OUTRUN-ROI-A-0056-3C52F2F4",
+      "source_file": "Q173_eda865cd192b5677_source.png",
+      "candidate_file": "Q173_eda865cd192b5677_source_k.png",
+      "source_ordinal": 278,
+      "english": "NATIONAL PARK",
+      "approved_korean": "내셔널 파크",
+      "original_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_sha256": "9c16802374dbd6ee949fbcfe17192192820c7922340b9549aee7e0327d12cb64",
+      "candidate_sha256": "72f89ca0034045b1584a71a93d2be6c0443bbc7802566f5aa6bb99649a08b6b0",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          944,
+          357
+        ],
+        "alpha_bbox": [
+          2,
+          0,
+          706,
+          357
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          184,
+          369
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2039,
+          771
+        ],
+        "alpha_bbox": [
+          0,
+          37,
+          1991,
+          701
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "내셔널 파크",
+      "translation_match": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_SHEET",
+      "source_roi_isolation": "FAIL",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "FAIL",
+      "c1_reason_code": "SOURCE_ROI_MULTILABEL_AND_CUT_NEIGHBOR",
+      "c1_reason": "원본 ROI에 MILKY WAY, SKYSCRAPERS, SUNNY BEACH 및 잘린 상단 문구가 함께 포함됨. 한 문구 단독 입력이 아님."
+    },
+    {
+      "role": "A",
+      "batch": 56,
+      "task": "OUTRUN-ROI-A-0056-3C52F2F4",
+      "source_file": "Q230_6f818e9df0a40e7a_source.png",
+      "candidate_file": "Q230_6f818e9df0a40e7a_source_k.png",
+      "source_ordinal": 277,
+      "english": "You already own this item",
+      "approved_korean": "이미 보유 중입니다",
+      "original_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_sha256": "fbfa49e31cfb1e6b5adb88e13f86cf4c33e369eee8580dea5147658bbecd9e84",
+      "candidate_sha256": "6a5f5b4f13826292d163221afe16562d7cbe4cc0ea697c1c4ea69f2c94240207",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1182,
+          148
+        ],
+        "alpha_bbox": [
+          31,
+          19,
+          1151,
+          129
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          128,
+          135,
+          2041,
+          603
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "이미 보유 중입니다",
+      "translation_match": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_SHEET",
+      "source_roi_isolation": "NO_EXTRANEOUS_TEXT_OBSERVED",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "HOLD",
+      "c1_reason_code": "NATIVE_CELL_RETURN_UNVERIFIED",
+      "c1_reason": "출력 한글은 읽히고 승인 매핑과 일치하나, 원본 ROI보다 큰 별도 생성 캔버스의 원래 UI cell 내 무침범 복귀가 검증되지 않음."
+    },
+    {
+      "role": "A",
+      "batch": 56,
+      "task": "OUTRUN-ROI-A-0056-3C52F2F4",
+      "source_file": "Q230_bb5bc4d95a0846ef_source.png",
+      "candidate_file": "Q230_bb5bc4d95a0846ef_source_k.png",
+      "source_ordinal": 276,
+      "english": "FERRARI CARS",
+      "approved_korean": "페라리 차량",
+      "original_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "source_sha256": "395d734d94732097890922721ea4ea7be8ec84ebd3d122b7cdf370c51628d2da",
+      "candidate_sha256": "88066552a4347f65df1048f499c3f84e11489ba3e8758b0daaf0e8efb7696c86",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1756,
+          292
+        ],
+        "alpha_bbox": [
+          63,
+          35,
+          1693,
+          257
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          27,
+          19,
+          2120,
+          656
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "페라리 차량",
+      "translation_match": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_SHEET",
+      "source_roi_isolation": "NO_EXTRANEOUS_TEXT_OBSERVED",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "HOLD",
+      "c1_reason_code": "NATIVE_CELL_RETURN_UNVERIFIED",
+      "c1_reason": "한글 표기는 승인 번역과 일치하나 원래 글자·효과 영역 및 인접 아트와의 배치가 증명되지 않음."
+    },
+    {
+      "role": "A",
+      "batch": 56,
+      "task": "OUTRUN-ROI-A-0056-3C52F2F4",
+      "source_file": "Q193_99b35bc369d60cb4_source.png",
+      "candidate_file": "Q193_99b35bc369d60cb4_source_k.png",
+      "source_ordinal": 275,
+      "english": "WELCOME TO THE",
+      "approved_korean": "환영합니다",
+      "original_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "source_sha256": "608fd8ae98f64c89335a580f0d68a6639e260e4e79d077e4f234c3c26bcecf68",
+      "candidate_sha256": "f4f9b366259e2edc91b40428cd74d8cac5eb1f3327091f1b526e42bed26423b8",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          633,
+          238
+        ],
+        "alpha_bbox": [
+          3,
+          96,
+          633,
+          216
+        ],
+        "edge_alpha_pixels": [
+          0,
+          23,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2045,
+          769
+        ],
+        "alpha_bbox": [
+          25,
+          79,
+          1586,
+          715
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "환영합니다",
+      "translation_match": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_SHEET",
+      "source_roi_isolation": "FAIL",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "FAIL",
+      "c1_reason_code": "SOURCE_ROI_EXTRANEOUS_GOAL_LABELS",
+      "c1_reason": "원본 WELCOME TO THE 크롭 아래에 Goal C와 잘린 Goal B가 같이 보임. 단일 문구 ROI 위반."
+    },
+    {
+      "role": "B",
+      "batch": 69,
+      "task": "OUTRUN-ROI-B-0069-44428066",
+      "source_file": "Q205_03ce77a9a59b9acd_source.png",
+      "candidate_file": "Q205_03ce77a9a59b9acd_source_k.png",
+      "source_ordinal": 334,
+      "english": "You got this item",
+      "approved_korean": "이 아이템을 획득했습니다",
+      "original_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "source_sha256": "b9b3896de9e831269fe30a4a4952184a492bfcf54ea254f9cfffb787a12b0c2a",
+      "candidate_sha256": "61e0c9f239b500a48546d945be3f82b15e18fa9e6425d723f595653cf48a4f86",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          956,
+          160
+        ],
+        "alpha_bbox": [
+          17,
+          19,
+          921,
+          141
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          65,
+          79,
+          2142,
+          648
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "이 아이템을 획득했습니다",
+      "translation_match": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_SHEET",
+      "source_roi_isolation": "NO_EXTRANEOUS_TEXT_OBSERVED",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "HOLD",
+      "c1_reason_code": "NATIVE_CELL_RETURN_UNVERIFIED",
+      "c1_reason": "문구와 글리프는 육안상 읽히지만 원본 UI 셀 좌표에 복귀했을 때의 크기·보호영역 검증 부재."
+    },
+    {
+      "role": "B",
+      "batch": 68,
+      "task": "OUTRUN-ROI-B-0068-5DD8D79E",
+      "source_file": "Q130_9c997fefb4fbfcd4_source.png",
+      "candidate_file": "Q130_9c997fefb4fbfcd4_source_k.png",
+      "source_ordinal": 329,
+      "english": "AVERAGE RANK:",
+      "approved_korean": "평균 랭크:",
+      "original_dds_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+      "source_sha256": "73d271e4ee6dfcea2b263123dadbd863d37baa3058b5a65cb801bc89040bfb26",
+      "candidate_sha256": "1d7d69030ff064bdc24061de633e6c05b79a088a7a94ecdd9709156063acaf73",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1364,
+          254
+        ],
+        "alpha_bbox": [
+          263,
+          150,
+          1329,
+          254
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          54
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          255,
+          11,
+          2039,
+          636
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "평균 랭크:",
+      "translation_match": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_SHEET",
+      "source_roi_isolation": "FAIL",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "FAIL",
+      "c1_reason_code": "SOURCE_ROI_PROTECTED_DYNAMIC_PLACEHOLDER",
+      "c1_reason": "원본 AVERAGE RANK: ROI 안에 독립 동적 값 ???도 같이 포함됨. 가변 숫자/문자 보존 영역을 포괄한 입력 위반."
+    },
+    {
+      "role": "B",
+      "batch": 67,
+      "task": "OUTRUN-ROI-B-0067-4F6545A7",
+      "source_file": "Q140_f84092b4aa9efe2c_source.png",
+      "candidate_file": "Q140_f84092b4aa9efe2c_source_k.png",
+      "source_ordinal": 324,
+      "english": "SELECT MODE",
+      "approved_korean": "모드 선택",
+      "original_dds_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+      "source_sha256": "10626c7ca98a332a4ce0c77e35612b459af1469c3f7e518a804a15b447b35fab",
+      "candidate_sha256": "05ca1d812190e70a3ba181fea0aff21cb7a3dc8de5d5b99905ced2a9aa6e13ad",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1698,
+          256
+        ],
+        "alpha_bbox": [
+          9,
+          26,
+          1635,
+          231
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          387,
+          23,
+          1951,
+          676
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "모드 선택",
+      "translation_match": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_SHEET",
+      "source_roi_isolation": "NO_EXTRANEOUS_TEXT_OBSERVED",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "HOLD",
+      "c1_reason_code": "NATIVE_CELL_RETURN_UNVERIFIED",
+      "c1_reason": "글리프·번역·투명성에는 관찰된 심각한 결함이 없지만 원래 UI cell에서의 충돌과 효과 범위가 검증되지 않음."
+    },
+    {
+      "role": "B",
+      "batch": 66,
+      "task": "OUTRUN-ROI-B-0066-5B10B5DA",
+      "source_file": "Q128_1745a6a4106df0b5_source.png",
+      "candidate_file": "Q128_1745a6a4106df0b5_source_k.png",
+      "source_ordinal": 319,
+      "english": "Bay Area",
+      "approved_korean": "베이 에어리어",
+      "original_dds_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+      "source_sha256": "7bf1e015ee2154579b1f4f7bc8178703d74d4b272926efc53bb5c3c377d13605",
+      "candidate_sha256": "e94204555fd01be510234e847c9e7a520cf53f11279cecde45c0a85d80bd22bc",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "previous_sha_reviewed": false,
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          502,
+          160
+        ],
+        "alpha_bbox": [
+          7,
+          17,
+          468,
+          141
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          27,
+          55,
+          2132,
+          660
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "observed_korean": "베이 에어리어",
+      "translation_match": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL_NATIVE_SHEET",
+      "source_roi_isolation": "NO_EXTRANEOUS_TEXT_OBSERVED",
+      "candidate_alpha_edges_clear": true,
+      "original_ui_cell_placement": "UNVERIFIED_NO_COMPOSITE",
+      "protected_art_after_compose": "UNVERIFIED",
+      "c1_decision": "HOLD",
+      "c1_reason_code": "NATIVE_CELL_RETURN_UNVERIFIED",
+      "c1_reason": "글리프·번역이 읽히나 원래 좌표에 재배치한 증빙이 없어 최종 C1 PASS 불가."
+    }
+  ],
+  "schema_version": 1,
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "scope": "8 existing generated PNG SHA, 4 from A-0056 and 4 across B-0066..B-0069; no queue mutation",
+  "operation": "INDP_LIGHTWEIGHT_QA_NO_IMAGEGEN",
+  "summary": {
+    "reviewed": 8,
+    "new_unique_candidate_sha": 8,
+    "previously_reviewed_sha_history": 391,
+    "duplicate_sha": 0,
+    "sha_pinned_source_sent": 8,
+    "source_manifest_sha_verified": 8,
+    "candidate_export_sha_verified": 8,
+    "png_rgba_with_transparency": 8,
+    "clear_output_alpha_border": 8,
+    "visually_legible_mapping_match": 8,
+    "c1_pass": 0,
+    "c1_fail": 3,
+    "c1_hold": 5,
+    "imagegen_calls": 0,
+    "producer_queue_consumed": 0,
+    "dds_written": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "evidence": {
+    "metrics_n100": "work/C1_QA_20261023_0245_metrics.json",
+    "script_n100": "work/C1_QA_20261023_0245_check.py",
+    "image_sheets_n100": [
+      "work/C1_QA_20261023_0245_A_pairs.jpg",
+      "work/C1_QA_20261023_0245_B_pairs.jpg"
+    ],
+    "note": "Evidence sheet images stored on N100, not committed to GitHub. Producer filenames were paired by export ordinal; manual visual review confirmed read text but does not establish original UV cell placement."
+  },
+  "policy": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md and docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md; shortage of Korean sentence width alone is not a FAIL; full C1 PASS requires actual placement proof."
+}
