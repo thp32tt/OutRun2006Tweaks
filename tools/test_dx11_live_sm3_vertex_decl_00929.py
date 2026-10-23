@@ -72,9 +72,11 @@ for token in ("game_sm3_decl_width(e.type)", "src.vertexCount < count",
               "catch (...) { return false; }"):
     require(token in assembly, "missing safe SM3 VB stream assembly " + token)
 
-require("if (nativeIndices[i] >= (compactListInstances ? expandedVertices : vertexCount)) return false;" in p and
+require("compactInstancedGeometry ? expandedVertices : vertexCount" in p and
+        "nativeIndexCount > kMaxIndices" in p and
         "game_sm3_expand_list_instance_indices(" in p and
-        "nativeSubmissionCount = compactListInstances ? 1u : instanceCount" in p and
+        "game_sm3_expand_connected_instance_indices(" in p and
+        "compactInstancedGeometry ? 1u : instanceCount" in p and
         "if (instance >= nativeSubmissionCount) break;" in p and
         "issueNativeGameDraw(drawVertexCount, base);" in p and
         "liveBatch.accepts_source_draw(" in p and
