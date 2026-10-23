@@ -11,7 +11,7 @@ assert "liveConstantsUsed = true" in cpp
 assert "indexedLoopLimits" in cpp and "dynamicRelativeLimits" in cpp
 assert "r283_c[" in h and " + r283_aL]" in h
 assert "dynamicExclusive = limit - base - rows + 1u" in h
-assert "for (unsigned reg = base; reg < limit; ++reg)" in h
+assert "for (unsigned reg = 0; reg < limit; ++reg)" in h
 # Static MOVA matrices check the signed effective row span before indexing;
 # the scalar index helper intentionally rejects encoded out-of-bank bases.
 assert "const auto first = static_cast<long long>(base) + staticAddress" in h

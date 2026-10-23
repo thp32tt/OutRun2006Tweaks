@@ -341,7 +341,8 @@ bool build_r283_sm3_mov_shader_source(
     std::array<std::uint16_t, 16>* dynamicRelativeLimits = nullptr,
     bool* writesDepth = nullptr,
     bool* writesColor = nullptr,
-    unsigned* writtenColorMask = nullptr) noexcept {
+    unsigned* writtenColorMask = nullptr,
+    std::array<std::int16_t, 16>* dynamicRelativeLowerBounds = nullptr) noexcept {
     translated.clear();
     if (writesDepth) *writesDepth = false;
     if (writesColor) *writesColor = false;
@@ -543,6 +544,8 @@ bool build_r283_sm3_mov_shader_source(
         std::vector<LoopRange> loopRanges;
         // Exclusive aL address limits for game-owned dynamic i# registers.
         std::array<std::uint16_t, 16> indexedLoopLimits{};
+        std::array<std::int16_t, 16> indexedLoopLowerBounds{};
+        indexedLoopLowerBounds.fill(-255);
         // a0.x from an exact shader-local DEF/MOVA is safe to resolve on
         // the CPU. Vertex-dependent MOVA stays on the D3D9 game renderer.
         int staticAddressIndex = 0;
@@ -1489,7 +1492,8 @@ bool build_r283_sm3_mov_shader_source(
                                 staticAddress, staticAddressIndex,
                                 dynamicLoop, minimum, maximum, integerRegister,
                                 defPresent, indexedLoopLimits,
-                                op.matrixRows, liveMatrix))
+                                op.matrixRows, liveMatrix,
+                                &indexedLoopLowerBounds))
                             return false;
                         if (liveMatrix) liveConstantsUsed = true;
                     } else {
@@ -1600,8 +1604,11 @@ bool build_r283_sm3_mov_shader_source(
                             // maximum to the shader's stage-specific range.
                             // DEF aliasing is conservatively rejected for any
                             // reachable address until it can be proven.
-                            for (unsigned k = reg; k < constantLimit; ++k)
+                            for (unsigned k = 0u; k < constantLimit; ++k)
                                 if (defPresent[k]) return false;
+                            auto& low = indexedLoopLowerBounds[range.integerRegister];
+                            const auto minimum = static_cast<std::int16_t>(-static_cast<int>(reg));
+                            if (minimum > low) low = minimum;
                             auto& end = indexedLoopLimits[range.integerRegister];
                             const auto exclusive = static_cast<std::uint16_t>(
                                 constantLimit - reg);
@@ -1933,6 +1940,8 @@ bool build_r283_sm3_mov_shader_source(
         else translated += "    return r283_color;\n}\n";
         if (translated.empty()) return false;
         if (dynamicRelativeLimits) *dynamicRelativeLimits = indexedLoopLimits;
+        if (dynamicRelativeLowerBounds)
+            *dynamicRelativeLowerBounds = indexedLoopLowerBounds;
         if (writesDepth) *writesDepth = depthWritten;
         if (writesColor) *writesColor = !vertexStage && outputWritten[0] != 0u;
         if (writtenColorMask) *writtenColorMask = vertexStage ? 0u : outputWritten[0];
@@ -2478,14 +2487,16 @@ bool compile_native_live_sm3_program(
     try {
         std::string vertexHlsl, pixelHlsl;
         std::array<std::uint16_t, 16> vertexIndexedLimits{}, pixelIndexedLimits{};
+        std::array<std::int16_t, 16> vertexIndexedLower{}, pixelIndexedLower{};
         bool pixelWritesDepth = false, pixelWritesColor = false;
         unsigned pixelWrittenColorMask = 0u;
         if (!build_r283_sm3_mov_shader_source(
-                vertexSource, true, vertexHlsl, &vertexIndexedLimits) ||
+                vertexSource, true, vertexHlsl, &vertexIndexedLimits,
+                nullptr, nullptr, nullptr, &vertexIndexedLower) ||
             !build_r283_sm3_mov_shader_source(
                 pixelSource, false, pixelHlsl, &pixelIndexedLimits,
                  &pixelWritesDepth, &pixelWritesColor,
-                  &pixelWrittenColorMask) ||
+                  &pixelWrittenColorMask, &pixelIndexedLower) ||
              (pixelWritesDepth && (alphaCompare != 0u || tableZFog)) ||
             !append_native_sm3_alpha_test(pixelHlsl, alphaCompare) ||
             !append_native_sm3_table_zfog(pixelHlsl, tableZFog) ||
@@ -2504,6 +2515,8 @@ bool compile_native_live_sm3_program(
         candidate.pixelWrittenColorMask = static_cast<std::uint8_t>(pixelWrittenColorMask);
         candidate.vertexLoopIndexedConstantEnd = vertexIndexedLimits;
         candidate.pixelLoopIndexedConstantEnd = pixelIndexedLimits;
+        candidate.vertexLoopIndexedConstantLower = vertexIndexedLower;
+        candidate.pixelLoopIndexedConstantLower = pixelIndexedLower;
         if (FAILED(device->CreateVertexShader(
                 vertexDxbc->GetBufferPointer(), vertexDxbc->GetBufferSize(),
                 nullptr, candidate.vertexShader.GetAddressOf())) ||

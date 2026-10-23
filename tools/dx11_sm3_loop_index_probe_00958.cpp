@@ -12,7 +12,11 @@ int main() {
     assert(native_sm3_static_loop_parameters({3u, 8u, static_cast<std::uint32_t>(-2), 0u}, count, first, step));
     assert(first == 8 && step == -2);
     assert(!native_sm3_static_loop_parameters({17u, 0u, 1u, 0u}, count, first, step));
-    assert(!native_sm3_static_loop_parameters({4u, 0u, static_cast<std::uint32_t>(-1), 0u}, count, first, step));
+    assert(native_sm3_static_loop_parameters({4u, 0u, static_cast<std::uint32_t>(-1), 0u}, count, first, step));
+    assert(first == 0 && step == -1);
+    assert(!native_sm3_static_loop_parameters(
+        {2u, static_cast<std::uint32_t>(-255),
+         static_cast<std::uint32_t>(-1), 0u}, count, first, step));
     assert(!native_sm3_static_loop_parameters({2u, 254u, 2u, 0u}, count, first, step));
     assert(!native_sm3_static_loop_parameters({2u, 0u, 1u, 1u}, count, first, step));
     std::array<int, 64> payload{};

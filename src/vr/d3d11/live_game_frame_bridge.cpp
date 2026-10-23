@@ -5700,7 +5700,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
            !native_sm3_live_loop_payload_valid(
               liveVertexInts, pipeline.program.vertexLoopIntegerMask) ||
            !native_sm3_live_loop_indexed_bounds_valid(
-              liveVertexInts, pipeline.program.vertexLoopIndexedConstantEnd)))) ||
+              liveVertexInts, pipeline.program.vertexLoopIndexedConstantLower,
+              pipeline.program.vertexLoopIndexedConstantEnd)))) ||
         (pipeline.program.pixelIntegerMask &&
          (FAILED(game->GetPixelShaderConstantI(
               0u, livePixelInts.data(), 16u)) ||
@@ -5709,7 +5710,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
            !native_sm3_live_loop_payload_valid(
               livePixelInts, pipeline.program.pixelLoopIntegerMask) ||
            !native_sm3_live_loop_indexed_bounds_valid(
-              livePixelInts, pipeline.program.pixelLoopIndexedConstantEnd)))))
+              livePixelInts, pipeline.program.pixelLoopIndexedConstantLower,
+              pipeline.program.pixelLoopIndexedConstantEnd)))))
         return false;
     const auto nativeByteCount = nativeStride * expandedVertices;
     if (!nativeByteCount || nativeByteCount > (1ull << 25u)) return false;

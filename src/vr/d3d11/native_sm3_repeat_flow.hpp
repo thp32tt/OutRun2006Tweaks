@@ -43,11 +43,11 @@ namespace outrun::vr::dx11 {
     unsigned& count, int& start, int& stride) noexcept {
     const auto initial = static_cast<std::int32_t>(words[1]);
     const auto step = static_cast<std::int32_t>(words[2]);
-    if (words[0] < 1u || words[0] > 16u || initial < 0 ||
+    if (words[0] < 1u || words[0] > 16u || initial < -255 ||
         initial > 255 || step < -128 || step > 127 || words[3] != 0u)
         return false;
     const int last = initial + (static_cast<int>(words[0]) - 1) * step;
-    if (last < 0 || last > 255) return false;
+    if (last < -255 || last > 255) return false;
     count = words[0]; start = initial; stride = step;
     return true;
 }
@@ -58,11 +58,11 @@ namespace outrun::vr::dx11 {
         if ((loopMask & (1u << i)) == 0u) continue;
         const int count = values[4u * i], start = values[4u * i + 1u],
                   stride = values[4u * i + 2u];
-        if (count < 1 || count > 16 || start < 0 || start > 255 ||
+        if (count < 1 || count > 16 || start < -255 || start > 255 ||
             stride < -128 || stride > 127 || values[4u * i + 3u] != 0)
             return false;
         const int last = start + (count - 1) * stride;
-        if (last < 0 || last > 255) return false;
+        if (last < -255 || last > 255) return false;
     }
     return true;
 }
@@ -86,6 +86,31 @@ namespace outrun::vr::dx11 {
         if (last < 0 || start >= static_cast<int>(end) ||
             last >= static_cast<int>(end))
             return false;
+    }
+    return true;
+}
+
+// Validate signed aL against every c[base+aL] reference before a real
+// D3D11 Draw; preserve the stricter two-argument legacy contract.
+[[nodiscard]] inline bool native_sm3_live_loop_indexed_bounds_valid(
+    const std::array<int, 16u * 4u>& values,
+    const std::array<std::int16_t, 16>& inclusiveLowerOffsets,
+    const std::array<std::uint16_t, 16>& exclusiveEnds) noexcept {
+    for (unsigned reg = 0; reg < 16u; ++reg) {
+        const int end = exclusiveEnds[reg];
+        if (!end) continue;
+        const int lower = inclusiveLowerOffsets[reg];
+        if (end > 256 || lower < -255 || lower >= end) return false;
+        const int count = values[4u * reg], start = values[4u * reg + 1u];
+        const int stride = values[4u * reg + 2u];
+        if (count < 1 || count > 16 || start < -255 || start > 255 ||
+            stride < -128 || stride > 127 || values[4u * reg + 3u] != 0)
+            return false;
+        const int last = start + (count - 1) * stride;
+        if (last < -255 || last > 255) return false;
+        const int minimum = start < last ? start : last;
+        const int maximum = start > last ? start : last;
+        if (minimum < lower || maximum >= end) return false;
     }
     return true;
 }

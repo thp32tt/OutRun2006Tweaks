@@ -4807,6 +4807,8 @@ struct NativeLiveSm3Program {
     // Zero means no dynamic c[base+aL] access for this i# loop.
     std::array<std::uint16_t, 16> vertexLoopIndexedConstantEnd{};
     std::array<std::uint16_t, 16> pixelLoopIndexedConstantEnd{};
+    std::array<std::int16_t, 16> vertexLoopIndexedConstantLower{};
+    std::array<std::int16_t, 16> pixelLoopIndexedConstantLower{};
     [[nodiscard]] bool ready() const noexcept {
         return vertexShader && pixelShader && !vertexBytecode.empty();
     }

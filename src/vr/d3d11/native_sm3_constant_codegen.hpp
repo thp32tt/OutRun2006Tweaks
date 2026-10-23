@@ -128,7 +128,8 @@ inline bool native_sm3_relative_matrix_references(
     bool dynamicLoop, int loopMinimum, int loopMaximum, unsigned loopRegister,
     const std::array<bool, 256>& defPresent,
     std::array<std::uint16_t, 16>& loopExclusiveLimits,
-    std::array<std::string, 4>& references, bool& readsLive) {
+    std::array<std::string, 4>& references, bool& readsLive,
+    std::array<std::int16_t, 16>* loopInclusiveLowerOffsets = nullptr) {
     readsLive = false;
     if (rows < 2u || rows > 4u || limit == 0u || limit > 256u ||
         base >= limit ||
@@ -149,7 +150,8 @@ inline bool native_sm3_relative_matrix_references(
     } else if (dynamicLoop) {
         if (loopRegister >= loopExclusiveLimits.size())
             return false;
-        for (unsigned reg = base; reg < limit; ++reg)
+        // Signed aL may alias a shader-local DEF below the matrix base.
+        for (unsigned reg = 0; reg < limit; ++reg)
             if (defPresent[reg]) return false;
         // aL may address the first row through the last legal matrix.
         // The source Draw validator checks i#.x/y/z against this bound.
@@ -187,6 +189,11 @@ inline bool native_sm3_relative_matrix_references(
         auto& old = loopExclusiveLimits[loopRegister];
         if (!old || dynamicExclusive < old)
             old = static_cast<std::uint16_t>(dynamicExclusive);
+        if (loopInclusiveLowerOffsets) {
+            auto& low = (*loopInclusiveLowerOffsets)[loopRegister];
+            const auto required = static_cast<std::int16_t>(-static_cast<int>(base));
+            if (required > low) low = required;
+        }
     }
     return true;
 }

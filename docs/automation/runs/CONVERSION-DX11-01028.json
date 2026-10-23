@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01028",
+  "production_id": "CONVERSION-DX11-01028",
+  "event_id": "CONVERSION-DX11-01028-E001",
+  "event_type": "dispatch",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01028",
+  "lane": "DX11",
+  "classification": "A",
+  "feature_id": "DX11:SIGNED_SM3_LOOP_NATIVE_CONSTANT_DRAW",
+  "work_key": "DX11:SIGNED_SM3_LOOP_NATIVE_CONSTANT_DRAW",
+  "checkpoint": "C4_MATERIAL",
+  "feature_stage": "C4_MATERIAL",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "source_head": "85670dc9a3fa25c1e1c664fa156f2dcce8ee2550",
+  "material_result_sha": null,
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "AUTOMATION_VALIDATION": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Signed SM3 DEFI/LOOP aL and live VS/PS indexed constant/matrix Draw bounds, D3D9Ex fallback preserved",
+  "feature_contract": {
+    "feature_id": "DX11:SIGNED_SM3_LOOP_NATIVE_CONSTANT_DRAW",
+    "goal": "Accept signed SM3 LOOP constant addresses in a live native shader Draw only with valid shader-specific bank bounds",
+    "acceptance_items": [
+      {
+        "id": "static",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Shader_DEFI",
+        "expected_behavior": "Signed DEFI loop compiles constant indexed/matrix HLSL"
+      },
+      {
+        "id": "dynamic",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native_Draw",
+        "expected_behavior": "Per-Draw live i# signed lower/upper bounds enforced before GPU resource mutation"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex",
+        "expected_behavior": "Underflow/overflow, invalid LOOP and shader DEF alias retain D3D9Ex"
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "C6_Exact_SHA",
+        "expected_behavior": "C++ signed positive/negative probe and five exact-SHA CI workflows"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "D3D9 SM3 DEFI/LOOP -> signed aL native constant/matrix HLSL",
+      "Shader program metadata -> Get*ShaderConstantI game snapshot -> native Draw guard"
+    ],
+    "batch_components": [
+      "native_sm3_repeat_flow.hpp + native_sm3_constant_codegen.hpp",
+      "native_backend.cpp + native_backend.hpp",
+      "live_game_frame_bridge.cpp",
+      "C++ signed regression + Python source graph"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Signed static and dynamic c# M4x4 in range",
+      "negative_regression": "Underflow/overflow and shader-owned DEF collision",
+      "component_integration": "game-authored VS/PS shader to native Draw preflight"
+    },
+    "conflict_keys": [
+      "DX11:SIGNED_SM3_LOOP_NATIVE_CONSTANT_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Original D3D9Ex renderer/input/FFB intact; native opt-in unchanged",
+    "visible_frame_acceptance": "SOURCE_ONLY, runtime UNTESTED",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "live_game_draw_path_scope": "Intended path, actual runtime evidence UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_sm3_repeat_flow.hpp",
+    "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_sm3_loop_index_probe_00958.cpp",
+    "tools/test_dx11_sm3_relative_matrix_00961.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_sm3_signed_loop_index_probe_01028.cpp",
+    "tools/test_dx11_sm3_signed_loop_index_01028.py"
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Need exact SHA mandatory CI and actual real-game observation",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_IMPLEMENTATION_ACTION": "Same ID causal CI repair then separate C6 status"
+}
