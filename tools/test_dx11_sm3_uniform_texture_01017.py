@@ -14,7 +14,9 @@ def need(ok, message):
 need('native_sm3_derivative_uniformity.hpp' in backend and
      'NativeSm3DerivativeUniformity derivativeUniformity;' in block,
      "real native compiler owns the derivative state")
-need('!derivativeUniformity.begin(native_sm3_ifc_is_quad_uniform(' in block and
+need('const bool uniformComparison = native_sm3_ifc_is_quad_uniform(' in block and
+     'if (!derivativeUniformity.begin(uniformComparison) ||' in block and
+     '!tempDrawUniformity.begin_if(uniformComparison)' in block and
      'scalarOrigins[0], scalarOrigins[1]' in block and
      'NativeSm3IfcScalarOrigin::PixelDependent' in block and
      'scalarOrigins[i] = NativeSm3IfcScalarOrigin::DrawFloatConstant;' in block and
