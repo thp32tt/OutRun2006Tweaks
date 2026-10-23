@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - test-r26-hud-rival-20261023
+  pull_request:
+    branches:
+      - vr-d3d9ex-focus
 
 jobs:
   build:
