@@ -277,14 +277,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V13";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V14";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V13";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V14";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -411,6 +411,7 @@ bool build_r283_sm3_mov_shader_source(
             std::array<UINT, 2> signTemps{};
             NativeSm3Texture2DMode textureMode = NativeSm3Texture2DMode::Implicit;
             unsigned samplerRegister{};
+            unsigned samplerSwizzle{0xe4u};
             unsigned texkillWrittenMask{};
             std::array<std::string, 4> sources{};
             std::array<std::string, 4> matrixRows{};
@@ -1231,9 +1232,14 @@ bool build_r283_sm3_mov_shader_source(
                         !samplerDeclared[reg] ||
                         (!sampler2dDeclared[reg] && !samplerCubeDeclared[reg] &&
                          !samplerVolumeDeclared[reg]) ||
-                        modifier != D3DSPSM_NONE || swizzle != 0xe4u)
+                        modifier != D3DSPSM_NONE ||
+                        !native_sm3_sampler_swizzle_valid(swizzle) ||
+                        (vertexStage && swizzle != 0xe4u))
                         return false;
+                    // ps_3_0 sN swizzle remaps the sampled texel, not UV.
+                    // VS texldl keeps its existing conservative restriction.
                     op.samplerRegister = reg;
+                    op.samplerSwizzle = swizzle;
                     op.textureCube = samplerCubeDeclared[reg];
                     op.textureVolume = samplerVolumeDeclared[reg];
                     // Projected cube semantics not proven for the game.
@@ -1606,15 +1612,18 @@ bool build_r283_sm3_mov_shader_source(
                     ? append_native_sm3_texturecube_sample(
                           translated, dest, op.destinationMask, op.sources[0],
                           op.samplerRegister, static_cast<unsigned>(i),
-                          op.textureMode, op.sources[2], op.sources[3])
+                          op.textureMode, op.sources[2], op.sources[3],
+                          op.samplerSwizzle)
                     : op.textureVolume ? append_native_sm3_texture3d_sample(
                           translated, dest, op.destinationMask, op.sources[0],
                           op.samplerRegister, static_cast<unsigned>(i),
-                          op.textureMode, op.sources[2], op.sources[3])
+                          op.textureMode, op.sources[2], op.sources[3],
+                          op.samplerSwizzle)
                     : append_native_sm3_texture2d_sample(
                           translated, dest, op.destinationMask, op.sources[0],
                           op.samplerRegister, static_cast<unsigned>(i),
-                          op.textureMode, op.sources[2], op.sources[3])))
+                          op.textureMode, op.sources[2], op.sources[3],
+                          op.samplerSwizzle)))
                     return false;
             } else if (op.matrixRowCount != 0u) {
                 if (!append_native_sm3_matrix(

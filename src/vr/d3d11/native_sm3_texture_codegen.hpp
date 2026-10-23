@@ -10,6 +10,24 @@ enum class NativeSm3Texture2DMode {
     Implicit, Projected, Bias, ExplicitLod, Gradients
 };
 
+// A ps_3_0 sampler operand's swizzle is applied AFTER the GPU lookup,
+// BEFORE the destination writemask (Microsoft texld/texldp/texldb/texldl
+// and texldd contracts). This remaps sampled RGBA, never texture UV/LOD
+// or per-Draw sampler-state identity. Reject non-byte synthetic encodings.
+[[nodiscard]] constexpr bool native_sm3_sampler_swizzle_valid(
+    unsigned swizzle) noexcept {
+    return swizzle <= 0xffu;
+}
+inline std::string native_sm3_sampled_channels(
+    const std::string& sampledTexel, unsigned destinationMask,
+    unsigned samplerSwizzle) {
+    std::string expression = sampledTexel + ".";
+    for (unsigned lane = 0u; lane < 4u; ++lane)
+        if (destinationMask & (1u << lane))
+            expression += "xyzw"[(samplerSwizzle >> (lane * 2u)) & 3u];
+    return expression;
+}
+
 // A D3D9 pixel shader can reach texture operations through IF/ELSE or
 // predicate control flow. D3D11 implicit LOD derivatives are not reliable
 // there when neighboring pixels take different branches. Explicit LOD and
@@ -92,9 +110,9 @@ inline bool append_native_sm3_texturecube_sample(
     std::string& out, const std::string& destination, unsigned mask,
     const std::string& coordinates, unsigned samplerRegister, unsigned ordinal,
     NativeSm3Texture2DMode mode, const std::string& dx,
-    const std::string& dy) {
+    const std::string& dy, unsigned samplerSwizzle = 0xe4u) {
     if (destination.empty() || coordinates.empty() || !mask || (mask & ~15u) ||
-        samplerRegister >= 16u ||
+        samplerRegister >= 16u || !native_sm3_sampler_swizzle_valid(samplerSwizzle) ||
         !native_sm3_cube_source_components(mode, 0u) ||
         (mode == NativeSm3Texture2DMode::Gradients
             ? (dx.empty() || dy.empty()) : (!dx.empty() || !dy.empty())))
@@ -115,8 +133,8 @@ inline bool append_native_sm3_texturecube_sample(
     std::string channels;
     for (unsigned i=0; i<4u; ++i)
         if (mask & (1u << i)) channels += "xyzw"[i];
-    out += "    " + destination + "." + channels + " = " + value + "." +
-           channels + ";\n";
+    out += "    " + destination + "." + channels + " = " +
+           native_sm3_sampled_channels(value, mask, samplerSwizzle) + ";\n";
     return true;
 }
 // SM3 D3DSTT_VOLUME uses XYZ, explicit LOD/bias in W and XYZ gradients.
@@ -145,9 +163,11 @@ inline bool append_native_sm3_texture3d_declarations(std::string& out,
 inline bool append_native_sm3_texture3d_sample(
     std::string& out, const std::string& destination, unsigned mask,
     const std::string& coordinates, unsigned slot, unsigned ordinal,
-    NativeSm3Texture2DMode mode, const std::string& dx, const std::string& dy) {
+    NativeSm3Texture2DMode mode, const std::string& dx, const std::string& dy,
+    unsigned samplerSwizzle = 0xe4u) {
     if (destination.empty() || coordinates.empty() || !mask || (mask & ~15u) ||
-        slot >= 16u || !native_sm3_volume_source_components(mode, 0u) ||
+        slot >= 16u || !native_sm3_sampler_swizzle_valid(samplerSwizzle) ||
+        !native_sm3_volume_source_components(mode, 0u) ||
         (mode == NativeSm3Texture2DMode::Gradients
             ? (dx.empty() || dy.empty()) : (!dx.empty() || !dy.empty()))) return false;
     const auto n = std::to_string(slot);
@@ -166,7 +186,7 @@ inline bool append_native_sm3_texture3d_sample(
     std::string channels;
     for (unsigned i=0u;i<4u;++i) if (mask & (1u << i)) channels += "xyzw"[i];
     out += "    " + destination + "." + channels + " = " +
-           texel + "." + channels + ";\n";
+           native_sm3_sampled_channels(texel, mask, samplerSwizzle) + ";\n";
     return true;
 }
 inline bool append_native_sm3_texture2d_declarations(
@@ -186,9 +206,11 @@ inline bool append_native_sm3_texture2d_sample(
     unsigned ordinal, NativeSm3Texture2DMode mode =
                           NativeSm3Texture2DMode::Implicit,
     const std::string& gradientX = {},
-    const std::string& gradientY = {}) {
+    const std::string& gradientY = {},
+    unsigned samplerSwizzle = 0xe4u) {
     if (destination.empty() || coordinates.empty() ||
         samplerRegister >= 16u || mask == 0u || (mask & ~15u) != 0u ||
+        !native_sm3_sampler_swizzle_valid(samplerSwizzle) ||
         (mode == NativeSm3Texture2DMode::Gradients
              ? (gradientX.empty() || gradientY.empty())
              : (!gradientX.empty() || !gradientY.empty())))
@@ -226,8 +248,8 @@ inline bool append_native_sm3_texture2d_sample(
     std::string lanes;
     for (unsigned i = 0; i < 4u; ++i)
         if ((mask & (1u << i)) != 0u) lanes += kLanes[i];
-    out += "    " + destination + "." + lanes + " = " + value + "." +
-           lanes + ";\n";
+    out += "    " + destination + "." + lanes + " = " +
+           native_sm3_sampled_channels(value, mask, samplerSwizzle) + ";\n";
     return true;
 }
 
