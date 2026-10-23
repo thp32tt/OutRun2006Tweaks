@@ -1521,9 +1521,11 @@ bool build_r283_sm3_mov_shader_source(
                 // A D3D9 c# is immutable during a Draw; a previously
                 // proven TEMP is also uniform only for its read lanes.
                 // Unknown banks and relative c# stay conservatively varying.
-                if (!(kind == D3DSPR_CONST &&
-                       native_sm3_addressed_const_draw_uniform(
-                           relative, staticAddress)) &&
+                // An ordinary c# is immutable for the Draw; a0-relative
+                // c# is equally uniform only after static DEF/MOVA
+                // resolution. Dynamic aL and varying a0 remain rejected.
+                if (!(kind == D3DSPR_CONST && !relative) &&
+                    !(kind == D3DSPR_CONST && relative && staticAddress) &&
                     !(kind == D3DSPR_TEMP &&
                       tempDrawUniformity.contains(
                           reg, uniformPhysicalComponents)))
