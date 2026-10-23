@@ -58,7 +58,7 @@
     "note": "Non-Windows portable probe only; production native_backend.cpp Windows build not yet executed."
   },
   "ci": {
-    "status": "EXACT_SHA_FIVE_ACTIONS_RUNNING",
+    "status": "4_OF_5_SUCCESS_HUD_IN_PROGRESS",
     "source_sha": "69af152a4986062517aaa4c615b1c128a645c85b",
     "fast_run_id": 39877332620,
     "build_run_id": 39877332676,
@@ -74,7 +74,50 @@
     "previous_full_gate_result": "5_PASS",
     "previous_failure_root": "MSVC C2338 src/vr/d3d11/live_game_frame_bridge.cpp(612,40) legacy expected SRCCOLOR independent alpha rejection contradicted newly legal alias",
     "validation_bearing_exact_sha": "4f2bf77990627e9be7a4708401764b639155fbec",
-    "notes": "4f2bf779 latest exact-SHA five gate candidate after mandatory original Fast/Backend/Build test failures caused by old conditional string; substantive C++ 69af. No full native game-frame runtime proof and no READY/score."
+    "notes": "4f2bf779 latest exact-SHA five gate candidate after mandatory original Fast/Backend/Build test failures caused by old conditional string; substantive C++ 69af. No full native game-frame runtime proof and no READY/score.",
+    "validated_sha": "4f2bf77990627e9be7a4708401764b639155fbec",
+    "results": [
+      {
+        "run_id": 39877332620,
+        "name": "DX11 Fast Structural Checks",
+        "sha": "4f2bf77990627e9be7a4708401764b639155fbec",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 39877332604,
+        "name": "Backend Conversion Gate",
+        "sha": "4f2bf77990627e9be7a4708401764b639155fbec",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 39877332676,
+        "name": "Build",
+        "sha": "4f2bf77990627e9be7a4708401764b639155fbec",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 39877332688,
+        "name": "OpenXR VR architecture",
+        "sha": "4f2bf77990627e9be7a4708401764b639155fbec",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 39877332580,
+        "name": "OutRun EXE HUD Inspector CI",
+        "sha": "4f2bf77990627e9be7a4708401764b639155fbec",
+        "status": "in_progress",
+        "conclusion": null
+      }
+    ],
+    "build_artifacts": [
+      "outrun2006tweaks-4f2bf77990627e9be7a4708401764b639155fbec",
+      "wheel-source-4f2bf77990627e9be7a4708401764b639155fbec"
+    ],
+    "backend_artifact": "backend-autovalidated-4f2bf77990627e9be7a4708401764b639155fbec"
   },
   "remaining_acceptance_items": [
     "Obtain five exact-SHA Action conclusions and artifacts for material 69af152a; repair only genuine failures",
@@ -85,7 +128,7 @@
   ],
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Real menu/car/race eligible_state_draws/native_draws/gpu_desktop_frames and continuous full native source frame UNTESTED; source-only FVF RGB-only separate alpha no longer unnecessarily rejects, exact SHA Windows CI pending.",
-  "next_implementation_action": "Read exact SHA 4f2bf779 mandatory CI #39877332620/#39877332604/#39877332676/#39877332688/#39877332580 and artifact lists; fix genuine failures on same TASK_ID, no repeated passed SHA checks. After structural pass collect real OutRun opt-in game log native eligible/draw/published menu/car/race counters and stereo fence/ACK; keep FEATURE_READY false until full acceptance.",
+  "next_implementation_action": "Await HUD 39877332580 exact-SHA success or repair failure under same task 01013. All other four mandatory CI success; Build and Backend artifacts present. Then collect actual game menu/car/race native counters and L/R fence/ACK before FEATURE_READY.",
   "feature_ready": false,
   "target_promoted": false,
   "runtime_validation": "UNTESTED",
@@ -176,9 +219,9 @@
   "automation_validation": "SOURCE_STATIC_PASS_WINDOWS_EXACT_SHA_PENDING",
   "full_dx11_renderer_complete": false,
   "targeted_validation_latest": {
-    "status": "FAST_SUCCESS_OTHER_EXACT_SHA_GATES_RUNNING",
+    "status": "4_OF_5_SUCCESS_HUD_IN_PROGRESS",
     "source_sha": "4f2bf77990627e9be7a4708401764b639155fbec",
-    "validation_command": "GitHub Actions fast #39877332620 SUCCESS; Backend #39877332604, Windows Build #39877332676, OpenXR #39877332688 and HUD #39877332580 running. Legacy game blending destructive checks upgraded for actual RT0 alpha mask.",
+    "validation_command": "Exact-SHA 4f2bf779 Actions: Fast 39877332620 SUCCESS; Backend 39877332604 SUCCESS incl smoke; Build 39877332676 SUCCESS + artifact; OpenXR 39877332688 SUCCESS; HUD 39877332580 pending. Hardware UNTESTED.",
     "evidence_paths": [
       "src/vr/d3d11/live_game_frame_bridge.cpp",
       "tools/test_dx11_game_blend_extrema_00717.py",
@@ -189,7 +232,7 @@
       "tools/test_dx11_native_subtractive_00599.py"
     ],
     "runtime_validation": "UNTESTED",
-    "windows_build_validation": "IN_PROGRESS"
+    "windows_build_validation": "SUCCESS"
   },
   "feature_last_head": "4f2bf77990627e9be7a4708401764b639155fbec",
   "last_material_source_commits": [
@@ -312,7 +355,7 @@
       39877332688,
       39877332580
     ],
-    "five_exact_sha_workflow_status": "FAST_SUCCESS_REST_RUNNING",
+    "five_exact_sha_workflow_status": "4_OF_5_SUCCESS_HUD_IN_PROGRESS",
     "prior_validated_exact_sha": "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84",
     "prior_five_exact_sha": "5_SUCCESS",
     "feature_ready": false,
@@ -320,7 +363,7 @@
     "runtime_validation": "UNTESTED",
     "score_change": 0,
     "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-    "next_implementation_action": "Read exact SHA 4f2bf779 mandatory CI #39877332620/#39877332604/#39877332676/#39877332688/#39877332580 and artifact lists; fix genuine failures on same TASK_ID, no repeated passed SHA checks. After structural pass collect real OutRun opt-in game log native eligible/draw/published menu/car/race counters and stereo fence/ACK; keep FEATURE_READY false until full acceptance.",
+    "next_implementation_action": "Await HUD 39877332580 exact-SHA success or repair failure under same task 01013. All other four mandatory CI success; Build and Backend artifacts present. Then collect actual game menu/car/race native counters and L/R fence/ACK before FEATURE_READY.",
     "real_game_draw_blocker": "Real menu/car/race eligible_state_draws/native_draws/gpu_desktop_frames and continuous full native source frame UNTESTED; source-only FVF RGB-only separate alpha no longer unnecessarily rejects, exact SHA Windows CI pending.",
     "source_cpp_sha": "69af152a4986062517aaa4c615b1c128a645c85b",
     "source_ci_repair_sha": "4f2bf77990627e9be7a4708401764b639155fbec",
