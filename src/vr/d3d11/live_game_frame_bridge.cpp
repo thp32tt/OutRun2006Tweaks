@@ -52,6 +52,7 @@
 #include "native_game_frame_batch.hpp"
 #include "native_game_cpu_surface_ticket.hpp"
 #include "native_game_source_mutation.hpp"
+#include "native_game_pre_draw_replay.hpp"
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_live_shader_cache.hpp"
@@ -5403,11 +5404,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (!s.clearColor.matches(owner, targetId) ||
             !s.preDrawFills.replay_ready(owner, targetId,
                                          source.Width, source.Height) ||
-            !s.backend.color_rtv() ||
-            FAILED(context->QueryInterface(
-                IID_PPV_ARGS(preDrawContext.GetAddressOf()))) ||
-            !preDrawContext)
+            !s.backend.color_rtv())
             return false;
+        // D3D11.0 does not expose ClearView; the existing bounded GPU
+        // rectangle rasterizer can still replay original game ColorFills.
+        (void)context->QueryInterface(
+            IID_PPV_ARGS(preDrawContext.GetAddressOf()));
     }
     ID3D11BlendState* extendedBlend = nullptr;
     if (customBlend) {
@@ -5803,23 +5805,32 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         s.backend.begin_frame(s.clearColor.native_color(
             reinterpret_cast<std::uintptr_t>(game),
             reinterpret_cast<std::uintptr_t>(targetIdentity.Get()), kBackground));
-        if (preDrawContext) {
-            // D3D9 ColorFill ignores blend, scissor and channel write masks.
-            // D3D11.1 ClearView copies each source ColorFill in order.
-            constexpr float scale = 1.0f / 255.0f;
-            for (std::uint32_t i = 0u; i < s.preDrawFills.count; ++i) {
-                const auto& fill = s.preDrawFills.entries[i];
-                const float rgba[4]{
-                    float((fill.argb >> 16) & 255u) * scale,
-                    float((fill.argb >> 8) & 255u) * scale,
-                    float(fill.argb & 255u) * scale,
-                    s.clearColor.opaqueDestinationAlpha ? 1.0f :
-                        float((fill.argb >> 24) & 255u) * scale};
-                const D3D11_RECT rect{
-                    static_cast<LONG>(fill.left), static_cast<LONG>(fill.top),
-                    static_cast<LONG>(fill.right), static_cast<LONG>(fill.bottom)};
-                preDrawContext->ClearView(s.backend.color_rtv(), rgba, &rect, 1u);
-            }
+        if (s.preDrawFills.count != 0u) {
+            // Both genuine programmable SM3 and fixed-function native
+            // Draws now replay the same game-authored rect/color sequence.
+            const auto owner = reinterpret_cast<std::uintptr_t>(game);
+            const auto targetId = reinterpret_cast<std::uintptr_t>(targetIdentity.Get());
+            const bool replayed = game_native_replay_pre_draw_fills(
+                s.preDrawFills, owner, targetId, source.Width, source.Height,
+                s.clearColor.opaqueDestinationAlpha, preDrawContext != nullptr,
+                [&](const GameNativePreDrawTile& tile) noexcept {
+                    if (!preDrawContext) return false;
+                    const D3D11_RECT rect{
+                        static_cast<LONG>(tile.left), static_cast<LONG>(tile.top),
+                        static_cast<LONG>(tile.right), static_cast<LONG>(tile.bottom)};
+                    preDrawContext->ClearView(
+                        s.backend.color_rtv(), tile.rgba.data(), &rect, 1u);
+                    return true;
+                },
+                [&](const GameNativePreDrawTile& tile) noexcept {
+                    const D3D11_RECT rect{
+                        static_cast<LONG>(tile.left), static_cast<LONG>(tile.top),
+                        static_cast<LONG>(tile.right), static_cast<LONG>(tile.bottom)};
+                    return native_game_raster_partial_backbuffer_color_clear(
+                        context, s.backend.color_rtv(), source.Width,
+                        source.Height, rect, tile.rgba.data());
+                });
+            if (!replayed) return false; // original D3D9 Draw stays authoritative
         }
         s.preDrawFills.discard();
     }
@@ -6578,33 +6589,45 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // native commands if the remembered fills cannot be replayed atomically.
     if (s.frameBatch.first_draw()) {
         ComPtr<ID3D11DeviceContext1> replayContext;
-        if (s.preDrawFills.count != 0u &&
-            (!env_full_game_opt_in() ||
-             !s.clearColor.matches(s.sourceGameDevice, output.targetIdentity) ||
-             !s.preDrawFills.belongs_to(s.sourceGameDevice, output.targetIdentity) ||
-             !s.backend.color_rtv() ||
-             FAILED(ctx->QueryInterface(IID_PPV_ARGS(replayContext.GetAddressOf()))) ||
-             !replayContext)) {
-            s.preDrawFills.discard();
-            return false; // original D3D9 Draw/Present/input remain authoritative
+        if (s.preDrawFills.count != 0u) {
+            if (!env_full_game_opt_in() ||
+                !s.clearColor.matches(s.sourceGameDevice, output.targetIdentity) ||
+                !s.preDrawFills.replay_ready(s.sourceGameDevice,
+                    output.targetIdentity, s.nativeWidth, s.nativeHeight) ||
+                !s.backend.color_rtv()) {
+                s.preDrawFills.discard();
+                return false; // original D3D9 Draw/Present/input remain authoritative
+            }
+            (void)ctx->QueryInterface(IID_PPV_ARGS(replayContext.GetAddressOf()));
         }
         s.backend.begin_frame(env_full_game_opt_in()
             ? s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)
             : kBackground);
-        if (replayContext) {
-            constexpr float scale = 1.0f / 255.0f;
-            for (std::uint32_t i = 0; i < s.preDrawFills.count; ++i) {
-                const auto& fill = s.preDrawFills.entries[i];
-                const float rgba[4]{
-                    float((fill.argb >> 16) & 255u) * scale,
-                    float((fill.argb >> 8) & 255u) * scale,
-                    float(fill.argb & 255u) * scale,
-                    s.clearColor.opaqueDestinationAlpha ? 1.0f :
-                        float((fill.argb >> 24) & 255u) * scale};
-                const D3D11_RECT area{
-                    static_cast<LONG>(fill.left), static_cast<LONG>(fill.top),
-                    static_cast<LONG>(fill.right), static_cast<LONG>(fill.bottom)};
-                replayContext->ClearView(s.backend.color_rtv(), rgba, &area, 1u);
+        if (s.preDrawFills.count != 0u) {
+            const bool replayed = game_native_replay_pre_draw_fills(
+                s.preDrawFills, s.sourceGameDevice, output.targetIdentity,
+                s.nativeWidth, s.nativeHeight,
+                s.clearColor.opaqueDestinationAlpha, replayContext != nullptr,
+                [&](const GameNativePreDrawTile& tile) noexcept {
+                    if (!replayContext) return false;
+                    const D3D11_RECT rect{
+                        static_cast<LONG>(tile.left), static_cast<LONG>(tile.top),
+                        static_cast<LONG>(tile.right), static_cast<LONG>(tile.bottom)};
+                    replayContext->ClearView(
+                        s.backend.color_rtv(), tile.rgba.data(), &rect, 1u);
+                    return true;
+                },
+                [&](const GameNativePreDrawTile& tile) noexcept {
+                    const D3D11_RECT rect{
+                        static_cast<LONG>(tile.left), static_cast<LONG>(tile.top),
+                        static_cast<LONG>(tile.right), static_cast<LONG>(tile.bottom)};
+                    return native_game_raster_partial_backbuffer_color_clear(
+                        ctx, s.backend.color_rtv(), s.nativeWidth,
+                        s.nativeHeight, rect, tile.rgba.data());
+                });
+            if (!replayed) {
+                s.preDrawFills.discard();
+                return false; // no partial scene may be published
             }
         }
         s.preDrawFills.discard();
