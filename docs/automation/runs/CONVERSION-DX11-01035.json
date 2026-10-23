@@ -11,10 +11,10 @@
   "feature_id": "DX11:LIVE_PREDRAW_TARGET_CLEAR_GPU_REPLAY",
   "work_key": "DX11:LIVE_PREDRAW_TARGET_CLEAR_GPU_REPLAY",
   "feature_base_sha": "055961946a655ddcadd42279e971dd4ad07798ba",
-  "status": "FEATURE_READY",
-  "feature_stage": "C4_RESULT_COMMITTED",
-  "checkpoint": "C4_RESULT_COMMITTED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -94,51 +94,97 @@
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/dx11_pre_draw_target_clear_probe_01035.cpp",
     "tools/test_dx11_pre_draw_target_clear_01035.py",
-    ".github/workflows/dx11-fast-structural.yml"
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_depth_only_clear_00732.py",
+    "tools/test_dx11_full_clear_clipped_00762.py"
   ],
-  "source_head": "055961946a655ddcadd42279e971dd4ad07798ba",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "source_head": "2260abfcd684a5f1ef527506f316de12ec465510",
+  "material_result_sha": "2260abfcd684a5f1ef527506f316de12ec465510",
+  "validation_bearing_result_sha": "2260abfcd684a5f1ef527506f316de12ec465510",
   "feature_ready": true,
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "NEXT_IMPLEMENTATION_ACTION": "Resolve only real C++/CI failure for 01035 at exact result SHA; after five success record C6, Quest3 remains untested.",
   "acceptance_results": {
     "native_order": {
-      "status": "PENDING",
+      "status": "PASS",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d11/native_game_source_mutation.hpp",
         "tools/dx11_pre_draw_target_clear_probe_01035.cpp",
         "tools/test_dx11_pre_draw_target_clear_01035.py"
-      ]
+      ],
+      "validation_command": "DX11 01035 C++ native pixel-order probe and source negative mutations SUCCESS (Fast Gate exact SHA)"
     },
     "transaction": {
-      "status": "PENDING",
+      "status": "PASS",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d11/native_game_source_mutation.hpp",
         "tools/dx11_pre_draw_target_clear_probe_01035.cpp",
         "tools/test_dx11_pre_draw_target_clear_01035.py"
-      ]
+      ],
+      "validation_command": "DX11 01035 C++ native pixel-order probe and source negative mutations SUCCESS (Fast Gate exact SHA)"
     },
     "fallback": {
-      "status": "PENDING",
+      "status": "PASS",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d11/native_game_source_mutation.hpp",
         "tools/dx11_pre_draw_target_clear_probe_01035.cpp",
         "tools/test_dx11_pre_draw_target_clear_01035.py"
-      ]
+      ],
+      "validation_command": "DX11 01035 C++ native pixel-order probe and source negative mutations SUCCESS (Fast Gate exact SHA)"
     },
     "gate": {
-      "status": "PENDING",
+      "status": "PASS",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d11/native_game_source_mutation.hpp",
         "tools/dx11_pre_draw_target_clear_probe_01035.cpp",
         "tools/test_dx11_pre_draw_target_clear_01035.py"
-      ]
+      ],
+      "validation_command": "GitHub Actions five required exact SHA SUCCESS"
     }
   },
-  "ci_failure_cause": "Exact-SHA Fast 40029022171: 01035 run strategy live_game_draw_path was prose instead of required ordered callsite/native Draw/visible output stage array; fixed metadata only, safety gates unchanged."
+  "ci_failure_cause": null,
+  "feature_last_head": "2260abfcd684a5f1ef527506f316de12ec465510",
+  "full_dx11_renderer_complete": false,
+  "c6_summary": "Required exact-SHA GitHub Actions Fast/Build/OpenXR/HUD/Backend SUCCESS at 2260abfcd684a5f1ef527506f316de12ec465510; signed D3DRECT source repair verified; real game/Quest3 runtime UNTESTED; score not re-awarded at C6.",
+  "ci_validation_runs": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40030019499,
+      "head_sha": "2260abfcd684a5f1ef527506f316de12ec465510",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40030019499"
+    },
+    {
+      "name": "Build",
+      "run_id": 40030019361,
+      "head_sha": "2260abfcd684a5f1ef527506f316de12ec465510",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40030019361"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40030019400,
+      "head_sha": "2260abfcd684a5f1ef527506f316de12ec465510",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40030019400"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40030019459,
+      "head_sha": "2260abfcd684a5f1ef527506f316de12ec465510",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40030019459"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40030019242,
+      "head_sha": "2260abfcd684a5f1ef527506f316de12ec465510",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40030019242"
+    }
+  ]
 }
