@@ -13,7 +13,12 @@ assert "instruction.opcode == D3DSIO_TEXLDD)" not in predication
 # Preserve the original rejection of implicit sampling under a predicated
 # instruction or a pixel-varying IFC, but allow draw-uniform D3D9 IF b#.
 assert "sourcePredicated || !derivativeUniformity.implicit_sampling_safe()" in backend
-assert "!derivativeUniformity.begin(false)" in backend
+# A real IFC(c#,c#) is now correctly quad-uniform; a pixel-varying
+# TEMP/input/vPos/vFace on EITHER side must not unlock implicit derivatives.
+assert "NativeSm3IfcScalarOrigin::PixelDependent" in backend
+assert "scalarOrigins[i] = NativeSm3IfcScalarOrigin::DrawFloatConstant;" in backend
+assert "!derivativeUniformity.begin(native_sm3_ifc_is_quad_uniform(" in backend
+assert "scalarOrigins[0], scalarOrigins[1]" in backend
 assert "!derivativeUniformity.begin(true)" in backend
 assert "!derivativeUniformity.end()" in backend
 assert "!derivativeUniformity.empty()" in backend
