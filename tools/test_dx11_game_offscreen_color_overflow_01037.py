@@ -21,8 +21,17 @@ for condition in ("!allocation || FAILED(allocation.As(&texture)) || !texture",
                   "scissorCount != 1u",
                   "!native_game_offscreen_color_region_valid(region)"):
     assert condition in capture, condition
-# Catch removal of any one previously protected invalid-capture branch.
-for n in range(5):
-    mutated=capture.replace("reject_unknown_footprint();", "/* unsafe omission */",n+1)
-    assert mutated.count("reject_unknown_footprint();")<5
+# Mutation-check each individual early return. A silent return after a
+# previously queued eligible Draw would otherwise appear to be untouched.
+for condition in ("!allocation || FAILED(allocation.As(&texture)) || !texture",
+                  "!view.valid", "viewportCount != 1u",
+                  "scissorCount != 1u",
+                  "!native_game_offscreen_color_region_valid(region)"):
+    prefix="if (" + condition + ")"
+    assert prefix in capture, condition
+    body=capture.split(prefix,1)[1].split("}",1)[0]
+    assert "reject_unknown_footprint();" in body, condition
+    bad=capture.replace(prefix + body, prefix + body.replace(
+        "reject_unknown_footprint();", "/* unsafe omission */",1), 1)
+    assert "reject_unknown_footprint();" not in bad.split(prefix,1)[1].split("}",1)[0]
 print("01037 queued GPU camera Draw uncertain-raster fail-closed guards PASS")
