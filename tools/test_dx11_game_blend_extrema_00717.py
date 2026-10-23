@@ -12,10 +12,10 @@ def integrated(c,s,h):
     mapping = c.split("if (extrema) output.blendOp = blendOp",1)[1].split(";",1)[0]
     om = s.split("} else if (output.blendOp == D3D11_BLEND_OP_MIN",1)[1].split(
         "} else if (output.blendOp != D3D11_BLEND_OP_ADD)",1)[0]
-    return all(x in gate for x in (
+    return "native_game_active_separate_alpha(separate, colorMask);" in c and all(x in gate for x in (
         "blendOp == D3DBLENDOP_MIN", "blendOp == D3DBLENDOP_MAX",
         "game_native_extremum_admission(",
-        "separate != FALSE, colorMask",
+        "activeSeparateAlpha, colorMask",
     )) and all(x in mapping for x in (
         "D3D11_BLEND_OP_MIN", "D3D11_BLEND_OP_MAX",
     )) and all(x in om for x in (
@@ -38,7 +38,7 @@ assert integrated(capture,submit,helper)
 assert bridge.count("for (auto& masked : s.extremumMaskedBlends) masked.Reset();") == 2
 assert "std::array<ComPtr<ID3D11BlendState>, 128> extremumMaskedBlends{};" in bridge
 for poison in ("game_native_extremum_admission(", "blendOp == D3DBLENDOP_MIN",
-               "blendOp == D3DBLENDOP_MAX", "separate != FALSE, colorMask"):
+               "blendOp == D3DBLENDOP_MAX", "activeSeparateAlpha, colorMask"):
     assert not integrated(capture.replace(poison,"",1),submit,helper)
 for poison in ("game_native_extremum_slot(",
                "desc.RenderTarget[0].BlendOpAlpha = output.blendOp;",

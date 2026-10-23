@@ -1141,7 +1141,8 @@ def main() -> None:
             "GetRenderState(D3DRS_BLENDOP, &blendOp)",
             "GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)",
             "src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA",
-            "if (separate != FALSE) {",
+            "if (activeSeparateAlpha) {",
+            "native_game_active_separate_alpha(separate, colorMask);",
             "GetRenderState(D3DRS_SRCBLENDALPHA, &srcAlpha)",
             "GetRenderState(D3DRS_DESTBLENDALPHA, &dstAlpha)",
             "GetRenderState(D3DRS_BLENDOPALPHA, &opAlpha)",
@@ -1195,7 +1196,7 @@ def main() -> None:
     for original, broken in (
         ("src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA",
          "src != D3DBLEND_SRCALPHA && dst != D3DBLEND_INVSRCALPHA"),
-        ("if (separate != FALSE) {",
+        ("if (activeSeparateAlpha) {",
          "if (false) {"),
         ("GetRenderState(D3DRS_SRCBLENDALPHA, &srcAlpha)",
          "/* omit source alpha state */"),

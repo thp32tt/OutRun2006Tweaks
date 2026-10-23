@@ -23,7 +23,8 @@ REQUIRED = {
     "bool supported_game_state(": [
         "GetRenderState(D3DRS_SRCBLEND, &src)",
         "GetRenderState(D3DRS_DESTBLEND, &dst)",
-        "if (separate != FALSE) {",
+        "if (activeSeparateAlpha) {",
+        "native_game_active_separate_alpha(separate, colorMask);",
         "!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,",
         "output.separateAlphaBlend = true;",
         "if (blendOp != D3DBLENDOP_ADD) {",
