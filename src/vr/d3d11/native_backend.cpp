@@ -494,6 +494,7 @@ bool build_r283_sm3_mov_shader_source(
         NativeSm3TempDrawUniformity tempDrawUniformity;
         NativeSm3StructuredFlow structuredFlow;
         NativeSm3PredicateFlow predicateFlow;
+        NativeSm3DrawUniformPredicate predicateDrawUniformity;
         // D3D9 aL always denotes the innermost LOOP, never REP.
         struct LoopRange { bool dynamic; int minimum; int maximum; unsigned integerRegister; };
         std::vector<LoopRange> loopRanges;
@@ -822,6 +823,14 @@ bool build_r283_sm3_mov_shader_source(
                                        " " + scalarOperands[1];
                 if (predicateWrite) {
                     predicateFlow.write();
+                    // Readiness of p0 never proves quad-uniform gradients.
+                    // Only unconditionally written immutable draw sources
+                    // may predicate a genuine D3D11 implicit texture Draw.
+                    predicateDrawUniformity.write(
+                        native_sm3_ifc_is_quad_uniform(
+                            scalarOrigins[0], scalarOrigins[1]),
+                        structuredFlow.empty() &&
+                            derivativeUniformity.implicit_sampling_safe());
                     predicateUsed = true;
                 }
                 operations.push_back(std::move(branch));
@@ -1158,7 +1167,8 @@ bool build_r283_sm3_mov_shader_source(
                 if (instruction.opcode == D3DSIO_TEXKILL ||
                     instruction.opcode == D3DSIO_DSX ||
                     instruction.opcode == D3DSIO_DSY ||
-                    instruction.opcode == D3DSIO_TEX)
+                    (instruction.opcode == D3DSIO_TEX &&
+                     !predicateDrawUniformity.implicit_sampling_safe(true)))
                     return false;
                 const DWORD predicate = instruction.operandTokens.back();
                 const unsigned swizzle =
@@ -1213,7 +1223,8 @@ bool build_r283_sm3_mov_shader_source(
                 // genuine pixel-varying IF or per-instruction predicates.
                 if (!native_sm3_texture_mode_allowed_in_control_flow(
                         op.textureMode,
-                        sourcePredicated || !derivativeUniformity.implicit_sampling_safe()))
+                        !predicateDrawUniformity.implicit_sampling_safe(sourcePredicated) ||
+                            !derivativeUniformity.implicit_sampling_safe()))
                     return false;
             }
             if (op.texkill) {

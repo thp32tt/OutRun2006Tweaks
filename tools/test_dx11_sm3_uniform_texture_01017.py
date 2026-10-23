@@ -22,7 +22,8 @@ need('!derivativeUniformity.begin(native_sm3_ifc_is_quad_uniform(' in block and
      '!derivativeUniformity.end()' in block and
      '!derivativeUniformity.empty()' in block,
      "IFC/IF/ENDIF and final balanced-branch checks")
-need('sourcePredicated || !derivativeUniformity.implicit_sampling_safe()' in block and
+need('!predicateDrawUniformity.implicit_sampling_safe(sourcePredicated)' in block and
+     '!derivativeUniformity.implicit_sampling_safe()' in block and
      'native_sm3_texture_mode_allowed_in_control_flow(' in block and
      'append_native_sm3_texture2d_sample(' in block,
      "real HLSL texture codegen enforces quad uniformity")

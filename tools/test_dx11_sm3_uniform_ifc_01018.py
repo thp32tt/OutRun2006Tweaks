@@ -25,7 +25,8 @@ need("first == NativeSm3IfcScalarOrigin::DrawFloatConstant" in flow and
      "second == NativeSm3IfcScalarOrigin::DrawFloatConstant" in flow,
      "both operands required for actual draw-uniform branch")
 need("native_sm3_texture_mode_allowed_in_control_flow(" in block and
-     "sourcePredicated || !derivativeUniformity.implicit_sampling_safe()" in block and
+     "!predicateDrawUniformity.implicit_sampling_safe(sourcePredicated)" in block and
+     "!derivativeUniformity.implicit_sampling_safe()" in block and
      "append_native_sm3_texture2d_sample(" in block,
      "the native real shader TEXLD admission consumes IFC uniformity")
 need("GetPixelShaderConstantF(" in bridge and

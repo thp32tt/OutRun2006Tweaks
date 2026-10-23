@@ -5,6 +5,23 @@
 #include <vector>
 
 namespace outrun::vr::dx11 {
+// Real SM3 SETP comparison provenance for implicit predicated TEX on a
+// game-authored Draw. Initialized p0 is not necessarily quad-uniform.
+// A later varying or conditional SETP must discard its uniform origin.
+class NativeSm3DrawUniformPredicate final {
+public:
+    constexpr void write(bool bothSourcesDrawUniform,
+                         bool unconditional) noexcept {
+        uniform_ = bothSourcesDrawUniform && unconditional;
+    }
+    [[nodiscard]] constexpr bool implicit_sampling_safe(
+        bool predicated) const noexcept {
+        return !predicated || uniform_;
+    }
+private:
+    bool uniform_ = false;
+};
+
 class NativeSm3PredicateFlow {
 public:
     [[nodiscard]] bool ready() const noexcept { return initialized_; }
