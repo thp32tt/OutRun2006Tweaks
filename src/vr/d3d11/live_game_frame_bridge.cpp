@@ -53,6 +53,7 @@
 #include "native_game_cpu_surface_ticket.hpp"
 #include "native_game_source_mutation.hpp"
 #include "native_game_pre_draw_replay.hpp"
+#include "native_game_pre_draw_depth.hpp"
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_live_shader_cache.hpp"
@@ -1323,6 +1324,7 @@ struct State {
     GameOutputSignature previousOutput{};
     GameNativeClearColor clearColor{};
     GameNativePreDrawFills preDrawFills{};
+    GameNativePreDrawDepth preDrawDepth{};
     std::uint64_t outputGeneration = 0u;
     // Successful game StretchRect/UpdateSurface postpasses are replayed into
     // the real full-size native texture, never treated as geometry Draws.
@@ -4875,6 +4877,35 @@ bool upload_full_game_stream(ID3D11DeviceContext* context,
                              ID3D11Buffer* buffer, UINT capacity,
                              const void* source, UINT bytes) noexcept;
 
+// Source pre-Draw partial Z values are replayed AFTER native full DSV seed,
+// BEFORE the first native depth-tested real game SM3 or FVF Draw.
+bool replay_native_game_pre_draw_depth(State& s,ID3D11DeviceContext* ctx,
+                                      UINT width,UINT height) noexcept {
+    if(!s.preDrawDepth.count)return true;
+    const auto owner=s.sourceGameDevice;
+    const auto rt=s.clearColor.backbufferIdentity;
+    const auto ds=s.preDrawDepth.depth;
+    if(!ctx||!s.backend.ready()||!s.diagnosticDepthView||
+       !s.clearColor.matches(owner,rt)||
+       !s.clearColor.main_depth_still_bound(ds)||
+       !s.preDrawDepth.replay_ready(owner,rt,ds,width,height))return false;
+    ComPtr<ID3D11DeviceContext1> context1;
+    (void)ctx->QueryInterface(IID_PPV_ARGS(context1.GetAddressOf()));
+    for(std::uint32_t i=0;i<s.preDrawDepth.count;++i){
+        const auto& tile=s.preDrawDepth.tiles[i];
+        const D3D11_RECT rect{static_cast<LONG>(tile.left),
+            static_cast<LONG>(tile.top),static_cast<LONG>(tile.right),
+            static_cast<LONG>(tile.bottom)};
+        if(context1){
+            const float value[4]={tile.z,0.f,0.f,0.f};
+            context1->ClearView(s.diagnosticDepthView.Get(),value,&rect,1u);
+        }else if(!native_game_raster_partial_backbuffer_depth_clear(
+            ctx,s.diagnosticDepthView.Get(),width,height,rect,tile.z))return false;
+    }
+    s.preDrawDepth.discard();
+    return true;
+}
+
 // Real programmable D3D9 game source -> SM3 HLSL/DXBC -> native D3D11
 // IA/VS/PS/tN/sN/b0/Draw. Preserve live game CW/CCW culling and the
 // four exact D3D9 RGB+alpha blend equations already owned by the backend.
@@ -5945,6 +5976,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             s.diagnosticDepthView.Get(), D3D11_CLEAR_DEPTH,
             liveBatch.depth_clear_value(reverseDepth), 0u);
         liveBatch.consume_depth_clear();
+        if(!replay_native_game_pre_draw_depth(s,context,source.Width,source.Height))return false;
     }
     context->OMSetDepthStencilState(liveDepthState, 0u);
     // Validate the actual native DSV before issuing oDepth GPU writes.
@@ -6647,6 +6679,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(), D3D11_CLEAR_DEPTH,
                 s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u), 0);
             s.frameBatch.consume_depth_clear();
+            if(!replay_native_game_pre_draw_depth(s,ctx,s.nativeWidth,s.nativeHeight))return false;
         }
         if (output.nativeDepthAlways)
             ctx->OMSetDepthStencilState(
@@ -7844,6 +7877,7 @@ void finish_game_surface_cpu_write(IDirect3DDevice9* game,
         s.frameBatch.abort();
         s.pending = false;
         s.preDrawFills.discard();
+        s.preDrawDepth.discard();
         s.clearColor.discard();
         if (++s.outputGeneration == 0u) ++s.outputGeneration;
     } catch (...) {
@@ -7888,6 +7922,7 @@ void observe_game_surface_mutation(
         s.frameBatch.abort();
         s.pending = false;
         s.preDrawFills.discard();
+        s.preDrawDepth.discard();
         s.clearColor.discard();
         if (++s.outputGeneration == 0u) ++s.outputGeneration;
     } catch (...) {
@@ -8252,6 +8287,7 @@ void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
         if (!ownsDraw && !ownsPreDrawColor) return;
         s.frameBatch.scene_boundary();
         s.preDrawFills.discard();
+        s.preDrawDepth.discard();
         if (ownsPreDrawColor && s.frameBatch.submitted == 0u)
             s.frameBatch.abort();
         // A GPU Draw may already have run, but its stale color must never be
@@ -8349,6 +8385,22 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         // never whole-DSV ClearDepthStencilView. Validate canonical main Z,
         // live native D32 view and every rectangle before any GPU mutation.
         if (partialDepth) {
+            // Full original D3D9 Z seed followed by partial Z before any GPU
+            // Draw. Record source rectangles until first real SM3/FVF Z Draw.
+            const bool beforeFirstDepth= !clearStencil &&
+                !continuingFullNativeDraw && s.sourceGameDevice==owner &&
+                !s.pending && s.frameBatch.depthClearPending &&
+                s.frameBatch.can_seed_pre_draw_depth(
+                    s.clearColor.matches(owner,reinterpret_cast<std::uintptr_t>(
+                        backbufferIdentity.Get())),s.sourceDrawsThisFrame==0u) &&
+                count<=GameNativePreDrawDepth::kCapacity &&
+                (count==0u||rects!=nullptr);
+            if(beforeFirstDepth)
+                return s.preDrawDepth.record(owner,
+                    reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
+                    reinterpret_cast<std::uintptr_t>(depthIdentity.Get()),
+                    bbDesc.Width,bbDesc.Height,vp.X,vp.Y,vp.Width,vp.Height,
+                    count,rects,z);
             if (!continuingFullNativeDraw ||
                 !GameNativeSourceMutation::mirrors_partial_depth_clear(
                     env_full_game_opt_in(), sameMainDepthStencil,
@@ -8420,7 +8472,10 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         // Z while keeping the native RTV color; DX9Ex/input are untouched.
         // Stencil-only Clear does not modify the native DSV depth. Combined
         // Z|STENCIL must still seed the native depth with the exact game z.
-        if (clearZ) s.frameBatch.note_full_depth_clear(z);
+        if (clearZ) {
+            s.preDrawDepth.discard();
+            s.frameBatch.note_full_depth_clear(z);
+        }
         return true;
     } catch (...) {
         return false; // Never change original game Draw/Present/gamepad.
@@ -8448,6 +8503,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         if (!foreignSource) {
             s.clearColor.discard();
             s.preDrawFills.discard();
+            s.preDrawDepth.discard();
         }
         ComPtr<IDirect3DSurface9> target, backbuffer;
         D3DSURFACE_DESC targetDesc{}, bbDesc{};
@@ -8478,6 +8534,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         if (foreignSource) {
             s.clearColor.discard();
             s.preDrawFills.discard();
+            s.preDrawDepth.discard();
         }
         std::uintptr_t mainDepthIdentity = 0u;
         if (wholeBackbuffer) {
@@ -8538,6 +8595,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
                         true, false, depthMatches, z))) {
                     s.frameBatch.abort(); // failed proof: original D3D9 lives
                 } else if (clearZ) {
+                    s.preDrawDepth.discard();
                     s.frameBatch.note_full_depth_clear(z);
                 }
             }
@@ -9445,6 +9503,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.cpuSurfaceReplay.reset();
         s.clearColor.discard();
         s.preDrawFills.discard();
+        s.preDrawDepth.discard();
         // Menu/car/race frames often have more than 64 eligible draws. The
         // cursor advances across the actual frame population; shrinking or
         // empty populations reset it without skipping the D3D9 fallback.
@@ -9496,6 +9555,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.previousOutput = {};
         s.clearColor.discard();
         s.preDrawFills.discard();
+        s.preDrawDepth.discard();
         s.insetSurface.Reset();
         s.insetFormat = D3DFMT_UNKNOWN;
         s.insetSurfaceDevice = 0u;
@@ -9535,6 +9595,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.previousOutput = {};
     s.clearColor.discard();
     s.preDrawFills.discard();
+    s.preDrawDepth.discard();
     s.outputGeneration = 0u;
     s.surfaceReplayReadback.Reset();
     s.surfaceReplayOwner = 0u;
