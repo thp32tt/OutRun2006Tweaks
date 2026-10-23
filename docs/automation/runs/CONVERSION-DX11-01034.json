@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01034",
+  "production_id": "CONVERSION-DX11-01034",
+  "event_id": "CONVERSION-DX11-01034-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01034",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_NATIVE_PREDRAW_COLORFILL_OVERDRAW",
+  "work_key": "DX11:LIVE_NATIVE_PREDRAW_COLORFILL_OVERDRAW",
+  "feature_branch": "feature/dx11-01034-live-predraw-fill-overdraw",
+  "feature_base_sha": "d4fcfd07e4a4f2d685e896f24cc1473c3da921ef",
+  "feature_last_head": "8af7ffdf978598e50d85b115cd1db638a69932eb",
+  "status": "FEATURE_READY",
+  "feature_stage": "FEATURE_READY",
+  "checkpoint": "C3_FEATURE_READY",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Production D3D9 pre-first-Draw ColorFill recorder now drops only fully superseded older rectangles, preserving ordered game pixels and the existing D3D11.1 ClearView/D3D11.0 native GPU raster path. Avoids unnecessary 16-tile aborts. No claim of a playable game frame.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_NATIVE_PREDRAW_COLORFILL_OVERDRAW",
+    "goal": "A real game-origin ColorFill sequence with >16 calls must still reach the already-wired first native SM3/FVF Draw when later fills completely overwrite earlier rectangles, without sacrificing exact D3D9 pixel result or DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "overdraw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_COLORFILL_TO_NATIVE_DRAW",
+        "expected_behavior": "16 distinct pre-Draw D3D9 ColorFills followed by a covering 17th rect compress losslessly into the existing GPU replay recorder instead of aborting the native first Draw."
+      },
+      {
+        "id": "pixel_order",
+        "category": "source_correctness",
+        "behavior_area": "D3D11_GPU_REPLAY",
+        "expected_behavior": "Clipped and overlapping ARGB fills retain the same pixels and original remaining order, including later differently colored nested rects."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9EX_AUTHORITATIVE",
+        "expected_behavior": "17 distinct uncovered rectangles, foreign COM owner, malformed rects and invalid replay provenance still fail closed with no destructive partial record mutation."
+      },
+      {
+        "id": "test",
+        "category": "targeted_validation",
+        "behavior_area": "SOURCE_TO_REPLAY",
+        "expected_behavior": "Compile the production C++ headers under -Werror and execute source-record/replay pixel parity and negative probes."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Actual successful D3D9 ColorFill backbuffer mutation",
+      "GameNativePreDrawFills::record clipping/fully-covered retirement",
+      "GameNativePreDrawFills::replay_ready checked in live SM3 and FVF first Draw",
+      "D3D11.1 ClearView / D3D11.0 native GPU raster / game Draw / visible native frame guarded by opt-in"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_source_mutation.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp (existing source admission)",
+      "src/vr/d3d11/native_game_pre_draw_replay.hpp (existing replay)",
+      "tools/dx11_pre_draw_overdraw_probe_01034.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "16 stripes then 17th covering pixel parity and count 1; nested overlapping colors retain D3D9 source result",
+      "negative_regression": "17 disjoint uncovered writes reject transactionally; foreign owner, malformed dimensions, mismatched replay owner reject",
+      "component_integration": "Same GameNativePreDrawFills production header used by the existing live game SM3/FVF first Draw paths"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_NATIVE_PREDRAW_COLORFILL_OVERDRAW",
+      "src/vr/d3d11/native_game_source_mutation.hpp:GameNativePreDrawFills::record"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Only existing explicit opt-in full game mode; original D3D9/DX9Ex Draw, input and FFB are authoritative; DXVK frozen; R175 TEXCOORD6 00477 untouched",
+    "visible_frame_acceptance": "SOURCE_ONLY RUNTIME_UNTESTED",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "tools/dx11_pre_draw_overdraw_probe_01034.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01034.json"
+  ],
+  "source_head": "d4fcfd07e4a4f2d685e896f24cc1473c3da921ef",
+  "material_result_sha": "8af7ffdf978598e50d85b115cd1db638a69932eb",
+  "validation_bearing_result_sha": "",
+  "acceptance_results": {
+    "overdraw": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_source_mutation.hpp",
+        "tools/dx11_pre_draw_overdraw_probe_01034.cpp"
+      ],
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. dx11_pre_draw_overdraw_probe_01034.cpp -o probe01034 && ./probe01034 (N100 isolated staging)"
+    },
+    "pixel_order": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_source_mutation.hpp",
+        "src/vr/d3d11/native_game_pre_draw_replay.hpp",
+        "tools/dx11_pre_draw_overdraw_probe_01034.cpp"
+      ],
+      "validation_command": "01034 production-header pixel frame parity probe PASS"
+    },
+    "fallback": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_source_mutation.hpp",
+        "tools/dx11_pre_draw_overdraw_probe_01034.cpp"
+      ],
+      "validation_command": "01034 transactional overflow/foreign replay negative probes PASS"
+    },
+    "test": {
+      "status": "PASS",
+      "evidence_paths": [
+        "tools/dx11_pre_draw_overdraw_probe_01034.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "N100 isolated g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic; exit 0"
+    }
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_source_mutation.hpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Require feature exact-SHA CI, then safe behind=0 compare/expected_sha force=false promotion and final target exact-SHA 5 GitHub Actions. No playable/native game-frame claim until real game/Quest3 test.",
+  "ci_validation_runs": {},
+  "feature_ready": true
+}
