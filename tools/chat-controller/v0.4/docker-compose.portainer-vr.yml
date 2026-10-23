@@ -61,10 +61,12 @@ services:
       PRODUCTION_COUNTER_MODE: "lane"
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      # New tasks: :00, :20 and :40 KST, once per lane per window.
-      SCHEDULE_MINUTES: "0,20,40"
-      # DX9Ex C review production and scheduled rollover: only at :00 KST.
+      # New DX11 production: :00 and :30 KST, at most twice per hour.
+      SCHEDULE_MINUTES: "0,30"
+      # New DX9Ex review production: even hours at :00 KST (12/day max).
+      # Active TASK_ID retries/rollovers are not throttled by this cadence.
       DX9EX_SCHEDULE_MINUTES: "0"
+      DX9EX_SCHEDULE_EVERY_HOURS: "2"
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
