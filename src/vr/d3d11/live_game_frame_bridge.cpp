@@ -12,6 +12,7 @@
 #include "live_game_sm3_stream_assembly.hpp"
 #include "live_game_sm3_instance_batches.hpp"
 #include "live_game_sm3_connected_instances.hpp"
+#include "live_game_sm3_polygon_raster.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
@@ -5015,8 +5016,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         }
     }
-    if (fill != D3DFILL_SOLID) {
-        ++s.liveSm3StateRejectReasons[3]; // wire/point raster unsupported
+    const bool pointFill = fill == D3DFILL_POINT;
+    const bool wireFill = fill == D3DFILL_WIREFRAME;
+    const bool triangleFamily = type == D3DPT_TRIANGLELIST ||
+        type == D3DPT_TRIANGLESTRIP || type == D3DPT_TRIANGLEFAN;
+    if (fill != D3DFILL_SOLID && (!(pointFill || wireFill) || !triangleFamily)) {
+        ++s.liveSm3StateRejectReasons[3]; // unsupported game polygon raster
         return false;
     }
     if ((colorMask & ~0x0fu) != 0u) {
@@ -5035,13 +5040,16 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // LASTPIXEL raster rules. An antialiased or last-pixel-disabled line
     // cannot be silently converted to a single-sample D3D11 line.
     // Query this state on the real shader-bound game Draw before touching GPU.
-    if (type == D3DPT_LINELIST || type == D3DPT_LINESTRIP) {
+    if (type == D3DPT_LINELIST || type == D3DPT_LINESTRIP || wireFill) {
         DWORD lineAA = TRUE, lastPixel = FALSE;
         if (FAILED(game->GetRenderState(D3DRS_ANTIALIASEDLINEENABLE, &lineAA)) ||
             FAILED(game->GetRenderState(D3DRS_LASTPIXEL, &lastPixel)) ||
-            !game_native_sm3_line_raster(static_cast<std::uint32_t>(type),
-                                         lineAA != FALSE, lastPixel != FALSE)) {
-            ++s.liveSm3StateRejectReasons[7]; // unsupported line rasterization
+            !(wireFill
+                ? game_sm3_polygon_fill_admitted(fill, type, cull,
+                    lineAA != FALSE, lastPixel != FALSE, false)
+                : game_native_sm3_line_raster(static_cast<std::uint32_t>(type),
+                    lineAA != FALSE, lastPixel != FALSE))) {
+            ++s.liveSm3StateRejectReasons[7]; // unsupported line/wire raster
             return false;
         }
     }
@@ -5224,7 +5232,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // same native VS/PS/texture/RT path as triangles and lines instead of
     // aborting the menu/race frame. An input PSIZE, scaled size or sprite
     // remains authoritative on the original D3D9 Draw.
-    if (type == D3DPT_POINTLIST) {
+    if (type == D3DPT_POINTLIST || pointFill) {
         DWORD size = 0u, minimum = 0u, maximum = 0u;
         DWORD sprite = TRUE, scaled = TRUE;
         bool perVertexSize = false;
@@ -5236,7 +5244,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             FAILED(game->GetRenderState(D3DRS_POINTSPRITEENABLE, &sprite)) ||
             FAILED(game->GetRenderState(D3DRS_POINTSCALEENABLE, &scaled)) ||
             !game_native_unit_point_raster(
-                size, minimum, maximum, sprite, scaled, perVertexSize))
+                size, minimum, maximum, sprite, scaled, perVertexSize) ||
+            (pointFill && !game_sm3_polygon_fill_admitted(
+                fill, type, cull, false, false, true)))
             return false;
     }
     std::vector<D3D11_INPUT_ELEMENT_DESC> input;
@@ -5322,6 +5332,23 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 compactConnectedIndices)) return false;
         nativeIndices = compactConnectedIndices.data();
         nativeIndexCount = static_cast<UINT>(compactConnectedIndices.size());
+    }
+    // D3DFILL_POINT produces one point per triangle occurrence, including
+    // repeated vertices shared by adjacent triangles. The source fan and
+    // connected-instance helpers above have already preserved their order;
+    // lower these triangles to a genuine GPU POINTLIST before IA/OM binding.
+    std::vector<std::uint32_t> pointFillIndices;
+    if (pointFill) {
+        const UINT logicalVertexCount = static_cast<UINT>(
+            compactInstancedGeometry ? expandedVertices : vertexCount);
+        const UINT sourceCount = nativeIndices ? nativeIndexCount : logicalVertexCount;
+        const UINT pointTopology = (compactConnectedInstances ||
+            type == D3DPT_TRIANGLEFAN) ? D3DPT_TRIANGLELIST : type;
+        if (!game_sm3_expand_polygon_points(pointTopology, nativeIndices,
+                sourceCount, logicalVertexCount, kMaxIndices, pointFillIndices))
+            return false;
+        nativeIndices = pointFillIndices.data();
+        nativeIndexCount = static_cast<UINT>(pointFillIndices.size());
     }
     // Keep input-layout cache identity separate when an instanced draw
     // requires source FLOAT4 packing even for already-float declarations.
@@ -5873,7 +5900,23 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             : nativeCull.d3d9Mode == D3DCULL_CCW
                 ? s.diagnosticCullRasters[scissorSlot + 1u].Get()
                 : (scissor != FALSE ? s.scissorRaster.Get() : s.raster.Get());
-    // Raster selection mirrors the source winding on both Draw/DrawIndexed.
+    // D3D11 wire fill uses a genuine triangle rasterizer with the D3D9
+    // cull/scissor decisions already validated above. It is isolated to
+    // this diagnostic Draw, not the global solid fallback raster cache.
+    ComPtr<ID3D11RasterizerState> wireRaster;
+    if (wireFill) {
+        D3D11_RASTERIZER_DESC desc{};
+        desc.FillMode = D3D11_FILL_WIREFRAME;
+        desc.CullMode = nativeCull.d3d9Mode == D3DCULL_NONE ?
+            D3D11_CULL_NONE : D3D11_CULL_BACK;
+        desc.FrontCounterClockwise =
+            nativeCull.d3d9Mode == D3DCULL_CW ? TRUE : FALSE;
+        desc.ScissorEnable = scissor != FALSE ? TRUE : FALSE;
+        desc.DepthClipEnable = TRUE;
+        if (FAILED(device->CreateRasterizerState(
+                &desc, wireRaster.GetAddressOf()))) return false;
+        liveRaster = wireRaster.Get();
+    }
     context->RSSetState(liveRaster);
     // D3D9 SRGBWRITEENABLE is live per shader-bound Draw. Its sRGB view
     // performs output encoding, including blend and destination-alpha
@@ -5934,7 +5977,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // Keep the authentic primitive family across programmable VB, IB and
     // UP game draws. Fan indices above were already triangulated; line
     // topologies must NEVER be reinterpreted as filled triangles.
-    context->IASetPrimitiveTopology(type == D3DPT_POINTLIST ?
+    context->IASetPrimitiveTopology(pointFill || type == D3DPT_POINTLIST ?
         D3D11_PRIMITIVE_TOPOLOGY_POINTLIST :
         type == D3DPT_LINELIST ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
         type == D3DPT_LINESTRIP ?

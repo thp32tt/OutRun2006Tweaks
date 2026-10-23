@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01032",
+  "production_id": "CONVERSION-DX11-01032",
+  "event_id": "CONVERSION-DX11-01032-E001",
+  "event_type": "dispatch",
+  "target_branch": "vr-dx11-native-r71",
+  "lane": "DX11",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01032",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW",
+  "work_key": "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW",
+  "status": "AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "summary": "Native D3D9 SM3 polygon point+wire modes integrated with actual game Draw/DrawIndexed, source instancing, GPU raster/point IA and fail-closed original game fallback.",
+  "feature_contract": {
+    "goal": "Native full-size game source SM3 polygon modes connect both source vertex topology and D3D11 raster with state safety",
+    "acceptance_items": [
+      {
+        "id": "wire",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GPU_Raster",
+        "expected_behavior": "Shader-bound D3D9 triangles wireframe obey original cull, scissor and line state on GPU"
+      },
+      {
+        "id": "points",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Source_Indexed_Geometry",
+        "expected_behavior": "D3DFILL_POINT triangle occurrence source indexed/instanced topology renders native POINTLIST"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Game_Input_FFB",
+        "expected_behavior": "Reject invalid indices, point size/sprite/culling and line AA; preserve original game Draw and input/FFB"
+      },
+      {
+        "id": "gate",
+        "category": "integrated_validation",
+        "behavior_area": "Exact_SHA",
+        "expected_behavior": "Portable positive/negative C++ regression and five mandatory GitHub Actions gates"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game source state and geometry interception",
+      "Indexed+instanced polygon triangle assembly",
+      "D3D11 IA/RS/OM GPU draw and D3D9 fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
+      "tools/dx11_sm3_polygon_raster_probe_01032.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "list/strip/fan occurrence geometry, connected instance and wire cull",
+      "negative_regression": "source bounds, overflow, wire line state and point cull/size",
+      "component_integration": "actual captured D3D9 SM3 draw into D3D11 native DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "native opt-in only, original D3D9 game Draw/Present/input/FFB and DXVK freeze preserved"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Game/Quest3 visible frame and eye output not runtime observed",
+  "NEXT_IMPLEMENTATION_ACTION": "Check exact-SHA CI and only repair causal errors",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
+    "tools/dx11_sm3_polygon_raster_probe_01032.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01032.json"
+  ]
+}
