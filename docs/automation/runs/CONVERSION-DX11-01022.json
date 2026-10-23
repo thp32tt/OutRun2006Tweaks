@@ -12,15 +12,15 @@
   "feature_id": "DX11:LIVE_SM3_BRANCH_TEMP_TO_IFC_TEXTURE_DRAW",
   "work_key": "DX11:LIVE_SM3_BRANCH_TEMP_TO_IFC_TEXTURE_DRAW",
   "work_class": "integration",
-  "feature_stage": "C4_STATE",
-  "checkpoint": "C4_STATE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "source_head": "f8446b7cbfb3507083ed9aa415d3f364104c29d2",
-  "material_result_sha": null,
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "material_result_sha": "eac1f1f86ada1677be74d0ec058dace3ea40c7a4",
+  "result_sha": "fcff0a77c3133d7e9480c95713445ed9318664bd",
+  "validation_bearing_result_sha": "fcff0a77c3133d7e9480c95713445ed9318664bd",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -95,15 +95,99 @@
     "docs/automation/runs/CONVERSION-DX11-01022.json"
   ],
   "pending_items": [
-    "Exact-SHA five Gate pending",
-    "Menu/car/race native frame and Quest 3/VDXR gamepad/FFB parity UNTESTED"
+    "Quest3/VDXR actual menu/vehicle/race frame, gamepad/FFB and native draw/published-frame counts remain UNTESTED; source-build CI does not promote runtime."
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "REAL_GAME_DRAW_BLOCKER": "No measured in-game native Draw and published-frame evidence",
+  "REAL_GAME_DRAW_BLOCKER": "Shader branch capability source/CI verified at exact SHA; gameplay native Draw and Quest3 HMD counts remain unmeasured.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "PENDING_MATERIAL_SHA",
-  "NEXT_IMPLEMENTATION_ACTION": "Address causal five Gate failures if any; continue remaining real-game frame native Draw coverage",
-  "acceptance_results": {},
-  "gate_evidence": null
+  "CODE_CHANGED_SHA": "eac1f1f86ada1677be74d0ec058dace3ea40c7a4",
+  "NEXT_IMPLEMENTATION_ACTION": "Controller select next independent real-game native frame/input defect; do not repeat 01022 exact-SHA Gate or award score on C6.",
+  "acceptance_results": {
+    "branch_texture_draw": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
+        "tools/dx11_sm3_branch_temp_probe_01022.cpp",
+        "tools/test_dx11_sm3_branch_temp_01022.py"
+      ],
+      "validation_command": "C++17 branch/ELSE TEMP -> IFC TEX Sample positive compiled probe on DX11 Fast 39944868886 SUCCESS",
+      "limitation": "Source/CI only; actual in-game native GPU frame, HMD, controller and FFB are not proven."
+    },
+    "dynamic_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
+        "tools/dx11_sm3_branch_temp_probe_01022.cpp",
+        "tools/test_dx11_sm3_dynamic_texture_flow_00962.py",
+        "tools/test_dx11_sm3_uniform_ifc_01018.py"
+      ],
+      "validation_command": "C++17 varying/missing ELSE/partial/loop negative branch probe and retained prior IFC/TEX derivative guards; Fast 39944868886 SUCCESS",
+      "limitation": "Source/CI only; actual in-game native GPU frame, HMD, controller and FFB are not proven."
+    },
+    "same_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_sm3_branch_temp_01022.py",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Exact SHA fcff0a77c3133d7e9480c95713445ed9318664bd DX11 Fast 39944868886, Backend 39944868912, Windows Build 39944868909, OpenXR 39944868913 and HUD 39944868888 all SUCCESS",
+      "limitation": "Source/CI only; actual in-game native GPU frame, HMD, controller and FFB are not proven."
+    }
+  },
+  "gate_evidence": {
+    "source_sha": "fcff0a77c3133d7e9480c95713445ed9318664bd",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39944868886,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39944868912,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39944868909,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39944868913,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39944868888,
+        "conclusion": "success"
+      }
+    },
+    "causal_repairs": [
+      {
+        "failing_sha": "eac1f1f86ada1677be74d0ec058dace3ea40c7a4",
+        "reason": "00962 source assertion searched obsolete inline IFC comparison; C++17 fixed-depth frame provenance and 01019/01020 linked test adjustment",
+        "repair_sha": "212da2bace6549eb5455cedff5807856c7993365"
+      },
+      {
+        "failing_sha": "212da2bace6549eb5455cedff5807856c7993365",
+        "reason": "01017 still matched obsolete direct derivative begin source string; retained complete uniform provenance and negative tests",
+        "repair_sha": "fcff0a77c3133d7e9480c95713445ed9318664bd"
+      }
+    ]
+  },
+  "material_repair_sha": "fcff0a77c3133d7e9480c95713445ed9318664bd",
+  "validation_sha": "fcff0a77c3133d7e9480c95713445ed9318664bd",
+  "feature_ready": {
+    "status": "FEATURE_READY",
+    "feature_id": "DX11:LIVE_SM3_BRANCH_TEMP_TO_IFC_TEXTURE_DRAW",
+    "feature_head_sha": "fcff0a77c3133d7e9480c95713445ed9318664bd",
+    "gate_head_sha": "fcff0a77c3133d7e9480c95713445ed9318664bd",
+    "condition": "SOURCE_AND_EXACT_SHA_CI_VERIFIED_NOT_GAMEPLAY_PROVEN",
+    "acceptance_results_status": "PASS_FEATURE_CI",
+    "material_source_sha": "eac1f1f86ada1677be74d0ec058dace3ea40c7a4",
+    "runtime_validation": "UNTESTED"
+  },
+  "score_status": "ELIGIBLE_ONCE_NEW_MATERIAL_01022_AND_EXACT_SHA_FIVE_GATE; C6_AND_CAUSAL_REPAIRS_NO_EXTRA_CREDIT"
 }
