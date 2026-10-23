@@ -7,6 +7,23 @@
 #include <array>
 
 namespace outrun::vr::dx11 {
+
+enum class NativeSm3IfcScalarOrigin : unsigned char {
+    PixelDependent,
+    DrawFloatConstant
+};
+
+// Only a directly validated scalar D3D9 c# operand is quad-uniform.
+// Do not infer TEMP provenance from prior writes: a varying value may have
+// reached it through earlier shader instructions. D3D9 relative constants
+// must be rejected independently before classifying a source as c#.
+[[nodiscard]] constexpr bool native_sm3_ifc_is_quad_uniform(
+    NativeSm3IfcScalarOrigin first,
+    NativeSm3IfcScalarOrigin second) noexcept {
+    return first == NativeSm3IfcScalarOrigin::DrawFloatConstant &&
+           second == NativeSm3IfcScalarOrigin::DrawFloatConstant;
+}
+
 class NativeSm3DerivativeUniformity final {
 public:
     [[nodiscard]] bool begin(bool uniformCondition) noexcept {

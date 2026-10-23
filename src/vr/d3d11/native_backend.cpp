@@ -728,6 +728,13 @@ bool build_r283_sm3_mov_shader_source(
                 // lane consumed by the full expression (including DZ/DW's
                 // denominator) rather than accepting HLSL's zero-init.
                 std::array<std::string, 2> scalarOperands{};
+                // Actual D3D9 c# (DEF or uploaded Set*ConstantF) is fixed
+                // for the entire Draw. IFC(c#, c#) does not diverge across
+                // pixels, even when the comparison changes between frames.
+                // TEMP/input/vPos/vFace provenance is conservatively varying.
+                std::array<NativeSm3IfcScalarOrigin, 2> scalarOrigins{
+                    NativeSm3IfcScalarOrigin::PixelDependent,
+                    NativeSm3IfcScalarOrigin::PixelDependent};
                 for (unsigned i = 0u; i < 2u; ++i) {
                     const DWORD token = instruction.operandTokens[i + (predicateWrite ? 1u : 0u)];
                     const unsigned swizzle =
@@ -778,6 +785,10 @@ bool build_r283_sm3_mov_shader_source(
                                 reg, constantLimit, defPresent[reg], value))
                             return false;
                         if (!defPresent[reg]) liveConstantsUsed = true;
+                        // Relative c[a0/aL] was rejected above. A scalar c#
+                        // register is immutable per Draw, including live
+                        // float constants uploaded to the native b0 buffer.
+                        scalarOrigins[i] = NativeSm3IfcScalarOrigin::DrawFloatConstant;
                     } else {
                         // Bool, integer, predicate or relative-indexed
                         // conditions are not float IFC/SETP/BREAKC operands.
@@ -788,11 +799,13 @@ bool build_r283_sm3_mov_shader_source(
                         return false;
                     scalarOperands[i] = std::move(value);
                 }
-                // IFC consumes pixel-dependent float source registers. Even
-                // an equal-looking comparison is not proof of quad-uniformity.
-                // Only IF b# is classified as uniform for implicit sampling.
+                // IFC using two genuinely draw-uniform c# operands may
+                // safely retain native implicit TEXLD/LDP/LDB gradients.
+                // A pixel input/TEMP/system input on either side remains
+                // varying and falls back for implicit sampling in its scope.
                 if (!predicateWrite && !conditionalBreak &&
-                    !derivativeUniformity.begin(false))
+                    !derivativeUniformity.begin(native_sm3_ifc_is_quad_uniform(
+                        scalarOrigins[0], scalarOrigins[1])))
                     return false;
                 Operation branch{};
                 branch.flowKind = predicateWrite ? 8u : (conditionalBreak ? 7u : 1u);
