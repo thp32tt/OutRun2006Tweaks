@@ -1,0 +1,395 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0715KST-NEW-SHA6",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "date_kst": "2026-10-24",
+  "reviewed_at_kst": "2026-10-24T07:16:03.248875+09:00",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "prior_reviewed_sha_count": 722,
+  "new_unique_sha_count": 6,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 6
+  },
+  "sha_verified_count": 6,
+  "rgba_png_count": 6,
+  "verified_native_ui_cell_placement_count": 0,
+  "producer_png_counts": {
+    "A": 334,
+    "B": 389
+  },
+  "producer_export_evidence_count": 148,
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_0715_metrics.json",
+    "A_pairs": "work/C1_QA_20261024_0715_A_pairs.jpg",
+    "B_pairs": "work/C1_QA_20261024_0715_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261024_0715_white.jpg",
+    "alpha": "work/C1_QA_20261024_0715_alpha.json"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false,
+    "VR_FFB_DX11_DXVK_touched": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0057-11DBE8EA-R2",
+      "ordinal": 281,
+      "english": "Adjust your Game settings",
+      "approved_korean": "게임 설정 조정",
+      "source_file": "Q205_29114a7e4316a7fb_source.png",
+      "candidate_file": "Q205_29114a7e4316a7fb_source_k.png",
+      "source_sha256": "1b97480809ddec6d4e9da2499377bf6d2a91f8341f517da79c00aff48ddf317d",
+      "candidate_sha256": "751acc488e0292ddba066ea2fb47c8536901b7b3ea7ee1e03037ed81da230891",
+      "original_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          984,
+          298
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          21,
+          116,
+          1933,
+          668
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.78415
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원문과 번역의 길이 차이 및 캔버스 크기 차이 자체는 FAIL 아님. SHA 검증과 문구 가독성은 양호하나, 원본 크롭에 다른 영문 UI 문구가 함께 있으며 실제 안전영역·기준선 재배치 증거 없음. 안전영역이 입증되기 전 PASS 불가.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0057-11DBE8EA-R2",
+      "ordinal": 280,
+      "english": "CLARISSA",
+      "approved_korean": "클라리사",
+      "source_file": "Q176_d9b75816183ff5d6_source.png",
+      "candidate_file": "Q176_d9b75816183ff5d6_source_k.png",
+      "source_sha256": "083ed1b05375bcf261a0ba4236105efb393883290921ed8837f41dd0efc55b9e",
+      "candidate_sha256": "121ce8a9e00dc0686bbfbda5a2db89bd952cb692fa6e43d57351737c2840af9f",
+      "original_dds_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1601,
+          686
+        ],
+        "candidate_size": [
+          1916,
+          821
+        ],
+        "alpha_bbox": [
+          25,
+          39,
+          1884,
+          753
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.69954
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원문과 번역의 길이 차이 및 캔버스 크기 차이 자체는 FAIL 아님. SHA 검증과 문구 가독성은 양호하나, 원본 크롭에 다른 레이블·아이콘·경계선이 포함되어 캐릭터명 글자층의 실제 배치 및 보호 픽셀 충돌 미확정. 안전영역이 입증되기 전 PASS 불가.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0057-11DBE8EA-R2",
+      "ordinal": 279,
+      "english": "JENNIFER",
+      "approved_korean": "제니퍼",
+      "source_file": "Q176_452b8a5f73a1a851_source.png",
+      "candidate_file": "Q176_452b8a5f73a1a851_source_k.png",
+      "source_sha256": "3919d46d4054d25fe1fe430d4d25817a35065df512494e98ab0f743f66a609b4",
+      "candidate_sha256": "ee77199e46b4e227f2af7b4b37716a15daa0aab4ec45dd8391038da69725223b",
+      "original_dds_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1286,
+          672
+        ],
+        "candidate_size": [
+          1735,
+          906
+        ],
+        "alpha_bbox": [
+          165,
+          104,
+          1699,
+          799
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.66099
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원문과 번역의 길이 차이 및 캔버스 크기 차이 자체는 FAIL 아님. SHA 검증과 문구 가독성은 양호하나, 원본 크롭에 다른 캐릭터명·얼굴 초상/선택 UI가 포함되어 보호 아트 침범 여부 미검증. 안전영역이 입증되기 전 PASS 불가.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0071-5C9428C4",
+      "ordinal": 341,
+      "english": "FLAGMAN 4",
+      "approved_korean": "플래그맨 4",
+      "source_file": "Q176_2f07831ec55d39c7_source.png",
+      "candidate_file": "Q176_2f07831ec55d39c7_source_k.png",
+      "source_sha256": "3832409819cf16b158104bd6950c17a39bc7defdb021be3297c81870be23651e",
+      "candidate_sha256": "580e62fba645ab110d70d9a1ce912fd500535f9d50798fe337debff2a814e1f4",
+      "original_dds_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1437,
+          462
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          85,
+          9,
+          2106,
+          654
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.63563
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원문과 번역의 길이 차이 및 캔버스 크기 차이 자체는 FAIL 아님. SHA 검증과 문구 가독성은 양호하나, 원본 크롭에 인접 캐릭터명/장식 그래픽 포함, 실제 텍스트 셀·배치 좌표가 미확정. 안전영역이 입증되기 전 PASS 불가.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0071-5C9428C4",
+      "ordinal": 340,
+      "english": "VIEW LICENSE",
+      "approved_korean": "라이선스 보기",
+      "source_file": "Q046_9a7a44871d33cdc4_source.png",
+      "candidate_file": "Q046_9a7a44871d33cdc4_source_k.png",
+      "source_sha256": "ef5e2297c29ae7f92b89435f9befcd73ef9686996303ee0acb8dbb43321092db",
+      "candidate_sha256": "55c7ba5e06f3bfd734a7c91573b64e068f7a69ffed7c0fc062fb16fcb23e6c2b",
+      "original_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1668,
+          260
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          142,
+          93,
+          2022,
+          595
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.80111
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원문과 번역의 길이 차이 및 캔버스 크기 차이 자체는 FAIL 아님. SHA 검증과 문구 가독성은 양호하나, 후보 텍스트 명도는 원본의 어두운 계열과 비슷하지만 실제 배경 대비 및 UV 안전영역 미검증. 안전영역이 입증되기 전 PASS 불가.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0070-E0F75987-R1",
+      "ordinal": 335,
+      "english": "TUNED",
+      "approved_korean": "튜닝",
+      "source_file": "Q139_c7b81611ee5859cc_source.png",
+      "candidate_file": "Q139_c7b81611ee5859cc_source_k.png",
+      "source_sha256": "76fa1ee13d3f621d99cc05099008b9895f8e87e97d003ce4988d89c15bbab029",
+      "candidate_sha256": "81553b0f417fb7c0807f1dcc272d3c319393eba00c4929aed0905b48ebaf65c3",
+      "original_dds_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          772,
+          236
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          16,
+          1868,
+          684
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.79974
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원문과 번역의 길이 차이 및 캔버스 크기 차이 자체는 FAIL 아님. SHA 검증과 문구 가독성은 양호하나, 원본 ROI의 텍스트 하단 배치와 후보 PNG 배치·배경 관계가 달라 합성 좌표 및 안전영역 미확정. 안전영역이 입증되기 전 PASS 불가.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    }
+  ]
+}
