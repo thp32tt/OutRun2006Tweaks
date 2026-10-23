@@ -61,9 +61,9 @@ for token in ("referenced[declaration[i].Stream] = true",
               "static_cast<std::uint8_t>(declaration[i].Stream)",
               "elements, streams, vertexCount, unpacked)"):
     require(token in p, "missing multistream VB/IB native admission " + token)
-# The C2397 repair only permits narrowing after live_sm3_input_layout has
-# rejected Stream >= 4. Removing that validation invalidates this proof.
-require("in.Stream >= 4u" in layout and
+# The C2397 repair narrows only after exact source bounds validation.
+# The game supports all sixteen D3D9 streams; stream 16 remains rejected.
+require("in.Stream >= 16u" in layout and
         "static_cast<std::uint8_t>(declaration[i].Stream)" in p,
         "multistream narrowing requires exact validated D3D9 stream bounds")
 assembly = (ROOT / "src/vr/d3d11/live_game_sm3_stream_assembly.hpp").read_text()

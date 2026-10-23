@@ -24,7 +24,7 @@ int main() {
     const float p[6]{8.f,80.f,800.f,2.f,20.f,200.f};
     const std::uint8_t c[16]{
         1,2,3,255,0,0x3c,0,0x38,10,20,30,128,0,0x38,0,0x34};
-    std::array<GameSm3StreamView,4> views{};
+    std::array<GameSm3StreamView,16> views{};
     views[0]={reinterpret_cast<const std::uint8_t*>(p),12u,2u};
     views[1]={c,8u,2u};
     std::vector<GameSm3ElementRef> e{

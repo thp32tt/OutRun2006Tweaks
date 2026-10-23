@@ -102,13 +102,15 @@
     "tools/test_dx11_sm3_multistream_game_draw_01029.py",
     "docs/automation/runs/CONVERSION-DX11-01029.json",
     "tools/dx11_sm3_interface_draw_probe_00964.cpp",
-    "tools/test_dx11_live_source_stride_00966.py"
+    "tools/test_dx11_live_source_stride_00966.py",
+    "tools/dx11_live_sm3_multistream_probe.cpp",
+    "tools/test_dx11_live_sm3_vertex_decl_00929.py"
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Actual OutRun menu/car/race native frame & Quest3 evidence still UNTESTED; five exact-SHA gates pending",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "NEXT_IMPLEMENTATION_ACTION": "Causal 00964 and 00966 legacy test signature repair in same 01029; observe full five exact SHA GitHub Actions, runtime UNTESTED",
+  "NEXT_IMPLEMENTATION_ACTION": "Repair second observed Fast gate legacy 4-stream signature/bound expectations without weakening negative tests; rerun all required GitHub workflows on changed exact SHA",
   "feature_ready": false,
   "pending_items": [
     "Five exact SHA GitHub Actions pending",
@@ -124,6 +126,25 @@
       "00966 source-contract regex demanded old in.Stream >= 4u guard rather than the new in.Stream >= 16u"
     ],
     "change": "Keep identical compiled 00964 positive/negative assertions and original 00966 small-stride/fallback checks while updating interface dimensions only",
-    "full_gate_plan": "one_validation_bearing_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "previous_causal_failure_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
+    "causal_repairs": [
+      {
+        "failed_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
+        "workflow_run_id": 39987719544,
+        "changes": [
+          "00964 C++ native stream signature",
+          "00966 indexed D3D9 source bounds assertion"
+        ]
+      },
+      {
+        "failed_sha": "c72a760763afae64be2583c7c165a567f84927b3",
+        "workflow_run_id": 39988197594,
+        "changes": [
+          "additional multistream assembly probe legacy std::array<4> input",
+          "00929 declaration source-bounds assertion still expects guard stream >=4"
+        ]
+      }
+    ]
   }
 }
