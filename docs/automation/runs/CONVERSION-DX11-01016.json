@@ -11,16 +11,16 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-01016",
   "feature_id": "DX11:LIVE_SM3_FACE_NATIVE_GAME_DRAW",
   "work_key": "DX11:LIVE_SM3_FACE_NATIVE_GAME_DRAW",
-  "feature_stage": "LEGACY_CI_CAUSAL_REPAIR",
+  "feature_stage": "FEATURE_READY",
   "feature_branch": null,
   "feature_goal": "Preserve authentic vFace SM3 real-game D3D9 Draw to D3D11 Draw and visible frame end-to-end direction",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "CI_CAUSAL_REPAIR_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_head": "9b22f216ff43a8546585111cede7e926eb3a80ac",
   "material_result_sha": "08f2aaaf392b58dfd1146bdaa7972dd96f2e221f",
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "result_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+  "validation_bearing_result_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "quest3_playable": false,
@@ -92,46 +92,46 @@
   ],
   "acceptance_results": {
     "real_face_signed_ifc_game_draw": {
-      "status": "PENDING_CI",
+      "status": "PASS_FEATURE_CI",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
-        "src/vr/d3d11/native_backend.cpp",
         "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/native_backend.cpp",
         "src/vr/d3d11/native_sm3_interface_channels.hpp",
-        "tools/dx11_sm3_face_compare_01016.cpp"
+        "tools/test_dx11_live_sm3_face_01016.py"
       ],
-      "validation_command": "Not yet passed at post-causal-repair validation-bearing SHA"
+      "validation_command": "python tools/test_dx11_live_sm3_face_01016.py in DX11 Fast run 39912972914; Win32 Build run 39912972870; exact SHA 3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "limitation": "Game-authored native draw count and visible full-frame output UNTESTED"
     },
     "unsupported_face_lane_and_d3d9ex_fallback": {
-      "status": "PENDING_CI",
+      "status": "PASS_FEATURE_CI",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
-        "src/vr/d3d11/native_backend.cpp",
-        "src/vr/d3d11/pipeline_translation.cpp",
-        "src/vr/d3d11/native_sm3_interface_channels.hpp",
-        "tools/dx11_sm3_face_compare_01016.cpp"
+        "tools/dx11_sm3_face_compare_01016.cpp",
+        "tools/test_dx11_live_sm3_face_01016.py",
+        "tools/test_dx11_live_sm3_pixel_position_01015.py",
+        "tools/test_dx11_sm3_interface_draw_00964.py"
       ],
-      "validation_command": "Not yet passed at post-causal-repair validation-bearing SHA"
+      "validation_command": "Compiled face and negative-mask/capacity assertions in DX11 Fast run 39912972914 at 3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "limitation": "Actual DX9Ex fallback/FFB/gamepad runtime not exercised"
     },
     "compiled_FACE_linker_full_exact_sha_gates": {
-      "status": "PENDING_CI",
+      "status": "PASS_FEATURE_CI",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
-        "src/vr/d3d11/native_backend.cpp",
-        "src/vr/d3d11/pipeline_translation.cpp",
-        "src/vr/d3d11/native_sm3_interface_channels.hpp",
-        "tools/dx11_sm3_face_compare_01016.cpp"
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_live_sm3_face_01016.py",
+        "tools/test_dx11_autodev_policy.py",
+        "docs/automation/runs/CONVERSION-DX11-01015.json"
       ],
-      "validation_command": "Not yet passed at post-causal-repair validation-bearing SHA"
+      "validation_command": "Five required exact-SHA GitHub Actions: Fast 39912972914; Backend 39912972882; Build 39912972870; OpenXR 39912972890; HUD 39912972994 at 3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "limitation": "Static/Win32 compile/artifact proof only; HMD and gameplay untested"
     }
   },
   "pending_items": [
-    "Confirm historical 01015 policy repair passes Backend/Fast Gate without relaxing policy",
-    "Confirm 00964 interface regression accepts new ten interpolated plus two rasterizer system inputs, forbids VS misc",
-    "Confirm 01015 vPos system semantic retains clip and mask while adding independent FACE rasterizer identity",
-    "Obtain exact-SHA five mandatory Actions success for native FACE source commit plus causal repair",
-    "Confirm 01016 compiled FACE regression and final Win32 build/bundle",
-    "Prove original OutRun game native Draw/visible game frame in real PC/Quest3 run before any gameplay/Quest3 PASS assertion"
+    "Actual OutRun authored native D3D9 Draw->D3D11 Draw count and visible full game frame not observed on hardware; separate future runtime work required",
+    "Quest3/HMD/gamepad/FFB and DX9Ex fallback runtime validation still UNTESTED",
+    "R175 TEXCOORD6 ownership 00477 not taken over in this task"
   ],
   "current_gate_failure": {
     "backend_run_id": 39911643561,
@@ -157,5 +157,99 @@
     "docs/automation/runs/CONVERSION-DX11-01016.json",
     "tools/test_dx11_sm3_interface_draw_00964.py",
     "tools/test_dx11_live_sm3_pixel_position_01015.py"
-  ]
+  ],
+  "validation_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change_pending_ssot_update": true,
+  "feature_ready_source_ci": true,
+  "feature_ready_gameplay": false,
+  "validation": {
+    "status": "PASS_EXACT_SHA",
+    "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "mandatory_check_count": 5,
+    "mandatory_checks_passed": 5,
+    "mandatory_workflow_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39912972914,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39912972882,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      },
+      {
+        "name": "Build",
+        "run_id": 39912972870,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39912972890,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39912972994,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      }
+    ],
+    "same_sha": true
+  },
+  "exact_sha_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 39912972914,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 39912972882,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 39912972870,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 39912972890,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39912972994,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    }
+  },
+  "bundle_evidence": {
+    "build_artifact_id": 12484011544,
+    "build_artifact_name": "outrun2006tweaks-3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "first_game_frame_artifact_id": 12484241293,
+    "first_game_frame_artifact_name": "feature-dx11-first-game-frame-3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "backend_artifact_name": "backend-autovalidated-3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "package_nested_zip_crc": "PASS",
+    "inner_sha256s_passed": 11,
+    "inner_sha256s_total": 11,
+    "build_identity_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "build_identity_feature_ready": false,
+    "meaning": "Compiled source verification only; not runtime gameplay validation"
+  },
+  "c6_record_role": "DOCUMENTATION_ONLY_POST_EXACT_SHA_SUCCESS_NOT_VALIDATION_BEARING",
+  "c6_source_validation_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+  "c6_no_hardware_claims": true,
+  "finalization_note": "All five required GitHub Actions succeeded on one exact source SHA; C6 docs-only commit occurs after source validation; no additional C++ code changes or runtime assertions."
 }
