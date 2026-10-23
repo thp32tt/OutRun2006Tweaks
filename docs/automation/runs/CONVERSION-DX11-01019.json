@@ -12,14 +12,14 @@
   "feature_id": "DX11:LIVE_SM3_TEMP_DRAW_UNIFORM_IFC_NATIVE_TEXTURE_DRAW",
   "work_key": "DX11:LIVE_SM3_TEMP_DRAW_UNIFORM_IFC_NATIVE_TEXTURE_DRAW",
   "work_class": "integration",
-  "feature_stage": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C2_SOURCE",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_head": "ff23b41ab28555526cc851c71e72f474ccf12f6d",
   "material_result_sha": "c005907d37bb9da1108d85ba2f65247e85513fb7",
-  "result_sha": "c005907d37bb9da1108d85ba2f65247e85513fb7",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "result_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+  "validation_bearing_result_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -103,37 +103,172 @@
   ],
   "acceptance_results": {
     "temp_uniform_ifc_native_game_draw": {
-      "status": "PENDING_EXACT_SHA",
+      "status": "PASS_FEATURE_CI",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
         "src/vr/d3d11/native_backend.cpp",
         "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
-        "tools/dx11_sm3_temp_uniform_probe_01019.cpp"
+        "tools/dx11_sm3_temp_uniform_probe_01019.cpp",
+        "tools/test_dx11_sm3_temp_uniform_01019.py"
       ],
-      "validation_command": "python tools/test_dx11_sm3_temp_uniform_01019.py; pending GitHub exact-SHA Actions"
+      "validation_command": "python tools/test_dx11_sm3_temp_uniform_01019.py; DX11 Fast Structural Checks 39930502241 SUCCESS at exact SHA 88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "limitation": "Source-linked game VS/PS/IFC/native Draw compilation only. Actual OutRun native Draw counts or visible menu/car/race screen are UNTESTED."
     },
     "varying_partial_predicate_fail_closed": {
-      "status": "PENDING_EXACT_SHA",
+      "status": "PASS_FEATURE_CI",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
         "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
-        "tools/dx11_sm3_temp_uniform_probe_01019.cpp"
+        "tools/dx11_sm3_temp_uniform_probe_01019.cpp",
+        "tools/test_dx11_sm3_temp_uniform_01019.py"
       ],
-      "validation_command": "python tools/test_dx11_sm3_temp_uniform_01019.py; pending GitHub exact-SHA Actions"
+      "validation_command": "python tools/test_dx11_sm3_temp_uniform_01019.py; compiled C++ partial lane, input/varying/branch/predicate/scratch negative cases in Fast 39930502241 at exact SHA 88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "limitation": "Real game DX9Ex fallback, FFB and input were not hardware tested; conservative original source path preserved."
     },
     "compiled_temp_proof_and_five_exact_sha_gates": {
-      "status": "PENDING_EXACT_SHA",
+      "status": "PASS_FEATURE_CI",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_backend.cpp",
+        ".github/workflows/dx11-fast-structural.yml",
         "tools/test_dx11_sm3_temp_uniform_01019.py",
-        ".github/workflows/dx11-fast-structural.yml"
+        "docs/automation/runs/CONVERSION-DX11-01019.json"
       ],
-      "validation_command": "GitHub exact-SHA mandatory Actions awaiting validation"
+      "validation_command": "Exact SHA 88e9ec628ff2d60bc2e2c6435a638c380553ac5c: DX11 Fast 39930502241, Backend 39930502236, Build 39930502048, OpenXR 39930502110, HUD 39930502467, all SUCCESS.",
+      "limitation": "GitHub build, source and static analysis proof only; no Quest3 gameplay, pixel capture or 72Hz proof."
     }
   },
   "pending_items": [
-    "Backend Conversion Gate 39929608105 FAIL at stale historical 01018 check, 01019 material record creation and corrected exact-SHA mandatory five CI pending.",
-    "Native OutRun Draw counts / visible menu/car/race / Quest3 VDXR / gamepad and FFB runtime UNTESTED; actual full renderer completion is not claimed."
+    "Actual game D3D9 Draw -> D3D11 native Draw counts / full-resolution menu, vehicle, sustained race frames remain UNTESTED; zero gameplay/Quest3/HMD proof. Need next live-capture assessment; do not claim playability.",
+    "R175 TEXCOORD6 shader color mismatch remains exclusively owned by existing 00477 while lease active; do not duplicate.",
+    "Continue same integrated game-frame milestone after this distinct TEMP IFC shader source CI stage. Preserve diagnostic opt-in and original DX9Ex renderer/input/FFB fallback."
   ],
-  "score_status": "NO_SCORE_UNTIL_NEW_INDEPENDENT_MATERIAL_RESULT_AND_EXACT_SHA_SUCCESS; SAME_TASK_ROLLOVER_NO_DUPLICATE"
+  "score_status": "ELIGIBLE_INDEPENDENT_01019_MATERIAL_CI_RESULT_ONCE; CHECK_AI_SCOREBOARD_SSOT; NO_SCORE_FOR_ROLLOVER_REPAIR_OR_C6",
+  "material_repair_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+  "validation_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "feature_ready": {
+    "status": "FEATURE_READY",
+    "feature_id": "DX11:LIVE_SM3_TEMP_DRAW_UNIFORM_IFC_NATIVE_TEXTURE_DRAW",
+    "feature_head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+    "gate_head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+    "condition": "SOURCE_AND_CI_VERIFIED_NOT_GAMEPLAY_PROVEN",
+    "acceptance_results_status": "PASS_FEATURE_CI",
+    "material_source_commit": "c005907d37bb9da1108d85ba2f65247e85513fb7",
+    "implementation_and_test_repair_commit": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+    "target_branch": "vr-dx11-native-r71",
+    "target_promotion": "LEGACY_IN_PLACE_FAST_FORWARD",
+    "target_expected_before_repair_sha": "c005907d37bb9da1108d85ba2f65247e85513fb7",
+    "target_was_behind_by": 0,
+    "force": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "validation": {
+    "status": "PASS_EXACT_SHA",
+    "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+    "same_sha": true,
+    "mandatory_check_count": 5,
+    "mandatory_checks_passed": 5,
+    "mandatory_workflow_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39930502241,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39930502236,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c"
+      },
+      {
+        "name": "Build",
+        "run_id": 39930502048,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39930502110,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39930502467,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c"
+      }
+    ],
+    "targeted_regression": "python tools/test_dx11_sm3_temp_uniform_01019.py",
+    "source_static_and_compiled_regression": "DX11 Fast Structural Checks 39930502241 SUCCESS at exact SHA",
+    "first_failed_backend_run_id": 39929608105,
+    "repair_backend_run_id": 39930502236
+  },
+  "exact_sha_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 39930502241,
+      "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 39930502236,
+      "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 39930502048,
+      "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 39930502110,
+      "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39930502467,
+      "head_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "conclusion": "success"
+    }
+  },
+  "bundle_evidence": [
+    {
+      "workflow": "Build",
+      "name": "outrun2006tweaks-88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "artifact_id": 12491871143,
+      "available": true
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "name": "backend-autovalidated-88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "artifact_id": 12491726862,
+      "available": true
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "name": "feature-dx11-first-game-frame-88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "artifact_id": 12491538018,
+      "available": true
+    },
+    {
+      "workflow": "HUD Inspector CI",
+      "name": "OR2006C2C-EXE-HUD-analysis-88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+      "artifact_id": 12491328115,
+      "available": true
+    }
+  ],
+  "c6_record_role": "DOCUMENTATION_ONLY_POST_EXACT_SHA_SUCCESS_NOT_VALIDATION_BEARING",
+  "c6_source_validation_sha": "88e9ec628ff2d60bc2e2c6435a638c380553ac5c",
+  "c6_no_hardware_claims": true,
+  "next_implementation_action": "NEXT_SOURCE_FILE=src/vr/d3d11/native_backend.cpp; REAL_GAME_DRAW_BLOCKER=actual playable native frame not yet measured; NATIVE_GAME_DRAW_COUNT=UNTESTED; NATIVE_PUBLISHED_FRAME_COUNT=UNTESTED; CODE_CHANGED_SHA=88e9ec628ff2d60bc2e2c6435a638c380553ac5c; NEXT_IMPLEMENTATION_ACTION=advance real live D3D9 Draw shader/resource translation into D3D11 Draw and visible full-frame source, without touching 00477 R175 ownership.",
+  "source_implementation_time_ratio": "UNMEASURED"
 }
