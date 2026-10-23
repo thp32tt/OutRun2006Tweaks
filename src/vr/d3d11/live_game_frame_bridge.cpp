@@ -10,6 +10,7 @@
 #include "live_game_sm3_partial_color.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_sm3_stream_assembly.hpp"
+#include "live_game_sm3_instance_batches.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
@@ -5293,6 +5294,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         }
     }
+    // Only independent D3D9 lists can merge instances into one GPU Draw:
+    // strips/fans would otherwise create geometry across instance edges.
+    const bool compactListInstances = sourceInstancing && instanceCount > 1u &&
+        game_sm3_independent_list(static_cast<std::uint32_t>(type));
+    std::vector<std::uint32_t> compactListIndices;
+    if (compactListInstances && nativeIndices) {
+        if (!game_sm3_expand_list_instance_indices(
+                nativeIndices, nativeIndexCount, vertexCount, instanceCount,
+                compactListIndices)) return false;
+        nativeIndices = compactListIndices.data();
+        nativeIndexCount = static_cast<UINT>(compactListIndices.size());
+    }
     // Keep input-layout cache identity separate when an instanced draw
     // requires source FLOAT4 packing even for already-float declarations.
     if (sourceInstancing && !repack) {
@@ -5724,7 +5737,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         return false;
     if (nativeIndices) {
         for (UINT i = 0; i < nativeIndexCount; ++i)
-            if (nativeIndices[i] >= vertexCount) return false;
+            if (nativeIndices[i] >= (compactListInstances ? expandedVertices : vertexCount)) return false;
         const UINT indexBytes = nativeIndexCount * sizeof(std::uint32_t);
         if (!ensure_full_game_upload_buffer(device, s.fullGameIndexUpload,
                                             s.fullGameIndexCapacity, indexBytes,
@@ -5916,15 +5929,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     context->VSSetSamplers(0u, 4u, boundVertexSamplers.data());
     context->PSSetShaderResources(0u, 16u, boundViews.data());
     context->PSSetSamplers(0u, 16u, boundSamplers.data());
-    // D3D9 single-source Draw with stream frequency N submits N native GPU
-    // primitives. Each independent strip/fan/list keeps its own topology;
-    // indexed draws reuse the original IB but rebase into each packed VB slice.
-    for (UINT instance = 0u; instance < instanceCount; ++instance) {
-        const UINT base = instance * vertexCount;
-        if (nativeIndices)
-            context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));
-        else
-            context->Draw(vertexCount, base);
+    // Source instance attributes and independent list indices are packed in
+    // source order. Batch lists, preserving separate fan/strip boundaries.
+    if (compactListInstances) {
+        if (nativeIndices) context->DrawIndexed(nativeIndexCount, 0u, 0);
+        else context->Draw(static_cast<UINT>(expandedVertices), 0u);
+    } else {
+        for (UINT instance = 0u; instance < instanceCount; ++instance) {
+            const UINT base = instance * vertexCount;
+            if (nativeIndices)
+                context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));
+            else context->Draw(vertexCount, base);
+        }
     }
     s.pending = true;
     ++s.issued;
