@@ -38,6 +38,33 @@ enum class LiveSm3Blend : std::uint8_t {
     std::uint32_t src, std::uint32_t dst) noexcept {
     return src == 12u ? 6u : src == 13u ? 5u : dst;
 }
+// Original D3D9 blend state getters are required only for channels the
+// intercepted game's RT0 Draw actually writes. Alpha-only with independent
+// alpha has no dependency on stale RGB factors. Depth-only cannot consume
+// either equation. Leave malformed/unknown written-channel state fail-closed.
+[[nodiscard]] constexpr bool live_sm3_queries_separate_alpha(
+    bool blendEnabled, std::uint32_t colorWriteMask) noexcept {
+    return blendEnabled && (colorWriteMask & 0x08u) != 0u;
+}
+[[nodiscard]] constexpr bool live_sm3_queries_rgb_blend(
+    bool blendEnabled, std::uint32_t colorWriteMask,
+    bool separateAlpha) noexcept {
+    return blendEnabled &&
+        ((colorWriteMask & 0x07u) != 0u ||
+         ((colorWriteMask & 0x08u) != 0u && !separateAlpha));
+}
+static_assert(!live_sm3_queries_separate_alpha(true, 0x00u) &&
+              !live_sm3_queries_separate_alpha(true, 0x07u) &&
+              live_sm3_queries_separate_alpha(true, 0x08u) &&
+              live_sm3_queries_separate_alpha(true, 0x0fu) &&
+              !live_sm3_queries_separate_alpha(false, 0x0fu));
+static_assert(!live_sm3_queries_rgb_blend(true, 0x00u, true) &&
+              !live_sm3_queries_rgb_blend(true, 0x08u, true) &&
+              live_sm3_queries_rgb_blend(true, 0x08u, false) &&
+              live_sm3_queries_rgb_blend(true, 0x07u, true) &&
+              live_sm3_queries_rgb_blend(true, 0x0fu, true) &&
+              !live_sm3_queries_rgb_blend(false, 0x0fu, false));
+
 // Only a channel actually written by the game's RT0 mask can consume the
 // dynamic OM constant. Independent alpha is ignored for RGB-only Draws;
 // RGB factors are still the alpha factors when separate alpha is disabled.

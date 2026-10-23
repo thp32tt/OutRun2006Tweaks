@@ -135,6 +135,18 @@ require("!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,", fvf)
 require("output.separateAlphaBlend = true;", fvf)
 assert fvf.index("if (activeSeparateAlpha) {") < fvf.index("D3DRS_SRCBLENDALPHA")
 
+# Original D3D9 blend queries follow the actual RT0 write dependencies:
+# depth-only: no blend equation; independent alpha-only: no RGB equation.
+# Both mixed RGB and non-independent alpha must still read real source state.
+require("live_sm3_queries_separate_alpha(blend != FALSE, colorMask)", game)
+require("live_sm3_queries_rgb_blend(", game)
+require("D3DRS_SEPARATEALPHABLENDENABLE, &separateAlpha)", game)
+assert game.index("D3DRS_SEPARATEALPHABLENDENABLE") < game.index("D3DRS_SRCBLEND")
+require("!live_sm3_queries_rgb_blend(true, 0x08u, true)", portable)
+require("live_sm3_queries_rgb_blend(true, 0x08u, false)", portable)
+require("live_sm3_queries_rgb_blend(true, 0x07u, true)", portable)
+require("!live_sm3_queries_rgb_blend(true, 0x00u, true)", portable)
+
 # Actual shader-bound game Draw/DrawIndexed must query independent-alpha
 # render states only if alpha is written. Stale alpha in a RGB-only or
 # depth-only Draw must not abort the contiguous native game frame; actual

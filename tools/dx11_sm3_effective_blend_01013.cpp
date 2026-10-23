@@ -26,4 +26,16 @@ int main() {
         true, 14u, 15u, true, 14u, 15u, 0x00u));
     assert(!live_sm3_needs_dynamic_blend_factor(
         true, 14u, 15u, true, 14u, 15u, 0x10u));
+    // Real game Draw query contract: depth-only and independent alpha
+    // cannot consume the previous Draw's RGB blend equation.
+    assert(!live_sm3_queries_separate_alpha(true, 0x00u));
+    assert(!live_sm3_queries_separate_alpha(true, 0x07u));
+    assert(live_sm3_queries_separate_alpha(true, 0x08u));
+    assert(!live_sm3_queries_separate_alpha(false, 0x0fu));
+    assert(!live_sm3_queries_rgb_blend(true, 0x00u, false));
+    assert(!live_sm3_queries_rgb_blend(true, 0x08u, true));
+    assert(live_sm3_queries_rgb_blend(true, 0x08u, false));
+    assert(live_sm3_queries_rgb_blend(true, 0x07u, true));
+    assert(live_sm3_queries_rgb_blend(true, 0x0fu, true));
+    assert(!live_sm3_queries_rgb_blend(false, 0x0fu, false));
 }

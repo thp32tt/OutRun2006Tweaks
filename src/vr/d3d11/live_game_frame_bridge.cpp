@@ -5196,7 +5196,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     DWORD blend = TRUE, alpha = TRUE, stencil = TRUE, depth = TRUE;
     DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, clipping = FALSE, fill = 0u;
     DWORD colorMask = 0u, cull = 0u, srgbWrite = TRUE;
-    DWORD srcBlend = 0u, dstBlend = 0u, blendOp = 0u, separateAlpha = TRUE;
+    DWORD srcBlend = 0u, dstBlend = 0u, blendOp = 0u, separateAlpha = FALSE;
     DWORD srcBlendAlpha = 0u, dstBlendAlpha = 0u, blendOpAlpha = 0u;
     DWORD alphaFunc = 0u, alphaRef = 0u;
     D3DVIEWPORT9 viewport{};
@@ -5358,12 +5358,21 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     if (!game_native_cull_admission(
             cull, static_cast<std::uint32_t>(type), nativeCull))
         return false;
-    if (blend != FALSE &&
+    // The game can write depth with RT0 color completely masked off, or
+    // write only independent alpha. D3D9 blend getters in a dormant channel
+    // must not poison the contiguous native source-frame batch. Query the
+    // separate-alpha enable only when alpha is written, then query the
+    // RGB equation only if an actual written channel consumes it.
+    // Every consumed original D3D9 state remains strictly fail-closed.
+    if (live_sm3_queries_separate_alpha(blend != FALSE, colorMask) &&
+        FAILED(game->GetRenderState(
+            D3DRS_SEPARATEALPHABLENDENABLE, &separateAlpha)))
+        return false;
+    if (live_sm3_queries_rgb_blend(
+            blend != FALSE, colorMask, separateAlpha != FALSE) &&
         (FAILED(game->GetRenderState(D3DRS_SRCBLEND, &srcBlend)) ||
          FAILED(game->GetRenderState(D3DRS_DESTBLEND, &dstBlend)) ||
-         FAILED(game->GetRenderState(D3DRS_BLENDOP, &blendOp)) ||
-         FAILED(game->GetRenderState(
-             D3DRS_SEPARATEALPHABLENDENABLE, &separateAlpha))))
+         FAILED(game->GetRenderState(D3DRS_BLENDOP, &blendOp))))
         return false;
     // The authentic RT0 write mask controls alpha-state consumption.
     // RGB-only (and depth-only) menu/car/race SM3 Draws must not fail
