@@ -304,6 +304,17 @@ bool r283_hlsl_semantic(
     bool output,
     std::string& label) {
     label.clear();
+    if (semantic.registerType == D3DSPR_MISCTYPE) {
+        if (!native_sm3_pixel_position_declaration(
+                vertexStage, semantic.registerIndex,
+                static_cast<unsigned>(
+                    (semantic.writeMask & D3DSP_WRITEMASK_ALL) >> 16u)) ||
+            output || semantic.usage != D3DDECLUSAGE_POSITION ||
+            semantic.usageIndex != 0u)
+            return false;
+        label = "SV_Position";
+        return true;
+    }
     const char* name = native_sm3_interface_semantic(
         static_cast<unsigned>(semantic.usage), vertexStage,
         output, semantic.usageIndex);
@@ -346,20 +357,33 @@ bool build_r283_sm3_mov_shader_source(
         std::vector<ProgrammableShaderInterfaceSemantic> inputs, outputs;
         std::array<unsigned, 16> inputDeclaredMasks{};
         std::array<unsigned, 16> outputDeclaredMasks{};
+        bool positionDeclared = false;
         for (const auto& semantic : interfaceSemantics.semantics) {
             const unsigned mask =
                 static_cast<unsigned>((semantic.writeMask &
                                        D3DSP_WRITEMASK_ALL) >> 16u);
+            const bool pixelPosition =
+                semantic.input &&
+                semantic.registerType == D3DSPR_MISCTYPE &&
+                semantic.usage == D3DDECLUSAGE_POSITION &&
+                semantic.usageIndex == 0u &&
+                native_sm3_pixel_position_declaration(
+                    vertexStage, semantic.registerIndex, mask);
             if (mask == 0u || semantic.registerIndex >= 16u ||
-                !native_sm3_interface_semantic(
+                (!pixelPosition && !native_sm3_interface_semantic(
                     static_cast<unsigned>(semantic.usage), vertexStage,
-                    semantic.output, semantic.usageIndex))
+                    semantic.output, semantic.usageIndex)))
                 return false;
             if (semantic.input) {
-                if (semantic.registerType != D3DSPR_INPUT ||
-                    inputDeclaredMasks[semantic.registerIndex] != 0u)
-                    return false;
-                inputDeclaredMasks[semantic.registerIndex] = mask;
+                if (pixelPosition) {
+                    if (positionDeclared) return false;
+                    positionDeclared = true;
+                } else {
+                    if (semantic.registerType != D3DSPR_INPUT ||
+                        inputDeclaredMasks[semantic.registerIndex] != 0u)
+                        return false;
+                    inputDeclaredMasks[semantic.registerIndex] = mask;
+                }
                 inputs.push_back(semantic);
             } else if (semantic.output) {
                 if (semantic.registerType != D3DSPR_OUTPUT ||
@@ -709,6 +733,12 @@ bool build_r283_sm3_mov_shader_source(
                                 inputDeclaredMasks[reg], requiredComponents))
                             return false;
                         value = "input.r" + std::to_string(reg);
+                    } else if (kind == D3DSPR_MISCTYPE) {
+                        if (!positionDeclared ||
+                            reg != static_cast<UINT>(D3DSMO_POSITION) ||
+                            !native_sm3_pixel_position_source(requiredComponents))
+                            return false;
+                        value = "input.r283_vpos";
                     } else if (kind == D3DSPR_CONST) {
                         if (reg >= constantLimit ||
                             !native_sm3_const_reference(
@@ -1338,6 +1368,25 @@ bool build_r283_sm3_mov_shader_source(
                             inputDeclaredMasks[reg], required))
                         return false;
                     value = "input.r" + std::to_string(reg);
+                } else if (kind == D3DSPR_MISCTYPE) {
+                    const unsigned logicalComponents =
+                        op.texture2d
+                            ? (op.textureCube
+                                 ? native_sm3_cube_source_components(op.textureMode, i)
+                                 : op.textureVolume ? native_sm3_volume_source_components(op.textureMode, i)
+                                                    : native_sm3_texture_source_components(op.textureMode, i))
+                            : op.matrixRowCount != 0u
+                                ? (op.matrixVectorComponents == 4u ? 15u : 7u)
+                                : native_sm3_source_components(op.opcode, mask, i);
+                    const unsigned required =
+                        native_sm3_swizzled_components(
+                            native_sm3_source_modifier_components(
+                                logicalComponents, modifier), swizzle);
+                    if (!positionDeclared || vertexStage ||
+                        reg != static_cast<UINT>(D3DSMO_POSITION) ||
+                        !native_sm3_pixel_position_source(required))
+                        return false;
+                    value = "input.r283_vpos";
                 } else if (kind == D3DSPR_CONST) {
                     if (relative && staticAddress) {
                         unsigned index = 0u;
@@ -1506,8 +1555,10 @@ bool build_r283_sm3_mov_shader_source(
             std::string label;
             if (!r283_hlsl_semantic(semantic, vertexStage, false, label))
                 return false;
-            translated += "    float4 r" +
-                std::to_string(semantic.registerIndex) +
+            translated += "    float4 " +
+                (semantic.registerType == D3DSPR_MISCTYPE
+                    ? std::string("r283_vpos")
+                    : "r" + std::to_string(semantic.registerIndex)) +
                 " : " + label + ";\n";
         }
         translated += "};\n";

@@ -2201,8 +2201,14 @@ namespace outrun::vr::dx11
                     continue;
                 }
 
+                // Pixel ps_3_0 vPos is supplied by the rasterizer.
+                // Unsupported vFace/misc variants preserve D3D9 fallback.
+                const bool pixelPosition =
+                    !decode.vertexStage &&
+                    registerType == D3DSPR_MISCTYPE &&
+                    registerIndex == static_cast<UINT>(D3DSMO_POSITION);
                 const bool input =
-                    registerType == D3DSPR_INPUT;
+                    registerType == D3DSPR_INPUT || pixelPosition;
                 const bool output =
                     decode.vertexStage &&
                     registerType == D3DSPR_OUTPUT;
@@ -2214,21 +2220,26 @@ namespace outrun::vr::dx11
                 if (writeMask == 0u)
                     return out;
 
-                if ((declarationInfo &
-                     ~(kDclInfoTokenMarker |
-                       kDclUsageMask |
-                       kDclUsageIndexMask)) != 0u)
+                if (pixelPosition
+                        ? (declarationInfo != kDclInfoTokenMarker ||
+                           writeMask != D3DSP_WRITEMASK_ALL)
+                        : ((declarationInfo &
+                            ~(kDclInfoTokenMarker |
+                              kDclUsageMask |
+                              kDclUsageIndexMask)) != 0u))
                     return out;
                 const DWORD rawUsage =
                     declarationInfo & kDclUsageMask;
-                if (rawUsage >
-                    static_cast<DWORD>(D3DDECLUSAGE_SAMPLE))
+                if (!pixelPosition &&
+                    rawUsage > static_cast<DWORD>(D3DDECLUSAGE_SAMPLE))
                     return out;
-                const auto usage =
-                    static_cast<D3DDECLUSAGE>(rawUsage);
-                const UINT usageIndex = static_cast<UINT>(
-                    (declarationInfo & kDclUsageIndexMask) >>
-                    kDclUsageIndexShift);
+                const auto usage = pixelPosition
+                    ? D3DDECLUSAGE_POSITION
+                    : static_cast<D3DDECLUSAGE>(rawUsage);
+                const UINT usageIndex = pixelPosition ? 0u :
+                    static_cast<UINT>(
+                        (declarationInfo & kDclUsageIndexMask) >>
+                        kDclUsageIndexShift);
 
                 if (output &&
                     (usage == D3DDECLUSAGE_POSITION ||
@@ -2360,6 +2371,32 @@ namespace outrun::vr::dx11
 
         for (const auto& pixelInput : pixelSemantics.semantics)
         {
+            if (pixelInput.registerType == D3DSPR_MISCTYPE)
+            {
+                // SV_Position arrives from rasterization rather than an
+                // interpolated VS varying. Still require the game's real
+                // full clip-position output before authorizing the GPU pair.
+                if (pixelInput.registerIndex !=
+                        static_cast<UINT>(D3DSMO_POSITION) ||
+                    pixelInput.usage != D3DDECLUSAGE_POSITION ||
+                    pixelInput.usageIndex != 0u ||
+                    pixelInput.writeMask != D3DSP_WRITEMASK_ALL)
+                    return out;
+                bool clipPosition = false;
+                for (const auto& vertexOutput : vertexSemantics.semantics)
+                    if (vertexOutput.output &&
+                        vertexOutput.usage == D3DDECLUSAGE_POSITION &&
+                        vertexOutput.usageIndex == 0u &&
+                        vertexOutput.writeMask == D3DSP_WRITEMASK_ALL)
+                        clipPosition = true;
+                if (!clipPosition) return out;
+                ++out.matchedSemanticCount;
+                mix(static_cast<DWORD>(pixelInput.registerType));
+                mix(pixelInput.registerIndex);
+                mix(pixelInput.writeMask);
+                mix(0x56504f53u); // vPos system semantic, not a VS varying
+                continue;
+            }
             const ProgrammableShaderInterfaceSemantic* match = nullptr;
             for (const auto& vertexOutput : vertexSemantics.semantics)
             {

@@ -23,6 +23,17 @@ namespace outrun::vr::dx11 {
     }
 }
 
+// ps_3_0 dcl vPos is a rasterizer system input, not an interpolated v#.
+// D3D9 defines only xy; z/w and vFace never become synthetic game data.
+[[nodiscard]] constexpr bool native_sm3_pixel_position_declaration(
+    bool vertexStage, unsigned registerIndex, unsigned mask) noexcept {
+    return !vertexStage && registerIndex == 0u && mask == 0x0fu;
+}
+[[nodiscard]] constexpr bool native_sm3_pixel_position_source(
+    unsigned physicalReadMask) noexcept {
+    return physicalReadMask != 0u && (physicalReadMask & ~0x03u) == 0u;
+}
+
 // Reject any physical source lane that D3D9 did not declare. A native HLSL
 // float4 with zero-initialized missing channels is NOT input provenance.
 [[nodiscard]] constexpr bool native_sm3_declared_components_cover(
