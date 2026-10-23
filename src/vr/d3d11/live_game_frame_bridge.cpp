@@ -7980,6 +7980,26 @@ bool preserve_game_partial_target_clear(
             if (game->GetRenderTarget(i, extra.GetAddressOf()) != D3DERR_NOTFOUND)
                 return false;
         }
+        // A clipped TARGET-only Clear before the first source GPU Draw
+        // previously aborted the full-frame SM3/FVF path, losing valid menu
+        // or car-select pixels. Record its viewport-clipped source rectangles
+        // in the SAME ordered pre-Draw transaction as actual ColorFills.
+        // Whole game Clears are new seeds and must use observe_game_clear.
+        // Reject Z/stencil, foreign, unowned and over-capacity commands
+        // without modifying any native GPU pixels or original D3D9 output.
+        if (!clearZ && !clearStencil && sameBackbuffer &&
+            s.sourceGameDevice == owner && !s.pending &&
+            s.frameBatch.submitted == 0u && !s.frameBatch.stopped &&
+            s.frameBatch.accepts_full(s.sourceDrawsThisFrame) &&
+            count <= GameNativePreDrawFills::kCapacity &&
+            !GameNativeClearCoverage::covers_whole(
+                backbufferDesc.Width, backbufferDesc.Height,
+                vp.X, vp.Y, vp.Width, vp.Height, count, rects)) {
+            return s.preDrawFills.record_target_clear(
+                owner, reinterpret_cast<std::uintptr_t>(bbIdentity.Get()),
+                backbufferDesc.Width, backbufferDesc.Height,
+                vp.X, vp.Y, vp.Width, vp.Height, count, rects, color);
+        }
         if (!GameNativeSourceMutation::mirrors_partial_target_clear(
                 true, true, s.sourceGameDevice == owner, sameBackbuffer,
                 s.pending && !s.frameBatch.stopped &&

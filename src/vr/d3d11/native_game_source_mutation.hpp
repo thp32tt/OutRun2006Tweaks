@@ -222,5 +222,47 @@ struct GameNativePreDrawFills {
         count = output;
         return true;
     }
+
+    // Successful game TARGET-only Clear before the first Draw is an ordered
+    // backbuffer color overwrite, just like ColorFill. Stage the *entire*
+    // D3DRECT batch to avoid publishing a prefix on capacity/owner failure.
+    // The caller handles whole-surface Clears as a new scene epoch instead.
+    template<class Rect>
+    [[nodiscard]] constexpr bool record_target_clear(
+        std::uintptr_t currentDevice, std::uintptr_t currentBackbuffer,
+        std::uint32_t width, std::uint32_t height,
+        std::uint32_t viewportX, std::uint32_t viewportY,
+        std::uint32_t viewportWidth, std::uint32_t viewportHeight,
+        std::uint32_t rectCount, const Rect* rects,
+        std::uint32_t color) noexcept {
+        if (!currentDevice || !currentBackbuffer ||
+            rectCount > kCapacity || (rectCount && !rects) ||
+            (count && !belongs_to(currentDevice, currentBackbuffer)))
+            return false;
+        GameNativePreDrawFills staged = *this;
+        for (std::uint32_t i = 0u; i < (rectCount ? rectCount : 1u); ++i) {
+            const std::int64_t l = rectCount ? rects[i].x1 : viewportX;
+            const std::int64_t t = rectCount ? rects[i].y1 : viewportY;
+            const std::int64_t r = rectCount ? rects[i].x2 :
+                static_cast<std::int64_t>(viewportX) + viewportWidth;
+            const std::int64_t b = rectCount ? rects[i].y2 :
+                static_cast<std::int64_t>(viewportY) + viewportHeight;
+            GameNativeSourceMutation::TargetClearRect clipped{};
+            const auto coverage = GameNativeSourceMutation::classify_target_clear_rect(
+                l, t, r, b, viewportX, viewportY, viewportWidth,
+                viewportHeight, width, height, clipped);
+            if (coverage == GameNativeSourceMutation::TargetClearClip::Invalid)
+                return false;
+            if (coverage == GameNativeSourceMutation::TargetClearClip::Empty)
+                continue; // D3D9 performed no pixel write.
+            if (!staged.record(currentDevice, currentBackbuffer,
+                               clipped.left, clipped.top,
+                               clipped.right, clipped.bottom,
+                               width, height, color))
+                return false;
+        }
+        *this = staged;
+        return true;
+    }
 };
 } // namespace outrun::vr::dx11::live_game_frame
