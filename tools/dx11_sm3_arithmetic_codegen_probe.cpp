@@ -211,14 +211,16 @@ int main() {
     // zeros may turn an unwritten channel into a native pixel discard.
     std::string killSource;
     static_assert(native_sm3_texkill_ready(2u, 15u));
-    static_assert(!native_sm3_texkill_ready(2u, 7u));
+    static_assert(native_sm3_texkill_ready(2u, 7u));
+    static_assert(!native_sm3_texkill_ready(2u, 3u));
     static_assert(!native_sm3_texkill_ready(2u, 0u));
     static_assert(!native_sm3_texkill_ready(32u, 15u));
     assert(append_native_sm3_texkill(killSource, 2u, 15u, 0u));
     assert(killSource == "    clip(r283_t2.xyz);\n");
-    assert(!append_native_sm3_texkill(killSource, 2u, 7u, 1u));
+    assert(append_native_sm3_texkill(killSource, 2u, 7u, 1u));
+    assert(!append_native_sm3_texkill(killSource, 2u, 3u, 2u));
     assert(!append_native_sm3_texkill(killSource, 32u, 15u, 1u));
-    assert(killSource == "    clip(r283_t2.xyz);\n");
+    assert(killSource == "    clip(r283_t2.xyz);\n    clip(r283_t2.xyz);\n");
     // Real backend rejects unwritten lanes even after a partial write.
     const unsigned tempWrittenX = 1u;
     const unsigned movReadX = native_sm3_swizzled_components(
