@@ -1,0 +1,419 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0115KST-NEW-SHA8",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "checked_at_kst": "2026-10-24 01:15+09:00 (run slot)",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "historical_reviewed_sha_count": 626,
+  "new_candidate_sha_count": 8,
+  "qa_counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "source_manifest_sha_matches": 8,
+  "source_sent_sha_matches": 8,
+  "candidate_export_sha_matches": 8,
+  "transparent_rgba_png_count": 8,
+  "original_ui_cell_placement_verified": 0,
+  "source_roi_with_multiple_ui_labels": 8,
+  "scope": "PNG text layer, image visually compared with English source, alpha white-matte, source/candidate SHA. Original HD UV cell re-composition is NOT verified.",
+  "n100_evidence": {
+    "metrics": "work/C1_QA_20261024_0115_metrics.json",
+    "comparison_A": "work/C1_QA_20261024_0115_A_pairs.jpg",
+    "comparison_B": "work/C1_QA_20261024_0115_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261024_0115_white.jpg"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "final_dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0059-51470E57",
+      "ordinal": 293,
+      "english": "PLAYERS",
+      "approved_korean": "플레이어",
+      "source_png": "Q225_a86b18f9c1f33370_source.png",
+      "candidate_png": "Q225_a86b18f9c1f33370_source_k.png",
+      "source_sha256": "f3086a81300c3a4e0787cbda701f8f14f9a15ab0d62abff4f6af0e8960fcb0d8",
+      "candidate_sha256": "97973304ea5268f9ff81b252845696fc6032ffa78e30254d3d958031e35cea40",
+      "original_dds_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+      "source_dimensions": [
+        956,
+        278
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        612,
+        207,
+        1701,
+        724
+      ],
+      "candidate_visible_alpha_edge_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "source_contains_adjacent_ui": true,
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS_ON_VISUAL_COMPARISON",
+      "korean_text_effect_only_on_white_matte": "PASS_VISUAL",
+      "shorter_translation_not_a_failure": true,
+      "scoped_png_qa": "PASS_OBSERVATION_ONLY",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_CONTAINS_OTHER_UI; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_PROTECTED_ART_CONTAINMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0059-51470E57",
+      "ordinal": 292,
+      "english": "CATCH-UP",
+      "approved_korean": "추격 보정",
+      "source_png": "Q225_8d195a14f15d02ce_source.png",
+      "candidate_png": "Q225_8d195a14f15d02ce_source_k.png",
+      "source_sha256": "4d91d7b62055624515311ff86f33447e516133fc4b1b0b906ba52f0630d3252d",
+      "candidate_sha256": "bbfea11d5816a2227a4601775edb5cbf804611e801b1d424ab3afd9bb8d1bf01",
+      "original_dds_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+      "source_dimensions": [
+        501,
+        210
+      ],
+      "candidate_dimensions": [
+        1937,
+        812
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        218,
+        9,
+        1465,
+        642
+      ],
+      "candidate_visible_alpha_edge_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "source_contains_adjacent_ui": true,
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS_ON_VISUAL_COMPARISON",
+      "korean_text_effect_only_on_white_matte": "PASS_VISUAL",
+      "shorter_translation_not_a_failure": true,
+      "scoped_png_qa": "PASS_OBSERVATION_ONLY",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_CONTAINS_OTHER_UI; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_PROTECTED_ART_CONTAINMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0059-51470E57",
+      "ordinal": 291,
+      "english": "SPECIAL REQUEST 2",
+      "approved_korean": "스페셜 요청 2",
+      "source_png": "Q132_53698138cb5111c3_source.png",
+      "candidate_png": "Q132_53698138cb5111c3_source_k.png",
+      "source_sha256": "460ac86079e1c29c5d274089d181079c12bd065b1fef146e2fea14e9c5f42f33",
+      "candidate_sha256": "657563cc2fba78659fb26d90dcb6d9f7702118348d4766c00358a62a3b27b78e",
+      "original_dds_sha256": "2a02471fe95e0c4253cf72ec58423cb9d16ae074e3012418716e88e75e2a2a80",
+      "source_dimensions": [
+        1361,
+        349
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        0,
+        32,
+        2088,
+        682
+      ],
+      "candidate_visible_alpha_edge_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "source_contains_adjacent_ui": true,
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS_ON_VISUAL_COMPARISON",
+      "korean_text_effect_only_on_white_matte": "PASS_VISUAL",
+      "shorter_translation_not_a_failure": true,
+      "scoped_png_qa": "PASS_OBSERVATION_ONLY",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_CONTAINS_OTHER_UI; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_PROTECTED_ART_CONTAINMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0059-51470E57",
+      "ordinal": 290,
+      "english": "Maximum Speed",
+      "approved_korean": "최고 속도",
+      "source_png": "Q121_30667e7a5825aca0_source.png",
+      "candidate_png": "Q121_30667e7a5825aca0_source_k.png",
+      "source_sha256": "6892904b418ec91c1a28aca5fb9f2b17181b6693ebff8b8d57a54c35afa21ef4",
+      "candidate_sha256": "f33998d01c2679e8217dfd6f6e94d9dbfea51dd4f2c8b5ce0cb906e909b09176",
+      "original_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "source_dimensions": [
+        818,
+        292
+      ],
+      "candidate_dimensions": [
+        2099,
+        749
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        119,
+        50,
+        1905,
+        694
+      ],
+      "candidate_visible_alpha_edge_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "source_contains_adjacent_ui": true,
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS_ON_VISUAL_COMPARISON",
+      "korean_text_effect_only_on_white_matte": "PASS_VISUAL",
+      "shorter_translation_not_a_failure": true,
+      "scoped_png_qa": "PASS_OBSERVATION_ONLY",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_CONTAINS_OTHER_UI; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_PROTECTED_ART_CONTAINMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0072-021BD751",
+      "ordinal": 349,
+      "english": "CONTINUE?",
+      "approved_korean": "계속?",
+      "source_png": "Q060_c0aeee0db065202c_source.png",
+      "candidate_png": "Q060_c0aeee0db065202c_source_k.png",
+      "source_sha256": "7d0e6a09557a8147dd01b3c70ca3de9151bb2c86898f1090b8e5a7e6706a19b3",
+      "candidate_sha256": "aca4a2267c952ae7388e6b38d6d6c3ce14d0e5be81c9ecbd1c33f3a46749cdc2",
+      "original_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "source_dimensions": [
+        1542,
+        709
+      ],
+      "candidate_dimensions": [
+        1849,
+        851
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        29,
+        25,
+        1809,
+        851
+      ],
+      "candidate_visible_alpha_edge_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "source_contains_adjacent_ui": true,
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS_ON_VISUAL_COMPARISON",
+      "korean_text_effect_only_on_white_matte": "PASS_VISUAL",
+      "shorter_translation_not_a_failure": true,
+      "scoped_png_qa": "PASS_OBSERVATION_ONLY",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_CONTAINS_OTHER_UI; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_PROTECTED_ART_CONTAINMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0072-021BD751",
+      "ordinal": 348,
+      "english": "COURSE",
+      "approved_korean": "코스",
+      "source_png": "Q225_3964c5c25fb1326e_source.png",
+      "candidate_png": "Q225_3964c5c25fb1326e_source_k.png",
+      "source_sha256": "86a108eaee8f9791f6432721dca3dafe0a46bb45885d48f313f771bd7141a901",
+      "candidate_sha256": "f1f5e753ff343d26b791e81326b0de605a77c37bf418b9e93fd702346d16e3b0",
+      "original_dds_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+      "source_dimensions": [
+        459,
+        210
+      ],
+      "candidate_dimensions": [
+        1853,
+        849
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        450,
+        115,
+        1460,
+        713
+      ],
+      "candidate_visible_alpha_edge_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "source_contains_adjacent_ui": true,
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS_ON_VISUAL_COMPARISON",
+      "korean_text_effect_only_on_white_matte": "PASS_VISUAL",
+      "shorter_translation_not_a_failure": true,
+      "scoped_png_qa": "PASS_OBSERVATION_ONLY",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_CONTAINS_OTHER_UI; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_PROTECTED_ART_CONTAINMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0072-021BD751",
+      "ordinal": 347,
+      "english": "COURSE",
+      "approved_korean": "코스",
+      "source_png": "Q225_084e5c2b38f73d6e_source.png",
+      "candidate_png": "Q225_084e5c2b38f73d6e_source_k.png",
+      "source_sha256": "2144cdbafdea0030080c81ffb894fecaba1308475060db1abcf93f1112eb8059",
+      "candidate_sha256": "68043ced5c55a73e7eb5a3469219d033c64316dfdc064f5c076d71ccb06838cb",
+      "original_dds_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+      "source_dimensions": [
+        459,
+        210
+      ],
+      "candidate_dimensions": [
+        1853,
+        849
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        406,
+        115,
+        1646,
+        759
+      ],
+      "candidate_visible_alpha_edge_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "source_contains_adjacent_ui": true,
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS_ON_VISUAL_COMPARISON",
+      "korean_text_effect_only_on_white_matte": "PASS_VISUAL",
+      "shorter_translation_not_a_failure": true,
+      "scoped_png_qa": "PASS_OBSERVATION_ONLY",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_CONTAINS_OTHER_UI; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_PROTECTED_ART_CONTAINMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0072-021BD751",
+      "ordinal": 346,
+      "english": "TIME ATTACK",
+      "approved_korean": "타임 어택",
+      "source_png": "Q220_5f9b58e045e6007c_source.png",
+      "candidate_png": "Q220_5f9b58e045e6007c_source_k.png",
+      "source_sha256": "fc051eb75bcf211c2afeb8ad33ed124956f8e7af0eb8912dcdf28416d098a445",
+      "candidate_sha256": "9d080394cecb3c88a6ba07afa261ae8aad9bc485ef5ad22ad2839d4bb4cfbb6b",
+      "original_dds_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "source_dimensions": [
+        1777,
+        402
+      ],
+      "candidate_dimensions": [
+        2033,
+        773
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        91,
+        9,
+        1943,
+        723
+      ],
+      "candidate_visible_alpha_edge_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "source_contains_adjacent_ui": true,
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS_ON_VISUAL_COMPARISON",
+      "korean_text_effect_only_on_white_matte": "PASS_VISUAL",
+      "shorter_translation_not_a_failure": true,
+      "scoped_png_qa": "PASS_OBSERVATION_ONLY",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_CONTAINS_OTHER_UI; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_PROTECTED_ART_CONTAINMENT_UNVERIFIED",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    }
+  ]
+}
