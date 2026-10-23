@@ -11,10 +11,10 @@
   "feature_id": "DX11:LIVE_PREDRAW_PARTIAL_DEPTH_NATIVE_REPLAY",
   "work_key": "DX11:LIVE_PREDRAW_PARTIAL_DEPTH_NATIVE_REPLAY",
   "feature_base_sha": "87ab1e9fe57c4582461e76eaba784b1de06b6827",
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "feature_stage": "C4_RESULT",
-  "checkpoint": "C4_RESULT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -98,10 +98,90 @@
     ".github/workflows/dx11-fast-structural.yml",
     "docs/automation/runs/CONVERSION-DX11-01036.json"
   ],
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "ci_validation_runs": [],
+  "material_result_sha": "6a14e3e1d80f6b4f0f6dd9852faf2ae83b6b99a4",
+  "validation_bearing_result_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
+  "ci_validation_runs": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40034797462,
+      "head_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40034797462"
+    },
+    {
+      "name": "Build",
+      "run_id": 40034807316,
+      "head_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40034807316"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40034807242,
+      "head_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40034807242"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40034797425,
+      "head_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40034797425"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40034797419,
+      "head_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40034797419"
+    }
+  ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Repair exact-SHA CI failures within TASK_ID, then record five-Gate result separately. Quest3 UNTESTED.",
-  "full_dx11_renderer_complete": false
+  "NEXT_IMPLEMENTATION_ACTION": "Built source depth integration verified at exact SHA; Quest3/VDXR native menu-car-race pixels and gamepad still RUNTIME_VALIDATION=UNTESTED; no DXVK changes.",
+  "full_dx11_renderer_complete": false,
+  "acceptance_results": {
+    "sm3_fvf": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+        "tools/dx11_pre_draw_depth_probe_01036.cpp",
+        "tools/test_dx11_pre_draw_depth_01036.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks source graph, portable C++ pixel coverage and negative source regressions SUCCESS at exact SHA f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1"
+    },
+    "transaction": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+        "tools/dx11_pre_draw_depth_probe_01036.cpp",
+        "tools/test_dx11_pre_draw_depth_01036.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks source graph, portable C++ pixel coverage and negative source regressions SUCCESS at exact SHA f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1"
+    },
+    "fallback": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+        "tools/dx11_pre_draw_depth_probe_01036.cpp",
+        "tools/test_dx11_pre_draw_depth_01036.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks source graph, portable C++ pixel coverage and negative source regressions SUCCESS at exact SHA f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1"
+    },
+    "gate": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+        "tools/dx11_pre_draw_depth_probe_01036.cpp",
+        "tools/test_dx11_pre_draw_depth_01036.py"
+      ],
+      "validation_command": "GitHub Actions five required exact-SHA SUCCESS f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1"
+    }
+  },
+  "CI_VALIDATION": "GITHUB_ACTIONS_EXACT_SHA",
+  "CI_VALIDATION_SHA": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1"
 }
