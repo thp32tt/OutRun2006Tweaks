@@ -84,7 +84,7 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_ONLY_RUNTIME_UNTESTED: real game camera GPU Draw/Clear then COPY/STRETCH source evidence only. No proven R30 callback, visible game frame, or HMD pixel output.",
     "activation_guard_and_fallback": "native diagnostic opt-in; no DXVK; original D3D9 source Draw/FFB unchanged",
-    "blocking_evidence": "Backend Conversion Gate run 40036246823 failed source-policy acceptance at 030d80d; queued eligible offscreen Draw had silent returns on unprovable RTV/viewport/scissor capture, allowing an untracked camera write to be regarded as untouched by native postpass. Fast Structural run 40036856843 also found 00988 regression still expecting direct admissibility call; current source routes through overflow-aware allows_postpass.",
+    "blocking_evidence": "Backend Conversion Gate run 40036246823 failed source-policy acceptance at 030d80d; queued eligible offscreen Draw had silent returns on unprovable RTV/viewport/scissor capture, allowing an untracked camera write to be regarded as untouched by native postpass. Fast Structural run 40036856843 also found 00988 regression still expecting direct admissibility call; current source routes through overflow-aware allows_postpass. Fast Structural 40036989780 rejected stale 00986 direct-admissibility guard text; source now correctly rejects via overflow-aware allows_postpass.",
     "live_game_draw_path": [
       "D3D11_NATIVE_DRAW",
       "NATIVE_STEREO_EYE_OUTPUT"
@@ -99,12 +99,13 @@
     "tools/test_dx11_game_offscreen_color_overflow_01037.py",
     "docs/automation/runs/CONVERSION-DX11-01037.json",
     ".github/workflows/backend-conversion-gate.yml",
-    "tools/test_dx11_native_eye_postpass_overwrite_00988.py"
+    "tools/test_dx11_native_eye_postpass_overwrite_00988.py",
+    "tools/test_dx11_game_camera_safe_composite_00986.py"
   ],
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Await Fast/Backend source branch CI at new exact SHA; correct only reproducible failed tests, then behind=0 non-force promotion and five exact-SHA target workflows.",
+  "NEXT_IMPLEMENTATION_ACTION": "Verify latest feature Fast/Backend CI after repairing old direct-admissibility regression tests; no fake playable status, then safely promote only successful exact SHA.",
   "full_dx11_renderer_complete": false,
   "acceptance_results": {
     "normal": {
