@@ -1,0 +1,509 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0345KST-NEW-SHA8",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "date_kst": "2026-10-24",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "prior_reviewed_sha_count": 666,
+  "new_unique_sha_count": 8,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 1,
+    "HOLD": 7
+  },
+  "sha_verified_count": 8,
+  "rgba_png_count": 8,
+  "verified_native_ui_cell_placement_count": 0,
+  "producer_output_counts": {
+    "A": 324,
+    "B": 379
+  },
+  "producer_export_evidence_count": 144,
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_0345_metrics.json",
+    "A_pairs": "work/C1_QA_20261024_0345_A_pairs.jpg",
+    "B_pairs": "work/C1_QA_20261024_0345_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261024_0345_white.jpg",
+    "alpha": "work/C1_QA_20261024_0345_alpha.json"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0065-1DA49FFC",
+      "ordinal": 323,
+      "english": "SORRY! You need more miles!",
+      "approved_korean": "죄송합니다! 마일이 더 필요합니다!",
+      "observed_korean": "죄송합니다! 마일이 더 필요합니다!",
+      "source_file": "Q205_3f7c30aa1d678c5d_source.png",
+      "candidate_file": "Q205_3f7c30aa1d678c5d_source_k.png",
+      "source_sha256": "90e6969ad9bc55eb45227d6c8ca680b36bd059c7bf55831fc7fe7c17c30c367d",
+      "candidate_sha256": "90513e8316caa0a5a14de50d56ac215d60648e2b71e7a949d7d3c25f8b68dca0",
+      "original_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          661,
+          178
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          29,
+          87,
+          2154,
+          651
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "line_layout": "FAIL_ORIGINAL_TWO_LINES_COLLAPSED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "FAIL",
+      "reason_code": "MULTILINE_LAYOUT_COLLAPSE",
+      "reason": "원본 SORRY! / You need more miles!는 상·하 2개 줄인데 후보에서 한 줄로 합쳐 줄별 정렬·높이 위계가 상실됨. 원본 661x178, 후보 2172x724; 원래 UI 안전영역에 직접 배치 불가",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0065-1DA49FFC",
+      "ordinal": 322,
+      "english": "In pre-game lobby",
+      "approved_korean": "게임 전 로비",
+      "observed_korean": "게임 전 로비",
+      "source_file": "Q046_8c92ae57205ab68a_source.png",
+      "candidate_file": "Q046_8c92ae57205ab68a_source_k.png",
+      "source_sha256": "b0c3171f7b3c68e6e75f9a41d8754342febafe7c5645d9e9fe5cf3989ab46698",
+      "candidate_sha256": "83a731149340bfc28b2e3f274a74254a176912c1935312d2eb509d2de8e37285",
+      "original_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          492,
+          166
+        ],
+        "candidate_size": [
+          2158,
+          728
+        ],
+        "alpha_bbox": [
+          39,
+          19,
+          2019,
+          661
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "line_layout": "NO_CONFIRMED_BREAK",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_PLACEMENT_AND_STYLE_UNVERIFIED",
+      "reason": "원본 흰색 소형 로비 UI와 후보 노랑 대형 레터링의 계열/좌표 차이가 큼. 원본 492x166, 후보 2158x728; 원본 인접 UI 포함되어 네이티브 셀 배치 검증 불가",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0065-1DA49FFC",
+      "ordinal": 321,
+      "english": "For Experts",
+      "approved_korean": "상급자용",
+      "observed_korean": "상급자용",
+      "source_file": "Q121_7025a87c6151b41e_source.png",
+      "candidate_file": "Q121_7025a87c6151b41e_source_k.png",
+      "source_sha256": "58cf40aa9b1ff736221845a3fc816cd47e99a2c8e9132473d330948730bb407b",
+      "candidate_sha256": "4869c89bb1e1d3ea38fee3cbd4c8c33ffe36845bc83b9adaccfaffb654749537",
+      "original_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          928,
+          391
+        ],
+        "candidate_size": [
+          1932,
+          814
+        ],
+        "alpha_bbox": [
+          184,
+          71,
+          1864,
+          755
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "line_layout": "NO_CONFIRMED_BREAK",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "한글 '상급자용' 읽힘. 원본 ROI에 복수 글귀/아트가 함께 포함되고 후보 크기 1932x814로 달라 배치 미확인",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0065-1DA49FFC",
+      "ordinal": 320,
+      "english": "Keep passing the cars!",
+      "approved_korean": "계속 차량을 추월하세요!",
+      "observed_korean": "계속 차량을 추월하세요!",
+      "source_file": "Q111_65868d4ae9a0c723_source.png",
+      "candidate_file": "Q111_65868d4ae9a0c723_source_k.png",
+      "source_sha256": "415d5c2dfe9dc8ff1c3cb855cd2190d6bf154b0ef533995169d9195188a13122",
+      "candidate_sha256": "997b498c777e675954b3952ce24239c6cca4432549e45a562d72aa3972d4bbae",
+      "original_dds_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          761,
+          382
+        ],
+        "candidate_size": [
+          1774,
+          887
+        ],
+        "alpha_bbox": [
+          41,
+          164,
+          1728,
+          750
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "line_layout": "NO_CONFIRMED_BREAK",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "번역 일치·글자 읽힘. 원본 ROI에 인접한 Drift/Transmission 등 다른 문구가 포함되며 원본 761x382, 후보 1774x887로 실셀 배치 미확인",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0078-4400EBCC",
+      "ordinal": 379,
+      "english": "Giant Statues",
+      "approved_korean": "자이언트 스태추스",
+      "observed_korean": "자이언트 스태추스",
+      "source_file": "Q086_ba5582d4ea3b0947_source.png",
+      "candidate_file": "Q086_ba5582d4ea3b0947_source_k.png",
+      "source_sha256": "d8d8825bf7c534c41f6af1ec155b2b2c061d5393819893b43ee1861dbc8cf3e7",
+      "candidate_sha256": "2c4a8ff3bdc73bcace7f16f40addcd156912174d9659ddbc5e04e1fcba96d216",
+      "original_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          494,
+          261
+        ],
+        "candidate_size": [
+          1725,
+          912
+        ],
+        "alpha_bbox": [
+          0,
+          167,
+          1630,
+          736
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "line_layout": "NO_CONFIRMED_BREAK",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원본 Giant Statues 외 288 GTO 등 보호 요소가 함께 있고 후보 1725x912로 크기 불일치, 실제 UI 셀 기준 보호 확인 필요",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0078-4400EBCC",
+      "ordinal": 378,
+      "english": "Honk the horn!",
+      "approved_korean": "경적을 울리세요!",
+      "observed_korean": "경적을 울리세요!",
+      "source_file": "Q054_de92d91948ad02fe_source.png",
+      "candidate_file": "Q054_de92d91948ad02fe_source_k.png",
+      "source_sha256": "0c1c172306fe29522c54bd00c96534d45fe52e25a14e5e9c18a3aa6fd98bed60",
+      "candidate_sha256": "a0bf0768530a00a8cc6e41bf3c4bd0e898f1aa52020de988584ca2ff5596e0fb",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          967,
+          352
+        ],
+        "candidate_size": [
+          2078,
+          757
+        ],
+        "alpha_bbox": [
+          0,
+          41,
+          2011,
+          699
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "line_layout": "NO_CONFIRMED_BREAK",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "한글은 읽히고 번역 일치, 원본 967x352와 후보 2078x757 크기 차이 및 차량/아이콘 보호 배치 미확인",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0078-4400EBCC",
+      "ordinal": 377,
+      "english": "Slipstream the cars!",
+      "approved_korean": "슬립스트림하세요!",
+      "observed_korean": "슬립스트림하세요!",
+      "source_file": "Q054_0df0cd0aea8dbcaf_source.png",
+      "candidate_file": "Q054_0df0cd0aea8dbcaf_source_k.png",
+      "source_sha256": "54581bef932c839646f6cc94e3fc96060f62a90c31104bc4eacb1764391b7d8d",
+      "candidate_sha256": "c6d8f54030138de6cefaf1a8176f3b99d6d76cec173539dc19aee53cbb10fcac",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1446,
+          488
+        ],
+        "candidate_size": [
+          2158,
+          729
+        ],
+        "alpha_bbox": [
+          0,
+          50,
+          2134,
+          704
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "line_layout": "NO_CONFIRMED_BREAK",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "한글 번역과 가독성은 적절하나 원본에 다른 구호·아이콘·차량이 있고 후보 2158x729와 크기 불일치",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0078-4400EBCC",
+      "ordinal": 376,
+      "english": "Spot the odd one out!",
+      "approved_korean": "다른 하나를 찾으세요!",
+      "observed_korean": "다른 하나를 찾으세요!",
+      "source_file": "Q054_06a5b6737a24deae_source.png",
+      "candidate_file": "Q054_06a5b6737a24deae_source_k.png",
+      "source_sha256": "0461324f26cc99b5194f8ed7d206150709c258e055e7e279ff972f708ea61836",
+      "candidate_sha256": "cdf95803712883f6aa20d4038f39e36d554cf13db319d48c10c267884ca49985",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1348,
+          488
+        ],
+        "candidate_size": [
+          2084,
+          755
+        ],
+        "alpha_bbox": [
+          49,
+          71,
+          2036,
+          657
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "line_layout": "NO_CONFIRMED_BREAK",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "한글 번역과 가독성은 적절하나 원본 복수 구호·차량/도로 그래픽과 후보 2084x755의 실제 셀 합성 미확인",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    }
+  ]
+}
