@@ -1123,8 +1123,8 @@ bool build_r283_sm3_mov_shader_source(
                 // D3D9 TEXKILL is encoded with a destination-style TEMP
                 // operand but only tests prior xyz values. Never promote a
                 // shader that kills from an unwritten channel or other bank.
-                // Microsoft D3D9 requires all FOUR TEMP components to have
-                // been written, even though clip tests xyz only.
+                // D3D9 TEXKILL only consumes xyz. A never-written TEMP.w
+                // must not reject a valid real game shader/native GPU Draw.
                 if (mask != 0x0fu || op.destinationType != D3DSPR_TEMP ||
                     op.destinationRegister >= tempWritten.size() ||
                     !native_sm3_texkill_ready(
