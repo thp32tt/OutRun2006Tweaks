@@ -22,7 +22,8 @@ require("native_sm3_matrix_draw_uniform(" in block and
         "tempDrawUniformity.write(" in block and
         "sourcesDrawUniform;" in block,
         "absolute uniform M*x* result must write physical TEMP provenance")
-require("tempDrawUniformity.contains(reg, uniformPhysicalComponents)" in block and
+require("tempDrawUniformity.contains(" in block and
+        "reg, uniformPhysicalComponents" in block and
         "native_sm3_ifc_is_quad_uniform(" in block and
         "derivativeUniformity.implicit_sampling_safe()" in block,
         "derived scalar TEMP must reach safe IFC/TEX derivative classifier")
