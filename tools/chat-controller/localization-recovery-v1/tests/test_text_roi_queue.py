@@ -2,6 +2,7 @@
 """Offline tests for the separate post-tile ImageGen ROI queue."""
 from __future__ import annotations
 import asyncio
+import datetime as dt
 import hashlib
 import json
 import os
@@ -157,6 +158,8 @@ class TextRoiQueueTests(unittest.TestCase):
         text_roi_queue.stage_submission("A",binding["task_id"],self.root)
         target="https://chatgpt.com/c/active-batch-chat"
         text_roi_queue.record_chat_url("A",binding["task_id"],target,self.root)
+        state_after_url=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
+        self.assertEqual(state_after_url["active"]["status"],"SENT_AWAITING_GENERATED_IMAGES")
         sent=self.root/"sent"
         sent.mkdir(parents=True,exist_ok=True)
         (sent/f'A_{binding["task_id"]}.json').write_text(json.dumps({
@@ -180,6 +183,99 @@ class TextRoiQueueTests(unittest.TestCase):
         self.assertFalse(can_continue)
         self.assertEqual(page.opened,[target])
         self.assertTrue(status.startswith("IMAGEGEN_OUTPUT_COUNT_MISMATCH:"))
+
+    def test_five_input_zero_output_waits_during_grace_period(self):
+        items=[]
+        for i in range(5):
+            name=f"Q205_ZeroFresh_{i}.png"
+            path=self.image_path.with_name(name)
+            Image.new("RGBA",(88+i,32),(0,0,0,0)).save(path)
+            items.append({
+                **self.item,
+                "id":f"Q205_ZeroFresh_{i}",
+                "role":"A",
+                "queue_index":"205",
+                "imagegen_input_png":name,
+                "imagegen_input_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+                "english":f"English {i}",
+                "korean":f"한글 {i}",
+            })
+        self.write_manifest(items)
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        task=binding["task_id"]
+        text_roi_queue.stage_submission("A",task,self.root)
+        target="https://chatgpt.com/c/zero-fresh"
+        text_roi_queue.record_chat_url("A",task,target,self.root)
+        sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
+        (sent/f"A_{task}.json").write_text(json.dumps({
+            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+            "task_id":task,"role":"A","submitted_at":text_roi_queue._now().isoformat(),
+            "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
+        }),encoding="utf-8")
+
+        class Page:
+            url=target
+            async def evaluate(self,*args,**kwargs):
+                return {"count":0,"expected":5,"busy":False,
+                        "verified_by":"SINGLE_VISIBLE_PREVIEW_FALLBACK","error":None}
+
+        can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",Page(),self.root))
+        self.assertFalse(can_continue)
+        self.assertTrue(status.startswith("IMAGEGEN_ZERO_OUTPUT_GRACE_PERIOD:"))
+        st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
+        self.assertEqual(st["active"]["task_id"],task)
+        self.assertEqual(st["next_ordinal"],1)
+        self.assertEqual(st["completed_files"],0)
+
+    def test_five_input_zero_output_stale_is_quarantined_and_retried(self):
+        items=[]
+        for i in range(5):
+            name=f"Q205_ZeroStale_{i}.png"
+            path=self.image_path.with_name(name)
+            Image.new("RGBA",(89+i,33),(0,0,0,0)).save(path)
+            items.append({
+                **self.item,
+                "id":f"Q205_ZeroStale_{i}",
+                "role":"B",
+                "queue_index":"205",
+                "imagegen_input_png":name,
+                "imagegen_input_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+                "english":f"English {i}",
+                "korean":f"한글 {i}",
+            })
+        self.write_manifest(items)
+        binding,error=text_roi_queue.next_binding("B",self.root)
+        self.assertIsNone(error)
+        task=binding["task_id"]
+        text_roi_queue.stage_submission("B",task,self.root)
+        target="https://chatgpt.com/c/zero-stale"
+        text_roi_queue.record_chat_url("B",task,target,self.root)
+        sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
+        stale=(text_roi_queue._now()-dt.timedelta(
+            seconds=text_roi_queue.ZERO_OUTPUT_STALE_RETRY_SECONDS+1)).isoformat()
+        (sent/f"B_{task}.json").write_text(json.dumps({
+            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+            "task_id":task,"role":"B","submitted_at":stale,
+            "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
+        }),encoding="utf-8")
+
+        class Page:
+            url=target
+            async def evaluate(self,*args,**kwargs):
+                return {"count":0,"expected":5,"busy":False,
+                        "verified_by":"SINGLE_VISIBLE_PREVIEW_FALLBACK","error":None}
+
+        can_continue,status=asyncio.run(text_roi_queue.inspect_slot("B",Page(),self.root))
+        self.assertTrue(can_continue)
+        self.assertEqual(status,"FIVE_IMAGE_BATCH_RETRY_STAGED")
+        st=json.loads((self.root/"text_roi_batches/B_state.json").read_text())
+        self.assertEqual(st["active"]["task_id"],task+"-R1")
+        self.assertEqual(st["active"]["ordinals"],[1,2,3,4,5])
+        self.assertEqual(st["next_ordinal"],1)
+        self.assertEqual(st["completed_files"],0)
+        self.assertEqual(st["quarantined"][-1]["retry_reason"],"IMAGEGEN_ZERO_OUTPUT_STALE")
+        self.assertEqual(st["quarantined"][-1]["observed_generated_images"],0)
 
     def test_five_input_single_output_is_quarantined_and_retried_as_five(self):
         items=[]
