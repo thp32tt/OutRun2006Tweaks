@@ -5819,7 +5819,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                         static_cast<LONG>(tile.left), static_cast<LONG>(tile.top),
                         static_cast<LONG>(tile.right), static_cast<LONG>(tile.bottom)};
                     preDrawContext->ClearView(
-                        s.backend.color_rtv(), tile.rgba.data(), &rect, 1u);
+                        s.backend.color_rtv(), tile.rgba, &rect, 1u);
                     return true;
                 },
                 [&](const GameNativePreDrawTile& tile) noexcept {
@@ -5828,7 +5828,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                         static_cast<LONG>(tile.right), static_cast<LONG>(tile.bottom)};
                     return native_game_raster_partial_backbuffer_color_clear(
                         context, s.backend.color_rtv(), source.Width,
-                        source.Height, rect, tile.rgba.data());
+                        source.Height, rect, tile.rgba);
                 });
             if (!replayed) return false; // original D3D9 Draw stays authoritative
         }
@@ -6614,7 +6614,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                         static_cast<LONG>(tile.left), static_cast<LONG>(tile.top),
                         static_cast<LONG>(tile.right), static_cast<LONG>(tile.bottom)};
                     replayContext->ClearView(
-                        s.backend.color_rtv(), tile.rgba.data(), &rect, 1u);
+                        s.backend.color_rtv(), tile.rgba, &rect, 1u);
                     return true;
                 },
                 [&](const GameNativePreDrawTile& tile) noexcept {
@@ -6623,7 +6623,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                         static_cast<LONG>(tile.right), static_cast<LONG>(tile.bottom)};
                     return native_game_raster_partial_backbuffer_color_clear(
                         ctx, s.backend.color_rtv(), s.nativeWidth,
-                        s.nativeHeight, rect, tile.rgba.data());
+                        s.nativeHeight, rect, tile.rgba);
                 });
             if (!replayed) {
                 s.preDrawFills.discard();

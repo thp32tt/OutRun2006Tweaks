@@ -7,7 +7,7 @@
 namespace outrun::vr::dx11::live_game_frame {
 struct GameNativePreDrawTile {
     std::int64_t left{}, top{}, right{}, bottom{};
-    std::array<float, 4> rgba{};
+    float rgba[4]{};
 };
 template<class ClearView, class Raster>
 [[nodiscard]] inline bool game_native_replay_pre_draw_fills(
