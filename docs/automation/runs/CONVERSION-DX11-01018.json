@@ -166,5 +166,56 @@
   "pending_items": [
     "Real OutRun native Draw count/menu/car/race visible full-frame publication and Quest3/VDXR/gamepad/FFB runtime UNTESTED; separate hardware proof required."
   ],
-  "score_status": "ELIGIBLE_NEW_INDEPENDENT_FEATURE_ONCE; VERIFY_AI_SCOREBOARD_MD_BEFORE_CREDIT"
+  "score_status": "ELIGIBLE_NEW_INDEPENDENT_FEATURE_ONCE; VERIFY_AI_SCOREBOARD_MD_BEFORE_CREDIT",
+  "checkpoint": "C6_STATE",
+  "acceptance_results": {
+    "native_uniform_ifc_real_draw": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_derivative_uniformity.hpp",
+        "tools/dx11_sm3_uniform_ifc_01018.cpp",
+        "tools/test_dx11_sm3_uniform_ifc_01018.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39924874299 SUCCESS at exact SHA d40be518885117c8544aa30d10cae093f55c35bf; compiled positive/negative native shader-source tests in tools/test_dx11_sm3_uniform_ifc_01018.py",
+      "limitation": "Game-authored native Draw count and visible menu/car/race frame UNTESTED; PASS_FEATURE_CI is not gameplay PASS."
+    },
+    "varying_ifc_reject": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_derivative_uniformity.hpp",
+        "tools/dx11_sm3_uniform_ifc_01018.cpp",
+        "tools/test_dx11_sm3_dynamic_texture_flow_00962.py",
+        "tools/test_dx11_sm3_uniform_texture_01017.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39924874299 SUCCESS at exact SHA d40be518885117c8544aa30d10cae093f55c35bf; negative varying/predication assertions and compiled C++ IFC coverage preserved",
+      "limitation": "Original DX9Ex/gamepad/FFB runtime fallback not exercised; source and CI regression only."
+    },
+    "source_ci_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_sm3_uniform_ifc_01018.py",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Exact SHA d40be518885117c8544aa30d10cae093f55c35bf: DX11 Fast 39924874299, Backend 39924874305, Build 39924880232, OpenXR 39924880255, HUD 39924880236 all GitHub Actions SUCCESS.",
+      "limitation": "CI is not a Quest3/VDXR real-game rendering/input acceptance test."
+    }
+  },
+  "hold_reason": "C6_NOT_COMPLETE",
+  "hold_reason_resolution": "Previous documentation-only C6 record omitted explicit checkpoint and feature_contract-aligned acceptance_results. Reconciled from already-successful exact-SHA CI evidence without changing source, validation SHA or feature contract.",
+  "c6_reconciliation": {
+    "reason": "C6_NOT_COMPLETE",
+    "previous_c6_sha": "e783ada6d48fcc08c73d2d7b5b4520528b4ca4fa",
+    "role": "DOCUMENTATION_ONLY_POST_EXACT_SHA_SUCCESS",
+    "previous_record_preserved": true,
+    "retested": false,
+    "source_modified": false,
+    "validation_sha_unchanged": true,
+    "score_delta": 0
+  }
 }
