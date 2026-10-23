@@ -239,13 +239,16 @@ struct GameNativePreDrawFills {
             rectCount > kCapacity || (rectCount && !rects) ||
             (count && !belongs_to(currentDevice, currentBackbuffer)))
             return false;
+        // D3DRECT uses signed LONG. Cast before the conditional operator:
+        // otherwise the UINT viewport arm converts negative source coordinates
+        // to UINT_MAX and rejects valid clipped game Clears.
         GameNativePreDrawFills staged = *this;
         for (std::uint32_t i = 0u; i < (rectCount ? rectCount : 1u); ++i) {
-            const std::int64_t l = rectCount ? rects[i].x1 : viewportX;
-            const std::int64_t t = rectCount ? rects[i].y1 : viewportY;
-            const std::int64_t r = rectCount ? rects[i].x2 :
+            const std::int64_t l = rectCount ? static_cast<std::int64_t>(rects[i].x1) : viewportX;
+            const std::int64_t t = rectCount ? static_cast<std::int64_t>(rects[i].y1) : viewportY;
+            const std::int64_t r = rectCount ? static_cast<std::int64_t>(rects[i].x2) :
                 static_cast<std::int64_t>(viewportX) + viewportWidth;
-            const std::int64_t b = rectCount ? rects[i].y2 :
+            const std::int64_t b = rectCount ? static_cast<std::int64_t>(rects[i].y2) :
                 static_cast<std::int64_t>(viewportY) + viewportHeight;
             GameNativeSourceMutation::TargetClearRect clipped{};
             const auto coverage = GameNativeSourceMutation::classify_target_clear_rect(
