@@ -16,7 +16,7 @@ def valid(code,hook,batch):
     "s.frameBatch.submitted == 0u || s.frameBatch.stopped" in sec,
     "constexpr DWORD kDepthStencilFlags = D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL;" in sec,
     "(flags & ~kDepthStencilFlags) != 0u" in sec,
-    "if (clearZ) s.frameBatch.note_full_depth_clear(z);" in sec,
+    "if (clearZ) {\n            s.preDrawDepth.discard();\n            s.frameBatch.note_full_depth_clear(z);\n        }" in sec,
     "GameNativeMainStencilClear::may_ignore(" in sec,
     "targetIdentity.Get() != backbufferIdentity.Get()" in sec,
     "dsDesc.Width != bbDesc.Width" in sec,
@@ -33,7 +33,8 @@ for old,new in (
  ("s.frameBatch.note_full_depth_clear(z);","s.frameBatch.abort();"),
  ("GameNativeClearCoverage::covers_whole(","GameNativeClearCoverage::skipped("),
  ("s.frameBatch.consume_depth_clear();","/* removed */"),
- ("if (clearZ) s.frameBatch.note_full_depth_clear(z);","/* suppress real Z */"),
+ ("if (clearZ) {\n            s.preDrawDepth.discard();\n            s.frameBatch.note_full_depth_clear(z);\n        }","/* suppress real Z */"),
+ ("s.preDrawDepth.discard();","/* retain stale Z tiles */"),
  ("(flags & ~kDepthStencilFlags) != 0u","false /* allow TARGET */"),
 ):
  # Mutate the exact Z-only Clear observer, not an earlier independent
