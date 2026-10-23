@@ -10,11 +10,11 @@
   "classification": "A",
   "feature_id": "DX11:SIGNED_SM3_LOOP_NATIVE_CONSTANT_DRAW",
   "work_key": "DX11:SIGNED_SM3_LOOP_NATIVE_CONSTANT_DRAW",
-  "checkpoint": "C4_MATERIAL",
-  "feature_stage": "C4_MATERIAL",
+  "checkpoint": "C5_CI_REPAIR",
+  "feature_stage": "C5_CI_REPAIR",
   "status": "IMPLEMENTED_PENDING_CI",
   "source_head": "85670dc9a3fa25c1e1c664fa156f2dcce8ee2550",
-  "material_result_sha": null,
+  "material_result_sha": "3c6e26ef7ed593bfb7b367d00cf4552d5ed36f2f",
   "result_sha": null,
   "validation_bearing_result_sha": null,
   "automation_validation": "PENDING",
@@ -102,11 +102,21 @@
     "tools/test_dx11_sm3_relative_matrix_00961.py",
     ".github/workflows/dx11-fast-structural.yml",
     "tools/dx11_sm3_signed_loop_index_probe_01028.cpp",
-    "tools/test_dx11_sm3_signed_loop_index_01028.py"
+    "tools/test_dx11_sm3_signed_loop_index_01028.py",
+    "tools/test_dx11_live_sm3_partial_color_01009.py"
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Need exact SHA mandatory CI and actual real-game observation",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "NEXT_IMPLEMENTATION_ACTION": "Same ID causal CI repair then separate C6 status"
+  "NEXT_IMPLEMENTATION_ACTION": "Same ID causal CI repair then separate C6 status",
+  "repair_evidence": {
+    "classification": "B",
+    "failure_exact_sha": "3c6e26ef7ed593bfb7b367d00cf4552d5ed36f2f",
+    "failure_workflow_run_id": 39980682963,
+    "failed_step": "Verify source graph and dormant runtime activation",
+    "causal_error": "01009 partial-color text regression still demanded the old shader compiler parameter-list token after real VS/PS signed indexed lower bounds were wired",
+    "change": "Update 01009 to assert both original pixelWrittenColorMask argument and new pixelIndexedLower plus candidate indexed lower metadata",
+    "full_gate_plan": "one_validation_bearing_sha"
+  }
 }

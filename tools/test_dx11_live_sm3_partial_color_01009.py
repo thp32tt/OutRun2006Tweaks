@@ -14,7 +14,9 @@ def require(value,message):
     if not value: raise SystemExit("01009 partial-color FAIL: "+message)
 for word in ("unsigned* writtenColorMask = nullptr",
              "writtenColorMask = vertexStage ? 0u : outputWritten[0]",
-             "&pixelWrittenColorMask)", "candidate.pixelWrittenColorMask =",
+             "&pixelWrittenColorMask, &pixelIndexedLower)",
+             "candidate.pixelLoopIndexedConstantLower = pixelIndexedLower;",
+             "candidate.pixelWrittenColorMask =",
              "candidate.pixelDepthOnly = pixelWritesDepth && !pixelWritesColor;"):
     require(word in backend,"real shader HLSL/metadata: "+word)
 require("std::uint8_t pixelWrittenColorMask{};" in metadata,"PS metadata")
