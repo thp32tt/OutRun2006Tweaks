@@ -1,0 +1,477 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0215KST-NEW-SHA8",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "date_kst": "2026-10-24",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "previous_qa_commit": "ce511784f3a1c176d755ccbe2f1f75d90645a0a1",
+  "prior_reviewed_sha_count": 642,
+  "new_unique_sha_count": 8,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "sha_verified_count": 8,
+  "rgba_png_count": 8,
+  "verified_native_ui_cell_placement_count": 0,
+  "producer_output_counts": {
+    "A": 304,
+    "B": 364
+  },
+  "producer_export_evidence_count": 137,
+  "orphan_outputs_without_evidence": {
+    "A": [],
+    "B": []
+  },
+  "export_evidence_without_local_outputs": {
+    "A": [],
+    "B": []
+  },
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_0215_metrics.json",
+    "A_pairs": "work/C1_QA_20261024_0215_A_pairs.jpg",
+    "B_pairs": "work/C1_QA_20261024_0215_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261024_0215_white.jpg"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0061-B48F9123",
+      "ordinal": 303,
+      "english": "Imperial Avenue",
+      "approved_korean": "임페리얼 애비뉴",
+      "source_file": "Q086_9dc7cafdc29ca37c_source.png",
+      "candidate_file": "Q086_9dc7cafdc29ca37c_source_k.png",
+      "source_sha256": "7c820ffcd41080973da3b3a7941c5ba8146fc3835f55c95fb5b4876e759b3443",
+      "candidate_sha256": "f29bcdcc361adfcac759f50600be36065107a1c65b957e652357ce0b2f72e328",
+      "original_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          622,
+          244
+        ],
+        "candidate_size": [
+          2002,
+          786
+        ],
+        "alpha_bbox": [
+          25,
+          123,
+          1988,
+          654
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "korean_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_MATTE",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "verdict": "HOLD",
+      "reason": "ORIGINAL_ROI_INCLUDES_ADJACENT_UI_OR_PROTECTED_ART; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_UNVERIFIED; PRODUCER_REWORK_DIMENSIONS",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0061-B48F9123",
+      "ordinal": 302,
+      "english": "Game Over",
+      "approved_korean": "게임 오버",
+      "source_file": "Q050_f559488447c0df63_source.png",
+      "candidate_file": "Q050_f559488447c0df63_source_k.png",
+      "source_sha256": "28d877ee3d74cf90f355ea9e356278596310dff12d8483662b35c67dd42b92e0",
+      "candidate_sha256": "0f1ca8a030413baf697c95be770ae24b667fbeb5dd12fdccc640eaa8d4633687",
+      "original_dds_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          2732,
+          952
+        ],
+        "candidate_size": [
+          2124,
+          740
+        ],
+        "alpha_bbox": [
+          98,
+          40,
+          2045,
+          740
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "korean_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_MATTE",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "verdict": "HOLD",
+      "reason": "ORIGINAL_ROI_INCLUDES_ADJACENT_UI_OR_PROTECTED_ART; OUTPUT_CANVAS_DIFFERS_FROM_SOURCE; NATIVE_UI_CELL_PLACEMENT_UNVERIFIED; PRODUCER_REWORK_DIMENSIONS",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0061-B48F9123",
+      "ordinal": 301,
+      "english": "Enjoy the original OutRun2SP",
+      "approved_korean": "오리지널 아웃런2 SP 즐기기",
+      "source_file": "Q205_c093ec5f9d5f9946_source.png",
+      "candidate_file": "Q205_c093ec5f9d5f9946_source_k.png",
+      "source_sha256": "be28d485e539d592c237f57533483d36300acf10cdae0f6cb0329f9f18da4b85",
+      "candidate_sha256": "59518b7785fbe5705a5dce5b4529b40a95b8c71ea211281241ed55d202d8e004",
+      "original_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          1870,
+          180
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          58,
+          89,
+          2134,
+          664
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "korean_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_MATTE",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_SOURCE_ROI; NATIVE_UI_CELL_PLACEMENT_UNVERIFIED; PRODUCER_REWORK_DIMENSIONS",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0061-B48F9123",
+      "ordinal": 300,
+      "english": "Enjoy the original OutRun2SP",
+      "approved_korean": "오리지널 아웃런2 SP 즐기기",
+      "source_file": "Q205_88f1a88d372018bc_source.png",
+      "candidate_file": "Q205_88f1a88d372018bc_source_k.png",
+      "source_sha256": "be28d485e539d592c237f57533483d36300acf10cdae0f6cb0329f9f18da4b85",
+      "candidate_sha256": "53c5eecf9eabde848e3442336e37131517feb5ebaeaca0dac46661da0f6b6011",
+      "original_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          1870,
+          180
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          43,
+          32,
+          2124,
+          579
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "korean_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_MATTE",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_SOURCE_ROI; NATIVE_UI_CELL_PLACEMENT_UNVERIFIED; PRODUCER_REWORK_DIMENSIONS",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0075-9FB97E6C",
+      "ordinal": 364,
+      "english": "Guess the sound!",
+      "approved_korean": "소리를 맞혀 보세요!",
+      "source_file": "Q054_50ce23b02c6aed09_source.png",
+      "candidate_file": "Q054_50ce23b02c6aed09_source_k.png",
+      "source_sha256": "9ce38dd7c73186813712bd9f807b836852403a468cbfdfb94a9219a0a909912e",
+      "candidate_sha256": "5d65315b0e81fd9e623ca3d4793cb8f5e6d4c9ec54e6bba6f071c6d4ea0e25c5",
+      "original_dds_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          1258,
+          216
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          82,
+          9,
+          2092,
+          708
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "korean_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_MATTE",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_SOURCE_ROI; NATIVE_UI_CELL_PLACEMENT_UNVERIFIED; PRODUCER_REWORK_DIMENSIONS",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0075-9FB97E6C",
+      "ordinal": 363,
+      "english": "Do the math!",
+      "approved_korean": "계산하세요!",
+      "source_file": "Q054_5142a65cfaa80ab9_source.png",
+      "candidate_file": "Q054_5142a65cfaa80ab9_source_k.png",
+      "source_sha256": "c89fa94c3fc884b027426faf6178ddef6fca8cb4b995b4ac77b247217278c7dd",
+      "candidate_sha256": "04a6808f8114283eedad7e7ffda2e4397ca9a0ef80898ba0ab2034485b20dd53",
+      "original_dds_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          964,
+          214
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          75,
+          31,
+          2102,
+          684
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "korean_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_MATTE",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_SOURCE_ROI; NATIVE_UI_CELL_PLACEMENT_UNVERIFIED; PRODUCER_REWORK_DIMENSIONS",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0075-9FB97E6C",
+      "ordinal": 362,
+      "english": "Ancient Ruins",
+      "approved_korean": "에인션트 루인스",
+      "source_file": "Q086_a5be7489aa680e44_source.png",
+      "candidate_file": "Q086_a5be7489aa680e44_source_k.png",
+      "source_sha256": "5c29d7fabd0376766bdc1b4bc30fb3addccd05eae8f0886ee52f2cb58866bc28",
+      "candidate_sha256": "f70c668ba5c2ba50d632c2011b38d340610d864c29e6a656c0e3dde56f5c63db",
+      "original_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          1276,
+          228
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          61,
+          2134,
+          611
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "korean_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_MATTE",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_SOURCE_ROI; NATIVE_UI_CELL_PLACEMENT_UNVERIFIED; PRODUCER_REWORK_DIMENSIONS",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0075-9FB97E6C",
+      "ordinal": 361,
+      "english": "Enjoy the original OutRun2SP",
+      "approved_korean": "오리지널 아웃런2 SP 즐기기",
+      "source_file": "Q205_69d302fcd79f80ac_source.png",
+      "candidate_file": "Q205_69d302fcd79f80ac_source_k.png",
+      "source_sha256": "be28d485e539d592c237f57533483d36300acf10cdae0f6cb0329f9f18da4b85",
+      "candidate_sha256": "341092fdfafeedeb62cbd250588022cad8bfe7fc9c59f62288ebd72400b9f230",
+      "original_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          1870,
+          180
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          38,
+          87,
+          2150,
+          706
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "korean_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_MATTE",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_SOURCE_ROI; NATIVE_UI_CELL_PLACEMENT_UNVERIFIED; PRODUCER_REWORK_DIMENSIONS",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    }
+  ]
+}
