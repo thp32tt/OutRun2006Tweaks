@@ -50,7 +50,7 @@
       },
       {
         "id": "test",
-        "category": "targeted_validation",
+        "category": "integrated_validation",
         "behavior_area": "SOURCE_TO_REPLAY",
         "expected_behavior": "Compile the production C++ headers under -Werror and execute source-record/replay pixel parity and negative probes."
       }
@@ -135,7 +135,8 @@
     }
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_source_mutation.hpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Require feature exact-SHA CI, then safe behind=0 compare/expected_sha force=false promotion and final target exact-SHA 5 GitHub Actions. No playable/native game-frame claim until real game/Quest3 test.",
+  "NEXT_IMPLEMENTATION_ACTION": "Recheck feature CI at new exact record SHA; promote with behind=0 + expected target HEAD + force=false only after required feature validation. Do not claim real HMD/gameplay.",
   "ci_validation_runs": {},
-  "feature_ready": true
+  "feature_ready": true,
+  "ci_failure_cause": "Feature Fast Structural Checks 40024303069 policy step rejected missing required integrated_validation acceptance category; no C++ or regression logic failure. Contract item test recategorized; feature C++ stays unchanged."
 }
