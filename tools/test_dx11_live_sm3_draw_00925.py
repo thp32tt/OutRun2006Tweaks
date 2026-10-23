@@ -55,7 +55,7 @@ for rejection in (
     "++s.liveSm3StateRejectReasons[5];",
     "++s.liveSm3StateRejectReasons[6];",
     "++s.liveSm3StateRejectReasons[7];",
-    "if (nativeIndices[i] >= (compactListInstances ? expandedVertices : vertexCount)) return false;",
+    "compactInstancedGeometry ? expandedVertices : vertexCount",
     "LiveGameShaderCacheReplacement::retire_oldest_if_full(",
     "pipeline.vertexTokens != vertexEvidence.tokens",
 ):
@@ -140,7 +140,9 @@ for token in (
 # remain enforced before the native D3D11 buffer upload.
 check("game_sm3_expand_list_instance_indices(" in source and
       "compactListInstances" in source and
-      "nativeSubmissionCount = compactListInstances ? 1u : instanceCount" in source and
+      "game_sm3_expand_connected_instance_indices(" in source and
+      "nativeIndexCount > kMaxIndices" in source and
+      "compactInstancedGeometry ? 1u : instanceCount" in source and
       "if (instance >= nativeSubmissionCount) break;" in source,
       "SM3 indexed game instance expansion/fallback contract missing")
 
@@ -150,7 +152,7 @@ check("game_sm3_expand_list_instance_indices(" in source and
 for token in (
     "if (nativeIndices) {",
     "for (UINT i = 0; i < nativeIndexCount; ++i)",
-    "if (nativeIndices[i] >= (compactListInstances ? expandedVertices : vertexCount)) return false;",
+    "compactInstancedGeometry ? expandedVertices : vertexCount",
     "s.fullGameIndexCapacity, nativeIndices, indexBytes",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
 ):
