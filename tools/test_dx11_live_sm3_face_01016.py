@@ -28,9 +28,13 @@ require("faceDeclared = true;" in shader and
         'label = pixelFace ? "SV_IsFrontFace" : "SV_Position"' in backend,
         "real ps raster bool feeds signed face scalar comparisons")
 require("else if (kind == D3DSPR_MISCTYPE)" in shader and
-        "native_sm3_face_scalar_source(required)" not in shader and
-        "native_sm3_pixel_position_source(required)" in shader,
-        "arithmetic/TEX vFace must fail closed; VPOS still separate")
+        "native_sm3_face_scalar_source(required)" in shader and
+        "native_sm3_pixel_position_source(required)" in shader and
+        "if (!faceDeclared ||" in shader and
+        "value = native_sm3_face_compare_hlsl();" in shader,
+        "arithmetic SM3 face sign accepts only declared x-lane; VPOS and missing FACE fail closed")
+# Validate actual game HLSL accepts front-facing arithmetic operands through
+# live programmable Draw/DrawIndexed, while rejecting y/z/w and invalid DCL.
 require("context->PSSetShader(" in bridge and
         "context->DrawIndexed(" in bridge and "context->Draw(" in bridge,
         "native game shader still binds D3D11 Draw/DrawIndexed")
@@ -43,4 +47,51 @@ with tempfile.TemporaryDirectory() as directory:
         str(root / "tools/dx11_sm3_face_compare_01016.cpp"),
         "-o", str(exe)], check=True)
     subprocess.run([str(exe)], check=True)
-print("01016 FACE compare native linkage PASS; actual game/Quest3 UNTESTED")
+
+# Source-linked, compiled positive/negative coverage for native shader
+# front-face arithmetic and mixed screen-position composition.
+    arithmetic = Path(directory) / "face_arithmetic.cpp"
+    arithmetic.write_text(r"""
+#include "native_sm3_interface_channels.hpp"
+#include "native_sm3_arithmetic_codegen.hpp"
+#include <array>
+#include <cassert>
+#include <string>
+using namespace outrun::vr::dx11;
+static_assert(native_sm3_face_declaration(false, 1u, 15u));
+static_assert(!native_sm3_face_declaration(true, 1u, 15u));
+static_assert(native_sm3_face_scalar_source(
+    native_sm3_swizzled_components(15u, 0x00u)));
+static_assert(!native_sm3_face_scalar_source(
+    native_sm3_swizzled_components(15u, 0xe4u)));
+static_assert(!native_sm3_face_scalar_source(
+    native_sm3_swizzled_components(15u, 0x55u)));
+static_assert(!native_sm3_face_scalar_source(
+    native_sm3_swizzled_components(
+        native_sm3_source_modifier_components(15u, 9u), 0xe4u)));
+int main() {
+    const auto actual = native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::MultiplyAdd, 15u, 0u);
+    assert(actual == 15u);
+    assert(native_sm3_face_scalar_source(
+        native_sm3_swizzled_components(actual, 0u)));
+    std::array<std::string, 3> sources{
+        std::string("(") + native_sm3_face_compare_hlsl() + ").xxxx",
+        "float4(0.5f, 0.5f, 0.5f, 0.5f)",
+        native_sm3_pixel_position_hlsl()};
+    std::string translated;
+    assert(append_native_sm3_arithmetic(
+        translated, NativeSm3ArithmeticOpcode::MultiplyAdd,
+        "r283_color", 15u, sources, 3u, 1u));
+    assert(translated.find("r283_frontface") != std::string::npos);
+    assert(translated.find("r283_vpos") != std::string::npos);
+    assert(translated.find("r283_color") != std::string::npos);
+}
+""")
+    face_exe = Path(directory) / "sm3_face_math"
+    subprocess.run([compiler, "-std=c++17", "-O2", "-Wall", "-Wextra",
+        "-Werror", "-pedantic", "-I", str(root / "src/vr/d3d11"),
+        str(arithmetic), "-o", str(face_exe)], check=True)
+    subprocess.run([str(face_exe)], check=True)
+
+print("01016 FACE compare + arithmetic native linkage PASS; actual game/Quest3 UNTESTED")
