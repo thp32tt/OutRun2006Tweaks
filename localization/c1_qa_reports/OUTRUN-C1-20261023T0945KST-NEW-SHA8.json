@@ -1,0 +1,580 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T0945KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T09:47:26.328676+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "prior_sha_history_count": 503,
+  "counts": {
+    "total": 8,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "source_and_sha_verification": {
+    "distinct_new_candidate_sha256": 8,
+    "source_manifest_match": 8,
+    "source_sent_match": 8,
+    "candidate_export_match": 8,
+    "RGBA_PNG": 8
+  },
+  "qa_comparison": {
+    "A": "N100:work/C1_QA_20261023_0945_A_pairs.jpg",
+    "B": "N100:work/C1_QA_20261023_0945_B_pairs.jpg",
+    "metrics": "N100:work/C1_QA_20261023_0945_metrics.json"
+  },
+  "review_scope": "N100 actual unapproved Korean PNG vs English source static visual QA. No UI cell composite/DDS/C2/C3/ingame approvals.",
+  "notes": [
+    "A four source ROI PNGs contain multiple English phrases, despite each manifest entry mapping one phrase. Input ROI separation must be corrected and re-confirmed independently before promotion.",
+    "All candidate outputs retain RGBA alpha and readable matched Korean text. Generation canvas sizes differ from input ROI, and native UI cell, aspect/UV/overlay placement and protected pixels are not verified. Do not infer failure from Korean text width reduction alone.",
+    "Candidate pairing is export output-order only, not producer visual binding. Visual mapping here was reviewed independently; exact per-ROI placement cannot be certified.",
+    "No ImageGen invoked, no A/B queue consumed, no DDS composed or deployed; C2/C3/user-game passes not created. RUNTIME_VALIDATION=UNTESTED.",
+    "No VR/FFB/DX11/DXVK changes."
+  ],
+  "reviews": [
+    {
+      "role": "A",
+      "batch": 42,
+      "task_id": "OUTRUN-ROI-A-0042-8FEDC08C",
+      "source_ordinal": 206,
+      "source_file": "Q161_3b5295459e4be3d2_source.png",
+      "candidate_file": "Q161_3b5295459e4be3d2_source_k.png",
+      "english": "TAURUS",
+      "approved_korean": "황소자리",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "fcd9858c2bd7fc2dd8e648bcc98528fef098c52c52a318d028f03d838754bac0",
+      "candidate_sha256": "3082d0396476fde60ef4c7d36743887932e2b1c78ebd3951c70d85e3206c0643",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1674,
+          262
+        ],
+        "alpha_bbox": [
+          264,
+          15,
+          1017,
+          254
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2025,
+          777
+        ],
+        "alpha_bbox": [
+          31,
+          64,
+          1408,
+          726
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_MULTI_PHRASE_SOURCE_ROI_AND_NATIVE_CELL_UNVERIFIED",
+      "C1_observation": "TAURUS→황소자리 글자 정적 판독 및 번역 일치. 원본 크롭에 복수 문구(SAGITTARIUS / TAURUS)가 혼재; 한 문구만의 crop 분리가 확인되지 않음. 출력 크기 불일치 및 native cell 합성 근거 부재.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "alpha_note": "RGBA; outer-edge alpha>8 (L,R,T,B) [0,0,0,0], native UI compositing not performed."
+    },
+    {
+      "role": "A",
+      "batch": 42,
+      "task_id": "OUTRUN-ROI-A-0042-8FEDC08C",
+      "source_ordinal": 205,
+      "source_file": "Q161_296f622bed3245f4_source.png",
+      "candidate_file": "Q161_296f622bed3245f4_source_k.png",
+      "english": "SOUTH KOREA",
+      "approved_korean": "대한민국",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "993e7b0f09d12798038b914613ba7cce349e008755848a597b64f4607a40dbf9",
+      "candidate_sha256": "e56d1dbb5f55f931336685b4c7ea80d166b7ca0d38d21bae54b100c12b2112b6",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          662,
+          196
+        ],
+        "alpha_bbox": [
+          2,
+          10,
+          403,
+          189
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2138,
+          736
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          2116,
+          673
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_MULTI_PHRASE_SOURCE_ROI_AND_NATIVE_CELL_UNVERIFIED",
+      "C1_observation": "SOUTH KOREA→대한민국 글자 정적 판독 및 번역 일치. 원본 크롭에 복수 문구(OTHER / SOUTH KOREA / SWEDEN)가 혼재; 한 문구만의 crop 분리가 확인되지 않음. 출력 크기 불일치 및 native cell 합성 근거 부재.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "alpha_note": "RGBA; outer-edge alpha>8 (L,R,T,B) [0,0,0,0], native UI compositing not performed."
+    },
+    {
+      "role": "A",
+      "batch": 42,
+      "task_id": "OUTRUN-ROI-A-0042-8FEDC08C",
+      "source_ordinal": 204,
+      "source_file": "Q161_1feedeb0bc9341cc_source.png",
+      "candidate_file": "Q161_1feedeb0bc9341cc_source_k.png",
+      "english": "VIRGO",
+      "approved_korean": "처녀자리",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "b48e32e02d619e99c6c2f67092f7440a3c394582813574de3bf391682c501136",
+      "candidate_sha256": "91cfbbe372add84a434d2d57b5ec3e63331e1459307745aba7def724cb2d5c09",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1324,
+          262
+        ],
+        "alpha_bbox": [
+          0,
+          15,
+          497,
+          255
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1875,
+          839
+        ],
+        "alpha_bbox": [
+          15,
+          168,
+          1687,
+          736
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_MULTI_PHRASE_SOURCE_ROI_AND_NATIVE_CELL_UNVERIFIED",
+      "C1_observation": "VIRGO→처녀자리 글자 정적 판독 및 번역 일치. 원본 크롭에 복수 문구(SCORPIO / VIRGO)가 혼재; 한 문구만의 crop 분리가 확인되지 않음. 출력 크기 불일치 및 native cell 합성 근거 부재.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "alpha_note": "RGBA; outer-edge alpha>8 (L,R,T,B) [0,0,0,0], native UI compositing not performed."
+    },
+    {
+      "role": "A",
+      "batch": 41,
+      "task_id": "OUTRUN-ROI-A-0041-1B495950",
+      "source_ordinal": 203,
+      "source_file": "Q161_5d82b5fcd656adda_source.png",
+      "candidate_file": "Q161_5d82b5fcd656adda_source_k.png",
+      "english": "THAILAND",
+      "approved_korean": "태국",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "d4fb76ff25877061b8f37ee28191cfc4efb9f269a61a1fbebdfe39c4017d80ea",
+      "candidate_sha256": "e726fbeceb05c4725e2c7aa81207c62fb91bddb9fe3d5278d363edc4f9c6b121",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          658,
+          190
+        ],
+        "alpha_bbox": [
+          0,
+          7,
+          288,
+          186
+        ],
+        "edge_alpha_pixels": [
+          9,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1920,
+          819
+        ],
+        "alpha_bbox": [
+          78,
+          275,
+          1162,
+          794
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_MULTI_PHRASE_SOURCE_ROI_AND_NATIVE_CELL_UNVERIFIED",
+      "C1_observation": "THAILAND→태국 글자 정적 판독 및 번역 일치. 원본 크롭에 복수 문구(SWEDEN / THAILAND / ARIES)가 혼재; 한 문구만의 crop 분리가 확인되지 않음. 출력 크기 불일치 및 native cell 합성 근거 부재.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "alpha_note": "RGBA; outer-edge alpha>8 (L,R,T,B) [0,0,0,0], native UI compositing not performed."
+    },
+    {
+      "role": "B",
+      "batch": 55,
+      "task_id": "OUTRUN-ROI-B-0055-63F37671",
+      "source_ordinal": 262,
+      "source_file": "Q140_4094bf4a7746445d_source.png",
+      "candidate_file": "Q140_4094bf4a7746445d_source_k.png",
+      "english": "SHOWROOM",
+      "approved_korean": "쇼룸",
+      "original_dds_sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_sha256": "5bcc51c6fa67fc40ece00f57a8c9bdbc911d1bb117d63d129051a64e4a5d0306",
+      "candidate_sha256": "79595577f7340b87c856ffb1d47d81fbffecbd3110ed98e767e0037efb4fb5d0",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1370,
+          248
+        ],
+        "alpha_bbox": [
+          9,
+          25,
+          1309,
+          225
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          49,
+          25,
+          1553,
+          636
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "SHOWROOM→쇼룸 가독성·맞춤법 정적 확인. RGBA 출력이나 영문 입력과 픽셀 크기·종횡비 다름; 실제 HD UI cell/UV 좌표·보호 픽셀·배치 확인 전 승인 불가.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "alpha_note": "RGBA; outer-edge alpha>8 (L,R,T,B) [0,0,0,0], native UI compositing not performed."
+    },
+    {
+      "role": "B",
+      "batch": 55,
+      "task_id": "OUTRUN-ROI-B-0055-63F37671",
+      "source_ordinal": 261,
+      "source_file": "Q140_45491bc18fadf334_source.png",
+      "candidate_file": "Q140_45491bc18fadf334_source_k.png",
+      "english": "SELECT STAGE",
+      "approved_korean": "스테이지 선택",
+      "original_dds_sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_sha256": "62d6ee2866c44327ef29a5fd6ed6f8b446ce49394c713aad77d66e2d05085a3e",
+      "candidate_sha256": "d721a0b808118adf7af2301f7fc282c27ce4c78190e23cb6b2bc1b045b6f33f2",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1748,
+          256
+        ],
+        "alpha_bbox": [
+          9,
+          26,
+          1685,
+          231
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          57,
+          9,
+          2076,
+          624
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "SELECT STAGE→스테이지 선택 가독성·맞춤법 정적 확인. RGBA 출력이나 영문 입력과 픽셀 크기·종횡비 다름; 실제 HD UI cell/UV 좌표·보호 픽셀·배치 확인 전 승인 불가.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "alpha_note": "RGBA; outer-edge alpha>8 (L,R,T,B) [0,0,0,0], native UI compositing not performed."
+    },
+    {
+      "role": "B",
+      "batch": 55,
+      "task_id": "OUTRUN-ROI-B-0055-63F37671",
+      "source_ordinal": 260,
+      "source_file": "Q140_3632f2ce8be745cc_source.png",
+      "candidate_file": "Q140_3632f2ce8be745cc_source_k.png",
+      "english": "SELECT RACE",
+      "approved_korean": "레이스 선택",
+      "original_dds_sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_sha256": "b12ec074f995039df46f8d5cdff9f0f447ee3d549f8dce3af12422e818187615",
+      "candidate_sha256": "756efea5dcdad8219f93e7905a36948acb61f53f30b22a88d77c2a72c05a86e0",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1654,
+          256
+        ],
+        "alpha_bbox": [
+          21,
+          26,
+          1591,
+          231
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          178,
+          65,
+          2021,
+          628
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "SELECT RACE→레이스 선택 가독성·맞춤법 정적 확인. RGBA 출력이나 영문 입력과 픽셀 크기·종횡비 다름; 실제 HD UI cell/UV 좌표·보호 픽셀·배치 확인 전 승인 불가.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "alpha_note": "RGBA; outer-edge alpha>8 (L,R,T,B) [0,0,0,0], native UI compositing not performed."
+    },
+    {
+      "role": "B",
+      "batch": 54,
+      "task_id": "OUTRUN-ROI-B-0054-4A087786",
+      "source_ordinal": 259,
+      "source_file": "Q140_4b487384b43b7237_source.png",
+      "candidate_file": "Q140_4b487384b43b7237_source_k.png",
+      "english": "SELECT MODE",
+      "approved_korean": "모드 선택",
+      "original_dds_sha256": "aadbe616a1e0de686c1982103b9d0922faa955b007b75c4a1b673a6a70cb23ea",
+      "source_sha256": "10626c7ca98a332a4ce0c77e35612b459af1469c3f7e518a804a15b447b35fab",
+      "candidate_sha256": "cd5e24cc10e9cbc9b2a2d04e2cf7e8a7cb80ba970909d875fae2bde448f26927",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1698,
+          256
+        ],
+        "alpha_bbox": [
+          9,
+          26,
+          1635,
+          231
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2035,
+          773
+        ],
+        "alpha_bbox": [
+          161,
+          17,
+          1871,
+          719
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "C1_status": "HOLD",
+      "C1_reason_code": "HOLD_NATIVE_UI_CELL_RESTORE_UNVERIFIED",
+      "C1_observation": "SELECT MODE→모드 선택 가독성·맞춤법 정적 확인. RGBA 출력이나 영문 입력과 픽셀 크기·종횡비 다름; 실제 HD UI cell/UV 좌표·보호 픽셀·배치 확인 전 승인 불가.",
+      "per_glyph_size_and_readability": "PASS_STATIC_VISUAL",
+      "mapping": "VISUALLY_MATCHES_PRODUCTION_MANIFEST",
+      "source_bbox_containment": "UNVERIFIED_NATIVE_CELL",
+      "protected_art_interference": "UNVERIFIED_COMPOSITE_NOT_PROVIDED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "alpha_note": "RGBA; outer-edge alpha>8 (L,R,T,B) [0,0,0,0], native UI compositing not performed."
+    }
+  ]
+}
