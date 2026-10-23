@@ -54,10 +54,10 @@ jobs:
           New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (-not $dll) { throw 'dinput8.dll missing' }
-          $host = Get-Item build-host/bin/outrun-vr-host.exe
-          if (-not $host) { throw 'outrun-vr-host.exe missing' }
+          $hostExe = Get-Item build-host/bin/outrun-vr-host.exe
+          if (-not $hostExe) { throw 'outrun-vr-host.exe missing' }
           Copy-Item $dll.FullName (Join-Path $dir 'dinput8.dll')
-          Copy-Item $host.FullName (Join-Path $dir 'outrun-vr-host.exe')
+          Copy-Item $hostExe.FullName (Join-Path $dir 'outrun-vr-host.exe')
           Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
           Set-Content (Join-Path $dir 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
