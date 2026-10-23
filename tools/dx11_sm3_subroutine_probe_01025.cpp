@@ -42,9 +42,11 @@ int main() {
            out[2].payload == 30u && out[3].payload == 40u);
     // A second CALL executes the body twice; no synthetic persistent state.
     auto repeated = nested;
-    repeated.insert(repeated.begin() + 3, marker(call, 2));
+    repeated.insert(repeated.begin() + 2, marker(call, 2));
     assert(lower(repeated, out) && out.size() == 5u &&
-           out[3].payload == 30u);
+           out[0].payload == 10u && out[1].payload == 20u &&
+           out[2].payload == 30u && out[3].payload == 30u &&
+           out[4].payload == 40u);
     auto bad = nested;
     bad[1] = marker(callnz, 1);
     assert(!lower(bad, out));
