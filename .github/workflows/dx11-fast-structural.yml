@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - vr-dx11-native-r71
+      - feature/dx11-01037-offscreen-postpass-overflow
       - feature/dx11-01013-visible-game-frame
       - feature/dx11-01034-live-predraw-fill-overdraw
       - feature/dx11-00952-live-sm3-device-bool

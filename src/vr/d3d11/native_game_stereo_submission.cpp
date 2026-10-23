@@ -422,20 +422,35 @@ static_assert(subtract_native_camera_clear(
 void NativeGameEyeDrawEncoder::remember_offscreen_color_source(
     ID3D11RenderTargetView* target) noexcept {
     if (!target) return;
+    // A color-capable game Draw was already queued by the caller. If its
+    // actual camera raster cannot be measured, the corresponding texture
+    // MUST NOT be called untouched by the subsequent GPU COPY/STRETCH.
+    const auto reject_unknown_footprint = [this]() noexcept {
+        offscreenColorProvenance_.note_untracked_gpu_write();
+    };
     Microsoft::WRL::ComPtr<ID3D11Resource> allocation;
     target->GetResource(allocation.GetAddressOf());
     Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-    if (!allocation || FAILED(allocation.As(&texture)) || !texture) return;
+    if (!allocation || FAILED(allocation.As(&texture)) || !texture) {
+        reject_unknown_footprint();
+        return;
+    }
     D3D11_TEXTURE2D_DESC td{};
     D3D11_RENDER_TARGET_VIEW_DESC vd{};
     texture->GetDesc(&td);
     target->GetDesc(&vd);
     const auto view = native_game_camera_rtv_extent(td, vd);
-    if (!view.valid) return;
+    if (!view.valid) {
+        reject_unknown_footprint();
+        return;
+    }
     D3D11_VIEWPORT viewport{};
     UINT viewportCount = 1u;
     context_->RSGetViewports(&viewportCount, &viewport);
-    if (viewportCount != 1u) return;
+    if (viewportCount != 1u) {
+        reject_unknown_footprint();
+        return;
+    }
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> raster;
     context_->RSGetState(raster.GetAddressOf());
     D3D11_RASTERIZER_DESC rasterDesc{};
@@ -444,7 +459,10 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_source(
     if (rasterDesc.ScissorEnable) {
         UINT scissorCount = 1u;
         context_->RSGetScissorRects(&scissorCount, &scissor);
-        if (scissorCount != 1u) return;
+        if (scissorCount != 1u) {
+            reject_unknown_footprint();
+            return;
+        }
     }
     const auto region = native_game_offscreen_draw_pixel_region(
         view.width, view.height,
@@ -453,7 +471,10 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_source(
         double(viewport.TopLeftY) + double(viewport.Height),
         rasterDesc.ScissorEnable != FALSE,
         scissor.left, scissor.top, scissor.right, scissor.bottom);
-    if (!native_game_offscreen_color_region_valid(region)) return;
+    if (!native_game_offscreen_color_region_valid(region)) {
+        reject_unknown_footprint();
+        return;
+    }
     remember_offscreen_color_region(
         texture.Get(), view.arraySlice, view.mip, region);
 
