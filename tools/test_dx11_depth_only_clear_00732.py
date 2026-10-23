@@ -36,7 +36,21 @@ for old,new in (
  ("if (clearZ) s.frameBatch.note_full_depth_clear(z);","/* suppress real Z */"),
  ("(flags & ~kDepthStencilFlags) != 0u","false /* allow TARGET */"),
 ):
- mutant=c.replace(old,new,1)
+ # Mutate the exact Z-only Clear observer, not an earlier independent
+ # TARGET pre-Draw replay with the same shared coverage helper.
+ a=c.index("bool observe_game_depth_clear(")
+ z=c.index("void observe_game_clear(",a)
+ if old == "s.frameBatch.consume_depth_clear();":
+  # DSV consumption belongs to the native GPU Draw submit path.
+  draw_a=c.index("bool submit(")
+  draw_z=c.index("bool observe_source_device(",draw_a)
+  segment=c[draw_a:draw_z]
+  assert old in segment
+  mutant=c[:draw_a]+segment.replace(old,new,1)+c[draw_z:]
+ else:
+  segment=c[a:z]
+  assert old in segment
+  mutant=c[:a]+segment.replace(old,new,1)+c[z:]
  assert mutant!=c and not valid(mutant,h,b), old
 assert not valid(c,h.replace("observe_game_depth_clear(","skipped_clear(",1),b)
 assert "python tools/test_dx11_depth_only_clear_00732.py" in wf
