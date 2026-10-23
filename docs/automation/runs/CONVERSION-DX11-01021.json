@@ -12,15 +12,15 @@
   "feature_id": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
   "work_key": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
   "work_class": "integration",
-  "feature_stage": "C4_MATERIAL",
-  "checkpoint": "C4_MATERIAL",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "source_head": "bcd5dab9d59412b19fd973560514bc4bd58ab7d4",
   "material_result_sha": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "result_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+  "validation_bearing_result_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -97,13 +97,100 @@
     "docs/automation/runs/CONVERSION-DX11-01021.json"
   ],
   "pending_items": [
-    "Final exact-SHA five-Gate pending; no game/HMD test performed.",
-    "Continue complete native menu/car/race frame and OpenXR/input handoff."
+    "Full game menu->vehicle->race native Draw count and published-frame evidence UNTESTED; Quest3/VDXR/gamepad/FFB HMD parity still requires user runtime test.",
+    "Continue remaining native full-frame coverage and OpenXR input; preserve DX9Ex fallback, DXVK frozen."
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Full game native Draw/frame count and HMD evidence unmeasured; shader p0 source added.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "CODE_CHANGED_SHA": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
-  "NEXT_IMPLEMENTATION_ACTION": "After exact SHA CI, implement remaining menu/car/race frame OpenXR/input paths."
+  "NEXT_IMPLEMENTATION_ACTION": "After exact SHA CI, implement remaining menu/car/race frame OpenXR/input paths.",
+  "material_repair_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+  "validation_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+  "acceptance_results": {
+    "uniform_setp_sample": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_predicate_flow.hpp",
+        "tools/dx11_sm3_uniform_predicate_texture_probe_01021.cpp",
+        "tools/test_dx11_sm3_uniform_predicate_texture_01021.py"
+      ],
+      "validation_command": "C++17 01021 uniform SETP p0 texture positive regression on DX11 Fast 39939619711 success at exact SHA 50dbe68f18f01c08cd54490917a0220e32bef8a2",
+      "limitation": "Code and source-linked CI; no in-game native Draw frame counts or Quest3 results"
+    },
+    "variable_setp_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_predicate_flow.hpp",
+        "tools/dx11_sm3_uniform_predicate_texture_probe_01021.cpp",
+        "tools/test_dx11_sm3_dynamic_texture_flow_00962.py"
+      ],
+      "validation_command": "C++17 01021 negative varying/conditional/unwritten p0 implicit TEX regression plus 00962 prior fallback safety checks; Fast 39939619711 success",
+      "limitation": "No actual gamepad/FFB/Quest3 DX9Ex parity test; opt-in native draw still guarded"
+    },
+    "compiled_five_gate": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tools/dx11_sm3_uniform_predicate_texture_probe_01021.cpp",
+        "tools/test_dx11_sm3_uniform_predicate_texture_01021.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Exact-SHA 50dbe68f18f01c08cd54490917a0220e32bef8a2 DX11 Fast 39939619711, Backend 39939619779 (validate+smoke), Build 39939619715, OpenXR 39939619724, HUD 39939619787 all SUCCESS",
+      "limitation": "Exact SHA CI is not evidence that full game menu/car/race screen or HMD is functional"
+    }
+  },
+  "gate_evidence": {
+    "source_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39939619711,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39939619779,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39939619715,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39939619724,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39939619787,
+        "conclusion": "success"
+      }
+    },
+    "causal_repairs": [
+      {
+        "failing_sha": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
+        "reason": "Copied terminal C6 evidence from prior 01020 and policy rejection",
+        "repair_sha": "855c3b9ba82bb2d38fde3fbe58faa1d6bfde7e1a"
+      },
+      {
+        "failing_sha": "855c3b9ba82bb2d38fde3fbe58faa1d6bfde7e1a",
+        "reason": "Preexisting 00962 obsolete literal rejects all predicated TEX; preserved negative/positive fail-closed regression on uniform p0",
+        "repair_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2"
+      }
+    ]
+  },
+  "feature_ready": {
+    "status": "FEATURE_READY",
+    "feature_id": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
+    "feature_head_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+    "gate_head_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+    "condition": "SOURCE_AND_EXACT_SHA_CI_VERIFIED_NOT_GAMEPLAY_PROVEN",
+    "acceptance_results_status": "PASS_FEATURE_CI",
+    "material_source_sha": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
+    "runtime_validation": "UNTESTED"
+  },
+  "score_status": "ELIGIBLE_ONCE_NEW_MATERIAL_01021_AND_EXACT_SHA_FIVE_GATE; C6_AND_CAUSAL_REPAIRS_NO_EXTRA_CREDIT"
 }
