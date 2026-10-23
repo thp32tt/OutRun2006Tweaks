@@ -3364,14 +3364,14 @@ def conversion_dispatch_plan(
 
 
 def vr_lane_schedule_window_due(slot_name: str, now: datetime) -> bool:
-    """DX9Ex C is hourly; other lanes retain the global schedule."""
+    """DX9Ex C uses its configured hour/minute slots; other lanes use the global schedule."""
     if CONTROLLER_MODE == "conversion" and slot_name == "C":
-        return now.minute in DX9EX_SCHEDULE_MINUTES
+        return now.hour % DX9EX_SCHEDULE_EVERY_HOURS == 0 and now.minute in DX9EX_SCHEDULE_MINUTES
     return not VR_SCHEDULED_DISPATCH_ENABLED or now.minute in SCHEDULE_MINUTES
 
 
 def vr_scheduled_dispatch_due(q: dict, slot_name: str, now: datetime) -> bool:
-    """New production: at most once per scheduled slot window (C always hourly)."""
+    """New production: at most once per configured KST slot window."""
     if not vr_lane_schedule_window_due(slot_name, now):
         return False
     if not VR_SCHEDULED_DISPATCH_ENABLED and not (CONTROLLER_MODE == "conversion" and slot_name == "C"):
