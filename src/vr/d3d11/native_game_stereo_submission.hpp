@@ -230,6 +230,8 @@ private:
     // independent eye attachments; source Draws must not mutate them.
     [[nodiscard]] bool geometry_outputs_isolated(
         ID3D11RenderTargetView* target) const noexcept;
+    [[nodiscard]] bool game_offscreen_outputs_admitted(
+        ID3D11RenderTargetView* gameTarget) const noexcept;
     [[nodiscard]] bool game_source_target_bound(
         ID3D11RenderTargetView* gameTarget) const noexcept;
     [[nodiscard]] bool prepare_offscreen_game_draw(
@@ -238,7 +240,9 @@ private:
     [[nodiscard]] bool eye_output_bound() const noexcept;
     [[nodiscard]] bool eye_color_writable() const noexcept;
     [[nodiscard]] bool source_color_writable(
-        ID3D11RenderTargetView* gameTarget) const noexcept;
+        ID3D11RenderTargetView* gameTarget, UINT outputSlot) const noexcept;
+    [[nodiscard]] bool remember_offscreen_color_outputs(
+        ID3D11RenderTargetView* gameTarget) noexcept;
     // Genuine offscreen game Draw -> exact source subresource -> GPU postpass.
     void remember_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
     void remember_offscreen_color_region(
@@ -249,7 +253,8 @@ private:
         ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
         const D3D11_BOX& sourceRegion,
         bool* nativeCameraAllocationTouched = nullptr) const noexcept;
-    [[nodiscard]] bool color_writable_for_samples(UINT sampleCount) const noexcept;
+    [[nodiscard]] bool color_writable_for_samples(
+        UINT sampleCount, UINT outputSlot = 0u) const noexcept;
     [[nodiscard]] bool unpredicated_color_evidence() const noexcept;
     // A real Draw still advances the source ordinal even if the current
     // primitive topology cannot assemble a single point/line/triangle.

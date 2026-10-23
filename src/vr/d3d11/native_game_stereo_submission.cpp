@@ -3,6 +3,7 @@
 #include "native_game_eye_pair_sources.hpp"
 #include "native_game_postpass_replay.hpp"
 #include "native_game_camera_view.hpp"
+#include "native_game_offscreen_mrt.hpp"
 #include "native_game_partial_color_format.hpp"
 #include "native_game_stretch_source.hpp"
 #include "native_game_stereo_draw_evidence.hpp"
@@ -280,6 +281,96 @@ bool NativeGameEyeDrawEncoder::eye_targets_bound() const noexcept {
 // Query UAV slots 1..7 only after proving RTV0 is the sole color attachment:
 // RTV and PS UAV slots overlap on D3D11 and querying an occupied RTV range
 // as UAV would be invalid. Balance all Get* COM references on every path.
+// XR-eye geometry remains single-RTV, but an authentic auxiliary game
+// camera may render MRT0..MRT7. Admit the *entire* bounded game MRT layout,
+// never a foreign/shared eye, mismatched physical mip/array, or a PS UAV.
+// Validate before issuing any D3D11 Draw so a rejected source retains the
+// original D3D9/FFB/Present fallback without partial native GPU writes.
+bool NativeGameEyeDrawEncoder::game_offscreen_outputs_admitted(
+    ID3D11RenderTargetView* gameTarget) const noexcept {
+    if (!context_ || !gameTarget || !eyeTarget_) return false;
+    ID3D11RenderTargetView* raw[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+    context_->OMGetRenderTargets(
+        D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, raw, nullptr);
+    std::array<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>,
+               D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT> targets{};
+    for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+        targets[i].Attach(raw[i]); // OMGet added these COM references.
+    if (targets[0].Get() != gameTarget) return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> device;
+    context_->GetDevice(device.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Resource> primaryResource, eyeResource;
+    Microsoft::WRL::ComPtr<ID3D11Resource> eyeDepthResource, gameDepthResource;
+    gameTarget->GetResource(primaryResource.GetAddressOf());
+    eyeTarget_->GetResource(eyeResource.GetAddressOf());
+    if (eyeDepth_) eyeDepth_->GetResource(eyeDepthResource.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> gameDepth;
+    context_->OMGetRenderTargets(0u, nullptr, gameDepth.GetAddressOf());
+    if (gameDepth) gameDepth->GetResource(gameDepthResource.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> primary;
+    if (!device || !primaryResource || !eyeResource ||
+        FAILED(primaryResource.As(&primary)) || !primary) return false;
+    D3D11_TEXTURE2D_DESC primaryDesc{};
+    D3D11_RENDER_TARGET_VIEW_DESC primaryView{};
+    primary->GetDesc(&primaryDesc);
+    gameTarget->GetDesc(&primaryView);
+    const auto camera = native_game_camera_rtv_extent(primaryDesc, primaryView);
+    if (!camera.valid) return false;
+    constexpr UINT shared = D3D11_RESOURCE_MISC_SHARED |
+        D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+        D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+    UINT occupiedPrefix = 1u;
+    for (UINT i = 1u; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i) {
+        auto* view = targets[i].Get();
+        if (!view) continue;
+        occupiedPrefix = i + 1u;
+        Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+        Microsoft::WRL::ComPtr<ID3D11Device> owner;
+        view->GetResource(resource.GetAddressOf());
+        if (!resource || FAILED(resource.As(&texture)) || !texture)
+            return false;
+        texture->GetDevice(owner.GetAddressOf());
+        D3D11_TEXTURE2D_DESC desc{};
+        D3D11_RENDER_TARGET_VIEW_DESC selected{};
+        texture->GetDesc(&desc);
+        view->GetDesc(&selected);
+        const auto physical = native_game_camera_rtv_extent(desc, selected);
+        const bool local = desc.Usage == D3D11_USAGE_DEFAULT &&
+            desc.CPUAccessFlags == 0u &&
+            (desc.MiscFlags & shared) == 0u &&
+            (desc.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u &&
+            physical.valid;
+        if (!native_game_offscreen_mrt_slot_compatible(
+                camera.width, camera.height,
+                primaryDesc.SampleDesc.Count, primaryDesc.SampleDesc.Quality,
+                physical.width, physical.height,
+                desc.SampleDesc.Count, desc.SampleDesc.Quality,
+                local, owner && owner.Get() == device.Get(),
+                resource.Get() != eyeResource.Get() &&
+                resource.Get() != eyeDepthResource.Get() &&
+                resource.Get() != gameDepthResource.Get()))
+            return false;
+    }
+    // RTV slots and PS UAV registers are a shared namespace. Scan only the
+    // legally unoccupied tail after the highest bound (possibly sparse) MRT.
+    // GPU game offscreen geometry cannot mutate a hidden pixel UAV while
+    // collecting independent L/R camera source evidence.
+    if (occupiedPrefix < D3D11_PS_CS_UAV_REGISTER_COUNT) {
+        ID3D11UnorderedAccessView* rawUav[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+        context_->OMGetRenderTargetsAndUnorderedAccessViews(
+            0u, nullptr, nullptr, occupiedPrefix,
+            D3D11_PS_CS_UAV_REGISTER_COUNT - occupiedPrefix,
+            rawUav + occupiedPrefix);
+        bool clean = true;
+        for (auto* uav : rawUav) {
+            if (uav) { clean = false; uav->Release(); }
+        }
+        if (!clean) return false;
+    }
+    return true;
+}
+
 bool NativeGameEyeDrawEncoder::geometry_outputs_isolated(
     ID3D11RenderTargetView* target) const noexcept {
     if (!context_ || !target) return false;
@@ -346,7 +437,7 @@ bool NativeGameEyeDrawEncoder::eye_color_writable() const noexcept {
 // certify that a subsequent GPU Copy/Stretch contains a fresh game frame.
 // Preserve the authentic GPU command and source draw ordinal regardless.
 bool NativeGameEyeDrawEncoder::source_color_writable(
-    ID3D11RenderTargetView* gameTarget) const noexcept {
+    ID3D11RenderTargetView* gameTarget, UINT outputSlot) const noexcept {
     if (!context_ || !gameTarget) return false;
     Microsoft::WRL::ComPtr<ID3D11Resource> resource;
     gameTarget->GetResource(resource.GetAddressOf());
@@ -355,7 +446,7 @@ bool NativeGameEyeDrawEncoder::source_color_writable(
         return false;
     D3D11_TEXTURE2D_DESC desc{};
     texture->GetDesc(&desc);
-    return color_writable_for_samples(desc.SampleDesc.Count);
+    return color_writable_for_samples(desc.SampleDesc.Count, outputSlot);
 }
 
 
@@ -615,7 +706,8 @@ bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
 }
 
 bool NativeGameEyeDrawEncoder::color_writable_for_samples(
-    UINT sampleCount) const noexcept {
+    UINT sampleCount, UINT outputSlot) const noexcept {
+    if (outputSlot >= D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT) return false;
     if (!context_) return false;
     ID3D11BlendState* blend = nullptr;
     FLOAT blendFactors[4]{};
@@ -629,9 +721,10 @@ bool NativeGameEyeDrawEncoder::color_writable_for_samples(
     if (blend) {
         D3D11_BLEND_DESC desc{};
         blend->GetDesc(&desc);
-        const auto& eye = desc.RenderTarget[0];
+        const auto& eye = desc.RenderTarget[
+            desc.IndependentBlendEnable ? outputSlot : 0u];
         writable = writable &&
-            (desc.RenderTarget[0].RenderTargetWriteMask &
+            (eye.RenderTargetWriteMask &
              D3D11_COLOR_WRITE_ENABLE_ALL) != 0u &&
             live_game_stereo::blended_eye_color_may_change(
                 eye.BlendEnable != FALSE, eye.RenderTargetWriteMask,
@@ -817,7 +910,7 @@ bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
     ID3D11RenderTargetView* gameTarget,
     bool requireDrawableRaster) noexcept {
     if (!game_source_target_bound(gameTarget) ||
-        !geometry_outputs_isolated(gameTarget) ||
+        !game_offscreen_outputs_admitted(gameTarget) ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
     if (requireDrawableRaster) {
@@ -862,20 +955,45 @@ bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
         geometry_outputs_isolated(gameTarget);
 }
 
+// One actual game draw can populate several separately authored camera
+// color attachments (for example an auxiliary menu mask in RT1). Attribute
+// only writable physical output slots to their own texture/mip/array, not
+// to RT0 or the XR eye. The geometry command advances the source timeline
+// once, regardless of how many local MRTs receive its pixels.
+bool NativeGameEyeDrawEncoder::remember_offscreen_color_outputs(
+    ID3D11RenderTargetView* gameTarget) noexcept {
+    ID3D11RenderTargetView* raw[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+    context_->OMGetRenderTargets(
+        D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, raw, nullptr);
+    std::array<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>,
+               D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT> targets{};
+    for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+        targets[i].Attach(raw[i]);
+    if (targets[0].Get() != gameTarget) {
+        offscreenColorProvenance_.note_untracked_gpu_write();
+        return false;
+    }
+    bool anyColorSource = false;
+    for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i) {
+        auto* output = targets[i].Get();
+        if (!output || !source_color_writable(output, i)) continue;
+        remember_offscreen_color_source(output);
+        anyColorSource = true;
+    }
+    return anyColorSource;
+}
+
 bool NativeGameEyeDrawEncoder::draw_offscreen(
     ID3D11RenderTargetView* gameTarget,
     UINT vertexCount, UINT startVertex) noexcept {
     if (!vertexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     const bool eligible = unpredicated_color_evidence() &&
-        source_color_writable(gameTarget) &&
         raster_primitive_possible(vertexCount);
     context_->Draw(vertexCount, startVertex);
     ++drawCount_; // source ordinal, NEVER direct XR color evidence
-    if (eligible) {
+    if (eligible && remember_offscreen_color_outputs(gameTarget))
         ++unpredicatedGameDrawCount_;
-        remember_offscreen_color_source(gameTarget);
-    }
     return true;
 }
 
@@ -885,14 +1003,11 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(
     if (!indexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     const bool eligible = unpredicated_color_evidence() &&
-        source_color_writable(gameTarget) &&
         raster_primitive_possible(indexCount);
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
-    if (eligible) {
+    if (eligible && remember_offscreen_color_outputs(gameTarget))
         ++unpredicatedGameDrawCount_;
-        remember_offscreen_color_source(gameTarget);
-    }
     return true;
 }
 
@@ -909,15 +1024,12 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_instanced(
         !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     const bool eligible = unpredicated_color_evidence() &&
-        source_color_writable(gameTarget) &&
         raster_primitive_possible(verticesPerInstance);
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
     ++drawCount_;
-    if (eligible) {
+    if (eligible && remember_offscreen_color_outputs(gameTarget))
         ++unpredicatedGameDrawCount_;
-        remember_offscreen_color_source(gameTarget);
-    }
     return true;
 }
 
@@ -930,16 +1042,13 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(
         !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     const bool eligible = unpredicated_color_evidence() &&
-        source_color_writable(gameTarget) &&
         raster_primitive_possible(indicesPerInstance);
     context_->DrawIndexedInstanced(
         indicesPerInstance, instanceCount, startIndex,
         baseVertex, startInstance);
     ++drawCount_;
-    if (eligible) {
+    if (eligible && remember_offscreen_color_outputs(gameTarget))
         ++unpredicatedGameDrawCount_;
-        remember_offscreen_color_source(gameTarget);
-    }
     return true;
 }
 

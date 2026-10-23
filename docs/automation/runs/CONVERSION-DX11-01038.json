@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01038",
+  "production_id": "CONVERSION-DX11-01038",
+  "event_id": "CONVERSION-DX11-01038-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01038",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW",
+  "work_key": "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW",
+  "feature_base_sha": "f865cfad053d692e8230ccfe4024c39b10cc509a",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "feature_stage": "C4_COMMITTED",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_GITHUB_ACTIONS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Native real offscreen game Draw/DrawIndexed and instanced calls may populate multiple game-owned MRT color targets. Validate every RT, reject PS UAV/shared/foreign/eye writes; collect color provenance per slot and independent blend mask without changing authoritative D3D9 input/FFB.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW",
+    "goal": "Admit real menu/car/race offscreen MRT0..MRT7 source geometry and track separate L/R camera pixels through real GPU postpasses",
+    "acceptance_items": [
+      {
+        "id": "gpu_mrt_draw",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Owned same-resolution game MRT Draw and DrawIndexed issue native GPU commands and record per-target source pixels"
+      },
+      {
+        "id": "blend_provenance",
+        "category": "source_correctness",
+        "expected_behavior": "IndependentBlendEnable and physical target subresource control color attribution"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Eye/direct Draw isolation preserved; foreign/shared/mismatched MRT and pixel UAV fail closed"
+      },
+      {
+        "id": "gate",
+        "category": "integrated_validation",
+        "expected_behavior": "New regression and all five required GitHub Actions exact SHA success"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAMES",
+    "integration_path": [
+      "game-author D3D9 MRT Draw",
+      "native offscreen multiple RTVs",
+      "per-slot independent blend/written region",
+      "GPU COPY/STRETCH to L/R native eyes",
+      "OpenXR shared-eye fence/ACK"
+    ],
+    "conflict_keys": [
+      "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY_UNTESTED; no real-game/HMD observation",
+    "activation_guard_and_fallback": "original D3D9Ex authoritative, opt-in native; no DXVK changes"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_offscreen_mrt.hpp",
+    "tools/dx11_game_offscreen_mrt_probe_01038.cpp",
+    "tools/test_dx11_game_offscreen_mrt_01038.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01038.json"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Validate exact GitHub Actions SHA; repair only causal failure, keep real menu/car/race HMD untested; do not claim native game draw without runtime evidence.",
+  "full_dx11_renderer_complete": false,
+  "feature_ready": false
+}
