@@ -45,7 +45,19 @@ for old,new in (
     ("if (r.x1 >= r.x2 || r.y1 >= r.y2) return false;", "if (false) return false;"),
 ):
     assert old in coverage and not linked(coverage.replace(old,new,1),bridge,batch,hook,probe,workflow)
-assert not linked(coverage,bridge.replace("GameNativeClearCoverage::covers_whole(", "/* native full color clear removed */",1),batch,hook,probe,workflow)
+# Change the actual observe_game_clear main color seed, not the newer
+# pre-Draw TARGET-only replay which also uses the shared clipping helper.
+color_start = bridge.index("void observe_game_clear(")
+color_end = bridge.index("void observe_unavailable_game_draw(",color_start)
+color_segment = bridge[color_start:color_end]
+assert "GameNativeClearCoverage::covers_whole(" in color_segment
+mutated_bridge = (
+    bridge[:color_start]
+    + color_segment.replace("GameNativeClearCoverage::covers_whole(",
+                            "/* native full color clear removed */",1)
+    + bridge[color_end:]
+)
+assert not linked(coverage,mutated_bridge,batch,hook,probe,workflow)
 assert not linked(coverage,bridge,batch.replace("return matchesClearedBackbuffer &&","return true &&",1),hook,probe,workflow)
 clear_hook_start = hook.index("HRESULT __stdcall ClearDestR9(")
 assert not linked(coverage,bridge,batch,hook[:clear_hook_start] + hook[clear_hook_start:].replace("observe_scene_boundary(device)","/* boundary bypass */",1),probe,workflow)
