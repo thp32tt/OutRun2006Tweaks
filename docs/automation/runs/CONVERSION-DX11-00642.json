@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00642",
+  "production_id": "CONVERSION-DX11-00642",
+  "event_id": "CONVERSION-DX11-00642-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_CURRENT_DIFFUSE_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "033e26066e3afbee7ff24fb771a774d4d7ac1cb8",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 live stage0 PM RGB with BLENDCURRENTALPHA and exact unmodified DIFFUSE/CURRENT ARG2",
+      "Native D3D11 PS alias to verified BLENDDIFFUSEALPHA shader; game-authored Draw/DrawIndexed; original DX9Ex preserved"
+    ],
+    "batch_components": [
+      "C++ fail-closed state capture, shader selection and native Draw integration",
+      "131072-case positive numeric plus source graph/operand-mutation negative regression, registered in fast and full GitHub gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Stage0 CURRENT=DIFFUSE; alpha=lerp(diffuse.a, texture.a, diffuse.a) for either DIFFUSE or CURRENT ARG2",
+      "negative_regression": "Reject complemented, swapped, missing/changed texture source or wrong alpha op; 00641 TFACTOR remains disjoint",
+      "component_integration": "Real GetTextureStageState -> supported_game_state -> shader alias -> native PS -> D3D11 Draw and DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_CURRENT_DIFFUSE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and numeric regression only; game menu/race, gamepad, Quest3/VDXR not tested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only; all D3D9 game draw and gamepad preserved"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_current_diffuse_00642.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00642.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: HEAD and AGENTS/policy/00641 checked",
+    "C1_REVIEW": "PASS: missing stage0 PM BLENDCURRENTALPHA with DIFFUSE/CURRENT argument",
+    "C2_IMPLEMENT": "PASS: new fail-closed C++ predicate and existing equivalent native shader dispatch",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38324521451 SUCCESS; DX11 Fast Structural Checks #38324521401 SUCCESS; Build #38324524772 SUCCESS; OpenXR architecture #38324524813/#38324521435 SUCCESS; HUD #38324524765 SUCCESS on 14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e.",
+    "C4_COMMIT": "PASS: material implementation 0a3c2cdca7a6ee934e3fc6dea2f5da2bed7195b7; validation-bearing repair/result 14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e; exact-SHA CI SUCCESS.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: PASS_EXACT_SHA; Quest3/VDXR HMD and gamepad runtime UNTESTED; no backend promotion."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No user-verified in-game/HMD proof"
+  },
+  "next_action": "C6 complete. Do not re-run CI or re-score this TASK_ID; hardware-only menu-to-race, Quest3/VDXR and gamepad runtime validation remains UNTESTED.",
+  "validation_bearing_result_sha": "14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e",
+  "material_result_sha": "0a3c2cdca7a6ee934e3fc6dea2f5da2bed7195b7",
+  "material_implementation_sha": "0a3c2cdca7a6ee934e3fc6dea2f5da2bed7195b7",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "git_actions": {
+    "backend_conversion_gate": {
+      "run_id": 38324521451,
+      "conclusion": "success",
+      "head_sha": "14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e"
+    },
+    "dx11_fast_structural": {
+      "run_id": 38324521401,
+      "conclusion": "success",
+      "head_sha": "14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e"
+    },
+    "windows_build": {
+      "run_id": 38324524772,
+      "conclusion": "success",
+      "head_sha": "14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e"
+    },
+    "openxr_architecture": {
+      "run_id": 38324524813,
+      "conclusion": "success",
+      "head_sha": "14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e"
+    },
+    "openxr_architecture_push": {
+      "run_id": 38324521435,
+      "conclusion": "success",
+      "head_sha": "14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e"
+    },
+    "hud_inspector": {
+      "run_id": 38324524765,
+      "conclusion": "success",
+      "head_sha": "14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e"
+    },
+    "vr_pc_fast_test_build": {
+      "run_id": 38324521380,
+      "conclusion": "skipped",
+      "head_sha": "14bef2999a0da3359c766b0fbb16cc7e7b9b3c8e"
+    }
+  },
+  "completed_at": "2026-10-13T00:11:08.216Z"
+}

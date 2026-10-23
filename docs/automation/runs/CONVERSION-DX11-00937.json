@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00937",
+  "production_id": "CONVERSION-DX11-00937",
+  "event_id": "CONVERSION-DX11-00937-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00937",
+  "feature_id": "DX11:LIVE_GAME_SM3_RGB_INDEPENDENT_ALPHA_OM",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "b583c34aa64cd8fa4c07a67e43a0207265f2e37c",
+  "validation_bearing_result_sha": "420bc96363129bdcc85c4038356a1175a0d16346",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_GAME_SM3_RGB_INDEPENDENT_ALPHA_OM",
+    "goal": "Bind actual game-authored D3D9 SM3 programmable Draw RGB and independent alpha blend equations to the native D3D11 output merger with lifetime-safe state caching and safe D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_sm3_rgb_alpha_om_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_shader_draw_output_merger",
+        "expected_behavior": "Read actual game blend factors and equations; create/cache compatible native D3D11 blend state and bind to programmable game Draw/DrawIndexed."
+      },
+      {
+        "id": "unsupported_blend_and_reset_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "unrepresentable_game_state_and_native_resource_lifetime",
+        "expected_behavior": "Unsupported factors/ops fail closed without modifying original D3D9 game draw; native blend cache is cleared across device teardown and Reset."
+      },
+      {
+        "id": "exact_sha_material_source_gate",
+        "category": "integrated_validation",
+        "behavior_area": "source_implementation_with_required_github_actions",
+        "expected_behavior": "A source-bearing native DX11 material commit exists and the selected final exact SHA passes Fast, Backend, Windows Build, OpenXR and HUD required gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "Intercept actual D3D9 programmable game Draw/DrawIndexed and retrieve RGB plus separate-alpha blend factors and operators",
+      "Translate supported factors and independent alpha operations to native D3D11 RT blend description with conservative fallback on unrepresentable state",
+      "Cache native per-device D3D11 OM blend states and bind them in live native game draw; invalidate cache on Reset/device recreation"
+    ],
+    "batch_components": [
+      "Game-owned D3D9 RGB/independent-alpha render-state capture and constexpr translation",
+      "D3D11 output-merger state cache/Reset cleanup integrated with native programmable Draw/DrawIndexed"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compile-time native SM3 RGB and independent-alpha equation regression and actual C++ OM binding source; exact-SHA native Windows Build SUCCESS.",
+      "negative_regression": "Unsupported blend factor/op and independent alpha cases return false without rewriting the original D3D9 game draw; cached states reset on native device teardown.",
+      "component_integration": "D3D9 source draw blend state -> native D3D11 RT blend desc/BlendState cache -> OMSetBlendState -> Draw/DrawIndexed; original D3D9 game render/input/FFB retained."
+    },
+    "conflict_keys": [
+      "DX11:SM3_BLEND_OM:CONVERSION-DX11-00937"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Real-game SM3 OM blend source integrated and exact-SHA CI verified; runtime gameplay menu, vehicle selection, race native pixel/frame output and HMD remain UNTESTED.",
+    "activation_guard_and_fallback": "Native Draw remains opt-in and fail-closed with original D3D9/DX9Ex renderer, game input, FFB and SkyGlow preserved; DXVK branch frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00936.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Resume existing 00937 source material b583c34a. Backend exact run 39171445142 and Fast 39171445132 failed in policy acceptance of previous 00936 terminal record, before C++ compile.",
+    "C1_REVIEW": "00936 had successful exact-SHA gates at 29186fbe but its three acceptance_results were still PENDING_EXACT_SHA while status was COMPLETE_BUILD_VERIFIED.",
+    "C2_IMPLEMENT": "Preserve prior 00937 real SM3 live RGB and independent alpha native OM C++ source implementation at material b583c34a; no duplicate source feature created during retry.",
+    "C3_VALIDATE": "Repair previous validated 00936 acceptance record at 420bc963; final exact-SHA DX11 Fast/Backend/Windows Build/OpenXR/HUD all SUCCESS at 420bc963.",
+    "C4_COMMIT": "material=b583c34aa64cd8fa4c07a67e43a0207265f2e37c; validation_bearing_repair=420bc96363129bdcc85c4038356a1175a0d16346",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA_5_OF_5; COMPLETE_BUILD_VERIFIED source only; RUNTIME_VALIDATION=UNTESTED; separately committed bookkeeping [skip ci]."
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Source has integrated OM translation, but actual-game native Draw/pixel and complete menu->car->race frame runtime proof is not available; require separately measured native_draws and published frames.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "b583c34aa64cd8fa4c07a67e43a0207265f2e37c",
+  "NEXT_IMPLEMENTATION_ACTION": "Controller selects next distinct unfinished native game Draw/shader/texture/eye-output feature. Preserve 00937 exact gate SHA; request game and Quest3/VDXR evidence before runtime promotion.",
+  "acceptance_results": {
+    "native_sm3_rgb_alpha_om_draw": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "unsupported_blend_and_reset_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "exact_sha_material_source_gate": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "head_sha": "420bc96363129bdcc85c4038356a1175a0d16346",
+    "required_workflow_runs": {
+      "fast": 39171678271,
+      "backend": 39171678251,
+      "windows_build": 39171678262,
+      "openxr": 39171678281,
+      "hud": 39171678268
+    },
+    "all_required_gates": "SUCCESS",
+    "runtime": "UNTESTED"
+  },
+  "score_policy": {
+    "run_key": "CONVERSION-DX11-00937",
+    "scoreboard_recorded_separately": true,
+    "scoreboard_commit": "b1b73c9102efb372bc56630149299603916a60a9",
+    "retry_additional_score": 0
+  }
+}

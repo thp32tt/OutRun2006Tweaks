@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00670",
+  "production_id": "CONVERSION-DX11-00670",
+  "event_id": "CONVERSION-DX11-00670-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_FLOAT_RGBA_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "143d61bb793cb01678a666cdc01ad79f998c1972",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "intercept OutRun D3D9 managed/systemmem float16/float32 RGBA game LockRect mip rows with source pitch",
+      "upload little-endian R/G/B/A float components to immutable DXGI R16G16B16A16_FLOAT/R32G32B32A32_FLOAT SRV mips",
+      "bind live native SRV in explicit opt-in game-authored Draw/DrawIndexed; preserve D3D9 Present and gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_float_rgba_texture.hpp",
+      "tools/dx11_game_float_rgba_probe.cpp",
+      "tools/test_dx11_native_float_rgba_00670.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Local ASan/UBSan C++ PASS: 16/32-bit FLOAT payload including signed zero/NaN/Inf, padded LockRect rows and tail mip",
+      "negative_regression": "16 destructive integration mutants; float sRGB and unreadable DEFAULT textures continue fail-closed on original D3D9 Draw",
+      "component_integration": "live D3D9 LockRect -> preserved UINT mip pitch -> immutable native FLOAT SRV -> PSSetShaderResources -> native Draw/DrawIndexed diagnostic frame"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_FLOAT_RGBA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_float_rgba_texture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE_ONLY: real menu, vehicle, race pixels and Quest3/VDXR parity require runtime test",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in; float sRGB/DEFAULT unreadable fail closed; original D3D9 Draw/Present and input unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_float_rgba_texture.hpp",
+    "tools/dx11_game_float_rgba_probe.cpp",
+    "tools/test_dx11_native_float_rgba_00670.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00670.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub HEAD 143d61bb793cb01678a666cdc01ad79f998c1972 and 00669 C6 complete; new 00670 record absent",
+    "C1_REVIEW": "PASS: game-authored float RGBA texture formats missing native mirror, 00669 released source",
+    "C2_IMPLEMENT": "PASS: float16/float32 native SRV mip and Draw source integration",
+    "C3_VALIDATE": "LOCAL_ASAN_UBSAN_PASS; exact SHA CI pending",
+    "C4_COMMIT": "MATERIAL_COMMIT; reference SHA via commit marker",
+    "C5_PACKAGE": "NOT_REQUIRED; no Quest3 visual evidence",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "LOCAL_ASAN_UBSAN_PASS",
+    "static_regression": "PENDING_GITHUB_FAST",
+    "compile_build": "PENDING_GITHUB_BUILD",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "next_action": "Await GitHub exact-SHA mandatory 5 Gates; repair actual source failures without skip. Once 5/5 success, separate C6 bookkeeping [skip ci] record, retaining material and validation SHA. Actual HMD/gamepad remains UNTESTED.",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null
+}

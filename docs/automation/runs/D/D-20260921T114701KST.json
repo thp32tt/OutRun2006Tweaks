@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "role": "D_FIX_VALIDATE_INTEGRATE",
+  "runId": "D-20260921T114701KST",
+  "startKst": "2026-09-21T11:47:01+09:00",
+  "baseIntegrationSha": "f03e54997d4a247ff65037aee4166614288922d5",
+  "runtimeSourceSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+  "execution_units_completed": 24,
+  "reviewerLedgers": {
+    "A": {"branch": "vr-d3d9ex-review-a", "createdThisRun": true, "importedUnits": 0},
+    "B": {"branch": "vr-d3d9ex-review-b", "runId": "B-20260921T1112KST", "verifiedPersistedUnits": 20, "checkpoint": "CP20"},
+    "C": {"branch": "vr-d3d9ex-review-c", "createdThisRun": true, "importedUnits": 0}
+  },
+  "n100Issue6": {
+    "inspected": true,
+    "commentCount": 0,
+    "importedCommentIds": [],
+    "dispositions": []
+  },
+  "partialInvalidation": {
+    "runtimeChanged": false,
+    "carriedForward": "all runtime-source coverage whose dependency identity is based on 8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+    "invalidated": []
+  },
+  "findingsTouched": [
+    "DX9EX-RESET-STATEBLOCK-001",
+    "DX9EX-SKYGLOW-001",
+    "DX9EX-PERF-PRODUCER-FENCE-001",
+    "DX9EX-TEST-HOST-SMOKES-CI-001",
+    "VR-HOST-002"
+  ],
+  "mandatoryRealChange": {
+    "attempted": true,
+    "findingId": "DX9EX-RESET-STATEBLOCK-001",
+    "candidateBranch": "vr-d3d9ex-candidate/DX9EX-RESET-STATEBLOCK-001-D-20260921T1147KST",
+    "baseBlobSha": "5dc13cf1a84ef9ff9a5081a5dd3351e92ab6c890",
+    "preparedPatchRecovered": true,
+    "applied": false,
+    "blocker": "GitHub fetch_file exposes complete source only through paged/truncated response resources and update_file requires one complete replacement string; no safe server-side apply-patch action is exposed. Candidate branch was created from exact base, but source remains byte-identical. No truncated reconstruction was written."
+  },
+  "safePatchPathsAttempted": [
+    "fetch_file complete-source recovery with immutable ref/blob identity",
+    "paged source recovery",
+    "candidate branch from exact integration base",
+    "Git Data capabilities create_blob/create_tree/create_commit inspected; still require complete patched blob content"
+  ],
+  "verifiedEvidence": {
+    "resetStateBlock": "R15 still retains D3DSBT_ALL state block across ResetEx; prepared patch remains applicable to runtime source blob 5dc13cf1...",
+    "skyGlow": "R30 current ping-pong selects temp after horizontal pass and reduced after vertical pass, opposite the just-produced textures; SkyGlowFactor=1 therefore composites pre-horizontal-blur temp.",
+    "producerFence": "R32 uses D3D9 EVENT GetData polling with D3DGETDATA_FLUSH then SwitchToThread loop under ProducerFenceBudgetMs=2; performance impact remains runtime-unverified."
+  },
+  "infrastructureCandidate": {
+    "findingId": "DX9EX-TEST-HOST-SMOKES-CI-001",
+    "branch": "vr-d3d9ex-candidate/DX9EX-TEST-HOST-SMOKES-CI-001-D-20260921T1147KST",
+    "candidateSha": "bad74c80d37e5b57b9f7ae761cc7e7a2af180c29",
+    "diff": ".github/workflows/vr-dx9ex-active.yml only, +24/-2",
+    "validationRunId": 35555390587,
+    "validationStateAtRecord": "in_progress",
+    "policy": "success",
+    "host": "building host + eight deterministic no-HMD smoke executables",
+    "game": "in_progress"
+  },
+  "otherValidation": {
+    "VR-HOST-002": {"candidateSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558", "runId": 35531382160, "build": "success", "integrationGate": "blocked pending exact-SHA independent post-review"},
+    "XYRZHWIntegration": {"sourceSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb", "runId": 35548649441, "build": "success", "runtime": "NEED_HMD_TEST"}
+  },
+  "blockers": [
+    "RESET production patch cannot yet be safely materialized as a complete replacement blob with current Chat connector surface.",
+    "High-risk candidates cannot integrate until exact-SHA A/B/C post-review records exist; A and C dedicated branches were created this run to unblock future reviews."
+  ],
+  "hmdTestEffect": "No new HMD test requested. Preserve one CORRECTNESS test policy.",
+  "nextActions": [
+    "Consume run 35555390587; if all deterministic smoke tests and package pass, integrate the CI-only candidate after prospective-tree validation.",
+    "Route VR-HOST-002 and future high-risk candidates to newly available A/C dedicated branches plus B for exact-SHA post-review.",
+    "Apply DX9EX-RESET-STATEBLOCK-001 only when a safe complete-source replacement can be materialized; never reconstruct from truncated excerpts.",
+    "Implement DX9EX-SKYGLOW-001 after deterministic ping-pong verifier is available or safe full-file patching is possible."
+  ]
+}

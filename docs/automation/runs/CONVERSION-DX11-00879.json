@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00879",
+  "production_id": "CONVERSION-DX11-00879",
+  "event_id": "CONVERSION-DX11-00879-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_NATIVE_STEREO_GPU_POSTPASS_SCRATCH_REUSE",
+  "feature_id": "DX11:GAME_NATIVE_STEREO_GPU_POSTPASS_SCRATCH_REUSE",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 1,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b",
+  "validation_bearing_result_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b",
+  "result_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Reuse a same-device exact size/DXGI format/binding D3D11 GPU resolve destination for genuine game-sourced per-eye clipped multisampled Copy postpasses, retaining the original ordered ResolveSubresource->CopySubresourceRegion.",
+      "Reuse a same-device exact size/format/binding one-slice mip-zero shader-resource texture for game-authored GPU Stretch postpasses and source format conversions, preserving the selected left/right camera slice and original source crop.",
+      "Serialize cache access through actual GPU command submission, reset on D3D11 device change and reject invalid/different typed sources without changing the original DX9Ex Draw/Present, gamepad, FFB, or SkyGlow."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stretch_source.hpp",
+      "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual C++ game-stereo Copy/Stretch encoder now reuses typed GPU scratch for eligible same-device same-size camera postpasses; constexpr C++ probe accepts matching 3440x1440 allocation keys; exact-SHA Windows/Fast/WARP builds succeed.",
+      "negative_regression": "C++ regression rejects different GPU extents, formats, bind flags and zero-sized keys; native ownership, crop, MSAA resolve, and original DX9Ex/gamepad/FFB rejection rules remain unchanged.",
+      "component_integration": "Both actual GPU Copy MSAA resolve and shader Stretch source extraction reuse the shared allocation key function and bound immediate-context command timelines; independently authored L/R source slices still replay."
+    },
+    "conflict_keys": [
+      "DX11:GAME_NATIVE_STEREO_GPU_POSTPASS_SCRATCH_REUSE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native source and exact-SHA automated gates 5/5 passed; actual OutRun 2006 menu, vehicle selection, race frame pacing and Quest3/VDXR pixels not observed.",
+    "activation_guard_and_fallback": "Native DX11 backend remains unpromoted; preserve guarded game-authored stereo source, original DX9Ex Draw/Present, gamepad/FFB/SkyGlow, and frozen DXVK."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_NATIVE_STEREO_GPU_POSTPASS_SCRATCH_REUSE",
+    "goal": "Avoid per-postpass GPU texture allocation in genuine game-authored native stereo Copy/MSAA Resolve/Stretch pipelines across menu, vehicle selection and sustained race, preserving exact camera source/fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "source_authored_gpu_postpass_lifetime",
+        "expected_behavior": "Ordered native game-eye Copy/Stretch postpasses reuse exact typed GPU scratch across compatible source events rather than repeatedly allocating full-frame textures."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "camera_source_device_generation_rejection",
+        "expected_behavior": "Device/texture extent/format/binding changes rebuild resource; different camera slices, invalid sources, failed allocation, original D3D9 input and FFB remain safe."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_mandatory_five_build_gates",
+        "expected_behavior": "Fast, Backend, Win32 Build, OpenXR and HUD Inspector all pass on same result SHA without CI skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stretch_source.hpp",
+    "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: fetched GitHub exact branch HEAD 9682cce752ce94254aaa566246476cd5698ce3fe; previous task 00878 completed without duplicate CI.",
+    "C1_REVIEW": "PASS: actual game-eye clipped MSAA Copy and GPU Stretch replay allocate per-command GPU textures, which can stall sustained native menu/car/race source replay.",
+    "C2_IMPLEMENT": "PASS: GPU resolve and sampled-scratch reuse across ordered source-authored camera postpasses; device/size/format/binding isolation and C++ regression in material result 5b287ead139b6e654473822b31ba2749f5bbbb4b.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast, Backend, Windows Build, OpenXR and HUD Inspector success on material/validation-bearing 5b287ead139b6e654473822b31ba2749f5bbbb4b; additional native transport WARP success run 39029061644.",
+    "C4_COMMIT": "PASS: implementation commit 5b287ead139b6e654473822b31ba2749f5bbbb4b includes [AUTO:CONVERSION-DX11-00879]; no CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: native DX11 stereo code not runtime promoted; no untested Quest3 package.",
+    "C6_STATE": "PASS_EXACT_SHA: five required GitHub Actions passed on exact SHA; C6 separate bookkeeping and no extra CI re-run."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b",
+    "validation_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b",
+    "five_mandatory_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39029061591,
+        "conclusion": "success",
+        "head_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39029061683,
+        "conclusion": "success",
+        "head_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b"
+      },
+      {
+        "name": "Build",
+        "id": 39029065044,
+        "conclusion": "success",
+        "head_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39029061593,
+        "conclusion": "success",
+        "head_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39029065049,
+        "conclusion": "success",
+        "head_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b"
+      }
+    ],
+    "additional_exact_sha_run": {
+      "name": "DX11 Native Transport Isolated WARP",
+      "id": 39029061644,
+      "conclusion": "success",
+      "head_sha": "5b287ead139b6e654473822b31ba2749f5bbbb4b"
+    },
+    "runtime_validation": "UNTESTED",
+    "live_menu_vehicle_race_test": "NOT_PERFORMED",
+    "quest3_vdxr_hmd_test": "NOT_PERFORMED",
+    "upstream_material_parent": "9682cce752ce94254aaa566246476cd5698ce3fe"
+  },
+  "next_action": "Do not rerun exact-SHA PASS/C6 or repeat score; next safe source integration is controlled by controller. Real menu/car/race/Quest3 verification remains NEED_HMD_TEST; full DX11 renderer incomplete."
+}

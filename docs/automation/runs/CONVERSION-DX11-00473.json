@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00473",
+  "production_id": "CONVERSION-DX11-00473",
+  "event_id": "CONVERSION-DX11-00473-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "ChatGPT reported that the current conversion lane conversation reached its length limit.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00473",
+  "lease_epoch": 1,
+  "work_key": "DX11:R168:OFFSCREEN_R145_BINDING_LINEAGE_STAGING:src/vr/d3d11/surface_mirror.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/surface_mirror.hpp:R168",
+    "src/vr/d3d11/surface_mirror.cpp:R168",
+    "tools/dx11_constant_buffer_probe.cpp:R168"
+  ],
+  "selected_work_item": "DX11_R168_WARP_R145_FULL_OM_BINDING_RECEIPT_STAGING_GUARD",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "5932c5dc3e04c0c43fd862874167955c2630c5bd",
+  "material_result_sha": "f8798808cb262e9c139c9bc49e9b8f76934f4260",
+  "validation_bearing_result_sha": "f8798808cb262e9c139c9bc49e9b8f76934f4260",
+  "result_sha": "f8798808cb262e9c139c9bc49e9b8f76934f4260",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R168 diagnostic staging requires exact R145 complete live OM binding snapshot in addition to R167 slot-0 RTV/DSV. WARP regression rejects absent/forged binding tokens, unrelated unsealed owner, and additional RTV slot 1 while bound color/depth slot 0 matches; exact owner restoration permits positive BGRA staging readback. No gameplay Draw activation.",
+  "changed_paths": [
+    "src/vr/d3d11/surface_mirror.hpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "static_validation": "PASS: exact SHA GitHub Backend Conversion Gate 37873116719 Windows Win32 validate and DX11 readiness smoke; R168 WARP constant-buffer probe built and executed successfully.",
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub vr-dx11-native-r71 HEAD 5932c5dc3e04c0c43fd862874167955c2630c5bd, prior 00472 COMPLETE, 00473 run absent; E002 rollover, ATTEMPT 1/3 unchanged.",
+    "C1_REVIEW": "PASS: reviewed R167 slot-0 RTV/DSV guard and R145 full OM binding readiness; selected missing R145 binding lineage/extra RTV slot guard with no duplicate R167 implementation.",
+    "C2_IMPLEMENT": "PASS: new R168 NativeSurfaceMirror diagnostic binding-snapshot staging API and isolated WARP negative/positive tests, three substantive source/test files at f8798808cb262e9c139c9bc49e9b8f76934f4260; no game draw activation.",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37873116719 SUCCESS on f8798808cb262e9c139c9bc49e9b8f76934f4260; Win32 validate 113635439480 SUCCESS; DX11 readiness smoke 113636517836 SUCCESS including Build/Run DX11 constant buffer probe; artifact 11591665726 sha256:66dc4ac369d97f5daaf0a5a6ec2b8383379f32450697d8b2e4ee53c241bd4632.",
+    "C4_COMMIT": "PASS: substantive 3-file GitHub material commit f8798808cb262e9c139c9bc49e9b8f76934f4260 [AUTO:CONVERSION-DX11-00473], CAS fast-forward to target branch.",
+    "C5_PACKAGE": "NOT_REQUIRED: isolated dormant diagnostic WARP probe; no player-facing native game Draw package or Quest3/VDXR HMD promotion.",
+    "C6_STATE": "PASS: GitHub Issue #14 source 6072804882 and validation 6072888085; task run and branch lane state persisted by skip-CI post-gate commit; gameplay runtime UNTESTED."
+  },
+  "next_action": "Do not redo or rescore 00473. Next independent R169 WARP interior fragment/pixel coverage proof with deterministic geometric setup, or isolated evidence of why existing arbitrary VB content cannot cover viewport; Quest3/VDXR exact-build user input/HUD/stereo/visual/frame-pacing required before native Draw promotion.",
+  "state_persisted": true,
+  "validation_bearing_sha": "f8798808cb262e9c139c9bc49e9b8f76934f4260",
+  "validation_run_id": 37873116719,
+  "validation_job_id": 113635439480,
+  "readiness_smoke_job_id": 113636517836,
+  "artifact_id": 11591665726,
+  "artifact_digest": "sha256:66dc4ac369d97f5daaf0a5a6ec2b8383379f32450697d8b2e4ee53c241bd4632",
+  "implementation_commits": [
+    "f8798808cb262e9c139c9bc49e9b8f76934f4260"
+  ],
+  "issue14_comment_id": 6072804882,
+  "validation_issue14_comment_id": 6072888085,
+  "resume_cursor": "TERMINAL_COMPLETE",
+  "last_real_activity_at": "2026-10-09T11:17:00+09:00",
+  "last_activity_evidence": "Exact-SHA Backend Conversion Gate 37873116719 completed SUCCESS; validate 113635439480 and DX11 readiness smoke 113636517836 SUCCESS; artifact 11591665726.",
+  "blockers": [
+    "No Quest3/VDXR user runtime evidence; native gameplay Draw remains dormant."
+  ],
+  "updated_at_kst": "2026-10-09T11:17:00+09:00",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00473.json"
+}

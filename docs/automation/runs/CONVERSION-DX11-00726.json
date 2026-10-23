@@ -1,0 +1,125 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00726",
+  "production_id": "CONVERSION-DX11-00726",
+  "event_id": "CONVERSION-DX11-00726-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_FRAME_SAME_PRESENT_READBACK",
+  "feature_id": "DX11-FULL-FRAME-SAME-PRESENT-NATIVE-PUBLISH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "994cecb48d96d26f8ea05a871ab1b8223bc35be1",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Real D3D9 game Draw/DrawIndexed -> native D3D11 owned full-frame game RT",
+      "Current D3D9 Present -> D3D11 full-frame GPU CopyResource/fence -> opportunistic same-Present Map/UpdateSurface",
+      "Prior Present GPU copies recycled only after fence, original D3D9 game/input fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/dx11_full_frame_same_present_probe_00726.cpp",
+      "tools/test_dx11_full_frame_same_present_00726.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Full-resolution current-game-frame successful native Draw+DrawIndexed submits and samples GPU CopyResource before same D3D9 Present when event is immediately ready",
+      "negative_regression": "Previous-Present full-screen native GPU frame can never replace newer menu, vehicle or race image; busy old copies not reused; inset still delayed",
+      "component_integration": "game-origin Draw -> native color RTV -> same-Present staging fence -> D3D9 full backbuffer UpdateSurface or untouched original game Present"
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_SAME_PRESENT_READBACK",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Code/CI only; same-Present nonblocking path can fail closed if GPU not ready, Quest3/VDXR UNTESTED",
+    "activation_guard_and_fallback": "Explicit opt-in, fail-closed on unsupported source or GPU fence, never bypass original D3D9 Draw/Present/gamepad"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-FRAME-SAME-PRESENT-NATIVE-PUBLISH",
+    "goal": "Prevent asynchronous full native game frame N from overwriting D3D9 game frame N+1 during menu/car/race; opportunistic same-Present publication and game fallback",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_frame_and_present",
+        "expected_behavior": "Current live game native Draw->GPU staging submitted and polled prior to this D3D9 Present; full-size upload only on successful same-Present fence"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "game_input_and_gpu_lifetime",
+        "expected_behavior": "Prior-frame GPU copies never overlay full screen; busy old staging remains protected until its fence; inset asynchronous behavior preserved"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "native_provenance_and_qa",
+        "expected_behavior": "C++17 positive/negative tests and integration mutant checks plus exact SHA DX11 Fast/Backend/Windows/OpenXR/HUD gates"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_readback_provenance.hpp",
+    "tools/dx11_full_frame_same_present_probe_00726.cpp",
+    "tools/test_dx11_full_frame_same_present_00726.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00726.json"
+  ],
+  "material_result_sha": "a24787aef3f4aee3de1aeb3f26d84f2997ce593c",
+  "validation_bearing_result_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05",
+  "exact_sha_gates": {
+    "DX11 Fast": {
+      "run_id": 38558296020,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    },
+    "Backend Conversion": {
+      "run_id": 38558295804,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    },
+    "Windows Build": {
+      "run_id": 38558301448,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    },
+    "OpenXR": {
+      "run_id": 38558301401,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    },
+    "HUD Inspector": {
+      "run_id": 38558301417,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    }
+  },
+  "runtime_gate": "NEED_HMD_TEST",
+  "packaging_status": "NOT_REQUIRED",
+  "completed_utc": "2026-10-14T11:56:00Z",
+  "resume_cursor": "Next independent DX11 full-size native game Draw integration; do not rerun 00726. Quest3/VDXR menu/vehicle/race and gamepad remains NEED_HMD_TEST for this exact candidate.",
+  "c6_score_ref": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md RUN_KEY=CONVERSION-DX11-00726",
+  "acceptance_results": {
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00729",
+  "production_id": "CONVERSION-DX11-00729",
+  "event_id": "CONVERSION-DX11-00729-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FAILED_CLEAR_FRAME_CONTINUITY",
+  "feature_id": "DX11-NATIVE-FAILED-CLEAR-FRAME-INTEGRITY",
+  "status": "BUILD_PENDING",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "15591d2692e1ae4156a0621f9e89c0e7771c84af",
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "D3D9 game Clear HRESULT handling on menu/car/race hook",
+      "Only successful color/depth/stencil Clear invalidates contiguous D3D11 Draw/DrawIndexed batch",
+      "Successful whole/tiled color Clear seeds a post-Clear native frame; failed Clear preserves original D3D9/input and native batch",
+      "Same-Present full-frame publication retains source ownership and fail-closed fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_game_scene_boundary_00696.py",
+      "tools/test_dx11_failed_clear_boundary_00729.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Successful real game Clear invalidates old native scene before whole/tiled background restarts full Draw output",
+      "negative_regression": "Failed original Clear cannot discard already composed native full-resolution Draw/DrawIndexed scene; no-flags Clear is inert",
+      "component_integration": "R9 Clear hook HRESULT + live D3D11 frame batch + same-Present publish/fallback"
+    },
+    "conflict_keys": [
+      "DX11:FAILED_CLEAR_FRAME_CONTINUITY",
+      "src/vr/d3d9/stereo_renderer.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI only; Quest3 game output and controller response not tested",
+    "activation_guard_and_fallback": "DX11 full rendering remains opt-in, original D3D9 Draw/Present/input authoritative; failed/no-op Clear preserves last successful DX11 scene",
+    "blocking_evidence": "Confirmed at 0939fad parent: src/vr/d3d9/stereo_renderer.cpp ClearDestR9 previously called observe_scene_boundary before invoking original Clear; a failed HRESULT therefore set GameNativeFrameBatch::stopped and pending=false before same-Present full-resolution Draw publication, despite D3D9 state remaining unchanged. 00729 fixes the actual hook and the negative/positive source mutations check successful/failed HRESULT and three D3D9 Clear paths."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-NATIVE-FAILED-CLEAR-FRAME-INTEGRITY",
+    "goal": "Keep an intact menu/vehicle/race native game frame when original D3D9 Clear fails, and restart correctly only after successful full Clear, preserving DX9Ex/gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_clear_hresult",
+        "expected_behavior": "Every successful original game Clear splits native frame; full color Clear can restart next post-Clear Draw/DrawIndexed"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "failed_clear_game_input",
+        "expected_behavior": "Failed/no-op Clear must not erase active game Draw or interrupt D3D9 Present/gamepad; partial successful Clear remains fail-closed"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_exact_sha",
+        "expected_behavior": "00696 scene probe, 00729 destructive success/failure hook probe and all five exact-SHA GitHub Gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "A1": "PENDING",
+    "A2": "PENDING",
+    "A3": "PENDING"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "tools/test_dx11_game_scene_boundary_00696.py",
+    "tools/test_dx11_failed_clear_boundary_00729.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00729.json"
+  ],
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "packaging_status": "NOT_REQUIRED"
+}

@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00992",
+  "production_id": "CONVERSION-DX11-00992",
+  "event_id": "CONVERSION-DX11-00992-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00992",
+  "feature_id": "DX11_NATIVE_LIVE_SM3_INSTANCED_GAME_GEOMETRY",
+  "work_key": "DX11:LIVE_SM3_NATIVE_INSTANCED_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "341f573b219fca248716446f989dd95bf7350b15",
+  "material_result_sha": "cc029bf12213fed9d444442ae174f015710378ba",
+  "validation_bearing_result_sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32",
+  "result_sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "code_change": "YES",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "score_change": 0,
+  "summary": "Real source implementation: game-origin D3D9 SM3 SetStreamSourceFreq indexed instancing expands per-vertex and per-instance data to native D3D11 FLOAT4 IA and issues separate GPU Draw/DrawIndexed per source instance, including source topology and shader cache identity. Four causal CI repairs retained negative test contracts without disabling gates. Exactly validated final source+test SHA 3dc9be07ce31a2f243a7e95fde8ec20b78528f32 with unchanged mandatory DX11 Fast/Backend/Windows/OpenXR/HUD 5/5 success. BUILD_VERIFIED only: full playable renderer, real OutRun menu/car/race frames, gamepad, Quest3/VDXR HMD and actual native draw/frame counters still UNTESTED. Original D3D9Ex/input/FFB/SkyGlow unchanged; DXVK frozen.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+    "tools/dx11_live_sm3_instancing_00992.cpp",
+    "tools/test_dx11_live_sm3_instancing_00992.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_NATIVE_LIVE_SM3_INSTANCED_GAME_GEOMETRY",
+    "goal": "Replay genuine menu/vehicle/race D3D9 SetStreamSourceFreq instanced programmable geometry through packed native D3D11 IA and discrete real GPU Draw/DrawIndexed while preserving fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_d3d9_instanced_gpu_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_sm3_stream_frequency_native_ia",
+        "expected_behavior": "Stream-zero indexed source instance count and secondary-rate payload produce distinct native D3D11 Draw or DrawIndexed per authored instance and real shader-bound pixels."
+      },
+      {
+        "id": "topology_boundary_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_topology_fragment_and_d3d9ex_preservation",
+        "expected_behavior": "Each source instance preserves independent fan/strip primitive topology, malformed frequency or missing instance payload fail closed, DX9Ex gamepad and FFB unaffected."
+      },
+      {
+        "id": "packed_stream_tests_ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_shader_input_layout_vertex_mirror_and_exact_sha_gates",
+        "expected_behavior": "Packed vertex and instance data regression with positive, negative overflow and source static linkage passes along with unchanged mandatory Fast, Backend, Windows Build, OpenXR and HUD Gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE: game authored SetStreamSourceFreq streams and Draw/DrawIndexed snapshots",
+      "D3D11_NATIVE_DRAW: CPU-expanded FLOAT4 input layouts, native VB/IB and discrete instance draw submission",
+      "VISIBLE_FRAME_OUTPUT: existing guarded full-resolution game frame publisher, preserving D3D9Ex fallback; game runtime not yet observed"
+    ],
+    "batch_components": [
+      "C++ live game SM3 instanced stream admission and physically separate GPU indexed/linear draw replay with packed shader attribute assembly and pipeline layout identity",
+      "Portable C++ and Python input/Draw integration regressions wired into the existing required DX11 Fast Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original game INDEXEDDATA stream0 with INSTANCEDATA stream1 cadence 2 yields source-exact 3 instances with distinct native vertex attributes and Draw/DrawIndexed calls.",
+      "negative_regression": "Short instance record, malformed source frequency, allocation overflow, stale cached input layout and merged strip/fan primitive boundaries remain rejected.",
+      "component_integration": "Live game D3D9 stream snapshot -> SM3 declaration/source shader pair -> packed native buffer -> GPU Draw per instance -> existing guarded frame output."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_NATIVE_INSTANCED_DRAW",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: full-resolution real game menu/vehicle/race native instanced pixels and GPU publication require exact-SHA CI and subsequent real OutRun session; observed native draw/frame counts remain UNTESTED.",
+    "activation_guard_and_fallback": "Opt-in DX11 mirror only; original D3D9 Draw HRESULT, gamepad/FFB and SkyGlow unchanged, invalid snapshot/frequency/layout fallback fails closed."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39696406606,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39696406499,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      },
+      {
+        "name": "Build",
+        "run_id": 39696413171,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39696413248,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39696413259,
+        "conclusion": "success",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      }
+    ],
+    "optional_skipped": [
+      {
+        "name": "VR PC Fast Test Build",
+        "run_id": 39696406520,
+        "conclusion": "skipped",
+        "sha": "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+      }
+    ],
+    "material_source_commit": "cc029bf12213fed9d444442ae174f015710378ba",
+    "causal_ci_repairs": [
+      "31fa9e922f7bfbda1ef2e7035d96d1ea2820f65e",
+      "cabbadc26aacff390c1ce62ec97a3003917ee841",
+      "bd6a59934c0a03ad5d3ddec304a87762f892f320",
+      "3dc9be07ce31a2f243a7e95fde8ec20b78528f32"
+    ]
+  },
+  "next_action": "Controller may select independent playable-native DX11 work; Quest3/VDXR real game HMD test on this feature NEED_HMD_TEST. Same TASK_ID repeat, C6 and CI repair must not earn extra points.",
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "c6_code_change": "NO",
+  "acceptance_results": {
+    "live_d3d9_instanced_gpu_draw": "PASS_EXACT_SHA_SOURCE_AND_BUILD",
+    "topology_boundary_fallback": "PASS_EXACT_SHA",
+    "packed_stream_tests_ci": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: source HEAD 341f573b; existing 00991 C6 distinct; owner/work_key scoped to SM3 native instanced game Draw.",
+    "C1_REVIEW": "PASS: D3D9 INDEXEDDATA and INSTANCEDATA multi-stream frequency unsupported in current native shader-bound Draw.",
+    "C2_IMPLEMENT": "PASS: real SM3 native instanced C++ IA/DX11 GPU Draw changes, packed stream assembly, 2 focused tests in material commit cc029bf1.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: five unchanged mandatory GitHub Actions success on 3dc9be07ce31a2f243a7e95fde8ec20b78528f32; Windows native Build and portable negative/source tests pass; HMD/game untested.",
+    "C4_COMMIT": "PASS: cc029bf material source, 31fa9e current acceptance record, cabbadc+bd6a+3dc9 causal CI fixtures/negative assertions, all marker [AUTO:CONVERSION-DX11-00992] without CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: Quest3 runtime/artifact not validated; no deployment falsely declared.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED, final validated SHA 3dc9be07ce31a2f243a7e95fde8ec20b78528f32, RUNTIME_VALIDATION=UNTESTED, SCORE_CHANGE=0 in checkpoint (separate scoreboard)."
+  }
+}

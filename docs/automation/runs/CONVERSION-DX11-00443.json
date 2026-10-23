@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00443",
+  "production_id": "CONVERSION-DX11-00443",
+  "event_id": "CONVERSION-DX11-00443-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "6397ebe97465997451c4b187e267d489613e7edd",
+  "result_sha": "69fc64358eaa715c24a716da28094e691d1f8eda",
+  "material_result_sha": "69fc64358eaa715c24a716da28094e691d1f8eda",
+  "validation_bearing_result_sha": "69fc64358eaa715c24a716da28094e691d1f8eda",
+  "selected_work_item": "DX11_R305_R292_R259_PRODUCTION_CENSUS_PAYLOAD_INTEGRITY_GUARD",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R305 closes the downstream copied-observation trust gap at the R292 validator used by production census. Validation now recomputes independent complete-payload identities for both the caller-supplied R292 observation and its nested R259 prerequisite handoff before accepting the historical R292 review token, so unsealed copied boolean/identity fields cannot be altered behind an unchanged stored token.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "69fc64358eaa715c24a716da28094e691d1f8eda"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered branch HEAD 6397ebe9, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, conversion lane state, prior 00442 run, regression knowledge/history and Issue #14",
+    "C1_REVIEW": "PASS: selected R292 production validator as the next downstream R259/R292 consumer because historical snapshot domains omit copied observation fields that R293 later trusts through validator success",
+    "C2_IMPLEMENT": "PASS: added independent R305 complete-payload recomputation for R292 plus nested R259 prerequisite payload, validator equality gate, two tamper regressions and source-graph registration",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37669548426; validate job 112957436541 SUCCESS; DX11 readiness smoke job 112959819320 SUCCESS including constant-buffer probe",
+    "C4_COMMIT": "PASS: material/validation-bearing result 69fc64358eaa715c24a716da28094e691d1f8eda contains [AUTO:CONVERSION-DX11-00443] and no CI-skip directive",
+    "C5_PACKAGE": "NOT_REQUIRED: bounded diagnostic/static production-census payload-integrity change; canonical CI artifact is validation evidence, not a runtime candidate",
+    "C6_STATE": "PASS: durable task record and conversion lane state persisted after exact-SHA Gate; Issue #14 event 6044727950 appended"
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37669548426,
+    "validation_job_id": 112957436541,
+    "readiness_smoke_job_id": 112959819320,
+    "artifact_id": 11505505111,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-69fc64358eaa715c24a716da28094e691d1f8eda",
+    "artifact_digest": "sha256:97abdb5951b1ee278cad026f73c45b9e031f9b3cba9fd80f62f56c6f2a9b0d4d",
+    "issue14_comment_id": 6044727950
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_test_required": false,
+  "next_action": "Inspect R293 census summary/serialization and analyzer consumers for trust in summarized activation-prerequisite exactness or snapshot identity without complete receipt/payload correlation; keep missing production R258/R262 receipts explicit and NativeDrawPath/Draw/DrawIndexed authorization fail-closed."
+}

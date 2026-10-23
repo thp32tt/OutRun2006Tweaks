@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00471",
+  "production_id": "CONVERSION-DX11-00471",
+  "event_id": "CONVERSION-DX11-00471-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "ChatGPT reported that the current conversion lane conversation reached its length limit.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00471",
+  "lease_epoch": 1,
+  "work_key": "DX11:R166:OFFSCREEN_COLOR_READBACK_LIVE_OM_RTV_IDENTITY:src/vr/d3d11/surface_mirror.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/surface_mirror.hpp:R166",
+    "src/vr/d3d11/surface_mirror.cpp:R166",
+    "tools/dx11_constant_buffer_probe.cpp:R166"
+  ],
+  "selected_work_item": "DX11_R166_WARP_LIVE_OM_COLOR_PROVENANCE_GUARD",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "278c88a9933e1103a18901aa41d1ac83d021c7ca",
+  "material_result_sha": "23ebea86514f0740d045e350234f6ef51e7290da",
+  "validation_bearing_result_sha": "23ebea86514f0740d045e350234f6ef51e7290da",
+  "result_sha": "23ebea86514f0740d045e350234f6ef51e7290da",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R166 requires exact live OM slot-0 RTV identity on same immediate-context, same-device current-generation color staging readback; WARP probe rejects late RTV detach and same-device matching-descriptor substitution, then restores exact RTV/DSV and verifies prior BGRA copy. Native gameplay Draw stays dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/surface_mirror.hpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "static_validation": "PASS: single changed-source 7/7 JS source invariants; exact-SHA GitHub Windows compiled WARP probe SUCCESS",
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub 00470 C6 sealed at 278c88a9933e1103a18901aa41d1ac83d021c7ca; 00471 absent; rollover E002 and ATTEMPT=1/3 unchanged.",
+    "C1_REVIEW": "PASS: R165 proves offscreen BGRA border readback but did not require color mirror remain live OM slot-0 target after late detach/substitution; branch-local regression and isolation reviewed.",
+    "C2_IMPLEMENT": "PASS: COM live OM slot-0 RTV identity guard and detached/same-device-substituted mirror negative controls, exact OM restoration in WARP test.",
+    "C3_VALIDATE": "PASS: source 7/7; exact-SHA 23ebea86514f0740d045e350234f6ef51e7290da Backend Conversion Gate 37870522643; Win32 validate 113627307990 SUCCESS; DX11 readiness smoke 113628750454 SUCCESS including R166 compiled/executed WARP probe; artifact 11590321860 sha256:c997544ed7b1f01f9c109e3e396c8520db891d767162d5cefce942aa9391a773.",
+    "C4_COMMIT": "PASS: substantive three-file material commit 23ebea86514f0740d045e350234f6ef51e7290da with [AUTO:CONVERSION-DX11-00471], GitHub branch CAS fast-forward.",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant diagnostic WARP scope, no player-facing binary candidate, no native gameplay Draw activation.",
+    "C6_STATE": "PASS: GitHub Issue #14 source comment 6072463686 and validation comment 6072557270; post-Gate run/lane C6 persistence in this state commit. Runtime UNTESTED."
+  },
+  "next_action": "Do not redo or rescore 00471. Next independent native DX11 isolated offscreen shaded-pixel coverage/diagnostic or resource-lifetime contract; Quest3/VDXR exact-build test required to establish gameplay visual/input/HUD/stereo and performance.",
+  "state_persisted": true,
+  "validation_bearing_sha": "23ebea86514f0740d045e350234f6ef51e7290da",
+  "validation_run_id": 37870522643,
+  "validation_job_id": 113627307990,
+  "readiness_smoke_job_id": 113628750454,
+  "artifact_id": 11590321860,
+  "artifact_digest": "sha256:c997544ed7b1f01f9c109e3e396c8520db891d767162d5cefce942aa9391a773",
+  "implementation_commits": [
+    "23ebea86514f0740d045e350234f6ef51e7290da"
+  ],
+  "issue14_comment_id": 6072463686,
+  "validation_issue14_comment_id": 6072557270,
+  "resume_cursor": "TERMINAL_COMPLETE",
+  "last_real_activity_at": "2026-10-09T10:45:39.419+09:00",
+  "last_activity_evidence": "Exact-SHA Backend Conversion Gate 37870522643 completed SUCCESS; validate 113627307990 and smoke 113628750454 SUCCESS; artifact 11590321860.",
+  "blockers": [
+    "No exact-build Quest3/VDXR user runtime evidence; native gameplay Draw remains dormant."
+  ],
+  "updated_at_kst": "2026-10-09T10:45:39.419+09:00",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00471.json"
+}

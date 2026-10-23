@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00339",
+  "production_id": "CONVERSION-DXVK-00338",
+  "event_id": "CONVERSION-DXVK-00338-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R233_ACCUMULATED_LOG_SIGNATURE_EPOCH_NAMESPACE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "68560bca397b3fbf5bbe13e473b8eee1f02c4b9a",
+  "result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+  "validation_bearing_result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+  "result_marker": "[AUTO:CONVERSION-DX11-00339]",
+  "selected_work_item": "DX11_R233_ACCUMULATED_LOG_SIGNATURE_EPOCH_NAMESPACE",
+  "summary": "R233 extends R225 signature namespace isolation from source-log scope to source-log plus startup epoch. In an accumulated log containing multiple process startups, repeated runtime signature IDs and their declaration/compile/detail evidence no longer overwrite or merge across process epochs.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00339.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD 68560bca397b3fbf5bbe13e473b8eee1f02c4b9a. Read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md and Set05, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/VR_REGRESSION_KNOWLEDGE.json and docs/VR_PROBLEM_HISTORY.md. R225-R232 durable work is preserved and not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R225 correctly scopes runtime signature IDs by source log, but accumulated logs can contain multiple process startups and runtime signature ordinals restart per process. Because SignatureKey is only (source_log, signature_id), startupA/signature#1 and startupB/signature#1 collide; setdefault preserves the older signature body while detail maps can be overwritten or merged by later epoch evidence.",
+      "review_lenses": {
+        "architecture": "Offline DX11 census analyzer/test/verifier only; vr-d3d9ex-focus and runtime renderer routing remain untouched.",
+        "ownership_lifetime": "No D3D9/D3D11 COM, resource generation, Reset, fence or consumer-ACK lifetime changes.",
+        "stereo_correctness": "No WVP, projection, HUD, sky/effects, recenter or eye-rendering changes.",
+        "performance": "Offline log parsing/reporting only; runtime hot path unchanged.",
+        "adversarial": "Single accumulated-log fixture repeats signature#1 across two startup epochs with distinct declaration and shader-compile evidence; both epochs must survive independently without cross-contamination."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "SignatureKey now includes source_log, startup_epoch and signature_id. Each recognized startup advances the per-log epoch; legacy logs without a startup marker remain epoch 0. Signature report entries export startup_epoch and every declaration/FFP/texture/shader compile/prototype detail map uses the same epoch-scoped key. Added an accumulated-log repeated-signature regression and source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R233_ACCUMULATED_LOG_SIGNATURE_EPOCH_NAMESPACE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1907 run 37168529018 completed success for df84ec00543bdb5e34a8f4dc40213547ce2e9f31. validate job 111336502277 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R233 census analyzer checks, then configured/built Win32, verified the binary and uploaded artifact 11290024040. DX11 readiness smoke job 111337167098 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:e62ab28fb7e941d41a95fc840bfa71a6b254a13853f8e950a05df05aa4b4d6bb. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+      "validation_bearing_result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+      "result_marker": "[AUTO:CONVERSION-DX11-00339]",
+      "implementation_commits": [
+        "df84ec00543bdb5e34a8f4dc40213547ce2e9f31"
+      ],
+      "source_implementation_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37168529018,
+      "validation_job_id": 111336502277,
+      "readiness_smoke_job_id": 111337167098,
+      "artifact_id": 11290024040,
+      "artifact_digest": "sha256:e62ab28fb7e941d41a95fc840bfa71a6b254a13853f8e950a05df05aa4b4d6bb",
+      "implementation_comment_id": 5975448498,
+      "validation_comment_id": 5975496814,
+      "exact_next_action": "Preserve R225-R233 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
+    }
+  },
+  "regression_assessment": {
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "runtime_risk_paths_touched": false,
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping only. No runtime regression riskPath is modified; NativeDrawPath remains dormant."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00339",
+    "production_id": "CONVERSION-DXVK-00338",
+    "event_id": "CONVERSION-DXVK-00338-E003",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Preserve R225-R233 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37168529018,
+      "run_number": 1907,
+      "result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+      "conclusion": "success",
+      "validate_job_id": 111336502277,
+      "readiness_smoke_job_id": 111337167098,
+      "artifact_id": 11290024040,
+      "artifact_digest": "sha256:e62ab28fb7e941d41a95fc840bfa71a6b254a13853f8e950a05df05aa4b4d6bb"
+    }
+  }
+}

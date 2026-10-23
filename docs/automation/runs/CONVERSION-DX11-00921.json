@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00921",
+  "production_id": "CONVERSION-DX11-00921",
+  "event_id": "CONVERSION-DX11-00921-E003",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00921",
+  "feature_id": "DX11:CAMERA_PARTIAL_NATIVE_CLEAR_SURVIVOR_LEDGER",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "feature_contract": {
+    "goal": "Retain authentic menu/vehicle/race camera Draw color pixels outside a successful clipped native D3D9 TARGET Clear in the stereo source-color provenance ledger",
+    "acceptance_items": [
+      {
+        "id": "clipped_color_survivors",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Native camera Draw region splits into surviving non-cleared rectangles and continues to qualify only its authentic postpass GPU source pixels",
+        "behavior_area": "native_camera_partial_clear_to_stereo_source_color"
+      },
+      {
+        "id": "erased_region_and_fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Cleared pixels lose color eligibility, other resource/mip/slice records survive safely, capacity failure cannot invent color, original D3D9/FFB/input remains active",
+        "behavior_area": "native_color_provenance_clear_and_safe_fallback"
+      },
+      {
+        "id": "five_required_exact_sha_gate",
+        "category": "integrated_validation",
+        "expected_behavior": "Native C++ rectangle positive and negative compile assertions and all five required GitHub Actions succeed on the identical validation-bearing commit",
+        "behavior_area": "native_dx11_win32_openxr_hud_ci"
+      }
+    ],
+    "feature_id": "DX11:CAMERA_PARTIAL_NATIVE_CLEAR_SURVIVOR_LEDGER"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "real game offscreen camera native color Draw/DrawIndexed raster region",
+      "successful clipped D3D9 TARGET Clear mapped into D3D11 pixel rectangle",
+      "subtract cleared overlap into disjoint surviving camera color regions",
+      "native L/R stereo GPU Copy/Stretch source-color ledger remains exact"
+    ],
+    "batch_components": [
+      "NativeCameraColorRemainder and subtract_native_camera_clear raster subtraction",
+      "NativeGameEyeDrawEncoder::clear_offscreen_game_color survivor source ledger"
+    ],
+    "conflict_keys": [
+      "DX11:CAMERA_PARTIAL_NATIVE_CLEAR_SURVIVOR_LEDGER:00921"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: native clipped camera pixel regions tracked, but OutRun menu/car/race Quest 3 gameplay not directly tested",
+    "activation_guard_and_fallback": "No native renderer promotion from source/Gate checks. Unsupported/failed Clear or overflow fails closed; original D3D9 rendering/gamepad/FFB and DX9Ex fallback retained; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Compile-time four disjoint surviving strips and camera pixel intersection checks for successful clipped Clear",
+      "negative_regression": "Full-clear leaves no survivors; non-overlap and degenerate Clear preserve authentic known Draw; cleared source pixels cannot certify stereo color",
+      "component_integration": "Source ledger retains matching physical camera resource/mip/slice and surviving rectangle strips for actual GPU postpass L/R color evidence without replacing original GPU Draw path"
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp"
+  ],
+  "material_result_sha": "b4c42000f5658666d7741a3ad60a65b8ca1d20c0",
+  "validation_bearing_result_sha": "ecc60f28e828de56896815bc2b702e71a2ac4690",
+  "acceptance_results": {
+    "clipped_color_survivors": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "erased_region_and_fallback": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "five_required_exact_sha_gate": "PASS_EXACT_SHA"
+  },
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "pipeline": {
+    "C0_RECOVER": "Resume material partial camera Clear source commit b4c42000f5658666d7741a3ad60a65b8ca1d20c0; inherited Backend and Fast failure was 00920 terminal acceptance pending",
+    "C1_REVIEW": "GitHub 00920 exact-SHA history: Fast/Backend SUCCESS, Build/OpenXR/HUD cancelled; not eligible for full verified C6",
+    "C2_IMPLEMENT": "Existing 00921 material C++ source implements clipped camera Clear survivor strips and ledger preservation; same-task 00920 CI contract reconciliation at ecc60f28e828de56896815bc2b702e71a2ac4690",
+    "C3_VALIDATE": "Fast #39136479231, Backend #39136479216, Win32 Build #39136479242, OpenXR #39136479182 and HUD #39136479244: all SUCCESS on exact SHA ecc60f28e828de56896815bc2b702e71a2ac4690",
+    "C4_COMMIT": "Game renderer material b4c42000f5658666d7741a3ad60a65b8ca1d20c0; actual failed Gate cause repair ecc60f28e828de56896815bc2b702e71a2ac4690 (run record only, no new game C++ in repair)",
+    "C5_PACKAGE": "NOT_REQUIRED_SOURCE_STAGE_HMD_UNTESTED",
+    "C6_RESULT": "PASS_EXACT_SHA; bookkeeping-only [skip ci] after 5/5 required GitHub Gate. Real Quest3/VDXR/OutRun input and frames UNTESTED. No duplicated scoring for retry."
+  },
+  "runtime_validation_note": "Quest 3/VDXR/OutRun real menu, car selection, racing frame, gamepad and FFB not tested. BUILD_VERIFIED_SOURCE_STAGE is not gameplay/HMD PASS.",
+  "validation_evidence": {
+    "scope": "SOURCE_STAGE_ONLY",
+    "runtime_validation": "UNTESTED",
+    "exact_sha": "ecc60f28e828de56896815bc2b702e71a2ac4690",
+    "ci_status": "SUCCESS",
+    "ci_gate_count": "MANDATORY_5_OF_5",
+    "github_exact_sha_workflow_runs_verified": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39136479231,
+        "conclusion": "success",
+        "head_sha": "ecc60f28e828de56896815bc2b702e71a2ac4690"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39136479216,
+        "conclusion": "success",
+        "head_sha": "ecc60f28e828de56896815bc2b702e71a2ac4690"
+      },
+      {
+        "name": "Build",
+        "run_id": 39136479242,
+        "conclusion": "success",
+        "head_sha": "ecc60f28e828de56896815bc2b702e71a2ac4690"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39136479182,
+        "conclusion": "success",
+        "head_sha": "ecc60f28e828de56896815bc2b702e71a2ac4690"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39136479244,
+        "conclusion": "success",
+        "head_sha": "ecc60f28e828de56896815bc2b702e71a2ac4690"
+      }
+    ],
+    "windows_build_success": true
+  },
+  "c6_bookkeeping_only": true
+}

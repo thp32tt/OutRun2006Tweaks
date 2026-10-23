@@ -1,0 +1,624 @@
+{
+  "schemaVersion": 2,
+  "updatedUtc": "2026-09-24T14:24:08Z",
+  "branch": "vr-d3d9ex-focus",
+  "publicationMode": "github-fast-forward-cas",
+  "frozen": false,
+  "phase": "two-full-cycles-per-hour / HUD+PERF+DXVK+DX12 parallel development / no-PC-runner",
+  "checkpoint": "C6_STATE",
+  "policy": {
+    "primaryBackend": "D3D9Ex + x64 D3D11 OpenXR host",
+    "blockedBackends": [],
+    "blockedBackendAction": "DXVK and DX12/D3D9On12 development, compile and smoke validation are re-enabled in isolated candidates after user acceptance of the R51 basic 3D reference. They may not replace the protected DX9Ex runtime baseline until backend-parity evidence is recorded.",
+    "genericBuildDisabled": true,
+    "dedicatedWorkflow": ".github/workflows/vr-dx9ex-active.yml",
+    "runtimeTesting": "Quest 3/VDXR evening gate uses six independent slots: A DX9Ex control, B HUD, C flare, D performance, E DXVK, F DX12. No slot blocks development of another.",
+    "profileModel": {
+      "default": "A_CONTROL",
+      "profiles": [
+        "A_CONTROL",
+        "B_HUD",
+        "C_FLARE",
+        "D_PERF",
+        "E_DXVK",
+        "F_DX12"
+      ],
+      "sameBinaryPreferred": false,
+      "note": "Use one binary within a backend when practical. DXVK/DX12 have distinct backend payload identity. HUD completion is not a prerequisite for performance/backend work."
+    },
+    "eveningFreeze": {
+      "reviewImplementWindow": "daytime / before evening HMD session",
+      "freezeAt": "19:45 Asia/Seoul when useful HMD experiment slots are ready",
+      "at20": "Keep one frozen EVENING_MATRIX package stable while the user tests; replace only for a blocking packaging defect."
+    },
+    "ciModel": {
+      "lightweightPolicyWorkflow": ".github/workflows/vr-test-policy.yml",
+      "activeValidationWorkflow": ".github/workflows/vr-dx9ex-active.yml",
+      "manualComparisonWorkflow": ".github/workflows/vr-unified-backends.yml",
+      "defaultSourceBuilds": "DX9Ex reference plus affected backend-specific build/smoke paths; DXVK/DX12 may run in isolated candidates in parallel.",
+      "comparisonMatrix": "Backend and performance validation is active work, not deferred behind HUD. Keep exact SHA/backend/profile identity."
+    },
+    "userRuntimeBaseline": {
+      "sourceOfTruth": "docs/VR_REGRESSION_KNOWLEDGE.json::userRuntimeVerifiedBaseline",
+      "movingHeadIsNotBaseline": true,
+      "advanceOnlyBy": "matching Quest3/VDXR USER_RUNTIME_VERIFIED evidence",
+      "candidateBaselineDeltaRequired": true,
+      "rejectKnownBadReintroduction": true,
+      "revalidateProspectiveMergedTreeWhenHeadMoves": true
+    },
+    "manualPackageGate": {
+      "enabled": true,
+      "appliesTo": [
+        "CHAT_DIRECT",
+        "MANUAL",
+        "ad-hoc build",
+        "ad-hoc package",
+        "package-only request"
+      ],
+      "latestMeans": "newest baseline-eligible exact tree, not blindly newest commit",
+      "recoverRegressionKnowledge": true,
+      "baselineDeltaRequired": true,
+      "exactShaConfigProfileRequired": true,
+      "revalidateIfHeadMoved": true,
+      "buildVerifiedCannotOverrideUserRuntimeBaseline": true,
+      "knownBadReintroductionBlocksRecommendedPackage": true,
+      "packageOnlyRequestsCannotBypassGate": true,
+      "diagnosticExceptionLabel": "DIAGNOSTIC / NOT BASELINE-SAFE / NEED_HMD_TEST",
+      "productionLedgerIssue": 14,
+      "runtimeRegressionLedgerIssue": 13
+    },
+    "parallelBackendDevelopment": {
+      "enabled": true,
+      "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+      "reason": "Basic 3D DX9Ex baseline is established. HUD is a separate visual defect track and must not serialize backend/performance development.",
+      "activeUserVisibleTracks": [
+        "HUD semantic lifetime",
+        "lens flare exact producer",
+        "dense-scene performance/frame pacing",
+        "DXVK SAFE compatibility then multiview optimization",
+        "DX12/D3D9On12 compatibility and transport"
+      ],
+      "productionIntegrationWip": 1,
+      "maxParallelHmdExperimentSlots": 6,
+      "nonBlockingRule": "HUD/FLARE delays must not block PERF/DXVK/DX12; backend failures must not block HUD/FLARE."
+    },
+    "pcFastBuild": {
+      "defaultMode": "INCREMENTAL",
+      "canonicalContract": "R51-PC-FAST-v2-R26HUD-ON",
+      "canonicalCMakeFlags": [
+        "OUTRUN_VR_SAFE_DRAW_COMPARE=OFF",
+        "OUTRUN_VR_R26_HUD_COMPARE=ON",
+        "OUTRUN_VR_C1_COMPARE=OFF",
+        "OUTRUN_VR_C2_COMPARE=OFF"
+      ],
+      "hardGate": "Build-OutRunPCFast.ps1 must verify CMakeCache before compile, after compile, and before packaging; any mismatch aborts the build/package.",
+      "cleanOnlyWhen": [
+        "build-system/CMake structure changes",
+        "dependency/toolchain changes",
+        "major branch/build-contract transition",
+        "runtime behavior cannot be explained by source/config and an incremental-build artifact is suspected"
+      ],
+      "packageEvidence": [
+        "backends/d3d9/CMAKE_FLAGS.txt",
+        "backends/d3d9/BUILD_CONTRACT.txt",
+        "BUILD_INPUTS.json::BuildMode",
+        "BUILD_INPUTS.json::BuildContract",
+        "BUILD_INPUTS.json::CMakeFlags"
+      ],
+      "rationale": "Earlier broken PC-fast R51 rebuild used OUTRUN_VR_R26_HUD_COMPARE=OFF while verified R51 and later good driver-seat PC-fast builds use ON. Incremental caching is not the primary root cause."
+    },
+    "implementationFirstEnforcement": {
+      "enabled": true,
+      "sourceOfTruth": "docs/automation/IMPLEMENTATION_FIRST_20260924.md#no-ready-parking-enforcement",
+      "rule": "READY is an instruction to act, not a parking state. Implement/validate/fix blockers in-run whenever HMD is not required.",
+      "noIdleGate": true,
+      "continueIndependentLaneWhileWaiting": true
+    }
+  },
+  "runtimeEvidence": {
+    "sourceMatrix": "VRM-20260920-803144005c0e",
+    "d3d9Safe": {
+      "startup": "pass",
+      "runtime": "regressed",
+      "visual": "driver and shadow acceptable; most other content corrupted",
+      "transport": "SBS compose succeeded; direct shared-eye not ready",
+      "compilePath": "R26/R23 safe path; R29-R34 excluded",
+      "performance": "~1800-2000 draws/present in heavy gameplay samples; semanticReject exceeded 568k; user reports HMD stutter",
+      "forcedRuntime": "PreferD3D9Ex=false, FramerateLimit=60, FramerateInterpolation=false, FrameCadenceMode=0 while OpenXR reported 90 Hz"
+    },
+    "dxvkSafe": "same visual regression, subjectively worse HMD stutter; development paused",
+    "dx12Strict": "Direct3DCreate9On12Ex succeeds but both original and normalized CreateDevice return 0x8876086C; development paused"
+  },
+  "currentHypotheses": [
+    "R51 remains the protected partial runtime baseline: road/background/vehicles render correct 3D; white HUD diplopia, rank HUD head-lock/doubling, vehicle-rank anchoring and dense-scene performance remain open.",
+    "Candidate 8d21824f proved EXE-map producer tagging can reach R30 draw ownership (semanticHudAccepted=93681), but renderer semanticOverlayBypass remained 0 for the entire session. Semantic ownership is becoming visible too late for the renderer c64/WVP injection boundary.",
+    "Vehicle rank-marker exact callsite tags are insufficient by themselves: the pre-screen-projection vehicle/world anchor must be preserved/reconstructed through SpriteNode data into per-eye WORLD_BILLBOARD projection.",
+    "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
+    "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
+  ],
+  "nextAction": "Run :00/:30 full cycles with NO-READY-PARKING: consume completed CI, implement bounded READY work immediately, repair deterministic blockers in-run, and leave only genuine HMD-only or hard-blocked work pending.",
+  "scheduledRunHistory": {
+    "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
+    "lastRunId": "RUN-0001",
+    "lastEntryStartKst": "2026-09-21T02:59:17+09:00",
+    "historyCommitSha": "035e061e9331867d993d983e1c4bdb514b12e2f3",
+    "result": "NO MATERIAL CHANGE / NO BUILD NEEDED",
+    "nextAction": "First consume the DX9Ex Active Validation result and latest lightweight policy/AST parser result. If green, routine source CI is one active game DLL + one host and four-way P1-P4 remains manual-only. Continue independent DX9Ex correctness work without requesting extra HMD tests; next default human test is one CORRECTNESS run."
+  },
+  "legacyCandidateMatrix": {
+    "matrixId": "DX9EX-20260920-ee94dc8051b6",
+    "binarySourceSha": "f46024f7005c5c530479c61673055be324381f2a",
+    "packagerSourceSha": "2827f20d456d5fb266cfbefbd4435df0f9952569",
+    "configFixSha": "ee94dc8051b6de8c0b6ce67d9bdd8b613b98363c",
+    "sourceBuildRunId": 35516112968,
+    "sourceBuildStatus": "all four Win32 game variants and x64 D3D11 host succeeded; package job alone failed before assembly on PowerShell variable delimiter",
+    "followupRunId": 35524755335,
+    "followupRunStatus": "success: host, all four game variants, package and package validation",
+    "packageSha256": "a21825389f0731ffc62dc23314a1415261bf05fcdf07f4accd4d92a0aa46e630",
+    "packageValidation": "GitHub artifact downloaded and opened; four inner ZIPs; each inner SHA256SUMS passed; exact runtime keys verified; four distinct PE32 x86 game DLLs + common PE32+ x64 host; no d3d9.dll, multiviewpatcher.dll, DX12 host or backends directory",
+    "variants": {
+      "P1_C1_FAST_WORLD": "R29 fast L+R + restored R27/R28 perspective-world classification; R30-R34 excluded",
+      "P2_C2_FAST_HUD": "P1 + R30 HUD/XYZRHW/SkyGlow; R31-R34 excluded",
+      "P3_FULL_R34": "complete current R29-R34 chain",
+      "P4_R26_HUD_SAFE": "conservative R26 world + R30 HUD/XYZRHW/SkyGlow"
+    },
+    "commonRuntime": {
+      "PreferD3D9Ex": true,
+      "DirectGpuOnly": false,
+      "DisableDesktopDuplication": false,
+      "FramerateLimit": 0,
+      "FramerateInterpolation": true,
+      "FramerateUnlockExperimental": true,
+      "FrameCadenceMode": 1,
+      "FrameCadenceTargetHz": 0,
+      "DisableDesktopVsync": true,
+      "SkyGlowFactor": 1
+    },
+    "artifactId": 10609329194,
+    "artifactDigest": "sha256:a21825389f0731ffc62dc23314a1415261bf05fcdf07f4accd4d92a0aa46e630",
+    "status": "retired-as-default-runtime-test-policy",
+    "note": "Preserved as historical compile-time isolation evidence. Do not require P1-P4 sequential user testing by default."
+  },
+  "testProfiles": {
+    "CONTROL": {
+      "purpose": "Conservative DX9Ex baseline only when A/B evidence is required",
+      "defaultUserTest": false
+    },
+    "CORRECTNESS": {
+      "purpose": "Default daily Quest/VDXR validation candidate",
+      "defaultUserTest": true
+    },
+    "PERFORMANCE": {
+      "purpose": "CORRECTNESS plus isolated performance experiments when comparison is required",
+      "defaultUserTest": false
+    }
+  },
+  "runtimeTestQueue": {
+    "level0": [
+      {
+        "id": "L0-PROFILE-001",
+        "status": "implemented",
+        "item": "Backend/TestProfile identity separated in selector/runner/session manifests."
+      },
+      {
+        "id": "L0-LOG-001",
+        "status": "implemented",
+        "item": "Profile-aware Matrix/Variant/Profile/Session log directory and ZIP naming."
+      },
+      {
+        "id": "L0-GUI-001",
+        "status": "implemented",
+        "item": "GUI exposes CORRECTNESS/CONTROL/PERFORMANCE with CORRECTNESS recommended."
+      },
+      {
+        "id": "L0-VERIFY-001",
+        "status": "implemented-ci-gated",
+        "item": "Deterministic profile/session/log policy verifier and CI hook."
+      },
+      {
+        "id": "L0-CAPTURE-001",
+        "status": "implemented-build-validation-pending",
+        "item": "Background watchdog rolling capture with Ctrl+F9; no render-hot-path file I/O."
+      }
+    ],
+    "level1": [
+      {
+        "id": "L1-VIS-001",
+        "status": "queued",
+        "item": "World/HUD/effect stereo correctness including white rank-score, 6th/6, menu and YES/NO."
+      },
+      {
+        "id": "L1-VIS-002",
+        "status": "queued",
+        "item": "Sky/cloud/SkyGlow/lens flare/smoke/skid placement and head-lock behavior."
+      },
+      {
+        "id": "L1-RECENTER-001",
+        "status": "queued",
+        "item": "Gameplay/menu recenter visual behavior."
+      }
+    ],
+    "level2": [
+      {
+        "id": "L2-PERF-001",
+        "status": "queued",
+        "item": "Fast stereo/R29+ draw amplification and frame-pacing optimizations; compare PERFORMANCE only when needed."
+      }
+    ],
+    "level3": [
+      {
+        "id": "L3-DX9EX-001",
+        "status": "queued",
+        "item": "D3D9Ex device promotion/reset/shared-resource/direct transport behavior requiring backend-specific runtime evidence."
+      }
+    ],
+    "level4": [
+      {
+        "id": "L4-RELEASE-001",
+        "status": "development-reenabled-release-gated",
+        "item": "DXVK/multiview/DX12 development/build/smoke may proceed in parallel; release/promotion remains gated on Quest3/VDXR parity with R51."
+      }
+    ]
+  },
+  "eveningCandidate": {
+    "profile": "CORRECTNESS",
+    "frozen": true,
+    "sourceSha": "8d21824f9502b3354fae679972a90868a0cce562",
+    "configHash": null,
+    "packageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
+    "reason": "HMD_FAILED HUD/rank fix; do not promote/integrate. Preserve only as failed evidence candidate. No further PC build tonight."
+  },
+  "diagnosticCapture": {
+    "status": "phase1-build-verified-user-runtime-pending",
+    "triggerPolicy": "Ctrl+F9 selected to avoid F11 Tweaks overlay and F12 recenter.",
+    "rollingTelemetrySeconds": 10,
+    "heavyContinuousImageDumping": false,
+    "requiredIdentity": [
+      "backend",
+      "profile",
+      "session",
+      "sourceSha",
+      "configHash"
+    ],
+    "targetEvidence": [
+      "framePoseIds",
+      "presentationStereoFallback",
+      "runtimeRefresh",
+      "recommendedEyeSize",
+      "leftRightMatrices",
+      "drawClassCounters",
+      "frameTimings",
+      "recentLogs"
+    ],
+    "eyeImages": "optional only when safe and low-overhead",
+    "postWindowSeconds": 2,
+    "phase1": [
+      "v2/v3 pose/frame/client/ack rolling samples",
+      "runtime recommended eye size",
+      "host/rendered eye pose/FOV snapshot",
+      "session/backend/profile/source/config identity",
+      "collector ZIP inclusion"
+    ],
+    "deferred": [
+      "per-stage wait/acquire/render-left/render-right/copy/end timings",
+      "left/right eye image snapshots",
+      "draw-class counters not already exposed by IPC"
+    ],
+    "buildEvidence": {
+      "workflow": "DX9Ex Focus Test Matrix",
+      "runId": 35529948535,
+      "result": "success",
+      "meaning": "x64 host and all existing Win32 comparison variants compiled and packaged with phase-1 rolling capture source present"
+    },
+    "runtimeEvidence": "USER_RUNTIME_REQUIRED: capture trigger/usability and headset performance impact have not yet been validated on Quest 3/VDXR."
+  },
+  "scheduledAutomationModel": {
+    "A_00": "Hourly :00 architecture/state/lifetime/OpenXR/synchronization deep review, with DXVK/DX12 backend architecture and parity-boundary review now active.",
+    "N100_10": "Hourly :10 auxiliary fresh-chat deep review. Review-only; publishes delta findings/checkpoints to Issue #6 and follows durable baseline policy.",
+    "B_20": "Hourly :20 rendering/stereo/visual/performance/frame-pacing deep review, prioritizing HUD/white-overlay/rank-marker correctness while protecting the R51 world owner.",
+    "C_35": "Hourly :35 post-fix/change-sanity/dedup/validation-prep review only. Review ready HUD, DXVK/DX12 and performance findings/candidates, publish exact evidence and D_IMPLEMENT_NEXT; never write production source or candidates.",
+    "D_45": "Hourly :45 sole production IMPLEMENT + BUILD + VALIDATE + INTEGRATE worker. May select one bounded ready item from HUD, backend or performance lanes; keep unrelated risky changes in separate candidate branches; backend promotion requires Quest3/VDXR parity evidence.",
+    "specialD": {
+      "01:45": "nightly consolidation and architecture/regression/cache integrity review",
+      "06:45": "overnight summary and daytime backlog reorder",
+      "19:45": "freeze newest already-validated useful CORRECTNESS artifact; max 3 user choices only when evidence requires comparison"
+    },
+    "canonicalRoleContract": true,
+    "staleHistoricalRoleDocsDoNotOverride": true,
+    "baselineLock": true
+  },
+  "policyVerification": {
+    "lightweightWorkflow": "VR Test Policy",
+    "lastKnownSuccessRunId": 35530274341,
+    "lastKnownSuccessSha": "e67b00dd3d673b80f73115b7e26392ee6c1a67a1",
+    "note": "Single-active/manual-matrix policy verifier repaired and passed. Additional AST parse coverage was added afterward and should be the next lightweight check."
+  },
+  "activeValidation": {
+    "workflow": "DX9Ex Active Validation",
+    "runId": 35530793478,
+    "sourceSha": "10df8cbe9b3f32d8844a2c4283bd5bed3c8950c3",
+    "status": "in-progress-at-state-write",
+    "policy": "success",
+    "host": "success",
+    "game": "in-progress",
+    "package": "pending",
+    "reason": "One-time validation triggered by candidate-branch CI/concurrency workflow change; runtime renderer source was not changed by this setup commit."
+  },
+  "coordination": {
+    "protocol": "docs/VR_AUTODEV_PROTOCOL.md",
+    "queue": "docs/VR_WORK_QUEUE.json",
+    "runtimeFeedback": "docs/VR_RUNTIME_FEEDBACK.json",
+    "runRecordGuide": "docs/automation/README.md",
+    "runRecordTemplate": "docs/automation/RUN_RECORD_TEMPLATE.json",
+    "integrationBranch": "vr-d3d9ex-focus",
+    "candidatePattern": "vr-d3d9ex-candidate/<finding-id>-<run-id>",
+    "productionWriter": "D_INTEGRATION_PLANNER",
+    "candidateWriter": "D_INTEGRATION_PLANNER",
+    "maxIndependentUnvalidatedRuntimeCandidates": 3,
+    "maxMateriallyDifferentFixAttempts": 2,
+    "candidateWorkflow": ".github/workflows/vr-dx9ex-active.yml",
+    "candidateWorkflowBranchPattern": "vr-d3d9ex-candidate/**",
+    "candidateConcurrency": "branch-scoped",
+    "aBCDoNotRewriteIntegrationQueue": true,
+    "validation": {
+      "workflow": ".github/workflows/vr-autodev-coordination.yml",
+      "script": "tools/Test-VRAutodevCoordination.ps1",
+      "latestRunId": 35530891316,
+      "latestResult": "success",
+      "validatedHead": "074029e71fd8005d8c5f3a57e3da4a813eac2212"
+    },
+    "reviewBranches": {
+      "A": "vr-d3d9ex-review-a",
+      "B": "vr-d3d9ex-review-b",
+      "C": "vr-d3d9ex-review-c"
+    },
+    "reviewOnlyRoles": [
+      "A_ARCH_STATE_LIFETIME_OPENXR_SYNC_REVIEW",
+      "B_RENDER_STEREO_VISUAL_PERF_FRAMEPACING_REVIEW",
+      "C_POSTFIX_CHANGE_SANITY_DEDUP_VALIDATION_PREP"
+    ],
+    "n100": {
+      "scheduleMinute": 10,
+      "role": "AUXILIARY_REVIEW_ONLY",
+      "persistence": "GitHub Issue #6 append-only findings + N100_CHECKPOINT",
+      "freshChatEachRun": true,
+      "previousBusyPolicy": "skip fresh launch; never close an actively generating prior run"
+    },
+    "superpowersPolicy": "docs/VR_SUPERPOWERS_POLICY.md"
+  },
+  "regressionKnowledge": {
+    "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
+    "history": "docs/VR_PROBLEM_HISTORY.md",
+    "ledgerIssue": 13,
+    "mandatoryAtRecover": true,
+    "reuseStableKeyOnRecurrence": true,
+    "requireTriggeredCaseRevalidationBeforeIntegration": true,
+    "startupBaselineKey": "VR-STARTUP-WHITE-001"
+  },
+  "productionChangeLogging": {
+    "ledgerIssue": 14,
+    "appliesTo": [
+      "SCHEDULED_D",
+      "CHAT_DIRECT",
+      "MANUAL"
+    ],
+    "directChatUsesDTransactionContract": true,
+    "mandatoryAfterProductionCommit": true,
+    "logCheckpoint": "C4.5_LOG",
+    "fields": [
+      "sourceMode",
+      "changedAtKst",
+      "baseSha",
+      "resultSha",
+      "changeSummary",
+      "changedPaths",
+      "reason",
+      "relatedFindingOrRegressionKeys",
+      "validation",
+      "runtimeTestRequired",
+      "nextAction"
+    ],
+    "runtimeProblemAlsoUpdates": {
+      "regressionLedgerIssue": 13,
+      "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
+      "history": "docs/VR_PROBLEM_HISTORY.md"
+    },
+    "onWriteFailure": "PUSH_PENDING_OR_CAPABILITY_BLOCKED"
+  },
+  "binaryContractGate": {
+    "status": "INTEGRATED",
+    "canonicalSource": "emoose/OutRun2006Tweaks release v0.1 OR2006C2C.EXE",
+    "manifest": "docs/VR_BINARY_CONTRACT.json",
+    "verifier": "tools/verify_vr_binary_contract.py",
+    "crashRegistry": "docs/VR_CRASH_SIGNATURES.json",
+    "requiredFor": "new-or-changed executable-RVA hooks and matching crash-signature revalidation",
+    "exeCommittedToRepo": false,
+    "canonicalSha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "imageBase": "0x00400000",
+    "discoveryRunId": 35636970665,
+    "validationRunId": 35637181469,
+    "validationSha": "c1cb4def3ecfefb23084401d7961b6d658620388",
+    "validation": {
+      "policy": "success",
+      "strictCanonicalExeContract": "success",
+      "hostBuild": "success",
+      "noHmdHostSmokes": "8/8 success",
+      "gameWin32Build": "success",
+      "package": "success"
+    },
+    "runtimeCrashSidecar": "compile/package verified; observe on next real crash, no synthetic crash required",
+    "integrationSha": "3e7c09db725880eef5650d41a96a8d1691998bdd",
+    "integrationPr": 15,
+    "nextAction": "Mandatory strict EXE contract + matching durable crash-signature revalidation for all future executable-RVA hook changes."
+  },
+  "superpowersPolicy": {
+    "status": "ENABLED",
+    "policy": "docs/VR_SUPERPOWERS_POLICY.md",
+    "roleOwnershipUnchanged": true,
+    "productionWriter": "D_IMPLEMENT_BUILD_VALIDATE_INTEGRATE",
+    "requiredGates": [
+      "systematic-debugging-before-production-fix",
+      "red-green-refactor-when-deterministic-oracle-possible",
+      "exact-sha-domain-code-review",
+      "verify-review-feedback-before-acting",
+      "fresh-verification-before-completion",
+      "prospective-merged-tree-verification-before-integration"
+    ],
+    "reviewRoles": [
+      "A",
+      "B",
+      "C",
+      "N100"
+    ],
+    "reviewQuotaUnchanged": true,
+    "maxMateriallyDifferentFixAttempts": 2,
+    "hardwareVisibleFinalDone": "USER_RUNTIME_VERIFIED_REQUIRED"
+  },
+  "workingBaseline": {
+    "status": "USER_RUNTIME_PARTIAL_VERIFIED_LOCKED",
+    "establishedAtKst": "2026-09-23T02:16:53+09:00",
+    "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "branch": "vr-d3d9ex-working-baseline",
+    "originCandidateBranch": "vr-d3d9ex-candidate/VR-R51-WORLD-HUD-OWNERSHIP-750453f2",
+    "profile": "CORRECTNESS",
+    "package": "OutRun2_VR_DX9EX_ACTIVE_17ad376bfdf7.zip",
+    "packageSha256": "bf9f5b7c04520f1bf018764f54c1a915e019f4a21b18bf5fab061ce29790fbe7",
+    "validationRun": 35753905582,
+    "semantic": "development continuation baseline",
+    "userRuntimeVerified": true,
+    "supersedesMistakenBaselineSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+    "protectedGoodBehaviors": [
+      "Road/world geometry renders correctly in 3D stereo.",
+      "Background renders correctly in 3D stereo.",
+      "Vehicles render correctly in 3D stereo.",
+      "Frame rate/frame pacing is more stable than earlier tested builds."
+    ],
+    "knownOpenRuntimeDefects": [
+      "6th/6 is not resized, appears doubled, and follows head movement.",
+      "Exit YES/NO, end-of-run time/countdown/record text and other white HUD/text elements appear doubled and follow head movement.",
+      "White marker above vehicles appears doubled.",
+      "Non-white 1st/2nd/3rd vehicle rank marker appears as one image but follows head movement and is not anchored above the vehicle; it behaves like HUD-space content."
+    ],
+    "rules": [
+      "Future runtime-visible development must preserve the verified-good R51 world/background/vehicle 3D stereo and improved frame stability.",
+      "Fix only the remaining HUD/marker ownership and anchoring paths; do not broadly reclassify world geometry as HUD.",
+      "When composing with vr-d3d9ex-focus, retain newer governance/regression-policy commits rather than force-moving or discarding them.",
+      "Do not silently fall back to R50 or an older renderer lineage."
+    ]
+  },
+  "parallelWorkstreams": {
+    "hud": {
+      "ownerLens": "B_RENDER_STEREO_VISUAL_PERF_FRAMEPACING_REVIEW",
+      "implementer": "D isolated candidate",
+      "priority": "P0",
+      "guard": "Do not alter R51 world ownership while fixing fixed-function white HUD and rank-marker anchors."
+    },
+    "backends": {
+      "ownerLens": "A_ARCH_STATE_LIFETIME_OPENXR_SYNC_REVIEW",
+      "implementer": "D isolated candidate",
+      "priority": "P1",
+      "scope": [
+        "DXVK",
+        "DX12/D3D9On12"
+      ],
+      "guard": "Isolated backend candidates only until parity gate passes."
+    },
+    "performance": {
+      "ownerLens": "B/C",
+      "implementer": "D isolated candidate",
+      "priority": "P1",
+      "guard": "Telemetry first; optimize waits/copies/draw amplification only after correctness invariants are asserted."
+    },
+    "integration": {
+      "owner": "D_INTEGRATION_PLANNER",
+      "rule": "Independent exact-SHA review, affected CI/regression validation, then integration; never combine unrelated risky lanes into one runtime candidate."
+    }
+  },
+  "pcRunnerAuthorization": {
+    "status": "DISABLED_UNTIL_EXPLICIT_USER_REAUTHORIZATION",
+    "endedAtKst": "2026-09-24T01:49:00+09:00",
+    "reason": "User ended today's PC-build/test session and is going to sleep.",
+    "allowedOvernight": "review, static analysis, EXE-map queries, documentation, normal cloud CI when necessary",
+    "forbiddenOvernight": "self-hosted PC build dispatch, PC fast build, PC clean build"
+  },
+  "overnightHandoff": {
+    "recordedAtKst": "2026-09-24T01:50:00+09:00",
+    "protectedBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "failedCandidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
+    "failedCandidateBranch": "vr-d3d9ex-candidate/VR-R51-HUD-PRODUCER-MAP-20260924",
+    "failedCandidatePackageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
+    "buildRunId": 35888306771,
+    "runtimeEvidenceId": "RUNTIME-20260924-R51-HUD-MAP-001",
+    "runtimeSessionId": "20260923T164207853Z-2202b186",
+    "logZipSha256": "25be7a39d7daad4073e0b1765e9c6312a13f0b077898a84e4b1a17bf1dfe6731",
+    "observedFailure": [
+      "white HUD/text remains doubled/head-following",
+      "position/rank HUD remains doubled/head-following",
+      "vehicle rank markers remain detached from vehicles/head-following"
+    ],
+    "observedPass": [
+      "R51 world/road/vehicle 3D preserved",
+      "DirectGPU transport stable"
+    ],
+    "keyTelemetry": {
+      "semanticHudAccepted": 93681,
+      "semanticOverlayBypass": 0,
+      "overlay2DAccepted": 371082,
+      "r30World": 4832,
+      "r44Spatial": 5154,
+      "directFrames": 13187,
+      "directFallbacks": 4,
+      "fenceTimeout": 0,
+      "maxDrawsPerPresent": 3929.3,
+      "lowerPresentMaxMs": 16.639
+    }
+  },
+  "hmdTestMatrix": {
+    "manifest": "docs/VR_HMD_TEST_MATRIX.json",
+    "runtimeBaseSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+    "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+    "baseStatus": "BUILD_VERIFIED_INTEGRATED_NEEDS_HMD",
+    "slots": [
+      "A_CONTROL: DX9Ex R51-protected reference",
+      "B_HUD: HUD semantic lifetime",
+      "C_FLARE: lens flare producer",
+      "D_PERF: dense-scene/frame-budget performance",
+      "E_DXVK: DXVK SAFE first, multiview next",
+      "F_DX12: D3D9On12 strict/device-resource compatibility"
+    ],
+    "nextAction": "Prepare D_PERF/E_DXVK/F_DX12 immediately in parallel with B_HUD/C_FLARE. Do not wait for HUD resolution."
+  },
+  "automationSchedule": {
+    "contract": "TWO-FULL-CYCLES-PER-HOUR",
+    "timezone": "Asia/Seoul",
+    "active": [
+      {
+        "taskId": "6ab45eaa511c8191ab7d5984495d7e93",
+        "title": "OutRun Full Cycle 1 (Chat)",
+        "minute": 0,
+        "scope": "full recover-review-implement-validate-integrate-matrix"
+      },
+      {
+        "taskId": "6ab45ed52f548191b94c90af792116fb",
+        "title": "OutRun Full Cycle 2 (Chat)",
+        "minute": 30,
+        "scope": "consume prior outputs then full recover-review-implement-validate-integrate-matrix"
+      }
+    ],
+    "disabled": [
+      {
+        "taskId": "6ab45ebf6ba08191a59cb6d49c251637",
+        "formerRole": "B review",
+        "minute": 20
+      },
+      {
+        "taskId": "6ab45eec82dc8191b63632bdad258a7d",
+        "formerRole": "D integration",
+        "minute": 45
+      }
+    ],
+    "productionIntegrationWip": 1,
+    "ownership": "remote GitHub claim/CAS; never concurrent source mutation",
+    "waitingPolicy": "If one cycle waits on CI/HMD/review or another live writer, advance another independent lane instead of idling."
+  }
+}

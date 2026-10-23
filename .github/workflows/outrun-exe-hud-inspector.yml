@@ -1,0 +1,206 @@
+name: OutRun EXE HUD Inspector CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [ vr-dxvk-r71-disasm, 'vr-d3d9ex-review-feature-*' ]
+    paths:
+      - 'src/vr/debug/hud_inspector.cpp'
+      - 'OutRun2006Tweaks.ini'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/analyze_outrun_assets.py'
+      - 'src/interpolation.cpp'
+      - 'src/hooks_exceptions.cpp'
+      - 'src/hooks_bugfixes.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r34.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r29.cpp'
+      - 'src/vr/game/outrun_renderer.cpp'
+      - 'src/vr/settings.cpp'
+      - 'src/vr/game/render_semantics.hpp'
+      - 'src/vr/hud_semantics.hpp'
+      - 'src/hooks_textures.cpp'
+      - 'CMakeLists.txt'
+      - 'cmake.toml'
+      - 'tools/analyze_outrun_exe.py'
+      - 'tools/test_dx11_first_game_frame_regressions.py'
+      - 'tools/test_dx11_*.py'
+      # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
+      - 'tools/dx11_sm3_*_probe.cpp'
+      - 'tools/dx11_live_sm3_texkill_01013.cpp'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'docs/VR_EXE_HUD_INSPECTOR.md'
+      - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
+      - 'src/vr/d3d11/**'
+      - 'tools/test_dx11_live_sm3_draw_00925.py'
+      - 'tools/test_dx11_live_sm3_blend_factor_00966.py'
+      # Exact pushed DX11 result SHA must retain the HUD inspector gate when
+      # a causal source-activation or packaging negative repair is committed.
+      - 'tools/verify_dx11_activation_boundary.py'
+      - 'tools/test_package_dx11_first_game_frame.py'
+      - 'tools/dx11_autodev_policy.py'
+      - 'tools/test_dx11_autodev_policy.py'
+      - 'docs/automation/runs/CONVERSION-DX11-*.json'
+      # Revalidate native artifacts on exact SHA when backend CI changes.
+      - '.github/workflows/backend-conversion-gate.yml'
+      - '.github/workflows/build.yml'
+      - '.github/workflows/vr-openxr.yml'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
+  pull_request:
+    paths:
+      - 'src/vr/debug/hud_inspector.cpp'
+      - 'OutRun2006Tweaks.ini'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/analyze_outrun_assets.py'
+      - 'src/interpolation.cpp'
+      - 'src/hooks_exceptions.cpp'
+      - 'src/hooks_bugfixes.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r34.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r29.cpp'
+      - 'src/vr/game/outrun_renderer.cpp'
+      - 'src/vr/settings.cpp'
+      - 'src/vr/game/render_semantics.hpp'
+      - 'src/vr/hud_semantics.hpp'
+      - 'src/hooks_textures.cpp'
+      - 'CMakeLists.txt'
+      - 'cmake.toml'
+      - 'tools/analyze_outrun_exe.py'
+      - 'tools/test_dx11_first_game_frame_regressions.py'
+      - 'tools/test_dx11_*.py'
+      # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
+      - 'tools/dx11_sm3_*_probe.cpp'
+      - 'tools/dx11_live_sm3_texkill_01013.cpp'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'docs/VR_EXE_HUD_INSPECTOR.md'
+      - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
+
+concurrency:
+  group: exe-hud-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  static-exe-analysis:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify exact pushed DX11 source checkout
+        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-01013-visible-game-frame' || github.ref_name == 'feature/dx11-00966-live-game-frame')
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $expected = '${{ github.sha }}'
+          if ($actual -ne $expected) { throw "DX11 exact-SHA checkout mismatch: $actual != $expected" }
+
+      - name: Validate PowerShell helper syntax
+        shell: pwsh
+        run: |
+          $failed=$false
+          foreach($script in @(
+            'tools/Collect-OutRunVRLogs.ps1',
+            'tools/Run-OutRunVRTest.ps1',
+            'tools/OutRunVR-TestProfiles.ps1',
+            'tools/Select-OutRunVRBackend.ps1'
+          )){
+            $tokens=$null
+            $errors=$null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $script), [ref]$tokens, [ref]$errors)
+            if($errors.Count -gt 0){
+              $failed=$true
+              $errors | ForEach-Object { Write-Error "${script}: $($_.Message)" }
+            }
+          }
+          if($failed){ throw 'PowerShell syntax validation failed' }
+
+      - name: Asset semantic parser self-test
+        shell: pwsh
+        run: python tools/analyze_outrun_assets.py --self-test
+
+      - name: Download upstream replacement EXE
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force analysis-input | Out-Null
+          Invoke-WebRequest `
+            -Uri 'https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.1/OR2006C2C.EXE' `
+            -OutFile analysis-input/OR2006C2C.EXE
+
+      - name: Analyze EXE HUD/render anchors
+        run: >
+          python tools/analyze_outrun_exe.py
+          --exe analysis-input/OR2006C2C.EXE
+          --out-dir analysis-output
+
+      - name: Show analysis summary
+        shell: pwsh
+        run: Get-Content analysis-output/OR2006C2C_EXE_ANALYSIS.md -TotalCount 120
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OR2006C2C-EXE-HUD-analysis-${{ github.sha }}
+          path: analysis-output/
+          if-no-files-found: error
+
+  build-hud-inspector:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify exact pushed DX11 source checkout
+        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-01013-visible-game-frame' || github.ref_name == 'feature/dx11-00966-live-game-frame')
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $expected = '${{ github.sha }}'
+          if ($actual -ne $expected) { throw "DX11 exact-SHA checkout mismatch: $actual != $expected" }
+
+      - name: Configure Win32 game DLL
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+
+      - name: Stage inspector payload
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll |
+            Where-Object { $_.FullName -match '\\bin\\' } |
+            Select-Object -First 1
+          if (-not $dll) { throw 'dinput8.dll missing' }
+          Copy-Item $dll.FullName stage/dinput8.dll
+          Copy-Item tools/Collect-OutRunVRLogs.ps1 stage/
+          Copy-Item tools/Run-OutRunVRTest.ps1 stage/
+          Copy-Item tools/OutRunVR-TestProfiles.ps1 stage/
+          Copy-Item tools/Select-OutRunVRBackend.ps1 stage/
+          Copy-Item tools/analyze_outrun_assets.py stage/
+          git rev-parse HEAD | Set-Content stage/SOURCE_SHA.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HUD-inspector-game-${{ github.sha }}
+          path: stage/
+          if-no-files-found: error

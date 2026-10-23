@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00690",
+  "production_id": "CONVERSION-DX11-00690",
+  "event_id": "CONVERSION-DX11-00690-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "NATIVE_STEREO_GAME_EYE_SOURCE_PROVENANCE",
+  "work_key": "DX11:NATIVE_STEREO_GAME_EYE_SOURCE_PROVENANCE",
+  "status": "MATERIAL_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Game native D3D11 color render-target pair from captured D3D9 game Draw/Indexed",
+      "Validate complete source COM identity and render-target provenance against all live ring output slots before GPU CopyResource",
+      "Copy left/right native eye textures, producer fence and exact lifetime ACK for x64 OpenXR host"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+      "tools/dx11_game_eye_pair_sources_probe_00690.cpp",
+      "tools/test_dx11_eye_pair_sources_00690.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Distinct native game render targets from producer device admitted and copied in stereo order",
+      "negative_regression": "Same-resource aliases, sources equal to any owned eye slot, missing RT bind or incomplete ring fail before GPU copy, preserving original DX9Ex input",
+      "component_integration": "Game native eye render targets to D3D11 stereo shared ring resource copy, fence publication and OpenXR host-visible pair identity"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_GAME_EYE_SOURCE_PROVENANCE",
+      "src/vr/d3d11/native_shared_eye_ring.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source pair safely enters shared OpenXR eye ring on native transport path; Quest3/VDXR image fidelity UNTESTED without actual hardware.",
+    "activation_guard_and_fallback": "No implicit native activation; invalid source pairs reject without issuing GPU CopyResource and preserve D3D9 Draw/Present/gamepad."
+  },
+  "feature_contract": {
+    "feature_id": "NATIVE_STEREO_GAME_EYE_SOURCE_PROVENANCE",
+    "goal": "Keep game-authored native stereo eye pair immutable and provenance-safe when copying into generation-owned shared OpenXR ring resources, without disrupting the original game input/render path.",
+    "acceptance_items": [
+      {
+        "id": "native-eye-copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_eye_to_openxr_ring",
+        "expected_behavior": "Two distinct native color render targets of the producer device copy in left/right order before producer completion fence"
+      },
+      {
+        "id": "immutable-foreign-ack",
+        "category": "fallback_regression",
+        "behavior_area": "ring_resource_immutability_and_dx9ex_fallback",
+        "expected_behavior": "Reject same underlying source, any ring-owned input across all slots, incomplete identity or missing render-target ownership before any GPU copy"
+      },
+      {
+        "id": "integrated-gates",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_source_and_exact_sha_ci",
+        "expected_behavior": "Portable compiled positive and destructive alias negative tests plus required exact-SHA GitHub Actions gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-eye-copy": "PENDING_EXACT_SHA",
+    "immutable-foreign-ack": "PENDING_EXACT_SHA",
+    "integrated-gates": "PENDING_EXACT_SHA"
+  },
+  "base_head_sha": "931ee4632456e140d996894b56a35cbe15ad558b",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+    "tools/dx11_game_eye_pair_sources_probe_00690.cpp",
+    "tools/test_dx11_eye_pair_sources_00690.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00688.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub source HEAD and active 00689 owner inspected",
+    "C1_REVIEW": "PASS: source alias and cross-slot lifetime overwrite risk; previous 00688 C6 policy regression reproduced from CI",
+    "C2_IMPLEMENT": "PASS: exact COM source identity and native shared eye transport copy integration",
+    "C3_VALIDATE": "Portable positive/negative compiled locally; exact-SHA CI pending",
+    "C4_COMMIT": "MATERIAL_RESULT via this committed tree; SHA to be captured after publication",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "next_action": "Check mandatory GitHub Actions against exact material commit SHA; only then separately complete C6 bookkeeping, preserve RUNTIME_VALIDATION=UNTESTED and do not rescore on retry."
+}

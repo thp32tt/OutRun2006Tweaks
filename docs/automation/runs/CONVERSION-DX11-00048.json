@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00048",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T19:29:38+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "76fa6862c40093cfe4b895c847c3eef1a4ca5be4",
+  "code_result_sha": "3bc3f3184f6148d2401b6bf38ad1ce5416b99838",
+  "result_sha": "3bc3f3184f6148d2401b6bf38ad1ce5416b99838",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R95 hosted D3D11 constant-buffer object/upload/b0-binding readiness probe for Set 05 F21.",
+  "summary": "Added a hosted R95 probe that consumes the R94 64-byte WVP payload and R93 generated fixed-function vertex shader, reflects FixedFunctionTransform as a 64-byte cbuffer at b0, creates a WARP D3D11 dynamic constant buffer, uploads the payload with Map(D3D11_MAP_WRITE_DISCARD), binds it to VS slot 0, and verifies the bound object. No draw call or game runtime binding was introduced.",
+  "prerequisite": {
+    "task_id": "CONVERSION-DX11-00046",
+    "code_sha": "fb6923d4bbaaf10e62c485fc99a119ea87202c13",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "changes": [
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Added R95 hosted WARP reflection/CreateBuffer/Map/b0 binding verification for the R94 payload and R93 VS."
+    },
+    {
+      "path": "cmake.toml",
+      "result": "Added dx11_constant_buffer_probe target with d3dcompiler/d3d11/dxguid linkage."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Added checked-in generated-equivalent dx11_constant_buffer_probe target."
+    },
+    {
+      "path": ".github/workflows/backend-conversion-gate.yml",
+      "result": "Added Build/Run DX11 constant buffer probe steps."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R95 source/build/workflow/reflection/binding contract guards."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R95 proves hosted object creation, upload and b0 binding only. It does not integrate a constant-buffer owner into the game runtime, update per-draw native DX11 state, execute a native draw, cover lighting/skinning/programmable shaders, or prove HMD visual parity."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36555252098,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "3bc3f3184f6148d2401b6bf38ad1ce5416b99838",
+      "evidence": "Build DX11 constant buffer probe PASS; Run DX11 constant buffer probe PASS."
+    },
+    "build": {
+      "run_id": 36555259246,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "3bc3f3184f6148d2401b6bf38ad1ce5416b99838"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36555259257,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "3bc3f3184f6148d2401b6bf38ad1ce5416b99838"
+    },
+    "hud_inspector": {
+      "run_id": 36555259273,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "3bc3f3184f6148d2401b6bf38ad1ce5416b99838"
+    },
+    "pc_fast": {
+      "run_id": 36555252194,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit 3bc3f3184f6148d2401b6bf38ad1ce5416b99838 contains [AUTO:CONVERSION-DX11-00048] and no CI-skip directive.",
+    "Verify DX11 source graph PASS on exact result SHA.",
+    "Backend Conversion Gate 36555252098 PASS including R95 build/run.",
+    "Build 36555259246 PASS.",
+    "OpenXR VR architecture 36555259257 PASS across all six jobs.",
+    "HUD Inspector 36555259273 PASS.",
+    "Issue #14 implementation comment 5888306862 and validation comment 5888398752 written.",
+    "No N100 workspace, PC fast runner, Quest3/VDXR, in-game runtime draw, or native runtime constant-buffer integration was used."
+  ],
+  "blocker": null,
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN",
+    "implementation_comment_id": 5888306862,
+    "validation_comment_id": 5888398752
+  },
+  "resume_cursor": "R95 is automation-validated. Continue F21 with one bounded non-routing prerequisite such as dormant runtime constant-buffer lifetime/ownership scaffolding or another independent shader-translation step; keep native draw activation and shaderTranslationExact false.",
+  "next_action": "Add a dormant DX11 constant-buffer lifetime/ownership wrapper or another narrowly scoped F21 prerequisite without routing game draws through it. Exact-build Quest3/VDXR remains mandatory before runtime promotion."
+}

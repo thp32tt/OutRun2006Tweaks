@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "canonicalExeContract": "docs/VR_BINARY_CONTRACT.json",
+  "policy": {
+    "stableKeyFormat": "VR-CRASH-<SUBSYSTEM>-NNN",
+    "reuseExistingKeyOnSameExceptionAndRva": true,
+    "requiredFieldsForKnownCrash": [
+      "key",
+      "exceptionCode",
+      "module",
+      "moduleRva",
+      "firstSeenSourceSha",
+      "symptom",
+      "rootCause",
+      "fixReference",
+      "validation",
+      "status"
+    ],
+    "integrationRule": "A candidate touching a matching hook/RVA or riskPath must revalidate the known crash signature before D integration."
+  },
+  "signatures": [],
+  "notes": [
+    "Crash ZIPs should contain crash_signature.json with exceptionCode, absoluteAddress, moduleBase and exeRva when the fault address belongs to OR2006C2C.EXE.",
+    "Exact EXE identity is verified separately by docs/VR_BINARY_CONTRACT.json.",
+    "Do not create a new key for a recurrence of the same bounded crash; append evidence to the existing key."
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00741",
+  "production_id": "CONVERSION-DX11-00741",
+  "event_id": "CONVERSION-DX11-00741-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:GAME_SOURCE_RESET_CONTINUITY",
+  "feature_id": "DX11-MENU-RACE-RESET-SOURCE-CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "base_head_sha": "7462e062fa5d19f186f854d0deb61cbcba1f68e7",
+  "material_result_sha": "334c335c16bb4a53cbd1bf3c05fdb463cbb0a5fd",
+  "validation_bearing_result_sha": "85277ca60d075c7b0488f12cbb4dc655dc3b75a3",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "change_summary": "Prevent auxiliary D3D9 Reset from wiping the live source-owned native D3D11 full game frame, pending GPU readbacks and fallback-safe gamepad Present; forward real device identity through both R30 hook variants; compile and destructive regression coverage.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/dx11_source_reset_probe_00741.cpp",
+    "tools/test_dx11_source_reset_00741.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "game source-owned Draw/DrawIndexed maintains device identity until owning D3D9 Present",
+      "DX11 native frame GPU buffers/fences and output generation ignore unrelated auxiliary Reset while owning Reset retires stale resource",
+      "R30 stable/safe Reset hooks forward D3D9 device without changing original HRESULT/gamepad fallback"
+    ],
+    "batch_components": [
+      "live D3D9 Reset callsite and DX11 source-owned GPU batch",
+      "pending native fence/readback/output and original D3D9 input/Present",
+      "portable C++ ownership/scene probe and adversarial Python wiring/CI regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00741 C++ verifies game/foreign/transition Reset and batch continuity; both R30 hooks reach device-aware implementation.",
+      "negative_regression": "00741 structural mutations reject flipped ownership, missing previous Present owner, dropped hook device arguments and test gate.",
+      "component_integration": "Real menu/race Draw->native GPU frame->game-owned Present survives auxiliary D3D9 Reset, while own Reset fully releases native GPU resources."
+    },
+    "conflict_keys": [
+      "DX11:GAME_SOURCE_RESET_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Foreign Reset cannot drop an active native full frame or fenced result; owning Reset safely retires all native resources; Quest3 output still untested.",
+    "activation_guard_and_fallback": "Original D3D9 Reset/Present/Draw HRESULT and gamepad remain authoritative; native frames remain opt-in and unsupported states fail closed."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-RESET-SOURCE-CONTINUITY",
+    "goal": "Preserve active full-resolution native menu/vehicle/race Draw and fenced Present across an unrelated auxiliary D3D9 Reset while retiring owned native resources on the actual game device Reset.",
+    "acceptance_items": [
+      {
+        "id": "native-frame-reset-survival",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Auxiliary Reset cannot abort a source-owned D3D11 game Draw/DrawIndexed batch destined for its own game Present."
+      },
+      {
+        "id": "owner-reset-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_fallback_input_and_transport",
+        "expected_behavior": "Owning Reset safely releases native resources and no hook alters original D3D9 Reset, gamepad or fallback drawing."
+      },
+      {
+        "id": "exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "build_ci_openxr_hud",
+        "expected_behavior": "Exact validation-bearing SHA passes DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-frame-reset-survival": "PASS",
+    "owner-reset-fallback": "PASS",
+    "exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "blocking_evidence": "Original before_game_reset() had no D3D9 device argument; both R30 Reset hooks called unconditional global DX11 resource teardown even when Reset belonged to auxiliary device. Existing source/Present ownership gating applied to Draw and Present but not Reset.",
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38618530118,
+      "conclusion": "success",
+      "head_sha": "85277ca60d075c7b0488f12cbb4dc655dc3b75a3"
+    },
+    "backend_conversion": {
+      "run_id": 38618530748,
+      "conclusion": "success",
+      "head_sha": "85277ca60d075c7b0488f12cbb4dc655dc3b75a3"
+    },
+    "windows_build": {
+      "run_id": 38618539977,
+      "conclusion": "success",
+      "head_sha": "85277ca60d075c7b0488f12cbb4dc655dc3b75a3"
+    },
+    "openxr_architecture": {
+      "run_id": 38618539215,
+      "conclusion": "success",
+      "head_sha": "85277ca60d075c7b0488f12cbb4dc655dc3b75a3"
+    },
+    "hud_inspector": {
+      "run_id": 38618539513,
+      "conclusion": "success",
+      "head_sha": "85277ca60d075c7b0488f12cbb4dc655dc3b75a3"
+    }
+  },
+  "result_note": "COMPLETE_BUILD_VERIFIED at exact validation-bearing SHA; native game source-owned Reset and fallback static/Windows CI verified. Real menu/vehicle/race/HMD/gamepad are UNTESTED, not promoted. Next action: independent controller-selected DX11 native game frame implementation or user Quest3/VDXR in-game/HMD validation, preserving DX9Ex fallback.",
+  "result_sha": "85277ca60d075c7b0488f12cbb4dc655dc3b75a3",
+  "packaging_reason": "No Quest3/VDXR HMD runtime-proven game package; source/build-only CI verification and user handles deployment.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: resumed previous material owner-aware Reset implementation 334c335c from actual Backend failure #38617011341; GitHub branch HEAD checked.",
+    "C1_REVIEW": "PASS: confirmed obsolete no-argument Reset verifier assertions in race depth, activation, full-frame mode, source owner, async GPU output and fallback; source ownership preserved.",
+    "C2_IMPLEMENT": "PASS: substantive C++ owner-aware D3D9 Reset in material commit 334c335c; repaired erroneous CI regression checks in subsequent validation-bearing commits eb4adfab,9867c5e,1024ddaa,07fdab05,85277ca.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 85277ca60d07, DX11 Fast #38618530118, Backend #38618530748, Windows Build #38618539977, OpenXR #38618539215, HUD #38618539513 all completed success; no HMD.",
+    "C4_COMMIT": "PASS: original material C++ 334c335c and final no-CI-skip validation-bearing repair SHA 85277ca60d075c7b0488f12cbb4dc655dc3b75a3 pushed nonforce to target branch.",
+    "C5_PACKAGE": "NOT_REQUIRED: user deployment, Quest3/VDXR game runtime not validated; no release or backend promotion.",
+    "C6_STATE": "PASS: recorded this separate checkpoint without changing validation-bearing SHA; next independent feature remains controller-owned."
+  }
+}

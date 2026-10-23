@@ -1,0 +1,209 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00536",
+  "production_id": "CONVERSION-DX11-00536",
+  "event_id": "CONVERSION-DX11-00536-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "e3f49c2496ff82319dad2d64facc30fefea2f65f",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00536",
+  "lease_epoch": 1,
+  "work_key": "DX11:R239:D3D9_INDEXED_UP_STRIP_WINDING_TO_NATIVE_WARP_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
+    "tools/dx11_indexed_up_strip_probe_r239.cpp",
+    "tools/test_dx11_indexed_up_strip_r239.py",
+    "DX11:R239:STRIP_INDEXED_UP"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 caller-attested transient INDEX16/INDEX32 triangle-strip spans",
+      "Winding-correct strip-to-list expansion and immutable R238 D3D11 VB/IB ownership",
+      "R238 exact shader/IA/sole-eye RTV preflight",
+      "Native WARP DrawIndexed(6) GPU dual-triangle pixel readback"
+    ],
+    "batch_components": [
+      "native_d3d9_indexed_up_strip_batch.hpp real adapter",
+      "dx11_indexed_up_strip_probe_r239.cpp WARP GPU readback and negative runtime cases",
+      "test_dx11_indexed_up_strip_r239.py negative source mutants and workflow/CMake integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Both INDEX16 and INDEX32 strip expand into six immutable D3D11 indices and render two WARP triangles with a black corner",
+      "negative_regression": "12 guard destructive mutations, null/short/index-overflow/out-of-range/stale generation/versions/PS/retire checks",
+      "component_integration": "D3D9 indexed-UP strip -> CPU winding expansion -> R238 immutable native IA/PS/RTV -> WARP GPU pixels"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
+      "tools/dx11_indexed_up_strip_probe_r239.cpp",
+      "tools/test_dx11_indexed_up_strip_r239.py",
+      "DX11:R239:STRIP_INDEXED_UP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "COMPLETE_R239_SCOPED_POST_R175_GATE_RECOVERED",
+  "checkpoint": "C6_STATE",
+  "result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "material_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "validation_bearing_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+  "automation_validation": "PASS_SUBSEQUENT_HEAD_EXACT_SHA_GATE",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "score_change": 0,
+  "summary": "Historical 00536 R239 production-safe dormant INDEX16/INDEX32 indexed-UP strip -> winding-correct D3D11 immutable buffer -> WARP GPU pixel proof already committed at 096f11f2. Original Gate failed inherited R175; independent owner 00477 fixed R175 at 2aae633. Subsequent unchanged-R239 full exact-SHA HEAD Gate 38052342312 SUCCESS. Scoped R239 complete; FIRST_GAME_DRAW_FRAME and real Quest 3/VDXR runtime are not delivered; +0 rollover score.",
+  "changed_files": [
+    "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
+    "tools/dx11_indexed_up_strip_probe_r239.cpp",
+    "tools/test_dx11_indexed_up_strip_r239.py",
+    "CMakeLists.txt",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00536.json"
+  ],
+  "pipeline": {
+    "C0": "PASS: authenticated Github HEAD e3f49c; controller checkpoint and no existing 00536 run",
+    "C1": "PASS: independent R239 source ownership; R238 untouched and 00477 R175 separately owned",
+    "C2": "PASS: coherent 7-file batch, native C++ strip winding expansion -> R238 immutable resource/bind pipeline -> real mono WARP DrawIndexed + test integration",
+    "C3": "SCOPED_PASS/FULL_GATE_FAIL: 12 source mutation guards + R239 static/build/WARP all SUCCESS at material SHA; Backend Gate validate SUCCESS, smoke FAILURE inherited R175",
+    "C4": "PASS: [AUTO:CONVERSION-DX11-00536] material commit 096f11f2d1ddc035e23e05a1864ce2ca6c52792c published without CI-skip, exact-SHA validated; following bookkeeping not promoted",
+    "C5": "NOT_REQUIRED: no gameplay draw activation/HMD package",
+    "C6": "COMPLETE_SCOPED_AFTER_UPSTREAM_R175_REPAIR: prior exact-SHA material Gate 38048751349 FAIL inherited R175 retained as history, subsequent exact-SHA full HEAD Gate 38052342312 SUCCESS including R239 static/build/GPU at unchanged R239 sources; no new gameplay activation; no duplicate score."
+  },
+  "evidence": {
+    "backend_gate_conclusion": "failure",
+    "runtime": "UNTESTED; no Quest3/VDXR game trial",
+    "validation_bearing_commit_url": "https://github.com/thp32tt/OutRun2006Tweaks/commit/096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+    "backend_gate_run_id": 38048751349,
+    "backend_gate_head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+    "backend_gate_validate_job": {
+      "id": 114203448745,
+      "conclusion": "success"
+    },
+    "backend_gate_smoke_job": {
+      "id": 114204079683,
+      "conclusion": "failure",
+      "failed_step": "Run DX11 constant buffer probe"
+    },
+    "r239_static": {
+      "result": "PASS",
+      "scope": "12 source mutant guard checks; separate R239 GPU proof integration",
+      "job_id": 114204079683
+    },
+    "r239_warp_build": {
+      "result": "PASS",
+      "job_id": 114204079683
+    },
+    "r239_warp_gpu": {
+      "result": "PASS",
+      "job_id": 114204079683,
+      "tests": [
+        "INDEX16 two-triangle strip red GPU pixels and black corner after caller pointer mutation",
+        "INDEX32 two-triangle strip red GPU pixels and black corner after caller pointer mutation"
+      ]
+    },
+    "inherited_failure": {
+      "key": "R175_GENERIC_VARYING_MISMATCH",
+      "owner_task": "CONVERSION-DX11-00477",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ]
+    },
+    "other_exact_sha_ci": [
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 38048754843,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 38048754780,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "id": 38048754802,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 38048751364,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "VR PC Fast Test Build",
+        "id": 38048751342,
+        "head_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "resume_cursor": "R239_COMPLETE_NO_REPLAY_NEXT_NEW_TASK_FIRST_GAME_DRAW_FRAME",
+  "next_action": "Do not replay CONVERSION-DX11-00536 or duplicate its [AUTO] material feature commit. Prior inherited R175 failure is resolved at 2aae633 and complete HEAD gate 38052342312 validates unchanged R239; schedule separate first live game draw feature from >=00537 with new ownership. RUNTIME_VALIDATION=UNTESTED.",
+  "blockers": [
+    "Real OutRun gameplay draw and visible game frame not implemented/tested by this historical R239 task; requires separately scoped >=00537 feature, not a replay of 00536.",
+    "Quest 3 / VDXR HMD validation not performed, RUNTIME_VALIDATION=UNTESTED."
+  ],
+  "last_real_activity_at": "2026-10-10T20:40:00+09:00",
+  "last_activity_evidence": "Exact-SHA Gate #38048751349 validate SUCCESS, R239 scoped 3/3 SUCCESS, full smoke failed R175; source material 096f11f2 confirmed",
+  "original_full_gate_outcome": {
+    "result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+    "gate_run_id": 38048751349,
+    "conclusion": "FAIL_R175_INHERITED",
+    "owned_r239_static_gpu": "PASS",
+    "independent_r175_owner": "CONVERSION-DX11-00477"
+  },
+  "post_r175_recovery": {
+    "event_id": "CONVERSION-DX11-00536-E008",
+    "event_type": "rollover",
+    "attempt": "2/3",
+    "chat_rollover": 4,
+    "checkpoint": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00536/20261010T2210-periodic.json",
+    "checkpoint_branch": "chat-controller-downloads",
+    "checkpoint_verified": true,
+    "feature_resolution": "EXISTING_R239_SOURCE_ALREADY_MATERIAL; NO_DUPLICATE_FEATURE_COMMIT",
+    "original_material_result_sha": "096f11f2d1ddc035e23e05a1864ce2ca6c52792c",
+    "corrected_r175_owner_task": "CONVERSION-DX11-00477",
+    "corrected_r175_material_sha": "2aae633d1e3024a88173dea2eadc25e4efe53e83",
+    "r175_exact_sha_full_gate": 38051638025,
+    "validation_head": "3e7d0a0677a2b61f419e6044f7aa2c743cce8ef1",
+    "validation_head_gate": 38052342312,
+    "validation_head_gate_conclusion": "success",
+    "validation_head_r239_steps": [
+      "Verify R239 strip adapter and GPU proof contract: success",
+      "Build R239 strip indexed-UP WARP probe: success",
+      "Run R239 strip indexed-UP WARP probe: success"
+    ],
+    "r239_source_files_unchanged_since_material": true,
+    "compare_base_to_validation_head": {
+      "ahead_by": 9,
+      "behind_by": 0
+    },
+    "source_changes_this_rollover": 0,
+    "gameplay_native_draw_activation": false,
+    "runtime_validation": "UNTESTED",
+    "score_change": 0,
+    "remaining_new_task": "FIRST_GAME_DRAW_FRAME requires separate >=00537 scoped integration; no in-game frame proof at 00536"
+  }
+}

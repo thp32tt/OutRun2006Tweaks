@@ -1,0 +1,155 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00843",
+  "production_id": "CONVERSION-DX11-00843",
+  "event_id": "CONVERSION-DX11-00843-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_STEREO_SCALED_CAMERA_ARRAY_POSTPASS_MIP0",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "NATIVE_SCALED_LR_ARRAY_GPU_POSTPASS_VERIFIED_R30_LIVE_CALLBACK_REMAINS",
+  "material_result_sha": "5144b27f99ff23b649412221d78f0ac7932fbe8f",
+  "validation_bearing_result_sha": "5144b27f99ff23b649412221d78f0ac7932fbe8f",
+  "source_material_commits": [
+    "5144b27f99ff23b649412221d78f0ac7932fbe8f"
+  ],
+  "validation_repair_commits": [],
+  "packaging_status": "NOT_REQUIRED",
+  "score_change": 0,
+  "score_note": "Continues DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR; camera-array scaled mip-zero postpass is one still-unfinished full native renderer source checkpoint, not an independent completed gameplay feature. CI/C6 do not earn points.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Integrate actual scaled left/right game-authored GPU array eye postpasses into native D3D11 game-eye output without CPU readback, preserving original D3D9/FFB fallback. Real game R30 independent camera Draw/DrawIndexed callbacks and Quest3 remain unsolved.",
+    "acceptance_items": [
+      {
+        "id": "native-scaled-eye-source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_gpu_postpass_to_native_lr_eye",
+        "expected_behavior": "Actual native game-eye GPU StretchRect samples the caller-proven mip-zero camera slice before GPU raster scaling into the selected native eye RTV."
+      },
+      {
+        "id": "distinct-eye-pixels",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_gpu_output",
+        "expected_behavior": "Win32 WARP produces distinct left and right camera-slice pixels in their separately scaled native eye targets."
+      },
+      {
+        "id": "fallback-and-draw-evidence",
+        "category": "fallback_regression",
+        "behavior_area": "source_admission_and_legacy_input",
+        "expected_behavior": "Out-of-range source slices reject before eye GPU mutation; draw evidence remains geometry-only and D3D9 input/FFB fallback stays untouched."
+      },
+      {
+        "id": "exact-sha-required-gates",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_backend_build_openxr_hud_warp",
+        "expected_behavior": "Five required GitHub Actions and native WARP pass at the same validation-bearing commit."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-scaled-eye-source": "PASS_NATIVE_GPU_SLICE_MIP0_STRETCH_SOURCE",
+    "distinct-eye-pixels": "PASS_NATIVE_WARP_DISTINCT_LEFT_RIGHT_SCALED_PIXELS",
+    "fallback-and-draw-evidence": "PASS_NATIVE_WARP_INVALID_SLICE_AND_GEOMETRY_EVIDENCE",
+    "exact-sha-required-gates": "PASS_EXACT_SHA_5_MANDATORY_PLUS_WARP"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38962059800,
+      "head_sha": "5144b27f99ff23b649412221d78f0ac7932fbe8f",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38962059447,
+      "head_sha": "5144b27f99ff23b649412221d78f0ac7932fbe8f",
+      "conclusion": "success"
+    },
+    "Build (Win32, Release)": {
+      "run_id": 38962066576,
+      "head_sha": "5144b27f99ff23b649412221d78f0ac7932fbe8f",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38962066527,
+      "head_sha": "5144b27f99ff23b649412221d78f0ac7932fbe8f",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38962066535,
+      "head_sha": "5144b27f99ff23b649412221d78f0ac7932fbe8f",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38962059474,
+      "head_sha": "5144b27f99ff23b649412221d78f0ac7932fbe8f",
+      "conclusion": "success"
+    }
+  },
+  "known_blockers": [
+    "Authentic OutRun R30 independently posed L/R camera Draw/DrawIndexed callback is not fully connected to native stereo submission for menu/vehicle/race; do not claim complete DX11 renderer.",
+    "Quest3/VDXR real-game stereo, input/FFB, HUD and performance have not been tested; RUNTIME_VALIDATION=UNTESTED and no native promotion."
+  ],
+  "resume_cursor": "Continue real game R30 independent L/R Draw/DrawIndexed source callback through native eye GPU ring and host OpenXR while preserving original gamepad/FFB and frozen DXVK; do not repeat this array-slice postpass.",
+  "pipeline": {
+    "C0_RECOVER": "TARGET_HEAD_AND_OWNER_CHECKED",
+    "C1_REVIEW": "UNSCALED_ARRAY_SUPPORTED_BUT_SCALED_CAMERA_ARRAY_POSTPASS_MISSING",
+    "C2_IMPLEMENT": [
+      "5144b27f99ff23b649412221d78f0ac7932fbe8f"
+    ],
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_MANDATORY_PLUS_ISOLATED_WARP",
+    "C4_COMMIT": [
+      "5144b27f99ff23b649412221d78f0ac7932fbe8f"
+    ],
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA_SEPARATE_SKIP_CI_BOOKKEEPING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "activation_guard_and_fallback": "No native gameplay activation or HMD success implied; DX9Ex D3D9 fallback and original input/FFB remain authoritative.",
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "Live D3D9 game camera Draw/DrawIndexed produces source-owned color texture-array postpass",
+      "Native D3D11 game-eye callback samples selected source array slice at mip zero and scales into real left/right eye GPU targets",
+      "Native stereo eye transport retains source pose and independent camera identity for eventual OpenXR handoff; R30 complete callback and HMD integration remain incomplete"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Build-verifiable independent L/R native D3D11 GPU eye pixels only; R30 live camera callsite and actual game-visible OpenXR/HMD output are not claimed complete, runtime UNTESTED.",
+    "acceptance_proof": {
+      "positive_probe": "Exact material SHA 5144b27f99ff23b649412221d78f0ac7932fbe8f passed isolated WARP left/right scaled array mip-zero GPU pixel probes and all five GitHub required checks as recorded in github_actions.",
+      "negative_regression": "WARP invalid source slice rejection, native draw evidence preservation and legacy D3D9/FFB fallback remained verified; no Quest3 runtime test.",
+      "component_integration": "src/vr/d3d11/native_game_stereo_submission.cpp/.hpp plus tools/dx11_native_transport_probe.cpp connect game GPU texture-array slices through selected native D3D11 eye target and preserve native stereo producer identity."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_SCALED_CAMERA_ARRAY_POSTPASS_MIP0",
+      "DX11:EYE_XR_HANDOFF"
+    ]
+  }
+}

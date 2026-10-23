@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00200",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "1ab165402f004b482cb75d57692d90a447931af2",
+  "staged_source_commits": [
+    "31bbce0006fbb49cd6d218dfa46fdf94e02b33c6",
+    "8dd15ba909e12d026e89f873fa6191048fe72cf7"
+  ],
+  "result_sha": "a09c9c09bfd02c29acd76935295e8a1cd5d04dbc",
+  "validation_bearing_result_sha": "a09c9c09bfd02c29acd76935295e8a1cd5d04dbc",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "google_drive_canonical_hd_source_transport": {
+    "approved_by_current_git_head": true,
+    "used": false,
+    "reason": "Selected F13 unit is canonical-EXE provenance only and requires no DDS source material. Approved Google Drive canonical HD source transport remains available and unblocked for tasks that need original DDS acquisition."
+  },
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R200_182391_FRESH_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00198 exact-decoded through exclusive end 0x182391 and explicitly named fresh exact bytes there as the next independent F13 task. A 96-byte capture includes local forward targets 0x18239F and 0x1823AC without requiring semantic interpretation. DXVK-00199 independently proved the same public-EXE capture shape; DX11 validation remains independent.",
+  "summary": "ATTEMPT=1 complete. Validation-bearing result a09c9c09bfd02c29acd76935295e8a1cd5d04dbc captures exactly 96 canonical-EXE bytes from 0x182391 through exclusive end 0x1823F1. The predecessor 0x182331..0x182390 control-flow proof remains exact; the new capture covers byte locations 0x182391, 0x18239F and 0x1823AC, records four raw outbound rel32 candidates, and deliberately keeps every included target's instruction-boundary/function identity plus call/render/HUD semantics unresolved. Backend Conversion Gate, Build, HUD Inspector and OpenXR all passed on the exact result SHA. No runtime source changed, Google Drive HD transport was not needed, and no Quest 3/VDXR or in-game test was performed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00200.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false,
+    "hd_source_transport_changed": false
+  },
+  "evidence": [
+    "Validation-bearing result a09c9c09bfd02c29acd76935295e8a1cd5d04dbc contains exact marker [AUTO:CONVERSION-DX11-00200] and has no CI-skip directive.",
+    "Base 1ab165402f004b482cb75d57692d90a447931af2 is the completed CONVERSION-DX11-00198 bookkeeping descendant; validation-bearing ancestor ad80a0c743a2d248a63a979479751d3da7f350b3 proves the prior exact decode ends at 0x182391.",
+    "Backend Conversion Gate 36818713185 validate job 110229414790 PASS on exact result SHA. Queue automation/HMD baseline/one-click/backend disassembly/session-regression/DX11 transport/source-graph/census contracts, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes and binary verification all succeeded.",
+    "Backend Gate artifact 11142772099 digest sha256:30f47f29c9320f0023eb05f7274b6e5963281d1a644a604650a95fe05e4feafb.",
+    "HUD Inspector 36818716991 PASS. Static job 110229430984 emitted EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED with predecessor_exact=True, section=.text, probe_len=96, probe_end=0x001823F1, probe_end_match=True, targets_in_window=True, inbound_raw=0 and outbound_raw=4.",
+    "Captured target-byte samples are 0x00182391:a9 ff ff 0f 00 75 f2 83, 0x0018239F:dd d8 db 2d f0 60 73 00, and 0x001823AC:83 3d 64 fa 85 00 00 0f. All remain BYTES_CAPTURED_BOUNDARIES_UNRESOLVED with function entry UNRESOLVED_AT_182391_18239F_1823AC.",
+    "Raw outbound rel32 candidates in the 96-byte window are 0x001823C4->0x00188877, 0x001823D6->0x00188948, 0x001823DB->0x001823ED and 0x001823E8->0x00188905. These are census-only and do not promote call semantics.",
+    "Canonical replacement EXE SHA-256 remained 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "HUD analysis artifact 11142721877 digest sha256:42dfafba7c2f385a892f929f43c38c312a870799d79daefb42867044aba39bd0; HUD inspector game artifact 11142901074 digest sha256:0a93b61967c1c5d789c51beabaebfa3046b6136ff53f9793932e7f561a46b436.",
+    "Build 36818717037 PASS on exact result SHA; binary artifact 11142353433 digest sha256:4ca8e9adaa74f678583713ff2b1cd57cf220f29538908445980150b5219c2a9a; wheel-source artifact 11142219243 digest sha256:824b28afba6bba3129baa41b437158d6f2726483b31d1ac3d936ee97a22c5bc0.",
+    "OpenXR VR architecture 36818717062 PASS on exact result SHA with all 6/6 jobs successful. Host artifact 11142288359 digest sha256:25013af820a3783f96f967b23ab35f38909253cb655624d19236cebcdc308e30.",
+    "VR PC Fast Test Build 36818713197 was skipped by branch policy and is not runtime validation.",
+    "Runtime source, native draw routing, D3D9 render policy, OpenXR transport, native DX11 transport and HD-source transport were not changed by this task.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED.",
+    "Approved Google Drive canonical HD source transport was not needed for this EXE-only task and remains available/unmodified for future DDS acquisition."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00199",
+    "source_result_sha": "ef199e1f3f842046f8854032d7b2c3f7506b87b1",
+    "source_validation_state_at_selection": "PASS",
+    "source_proof_target": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "reason": "Reuse only the bounded exact-byte raw provenance capture design on the shared canonical EXE. DX11 depends on its own R198 predecessor and independent exact-result GitHub Actions."
+  },
+  "proof_contract": {
+    "predecessor_status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+    "predecessor_exact": true,
+    "target_rva": "0x00182391",
+    "target_section": ".text",
+    "probe_len": 96,
+    "probe_end_rva": "0x001823F1",
+    "probe_end_matches": true,
+    "referenced_target_rvas": [
+      "0x00182391",
+      "0x0018239F",
+      "0x001823AC"
+    ],
+    "referenced_targets_in_window": true,
+    "target_byte_samples": {
+      "0x00182391": "a9 ff ff 0f 00 75 f2 83",
+      "0x0018239F": "dd d8 db 2d f0 60 73 00",
+      "0x001823AC": "83 3d 64 fa 85 00 00 0f"
+    },
+    "raw_inbound_rel32_candidate_count": 0,
+    "raw_outbound_rel32_candidates": [
+      "0x001823C4->0x00188877",
+      "0x001823D6->0x00188948",
+      "0x001823DB->0x001823ED",
+      "0x001823E8->0x00188905"
+    ],
+    "status": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
+    "referenced_target_status": "BYTES_CAPTURED_BOUNDARIES_UNRESOLVED",
+    "function_entry_status": "UNRESOLVED_AT_182391_18239F_1823AC",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_TARGET_BYTES_AND_REL32_CENSUS_ONLY"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector, package or HD-source transport behavior changes.",
+    "ownership": "Fresh raw continuation bytes do not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Capture fails closed unless R198 remains exact through exclusive end 0x182391, the new probe starts exactly there in .text, all 96 bytes are available, its exclusive end is exactly 0x1823F1, and all referenced target RVAs are inside the new window. No target-boundary inference is permitted."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182331_CONTROL_FLOW_PREFIX_PROVEN",
+    "after": "PARTIAL_PLUS_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "runtime_claim": false
+  },
+  "blocker": "The exact 0x182391..0x1823F0 bytes and target-byte snapshots are now durable, but 0x182391/0x18239F/0x1823AC are not yet proven instruction boundaries or function entries. The four raw rel32 candidates are census-only. Exact decode, branch-target alignment, call semantics and all ScreenHud/world/render ownership remain unresolved.",
+  "next_action": "Exact-decode the captured 0x182391..0x1823F0 window before assigning instruction boundaries/function identities or any call/render/HUD ownership. Runtime remains UNTESTED.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T14:20:16+09:00",
+  "runtime_claim": "NONE",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36818713185,
+      "job_id": 110229414790,
+      "conclusion": "success",
+      "validated_sha": "a09c9c09bfd02c29acd76935295e8a1cd5d04dbc",
+      "artifact_id": 11142772099,
+      "artifact_digest": "sha256:30f47f29c9320f0023eb05f7274b6e5963281d1a644a604650a95fe05e4feafb"
+    },
+    "build": {
+      "run_id": 36818717037,
+      "conclusion": "success",
+      "validated_sha": "a09c9c09bfd02c29acd76935295e8a1cd5d04dbc",
+      "artifact_id": 11142353433,
+      "artifact_digest": "sha256:4ca8e9adaa74f678583713ff2b1cd57cf220f29538908445980150b5219c2a9a",
+      "source_snapshot_artifact_id": 11142219243,
+      "source_snapshot_artifact_digest": "sha256:824b28afba6bba3129baa41b437158d6f2726483b31d1ac3d936ee97a22c5bc0"
+    },
+    "hud_inspector": {
+      "run_id": 36818716991,
+      "conclusion": "success",
+      "validated_sha": "a09c9c09bfd02c29acd76935295e8a1cd5d04dbc",
+      "static_analysis_job_id": 110229430984,
+      "analysis_artifact_id": 11142721877,
+      "analysis_artifact_digest": "sha256:42dfafba7c2f385a892f929f43c38c312a870799d79daefb42867044aba39bd0",
+      "game_artifact_id": 11142901074,
+      "game_artifact_digest": "sha256:0a93b61967c1c5d789c51beabaebfa3046b6136ff53f9793932e7f561a46b436",
+      "proof_status": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
+      "proof_predecessor_status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+      "proof_predecessor_exact": true,
+      "proof_target_section": ".text",
+      "proof_probe_len": 96,
+      "proof_end_rva": "0x001823F1",
+      "proof_end_matches": true,
+      "proof_targets_in_window": true,
+      "proof_raw_inbound_count": 0,
+      "proof_raw_outbound_count": 4,
+      "proof_start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
+      "proof_referenced_target_status": "BYTES_CAPTURED_BOUNDARIES_UNRESOLVED",
+      "proof_function_entry_status": "UNRESOLVED_AT_182391_18239F_1823AC",
+      "proof_semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+      "proof_ownership_effect": "NONE"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36818717062,
+      "conclusion": "success",
+      "validated_sha": "a09c9c09bfd02c29acd76935295e8a1cd5d04dbc",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11142288359,
+      "host_artifact_digest": "sha256:25013af820a3783f96f967b23ab35f38909253cb655624d19236cebcdc308e30"
+    },
+    "pc_fast": {
+      "run_id": 36818713197,
+      "conclusion": "skipped",
+      "validated_sha": "a09c9c09bfd02c29acd76935295e8a1cd5d04dbc",
+      "policy": "Branch policy skipped PC fast runner; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "31bbce0006fbb49cd6d218dfa46fdf94e02b33c6",
+      "message": "dx11: stage 0x182391 continuation provenance",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "validation_result": "superseded_by_result_gate"
+    },
+    {
+      "sha": "8dd15ba909e12d026e89f873fa6191048fe72cf7",
+      "message": "dx11: stage 0x182391 provenance verifier",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "validation_result": "superseded_by_result_gate"
+    },
+    {
+      "sha": "a09c9c09bfd02c29acd76935295e8a1cd5d04dbc",
+      "message": "dx11: capture 0x182391 continuation provenance [AUTO:CONVERSION-DX11-00200]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5925194101,
+    "validation_comment_id": 5925264472,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  }
+}

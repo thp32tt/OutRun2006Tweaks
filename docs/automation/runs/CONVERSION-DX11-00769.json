@@ -1,0 +1,49 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00769",
+  "production_id": "CONVERSION-DX11-00769",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": "93354106078845d29f99e56bed9a14849bdc8d62",
+  "validation_bearing_result_sha": "93354106078845d29f99e56bed9a14849bdc8d62",
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_multi_dirty_upload.hpp",
+    "tools/dx11_overlap_dirty_game_present_00769.cpp",
+    "tools/test_dx11_overlap_dirty_game_present_00769.py"
+  ],
+  "change_summary": "For real full-resolution menu/vehicle/race native D3D11 output, allow overlapping partial D3D9 Present dirty rectangles only in a verified backbuffer-seeded single atomic UpdateSurface path, retaining strict full-coverage rules and original D3D9/input fallback.",
+  "pipeline": {
+    "C3_VALIDATE": "Exact 93354106078845d29f99e56bed9a14849bdc8d62 GitHub Actions Build, DX11 Fast Structural Checks, Backend Conversion Gate, OpenXR VR architecture and HUD Inspector completed SUCCESS; no CI rerun.",
+    "C4_COMMIT": "Existing source material and validation-bearing SHA 93354106078845d29f99e56bed9a14849bdc8d62; unchanged.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA; runtime UNTESTED"
+  },
+  "evidence": {
+    "validation_sha": "93354106078845d29f99e56bed9a14849bdc8d62",
+    "source_commit_url": "https://github.com/thp32tt/OutRun2006Tweaks/commit/93354106078845d29f99e56bed9a14849bdc8d62",
+    "ci_evidence_basis": "GitHub Actions queried for the exact SHA; five mandatory workflow families succeeded. The separate optional VR PC Fast Test Build workflow was skipped.",
+    "ci_workflow_runs": {
+      "build": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38723487183",
+      "dx11_fast": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38723481442",
+      "backend_conversion_gate": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38723481404",
+      "openxr": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38723487189",
+      "hud_inspector": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38723487192"
+    },
+    "prior_blocker": "RUN_RECORD_NOT_FOUND",
+    "run_record_recovery": "The requested run JSON was absent on the target branch at the validation SHA. No original feature_contract or acceptance_results were available to preserve; neither has been invented or replaced.",
+    "runtime_validation": "UNTESTED",
+    "source_only_limit": "No real OutRun, gamepad, Quest3 or VDXR exercise was performed in this bookkeeping-only C6 operation."
+  }
+}

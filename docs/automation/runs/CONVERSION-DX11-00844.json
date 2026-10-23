@@ -1,0 +1,165 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00844",
+  "production_id": "CONVERSION-DX11-00844",
+  "event_id": "CONVERSION-DX11-00844-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_BGRA_CAMERA_GPU_POSTPASS_RGBA_EYE",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "NATIVE_BGRA_LR_CAMERA_FORMAT_CONVERSION_GPU_POSTPASS_BUILD_VERIFIED_R30_CAMERA_CALLBACK_REMAINS",
+  "material_result_sha": "b95c02e86d40a499687fc978b126fcfa91db2f04",
+  "validation_bearing_result_sha": "d4e86b30c30891f9aad12b010d90be6b722ee92f",
+  "source_material_commits": [
+    "b95c02e86d40a499687fc978b126fcfa91db2f04",
+    "6c144090cd1a2d92e192d78fc1469ec554ed108c",
+    "d4e86b30c30891f9aad12b010d90be6b722ee92f"
+  ],
+  "validation_repair_commits": [
+    "6c144090cd1a2d92e192d78fc1469ec554ed108c",
+    "d4e86b30c30891f9aad12b010d90be6b722ee92f"
+  ],
+  "related_bookkeeping_commits": [
+    "b8aa3e87e507eb8e0e80dad9ab54ffda1b27d70c"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "score_change": 0,
+  "score_note": "Source-completion continuation of the same DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR feature. Actual WARP regression repair and exact-SHA CI/C6 are one continuing outcome, no new independently completed renderer or additional score.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Preserve real game-authored BGRA left/right camera array GPU postpasses when copied into distinct native RGBA stereo eye textures, with zero CPU color readback, correct OM restoration, source-slice and destination validation, full exact-SHA CI, and original D3D9/input/FFB fallback; full live R30 to OpenXR camera callback remains unfinished.",
+    "acceptance_items": [
+      {
+        "id": "real-gpu-camera-format-postpass",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_gpu_postpass_to_native_lr_eye",
+        "expected_behavior": "Selected BGRA camera array slice mip-zero converts on GPU into the correct independent RGBA eye region while preserving unrelated original game postpass pixels."
+      },
+      {
+        "id": "native-lr-pixel-regression",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_gpu_output",
+        "expected_behavior": "Isolated Windows WARP native eye transport proves separate converted red/green left/right GPU pixels alongside existing RTV/SRV/MSAA/mip copy regions."
+      },
+      {
+        "id": "fail-closed-legacy-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_admission_and_legacy_input",
+        "expected_behavior": "Unsupported source slices or destinations are rejected, eye OM RTV/DSV state restored, genuine Draw evidence unchanged, D3D9 input/FFB/SkyGlow and DXVK freeze unaffected."
+      },
+      {
+        "id": "required-five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_backend_build_openxr_hud_warp",
+        "expected_behavior": "Five required GitHub Actions and isolated WARP conclude SUCCESS on identical validation-bearing material SHA; no HMD success claimed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real-gpu-camera-format-postpass": "PASS_NATIVE_BGRA_CAMERA_RGBA_GPU_CONVERSION",
+    "native-lr-pixel-regression": "PASS_WARP_INDEPENDENT_EYE_PIXELS_AND_NONOVERLAP",
+    "fail-closed-legacy-fallback": "PASS_NEGATIVE_SLICE_BOUNDS_OM_AND_DRAW_EVIDENCE",
+    "required-five-exact-sha-gates": "PASS_EXACT_SHA_5_REQUIRED_PLUS_WARP"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38965600264,
+      "head_sha": "d4e86b30c30891f9aad12b010d90be6b722ee92f",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38965600660,
+      "head_sha": "d4e86b30c30891f9aad12b010d90be6b722ee92f",
+      "conclusion": "success"
+    },
+    "Build (Win32, Release)": {
+      "run_id": 38965606478,
+      "head_sha": "d4e86b30c30891f9aad12b010d90be6b722ee92f",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38965606452,
+      "head_sha": "d4e86b30c30891f9aad12b010d90be6b722ee92f",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38965606457,
+      "head_sha": "d4e86b30c30891f9aad12b010d90be6b722ee92f",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38965600470,
+      "head_sha": "d4e86b30c30891f9aad12b010d90be6b722ee92f",
+      "conclusion": "success"
+    }
+  },
+  "known_blockers": [
+    "Native DX11 full renderer source remains incomplete: actual OutRun R30 independently posed L/R game-camera Draw/DrawIndexed callback through native GPU eye ring and host OpenXR menu, vehicle selection and sustained race not fully connected.",
+    "Quest3/VDXR game display, gamepad/FFB, HUD and performance not physically exercised; HMD/backend promotion prohibited, RUNTIME_VALIDATION=UNTESTED."
+  ],
+  "resume_cursor": "Continue R30 authentic independent L/R game camera Draw/DrawIndexed callback to native D3D11 eye ring and host OpenXR. Do not redo verified BGRA conversion and 00844 CI/C6; keep DX9Ex fallback and DXVK freeze.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Game-authored D3D9 camera Draw/DrawIndexed produces per-camera BGRA GPU texture array intermediate",
+      "Native D3D11 encoder selects genuine camera slice and point-samples mip-zero through shader into corresponding RGBA eye region, preserving earlier SRV/RTV content and caller OM",
+      "Distinct camera eye GPU ring and source pose identities are kept for eventual host OpenXR callback; full live R30/HMD output not yet completed"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Win32 Native Transport WARP 38965600470 SUCCESS at exact d4e86b30; checks converted red/green separate L/R camera pixels, nonoverlapping original texture postpass and output OM.",
+      "negative_regression": "WARP rejects invalid array slice/eye rect, maintains prior MSAA/SRV/mip and geometry Draw evidence, native BGRA conversion now requires eye OM restore; legacy D3D9/input/FFB paths unchanged.",
+      "component_integration": "NativeGameEyeDrawEncoder::copy_game_surface uses stretch_game_surface GPU shader to convert actual game BGRA array source into native RGBA left/right shared eye output; copy result is guarded by eye_targets_bound and isolated full-pixel WARP transport probe."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_BGRA_CAMERA_GPU_POSTPASS_RGBA_EYE",
+      "DX11:EYE_XR_HANDOFF"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "At this incomplete source stage, genuine GPU independent L/R native eye pixels and exact-SHA CI are verified but R30 game-visible OpenXR scene and Quest3 parity are not. No full renderer completion claim.",
+    "activation_guard_and_fallback": "NativeDrawPathActive false by default; reject invalid source, preserve original D3D9/DX9Ex draw/input/FFB/SkyGlow, no DXVK advancement."
+  },
+  "pipeline": {
+    "C0_RECOVER": "EXACT_38964537355_CI_FAILURE_AND_B95_WARP_OVERLAP_CONFIRMED",
+    "C1_REVIEW": "HISTORICAL_00843_STRATEGY_INCOMPLETE_AND_00844_SHADER_PIXEL_OVERLAP",
+    "C2_IMPLEMENT": [
+      "b95c02e86d40a499687fc978b126fcfa91db2f04",
+      "6c144090cd1a2d92e192d78fc1469ec554ed108c",
+      "d4e86b30c30891f9aad12b010d90be6b722ee92f"
+    ],
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_MANDATORY_PLUS_NATIVE_WARP",
+    "C4_COMMIT": [
+      "b95c02e86d40a499687fc978b126fcfa91db2f04",
+      "6c144090cd1a2d92e192d78fc1469ec554ed108c",
+      "d4e86b30c30891f9aad12b010d90be6b722ee92f"
+    ],
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA_SEPARATE_SKIP_CI_BOOKKEEPING"
+  }
+}

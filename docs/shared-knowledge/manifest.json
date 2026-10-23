@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "policy": "docs/DOMAIN_ISOLATION_POLICY.md",
+  "domains": {
+    "VR": {
+      "branch": "vr-d3d9ex-focus"
+    },
+    "LOCALIZATION": {
+      "branch": "korean-localization-prototype"
+    },
+    "FFB": {
+      "branch": "ffb-arcade-dd-research"
+    }
+  },
+  "exchangeRoot": "docs/shared-knowledge/",
+  "executableSourceAllowed": false,
+  "entries": []
+}

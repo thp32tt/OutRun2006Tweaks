@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "id": "SEM-HUD-SPRITENODE-QUEUE-ENTER",
+      "rva": "0x0002D734",
+      "kind": "render-queue",
+      "name": "SpriteNodeQueue_Enter",
+      "tags": ["HUD", "SPRITE", "QUEUE", "SCREEN_SPACE"],
+      "confidence": "high",
+      "evidence": "canonical executable byte contract + source/runtime investigation",
+      "notes": "Entry of the canonical SpriteNode render queue; queue membership alone must not imply blanket HUD ownership."
+    },
+    {
+      "id": "SEM-HUD-SPRITENODE-NODE-RENDER",
+      "rva": "0x0002D762",
+      "kind": "render-node",
+      "name": "SpriteNode_Render",
+      "tags": ["HUD", "SPRITE", "DRAW"],
+      "confidence": "high",
+      "evidence": "canonical executable byte contract + source/runtime investigation",
+      "notes": "Per-node render point used as an exact provenance anchor for HUD semantic tagging."
+    },
+    {
+      "id": "SEM-HUD-SPRITENODE-QUEUE-EXIT",
+      "rva": "0x0002DCB4",
+      "kind": "render-queue",
+      "name": "SpriteNodeQueue_Exit",
+      "tags": ["HUD", "SPRITE", "QUEUE"],
+      "confidence": "high",
+      "evidence": "canonical executable byte contract",
+      "notes": "Exit of canonical SpriteNode render queue."
+    },
+    {
+      "id": "SEM-UI-CALC3D2D",
+      "rva": "0x00049940",
+      "kind": "projection",
+      "name": "Calc3D2D",
+      "tags": ["UI", "WORLD_BILLBOARD", "RANK_MARKER", "PROJECTION"],
+      "confidence": "high",
+      "evidence": "upstream hook + canonical executable byte contract",
+      "notes": "World-to-screen projection anchor relevant to vehicle-attached rank marker reconstruction."
+    },
+    {
+      "id": "SEM-RIVAL-RANK-TRUNCATE",
+      "rva": "0x000BB046",
+      "kind": "rank-marker",
+      "name": "RankMarker_Truncate",
+      "tags": ["HUD", "WORLD_BILLBOARD", "RANK_MARKER"],
+      "confidence": "high",
+      "evidence": "upstream hook + canonical executable byte contract",
+      "notes": "Rival rank marker anchor in sub_4BAD20; useful starting point for marker producer and vehicle-anchor XREF traversal."
+    }
+  ]
+}

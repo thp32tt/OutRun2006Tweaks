@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00118",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T19:47:38+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "fe173e3e293870a6f0b1f6dbaf54bc6e1e07d25e",
+  "result_sha": "d06287624bc8a959e07e7963c890b1f0f248d979",
+  "validation_bearing_result_sha": "d06287624bc8a959e07e7963c890b1f0f248d979",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R130_C2CSPEECHBUBBLEGF_RANK_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "The three exact C2CSpeechBubbleGF rank emoji/text position-correction edges at 0xFC84E, 0xFC882 and 0xFC8B4 now preserve their existing AddSpriteSpacing((float*)(ctx.esp), false) behavior while deriving immediate next-draw ScreenHud ownership from the shared backend-neutral producer map. Compile-time assertions require all three exact RVAs to remain canonical ScreenHud, and the backend verifier requires the exact templated bindings while rejecting the legacy spacing-only callbacks. Existing canonical ranges 0xFC800-0xFC8A0 and 0xFC8A0-0xFC900 are unchanged.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "provenance": "0xFC84E and 0xFC882 are exact HUD_RANK_EMOJI anchors in canonical ScreenHud range 0xFC800-0xFC8A0; 0xFC8B4 is exact HUD_RANK_TEXT in canonical ScreenHud range 0xFC8A0-0xFC900. Shared contract, analyzer and hud_semantics agree.",
+    "behavior_preservation": "All three retain the original ESP0 AddSpriteSpacing operation before semantic handoff.",
+    "scope_control": "Only the three rank emoji/text position hooks change; speech initial-position, heart, rival, state-toggle and unrelated GF speech hooks remain untouched.",
+    "regression_safety": "src/hooks_uiscaling.cpp and src/vr/game/render_semantics.hpp are protected risk paths for R50 world stereo and R51 white-HUD behavior; hosted CI is not HMD proof.",
+    "validation": "Compile-time exact-RVA classification plus backend verifier markers and legacy-binding rejection fail closed on semantic drift."
+  },
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "This is a bounded ownership-source substitution for three already-proven ScreenHud callsites. It preserves their existing position correction and does not widen producer semantics, enable native DX11 draw ownership, alter D3D9 render policy, or alter OpenXR transport. Hosted CI cannot prove Quest3/VDXR visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36703942204,
+      "conclusion": "success",
+      "validated_sha": "d06287624bc8a959e07e7963c890b1f0f248d979",
+      "artifact_id": 11090514549,
+      "artifact_digest": "sha256:e0d8d588bbc82cb8e3df8514f8e649c3a7cf1066e54a094bed484e7e769c013e",
+      "evidence": "Mandatory conversion gate passed, including backend disassembly/source-graph checks, Win32 build path and DX11 semantic/object/linkage/constant-buffer/native-transport probes."
+    },
+    "build": {
+      "run_id": 36703949083,
+      "conclusion": "success",
+      "validated_sha": "d06287624bc8a959e07e7963c890b1f0f248d979",
+      "evidence": "Generic Win32 Release build completed successfully."
+    },
+    "hud_inspector": {
+      "run_id": 36703946128,
+      "conclusion": "success",
+      "validated_sha": "d06287624bc8a959e07e7963c890b1f0f248d979",
+      "evidence": "static-exe-analysis and build-hud-inspector both passed."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36703949766,
+      "conclusion": "success",
+      "validated_sha": "d06287624bc8a959e07e7963c890b1f0f248d979",
+      "evidence": "All six jobs passed: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify and game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36703942238,
+      "conclusion": "skipped",
+      "validated_sha": "d06287624bc8a959e07e7963c890b1f0f248d979"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5909571017,
+    "validation_comment_id": 5909659355,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact marker [AUTO:CONVERSION-DX11-00118] and contains no CI-skip directive.",
+    "0xFC84E, 0xFC882 and 0xFC8B4 are exact ScreenHud semantic anchors and are compile-time classified through GameSemantic::ClassifyCriticalProducer.",
+    "The original AddSpriteSpacing((float*)(ctx.esp), false) correction remains on all three exact edges.",
+    "The backend verifier requires all three C2CSpeechBubbleRank_AdjustPositionESP0AndHud template bindings and rejects restoration of the three legacy spacing-only hook bindings.",
+    "Existing canonical ranges 0xFC800-0xFC8A0 and 0xFC8A0-0xFC900 were not added, widened or reclassified.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs passed on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R130 C2CSpeechBubbleGF rank emoji/text shared producer-map adoption is automation-validated on the DX11 branch. Runtime visual behavior remains untested.",
+  "next_action": "Continue Set04/F13 only with another independently proven producer sub-family. Reconfirm exact semantic anchors and that a hook directly precedes the owned draw before converting it; do not widen producer ranges or convert state-toggle-only hooks without immediate draw-ownership evidence. Exact-build Quest3/VDXR evidence remains required for visual correctness."
+}

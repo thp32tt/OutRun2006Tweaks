@@ -1,0 +1,111 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00765",
+  "production_id": "CONVERSION-DX11-00765",
+  "event_id": "CONVERSION-DX11-00765-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_FRAME_OFFSCREEN_RT_CONTINUITY",
+  "feature_id": "DX11-FULL_FRAME_OFFSCREEN_RT_CONTINUITY",
+  "status": "BUILD_VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "f598860980a19e7fcb03cf8001e162fce6350800",
+  "source_implementation_sha": "f598860980a19e7fcb03cf8001e162fce6350800",
+  "material_result_sha": "f598860980a19e7fcb03cf8001e162fce6350800",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_offscreen_pass.hpp",
+    "tools/dx11_game_offscreen_pass_00765.cpp",
+    "tools/test_dx11_game_offscreen_pass_00765.py",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-00764.json"
+  ],
+  "change_summary": "Continue real menu/vehicle render-to-texture game Draw source continuity: honor actual D3D9 NumSimultaneousRTs for MRT probes, rejecting caps ambiguity; correct strict source-graph acceptance for the established fail-closed unsupported-draw path, retain exact native full-frame source and D3D9 fallback.",
+  "feature_contract": {
+    "feature_id": "DX11-FULL_FRAME_OFFSCREEN_RT_CONTINUITY",
+    "goal": "Preserve full-resolution native menu/vehicle/race game Draw and DrawIndexed frame continuity through actual isolated offscreen render-to-texture work without overriding original DX9Ex output or controller input.",
+    "acceptance_items": [
+      {
+        "id": "game-offscreen-source-native-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_live_game_RT0_MRT_to_D3D11_Draw_frame",
+        "expected_behavior": "Interleaved game-created offscreen Draws retain exact source ordinals on adapters exposing one to four valid MRT slots."
+      },
+      {
+        "id": "offscreen-depth-mrt-fail-closed",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_original_Present_gamepad_fallback",
+        "expected_behavior": "Unknown caps, bound extra MRT, depth or stencil, unsupported main Draw, foreign/failed source all reject silent native publication while game input survives."
+      },
+      {
+        "id": "same-sha-five-actions",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub_DX11_Fast_Backend_Build_OpenXR_HUD",
+        "expected_behavior": "All mandatory workflows finish success for one exact source-bearing result SHA; actual Quest3 and VDXR game evidence is separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game-offscreen-source-native-continuity": "PENDING",
+    "offscreen-depth-mrt-fail-closed": "PENDING",
+    "same-sha-five-actions": "PENDING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_R9_OFFSCREEN_RT_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Exact game Draw ordinals and live RT switch integrated with full-screen D3D11 frame bridge; Quest3/VDXR parity is untested.",
+    "activation_guard_and_fallback": "Exact OUTRUN_DX11_FIRST_GAME_FRAME and OUTRUN_DX11_FULL_GAME_FRAME opt-in; unsupported/caps-missing sources abort native publication without changing real D3D9 Draw/Present/controller.",
+    "integration_path": [
+      "Real successful D3D9 Draw/DrawIndexed and R9 RT0 transition with adapter-supported MRT binding checks",
+      "Guarded source ordinal absorption for truly isolated texture-only game Draw, native D3D11 backbuffer Draw retained",
+      "Same Present full-resolution native output and fail-closed D3D9/input fallback"
+    ],
+    "batch_components": [
+      "Live D3D9 adapter MRT capability queried in native game Draw observer with bounded no-extra-RT checks",
+      "Portable C++ slot-boundary admission and destructive Python source regression plus source graph invariant",
+      "Existing live game R9 RT transition/native batch and exact-SHA Fast/Backend/Windows/OpenXR/HUD suite"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ static_assert and runtime asserts: MRT counts 1..4 accepted and isolated live game offscreen draw exact ordinal preserved.",
+      "negative_regression": "Zero/overflow MRT count, occupied MRT, enabled depth/stencil and unsupported backbuffer writes continue abort/fallback; destructively mutate cap or slot loop.",
+      "component_integration": "Real R9 game D3D9 GetDeviceCaps+GetRenderTarget -> offscreen source-only draw accounting -> subsequent native D3D11 Draw/DrawIndexed -> full frame guarded Present."
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_OFFSCREEN_RT_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Existing 00765 material SHA 886bbe and failing Backend 38710874591, DX11 Fast 38710874569, Build 38710881512.",
+    "C1_REVIEW": "Backend/Fast rejected historical 00764 incomplete strategy; Build rejected obsolete source-text assertion; actual D3D9 MRT probe over-queries adapters with fewer than four RT slots.",
+    "C2_IMPLEMENT": "Full game offscreen Draw checks query actual caps slot range, portable MRT test matrix; restore 00764 strategy contract and native bridge fail-closed source-graph acceptance.",
+    "C3_VALIDATE": "New exact-SHA five-workflow CI pending; local HMD/game not exercised.",
+    "C4_COMMIT": "Existing 00765 material commit plus current integrated C++ repair awaiting SHA.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "AWAIT_EXACT_SHA"
+  },
+  "evidence": {
+    "failure_run_id": 38710874591,
+    "failure_code": "00764 missing strategy; stale bounded activation string",
+    "runtime_validation": "UNTESTED",
+    "source_only_limit": "No actual Quest3/VDXR, in-game menu/vehicle/race or gamepad test performed."
+  }
+}

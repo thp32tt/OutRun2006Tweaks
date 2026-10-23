@@ -1,0 +1,103 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00750",
+  "production_id": "CONVERSION-DX11-00750",
+  "event_id": "CONVERSION-DX11-00750-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_CROPPED_DIRTY_PRESENT",
+  "feature_id": "DX11-MENU-RACE-NATIVE-CROPPED-DIRTY-PRESENT",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "85ef9845ff5d3764c8289c1e2e22f6228b02d24d",
+  "material_result_sha": "85ef9845ff5d3764c8289c1e2e22f6228b02d24d",
+  "change_summary": "Complete real D3D9 cropped menu/vehicle/race Present -> full-size native D3D11 output support for exact single rectangle and 2..8 disjoint crop-tile dirty regions, with bounded UpdateSurface and original D3D9/gamepad fallback for holes/overlaps/malformed regions.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_dirty_region.hpp",
+    "tools/dx11_full_dirty_crop_probe_00750.cpp",
+    "tools/test_dx11_full_dirty_crop_00750.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00750.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Real live D3D9 game Draw/DrawIndexed -> full resolution native D3D11 staged frame",
+      "Exact full-source-crop RGNDATA single/2..8 disjoint tile proof -> same-Present bounded D3D9 UpdateSurface",
+      "Partial/overlapping/out-of-range dirty sources -> untouched D3D9 Present and gamepad"
+    ],
+    "batch_components": [
+      "C++ live Present crop union admission and game frame publish",
+      "C++ exact bounded partition geometry source helper",
+      "C++ executable compile-time positive/negative crop partitions and destructive Python integration mutations"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00750 portable C++ exact two/four tile cropped frame partition static_assert and same Present source integration",
+      "negative_regression": "Holes, overlap, invalid counts/bytes, wrong bounds and outside pixels reject upload; D3D9/gamepad preserved",
+      "component_integration": "Real game native full D3D11 Draw -> fence/Map -> cropped D3D9 staging -> guarded UpdateSurface -> original D3D9 Present"
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_CROPPED_DIRTY_PRESENT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Actual menu/car/race crop source C++ path + exact SHA five required GitHub Gates pending; HMD parity UNTESTED",
+    "activation_guard_and_fallback": "Existing native full-frame dual opt-in remains disabled by default. Publish native only for complete exact dirty crop; untouched D3D9 Present/gamepad on all other cases."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-NATIVE-CROPPED-DIRTY-PRESENT",
+    "goal": "Publish complete native full-resolution game frame in exact D3D9 cropped dirty source Presents, covering single RECT and tiled menu/vehicle/race scenes without overwriting other game pixels.",
+    "acceptance_items": [
+      {
+        "id": "cropped-native-game-frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_present",
+        "expected_behavior": "Single/2..8 disjoint dirty RECTs exactly covering a valid source crop admit full-resolution native game frame bounded to that crop."
+      },
+      {
+        "id": "safe-partial-dirty-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gamepad_and_d3d9_fallback",
+        "expected_behavior": "Partial/hole/overlap/out-of-bounds/malformed dirty region does not overwrite D3D9 pixels and original Present and controller remain authoritative."
+      },
+      {
+        "id": "same-sha-five-gates",
+        "category": "integrated_validation",
+        "behavior_area": "win32_dx11_openxr_hud",
+        "expected_behavior": "Portable C++ tile tests, destructive source mutation checks and DX11 Fast, Backend Conversion, Build, OpenXR and HUD Gates all pass at the same exact result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "cropped-native-game-frame": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "safe-partial-dirty-fallback": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "same-sha-five-gates": "PENDING_EXACT_SHA"
+  },
+  "blocking_evidence": "Backend Conversion workflow run 38650949424 failed policy acceptance on 00749 C6 stale pending values. 00749 C6 bookkeeping reconciled in 9bc74805; this cohesive follow-up fixes unsupported exact tiled dirty source crop game publication.",
+  "pipeline": {
+    "C0_RECOVER": "PASS 85ef9845 material task commit and failed Backend Conversion run 38650949424 inspected",
+    "C1_REVIEW": "PASS single-source dirty crop supported but 2..8 verified tile crop rejected; 00749 stale C6 acceptance fixed separately",
+    "C2_IMPLEMENT": "PASS C++ safe tile coverage and native cropped Present admission + C++/Python regression",
+    "C3_VALIDATE": "PENDING exact SHA five mandatory Gates",
+    "C4_COMMIT": "Material recovery commit (this record accompanies source patch)",
+    "C5_PACKAGE": "NOT_REQUIRED user Quest3 packaging controlled",
+    "C6_STATE": "PENDING exact SHA; HMD/gamepad UNTESTED"
+  },
+  "next_action": "Check resulting exact-SHA DX11 Fast, Backend Conversion, Win32 Build, OpenXR and HUD Gates. Repair only proven failures; do not claim runtime PASS."
+}

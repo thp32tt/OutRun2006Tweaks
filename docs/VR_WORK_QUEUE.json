@@ -1,0 +1,445 @@
+{
+  "schemaVersion": 2,
+  "integrationBranch": "vr-d3d9ex-focus",
+  "owner": "D_INTEGRATION_PLANNER",
+  "updatedKst": "2026-09-24T23:24:08+09:00",
+  "policy": {
+    "maxIndependentUnvalidatedRuntimeCandidates": 1,
+    "maxMateriallyDifferentFixAttempts": 2,
+    "productionWriter": "D_INTEGRATION_PLANNER",
+    "candidateWriter": "D_INTEGRATION_PLANNER",
+    "queueWriter": "D_INTEGRATION_PLANNER",
+    "runtimeTruthRequiresQuest3Vdxr": true,
+    "skipUnchangedCompletedInputs": true,
+    "primaryBackend": "DX9Ex remains the protected reference baseline; HUD, performance, DXVK and DX12 are independent parallel development/test tracks and none may block the others.",
+    "regressionKnowledge": {
+      "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
+      "ledgerIssue": 13,
+      "loadAtC0Recover": true,
+      "gateIntegrationOnTriggeredCases": true,
+      "recurrenceAction": "REOPEN_EXISTING_STABLE_KEY"
+    },
+    "protectedRuntimeBaselineSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "parallelBackendDevelopment": true,
+    "backendReplacementGate": "DXVK/DX12 may be developed, built and HMD-tested in parallel; only promotion to protected/default backend requires Quest3/VDXR parity with R51.",
+    "parallelTracks": {
+      "HUD": "B/C/D continue exact semantic-lifetime and world-marker work independently.",
+      "PERFORMANCE": "D/C continue dense-scene/frame-budget optimization without waiting for HUD completion.",
+      "DXVK": "A/C/D resume x86 DXVK SAFE compatibility first, then multiview optimization after SAFE evidence.",
+      "DX12": "A/C/D resume D3D9On12 device/resource compatibility and HMD test preparation independently of HUD."
+    },
+    "pcRunnerAuthorization": {
+      "status": "DISABLED_UNTIL_EXPLICIT_USER_REAUTHORIZATION",
+      "endedAtKst": "2026-09-24T01:49:00+09:00",
+      "rule": "Scheduled overnight work may review/analyze/use normal cloud CI, but must not dispatch or trigger self-hosted PC builds until the user explicitly opens a new PC-build session."
+    },
+    "eveningHmdMatrix": {
+      "enabled": true,
+      "maxExperimentSlots": 6,
+      "productionIntegrationWip": 1,
+      "rule": "Parallel HMD experiment preparation is allowed from one TEST_MATRIX_BASE; experiment slots are test-only until HMD evidence and exact-tree validation.",
+      "frozenPrimaryWork": [
+        "broad EXE-map expansion unrelated to active HUD/flare/backend work",
+        "generic dependency/toolchain cleanup unrelated to active builds",
+        "PS2/FFB runtime",
+        "localization runtime"
+      ],
+      "requiredSlots": [
+        "A_CONTROL",
+        "B_HUD",
+        "C_FLARE",
+        "D_PERF",
+        "E_DXVK",
+        "F_DX12"
+      ],
+      "nonBlockingRule": "A failure or delay in HUD/FLARE must not block PERF, DXVK or DX12 implementation/build/test preparation. A backend failure must not block HUD/FLARE work."
+    },
+    "automationCycle": {
+      "mode": "TWO_FULL_CYCLES_PER_HOUR",
+      "schedules": [
+        ":00",
+        ":30"
+      ],
+      "activeTaskIds": [
+        "6ab45eaa511c8191ab7d5984495d7e93",
+        "6ab45ed52f548191b94c90af792116fb"
+      ],
+      "productionIntegrationWip": 1,
+      "rule": "Each cycle performs recover/review/implement/validate/integrate. Remote claim/CAS prevents collisions. Waiting on one lane must not idle the cycle."
+    },
+    "implementationFirstEnforcement": {
+      "enabled": true,
+      "noReadyParking": true,
+      "actionableStates": [
+        "READY",
+        "IMPLEMENT_NEXT",
+        "NEEDS_VALIDATION"
+      ],
+      "sameCycleRule": "If safe without HMD, implement or deterministically validate in the same full cycle; documentation alone is not completion.",
+      "ciPendingRule": "Persist exact immutable SHA/run then advance another non-conflicting lane; never idle or busy-poll.",
+      "staleQueueRule": "If source already contains the fix, correct the queue and add/persist a regression verifier instead of recreating the fix.",
+      "hmdGateRule": "Use NEED_HMD_TEST only for genuinely hardware-visible uncertainty after deterministic gates are exhausted.",
+      "endOfCycleGate": "Scan actionable states and continue useful independent work until only HMD gates, active immutable CI, ownership conflict, or hard capability blockers remain."
+    }
+  },
+  "candidateWip": {
+    "activeUnvalidatedCount": 0,
+    "candidateBranches": [],
+    "activeCandidate": null,
+    "lastIntegratedCandidate": {
+      "candidateId": "R51-MATRIX-BASE-MANUAL-20260924",
+      "candidateBranch": "vr-d3d9ex-candidate/R51-MATRIX-BASE-MANUAL-20260924",
+      "candidateSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+      "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+      "candidateCiRuns": [
+        36007124220,
+        36007124238
+      ],
+      "candidateCiResult": "SUCCESS",
+      "status": "INTEGRATED_NEEDS_HMD",
+      "integratedAtKst": "2026-09-24T22:46:00+09:00",
+      "evidenceNote": "Prospective integration preserves candidate runtime/build-input blobs; intervening focus commits were queue/matrix documentation only."
+    }
+  },
+  "items": [
+    {
+      "id": "VR-R51-RANK-ANCHOR-PROPAGATION-001",
+      "priority": 13,
+      "status": "VALIDATING",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "Reconstruct rival rank-marker anchor propagation from Calc3D2D/vehicle source through sprani/put_clip SpriteNode and per-eye WORLD_BILLBOARD projection; current exact-callsite tags still leave markers head-locked/detached.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 1,
+      "runtimeCandidate": false,
+      "sourceEvidence": {
+        "candidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
+        "sessionId": "20260923T164207853Z-2202b186",
+        "userResult": "vehicle rank markers remain detached and head-locked"
+      },
+      "guard": "Preserve R51 road/background/vehicle stereo and keep ordinary HUD separate.",
+      "candidateBranch": "vr-d3d9ex-candidate/RANK-ANCHOR-SIDECAR-20260924",
+      "candidateSha": "bdfcea9b40d461fb6f043a9f5da73b61332d2570",
+      "validationRunId": 36009907829,
+      "validationResult": "IN_PROGRESS",
+      "implementationProgress": "Calc3D2D original 3D anchor + stock projected anchor are now preserved per rank SpriteNode via a sidecar; R30 telemetry confirms reachability at WORLD_BILLBOARD draw once runtime-exercised. Visual reprojection behavior is intentionally unchanged in this candidate.",
+      "nextAction": "Complete exact-SHA CI, then HMD-run this anchor-provenance candidate. If VR R51 RANK ANCHOR telemetry proves sidecar reachability, implement per-eye reprojection from the preserved world anchor rather than screen-space coordinates."
+    },
+    {
+      "id": "VR-R51-HUD-SEMANTIC-LIFETIME-001",
+      "priority": 13,
+      "status": "NEED_HMD_TEST",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "Explain why exact producer tags yield semanticHudAccepted>0 while renderer semanticOverlayBypass stays 0; trace producer/node/queue/c64/draw ordering and design exact lifetime propagation.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 1,
+      "runtimeCandidate": false,
+      "sourceEvidence": {
+        "candidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
+        "sessionId": "20260923T164207853Z-2202b186",
+        "semanticHudAccepted": 93681,
+        "semanticOverlayBypass": 0
+      },
+      "guard": "Do not modify protected R51 world owner; do not create another HMD candidate until ordering evidence explains the contradiction.",
+      "candidateBranch": "vr-d3d9ex-candidate/HUD-SEMANTIC-LIFETIME-B-20260924",
+      "candidateSha": "7e2095aa2156f6a9dd301d2899b0e62b4d92f4f1",
+      "validationRunId": 36008480891,
+      "validationResult": "BUILD_VERIFIED",
+      "nextAction": "Run B_HUD/HUD_SCREEN on Quest3; verify semanticOverlayBypass becomes nonzero and HUD diplopia/head-lock improves without R51 world regression."
+    },
+    {
+      "id": "DX9EX-FINGERPRINT-001",
+      "priority": 11,
+      "status": "READY",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "Establish bounded exact draw fingerprints for unresolved HUD/white-overlay/effect classes without broad WVP ownership.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false
+    },
+    {
+      "id": "L1-VIS-001",
+      "priority": 12,
+      "status": "READY",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "World/HUD/effect stereo correctness: white rank-score, 6th/6, menu and YES/NO. Produce exact evidence before behavior change.",
+      "testLevel": "LEVEL1",
+      "dependencies": [
+        "DX9EX-FINGERPRINT-001"
+      ],
+      "attempts": 1,
+      "runtimeCandidate": false,
+      "lastCandidateSha": "8d21824f9502b3354fae679972a90868a0cce562",
+      "lastCandidateBranch": "vr-d3d9ex-candidate/VR-R51-HUD-PRODUCER-MAP-20260924",
+      "lastRuntimeEvidenceId": "RUNTIME-20260924-R51-HUD-MAP-001",
+      "lastResult": "EXE-map producer tagging reached R30 semantic HUD ownership, but white/rank HUD remained doubled/head-locked and rival markers remained detached from vehicles.",
+      "newEvidence": [
+        "semanticHudAccepted reached 93681",
+        "semanticOverlayBypass remained 0 for the full session",
+        "world baseline remained visually correct"
+      ],
+      "nextAction": "Trace exact semantic lifetime/order through c64/WVP upload before any new candidate; create a token/ownership mechanism visible at c64 time without widening generic queue HUD ownership."
+    },
+    {
+      "id": "VR-BINARY-CONTRACT-001",
+      "priority": 10,
+      "status": "DONE",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "Pin the upstream replacement OR2006C2C.EXE as the canonical reverse-engineering baseline; gate executable-RVA hooks on SHA/PE identity, byte signatures, source bindings, and durable crash-RVA revalidation.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 1,
+      "runtimeCandidate": false,
+      "candidateBranch": "vr-d3d9ex-candidate/VR-BINARY-CONTRACT-001-CHAT-20260922",
+      "expectedFix": "Strict canonical EXE binary contract must pass in DX9Ex Active Validation; crash ZIP must include ASLR-stable exeRva sidecar.",
+      "validationRunId": 35637181469,
+      "validationSha": "c1cb4def3ecfefb23084401d7961b6d658620388",
+      "validationResult": "BUILD_VERIFIED",
+      "validationEvidence": [
+        "strict canonical EXE SHA/PE/image-base/RVA opcode/source-binding contract PASS",
+        "x64 D3D11 OpenXR host build PASS",
+        "8 deterministic no-HMD host smoke tests PASS",
+        "Win32 active DX9Ex game DLL build PASS",
+        "active DX9Ex package assembly/validation PASS"
+      ],
+      "runtimeCrashSidecarEndToEnd": "NOT_FORCED: compile/package verified; next naturally occurring crash bundle will validate sidecar observation without deliberately crashing the game",
+      "integrationSha": "3e7c09db725880eef5650d41a96a8d1691998bdd",
+      "integratedViaPr": 15,
+      "nextAction": "Apply strict binary-contract and crash-signature revalidation to every future new/changed executable-RVA hook; ingest crash_signature.json on the next natural crash."
+    },
+    {
+      "id": "DX9EX-RESET-STATEBLOCK-001",
+      "priority": 10,
+      "status": "DONE",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "R15 retains and reapplies a D3DSBT_ALL state-block object across ResetEx; replace cross-reset COM state-block replay with R13 baseline plus explicit fresh-device state-family replay.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 1,
+      "runtimeCandidate": false,
+      "sourceIdentity": "src/vr/d3d9/ex_device_upgrade_r15.cpp@5dc13cf1a84ef9ff9a5081a5dd3351e92ab6c890",
+      "preparedPatchBranch": "vr-d3d9ex-candidate/DX9EX-RESET-STATEBLOCK-001-B-20260921T1012KST",
+      "implementationBlocker": "Safe full replacement blob cannot yet be materialized from the Chat connector without reconstructing truncated source excerpts; do not write partial source.",
+      "validationSha": "b536d4022a3afabd7ca00f75ce462c6ed37a3f42",
+      "validationRunId": 36009313286,
+      "validationResult": "BUILD_VERIFIED",
+      "resolution": "Current R15 already uses explicit fresh-device state replay and no pre-Reset D3DSBT_ALL state-block Apply. Durable verifier is persisted on focus.",
+      "nextAction": "Reopen only if verifier fails or Quest3 reset/lost-device runtime evidence regresses."
+    },
+    {
+      "id": "VR-HOST-002",
+      "priority": 10,
+      "status": "NEEDS_POST_REVIEW",
+      "preferredRole": "C_PERF_REVIEW",
+      "summary": "Restore omitted post-test runtime safety fixes: loading/stall projection hold, Frame.v2 run-generation identity, stale slot/run rejection, DirectGPU run binding, validated gameplay handoff, fallback stale-run rejection, and matching verifiers.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "candidateBranch": "vr-d3d9ex-candidate/VR-HOST-002-reconcile",
+      "candidateSha": "a2b2e4d0168c311e8998df4dc6c012c47e855558",
+      "validationRunId": 35531382160,
+      "validationResult": "BUILD_VERIFIED",
+      "postReviewRequired": [
+        "A",
+        "B",
+        "C"
+      ],
+      "provenance": [
+        "ad14ed6c6757634233ec79b71f42be53c563edb7",
+        "edee6b911198f4ab1fd9bd0e36ca3a5cf54a6162",
+        "6ff14350d00a29d581adf963afb6f09e7c6059d0",
+        "db730290ea2f5c7920ba78a8236cbb2ac636ab7d",
+        "c65403e79d39a101a53244fb689e852d89ce6d15",
+        "f3d5f3f9b970fd4d3bcd760f140138794c7fc2e4",
+        "94be96fb8bbdc20ac53349707d53111d8d5ae885",
+        "256fd8c5867042d73458a2f58f125c01352c76b3",
+        "6585f9c7770de4e1c68bd16ffeb6ddeb9b3b8a4d"
+      ]
+    },
+    {
+      "id": "DX9EX-SKYGLOW-001",
+      "priority": 9,
+      "status": "NEED_HMD_TEST",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "R30 SkyGlow ping-pong composites the texture opposite the last produced blur result: factor=1 selects temp after horizontal temp->reduced, while two-step selects reduced after vertical reduced->temp.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 1,
+      "runtimeCandidate": true,
+      "sourceIdentity": "src/vr/d3d9/stereo_renderer_r30.cpp@bc7eb2c152d82b3a42df13d8361d31cffe7d31b9",
+      "expectedFix": "Horizontal temp->reduced composites reduced; optional vertical reduced->temp composites temp. Static regression gate added.",
+      "candidateBranch": "vr-d3d9ex-candidate/SKYGLOW-PINGPONG-FIX-20260924",
+      "candidateSha": "c14634f9e1d9f3bf109db900110c129d8aa55d3f",
+      "validationRunId": 36009049710,
+      "validationResult": "BUILD_VERIFIED",
+      "nextAction": "Quest3/VDXR visual check for per-eye SkyGlow; integrate after runtime verification."
+    },
+    {
+      "id": "DX9EX-TEST-HOST-SMOKES-CI-001",
+      "priority": 9,
+      "status": "NEEDS_VALIDATION",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "Run existing deterministic no-HMD host smoke executables in DX9Ex Active Validation instead of merely building outrun-vr-host.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 1,
+      "runtimeCandidate": false,
+      "candidateBranch": "vr-d3d9ex-candidate/DX9EX-TEST-HOST-SMOKES-CI-001-D-20260921T1147KST",
+      "candidateSha": "bad74c80d37e5b57b9f7ae761cc7e7a2af180c29",
+      "validationRunId": 35555390587,
+      "validationState": "host build + eight smoke tests PASS; game/package still running at queue write"
+    },
+    {
+      "id": "L0-CAPTURE-001",
+      "priority": 9,
+      "status": "NEED_HMD_TEST",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "Phase-1 rolling diagnostic capture is build verified; runtime trigger/usability and HMD overhead remain unverified.",
+      "testLevel": "LEVEL1",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false
+    },
+    {
+      "id": "DXVK-REACTIVATE-001",
+      "priority": 13,
+      "status": "READY",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "Re-enable the isolated x86 DXVK path and turn the existing PoC into a repeatable build/smoke/backend-identity path while preserving the R51 semantic/frame contract.",
+      "testLevel": "LEVEL2",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "expectedFix": "Backend selector/log manifest must identify DXVK explicitly; verify D3D9 initialization/reset and transport behavior without modifying the protected DX9Ex world renderer.",
+      "parallelIndependent": true,
+      "blockedByHud": false
+    },
+    {
+      "id": "DX12-D3D9ON12-REACTIVATE-001",
+      "priority": 13,
+      "status": "READY",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "Resume DX12/D3D9On12 from the known Direct3DCreate9On12Ex/CreateDevice 0x8876086C boundary; isolate device parameters and translated MANAGED/LockRect compatibility before any renderer promotion.",
+      "testLevel": "LEVEL2",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "expectedFix": "First obtain deterministic device-creation/resource-compatibility diagnostics and a no-HMD smoke build; do not change R51 world/HUD ownership to make DX12 pass.",
+      "parallelIndependent": true,
+      "blockedByHud": false
+    },
+    {
+      "id": "VR-PERF-COMMON-001",
+      "priority": 13,
+      "status": "READY",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "Create a common frame-budget telemetry and optimization lane covering game-thread producer fence wait, host copy/fence wait, draw amplification, capture/commit copy, render and xrEndFrame timing across backends.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "expectedFix": "Instrumentation first with bounded counters/QPC windows; only then remove redundant waits/copies or reduce draw work where deterministic correctness gates prove equivalence.",
+      "parallelIndependent": true,
+      "blockedByHud": false
+    },
+    {
+      "id": "L1-VIS-002",
+      "priority": 8,
+      "status": "READY",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "Sky/cloud/SkyGlow/lens flare/smoke/skid placement and head-lock semantics.",
+      "testLevel": "LEVEL1",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
+      "id": "DX9EX-PERF-PRODUCER-FENCE-001",
+      "priority": 8,
+      "status": "NEED_HMD_TEST",
+      "preferredRole": "C_PERF_REVIEW",
+      "summary": "DirectGPU producer path issues D3D9 EVENT GetData(D3DGETDATA_FLUSH) then polls GetData with SwitchToThread up to ProducerFenceBudgetMs=2 on the game thread; quantify wait cost before changing synchronization semantics.",
+      "testLevel": "LEVEL2",
+      "dependencies": [],
+      "attempts": 1,
+      "runtimeCandidate": true,
+      "sourceIdentity": "src/vr/d3d9/stereo_renderer_r32.cpp@301f300075f0cb27c7b6daa6f3c205cdc74318a4 + src/vr/d3d9/r32_policy.hpp@bcaae26253033a8d7fdf8ad1188e8086bc4e2344",
+      "expectedFix": "First add bounded wait-count/QPC telemetry or deterministic policy verifier; do not remove producer safety fence without evidence.",
+      "candidateBranch": "vr-d3d9ex-candidate/PERF-FENCE-TELEMETRY-D-20260924",
+      "candidateSha": "2d96a3117a6057bf66b7415c9cda959d80834fd5",
+      "validationRunId": 36008667500,
+      "validationResult": "BUILD_VERIFIED",
+      "nextAction": "Run D_PERF and use fenceSamples/fencePolls/fenceAvgUs/fenceMaxUs to decide whether producer wait is a real frame-time bottleneck."
+    },
+    {
+      "id": "L2-PERF-001",
+      "priority": 12,
+      "status": "READY",
+      "preferredRole": "C_PERF_REVIEW",
+      "summary": "Cross-backend frame-pacing optimization: quantify R29+ draw amplification, producer/consumer waits, copies and XR pacing without waiting for all visual cleanup. Correctness invariants remain hard gates.",
+      "testLevel": "LEVEL2",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": true,
+      "parallelIndependent": true,
+      "blockedByHud": false
+    },
+    {
+      "id": "L1-RECENTER-001",
+      "priority": 7,
+      "status": "READY",
+      "preferredRole": "B_RENDER_REVIEW",
+      "summary": "Gameplay/menu recenter application-space behavior and visual transition correctness.",
+      "testLevel": "LEVEL1",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
+      "id": "L3-DX9EX-001",
+      "priority": 5,
+      "status": "READY",
+      "preferredRole": "A_ARCH_REVIEW",
+      "summary": "D3D9Ex device promotion/reset/shared-resource/direct transport robustness.",
+      "testLevel": "LEVEL3",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": true
+    },
+    {
+      "id": "L4-RELEASE-001",
+      "priority": 1,
+      "status": "BLOCKED",
+      "preferredRole": "D_INTEGRATION_PLANNER",
+      "summary": "DXVK/multiview/DX12 implementation/build/smoke is re-enabled. Release/promotion matrix remains gated until backend parity with protected R51 is demonstrated.",
+      "testLevel": "LEVEL4",
+      "dependencies": [
+        "DXVK-REACTIVATE-001",
+        "DX12-D3D9ON12-REACTIVATE-001",
+        "VR-PERF-COMMON-001"
+      ],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "blockReason": "Development/build/smoke is allowed; only release/promotion is blocked pending Quest3/VDXR parity with the protected R51 baseline."
+    }
+  ],
+  "hmdTestMatrix": {
+    "status": "BASE_BUILD_VERIFIED",
+    "testMatrixBaseRuntimeSha": "27f4ad958cf965f33bc6791395dd77ca1af7fb42",
+    "integrationSha": "060e2ae5ff78503b41d8a38980843dd5003e43bb",
+    "maxSlots": 6,
+    "manifest": "docs/VR_HMD_TEST_MATRIX.json",
+    "requiredSlots": [
+      "A_CONTROL",
+      "B_HUD",
+      "C_FLARE",
+      "D_PERF",
+      "E_DXVK",
+      "F_DX12"
+    ],
+    "nextAction": "Prepare B_HUD, C_FLARE, D_PERF, E_DXVK and F_DX12 in parallel from the protected baseline. Do not wait for HUD completion before backend/performance work."
+  }
+}

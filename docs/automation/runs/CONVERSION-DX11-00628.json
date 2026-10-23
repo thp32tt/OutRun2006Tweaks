@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00628",
+  "production_id": "CONVERSION-DX11-00628",
+  "event_id": "CONVERSION-DX11-00628-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_BLENDDIFFUSEALPHA_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "84658fc71b6e7433deba1cb6b9458ec87db3ab55",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live game-authored D3D9 PM RGB and BLENDDIFFUSEALPHA alpha stage capture",
+      "D3D11 HLSL PS compilation/binding and guarded native Draw/DrawIndexed",
+      "Original DX9Ex draw and gamepad passthrough for unsupported operands"
+    ],
+    "batch_components": [
+      "D3D9 stage capture and admission C++",
+      "D3D11 PS compile/create/reset and dispatch",
+      "Negative source mutations and 256-case numerical checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Different factors for premultiplied RGB and diffuse-weighted alpha",
+      "negative_regression": "Reject changed shader equation, swapped/modified operands and severed native graph",
+      "component_integration": "Live D3D9 callsite to guarded D3D11 Draw/DrawIndexed via compiled independent PS"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_BLENDDIFFUSEALPHA_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI/source only; in-game menu/race and Quest3 runtime UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in; DX9Ex fallback default"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_stage0_pm_blenddiffusealpha_00628.py",
+    "docs/automation/runs/CONVERSION-DX11-00628.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: remote HEAD and prior 00627 checked",
+    "C1_REVIEW": "PASS: PM RGB + BLENDDIFFUSEALPHA not routed",
+    "C2_IMPLEMENT": "PASS: live capture HLSL native Draw and regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38294185382 validate and readiness smoke SUCCESS; DX11 Fast #38294185360, Windows Build #38294190182, OpenXR #38294190198, HUD Inspector #38294190216 SUCCESS",
+    "C4_COMMIT": "PASS: material 7f06895397e00cba9ea5f87a565e0f899e2ef483, actual failed-test repair 45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5 (validation-bearing, no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED; exact-SHA result 45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "C6 complete. Next independent DX11 unimplemented live renderer/vehicle/game input task only, not rerun 00628. Quest3/VDXR and gamepad runtime remain UNTESTED.",
+  "validation_bearing_result_sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5",
+  "material_source_sha": "7f06895397e00cba9ea5f87a565e0f899e2ef483",
+  "result_sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5",
+  "validation_runs": {
+    "backend_gate": {
+      "id": 38294185382,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    },
+    "dx11_fast": {
+      "id": 38294185360,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    },
+    "windows_build": {
+      "id": 38294190182,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    },
+    "openxr": {
+      "id": 38294190198,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    },
+    "hud_inspector": {
+      "id": 38294190216,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    }
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00156",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "18643dd8cbc5f8669b10f7dbfeae83c46c3a8ae9",
+  "result_sha": "fddb467f821ad981db58f3aa441d042f66ecb8fa",
+  "validation_bearing_result_sha": "fddb467f821ad981db58f3aa441d042f66ecb8fa",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R156_HELPER_28320_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00154 proved the prior 0x282B0 callee terminal/padding and only a three-byte next-code anchor at 0x28320, explicitly requiring independent provenance/instruction proof before assigning a function or render semantic. The smallest runnable HMD-free next unit is a fresh bounded exact-EXE provenance capture beginning at 0x28320. DXVK-00155 independently selected the same exact-EXE boundary, but DX11 binds this capture to its own 00154 predecessor and exact-result Actions.",
+  "summary": "Completed an independent DX11 bounded exact-EXE provenance capture for code beginning at 0x28320. The collector verified exact continuity from the R154 terminal/padding proof, captured a fresh 96-byte .text window, recorded 100 raw inbound rel32 candidates and one raw outbound rel32 candidate at 0x28379->0x282B0, and left function-entry status and render semantics unresolved. No runtime renderer or ownership behavior changed.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00155",
+    "source_result_sha": "1c12478c7ac3681d09864cffca5f52edd5c8241a",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded provenance design only. DXVK hosted static analysis has independently captured the same 0x28320 window; DX11 must pass its own predecessor chain and exact-result Actions before the evidence is durable on this lane."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00156.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00154 validation-bearing result 21de28945d863a6e564b19261afd1a2260a1575d proved the exact terminal/padding boundary and three-byte 0x28320 anchor.",
+    "Validation-bearing result fddb467f821ad981db58f3aa441d042f66ecb8fa contains exact marker [AUTO:CONVERSION-DX11-00156] and no CI-skip directive.",
+    "Exact public EXE SHA256 is 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "HUD Inspector static job 110038319316 PASS captured a fresh 96-byte .text window at 0x28320 with predecessor continuity, 100 raw inbound rel32 candidates and one raw outbound candidate 0x28379->0x282B0.",
+    "The function-start guess is absent and function_entry_status remains UNRESOLVED; raw rel32 census is not promoted into instruction-boundary or semantic proof.",
+    "DXVK-00155 independently emitted the same bounded 0x28320 provenance shape on the same exact public EXE.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed on the exact DX11 result SHA.",
+    "VR PC Fast Test Build was skipped by policy and is not runtime validation.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Keep guarded GF hooks spacing-only and ownership unchanged. Continue only with another bounded exact-EXE proof. Runtime-visible claims still require Quest 3/VDXR evidence.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T03:41:55+09:00",
+  "next_code_28320_provenance": {
+    "target_rva": "0x00028320",
+    "target_section": ".text",
+    "function_start_guess_rva": null,
+    "probe_len": 96,
+    "predecessor_status": "EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN",
+    "predecessor_next_code_rva": "0x00028320",
+    "predecessor_anchor_matches": true,
+    "predecessor_exact": true,
+    "raw_inbound_rel32_candidate_count": 100,
+    "raw_outbound_rel32_candidate_count": 1,
+    "raw_outbound_rel32_candidates": [
+      {
+        "call_rva": "0x00028379",
+        "target_rva": "0x000282B0",
+        "known_target": "unknown",
+        "target_section": ".text"
+      }
+    ],
+    "status": "EXACT_EXE_NEXT_CODE_PROVENANCE_CAPTURED",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "UNRESOLVED_NEXT_CODE_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "bytes": "83 ec 0c 8b 44 24 10 55 56 57 8b f8 c1 ef 10 83 ff 20 c7 44 24 0c ff ff ff ff 0f 8c f3 00 00 00 83 ff 4b 0f 8d ea 00 00 00 33 f6 25 ff ff 00 00 3b fe 7c 12 8b 0c bd b8 68 95 00 3b ce 74 07 8b 2c 81 3b ee 75 0a 5f 5e 83 c8 ff 5d 83 c4 0c c3 8d 44 24 10 50 8b 44 24 24 e8 32 ff ff ff 83 c4"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. Native DX11 renderer/backend activation, selector, transport, host runtime and game draw routing are unchanged.",
+    "ownership": "The fresh 0x28320 window is exact provenance only. It does not establish function-entry identity or ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, rank-marker projection, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The capture fails closed unless the R154 predecessor still proves the 0x28320 anchor in .text and the exact EXE provides all 96 bytes. The 100 raw inbound rel32 candidates and one raw outbound rel32 candidate are census evidence only and are not instruction-boundary or function-entry proof."
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "Static analyzer/verifier only; no protected runtime renderer risk path was changed and no open visual regression is claimed fixed."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36759546650,
+      "conclusion": "success",
+      "validated_sha": "fddb467f821ad981db58f3aa441d042f66ecb8fa",
+      "artifact_id": 11117919636,
+      "artifact_digest": "sha256:a04373efe7a30def5b66fa55de0a373371136d20bbfc0442135299aebe4deb67"
+    },
+    "build": {
+      "run_id": 36759554090,
+      "conclusion": "success",
+      "validated_sha": "fddb467f821ad981db58f3aa441d042f66ecb8fa",
+      "artifact_id": 11118470829,
+      "artifact_digest": "sha256:955da30c205ce66ed092e4fef28bf46c56f5db4bc8bcc3e512be5b1520da3b23",
+      "source_snapshot_artifact_id": 11118550834,
+      "source_snapshot_artifact_digest": "sha256:0c51e77d4902d3429a0a1e34f9346118caededc6238403f2728c6b19aec246b3"
+    },
+    "hud_inspector": {
+      "run_id": 36759553911,
+      "conclusion": "success",
+      "validated_sha": "fddb467f821ad981db58f3aa441d042f66ecb8fa",
+      "static_analysis_job_id": 110038319316,
+      "analysis_artifact_id": 11117453635,
+      "analysis_artifact_digest": "sha256:489f682c76a3a6400f7f96d56be7b2d2d7c603dd3a3cd0615db347a59375b85a",
+      "game_artifact_id": 11117369365,
+      "game_artifact_digest": "sha256:4cdd9933cfc7fbb5f0468fe41f457b51597cfbfae7507c58906eafe3c91d964a",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_next_code=0x00028320 status=EXACT_EXE_NEXT_CODE_PROVENANCE_CAPTURED predecessor_status=EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN predecessor_next=0x00028320 predecessor_anchor=True predecessor_exact=True section=.text start_guess=- probe_len=96 inbound_raw=100 outbound_raw=1 outbound=0x00028379->0x000282B0:unknown:.text function_entry=UNRESOLVED semantic_effect=UNRESOLVED_NEXT_CODE_BYTES_ONLY ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36759554061,
+      "conclusion": "success",
+      "validated_sha": "fddb467f821ad981db58f3aa441d042f66ecb8fa",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11118053183,
+      "host_artifact_digest": "sha256:cc4b8fb4bfc3a2a8dc6f26c5afb6cfe63cb0d9b23a77ec9bc1b36d4cb3cd924e"
+    },
+    "pc_fast": {
+      "run_id": 36759546641,
+      "conclusion": "skipped",
+      "validated_sha": "fddb467f821ad981db58f3aa441d042f66ecb8fa",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "fddb467f821ad981db58f3aa441d042f66ecb8fa",
+      "message": "dx11: capture target C next-code provenance [AUTO:CONVERSION-DX11-00156]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5917359447,
+    "validation_comment_id": 5917475900,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_HELPER_2830A_TERMINAL_PADDING_ANCHOR",
+    "after": "PARTIAL_PLUS_HELPER_28320_PROVENANCE",
+    "runtime_claim": false
+  },
+  "blocker": "The exact 0x28320 96-byte provenance window is now durable, but function entry is unresolved and the raw inbound/outbound rel32 census does not prove instruction boundaries. Complete instruction decoding for 0x28320 code, full callee semantics, second callee 0x8BD20, helper 0x28460 continuation, and all ScreenHud/world/render ownership remain unresolved.",
+  "resume_cursor": "Set04/F13 now has target-C call alignment, helper 0x28460 lookup/success call-chain proof, first-callee 0x282B0 slot-scan prefix/terminal boundary, and fresh exact provenance beginning at 0x28320. The next independent bounded static unit may decode only complete instructions from the 0x28320 window, analyze 0x8BD20, or continue helper 0x28460 after 0x284DE."
+}

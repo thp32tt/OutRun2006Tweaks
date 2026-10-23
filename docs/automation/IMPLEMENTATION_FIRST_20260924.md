@@ -1,0 +1,184 @@
+# OutRun VR Automation — IMPLEMENTATION-FIRST + PARALLEL-HMD-MATRIX
+
+Effective: 2026-09-24 KST
+Repository: thp32tt/OutRun2006Tweaks
+Integration branch: vr-d3d9ex-focus
+Protected runtime baseline: R51 17ad376bfdf7939f0851c0c629e4fa094a84f28a
+
+Schedule backups:
+- docs/automation/schedule-backups/2026-09-24T2216KST_FLOW-20260924-1.md
+- docs/automation/schedule-backups/2026-09-24T2305KST_FOUR-TO-TWO-CYCLES.md
+- latest pre-consolidation backup commit: 9c553489cfcc2cb8258d9cbff54c48114f85649e
+
+## Hourly schedule
+
+| Minute | Automation | Role |
+|---|---|---|
+| :00 | OutRun Full Cycle 1 (Chat) | full recover -> review -> implement -> validate -> integrate -> matrix/package cycle |
+| :30 | OutRun Full Cycle 2 (Chat) | consume Cycle 1 outputs/CI, then full recover -> review -> implement -> validate -> integrate -> matrix/package cycle |
+
+Only these two OutRun development automations are active. The previous :20 review and :45 integration tasks are disabled.
+
+Both cycles may perform production work, but repository remote claim/CAS plus production integration WIP=1 prevents concurrent source writers. If one cycle owns the active candidate, the other must consume immutable evidence or advance a non-conflicting independent lane rather than waiting idle.
+
+## Core rule: integration is serial, HMD experiments are parallel
+
+Production integration WIP remains exactly ONE.
+
+In addition, up to SIX immutable HMD experiment slots may exist for the next user test session. These experiment slots do NOT count as production integration WIP and must not be merged merely because they build.
+
+All experiment slots must be based on the same declared TEST_MATRIX_BASE unless a slot explicitly documents a dependency on another slot. Every slot records full source SHA, binary SHA256, config/profile hash, feature flags, changed paths, hypothesis and expected observable result.
+
+Prefer one binary with runtime feature flags/profiles when that keeps code identity valid. If a hypothesis changes compiled code and cannot be isolated safely by a runtime flag, use separate immutable binaries/branches.
+
+## Evening matrix target
+
+When enough evidence exists, D should prepare up to six high-information tests:
+
+- A CONTROL: reconciled R51-equivalent/current protected behavior
+- B HUD: HUD semantic lifetime candidate
+- C FLARE: lens-flare exact-producer candidate
+- D PERF: dense-scene instrumentation or measured low-risk optimization candidate
+- E DXVK: x86 DXVK SAFE compatibility first; then multiview/performance if SAFE is viable
+- F DX12: D3D9On12/DX12 strict compatibility, device/resource diagnostics and VR transport
+
+Slots are examples, not a requirement to fabricate work. If a lane lacks implementation-ready evidence, replace that slot with a meaningful alternate hypothesis for an active problem or omit it.
+
+Goal: one evening Quest3/VDXR session should validate multiple independent changes and their interactions, rather than consuming one day per change.
+
+## Development lanes
+
+### Phase 0 — R51 reconciliation
+Reconcile vr-d3d9ex-focus/current candidates with the R51 runtime contract without force-resetting protected refs or discarding unique concurrent work.
+
+References:
+- R51: 17ad376bfdf7939f0851c0c629e4fa094a84f28a
+- R51 restoration/gate candidate: 291fe517aece1ad05f5dac4f0ab72e403ab0fb58
+- CD20-17: 312ae9374980ee49c89275652565e0af6e7abd39
+
+Keep only necessary runtime protection/build provenance changes. Do not import unrelated PS2/FFB/localization/general reverse-research changes.
+
+Canonical build flags where applicable:
+- OUTRUN_VR_SAFE_DRAW_COMPARE=OFF
+- OUTRUN_VR_R26_HUD_COMPARE=ON
+- OUTRUN_VR_C1_COMPARE=OFF
+- OUTRUN_VR_C2_COMPARE=OFF
+
+### HUD lane
+Failed HMD candidate 8d21824f9502b3354fae679972a90868a0cce562 is negative evidence and must not be reapplied unchanged.
+Fix semantic ownership at the earliest correct producer/lifetime while preserving generic world/SpriteNode 3D behavior.
+
+### Lens flare lane
+Use VR-LENSFLARE-EXACT-PRODUCER-001 and the confirmed dedicated transformed 3D alpha-object path:
+0x40CBC0 -> 0x40C9A0 -> DrawObjectAlpha_Internal.
+Never treat lens flare as generic SCREEN_HUD.
+
+### Dense-scene performance lane
+Instrumentation first, then measured optimization.
+Track draw amplification, copies/waits, resource churn/cache misses and frame cadence. Performance work is active even while HUD remains unresolved.
+
+## Parallel preparation vs integration
+
+HUD, lens-flare, performance, DXVK and DX12 experiment candidates may be prepared and built in parallel during the day when each has bounded evidence and can be isolated from the common TEST_MATRIX_BASE. HUD/flare delays must never block performance or backend work; backend failures must never block HUD/flare.
+
+Actual integration stays conservative:
+1. reconcile/protect R51 contract;
+2. integrate only HMD-supported successful changes;
+3. preserve exact evidence for each change;
+4. validate combined tree before promoting a new USER_RUNTIME_VERIFIED baseline.
+
+A failed experiment must never regress or block unrelated experiment slots.
+
+## Active backend lanes
+
+DXVK and DX12 are active first-class development/test lanes alongside HUD/flare/performance.
+
+### DXVK lane
+Start with x86 DXVK SAFE so initialization, Reset, gameplay rendering and VR transport are repeatable and identity-tracked. Once SAFE evidence is viable, continue to DXVK multiview/performance optimization as a separate exact identity. Do not wait for HUD completion.
+
+### DX12 / D3D9On12 lane
+Resume from the known CreateDevice/resource-compatibility boundary, including 0x8876086C evidence. Isolate device parameters, MANAGED/LockRect/resource lifetime behavior and VR transport. Do not change protected R51 world/HUD ownership merely to make DX12 pass. Do not wait for HUD completion.
+
+Only promotion to the protected/default backend is gated on Quest3/VDXR parity with R51.
+
+## Frozen work
+
+Do not spend primary development time on unrelated work while active user-visible/backend lanes remain:
+- broad EXE-map expansion unrelated to HUD/flare/backend work
+- general dependency/toolchain cleanup unrelated to active builds
+- PS2/FFB runtime work
+- localization runtime work
+- broad architecture refactors unrelated to current backend blockers
+
+Existing infrastructure/reverse knowledge may be reused.
+
+## Interrupt policy
+
+Only these may preempt the user-visible matrix work:
+- crash
+- white-screen/startup failure
+- protected R51 runtime regression
+- data corruption
+- deterministic build break
+
+Other findings are BACKLOG_ONLY.
+
+## In-cycle review and validation
+
+The old mandatory A -> B -> C -> D handoff chain is removed. Each full cycle performs impact-based review and validation inside the same run.
+
+- HUD/render/visual/performance changes require render-oriented scrutiny plus independent deterministic validation.
+- architecture/reset/resource/synchronization/backend/device changes require architecture-oriented scrutiny plus independent deterministic validation.
+- mixed changes require both lenses.
+
+Use actual diffs, call paths, regression guards and exact-SHA cloud CI. No review-count quota and no artificial role-stage waiting. A change may integrate in the same cycle once all applicable deterministic/domain gates pass. HMD-only uncertainty remains INTEGRATED_NEEDS_HMD.
+
+
+## No-ready-parking enforcement
+
+The automation is not allowed to stop after discovering or documenting actionable work.
+
+For every READY / IMPLEMENT_NEXT / actionable review finding, the same full-cycle run must do one of the following:
+
+1. **Implement now** when the root cause is sufficiently bounded and no Quest3/VDXR evidence is required to make the source change safely.
+2. **Validate/integrate now** when an exact immutable candidate already exists and its required deterministic/domain gates have completed.
+3. **Repair the blocker now** when the obstacle is stale queue metadata, missing regression coverage, CI trigger/identity, branch drift, packaging identity, or another repository/tooling issue that can be corrected without HMD evidence.
+4. **Move to NEED_HMD_TEST** only when the remaining uncertainty is genuinely visual/runtime and cannot be resolved deterministically.
+5. **Move to BLOCKED with exact evidence** only when the required capability/evidence is genuinely unavailable after attempting the available recovery path.
+
+Merely writing READY, IMPLEMENT_NEXT, NEEDS_VALIDATION, a review comment, or a nextAction is **not cycle completion** when implementation or deterministic validation can still be performed in the current run.
+
+If CI is pending, persist the exact candidate/run identity and immediately advance another non-conflicting lane. Do not busy-poll and do not idle.
+
+Before a cycle ends, perform a **NO-IDLE GATE**:
+- scan READY / IMPLEMENT_NEXT / NEEDS_VALIDATION items;
+- resolve stale queue entries whose source is already fixed;
+- consume completed exact-SHA CI immediately;
+- ensure every still-actionable item has either concrete source progress in this run, an active immutable validation run, a genuine HMD-only gate, or a documented hard blocker;
+- continue an independent lane if any useful work remains.
+
+Progress is measured by implemented source, deterministic validation, resolved blockers, integrated changes, or HMD-ready immutable experiments — not by review/findings count.
+
+## Evening package contract
+
+D should freeze one self-contained EVENING_MATRIX package near 19:45 KST when useful candidates exist. If the day's package was not created and the user changes policy after 19:45, the next D run may create one late-evening package once.
+
+The package should provide simple launchers or a selector for each slot and automatically record:
+- Slot ID
+- Source SHA
+- Binary SHA256
+- TEST_MATRIX_BASE
+- config/profile hash
+- feature flags
+- SessionID
+- timestamps
+
+One final collector should create one ZIP containing all session logs. The user should not have to manually rename logs.
+
+Default maximum: 6 slots. Fewer is preferable when additional slots do not distinguish a real hypothesis.
+
+## Verification states
+
+STATICALLY_VERIFIED, BUILD_VERIFIED, HMD_EXPERIMENT_READY, INTEGRATED_NEEDS_HMD and USER_RUNTIME_VERIFIED remain distinct.
+
+Only matching Quest3/VDXR runtime evidence can promote a visual/runtime change to USER_RUNTIME_VERIFIED.

@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00904",
+  "production_id": "CONVERSION-DX11-00904",
+  "event_id": "CONVERSION-DX11-00904-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00904",
+  "feature_id": "DX11:NATIVE_GAME_PHYSICAL_CAMERA_VIEW_STEREO_CLEAR_COPY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "f1360ce793ba0f1061ed9e719c5bdb2f1ba80582",
+  "validation_bearing_result_sha": "a2e13e0a327b6a0c0fa23330b3ee875a6a356e71",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_GAME_PHYSICAL_CAMERA_VIEW_STEREO_CLEAR_COPY",
+    "goal": "Replay real game-owned nonzero-mip auxiliary camera RTV/DSV color and depth/stencil clears through an exact GPU postpass into distinct full-sized left and right native DX11 OpenXR eye buffers while preserving original game output.",
+    "acceptance_items": [
+      {
+        "id": "physical_camera_mip_view_to_stereo_gpu",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_camera_mip_clear_depth_and_stereo_gpu_copy",
+        "expected_behavior": "Physical mip1 game RTV and DSV use actual 32x32 view dimensions, preserving actual per-eye GPU color and native shared L/R copy."
+      },
+      {
+        "id": "original_eye_and_input_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "strict_camera_bounds_and_original_fallback",
+        "expected_behavior": "Invalid source rectangles and aliased eye ownership reject before GPU mutation; original D3D9Ex color seed, gamepad and FFB fallback remain untouched."
+      },
+      {
+        "id": "warp_pixels_and_exact_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "win32_warp_gpu_pixels_and_git_actions",
+        "expected_behavior": "Real GPU independent left/right selected camera mip1 color readback and all five exact-SHA GitHub Actions succeed without claiming Quest3 or live OutRun gameplay."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "physical_camera_mip_view_to_stereo_gpu": "PASS_WARP_PHYSICAL_MIP1_EYE_PIXELS",
+    "original_eye_and_input_fail_closed": "PASS_BOUNDED_VIEW_AND_ORIGINAL_FALLBACK",
+    "warp_pixels_and_exact_five_gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Real game GPU offscreen camera mip/array RTV+DSV source Clear and Draw physical view admission",
+      "Native GPU subresource Copy into independent left/right shared OpenXR eye color targets while maintaining game-authored timeline and host ACK"
+    ],
+    "batch_components": [
+      "Native C++ per-view RTV/DSV physical extent admission for genuine game Clear/Draw",
+      "Win32 WARP 32x32 selected mip1 camera real source Copy and per-eye GPU readback",
+      "Fail-closed activation audit, destructive negative regressions and exact-SHA CI cause repair"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STEREO:PHYSICAL_MIP_VIEW_CLEAR_GPU_COPY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY: synthetic WARP uses real GPU texture mip views and distinct eye pixels, but menu/car/race live OutRun image and Quest3/VDXR gameplay remain unobserved.",
+    "activation_guard_and_fallback": "Native opt-in not promoted; no changes to DX9Ex rendering, original input/FFB/SkyGlow or frozen DXVK lane.",
+    "blocking_evidence": "Prior offscreen camera clear/draw admission compared RTV mip1 against allocation base dimensions and could accept invalid color/depth clear rectangles; initial WARP pixel overlap and stale static audit were causally fixed.",
+    "acceptance_proof": {
+      "positive_probe": "Isolated Win32 Native Transport WARP #39086190152 SUCCESS at 59d3b257 on unchanged C++/GPU probe material; independent selected 32x32 mip1 left/right physical GPU pixel readback and original full eye seed retained.",
+      "negative_regression": "Reject invalid physical mip1 camera color/DSV regions; Python destructive mutation checks reject removal of viewport restoration, independently owned GPU pixel checks and non-overlapping game full TARGET seed. DX9Ex/gamepad/FFB unchanged.",
+      "component_integration": "C++ material f1360ce7 and same-task causal CI/test repairs to exact SHA a2e13e0a, with Fast/Backend/Build/OpenXR/HUD all 5 SUCCESS."
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_camera_view.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_dx11_eye_partial_depth_activation.py",
+    "docs/automation/runs/CONVERSION-DX11-00903.json"
+  ],
+  "validation_evidence": {
+    "material_sha": "f1360ce793ba0f1061ed9e719c5bdb2f1ba80582",
+    "validation_sha": "a2e13e0a327b6a0c0fa23330b3ee875a6a356e71",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39086552843,
+        "conclusion": "success",
+        "validation_sha": "a2e13e0a327b6a0c0fa23330b3ee875a6a356e71"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39086552834,
+        "conclusion": "success",
+        "validation_sha": "a2e13e0a327b6a0c0fa23330b3ee875a6a356e71"
+      },
+      {
+        "name": "Build",
+        "run_id": 39086552818,
+        "conclusion": "success",
+        "validation_sha": "a2e13e0a327b6a0c0fa23330b3ee875a6a356e71"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39086555796,
+        "conclusion": "success",
+        "validation_sha": "a2e13e0a327b6a0c0fa23330b3ee875a6a356e71"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39086555801,
+        "conclusion": "success",
+        "validation_sha": "a2e13e0a327b6a0c0fa23330b3ee875a6a356e71"
+      }
+    ],
+    "isolated_warp_run_id": 39086190152,
+    "isolated_warp_sha": "59d3b2573f333383c4e1278a01b9f09154d37c79",
+    "isolated_warp_conclusion": "success",
+    "source_graph_identical_since_warp": true,
+    "runtime_validation": "UNTESTED",
+    "full_gameplay_renderer_complete": false
+  },
+  "runtime_validation_note": "Quest3, VDXR, native OutRun menu/vehicle/race visuals, sustained HMD frame pacing and physical gamepad/FFB session UNTESTED. Synthetic WARP GPU pixels are not user-playable confirmation.",
+  "pipeline": {
+    "C0_RECOVER": "Checked GitHub branch and prior 00903 terminal C6 at 358f7f09; no 00904 run record.",
+    "C1_REVIEW": "Classified physical mip camera RTV/DSV source admission mismatch as implementation defect and exact CI failures as same-task repair.",
+    "C2_IMPLEMENT": "Genuine C++ physical camera RTV/DSV game offscreen Clear/Draw admission and GPU eye Copy plus WARP eye-pixel test, material f1360ce7.",
+    "C3_VALIDATE": "Source-exact WARP success at 59d3b257. Five mandatory exact-SHA Gates success at a2e13e0a.",
+    "C4_COMMIT": "Material source and same-task repairs committed without force or CI-skip on validation-bearing commits.",
+    "C5_PACKAGE": "NOT_REQUIRED, GitHub Build job produced artifacts.",
+    "C6_STATE": "PASS_EXACT_SHA, BUILD_VERIFIED source stage only, actual game/HMD UNTESTED; no duplicate score in retry/C6."
+  }
+}

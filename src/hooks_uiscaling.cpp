@@ -1,0 +1,1932 @@
+#include "hook_mgr.hpp"
+#include "plugin.hpp"
+#include "game_addrs.hpp"
+#include "vr/game/render_semantics.hpp"
+
+#include <array>
+#include <atomic>
+
+namespace Settings
+{
+	extern Setting<bool> VREnabled;
+	Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,
+		"Adjusts the UI scaling applied by the game.",
+		{ "Vanilla, stretches to screen ratio", "Scaled UI, no stretching (Outrun Online Arcade)",
+		  "Centered 4:3 UI" } };
+	Setting<int> UILetterboxing{ "Graphics", "UILetterboxing", 1,
+		"Adds 4:3 letterboxing to game menus, to address graphical issues outside of the menus 4:3 display. "
+		"Only used when UIScalingMode isn't set to Vanilla.",
+		{ "Disable all letterboxing", "Letterbox menus only, disabled when in-game",
+		  "Always letterbox (only use with Centered 4:3 UI)" } };
+}
+
+enum class ScalingMode
+{
+	Vanilla,
+	OnlineArcade,
+	KeepCentered,
+	Other
+};
+
+#define SCREEN_ONE_THIRD 213
+#define SCREEN_TWO_THIRD 426
+
+class UIScaling : public Hook
+{
+	const static int D3DXMatrixTransformation2D_Addr = 0x39400;
+	const static int draw_sprite_custom_matrix_mid_Addr = 0x2A556;
+	const static int Calc3D2D_Addr = 0x49940;
+
+	const static int NaviPub_Disp_SpriteScaleEnable_Addr = 0xBEB31;
+	const static int NaviPub_Disp_SpriteScaleEnable2_Addr = 0xBEDBE;
+	const static int NaviPub_Disp_SpriteScaleDisable_Addr = 0xBEDE0;
+	const static int NaviPub_Disp_SpriteScaleDisable2_Addr = 0xBEE21;
+	const static int drawFootage_caller_Addr = 0x293F3;
+	const static int draw_sprite_custom_matrix_multi__case2_Addr = 0x2B1E2;
+	const static int draw_sprite_custom_matrix_multi__case3_Addr = 0x2B53E;
+	const static int draw_sprite_custom_matrix_multi__case4_Addr = 0x2BB2F;
+
+	// sub_4BAD20 draws the 1st/2nd/3rd position markers above rival cars. It
+	// projects the car position to screen, then rounds it down to a whole pixel
+	// of the game's 640x480 coordinate space. That space is stretched to fill
+	// the display, so a single pixel of it spans several real ones and the
+	// marker visibly steps as it moves.
+	//
+	// RankMarker_Truncate is the address just past both cvttss2si, where the
+	// values from before the rounding are still on the stack at these offsets.
+	const static int RankMarker_Truncate = 0xBB046;
+	const static int RankMarker_StackX = 0x40;
+	const static int RankMarker_StackY = 0x44;
+
+	// R56 runtime-only HMD probe selector. A single DLL carries all 20 cases so
+	// every comparison uses identical codegen except for the selected probe.
+	static int VRHudProbeMode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			const DWORD len = GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_PROBE", text,
+				static_cast<DWORD>(sizeof(text)));
+			if (len == 0 || len >= sizeof(text))
+				return 0;
+			int value = 0;
+			for (DWORD i = 0; i < len; ++i)
+			{
+				if (text[i] < '0' || text[i] > '9')
+					return 0;
+				value = value * 10 + int(text[i] - '0');
+			}
+			return (value >= 1 && value <= 20) ? value : 0;
+		}();
+		return mode;
+	}
+
+	inline static std::atomic<std::uint64_t> VRProbeDispRankHits{ 0 };
+	inline static std::atomic<std::uint64_t> VRProbeRank13Hits{ 0 };
+	inline static std::atomic<std::uint64_t> VRProbeRank46Hits{ 0 };
+
+	static void VRHudProbeTrace(
+		const char* site, std::atomic<std::uint64_t>& counter) noexcept
+	{
+		const int probe = VRHudProbeMode();
+		if (!probe)
+			return;
+		const std::uint64_t hit =
+			counter.fetch_add(1, std::memory_order_relaxed) + 1;
+		// Power-of-two logging proves the producer was reached without flooding
+		// long race logs.
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R56 PROBE: mode={} producer={} hits={}",
+				probe, site, hit);
+	}
+
+	static int VRR57Mode() noexcept
+	{
+		static const int mode = []() noexcept {
+			char text[8]{};
+			const DWORD len = GetEnvironmentVariableA(
+				"OUTRUN_VR_R57_MODE", text,
+				static_cast<DWORD>(sizeof(text)));
+			// R66 production baseline: HMD testing established mode 6 as the
+			// correct projected 1st-5th marker + DispRank ownership path.
+			// Explicit env=0 remains available for controlled regression tests.
+			if (len == 0 || len >= sizeof(text))
+				return 6;
+			int value = 0;
+			for (DWORD i = 0; i < len; ++i)
+			{
+				if (text[i] < '0' || text[i] > '9')
+					return 6;
+				value = value * 10 + int(text[i] - '0');
+			}
+			return (value >= 0 && value <= 10) ? value : 6;
+		}();
+		return mode;
+	}
+
+	inline static thread_local
+		OutRunVR::GameSemantic::ProjectedMarkerInfo RankMarkerProjectedInfo{};
+
+	static OutRunVR::GameSemantic::RenderScope
+	R57RankProducerScope(bool rank13) noexcept
+	{
+		switch (VRR57Mode())
+		{
+		case 4:
+			return OutRunVR::GameSemantic::RenderScope::ScreenHud;
+		case 5:
+		case 6:
+		case 9:
+		case 10:
+			return OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+		case 7:
+			return rank13
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+		case 8:
+			return rank13
+				? OutRunVR::GameSemantic::RenderScope::WorldBillboard
+				: OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+		default:
+			return OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+		}
+	}
+
+	// Addresses of the draw calls sub_4BAD20 makes. sprani_play_ae_auth_alpha
+	// and put_clip_sprite are both used throughout the game, so each call site
+	// is redirected on its own rather than hooking either function.
+	static constexpr int RankMarker_SpraniCalls[] = { 0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5 };
+	static constexpr int RankMarker_ClipSpriteCalls[] = { 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0 };
+	static constexpr int DispRank_SpraniCall = 0xB9DA6;
+	static constexpr int DispRank_ClipSpriteCalls[] = {
+		0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
+		0xB9FFC, 0xBA01E, 0xBA035, 0xBA052
+	};
+
+	// R65 full-EXE map: these four sprite IDs (0x2C0251..0x2C0254)
+	// occur only in the two option/menu arrow producers below.
+	static constexpr int OptionArrow_ClipSpriteCalls[] = {
+		0xE358B, 0xE35A3, 0xE35CC, 0xE35F7,
+		0xE481B, 0xE4833, 0xE485C, 0xE4887,
+		// R69 candidate: generic menu/list boundary arrows. Canonical EXE
+		// disassembly shows sprite 0x3004A/0x3004B emitted only at list
+		// previous/next boundaries; keep these exact instead of widening HUD rules.
+		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3
+	};
+
+	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
+	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
+	static int __stdcall D3DXMatrixTransformation2D_dest(D3DMATRIX* pOut, D3DXVECTOR2* pScalingCenter, float pScalingRotation,
+		D3DXVECTOR2* pScaling, D3DXVECTOR2* pRotationCenter, float Rotation, D3DXVECTOR2* pTranslation)
+	{
+		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+
+		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
+		{
+			// Multiply by the smallest scale factor
+			float scale = min(Game::screen_scale->x, Game::screen_scale->y);
+
+			pScaling->x = (pScaling->x / Game::screen_scale->x) * scale;
+			pScaling->y = (pScaling->y / Game::screen_scale->y) * scale;
+
+			float origX = (pTranslation->x / Game::screen_scale->x);
+
+			// Reposition sprite to be centered
+			float centering = (Game::screen_resolution->x - (Game::original_resolution.x * scale)) / 2;
+			pTranslation->x = (origX * scale) + centering;
+			pTranslation->y = (pTranslation->y / Game::screen_scale->y) * scale;
+		}
+
+		return D3DXMatrixTransformation2D.stdcall<int>(pOut, pScalingCenter, pScalingRotation, pScaling, pRotationCenter, Rotation, pTranslation);
+	}
+
+	static inline SafetyHookMid draw_sprite_custom_matrix_hk = {};
+	static void __cdecl draw_sprite_custom_matrix_mid(safetyhook::Context& ctx)
+	{
+		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+
+		float* g_spriteVertexStream = Module::exe_ptr<float>(0x58B868);
+		SPRARGS2* a1 = (SPRARGS2*)ctx.ebx;
+
+		D3DSURFACE_DESC v25;
+		a1->d3dtexture_ptr_C->GetLevelDesc(0, &v25);
+		float v21 = 0.50999999 / (double)v25.Width;
+		float v22 = 0.50999999 / (double)v25.Height;
+
+		D3DMATRIX pM;
+		memcpy(&pM, &a1->mtx_14, sizeof(pM));
+
+		D3DXVECTOR4 vec;
+
+		D3DXVECTOR4 topLeft{ 0 };
+		D3DXVECTOR4 bottomLeft{ 0 };
+		D3DXVECTOR4 topRight{ 0 };
+		D3DXVECTOR4 bottomRight{ 0 };
+
+		float scaleY = Game::screen_scale->y;
+
+		// Multiply by the smallest scale factor
+		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
+			scaleY = min(Game::screen_scale->x, Game::screen_scale->y);
+
+		// TopLeft
+		vec.x = a1->TopLeft_54.x;
+		vec.y = a1->TopLeft_54.y;
+		vec.z = a1->TopLeft_54.z;
+		vec.w = 1.0;
+		Game::D3DXVec4Transform(&topLeft, &vec, &pM);
+
+		g_spriteVertexStream[1] = scaleY * topLeft.y + 0.5;
+		g_spriteVertexStream[2] = topLeft.z;
+		g_spriteVertexStream[3] = 1.0;
+		g_spriteVertexStream[4] = a1->color_4;
+		g_spriteVertexStream[5] = v21 + a1->top_9C;
+		g_spriteVertexStream[6] = -v22 + a1->left_A0;
+
+		// BottomLeft
+		vec.x = a1->BottomLeft_60.x;
+		vec.y = a1->BottomLeft_60.y;
+		vec.z = a1->BottomLeft_60.z;
+		vec.w = 1.0;
+		Game::D3DXVec4Transform(&bottomLeft, &vec, &pM);
+
+		g_spriteVertexStream[8] = scaleY * bottomLeft.y + 0.5;
+		g_spriteVertexStream[9] = bottomLeft.z;
+		g_spriteVertexStream[0xA] = 1.0;
+		g_spriteVertexStream[0xB] = a1->color_4;
+		g_spriteVertexStream[0xC] = v21 + a1->top_94;
+		g_spriteVertexStream[0xD] = v22 + a1->right_98;
+
+		// TopRight
+		vec.x = a1->TopRight_6C.x;
+		vec.y = a1->TopRight_6C.y;
+		vec.z = a1->TopRight_6C.z;
+		vec.w = 1.0;
+		Game::D3DXVec4Transform(&topRight, &vec, &pM);
+
+		g_spriteVertexStream[0xF] = scaleY * topRight.y + 0.5;
+		g_spriteVertexStream[0x10] = topRight.z;
+		g_spriteVertexStream[0x11] = 1.0;
+		g_spriteVertexStream[0x12] = a1->color_4;
+		g_spriteVertexStream[0x13] = -v21 + a1->bottom_84;
+		g_spriteVertexStream[0x14] = -v22 + a1->left_88;
+
+		// BottomRight
+		vec.x = a1->BottomRight_78.x;
+		vec.y = a1->BottomRight_78.y;
+		vec.z = a1->BottomRight_78.z;
+		vec.w = 1.0;
+		Game::D3DXVec4Transform(&bottomRight, &vec, &pM);
+
+		g_spriteVertexStream[0x16] = scaleY * bottomRight.y + 0.5;
+		g_spriteVertexStream[0x17] = bottomRight.z;
+		g_spriteVertexStream[0x18] = 1.0;
+		g_spriteVertexStream[0x19] = a1->color_4;
+		g_spriteVertexStream[0x1A] = -v21 + a1->bottom_8C;
+		g_spriteVertexStream[0x1B] = v22 + a1->right_90;
+
+		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
+		{
+			float add = (Game::screen_resolution->x - (Game::original_resolution.x * scaleY)) / 2;
+
+			g_spriteVertexStream[0] = (scaleY * topLeft.x) + add;
+			g_spriteVertexStream[7] = (scaleY * bottomLeft.x) + add;
+			g_spriteVertexStream[0xE] = (scaleY * topRight.x) + add;
+			g_spriteVertexStream[0x15] = (scaleY * bottomRight.x) + add;
+		}
+		else // if (mode == Mode::Vanilla)
+		{
+			g_spriteVertexStream[0] = (Game::screen_scale->y * topLeft.x);
+			g_spriteVertexStream[7] = (Game::screen_scale->y * bottomLeft.x);
+			g_spriteVertexStream[0xE] = (Game::screen_scale->y * topRight.x);
+			g_spriteVertexStream[0x15] = (Game::screen_scale->y * bottomRight.x);
+		}
+
+		// Game seems to add these, half-pixel offset?
+		g_spriteVertexStream[0] += 0.5f;
+		g_spriteVertexStream[7] += 0.5f;
+		g_spriteVertexStream[0xE] += 0.5f;
+		g_spriteVertexStream[0x15] += 0.5f;
+
+		Game::D3DDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2u, g_spriteVertexStream, 0x1Cu);
+	}
+
+	// Adjust positions of sprites in 3d space (eg 1st/2nd/etc markers)
+	static inline SafetyHookInline Calc3D2D_hk = {};
+	static void Calc3D2D_dest(float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
+	{
+		Calc3D2D_hk.call(a1, a2, in, out);
+
+		// R57: sub_4BAD20 callsite RVA 0xBAEE2 returns at 0xBAEE7.
+		// Calc3D2D projects a stock-view point as:
+		//   sx = viewX / -viewZ * a1
+		//   sy = viewY / -viewZ * a2
+		// Preserve the recovered view point so the final queued sprite can be
+		// translated to the real left/right OpenXR projections instead of
+		// guessing depth from an already-flattened SpriteNode.
+		const void* returnAddress = _ReturnAddress();
+		auto recoverViewPoint = [&](OutRunVR::GameSemantic::ProjectedMarkerInfo& info) {
+			info = {};
+			if (!out || !std::isfinite(out->x) || !std::isfinite(out->y) ||
+				!std::isfinite(out->z) || !std::isfinite(a1) ||
+				!std::isfinite(a2) || std::fabs(a1) <= 1.0e-6f ||
+				std::fabs(a2) <= 1.0e-6f || std::fabs(out->z) <= 1.0e-6f)
+				return;
+			info.valid = true;
+			info.viewZ = out->z;
+			info.viewX = out->x * (-out->z) / a1;
+			info.viewY = out->y * (-out->z) / a2;
+		};
+
+		if (returnAddress == Module::exe_ptr(0xBAEE7))
+		{
+			recoverViewPoint(RankMarkerProjectedInfo);
+		}
+		else if (returnAddress == Module::exe_ptr(0xCF53))
+		{
+			// R67: FUN_0040CBC0 projects the flare anchor exactly once here,
+			// before the twelve 0x40C9A0 alpha-object draws. Preserve the
+			// already head-synchronised game-view point for eye-relative
+			// reprojection instead of trying to repair the flattened result.
+			OutRunVR::GameSemantic::ProjectedMarkerInfo flareAnchor{};
+			recoverViewPoint(flareAnchor);
+			if (flareAnchor.valid)
+				OutRunVR::GameSemantic::SetLatestProjectedScreenAnchor(flareAnchor);
+			else
+				OutRunVR::GameSemantic::ClearLatestProjectedScreenAnchor();
+		}
+
+		// TODO: OnlineArcade mode needs to add position here
+
+		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+
+		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
+			out->x = (out->x / Game::screen_scale->y) * Game::screen_scale->x;
+	};
+
+	// The fraction of a pixel sub_4BAD20 discarded when it rounded the marker
+	// position down, for the draws below to add back.
+	static inline float RankMarkerFracX = 0.0f;
+	static inline float RankMarkerFracY = 0.0f;
+
+	static inline SafetyHookMid RankMarker_Truncate_hk{};
+	static void RankMarker_Truncate_dest(safetyhook::Context& ctx)
+	{
+		const float x = *reinterpret_cast<const float*>(ctx.esp + RankMarker_StackX);
+		const float y = *reinterpret_cast<const float*>(ctx.esp + RankMarker_StackY);
+
+		// esi and ebp hold the rounded position. Keeping the difference instead
+		// of the exact position lets every draw apply it, whatever offset from
+		// the marker that draw sits at.
+		RankMarkerFracX = (x + 320.0f) - float(int(ctx.esi));
+		RankMarkerFracY = ((240.0f - y) - 32.0f) - float(int(ctx.ebp));
+	}
+
+	// 1st, 2nd and 3rd are each a single sprite, and this call takes its
+	// position as floats, so the discarded fraction goes straight back on.
+	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
+	{
+		VRHudProbeTrace("rank13_sprani", VRProbeRank13Hits);
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		const int probe = VRHudProbeMode();
+		float probeX = x + RankMarkerFracX;
+		float probeY = y + RankMarkerFracY;
+		// R56 09-12: directly perturb only the known 1st/2nd/3rd producer.
+		// A visible movement proves the final image still contains this producer.
+		if (probe == 9) probeX += 96.0f;
+		else if (probe == 10) probeX -= 96.0f;
+		else if (probe == 11) probeY -= 72.0f;
+		else if (probe == 12) { probeX = 320.0f; probeY = 208.0f; }
+
+		int result = 0;
+		if (VRR57Mode() != 0)
+		{
+			const auto scope = R57RankProducerScope(true);
+			const auto* marker =
+				scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				? &RankMarkerProjectedInfo : nullptr;
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				scope, marker);
+			result = Game::sprani_play_ae_auth_alpha(
+				spriteId, probeX, probeY, a4, a5, alpha);
+		}
+		else
+		{
+			result = Game::sprani_play_ae_auth_alpha(
+				spriteId, probeX, probeY, a4, a5, alpha);
+
+			// R56 compatibility path.
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				SpriteNode* node = root ? root->tail_4 : nullptr;
+				if (node && node != tailsBefore[prio])
+				{
+					const auto scope =
+						(probe == 16)
+						? OutRunVR::GameSemantic::RenderScope::ScreenHud
+						: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+					OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+				}
+			}
+		}
+		return result;
+	}
+
+	// R58 HMD evidence: mode 6 proved head-inverse projected tracking for 1st-3rd;
+	// mode 8 proved 4th+ kind-0 ownership never reached the final projected path.
+	// 4th place onward is spelled out from digit sprites drawn by
+	// put_clip_sprite, which takes its position as int. It converts that to
+	// float when filling in the sprite it queues, so the fraction goes back on
+	// there instead.
+	static int __cdecl RankMarker_putClipSprite(int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
+	{
+		VRHudProbeTrace("rank46_clip", VRProbeRank46Hits);
+		int prio = int(priority);
+		prio = prio < 0 ? 0 : (prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		const int probe = VRHudProbeMode();
+		int probeX = x;
+		int probeY = y;
+		// R56 13-15: directly perturb only the 4th+ digit-sprite producer.
+		if (probe == 13) probeX += 96;
+		else if (probe == 14) probeY -= 72;
+		else if (probe == 15) { probeX = 320; probeY = 208; }
+		int result = 0;
+		const auto r57Scope = R57RankProducerScope(false);
+		const auto* r57Marker =
+			r57Scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+			? &RankMarkerProjectedInfo : nullptr;
+		if (VRR57Mode() != 0)
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				r57Scope, r57Marker);
+			result = Game::put_clip_sprite(
+				xstnum, probeX, probeY, flags, priority, color);
+		}
+		else
+		{
+			result = Game::put_clip_sprite(
+				xstnum, probeX, probeY, flags, priority, color);
+		}
+
+		// Canonical put_clip_sprite (RVA 0x2D280) performs exactly one
+		// put_sprite_ex call (RVA 0x2D2EC). Register the actual appended node
+		// here as the presentation-authoritative owner instead of relying only on
+		// nested producer-scope propagation. R57 HMD mode 8 proved that the
+		// indirect path could lose 4th+ PROJECTED_WORLD_MARKER_2D ownership.
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+		{
+			node->args_10.float24 += RankMarkerFracX;
+			node->args_10.float28 += RankMarkerFracY;
+			if (VRR57Mode() != 0)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, r57Scope, r57Marker);
+				static std::atomic<std::uint64_t> directRank46Tags{ 0 };
+				const auto hit = directRank46Tags.fetch_add(
+					1, std::memory_order_relaxed) + 1;
+				if ((hit & (hit - 1)) == 0)
+					spdlog::info(
+						"VR R58 DIRECT CLIP: owner=rank46 prio={} kind={} projected={} hits={}",
+						prio, node->kind_C,
+						r57Marker && r57Marker->valid ? 1 : 0, hit);
+			}
+			else
+			{
+				const auto scope =
+					(probe == 17)
+					? OutRunVR::GameSemantic::RenderScope::ScreenHud
+					: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+			}
+			// R56-18 deliberately tests whether a one-shot semantic survives from
+			// this exact producer to the eventual D3D draw. Cross-thread loss is a
+			// useful negative result, not a production policy.
+			if (probe == 18)
+				OutRunVR::GameSemantic::ArmNextDraw(
+					OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+		}
+
+		return result;
+	}
+
+
+	using DispRankSpraniFn =
+		int(__cdecl*)(std::uint32_t, float, float, int, int);
+
+	static int __cdecl DispRank_sprani(
+		std::uint32_t spriteId, float x, float y, int a4, int a5)
+	{
+		auto original = reinterpret_cast<DispRankSpraniFn>(
+			Module::exe_ptr(0x29530));
+		const int r57 = VRR57Mode();
+		const bool exactPositionOwner = r57 == 1 || r57 == 3 || r57 == 6;
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		if (exactPositionOwner)
+		{
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				tailsBefore[prio] = root ? root->tail_4 : nullptr;
+			}
+		}
+
+		int result = 0;
+		if (exactPositionOwner)
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = original(spriteId, x, y, a4, a5);
+		}
+		else
+		{
+			result = original(spriteId, x, y, a4, a5);
+		}
+
+		if (exactPositionOwner)
+		{
+			std::uint64_t tagged = 0;
+			for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+			{
+				SpriteNode* root = Game::sprite_prio_root[prio];
+				SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+				if (!root || !tailAfter || tailAfter == tailsBefore[prio])
+					continue;
+
+				SpriteNode* node = tailsBefore[prio]
+					? tailsBefore[prio]->next_0 : root->next_0;
+				for (unsigned guard = 0; node && guard < 0x230; ++guard)
+				{
+					OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+						node,
+						OutRunVR::GameSemantic::RenderScope::ScreenHud,
+						nullptr,
+						OutRunVR::GameSemantic::SpriteNodeOwner::DispRank);
+					++tagged;
+					if (node == tailAfter)
+						break;
+					node = node->next_0;
+				}
+			}
+
+			static std::atomic<std::uint64_t> directPositionKind1Tags{ 0 };
+			const auto total = directPositionKind1Tags.fetch_add(
+				tagged, std::memory_order_relaxed) + tagged;
+			if (tagged != 0 && (total & (total - 1)) == 0)
+				spdlog::info(
+					"VR R59 DIRECT SPRANI: owner=position kind=1 tagged={} total={}",
+					tagged, total);
+		}
+		return result;
+	}
+
+	template<std::uintptr_t CallerRva>
+	static int __cdecl DispRank_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		constexpr auto producerScope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			producerScope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispRank clip callsite must remain canonical SCREEN_HUD");
+
+		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
+		AddSpriteSpacing(&x, false);
+
+		const int probe = VRHudProbeMode();
+		if (probe == 5) x += 96;
+		else if (probe == 6) x -= 96;
+		else if (probe == 7)
+			x = 320 + int((float(x) - 320.0f) * 0.35f);
+		else if (probe == 8)
+			x = 320;
+		else if (probe == 19)
+			OutRunVR::GameSemantic::ArmNextDraw(producerScope);
+
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		const int r57 = VRR57Mode();
+		int result = 0;
+		if (r57 == 2 || r57 == 3 || r57 == 6)
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				producerScope);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+		else
+		{
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		// R120/F13: the exact DispRank clip callsite selects ownership from the
+		// shared disassembly producer map. Preserve R57's proven direct node pin,
+		// but do not duplicate SCREEN_HUD classification in this runtime path.
+		if (r57 == 2 || r57 == 3 || r57 == 6)
+		{
+			root = Game::sprite_prio_root[prio];
+			SpriteNode* node = root ? root->tail_4 : nullptr;
+			if (node && node != tailBefore)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node,
+					producerScope,
+					nullptr,
+					OutRunVR::GameSemantic::SpriteNodeOwner::DispRank);
+				static std::atomic<std::uint64_t> directPositionTags{ 0 };
+				const auto hit = directPositionTags.fetch_add(
+					1, std::memory_order_relaxed) + 1;
+				if ((hit & (hit - 1)) == 0)
+					spdlog::info(
+						"VR R120 DIRECT CLIP: shared producer-map rva=0x{:x} prio={} kind={} hits={}",
+						CallerRva, prio, node->kind_C, hit);
+			}
+		}
+		return result;
+	}
+
+	static int __cdecl OptionArrow_putClipSprite(
+		int xstnum, int x, int y, std::uint32_t flags,
+		float priority, std::uint32_t color)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = Game::put_clip_sprite(
+				xstnum, x, y, flags, priority, color);
+		}
+
+		// R66 review pass 5: exact option-arrow callsites are proven, but the
+		// 4th+ rank history showed that a nested producer scope alone can be lost
+		// before queue consumption. Pin the one node appended by put_clip_sprite.
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			static std::atomic<std::uint64_t> directArrowTags{ 0 };
+			const auto hit = directArrowTags.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR R66 OPTION ARROW: exact node pinned prio={} kind={} hits={}",
+					prio, node->kind_C, hit);
+		}
+		return result;
+	}
+
+	using TextGlyphPutSpriteFn =
+		int(__cdecl*)(SPRARGS*, float);
+
+	static int __cdecl TextGlyph_putSprite(
+		SPRARGS* args, float priority)
+	{
+		auto original = reinterpret_cast<TextGlyphPutSpriteFn>(
+			Module::exe_ptr(0x2CFE0));
+
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			result = original(args, priority);
+		}
+
+		// R68: canonical glyph rendering is deferred through the SpriteNode
+		// queue. Producer scope alone expires before the later queue draw.
+		// Pin only the node appended by the verified 0x2C808/0x2C9DB glyph edges.
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+		{
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			static std::atomic<std::uint64_t> glyphTags{ 0 };
+			const auto hit = glyphTags.fetch_add(
+				1, std::memory_order_relaxed) + 1;
+			if ((hit & (hit - 1)) == 0)
+				spdlog::info(
+					"VR R68 TEXT GLYPH: canonical node pinned prio={} kind={} hits={}",
+					prio, node->kind_C, hit);
+		}
+		return result;
+	}
+
+	enum SpriteScaleType
+	{
+		Disabled = 0,
+		DetectEdges = 1,
+		ForceLeft = 2,
+		ForceRight = 3
+	};
+
+	static inline SpriteScaleType ScalingType = SpriteScaleType::Disabled;
+
+	static inline SafetyHookMid drawFootage{};
+	static void drawFootage_dest(safetyhook::Context& ctx)
+	{
+		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		if (mode == ScalingMode::OnlineArcade && ScalingType != SpriteScaleType::Disabled)
+		{
+			float spacing = -((Game::screen_scale->y * Game::original_resolution.x) - Game::screen_resolution->x) / 2;
+
+			// Space out the UI elements if they're on the sides of the screen
+			float* m = *Module::exe_ptr<float*>(0x49B564);
+			float x = m[12];
+
+			float add = 0;
+			if (ScalingType == SpriteScaleType::ForceLeft || ScalingType == SpriteScaleType::DetectEdges && x < SCREEN_ONE_THIRD)
+				add = -(spacing / Game::screen_scale->x);
+			if (ScalingType == SpriteScaleType::ForceRight || ScalingType == SpriteScaleType::DetectEdges && x >= SCREEN_TWO_THIRD)
+				add = (spacing / Game::screen_scale->x);
+
+			m[12] = x + add;
+		}
+	}
+	static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite_hk{};
+	static void draw_sprite_custom_matrix_multi_CenterSprite(safetyhook::Context& ctx)
+	{
+		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		if (mode != ScalingMode::KeepCentered && mode != ScalingMode::OnlineArcade)
+			return;
+
+		float* vtxStream = (float*)(ctx.ecx);
+
+		float scale = min(Game::screen_scale->x, Game::screen_scale->y);
+		float centering = (Game::screen_resolution->x - (Game::original_resolution.x * scale)) / 2;
+
+		float x1 = vtxStream[0];
+		float x2 = vtxStream[9];
+		float x3 = vtxStream[18];
+		float x4 = vtxStream[27];
+
+		vtxStream[0] = ((vtxStream[0] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[9] = ((vtxStream[9] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[18] = ((vtxStream[18] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[27] = ((vtxStream[27] / Game::screen_scale->x) * scale) + centering;
+	}
+
+	static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite2_hk{};
+	static void draw_sprite_custom_matrix_multi_CenterSprite2(safetyhook::Context& ctx)
+	{
+		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		if (mode != ScalingMode::KeepCentered && mode != ScalingMode::OnlineArcade)
+			return;
+
+		float* vtxStream = (float*)(ctx.esp + 0x80);
+
+		float scale = min(Game::screen_scale->x, Game::screen_scale->y);
+		float centering = (Game::screen_resolution->x - (Game::original_resolution.x * scale)) / 2;
+
+		float x1 = vtxStream[0];
+		float x2 = vtxStream[11];
+		float x3 = vtxStream[22];
+		float x4 = vtxStream[33];
+
+		vtxStream[0] = ((vtxStream[0] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[11] = ((vtxStream[11] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[22] = ((vtxStream[22] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[33] = ((vtxStream[33] / Game::screen_scale->x) * scale) + centering;
+	}
+
+	static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite3_hk{};
+	static void draw_sprite_custom_matrix_multi_CenterSprite3(safetyhook::Context& ctx)
+	{
+		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		if (mode != ScalingMode::KeepCentered && mode != ScalingMode::OnlineArcade)
+			return;
+
+		float* vtxStream = (float*)(ctx.edx);
+
+		float scale = min(Game::screen_scale->x, Game::screen_scale->y);
+		float centering = (Game::screen_resolution->x - (Game::original_resolution.x * scale)) / 2;
+
+		float x1 = vtxStream[0];
+		float x2 = vtxStream[13];
+		float x3 = vtxStream[26];
+		float x4 = vtxStream[39];
+
+		vtxStream[0] = ((vtxStream[0] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[13] = ((vtxStream[13] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[26] = ((vtxStream[26] / Game::screen_scale->x) * scale) + centering;
+		vtxStream[39] = ((vtxStream[39] / Game::screen_scale->x) * scale) + centering;
+	}
+
+	static void SpriteSpacingEnable(safetyhook::Context& ctx)
+	{
+		ScalingType = SpriteScaleType::DetectEdges;
+	}
+	static void SpriteSpacingDisable(safetyhook::Context& ctx)
+	{
+		ScalingType = SpriteScaleType::Disabled;
+	}
+	static void SpriteSpacingForceLeft(safetyhook::Context& ctx)
+	{
+		ScalingType = SpriteScaleType::ForceLeft;
+	}
+	static void SpriteSpacingForceRight(safetyhook::Context& ctx)
+	{
+		ScalingType = SpriteScaleType::ForceRight;
+	}
+
+	// NaviPub_Disp
+	static inline SafetyHookMid NaviPub_Disp_SpriteSpacingEnable_hk{};
+	static inline SafetyHookMid NaviPub_Disp_SpriteSpacingEnable2_hk{};
+
+	static inline SafetyHookMid NaviPub_Disp_SpriteSpacingDisable_hk{};
+	static inline SafetyHookMid NaviPub_Disp_SpriteSpacingDisable2_hk{};
+
+	// dispMarkerCheck
+	static inline SafetyHookMid dispMarkerCheck_SpriteScalingDisable_hk{};
+
+	// DispTimeAttack2D
+	static inline SafetyHookMid DispTimeAttack2D_SpriteScalingForceRight_hk{};
+	static inline SafetyHookMid DispTimeAttack2D_SpriteScalingForceLeft_hk{};
+	static inline SafetyHookMid DispTimeAttack2D_SpriteScalingDisable_hk{};
+	static inline SafetyHookMid DispTimeAttack2D_SpriteScalingForceEnable_hk{};
+
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk2{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk3{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk4{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk5{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk6{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk7{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk8{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk9{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk10{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk11{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk12{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk13{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk14{};
+	static inline SafetyHookMid DispTimeAttack2D_put_scroll_AdjustPosition_hk15{};
+
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk1{};
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk2{};
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk3{};
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk4{};
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk5{};
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk6{};
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk7{};
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk8{};
+	static inline SafetyHookMid DispRank_put_scroll_AdjustPosition_hk9{};
+
+	static inline SafetyHookMid DispGearPosition_put_scroll_AdjustPosition_hk1{};
+	static inline SafetyHookMid DispGearPosition_put_scroll_AdjustPosition_hk2{};
+	static inline SafetyHookMid DispGearPosition_put_scroll_AdjustPosition_hk3{};
+
+	template <typename T>
+	static void AddSpriteSpacing(T* value, bool left)
+	{
+		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		if (mode != ScalingMode::OnlineArcade)
+			return;
+
+		float spacing = -((Game::screen_scale->y * Game::original_resolution.x) - Game::screen_resolution->x) / 2;
+		spacing = spacing / Game::screen_scale->x;
+
+		// round our spacing value to nearest if this is integer, fixes REV indicator light being slightly offset
+		if constexpr (std::is_integral_v<T>)
+			spacing = std::round(spacing);
+
+		if(left)
+			*value = T(float(*value) - spacing);
+		else
+			*value = T(float(*value) + spacing);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void C2CDontLoseGF_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CDontLoseGF callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R123 GF WARNING HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void C2CTestSlipstream_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CTestSlipstream callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R122 SLIPSTREAM HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void TimeRecord_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		// R119/F13: these exact producer callsites now consume the shared
+		// disassembly contract used by DX11/DXVK analysis instead of duplicating
+		// SCREEN_HUD ownership locally. Keep the existing immediate handoff
+		// behavior, but fail the build if the canonical producer map drifts.
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispTimeAttack2D callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R119 TIME HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+	template<std::uintptr_t CallerRva>
+	static void DispGearPosition_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), true);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispGearPosition callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R124 GEAR REV HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	// R66: NaviPub_DispTimeAttackGoal (RVA 0xBEA50) does not execute the
+	// DispTimeAttack2D callsites above. Disassembly proves it calls only
+	// 0xBE020 and 0xBE150 after the 120-frame gate. Own only those two exact
+	// caller edges and tag every SpriteNode they append as SCREEN_HUD.
+	using GoalTimeHelperFn = void(__cdecl*)();
+
+	template<std::uintptr_t CallerRva, int HelperRva>
+	static void GoalTime_TagHelper(const char* label)
+	{
+		constexpr auto producerScope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			producerScope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"TimeAttackGoal callsite must remain canonical SCREEN_HUD");
+
+		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			tailsBefore[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		{
+			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
+				producerScope);
+			auto original = reinterpret_cast<GoalTimeHelperFn>(
+				Module::exe_ptr(HelperRva));
+			original();
+		}
+
+		std::uint64_t tagged = 0;
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == tailsBefore[prio])
+				continue;
+
+			SpriteNode* node = tailsBefore[prio]
+				? tailsBefore[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < 0x230; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, producerScope);
+				++tagged;
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+
+		static std::atomic<std::uint64_t> calls{ 0 };
+		static std::atomic<std::uint64_t> nodes{ 0 };
+		const auto call = calls.fetch_add(1, std::memory_order_relaxed) + 1;
+		const auto total = nodes.fetch_add(tagged, std::memory_order_relaxed) + tagged;
+		if ((call & (call - 1)) == 0)
+			spdlog::info(
+				"VR R121 GOAL TIME HUD: shared producer-map rva=0x{:x} helper={} calls={} tagged={} totalTags={}",
+				CallerRva, label, call, tagged, total);
+	}
+
+	static void __cdecl GoalTime_Help020()
+	{
+		GoalTime_TagHelper<0x000BEA5Au, 0xBE020>("BE020");
+	}
+
+	static void __cdecl GoalTime_Help150()
+	{
+		GoalTime_TagHelper<0x000BEA5Fu, 0xBE150>("BE150");
+	}
+
+	// R56 05-08/19: exact DispRank producer probe. The eight original-mod
+	// callsites all pass the rank/POSITION horizontal coordinate at ESP+4.
+	static void DispRankProbe_AdjustPosition(safetyhook::Context& ctx)
+	{
+		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
+		int* x = reinterpret_cast<int*>(ctx.esp + 4);
+		AddSpriteSpacing(x, false);
+		const int probe = VRHudProbeMode();
+		if (probe == 5) *x += 96;
+		else if (probe == 6) *x -= 96;
+		else if (probe == 7)
+			*x = 320 + int((float(*x) - 320.0f) * 0.35f);
+		else if (probe == 8)
+			*x = 320;
+		else if (probe == 19)
+			OutRunVR::GameSemantic::ArmNextDraw(
+				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+	}
+
+	// PutGhostGapInfo
+	static inline SafetyHookMid PutGhostGapInfo_AdjustPosition_hk{};
+	template<std::uintptr_t CallerRva>
+	static void PutGhostGapInfo_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		bool left = false;
+		int* val = (int*)&ctx.ebp;
+		if (*val == 102)
+			left = true;
+
+		AddSpriteSpacing(val, left);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"PutGhostGapInfo callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R125 GHOST GAP INFO HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	// Fix position of the "Ghost/You/Diff" sprites shown with ghost car info
+	// Online arcade doesn't seem to adjust this, maybe was left broken in that? (it's needed for 21:9 at least...)
+	static inline SafetyHookMid PutGhostGapInfo_sub_AdjustPosition_hk{};
+	template<std::uintptr_t CallerRva>
+	static void PutGhostGapInfo_sub_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
+	{
+		bool left = false;
+		float* val = &ctx.xmm0.f32[0];
+		if (*val == 4.0f)
+			left = true;
+
+		AddSpriteSpacing(val, left);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"PutGhostGapInfo_sub callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R126 GHOST GAP SUB HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	// DispGhostGap
+	static inline SafetyHookMid DispGhostGap_ForceLeft_hk{};
+	static inline SafetyHookMid DispGhostGap_ForceLeft2_hk{};
+	static inline SafetyHookMid DispGhostGap_ForceRight_hk{};
+	static inline SafetyHookMid DispGhostGap_ForceRight2_hk{};
+
+	template<std::uintptr_t CallerRva, bool ForceLeft>
+	static void DispGhostGap_ForceSpacingAndHud(safetyhook::Context& ctx)
+	{
+		if constexpr (ForceLeft)
+			SpriteSpacingForceLeft(ctx);
+		else
+			SpriteSpacingForceRight(ctx);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispGhostGap callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R127 GHOST GAP FORCE HUD: shared producer-map handoff rva=0x{:x} side={} hits={}",
+				CallerRva, ForceLeft ? "left" : "right", hit);
+	}
+
+	// NaviPub_DispTimeAttackGoal
+	static inline SafetyHookMid NaviPub_DispTimeAttackGoal_DisableScaling_hk{};
+
+	// Heart totals
+	static inline SafetyHookMid NaviPub_Disp_HeartDisableScaling_hk{};
+	static inline SafetyHookMid NaviPub_Disp_HeartEnableScaling_hk{};
+	static inline SafetyHookMid NaviPub_Disp_C2CHeartDisableScaling_hk{};
+	static inline SafetyHookMid NaviPub_Disp_C2CHeartEnableScaling_hk{};
+	static inline SafetyHookMid NaviPub_Disp_C2CHeartEnableScaling2_hk{};
+
+	static inline SafetyHookMid NaviPub_Disp_C2CFruitDisableScaling_hk{};
+	static inline SafetyHookMid NaviPub_Disp_C2CFruitEnableScaling_hk{};
+
+	static inline SafetyHookMid NaviPub_Disp_RivalDisableScaling_hk{};
+	static inline SafetyHookMid NaviPub_Disp_RivalEnableScaling_hk{};
+	static inline SafetyHookMid NaviPub_Disp_RivalOnlineDisableScaling_hk{};
+	static inline SafetyHookMid NaviPub_Disp_RivalOnlineEnableScaling_hk{};
+
+	static inline SafetyHookMid ctrl_icon_work_AdjustPosition_hk{};
+	template<std::uintptr_t CallerRva>
+	static void ctrl_icon_work_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing(&ctx.xmm0.f32[0], false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"ctrl_icon_work callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R129 CTRL ICON HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	static inline SafetyHookMid ctrl_icon_work_AdjustPosition2_hk{};
+	static inline SafetyHookMid set_icon_work_AdjustPosition_hk{};
+	template<std::uintptr_t CallerRva>
+	static void ctrl_icon_work_AdjustPosition2AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing(&ctx.xmm0.f32[0], false);
+		*(float*)(ctx.esp) = ctx.xmm0.f32[0];
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"ctrl_icon_work stack-write callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R129 CTRL ICON HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	static inline SafetyHookMid DispTempHeartNum_AdjustPosition_hk{};
+	template<std::uintptr_t CallerRva>
+	static void DispTempHeartNum_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispTempHeartNum callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R128 TEMP HEART HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk1{};
+	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk2{};
+	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk3{};
+	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk4{};
+	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk5{};
+	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk6{};
+	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk7{};
+
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk1{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk2{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk3{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk4{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk5{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk6{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk7{};
+	static inline SafetyHookMid C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk1{};
+	static inline SafetyHookMid C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk2{};
+	static inline SafetyHookMid C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk3{};
+	static inline SafetyHookMid C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk4{};
+
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk8{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk9{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk10{};
+
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk11{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk12{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk13{};
+	static inline SafetyHookMid C2CSpeechBubbleGF_AdjustPositionESP0_hk14{};
+
+	static inline SafetyHookMid C2CDontLoseGF_AdjustPosition_hk1{};
+	static inline SafetyHookMid C2CDontLoseGF_AdjustPosition_hk2{};
+	static inline SafetyHookMid C2CDontLoseGF_AdjustPosition_hk3{};
+	static inline SafetyHookMid C2CTestSlipstream_AdjustPosition_hk{};
+
+	static void C2CSpeechBubble_AdjustPositionESP0(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void C2CSpeechBubble_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubble callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R132 C2C SPEECH HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void C2CSpeechBubbleGF_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubbleGF callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R133 GF SPEECH HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void C2CSpeechBubbleRank_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubbleGF rank callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R130 SPEECH RANK HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva, int StackOffset>
+	static void C2CSpeechBubbleGFInitial_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp + StackOffset), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubbleGF initial-position callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R131 GF SPEECH INITIAL HUD: shared producer-map handoff rva=0x{:x} stackOffset={} hits={}",
+				CallerRva, StackOffset, hit);
+	}
+
+	static void C2CSpeechBubble_AdjustPositionESP4(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp + 4), false);
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "UIScaling";
+	}
+
+	bool validate() override
+	{
+		return Settings::UIScalingMode > 0;
+	}
+
+	void declare_settings() override
+	{
+		Settings::UIScalingMode.needs_restart([] {
+			// apply() nops 0x293 bytes of the original sprite path, so mode 0 can't
+			// be returned to. 1 and 2 only change what the hooks read.
+			return (Settings::UIScalingMode.startup_value() == 0) != (Settings::UIScalingMode.get() == 0);
+		});
+	}
+
+	bool apply() override
+	{
+		Memory::VP::Nop(Module::exe_ptr(draw_sprite_custom_matrix_mid_Addr), 0x293);
+
+		draw_sprite_custom_matrix_hk = safetyhook::create_mid(Module::exe_ptr(draw_sprite_custom_matrix_mid_Addr), draw_sprite_custom_matrix_mid);
+
+		// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
+		D3DXMatrixTransformation2D = safetyhook::create_inline(Module::exe_ptr(D3DXMatrixTransformation2D_Addr), D3DXMatrixTransformation2D_dest);
+
+		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
+
+		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
+		for (int addr : RankMarker_SpraniCalls)
+			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_sprani, Memory::HookType::Call);
+		for (int addr : RankMarker_ClipSpriteCalls)
+			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_putClipSprite, Memory::HookType::Call);
+		for (int addr : OptionArrow_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), OptionArrow_putClipSprite,
+				Memory::HookType::Call);
+
+		NaviPub_Disp_SpriteSpacingEnable_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable_Addr), SpriteSpacingEnable);
+		NaviPub_Disp_SpriteSpacingEnable2_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable2_Addr), SpriteSpacingEnable);
+		NaviPub_Disp_SpriteSpacingDisable_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleDisable_Addr), SpriteSpacingDisable);
+		NaviPub_Disp_SpriteSpacingDisable2_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleDisable2_Addr), SpriteSpacingDisable);
+		NaviPub_Disp_HeartDisableScaling_hk = safetyhook::create_mid((void*)0x4BEBE1, SpriteSpacingDisable);
+		NaviPub_Disp_HeartEnableScaling_hk = safetyhook::create_mid((void*)0x4BEBE6, SpriteSpacingEnable);
+
+		NaviPub_Disp_C2CHeartDisableScaling_hk = safetyhook::create_mid((void*)0x481B76, SpriteSpacingDisable);
+		NaviPub_Disp_C2CHeartEnableScaling_hk = safetyhook::create_mid((void*)0x4BECBA, SpriteSpacingEnable);
+		NaviPub_Disp_C2CHeartEnableScaling2_hk = safetyhook::create_mid((void*)0x4BECE0, SpriteSpacingEnable);
+
+		NaviPub_Disp_C2CFruitDisableScaling_hk = safetyhook::create_mid((void*)0x481A86, SpriteSpacingDisable);
+		NaviPub_Disp_C2CFruitEnableScaling_hk = safetyhook::create_mid((void*)0x481A8B, SpriteSpacingEnable);
+
+		NaviPub_Disp_RivalDisableScaling_hk = safetyhook::create_mid((void*)0x4BEB8E, SpriteSpacingDisable);
+		NaviPub_Disp_RivalEnableScaling_hk = safetyhook::create_mid((void*)0x4BEBAF, SpriteSpacingEnable);
+		NaviPub_Disp_RivalOnlineDisableScaling_hk = safetyhook::create_mid((void*)0x4BEC83, SpriteSpacingDisable);
+		NaviPub_Disp_RivalOnlineEnableScaling_hk = safetyhook::create_mid((void*)0x4BEC88, SpriteSpacingEnable);
+
+		// dispMarkerCheck is called by all three rival-marker functions, hopefully can fix them all
+		dispMarkerCheck_SpriteScalingDisable_hk = safetyhook::create_mid((void*)0x4BA0E0, SpriteSpacingDisable);
+
+		drawFootage = safetyhook::create_mid(Module::exe_ptr(drawFootage_caller_Addr), drawFootage_dest);
+
+		// Hook the DrawPrimitiveUP call inside the three custom_matrix_multi cases so we can fix up X position
+		// (except case3 doesn't point to the scaled-position-array for some reason, so we have to hook slightly earlier)
+		draw_sprite_custom_matrix_multi_CenterSprite_hk = safetyhook::create_mid(Module::exe_ptr(draw_sprite_custom_matrix_multi__case2_Addr), draw_sprite_custom_matrix_multi_CenterSprite);
+		draw_sprite_custom_matrix_multi_CenterSprite2_hk = safetyhook::create_mid(Module::exe_ptr(draw_sprite_custom_matrix_multi__case3_Addr), draw_sprite_custom_matrix_multi_CenterSprite2);
+		draw_sprite_custom_matrix_multi_CenterSprite3_hk = safetyhook::create_mid(Module::exe_ptr(draw_sprite_custom_matrix_multi__case4_Addr), draw_sprite_custom_matrix_multi_CenterSprite3);
+
+		// Fixes for the time displays in time attack mode
+		DispTimeAttack2D_SpriteScalingForceRight_hk = safetyhook::create_mid((void*)0x4BE4BC, SpriteSpacingForceRight);
+		DispTimeAttack2D_SpriteScalingDisable_hk = safetyhook::create_mid((void*)0x4BE4C1, SpriteSpacingDisable);
+		DispTimeAttack2D_SpriteScalingForceLeft_hk = safetyhook::create_mid((void*)0x4BE4E7, SpriteSpacingForceLeft);
+		DispTimeAttack2D_SpriteScalingForceEnable_hk = safetyhook::create_mid((void*)0x4BE575, SpriteSpacingEnable);
+
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, TimeRecord_AdjustPositionAndHud<0x000BE5CDu>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, TimeRecord_AdjustPositionAndHud<0x000BE603u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, TimeRecord_AdjustPositionAndHud<0x000BE633u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, TimeRecord_AdjustPositionAndHud<0x000BE66Du>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, TimeRecord_AdjustPositionAndHud<0x000BE690u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, TimeRecord_AdjustPositionAndHud<0x000BE6B5u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, TimeRecord_AdjustPositionAndHud<0x000BE6D5u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, TimeRecord_AdjustPositionAndHud<0x000BE8D8u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, TimeRecord_AdjustPositionAndHud<0x000BE915u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, TimeRecord_AdjustPositionAndHud<0x000BE94Au>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, TimeRecord_AdjustPositionAndHud<0x000BE97Au>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, TimeRecord_AdjustPositionAndHud<0x000BE9A3u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, TimeRecord_AdjustPositionAndHud<0x000BE7E8u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud<0x000BE802u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud<0x000BE81Cu>);
+
+		// R68 canonical font glyph ownership. Disassembly proves two
+		// independent character renderers call put_sprite_ex directly:
+		// 0x2C808 (alternate/compact glyph path, observed on finish name/time)
+		// and 0x2C9DB (existing proportional glyph path). Keep this exact;
+		// generic put_sprite_ex/put_sprite_ex2 also carry non-font sprites.
+		for (int addr : { 0x2C808, 0x2C9DB })
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr),
+				TextGlyph_putSprite, Memory::HookType::Call);
+
+		// R57 direct producer ownership: DispRank is a composite. Its first
+		// element uses sprani/SPRARGS2 (kind_C=1), while the remaining eight
+		// use put_clip_sprite/SPRARGS (kind_C=0).
+		Memory::VP::InjectHook(
+			Module::exe_ptr(DispRank_SpraniCall),
+			DispRank_sprani, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F3A),
+			DispRank_putClipSprite<0x000B9F3Au>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F5E),
+			DispRank_putClipSprite<0x000B9F5Eu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F81),
+			DispRank_putClipSprite<0x000B9F81u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9FD0),
+			DispRank_putClipSprite<0x000B9FD0u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9FFC),
+			DispRank_putClipSprite<0x000B9FFCu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA01E),
+			DispRank_putClipSprite<0x000BA01Eu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA035),
+			DispRank_putClipSprite<0x000BA035u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA052),
+			DispRank_putClipSprite<0x000BA052u>, Memory::HookType::Call);
+
+		// R124/F13: exact DispGearPosition/REV producer edges are canonical
+		// SCREEN_HUD in the shared disassembly map. Preserve left-side spacing
+		// correction while sourcing only the immediate draw owner from that map.
+		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid(
+			(void*)0x4B9096,
+			DispGearPosition_AdjustPositionAndHud<0x000B9096u>);
+		DispGearPosition_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid(
+			(void*)0x4B90B3,
+			DispGearPosition_AdjustPositionAndHud<0x000B90B3u>);
+		DispGearPosition_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid(
+			(void*)0x4B90F6,
+			DispGearPosition_AdjustPositionAndHud<0x000B90F6u>);
+
+		// R125/F13: exact PutGhostGapInfo producer edge 0xBDE3A is canonical
+		// GhostGap SCREEN_HUD. Preserve the original conditional spacing and
+		// source only the immediate next-draw owner from the shared map.
+		PutGhostGapInfo_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BDE3A,
+			PutGhostGapInfo_AdjustPositionAndHud<0x000BDE3Au>);
+		// R127/F13: the remaining four GhostGap spacing-state edges are inside
+		// the canonical GhostGap SCREEN_HUD producer range. Preserve the exact
+		// ForceLeft/ForceRight state transitions and source only the immediate
+		// next-draw owner from the shared backend-neutral producer map.
+		DispGhostGap_ForceLeft_hk = safetyhook::create_mid(
+			(void*)0x4BE045,
+			DispGhostGap_ForceSpacingAndHud<0x000BE045u, true>);
+		DispGhostGap_ForceLeft2_hk = safetyhook::create_mid(
+			(void*)0x4BE083,
+			DispGhostGap_ForceSpacingAndHud<0x000BE083u, true>);
+		DispGhostGap_ForceRight_hk = safetyhook::create_mid(
+			(void*)0x4BE0A5,
+			DispGhostGap_ForceSpacingAndHud<0x000BE0A5u, false>);
+		DispGhostGap_ForceRight2_hk = safetyhook::create_mid(
+			(void*)0x4BE067,
+			DispGhostGap_ForceSpacingAndHud<0x000BE067u, false>);
+
+		// R126/F13: exact PutGhostGapInfo_sub edge 0xBDAE8 is canonical
+		// GhostGap SCREEN_HUD. Preserve its float spacing correction while
+		// sourcing only the immediate next-draw owner from the shared map.
+		PutGhostGapInfo_sub_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BDAE8,
+			PutGhostGapInfo_sub_AdjustPositionAndHud<0x000BDAE8u>);
+
+		NaviPub_DispTimeAttackGoal_DisableScaling_hk = safetyhook::create_mid((void*)0x4BEA64, SpriteSpacingDisable);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBEA5A),
+			GoalTime_Help020, Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(0xBEA5F),
+			GoalTime_Help150, Memory::HookType::Call);
+
+		// adjusts the girlfriend request speech bubble
+		// R129/F13: all three existing ctrl/set icon position-correction edges
+		// are inside the canonical ctrl_icon_work SCREEN_HUD producer range.
+		// Preserve spacing/stack-write behavior and source only the immediate
+		// next-draw owner from the shared disassembly producer map.
+		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x460D40,
+			ctrl_icon_work_AdjustPositionAndHud<0x00060D40u>);
+		ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid(
+			(void*)0x460FBC,
+			ctrl_icon_work_AdjustPosition2AndHud<0x00060FBCu>);
+		set_icon_work_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x460A21,
+			ctrl_icon_work_AdjustPosition2AndHud<0x00060A21u>); // set_icon_work keeps the same stack-write correction
+
+		// R128/F13: exact DispTempHeartNum edge 0xBBA89 is canonical
+		// SCREEN_HUD. Preserve the existing negative-heart X correction and
+		// source only the immediate next-draw owner from the shared producer map.
+		DispTempHeartNum_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BBA89,
+			DispTempHeartNum_AdjustPositionAndHud<0x000BBA89u>);
+
+		// R132/F13: exact C2CSpeechBubble position-correction edges are all
+		// canonical SCREEN_HUD in the shared disassembly map. Preserve the
+		// original ESP0 spacing correction while sourcing only immediate
+		// next-draw ownership from the backend-neutral producer map.
+		C2CSpeechBubble_AdjustPositionESP0_hk1 = safetyhook::create_mid(
+			(void*)0x496AC7,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096AC7u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk2 = safetyhook::create_mid(
+			(void*)0x496B14,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B14u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk3 = safetyhook::create_mid(
+			(void*)0x496B39,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B39u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk4 = safetyhook::create_mid(
+			(void*)0x496B94,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B94u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk5 = safetyhook::create_mid(
+			(void*)0x496BE1,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096BE1u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk6 = safetyhook::create_mid(
+			(void*)0x496C10,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096C10u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk7 = safetyhook::create_mid(
+			(void*)0x496C6A,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096C6Au>);
+
+		// R133/F13: these six exact C2CSpeechBubbleGF position-correction
+		// edges are canonical HUD_GF_SPEECH SCREEN_HUD in the shared map.
+		// Preserve their original ESP0 spacing correction while sourcing only
+		// immediate next-draw ownership from the backend-neutral producer map.
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk1 = safetyhook::create_mid(
+			(void*)0x4FCDC1,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCDC1u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk2 = safetyhook::create_mid(
+			(void*)0x4FCDEA,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCDEAu>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk3 = safetyhook::create_mid(
+			(void*)0x4FCEB0,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCEB0u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk4 = safetyhook::create_mid(
+			(void*)0x4FCED9,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCED9u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk5 = safetyhook::create_mid(
+			(void*)0x4FCF22,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCF22u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk6 = safetyhook::create_mid(
+			(void*)0x4FCF4F,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCF4Fu>);
+
+		// unsure if this has any effect...
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk7 = safetyhook::create_mid((void*)0x4FE8B1, C2CSpeechBubble_AdjustPositionESP0);
+
+		// 4FD1A9 seemed related but no effect?
+		C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk1 = safetyhook::create_mid((void*)0x4FD60C, C2CSpeechBubble_AdjustPositionESP0);
+		C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk2 = safetyhook::create_mid((void*)0x4FD591, C2CSpeechBubble_AdjustPositionESP0);
+		C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk3 = safetyhook::create_mid((void*)0x4FD5CD, C2CSpeechBubble_AdjustPositionESP0);
+		C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk4 = safetyhook::create_mid((void*)0x4FD652, C2CSpeechBubble_AdjustPositionESP0);
+
+		// R130/F13: exact C2CSpeechBubbleGF rank emoji/text position edges are
+		// canonical SCREEN_HUD. Preserve the original ESP0 spacing correction
+		// and source only the immediate next-draw owner from the shared map.
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk8 = safetyhook::create_mid(
+			(void*)0x4FC84E,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC84Eu>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk9 = safetyhook::create_mid(
+			(void*)0x4FC882,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC882u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk10 = safetyhook::create_mid(
+			(void*)0x4FC8B4,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC8B4u>);
+
+		// R131/F13: exact C2CSpeechBubbleGF initial-position edges are canonical
+		// SCREEN_HUD. Preserve the original three ESP0 and one ESP4 spacing
+		// corrections while sourcing only immediate next-draw ownership from the
+		// shared backend-neutral producer map.
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk11 = safetyhook::create_mid(
+			(void*)0x4FC9EB,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FC9EBu, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk12 = safetyhook::create_mid(
+			(void*)0x4FCA1E,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCA1Eu, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk13 = safetyhook::create_mid(
+			(void*)0x4FCA51,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCA51u, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk14 = safetyhook::create_mid(
+			(void*)0x4FCB20,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCB20u, 4>);
+
+		// R123/F13: the three exact C2CDontLoseGF producer edges are all
+		// canonical SCREEN_HUD in the shared disassembly map. Preserve the
+		// original spacing correction and source only next-draw ownership there.
+		C2CDontLoseGF_AdjustPosition_hk1 = safetyhook::create_mid(
+			(void*)0x4BD397,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD397u>);
+		C2CDontLoseGF_AdjustPosition_hk2 = safetyhook::create_mid(
+			(void*)0x4BD414,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD414u>);
+		C2CDontLoseGF_AdjustPosition_hk3 = safetyhook::create_mid(
+			(void*)0x4BD472,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD472u>);
+
+		// R122/F13: exact C2CTestSlipstream producer is already canonical
+		// SCREEN_HUD in the shared disassembly map. Preserve the original spacing
+		// correction while sourcing the immediate draw owner from that map.
+		C2CTestSlipstream_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BD32E,
+			C2CTestSlipstream_AdjustPositionAndHud<0x000BD32Eu>);
+
+		return true;
+	}
+	static UIScaling instance;
+};
+
+UIScaling UIScaling::instance;
+
+// R63: isolate only exact PROJECTED_WORLD_MARKER_2D D3DXSprite draws.
+// R62 proved kind-0 rank markers are emitted as D3DXSprite fixed-function
+// batches (FVF 0x142). The HMD result then showed two rival rank quads can be
+// coalesced into one DrawIndexedPrimitive (prim=4), causing one vehicle anchor
+// to move both quads. Flush immediately after each projected D3DXSprite::Draw
+// while the current queue node/marker is still authoritative. Unlike rejected
+// R60, generic HUD and SCREEN_HUD batches are never flushed here.
+class VRProjectedD3DXSpriteIsolation : public Hook
+{
+	inline static SafetyHookInline Draw_hk{};
+	inline static std::atomic<std::uint64_t> Flushes{ 0 };
+	inline static std::atomic<std::uint64_t> Failures{ 0 };
+
+	static HRESULT __stdcall DrawDest(
+		void* self, IDirect3DTexture9* texture, const RECT* rect,
+		const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
+	{
+		const HRESULT hr = Draw_hk.stdcall<HRESULT>(
+			self, texture, rect, center, pos, color);
+		if (FAILED(hr))
+			return hr;
+
+		const auto scope =
+			OutRunVR::GameSemantic::EffectiveScope();
+		const auto* marker =
+			OutRunVR::GameSemantic::CurrentProjectedMarker();
+		const bool projectedRank =
+			OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+				scope) &&
+			marker && marker->valid;
+		const bool dispRankHud =
+			OutRunVR::GameSemantic::CorroboratesHud(scope) &&
+			OutRunVR::GameSemantic::CurrentSpriteOwner() ==
+				OutRunVR::GameSemantic::SpriteNodeOwner::DispRank;
+		if ((!projectedRank && !dispRankHud) || !self)
+			return hr;
+
+		void** vtable = *reinterpret_cast<void***>(self);
+		if (!vtable || !vtable[10])
+			return hr;
+
+		using FlushFn = HRESULT(__stdcall*)(void*);
+		const HRESULT flushHr =
+			reinterpret_cast<FlushFn>(vtable[10])(self);
+		const auto hit = Flushes.fetch_add(
+			1, std::memory_order_relaxed) + 1;
+		if (FAILED(flushHr))
+			Failures.fetch_add(1, std::memory_order_relaxed);
+
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R64 D3DX ISOLATE: owner={} flushes={} failures={} markerValid={}",
+				projectedRank ? "projected-rank" : "disprank-hud",
+				hit,
+				Failures.load(std::memory_order_relaxed),
+				marker && marker->valid ? 1 : 0);
+		return hr;
+	}
+
+	static DWORD WINAPI InstallThread(void*)
+	{
+		for (int attempt = 0; attempt < 7200; ++attempt)
+		{
+			void* sprite = *Module::exe_ptr<void*>(0x55B218);
+			if (sprite)
+			{
+				void** vtable = *reinterpret_cast<void***>(sprite);
+				if (vtable && vtable[9] && vtable[10])
+				{
+					const auto disabled =
+						safetyhook::InlineHook::StartDisabled;
+					Draw_hk = safetyhook::create_inline(
+						vtable[9],
+						reinterpret_cast<void*>(&DrawDest),
+						disabled);
+					if (Draw_hk &&
+						Draw_hk.enable().has_value())
+					{
+						spdlog::info(
+							"VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE; generic HUD batching untouched");
+						return 0;
+					}
+					Draw_hk = {};
+				}
+			}
+			Sleep(25);
+		}
+		spdlog::warn(
+			"VR R63 PROJECTED D3DX ISOLATE: ID3DXSprite Draw hook unavailable; R62 behavior retained");
+		return 0;
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRProjectedD3DXSpriteIsolationR63";
+	}
+	bool validate() override
+	{
+		return Settings::VREnabled.get();
+	}
+	bool apply() override
+	{
+		HANDLE thread = CreateThread(
+			nullptr, 0, InstallThread, nullptr, 0, nullptr);
+		if (!thread)
+			return false;
+		CloseHandle(thread);
+		return true;
+	}
+	static VRProjectedD3DXSpriteIsolation instance;
+};
+VRProjectedD3DXSpriteIsolation
+	VRProjectedD3DXSpriteIsolation::instance;
+
+// VR semantic bridge for the game's canonical queued 2D renderer.
+// Canonical replacement EXE SHA256:
+// 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
+// Static reverse analysis proves:
+//   RVA 0x2D734 = queue-entry context only; DO NOT hook this address,
+//   RVA 0x2D762 = per-node iteration with EDI = SpriteNode*,
+//   RVA 0x2DCB4 = common epilogue.
+// Runtime crash signatures at EXE+0x2D738 and EXE+0x2D73E proved that a
+// SafetyHookMid at 0x2D734 can resume inside the relocated prologue.
+// Queue scope therefore starts lazily at the first real node (0x2D762).
+// This is deliberately semantic, not a draw-state heuristic. The queue hook
+// selects an explicit tag when present. Untagged nodes use SCREEN_OVERLAY_2D:
+    // asymmetric-FOV alignment only, never finite HUD-plane/world-lock. Exact
+    // producer/call-site evidence may register SCREEN_HUD or WORLD_BILLBOARD.
+class VRHudQueueSemanticBridge : public Hook
+{
+	inline static SafetyHookMid QueueNode_hk{};
+	inline static SafetyHookMid QueueEnd_hk{};
+	inline static std::uint64_t QueuePasses = 0;
+	inline static std::uint64_t LastRegistered = 0;
+	inline static std::uint64_t LastConsumed = 0;
+	inline static std::uint64_t LastStaleCleared = 0;
+
+	static void QueueNode(SafetyHookContext& ctx)
+	{
+		OutRunVR::GameSemantic::SelectSpriteQueueNode(
+			reinterpret_cast<const void*>(ctx.edi));
+	}
+
+	static void QueueEnd(SafetyHookContext&)
+	{
+		OutRunVR::GameSemantic::EndSpriteQueueRender();
+		++QueuePasses;
+		if ((QueuePasses % 300u) != 0)
+			return;
+
+		const auto registered =
+			OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+				std::memory_order_relaxed);
+		const auto consumed =
+			OutRunVR::GameSemantic::SpriteNodeSemanticConsumed.load(
+				std::memory_order_relaxed);
+		const auto staleCleared =
+			OutRunVR::GameSemantic::SpriteNodeSemanticStaleCleared.load(
+				std::memory_order_relaxed);
+		if (registered != LastRegistered ||
+			consumed != LastConsumed ||
+			staleCleared != LastStaleCleared)
+		{
+			spdlog::info(
+				"VR HUD SEMANTIC R53: queuePass={} registered={} consumed={} staleCleared={} deltaRegistered={} deltaConsumed={}",
+				QueuePasses, registered, consumed, staleCleared,
+				registered - LastRegistered, consumed - LastConsumed);
+			LastRegistered = registered;
+			LastConsumed = consumed;
+			LastStaleCleared = staleCleared;
+		}
+	}
+
+public:
+	std::string_view description() override
+	{
+		return "VRHudQueueSemanticBridge";
+	}
+
+	bool validate() override
+	{
+		return Settings::VREnabled.get();
+	}
+
+	bool apply() override
+	{
+		char modeText[8]{};
+		// R66: sticky exact queue ownership (mode 2) is the proven R57/R64
+		// baseline. Keep env=0 available only as an explicit diagnostic rollback.
+		int experimentMode = 2;
+		if (GetEnvironmentVariableA(
+				"OUTRUN_VR_HUD_EXPERIMENT_MODE",
+				modeText, static_cast<DWORD>(sizeof(modeText))) > 0 &&
+			modeText[0] >= '0' && modeText[0] <= '4')
+			experimentMode = modeText[0] - '0';
+		OutRunVR::GameSemantic::SetHudExperimentMode(experimentMode);
+
+		QueueNode_hk = safetyhook::create_mid(
+			Module::exe_ptr(0x2D762), QueueNode);
+		QueueEnd_hk = safetyhook::create_mid(
+			Module::exe_ptr(0x2DCB4), QueueEnd);
+
+		const bool ok = QueueNode_hk && QueueEnd_hk;
+		if (!ok)
+		{
+			// The semantic bridge is all-or-nothing. Never leave a partial
+			// queue hook alive after a failed install.
+			QueueNode_hk = {};
+			QueueEnd_hk = {};
+		}
+		if (ok)
+		{
+			spdlog::info(
+				"VR HUD SEMANTIC R54: experimentMode={} sprite queue node 0x2D762 consumes explicit tags; mode1=next-draw latch mode2=sticky mode3=full owner mode4=full HUD-plane", experimentMode);
+		}
+		else
+		{
+			spdlog::error(
+				"VR HUD SEMANTIC: failed to install canonical sprite-queue ownership hooks; semantic HUD promotion disabled");
+		}
+		return ok;
+	}
+
+	static VRHudQueueSemanticBridge instance;
+};
+VRHudQueueSemanticBridge VRHudQueueSemanticBridge::instance;

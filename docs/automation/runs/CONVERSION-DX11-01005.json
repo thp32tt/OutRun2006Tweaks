@@ -1,0 +1,185 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01005",
+  "production_id": "CONVERSION-DX11-01005",
+  "event_id": "CONVERSION-DX11-01005-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01005",
+  "work_key": "DX11:LIVE_GAME_SM3_PROGRAMMABLE_TABLE_Z_FOG_GPU_DRAW",
+  "feature_id": "DX11:LIVE_GAME_SM3_PROGRAMMABLE_TABLE_Z_FOG_GPU_DRAW",
+  "work_class": "integration",
+  "milestone_id": "full_resolution_native_game_frame",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "f464e4813b57069348fb158658413b99f5fcfc98",
+  "material_result_sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a",
+  "validation_bearing_result_sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a",
+  "result_sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "summary": "C++/HLSL integration: real D3D9 SM3 programmable menu/vehicle/race Draw/DrawIndexed source Z-table EXP/EXP2/LINEAR fog admission and per-draw D3D11 pixel post-shader RGB via b4 constants; preserve alpha, live shader cache identity, device Reset and original D3D9 Draw/input/FFB fallback. Explicit W/vertex/range fog, sRGB and unknown state fail closed. Five exact material SHA Gates SUCCESS plus isolated WARP; actual game/Quest3 pixels and 72Hz UNTESTED. C6 is docs-only and NOT a replacement validation commit.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_GAME_SM3_PROGRAMMABLE_TABLE_Z_FOG_GPU_DRAW",
+    "goal": "Translate provable genuine programmable SM3 Z table-fog game Draw/DrawIndexed into native DX11 pixel output while retaining fail-closed original D3D9 game rendering and input.",
+    "acceptance_items": [
+      {
+        "id": "game_fog_native_gpu_shader_and_state",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_D3D9_render_state_to_D3D11_PS_GPU_Draw",
+        "expected_behavior": "Read authentic per-draw table fog mode/color/start/end/density; inject RGB fog after original pixel shader alpha test, bind fog b4 PS constant buffer, dispatch genuine native Draw/DrawIndexed with fog-specific shader cache identity."
+      },
+      {
+        "id": "original_game_fallback_and_negative_fog_admission",
+        "category": "fallback_regression",
+        "behavior_area": "native_gpu_safety_DX9Ex_input_FFB",
+        "expected_behavior": "Prove ZFOG without WFOG and no vertex/range fog/sRGB, reject malformed or unsupported fog and create errors without replacing original D3D9 drawing/gamepad/FFB."
+      },
+      {
+        "id": "exact_SHA_positive_negative_and_five_Gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable_CPP_HLSL_and_five_GitHub_Actions",
+        "expected_behavior": "Real C++/HLSL/bridge binding positive and negative coverage in required Fast, and five mandatory exact-SHA Actions SUCCESS. Runtime/HMD remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game_fog_native_gpu_shader_and_state": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/live_game_sm3_table_fog.hpp"
+      ],
+      "runtime_validation": "UNTESTED",
+      "validation_command": "python tools/test_dx11_live_sm3_table_zfog_01005.py in DX11 Fast run 39748222650 SUCCESS, exact 01005 source SHA b55bd1b2a9f6171828e6093b28d40abf12c7728a; static/portable C++ and HLSL integration only; game/HMD UNTESTED"
+    },
+    "original_game_fallback_and_negative_fog_admission": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_live_sm3_table_zfog_01005.cpp",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "runtime_validation": "UNTESTED",
+      "validation_command": "python tools/test_dx11_live_sm3_table_zfog_01005.py; DX11 Fast run 39748222650 SUCCESS at b55bd1b2a9f6171828e6093b28d40abf12c7728a; negative state tests and guarded fallback source; gamepad/FFB runtime UNTESTED"
+    },
+    "exact_SHA_positive_negative_and_five_Gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "validation_bearing_result_sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a",
+      "validation_command": "GitHub Actions at 01005 exact SHA b55bd1b2a9f6171828e6093b28d40abf12c7728a: DX11 Fast 39748222650, Backend 39748222708, Build 39748222643, OpenXR 39748222654, HUD 39748229041 all SUCCESS; no rerun, game/HMD UNTESTED"
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Live intercepted D3D9 programmable Draw -> per-draw Z-table fog state/cap admission",
+      "D3D11 PS shader generation + fog-aware cache identity + GPU b4 -> actual Draw/DrawIndexed",
+      "Unsupported fog keeps original D3D9 game frame, controller input, FFB; Quest3 evidence separately required"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "live game D3D9 fog state and per-draw D3D11 GPU constants",
+      "native SM3 PS post-shader fog HLSL generation and cache identity",
+      "positive/negative portable and structural regression attached to DX11 Fast"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SM3_PROGRAMMABLE_TABLE_Z_FOG_GPU_DRAW",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY_REAL_GAME_PIXELS_AND_QUEST3_UNTESTED",
+    "activation_guard_and_fallback": "Full game opt-in retained; unproven or invalid game fog remains on unmodified original D3D9 Ex Draw/Present/input/FFB.",
+    "acceptance_proof": {
+      "positive_probe": "Authentic programmable D3D9 SM3 Draw/DrawIndexed Z-table fog state translates to D3D11 PS RGB table-fog via per-draw b4 constants; python tools/test_dx11_live_sm3_table_zfog_01005.py and C++ regression in DX11 Fast run 39748222650 succeeded at source SHA b55bd1b2a9f6171828e6093b28d40abf12c7728a. Actual game pixels UNTESTED.",
+      "negative_regression": "Negative native_sm3_table_zfog_admission cases reject unsupported WFOG/vertex/range fog, sRGB and malformed mode/density/coefficients and preserve DX9Ex fallback; bounded source/C++ tests passed in DX11 Fast 39748222650; gameplay/FFB runtime UNTESTED.",
+      "component_integration": "src/vr/d3d11/live_game_frame_bridge.cpp connects intercepted D3D9 render state to native_backend.cpp pixel shader generation, fog-specific shader cache identity and D3D11 PS constant slot b4 preceding Draw/DrawIndexed; five required same-SHA GitHub Actions succeeded for 01005; full renderer not runtime-verified."
+    }
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "material_source_commit": "b55bd1b2a9f6171828e6093b28d40abf12c7728a",
+    "validation_bearing_exact_sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39748222650,
+        "conclusion": "success",
+        "sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39748222708,
+        "conclusion": "success",
+        "sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a"
+      },
+      {
+        "name": "Build",
+        "run_id": 39748222643,
+        "conclusion": "success",
+        "sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39748222654,
+        "conclusion": "success",
+        "sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39748229041,
+        "conclusion": "success",
+        "sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a"
+      }
+    ],
+    "optional": {
+      "name": "DX11 Native Transport Isolated WARP",
+      "run_id": 39748222668,
+      "conclusion": "success",
+      "sha": "b55bd1b2a9f6171828e6093b28d40abf12c7728a"
+    },
+    "note": "Existing automatic runs checked at exact source SHA once; no CI rerun. Optional VR PC Fast Test Build skipped. C6 [skip ci] is separate bookkeeping only."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: prior 01004 C6 and live 01005 no-run-record/no-owner-conflict, exact branch source head verified",
+    "C1_REVIEW": "PASS: confirmed unconditional live SM3 FOGENABLE rejection as next native real-game feature gap",
+    "C2_IMPLEMENT": "PASS: source+HLSL+cache+regression material C++ commit b55bd1b2a9f6171828e6093b28d40abf12c7728a",
+    "C3_VALIDATE": "PASS: mandatory 5/5 GitHub Actions SUCCESS on exact b55bd1b2a9f6171828e6093b28d40abf12c7728a; Quest3/real game UNTESTED",
+    "C4_COMMIT": "PASS: nonforce GitHub material source result b55bd1b2a9f6171828e6093b28d40abf12c7728a with [AUTO:CONVERSION-DX11-01005], no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED_NO_RUNTIME_RELEASE",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED docs-only run record; validation SHA remains material source"
+  },
+  "feature_stage": "BUILD_VERIFIED_NEED_REAL_GAME_AND_HMD_TEST",
+  "real_game_draw_blocker": "EXACT_SOURCE_REAL_GAME_PROGRAMMABLE_FOG_PIXELS_AND_NATIVE_PUBLISHED_FRAMES_UNTESTED",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Continue actual full-frame source output coverage and GPU-to-GPU L/R OpenXR in next independent feature; prove live menu/car/race native Draw and published frames before promotion."
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00737",
+  "production_id": "CONVERSION-DX11-00737",
+  "event_id": "CONVERSION-DX11-00737-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:SPARSE_LARGE_INDEXED_UP_GAME_SOURCE",
+  "feature_id": "DX11-NATIVE-LARGE-WINDOW-INDEXED-UP",
+  "status": "C6_COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "base_head_sha": "00ec53119f83a5510dbcc94dd256f800feb8d1b0",
+  "material_result_sha": "a9870d6312f9f39ec24ca529b2e2dcc442233df8",
+  "validation_bearing_result_sha": "fd117c79802e460b09f9540bb89d1155695c359f",
+  "automation_validation": "PASS_5_OF_5",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "change_summary": "Real D3D9 game-authored DrawIndexedPrimitiveUP source window >6144 or distant MinVertexIndex is compacted into owned native DX11 DrawIndexed vertices/indices, preserving original D3D9 Draw, HRESULT, input and fail-closed fallback. Existing dense path remains intact.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    "tools/test_dx11_sparse_index_draw_00646.py",
+    "tools/dx11_x8_dest_alpha_00736.cpp",
+    "tools/dx11_game_stage1_temp_probe_00708.cpp"
+  ],
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38604924583,
+      "conclusion": "success"
+    },
+    "backend_conversion": {
+      "run_id": 38604924448,
+      "conclusion": "success",
+      "run_attempt": 2
+    },
+    "windows_build": {
+      "run_id": 38604931874,
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "run_id": 38604931777,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38604931959,
+      "conclusion": "success"
+    }
+  },
+  "runtime_gate": "NEED_HMD_TEST",
+  "result_note": "Exact-SHA GitHub mandatory 5/5 SUCCESS. Quest3/VDXR and physical game/gamepad pixels/input have not been tested; do not report production runtime pass. Post-validation checkpoint only, [skip ci] permitted because CI belongs to validation-bearing material result SHA."
+}

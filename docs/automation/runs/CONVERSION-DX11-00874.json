@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00874",
+  "production_id": "CONVERSION-DX11-00874",
+  "event_id": "CONVERSION-DX11-00874-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_AUTHORED_STEREO_POSTPASS_COLOR_EVIDENCE",
+  "feature_id": "DX11:GAME_AUTHORED_STEREO_POSTPASS_COLOR_EVIDENCE",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "fdf21711ef27a3d4c79064bfeabdcf6b6201f08d",
+  "validation_bearing_result_sha": "fdf21711ef27a3d4c79064bfeabdcf6b6201f08d",
+  "result_sha": "fdf21711ef27a3d4c79064bfeabdcf6b6201f08d",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Actual game-authored offscreen GPU Copy/Stretch timeline may provide native L/R eye color even when visible on-eye geometry Draw writes only depth.",
+      "NativeGameEyeDrawEncoder records only successful source-timeline GPU Copy/Stretch as authored color postpasses, never as synthesized geometry Draw ordinals.",
+      "NativeGameStereoSubmission requires genuine nonzero Draw evidence plus actual color Draw or successful authored GPU postpass, matching draw count and valid view/pose evidence before source-native eye admission."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ constexpr assertions accept 2 geometry Draws with 1 successful authored Copy/Stretch postpass and 1 geometry Draw with 1 direct color Draw; exact-SHA GitHub mandatory CI succeeded.",
+      "negative_regression": "C++ constexpr assertions reject authored postpass without any geometry Draw and geometry Draws without any direct or authored postpass color. Existing source view signature/pose and draw-count guards remain in place.",
+      "component_integration": "Per-eye source-clear timeline replay increments postpass count only after successful GPU Copy/Stretch, feeding the native eye final color-evidence predicate."
+    },
+    "conflict_keys": [
+      "DX11:GAME_AUTHORED_STEREO_POSTPASS_COLOR_EVIDENCE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact-SHA source and CI verify game-authored postpass color evidence admission; real menu/car/race stereo pixels on Quest3/VDXR and runtime frame pacing are UNTESTED.",
+    "activation_guard_and_fallback": "Native stereo route remains subject to original genuine per-eye Draw/pose/view checks and fail-closed DX9Ex fallback; no runtime promotion or DXVK changes."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_AUTHORED_STEREO_POSTPASS_COLOR_EVIDENCE",
+    "goal": "Admit genuine per-eye game-authored offscreen GPU Copy/Stretch color to the native D3D11 L/R stereo eye path when on-eye game Draws write depth only, without allowing fabricated Draw evidence or weakening original game fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_gpu_postpass_color_evidence",
+        "expected_behavior": "Successful source-timeline Copy/Stretch is counted as per-eye authored color evidence and can satisfy the output-ready predicate with a genuine nonzero geometry Draw and matching view/pose evidence."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "draw_evidence_and_fail_closed_game_fallback",
+        "expected_behavior": "A postpass alone with zero geometry Draw or Draw alone without color output cannot certify an eye; invalid GPU replay remains rejected without synthetic Draw ordinals or runtime activation."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_mandatory_exact_sha_ci",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR architecture and HUD Inspector all complete SUCCESS at the identical validation-bearing result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: run record absent (GitHub 404) on target branch; reconstructed from exact material commit and read-only same-SHA Actions evidence. No prior feature_contract or acceptance_results file to replace.",
+    "C1_REVIEW": "PASS_SOURCE_EVIDENCE: exact material commit contains authored postpass counter, predicate and C++ positive/negative constexpr checks.",
+    "C2_IMPLEMENT": "PASS_EXISTING_SOURCE: original material commit fdf21711ef27a3d4c79064bfeabdcf6b6201f08d contains genuine C++ implementation [AUTO:CONVERSION-DX11-00874]; no C6 source edit.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: five required GitHub workflow runs completed SUCCESS at fdf21711ef27a3d4c79064bfeabdcf6b6201f08d; no builds or CI rerun.",
+    "C4_COMMIT": "PASS_EXISTING_SOURCE: validated original source commit fdf21711ef27a3d4c79064bfeabdcf6b6201f08d; C6 result is a separate [skip ci] bookkeeping-only commit.",
+    "C5_PACKAGE": "NOT_REQUIRED: no candidate packaging or HMD testing in C6.",
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED recorded without changing validation SHA, runtime status or scores."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "fdf21711ef27a3d4c79064bfeabdcf6b6201f08d",
+    "validation_sha": "fdf21711ef27a3d4c79064bfeabdcf6b6201f08d",
+    "source_commit_message": "feat(dx11): replay authored offscreen GPU color into native stereo eyes [AUTO:CONVERSION-DX11-00874]",
+    "run_record_recovery": "RUN_RECORD_NOT_FOUND: target run JSON did not exist. Reconstructed feature contract and acceptance results from material source diff and read-only exact-SHA CI; no existing fields overwritten.",
+    "exact_sha_ci": {
+      "validation_sha": "fdf21711ef27a3d4c79064bfeabdcf6b6201f08d",
+      "workflows": {
+        "dx11_fast": {
+          "id": 39020712424,
+          "conclusion": "success"
+        },
+        "backend_conversion": {
+          "id": 39020712504,
+          "conclusion": "success"
+        },
+        "windows_build": {
+          "id": 39020712607,
+          "conclusion": "success"
+        },
+        "openxr": {
+          "id": 39020712585,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "id": 39020712626,
+          "conclusion": "success"
+        }
+      },
+      "additional_success": [
+        {
+          "name": "OpenXR VR architecture",
+          "id": 39020712606
+        },
+        {
+          "name": "DX11 Native Transport Isolated WARP",
+          "id": 39020712453
+        }
+      ],
+      "optional_vr_pc_fast": {
+        "id": 39020712429,
+        "conclusion": "skipped"
+      },
+      "note": "All mandatory workflows confirmed on the original SHA via read-only GitHub Actions listings; no CI rerun.",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "next_action": "No duplicate C6 or score increment for this TASK_ID; real menu/car/race Quest3/VDXR validation remains UNTESTED and full integrated DX11 renderer is not yet certified."
+}

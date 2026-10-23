@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "job_id": "CONV-DX11-000001",
+  "task_id": "CONV-DX11-000001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "20bd06813ccaaab3e4ff7ce818e3b26c974d90cd",
+  "state_parent_head": "7d59bb5c504305860d10598b705f2ec0b86dd5b3",
+  "material_result_sha": "b46c39819f93e5613ca18da85cb0cd4f1f5a1145",
+  "source_implementation_sha": "c4ec9443cdcf9b26be158a39739ddc147ed8aa76",
+  "validation_bearing_sha": "b46c39819f93e5613ca18da85cb0cd4f1f5a1145",
+  "retaining_descendant_sha": "7d59bb5c504305860d10598b705f2ec0b86dd5b3",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_FFP_D3DTA_TEMP_RESULTARG_R200_R201",
+  "selection_reason": "Fresh authenticated DX11 audit found D3DTSS_RESULTARG=D3DTA_TEMP and D3DTA_TEMP consumption were still a dormant fixed-function semantic gap that could be completed without runtime hardware. R201 then corrected the TEMP initial value to D3D9 default-zero semantics.",
+  "summary": "Implemented dormant fixed-function TEMP register dataflow and RESULTARG=TEMP routing, preserving CURRENT on TEMP writes. Reconciled the implementation to R201 default-zero TEMP semantics and aligned hosted shader compilation probes, semantic smoke coverage, census demand regressions, and source-graph guards.",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": [
+        "Read authenticated GitHub HEAD, AGENTS.md, branch conversion state/run record, regression context and Issue #14; repeatedly refreshed HEAD during same-lane concurrent commits."
+      ]
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": [
+        "Identified D3DTA_TEMP / D3DTSS_RESULTARG TEMP as the highest-value independent dormant fixed-function semantic gap available without the gaming PC.",
+        "Subsequent branch evidence corrected initial pre-write fail-closed handling to D3D9 TEMP default-zero semantics (R201)."
+      ]
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/pipeline_translation.hpp",
+        "tools/dx11_fixed_function_pipeline_probe.cpp",
+        "tools/dx11_fixed_function_shader_semantics.cpp",
+        "tools/analyze_dx11_census.py",
+        "tools/test_analyze_dx11_census.py",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "implementation_commits": [
+        "c4ec9443cdcf9b26be158a39739ddc147ed8aa76",
+        "254ad16e5cabf85fb877166a8e2443a224214b76",
+        "c28cec04cd374f72d30ad99b9697f5316ff71df0",
+        "8cb24e26614924f13875c510b62d2d1e2a39b340",
+        "ba09eae18565ae418d18f2bc352f2a1570bb71d6",
+        "d9c3ca4a6c8e0ad0c6db7a4f52148a3b20cf8576",
+        "46b6bd4b77083eddc26efebd825b473a07d7f54d",
+        "5509170a68c0243b65d0630db866427f8f47b785",
+        "9225f16b21675aaf7d47f52ddbd4d03ab7690b91",
+        "9eefe880d66e8249a3057481dc1c59387d483fd2",
+        "1111589127021b30d71c573df936cdf0e6820ff6",
+        "9b0914cef51ca129238fe29ec8d1b58e40ebc3a5",
+        "b46c39819f93e5613ca18da85cb0cd4f1f5a1145"
+      ],
+      "details": [
+        "Added D3DTA_TEMP argument translation and RESULTARG TEMP output routing while preserving CURRENT.",
+        "Generated a dedicated float4 TEMP register initialized to zero and retained R201 default-zero reads.",
+        "Added hosted shader-generation/compile probes, semantic smoke coverage, demand-census fixtures, and fail-closed invalid RESULTARG coverage.",
+        "Repaired stale R173/R200 source-graph contracts after the R201 semantic correction."
+      ]
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE_STATIC_BUILD_CANCELLED",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_AND_WIN32_CONFIGURE; BUILD_WIN32_CANCELLED_DURING_EXECUTION_BY_DESCENDANT_PUSH; BINARY_SUCCESS_NOT_CLAIMED",
+      "evidence": [
+        "Exact SHA b46c39819f93e5613ca18da85cb0cd4f1f5a1145 Backend Conversion Gate run 36996184467 job 110803311004 passed DX11 source graph, dormant activation boundary, census analyzer, Win32 configure, and VC2022 dependency workaround.",
+        "Build Win32 entered execution but was cancelled by a later descendant push; Verify binary was skipped, so compile/binary success is not claimed.",
+        "Retaining descendant d073cd4ffb360ac6d6db404f7b3664c8fb5a993f independently re-passed source graph, dormant activation boundary, and census analyzer before configure."
+      ],
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "required_marker": "[AUTO:CONV-DX11-000001]",
+      "implementation_commits": [
+        "c4ec9443cdcf9b26be158a39739ddc147ed8aa76",
+        "254ad16e5cabf85fb877166a8e2443a224214b76",
+        "c28cec04cd374f72d30ad99b9697f5316ff71df0",
+        "8cb24e26614924f13875c510b62d2d1e2a39b340",
+        "ba09eae18565ae418d18f2bc352f2a1570bb71d6",
+        "d9c3ca4a6c8e0ad0c6db7a4f52148a3b20cf8576",
+        "46b6bd4b77083eddc26efebd825b473a07d7f54d",
+        "5509170a68c0243b65d0630db866427f8f47b785",
+        "9225f16b21675aaf7d47f52ddbd4d03ab7690b91",
+        "9eefe880d66e8249a3057481dc1c59387d483fd2",
+        "1111589127021b30d71c573df936cdf0e6820ff6",
+        "9b0914cef51ca129238fe29ec8d1b58e40ebc3a5",
+        "b46c39819f93e5613ca18da85cb0cd4f1f5a1145"
+      ],
+      "result_commit": "b46c39819f93e5613ca18da85cb0cd4f1f5a1145",
+      "issue14_comment_id": 5950571133
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant DX11 source/test/static-contract unit; NativeDrawPathActive remains disabled and no runtime payload/localization/DXVK lane was modified."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE_WITH_STATIC_VALIDATION",
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R201 D3DTA_TEMP default-zero and RESULTARG TEMP dataflow semantics plus newer retained work; fresh-audit only the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+    }
+  },
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "openxr_transport_changed": false,
+    "dxvk_lane_modified": false,
+    "localization_modified": false,
+    "other_backend_modified": false,
+    "native_draw_path_active_changed": false,
+    "runtime_validation_claimed": false
+  },
+  "issue14_comment_id": 5950571133,
+  "validation_run_id": 36996184467,
+  "validation_job_id": 110803311004,
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_AND_WIN32_CONFIGURE; BUILD_WIN32_CANCELLED_DURING_EXECUTION_BY_DESCENDANT_PUSH; BINARY_SUCCESS_NOT_CLAIMED",
+  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA static/configure checks passed, but Win32 build was cancelled during execution by descendant branch churn; binary success is not claimed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve R201 D3DTA_TEMP default-zero and RESULTARG TEMP dataflow semantics plus newer retained work; fresh-audit only the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+  "runtime_claim": "UNTESTED",
+  "source_head": "7d59bb5c504305860d10598b705f2ec0b86dd5b3",
+  "result_sha": "b46c39819f93e5613ca18da85cb0cd4f1f5a1145",
+  "selected_work_item": "DX11_FFP_D3DTA_TEMP_RESULTARG_R200_R201",
+  "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "tools/dx11_fixed_function_pipeline_probe.cpp",
+    "tools/dx11_fixed_function_shader_semantics.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R201 D3DTA_TEMP default-zero and RESULTARG TEMP dataflow semantics plus newer retained work; fresh-audit only the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "semantic_correction_sha": "5509170a68c0243b65d0630db866427f8f47b785"
+}

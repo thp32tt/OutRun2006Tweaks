@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00913",
+  "production_id": "CONVERSION-DX11-00913",
+  "event_id": "CONVERSION-DX11-00913-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00913",
+  "feature_id": "DX11:NATIVE_STEREO_EYE_RASTER_SOURCE_EVENT_REPLAY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_EYE_RASTER_SOURCE_EVENT_REPLAY",
+    "goal": "Preserve independent OpenXR left/right native eye viewport and scissor during authentic offscreen menu/vehicle/race TARGET Clear/Copy/Stretch timeline replay; restore the original game camera raster for subsequent Draw/DrawIndexed and retain fail-closed DX9Ex controls.",
+    "acceptance_items": [
+      {
+        "id": "eye_raster_source_replay",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_eye_gpu_target_clear_copy_stretch_raster",
+        "expected_behavior": "Replay authentic menu, vehicle and race source TARGET clears/Copy/Stretch on saved native eye viewport, scissor and raster state even after callback binds offscreen game camera."
+      },
+      {
+        "id": "offscreen_camera_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "offscreen_mrt_uav_original_d3d9_gamepad_ffb",
+        "expected_behavior": "After synchronous source-eye replay, return to exact game camera raster and MRT/CS/PS UAV state before genuine Draw/DrawIndexed; never override DX9Ex original frame or input."
+      },
+      {
+        "id": "native_stereo_exact_sha_build",
+        "category": "integrated_validation",
+        "behavior_area": "native_eye_source_gpu_cpp_and_github_windows_openxr_gate",
+        "expected_behavior": "The same two-file native stereo implementation compiles and passes unchanged exact-SHA DX11 Fast/Backend/Build/OpenXR/HUD and optional WARP in GitHub Actions."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_EYE_OUTPUT:00913"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: DX11 stereo eye raster/restoration is exact-SHA CI verified only, not proof of actual live menu/vehicle/race or Quest3/VDXR pixels.",
+    "activation_guard_and_fallback": "No native gameplay backend promotion; keep original DX9Ex Draw/Present, gamepad, input, FFB, SkyGlow and DXVK freeze unchanged.",
+    "acceptance_proof": {
+      "positive_probe": "Both native game Draw encoder files record original eye raster and execute authentic game GPU source events under a scoped eye raster; Win32 compiler, native WARP and OpenXR source graph passed.",
+      "negative_regression": "Missing/foreign offscreen camera state rejects without fabricated eye pixels; source callback's original viewport/scissor/raster, MRT/DSV and UAV outputs are restored before subsequent original camera draw.",
+      "component_integration": "Native eye camera raster snapshot header + synchronous source GPU replay RAII implementation tested together in exact material/validation-bearing GitHub result SHA."
+    }
+  },
+  "acceptance_results": {
+    "eye_raster_source_replay": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "offscreen_camera_and_fallback": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "native_stereo_exact_sha_build": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp"
+  ],
+  "material_result_sha": "b3b388469ee03c3fbb393fa5c256fa4b17a146eb",
+  "validation_bearing_result_sha": "b3b388469ee03c3fbb393fa5c256fa4b17a146eb",
+  "validation_evidence": {
+    "github_exact_sha_workflow_runs_verified": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39120727920,
+        "conclusion": "success",
+        "head_sha": "b3b388469ee03c3fbb393fa5c256fa4b17a146eb"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39120727911,
+        "conclusion": "success",
+        "head_sha": "b3b388469ee03c3fbb393fa5c256fa4b17a146eb"
+      },
+      {
+        "name": "Build",
+        "run_id": 39120727982,
+        "conclusion": "success",
+        "head_sha": "b3b388469ee03c3fbb393fa5c256fa4b17a146eb"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39120728154,
+        "conclusion": "success",
+        "head_sha": "b3b388469ee03c3fbb393fa5c256fa4b17a146eb"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39120727890,
+        "conclusion": "success",
+        "head_sha": "b3b388469ee03c3fbb393fa5c256fa4b17a146eb"
+      },
+      {
+        "name": "DX11 Native Transport Isolated WARP",
+        "run_id": 39120727979,
+        "conclusion": "success",
+        "head_sha": "b3b388469ee03c3fbb393fa5c256fa4b17a146eb"
+      }
+    ],
+    "scope": "SOURCE_STAGE_ONLY",
+    "ci_gate_count": "MANDATORY_5_OF_5_PLUS_WARP",
+    "runtime_validation": "UNTESTED"
+  },
+  "runtime_validation_note": "No real game menu, vehicle selection or race session, Quest3/VDXR stereo or hardware gamepad test. RUNTIME_VALIDATION=UNTESTED; full DX11 renderer is not complete.",
+  "c6_bookkeeping_only": true,
+  "pipeline": {
+    "C0_RECOVER": "GitHub remote native DX11 branch initial HEAD 2b3b0e4480727e7260af9ff5d9c9c848df1e1115; prior 00912 completed and no 00913 run record or owner conflict found.",
+    "C1_REVIEW": "Confirmed game-owned offscreen viewport/scissor can clip real stereo-eye GPU source TARGET Clear/Copy/Stretch at same draw ordinal after OM target transition.",
+    "C2_IMPLEMENT": "Capture native eye's original raster in NativeGameEyeDrawEncoder; scoped restoration around chronological source events preserves game offscreen camera for next Draw/DrawIndexed.",
+    "C3_VALIDATE": "One exact-SHA five required GitHub Actions succeeded with WARP; no hardware test.",
+    "C4_COMMIT": "Original material and validation-bearing commit b3b388469ee03c3fbb393fa5c256fa4b17a146eb with [AUTO:CONVERSION-DX11-00913], no CI-skip. All exact SHA runs were complete before this distinct bookkeeping record.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED source-stage only; Quest3/VDXR RUNTIME_VALIDATION=UNTESTED, no duplicate CI or checkpoint score."
+  }
+}

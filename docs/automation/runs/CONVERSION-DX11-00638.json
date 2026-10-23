@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00638",
+  "production_id": "CONVERSION-DX11-00638",
+  "event_id": "CONVERSION-DX11-00638-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_MODULATE2X4X_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "c0305cfcc4fddc22a829e14cff663acb32d85ccd",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game-authored D3D9 PM RGB / MODULATE2X or MODULATE4X alpha operand admission for TFACTOR and complemented TFACTOR",
+      "Fail-closed D3DRS_TEXTUREFACTOR snapshot and scaling to D3D11 alpha constant",
+      "Native pixel shader saturates scaled source alpha before AlphaGate, then bound to game-authored Draw/DrawIndexed"
+    ],
+    "batch_components": [
+      "Live D3D9 stage state + render factor read with exact source and fallback gates",
+      "Scaled factor constant and saturating native D3D11 pixel shader integrated with existing native gameplay diagnostic Draw",
+      "Destructive source graph + 10240-value numeric regression in fast and full Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Both scaled factor operations, ordinary and complemented, preserve PM RGB source and saturating alpha.",
+      "negative_regression": "Reject wrong alpha op/operands/rgb blend, missing factor read, unsupported modifiers; original D3D9 Draw unchanged.",
+      "component_integration": "GetTextureStageState + GetRenderState -> capture.blendFactorAlphaValue -> alphaParams.w -> HLSL saturate -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_MODULATE2X4X_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "No actual game/HMD input or frame capture; CI source/build only.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic opt-in; production and D3D9 gamepad fallback unchanged."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_stage0_pm_scaled_factor_00638.py",
+    "docs/automation/runs/CONVERSION-DX11-00638.json",
+    "tools/test_dx11_stage0_pm_modulate_factor_00636.py",
+    "tools/test_dx11_stage0_pm_inverse_modulate_factor_00637.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest HEAD and 00637 complete; distinct 2X/4X TFACTOR work key",
+    "C1_REVIEW": "PASS: unhandled PM RGB + MODULATE2X/4X(TFACTOR/complement) alpha native path",
+    "C2_IMPLEMENT": "PASS: game-authored D3D9 source capture, factor scaling/complement, saturating HLSL and guarded D3D11 Draw; legacy 00636/00637 regression failures repaired",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast #38317656091, Backend Gate validate+readiness #38317656085, Windows Build #38317662176, OpenXR #38317662274, HUD #38317662211 all SUCCESS on 6073b00de35367c79912f05d48c0766718ebeb2a",
+    "C4_COMMIT": "PASS: material source SHA 5e2c1ba134fcdecd68930b025dcbf30bd35a37d5 plus failed regressions fixed by 90b565c01015ff9854e4bd5ee4d9c7b53ac3dc64 and final validation-bearing 6073b00de35367c79912f05d48c0766718ebeb2a, no force and no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED: game/HMD/VDXR menu and input untested; diagnostic opt-in not release",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: exact-SHA full CI SUCCESS; hardware gameplay NEED_HMD_TEST, RUNTIME_VALIDATION=UNTESTED"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No HMD/gameplay runtime acceptance"
+  },
+  "next_action": "00638 exact CI complete; no repeat task. Continue distinct game input/menu/vehicle/race native Draw integration. Gamepad and Quest3/VDXR remain NEED_HMD_TEST. DXVK frozen.",
+  "material_implementation_sha": "5e2c1ba134fcdecd68930b025dcbf30bd35a37d5",
+  "material_result_sha": "6073b00de35367c79912f05d48c0766718ebeb2a",
+  "validation_bearing_result_sha": "6073b00de35367c79912f05d48c0766718ebeb2a",
+  "result_sha": "6073b00de35367c79912f05d48c0766718ebeb2a",
+  "completed_at": "2026-10-13T07:48:04+09:00",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38317656085,
+      "conclusion": "SUCCESS",
+      "head_sha": "6073b00de35367c79912f05d48c0766718ebeb2a"
+    },
+    "dx11_fast": {
+      "run_id": 38317656091,
+      "conclusion": "SUCCESS",
+      "head_sha": "6073b00de35367c79912f05d48c0766718ebeb2a"
+    },
+    "windows_build": {
+      "run_id": 38317662176,
+      "conclusion": "SUCCESS",
+      "head_sha": "6073b00de35367c79912f05d48c0766718ebeb2a"
+    },
+    "openxr": {
+      "run_id": 38317662274,
+      "conclusion": "SUCCESS",
+      "head_sha": "6073b00de35367c79912f05d48c0766718ebeb2a"
+    },
+    "hud_inspector": {
+      "run_id": 38317662211,
+      "conclusion": "SUCCESS",
+      "head_sha": "6073b00de35367c79912f05d48c0766718ebeb2a"
+    }
+  },
+  "evidence": {
+    "backend_gate_run_id": 38317656085,
+    "backend_gate_conclusion": "success",
+    "dx11_fast_run_id": 38317656091,
+    "dx11_fast_conclusion": "success",
+    "windows_build_run_id": 38317662176,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 38317662274,
+    "openxr_conclusion": "success",
+    "hud_run_id": 38317662211,
+    "hud_conclusion": "success",
+    "validation_bearing_result_sha": "6073b00de35367c79912f05d48c0766718ebeb2a",
+    "runtime_validation": "UNTESTED"
+  }
+}

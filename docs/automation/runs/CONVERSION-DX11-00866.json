@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00866",
+  "production_id": "CONVERSION-DX11-00866",
+  "event_id": "CONVERSION-DX11-00866-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_GAME_OM_PIXEL_UAV_STEREO_REPLAY",
+  "feature_id": "DX11:NATIVE_GAME_OM_PIXEL_UAV_STEREO_REPLAY",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "1052ad57a28241db107a815f9269ff54344f92d4",
+  "validation_bearing_result_sha": "1052ad57a28241db107a815f9269ff54344f92d4",
+  "result_sha": "1052ad57a28241db107a815f9269ff54344f92d4",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_GAME_OM_PIXEL_UAV_STEREO_REPLAY",
+    "goal": "Preserve caller D3D11 output-merger pixel UAV, MRT/DSV and compute UAV state during native stereoscopic game-eye replay and GPU copy/stretch postpasses without resetting UAV append/consume counters or altering dormant-native D3D9Ex/input/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "left_right_native_stereo_eye_game_draw_and_gpu_postpasses",
+        "expected_behavior": "Left and right native game-eye callback draw/copy paths retain original pixel-stage OM UAV and MRT/depth state across eye replay and GPU postpasses."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d11_uav_alias_and_original_dx9ex_fallback",
+        "expected_behavior": "Temporarily detach writable OM/CS aliases around Copy/Stretch, restore original OM/CS state without resetting UAV counters, retain opt-in native activation and original D3D9Ex input/FFB behavior."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_source_sha_github_ci",
+        "expected_behavior": "All required GitHub workflows succeed on the exact validation-bearing source SHA; real game and Quest3/VDXR behavior remains UNTESTED unless separately performed."
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub target branch HEAD exactly matches validation SHA. Task run JSON was NOT_FOUND (404) at HEAD and source commit; recover new record from the actual material commit without overwriting any existing result.",
+    "C1_REVIEW": "PASS: actual source commit describes caller OM pixel UAV/RTV/DSV restore and writable alias detach while native stereo eye replay and GPU copy/stretch operate.",
+    "C2_IMPLEMENT": "PASS: material source commit 1052ad57a28241db107a815f9269ff54344f92d4 changes native_game_stereo_submission.cpp and dx11_native_transport_probe.cpp, including WARP L/R game draw regressions.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: user confirms exact-SHA GitHub CI SUCCESS; GitHub workflow lookup independently observed Build #39006814102, HUD Inspector #39006814086 and OpenXR #39006813961 completed SUCCESS. No CI rerun. HMD and real game runtime UNTESTED.",
+    "C4_COMMIT": "PASS: existing source-bearing commit 1052ad57a28241db107a815f9269ff54344f92d4 contains [AUTO:CONVERSION-DX11-00866] without [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED: no new runtime package or Quest3 test in this C6 bookkeeping-only task.",
+    "C6_STATE": "PASS_EXACT_SHA: create separate [skip ci] run-record commit; preserve validation-bearing source SHA and material-result SHA, do not modify source, rerun CI, or add points."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "1052ad57a28241db107a815f9269ff54344f92d4",
+    "validation_sha": "1052ad57a28241db107a815f9269ff54344f92d4",
+    "run_record_recovery": "RUN_RECORD_NOT_FOUND: target JSON absent at exact source/HEAD. feature_contract and acceptance_results are source-based reconstructed bookkeeping, not a previously existing record.",
+    "exact_sha_ci": {
+      "validation_sha": "1052ad57a28241db107a815f9269ff54344f92d4",
+      "user_confirmed_all_required_success": true,
+      "github_directly_observed_successful_workflows": {
+        "windows_build": 39006814102,
+        "hud_inspector": 39006814086,
+        "openxr": 39006813961
+      },
+      "note": "Combined commit status API reported no statuses; commit workflow lookup returns a subset of runs. Full exact-SHA CI SUCCESS supplied by user, not independently re-executed.",
+      "runtime_validation": "UNTESTED"
+    },
+    "c6_policy_repair": "00867 causal CI repair: prior 00866 record restored from missing-file C6 without mandatory development_strategy and non-null feature ID. Material/validation SHA and runtime status unchanged; no new score or source result claimed."
+  },
+  "next_action": "C6 bookkeeping recorded only. Continue unfinished native DX11 gameplay/HMD integration in a separate development task; avoid duplicate scoring or repeated CI for this result.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Source game Draw/DrawIndexed native eye callback",
+      "Shared D3D11 OM/CS UAV copy/stretch across independent eye targets",
+      "Producer fence and separate OpenXR consumer publication"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "WARP callback runs separate L/R native eye draws with caller OM pixel UAV and postpass CS UAV bound, then reads source-native eye pixels",
+      "negative_regression": "Foreign/unsupported source GPU aliases and active D3D9Ex fallback remain fail-closed; UAV counters preserved across pixel/compute restoration",
+      "component_integration": "Two eye RTV/DSV outputs, GPU copy/stretch, and producer/consumer fence are covered by the exact-SHA game-eye source regression"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_OM_PIXEL_UAV_STEREO_REPLAY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI validates source-stage WARP L/R pixel provenance and transport; physical menu/race and Quest3 output remain UNTESTED",
+    "activation_guard_and_fallback": "Native D3D11 stereo stays opt-in with D3D9Ex default, original input/FFB and DXVK branch isolated"
+  },
+  "historical_acceptance_results": {
+    "end2end": "SOURCE_REGRESSION_ADDED_AND_CI_SUCCESS; REAL_GAME_UNTESTED",
+    "fallback": "SOURCE_GUARD_AND_WARP_REGRESSION_ADDED; RUNTIME_UNTESTED",
+    "gates": "PASS_EXACT_SHA_USER_CONFIRMED",
+    "real_game_and_quest3": "UNTESTED"
+  }
+}

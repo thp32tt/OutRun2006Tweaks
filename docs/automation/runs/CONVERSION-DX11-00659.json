@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00659",
+  "production_id": "CONVERSION-DX11-00659",
+  "event_id": "CONVERSION-DX11-00659-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_RGB24_MIP_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "1f249cbf77c865204d7e65bf3297ebcb3239d59f",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 game-authored R8G8B8 LockRect per mip",
+      "RGB24->opaque BGRA8 D3D11 SRV and native sampler",
+      "live native Draw/DrawIndexed to Present diagnostic"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge.cpp source format admission and upload",
+      "portable C++ RGB24 pixel decoder",
+      "game Draw edge destructive regression plus CPU pixel/padding/mip probe wired to GitHub Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "R8G8B8 BGR rows upload opaque BGRA8 to game shader SRV on native Draw including readable mips",
+      "negative_regression": "short-pitch/failed LockRect/default pool continue original game D3D9 Draw; 11 destructive native-link mutations",
+      "component_integration": "D3D9 GetLevelDesc/LockRect -> CPU BGRA8 -> immutable D3D11 SRV -> PSSetShaderResources -> native Draw/DrawIndexed -> Present"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_RGB24_MIP_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE only until actual game/HMD; BUILD_VERIFIED only with exact-SHA CI",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME controlled opt-in; unsupported formats/LockRect/GPU state fall back to original D3D9 game Draw/input"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_rgb24_texture.hpp",
+    "tools/dx11_game_rgb24_probe.cpp",
+    "tools/test_dx11_native_rgb24_texture_00659.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00659.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS prior 00658 C6 at HEAD",
+    "C1_REVIEW": "PASS R8G8B8 missing from native bridge",
+    "C2_IMPLEMENT": "PASS C++ game bridge and decoder",
+    "C3_VALIDATE": "LOCAL_RGB24_CPU_PROBE_PASS; Build #38355081329 failed outdated packed16 source regression expecting pre-RGB24 predicate; preserve packed16 mutation check and broaden positive predicate to include RGB24; exact SHA CI pending",
+    "C4_COMMIT": "MATERIAL_COMMIT_REQUESTED",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "LOCAL_CPP_PASS",
+    "compile_build": "PENDING_EXACT_SHA",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "aa57fd0b5edfa7b117f4e0badcd5991af61a5e73",
+  "result_sha": null,
+  "next_action": "BUILD_VERIFIED exact-SHA GitHub CI SUCCESS; Quest3/VDXR HMD and gamepad runtime validation remain UNTESTED"
+}

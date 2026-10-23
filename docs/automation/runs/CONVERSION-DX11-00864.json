@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00864",
+  "production_id": "CONVERSION-DX11-00864",
+  "event_id": "CONVERSION-DX11-00864-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_EYE_COMPUTE_REPLAY_STATE",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "810e72cdf0559969b6370e8dc6b0255849c6bccd",
+  "validation_bearing_result_sha": "810e72cdf0559969b6370e8dc6b0255849c6bccd",
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Complete compute postpass binding continuity across independently replayed native D3D11 game camera eye Draw/DrawIndexed, preventing eye-L CS shader/input/UAV mutations from corrupting eye-R and restoring the original game/host pipeline without changing D3D9Ex fallback or inputs.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_camera_compute_pipeline_left_right_replay",
+        "expected_behavior": "Capture and restore CS shader/class, SRV, sampler, constant-buffer and UAV bindings around both full-frame native GPU camera eye draws; eye R receives the same caller compute state as eye L."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_openxr_game_pipeline_and_d3d9ex_input",
+        "expected_behavior": "After per-eye source mutations, restore caller GPU/CS state and UAV counters while preserving existing original D3D9Ex rendering, gamepad, FFB, DX9Ex fallback and dormant native activation."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "final_exact_sha_fast_backend_build_openxr_hud",
+        "expected_behavior": "Run the unchanged five GitHub CI gates at the final result SHA; Quest3/VDXR and real menu/race behavior remain UNTESTED absent HMD evidence."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native full-frame menu/car/race stereo replay preserves source CS pipeline through two eyes; actual gameplay output/Quest3 is not proven by WARP.",
+    "activation_guard_and_fallback": "Opt-in native renderer remains dormant by default. Preserve D3D9Ex Present/Draw/input/FFB fallback, owner lease and DXVK freeze.",
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp: actual CS shader/resources/samplers/constants/UAV scope restore per eye.",
+      "tools/dx11_native_transport_probe.cpp: two independent game-camera WARP passes mutate compute state and assert restore."
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Targeted native transport WARP callback asserts inherited CS state for both eyes.",
+      "negative_regression": "Eye L/R deliberately detaches compute outputs and inputs; source pipeline is restored before next eye and after callback; D3D9 fallback unchanged.",
+      "component_integration": "Actual NativeGameStereoSubmission immediate-context Draw/DrawIndexed camera replay -> compute postpass state recovery -> NativeSharedEyeRing OpenXR frame fence/ACK.",
+      "activation_guard_and_fallback": "Original D3D9Ex game Draw/Present/input retained; no runtime promotion."
+    },
+    "conflict_keys": [
+      "DX11:GAME_EYE_COMPUTE_REPLAY_STATE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "acceptance_results": {
+    "end2end": "PASS_TARGETED_WARP",
+    "fallback": "PASS_TARGETED_WARP",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: branch HEAD and 00863 exact-sha C6 inspected; 00864 run absent.",
+    "C1_REVIEW": "PASS: scoped native game eye replay lacked CS pipeline restoration across stereo camera draws.",
+    "C2_IMPLEMENT": "PASS: C++ actual camera replay state and WARP regression added.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: WARP 39004506602 and required Fast 39004506597 / Backend 39004506610 / Build 39004509156 / OpenXR 39004509168 / HUD 39004509169 all SUCCESS on exact SHA 810e72cdf0559969b6370e8dc6b0255849c6bccd; HMD UNTESTED.",
+    "C4_COMMIT": "PASS material 810e72cdf0559969b6370e8dc6b0255849c6bccd (source + regression, no CI skip).",
+    "C5_PACKAGE": "NOT_REQUIRED: HMD/game runtime not executed.",
+    "C6_STATE": "PASS_EXACT_SHA: exact material SHA validated 5/5 and WARP, bookkeeping commit is separate; source SHA unchanged."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Continue full menu/vehicle/race native renderer and actual Quest3/VDXR testing; CI is not in-game/HMD evidence. No rerun of this exact SHA.",
+  "result_sha": "810e72cdf0559969b6370e8dc6b0255849c6bccd",
+  "evidence": {
+    "material_sha": "810e72cdf0559969b6370e8dc6b0255849c6bccd",
+    "validation_sha": "810e72cdf0559969b6370e8dc6b0255849c6bccd",
+    "exact_sha_ci": {
+      "validation_sha": "810e72cdf0559969b6370e8dc6b0255849c6bccd",
+      "required_gates_success": {
+        "fast": 39004506597,
+        "backend": 39004506610,
+        "build": 39004509156,
+        "openxr": 39004509168,
+        "hud": 39004509169
+      },
+      "native_transport_warp_success": 39004506602,
+      "runtime_validation": "UNTESTED"
+    }
+  }
+}

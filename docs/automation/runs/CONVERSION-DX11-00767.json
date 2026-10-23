@@ -1,0 +1,48 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00767",
+  "production_id": "CONVERSION-DX11-00767",
+  "event_id": "CONVERSION-DX11-00767-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": "12623e80f797eea7cfbb3c9fbbc77681230af3a6",
+  "validation_bearing_result_sha": "12623e80f797eea7cfbb3c9fbbc77681230af3a6",
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_dirty_region.hpp",
+    "src/vr/d3d11/native_game_multi_dirty_upload.hpp",
+    "tools/dx11_extended_dirty_batch_probe_00767.cpp",
+    "tools/dx11_full_dirty_partition_probe_00749.cpp",
+    "tools/dx11_multi_dirty_upload_probe_00754.cpp",
+    "tools/test_dx11_extended_dirty_batch_00767.py"
+  ],
+  "change_summary": "Extend real native DX11 game frame readback into D3D9 Present from 8 to 32 bounded dirty tiles for full-frame and cropped menu/vehicle/race updates, with original D3D9 pixels/input preserved on failed validation, readback, or upload.",
+  "pipeline": {
+    "C3_VALIDATE": "User-confirmed GitHub CI SUCCESS for exact validation-bearing source SHA; no CI rerun.",
+    "C4_COMMIT": "Existing source material and validation-bearing SHA 12623e80f797eea7cfbb3c9fbbc77681230af3a6; unchanged.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA; runtime UNTESTED"
+  },
+  "evidence": {
+    "validation_sha": "12623e80f797eea7cfbb3c9fbbc77681230af3a6",
+    "source_commit_url": "https://github.com/thp32tt/OutRun2006Tweaks/commit/12623e80f797eea7cfbb3c9fbbc77681230af3a6",
+    "ci_evidence_basis": "User-provided exact-SHA GitHub CI SUCCESS; no workflow rerun or independent revalidation performed for this bookkeeping-only update.",
+    "prior_blocker": "RUN_RECORD_NOT_FOUND",
+    "run_record_recovery": "The requested JSON did not exist on target branch or validation commit; original feature_contract and acceptance_results could not be recovered and were not fabricated.",
+    "runtime_validation": "UNTESTED",
+    "source_only_limit": "No Quest3/VDXR or real gamepad exercise performed in this C6 bookkeeping operation."
+  }
+}
