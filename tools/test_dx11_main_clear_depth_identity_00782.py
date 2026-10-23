@@ -27,7 +27,7 @@ def valid(s,g,h):
         "native_game_partial_depth_ready(" in s,
         "true, seededMainColor, sameMainDepthStencil," in s,
         "compatibleCoverage, !s.frameBatch.stopped)" in s,
-        "if (clearZ) s.frameBatch.note_full_depth_clear(z);" in s,
+        "if (clearZ) {\n            s.preDrawDepth.discard();\n            s.frameBatch.note_full_depth_clear(z);\n        }" in s,
         "return !clearsDepth || coversWholeDepth;" in g,
         "GameNativeMainStencilClear::may_ignore(" in s,
         "live_game_frame::observe_game_depth_clear(" in h,
@@ -46,7 +46,8 @@ for old,new in (
     ("if (!wholeStencilSafe && !clippedStencilSafe) return false;", "/* unverified stencil admitted */"),
     ("FAILED(depth.As(&depthIdentity)) || !depthIdentity","false"),
     ("GameNativeMainStencilClear::preserves_clear_coverage(clearZ, coversDepth)","true"),
-    ("if (clearZ) s.frameBatch.note_full_depth_clear(z);","/* discard depth */"),
+    ("if (clearZ) {\n            s.preDrawDepth.discard();\n            s.frameBatch.note_full_depth_clear(z);\n        }","/* discard depth */"),
+    ("s.preDrawDepth.discard();","/* stale source depth tiles */"),
 ):
     assert old in scope and not valid(scope.replace(old,new,1),guard,hook),old
 assert not valid(scope,guard.replace("return !clearsDepth || coversWholeDepth;","return true;"),hook)
