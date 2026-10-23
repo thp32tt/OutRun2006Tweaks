@@ -813,10 +813,13 @@ bool build_r283_sm3_mov_shader_source(
                 // safely retain native implicit TEXLD/LDP/LDB gradients.
                 // A pixel input/TEMP/system input on either side remains
                 // varying and falls back for implicit sampling in its scope.
-                if (!predicateWrite && !conditionalBreak &&
-                    !derivativeUniformity.begin(native_sm3_ifc_is_quad_uniform(
-                        scalarOrigins[0], scalarOrigins[1])))
-                    return false;
+                if (!predicateWrite && !conditionalBreak) {
+                    const bool uniformComparison = native_sm3_ifc_is_quad_uniform(
+                        scalarOrigins[0], scalarOrigins[1]);
+                    if (!derivativeUniformity.begin(uniformComparison) ||
+                        !tempDrawUniformity.begin_if(uniformComparison))
+                        return false;
+                }
                 Operation branch{};
                 branch.flowKind = predicateWrite ? 8u : (conditionalBreak ? 7u : 1u);
                 branch.flowCondition = scalarOperands[0] + " " + compareOp +
@@ -865,7 +868,8 @@ bool build_r283_sm3_mov_shader_source(
                 // DEFB and actual per-Draw b# are scalar across the entire
                 // primitive. Permit texld/texldp/texldb in this IF, but never
                 // in a nested pixel-varying IFC or predicated instruction.
-                if (!derivativeUniformity.begin(true)) return false;
+                if (!derivativeUniformity.begin(true) ||
+                    !tempDrawUniformity.begin_if(true)) return false;
                 Operation branch{};
                 branch.flowKind = 1u;
                 branch.flowCondition = std::move(boolCondition);
@@ -879,7 +883,8 @@ bool build_r283_sm3_mov_shader_source(
                     operations.size() >= kMaxOps ||
                     !structuredFlow.otherwise() ||
                     !writtenFlow.otherwise(tempWritten, outputWritten) ||
-                    !predicateFlow.otherwise())
+                    !predicateFlow.otherwise() ||
+                     !tempDrawUniformity.otherwise())
                     return false;
                 Operation branch{};
                 branch.flowKind = 2u;
@@ -893,7 +898,8 @@ bool build_r283_sm3_mov_shader_source(
                     !structuredFlow.end_if() ||
                     !writtenFlow.end(tempWritten, outputWritten) ||
                     !predicateFlow.end_if() ||
-                    !derivativeUniformity.end())
+                    !derivativeUniformity.end() ||
+                     !tempDrawUniformity.end_if())
                     return false;
                 Operation branch{};
                 branch.flowKind = 3u;
@@ -925,7 +931,8 @@ bool build_r283_sm3_mov_shader_source(
                     !(dynamic
                         ? structuredFlow.begin_live_repeat(tempWritten, outputWritten)
                         : structuredFlow.begin_repeat(count, tempWritten, outputWritten)) ||
-                    !predicateFlow.begin_repeat())
+                    !predicateFlow.begin_repeat() ||
+                     !tempDrawUniformity.begin_loop())
                     return false;
                 Operation loop{};
                 loop.flowKind = 4u;
@@ -941,7 +948,8 @@ bool build_r283_sm3_mov_shader_source(
                     !instruction.operandTokens.empty() ||
                     operations.size() >= kMaxOps ||
                     !structuredFlow.end_repeat(tempWritten, outputWritten) ||
-                    !predicateFlow.end_repeat())
+                    !predicateFlow.end_repeat() ||
+                     !tempDrawUniformity.end_loop())
                     return false;
                 Operation loop{};
                 loop.flowKind = 5u;
@@ -974,7 +982,8 @@ bool build_r283_sm3_mov_shader_source(
                 if ((!dynamic && !native_sm3_static_loop_parameters(
                          intDefBits[reg], count, first, step)) ||
                     !structuredFlow.begin_loop(count, tempWritten, outputWritten, dynamic) ||
-                    !predicateFlow.begin_repeat())
+                    !predicateFlow.begin_repeat() ||
+                     !tempDrawUniformity.begin_loop())
                     return false;
                 const int last = first + (static_cast<int>(count) - 1) * step;
                 loopRanges.push_back({dynamic, first < last ? first : last,
@@ -995,7 +1004,8 @@ bool build_r283_sm3_mov_shader_source(
                     !instruction.operandTokens.empty() || loopRanges.empty() ||
                     operations.size() >= kMaxOps ||
                     !structuredFlow.end_loop(tempWritten, outputWritten) ||
-                    !predicateFlow.end_repeat())
+                    !predicateFlow.end_repeat() ||
+                     !tempDrawUniformity.end_loop())
                     return false;
                 loopRanges.pop_back();
                 Operation loop{};
@@ -1606,7 +1616,7 @@ bool build_r283_sm3_mov_shader_source(
                     sourcesDrawUniform;
                 tempDrawUniformity.write(
                     op.destinationRegister, mask, pureDrawArithmetic,
-                    structuredFlow.empty() && !op.predicated);
+                    tempDrawUniformity.uniform_flow() && !op.predicated);
                 tempWritten[op.destinationRegister] =
                     native_sm3_predicated_write_mask(
                         tempWritten[op.destinationRegister], mask, op.predicated);
@@ -1630,7 +1640,8 @@ bool build_r283_sm3_mov_shader_source(
         }
         if (operations.empty() || !writtenFlow.empty() ||
             !structuredFlow.empty() || !predicateFlow.empty() ||
-            !derivativeUniformity.empty()) return false;
+            !derivativeUniformity.empty() || !tempDrawUniformity.empty())
+            return false;
         if (vertexStage) {
             for (const auto& output : outputs)
                 if (output.registerType != D3DSPR_OUTPUT ||

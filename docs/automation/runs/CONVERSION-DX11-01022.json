@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01022",
+  "production_id": "CONVERSION-DX11-01022",
+  "dispatch_event_id": "CONVERSION-DX11-01022-E001",
+  "event_id": "CONVERSION-DX11-01022-E001",
+  "event_type": "dispatch",
+  "classification": "A",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01022",
+  "feature_id": "DX11:LIVE_SM3_BRANCH_TEMP_TO_IFC_TEXTURE_DRAW",
+  "work_key": "DX11:LIVE_SM3_BRANCH_TEMP_TO_IFC_TEXTURE_DRAW",
+  "work_class": "integration",
+  "feature_stage": "C4_STATE",
+  "checkpoint": "C4_STATE",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "source_head": "f8446b7cbfb3507083ed9aa415d3f364104c29d2",
+  "material_result_sha": null,
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "ffb_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "SM3 game IF/ELSE per-Draw TEMP physical-lane provenance joins to IFC and native implicit TEX GPU Draw; divergent/missing branch, loops and predicated writes remain original D3D9 fail closed.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Intercepted SM3 live shader IF/ELSE b#/c# writes physical TEMP lanes on both paths",
+      "Merge actual uniform TEMP into IFC control flow, native implicit TEX and GPU Draw/DrawIndexed"
+    ],
+    "batch_components": [
+      "Native C++ shader control-flow interpreter and per-lane provenance state",
+      "Compiled source-linked C++17 positive/negative program regression with preserved five exact-SHA gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "b#/c# IF/ELSE both-arm TEMP.xy survives uniform IFC and compiled texture Sample",
+      "negative_regression": "Varying IFC, missing ELSE, partial TEMP, loop/predicate prevent native uniform origin and retain DX9Ex renderer",
+      "component_integration": "native_backend.cpp -> native_sm3_temp_draw_uniformity.hpp -> SM3 texture emitter -> live_game_frame_bridge.cpp GPU Draw"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY; real game native draw/published frames/Quest3 UNTESTED",
+    "activation_guard_and_fallback": "Proven uniform branch and definite per-lane TEMP writes required; varying/loop/conditional writes fail closed on original D3D9."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_BRANCH_TEMP_TO_IFC_TEXTURE_DRAW",
+    "goal": "Merge authentic shader game-owned constant IF/ELSE TEMP lanes and feed native D3D11 IFC texture Draw without promoting varying/undefined/loop writes; preserve fallback with integrated five exact-SHA Gates.",
+    "acceptance_items": [
+      {
+        "id": "branch_texture_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Uniform_IF_TEMP_IFC_native_texture_Draw",
+        "expected_behavior": "Uniform IF/ELSE both-arm TEMP result qualifies subsequent IFC native implicit D3D11 texture Sample"
+      },
+      {
+        "id": "dynamic_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "PixelVarying_Loops_DX9Ex",
+        "expected_behavior": "Unknown or partial TEMP, varying IFC, loops and absent ELSE do not promote implicit texture Draw"
+      },
+      {
+        "id": "same_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Compiled_Shader_Runtime_And_OpenXR_Gates",
+        "expected_behavior": "C++17 source-linked regression and exact-SHA DX11 Fast, Backend, Build, OpenXR, HUD success"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_sm3_branch_temp_probe_01022.cpp",
+    "tools/test_dx11_sm3_branch_temp_01022.py",
+    "docs/automation/runs/CONVERSION-DX11-01022.json"
+  ],
+  "pending_items": [
+    "Exact-SHA five Gate pending",
+    "Menu/car/race native frame and Quest 3/VDXR gamepad/FFB parity UNTESTED"
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "No measured in-game native Draw and published-frame evidence",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "PENDING_MATERIAL_SHA",
+  "NEXT_IMPLEMENTATION_ACTION": "Address causal five Gate failures if any; continue remaining real-game frame native Draw coverage",
+  "acceptance_results": {},
+  "gate_evidence": null
+}
