@@ -358,6 +358,7 @@ bool build_r283_sm3_mov_shader_source(
         std::array<unsigned, 16> inputDeclaredMasks{};
         std::array<unsigned, 16> outputDeclaredMasks{};
         bool positionDeclared = false;
+        unsigned positionDeclaredMask = 0u;
         for (const auto& semantic : interfaceSemantics.semantics) {
             const unsigned mask =
                 static_cast<unsigned>((semantic.writeMask &
@@ -378,6 +379,7 @@ bool build_r283_sm3_mov_shader_source(
                 if (pixelPosition) {
                     if (positionDeclared) return false;
                     positionDeclared = true;
+                    positionDeclaredMask = mask & 0x03u;
                 } else {
                     if (semantic.registerType != D3DSPR_INPUT ||
                         inputDeclaredMasks[semantic.registerIndex] != 0u)
@@ -736,9 +738,10 @@ bool build_r283_sm3_mov_shader_source(
                     } else if (kind == D3DSPR_MISCTYPE) {
                         if (!positionDeclared ||
                             reg != static_cast<UINT>(D3DSMO_POSITION) ||
-                            !native_sm3_pixel_position_source(requiredComponents))
+                            !native_sm3_pixel_position_source(requiredComponents) ||
+                            (requiredComponents & ~positionDeclaredMask) != 0u)
                             return false;
-                        value = "input.r283_vpos";
+                        value = native_sm3_pixel_position_hlsl();
                     } else if (kind == D3DSPR_CONST) {
                         if (reg >= constantLimit ||
                             !native_sm3_const_reference(
@@ -1384,9 +1387,10 @@ bool build_r283_sm3_mov_shader_source(
                                 logicalComponents, modifier), swizzle);
                     if (!positionDeclared || vertexStage ||
                         reg != static_cast<UINT>(D3DSMO_POSITION) ||
-                        !native_sm3_pixel_position_source(required))
+                        !native_sm3_pixel_position_source(required) ||
+                        (required & ~positionDeclaredMask) != 0u)
                         return false;
-                    value = "input.r283_vpos";
+                    value = native_sm3_pixel_position_hlsl();
                 } else if (kind == D3DSPR_CONST) {
                     if (relative && staticAddress) {
                         unsigned index = 0u;

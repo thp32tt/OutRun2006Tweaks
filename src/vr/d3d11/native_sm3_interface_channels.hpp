@@ -27,7 +27,13 @@ namespace outrun::vr::dx11 {
 // D3D9 defines only xy; z/w and vFace never become synthetic game data.
 [[nodiscard]] constexpr bool native_sm3_pixel_position_declaration(
     bool vertexStage, unsigned registerIndex, unsigned mask) noexcept {
-    return !vertexStage && registerIndex == 0u && mask == 0x0fu;
+    return !vertexStage && registerIndex == 0u &&
+           ((mask != 0u && (mask & ~0x03u) == 0u) || mask == 0x0fu);
+}
+// SV_Position uses D3D10+ pixel centers (+0.5) while D3D9 VPOS is
+// integer pixel-centered. Offset only xy; leave unsupported zw unread.
+[[nodiscard]] constexpr const char* native_sm3_pixel_position_hlsl() noexcept {
+    return "(input.r283_vpos - float4(0.5f, 0.5f, 0.0f, 0.0f))";
 }
 [[nodiscard]] constexpr bool native_sm3_pixel_position_source(
     unsigned physicalReadMask) noexcept {

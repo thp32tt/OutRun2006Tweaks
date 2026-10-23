@@ -1,5 +1,6 @@
 #include "pipeline_translation.hpp"
 #include "native_sm3_trig_sign_opcode.hpp"
+#include "native_sm3_interface_channels.hpp"
 
 #include <d3dcompiler.h>
 #include <cmath>
@@ -2222,7 +2223,9 @@ namespace outrun::vr::dx11
 
                 if (pixelPosition
                         ? (declarationInfo != kDclInfoTokenMarker ||
-                           writeMask != D3DSP_WRITEMASK_ALL)
+                           !native_sm3_pixel_position_declaration(
+                               false, registerIndex,
+                               static_cast<UINT>(writeMask >> 16u)))
                         : ((declarationInfo &
                             ~(kDclInfoTokenMarker |
                               kDclUsageMask |
@@ -2376,11 +2379,11 @@ namespace outrun::vr::dx11
                 // SV_Position arrives from rasterization rather than an
                 // interpolated VS varying. Still require the game's real
                 // full clip-position output before authorizing the GPU pair.
-                if (pixelInput.registerIndex !=
-                        static_cast<UINT>(D3DSMO_POSITION) ||
+                if (!native_sm3_pixel_position_declaration(
+                        false, pixelInput.registerIndex,
+                        static_cast<UINT>(pixelInput.writeMask >> 16u)) ||
                     pixelInput.usage != D3DDECLUSAGE_POSITION ||
-                    pixelInput.usageIndex != 0u ||
-                    pixelInput.writeMask != D3DSP_WRITEMASK_ALL)
+                    pixelInput.usageIndex != 0u)
                     return out;
                 bool clipPosition = false;
                 for (const auto& vertexOutput : vertexSemantics.semantics)
