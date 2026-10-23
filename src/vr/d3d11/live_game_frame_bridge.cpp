@@ -5929,18 +5929,19 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     context->VSSetSamplers(0u, 4u, boundVertexSamplers.data());
     context->PSSetShaderResources(0u, 16u, boundViews.data());
     context->PSSetSamplers(0u, 16u, boundSamplers.data());
-    // Source instance attributes and independent list indices are packed in
-    // source order. Batch lists, preserving separate fan/strip boundaries.
-    if (compactListInstances) {
-        if (nativeIndices) context->DrawIndexed(nativeIndexCount, 0u, 0);
-        else context->Draw(static_cast<UINT>(expandedVertices), 0u);
-    } else {
-        for (UINT instance = 0u; instance < instanceCount; ++instance) {
-            const UINT base = instance * vertexCount;
-            if (nativeIndices)
-                context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));
-            else context->Draw(vertexCount, base);
-        }
+    // One guarded GPU submit for every independent source-instance list.
+    // Keep exactly one Draw and DrawIndexed dispatch call site: this is the
+    // audited opt-in D3D11 game draw boundary, never a second unguarded path.
+    // Strip/fan boundaries remain separate when batching would connect them.
+    const UINT nativeSubmissionCount = compactListInstances ? 1u : instanceCount;
+    const UINT drawVertexCount = compactListInstances
+        ? static_cast<UINT>(expandedVertices) : vertexCount;
+    for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance) {
+        const UINT base = compactListInstances ? 0u : instance * vertexCount;
+        if (nativeIndices)
+            context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));
+        else
+            context->Draw(drawVertexCount, base);
     }
     s.pending = true;
     ++s.issued;
