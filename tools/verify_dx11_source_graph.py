@@ -71,6 +71,9 @@ NATIVE_BACKEND_HPP = (
 NATIVE_BACKEND_CPP = (
     ROOT / "src" / "vr" / "d3d11" / "native_backend.cpp"
 ).read_text(encoding="utf-8")
+NATIVE_SM3_TEXTURE = (
+    ROOT / "src" / "vr" / "d3d11" / "native_sm3_texture_codegen.hpp"
+).read_text(encoding="utf-8")
 RESOURCE_TRANSLATION_HPP = (
     ROOT / "src" / "vr" / "d3d11" / "resource_translation.hpp"
 ).read_text(encoding="utf-8")
@@ -11151,10 +11154,18 @@ def main() -> None:
          NATIVE_BACKEND_HPP, "R283 materializer declaration"),
         ("validate_programmable_shader_target_bytecode_materialization_snapshot(",
          NATIVE_BACKEND_HPP, "R283 materialized bytecode validator declaration"),
-        ("R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V13",
+        ("R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V14",
          NATIVE_BACKEND_CPP, "R283 bounded materializer revision"),
-        ("R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V13",
+        ("R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V14",
          NATIVE_BACKEND_CPP, "R283 provenance contract"),
+        ("op.samplerSwizzle = swizzle;",
+         NATIVE_BACKEND_CPP, "R283 captures real PS sampler-result swizzle"),
+        ("op.samplerSwizzle)",
+         NATIVE_BACKEND_CPP, "R283 binds sampler channels to native sample"),
+        ("native_sm3_sampled_channels(value, mask, samplerSwizzle)",
+         NATIVE_SM3_TEXTURE, "R283 remaps 2D sampled RGBA before masked write"),
+        ("native_sm3_sampled_channels(texel, mask, samplerSwizzle)",
+         NATIVE_SM3_TEXTURE, "R283 remaps volume sampled RGBA before masked write"),
         ("native_sm3_scalar_condition_required_components(swizzle, modifier)",
          NATIVE_BACKEND_CPP, "R283 game scalar compare checks required physical lanes"),
         ("(tempWritten[reg] & requiredComponents) != requiredComponents",
