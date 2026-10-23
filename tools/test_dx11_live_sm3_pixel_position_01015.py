@@ -16,7 +16,7 @@ def require(ok, reason):
 
 require("registerType == D3DSPR_MISCTYPE" in linkage and
         "D3DSMO_POSITION" in linkage and
-        "pixelPosition ? 0u" in linkage and
+        "(pixelPosition || pixelFace) ? 0u" in linkage and
         "native_sm3_pixel_position_declaration(" in linkage and
         "if (pixelInput.registerType == D3DSPR_MISCTYPE)" in linkage and
         "if (!clipPosition) return out;" in linkage,
@@ -30,12 +30,12 @@ require("positionDeclared = true;" in shader and
         "native_sm3_pixel_position_source(required)" in shader and
         "native_sm3_pixel_position_source(requiredComponents)" in shader and
         "std::string(\"r283_vpos\")" in shader and
-        "label = \"SV_Position\";" in backend,
+        'label = pixelFace ? "SV_IsFrontFace" : "SV_Position";' in backend,
         "unique pixel system input and masked register reads in compiled HLSL")
 require("physicalReadMask & ~0x03u" in header and
         "float4(0.5f, 0.5f, 0.0f, 0.0f)" in header and
         "vertexStage" in header and "registerIndex == 0u" in header,
-        "reject vFace, vertex MISCTYPE, z/w and unsupported modifiers")
+        "keep FACE distinct from VPOS; reject vertex MISCTYPE, z/w and unsupported modifiers")
 require("context->PSSetShader(" in bridge and
         "context->DrawIndexed(" in bridge and "context->Draw(" in bridge,
         "genuine native D3D11 game Draw/DrawIndexed remains linked")

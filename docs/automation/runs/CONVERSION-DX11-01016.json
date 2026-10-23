@@ -128,6 +128,7 @@
   "pending_items": [
     "Confirm historical 01015 policy repair passes Backend/Fast Gate without relaxing policy",
     "Confirm 00964 interface regression accepts new ten interpolated plus two rasterizer system inputs, forbids VS misc",
+    "Confirm 01015 vPos system semantic retains clip and mask while adding independent FACE rasterizer identity",
     "Obtain exact-SHA five mandatory Actions success for native FACE source commit plus causal repair",
     "Confirm 01016 compiled FACE regression and final Win32 build/bundle",
     "Prove original OutRun game native Draw/visible game frame in real PC/Quest3 run before any gameplay/Quest3 PASS assertion"
@@ -142,6 +143,11 @@
       "run_id": 39912512240,
       "reason": "Legacy test asserted literal pre-01016 capacity implementation, not bounded 10-varying plus 2-system raster rule",
       "repair": "Preserve capacity negative guards and VS no-system-input semantics"
+    },
+    "additional_fast_01015": {
+      "run_id": 39912763706,
+      "reason": "Historical 01015 text check assumed only VPOS misc semantic; 01016 preserves VPOS and newly recognizes separate FACE semantics",
+      "repair": "Assert both raster inputs separated, verify actual VS clip and VPOS mask; preserve compiled regression"
     }
   },
   "runtime_note": "Real game/HMD/Quest3/FFB UNTESTED; test GPU geometry != playable game.",
@@ -149,6 +155,7 @@
     "docs/automation/runs/CONVERSION-DX11-01015.json",
     "tools/test_dx11_autodev_policy.py",
     "docs/automation/runs/CONVERSION-DX11-01016.json",
-    "tools/test_dx11_sm3_interface_draw_00964.py"
+    "tools/test_dx11_sm3_interface_draw_00964.py",
+    "tools/test_dx11_live_sm3_pixel_position_01015.py"
   ]
 }
