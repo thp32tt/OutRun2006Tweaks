@@ -426,6 +426,7 @@ jobs:
           python tools/test_dx11_sm3_uniform_texture_01017.py
           python tools/test_dx11_sm3_uniform_ifc_01018.py
           python tools/test_dx11_sm3_temp_uniform_01019.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_static_address_matrix_probe_01027.cpp -o /tmp/dx11_sm3_static_address_01027 && /tmp/dx11_sm3_static_address_01027
           python tools/test_dx11_sm3_matrix_draw_uniform_01020.py
           python tools/test_dx11_sm3_uniform_predicate_texture_01021.py
           python tools/test_dx11_sm3_branch_temp_01022.py

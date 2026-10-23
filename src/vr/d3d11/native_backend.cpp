@@ -1455,7 +1455,7 @@ bool build_r283_sm3_mov_shader_source(
                                            : native_sm3_texture_modifier_supported(op.textureMode, i, modifier)))
                     return false;
                 if (op.matrixRowCount != 0u && i == 1u) {
-                    matrixRowsAreAbsolute = !relative;
+                    matrixRowsAreAbsolute = native_sm3_addressed_const_draw_uniform(relative, staticAddress);
                     // Each SM3 M*x* instruction reads a consecutive matrix
                     // register block. A shader-owned a0 or authentic aL may
                     // shift the whole block, not the individual source rows.
@@ -1463,7 +1463,9 @@ bool build_r283_sm3_mov_shader_source(
                     // unknown vertex-owned addresses still fail closed.
                     if (kind != D3DSPR_CONST || modifier != D3DSPSM_NONE ||
                         swizzle != 0xe4u || reg >= constantLimit ||
-                        op.matrixRowCount > constantLimit - reg)
+                        !native_sm3_matrix_source_span_accepted(
+                             reg, op.matrixRowCount, constantLimit,
+                             relative, staticAddress))
                         return false;
                     if (relative) {
                         if (!staticAddress && loopRanges.empty())
@@ -1514,7 +1516,9 @@ bool build_r283_sm3_mov_shader_source(
                 // A D3D9 c# is immutable during a Draw; a previously
                 // proven TEMP is also uniform only for its read lanes.
                 // Unknown banks and relative c# stay conservatively varying.
-                if (!(kind == D3DSPR_CONST && !relative) &&
+                if (!(kind == D3DSPR_CONST &&
+                       native_sm3_addressed_const_draw_uniform(
+                           relative, staticAddress)) &&
                     !(kind == D3DSPR_TEMP &&
                       tempDrawUniformity.contains(
                           reg, uniformPhysicalComponents)))

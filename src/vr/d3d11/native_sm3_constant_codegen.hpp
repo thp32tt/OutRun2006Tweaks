@@ -97,6 +97,24 @@ inline bool append_native_sm3_matrix(
 }
 
 
+// A shader-owned, DEF-folded MOVA a0.x is immutable for the Draw.
+// Dynamic aL is not uniform, and signed effective indices still require
+// bank checks before native HLSL emission.
+[[nodiscard]] constexpr bool native_sm3_addressed_const_draw_uniform(
+    bool relative, bool staticAddress) noexcept {
+    return !relative || staticAddress;
+}
+// Negative fixed a0 can bring a late c# matrix back into the register bank.
+// Check the encoded base here; the complete signed row span is checked by
+// native_sm3_relative_matrix_references on the resolved address.
+[[nodiscard]] constexpr bool native_sm3_matrix_source_span_accepted(
+    unsigned base, unsigned rows, unsigned limit,
+    bool relative, bool staticAddress) noexcept {
+    return rows >= 2u && rows <= 4u && limit >= 1u &&
+           limit <= 256u && base < limit &&
+           ((relative && staticAddress) || rows <= limit - base);
+}
+
 /*
  * Bind an entire game SM3 M*x* c-register matrix, including c[base+a0]
  * and c[base+aL]. Static a0 uses real DEF precedence; aL must refer to
