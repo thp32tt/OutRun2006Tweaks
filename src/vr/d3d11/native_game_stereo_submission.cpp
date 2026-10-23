@@ -952,7 +952,7 @@ bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
         if (!replay_due_source_clears()) return false;
     }
     return game_source_target_bound(gameTarget) &&
-        geometry_outputs_isolated(gameTarget);
+        game_offscreen_outputs_admitted(gameTarget);
 }
 
 // One actual game draw can populate several separately authored camera

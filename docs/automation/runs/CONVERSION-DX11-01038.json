@@ -88,7 +88,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "blocking_evidence": "Fast Structural Gate run 40040420285 and Backend Gate run 40040420259 rejected incomplete 01038 task-contract fields; Windows Build run 40040420364 rejected stale structural matcher demanding sole offscreen RTV, though the actual implementation validates bounded MRT with no pixel UAV. Fast Structural #40040648557 failed 01037 outdated global note_untracked_gpu_write call-count after real 01038 MRT recorder added fourth fail-closed path; retain negative route assertions."
+    "blocking_evidence": "Fast Structural Gate run 40040420285 and Backend Gate run 40040420259 rejected incomplete 01038 task-contract fields; Windows Build run 40040420364 rejected stale structural matcher demanding sole offscreen RTV, though the actual implementation validates bounded MRT with no pixel UAV. Fast Structural #40040648557 failed 01037 outdated global note_untracked_gpu_write call-count after real 01038 MRT recorder added fourth fail-closed path; retain negative route assertions. Windows Build #40040648615 found old isolated-RT rebind path after pre-Draw eye timeline replay; actual camera MRT rebind must satisfy full validated game_offscreen_outputs_admitted."
   },
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.cpp",
@@ -104,7 +104,7 @@
   "material_result_sha": "d2a0a4c293701126dedd3f1f3bfd849126761bd4",
   "validation_bearing_result_sha": null,
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Exact SHA full GitHub Gate including Windows build; repair only confirmed causal failures in 01038; no HMD/game inference.",
+  "NEXT_IMPLEMENTATION_ACTION": "Five GitHub Actions exact SHA on final corrected source: source MRT after chronological eye Clear/Copy replay plus per-slot provenance, no HMD run.",
   "full_dx11_renderer_complete": false,
   "feature_ready": false
 }
