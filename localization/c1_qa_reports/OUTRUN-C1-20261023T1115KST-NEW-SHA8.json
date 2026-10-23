@@ -1,0 +1,576 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T1115KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T11:18:18.020129+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "history_excluded_sha_count": 527,
+  "counts": {
+    "total": 8,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "sha_verification": {
+    "source_manifest_sha_match": 8,
+    "source_sent_sha_match": 8,
+    "candidate_export_sha_match": 8,
+    "rgba_png": 8
+  },
+  "evidence_on_N100": {
+    "metrics": "work/C1_QA_20261023_1115_metrics.json",
+    "compare_A": "work/C1_QA_20261023_1115_A_pairs.jpg",
+    "compare_B": "work/C1_QA_20261023_1115_B_pairs.jpg"
+  },
+  "scope": "A/B actual ChatGPT ImageGen-generated PNG candidates, C1 independent QA only. No ImageGen call, A/B queue consumption, DDS production/approval/deployment, C2/C3 or in-game PASS.",
+  "notes": [
+    "후보 PNG 8/8의 번역 한글 가독성 및 매핑을 실물 A/B 비교 시트로 확인했으며 영문 대비 길이 차이는 반려 사유로 사용하지 않음.",
+    "출력 이미지의 source ROI 대비 해상도가 8/8 일치하지 않고 producer pairing은 OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED. 실제 atlas UI cell/UV 위치·원본 보호 아트 충돌을 검증한 자료가 없으므로 보류.",
+    "A 4건은 ROI에 여러 영어 레이블과 버튼/차량/도로 아트가 포함돼 정확한 문구 셀/보호 픽셀을 미확정. B 4건은 원본 대비 효과/색상 변화가 큰 항목이 있어 합성 전에 디자인 정합성 확인 필요.",
+    "HOLD는 실제 시각 결함 확정 FAIL이 아니며 QA용 대기 상태. SOURCE_BBOX_CONTAINMENT=UNTESTED. 새로운 DDS/실게임 승인 아님."
+  ],
+  "records": [
+    {
+      "role": "A",
+      "batch": 40,
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "source_ordinal": 194,
+      "source_file": "Q097_ba81b81a13e85d54_source.png",
+      "candidate_file": "Q097_ba81b81a13e85d54_source_k.png",
+      "english": "NORMAL",
+      "approved_korean": "일반",
+      "original_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "source_sha256": "16568e406e9fec35f29149fa39c5102e59987131c009e33f3541c825f21f9b53",
+      "candidate_sha256": "8128d2daa7901d13af4d94de10fe2020c1a58f155f2e9ae6a4e79d1d78366613",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          899,
+          510
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          899,
+          510
+        ],
+        "edge_alpha_pixels": [
+          304,
+          211,
+          350,
+          733
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1672,
+          941
+        ],
+        "alpha_bbox": [
+          561,
+          169,
+          1425,
+          714
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 NORMAL의 녹색 버튼·TUNED/RANDOM 인접 보호 아트 포함. 후보 '일반' 글리프와 효과는 가독 가능하나 정확한 버튼 텍스트 셀·합성 위치 미검증.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "A",
+      "batch": 39,
+      "task_id": "OUTRUN-ROI-A-0039-DD2771C2",
+      "source_ordinal": 193,
+      "source_file": "Q097_fcfb148739388251_source.png",
+      "candidate_file": "Q097_fcfb148739388251_source_k.png",
+      "english": "TUNED",
+      "approved_korean": "튜닝",
+      "original_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "source_sha256": "7b01f1b00a2f3f38a19d3037fb934003aee34a6874c2d31a61c56cd82e7dd63b",
+      "candidate_sha256": "2e48a34c280983b3f125ee11c38332abbd4034878d6057f29f306db47e787ade",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          972,
+          550
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          972,
+          550
+        ],
+        "edge_alpha_pixels": [
+          445,
+          355,
+          319,
+          809
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1667,
+          943
+        ],
+        "alpha_bbox": [
+          89,
+          121,
+          1503,
+          866
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 TUNED는 빨간 선택판 및 NORMAL 인접 UI 포함. '튜닝' 글리프는 뚜렷함. ROI 대비 출력 크기 차이로 native 원형/기울기 정합 미확인.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "A",
+      "batch": 39,
+      "task_id": "OUTRUN-ROI-A-0039-DD2771C2",
+      "source_ordinal": 192,
+      "source_file": "Q061_b0158ad1e7fa3f75_source.png",
+      "candidate_file": "Q061_b0158ad1e7fa3f75_source_k.png",
+      "english": "Don't crash!",
+      "approved_korean": "충돌하지 마세요!",
+      "original_dds_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "source_sha256": "2a66f35869605a23e4a5067a9aa0540e7ff77a5dd105503b39f90b22cda8711f",
+      "candidate_sha256": "8bc2917f8ffc5fb1bc7f2f86df3e0cf8e68cac817823d162bec0343c389c7395",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1241,
+          570
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1241,
+          570
+        ],
+        "edge_alpha_pixels": [
+          360,
+          316,
+          1203,
+          1188
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1850,
+          850
+        ],
+        "alpha_bbox": [
+          25,
+          99,
+          1832,
+          786
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 여러 영어 도움말 문구·차량/도로/바가 공존함. '충돌하지 마세요!' 명확하지만 독립 단일 문구 좌표·이웃 글자 보호를 검증할 수 없음.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "A",
+      "batch": 39,
+      "task_id": "OUTRUN-ROI-A-0039-DD2771C2",
+      "source_ordinal": 191,
+      "source_file": "Q061_fa3aee16a8174302_source.png",
+      "candidate_file": "Q061_fa3aee16a8174302_source_k.png",
+      "english": "Collect coins!",
+      "approved_korean": "코인을 모으세요!",
+      "original_dds_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "source_sha256": "a28e8f5e61df2c009ec42cebce91ab731292cd71c1572836900138002a0219ae",
+      "candidate_sha256": "9d7c76eef4f0f3c68016001c50a48c54e452a028feac9704db09ba42f8cc86c2",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1241,
+          598
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1241,
+          598
+        ],
+        "edge_alpha_pixels": [
+          370,
+          288,
+          1189,
+          913
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1806,
+          871
+        ],
+        "alpha_bbox": [
+          55,
+          149,
+          1767,
+          714
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 여러 영어 지시 문구·차량·도로 UI 동시 포함. '코인을 모으세요!' 읽힘. 인접 'Don't crash!' 및 다른 문구와 합성 시 간섭 미검증.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "B",
+      "batch": 53,
+      "task_id": "OUTRUN-ROI-B-0053-1DBF9F13",
+      "source_ordinal": 250,
+      "source_file": "Q212_423e0cb72a1eed98_source.png",
+      "candidate_file": "Q212_423e0cb72a1eed98_source_k.png",
+      "english": "SELECT PHOTO",
+      "approved_korean": "사진 선택",
+      "original_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_sha256": "3b569aa423d4ad043cccfaa47271ab9c9939b742b2d894a0f21efb32f18a0660",
+      "candidate_sha256": "c8db2f87d212db1b79d1506949f1d15c4cc1384c55055271cdf56df59cee23df",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          865,
+          352
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          865,
+          352
+        ],
+        "edge_alpha_pixels": [
+          44,
+          12,
+          243,
+          12
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1966,
+          800
+        ],
+        "alpha_bbox": [
+          0,
+          6,
+          1908,
+          766
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 SELECT PHOTO 외 SELECT NATIONALITY/SELECT STAR SIGN 등 다중 항목 공존. '사진 선택'은 읽히지만 원본 무채색 평면 폰트와 후보 금색 입체 효과 차이 및 정확 배치 미확인.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "B",
+      "batch": 52,
+      "task_id": "OUTRUN-ROI-B-0052-6AEE4989-R1",
+      "source_ordinal": 249,
+      "source_file": "Q212_eece084213157579_source.png",
+      "candidate_file": "Q212_eece084213157579_source_k.png",
+      "english": "OUTRUN",
+      "approved_korean": "아웃런",
+      "original_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_sha256": "3f5265b56a678b2de7196c0739f80f344223fbc26bc7f734f43898f0367a88a6",
+      "candidate_sha256": "3b5fc2f6c105d25183c1bbfa860aec865a7915a92802b417b4331a47173c1780",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1588,
+          689
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1588,
+          689
+        ],
+        "edge_alpha_pixels": [
+          197,
+          196,
+          526,
+          644
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1904,
+          826
+        ],
+        "alpha_bbox": [
+          0,
+          9,
+          1862,
+          826
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 OUTRUN 주변 ART ATTACK/차량 로고 요소 공존. '아웃런'은 가독 가능하며 원본 붉은 평면 글씨와 후보 은색 입체 글씨 차이가 뚜렷해 디자인 및 보호 아트 간섭 별도 확인 필요.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "B",
+      "batch": 52,
+      "task_id": "OUTRUN-ROI-B-0052-6AEE4989-R1",
+      "source_ordinal": 248,
+      "source_file": "Q212_eb988795d1d577d4_source.png",
+      "candidate_file": "Q212_eb988795d1d577d4_source_k.png",
+      "english": "SELECT STAR SIGN",
+      "approved_korean": "별자리 선택",
+      "original_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_sha256": "c27cc8877b4eba73068a352a7c7448515dd6fe89e1f0f9d35489440fcab0e319",
+      "candidate_sha256": "0bd2e9e3b46ed419891e6b1a62e4a0e26cca3615d4f0990800fcab777510a0f0",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1076,
+          383
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1076,
+          383
+        ],
+        "edge_alpha_pixels": [
+          102,
+          43,
+          390,
+          405
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2102,
+          748
+        ],
+        "alpha_bbox": [
+          75,
+          37,
+          2016,
+          709
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 SELECT STAR SIGN 주변 SELECT PHOTO 및 하단 다른 영역 포함. '별자리 선택' 읽힘. 강한 입체 효과·출력 크기 차이로 native 위치/안전영역 미확인.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "B",
+      "batch": 52,
+      "task_id": "OUTRUN-ROI-B-0052-6AEE4989-R1",
+      "source_ordinal": 247,
+      "source_file": "Q197_2cc525ea6653395c_source.png",
+      "candidate_file": "Q197_2cc525ea6653395c_source_k.png",
+      "english": "OUTRUN LICENSE",
+      "approved_korean": "아웃런 라이선스",
+      "original_dds_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "source_sha256": "5dd66249c237348fcffb5f03cb381f6bab6041856835b1b3d5387094e2a216bb",
+      "candidate_sha256": "cc485fc1e4e9265bd6795f1616cdedd829771c5ce77384ff305a6a4c6b8b8319",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          938,
+          442
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          938,
+          442
+        ],
+        "edge_alpha_pixels": [
+          386,
+          442,
+          938,
+          938
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1827,
+          861
+        ],
+        "alpha_bbox": [
+          0,
+          153,
+          1575,
+          804
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 OUTRUN LICENSE는 UI 흰 패널 내부 텍스트. '아웃런 라이선스' 정확히 읽히지만 최종 패널 텍스트 셀 배치·배경 대비 및 효과 범위 검증 없음.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    }
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "DDS_APPROVED": false,
+  "C2_C3_APPROVED": false,
+  "A_B_QUEUE_CONSUMED": false,
+  "IMAGEGEN_CALLED": false,
+  "score_reward": "New SHA QA may count only once for this RUN_KEY; update scoreboard separately from its latest authoritative baseline."
+}
