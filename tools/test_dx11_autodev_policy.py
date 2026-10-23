@@ -273,6 +273,23 @@ failed_00966 = copy.deepcopy(historical_00966)
 failed_00966["automation_validation"] = "FAIL_EXACT_SHA"
 assert validate_task(failed_00966, p)
 
+# 01016 causal CI repair: 01015 C6 source-proof metadata must satisfy the
+# same post-00672 feature unit as earlier implementation records, without
+# promoting any unobserved game/Quest3 result to gameplay PASS.
+historical_01015 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01015.json").read_text(encoding="utf-8"))
+assert historical_01015["runtime_validation"] == "UNTESTED"
+assert historical_01015["validation_bearing_result_sha"] == "4a6b1bface948fa1edbf83514b27a0b81ef2c071"
+assert not validate_task(historical_01015, p), validate_task(historical_01015, p)
+for label, mutate in (
+    ("missing historical gameplay target", lambda t: t["development_strategy"].pop("gameplay_delivery_target")),
+    ("missing historical feature contract", lambda t: t.pop("feature_contract")),
+    ("unproven historical acceptance", lambda t: t["acceptance_results"]["live_sm3_vpos_to_native_game_draw"].update(status="PENDING_CI")),
+):
+    bad = copy.deepcopy(historical_01015)
+    mutate(bad)
+    assert validate_task(bad, p), "01015 metadata guard bypassed: " + label
+
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
 print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")
