@@ -12,15 +12,15 @@
   "feature_id": "DX11:LIVE_SM3_CALL_SUBROUTINE_NATIVE_DRAW",
   "work_key": "DX11:LIVE_SM3_CALL_SUBROUTINE_NATIVE_DRAW",
   "work_class": "integration",
-  "feature_stage": "C4_MATERIAL",
-  "checkpoint": "C4_MATERIAL",
-  "status": "SOURCE_COMMITTED_CI_PENDING",
-  "source_head": "e19dae869d90146950036500e5dd5eacf4b1d6b0",
-  "material_result_sha": null,
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_CI",
-  "AUTOMATION_VALIDATION": "PENDING_CI",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "source_head": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+  "material_result_sha": "d30d3c93e91277b2edeeeb5f93252926aee0dfa5",
+  "result_sha": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+  "validation_bearing_result_sha": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -95,47 +95,89 @@
     "docs/automation/runs/CONVERSION-DX11-01025.json"
   ],
   "pending_items": [
-    "Final five exact-SHA GitHub Gates pending; physical menu/car/race Quest3/VDXR input and FFB UNTESTED"
+    "Physical Quest3/VDXR native first visible game frame, input/gamepad/FFB and menu-car-race gameplay UNTESTED"
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Game shader CALL paths translated at source level but no matching real game native Draw+published-frame measurement",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "PENDING_MATERIAL_SHA",
-  "NEXT_IMPLEMENTATION_ACTION": "Await mandatory exact-SHA CI, repair only verified causality; retain D3D9Ex fallback and runtime UNTESTED",
+  "CODE_CHANGED_SHA": "d30d3c93e91277b2edeeeb5f93252926aee0dfa5",
+  "NEXT_IMPLEMENTATION_ACTION": "Physical Quest3/VDXR menu-car-race native Draw+published-frame measurements remain UNTESTED; preserve DX9Ex fallback.",
   "acceptance_results": {
     "sm3_subroutine_game_draw": {
-      "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+      "status": "PASS_FEATURE_CI",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
         "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
         "src/vr/d3d11/native_backend.cpp",
         "tools/dx11_sm3_subroutine_probe_01025.cpp"
-      ]
+      ],
+      "validation_command": "DX11 Fast Structural Checks: SM3 subroutine probe + source graph and masked shader regression"
     },
     "original_fallback": {
-      "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+      "status": "PASS_FEATURE_CI",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
         "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
         "tools/dx11_sm3_subroutine_probe_01025.cpp"
-      ]
+      ],
+      "validation_command": "DX11 Fast Structural Checks: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_subroutine_probe_01025.cpp"
     },
     "same_sha_gates": {
-      "status": "PENDING_CI",
+      "status": "PASS",
       "runtime_validation": "UNTESTED",
       "evidence_paths": [
         "src/vr/d3d11/native_sm3_subroutine_expansion.hpp",
         "src/vr/d3d11/native_backend.cpp",
         "tools/dx11_sm3_subroutine_probe_01025.cpp",
         ".github/workflows/dx11-fast-structural.yml"
-      ]
+      ],
+      "validation_command": "GitHub Actions exact SHA 4520c743: Fast 39963301582, Backend 39963301463, Win32 39963301548, OpenXR 39963308934, HUD 39963308551"
     }
   },
   "gate_evidence": {
-    "source_sha": null,
-    "material_source_sha": null,
-    "required_gates": {},
-    "causal_repairs": []
-  }
+    "source_sha": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+    "material_source_sha": "d30d3c93e91277b2edeeeb5f93252926aee0dfa5",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39963301582,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39963301463,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39963301548,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39963308934,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39963308551,
+        "conclusion": "success"
+      }
+    },
+    "causal_repairs": [
+      {
+        "sha": "348cc4b268dbae468f7a3376abc92a60c4b1db0f",
+        "reason": "SM3 shader cache V15 regression expectation"
+      },
+      {
+        "sha": "8a2b5f7437a28f8e41be92e2b444d055bf06b947",
+        "reason": "R283 source graph and MOVA provenance V15"
+      },
+      {
+        "sha": "e9d22ba0f2989b5079d8200b704f12cf0515b22d",
+        "reason": "masked SM3 V15 test expectation"
+      },
+      {
+        "sha": "4520c7434ab8b0e37c3dd50e022310ea6353838a",
+        "reason": "repeated nested CALL execution order probe"
+      }
+    ]
+  },
+  "feature_ready": true
 }
