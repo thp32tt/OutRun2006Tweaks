@@ -16,7 +16,16 @@ assert "instruction.opcode == D3DSIO_TEXLDD)" not in predication
 assert "!predicateDrawUniformity.implicit_sampling_safe(sourcePredicated)" in backend
 assert "!derivativeUniformity.implicit_sampling_safe()" in backend
 assert "predicateDrawUniformity.write(" in backend
-assert "structuredFlow.empty() &&" in backend
+# Branch/loop admission now follows the explicit p0 physical provenance
+# tracker, not a blanket structuredFlow.empty() ban. Preserve the legacy
+# varying-IFC and unknown-p0 denial while permitting uniform both-arm SETP.
+assert "predicateDrawUniformity.uniform_flow() &&" in backend
+assert "predicateDrawUniformity.begin_if(uniformComparison)" in backend
+assert "predicateDrawUniformity.begin_if(true)" in backend
+assert "predicateDrawUniformity.otherwise()" in backend
+assert "predicateDrawUniformity.end_if()" in backend
+assert "predicateDrawUniformity.begin_loop()" in backend
+assert "predicateDrawUniformity.end_loop()" in backend
 # A real IFC(c#,c#) is now correctly quad-uniform; a pixel-varying
 # TEMP/input/vPos/vFace on EITHER side must not unlock implicit derivatives.
 assert "NativeSm3IfcScalarOrigin::PixelDependent" in backend
