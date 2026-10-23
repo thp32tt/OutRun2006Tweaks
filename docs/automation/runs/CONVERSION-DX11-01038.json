@@ -11,10 +11,10 @@
   "feature_id": "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW",
   "work_key": "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW",
   "feature_base_sha": "f865cfad053d692e8230ccfe4024c39b10cc509a",
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "feature_stage": "C4_COMMITTED",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_GITHUB_ACTIONS_EXACT_SHA",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "feature_stage": "C5_VALIDATION_PENDING",
+  "checkpoint": "C5_GATES",
+  "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -31,29 +31,33 @@
       {
         "id": "gpu_mrt_draw",
         "category": "end_to_end_behavior",
-        "expected_behavior": "Owned same-resolution game MRT Draw and DrawIndexed issue native GPU commands and record per-target source pixels"
+        "expected_behavior": "Owned same-resolution game MRT Draw and DrawIndexed issue native GPU commands and record per-target source pixels",
+        "behavior_area": "NATIVE_OFFSCREEN_GAME_MRT_DRAW"
       },
       {
         "id": "blend_provenance",
         "category": "source_correctness",
-        "expected_behavior": "IndependentBlendEnable and physical target subresource control color attribution"
+        "expected_behavior": "IndependentBlendEnable and physical target subresource control color attribution",
+        "behavior_area": "CAMERA_PIXEL_SOURCE_PROVENANCE"
       },
       {
         "id": "fallback",
         "category": "fallback_regression",
-        "expected_behavior": "Eye/direct Draw isolation preserved; foreign/shared/mismatched MRT and pixel UAV fail closed"
+        "expected_behavior": "Eye/direct Draw isolation preserved; foreign/shared/mismatched MRT and pixel UAV fail closed",
+        "behavior_area": "OPENXR_EYE_ISOLATION_AND_GAME_FALLBACK"
       },
       {
         "id": "gate",
         "category": "integrated_validation",
-        "expected_behavior": "New regression and all five required GitHub Actions exact SHA success"
+        "expected_behavior": "New regression and all five required GitHub Actions exact SHA success",
+        "behavior_area": "EXACT_SHA_INTEGRATED_CI"
       }
     ]
   },
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
-    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAMES",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
     "integration_path": [
       "game-author D3D9 MRT Draw",
       "native offscreen multiple RTVs",
@@ -65,7 +69,26 @@
       "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW"
     ],
     "visible_frame_acceptance": "SOURCE_ONLY_UNTESTED; no real-game/HMD observation",
-    "activation_guard_and_fallback": "original D3D9Ex authoritative, opt-in native; no DXVK changes"
+    "activation_guard_and_fallback": "original D3D9Ex authoritative, opt-in native; no DXVK changes",
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_offscreen_mrt.hpp",
+      "tools/dx11_game_offscreen_mrt_probe_01038.cpp",
+      "tools/test_dx11_game_offscreen_mrt_01038.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_game_offscreen_mrt_probe_01038.cpp verifies compatible full-size and MSAA actual game camera MRT slot admission.",
+      "negative_regression": "tools/test_dx11_game_offscreen_mrt_01038.py checks authentic Draw source chronology plus negative shared/foreign/eye, mismatched extent/sample and pixel UAV isolation.",
+      "component_integration": "src/vr/d3d11/native_game_stereo_submission.cpp routes real offscreen Draw/DrawIndexed and instanced camera output through each MRT's blend mask and physical source provenance into later XR GPU Copy/Stretch."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "blocking_evidence": "Fast Structural Gate run 40040420285 and Backend Gate run 40040420259 rejected incomplete 01038 task-contract fields; Windows Build run 40040420364 rejected stale structural matcher demanding sole offscreen RTV, though the actual implementation validates bounded MRT with no pixel UAV."
   },
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.cpp",
@@ -74,12 +97,13 @@
     "tools/dx11_game_offscreen_mrt_probe_01038.cpp",
     "tools/test_dx11_game_offscreen_mrt_01038.py",
     ".github/workflows/dx11-fast-structural.yml",
-    "docs/automation/runs/CONVERSION-DX11-01038.json"
+    "docs/automation/runs/CONVERSION-DX11-01038.json",
+    "tools/verify_dx11_activation_boundary.py"
   ],
-  "material_result_sha": null,
+  "material_result_sha": "d2a0a4c293701126dedd3f1f3bfd849126761bd4",
   "validation_bearing_result_sha": null,
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Validate exact GitHub Actions SHA; repair only causal failure, keep real menu/car/race HMD untested; do not claim native game draw without runtime evidence.",
+  "NEXT_IMPLEMENTATION_ACTION": "Exact SHA full GitHub Gate including Windows build; repair only confirmed causal failures in 01038; no HMD/game inference.",
   "full_dx11_renderer_complete": false,
   "feature_ready": false
 }

@@ -332,7 +332,7 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
     ]
     preflight_guards = [
         "if (!game_source_target_bound(gameTarget) ||",
-        "!geometry_outputs_isolated(gameTarget) ||",
+        "!game_offscreen_outputs_admitted(gameTarget) ||",
         "drawCount_ == (std::numeric_limits<std::uint64_t>::max)())",
         "if (sourceClears_ &&",
         ".afterDrawOrdinal <= drawCount_)",
@@ -340,8 +340,27 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         "context_->OMSetRenderTargets(1u, &eye, eyeDepth_);",
         "if (!replay_due_source_clears()) return false;",
         "return game_source_target_bound(gameTarget) &&",
-        "geometry_outputs_isolated(gameTarget);",
+        "game_offscreen_outputs_admitted(gameTarget);",
     ]
+    # Separate XR direct-eye isolation from real game-owned auxiliary MRTs.
+    # The latter must reject a foreign/shared eye, mismatched geometry extent,
+    # depth-aliasing allocations and any pixel UAV in the non-RTV tail.
+    mrt = section(
+        "bool NativeGameEyeDrawEncoder::game_offscreen_outputs_admitted(",
+        "\nbool NativeGameEyeDrawEncoder::geometry_outputs_isolated(")
+    mrt_guards = [
+        "context_->OMGetRenderTargets(",
+        "targets[0].Get() != gameTarget",
+        "native_game_camera_rtv_extent(",
+        "native_game_offscreen_mrt_slot_compatible(",
+        "resource.Get() != eyeResource.Get()",
+        "resource.Get() != gameDepthResource.Get()",
+        "owner.Get() == device.Get()",
+        "context_->OMGetRenderTargetsAndUnorderedAccessViews(",
+        "if (!clean) return false;",
+    ]
+    missing_mrt = ["offscreen-mrt:" + guard for guard in mrt_guards
+                   if guard not in mrt]
     # The camera's physical RTV view and actual immediate-context raster
     # state must be inspected BEFORE replaying any eye postpass commands.
     # This remains separate from clipped D3D9 Clear semantics.
@@ -430,6 +449,7 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
     missing = [
         "offscreen-target:" + token for token in source_guards if token not in target
     ]
+    missing += missing_mrt
     missing += [
         "offscreen-raster:" + token for token in raster_guards
         if token not in raster_section
