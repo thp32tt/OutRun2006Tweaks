@@ -6,7 +6,12 @@ bridge = (r / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 stereo = (r / "src/vr/d3d11/native_game_stereo_submission.cpp").read_text()
 header = (r / "src/vr/d3d11/native_game_stereo_submission.hpp").read_text()
 assert "native_game_raster_partial_backbuffer_color_clear(" in bridge
-assert bridge.count("native_game_raster_partial_backbuffer_color_clear(") == 2
+# Two existing live partial TARGET/ColorFill sites plus both newly admitted
+# first-Draw SM3/FVF replay paths must retain genuine D3D11.0 GPU dispatch.
+assert bridge.count("native_game_raster_partial_backbuffer_color_clear(") == 4
+assert bridge.count("game_native_replay_pre_draw_fills(") == 2
+assert "if (!replayed) return false;" in bridge
+assert "if (!replayed) {" in bridge
 assert "native_game_raster_partial_backbuffer_color_clear(" in stereo
 assert "native_game_raster_partial_backbuffer_color_clear(" in header
 assert "raster_partial_eye_color_clear(" in stereo
