@@ -31,7 +31,8 @@ def connected(s):
         and all(x in capture for x in (
             "src == D3DBLEND_DESTCOLOR && dst == D3DBLEND_ZERO",
             "src == D3DBLEND_ZERO && dst == D3DBLEND_SRCCOLOR",
-            "if (separate != FALSE) {",
+            "if (activeSeparateAlpha) {",
+            "native_game_active_separate_alpha(separate, colorMask);",
             "!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,",
             "output.separateAlphaBlend = true;",
             "if (blendOp != D3DBLENDOP_ADD) {",

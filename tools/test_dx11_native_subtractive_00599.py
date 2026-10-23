@@ -32,7 +32,8 @@ def connected(s):
         and all(x in producer for x in (
             "GetRenderState(D3DRS_BLENDOP, &blendOp)",
             "GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)",
-            "if (separate != FALSE) {",
+            "if (activeSeparateAlpha) {",
+            "native_game_active_separate_alpha(separate, colorMask);",
             "!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,",
             "output.separateAlphaBlend = true;",
             "if (blendOp != D3DBLENDOP_ADD) {",
