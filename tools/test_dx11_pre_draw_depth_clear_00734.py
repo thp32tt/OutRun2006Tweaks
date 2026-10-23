@@ -12,7 +12,9 @@ def linked(b, h, r):
     end = b.index("void observe_game_clear(", start)
     observer = b[start:end]
     # Check the canonical full-Z seed branch, not the 01036 partial-Z recorder.
-    if "const bool beforeFirstGameDraw = !s.pending &&" not in observer:\n        return False  # Destructive mutation removed this necessary source-Z seed.\n    canonical = observer.split("const bool beforeFirstGameDraw = !s.pending &&",1)[1]
+    if "const bool beforeFirstGameDraw = !s.pending &&" not in observer:
+        return False  # Destructive mutation removed this necessary source-Z seed.
+    canonical = observer.split("const bool beforeFirstGameDraw = !s.pending &&",1)[1]
     pre_seed = canonical.split("s.frameBatch.can_seed_pre_draw_depth(",1)[1].split(");",1)[0]
     color = b[b.index("void observe_game_clear("):b.index("void observe_unavailable_game_draw(")]
     draw = b[b.index("bool submit("):b.index("bool observe_source_device(")]
