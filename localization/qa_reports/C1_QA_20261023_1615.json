@@ -1,0 +1,334 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261023T1615KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T16:22:40+09:00",
+  "role": "C1",
+  "source_branch": "korean-localization-recovery-20260928",
+  "reviewed_sha_history_count": 607,
+  "total_new_unique_candidate_sha256": 7,
+  "summary": {
+    "PASS": 0,
+    "FAIL": 1,
+    "HOLD": 6,
+    "source_manifest_sha_matches": 7,
+    "source_sent_sha_matches": 7,
+    "candidate_export_sha_matches": 7,
+    "rgba_png_count": 7,
+    "native_source_canvas_matches": 0
+  },
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_n100": [
+    "work/C1_QA_20261023_1615_metrics.json",
+    "work/C1_QA_20261023_1615_A_pairs.jpg",
+    "work/C1_QA_20261023_1615_B_pairs.jpg",
+    "work/C1_QA_20261023_1615_white.jpg"
+  ],
+  "role_boundaries": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "game_deployed": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "source_ordinal": 154,
+      "english": "NORWAY",
+      "approved_korean": "노르웨이",
+      "source_png": "Q161_533f9569493fb2fb_source.png",
+      "candidate_png": "Q161_533f9569493fb2fb_source_k.png",
+      "source_sha256": "66a07e2df6608ddf0b05ef199eb521cda4173545d35e7daa886e4c64afa20de6",
+      "candidate_sha256": "97d105ff33a2aef017d8a1f243ab4274ed1343042d0587632ac09921737e5422",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_size": [
+        1210,
+        116
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_rgba_png": true,
+      "candidate_alpha_bbox": [
+        57,
+        71,
+        1144,
+        595
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_korean_mapping": "MATCH",
+      "verdict": "HOLD",
+      "reason": "HOLD_RESIZED_CANVAS_AND_UI_PLACEMENT: 한글 번역과 시각적 가독성은 확인되나 출력 PNG 캔버스가 원본 ROI와 달라 native UI cell/UV 배치·효과 클리핑을 아직 검증할 수 없음.",
+      "text_length_difference_ignored": true,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0031-709B11A6",
+      "source_ordinal": 153,
+      "english": "Heart Attack Mode",
+      "approved_korean": "하트 어택 모드",
+      "source_png": "Q116_a9da32ccca1ed48a_source.png",
+      "candidate_png": "Q116_a9da32ccca1ed48a_source_k.png",
+      "source_sha256": "4fbe3c95680b1876324fd7eb4dc6fff4e3f3883b6f06a9a1e8382bc314d51011",
+      "candidate_sha256": "0ba1c43ed87ebdaa595fc2480f797c3e4350ee335fa4e6ed982772325ebce800",
+      "original_dds_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+      "source_size": [
+        1243,
+        154
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_rgba_png": true,
+      "candidate_alpha_bbox": [
+        36,
+        31,
+        2150,
+        724
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_korean_mapping": "MATCH",
+      "verdict": "HOLD",
+      "reason": "HOLD_RESIZED_CANVAS_AND_UI_PLACEMENT: 한글 번역과 시각적 가독성은 확인되나 출력 PNG 캔버스가 원본 ROI와 달라 native UI cell/UV 배치·효과 클리핑을 아직 검증할 수 없음. 후보 알파가 하단 경계에 닿아 효과/획 잘림 여부 추가 확인 필요.",
+      "text_length_difference_ignored": true,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0031-709B11A6",
+      "source_ordinal": 152,
+      "english": "GOAL",
+      "approved_korean": "골",
+      "source_png": "Q063_a23cdd8f59fc6939_source.png",
+      "candidate_png": "Q063_a23cdd8f59fc6939_source_k.png",
+      "source_sha256": "c4b2280e40e633376e9493689360efff5e973b27db93621df2ea1b1d7ddd4c68",
+      "candidate_sha256": "c13d6792f65e84d079110598a0de876b3f2c91a17f1d40f60feb0b345c8ee0c6",
+      "original_dds_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+      "source_size": [
+        280,
+        108
+      ],
+      "candidate_size": [
+        2019,
+        779
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_rgba_png": true,
+      "candidate_alpha_bbox": [
+        0,
+        4,
+        1983,
+        761
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_korean_mapping": "MATCH",
+      "verdict": "FAIL",
+      "reason": "FAIL_NON_TEXT_FRAME: GOAL→골 출력에 붉은 배지 플레이트와 금속 프레임이 통째로 재생성됨. 투명 글자 전용 PNG 요구 위반. 크기 불일치는 별도.",
+      "text_length_difference_ignored": true,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0031-709B11A6",
+      "source_ordinal": 151,
+      "english": "Hit the zippers!",
+      "approved_korean": "지퍼를 맞히세요!",
+      "source_png": "Q053_219808ea70df894c_source.png",
+      "candidate_png": "Q053_219808ea70df894c_source_k.png",
+      "source_sha256": "f81e76e310081d7d9feeafd6af3cfbe3c98e9cfdfef9e6e17f5d3e3a4d875b4b",
+      "candidate_sha256": "15122a9c0d47a07ac1a8d59d374247667b1e58cf415ffeaf26ee8865bf7057c1",
+      "original_dds_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "source_size": [
+        1228,
+        246
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_rgba_png": true,
+      "candidate_alpha_bbox": [
+        115,
+        9,
+        2056,
+        724
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_korean_mapping": "MATCH",
+      "verdict": "HOLD",
+      "reason": "HOLD_RESIZED_CANVAS_AND_UI_PLACEMENT: 한글 번역과 시각적 가독성은 확인되나 출력 PNG 캔버스가 원본 ROI와 달라 native UI cell/UV 배치·효과 클리핑을 아직 검증할 수 없음. 후보 알파가 하단 경계에 닿아 효과/획 잘림 여부 추가 확인 필요.",
+      "text_length_difference_ignored": true,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "source_ordinal": 210,
+      "english": "ACCOUNT PASSWORD:",
+      "approved_korean": "계정 비밀번호:",
+      "source_png": "Q051_4a8f479dbea83acf_source.png",
+      "candidate_png": "Q051_4a8f479dbea83acf_source_k.png",
+      "source_sha256": "e29ac413f761c53b93cfd3975fd6fa64477e32ce0c16dd8651c54cf8687c5512",
+      "candidate_sha256": "ba6a1fda38a85e1196d4eadeace8d30b1647a9e016a23cef210225511f9a3641",
+      "original_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "source_size": [
+        722,
+        233
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_rgba_png": true,
+      "candidate_alpha_bbox": [
+        88,
+        9,
+        2158,
+        708
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_korean_mapping": "MATCH",
+      "verdict": "HOLD",
+      "reason": "HOLD_SOURCE_COMPOSITE_AND_UI_PLACEMENT: 원본 ROI 안에 여러 다른 영문·아이콘·보호 아트가 함께 있어 문구별 안전영역 분리 검증 필요. PNG 크기 변경 및 native UI cell/UV 배치 미검증.",
+      "text_length_difference_ignored": true,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0044-881A0AFD",
+      "source_ordinal": 209,
+      "english": "Floral Village",
+      "approved_korean": "플로럴 빌리지",
+      "source_png": "Q051_c5c1e87d053a9081_source.png",
+      "candidate_png": "Q051_c5c1e87d053a9081_source_k.png",
+      "source_sha256": "35f697e44bd335eae354715101c2059ecb699717ef7fe6c27d3476e28a21827b",
+      "candidate_sha256": "fc77280ed73d6ef43568162db8eaab8e763669f2f832f6dc85483dca5a13d18a",
+      "original_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "source_size": [
+        1171,
+        612
+      ],
+      "candidate_size": [
+        1735,
+        907
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_rgba_png": true,
+      "candidate_alpha_bbox": [
+        111,
+        153,
+        1687,
+        759
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_korean_mapping": "MATCH",
+      "verdict": "HOLD",
+      "reason": "HOLD_SOURCE_COMPOSITE_AND_UI_PLACEMENT: 원본 ROI 안에 여러 다른 영문·아이콘·보호 아트가 함께 있어 문구별 안전영역 분리 검증 필요. PNG 크기 변경 및 native UI cell/UV 배치 미검증.",
+      "text_length_difference_ignored": true,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0044-881A0AFD",
+      "source_ordinal": 208,
+      "english": "Legend",
+      "approved_korean": "레전드",
+      "source_png": "Q051_0f50d9f098ed0341_source.png",
+      "candidate_png": "Q051_0f50d9f098ed0341_source_k.png",
+      "source_sha256": "00f5d0c5d50ba1c28c059a8d5f9f6893cbbf7127f3d1aca097f055478809c9d0",
+      "candidate_sha256": "a525e692d1391c8f25455268d1e9d16aba5655c8a455347d5b408ad46d9736dc",
+      "original_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "source_size": [
+        1213,
+        584
+      ],
+      "candidate_size": [
+        1808,
+        870
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_rgba_png": true,
+      "candidate_alpha_bbox": [
+        579,
+        164,
+        1233,
+        570
+      ],
+      "candidate_edge_alpha_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_korean_mapping": "MATCH",
+      "verdict": "HOLD",
+      "reason": "HOLD_SOURCE_COMPOSITE_AND_UI_PLACEMENT: 원본 ROI 안에 여러 다른 영문·아이콘·보호 아트가 함께 있어 문구별 안전영역 분리 검증 필요. PNG 크기 변경 및 native UI cell/UV 배치 미검증.",
+      "text_length_difference_ignored": true,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_pass": false
+    }
+  ]
+}
