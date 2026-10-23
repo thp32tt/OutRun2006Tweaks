@@ -1,0 +1,55 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261023T2345KST-NEW-SHA",
+  "role": "C1",
+  "status": "IDLE",
+  "checked_at_kst": "2026-10-23T23:49:11.577304+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_record": "5c077ca91f9b0b1e4f84165c53ecb0ad413ddeb3",
+  "sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "n100_metrics_path": "work/C1_QA_20261023_2345_metrics.json",
+  "n100_metrics_sha256": "a5274b040ea0cb946ad0d1c1aad67cb0cdc6ee23c63663d9a3f663e624dfe009",
+  "producer_candidate_png_counts": {
+    "A": 279,
+    "B": 334,
+    "total": 613
+  },
+  "producer_export_evidence_files": 126,
+  "previously_recorded_candidate_sha256_count": 618,
+  "local_outputs_missing_producer_export_evidence": {
+    "A": 0,
+    "B": 0
+  },
+  "producer_export_evidence_missing_local_outputs": {
+    "A": 0,
+    "B": 0
+  },
+  "new_unique_candidate_sha_count": 0,
+  "verdict_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "notes": "At 23:49 KST, SHA-deduplicated A/B producer-evidenced PNG candidates contained zero new unique SHAs. No same-SHA re-review, quality promotion, or queue consumption. Older candidate verdicts remain unchanged.",
+  "role_boundaries": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "game_deployed": false,
+    "c2_c3_or_ingame_pass_created": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score": {
+    "ai": "AI 1",
+    "ssot": "thp32tt/ai-dev-lab@52444330e5de8948cd4658e1aa9b9513371b3d0d:AI_SCOREBOARD.md",
+    "previous_confirmed": 1753,
+    "delta": 0,
+    "current": 1753,
+    "reason": "Status-only IDLE, no new SHA or substantive QA outcome."
+  }
+}
