@@ -1509,12 +1509,24 @@ bool build_r283_sm3_mov_shader_source(
                         native_sm3_swizzled_components(
                             native_sm3_source_modifier_components(
                                 logicalComponents, modifier), swizzle);
-                    if (!positionDeclared || vertexStage ||
-                        reg != static_cast<UINT>(D3DSMO_POSITION) ||
-                        !native_sm3_pixel_position_source(required) ||
-                        (required & ~positionDeclaredMask) != 0u)
-                        return false;
-                    value = native_sm3_pixel_position_hlsl();
+                    // Actual ps_3_0 system inputs are two disjoint
+                    // rasterizer-owned banks. vPos has only declared xy;
+                    // vFace is the signed (+1/-1) scalar x, even when a
+                    // shader explicitly swizzles .xxxx to shade all lanes.
+                    // Do not source yzw from our HLSL helper's zero fill.
+                    if (vertexStage) return false;
+                    if (reg == static_cast<UINT>(D3DSMO_POSITION)) {
+                        if (!positionDeclared ||
+                            !native_sm3_pixel_position_source(required) ||
+                            (required & ~positionDeclaredMask) != 0u)
+                            return false;
+                        value = native_sm3_pixel_position_hlsl();
+                    } else if (reg == static_cast<UINT>(D3DSMO_FACE)) {
+                        if (!faceDeclared ||
+                            !native_sm3_face_scalar_source(required))
+                            return false;
+                        value = native_sm3_face_compare_hlsl();
+                    } else return false;
                 } else if (kind == D3DSPR_CONST) {
                     if (relative && staticAddress) {
                         unsigned index = 0u;
