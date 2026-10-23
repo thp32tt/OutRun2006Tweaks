@@ -362,10 +362,10 @@ bool build_r283_sm3_mov_shader_source(
         if (!decode.exact() || !registers.exact() ||
             !interfaceSemantics.exact())
             return false;
-        // A real SM3 CALL/LABEL/RET graph is a legal programmable VS/PS
+        // A real SM3 CALL/CALLNZ/LABEL/RET graph is a legal programmable VS/PS
         // source, not an unsupported D3D9 state. Inline bounded, acyclic
-        // subroutines into the same native TEMP/constant/texture and Draw
-        // materialization path. Unknown flow stays with D3D9Ex.
+        // subroutines (including b#-conditioned CALLNZ) into the native
+        // TEMP/constant/texture Draw path. Unknown flow stays with D3D9Ex.
         auto sourceInstructions = decode.instructions;
         if (!native_sm3_expand_subroutines(
                 decode.instructions,
@@ -373,6 +373,8 @@ bool build_r283_sm3_mov_shader_source(
                 static_cast<DWORD>(D3DSIO_CALLNZ),
                 static_cast<DWORD>(D3DSIO_LABEL),
                 static_cast<DWORD>(D3DSIO_RET),
+                static_cast<DWORD>(D3DSIO_IF),
+                static_cast<DWORD>(D3DSIO_ENDIF),
                 [](DWORD token, unsigned& label) noexcept {
                     if ((token & 0x80000000u) == 0u ||
                         r283_decode_register_type(token) != D3DSPR_LABEL ||
@@ -381,6 +383,18 @@ bool build_r283_sm3_mov_shader_source(
                         return false;
                     label = token & D3DSP_REGNUM_MASK;
                     return true;
+                },
+                [](DWORD token) noexcept {
+                    const unsigned swizzle =
+                        (token & D3DSP_SWIZZLE_MASK) >> 16u;
+                    return (token & 0x80000000u) != 0u &&
+                           r283_decode_register_type(token) ==
+                               D3DSPR_CONSTBOOL &&
+                           (token & D3DSHADER_ADDRESSMODE_MASK) == 0u &&
+                           ((token & D3DSP_SRCMOD_MASK) >>
+                            D3DSP_SRCMOD_SHIFT) == D3DSPSM_NONE &&
+                           (swizzle == 0u || swizzle == 0xe4u) &&
+                           (token & D3DSP_REGNUM_MASK) < 16u;
                 },
                 [](DWORD opcode) noexcept {
                     return opcode != D3DSIO_DCL &&

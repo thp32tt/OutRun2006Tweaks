@@ -13,14 +13,17 @@
 
 namespace outrun::vr::dx11 {
 
-template <class Instruction, class DecodeLabel, class ExecutableBody>
+template <class Instruction, class DecodeLabel, class ValidateBoolean, class ExecutableBody>
 bool native_sm3_expand_subroutines(
     const std::vector<Instruction>& instructions,
     std::uint32_t callOpcode,
     std::uint32_t conditionalCallOpcode,
     std::uint32_t labelOpcode,
     std::uint32_t returnOpcode,
+    std::uint32_t ifOpcode,
+    std::uint32_t endIfOpcode,
     DecodeLabel decodeLabel,
+    ValidateBoolean validateBoolean,
     ExecutableBody executableBody,
     std::vector<Instruction>& expanded) {
     expanded.clear();
@@ -42,11 +45,6 @@ bool native_sm3_expand_subroutines(
         expanded = instructions;
         return true;
     }
-
-    // A CALLNZ depends on a live boolean predicate and requires a separate
-    // source/flow lowering contract. Never turn it into an unconditional call.
-    for (const auto& ins : instructions)
-        if (ins.opcode == conditionalCallOpcode) return false;
 
     std::size_t mainReturn = instructions.size();
     for (std::size_t i = 0; i < instructions.size(); ++i) {
@@ -100,11 +98,16 @@ bool native_sm3_expand_subroutines(
     expandRange = [&](std::size_t first, std::size_t last) -> bool {
         for (std::size_t i = first; i < last; ++i) {
             const auto& ins = instructions[i];
-            if (ins.opcode == callOpcode) {
+            if (ins.opcode == callOpcode ||
+                ins.opcode == conditionalCallOpcode) {
+                const bool conditional = ins.opcode == conditionalCallOpcode;
                 unsigned target = 0u;
-                if (ins.operandTokens.size() != 1u ||
+                if (ins.operandTokens.size() != (conditional ? 2u : 1u) ||
                     (ins.instructionToken & 0xf0ff0000u) != 0u ||
-                    !decodeLabel(ins.operandTokens[0], target))
+                    !decodeLabel(ins.operandTokens[0], target) ||
+                    (conditional &&
+                     (ifOpcode == 0u || endIfOpcode == 0u ||
+                      !validateBoolean(ins.operandTokens[1]))))
                     return false;
                 const auto found = labels.find(target);
                 if (found == labels.end() ||
@@ -112,11 +115,34 @@ bool native_sm3_expand_subroutines(
                     std::find(callStack.begin(), callStack.end(), target) !=
                         callStack.end())
                     return false;
+
+                // CALLNZ l#, b# executes its body only when the game's
+                // DEFB/live b# is true. Materialize IF/ENDIF as real SM3
+                // operations, preserving flow-dependent TEMP/output writes,
+                // derivative safety and per-Draw boolean bindings downstream.
+                if (conditional) {
+                    if (expanded.size() + 2u > kMaxInstructions)
+                        return false;
+                    Instruction begin = ins;
+                    begin.opcode = ifOpcode;
+                    begin.instructionToken = (1u << 24u) | ifOpcode;
+                    begin.operandTokens = {ins.operandTokens[1]};
+                    expanded.push_back(std::move(begin));
+                }
                 callStack.push_back(target);
                 const bool ok = expandRange(found->second.begin,
                                             found->second.end);
                 callStack.pop_back();
                 if (!ok) return false;
+                if (conditional) {
+                    if (expanded.size() >= kMaxInstructions)
+                        return false;
+                    Instruction end = ins;
+                    end.opcode = endIfOpcode;
+                    end.instructionToken = endIfOpcode;
+                    end.operandTokens.clear();
+                    expanded.push_back(std::move(end));
+                }
             } else {
                 if (ins.opcode == labelOpcode ||
                     ins.opcode == returnOpcode ||
@@ -133,6 +159,26 @@ bool native_sm3_expand_subroutines(
         return false;
     }
     return true;
+}
+
+// Preserve the established unconditional-only API. Existing callers keep
+// rejecting CALLNZ until they explicitly provide boolean register validation
+// and native IF/ENDIF lowering.
+template <class Instruction, class DecodeLabel, class ExecutableBody>
+bool native_sm3_expand_subroutines(
+    const std::vector<Instruction>& instructions,
+    std::uint32_t callOpcode,
+    std::uint32_t conditionalCallOpcode,
+    std::uint32_t labelOpcode,
+    std::uint32_t returnOpcode,
+    DecodeLabel decodeLabel,
+    ExecutableBody executableBody,
+    std::vector<Instruction>& expanded) {
+    return native_sm3_expand_subroutines(
+        instructions, callOpcode, conditionalCallOpcode, labelOpcode,
+        returnOpcode, 0u, 0u, decodeLabel,
+        [](std::uint32_t) noexcept { return false; },
+        executableBody, expanded);
 }
 
 } // namespace outrun::vr::dx11

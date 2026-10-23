@@ -422,6 +422,7 @@ jobs:
           python tools/test_dx11_live_sm3_pixel_position_01015.py
           python tools/test_dx11_live_sm3_face_01016.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_subroutine_probe_01025.cpp -o /tmp/dx11_sm3_subroutine_01025 && /tmp/dx11_sm3_subroutine_01025
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_conditional_call_probe_01026.cpp -o /tmp/dx11_sm3_conditional_call_01026 && /tmp/dx11_sm3_conditional_call_01026
           python tools/test_dx11_sm3_uniform_texture_01017.py
           python tools/test_dx11_sm3_uniform_ifc_01018.py
           python tools/test_dx11_sm3_temp_uniform_01019.py
