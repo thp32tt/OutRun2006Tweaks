@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01037",
+  "production_id": "CONVERSION-DX11-01037",
+  "event_id": "CONVERSION-DX11-01037-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01037",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
+  "work_key": "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
+  "feature_branch": "feature/dx11-01037-offscreen-postpass-overflow",
+  "feature_base_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "feature_stage": "C4_RESULT",
+  "checkpoint": "C4_RESULT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Authentic native GPU offscreen game camera Draw/Clear writes beyond 32 tracked rectangles must not enter GPU OpenXR COPY/STRETCH as untouched source; original D3D9 gameplay preserved.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
+    "goal": "Preserve authenticated native camera pixels and fail closed on pixel evidence loss before L/R GPU transport",
+    "acceptance_items": [
+      {
+        "id": "normal",
+        "behavior_area": "CAMERA_GPU_COPY_STRETCH",
+        "expected_behavior": "Authentic proven camera regions and truly untouched postpasses remain supported"
+      },
+      {
+        "id": "overflow",
+        "behavior_area": "CAMERA_SOURCE_LEDGER",
+        "expected_behavior": "Unrecorded 33rd real GPU source writes and split-Clear regions cannot be treated as untouched"
+      },
+      {
+        "id": "fallback",
+        "behavior_area": "GAME_D3D9_INPUT",
+        "expected_behavior": "Unproven XR eye postpass rejected without changing original D3D9 Draw/input/FFB"
+      },
+      {
+        "id": "gate",
+        "behavior_area": "CI",
+        "expected_behavior": "C++ positive/negative probe plus five exact-SHA GitHub Gates"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "game D3D9 Draw/Clear",
+      "native camera RTV GPU pixel evidence",
+      "overflow-aware persistent per-eye source provenance",
+      "GPU COPY/STRETCH OpenXR L/R with DX9Ex fallback"
+    ],
+    "batch_components": [
+      "native_game_offscreen_color_provenance.hpp",
+      "native_game_stereo_submission.hpp",
+      "native_game_stereo_submission.cpp",
+      "dx11_game_offscreen_color_overflow_01037.cpp",
+      "test_dx11_game_offscreen_color_overflow_01037.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "32 contiguous real-source tiles permit native GPU postpass",
+      "negative_regression": "33rd unrecorded allocation and overflowing split-Clear prevent any false eye attribution",
+      "component_integration": "both NativeGameEyeDrawEncoder COPY and filtered STRETCH guarded by shared state"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
+      "src/vr/d3d11/native_game_stereo_submission.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_ONLY_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "native diagnostic opt-in; no DXVK; original D3D9 source Draw/FFB unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_offscreen_color_overflow_01037.cpp",
+    "tools/test_dx11_game_offscreen_color_overflow_01037.py",
+    "docs/automation/runs/CONVERSION-DX11-01037.json"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Integrate after 01036 CI completes to avoid cancelling running ref Gates, verify exact SHA."
+}
