@@ -284,6 +284,8 @@ private:
     };
     // One per-eye lifetime; no global cross-frame stale camera ownership.
     std::array<OffscreenColorSource, 32u> offscreenColorSources_{};
+    // A source camera GPU write can outlive the 32-slot evidence capacity.
+    NativeGameOffscreenColorProvenanceState offscreenColorProvenance_{};
     std::uint32_t authoredFullColorClearCount_{};
     std::uint64_t lastFullClearDrawOrdinal_{};
     std::uint64_t unpredicatedEyeAtLastPartialClear_{};

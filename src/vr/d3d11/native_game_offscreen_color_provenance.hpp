@@ -252,6 +252,29 @@ template <std::size_t N>
 static_assert(native_game_gpu_eye_composite_write_admissible(false, false));
 static_assert(native_game_gpu_eye_composite_write_admissible(true, true));
 static_assert(!native_game_gpu_eye_composite_write_admissible(true, false));
+// GPU writes beyond the bounded per-eye camera color ledger cannot be
+// mistaken for an untouched game resource at native XR COPY/STRETCH.
+// Quarantine only native eye attribution; D3D9 input/FFB remain untouched.
+struct NativeGameOffscreenColorProvenanceState {
+    bool untrackedGpuWrite{};
+    constexpr void note_untracked_gpu_write() noexcept {
+        untrackedGpuWrite = true;
+    }
+    [[nodiscard]] constexpr bool allows_postpass(bool touched,
+                                                bool proven) const noexcept {
+        return !untrackedGpuWrite &&
+            native_game_gpu_eye_composite_write_admissible(touched, proven);
+    }
+};
+static_assert(NativeGameOffscreenColorProvenanceState{}.allows_postpass(false, false));
+static_assert(NativeGameOffscreenColorProvenanceState{}.allows_postpass(true, true));
+static_assert(!NativeGameOffscreenColorProvenanceState{}.allows_postpass(true, false));
+static_assert([]() constexpr {
+    NativeGameOffscreenColorProvenanceState state;
+    state.note_untracked_gpu_write();
+    return !state.allows_postpass(false, false) &&
+           !state.allows_postpass(true, true);
+}());
 
 // When many authentic game camera Draw/Clear tiles form a non-slicing
 // mosaic, pairwise union alone cannot compact its 32-slot GPU pixel ledger.

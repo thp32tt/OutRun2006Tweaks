@@ -102,6 +102,10 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_visible_postpass_source_00982.cpp -o /tmp/dx11_visible_postpass_00982 && /tmp/dx11_visible_postpass_00982
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_offscreen_color_coverage_00981.cpp -o /tmp/dx11_camera_coverage_00981 && /tmp/dx11_camera_coverage_00981
           python tools/test_dx11_game_offscreen_color_coverage_00981.py
+          # 01037: camera GPU writes not recorded due to ledger overflow
+          # must never be accepted as untouched native L/R eye postpass.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o /tmp/dx11_camera_overflow_01037 && /tmp/dx11_camera_overflow_01037
+          python tools/test_dx11_game_offscreen_color_overflow_01037.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_arithmetic_codegen_probe.cpp -o /tmp/dx11_sm3_arithmetic && /tmp/dx11_sm3_arithmetic
           python tools/test_dx11_live_sm3_sampler_swizzle_01014.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_conditional_flow_probe_00946.cpp -o /tmp/dx11_sm3_ifc_00946 && /tmp/dx11_sm3_ifc_00946

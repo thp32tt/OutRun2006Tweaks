@@ -529,8 +529,10 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_region(
         record.region = region;
         return;
     }
-    // If genuine GPU pixels cannot prove a gap-free island, omit ONLY
-    // extra evidence; original D3D9 game rendering/input stays authoritative.
+    // This camera was GPU-written even though its new footprint could not
+    // be retained. Never mistake it for an untouched COPY/STRETCH source.
+    offscreenColorProvenance_.note_untracked_gpu_write();
+    // Original D3D9 Draw/Present/input/FFB stays authoritative.
 }
 void NativeGameEyeDrawEncoder::invalidate_offscreen_color_source(
     ID3D11RenderTargetView* target) noexcept {
@@ -1020,9 +1022,14 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
                 next.region = kept.parts[i];
             }
         }
-        for (std::size_t i = 0u; i < extraCount &&
-                survivorCount < survivors.size(); ++i)
-            survivors[survivorCount++] = std::move(extras[i]);
+        std::size_t transferred = 0u;
+        for (; transferred < extraCount &&
+                survivorCount < survivors.size(); ++transferred)
+            survivors[survivorCount++] = std::move(extras[transferred]);
+        // A clipped game Clear may split one camera footprint into
+        // multiple real islands. Lost islands cannot certify eye COPY.
+        if (transferred != extraCount)
+            offscreenColorProvenance_.note_untracked_gpu_write();
         offscreenColorSources_ = std::move(survivors);
     };
     // Actual camera GPU Clears supply the missing source background pixels
@@ -1197,7 +1204,7 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             // Prevent stale/foreign GPU camera bytes from overwriting genuine
             // XR-eye Draw color before the frame-validity decision.
             // Unsupported source reverts to the original D3D9Ex output.
-            if (!native_game_gpu_eye_composite_write_admissible(
+            if (!offscreenColorProvenance_.allows_postpass(
                     nativeCameraAllocationTouched, proven))
                 return false;
             if (!copy_game_surface(clear.source, &clear.sourceBox,
@@ -1260,7 +1267,7 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                     &nativeCameraAllocationTouched);
             // Bilinear neighbors must be GPU-authored on this very eye/mip;
             // do not queue a filtered native postpass on unproven pixels.
-            if (!native_game_gpu_eye_composite_write_admissible(
+            if (!offscreenColorProvenance_.allows_postpass(
                     nativeCameraAllocationTouched, proven))
                 return false;
             if (!stretch_game_surface(clear.source, clear.sourceBox,
