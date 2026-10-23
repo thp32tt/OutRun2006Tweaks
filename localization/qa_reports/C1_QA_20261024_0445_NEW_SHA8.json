@@ -1,0 +1,494 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0445KST-NEW-SHA8",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "date_kst": "2026-10-24",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "prior_reviewed_sha_count": 682,
+  "new_unique_sha_count": 8,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "sha_verified_count": 8,
+  "rgba_png_count": 8,
+  "verified_native_ui_cell_placement_count": 0,
+  "producer_output_counts": {
+    "A": 334,
+    "B": 389
+  },
+  "producer_export_evidence_count": 148,
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_0445_metrics.json",
+    "A_pairs": "work/C1_QA_20261024_0445_A_pairs.jpg",
+    "B_pairs": "work/C1_QA_20261024_0445_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261024_0445_white.jpg",
+    "alpha": "work/C1_QA_20261024_0445_alpha.json"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false,
+    "VR_FFB_DX11_DXVK_touched": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0067-5678B761",
+      "ordinal": 333,
+      "english": "GOAL B",
+      "approved_korean": "골 B",
+      "source_file": "Q215_03a641c3ed3f616a_source.png",
+      "candidate_file": "Q215_03a641c3ed3f616a_source_k.png",
+      "source_sha256": "3f913ff0839c8da93cff6cc13d4ea02b2ac2170d7fece363b5004fdf94ab2104",
+      "candidate_sha256": "08ee75b7a23de9265eac1c117106350344bebcd1436aa7ee2ebcada69d1eb233",
+      "original_dds_sha256": "c2bd35e7000a3a232c55e8435f607d3a034860b4be51a97311b36a03732454ff",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          832,
+          304
+        ],
+        "candidate_size": [
+          2075,
+          758
+        ],
+        "alpha_bbox": [
+          343,
+          48,
+          1723,
+          733
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "'골 B' 매핑 일치, 노란 채움·남색 외곽선 및 가독성 확인. 원본 단일 문구 ROI와 생성 캔버스 배율이 달라 네이티브 UV/셀 기준 효과 경계 확인 전 승인 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0067-5678B761",
+      "ordinal": 332,
+      "english": "START",
+      "approved_korean": "시작",
+      "source_file": "Q057_226df35e5bc569de_source.png",
+      "candidate_file": "Q057_226df35e5bc569de_source_k.png",
+      "source_sha256": "f471fa60a1927443efbd67542e82e1954c59d98c25fe05c6870c65a495c1cbe0",
+      "candidate_sha256": "2dc2f210e9bab877f087a20414248815bbec97e0eed6e40deaa9636f8a05be8f",
+      "original_dds_sha256": "e22210f12977306c9412a266f8d57cee20ad5cce6507f2d8e8902a93a4f1fcf3",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          425,
+          227
+        ],
+        "candidate_size": [
+          1716,
+          917
+        ],
+        "alpha_bbox": [
+          119,
+          25,
+          1638,
+          893
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "PROTECTED_NEIGHBOR_AND_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "'시작'이 명확히 읽히며 투명 글자 레이어임. 원본 START 주위에 다른 표제·장식·진행 막대가 존재해 출력 크기 재배치 시 침범 검증 필요.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0067-5678B761",
+      "ordinal": 331,
+      "english": "Count Red Cars!",
+      "approved_korean": "빨간색 차를 세세요!",
+      "source_file": "Q054_883b4b9c411f06e0_source.png",
+      "candidate_file": "Q054_883b4b9c411f06e0_source_k.png",
+      "source_sha256": "d75fbba0baa492eed1079f1790418ceb87f77259b624eb295e61818f2257bcd2",
+      "candidate_sha256": "5df980cffe9db799002e583855739546227752f573c6e8d4d58d99997a18ed53",
+      "original_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1151,
+          462
+        ],
+        "candidate_size": [
+          1979,
+          795
+        ],
+        "alpha_bbox": [
+          31,
+          89,
+          1881,
+          706
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "MULTILABEL_ART_SAFE_AREA_UNVERIFIED",
+      "reason": "'빨간색 차를 세세요!' 정확히 읽힘. 영문 원본에는 양옆의 다른 지시문과 컨트롤 아이콘이 있어 실제 대상 줄·보호 아트 비침범은 독립 배치 검증 전 미확정.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0067-5678B761",
+      "ordinal": 330,
+      "english": "STATUS",
+      "approved_korean": "상태",
+      "source_file": "Q048_092c557a5055dea0_source.png",
+      "candidate_file": "Q048_092c557a5055dea0_source_k.png",
+      "source_sha256": "ad24f5dbe3acf5c77740f214e6e933e7812cf5b43e5a2dffaecbe03e1c91e1fc",
+      "candidate_sha256": "c0f7a122dc705659458acd5a9285216f7bf6ff8e72275719e7c5249f7a7225ea",
+      "original_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          433,
+          199
+        ],
+        "candidate_size": [
+          1850,
+          850
+        ],
+        "alpha_bbox": [
+          395,
+          21,
+          1538,
+          802
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "MENU_BAR_SINGLE_LINE_FIT_UNVERIFIED",
+      "reason": "'상태' 자체는 맞고 획도 선명함. 영문 STATUS가 메뉴 바 한 줄에 놓여 있는데 후보 한글 효과의 높이가 크므로 해당 바의 실제 안전 높이 및 RECORD 인접 간섭 검증 필요.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0080-1917AF43",
+      "ordinal": 385,
+      "english": "Spot the odd one out!",
+      "approved_korean": "다른 하나를 찾으세요!",
+      "source_file": "Q054_2edfbabbfcac2c05_source.png",
+      "candidate_file": "Q054_2edfbabbfcac2c05_source_k.png",
+      "source_sha256": "0ed1f7e0affc8cded01f825d17a2255a2e895ef7528c9c8902b36c4c103d750f",
+      "candidate_sha256": "045c317f5e32ad84a85d7f52c87559c47bf778ebe6627c6afb3c9e78d0aa2e68",
+      "original_dds_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1669,
+          723
+        ],
+        "candidate_size": [
+          1905,
+          825
+        ],
+        "alpha_bbox": [
+          0,
+          108,
+          1888,
+          736
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "PROTECTED_ART_AND_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "'다른 하나를 찾으세요!' 철자·표기 일치, 올바른 기울기·투명 배경 확인. 원본에 차량·화살표·상하 문구가 밀집하여 대상 줄 안전영역 재합성 검증 필요.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0079-6A92BE72",
+      "ordinal": 384,
+      "english": "coast 2 coast",
+      "approved_korean": "코스트 2 코스트",
+      "source_file": "Q228_2091a7c7837eec3e_source.png",
+      "candidate_file": "Q228_2091a7c7837eec3e_source_k.png",
+      "source_sha256": "a3e85557a7ae31845669f0fad89d411d836bac4600f718384d60d6ae03377942",
+      "candidate_sha256": "08109092611b03680e514c33a391105bc8684991ddfec38f837ddf044b2c33d0",
+      "original_dds_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1490,
+          166
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          118,
+          87,
+          2156,
+          493
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_SINGLE_LINE_ALIGNMENT_UNVERIFIED",
+      "reason": "'코스트 2 코스트' 일치, 금속 효과와 투명도 정상. 원본은 폭 넓고 세로가 매우 낮은 한 줄 ROI로, 생성 후보의 원본 축소 후 높이/기준선 검증은 미완료.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0079-6A92BE72",
+      "ordinal": 383,
+      "english": "OUTRUN2SP COURSE",
+      "approved_korean": "아웃런2 SP 코스",
+      "source_file": "Q130_338cdaf0d79fc84e_source.png",
+      "candidate_file": "Q130_338cdaf0d79fc84e_source_k.png",
+      "source_sha256": "c6e76e201ef7c3c484ae0296a58937d83e58f5aa4438f13f94b112b2cb6da396",
+      "candidate_sha256": "755af8a1acf608816d6adc126ebda76409ed3fb47f898acf558bb2ff49fcb824",
+      "original_dds_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1848,
+          188
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          23,
+          51,
+          2144,
+          700
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "'아웃런2 SP 코스' 승인 번역과 의미 일치. 투명 단일 문구이나 원문 대비 생성 캔버스 비율·자간/줄 높이 차이가 있어 원래 UI 셀 합성 위치는 미확정.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0079-6A92BE72",
+      "ordinal": 382,
+      "english": "rankings",
+      "approved_korean": "랭킹",
+      "source_file": "Q228_846de80d92e64cd4_source.png",
+      "candidate_file": "Q228_846de80d92e64cd4_source_k.png",
+      "source_sha256": "ec1b9590cb4537b9bd67df1dc7238865b0c0614c27e00b8883717bb71bd705a4",
+      "candidate_sha256": "e5eccfb691701e4c567e9b2b9861c4ab12fee4392193d5df27f8dafc3cf493e8",
+      "original_dds_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1158,
+          649
+        ],
+        "candidate_size": [
+          1672,
+          941
+        ],
+        "alpha_bbox": [
+          0,
+          17,
+          1634,
+          850
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH",
+        "glyph_legibility": "PASS_DARK_AND_WHITE_MATTE",
+        "transparent_text_layer": "PASS_WHITE_MATTE_NO_VISIBLE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "MULTILABEL_ROW_PLACEMENT_UNVERIFIED",
+      "reason": "'랭킹' 표시·금속 효과 확인, 한글 받침도 식별 가능. 여러 메뉴 레이블과 나란한 원본 ROI에서 해당 랭킹 한 줄의 높이 및 위·아래 문구 비침범은 확인되지 않음.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    }
+  ]
+}
