@@ -26,7 +26,7 @@ int main() {
     std::array<float, 4> secondary{};
     for (unsigned i = 0; i < 8; ++i) primary[i] = i + 0.25f;
     for (unsigned i = 0; i < 4; ++i) secondary[i] = i + 100.75f;
-    std::array<GameSm3StreamView, 4> streams{};
+    std::array<GameSm3StreamView, 16> streams{};
     streams[0] = {reinterpret_cast<const std::uint8_t*>(primary.data()),
                   static_cast<std::uint32_t>(primary.size() * sizeof(float)), 1u};
     streams[1] = {reinterpret_cast<const std::uint8_t*>(secondary.data()),

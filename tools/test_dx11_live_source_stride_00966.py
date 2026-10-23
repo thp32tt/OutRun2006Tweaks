@@ -31,7 +31,8 @@ layout = bridge.split("bool live_sm3_input_layout(", 1)[1].split(
     "bool live_sm3_shader_bytes(", 1)[0]
 assert "!game_native_source_stride_valid(stride)" in layout
 assert "static_cast<UINT>(in.Offset) + width > sourceStride" in layout
-assert "in.Stream >= 4u" in layout
+# D3D9 SM3 game streams 0..15 supported; stream 16 stays fail-closed.
+assert "in.Stream >= 16u" in layout
 assert "if (!extra || !extra->extra[in.Stream-1u].bytes) return false;" in layout
 draw = bridge.split("bool submit_live_sm3_game_draw(", 1)[1].split(
     "// Reuse geometric growth buffers", 1)[0]

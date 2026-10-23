@@ -10,11 +10,11 @@
   "classification": "A",
   "feature_id": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
   "work_key": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
-  "checkpoint": "C4_MATERIAL",
-  "feature_stage": "C4_MATERIAL",
+  "checkpoint": "C5_CI_REPAIR",
+  "feature_stage": "C5_CI_REPAIR",
   "status": "IMPLEMENTED_PENDING_CI",
   "source_head": "c5dd530d3288674e07af779ab9a4dfdeeff27233",
-  "material_result_sha": null,
+  "material_result_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
   "result_sha": null,
   "validation_bearing_result_sha": null,
   "automation_validation": "PENDING",
@@ -100,16 +100,30 @@
     ".github/workflows/dx11-fast-structural.yml",
     "tools/dx11_sm3_multistream_game_draw_probe_01029.cpp",
     "tools/test_dx11_sm3_multistream_game_draw_01029.py",
-    "docs/automation/runs/CONVERSION-DX11-01029.json"
+    "docs/automation/runs/CONVERSION-DX11-01029.json",
+    "tools/dx11_sm3_interface_draw_probe_00964.cpp",
+    "tools/test_dx11_live_source_stride_00966.py"
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Actual OutRun menu/car/race native frame & Quest3 evidence still UNTESTED; five exact-SHA gates pending",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "NEXT_IMPLEMENTATION_ACTION": "Same-task exact-SHA gate and causal repair only; desktop/Quest3 native frame parity separately needs real hardware.",
+  "NEXT_IMPLEMENTATION_ACTION": "Causal 00964 and 00966 legacy test signature repair in same 01029; observe full five exact SHA GitHub Actions, runtime UNTESTED",
   "feature_ready": false,
   "pending_items": [
     "Five exact SHA GitHub Actions pending",
     "Original game and Quest3/VDXR HMD/input/FFB runtime tests UNTESTED"
-  ]
+  ],
+  "repair_evidence": {
+    "classification": "B",
+    "failure_exact_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
+    "failure_workflow_run_id": 39987719544,
+    "failed_step": "Run focused DX11 source-only regression checks",
+    "causal_errors": [
+      "00964 compiled probe retained std::array<GameSm3StreamView,4> after full source 16-stream integration",
+      "00966 source-contract regex demanded old in.Stream >= 4u guard rather than the new in.Stream >= 16u"
+    ],
+    "change": "Keep identical compiled 00964 positive/negative assertions and original 00966 small-stride/fallback checks while updating interface dimensions only",
+    "full_gate_plan": "one_validation_bearing_sha"
+  }
 }
