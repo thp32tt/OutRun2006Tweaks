@@ -71,7 +71,9 @@ def sm3_fan_connected(src):
         "context->Draw(vertexCount, base);",
         "for (UINT instance = 0u; instance < instanceCount; ++instance)",
         "if (instance >= nativeSubmissionCount) break;",
-        "nativeSubmissionCount = compactListInstances ? 1u : instanceCount",
+        "compactInstancedGeometry ? 1u : instanceCount",
+        "game_sm3_expand_connected_instance_indices(",
+        "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "liveBatch.record_source_draw(sourceOrdinal);",
     ))
 assert sm3_fan_connected(c)
