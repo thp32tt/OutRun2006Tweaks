@@ -1,0 +1,63 @@
+{
+  "schema": "outrun.c1.idle_sha_inventory.v1",
+  "run_key": "OUTRUN-C1-20261023T2115KST-NEW-SHA",
+  "checked_at_kst": "2026-10-23T21:19:05.473730+09:00",
+  "role": "C1",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_head_before_record": "f9f8aebf98f98da5c8432f8fadabefe2d3fdc288",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_A_B_CANDIDATE_SHA",
+  "reviewed_sha_history_count": 618,
+  "new_unique_count": 0,
+  "reviewed_new": 0,
+  "pass": 0,
+  "fail": 0,
+  "hold": 0,
+  "candidate_records": [],
+  "inventory": {
+    "local_manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "evidence_directory": "work/image-src/text_roi_batches/export_evidence",
+    "export_evidence_json_files": 126,
+    "candidates": {
+      "A": {
+        "png_files": 279,
+        "evidenced_unique": 279,
+        "unevidenced_files": 0,
+        "evidence_missing_local": 0
+      },
+      "B": {
+        "png_files": 334,
+        "evidenced_unique": 334,
+        "unevidenced_files": 0,
+        "evidence_missing_local": 0
+      }
+    },
+    "n100_evidence_files": [
+      "work/C1_QA_20261023_2115_metrics.json",
+      "work/C1_QA_20261023_2115_check.py"
+    ],
+    "method": "Independent SHA256 comparison of producer export JSON and local candidate PNG, SHA history dedupe; no new candidate eligible for independent lightweight QA."
+  },
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "limits": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds": false,
+    "dds_deployed": false,
+    "c2_c3_ingame_pass_created": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score": {
+    "ai": "AI 1",
+    "previous_confirmed": 1753,
+    "delta": 0,
+    "current": 1753,
+    "reason": "IDLE / no new QA outcome; no duplicate point credit",
+    "scoreboard_blob_sha": "ae029289a002280d394df56ede370b85f0b5c65f"
+  }
+}
