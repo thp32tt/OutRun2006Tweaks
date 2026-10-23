@@ -2,21 +2,21 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01013",
   "production_id": "CONVERSION-DX11-01013",
-  "event_id": "CONVERSION-DX11-01013-E011",
+  "event_id": "CONVERSION-DX11-01013-E012",
   "event_type": "rollover",
   "lane": "DX11",
   "attempt": "1/3",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01013",
   "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
   "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
-  "feature_stage": "EXACT_SHA_WINDOWS_CI_IN_PROGRESS",
+  "feature_stage": "C3_EXACT_SHA_WINDOWS_IN_PROGRESS",
   "work_key": "DX11:R175_UNBLOCK_OR_FIRST_VISIBLE_GAME_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
-  "material_source_sha": "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84",
+  "material_source_sha": "69af152a4986062517aaa4c615b1c128a645c85b",
   "source_implementation": {
-    "status": "MIXED_GAME_FVF_SM3_ALPHA_COLOR_ALIAS_SOURCE_COMMITTED_CI_IN_PROGRESS",
-    "implementation_scope": "Real mixed OutRun game shader-bound native SM3 Draw and game fixed-function Draw now agree on four legal D3D9 independent-alpha SRCCOLOR/INVSRCCOLOR/DESTCOLOR/INVDESTCOLOR -> D3D11 alpha-component factors. Previous exact source 6d696be6 passed all five mandatory Actions. New integration source 9ec9b4bc supplies actual C++ OM acceptance and compile-time positive/negative FVF regression, plus existing live game source test; no real menu/vehicle/race native frames observed yet.",
+    "status": "REAL_GAME_FVF_RGB_MASK_INDEPENDENT_ALPHA_SOURCE_COMMITTED_CI_IN_PROGRESS",
+    "implementation_scope": "Corrected real mixed game fixed-function FVF native D3D11 Draw/DrawIndexed: stale separate-alpha state no longer vetoes RGB-only RT0 output. Alpha-writing draws still query actual game alpha factors and fail closed, with old D3D9 game Draw/input/FFB preserved. Exact SHA Windows CI in progress. No observed real menu/car/race native frame or HMD validation.",
     "changed_files": [
       "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
       "src/vr/d3d11/native_backend.cpp",
@@ -38,7 +38,8 @@
       "Real D3D9 vs_3_0 EXPP/LOGP are admitted by R266 exact register source semantics and emitted by the native VS shader compiler as existing full-precision EXP/LOG GPU arithmetic; ps_3_0 forms remain fail-closed.",
       "Translate D3D9 independent alpha SRCCOLOR/INVSRCCOLOR/DESTCOLOR/INVDESTCOLOR to D3D11 SRC_ALPHA/INV_SRC_ALPHA/DEST_ALPHA/INV_DEST_ALPHA in the real SM3 shader-bound live GPU Draw; keep unhandled SRCALPHASAT/reserved alpha factors fail-closed.",
       "CI repair: existing RGB/alpha blend regression now accepts independent D3D9 SRCCOLOR -> D3D11 SRC_ALPHA and asserts SRCALPHASAT invalid state and unchanged prior OM output; regression remains a compile-time static_assert within real live_game_frame_bridge.cpp.",
-      "Preserve exact independent-alpha COLOR factor aliases across original fixed-function game Draw and live SM3 Draw in one continuous native source-ordinal game frame, retaining unknown/SRCALPHASAT/BLENDFACTOR fail-closed on fixed-function path."
+      "Preserve exact independent-alpha COLOR factor aliases across original fixed-function game Draw and live SM3 Draw in one continuous native source-ordinal game frame, retaining unknown/SRCALPHASAT/BLENDFACTOR fail-closed on fixed-function path.",
+      "Real FVF game RGB-only Draw ignores dormant independent-alpha factors; alpha-writing Draw continues authentic factor queries and original fallbacks. C++ compile-time positive/negative color write-mask contract plus existing live game source regression."
     ],
     "observed_native_game_draw_count": "UNTESTED",
     "observed_native_published_frame_count": "UNTESTED"
@@ -58,40 +59,39 @@
   },
   "ci": {
     "status": "EXACT_SHA_FIVE_ACTIONS_IN_PROGRESS",
-    "source_sha": "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84",
-    "fast_run_id": 39871961664,
-    "build_run_id": 39871961758,
-    "hud_run_id": 39871961764,
+    "source_sha": "69af152a4986062517aaa4c615b1c128a645c85b",
+    "fast_run_id": 39876279396,
+    "build_run_id": 39876279340,
+    "hud_run_id": 39876279264,
     "prior_source_fast_sha": "2a1a3e6408275f6045c8c9445fc5848b84bd3011",
     "prior_source_fast_run_id": 39814155650,
     "prior_source_fast_result": "SUCCESS",
-    "note": "All 5 exact-SHA workflows for material 6d696be6 passed with bundles; new source 9ec9b4bc triggered 5 exact-SHA workflows now in_progress; do not mark PASS before completion.",
-    "backend_run_id": 39871961761,
-    "openxr_run_id": 39871961798,
+    "note": "9ec9b4bc 5 exact-SHA SUCCESS with Build/backend bundles. New mixed FVF RGB-only alpha-mask material 69af152a five exact-SHA Actions RUNNING. No gameplay evidence; do not submit READY or target-promote.",
+    "backend_run_id": 39876279491,
+    "openxr_run_id": 39876279355,
     "fast_result": "SUCCESS",
-    "previous_source_sha": "6d696be637b48ac9ac9d4d7d13557859426da1e7",
+    "previous_source_sha": "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84",
     "previous_full_gate_result": "5_PASS",
     "previous_failure_root": "MSVC C2338 src/vr/d3d11/live_game_frame_bridge.cpp(612,40) legacy expected SRCCOLOR independent alpha rejection contradicted newly legal alias"
   },
   "remaining_acceptance_items": [
-    "Resolve live R175 TEXCOORD6 color parity only with 00477 owner release; do not duplicate owner work",
-    "Integrate and verify continuous real-game D3D9 Draw/DrawIndexed -> native GPU frame without unsupported scene gap",
-    "Launch game and prove eligible_state_draws>0, native_draws>0 and published full native frames>0 on exact integrated SHA",
-    "Menu, vehicle selection, sustained race source-ordinal coverage and fail-closed D3D9 fallback",
-    "Distinct left/right real native images, OpenXR consumer fence/ACK and Quest3/VDXR hardware validation",
-    "Complete five mandatory exact-SHA Actions and artifacts before compare behind=0 safe target promotion"
+    "Obtain five exact-SHA Action conclusions and artifacts for material 69af152a; repair only genuine failures",
+    "Real-game menu/vehicle/race contiguous D3D9 Draw/DrawIndexed -> native full game-frame counters (>0) UNTESTED; game launch needed to identify next actual source rejection",
+    "Native left/right game images and OpenXR source-generation/fence/ACK unproven; Quest3/VDXR hardware UNTESTED",
+    "Do not duplicate completed R175 WARP/TEXCOORD6 owner 00477; original DX9Ex render/input/FFB and opt-in preserved",
+    "FEATURE_READY only after real game full-frame acceptance, exact SHA Gates and bundles; behind-zero target fast-forward only once READY"
   ],
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "real_game_draw_blocker": "Real game native Draw/DrawIndexed and published menu/race full-resolution frames are UNTESTED; no Quest3/VDXR hardware launch. The EXPP/LOGP source semantics + GPU compiler bridge is implemented but cannot be declared visible in actual game.",
-  "next_implementation_action": "Check five exact 9ec9b4bc workflow runs 39871961664/39871961758/39871961761/39871961798/39871961764; fix only actual failures without changing TASK_ID. Then collect real-game menu/car/race eligible_state_draws/native_draws/published frames and L/R source fence/ACK evidence, locate next real native rejection; preserve R175 00477 owner and DX9Ex fallback.",
+  "real_game_draw_blocker": "Real menu/car/race eligible_state_draws/native_draws/gpu_desktop_frames and continuous full native source frame UNTESTED; source-only FVF RGB-only separate alpha no longer unnecessarily rejects, exact SHA Windows CI pending.",
+  "next_implementation_action": "Read exact 69af152a 5 Windows Actions and artifacts; repair only failure on existing TASK_ID. Then obtain original game opt-in log for eligible_state_draws/native_draws/gpu_desktop_frames/sm3_reject, implement next actual failing renderer source state (not new WARP fixture). Do not READY/promote absent full native frame proof.",
   "feature_ready": false,
   "target_promoted": false,
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "status": "IN_PROGRESS",
-  "checkpoint": "C2_SOURCE_COMMITTED_C3_WINDOWS_RUNNING",
+  "checkpoint": "C3_WAIT_ACTUAL_SOURCE_CI",
   "notes": "2026-10-23 E011 rollover resumed same feature; substantive fixed-function/native SM3 mixed-game alpha alias C++ + source regression 9ec9b4bc committed. 6d696be6 mandatory 5/5 CI PASS, new source CI in-progress; still no real menu/car/race or stereo game validation. ATTEMPT remains 1/3, no score, no promotion.",
-  "chat_rollovers": 6,
+  "chat_rollovers": 18,
   "previous_material_source_sha": "e8cce7b55fd000c0f31106a13b2161f37388d7c3",
   "work_class": "integration",
   "classification": "A",
@@ -168,9 +168,9 @@
   "automation_validation": "SOURCE_STATIC_PASS_WINDOWS_EXACT_SHA_PENDING",
   "full_dx11_renderer_complete": false,
   "targeted_validation_latest": {
-    "status": "STATIC_SOURCE_ALIAS_CONTRACT_CHECK_PASS_EXACT_SHA_WINDOWS_PENDING",
-    "source_sha": "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84",
-    "validation_command": "Authenticated GitHub source-blob transformation assertions for native_game_alpha_factor/sm3 independent-alpha mappings and compile-time native_game_separate_alpha_contract; five GitHub Actions exact-SHA running",
+    "status": "SOURCE_STATIC_CONTRACT_PASS_EXACT_SHA_WINDOWS_IN_PROGRESS",
+    "source_sha": "69af152a4986062517aaa4c615b1c128a645c85b",
+    "validation_command": "GitHub connector source AST-pattern invariants on live_game_frame_bridge.cpp and tools/test_dx11_live_sm3_blend_factor_00966.py; compile-time static_assert queued via GitHub Windows Build; exact-SHA Actions 39876279396/39876279491/39876279340/39876279355/39876279264",
     "evidence_paths": [
       "src/vr/d3d11/live_game_frame_bridge.cpp",
       "tools/test_dx11_live_sm3_blend_factor_00966.py"
@@ -178,13 +178,14 @@
     "windows_build_validation": "IN_PROGRESS",
     "runtime_validation": "UNTESTED"
   },
-  "feature_last_head": "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84",
+  "feature_last_head": "69af152a4986062517aaa4c615b1c128a645c85b",
   "last_material_source_commits": [
     "05d1a920517e89a094c1d8edd5ec19e9ad1861fe",
     "a85d197badb53f4ebfa75936da60577273444c10",
     "01ccf838ef5519aa9cfcef80f33534d59c072a9a",
     "6d696be637b48ac9ac9d4d7d13557859426da1e7",
-    "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84"
+    "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84",
+    "69af152a4986062517aaa4c615b1c128a645c85b"
   ],
   "resume_checkpoint_20261023T0620": {
     "reason": "VR_FORCED_30_MINUTE_ROLLOVER",
@@ -274,5 +275,39 @@
     "runtime_validation": "UNTESTED",
     "feature_ready": false,
     "score_change": 0
+  },
+  "resume_checkpoint_20261023T0900": {
+    "event_id": "CONVERSION-DX11-01013-E012",
+    "attempt": "1/3",
+    "chat_rollover": 18,
+    "base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+    "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+    "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+    "material_source_sha": "69af152a4986062517aaa4c615b1c128a645c85b",
+    "material_source_changed_files": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_live_sm3_blend_factor_00966.py"
+    ],
+    "compare_before_source": {
+      "ahead": 32,
+      "behind": 0
+    },
+    "five_exact_sha_workflow_ids": [
+      39876279396,
+      39876279491,
+      39876279340,
+      39876279355,
+      39876279264
+    ],
+    "five_exact_sha_workflow_status": "IN_PROGRESS",
+    "prior_validated_exact_sha": "9ec9b4bcc5f8ec84bc6911c604e9d91df7247a84",
+    "prior_five_exact_sha": "5_SUCCESS",
+    "feature_ready": false,
+    "target_promoted": false,
+    "runtime_validation": "UNTESTED",
+    "score_change": 0,
+    "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "next_implementation_action": "Read exact 69af152a 5 Windows Actions and artifacts; repair only failure on existing TASK_ID. Then obtain original game opt-in log for eligible_state_draws/native_draws/gpu_desktop_frames/sm3_reject, implement next actual failing renderer source state (not new WARP fixture). Do not READY/promote absent full native frame proof.",
+    "real_game_draw_blocker": "Real menu/car/race eligible_state_draws/native_draws/gpu_desktop_frames and continuous full native source frame UNTESTED; source-only FVF RGB-only separate alpha no longer unnecessarily rejects, exact SHA Windows CI pending."
   }
 }
