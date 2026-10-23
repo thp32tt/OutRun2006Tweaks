@@ -22,9 +22,12 @@ require("_HLSL_MATERIALIZER_V15" in backend and
 require("fraction == 0.5f" in address and
         "static_cast<long long>(base) + address" in address,
         "signed D3D9 nearest conversion and fail-closed constant bank")
-require("base + row, staticAddress," in matrix and
-        "const auto first = static_cast<long long>(base) + staticAddress" in matrix,
-        "source matrix rows inherit signed MOVA offset")
+require("const auto first = static_cast<long long>(base) + staticAddress" in matrix and
+        "const auto last = first + static_cast<long long>(rows) - 1" in matrix and
+        "if (first < 0 || last >= static_cast<long long>(limit))" in matrix and
+        "const unsigned index = staticFirstIndex + row;" in matrix and
+        "native_sm3_const_reference(" in matrix,
+        "signed MOVA must resolve and bank-check all effective matrix rows")
 require("context->DrawIndexed(" in bridge and "context->Draw(" in bridge,
         "live GPU gameplay draws remain attached")
 compiler = shutil.which("g++") or shutil.which("clang++")

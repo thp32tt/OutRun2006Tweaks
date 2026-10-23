@@ -14,10 +14,13 @@ def require(ok, what):
     if not ok:
         raise SystemExit("01020 native matrix IFC regression FAIL: " + what)
 
-require("matrixRowsAreAbsolute = !relative" in block and
+constant_codegen = (root / "src/vr/d3d11/native_sm3_constant_codegen.hpp").read_text()
+require("matrixRowsAreAbsolute = native_sm3_addressed_const_draw_uniform(relative, staticAddress)" in block and
+        "return !relative || staticAddress;" in constant_codegen and
+        "native_sm3_matrix_source_span_accepted(" in block and
         "native_sm3_relative_matrix_references(" in block and
         "native_sm3_const_reference(" in block,
-        "real relative/absolute c# matrix row expansion must feed provenance")
+        "only absolute or resolved static MOVA matrix rows may feed provenance")
 require("native_sm3_matrix_draw_uniform(" in block and
         "tempDrawUniformity.write(" in block and
         "sourcesDrawUniform;" in block,
