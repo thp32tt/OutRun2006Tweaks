@@ -6,12 +6,16 @@
 
 namespace outrun::vr::dx11 {
 [[nodiscard]] constexpr bool native_sm3_interface_decl_capacity(
-    bool vertexStage, std::size_t inputs, std::size_t outputs) noexcept {
-    // vs_3_0 has 16 input and 12 output registers; ps_3_0 has ten
-    // interpolated inputs and an implicit color output (not a DCL).
-    return inputs != 0u && inputs <= (vertexStage ? 16u : 10u) &&
-           (vertexStage ? (outputs != 0u && outputs <= 12u)
-                        : outputs == 0u);
+    bool vertexStage, std::size_t inputs, std::size_t outputs,
+    std::size_t systemInputs = 0u) noexcept {
+    // ps_3_0 has ten interpolated v# registers PLUS rasterizer-provided
+    // vPos/vFace (neither consumes a v# slot); vs_3_0 has no misc inputs.
+    if (inputs == 0u || systemInputs > inputs || systemInputs > 2u)
+        return false;
+    return vertexStage
+        ? (systemInputs == 0u && inputs <= 16u &&
+           outputs != 0u && outputs <= 12u)
+        : (inputs - systemInputs <= 10u && outputs == 0u);
 }
 [[nodiscard]] constexpr bool native_sm3_ia_element_capacity(
     std::size_t elements) noexcept {
@@ -20,6 +24,11 @@ namespace outrun::vr::dx11 {
 }
 static_assert(native_sm3_interface_decl_capacity(true, 16u, 12u));
 static_assert(native_sm3_interface_decl_capacity(false, 10u, 0u));
+static_assert(native_sm3_interface_decl_capacity(false, 12u, 0u, 2u));
+static_assert(native_sm3_interface_decl_capacity(false, 2u, 0u, 2u));
+static_assert(!native_sm3_interface_decl_capacity(false, 13u, 0u, 2u));
+static_assert(!native_sm3_interface_decl_capacity(false, 3u, 0u, 3u));
+static_assert(!native_sm3_interface_decl_capacity(true, 3u, 1u, 1u));
 static_assert(!native_sm3_interface_decl_capacity(true, 17u, 12u));
 static_assert(!native_sm3_interface_decl_capacity(true, 16u, 13u));
 static_assert(!native_sm3_interface_decl_capacity(false, 11u, 0u));

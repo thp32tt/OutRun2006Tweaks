@@ -2202,14 +2202,19 @@ namespace outrun::vr::dx11
                     continue;
                 }
 
-                // Pixel ps_3_0 vPos is supplied by the rasterizer.
-                // Unsupported vFace/misc variants preserve D3D9 fallback.
+                // ps_3_0 rasterizer inputs are NOT vertex interpolants.
+                // A face declaration is full-mask but carries one sign bit;
+                // comparisons must use the scalar X lane only.
                 const bool pixelPosition =
                     !decode.vertexStage &&
                     registerType == D3DSPR_MISCTYPE &&
                     registerIndex == static_cast<UINT>(D3DSMO_POSITION);
+                const bool pixelFace =
+                    !decode.vertexStage &&
+                    registerType == D3DSPR_MISCTYPE &&
+                    registerIndex == static_cast<UINT>(D3DSMO_FACE);
                 const bool input =
-                    registerType == D3DSPR_INPUT || pixelPosition;
+                    registerType == D3DSPR_INPUT || pixelPosition || pixelFace;
                 const bool output =
                     decode.vertexStage &&
                     registerType == D3DSPR_OUTPUT;
@@ -2221,11 +2226,15 @@ namespace outrun::vr::dx11
                 if (writeMask == 0u)
                     return out;
 
-                if (pixelPosition
+                if (pixelPosition || pixelFace
                         ? (declarationInfo != kDclInfoTokenMarker ||
-                           !native_sm3_pixel_position_declaration(
-                               false, registerIndex,
-                               static_cast<UINT>(writeMask >> 16u)))
+                           !(pixelPosition
+                               ? native_sm3_pixel_position_declaration(
+                                     false, registerIndex,
+                                     static_cast<UINT>(writeMask >> 16u))
+                               : native_sm3_face_declaration(
+                                     false, registerIndex,
+                                     static_cast<UINT>(writeMask >> 16u))))
                         : ((declarationInfo &
                             ~(kDclInfoTokenMarker |
                               kDclUsageMask |
@@ -2233,13 +2242,16 @@ namespace outrun::vr::dx11
                     return out;
                 const DWORD rawUsage =
                     declarationInfo & kDclUsageMask;
-                if (!pixelPosition &&
+                if (!pixelPosition && !pixelFace &&
                     rawUsage > static_cast<DWORD>(D3DDECLUSAGE_SAMPLE))
                     return out;
+                // PSIZE is internal face bookkeeping, never an actual
+                // raster attribute or a programmable VS varying.
                 const auto usage = pixelPosition
                     ? D3DDECLUSAGE_POSITION
-                    : static_cast<D3DDECLUSAGE>(rawUsage);
-                const UINT usageIndex = pixelPosition ? 0u :
+                    : pixelFace ? D3DDECLUSAGE_PSIZE
+                                : static_cast<D3DDECLUSAGE>(rawUsage);
+                const UINT usageIndex = (pixelPosition || pixelFace) ? 0u :
                     static_cast<UINT>(
                         (declarationInfo & kDclUsageIndexMask) >>
                         kDclUsageIndexShift);
@@ -2376,13 +2388,21 @@ namespace outrun::vr::dx11
         {
             if (pixelInput.registerType == D3DSPR_MISCTYPE)
             {
-                // SV_Position arrives from rasterization rather than an
-                // interpolated VS varying. Still require the game's real
-                // full clip-position output before authorizing the GPU pair.
-                if (!native_sm3_pixel_position_declaration(
-                        false, pixelInput.registerIndex,
-                        static_cast<UINT>(pixelInput.writeMask >> 16u)) ||
-                    pixelInput.usage != D3DDECLUSAGE_POSITION ||
+                // SV_Position and SV_IsFrontFace arrive from rasterization,
+                // not from an invented VS varying. Both need the authentic
+                // VS clip position and validated declaration provenance.
+                const bool pixelFace =
+                    pixelInput.registerIndex ==
+                    static_cast<UINT>(D3DSMO_FACE);
+                if (!(pixelFace
+                        ? native_sm3_face_declaration(
+                              false, pixelInput.registerIndex,
+                              static_cast<UINT>(pixelInput.writeMask >> 16u))
+                        : native_sm3_pixel_position_declaration(
+                              false, pixelInput.registerIndex,
+                              static_cast<UINT>(pixelInput.writeMask >> 16u))) ||
+                    pixelInput.usage != (pixelFace ? D3DDECLUSAGE_PSIZE
+                                                   : D3DDECLUSAGE_POSITION) ||
                     pixelInput.usageIndex != 0u)
                     return out;
                 bool clipPosition = false;
@@ -2397,7 +2417,8 @@ namespace outrun::vr::dx11
                 mix(static_cast<DWORD>(pixelInput.registerType));
                 mix(pixelInput.registerIndex);
                 mix(pixelInput.writeMask);
-                mix(0x56504f53u); // vPos system semantic, not a VS varying
+                mix(pixelFace ? 0x56464143u : 0x56504f53u);
+                // vFace/vPos carry distinct raster semantics; never alias VS v#.
                 continue;
             }
             const ProgrammableShaderInterfaceSemantic* match = nullptr;

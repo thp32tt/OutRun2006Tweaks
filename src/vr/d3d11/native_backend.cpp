@@ -305,14 +305,20 @@ bool r283_hlsl_semantic(
     std::string& label) {
     label.clear();
     if (semantic.registerType == D3DSPR_MISCTYPE) {
-        if (!native_sm3_pixel_position_declaration(
-                vertexStage, semantic.registerIndex,
-                static_cast<unsigned>(
-                    (semantic.writeMask & D3DSP_WRITEMASK_ALL) >> 16u)) ||
-            output || semantic.usage != D3DDECLUSAGE_POSITION ||
-            semantic.usageIndex != 0u)
+        const bool pixelFace =
+            semantic.registerIndex == static_cast<UINT>(D3DSMO_FACE);
+        const unsigned mask = static_cast<unsigned>(
+            (semantic.writeMask & D3DSP_WRITEMASK_ALL) >> 16u);
+        if (output || semantic.usageIndex != 0u ||
+            !(pixelFace
+                ? (semantic.usage == D3DDECLUSAGE_PSIZE &&
+                   native_sm3_face_declaration(vertexStage,
+                                               semantic.registerIndex, mask))
+                : (semantic.usage == D3DDECLUSAGE_POSITION &&
+                   native_sm3_pixel_position_declaration(vertexStage,
+                                                         semantic.registerIndex, mask))))
             return false;
-        label = "SV_Position";
+        label = pixelFace ? "SV_IsFrontFace" : "SV_Position";
         return true;
     }
     const char* name = native_sm3_interface_semantic(
@@ -359,6 +365,7 @@ bool build_r283_sm3_mov_shader_source(
         std::array<unsigned, 16> outputDeclaredMasks{};
         bool positionDeclared = false;
         unsigned positionDeclaredMask = 0u;
+        bool faceDeclared = false;
         for (const auto& semantic : interfaceSemantics.semantics) {
             const unsigned mask =
                 static_cast<unsigned>((semantic.writeMask &
@@ -370,8 +377,16 @@ bool build_r283_sm3_mov_shader_source(
                 semantic.usageIndex == 0u &&
                 native_sm3_pixel_position_declaration(
                     vertexStage, semantic.registerIndex, mask);
+            const bool pixelFace =
+                semantic.input &&
+                semantic.registerType == D3DSPR_MISCTYPE &&
+                semantic.usage == D3DDECLUSAGE_PSIZE &&
+                semantic.usageIndex == 0u &&
+                native_sm3_face_declaration(
+                    vertexStage, semantic.registerIndex, mask);
             if (mask == 0u || semantic.registerIndex >= 16u ||
-                (!pixelPosition && !native_sm3_interface_semantic(
+                (!pixelPosition && !pixelFace &&
+                 !native_sm3_interface_semantic(
                     static_cast<unsigned>(semantic.usage), vertexStage,
                     semantic.output, semantic.usageIndex)))
                 return false;
@@ -380,6 +395,9 @@ bool build_r283_sm3_mov_shader_source(
                     if (positionDeclared) return false;
                     positionDeclared = true;
                     positionDeclaredMask = mask & 0x03u;
+                } else if (pixelFace) {
+                    if (faceDeclared) return false;
+                    faceDeclared = true;
                 } else {
                     if (semantic.registerType != D3DSPR_INPUT ||
                         inputDeclaredMasks[semantic.registerIndex] != 0u)
@@ -401,7 +419,9 @@ bool build_r283_sm3_mov_shader_source(
         // HLSL generation; later semantic/write-mask and live IA checks
         // still reject unknown, missing or partially initialized registers.
         if (!native_sm3_interface_decl_capacity(
-                vertexStage, inputs.size(), outputs.size()))
+                vertexStage, inputs.size(), outputs.size(),
+                static_cast<unsigned>(positionDeclared) +
+                static_cast<unsigned>(faceDeclared)))
             return false;
 
         struct Operation {
@@ -736,12 +756,20 @@ bool build_r283_sm3_mov_shader_source(
                             return false;
                         value = "input.r" + std::to_string(reg);
                     } else if (kind == D3DSPR_MISCTYPE) {
-                        if (!positionDeclared ||
-                            reg != static_cast<UINT>(D3DSMO_POSITION) ||
-                            !native_sm3_pixel_position_source(requiredComponents) ||
-                            (requiredComponents & ~positionDeclaredMask) != 0u)
-                            return false;
-                        value = native_sm3_pixel_position_hlsl();
+                        if (reg == static_cast<UINT>(D3DSMO_POSITION)) {
+                            if (!positionDeclared ||
+                                !native_sm3_pixel_position_source(requiredComponents) ||
+                                (requiredComponents & ~positionDeclaredMask) != 0u)
+                                return false;
+                            value = native_sm3_pixel_position_hlsl();
+                        } else if (reg == static_cast<UINT>(D3DSMO_FACE)) {
+                            // D3D9 vFace can appear only in scalar compare
+                            // IFC/BREAKC/SETP; never synthesize vector data.
+                            if (!faceDeclared || vertexStage ||
+                                !native_sm3_face_scalar_source(requiredComponents))
+                                return false;
+                            value = native_sm3_face_compare_hlsl();
+                        } else return false;
                     } else if (kind == D3DSPR_CONST) {
                         if (reg >= constantLimit ||
                             !native_sm3_const_reference(
@@ -1559,8 +1587,12 @@ bool build_r283_sm3_mov_shader_source(
             std::string label;
             if (!r283_hlsl_semantic(semantic, vertexStage, false, label))
                 return false;
-            translated += "    float4 " +
-                (semantic.registerType == D3DSPR_MISCTYPE
+            const bool pixelFace = semantic.registerType == D3DSPR_MISCTYPE &&
+                                   semantic.registerIndex ==
+                                       static_cast<UINT>(D3DSMO_FACE);
+            translated += std::string("    ") + (pixelFace ? "bool " : "float4 ") +
+                (pixelFace ? std::string("r283_frontface") :
+                 semantic.registerType == D3DSPR_MISCTYPE
                     ? std::string("r283_vpos")
                     : "r" + std::to_string(semantic.registerIndex)) +
                 " : " + label + ";\n";
