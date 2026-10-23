@@ -11,10 +11,10 @@
   "feature_id": "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW",
   "work_key": "DX11:LIVE_OFFSCREEN_MRT_CAMERA_DRAW",
   "feature_base_sha": "f865cfad053d692e8230ccfe4024c39b10cc509a",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "feature_stage": "C5_VALIDATION_PENDING",
-  "checkpoint": "C5_GATES",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -101,10 +101,99 @@
     "tools/verify_dx11_activation_boundary.py",
     "tools/test_dx11_game_offscreen_color_overflow_01037.py"
   ],
-  "material_result_sha": "d2a0a4c293701126dedd3f1f3bfd849126761bd4",
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "831ad528ad6a943de775c2ed8878e039951aa0a9",
+  "validation_bearing_result_sha": "831ad528ad6a943de775c2ed8878e039951aa0a9",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Five GitHub Actions exact SHA on final corrected source: source MRT after chronological eye Clear/Copy replay plus per-slot provenance, no HMD run.",
+  "NEXT_IMPLEMENTATION_ACTION": "Source-stage C6 complete. Controller may select next independent native D3D9→DX11 menu/car/race/OpenXR integration feature; Quest3 RUNTIME_VALIDATION remains UNTESTED.",
   "full_dx11_renderer_complete": false,
-  "feature_ready": false
+  "feature_ready": false,
+  "material_commit_history": [
+    "d2a0a4c293701126dedd3f1f3bfd849126761bd4",
+    "d9189cdf141a5e30f66b7950d47cc43f76fcd6cd",
+    "7f9b42eb8b17af3ec5fe760ab22b7837440958e6",
+    "831ad528ad6a943de775c2ed8878e039951aa0a9"
+  ],
+  "c6_summary": "All five required GitHub Actions completed SUCCESS for exact source SHA; native MRT source batch build verified, no Quest3/game runtime test.",
+  "validation_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 40040784847,
+      "head_sha": "831ad528ad6a943de775c2ed8878e039951aa0a9",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40040784847"
+    },
+    "Build": {
+      "run_id": 40040784778,
+      "head_sha": "831ad528ad6a943de775c2ed8878e039951aa0a9",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40040784778"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 40040784924,
+      "head_sha": "831ad528ad6a943de775c2ed8878e039951aa0a9",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40040784924"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 40040784771,
+      "head_sha": "831ad528ad6a943de775c2ed8878e039951aa0a9",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40040784771"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 40040784873,
+      "head_sha": "831ad528ad6a943de775c2ed8878e039951aa0a9",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40040784873"
+    }
+  },
+  "acceptance_results": {
+    "gpu_mrt_draw": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_stereo_submission.hpp",
+        "src/vr/d3d11/native_game_offscreen_mrt.hpp",
+        "tools/dx11_game_offscreen_mrt_probe_01038.cpp"
+      ],
+      "validation_command": "GitHub DX11 Fast Structural Checks #40040784847 SUCCESS; Build #40040784778 SUCCESS (native MRT source implementation, no game-runtime evidence)"
+    },
+    "blend_provenance": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_offscreen_mrt.hpp",
+        "tools/test_dx11_game_offscreen_mrt_01038.py"
+      ],
+      "validation_command": "python tools/test_dx11_game_offscreen_mrt_01038.py; GitHub DX11 Fast Structural Checks #40040784847 SUCCESS"
+    },
+    "fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/verify_dx11_activation_boundary.py",
+        "tools/test_dx11_game_offscreen_color_overflow_01037.py"
+      ],
+      "validation_command": "GitHub Build #40040784778 source graph PASS; DX11 Fast Structural Checks #40040784847 SUCCESS; original D3D9 game runtime UNTESTED"
+    },
+    "gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/dx11_game_offscreen_mrt_probe_01038.cpp",
+        "tools/test_dx11_game_offscreen_mrt_01038.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #40040784847 SUCCESS @ 831ad528ad6a943de775c2ed8878e039951aa0a9; Build #40040784778 SUCCESS @ 831ad528ad6a943de775c2ed8878e039951aa0a9; OpenXR VR architecture #40040784924 SUCCESS @ 831ad528ad6a943de775c2ed8878e039951aa0a9; OutRun EXE HUD Inspector CI #40040784771 SUCCESS @ 831ad528ad6a943de775c2ed8878e039951aa0a9; Backend Conversion Gate #40040784873 SUCCESS @ 831ad528ad6a943de775c2ed8878e039951aa0a9"
+    }
+  }
 }
