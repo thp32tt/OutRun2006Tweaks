@@ -1,0 +1,502 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0245KST-NEW-SHA8",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "date_kst": "2026-10-24",
+  "checked_at_kst": "2026-10-24T02:47:00.643115+09:00",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "previous_qa_commit": "0174c179544e2fa4dfce12a38de616d953862994",
+  "prior_reviewed_sha_count": 650,
+  "new_unique_sha_count": 8,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 2,
+    "HOLD": 6
+  },
+  "sha_verified_count": 8,
+  "rgba_png_count": 8,
+  "verified_native_ui_cell_placement_count": 0,
+  "producer_output_counts": {
+    "A": 314,
+    "B": 369
+  },
+  "producer_export_evidence_count": 140,
+  "orphan_outputs_without_evidence": {
+    "A": [],
+    "B": []
+  },
+  "export_evidence_without_local_outputs": {
+    "A": [],
+    "B": []
+  },
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_0245_metrics.json",
+    "A_pairs": "work/C1_QA_20261024_0245_A_pairs.jpg",
+    "B_pairs": "work/C1_QA_20261024_0245_B_pairs.jpg"
+  },
+  "summary": "8 distinct unreviewed candidate SHAs inspected; A ordinal 312 and 311 are definite translation-to-output mapping mismatches. Remaining 6 are HOLD rather than false static PASS because output canvas differs from source ROI and native cell-safe placement is unverified. Text-length differences alone are not failure.",
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0063-ED2F7001",
+      "ordinal": 313,
+      "english": "For Experts",
+      "approved_korean": "상급자용",
+      "observed_korean": "상급자용",
+      "source_file": "Q121_b0e5eeeba94ae7c8_source.png",
+      "candidate_file": "Q121_b0e5eeeba94ae7c8_source_k.png",
+      "source_sha256": "8057f06bd2c7bad070f14df38083d4abc7db50df8894dad9e694cd2472ba14d1",
+      "candidate_sha256": "91bca0e9ec2ce3483817223b8adc72b6a84db2a10602ddfab4fce86054418583",
+      "original_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          914,
+          242
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          33,
+          2078,
+          676
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "candidate_text_readable": true,
+        "translation_mapping": "MATCH",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원문 매핑과 개별 글자 가독성은 시각상 일치하나 원본 ROI 크기와 출력 캔버스가 다르고 원본 UI cell 실제 배치 불명",
+      "source_and_output_same_dimensions": false,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0063-ED2F7001",
+      "ordinal": 312,
+      "english": "Drive above the speed!",
+      "approved_korean": "지정 속도 이상으로 달리세요!",
+      "observed_korean": "이 스테이지 랭크",
+      "source_file": "Q054_b855b3dbe586c22e_source.png",
+      "candidate_file": "Q054_b855b3dbe586c22e_source_k.png",
+      "source_sha256": "d866306898fc86b6948117fe5795d6a4f6beb82f0fff8a1b288cdc6d36fb1fb9",
+      "candidate_sha256": "7d5aa8d416887a08595b55cba021f39bca0c24e959ce4be6684b3f7f1610e6f2",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          1375,
+          488
+        ],
+        "candidate_size": [
+          1979,
+          795
+        ],
+        "alpha_bbox": [
+          59,
+          84,
+          1938,
+          696
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "candidate_text_readable": true,
+        "translation_mapping": "MISMATCH",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "FAIL",
+      "reason_code": "APPROVED_KOREAN_MAPPING_MISMATCH",
+      "reason": "원본 'Drive above the speed!'에 대응한 정본 '지정 속도 이상으로 달리세요!'와 다른 문구가 출력됨; source ROI에 인접 UI/보호 아트도 포함",
+      "source_and_output_same_dimensions": false,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0063-ED2F7001",
+      "ordinal": 311,
+      "english": "Honk the horn!",
+      "approved_korean": "경적을 울리세요!",
+      "observed_korean": "지정 속도 이상으로 달리세요!",
+      "source_file": "Q054_4f664f7833192059_source.png",
+      "candidate_file": "Q054_4f664f7833192059_source_k.png",
+      "source_sha256": "ba6f59b79c502fb01160a0fa725c25fcca493b92e9b6a39c2cde946049b03bc1",
+      "candidate_sha256": "7901a15cc20adc3bfa04d3339c55cf68d2cbe5921c67433076561a14bf1da503",
+      "original_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          967,
+          352
+        ],
+        "candidate_size": [
+          2105,
+          747
+        ],
+        "alpha_bbox": [
+          24,
+          89,
+          2085,
+          625
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "candidate_text_readable": true,
+        "translation_mapping": "MISMATCH",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "FAIL",
+      "reason_code": "APPROVED_KOREAN_MAPPING_MISMATCH",
+      "reason": "원본 'Honk the horn!'에 대응한 정본 '경적을 울리세요!'와 다른 문구가 출력됨; source ROI에 인접 UI/보호 아트도 포함",
+      "source_and_output_same_dimensions": false,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0063-ED2F7001",
+      "ordinal": 310,
+      "english": "Honk the horn!",
+      "approved_korean": "경적을 울리세요!",
+      "observed_korean": "경적을 울리세요!",
+      "source_file": "Q054_c562988da81b25c3_source.png",
+      "candidate_file": "Q054_c562988da81b25c3_source_k.png",
+      "source_sha256": "4dbb3680d6509e6a508eafd8690cb5a16b255c44786dcb15de89c43144979888",
+      "candidate_sha256": "341261fdcd1c6dee7875283e9c364bf939adb57bbb7fe235d7976ffafc033925",
+      "original_dds_sha256": "68ae256333e45edf6504169f33dcd93c41855bbd3d86f2212f298b2c3a98ee67",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          967,
+          352
+        ],
+        "candidate_size": [
+          2078,
+          757
+        ],
+        "alpha_bbox": [
+          98,
+          51,
+          2046,
+          672
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "candidate_text_readable": true,
+        "translation_mapping": "MATCH",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "문구는 매핑과 일치하나 원본 ROI에 인접 UI/보호 아트 포함, 실제 UI cell 배치 불명",
+      "source_and_output_same_dimensions": false,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0076-A79C8392",
+      "ordinal": 369,
+      "english": "Manual",
+      "approved_korean": "수동",
+      "observed_korean": "수동",
+      "source_file": "Q095_13497d0995cb4553_source.png",
+      "candidate_file": "Q095_13497d0995cb4553_source_k.png",
+      "source_sha256": "2b17d0e879cde931ea9b9f59eae9d96f372e9e3226e2efcdbc61b98459164f97",
+      "candidate_sha256": "1182991fd8bc1bb96535bf9e2d18cba7b73225be25c832ea9c074b96e91fe019",
+      "original_dds_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          874,
+          230
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          492,
+          31,
+          1798,
+          692
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "candidate_text_readable": true,
+        "translation_mapping": "MATCH",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "문구 일치, PNG RGBA; 출력 캔버스 크기 다르고 네이티브 UI cell 배치 미확인",
+      "source_and_output_same_dimensions": false,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0076-A79C8392",
+      "ordinal": 368,
+      "english": "Alpine",
+      "approved_korean": "알파인",
+      "observed_korean": "알파인",
+      "source_file": "Q046_571c8ff67bb38011_source.png",
+      "candidate_file": "Q046_571c8ff67bb38011_source_k.png",
+      "source_sha256": "a46c2a2eabe9332c50e8a156e067da9e0fb746fbe0b4ae1c6d4d03d39f1b86f5",
+      "candidate_sha256": "b8b3219762a3102f7a24bd4745f3f2d3db0a43d59d7c34953bcc92c09c5b4d76",
+      "original_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          986,
+          578
+        ],
+        "candidate_size": [
+          1619,
+          971
+        ],
+        "alpha_bbox": [
+          81,
+          145,
+          1551,
+          886
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "candidate_text_readable": true,
+        "translation_mapping": "MATCH",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "문구 일치, 원본 ROI에 이웃 문구·아이콘/보호 아트 포함, 실제 배치 미확인",
+      "source_and_output_same_dimensions": false,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0076-A79C8392",
+      "ordinal": 367,
+      "english": "Guess the sound!",
+      "approved_korean": "소리를 맞혀 보세요!",
+      "observed_korean": "소리를 맞혀 보세요!",
+      "source_file": "Q054_8a835074b1d20234_source.png",
+      "candidate_file": "Q054_8a835074b1d20234_source_k.png",
+      "source_sha256": "9ce38dd7c73186813712bd9f807b836852403a468cbfdfb94a9219a0a909912e",
+      "candidate_sha256": "d7679a3ef66f0b72fee926672bd47dd666eb28aa6bc313ccd445e43004f99ebb",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          1258,
+          216
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          8,
+          2158,
+          690
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "candidate_text_readable": true,
+        "translation_mapping": "MATCH",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "문구 일치, 캔버스 크기 불일치, 실제 UI cell 배치 미확인",
+      "source_and_output_same_dimensions": false,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0076-A79C8392",
+      "ordinal": 366,
+      "english": "Guess the sound!",
+      "approved_korean": "소리를 맞혀 보세요!",
+      "observed_korean": "소리를 맞혀 보세요!",
+      "source_file": "Q054_67dc43175039bc5e_source.png",
+      "candidate_file": "Q054_67dc43175039bc5e_source_k.png",
+      "source_sha256": "9ce38dd7c73186813712bd9f807b836852403a468cbfdfb94a9219a0a909912e",
+      "candidate_sha256": "33c91db8b4a27193871a9652eeeed54a19fa8daed30ab44d972598496374e2b0",
+      "original_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "source_size": [
+          1258,
+          216
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          64,
+          7,
+          2126,
+          700
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "candidate_text_readable": true,
+        "translation_mapping": "MATCH",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "문구 일치, 캔버스 크기 불일치, 실제 UI cell 배치 미확인",
+      "source_and_output_same_dimensions": false,
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    }
+  ]
+}
