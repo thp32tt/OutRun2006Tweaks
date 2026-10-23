@@ -1,0 +1,48 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261023T1715KST-IDLE",
+  "checked_at_kst": "2026-10-23T17:18:29.909943+09:00",
+  "role": "C1",
+  "status": "IDLE_NO_UNREVIEWED_CANDIDATES",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "reviewed_sha_history_count": 618,
+  "reviewed_new_unique": 0,
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "A": 0,
+    "B": 0
+  },
+  "scan": {
+    "n100_root": "work/image-src/text_roi_batches",
+    "manifest": "production_manifest.json",
+    "evidence": "export_evidence/*.json",
+    "candidate_dirs": [
+      "candidate_outputs/A",
+      "candidate_outputs/B"
+    ],
+    "duplicate_exclusion": "prior C1 QA candidate SHA256",
+    "new_candidates": 0
+  },
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_n100": [
+    "work/C1_QA_20261023_1715_check.py",
+    "work/C1_QA_20261023_1715_metrics.json"
+  ],
+  "boundary": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_final_compose": false,
+    "game_deployed": false,
+    "c2_c3_ingame_pass_created": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score_change": 0,
+  "notes": "No candidate available after excluding 618 previously reviewed candidate SHA256 hashes. No QA PASS/FAIL/HOLD was fabricated; this IDLE run is not a new QA achievement."
+}
