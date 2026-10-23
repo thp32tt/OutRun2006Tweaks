@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_dev_checkpoint",
+  "task_id": "CONVERSION-DX11-01013",
+  "production_id": "CONVERSION-DX11-01013",
+  "event_id": "CONVERSION-DX11-01013-E015",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 21,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01013",
+  "lane": "DX11",
+  "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+  "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+  "target_branch": "vr-dx11-native-r71",
+  "target_base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "feature_source_sha": "146f52a662e24c6ea5116108d56e6a315e4c8e2e",
+  "feature_stage": "C3_EXACT_SHA_CI_RUNNING",
+  "source_change": "Live shader-bound game D3D9 Draw/DrawIndexed now queries RGB blend factors only if RGB writes or non-independent alpha writes require them; depth-only and independent alpha-only no longer require dormant source blend states.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_composite.hpp",
+    "tools/dx11_sm3_effective_blend_01013.cpp",
+    "tools/test_dx11_live_sm3_blend_factor_00966.py"
+  ],
+  "validation_command": "GitHub Actions exact-SHA 146f52a: Fast 39887843274 SUCCESS; Backend 39887843260, Build 39887843390, OpenXR 39887843255, HUD 39887843353 pending at checkpoint.",
+  "remaining_acceptance": [
+    "Exact-SHA remaining four mandatory Actions and backend/build bundles, repair only causal failure",
+    "Real game launch native eligible_state_draws/native_draws/gpu_desktop_frames >0 and continuous menu/car/race source ordinal coverage UNTESTED",
+    "Independent native game L/R image, generation/fence/ACK, Quest3/VDXR runtime UNTESTED",
+    "R175 TEXCOORD6 owned by 00477; no duplicate modification",
+    "FEATURE_READY and target promotion only when acceptance complete; target remains unmodified"
+  ],
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Read actual CI conclusions for 146f52a; repair any failed exact-SHA test under SAME TASK_ID, then capture real-game source rejection and native full-frame evidence before READY.",
+  "runtime_validation": "UNTESTED",
+  "feature_ready": false,
+  "target_promoted": false,
+  "score_change": 0
+}
