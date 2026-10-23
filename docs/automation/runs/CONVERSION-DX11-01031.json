@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01031",
+  "production_id": "CONVERSION-DX11-01031",
+  "event_id": "CONVERSION-DX11-01031-E001",
+  "event_type": "dispatch",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01031",
+  "lane": "DX11",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_SM3_CONNECTED_INSTANCE_GPU_DRAW",
+  "work_key": "DX11:LIVE_SM3_CONNECTED_INSTANCE_GPU_DRAW",
+  "checkpoint": "C5_VALIDATION_PENDING",
+  "feature_stage": "C5_VALIDATION_PENDING",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "source_head": "9d26c96cd184e13eab38f05f3503a705e7586728",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Expand D3D9 live SM3 indexed/nonindexed instanced line strips, triangle strips, and fans into a single native indexed GPU draw with precise primitive winding and boundaries; DX9Ex fallback remains opt-in safe.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_CONNECTED_INSTANCE_GPU_DRAW",
+    "goal": "All real game SM3 16-stream instanced strip/fan sources keep per-instance topology and draw on one GPU indexed batch while preserving fallback.",
+    "acceptance_items": [
+      {
+        "id": "connected",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Live_SM3_GPU_Draw",
+        "expected_behavior": "Native single DrawIndexed for indexed and nonindexed D3D9 strips and fans without connecting adjacent instances"
+      },
+      {
+        "id": "winding",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Raster_Topology",
+        "expected_behavior": "Odd/even triangle-strip winding and fan center, line segments and source per-instance vertex attributes remain unchanged"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_Input_FFB",
+        "expected_behavior": "Invalid source indices, count/byte overflow and unsupported topology are rejected without corrupting prior list indices; original renderer and input/FFB untouched"
+      },
+      {
+        "id": "gate",
+        "category": "integrated_validation",
+        "behavior_area": "C6_Exact_SHA",
+        "expected_behavior": "Bounded portable C++ connected-instance positive/negative regressions and all mandatory exact-SHA GitHub Gates"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Intercept actual game D3D9 programmable SM3 instanced VB/IB/UP",
+      "Build per-instance ordered index geometry preserving strip/fan topology",
+      "Submit native D3D11 DrawIndexed with original D3D9 fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_connected_instances.hpp",
+      "tools/dx11_sm3_connected_instance_probe_01031.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Per-instance 16-stream source plus strip parity/triangle fan and line segments",
+      "negative_regression": "Invalid indices, overflow, unsupported source and transactional buffer preservation",
+      "component_integration": "Source instance streaming -> topology-index assembly -> native IA DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_CONNECTED_INSTANCE_GPU_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Native opt-in; original D3D9 Draw/Present/gamepad/FFB unchanged; DXVK frozen",
+    "visible_frame_acceptance": "SOURCE_ONLY RUNTIME_UNTESTED",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_connected_instances.hpp",
+    "tools/dx11_sm3_connected_instance_probe_01031.cpp",
+    "tools/test_dx11_live_sm3_instancing_00992.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01031.json"
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Quest3/VDXR live visual evidence not yet observed",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_IMPLEMENTATION_ACTION": "Review GitHub exact-SHA gate, repair only evidenced failures; separate game/HMD runtime.",
+  "acceptance_results": {
+    "connected": {
+      "status": "PENDING_EXACT_SHA",
+      "evidence": "Portable topology helper local C++ passed; full SM3 bridge requires Windows/GitHub Gate."
+    },
+    "winding": {
+      "status": "PENDING_EXACT_SHA",
+      "evidence": "Generated index parity and source-instance bounds checked in bounded probe."
+    },
+    "fallback": {
+      "status": "PENDING_EXACT_SHA",
+      "evidence": "Negative source and preserved legacy non-instanced path."
+    },
+    "gate": {
+      "status": "PENDING_EXACT_SHA",
+      "evidence": "CI not observed."
+    },
+    "runtime": {
+      "status": "UNTESTED"
+    }
+  },
+  "material_result_sha": "",
+  "validation_bearing_result_sha": "",
+  "c6_recovery_hold_reason": "WAITING_EXACT_SHA_GATE"
+}

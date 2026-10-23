@@ -457,6 +457,7 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_multistream_game_draw_probe_01029.cpp -o /tmp/dx11_sm3_multistream_01029 && /tmp/dx11_sm3_multistream_01029
           python tools/test_dx11_sm3_multistream_game_draw_01029.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_instance_list_batch_probe_01030.cpp -o /tmp/dx11_list_batch_01030 && /tmp/dx11_list_batch_01030
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_connected_instance_probe_01031.cpp -o /tmp/dx11_connected_instance_01031 && /tmp/dx11_connected_instance_01031
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
           # Native L/R partial-depth GPU Draw is a separate non-evidence

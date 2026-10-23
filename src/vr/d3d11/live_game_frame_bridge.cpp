@@ -11,6 +11,7 @@
 #include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_sm3_stream_assembly.hpp"
 #include "live_game_sm3_instance_batches.hpp"
+#include "live_game_sm3_connected_instances.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
@@ -5294,17 +5295,33 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         }
     }
-    // Only independent D3D9 lists can merge instances into one GPU Draw:
-    // strips/fans would otherwise create geometry across instance edges.
+    // D3D9 lists are already independently connected. For strip/fan source
+    // instances, materialize an indexed list for each instance, preserving
+    // triangle-strip alternating winding and fan/line boundaries. This
+    // enables ONE native DrawIndexed without joining adjacent instances.
     const bool compactListInstances = sourceInstancing && instanceCount > 1u &&
         game_sm3_independent_list(static_cast<std::uint32_t>(type));
+    const bool compactConnectedInstances = sourceInstancing && instanceCount > 1u &&
+        (type == D3DPT_LINESTRIP || type == D3DPT_TRIANGLESTRIP ||
+         type == D3DPT_TRIANGLEFAN);
+    const bool compactInstancedGeometry =
+        compactListInstances || compactConnectedInstances;
     std::vector<std::uint32_t> compactListIndices;
+    std::vector<std::uint32_t> compactConnectedIndices;
     if (compactListInstances && nativeIndices) {
         if (!game_sm3_expand_list_instance_indices(
                 nativeIndices, nativeIndexCount, vertexCount, instanceCount,
                 compactListIndices)) return false;
         nativeIndices = compactListIndices.data();
         nativeIndexCount = static_cast<UINT>(compactListIndices.size());
+    }
+    if (compactConnectedInstances) {
+        if (!game_sm3_expand_connected_instance_indices(
+                static_cast<std::uint32_t>(type), indices, expected,
+                vertexCount, instanceCount, kMaxIndices,
+                compactConnectedIndices)) return false;
+        nativeIndices = compactConnectedIndices.data();
+        nativeIndexCount = static_cast<UINT>(compactConnectedIndices.size());
     }
     // Keep input-layout cache identity separate when an instanced draw
     // requires source FLOAT4 packing even for already-float declarations.
@@ -5726,6 +5743,16 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
               livePixelInts, pipeline.program.pixelLoopIndexedConstantLower,
               pipeline.program.pixelLoopIndexedConstantEnd)))))
         return false;
+    // Validate source IB and newly expanded indices before touching the
+    // native upload buffers. Failed plans leave the preceding GPU draw
+    // resources intact and take the original D3D9 fallback.
+    if (nativeIndices) {
+        if (!nativeIndexCount || nativeIndexCount > kMaxIndices) return false;
+        for (UINT i = 0u; i < nativeIndexCount; ++i)
+            if (nativeIndices[i] >=
+                (compactInstancedGeometry ? expandedVertices : vertexCount))
+                return false;
+    }
     const auto nativeByteCount = nativeStride * expandedVertices;
     if (!nativeByteCount || nativeByteCount > (1ull << 25u)) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
@@ -5736,8 +5763,6 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                  s.fullGameVertexCapacity, nativeBytes, vertexBytes))
         return false;
     if (nativeIndices) {
-        for (UINT i = 0; i < nativeIndexCount; ++i)
-            if (nativeIndices[i] >= (compactListInstances ? expandedVertices : vertexCount)) return false;
         const UINT indexBytes = nativeIndexCount * sizeof(std::uint32_t);
         if (!ensure_full_game_upload_buffer(device, s.fullGameIndexUpload,
                                             s.fullGameIndexCapacity, indexBytes,
@@ -5913,9 +5938,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         D3D11_PRIMITIVE_TOPOLOGY_POINTLIST :
         type == D3DPT_LINELIST ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
         type == D3DPT_LINESTRIP ?
-        D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP :
+        (compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
+            D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP) :
         type == D3DPT_TRIANGLESTRIP ?
-        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP :
+        (compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST :
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP) :
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     if (nativeIndices)
         context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
@@ -5929,12 +5956,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     context->VSSetSamplers(0u, 4u, boundVertexSamplers.data());
     context->PSSetShaderResources(0u, 16u, boundViews.data());
     context->PSSetSamplers(0u, 16u, boundSamplers.data());
-    // One guarded GPU submit for every independent source-instance list.
-    // Keep exactly one Draw and DrawIndexed dispatch call site: this is the
-    // audited opt-in D3D11 game draw boundary, never a second unguarded path.
-    // Strip/fan boundaries remain separate when batching would connect them.
-    const UINT nativeSubmissionCount = compactListInstances ? 1u : instanceCount;
-    const UINT drawVertexCount = compactListInstances
+    // One audited GPU Draw call site; independent indexed strip/fan lists
+    // preserve exact source boundaries while merging all instances into one
+    // DrawIndexed. Legacy one-instance and non-instanced paths are unchanged.
+    const UINT nativeSubmissionCount =
+        compactInstancedGeometry ? 1u : instanceCount;
+    const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
     // The native API dispatch sites remain inside this guarded submit.
     // GPU source counts and batch indices are captured only for this Draw.
@@ -5946,7 +5973,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     };
     for (UINT instance = 0u; instance < instanceCount; ++instance) {
         if (instance >= nativeSubmissionCount) break;
-        const UINT base = compactListInstances ? 0u : instance * vertexCount;
+        const UINT base = compactInstancedGeometry ? 0u : instance * vertexCount;
         issueNativeGameDraw(drawVertexCount, base);
     }
     s.pending = true;

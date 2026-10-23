@@ -13,7 +13,10 @@ assert "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in b
 assert "context->Draw(vertexCount, base)" in bridge
 assert "issueNativeGameDraw(drawVertexCount, base);" in bridge
 assert "if (instance >= nativeSubmissionCount) break;" in bridge
-assert "nativeSubmissionCount = compactListInstances ? 1u : instanceCount" in bridge
+assert "compactInstancedGeometry ? 1u : instanceCount" in bridge
+assert "game_sm3_expand_connected_instance_indices(" in bridge
+assert "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST" in bridge
+assert "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in bridge
 assert "game_sm3_expand_list_instance_indices(" in bridge
 assert "hashBytes(&packedFloat4, sizeof(packedFloat4));" in bridge
 assert "sourceInstancing && !repack" in bridge
