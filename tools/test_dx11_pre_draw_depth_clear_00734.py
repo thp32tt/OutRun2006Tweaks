@@ -11,7 +11,9 @@ def linked(b, h, r):
     start = b.index("bool observe_game_depth_clear(")
     end = b.index("void observe_game_clear(", start)
     observer = b[start:end]
-    pre_seed = observer.split("s.frameBatch.can_seed_pre_draw_depth(",1)[1].split(");",1)[0]
+    # Check the canonical full-Z seed branch, not the 01036 partial-Z recorder.
+    canonical = observer.split("const bool beforeFirstGameDraw = !s.pending &&",1)[1]
+    pre_seed = canonical.split("s.frameBatch.can_seed_pre_draw_depth(",1)[1].split(");",1)[0]
     color = b[b.index("void observe_game_clear("):b.index("void observe_unavailable_game_draw(")]
     draw = b[b.index("bool submit("):b.index("bool observe_source_device(")]
     entry = r[r.index("HRESULT __stdcall ClearDestR9("):r.index(
@@ -57,7 +59,7 @@ for old, new in (
     # Main STENCIL safety also probes this owner's color identity earlier.
     # Mutate this test's exact pre-first-Draw Z seed, not the stencil gate.
     if old == "s.clearColor.matches(owner,":
-        anchor = segment.index("s.frameBatch.can_seed_pre_draw_depth(")
+        anchor = segment.index("const bool beforeFirstGameDraw = !s.pending &&")
         segment = segment[:anchor] + segment[anchor:].replace(old, new, 1)
     else:
         segment = segment.replace(old, new, 1)
