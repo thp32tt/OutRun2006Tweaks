@@ -17,7 +17,7 @@ def valid(bridge,hook,guard):
       "GameNativeClearCoverage::covers_whole(" in main,
       "s.clearColor.main_depth_still_bound(" in main,
       "GameNativeMainStencilClear::may_ignore(" in main,
-      "if (clearZ) s.frameBatch.note_full_depth_clear(z);" in main,
+      "if (clearZ) {\n            s.preDrawDepth.discard();\n            s.frameBatch.note_full_depth_clear(z);\n        }" in main,
       "GameNativeMainStencilClear::may_ignore(" in color,
       "mainDepthIdentity != 0u" in color,
       "if ((clearStencil && !ignoreStencil) ||" in color,
@@ -47,7 +47,8 @@ def mutant(which,old,new):
 for scope,old,new in (
  ("main","GameNativeClearCoverage::covers_whole(","GameNativeClearCoverage::skip("),
  ("main","s.clearColor.main_depth_still_bound(","true /* unproven */("),
- ("main","if (clearZ) s.frameBatch.note_full_depth_clear(z);","/* omitted Z */"),
+ ("main","if (clearZ) {\n            s.preDrawDepth.discard();\n            s.frameBatch.note_full_depth_clear(z);\n        }","/* omitted Z */"),
+ ("main","s.preDrawDepth.discard();","/* retain stale pre-draw Z */"),
  ("color","mainDepthIdentity != 0u","true /* foreign Z */"),
  ("color","if ((clearStencil && !ignoreStencil) ||","if ((clearStencil && ignoreStencil) ||"),
  ("color","s.frameBatch.abort(); // failed proof: original D3D9 lives","s.frameBatch.reset(); // fail open"),
