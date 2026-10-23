@@ -136,11 +136,16 @@ inline bool native_sm3_relative_matrix_references(
         (fromStaticAddress && dynamicLoop))
         return false;
     unsigned dynamicExclusive = 0u;
+    unsigned staticFirstIndex = 0u;
     if (fromStaticAddress) {
+        // Resolve the signed a0 exactly once before adding matrix rows.
+        // base+row can exceed the encoded c# bank even when negative a0
+        // brings every effective row back inside c0..c255.
         const auto first = static_cast<long long>(base) + staticAddress;
         const auto last = first + static_cast<long long>(rows) - 1;
         if (first < 0 || last >= static_cast<long long>(limit))
             return false;
+        staticFirstIndex = static_cast<unsigned>(first);
     } else if (dynamicLoop) {
         if (loopRegister >= loopExclusiveLimits.size())
             return false;
@@ -163,11 +168,11 @@ inline bool native_sm3_relative_matrix_references(
     bool live = false;
     for (unsigned row = 0u; row < rows; ++row) {
         if (fromStaticAddress) {
-            unsigned index = 0u;
-            if (!native_sm3_static_address_const_index(
-                    base + row, staticAddress,
-                    limit, index) ||
-                !native_sm3_const_reference(
+            // The complete signed [first,last] span was checked above.
+            // Never pass base+row to the single-register unsigned helper:
+            // it would reject legal c255 + (-3) + row addresses.
+            const unsigned index = staticFirstIndex + row;
+            if (!native_sm3_const_reference(
                     index, limit, defPresent[index], next[row]))
                 return false;
             if (!defPresent[index]) live = true;
