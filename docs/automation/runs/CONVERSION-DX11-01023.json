@@ -12,15 +12,15 @@
   "feature_id": "DX11:LIVE_SM3_PREDICATE_BRANCH_TO_TEXTURE_DRAW",
   "work_key": "DX11:LIVE_SM3_PREDICATE_BRANCH_TO_TEXTURE_DRAW",
   "work_class": "integration",
-  "feature_stage": "C4_STATE",
-  "checkpoint": "C4_STATE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "source_head": "5a0ac049543cbe897393035b6de6b581bf0cd820",
-  "material_result_sha": null,
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "material_result_sha": "c4b5fee481cc2f954200fa8adfd54e57b0784472",
+  "result_sha": "12db8569a35f19fe33414b5f33f924f3adc041d3",
+  "validation_bearing_result_sha": "12db8569a35f19fe33414b5f33f924f3adc041d3",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -96,15 +96,83 @@
     "docs/automation/runs/CONVERSION-DX11-01023.json"
   ],
   "pending_items": [
-    "Exact SHA five Actions Gate pending",
-    "Actual menu/car/race game frame, gamepad, FFB and Quest3/VDXR runtime UNTESTED"
+    "Quest3/VDXR real menu/vehicle/race native Draw/published frames, gamepad and FFB remain UNTESTED; exact-SHA source CI does not prove runtime."
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "No matching real-game native Draw or native frame publication measurements",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "PENDING_MATERIAL_SHA",
-  "NEXT_IMPLEMENTATION_ACTION": "Resolve any causal exact-SHA gate failure under 01023 then continue native game-frame draw coverage",
-  "acceptance_results": {},
-  "gate_evidence": null
+  "CODE_CHANGED_SHA": "c4b5fee481cc2f954200fa8adfd54e57b0784472",
+  "NEXT_IMPLEMENTATION_ACTION": "C6 exact-SHA closed; new independent source work may start only after controller assignment, hardware-only runtime conclusions remain pending.",
+  "acceptance_results": {
+    "shader_predicate_draw": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_predicate_flow.hpp",
+        "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+        "tools/dx11_sm3_branch_predicate_probe_01023.cpp",
+        "tools/test_dx11_sm3_branch_predicate_01023.py"
+      ],
+      "validation_command": "SM3 IF/IFC SETP p0 both-arm provenance -> native implicit TEX positive compiled and source-linked Draw/DrawIndexed; exact-SHA DX11 Fast 39948945553 SUCCESS",
+      "limitation": "Only source and CI verified; native game menu/car/race output, gamepad, FFB and Quest3/VDXR runtime UNTESTED."
+    },
+    "fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_predicate_flow.hpp",
+        "tools/dx11_sm3_branch_predicate_probe_01023.cpp",
+        "tools/test_dx11_sm3_dynamic_texture_flow_00962.py",
+        "tools/test_dx11_sm3_uniform_predicate_texture_01021.py"
+      ],
+      "validation_command": "Compiled varying IFC, missing ELSE and REP/LOOP mutation negative cases; same-SHA DX11 Fast 39948945553 SUCCESS",
+      "limitation": "Only source and CI verified; native game menu/car/race output, gamepad, FFB and Quest3/VDXR runtime UNTESTED."
+    },
+    "same_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_sm3_branch_predicate_01023.py",
+        "docs/automation/runs/CONVERSION-DX11-01023.json"
+      ],
+      "validation_command": "Exact SHA 12db8569a35f19fe33414b5f33f924f3adc041d3: Fast 39948945553, Backend 39948945518, Win32 Build 39948945547, OpenXR 39948945512, HUD 39948945490 all SUCCESS",
+      "limitation": "Only source and CI verified; native game menu/car/race output, gamepad, FFB and Quest3/VDXR runtime UNTESTED."
+    }
+  },
+  "gate_evidence": {
+    "source_sha": "12db8569a35f19fe33414b5f33f924f3adc041d3",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39948945553,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39948945518,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39948945547,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39948945512,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39948945490,
+        "conclusion": "success"
+      }
+    },
+    "material_source_sha": "c4b5fee481cc2f954200fa8adfd54e57b0784472",
+    "causal_repairs": [
+      {
+        "failing_sha": "c4b5fee481cc2f954200fa8adfd54e57b0784472",
+        "repair_sha": "12db8569a35f19fe33414b5f33f924f3adc041d3",
+        "reason": "00962 obsolete structuredFlow.empty regex repaired within 01023 without relaxing varying-IFC or unknown-p0 safety"
+      }
+    ]
+  }
 }
