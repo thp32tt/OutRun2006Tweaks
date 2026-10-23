@@ -55,8 +55,10 @@ assert "vertexCubeSamplerMask" in bridge and "pixelCubeSamplerMask" in bridge
 assert "context->PSSetShaderResources(0u, 16u, boundViews.data())" in bridge
 assert "context->VSSetShaderResources(0u, 4u, boundVertexViews.data())" in bridge
 assert re.search(r"if \(nativeIndices\)\s*context->DrawIndexed\(nativeIndexCount", bridge)
-assert "nativeSubmissionCount = compactListInstances ? 1u : instanceCount" in bridge
+assert "compactInstancedGeometry ? 1u : instanceCount" in bridge
+assert "game_sm3_expand_connected_instance_indices(" in bridge
+assert "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in bridge
 assert "for (UINT instance = 0u; instance < instanceCount; ++instance)" in bridge
 assert "if (instance >= nativeSubmissionCount) break;" in bridge
-assert "const UINT base = compactListInstances ? 0u : instance * vertexCount" in bridge
+assert "const UINT base = compactInstancedGeometry ? 0u : instance * vertexCount" in bridge
 print("Native game shader TEXLDD / TEXLDL conditional translation + fail-closed sampler path linked; HMD untested")
