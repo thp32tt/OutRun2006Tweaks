@@ -7,6 +7,7 @@
 #include "native_sm3_texture_codegen.hpp"
 #include "native_sm3_fragment_codegen.hpp"
 #include "native_sm3_conditional_flow.hpp"
+#include "native_sm3_derivative_uniformity.hpp"
 #include "native_sm3_interface_channels.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "native_sm3_repeat_flow.hpp"
@@ -488,6 +489,7 @@ bool build_r283_sm3_mov_shader_source(
         bool liveBooleansUsed = false;
         bool liveIntegersUsed = false;
         NativeSm3ConditionalFlow writtenFlow;
+        NativeSm3DerivativeUniformity derivativeUniformity;
         NativeSm3StructuredFlow structuredFlow;
         NativeSm3PredicateFlow predicateFlow;
         // D3D9 aL always denotes the innermost LOOP, never REP.
@@ -786,6 +788,12 @@ bool build_r283_sm3_mov_shader_source(
                         return false;
                     scalarOperands[i] = std::move(value);
                 }
+                // IFC consumes pixel-dependent float source registers. Even
+                // an equal-looking comparison is not proof of quad-uniformity.
+                // Only IF b# is classified as uniform for implicit sampling.
+                if (!predicateWrite && !conditionalBreak &&
+                    !derivativeUniformity.begin(false))
+                    return false;
                 Operation branch{};
                 branch.flowKind = predicateWrite ? 8u : (conditionalBreak ? 7u : 1u);
                 branch.flowCondition = scalarOperands[0] + " " + compareOp +
@@ -823,6 +831,10 @@ bool build_r283_sm3_mov_shader_source(
                     !writtenFlow.begin(tempWritten, outputWritten) ||
                     !predicateFlow.begin_if())
                     return false;
+                // DEFB and actual per-Draw b# are scalar across the entire
+                // primitive. Permit texld/texldp/texldb in this IF, but never
+                // in a nested pixel-varying IFC or predicated instruction.
+                if (!derivativeUniformity.begin(true)) return false;
                 Operation branch{};
                 branch.flowKind = 1u;
                 branch.flowCondition = std::move(boolCondition);
@@ -849,7 +861,8 @@ bool build_r283_sm3_mov_shader_source(
                     operations.size() >= kMaxOps ||
                     !structuredFlow.end_if() ||
                     !writtenFlow.end(tempWritten, outputWritten) ||
-                    !predicateFlow.end_if())
+                    !predicateFlow.end_if() ||
+                    !derivativeUniformity.end())
                     return false;
                 Operation branch{};
                 branch.flowKind = 3u;
@@ -1178,7 +1191,7 @@ bool build_r283_sm3_mov_shader_source(
                 // genuine pixel-varying IF or per-instruction predicates.
                 if (!native_sm3_texture_mode_allowed_in_control_flow(
                         op.textureMode,
-                        sourcePredicated || !writtenFlow.empty()))
+                        sourcePredicated || !derivativeUniformity.implicit_sampling_safe()))
                     return false;
             }
             if (op.texkill) {
@@ -1530,7 +1543,8 @@ bool build_r283_sm3_mov_shader_source(
             operations.push_back(std::move(op));
         }
         if (operations.empty() || !writtenFlow.empty() ||
-            !structuredFlow.empty() || !predicateFlow.empty()) return false;
+            !structuredFlow.empty() || !predicateFlow.empty() ||
+            !derivativeUniformity.empty()) return false;
         if (vertexStage) {
             for (const auto& output : outputs)
                 if (output.registerType != D3DSPR_OUTPUT ||
