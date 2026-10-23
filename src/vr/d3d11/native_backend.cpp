@@ -1463,6 +1463,11 @@ bool build_r283_sm3_mov_shader_source(
                     // unknown vertex-owned addresses still fail closed.
                     if (kind != D3DSPR_CONST || modifier != D3DSPSM_NONE ||
                         swizzle != 0xe4u || reg >= constantLimit ||
+                        // Preserve the original overflow-safe absolute/aL
+                        // bank check; only a shader-owned, fixed negative
+                        // a0 may resolve a late c# matrix into the bank.
+                        ((!relative || !staticAddress) &&
+                         op.matrixRowCount > constantLimit - reg) ||
                         !native_sm3_matrix_source_span_accepted(
                              reg, op.matrixRowCount, constantLimit,
                              relative, staticAddress))

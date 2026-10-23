@@ -9,6 +9,9 @@ int main() {
     assert(native_sm3_matrix_source_span_accepted(255, 4, 256, true, true));
     assert(!native_sm3_matrix_source_span_accepted(255, 4, 256, false, false));
     assert(!native_sm3_matrix_source_span_accepted(255, 4, 256, true, false));
+    assert(native_sm3_matrix_source_span_accepted(252, 4, 256, true, false));
+    assert(!native_sm3_matrix_source_span_accepted(253, 4, 256, true, false));
+    assert(native_sm3_matrix_source_span_accepted(253, 4, 256, true, true));
     assert(!native_sm3_matrix_source_span_accepted(256, 4, 256, true, true));
     assert(!native_sm3_matrix_source_span_accepted(255, 1, 256, true, true));
     assert(!native_sm3_matrix_source_span_accepted(255, 5, 256, true, true));
