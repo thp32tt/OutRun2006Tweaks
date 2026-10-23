@@ -8,11 +8,15 @@ bridge = (root / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 start = backend.index("if (sourcePredicated) {")
 end = backend.index("op.sineCosine =", start)
 predication = backend[start:end]
-assert "instruction.opcode == D3DSIO_TEX)" in predication
+assert "instruction.opcode == D3DSIO_TEX &&" in predication
+assert "!predicateDrawUniformity.implicit_sampling_safe(true)" in predication
 assert "instruction.opcode == D3DSIO_TEXLDD)" not in predication
-# Preserve the original rejection of implicit sampling under a predicated
-# instruction or a pixel-varying IFC, but allow draw-uniform D3D9 IF b#.
-assert "sourcePredicated || !derivativeUniformity.implicit_sampling_safe()" in backend
+# Implicit TEX is still denied under pixel-varying IFC or unproven p0;
+# genuine draw-uniform SETP p0 and D3D9 IF b# now admit native sampling.
+assert "!predicateDrawUniformity.implicit_sampling_safe(sourcePredicated)" in backend
+assert "!derivativeUniformity.implicit_sampling_safe()" in backend
+assert "predicateDrawUniformity.write(" in backend
+assert "structuredFlow.empty() &&" in backend
 # A real IFC(c#,c#) is now correctly quad-uniform; a pixel-varying
 # TEMP/input/vPos/vFace on EITHER side must not unlock implicit derivatives.
 assert "NativeSm3IfcScalarOrigin::PixelDependent" in backend
