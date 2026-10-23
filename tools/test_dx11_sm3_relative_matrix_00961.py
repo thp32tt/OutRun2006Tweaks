@@ -12,7 +12,13 @@ assert "indexedLoopLimits" in cpp and "dynamicRelativeLimits" in cpp
 assert "r283_c[" in h and " + r283_aL]" in h
 assert "dynamicExclusive = limit - base - rows + 1u" in h
 assert "for (unsigned reg = base; reg < limit; ++reg)" in h
-assert "native_sm3_static_address_const_index(" in h
+# Static MOVA matrices check the signed effective row span before indexing;
+# the scalar index helper intentionally rejects encoded out-of-bank bases.
+assert "const auto first = static_cast<long long>(base) + staticAddress" in h
+assert "const auto last = first + static_cast<long long>(rows) - 1" in h
+assert "if (first < 0 || last >= static_cast<long long>(limit))" in h
+assert "const unsigned index = staticFirstIndex + row;" in h
+assert "native_sm3_const_reference(" in h
 assert "native_sm3_live_loop_indexed_bounds_valid(" in bridge
 assert "if (relative && op.texture2d && i == 1u)" in cpp
 print("SM3 relative matrix Draw pipeline wired with bounded aL/a0; runtime UNTESTED")
