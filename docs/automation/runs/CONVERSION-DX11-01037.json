@@ -49,14 +49,9 @@
       },
       {
         "id": "gate",
-        "behavior_area": "CI",
-        "expected_behavior": "C++ positive/negative probe plus five exact-SHA GitHub Gates"
-      },
-      {
-        "id": "gate",
-        "category": "integrated_validation",
         "behavior_area": "EXACT_SHA_GITHUB_ACTIONS",
-        "expected_behavior": "Native camera C++/Python regression plus successful same SHA GitHub Fast, Build, OpenXR, HUD and Backend Gates; runtime remains UNTESTED."
+        "expected_behavior": "Native camera C++/Python regression plus successful same SHA GitHub Fast, Build, OpenXR, HUD and Backend Gates; runtime remains UNTESTED.",
+        "category": "integrated_validation"
       }
     ]
   },
