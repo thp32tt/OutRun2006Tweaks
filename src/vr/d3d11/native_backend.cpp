@@ -1279,6 +1279,11 @@ bool build_r283_sm3_mov_shader_source(
             // modification. A native TEMP only inherits draw uniformity
             // from earlier guaranteed, unconditional constant arithmetic.
             bool sourcesDrawUniform = sourceCount != 0u;
+            // Matrix row source #1 is expanded into actual constant
+            // registers and exits the ordinary source classifier early.
+            // Track those rows explicitly instead of either losing valid
+            // absolute draw constants or assuming relative rows are safe.
+            bool matrixRowsAreAbsolute = false;
             for (unsigned i = 0; i < sourceCount; ++i) {
                 if (operandCursor >= instruction.operandTokens.size() -
                                          (sourcePredicated ? 1u : 0u))
@@ -1378,6 +1383,7 @@ bool build_r283_sm3_mov_shader_source(
                                            : native_sm3_texture_modifier_supported(op.textureMode, i, modifier)))
                     return false;
                 if (op.matrixRowCount != 0u && i == 1u) {
+                    matrixRowsAreAbsolute = !relative;
                     // Each SM3 M*x* instruction reads a consecutive matrix
                     // register block. A shader-owned a0 or authentic aL may
                     // shift the whole block, not the individual source rows.
@@ -1572,14 +1578,18 @@ bool build_r283_sm3_mov_shader_source(
             // previously undefined game register. HLSL's zero-initialized
             // placeholder is not D3D9 register-provenance evidence.
             if (op.destinationType == D3DSPR_TEMP) {
-                // Only real pure arithmetic paths may propagate a per-Draw
-                // uniform TEMP. Texture samples, implicit derivatives,
-                // conditional/predicated writes and all matrix/scratch paths
-                // must invalidate the affected lanes, never inherit an
-                // unrelated HLSL zero-initializer or earlier uniform value.
+                // Only physical lanes produced from immutable per-Draw
+                // sources may drive IFC implicit texture derivatives.
+                // Real matrix dot rows use c#/DEF constants and may carry
+                // proven uniform TEMP vectors. Relative/unknown matrices,
+                // texture samples, scratch, derivative, conditional or
+                // predicated writes invalidate their actual destination lanes.
                 const bool pureDrawArithmetic =
                     !op.texture2d && !op.texkill && !op.signScratch &&
-                    op.matrixRowCount == 0u &&
+                    (op.matrixRowCount == 0u ||
+                     native_sm3_matrix_draw_uniform(
+                         op.matrixRowCount, op.matrixVectorComponents,
+                         mask, matrixRowsAreAbsolute)) &&
                     op.opcode != NativeSm3ArithmeticOpcode::DerivativeX &&
                     op.opcode != NativeSm3ArithmeticOpcode::DerivativeY &&
                     sourcesDrawUniform;

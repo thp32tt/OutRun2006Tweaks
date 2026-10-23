@@ -6,6 +6,20 @@
 #include <array>
 
 namespace outrun::vr::dx11 {
+// A real game SM3 M4x4/M4x3/M3x4/M3x3/M3x2 computes dot products
+// across immutable per-Draw c# or DEF rows. If its vector came only from
+// draw-uniform c#/TEMP lanes, all physically written result lanes may feed
+// a quad-uniform IFC and native implicit TEX. Relative c[a0]/c[aL] and
+// conditional writes deliberately remain pixel-dependent for admission.
+[[nodiscard]] constexpr bool native_sm3_matrix_draw_uniform(
+    unsigned rows, unsigned vectorComponents, unsigned writtenMask,
+    bool absoluteConstantRows) noexcept {
+    const bool dimensions =
+        (vectorComponents == 4u && (rows == 4u || rows == 3u)) ||
+        (vectorComponents == 3u && (rows == 4u || rows == 3u || rows == 2u));
+    return absoluteConstantRows && dimensions && writtenMask != 0u &&
+           (writtenMask & ~((1u << rows) - 1u)) == 0u;
+}
 class NativeSm3TempDrawUniformity final {
 public:
     [[nodiscard]] constexpr bool contains(unsigned reg,
