@@ -2,6 +2,7 @@
 
 #include "pipeline_translation.hpp"
 #include "native_sm3_arithmetic_codegen.hpp"
+#include "native_sm3_subroutine_expansion.hpp"
 #include "native_sm3_trig_sign_opcode.hpp"
 #include "native_sm3_constant_codegen.hpp"
 #include "native_sm3_texture_codegen.hpp"
@@ -279,14 +280,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V14";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V15";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V14";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V15";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -360,6 +361,34 @@ bool build_r283_sm3_mov_shader_source(
             decode_programmable_shader_interface_semantics(decode, registers);
         if (!decode.exact() || !registers.exact() ||
             !interfaceSemantics.exact())
+            return false;
+        // A real SM3 CALL/LABEL/RET graph is a legal programmable VS/PS
+        // source, not an unsupported D3D9 state. Inline bounded, acyclic
+        // subroutines into the same native TEMP/constant/texture and Draw
+        // materialization path. Unknown flow stays with D3D9Ex.
+        auto sourceInstructions = decode.instructions;
+        if (!native_sm3_expand_subroutines(
+                decode.instructions,
+                static_cast<DWORD>(D3DSIO_CALL),
+                static_cast<DWORD>(D3DSIO_CALLNZ),
+                static_cast<DWORD>(D3DSIO_LABEL),
+                static_cast<DWORD>(D3DSIO_RET),
+                [](DWORD token, unsigned& label) noexcept {
+                    if ((token & 0x80000000u) == 0u ||
+                        r283_decode_register_type(token) != D3DSPR_LABEL ||
+                        (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                        (token & D3DSP_SRCMOD_MASK) != 0u)
+                        return false;
+                    label = token & D3DSP_REGNUM_MASK;
+                    return true;
+                },
+                [](DWORD opcode) noexcept {
+                    return opcode != D3DSIO_DCL &&
+                           opcode != D3DSIO_DEF &&
+                           opcode != D3DSIO_DEFB &&
+                           opcode != D3DSIO_DEFI;
+                },
+                sourceInstructions))
             return false;
 
         std::vector<ProgrammableShaderInterfaceSemantic> inputs, outputs;
@@ -606,7 +635,7 @@ bool build_r283_sm3_mov_shader_source(
         // No constants or dynamic indexing are fabricated here: real game
         // Set*ShaderConstantF and sampler bindings must be connected before
         // programs requiring them can become native Draw candidates.
-        for (const auto& instruction : decode.instructions) {
+        for (const auto& instruction : sourceInstructions) {
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL) ||
                 instruction.opcode == static_cast<DWORD>(D3DSIO_DEF) ||
                 instruction.opcode == static_cast<DWORD>(D3DSIO_DEFB) ||
