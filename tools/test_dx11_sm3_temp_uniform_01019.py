@@ -28,7 +28,7 @@ need("native_sm3_source_modifier_components(" in block and
      "tempDrawUniformity.contains(" in block and
      "kind == D3DSPR_CONST && !relative" in block,
      "actual per-lane uniform arithmetic source propagation must be connected")
-need("structuredFlow.empty() && !op.predicated" in block and
+need("tempDrawUniformity.uniform_flow() && !op.predicated" in block and
      "tempDrawUniformity.invalidate(scratch)" in block and
      "op.opcode != NativeSm3ArithmeticOpcode::DerivativeX" in block and
      "op.opcode != NativeSm3ArithmeticOpcode::DerivativeY" in block,
@@ -45,7 +45,7 @@ need("bool sourcesDrawUniform = sourceCount != 0u" in block and
      "pure arithmetic must propagate only proven, physical constant/TEMP lanes")
 need("!op.texture2d && !op.texkill && !op.signScratch" in block and
      "tempDrawUniformity.write(" in block and
-     "structuredFlow.empty() && !op.predicated" in block,
+     "tempDrawUniformity.uniform_flow() && !op.predicated" in block,
      "texture/scratch/predicate/branch destinations must never inherit uniformity")
 need("context->PSSetShader(" in bridge and
      "context->DrawIndexed(" in bridge and "context->Draw(" in bridge,

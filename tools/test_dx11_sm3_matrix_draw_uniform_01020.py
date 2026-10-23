@@ -32,7 +32,7 @@ require("append_native_sm3_matrix(" in block and
         "context->PSSetShader(" in bridge and
         "context->DrawIndexed(" in bridge and "context->Draw(" in bridge,
         "matrix shader emission must remain linked to native game Draw")
-require("structuredFlow.empty() && !op.predicated" in block and
+require("tempDrawUniformity.uniform_flow() && !op.predicated" in block and
         "op.opcode != NativeSm3ArithmeticOpcode::DerivativeX" in block,
         "conditional, predicated and derivative writes may not authorize IFC")
 compiler = shutil.which("g++") or shutil.which("clang++")

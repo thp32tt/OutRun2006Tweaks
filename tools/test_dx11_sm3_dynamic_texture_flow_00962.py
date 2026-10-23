@@ -21,7 +21,9 @@ assert "structuredFlow.empty() &&" in backend
 # TEMP/input/vPos/vFace on EITHER side must not unlock implicit derivatives.
 assert "NativeSm3IfcScalarOrigin::PixelDependent" in backend
 assert "scalarOrigins[i] = NativeSm3IfcScalarOrigin::DrawFloatConstant;" in backend
-assert "!derivativeUniformity.begin(native_sm3_ifc_is_quad_uniform(" in backend
+assert "const bool uniformComparison = native_sm3_ifc_is_quad_uniform(" in backend
+assert "if (!derivativeUniformity.begin(uniformComparison) ||" in backend
+assert "!tempDrawUniformity.begin_if(uniformComparison)" in backend
 assert "scalarOrigins[0], scalarOrigins[1]" in backend
 assert "!derivativeUniformity.begin(true)" in backend
 assert "!derivativeUniformity.end()" in backend
