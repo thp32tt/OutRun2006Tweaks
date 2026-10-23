@@ -206,6 +206,27 @@ constexpr bool native_game_alpha_factor(DWORD f, D3D11_BLEND& out) noexcept {
     default: return false;
     }
 }
+// D3D9 independent alpha factors affect only RT0 alpha. A real menu/race
+// fixed-function Draw with an RGB-only write mask must not be rejected because
+// of stale/unrepresentable alpha-only state from an earlier Draw.
+[[nodiscard]] constexpr bool native_game_active_separate_alpha(
+    DWORD enabled, DWORD writeMask) noexcept {
+    return enabled != FALSE &&
+           (writeMask & D3DCOLORWRITEENABLE_ALPHA) != 0u;
+}
+static_assert(!native_game_active_separate_alpha(
+                  FALSE, D3DCOLORWRITEENABLE_ALPHA) &&
+              !native_game_active_separate_alpha(TRUE, 0u) &&
+              !native_game_active_separate_alpha(
+                  TRUE, D3DCOLORWRITEENABLE_RED |
+                        D3DCOLORWRITEENABLE_GREEN |
+                        D3DCOLORWRITEENABLE_BLUE) &&
+              native_game_active_separate_alpha(
+                  TRUE, D3DCOLORWRITEENABLE_ALPHA) &&
+              native_game_active_separate_alpha(
+                  TRUE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_ALPHA),
+              "Real FVF RGB-only Draw must ignore stale independent alpha");
+
 constexpr bool native_game_separate_alpha(
     DWORD source, DWORD destination, DWORD equation,
     D3D11_BLEND& src, D3D11_BLEND& dst, D3D11_BLEND_OP& op) noexcept {
@@ -2960,9 +2981,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetRenderState(D3DRS_BLENDOP, &blendOp)) ||
             FAILED(game->GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)))
             return false;
-        // Capture the actual independent game alpha operation only when
-        // enabled. Never use RGB factors as a surrogate for a menu fade.
-        if (separate != FALSE) {
+        // Only an alpha-writing Draw consumes the D3D9 independent-alpha
+        // state. An RGB-only menu/vehicle Draw must retain native coverage
+        // even if stale source alpha factors cannot map to D3D11.
+        const bool activeSeparateAlpha =
+            native_game_active_separate_alpha(separate, colorMask);
+        if (activeSeparateAlpha) {
             DWORD srcAlpha = 0u, dstAlpha = 0u, opAlpha = 0u;
             if (FAILED(game->GetRenderState(D3DRS_SRCBLENDALPHA, &srcAlpha)) ||
                 FAILED(game->GetRenderState(D3DRS_DESTBLENDALPHA, &dstAlpha)) ||
@@ -2979,7 +3003,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         const bool extrema = blendOp == D3DBLENDOP_MIN ||
                              blendOp == D3DBLENDOP_MAX;
         if (extrema && !game_native_extremum_admission(
-                blendOp, src, dst, separate != FALSE, colorMask))
+                blendOp, src, dst, activeSeparateAlpha, colorMask))
             return false;
         if (blendOp != D3DBLENDOP_ADD) {
             if (blendOp != D3DBLENDOP_SUBTRACT &&

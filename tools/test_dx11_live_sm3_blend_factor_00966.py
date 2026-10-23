@@ -118,4 +118,20 @@ require("static_assert(sm3_live_legacy_source_blend_regression()", src)
 require("D3DBLEND_BOTHINVSRCALPHA, D3DBLEND_ZERO, D3DBLENDOP_ADD", src)
 require("b.BlendOpAlpha != D3D11_BLEND_OP_MAX", src)
 require("b.BlendOpAlpha == saved.BlendOpAlpha", src)
-print("PASS source: actual shader-bound Draw blend factor/alpha/native OM/fail-closed; runtime UNTESTED")
+
+# Real mixed FVF/SM3 RGB-only Draws must not abort the entire native
+# game frame on irrelevant independent-alpha state from the previous Draw.
+# Alpha-writing Draws still query/validate the genuine D3D9 state and
+# reject unsupported alpha factors without touching the D3D9 fallback.
+fvf = src[src.index("constexpr bool native_game_active_separate_alpha("):
+          src.index("if (alpha) {", src.index("constexpr bool native_game_active_separate_alpha("))]
+require("(writeMask & D3DCOLORWRITEENABLE_ALPHA) != 0u;", fvf)
+require("static_assert(!native_game_active_separate_alpha(", fvf)
+require("const bool activeSeparateAlpha =", fvf)
+require("native_game_active_separate_alpha(separate, colorMask);", fvf)
+require("if (activeSeparateAlpha) {", fvf)
+require("blendOp, src, dst, activeSeparateAlpha, colorMask))", fvf)
+require("!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,", fvf)
+require("output.separateAlphaBlend = true;", fvf)
+assert fvf.index("if (activeSeparateAlpha) {") < fvf.index("D3DRS_SRCBLENDALPHA")
+print("PASS source: actual shader-bound and FVF RGB-mask independent-alpha/OM/fallback; runtime UNTESTED")
