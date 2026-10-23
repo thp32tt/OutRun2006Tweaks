@@ -1,0 +1,53 @@
+{
+  "schema": "outrun.c1.idle_sha_inventory.v1",
+  "run_key": "OUTRUN-C1-20261023T1915KST-NEW-SHA",
+  "checked_at_kst": "2026-10-23T19:18:24.434185+09:00",
+  "role": "C1",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_A_B_CANDIDATE_SHA",
+  "reviewed_sha_history_count": 618,
+  "new_unique_count": 0,
+  "reviewed_new": 0,
+  "pass": 0,
+  "fail": 0,
+  "hold": 0,
+  "candidate_records": [],
+  "inventory": {
+    "manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence": "work/image-src/text_roi_batches/export_evidence",
+    "candidate_roots": [
+      "work/image-src/text_roi_batches/candidate_outputs/A",
+      "work/image-src/text_roi_batches/candidate_outputs/B"
+    ],
+    "previous_qa_patterns": [
+      "work/c1_batch_*/report.json",
+      "work/c1_batch_*/metrics.json",
+      "work/C1_QA_*/metrics.json",
+      "work/C1_QA_*_metrics.json"
+    ],
+    "local_evidence": "work/C1_QA_20261023_1915_metrics.json",
+    "method": "N100 source/export candidate sha256 dedup versus saved C1 metrics and QA reports, plus manifest/sent/export linkage"
+  },
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "limits": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds": false,
+    "dds_deployed": false,
+    "c2_c3_ingame_pass_created": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score": {
+    "ai": "AI 1",
+    "previous_confirmed": 1753,
+    "delta": 0,
+    "current": 1753,
+    "reason": "IDLE only; no new independently reviewed candidate SHA"
+  }
+}
