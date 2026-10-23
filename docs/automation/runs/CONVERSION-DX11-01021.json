@@ -12,15 +12,15 @@
   "feature_id": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
   "work_key": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
   "work_class": "integration",
-  "feature_stage": "C6_STATE",
-  "checkpoint": "C6_STATE",
-  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C4_MATERIAL",
+  "checkpoint": "C4_MATERIAL",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
   "source_head": "bcd5dab9d59412b19fd973560514bc4bd58ab7d4",
-  "material_result_sha": "a870d88648e71d2bdc6bc456a931dc9ec7767052",
-  "result_sha": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-  "validation_bearing_result_sha": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-  "automation_validation": "PASS_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "material_result_sha": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -104,86 +104,6 @@
   "REAL_GAME_DRAW_BLOCKER": "Full game native Draw/frame count and HMD evidence unmeasured; shader p0 source added.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-  "NEXT_IMPLEMENTATION_ACTION": "After exact SHA CI, implement remaining menu/car/race frame OpenXR/input paths.",
-  "material_repair_sha": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-  "validation_sha": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-  "acceptance_results": {
-    "matrix_uniform_ifc_live_shader_draw": {
-      "status": "PASS_FEATURE_CI",
-      "runtime_validation": "UNTESTED",
-      "evidence_paths": [
-        "src/vr/d3d11/native_backend.cpp",
-        "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
-        "tools/dx11_sm3_matrix_draw_uniform_probe_01020.cpp",
-        "tools/test_dx11_sm3_matrix_draw_uniform_01020.py"
-      ],
-      "validation_command": "Compiled C++17 01020 matrix dot/IFC/native TEX positive regression; DX11 Fast 39934589820 SUCCESS at exact 12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-      "limitation": "Source-linked path and CI only; no real OutRun native Draw/frame measured."
-    },
-    "matrix_variable_failclosed": {
-      "status": "PASS_FEATURE_CI",
-      "runtime_validation": "UNTESTED",
-      "evidence_paths": [
-        "src/vr/d3d11/native_backend.cpp",
-        "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
-        "tools/dx11_sm3_matrix_draw_uniform_probe_01020.cpp"
-      ],
-      "validation_command": "Compiled 01020 negative relative/varying/predicate/partial output mask cases and pre-existing fallback regressions; Fast 39934589820 SUCCESS",
-      "limitation": "No HMD/gamepad/FFB parity hardware test; native opt-in and original DX9Ex path remain unpromoted."
-    },
-    "matrix_compiled_ci_five_gate": {
-      "status": "PASS_FEATURE_CI",
-      "runtime_validation": "UNTESTED",
-      "evidence_paths": [
-        "tools/test_dx11_sm3_matrix_draw_uniform_01020.py",
-        ".github/workflows/dx11-fast-structural.yml",
-        "docs/automation/runs/CONVERSION-DX11-01020.json"
-      ],
-      "validation_command": "Exact SHA 12679854aaf2b6c82a9c3f1b11b43ee25bc89803: Fast 39934589820, Backend 39934589781 (validate+smoke), Build 39934589740, OpenXR 39934589821, HUD 39934589790 all SUCCESS",
-      "limitation": "GitHub Actions does not prove 3D native menu-car-race playability; RUNTIME_VALIDATION=UNTESTED."
-    }
-  },
-  "gate_evidence": {
-    "source_sha": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-    "required_gates": {
-      "dx11_fast": {
-        "run_id": 39934589820,
-        "conclusion": "success"
-      },
-      "backend": {
-        "run_id": 39934589781,
-        "conclusion": "success"
-      },
-      "windows_build": {
-        "run_id": 39934589740,
-        "conclusion": "success"
-      },
-      "openxr": {
-        "run_id": 39934589821,
-        "conclusion": "success"
-      },
-      "hud": {
-        "run_id": 39934589790,
-        "conclusion": "success"
-      }
-    },
-    "first_causal_failure": {
-      "source_sha": "a870d88648e71d2bdc6bc456a931dc9ec7767052",
-      "fast_run_id": 39934382015,
-      "reason": "New test incorrectly expected one-line native TEMP contains call; C++ source uses multiline call",
-      "repair_sha": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803"
-    }
-  },
-  "feature_ready": {
-    "status": "FEATURE_READY",
-    "feature_id": "DX11:LIVE_SM3_MATRIX_TEMP_IFC_NATIVE_TEXTURE_DRAW",
-    "feature_head_sha": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-    "gate_head_sha": "12679854aaf2b6c82a9c3f1b11b43ee25bc89803",
-    "condition": "SOURCE_AND_EXACT_SHA_CI_VERIFIED_NOT_GAMEPLAY_PROVEN",
-    "acceptance_results_status": "PASS_FEATURE_CI",
-    "material_source_sha": "a870d88648e71d2bdc6bc456a931dc9ec7767052",
-    "runtime_validation": "UNTESTED"
-  },
-  "score_status": "ELIGIBLE_ONCE_NEW_MATERIAL_01020_AND_EXACT_SHA_FIVE_GATE; C6_AND_REPAIR_NO_EXTRA_CREDIT"
+  "CODE_CHANGED_SHA": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
+  "NEXT_IMPLEMENTATION_ACTION": "After exact SHA CI, implement remaining menu/car/race frame OpenXR/input paths."
 }
