@@ -55,7 +55,7 @@ for rejection in (
     "++s.liveSm3StateRejectReasons[5];",
     "++s.liveSm3StateRejectReasons[6];",
     "++s.liveSm3StateRejectReasons[7];",
-    "if (nativeIndices[i] >= vertexCount) return false;",
+    "if (nativeIndices[i] >= (compactListInstances ? expandedVertices : vertexCount)) return false;",
     "LiveGameShaderCacheReplacement::retire_oldest_if_full(",
     "pipeline.vertexTokens != vertexEvidence.tokens",
 ):
@@ -135,13 +135,22 @@ for token in (
 ):
     check(token in composite, "native D3D9 blend mapping/fallback missing: " + token)
 
+# Genuine D3D9 instance-packed indices are expanded into a separate validated
+# source GPU index buffer. Both original and expanded source ranges must
+# remain enforced before the native D3D11 buffer upload.
+check("game_sm3_expand_list_instance_indices(" in source and
+      "compactListInstances" in source and
+      "nativeSubmissionCount = compactListInstances ? 1u : instanceCount" in source and
+      "if (instance >= nativeSubmissionCount) break;" in source,
+      "SM3 indexed game instance expansion/fallback contract missing")
+
 # The SM3 real-game fan expansion changes the physical index buffer owner.
 # The exact post-conversion pointer/count must be checked before the dynamic
 # D3D11 upload; do not silently validate only the old D3D9 index pointer.
 for token in (
     "if (nativeIndices) {",
     "for (UINT i = 0; i < nativeIndexCount; ++i)",
-    "if (nativeIndices[i] >= vertexCount) return false;",
+    "if (nativeIndices[i] >= (compactListInstances ? expandedVertices : vertexCount)) return false;",
     "s.fullGameIndexCapacity, nativeIndices, indexBytes",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
 ):
