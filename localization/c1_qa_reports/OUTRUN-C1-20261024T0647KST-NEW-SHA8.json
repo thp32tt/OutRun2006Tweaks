@@ -1,0 +1,503 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0647KST-NEW-SHA8",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "date_kst": "2026-10-24",
+  "reviewed_at_kst": "2026-10-24T06:48:45.721901+09:00",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "prior_reviewed_sha_count": 714,
+  "new_unique_sha_count": 8,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "sha_verified_count": 8,
+  "rgba_png_count": 8,
+  "verified_native_ui_cell_placement_count": 0,
+  "producer_png_counts": {
+    "A": 334,
+    "B": 389
+  },
+  "producer_export_evidence_count": 148,
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_0647_metrics.json",
+    "A_pairs": "work/C1_QA_20261024_0647_A_pairs.jpg",
+    "B_pairs": "work/C1_QA_20261024_0647_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261024_0647_white.jpg",
+    "alpha": "work/C1_QA_20261024_0647_alpha.json"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false,
+    "VR_FFB_DX11_DXVK_touched": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0059-51470E57",
+      "ordinal": 289,
+      "english": "CAR TYPE",
+      "approved_korean": "차량 유형",
+      "source_file": "Q225_d38bf64bf480091e_source.png",
+      "candidate_file": "Q225_d38bf64bf480091e_source_k.png",
+      "source_sha256": "ed663c559f0b079a8d3c91cdba3f05ecae752b3249a6526c3b8b1c30221e42d2",
+      "candidate_sha256": "e90f12bcaf1a2c90997e17c1fcd19e4db5735c50137716528863c7ef1e942824",
+      "original_dds_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          496,
+          210
+        ],
+        "candidate_size": [
+          1928,
+          816
+        ],
+        "alpha_bbox": [
+          31,
+          67,
+          1791,
+          778
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보는 SHA 검증된 투명 RGBA 글자층이며 승인 한글 문구 및 기본 가독성이 확인됨. 다만 원본 ROI와 출력 캔버스 크기가 상이하고 해당 ROI가 다른 UI 문구·보호 픽셀을 포함할 수 있어 원본 native UI cell/UV 안전영역 및 보호 아트 침범 여부를 미검증함. 단순 크기 차이는 FAIL 근거가 아니므로 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0058-B4C34B04",
+      "ordinal": 284,
+      "english": "Transmission",
+      "approved_korean": "변속기",
+      "source_file": "Q121_24b34af9518cc1ea_source.png",
+      "candidate_file": "Q121_24b34af9518cc1ea_source_k.png",
+      "source_sha256": "918ba5284cd5cbe4a776c50fb96f45a22b61b1e0742acd666de731caaf9cf1c3",
+      "candidate_sha256": "6db21066e8e05b2deeec4f44f0107601e80ad969e08f3d20c08a40569d8684b2",
+      "original_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1128,
+          172
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          25,
+          31,
+          2158,
+          689
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보는 SHA 검증된 투명 RGBA 글자층이며 승인 한글 문구 및 기본 가독성이 확인됨. 다만 원본 ROI와 출력 캔버스 크기가 상이하고 해당 ROI가 다른 UI 문구·보호 픽셀을 포함할 수 있어 원본 native UI cell/UV 안전영역 및 보호 아트 침범 여부를 미검증함. 단순 크기 차이는 FAIL 근거가 아니므로 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0057-11DBE8EA-R2",
+      "ordinal": 283,
+      "english": "Adjust your Game settings",
+      "approved_korean": "게임 설정 조정",
+      "source_file": "Q205_e3c7a08cadd94345_source.png",
+      "candidate_file": "Q205_e3c7a08cadd94345_source_k.png",
+      "source_sha256": "7ce54415e9d3be74f233c826d821ed43d7c415a18346a7ae6053e725e29a1d18",
+      "candidate_sha256": "a47eb6ce71ce09b88394bc64b4c9c69f2ea9ffeed4f2a2353e4e29c90654434d",
+      "original_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          984,
+          298
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          16,
+          39,
+          1549,
+          626
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보는 SHA 검증된 투명 RGBA 글자층이며 승인 한글 문구 및 기본 가독성이 확인됨. 다만 원본 ROI와 출력 캔버스 크기가 상이하고 해당 ROI가 다른 UI 문구·보호 픽셀을 포함할 수 있어 원본 native UI cell/UV 안전영역 및 보호 아트 침범 여부를 미검증함. 단순 크기 차이는 FAIL 근거가 아니므로 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0057-11DBE8EA-R2",
+      "ordinal": 282,
+      "english": "Adjust your Game settings",
+      "approved_korean": "게임 설정 조정",
+      "source_file": "Q205_8480952d3ba1099a_source.png",
+      "candidate_file": "Q205_8480952d3ba1099a_source_k.png",
+      "source_sha256": "7ce54415e9d3be74f233c826d821ed43d7c415a18346a7ae6053e725e29a1d18",
+      "candidate_sha256": "17f0e1260862abe3a6d0661e54e1d8953faf600d1ca943241c00f07c11915281",
+      "original_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          984,
+          298
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          136,
+          1500,
+          667
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보는 SHA 검증된 투명 RGBA 글자층이며 승인 한글 문구 및 기본 가독성이 확인됨. 다만 원본 ROI와 출력 캔버스 크기가 상이하고 해당 ROI가 다른 UI 문구·보호 픽셀을 포함할 수 있어 원본 native UI cell/UV 안전영역 및 보호 아트 침범 여부를 미검증함. 단순 크기 차이는 FAIL 근거가 아니므로 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0072-021BD751",
+      "ordinal": 345,
+      "english": "Time Attack Mode / 15 C.",
+      "approved_korean": "타임 어택 모드 / 15코스",
+      "source_file": "Q128_451d00643f856186_source.png",
+      "candidate_file": "Q128_451d00643f856186_source_k.png",
+      "source_sha256": "bebf36f34038cb18dfc9b9be2e39eec9030bcf195e1c5e09232ce4f9bb6e047b",
+      "candidate_sha256": "ba622146f6b8b3cb9a0d9244dd92b6c32de4425049846cd6d22f44b05dde7b7f",
+      "original_dds_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1330,
+          148
+        ],
+        "candidate_size": [
+          2019,
+          779
+        ],
+        "alpha_bbox": [
+          17,
+          56,
+          2009,
+          730
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보는 SHA 검증된 투명 RGBA 글자층이며 승인 한글 문구 및 기본 가독성이 확인됨. 다만 원본 ROI와 출력 캔버스 크기가 상이하고 해당 ROI가 다른 UI 문구·보호 픽셀을 포함할 수 있어 원본 native UI cell/UV 안전영역 및 보호 아트 침범 여부를 미검증함. 단순 크기 차이는 FAIL 근거가 아니므로 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0071-5C9428C4",
+      "ordinal": 344,
+      "english": "SEND GAME INVITE",
+      "approved_korean": "게임 초대 보내기",
+      "source_file": "Q220_e3baa48e811e1c21_source.png",
+      "candidate_file": "Q220_e3baa48e811e1c21_source_k.png",
+      "source_sha256": "ca1690a61402e0f7b44e8ac598835c53d5cdc328c7aa338209b52ce78fb9d188",
+      "candidate_sha256": "9c0eb4b17d4d0e260e5c95b1113be79116af5684741a30d46755bde2d420974b",
+      "original_dds_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          604,
+          210
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          33,
+          85,
+          2154,
+          700
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보는 SHA 검증된 투명 RGBA 글자층이며 승인 한글 문구 및 기본 가독성이 확인됨. 다만 원본 ROI와 출력 캔버스 크기가 상이하고 해당 ROI가 다른 UI 문구·보호 픽셀을 포함할 수 있어 원본 native UI cell/UV 안전영역 및 보호 아트 침범 여부를 미검증함. 단순 크기 차이는 FAIL 근거가 아니므로 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0071-5C9428C4",
+      "ordinal": 343,
+      "english": "Adjust your Game settings",
+      "approved_korean": "게임 설정 조정",
+      "source_file": "Q205_729a1387a4bb2657_source.png",
+      "candidate_file": "Q205_729a1387a4bb2657_source_k.png",
+      "source_sha256": "7ce54415e9d3be74f233c826d821ed43d7c415a18346a7ae6053e725e29a1d18",
+      "candidate_sha256": "07f569eea43d605d23b28d666bad4a8f01ae29894eced14b0d33720338ea5eb3",
+      "original_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          984,
+          298
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          33,
+          134,
+          1723,
+          676
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보는 SHA 검증된 투명 RGBA 글자층이며 승인 한글 문구 및 기본 가독성이 확인됨. 다만 원본 ROI와 출력 캔버스 크기가 상이하고 해당 ROI가 다른 UI 문구·보호 픽셀을 포함할 수 있어 원본 native UI cell/UV 안전영역 및 보호 아트 침범 여부를 미검증함. 단순 크기 차이는 FAIL 근거가 아니므로 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0071-5C9428C4",
+      "ordinal": 342,
+      "english": "HOLLY",
+      "approved_korean": "홀리",
+      "source_file": "Q176_54edb9067099ec7e_source.png",
+      "candidate_file": "Q176_54edb9067099ec7e_source_k.png",
+      "source_sha256": "c3df6aecdbf12fb9a0c7135fe88502c49510b6ffb567d1ae621f767f8909b48b",
+      "candidate_sha256": "e11312457924301966c5c9ce9026f3182e6bcbe758b3f54d93d5ae421f723d12",
+      "original_dds_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          998,
+          630
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          178,
+          61,
+          1895,
+          690
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_BLACK_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보는 SHA 검증된 투명 RGBA 글자층이며 승인 한글 문구 및 기본 가독성이 확인됨. 다만 원본 ROI와 출력 캔버스 크기가 상이하고 해당 ROI가 다른 UI 문구·보호 픽셀을 포함할 수 있어 원본 native UI cell/UV 안전영역 및 보호 아트 침범 여부를 미검증함. 단순 크기 차이는 FAIL 근거가 아니므로 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    }
+  ]
+}
