@@ -1,0 +1,426 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261023T1545KST-NEW-SHA8",
+  "reviewed_at_kst": "2026-10-23T15:47:48.028527+09:00",
+  "role": "C1",
+  "source_branch": "korean-localization-recovery-20260928",
+  "previously_reviewed_candidate_sha256_count": 599,
+  "new_unique_count": 8,
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8,
+    "source_manifest_sha_matches": 8,
+    "source_sent_sha_matches": 8,
+    "candidate_export_sha_matches": 8,
+    "rgba_png_count": 8,
+    "transparent_lettering_visual_checks": 8,
+    "candidate_canvas_matches_source": 0
+  },
+  "review_method": "Manual comparison of per-role source/candidate contact sheets and white-matte alpha visualization; N100 SHA256, PNG mode, alpha border checked; no DDS compositing or UI cell reintegration",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence": {
+    "metrics_n100": "work/C1_QA_20261023_1545_metrics.json",
+    "comparison_A_n100": "work/C1_QA_20261023_1545_A_pairs.jpg",
+    "comparison_B_n100": "work/C1_QA_20261023_1545_B_pairs.jpg",
+    "white_matte_n100": "work/C1_QA_20261023_1545_white.jpg"
+  },
+  "role_boundaries": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "game_deployed": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "ordinal": 158,
+      "english": "AUSTRIA",
+      "approved_korean": "오스트리아",
+      "source_png": "Q161_79406ebfad3d5500_source.png",
+      "candidate_png": "Q161_79406ebfad3d5500_source_k.png",
+      "source_sha256": "8f4d7b577e49fd4ed9668b086aea85a2b816a3c73f8cdacdae2e83def1a18d0e",
+      "candidate_sha256": "8e74f8624e3fc7cac0555a10fd3bcf2727a418b61156fc2ad741aa89987e2642",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_size": [
+        1210,
+        116
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        25,
+        152,
+        1138,
+        555
+      ],
+      "candidate_alpha_border_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS",
+      "korean_text_only_transparency": "PASS_ON_WHITE_MATTE",
+      "source_crop_isolated_text": "VISUALLY_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "c1_png_text_only_qa": "PASS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_ORIGINAL; NATIVE_UI_CELL_UV_PLACEMENT_AND_PROTECTED_PIXEL_CONTAINMENT_NOT_VERIFIED; OUTPUT_ORDER_PAIRING_NOT_PROVEN",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "ordinal": 157,
+      "english": "PISCES",
+      "approved_korean": "물고기자리",
+      "source_png": "Q161_563039872fa7181e_source.png",
+      "candidate_png": "Q161_563039872fa7181e_source_k.png",
+      "source_sha256": "2cf4945db2d1d4f22660f9fea418cdc21c1d81039856155c3089ff3633c38673",
+      "candidate_sha256": "d50aa9a92864fa4f209a7f90251e8a895aad7d19fd55365431589359be5c803f",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_size": [
+        1092,
+        120
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        73,
+        104,
+        1209,
+        579
+      ],
+      "candidate_alpha_border_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS",
+      "korean_text_only_transparency": "PASS_ON_WHITE_MATTE",
+      "source_crop_isolated_text": "VISUALLY_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "c1_png_text_only_qa": "PASS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_ORIGINAL; NATIVE_UI_CELL_UV_PLACEMENT_AND_PROTECTED_PIXEL_CONTAINMENT_NOT_VERIFIED; OUTPUT_ORDER_PAIRING_NOT_PROVEN",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "ordinal": 156,
+      "english": "NORTH KOREA",
+      "approved_korean": "북한",
+      "source_png": "Q161_092816d9210fd402_source.png",
+      "candidate_png": "Q161_092816d9210fd402_source_k.png",
+      "source_sha256": "8dfc4b783fedc67ed56202cfe91af79fe3e57258c29d6ff9ac27b5663f713dcc",
+      "candidate_sha256": "e4950a8ba7a0e32ffe4f032491588c9f1c947d741129d500262b4a6b60610007",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_size": [
+        1092,
+        120
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        41,
+        138,
+        528,
+        555
+      ],
+      "candidate_alpha_border_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS",
+      "korean_text_only_transparency": "PASS_ON_WHITE_MATTE",
+      "source_crop_isolated_text": "VISUALLY_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "c1_png_text_only_qa": "PASS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_ORIGINAL; NATIVE_UI_CELL_UV_PLACEMENT_AND_PROTECTED_PIXEL_CONTAINMENT_NOT_VERIFIED; OUTPUT_ORDER_PAIRING_NOT_PROVEN",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "ordinal": 155,
+      "english": "GERMANY",
+      "approved_korean": "독일",
+      "source_png": "Q161_b6a048101dacac92_source.png",
+      "candidate_png": "Q161_b6a048101dacac92_source_k.png",
+      "source_sha256": "6619da4bd8be5822a92707eedb68e00d2f375be97caa7fb5fee6bae7002ca166",
+      "candidate_sha256": "d40908b6d925a38d8633efa77725ba077f7b04469973a129d8aa49f3ad43ccd7",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_size": [
+        1092,
+        116
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        67,
+        253,
+        1067,
+        610
+      ],
+      "candidate_alpha_border_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS",
+      "korean_text_only_transparency": "PASS_ON_WHITE_MATTE",
+      "source_crop_isolated_text": "VISUALLY_TEXT_ONLY",
+      "text_length_difference_ignored": true,
+      "c1_png_text_only_qa": "PASS",
+      "verdict": "HOLD",
+      "reason": "OUTPUT_CANVAS_DIFFERS_FROM_ORIGINAL; NATIVE_UI_CELL_UV_PLACEMENT_AND_PROTECTED_PIXEL_CONTAINMENT_NOT_VERIFIED; OUTPUT_ORDER_PAIRING_NOT_PROVEN",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "ordinal": 214,
+      "english": "Honk the horn!",
+      "approved_korean": "경적을 울리세요!",
+      "source_png": "Q054_0074f14b2888ca4a_source.png",
+      "candidate_png": "Q054_0074f14b2888ca4a_source_k.png",
+      "source_sha256": "ca8d040ae710cfd28e8e36e40cdccfcbf5c17275fd1d11344474442346ea5509",
+      "candidate_sha256": "2fcd42b9313d6001223197c221c9712fdb305191b431efbe71b6424a00422e19",
+      "original_dds_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "source_size": [
+        1192,
+        412
+      ],
+      "candidate_size": [
+        2133,
+        737
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        187,
+        17,
+        2055,
+        625
+      ],
+      "candidate_alpha_border_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS",
+      "korean_text_only_transparency": "PASS_ON_WHITE_MATTE",
+      "source_crop_isolated_text": "NO_MULTIPLE_LABELS_AND_PROTECTED_ART",
+      "text_length_difference_ignored": true,
+      "c1_png_text_only_qa": "PASS",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_INCLUDES_ADJACENT_ENGLISH_AND_PROTECTED_ART; OUTPUT_CANVAS_DIFFERS_FROM_ORIGINAL; NATIVE_UI_CELL_UV_PLACEMENT_AND_PROTECTED_PIXEL_CONTAINMENT_NOT_VERIFIED; OUTPUT_ORDER_PAIRING_NOT_PROVEN",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "ordinal": 213,
+      "english": "END",
+      "approved_korean": "종료",
+      "source_png": "Q053_f49faacd5079ee02_source.png",
+      "candidate_png": "Q053_f49faacd5079ee02_source_k.png",
+      "source_sha256": "d3751afb02d554b73cbf6c5be630e111133edeac8850de949fd28357ad1799c5",
+      "candidate_sha256": "9769e3965e2f128b854d2f2968c02b732dfd76236b8f02138a6b6955ca55a986",
+      "original_dds_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "source_size": [
+        2140,
+        1105
+      ],
+      "candidate_size": [
+        1745,
+        901
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        191,
+        19,
+        1595,
+        901
+      ],
+      "candidate_alpha_border_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS",
+      "korean_text_only_transparency": "PASS_ON_WHITE_MATTE",
+      "source_crop_isolated_text": "NO_MULTIPLE_LABELS_AND_PROTECTED_ART",
+      "text_length_difference_ignored": true,
+      "c1_png_text_only_qa": "PASS",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_INCLUDES_ADJACENT_ENGLISH_AND_PROTECTED_ART; OUTPUT_CANVAS_DIFFERS_FROM_ORIGINAL; NATIVE_UI_CELL_UV_PLACEMENT_AND_PROTECTED_PIXEL_CONTAINMENT_NOT_VERIFIED; OUTPUT_ORDER_PAIRING_NOT_PROVEN",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "ordinal": 212,
+      "english": "See the sights!",
+      "approved_korean": "명소를 구경하세요!",
+      "source_png": "Q053_0aa372dc301c2d95_source.png",
+      "candidate_png": "Q053_0aa372dc301c2d95_source_k.png",
+      "source_sha256": "3c93fba63b488f5d91a617a795f15236c5a8f1f63f19d6aaa3ac5ba3772a37eb",
+      "candidate_sha256": "d7674de47f666d96688a5015955b97ea8f4f3330080ad62604c629b9ff13377c",
+      "original_dds_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "source_size": [
+        1178,
+        485
+      ],
+      "candidate_size": [
+        1954,
+        805
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        89,
+        52,
+        1900,
+        756
+      ],
+      "candidate_alpha_border_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS",
+      "korean_text_only_transparency": "PASS_ON_WHITE_MATTE",
+      "source_crop_isolated_text": "NO_MULTIPLE_LABELS_AND_PROTECTED_ART",
+      "text_length_difference_ignored": true,
+      "c1_png_text_only_qa": "PASS",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_INCLUDES_ADJACENT_ENGLISH_AND_PROTECTED_ART; OUTPUT_CANVAS_DIFFERS_FROM_ORIGINAL; NATIVE_UI_CELL_UV_PLACEMENT_AND_PROTECTED_PIXEL_CONTAINMENT_NOT_VERIFIED; OUTPUT_ORDER_PAIRING_NOT_PROVEN",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0045-AB88262D",
+      "ordinal": 211,
+      "english": "QUESTION",
+      "approved_korean": "문제",
+      "source_png": "Q053_f640292a13c14a76_source.png",
+      "candidate_png": "Q053_f640292a13c14a76_source_k.png",
+      "source_sha256": "152c35267f9a361f2dd95062465e156a06ea3133e16798951069535ef9420944",
+      "candidate_sha256": "6368785dfb51cb29c61f60ff3953fbfce70dbcf3f73f0107559ce31273808d63",
+      "original_dds_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "source_size": [
+        2560,
+        986
+      ],
+      "candidate_size": [
+        2021,
+        778
+      ],
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_mode": "RGBA",
+      "candidate_alpha_bbox": [
+        225,
+        52,
+        1803,
+        681
+      ],
+      "candidate_alpha_border_pixels_gt8": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual_mapping": "MATCH",
+      "glyph_readability": "PASS",
+      "korean_text_only_transparency": "PASS_ON_WHITE_MATTE",
+      "source_crop_isolated_text": "NO_MULTIPLE_LABELS_AND_PROTECTED_ART",
+      "text_length_difference_ignored": true,
+      "c1_png_text_only_qa": "PASS",
+      "verdict": "HOLD",
+      "reason": "SOURCE_ROI_INCLUDES_ADJACENT_ENGLISH_AND_PROTECTED_ART; OUTPUT_CANVAS_DIFFERS_FROM_ORIGINAL; NATIVE_UI_CELL_UV_PLACEMENT_AND_PROTECTED_PIXEL_CONTAINMENT_NOT_VERIFIED; OUTPUT_ORDER_PAIRING_NOT_PROVEN",
+      "runtime_validation": "UNTESTED",
+      "dds_or_c2_c3_game_pass": false
+    }
+  ]
+}
