@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01019",
+  "production_id": "CONVERSION-DX11-01019",
+  "dispatch_event_id": "CONVERSION-DX11-01019-E001",
+  "event_id": "CONVERSION-DX11-01019-E003",
+  "event_type": "rollover",
+  "classification": "A",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01019",
+  "feature_id": "DX11:LIVE_SM3_TEMP_DRAW_UNIFORM_IFC_NATIVE_TEXTURE_DRAW",
+  "work_key": "DX11:LIVE_SM3_TEMP_DRAW_UNIFORM_IFC_NATIVE_TEXTURE_DRAW",
+  "work_class": "integration",
+  "feature_stage": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C2_SOURCE",
+  "source_head": "ff23b41ab28555526cc851c71e72f474ccf12f6d",
+  "material_result_sha": "c005907d37bb9da1108d85ba2f65247e85513fb7",
+  "result_sha": "c005907d37bb9da1108d85ba2f65247e85513fb7",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "ffb_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Resume previously committed c# -> TEMP arithmetic draw-uniform provenance for genuine D3D9 game SM3 IFC implicit texture native PSSetShader/Draw/DrawIndexed path; Backend Gate 39929608105 failed at --check-latest because 01019 run record was absent and historical 01018 metadata is noncompliant. Add 01019 contract and strengthen compiled mask-overwrite negative regressions without changing previously committed C++ shader behavior. Frame/HMD UNTESTED.",
+  "failure_context": {
+    "backend_run_id": 39929608105,
+    "head_sha": "c005907d37bb9da1108d85ba2f65247e85513fb7",
+    "conclusion": "failure",
+    "failed_step": "Verify DX11 integration-first auto-development acceptance",
+    "cause": "--check-latest selected stale 01018 record because 01019 record absent; 01018 lacked full live_game_draw_path and visible_frame_acceptance",
+    "repair": "Persist true 01019 pending source record and add compiled boundary regressions; do not mutate completed 01018 C6"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "D3D9 game SM3 c# and known TEMP partial-lane arithmetic operands enter native_backend.cpp IFC scalar origin / pixel-quad derivative classifier",
+      "Native D3D11 SM3 HLSL implicit TEX codegen connects to live_game_frame_bridge.cpp PSSetShader/Draw/DrawIndexed while unsupported varying/relative sources fail closed into original D3D9Ex"
+    ],
+    "batch_components": [
+      "Native SM3 physical TEMP provenance writes, per-lane read checks, origin inference and runtime derivative uniformity linked to actual game-native shader translation",
+      "Compiled C++ positive/negative overwrite and provenance regressions plus GitHub exact-SHA five-Gate integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Constant-derived partial TEMP scalar can safely drive IFC implicit native TEX; source-linked compiled test covers Draw/DrawIndexed and per-lane provenance",
+      "negative_regression": "A pixel source, derivative, texture sample, predicated/conditional overwrite, SGN scratch, relative c# or undefined physical lane may never unlock implicit TEX; DX9Ex fallback retained",
+      "component_integration": "native_backend.cpp -> native_sm3_temp_draw_uniformity.hpp -> native_sm3_derivative_uniformity.hpp -> native_sm3_texture_codegen.hpp -> live_game_frame_bridge.cpp PSSetShader/DrawIndexed/Draw"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_EXACT_SHA_CI_ONLY; no actual OutRun native Draw count, full-resolution menu/car/race frame publication or Quest3 stereo claim; gameplay remains UNTESTED",
+    "activation_guard_and_fallback": "Native Draw unsupported shader operations fail closed; original D3D9Ex rendering, input and FFB remain authoritative, diagnostic opt-in and no forced DX11 promotion."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_TEMP_DRAW_UNIFORM_IFC_NATIVE_TEXTURE_DRAW",
+    "goal": "Propagate immutable game D3D9 c# through straight-line per-channel SM3 TEMP arithmetic into quad-uniform IFC so real native D3D11 implicit texture game Draw can proceed; reject varying/predicated/unknown provenance and preserve DX9Ex fallback, with exact-SHA CI while gameplay/HMD remain unverified.",
+    "acceptance_items": [
+      {
+        "id": "temp_uniform_ifc_native_game_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_SM3_TEMP_to_D3D11_IFC_TEX_Draw",
+        "expected_behavior": "Physically written draw-uniform TEMP components derived from c# enter IFC scalar origin and permit native TEX shader while PSSetShader and real Draw/DrawIndexed source path remains linked."
+      },
+      {
+        "id": "varying_partial_predicate_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_TEMP_register_provenance_and_DX9Ex_fallback",
+        "expected_behavior": "Only proven physical components can reach IFC; input/texture/unknown/relative/derivative/branch/predicated/SGN scratch poison affected lanes and leave original D3D9Ex renderer/input/FFB usable."
+      },
+      {
+        "id": "compiled_temp_proof_and_five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "compiled_CXX_source_linked_regression_and_Actions",
+        "expected_behavior": "Compile C++ positive/negative physical register provenance, validate source-to-Draw links, and pass all five GitHub mandatory Actions at one exact source SHA."
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
+    "tools/dx11_sm3_temp_uniform_probe_01019.cpp",
+    "tools/test_dx11_sm3_temp_uniform_01019.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01019.json"
+  ],
+  "acceptance_results": {
+    "temp_uniform_ifc_native_game_draw": {
+      "status": "PENDING_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
+        "tools/dx11_sm3_temp_uniform_probe_01019.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_sm3_temp_uniform_01019.py; pending GitHub exact-SHA Actions"
+    },
+    "varying_partial_predicate_fail_closed": {
+      "status": "PENDING_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_temp_draw_uniformity.hpp",
+        "tools/dx11_sm3_temp_uniform_probe_01019.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_sm3_temp_uniform_01019.py; pending GitHub exact-SHA Actions"
+    },
+    "compiled_temp_proof_and_five_exact_sha_gates": {
+      "status": "PENDING_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tools/test_dx11_sm3_temp_uniform_01019.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "GitHub exact-SHA mandatory Actions awaiting validation"
+    }
+  },
+  "pending_items": [
+    "Backend Conversion Gate 39929608105 FAIL at stale historical 01018 check, 01019 material record creation and corrected exact-SHA mandatory five CI pending.",
+    "Native OutRun Draw counts / visible menu/car/race / Quest3 VDXR / gamepad and FFB runtime UNTESTED; actual full renderer completion is not claimed."
+  ],
+  "score_status": "NO_SCORE_UNTIL_NEW_INDEPENDENT_MATERIAL_RESULT_AND_EXACT_SHA_SUCCESS; SAME_TASK_ROLLOVER_NO_DUPLICATE"
+}

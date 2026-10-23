@@ -45,5 +45,27 @@ int main() {
     temps.write(2u, 0x0fu, true, true);
     temps.invalidate(2u); // D3D9 SGN scratch register lifetime
     assert(!temps.contains(2u, 0x0fu));
+    // A partial varying overwrite must poison only the written physical
+    // channels, retaining independent c#-derived lanes for subsequent IFC.
+    temps.write(3u, 0x0fu, true, true);
+    temps.write(3u, 0x05u, false, true);
+    assert(!temps.contains(3u, 0x01u));
+    assert(!temps.contains(3u, 0x04u));
+    assert(temps.contains(3u, 0x0au));
+    assert(!temps.contains(3u, 0x0bu));
+    // A predicated/structured overwrite cannot pretend to preserve
+    // previously uniform content on a lane it may have modified.
+    temps.write(3u, 0x02u, true, false);
+    assert(!temps.contains(3u, 0x02u));
+    assert(temps.contains(3u, 0x08u));
+    // Invalid mask bits and out-of-range register IDs never become proof.
+    assert(!temps.contains(3u, 0x10u));
+    temps.write(32u, 0x0fu, true, true);
+    assert(!temps.contains(32u, 0x0fu));
+    temps.write(31u, 0x08u, true, true);
+    assert(temps.contains(31u, 0x08u));
+    assert(!temps.contains(31u, 0x01u));
+    temps.invalidate(31u);
+    assert(!temps.contains(31u, 0x08u));
     assert(flow.empty());
 }

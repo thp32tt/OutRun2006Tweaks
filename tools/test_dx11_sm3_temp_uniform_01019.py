@@ -36,6 +36,17 @@ need("structuredFlow.empty() && !op.predicated" in block and
 need("writtenMask &= 0x0fu" in header and
      "(masks_[reg] & requiredMask) == requiredMask" in header,
      "component-accurate write and scalar-read physical lane checks")
+need("bool sourcesDrawUniform = sourceCount != 0u" in block and
+     "sourcesDrawUniform = false;" in block and
+     "kind == D3DSPR_TEMP &&" in block and
+     "reg, uniformPhysicalComponents" in block and
+     "op.matrixRowCount == 0u" in block and
+     "sourcesDrawUniform;" in block,
+     "pure arithmetic must propagate only proven, physical constant/TEMP lanes")
+need("!op.texture2d && !op.texkill && !op.signScratch" in block and
+     "tempDrawUniformity.write(" in block and
+     "structuredFlow.empty() && !op.predicated" in block,
+     "texture/scratch/predicate/branch destinations must never inherit uniformity")
 need("context->PSSetShader(" in bridge and
      "context->DrawIndexed(" in bridge and "context->Draw(" in bridge,
      "live shader/DrawIndexed/Draw linkage is required")
