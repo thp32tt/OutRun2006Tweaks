@@ -1,0 +1,578 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T1145KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T11:47:13.214195+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "history_excluded_sha_count": 535,
+  "counts": {
+    "total": 8,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "sha_verification": {
+    "source_manifest_sha_match": 8,
+    "source_sent_sha_match": 8,
+    "candidate_export_sha_match": 8,
+    "rgba_png": 8
+  },
+  "evidence_on_N100": {
+    "metrics": "work/C1_QA_20261023_1145_metrics.json",
+    "compare_A": "work/C1_QA_20261023_1145_A_pairs.jpg",
+    "compare_B": "work/C1_QA_20261023_1145_B_pairs.jpg"
+  },
+  "scope": "N100에 실제 저장된 A/B ImageGen 후보 PNG의 C1 독립 QA만. ImageGen 호출, A/B 큐 소비, DDS 생성/승인/배포, C2/C3/실게임 PASS 없음.",
+  "notes": [
+    "기존 535개 후보 SHA 제외, 신규 서로 다른 SHA 8개를 시각·SHA 검증함. 검증된 8개 모두 manifest/sent/export SHA256 일치.",
+    "후보 모든 PNG는 RGBA이고 외곽 alpha 양성 픽셀 0으로 측정됨. 문구 오탈자/가짜 자소의 명백한 징후는 접촉 비교 이미지에서 발견되지 않음.",
+    "8개 출력 해상도는 원본 ROI 크기와 다르며 producer pairing=OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED. 그 자체로 FAIL을 부여하지 않지만 native 좌표·UI cell/UV 안전영역에 배치했다는 근거가 없어 HOLD.",
+    "영문보다 한글이 짧거나 크기가 다른 사유만으로 FAIL하지 않았으며, 원문 다중 텍스트/보호 픽셀의 충돌 여부, 이탈리아/일본 등 행 배치 문제를 명시적으로 보류.",
+    "SOURCE_BBOX_CONTAINMENT=UNTESTED_NO_NATIVE_PLACEMENT. 정식 DDS·실게임 검증 없음, RUNTIME_VALIDATION=UNTESTED."
+  ],
+  "records": [
+    {
+      "role": "A",
+      "batch": 39,
+      "task_id": "OUTRUN-ROI-A-0039-DD2771C2",
+      "source_ordinal": 190,
+      "source_file": "Q061_fa8ed9b5cd1b82de_source.png",
+      "candidate_file": "Q061_fa8ed9b5cd1b82de_source_k.png",
+      "english": "Run through red!",
+      "approved_korean": "빨간색을 통과하세요!",
+      "original_dds_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "source_sha256": "979590ae5049d8c150dafd5ea04391cb5b2a1b08e7cd326ebc3e263a42624de6",
+      "candidate_sha256": "6f003d57f281184ada446c0690392b7227643807d28e8a636c60374e28cee259",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1116,
+          513
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1116,
+          513
+        ],
+        "edge_alpha_pixels": [
+          507,
+          361,
+          0,
+          934
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1850,
+          850
+        ],
+        "alpha_bbox": [
+          57,
+          131,
+          1822,
+          760
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING_AT_CONTACT_SHEET",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG_ONLY",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true,
+      "imagegen_candidate_unapproved": true,
+      "observations": "Q061의 다중 지시문·차량/버튼 보호 픽셀과 공존하는 ROI. '빨간색을 통과하세요!' 읽힘; 실제 빨간 콘 관련 텍스트 셀 식별 및 합성 배치 검증 필요."
+    },
+    {
+      "role": "A",
+      "batch": 39,
+      "task_id": "OUTRUN-ROI-A-0039-DD2771C2",
+      "source_ordinal": 189,
+      "source_file": "Q061_5cc35796bf17b80e_source.png",
+      "candidate_file": "Q061_5cc35796bf17b80e_source_k.png",
+      "english": "Pass the convoy!",
+      "approved_korean": "차량 행렬을 추월하세요!",
+      "original_dds_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "source_sha256": "841449231101858c20752632758613996c1705967de267fb48a64916d132fe1d",
+      "candidate_sha256": "eac60f334705de78546864a40424838d81efbc3a76479416c87eaca455693b12",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1096,
+          513
+        ],
+        "alpha_bbox": [
+          0,
+          1,
+          1096,
+          513
+        ],
+        "edge_alpha_pixels": [
+          348,
+          215,
+          0,
+          518
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1833,
+          858
+        ],
+        "alpha_bbox": [
+          31,
+          102,
+          1815,
+          749
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING_AT_CONTACT_SHEET",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG_ONLY",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true,
+      "imagegen_candidate_unapproved": true,
+      "observations": "Q061의 다른 지시문/차량/순위 UI와 공유한 ROI. '차량 행렬을 추월하세요!' 읽힘; 정확한 UI 셀과 충돌/보호 픽셀 미검증."
+    },
+    {
+      "role": "A",
+      "batch": 38,
+      "task_id": "OUTRUN-ROI-A-0038-267090F3",
+      "source_ordinal": 188,
+      "source_file": "Q061_bff40350adce5040_source.png",
+      "candidate_file": "Q061_bff40350adce5040_source_k.png",
+      "english": "Position",
+      "approved_korean": "순위",
+      "original_dds_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "source_sha256": "cd9c125560ff101343c82f8da25879b2b2c5ec7840f794c5f2c950875ededc0d",
+      "candidate_sha256": "fb25ba9f68bb982c8e80c4f7da75217ec6b9e357339089a2a1dd2c8cceddc874",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1326,
+          598
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1326,
+          598
+        ],
+        "edge_alpha_pixels": [
+          21,
+          102,
+          1067,
+          484
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1868,
+          842
+        ],
+        "alpha_bbox": [
+          426,
+          56,
+          1532,
+          799
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING_AT_CONTACT_SHEET",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG_ONLY",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true,
+      "imagegen_candidate_unapproved": true,
+      "observations": "Q061 인접 별 아이콘 및 캐릭터/다른 UI 이미지 보호 필요. '순위' 읽힘; atlas native 좌표 안전영역 및 원본 효과 정합성 미검증."
+    },
+    {
+      "role": "A",
+      "batch": 38,
+      "task_id": "OUTRUN-ROI-A-0038-267090F3",
+      "source_ordinal": 187,
+      "source_file": "Q061_4e7b1afaac18ef4c_source.png",
+      "candidate_file": "Q061_4e7b1afaac18ef4c_source_k.png",
+      "english": "GET!!",
+      "approved_korean": "획득!!",
+      "original_dds_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "source_sha256": "8638e58518dc5d14bf5ddbeff07a8e42a48d9a0eac398f3bb2660d2801a06216",
+      "candidate_sha256": "af9f86042bd7d325a4a5acd1ee768d578ccbc0e721ff27c6d9abfd3aea4b9909",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          947,
+          683
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          926,
+          669
+        ],
+        "edge_alpha_pixels": [
+          421,
+          0,
+          259,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1477,
+          1065
+        ],
+        "alpha_bbox": [
+          0,
+          104,
+          1399,
+          1025
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING_AT_CONTACT_SHEET",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG_ONLY",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true,
+      "imagegen_candidate_unapproved": true,
+      "observations": "Q061의 GET!! 아래 Beat that car 등 다중 문구와 아이콘 공존. '획득!!' 읽힘; 원본 음영/문구 셀 크기와 합성 보호 영역 미검증."
+    },
+    {
+      "role": "B",
+      "batch": 52,
+      "task_id": "OUTRUN-ROI-B-0052-6AEE4989-R1",
+      "source_ordinal": 246,
+      "source_file": "Q161_a23756b65be7f8bc_source.png",
+      "candidate_file": "Q161_a23756b65be7f8bc_source_k.png",
+      "english": "SINGAPORE",
+      "approved_korean": "싱가포르",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "229a418328e26a94ee9274422bac9c8df76fed9fb9f63a9f97acf5306c18e43a",
+      "candidate_sha256": "10cfcc8378142d36de05b8fd504090d9a3bb8aa17744aad77e2319754b6be369",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          837,
+          196
+        ],
+        "alpha_bbox": [
+          134,
+          10,
+          464,
+          189
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          237,
+          81,
+          1257,
+          668
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING_AT_CONTACT_SHEET",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG_ONLY",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true,
+      "imagegen_candidate_unapproved": true,
+      "observations": "Q212 원본 NORWAY/SINGAPORE/SPAIN 다중 행에 해당하고 생성물은 단일 '싱가포르' 레이어. 실제 해당 행 교체 좌표 미검증."
+    },
+    {
+      "role": "B",
+      "batch": 52,
+      "task_id": "OUTRUN-ROI-B-0052-6AEE4989-R1",
+      "source_ordinal": 245,
+      "source_file": "Q161_72a382df95bd7d28_source.png",
+      "candidate_file": "Q161_72a382df95bd7d28_source_k.png",
+      "english": "ITALY",
+      "approved_korean": "이탈리아",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "4f5259a0d2ebf1e39756884c49827e907d09ff19f5088424b57d051ce90389ce",
+      "candidate_sha256": "8f5b14094ae5c4236ac03fbe9fe3d6c66edece0ebd46523207f87453dc396326",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          658,
+          190
+        ],
+        "alpha_bbox": [
+          5,
+          8,
+          293,
+          187
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          19,
+          49,
+          1104,
+          644
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING_AT_CONTACT_SHEET",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG_ONLY",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true,
+      "imagegen_candidate_unapproved": true,
+      "observations": "Q212 GERMANY/ITALY/MEXICO 다중 행에 해당하며 단일 '이탈리아' 생성물. native 텍스트 셀 적합성과 원본 색/효과 미검증."
+    },
+    {
+      "role": "B",
+      "batch": 51,
+      "task_id": "OUTRUN-ROI-B-0051-7E391573",
+      "source_ordinal": 244,
+      "source_file": "Q161_8429119f1960011e_source.png",
+      "candidate_file": "Q161_8429119f1960011e_source_k.png",
+      "english": "JAPAN",
+      "approved_korean": "일본",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "555236c31a42b8ca6bf86d3351ba547660a6092c65f4775ff834ab1fe2dd00df",
+      "candidate_sha256": "cf3d8fa9a6c46891368907b04c3fea6e73ca3a67b4631d6992423696418a274a",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          829,
+          190
+        ],
+        "alpha_bbox": [
+          130,
+          6,
+          545,
+          183
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          313,
+          71,
+          1539,
+          573
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING_AT_CONTACT_SHEET",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG_ONLY",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true,
+      "imagegen_candidate_unapproved": true,
+      "observations": "Q212 HONG KONG/JAPAN/NEW ZEALAND 다중 행의 JAPAN 교체. 생성물 '일본'은 시각적으로 2단 구성; 원본 1행 안전영역 및 인접 행 충돌 우려의 확인 필요. 실제 위반은 미확정."
+    },
+    {
+      "role": "B",
+      "batch": 51,
+      "task_id": "OUTRUN-ROI-B-0051-7E391573",
+      "source_ordinal": 243,
+      "source_file": "Q161_59340de4d748c184_source.png",
+      "candidate_file": "Q161_59340de4d748c184_source_k.png",
+      "english": "CANCER",
+      "approved_korean": "게자리",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "ab060aa3eb5fff4226f100b98ff93fff6d71e9050976a51b18b78ae18fdb664a",
+      "candidate_sha256": "f70159d1352d9d49aae50506307c550475e8518f68daae8655de7688b415e6be",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          837,
+          196
+        ],
+        "alpha_bbox": [
+          134,
+          10,
+          430,
+          189
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          182,
+          124,
+          1105,
+          626
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING_AT_CONTACT_SHEET",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG_ONLY",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true,
+      "imagegen_candidate_unapproved": true,
+      "observations": "Q212 AQUARIUS/CANCER/GEMINI 다중 행의 CANCER 대체. 생성물 '게자리' 읽힘; native 정확한 행 위치, 보호 효과 및 인접 행 충돌 미검증."
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "excluded_workstreams": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
