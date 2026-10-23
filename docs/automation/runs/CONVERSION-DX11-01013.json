@@ -12,16 +12,16 @@
   "work_key": "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN",
   "feature_id": "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN",
   "feature_branch": "feature/dx11-01013-visible-game-frame",
-  "feature_stage": "C6_SOURCE_INTEGRATED_CI_PASS_RUNTIME_UNTESTED",
-  "status": "SOURCE_INTEGRATED_RUNTIME_PENDING",
-  "checkpoint": "C6_SOURCE_PROMOTED",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
   "feature_last_head": "0b829f569a2acfd3dbd66b25168e4d63afa30fce",
   "source_head": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
   "material_result_sha": "c213b60732517fa7ffaa4544a40166ea9e8f0de9",
   "result_sha": "c213b60732517fa7ffaa4544a40166ea9e8f0de9",
-  "validation_bearing_result_sha": "0b829f569a2acfd3dbd66b25168e4d63afa30fce",
-  "automation_validation": "PASS_FEATURE_CI_EXACT_SHA",
+  "validation_bearing_result_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -137,8 +137,8 @@
     }
   },
   "ci": {
-    "status": "5_OF_5_PASS_EXACT_SHA",
-    "validated_sha": "0b829f569a2acfd3dbd66b25168e4d63afa30fce",
+    "status": "PASS_EXACT_SHA",
+    "validated_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
     "results": [
       {
         "name": "DX11 Fast Structural Checks",
@@ -170,7 +170,45 @@
       "wheel-source-0b829f569a2acfd3dbd66b25168e4d63afa30fce",
       "outrun2006tweaks-0b829f569a2acfd3dbd66b25168e4d63afa30fce"
     ],
-    "backend_artifact": "backend-autovalidated-0b829f569a2acfd3dbd66b25168e4d63afa30fce"
+    "backend_artifact": "backend-autovalidated-0b829f569a2acfd3dbd66b25168e4d63afa30fce",
+    "prior_source_validated_sha": "0b829f569a2acfd3dbd66b25168e4d63afa30fce",
+    "c6_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39897074597,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39897074550,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 39897074581,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39897074512,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39897074541,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "No runtime hardware evidence. Real game menu/car/race native Draw counts and first published frame remain UNTESTED; separate concurrent feature branch changes require explicit conflict resolution before further promotion.",
@@ -189,5 +227,54 @@
     "force": false,
     "note": "Source was promoted only after 5 mandatory exact-SHA CI successes. This C6 documentation update follows the validated source material; it does not imply native runtime observation."
   },
-  "score_note": "TASK_ID CONVERSION-DX11-01013 is unchanged across rollover; no duplicate point for repeat event or CI/promotion reconciliation."
+  "score_note": "Same TASK_ID and same material results; C6 terminal-status reconciliation only, +0 points and no AI_SCOREBOARD.md change.",
+  "validation_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_resolution": "Terminal status bookkeeping complete; hold reason TERMINAL_STATUS_NOT_COMPLETE resolved by this documentation-only commit.",
+  "c6": {
+    "status": "PASS_EXACT_SHA",
+    "checkpoint": "C6_STATE",
+    "validation_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+    "prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "exact_sha_ci": {
+      "status": "SUCCESS",
+      "jobs": [
+        {
+          "name": "DX11 Fast Structural Checks",
+          "run_id": 39897074597,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        },
+        {
+          "name": "Backend Conversion Gate",
+          "run_id": 39897074550,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        },
+        {
+          "name": "Build",
+          "run_id": 39897074581,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        },
+        {
+          "name": "OpenXR VR architecture",
+          "run_id": 39897074512,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        },
+        {
+          "name": "OutRun EXE HUD Inspector CI",
+          "run_id": 39897074541,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        }
+      ]
+    },
+    "commit_scope": "BOOKKEEPING_ONLY_SKIP_CI",
+    "material_code_change": false,
+    "workflow_retriggered": false,
+    "runtime_validation": "UNTESTED",
+    "preservation": "Prior material_result_sha, feature_contract and acceptance_results unchanged; feature CI evidence and playable-game limitations preserved."
+  }
 }
