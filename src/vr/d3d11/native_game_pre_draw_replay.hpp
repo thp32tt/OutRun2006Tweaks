@@ -21,10 +21,10 @@ template<class ClearView, class Raster>
         const auto& fill = fills.entries[i];
         const GameNativePreDrawTile tile{
             fill.left, fill.top, fill.right, fill.bottom,
-            {{float((fill.argb >> 16) & 255u) * scale,
-              float((fill.argb >> 8) & 255u) * scale,
-              float(fill.argb & 255u) * scale,
-              opaqueAlpha ? 1.0f : float((fill.argb >> 24) & 255u) * scale}}};
+            {float((fill.argb >> 16) & 255u) * scale,
+             float((fill.argb >> 8) & 255u) * scale,
+             float(fill.argb & 255u) * scale,
+             opaqueAlpha ? 1.0f : float((fill.argb >> 24) & 255u) * scale}};
         if (!(clearViewAvailable ? clearView(tile) : raster(tile)))
             return false;
     }
