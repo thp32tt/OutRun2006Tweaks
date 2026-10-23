@@ -10,12 +10,12 @@
   "classification": "A",
   "feature_id": "DX11:LIVE_SM3_CONNECTED_INSTANCE_GPU_DRAW",
   "work_key": "DX11:LIVE_SM3_CONNECTED_INSTANCE_GPU_DRAW",
-  "checkpoint": "C5_VALIDATION_PENDING",
-  "feature_stage": "C5_VALIDATION_PENDING",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "source_head": "9d26c96cd184e13eab38f05f3503a705e7586728",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -123,6 +123,34 @@
     }
   },
   "material_result_sha": "",
-  "validation_bearing_result_sha": "",
-  "c6_recovery_hold_reason": "WAITING_EXACT_SHA_GATE"
+  "validation_bearing_result_sha": "940f5f3006a9dcb579ebd3d516731c466126d3fd",
+  "c6_recovery_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "gate_evidence": {
+    "validation_sha": "940f5f3006a9dcb579ebd3d516731c466126d3fd",
+    "exact_sha_verified": true,
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 40001287719,
+        "conclusion": "success"
+      },
+      "backend_conversion": {
+        "run_id": 40001287783,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 40001287759,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 40001287775,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 40001287788,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED"
+  },
+  "c6_bookkeeping_note": "C6 result-only [skip ci]; original feature_contract, acceptance_results and material_result_sha preserved unchanged. Exact validation-bearing source SHA unchanged; no source edits, CI rerun or duplicate score."
 }
