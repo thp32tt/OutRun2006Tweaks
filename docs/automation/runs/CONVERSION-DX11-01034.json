@@ -12,11 +12,11 @@
   "work_key": "DX11:LIVE_NATIVE_PREDRAW_COLORFILL_OVERDRAW",
   "feature_branch": "feature/dx11-01034-live-predraw-fill-overdraw",
   "feature_base_sha": "d4fcfd07e4a4f2d685e896f24cc1473c3da921ef",
-  "feature_last_head": "6f1cf349dfec5447b5377bec427c4184f9d0fc68",
-  "status": "FEATURE_READY",
-  "feature_stage": "FEATURE_READY",
-  "checkpoint": "C3_FEATURE_READY",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "feature_last_head": "6260ff35fe72102f846c70b48498068c4c70d341",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -101,7 +101,7 @@
   ],
   "source_head": "d4fcfd07e4a4f2d685e896f24cc1473c3da921ef",
   "material_result_sha": "ee9db1923bbeb04dbed046267f98a0cc737fcf66",
-  "validation_bearing_result_sha": "",
+  "validation_bearing_result_sha": "6260ff35fe72102f846c70b48498068c4c70d341",
   "acceptance_results": {
     "overdraw": {
       "status": "PASS",
@@ -140,8 +140,60 @@
     }
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_source_mutation.hpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Recheck exact new feature CI and safe promote only after success; mandatory target Actions and bundle pending; runtime UNTESTED.",
-  "ci_validation_runs": {},
+  "NEXT_IMPLEMENTATION_ACTION": "Run actual OutRun 2006 D3D9 draw and DX11 opt-in native frame on Quest3/VDXR with menu/race and frame image evidence; follow-up tasks should repair actual visible frame not WARP-only readiness. Preserve DX9Ex input/FFB fallback.",
+  "ci_validation_runs": {
+    "fast": {
+      "run_id": 40025362025,
+      "job_ids": [
+        120660080383
+      ],
+      "result": "SUCCESS",
+      "validation_sha": "6260ff35fe72102f846c70b48498068c4c70d341"
+    },
+    "backend": {
+      "run_id": 40025362170,
+      "job_ids": [
+        120660081003,
+        120662713256
+      ],
+      "result": "SUCCESS",
+      "validation_sha": "6260ff35fe72102f846c70b48498068c4c70d341"
+    },
+    "build": {
+      "run_id": 40025362144,
+      "job_ids": [
+        120660080651
+      ],
+      "result": "SUCCESS",
+      "validation_sha": "6260ff35fe72102f846c70b48498068c4c70d341"
+    },
+    "openxr": {
+      "run_id": 40025362009,
+      "job_ids": [
+        120660080002,
+        120660080209,
+        120660080240,
+        120660080377,
+        120660080463,
+        120660080609,
+        120663141823
+      ],
+      "result": "SUCCESS",
+      "validation_sha": "6260ff35fe72102f846c70b48498068c4c70d341"
+    },
+    "hud": {
+      "run_id": 40025362078,
+      "job_ids": [
+        120660080791,
+        120660081130
+      ],
+      "result": "SUCCESS",
+      "validation_sha": "6260ff35fe72102f846c70b48498068c4c70d341"
+    }
+  },
   "feature_ready": true,
-  "ci_failure_cause": "Fast run 40024303069: missing integrated_validation category, repaired; run 40024416208: legacy frame-batch static_assert assumed overwritten same-RECT ColorFills must consume all 16 slots. Test now uses 16 actually distinct disjoint writes and checks overflow + later superseding ColorFill (no production workaround or guard bypass). Fast run 40024746390: 00799 fragile string-wiring fixture demanded exact pre-01034 `entries[count++]` / `if (count >= kCapacity)`, despite legitimate replacement by lossless compaction. Updated fixture to verify non-destructive retained count and bounded append; production C++ unchanged."
+  "ci_failure_cause": "Fast run 40024303069: missing integrated_validation category, repaired; run 40024416208: legacy frame-batch static_assert assumed overwritten same-RECT ColorFills must consume all 16 slots. Test now uses 16 actually distinct disjoint writes and checks overflow + later superseding ColorFill (no production workaround or guard bypass). Fast run 40024746390: 00799 fragile string-wiring fixture demanded exact pre-01034 `entries[count++]` / `if (count >= kCapacity)`, despite legitimate replacement by lossless compaction. Updated fixture to verify non-destructive retained count and bounded append; production C++ unchanged.",
+  "c6_summary": "Target native C++ source SHA 6260ff35: 5 mandatory exact-SHA GitHub Actions passed including Fast, Backend Conversion Gate validation+readiness smoke, Win32 Build, OpenXR 7 jobs and HUD Inspector 2 jobs. Real Quest3/VDXR menu/race frame and gameplay remain UNTESTED; diagnostic bundle is not a playable declaration.",
+  "bundle_artifact_name": "feature-dx11-first-game-frame-6260ff35fe72102f846c70b48498068c4c70d341",
+  "bundle_artifact_id": 12532264279
 }
