@@ -15,7 +15,9 @@ def require(ok, what):
 require("NativeSm3DrawUniformPredicate predicateDrawUniformity;" in block and
         "predicateDrawUniformity.write(" in block and
         "native_sm3_ifc_is_quad_uniform(" in block and
-        "structuredFlow.empty() &&" in block and
+        "predicateDrawUniformity.uniform_flow() &&" in block and
+        "predicateDrawUniformity.begin_if(" in block and
+        "predicateDrawUniformity.end_if()" in block and
         "derivativeUniformity.implicit_sampling_safe()" in block,
         "draw-uniform SETP source, condition and loop provenance")
 require("instruction.opcode == D3DSIO_TEX &&" in block and
