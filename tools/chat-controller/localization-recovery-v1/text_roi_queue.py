@@ -34,6 +34,7 @@ RANGES = {"A": (1, 99999), "B": (1, 99999)}
 SLOTS = {"A": (0, 10, 20, 30, 40, 50), "B": (5, 15, 25, 35, 45, 55)}
 SIZE = 5
 MAX_ROLLING_UPLOADS = 75  # Account upload cap may be stricter.
+ZERO_OUTPUT_STALE_RETRY_SECONDS = 30 * 60
 
 def state_path(root, role):
     return Path(root) / STATE_DIR / (role + "_state.json")
@@ -287,6 +288,8 @@ def record_chat_url(role, task_id, url, root="/data/imagegen"):
     if not active or active["task_id"] != task_id:
         return "STATE_TASK_MISMATCH"
     active["source_chat_url"] = url
+    active["status"] = "SENT_AWAITING_GENERATED_IMAGES"
+    active["sent_at"] = _now().isoformat()
     st["status"] = "SENT_AWAITING_GENERATED_IMAGES"
     _atomic_json(state_path(root,role),st)
     return "URL_RECORDED"
@@ -429,6 +432,21 @@ def _local_export_confirmed(root, active):
         "qa_status":"PENDING_C1",
         "dds_status":"UNTESTED",
     },None
+
+
+def _batch_age_seconds(active, receipt):
+    """Return conservative age for a sent active batch, or None if timestamps are invalid."""
+    raw = receipt.get("submitted_at") or active.get("sent_at") or active.get("created_at")
+    if not isinstance(raw, str) or not raw:
+        return None
+    try:
+        when = dt.datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        if when.tzinfo is None:
+            return None
+        age = (_now() - when.astimezone(dt.timezone.utc)).total_seconds()
+        return max(0.0, age)
+    except (TypeError, ValueError, OverflowError):
+        return None
 
 
 def _chat_conversation_id(url):
@@ -794,14 +812,25 @@ async def inspect_slot(role, page, root="/data/imagegen"):
             # carousel duplication. Never guess which five belong to the five
             # source ROIs: quarantine the ambiguous turn and restage the exact
             # same ordinals under a new task id.
-            if (expected == 5 and isinstance(observed,int) and observed > 0):
-                reason=("IMAGEGEN_INCOMPLETE_FIVE" if observed < expected
-                        else "IMAGEGEN_AMBIGUOUS_EXTRA_FIVE")
-                retried,msg=_retry_same_five(
-                    st,active,root,reason,observed=observed)
-                if retried:
-                    return True,msg
-                return False,msg
+            if expected == 5 and isinstance(observed,int):
+                if observed > 0:
+                    reason=("IMAGEGEN_INCOMPLETE_FIVE" if observed < expected
+                            else "IMAGEGEN_AMBIGUOUS_EXTRA_FIVE")
+                    retried,msg=_retry_same_five(
+                        st,active,root,reason,observed=observed)
+                    if retried:
+                        return True,msg
+                    return False,msg
+                if observed == 0:
+                    age=_batch_age_seconds(active,data)
+                    if age is not None and age >= ZERO_OUTPUT_STALE_RETRY_SECONDS:
+                        retried,msg=_retry_same_five(
+                            st,active,root,"IMAGEGEN_ZERO_OUTPUT_STALE",observed=0)
+                        if retried:
+                            return True,msg
+                        return False,msg
+                    age_text=("unknown" if age is None else str(int(age)))
+                    return False,"IMAGEGEN_ZERO_OUTPUT_GRACE_PERIOD:"+age_text
             return False, "IMAGEGEN_OUTPUT_COUNT_MISMATCH:"+str(observed)+"/"+str(expected)
         try:
             export_status=await export_unapproved_k_candidates(page,active,root)
