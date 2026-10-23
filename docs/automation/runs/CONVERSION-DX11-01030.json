@@ -10,12 +10,12 @@
   "classification": "A",
   "feature_id": "DX11:LIVE_SM3_INSTANCE_LIST_GPU_DRAW",
   "work_key": "DX11:LIVE_SM3_INSTANCE_LIST_GPU_DRAW",
-  "checkpoint": "C4_MATERIAL",
-  "feature_stage": "C4_MATERIAL",
-  "status": "IN_PROGRESS",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "source_head": "eeebb8cb1f3bace239d0f745105c27a857e0fb7d",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -99,22 +99,57 @@
   "REAL_GAME_DRAW_BLOCKER": "Real game/HMD runtime observation UNTESTED",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "NEXT_IMPLEMENTATION_ACTION": "Confirm all 5 exact-SHA CI gates then same-task causal repair or C6 bookkeeping.",
+  "NEXT_IMPLEMENTATION_ACTION": "C6 build verification complete; leave physical Quest3/VDXR gameplay and stereo parity for separate runtime validation.",
   "acceptance_results": {
     "nonindexed": {
-      "status": "SOURCE_CHANGED"
+      "status": "PASS_SOURCE_CI",
+      "evidence": "Native nonindexed instance-list source and 01030 compiled probe within DX11 Fast at exact SHA."
     },
     "indexed": {
-      "status": "SOURCE_CHANGED"
+      "status": "PASS_SOURCE_CI",
+      "evidence": "Rebased indexed instance-list source and 01030 compiled probe within DX11 Fast at exact SHA."
     },
     "fallback": {
-      "status": "SOURCE_CHANGED"
+      "status": "PASS_SOURCE_CI",
+      "evidence": "Negative index/overflow/unsupported topology regression and original D3D9 fallback retained; no game or HMD runtime test."
     },
     "gate": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_EXACT_SHA",
+      "evidence": "All five required GitHub Actions successful at 94c544b28d54ed44eac9918659c16e1790d6f9be."
     },
     "runtime": {
       "status": "UNTESTED"
     }
-  }
+  },
+  "material_result_sha": "fae2c8103574572702e82f479685e598aff04402",
+  "validation_bearing_result_sha": "94c544b28d54ed44eac9918659c16e1790d6f9be",
+  "c6_recovery_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "gate_evidence": {
+    "validation_sha": "94c544b28d54ed44eac9918659c16e1790d6f9be",
+    "exact_sha_verified": true,
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39995040087,
+        "conclusion": "success"
+      },
+      "backend_conversion": {
+        "run_id": 39995040376,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39995040057,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39995040245,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39995040393,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED"
+  },
+  "c6_bookkeeping_note": "C6 bookkeeping-only [skip ci]; exact validation-bearing SHA unchanged; no source edits, CI rerun, or duplicate score."
 }
