@@ -1,0 +1,577 @@
+{
+  "schema": "C1_INDEPENDENT_LIGHTWEIGHT_QA_V1",
+  "run_key": "OUTRUN-C1-20261023T1045KST-NEW-SHA",
+  "reviewed_at_kst": "2026-10-23T10:46:44.288932+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "history_excluded_sha_count": 519,
+  "counts": {
+    "total": 8,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "sha_verification": {
+    "source_manifest_sha_match": 8,
+    "source_sent_sha_match": 8,
+    "candidate_export_sha_match": 8,
+    "rgba_png": 8
+  },
+  "evidence_on_N100": {
+    "metrics": "work/C1_QA_20261023_1045_metrics.json",
+    "compare_A": "work/C1_QA_20261023_1045_A_pairs.jpg",
+    "compare_B": "work/C1_QA_20261023_1045_B_pairs.jpg"
+  },
+  "scope": "A/B generated PNG independent C1 QA only. No source restoration/composition, no C2/C3, no DDS approval, no in-game claim.",
+  "notes": [
+    "모든 한글 표기/가독성은 미합성 PNG 육안검사에서 명확하며 영문보다 짧은 번역은 반려 사유가 아님.",
+    "출력 해상도 8/8이 원본 ROI와 다르고 생성기 pairing=OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED. 실제 한글 정확 위치/UV와 효과/보호 픽셀의 안전성을 입증할 native 합성 자료 없음.",
+    "B 출력 4건의 금색 입체 효과가 원본 회색 평면 영문과 상당히 달라 적용 전 디자인 검토 필요.",
+    "원본 crop 내 여러 레이블 및 보호 아트의 공존을 확인함. A/B 생산자 상태 REWORK_DIMENSIONS를 변경하지 않음.",
+    "C1 HOLD는 새로운 승인/배포/실게임 PASS가 아님."
+  ],
+  "records": [
+    {
+      "role": "A",
+      "batch": 40,
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "source_ordinal": 198,
+      "source_file": "Q161_72168a7e71342541_source.png",
+      "candidate_file": "Q161_72168a7e71342541_source_k.png",
+      "english": "AUSTRALIA",
+      "approved_korean": "호주",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "e25f3995b71801a17799e4fa23408d240c4fc4e4bf854798efefd72a34e9c0e6",
+      "candidate_sha256": "26e47fd71513a65bf624f685c4bb447befa4e086da8a1496cd08b9590808e498",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          666,
+          204
+        ],
+        "alpha_bbox": [
+          1,
+          78,
+          337,
+          193
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          162,
+          134,
+          1533,
+          652
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "영문 ROI에 AUSTRALIA와 BELGIUM이 함께 보임. '호주' 글자는 읽히지만 단일문구 위치/인접 문구 보존 및 배치 영역 미검증.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "A",
+      "batch": 40,
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "source_ordinal": 197,
+      "source_file": "Q161_6b26e2d669ced156_source.png",
+      "candidate_file": "Q161_6b26e2d669ced156_source_k.png",
+      "english": "LIBRA",
+      "approved_korean": "천칭자리",
+      "original_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_sha256": "e7bbb7a2dffb810b881c9ef3cb508e9c666c43c033e0e3e47f480e390ed34feb",
+      "candidate_sha256": "133bfc5e2fc5cf29a49026a43c2234218bbd9f8a9d601e8e65092a13121d02aa",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          829,
+          190
+        ],
+        "alpha_bbox": [
+          130,
+          7,
+          502,
+          186
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          73,
+          138,
+          1056,
+          587
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "원본 ROI에 GEMINI/LIBRA/SAGITTARIUS 다중 레이블 포함. '천칭자리'는 가독 가능하나 원본 정확한 줄 위치/이웃 레이블 충돌 미검증.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "A",
+      "batch": 40,
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "source_ordinal": 196,
+      "source_file": "Q097_03f281f5bc62e168_source.png",
+      "candidate_file": "Q097_03f281f5bc62e168_source_k.png",
+      "english": "RANDOM",
+      "approved_korean": "무작위",
+      "original_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "source_sha256": "033f79a67fe8f5fb1b27b3860d2fecd0f8c6ed1ec4d9b285df0212d3410d0d37",
+      "candidate_sha256": "eb924369c9b0ccf46b24a925e6cb91d9bb88781c362400eae306c67f8342a5b4",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          610,
+          445
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          505,
+          445
+        ],
+        "edge_alpha_pixels": [
+          332,
+          0,
+          317,
+          400
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1448,
+          1086
+        ],
+        "alpha_bbox": [
+          376,
+          120,
+          1299,
+          697
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "RANDOM 주변 아이콘·선택 패널이 원본에 포함. 후보 '무작위'는 읽히며 배경/프레임이 눈에 띄지 않으나 보호 아트와의 실제 합성 충돌 미검증.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "A",
+      "batch": 40,
+      "task_id": "OUTRUN-ROI-A-0040-7BD211C6",
+      "source_ordinal": 195,
+      "source_file": "Q097_9046d2c60a4714be_source.png",
+      "candidate_file": "Q097_9046d2c60a4714be_source_k.png",
+      "english": "Automatic",
+      "approved_korean": "자동",
+      "original_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "source_sha256": "740e0f50451a80f7fa2972ad6d5774b5ae1ace705381be3025725e473c22a394",
+      "candidate_sha256": "a5d6e3e4e97afd6ea981dd28fbc45be4c04cf5467b7bed05795609bf5f254e9d",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          967,
+          534
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          967,
+          534
+        ],
+        "edge_alpha_pixels": [
+          0,
+          289,
+          0,
+          344
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1672,
+          941
+        ],
+        "alpha_bbox": [
+          25,
+          137,
+          1562,
+          837
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "Automatic 주변 Testarossa/F40/스티어링 휠 및 패널 아트 존재. '자동'은 읽히지만 UI 글자 위치·원본 보호 픽셀 미검증.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "B",
+      "batch": 53,
+      "task_id": "OUTRUN-ROI-B-0053-1DBF9F13",
+      "source_ordinal": 254,
+      "source_file": "Q212_c80115885b0cbaa4_source.png",
+      "candidate_file": "Q212_c80115885b0cbaa4_source_k.png",
+      "english": "ENTER NAME",
+      "approved_korean": "이름 입력",
+      "original_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_sha256": "894f90032c25d3a474fcdfe60e00d4e1cd364527dac7cdebb54ec411685c1416",
+      "candidate_sha256": "8122fdd5da8d8cdb897459b70f80d104351d89a366397315ce1e5d273052e8be",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          863,
+          383
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          863,
+          383
+        ],
+        "edge_alpha_pixels": [
+          102,
+          92,
+          290,
+          234
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1882,
+          836
+        ],
+        "alpha_bbox": [
+          0,
+          59,
+          1836,
+          780
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "ENTER NAME 및 인접 PROFESSIONAL/SELECT NATIONALITY/SELECT PHOTO 등이 원본에 공존. '이름 입력' 읽힘; 후보는 원본의 어두운 플랫 텍스트와 다른 금색 돌출 효과. 위치·스타일 승인 보류.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "B",
+      "batch": 53,
+      "task_id": "OUTRUN-ROI-B-0053-1DBF9F13",
+      "source_ordinal": 253,
+      "source_file": "Q212_fa46a980b01f234e_source.png",
+      "candidate_file": "Q212_fa46a980b01f234e_source_k.png",
+      "english": "DONE",
+      "approved_korean": "완료",
+      "original_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_sha256": "984c064d20370f62dfe5691ad1619e0275b197bfc51132cc107c9a77efc39b49",
+      "candidate_sha256": "35ffb74e284e0448e900947a7e5f962d166c36f263ab1b845eb61ccaa8f13557",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          365,
+          232
+        ],
+        "alpha_bbox": [
+          2,
+          14,
+          365,
+          232
+        ],
+        "edge_alpha_pixels": [
+          0,
+          52,
+          0,
+          172
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1573,
+          1000
+        ],
+        "alpha_bbox": [
+          0,
+          19,
+          1553,
+          982
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "DONE 주변 CLARISSA/JENNIFER 등 명칭이 원본에 공존. '완료' 읽힘; 크기 및 금색 입체 효과가 원본 어두운 텍스트와 크게 다름. UI cell 검증 보류.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "B",
+      "batch": 53,
+      "task_id": "OUTRUN-ROI-B-0053-1DBF9F13",
+      "source_ordinal": 252,
+      "source_file": "Q212_291338bdd2742333_source.png",
+      "candidate_file": "Q212_291338bdd2742333_source_k.png",
+      "english": "SELECT NATIONALITY",
+      "approved_korean": "국적 선택",
+      "original_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_sha256": "3281371c0fd9ea3a45646630bd9a9875e3ee24dc2a04393dbb2262a178e7587f",
+      "candidate_sha256": "fff4de31a9cb641658bf405e6b05806a097db01869187f7af04c3dba4f54d23f",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1114,
+          301
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          1085,
+          273
+        ],
+        "edge_alpha_pixels": [
+          19,
+          0,
+          1070,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          61,
+          7,
+          2061,
+          686
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "SELECT NATIONALITY가 다른 인접 레이블과 동일 ROI에 포함. '국적 선택' 읽힘; 원본과 달리 금색 입체 효과, 실제 배치 좌표 및 이웃 보호 텍스트 미검증.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    },
+    {
+      "role": "B",
+      "batch": 53,
+      "task_id": "OUTRUN-ROI-B-0053-1DBF9F13",
+      "source_ordinal": 251,
+      "source_file": "Q212_14e0c3ca6091ecd4_source.png",
+      "candidate_file": "Q212_14e0c3ca6091ecd4_source_k.png",
+      "english": "DONE",
+      "approved_korean": "완료",
+      "original_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_sha256": "db0905c06d73d1844d5232fd4697617129b2b01f1a58fe4429c5a6c18bb4c358",
+      "candidate_sha256": "7daa73967ab86a0dd281173ceebc89123c3efcb38bd18879d948967308003676",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          574,
+          275
+        ],
+        "alpha_bbox": [
+          0,
+          26,
+          574,
+          175
+        ],
+        "edge_alpha_pixels": [
+          92,
+          47,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1812,
+          868
+        ],
+        "alpha_bbox": [
+          97,
+          35,
+          1612,
+          832
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "c1_verdict": "HOLD_NATIVE_UI_PLACEMENT_AND_PROVENANCE",
+      "hangul_visual": "READABLE_MATCHES_MAPPING",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_VISIBLE_PNG",
+      "source_bbox_containment": "UNTESTED_NO_NATIVE_PLACEMENT",
+      "imagegen_candidate_unapproved": true,
+      "observations": "DONE 인근 VERDE MUGELLO 및 배경 화살표 아트 포함. '완료' 읽힘; 원본 대비 금색 입체 효과가 큼. 보호 영역·합성 방향 미검증.",
+      "source_candidate_dimensions_equal": false,
+      "source_provenance_pairing_unverified": true
+    }
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "DDS_APPROVED": false,
+  "C2_C3_APPROVED": false,
+  "A_B_QUEUE_CONSUMED": false,
+  "IMAGEGEN_CALLED": false,
+  "score_reward": "Only if separate SSOT event is not already credited; never score repeated SHA."
+}
