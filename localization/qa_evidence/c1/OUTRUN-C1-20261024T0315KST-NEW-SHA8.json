@@ -1,0 +1,536 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0315KST-NEW-SHA8",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "date_kst": "2026-10-24",
+  "checked_at_kst": "2026-10-24T03:17:07.552863+09:00",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "previous_qa_commit": "bd77d8f72884aadb1913ade4f882a7560ca01b5a",
+  "prior_reviewed_sha_count": 658,
+  "new_unique_sha_count": 8,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "sha_verified_count": 8,
+  "rgba_png_count": 8,
+  "verified_native_ui_cell_placement_count": 0,
+  "producer_output_counts": {
+    "A": 319,
+    "B": 374
+  },
+  "producer_export_evidence_count": 142,
+  "orphan_outputs_without_evidence": {
+    "A": [],
+    "B": []
+  },
+  "export_evidence_without_local_outputs": {
+    "A": [],
+    "B": []
+  },
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_0315_metrics.json",
+    "A_pairs": "work/C1_QA_20261024_0315_A_pairs.jpg",
+    "B_pairs": "work/C1_QA_20261024_0315_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261024_0315_white.jpg",
+    "alpha_metrics": "work/C1_QA_20261024_0315_alpha.json"
+  },
+  "summary": "8 new candidate SHAs verified and visually compared with their source ROI and Korean mapping. All 8 match the Korean translation and are legible as transparent text layers, but output canvas dimensions differ from source and native in-game UI cell/UV placement is unverified; no standalone static approval.",
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0064-FD1658CA",
+      "ordinal": 318,
+      "english": "15 continuous course",
+      "approved_korean": "15코스 연속",
+      "observed_korean": "15코스 연속",
+      "source_file": "Q092_c3e26b50f325db99_source.png",
+      "candidate_file": "Q092_c3e26b50f325db99_source_k.png",
+      "source_sha256": "d4e6f856fd15b85eec5ab8e80c430aff4234c55d1784abc88a2da18adf09a3d6",
+      "candidate_sha256": "b36ca8c41aa046d6c394248c89ccf579c8f3c40cd5594567b50d41808127ec55",
+      "original_dds_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+      "sha_checks": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "source_mode": "RGBA",
+        "source_size": [
+          1532,
+          256
+        ],
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "candidate_alpha_bbox": [
+          443,
+          94,
+          1607,
+          573
+        ],
+        "alpha_zero_fraction": 0.88937,
+        "alpha_opaque_fraction": 0.00109,
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "korean_mapping": "MATCH",
+        "per_glyph_readability": "PASS_ON_DARK_AND_WHITE_MATTE",
+        "transparent_glyph_layer": "PASS_NO_VISIBLE_BACKGROUND_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보 한국어 문구·가독성·투명 RGBA는 육안 확인. 생성 출력의 canvas 크기가 원본 ROI와 다르고 원본 native UI cell/UV 안전영역 내 정확한 배치·보호 아트 간섭 여부가 입증되지 않아 정적 승인은 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0064-FD1658CA",
+      "ordinal": 317,
+      "english": "Memorize the sequence!",
+      "approved_korean": "순서를 기억하세요!",
+      "observed_korean": "순서를 기억하세요!",
+      "source_file": "Q054_7c3fa4f9142fea4c_source.png",
+      "candidate_file": "Q054_7c3fa4f9142fea4c_source_k.png",
+      "source_sha256": "0a532cefb327b48dd97f8379bb403af6f0614863f7e59fba39430025e2944af4",
+      "candidate_sha256": "b9e1730b0de2dc7fd3eeddee3a04a6c2c38a75e2c309d3ed87abdbe80c319170",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "sha_checks": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "source_mode": "RGBA",
+        "source_size": [
+          1106,
+          488
+        ],
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "candidate_alpha_bbox": [
+          39,
+          118,
+          2122,
+          706
+        ],
+        "alpha_zero_fraction": 0.72253,
+        "alpha_opaque_fraction": 0.00165,
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "korean_mapping": "MATCH",
+        "per_glyph_readability": "PASS_ON_DARK_AND_WHITE_MATTE",
+        "transparent_glyph_layer": "PASS_NO_VISIBLE_BACKGROUND_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보 한국어 문구·가독성·투명 RGBA는 육안 확인. 생성 출력의 canvas 크기가 원본 ROI와 다르고 원본 native UI cell/UV 안전영역 내 정확한 배치·보호 아트 간섭 여부가 입증되지 않아 정적 승인은 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0064-FD1658CA",
+      "ordinal": 316,
+      "english": "Hold the line!",
+      "approved_korean": "라인을 유지하세요!",
+      "observed_korean": "라인을 유지하세요!",
+      "source_file": "Q054_a279f212acf0c9d7_source.png",
+      "candidate_file": "Q054_a279f212acf0c9d7_source_k.png",
+      "source_sha256": "8348a49fc32a885bb129bd5bb6c89b2b9f0c73512698e3ecea85b897b2ec51bb",
+      "candidate_sha256": "ef9c4601f01c1a1c33fdfd60a8dd3a74d01e9345e8d2177c0f875d3130679690",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "sha_checks": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "source_mode": "RGBA",
+        "source_size": [
+          1008,
+          307
+        ],
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "candidate_alpha_bbox": [
+          0,
+          61,
+          2106,
+          676
+        ],
+        "alpha_zero_fraction": 0.71088,
+        "alpha_opaque_fraction": 0.00209,
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "korean_mapping": "MATCH",
+        "per_glyph_readability": "PASS_ON_DARK_AND_WHITE_MATTE",
+        "transparent_glyph_layer": "PASS_NO_VISIBLE_BACKGROUND_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보 한국어 문구·가독성·투명 RGBA는 육안 확인. 생성 출력의 canvas 크기가 원본 ROI와 다르고 원본 native UI cell/UV 안전영역 내 정확한 배치·보호 아트 간섭 여부가 입증되지 않아 정적 승인은 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0064-FD1658CA",
+      "ordinal": 315,
+      "english": "Enjoy the original OutRun2SP",
+      "approved_korean": "오리지널 아웃런2 SP 즐기기",
+      "observed_korean": "오리지널 아웃런2 SP 즐기기",
+      "source_file": "Q205_e407fc863e6036d5_source.png",
+      "candidate_file": "Q205_e407fc863e6036d5_source_k.png",
+      "source_sha256": "fee3efd4e75b94b337d8a1f365edeec074a7cee35374466485fb930a5de33b95",
+      "candidate_sha256": "4bae05473fc2a56ff3230a2fb4117c5e011a058e504306741a36f29424677422",
+      "original_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "sha_checks": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "source_mode": "RGBA",
+        "source_size": [
+          1866,
+          178
+        ],
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "candidate_alpha_bbox": [
+          25,
+          106,
+          2148,
+          603
+        ],
+        "alpha_zero_fraction": 0.83036,
+        "alpha_opaque_fraction": 0.00201,
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "korean_mapping": "MATCH",
+        "per_glyph_readability": "PASS_ON_DARK_AND_WHITE_MATTE",
+        "transparent_glyph_layer": "PASS_NO_VISIBLE_BACKGROUND_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보 한국어 문구·가독성·투명 RGBA는 육안 확인. 생성 출력의 canvas 크기가 원본 ROI와 다르고 원본 native UI cell/UV 안전영역 내 정확한 배치·보호 아트 간섭 여부가 입증되지 않아 정적 승인은 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0077-1A4520EF",
+      "ordinal": 374,
+      "english": "Run through green!",
+      "approved_korean": "초록색을 통과하세요!",
+      "observed_korean": "초록색을 통과하세요!",
+      "source_file": "Q054_513b231adad72457_source.png",
+      "candidate_file": "Q054_513b231adad72457_source_k.png",
+      "source_sha256": "088fdbb135485670749129ff6c19c2c5022fd531159e5103e083d939ca3d374d",
+      "candidate_sha256": "78cb7a010df848c0380ac4e83fcbe2b72dc439288f8039750d80d815ee686398",
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "sha_checks": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "source_mode": "RGBA",
+        "source_size": [
+          1268,
+          488
+        ],
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "candidate_size": [
+          2022,
+          778
+        ],
+        "candidate_alpha_bbox": [
+          43,
+          62,
+          1990,
+          673
+        ],
+        "alpha_zero_fraction": 0.73731,
+        "alpha_opaque_fraction": 0.00169,
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "korean_mapping": "MATCH",
+        "per_glyph_readability": "PASS_ON_DARK_AND_WHITE_MATTE",
+        "transparent_glyph_layer": "PASS_NO_VISIBLE_BACKGROUND_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보 한국어 문구·가독성·투명 RGBA는 육안 확인. 생성 출력의 canvas 크기가 원본 ROI와 다르고 원본 native UI cell/UV 안전영역 내 정확한 배치·보호 아트 간섭 여부가 입증되지 않아 정적 승인은 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0077-1A4520EF",
+      "ordinal": 373,
+      "english": "Hold the line!",
+      "approved_korean": "라인을 유지하세요!",
+      "observed_korean": "라인을 유지하세요!",
+      "source_file": "Q054_cc6253f354ae56cc_source.png",
+      "candidate_file": "Q054_cc6253f354ae56cc_source_k.png",
+      "source_sha256": "8348a49fc32a885bb129bd5bb6c89b2b9f0c73512698e3ecea85b897b2ec51bb",
+      "candidate_sha256": "41b79cd9f16acd8e91f3245f75297d0f1d7bdb63f12cd8d4745f054f131bd4a5",
+      "original_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "sha_checks": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "source_mode": "RGBA",
+        "source_size": [
+          1008,
+          307
+        ],
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "candidate_alpha_bbox": [
+          23,
+          35,
+          2172,
+          704
+        ],
+        "alpha_zero_fraction": 0.66549,
+        "alpha_opaque_fraction": 0.00208,
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "korean_mapping": "MATCH",
+        "per_glyph_readability": "PASS_ON_DARK_AND_WHITE_MATTE",
+        "transparent_glyph_layer": "PASS_NO_VISIBLE_BACKGROUND_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보 한국어 문구·가독성·투명 RGBA는 육안 확인. 생성 출력의 canvas 크기가 원본 ROI와 다르고 원본 native UI cell/UV 안전영역 내 정확한 배치·보호 아트 간섭 여부가 입증되지 않아 정적 승인은 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0077-1A4520EF",
+      "ordinal": 372,
+      "english": "Hold the line!",
+      "approved_korean": "라인을 유지하세요!",
+      "observed_korean": "라인을 유지하세요!",
+      "source_file": "Q054_5dad8f4c4d45d2c5_source.png",
+      "candidate_file": "Q054_5dad8f4c4d45d2c5_source_k.png",
+      "source_sha256": "8348a49fc32a885bb129bd5bb6c89b2b9f0c73512698e3ecea85b897b2ec51bb",
+      "candidate_sha256": "fc70de83e8dc7c7195aa5d3256d7372bac49dcc737235e6abe8054fbf7e1f1b0",
+      "original_dds_sha256": "68ae256333e45edf6504169f33dcd93c41855bbd3d86f2212f298b2c3a98ee67",
+      "sha_checks": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "source_mode": "RGBA",
+        "source_size": [
+          1008,
+          307
+        ],
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "candidate_alpha_bbox": [
+          31,
+          56,
+          2155,
+          700
+        ],
+        "alpha_zero_fraction": 0.65432,
+        "alpha_opaque_fraction": 0.00203,
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "korean_mapping": "MATCH",
+        "per_glyph_readability": "PASS_ON_DARK_AND_WHITE_MATTE",
+        "transparent_glyph_layer": "PASS_NO_VISIBLE_BACKGROUND_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보 한국어 문구·가독성·투명 RGBA는 육안 확인. 생성 출력의 canvas 크기가 원본 ROI와 다르고 원본 native UI cell/UV 안전영역 내 정확한 배치·보호 아트 간섭 여부가 입증되지 않아 정적 승인은 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0077-1A4520EF",
+      "ordinal": 371,
+      "english": "Honk the horn!",
+      "approved_korean": "경적을 울리세요!",
+      "observed_korean": "경적을 울리세요!",
+      "source_file": "Q054_300ecfebf2d3f9ba_source.png",
+      "candidate_file": "Q054_300ecfebf2d3f9ba_source_k.png",
+      "source_sha256": "f14ebf36604ca2863dfc16607b51fa682a4afafd900fd002598de4040ae923bc",
+      "candidate_sha256": "9f14d12e5f9413635b8fc71cd131ecb6cdc9a363401d6615c844656c22f93b8f",
+      "original_dds_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "sha_checks": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "source_mode": "RGBA",
+        "source_size": [
+          967,
+          352
+        ],
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "candidate_size": [
+          2078,
+          757
+        ],
+        "candidate_alpha_bbox": [
+          43,
+          52,
+          2059,
+          685
+        ],
+        "alpha_zero_fraction": 0.63561,
+        "alpha_opaque_fraction": 0.00183,
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "korean_mapping": "MATCH",
+        "per_glyph_readability": "PASS_ON_DARK_AND_WHITE_MATTE",
+        "transparent_glyph_layer": "PASS_NO_VISIBLE_BACKGROUND_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "후보 한국어 문구·가독성·투명 RGBA는 육안 확인. 생성 출력의 canvas 크기가 원본 ROI와 다르고 원본 native UI cell/UV 안전영역 내 정확한 배치·보호 아트 간섭 여부가 입증되지 않아 정적 승인은 보류.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    }
+  ]
+}
