@@ -10,10 +10,10 @@
   "classification": "A",
   "feature_id": "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW",
   "work_key": "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW",
-  "status": "AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_CAUSAL_CI_REPAIR",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -96,5 +96,20 @@
     ".github/workflows/dx11-fast-structural.yml",
     "docs/automation/runs/CONVERSION-DX11-01032.json"
   ],
-  "material_result_sha": "0a06a4af20f91b9d580830962ab70a4913ff5a2d"
+  "material_result_sha": "0a06a4af20f91b9d580830962ab70a4913ff5a2d",
+  "feature_stage": "C6_STATE",
+  "validation_bearing_result_sha": "5eeadcae002901fd6bc89c51e24455f3d1721397",
+  "terminal_hold_reason_resolved": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_gate_evidence": {
+    "validation_sha": "5eeadcae002901fd6bc89c51e24455f3d1721397",
+    "gate_result": "PASS_EXACT_SHA",
+    "gate_run_ids": {
+      "dx11_fast": 40008287884,
+      "backend_conversion": 40008287862,
+      "windows_build": 40008295820,
+      "openxr": 40008295724,
+      "hud_inspector": 40008295880
+    },
+    "runtime_validation": "UNTESTED"
+  }
 }
