@@ -19,8 +19,12 @@ def wired(b, h):
         "static_cast<LONG>(clipped.left)" in b,
         "context1->ClearView(s.backend.color_rtv(), rgba, &nativeRect, 1u)" in b,
         "classify_color_fill_rect(" in h,
-        "entries[count++] = {clipped.left, clipped.top, clipped.right," in h,
-        "if (count >= kCapacity) return false;" in h,
+        // 01034: newer ColorFill can fully supersede older game-authored
+        // rectangles, but overflow of genuinely distinct pixels stays closed.
+        "if (!covers(next, entries[i])) ++retained;" in h,
+        "if (retained >= kCapacity) return false;" in h,
+        "if (!covers(next, saved)) entries[output++] = saved;" in h,
+        "entries[output++] = next;" in h,
     ))
 assert wired(region, header)
 for original, broken in (
