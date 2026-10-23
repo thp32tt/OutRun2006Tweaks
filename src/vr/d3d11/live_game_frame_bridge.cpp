@@ -5936,12 +5936,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     const UINT nativeSubmissionCount = compactListInstances ? 1u : instanceCount;
     const UINT drawVertexCount = compactListInstances
         ? static_cast<UINT>(expandedVertices) : vertexCount;
-    for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance) {
-        const UINT base = compactListInstances ? 0u : instance * vertexCount;
+    // The native API dispatch sites remain inside this guarded submit.
+    // GPU source counts and batch indices are captured only for this Draw.
+    const auto issueNativeGameDraw = [&](UINT vertexCount, UINT base) noexcept {
         if (nativeIndices)
             context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));
         else
-            context->Draw(drawVertexCount, base);
+            context->Draw(vertexCount, base);
+    };
+    for (UINT instance = 0u; instance < instanceCount; ++instance) {
+        if (instance >= nativeSubmissionCount) break;
+        const UINT base = compactListInstances ? 0u : instance * vertexCount;
+        issueNativeGameDraw(drawVertexCount, base);
     }
     s.pending = true;
     ++s.issued;

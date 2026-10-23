@@ -21,7 +21,7 @@ for token in ("GetVertexDeclaration(", "live_sm3_input_layout(declaration, strid
               "streams[0]={static_cast<const std::uint8_t*>(bytes),stride,vertexCount};",
               "nativeBytes=unpacked.data()", "s.fullGameVertexCapacity, nativeBytes, vertexBytes",
               "context->IASetVertexBuffers(0u, 1u, &stream, &nativeStride, &offset)",
-              "context->DrawIndexed(nativeIndexCount", "context->Draw(drawVertexCount",
+              "context->DrawIndexed(nativeIndexCount", "context->Draw(vertexCount",
               "nativeByteCount > (1ull << 25u)",
               "GetStreamSourceFreq(0u, &sourceFrequency)",
               "sourceFrequency != 1u", "catch (...) {",
@@ -75,6 +75,8 @@ for token in ("game_sm3_decl_width(e.type)", "src.vertexCount < count",
 require("if (nativeIndices[i] >= (compactListInstances ? expandedVertices : vertexCount)) return false;" in p and
         "game_sm3_expand_list_instance_indices(" in p and
         "nativeSubmissionCount = compactListInstances ? 1u : instanceCount" in p and
+        "if (instance >= nativeSubmissionCount) break;" in p and
+        "issueNativeGameDraw(drawVertexCount, base);" in p and
         "liveBatch.accepts_source_draw(" in p and
         "if (!env_full_game_opt_in()" in p and
         "liveBatch.record_source_draw(sourceOrdinal)" in p,

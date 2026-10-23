@@ -10,7 +10,9 @@ assert "sourceFrequency != 1u" in bridge
 assert "(frequency & ~kStreamFrequencyMask) == kStreamInstanced" in bridge
 assert "instance * vertexCount" in bridge
 assert "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge
-assert "context->Draw(drawVertexCount, base)" in bridge
+assert "context->Draw(vertexCount, base)" in bridge
+assert "issueNativeGameDraw(drawVertexCount, base);" in bridge
+assert "if (instance >= nativeSubmissionCount) break;" in bridge
 assert "nativeSubmissionCount = compactListInstances ? 1u : instanceCount" in bridge
 assert "game_sm3_expand_list_instance_indices(" in bridge
 assert "hashBytes(&packedFloat4, sizeof(packedFloat4));" in bridge

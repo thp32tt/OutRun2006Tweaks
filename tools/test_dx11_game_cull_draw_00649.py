@@ -68,8 +68,9 @@ def sm3_fan_connected(src):
         "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),",
         "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
-        "context->Draw(drawVertexCount, base);",
-        "for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance)",
+        "context->Draw(vertexCount, base);",
+        "for (UINT instance = 0u; instance < instanceCount; ++instance)",
+        "if (instance >= nativeSubmissionCount) break;",
         "nativeSubmissionCount = compactListInstances ? 1u : instanceCount",
         "liveBatch.record_source_draw(sourceOrdinal);",
     ))
