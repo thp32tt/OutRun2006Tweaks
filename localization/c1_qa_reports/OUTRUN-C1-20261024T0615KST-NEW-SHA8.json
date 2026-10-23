@@ -1,0 +1,506 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T0615KST-NEW-SHA8",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "date_kst": "2026-10-24",
+  "reviewed_at_kst": "2026-10-24T06:16:30.229568+09:00",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "prior_reviewed_sha_count": 706,
+  "new_unique_sha_count": 8,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "sha_verified_count": 8,
+  "rgba_png_count": 8,
+  "verified_native_ui_cell_placement_count": 0,
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_0615_metrics.json",
+    "A_pairs": "work/C1_QA_20261024_0615_A_pairs.jpg",
+    "B_pairs": "work/C1_QA_20261024_0615_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261024_0615_white.jpg",
+    "alpha": "work/C1_QA_20261024_0615_alpha.json"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false,
+    "VR_FFB_DX11_DXVK_touched": false
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0062-8336D2CF",
+      "ordinal": 305,
+      "english": "Do the math!",
+      "approved_korean": "계산하세요!",
+      "source_file": "Q054_5a4eb7c999eaabe4_source.png",
+      "candidate_file": "Q054_5a4eb7c999eaabe4_source_k.png",
+      "source_sha256": "c89fa94c3fc884b027426faf6178ddef6fca8cb4b995b4ac77b247217278c7dd",
+      "candidate_sha256": "9786b0049628084b10d18fbf5fdec4610c392bd00a7c9b6366b55f126ed24505",
+      "original_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          964,
+          214
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          29,
+          2134,
+          724
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.54005
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_NATIVE_CONTACT_SHEET_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "번역·글자 가독성과 독립 PNG 글자층은 육안상 양호하나, 후보 PNG 크기가 원본 ROI와 달라 네이티브 UI cell·보호 영역 정렬을 검증할 수 없음. 크기 불일치만으로 FAIL하지 않음.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0062-8336D2CF",
+      "ordinal": 304,
+      "english": "Do the math!",
+      "approved_korean": "계산하세요!",
+      "source_file": "Q054_9e04b2316116e2d9_source.png",
+      "candidate_file": "Q054_9e04b2316116e2d9_source_k.png",
+      "source_sha256": "c89fa94c3fc884b027426faf6178ddef6fca8cb4b995b4ac77b247217278c7dd",
+      "candidate_sha256": "67f0dbd257fe1999ddb69a8110dfd213649e3adef80d65e3d03bd43ddeb48d2c",
+      "original_dds_sha256": "68ae256333e45edf6504169f33dcd93c41855bbd3d86f2212f298b2c3a98ee67",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          964,
+          214
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          97,
+          51,
+          1953,
+          700
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.59299
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_NATIVE_CONTACT_SHEET_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "번역·글자 가독성과 독립 PNG 글자층은 육안상 양호하나, 후보 PNG 크기가 원본 ROI와 달라 네이티브 UI cell·보호 영역 정렬을 검증할 수 없음. 크기 불일치만으로 FAIL하지 않음.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0061-B48F9123",
+      "ordinal": 299,
+      "english": "Game Over",
+      "approved_korean": "게임 오버",
+      "source_file": "Q089_bc7eeb2a41b011ad_source.png",
+      "candidate_file": "Q089_bc7eeb2a41b011ad_source_k.png",
+      "source_sha256": "67aceb2c7212f84c12f823fd847ff9e0ab3c355569bc5b22dd33908e6e5e44b6",
+      "candidate_sha256": "9c92ed8dc87c06c7bff1f7a71f89446f02de1a6aa73c8a7160a571433bc5b604",
+      "original_dds_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          2048,
+          256
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          103,
+          9,
+          2156,
+          692
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.70045
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_NATIVE_CONTACT_SHEET_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "번역·글자 가독성과 독립 PNG 글자층은 육안상 양호하나, 후보 PNG 크기가 원본 ROI와 달라 네이티브 UI cell·보호 영역 정렬을 검증할 수 없음. 크기 불일치만으로 FAIL하지 않음.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0060-35F30767-R1",
+      "ordinal": 294,
+      "english": "CLOUDY HIGHLAND",
+      "approved_korean": "클라우디 하이랜드",
+      "source_file": "Q227_eb4b7b6e0899ea62_source.png",
+      "candidate_file": "Q227_eb4b7b6e0899ea62_source_k.png",
+      "source_sha256": "e35e8f91ec49fdf92d1688f1e98f815391de61a02fa020972d6ae54057caa2ee",
+      "candidate_sha256": "6a233c8af61ff786eb7503cbbdc2224ec551c50c800158bcad5d216ec021585d",
+      "original_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1073,
+          357
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          109,
+          52,
+          2132,
+          698
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.77599
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_NATIVE_CONTACT_SHEET_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원본 ROI에 인접한 다수 영문 문구가 함께 들어 있음. 목표 문구 분리/실제 네이티브 UI 셀 배치 확인 필요.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0074-5F365707",
+      "ordinal": 357,
+      "english": "ANCIENT RUINS",
+      "approved_korean": "에인션트 루인스",
+      "source_file": "Q227_20e6dcfbb3f28c8c_source.png",
+      "candidate_file": "Q227_20e6dcfbb3f28c8c_source_k.png",
+      "source_sha256": "d213ff9189386f95b98fa4e63474c0f0e539d0fe72a725ac3ce39f840cf9bc51",
+      "candidate_sha256": "8550f668e19b3b6432720ae6c10bbba87e2fcfb3ff7ed1ac79700297242479a0",
+      "original_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          944,
+          357
+        ],
+        "candidate_size": [
+          2039,
+          771
+        ],
+        "alpha_bbox": [
+          0,
+          37,
+          1991,
+          738
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.71612
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_NATIVE_CONTACT_SHEET_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원본 ROI에 ALPINE/CAPE WAY 등 인접 문구가 함께 보임. 목표 문구 셀 위치 및 보호 영역 미검증.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0074-5F365707",
+      "ordinal": 356,
+      "english": "FLAGMAN 3",
+      "approved_korean": "플래그맨 3",
+      "source_file": "Q227_6f70b1123b730776_source.png",
+      "candidate_file": "Q227_6f70b1123b730776_source_k.png",
+      "source_sha256": "bcb685d26d682bc27ffc6cb49b0b0c7ea66ec551fbade94ddf7b4b9387c61beb",
+      "candidate_sha256": "0851ae931c8cf2c81298ce71feb56a08edb7815a6b563e465800eb27da8255ff",
+      "original_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          1419,
+          407
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          24,
+          9,
+          2059,
+          684
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.70705
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_NATIVE_CONTACT_SHEET_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원본 ROI에 FLAGMAN 1/2, NOVICE, 아이콘이 함께 있음. FLAGMAN 3 위치·보호 아트 경계 미검증.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0074-5F365707",
+      "ordinal": 355,
+      "english": "BAY AREA",
+      "approved_korean": "베이 에어리어",
+      "source_file": "Q227_202579d241d5d059_source.png",
+      "candidate_file": "Q227_202579d241d5d059_source_k.png",
+      "source_sha256": "e59c66c1c2fa6a2e2a00aacea3fcc2988a730f1745b5115830bdd7da1b1b69ef",
+      "candidate_sha256": "e4989dec225fd58c076452aa0a3282ae5aac24a48c5b6cabbbd760264a0b6df6",
+      "original_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          660,
+          335
+        ],
+        "candidate_size": [
+          1760,
+          894
+        ],
+        "alpha_bbox": [
+          76,
+          54,
+          1670,
+          817
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.79849
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_NATIVE_CONTACT_SHEET_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "원본 ROI에 DESERT와 다른 텍스트도 포함됨. BAY AREA 네이티브 셀 분리/배치 미검증.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0073-D117A157",
+      "ordinal": 350,
+      "english": "REQUEST",
+      "approved_korean": "요청",
+      "source_file": "Q132_9ea5f69b24935739_source.png",
+      "candidate_file": "Q132_9ea5f69b24935739_source_k.png",
+      "source_sha256": "98af48dd5f39dea4f5fbe78f06d1e2f1c0079259320097e89aa8fae910f912bd",
+      "candidate_sha256": "1b52bcbc52c5b194c1d50c236ae75e2f3bccb976ead00f8ba2fca076bb4ca14c",
+      "original_dds_sha256": "2a02471fe95e0c4253cf72ec58423cb9d16ae074e3012418716e88e75e2a2a80",
+      "sha_matches": {
+        "source_manifest": true,
+        "source_sent": true,
+        "candidate_export": true
+      },
+      "png": {
+        "source_format": "PNG",
+        "candidate_format": "PNG",
+        "candidate_mode": "RGBA",
+        "source_size": [
+          904,
+          206
+        ],
+        "candidate_size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          474,
+          129,
+          1667,
+          705
+        ],
+        "edge_alpha_pixels_gt8": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "alpha_zero_fraction": 0.78582
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE_NATIVE_CONTACT_SHEET_AND_WHITE_MATTE",
+        "transparent_text_layer": "NO_VISIBLE_OPAQUE_FRAME",
+        "native_ui_cell_placement": "UNVERIFIED",
+        "text_length_difference_ignored": true,
+        "orientation": "NO_OBVIOUS_REVERSAL"
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "읽기는 가능하나 두 음절의 기준선 높이 차이가 큼. 원본 요청 UI의 실제 셀 배치 및 가독성 재확인 필요.",
+      "runtime_validation": "UNTESTED",
+      "c2_c3_or_game_pass": false
+    }
+  ]
+}
