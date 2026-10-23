@@ -151,7 +151,7 @@ check("game_sm3_expand_list_instance_indices(" in source and
 # D3D11 upload; do not silently validate only the old D3D9 index pointer.
 for token in (
     "if (nativeIndices) {",
-    "for (UINT i = 0; i < nativeIndexCount; ++i)",
+    "for (UINT i = 0u; i < nativeIndexCount; ++i)",
     "compactInstancedGeometry ? expandedVertices : vertexCount",
     "s.fullGameIndexCapacity, nativeIndices, indexBytes",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
