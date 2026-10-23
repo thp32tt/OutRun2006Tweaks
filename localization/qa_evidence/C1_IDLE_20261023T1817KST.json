@@ -1,0 +1,48 @@
+{
+  "schema": "outrun.c1.idle.v1",
+  "run_key": "OUTRUN-C1-20261023T1817KST-IDLE",
+  "role": "C1",
+  "status": "IDLE",
+  "checked_at_kst": "2026-10-23T18:19:23+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before": "7feefc6b330c973fa3483ed470371865642eb090",
+  "policy_files_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_inventory": {
+    "root": "/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "source": "export_evidence/*.json with A/B candidate_outputs, input PNG and sent manifest",
+    "export_evidence_files": 126,
+    "historical_candidate_sha256": 618,
+    "new_unreviewed_sha256": 0,
+    "selection_limit_per_role": 4,
+    "selection_limit_total": 8,
+    "local_metrics": "work/C1_QA_20261023_1817_metrics.json",
+    "local_inventory_script": "work/C1_QA_20261023_1817_check.py"
+  },
+  "qa_actions": {
+    "reviewed_new": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "imagegen_calls": 0,
+    "ab_queue_consumed": 0,
+    "final_dds_written": 0,
+    "game_deployed": 0,
+    "c2_c3_ingame_pass_created": 0
+  },
+  "reason": "No novel SHA among eligible A/B exported candidate PNG with both input and output files present. Avoid duplicate C1 review.",
+  "quality_policy": "Shorter line width or slightly smaller readable Korean characters alone are not a FAIL condition.",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "score_reason": "No new SHA or distinct QA achievement: status/inventory recheck only.",
+  "out_of_scope_untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
