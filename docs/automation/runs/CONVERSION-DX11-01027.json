@@ -2,23 +2,23 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01027",
   "production_id": "CONVERSION-DX11-01027",
-  "event_id": "CONVERSION-DX11-01027-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-01027-E003",
+  "event_type": "retry",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01027",
   "lane": "DX11",
   "classification": "A",
   "feature_id": "DX11:STATIC_MOVA_MATRIX_NATIVE_DRAW",
   "work_key": "DX11:STATIC_MOVA_MATRIX_NATIVE_DRAW",
-  "checkpoint": "C4_SOURCE",
-  "feature_stage": "C4_MATERIAL_COMMITTED",
-  "status": "PENDING_EXACT_SHA_CI",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "source_head": "d99b71e0f7d75692b01ee4c6aa7932d327340c26",
   "material_result_sha": "dc8c657d67a8acbfe77ad2f7fa9ae62af40d0a2e",
-  "result_sha": "dc8c657d67a8acbfe77ad2f7fa9ae62af40d0a2e",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "result_sha": "3a05796f9e26a75684fd94d44d6f689c35fdc61e",
+  "validation_bearing_result_sha": "3a05796f9e26a75684fd94d44d6f689c35fdc61e",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -95,7 +95,10 @@
     ".github/workflows/dx11-fast-structural.yml",
     "src/vr/d3d11/native_backend.cpp",
     "src/vr/d3d11/native_sm3_constant_codegen.hpp",
-    "tools/dx11_sm3_static_address_matrix_probe_01027.cpp"
+    "tools/dx11_sm3_static_address_matrix_probe_01027.cpp",
+    "tools/test_dx11_sm3_signed_mova_01012.py",
+    "tools/test_dx11_sm3_matrix_draw_uniform_01020.py",
+    "tools/test_dx11_sm3_relative_matrix_00961.py"
   ],
   "repair_evidence": {
     "classification": "B",
@@ -111,5 +114,112 @@
     ],
     "repair_scope": "Correct 01027 run-record schema for existing material native shader implementation; no source edits, no test weakening, no completed gameplay claim.",
     "runtime_validation": "UNTESTED"
-  }
+  },
+  "dispatch_event_id": "CONVERSION-DX11-01027-E001",
+  "acceptance_results": {
+    "matrix": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+        "tools/dx11_sm3_static_address_matrix_probe_01027.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39975449830: compiled signed c255-3 matrix probe and source checks, exact SHA"
+    },
+    "uniform": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+        "tools/test_dx11_sm3_temp_uniform_01019.py",
+        "tools/test_dx11_sm3_matrix_draw_uniform_01020.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39975449830: constant/TEMP uniformity and IFC regressions, exact SHA"
+    },
+    "fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_sm3_static_address_matrix_probe_01027.cpp",
+        "tools/dx11_sm3_signed_mova_01012.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39975449830: signed underflow, overflow, dynamic relative matrix and divergent uniformity negative tests; source-only fail-closed checks"
+    },
+    "gates": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01027.json"
+      ],
+      "validation_command": "Exact source SHA 3a05796f9e26a75684fd94d44d6f689c35fdc61e: Fast 39975449830, Backend 39975449745, Windows Build 39975449731, OpenXR 39975449835, HUD 39975449898: all five push runs completed success"
+    }
+  },
+  "gate_evidence": {
+    "source_sha": "3a05796f9e26a75684fd94d44d6f689c35fdc61e",
+    "material_source_sha": "dc8c657d67a8acbfe77ad2f7fa9ae62af40d0a2e",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39975449830,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39975449745,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39975449731,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39975449835,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39975449898,
+        "conclusion": "success"
+      }
+    },
+    "causal_repairs": [
+      {
+        "sha": "743b0c59398e3f0dac5c2f34998edaddb62fa49a",
+        "reason": "CI policy contract missing strategy fields and feature identity"
+      },
+      {
+        "sha": "b4f122c7c999acd2140b9c1c4bb97c902a0370d5",
+        "reason": "Restore overflow-safe absolute/dynamic matrix admission"
+      },
+      {
+        "sha": "9cd4f37915724f37a0ea012b6577b15b65cd6cff",
+        "reason": "Preserve per-Draw constant/TEMP uniform provenance"
+      },
+      {
+        "sha": "4a68cf4908e1c40589e0c9e3801002a1de5772aa",
+        "reason": "Fix actual signed static MOVA effective matrix row indexing bug"
+      },
+      {
+        "sha": "04ac98cb45aa4ad02c3f25b7c09ef6149da34f38",
+        "reason": "Adapt bounded signed MOVA and uniform matrix regression assertions"
+      },
+      {
+        "sha": "3a05796f9e26a75684fd94d44d6f689c35fdc61e",
+        "reason": "Keep prior relative matrix regression against effective signed bounds"
+      }
+    ]
+  },
+  "feature_ready": true,
+  "pending_items": [
+    "Actual desktop OutRun menu/vehicle/race native Draw and published-frame measurements remain UNTESTED.",
+    "Quest3/VDXR, gamepad, FFB and visual/runtime correctness remain UNTESTED."
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "No live gameplay or Quest3 measurement at exact validation source SHA.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "3a05796f9e26a75684fd94d44d6f689c35fdc61e",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue native menu-to-race frame integration as separate controller-owned work; run desktop/Quest3 visual and input/FFB validation before gameplay or deployment PASS."
 }
