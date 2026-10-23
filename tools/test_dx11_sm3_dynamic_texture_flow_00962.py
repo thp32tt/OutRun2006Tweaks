@@ -10,7 +10,13 @@ end = backend.index("op.sineCosine =", start)
 predication = backend[start:end]
 assert "instruction.opcode == D3DSIO_TEX)" in predication
 assert "instruction.opcode == D3DSIO_TEXLDD)" not in predication
-assert "sourcePredicated || !writtenFlow.empty()" in backend
+# Preserve the original rejection of implicit sampling under a predicated
+# instruction or a pixel-varying IFC, but allow draw-uniform D3D9 IF b#.
+assert "sourcePredicated || !derivativeUniformity.implicit_sampling_safe()" in backend
+assert "!derivativeUniformity.begin(false)" in backend
+assert "!derivativeUniformity.begin(true)" in backend
+assert "!derivativeUniformity.end()" in backend
+assert "!derivativeUniformity.empty()" in backend
 assert "native_sm3_texture_mode_allowed_in_control_flow(" in backend
 assert "return !conditional;" in texture
 assert "case NativeSm3Texture2DMode::ExplicitLod:" in texture
