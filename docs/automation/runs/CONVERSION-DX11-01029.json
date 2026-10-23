@@ -10,15 +10,15 @@
   "classification": "A",
   "feature_id": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
   "work_key": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
-  "checkpoint": "C5_CI_REPAIR",
-  "feature_stage": "C5_CI_REPAIR",
-  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "source_head": "c5dd530d3288674e07af779ab9a4dfdeeff27233",
   "material_result_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
-  "AUTOMATION_VALIDATION": "PENDING",
+  "result_sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+  "validation_bearing_result_sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -107,14 +107,14 @@
     "tools/test_dx11_live_sm3_vertex_decl_00929.py"
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "REAL_GAME_DRAW_BLOCKER": "Actual OutRun menu/car/race native frame & Quest3 evidence still UNTESTED; five exact-SHA gates pending",
+  "REAL_GAME_DRAW_BLOCKER": "Hardware game/HMD reality not observed, despite all exact-SHA CI gates succeeding",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "NEXT_IMPLEMENTATION_ACTION": "Repair second observed Fast gate legacy 4-stream signature/bound expectations without weakening negative tests; rerun all required GitHub workflows on changed exact SHA",
-  "feature_ready": false,
+  "NEXT_IMPLEMENTATION_ACTION": "C6 exact-SHA build verified; separate actual desktop game/HMD stereo/input/FFB test remains UNTESTED. New independent features controlled by dispatcher.",
+  "feature_ready": true,
   "pending_items": [
-    "Five exact SHA GitHub Actions pending",
-    "Original game and Quest3/VDXR HMD/input/FFB runtime tests UNTESTED"
+    "Desktop game menu/car/race pixel and native frame counters UNTESTED",
+    "Quest 3 VDXR stereo/FFB/input runtime test UNTESTED"
   ],
   "repair_evidence": {
     "classification": "B",
@@ -146,5 +146,84 @@
         ]
       }
     ]
-  }
+  },
+  "gate_evidence": {
+    "validation_bearing_result_sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+    "checked_count": 5,
+    "mandatory_gate_results": [
+      {
+        "workflow": "DX11 Fast Structural Checks",
+        "run_id": 39988491148,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988491148"
+      },
+      {
+        "workflow": "Backend Conversion Gate",
+        "run_id": 39988490990,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988490990"
+      },
+      {
+        "workflow": "Build",
+        "run_id": 39988491167,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988491167"
+      },
+      {
+        "workflow": "OpenXR VR architecture",
+        "run_id": 39988491158,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988491158"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 39988491157,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988491157"
+      }
+    ],
+    "excluded_nonmandatory_run": {
+      "name": "VR PC Fast Test Build",
+      "status": "skipped",
+      "reason": "User explicitly prohibits PC Fast runner; this workflow is not among the five mandatory Gates"
+    }
+  },
+  "acceptance_results": {
+    "capture": {
+      "status": "PASS_SOURCE_CI",
+      "evidence": "R30 stream source 0..15 VB/IB/UP epoch hooks and bounded shadow staging cross-file 01029 source graph validated"
+    },
+    "shader_ia": {
+      "status": "PASS_COMPILED_PROBE",
+      "evidence": "01029 positive/negative compiled C++ probe and existing 00992 instancing regression passed DX11 Fast Gate exact SHA"
+    },
+    "fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence": "Missing/stale/budget guards and original DX9Ex game Draw, input and FFB unchanged, native source-only scope"
+    },
+    "gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "five GitHub Actions exact SHA completed SUCCESS"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "evidence": "No desktop OutRun or Quest3/VDXR real game test executed; no pixel or stereo promotion"
+    }
+  },
+  "c6_bookkeeping_note": "Bookkeeping only; source implementation and validation-bearing CI commit remain separate; no duplicate CI/score."
 }
