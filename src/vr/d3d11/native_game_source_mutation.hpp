@@ -134,7 +134,9 @@ struct GameNativeSourceMutation {
 // D3D9 can ColorFill several rectangles after its whole-backbuffer Clear but
 // before the first Draw. Replay those game-authored fills IN ORDER after the
 // native full-frame clear and before the first native Draw. Entries bind to
-// the exact canonical backbuffer; overflow/foreign writes fail closed.
+// the exact canonical backbuffer. ColorFill is an unconditional pixel overwrite:
+// a newer rect can retire wholly covered older writes without changing the
+// final ordered game pixels. Unrelated overflow/foreign writes fail closed.
 struct GameNativePreDrawFills {
     struct Fill {
         std::int64_t left{}, top{}, right{}, bottom{};
@@ -179,7 +181,7 @@ struct GameNativePreDrawFills {
         std::int64_t right, std::int64_t bottom,
         std::uint32_t width, std::uint32_t height,
         std::uint32_t color) noexcept {
-        if (!currentDevice || !currentBackbuffer ||
+        if (!currentDevice || !currentBackbuffer || count > kCapacity ||
             (count && !belongs_to(currentDevice, currentBackbuffer)))
             return false;
         GameNativeSourceMutation::ColorFillRect clipped{};
@@ -189,13 +191,35 @@ struct GameNativePreDrawFills {
             return false;
         if (coverage == GameNativeSourceMutation::ColorFillClip::Empty)
             return true; // The original game wrote nothing; consume no tile slot.
-        if (count >= kCapacity) return false;
+        const Fill next{clipped.left, clipped.top, clipped.right,
+                        clipped.bottom, color};
+        const auto covers = [](const Fill& outer, const Fill& inner) constexpr {
+            return outer.left <= inner.left && outer.top <= inner.top &&
+                   outer.right >= inner.right && outer.bottom >= inner.bottom;
+        };
+        // Only the immediately preceding same-color write may subsume the
+        // new write: an intervening differently colored fill could require it.
+        if (count && entries[count - 1u].argb == color &&
+            covers(entries[count - 1u], next))
+            return true;
+        // The latest opaque D3D9 ColorFill wins over every *fully* enclosed
+        // earlier tile, regardless of intervening writes or earlier colors.
+        // Determine capacity before mutating the recorded source transaction.
+        std::uint32_t retained = 0u;
+        for (std::uint32_t i = 0u; i < count; ++i)
+            if (!covers(next, entries[i])) ++retained;
+        if (retained >= kCapacity) return false;
         if (!count) {
             device = currentDevice;
             backbuffer = currentBackbuffer;
         }
-        entries[count++] = {clipped.left, clipped.top, clipped.right,
-                            clipped.bottom, color};
+        std::uint32_t output = 0u;
+        for (std::uint32_t i = 0u; i < count; ++i) {
+            const Fill saved = entries[i];
+            if (!covers(next, saved)) entries[output++] = saved;
+        }
+        entries[output++] = next;
+        count = output;
         return true;
     }
 };
