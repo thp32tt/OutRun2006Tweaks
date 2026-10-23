@@ -5365,7 +5365,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
          FAILED(game->GetRenderState(
              D3DRS_SEPARATEALPHABLENDENABLE, &separateAlpha))))
         return false;
-    if (blend != FALSE && separateAlpha != FALSE &&
+    // The authentic RT0 write mask controls alpha-state consumption.
+    // RGB-only (and depth-only) menu/car/race SM3 Draws must not fail
+    // merely because a dormant D3D9 independent-alpha query is unavailable.
+    // Alpha-writing Draws still query all three states and fail closed.
+    if (blend != FALSE &&
+        native_game_active_separate_alpha(separateAlpha, colorMask) &&
         (FAILED(game->GetRenderState(D3DRS_SRCBLENDALPHA, &srcBlendAlpha)) ||
          FAILED(game->GetRenderState(D3DRS_DESTBLENDALPHA, &dstBlendAlpha)) ||
          FAILED(game->GetRenderState(D3DRS_BLENDOPALPHA, &blendOpAlpha))))

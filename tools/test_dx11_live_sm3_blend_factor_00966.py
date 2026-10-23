@@ -134,4 +134,17 @@ require("blendOp, src, dst, activeSeparateAlpha, colorMask))", fvf)
 require("!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,", fvf)
 require("output.separateAlphaBlend = true;", fvf)
 assert fvf.index("if (activeSeparateAlpha) {") < fvf.index("D3DRS_SRCBLENDALPHA")
+
+# Actual shader-bound game Draw/DrawIndexed must query independent-alpha
+# render states only if alpha is written. Stale alpha in a RGB-only or
+# depth-only Draw must not abort the contiguous native game frame; actual
+# alpha-writing Draws still fail closed on failed source queries.
+require("native_game_active_separate_alpha(separateAlpha, colorMask)", game)
+require("if (blend != FALSE &&\\n        native_game_active_separate_alpha(separateAlpha, colorMask) &&", game)
+assert game.index("native_game_active_separate_alpha(separateAlpha, colorMask)") < game.index("D3DRS_SRCBLENDALPHA")
+for name in ("D3DRS_SRCBLENDALPHA", "D3DRS_DESTBLENDALPHA", "D3DRS_BLENDOPALPHA"):
+    require(name, game)
+# The shared helper is compiled with positive/negative masks by Windows Build.
+require("native_game_active_separate_alpha(\\n                  TRUE, D3DCOLORWRITEENABLE_RED |", src)
+
 print("PASS source: actual shader-bound and FVF RGB-mask independent-alpha/OM/fallback; runtime UNTESTED")
