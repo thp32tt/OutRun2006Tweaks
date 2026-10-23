@@ -127,6 +127,7 @@
   },
   "pending_items": [
     "Confirm historical 01015 policy repair passes Backend/Fast Gate without relaxing policy",
+    "Confirm 00964 interface regression accepts new ten interpolated plus two rasterizer system inputs, forbids VS misc",
     "Obtain exact-SHA five mandatory Actions success for native FACE source commit plus causal repair",
     "Confirm 01016 compiled FACE regression and final Win32 build/bundle",
     "Prove original OutRun game native Draw/visible game frame in real PC/Quest3 run before any gameplay/Quest3 PASS assertion"
@@ -136,12 +137,18 @@
     "dx11_fast_run_id": 39911643629,
     "head_sha": "08f2aaaf392b58dfd1146bdaa7972dd96f2e221f",
     "conclusion": "failure",
-    "cause": "Prior 01015 C6 run metadata missing mandatory 00672+ feature_contract and 00537+ gameplay_delivery_target; no evidence of C++ compiler error"
+    "cause": "Prior 01015 C6 run metadata missing mandatory 00672+ feature_contract and 00537+ gameplay_delivery_target; no evidence of C++ compiler error",
+    "additional_fast_00964": {
+      "run_id": 39912512240,
+      "reason": "Legacy test asserted literal pre-01016 capacity implementation, not bounded 10-varying plus 2-system raster rule",
+      "repair": "Preserve capacity negative guards and VS no-system-input semantics"
+    }
   },
   "runtime_note": "Real game/HMD/Quest3/FFB UNTESTED; test GPU geometry != playable game.",
   "repair_scope": [
     "docs/automation/runs/CONVERSION-DX11-01015.json",
     "tools/test_dx11_autodev_policy.py",
-    "docs/automation/runs/CONVERSION-DX11-01016.json"
+    "docs/automation/runs/CONVERSION-DX11-01016.json",
+    "tools/test_dx11_sm3_interface_draw_00964.py"
   ]
 }
