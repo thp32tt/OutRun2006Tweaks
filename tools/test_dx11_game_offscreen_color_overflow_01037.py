@@ -5,7 +5,14 @@ cpp=(root/"src/vr/d3d11/native_game_stereo_submission.cpp").read_text()
 hdr=(root/"src/vr/d3d11/native_game_stereo_submission.hpp").read_text()
 src=(root/"src/vr/d3d11/native_game_offscreen_color_provenance.hpp").read_text()
 assert "NativeGameOffscreenColorProvenanceState offscreenColorProvenance_" in hdr
-assert cpp.count("offscreenColorProvenance_.note_untracked_gpu_write();")==3
+# The 01038 auxiliary MRT recorder adds a fourth guarded native GPU write
+# path. Keep all original 01037 overflow rejection assertions AND require
+# that failed multi-output color attribution is also fail-closed.
+assert cpp.count("offscreenColorProvenance_.note_untracked_gpu_write();")==4
+mrt_record=cpp.split(
+    "bool NativeGameEyeDrawEncoder::remember_offscreen_color_outputs(", 1
+)[1].split("bool NativeGameEyeDrawEncoder::draw_offscreen(", 1)[0]
+assert "offscreenColorProvenance_.note_untracked_gpu_write();" in mrt_record
 assert cpp.count("offscreenColorProvenance_.allows_postpass(")==2
 assert "transferred != extraCount" in cpp
 assert "return !untrackedGpuWrite &&" in src
