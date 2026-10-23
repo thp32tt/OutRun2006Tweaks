@@ -25,10 +25,10 @@ def connected(source: str, header: str) -> bool:
         "if (s.sourceGameDevice == 0u) s.sourceGameDevice = current;" in owner,
         "const bool foreignSource =" in clear,
         "if (foreignSource && !env_full_game_opt_in()) return;" in clear,
-        "if (!foreignSource) {\n            s.clearColor.discard();\n            s.preDrawFills.discard();\n        }" in clear,
+        "if (!foreignSource) {\n            s.clearColor.discard();\n            s.preDrawFills.discard();\n            s.preDrawDepth.discard();\n        }" in clear,
         "GameNativeFrameBatch::can_reacquire_full_clear(" in clear,
         "if (foreignSource && !sourceReacquired) return;" in clear,
-        "if (foreignSource) {\n            s.clearColor.discard();\n            s.preDrawFills.discard();\n        }" in clear,
+        "if (foreignSource) {\n            s.clearColor.discard();\n            s.preDrawFills.discard();\n            s.preDrawDepth.discard();\n        }" in clear,
         0 <= clear.find("if (foreignSource && !sourceReacquired) return;") <
             clear.find("s.clearColor.record("),
         "if (sourceReacquired || s.sourceGameDevice == 0u)" in clear,
@@ -51,6 +51,11 @@ for old, new in (
     ("if (foreignSource && !sourceReacquired) return;", "if (false) return;"),
     ("if (sourceReacquired || s.sourceGameDevice == 0u)", "if (false)"),
     ("s.sourceGameDevice = sourceDevice;", "s.sourceGameDevice = 0u;"),
+    # Either owner handoff must retire its old pre-Draw Z transaction.
+    ("if (!foreignSource) {\n            s.clearColor.discard();\n            s.preDrawFills.discard();\n            s.preDrawDepth.discard();",
+     "if (!foreignSource) {\n            s.clearColor.discard();\n            s.preDrawFills.discard();"),
+    ("if (foreignSource) {\n            s.clearColor.discard();\n            s.preDrawFills.discard();\n            s.preDrawDepth.discard();",
+     "if (foreignSource) {\n            s.clearColor.discard();\n            s.preDrawFills.discard();"),
     ("if (!foreignSource) {\n            s.clearColor.discard();", "if (false) {\n            s.clearColor.discard();"),
     ("if (foreignSource) {\n            s.clearColor.discard();", "if (false) {\n            s.clearColor.discard();"),
 ):
