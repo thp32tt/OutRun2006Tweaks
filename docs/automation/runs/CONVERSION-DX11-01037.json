@@ -12,10 +12,10 @@
   "work_key": "DX11:LIVE_NATIVE_CAMERA_PIXEL_PROVENANCE_OVERFLOW",
   "feature_branch": "feature/dx11-01037-offscreen-postpass-overflow",
   "feature_base_sha": "f8fb48ef552b79b2e59c453bbe0eb64b7c0b55c1",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "feature_stage": "C4_RESULT",
-  "checkpoint": "C4_RESULT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -102,52 +102,92 @@
     "tools/test_dx11_native_eye_postpass_overwrite_00988.py",
     "tools/test_dx11_game_camera_safe_composite_00986.py"
   ],
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+  "validation_bearing_result_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Verify latest feature Fast/Backend CI after repairing old direct-admissibility regression tests; no fake playable status, then safely promote only successful exact SHA.",
+  "NEXT_IMPLEMENTATION_ACTION": "C6 SOURCE_ONLY verified; preserve R175 ownership and continue real D3D9 Draw to native D3D11 Draw to visible game frame integration. Do not claim HMD/gameplay PASS.",
   "full_dx11_renderer_complete": false,
   "acceptance_results": {
     "normal": {
-      "status": "PENDING_FEATURE_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_stereo_submission.cpp",
         "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
         "tools/dx11_game_offscreen_color_overflow_01037.cpp",
         "tools/test_dx11_game_offscreen_color_overflow_01037.py"
       ],
-      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o dx11_camera_overflow_01037 && ./dx11_camera_overflow_01037; exact SHA GitHub Actions"
+      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o /tmp/dx11_camera_overflow_01037 && /tmp/dx11_camera_overflow_01037; GitHub DX11 Fast Structural #40037241520 SUCCESS"
     },
     "overflow": {
-      "status": "PENDING_FEATURE_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_stereo_submission.cpp",
         "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
         "tools/dx11_game_offscreen_color_overflow_01037.cpp",
         "tools/test_dx11_game_offscreen_color_overflow_01037.py"
       ],
-      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o dx11_camera_overflow_01037 && ./dx11_camera_overflow_01037; exact SHA GitHub Actions"
+      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o /tmp/dx11_camera_overflow_01037 && /tmp/dx11_camera_overflow_01037; GitHub DX11 Fast Structural #40037241520 SUCCESS"
     },
     "fallback": {
-      "status": "PENDING_FEATURE_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_stereo_submission.cpp",
         "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
         "tools/dx11_game_offscreen_color_overflow_01037.cpp",
         "tools/test_dx11_game_offscreen_color_overflow_01037.py"
       ],
-      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o dx11_camera_overflow_01037 && ./dx11_camera_overflow_01037; exact SHA GitHub Actions"
+      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o /tmp/dx11_camera_overflow_01037 && /tmp/dx11_camera_overflow_01037; GitHub DX11 Fast Structural #40037241520 SUCCESS"
     },
     "gate": {
-      "status": "PENDING_FEATURE_CI",
+      "status": "PASS_EXACT_SHA",
       "evidence_paths": [
         "src/vr/d3d11/native_game_stereo_submission.cpp",
         "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
         "tools/dx11_game_offscreen_color_overflow_01037.cpp",
         "tools/test_dx11_game_offscreen_color_overflow_01037.py"
       ],
-      "validation_command": "python tools/test_dx11_game_offscreen_color_overflow_01037.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o dx11_camera_overflow_01037 && ./dx11_camera_overflow_01037; exact SHA GitHub Actions"
+      "validation_command": "GitHub Actions all five exact SHA SUCCESS: DX11 Fast Structural Checks #40037241520; Build #40037241587; OpenXR VR architecture #40037241529; OutRun EXE HUD Inspector CI #40037245142; Backend Conversion Gate #40037241547"
     }
   },
-  "feature_ready": false
+  "feature_ready": true,
+  "feature_last_head": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+  "ci_validation_runs": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40037241520,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037241520"
+    },
+    {
+      "name": "Build",
+      "run_id": 40037241587,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037241587"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40037241529,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037241529"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40037245142,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037245142"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40037241547,
+      "head_sha": "8af76f66d472c00a3b63d8771ca27b8376e3ea4b",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40037241547"
+    }
+  ],
+  "c6_summary": "Five mandatory GitHub exact-SHA Gates SUCCESS on 8af76f66d472c00a3b63d8771ca27b8376e3ea4b; untracked native camera Draw/partial Clear provenance fails closed before GPU COPY/STRETCH while original D3D9Ex Draw/input/FFB remain authoritative. Source-only stage; live game native L/R output and Quest3 HMD untested.",
+  "ci_failure_cause": null
 }
