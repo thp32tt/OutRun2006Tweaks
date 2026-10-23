@@ -10,13 +10,13 @@
   "classification": "A",
   "feature_id": "DX11:FULLFRAME_PREDRAW_D3D110_COLORFILL_GPU_REPLAY",
   "work_key": "DX11:FULLFRAME_PREDRAW_D3D110_COLORFILL_GPU_REPLAY",
-  "status": "PENDING_EXACT_SHA_GATE",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "score_change": 0,
-  "score_award_event": false,
+  "score_change": 1,
+  "score_award_event": true,
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
   "native_game_draw_count": "UNTESTED",
@@ -92,9 +92,52 @@
     "docs/automation/runs/CONVERSION-DX11-01033.json"
   ],
   "source_head": "432f21a40db37797c7b6febfa446a91281d5717c",
-  "material_result_sha": "",
-  "validation_bearing_result_sha": "",
+  "material_result_sha": "58386db6f20d7dd81a7910e93d124081ebca6460",
+  "validation_bearing_result_sha": "58386db6f20d7dd81a7910e93d124081ebca6460",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Wait for mandatory exact-SHA GitHub Actions; repair only evidenced failures on this task; Quest3 gameplay remains untested",
-  "ci_failure_cause": "Original material result c3867668ee489974f6605cec0cfa93316445c7cc failed DX11 Fast / Backend policy acceptance solely due to omitted mandatory live_game_draw_path metadata. Exact-SHA failure repair retains source implementation; no test/guard bypass."
+  "NEXT_IMPLEMENTATION_ACTION": "RUNTIME_VALIDATION=UNTESTED; no playable claim; separate Quest3/menu-to-race verification required.",
+  "ci_failure_cause": "Original material result c3867668ee489974f6605cec0cfa93316445c7cc failed DX11 Fast / Backend policy acceptance solely due to omitted mandatory live_game_draw_path metadata. Exact-SHA failure repair retains source implementation; no test/guard bypass.",
+  "feature_stage": "C6_STATE",
+  "acceptance_results": {
+    "sm3": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_replay.hpp",
+        "tools/dx11_pre_draw_colorfill_gpu_probe_01033.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks; Backend Conversion Gate Win32"
+    },
+    "fvf": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_replay.hpp"
+      ],
+      "validation_command": "GitHub Build Win32 Release"
+    },
+    "fallback": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_pre_draw_replay.hpp",
+        "tools/dx11_pre_draw_colorfill_gpu_probe_01033.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 01033 portable probe"
+    },
+    "gate": {
+      "status": "PASS",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01033.json"
+      ],
+      "validation_command": "GitHub Actions exact-SHA 5/5 SUCCESS"
+    }
+  },
+  "ci_validation_runs": {
+    "DX11 Fast Structural Checks": 40018748678,
+    "Backend Conversion Gate": 40018748729,
+    "Build": 40018748679,
+    "OpenXR VR architecture": 40018748666,
+    "OutRun EXE HUD Inspector CI": 40018748723
+  }
 }
