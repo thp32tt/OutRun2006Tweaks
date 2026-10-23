@@ -26,6 +26,9 @@ on:
       - 'tools/analyze_outrun_exe.py'
       - 'tools/test_dx11_first_game_frame_regressions.py'
       - 'tools/test_dx11_*.py'
+      # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
+      - 'tools/dx11_sm3_*_probe.cpp'
+      - 'tools/dx11_live_sm3_texkill_01013.cpp'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
@@ -68,6 +71,9 @@ on:
       - 'tools/analyze_outrun_exe.py'
       - 'tools/test_dx11_first_game_frame_regressions.py'
       - 'tools/test_dx11_*.py'
+      # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
+      - 'tools/dx11_sm3_*_probe.cpp'
+      - 'tools/dx11_live_sm3_texkill_01013.cpp'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'

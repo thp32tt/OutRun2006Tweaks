@@ -16,7 +16,7 @@
   "status": "SOURCE_IMPLEMENTED_CI_PENDING",
   "checkpoint": "C2_IMPLEMENTED_CI_PENDING",
   "feature_base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
-  "feature_last_head": "c213b60732517fa7ffaa4544a40166ea9e8f0de9",
+  "feature_last_head": "1990c180bba27ccfa58f87c032e83751d9411c7b",
   "source_head": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
   "material_result_sha": "c213b60732517fa7ffaa4544a40166ea9e8f0de9",
   "result_sha": "c213b60732517fa7ffaa4544a40166ea9e8f0de9",
@@ -96,7 +96,8 @@
     ".github/workflows/backend-conversion-gate.yml",
     ".github/workflows/vr-openxr.yml",
     ".github/workflows/build.yml",
-    ".github/workflows/outrun-exe-hud-inspector.yml"
+    ".github/workflows/outrun-exe-hud-inspector.yml",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
   ],
   "acceptance_results": {},
   "ci": {
@@ -108,10 +109,14 @@
       "Build",
       "OpenXR VR architecture",
       "OutRun EXE HUD Inspector CI"
-    ]
+    ],
+    "failed_sha": "0f4c9f0074e215a638d63ee2b1dacaa12a62772c",
+    "failure_reason": "DX11 Fast structural on previous feature SHA failed: legacy tools/dx11_sm3_arithmetic_codegen_probe.cpp:214 expected unsupported uninitialized TEMP.w; validated correct xyz-only TEXKILL and fixed old assertion in 1990c180.",
+    "test_repair_sha": "1990c180bba27ccfa58f87c032e83751d9411c7b",
+    "targeted_test": "DX11 Fast Structural Checks SUCCESS exact 1990c180bba27ccfa58f87c032e83751d9411c7b, run_id 39892262400; mandatory full exact-SHA five gates pending newer feature CI."
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Real game D3D9 source acceptance counts not reproduced in this environment; next task is actual menu/car/race Draw capture and first genuine published native frame.",
-  "next_implementation_action": "Run five actual Actions on exact feature SHA. Repair only causal failures on same TASK_ID; then if 5/5 PASS record FEATURE_READY, compare behind=0, target expected_sha force=false, verify target gates+bundle. If actual frame still UNTESTED never claim gameplay.",
+  "next_implementation_action": "CI-only repair on same feature: make OpenXR/HUD triggers include actual changed C++ probe file, run all five mandatory Actions on final exact SHA; if 5 PASS and all bounded acceptance covered, FEATURE_READY then promote behind=0 expected SHA force=false.",
   "RUNTIME_VALIDATION_NOTES": "No local game or Quest3/VDXR HMD test performed; game GPU Draw/native published frame counters UNTESTED. CI confirms compiler/structural correctness only."
 }
