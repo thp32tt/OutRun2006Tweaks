@@ -1,0 +1,55 @@
+{
+  "schema": "outrun.c1.idle.v1",
+  "run_key": "OUTRUN-C1-20261023T1745KST-IDLE",
+  "role": "C1",
+  "status": "IDLE",
+  "checked_at_kst": "2026-10-23T17:47:52+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before": "20044cdc601e6384d4c2f78e2d48e2157bb5ebe4",
+  "policy_files_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_inventory": {
+    "root": "/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "sources": [
+      "export_evidence/*.json",
+      "candidate_outputs/A/*.png",
+      "candidate_outputs/B/*.png",
+      "inputs/*.png",
+      "production_manifest.json",
+      "/home/chatgpt-runner2/work/image-src/sent"
+    ],
+    "historical_candidate_sha256": 618,
+    "new_unreviewed_sha256": 0,
+    "selection_limit_per_role": 4,
+    "selection_limit_total": 8,
+    "scope": "only producer export-evidenced files present on N100, with source and output existing",
+    "local_metrics": "work/C1_QA_20261023_1745_metrics.json",
+    "local_inventory_script": "work/C1_QA_20261023_1745_check.py"
+  },
+  "qa_actions": {
+    "reviewed_new": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "imagegen_calls": 0,
+    "ab_queue_consumed": 0,
+    "final_dds_written": 0,
+    "game_deployed": 0,
+    "c2_c3_ingame_pass_created": 0
+  },
+  "reason": "All eligible currently exported and locally available A/B candidate PNG SHA256 values already present in C1 historical QA metrics or reports; no new unique SHA to review.",
+  "quality_policy": "Korean overall line-width underfill or slightly smaller readable glyphs alone are not FAIL; no speculative rework.",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "score_reason": "Status recheck with zero new C1-reviewed candidates is not a new scored achievement.",
+  "out_of_scope_untouched": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
