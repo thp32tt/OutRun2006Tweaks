@@ -77,7 +77,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "activation_guard_and_fallback": "Native remains explicit opt-in; original D3D9/FFB input and DX9Ex fallback unaffected; DXVK frozen",
-    "visible_frame_acceptance": "SOURCE_ONLY RUNTIME_UNTESTED"
+    "visible_frame_acceptance": "SOURCE_ONLY RUNTIME_UNTESTED",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -90,5 +95,6 @@
   "material_result_sha": "",
   "validation_bearing_result_sha": "",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Wait for mandatory exact-SHA GitHub Actions; repair only evidenced failures on this task; Quest3 gameplay remains untested"
+  "NEXT_IMPLEMENTATION_ACTION": "Wait for mandatory exact-SHA GitHub Actions; repair only evidenced failures on this task; Quest3 gameplay remains untested",
+  "ci_failure_cause": "Original material result c3867668ee489974f6605cec0cfa93316445c7cc failed DX11 Fast / Backend policy acceptance solely due to omitted mandatory live_game_draw_path metadata. Exact-SHA failure repair retains source implementation; no test/guard bypass."
 }
