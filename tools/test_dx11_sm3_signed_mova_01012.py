@@ -16,8 +16,8 @@ require("staticAddressReady = true" in backend and
         "reg, staticAddressIndex," in backend and
         "int address = 0;" in backend,
         "authentic game shader MOVA offset routed to constant and matrix source")
-require("_HLSL_MATERIALIZER_V13" in backend and
-        "_TEX2D_IFC_PROVENANCE_V13" in backend,
+require("_HLSL_MATERIALIZER_V14" in backend and
+        "_TEX2D_IFC_PROVENANCE_V14" in backend,
         "invalidate old shader artifact identity")
 require("fraction == 0.5f" in address and
         "static_cast<long long>(base) + address" in address,
