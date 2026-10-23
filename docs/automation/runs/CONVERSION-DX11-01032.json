@@ -2,8 +2,8 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01032",
   "production_id": "CONVERSION-DX11-01032",
-  "event_id": "CONVERSION-DX11-01032-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-01032-E002",
+  "event_type": "retry",
   "target_branch": "vr-dx11-native-r71",
   "lane": "DX11",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01032",
@@ -11,7 +11,7 @@
   "feature_id": "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW",
   "work_key": "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW",
   "status": "AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL",
+  "checkpoint": "C4_CAUSAL_CI_REPAIR",
   "automation_validation": "PENDING_EXACT_SHA",
   "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -52,7 +52,8 @@
         "behavior_area": "Exact_SHA",
         "expected_behavior": "Portable positive/negative C++ regression and five mandatory GitHub Actions gates"
       }
-    ]
+    ],
+    "feature_id": "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -77,16 +78,23 @@
       "DX11:LIVE_SM3_POLYGON_RASTER_NATIVE_DRAW"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "activation_guard_and_fallback": "native opt-in only, original D3D9 game Draw/Present/input/FFB and DXVK freeze preserved"
+    "activation_guard_and_fallback": "native opt-in only, original D3D9 game Draw/Present/input/FFB and DXVK freeze preserved",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY RUNTIME_UNTESTED: source-authored real D3D9 Draw/DrawIndexed -> native full-resolution D3D11 polygon GPU Draw -> visible frame publication candidate; actual complete frame, Quest3/VDXR parity and input remain UNTESTED"
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Game/Quest3 visible frame and eye output not runtime observed",
-  "NEXT_IMPLEMENTATION_ACTION": "Check exact-SHA CI and only repair causal errors",
+  "NEXT_IMPLEMENTATION_ACTION": "After exact-SHA mandatory GitHub Actions gates, repair only evidenced compile/acceptance failures under same 01032 ID; test actual game/HMD separately",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
     "tools/dx11_sm3_polygon_raster_probe_01032.cpp",
     ".github/workflows/dx11-fast-structural.yml",
     "docs/automation/runs/CONVERSION-DX11-01032.json"
-  ]
+  ],
+  "material_result_sha": "0a06a4af20f91b9d580830962ab70a4913ff5a2d"
 }
