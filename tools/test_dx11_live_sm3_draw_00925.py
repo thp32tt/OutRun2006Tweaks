@@ -34,7 +34,7 @@ for condition in (
 for rejection in (
     "if (fog != FALSE) {",
     "if (clipPlanes != 0u) {",
-    "if (fill != D3DFILL_SOLID) {",
+    "fill != D3DFILL_SOLID && (!(pointFill || wireFill) || !triangleFamily)",
     "D3DRS_ALPHAFUNC", "D3DRS_ALPHAREF", "alphaRef > 255u",
     "alphaFunc < D3DCMP_NEVER", "alphaFunc > D3DCMP_ALWAYS",
     "pipeline.alphaCompare != alphaFunc", "pipeline.alphaReference",
@@ -146,6 +146,35 @@ check("game_sm3_expand_list_instance_indices(" in source and
       "if (instance >= nativeSubmissionCount) break;" in source,
       "SM3 indexed game instance expansion/fallback contract missing")
 
+# 01032: actual captured polygon fill is no longer SOLID-only. Native
+# WIREFRAME must bind a real wire raster with original source culling/scissor;
+# POINT must materialize source triangle occurrences into an indexed POINTLIST
+# only after point-size/sprite/culling and source bounds are checked. This is
+# source-to-GPU regression coverage, not proof of real game/HMD parity.
+for token in (
+    "const bool pointFill = fill == D3DFILL_POINT;",
+    "const bool wireFill = fill == D3DFILL_WIREFRAME;",
+    "fill != D3DFILL_SOLID && (!(pointFill || wireFill) || !triangleFamily)",
+    "game_sm3_polygon_fill_admitted(fill, type, cull,",
+    "game_sm3_expand_polygon_points(pointTopology, nativeIndices,",
+    "nativeIndices = pointFillIndices.data();",
+    "desc.FillMode = D3D11_FILL_WIREFRAME;",
+    "(pointFill && !game_sm3_polygon_fill_admitted(",
+    "pointFill || type == D3DPT_POINTLIST ?",
+    "if (!liveRaster) return false;",
+):
+    # The optional raster guard is represented by checked CreateRasterizerState
+    # rather than a generic non-null test; keep all required GPU checks exact.
+    if token == "if (!liveRaster) return false;":
+        check("if (FAILED(device->CreateRasterizerState(" in source,
+              "unvalidated wire rasterizer GPU creation")
+    else:
+        check(token in source, "missing actual native D3D9 polygon conversion: " + token)
+    # Deleting the single source signal must invalidate the acceptance probe.
+    if token != "if (!liveRaster) return false;":
+        check(token not in source.replace(token, "", 1),
+              "polygon source mutation escaped: " + token)
+
 # The SM3 real-game fan expansion changes the physical index buffer owner.
 # The exact post-conversion pointer/count must be checked before the dynamic
 # D3D11 upload; do not silently validate only the old D3D9 index pointer.
@@ -168,7 +197,7 @@ for token in (
     "D3D11_PRIMITIVE_TOPOLOGY_LINELIST",
     "D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP",
     "type == D3DPT_LINELIST ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :",
-    "context->IASetPrimitiveTopology(type == D3DPT_POINTLIST ?",
+    "context->IASetPrimitiveTopology(pointFill || type == D3DPT_POINTLIST ?",
     "D3D11_PRIMITIVE_TOPOLOGY_POINTLIST",
 ):
     check(token in source, "live SM3 game point/line GPU routing absent: " + token)
@@ -179,7 +208,7 @@ for token in (
 # original D3D9 before native pipeline/upload mutation.
 for token in (
     "type != D3DPT_POINTLIST && type != D3DPT_TRIANGLELIST",
-    "if (type == D3DPT_POINTLIST) {",
+    "if (type == D3DPT_POINTLIST || pointFill) {",
     "D3DRS_POINTSIZE, &size",
     "D3DRS_POINTSIZE_MIN, &minimum",
     "D3DRS_POINTSIZE_MAX, &maximum",
