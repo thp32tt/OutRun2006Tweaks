@@ -231,23 +231,42 @@ check("!antialiased && lastPixel" in span_header and
       "game_native_sm3_line_raster(3u, false, true)" in span_header,
       "live SM3 D3D9 line raster unsupported-state fallback absent")
 
-# SM3 first-Draw source ColorFill must be replayed as actual GPU ClearView
-# BEFORE native Draw and only after matching owner, extent and D3D11.1.
+# SM3 first-Draw source ColorFill must be replayed as actual native GPU
+# pixel writes BEFORE native Draw. D3D11.1 ClearView is optional: older
+# devices use the same bounded native shader raster as post-Draw ColorFill.
+# Require owner/extent proof and both GPU paths (not a guard bypass).
 check("s.preDrawFills.count != 0u || viewport.Width" not in source,
       "real SM3 source ColorFill still rejected unconditionally")
 for token in (
     "s.preDrawFills.replay_ready(", "s.clearColor.matches(owner, targetId)",
     "IID_PPV_ARGS(preDrawContext.GetAddressOf())",
-    "preDrawContext->ClearView(s.backend.color_rtv(), rgba, &rect, 1u)",
-    "s.clearColor.opaqueDestinationAlpha ? 1.0f",
+    "game_native_replay_pre_draw_fills(",
+    "preDrawContext->ClearView(",
+    "native_game_raster_partial_backbuffer_color_clear(",
+    "s.clearColor.opaqueDestinationAlpha, preDrawContext != nullptr,",
     "s.preDrawFills.discard();",
 ):
-    check(token in source, "live SM3 pre-Draw replay missing: " + token)
+    check(token in source, "live SM3 pre-Draw GPU replay missing: " + token)
 check(source.index("s.preDrawFills.replay_ready(") <
       source.index("upload_full_game_stream(") <
-      source.index("preDrawContext->ClearView(") <
+      source.index("game_native_replay_pre_draw_fills(") <
       source.index("context->DrawIndexed(nativeIndexCount"),
-      "SM3 pre-Draw validation/replay must precede GPU draw")
+      "SM3 pre-Draw owner/extent validation and native replay must precede actual GPU Draw")
+check("if (!replayed) return false;" in source,
+      "failed pre-Draw GPU raster must not publish an incomplete native scene")
+replay_header = (ROOT / "src/vr/d3d11/native_game_pre_draw_replay.hpp").read_text()
+for token in (
+    "fills.replay_ready(owner, target, width, height)",
+    "clearViewAvailable ? clearView(tile) : raster(tile)",
+    "fill.left, fill.top, fill.right, fill.bottom",
+    "opaqueAlpha ? 1.0f",
+    "return false;",
+):
+    check(token in replay_header, "real D3D11.0/1 native pre-Draw ColorFill fallback missing: " + token)
+check("if (!replayContext)" in bridge and
+      "replayContext->ClearView(" in bridge and
+      "s.clearColor.opaqueDestinationAlpha, replayContext != nullptr," in bridge,
+      "fixed-function full-game Draw missing real D3D11.0/1 replay connection")
 fill_header = (ROOT / "src/vr/d3d11/native_game_source_mutation.hpp").read_text()
 for token in (
     "constexpr bool replay_ready(", "!belongs_to(currentDevice, currentBackbuffer)",
