@@ -81,8 +81,12 @@
       "negative_regression": "tools/test_dx11_pre_draw_target_clear_01035.py",
       "component_integration": "src/vr/d3d11/live_game_frame_bridge.cpp"
     },
-    "live_game_draw_path": "successful game Clear -> source-owned pre-Draw tiles -> D3D11 GPU SM3/FVF Draw",
-    "visible_frame_acceptance": "game pixel parity by source probe, HMD not run",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-tested D3D9 Clear/ColorFill precede game SM3/FVF Draw -> D3D11.1 ClearView or D3D11.0 GPU raster -> guarded full-resolution native frame output; real game/HMD observation UNTESTED.",
     "activation_guard_and_fallback": "opt-in existing diagnostic native path; original D3D9 Clear/Draw/Present untouched"
   },
   "changed_files": [
@@ -135,5 +139,6 @@
         "tools/test_dx11_pre_draw_target_clear_01035.py"
       ]
     }
-  }
+  },
+  "ci_failure_cause": "Exact-SHA Fast 40029022171: 01035 run strategy live_game_draw_path was prose instead of required ordered callsite/native Draw/visible output stage array; fixed metadata only, safety gates unchanged."
 }
