@@ -10,15 +10,15 @@
   "classification": "A",
   "feature_id": "DX11:SIGNED_SM3_LOOP_NATIVE_CONSTANT_DRAW",
   "work_key": "DX11:SIGNED_SM3_LOOP_NATIVE_CONSTANT_DRAW",
-  "checkpoint": "C5_CI_REPAIR",
-  "feature_stage": "C5_CI_REPAIR",
-  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "source_head": "85670dc9a3fa25c1e1c664fa156f2dcce8ee2550",
   "material_result_sha": "3c6e26ef7ed593bfb7b367d00cf4552d5ed36f2f",
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
-  "AUTOMATION_VALIDATION": "PENDING",
+  "result_sha": "c7c91c16dd306781650c68290606063410557024",
+  "validation_bearing_result_sha": "c7c91c16dd306781650c68290606063410557024",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -106,10 +106,10 @@
     "tools/test_dx11_live_sm3_partial_color_01009.py"
   ],
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "REAL_GAME_DRAW_BLOCKER": "Need exact SHA mandatory CI and actual real-game observation",
+  "REAL_GAME_DRAW_BLOCKER": "No actual game or Quest3/VDXR measurements on validation SHA; CI is build/source verification only.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "NEXT_IMPLEMENTATION_ACTION": "Same ID causal CI repair then separate C6 status",
+  "NEXT_IMPLEMENTATION_ACTION": "C6 BUILD_VERIFIED complete; defer runtime promotion to actual OutRun desktop/Quest3/VDXR, gamepad/FFB tests, and controller-owned next independent feature.",
   "repair_evidence": {
     "classification": "B",
     "failure_exact_sha": "3c6e26ef7ed593bfb7b367d00cf4552d5ed36f2f",
@@ -118,5 +118,82 @@
     "causal_error": "01009 partial-color text regression still demanded the old shader compiler parameter-list token after real VS/PS signed indexed lower bounds were wired",
     "change": "Update 01009 to assert both original pixelWrittenColorMask argument and new pixelIndexedLower plus candidate indexed lower metadata",
     "full_gate_plan": "one_validation_bearing_sha"
-  }
+  },
+  "feature_ready": true,
+  "c6_recovery_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "gate_evidence": {
+    "source_sha": "c7c91c16dd306781650c68290606063410557024",
+    "material_source_sha": "3c6e26ef7ed593bfb7b367d00cf4552d5ed36f2f",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39980986865,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39980986678,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39980986726,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39980986690,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39980986732,
+        "conclusion": "success"
+      }
+    },
+    "ci_repair_sha": "c7c91c16dd306781650c68290606063410557024",
+    "original_causal_failure_run_id": 39980682963,
+    "verification_basis": "All five required push GitHub Actions completed success at the exact same validation-bearing source SHA; no build or workflow rerun performed during C6."
+  },
+  "acceptance_results": {
+    "static": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_repeat_flow.hpp",
+        "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+        "tools/dx11_sm3_signed_loop_index_probe_01028.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39980986865: compiled signed static loop and matrix positive/negative probe."
+    },
+    "dynamic": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_backend.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_sm3_signed_loop_index_01028.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39980986865: VS/PS integer c[base+aL] lower/upper game Draw source wiring and portable runtime-domain probe."
+    },
+    "fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_repeat_flow.hpp",
+        "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+        "tools/dx11_sm3_signed_loop_index_probe_01028.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39980986865: invalid signed indexed address, loop and DEF alias negative regressions; real-game fallback not observed."
+    },
+    "gates": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01028.json",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Exact SHA c7c91c16dd306781650c68290606063410557024: Fast 39980986865, Backend 39980986678, Windows Build 39980986726, OpenXR 39980986690, HUD 39980986732; completed success 5/5."
+    }
+  },
+  "pending_items": [
+    "Desktop game native menu -> car selection -> race visible Draw/frame runtime correctness remains UNTESTED.",
+    "Quest 3 / VDXR and gamepad/FFB runtime testing remains UNTESTED."
+  ]
 }
