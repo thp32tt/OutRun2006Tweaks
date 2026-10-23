@@ -48,8 +48,8 @@ with tempfile.TemporaryDirectory() as directory:
         "-o", str(exe)], check=True)
     subprocess.run([str(exe)], check=True)
 
-# Source-linked, compiled positive/negative coverage for native shader
-# front-face arithmetic and mixed screen-position composition.
+    # Source-linked, compiled positive/negative coverage for native shader
+    # front-face arithmetic and mixed screen-position composition.
     arithmetic = Path(directory) / "face_arithmetic.cpp"
     arithmetic.write_text(r"""
 #include "native_sm3_interface_channels.hpp"
