@@ -12,7 +12,7 @@
   "work_key": "DX11:LIVE_NATIVE_PREDRAW_COLORFILL_OVERDRAW",
   "feature_branch": "feature/dx11-01034-live-predraw-fill-overdraw",
   "feature_base_sha": "d4fcfd07e4a4f2d685e896f24cc1473c3da921ef",
-  "feature_last_head": "8af7ffdf978598e50d85b115cd1db638a69932eb",
+  "feature_last_head": "d2e2d8a2891cc520e1ad1ce7bd9fe2474d1bd126",
   "status": "FEATURE_READY",
   "feature_stage": "FEATURE_READY",
   "checkpoint": "C3_FEATURE_READY",
@@ -70,7 +70,8 @@
       "src/vr/d3d11/native_game_source_mutation.hpp",
       "src/vr/d3d11/live_game_frame_bridge.cpp (existing source admission)",
       "src/vr/d3d11/native_game_pre_draw_replay.hpp (existing replay)",
-      "tools/dx11_pre_draw_overdraw_probe_01034.cpp"
+      "tools/dx11_pre_draw_overdraw_probe_01034.cpp",
+      "tools/dx11_native_frame_batch_probe.cpp (existing native frame invariant updated for lossless overdraw)"
     ],
     "acceptance_proof": {
       "positive_probe": "16 stripes then 17th covering pixel parity and count 1; nested overlapping colors retain D3D9 source result",
@@ -93,11 +94,12 @@
   "changed_files": [
     "src/vr/d3d11/native_game_source_mutation.hpp",
     "tools/dx11_pre_draw_overdraw_probe_01034.cpp",
+    "tools/dx11_native_frame_batch_probe.cpp",
     ".github/workflows/dx11-fast-structural.yml",
     "docs/automation/runs/CONVERSION-DX11-01034.json"
   ],
   "source_head": "d4fcfd07e4a4f2d685e896f24cc1473c3da921ef",
-  "material_result_sha": "8af7ffdf978598e50d85b115cd1db638a69932eb",
+  "material_result_sha": "ee9db1923bbeb04dbed046267f98a0cc737fcf66",
   "validation_bearing_result_sha": "",
   "acceptance_results": {
     "overdraw": {
@@ -129,14 +131,15 @@
       "status": "PASS",
       "evidence_paths": [
         "tools/dx11_pre_draw_overdraw_probe_01034.cpp",
-        ".github/workflows/dx11-fast-structural.yml"
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/dx11_native_frame_batch_probe.cpp"
       ],
-      "validation_command": "N100 isolated g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic; exit 0"
+      "validation_command": "N100 isolated g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic; exit 0; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. dx11_native_frame_batch_probe.cpp -o legacy_probe01034 && ./legacy_probe01034 (PASS)"
     }
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_source_mutation.hpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Recheck feature CI at new exact record SHA; promote with behind=0 + expected target HEAD + force=false only after required feature validation. Do not claim real HMD/gameplay.",
+  "NEXT_IMPLEMENTATION_ACTION": "Check feature exact-SHA Fast/Build CI after failure regression repair; only with successful required feature gates compare behind=0 then target fast-forward expected_sha force=false and check mandatory 5 Actions; runtime still UNTESTED.",
   "ci_validation_runs": {},
   "feature_ready": true,
-  "ci_failure_cause": "Feature Fast Structural Checks 40024303069 policy step rejected missing required integrated_validation acceptance category; no C++ or regression logic failure. Contract item test recategorized; feature C++ stays unchanged."
+  "ci_failure_cause": "Fast run 40024303069: missing integrated_validation category, repaired; run 40024416208: legacy frame-batch static_assert assumed overwritten same-RECT ColorFills must consume all 16 slots. Test now uses 16 actually distinct disjoint writes and checks overflow + later superseding ColorFill (no production workaround or guard bypass)."
 }
