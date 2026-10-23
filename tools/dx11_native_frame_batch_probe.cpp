@@ -29,11 +29,21 @@ constexpr bool native_predraw_color_fill_regression() {
         queue.record(11, 101, 10, 10, 10, 12, 640, 480, 0) ||
         queue.record(11, 101, 9, 8, 8, 12, 640, 480, 0))
         return false;
-    for (std::uint32_t i = 4; i < GameNativePreDrawFills::kCapacity; ++i)
-        if (!queue.record(11, 101, 1, 1, 3, 3, 640, 480, i))
+    // Fill the remaining slots with actually disjoint source pixels.
+    // Repeatedly overwriting the same tile no longer consumes new slots:
+    // later D3D9 ColorFill replaces completely covered prior pixels.
+    for (std::uint32_t i = 4; i < GameNativePreDrawFills::kCapacity; ++i) {
+        const auto x = 200 + static_cast<std::int64_t>(i - 4u) * 3;
+        if (!queue.record(11, 101, x, 200, x + 2, 202, 640, 480, i))
             return false;
+    }
+    // The 17th unrelated write still fails closed without modifying the
+    // source ledger; a new covering write instead retires its 12 older tiles.
     if (queue.count != GameNativePreDrawFills::kCapacity ||
-        queue.record(11, 101, 1, 1, 3, 3, 640, 480, 999))
+        queue.record(11, 101, 240, 200, 242, 202, 640, 480, 999) ||
+        queue.count != GameNativePreDrawFills::kCapacity ||
+        !queue.record(11, 101, 200, 200, 236, 202, 640, 480, 0xff445566u) ||
+        queue.count != 5u || queue.entries[4].argb != 0xff445566u)
         return false;
     queue.discard(); // new full TARGET Clear / Reset / Present
     return queue.count == 0u && !queue.belongs_to(11, 101) &&
