@@ -1,0 +1,54 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261023T2245KST-NEW-SHA",
+  "role": "C1",
+  "status": "IDLE",
+  "checked_at_kst": "2026-10-23T22:49:29.198868+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_record": "999aee5ef767ed1b02d9853a44806c2217d9a9e6",
+  "sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "n100_metrics_path": "work/C1_QA_20261023_2245_metrics.json",
+  "producer_candidate_png_counts": {
+    "A": 279,
+    "B": 334,
+    "total": 613
+  },
+  "producer_export_evidence_files": 126,
+  "previously_recorded_candidate_sha256_count": 618,
+  "local_outputs_missing_producer_export_evidence": {
+    "A": 0,
+    "B": 0
+  },
+  "producer_export_evidence_missing_local_outputs": {
+    "A": 0,
+    "B": 0
+  },
+  "new_unique_candidate_sha_count": 0,
+  "verdict_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "notes": "At 22:49 KST no producer-evidenced N100 A/B candidate PNG had a SHA absent from previous C1 local reports. No identical-SHA re-review. IDLE does not imply historical candidate approval, full-asset QA or in-game PASS.",
+  "role_boundaries": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "game_deployed": false,
+    "c2_c3_or_ingame_pass_created": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score": {
+    "ai": "AI 1",
+    "ssot": "thp32tt/ai-dev-lab@e0fdb62493ab7a2865a2842df0657c25452d6541:AI_SCOREBOARD.md",
+    "previous_confirmed": 1753,
+    "delta": 0,
+    "current": 1753,
+    "reason": "No new unique SHA candidate or substantive QA result; status-only IDLE."
+  }
+}
