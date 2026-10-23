@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01029",
+  "production_id": "CONVERSION-DX11-01029",
+  "event_id": "CONVERSION-DX11-01029-E001",
+  "event_type": "dispatch",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01029",
+  "lane": "DX11",
+  "classification": "A",
+  "feature_id": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
+  "work_key": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
+  "checkpoint": "C4_MATERIAL",
+  "feature_stage": "C4_MATERIAL",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "source_head": "c5dd530d3288674e07af779ab9a4dfdeeff27233",
+  "material_result_sha": null,
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "AUTOMATION_VALIDATION": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "D3D9 16 authored vertex streams, sparse physical VB/IB/UP shadow and instance-step data into native D3D11 SM3 shader Draw/DrawIndexed; preserve original DX9Ex/gamepad/FFB fallback.",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
+    "goal": "Permit live game programmable shader Draw to use D3D9 streams 4..15 with faithful authored packed attributes and D3D9 instance rates; fail closed without changing original gameplay.",
+    "acceptance_items": [
+      {
+        "id": "capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Live_D3D9_Draw",
+        "expected_behavior": "Hook gathers all source-epoch SM3 stream slots 0..15 including sparse game indices"
+      },
+      {
+        "id": "native",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native_D3D11_Draw",
+        "expected_behavior": "SM3 shader IA consumes stream 4 and stream 15 attributes with correct source instance stepping in Draw/DrawIndexed"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex_Input",
+        "expected_behavior": "Missing/stale 16th stream or invalid byte budget returns original D3D9 Draw/Present with no partial packed GPU source"
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "C6_Exact_SHA",
+        "expected_behavior": "Portable positive and negative C++ probe and unchanged mandatory five full GitHub workflow gates"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "D3D9 R30 intercepted game Draw VB/UP source epoch -> all 16 stream snapshots",
+      "D3D11 real game shader declaration -> 16-stream FLOAT4 IA -> native Draw/DrawIndexed and original D3D9 fallback"
+    ],
+    "batch_components": [
+      "stereo_renderer_r30.cpp + live_game_frame_bridge.hpp",
+      "live_game_frame_bridge.cpp + live_game_sm3_stream_assembly.hpp",
+      "01029 portable positive/negative C++ probe and 00992 native instancing regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source streams 0/4/15 and mixed instance frequency to native packed SM3 IA",
+      "negative_regression": "Missing/stale high stream, out-of-range stream and upload-size bounds",
+      "component_integration": "R30 capture -> 16-stream shader source -> D3D11 native geometry Draw"
+    },
+    "conflict_keys": [
+      "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Native opt-in unchanged; source D3D9 Draw/Present, gamepad, FFB and DX9Ex preserved; DXVK frozen",
+    "visible_frame_acceptance": "SOURCE_ONLY, RUNTIME_UNTESTED",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "live_game_draw_path_scope": "Connected C++ path only; HMD/native live game screenshot UNTESTED."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/dx11_live_sm3_instancing_00992.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_sm3_multistream_game_draw_probe_01029.cpp",
+    "tools/test_dx11_sm3_multistream_game_draw_01029.py",
+    "docs/automation/runs/CONVERSION-DX11-01029.json"
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Actual OutRun menu/car/race native frame & Quest3 evidence still UNTESTED; five exact-SHA gates pending",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_IMPLEMENTATION_ACTION": "Same-task exact-SHA gate and causal repair only; desktop/Quest3 native frame parity separately needs real hardware.",
+  "feature_ready": false,
+  "pending_items": [
+    "Five exact SHA GitHub Actions pending",
+    "Original game and Quest3/VDXR HMD/input/FFB runtime tests UNTESTED"
+  ]
+}

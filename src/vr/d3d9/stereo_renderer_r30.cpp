@@ -3440,7 +3440,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device,
             const std::vector<std::uint32_t>& physical,
             outrun::vr::dx11::live_game_frame::NativeGameAdditionalStreams& extra,
-            std::array<std::vector<std::uint8_t>,3>& owned)
+            std::array<std::vector<std::uint8_t>,15>& owned)
         {
             if (!device || physical.empty()) return false;
             IDirect3DVertexDeclaration9* decl=nullptr;
@@ -3451,11 +3451,12 @@ namespace OutRunVRStereo
             const bool ok=SUCCEEDED(decl->GetDeclaration(elements.data(),&count));
             decl->Release();
             if (!ok || count<2u || count>MAXD3DDECLLENGTH) return false;
-            std::array<bool,4> used{};
+            std::array<bool,16> used{};
             for (UINT i=0u; i+1u<count; ++i) {
                 if (elements[i].Stream>=used.size()) return false;
                 used[elements[i].Stream]=true;
             }
+            std::uint64_t capturedExtraBytes = 0u;
             for (UINT slot=1u; slot<used.size(); ++slot) {
                 if (!used[slot]) continue;
                 IDirect3DVertexBuffer9* vb=nullptr;
@@ -3471,6 +3472,10 @@ namespace OutRunVRStereo
                     vb,offset,stride,physical,owned[slot-1u]);
                 vb->Release();
                 if (!captured) return false;
+                // Limit per-Draw total high-stream shadow staging when the
+                // game declares sparse streams 4..15; D3D9 remains fallback.
+                capturedExtraBytes += owned[slot-1u].size();
+                if (capturedExtraBytes > (1ull << 27u)) return false;
                 extra.extra[slot-1u]={
                     owned[slot-1u].data(),stride,
                     static_cast<UINT>(physical.size())};
@@ -3537,7 +3542,7 @@ namespace OutRunVRStereo
                     for (UINT i=0u; i<nativeElements; ++i)
                         physical[i]=firstVertex+i;
                     live::NativeGameAdditionalStreams extra{};
-                    std::array<std::vector<std::uint8_t>,3> owned{};
+                    std::array<std::vector<std::uint8_t>,15> owned{};
                     if (!R30CaptureNativeAdditionalStreams(
                             device,physical,extra,owned)) return;
                     if (valid) nativeSource.forwarded = true;
@@ -3684,7 +3689,7 @@ namespace OutRunVRStereo
                 vb->Release();
                 if (ok) {
                     live::NativeGameAdditionalStreams extra{};
-                    std::array<std::vector<std::uint8_t>,3> owned{};
+                    std::array<std::vector<std::uint8_t>,15> owned{};
                     if (capturedPhysical.size()!=nativeVertexCount ||
                         !R30CaptureNativeAdditionalStreams(
                             device,capturedPhysical,extra,owned)) return;
@@ -3723,7 +3728,7 @@ namespace OutRunVRStereo
                 std::vector<std::uint32_t> physical(nativeElements);
                 for (UINT i = 0u; i < nativeElements; ++i) physical[i] = i;
                 live::NativeGameAdditionalStreams extra{};
-                std::array<std::vector<std::uint8_t>,3> owned{};
+                std::array<std::vector<std::uint8_t>,15> owned{};
                 if (!R30CaptureNativeAdditionalStreams(
                         device, physical, extra, owned))
                     return; // Fail closed; game Draw/input/FFB remain intact.
@@ -3814,7 +3819,7 @@ namespace OutRunVRStereo
                             compactIndices, true, physical))
                         return;
                     live::NativeGameAdditionalStreams extra{};
-                    std::array<std::vector<std::uint8_t>,3> owned{};
+                    std::array<std::vector<std::uint8_t>,15> owned{};
                     if (!R30CaptureNativeAdditionalStreams(
                             device, physical, extra, owned))
                         return; // Missing/stale stream: never splice a native frame.
@@ -3831,7 +3836,7 @@ namespace OutRunVRStereo
                         rebasedIndices, false, physical))
                     return;
                 live::NativeGameAdditionalStreams extra{};
-                std::array<std::vector<std::uint8_t>,3> owned{};
+                std::array<std::vector<std::uint8_t>,15> owned{};
                 if (!R30CaptureNativeAdditionalStreams(
                         device, physical, extra, owned))
                     return; // Original D3D9 IndexedUP/input still execute.

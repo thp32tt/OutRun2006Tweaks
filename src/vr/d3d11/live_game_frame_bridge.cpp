@@ -4764,7 +4764,7 @@ bool live_sm3_input_layout(
     nativeStride = stride;
     for (std::size_t i = 0; i + 1u < declaration.size(); ++i) {
         const auto& in = declaration[i];
-        if (in.Stream >= 4u || in.Method != D3DDECLMETHOD_DEFAULT ||
+        if (in.Stream >= 16u || in.Method != D3DDECLMETHOD_DEFAULT ||
             in.UsageIndex >= 16u) return false;
         const UINT sourceStride = in.Stream == 0u ? stride :
             extra ? extra->extra[in.Stream-1u].stride : 0u;
@@ -5270,8 +5270,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         static_cast<std::uint64_t>(vertexCount) * instanceCount;
     if (!expandedVertices || expandedVertices > kMaxVertices)
         return false;
-    std::array<std::uint32_t,4> instanceSteps{};
-    std::array<bool,4> referenced{};
+    std::array<std::uint32_t,16> instanceSteps{};
+    std::array<bool,16> referenced{};
     for (std::size_t i = 0u; i + 1u < declaration.size(); ++i)
         referenced[declaration[i].Stream] = true;
     for (UINT slot = 1u; slot < referenced.size(); ++slot) {
@@ -5307,9 +5307,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     std::vector<std::uint8_t> unpacked;
     const void* nativeBytes = bytes;
     if (repack) {
-        std::array<GameSm3StreamView,4> streams{};
+        std::array<GameSm3StreamView,16> streams{};
         streams[0]={static_cast<const std::uint8_t*>(bytes),stride,vertexCount};
-        if (extra) for (UINT slot=1u; slot<4u; ++slot)
+        if (extra) for (UINT slot=1u; slot<16u; ++slot)
             streams[slot]={
                 static_cast<const std::uint8_t*>(extra->extra[slot-1u].bytes),
                 extra->extra[slot-1u].stride,

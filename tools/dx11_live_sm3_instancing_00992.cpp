@@ -14,14 +14,14 @@ static float component(const std::vector<std::uint8_t>& b,
 int main() {
     const float positions[3]{1.f, 2.f, 3.f};
     const float instances[2]{10.f, 20.f};
-    const std::array<GameSm3StreamView,4> streams{{
+    const std::array<GameSm3StreamView,16> streams{{
         {reinterpret_cast<const std::uint8_t*>(positions),4u,3u},
         {reinterpret_cast<const std::uint8_t*>(instances),4u,2u},
         {}, {}
     }};
     const std::vector<GameSm3ElementRef> elements{{0u,0u,0u},{1u,0u,0u}};
     std::vector<std::uint8_t> packed;
-    const std::array<std::uint32_t,4> frequency{{0u,2u,0u,0u}};
+    const std::array<std::uint32_t,16> frequency{{0u,2u,0u,0u}};
     assert(game_sm3_assemble_instanced_streams(
         elements, streams, 3u, 3u, frequency, packed));
     assert(packed.size() == 9u * 32u);
@@ -40,7 +40,7 @@ int main() {
         elements, streams, 3u, 0u, frequency, packed));
     assert(!game_sm3_assemble_instanced_streams(
         elements, streams, 1000000u, 1000000u, frequency, packed));
-    const std::array<std::uint32_t,4> illegal{{1u,2u,0u,0u}};
+    const std::array<std::uint32_t,16> illegal{{1u,2u,0u,0u}};
     assert(!game_sm3_assemble_instanced_streams(
         elements, streams, 3u, 3u, illegal, packed));
     assert(packed == copy);

@@ -20,7 +20,7 @@ struct GameSm3ElementRef {
 };
 [[nodiscard]] inline bool game_sm3_assemble_streams(
     const std::vector<GameSm3ElementRef>& elements,
-    const std::array<GameSm3StreamView,4>& streams,
+    const std::array<GameSm3StreamView,16>& streams,
     std::uint32_t count, std::vector<std::uint8_t>& destination) noexcept {
     constexpr std::uint64_t kMaxBytes = 1ull << 25u;
     if (elements.empty() || elements.size() > 32u || !count) return false;
@@ -62,9 +62,9 @@ struct GameSm3ElementRef {
 // Draw/DrawIndexed PER source instance for strip and fan topology boundaries.
 [[nodiscard]] inline bool game_sm3_assemble_instanced_streams(
     const std::vector<GameSm3ElementRef>& elements,
-    const std::array<GameSm3StreamView,4>& streams,
+    const std::array<GameSm3StreamView,16>& streams,
     std::uint32_t verticesPerInstance, std::uint32_t instanceCount,
-    const std::array<std::uint32_t,4>& instanceStep,
+    const std::array<std::uint32_t,16>& instanceStep,
     std::vector<std::uint8_t>& destination) noexcept {
     constexpr std::uint64_t kMaxBytes = 1ull << 25u;
     if (elements.empty() || elements.size() > 32u ||

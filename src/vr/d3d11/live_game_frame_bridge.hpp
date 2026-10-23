@@ -29,12 +29,13 @@ void set_native_full_game_gpu_sink(NativeFullGameGpuSink sink, void* user) noexc
 // Never intercept, skip or replace the game's original D3D9 return value.
 bool diagnostic_enabled() noexcept;
 
-// Source-owned, epoch-valid secondary D3D9 VB shadows. Each stream shares
+// Source-owned, epoch-valid secondary D3D9 VB shadows for all 16
+// D3D9 stream slots. Unavailable epochs must abort native publication. Each stream shares
 // stream-0's exact physical vertex order (including indexed sparse gathers).
 // Borrowed pointers are valid only during the synchronous observe call.
 struct NativeGameAdditionalStreams {
     struct View { const void* bytes{}; UINT stride{}; UINT vertexCount{}; };
-    std::array<View, 3> extra{};
+    std::array<View, 15> extra{}; // D3D9 streams 1..15; stream 0 is separate.
 };
 
 // Pointer lifetime is limited to this call: data is copied before returning.
