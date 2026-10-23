@@ -8,6 +8,7 @@
 #include "native_sm3_fragment_codegen.hpp"
 #include "native_sm3_conditional_flow.hpp"
 #include "native_sm3_derivative_uniformity.hpp"
+#include "native_sm3_temp_draw_uniformity.hpp"
 #include "native_sm3_interface_channels.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "native_sm3_repeat_flow.hpp"
@@ -490,6 +491,7 @@ bool build_r283_sm3_mov_shader_source(
         bool liveIntegersUsed = false;
         NativeSm3ConditionalFlow writtenFlow;
         NativeSm3DerivativeUniformity derivativeUniformity;
+        NativeSm3TempDrawUniformity tempDrawUniformity;
         NativeSm3StructuredFlow structuredFlow;
         NativeSm3PredicateFlow predicateFlow;
         // D3D9 aL always denotes the innermost LOOP, never REP.
@@ -758,6 +760,13 @@ bool build_r283_sm3_mov_shader_source(
                             return false;
                         tempUsed[reg] = true;
                         value = "r283_t" + std::to_string(reg);
+                        // A straight-line c# -> TEMP arithmetic chain is
+                        // draw-uniform even though the D3D9 register bank is
+                        // TEMP. Only individually proven physical lanes can
+                        // admit implicit native TEX inside this IFC.
+                        if (tempDrawUniformity.contains(reg, requiredComponents))
+                            scalarOrigins[i] =
+                                NativeSm3IfcScalarOrigin::DrawFloatConstant;
                     } else if (kind == D3DSPR_INPUT) {
                         if (reg >= inputDeclaredMasks.size() ||
                             !native_sm3_declared_components_cover(
@@ -1266,6 +1275,10 @@ bool build_r283_sm3_mov_shader_source(
             }
 
             std::size_t operandCursor = 1u;
+            // Classify original D3D9 source lanes before their HLSL
+            // modification. A native TEMP only inherits draw uniformity
+            // from earlier guaranteed, unconditional constant arithmetic.
+            bool sourcesDrawUniform = sourceCount != 0u;
             for (unsigned i = 0; i < sourceCount; ++i) {
                 if (operandCursor >= instruction.operandTokens.size() -
                                          (sourcePredicated ? 1u : 0u))
@@ -1406,6 +1419,28 @@ bool build_r283_sm3_mov_shader_source(
                     }
                     continue;
                 }
+                const unsigned uniformLogicalComponents =
+                    op.texture2d
+                        ? (op.textureCube
+                            ? native_sm3_cube_source_components(op.textureMode, i)
+                            : op.textureVolume
+                                ? native_sm3_volume_source_components(op.textureMode, i)
+                                : native_sm3_texture_source_components(op.textureMode, i))
+                        : op.matrixRowCount != 0u
+                            ? (op.matrixVectorComponents == 4u ? 15u : 7u)
+                            : native_sm3_source_components(op.opcode, mask, i);
+                const unsigned uniformPhysicalComponents =
+                    native_sm3_swizzled_components(
+                        native_sm3_source_modifier_components(
+                            uniformLogicalComponents, modifier), swizzle);
+                // A D3D9 c# is immutable during a Draw; a previously
+                // proven TEMP is also uniform only for its read lanes.
+                // Unknown banks and relative c# stay conservatively varying.
+                if (!(kind == D3DSPR_CONST && !relative) &&
+                    !(kind == D3DSPR_TEMP &&
+                      tempDrawUniformity.contains(
+                          reg, uniformPhysicalComponents)))
+                    sourcesDrawUniform = false;
                 if (kind == D3DSPR_INPUT) {
                     const unsigned logicalComponents =
                         op.texture2d
@@ -1536,10 +1571,25 @@ bool build_r283_sm3_mov_shader_source(
             // A conditional draw-time instruction cannot initialize a
             // previously undefined game register. HLSL's zero-initialized
             // placeholder is not D3D9 register-provenance evidence.
-            if (op.destinationType == D3DSPR_TEMP)
+            if (op.destinationType == D3DSPR_TEMP) {
+                // Only real pure arithmetic paths may propagate a per-Draw
+                // uniform TEMP. Texture samples, implicit derivatives,
+                // conditional/predicated writes and all matrix/scratch paths
+                // must invalidate the affected lanes, never inherit an
+                // unrelated HLSL zero-initializer or earlier uniform value.
+                const bool pureDrawArithmetic =
+                    !op.texture2d && !op.texkill && !op.signScratch &&
+                    op.matrixRowCount == 0u &&
+                    op.opcode != NativeSm3ArithmeticOpcode::DerivativeX &&
+                    op.opcode != NativeSm3ArithmeticOpcode::DerivativeY &&
+                    sourcesDrawUniform;
+                tempDrawUniformity.write(
+                    op.destinationRegister, mask, pureDrawArithmetic,
+                    structuredFlow.empty() && !op.predicated);
                 tempWritten[op.destinationRegister] =
                     native_sm3_predicated_write_mask(
                         tempWritten[op.destinationRegister], mask, op.predicated);
+            }
             else if (op.destinationType == D3DSPR_OUTPUT)
                 outputWritten[op.destinationRegister] =
                     native_sm3_predicated_write_mask(
@@ -1550,8 +1600,10 @@ bool build_r283_sm3_mov_shader_source(
                         outputWritten[op.destinationRegister], mask, op.predicated);
             // oDepth is not evidence of fully written COLOROUT.
             if (op.signScratch) {
-                for (const UINT scratch : op.signTemps)
+                for (const UINT scratch : op.signTemps) {
                     tempWritten[scratch] = 0u;
+                    tempDrawUniformity.invalidate(scratch);
+                }
             }
             operations.push_back(std::move(op));
         }
