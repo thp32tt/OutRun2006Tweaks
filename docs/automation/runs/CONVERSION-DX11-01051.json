@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:LIVE_PREDRAW_OFFSCREEN_COLOR_CONTINUITY",
   "work_key": "DX11:MENU_CAR_RACE_PREDRAW_CANONICAL_COLOR",
-  "status": "SOURCE_IMPLEMENTED",
-  "checkpoint": "C4_RESULT_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -97,16 +97,43 @@
   },
   "acceptance_results": {
     "offscreen_source_continuity": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+        "tools/dx11_native_predraw_colorfill_01051.cpp",
+        "tools/test_dx11_predraw_colorfill_01051.py"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks #40085008114 SUCCESS at exact SHA; compiled C++ 01051 and ran Python 01051 source regression."
     },
     "canonical_full_overwrite": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+        "tools/dx11_native_predraw_colorfill_01051.cpp"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks #40085008114 and Windows Build #40085008120 SUCCESS at exact SHA."
     },
     "live_writer_fallback": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_native_predraw_colorfill_01051.cpp",
+        "tools/test_dx11_predraw_colorfill_01051.py"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks #40085008114 SUCCESS at exact SHA; real game input/FFB/HMD not executed."
     },
     "exact_sha_gate": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Exact SHA 89d9aef57f08ba9348c7c20b275a213300840f95; Fast #40085008114; Backend #40085008105; Build #40085008120; OpenXR #40085008101; HUD #40085008126; all SUCCESS."
     }
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -114,5 +141,36 @@
   "next_implementation_action": "Resolve exact-SHA mandatory GitHub Actions on this material result, repair actual failures without redundant CI.",
   "runtime_note": "Game and Quest3/VDXR not run; native pixels and frames UNTESTED.",
   "material_result_sha": "69114020c3962c94f439eec6389e813811c1fb03",
-  "ci_failure_repair": "Original source candidate Fast #40084923273 failed task record validation (missing acceptance_proof, conflict_keys, measurable blocker evidence, and ordered live-game draw path); keeping source and required gates unchanged, same TASK_ID."
+  "ci_failure_repair": "Original source candidate Fast #40084923273 failed task record validation (missing acceptance_proof, conflict_keys, measurable blocker evidence, and ordered live-game draw path); keeping source and required gates unchanged, same TASK_ID.",
+  "validation_bearing_result_sha": "89d9aef57f08ba9348c7c20b275a213300840f95",
+  "c6_reconciliation_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_gate_results": {
+    "validation_sha": "89d9aef57f08ba9348c7c20b275a213300840f95",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40085008114,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40085008105,
+      "event": "push"
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40085008120,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40085008101,
+      "event": "push"
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40085008126,
+      "event": "push"
+    },
+    "note": "All five mandatory GitHub Actions succeeded on the exact validation-bearing result SHA; no new CI or game/HMD runtime evidence. C6 bookkeeping only, source and material_result_sha unchanged, no new score."
+  }
 }
