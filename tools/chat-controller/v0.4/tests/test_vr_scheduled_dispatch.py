@@ -1,4 +1,4 @@
-"""VR Docker lane schedule regression tests: DX11 :00/:20/:40, DX9Ex :00 KST."""
+"""VR Docker lane schedule regression tests: DX11 :30, DX9Ex :00 hourly KST."""
 import ast
 import unittest
 from datetime import datetime
@@ -16,8 +16,9 @@ def due(enabled=True, mode="conversion"):
              and n.name in {"vr_lane_schedule_window_due", "vr_scheduled_dispatch_due"}]
     assert len(funcs) == 2
     ns = {"VR_SCHEDULED_DISPATCH_ENABLED": enabled,
-          "SCHEDULE_MINUTES": [0, 20, 40],
+          "SCHEDULE_MINUTES": [30],
           "DX9EX_SCHEDULE_MINUTES": [0],
+          "DX9EX_SCHEDULE_EVERY_HOURS": 1,
           "CONTROLLER_MODE": mode,
           "datetime": datetime}
     exec(compile(ast.Module(body=funcs, type_ignores=[]), "<schedule>", "exec"), ns)
@@ -38,8 +39,8 @@ class ScheduledDispatchTests(unittest.TestCase):
         for minute in range(60):
             now = datetime(2026, 10, 22, 8, minute, 15, tzinfo=TZ)
             with self.subTest(minute=minute):
-                self.assertEqual(dispatch({}, "A", now), minute in {0, 20, 40})
-                self.assertEqual(window("A", now), minute in {0, 20, 40})
+                self.assertEqual(dispatch({}, "A", now), minute == 30)
+                self.assertEqual(window("A", now), minute == 30)
 
     def test_dx9ex_deduplicates_and_rearms_next_hour(self):
         dispatch, _ = due()
@@ -48,7 +49,7 @@ class ScheduledDispatchTests(unittest.TestCase):
         self.assertFalse(dispatch(q, "C", datetime(2026, 10, 22, 8, 20, tzinfo=TZ)))
         self.assertFalse(dispatch(q, "C", datetime(2026, 10, 22, 8, 40, tzinfo=TZ)))
         self.assertTrue(dispatch(q, "C", datetime(2026, 10, 22, 9, 0, tzinfo=TZ)))
-        self.assertTrue(dispatch(q, "A", datetime(2026, 10, 22, 8, 20, tzinfo=TZ)))
+        self.assertTrue(dispatch(q, "A", datetime(2026, 10, 22, 8, 30, tzinfo=TZ)))
 
     def test_dx9ex_hourly_even_global_schedule_disabled(self):
         dispatch, _ = due(False)
@@ -75,8 +76,9 @@ class ScheduledDispatchTests(unittest.TestCase):
         self.assertIn("vr_lane_schedule_window_due", ast.get_source_segment(SOURCE, rollover))
         yml = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
         for snippet in ('VR_SCHEDULED_DISPATCH_ENABLED: "true"',
-                        'SCHEDULE_MINUTES: "0,20,40"',
+                        'SCHEDULE_MINUTES: "30"',
                         'DX9EX_SCHEDULE_MINUTES: "0"',
+                        'DX9EX_SCHEDULE_EVERY_HOURS: "1"',
                         'DX9EX_REVIEW_ONLY: "true"'):
             self.assertIn(snippet, yml)
 
