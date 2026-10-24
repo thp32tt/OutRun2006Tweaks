@@ -1,0 +1,58 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261024T1915KST-NEW-SHA",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "source_branch": "korean-localization-recovery-20260928",
+  "checked_at_kst": "2026-10-24T19:21:58.413078+09:00",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE",
+  "reviewed_sha_history_count": 728,
+  "new_unique_sha_count": 0,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "producer_candidate_png_counts": {
+    "A": 334,
+    "B": 389
+  },
+  "export_evidence_json_count": 148,
+  "local_without_export_evidence": {
+    "A": [],
+    "B": []
+  },
+  "export_evidence_without_local": {
+    "A": [],
+    "B": []
+  },
+  "invalid_evidence": [],
+  "local_png_byte_sha256_verified_count": 723,
+  "local_png_sha256_mismatch_count": 0,
+  "new_unique_candidates": [],
+  "evidence_n100": [
+    "work/C1_QA_20261024_1915_metrics.json",
+    "work/C1_QA_20261024_1915_byte_audit.json"
+  ],
+  "execution_backend": "N100 MCP (source candidate PNG available only on N100; lightweight SHA inventory)",
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_or_ingame_pass_created": false,
+    "game_deployed": false,
+    "runtime_validation": "UNTESTED",
+    "excluded_VR_FFB_DX11_DXVK_untouched": true
+  },
+  "ai_score": {
+    "AI1_previous_confirmed_cumulative": 1768,
+    "delta": 0,
+    "AI1_new_cumulative": 1768
+  },
+  "note": "N100 A/B unapproved PNG and export evidence were byte-SHA verified against prior 728 reviewed candidate SHA records. No unseen candidate SHA remained, so visual QA was not attempted and no PASS/FAIL was manufactured. Counts of prior reviewed SHA records are historical and not the number of current candidate files."
+}
