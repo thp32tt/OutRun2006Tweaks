@@ -52,7 +52,8 @@ for old, new in (
     ("if (sourceReacquired || s.sourceGameDevice == 0u)", "if (false)"),
     ("s.sourceGameDevice = sourceDevice;", "s.sourceGameDevice = 0u;"),
     # Either owner handoff must retire both pre-Draw copy pixels and Z.
-    ("s.preDrawSurface.discard();", "/* lost copied color provenance */"),
+    ("if (!foreignSource) {\n            s.clearColor.discard();\n            s.preDrawSurface.discard();",
+     "if (!foreignSource) {\n            s.clearColor.discard();"),
     # Existing owner/Z and fallback mutations remain intact.
     ("if (!foreignSource) {\n            s.clearColor.discard();\n            s.preDrawSurface.discard();\n            s.preDrawFills.discard();\n            s.preDrawDepth.discard();",
      "if (!foreignSource) {\n            s.clearColor.discard();\n            s.preDrawSurface.discard();\n            s.preDrawFills.discard();"),
