@@ -1,0 +1,329 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0051KST-NEW-SHA4",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "qa_type": "A/B saved Korean PNG independent lightweight",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_producer": "B",
+  "batch_id": "OUTRUN-ROI-B-0081-41C388BB-R1",
+  "sha_history_before": 728,
+  "new_unique_sha_count": 4,
+  "verdict_counts": {
+    "PASS": 0,
+    "FAIL": 1,
+    "HOLD": 3
+  },
+  "byte_hashes_verified": true,
+  "producer_evidence_files": 149,
+  "producer_candidate_png_counts": {
+    "A": 334,
+    "B": 393
+  },
+  "records": [
+    {
+      "role": "B",
+      "batch": 81,
+      "task_id": "OUTRUN-ROI-B-0081-41C388BB-R1",
+      "source_ordinal": 393,
+      "source_file": "Q228_e7768795d2549af8_source.png",
+      "candidate_file": "Q228_e7768795d2549af8_source_k.png",
+      "english": "license select",
+      "approved_korean": "라이선스 선택",
+      "original_dds_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "source_sha256": "b653ce6abc803a70a95da928a2861f4ff16b0b1889de9bf8ae65a39da9da3d72",
+      "candidate_sha256": "939f9eb0d5f56052402dcae77963abe7d9a3086247fa38bb2ab6937974433d2e",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1537,
+          177
+        ],
+        "alpha_bbox": [
+          6,
+          24,
+          1500,
+          143
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          65,
+          49,
+          2158,
+          650
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE",
+        "transparent_lettering": "RGBA_NO_OBVIOUS_FRAME",
+        "text_length_difference_ignored": true,
+        "native_ui_cell_placement": "UNVERIFIED",
+        "original_black_outline_preserved": null
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "'라이선스 선택' 가독성·자소·번역 매핑·RGBA·문구 단위 투명도 양호. 하지만 source 1537x177 / candidate 2172x724, producer REWORK_DIMENSIONS, 실제 원본 UI cell 축소/좌표 및 보호 영역 증빙 부재. 폭 차이 자체는 FAIL이 아니며 실제 안전영역 배치가 검증될 때까지 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "source_bbox_containment": "UNVERIFIED"
+    },
+    {
+      "role": "B",
+      "batch": 81,
+      "task_id": "OUTRUN-ROI-B-0081-41C388BB-R1",
+      "source_ordinal": 392,
+      "source_file": "Q228_d5b16dbfa2573c42_source.png",
+      "candidate_file": "Q228_d5b16dbfa2573c42_source_k.png",
+      "english": "race select",
+      "approved_korean": "레이스 선택",
+      "original_dds_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "source_sha256": "bfa599eb9d5414f7648ae3908207ca0f4812106dbf0d7a13a96ec4cc9609c634",
+      "candidate_sha256": "d02fcc72eae14e5c53b5814b8726b987e946275d7800dc7860cef0fb30afb413",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1282,
+          174
+        ],
+        "alpha_bbox": [
+          6,
+          24,
+          1244,
+          143
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          218,
+          68,
+          2094,
+          642
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE",
+        "transparent_lettering": "RGBA_NO_OBVIOUS_FRAME",
+        "text_length_difference_ignored": true,
+        "native_ui_cell_placement": "UNVERIFIED",
+        "original_black_outline_preserved": null
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "'레이스 선택' 가독성·번역 매핑·RGBA 정상. source 1282x174 / candidate 2172x724, producer REWORK_DIMENSIONS; 실제 배치/기준선/UV 안전영역에 대한 정확한 비교가 없어 HOLD. 번역 길이/캔버스 크기 차이 단독 FAIL 금지.",
+      "runtime_validation": "UNTESTED",
+      "source_bbox_containment": "UNVERIFIED"
+    },
+    {
+      "role": "B",
+      "batch": 81,
+      "task_id": "OUTRUN-ROI-B-0081-41C388BB-R1",
+      "source_ordinal": 391,
+      "source_file": "Q140_629b3efe8d2c5d78_source.png",
+      "candidate_file": "Q140_629b3efe8d2c5d78_source_k.png",
+      "english": "PRESS [ENTER-KEY ICON] KEY",
+      "approved_korean": "누르세요 [엔터 키 아이콘] 키",
+      "original_dds_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+      "source_sha256": "64edb4f91e646acb2e5bac8a1a453803f32ebf9666afab3acf63e3a5e53b73cb",
+      "candidate_sha256": "0492b6018583024b65bfb4de038f25bc125dc708def8a43f9fd772732f039f17",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1780,
+          304
+        ],
+        "alpha_bbox": [
+          39,
+          15,
+          1741,
+          289
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          106,
+          8,
+          2057,
+          707
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE",
+        "transparent_lettering": "RGBA_NO_OBVIOUS_FRAME",
+        "text_length_difference_ignored": true,
+        "native_ui_cell_placement": "UNVERIFIED",
+        "original_black_outline_preserved": false
+      },
+      "verdict": "FAIL",
+      "reason_code": "SOURCE_BLACK_OUTLINE_MISSING",
+      "reason": "'누르세요 [엔터 아이콘] 키'의 한글·아이콘은 읽히고 번역 대응함. 그러나 원본 노랑 글자·Enter 아이콘 전부를 감싸는 뚜렷한 검정 굵은 외곽선이 후보에는 보이지 않음(검정/흰색 matte 재확인). 단순 미세 미관 차이가 아닌 필수 대비 효과의 명백한 누락으로 FAIL.",
+      "runtime_validation": "UNTESTED",
+      "source_bbox_containment": "UNVERIFIED"
+    },
+    {
+      "role": "B",
+      "batch": 81,
+      "task_id": "OUTRUN-ROI-B-0081-41C388BB-R1",
+      "source_ordinal": 390,
+      "source_file": "Q228_eca1b3afbb557a67_source.png",
+      "candidate_file": "Q228_eca1b3afbb557a67_source_k.png",
+      "english": "main menu",
+      "approved_korean": "메인 메뉴",
+      "original_dds_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "source_sha256": "75862322996aaeed23c9503f0a2a65250c33fbde7feaed053f71ee5c82df19d5",
+      "candidate_sha256": "563efc720f7b089991d93fa041223fba2bf373a8921a1ef09dbb2d3d18491606",
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source_manifest_sha_match": true,
+      "source_sent_sha_match": true,
+      "candidate_export_sha_match": true,
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1330,
+          590
+        ],
+        "alpha_bbox": [
+          6,
+          0,
+          1330,
+          590
+        ],
+        "edge_alpha_pixels": [
+          0,
+          30,
+          906,
+          1025
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1883,
+          835
+        ],
+        "alpha_bbox": [
+          21,
+          21,
+          1867,
+          793
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visual": {
+        "translation_mapping": "MATCH_VISUAL",
+        "glyph_legibility": "READABLE",
+        "transparent_lettering": "RGBA_NO_OBVIOUS_FRAME",
+        "text_length_difference_ignored": true,
+        "native_ui_cell_placement": "UNVERIFIED",
+        "original_black_outline_preserved": null
+      },
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "'메인 메뉴' 읽힘/번역 일치/투명 PNG 정상. source ROI 1330x590 안에 game lobby, main menu, multiplayer 등 다른 레이블과 상하 잘린 문구가 포함됨. 후보는 레이블 하나만 별도 생성됐으나 실제 main menu 영역·기준선·보호 아트 충돌 검증이 없어 HOLD.",
+      "runtime_validation": "UNTESTED",
+      "source_bbox_containment": "UNVERIFIED"
+    }
+  ],
+  "evidence_n100": {
+    "source_candidate_pairs": "work/C1_QA_20261025_0051_B_pairs.jpg",
+    "white_matte": "work/C1_QA_20261025_0051_white.jpg",
+    "alpha": "work/C1_QA_20261025_0051_alpha.json"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_ingame_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "VR_FFB_DX11_DXVK_touched": false
+  },
+  "score": {
+    "ai": "AI1",
+    "previous": 1768,
+    "delta": 1,
+    "proposed_cumulative": 1769,
+    "score_event_basis": "NEW_SHA4_INDEPENDENT_REVIEW"
+  }
+}
