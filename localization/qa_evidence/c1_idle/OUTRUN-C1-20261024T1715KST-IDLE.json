@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261024T1715KST-NEW-SHA",
+  "role": "C1",
+  "requested_slot_kst": "2026-10-24T17:15:00+09:00",
+  "checked_at_kst": "2026-10-24T17:19:06.108154+09:00",
+  "status": "IDLE",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_branch_head_before": "9c40415b8d7e6b326443e25809dc1ff162744dab",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source": "N100 live work/image-src/text_roi_batches/candidate_outputs and export_evidence",
+  "execution_backend": "N100 structured filesystem inventory and SHA history dedupe (no production processing)",
+  "local_metrics": "work/C1_QA_20261024_1715_metrics.json",
+  "history_unique_sha_count": 728,
+  "candidate_outputs_count": {
+    "A": 334,
+    "B": 389
+  },
+  "export_evidence_count": 148,
+  "new_unique_sha_count": 0,
+  "new_candidates": [],
+  "missing_export_evidence": {
+    "A": [],
+    "B": []
+  },
+  "missing_local_output": {
+    "A": [],
+    "B": []
+  },
+  "invalid_evidence": [],
+  "qa_outcome_this_run": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "candidate_qa_performed": false,
+  "source_candidate_sha_only_rechecks": false,
+  "restrictions": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_written": false,
+    "game_deployed": false,
+    "C2_C3_ingame_approval_created": false
+  },
+  "runtime_validation": "UNTESTED",
+  "scoreboard": {
+    "ai": "AI 1",
+    "score_before": 1768,
+    "delta": 0,
+    "score_after": 1768
+  },
+  "note": "No unreviewed SHA at the scheduled slot; no candidate fabricated and no duplicate QA or scoring."
+}
