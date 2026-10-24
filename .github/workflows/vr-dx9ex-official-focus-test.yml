@@ -106,19 +106,11 @@ jobs:
             New-Item -ItemType Directory -Force $dir | Out-Null
             Copy-Item "$payload/dinput8.dll" "$dir/dinput8.dll"
             Copy-Item "$payload/outrun-vr-host.exe" "$dir/outrun-vr-host.exe"
-            # SOURCE remains unchanged. Sanitize only package INI to stop silent
-            # settings fallback: original [VR] has the same basis key twice.
-            $ini = Get-Content OutRun2006Tweaks.ini -Raw
-            $basis = 'DriverSeatCarSpaceBasis = false'
-            $first = $ini.IndexOf($basis, [System.StringComparison]::Ordinal)
-            if ($first -lt 0 -or $ini.IndexOf($basis, $first + $basis.Length, [System.StringComparison]::Ordinal) -lt 0) { throw 'Wrong original INI basis entries' }
-            $lineEnd = $ini.IndexOf([char]10, $first)
-            if ($lineEnd -lt 0) { throw 'Malformed source INI' }
-            $ini = $ini.Remove($first, $lineEnd - $first + 1)
-            $ini = $ini.Replace('DriverSeatView = true', 'DriverSeatView = false')
-            Set-Content "$dir/OutRun2006Tweaks.ini" $ini -Encoding utf8 -NoNewline
+            # The repository INI must already be unambiguous: never silently
+            # repair duplicate keys only in one packaging workflow.
+            Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
             $env:OFFICIAL_PACKAGE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
-            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False'
+            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False; assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False'
             if ($LASTEXITCODE -ne 0) { throw 'Packaged INI strict parse failed' }
             Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
             Copy-Item tools/START_FOCUS_OFFICIAL_TEST.cmd "$dir/START_HERE.cmd"
