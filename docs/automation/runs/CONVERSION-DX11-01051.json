@@ -79,7 +79,21 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
-    "activation_guard_and_fallback": "Native DX11 opt-in only; original DX9Ex input, FFB, Present unchanged; DXVK frozen."
+    "activation_guard_and_fallback": "Native DX11 opt-in only; original DX9Ex input, FFB, Present unchanged; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "A full-sized game backbuffer snapshot from authentic LockRect/ReleaseDC survives repeated foreign offscreen whole ColorFill events, then feeds the real first native SM3/FVF Draw.",
+      "negative_regression": "A source-identical full canonical ColorFill retires the stale snapshot; mismatched device/camera ColorFill preserves it, active CPU/GDI ticket fails closed, and original game Present/input/FFB remain untouched.",
+      "component_integration": "Original D3D9 game ColorFill hook -> live_game_frame_bridge.cpp ownership and ticket validation -> native_game_pre_draw_surface.hpp authenticated retirement -> real native SM3/FVF first Draw/visible game frame."
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_PREDRAW_CANONICAL_COLOR"
+    ],
+    "blocking_evidence": "At e9bbd386 original bridge code unconditionally s.preDrawSurface.discard() before mirrors_full_color_fill admission, including a foreign offscreen menu-camera whole ColorFill, discarding game-authored backbuffer CPU/GDI color before native Draw. Corrected at 69114020. Regression 01051 tests snapshot identity.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "acceptance_results": {
     "offscreen_source_continuity": {
@@ -98,5 +112,7 @@
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Foreign offscreen full ColorFill prematurely retired pre-Draw color provenance.",
   "next_implementation_action": "Resolve exact-SHA mandatory GitHub Actions on this material result, repair actual failures without redundant CI.",
-  "runtime_note": "Game and Quest3/VDXR not run; native pixels and frames UNTESTED."
+  "runtime_note": "Game and Quest3/VDXR not run; native pixels and frames UNTESTED.",
+  "material_result_sha": "69114020c3962c94f439eec6389e813811c1fb03",
+  "ci_failure_repair": "Original source candidate Fast #40084923273 failed task record validation (missing acceptance_proof, conflict_keys, measurable blocker evidence, and ordered live-game draw path); keeping source and required gates unchanged, same TASK_ID."
 }
