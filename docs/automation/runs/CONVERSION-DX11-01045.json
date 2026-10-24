@@ -33,7 +33,8 @@
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_color_fill_seed.hpp",
     "tools/dx11_native_full_colorfill_seed_01045.cpp",
-    ".github/workflows/dx11-fast-structural.yml"
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_live_full_colorfill_seed_01045.py"
   ],
   "feature_contract": {
     "feature_id": "DX11:LIVE_FULL_COLORFILL_FIRST_GAME_DRAW",
@@ -67,7 +68,7 @@
   },
   "development_strategy": {
     "work_class": "integration",
-    "milestone_id": "native_live_game_draw_color_source",
+    "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
     "integration_path": [
       "real D3D9 ColorFill original successful write",
@@ -78,7 +79,8 @@
     "batch_components": [
       "src/vr/d3d11/live_game_frame_bridge.cpp",
       "src/vr/d3d11/native_game_color_fill_seed.hpp",
-      "tools/dx11_native_full_colorfill_seed_01045.cpp"
+      "tools/dx11_native_full_colorfill_seed_01045.cpp",
+      "tools/test_dx11_live_full_colorfill_seed_01045.py"
     ],
     "acceptance_proof": {
       "positive_probe": "tools/dx11_native_full_colorfill_seed_01045.cpp compiles and simulates native color and Draw epoch; integrated actual D3D9 ColorFill hook stores the real source COM seed.",
@@ -90,11 +92,11 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
-      "D3D9_COLORFILL",
+      "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "NATIVE_GPU_PRESENT"
+      "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "SOURCE_ONLY_RUNTIME_UNTESTED",
+    "visible_frame_acceptance": "SOURCE_STAGE_CI_PENDING_RUNTIME_UNTESTED; real frame visibility still UNTESTED",
     "activation_guard_and_fallback": "opt-in diagnostic native only; exact COM/caps/owner match or DX9Ex original authoritative."
   },
   "acceptance_results": {
@@ -103,7 +105,8 @@
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d11/native_game_color_fill_seed.hpp",
-        "tools/dx11_native_full_colorfill_seed_01045.cpp"
+        "tools/dx11_native_full_colorfill_seed_01045.cpp",
+        "tools/test_dx11_live_full_colorfill_seed_01045.py"
       ],
       "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_seed_01045.cpp; Windows CI pending"
     },
@@ -131,5 +134,6 @@
       ],
       "validation_command": "feature branch GitHub Actions pending"
     }
-  }
+  },
+  "ci_failure_repair": "Initial feature Fast failed in policy stage due unsupported milestone label and missing canonical live-game frame stage markers, not C++ failure. Preserved source implementation, aligned to policy milestone full_resolution_native_game_frame and LIVE_D3D9_CALLSITE->D3D11_NATIVE_DRAW->VISIBLE_FRAME_OUTPUT. Added source-wiring regression."
 }
