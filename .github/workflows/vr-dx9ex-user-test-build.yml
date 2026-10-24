@@ -73,7 +73,7 @@ jobs:
           if (-not $dll) { throw 'dinput8.dll missing' }
           $vrHostExe = Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
           if (-not $vrHostExe) { throw 'outrun-vr-host.exe missing' }
-          foreach ($variant in @('R26_REVIEW_CONTROL','R26_REVIEW_LATE_THROTTLE')) {
+          foreach ($variant in @('R26_REVIEW_CONTROL','R26_REVIEW_LATE_THROTTLE','R26_REVIEW_PARTICLE_VB','R26_REVIEW_COMBINED')) {
             $dir = "OutRun2_VR_${variant}_$short"
             New-Item -ItemType Directory -Force $dir | Out-Null
             Copy-Item $dll.FullName "$dir/dinput8.dll"
@@ -87,8 +87,9 @@ jobs:
             @(
               'R26+HUD review 01454..01467, separate A/B source branch'
               "Variant: $variant"
-              'Identical game DLL and host; only explicit 01466 command-line switch differs'
-              'CONTROL = stock reflection face budget; LATE_THROTTLE = 0.25 scale on detected late frames'
+              'Identical game DLL and host; 01465 particle DynamicVB and 01466 late-reflection are opt-in independently'
+              'CONTROL: both off; LATE_THROTTLE: reflection only; PARTICLE_VB: existing WorldParticle ring only; COMBINED: both'
+              'Particle ring uploads two eye payloads with one lock but still executes two GPU Draws.'
               'Other optical/HUD candidate patches are NOT applied; no Quest3 outcome claimed'
               'Renderer: R26+HUD; R84 not promoted; original game and source EXE not bundled'
               'RUNTIME_VALIDATION=UNTESTED'

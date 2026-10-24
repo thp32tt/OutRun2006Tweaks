@@ -56,8 +56,11 @@ $gameArgs = @(
 )
 # Both builds use the same review DLL; only the explicit 01466 switch differs.
 # Do not silently opt in while running a control or an older variant.
-$reviewThrottle = $variant -eq 'R26_REVIEW_LATE_THROTTLE'
+$reviewThrottle = $variant -in @('R26_REVIEW_LATE_THROTTLE','R26_REVIEW_COMBINED')
+$reviewParticle = $variant -in @('R26_REVIEW_PARTICLE_VB','R26_REVIEW_COMBINED')
+$env:OUTRUN_VR_R30_PARTICLE_VB = if ($reviewParticle) { '1' } else { '0' }
 $gameArgs += ('-ReflectionLateFrameThrottle=' + $reviewThrottle.ToString().ToLowerInvariant())
+Set-Content (Join-Path $session 'RUN_ENV.txt') "OUTRUN_VR_R30_PARTICLE_VB=$env:OUTRUN_VR_R30_PARTICLE_VB" -Encoding UTF8
 Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8
 Copy-Item $variantFile (Join-Path $session 'DX9EX_VARIANT.txt')
 Copy-Item (Join-Path $root 'OutRun2006Tweaks.ini') (Join-Path $session 'OutRun2006Tweaks.ini')

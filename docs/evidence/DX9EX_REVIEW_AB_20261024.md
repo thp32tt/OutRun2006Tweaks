@@ -22,13 +22,15 @@
 | 01462 | C993/CABE flare ordinal lifetime | NOT APPLIED | Must prove original same-frame source before sequence rekey |
 | 01463 | Reset/reseed/reentry | PRESERVED | Fail-closed source protections, no repeatable Reset trace |
 | 01464 | SkyGlow pre-HUD capture | NOT APPLIED | No exact source pixel contribution or confirmed glare regression |
-| 01465 | optional WorldParticle ring | PRESERVED | Already opt-in; one-lock is not one Draw, no measured GPU benefit |
+| 01465 | optional WorldParticle ring | PRESERVED | PREEXISTING OPT-IN EXPOSED IN TEST PACKAGING; one-lock is not one Draw, no measured GPU benefit |
 | 01466 | late 120Hz cubemap face cadence | APPLIED OPT-IN | A/B throttle requests half late-only normalized face budget; healthy/desktop unchanged, no GPU benefit claimed |
 | 01467 | depth-off water/glass binocular classification | NOT APPLIED | Original material unproven, global world promotion risks HUD/flare |
 
 ## Test contract
 - `R26_REVIEW_CONTROL`: exact source build with `-ReflectionLateFrameThrottle=false`.
 - `R26_REVIEW_LATE_THROTTLE`: same binaries with `-ReflectionLateFrameThrottle=true`.
+- `R26_REVIEW_PARTICLE_VB`: same binaries with `OUTRUN_VR_R30_PARTICLE_VB=1`, existing opt-in 01465 ring; reflection throttle off.
+- `R26_REVIEW_COMBINED`: both options enabled. Four-way matched trial isolates the two features and their interaction.
 - Production default = false; only explicitly launched B variant activates changed face budget. Original 120Hz steady-state 180 faces/s unchanged; detected late frames request fewer. This may create reflection staleness/pop and should not be deployed without matched test.
 - One game session at a time. Identical scene/camera/settings, Quest 3/VDXR, 72/90/120 Hz, collect p50/p95/p99 frame-time and reflections, +TIME, GOAL, results, F11, rival/rank, flare and stereo L/R.
 - Automated checks: portable C++ reflection regression and GitHub-hosted Win32 R26 DLL/x64 host build, two separate artifacts. HMD runtime remains UNTESTED.
