@@ -14,7 +14,7 @@
   "v2_batch_sheet_dispatch_implemented": false,
   "runtime_activation_approved": true,
   "controller_auto_send": true,
-  "auto_scope": "NATIVE_CROP_TO_A_B_IMAGEGEN_LOCAL_SHA_PERSIST_AND_C1_LIGHT_QA",
+  "auto_scope": "NATIVE_CROP_TO_A_B_IMAGEGEN_AND_C1_GPT_CHAT_VISION_OCR_FALLBACK_THEN_LIGHT_QA",
   "auto_dds_write": false,
   "auto_game_pass": false,
   "auto_deploy": false,
@@ -39,7 +39,9 @@
     "protected_pixels_zero_change": true,
     "runtime_and_game_approval_separate": true,
     "local_generated_png_sha_verified": true,
-    "project_library_status": "SUPPLEMENTAL_NONBLOCKING"
+    "project_library_status": "SUPPLEMENTAL_NONBLOCKING",
+    "c1_gpt_chat_vision_ocr_fallback": true,
+    "external_ocr_api_used": false
   },
   "release_owner": "USER_MANUAL_PORTAINER_REDEPLOY_ONLY",
   "no_live_or_other_projects_modified": true
