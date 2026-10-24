@@ -1,0 +1,280 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01013",
+  "production_id": "CONVERSION-DX11-01013",
+  "event_id": "CONVERSION-DX11-01013-E017",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollovers": 23,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01013",
+  "work_key": "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN",
+  "feature_id": "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN",
+  "feature_branch": "feature/dx11-01013-visible-game-frame",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "feature_last_head": "0b829f569a2acfd3dbd66b25168e4d63afa30fce",
+  "source_head": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "material_result_sha": "c213b60732517fa7ffaa4544a40166ea9e8f0de9",
+  "result_sha": "c213b60732517fa7ffaa4544a40166ea9e8f0de9",
+  "validation_bearing_result_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "score_change": 0,
+  "summary": "Resume after forced rollover: authentic ps_3_0 TEXKILL with real TEMP.xyz values and never-written TEMP.w wrongly rejected before native GPU Draw. Correct original D3D9 shader op-source register admission to match documented xyz-only clip, preserve fail-closed/DX9Ex fallback, add compiled positive and negative C++ source-to-native regression. Material source committed on feature; feature 5 exact-SHA CI and actual first visible frame NOT yet verified. No independent milestone score.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Intercept authentic D3D9 source Draw/DrawIndexed, parse ps_3_0 TEXKILL with real instruction-time TEMP.xyz provenance and compile matching HLSL clip",
+      "Bind game pixel/vertex shaders and original resources to D3D11 GPU Draw/DrawIndexed -> game-sized target, preserve source ordinals/native frame publication and D3D9Ex input/FFB fallback"
+    ],
+    "batch_components": [
+      "Native shader decoder+fragment opcode admission in real source translation and GPU Draw linkage",
+      "Portable C++ positive/negative shader regression, executable linked path structural test, five exact-SHA GitHub workflow triggers"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "xyz-written/w-unwritten TEXKILL compiles to native clip(r283_tN.xyz); actual real menu/car/race game GPU Draw remains UNTESTED",
+      "negative_regression": "missing any xyz TEMP component, wrong TEMP register or unsupported instruction reject native path; D3D9Ex fallback remains",
+      "component_integration": "native_backend.cpp D3D9 source -> HLSL materializer -> live_game_frame_bridge.cpp PSSetShader/DrawIndexed/Draw -> protected full frame"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_ONLY_CI_PENDING; REAL_GAME_ELIGIBLE_DRAWS_AND_NATIVE_PUBLISHED_FRAME_COUNT_UNTESTED; NO_GAMEPLAY_CLAIM",
+    "activation_guard_and_fallback": "Game native opt-in only; all other unsupported D3D9 shaders/states fail closed, original game DX9Ex rendering/gamepad/FFB continue unchanged.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN",
+    "goal": "Complete the genuine game-shader native DX11 first-visible-frame chain, including accurate ps_3_0 TEXKILL source admission while retaining full game DX9Ex fallback; do not claim runtime frames before measured actual gameplay.",
+    "acceptance_items": [
+      {
+        "id": "game_sm3_texkill_native_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_ps3_shader_to_D3D11_GPU_Draw",
+        "expected_behavior": "Authentic D3D9 game ps_3_0 TEXKILL with initialized xyz and uninitialized w translates through native shader compiler and D3D11 game Draw/DrawIndexed without fabricated w reads"
+      },
+      {
+        "id": "unsupported_game_shader_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_TEMP_lane_provenance_and_DX9Ex_game_control",
+        "expected_behavior": "Missing x/y/z, foreign or uninitialized destination TEMP or unsupported operand remains native fail-closed; original game D3D9Ex Draw, controls and FFB are authoritative"
+      },
+      {
+        "id": "integration_cpp_and_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "source_HLSL_codegen_CI_game_frame_output",
+        "expected_behavior": "Compile and execute C++ shader integration and negative cases, run unchanged five mandatory GitHub Actions on same exact source SHA before target promotion"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_sm3_fragment_codegen.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_live_sm3_texkill_01013.cpp",
+    "tools/test_dx11_live_sm3_texkill_01013.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/vr-openxr.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/outrun-exe-hud-inspector.yml",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
+  ],
+  "acceptance_results": {
+    "game_sm3_texkill_native_draw": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_fragment_codegen.hpp",
+        "tools/dx11_live_sm3_texkill_01013.cpp",
+        "tools/test_dx11_live_sm3_texkill_01013.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39892403252; Backend Conversion Gate 39892403233; Build 39892403251 (exact source SHA 0b829f569a2acfd3dbd66b25168e4d63afa30fce)",
+      "limitation": "No observed native game shader draw on OutRun executable; compiler and source-integrated tests only"
+    },
+    "unsupported_game_shader_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_fragment_codegen.hpp",
+        "tools/dx11_live_sm3_texkill_01013.cpp",
+        "tools/test_dx11_live_sm3_texkill_01013.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39892403252 (exact source SHA 0b829f569a2acfd3dbd66b25168e4d63afa30fce)",
+      "limitation": "Runtime original D3D9Ex controls/FFB were not exercised"
+    },
+    "integration_cpp_and_exact_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml",
+        "tools/test_dx11_live_sm3_texkill_01013.py"
+      ],
+      "validation_command": "GitHub Actions exact-SHA 0b829f569a2acfd3dbd66b25168e4d63afa30fce: Fast 39892403252, Backend 39892403233, Build 39892403251, OpenXR 39892403274, HUD 39892403222",
+      "limitation": "CI proves compile/structural gates, not gameplay or headset output"
+    }
+  },
+  "ci": {
+    "status": "PASS_EXACT_SHA",
+    "validated_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+    "results": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39892403252,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39892403233,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 39892403251,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39892403274,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39892403222,
+        "conclusion": "success"
+      }
+    ],
+    "build_artifacts": [
+      "wheel-source-0b829f569a2acfd3dbd66b25168e4d63afa30fce",
+      "outrun2006tweaks-0b829f569a2acfd3dbd66b25168e4d63afa30fce"
+    ],
+    "backend_artifact": "backend-autovalidated-0b829f569a2acfd3dbd66b25168e4d63afa30fce",
+    "prior_source_validated_sha": "0b829f569a2acfd3dbd66b25168e4d63afa30fce",
+    "c6_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39897074597,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39897074550,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 39897074581,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39897074512,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39897074541,
+        "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "No runtime hardware evidence. Real game menu/car/race native Draw counts and first published frame remain UNTESTED; separate concurrent feature branch changes require explicit conflict resolution before further promotion.",
+  "next_implementation_action": "Unmerged feature/dx11-01013-live-sm3-game-frame must reconcile with the now-promoted target via safe compare/rebase (no force, no blind duplicated R175/00477 edits). Continue actual genuine menu/car/race D3D9->D3D11 Draw and full-frame/Quest3 acceptance on a separately validated material SHA; do not treat source-level feature readiness as playable VR.",
+  "RUNTIME_VALIDATION_NOTES": "No local game or Quest3/VDXR HMD test performed; game GPU Draw/native published frame counters UNTESTED. CI confirms compiler/structural correctness only.",
+  "feature_ready": true,
+  "feature_ready_scope": "PASS_FEATURE_CI only: authentic game ps_3_0 TEXKILL xyz shader admission and source->native Draw pipeline compile/structural checks; no evidence of an actual visible playable frame",
+  "promotion": {
+    "status": "FAST_FORWARD_PROMOTED_AND_READBACK_VERIFIED",
+    "target_branch": "vr-dx11-native-r71",
+    "source_branch": "feature/dx11-01013-visible-game-frame",
+    "source_sha": "0b829f569a2acfd3dbd66b25168e4d63afa30fce",
+    "expected_target_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+    "compare_ahead": 4,
+    "compare_behind": 0,
+    "force": false,
+    "note": "Source was promoted only after 5 mandatory exact-SHA CI successes. This C6 documentation update follows the validated source material; it does not imply native runtime observation."
+  },
+  "score_note": "Same TASK_ID and same material results; C6 terminal-status reconciliation only, +0 points and no AI_SCOREBOARD.md change.",
+  "validation_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_resolution": "Terminal status bookkeeping complete; hold reason TERMINAL_STATUS_NOT_COMPLETE resolved by this documentation-only commit.",
+  "c6": {
+    "status": "PASS_EXACT_SHA",
+    "checkpoint": "C6_STATE",
+    "validation_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6",
+    "prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "exact_sha_ci": {
+      "status": "SUCCESS",
+      "jobs": [
+        {
+          "name": "DX11 Fast Structural Checks",
+          "run_id": 39897074597,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        },
+        {
+          "name": "Backend Conversion Gate",
+          "run_id": 39897074550,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        },
+        {
+          "name": "Build",
+          "run_id": 39897074581,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        },
+        {
+          "name": "OpenXR VR architecture",
+          "run_id": 39897074512,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        },
+        {
+          "name": "OutRun EXE HUD Inspector CI",
+          "run_id": 39897074541,
+          "conclusion": "success",
+          "head_sha": "8dd5ed0de6cbe81d4fdf56a8a9a8b9c3a4dbafe6"
+        }
+      ]
+    },
+    "commit_scope": "BOOKKEEPING_ONLY_SKIP_CI",
+    "material_code_change": false,
+    "workflow_retriggered": false,
+    "runtime_validation": "UNTESTED",
+    "preservation": "Prior material_result_sha, feature_contract and acceptance_results unchanged; feature CI evidence and playable-game limitations preserved."
+  }
+}

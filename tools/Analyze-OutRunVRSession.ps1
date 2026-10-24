@@ -34,6 +34,37 @@ if($dxvkLog -match 'DXVK:\s*v([0-9\.]+)'){$provider='DXVK '+$matches[1]}
 elseif($gameLog -match 'native D3D9Ex zero-copy transport'){$provider='NATIVE_D3D9EX'}
 elseif($gameLog -match 'plain IDirect3DDevice9 detected'){$provider='PLAIN_D3D9'}
 
+$analysisBackend=if($session.Backend){[string]$session.Backend}else{'UNKNOWN'}
+
+# R139/DX11 runtime-analysis guard: a healthy direct-frame aggregate can coexist
+# with a user-visible menu that is continuously submitted from cached fallback
+# imagery. Treat a 300+ frame cached-image submit window (or 120+ per-frame final
+# fallback markers when window summaries are unavailable) as a visual-path red
+# flag for the DX11 test backend. This is diagnostic only; it does not infer a
+# rendering fix or native DX11 draw activation.
+$fallbackCachedImageWindowCount=0
+$fallbackCachedImageFrames=0L
+$maxFallbackCachedImageWindowFrames=0L
+foreach($fm in [regex]::Matches(
+    $hostLog,
+    'actualSubmits=\{[^}\r\n]*fallback-cached-image:(\d+)[^}\r\n]*\}',
+    [Text.RegularExpressions.RegexOptions]::IgnoreCase
+)){
+    $count=[int64]$fm.Groups[1].Value
+    $fallbackCachedImageWindowCount++
+    $fallbackCachedImageFrames+=$count
+    if($count -gt $maxFallbackCachedImageWindowFrames){$maxFallbackCachedImageWindowFrames=$count}
+}
+$fallbackCachedImageFinalCount=([regex]::Matches(
+    $hostLog,
+    'actualFinal=fallback-cached-image',
+    [Text.RegularExpressions.RegexOptions]::IgnoreCase
+)).Count
+$sustainedCachedImageFallback=(
+    $analysisBackend -match '^dx11$' -and
+    ($maxFallbackCachedImageWindowFrames -ge 300 -or $fallbackCachedImageFinalCount -ge 120)
+)
+
 $sbsFallback=($combined -match 'transport=SBS Desktop Duplication' -or
     $combined -match 'SBS/Desktop Duplication remains active' -or
     $combined -match 'keeping SBS/Desktop Duplication fallback')
@@ -88,17 +119,19 @@ if($plainD3D9){$flags+='PLAIN_D3D9_PROVIDER'}
 if($sharedProbeFailed){$flags+='D3D9EX_SHARED_PROBE_FAILED'}
 if($driverSeatCount -gt 0){$flags+='DRIVER_SEAT_CAMERA_ACTIVE'}
 if($directFrames -eq 0 -and $directFallbacks -gt 0){$flags+='DIRECT_GPU_NOT_ACTIVE'}
+if($sustainedCachedImageFallback){$flags+='DX11_SUSTAINED_CACHED_IMAGE_FALLBACK'}
 if($crashEvidence){$flags+='CRASH_TEXT_PRESENT'}
 if($whiteScreenEvidence){$flags+='WHITE_SCREEN_TEXT_PRESENT'}
 if($flags.Count -eq 0){$flags+='NO_AUTOMATIC_RED_FLAG'}
 
 $variant=if($session.VariantId){[string]$session.VariantId}else{'UNKNOWN'}
-$backend=if($session.Backend){[string]$session.Backend}else{'UNKNOWN'}
+$backend=$analysisBackend
 $profile=if($session.TestProfile){[string]$session.TestProfile}else{'UNKNOWN'}
 $sourceSha=if($session.SourceSha){[string]$session.SourceSha}else{'UNKNOWN'}
 
 $status='OK'
 if($sbsFallback -and $backend -match 'dxvk'){$status='DXVK_SBS_FALLBACK_CONFIRMED'}
+elseif($sustainedCachedImageFallback){$status='DX11_SUSTAINED_CACHED_IMAGE_FALLBACK_CONFIRMED'}
 elseif($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){$status='UNEXPECTED_DRIVER_SEAT_CAMERA_ACTIVE'}
 elseif($directFrames -eq 0 -and $directFallbacks -gt 0){$status='DIRECT_GPU_UNAVAILABLE'}
 
@@ -116,6 +149,11 @@ $result=[ordered]@{
     DirectFrames=$directFrames
     DirectFallbacks=$directFallbacks
     FenceTimeouts=$fenceTimeout
+    FallbackCachedImageWindowCount=$fallbackCachedImageWindowCount
+    FallbackCachedImageFrames=$fallbackCachedImageFrames
+    MaxFallbackCachedImageWindowFrames=$maxFallbackCachedImageWindowFrames
+    FallbackCachedImageFinalCount=$fallbackCachedImageFinalCount
+    SustainedCachedImageFallback=$sustainedCachedImageFallback
     DriverSeatCameraActivationCount=$driverSeatCount
     SemanticRegistered=$semanticRegistered
     SemanticConsumed=$semanticConsumed
@@ -144,6 +182,11 @@ $lines=@(
     "directFrames=$directFrames"
     "directFallbacks=$directFallbacks"
     "fenceTimeouts=$fenceTimeout"
+    "fallbackCachedImageWindowCount=$fallbackCachedImageWindowCount"
+    "fallbackCachedImageFrames=$fallbackCachedImageFrames"
+    "maxFallbackCachedImageWindowFrames=$maxFallbackCachedImageWindowFrames"
+    "fallbackCachedImageFinalCount=$fallbackCachedImageFinalCount"
+    "sustainedCachedImageFallback=$sustainedCachedImageFallback"
     "driverSeatCameraActivationCount=$driverSeatCount"
     "semanticRegistered=$semanticRegistered"
     "semanticConsumed=$semanticConsumed"
@@ -158,6 +201,9 @@ $lines=@(
 )
 if($status -eq 'DXVK_SBS_FALLBACK_CONFIRMED'){
     $lines+='interpretation=DXVK loaded, but DirectGPU shared-eye transport did not activate; runtime fell back to SBS/Desktop Duplication.'
+}
+if($status -eq 'DX11_SUSTAINED_CACHED_IMAGE_FALLBACK_CONFIRMED'){
+    $lines+='interpretation_dx11_fallback=DX11 test session sustained fallback-cached-image submission; transport/cadence health must not be treated as visual parity or native DX11 rendering.'
 }
 if($driverSeatCount -gt 0 -and $variant -ne 'G_COCKPIT'){
     $lines+='interpretation_camera=Driver-seat camera code activated during a non-cockpit test slot.'

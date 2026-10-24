@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01011",
+  "production_id": "CONVERSION-DX11-01011",
+  "event_id": "CONVERSION-DX11-01011-E003",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01011",
+  "work_key": "DX11:LIVE_SM3_MASKED_CHANNEL_GAME_DRAW",
+  "feature_id": "DX11:LIVE_SM3_MASKED_CHANNEL_GAME_DRAW",
+  "work_class": "integration",
+  "classification": "A",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "80e3741cd13b68a59848c7a9ef5e7890e08b4bb4",
+  "material_result_sha": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+  "validation_bearing_result_sha": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "score_change": 0,
+  "summary": "Actual SM3 source register partial writes emitted vector HLSL reading unwritten channels even though D3D9 output mask consumes only chosen components. This source-batch implements masked-lane scalar HLSL generation for real game MOV, ADD/SUB/MUL, MIN/MAX, MAD, LRP, ABS/FRC, derivatives, CMP, SLT/SGE and SGN while retaining full-vector and dot/matrix code paths. Maintains original DX9Ex fallback and real D3D11 Draw/DrawIndexed game linkage; portable positive/negative regression in existing DX11 Fast. Build, real-game and Quest3 runtime not yet verified.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game-authored D3D9 ps_3_0 arithmetic source operand masked channels -> D3D11 real GPU shader HLSL codegen with only initialized TEMP physical lanes",
+      "Shader cache revision update -> actual live native programmable VS/PS Draw/DrawIndexed path -> game-size target, safeguarded D3D9 fallback"
+    ],
+    "batch_components": [
+      "Actual C++ source codegen for masked channel operations and authentic shader cache materialization revision",
+      "Native game draw integration regression with positive and negative codegen plus existing arithmetic compiler compatibility under mandatory CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++ unit executes game shader per-lane arithmetic codegen, real live GPU source->Draw callsite verified structurally; real gameplay UNTESTED",
+      "negative_regression": "Unselected D3D9 TEMP lanes do not appear as HLSL reads; mask-zero fails closed and whole-register/dot shaders keep prior path",
+      "component_integration": "Native backend receives authentic shader opcode/output mask and emits HLSL -> live_game_frame_bridge native GPU Draw/DrawIndexed; fail-closed D3D9 fallback remains"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_MASKED_CHANNEL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_NOT_YET_BUILD_VERIFIED; ACTUAL_GAME_PIXELS_AND_HMD_UNTESTED",
+    "activation_guard_and_fallback": "Original D3D9 game drawing/input/FFB and DX9Ex fallback retained. DXVK frozen; shader partial mask cannot widen reads.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_MASKED_CHANNEL_GAME_DRAW",
+    "goal": "Retain original native game GPU Draw/DrawIndexed pixel output semantics for SM3 partial destination writes without fabricated reads of undeclared TEMP components.",
+    "acceptance_items": [
+      {
+        "id": "partial_vector_arithmetic_native_codegen",
+        "category": "end_to_end_behavior",
+        "behavior_area": "authentic_sm3_bytecode_to_native_GPU_HLSL",
+        "expected_behavior": "True per-lane HLSL operations emit only game-written mask source channels for the full SM3 channel-wise opcode family, across menu/car/race shader Draws"
+      },
+      {
+        "id": "safe_fallback_and_full_register",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_input_FFB_and_shader_provenance",
+        "expected_behavior": "Mask-zero invalid, unselected channels never sourced, full-mask and scalar dot operations preserve existing GPU semantics; original D3D9 fallback remains"
+      },
+      {
+        "id": "exact_sha_build_validation",
+        "category": "integrated_validation",
+        "behavior_area": "native_shader_build_and_actions",
+        "expected_behavior": "Portable C++ positive/negative regression, existing arithmetic compatibility, shader materializer cache revision, mandatory five unchanged exact-SHA GitHub Actions"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_live_sm3_masked_channels_01011.cpp",
+    "tools/test_dx11_live_sm3_masked_channels_01011.py",
+    "docs/automation/runs/CONVERSION-DX11-01011.json"
+  ],
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "exact_sha": "2da592a3558d6399ac8019be0b9f77ed3620dd28",
+    "required_workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39779815777,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815777"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39779815949,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815949"
+      },
+      {
+        "name": "Build",
+        "run_id": 39779815757,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815757"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39779815741,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815741"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39779815797,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39779815797"
+      }
+    ],
+    "artifacts": [
+      "backend-autovalidated-2da592a3558d6399ac8019be0b9f77ed3620dd28",
+      "outrun2006tweaks-2da592a3558d6399ac8019be0b9f77ed3620dd28",
+      "feature-dx11-first-game-frame-2da592a3558d6399ac8019be0b9f77ed3620dd28"
+    ]
+  },
+  "next_source_file": "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+  "real_game_draw_blocker": "Actual per-channel game GPU coverage not yet measured; this batch removes unnecessary unwritten lane reads",
+  "next_implementation_action": "Check targeted source compile and exact-SHA five CI results. If failure, repair under 01011 and revalidate; HMD UNTESTED.",
+  "feature_stage": "COMPLETE_BUILD_VERIFIED",
+  "feature_branch": "feature/dx11-01011-gate-repair-20261022",
+  "target_promotion": "NOT_REQUIRED_PRIOR_ROLLOVER_COMMITTED_IDENTICAL_SOURCE",
+  "result_source_tree_sha": "218b265af0de72dd89395658d533610d60cea2e4",
+  "acceptance_results": {
+    "partial_vector_arithmetic_native_codegen": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_live_sm3_masked_channels_01011.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_masked_channels_01011.py; GitHub Actions 5 mandatory Gates exact SHA 2da592a3558d6399ac8019be0b9f77ed3620dd28"
+    },
+    "safe_fallback_and_full_register": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+        "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+        "tools/test_dx11_sm3_interface_channels_00957.py"
+      ],
+      "validation_command": "python tools/test_dx11_sm3_interface_channels_00957.py; python tools/test_dx11_live_sm3_masked_channels_01011.py; GitHub Actions exact SHA 2da592a3558d6399ac8019be0b9f77ed3620dd28"
+    },
+    "exact_sha_build_validation": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tools/verify_dx11_source_graph.py",
+        ".github/workflows/dx11-fast-structural.yml",
+        "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp"
+      ],
+      "validation_command": "python tools/verify_dx11_source_graph.py; GitHub Actions 5 mandatory Gates exact SHA 2da592a3558d6399ac8019be0b9f77ed3620dd28"
+    }
+  },
+  "hardware_notes": "No real OutRun game rendering, first visible native frame, Quest3/VDXR or input/FFB hardware validation performed; remains UNTESTED. Material SHA exact CI PASS is structural/build evidence only."
+}

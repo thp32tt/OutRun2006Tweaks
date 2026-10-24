@@ -1,0 +1,207 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00383",
+  "production_id": "CONVERSION-DX11-00383",
+  "event_id": "CONVERSION-DX11-00383-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R254_PROGRAMMABLE_LIVE_IA_INDEX_BINDING_REOBSERVATION_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "base_sha": "aaaaa6c444ae3993636eb90c38a0439be65103b6",
+  "result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+  "material_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+  "source_implementation_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+  "validation_bearing_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+  "result_marker": "[AUTO:CONVERSION-DX11-00383]",
+  "selected_work_item": "DX11_R254_PROGRAMMABLE_INDEXED_LIVE_IA_REOBSERVATION_READINESS",
+  "summary": "R254 adds a dormant fresh IAGetIndexBuffer reobservation after R253 and seals live index-buffer identity, DXGI format, byte offset, current MANAGED mirror lineage, context device, and a self-authenticated R253 source-value receipt without issuing DrawIndexed or activating NativeDrawPath.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "0371aed8d49aca454a49ea6697bbd727f5425633"
+  ],
+  "validation_candidate_commit": "0371aed8d49aca454a49ea6697bbd727f5425633",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD aaaaa6c444ae3993636eb90c38a0439be65103b6, read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/CONVERSION_LANE_STATE.json, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, regression/history state and CONVERSION-DX11-00380. The prior exact next action selected a fresh live IA index-buffer/format/offset reobservation successor; no completed R253 work was repeated. Current explicit rollover E002/CHAT_ROLLOVER=2 is authoritative over the earlier automatic-queue E005/retry bookkeeping; ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R253 seals actual MANAGED source-index values against R252 but its final receipt does not itself carry a dedicated post-R253 live IA index-buffer/format/offset freshness proof. R254 adds that fail-closed proof while leaving DrawIndexed and NativeDrawPath dormant.",
+      "review_lenses": {
+        "architecture": "Extend NativeProgrammableShaderPairCache readiness only; keep DX9Ex, selector, OpenXR transport and production draw routing untouched.",
+        "ownership_lifetime": "Require current MANAGED index mirror identity, expected context device, and a self-authenticated R253 snapshot before accepting fresh IA state.",
+        "stereo_correctness": "No WVP/projection/HUD/surface/OpenXR behavior changed; runtime remains UNTESTED.",
+        "performance": "Dormant readiness/probe path only; no production hot-path activation.",
+        "adversarial": "Fail closed on missing/replaced live IB, DXGI format drift, byte-offset drift, forged/copied R253 state, stale mirror identity, unsupported formats, or mismatched context device."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderIndexedLiveIndexBindingReadiness plus compose/validate methods; reconstructs the R253 seal, reobserves IAGetIndexBuffer, checks buffer identity/format/offset/context/mirror lineage, and adds positive plus buffer/format/offset drift WARP regressions and source-graph guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R254_PROGRAMMABLE_LIVE_IA_INDEX_BINDING_REOBSERVATION_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "validation_run_id": 37230629027,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111519331007,
+      "readiness_smoke_job_id": 111520282209,
+      "artifact_id": 11314175217,
+      "artifact_digest": "sha256:51d2e7a8b90659f5aaaeb49262040d7b8e6abad65105b94570b4d651918abc5d",
+      "evidence": "Exact SHA 0371aed8d49aca454a49ea6697bbd727f5425633 passed Backend Conversion Gate run 37230629027 attempt 1. validate job 111519331007 passed source graph, dormant activation boundary, Win32 Release build, binary check and artifact upload; DX11 readiness smoke job 111520282209 passed the full suite including the R254 constant-buffer probe."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "material_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "source_implementation_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "validation_bearing_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "result_marker": "[AUTO:CONVERSION-DX11-00383]",
+      "implementation_commits": [
+        "0371aed8d49aca454a49ea6697bbd727f5425633"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable indexed live-IA readiness/probe only; no runtime package, HMD binary distribution, selector, DrawIndexed routing, or NativeDrawPath activation changes."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 5983942805,
+      "exact_next_action": "Preserve validated R239-R254 programmable readiness. Under a new TASK_ID, compose a final dormant indexed pre-Draw receipt that joins the current R252 dispatch tuple, R253 source-value proof, and R254 fresh live IA index binding before any DrawIndexed/NativeDrawPath activation.",
+      "rollover_metadata_reconciled": true,
+      "authoritative_event_id": "CONVERSION-DX11-00383-E002",
+      "authoritative_event_type": "rollover",
+      "authoritative_attempt": "1/3"
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS",
+      "VR_BACKEND_SET05_F23_SAMPLE_EXACT_NOT_ACTIVATION_GATE"
+    ],
+    "evidence": "R254 changes only dormant DX11 readiness/probe/static-guard code. No vr-d3d9ex-focus source, selector, OpenXR transport, production Draw* routing, or NativeDrawPath activation changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00383",
+    "production_id": "CONVERSION-DX11-00383",
+    "event_id": "CONVERSION-DX11-00383-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_ROLLOVER",
+    "dispatch_source": "CURRENT_USER_ROLLOVER",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+    "source_implementation_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+    "validation_bearing_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+    "validation_run_id": 37230629027,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111519331007,
+    "readiness_smoke_job_id": 111520282209,
+    "artifact_id": 11314175217,
+    "artifact_digest": "sha256:51d2e7a8b90659f5aaaeb49262040d7b8e6abad65105b94570b4d651918abc5d",
+    "implementation_comment_id": 5983870050,
+    "validation_comment_id": 5983942805
+  },
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37230629027,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "validate_job_id": 111519331007,
+      "readiness_smoke_job_id": 111520282209,
+      "artifact_id": 11314175217,
+      "artifact_digest": "sha256:51d2e7a8b90659f5aaaeb49262040d7b8e6abad65105b94570b4d651918abc5d"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5983870050,
+    "validation_and_reconciliation_comment_id": 5983942805
+  },
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00383",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00383",
+      "production_id": "CONVERSION-DX11-00383",
+      "event_id": "CONVERSION-DX11-00383-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "dispatch_source": "CURRENT_USER_ROLLOVER",
+      "runtime_validation": "UNTESTED",
+      "native_draw_path_activation_changed": false,
+      "material_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "source_implementation_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "validation_bearing_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+      "validation_run_id": 37230629027,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111519331007,
+      "readiness_smoke_job_id": 111520282209,
+      "artifact_id": 11314175217,
+      "artifact_digest": "sha256:51d2e7a8b90659f5aaaeb49262040d7b8e6abad65105b94570b4d651918abc5d",
+      "implementation_comment_id": 5983870050,
+      "validation_comment_id": 5983942805
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00383",
+        "production_id": "CONVERSION-DX9EX-00382",
+        "event_id": "CONVERSION-DX9EX-00382-E005",
+        "event_type": "retry",
+        "attempt": "1/3",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE",
+        "runtime_validation": "UNTESTED",
+        "native_draw_path_activation_changed": false,
+        "material_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+        "source_implementation_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+        "validation_bearing_result_sha": "0371aed8d49aca454a49ea6697bbd727f5425633",
+        "validation_run_id": 37230629027,
+        "validation_run_attempt": 1,
+        "validation_job_id": 111519331007,
+        "readiness_smoke_job_id": 111520282209,
+        "artifact_id": 11314175217,
+        "artifact_digest": "sha256:51d2e7a8b90659f5aaaeb49262040d7b8e6abad65105b94570b4d651918abc5d",
+        "implementation_comment_id": 5983870050,
+        "validation_comment_id": 5983942805
+      }
+    ],
+    "reason": "The current explicit user rollover CONVERSION-DX11-00383-E002 / CHAT_ROLLOVER=2 supersedes the earlier automatic-queue E005/retry bookkeeping only. This rollover is not a retry, so ATTEMPT remains 1/3. R254 material and exact-SHA validation evidence are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "exact_next_action": "Preserve validated R239-R254 programmable readiness. Under a new TASK_ID, compose a final dormant indexed pre-Draw receipt that joins the current R252 dispatch tuple, R253 source-value proof, and R254 fresh live IA index binding before any DrawIndexed/NativeDrawPath activation.",
+  "validation_run_id": 37230629027,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111519331007,
+  "readiness_smoke_job_id": 111520282209,
+  "artifact_id": 11314175217,
+  "artifact_digest": "sha256:51d2e7a8b90659f5aaaeb49262040d7b8e6abad65105b94570b4d651918abc5d",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt"
+}

@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00684",
+  "production_id": "CONVERSION-DX11-00684",
+  "event_id": "CONVERSION-DX11-00684-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:SAME_MODE_PRESENT_BACKBUFFER_IDENTITY_GENERATION",
+  "feature_id": "MENU_RACE_BACKBUFFER_COM_REPLACEMENT_FENCING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 game Present GetBackBuffer and canonical COM identity",
+      "Native diagnostic output signature and GPU readback output-generation fence",
+      "Device-owned D3D9 system-memory inset upload only for current backbuffer and output generation"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/test_dx11_same_mode_swapchain_transition_00684.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++17 menu/vehicle/race transitions preserving device/format/size but replacing COM backbuffer identity; connected Draw-Present source structural check",
+      "negative_regression": "Source removal of identity capture/generation/readback fence and C++ reversed or removed identity comparison",
+      "component_integration": "D3D9 GetBackBuffer IUnknown -> output COM identity change -> outputGeneration -> async D3D11 readback provenance -> D3D9 UpdateSurface"
+    },
+    "conflict_keys": [
+      "DX11:SAME_MODE_PRESENT_BACKBUFFER_IDENTITY_GENERATION",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/test_dx11_same_mode_swapchain_transition_00684.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Reject previous GPU diagnostic pixels on identical-resolution/format swaps whose primary D3D9 Present COM backbuffer changed.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only, no forced promotion; original game D3D9 Draw/Present/controller always run."
+  },
+  "feature_contract": {
+    "feature_id": "MENU_RACE_BACKBUFFER_COM_REPLACEMENT_FENCING",
+    "goal": "Ensure menu-to-vehicle-to-race native diagnostic GPU output belongs to the current D3D9 Present backbuffer even across same-resolution and same-format backbuffer object replacement.",
+    "acceptance_items": [
+      {
+        "id": "menu-race-surface-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_draw",
+        "expected_behavior": "A current D3D9 backbuffer COM identity is integrated into every Present output generation so stale native GPU frames cannot masquerade as the next same-mode scene."
+      },
+      {
+        "id": "controller-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_present_controller",
+        "expected_behavior": "An identity or resource failure rejects native overlay, leaves D3D9 Draw/Present/gamepad untouched, and fails closed."
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_windows",
+        "expected_behavior": "Portable C++17 identity matrix, destructive source regressions and mandated exact-SHA GitHub Actions pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu-race-surface-continuity": "PENDING_EXACT_SHA",
+    "controller-safe-fallback": "PENDING_EXACT_SHA",
+    "exact-sha-ci": "PENDING_EXACT_SHA"
+  },
+  "base_head_sha": "d998819b0ddfa132ebfa3a8fd576abe3d0560274",
+  "changed_files": [
+    "src/vr/d3d11/native_game_readback_provenance.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_game_output_transition_00682.py",
+    "tools/test_dx11_same_mode_swapchain_transition_00684.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00684.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub branch and 00683 five mandatory gates verified",
+    "C1_REVIEW": "PASS same-mode backbuffer replacement missing from output-generation identity",
+    "C2_IMPLEMENT": "PASS COM canonical output identity and generation/readback integration",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 5/5 GitHub Actions SUCCESS at validation-bearing result SHA",
+    "C4_COMMIT": "MATERIAL_RESULT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; runtime UNTESTED"
+  },
+  "next_action": "C6 terminal build verification recorded. Do not rerun this TASK_ID; advance controller to next independent DX11 feature. Quest3/VDXR and gamepad need separate runtime test.",
+  "material_result_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+  "validation_bearing_result_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "exact_sha_gates": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38424439829,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424439829"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38424439614,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424439614"
+    },
+    {
+      "name": "Build",
+      "run_id": 38424447870,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424447870"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38424448023,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424448023"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38424447906,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424447906"
+    }
+  ]
+}

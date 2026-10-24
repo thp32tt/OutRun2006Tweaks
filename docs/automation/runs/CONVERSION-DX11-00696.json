@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00696",
+  "production_id": "CONVERSION-DX11-00696",
+  "event_id": "CONVERSION-DX11-00696-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_MENU_RACE_SCENE_BOUNDARY_CONTINUITY",
+  "work_key": "DX11:GAME_CLEAR_RT0_NATIVE_BATCH",
+  "status": "AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real game Clear and RT0 changes during menu/vehicle/race intercepted by R9 callback after D3D9 hook attribution",
+      "Current game-device native Draw batch invalidated after scene boundary; no stale GPU readback queued on Present",
+      "Next game frame may resume native Draw/DrawIndexed while original game Draw/Present/gamepad always continues"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.hpp",
+      "tools/test_dx11_game_scene_boundary_00696.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable constexpr C++17 verifies first Draw, boundary invalidation, next frame fresh Draw and full-eight-draw boundary invalidation; integrated R9 callback source assertions",
+      "negative_regression": "Structural destructive tests remove Clear hook, RT0 old/new comparison, successful state transition, GPU pending invalidation or batch stop and must fail",
+      "component_integration": "Observed real game Clear or changed RT0 -> scene_boundary -> native batch unpublished even if GPU Draw executed; original D3D9 draw/gamepad and reset are unchanged"
+    },
+    "conflict_keys": [
+      "DX11:GAME_CLEAR_RT0_NATIVE_BATCH",
+      "src/vr/d3d9/stereo_renderer.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_CLEAR_RT_SWITCH",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native menu/vehicle/race diagnostic frame avoids stale scene compositing across real Clear or RT0 transitions; in-game visible outcome requires user Quest3/VDXR proof.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only; original game Clear/RT0/Draw/Present and pad hooks remain authoritative; boundary drops only diagnostic GPU readback."
+  },
+  "feature_contract": {
+    "feature_id": "GAME_MENU_RACE_SCENE_BOUNDARY_CONTINUITY",
+    "goal": "Preserve live menu/car selection/race native frame scene coherence across D3D9 Clear and RT0 switches without stale GPU publication or perturbing original game input.",
+    "acceptance_items": [
+      {
+        "id": "game-scene-boundary-events",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_clear_rt0_hook_native_frame",
+        "expected_behavior": "Actual game Clear and real successful RT0 change invalidate only the current device native Draw batch before Present"
+      },
+      {
+        "id": "original-game-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "fallback_gamepad_gpu_readback",
+        "expected_behavior": "Unchanged render-target calls, internal stereo calls and pre-draw Clears keep original D3D9 path; invalidated native GPU pixels never publish"
+      },
+      {
+        "id": "scene-boundary-gate",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_scene_batch_source_gate",
+        "expected_behavior": "Portable C++17 scene boundary and destructive source wiring tests plus exact-SHA GitHub mandatory build gates succeed"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game-scene-boundary-events": "PENDING_GATE",
+    "original-game-fallback": "PENDING_GATE",
+    "scene-boundary-gate": "PENDING_GATE"
+  },
+  "base_head_sha": "ce147c8a8785ed58766476132f9381b04626ebf9",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_game_scene_boundary_00696.py",
+    "docs/automation/runs/CONVERSION-DX11-00696.json"
+  ],
+  "next_action": "Run exact-SHA GitHub Actions Gate and fix actual regressions under same task; HMD/gamepad runtime untested; separate C6 bookkeeping after PASS."
+}

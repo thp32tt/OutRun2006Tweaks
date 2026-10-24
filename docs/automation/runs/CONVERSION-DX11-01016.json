@@ -1,0 +1,255 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01016",
+  "production_id": "CONVERSION-DX11-01016",
+  "event_id": "CONVERSION-DX11-01016-E003",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "chat_rollover": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01016",
+  "feature_id": "DX11:LIVE_SM3_FACE_NATIVE_GAME_DRAW",
+  "work_key": "DX11:LIVE_SM3_FACE_NATIVE_GAME_DRAW",
+  "feature_stage": "FEATURE_READY",
+  "feature_branch": null,
+  "feature_goal": "Preserve authentic vFace SM3 real-game D3D9 Draw to D3D11 Draw and visible frame end-to-end direction",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "9b22f216ff43a8546585111cede7e926eb3a80ac",
+  "material_result_sha": "08f2aaaf392b58dfd1146bdaa7972dd96f2e221f",
+  "result_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+  "validation_bearing_result_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Decode authentic live D3D9 ps_3_0 vFace shader declaration and preserve signed per-face conditional raster input identity",
+      "Link real VS clip position and pixel PS system FACE/VPOS to native HLSL shader bound to source-owned D3D11 Draw/DrawIndexed and eventual visible game frame"
+    ],
+    "batch_components": [
+      "C++ native shader bytecode/semantic linker and HLSL FACE conditional source translation into game GPU Draw",
+      "Portable compiled C++ and linked source positive/negative FACE regression with mandatory five CI Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native SM3 FACE scalar conditional codegen and live PSSetShader/Draw/DrawIndexed source integration compiled test",
+      "negative_regression": "Reject unsupported FACE arithmetic/swizzle/undeclared register and missing VS clip; preserve DX9Ex fallback",
+      "component_integration": "pipeline_translation.cpp -> native_backend.cpp -> live_game_frame_bridge.cpp -> game native Draw"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPL_ONLY; actual OutRun-created GPU Draw/native published visible frame not yet hardware verified; no gameplay/HMD claims",
+    "activation_guard_and_fallback": "Keep explicit diagnostic opt-in, fail-closed unsupported shaders and original DX9Ex Draw/input/FFB; no implicit native activation."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_FACE_NATIVE_GAME_DRAW",
+    "goal": "Translate authentic real-game D3D9 ps_3_0 signed FACE conditional shader semantics to native D3D11 SV_IsFrontFace linked to game Draw while preserving safe DX9Ex fallback, real visible game frame objective and five exact-SHA CI Gates.",
+    "acceptance_items": [
+      {
+        "id": "real_face_signed_ifc_game_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "SM3_FACE_raster_declaration_to_D3D11_native_game_GPU_Draw",
+        "expected_behavior": "Decode game-authored ps_3_0 dcl vFace full mask into native SV_IsFrontFace with correct signed scalar IFC BREAKC SETP operands and actual shader-bound D3D11 Draw/DrawIndexed path"
+      },
+      {
+        "id": "unsupported_face_lane_and_d3d9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "SM3_FACE_provenance_invalid_lane_guards_and_D3D9Ex_fallback",
+        "expected_behavior": "Fail closed on invalid face register mask/swizzle, inappropriate arithmetic/TEX, invalid stages and missing VS clip output without replacing original DX9Ex drawing and input/FFB"
+      },
+      {
+        "id": "compiled_FACE_linker_full_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "CXX_HLSL_source_link_regressions_and_mandatory_actions",
+        "expected_behavior": "Compiled native SM3 FACE positive/negative regression and live source linked Draw tests followed by Backend, DX11 Fast, Build, OpenXR and HUD full exact-SHA Gate"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/native_sm3_interface_channels.hpp",
+    "src/vr/d3d11/live_game_sm3_interface_capacity.hpp",
+    "tools/dx11_sm3_face_compare_01016.cpp",
+    "tools/test_dx11_live_sm3_face_01016.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "acceptance_results": {
+    "real_face_signed_ifc_game_draw": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_interface_channels.hpp",
+        "tools/test_dx11_live_sm3_face_01016.py"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_face_01016.py in DX11 Fast run 39912972914; Win32 Build run 39912972870; exact SHA 3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "limitation": "Game-authored native draw count and visible full-frame output UNTESTED"
+    },
+    "unsupported_face_lane_and_d3d9ex_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tools/dx11_sm3_face_compare_01016.cpp",
+        "tools/test_dx11_live_sm3_face_01016.py",
+        "tools/test_dx11_live_sm3_pixel_position_01015.py",
+        "tools/test_dx11_sm3_interface_draw_00964.py"
+      ],
+      "validation_command": "Compiled face and negative-mask/capacity assertions in DX11 Fast run 39912972914 at 3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "limitation": "Actual DX9Ex fallback/FFB/gamepad runtime not exercised"
+    },
+    "compiled_FACE_linker_full_exact_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_live_sm3_face_01016.py",
+        "tools/test_dx11_autodev_policy.py",
+        "docs/automation/runs/CONVERSION-DX11-01015.json"
+      ],
+      "validation_command": "Five required exact-SHA GitHub Actions: Fast 39912972914; Backend 39912972882; Build 39912972870; OpenXR 39912972890; HUD 39912972994 at 3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "limitation": "Static/Win32 compile/artifact proof only; HMD and gameplay untested"
+    }
+  },
+  "pending_items": [
+    "Actual OutRun authored native D3D9 Draw->D3D11 Draw count and visible full game frame not observed on hardware; separate future runtime work required",
+    "Quest3/HMD/gamepad/FFB and DX9Ex fallback runtime validation still UNTESTED",
+    "R175 TEXCOORD6 ownership 00477 not taken over in this task"
+  ],
+  "current_gate_failure": {
+    "backend_run_id": 39911643561,
+    "dx11_fast_run_id": 39911643629,
+    "head_sha": "08f2aaaf392b58dfd1146bdaa7972dd96f2e221f",
+    "conclusion": "failure",
+    "cause": "Prior 01015 C6 run metadata missing mandatory 00672+ feature_contract and 00537+ gameplay_delivery_target; no evidence of C++ compiler error",
+    "additional_fast_00964": {
+      "run_id": 39912512240,
+      "reason": "Legacy test asserted literal pre-01016 capacity implementation, not bounded 10-varying plus 2-system raster rule",
+      "repair": "Preserve capacity negative guards and VS no-system-input semantics"
+    },
+    "additional_fast_01015": {
+      "run_id": 39912763706,
+      "reason": "Historical 01015 text check assumed only VPOS misc semantic; 01016 preserves VPOS and newly recognizes separate FACE semantics",
+      "repair": "Assert both raster inputs separated, verify actual VS clip and VPOS mask; preserve compiled regression"
+    }
+  },
+  "runtime_note": "Real game/HMD/Quest3/FFB UNTESTED; test GPU geometry != playable game.",
+  "repair_scope": [
+    "docs/automation/runs/CONVERSION-DX11-01015.json",
+    "tools/test_dx11_autodev_policy.py",
+    "docs/automation/runs/CONVERSION-DX11-01016.json",
+    "tools/test_dx11_sm3_interface_draw_00964.py",
+    "tools/test_dx11_live_sm3_pixel_position_01015.py"
+  ],
+  "validation_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change_pending_ssot_update": true,
+  "feature_ready_source_ci": true,
+  "feature_ready_gameplay": false,
+  "validation": {
+    "status": "PASS_EXACT_SHA",
+    "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "mandatory_check_count": 5,
+    "mandatory_checks_passed": 5,
+    "mandatory_workflow_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39912972914,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39912972882,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      },
+      {
+        "name": "Build",
+        "run_id": 39912972870,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39912972890,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39912972994,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12"
+      }
+    ],
+    "same_sha": true
+  },
+  "exact_sha_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 39912972914,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 39912972882,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 39912972870,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 39912972890,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39912972994,
+      "head_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+      "conclusion": "success"
+    }
+  },
+  "bundle_evidence": {
+    "build_artifact_id": 12484011544,
+    "build_artifact_name": "outrun2006tweaks-3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "first_game_frame_artifact_id": 12484241293,
+    "first_game_frame_artifact_name": "feature-dx11-first-game-frame-3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "backend_artifact_name": "backend-autovalidated-3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "package_nested_zip_crc": "PASS",
+    "inner_sha256s_passed": 11,
+    "inner_sha256s_total": 11,
+    "build_identity_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+    "build_identity_feature_ready": false,
+    "meaning": "Compiled source verification only; not runtime gameplay validation"
+  },
+  "c6_record_role": "DOCUMENTATION_ONLY_POST_EXACT_SHA_SUCCESS_NOT_VALIDATION_BEARING",
+  "c6_source_validation_sha": "3d0d1fb63b6392f244899760a8e1e9a876b51e12",
+  "c6_no_hardware_claims": true,
+  "finalization_note": "All five required GitHub Actions succeeded on one exact source SHA; C6 docs-only commit occurs after source validation; no additional C++ code changes or runtime assertions."
+}

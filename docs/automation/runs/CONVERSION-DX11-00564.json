@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00564",
+  "production_id": "CONVERSION-DX11-00564",
+  "event_id": "CONVERSION-DX11-00564-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00564",
+  "base_sha": "819355a60f5190ae74a7285c3ad33fecacee5de6",
+  "work_key": "DX11:MENU_RACE_FACTOR_RGB_DIFFUSE_ADD_ALPHA_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Actual game D3D9 BLENDFACTORALPHA RGB and SELECTARG2/ADD alpha",
+      "D3D9 texture factor and operand validation to HLSL PS shader bytecode",
+      "D3D11 Draw/DrawIndexed and opt-in diagnostic inset without gamepad/DX9Ex disruption"
+    ],
+    "batch_components": [
+      "D3D9 actual source state capture/validation",
+      "D3D11 HLSL shader compilation/lifetime/dispatch",
+      "Python destructive source linkage+RGBA numerical regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real-game Draw fixed-function independent alpha routed to native PS",
+      "negative_regression": "D3D9 unsupported ops fail closed; destructively severed producer/shader links fail",
+      "component_integration": "Game GetTextureStageState/TextureFactor -> DX11 PS -> native Draw/DrawIndexed -> inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_FACTOR_RGB_DIFFUSE_ADD_ALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:FACTOR_RGB_DIFFUSE_ADD_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "FACTOR_RGB_INDEPENDENT_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST Quest3/VDXR/menu/vehicle/race/gamepad",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in; original D3D9 Draw/Present/input authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00564.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub latest HEAD, AGENTS policy, task 00563 reviewed",
+    "C1_REVIEW": "Missing independently selected stage0 diffuse alpha and ADD alpha with factor RGB",
+    "C2_IMPLEMENT": "D3D9 state producer, new native HLSL PS, Draw/DrawIndexed dispatch and negative tests",
+    "C3_VALIDATE": "PASS_EXACT_SHA 5c68d4591b706397f228d5a5333b980f8ed668fc: Backend #38169394317 SUCCESS, Build #38169397173 SUCCESS, DX11 Fast #38169394237 SUCCESS, OpenXR push #38169394293 + PR #38169397125 SUCCESS, HUD #38169397202 SUCCESS. Initial 6a9b43be9341f6b7697cb66407a1cd4f9d0524ed Win32 feature regression failure, repaired 5c68d4591b706397f228d5a5333b980f8ed668fc. Quest3/VDXR/gamepad UNTESTED.",
+    "C4_COMMIT": "Material source 6a9b43be9341f6b7697cb66407a1cd4f9d0524ed; same-task C++/Python validation repair 5c68d4591b706397f228d5a5333b980f8ed668fc; no CI skip on either. C6 separate docs-only bookkeeping [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED/PASS_EXACT_SHA at 5c68d4591b706397f228d5a5333b980f8ed668fc; no game/Quest3/VDXR/gamepad evidence. Original DX9Ex path remains authoritative; native inset requires opt-in."
+  },
+  "runtime_evidence": "No Quest3, VDXR, in-game visuals or gamepad test performed",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "C6 sealed; allocate new independent unfinished DX11 menu->vehicle->race/input source feature; do not replay/score 00564. HMD game visuals/gamepad NEED_HMD_TEST.",
+  "state_persisted": true,
+  "initial_failed_validation": {
+    "sha": "6a9b43be9341f6b7697cb66407a1cd4f9d0524ed",
+    "run_id": 38169254725,
+    "failed_step": "Feature acceptance: DX11-SAFE-RETURN",
+    "cause": "Legacy mixed-alpha source test expected original parenthesized gate. New independent-alpha test also needed all-occurrence negative mutation."
+  },
+  "material_result_sha": "6a9b43be9341f6b7697cb66407a1cd4f9d0524ed",
+  "validation_bearing_result_sha": "5c68d4591b706397f228d5a5333b980f8ed668fc",
+  "result_sha": "5c68d4591b706397f228d5a5333b980f8ed668fc",
+  "acceptance_results": {
+    "source_and_negative_regression": "Live D3D9 factor RGB + independently selected diffuse or saturated additive alpha -> own HLSL -> native Draw/DrawIndexed. Legacy 00556 test preserved; 00564 destructive producer/consumer and CPU factor 0/128/255 PASS.",
+    "backend_conversion_gate": "SUCCESS",
+    "build": "SUCCESS",
+    "dx11_fast_structural": "SUCCESS",
+    "openxr_vr_architecture": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "exact_sha": "5c68d4591b706397f228d5a5333b980f8ed668fc",
+    "runtime_validation": "UNTESTED"
+  },
+  "validation_evidence": {
+    "exact_sha": "5c68d4591b706397f228d5a5333b980f8ed668fc",
+    "github_actions": [
+      {
+        "run_id": 38169397125,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS",
+        "event": "pull_request"
+      },
+      {
+        "run_id": 38169397173,
+        "name": "Build",
+        "status": "SUCCESS",
+        "event": "pull_request"
+      },
+      {
+        "run_id": 38169397202,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS",
+        "event": "pull_request"
+      },
+      {
+        "run_id": 38169394237,
+        "name": "DX11 Fast Structural Checks",
+        "status": "SUCCESS",
+        "event": "push"
+      },
+      {
+        "run_id": 38169394293,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS",
+        "event": "push"
+      },
+      {
+        "run_id": 38169394317,
+        "name": "Backend Conversion Gate",
+        "status": "SUCCESS",
+        "event": "push"
+      }
+    ],
+    "original_source_sha": "6a9b43be9341f6b7697cb66407a1cd4f9d0524ed",
+    "repair_sha": "5c68d4591b706397f228d5a5333b980f8ed668fc",
+    "initial_failed_run": {
+      "sha": "6a9b43be9341f6b7697cb66407a1cd4f9d0524ed",
+      "run_id": 38169254725,
+      "failed_step": "Feature acceptance: DX11-SAFE-RETURN",
+      "cause": "Legacy mixed-alpha source test expected original parenthesized gate. New independent-alpha test also needed all-occurrence negative mutation."
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  },
+  "feature_contract": {
+    "scope": "Native D3D9 stage0 blend-factor RGB, SELECTARG2(DIFFUSE/CURRENT) alpha, saturated ADD alpha -> D3D11 PS -> Draw/DrawIndexed diagnostic; original D3D9 input/Present authoritative.",
+    "source_material_sha": "6a9b43be9341f6b7697cb66407a1cd4f9d0524ed",
+    "validation_bearing_sha": "5c68d4591b706397f228d5a5333b980f8ed668fc",
+    "runtime_acceptance": "Quest3/VDXR/menu/vehicle/race visual and gamepad NEED_HMD_TEST"
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00781",
+  "production_id": "CONVERSION-DX11-00781",
+  "event_id": "CONVERSION-DX11-00781-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:MAIN_BACKBUFFER_STENCIL_CLEAR_FRAME_CONTINUITY",
+  "feature_id": "DX11-MAIN-STENCIL-CLEAR-NATIVE-FRAME-CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "1e678aa4ba571754d61b69f4fd3b334badf975eb",
+  "material_result_sha": "3fa6297a14db02d0f7fdb03b6b2125d3b34243a4",
+  "validation_bearing_result_sha": "0118d718871ea9c75e3915a3154c79d6b22e59fc",
+  "ci_regression_repair_shas": [
+    "cbac1c69c1464297c94566be98bfdd823c9952ad",
+    "0118d718871ea9c75e3915a3154c79d6b22e59fc"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_main_stencil_clear.hpp",
+    "tools/dx11_main_stencil_clear_game_frame_00781.cpp",
+    "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
+    "tools/test_dx11_depth_only_clear_00732.py",
+    "tools/test_dx11_full_color_depth_clear_00733.py",
+    "tools/test_dx11_pre_draw_depth_clear_00734.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-MAIN-STENCIL-CLEAR-NATIVE-FRAME-CONTINUITY",
+    "goal": "Preserve real full-resolution D3D9 game-origin native Draw/DrawIndexed menu/car/race frame continuity across whole main-backbuffer STENCIL and Z|STENCIL Clears without changing the D3D9 input, FFB, SkyGlow and fallback.",
+    "acceptance_items": [
+      {
+        "id": "main-stencil-clear-game-frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_D3D9_Clear_Draw_DrawIndexed_Present",
+        "expected_behavior": "Same canonical main RT0 and main Z/S identities plus verified full-Clear coverage admit stencil-only and Z|stencil Clears; only actual Z clear updates native DSV."
+      },
+      {
+        "id": "unverified-main-stencil-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "stencil_writes_owner_depth_identity_and_original_D3D9_input",
+        "expected_behavior": "Unproven owner/identity/coverage or stencil-dependent game Draw fails native admission while original D3D9 Draw/Present/gamepad remain authoritative."
+      },
+      {
+        "id": "exact-sha-integrated-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "C++ compiled frame continuity, destructive Python source regressions and all five mandatory GitHub workflows success on the same validation-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "main-stencil-clear-game-frame": "PASS_BUILD",
+    "unverified-main-stencil-fallback": "PASS_BUILD",
+    "exact-sha-integrated-gates": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read exact DX11 branch HEAD, AGENTS.md, execution policy and recent lane ownership.",
+    "C1_REVIEW": "Located real main backbuffer STENCIL Clear interruption of native full frame.",
+    "C2_IMPLEMENT": "Implemented native main stencil Clear source continuity in C++ bridge plus verified Z/S predicate and real source-order regression.",
+    "C3_VALIDATE": "Existing + new compiled and destructive fast regressions; five required exact-SHA GitHub Actions SUCCESS. No Quest3/gamepad test.",
+    "C4_COMMIT": "material 3fa6297a14db02d0f7fdb03b6b2125d3b34243a4; validation-bearing 0118d718871ea9c75e3915a3154c79d6b22e59fc; non-force; no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "Bookkeeping recorded after all five exact SHA gates succeeded; HMD remains NEED_HMD_TEST."
+  },
+  "evidence": {
+    "ci_head_sha": "0118d718871ea9c75e3915a3154c79d6b22e59fc",
+    "gates": {
+      "DX11 Fast": {
+        "workflow_run_id": 38768645897,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38768645897"
+      },
+      "Backend Conversion Gate": {
+        "workflow_run_id": 38768646055,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38768646055"
+      },
+      "Windows Build": {
+        "workflow_run_id": 38768718524,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38768718524"
+      },
+      "OpenXR VR architecture": {
+        "workflow_run_id": 38768657432,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38768657432"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "workflow_run_id": 38768657473,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38768657473"
+      }
+    },
+    "runtime_testing": "Not performed; no gameplay, Quest3/VDXR or gamepad confirmation."
+  },
+  "c6_record": {
+    "independent_score_event": false,
+    "source_changes": false,
+    "reran_workflows": false,
+    "note": "C6 bookkeeping does not create additional scored development. Exact SHA preserved."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Successful original D3D9 main STENCIL or Z|STENCIL Clear on the exact owner, whole-backbuffer footprint and canonical main depth surface",
+      "Admitted native D3D11 menu/vehicle/race Draw and DrawIndexed frame keeps output continuity while only Z Clear seeds DSV",
+      "Original D3D9 Draw, Present and gamepad path remain authoritative when any identity or state proof fails"
+    ],
+    "batch_components": [
+      "Source Clear observer integration in live_game_frame_bridge.cpp and D3D9 stereo_renderer.cpp hook",
+      "Canonical main Z/stencil predicate in native_game_main_stencil_clear.hpp and native game frame batch",
+      "Compiled C++ and destructive Python Z/stencil tests with required Fast/Backend/Win32/OpenXR/HUD exact-SHA workflows"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_main_stencil_clear_game_frame_00781.cpp whole-main STENCIL and Z|STENCIL with frame continuity",
+      "negative_regression": "tools/test_dx11_main_stencil_clear_game_frame_00781.py and inherited depth Clear source mutation tests",
+      "component_integration": "Actual D3D9 Clear hook -> canonical main RT/Z identities -> native D3D11 DrawIndexed+DSV seed -> guarded D3D9 Present and gamepad fallback"
+    },
+    "conflict_keys": [
+      "DX11:MAIN_BACKBUFFER_STENCIL_CLEAR_FRAME_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source build and exact-SHA workflow gates succeeded at 0118d718; Quest3/VDXR/real game parity remains UNTESTED.",
+    "activation_guard_and_fallback": "Diagnostic opt-in only, fail-closed to original D3D9 render/input, FFB, SkyGlow and DX9Ex fallback. DXVK frozen."
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00756",
+  "production_id": "CONVERSION-DX11-00756",
+  "event_id": "CONVERSION-DX11-00756-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:R30_ZERO_COUNT_SOURCE_HOOK_RECOVERY",
+  "feature_id": "DX11-FULLGAME-ZERO-SOURCE-HOOK-RECOVERY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "7e98eae9d32b5ccda02dda62e245a5694150a394",
+  "material_result_sha": "b1db6d4e450c2c799a1e1d9658704efeace7ec1d",
+  "validation_bearing_result_sha": "74fc2ecb05321239bdae59a052900f2a65f19203",
+  "changed_files": [
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_zero_source_hook_probe_00756.cpp",
+    "tools/test_dx11_zero_source_hook_00756.py",
+    "docs/automation/runs/CONVERSION-DX11-00756.json"
+  ],
+  "change_summary": "Route actual successful zero-count game-authored VB/IB/UP Draw calls to full-size native source continuity before nonexistent buffer capture; preserve original D3D9 Draw HRESULT, gamepad and full-frame abort on unsupported calls.",
+  "feature_contract": {
+    "feature_id": "DX11-FULLGAME-ZERO-SOURCE-HOOK-RECOVERY",
+    "goal": "Full-resolution native menu/car/race game frames preserve true D3D9 Draw source order across zero-count VB, IB, PrimitiveUP and IndexedUP calls, closing the live-hook bypass of existing native source logic.",
+    "acceptance_items": [
+      {
+        "id": "live-four-entrypoint-zero-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_capture_native_draw_and_present",
+        "expected_behavior": "All four real game Draw entrypoints forward known-topology zero-count calls without nonexistent vertex/index data and preserve source ordinal between native game Draws."
+      },
+      {
+        "id": "unknown-and-failed-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_hresult_original_gamepad",
+        "expected_behavior": "Unsupported enums, unseeded scenes and failed original D3D9 Draws cannot publish native game pixels or change gamepad/HRESULT."
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_win32_openxr_hud",
+        "expected_behavior": "Portable C++ span/batch tests, destructive hook source wiring test and mandatory exact SHA DX11 Fast/Backend/Win32/OpenXR/HUD Actions PASS."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live-four-entrypoint-zero-draw": "PASS_EXACT_SHA",
+    "unknown-and-failed-fallback": "PASS_EXACT_SHA",
+    "exact-sha-ci": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Four real live game zero-count Draw APIs preserve complete full-sized frame between real GPU Draws when final game Present source matches.",
+    "activation_guard_and_fallback": "Opt-in disabled by default, actual D3D9 HRESULT and gamepad input remain authoritative; unknown topology or game failure aborts full native publication.",
+    "conflict_keys": [
+      "DX11:R30_ZERO_COUNT_SOURCE_HOOK_RECOVERY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "R30 real VB/IB/UP Draw -> empty source dispatch before shadow",
+      "live D3D9 zero ordinal -> native game frame batch -> next real Draw and same-Present full-size output"
+    ],
+    "batch_components": [
+      "R30 VB/IB/UP intercepts + D3D11 bridge and primitive source",
+      "Portable C++ source-frame batch + destructive hook regression + CI workflow"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Four zero-count callback routes avoid VB/IB CPU shadow and permit native full game Draw after them.",
+      "negative_regression": "Unknown primitive topology, leading empty or failed original D3D9 Draw retains fallback without fabricated native GPU output.",
+      "component_integration": "D3D9 hook capture -> native bridge -> live frame batch -> native scene completion -> D3D9 Present"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS existing exact SHA 00755 C6 and authenticated latest HEAD",
+    "C1_REVIEW": "PASS live R30 empty Draw paths reject before 00755 frame bridge support",
+    "C2_IMPLEMENT": "PASS substantive R30 + bridge source changes",
+    "C3_VALIDATE": "PASS_EXACT_SHA native exact source result 74fc2ecb: DX11 Fast #38683662017, Backend Conversion #38683661945 (validate+104-step readiness smoke), Win32 Build #38683665729, OpenXR #38683665765 and HUD Inspector #38683665723 all SUCCESS; actual game/Quest3 runtime UNTESTED.",
+    "C4_COMMIT": "PASS material source result b1db6d4e (C++ R30 VB/IB/UP hooks, bridge and tests) plus causal existing negative test repair at validation-bearing source SHA 74fc2ecb; no CI skip on either source commit.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: C6 record after exact validation-bearing 74fc2ecb all five required GitHub Actions SUCCESS. Bookkeeping commit [skip ci] is separate, not the validation SHA; runtime remains UNTESTED."
+  },
+  "c6_trigger_reason": "CI_COMPLETE_FIVE_REQUIRED_EXACT_SHA",
+  "validation_workflow_runs": {
+    "dx11_fast": 38683662017,
+    "backend_conversion": 38683661945,
+    "windows_build": 38683665729,
+    "openxr": 38683665765,
+    "hud_inspector": 38683665723
+  }
+}

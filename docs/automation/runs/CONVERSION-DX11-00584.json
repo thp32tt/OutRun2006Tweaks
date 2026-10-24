@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00584",
+  "production_id": "CONVERSION-DX11-00584",
+  "event_id": "CONVERSION-DX11-00584-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00584",
+  "base_sha": "441e55b5f1ad01eef74e04cb9132172f403f7eb6",
+  "work_key": "DX11:MENU_RACE_SELECTARG_BLENDFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real game D3D9 SELECTARG1/2 RGB and independent BLENDFACTORALPHA state capture",
+      "Native HLSL shader create/dispatch into Draw/DrawIndexed and opt-in game Present inset"
+    ],
+    "batch_components": [
+      "C++ D3D9 pipeline capture, fail-closed argument/factor admission and HLSL shaders",
+      "D3D11 PS lifecycle and Draw submission, 20 destructive mutation tests in exact SHA Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two independent RGB selectors and alpha blend using D3DRS_TEXTUREFACTOR alpha byte",
+      "negative_regression": "20 destructive source mutations and 24 arithmetic cases",
+      "component_integration": "Game Draw state -> native PS -> Draw/DrawIndexed -> opt-in inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SELECTARG_BLENDFACTOR_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SELECTARG_FACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native 256x144 diagnostic inset only; Quest3/VDXR menu/race/gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in; original DX9Ex Draw/input unchanged; no auto promotion"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_selectarg_factor_alpha_00584.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00584.json"
+  ],
+  "evidence": {
+    "static_precommit": "Live D3D9 state to native shader source, ready, reset, dispatch guarded; 20 mutation cases",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_action": "NEED_HMD_TEST: Quest 3/VDXR and real menu/vehicle-select/race/gamepad visual proof; new feature assignment may proceed independently without implicit native gameplay promotion.",
+  "material_result_sha": "a2727c125f7f7aa52cb1141a9c2e475dbb7d9c0f",
+  "validation_bearing_result_sha": "37611f77146da5a83766d13e56643265b8ccfcb8",
+  "result_sha": "37611f77146da5a83766d13e56643265b8ccfcb8",
+  "c6_basis_head_sha": "37611f77146da5a83766d13e56643265b8ccfcb8",
+  "c6_validation_note": "Exact SHA Backend Conversion Gate (validate + readiness smoke), Build, DX11 Fast, OpenXR x86/x64 and HUD Inspector succeeded. Win32 C2065 declaration-order repaired, 22 negative mutation probes; no gameplay/HMD promotion.",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38196288256,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38196292202,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38196288230,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38196288279,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38196292214,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38196292253,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    }
+  ]
+}

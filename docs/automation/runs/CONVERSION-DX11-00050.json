@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00050",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T20:02:00+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "a63eff3008a2a40c1d20c2373f23d42dc144119d",
+  "code_result_sha": "75a7291dc2d0acc056508160dd1f6064de80aeb3",
+  "validation_bearing_result_sha": "75a7291dc2d0acc056508160dd1f6064de80aeb3",
+  "result_sha": "75a7291dc2d0acc056508160dd1f6064de80aeb3",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R96 dormant NativeFixedFunctionTransformBuffer lifetime/ownership wrapper for Set 05 F21, plus fail-closed validation recovery.",
+  "summary": "Added a dormant WRL-owned D3D11 transform constant-buffer owner with initialize/upload_and_bind/shutdown lifecycle, same-device-context rejection, WRITE_DISCARD upload, b0 binding, monotonic successful-upload generation and explicit resource release/recreate coverage. The hosted constant-buffer probe was converted to exercise the owner without adding any game runtime caller or native draw routing. Validation recovery preserved the R95 contract after the implementation moved from the probe into native_backend.cpp and added the required R96 hosted completion marker.",
+  "changes": [
+    {
+      "path": "src/vr/d3d11/native_backend.hpp",
+      "result": "Added NativeFixedFunctionTransformBuffer owner API and owned D3D11 device/buffer lifetime."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.cpp",
+      "result": "Implemented fail-closed same-device upload/bind lifecycle, WRITE_DISCARD b0 upload, generation tracking and shutdown/reinitialize behavior."
+    },
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Converted hosted R95 probe to exercise the R96 owner lifecycle and added the R96 completion marker required by the source-graph guard."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Preserved R95 evidence across hosted probe plus production owner and added durable R96 lifecycle contract checks."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Linked the hosted constant-buffer probe against the native backend implementation."
+    },
+    {
+      "path": "cmake.toml",
+      "result": "Linked the hosted constant-buffer probe against the native backend implementation."
+    }
+  ],
+  "recovery": {
+    "failure_context_run": 36558289780,
+    "failure_context_sha": "a66a6471a72cf3cb27b3413a89333a561dd8fa74",
+    "failure_signature": "DX11 R96 constant-owner probe drift: R96 probe completion marker",
+    "root_cause": "The R96 lifecycle cases were present, but tools/verify_dx11_source_graph.py required an explicit hosted completion marker that tools/dx11_constant_buffer_probe.cpp did not yet emit.",
+    "repair_sha": "75a7291dc2d0acc056508160dd1f6064de80aeb3",
+    "repair": "Added the exact DX11 constant buffer lifetime R96: PASS marker without weakening the verifier or changing runtime routing.",
+    "same_failure_repeated": false
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R96 proves dormant constant-buffer ownership/lifetime and hosted upload/bind behavior only. It does not add a game runtime caller, native shader/draw routing, full fixed-function translation parity, or Quest3/VDXR visual validation."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36558418530,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "75a7291dc2d0acc056508160dd1f6064de80aeb3",
+      "evidence": "Queue/baseline/disassembly/native-transport/source-graph/census checks PASS; Win32 build PASS; all DX11 semantic/object/linkage probes PASS; Build/Run DX11 constant buffer probe PASS."
+    },
+    "build": {
+      "run_id": 36558423692,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "75a7291dc2d0acc056508160dd1f6064de80aeb3"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36558423736,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "75a7291dc2d0acc056508160dd1f6064de80aeb3",
+      "evidence": "All six architecture jobs PASS."
+    },
+    "hud_inspector": {
+      "run_id": 36558423649,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "75a7291dc2d0acc056508160dd1f6064de80aeb3"
+    },
+    "failed_predecessor_gate": {
+      "run_id": 36558289780,
+      "status": "completed",
+      "conclusion": "failure",
+      "validated_sha": "a66a6471a72cf3cb27b3413a89333a561dd8fa74",
+      "evidence": "Failed only at Verify DX11 source graph because the explicit R96 completion marker was absent; repaired by 75a7291."
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit 75a7291dc2d0acc056508160dd1f6064de80aeb3 contains [AUTO:CONVERSION-DX11-00050] and no CI-skip directive.",
+    "Backend Conversion Gate 36558418530 PASS on exact result SHA, including Build/Run DX11 constant buffer probe.",
+    "Build 36558423692 PASS on exact result SHA.",
+    "OpenXR VR architecture 36558423736 PASS across all six jobs on exact result SHA.",
+    "HUD Inspector 36558423649 PASS on exact result SHA.",
+    "Failure-context Gate 36558289780 was inspected directly and its exact failure signature was repaired rather than retried unchanged.",
+    "No N100 workspace, self-hosted PC fast runner, Quest3/VDXR, or in-game runtime execution was used.",
+    "Issue #14 validation comment 5888900691 written after exact-SHA PASS.",
+    "Controller-issued ATTEMPT=1/3 remains authoritative; two in-task repair commits were recorded separately and did not increment the outer task attempt."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_ids": [
+      5888729331,
+      5888740663,
+      5888764130
+    ],
+    "validation_comment_id": 5888900691,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN",
+    "bookkeeping_correction_comment_id": 5888926913
+  },
+  "blocker": null,
+  "resume_cursor": "R96 is automation-validated but runtime-untested. Controller ATTEMPT remains 1/3. Continue Set 05 F21 only with another bounded non-routing prerequisite; keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false.",
+  "next_action": "Advance another narrow DX11 fixed-function/shader translation prerequisite without enabling native game draw routing. Quest3/VDXR exact-build evidence remains mandatory before runtime promotion.",
+  "in_task_repairs": 2
+}

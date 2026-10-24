@@ -1,0 +1,237 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00398",
+  "production_id": "CONVERSION-DX11-00398",
+  "event_id": "CONVERSION-DX11-00398-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R260_PROGRAMMABLE_GEOMETRY_RESOURCE_BEHAVIOR_PROOF_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "base_sha": "9198679084ff421b09330f601c81671ba3e53b2f",
+  "result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+  "material_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+  "source_implementation_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+  "validation_bearing_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+  "result_marker": "[AUTO:CONVERSION-DX11-00398]",
+  "selected_work_item": "DX11_R260_PROGRAMMABLE_GEOMETRY_RESOURCE_BEHAVIOR_PROOF",
+  "summary": "E003 retry inspected the requested cancelled intermediate Gate and confirmed it was superseded by the already-successful R259 exact-SHA Gate. Without repeating R259, the retry advances F18 with R260: a current geometry resource-behavior receipt that revalidates the exact MANAGED vertex/index mirror descriptor, mutation plan, Reset lifetime and snapshot identity behind the R258 candidate, then feeds that evidence into R259. Texture/output resource behavior remain explicit missing scopes, so full F18 and F21 stay fail-closed and native draw remains unauthorized.",
+  "evidence": "Requested Gate 37246345353 on intermediate SHA 5a5b41b42fc11423408648efae795e371295bcd8 was cancelled while verify_dx11_native_transport_contract.py was running; log signature was 'The operation was canceled.' Queue contract classifies it as superseded because R259 validation-bearing SHA b0fd81ac8ad40139bc72da8b5ab219a617385348 later passed Gate 37246405775. E003 material SHA cb4275d9964e90e90d8ce548b8b2f4249c423000 passed Backend Conversion Gate 37248409424 attempt 1: validate 111570853955 and DX11 readiness smoke 111571735439 both succeeded, including build/run of the R260 constant-buffer probe. Artifact 11320380324 digest sha256:e6454d8b6f1faffaafc8960f78f938d70667cab1cb65e47b59be54795189baf0. No HMD/game runtime test was performed.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "baa3a7d87b92742050ef1adb07b146c0dde24146",
+    "2e0a55b53b316105ccc48db5cb8dc0825f4b238b",
+    "d8899609d37870af9d1f5e625a3c19ccba771ff3",
+    "cb4275d9964e90e90d8ce548b8b2f4249c423000"
+  ],
+  "validation_candidate_commit": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Fetched current vr-dx11-native-r71 HEAD 9198679084ff421b09330f601c81671ba3e53b2f, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, branch-local lane state and current 00398 run record. Inspected explicitly requested cancelled Gate 37246345353 and job 111564925409. Steps through VR session regression passed; verify_dx11_native_transport_contract.py ended cancelled with 'The operation was canceled.' The older 5a5b41b4 run was superseded by R259 exact-SHA success 37246405775, so completed R259 work was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Current durable next action prioritizes F18 resource-behavior proof. Existing R119 MANAGED buffer mirror readiness already proves descriptorExact, mutationPlanExact, shadow/lifetime currency and device identity, but R259 had no explicit activation-review receipt carrying that proof. The smallest safe step is geometry-only R260, with texture/output scope fixed absent.",
+      "review_lenses": {
+        "architecture": "Add a value/snapshot review receipt between R258 and R259; no production draw routing.",
+        "ownership_lifetime": "Revalidate actual NativeManagedBufferShadow receipts against expected D3D11 device and current mirror snapshot tokens.",
+        "stereo_correctness": "No WVP, projection, HUD, eye transport, pose or recenter change.",
+        "performance": "Dormant review/probe path only; no game render hot-path activation.",
+        "adversarial": "Reject stale vertex/index mirror tokens and stale R260 handoff tokens; keep texture/output scopes absent and full F18 false."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderResourceBehaviorReadiness R260 plus compose/validate functions. R260 revalidates R258 lineage and current MANAGED VB/IB mirror readiness, records geometryResourceBehaviorExact, leaves texture/output scopes fixed absent with missingResourceScopeMask=0x6, and produces a review token only when geometry evidence is current. R259 now consumes the R260 receipt but keeps resourceBehaviorProofPresent=false until full resource scope is complete. Indexed/non-indexed positive regressions, stale vertex receipt rejection and stale R260 handoff rejection were added."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R260_PROGRAMMABLE_GEOMETRY_RESOURCE_BEHAVIOR_PROOF_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+      "validation_run_id": 37248409424,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111570853955,
+      "readiness_smoke_job_id": 111571735439,
+      "artifact_id": 11320380324,
+      "artifact_digest": "sha256:e6454d8b6f1faffaafc8960f78f938d70667cab1cb65e47b59be54795189baf0",
+      "artifact_size_bytes": 2366689,
+      "evidence": "Exact SHA cb4275d9964e90e90d8ce548b8b2f4249c423000 passed queue/baseline/transport/static/source-graph/dormant-boundary/census checks, Win32 configure/build/binary artifact, and the full DX11 readiness smoke suite. Build and Run DX11 constant buffer probe both succeeded with R260 indexed/non-indexed/stale-identity regressions."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+      "material_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+      "source_implementation_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+      "validation_bearing_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+      "result_marker": "[AUTO:CONVERSION-DX11-00398]",
+      "implementation_commits": [
+        "baa3a7d87b92742050ef1adb07b146c0dde24146",
+        "2e0a55b53b316105ccc48db5cb8dc0825f4b238b",
+        "d8899609d37870af9d1f5e625a3c19ccba771ff3",
+        "cb4275d9964e90e90d8ce548b8b2f4249c423000"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R260 is a dormant geometry resource-behavior proof receipt only. It adds no selector route, Draw/DrawIndexed dispatch, NativeDrawPath activation or runtime candidate requiring distribution packaging."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "issue14_implementation_comment_id": 5986162483,
+      "issue14_validation_comment_id": 5986230127,
+      "exact_next_action": "Preserve the validated R239-R260 dormant chain. Under a new TASK_ID, extend F18 with an exact current texture-resource behavior receipt and feed it into R260/R259 while output-resource behavior and F21 remain fail-closed. Do not enable Draw/DrawIndexed or NativeDrawPath; runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": true,
+    "runtime_behavior_changed": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F18_RESOURCE_USAGE_LOCK_POOL_SEMANTICS",
+      "VR_BACKEND_SET05_F23_SAMPLE_EXACT_NOT_ACTIVATION_GATE"
+    ],
+    "evidence": "native_backend.hpp/cpp are VR risk paths, but R260 is dormant/readiness-only. DX9Ex, OpenXR transport, selector, production Draw* routing and NativeDrawPath activation remain unchanged."
+  },
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "draw_dispatch_changed": false,
+    "dx9ex_branch_modified": false
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00398",
+    "production_id": "CONVERSION-DX11-00398",
+    "event_id": "CONVERSION-DX11-00398-E003",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "lane": "DX11",
+    "target_branch": "vr-dx11-native-r71",
+    "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
+    "failure_context": "Backend Conversion Gate exact run 37246345353 concluded cancelled",
+    "failure_context_classification": "SUPERSEDED_INTERMEDIATE_SHA_CANCEL",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+    "source_implementation_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+    "validation_bearing_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+    "validation_run_id": 37248409424,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111570853955,
+    "readiness_smoke_job_id": 111571735439,
+    "artifact_id": 11320380324,
+    "artifact_digest": "sha256:e6454d8b6f1faffaafc8960f78f938d70667cab1cb65e47b59be54795189baf0",
+    "implementation_comment_id": 5986162483,
+    "validation_comment_id": 5986230127
+  },
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37248409424,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+      "validate_job_id": 111570853955,
+      "readiness_smoke_job_id": 111571735439,
+      "artifact_id": 11320380324,
+      "artifact_digest": "sha256:e6454d8b6f1faffaafc8960f78f938d70667cab1cb65e47b59be54795189baf0",
+      "artifact_size_bytes": 2366689
+    },
+    "requested_failure_context": {
+      "run_id": 37246345353,
+      "exact_sha": "5a5b41b42fc11423408648efae795e371295bcd8",
+      "conclusion": "cancelled",
+      "validate_job_id": 111564925409,
+      "cancelled_step": "Verify DX11 native transport lifetime contract",
+      "log_signature": "The operation was canceled.",
+      "classification": "SUPERSEDED",
+      "superseded_by_prior_r259_gate": 37246405775
+    },
+    "r260_contract": {
+      "geometry_resource_behavior_exact": true,
+      "texture_resource_behavior_proof": "MISSING",
+      "output_resource_behavior_proof": "MISSING",
+      "missing_resource_scope_mask": "0x6",
+      "full_f18_proof_present": false,
+      "r259_resource_behavior_proof_present": false,
+      "shader_translation_proof": "MISSING_F21",
+      "native_draw_path_activation_allowed": false,
+      "draw_dispatch_authorized": false,
+      "activation_snapshot_token": "0"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5986162483,
+    "validation_comment_id": 5986230127
+  },
+  "exact_next_action": "Preserve the validated R239-R260 dormant chain. Under a new TASK_ID, extend F18 with an exact current texture-resource behavior receipt and feed it into R260/R259 while output-resource behavior and F21 remain fail-closed. Do not enable Draw/DrawIndexed or NativeDrawPath; runtime-visible activation remains separately gated on matching Quest 3/VDXR evidence.",
+  "chat_rollover": 2,
+  "rollover_is_retry": true,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00398",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00398",
+      "production_id": "CONVERSION-DX11-00398",
+      "event_id": "CONVERSION-DX11-00398-E003",
+      "event_type": "retry",
+      "attempt": "2/3",
+      "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE",
+      "failure_context": "Backend Conversion Gate exact run 37246345353 concluded cancelled",
+      "runtime_validation": "UNTESTED",
+      "material_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+      "validation_bearing_result_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000"
+    },
+    "superseded": [
+      {
+        "event_id": "CONVERSION-DX11-00398-E002",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "reason": "Older same-task rollover bookkeeping superseded by explicit E003 retry."
+      }
+    ],
+    "reason": "E003/ATTEMPT=2/3 is the latest explicit controller dispatch. The requested cancelled intermediate Gate was inspected and classified SUPERSEDED; new R260 material was implemented and exact-SHA validated.",
+    "material_and_validation_bearing_sha_unchanged": false
+  },
+  "current_user_metadata_reconciliation": {
+    "authoritative_production_id": "CONVERSION-DX11-00398",
+    "authoritative_event_id": "CONVERSION-DX11-00398-E003",
+    "authoritative_attempt": "2/3",
+    "event_type": "retry",
+    "source": "CURRENT_USER_QUEUE",
+    "material_and_validation_bearing_sha_unchanged": false
+  },
+  "failure_context": "Backend Conversion Gate exact run 37246345353 concluded cancelled",
+  "prior_validated_result_sha": "b0fd81ac8ad40139bc72da8b5ab219a617385348",
+  "validation_run_id": 37248409424,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111570853955,
+  "readiness_smoke_job_id": 111571735439,
+  "artifact_id": 11320380324,
+  "artifact_digest": "sha256:e6454d8b6f1faffaafc8960f78f938d70667cab1cb65e47b59be54795189baf0",
+  "retry_history": [
+    {
+      "event_id": "CONVERSION-DX11-00398-E003",
+      "attempt": "2/3",
+      "failure_context_run_id": 37246345353,
+      "failure_context_outcome": "CANCELLED_SUPERSEDED",
+      "material_sha": "cb4275d9964e90e90d8ce548b8b2f4249c423000",
+      "validation_run_id": 37248409424,
+      "validation_outcome": "PASS"
+    }
+  ]
+}

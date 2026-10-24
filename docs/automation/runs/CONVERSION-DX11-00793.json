@@ -1,0 +1,152 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00793",
+  "production_id": "CONVERSION-DX11-00793",
+  "event_id": "CONVERSION-DX11-00793-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_FULLFRAME_VIEWPORT_TARGET_CLEAR_CONTINUITY",
+  "feature_id": "DX11-LIVE-GAME-TARGET-CLEAR-RTV-CLIP-INTEGRATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "7db74be5383992ab6a2b63ce8b29f93a346df671",
+  "material_result_sha": "5db8c48cfd2b20e8359239914184801f91cc4d93",
+  "validation_bearing_result_sha": "fa076cddc93463fd511101616402914b6b1fbd06",
+  "changed_files": [
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "tools/dx11_native_frame_batch_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-GAME-TARGET-CLEAR-RTV-CLIP-INTEGRATION",
+    "goal": "After actual game-authored Draw/DrawIndexed, replay successful screen-space clipped D3D9 TARGET-only Clear to the same full-resolution DX11 native RTV with D3D11.1 ClearView without losing existing menu/vehicle/race color/depth or original game input/Present fallback.",
+    "acceptance_items": [
+      {
+        "id": "game-target-clear-r9-dx11-rtv",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_Clear_hook_D3D11_ClearView",
+        "expected_behavior": "Verified live R9 Clear(TARGET) updates clipped full-size native game RTV with one validated rectangle batch and real game source ownership."
+      },
+      {
+        "id": "source-and-depth-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_menu_vehicle_race_game_Draw_depth_Present",
+        "expected_behavior": "Earlier Draw/DrawIndexed and native DSV persist with correct source ordinals and original D3D9 Present/input."
+      },
+      {
+        "id": "unproved-clear-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_owner_MRT_rectangle_bounds_DX9Ex",
+        "expected_behavior": "Foreign/stale/unsupported/Z+STENCIL/MRT/unbounded/no-D3D11.1 clear rejects native replay and preserves original D3D9 game and FFB."
+      },
+      {
+        "id": "five-required-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "Same validation-bearing SHA has all required five GitHub Actions SUCCESS; Quest3/VDXR remains UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Successful real game D3D9 R9 Clear(TARGET) observes post-Draw source owner",
+      "Validate canonical RT0/viewport/MRT and batch of clipped D3DRECTs",
+      "Issue D3D11.1 ClearView to existing full-resolution RTV then retain Draw/DrawIndexed continuity and original D3D9 Present/inputs"
+    ],
+    "batch_components": [
+      "R9 D3D9 Clear hook and DX11 bridge",
+      "D3D11 ClearView matching backbuffer RTV/multi-region admission",
+      "Portable C++ positive-negative frame batch regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual post-Draw Clear(TARGET) applies bounded viewport regions without reseeding RTV/DSV or source ordinals.",
+      "negative_regression": "Invalid bounds, foreign owner, MRT, failed HRESULT, unsupported Z/stencil, missing D3D11.1 all fail closed, original D3D9 unchanged.",
+      "component_integration": "Original D3D9 game Clear -> real source-backed native RTV -> D3D11.1 ClearView -> same-Present game frame while DX9Ex/input remain authoritative."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_FULLFRAME_VIEWPORT_TARGET_CLEAR_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_CLEAR_TARGET",
+      "D3D11_NATIVE_DRAW",
+      "D3D11_NATIVE_RTV_CLEARVIEW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Build source path verified by exact-SHA CI; real Quest3/VDXR output and gamepad behavior UNTESTED.",
+    "activation_guard_and_fallback": "Diagnostics opt-in; unsupported states keep original D3D9/FFB/SkyGlow and DX9Ex; DXVK frozen."
+  },
+  "acceptance_results": {
+    "game-target-clear-r9-dx11-rtv": "PASS_BUILD",
+    "source-and-depth-continuity": "PASS_BUILD",
+    "unproved-clear-fallback": "PASS_BUILD",
+    "five-required-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub branch HEAD 7db74be after 00792 C6; partial ColorFill already complete, real TARGET-only viewport Clear invalidated native frame.",
+    "C1_REVIEW": "Connect successful D3D9 Clear to exact active game-native D3D11 RTV with clipped region and no input interception.",
+    "C2_IMPLEMENT": "R9 hook, DX11.1 live game ClearView, viewport/multi-rect validation, portable positive/negative C++ probe.",
+    "C3_VALIDATE": "Initial material SHA 5db8 Fast failed preexisting exact-string 00696 scanner; related 00696/00729/00725 negative test scanners adapted under same task without weakening Gate. Validation-bearing fa076 passes all five mandatory exact SHA workflows; Quest3/VDXR not run.",
+    "C4_COMMIT": "material 5db8c48cfd2b20e8359239914184801f91cc4d93, CI repair 3fa26b5100791402be910f3f89c5445eec433476 and validation bearing fa076cddc93463fd511101616402914b6b1fbd06 all [AUTO:CONVERSION-DX11-00793] no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA five/5 exact SHA CI; separate bookkeeping [skip ci], no gameplay/HMD promotion or extra score for repair/checkpoint."
+  },
+  "evidence": {
+    "material_commit": "5db8c48cfd2b20e8359239914184801f91cc4d93",
+    "ci_repair_commits": [
+      "3fa26b5100791402be910f3f89c5445eec433476",
+      "fa076cddc93463fd511101616402914b6b1fbd06"
+    ],
+    "validation_bearing_result_sha": "fa076cddc93463fd511101616402914b6b1fbd06",
+    "exact_sha_workflow_runs": {
+      "DX11 Fast Structural Checks": {
+        "run_id": 38815100358,
+        "conclusion": "success",
+        "head_sha": "fa076cddc93463fd511101616402914b6b1fbd06"
+      },
+      "Backend Conversion Gate": {
+        "run_id": 38815100363,
+        "conclusion": "success",
+        "head_sha": "fa076cddc93463fd511101616402914b6b1fbd06"
+      },
+      "Build": {
+        "run_id": 38815107790,
+        "conclusion": "success",
+        "head_sha": "fa076cddc93463fd511101616402914b6b1fbd06"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38815107785,
+        "conclusion": "success",
+        "head_sha": "fa076cddc93463fd511101616402914b6b1fbd06"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38815107891,
+        "conclusion": "success",
+        "head_sha": "fa076cddc93463fd511101616402914b6b1fbd06"
+      }
+    }
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00793",
+    "independent_material_result": true,
+    "score_duplicate": false,
+    "score_recorded_separately": true
+  }
+}

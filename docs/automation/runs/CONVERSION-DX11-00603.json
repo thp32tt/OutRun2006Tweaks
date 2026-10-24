@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00603",
+  "production_id": "CONVERSION-DX11-00603",
+  "event_id": "CONVERSION-DX11-00603-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00603",
+  "work_key": "DX11:MENU_RACE_ONE_ZERO_SOURCE_REPLACE",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "c0d833fc8491273b52061131be6bc71422b474ca",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Original game D3D9 ONE/ZERO blend GetRenderState captured on menu/selection/race draw",
+      "Dedicated D3D11 RGB/alpha ONE/ZERO blend state plus 16 channel-mask cache",
+      "Opt-in game-authored linear/indexed native Draw and native diagnostic visible inset with DX9Ex Draw/Present intact"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_source_replace_00603.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "65536 numeric RGB/alpha factor cases plus GitHub Windows C++ build",
+      "negative_regression": "19 destructive admission/OM/cache/draw mutations and default unsupported-state fallback",
+      "component_integration": "D3D9 GetRenderState -> OutputCapture -> D3D11 OM mask cache -> Draw or DrawIndexed -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_ONE_ZERO_SOURCE_REPLACE",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:ONE_ZERO_SOURCE_REPLACE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST: actual menu/selection/race frame and gamepad/Quest3 untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in only; original D3D9 Draw, Present and gamepad always retained"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_source_replace_00603.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00603.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "diagnostic-only, no verified game/Quest3 parity"
+  },
+  "next_action": "Check exact-SHA five GitHub Actions Gates before final result. HMD runtime remains untested."
+}

@@ -1,0 +1,180 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01006",
+  "production_id": "CONVERSION-DX11-01006",
+  "event_id": "CONVERSION-DX11-01006-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01006",
+  "work_key": "DX11:LIVE_GAME_SM3_PROGRAMMABLE_USER_CLIP_GPU_DRAW",
+  "feature_id": "DX11:LIVE_GAME_SM3_PROGRAMMABLE_USER_CLIP_GPU_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "e338beedb2b9e8ad1493f2948694a707f5de9fae",
+  "material_result_sha": "1666b727169def6bec9abe3da3aaa61170a55c7c",
+  "validation_bearing_result_sha": "2ccdaf20d08cf685b87f6df46177fbfe1de411e5",
+  "result_sha": "2ccdaf20d08cf685b87f6df46177fbfe1de411e5",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "score_change": 0,
+  "source_implementation_time_ratio": "UNMEASURED",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/live_game_sm3_user_clip.hpp",
+    "tools/dx11_live_sm3_user_clip_01006.cpp",
+    "tools/test_dx11_live_sm3_user_clip_01006.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "cause_repair_changes": [
+    "docs/automation/runs/CONVERSION-DX11-01005.json",
+    "tools/test_dx11_live_sm3_user_clip_01006.py"
+  ],
+  "summary": "C++/HLSL material native VS programmable 6-plane clip-space SV_ClipDistance0/1 on real intercepted D3D9 game SM3 Draw/DrawIndexed. Actual source GetClipPlane/caps/mask ownership, cached VS b4 buffer update, shader-cache identity and original game Draw/input/FFB fallback; positive/negative C++ tests wired to DX11 Fast. Same-task CI repair normalized 01005 historical acceptance evidence and 01006 regression spelling. Five mandatory exact-SHA Actions SUCCESS on repair SHA; game, Quest3, VDXR and runtime performance UNTESTED.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_GAME_SM3_PROGRAMMABLE_USER_CLIP_GPU_DRAW",
+    "goal": "Translate genuine OutRun 2006 D3D9 programmable SM3 Draw/DrawIndexed clip-space user clip planes into native D3D11 VS SV_ClipDistance GPU rasterization while preserving original game renderer and input on unsupported source states.",
+    "acceptance_items": [
+      {
+        "id": "game_owned_clip_plane_gpu_output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_D3D9_SM3_clip_state_native_D3D11_VS_Draw",
+        "expected_behavior": "Fetch actual D3D9 game clip plane coefficients/caps, emit 6-plane native SV_ClipDistance0/1 and upload per-Draw VS b4 constants to Draw/DrawIndexed."
+      },
+      {
+        "id": "clip_plane_fallback_source_ownership",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_gamepad_FFB_unsupported_clipping_and_shader_cache",
+        "expected_behavior": "Reject invalid plane indexes/capability/NaN, CLIPPING disabled and missing program semantics; inactive plane mask and shader cache identity preserve original D3D9Ex fallback."
+      },
+      {
+        "id": "native_clip_regression_and_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "CXX_HLSL_dynamic_render_provenance_and_GitHub_Actions",
+        "expected_behavior": "Portable C++ positive and negative clip tests, native shader/buffer wire structural regression and all five exact-SHA mandatory GitHub Actions succeed without claiming actual HMD/gameplay evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game_owned_clip_plane_gpu_output": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/live_game_sm3_user_clip.hpp"
+      ],
+      "validation_command": "DX11 Fast 39754297166 and Build 39754297175 SUCCESS at 2ccdaf20d08cf685b87f6df46177fbfe1de411e5; runtime visual UNTESTED"
+    },
+    "clip_plane_fallback_source_ownership": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_live_sm3_user_clip_01006.cpp",
+        "tools/test_dx11_live_sm3_user_clip_01006.py"
+      ],
+      "validation_command": "Required DX11 Fast 39754297166 and Backend 39754297101 SUCCESS at 2ccdaf20d08cf685b87f6df46177fbfe1de411e5; gamepad/FFB runtime UNTESTED"
+    },
+    "native_clip_regression_and_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "tools/test_dx11_live_sm3_user_clip_01006.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Five exact-SHA GitHub Actions SUCCESS: Fast 39754297166, Backend 39754297101, Build 39754297175, OpenXR 39754297150, HUD 39754297185; no HMD/game test"
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Intercepted original D3D9 programmable SM3 Draw/DrawIndexed -> source GetClipPlane/caps/CLIPPING validation",
+      "Native VS shader SV_ClipDistance0/1 generation + cache and D3D11 b4 per-Draw upload -> actual GPU Draw",
+      "Guarded original full-size game frame/presentation with DX9Ex Draw/input/FFB fallback; Quest3 promotion withheld"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "Live game D3D9 programmable clip plane admission and source state validation",
+      "HLSL SM3 VS output and per-Draw GPU b4/cache binding",
+      "Positive/negative portable clip tests and changed-component required DX11 Fast"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++ 6-plane positive semantic test, structural exact source-to-GPU binding and native compiler build SUCCESS at exact SHA 2ccdaf20d08cf685b87f6df46177fbfe1de411e5; game pixels UNTESTED",
+      "negative_regression": "Rejected unsupported clip caps/mask, NaN, absent semantics, disabled global clipping, reuse wrong shader cache identity; original D3D9 Draw/Present/gamepad/FFB and DX9Ex fallback unchanged",
+      "component_integration": "Authentic intercepted game D3D9 user planes -> D3D11 HLSL VS SV_ClipDistance0/1 -> native b4 constants and real Draw/DrawIndexed; five exact-SHA Gates SUCCESS; VR runtime UNTESTED"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SM3_PROGRAMMABLE_USER_CLIP_GPU_DRAW",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED; REAL_GAME_PIXELS_NATIVE_DRAW_COUNTERS_QUEST3_VDXR_UNTESTED",
+    "activation_guard_and_fallback": "Native full-game path remains opt-in and fail-closed; invalid user planes keep original D3D9Ex Draw, Present, gamepad and FFB authoritative."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "initial_failure": {
+      "sha": "1666b727169def6bec9abe3da3aaa61170a55c7c",
+      "failed_runs": [
+        39753501260,
+        39753501249
+      ],
+      "reason": "previous 01005 C6 acceptance fields and 01006 test token spelling; causal repair under same task"
+    },
+    "material_source_commit": "1666b727169def6bec9abe3da3aaa61170a55c7c",
+    "validation_bearing_exact_sha": "2ccdaf20d08cf685b87f6df46177fbfe1de411e5",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39754297166,
+        "conclusion": "success",
+        "sha": "2ccdaf20d08cf685b87f6df46177fbfe1de411e5"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39754297101,
+        "conclusion": "success",
+        "sha": "2ccdaf20d08cf685b87f6df46177fbfe1de411e5"
+      },
+      {
+        "name": "Build",
+        "run_id": 39754297175,
+        "conclusion": "success",
+        "sha": "2ccdaf20d08cf685b87f6df46177fbfe1de411e5"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39754297150,
+        "conclusion": "success",
+        "sha": "2ccdaf20d08cf685b87f6df46177fbfe1de411e5"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39754297185,
+        "conclusion": "success",
+        "sha": "2ccdaf20d08cf685b87f6df46177fbfe1de411e5"
+      }
+    ],
+    "optional_isolated_warp": {
+      "run_id": 39753501294,
+      "conclusion": "success",
+      "sha": "1666b727169def6bec9abe3da3aaa61170a55c7c"
+    }
+  },
+  "RUNTIME_VALIDATION_NOTES": "No physical game, controller, Quest 3, VDXR or 72Hz/performance test performed; never promote to runtime PASS.",
+  "next_implementation_action": "Continue independent source integration toward actual menu->vehicle->race native D3D11 frames and OpenXR L/R, only on separately assigned task after this exact-SHA build milestone, preserving original DX9Ex and frozen DXVK."
+}

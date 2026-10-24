@@ -1,0 +1,196 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01021",
+  "production_id": "CONVERSION-DX11-01021",
+  "dispatch_event_id": "CONVERSION-DX11-01021-E001",
+  "event_id": "CONVERSION-DX11-01021-E001",
+  "event_type": "dispatch",
+  "classification": "A",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01021",
+  "feature_id": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
+  "work_key": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
+  "work_class": "integration",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "source_head": "bcd5dab9d59412b19fd973560514bc4bd58ab7d4",
+  "material_result_sha": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
+  "result_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+  "validation_bearing_result_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "ffb_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Implement actual SM3 SETP(c#/DEF or draw-uniform TEMP)->quad-uniform p0 -> predicated native TEXLD/LDP/LDB sample+Draw; varying, conditional or unknown predicate stays original DX9Ex fallback. No runtime/game/HMD evidence.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Actual D3D9 game shader SETP float compares immutable c#/uniform TEMP and updates live p0 uniformity",
+      "Game TEXLD/TEXLDP/TEXLDB with proven p0 compiles D3D11 HLSL Sample and reaches guarded Draw/DrawIndexed"
+    ],
+    "batch_components": [
+      "C++ real SM3 predicate origin and control flow handling",
+      "Compiled positive/negative implicit/projection/bias/explicit sample checks plus source-linked native Draw regression and final exact-SHA five-Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Constant/DEF or uniform TEMP SETP -> uniform p0 -> native implicit texture Draw",
+      "negative_regression": "Unknown/input/conditional/varying SETP and varying parent IFC reject implicit texture; source/DX9Ex input/FFB preserved",
+      "component_integration": "native_backend.cpp SETP -> NativeSm3DrawUniformPredicate -> native_sm3_texture_codegen.hpp -> live_game_frame_bridge.cpp native Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SHADER_NATIVE_FRAME_CHAIN"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY; game native draw and frame counts/Quest3 UNTESTED",
+    "activation_guard_and_fallback": "Only proven uniform p0 permits native implicit TEX; unknown/pixel-varying/conditional predicates remain DX9Ex-owned."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
+    "goal": "Actual game-authored SETP predicate controls implicit native DX11 texture Draw safely, without losing fallback.",
+    "acceptance_items": [
+      {
+        "id": "uniform_setp_sample",
+        "category": "end_to_end_behavior",
+        "behavior_area": "SETP_to_native_TEX_and_Draw",
+        "expected_behavior": "Draw-uniform SETP c#/TEMP -> p0 -> D3D11 predicated TEXLD/LDP/LDB native sample"
+      },
+      {
+        "id": "variable_setp_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Varying_SETP_DX9Ex",
+        "expected_behavior": "Predicated implicit TEX with varying/unwritten/conditional SETP is rejected; explicit LOD/Grad is retained"
+      },
+      {
+        "id": "compiled_five_gate",
+        "category": "integrated_validation",
+        "behavior_area": "CXX_source_and_GitHub_Actions",
+        "expected_behavior": "Portable C++17 positive/negative regression with exact SHA mandatory five Gate"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_predicate_flow.hpp",
+    "tools/test_dx11_sm3_uniform_texture_01017.py",
+    "tools/test_dx11_sm3_uniform_ifc_01018.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_sm3_uniform_predicate_texture_probe_01021.cpp",
+    "tools/test_dx11_sm3_uniform_predicate_texture_01021.py",
+    "docs/automation/runs/CONVERSION-DX11-01021.json"
+  ],
+  "pending_items": [
+    "Full game menu->vehicle->race native Draw count and published-frame evidence UNTESTED; Quest3/VDXR/gamepad/FFB HMD parity still requires user runtime test.",
+    "Continue remaining native full-frame coverage and OpenXR input; preserve DX9Ex fallback, DXVK frozen."
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Full game native Draw/frame count and HMD evidence unmeasured; shader p0 source added.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
+  "NEXT_IMPLEMENTATION_ACTION": "After exact SHA CI, implement remaining menu/car/race frame OpenXR/input paths.",
+  "material_repair_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+  "validation_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+  "acceptance_results": {
+    "uniform_setp_sample": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_predicate_flow.hpp",
+        "tools/dx11_sm3_uniform_predicate_texture_probe_01021.cpp",
+        "tools/test_dx11_sm3_uniform_predicate_texture_01021.py"
+      ],
+      "validation_command": "C++17 01021 uniform SETP p0 texture positive regression on DX11 Fast 39939619711 success at exact SHA 50dbe68f18f01c08cd54490917a0220e32bef8a2",
+      "limitation": "Code and source-linked CI; no in-game native Draw frame counts or Quest3 results"
+    },
+    "variable_setp_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_predicate_flow.hpp",
+        "tools/dx11_sm3_uniform_predicate_texture_probe_01021.cpp",
+        "tools/test_dx11_sm3_dynamic_texture_flow_00962.py"
+      ],
+      "validation_command": "C++17 01021 negative varying/conditional/unwritten p0 implicit TEX regression plus 00962 prior fallback safety checks; Fast 39939619711 success",
+      "limitation": "No actual gamepad/FFB/Quest3 DX9Ex parity test; opt-in native draw still guarded"
+    },
+    "compiled_five_gate": {
+      "status": "PASS_FEATURE_CI",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tools/dx11_sm3_uniform_predicate_texture_probe_01021.cpp",
+        "tools/test_dx11_sm3_uniform_predicate_texture_01021.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Exact-SHA 50dbe68f18f01c08cd54490917a0220e32bef8a2 DX11 Fast 39939619711, Backend 39939619779 (validate+smoke), Build 39939619715, OpenXR 39939619724, HUD 39939619787 all SUCCESS",
+      "limitation": "Exact SHA CI is not evidence that full game menu/car/race screen or HMD is functional"
+    }
+  },
+  "gate_evidence": {
+    "source_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39939619711,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39939619779,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39939619715,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39939619724,
+        "conclusion": "success"
+      },
+      "hud": {
+        "run_id": 39939619787,
+        "conclusion": "success"
+      }
+    },
+    "causal_repairs": [
+      {
+        "failing_sha": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
+        "reason": "Copied terminal C6 evidence from prior 01020 and policy rejection",
+        "repair_sha": "855c3b9ba82bb2d38fde3fbe58faa1d6bfde7e1a"
+      },
+      {
+        "failing_sha": "855c3b9ba82bb2d38fde3fbe58faa1d6bfde7e1a",
+        "reason": "Preexisting 00962 obsolete literal rejects all predicated TEX; preserved negative/positive fail-closed regression on uniform p0",
+        "repair_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2"
+      }
+    ]
+  },
+  "feature_ready": {
+    "status": "FEATURE_READY",
+    "feature_id": "DX11:LIVE_SM3_DRAW_UNIFORM_SETP_PREDICATED_TEXTURE",
+    "feature_head_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+    "gate_head_sha": "50dbe68f18f01c08cd54490917a0220e32bef8a2",
+    "condition": "SOURCE_AND_EXACT_SHA_CI_VERIFIED_NOT_GAMEPLAY_PROVEN",
+    "acceptance_results_status": "PASS_FEATURE_CI",
+    "material_source_sha": "2b2ca4cac2718ac4a0a70c4def312f92bb5a3f87",
+    "runtime_validation": "UNTESTED"
+  },
+  "score_status": "ELIGIBLE_ONCE_NEW_MATERIAL_01021_AND_EXACT_SHA_FIVE_GATE; C6_AND_CAUSAL_REPAIRS_NO_EXTRA_CREDIT"
+}

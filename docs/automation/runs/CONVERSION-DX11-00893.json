@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00893",
+  "production_id": "CONVERSION-DX11-00893",
+  "event_id": "CONVERSION-DX11-00893-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00893",
+  "feature_id": "DX11:OPENXR_NATIVE_GAME_STEREO_GPU_COPY",
+  "work_key": "DX11:FULLFRAME:HOST_NATIVE_STEREO_EYE_COPY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "base_sha": "30440fcbcca805c8974e680ce490cb8150a53969",
+  "material_result_sha": "232a7cc937622c94c73b7cfba41ec5f8e3371d78",
+  "validation_bearing_result_sha": "69e8c5786aa2956494386ef3efa8406ebe91df04",
+  "feature_contract": {
+    "feature_id": "DX11:OPENXR_NATIVE_GAME_STEREO_GPU_COPY",
+    "goal": "Connect genuine 10bit native game stereo GPU eyes through the host to exact-format OpenXR array slices with alias-safe shader fallback and paired WARP pixels; full-game/HMD runtime separately untested.",
+    "acceptance_items": [
+      {
+        "id": "real_stereo_10bit_projection_copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_full_frame_xr_gpu_eye_presentation",
+        "expected_behavior": "Host sends independent full-size genuine 10-bit game color eyes to matching OpenXR array slices without CPU readback or shader repack."
+      },
+      {
+        "id": "gpu_eye_alias_and_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_host_input_d3d9ex_fallback",
+        "expected_behavior": "Canonical texture alias and foreign device eyes reject before recording OpenXR GPU copies, while incompatible sRGB/float/extent uses existing projection shader and original D3D9Ex remains valid."
+      },
+      {
+        "id": "gpu_eye_pixel_regression",
+        "category": "end_to_end_behavior",
+        "behavior_area": "gpu_warp_stereo_content_regression",
+        "expected_behavior": "WARP reads independent red and green 10bit colors from two OpenXR array slices after production copy path."
+      },
+      {
+        "id": "five_exact_sha_build_gates",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_source_validation",
+        "expected_behavior": "Five mandatory Windows/DX11/OpenXR/HUD/Backend workflow runs all complete successfully for one exact validation-bearing commit SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Native x86 game-produced independent D3D11 L/R shareable GPU eye targets via existing OpenXR transport",
+      "x64 host native full-size 10bit GPU hold and exact format two-slice OpenXR swapchain CopySubresourceRegion",
+      "Fallback remains original shader transfer plus D3D9Ex gamepad/FFB on invalid descriptors or aliased resources"
+    ],
+    "batch_components": [
+      "Actual host x64 D3D11 OpenXR two-eye GPU copy format and canonical resource-identity C++",
+      "Actual WARP host GPU 10bit red/green L/R pixel staging to XR array with negative descriptor and fallback regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "New 10bit WARP GPU independent L/R CopySubresourceRegion test in production host native_direct_eye_pair_smoke; OpenXR exact-SHA Gate success.",
+      "negative_regression": "Native array destination aliased to left/right rejects before GPU commands; exact mismatch, sRGB, float, stale/foreign-device source fall back.",
+      "component_integration": "Existing D3D9 game -> native independent L/R frame ring -> real x64 host hold -> two-slice XR array, exact-format GPU copy, Quest3/VDXR not run."
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME:HOST_NATIVE_STEREO_EYE_COPY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "OpenXR native copy stage and WARP two-eye pixels BUILD_VERIFIED; actual live menu/vehicle/race and Quest3 not observed.",
+    "activation_guard_and_fallback": "Explicit OUTRUN_VR_NATIVE_XR_EYE_COPY opt-in, exact-format and canonical alias checks; original D3D9Ex rendering/inputs/FFB and shader fallback preserved; DXVK frozen."
+  },
+  "acceptance_results": {
+    "real_stereo_10bit_projection_copy": "PASS_BUILD_NATIVE_TENBIT_GPU_COPY",
+    "gpu_eye_alias_and_source_fallback": "PASS_ALIAS_GUARD_SHADER_FALLBACK",
+    "gpu_eye_pixel_regression": "PASS_WARP_INDEPENDENT_TENBIT_EYE_PIXELS",
+    "five_exact_sha_build_gates": "PASS_EXACT_SHA_5_OF_5",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "validation_evidence": {
+    "material_sha": "232a7cc937622c94c73b7cfba41ec5f8e3371d78",
+    "initial_fast_failure_run_id": 39064396077,
+    "initial_backend_failure_run_id": 39064396048,
+    "causal_repair": "00892 prior PASS_FAIL_CLOSED acceptance marker was read as negative FAIL by the mandatory historical run parser; stored 00892 PASS_CLOSED_FALLBACK positive wording, no gameplay changes.",
+    "ci_repair_sha": "69e8c5786aa2956494386ef3efa8406ebe91df04",
+    "validation_sha": "69e8c5786aa2956494386ef3efa8406ebe91df04",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39064550253,
+        "conclusion": "success",
+        "validation_sha": "69e8c5786aa2956494386ef3efa8406ebe91df04"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39064550196,
+        "conclusion": "success",
+        "validation_sha": "69e8c5786aa2956494386ef3efa8406ebe91df04"
+      },
+      {
+        "name": "Build",
+        "run_id": 39064554317,
+        "conclusion": "success",
+        "validation_sha": "69e8c5786aa2956494386ef3efa8406ebe91df04"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39064554318,
+        "conclusion": "success",
+        "validation_sha": "69e8c5786aa2956494386ef3efa8406ebe91df04"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39064554354,
+        "conclusion": "success",
+        "validation_sha": "69e8c5786aa2956494386ef3efa8406ebe91df04"
+      }
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Reconciled previous 00892 C6 and exact 30440fcb branch, native full-size XR game eye path still incomplete for 10bit direct copy.",
+    "C1_REVIEW": "Checked existing x64 R23 and legacy host native GPU DirectGPU -> XR array copy, frozen DXVK/DX9Ex fallback.",
+    "C2_IMPLEMENT": "Enabled exact-match 10bit native L/R eye XR copy and prohibited canonical source/destination resource alias; actual WARP red/green 10bit GPU pixel regression.",
+    "C3_VALIDATE": "Five exact-SHA mandatory GitHub Actions SUCCESS on 69e8c578; REAL Quest3/VDXR and gamepad UNTESTED.",
+    "C4_COMMIT": "Material 232a7cc9; prerequisite historical 00892 acceptance parser record repair 69e8c578; this C6 is separate bookkeeping.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "BUILD_VERIFIED bounded native OpenXR GPU eye transport stage, not integrated game renderer completion, HMD UNTESTED; no score awarded for microstage or bookkeeping."
+  }
+}

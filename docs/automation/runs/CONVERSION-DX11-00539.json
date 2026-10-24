@@ -1,0 +1,151 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00539",
+  "production_id": "CONVERSION-DX11-00539",
+  "event_id": "CONVERSION-DX11-00539-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00539",
+  "attempt": "1/3",
+  "feature_id": null,
+  "work_key": "DX11:MENU_RACE_TEX1_SELECT_MIP0",
+  "base_sha": "2bc063b7ef7f31f2c3f57317c846a31b6c47e654",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "validation_bearing_result_sha": "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf",
+  "result_sha": "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf",
+  "material_result_sha": "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf",
+  "material_source_shas": [
+    "528a99cae86c4963d7ed4dfba9d6f0f32b95ac32",
+    "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf"
+  ],
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "feature_status": "SOURCE_INTEGRATED__HMD_PENDING",
+  "source_stage": "BUILD_VERIFIED__RUNTIME_HMD_GAME_NOT_TESTED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Intercept existing game-authored D3D9 TEX1 Draw/DrawIndexed and read fixed-function stage0 state",
+      "Select mirrored D3D11 PS for SELECTARG1 TEXTURE or MODULATE and lock source mip level 0",
+      "Clamp D3D11 sampler to native mip0 SRV and submit guarded D3D11 Draw/DrawIndexed to opt-in diagnostic inset"
+    ],
+    "batch_components": [
+      "C++ native HLSL texture-only PS and stage0 COLOR/ALPHA matched SELECTARG1 path with fail-closed fallback",
+      "C++ multi-mip source level0 snapshot and D3D11 min/max LOD=0 sampling",
+      "Python static negative-mutation regression for operation consistency, texture, sampler and submission"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Build #38133495733 SUCCESS at exact SHA with DX11-LIVE-CALLSITE/NATIVE-DRAW/VISIBLE-FRAME/SAFE-RETURN source acceptance steps; OpenXR #38133495730 SUCCESS. No actual game/HMD output proof.",
+      "negative_regression": "Build DX11-SAFE-RETURN regression step SUCCESS; guard rejects mixed stage color/alpha operation and unsupported textures, leaving source D3D9 Draw/input untouched.",
+      "component_integration": "Game D3D9 TEX1 stage0 state -> D3D11 texture-only or modulate shader -> level0 BGRA SRV/sampler -> existing native Draw/inset connected in source and Win32 build; actual game image/Quest3 UNTESTED."
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_TEX1_SELECT_MIP0",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:TEX1_SELECT_MIP0",
+      "tools/test_dx11_first_game_frame_regressions.py:TEX1_SELECT_MIP0"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source integration and CI build verified; actual menu/car/race pixels, input handling and Quest 3/VDXR parity need runtime testing; no gameplay PASS claimed.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic only; production NativeDrawPathActive remains disabled; unsupported states or native diagnostic failures preserve original DX9Ex Draw and input."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00539.json"
+  ],
+  "validation_gates": {
+    "build": {
+      "name": "Build",
+      "run_id": 38133495733,
+      "head_sha": "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf",
+      "conclusion": "SUCCESS",
+      "win32_release": "SUCCESS",
+      "dx11_source_acceptance": {
+        "DX11-LIVE-CALLSITE": "SUCCESS",
+        "DX11-NATIVE-DRAW": "SUCCESS",
+        "DX11-VISIBLE-FRAME": "SUCCESS",
+        "DX11-SAFE-RETURN": "SUCCESS"
+      }
+    },
+    "openxr": {
+      "name": "OpenXR VR architecture",
+      "run_id": 38133495730,
+      "head_sha": "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf",
+      "conclusion": "SUCCESS",
+      "game_x86_variants": "SUCCESS",
+      "host_x64": "SUCCESS",
+      "dx11_first_game_frame_bundle": "SKIPPED_ON_THIS_SHA"
+    },
+    "hud_inspector": {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38133495784,
+      "head_sha": "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf",
+      "conclusion": "SUCCESS",
+      "static_exe_analysis": "SUCCESS",
+      "build_hud_inspector": "SUCCESS"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS verified GitHub head base 2bc063b; previous 00538 TEX1 modulate support and no 00539 run record.",
+    "C1_REVIEW": "PASS selected disjoint stage0 SELECTARG1 texture-only and source mip0 sampling integration.",
+    "C2_IMPLEMENT": "PASS native C++ shader/state/sampler changes in 528a99ca; new regression checks in a57efdf4.",
+    "C3_VALIDATE": "PASS exact SHA a57efdf4: Build 38133495733, OpenXR 38133495730 and HUD Inspector 38133495784 SUCCESS; four Build DX11 source acceptance steps SUCCESS; no game or HMD testing.",
+    "C4_COMMIT": "PASS non-force material commits 528a99ca and validation-bearing a57efdf4 both marked [AUTO:CONVERSION-DX11-00539], no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED for this C6 result-only recovery; no new binary/package generated.",
+    "C6_STATE": "PASS_EXACT_SHA on original a57efdf4; previously missing 00539 run record restored by separate [skip ci] bookkeeping; unchanged validation-bearing/material SHA, no rerun and no extra score."
+  },
+  "c6_recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "c6_exact_sha_validation": {
+    "head_sha": "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf",
+    "result": "PASS_EXACT_SHA",
+    "source_material_sha": "a57efdf4a53ab0d0eccfa719f7767c2d4b256faf",
+    "confirmed_gates": [
+      {
+        "name": "Build",
+        "run_id": 38133495733,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38133495730,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38133495784,
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "note": "C6 bookkeeping only: no source changes, full CI/build rerun, HMD test, validation SHA replacement or score change. Additional workflows not independently enumerated by connector."
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "PASS_SOURCE_CI",
+    "DX11-NATIVE-DRAW": "PASS_SOURCE_CI",
+    "DX11-VISIBLE-FRAME": "PASS_SOURCE_CI",
+    "DX11-SAFE-RETURN": "PASS_SOURCE_CI",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "score_change": 0,
+  "scoreboard": {
+    "repo": "thp32tt/ai-dev-lab",
+    "path": "AI_SCOREBOARD.md",
+    "verified_ai2_total": 971,
+    "delta_on_c6_retry": 0,
+    "run_key": "CONVERSION-DX11-00539",
+    "note": "C6 recovery has no independent score. Do not add score or write scoreboard in this bookkeeping task."
+  },
+  "next_action": "Start independent later DX11 material implementation of alpha blend/test or more supported game texture formats/callsites, without retesting this completed TASK_ID; actual menu/race/Quest3 evidence pending.",
+  "blocker": null,
+  "runtime_evidence": "No OutRun 2006 live game/Quest3 VDXR render or input testing performed in this task; desktop GPU parity remains UNTESTED."
+}

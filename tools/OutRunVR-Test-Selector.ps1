@@ -4,7 +4,6 @@ Add-Type -AssemblyName System.Drawing
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
 $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
-$probe=Join-Path $root 'outrun-d3d9on12-probe.exe'
 
 $slots=[ordered]@{
     'R57_01_POSITION_KIND1_HUD35'=@('01. POSITION kind=1 only','첫 sprani/SPRARGS2 요소만 SCREEN_HUD + 35%.')
@@ -35,7 +34,7 @@ $form.ClientSize=[System.Drawing.Size]::new(1040,790)
 $form.MinimumSize=[System.Drawing.Size]::new(920,680)
 
 $title=New-Object System.Windows.Forms.Label
-$title.Text='OutRun VR Nightly - R57 + DX9Ex / DX11 Host / DXVK / DX12'
+$title.Text='OutRun VR Nightly - DX9Ex / DX11 Host / DXVK'
 $title.Font=New-Object System.Drawing.Font('Segoe UI',15,[System.Drawing.FontStyle]::Bold)
 $title.AutoSize=$true
 $title.Location=[System.Drawing.Point]::new(24,16)
@@ -58,8 +57,7 @@ $backendButtons=@(
     @('DX9Ex + D3D11 Host','d3d9','R57_06_RANK_PROJECTED_HEAD','기준. DirectGPU 실패 시 fallback 허용.'),
     @('DX11 Host DirectGPU','dx11','R57_06_RANK_PROJECTED_HEAD','D3D9Ex 게임 + D3D11 OpenXR host. DirectGPU-only / ACK run identity.'),
     @('DXVK SAFE','dxvk-safe','R57_06_RANK_PROJECTED_HEAD','DXVK provider-local Ex probe, multiview off, fallback 허용.'),
-    @('DXVK MULTIVIEW','dxvk','R57_06_RANK_PROJECTED_HEAD','DXVK + multiviewpatcher 실험 경로.'),
-    @('DX12 STRICT','dx12','R57_06_RANK_PROJECTED_HEAD','실험적 D3D9On12 기대 경로. Probe PASS 후 실행.')
+    @('DXVK MULTIVIEW','dxvk','R57_06_RANK_PROJECTED_HEAD','DXVK + multiviewpatcher 실험 경로.')
 )
 $x=14
 foreach($b in $backendButtons){
@@ -75,22 +73,6 @@ foreach($b in $backendButtons){
     $x+=192
 }
 
-$probeBtn=New-Object System.Windows.Forms.Button
-$probeBtn.Text='DX12 D3D9On12 PROBE'
-$probeBtn.Size=[System.Drawing.Size]::new(220,38)
-$probeBtn.Location=[System.Drawing.Point]::new(14,86)
-$probeBtn.Add_Click({
-    if(!(Test-Path $probe)){[System.Windows.Forms.MessageBox]::Show('outrun-d3d9on12-probe.exe가 없습니다.','DX12 Probe');return}
-    Start-Process cmd -ArgumentList @('/k',('"' + $probe + '"')) -WorkingDirectory $root
-})
-$backendBox.Controls.Add($probeBtn)
-
-$note=New-Object System.Windows.Forms.Label
-$note.Text='DX12 Probe 결과에서 d3d9on12_bridge / legacy_create_device / resource_interop / legacy_reset / DX12_POC_RESULT 가 모두 PASS여야 합니다.'
-$note.AutoSize=$false
-$note.Size=[System.Drawing.Size]::new(735,40)
-$note.Location=[System.Drawing.Point]::new(248,86)
-$backendBox.Controls.Add($note)
 
 $r57Box=New-Object System.Windows.Forms.GroupBox
 $r57Box.Text='R57 HUD / 차량 순위 원인 분리'

@@ -1,0 +1,151 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00883",
+  "production_id": "CONVERSION-DX11-00883",
+  "event_id": "CONVERSION-DX11-00883-E004",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "owner_id": "ChatGPT2",
+  "feature_id": "DX11:GAME_AUTHORED_OFFSCREEN_INSTANCED_CAMERA_GPU_DRAW",
+  "work_key": "DX11:GAME_AUTHORED_OFFSCREEN_INSTANCED_CAMERA_GPU_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "record_reconstruction": "The run JSON for this task was absent on exact validation SHA (GitHub contents 404); reconstruct immutable original feature material SHA, acceptance contract and existing five exact-SHA GitHub Actions outcomes. No pre-existing record was replaced, no source edited, no CI or HMD/gameplay rerun, and no score added.",
+  "material_result_sha": "ecaa692f439937d86feae7bebb55fd3e26d17a69",
+  "validation_bearing_result_sha": "a9837100b45be63435e8f45c1805c91131dfc04c",
+  "result_sha": "a9837100b45be63435e8f45c1805c91131dfc04c",
+  "feature_contract": {
+    "feature_id": "DX11:GAME_AUTHORED_OFFSCREEN_INSTANCED_CAMERA_GPU_DRAW",
+    "goal": "Replay authentic game-owned offscreen menu/vehicle/race instanced DrawInstanced and DrawIndexedInstanced on independently allocated game RTVs as one chronological source command each, without falsely certifying source geometry as OpenXR eye color. Only genuine subsequent source-authored GPU Copy/Stretch supplies the per-eye pixels.",
+    "acceptance_items": [
+      {
+        "id": "offscreen_instanced",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_offscreen_instanced_source_draws",
+        "expected_behavior": "Admit genuinely valid and owned game offscreen RTVs, issue source DrawInstanced and DrawIndexedInstanced exactly once per game command, and advance one chronological source draw ordinal regardless of instance count."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "owned_target_instance_guards_and_eye_color_evidence",
+        "expected_behavior": "Reject eye-aliased/foreign/detached/null offscreen targets, zero-instance inputs and invalid chronology without GPU dispatch or forged direct-eye color; preserve ring eye rebind and original D3D9 Draw/Present/input/FFB fallback."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_github_actions",
+        "expected_behavior": "DX11 Fast, Backend Conversion Gate, Build, OpenXR architecture, and HUD Inspector CI all succeed on exactly one unchanged validation-bearing commit SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "offscreen_instanced": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/test_dx11_eye_partial_depth_activation.py",
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "NativeGameEyeDrawEncoder issues actual D3D11.0 DrawInstanced/DrawIndexedInstanced into a validated independent game offscreen RTV and advances chronological source draw count only once per call.",
+      "Native transport probe exercises L/R offscreen instancing, rejects invalid target/empty instance, leaves direct-eye color draw count unchanged, and restores eye bindings for HUD/eye draws.",
+      "Activation-boundary structural checks and negative tamper tests cover all eleven audited GPU dispatches; inherited 00882 record contract is repaired before exact-SHA CI."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_native_transport_probe.cpp",
+      "tools/test_dx11_eye_partial_depth_activation.py",
+      "tools/verify_dx11_activation_boundary.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source change ecaa692 includes offscreen instanced Draws and WARP fixture assertions for left/right cameras; five existing exact-SHA mandatory GitHub Actions at a983710 succeeded.",
+      "negative_regression": "Source preflight checks target and instance count, does not increment direct-eye color; 9a2c314 extends dispatch inventory and negative tamper assertions. No gameplay/HMD assertion.",
+      "component_integration": "NativeGameEyeDrawEncoder's source game RTV instancing integrates with offscreen camera frame chronology, isolated stereo transport probe, and DX11 activation gate audits."
+    },
+    "conflict_keys": [
+      "DX11:GAME_AUTHORED_OFFSCREEN_INSTANCED_CAMERA_GPU_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Existing source and five mandatory CI SUCCESS; real OutRun menu/vehicle/race, Quest3/VDXR image, controller, and FPS not tested.",
+    "activation_guard_and_fallback": "Native DX11 backend is not promoted for live gameplay; preserve D3D9Ex Draw/Present/input/FFB and frozen DXVK."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub branch HEAD was the exact requested SHA; task run file did not exist (RUN_RECORD_NOT_FOUND), evidence reconstructed from immutable commits and workflow runs.",
+    "C1_REVIEW": "PASS: reviewed material instanced offscreen GPU draw commit and subsequent negative-guard and inherited acceptance-contract repairs.",
+    "C2_IMPLEMENT": "PASS_EXISTING: real material source feature in ecaa692f439937d86feae7bebb55fd3e26d17a69; no source modified during this C6-only operation.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 5/5 existing required GitHub Actions SUCCESS on a9837100b45be63435e8f45c1805c91131dfc04c; no CI rerun.",
+    "C4_COMMIT": "PASS_EXISTING: material ecaa692f439937d86feae7bebb55fd3e26d17a69; repair 9a2c3144b352e770974e1b0adba1cba3ce5c7202; exact-SHA acceptance repair a9837100b45be63435e8f45c1805c91131dfc04c; all source/repair commits contain task marker.",
+    "C5_PACKAGE": "NOT_REQUIRED: no real OutRun/Quest3 HMD gameplay validation or package produced.",
+    "C6_STATE": "PASS_EXACT_SHA: separate [skip ci] bookkeeping commit reconstructs missing task JSON, preserves immutable material/validation identities, no source modifications or repeat score."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "ecaa692f439937d86feae7bebb55fd3e26d17a69",
+    "validation_sha": "a9837100b45be63435e8f45c1805c91131dfc04c",
+    "causal_ci_repair_shas": [
+      "9a2c3144b352e770974e1b0adba1cba3ce5c7202",
+      "a9837100b45be63435e8f45c1805c91131dfc04c"
+    ],
+    "five_mandatory_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39037855095,
+        "conclusion": "success",
+        "head_sha": "a9837100b45be63435e8f45c1805c91131dfc04c"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39037855099,
+        "conclusion": "success",
+        "head_sha": "a9837100b45be63435e8f45c1805c91131dfc04c"
+      },
+      {
+        "name": "Build",
+        "id": 39037860173,
+        "conclusion": "success",
+        "head_sha": "a9837100b45be63435e8f45c1805c91131dfc04c"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39037860335,
+        "conclusion": "success",
+        "head_sha": "a9837100b45be63435e8f45c1805c91131dfc04c"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39037860630,
+        "conclusion": "success",
+        "head_sha": "a9837100b45be63435e8f45c1805c91131dfc04c"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "live_menu_vehicle_race_test": "NOT_PERFORMED",
+    "quest3_vdxr_hmd_test": "NOT_PERFORMED"
+  },
+  "next_action": "C6 record complete only. Do not change validation SHA, rerun successful gates, double count feature score or claim gameplay/HMD validation. New source work belongs to a separate task."
+}

@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00860",
+  "production_id": "CONVERSION-DX11-00860",
+  "event_id": "CONVERSION-DX11-00860-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_GRAPHICS_STAGE_INPUT_RESTORE",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "2639cb444de4266a48dccf93ab9054378ead1da9",
+  "validation_bearing_result_sha": "13eb5a25dfa0640f6acc84884ee42fe8c73d496f",
+  "result_sha": "13eb5a25dfa0640f6acc84884ee42fe8c73d496f",
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Preserve inherited D3D11 GS/HS/DS shader resources, samplers and constant buffers across real game-authored native left/right eye Draw replay and restore the original caller's graphics pipeline state, without promoting dormant native gameplay rendering or disturbing DX9Ex/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_stereo_eye_replay",
+        "expected_behavior": "Native game stereo submission preserves source GS/HS/DS bindings for both left/right game Draw callbacks even after the first eye dirties inherited shader stage inputs."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_host_graphics_state_and_dx9ex",
+        "expected_behavior": "Restore inherited GS/HS/DS resources, samplers and constant buffers on scope exit; retain prior D3D9Ex Draw/Present/input/FFB fallback and dormant native activation."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_backend_windows_openxr_hud",
+        "expected_behavior": "All mandatory DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD CI workflows must succeed against one exact validation SHA without treating source/CI as real game or HMD observation."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp: capture and restore GS/HS/DS SRVs, samplers and CBs across both eyes and caller return",
+      "tools/dx11_native_transport_probe.cpp: WARP callback state-pollution and original host-state assertions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "The native transport WARP test builds and runs successfully in exact-SHA Backend Conversion Gate job 117301091136 at 13eb5a25; source commit 2639cb44 adds per-eye GS/HS/DS regression.",
+      "negative_regression": "The same WARP probe asserts original host GS/HS/DS resource, sampler and CB identity after deliberate left-eye callback unbinding; existing DX9Ex fallback and native activation remain unchanged.",
+      "component_integration": "Game-authored native stereo submission scoped graphics state -> two eye callbacks -> original caller state restore -> existing OpenXR/desktop transport; no runtime headset acceptance claim."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_GRAPHICS_STAGE_INPUT_RESTORE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Native two-eye state isolation source and Windows WARP regression passed; the full real-game menu/car/race/HMD visible native frame was not exercised and DX11 full renderer is not declared complete.",
+    "activation_guard_and_fallback": "No active gameplay promotion; original D3D9Ex rendering, input, FFB and frozen DXVK remain untouched."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "acceptance_results": {
+    "end2end": "PASS_WARP_NATIVE_EYE_STAGE_REPLAY",
+    "fallback": "PASS_WARP_GS_HS_DS_RESTORE",
+    "gates": "PASS_EXACT_SHA_5_OF_5",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: target GitHub branch HEAD and exact SHA verified; prior 00860 run JSON absent (RUN_RECORD_NOT_FOUND).",
+    "C1_REVIEW": "PASS: verified 00860 material commit, separate causal 00858 CI acceptance repair, exact SHA workflows and comparable prior DX11 run contracts; original 00860 feature contract unavailable.",
+    "C2_IMPLEMENT": "PASS: existing substantive material commit 2639cb444de4266a48dccf93ab9054378ead1da9 modifies native stereo submission and executable WARP transport probe; no C6 source edit.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 13eb5a25dfa0640f6acc84884ee42fe8c73d496f; DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD all SUCCESS. Backend WARP native transport probe build/run SUCCESS. Real game and HMD UNTESTED.",
+    "C4_COMMIT": "PASS: existing material 2639cb444de4266a48dccf93ab9054378ead1da9; validation-bearing CI acceptance repair 13eb5a25dfa0640f6acc84884ee42fe8c73d496f; neither is a newly performed C6 implementation.",
+    "C5_PACKAGE": "NOT_REQUIRED: result-only C6 bookkeeping; no runtime-tested game candidate requested.",
+    "C6_STATE": "PASS_EXACT_SHA: five required workflows SUCCESS at 13eb5a25dfa0640f6acc84884ee42fe8c73d496f; reconstruct missing run record by [skip ci] bookkeeping only, original material SHA preserved. Quest3/VDXR gamepad runtime UNTESTED."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "2639cb444de4266a48dccf93ab9054378ead1da9",
+    "validation_bearing_sha": "13eb5a25dfa0640f6acc84884ee42fe8c73d496f",
+    "dx11_fast_run_id": 38999800943,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 38999801008,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 38999802899,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 38999802896,
+    "openxr_conclusion": "success",
+    "hud_inspector_run_id": 38999802895,
+    "hud_inspector_conclusion": "success",
+    "native_transport_warp_job_id": 117301091136,
+    "native_transport_warp_build_and_run": "success",
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "original_record_status": "RUN_RECORD_NOT_FOUND",
+    "contract_source": "Reconstructed from 00860 material SHA and associated exact-SHA GitHub CI; no prior 00860 JSON, feature_contract or acceptance_results existed to preserve.",
+    "ci_repair_commit_scope": "00858 previous feature acceptance bookkeeping correction on 00860 validation-bearing SHA; not a second 00860 feature.",
+    "score_policy": "C6 bookkeeping only; score_change=0; no new task achievement or duplicate scoring."
+  },
+  "next_action": "Resume ongoing integrated native full game source work under its existing feature ownership; obtain separate real menu/car/race Quest3/VDXR and gamepad evidence before any runtime promotion. No repeat of this SHA's CI."
+}

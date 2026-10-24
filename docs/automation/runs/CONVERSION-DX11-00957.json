@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00957",
+  "production_id": "CONVERSION-DX11-00957",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00957",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "2591dac5fd62c81f656037e2c9019eb94204c6d9",
+  "validation_bearing_result_sha": "c7a93df3916b0148d51214d667fa62598b195143",
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Translate original D3D9 SM3 DCL semantic and partial-channel declarations into opt-in native D3D11 VS/PS shader inputs and outputs while preserving physical read/write provenance and original D3D9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_live_dcl_semantics",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_d3d9_dcl_vs_ps_native_hlsl_input_output",
+        "expected_behavior": "Map supported original VS/PS DCL usages, including vertex blend weights/indices and tangent/binormal/normal/TEXCOORD/COLOR, to native shader semantics and existing Draw path."
+      },
+      {
+        "id": "declared_channel_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "partial_vs_ps_dcl_lane_read_write_and_original_game",
+        "expected_behavior": "Reject undeclared physical source lanes, incomplete declared VS output lanes, invalid usages and stage/index mismatches; retain original D3D9Ex Draw, gamepad and FFB."
+      },
+      {
+        "id": "single_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_fast_backend_windows_openxr_hud",
+        "expected_behavior": "Preserve 00957 positive/negative C++ and Python tests and require all five GitHub CI gate successes against the single fixed validation SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_live_dcl_semantics": "PASS_SOURCE_CXX_PYTHON_AND_EXACT_SHA_5_OF_5; REAL_GAME_DRAW_UNTESTED",
+    "declared_channel_fallback": "PASS_SOURCE_REGRESSION_AND_EXACT_SHA_5_OF_5; RUNTIME_UNTESTED",
+    "single_exact_sha_gate": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_interface_channels.hpp",
+    "tools/dx11_sm3_interface_channels_probe_00957.cpp",
+    "tools/test_dx11_sm3_interface_channels_00957.py",
+    "tools/verify_dx11_source_graph.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_sm3_conditional_flow_00946.py"
+  ],
+  "exact_sha_gate_results": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 39497813275,
+      "head_sha": "c7a93df3916b0148d51214d667fa62598b195143",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 39497813204,
+      "head_sha": "c7a93df3916b0148d51214d667fa62598b195143",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 39497820402,
+      "head_sha": "c7a93df3916b0148d51214d667fa62598b195143",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 39497820445,
+      "head_sha": "c7a93df3916b0148d51214d667fa62598b195143",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39497820509,
+      "head_sha": "c7a93df3916b0148d51214d667fa62598b195143",
+      "conclusion": "success"
+    }
+  },
+  "ci_failure_repair": {
+    "material_commit": "2591dac5fd62c81f656037e2c9019eb94204c6d9",
+    "first_followup_sha": "4aa036ab0ecaf73662194fe23624f0fc40f5b91e",
+    "exact_validation_repair_sha": "c7a93df3916b0148d51214d667fa62598b195143",
+    "explanation": "00957 Fast/Backend test and prior 00956 PASS parsing were repaired without bypassing checks; final 00957 negative provenance test checks declared-lane guard."
+  },
+  "run_record_recovery": {
+    "hold_reason": "RUN_RECORD_NOT_FOUND",
+    "source": "Reconstructed C6-only record from 00957 material and repair commits, 00957 source regressions, and GitHub Actions results at exact validation SHA; no previous 00957 run JSON existed on target branch.",
+    "bookkeeping_only": true,
+    "ci_rerun_requested": false
+  },
+  "pipeline": {
+    "C4_COMMIT": "material 2591dac5fd62c81f656037e2c9019eb94204c6d9; causal CI fixes 4aa036ab0ecaf73662194fe23624f0fc40f5b91e and c7a93df3916b0148d51214d667fa62598b195143",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5 at c7a93df3916b0148d51214d667fa62598b195143; run IDs 39497813275, 39497813204, 39497820402, 39497820445, 39497820509",
+    "C5_PACKAGE": "NOT_REQUIRED; no HMD or live game package validation performed",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; AUTOMATION_VALIDATION=PASS_EXACT_SHA; RUNTIME_VALIDATION=UNTESTED"
+  },
+  "score_change": 0
+}

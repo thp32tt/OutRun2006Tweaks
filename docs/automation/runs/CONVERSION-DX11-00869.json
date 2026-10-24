@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00869",
+  "production_id": "CONVERSION-DX11-00869",
+  "event_id": "CONVERSION-DX11-00869-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_MSAA_GPU_DESKTOP_PRESENT",
+  "feature_id": "DX11:GAME_MSAA_GPU_DESKTOP_PRESENT",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "5ef70839cbc0d51f01c84f1cf104599e250e575b",
+  "validation_bearing_result_sha": "8b10d00826bd108caff437563a64eb58e99fe5d8",
+  "result_sha": "8b10d00826bd108caff437563a64eb58e99fe5d8",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Game-created D3D9 menu/car/race Draw/DrawIndexed to guarded full-resolution D3D11 game color producer",
+      "MSAA BGRA8 D3D11 game color texture to per-output-generation native ResolveSubresource GPU intermediate",
+      "Same-frame GPU CopyResource or exact dirty-region tiles to shared D3D9Ex backbuffer with EVENT fence and D3D9 backup/rollback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_shared_desktop.hpp",
+      "src/vr/d3d11/native_game_shared_desktop_source.hpp",
+      "tests/vr/dx11_native_shared_desktop_admission.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Single sample game color uses original GPU copy; real 4x/8x multisampled RTV color is admitted only with format resolve support and resolved once into a private single-sample device texture before bounded shared desktop transfer.",
+      "negative_regression": "Zero or >32 samples, 1x nonzero quality, unsupported resolve, MSAA non-RT, mip chain and texture array reject without touching the game's original D3D9 Draw/Present/input/FFB; existing exact tile backup and failed upload restoration are unchanged.",
+      "component_integration": "NativeSharedDesktopBridge::try_present_regions consults GPU source admission, resolves MSAA on the owner device, then submits existing full/partial/multi dirty GPU shared desktop copy under EVENT fence, with per-generation reset and original D3D9 rollback."
+    },
+    "conflict_keys": [
+      "DX11:GAME_MSAA_GPU_DESKTOP_PRESENT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Full-size native GPU desktop MSAA source transfer is source integrated and GitHub five-gate build verified; real OutRun menu, car-select, race visuals, gamepad and Quest3 stereo remain UNTESTED.",
+    "activation_guard_and_fallback": "Existing native game frame admission/opt-in and original D3D9Ex input/FFB/Draw fallback remain unchanged; unsupported MSAA source or failed GPU transfer returns false, original game pixels backed up and restored; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_MSAA_GPU_DESKTOP_PRESENT",
+    "goal": "Integrate the real multisampled DX11 menu, vehicle-selection and race color frame through a GPU Resolve, same-frame fenced native full-resolution D3D9Ex desktop Present and exact-region original-game fallback without CPU readback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "msaa_gpu_color_to_full_size_native_desktop",
+        "expected_behavior": "Admitted full-frame BGRA8 4x/8x native game source resolves on the GPU into a single-sample allocation, then copies exact visible regions into the existing D3D9Ex shared output under its EVENT fence."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "invalid_msaa_source_and_original_game_preservation",
+        "expected_behavior": "Unsupported sample configuration, non-RT MSAA, unavailable format resolve, invalid array/mip preserve D3D9Ex Draw/Present, controller/FFB, source pixels and existing rollback."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_action_exact_source_sha",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR architecture and HUD Inspector must all be SUCCESS at the exact validation-bearing commit SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "src/vr/d3d11/native_game_shared_desktop_source.hpp",
+    "tests/vr/dx11_native_shared_desktop_admission.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub target HEAD 088199682e823762357fa1ca4a95a2b33b272290 and previous 00868 exact-SHA C6 recovered; distinct work_key avoids source collision.",
+    "C1_REVIEW": "PASS: source inspection identified unsupported multisampled native game color GPU desktop transfer while existing mono/eye GPU postpass and D3D9 rollback logic already existed.",
+    "C2_IMPLEMENT": "PASS_SOURCE: code-bearing material commit 5ef70839cbc0d51f01c84f1cf104599e250e575b implements opt-in device-owned multisample resolve and exact-region shared desktop copy, plus positive/negative tests.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: all five mandatory GitHub workflow runs at 8b10d00826bd108caff437563a64eb58e99fe5d8 are completed SUCCESS. Initial material candidate failed pre-existing 00868 policy classification, repaired at same task in 8b10d00826bd108caff437563a64eb58e99fe5d8 without rewriting 00868 material/CI results.",
+    "C4_COMMIT": "PASS: material 5ef70839cbc0d51f01c84f1cf104599e250e575b and causal 00868 JSON policy repair 8b10d00826bd108caff437563a64eb58e99fe5d8 are distinct from the new [skip ci] C6 bookkeeping record.",
+    "C5_PACKAGE": "NOT_REQUIRED: no HMD/runtime promotion and no user distribution.",
+    "C6_STATE": "PASS_EXACT_SHA: source candidate validated at exact SHA; retain original material SHA and no extra score for C6 itself."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "5ef70839cbc0d51f01c84f1cf104599e250e575b",
+    "validation_sha": "8b10d00826bd108caff437563a64eb58e99fe5d8",
+    "causal_ci_repair_sha": "8b10d00826bd108caff437563a64eb58e99fe5d8",
+    "exact_sha_ci": {
+      "validation_sha": "8b10d00826bd108caff437563a64eb58e99fe5d8",
+      "workflows": {
+        "dx11_fast": {
+          "id": 39012025518,
+          "conclusion": "success"
+        },
+        "backend_conversion": {
+          "id": 39012025505,
+          "conclusion": "success"
+        },
+        "windows_build": {
+          "id": 39012029728,
+          "conclusion": "success"
+        },
+        "openxr": {
+          "id": 39012029724,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "id": 39012029727,
+          "conclusion": "success"
+        }
+      },
+      "optional_vr_pc_fast": {
+        "id": 39012025507,
+        "conclusion": "skipped"
+      },
+      "runtime_validation": "UNTESTED"
+    },
+    "source_commit_message": "feat(dx11): resolve multisampled game color for safe native GPU desktop presentation [AUTO:CONVERSION-DX11-00869]",
+    "note": "Source build verification only. No matching Quest3/VDXR/menu/car/race/gamepad session; no claim of native full-renderer completion or runtime HMD PASS."
+  },
+  "next_action": "Continue missing end-to-end native DX11 menu/car/race and real separated OpenXR eye camera integration in a separate nonoverlapping work unit, without rerunning this exact task or scoring C6 twice."
+}

@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00623",
+  "production_id": "CONVERSION-DX11-00623",
+  "event_id": "CONVERSION-DX11-00623-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_DUAL_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "base_head_sha": "9ac2952c6fe4a6257f684b51fbf80a8cec2b5dd2",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game-authored D3D9 stage0 PM RGB with independent ADDSMOOTH/MODULATE2X alpha",
+      "Native D3D11 pixel shader compile/creation and Draw/DrawIndexed selection",
+      "Opt-in inset; unsupported state DX9Ex fallback and controls preserved"
+    ],
+    "batch_components": [
+      "Two independent stage0 alpha capture predicates and formulas",
+      "Two live D3D11 shader objects and lifecycle bindings",
+      "Destructive source mutations and 512 numeric examples in DX11 Fast"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game capture and native Draw dual shader links; 512 arithmetic cases",
+      "negative_regression": "Mutated ALPHAOP/operands/shaders/capture disallowed",
+      "component_integration": "Game D3D9 callsite -> D3D11 pixel shader -> guarded Draw -> inset readback"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_DUAL_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED only after exact CI, HMD visual test required",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in, DX9Ex Draw/input unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_dual_00623.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00623.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: HEAD and 00622 checked",
+    "C1_REVIEW": "PASS: two unimplemented PM alpha modes",
+    "C2_IMPLEMENT": "PASS: both modes connected to guarded native Draw",
+    "C3_VALIDATE": "PASS: material SHA 1a0d6c5cdc416ff1f58af0c69bf4b62384f3f2c0 Backend Gate + readiness smoke, DX11 Fast, Windows Build, OpenXR push/PR and HUD Inspector all exact-SHA SUCCESS",
+    "C4_COMMIT": "PASS: material commit 1a0d6c5cdc416ff1f58af0c69bf4b62384f3f2c0 includes new C++/HLSL live shader/capture/submission and CI regression",
+    "C5_PACKAGE": "NOT_REQUIRED: no runtime distribution",
+    "C6_STATE": "PASS_EXACT_SHA: BUILD_VERIFIED; visual/input/HMD runtime NEED_HMD_TEST"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "00623 exact-SHA C6 complete. Do not rerun this TASK; next independent DX11 code integration on a new TASK_ID. Quest3/VDXR menu/car/race/gamepad and native visual parity NEED_HMD_TEST; fallback maintained.",
+  "material_result_sha": "1a0d6c5cdc416ff1f58af0c69bf4b62384f3f2c0",
+  "validation_bearing_result_sha": "1a0d6c5cdc416ff1f58af0c69bf4b62384f3f2c0",
+  "result_sha": "1a0d6c5cdc416ff1f58af0c69bf4b62384f3f2c0",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38284164410,
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38284164386,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38284169712,
+    "openxr_push_conclusion": "success",
+    "openxr_push_run_id": 38284164260,
+    "openxr_pr_conclusion": "success",
+    "openxr_pr_run_id": 38284169609,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38284169696,
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST",
+    "material_sha": "1a0d6c5cdc416ff1f58af0c69bf4b62384f3f2c0"
+  }
+}

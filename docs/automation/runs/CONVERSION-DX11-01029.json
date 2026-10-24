@@ -1,0 +1,229 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01029",
+  "production_id": "CONVERSION-DX11-01029",
+  "event_id": "CONVERSION-DX11-01029-E001",
+  "event_type": "dispatch",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01029",
+  "lane": "DX11",
+  "classification": "A",
+  "feature_id": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
+  "work_key": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "source_head": "c5dd530d3288674e07af779ab9a4dfdeeff27233",
+  "material_result_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
+  "result_sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+  "validation_bearing_result_sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "D3D9 16 authored vertex streams, sparse physical VB/IB/UP shadow and instance-step data into native D3D11 SM3 shader Draw/DrawIndexed; preserve original DX9Ex/gamepad/FFB fallback.",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW",
+    "goal": "Permit live game programmable shader Draw to use D3D9 streams 4..15 with faithful authored packed attributes and D3D9 instance rates; fail closed without changing original gameplay.",
+    "acceptance_items": [
+      {
+        "id": "capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Live_D3D9_Draw",
+        "expected_behavior": "Hook gathers all source-epoch SM3 stream slots 0..15 including sparse game indices"
+      },
+      {
+        "id": "native",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native_D3D11_Draw",
+        "expected_behavior": "SM3 shader IA consumes stream 4 and stream 15 attributes with correct source instance stepping in Draw/DrawIndexed"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex_Input",
+        "expected_behavior": "Missing/stale 16th stream or invalid byte budget returns original D3D9 Draw/Present with no partial packed GPU source"
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "C6_Exact_SHA",
+        "expected_behavior": "Portable positive and negative C++ probe and unchanged mandatory five full GitHub workflow gates"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "D3D9 R30 intercepted game Draw VB/UP source epoch -> all 16 stream snapshots",
+      "D3D11 real game shader declaration -> 16-stream FLOAT4 IA -> native Draw/DrawIndexed and original D3D9 fallback"
+    ],
+    "batch_components": [
+      "stereo_renderer_r30.cpp + live_game_frame_bridge.hpp",
+      "live_game_frame_bridge.cpp + live_game_sm3_stream_assembly.hpp",
+      "01029 portable positive/negative C++ probe and 00992 native instancing regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source streams 0/4/15 and mixed instance frequency to native packed SM3 IA",
+      "negative_regression": "Missing/stale high stream, out-of-range stream and upload-size bounds",
+      "component_integration": "R30 capture -> 16-stream shader source -> D3D11 native geometry Draw"
+    },
+    "conflict_keys": [
+      "DX11:FULL_D3D9_SM3_STREAMS_NATIVE_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Native opt-in unchanged; source D3D9 Draw/Present, gamepad, FFB and DX9Ex preserved; DXVK frozen",
+    "visible_frame_acceptance": "SOURCE_ONLY, RUNTIME_UNTESTED",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "live_game_draw_path_scope": "Connected C++ path only; HMD/native live game screenshot UNTESTED."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/dx11_live_sm3_instancing_00992.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_sm3_multistream_game_draw_probe_01029.cpp",
+    "tools/test_dx11_sm3_multistream_game_draw_01029.py",
+    "docs/automation/runs/CONVERSION-DX11-01029.json",
+    "tools/dx11_sm3_interface_draw_probe_00964.cpp",
+    "tools/test_dx11_live_source_stride_00966.py",
+    "tools/dx11_live_sm3_multistream_probe.cpp",
+    "tools/test_dx11_live_sm3_vertex_decl_00929.py"
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Hardware game/HMD reality not observed, despite all exact-SHA CI gates succeeding",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_IMPLEMENTATION_ACTION": "C6 exact-SHA build verified; separate actual desktop game/HMD stereo/input/FFB test remains UNTESTED. New independent features controlled by dispatcher.",
+  "feature_ready": true,
+  "pending_items": [
+    "Desktop game menu/car/race pixel and native frame counters UNTESTED",
+    "Quest 3 VDXR stereo/FFB/input runtime test UNTESTED"
+  ],
+  "repair_evidence": {
+    "classification": "B",
+    "failure_exact_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
+    "failure_workflow_run_id": 39987719544,
+    "failed_step": "Run focused DX11 source-only regression checks",
+    "causal_errors": [
+      "00964 compiled probe retained std::array<GameSm3StreamView,4> after full source 16-stream integration",
+      "00966 source-contract regex demanded old in.Stream >= 4u guard rather than the new in.Stream >= 16u"
+    ],
+    "change": "Keep identical compiled 00964 positive/negative assertions and original 00966 small-stride/fallback checks while updating interface dimensions only",
+    "full_gate_plan": "one_validation_bearing_sha",
+    "previous_causal_failure_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
+    "causal_repairs": [
+      {
+        "failed_sha": "79e2e4f01826b0b0c8ab27c30e7bdc0474823b28",
+        "workflow_run_id": 39987719544,
+        "changes": [
+          "00964 C++ native stream signature",
+          "00966 indexed D3D9 source bounds assertion"
+        ]
+      },
+      {
+        "failed_sha": "c72a760763afae64be2583c7c165a567f84927b3",
+        "workflow_run_id": 39988197594,
+        "changes": [
+          "additional multistream assembly probe legacy std::array<4> input",
+          "00929 declaration source-bounds assertion still expects guard stream >=4"
+        ]
+      }
+    ]
+  },
+  "gate_evidence": {
+    "validation_bearing_result_sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+    "checked_count": 5,
+    "mandatory_gate_results": [
+      {
+        "workflow": "DX11 Fast Structural Checks",
+        "run_id": 39988491148,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988491148"
+      },
+      {
+        "workflow": "Backend Conversion Gate",
+        "run_id": 39988490990,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988490990"
+      },
+      {
+        "workflow": "Build",
+        "run_id": 39988491167,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988491167"
+      },
+      {
+        "workflow": "OpenXR VR architecture",
+        "run_id": 39988491158,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988491158"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 39988491157,
+        "sha": "433bd324ee7aacefd69b2a1dbe6544ad2dea852c",
+        "status": "completed",
+        "conclusion": "success",
+        "event": "push",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/39988491157"
+      }
+    ],
+    "excluded_nonmandatory_run": {
+      "name": "VR PC Fast Test Build",
+      "status": "skipped",
+      "reason": "User explicitly prohibits PC Fast runner; this workflow is not among the five mandatory Gates"
+    }
+  },
+  "acceptance_results": {
+    "capture": {
+      "status": "PASS_SOURCE_CI",
+      "evidence": "R30 stream source 0..15 VB/IB/UP epoch hooks and bounded shadow staging cross-file 01029 source graph validated"
+    },
+    "shader_ia": {
+      "status": "PASS_COMPILED_PROBE",
+      "evidence": "01029 positive/negative compiled C++ probe and existing 00992 instancing regression passed DX11 Fast Gate exact SHA"
+    },
+    "fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence": "Missing/stale/budget guards and original DX9Ex game Draw, input and FFB unchanged, native source-only scope"
+    },
+    "gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "five GitHub Actions exact SHA completed SUCCESS"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "evidence": "No desktop OutRun or Quest3/VDXR real game test executed; no pixel or stereo promotion"
+    }
+  },
+  "c6_bookkeeping_note": "Bookkeeping only; source implementation and validation-bearing CI commit remain separate; no duplicate CI/score."
+}

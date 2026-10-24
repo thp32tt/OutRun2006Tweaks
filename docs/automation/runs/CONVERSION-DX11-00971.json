@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00971",
+  "production_id": "CONVERSION-DX11-00971",
+  "event_id": "CONVERSION-DX11-00971-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00971",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "SM3_SAME_DRAW_TEXTURE_VIEW_INTEGRATED",
+  "checkpoint": "C6_STATE",
+  "base_sha": "9197b92b3da46aecfe23d33671a2bf772a221a4e",
+  "material_result_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8",
+  "validation_bearing_result_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8",
+  "result_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8",
+  "source_head": "fd2437f7c7ba537be8b5b4737169397c442174e8",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00971",
+  "score_status": "C6_IS_NOT_INDEPENDENT_PERFORMANCE",
+  "work_time_percentages": "NOT_MEASURED",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_draw_mirror_cache.hpp",
+    "tools/dx11_live_game_draw_mirror_probe_00971.cpp",
+    "tools/test_dx11_live_game_draw_mirror_00971.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_GPU_TEXTURE_SNAPSHOT",
+      "D3D11_NATIVE_SHADER_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_draw_mirror_cache.hpp",
+      "tools/dx11_live_game_draw_mirror_probe_00971.cpp",
+      "tools/test_dx11_live_game_draw_mirror_00971.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Per-source-Draw identical D3D9 texture+mip+sRGB shader-bound VS/PS slots receive one GPU snapshot and correctly distinct D3D11 samplers; C++ constexpr probe + structural mutation checks.",
+      "negative_regression": "Different mip-chain, sRGB profile or D3D9 source identity never share SRV. Unsupported source and invalid sampler return to game D3D9 Draw/Present; no caching across Draw/Reset.",
+      "component_integration": "Real game SM3 VS and PS capture_live_sm3_sampler calls route through mirrorLiveSampler, then native VS/PS shader resource bindings and actual Draw/DrawIndexed."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME:CONVERSION-DX11-00971"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and CI PASS for one SM3 same-draw image identity. Actual game frame/pixels/native draw count and Quest3 stereo UNTESTED; full renderer NOT_COMPLETE.",
+    "activation_guard_and_fallback": "Native opt-in only. No implicit activation; a failed D3D9 source image/sampler, unsupported formats or invalid shader state fail closed to original DX9Ex Draw and input."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Continue authentic game programmable SM3 native fullscreen Draw/DrawIndexed including current D3D9 render-target texture feedback, VS and PS samplers, and original DX9Ex fail-closed fallback.",
+    "acceptance_items": [
+      {
+        "id": "real_shader_draw_texture_alias",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_native_programmable_draw",
+        "expected_behavior": "A single authentic D3D9 texture bound to multiple native VS/PS SM3 sampler slots uploads its correct source image only once per source Draw."
+      },
+      {
+        "id": "source_draw_sampler_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_renderer_input_ffb_safety",
+        "expected_behavior": "Different sRGB/mip/texture views or unsupported cube/sampler states do not share a stale native SRV; original D3D9 drawing and input remain authoritative."
+      },
+      {
+        "id": "exact_sha_five_actions",
+        "category": "integrated_validation",
+        "behavior_area": "windows_backend_fast_openxr_hud",
+        "expected_behavior": "All five mandatory CI workflows succeed against one exact material C++ source SHA without CI bypass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real_shader_draw_texture_alias": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_draw_mirror_cache.hpp",
+        "tools/dx11_live_game_draw_mirror_probe_00971.cpp",
+        "tools/test_dx11_live_game_draw_mirror_00971.py"
+      ],
+      "validation_command": "GitHub DX11 Fast Structural Checks #39590592121 and Backend Conversion Gate #39590592046"
+    },
+    "source_draw_sampler_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_draw_mirror_cache.hpp",
+        "tools/dx11_live_game_draw_mirror_probe_00971.cpp",
+        "tools/test_dx11_live_game_draw_mirror_00971.py"
+      ],
+      "validation_command": "GitHub DX11 Fast #39590592121 C++17 source identity and destructive Python negative regression"
+    },
+    "exact_sha_five_actions": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_draw_mirror_cache.hpp",
+        "tools/dx11_live_game_draw_mirror_probe_00971.cpp",
+        "tools/test_dx11_live_game_draw_mirror_00971.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Fast #39590592121; Backend #39590592046; Build #39590592025; OpenXR #39590592088; HUD #39590592106"
+    }
+  },
+  "ci": {
+    "exact_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8",
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "gates": {
+      "DX11 Fast Structural Checks": {
+        "id": 39590592121,
+        "conclusion": "success",
+        "head_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8"
+      },
+      "Backend Conversion Gate": {
+        "id": 39590592046,
+        "conclusion": "success",
+        "head_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8"
+      },
+      "Build": {
+        "id": 39590592025,
+        "conclusion": "success",
+        "head_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8"
+      },
+      "OpenXR VR architecture": {
+        "id": 39590592088,
+        "conclusion": "success",
+        "head_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "id": 39590592106,
+        "conclusion": "success",
+        "head_sha": "fd2437f7c7ba537be8b5b4737169397c442174e8"
+      }
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: prior 00970 C6 and five prior exact-SHA results reconciled at 9197b92; 00971 no conflicting live claim.",
+    "C1_REVIEW": "PASS: real SM3 VS/PS shader-bound game Draw independently mirrored the same full-resolution D3D9 render target source on each sampler slot.",
+    "C2_IMPLEMENT": "PASS: modified live_game_frame_bridge.cpp authentic VS/PS per-Draw source alias path and added dedicated cache helper and C++/Python regression. No state-only or review-only work.",
+    "C3_VALIDATE": "PASS: five mandatory exact-material-SHA GitHub Actions succeeded, Fast 39590592121, Backend 39590592046, Windows 39590592025, OpenXR 39590592088, HUD 39590592106; supplemental isolated WARP 39590592074 succeeded.",
+    "C4_COMMIT": "PASS: material source+tests commit fd2437f7c7ba537be8b5b4737169397c442174e8, marker [AUTO:CONVERSION-DX11-00971], non-force expected-SHA fast-forward.",
+    "C5_PACKAGE": "NOT_REQUIRED: normal build artifacts available; deployment and real-game/Quest3 not performed.",
+    "C6_RESULT": "PASS_EXACT_SHA SOURCE_ONLY: all five exact-SHA gates SUCCESS, runtime UNTESTED. One bookkeeping C6 commit distinct from material result, no independent C6 score."
+  },
+  "REAL_GAME_DRAW_BLOCKER": "No observed real OutRun game native_draws>0 or published native full-game-frame pixels for exact SHA; Quest3/VDXR UNTESTED. Source CI alone cannot prove menu/car/race playability.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "fd2437f7c7ba537be8b5b4737169397c442174e8",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Capture one real native SM3 Draw/DrawIndexed game frame with source ordinals and current per-Draw sampler counts; repair exact shader/texture/output failed cause without weakening D3D9 fallback."
+}

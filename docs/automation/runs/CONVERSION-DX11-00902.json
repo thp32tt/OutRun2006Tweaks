@@ -1,0 +1,152 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00902",
+  "production_id": "CONVERSION-DX11-00902",
+  "event_id": "CONVERSION-DX11-00902-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00902",
+  "feature_id": "DX11:NATIVE_GAME_STEREO_MIP_POSTPASS_GPU_BOUNDARY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "aced1a3aab339d5d64a9afefaecda1c581204c5b",
+  "validation_bearing_result_sha": "56d25967e7859f43ac85bc3598d28d6bdef416fd",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_GAME_STEREO_MIP_POSTPASS_GPU_BOUNDARY",
+    "goal": "Validate actual game-authored native D3D11 menu/vehicle/race camera mip/array source bounds consistently before any left or right OpenXR game-eye GPU Copy/Stretch replay, including required GPU shader components and safe original D3D9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_game_camera_mip_array_stereo_replay",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_game_camera_mip_array_gpu_to_stereo_eye_replay",
+        "expected_behavior": "Real native D3D11 game SourceCopy/Stretch encoders and both-eye preflight use identical selected physical mip and eye slice sizes before scheduling GPU commands."
+      },
+      {
+        "id": "gpu_postpass_shader_and_dx9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GPU_shader_admission_original_D3D9Ex_input_FFB_fallback",
+        "expected_behavior": "Reject invalid late-eye source boxes, mismatched MSAA and missing native copy/stretch pixel-shader compiler before any left-eye write; preserve the original game Draw/input/FFB fallback."
+      },
+      {
+        "id": "exact_sha_game_gpu_postpass_ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_GPU_source_regression_and_exact_SHA_actions",
+        "expected_behavior": "C++17 physical mip/slice positive and negative regression and all five mandatory GitHub Actions succeed on one exact validation-bearing SHA, while runtime/HMD remains explicitly untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_game_camera_mip_array_stereo_replay": "PASS_CPP17_NATIVE_SOURCE_MIP_REGRESSION",
+    "gpu_postpass_shader_and_dx9ex_fallback": "PASS_SOURCE_GUARD_CI",
+    "exact_sha_game_gpu_postpass_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Real game D3D9 menu/car/race camera native D3D11 source texture mip and array slice bounds -> shared encoder and both-eye GPU replay validation",
+      "Verified physical camera subresource and GPU Copy/Stretch shader admission -> independent OpenXR L/R eye ring output and DX9Ex safe fallback"
+    ],
+    "batch_components": [
+      "Actual native_game_stereo_submission.cpp GPU SourceCopy/Stretch mip/array preflight and shader dependency paths",
+      "New common real camera postpass mip source bounds C++ and expanded existing negative/positive C++17 probe",
+      "Exact-SHA CI source-graph negative contract and OpenXR packaging-negative repair, preserving all five mandatory Gates"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STEREO:MIP_ARRAY_COPY_STRETCH_AND_GPU_SHADER"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY: native postpass game L/R GPU source preflight and OpenXR code validated, but no real OutRun D3D9 game menu/car/race screen, Quest3/VDXR HMD or gamepad/FFB physical test was performed; full gameplay path is not proven.",
+    "activation_guard_and_fallback": "Original D3D9Ex game Draw/Present/input/FFB, SkyGlow, legacy fallback and DXVK freeze remain unchanged; native GPU operation uses source-owner and exact-eye bounds fail-closed rules.",
+    "blocking_evidence": "A game-created mipmapped dual-eye postpass could pass a level-0 cropped source rectangle at level-1 preflight; a later right-eye encoder could fail only after the left eye queued GPU writes, faulting the ring. Shader compiler dependency was only checked for partial TARGET Clear, not source format Copy or scaled Stretch.",
+    "acceptance_proof": {
+      "positive_probe": "Local C++17 -Wall -Wextra -Werror source mip/array physical width and positive two-eye source rectangle regression PASS. Native Transport isolated Win32 WARP #39081155243 SUCCESS on unchanged source material aced1a3aab339d5d64a9afefaecda1c581204c5b.",
+      "negative_regression": "Local C++17 rejects level-0 oversized right-eye mip rectangle, invalid array slice/mip, invalid MSAA and missing source pixels. Existing DX11 native static, transport, activation and OpenXR packaging synthetic negative guards retained; no HMD assertion.",
+      "component_integration": "Material aced1a3aab339d5d64a9afefaecda1c581204c5b changes real native GPU SourceCopy/Stretch encoders, shared source admission and existing C++ test; same TASK_ID CI causal repair 56d25967e7859f43ac85bc3598d28d6bdef416fd exact gate Fast #39081910548, Backend #39081910557, Build #39081910575, OpenXR #39081910536, HUD #39081910576 all SUCCESS."
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_postpass_replay.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_game_eye_om_slots_probe_00888.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_package_dx11_first_game_frame.py",
+    ".github/workflows/outrun-exe-hud-inspector.yml"
+  ],
+  "ci_blocker": {
+    "original_material_sha": "aced1a3aab339d5d64a9afefaecda1c581204c5b",
+    "build_failed_run_id": 39081155240,
+    "backend_failed_run_id": 39081155281,
+    "fast_failed_run_id": 39081155271,
+    "openxr_failed_run_id": 39081155250,
+    "failure_cause": "Original static verifier demanded old inlined sourceMipSlice/mipWidth tokens instead of shared physical source admission, and OpenXR PR-only synthetic negative replaced a non-bundle earlier global occurrence.",
+    "resolved": true,
+    "repair_sha": "56d25967e7859f43ac85bc3598d28d6bdef416fd",
+    "repair_result": "Fast/Backend/Build/OpenXR/HUD all SUCCESS at the exact revised SHA; no CI-skip on validation-bearing commits."
+  },
+  "runtime_validation_note": "Original OutRun game, Quest3/VDXR headset, input/FFB and sustained scene FPS were not executed. CI success is not proof of visible full native DX11 gameplay.",
+  "validation_evidence": {
+    "material_sha": "aced1a3aab339d5d64a9afefaecda1c581204c5b",
+    "validation_sha": "56d25967e7859f43ac85bc3598d28d6bdef416fd",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39081910548,
+        "conclusion": "success",
+        "validation_sha": "56d25967e7859f43ac85bc3598d28d6bdef416fd"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39081910557,
+        "conclusion": "success",
+        "validation_sha": "56d25967e7859f43ac85bc3598d28d6bdef416fd"
+      },
+      {
+        "name": "Build",
+        "run_id": 39081910575,
+        "conclusion": "success",
+        "validation_sha": "56d25967e7859f43ac85bc3598d28d6bdef416fd"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39081910536,
+        "conclusion": "success",
+        "validation_sha": "56d25967e7859f43ac85bc3598d28d6bdef416fd"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39081910576,
+        "conclusion": "success",
+        "validation_sha": "56d25967e7859f43ac85bc3598d28d6bdef416fd"
+      }
+    ],
+    "isolated_native_warp_run_id": 39081155243,
+    "isolated_native_warp_conclusion": "success",
+    "isolated_native_warp_sha": "aced1a3aab339d5d64a9afefaecda1c581204c5b",
+    "cpp17_mip_array_probe": "PASS_LOCAL_CPP17_WERROR",
+    "runtime_validation": "UNTESTED",
+    "full_gameplay_renderer_complete": false,
+    "blocking_evidence": "Full D3D9 Draw hook to native stereo independent OpenXR eye, real menu/car/race frames and Quest3/VDXR input/FFB visual validation not executed."
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD, 00901 C6, 00902 absent record and actual active branch/lease recovered; new unique TASK_ID material.",
+    "C1_REVIEW": "Real game camera SourceCopy/Stretch preflight used physical mip extent inconsistently and shader dependency was late in right-eye replay.",
+    "C2_IMPLEMENT": "Three source and C++ regression files at material aced1a3aab339d5d64a9afefaecda1c581204c5b; source-active native Draw/Copy/Stretch behavior changed, not a metadata-only task.",
+    "C3_VALIDATE": "Source-local C++17 positive/negative PASS, native WARP #39081155243 SUCCESS on material. Same-TASK old CI guard and package negatives repaired; five mandatory exact-SHA actions all SUCCESS on 56d25967e7859f43ac85bc3598d28d6bdef416fd.",
+    "C4_COMMIT": "Implementation aced1a3aab339d5d64a9afefaecda1c581204c5b; same TASK C++ source-guard/CI failure repair validation-bearing 56d25967e7859f43ac85bc3598d28d6bdef416fd; C6 bookkeeping after CI only.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA; Quest3/VDXR UNTESTED; no duplicated task score or gameplay promotion."
+  }
+}

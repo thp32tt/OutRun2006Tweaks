@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00315",
+  "production_id": "CONVERSION-DXVK-00314",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00314-E001",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R221_SHADER_COMPILE_COVERAGE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "68d59edfb7af151a4d2039a5d98bc7cc24c2179d",
+  "result_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
+  "validation_bearing_result_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
+  "result_marker": "[AUTO:CONVERSION-DX11-00315]",
+  "selected_work_item": "DX11_R221_FIXED_FUNCTION_SHADER_COMPILE_COVERAGE_CAP_GUARD",
+  "summary": "R221 decouples fixed-function D3DCompile readiness probes from the 64-entry detailed signature log cap. Every newly tracked fixed-function signature is compile-probed through the independent 512-entry signature hash cap; only genuinely untracked signatures beyond that hash cap increment skipped compile coverage. The analyzer now reports compile-coverage completeness explicitly. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00315.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD 68d59edfb7af151a4d2039a5d98bc7cc24c2179d; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR regression/history and Issue #14. R220/00313 is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set-05 F22 remains a bounded evidence gap: DetailedSignatureLogCap=64 also capped fixed-function D3DCompile probes, so signature 65..512 could be hash-tracked yet lack compile-readiness evidence. fixedFunctionShaderCompileSkippedCap was parsed but compile coverage completeness was not surfaced by the analyzer.",
+      "review_lenses": {
+        "architecture": "Separate diagnostic presentation/log-detail bounds from shader compile-readiness evidence without activating native draw.",
+        "ownership_lifetime": "No COM ownership, Reset, resource generation, shared surface or transport lifetime changes.",
+        "stereo_correctness": "No eye routing, WVP, HUD, OpenXR submission or presentation behavior changes.",
+        "performance": "Additional D3DCompile work is bounded to newly observed unique fixed-function signatures while the diagnostic census is active, up to SignatureHashCap=512; repeated signatures are not recompiled.",
+        "adversarial": "If signature diversity exceeds the hash cap, skipped compile coverage remains explicitly counted and analyzer-visible rather than being silently treated as complete."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "TDD RED reproduced the old coupling: source-graph verifier rejected DetailedSignatureLogCap inside the compile-probe block and analyzer regression lacked compile coverage fields. R221 removes the 64-entry compile gate, counts skips only on signatureHashCapHit, adds ShaderCompileSkippedSignatureCap/ShaderCompileCoverageComplete analyzer evidence, and updates regression/static contracts."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R221_SHADER_COMPILE_COVERAGE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37148931205 passed on 823e91150ab33d8584bb81fc09d750cae518cb79. Validate job 111278512220 passed queue/baseline/backend/static-surface/source-graph/dormant-activation/census checks, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111279448754 passed all fixed-function shader, input-layout/signature, shader object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and pipeline-handoff probes."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "823e91150ab33d8584bb81fc09d750cae518cb79"
+      ],
+      "validation_bearing_result_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
+      "issue14_implementation_comment_id": 5972830799,
+      "issue14_validation_comment_id": 5972893328
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R221 changes dormant census diagnostic/compile-readiness evidence only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_implementation_comment_id": 5972830799,
+      "issue14_validation_comment_id": 5972893328,
+      "dispatch_metadata_correction_comment_id": 5972914979,
+      "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R221 compile-readiness coverage separation and R213-R220 exactness protections; programmable shader translation, native draw activation and Quest 3/VDXR runtime parity remain fail-closed until their own evidence gates pass."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "VR-STARTUP-WHITE-001_PATH_MATCH_ONLY_TRIGGER_NOT_MET",
+    "evidence": "src/vr/** matches the broad historical risk path, but R221 changes census-only unique-signature compile probing and analyzer evidence. Startup/device creation/reset/present, transport/shared resources, host fallback, configuration and native draw routing are unchanged."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00314",
+    "event_id": "CONVERSION-DXVK-00314-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_ROLLOVER",
+    "material_result_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
+    "source_implementation_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
+    "validation_bearing_result_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
+    "implementation_comment_id": 5972830799,
+    "validation_comment_id": 5972893328,
+    "dispatch_metadata_correction_comment_id": 5972914979
+  },
+  "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R221 compile-readiness coverage separation and R213-R220 exactness protections; programmable shader translation, native draw activation and Quest 3/VDXR runtime parity remain fail-closed until their own evidence gates pass.",
+  "source_implementation_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
+  "implementation_commits": [
+    "823e91150ab33d8584bb81fc09d750cae518cb79"
+  ],
+  "issue14_comment_ids": [
+    5972830799,
+    5972893328,
+    5972914979
+  ],
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37148931205,
+    "head_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
+    "validate_job_id": 111278512220,
+    "readiness_smoke_job_id": 111279448754,
+    "artifact_id": 11282803468,
+    "artifact_digest": "sha256:99e66142660bb74b4ac1e206b3f012d50a5259cc6d258338e00b6e54cf4de3dd"
+  },
+  "dispatch_metadata_correction": {
+    "authoritative_production_id": "CONVERSION-DXVK-00314",
+    "authoritative_event_id": "CONVERSION-DXVK-00314-E001",
+    "authoritative_event_type": "rollover",
+    "authoritative_attempt": "1/3",
+    "corrected_from": {
+      "production_id": "CONVERSION-DX11-00315",
+      "event_id": "CONVERSION-DX11-00315-E001",
+      "event_type": "rollover",
+      "attempt": "1/3"
+    },
+    "evidence_comment_id": 5972914979,
+    "superseded_issue_comment_id": 5972895805,
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

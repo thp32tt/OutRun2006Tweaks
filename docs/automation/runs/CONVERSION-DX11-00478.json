@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00478",
+  "production_id": "CONVERSION-DX11-00478",
+  "event_id": "CONVERSION-DX11-00478-E002",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "attempt": "1/3",
+  "resume_reason": "VR_FORCED_40_MINUTE_RESUME",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00478",
+  "lease_epoch": 1,
+  "work_key": "DX11:R176:INDEPENDENT_TEXCOORD6_DXBC_SIGNATURE:tools/dx11_shader_linkage_probe.cpp",
+  "conflict_keys": [
+    "tools/dx11_shader_linkage_probe.cpp:R176"
+  ],
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "02eeb7b4f05d7661664716ce9dff11dd279fa71b",
+  "material_result_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+  "validation_bearing_result_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+  "automation_validation": "PASS_R176_SCOPED_FAIL_EXACT_SHA_BACKEND_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "prior_task": {
+    "id": "CONVERSION-DX11-00477",
+    "status": "BLOCKED_WITH_SEPARATE_LIVE_DIAGNOSTIC_CONTINUATION",
+    "owned_path": "tools/dx11_constant_buffer_probe.cpp",
+    "last_head": "02eeb7b4f05d7661664716ce9dff11dd279fa71b",
+    "material_sha": "4bef0e017e1d4a040678f6b2acfd9655d3a936c2",
+    "gate_id": 37927656851,
+    "validate": "SUCCESS",
+    "smoke": "FAIL",
+    "classification": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "ownership_isolation": "R176 uses independent shader-linkage source; no changes to R173/R175 raster probe"
+  },
+  "selected_work_item": "R176 independently reproduce R175 TEXCOORD6 VS/PS DXBC signature as float4 and add negative TEXCOORD7 and UINT4 linkage guards; distinguish valid bytecode signatures from unchanged failing WARP raster output.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: live GitHub HEAD 02eeb7b4; no 00478 record/commit before this run; 00477 R175 exact-SHA failure gate and prior owner recovered.",
+    "C1_REVIEW": "PASS: R175 direct/generated/constant COLOR0 and TEXCOORD6 all returned identical incorrect BGRA; signed linkage is independent discriminator; separate tools/dx11_shader_linkage_probe.cpp selected to avoid 00477 write conflict.",
+    "C2_IMPLEMENT": "COMPLETE: new R176 C++ VS/PS DXBC reflection checks (float4, component mask, TEXCOORD6, VS/PS reflection and VS register/PS register observability) plus TEXCOORD7 and uint4 negative controls.",
+    "C3_VALIDATE": "PASS_R176_SCOPED / FAIL_FULL_GATE: exact 0593e17a Gate 37931273252 validate job SUCCESS, shader-linkage step SUCCESS with R176 VS_register=1 PS_register=0 and both negative controls REJECT. Downstream prior 00477-owned constant buffer WARP R175 failed with same [128,0,16,255] vs [224,128,32,255]; full Gate failure cannot be called PASS.",
+    "C4_COMMIT": "COMPLETE: non-bookkeeping source commit 0593e17afaaa02c5fb8f77a6315c4833185e3e1a with exact [AUTO:CONVERSION-DX11-00478] marker; Issue #14 append-only record 6081050084.",
+    "C5_PACKAGE": "NOT_REQUIRED: source-only isolated diagnostic guard; no native Draw activation or deployable Quest3/VDXR build identity advanced.",
+    "C6_STATE": "PERSISTED_BLOCKED_DEPENDENCY: independent R176 DXBC signature check passed and test material committed, but normal controller release is blocked by existing 00477 R175 failing full gate. No duplicate R176 work or point; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "changed_paths": [
+    "tools/dx11_shader_linkage_probe.cpp"
+  ],
+  "validation_run_id": 37931273252,
+  "validation_issue14_comment_id": 6081184165,
+  "checkpoints": [
+    {
+      "event": "E002",
+      "reason": "rollover recovery",
+      "timestamp_kst": "2026-10-09T21:38:00+09:00",
+      "material_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+      "ci_run_id": 37931273252,
+      "phase": "C3_PENDING",
+      "actual_runtime": "UNTESTED"
+    },
+    {
+      "event": "C3_VALIDATE_PARTIAL",
+      "timestamp_kst": "2026-10-09T21:44:00+09:00",
+      "head": "a7b3e76807906df1098fe820093de11d931326b0",
+      "material_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+      "run_id": 37931273252,
+      "validate_job_id": 113822316237,
+      "validate": "SUCCESS",
+      "smoke_job_id": 113824261638,
+      "smoke": "IN_PROGRESS",
+      "runtime_validation": "UNTESTED",
+      "next_action": "Read R176 shader linkage step and R175 inherited WARP error from the exact source's smoke job logs."
+    },
+    {
+      "event": "C6_SCOPED_PASS_DEPENDENCY_BLOCK",
+      "timestamp_kst": "2026-10-09T21:46:30+09:00",
+      "material_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+      "run_id": 37931273252,
+      "validate": "SUCCESS",
+      "r176_linkage": "SUCCESS",
+      "full_gate": "FAIL_R175_PREEXISTING",
+      "issue14_comment_id": 6081184165,
+      "score_change": 0,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "next_action": "Preserve successful independent R176 linkage contract without repeat or rewrites. Under 00477's ownership resolve native WARP R175_GENERIC_VARYING_MISMATCH in tools/dx11_constant_buffer_probe.cpp (VS/PS varyings or OM binding), rerun full exact-SHA Backend Conversion Gate; only then reconcile 00478 from BLOCKED_UPSTREAM to COMPLETE and consider scoring. Do not activate gameplay Draw before Quest3/VDXR evidence.",
+  "resume_cursor": "WAIT_DISTINCT_OWNER_00477_R175_REPAIR_AND_FULL_GATE",
+  "blockers": [
+    "Full Backend Conversion Gate remains FAILURE from pre-existing 00477 R175 generic-varying WARP pixel mismatch; R176 linkage test itself passes.",
+    "No Quest3/VDXR actual runtime evidence."
+  ],
+  "state_persisted": true,
+  "score_change": 0,
+  "score_reason": "Scoped regression validated but task normal release blocked by exact-SHA full gate failure from 00477-owned fixture; no point is confirmed.",
+  "validation_job_id": 113822316237,
+  "validation_job_result": "SUCCESS",
+  "readiness_smoke_job_id": 113824261638,
+  "readiness_smoke_result": "FAIL_R175_GENERIC_VARYING_MISMATCH",
+  "validation_result_final": "EXACT_SHA_GATE_FAILURE_R175_UPSTREAM",
+  "linkage_probe_result": "PASS",
+  "linkage_probe_log": "DX11 R176 TEXCOORD6 DXBC signature: MATCH float4 VS_register=1 PS_register=0 negative_semantic=REJECT negative_type=REJECT",
+  "exact_sha_gate": {
+    "run_id": 37931273252,
+    "head_sha": "0593e17afaaa02c5fb8f77a6315c4833185e3e1a",
+    "conclusion": "failure",
+    "validate": {
+      "job_id": 113822316237,
+      "conclusion": "success"
+    },
+    "dx11_readiness_smoke": {
+      "job_id": 113824261638,
+      "conclusion": "failure",
+      "r176_shader_linkage_step": "success",
+      "legacy_r175_constant_buffer_step": "failure",
+      "r175_observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "r175_expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "classification": "R175_GENERIC_VARYING_MISMATCH"
+    },
+    "artifact": {
+      "id": 11616133727,
+      "digest": "sha256:270166e9d48273c229b1a65779433d69192ada7652d3d1ce03edad0f04b6d6e1",
+      "purpose": "Win32 validate build evidence, NOT native gameplay/Quest3 candidate"
+    }
+  },
+  "source_comparison": {
+    "user_supplied_base_sha": "b24aba86e4f326eb850c4e52561cce7c6dbb8fb3",
+    "recovered_head_before_work": "02eeb7b4f05d7661664716ce9dff11dd279fa71b",
+    "status": "ahead",
+    "ahead_by": 17,
+    "behind_by": 0,
+    "meaning": "user base is an ancestor of recovered 00477 source, not the latest HEAD"
+  }
+}

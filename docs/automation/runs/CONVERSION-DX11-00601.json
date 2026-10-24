@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00601",
+  "production_id": "CONVERSION-DX11-00601",
+  "event_id": "CONVERSION-DX11-00601-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00601",
+  "work_key": "DX11:MENU_RACE_BOTH_SOURCE_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "317763ee267cf48bc465e17d082597fad0536370",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live original D3D9 BOTH[SRC/INVSRC]ALPHA blend state from menu/car/race draw",
+      "D3D11 RGB and alpha OM over/inverse-over + per-channel mask cache",
+      "DX11 Draw/DrawIndexed diagnostic inset with original D3D9 Draw/input/Present preserved"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_both_source_alpha_00601.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "131072 numeric factor cases plus exact-SHA hosted Windows build",
+      "negative_regression": "19 destructive regression mutations plus default fail-closed on unsupported states",
+      "component_integration": "GetRenderState -> OutputCapture -> native OM -> indexed/linear Draw"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BOTH_SOURCE_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BOTH_SOURCE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR/gamepad runtime NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Opt-in OUTRUN_DX11_FIRST_GAME_FRAME=1; original D3D9 Draw/Present/input always run"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_both_source_alpha_00601.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00601.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Diagnostic-only source implementation, no HMD-qualified release"
+  },
+  "next_action": "Independent next DX11 menu->race or native XR link task; Quest3/VDXR and gamepad runtime remain NEED_HMD_TEST, never infer actual gameplay parity from CI.",
+  "result_sha": "f013416de2fe7d331675bfcfd18310b2e8f13478",
+  "validation_bearing_result_sha": "f013416de2fe7d331675bfcfd18310b2e8f13478",
+  "material_commit_sha": "d76c4c36c0d51b7bc316105eafd21f3568be4f0a",
+  "repair_commit_shas": [
+    "f013416de2fe7d331675bfcfd18310b2e8f13478"
+  ],
+  "verified_ci": {
+    "backend_conversion_gate": {
+      "id": 38225154188,
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "build": {
+      "id": 38225158890,
+      "conclusion": "success"
+    },
+    "dx11_fast_structural": {
+      "id": 38225154190,
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "id": 38225158897,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "id": 38225159005,
+      "conclusion": "success"
+    },
+    "vr_pc_fast": {
+      "id": 38225154179,
+      "conclusion": "skipped",
+      "required": false
+    }
+  },
+  "validation_notes": "Exact f013416d: required five GitHub workflows SUCCESS; original d76c4c36 Backend 00599 destructive gate failure repaired by narrowing test scope to subtractive OM branch. 19 new 00601 mutations and 131072 formula checks run under validation. No actual game/HMD/gamepad runtime."
+}

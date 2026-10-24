@@ -1,0 +1,125 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00727",
+  "production_id": "CONVERSION-DX11-00727",
+  "event_id": "CONVERSION-DX11-00727-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_FRAME_PUBLICATION_WITHOUT_SENTINEL",
+  "feature_id": "DX11-FULL-FRAME-SAME-PRESENT-VALID-PUBLICATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "5a02af41f919a4d64d63b02dce44d3eb86c44287",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Real D3D9 Draw/DrawIndexed whole game framebuffer -> native D3D11 GPU full-resolution game frame",
+      "GPU same-Present staged fence and readback -> D3D9 whole-backbuffer UpdateSurface without sentinel scan",
+      "D3D9 menu/vehicle/race Present+gamepad fail-closed fallback, inset retains pixel-change probe"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_publication.hpp",
+      "tools/dx11_game_frame_publication_probe_00727.cpp",
+      "tools/test_dx11_game_frame_publication_00727.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Full-resolution complete real game native Draw/DrawIndexed frame passes same-Present fence and is uploaded even when every pixel matches former fixed diagnostic sentinel",
+      "negative_regression": "Partial/unsupported Draw scene, stale fence, output mismatch, short staging or negative D3D9 lock pitch cannot upload; diagnostic inset still requires changed pixels",
+      "component_integration": "Game Draw -> native RT -> GPU same-Present fence -> guarded D3D9 UpdateSurface; valid row pitch and original input fallback preserved"
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_PUBLICATION_WITHOUT_SENTINEL",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_publication.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI only; same-Present GPU fence, whole-backbuffer D3D9 UpdateSurface, dark/solid frame publication; no actual Quest3/VDXR screen evidence",
+    "activation_guard_and_fallback": "Explicit environment opt-in, NativeDrawPathActive=false by default; partial/unsupported game Draw/fence/stride failure leaves original D3D9 Draw/Present/gamepad authoritative"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-FRAME-SAME-PRESENT-VALID-PUBLICATION",
+    "goal": "Publish complete native full-resolution menu, vehicle-select and race game frames on the originating D3D9 Present even when the image matches former inset sentinel, while preserving fail-closed original input/gameframe on invalid/partial GPU output",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_draw_to_native_game_present",
+        "expected_behavior": "Whole native full resolution game output is uploaded on same-Present complete Draw coverage, even for solid-color/dark frames, without scanning every pixel"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "game_input_and_readback_memory_safety",
+        "expected_behavior": "Partial/unsupported or stale native frame, non-writable backbuffer, invalid staging or D3D9 surface pitch never publishes; original D3D9 Present and gamepad retained, inset detects changed pixels"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "source_graph_and_ci_quality",
+        "expected_behavior": "C++17 positive/negative publication/pitch unit probe and destructively mutated Python source integration with same SHA DX11 Fast, Backend, Windows, OpenXR and HUD Gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_publication.hpp",
+    "tools/dx11_game_frame_publication_probe_00727.cpp",
+    "tools/test_dx11_game_frame_publication_00727.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00726.json"
+  ],
+  "material_result_sha": "0300e74efc7df78547db4c7688c13c4a2c4f69d9",
+  "validation_bearing_result_sha": "192903cd0260a56993caf58a3f3bcfefe1dbd641",
+  "exact_sha_gates": {
+    "DX11 Fast": {
+      "run_id": 38561727063,
+      "conclusion": "success",
+      "head_sha": "192903cd0260a56993caf58a3f3bcfefe1dbd641"
+    },
+    "Backend Conversion": {
+      "run_id": 38561727040,
+      "conclusion": "success",
+      "head_sha": "192903cd0260a56993caf58a3f3bcfefe1dbd641"
+    },
+    "Windows Build": {
+      "run_id": 38561734757,
+      "conclusion": "success",
+      "head_sha": "192903cd0260a56993caf58a3f3bcfefe1dbd641"
+    },
+    "OpenXR": {
+      "run_id": 38561734831,
+      "conclusion": "success",
+      "head_sha": "192903cd0260a56993caf58a3f3bcfefe1dbd641"
+    },
+    "HUD Inspector": {
+      "run_id": 38561734651,
+      "conclusion": "success",
+      "head_sha": "192903cd0260a56993caf58a3f3bcfefe1dbd641"
+    }
+  },
+  "runtime_gate": "NEED_HMD_TEST",
+  "packaging_status": "NOT_REQUIRED",
+  "completed_utc": "2026-10-14T12:20:00Z",
+  "resume_cursor": "New DX11 full-resolution game Draw integration after 00727; do not re-execute same TASK_ID, Quest3/VDXR game display and gamepad remain NEED_HMD_TEST.",
+  "c6_score_ref": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md RUN_KEY=CONVERSION-DX11-00727"
+}

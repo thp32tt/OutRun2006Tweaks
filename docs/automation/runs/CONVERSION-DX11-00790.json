@@ -1,0 +1,118 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00790",
+  "production_id": "CONVERSION-DX11-00790",
+  "event_id": "CONVERSION-DX11-00790-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_FULLFRAME_CPU_BACKBUFFER_SOURCE_WRITE_CONTINUITY",
+  "feature_id": "DX11-LIVE-FRAME-CPU-SURFACE-WRITE-FALLBACK",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "40a99f7c33e51ee0c152b49c02e58ae039f5c085",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "tools/dx11_native_frame_batch_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-FRAME-CPU-SURFACE-WRITE-FALLBACK",
+    "goal": "Prevent native D3D11 menu/vehicle/race full-frame source contamination when original D3D9 backbuffer is CPU-written through successful LockRect or GDI GetDC without game Draw/Clear; preserve native source identity and original D3D9 Present/gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "cpu-backbuffer-lock-and-dc-source-observation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_GetBackBuffer_LockRect_GetDC_D3D11_native_full_frame",
+        "expected_behavior": "Hook actual returned swapchain surface CPU writable acquisitions and invalidate the exact seeded game-owner native full-frame batch before altered pixels reach the game Present."
+      },
+      {
+        "id": "readonly-failed-staging-foreign-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_original_gamepad_Present_FFB_and_native_SYSTEMMEM_upload",
+        "expected_behavior": "READONLY/failed/non-default pool locks and foreign or auxiliary surface writes never corrupt the owned native game frame or interfere with original D3D9 Present/input/FFB/SkyGlow."
+      },
+      {
+        "id": "same-sha-five-gate",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "New positive/negative C++ frame-batch regression with exact same validation-bearing source SHA passing five required GitHub Actions."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "D3D9 game GetBackBuffer -> COM IDirect3DSurface9 LockRect/GetDC actual writable acquisition",
+      "Actual D3D9 owner/backbuffer identity -> native full-frame source-mutation observer and batch invalidation",
+      "D3D11 native Draw/DrawIndexed publication quarantined where CPU backbuffer writes intervened; untouched original D3D9 Present/input remains authoritative"
+    ],
+    "batch_components": [
+      "R30 live D3D9 backbuffer COM hook installation/reset reacquisition and CPU access observation",
+      "Native game-source CPU write admission and exact game device/RT0 identity abort",
+      "Compiled frame-batch positive and negative CPU-write/fallback regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_native_frame_batch_probe.cpp successful writable DEFAULT-pool backbuffer and native batch abort constexpr regression",
+      "negative_regression": "Failed/READONLY/SYSTEMMEM/foreign/auxiliary/self-upload must not invalidate source batch; all existing destructive tests retained",
+      "component_integration": "D3D9 swapchain backbuffer direct CPU/DC writes -> COM hooks -> exact source observer -> native Draw output discard -> original game Present"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_FULLFRAME_CPU_BACKBUFFER_SOURCE_WRITE_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Five required automated exact-SHA Gates SUCCESS at 9113a57fe1c03899eeebefe207dc74fe7c979943; Quest3/VDXR actual menu/vehicle/race HMD output UNTESTED.",
+    "activation_guard_and_fallback": "Native game full frame remains opt-in; original game D3D9 Draw/Present/gamepad/FFB/SkyGlow intact; DXVK remains frozen."
+  },
+  "acceptance_results": {
+    "cpu-backbuffer-lock-and-dc-source-observation": "PASS_BUILD",
+    "readonly-failed-staging-foreign-fallback": "PASS_BUILD",
+    "same-sha-five-gate": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read actual GitHub HEAD 40a99f7c and prior 00789 UpdateSurface/StretchRect/ColorFill source observer; this unobserved CPU write path is distinct.",
+    "C1_REVIEW": "Direct CPU LockRect/GetDC on swapchain backbuffer can alter source pixels after native Draw without invoking D3D9 device Draw/Clear/StretchRect hooks.",
+    "C2_IMPLEMENT": "Hook real D3D9 GetBackBuffer surface writable LockRect/GetDC and connect to seeded native full-frame source invalidation; add positive/negative CPU-write C++ regression.",
+    "C3_VALIDATE": "Exact validation-bearing SHA 9113a57fe1c03899eeebefe207dc74fe7c979943 DX11 Fast #38804107554, Backend #38804107547, Windows Build #38804115080, OpenXR #38804115073, HUD #38804115075 all SUCCESS; runtime UNTESTED.",
+    "C4_COMMIT": "Material and validation-bearing source 9113a57fe1c03899eeebefe207dc74fe7c979943 [AUTO:CONVERSION-DX11-00790]; nonforced ref update; no CI-skip on implementation.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "Five required exact-SHA automatic Gates SUCCESS; separate bookkeeping only, Quest3/VDXR/gamepad runtime UNTESTED; no duplicate score."
+  },
+  "evidence": {
+    "material_commit": "9113a57fe1c03899eeebefe207dc74fe7c979943",
+    "validation_bearing_result_sha": "9113a57fe1c03899eeebefe207dc74fe7c979943",
+    "ci_repairs": [],
+    "runtime_testing": "Quest3/VDXR real game HMD and gamepad not executed",
+    "fast_gate_run_id": 38804107554,
+    "backend_gate_run_id": 38804107547,
+    "windows_build_run_id": 38804115080,
+    "openxr_gate_run_id": 38804115073,
+    "hud_gate_run_id": 38804115075,
+    "fast_gate_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_gate_conclusion": "success",
+    "hud_gate_conclusion": "success",
+    "same_sha_verified": true,
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": "9113a57fe1c03899eeebefe207dc74fe7c979943",
+  "validation_bearing_result_sha": "9113a57fe1c03899eeebefe207dc74fe7c979943"
+}

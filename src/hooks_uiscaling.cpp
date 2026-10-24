@@ -594,10 +594,17 @@ class UIScaling : public Hook
 		return result;
 	}
 
+	template<std::uintptr_t CallerRva>
 	static int __cdecl DispRank_putClipSprite(
 		int xstnum, int x, int y, std::uint32_t flags,
 		float priority, std::uint32_t color)
 	{
+		constexpr auto producerScope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			producerScope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispRank clip callsite must remain canonical SCREEN_HUD");
+
 		VRHudProbeTrace("position_disprank", VRProbeDispRankHits);
 		AddSpriteSpacing(&x, false);
 
@@ -609,8 +616,7 @@ class UIScaling : public Hook
 		else if (probe == 8)
 			x = 320;
 		else if (probe == 19)
-			OutRunVR::GameSemantic::ArmNextDraw(
-				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+			OutRunVR::GameSemantic::ArmNextDraw(producerScope);
 
 		int prio = int(priority);
 		prio = prio < 0 ? 0 :
@@ -623,7 +629,7 @@ class UIScaling : public Hook
 		if (r57 == 2 || r57 == 3 || r57 == 6)
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				producerScope);
 			result = Game::put_clip_sprite(
 				xstnum, x, y, flags, priority, color);
 		}
@@ -633,9 +639,9 @@ class UIScaling : public Hook
 				xstnum, x, y, flags, priority, color);
 		}
 
-		// R57 HMD modes 2/3 proved that the nested put_clip_sprite -> put_sprite_ex
-		// producer scope did not survive as an accepted kind-0 HUD owner. The
-		// canonical helper appends one node, so pin the exact new node directly.
+		// R120/F13: the exact DispRank clip callsite selects ownership from the
+		// shared disassembly producer map. Preserve R57's proven direct node pin,
+		// but do not duplicate SCREEN_HUD classification in this runtime path.
 		if (r57 == 2 || r57 == 3 || r57 == 6)
 		{
 			root = Game::sprite_prio_root[prio];
@@ -644,7 +650,7 @@ class UIScaling : public Hook
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 					node,
-					OutRunVR::GameSemantic::RenderScope::ScreenHud,
+					producerScope,
 					nullptr,
 					OutRunVR::GameSemantic::SpriteNodeOwner::DispRank);
 				static std::atomic<std::uint64_t> directPositionTags{ 0 };
@@ -652,8 +658,8 @@ class UIScaling : public Hook
 					1, std::memory_order_relaxed) + 1;
 				if ((hit & (hit - 1)) == 0)
 					spdlog::info(
-						"VR R58 DIRECT CLIP: owner=position prio={} kind={} hits={}",
-						prio, node->kind_C, hit);
+						"VR R120 DIRECT CLIP: shared producer-map rva=0x{:x} prio={} kind={} hits={}",
+						CallerRva, prio, node->kind_C, hit);
 			}
 		}
 		return result;
@@ -922,27 +928,85 @@ class UIScaling : public Hook
 			*value = T(float(*value) + spacing);
 	}
 
-	static void put_scroll_AdjustPositionRight(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void C2CDontLoseGF_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), false);
-	}
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CDontLoseGF callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
 
-	static void TimeRecord_AdjustPositionAndHud(safetyhook::Context& ctx)
-	{
-		AddSpriteSpacing((int*)(ctx.esp + 4), false);
-		// These 15 exact DispTimeAttack2D callsites are already individually
-		// identified by the original UI-scaling patch. Arm only the immediate
-		// render handoff instead of promoting generic put_scroll/put_clip paths.
-		OutRunVR::GameSemantic::ArmNextDraw(
-			OutRunVR::GameSemantic::RenderScope::ScreenHud);
 		static std::atomic<std::uint64_t> hits{ 0 };
 		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
 		if ((hit & (hit - 1)) == 0)
-			spdlog::info("VR R65 TIME HUD: exact DispTimeAttack2D handoff hits={}", hit);
+			spdlog::info(
+				"VR R123 GF WARNING HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
-	static void put_scroll_AdjustPositionLeft(safetyhook::Context& ctx)
+
+	template<std::uintptr_t CallerRva>
+	static void C2CTestSlipstream_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CTestSlipstream callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R122 SLIPSTREAM HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void TimeRecord_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		// R119/F13: these exact producer callsites now consume the shared
+		// disassembly contract used by DX11/DXVK analysis instead of duplicating
+		// SCREEN_HUD ownership locally. Keep the existing immediate handoff
+		// behavior, but fail the build if the canonical producer map drifts.
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispTimeAttack2D callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R119 TIME HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+	template<std::uintptr_t CallerRva>
+	static void DispGearPosition_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispGearPosition callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R124 GEAR REV HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	// R66: NaviPub_DispTimeAttackGoal (RVA 0xBEA50) does not execute the
@@ -951,8 +1015,15 @@ class UIScaling : public Hook
 	// caller edges and tag every SpriteNode they append as SCREEN_HUD.
 	using GoalTimeHelperFn = void(__cdecl*)();
 
-	static void GoalTime_TagHelper(int helperRva, const char* label)
+	template<std::uintptr_t CallerRva, int HelperRva>
+	static void GoalTime_TagHelper(const char* label)
 	{
+		constexpr auto producerScope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			producerScope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"TimeAttackGoal callsite must remain canonical SCREEN_HUD");
+
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -962,9 +1033,9 @@ class UIScaling : public Hook
 
 		{
 			OutRunVR::GameSemantic::ScopedProducerSemantic producer(
-				OutRunVR::GameSemantic::RenderScope::ScreenHud);
+				producerScope);
 			auto original = reinterpret_cast<GoalTimeHelperFn>(
-				Module::exe_ptr(helperRva));
+				Module::exe_ptr(HelperRva));
 			original();
 		}
 
@@ -981,7 +1052,7 @@ class UIScaling : public Hook
 			for (unsigned guard = 0; node && guard < 0x230; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+					node, producerScope);
 				++tagged;
 				if (node == tailAfter)
 					break;
@@ -995,18 +1066,18 @@ class UIScaling : public Hook
 		const auto total = nodes.fetch_add(tagged, std::memory_order_relaxed) + tagged;
 		if ((call & (call - 1)) == 0)
 			spdlog::info(
-				"VR R66 GOAL TIME HUD: helper={} calls={} tagged={} totalTags={}",
-				label, call, tagged, total);
+				"VR R121 GOAL TIME HUD: shared producer-map rva=0x{:x} helper={} calls={} tagged={} totalTags={}",
+				CallerRva, label, call, tagged, total);
 	}
 
 	static void __cdecl GoalTime_Help020()
 	{
-		GoalTime_TagHelper(0xBE020, "BE020");
+		GoalTime_TagHelper<0x000BEA5Au, 0xBE020>("BE020");
 	}
 
 	static void __cdecl GoalTime_Help150()
 	{
-		GoalTime_TagHelper(0xBE150, "BE150");
+		GoalTime_TagHelper<0x000BEA5Fu, 0xBE150>("BE150");
 	}
 
 	// R56 05-08/19: exact DispRank producer probe. The eight original-mod
@@ -1030,7 +1101,8 @@ class UIScaling : public Hook
 
 	// PutGhostGapInfo
 	static inline SafetyHookMid PutGhostGapInfo_AdjustPosition_hk{};
-	static void PutGhostGapInfo_AdjustPosition(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void PutGhostGapInfo_AdjustPositionAndHud(safetyhook::Context& ctx)
 	{
 		bool left = false;
 		int* val = (int*)&ctx.ebp;
@@ -1038,12 +1110,27 @@ class UIScaling : public Hook
 			left = true;
 
 		AddSpriteSpacing(val, left);
-	};
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"PutGhostGapInfo callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R125 GHOST GAP INFO HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
 
 	// Fix position of the "Ghost/You/Diff" sprites shown with ghost car info
 	// Online arcade doesn't seem to adjust this, maybe was left broken in that? (it's needed for 21:9 at least...)
 	static inline SafetyHookMid PutGhostGapInfo_sub_AdjustPosition_hk{};
-	static void PutGhostGapInfo_sub_AdjustPosition(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void PutGhostGapInfo_sub_AdjustPositionAndHud(
+		safetyhook::Context& ctx)
 	{
 		bool left = false;
 		float* val = &ctx.xmm0.f32[0];
@@ -1051,6 +1138,19 @@ class UIScaling : public Hook
 			left = true;
 
 		AddSpriteSpacing(val, left);
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"PutGhostGapInfo_sub callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R126 GHOST GAP SUB HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	// DispGhostGap
@@ -1058,6 +1158,29 @@ class UIScaling : public Hook
 	static inline SafetyHookMid DispGhostGap_ForceLeft2_hk{};
 	static inline SafetyHookMid DispGhostGap_ForceRight_hk{};
 	static inline SafetyHookMid DispGhostGap_ForceRight2_hk{};
+
+	template<std::uintptr_t CallerRva, bool ForceLeft>
+	static void DispGhostGap_ForceSpacingAndHud(safetyhook::Context& ctx)
+	{
+		if constexpr (ForceLeft)
+			SpriteSpacingForceLeft(ctx);
+		else
+			SpriteSpacingForceRight(ctx);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispGhostGap callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R127 GHOST GAP FORCE HUD: shared producer-map handoff rva=0x{:x} side={} hits={}",
+				CallerRva, ForceLeft ? "left" : "right", hit);
+	}
 
 	// NaviPub_DispTimeAttackGoal
 	static inline SafetyHookMid NaviPub_DispTimeAttackGoal_DisableScaling_hk{};
@@ -1078,24 +1201,68 @@ class UIScaling : public Hook
 	static inline SafetyHookMid NaviPub_Disp_RivalOnlineEnableScaling_hk{};
 
 	static inline SafetyHookMid ctrl_icon_work_AdjustPosition_hk{};
-	static void ctrl_icon_work_AdjustPosition(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void ctrl_icon_work_AdjustPositionAndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing(&ctx.xmm0.f32[0], false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"ctrl_icon_work callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R129 CTRL ICON HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	static inline SafetyHookMid ctrl_icon_work_AdjustPosition2_hk{};
 	static inline SafetyHookMid set_icon_work_AdjustPosition_hk{};
-	static void ctrl_icon_work_AdjustPosition2(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void ctrl_icon_work_AdjustPosition2AndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing(&ctx.xmm0.f32[0], false);
-
 		*(float*)(ctx.esp) = ctx.xmm0.f32[0];
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"ctrl_icon_work stack-write callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R129 CTRL ICON HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	static inline SafetyHookMid DispTempHeartNum_AdjustPosition_hk{};
-	static void DispTempHeartNum_AdjustPosition(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void DispTempHeartNum_AdjustPositionAndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispTempHeartNum callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R128 TEMP HEART HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk1{};
@@ -1135,6 +1302,86 @@ class UIScaling : public Hook
 	static void C2CSpeechBubble_AdjustPositionESP0(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((float*)(ctx.esp), false);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void C2CSpeechBubble_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubble callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R132 C2C SPEECH HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void C2CSpeechBubbleGF_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubbleGF callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R133 GF SPEECH HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva>
+	static void C2CSpeechBubbleRank_AdjustPositionESP0AndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubbleGF rank callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R130 SPEECH RANK HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
+	}
+
+	template<std::uintptr_t CallerRva, int StackOffset>
+	static void C2CSpeechBubbleGFInitial_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((float*)(ctx.esp + StackOffset), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"C2CSpeechBubbleGF initial-position callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R131 GF SPEECH INITIAL HUD: shared producer-map handoff rva=0x{:x} stackOffset={} hits={}",
+				CallerRva, StackOffset, hit);
 	}
 
 	static void C2CSpeechBubble_AdjustPositionESP4(safetyhook::Context& ctx)
@@ -1219,21 +1466,21 @@ public:
 		DispTimeAttack2D_SpriteScalingForceLeft_hk = safetyhook::create_mid((void*)0x4BE4E7, SpriteSpacingForceLeft);
 		DispTimeAttack2D_SpriteScalingForceEnable_hk = safetyhook::create_mid((void*)0x4BE575, SpriteSpacingEnable);
 
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, TimeRecord_AdjustPositionAndHud<0x000BE5CDu>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, TimeRecord_AdjustPositionAndHud<0x000BE603u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, TimeRecord_AdjustPositionAndHud<0x000BE633u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, TimeRecord_AdjustPositionAndHud<0x000BE66Du>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, TimeRecord_AdjustPositionAndHud<0x000BE690u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, TimeRecord_AdjustPositionAndHud<0x000BE6B5u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, TimeRecord_AdjustPositionAndHud<0x000BE6D5u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, TimeRecord_AdjustPositionAndHud<0x000BE8D8u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, TimeRecord_AdjustPositionAndHud<0x000BE915u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, TimeRecord_AdjustPositionAndHud<0x000BE94Au>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, TimeRecord_AdjustPositionAndHud<0x000BE97Au>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, TimeRecord_AdjustPositionAndHud<0x000BE9A3u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, TimeRecord_AdjustPositionAndHud<0x000BE7E8u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud<0x000BE802u>);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud<0x000BE81Cu>);
 
 		// R68 canonical font glyph ownership. Disassembly proves two
 		// independent character renderers call put_sprite_ex directly:
@@ -1251,24 +1498,65 @@ public:
 		Memory::VP::InjectHook(
 			Module::exe_ptr(DispRank_SpraniCall),
 			DispRank_sprani, Memory::HookType::Call);
-		for (int addr : DispRank_ClipSpriteCalls)
-			Memory::VP::InjectHook(
-				Module::exe_ptr(addr),
-				DispRank_putClipSprite, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F3A),
+			DispRank_putClipSprite<0x000B9F3Au>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F5E),
+			DispRank_putClipSprite<0x000B9F5Eu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9F81),
+			DispRank_putClipSprite<0x000B9F81u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9FD0),
+			DispRank_putClipSprite<0x000B9FD0u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xB9FFC),
+			DispRank_putClipSprite<0x000B9FFCu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA01E),
+			DispRank_putClipSprite<0x000BA01Eu>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA035),
+			DispRank_putClipSprite<0x000BA035u>, Memory::HookType::Call);
+		Memory::VP::InjectHook(Module::exe_ptr(0xBA052),
+			DispRank_putClipSprite<0x000BA052u>, Memory::HookType::Call);
 
-		// REV indicator
-		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9096, put_scroll_AdjustPositionLeft);
-		DispGearPosition_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B90B3, put_scroll_AdjustPositionLeft);
-		DispGearPosition_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4B90F6, put_scroll_AdjustPositionLeft);
+		// R124/F13: exact DispGearPosition/REV producer edges are canonical
+		// SCREEN_HUD in the shared disassembly map. Preserve left-side spacing
+		// correction while sourcing only the immediate draw owner from that map.
+		DispGearPosition_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid(
+			(void*)0x4B9096,
+			DispGearPosition_AdjustPositionAndHud<0x000B9096u>);
+		DispGearPosition_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid(
+			(void*)0x4B90B3,
+			DispGearPosition_AdjustPositionAndHud<0x000B90B3u>);
+		DispGearPosition_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid(
+			(void*)0x4B90F6,
+			DispGearPosition_AdjustPositionAndHud<0x000B90F6u>);
 
-		// Fix ghost car info text positions
-		PutGhostGapInfo_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDE3A, PutGhostGapInfo_AdjustPosition);
-		DispGhostGap_ForceLeft_hk = safetyhook::create_mid((void*)0x4BE045, SpriteSpacingForceLeft);
-		DispGhostGap_ForceLeft2_hk = safetyhook::create_mid((void*)0x4BE083, SpriteSpacingForceLeft);
-		DispGhostGap_ForceRight_hk = safetyhook::create_mid((void*)0x4BE0A5, SpriteSpacingForceRight);
-		DispGhostGap_ForceRight2_hk = safetyhook::create_mid((void*)0x4BE067, SpriteSpacingForceRight);
+		// R125/F13: exact PutGhostGapInfo producer edge 0xBDE3A is canonical
+		// GhostGap SCREEN_HUD. Preserve the original conditional spacing and
+		// source only the immediate next-draw owner from the shared map.
+		PutGhostGapInfo_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BDE3A,
+			PutGhostGapInfo_AdjustPositionAndHud<0x000BDE3Au>);
+		// R127/F13: the remaining four GhostGap spacing-state edges are inside
+		// the canonical GhostGap SCREEN_HUD producer range. Preserve the exact
+		// ForceLeft/ForceRight state transitions and source only the immediate
+		// next-draw owner from the shared backend-neutral producer map.
+		DispGhostGap_ForceLeft_hk = safetyhook::create_mid(
+			(void*)0x4BE045,
+			DispGhostGap_ForceSpacingAndHud<0x000BE045u, true>);
+		DispGhostGap_ForceLeft2_hk = safetyhook::create_mid(
+			(void*)0x4BE083,
+			DispGhostGap_ForceSpacingAndHud<0x000BE083u, true>);
+		DispGhostGap_ForceRight_hk = safetyhook::create_mid(
+			(void*)0x4BE0A5,
+			DispGhostGap_ForceSpacingAndHud<0x000BE0A5u, false>);
+		DispGhostGap_ForceRight2_hk = safetyhook::create_mid(
+			(void*)0x4BE067,
+			DispGhostGap_ForceSpacingAndHud<0x000BE067u, false>);
 
-		PutGhostGapInfo_sub_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BDAE8, PutGhostGapInfo_sub_AdjustPosition);
+		// R126/F13: exact PutGhostGapInfo_sub edge 0xBDAE8 is canonical
+		// GhostGap SCREEN_HUD. Preserve its float spacing correction while
+		// sourcing only the immediate next-draw owner from the shared map.
+		PutGhostGapInfo_sub_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BDAE8,
+			PutGhostGapInfo_sub_AdjustPositionAndHud<0x000BDAE8u>);
 
 		NaviPub_DispTimeAttackGoal_DisableScaling_hk = safetyhook::create_mid((void*)0x4BEA64, SpriteSpacingDisable);
 		Memory::VP::InjectHook(
@@ -1279,28 +1567,75 @@ public:
 			GoalTime_Help150, Memory::HookType::Call);
 
 		// adjusts the girlfriend request speech bubble
-		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);
-		ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid((void*)0x460FBC, ctrl_icon_work_AdjustPosition2);
-		set_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460A21, ctrl_icon_work_AdjustPosition2); // set_icon_work can use same logic as ctrl_icon_work_AdjustPosition2
+		// R129/F13: all three existing ctrl/set icon position-correction edges
+		// are inside the canonical ctrl_icon_work SCREEN_HUD producer range.
+		// Preserve spacing/stack-write behavior and source only the immediate
+		// next-draw owner from the shared disassembly producer map.
+		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x460D40,
+			ctrl_icon_work_AdjustPositionAndHud<0x00060D40u>);
+		ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid(
+			(void*)0x460FBC,
+			ctrl_icon_work_AdjustPosition2AndHud<0x00060FBCu>);
+		set_icon_work_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x460A21,
+			ctrl_icon_work_AdjustPosition2AndHud<0x00060A21u>); // set_icon_work keeps the same stack-write correction
 
-		// "-" text when negative heart score
-		DispTempHeartNum_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BBA89, DispTempHeartNum_AdjustPosition);
+		// R128/F13: exact DispTempHeartNum edge 0xBBA89 is canonical
+		// SCREEN_HUD. Preserve the existing negative-heart X correction and
+		// source only the immediate next-draw owner from the shared producer map.
+		DispTempHeartNum_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BBA89,
+			DispTempHeartNum_AdjustPositionAndHud<0x000BBA89u>);
 
-		// C2C-specific speech bubbles
-		C2CSpeechBubble_AdjustPositionESP0_hk1 = safetyhook::create_mid((void*)0x496AC7, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk2 = safetyhook::create_mid((void*)0x496B14, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk3 = safetyhook::create_mid((void*)0x496B39, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk4 = safetyhook::create_mid((void*)0x496B94, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk5 = safetyhook::create_mid((void*)0x496BE1, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk6 = safetyhook::create_mid((void*)0x496C10, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubble_AdjustPositionESP0_hk7 = safetyhook::create_mid((void*)0x496C6A, C2CSpeechBubble_AdjustPositionESP0);
+		// R132/F13: exact C2CSpeechBubble position-correction edges are all
+		// canonical SCREEN_HUD in the shared disassembly map. Preserve the
+		// original ESP0 spacing correction while sourcing only immediate
+		// next-draw ownership from the backend-neutral producer map.
+		C2CSpeechBubble_AdjustPositionESP0_hk1 = safetyhook::create_mid(
+			(void*)0x496AC7,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096AC7u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk2 = safetyhook::create_mid(
+			(void*)0x496B14,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B14u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk3 = safetyhook::create_mid(
+			(void*)0x496B39,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B39u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk4 = safetyhook::create_mid(
+			(void*)0x496B94,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096B94u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk5 = safetyhook::create_mid(
+			(void*)0x496BE1,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096BE1u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk6 = safetyhook::create_mid(
+			(void*)0x496C10,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096C10u>);
+		C2CSpeechBubble_AdjustPositionESP0_hk7 = safetyhook::create_mid(
+			(void*)0x496C6A,
+			C2CSpeechBubble_AdjustPositionESP0AndHud<0x00096C6Au>);
 
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk1 = safetyhook::create_mid((void*)0x4FCDC1, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk2 = safetyhook::create_mid((void*)0x4FCDEA, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk3 = safetyhook::create_mid((void*)0x4FCEB0, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk4 = safetyhook::create_mid((void*)0x4FCED9, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk5 = safetyhook::create_mid((void*)0x4FCF22, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk6 = safetyhook::create_mid((void*)0x4FCF4F, C2CSpeechBubble_AdjustPositionESP0);
+		// R133/F13: these six exact C2CSpeechBubbleGF position-correction
+		// edges are canonical HUD_GF_SPEECH SCREEN_HUD in the shared map.
+		// Preserve their original ESP0 spacing correction while sourcing only
+		// immediate next-draw ownership from the backend-neutral producer map.
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk1 = safetyhook::create_mid(
+			(void*)0x4FCDC1,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCDC1u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk2 = safetyhook::create_mid(
+			(void*)0x4FCDEA,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCDEAu>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk3 = safetyhook::create_mid(
+			(void*)0x4FCEB0,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCEB0u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk4 = safetyhook::create_mid(
+			(void*)0x4FCED9,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCED9u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk5 = safetyhook::create_mid(
+			(void*)0x4FCF22,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCF22u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk6 = safetyhook::create_mid(
+			(void*)0x4FCF4F,
+			C2CSpeechBubbleGF_AdjustPositionESP0AndHud<0x000FCF4Fu>);
 
 		// unsure if this has any effect...
 		C2CSpeechBubbleGF_AdjustPositionESP0_hk7 = safetyhook::create_mid((void*)0x4FE8B1, C2CSpeechBubble_AdjustPositionESP0);
@@ -1311,26 +1646,55 @@ public:
 		C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk3 = safetyhook::create_mid((void*)0x4FD5CD, C2CSpeechBubble_AdjustPositionESP0);
 		C2CSpeechBubbleGFHeart_AdjustPositionESP0_hk4 = safetyhook::create_mid((void*)0x4FD652, C2CSpeechBubble_AdjustPositionESP0);
 
-		// ranking emoji position
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk8 = safetyhook::create_mid((void*)0x4FC84E, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk9 = safetyhook::create_mid((void*)0x4FC882, C2CSpeechBubble_AdjustPositionESP0);
+		// R130/F13: exact C2CSpeechBubbleGF rank emoji/text position edges are
+		// canonical SCREEN_HUD. Preserve the original ESP0 spacing correction
+		// and source only the immediate next-draw owner from the shared map.
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk8 = safetyhook::create_mid(
+			(void*)0x4FC84E,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC84Eu>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk9 = safetyhook::create_mid(
+			(void*)0x4FC882,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC882u>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk10 = safetyhook::create_mid(
+			(void*)0x4FC8B4,
+			C2CSpeechBubbleRank_AdjustPositionESP0AndHud<0x000FC8B4u>);
 
-		// "rank: aaa" position
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk10 = safetyhook::create_mid((void*)0x4FC8B4, C2CSpeechBubble_AdjustPositionESP0);
+		// R131/F13: exact C2CSpeechBubbleGF initial-position edges are canonical
+		// SCREEN_HUD. Preserve the original three ESP0 and one ESP4 spacing
+		// corrections while sourcing only immediate next-draw ownership from the
+		// shared backend-neutral producer map.
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk11 = safetyhook::create_mid(
+			(void*)0x4FC9EB,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FC9EBu, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk12 = safetyhook::create_mid(
+			(void*)0x4FCA1E,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCA1Eu, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk13 = safetyhook::create_mid(
+			(void*)0x4FCA51,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCA51u, 0>);
+		C2CSpeechBubbleGF_AdjustPositionESP0_hk14 = safetyhook::create_mid(
+			(void*)0x4FCB20,
+			C2CSpeechBubbleGFInitial_AdjustPositionAndHud<0x000FCB20u, 4>);
 
-		// speech bubble initial position
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk11 = safetyhook::create_mid((void*)0x4FC9EB, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk12 = safetyhook::create_mid((void*)0x4FCA1E, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk13 = safetyhook::create_mid((void*)0x4FCA51, C2CSpeechBubble_AdjustPositionESP0);
-		C2CSpeechBubbleGF_AdjustPositionESP0_hk14 = safetyhook::create_mid((void*)0x4FCB20, C2CSpeechBubble_AdjustPositionESP4);
+		// R123/F13: the three exact C2CDontLoseGF producer edges are all
+		// canonical SCREEN_HUD in the shared disassembly map. Preserve the
+		// original spacing correction and source only next-draw ownership there.
+		C2CDontLoseGF_AdjustPosition_hk1 = safetyhook::create_mid(
+			(void*)0x4BD397,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD397u>);
+		C2CDontLoseGF_AdjustPosition_hk2 = safetyhook::create_mid(
+			(void*)0x4BD414,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD414u>);
+		C2CDontLoseGF_AdjustPosition_hk3 = safetyhook::create_mid(
+			(void*)0x4BD472,
+			C2CDontLoseGF_AdjustPositionAndHud<0x000BD472u>);
 
-		// "don't lose your girlfriend" UI sprites
-		C2CDontLoseGF_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4BD397, put_scroll_AdjustPositionRight);
-		C2CDontLoseGF_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BD414, put_scroll_AdjustPositionRight);
-		C2CDontLoseGF_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BD472, put_scroll_AdjustPositionRight);
-
-		// "test your slipstream" rival text
-		C2CTestSlipstream_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BD32E, put_scroll_AdjustPositionRight);
+		// R122/F13: exact C2CTestSlipstream producer is already canonical
+		// SCREEN_HUD in the shared disassembly map. Preserve the original spacing
+		// correction while sourcing the immediate draw owner from that map.
+		C2CTestSlipstream_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BD32E,
+			C2CTestSlipstream_AdjustPositionAndHud<0x000BD32Eu>);
 
 		return true;
 	}

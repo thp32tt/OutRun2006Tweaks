@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00621",
+  "production_id": "CONVERSION-DX11-00621",
+  "event_id": "CONVERSION-DX11-00621-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_ADD_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "base_head_sha": "1a1c3adbc399fe81a337befec1fc1c7ae5097bb6",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live D3D9 stage0 PM RGB and independent ADD alpha operand capture",
+      "Compiled DX11 pixel shader lifecycle and source-linked native Draw/DrawIndexed",
+      "Diagnostic opt-in readback/inset; default DX9Ex input and Draw remain active"
+    ],
+    "batch_components": [
+      "D3D9 exact ADD alpha predicate and fail-closed source selection",
+      "New D3D11 PM RGB/ADD alpha shader and creation, reset, release, Draw binding",
+      "Destructive/numeric source-linked regression wired into DX11 Fast CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "New ADD alpha shader combines PM RGB with saturated texture and diffuse alpha; 256 modeled samples",
+      "negative_regression": "Reject modified, reversed, and wrong D3D9 stage0 alpha operands; verify all shaders are still present",
+      "component_integration": "D3D9 GetTextureStageState -> create DX11 PS -> native Draw/DrawIndexed -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_ADD_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED only after exact-SHA actions; actual Quest3/VDXR pixels require HMD",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only, DX9Ex default on unmirrored state"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_add_00621.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00621.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "validation_bearing_result_sha": "88d7868505437791ff0d08ebbde800981430993b",
+  "result_sha": "88d7868505437791ff0d08ebbde800981430993b",
+  "previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38279708354,
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38279708355,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38279714144,
+    "openxr_push_conclusion": "success",
+    "openxr_push_run_id": 38279708438,
+    "openxr_pr_conclusion": "success",
+    "openxr_pr_run_id": 38279714153,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38279714147,
+    "game_quest3_vdxr": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST"
+  },
+  "next_action": "C6 completed for 00621: do not rerun same TASK_ID; hardware-only menu/vehicle/race pixel parity and gamepad/Quest3 remain NEED_HMD_TEST."
+}

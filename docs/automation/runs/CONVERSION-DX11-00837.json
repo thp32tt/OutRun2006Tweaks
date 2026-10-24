@@ -1,0 +1,156 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00837",
+  "production_id": "CONVERSION-DX11-00837",
+  "event_id": "CONVERSION-DX11-00837-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_R23_DIRECTGPU_HOLD_OM_STATE",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "BLOCKED_CI",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "FAIL_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "INHERITED_00836_NATIVE_STRETCH_WARP_ACCESS_VIOLATION_REQUIRES_EXISTING_OWNER_REPAIR",
+  "material_result_sha": "22ccfb3fd20334064251030c39b1fde382994e4f",
+  "validation_bearing_result_sha": "22ccfb3fd20334064251030c39b1fde382994e4f",
+  "source_material_commits": [
+    "22ccfb3fd20334064251030c39b1fde382994e4f"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "score_change": 0,
+  "score_note": "Actual independent host C++/WARP regression was committed; mandatory exact-SHA Backend Conversion Gate failed in pre-existing 00836 native postpass source. No PASS_EXACT_SHA and no new point.",
+  "changed_files": [
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "goal": "Preserve all MRT0..MRT7 and depth/stencil bindings during genuine independent game DirectGPU eye-to-host hold staging, retaining two actual eye pixels in the subsequent native OpenXR compositor without disturbing original D3D9/FFB/input fallback.",
+    "full_dx11_renderer_complete": false,
+    "acceptance_items": [
+      {
+        "id": "directgpu-om-mrt-hold-restore",
+        "category": "end_to_end_behavior",
+        "behavior_area": "x64_host_directgpu_eye_staging",
+        "expected_behavior": "Detach bound game RTs before GPU CopyResource and restore all eight MRT slots and the exact DSV afterward."
+      },
+      {
+        "id": "directgpu-stereo-pixels",
+        "category": "end_to_end_behavior",
+        "behavior_area": "host_openxr_stereo_compositor",
+        "expected_behavior": "Actual WARP native L/R eye hold-copy preserves distinct red/green pixels during subsequent XR array transfer."
+      },
+      {
+        "id": "directgpu-fallback-reject",
+        "category": "fallback_regression",
+        "behavior_area": "host_game_input_and_resource_ownership",
+        "expected_behavior": "Reject aliased, stale-device, deferred-context and SBS route pairs before GPU copies without altering original MRT or input/FFB."
+      },
+      {
+        "id": "exact-sha-all-mandatory-gates",
+        "category": "integrated_validation",
+        "behavior_area": "full_dx11_backend_host_build_and_hud",
+        "expected_behavior": "Five mandatory exact-SHA GitHub Actions are SUCCESS, including Backend Conversion Gate native transport probe."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "directgpu-om-mrt-hold-restore": "PASS_HOST_X64",
+    "directgpu-stereo-pixels": "PASS_HOST_X64",
+    "directgpu-fallback-reject": "PASS_HOST_X64",
+    "exact-sha-all-mandatory-gates": "FAIL_BACKEND_NATIVE_TRANSPORT_WARP"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38939504534,
+      "head_sha": "22ccfb3fd20334064251030c39b1fde382994e4f",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38939504671,
+      "head_sha": "22ccfb3fd20334064251030c39b1fde382994e4f",
+      "conclusion": "failure",
+      "failed_job": "DX11 readiness smoke probes",
+      "failed_step": "Run DX11 native transport probe",
+      "exit_code": -1073741819,
+      "source_scope": "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "log_evidence": "R178-DIAG eye callback 0; R178-DIAG stretch begin 0; access violation before stretch returned"
+    },
+    "Build (Win32, Release)": {
+      "run_id": 38939515853,
+      "head_sha": "22ccfb3fd20334064251030c39b1fde382994e4f",
+      "conclusion": "success",
+      "job": "build (Win32, Release)"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38939514722,
+      "head_sha": "22ccfb3fd20334064251030c39b1fde382994e4f",
+      "conclusion": "success",
+      "host_x64": "success",
+      "native_stereo_regression": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38939514340,
+      "head_sha": "22ccfb3fd20334064251030c39b1fde382994e4f",
+      "conclusion": "success"
+    }
+  },
+  "known_blockers": [
+    "Inherited CONVERSION-DX11-00836 game-eye stretch_game_surface WARP regression access violation 0xC0000005 in Backend Conversion Gate at this exact SHA.",
+    "Same source file was owned by existing 00836 workstream; no conflicting duplicate edits are made by 00837.",
+    "Real game menu-to-race native camera Draw/DrawIndexed -> full stereo/OpenXR remains incomplete; Quest3 runtime untested."
+  ],
+  "resume_cursor": "Await owner 00836 source repair/handoff for existing postpass WARP access violation, then validate a new integrated source SHA without rerunning failed SHA; do not mark C6 PASS or score until every mandatory Gate succeeds.",
+  "pipeline": {
+    "C0_RECOVER": "GH_HEAD_OWNER_AND_PREVIOUS_00836_CHECKED",
+    "C1_REVIEW": "INHERITED_POSTPASS_AND_DISJOINT_HOST_CODE_SELECTED",
+    "C2_IMPLEMENT": "22ccfb3fd20334064251030c39b1fde382994e4f",
+    "C3_VALIDATE": "FAIL_EXACT_SHA_BACKEND_PROBE",
+    "C4_COMMIT": "22ccfb3fd20334064251030c39b1fde382994e4f",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "BLOCKED_CI_CHECKPOINT"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Actual x64 host R23 DirectGPU game-eye source->hold CopyResource preserves live game's MRT/DSV outputs.",
+      "Distinct WARP left/right hold textures enter the OpenXR projection array, with original color pixels and rejected-source fallback.",
+      "All mandatory exact-SHA gates then runtime game/HMD test before promotion."
+    ],
+    "batch_components": [
+      "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+      "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "OpenXR VR architecture host-x64 SUCCESS at exact material SHA; WARP native direct stereo hold and XR array pixel smoke PASS.",
+      "negative_regression": "Aliased, foreign-device, SBS route and deferred context reject; native OM MRT0/MRT1 unchanged on reject.",
+      "component_integration": "Production vrhost/src/main.cpp CopyDirectEyesToHold feeds DirectGPU L/R hold textures consumed by OpenXR native array route; Backend Gate native producer postpass failed independently."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_R23_DIRECTGPU_HOLD_OM_STATE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Source and x64 WARP evidence only; full native gameplay and matching Quest3/VDXR user visual frame UNTESTED",
+    "activation_guard_and_fallback": "Do not auto-promote. Preserve game D3D9 Draw/Present/gamepad/FFB and original DX9Ex fallback.",
+    "remaining_implementation": [
+      "Existing 00836 native GPU scaled postpass WARP access violation must be repaired by owning workstream.",
+      "Native R30 per-eye camera game Draw/DrawIndexed integration and real Quest3 HMD gameplay visual tests remain outstanding."
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "live_game_draw_path_scope": "Target source-graph integration dependency, not completed runtime proof; 00837 contributes only the DirectGPU x64 host MRT/DSV hold stage. Native producer stretch WARP probe remains failed under 00836 ownership."
+  }
+}

@@ -1,0 +1,265 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00970",
+  "production_id": "CONVERSION-DX11-00970",
+  "event_id": "CONVERSION-DX11-00970-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00970",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "FEATURE_READY_PROMOTED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "work_time_percentages": "NOT_MEASURED",
+  "time_allocation_claim": "NOT_MEASURED",
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00970",
+  "score_status": "NO_NEW_AWARD_C6_BOOKKEEPING_ALREADY_CREDITED",
+  "source_head": "e4a63381feb01e0256ff6a74836c87ba76351f5a",
+  "material_result_sha": "be14e0af3d7963418988cfe4d1ff332d7c92ef6b",
+  "validation_bearing_result_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716",
+  "result_sha": "55496c5927daecb4066376997e5943bb0d4cb256",
+  "CODE_CHANGED_SHA": "be14e0af3d7963418988cfe4d1ff332d7c92ef6b",
+  "changed_files": [
+    "src/vr/d3d11/live_game_render_target_readback.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_live_game_rt_frame_probe_00970.cpp",
+    "tools/test_dx11_live_game_rt_frame_00970.py",
+    "tools/test_dx11_game_texture_atlas_00699.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/vr-openxr.yml",
+    ".github/workflows/build.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "REAL_GAME_RT_TEXTURE_MIRROR",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_render_target_readback.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_live_game_rt_frame_probe_00970.cpp",
+      "tools/test_dx11_live_game_rt_frame_00970.py",
+      "tools/test_dx11_game_texture_atlas_00699.py",
+      ".github/workflows/dx11-fast-structural.yml",
+      ".github/workflows/backend-conversion-gate.yml",
+      ".github/workflows/vr-openxr.yml",
+      ".github/workflows/build.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game-authored 1080p and 2K render-target mip surfaces copied through matching GPU->SYSTEMMEM readback and decoded to current native SRV in real Draw/DrawIndexed.",
+      "negative_regression": "Oversized mip snapshots, unsupported formats and failed readback abort native publication but preserve original D3D9 Draw, Present, input and FFB.",
+      "component_integration": "Captured real game D3D9 RT texture -> bounded current-mip GPU readback -> D3D11 shader SRV -> opt-in full native Draw -> source-accounted Present."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME:CONVERSION-DX11-00970"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "RT_TEXTURE_READBACK",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source committed; five exact-SHA CI gates pending; real game GPU pixels / L-R OpenXR/Quest3 UNTESTED.",
+    "activation_guard_and_fallback": "Native opt-in only; unknown or over-budget game RT fails closed preserving DX9Ex rendering/gamepad/FFB and original D3D9 Draw."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Connect real OutRun main and offscreen menu/car/race texture Draw to contiguous native full-resolution output with safe original DX9Ex fallback and final exact-SHA validation.",
+    "acceptance_items": [
+      {
+        "id": "game_rt_mirror_into_native_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_texture_to_native_frame",
+        "expected_behavior": "Real 1080p and bounded 2K D3D9 render-target textures feed current native SRV Draw/DrawIndexed without stale approximations."
+      },
+      {
+        "id": "original_renderer_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "renderer_gamepad_ffb",
+        "expected_behavior": "Unsupported or expensive RT snapshots leave original D3D9Ex Draw/Present/input/FFB unchanged and native frame unpublished."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "fast_backend_win32_openxr_hud",
+        "expected_behavior": "All five mandatory GitHub checks complete on the same exact source SHA before any promotion."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game_rt_mirror_into_native_draw": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_render_target_readback.hpp",
+        "tools/dx11_live_game_rt_frame_probe_00970.cpp"
+      ],
+      "validation_command": "GitHub DX11 Fast Structural Checks #39583651989 (includes tools/test_dx11_live_game_rt_frame_00970.py and C++17 tools/dx11_live_game_rt_frame_probe_00970.cpp); Backend Conversion Gate #39583652005"
+    },
+    "original_renderer_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/test_dx11_live_game_rt_frame_00970.py",
+        "tools/test_dx11_game_texture_atlas_00699.py"
+      ],
+      "validation_command": "GitHub DX11 Fast Structural Checks #39583651989 (positive and destructive source-path/mip/budget regression), Backend Conversion Gate #39583652005"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Exact SHA 55496c5927daecb4066376997e5943bb0d4cb256 five GitHub Actions: 39583651989, 39583652005, 39583651911, 39583651903, 39583651927 (all success)"
+    }
+  },
+  "ci": {
+    "exact_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716",
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39585926381,
+        "conclusion": "success",
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39585926486,
+        "conclusion": "success",
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
+      },
+      {
+        "name": "Build",
+        "run_id": 39585932772,
+        "conclusion": "success",
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39585932801,
+        "conclusion": "success",
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39585932775,
+        "conclusion": "success",
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
+      }
+    ],
+    "artifacts": [
+      {
+        "run_id": 39583651911,
+        "id": 12337933716,
+        "name": "outrun2006tweaks-55496c5927daecb4066376997e5943bb0d4cb256"
+      },
+      {
+        "run_id": 39583651911,
+        "id": 12337998971,
+        "name": "wheel-source-55496c5927daecb4066376997e5943bb0d4cb256"
+      },
+      {
+        "run_id": 39583652005,
+        "id": 12338293911,
+        "name": "backend-autovalidated-55496c5927daecb4066376997e5943bb0d4cb256"
+      }
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: restored 19:00 checkpoint and target e4a633; previous 00969 exact five CI PASS.",
+    "C1_REVIEW": "PASS: full-resolution game RT feedback blocked by 1024px live-readback cap.",
+    "C2_IMPLEMENT": "PASS source: be14e0af real RT budget/readback path plus positive/negative integrated tests.",
+    "C3_VALIDATE": "PASS: Five mandatory GitHub Actions success on exact feature SHA 55496c5927daecb4066376997e5943bb0d4cb256; backend readiness WARP probes success, build and backend artifacts verified.",
+    "C4_COMMIT": "PASS: four source/test/workflow commits on feature branch; non-force expected-SHA fast-forward to target from e4a63381feb01e0256ff6a74836c87ba76351f5a, compare ahead=4 behind=0.",
+    "C5_PACKAGE": "BUILD_ARTIFACTS_AVAILABLE: artifacts outrun2006tweaks, wheel-source, backend-autovalidated at exact source SHA; no HMD test, user deployment not performed.",
+    "C6_RESULT": "PASS_EXACT_SHA: mandatory five GitHub Actions completed SUCCESS at a35efc7740f9ccf5353d9bc101f1b6930c1c8716; C6 terminal status COMPLETE_BUILD_VERIFIED (bookkeeping only); parent material/code SHA preserved; real-game/Quest3 RUNTIME_VALIDATION=UNTESTED.",
+    "C6_STATE": "PASS_EXACT_SHA at a35efc7740f9ccf5353d9bc101f1b6930c1c8716; prior hold TERMINAL_STATUS_NOT_COMPLETE resolved; no source changes, no CI rerun."
+  },
+  "REAL_GAME_DRAW_BLOCKER": "No observed native full-game pixels from a real OutRun launch and no Quest3/VDXR stereo evidence; source/CI success does not prove menu/car/race playable.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue SAME DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME feature stream toward observed live native Draw>0 and full frame publication; capture real-game diagnostics first, repair precise game shader/texture/RT failure without weakening DX9Ex fallback.",
+  "feature_branch": "feature/dx11-00970-live-game-rt-frame",
+  "base_sha": "db51f10dc641ec387378183a514bc5923f81ae86",
+  "chat_rollover": 3,
+  "promotion_sha": "55496c5927daecb4066376997e5943bb0d4cb256",
+  "feature_ready": {
+    "status": "PASS_FEATURE_CI",
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "Bounded current-mip real-game render-target mirror into native Draw/DrawIndexed, opt-in with DX9Ex fallback",
+    "ci_exact_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716",
+    "target_branch": "vr-dx11-native-r71",
+    "promoted": true,
+    "promotion": {
+      "previous_target_sha": "e4a63381feb01e0256ff6a74836c87ba76351f5a",
+      "expected_sha": "e4a63381feb01e0256ff6a74836c87ba76351f5a",
+      "force": false,
+      "compare_behind": 0,
+      "compare_ahead": 4
+    },
+    "acceptance_results": {
+      "game_rt_mirror_into_native_draw": {
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "src/vr/d3d11/live_game_frame_bridge.cpp",
+          "src/vr/d3d11/live_game_render_target_readback.hpp",
+          "tools/dx11_live_game_rt_frame_probe_00970.cpp"
+        ],
+        "validation_command": "GitHub DX11 Fast Structural Checks #39583651989 (includes tools/test_dx11_live_game_rt_frame_00970.py and C++17 tools/dx11_live_game_rt_frame_probe_00970.cpp); Backend Conversion Gate #39583652005"
+      },
+      "original_renderer_fallback": {
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "tools/test_dx11_live_game_rt_frame_00970.py",
+          "tools/test_dx11_game_texture_atlas_00699.py"
+        ],
+        "validation_command": "GitHub DX11 Fast Structural Checks #39583651989 (positive and destructive source-path/mip/budget regression), Backend Conversion Gate #39583652005"
+      },
+      "five_exact_sha_gates": {
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          ".github/workflows/dx11-fast-structural.yml",
+          ".github/workflows/backend-conversion-gate.yml",
+          ".github/workflows/vr-openxr.yml",
+          ".github/workflows/build.yml",
+          ".github/workflows/outrun-exe-hud-inspector.yml"
+        ],
+        "validation_command": "Exact SHA 55496c5927daecb4066376997e5943bb0d4cb256 five GitHub Actions: 39583651989, 39583652005, 39583651911, 39583651903, 39583651927 (all success)"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "game_frame_observed": "UNTESTED"
+  },
+  "c6_previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_hold_resolution": "RESOLVED_BY_PASS_EXACT_SHA",
+  "c6_validation_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
+}

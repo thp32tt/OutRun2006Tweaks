@@ -1,0 +1,124 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00736",
+  "production_id": "CONVERSION-DX11-00736",
+  "event_id": "CONVERSION-DX11-00736-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:X8_DESTINATION_ALPHA_FULL_FRAME",
+  "feature_id": "DX11-OPAQUE-X8-FULL-FRAME-BLEND",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "7d4efc63570a480efd960c2b29ecad4a94211866",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Successful original game full TARGET Clear captures actual A8/X8 backbuffer format",
+      "Native D3D11 whole frame seeds X8 alpha opaque while preserving A8 source alpha and RGB",
+      "Game-created contiguous Draw/Indexed, actual D3D9 Present/gamepad unchanged; invalid/partial Clear fails closed"
+    ],
+    "conflict_keys": [
+      "DX11:X8_DESTINATION_ALPHA_FULL_FRAME",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_clear_color.hpp"
+    ],
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "activation_guard_and_fallback": "Explicit full opt-in, exact same source Clear; D3D9 native rendering and input fallback remain primary",
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_clear_color.hpp",
+      "tools/dx11_x8_dest_alpha_00736.cpp",
+      "tools/test_dx11_x8_dest_alpha_00736.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game X8 Clear seeds opaque alpha; native full-frame Draw/DrawIndexed masks alpha writes across subsequent Draws; portable constexpr and destructive hook/OM probes",
+      "negative_regression": "A8 retains alpha writes and source Clear alpha; partial, foreign or invalid Clear leaves source mask; original D3D9 Present/input remains authoritative",
+      "component_integration": "Original successful D3D9 Clear -> A8/X8 canonical source -> D3D11 full frame initial color -> per-native-Draw masked RGB OM -> guarded frame publication"
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/native OM integration and exact-SHA five Actions required; game/Quest3 visual parity remains untested"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-OPAQUE-X8-FULL-FRAME-BLEND",
+    "goal": "Match menu/vehicle/race full-screen D3D9 X8 destination-alpha semantics in D3D11 live Draw, retain A8 alpha and safe D3D9 gamepad/render fallback.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_clear_native_blend",
+        "expected_behavior": "Game X8R8G8B8 full backbuffer Clear uses opaque native RTV destination alpha for contiguous Draw/Indexed while original RGB stays exact"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_input_fallback",
+        "expected_behavior": "A8R8G8B8 alpha preserved; invalid/partial/wrong-source Clear cannot leak X8 opaque seed or publish native frame"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_ci",
+        "expected_behavior": "C++ constexpr positive and negative probes plus destructive Python hook->native source linkage and five exact SHA Actions"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_clear_color.hpp",
+    "tools/dx11_x8_dest_alpha_00736.cpp",
+    "tools/test_dx11_x8_dest_alpha_00736.py",
+    "docs/automation/runs/CONVERSION-DX11-00736.json",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": "140d08b4074b5a19578e09118a6d4028ecf571eb",
+  "validation_bearing_result_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e",
+  "ci_evidence": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38600987619,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38600987567,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    },
+    "Build": {
+      "run_id": 38600997375,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38600997457,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38600997393,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    }
+  },
+  "validation_note": "Retry E003 causal policy record + X8 full-frame native OM alpha-write lifetime fix, source and destructive test repairs. All five mandatory GitHub Actions at exact SHA 947b7c32e3332ddc55b9ca900cb60b8aff49ca6e SUCCESS, including Backend readiness smoke. Actual game/Quest3/VDXR/controller runtime UNTESTED; no runtime promotion. Same TASK retries/C6 are not independent score events."
+}

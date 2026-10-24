@@ -1,0 +1,141 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00759",
+  "production_id": "CONVERSION-DX11-00759",
+  "event_id": "CONVERSION-DX11-00759-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:MENU_RACE_LEADING_NOOP_DRAW_CONTINUITY",
+  "feature_id": "DX11-MENU-RACE-LEADING-NOOP-DRAW-CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "6fe46c683011a3a71003914de2f2dc154218dbef",
+  "material_result_sha": "6ed2b6c3d07ff9d87d4199a7542f0dcb5c0ca4cf",
+  "validation_bearing_result_sha": "6ed2b6c3d07ff9d87d4199a7542f0dcb5c0ca4cf",
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_full_frame_empty_draw_probe_00755.cpp",
+    "tools/test_dx11_full_frame_empty_draw_00755.py",
+    "docs/automation/runs/CONVERSION-DX11-00759.json",
+    "tools/test_dx11_native_frame_batch_00671.py",
+    "tools/test_dx11_zero_source_hook_00756.py",
+    "tools/test_dx11_pre_draw_depth_clear_00734.py",
+    "tools/dx11_pre_draw_depth_clear_00734.cpp"
+  ],
+  "change_summary": "Keep real D3D9 full-clear seeded leading and trailing zero-primitive Draw source ordinals without incrementing actual native D3D11 GPU Draw count; preserve first RTV/DSV initialization, same-Present menu/vehicle/race source continuity and original DX9Ex/gamepad fallback. Repair stale destructive test mutations and canonical exact-SHA gate acceptance identifiers.",
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-LEADING-NOOP-DRAW-CONTINUITY",
+    "goal": "Menu/vehicle/race can issue legitimate empty Draw/DrawIndexed between game Clear and first real Draw without preventing a complete native D3D11 full-frame, destroying first-draw clear, or altering D3D9 gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "leading-empty-draw-native-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_source_draw_sequence_to_d3d11_native_frame",
+        "expected_behavior": "Admit verified-color-Clear leading zero-primitive game commands, keep first nonempty native Draw as first RTV GPU submission, and publish only complete source sequence."
+      },
+      {
+        "id": "game-clear-depth-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "device_owned_color_clear_z_clear_gamepad",
+        "expected_behavior": "Allow independent full Z Clear after admitted no-op game Draws; reject unseeded, skipped/failed, foreign or aborted game source calls without changing D3D9 Present/input."
+      },
+      {
+        "id": "exact-sha-integrated-validation",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_backend_windows_openxr_hud",
+        "expected_behavior": "Compile constexpr state cases, destructive source check, then require five exact-SHA GitHub gates; Quest3/VDXR remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "leading-empty-draw-native-continuity": "PASS",
+    "game-clear-depth-fallback": "PASS",
+    "exact-sha-integrated-validation": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "REAL_D3D9_CLEAR_AND_EMPTY_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "SAME_PRESENT_FULL_FRAME",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-ordered native Clear/Draw/DrawIndexed is not prematurely aborted by verified leading no-op menu/race commands; runtime pixel proof deferred.",
+    "activation_guard_and_fallback": "Original DX9Ex game Draw/Present/gamepad remains authoritative; optional native full-frame enabled only by diagnostic environment and fail-closed upon unsupported source.",
+    "conflict_keys": [
+      "DX11:MENU_RACE_LEADING_NOOP_DRAW_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "D3D9 full TARGET Clear -> zero-primitive game Draw source ordinal -> optional full Z Clear",
+      "First real Draw/DrawIndexed native RTV/DSV Clear and submission -> all-source Present publication -> DX9Ex fallback"
+    ],
+    "batch_components": [
+      "Native D3D11 live game observation/first-draw state and contiguous empty ordinals",
+      "Compile-time C++ source-order/depth-clear tests plus destructive source-hook tests"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Static-assert compiled C++ verified-clear leading no-op Draw followed by actual native Draw and published complete game stream.",
+      "negative_regression": "Unseeded empty, source ordinal gap, aborted sequence and unverified Z Clear rejected; original D3D9 Draw/input untouched.",
+      "component_integration": "Actual live D3D9 hook observation->native game frame batch->D3D11 first nonempty Draw->full frame Present."
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "Prior 00759 material HEAD 1ff91fc3a134632cc0edc53b3caaca1bb2fde709 had Backend Conversion Gate #38690201583 and DX11 Fast #38690201595 failures at mandatory live_game_draw_path acceptance; no runtime test.",
+    "C1_REVIEW": "Two confirmed issues: stale task acceptance stage identifiers; post-GPU zero-primitive D3D9 Draw incremented native submitted GPU counter, and destructive Python test targeted pre-00759 call syntax.",
+    "C2_IMPLEMENT": "Native batch now accounts post-GPU zero-primitive source ordinals separately from native Draw count, with constexpr and destructive source-order regression tests; repair feature path evidence without weakening validator.",
+    "C3_VALIDATE": "EXACT SHA 6ed2b6c3d07ff9d87d4199a7542f0dcb5c0ca4cf: DX11 Fast #38691086292, Backend Conversion #38691086272 (validate + DX11 readiness smoke), Windows Build #38691090238, OpenXR #38691090196, HUD Inspector #38691090205 all SUCCESS; real game/Quest3/VDXR untested",
+    "C4_COMMIT": "Material and validation-bearing 6ed2b6c3d07ff9d87d4199a7542f0dcb5c0ca4cf (prior source commits preserved); all feature gates same SHA",
+    "C5_PACKAGE": "NOT_REQUIRED: user release/hardware test separate",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED, PASS_EXACT_SHA, NEED_HMD_TEST, RUNTIME_VALIDATION=UNTESTED"
+  },
+  "evidence": {
+    "validation_bearing_sha": "6ed2b6c3d07ff9d87d4199a7542f0dcb5c0ca4cf",
+    "exact_sha_gate_results": [
+      {
+        "workflow": "DX11 Fast Structural Checks",
+        "run_id": 38691086292,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "Backend Conversion Gate",
+        "run_id": 38691086272,
+        "conclusion": "success",
+        "jobs": [
+          "validate:success",
+          "DX11 readiness smoke probes:success"
+        ]
+      },
+      {
+        "workflow": "Build",
+        "run_id": 38691090238,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "OpenXR VR architecture",
+        "run_id": 38691090196,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 38691090205,
+        "conclusion": "success"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "source_only_limit": "No actual OutRun menu/car/race, gamepad, Quest3, or VDXR run"
+  }
+}

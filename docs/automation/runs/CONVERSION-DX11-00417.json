@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00417",
+  "production_id": "CONVERSION-DX11-00417",
+  "event_id": "CONVERSION-DX11-00417-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R279_PROGRAMMABLE_OBJECT_OWNERSHIP_PREREQUISITE",
+  "base_sha": "4a9bb0db96fafd7891c04a6d87d36dd1abb221af",
+  "result_sha": "4a4259a8975c2d52ab74dad89bb7e450e74375cf",
+  "material_result_sha": "4a4259a8975c2d52ab74dad89bb7e450e74375cf",
+  "validation_bearing_result_sha": "4a4259a8975c2d52ab74dad89bb7e450e74375cf",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "status": "COMPLETE",
+  "summary": "R279 adds diagnostic-only translated programmable shader object ownership/lifetime prerequisite evidence bound to exact R239 pair identity and R276 semantic plan. Production census emits signature-attributable R279 evidence, analyzer correlates it before classifying the remaining R242 ownership gap, and no shader object creation/binding or native draw activation is introduced.",
+  "evidence": [
+    "native_backend.hpp/.cpp define and validate NativeProgrammableShaderTranslationObjectPrerequisiteEvidence for R240 owner generation, R241 slot generation, R242 receipt generation, same-device VS/PS, cache snapshot and slot snapshot requirements.",
+    "runtime_census.cpp seals R279 prerequisite identity into SourceSignature/hash and emits signature-attributable R279 logs while retaining sig.shaderTranslationExact=false.",
+    "analyze_dx11_census.py parses/correlates R279 evidence and only classifies R242_TRANSLATED_OBJECT_OWNERSHIP when the R279 prerequisite itself is exact.",
+    "tools/test_analyze_dx11_census.py and tools/dx11_constant_buffer_probe.cpp cover positive and stale-plan fail-closed R279 paths; verify_dx11_source_graph.py pins the contract.",
+    "Exact-SHA Backend Conversion Gate 37558912915 completed success for 4a4259a8975c2d52ab74dad89bb7e450e74375cf; validate 112591486514 and DX11 readiness smoke 112592859486 both succeeded.",
+    "Artifact 11456017598 digest sha256:6af528e5183d7cb89b973335fbb7408b228267e7c8ab78fabe84d97ddf97e782.",
+    "Issue #14 production change ledger event 6029142733 records the material change."
+  ],
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_programmable_object_created": false,
+    "native_programmable_object_bound": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "shader_translation_exact_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered branch HEAD 4a9bb0db96fafd7891c04a6d87d36dd1abb221af; read AGENTS.md, VR backend review index, QUEUE_CONTROLLER_CONTRACT.md, branch-local lane state and CONVERSION-DX11-00416 durable result."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Confirmed R242 dormant owner/slot/object receipt already exists in hosted code, while production census previously supplied an empty R242 receipt without sealing the exact ownership/lifetime prerequisite contract."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R279 prerequisite type/derivation/validator, production census signature fields/hash/logging, analyzer parsing/correlation, regression fixture, source-graph guard and hosted constant-buffer probe."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Backend Conversion Gate 37558912915 exact SHA success; validate 112591486514 and DX11 readiness smoke 112592859486 succeeded; artifact 11456017598 produced. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit 4a4259a8975c2d52ab74dad89bb7e450e74375cf contains [AUTO:CONVERSION-DX11-00417] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R279 is diagnostic-only prerequisite evidence and does not create a runtime-testable programmable shader object path."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Durable run/lane state preserves exact result SHA, Gate/jobs/artifact, issue ledger entry, UNTESTED runtime status and next independent action."
+    }
+  },
+  "exact_next_action": "Derive and validate a diagnostic-only programmable shader object-creation handoff from exact R264 source bytecode evidence + R276 semantic translation plan + R279 ownership/lifetime prerequisite, without compiling/creating/binding D3D11 programmable shader objects.",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "issue14_comment_id": 6029142733,
+  "validation": {
+    "exact_sha": "4a4259a8975c2d52ab74dad89bb7e450e74375cf",
+    "backend_conversion_gate": {
+      "run_id": 37558912915,
+      "conclusion": "success",
+      "validate_job_id": 112591486514,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112592859486,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11456017598,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-4a4259a8975c2d52ab74dad89bb7e450e74375cf",
+      "artifact_digest": "sha256:6af528e5183d7cb89b973335fbb7408b228267e7c8ab78fabe84d97ddf97e782"
+    }
+  }
+}

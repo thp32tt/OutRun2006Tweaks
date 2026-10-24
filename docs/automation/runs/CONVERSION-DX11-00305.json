@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00305",
+  "production_id": "CONVERSION-DX11-00304",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00304-E003",
+  "event_type": "retry",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "aa22cc5660906565f61550898ab0d3c72e3e70b4",
+  "source_implementation_sha": "078b3ec1bbcaebde9fc79abf37da22c83e45bf47",
+  "result_sha": "078b3ec1bbcaebde9fc79abf37da22c83e45bf47",
+  "validation_bearing_result_sha": "078b3ec1bbcaebde9fc79abf37da22c83e45bf47",
+  "result_marker": "[AUTO:CONVERSION-DX11-00305]",
+  "selected_work_item": "DX11_R216_EXACT_SAMPLES_FIXED_FUNCTION_SCOPE_GUARD",
+  "summary": "R216 makes the final ExactSamples census boundary explicitly require signature.fixedFunction in addition to the existing R215 shaderTranslationExact gate. This prevents programmable D3D9 shader pairs from becoming diagnostic exact samples unless a future translation implementation and activation review deliberately opens that scope. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "078b3ec1bbcaebde9fc79abf37da22c83e45bf47"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered the authoritative vr-dx11-native-r71 GitHub HEAD, prior durable task state, review/index/AGENTS/queue-contract/VR state documents and Issue #14 before implementation. The current user queue dispatch is CONVERSION-DX11-00304-E003 retry with ATTEMPT=1/3; completed R215 work was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "The R215 assignment site already constrained shaderTranslationExact to fixed-function samples, but the final ExactSamples predicate did not independently encode that scope. R216 adds an explicit signature.fixedFunction guard at the final census boundary so later shader-translation changes cannot accidentally widen diagnostic exactness.",
+      "review_lenses": {
+        "architecture": "Diagnostic census/readiness boundary only; backend selection and NativeDrawPath activation are unchanged.",
+        "ownership_lifetime": "No COM/resource ownership, reset, synchronization or device-lifetime behavior changes.",
+        "stereo_correctness": "No draw routing, eye submission or camera behavior changes.",
+        "performance": "One boolean conjunction in the sampled census path; no new allocation or GPU work.",
+        "adversarial": "Programmable D3D9 shader pairs remain fail-closed at ExactSamples even if shaderTranslationExact semantics are widened later."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "078b3ec1bbcaebde9fc79abf37da22c83e45bf47 adds signature.fixedFunction to the final ExactSamples predicate and aligns both source-graph and dormant-activation verifiers to the R216 contract."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "evidence": "Exact-SHA Backend Conversion Gate 37139600955 passed on 078b3ec1bbcaebde9fc79abf37da22c83e45bf47. validate job 111251105508 passed source graph, dormant activation boundary, census analyzer, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111252044368 passed all probes."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "078b3ec1bbcaebde9fc79abf37da22c83e45bf47"
+      ],
+      "validation_bearing_result_sha": "078b3ec1bbcaebde9fc79abf37da22c83e45bf47"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R216 changes diagnostic census/static verification only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "lane_state_commit": "0327f91c31a1777107ec33cd14fc3d9c9c99b01a",
+      "issue14_comment_id": 5971618955,
+      "validation_comment_id": 5971591685,
+      "authoritative_metadata_correction_comment_id": 5971618955,
+      "superseded_issue_comment_id": 5971516225,
+      "exact_next_action": "Keep NativeDrawPathActive disabled and select one new independent dormant DX11 source/static gap from the newest authenticated vr-dx11-native-r71 HEAD. Quest 3/VDXR runtime parity remains a separate activation and visual-correctness gate.",
+      "superseded_dispatch_comment_ids": [
+        5971548076,
+        5971591685
+      ]
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37139600955,
+    "head_sha": "078b3ec1bbcaebde9fc79abf37da22c83e45bf47",
+    "validate_job_id": 111251105508,
+    "readiness_smoke_job_id": 111252044368,
+    "artifact_id": 11279637775,
+    "artifact_digest": "sha256:00d82cfbfadfb5a96f36a21c39125cbebbe0fcabd70ed31cd8739f3e63a40502"
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5971618955,
+  "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00304",
+    "event_id": "CONVERSION-DX11-00304-E003",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH"
+  },
+  "validation_comment_id": 5971591685,
+  "authoritative_metadata_correction_comment_id": 5971618955,
+  "issue14_comment_ids": [
+    5971516225,
+    5971548076,
+    5971591685,
+    5971618955
+  ],
+  "superseded_dispatch_comment_ids": [
+    5971548076,
+    5971591685
+  ],
+  "dispatch_correction_note": "Comments 5971548076 and 5971591685 used concurrent rollover metadata. Their material/validation evidence remains valid, but their dispatch metadata is superseded by Issue #14 comment 5971618955 and this current-user queue record."
+}

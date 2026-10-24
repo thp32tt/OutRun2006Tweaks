@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00571",
+  "production_id": "CONVERSION-DX11-00571",
+  "event_id": "CONVERSION-DX11-00571-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00571",
+  "base_sha": "c96b890d102c19f930af1179927a7bac079f9955",
+  "work_key": "DX11:MENU_RACE_BLEND_RGB_SUBTRACT_ALPHA_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game D3D9 draw stage0 factor blend RGB plus independent subtractive alpha state producer",
+      "Two compiled HLSL PS, device create/reset and D3D11 Draw/DrawIndexed consumer",
+      "GPU readback diagnostic inset; original game DX9Ex Draw/gamepad input/Present remains authoritative"
+    ],
+    "batch_components": [
+      "D3D9 source operand/state intake and fail-closed alpha choice",
+      "HLSL pixel shader compile/create/recreate and native draw selector",
+      "14 destructive source link mutants plus nine state cases and saturating CPU RGBA proof"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two game BLEND RGB with independent SUBTRACT alpha native draw variants",
+      "negative_regression": "14 destructive link mutants + 9 operation/operand cases + CPU RGBA saturation",
+      "component_integration": "Live game D3D9 callsite -> native D3D11 shader/Draw -> visible opt-in diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BLEND_RGB_SUBTRACT_ALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BLEND_SUBTRACT_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "BLEND_RGB_SUBTRACT_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Diagnostic opt-in only; menu/vehicle/race/Quest3/VDXR/gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 optional; default off; original DX9Ex game Draw/input/Present unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00571.json"
+  ],
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "pipeline": {
+    "C0_RECOVER": "GitHub exact branch c96b890d102c19f930af1179927a7bac079f9955, 00570 C6 verified",
+    "C1_REVIEW": "Blend RGB + independent SUBTRACT alpha unsupported in native PS",
+    "C2_IMPLEMENT": "Game capture, two PS, Draw/Indexed, 14 negative mutations",
+    "C3_VALIDATE": "GitHub CI SUCCESS for exact material SHA 82fdfa6ab3cb00edbe2771cb3de4f85902f53b56; previously triggered workflows confirmed successful; Quest3/VDXR/gamepad runtime untested",
+    "C4_COMMIT": "Atomic C++/test/run material commit without CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic-only",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA for 82fdfa6ab3cb00edbe2771cb3de4f85902f53b56; separate bookkeeping [skip ci]; Quest3/VDXR/gamepad UNTESTED"
+  },
+  "next_action": "Exact-SHA GitHub CI verified; no retry or duplicate scoring. Quest3/VDXR/gamepad HMD runtime test remains outstanding.",
+  "state_persisted": true,
+  "validation_bearing_result_sha": "82fdfa6ab3cb00edbe2771cb3de4f85902f53b56",
+  "material_result_sha": "82fdfa6ab3cb00edbe2771cb3de4f85902f53b56",
+  "result_sha": "82fdfa6ab3cb00edbe2771cb3de4f85902f53b56",
+  "c6_recovery_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "validation_evidence": {
+    "exact_sha": "82fdfa6ab3cb00edbe2771cb3de4f85902f53b56",
+    "github_workflow_runs_observed": [
+      {
+        "run_id": 38179090587,
+        "name": "OpenXR VR architecture",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 38179090657,
+        "name": "OutRun EXE HUD Inspector CI",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 38179090551,
+        "name": "Build",
+        "conclusion": "success"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
+}

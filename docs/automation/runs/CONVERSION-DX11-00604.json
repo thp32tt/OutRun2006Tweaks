@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00604",
+  "production_id": "CONVERSION-DX11-00604",
+  "event_id": "CONVERSION-DX11-00604-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00604",
+  "work_key": "DX11:MENU_RACE_INVSRCALPHA_ZERO_ONE",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "6e0dc6c0b5bac1373f8177750a6add8269bfcf38",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live D3D9 menu/race GetRenderState for inverse-alpha ZERO or ONE",
+      "D3D11 RGBA OM descriptors and masked caches",
+      "Native Draw/DrawIndexed diagnostic inset, D3D9 fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_inverse_alpha_00604.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "131072 numeric factor cases plus exact-SHA Windows C++ Build",
+      "negative_regression": "28 destructive admission/OM/mask/reset mutations with unsupported op fallback",
+      "component_integration": "D3D9 GetRenderState -> OutputCapture -> D3D11 OM -> native Draw"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_INVSRCALPHA_ZERO_ONE",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:INVSRCALPHA_ZERO_ONE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST: not observed on Quest3/VDXR",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in, D3D9 Draw/Present/gamepad unmodified"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_inverse_alpha_00604.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00604.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "diagnostic-only; hardware parity untested"
+  },
+  "next_action": "New independent DX11 work may continue. This feature requires real Quest3/VDXR/menu-selection-race and gamepad input parity verification prior to gameplay promotion.",
+  "result_sha": "c479c503fb4fac5093402708c3d03a0ef525cc96",
+  "validation_bearing_sha": "c479c503fb4fac5093402708c3d03a0ef525cc96",
+  "ci_summary": "Exact-SHA Backend Conversion Gate + DX11 Fast + Build + OpenXR + HUD successful; no Quest3/VDXR user runtime test",
+  "validation_runs": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38232780981,
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38232781045,
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 38232788014,
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38232788101,
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38232788072,
+      "conclusion": "success"
+    }
+  ],
+  "material_commit": "1f70374ae61ed415714839570e761c9963362d85",
+  "validation_repairs": [
+    "839d81e43dc00d365a02d909ad9203b01b29e4b2",
+    "f88e00c8c8d2b8665b749b83b65291814aa420f5",
+    "c479c503fb4fac5093402708c3d03a0ef525cc96"
+  ]
+}

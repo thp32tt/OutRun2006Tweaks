@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00884",
+  "production_id": "CONVERSION-DX11-00884",
+  "event_id": "CONVERSION-DX11-00884-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "feature_id": "DX11:OWNED_OFFSCREEN_GAME_CAMERA_COLOR_DEPTH_CLEAR",
+  "work_key": "DX11:OWNED_OFFSCREEN_GAME_CAMERA_COLOR_DEPTH_CLEAR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 1,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571",
+  "validation_bearing_result_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571",
+  "result_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571",
+  "feature_contract": {
+    "feature_id": "DX11:OWNED_OFFSCREEN_GAME_CAMERA_COLOR_DEPTH_CLEAR",
+    "goal": "Replay authentic game-owned auxiliary camera GPU color/depth/stencil Clears into owned D3D11 offscreen color/depth targets before Draw and chronological GPU Copy/Stretch to stereo eye output. Do not treat the offscreen camera Clear or geometry as direct XR-eye evidence.",
+    "acceptance_items": [
+      {
+        "id": "owned_game_camera_clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "menu_vehicle_race_offscreen_gpu_camera",
+        "expected_behavior": "Source-owned, actively bound independent RTV and compatible same-device DSV are cleared with caller game ARGB/Z/stencil on the GPU before offscreen Draw/DrawIndexed and actual Copy into the eye."
+      },
+      {
+        "id": "original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "eye_isolation_and_dx9ex_original_input_ffb",
+        "expected_behavior": "Reject null, eye-alias, unbound, foreign, invalid depth/range and empty clear inputs; preserve direct-eye color/draw ordinals and unmodified D3D9 Draw, input, FFB and DXVK freeze."
+      },
+      {
+        "id": "mandatory_ci",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_github_actions",
+        "expected_behavior": "DX11 Fast, Backend Conversion Gate, Windows Build, OpenXR architecture and HUD Inspector all SUCCESS at the same final validation-bearing source SHA, without CI skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "owned_game_camera_clear": "PASS_SOURCE_CI",
+    "original_fallback": "PASS_SOURCE_CI",
+    "mandatory_ci": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/test_dx11_eye_partial_depth_activation.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Verified source-owned offscreen game RTV and separate DSV Clear in NativeGameEyeDrawEncoder using immediate D3D11 GPU commands.",
+      "Existing game offscreen Draw/DrawIndexed follows Clear without direct-eye color evidence; native source GPU Copy composites into stereo eye.",
+      "Real D3D11 WARP fixture exercises both eyes, negative safety checks, and source-static tamper test without weakening existing full GitHub gate."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_native_transport_probe.cpp",
+      "tools/test_dx11_eye_partial_depth_activation.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Native Transport Isolated WARP #39039729879 SUCCESS at immutable material SHA, both source camera eyes and clear->Draw->GPU Copy inspected in source.",
+      "negative_regression": "Invalid RTV, alien ring-eye DSV, empty clear, out-of-range depth and changed draw counts rejected; tamper checks in targeted Python.",
+      "component_integration": "Source-owned offscreen RTV/DSV GPU Clear into native source Draw/DrawIndexed then eye GPU copy with ring source chronology."
+    },
+    "conflict_keys": [
+      "DX11:OWNED_OFFSCREEN_GAME_CAMERA_COLOR_DEPTH_CLEAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source code and GitHub/WARP build checks successful; real OutRun menu/vehicle/race and Quest3/VDXR image, controller, timing and FPS not tested.",
+    "activation_guard_and_fallback": "Native full-game path remains guarded diagnostic/opt-in; original DX9Ex game Draw/Present/input/FFB unchanged; DXVK frozen."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered GitHub exact branch HEAD and previous 00883 C6, verified no 00884 task record before C4.",
+    "C1_REVIEW": "PASS: audited existing genuine offscreen Draw/DrawIndexed, source GPU Copy/Stretch, lifetime and eye alias boundaries.",
+    "C2_IMPLEMENT": "PASS_SOURCE: implemented native owned auxiliary color/depth/stencil Clears plus per-eye WARP fixture and negative tamper in four files.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: five mandatory GitHub Actions SUCCESS at immutable material SHA; isolated native transport WARP SUCCESS. Real-game/HMD untested.",
+    "C4_COMMIT": "PASS: exact material commit without skip-ci, marker [AUTO:CONVERSION-DX11-00884].",
+    "C5_PACKAGE": "NOT_REQUIRED: no real-game or Quest3 HMD deployment performed.",
+    "C6_STATE": "PASS_EXACT_SHA: standalone [skip ci] task result bookkeeping commit; validation-bearing material SHA unchanged."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571",
+    "validation_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571",
+    "five_mandatory_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_ids": [
+          39039729847
+        ],
+        "conclusion": "success",
+        "head_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_ids": [
+          39039729861
+        ],
+        "conclusion": "success",
+        "head_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571"
+      },
+      {
+        "name": "Build",
+        "run_ids": [
+          39039733837
+        ],
+        "conclusion": "success",
+        "head_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_ids": [
+          39039733838,
+          39039729840
+        ],
+        "conclusion": "success",
+        "head_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_ids": [
+          39039733830
+        ],
+        "conclusion": "success",
+        "head_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571"
+      }
+    ],
+    "additional_native_transport_warp": {
+      "id": 39039729879,
+      "name": "DX11 Native Transport Isolated WARP",
+      "conclusion": "success",
+      "head_sha": "0f455b5b997b5970e63332e09f81cc8ba4bca571"
+    },
+    "runtime_validation": "UNTESTED",
+    "live_menu_vehicle_race_test": "NOT_PERFORMED",
+    "quest3_vdxr_hmd_test": "NOT_PERFORMED"
+  },
+  "next_action": "C6 BUILD_VERIFIED only. Preserve validation SHA and original D3D9 fallback, no HMD/real-game success assertion. New independent source task only after terminal."
+}

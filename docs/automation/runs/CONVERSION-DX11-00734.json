@@ -1,0 +1,123 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00734",
+  "production_id": "CONVERSION-DX11-00734",
+  "event_id": "CONVERSION-DX11-00734-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_GAME_PRE_DRAW_SEPARATE_Z_CLEAR",
+  "feature_id": "DX11-FULL-GAME-PRE_DRAW-SEPARATE-Z-CLEAR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "9872e73ffdbbe971d64b99e2583f17dac98ff1de",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Actual successful full D3D9 TARGET Clear seeds native RTV with canonical device/backbuffer identity",
+      "Subsequent separate full ZBUFFER Clear before first game Draw seeds exact Z through D3D11 DSV",
+      "First real game Draw/DrawIndexed produces native full-resolution frame; unsupported/foreign/partial Clear or source Draw fail closed to D3D9/controls"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "tools/dx11_pre_draw_depth_clear_00734.cpp",
+      "tools/test_dx11_pre_draw_depth_clear_00734.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ executes TARGET->Z seed->first Draw and exact 0.375 DSV value; Python traces original successful D3D9 hook through native Clear/Draw",
+      "negative_regression": "Foreign/partial/aborted/unavailable Draw cannot seed DSV or publish stale GPU color; Python destructive mutations",
+      "component_integration": "D3D9 Clear interceptor, full-resolution DX11 bridge and frame-batch DSV; same SHA DX11 five gates"
+    },
+    "conflict_keys": [
+      "DX11:FULL_GAME_PRE_DRAW_SEPARATE_Z_CLEAR",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/unit/CI only, not a verified menu/race or Quest3 screenshot",
+    "activation_guard_and_fallback": "Environment diagnostic opt-in; unsupported geometry/state or mismatched Clear retains authoritative D3D9 Draw/Present/input"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-PRE_DRAW-SEPARATE-Z-CLEAR",
+    "goal": "Connect real game separate full color and pre-first-Draw depth Clears to the native full-size raster before menu, vehicle and race Draw/Indexed.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_split_clear_native_draw",
+        "expected_behavior": "Completed D3D9 TARGET then same-backbuffer full Z-only Clear uses actual Z when first native D3D11 Draw binds DSV."
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "renderer_input_fallback",
+        "expected_behavior": "Foreign/partial/unsupported/aborted source draw cannot seed or publish incorrect native frame; original game/input unchanged."
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_ci",
+        "expected_behavior": "Portable C++ positive/negative tests, source destructive mutations, DX11 Fast + Backend Conversion + Windows Build + OpenXR + HUD exact SHA gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "A1": "SOURCE_IMPLEMENTED",
+    "A2": "SOURCE_IMPLEMENTED",
+    "A3": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "tools/dx11_pre_draw_depth_clear_00734.cpp",
+    "tools/test_dx11_pre_draw_depth_clear_00734.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00734.json"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708",
+  "validation_bearing_result_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708",
+  "ci_evidence": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38590405531,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38590405495,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    },
+    "Build": {
+      "run_id": 38590414967,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38590414896,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38590415078,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    }
+  },
+  "validation_note": "Five mandatory GitHub Gate runs passed for the exact material commit. No Quest3/VDXR/gamepad runtime run; no backend promotion."
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00648",
+  "production_id": "CONVERSION-DX11-00648",
+  "event_id": "CONVERSION-DX11-00648-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_DEPTH_ENABLED_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "173178e648f27d7b6bfe688879656800bff7e1fa",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "real R30 D3D9 Z-enabled gameplay primitive and game depth state capture",
+      "isolated D3D11 depth texture + DSV + LESS/LESSEQUAL -> Draw/DrawIndexed -> diagnostic visible inset"
+    ],
+    "batch_components": [
+      "D3D9 depth state/surface capture and conservative portable admission",
+      "D3D11 DSV/OM per draw and Reset lifecycle, targeted positive/negative regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "real supported ZWRITE+LESS/LESSEQUAL source gets native depth target, native Draw and inset",
+      "negative_regression": "W buffer, depth bias, absent/MSAA depth, unsupported compare or disabled ZWRITE preserve unmodified D3D9; menu no-depth explicitly clears persistent native depth state",
+      "component_integration": "live game R30->D3D9 Z state->native DSV+Draw/DrawIndexed->game-present opt-in inset"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_DEPTH_ENABLED_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "isolated one-draw Z diagnostic is not full race depth scene parity, Quest3/VDXR and gamepad UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME exact opt-in, original D3D9 game Draw/Present/input untouched"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_depth_state.hpp",
+    "tools/dx11_game_depth_probe.cpp",
+    "tools/test_dx11_race_depth_draw_00648.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00648.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "PASS: native live bridge rejected all depth-enabled game draws",
+    "C2_IMPLEMENT": "PASS: guarded D3D9 depth capture and isolated native DSV drawing",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Verify exact SHA Actions and complete C6; Quest3/VDXR HMD and gamepad UNTESTED; DXVK frozen.",
+  "material_result_sha": null,
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "validation_evidence": {}
+}

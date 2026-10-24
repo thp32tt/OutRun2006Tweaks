@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "run_id": "CHAT-DX11-NATIVE-CONTEXT-20261008",
+  "source_mode": "CHAT_DIRECT",
+  "lane": "DX11",
+  "branch": "vr-dx11-native-r71",
+  "base_sha": "9342143483f725aadf996b999d497498fcec652a",
+  "material_result_sha": "84ece0e0f3ce5e6ae54859f6c446752dc776c6ae",
+  "task_marker": "[CHAT:DX11-CONTEXT-20261008]",
+  "changed_at_kst": "2026-10-08T15:04:45+09:00",
+  "work_item": "NativeSharedEyeRing strict D3D11 producer immediate-context ownership",
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "DX11 branch HEAD, AGENTS.md, CONVERSION_LANE_STATE.json, native transport sources and HMD regression issue reviewed"
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Foreign/deferred D3D11 context may reach slot acquisition, query End/GetData or publication without checking exact producer-device ownership"
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "paths": [
+        "src/vr/d3d11/native_shared_eye_ring.hpp",
+        "src/vr/d3d11/native_shared_eye_ring.cpp",
+        "tools/dx11_native_transport_probe.cpp",
+        "tools/verify_dx11_native_transport_contract.py"
+      ],
+      "material_result_sha": "84ece0e0f3ce5e6ae54859f6c446752dc776c6ae"
+    },
+    "C3_VALIDATE": {
+      "status": "STATIC_PASSED_BUILD_RUNNING",
+      "backend_conversion_gate_run_id": 37735657547,
+      "build_run_id": 37735662420,
+      "verified_static_step": "Verify DX11 native transport lifetime contract: SUCCESS",
+      "exact_sha": "84ece0e0f3ce5e6ae54859f6c446752dc776c6ae",
+      "compile_passed": false,
+      "compile_status": "IN_PROGRESS"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "84ece0e0f3ce5e6ae54859f6c446752dc776c6ae"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant native source-only lifetime correction; no new runtime candidate or player-facing package; do not replace DX9Ex fallback"
+    },
+    "C6_STATE": {
+      "status": "PERSISTED_PENDING_CI_VERIFICATION",
+      "issue14_comment_id": 6053511875
+    }
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "next_action": "Check exact-SHA CI completion, repair any test/build regression; continue real native D3D11 object/device/Draw readiness implementation while retaining activation gates and exact-build Quest3/VDXR requirement."
+}
