@@ -1,0 +1,395 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0445KST-A0072R1-A0073-NEW-SHA8",
+  "scheduled_slot_kst": "2026-10-25T04:45:00+09:00",
+  "checked_at_kst": "2026-10-25T04:50:03+09:00",
+  "reviewer": "ChatGPT AI1",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "previous_reviewed_unique_sha_count": 768,
+  "new_reviewed_unique_sha_count": 8,
+  "task_ids": [
+    "OUTRUN-ROI-A-0072-782D7CD5-R1",
+    "OUTRUN-ROI-A-0073-8EE8F626"
+  ],
+  "summary": {
+    "PASS": 0,
+    "FAIL": 1,
+    "HOLD": 7
+  },
+  "records": [
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0072-782D7CD5-R1",
+      "source_ordinal": 356,
+      "candidate_file": "Q057_f18b5157495ad642_source_k.png",
+      "source_file": "Q057_f18b5157495ad642_source.png",
+      "candidate_sha256": "1fd24ef472091a0072b5bdfe28918ea8151a574772648aa93e0b94d57a6f509b",
+      "source_sha256": "d739b1105f1b82ac3053cf0d81543de1383ae9e66b7be45995c8573296fcf129",
+      "sha_checked_against_export": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "was_reviewed_before_this_run": false,
+      "approved_mapping": {
+        "english": "MISSION FAILED!",
+        "korean": "미션 실패!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "alpha_bbox": [
+          144,
+          37,
+          1650,
+          925
+        ],
+        "alpha_canvas_border_nonzero": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "source_rgba_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "non_text_content": "NO_UNEXPECTED_NON_TEXT_CONTENT_OBSERVED",
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Source/output side-by-side visually readable; source and candidate hashes and exact translation mapping validated; original-HD native UI-cell registration and adjacent protected art not established, so full independent C1 PASS withheld."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0072-782D7CD5-R1",
+      "source_ordinal": 357,
+      "candidate_file": "Q057_fd90136dde1519ea_source_k.png",
+      "source_file": "Q057_fd90136dde1519ea_source.png",
+      "candidate_sha256": "38c6ec229069e3c70f640710da583241ab6c84bdb85ed9b1e5ac90dbaec2acab",
+      "source_sha256": "40687781990de34d25db188302f8eaf8f24407f3b23c11d0784b8ab7869cc514",
+      "sha_checked_against_export": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "was_reviewed_before_this_run": false,
+      "approved_mapping": {
+        "english": "Hearts",
+        "korean": "하트"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          379,
+          51,
+          1860,
+          668
+        ],
+        "alpha_canvas_border_nonzero": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "source_rgba_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "non_text_content": "NO_UNEXPECTED_NON_TEXT_CONTENT_OBSERVED",
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Source/output side-by-side visually readable; source and candidate hashes and exact translation mapping validated; original-HD native UI-cell registration and adjacent protected art not established, so full independent C1 PASS withheld."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0072-782D7CD5-R1",
+      "source_ordinal": 358,
+      "candidate_file": "Q057_e128cce6ff0942c8_source_k.png",
+      "source_file": "Q057_e128cce6ff0942c8_source.png",
+      "candidate_sha256": "9be3c4590a4bb4d616dfa2cdb878ee34e0f1adf0b14e703801eba94f368dbbd9",
+      "source_sha256": "e05844490400701ebd9f86f8761ef5ec49f64de1933d598f2e6171b00a3e2520",
+      "sha_checked_against_export": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "was_reviewed_before_this_run": false,
+      "approved_mapping": {
+        "english": "Collect the stars!",
+        "korean": "별을 모으세요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1774,
+          887
+        ],
+        "alpha_bbox": [
+          21,
+          63,
+          1746,
+          764
+        ],
+        "alpha_canvas_border_nonzero": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "source_rgba_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "non_text_content": "NO_UNEXPECTED_NON_TEXT_CONTENT_OBSERVED",
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Source/output side-by-side visually readable; source and candidate hashes and exact translation mapping validated; original-HD native UI-cell registration and adjacent protected art not established, so full independent C1 PASS withheld."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0073-8EE8F626",
+      "source_ordinal": 359,
+      "candidate_file": "Q057_8fc826efdeb6036c_source_k.png",
+      "source_file": "Q057_8fc826efdeb6036c_source.png",
+      "candidate_sha256": "a3a2162583e4843b3e765dc4bbfd1966f1db264856ba6cd3c5178a07ec3e2309",
+      "source_sha256": "71cec643c38ebe54fa454ca700ccd5aa0fd281dc502613c0921ed9f6e8a92d97",
+      "sha_checked_against_export": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "was_reviewed_before_this_run": false,
+      "approved_mapping": {
+        "english": "STORING ONLINE RECORD...",
+        "korean": "온라인 기록 저장 중..."
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          57,
+          46,
+          1978,
+          622
+        ],
+        "alpha_canvas_border_nonzero": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "source_rgba_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "non_text_content": "NO_UNEXPECTED_NON_TEXT_CONTENT_OBSERVED",
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Source/output side-by-side visually readable; source and candidate hashes and exact translation mapping validated; original-HD native UI-cell registration and adjacent protected art not established, so full independent C1 PASS withheld."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0073-8EE8F626",
+      "source_ordinal": 360,
+      "candidate_file": "Q060_0c14ba000bb71ba7_source_k.png",
+      "source_file": "Q060_0c14ba000bb71ba7_source.png",
+      "candidate_sha256": "d68085e310c6dd2cdbf6ac9c4186732c240b3511802a9900f6ebaed12a58b97c",
+      "source_sha256": "7095eaff5fb77c03e17fb0c30dda27de89780b01ec1d0264f18796e725f16cc3",
+      "sha_checked_against_export": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "was_reviewed_before_this_run": false,
+      "approved_mapping": {
+        "english": "EASY",
+        "korean": "쉬움"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "alpha_bbox": [
+          210,
+          137,
+          1497,
+          868
+        ],
+        "alpha_canvas_border_nonzero": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "source_rgba_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "non_text_content": "FAIL_SOURCE_ARROW_INCLUDED_IN_TEXT_LAYER",
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "FAIL",
+        "reason_code": "NON_TEXT_PROTECTED_UI_ARROW_IN_GENERATED_LETTERING_LAYER",
+        "reason": "Generated Korean EASY→쉬움 candidate contains a solid green left-pointing UI arrow to the left of its letters (visible in output). The English source already contains this arrow next to EASY. This task calls for isolated transparent Korean lettering/effects only; carrying the arrow into the replacement text layer risks duplicate protected UI art on composition. Source/translation text itself is correct."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0073-8EE8F626",
+      "source_ordinal": 361,
+      "candidate_file": "Q060_ceae188bbc8c4af3_source_k.png",
+      "source_file": "Q060_ceae188bbc8c4af3_source.png",
+      "candidate_sha256": "ad0798896fa49761c2f8f13121b8f0bba83871ddc4e558f3bc4a58ff9d24780b",
+      "source_sha256": "fb5ff32936c4fd4842621efc971cb54d562542b97a51de89b6bf88a2c5a7eb93",
+      "sha_checked_against_export": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "was_reviewed_before_this_run": false,
+      "approved_mapping": {
+        "english": "Rank",
+        "korean": "랭크"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "alpha_bbox": [
+          556,
+          394,
+          1288,
+          786
+        ],
+        "alpha_canvas_border_nonzero": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "source_rgba_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "non_text_content": "NO_UNEXPECTED_NON_TEXT_CONTENT_OBSERVED",
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Source/output side-by-side visually readable; source and candidate hashes and exact translation mapping validated; original-HD native UI-cell registration and adjacent protected art not established, so full independent C1 PASS withheld."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0073-8EE8F626",
+      "source_ordinal": 362,
+      "candidate_file": "Q060_2aec6ab90b406fd8_source_k.png",
+      "source_file": "Q060_2aec6ab90b406fd8_source.png",
+      "candidate_sha256": "c160f79fd0d43b24040ca909e5e9269a4e267b0fe3b350af94cdd9be461103ea",
+      "source_sha256": "88999bf46f650fc80fbc1ddf71202cda6db5ce819036c5729635c6a61bd4e296",
+      "sha_checked_against_export": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "was_reviewed_before_this_run": false,
+      "approved_mapping": {
+        "english": "BEST TIME:",
+        "korean": "최고 기록:"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          461,
+          63,
+          1909,
+          668
+        ],
+        "alpha_canvas_border_nonzero": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "source_rgba_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "non_text_content": "NO_UNEXPECTED_NON_TEXT_CONTENT_OBSERVED",
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Source/output side-by-side visually readable; source and candidate hashes and exact translation mapping validated; original-HD native UI-cell registration and adjacent protected art not established, so full independent C1 PASS withheld."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0073-8EE8F626",
+      "source_ordinal": 363,
+      "candidate_file": "Q061_7d414e61a6bc6a31_source_k.png",
+      "source_file": "Q061_7d414e61a6bc6a31_source.png",
+      "candidate_sha256": "a59ab5d4144e0608d257ca7ac1918a4641f00dd24251957c2b18df374e854632",
+      "source_sha256": "c5682625fec4d36ab075ded1c1def70d1d2d4c1820af3b7758a99dcd5b957588",
+      "sha_checked_against_export": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "was_reviewed_before_this_run": false,
+      "approved_mapping": {
+        "english": "Beat that car!",
+        "korean": "저 차를 이기세요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1672,
+          941
+        ],
+        "alpha_bbox": [
+          41,
+          200,
+          1608,
+          783
+        ],
+        "alpha_canvas_border_nonzero": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "source_rgba_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "non_text_content": "NO_UNEXPECTED_NON_TEXT_CONTENT_OBSERVED",
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Source/output side-by-side visually readable; source and candidate hashes and exact translation mapping validated; original-HD native UI-cell registration and adjacent protected art not established, so full independent C1 PASS withheld."
+      }
+    }
+  ],
+  "evidence": {
+    "source": "work/image-src/text_roi_batches/production_manifest.json",
+    "candidate_export_manifests": [
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0072-782D7CD5-R1.json",
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0073-8EE8F626.json"
+    ],
+    "inspection_script": "work/C1_QA_20261025_0445_inspect.py",
+    "preflight": "work/C1_QA_20261025_0445_preflight.json",
+    "contact_sheets": [
+      "work/C1_QA_20261025_0445_A0072_pairs.jpg",
+      "work/C1_QA_20261025_0445_A0073_pairs.jpg"
+    ],
+    "explicit_fail_file": "work/image-src/text_roi_batches/candidate_outputs/A/Q060_0c14ba000bb71ba7_source_k.png"
+  },
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "scope": {
+    "imagegen_called": false,
+    "A_B_queue_consumed": false,
+    "C2_C3_game_pass_created": false,
+    "DDS_final_written": false,
+    "final_deployment": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}
