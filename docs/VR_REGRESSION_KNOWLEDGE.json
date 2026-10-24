@@ -1037,5 +1037,14 @@
       "Dense building scenes still exhibit frame-rate loss and require separate optimization."
     ],
     "note": "Corrected baseline identity: the user's described runtime result belongs to R51 exact SHA 17ad376b, not R50 750453f2. Preserve verified-good world stereo/frame stability while fixing only remaining HUD/marker semantics."
+  },
+  "user_direct_lens_centre_20261025": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "task_id": "USER-DX9EX-LENS-CENTRE-20261025",
+    "status": "SOURCE_VALIDATED_AWAITING_EXACT_SHA_CI",
+    "runtime_validation": "UNTESTED",
+    "evidence": "docs/automation/reviews/LENS_CENTRE_RAY_20261025.md",
+    "confirmed_static": "Identical NDC in asymmetric eye projections reconstructs different sun directions. Correct only direct C993 projected sun rays; retain source camera-sync ownership to avoid double head rotation."
   }
 }

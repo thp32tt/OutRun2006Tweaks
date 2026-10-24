@@ -294,3 +294,16 @@ New per GOAL/TIMEUP/LINK_TIMEUP read-only evidence: `R30TracePreRestartHudDrawFo
 **Restricted material restoration:** `0c7fd75e966784bb303d24b7e622c7bfd3922104` adds `DispRankClipSprite`; `2cc66a7cfa223bee1ee8f2a18e49c4742eed14e1` splits only original 8 DispRank kind0 x86 E8 children, preserving same right spacing and all-sibling ScreenHud, leaving TimeAttack/goal/other right clips unchanged; `87a275de7d02b9509c6881539dec6f65992b242d` restores the historical ID3DXSprite vtable9 Draw→vtable10 Flush on exact `ProjectedWorldMarker2D`/valid anchor or `ScreenHud`+`DispRankFirst/DispRankClipSprite` only. Does NOT flush GOAL, +TIME, option arrows, generic HUD or F11.
 
 **Verifiers:** `e4c885b44e1915b2426379ede03f6aeebf56c7d9` and `11d0732fa2b5f8428079bbf7ad7ed8d72aaebbda` enforce 5 negative R64 cases including true vtable9 Draw target, no widening; `666e6546322b3279e1c4f9151f0032a5f1b266e3` retains original 71 x86 CALL binary ABI contract while accepting only the eight-DispRank conditional hook; `e52a793fc0b8570c3bbe88db251ff3ba9540ddeb` aligns cadence guard. Initial green policy and HUD static at `11d0732...`; later `870a92b2...` full policy **FAILED only because this human ledger lacked the new machine case**, not due to compiler or HMD, now fixed by this history entry. Independent Win32 game/x64 host/R33/package exact-SHA validation still pending; `RUNTIME_VALIDATION=UNTESTED`. Source deep review `docs/automation/reviews/DX9EX_DEEP_GOAL_TIMING_MULTIPATH_REVIEW_20261009.md`, runbook `docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md`.
+
+
+
+## 2026-10-25 — isolated C993 central-sun ray correction
+
+TASK_ID=USER-DX9EX-LENS-CENTRE-20261025, existing DX9EX:VIS:LENS_FLARE_CENTRE.
+See docs/automation/reviews/LENS_CENTRE_RAY_20261025.md. Source numeric counterexample
+confirms identical clip coordinates are not a common visual ray under asymmetric
+eye FOV. New R26 direct C993-only correction preserves original source camera-sync
+ownership, excludes artificial-plane IPD, and retains CABE/HUD/GOAL paths.
+Local numerical and 71-CALL guards pass; exact-SHA Windows CI is pending.
+The old R84 C993 verifier already fails on the base due to the earlier projected
+screen-family change, so do not claim full-suite PASS. RUNTIME_VALIDATION=UNTESTED.

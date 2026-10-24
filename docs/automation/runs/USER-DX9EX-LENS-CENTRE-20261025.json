@@ -1,0 +1,28 @@
+{
+  "schema_version": 2,
+  "task_id": "USER-DX9EX-LENS-CENTRE-20261025",
+  "sourceMode": "CHAT_DIRECT",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "branch": "vr-d3d9ex-focus",
+  "base_sha": "990158b51293b294033c2466558d637df74936d0",
+  "checkpoint": "C3_VALIDATE",
+  "status": "SOURCE_VALIDATED_AWAITING_EXACT_SHA_CI",
+  "attempt": 1,
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_runtime_paths": [
+    "src/hooks_graphics.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d9/projected_sun_ray.hpp",
+    "src/vr/game/outrun_renderer.cpp"
+  ],
+  "validation": {
+    "numeric_ray_smoke": "PASS",
+    "baseline_numeric_counterexample": "FAIL_EXPECTED: same-NDC asymmetric eye ray mismatch",
+    "hud_original_71_call_contract": "PASS, 22 mutation cases",
+    "outer_CABE_fusion_contract": "PASS",
+    "legacy_R84_lens_guard": "FAIL on base and candidate: stale ScopedExactLensCentreGpuDraw requirement"
+  },
+  "next_action": "Read exact material SHA Windows official, Active, Inspector, Full Source and Domain CI; record failures without optical PASS. Inspect C993 RAY EYES runtime evidence in a new matching HMD capture."
+}
