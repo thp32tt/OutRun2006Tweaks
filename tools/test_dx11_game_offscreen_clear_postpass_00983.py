@@ -13,7 +13,8 @@ required = [
     "native_game_offscreen_clear_written_region(",
     "if (!native_game_offscreen_color_region_valid(filled)) return;",
     "remember_offscreen_color_region(",
-    "texture.Get(), camera.arraySlice, camera.mip, filled);",
+    "texture.Get(), camera.arraySlice, camera.mip,",
+    "viewDesc.Format, filled);",
 ]
 assert all(s in writer for s in required), "Cleared camera pixel provenance missing"
 # The shared Draw/Clear admission method must retain exact physical keys,
@@ -28,6 +29,7 @@ assert all(s in helper for s in [
     "record.texture = texture;",
     "record.arraySlice = arraySlice;",
     "record.mipSlice = mipSlice;",
+    "record.renderedViewFormat = renderedViewFormat;",
     "record.region = region;",
 ]), "Shared camera Draw/Clear pixel evidence must remain exact-key and fail-closed"
 

@@ -8,7 +8,13 @@ assert "NativeGameOffscreenColorProvenanceState offscreenColorProvenance_" in hd
 # The 01038 auxiliary MRT recorder adds a fourth guarded native GPU write
 # path. Keep all original 01037 overflow rejection assertions AND require
 # that failed multi-output color attribution is also fail-closed.
-assert cpp.count("offscreenColorProvenance_.note_untracked_gpu_write();")==4
+# 01039 adds a fifth quarantine route for conflicting RTV typed color
+# interpretations over the same physical camera mip/slice.
+assert cpp.count("offscreenColorProvenance_.note_untracked_gpu_write();")==5
+format_guard=cpp.split("void NativeGameEyeDrawEncoder::remember_offscreen_color_region(", 1)[1].split("bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(", 1)[0]
+assert "prior.renderedViewFormat != renderedViewFormat" in format_guard
+assert "offscreenColorProvenance_.note_untracked_gpu_write();" in format_guard
+
 mrt_record=cpp.split(
     "bool NativeGameEyeDrawEncoder::remember_offscreen_color_outputs(", 1
 )[1].split("bool NativeGameEyeDrawEncoder::draw_offscreen(", 1)[0]
