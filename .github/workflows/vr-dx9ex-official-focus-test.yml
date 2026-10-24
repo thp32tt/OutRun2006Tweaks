@@ -29,6 +29,9 @@ jobs:
           if ($duplicates.Count -ne 2) { throw 'Unexpected official INI original duplicate count' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'HudScale = 0.55' -SimpleMatch -Quiet)) { throw 'HUD scale changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'CullingUnionMarginDegrees = 8.0' -SimpleMatch -Quiet)) { throw 'Culling setting changed unexpectedly' }
+          if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'DriverSeatView = false' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source INI' }
+          if (-not (Select-String src/vr/settings.cpp -Pattern 'Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source defaults' }
+          if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR R26 RESULT_HUD_STAGE_HR' -SimpleMatch -Quiet)) { throw 'R26 result HUD stage telemetry missing' }
       - name: Configure Win32 R26+HUD
         shell: pwsh
         run: |
@@ -119,14 +122,15 @@ jobs:
             Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant" -Encoding ascii
             Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
             @(
-              'OFFICIAL FOCUS R26+HUD visual correctness test: October 22 renderer fixes'
+              'OFFICIAL FOCUS R26+HUD: October 25 R62 stage/identity diagnostic build'
               "Variant: $mode; TEST=Release; DEBUG=RelWithDebInfo and opt-in GPU diagnostics"
               'Original game EXE is not bundled. Backup your current DLL, host, and all INIs before unpacking.'
               '1. Unpack EXACTLY ONE variant ZIP into the original OR2006C2C.EXE directory.'
               '2. Double-click START_HERE.cmd, never launch outrun-vr-host.exe alone.'
               '3. Check DX9EX_LAUNCH_HEALTH.txt and DX9EX_LOGS after game exit.'
               '4. Test menu 4:3, car selection, +TIME, GOAL graph, rank/rival, F11 and cursor, flare/sun/sky.'
-              '5. DriverSeatView=false is forced due to the reported cockpit oscillation.'
+              '5. DriverSeatView=false is the default to prevent reported cockpit oscillation.'
+              '5a. RESULT_HUD_STAGE_HR logs each eye projection/draw and right-state failures; GOAL optical repair is still unverified.'
               '6. Experimental reflection throttle and particle VB remain disabled.'
               '7. No HMD success claimed; RUNTIME_VALIDATION=UNTESTED.'
               '8. No experimental test-branch COMBINED/ALL visual or performance patches.'
@@ -145,6 +149,6 @@ jobs:
           }
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-OFFICIAL-FOCUS-20261024
+          name: OutRun2-VR-R26-OFFICIAL-FOCUS-20261025
           path: OutRun2_VR_R26_FOCUS_OFFICIAL_*.zip
           if-no-files-found: error
