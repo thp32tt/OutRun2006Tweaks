@@ -1313,7 +1313,7 @@ def check_f11_xyz_owner(source):
             'F11 owner must be reached from actual indexed draw')
     require('if (externalImGui != E_NOTIMPL)', indexed,
             'F11 owner result must bypass stock R26')
-    require('R30BuildHudPlaneCoefficients(state, true)', world,
+    require('R30BuildHudPlaneCoefficients(state, !externalF11)', world,
             'regular game sprites must retain the configured HudScale')
     require('R30XyzrhwLooksLikeHudPlane(', world,
             'untagged flat RHW=1 world evidence must be checked')
@@ -1346,7 +1346,7 @@ for label, needle in (
     ('XYZ vertex gate', 'D3DFVF_XYZ'),
     ('per-eye scissor', 'device->SetScissorRect(&eyeScissors[eye])'),
     ('F11 eye affine', 'OutRunVRF11Screen2D::Build(bounds, f11Affine)'),
-    ('game sprite scale isolation', 'R30BuildHudPlaneCoefficients(state, true)'),
+    ('game sprite scale isolation', 'R30BuildHudPlaneCoefficients(state, !externalF11)'),
     ('host world authority', 'if (state.worldEvidenceAuthoritative)'),
     ('global shadow budget', 'R30TotalShadowBudgetBytes'),
 ):
