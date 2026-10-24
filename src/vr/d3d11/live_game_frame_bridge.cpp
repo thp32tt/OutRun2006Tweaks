@@ -7678,10 +7678,11 @@ bool preserve_game_surface_copy(
 
         ComPtr<IDirect3DSurface9> backbuffer;
         ComPtr<IUnknown> actualIdentity, backbufferIdentity;
-        D3DSURFACE_DESC desc{};
+        D3DSURFACE_DESC desc{}, canonicalDesc{};
         if (FAILED(game->GetBackBuffer(0u, 0u, D3DBACKBUFFER_TYPE_MONO,
                                       backbuffer.GetAddressOf())) || !backbuffer ||
             FAILED(destination->GetDesc(&desc)) ||
+            FAILED(backbuffer->GetDesc(&canonicalDesc)) ||
             FAILED(destination->QueryInterface(
                 IID_PPV_ARGS(actualIdentity.GetAddressOf()))) ||
             FAILED(backbuffer.As(&backbufferIdentity)) || !actualIdentity ||
@@ -7693,7 +7694,10 @@ bool preserve_game_surface_copy(
             desc.MultiSampleType != D3DMULTISAMPLE_NONE ||
             (desc.Format != D3DFMT_A8R8G8B8 &&
              desc.Format != D3DFMT_X8R8G8B8) ||
-            desc.Width != s.nativeWidth || desc.Height != s.nativeHeight)
+            !GameNativePreDrawSurface::source_matches_canonical(
+                desc.Width, desc.Height, static_cast<std::uint32_t>(desc.Format),
+                canonicalDesc.Width, canonicalDesc.Height,
+                static_cast<std::uint32_t>(canonicalDesc.Format)))
             return false;
 
         const auto changedRegion = changedArea
@@ -7713,7 +7717,14 @@ bool preserve_game_surface_copy(
         const bool postDrawCopy = s.frameBatch.publishable(s.pending) &&
             s.backend.ready() && s.backend.device() &&
             s.backend.context() && s.backend.color_texture();
-        if (!preDrawCopy && !postDrawCopy) return false;
+        // A genuine game-source snapshot before the first native Draw has
+        // no DX11 render target yet (cold menu start or resolution Reset).
+        // Only a post-Draw GPU copy requires the already allocated native
+        // target to match its dimensions. First Draw revalidates the staged
+        // source owner, extent and format before UpdateSubresource.
+        if (!GameNativePreDrawSurface::capture_extent_allowed(
+                preDrawCopy, postDrawCopy, desc.Width, desc.Height,
+                s.nativeWidth, s.nativeHeight)) return false;
         // A complete snapshot includes preceding fills/copies. Subsequent
         // fills remain individually replayed in their original source order.
         const auto region = preDrawCopy

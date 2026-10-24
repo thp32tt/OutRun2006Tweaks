@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01052",
+  "production_id": "CONVERSION-DX11-01052",
+  "event_id": "CONVERSION-DX11-01052-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01052",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_COLD_RESET_PREDRAW_SOURCE_TO_FIRST_NATIVE_DRAW",
+  "work_key": "DX11:MENU_CAR_RACE_PREDRAW_NATIVE_FIRST_FRAME_EXTENT",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Correct live canonical D3D9 menu/car/race pre-Draw snapshot admission on cold start and resolution Reset: the native D3D11 texture may be unallocated or stale before first SM3/FVF Draw, so source readback validates actual D3D9 backbuffer descriptor while post-Draw replay still enforces exact live native extent. Input/FFB/fallback unchanged.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+    "tools/dx11_native_cold_predraw_01052.cpp",
+    "tools/test_dx11_cold_predraw_01052.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01052.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_COLD_RESET_PREDRAW_SOURCE_TO_FIRST_NATIVE_DRAW",
+    "goal": "Carry authentic pre-Draw CPU/GDI/StretchRect full game color into the first native D3D11 Draw on menu cold startup and post-Reset resolution change without weakening post-Draw target-size checks.",
+    "acceptance_items": [
+      {
+        "id": "cold_first_frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_CANONICAL_SOURCE_TO_NATIVE_FIRST_DRAW",
+        "expected_behavior": "Canonical 3440x1440 real game pre-Draw color can stage with a 0x0 native target and is revalidated at first SM3/FVF Draw."
+      },
+      {
+        "id": "reset_resolution",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_GAME_FRAME_RESET",
+        "expected_behavior": "Real backbuffer at a new resolution stages despite previous native target dimensions and retains exact source identity and format."
+      },
+      {
+        "id": "postdraw_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_ORIGINAL_PRESENT_INPUT_FFB",
+        "expected_behavior": "Post-Draw region upload with absent or mismatched native dimensions fails closed; original D3D9 Present, input and FFB are untouched."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "Required five unchanged full GitHub Actions gates pass on exact validation-bearing result SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "ACTUAL_GAME_RT0_PRE_DRAW_CPU_GDI_STRETCHRECT",
+      "CANONICAL_D3D9_DESCRIPTOR_AND_OWNER",
+      "NATIVE_SM3_FVF_FIRST_DRAW_UPLOAD",
+      "FULL_RESOLUTION_VISIBLE_FRAME"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+      "tools/dx11_native_cold_predraw_01052.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compile C++ cold native dimensions=0 and Reset stale dimensions with authentic D3D9 source; verify staged source later matches native first SM3/FVF Draw identity.",
+      "negative_regression": "Reject foreign/mismatched canonical source extent/format and post-Draw stale target dimensions; preserve pending/out-of-sequence abort and original D3D9 fallback.",
+      "component_integration": "Original D3D9 backbuffer mutation/cpu finish -> preserve_game_surface_copy canonical readback -> GameNativePreDrawSurface staging -> first native real-game SM3/FVF Draw source identity match -> D3D11 UpdateSubresource."
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_PREDRAW_NATIVE_FIRST_FRAME_EXTENT"
+    ],
+    "blocking_evidence": "At 37282d44, preserve_game_surface_copy() unconditionally rejects desc.Width != s.nativeWidth || desc.Height != s.nativeHeight before preDrawCopy admission; nativeWidth/nativeHeight can be zero or stale before ensure_pipeline() on first Draw (cold menu launch or resolution Reset).",
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "Diagnostic native Draw opt-in remains off by default; D3D9 original render/input/FFB/SkyGlow and DX9Ex fallback retained; DXVK frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "acceptance_results": {
+    "cold_first_frame": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+        "tools/dx11_native_cold_predraw_01052.cpp"
+      ]
+    },
+    "reset_resolution": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        "tools/dx11_native_cold_predraw_01052.cpp"
+      ]
+    },
+    "postdraw_fallback": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        "tools/dx11_native_cold_predraw_01052.cpp",
+        "tools/test_dx11_cold_predraw_01052.py"
+      ]
+    },
+    "exact_sha_gate": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ]
+    }
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "Unconditional native dimension match drops authentic first pre-Draw game pixels before native target allocation or after source resolution change.",
+  "next_implementation_action": "Validate this exact source SHA against required GitHub Actions gates and repair real failures within CONVERSION-DX11-01052.",
+  "runtime_note": "No game/Quest3 VDXR test performed; native pixels and frame counts UNTESTED."
+}

@@ -26,6 +26,28 @@ struct GameNativePreDrawSurface {
         std::uint32_t w, std::uint32_t h) noexcept {
         return w && h && std::uint64_t(w)*h<=kMaxPixels;
     }
+    // The backbuffer's actual D3D9 desc is authoritative before any native
+    // render target has been created. Reject mismatched source extent/format
+    // and unbounded CPU staging even on a cold menu frame or after Reset.
+    [[nodiscard]] static constexpr bool source_matches_canonical(
+        std::uint32_t w, std::uint32_t h, std::uint32_t fmt,
+        std::uint32_t canonicalW, std::uint32_t canonicalH,
+        std::uint32_t canonicalFmt) noexcept {
+        return fmt != 0u && size_allowed(w,h) &&
+            w == canonicalW && h == canonicalH && fmt == canonicalFmt;
+    }
+    // Before the first source Draw, the native frame target may be 0x0 or
+    // retain a previous resolution. The later SM3/FVF Draw verifies the
+    // staged snapshot against the newly allocated target. Post-Draw copies
+    // must match its CURRENT dimensions before touching native GPU pixels.
+    [[nodiscard]] static constexpr bool capture_extent_allowed(
+        bool preDrawCopy, bool postDrawCopy,
+        std::uint32_t w, std::uint32_t h,
+        std::uint32_t nativeW, std::uint32_t nativeH) noexcept {
+        return size_allowed(w,h) &&
+            (preDrawCopy || (postDrawCopy &&
+                             w == nativeW && h == nativeH));
+    }
     [[nodiscard]] bool active() const noexcept { return owner!=0u; }
     // Called only AFTER a successful, source-authenticated full D3D9 RT0
     // ColorFill has been admitted for native replay. Foreign game cameras
