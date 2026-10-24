@@ -1272,7 +1272,9 @@ def check_f11_xyz_owner(source):
     prepare = function_body(source, 'bool R30PrepareExternalImGuiProjection(')
     draw = function_body(source, 'HRESULT R30TryExternalImGuiIndexed(')
     indexed = function_body(source, 'HRESULT __stdcall DrawIndexedPrimitiveDestR30(')
-    world = function_body(source, 'bool R30ConfigureXyzrhwWorldEffect(')
+    # Skip the R26 header declaration; validate the actual body, not R30PrepareXyzrhwState.
+    world = function_body(source[source.rfind('bool R30ConfigureXyzrhwWorldEffect('):],
+                          'bool R30ConfigureXyzrhwWorldEffect(')
     execute = function_body(source, 'HRESULT R30ExecuteXyzrhwStereo(')
     for token in (
         'ExternalOverlaySemanticDepth == 0',
