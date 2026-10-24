@@ -16,8 +16,8 @@ struct GameNativeFrameBatch {
         // replace the previous scene's entire COLOR history. Native draws
         // after that fill are still contiguous within the new source epoch.
         return !stopped && consumed < kMaxFullFrameDraws &&
-            ordinal >= sourceEpochStart &&
-            ordinal - sourceEpochStart == consumed &&
+            sourceEpochStart <= UINT64_MAX - consumed &&
+            ordinal == consumed + sourceEpochStart &&
             (!hasSourceDraw || lastSourceDraw + 1u == ordinal);
     }
     // A full-resolution image cannot start from a synthetic diagnostic
@@ -213,9 +213,9 @@ struct GameNativeFrameBatch {
     constexpr bool first_draw() const noexcept { return submitted == 0u; }
     constexpr bool clear_depth() const noexcept { return !depthReady; }
     constexpr bool accepts_depth(bool depth, bool reversed) const noexcept {
-        return !(colorFillEpoch && depth) &&
-               (!depth || depthDirection == 0u ||
-                depthDirection == (reversed ? 2u : 1u));
+        if (colorFillEpoch && depth) return false;
+        return !depth || depthDirection == 0u ||
+               depthDirection == (reversed ? 2u : 1u);
     }
     // The game's successful post-Draw full-backbuffer ColorFill discards all
     // prior COLOR contributions but preserves the original Z/stencil state.

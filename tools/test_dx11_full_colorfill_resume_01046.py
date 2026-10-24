@@ -17,6 +17,6 @@ assert "s.frameBatch.abort();" in hook
 assert "s.clearColor.discard();" in hook
 assert "s.outputGeneration" in hook
 assert "sourceEpochStart" in batch
-assert "!(colorFillEpoch && depth)" in batch
+assert "if (colorFillEpoch && depth) return false;" in batch
 assert "sourceDraws - sourceEpochStart" in batch
 print("01046 live game ColorFill -> new native Draw epoch and original fallback PASS")

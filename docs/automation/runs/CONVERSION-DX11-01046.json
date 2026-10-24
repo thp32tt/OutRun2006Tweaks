@@ -2,8 +2,8 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01046",
   "production_id": "CONVERSION-DX11-01046",
-  "event_id": "CONVERSION-DX11-01046-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-01046-E002",
+  "event_type": "retry",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01046",
@@ -31,7 +31,8 @@
     "src/vr/d3d11/native_game_frame_batch.hpp",
     "tools/dx11_native_full_colorfill_resume_01046.cpp",
     "tools/test_dx11_full_colorfill_resume_01046.py",
-    ".github/workflows/dx11-fast-structural.yml"
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_full_colorfill_resume_01046.py"
   ],
   "feature_contract": {
     "feature_id": "DX11:POST_DRAW_FULL_COLORFILL_NATIVE_EPOCH",
@@ -128,5 +129,6 @@
       ],
       "validation_command": "five workflow gate same exact SHA"
     }
-  }
+  },
+  "ci_failure_repair": "e46c5f0 Fast: inherited 00671 source-contiguity mutation required ordinal == consumed expression; changed to exact bounded sourceEpochStart shift, preserving rejection for skipped Draw and UINT64 overflow. Backend/Win32 source graph: historical first-frame safety check requires original depth predicate shape; preserved original expression preceded by stricter post-ColorFill depth refusal. Existing tests/gates not removed."
 }
