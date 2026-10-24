@@ -1,0 +1,48 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261025T0045KST-NEW-SHA",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "checked_at_kst": "2026-10-25T00:47:27.151872+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE",
+  "source": "N100 SHA-verified A/B candidate_outputs and export_evidence, historical C1 SHA reports",
+  "candidate_count": {
+    "A": 334,
+    "B": 389,
+    "total": 723
+  },
+  "producer_evidence_files": 148,
+  "reviewed_sha_history_count": 728,
+  "new_unique_sha_count": 0,
+  "verdict_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "local_output_without_evidence": {
+    "A": [],
+    "B": []
+  },
+  "evidence_without_local_output": {
+    "A": [],
+    "B": []
+  },
+  "constraints": {
+    "no_sha_reinspection": true,
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "n100_evidence": "work/C1_QA_20261025_0045_metrics.json",
+  "score_delta": 0
+}
