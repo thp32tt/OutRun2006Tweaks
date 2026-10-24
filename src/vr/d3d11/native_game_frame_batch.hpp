@@ -268,6 +268,7 @@ struct GameNativeFrameBatch {
     // canonical main depth surface, and retained RT0/depth COM identities.
     // This consumes no source Draw; the NEXT real Draw will seed the native
     // DSV from z and the RTV from the ColorFill color, in source order.
+    // The shared original D3D9 Z-Clear observer commits the DSV seed.
     [[nodiscard]] constexpr bool resume_after_game_full_depth_clear(
         std::uint64_t originalDrawsSeen, float z) noexcept {
         if (!awaitingColorFillDepthReset || stopped || submitted != 0u ||
@@ -278,7 +279,6 @@ struct GameNativeFrameBatch {
             return false;
         awaitingColorFillDepthReset = false;
         colorFillEpoch = false;
-        note_full_depth_clear(z);
         return true;
     }
     constexpr void succeeded(bool depth, bool reversed = false) noexcept {

@@ -8559,21 +8559,18 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
             }
             return true; // Keep RTV, unaffected Z and native Draw ordinals.
         }
-        // A real ColorFill after depth-writing native Draws has already
-        // retired the old RTV/DSV epoch. Recover only after this successful
-        // COMPLETE Z Clear, with the same game RT0 and canonical main depth
-        // identity proved above. A partial Z, stencil-only, foreign target,
-        // or intervening Draw must never resurrect stale game depth.
-        if (s.frameBatch.awaitingColorFillDepthReset) {
-            if (!clearZ || !coversDepth ||
-                !s.clearColor.matches(owner,
-                    reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get())) ||
-                !s.frameBatch.resume_after_game_full_depth_clear(
-                    s.sourceDrawsThisFrame, z))
-                return false;
-            s.preDrawDepth.discard();
-            return true; // Next Draw seeds new RTV color AND genuine game Z.
-        }
+        // A ColorFill after depth-writing native Draws retired old RTV/DSV
+        // pixels. Recover ONLY after this successful original whole-main Z
+        // Clear with identical COM ownership, full coverage and zero
+        // intervening source Draws. Commit Z through the SAME existing
+        // depth-only observer path below, never via a second depth shortcut.
+        const bool waitingForGameZ = s.frameBatch.awaitingColorFillDepthReset;
+        const bool resumedGameZ = waitingForGameZ && clearZ && coversDepth &&
+            s.clearColor.matches(owner,
+                reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get())) &&
+            s.frameBatch.resume_after_game_full_depth_clear(
+                s.sourceDrawsThisFrame, z);
+        if (waitingForGameZ && !resumedGameZ) return false;
         // Prove the same canonical D3D9 backbuffer/color Clear before
         // admitting a separate full Z Clear with zero native game Draws.
         // This covers menu->vehicle->race startup where TARGET and ZBUFFER
@@ -8584,7 +8581,7 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                     backbufferIdentity.Get())),
                 s.sourceDrawsThisFrame == 0u);
         if ((s.frameBatch.submitted == 0u || s.frameBatch.stopped) &&
-            !beforeFirstGameDraw) return false;
+            !beforeFirstGameDraw && !resumedGameZ) return false;
         if (s.frameBatch.submitted != 0u && !continuingFullNativeDraw)
             return false;
         // The next real native depth Draw clears the DSV to the exact game

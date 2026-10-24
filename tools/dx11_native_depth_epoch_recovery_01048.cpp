@@ -33,6 +33,8 @@ int main() {
     // The observer verifies real game-owned full Z coverage and identity.
     assert(b.resume_after_game_full_depth_clear(2u,0.6f));
     assert(!b.awaitingColorFillDepthReset && !b.colorFillEpoch);
+    assert(!b.depthClearPending); // Observer has not yet committed Z.
+    b.note_full_depth_clear(0.6f); // Shared original Clear observer path.
     assert(b.depthClearPending && b.depth_clear_value(false)==0.6f);
     assert(!b.resume_after_game_full_depth_clear(2u,0.2f));
     assert(!b.publishable_full(true,2u));
@@ -47,6 +49,7 @@ int main() {
     assert(b.defer_full_color_fill_until_depth_clear(3u));
     assert(!b.publishable_full(true,3u));
     assert(b.resume_after_game_full_depth_clear(3u,0.2f));
+    b.note_full_depth_clear(0.2f);
     b.record_source_draw(3u); b.succeeded(true);
     assert(b.publishable_full(true,4u));
     assert(!b.publishable_full(true,5u));

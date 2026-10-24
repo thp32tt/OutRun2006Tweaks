@@ -123,5 +123,6 @@
         ".github/workflows/dx11-fast-structural.yml"
       ]
     }
-  }
+  },
+  "ci_failure_repair": "First exact-SHA Fast 40074875575 failed historical 00732 depth-only mutation because new recovery branch duplicated the original preDrawDepth.discard() operation; restructured source to route recovered whole-Z into the SAME verified existing clearZ discard+DSV seed (not weakening the existing 00732 mutation or any Gate)."
 }
