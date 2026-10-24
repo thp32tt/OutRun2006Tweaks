@@ -237,6 +237,18 @@
           "Quest3/VDXR: 6th/6, exit YES/NO and end-of-run white text render binocularly single and no longer follow head rotation",
           "confirm intended HUD resize is applied and road/background/vehicles remain unchanged"
         ]
+      },
+      "continuation20261025": {
+        "taskId": "CHAT-DX9EX-R26-RESULT-HUD-20261020",
+        "featureId": "DX9EX:VIS:EXTENDED_TIME",
+        "status": "SOURCE_COVERAGE_FIXED_RUNTIME_UNTESTED",
+        "baseSha": "990158b51293b294033c2466558d637df74936d0",
+        "changedPath": "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "boundedCause": "Exact +TIME shaderless FVF142 DP/DPUP/DIPUP lacked the existing R62 finite-plane route. Actual failing runtime API remains unproven.",
+        "verifier": "python tools/verify_vr_r26_stage_fixedfn.py",
+        "noNewRecurrenceCount": "Same reported symptom; user did not supply an exact new tested SHA.",
+        "noLensChanges": true,
+        "nextAction": "Canonical candidate CI, then matching Quest3 optics; do not mark runtime fixed."
       }
     },
     {

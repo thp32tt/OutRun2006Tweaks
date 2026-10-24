@@ -1,3 +1,13 @@
+# 2026-10-25 +TIME-only R26 draw coverage continuation
+
+Task `CHAT-DX9EX-R26-RESULT-HUD-20261020`, attempt 2; feature `DX9EX:VIS:EXTENDED_TIME`, existing regression `VR-R50-WHITE-HUD-DIPLOPIA-001`. User requests only duplicate/head-follow +TIME; lens work belongs to another account.
+
+Base `990158b51293b294033c2466558d637df74936d0`: R62 finite-HUD fixed-function dispatch exists only for DIP. An exact +TIME XYZ/FVF142 DP/DPUP/DIPUP cannot enter it; XYZRHW and shader owners do not cover this physical format. Share the existing R62 projection/restore transaction with these APIs only under exact stage ownership. Ordinary HUD, GOAL, rank and external F11 keep their original dispatch. All original arguments, source animation/timer, projection math, pose, scale and lens code are preserved.
+
+Executable regression compiles the actual R26 core/dispatch with fake D3D9 calls: base fails on first DP; candidate passes all four APIs, direct/queued ownership, argument preservation, foreign-owner/live-VS/format/pose vetoes and left/right/projection-restore failure cases. These are CPU contract checks, not a physical GPU or HMD result. The actual failing +TIME API is unmeasured; `RUNTIME_VALIDATION=UNTESTED`.
+
+The global visual checker has pre-existing drift: formatting/forward-declaration/F11 scale assertions were synchronized without runtime edits. Its independent central-lens owner assertion still conflicts with current lens source. Do not change lens behavior or disable its gate to claim this +TIME candidate fully validated. Exact-SHA CI and matching headset acceptance remain required; no new score or recurrence for the same unverified optical symptom.
+
 # 2026-10-15 lens/+TIME source-path development handoff
 
 User request at 01:36:52 KST. See [development guide](DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md). Reuses DX9EX:SYMPTOM:LENS_FLARE_CENTRE and DX9EX:SYMPTOM:EXTENDED_TIME; preserves prior HMD failures and known-good categories. No new HMD observation, recurrence count or optical FIXED claim.

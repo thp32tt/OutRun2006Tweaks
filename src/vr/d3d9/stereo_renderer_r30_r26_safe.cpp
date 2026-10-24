@@ -5355,10 +5355,13 @@ namespace OutRunVRStereo
             return r29Draw();
         }
 
-        HRESULT R62TryFixedFunctionSpriteIndexed(
+        // Share the existing R62 projection/restore transaction across native
+        // APIs. The indexed entry keeps its historical HUD/rank admission;
+        // new API entries below are restricted to exact +TIME ownership.
+        template <typename RawDraw>
+        HRESULT R62TryFixedFunctionSpriteStereo(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
+            UINT primitiveCount, RawDraw&& rawDraw, const char* drawApi)
         {
             if (!device || type != D3DPT_TRIANGLELIST ||
                 !TargetIsBackBuffer() || !R30SafeStereoBase(device))
@@ -5525,9 +5528,7 @@ namespace OutRunVRStereo
                 if (FAILED(projectionSetHr[eye]))
                     return E_FAIL;
                 drawAttempted[eye] = true;
-                drawHr[eye] = DrawIndexedPrimitiveHook.stdcall<HRESULT>(
-                    device, type, baseVertexIndex, minVertexIndex,
-                    numVertices, startIndex, primitiveCount);
+                drawHr[eye] = rawDraw();
                 eyeHr[eye] = drawHr[eye];
                 return eyeHr[eye];
             };
@@ -5589,8 +5590,8 @@ namespace OutRunVRStereo
                         sourceCommand.queueNode == afterCommand.queueNode &&
                         sourceCommand.queueEpoch == afterCommand.queueEpoch;
                     spdlog::info(
-                        "VR R26 RESULT_HUD_EYES: route=FiniteHud api=DIP producer={} queued={} node={} epoch={} pose={} viewport={},{},{},{} fvf=0x{:X} VS=0 left=0x{:08X} right=0x{:08X} projectionRestored={} frameIncomplete={} hits={}",
-                        OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        "VR R26 RESULT_HUD_EYES: route=FiniteHud api={} producer={} queued={} node={} epoch={} pose={} viewport={},{},{},{} fvf=0x{:X} VS=0 left=0x{:08X} right=0x{:08X} projectionRestored={} frameIncomplete={} hits={}",
+                        drawApi, OutRunVR::GameSemantic::Name(sourceCommand.producer),
                         sourceCommand.queued, sourceCommand.queueNode,
                         sourceCommand.queueEpoch, state.stereo.poseSequence,
                         state.viewport.X, state.viewport.Y,
@@ -5624,6 +5625,45 @@ namespace OutRunVRStereo
             return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;
         }
 
+        HRESULT R62TryFixedFunctionSpriteIndexed(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+            UINT startIndex, UINT primitiveCount)
+        {
+            return R62TryFixedFunctionSpriteStereo(device, type, primitiveCount,
+                [&]() {
+                    return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                        device, type, baseVertexIndex, minVertexIndex,
+                        numVertices, startIndex, primitiveCount);
+                }, "DIP");
+        }
+
+        template <typename RawDraw>
+        HRESULT R62TryStageExtensionFixedFunction(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            UINT primitiveCount, RawDraw&& rawDraw, const char* drawApi)
+        {
+            using namespace OutRunVR::GameSemantic;
+            const auto command = CapturePhysicalDrawCommand();
+            // A native animation/direct-UP source is not necessarily the
+            // indexed D3DXSprite path. Only the proven +TIME sprite/numeral
+            // owner may use the additional APIs. Do not widen GOAL, ordinary
+            // HUD, F11, rank, mode=2, world or lens rendering.
+            if (!device || !IsGameDevice(device) || InternalStereoPass ||
+                ExternalOverlaySemanticDepth != 0 ||
+                command.scope != RenderScope::ScreenHud ||
+                command.producer != ProducerToken::StageExtensionTime ||
+                (command.queued &&
+                 (!command.queueNode || command.queueEpoch == 0)) ||
+                primitiveCount == 0)
+                return E_NOTIMPL;
+            // The shared transaction still requires live-null VS, FVF 0x142,
+            // a main target, matching head/eye pose and valid projection.
+            // Original vertices/UV/color, topology and UP post-state survive.
+            return R62TryFixedFunctionSpriteStereo(
+                device, type, primitiveCount, rawDraw, drawApi);
+        }
+
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
@@ -5635,6 +5675,13 @@ namespace OutRunVRStereo
                 drawSemanticValue);
             R30TracePreRestartHudEligibility(device, 0u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
+            const HRESULT stageFixedFn = R62TryStageExtensionFixedFunction(
+                device, type, primitiveCount, [&]() {
+                    return DrawPrimitiveHook.stdcall<HRESULT>(
+                        device, type, startVertex, primitiveCount);
+                }, "DP");
+            if (stageFixedFn != E_NOTIMPL)
+                return stageFixedFn;
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
@@ -5751,6 +5798,18 @@ namespace OutRunVRStereo
                 drawSemanticValue);
             R30TracePreRestartHudEligibility(device, 2u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
+            // FVF142 is XYZ(12) + diffuse(4) + UV(8). Native D3D9 owns
+            // validation of the caller's memory; never reinterpret XYZRHW.
+            if (data && stride >= 24u)
+            {
+                const HRESULT stageFixedFn = R62TryStageExtensionFixedFunction(
+                    device, type, primitiveCount, [&]() {
+                        return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                            device, type, primitiveCount, data, stride);
+                    }, "DPUP");
+                if (stageFixedFn != E_NOTIMPL)
+                    return stageFixedFn;
+            }
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
@@ -5782,6 +5841,18 @@ namespace OutRunVRStereo
                 drawSemanticValue);
             R30TracePreRestartHudEligibility(device, 3u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
+            if (indexData && vertexData && stride >= 24u && numVertices != 0 &&
+                (indexFormat == D3DFMT_INDEX16 || indexFormat == D3DFMT_INDEX32))
+            {
+                const HRESULT stageFixedFn = R62TryStageExtensionFixedFunction(
+                    device, type, primitiveCount, [&]() {
+                        return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+                            device, type, minVertexIndex, numVertices, primitiveCount,
+                            indexData, indexFormat, vertexData, stride);
+                    }, "DIPUP");
+                if (stageFixedFn != E_NOTIMPL)
+                    return stageFixedFn;
+            }
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
