@@ -7709,7 +7709,7 @@ bool preserve_game_surface_copy(
                 reinterpret_cast<std::uintptr_t>(actualIdentity.Get())),
             s.frameBatch.accepts_full(s.sourceDrawsThisFrame),
             s.frameBatch.submitted==0u && !s.frameBatch.stopped,
-            s.pending,s.cpuSurfaceReplay.active());
+            s.pending,s.cpuSurfaceReplay.active(),completingCpuWrite);
         const bool postDrawCopy = s.frameBatch.publishable(s.pending) &&
             s.backend.ready() && s.backend.device() &&
             s.backend.context() && s.backend.color_texture();
@@ -7789,6 +7789,11 @@ bool preserve_game_surface_copy(
                     s.surfaceReplayPixels)) return false;
             s.preDrawFills.discard(); // snapshot includes all earlier fills
             ++s.surfaceReplayCount;
+            // The successful original CPU/GDI completion is now part of the
+            // native first-Draw seed. Release its ticket before the game's
+            // next original Draw, Clear, or Present; never leave a false
+            // 'CPU write still open' abort behind this successful snapshot.
+            if (completingCpuWrite) s.cpuSurfaceReplay.reset();
             return true;
         }
 
@@ -7888,13 +7893,25 @@ bool begin_game_surface_cpu_write(IDirect3DDevice9* game,
             s.pending = false;
             return false;
         }
-        if (s.sourceGameDevice != owner ||
-            !s.clearColor.matches(owner,
-                reinterpret_cast<std::uintptr_t>(identity.Get())) ||
-            !s.frameBatch.publishable(s.pending) ||
-            !s.backend.ready() || !s.backend.color_texture() ||
-            s.nativeWidth != desc.Width || s.nativeHeight != desc.Height ||
-            s.surfaceReplayCount >= 8u) return false;
+        const bool seededMainBackbuffer = s.clearColor.matches(owner,
+            reinterpret_cast<std::uintptr_t>(identity.Get()));
+        // Before the first real SM3/FVF native Draw there is no D3D11
+        // output target yet. Permit an authentic, lockable game backbuffer
+        // LockRect/GetDC and snapshot it only after its matching completion.
+        // The later first Draw rechecks owner, format and full extent.
+        const bool preDrawWrite =
+            GameNativePreDrawSurface::capture_allowed(
+                seededMainBackbuffer,
+                s.frameBatch.accepts_full(s.sourceDrawsThisFrame),
+                s.frameBatch.submitted == 0u && !s.frameBatch.stopped,
+                s.pending,s.cpuSurfaceReplay.active()) &&
+            GameNativePreDrawSurface::size_allowed(desc.Width,desc.Height);
+        const bool postDrawWrite = s.frameBatch.publishable(s.pending) &&
+            s.backend.ready() && s.backend.color_texture() &&
+            s.nativeWidth == desc.Width && s.nativeHeight == desc.Height;
+        if (s.sourceGameDevice != owner || !seededMainBackbuffer ||
+            s.surfaceReplayCount >= 8u ||
+            (!preDrawWrite && !postDrawWrite)) return false;
         return s.cpuSurfaceReplay.begin(owner,
             reinterpret_cast<std::uintptr_t>(identity.Get()),
             region.left, region.top, region.right, region.bottom,
@@ -7933,6 +7950,7 @@ void finish_game_surface_cpu_write(IDirect3DDevice9* game,
         s.cpuSurfaceReplay.reset();
         s.frameBatch.abort();
         s.pending = false;
+        s.preDrawSurface.discard();
         s.preDrawFills.discard();
         s.preDrawDepth.discard();
         s.clearColor.discard();
@@ -7943,6 +7961,11 @@ void finish_game_surface_cpu_write(IDirect3DDevice9* game,
         s.cpuSurfaceReplay.reset();
         s.frameBatch.abort();
         s.pending = false;
+        s.preDrawSurface.discard();
+        s.preDrawFills.discard();
+        s.preDrawDepth.discard();
+        s.clearColor.discard();
+        if (++s.outputGeneration == 0u) ++s.outputGeneration;
     }
 }
 

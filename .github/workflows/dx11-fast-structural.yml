@@ -92,6 +92,8 @@ jobs:
           python tools/test_dx11_full_colorfill_resume_01046.py
           # 01049 real game pre-Draw source copy feeds SM3/FVF native pixels.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_pre_draw_copy_01049.cpp -o /tmp/dx11_pre_draw_copy_01049 && /tmp/dx11_pre_draw_copy_01049
+          # 01050 original LockRect/GetDC before first native Draw and safe completion.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_predraw_cpu_surface_01050.cpp -o /tmp/dx11_predraw_cpu_01050 && /tmp/dx11_predraw_cpu_01050
           # 01048 authentic color overwrite -> full main Z Clear -> native race Draw.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_depth_epoch_recovery_01048.cpp -o /tmp/dx11_depth_epoch_01048 && /tmp/dx11_depth_epoch_01048
           # 01047 repeated REAL full ColorFill cycles with game Draw/no-op chronology.

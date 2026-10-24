@@ -14,9 +14,13 @@ struct GameNativePreDrawSurface {
     std::vector<std::uint8_t> pixels;
     [[nodiscard]] static constexpr bool capture_allowed(
         bool seeded, bool contiguous, bool beforeFirstDraw,
-        bool pending, bool cpuWriteOpen) noexcept {
+        bool pending, bool cpuWriteOpen,
+        bool authenticatedCpuFinish = false) noexcept {
+        // An open CPU/GDI write is NOT a valid native snapshot. Only its
+        // matching, successful UnlockRect/ReleaseDC may capture the full
+        // current D3D9 color, before any native Draw has been admitted.
         return seeded && contiguous && beforeFirstDraw && !pending &&
-            !cpuWriteOpen;
+            (!cpuWriteOpen || authenticatedCpuFinish);
     }
     [[nodiscard]] static constexpr bool size_allowed(
         std::uint32_t w, std::uint32_t h) noexcept {
