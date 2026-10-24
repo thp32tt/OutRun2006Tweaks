@@ -1,0 +1,61 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261025T0645KST-IDLE-COVERED-784",
+  "scheduled_slot_kst": "2026-10-25T06:45:00+09:00",
+  "checked_at_kst": "2026-10-25T06:47:02+09:00",
+  "reviewer": "ChatGPT AI1",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "N100_inventory": {
+    "candidate_outputs_A_file_count": 365,
+    "candidate_outputs_B_file_count": 419,
+    "candidate_outputs_total": 784,
+    "export_evidence_entries": 784,
+    "historical_unique_review_SHA_count": 789,
+    "exported_entries_with_historical_C1_SHA_record": 784,
+    "unreviewed_export_SHA_count": 0,
+    "missing_file_status": "NOT_REHASHED_FOR_ALREADY_REVIEWED_SHA",
+    "export_sha_bytes_status": "NOT_REHASHED_FOR_ALREADY_REVIEWED_SHA",
+    "sha_audit_script": "work/C1_QA_20261025_0515_inventory.py",
+    "sha_audit_stdout_summary": {
+      "seen_sha_count": 789,
+      "exported_entries": 784,
+      "reviewed_entries": 784,
+      "unreviewed_count": 0,
+      "missing": 0,
+      "sha_mismatch": 0,
+      "unreviewed_first": []
+    },
+    "note": "History SHA count can exceed current output file count due to superseded/retry versions. Missing and mismatch are evaluated only for unreviewed export entries by this script; zero does not certify rehashing every existing image."
+  },
+  "summary": {
+    "state": "IDLE_NO_NEW_SHA",
+    "new_candidate_shas": 0,
+    "new_visual_inspections": 0,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "reason": "No exported candidate with a previously unreviewed SHA-256; no repeat QA on same SHA."
+  },
+  "restrictions": {
+    "ImageGen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_auto_deployed": false,
+    "C2_C3_or_game_pass_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_ssot": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md",
+    "previous_AI1_cumulative": 1662,
+    "this_run_change": 0,
+    "new_AI1_cumulative": 1662,
+    "reason": "IDLE/status-only verification is not a new QA achievement; no score update."
+  }
+}
