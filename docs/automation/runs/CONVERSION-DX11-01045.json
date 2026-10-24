@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01045",
+  "production_id": "CONVERSION-DX11-01045",
+  "event_id": "CONVERSION-DX11-01045-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01045",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_FULL_COLORFILL_FIRST_GAME_DRAW",
+  "work_key": "DX11:REAL_BACKBUFFER_COLORFILL_TO_NATIVE_DRAW",
+  "feature_branch": "feature/dx11-01045-first-full-colorfill-game-frame",
+  "feature_base_sha": "853f21e060c4f5081dcaa6944f819e81615b006b",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "status": "FEATURE_READY",
+  "feature_stage": "FEATURE_READY",
+  "checkpoint": "C4_FEATURE_READY",
+  "automation_validation": "PENDING_FEATURE_CI",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "feature_ready": true,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "First real-game whole-backbuffer D3D9 ColorFill can establish a native D3D11 Draw color seed without a prior TARGET Clear only after proven RT0/backbuffer identity, game device provenance, geometry, physical format, no-MSAA and untouched source call epoch. Native output/runtime UNTESTED. D3D9 fallback and post-Draw source overwrite abort remain unchanged.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_color_fill_seed.hpp",
+    "tools/dx11_native_full_colorfill_seed_01045.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FULL_COLORFILL_FIRST_GAME_DRAW",
+    "goal": "Unblock genuine ColorFill-origin game Draw -> native GPU texture -> same-Present path while retaining original game fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_color_fill_seed",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_DRAW_SOURCE",
+        "expected_behavior": "Original full-backbuffer ColorFill without TARGET Clear creates a verifiable first Draw native color seed."
+      },
+      {
+        "id": "strict_admission",
+        "category": "fallback_regression",
+        "behavior_area": "GAME_BACKBUFFER_PROVENANCE",
+        "expected_behavior": "All unowned, incompatible, clipped, MSAA or nonpristine draw sequences retain unchanged DX9Ex."
+      },
+      {
+        "id": "dx9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_INPUT",
+        "expected_behavior": "Original D3D9 HRESULT/Draw/Present/input/FFB preserved, no fake first visible frame."
+      },
+      {
+        "id": "final_gates",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_ACTIONS",
+        "expected_behavior": "Five mandatory GitHub Actions pass exact last material target HEAD."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_live_game_draw_color_source",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "real D3D9 ColorFill original successful write",
+      "canonical game backbuffer and first native color seed",
+      "real game D3D9 Draw observer -> D3D11 native Draw",
+      "existing GPU/desktop/native stereo transport"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_color_fill_seed.hpp",
+      "tools/dx11_native_full_colorfill_seed_01045.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_native_full_colorfill_seed_01045.cpp compiles and simulates native color and Draw epoch; integrated actual D3D9 ColorFill hook stores the real source COM seed.",
+      "negative_regression": "Ten independent invalid admissions reject; original post-Draw ColorFill retirement and original game HRESULT retained.",
+      "component_integration": "Live preserve_game_color_fill now records the genuine bound RT0 for the next native Draw instead of a synthetic WARP-only frame."
+    },
+    "conflict_keys": [
+      "DX11:REAL_BACKBUFFER_COLORFILL_TO_NATIVE_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D9_COLORFILL",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_PRESENT"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "opt-in diagnostic native only; exact COM/caps/owner match or DX9Ex original authoritative."
+  },
+  "acceptance_results": {
+    "live_color_fill_seed": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_color_fill_seed.hpp",
+        "tools/dx11_native_full_colorfill_seed_01045.cpp"
+      ],
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_seed_01045.cpp; Windows CI pending"
+    },
+    "strict_admission": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_color_fill_seed.hpp",
+        "tools/dx11_native_full_colorfill_seed_01045.cpp"
+      ],
+      "validation_command": "ten-negative-state regression in tools/dx11_native_full_colorfill_seed_01045.cpp; Windows CI pending"
+    },
+    "dx9ex_fallback": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_native_full_colorfill_seed_01045.cpp"
+      ],
+      "validation_command": "source inspection: original D3D9 HRESULT remains unchanged, existing 01044 post-draw batch abort preserved; CI pending"
+    },
+    "final_gates": {
+      "status": "PENDING_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "feature branch GitHub Actions pending"
+    }
+  }
+}

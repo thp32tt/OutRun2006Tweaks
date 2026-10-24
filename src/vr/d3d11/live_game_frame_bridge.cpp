@@ -70,6 +70,7 @@
 #include "native_game_multi_dirty_upload.hpp"
 #include "native_game_clear_color.hpp"
 #include "native_game_color_fill.hpp"
+#include "native_game_color_fill_seed.hpp"
 #include "native_game_masked_draw.hpp"
 #include "native_game_fragment_reject.hpp"
 #include "native_game_scissor_clip.hpp"
@@ -8185,6 +8186,77 @@ bool preserve_game_color_fill(
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        // Original D3D9 can establish an entire frame with ColorFill instead
+        // of a prior TARGET Clear. Only the CANONICAL bound game RT0/backbuffer
+        // and an entirely pristine source draw epoch may start native color.
+        // The hook runs after the real successful D3D9 API call, preserving
+        // its original HRESULT, Draw/Present, input and force feedback.
+        if (wholeSurface && !s.clearColor.valid &&
+            !s.frameBatch.stopped && !s.pending &&
+            s.frameBatch.submitted == 0u && s.sourceDrawsThisFrame == 0u) {
+            ComPtr<IDirect3DSurface9> backbuffer, boundTarget;
+            ComPtr<IUnknown> backbufferId, targetId;
+            D3DSURFACE_DESC bbDesc{}, rtDesc{};
+            const bool verifiedMain =
+                SUCCEEDED(game->GetBackBuffer(0u,0u,D3DBACKBUFFER_TYPE_MONO,
+                    backbuffer.GetAddressOf())) && backbuffer &&
+                SUCCEEDED(game->GetRenderTarget(0u,
+                    boundTarget.GetAddressOf())) && boundTarget &&
+                SUCCEEDED(backbuffer->GetDesc(&bbDesc)) &&
+                SUCCEEDED(boundTarget->GetDesc(&rtDesc)) &&
+                SUCCEEDED(backbuffer.As(&backbufferId)) &&
+                SUCCEEDED(boundTarget.As(&targetId)) &&
+                backbufferId && targetId;
+            const bool boundBackbuffer = verifiedMain &&
+                surfaceIdentity.Get() == backbufferId.Get() &&
+                targetId.Get() == backbufferId.Get();
+            const bool matchingExtents = verifiedMain &&
+                desc.Width != 0u && desc.Height != 0u &&
+                desc.Width == bbDesc.Width && desc.Height == bbDesc.Height &&
+                rtDesc.Width == bbDesc.Width && rtDesc.Height == bbDesc.Height;
+            const bool supportedFormat = verifiedMain &&
+                desc.Pool == D3DPOOL_DEFAULT &&
+                desc.Format == bbDesc.Format && rtDesc.Format == bbDesc.Format &&
+                (desc.Format == D3DFMT_A8R8G8B8 ||
+                 desc.Format == D3DFMT_X8R8G8B8);
+            const bool noMsaa = verifiedMain &&
+                desc.MultiSampleType == D3DMULTISAMPLE_NONE &&
+                rtDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
+                bbDesc.MultiSampleType == D3DMULTISAMPLE_NONE;
+            const bool originalOwner = GameNativeFrameBatch::admits_game_source(
+                owner,s.sourceGameDevice,
+                s.previousOutput.valid() ? s.previousOutput.device : 0u);
+            if (native_game_full_color_fill_can_seed(
+                    wholeSurface,!s.clearColor.valid,
+                    s.sourceDrawsThisFrame == 0u && !s.frameBatch.hasSourceDraw,
+                    s.frameBatch.submitted == 0u,
+                    !s.frameBatch.stopped && !s.pending,
+                    originalOwner,boundBackbuffer,matchingExtents,
+                    supportedFormat,noMsaa)) {
+                // ColorFill changed color only. Keep the actual bound game
+                // depth COM owner, but never fabricate a D3D9 Z Clear.
+                ComPtr<IDirect3DSurface9> depth;
+                ComPtr<IUnknown> depthId;
+                std::uintptr_t mainDepthOwner = 0u;
+                if (SUCCEEDED(game->GetDepthStencilSurface(
+                        depth.GetAddressOf())) && depth &&
+                    SUCCEEDED(depth.As(&depthId)) && depthId)
+                    mainDepthOwner = reinterpret_cast<std::uintptr_t>(depthId.Get());
+                s.clearColor.record(owner,
+                    reinterpret_cast<std::uintptr_t>(backbufferId.Get()),
+                    color,true,desc.Format == D3DFMT_X8R8G8B8,
+                    mainDepthOwner);
+                s.sourceGameDevice = owner;
+                s.frameBatch.reset();
+                s.preDrawFills.discard();
+                s.preDrawDepth.discard();
+                s.cpuSurfaceReplay.reset();
+                s.surfaceReplayCount = 0u;
+                s.sourceModeKnown = false;
+                s.eligibleThisFrame = 0u;
+                if (++s.outputGeneration == 0u) ++s.outputGeneration;
+            }
+        }
         const bool sameGameBackbuffer = s.clearColor.matches(
             owner, reinterpret_cast<std::uintptr_t>(surfaceIdentity.Get())) &&
             (s.sourceGameDevice == 0u || s.sourceGameDevice == owner);
