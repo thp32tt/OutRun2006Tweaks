@@ -1,4 +1,4 @@
-name: DX9Ex R26 b7ca Isolated Test Packages
+name: DX9Ex R26 GOAL Final Seat Off TEST DEBUG
 
 permissions:
   contents: read
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - vr-d3d9ex-candidate/20261025-b7ca-correctness
+      - vr-d3d9ex-candidate/20261025-goal-final-seat-off
     paths:
       - '.github/workflows/vr-dx9ex-b7ca-correctness-package.yml'
 
@@ -31,12 +31,14 @@ jobs:
           $settings=Get-Content OutRun2006Tweaks.ini -Raw
           foreach ($token in @('HudScale = 0.55','CullingUnionMarginDegrees = 8.0',
                                'RivalDx11NativeRoute = false','DriverSeatVehicleScale = 1.0',
-                               'FollowGameResolution = true','UnifiedEyeMenuSource = false')) {
+                               'FollowGameResolution = true','UnifiedEyeMenuSource = false',
+                               'DriverSeatView = false')) {
             if (!$settings.Contains($token)) { throw "Baseline invariant failed: $token" }
           }
           foreach ($test in @('tools/verify_vr_driver_seat_basis_stability.py',
                                'tools/verify_vr_r26_result_hud_pose.py',
-                               'tools/verify_vr_rank_dx11_reference.py')) {
+                               'tools/verify_vr_rank_dx11_reference.py',
+                               'tools/verify_vr_goal_final_seat_off_20261025.py')) {
             python $test
             if ($LASTEXITCODE -ne 0) { throw "R26 critical source test failed: $test" }
           }
@@ -73,8 +75,8 @@ jobs:
           cmake --build build-host --config Release --target outrun-vr-host --parallel 2
           if ($LASTEXITCODE -ne 0) { throw 'x64 Release OpenXR host compile failed' }
           New-Item -ItemType Directory -Force stage/TEST | Out-Null
-          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
-          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' -and $_.FullName -match '\\Release\\' } | Select-Object -First 1
+          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
           if (!$dll -or !$exe) { throw 'Compiled Release binaries missing' }
           Copy-Item $dll.FullName stage/TEST/dinput8.dll
           Copy-Item $exe.FullName stage/TEST/outrun-vr-host.exe
@@ -86,8 +88,8 @@ jobs:
           cmake --build build-host --config RelWithDebInfo --target outrun-vr-host --parallel 2
           if ($LASTEXITCODE -ne 0) { throw 'x64 debug-symbol OpenXR host compile failed' }
           New-Item -ItemType Directory -Force stage/DEBUG | Out-Null
-          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
-          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\RelWithDebInfo\\' } | Select-Object -First 1
+          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Where-Object { $_.FullName -match '\\RelWithDebInfo\\' } | Select-Object -First 1
           if (!$dll -or !$exe) { throw 'Compiled debug binaries missing' }
           Copy-Item $dll.FullName stage/DEBUG/dinput8.dll
           Copy-Item $exe.FullName stage/DEBUG/outrun-vr-host.exe
@@ -99,7 +101,7 @@ jobs:
           $sha=$env:GITHUB_SHA
           $short=$sha.Substring(0,12)
           foreach ($mode in @('TEST','DEBUG')) {
-            $dir="OutRun2_VR_R26_B7CA_ISOLATED_$($mode)_$short"
+            $dir="OutRun2_VR_R26_GOAL_FINAL_SEAT_OFF_$($mode)_$short"
             New-Item -ItemType Directory -Force "$dir/backends/d3d9" | Out-Null
             Copy-Item "stage/$mode/dinput8.dll" "$dir/backends/d3d9/dinput8.dll"
             Copy-Item "stage/$mode/outrun-vr-host.exe" "$dir/backends/d3d9/outrun-vr-host.exe"
@@ -117,18 +119,19 @@ jobs:
             Set-Content "$dir/backends/d3d9/BUILD_VARIANT.txt" "ACTIVE_R26_R43_R44" -Encoding ascii
             Set-Content "$dir/backends/d3d9/CMAKE_FLAGS.txt" "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF" -Encoding ascii
             Set-Content "$dir/SOURCE_SHA.txt" $sha -Encoding ascii
-            Set-Content "$dir/BUILD_MATRIX_ID.txt" "R26_B7CA_ISOLATED_$mode" -Encoding ascii
+            Set-Content "$dir/BUILD_MATRIX_ID.txt" "R26_GOAL_FINAL_SEAT_OFF_$mode" -Encoding ascii
             $inputs=[ordered]@{SchemaVersion=1;IntegrationSha=$sha;VariantId='ACTIVE_R26_R43_R44';ValidationClass='GITHUB_ACTIONS_NORMAL_BUILD';HmdRuntimeVerified=$false}
             $inputs | ConvertTo-Json | Set-Content "$dir/BUILD_INPUTS.json" -Encoding UTF8
             @(
-              'OutRun 2006 VR R26 baseline b7ca isolated correctness candidate'
+              'OutRun 2006 VR R26 b7ca GOAL final summary + native camera off test'
               "Mode: $mode"
               "GitHub exact commit: $sha"
               '1. Back up your game folder DLL/host/INI and prior settings.'
               '2. Extract ALL files directly into the original OR2006C2C.EXE game folder.'
               '3. Double-click START_HERE.cmd (DO NOT run host EXE by itself).'
-              '4. Test camera view switches, cockpit, +TIME, GOAL, rival, lens and menu aspect.'
-              '5. On exit provide log archive and exact runtime visual feedback.'
+              '4. Leave DriverSeatView=false. First test menu 4:3 and views 1/2/3, then GOAL climbing graph and static final summary separately.'
+              '5. Inspect plus-time and rival/lens without changing settings mid-run.'
+              '6. On exit provide log archive and exact runtime visual feedback.'
               'Compile success does NOT equal headset test success.'
             ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
             foreach ($required in @('START_HERE.cmd','START_DX9EX_TEST.cmd',
@@ -152,6 +155,6 @@ jobs:
           }
       - uses: actions/upload-artifact@v4
         with:
-          name: DX9Ex-R26-b7ca-Test-and-Debug-${{ github.sha }}
+          name: DX9Ex-R26-GOAL-Final-SeatOff-TEST-DEBUG-${{ github.sha }}
           path: OutRun2_VR_R26_B7CA_ISOLATED_*.zip
           if-no-files-found: error
