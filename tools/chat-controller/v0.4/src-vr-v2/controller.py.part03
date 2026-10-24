@@ -1004,19 +1004,43 @@ def vr_finalize_verified_feature(active: dict, record: dict, gate_run: dict) -> 
     candidate SHA, retrigger its build or require another review-only chat.
     Never infer feature implementation from a generic successful workflow.
     """
-    if not active.get("feature_contract") or not isinstance(record, dict):
-        return None
-    if (record.get("feature_status") != "FEATURE_READY"
-            or (record.get("feature_acceptance") or {}).get("implementation_complete") is not True):
+    if not isinstance(record, dict):
         return None
     sha = str(active.get("result_sha") or "")
-    result = {key: record.get(key) for key in (
-        "task_id", "production_id", "target_branch", "feature_id", "feature_branch",
-        "work_key", "material_result_sha", "acceptance_results", "feature_acceptance")}
-    result.update(schema_version=1, status="COMPLETE_BUILD_VERIFIED", checkpoint="C6_STATE",
-                  automation_validation="PASS_EXACT_SHA", runtime_validation="UNTESTED",
-                  validation_bearing_result_sha=sha, controller_terminal=True,
-                  delivery_evidence=active.get("delivery_evidence"))
+    if (not re.fullmatch(r"[0-9a-f]{40}", sha)
+            or gate_run.get("head_sha") != sha
+            or gate_run.get("status") != "completed"
+            or gate_run.get("conclusion") != "success"):
+        return None
+    if not active.get("feature_contract"):
+        # Legacy DX11 jobs can have a real material commit and successful
+        # exact-SHA CI while the model leaves only SOURCE_IMPLEMENTED_CI_PENDING.
+        # Two chat reminders are not sufficient: that left 01053 in WAIT_ACTIONS
+        # indefinitely. Finalize a separate controller-branch C6 evidence record
+        # without modifying the game branch or inventing an HMD result.
+        if (active.get("lane") != "DX11"
+                or record.get("task_id") != active.get("task_id")
+                or record.get("target_branch") != active.get("branch")
+                or record.get("status") not in {"SOURCE_IMPLEMENTED_CI_PENDING", "CI_PENDING"}
+                or f"[AUTO:{active.get('task_id')}]" not in (github_commit_message(sha) or "")):
+            return None
+        result = dict(record)
+        result.setdefault("material_result_sha", sha)
+        result.update(status="COMPLETE_BUILD_VERIFIED", checkpoint="C6_STATE",
+                      automation_validation="PASS_EXACT_SHA", runtime_validation="UNTESTED",
+                      validation_bearing_result_sha=sha, controller_terminal=True,
+                      controller_finalize_reason="LEGACY_EXACT_SHA_GATE_SUCCESS")
+    else:
+        if (record.get("feature_status") != "FEATURE_READY"
+                or (record.get("feature_acceptance") or {}).get("implementation_complete") is not True):
+            return None
+        result = {key: record.get(key) for key in (
+            "task_id", "production_id", "target_branch", "feature_id", "feature_branch",
+            "work_key", "material_result_sha", "acceptance_results", "feature_acceptance")}
+        result.update(schema_version=1, status="COMPLETE_BUILD_VERIFIED", checkpoint="C6_STATE",
+                      automation_validation="PASS_EXACT_SHA", runtime_validation="UNTESTED",
+                      validation_bearing_result_sha=sha, controller_terminal=True,
+                      delivery_evidence=active.get("delivery_evidence"))
     valid, _ = conversion_terminal_verdict(result, active, gate_run)
     if not valid:
         return None
