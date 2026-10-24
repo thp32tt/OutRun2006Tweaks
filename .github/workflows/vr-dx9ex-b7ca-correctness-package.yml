@@ -157,5 +157,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: DX9Ex-R26-GOAL-Final-SeatOff-TEST-DEBUG-${{ github.sha }}
-          path: OutRun2_VR_R26_B7CA_ISOLATED_*.zip
+          path: OutRun2_VR_R26_GOAL_FINAL_SEAT_OFF_*.zip
           if-no-files-found: error
