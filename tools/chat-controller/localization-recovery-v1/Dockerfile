@@ -33,6 +33,7 @@ RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.p
 # Exact pinned controller source is patched at build time; never alter a live container.
 # Build fails closed if upstream Python anchors change.
 COPY controller_png_attach.py /opt/outrun/app/controller_png_attach.py
+COPY gpt_vision_chat_ocr.py /opt/outrun/app/gpt_vision_chat_ocr.py
 COPY tile_batch_queue.py /opt/outrun/app/tile_batch_queue.py
 COPY tile_orientation_policy.py /opt/outrun/app/tile_orientation_policy.py
 COPY ab_batch_queue.py /opt/outrun/app/ab_batch_queue.py
@@ -49,6 +50,13 @@ COPY patch_controller_c1_slot.py /tmp/patch_controller_c1_slot.py
 RUN python /tmp/patch_controller_c1_slot.py /opt/outrun/app/controller.py \
  && python -m py_compile /opt/outrun/app/controller.py \
  && rm -f /tmp/patch_controller_c1_slot.py
+
+# C1 first handles OCR-exhausted originals through normal ChatGPT image attachments.
+# No external API and no Create-image tool are used by this fallback.
+COPY patch_controller_gpt_chat_ocr.py /tmp/patch_controller_gpt_chat_ocr.py
+RUN python /tmp/patch_controller_gpt_chat_ocr.py /opt/outrun/app/controller.py \
+ && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/gpt_vision_chat_ocr.py /opt/outrun/app/controller_png_attach.py \
+ && rm -f /tmp/patch_controller_gpt_chat_ocr.py
 
 COPY v2_automation_policy.py /opt/outrun/app/v2_automation_policy.py
 COPY v2_docker_policy.json /opt/outrun/v2_docker_policy.json
