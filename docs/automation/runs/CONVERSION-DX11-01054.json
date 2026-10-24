@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:AUTHENTIC_PREDRAW_FRAME_RECYCLING",
   "work_key": "DX11:MENU_CAR_RACE_PREDRAW_SOURCE_REUSE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMITTED_AWAITING_EXACT_SHA_GATES",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -115,5 +115,20 @@
   "next_source_file": "src/vr/d3d11/native_game_pre_draw_surface.hpp",
   "real_game_draw_blocker": "Actual native game/HMD draw evidence UNTESTED since 2026-10-18",
   "next_implementation_action": "Revalidate exact SHA with all required Actions; no changes to D3D9 fallback or CI safety checks.",
-  "runtime_note": "No real game/HMD test performed; source and simulated copy semantics only; counts UNTESTED."
+  "runtime_note": "No real game/HMD test performed; source and simulated copy semantics only; counts UNTESTED.",
+  "validation_bearing_result_sha": "69f12986effdbc4e742005b8b8c12f5d3ccb1e23",
+  "c6_validation_evidence": {
+    "exact_sha": "69f12986effdbc4e742005b8b8c12f5d3ccb1e23",
+    "dx11_fast_run_id": 40140033243,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 40140033242,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 40140033217,
+    "windows_build_conclusion": "success",
+    "openxr_architecture_run_id": 40140033239,
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_run_id": 40140033203,
+    "hud_inspector_conclusion": "success",
+    "validation_scope": "Five GitHub Actions Gates on unchanged exact material SHA; no gameplay/HMD execution"
+  }
 }
