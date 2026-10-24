@@ -46,7 +46,7 @@ int main() {
     }
     assert(!runaway.admits(1,1)); // reject pathological repeated tiny reads
 
-    // 01054: The SAME live bridge calls preDrawSurface.record() with the
+    // 01054: The SAME live bridge calls preDrawSurface.record_consuming() with the
     // mutable GameNativeSurfaceReplayPixels, so overload selection recycles
     // full-screen 1080p CPU/GDI/StretchRect snapshots before first DX11 Draw.
     using S = outrun::vr::dx11::live_game_frame::GameNativePreDrawSurface;
@@ -65,7 +65,7 @@ int main() {
         if (i==1u) allocationA=candidate;
         if (i==2u) allocationB=candidate;
         if (i==3u) assert(candidate==allocationA);
-        assert(nativeFirstDrawSeed.record(owner,surface,1920,1080,21u,readback));
+        assert(nativeFirstDrawSeed.record_consuming(owner,surface,1920,1080,21u,readback));
         sourceBudget.note_success(1920,1080);
         assert(nativeFirstDrawSeed.matches(owner,surface,1920,1080,21u));
         assert(nativeFirstDrawSeed.pixels.data()==candidate);
@@ -80,9 +80,9 @@ int main() {
     // previously seeded native frame; D3D9 game fallback remains unchanged.
     const auto* stable=nativeFirstDrawSeed.pixels.data();
     std::vector<std::uint8_t> malformed(1u,13u);
-    assert(!nativeFirstDrawSeed.record(owner,surface,1920,1080,21u,malformed));
-    assert(!nativeFirstDrawSeed.record(owner,surface,1920,1080,21u,
-                                       nativeFirstDrawSeed.pixels));
+    assert(!nativeFirstDrawSeed.record_consuming(owner,surface,1920,1080,21u,malformed));
+    assert(!nativeFirstDrawSeed.record_consuming(owner,surface,1920,1080,21u,
+                                                 nativeFirstDrawSeed.pixels));
     assert(nativeFirstDrawSeed.pixels.data()==stable);
     assert(nativeFirstDrawSeed.pixels.front()==20u);
     assert(!nativeFirstDrawSeed.matches(owner+1u,surface,1920,1080,21u));
@@ -90,7 +90,7 @@ int main() {
     readback.resize(std::size_t{3440}*1440u*4u);
     std::fill(readback.begin(),readback.end(),91u);
     const auto* resizedData=readback.data();
-    assert(nativeFirstDrawSeed.record(owner,surface,3440,1440,22u,readback));
+    assert(nativeFirstDrawSeed.record_consuming(owner,surface,3440,1440,22u,readback));
     assert(nativeFirstDrawSeed.pixels.data()==resizedData);
     assert(nativeFirstDrawSeed.matches(owner,surface,3440,1440,22u));
     assert(!nativeFirstDrawSeed.matches(owner,surface,1920,1080,21u));

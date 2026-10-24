@@ -7799,7 +7799,7 @@ bool preserve_game_surface_copy(
         const HRESULT unlocked = s.surfaceReplayReadback->UnlockRect();
         if (!copied || FAILED(unlocked)) return false;
         if (preDrawCopy) {
-            if (!s.preDrawSurface.record(owner,
+            if (!s.preDrawSurface.record_consuming(owner,
                     reinterpret_cast<std::uintptr_t>(actualIdentity.Get()),
                     desc.Width,desc.Height,static_cast<std::uint32_t>(desc.Format),
                     s.surfaceReplayPixels)) return false;

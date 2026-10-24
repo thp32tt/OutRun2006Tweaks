@@ -2,8 +2,8 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01054",
   "production_id": "CONVERSION-DX11-01054",
-  "event_id": "CONVERSION-DX11-01054-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-01054-E002",
+  "event_type": "retry",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01054",
@@ -22,12 +22,14 @@
   "full_dx11_renderer_complete": false,
   "score_change": 0,
   "score_award_event": false,
-  "summary": "Actual source implementation: recycle full-size canonical D3D9 CPU/GDI/StretchRect readback vector with its previous native pre-Draw seed across repeated game menu/car/race updates. The existing source observer passes a non-const disposable vector to record(); overload now swaps allocations after validation, preserves current image and retains deep-copy behavior for const call sites. Source tested by expanded portable 01053 C++ and bridge static probes; mandatory exact-SHA five-Gate CI pending, HMD UNTESTED.",
+  "summary": "Causal failure repair for the new real-game source reuse: original record(const vector&) keeps deep-copy semantics for existing mutable and const callers; only preserve_game_surface_copy() explicitly consumes its disposable authenticated D3D9 readback via record_consuming(). One real native renderer integration source change, C++ and Python regression updates; five-gate exact-SHA and game/HMD pending. Predecessor 01053 C6 evidence removed from this unverified 01054 run to prevent false PASS attribution.",
   "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_pre_draw_surface.hpp",
     "tools/dx11_native_burst_surface_copy_01053.cpp",
     "tools/test_dx11_burst_surface_copy_01053.py",
-    "docs/automation/runs/CONVERSION-DX11-01054.json"
+    "docs/automation/runs/CONVERSION-DX11-01054.json",
+    "tools/test_dx11_cold_predraw_01052.py"
   ],
   "feature_contract": {
     "feature_id": "DX11:AUTHENTIC_PREDRAW_FRAME_RECYCLING",
@@ -70,14 +72,14 @@
       "FIRST_NATIVE_DRAW_AND_D3D9_FALLBACK"
     ],
     "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
       "src/vr/d3d11/native_game_pre_draw_surface.hpp",
-      "tools/dx11_native_burst_surface_copy_01053.cpp",
-      "tools/test_dx11_burst_surface_copy_01053.py"
+      "tools/dx11_native_burst_surface_copy_01053.cpp"
     ],
     "acceptance_proof": {
       "positive_probe": "C++ exercises 20 real full-resolution 1920x1080 staged buffers, their exact no-copy allocation identities, latest values, resolution Reset 3440x1440, and const-source old behavior.",
       "negative_regression": "C++ rejects undersized buffer and overlapping alias without invalidating the previous seed; Python verifies live source bridge record order, actual budget charge, and CPU ticket closure.",
-      "component_integration": "D3D9 canonical GetRenderTargetData -> LockRect -> native source buffer -> overloaded preDrawSurface record() -> authentic first native SM3/FVF Draw->full-frame GPU seed."
+      "component_integration": "D3D9 canonical GetRenderTargetData -> LockRect -> native source buffer -> explicit preDrawSurface.record_consuming() -> authentic first native SM3/FVF Draw->full-frame GPU seed."
     },
     "conflict_keys": [
       "DX11:MENU_CAR_RACE_PREDRAW_SOURCE_REUSE"
@@ -90,7 +92,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "blocking_evidence": "Pre-Draw CPU/GDI/StretchRect burst in existing preserve_game_surface_copy() repeatedly copied each full-frame source vector through record(const std::vector&) after another real D3D9 GetRenderTargetData, increasing memory traffic per menu/car/race frame."
+    "blocking_evidence": "Exact-SHA DX11 Fast d991c0e5 segfault (exit 139) in unchanged tools/dx11_native_pre_draw_copy_01049.cpp: a newly introduced non-const record() overload consumes existing mutable source even where original 01049 API contract requires independent deep copy. Restore copy contract; require explicitly named record_consuming() in actual D3D9 observer."
   },
   "acceptance_results": {
     "authentic_burst_seed": {
@@ -112,14 +114,6 @@
   },
   "next_source_file": "src/vr/d3d11/native_game_pre_draw_surface.hpp",
   "real_game_draw_blocker": "Actual native game/HMD draw evidence UNTESTED since 2026-10-18",
-  "next_implementation_action": "Exact-SHA validation repair: 01054 Fast failed on mismatched policy full_gate_plan (schema); retry all required gates on the repaired result SHA. No native source or safety checks disabled.",
-  "runtime_note": "No real game/HMD test performed; source and simulated copy semantics only; counts UNTESTED.",
-  "c6_validation_evidence": {
-    "exact_sha": "65efec460053277ff1f071f1f2a8bd31f2874b80",
-    "backend_gate_run_id": 40090830134,
-    "backend_gate_conclusion": "success",
-    "dx11_fast_run_id": 40090830147,
-    "dx11_fast_conclusion": "success",
-    "validation_scope": "GitHub Actions exact-SHA CI; no HMD/runtime validation"
-  }
+  "next_implementation_action": "Revalidate exact SHA with all required Actions; no changes to D3D9 fallback or CI safety checks.",
+  "runtime_note": "No real game/HMD test performed; source and simulated copy semantics only; counts UNTESTED."
 }

@@ -11,7 +11,7 @@ check=copy.index('GameNativePreDrawSurface::source_matches_canonical(',canonical
 predraw=copy.index('const bool preDrawCopy =',check)
 postdraw=copy.index('const bool postDrawCopy =',predraw)
 extent=copy.index('GameNativePreDrawSurface::capture_extent_allowed(',postdraw)
-snapshot=copy.index('s.preDrawSurface.record(',extent)
+snapshot=copy.index('s.preDrawSurface.record_consuming(',extent)
 assert canonical < check < predraw < postdraw < extent < snapshot
 assert 'desc.Width != s.nativeWidth || desc.Height != s.nativeHeight' not in copy[:predraw]
 assert 's.preDrawFills.discard(); // snapshot includes all earlier fills' in copy[snapshot:]

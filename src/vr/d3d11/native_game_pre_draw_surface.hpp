@@ -72,7 +72,7 @@ struct GameNativePreDrawSurface {
     // with the previous seed instead of allocating and recopying a complete
     // 1080p/1440p frame on every menu/car/race CPU/GDI surface mutation.
     // Validation precedes the noexcept swap; failed captures keep the seed.
-    [[nodiscard]] bool record(std::uintptr_t device, std::uintptr_t surface,
+    [[nodiscard]] bool record_consuming(std::uintptr_t device, std::uintptr_t surface,
         std::uint32_t w, std::uint32_t h, std::uint32_t fmt,
         std::vector<std::uint8_t>& source) noexcept {
         if (!device || !surface || !fmt || !size_allowed(w,h) ||
@@ -82,6 +82,9 @@ struct GameNativePreDrawSurface {
         owner=device; target=surface; width=w; height=h; format=fmt;
         return true;
     }
+    // Existing record() callers are copy-preserving, whether their vector
+    // happens to be const or mutable. Only the authenticated game-readback
+    // observer opts into consuming its disposable staging allocation.
     // Read-only source snapshots retain the previous deep-copy semantics.
     [[nodiscard]] bool record(std::uintptr_t device, std::uintptr_t surface,
         std::uint32_t w, std::uint32_t h, std::uint32_t fmt,
