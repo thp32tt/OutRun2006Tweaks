@@ -1,7 +1,7 @@
 {
   "schema": "outrun.c1.independent_lightweight_qa.v1",
   "run_key": "OUTRUN-C1-20261025T0315KST-B0084R1-A0071-NEW-SHA8",
-  "checked_at_kst": "2026-10-25T03:15:00+09:00",
+  "checked_at_kst": "2026-10-25T03:22:35.745+09:00",
   "reviewer": "ChatGPT AI1",
   "role": "C1",
   "repository": "thp32tt/OutRun2006Tweaks",
@@ -375,5 +375,7 @@
     "C2_C3_or_game_PASS_created": false,
     "VR_FFB_DX11_DXVK_touched": false,
     "RUNTIME_VALIDATION": "UNTESTED"
-  }
+  },
+  "scheduled_slot_kst": "2026-10-25T03:15:00+09:00",
+  "checked_at_note": "Timestamp denotes completed record verification; 03:15 is the scheduled C1 slot, not asserted wall-clock completion time."
 }
