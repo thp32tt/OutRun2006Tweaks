@@ -76,8 +76,8 @@ jobs:
           cmake --build build-host --config Release --target outrun-vr-host --parallel 2
           if ($LASTEXITCODE -ne 0) { throw 'x64 Release OpenXR host compile failed' }
           New-Item -ItemType Directory -Force stage/TEST | Out-Null
-          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' -and $_.FullName -match '\\Release\\' } | Select-Object -First 1
-          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (!$dll -or !$exe) { throw 'Compiled Release binaries missing' }
           Copy-Item $dll.FullName stage/TEST/dinput8.dll
           Copy-Item $exe.FullName stage/TEST/outrun-vr-host.exe
@@ -89,8 +89,8 @@ jobs:
           cmake --build build-host --config RelWithDebInfo --target outrun-vr-host --parallel 2
           if ($LASTEXITCODE -ne 0) { throw 'x64 debug-symbol OpenXR host compile failed' }
           New-Item -ItemType Directory -Force stage/DEBUG | Out-Null
-          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\RelWithDebInfo\\' } | Select-Object -First 1
-          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Where-Object { $_.FullName -match '\\RelWithDebInfo\\' } | Select-Object -First 1
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (!$dll -or !$exe) { throw 'Compiled debug binaries missing' }
           Copy-Item $dll.FullName stage/DEBUG/dinput8.dll
           Copy-Item $exe.FullName stage/DEBUG/outrun-vr-host.exe
