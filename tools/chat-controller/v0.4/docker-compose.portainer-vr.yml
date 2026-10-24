@@ -20,7 +20,7 @@ services:
       # Retain live TASK_ID but never chain new production immediately.
       VR_CONTINUOUS_30M_ENABLED: "true"
       VR_SCHEDULED_DISPATCH_ENABLED: "true"
-      VR_CONTINUOUS_INTERVAL_SECONDS: "1800"
+      VR_CONTINUOUS_INTERVAL_SECONDS: "3600"
       VR_FEATURE_PROMOTION_MODE: "ai"
       VR_FEATURE_POLL_SECONDS: "60"
       VR_FEATURE_C6_REMINDER_SECONDS: "300"
@@ -61,12 +61,12 @@ services:
       PRODUCTION_COUNTER_MODE: "lane"
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      # New DX11 production: :00 and :30 KST, at most twice per hour.
-      SCHEDULE_MINUTES: "0,30"
-      # New DX9Ex review production: even hours at :00 KST (12/day max).
+      # New DX11 production: :30 KST, at most once per hour.
+      SCHEDULE_MINUTES: "30"
+      # New DX9Ex review production: every hour at :00 KST (24/day max).
       # Active TASK_ID retries/rollovers are not throttled by this cadence.
       DX9EX_SCHEDULE_MINUTES: "0"
-      DX9EX_SCHEDULE_EVERY_HOURS: "2"
+      DX9EX_SCHEDULE_EVERY_HOURS: "1"
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
