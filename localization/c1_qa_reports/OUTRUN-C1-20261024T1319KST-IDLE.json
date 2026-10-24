@@ -1,0 +1,49 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "role": "C1",
+  "run_key": "OUTRUN-C1-20261024T1319KST-IDLE",
+  "checked_at_kst": "2026-10-24T13:19:55+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE",
+  "baseline_run": "OUTRUN-C1-20261024T1245KST-IDLE",
+  "baseline_reviewed_sha_history_count": 728,
+  "new_unique_sha_count": 0,
+  "counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "producer_png_counts": {
+    "A": 334,
+    "B": 389
+  },
+  "producer_export_evidence_count": 148,
+  "latest_producer_png_mtime_kst": {
+    "A": "2026-10-24T04:40:07.918+09:00",
+    "B": "2026-10-24T04:10:03.473+09:00"
+  },
+  "latest_export_evidence_mtime_kst": "2026-10-24T04:40:07.919+09:00",
+  "historical_ab_tiles": {
+    "A": 110,
+    "B": 180,
+    "latest_mtime_before_prior_qa": true,
+    "excluded_as_legacy_inputs": true
+  },
+  "verification": "N100 producer candidate and export evidence inventory counts matched the previous 12:45 KST report. Latest file modification timestamps precede that report, so no newly written candidate since last QA. Full per-file SHA rehash not repeated; candidate contents assumed unchanged based on timestamps and counts.",
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_game_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false,
+    "VR_FFB_DX11_DXVK_touched": false
+  },
+  "score_change": 0,
+  "reason": "No new unreviewed candidate discovered after prior run; prevent duplicate SHA review and false PASS."
+}
