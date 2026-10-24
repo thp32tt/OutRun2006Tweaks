@@ -68,6 +68,11 @@ def linked(b, h, r):
         # does not prove that a failed native copy is vetoed before publish.
         and replay.rfind("if (FAILED(device->GetDeviceRemovedReason())) return false;")
             > replay.index("context->CopySubresourceRegion(")
+        # The pre-Draw snapshot has a separate increment before native
+        # CopySubresourceRegion; prove the REAL post-Draw replay is counted
+        # after the GPU copy, not just anywhere in this function.
+        and replay.rfind("++s.surfaceReplayCount;")
+            > replay.index("context->CopySubresourceRegion(")
         and replay.index("ScopedNativeGameGpuTransferOutputs outputs(context);")
             < replay.index("context->CopySubresourceRegion(")
         and all(token in gpu_outputs for token in (
