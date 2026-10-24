@@ -82,7 +82,7 @@
     "conflict_keys": [
       "DX11:MENU_CAR_RACE_PREDRAW_SOURCE_REUSE"
     ],
-    "full_gate_plan": "one_validation_bearing_exact_sha",
+    "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
     "activation_guard_and_fallback": "Retain strict opt-in and original game Draw/Present/input/FFB, DX9Ex fallback and DXVK freeze.",
     "live_game_draw_path": [
@@ -112,7 +112,7 @@
   },
   "next_source_file": "src/vr/d3d11/native_game_pre_draw_surface.hpp",
   "real_game_draw_blocker": "Actual native game/HMD draw evidence UNTESTED since 2026-10-18",
-  "next_implementation_action": "Finish required exact-SHA CI, repair only causal failures under same TASK_ID.",
+  "next_implementation_action": "Exact-SHA validation repair: 01054 Fast failed on mismatched policy full_gate_plan (schema); retry all required gates on the repaired result SHA. No native source or safety checks disabled.",
   "runtime_note": "No real game/HMD test performed; source and simulated copy semantics only; counts UNTESTED.",
   "c6_validation_evidence": {
     "exact_sha": "65efec460053277ff1f071f1f2a8bd31f2874b80",
