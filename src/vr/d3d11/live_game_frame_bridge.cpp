@@ -54,6 +54,7 @@
 #include "native_game_source_mutation.hpp"
 #include "native_game_pre_draw_replay.hpp"
 #include "native_game_pre_draw_depth.hpp"
+#include "native_game_pre_draw_surface.hpp"
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_live_shader_cache.hpp"
@@ -1327,6 +1328,7 @@ struct State {
     GameNativeClearColor clearColor{};
     GameNativePreDrawFills preDrawFills{};
     GameNativePreDrawDepth preDrawDepth{};
+    GameNativePreDrawSurface preDrawSurface{};
     std::uint64_t outputGeneration = 0u;
     // Successful game StretchRect/UpdateSurface postpasses are replayed into
     // the real full-size native texture, never treated as geometry Draws.
@@ -4881,6 +4883,24 @@ bool upload_full_game_stream(ID3D11DeviceContext* context,
 
 // Source pre-Draw partial Z values are replayed AFTER native full DSV seed,
 // BEFORE the first native depth-tested real game SM3 or FVF Draw.
+// Seed the native first Draw from the actual post-copy D3D9 color pixels,
+// never from a fabricated clear. Exact owner/extent/format must still match.
+bool replay_native_game_pre_draw_surface(State& s, ID3D11DeviceContext* ctx,
+    std::uintptr_t owner, std::uintptr_t target,
+    std::uint32_t w, std::uint32_t h, std::uint32_t fmt) noexcept {
+    if (!s.preDrawSurface.active()) return true;
+    if (!ctx || !s.backend.device() || !s.backend.color_texture() ||
+        !s.preDrawSurface.matches(owner,target,w,h,fmt)) return false;
+    {
+        ScopedNativeGameGpuTransferInputs inputs(ctx,s.backend.color_texture());
+        ScopedNativeGameGpuTransferOutputs outputs(ctx);
+        ctx->UpdateSubresource(s.backend.color_texture(),0u,nullptr,
+            s.preDrawSurface.pixels.data(),w*4u,0u);
+    }
+    if (FAILED(s.backend.device()->GetDeviceRemovedReason())) return false;
+    s.preDrawSurface.discard();
+    return true;
+}
 bool replay_native_game_pre_draw_depth(State& s,ID3D11DeviceContext* ctx,
                                       UINT width,UINT height) noexcept {
     if(!s.preDrawDepth.count)return true;
@@ -5838,6 +5858,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         s.backend.begin_frame(s.clearColor.native_color(
             reinterpret_cast<std::uintptr_t>(game),
             reinterpret_cast<std::uintptr_t>(targetIdentity.Get()), kBackground));
+        if (!replay_native_game_pre_draw_surface(s,context,
+                reinterpret_cast<std::uintptr_t>(game),
+                reinterpret_cast<std::uintptr_t>(targetIdentity.Get()),
+                source.Width,source.Height,static_cast<std::uint32_t>(source.Format)))
+            return false;
         if (s.preDrawFills.count != 0u) {
             // Both genuine programmable SM3 and fixed-function native
             // Draws now replay the same game-authored rect/color sequence.
@@ -6637,6 +6662,12 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         s.backend.begin_frame(env_full_game_opt_in()
             ? s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)
             : kBackground);
+        if (!replay_native_game_pre_draw_surface(s,ctx,
+                s.sourceGameDevice,output.targetIdentity,s.nativeWidth,
+                s.nativeHeight,static_cast<std::uint32_t>(
+                    s.clearColor.opaqueDestinationAlpha ?
+                    D3DFMT_X8R8G8B8 : D3DFMT_A8R8G8B8)))
+            return false;
         if (s.preDrawFills.count != 0u) {
             const bool replayed = game_native_replay_pre_draw_fills(
                 s.preDrawFills, s.sourceGameDevice, output.targetIdentity,
@@ -7643,10 +7674,7 @@ bool preserve_game_surface_copy(
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
-        if (s.sourceGameDevice != owner || !s.frameBatch.publishable(s.pending) ||
-            s.surfaceReplayCount >= 8u || !s.backend.ready() ||
-            !s.backend.device() || !s.backend.context() ||
-            !s.backend.color_texture()) return false;
+        if (s.sourceGameDevice != owner || s.surfaceReplayCount >= 8u) return false;
 
         ComPtr<IDirect3DSurface9> backbuffer;
         ComPtr<IUnknown> actualIdentity, backbufferIdentity;
@@ -7668,20 +7696,38 @@ bool preserve_game_surface_copy(
             desc.Width != s.nativeWidth || desc.Height != s.nativeHeight)
             return false;
 
-        const auto region = changedArea
+        const auto changedRegion = changedArea
             ? GameNativeSurfaceCopyRegion::destination(
                 changedArea->left, changedArea->top,
                 changedArea->right, changedArea->bottom,
                 desc.Width, desc.Height)
             : GameNativeSurfaceCopyRegion::destination(
-                0, 0, desc.Width, desc.Height, desc.Width, desc.Height);
+                0,0,desc.Width,desc.Height,desc.Width,desc.Height);
+        if (!changedRegion.valid) return false;
+        const bool preDrawCopy = GameNativePreDrawSurface::capture_allowed(
+            s.clearColor.matches(owner,
+                reinterpret_cast<std::uintptr_t>(actualIdentity.Get())),
+            s.frameBatch.accepts_full(s.sourceDrawsThisFrame),
+            s.frameBatch.submitted==0u && !s.frameBatch.stopped,
+            s.pending,s.cpuSurfaceReplay.active());
+        const bool postDrawCopy = s.frameBatch.publishable(s.pending) &&
+            s.backend.ready() && s.backend.device() &&
+            s.backend.context() && s.backend.color_texture();
+        if (!preDrawCopy && !postDrawCopy) return false;
+        // A complete snapshot includes preceding fills/copies. Subsequent
+        // fills remain individually replayed in their original source order.
+        const auto region = preDrawCopy
+            ? GameNativeSurfaceCopyRegion::destination(
+                0,0,desc.Width,desc.Height,desc.Width,desc.Height)
+            : changedRegion;
         if (!region.valid) return false;
         // No other D3D9 postpass may consume pixels from an open CPU/GDI
         // write. Only the exact locked surface/rectangle may finish it.
         if (s.cpuSurfaceReplay.active() != completingCpuWrite ||
             (completingCpuWrite && !s.cpuSurfaceReplay.matches(
                 owner, reinterpret_cast<std::uintptr_t>(actualIdentity.Get()),
-                region.left, region.top, region.right, region.bottom)))
+                changedRegion.left, changedRegion.top,
+                changedRegion.right, changedRegion.bottom)))
             return false;
 
         // GetRenderTargetData synchronizes real D3D9 pixels. It is explicitly
@@ -7736,6 +7782,15 @@ bool preserve_game_surface_copy(
         }
         const HRESULT unlocked = s.surfaceReplayReadback->UnlockRect();
         if (!copied || FAILED(unlocked)) return false;
+        if (preDrawCopy) {
+            if (!s.preDrawSurface.record(owner,
+                    reinterpret_cast<std::uintptr_t>(actualIdentity.Get()),
+                    desc.Width,desc.Height,static_cast<std::uint32_t>(desc.Format),
+                    s.surfaceReplayPixels)) return false;
+            s.preDrawFills.discard(); // snapshot includes all earlier fills
+            ++s.surfaceReplayCount;
+            return true;
+        }
 
         auto* device = s.backend.device();
         auto* context = s.backend.context();
@@ -7923,6 +7978,7 @@ void observe_game_surface_mutation(
         // overwrite any part of that original menu/vehicle/race image.
         s.frameBatch.abort();
         s.pending = false;
+        s.preDrawSurface.discard();
         s.preDrawFills.discard();
         s.preDrawDepth.discard();
         s.clearColor.discard();
@@ -8248,6 +8304,7 @@ bool preserve_game_color_fill(
                     mainDepthOwner);
                 s.sourceGameDevice = owner;
                 s.frameBatch.reset();
+        s.preDrawSurface.discard();
                 s.preDrawFills.discard();
                 s.preDrawDepth.discard();
                 s.cpuSurfaceReplay.reset();
@@ -8315,6 +8372,8 @@ bool preserve_game_color_fill(
             // Keep the original full Clear seed, depth and Draw ordinals.
             return true;
         }
+        // A genuine full ColorFill erases earlier copied backbuffer color.
+        s.preDrawSurface.discard();
         // A previously submitted scene can be replaced only while its exact
         // D3D11 GPU output remains pending and owned. An old/nonpending
         // batch must not be revived by a later game ColorFill.
@@ -8390,6 +8449,7 @@ void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
             s.clearColor.valid && s.clearColor.sourceDevice == owner;
         if (!ownsDraw && !ownsPreDrawColor) return;
         s.frameBatch.scene_boundary();
+        s.preDrawSurface.discard();
         s.preDrawFills.discard();
         s.preDrawDepth.discard();
         if (ownsPreDrawColor && s.frameBatch.submitted == 0u)
@@ -8618,6 +8678,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         // Only a successful whole-backbuffer Clear may rebind ownership.
         if (!foreignSource) {
             s.clearColor.discard();
+            s.preDrawSurface.discard();
             s.preDrawFills.discard();
             s.preDrawDepth.discard();
         }
@@ -8649,6 +8710,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         if (foreignSource && !sourceReacquired) return;
         if (foreignSource) {
             s.clearColor.discard();
+            s.preDrawSurface.discard();
             s.preDrawFills.discard();
             s.preDrawDepth.discard();
         }
@@ -8676,6 +8738,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             // post-Clear Draw/DrawIndexed on this SAME game device/Present.
             // Never revive a batch after a partial or foreign Clear.
             s.frameBatch.reset();
+        s.preDrawSurface.discard();
             s.cpuSurfaceReplay.reset();
             s.surfaceReplayCount = 0u; // a new verified full Clear starts a new source epoch
             s.pending = false;
@@ -9616,6 +9679,7 @@ void before_game_present(IDirect3DDevice9* game,
         } else if (s.pending) ++s.failed;
         s.pending = false;
         s.frameBatch.reset();
+        s.preDrawSurface.discard();
         s.cpuSurfaceReplay.reset();
         s.clearColor.discard();
         s.preDrawFills.discard();
@@ -9662,6 +9726,7 @@ void before_game_present(IDirect3DDevice9* game,
         State& s = state();
         s.pending = false;
         s.frameBatch.reset();
+        s.preDrawSurface.discard();
         s.cpuSurfaceReplay.reset();
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
@@ -9693,6 +9758,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
         return;
     s.pending = false;
     s.frameBatch.reset();
+        s.preDrawSurface.discard();
     s.cpuSurfaceReplay.reset();
     s.eligibleThisFrame = 0;
     s.sourceDrawsThisFrame = 0u;
