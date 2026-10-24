@@ -1,0 +1,424 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0515KST-A0068-A0069-A0074-NEW-SHA8",
+  "scheduled_slot_kst": "2026-10-25T05:15:00+09:00",
+  "checked_at_kst": "2026-10-25T05:20:22+09:00",
+  "reviewer": "ChatGPT AI1",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source": "N100 SHA-verified exported Korean RGBA PNG",
+  "previous_reviewed_unique_sha_count": 776,
+  "new_reviewed_unique_sha_count": 8,
+  "task_ids": [
+    "OUTRUN-ROI-A-0068-DE194A92",
+    "OUTRUN-ROI-A-0069-B88C35F9",
+    "OUTRUN-ROI-A-0074-55F45974"
+  ],
+  "excluded_already_reviewed_sha256": [
+    "022d077c74831737a9246872a1f25708184b8eae7c5907207a703ae6d4242607"
+  ],
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "records": [
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0068-DE194A92",
+      "source_ordinal": 334,
+      "candidate_file": "Q060_bd509c5bfa15f6b6_source_k.png",
+      "source_file": "Q060_bd509c5bfa15f6b6_source.png",
+      "candidate_sha256": "ab705efb11171ca2dc2bc7f32bb4e25222c04e3f7ba3b58de1b09262d6916fa3",
+      "source_sha256": "83962fec2e2e969a18f5acabb247d4a461b2f1c9a614e0f0c8695913f18a32b2",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "DUMPED!",
+        "korean": "차였어요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1919,
+          820
+        ],
+        "original_roi_dimensions": [
+          1094,
+          295
+        ],
+        "alpha_bbox": [
+          38,
+          105,
+          1878,
+          667
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0,
+        "generated_dimensions_differ_from_source": true
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glpyh_clipping": "NOT_OBSERVED",
+        "plain_Korean_lettering_only": "NO_OBVIOUS_UNNEEDED_BACKGROUND_OR_FRAME",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean glyphs readable; export SHA and source SHA matched; exact approved mapping seen. Standalone enlarged transparent lettering PNG does not prove pixel-safe native UI registration or protection of adjacent original art."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0068-DE194A92",
+      "source_ordinal": 335,
+      "candidate_file": "Q051_d26351d45045cfe3_source_k.png",
+      "source_file": "Q051_d26351d45045cfe3_source.png",
+      "candidate_sha256": "bf9bbfda1fc55adf84d7a8fb3eeb764d03fd35d6fd48888b63c4527b4c76d059",
+      "source_sha256": "b425d783204f204ecd15d549429cb373ed62287e6cf09a54dd6c1adc4775bc86",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Start",
+        "korean": "시작"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1586,
+          992
+        ],
+        "original_roi_dimensions": [
+          713,
+          445
+        ],
+        "alpha_bbox": [
+          482,
+          180,
+          1332,
+          744
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0,
+        "generated_dimensions_differ_from_source": true
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glpyh_clipping": "NOT_OBSERVED",
+        "plain_Korean_lettering_only": "NO_OBVIOUS_UNNEEDED_BACKGROUND_OR_FRAME",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean glyphs readable; export SHA and source SHA matched; exact approved mapping seen. Standalone enlarged transparent lettering PNG does not prove pixel-safe native UI registration or protection of adjacent original art."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0068-DE194A92",
+      "source_ordinal": 336,
+      "candidate_file": "Q051_55bb646a0def753f_source_k.png",
+      "source_file": "Q051_55bb646a0def753f_source.png",
+      "candidate_sha256": "e4b33cb20a2fd6b1a8d9462fa2f8e940aa1be2c9e6a2161a46d0d6a6f2546209",
+      "source_sha256": "adb94ff3ea01aa97ac97c4977383e742d23a777430cdf4d4a7d31f21fd56eaae",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Target",
+        "korean": "목표"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1640,
+          959
+        ],
+        "original_roi_dimensions": [
+          737,
+          431
+        ],
+        "alpha_bbox": [
+          286,
+          202,
+          1383,
+          780
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0,
+        "generated_dimensions_differ_from_source": true
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glpyh_clipping": "NOT_OBSERVED",
+        "plain_Korean_lettering_only": "NO_OBVIOUS_UNNEEDED_BACKGROUND_OR_FRAME",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean glyphs readable; export SHA and source SHA matched; exact approved mapping seen. Standalone enlarged transparent lettering PNG does not prove pixel-safe native UI registration or protection of adjacent original art."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0068-DE194A92",
+      "source_ordinal": 337,
+      "candidate_file": "Q051_a5265b4d80e789f5_source_k.png",
+      "source_file": "Q051_a5265b4d80e789f5_source.png",
+      "candidate_sha256": "cd1f68f3840e5248b887c0219701800451fcfda58f21fd51089bddde50073ff2",
+      "source_sha256": "91be5af6b54562c11e83b11c2a8ef77238eae23d933a707a707d6a3b0ce50c26",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Target",
+        "korean": "목표"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1614,
+          975
+        ],
+        "original_roi_dimensions": [
+          737,
+          445
+        ],
+        "alpha_bbox": [
+          289,
+          216,
+          1311,
+          729
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0,
+        "generated_dimensions_differ_from_source": true
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glpyh_clipping": "NOT_OBSERVED",
+        "plain_Korean_lettering_only": "NO_OBVIOUS_UNNEEDED_BACKGROUND_OR_FRAME",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean glyphs readable; export SHA and source SHA matched; exact approved mapping seen. Standalone enlarged transparent lettering PNG does not prove pixel-safe native UI registration or protection of adjacent original art."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0068-DE194A92",
+      "source_ordinal": 338,
+      "candidate_file": "Q054_aa022a1fbb2de297_source_k.png",
+      "source_file": "Q054_aa022a1fbb2de297_source.png",
+      "candidate_sha256": "ac09bd2cec96d0b82de5a2018fef187f4f0243b5f1baa375bffce189fb31ad61",
+      "source_sha256": "f7a206d4dc624c4dfc55f87543cbf9431087bcf67dc172f05a29b78b99bc0855",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Drive above the speed!",
+        "korean": "지정 속도 이상으로 달리세요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1829,
+          860
+        ],
+        "original_roi_dimensions": [
+          2840,
+          1333
+        ],
+        "alpha_bbox": [
+          29,
+          108,
+          1800,
+          745
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0,
+        "generated_dimensions_differ_from_source": true
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glpyh_clipping": "NOT_OBSERVED",
+        "plain_Korean_lettering_only": "NO_OBVIOUS_UNNEEDED_BACKGROUND_OR_FRAME",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean glyphs readable; export SHA and source SHA matched; exact approved mapping seen. Standalone enlarged transparent lettering PNG does not prove pixel-safe native UI registration or protection of adjacent original art."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0069-B88C35F9",
+      "source_ordinal": 339,
+      "candidate_file": "Q054_f814af9296b82f30_source_k.png",
+      "source_file": "Q054_f814af9296b82f30_source.png",
+      "candidate_sha256": "d187ab5590f20cc65b5fc6ab50818da79331fdea65b7c0bdaf46ed134fc47288",
+      "source_sha256": "7ab2cf3c47cd3e3f90f3ff848f4658318eb3cb70638cb68126464b95426b7c67",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Count Blue Cars!",
+        "korean": "파란색 차를 세세요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2081,
+          755
+        ],
+        "original_roi_dimensions": [
+          1298,
+          471
+        ],
+        "alpha_bbox": [
+          33,
+          30,
+          1947,
+          667
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0,
+        "generated_dimensions_differ_from_source": true
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glpyh_clipping": "NOT_OBSERVED",
+        "plain_Korean_lettering_only": "NO_OBVIOUS_UNNEEDED_BACKGROUND_OR_FRAME",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean glyphs readable; export SHA and source SHA matched; exact approved mapping seen. Standalone enlarged transparent lettering PNG does not prove pixel-safe native UI registration or protection of adjacent original art."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0069-B88C35F9",
+      "source_ordinal": 340,
+      "candidate_file": "Q054_08c520d352b032a0_source_k.png",
+      "source_file": "Q054_08c520d352b032a0_source.png",
+      "candidate_sha256": "c02351133ca80618a9bd7d5ef71c227fb5f4677bb69e51d43721444f125e8237",
+      "source_sha256": "5df93caf1f25e926feca7ed8f6622ecb63233412d44aea18c8a32dbb2986545a",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Hit the boost!",
+        "korean": "부스트를 밟으세요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "original_roi_dimensions": [
+          1142,
+          310
+        ],
+        "alpha_bbox": [
+          260,
+          84,
+          1951,
+          611
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0,
+        "generated_dimensions_differ_from_source": true
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glpyh_clipping": "NOT_OBSERVED",
+        "plain_Korean_lettering_only": "NO_OBVIOUS_UNNEEDED_BACKGROUND_OR_FRAME",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean glyphs readable; export SHA and source SHA matched; exact approved mapping seen. Standalone enlarged transparent lettering PNG does not prove pixel-safe native UI registration or protection of adjacent original art."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0074-55F45974",
+      "source_ordinal": 364,
+      "candidate_file": "Q063_961450721720e810_source_k.png",
+      "source_file": "Q063_961450721720e810_source.png",
+      "candidate_sha256": "30bb230f912fc1a833b0c38245e54e552d8229e9caf33985ff0f7db381f5f5e9",
+      "source_sha256": "720341d23f055bb2cdad38a9d5a08cffb090770abae1158b11fd2d147fb741ea",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "START",
+        "korean": "출발"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1500,
+          1049
+        ],
+        "original_roi_dimensions": [
+          366,
+          256
+        ],
+        "alpha_bbox": [
+          74,
+          55,
+          1375,
+          992
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0,
+        "generated_dimensions_differ_from_source": true
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glpyh_clipping": "NOT_OBSERVED",
+        "plain_Korean_lettering_only": "NO_OBVIOUS_UNNEEDED_BACKGROUND_OR_FRAME",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean glyphs readable; export SHA and source SHA matched; exact approved mapping seen. Standalone enlarged transparent lettering PNG does not prove pixel-safe native UI registration or protection of adjacent original art."
+      }
+    }
+  ],
+  "restrictions": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_auto_deployed": false,
+    "C2_C3_or_game_pass_created": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence_on_N100": [
+    "work/C1_QA_20261025_0515_preflight.json",
+    "work/C1_QA_20261025_0515_pairs_1.jpg",
+    "work/C1_QA_20261025_0515_pairs_2.jpg"
+  ]
+}
