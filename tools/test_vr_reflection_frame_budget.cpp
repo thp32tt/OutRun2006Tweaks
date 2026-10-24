@@ -108,7 +108,7 @@ int main()
     const auto optedLate = Advance(0.0f, 0.5f, 0.5f, true, true, true);
     assert(originalLate.faces == 1);
     assert(optedLate.faces == 0);
-    assert(optedLate.pendingFaces > 0.f && optedLate.pendingFaces < originalLate.pendingFaces);
+    assert(optedLate.pendingFaces > originalLate.pendingFaces && optedLate.pendingFaces < 1.0f);
     // No effect outside VR-normalized mode; malformed configuration and
     // disabling reflection still clear debt on both variants.
     const auto desktopA = Advance(0.0f, 0.5f, 1.0f, false, true, false);
