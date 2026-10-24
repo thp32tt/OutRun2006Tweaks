@@ -308,7 +308,7 @@ def check_packaged_f11_plane_scale() -> None:
     assert "R30BuildHudPlaneCoefficients(state, false)" not in f11
     assert "GetLatchedHeadInverse(" not in f11
     assert "MatrixFromQuaternionTranslation(" not in f11
-    assert "R30BuildHudPlaneCoefficients(state, true)" in gameplay
+    assert "R30BuildHudPlaneCoefficients(state, !externalF11)" in gameplay
     assert "!R30SafeStereoBase(device)" in f11
     assert "ExternalOverlaySemanticDepth == 0" in f11
     assert "CurrentVertexShaderIdentity.load(" in f11
