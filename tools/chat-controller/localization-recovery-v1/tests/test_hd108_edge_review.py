@@ -80,6 +80,114 @@ class EdgeReviewTests(unittest.TestCase):
                 mod.LEGACY_ALLOWED_ROOTS=old_roots
                 mod.ocr.approved_phrases=old_phrases
 
+
+    def test_legacy_layout_suffix_alias_maps_only_to_reviewed_phrase(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            legacy_root=root/"legacy"; src=root/"src"; out=root/"out"; report=root/"report"
+            legacy_root.mkdir(); src.mkdir(); out.mkdir(); report.mkdir()
+            name="Q012_TEST.png"
+            current=Image.new("RGBA",(120,70),(0,0,0,0))
+            draw=ImageDraw.Draw(current)
+            draw.rectangle([30,25,70,40],fill=(255,255,255,255))
+            current.save(src/name,compress_level=1)
+            old=legacy_root/"q012_old.png"
+            current.save(old,compress_level=9)
+            items=[{
+                "id":"Q012-CONTINUE_QUESTION",
+                "source_path":"legacy/q012_old.png",
+                "bbox_xyxy":[20,15,80,50],
+            }]
+            items.extend({"id":f"BAD-{i}"} for i in range(254))
+            master=root/"master.json"
+            master.write_text(json.dumps({"items":items}),encoding="utf-8")
+            row={
+                "png_filename":name,
+                "png_sha256":hashlib.sha256((src/name).read_bytes()).hexdigest(),
+                "png_size_bytes":str((src/name).stat().st_size),
+                "width":"120","height":"70","queue_indexes":"012",
+                "source_dds_path":"textures/Q012.dds","dds_sha256":"a"*64,
+            }
+            old_master=mod.discover.MASTER
+            old_report=mod.REPORT
+            old_home=mod.LEGACY_HOME
+            old_roots=mod.LEGACY_ALLOWED_ROOTS
+            old_phrases=mod.ocr.approved_phrases
+            try:
+                mod.discover.MASTER=master
+                mod.REPORT=report
+                mod.LEGACY_HOME=root
+                mod.LEGACY_ALLOWED_ROOTS=(legacy_root,)
+                mod.ocr.approved_phrases=lambda q:{"CONTINUE":"Continue?"} if q=="Q012" else {}
+                q,phrase=mod._legacy_phrase_for_item(items[0])
+                self.assertEqual((q,phrase),("Q012","Continue?"))
+                result=mod.recover_legacy_pixel_equal([row],max_new=10,src_root=src,out_root=out)
+                self.assertEqual(result["recovered"],1)
+                recovered=json.loads(next(out.glob("Q012_TEST/*/manifest.json")).read_text())
+                self.assertEqual(recovered["english"],"Continue?")
+                self.assertEqual(recovered["bbox_xyxy"],[20,15,80,50])
+            finally:
+                mod.discover.MASTER=old_master
+                mod.REPORT=old_report
+                mod.LEGACY_HOME=old_home
+                mod.LEGACY_ALLOWED_ROOTS=old_roots
+                mod.ocr.approved_phrases=old_phrases
+
+    def test_cross_variant_recovery_requires_exact_rgba_region(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); src=root/"src"; out=root/"out"
+            src.mkdir(); out.mkdir()
+            ref_name="Q051_REF.png"; target_name="Q051_TARGET.png"
+            ref=Image.new("RGBA",(120,80),(0,0,0,0))
+            d=ImageDraw.Draw(ref); d.rectangle([30,25,60,35],fill=(255,255,255,255))
+            target=ref.copy()
+            ImageDraw.Draw(target).rectangle([100,60,110,70],fill=(255,0,0,255))
+            ref.save(src/ref_name); target.save(src/target_name)
+            ref_sha=hashlib.sha256((src/ref_name).read_bytes()).hexdigest()
+            target_sha=hashlib.sha256((src/target_name).read_bytes()).hexdigest()
+            self.assertNotEqual(ref_sha,target_sha)
+            box=[20,15,70,45]
+            folder=out/"Q051_REF"/"crop"; folder.mkdir(parents=True)
+            crop=ref.crop(tuple(box)); crop.save(folder/"english_original_native_crop.png")
+            crop_sha=hashlib.sha256((folder/"english_original_native_crop.png").read_bytes()).hexdigest()
+            (folder/"manifest.json").write_text(json.dumps({
+                "status":"CROP_TEST_ONLY_REVIEW_REQUIRED",
+                "source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+                "source_png":ref_name,"source_sha256":ref_sha,
+                "reference_dds_path":"textures/ref.dds","reference_dds_sha256":"a"*64,
+                "queue_indexes":"051","english":"PLAY","bbox_xyxy":box,
+                "source_dimensions":[120,80],"crop_dimensions":[50,30],
+                "crop_sha256":crop_sha,"edge_warning":None,
+                "old_split_tiles_used":False,
+            }),encoding="utf-8")
+            rows=[
+                {"png_filename":ref_name,"png_sha256":ref_sha,
+                 "png_size_bytes":str((src/ref_name).stat().st_size),
+                 "width":"120","height":"80","queue_indexes":"051",
+                 "source_dds_path":"textures/ref.dds","dds_sha256":"a"*64},
+                {"png_filename":target_name,"png_sha256":target_sha,
+                 "png_size_bytes":str((src/target_name).stat().st_size),
+                 "width":"120","height":"80","queue_indexes":"051",
+                 "source_dds_path":"textures/target.dds","dds_sha256":"b"*64},
+            ]
+            old_phrases=mod.ocr.approved_phrases
+            try:
+                mod.ocr.approved_phrases=lambda q:{"PLAY":"PLAY"} if q=="Q051" else {}
+                result=mod.recover_cross_variant_exact_regions(
+                    rows,max_new=10,src_root=src,out_root=out)
+                self.assertEqual(result["recovered"],1)
+                manifests=list((out/"Q051_TARGET").glob("*/manifest.json"))
+                self.assertEqual(len(manifests),1)
+                recovered=json.loads(manifests[0].read_text())
+                self.assertEqual(recovered["english"],"PLAY")
+                self.assertEqual(recovered["bbox_xyxy"],box)
+                self.assertTrue(recovered["cross_variant_region_rgba_equality"])
+                target_crop=manifests[0].parent/"english_original_native_crop.png"
+                with Image.open(target_crop) as got:
+                    self.assertEqual(got.convert("RGBA").tobytes(),crop.tobytes())
+            finally:
+                mod.ocr.approved_phrases=old_phrases
+
     def test_warning_crop_can_be_rescued_by_safe_expansion(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
