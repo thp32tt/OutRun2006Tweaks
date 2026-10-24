@@ -270,7 +270,7 @@ def check_stage_extension_direct_owner(text: str) -> None:
     leave = function_body(text, "static void StageExtensionLeave(")
     install = function_body(text, "static void Install") if "static void Install" in text else text
     expected = (
-        "Settings::VREnabled &&",
+        "Settings::VREnabled && goalSummary",
         "GameSemantic::SpriteQueueDepth == 0",
         "StageExtensionDirectDrawOwner.emplace(",
         "RenderScope::ScreenHud,",
@@ -284,27 +284,27 @@ def check_stage_extension_direct_owner(text: str) -> None:
     # before entering native D3DX. Merely finding another == 0 later in
     # the function would let a mutated source snapshot escape this guard.
     if re.search(
-        r"StageExtensionAdmission\s*=\s*\{\s*Settings::VREnabled\s*,\s*"
+        r"StageExtensionAdmission\s*=\s*\{\s*Settings::VREnabled\s*&&\s*goalSummary\s*,\s*"
         r"!OutRunVR::GameSemantic::QueueRenderActive\(\)\s*,\s*"
         r"OutRunVR::GameSemantic::CurrentQueueNodeEpoch\(\)\s*\}",
         enter,
     ) is None:
-        fail("stage +TIME entry VR/queue snapshot lost")
+        fail("GOAL post-table entry VR/state/queue snapshot lost")
     if re.search(
-        r"if\s*\(\s*Settings::VREnabled\s*&&\s*"
-        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*&&\s*"
-        r"StageExtensionAdmission\.mayBeginDirect\(\)\s*\)",
+        r"if\s*\(\s*StageExtensionAdmission\.mayBeginDirect\(\)\s*&&\s*"
+        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*\)",
         enter,
     ) is None:
-        fail("stage +TIME live VR/queue direct ownership fence lost")
+        fail("GOAL post-table live direct ownership fence lost")
     if re.search(
         r"if\s*\(\s*StageExtensionAdmission\.mayPublish\(\s*"
-        r"Settings::VREnabled\s*,\s*"
+        r"Settings::VREnabled\s*&&\s*Game::current_mode\s*&&\s*"
+        r"\*Game::current_mode\s*==\s*GameState::STATE_GOAL\s*,\s*"
         r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*,\s*"
         r"OutRunVR::GameSemantic::CurrentQueueNodeEpoch\(\)\s*\)\s*\)",
         leave,
     ) is None:
-        fail("stage +TIME queued sibling/native flush exit admission lost")
+        fail("GOAL post-table queued sibling/native flush state guard lost")
     if "GameSemantic::CurrentScope =" in enter:
         fail("stage +TIME immediate parent overrides an active sprite queue")
     for marker in (
