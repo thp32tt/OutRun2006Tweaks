@@ -1,0 +1,338 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0345KST-B0085-A0071-NEW-SHA7",
+  "scheduled_slot_kst": "2026-10-25T03:45:00+09:00",
+  "checked_at_kst": "2026-10-25T03:49:02+09:00",
+  "reviewer": "ChatGPT AI1",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "task_ids": [
+    "OUTRUN-ROI-B-0085-419B320E",
+    "OUTRUN-ROI-A-0071-9404538C"
+  ],
+  "previous_reviewed_unique_sha_count": 753,
+  "newly_reviewed_unique_sha_count": 7,
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 7
+  },
+  "policy_paths": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "records": [
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0085-419B320E",
+      "ordinal": 409,
+      "source_file": "Q057_2d0b076fe8bd6526_source.png",
+      "source_sha256": "1fff85748e717d69bbc1edeb69e58588aa1adfe5fa47c3b0049c0ab50577f741",
+      "candidate_file": "Q057_2d0b076fe8bd6526_source_k.png",
+      "candidate_sha256": "925bf843c059df7134a30e754bd700a6979216ed50dd1d73f3881a679bb9e535",
+      "english": "MISSION CLEARED!",
+      "approved_korean": "미션 성공!",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1737,
+        906
+      ],
+      "source_dimensions": [
+        2864,
+        1493
+      ],
+      "candidate_alpha_bbox": [
+        33,
+        72,
+        1725,
+        880
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable Korean lettering '미션 성공!' matches approved mapping for 'MISSION CLEARED!'. Native placement against original atlas UI cell and protected adjacent graphics not demonstrated; C1 image-only evidence is insufficient for placement PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0085-419B320E",
+      "ordinal": 410,
+      "source_file": "Q057_f32b407ab881480b_source.png",
+      "source_sha256": "b0d034faba4d35649702609021625191d58d1ba5d6c725c4708b24270f21309a",
+      "candidate_file": "Q057_f32b407ab881480b_source_k.png",
+      "candidate_sha256": "6b714ceee0f496388a196d6e40bfba5a11314d7e0845f59d365ef5871d15144f",
+      "english": "STORING ONLINE RECORD...",
+      "approved_korean": "온라인 기록 저장 중...",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        2031,
+        471
+      ],
+      "candidate_alpha_bbox": [
+        60,
+        228,
+        2128,
+        692
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable Korean lettering '온라인 기록 저장 중...' matches approved mapping for 'STORING ONLINE RECORD...'. Native placement against original atlas UI cell and protected adjacent graphics not demonstrated; C1 image-only evidence is insufficient for placement PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0085-419B320E",
+      "ordinal": 411,
+      "source_file": "Q057_dacaabfe0dc57dc0_source.png",
+      "source_sha256": "40687781990de34d25db188302f8eaf8f24407f3b23c11d0784b8ab7869cc514",
+      "candidate_file": "Q057_dacaabfe0dc57dc0_source_k.png",
+      "candidate_sha256": "35df7591cf814ef10b8d9f41a1425420d684a15201a2dc9242c0359237eefad2",
+      "english": "Hearts",
+      "approved_korean": "하트",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1986,
+        594
+      ],
+      "candidate_alpha_bbox": [
+        162,
+        19,
+        1814,
+        700
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable Korean lettering '하트' matches approved mapping for 'Hearts'. Native placement against original atlas UI cell and protected adjacent graphics not demonstrated; C1 image-only evidence is insufficient for placement PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0085-419B320E",
+      "ordinal": 412,
+      "source_file": "Q057_a5690a31cadbf291_source.png",
+      "source_sha256": "b0f8423df26f4c5b360b75f8029937ec2aa7ef2467937ba651a1024bf62b29c0",
+      "candidate_file": "Q057_a5690a31cadbf291_source_k.png",
+      "candidate_sha256": "785e460ccde09564aa6e03ebf26974ac0dd3db48e532fe44dc50830230906048",
+      "english": "MISSION FAILED!",
+      "approved_korean": "미션 실패!",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1650,
+        953
+      ],
+      "source_dimensions": [
+        3326,
+        1921
+      ],
+      "candidate_alpha_bbox": [
+        31,
+        47,
+        1640,
+        919
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable Korean lettering '미션 실패!' matches approved mapping for 'MISSION FAILED!'. Native placement against original atlas UI cell and protected adjacent graphics not demonstrated; C1 image-only evidence is insufficient for placement PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0085-419B320E",
+      "ordinal": 413,
+      "source_file": "Q057_86294fdb94d0324c_source.png",
+      "source_sha256": "e05844490400701ebd9f86f8761ef5ec49f64de1933d598f2e6171b00a3e2520",
+      "candidate_file": "Q057_86294fdb94d0324c_source_k.png",
+      "candidate_sha256": "22b8510c24c9bb75e3de8a524bae8185816c4e904b21e2ffff222db2f38de554",
+      "english": "Collect the stars!",
+      "approved_korean": "별을 모으세요!",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1792,
+        878
+      ],
+      "source_dimensions": [
+        962,
+        471
+      ],
+      "candidate_alpha_bbox": [
+        57,
+        151,
+        1762,
+        781
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable Korean lettering '별을 모으세요!' matches approved mapping for 'Collect the stars!'. Native placement against original atlas UI cell and protected adjacent graphics not demonstrated; C1 image-only evidence is insufficient for placement PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0071-9404538C",
+      "ordinal": 352,
+      "source_file": "Q057_43d4b0296b784f18_source.png",
+      "source_sha256": "40687781990de34d25db188302f8eaf8f24407f3b23c11d0784b8ab7869cc514",
+      "candidate_file": "Q057_43d4b0296b784f18_source_k.png",
+      "candidate_sha256": "94ed5d25f4fe27e3f8382680124a551a349b4793f629db55c0c846325f4c23ea",
+      "english": "Hearts",
+      "approved_korean": "하트",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1986,
+        594
+      ],
+      "candidate_alpha_bbox": [
+        427,
+        103,
+        1738,
+        644
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable Korean lettering '하트' matches approved mapping for 'Hearts'. Native placement against original atlas UI cell and protected adjacent graphics not demonstrated; C1 image-only evidence is insufficient for placement PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0071-9404538C",
+      "ordinal": 353,
+      "source_file": "Q057_c7229b9926b666b4_source.png",
+      "source_sha256": "1fff85748e717d69bbc1edeb69e58588aa1adfe5fa47c3b0049c0ab50577f741",
+      "candidate_file": "Q057_c7229b9926b666b4_source_k.png",
+      "candidate_sha256": "25169f67d59cdde83387011b5cb19148aafc1599791a4b1ee2b98201728bd38a",
+      "english": "MISSION CLEARED!",
+      "approved_korean": "미션 성공!",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1737,
+        906
+      ],
+      "source_dimensions": [
+        2864,
+        1493
+      ],
+      "candidate_alpha_bbox": [
+        19,
+        23,
+        1720,
+        841
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable Korean lettering '미션 성공!' matches approved mapping for 'MISSION CLEARED!'. Native placement against original atlas UI cell and protected adjacent graphics not demonstrated; C1 image-only evidence is insufficient for placement PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "evidence": {
+    "preflight_n100": "work/C1_QA_20261025_0345_preflight.json",
+    "B_contact_sheet_n100": "work/C1_QA_20261025_0345_B_pairs.jpg",
+    "A_contact_sheet_n100": "work/C1_QA_20261025_0345_A_pairs.jpg",
+    "inspection_script_n100": "work/C1_QA_20261025_0345_inspect.py",
+    "B_export": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0085-419B320E.json",
+    "A_export": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0071-9404538C.json",
+    "mapping": "work/image-src/text_roi_batches/production_manifest.json"
+  },
+  "caveats": [
+    "Composite original ROI includes adjacent graphics and UI text; native target-cell alignment, surrounding pixel safety and final blend not verified.",
+    "Candidate bitmap dimensions may differ from ROI dimensions; size difference by itself does not produce FAIL.",
+    "No candidate failed solely for narrower Korean sentence width or smaller glyphs."
+  ],
+  "constraints": {
+    "imagegen_called": false,
+    "A_B_queues_consumed": false,
+    "new_DDS_written": false,
+    "final_deployment": false,
+    "C2_C3_or_game_PASS_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}
