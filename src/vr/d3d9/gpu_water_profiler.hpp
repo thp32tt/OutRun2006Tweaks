@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include "gpu_census_phase.hpp"
 namespace OutRunVRStereo::GpuWaterProbe {
 // Diagnostic dispatch categories, NOT confirmed material/producers.
 enum class DrawRoute : std::size_t {
@@ -18,12 +19,23 @@ inline bool Enabled() noexcept {
     static const bool on=[] { const char* v=std::getenv("OUTRUN_VR_GPU_PROFILE"); return v && std::strcmp(v,"1")==0; }();
     return on;
 }
+// Completely opt-in; normal render has no additional COM identity queries.
+inline bool CensusV2Enabled() noexcept {
+    static const bool on=[] {
+        if(!Enabled()) return false;
+        const char* v=std::getenv("OUTRUN_VR_GPU_PROFILE_CENSUS_V2");
+        return v && std::strcmp(v,"1")==0;
+    }();
+    return on;
+}
 struct Slot {
     IDirect3DQuery9 *disjoint=nullptr,*freq=nullptr,*begin=nullptr,*end=nullptr,*sampleBegin=nullptr,*sampleEnd=nullptr;
     bool pending=false,sampleSet=false,blend=false;
     unsigned draws=0, samples=0, blendSamples=0, alphaTestSamples=0, pick=0;
     unsigned noDepthWriteSamples=0, depthDisabledSamples=0, stencilSamples=0, pixelShaderSamples=0, fixedFunctionSamples=0;
     unsigned rtSamples=0, offscreenRtSamples=0, multisampleRtSamples=0;
+    unsigned censusEligible=0, verifiedBackbufferRtSamples=0;
+    unsigned verifiedNonBackbufferRtSamples=0, rtIdentityUnknownSamples=0;
     void release() noexcept {
         for(IDirect3DQuery9** q : {&disjoint,&freq,&begin,&end,&sampleBegin,&sampleEnd}) {
             if(*q) { (*q)->Release(); *q=nullptr; }
@@ -52,6 +64,8 @@ class Meter {
     std::uint64_t frame_=0, samples_=0, alpha_=0, alphaTest_=0, frames_=0, dropped_=0, invalid_=0, timedBlend_=0, timedOpaque_=0;
     std::uint64_t noDepthWrite_=0, depthDisabled_=0, stencil_=0, pixelShader_=0, fixedFunction_=0;
     std::uint64_t rtSamples_=0, offscreenRtSamples_=0, multisampleRtSamples_=0;
+    std::uint64_t censusEligible_=0, verifiedBackbufferRtSamples_=0;
+    std::uint64_t verifiedNonBackbufferRtSamples_=0, rtIdentityUnknownSamples_=0;
     // Logical R33 hook calls versus routes taken. Unclassified calls include
     // raster-guard bypasses; they must NOT be called glass/water by inference.
     std::uint64_t logicalDrawCalls_=0;
@@ -90,6 +104,10 @@ class Meter {
             fixedFunction_+=s.fixedFunctionSamples;
             rtSamples_+=s.rtSamples; offscreenRtSamples_+=s.offscreenRtSamples;
             multisampleRtSamples_+=s.multisampleRtSamples;
+            censusEligible_+=s.censusEligible;
+            verifiedBackbufferRtSamples_+=s.verifiedBackbufferRtSamples;
+            verifiedNonBackbufferRtSamples_+=s.verifiedNonBackbufferRtSamples;
+            rtIdentityUnknownSamples_+=s.rtIdentityUnknownSamples;
             if(s.sampleSet) {
                 const double drawMs=double(y-x)*1000.0/double(f);
                 if(s.blend){++timedBlend_;sumBlend_+=drawMs;}else{++timedOpaque_;sumOpaque_+=drawMs;}
@@ -108,7 +126,7 @@ class Meter {
             return gpuSpans_[(std::max)(size_t{1},n)-1];
         };
         const char* scene=std::getenv("OUTRUN_VR_GPU_SCENE");
-        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} dropped={} invalid={} logicalDrawCalls={} xyzrhwRoutes={} hudRoutes={} fastWorldRoutes={} r29FallbackRoutes={} stateBlockRawRoutes={} otherGuardRoutes={} waterAttribution=UNPROVEN",
+        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} dropped={} invalid={} logicalDrawCalls={} xyzrhwRoutes={} hudRoutes={} fastWorldRoutes={} r29FallbackRoutes={} stateBlockRawRoutes={} otherGuardRoutes={} censusMode={} censusEligible={} verifiedBackbufferRtSamples={} verifiedNonBackbufferRtSamples={} rtIdentityUnknownSamples={} waterAttribution=UNPROVEN",
             scene?scene:"NONE",frames_,frames_?sumFrame_/frames_:0.0,
             percentile(0.50),percentile(0.95),percentile(0.99),maxFrame_,
             gpuSpanCount_,gpuSpanOverflow_,
@@ -121,10 +139,15 @@ class Meter {
             logicalDrawCalls_ >= (routeCounts_[0]+routeCounts_[1]+routeCounts_[2]+
                 routeCounts_[3]+routeCounts_[4])
                 ? logicalDrawCalls_ - (routeCounts_[0]+routeCounts_[1]+routeCounts_[2]+
-                    routeCounts_[3]+routeCounts_[4]) : 0);
+                    routeCounts_[3]+routeCounts_[4]) : 0,
+            CensusV2Enabled() ? "DEPHASED_OPT_IN" : "LEGACY",
+            censusEligible_,verifiedBackbufferRtSamples_,
+            verifiedNonBackbufferRtSamples_,rtIdentityUnknownSamples_);
         samples_=alpha_=alphaTest_=frames_=dropped_=invalid_=timedBlend_=timedOpaque_=0;
         noDepthWrite_=depthDisabled_=stencil_=pixelShader_=fixedFunction_=0;
         rtSamples_=offscreenRtSamples_=multisampleRtSamples_=0;
+        censusEligible_=verifiedBackbufferRtSamples_=0;
+        verifiedNonBackbufferRtSamples_=rtIdentityUnknownSamples_=0;
         sumFrame_=maxFrame_=sumBlend_=sumOpaque_=0;
         logicalDrawCalls_=0;
         routeCounts_.fill(0);
@@ -154,6 +177,8 @@ public:
         timedBlend_=timedOpaque_=0;
         noDepthWrite_=depthDisabled_=stencil_=pixelShader_=fixedFunction_=0;
         rtSamples_=offscreenRtSamples_=multisampleRtSamples_=0;
+        censusEligible_=verifiedBackbufferRtSamples_=0;
+        verifiedNonBackbufferRtSamples_=rtIdentityUnknownSamples_=0;
         logicalDrawCalls_=0; routeCounts_.fill(0);
         sumFrame_=maxFrame_=sumBlend_=sumOpaque_=0.0;
         gpuSpanCount_=gpuSpanOverflow_=0;
@@ -181,6 +206,8 @@ public:
             s.noDepthWriteSamples=s.depthDisabledSamples=s.stencilSamples=0;
             s.pixelShaderSamples=s.fixedFunctionSamples=0;
             s.rtSamples=s.offscreenRtSamples=s.multisampleRtSamples=0;
+            s.censusEligible=s.verifiedBackbufferRtSamples=0;
+            s.verifiedNonBackbufferRtSamples=s.rtIdentityUnknownSamples=0;
             s.sampleSet=false;
             s.pick=static_cast<unsigned>((frame_*997u+13u)%lastDraws_);
             if(FAILED(s.disjoint->Issue(D3DISSUE_BEGIN))||FAILED(s.begin->Issue(D3DISSUE_END))) {
@@ -191,8 +218,14 @@ public:
         Slot& s=*active_;
         const unsigned i=s.draws++;
         const bool sample=((i+static_cast<unsigned>(frame_*7u))&15u)==0;
+        // Legacy accidental nested modulo predicates only census one frame
+        // phase in sixteen. Optional V2 rotates through all 64 Draw indices.
+        const bool census=CensusV2Enabled()
+            ? GpuCensusPhase::Dephased(frame_,i)
+            : GpuCensusPhase::Legacy(frame_,i);
         const bool time=i==s.pick;
-        if(!sample&&!time) return false;
+        if(!sample&&!time&&!census) return false;
+        if(census) ++s.censusEligible;
         DWORD alpha=FALSE,test=FALSE;
         const bool valid=SUCCEEDED(d->GetRenderState(D3DRS_ALPHABLENDENABLE,&alpha)) &&
                          SUCCEEDED(d->GetRenderState(D3DRS_ALPHATESTENABLE,&test));
@@ -202,32 +235,51 @@ public:
             if(SUCCEEDED(d->GetRenderState(D3DRS_ZWRITEENABLE,&zWrite))) s.noDepthWriteSamples+=(zWrite==FALSE);
             if(SUCCEEDED(d->GetRenderState(D3DRS_ZENABLE,&zEnable))) s.depthDisabledSamples+=(zEnable==D3DZB_FALSE);
             if(SUCCEEDED(d->GetRenderState(D3DRS_STENCILENABLE,&stencil))) s.stencilSamples+=(stencil!=FALSE);
-            if((i&63u)==0) {
-                // Sparse RT census distinguishes main-eye-sized and smaller
-                // offscreen effects. Dimensions alone cannot prove a water pass.
-                // COM GetRenderTarget AddRef must be balanced in every branch.
-                IDirect3DSurface9* target=nullptr;
-                if(SUCCEEDED(d->GetRenderTarget(0,&target)) && target){
-                    D3DSURFACE_DESC desc{};
-                    if(SUCCEEDED(target->GetDesc(&desc))){
-                        ++s.rtSamples;
-                        if(!referenceWidth_ || !referenceHeight_){
-                            referenceWidth_=desc.Width;
-                            referenceHeight_=desc.Height;
-                        }
-                        s.offscreenRtSamples+=
-                            (desc.Width < referenceWidth_ || desc.Height < referenceHeight_);
-                        s.multisampleRtSamples+=(desc.MultiSampleType != D3DMULTISAMPLE_NONE);
+        }
+        if(census && (CensusV2Enabled() || valid)) {
+            // Preserve dimension-only heuristic as a SEPARATE legacy datum.
+            IDirect3DSurface9* target=nullptr;
+            if(SUCCEEDED(d->GetRenderTarget(0,&target)) && target){
+                D3DSURFACE_DESC desc{};
+                if(SUCCEEDED(target->GetDesc(&desc))){
+                    ++s.rtSamples;
+                    if(!referenceWidth_ || !referenceHeight_){
+                        referenceWidth_=desc.Width;
+                        referenceHeight_=desc.Height;
                     }
-                    target->Release();
+                    s.offscreenRtSamples+=
+                        (desc.Width < referenceWidth_ || desc.Height < referenceHeight_);
+                    s.multisampleRtSamples+=(desc.MultiSampleType != D3DMULTISAMPLE_NONE);
+                    if(CensusV2Enabled()){
+                        // Query canonical COM IUnknown, not matching dimensions.
+                        // "Non-backbuffer" is NOT proof of original water/glass.
+                        IDirect3DSurface9* backbuffer=nullptr;
+                        if(SUCCEEDED(d->GetBackBuffer(0,0,D3DBACKBUFFER_TYPE_MONO,&backbuffer)) && backbuffer){
+                            IUnknown* targetIdentity=nullptr;
+                            IUnknown* backbufferIdentity=nullptr;
+                            const bool identified=
+                                SUCCEEDED(target->QueryInterface(IID_IUnknown,
+                                    reinterpret_cast<void**>(&targetIdentity))) &&
+                                targetIdentity &&
+                                SUCCEEDED(backbuffer->QueryInterface(IID_IUnknown,
+                                    reinterpret_cast<void**>(&backbufferIdentity))) &&
+                                backbufferIdentity;
+                            if(identified){
+                                s.verifiedBackbufferRtSamples+=(targetIdentity==backbufferIdentity);
+                                s.verifiedNonBackbufferRtSamples+=(targetIdentity!=backbufferIdentity);
+                            }else ++s.rtIdentityUnknownSamples;
+                            if(targetIdentity) targetIdentity->Release();
+                            if(backbufferIdentity) backbufferIdentity->Release();
+                        }else ++s.rtIdentityUnknownSamples;
+                        if(backbuffer) backbuffer->Release();
+                    }
                 }
+                target->Release();
             }
-            if((i&63u)==0) { // lower-rate shader sample: GetPixelShader AddRef must be released
-                IDirect3DPixelShader9* ps=nullptr;
-                if(SUCCEEDED(d->GetPixelShader(&ps))) {
-                    if(ps) { ++s.pixelShaderSamples; ps->Release(); }
-                    else ++s.fixedFunctionSamples;
-                }
+            IDirect3DPixelShader9* ps=nullptr;
+            if(SUCCEEDED(d->GetPixelShader(&ps))) {
+                if(ps) { ++s.pixelShaderSamples; ps->Release(); }
+                else ++s.fixedFunctionSamples;
             }
         }
         if(!time||!valid||FAILED(s.sampleBegin->Issue(D3DISSUE_END))) return false;
