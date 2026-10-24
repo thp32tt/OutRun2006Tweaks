@@ -8320,21 +8320,33 @@ bool preserve_game_color_fill(
                 true, SUCCEEDED(originalResult), sameGameBackbuffer,
                 sameGameBackbuffer, true, !s.frameBatch.stopped,
                 wholeTargetReady)) return false;
-        // A full source ColorFill AFTER an authentic game Draw overwrote
-        // every source color pixel. Simply updating the seed/RTV leaves the
-        // OLD submitted Draws publishable, even though their GPU pixels were
-        // erased. Retire this source batch (and asynchronous publication)
-        // until a new verified full scene epoch; the original D3D9 result
-        // remains authoritative. Pre-Draw fills still update their seed.
+        // A real post-Draw whole-backbuffer ColorFill overwrites all source
+        // COLOR. Start a new contiguous native Draw epoch only if all earlier
+        // source draws were mirrored, no depth writes survived and the
+        // authoritative game ColorFill target was fully verified above.
+        // ColorFill does NOT clear game Z: the epoch explicitly rejects
+        // subsequent depth-dependent draws. Otherwise retire the candidate.
         if (native_game_color_fill_retires_draw_batch(
                 wholeSurface, alreadyDrawn)) {
-            s.frameBatch.abort();
+            const bool restarted = s.frameBatch.restart_after_full_color_fill(
+                s.sourceDrawsThisFrame);
             s.pending = false;
             s.preDrawFills.discard();
             s.preDrawDepth.discard();
-            s.clearColor.discard();
+            s.cpuSurfaceReplay.reset();
+            s.surfaceReplayCount = 0u;
             if (++s.outputGeneration == 0u) ++s.outputGeneration;
-            return false;
+            if (!restarted) {
+                s.frameBatch.abort();
+                s.clearColor.discard();
+                return false; // Original D3D9 pixels/input stay authoritative.
+            }
+            // The first native Draw of the new epoch reinitializes its RTV
+            // from this ACTUAL game color, never from old GPU pixels.
+            s.clearColor.argb = color;
+            s.clearColor.opaqueDestinationAlpha =
+                desc.Format == D3DFMT_X8R8G8B8;
+            return true;
         }
         s.preDrawFills.discard(); // whole ColorFill supersedes prior tiles
         s.clearColor.argb = color;

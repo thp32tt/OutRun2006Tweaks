@@ -87,6 +87,9 @@ jobs:
           # Source-authored ColorFill -> native stereo GPU fill regression.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_color_fill_01043.cpp -o /tmp/dx11_eye_color_fill_01043 && /tmp/dx11_eye_color_fill_01043
           python tools/test_dx11_live_full_colorfill_seed_01045.py
+          # 01046 post-Draw full game ColorFill -> new contiguous native color epoch.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_resume_01046.cpp -o /tmp/dx11_full_colorfill_resume_01046 && /tmp/dx11_full_colorfill_resume_01046
+          python tools/test_dx11_full_colorfill_resume_01046.py
           # 01045 original full D3D9 ColorFill -> real game native Draw seed.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_seed_01045.cpp -o /tmp/dx11_seed_01045 && /tmp/dx11_seed_01045
           # 01044 complete-source ColorFill overwrites & per-eye X8/A8 seeds.

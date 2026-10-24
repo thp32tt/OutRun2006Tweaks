@@ -12,8 +12,12 @@ struct GameNativeFrameBatch {
         const std::uint64_t consumed =
             static_cast<std::uint64_t>(submitted) + leadingEmptySourceDraws +
             postDrawEmptySourceDraws;
+        // A successful original full ColorFill after color-only Draws can
+        // replace the previous scene's entire COLOR history. Native draws
+        // after that fill are still contiguous within the new source epoch.
         return !stopped && consumed < kMaxFullFrameDraws &&
-            ordinal == consumed &&
+            ordinal >= sourceEpochStart &&
+            ordinal - sourceEpochStart == consumed &&
             (!hasSourceDraw || lastSourceDraw + 1u == ordinal);
     }
     // A full-resolution image cannot start from a synthetic diagnostic
@@ -45,8 +49,9 @@ struct GameNativeFrameBatch {
     [[nodiscard]] constexpr bool publishable_full(
         bool pending, std::uint64_t sourceDraws) const noexcept {
         return publishable(pending) && hasSourceDraw &&
+            sourceEpochStart <= sourceDraws &&
             static_cast<std::uint64_t>(submitted) + leadingEmptySourceDraws +
-                postDrawEmptySourceDraws == sourceDraws &&
+                postDrawEmptySourceDraws == sourceDraws - sourceEpochStart &&
             lastSourceDraw + 1u == sourceDraws;
     }
     // Game-created native Draws belong to their source D3D9 device. A
@@ -99,6 +104,13 @@ struct GameNativeFrameBatch {
                                : lastPresentOwner == 0u ||
                                  resettingDevice == lastPresentOwner);
     }
+    // Earlier source Draws can be excluded ONLY after an authentic complete
+    // ColorFill overwrote the entire original main game backbuffer. Retaining
+    // the absolute source ordinal prevents silently skipping later Draws.
+    std::uint64_t sourceEpochStart = 0u;
+    // ColorFill does not clear game depth. Post-fill epochs therefore admit
+    // only depth-independent Draws; depth state is never fabricated.
+    bool colorFillEpoch = false;
     std::uint32_t submitted = 0u;
     // Exact successful source ordinals before the first nonempty GPU Draw.
     // Kept separate because the first real native Draw must still Clear RTV.
@@ -201,8 +213,29 @@ struct GameNativeFrameBatch {
     constexpr bool first_draw() const noexcept { return submitted == 0u; }
     constexpr bool clear_depth() const noexcept { return !depthReady; }
     constexpr bool accepts_depth(bool depth, bool reversed) const noexcept {
-        return !depth || depthDirection == 0u ||
-               depthDirection == (reversed ? 2u : 1u);
+        return !(colorFillEpoch && depth) &&
+               (!depth || depthDirection == 0u ||
+                depthDirection == (reversed ? 2u : 1u));
+    }
+    // The game's successful post-Draw full-backbuffer ColorFill discards all
+    // prior COLOR contributions but preserves the original Z/stencil state.
+    // Recover an independent mono native scene only when the observed source
+    // has NO native depth history, every preceding source Draw was accounted
+    // for, and no batch was previously poisoned. A later depth-using Draw
+    // aborts rather than assuming ColorFill also cleared Z.
+    [[nodiscard]] constexpr bool restart_after_full_color_fill(
+        std::uint64_t originalDrawsSeen) noexcept {
+        if (stopped || submitted == 0u || depthReady ||
+            depthClearPending || colorFillEpoch ||
+            !hasSourceDraw || originalDrawsSeen == 0u ||
+            lastSourceDraw == UINT64_MAX ||
+            lastSourceDraw + 1u != originalDrawsSeen ||
+            sourceEpochStart > originalDrawsSeen)
+            return false;
+        reset();
+        sourceEpochStart = originalDrawsSeen;
+        colorFillEpoch = true;
+        return true;
     }
     constexpr void succeeded(bool depth, bool reversed = false) noexcept {
         ++submitted;
@@ -222,6 +255,7 @@ struct GameNativeFrameBatch {
     constexpr void reset() noexcept {
         submitted = 0u; leadingEmptySourceDraws = 0u;
         postDrawEmptySourceDraws = 0u;
+        sourceEpochStart = 0u; colorFillEpoch = false;
         stopped = false; depthReady = false;
         depthClearPending = false; depthClearValue = 1.0f;
         depthDirection = 0u;
