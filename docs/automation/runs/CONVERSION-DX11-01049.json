@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:LIVE_PREDRAW_COPY_NATIVE_GAME_FRAME",
   "work_key": "DX11:MENU_CAR_RACE_PRE_DRAW_BACKBUFFER_COPY",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C5_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -21,7 +21,7 @@
   "native_published_frame_count": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "material_result_sha": "e39dd60981dc5b09b5c269fd99a0d22b7621bc7e",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "91bf170e4b232f967363ffd8ac8e04a8c570b349",
   "score_change": 0,
   "score_award_event": false,
   "summary": "Original game full Clear -> successful pre-Draw UpdateSurface/StretchRect into owned canonical D3D9 backbuffer -> current CPU-staged full color snapshot -> real native SM3/FVF game Draw and guarded same-Present. Subsequent fills replay after snapshot in source order; all unsupported writes remain D3D9 fallback. Runtime/HMD untested.",
@@ -30,7 +30,9 @@
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/dx11_native_pre_draw_copy_01049.cpp",
     ".github/workflows/dx11-fast-structural.yml",
-    "docs/automation/runs/CONVERSION-DX11-01049.json"
+    "docs/automation/runs/CONVERSION-DX11-01049.json",
+    "tools/test_dx11_source_owner_handoff_00740.py",
+    "tools/test_dx11_game_surface_copy_00886.py"
   ],
   "feature_contract": {
     "feature_id": "DX11:LIVE_PREDRAW_COPY_NATIVE_GAME_FRAME",
@@ -97,32 +99,72 @@
   },
   "acceptance_results": {
     "native_predraw_source": {
-      "status": "SOURCE_IMPLEMENTED",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/native_game_pre_draw_surface.hpp",
         "src/vr/d3d11/live_game_frame_bridge.cpp"
-      ]
+      ],
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_pre_draw_copy_01049.cpp -o /tmp/dx11_pre_draw_copy_01049 && /tmp/dx11_pre_draw_copy_01049"
     },
     "sm3_fvf_draw": {
-      "status": "SOURCE_IMPLEMENTED",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp"
-      ]
+      ],
+      "validation_command": "Windows Build run 40079715441 SUCCESS + DX11 Fast Structural Checks run 40079714792 SUCCESS at exact validation SHA"
     },
     "fail_closed": {
-      "status": "SOURCE_IMPLEMENTED",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/native_game_pre_draw_surface.hpp",
-        "tools/dx11_native_pre_draw_copy_01049.cpp"
-      ]
+        "tools/dx11_native_pre_draw_copy_01049.cpp",
+        "tools/test_dx11_source_owner_handoff_00740.py",
+        "tools/test_dx11_game_surface_copy_00886.py"
+      ],
+      "validation_command": "python tools/test_dx11_source_owner_handoff_00740.py && python tools/test_dx11_game_surface_copy_00886.py"
     },
     "integrated_exact_sha": {
-      "status": "PENDING_EXACT_SHA",
+      "status": "PASS_EXACT_SHA",
       "evidence_paths": [
-        ".github/workflows/dx11-fast-structural.yml"
-      ]
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "GitHub Actions exact SHA: Fast 40079714792; Backend 40079714873; Build 40079715441; OpenXR 40079714829; HUD 40079714871"
     }
   },
-  "ci_failure_repair": "Previous exact-SHA e39dd60981dc5b09b5c269fd99a0d22b7621bc7e Fast 40079080747 and Backend 40079080734 failed tools/dx11_autodev_policy.py --check-latest on stale 01048 terminal record (acceptance SOURCE_IMPLEMENTED and PENDING_EXACT_SHA, as originally authored). Adding this actual current 01049 feature record makes policy target current source stage; prior 01048 validation SHA and acceptance remain unchanged. No required Gate relaxed.",
-  "runtime_note": "No actual OutRun desktop or Quest3/VDXR matching run. D3D11 native draw/published frames UNTESTED."
+  "ci_failure_repair": "Previous exact-SHA e39dd60981dc5b09b5c269fd99a0d22b7621bc7e Fast 40079080747 and Backend 40079080734 failed tools/dx11_autodev_policy.py --check-latest on stale 01048 terminal record (acceptance SOURCE_IMPLEMENTED and PENDING_EXACT_SHA, as originally authored). Adding this actual current 01049 feature record makes policy target current source stage; prior 01048 validation SHA and acceptance remain unchanged. No required Gate relaxed. Second candidate 24abc5e4695f7a64367c755c5060c2e543daa2c4 failed inherited 00740 because new pre-Draw copied-color retirement changed owner-clear chain; repaired negative mutation with 00740. Following Fast 40079522646/40079637408 failed inherited 00886 because post-Draw GPU copy mutation matched earlier new pre-Draw copy counter; retained the original post-Draw negative mutation and required final count after actual CopySubresourceRegion. Final exact-SHA five mandatory workflows PASS at 91bf170e4b232f967363ffd8ac8e04a8c570b349.",
+  "runtime_note": "No actual OutRun desktop or Quest3/VDXR matching run. D3D11 native draw/published frames UNTESTED.",
+  "c6_reconciliation_reason": "FIVE_MANDATORY_GATES_EXACT_SHA_AFTER_CAUSAL_REPAIR",
+  "c6_gate_results": {
+    "validation_sha": "91bf170e4b232f967363ffd8ac8e04a8c570b349",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40079714792,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40079714873,
+      "event": "push"
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40079715441,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40079714829,
+      "event": "push"
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40079714871,
+      "event": "push"
+    },
+    "note": "Five mandatory exact-SHA GitHub Actions SUCCESS. HMD/game runtime UNTESTED, native frames counts UNTESTED. Prior source material SHA preserved. C6 bookkeeping [skip ci], no duplicate CI or scoring."
+  }
 }
