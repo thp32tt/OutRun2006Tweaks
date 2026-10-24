@@ -10,10 +10,10 @@
   "classification": "A",
   "feature_id": "DX11_GAME_CAMERA_SOURCECOPY_STEREO_GPU_FALLBACK_01042",
   "work_key": "DX11:GAME_CAMERA_SOURCECOPY_TYPED_RTV_ROUTED_FALLBACK",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "feature_stage": "C4_RESULT_PENDING_EXACT_SHA",
-  "checkpoint": "C4_RESULT_PENDING_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -26,8 +26,8 @@
   "score_award_event": false,
   "summary": "Game-created typeless camera with an independently selected actual RTV now chooses D3D11 Copy/Resolve versus shader Stretch using physical view provenance. Both stereo-eye preflight routes and compiler availability are checked before GPU writes; no D3D9Ex or input fallback activation changes.",
   "feature_base_sha": "3477d5a7f26555ef5f0ab6feadc8ec45464adacd",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "3a6273c68c373eee13d93ec12ee0e2c0df149062",
+  "validation_bearing_result_sha": "3a6273c68c373eee13d93ec12ee0e2c0df149062",
   "changed_files": [
     "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
     "src/vr/d3d11/native_game_stereo_submission.cpp",
@@ -99,5 +99,97 @@
     ],
     "visible_frame_acceptance": "SOURCE_CI_ONLY_RUNTIME_UNTESTED",
     "activation_guard_and_fallback": "Existing opt-in NativeDrawPathActive=false and original D3D9Ex/menu/race/input/FFB remain authoritative; DXVK frozen"
-  }
+  },
+  "material_commit_history": [
+    "3a6273c68c373eee13d93ec12ee0e2c0df149062"
+  ],
+  "c6_summary": "Five mandatory push GitHub Actions are completed SUCCESS on exact material SHA. Extra native transport WARP SUCCESS; gameplay/Quest3/VDXR UNTESTED; source-graph build only, full renderer not certified.",
+  "validation_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 40052695349,
+      "head_sha": "3a6273c68c373eee13d93ec12ee0e2c0df149062",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40052695349"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 40052695341,
+      "head_sha": "3a6273c68c373eee13d93ec12ee0e2c0df149062",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40052695341"
+    },
+    "Build": {
+      "run_id": 40052695339,
+      "head_sha": "3a6273c68c373eee13d93ec12ee0e2c0df149062",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40052695339"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 40052695316,
+      "head_sha": "3a6273c68c373eee13d93ec12ee0e2c0df149062",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40052695316"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 40052695322,
+      "head_sha": "3a6273c68c373eee13d93ec12ee0e2c0df149062",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40052695322"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 40052695323,
+      "head_sha": "3a6273c68c373eee13d93ec12ee0e2c0df149062",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40052695323"
+    }
+  },
+  "acceptance_results": {
+    "physical_rtv_copy_route": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_typed_camera_copy_fallback_01042.py"
+      ],
+      "validation_command": "Same push SHA 3a6273c68c373eee13d93ec12ee0e2c0df149062: Fast 40052695349; Backend 40052695341; Build 40052695339; OpenXR 40052695316; HUD 40052695322, all SUCCESS. Original D3D9 game and Quest3 runtime UNTESTED."
+    },
+    "both_eye_preflight": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_typed_camera_copy_fallback_01042.py"
+      ],
+      "validation_command": "Same push SHA 3a6273c68c373eee13d93ec12ee0e2c0df149062: Fast 40052695349; Backend 40052695341; Build 40052695339; OpenXR 40052695316; HUD 40052695322, all SUCCESS. Original D3D9 game and Quest3 runtime UNTESTED."
+    },
+    "safe_rejection": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_typed_camera_copy_fallback_01042.py"
+      ],
+      "validation_command": "Same push SHA 3a6273c68c373eee13d93ec12ee0e2c0df149062: Fast 40052695349; Backend 40052695341; Build 40052695339; OpenXR 40052695316; HUD 40052695322, all SUCCESS. Original D3D9 game and Quest3 runtime UNTESTED."
+    },
+    "exact_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01042.json"
+      ],
+      "validation_command": "Same push SHA 3a6273c68c373eee13d93ec12ee0e2c0df149062: Fast 40052695349; Backend 40052695341; Build 40052695339; OpenXR 40052695316; HUD 40052695322, all SUCCESS. Original D3D9 game and Quest3 runtime UNTESTED."
+    }
+  },
+  "score_policy": "C6 bookkeeping has zero additional points; any one-time feature completion award is recorded only in ai-dev-lab scoreboard."
 }
