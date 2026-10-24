@@ -11,10 +11,10 @@
   "feature_id": "DX11:LIVE_CAMERA_TYPED_PREFLIGHT_TO_EYE_GPU_POSTPASS",
   "work_key": "DX11:LIVE_CAMERA_TYPED_PREFLIGHT_TO_EYE_GPU_POSTPASS",
   "feature_base_sha": "7e59042303171141636ad597684382746b3db3f4",
-  "status": "IN_PROGRESS",
-  "feature_stage": "C4_MATERIAL_COMMIT",
-  "checkpoint": "C4",
-  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "score_change": 0,
@@ -100,8 +100,90 @@
     "tools/test_dx11_typed_camera_preflight_01040.py",
     "docs/automation/runs/CONVERSION-DX11-01040.json"
   ],
-  "material_result_sha": "PENDING_RESULT_COMMIT",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "material_result_sha": "2ad5d3c22d5a042521315846fda29d4f40bb0edc",
+  "validation_bearing_result_sha": "2ad5d3c22d5a042521315846fda29d4f40bb0edc",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Finish native game offscreen Draw -> eye handoff and Quest3 runtime; exact source SHA Gate needed"
+  "NEXT_IMPLEMENTATION_ACTION": "Native source-stage exact-SHA build verified; continue end-to-end real menu/car/race GPU Draw to OpenXR frame; verify game/Quest3 independently.",
+  "material_commit_history": [
+    "13eab74aabdc8f054bbcf959a3ce8ccf9da3dc36",
+    "2ad5d3c22d5a042521315846fda29d4f40bb0edc"
+  ],
+  "c6_summary": "All five required GitHub Actions completed SUCCESS on one exact source SHA for real D3D11 game camera typed RTV preflight to native L/R GPU Copy/Stretch postpass; actual OutRun 2006 gameplay and Quest3/VDXR runtime UNTESTED.",
+  "validation_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 40045978823,
+      "head_sha": "2ad5d3c22d5a042521315846fda29d4f40bb0edc",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40045978823"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 40045978903,
+      "head_sha": "2ad5d3c22d5a042521315846fda29d4f40bb0edc",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40045978903"
+    },
+    "Build": {
+      "run_id": 40045978849,
+      "head_sha": "2ad5d3c22d5a042521315846fda29d4f40bb0edc",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40045978849"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 40045978872,
+      "head_sha": "2ad5d3c22d5a042521315846fda29d4f40bb0edc",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40045978872"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 40045978797,
+      "head_sha": "2ad5d3c22d5a042521315846fda29d4f40bb0edc",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40045978797"
+    }
+  },
+  "acceptance_results": {
+    "typed_preflight": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_typed_camera_preflight_01040.py"
+      ],
+      "validation_command": "Exact-source SHA 2ad5d3c22d5a042521315846fda29d4f40bb0edc gates Fast #40045978823 / Backend #40045978903 / Build #40045978849 / OpenXR #40045978872 / HUD #40045978797: all SUCCESS; game/Quest3 runtime UNTESTED"
+    },
+    "exact_view": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/test_dx11_typed_camera_postpass_01039.py"
+      ],
+      "validation_command": "Exact-source SHA 2ad5d3c22d5a042521315846fda29d4f40bb0edc gates Fast #40045978823 / Backend #40045978903 / Build #40045978849 / OpenXR #40045978872 / HUD #40045978797: all SUCCESS; game/Quest3 runtime UNTESTED"
+    },
+    "fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_typed_camera_preflight_01040.py"
+      ],
+      "validation_command": "Exact-source SHA 2ad5d3c22d5a042521315846fda29d4f40bb0edc gates Fast #40045978823 / Backend #40045978903 / Build #40045978849 / OpenXR #40045978872 / HUD #40045978797: all SUCCESS; game/Quest3 runtime UNTESTED"
+    },
+    "gate": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01040.json"
+      ],
+      "validation_command": "Exact-source SHA 2ad5d3c22d5a042521315846fda29d4f40bb0edc gates Fast #40045978823 / Backend #40045978903 / Build #40045978849 / OpenXR #40045978872 / HUD #40045978797: all SUCCESS; game/Quest3 runtime UNTESTED"
+    }
+  }
 }
