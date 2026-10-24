@@ -1,5 +1,6 @@
 #pragma once
 #include "native_game_offscreen_color_provenance.hpp"
+#include "native_game_typed_camera_postpass.hpp"
 #include "native_game_eye_postpass_coverage.hpp"
 
 #include "native_shared_eye_ring.hpp"
@@ -247,7 +248,10 @@ private:
     void remember_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
     void remember_offscreen_color_region(
         ID3D11Texture2D* texture, UINT arraySlice, UINT mipSlice,
+        DXGI_FORMAT renderedViewFormat,
         NativeGameOffscreenColorRegion region) noexcept;
+    [[nodiscard]] DXGI_FORMAT offscreen_color_view_format(
+        ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept;
     void invalidate_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
     [[nodiscard]] bool offscreen_color_source_proven(
         ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
@@ -285,6 +289,7 @@ private:
     struct OffscreenColorSource {
         Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
         UINT arraySlice{}, mipSlice{};
+        DXGI_FORMAT renderedViewFormat{DXGI_FORMAT_UNKNOWN};
         NativeGameOffscreenColorRegion region{};
     };
     // One per-eye lifetime; no global cross-frame stale camera ownership.

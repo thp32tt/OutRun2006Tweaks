@@ -4,6 +4,7 @@
 #include "native_game_postpass_replay.hpp"
 #include "native_game_camera_view.hpp"
 #include "native_game_offscreen_mrt.hpp"
+#include "native_game_typed_camera_postpass.hpp"
 #include "native_game_partial_color_format.hpp"
 #include "native_game_stretch_source.hpp"
 #include "native_game_stereo_draw_evidence.hpp"
@@ -567,7 +568,7 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_source(
         return;
     }
     remember_offscreen_color_region(
-        texture.Get(), view.arraySlice, view.mip, region);
+        texture.Get(), view.arraySlice, view.mip, vd.Format, region);
 
 }
 // Keep the exact per-camera GPU-written color union bounded without letting
@@ -576,8 +577,20 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_source(
 // union is rectangular. A disjoint gap or foreign eye never becomes color.
 void NativeGameEyeDrawEncoder::remember_offscreen_color_region(
     ID3D11Texture2D* texture, UINT arraySlice, UINT mipSlice,
+    DXGI_FORMAT renderedViewFormat,
     NativeGameOffscreenColorRegion region) noexcept {
-    if (!texture || !native_game_offscreen_color_region_valid(region)) return;
+    if (!texture || renderedViewFormat == DXGI_FORMAT_UNKNOWN ||
+        !native_game_offscreen_color_region_valid(region)) return;
+    // Mixed typed views over one physical typeless camera have ambiguous
+    // shader color semantics; quarantine native provenance for both eyes.
+    for (const auto& prior : offscreenColorSources_) {
+        if (prior.texture.Get() == texture &&
+            prior.arraySlice == arraySlice && prior.mipSlice == mipSlice &&
+            prior.renderedViewFormat != renderedViewFormat) {
+            offscreenColorProvenance_.note_untracked_gpu_write();
+            return;
+        }
+    }
     const NativeGameOffscreenColorKey key{
         reinterpret_cast<std::uintptr_t>(texture), arraySlice, mipSlice};
     // A new strip can bridge multiple old strips; restart after each merge.
@@ -638,6 +651,7 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_region(
         record.texture = texture;
         record.arraySlice = arraySlice;
         record.mipSlice = mipSlice;
+        record.renderedViewFormat = renderedViewFormat;
         record.region = region;
         return;
     }
@@ -667,6 +681,7 @@ void NativeGameEyeDrawEncoder::invalidate_offscreen_color_source(
                       record.arraySlice, record.mipSlice})) {
             record.texture.Reset();
             record.arraySlice = record.mipSlice = 0u;
+            record.renderedViewFormat = DXGI_FORMAT_UNKNOWN;
             record.region = {};
         }
 }
@@ -703,6 +718,23 @@ bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
     }
     return native_game_gpu_eye_composite_source_proven(
         key, copied, keys, regions, count);
+}
+
+DXGI_FORMAT NativeGameEyeDrawEncoder::offscreen_color_view_format(
+    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept {
+    if (!source || offscreenColorProvenance_.untrackedGpuWrite)
+        return DXGI_FORMAT_UNKNOWN;
+    DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+    for (const auto& record : offscreenColorSources_) {
+        if (record.texture.Get() != source ||
+            record.arraySlice != arraySlice || record.mipSlice != mipSlice)
+            continue;
+        if (format != DXGI_FORMAT_UNKNOWN &&
+            format != record.renderedViewFormat)
+            return DXGI_FORMAT_UNKNOWN;
+        format = record.renderedViewFormat;
+    }
+    return format;
 }
 
 bool NativeGameEyeDrawEncoder::color_writable_for_samples(
@@ -1141,6 +1173,7 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
                 first.texture = record.texture;
                 first.arraySlice = record.arraySlice;
                 first.mipSlice = record.mipSlice;
+                first.renderedViewFormat = record.renderedViewFormat;
                 first.region = kept.parts[0];
             }
             for (std::size_t i = 1u; i < kept.count &&
@@ -1149,6 +1182,7 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
                 next.texture = record.texture;
                 next.arraySlice = record.arraySlice;
                 next.mipSlice = record.mipSlice;
+                next.renderedViewFormat = record.renderedViewFormat;
                 next.region = kept.parts[i];
             }
         }
@@ -1176,7 +1210,8 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
             actual ? actual->right : 0, actual ? actual->bottom : 0);
         if (!native_game_offscreen_color_region_valid(filled)) return;
         remember_offscreen_color_region(
-            texture.Get(), camera.arraySlice, camera.mip, filled);
+            texture.Get(), camera.arraySlice, camera.mip,
+            viewDesc.Format, filled);
     };
     switch (route) {
     case live_game_stereo::NativeColorClearRoute::FullRtv:
@@ -2559,12 +2594,17 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         srcBox.right, srcBox.bottom, targetWidth_, targetHeight_,
         dest.left, dest.top, dest.right, dest.bottom);
     if (!clipped.valid) return false;
-    // D3D11 postpass sampling converts the real game source into the eye's
-    // render-target format; unlike GPU CopyResource, a filtered StretchRect
-    // does not require identical DXGI formats. Menu/car offscreen RTs often
-    // use a different format or have a full mip chain. Sample mip zero only.
+    // Game camera allocations are often TYPELESS with a typed RTV chosen
+    // for the actual authored Draw/Clear. An implicit SRV over a typeless
+    // Texture2D is invalid even though its RTV color is real. Carry the
+    // precise current-eye physical RTV format into SRV or GPU staging.
+    // Never guess a format for an untracked mip, array eye, or other camera.
+    const DXGI_FORMAT sampleFormat = native_game_typed_camera_shader_format(
+        sd.Format,
+        offscreen_color_view_format(source, sourceArraySlice, sourceMipSlice));
+    if (sampleFormat == DXGI_FORMAT_UNKNOWN) return false;
     UINT sourceSupport = 0u, eyeSupport = 0u;
-    if (FAILED(device->CheckFormatSupport(sd.Format, &sourceSupport)) ||
+    if (FAILED(device->CheckFormatSupport(sampleFormat, &sourceSupport)) ||
         FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)))
         return false;
     const auto transfer = native_game_stretch_source_transfer(
@@ -2685,6 +2725,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         D3D11_TEXTURE2D_DESC desc = sd;
         desc.Width = mipWidth;
         desc.Height = mipHeight;
+        desc.Format = sampleFormat; // typed GPU staging for typeless camera
         desc.MipLevels = 1u;
         desc.ArraySize = 1u;
         desc.SampleDesc.Count = 1u;
@@ -2710,8 +2751,17 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         sampled = sampledScratch;
     }
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+    D3D11_SHADER_RESOURCE_VIEW_DESC typedView{};
+    D3D11_SHADER_RESOURCE_VIEW_DESC* explicitView = nullptr;
+    if (sampled.Get() == source && sd.Format != sampleFormat) {
+        typedView.Format = sampleFormat;
+        typedView.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        typedView.Texture2D.MostDetailedMip = 0u;
+        typedView.Texture2D.MipLevels = 1u;
+        explicitView = &typedView;
+    }
     if (FAILED(device->CreateShaderResourceView(
-            sampled.Get(), nullptr, srv.GetAddressOf()))) return false;
+            sampled.Get(), explicitView, srv.GetAddressOf()))) return false;
     // Context-state swap snapshots ALL graphics bindings: MRT0..7, DSV,
     // shaders, class instances, IA buffers, samplers, blend, raster and Z.
     // The original D3D9 fallback and the next native eye draw are untouched.
@@ -2737,7 +2787,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
                                  sd.MipLevels);
         if (transfer == NativeGameStretchSourceTransfer::ResolveToSampled)
             context_->ResolveSubresource(
-                sampled.Get(), 0u, source, sourceSubresource, sd.Format);
+                sampled.Get(), 0u, source, sourceSubresource, sampleFormat);
         else
             context_->CopySubresourceRegion(
                 sampled.Get(), 0u, 0u, 0u, 0u,
