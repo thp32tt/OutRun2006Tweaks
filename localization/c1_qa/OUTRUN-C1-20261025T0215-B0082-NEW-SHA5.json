@@ -1,0 +1,179 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0215KST-B0082-NEW-SHA5",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "checked_at_kst": "2026-10-25T02:19:52+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "task_id": "OUTRUN-ROI-B-0082-D83E0E35",
+  "producer": "B",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "previous_unique_sha_count": 732,
+  "new_unique_sha_count": 5,
+  "results": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 5
+  },
+  "candidate_export_sha_matches": true,
+  "source_sha_matches_manifest": true,
+  "records": [
+    {
+      "source_ordinal": 394,
+      "source_file": "Q012_0909e9d5397ec72e_source.png",
+      "candidate_file": "Q012_0909e9d5397ec72e_source_k.png",
+      "candidate_sha256": "f88974af1876c6cf4ef21339dcd7c61ec1203165890773033b66c131e82ca75b",
+      "source_sha256": "f3526f95ae40c38d13b5fb36b595a32f4ed49bbddfd9c7f32529d33c3ad11287",
+      "english": "Continue?",
+      "approved_korean": "계속?",
+      "source_dimensions": [
+        1024,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "visual_translation_match": true,
+      "glyph_legibility": "READABLE",
+      "transparent_lettering": "PASS_NO_OBVIOUS_RECTANGULAR_FRAME",
+      "source_bbox_containment": "UNVERIFIED",
+      "native_ui_cell_placement": "UNVERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable glyphs and translation, but generated canvas and aspect differ from source ROI. Native-resolution fit, alignment and protected region containment unverified; size difference alone is not FAIL."
+    },
+    {
+      "source_ordinal": 395,
+      "source_file": "Q051_1c4a497be9e793ca_source.png",
+      "candidate_file": "Q051_1c4a497be9e793ca_source_k.png",
+      "candidate_sha256": "ff58001e9db31a1084394a91197640d88af9ee4778c261491532a637f4167419",
+      "source_sha256": "85abf1d580c6d1ad58dc736c5c627e0201a3338bfaa95b5b981f69d895a64fff",
+      "english": "GOAL",
+      "approved_korean": "골",
+      "source_dimensions": [
+        676,
+        445
+      ],
+      "candidate_dimensions": [
+        1546,
+        1017
+      ],
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "visual_translation_match": true,
+      "glyph_legibility": "READABLE",
+      "transparent_lettering": "PASS_NO_OBVIOUS_RECTANGULAR_FRAME",
+      "source_bbox_containment": "UNVERIFIED",
+      "native_ui_cell_placement": "UNVERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable white Hangul with navy outline, but generated canvas differs from source and the original GOAL/Start text is within a composite UI scene. Native fit and original font/effect hierarchy not verified; size difference alone is not FAIL."
+    },
+    {
+      "source_ordinal": 396,
+      "source_file": "Q051_688e58cbd06a33ec_source.png",
+      "candidate_file": "Q051_688e58cbd06a33ec_source_k.png",
+      "candidate_sha256": "f3565a0117122873c464c03dc00ce3a8221c65a2c5637b6e88223c12206a5d1b",
+      "source_sha256": "9c3548c1687296378ff1acab331231f6e111b547d2ada3d2cab856716650aed9",
+      "english": "GOAL",
+      "approved_korean": "골",
+      "source_dimensions": [
+        644,
+        431
+      ],
+      "candidate_dimensions": [
+        1533,
+        1026
+      ],
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "visual_translation_match": true,
+      "glyph_legibility": "READABLE",
+      "transparent_lettering": "PASS_NO_OBVIOUS_RECTANGULAR_FRAME",
+      "source_bbox_containment": "UNVERIFIED",
+      "native_ui_cell_placement": "UNVERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable white Hangul with navy outline, but generated canvas differs from source and the original GOAL/Start text is within a composite UI scene. Native fit and original font/effect hierarchy not verified; size difference alone is not FAIL."
+    },
+    {
+      "source_ordinal": 397,
+      "source_file": "Q051_3909d47ba88d6392_source.png",
+      "candidate_file": "Q051_3909d47ba88d6392_source_k.png",
+      "candidate_sha256": "58d8dd695510628449092207fd1dc68ec10f0e1046b8ac05df0cb382084dd4b4",
+      "source_sha256": "544efcd4394860e61d018c39fcd76dc26dd7c10acbcdedf48b1cb6374a85d5f9",
+      "english": "Start",
+      "approved_korean": "시작",
+      "source_dimensions": [
+        725,
+        445
+      ],
+      "candidate_dimensions": [
+        1601,
+        983
+      ],
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "visual_translation_match": true,
+      "glyph_legibility": "READABLE",
+      "transparent_lettering": "PASS_NO_OBVIOUS_RECTANGULAR_FRAME",
+      "source_bbox_containment": "UNVERIFIED",
+      "native_ui_cell_placement": "UNVERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable white Hangul with navy outline, but generated canvas differs from source and the original GOAL/Start text is within a composite UI scene. Native fit and original font/effect hierarchy not verified; size difference alone is not FAIL."
+    },
+    {
+      "source_ordinal": 398,
+      "source_file": "Q054_9adc0d73e1df0bb5_source.png",
+      "candidate_file": "Q054_9adc0d73e1df0bb5_source_k.png",
+      "candidate_sha256": "231d651c05a32ad872136974aac2150ff964ac7df87f335a6a30b89adfe03495",
+      "source_sha256": "0a532cefb327b48dd97f8379bb403af6f0614863f7e59fba39430025e2944af4",
+      "english": "Memorize the sequence!",
+      "approved_korean": "순서를 기억하세요!",
+      "source_dimensions": [
+        1106,
+        488
+      ],
+      "candidate_dimensions": [
+        1888,
+        833
+      ],
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "visual_translation_match": true,
+      "glyph_legibility": "READABLE",
+      "transparent_lettering": "PASS_NO_OBVIOUS_RECTANGULAR_FRAME",
+      "source_bbox_containment": "UNVERIFIED",
+      "native_ui_cell_placement": "UNVERIFIED",
+      "verdict": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Readable yellow Hangul with navy outline. Source ROI also contains unrelated UI art/text; cropped target overlay alignment and protected-art safety unverified. No FAIL solely for differing length."
+    }
+  ],
+  "evidence": {
+    "n100_preflight": "work/C1_QA_20261025_0215_preflight.json",
+    "n100_source_candidate_contact_sheet": "work/C1_QA_20261025_0215_B82_pairs.jpg",
+    "n100_white_matte": "work/C1_QA_20261025_0215_B82_white.jpg",
+    "n100_producer_evidence": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0082-D83E0E35.json"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queues_consumed": false,
+    "dds_written": false,
+    "game_deployed": false,
+    "c2_c3_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score_event_basis": "NEW_SHA5_INDEPENDENT_QA_ONE_UNIQUE_ACHIEVEMENT",
+  "provisional_score_delta": 1
+}
