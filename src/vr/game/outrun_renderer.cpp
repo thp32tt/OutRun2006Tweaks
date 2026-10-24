@@ -199,6 +199,7 @@ namespace OutRunVRRenderer
 		std::uint64_t LastGameWvpQueueNodeEpoch = 0;
 		const void* LastGameWvpQueueNode = nullptr;
 		std::uint64_t LastGameWvpLensCentreCallEpoch = 0;
+		bool LastRawGameWvpCameraSynced = false;
 	OutRunVR::GameSemantic::ProducerToken LastGameWvpProducerToken =
 			OutRunVR::GameSemantic::ProducerToken::None;
 		std::uint32_t LoggedProducerC64Mask = 0;
@@ -1647,6 +1648,7 @@ namespace OutRunVRRenderer
 		void InvalidateGameWvpWrite() noexcept
 		{
 			LastGameWvpWriteValid = false;
+			LastRawGameWvpCameraSynced = false;
 			LastGameWvpTopLevelDrawSerial = 0;
 			LastGameWvpPoseEpoch = 0;
 			LastGameWvpShaderIdentity = 0;
@@ -1682,6 +1684,7 @@ namespace OutRunVRRenderer
 				++LastGameWvpWriteSerial;
 			LastGameWvpTopLevelDrawSerial = OutRunVRStereo::GetTopLevelDrawSerial();
 			LastGameWvpPoseEpoch = LatchedPoseEpoch;
+			LastRawGameWvpCameraSynced = CullingCameraOverridden;
 			LastGameWvpShaderIdentity = shaderIdentity;
 			LastGameWvpShaderSerial = shaderSerial;
 			LastGameWvpSemanticScope = OutRunVR::GameSemantic::EffectiveScope();
@@ -2374,6 +2377,11 @@ namespace OutRunVRRenderer
 		return LastGameWvpWriteValid ? LastGameWvpLensCentreCallEpoch : 0;
 	}
 
+	bool GetLastRawGameWvpCameraSynced() noexcept
+	{
+		return LastGameWvpWriteValid && LastRawGameWvpCameraSynced;
+	}
+
 	std::uint64_t GetCurrentLatchedPoseEpoch() noexcept
 	{
 		return LatchedPoseEpoch;
@@ -2426,3 +2434,4 @@ namespace OutRunVRRenderer
 
 	VRRendererHook VRRendererHook::instance;
 }
+

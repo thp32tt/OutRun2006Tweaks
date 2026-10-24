@@ -18,6 +18,7 @@
 #include "r30_shadow_scratch.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
+#include "projected_sun_ray.hpp"
 #include "stage_extension_eye_plane.hpp"
 #include "f11_screen_2d.hpp"
 #include "hud_1080p_reference.hpp"
@@ -44,6 +45,7 @@ namespace Settings
 
 namespace OutRunVRRenderer
 {
+    bool GetLastRawGameWvpCameraSynced() noexcept;
     std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept;
     std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
     std::uint64_t GetLastGameWvpPoseEpoch() noexcept;
@@ -4863,6 +4865,47 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
+                // Only exact, nonqueued C993 sun objects use this correction.
+                // CABE outer discs retain their existing R69 path below.
+                if (!OutRunVR::GameSemantic::QueueRenderActive() &&
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                        OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
+                {
+                    float headRaw[16]{};
+                    std::uint32_t headSequence = 0;
+                    if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                            headRaw, headSequence) ||
+                        headSequence != stereo.poseSequence)
+                        return false;
+                    D3DMATRIX headInverse{};
+                    std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                    float relativeOffsets[2][3]{};
+                    float relativeOrientations[2][4]{};
+                    if (!OutRunVR::LensCentre::BuildHeadRelativeEyePose(
+                            stereo.eyeOffset, stereo.eyeOrientation,
+                            relativeOffsets, relativeOrientations))
+                        return false;
+                    const float zeroTranslation[3]{};
+                    float candidate[2][16]{};
+                    for (int eye = 0; eye < 2; ++eye)
+                    {
+                        const D3DMATRIX eyeInverse = InverseRigid(
+                            MatrixFromQuaternionTranslation(
+                                relativeOrientations[eye], zeroTranslation, 1.0f));
+                        const D3DMATRIX eyeProjection =
+                            ProjectionFromFov(baseProjection, stereo.eyeFov[eye]);
+                        D3DMATRIX corrected{};
+                        if (!OutRunVR::LensCentre::BuildProjectedSunRay(
+                                stockWvp, inverseBaseProjection, headInverse,
+                                eyeInverse, eyeProjection, corrected,
+                                OutRunVRRenderer::GetLastRawGameWvpCameraSynced()))
+                            return false;
+                        const D3DMATRIX correctedT = TransposeMatrix(corrected);
+                        std::memcpy(candidate[eye], &correctedT, sizeof(correctedT));
+                    }
+                    std::memcpy(eyeConstants, candidate, sizeof(candidate));
+                    return true;
+                }
                 // R69 HMD-proven DX11 behavior: CABE's Calc3D2D result is
                 // already a centre-eye screen position. Independent L/R world
                 // reprojection makes the flare split into two images. Submit
@@ -5303,6 +5346,21 @@ namespace OutRunVRStereo
             }
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
+                if (Settings::VRTelemetry &&
+                    !OutRunVR::GameSemantic::QueueRenderActive() &&
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                        OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
+                {
+                    static std::uint64_t centreDraws = 0;
+                    const auto n = ++centreDraws;
+                    if (n <= 8 || (n & (n - 1)) == 0)
+                        spdlog::info(
+                            "VR LENS C993 RAY EYES: pose={} draw={} left=0x{:08X} right=0x{:08X} restore={} cameraSynced={} hits={} mode=ROTATION_ONLY_EYE_FOV",
+                            stereo.poseSequence, TopLevelDrawSerial(),
+                            static_cast<unsigned>(leftHr),
+                            static_cast<unsigned>(rightHr), restoreOk ? 1 : 0,
+                            OutRunVRRenderer::GetLastRawGameWvpCameraSynced() ? 1 : 0, n);
+                }
                 static bool firstProjectedScreenEffectLogged = false;
                 if (!firstProjectedScreenEffectLogged)
                 {

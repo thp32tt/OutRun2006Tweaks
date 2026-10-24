@@ -1,5 +1,7 @@
 name: DX9Ex OFFICIAL FOCUS R26 HUD Test and Debug
 
+# USER-DX9EX-LENS-CENTRE-20261025: isolated central-sun ray correction.
+
 permissions:
   contents: read
 
@@ -42,6 +44,9 @@ jobs:
           if ($cache -notcontains 'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON') {
             throw 'R26+HUD default renderer is not active'
           }
+
+      - name: Verify protected outer flare path
+        run: python tools/verify_dx9ex_r26_projected_flare_fusion.py
 
       - name: Apply VC2022 dependency workarounds
         shell: pwsh
@@ -153,3 +158,4 @@ jobs:
           name: OutRun2-VR-R26-OFFICIAL-FOCUS-20261025
           path: OutRun2_VR_R26_FOCUS_OFFICIAL_*.zip
           if-no-files-found: error
+

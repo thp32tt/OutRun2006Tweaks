@@ -809,16 +809,15 @@ class VRLensFlareProjected2D : public Hook
                     LensCentreDepth, LensCentreOwnerDepth);
         }
 
-        // The original pass already projected these four objects through the
-        // camera screen matrix. Mirror the HMD-proven R69 CABE treatment:
-        // preserve the raw game WVP and submit the same centre-eye placement
-        // to both eye targets (zero binocular disparity). Explicitly clear the
-        // D3A5 LensFlareCentre token inside this draw so C993 cannot fall back
-        // into the old WorldBillboard/raw-c64 route.
+        // Keep C993 distinct from the already-working CABE outer discs.
+        // ProjectedScreenEffect2D remains the coordinate-space authority;
+        // the exact centre token selects rotation-only eye reprojection in
+        // R26 instead of copying identical NDC into asymmetric eye frusta.
+        // It cannot enter WorldBillboard while this projected scope is active.
         OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
             OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D,
             nullptr, true,
-            OutRunVR::GameSemantic::ProducerToken::None);
+            OutRunVR::GameSemantic::ProducerToken::LensFlareCentre);
         OutRunVR::GameSemantic::ScopedRenderSemantic sunDrawScope(
             OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);

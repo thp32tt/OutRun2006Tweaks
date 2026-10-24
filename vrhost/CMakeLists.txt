@@ -220,6 +220,14 @@ add_custom_command(TARGET outrun-vr-sprite-root-stability-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-sprite-root-stability-smoke>"
     COMMENT "Verify original x86 sprite priority root stability"
     VERBATIM)
+add_executable(outrun-vr-projected-sun-ray-smoke tests/projected_sun_ray_smoke.cpp)
+target_include_directories(outrun-vr-projected-sun-ray-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-projected-sun-ray-smoke)
+add_custom_command(TARGET outrun-vr-projected-sun-ray-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-projected-sun-ray-smoke>"
+    COMMENT "Verify central sun ray convergence without changing outer flare discs"
+    VERBATIM)
 # Build the real game CalcBall3D2D correction without a Windows game or HMD.
 add_executable(outrun-vr-stage-edge-cull-smoke tests/stage_edge_cull_smoke.cpp)
 target_include_directories(outrun-vr-stage-edge-cull-smoke PRIVATE
