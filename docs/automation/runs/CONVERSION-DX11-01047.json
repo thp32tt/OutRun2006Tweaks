@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:CHAINED_REAL_FULL_COLORFILL_EPOCHS",
   "work_key": "DX11:CHAINED_MENU_CAR_RACE_COLOR_EPOCHS",
-  "status": "SOURCE_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_RESULT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "08be10f554aa775de03e0620e52d2d6dde14fb46",
   "score_change": 0,
   "score_award_event": false,
   "summary": "Preserve multiple genuine full-backbuffer ColorFill overwrites between native Draw segments within one original game Present. Retire old GPU color epochs, consume real D3D9 zero-primitive source ordinals and never invent depth; require pending owner/target to restart native scene. Original game/FFB and unsupported frame fallback unchanged.",
@@ -123,5 +123,35 @@
       ]
     }
   },
-  "ci_failure_repair": "Initial Fast Gate 40070852751 failed task-policy parser because the run strategy omitted the documented live_game_draw_path stage names; corrected metadata, retained all validation scripts and native renderer code unchanged."
+  "ci_failure_repair": "Initial Fast Gate 40070852751 failed task-policy parser because the run strategy omitted the documented live_game_draw_path stage names; corrected metadata, retained all validation scripts and native renderer code unchanged.",
+  "c6_reconciliation_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_gate_results": {
+    "validation_sha": "08be10f554aa775de03e0620e52d2d6dde14fb46",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40070940564,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40070940548,
+      "event": "push"
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40070940567,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40070940574,
+      "event": "push"
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40070940572,
+      "event": "push"
+    },
+    "note": "Five required exact-SHA GitHub Actions SUCCESS. Game/Quest3/VDXR runtime not tested; neither game-frame nor HMD success claimed."
+  }
 }
