@@ -335,7 +335,6 @@ struct NativeGameEyePartialTargetClear {
     struct Entry {
         D3D11_RECT rect{};
         std::uint32_t argb{};
-        bool opaqueDestinationAlpha{}; // D3D9 X8 destination
         std::uint64_t afterDrawOrdinal{}; // source geometry Draws before Clear
         Kind kind{Kind::TargetRect};
         float depth{1.0f};
@@ -352,6 +351,8 @@ struct NativeGameEyePartialTargetClear {
         UINT sourceArraySlice{};
         UINT sourceMipSlice{}; // captured game camera mip, defaults to zero
         bool linearFilter{};
+        // Appended: preserve existing positional Entry aggregate initializers.
+        bool opaqueDestinationAlpha{}; // D3D9 X8 destination
     };
     std::uint32_t count[2]{};
     Entry entries[2][kMaxRectsPerEye]{};
