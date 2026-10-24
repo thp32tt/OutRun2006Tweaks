@@ -93,7 +93,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "blocking_evidence": "Original 01054 post-Draw preserve_game_surface_copy unconditionally calls GetRenderTargetData on entire 3440x1440 D3D9 backbuffer even for a 1px partial UpdateSurface/StretchRect, then sends only the patch to native D3D11.; Exact SHA 3b5856 Fast Gate failed: inherited 01053 portable g++ probe declares two differently typed fields in one const auto (GCC -Werror compilation failure); 01055 structural Python check expected spaces in C++ call not present. Scoped repair on same TASK_ID."
+    "blocking_evidence": "Original 01054 post-Draw preserve_game_surface_copy unconditionally calls GetRenderTargetData on entire 3440x1440 D3D9 backbuffer even for a 1px partial UpdateSurface/StretchRect, then sends only the patch to native D3D11.; Exact SHA 3b5856 Fast Gate failed: inherited 01053 portable g++ probe declares two differently typed fields in one const auto (GCC -Werror compilation failure); 01055 structural Python check expected spaces in C++ call not present. Scoped repair on same TASK_ID.; Fast Gate at 4932107d passed 01053 C++ plus 01055 C++/Python, but failed the old 00886 immutable structural test which assumed an unconditional original full-readback staging member."
   },
   "acceptance_results": {
     "authentic_postdraw_gpu_tile": {
@@ -115,7 +115,7 @@
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Exact real-game native draw and output counts remain UNTESTED.",
-  "next_implementation_action": "Run same five full required GitHub Gates at new repair SHA. Earlier SHA Fast failed; do not claim complete. HMD UNTESTED.",
+  "next_implementation_action": "Verify five mandatory GitHub Actions at updated validation-bearing SHA after causal 00886 integration regression repair; HMD/runtime UNTESTED.",
   "runtime_note": "No real gameplay/Quest 3 executed. Simulated pixel parity does not establish native runtime output.",
   "validation_history": [
     {
@@ -125,6 +125,14 @@
       "result": "FAIL",
       "root_cause": "C++ probe mixed auto deduction and 01055 Python whitespace assertion",
       "remediation": "Same-ID patch of affected C++ source spelling and inherited local test declaration; no safety check removed."
+    },
+    {
+      "exact_sha": "4932107d25ac0042b3bf5374244d948bfc056832",
+      "gate": "DX11 Fast Structural Checks",
+      "run_id": 40143516926,
+      "result": "FAIL",
+      "root_cause": "00886 still checks unconditional s.surfaceReplayReadback->LockRect/UnlockRect instead of the new tile/full selected staging surface.",
+      "remediation": "Adapt 00886 positive and destructive checks for both source game tile capture and full readback fallback, offsets and original GPU/output safety checks."
     }
   ]
 }

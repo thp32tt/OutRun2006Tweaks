@@ -36,12 +36,18 @@ def linked(b, h, r):
         "GameNativeSurfaceCopyRegion::destination(",
         "desc.MultiSampleType != D3DMULTISAMPLE_NONE",
         "game->GetRenderTargetData(",
-        "destination, s.surfaceReplayReadback.Get()",
-        "s.surfaceReplayReadback->LockRect(",
-        "s.surfaceReplayReadback->UnlockRect()",
-        "catch (...) { copied = false; }",
+        "tileSucceeded = s.surfaceReplayTile.capture(",
+        "if (!tileSucceeded) {",
+        "if (tileSucceeded) readback=s.surfaceReplayTile.staging();",
+        "readback=s.surfaceReplayReadback.Get();",
+        "GameNativeSurfaceTilePlan::source_x(region, tileSucceeded)",
+        "GameNativeSurfaceTilePlan::source_y(region, tileSucceeded)",
+        "destination,s.surfaceReplayReadback.Get()",
+        "readback->LockRect(",
+        "readback->UnlockRect()",
+        "catch (...) { copied=false; }",
         "desc.Format == D3DFMT_X8R8G8B8",
-        "dst[x] = 0xffu;",
+        "dst[x]=0xffu;",
         "context->UpdateSubresource(s.surfaceReplayScratch.Get()",
         "ScopedNativeGameGpuTransferInputs shaderInputs(",
         "ScopedNativeGameGpuTransferOutputs outputs(context);",
@@ -112,6 +118,12 @@ replay_begin = bridge.index("bool preserve_game_surface_copy(")
 replay_end = bridge.index("bool begin_game_surface_cpu_write(", replay_begin)
 replay_body = bridge[replay_begin:replay_end]
 for token in (
+    # Mutation of either crop or fallback disconnects native integration.
+    "tileSucceeded = s.surfaceReplayTile.capture(",
+    "if (!tileSucceeded) {",
+    "GameNativeSurfaceTilePlan::source_x(region, tileSucceeded)",
+    "GameNativeSurfaceTilePlan::source_y(region, tileSucceeded)",
+    "readback=s.surfaceReplayReadback.Get();",
     "game->GetRenderTargetData(",
     "s.frameBatch.publishable(s.pending)",
     "actualIdentity.Get() != backbufferIdentity.Get()",
@@ -119,7 +131,7 @@ for token in (
     "ScopedNativeGameGpuTransferOutputs outputs(context);",
     "context->CopySubresourceRegion(",
     "if (FAILED(device->GetDeviceRemovedReason())) return false;\n        s.surfaceReplayBudget.note_success(desc.Width, desc.Height);",
-    "s.surfaceReplayReadback->UnlockRect()",
+    "readback->UnlockRect()",
     "s.surfaceReplayBudget.note_success(desc.Width, desc.Height);",
 ):
     assert token in replay_body, "replay guard absent before mutation: " + token
