@@ -1,0 +1,32 @@
+name: R26 HUD Trace and VR Skills Check
+
+on:
+  push:
+    branches:
+      - vr-r26hud-drawtrace-skills-20261021
+    paths:
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/vr/game/universal_draw_trace.hpp'
+      - 'tools/verify_vr_r26_universal_draw_trace.py'
+      - '.github/skills/out*'
+      - '.github/workflows/vr-r26-drawtrace-check.yml'
+  pull_request:
+    branches:
+      - vr-d3d9ex-focus
+    paths:
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/vr/game/universal_draw_trace.hpp'
+      - 'tools/verify_vr_r26_universal_draw_trace.py'
+      - '.github/skills/**'
+      - '.github/workflows/vr-r26-drawtrace-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  static-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: R26 physical GPU Draw and VR skill regression
+        run: python3 tools/verify_vr_r26_universal_draw_trace.py

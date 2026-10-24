@@ -29,7 +29,8 @@ namespace OutRunVR::UniversalTrace
     };
     enum class Route : std::uint8_t {
         NoRouteEvidence, R30FixedSprite, R30Xyzrhw, R33HudStereo,
-        R33FastWorld, R29Fallback, OriginalPreserved, StateBlockRaw, Count
+        R33FastWorld, R29Fallback, OriginalPreserved, StateBlockRaw,
+        R26ScreenSpace, R26LowerFallback, R26ExternalImGui, Count
     };
     constexpr std::size_t RouteCount = static_cast<std::size_t>(Route::Count);
     constexpr std::size_t FamilyCount = static_cast<std::size_t>(Family::Count);
