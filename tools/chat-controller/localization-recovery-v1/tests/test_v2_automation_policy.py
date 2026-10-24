@@ -27,6 +27,7 @@ class PolicyTests(unittest.TestCase):
             "OUTRUN_AB_TEXT_ROI_QUEUE":"true",
             "OUTRUN_ROI_BRIDGE_ENABLED":"true",
             "OUTRUN_KR_V2_AUTO_GENERATE":"true",
+            "OUTRUN_GPT_CHAT_OCR_ENABLED":"true",
             "OUTRUN_KR_V2_AUTO_COMPOSE":"false",
             "OUTRUN_KR_V2_AUTO_DEPLOY":"false",
             "OUTRUN_A_SINGLE_SMOKE_TASK_ID":"",
@@ -61,6 +62,7 @@ class PolicyTests(unittest.TestCase):
         self.assertIn("PIPELINE_NOT_FULLY_ENABLED", self.gate(OUTRUN_ROI_BRIDGE_ENABLED="false")[1])
         self.assertIn("PIPELINE_NOT_FULLY_ENABLED", self.gate(OUTRUN_AB_TEXT_ROI_QUEUE="false")[1])
         self.assertIn("PIPELINE_NOT_FULLY_ENABLED", self.gate(OUTRUN_KR_V2_AUTO_GENERATE="false")[1])
+        self.assertIn("PIPELINE_NOT_FULLY_ENABLED", self.gate(OUTRUN_GPT_CHAT_OCR_ENABLED="false")[1])
         self.assertIn("NO_SEND_INTERLOCK", self.gate(OUTRUN_KR_V2_NO_SEND="true")[1])
 
     def test_invalid_phase_and_bad_policy_rejected(self):
@@ -86,6 +88,7 @@ class PolicyTests(unittest.TestCase):
         self.assertIn('AUTO_SEND: "true"', s)
         self.assertIn('SCHEDULE_MINUTES: "0,10,15,20,30,40,45,50"', s)
         self.assertIn('OUTRUN_AB_TEXT_ROI_QUEUE: "true"', s)
+        self.assertIn('OUTRUN_GPT_CHAT_OCR_ENABLED: "true"', s)
         self.assertIn('OUTRUN_A_TILE_BATCH_QUEUE: "false"', s)
         self.assertIn('OUTRUN_AB_BATCH_QUEUE: "false"', s)
         self.assertIn('OUTRUN_KR_V2_AUTO_COMPOSE: "false"', s)
