@@ -84,8 +84,10 @@
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
       "NATIVE_EYE_GPU_POSTPASS",
-      "OPENXR_GPU_HANDOFF"
-    ]
+      "OPENXR_GPU_HANDOFF",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_goal_validation": "VISIBLE_FRAME_OUTPUT is the required planned final stage, NOT proof of a rendered real-game pixel. Runtime/HMD remain UNTESTED."
   },
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.cpp",
@@ -98,6 +100,6 @@
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_game_stereo_submission.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Complete mandatory exact-SHA CI; repair actual failures under 01039. Do not claim game/HMD PASS.",
+  "NEXT_IMPLEMENTATION_ACTION": "Run exact-SHA mandatory gates for typed camera GPU postpass; repair only observed CI errors. Visible real-game output remains UNTESTED.",
   "full_dx11_renderer_complete": false
 }

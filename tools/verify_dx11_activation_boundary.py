@@ -655,7 +655,10 @@ def main() -> None:
                 "float(clipped.right - clipped.left),",
                 "float(clipped.bottom - clipped.top), 0.f, 1.f",
                 "clipped.uv.constants.data()",
-                "FAILED(device->CheckFormatSupport(sd.Format, &sourceSupport)) ||",
+                # Verify the *resolved typed RTV interpretation*, not the
+                # typeless allocation that cannot be sampled by the shader.
+                # Keep a hard guard so skipping CheckFormatSupport fails closed.
+                "FAILED(device->CheckFormatSupport(sampleFormat, &sourceSupport)) ||",
                 "FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)))",
                 "(sourceSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,",
                 "(eyeSupport & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,",

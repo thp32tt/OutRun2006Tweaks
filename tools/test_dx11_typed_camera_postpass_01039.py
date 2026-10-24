@@ -14,6 +14,12 @@ assert "next.renderedViewFormat = record.renderedViewFormat;" in cpp
 assert "prior.renderedViewFormat != renderedViewFormat" in cpp
 assert "offscreen_color_view_format(source, sourceArraySlice, sourceMipSlice)" in cpp
 assert "CheckFormatSupport(sampleFormat, &sourceSupport)" in cpp
+# The native-eye activation boundary must explicitly require the typed source
+# format check, or Build/source-graph CI could silently regress to checking the
+# non-sampleable DXGI TYPELESS allocation instead of the actual RTV view.
+activation = (root / "tools/verify_dx11_activation_boundary.py").read_text()
+assert '"FAILED(device->CheckFormatSupport(sampleFormat, &sourceSupport)) ||"' in activation
+assert '"FAILED(device->CheckFormatSupport(sd.Format, &sourceSupport)) ||"' not in activation
 assert "desc.Format = sampleFormat;" in cpp
 assert "typedView.Format = sampleFormat;" in cpp
 assert "sampled.Get(), 0u, source, sourceSubresource, sampleFormat)" in cpp
