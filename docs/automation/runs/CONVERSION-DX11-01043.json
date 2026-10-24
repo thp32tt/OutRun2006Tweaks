@@ -72,7 +72,7 @@
   },
   "development_strategy": {
     "work_class": "integration",
-    "milestone_id": "full_resolution_native_game_frame",
+    "milestone_id": "native_stereo_eye_transport",
     "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
     "integration_path": [
       "game-authored color fill event structure",
@@ -81,7 +81,27 @@
       "source-code and isolated WARP verification"
     ],
     "visible_frame_acceptance": "SOURCE_CI_ONLY_RUNTIME_UNTESTED",
-    "activation_guard_and_fallback": "Original D3D9Ex rendering, input, FFB and DXVK frozen; still no real HMD runtime proof"
+    "activation_guard_and_fallback": "Original D3D9Ex rendering, input, FFB and DXVK frozen; still no real HMD runtime proof",
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_color_fill.hpp",
+      "tools/dx11_native_eye_color_fill_01043.cpp",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Existing exact-SHA Windows WARP source replay regression tools/dx11_native_eye_color_fill_01043.cpp and live ColorFill stereo C++ GPU path (five recorded source SHA gates).",
+      "negative_regression": "Physical surface clipping rejects invalid coverage while original D3D9 output stays authoritative and runtime counts remain UNTESTED.",
+      "component_integration": "NativeGameEyeDrawEncoder::clear_target_argb replays ColorFill in ordinal sequence in native_game_stereo_submission.cpp; actual game producer/HMD linkage is not yet demonstrated."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_AUTHORED_COLORFILL"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ]
   },
   "validation_gates": {
     "DX11 Fast Structural Checks": {
@@ -141,24 +161,31 @@
       "evidence_paths": [
         "src/vr/d3d11/native_game_color_fill.hpp",
         "tools/dx11_native_eye_color_fill_01043.cpp"
-      ]
+      ],
+      "validation_command": "GitHub Actions: DX11 Fast Structural Checks and native WARP run SUCCESS at c32894d6daf793403ef2b4784dbc512a3a431ad6"
     },
     "alpha_and_ordinal": {
       "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_stereo_submission.cpp",
         "src/vr/d3d11/native_game_stereo_submission.hpp"
-      ]
+      ],
+      "validation_command": "GitHub Actions: DX11 Fast Structural Checks and native WARP run SUCCESS at c32894d6daf793403ef2b4784dbc512a3a431ad6"
     },
     "fail_closed": {
       "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_stereo_submission.cpp"
-      ]
+      ],
+      "validation_command": "GitHub Actions: DX11 Fast Structural Checks and native WARP run SUCCESS at c32894d6daf793403ef2b4784dbc512a3a431ad6"
     },
     "exact_sha": {
       "status": "PASS_EXACT_SHA",
-      "validation_bearing_result_sha": "c32894d6daf793403ef2b4784dbc512a3a431ad6"
+      "validation_bearing_result_sha": "c32894d6daf793403ef2b4784dbc512a3a431ad6",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01043.json"
+      ],
+      "validation_command": "GitHub Actions five mandatory push workflows SUCCESS at c32894d6daf793403ef2b4784dbc512a3a431ad6"
     }
   },
   "c6_summary": "Five mandatory GitHub push Actions SUCCESS on exact repair source SHA; additional WARP SUCCESS. Code-only validation; actual game/Quest3/VDXR, native rendered pixel output and input UNTESTED.",

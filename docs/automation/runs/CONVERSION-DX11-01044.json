@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01044",
+  "production_id": "CONVERSION-DX11-01044",
+  "event_id": "CONVERSION-DX11-01044-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01044",
+  "classification": "A",
+  "feature_id": "DX11_NATIVE_FULL_COLORFILL_EPOCH_STEREO_ALPHA_01044",
+  "work_key": "DX11:LIVE_COLORFILL_SOURCE_EPOCH_AND_NATIVE_STEREO_ALPHA",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "feature_stage": "C5_VALIDATION_WAIT",
+  "checkpoint": "C5_VALIDATION_WAIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "feature_ready": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Fix observed source-code defect: after a genuine already-submitted native draw a successful whole D3D9 ColorFill must retire old GPU source draw evidence rather than publish erased geometry. Preserve original game fallback. Reuse one exact D3D9 ARGB/X8 converter for native stereo eye full seed, chronological ColorFill and live native partial ColorFill. Actual game and HMD remain UNTESTED.",
+  "feature_base_sha": "929495acbe8a9a13febad278d923802c23f73aeb",
+  "material_result_sha": "4a47fd2bbc6ff24c41afde111fdf51124de3cee9",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_color_fill.hpp",
+    "tools/dx11_native_full_colorfill_epoch_01044.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_NATIVE_FULL_COLORFILL_EPOCH_STEREO_ALPHA_01044",
+    "goal": "Preserve authentic native game-frame color evidence and per-eye physical-alpha pixels across full D3D9 ColorFill, keeping DX9Ex fallback authoritative.",
+    "acceptance_items": [
+      {
+        "id": "live_full_fill_epoch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_DRAW_COLOR_EPOCH",
+        "expected_behavior": "A full game ColorFill after a real native Draw retires the old source batch without presenting erased geometry."
+      },
+      {
+        "id": "stereo_physical_alpha",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_STEREO_EYE_COLOR_SEED",
+        "expected_behavior": "Each native stereo-eye full seed and chronological ColorFill preserve X8 opaque and A8 source alpha semantics."
+      },
+      {
+        "id": "dx9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_GAME_INPUT_PRESENT",
+        "expected_behavior": "Previously submitted GPU bytes are not published after overwrite; original D3D9 output, input and FFB remain authoritative."
+      },
+      {
+        "id": "final_gates",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_GITHUB_ACTIONS",
+        "expected_behavior": "Mandatory Fast, Backend, Build, OpenXR and HUD Actions succeed on identical last material source SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "real D3D9 ColorFill interception and native live game draw evidence",
+      "whole ColorFill source epoch retirement or partial in-place GPU replay",
+      "per-eye native source full color seed from physical X8/A8 provenance",
+      "native stereo chronological GPU fill and original D3D9 fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_color_fill.hpp",
+      "tools/dx11_native_full_colorfill_epoch_01044.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_native_full_colorfill_epoch_01044.cpp covers A8/X8 dual-eye alpha, source draw batch invalidation and scoped partial replay; final Windows build gate still required.",
+      "negative_regression": "The original D3D9 HRESULT, renderer, gamepad and FFB remain untouched; full overwrite after a Draw invalidates native publication rather than claiming a rendered frame.",
+      "component_integration": "Live native D3D9 ColorFill interceptor and shared native eye encoder use a common physical-alpha pixel conversion; stereo full source seed preserves per-eye surface format. Actual HMD producer linkage remains unproven."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_COLORFILL_SOURCE_EPOCH_AND_NATIVE_STEREO_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_CI_PENDING_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "Native opt-in and source provenance remain fail-closed, original DX9Ex renderer/input/FFB authoritative and DXVK frozen."
+  },
+  "acceptance_results": {
+    "live_full_fill_epoch": {
+      "status": "PENDING_CI"
+    },
+    "stereo_physical_alpha": {
+      "status": "PENDING_CI"
+    },
+    "dx9ex_fallback": {
+      "status": "PENDING_CI"
+    },
+    "final_gates": {
+      "status": "PENDING_EXACT_SHA"
+    }
+  },
+  "ci_failure_repair": "Initial Fast/Backend source SHA 4a47fd2 failed before source probes: previous 01043 run-record lacked new policy strategy fields and acceptance proof commands. Added authentic source-stage metadata, kept earlier validated SHA and truthful runtime status unchanged."
+}
