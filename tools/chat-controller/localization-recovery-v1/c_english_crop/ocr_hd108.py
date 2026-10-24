@@ -125,6 +125,8 @@ def recover_legacy_pixel_equal(rows,max_new=1000,src_root=SRC,out_root=OUT):
  try:
   prior=json.loads(receipt_path.read_text(encoding="utf-8"))
   if prior.get("version")==LEGACY_PIXEL_RECOVERY_VERSION and prior.get("status")=="LEGACY_PIXEL_RECOVERY_COMPLETE":
+   prior=dict(prior)
+   prior["recovered_this_call"]=0
    return prior
  except (OSError,ValueError,TypeError):
   pass
@@ -267,6 +269,7 @@ def recover_legacy_pixel_equal(rows,max_new=1000,src_root=SRC,out_root=OUT):
    result["details"].append({"q":q,"legacy_source":str(old),
                              "status":"HOLD","reason":type(e).__name__+":"+str(e)[:180]})
  result["status"]="LEGACY_PIXEL_RECOVERY_COMPLETE"
+ result["recovered_this_call"]=result["recovered"]
  REPORT.mkdir(parents=True,exist_ok=True)
  discover.save_json_atomic(receipt_path,result)
  return result
@@ -476,7 +479,7 @@ def scan(max_sources=4,max_new=1000):
          "located_phrase_count":located_phrase_count,
          "selected":[r["png_filename"] for _,r in selected],
          "scanned":0,"matched":0,
-         "new_crops":int(legacy_recovery.get("recovered",0)),
+         "new_crops":int(legacy_recovery.get("recovered_this_call",0)),
          "legacy_recovered":int(legacy_recovery.get("recovered",0)),
          "duplicates":0,"held":0,
          "edge_review_crops":int(legacy_recovery.get("edge_review_crops",0)),
