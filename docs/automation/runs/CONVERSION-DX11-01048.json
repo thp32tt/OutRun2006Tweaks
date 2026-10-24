@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:LIVE_COLORFILL_DEPTH_SCENE_RECOVERY",
   "work_key": "DX11:MENU_CAR_RACE_AUTHORED_COLOR_Z_EPOCH",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_RESULT_COMMITTED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "bc6c2e51e394c3b5dc4de325490a46cab320d271",
   "score_change": 0,
   "score_award_event": false,
   "summary": "Retire game native D3D11 color+depth after a genuine whole ColorFill and resume same-Present full-sized Draw only after a real full canonical-main-Z D3D9 Clear on the same device/target; never publish stale depth or colors. Original D3D9 Present/input/FFB stays authoritative; actual game/HMD UNTESTED.",
@@ -124,5 +124,35 @@
       ]
     }
   },
-  "ci_failure_repair": "First exact-SHA Fast 40074875575 failed historical 00732 depth-only mutation because new recovery branch duplicated the original preDrawDepth.discard() operation; restructured source to route recovered whole-Z into the SAME verified existing clearZ discard+DSV seed (not weakening the existing 00732 mutation or any Gate). Second exact-SHA Fast 40075069256 passed 00732 but 00734 required the historical !beforeFirstGameDraw conditional unchanged; folded recovered main-Z eligibility into the existing beforeFirstGameDraw predicate, retaining both mutation checks and the same real owner/coverage validation."
+  "ci_failure_repair": "First exact-SHA Fast 40074875575 failed historical 00732 depth-only mutation because new recovery branch duplicated the original preDrawDepth.discard() operation; restructured source to route recovered whole-Z into the SAME verified existing clearZ discard+DSV seed (not weakening the existing 00732 mutation or any Gate). Second exact-SHA Fast 40075069256 passed 00732 but 00734 required the historical !beforeFirstGameDraw conditional unchanged; folded recovered main-Z eligibility into the existing beforeFirstGameDraw predicate, retaining both mutation checks and the same real owner/coverage validation.",
+  "c6_reconciliation_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_gate_results": {
+    "validation_sha": "bc6c2e51e394c3b5dc4de325490a46cab320d271",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40075237217,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40075237290,
+      "event": "push"
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40075237239,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40075237286,
+      "event": "push"
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40075237205,
+      "event": "push"
+    },
+    "note": "Five mandatory GitHub Actions SUCCESS at exact material validation SHA; gameplay and Quest3/VDXR runtime remain UNTESTED. C6 bookkeeping [skip ci], no duplicate CI or scoring."
+  }
 }
