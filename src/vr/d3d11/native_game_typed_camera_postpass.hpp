@@ -175,4 +175,44 @@ static_assert(native_game_typed_camera_preflight_formats(
 static_assert(native_game_typed_camera_preflight_formats(
     DXGI_FORMAT_R8G8B8A8_UNORM)[0] == DXGI_FORMAT_R8G8B8A8_UNORM);
 
+ // A real TYPELESS camera may transfer raw color into a typed XR eye only
+ // if its exact game Draw/Clear RTV view (physical mip/array) matches that eye.
+ // This candidate helper is for BOTH-eye preflight, never pixel proof.
+ [[nodiscard]] constexpr bool native_game_raw_camera_copy_candidate(
+     DXGI_FORMAT allocation, DXGI_FORMAT eyeFormat) noexcept {
+     if (eyeFormat == DXGI_FORMAT_UNKNOWN || allocation == eyeFormat)
+         return false;
+     for (const auto typed :
+          native_game_typed_camera_preflight_formats(allocation))
+         if (typed == eyeFormat &&
+             native_game_typed_camera_shader_format(allocation, typed) == typed)
+             return true;
+     return false;
+ }
+ [[nodiscard]] constexpr bool native_game_raw_camera_copy_format(
+     DXGI_FORMAT allocation, DXGI_FORMAT eyeFormat,
+     DXGI_FORMAT observedView) noexcept {
+     return observedView == eyeFormat &&
+            native_game_raw_camera_copy_candidate(allocation, eyeFormat);
+ }
+ static_assert(native_game_raw_camera_copy_candidate(
+     DXGI_FORMAT_R8G8B8A8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM));
+ static_assert(native_game_raw_camera_copy_candidate(
+     DXGI_FORMAT_R16G16B16A16_TYPELESS, DXGI_FORMAT_R16G16B16A16_FLOAT));
+ static_assert(native_game_raw_camera_copy_format(
+     DXGI_FORMAT_B8G8R8A8_TYPELESS, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+     DXGI_FORMAT_B8G8R8A8_UNORM_SRGB));
+ static_assert(!native_game_raw_camera_copy_format(
+     DXGI_FORMAT_R8G8B8A8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM,
+     DXGI_FORMAT_UNKNOWN));
+ static_assert(!native_game_raw_camera_copy_format(
+     DXGI_FORMAT_R8G8B8A8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM,
+     DXGI_FORMAT_R8G8B8A8_UNORM_SRGB));
+ static_assert(!native_game_raw_camera_copy_candidate(
+     DXGI_FORMAT_R24G8_TYPELESS, DXGI_FORMAT_R24_UNORM_X8_TYPELESS));
+ static_assert(!native_game_raw_camera_copy_candidate(
+     DXGI_FORMAT_BC1_TYPELESS, DXGI_FORMAT_BC1_UNORM));
+ static_assert(!native_game_raw_camera_copy_candidate(
+     DXGI_FORMAT_R8G8B8A8_UINT, DXGI_FORMAT_R8G8B8A8_UNORM));
+
 } // namespace outrun::vr::dx11

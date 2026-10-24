@@ -473,6 +473,8 @@ jobs:
           python tools/test_dx11_typed_camera_postpass_01039.py
           # 01040: typed camera preflight -> exact live RTV GPU postpass path.
           python tools/test_dx11_typed_camera_preflight_01040.py
+          # 01041 full-frame typed game camera Copy/Resolve without shader.
+          python tools/test_dx11_typed_camera_raw_copy_01041.py
           # 01038 independently authored offscreen MRT game Draw -> GPU color source.
           python tools/test_dx11_game_offscreen_mrt_01038.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_mrt_probe_01038.cpp -o /tmp/dx11_offscreen_mrt_01038 && /tmp/dx11_offscreen_mrt_01038

@@ -1736,6 +1736,13 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         clippedCopy.sourceRight, clippedCopy.sourceBottom, 1u};
     const UINT eyeDestX = clippedCopy.destX;
     const UINT eyeDestY = clippedCopy.destY;
+    // Genuine game camera color in a TYPELESS allocation can be GPU-copied
+    // byte-for-byte into a typed ring RTV ONLY when the actually observed
+    // physical camera RTV format matches the XR eye. Never guess from family.
+    const bool rawTypedCameraCopy = native_game_raw_camera_copy_format(
+        sourceDesc.Format, eyeDesc.Format,
+        offscreen_color_view_format(
+            source, sourceArraySlice, sourceMipSlice));
     // D3D9 StretchRect also performs format conversion for unscaled
     // menu/vehicle postpasses. CopySubresourceRegion cannot do that. Replay
     // the caller's exact mip-zero source rectangle with a native point-sampled
@@ -1743,7 +1750,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // or falling back to a CPU/desktop copy. The existing stretch admission
     // rejects unsupported/foreign resources before GPU mutation. This path
     // must never count its fullscreen shader triangle as game Draw evidence.
-    if (sourceDesc.Format != eyeDesc.Format) {
+    if (sourceDesc.Format != eyeDesc.Format && !rawTypedCameraCopy) {
         const UINT width = box.right - box.left;
         const UINT height = box.bottom - box.top;
         const UINT maxLong = static_cast<UINT>(
@@ -1792,7 +1799,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // MSAA sources still require exactly one mip and an explicit GPU resolve.
     const bool needsResolve = sourceDesc.SampleDesc.Count > 1u;
     if (sourceDesc.Format == DXGI_FORMAT_UNKNOWN ||
-        sourceDesc.Format != eyeDesc.Format ||
+        (sourceDesc.Format != eyeDesc.Format && !rawTypedCameraCopy) ||
         sourceDesc.MipLevels == 0u ||
         (needsResolve && sourceDesc.MipLevels != 1u) ||
         sourceArraySlice >= sourceDesc.ArraySize ||
@@ -1811,7 +1818,9 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         // unresolvable/typeless color format; retain D3D9 in that case.
         UINT support = 0u;
         if ((sourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u ||
-            FAILED(owner->CheckFormatSupport(sourceDesc.Format, &support)) ||
+            FAILED(owner->CheckFormatSupport(
+                rawTypedCameraCopy ? eyeDesc.Format : sourceDesc.Format,
+                &support)) ||
             (support & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)
             return false;
     }
@@ -1849,6 +1858,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     if (needsResolve && !fullResolve) {
         resolveScratchLock = std::unique_lock<std::mutex>(resolveScratchMutex);
         D3D11_TEXTURE2D_DESC resolvedDesc = sourceDesc;
+        // Resolve the observed typed RTV, never the TYPELESS allocation.
+        if (rawTypedCameraCopy) resolvedDesc.Format = eyeDesc.Format;
         resolvedDesc.SampleDesc.Count = 1u;
         resolvedDesc.SampleDesc.Quality = 0u;
         resolvedDesc.ArraySize = 1u; // selected camera only
@@ -1887,7 +1898,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         if (needsResolve) {
             context_->ResolveSubresource(
                 fullResolve ? eyeColor.Get() : resolved.Get(),
-                0u, source, sourceSubresource, sourceDesc.Format);
+                0u, source, sourceSubresource,
+                rawTypedCameraCopy ? eyeDesc.Format : sourceDesc.Format);
             if (!fullResolve) {
                 context_->CopySubresourceRegion(
                     eyeColor.Get(), 0u, eyeDestX, eyeDestY, 0u,
@@ -3103,7 +3115,13 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                               (desc.BindFlags &
                                D3D11_BIND_RENDER_TARGET) == 0u)))
                             return false;
-                        if (desc.Format != ring_.format()) {
+                        // This is only format-family preflight. The GPU
+                        // encoder later demands the exact observed RTV.
+                        const bool rawCameraCandidate =
+                            native_game_raw_camera_copy_candidate(
+                                desc.Format, ring_.format());
+                        if (desc.Format != ring_.format() &&
+                            !rawCameraCandidate) {
                             needsPostpassShader = true;
                             // Both real camera view families and the output
                             // format must pass BEFORE either eye is touched.
@@ -3113,7 +3131,9 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         } else if (desc.SampleDesc.Count > 1u) {
                             UINT support = 0u;
                             if (FAILED(producer->CheckFormatSupport(
-                                    desc.Format, &support)) ||
+                                    rawCameraCandidate
+                                        ? ring_.format() : desc.Format,
+                                    &support)) ||
                                 (support &
                                  D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)
                                 return false;
