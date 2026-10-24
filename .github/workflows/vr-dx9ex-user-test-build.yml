@@ -61,6 +61,9 @@ jobs:
           Copy-Item $vrHostExe.FullName "$dir/outrun-vr-host.exe"
           Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
           Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
+          Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
+          Copy-Item tools/Run-DX9ExFocusTest.ps1 "$dir/Run-DX9ExFocusTest.ps1"
+          Set-Content "$dir/DX9EX_VARIANT.txt" 'variant=R26_TIME_GOAL_RIVAL_TEST' -Encoding ascii
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
           @(
             'DX9Ex R26 + HUD user test build'
@@ -68,7 +71,29 @@ jobs:
             'Renderer: R26+HUD default'
             'Runner: GitHub-hosted windows-2022'
             'RUNTIME_VALIDATION=UNTESTED'
+            ''
+            'EXECUTION / 실행 방법'
+            '1. Extract ALL files directly into the folder containing OR2006C2C.EXE.'
+            '2. Double-click RUN_DX9EX_TEST.cmd.'
+            '3. Do NOT run outrun-vr-host.exe directly. It is a VR helper process and a white helper window is not the game.'
+            '4. Test +TIME, GOAL/result time/progress, and the RIVAL marker; then exit the game normally.'
+            '5. Upload DX9EX_LOGS/DX9EX_LOG_R26_TIME_GOAL_RIVAL_TEST_*.zip if a defect remains.'
+          ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
+          @(
+            'DX9Ex R26 + HUD user test build'
+            'Targets: +TIME / GOAL-result HUD / rival marker regression'
+            'Renderer: R26+HUD default'
+            'Runner: GitHub-hosted windows-2022'
+            'Launcher: RUN_DX9EX_TEST.cmd'
+            'RUNTIME_VALIDATION=UNTESTED'
           ) | Set-Content "$dir/TEST_SCOPE.txt" -Encoding UTF8
+          foreach ($required in @(
+            'dinput8.dll','outrun-vr-host.exe','RUN_DX9EX_TEST.cmd',
+            'Run-DX9ExFocusTest.ps1','DX9EX_VARIANT.txt','START_HERE.txt')) {
+            if (-not (Test-Path (Join-Path $dir $required))) {
+              throw "user test package missing $required"
+            }
+          }
           Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
 
       - uses: actions/upload-artifact@v4
