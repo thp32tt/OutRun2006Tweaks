@@ -1,0 +1,157 @@
+name: DX9Ex R26 b7ca Isolated Test Packages
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - vr-d3d9ex-candidate/20261025-b7ca-correctness
+    paths:
+      - '.github/workflows/vr-dx9ex-b7ca-correctness-package.yml'
+
+jobs:
+  normal-build-and-package:
+    runs-on: windows-2022
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+      - name: Verify exact user-tested baseline heritage
+        shell: pwsh
+        run: |
+          $sha=(git rev-parse HEAD).Trim()
+          if ($sha -ne $env:GITHUB_SHA) { throw 'Build SHA drift' }
+          $parent='b7ca566b0098dba8b7a4746c7950c65a7309006b'
+          git merge-base --is-ancestor $parent HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'This build did not descend from user-tested b7ca baseline' }
+          $settings=Get-Content OutRun2006Tweaks.ini -Raw
+          foreach ($token in @('HudScale = 0.55','CullingUnionMarginDegrees = 8.0',
+                               'RivalDx11NativeRoute = false','DriverSeatVehicleScale = 1.0',
+                               'FollowGameResolution = true','UnifiedEyeMenuSource = false')) {
+            if (!$settings.Contains($token)) { throw "Baseline invariant failed: $token" }
+          }
+          foreach ($test in @('tools/verify_vr_driver_seat_basis_stability.py',
+                               'tools/verify_vr_r26_result_hud_pose.py',
+                               'tools/verify_vr_rank_dx11_reference.py')) {
+            python $test
+            if ($LASTEXITCODE -ne 0) { throw "R26 critical source test failed: $test" }
+          }
+      - name: Configure original R26 HUD Win32 and x64 host
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          if ($LASTEXITCODE -ne 0) { throw 'R26 game CMake configuration failed' }
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          if ($LASTEXITCODE -ne 0) { throw 'Host CMake configuration failed' }
+      - name: Apply pinned Windows dependency compatibility fixes
+        shell: pwsh
+        run: |
+          foreach ($f in @('build-game/_deps/safetyhook-build/src/safetyhook.vcxproj',
+                           'build-game/_deps/zydis-build/Zydis.vcxproj',
+                           'build-game/_deps/zydis-build/zycore/Zycore.vcxproj')) {
+            if (Test-Path $f) {
+              (Get-Content $f) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content $f
+            }
+          }
+          if (Test-Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c) {
+            Set-Content build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          }
+          $cfg='build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h'
+          if (Test-Path $cfg) {
+            (Get-Content $cfg) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content $cfg
+          }
+      - name: Compile full Release test binaries
+        shell: pwsh
+        run: |
+          cmake --build build-game --config Release --target outrun2006tweaks --parallel 2
+          if ($LASTEXITCODE -ne 0) { throw 'x86 Release game compile failed' }
+          cmake --build build-host --config Release --target outrun-vr-host --parallel 2
+          if ($LASTEXITCODE -ne 0) { throw 'x64 Release OpenXR host compile failed' }
+          New-Item -ItemType Directory -Force stage/TEST | Out-Null
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
+          if (!$dll -or !$exe) { throw 'Compiled Release binaries missing' }
+          Copy-Item $dll.FullName stage/TEST/dinput8.dll
+          Copy-Item $exe.FullName stage/TEST/outrun-vr-host.exe
+      - name: Compile full RelWithDebInfo debug binaries
+        shell: pwsh
+        run: |
+          cmake --build build-game --config RelWithDebInfo --target outrun2006tweaks --parallel 2
+          if ($LASTEXITCODE -ne 0) { throw 'x86 debug-symbol game compile failed' }
+          cmake --build build-host --config RelWithDebInfo --target outrun-vr-host --parallel 2
+          if ($LASTEXITCODE -ne 0) { throw 'x64 debug-symbol OpenXR host compile failed' }
+          New-Item -ItemType Directory -Force stage/DEBUG | Out-Null
+          $dll=Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          $exe=Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
+          if (!$dll -or !$exe) { throw 'Compiled debug binaries missing' }
+          Copy-Item $dll.FullName stage/DEBUG/dinput8.dll
+          Copy-Item $exe.FullName stage/DEBUG/outrun-vr-host.exe
+          Get-ChildItem build-game -Recurse -Filter dinput8.pdb | Select-Object -First 1 | ForEach-Object { Copy-Item $_.FullName stage/DEBUG/dinput8.pdb }
+          Get-ChildItem build-host -Recurse -Filter outrun-vr-host.pdb | Select-Object -First 1 | ForEach-Object { Copy-Item $_.FullName stage/DEBUG/outrun-vr-host.pdb }
+      - name: Package two complete game-launch bundles
+        shell: pwsh
+        run: |
+          $sha=$env:GITHUB_SHA
+          $short=$sha.Substring(0,12)
+          foreach ($mode in @('TEST','DEBUG')) {
+            $dir="OutRun2_VR_R26_B7CA_ISOLATED_$($mode)_$short"
+            New-Item -ItemType Directory -Force "$dir/backends/d3d9" | Out-Null
+            Copy-Item "stage/$mode/dinput8.dll" "$dir/backends/d3d9/dinput8.dll"
+            Copy-Item "stage/$mode/outrun-vr-host.exe" "$dir/backends/d3d9/outrun-vr-host.exe"
+            foreach ($name in @('START_DX9EX_TEST.cmd','Select-OutRunVRBackend.ps1',
+                                 'Run-OutRunVRTest.ps1','OutRunVR-TestProfiles.ps1',
+                                 'Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1',
+                                 'Collect-OutRunVREyeExtent.ps1')) {
+              if (!(Test-Path "tools/$name")) { throw "Required runner missing: $name" }
+              Copy-Item "tools/$name" "$dir/$name"
+            }
+            Copy-Item "tools/START_DX9EX_TEST.cmd" "$dir/START_HERE.cmd"
+            Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
+            Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
+            Set-Content "$dir/backends/d3d9/SOURCE_SHA.txt" $sha -Encoding ascii
+            Set-Content "$dir/backends/d3d9/BUILD_VARIANT.txt" "ACTIVE_R26_R43_R44" -Encoding ascii
+            Set-Content "$dir/backends/d3d9/CMAKE_FLAGS.txt" "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF" -Encoding ascii
+            Set-Content "$dir/SOURCE_SHA.txt" $sha -Encoding ascii
+            Set-Content "$dir/BUILD_MATRIX_ID.txt" "R26_B7CA_ISOLATED_$mode" -Encoding ascii
+            $inputs=[ordered]@{SchemaVersion=1;IntegrationSha=$sha;VariantId='ACTIVE_R26_R43_R44';ValidationClass='GITHUB_ACTIONS_NORMAL_BUILD';HmdRuntimeVerified=$false}
+            $inputs | ConvertTo-Json | Set-Content "$dir/BUILD_INPUTS.json" -Encoding UTF8
+            @(
+              'OutRun 2006 VR R26 baseline b7ca isolated correctness candidate'
+              "Mode: $mode"
+              "GitHub exact commit: $sha"
+              '1. Back up your game folder DLL/host/INI and prior settings.'
+              '2. Extract ALL files directly into the original OR2006C2C.EXE game folder.'
+              '3. Double-click START_HERE.cmd (DO NOT run host EXE by itself).'
+              '4. Test camera view switches, cockpit, +TIME, GOAL, rival, lens and menu aspect.'
+              '5. On exit provide log archive and exact runtime visual feedback.'
+              'Compile success does NOT equal headset test success.'
+            ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
+            foreach ($required in @('START_HERE.cmd','START_DX9EX_TEST.cmd',
+                       'Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1',
+                       'OutRun2006Tweaks.ini','BUILD_INPUTS.json',
+                       'backends/d3d9/dinput8.dll','backends/d3d9/outrun-vr-host.exe',
+                       'backends/d3d9/SOURCE_SHA.txt')) {
+              if (!(Test-Path (Join-Path $dir $required))) { throw "Missing runnable payload file: $required" }
+            }
+            foreach ($bin in @('backends/d3d9/dinput8.dll','backends/d3d9/outrun-vr-host.exe')) {
+              $f=Join-Path $dir $bin
+              $bytes=[IO.File]::ReadAllBytes((Resolve-Path $f).Path)
+              if ($bytes.Length -lt 512 -or $bytes[0] -ne 77 -or $bytes[1] -ne 90) { throw "Invalid PE binary: $f" }
+            }
+            if ($mode -eq 'DEBUG') {
+              Get-ChildItem stage/DEBUG -Filter *.pdb | ForEach-Object { Copy-Item $_.FullName $dir }
+            }
+            Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
+            if ((Get-Item "$dir.zip").Length -lt 250000) { throw 'ZIP smaller than full runtime package' }
+            Get-FileHash "$dir.zip" -Algorithm SHA256 | Format-List
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DX9Ex-R26-b7ca-Test-and-Debug-${{ github.sha }}
+          path: OutRun2_VR_R26_B7CA_ISOLATED_*.zip
+          if-no-files-found: error
