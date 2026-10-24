@@ -1,0 +1,353 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0245KST-B0083-A0070-NEW-SHA8",
+  "reviewer": "ChatGPT AI1",
+  "checked_at_kst": "2026-10-25T02:49:00+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "task_ids": [
+    "OUTRUN-ROI-B-0083-3DF4EE71",
+    "OUTRUN-ROI-A-0070-4F31A100"
+  ],
+  "previous_reviewed_unique_sha_count": 737,
+  "newly_reviewed_unique_sha_count": 8,
+  "summary": {
+    "PASS": 0,
+    "FAIL": 1,
+    "HOLD": 7
+  },
+  "policy_paths": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "records": [
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0083-3DF4EE71",
+      "ordinal": 399,
+      "source_file": "Q054_297a75bdfd299a60_source.png",
+      "source_sha256": "2f1ab1220c845831d0c3e5b3201e742b4e8f62f890f2564a6c7a3edf00d0e12d",
+      "candidate_file": "Q054_297a75bdfd299a60_source_k.png",
+      "candidate_sha256": "0b2a703bcbe34e942d0b613a01e7e1a0cbe4f8deb84026630801ea10a5540147",
+      "english": "Count Red Cars!",
+      "approved_korean": "빨간색 차를 세세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1841,
+        854
+      ],
+      "source_dimensions": [
+        2436,
+        1130
+      ],
+      "candidate_alpha_bbox": [
+        50,
+        49,
+        1813,
+        814
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct and legible '빨간색 차를 세세요!'; original input is a multi-UI atlas crop. Exact target text mask, native scaling and adjacent protected-art containment not verified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0083-3DF4EE71",
+      "ordinal": 400,
+      "source_file": "Q054_9a855b77e7d5119f_source.png",
+      "source_sha256": "a6503543812097c6652c82b0c5bd50e8edfde5b47166baa5cefca2f493973950",
+      "candidate_file": "Q054_9a855b77e7d5119f_source_k.png",
+      "candidate_sha256": "5b25c3f63dc1a961ec48c99580502a877ba2020c628a1db16762290d25d5e0a0",
+      "english": "Count Red Cars!",
+      "approved_korean": "빨간색 차를 세세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1979,
+        795
+      ],
+      "source_dimensions": [
+        1151,
+        462
+      ],
+      "candidate_alpha_bbox": [
+        65,
+        69,
+        1934,
+        692
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct and legible '빨간색 차를 세세요!'; original contains other English lines, button icons and a composite panel. Must isolate target native cell before overlay.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0083-3DF4EE71",
+      "ordinal": 401,
+      "source_file": "Q054_670b2fe6b77b9efd_source.png",
+      "source_sha256": "03ed972cf429b375cc881fab3cf596ef6e31328e7669a853f4974eead1120254",
+      "candidate_file": "Q054_670b2fe6b77b9efd_source_k.png",
+      "candidate_sha256": "5e39b6c1d689cf77bec5c472852b1d4e2674d9390e24589a6ceda09e0961d274",
+      "english": "Run through green!",
+      "approved_korean": "초록색을 통과하세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2089,
+        753
+      ],
+      "source_dimensions": [
+        1133,
+        408
+      ],
+      "candidate_alpha_bbox": [
+        23,
+        17,
+        2055,
+        699
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct and legible '초록색을 통과하세요!'; source contains adjacent English/UI art. Target ROI protection and alignment are not evidenced.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0083-3DF4EE71",
+      "ordinal": 402,
+      "source_file": "Q054_b96446df2484294e_source.png",
+      "source_sha256": "4df562cbe37677b1ab46af2632ee7def31cef1a59b28a4910cc37a63f732330f",
+      "candidate_file": "Q054_b96446df2484294e_source_k.png",
+      "candidate_sha256": "cc2b6c8484c6917b9c4abacb0e439d758af05250a83b8262aa6be8307aa707df",
+      "english": "Drive above the speed!",
+      "approved_korean": "지정 속도 이상으로 달리세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1831,
+        859
+      ],
+      "source_dimensions": [
+        2840,
+        1333
+      ],
+      "candidate_alpha_bbox": [
+        42,
+        46,
+        1804,
+        705
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct and legible '지정 속도 이상으로 달리세요!'; input is a shared instruction atlas. Placement within actual UI cell/UV and protected illustrations not verified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0083-3DF4EE71",
+      "ordinal": 403,
+      "source_file": "Q054_e60dc2a7c26b40c6_source.png",
+      "source_sha256": "8ae56823a08d76d46b32951d4b5f0eb28a6183a6a4d5896c933affb78effe6a0",
+      "candidate_file": "Q054_e60dc2a7c26b40c6_source_k.png",
+      "candidate_sha256": "385eeacd18a157c985622d386f8cd0cf45906633dd95ab1846bbbf7890f08756",
+      "english": "Run through green!",
+      "approved_korean": "초록색을 통과하세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2089,
+        753
+      ],
+      "source_dimensions": [
+        1133,
+        408
+      ],
+      "candidate_alpha_bbox": [
+        45,
+        44,
+        2042,
+        721
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct and legible '초록색을 통과하세요!'; resized candidate is not proven registered to native source coordinates. Missing protection/overlap verification.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0070-4F31A100",
+      "ordinal": 344,
+      "source_file": "Q054_5c2018c95b8a7041_source.png",
+      "source_sha256": "3c4a4c6c5e22f3bf7776c2c8d1018c63e995d3412e45bc1daf16d8d250855e4f",
+      "candidate_file": "Q054_5c2018c95b8a7041_source_k.png",
+      "candidate_sha256": "dff98cdef4e14d8563da7d34ba19e44a3ed850f80e326f8c6c4b0ce2e1036212",
+      "english": "Spot the odd one out!",
+      "approved_korean": "다른 하나를 찾으세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1905,
+        825
+      ],
+      "source_dimensions": [
+        1669,
+        723
+      ],
+      "candidate_alpha_bbox": [
+        11,
+        88,
+        1905,
+        702
+      ],
+      "candidate_alpha_touches_canvas_edge": true,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "FAIL",
+      "reason_code": "RIGHT_EDGE_EFFECT_CLIPPING",
+      "reason": "Correct '다른 하나를 찾으세요!' but alpha effects touch the rightmost canvas edge (alpha bbox right=1905 equals width=1905), and visible dark right-edge contour is cropped. Needs regeneration with safe transparent margin; native fit still unverified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0070-4F31A100",
+      "ordinal": 345,
+      "source_file": "Q054_4deb72a614f7778c_source.png",
+      "source_sha256": "7ab2cf3c47cd3e3f90f3ff848f4658318eb3cb70638cb68126464b95426b7c67",
+      "candidate_file": "Q054_4deb72a614f7778c_source_k.png",
+      "candidate_sha256": "83e99c9917a144562b44e97016d9310d7a192818821c39f0cde6251ef2856ddf",
+      "english": "Count Blue Cars!",
+      "approved_korean": "파란색 차를 세세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2081,
+        755
+      ],
+      "source_dimensions": [
+        1298,
+        471
+      ],
+      "candidate_alpha_bbox": [
+        31,
+        43,
+        2066,
+        723
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct and legible '파란색 차를 세세요!'; source includes other labels and protected sprites. Safe native fit and placement unverified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0070-4F31A100",
+      "ordinal": 346,
+      "source_file": "Q054_f42e51c61d47c093_source.png",
+      "source_sha256": "9160ffb54f84faaab695389439ac469689a3d42133718ceb257438741d677f93",
+      "candidate_file": "Q054_f42e51c61d47c093_source_k.png",
+      "candidate_sha256": "9ce1c78c1c1c16fd2acbb145528776683b84046e822b07103a23bccda45e1d4a",
+      "english": "Count Red Cars!",
+      "approved_korean": "빨간색 차를 세세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1979,
+        795
+      ],
+      "source_dimensions": [
+        1151,
+        462
+      ],
+      "candidate_alpha_bbox": [
+        37,
+        90,
+        1957,
+        679
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct and legible '빨간색 차를 세세요!'; source includes unrelated interface elements. Placement and native safe area require independent check.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "evidence": {
+    "preflight_n100": "work/C1_QA_20261025_0245_preflight.json",
+    "candidate_contact_sheet_n100": "work/C1_QA_20261025_0245_candidates.jpg",
+    "source_contact_sheet_n100": "work/C1_QA_20261025_0245_sources.jpg",
+    "B_export": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0083-3DF4EE71.json",
+    "A_export": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0070-4F31A100.json",
+    "source_mapping": "work/image-src/text_roi_batches/production_manifest.json"
+  },
+  "caveats": [
+    "Original source PNGs are composite multi-label atlas ROIs; independent target crop and UV alignment not yet evidenced.",
+    "No candidate rejected due solely to text width, minor native glyph size, or differing generated canvas dimensions.",
+    "C1 review is not C2/C3 approval and not actual game QA."
+  ],
+  "constraints": {
+    "imagegen_called": false,
+    "A_B_queues_consumed": false,
+    "new_DDS_written": false,
+    "final_deployment": false,
+    "C2_C3_or_game_PASS_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}
