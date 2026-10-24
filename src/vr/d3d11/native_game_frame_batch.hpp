@@ -15,7 +15,8 @@ struct GameNativeFrameBatch {
         // A successful original full ColorFill after color-only Draws can
         // replace the previous scene's entire COLOR history. Native draws
         // after that fill are still contiguous within the new source epoch.
-        return !stopped && consumed < kMaxFullFrameDraws &&
+        return !stopped && !awaitingColorFillDepthReset &&
+            consumed < kMaxFullFrameDraws &&
             sourceEpochStart <= UINT64_MAX - consumed &&
             ordinal == consumed + sourceEpochStart &&
             (!hasSourceDraw || lastSourceDraw + 1u == ordinal);
@@ -111,6 +112,10 @@ struct GameNativeFrameBatch {
     // ColorFill does not clear game depth. Post-fill epochs therefore admit
     // only depth-independent Draws; depth state is never fabricated.
     bool colorFillEpoch = false;
+    // A game-authored whole ColorFill does NOT reset prior depth writes.
+    // With old native Z history, discard the color epoch but admit no Draw
+    // until the SAME canonical game depth is wholly cleared by D3D9.
+    bool awaitingColorFillDepthReset = false;
     std::uint32_t submitted = 0u;
     // Exact successful source ordinals before the first nonempty GPU Draw.
     // Kept separate because the first real native Draw must still Clear RTV.
@@ -240,6 +245,42 @@ struct GameNativeFrameBatch {
         colorFillEpoch = true;
         return true;
     }
+    // Genuine full ColorFill destroys the previous native RTV pixels even if
+    // earlier game geometry wrote Z. Retire them without inventing new depth;
+    // the source can resume only after its own COMPLETE, main-Z D3D9 Clear.
+    // No intermediate Draw (including no-op Draw ordinals) is permitted.
+    [[nodiscard]] constexpr bool defer_full_color_fill_until_depth_clear(
+        std::uint64_t originalDrawsSeen) noexcept {
+        if (stopped || submitted == 0u ||
+            (!depthReady && !depthClearPending) ||
+            awaitingColorFillDepthReset || !hasSourceDraw ||
+            originalDrawsSeen == 0u || lastSourceDraw == UINT64_MAX ||
+            lastSourceDraw + 1u != originalDrawsSeen ||
+            sourceEpochStart > originalDrawsSeen)
+            return false;
+        reset();
+        sourceEpochStart = originalDrawsSeen;
+        colorFillEpoch = true;
+        awaitingColorFillDepthReset = true;
+        return true;
+    }
+    // Caller must prove the ACTUAL game Z Clear succeeded, covered the whole
+    // canonical main depth surface, and retained RT0/depth COM identities.
+    // This consumes no source Draw; the NEXT real Draw will seed the native
+    // DSV from z and the RTV from the ColorFill color, in source order.
+    [[nodiscard]] constexpr bool resume_after_game_full_depth_clear(
+        std::uint64_t originalDrawsSeen, float z) noexcept {
+        if (!awaitingColorFillDepthReset || stopped || submitted != 0u ||
+            hasSourceDraw || leadingEmptySourceDraws != 0u ||
+            postDrawEmptySourceDraws != 0u ||
+            originalDrawsSeen != sourceEpochStart ||
+            !(z >= 0.0f && z <= 1.0f))
+            return false;
+        awaitingColorFillDepthReset = false;
+        colorFillEpoch = false;
+        note_full_depth_clear(z);
+        return true;
+    }
     constexpr void succeeded(bool depth, bool reversed = false) noexcept {
         ++submitted;
         if (depth) {
@@ -259,6 +300,7 @@ struct GameNativeFrameBatch {
         submitted = 0u; leadingEmptySourceDraws = 0u;
         postDrawEmptySourceDraws = 0u;
         sourceEpochStart = 0u; colorFillEpoch = false;
+        awaitingColorFillDepthReset = false;
         stopped = false; depthReady = false;
         depthClearPending = false; depthClearValue = 1.0f;
         depthDirection = 0u;

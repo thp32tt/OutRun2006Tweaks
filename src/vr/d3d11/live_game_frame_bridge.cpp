@@ -8334,7 +8334,9 @@ bool preserve_game_color_fill(
         if (native_game_color_fill_retires_draw_batch(
                 wholeSurface, alreadyDrawn)) {
             const bool restarted = s.frameBatch.restart_after_full_color_fill(
-                s.sourceDrawsThisFrame);
+                s.sourceDrawsThisFrame) ||
+                s.frameBatch.defer_full_color_fill_until_depth_clear(
+                    s.sourceDrawsThisFrame);
             s.pending = false;
             s.preDrawFills.discard();
             s.preDrawDepth.discard();
@@ -8556,6 +8558,21 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                         return false;
             }
             return true; // Keep RTV, unaffected Z and native Draw ordinals.
+        }
+        // A real ColorFill after depth-writing native Draws has already
+        // retired the old RTV/DSV epoch. Recover only after this successful
+        // COMPLETE Z Clear, with the same game RT0 and canonical main depth
+        // identity proved above. A partial Z, stencil-only, foreign target,
+        // or intervening Draw must never resurrect stale game depth.
+        if (s.frameBatch.awaitingColorFillDepthReset) {
+            if (!clearZ || !coversDepth ||
+                !s.clearColor.matches(owner,
+                    reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get())) ||
+                !s.frameBatch.resume_after_game_full_depth_clear(
+                    s.sourceDrawsThisFrame, z))
+                return false;
+            s.preDrawDepth.discard();
+            return true; // Next Draw seeds new RTV color AND genuine game Z.
         }
         // Prove the same canonical D3D9 backbuffer/color Clear before
         // admitting a separate full Z Clear with zero native game Draws.

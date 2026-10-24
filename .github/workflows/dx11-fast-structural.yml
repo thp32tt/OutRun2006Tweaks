@@ -90,6 +90,8 @@ jobs:
           # 01046 post-Draw full game ColorFill -> new contiguous native color epoch.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_resume_01046.cpp -o /tmp/dx11_full_colorfill_resume_01046 && /tmp/dx11_full_colorfill_resume_01046
           python tools/test_dx11_full_colorfill_resume_01046.py
+          # 01048 authentic color overwrite -> full main Z Clear -> native race Draw.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_depth_epoch_recovery_01048.cpp -o /tmp/dx11_depth_epoch_01048 && /tmp/dx11_depth_epoch_01048
           # 01047 repeated REAL full ColorFill cycles with game Draw/no-op chronology.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_chained_colorfill_epochs_01047.cpp -o /tmp/dx11_chained_colorfill_01047 && /tmp/dx11_chained_colorfill_01047
           # 01045 original full D3D9 ColorFill -> real game native Draw seed.
