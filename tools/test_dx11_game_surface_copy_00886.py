@@ -30,7 +30,7 @@ def linked(b, h, r):
         "FAILED(originalResult)",
         "s.sourceGameDevice != owner",
         "s.frameBatch.publishable(s.pending)",
-        "s.surfaceReplayCount >= 8u",
+        "!s.surfaceReplayBudget.admits(desc.Width, desc.Height)",
         "actualIdentity.Get() != backbufferIdentity.Get()",
         "s.clearColor.matches(",
         "GameNativeSurfaceCopyRegion::destination(",
@@ -48,7 +48,7 @@ def linked(b, h, r):
         "context->CopySubresourceRegion(",
         "s.backend.color_texture(), 0u, region.left, region.top, 0u,",
         "if (FAILED(device->GetDeviceRemovedReason())) return false;",
-        "++s.surfaceReplayCount;",
+        "s.surfaceReplayBudget.note_success(desc.Width, desc.Height);",
     )) and (
         '#include "native_game_gpu_output_preserve.hpp"' in b
         and "ScopedNativeGameGpuTransferInputs shaderInputs(\n                context, s.backend.color_texture());" in replay
@@ -68,10 +68,10 @@ def linked(b, h, r):
         # does not prove that a failed native copy is vetoed before publish.
         and replay.rfind("if (FAILED(device->GetDeviceRemovedReason())) return false;")
             > replay.index("context->CopySubresourceRegion(")
-        # The pre-Draw snapshot has a separate increment before native
+        # The pre-Draw snapshot has a separate successful replay charge before native
         # CopySubresourceRegion; prove the REAL post-Draw replay is counted
         # after the GPU copy, not just anywhere in this function.
-        and replay.rfind("++s.surfaceReplayCount;")
+        and replay.rfind("s.surfaceReplayBudget.note_success(desc.Width, desc.Height);")
             > replay.index("context->CopySubresourceRegion(")
         and replay.index("ScopedNativeGameGpuTransferOutputs outputs(context);")
             < replay.index("context->CopySubresourceRegion(")
@@ -95,7 +95,7 @@ def linked(b, h, r):
     )) and all(token in b for token in (
         "s.surfaceReplayReadback.Reset();",
         "s.surfaceReplayScratch.Reset();",
-        "s.surfaceReplayCount = 0u;",
+        "s.surfaceReplayBudget.reset();",
     )) and all(token in r for token in (
         "destX > destWidth || destY > destHeight",
         "(srcRight-srcLeft) > std::int64_t(destWidth)-destX",
@@ -118,15 +118,15 @@ for token in (
     "ScopedNativeGameGpuTransferInputs shaderInputs(",
     "ScopedNativeGameGpuTransferOutputs outputs(context);",
     "context->CopySubresourceRegion(",
-    "if (FAILED(device->GetDeviceRemovedReason())) return false;\n        ++s.surfaceReplayCount;",
+    "if (FAILED(device->GetDeviceRemovedReason())) return false;\n        s.surfaceReplayBudget.note_success(desc.Width, desc.Height);",
     "s.surfaceReplayReadback->UnlockRect()",
-    "++s.surfaceReplayCount;",
+    "s.surfaceReplayBudget.note_success(desc.Width, desc.Height);",
 ):
     assert token in replay_body, "replay guard absent before mutation: " + token
     # Pre-Draw snapshots have a separate bounded copy counter. The legacy
-    # post-Draw mutation must remove the LAST increment, which belongs to
+    # post-Draw mutation must remove the LAST charge, which belongs to
     # the real GPU CopySubresourceRegion replay, not the initial snapshot.
-    if token == "++s.surfaceReplayCount;":
+    if token == "s.surfaceReplayBudget.note_success(desc.Width, desc.Height);":
         at = replay_body.rfind(token)
         mutant_body = (replay_body[:at] + "/* removed native postpass */" +
                        replay_body[at + len(token):])
