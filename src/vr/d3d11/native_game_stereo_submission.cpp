@@ -1584,8 +1584,12 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
     // Do not erase another menu/HUD area of the native L/R eye, and do not
     // reset geometry evidence for a nominal full RECT that is actually cropped.
     const auto covered = [&]() noexcept -> NativeGameCameraClearRegion {
+        // Keep the original native D3D9 TARGET clear admission intact.
+        // ColorFill additionally uses the physical-surface-only clip below.
+        const auto covered = camera_clear_coverage(
+            context_, targetWidth_, targetHeight_, region);
         if (!ignoreRasterClip)
-            return camera_clear_coverage(context_,targetWidth_,targetHeight_,region);
+            return covered;
         // ColorFill clips to the PHYSICAL surface, never a Draw viewport.
         const auto clip=native_game_color_fill_clip(
             targetWidth_,targetHeight_,region!=nullptr,
