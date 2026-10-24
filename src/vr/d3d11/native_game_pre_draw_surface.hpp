@@ -27,6 +27,14 @@ struct GameNativePreDrawSurface {
         return w && h && std::uint64_t(w)*h<=kMaxPixels;
     }
     [[nodiscard]] bool active() const noexcept { return owner!=0u; }
+    // Called only AFTER a successful, source-authenticated full D3D9 RT0
+    // ColorFill has been admitted for native replay. Foreign game cameras
+    // cannot retire the staged real main backbuffer CPU/GDI color.
+    void discard_if_canonical_full_write(std::uintptr_t device,
+                                         std::uintptr_t surface) noexcept {
+        if (owner != 0u && target != 0u && owner == device &&
+            target == surface) discard();
+    }
     void discard() noexcept {
         owner=target=0u; width=height=format=0u; pixels.clear();
     }

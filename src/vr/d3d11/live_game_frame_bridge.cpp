@@ -8340,6 +8340,10 @@ bool preserve_game_color_fill(
         const bool sameGameBackbuffer = s.clearColor.matches(
             owner, reinterpret_cast<std::uintptr_t>(surfaceIdentity.Get())) &&
             (s.sourceGameDevice == 0u || s.sourceGameDevice == owner);
+        // A live LockRect/GetDC ticket makes a same-backbuffer ColorFill
+        // chronologically unsafe to mirror. Keep the original D3D9 result
+        // and fail closed rather than publish color from an open CPU writer.
+        if (sameGameBackbuffer && s.cpuSurfaceReplay.active()) return false;
         const bool alreadyDrawn = s.frameBatch.submitted != 0u;
         const bool targetReady = s.backend.ready() && s.backend.color_rtv() &&
             s.backend.context() && s.nativeWidth == desc.Width &&
@@ -8395,8 +8399,9 @@ bool preserve_game_color_fill(
             // Keep the original full Clear seed, depth and Draw ordinals.
             return true;
         }
-        // A genuine full ColorFill erases earlier copied backbuffer color.
-        s.preDrawSurface.discard();
+        // A foreign menu/camera full ColorFill is NOT a write to the game
+        // backbuffer: never lose authentic pre-Draw CPU/GDI pixels here.
+        // The proven canonical full overwrite below owns retirement.
         // A previously submitted scene can be replaced only while its exact
         // D3D11 GPU output remains pending and owned. An old/nonpending
         // batch must not be revived by a later game ColorFill.
@@ -8406,6 +8411,10 @@ bool preserve_game_color_fill(
                 true, SUCCEEDED(originalResult), sameGameBackbuffer,
                 sameGameBackbuffer, true, !s.frameBatch.stopped,
                 wholeTargetReady)) return false;
+        // Only this admitted authentic full RT0 backbuffer overwrite replaces
+        // the staged pre-first-Draw source (not an unrelated full offscreen RT).
+        s.preDrawSurface.discard_if_canonical_full_write(
+            owner, reinterpret_cast<std::uintptr_t>(surfaceIdentity.Get()));
         // A real post-Draw whole-backbuffer ColorFill overwrites all source
         // COLOR, including an earlier ColorFill-started native scene. Permit
         // consecutive menu/car transition epochs only while *each* prior

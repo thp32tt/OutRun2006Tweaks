@@ -94,6 +94,9 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_pre_draw_copy_01049.cpp -o /tmp/dx11_pre_draw_copy_01049 && /tmp/dx11_pre_draw_copy_01049
           # 01050 original LockRect/GetDC before first native Draw and safe completion.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_predraw_cpu_surface_01050.cpp -o /tmp/dx11_predraw_cpu_01050 && /tmp/dx11_predraw_cpu_01050
+          # 01051 canonical color continuity through foreign game camera fills.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_predraw_colorfill_01051.cpp -o /tmp/dx11_predraw_colorfill_01051 && /tmp/dx11_predraw_colorfill_01051
+          python tools/test_dx11_predraw_colorfill_01051.py
           # 01048 authentic color overwrite -> full main Z Clear -> native race Draw.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_depth_epoch_recovery_01048.cpp -o /tmp/dx11_depth_epoch_01048 && /tmp/dx11_depth_epoch_01048
           # 01047 repeated REAL full ColorFill cycles with game Draw/no-op chronology.
