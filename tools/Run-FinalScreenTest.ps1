@@ -26,6 +26,31 @@ try {
     if (Get-Process -Name OR2006C2C -ErrorAction SilentlyContinue) { throw 'Original game is already running. Exit it before launching this test.' }
     Get-Process -Name outrun-vr-host -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
     New-Item -ItemType Directory -Force -Path $session | Out-Null
+    # Refuse to run with an invalid INI. Prior 2026-10-24 packages shipped
+    # duplicated [VR].DriverSeatCarSpaceBasis and silently fell back to defaults.
+    foreach ($iniName in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.user.ini')) {
+        $iniPath = Join-Path $root $iniName
+        if (-not (Test-Path -LiteralPath $iniPath)) { continue }
+        $currentSection = ''
+        $seenKeys = @{}
+        $lineNo = 0
+        foreach ($rawLine in (Get-Content -LiteralPath $iniPath)) {
+            $lineNo++
+            $cleanLine = $rawLine.Trim()
+            if ($cleanLine -match '^[#;]' -or $cleanLine -eq '') { continue }
+            if ($cleanLine -match '^\[([^\]]+)\]') {
+                $currentSection = $matches[1].Trim().ToLowerInvariant()
+                continue
+            }
+            if ($cleanLine -match '^([A-Za-z_][A-Za-z0-9_\.]*)\s*=') {
+                $keyId = $currentSection + '|' + $matches[1].ToLowerInvariant()
+                if ($seenKeys.ContainsKey($keyId)) {
+                    throw ("INI_DUPLICATE_KEY in " + $iniName + " line " + $lineNo + ": " + $keyId + "; game startup canceled instead of silently using defaults.")
+                }
+                $seenKeys[$keyId] = $lineNo
+            }
+        }
+    }
     $debugMode = $variant -eq 'R26_FINAL_DEBUG'
     # Debug gathers diagnostic logical GPU Draw sampling, never enables experimental VB/throttle render changes.
     $env:OUTRUN_VR_R30_PARTICLE_VB = '0'
@@ -67,7 +92,10 @@ try {
     }
     $exitCode = $gameProcess.ExitCode
     Start-Sleep -Milliseconds 700
-    $state = if (-not $hostSeen) { 'HOST_NEVER_STARTED' } elseif ($hostLost) { 'HOST_DISAPPEARED_DURING_GAME' } elseif ($exitCode -ne 0) { 'GAME_NONZERO_EXIT' } else { 'HOST_PROCESS_OBSERVED_NOT_HMD_VERIFIED' }
+    $gameLog = Join-Path $root 'OutRun2006Tweaks.log'
+    $iniParseFailed = (Test-Path -LiteralPath $gameLog) -and
+        (Select-String -LiteralPath $gameLog -Pattern 'Settings::read - INI read failed!' -Quiet -ErrorAction SilentlyContinue)
+    $state = if ($iniParseFailed) { 'INI_PARSE_FAILED' } elseif (-not $hostSeen) { 'HOST_NEVER_STARTED' } elseif ($hostLost) { 'HOST_DISAPPEARED_DURING_GAME' } elseif ($exitCode -ne 0) { 'GAME_NONZERO_EXIT' } else { 'HOST_PROCESS_OBSERVED_NOT_HMD_VERIFIED' }
     @("variant=$variant","sourceSha=$(Get-Content (Join-Path $root 'SOURCE_SHA.txt') -ErrorAction SilentlyContinue)",
       "hostStatus=$state","hostFirstSeen=$hostFirstSeen","gameExitCode=$exitCode",
       "runtimeValidation=UNTESTED","finished=$((Get-Date).ToString('o'))") | Set-Content -LiteralPath $health -Encoding UTF8
