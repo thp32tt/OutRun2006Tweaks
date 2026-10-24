@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01041",
+  "production_id": "CONVERSION-DX11-01041",
+  "event_id": "CONVERSION-DX11-01041-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01041",
+  "classification": "A",
+  "c6_followup_classification": "C",
+  "feature_id": null,
+  "work_key": "DX11:LIVE_TYPELESS_CAMERA_TYPED_EYE_GPU_COPY_RESOLVE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "feature_ready": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "score_policy": "C6 bookkeeping only; no duplicate score for existing material result",
+  "c6_blocker_resolved": "RUN_RECORD_NOT_FOUND",
+  "run_record_origin": "C6 record reconstructed from exact source SHA and completed GitHub Actions because previous run JSON did not exist",
+  "summary": "Exact game-created TYPELESS camera RTV interpretation authorizes D3D11 GPU-only Copy/Resolve to a matching typed XR eye; preflight and runtime provenance remain separate, with shader conversion or D3D9Ex fallback for mismatches and unsafe sources. Source verified by exact-SHA Actions, actual game/Quest3 untested.",
+  "feature_base_sha": "ae3c64d9ed83d1795e4a822dd9e71107cbbefb5c",
+  "material_result_sha": "b6f5f43550f0a35208acafb88ebff137fa6b8bc7",
+  "validation_bearing_result_sha": "b6f5f43550f0a35208acafb88ebff137fa6b8bc7",
+  "material_commit_history": [
+    "b6f5f43550f0a35208acafb88ebff137fa6b8bc7"
+  ],
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+    "tools/test_dx11_typed_camera_raw_copy_01041.py"
+  ],
+  "bookkeeping_file": "docs/automation/runs/CONVERSION-DX11-01041.json",
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Use an actually observed compatible typed RTV of a live TYPELESS D3D11 game camera for native GPU Copy or MSAA Resolve into the corresponding XR eye without bypassing source view provenance or DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "raw_camera_copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_CAMERA_TO_NATIVE_GPU_EYE",
+        "expected_behavior": "Live game camera allocation + exact physical RTV view format matching eye output enables native CopySubresourceRegion without an unnecessary shader conversion."
+      },
+      {
+        "id": "typed_msaa_resolve",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_CAMERA_MSAA_TO_NATIVE_GPU_EYE",
+        "expected_behavior": "Live TYPELESS MSAA camera with observed compatible view resolves to typed eye or private typed single-sample intermediate; partial color copy stays clipped."
+      },
+      {
+        "id": "fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "CAMERA_PROVENANCE_AND_ORIGINAL_GAME",
+        "expected_behavior": "Missing, mixed, foreign or unsupported view formats fail closed; same-device/ownership/source pixel clipping and original game rendering/input/FFB fallback preserved."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "FIVE_REQUIRED_GITHUB_ACTIONS",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR, HUD all succeed on same material source SHA; gameplay and HMD validation separately UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "intercepted live game camera Draw/Clear with exact typed RTV source provenance",
+      "bidirectional two-eye preflight of TYPELESS format-family candidate",
+      "actual per-eye copy_game_surface observed RTV format admission",
+      "native D3D11 CopySubresourceRegion or typed MSAA ResolveSubresource into eye GPU color",
+      "stereo ring and OpenXR transport, with D3D9Ex fallback on nonadmission"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/test_dx11_typed_camera_raw_copy_01041.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01041 Fast source regression checks game-observed RTV exact match and GPU Copy/Resolve integration, plus exact-SHA Windows build.",
+      "negative_regression": "Compile-time/static checks reject unknown or mixed RTV, depth/BC and wrong typed families while preserving provenance admission.",
+      "component_integration": "D3D11 offscreen camera physical typed source, both-eye preflight, copy_game_surface and shared GPU eye ring."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_TYPELESS_CAMERA_TYPED_EYE_GPU_COPY_RESOLVE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_CI_ONLY_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "native diagnostic opt-in and original D3D9Ex game/menu/race/input/FFB remain authoritative; DXVK frozen",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "NATIVE_D3D11_GAME_DRAW",
+      "CAMERA_TYPED_GPU_COPY_RESOLVE",
+      "NATIVE_EYE_GPU_OUTPUT",
+      "OPENXR_GPU_HANDOFF"
+    ],
+    "integration_goal_validation": "HMD / real-game pixels UNTESTED"
+  },
+  "validation_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 40050500803,
+      "head_sha": "b6f5f43550f0a35208acafb88ebff137fa6b8bc7",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40050500803"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 40050500816,
+      "head_sha": "b6f5f43550f0a35208acafb88ebff137fa6b8bc7",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40050500816"
+    },
+    "Build": {
+      "run_id": 40050500846,
+      "head_sha": "b6f5f43550f0a35208acafb88ebff137fa6b8bc7",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40050500846"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 40050500780,
+      "head_sha": "b6f5f43550f0a35208acafb88ebff137fa6b8bc7",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40050500780"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 40050500796,
+      "head_sha": "b6f5f43550f0a35208acafb88ebff137fa6b8bc7",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40050500796"
+    }
+  },
+  "acceptance_results": {
+    "raw_camera_copy": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_typed_camera_raw_copy_01041.py"
+      ],
+      "validation_command": "Exact SHA b6f5f43550f0a35208acafb88ebff137fa6b8bc7: Fast #40050500803; Backend #40050500816; Build #40050500846; OpenXR #40050500780; HUD #40050500796: all SUCCESS. Runtime UNTESTED."
+    },
+    "typed_msaa_resolve": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp"
+      ],
+      "validation_command": "Exact SHA b6f5f43550f0a35208acafb88ebff137fa6b8bc7: all five required GitHub Actions SUCCESS. Runtime UNTESTED."
+    },
+    "fail_closed": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/test_dx11_typed_camera_raw_copy_01041.py"
+      ],
+      "validation_command": "Fast #40050500803 and full exact SHA Gates SUCCESS; actual HMD fallback UNTESTED."
+    },
+    "exact_sha_gate": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01041.json"
+      ],
+      "validation_command": "Fast #40050500803 / Backend #40050500816 / Build #40050500846 / OpenXR #40050500780 / HUD #40050500796 all SUCCESS at b6f5f43550f0a35208acafb88ebff137fa6b8bc7."
+    }
+  },
+  "c6_summary": "All 5 mandatory GitHub Actions SUCCESS on original validation-bearing source SHA; bookkeeping commit separate [skip ci]. No new build/CI launched; original material result SHA unchanged; real OutRun gameplay/Quest3/VDXR UNTESTED.",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue full live menu/car/race native game Draw->GPU L/R OpenXR integration under separately assigned development work; real hardware validation is still required."
+}
