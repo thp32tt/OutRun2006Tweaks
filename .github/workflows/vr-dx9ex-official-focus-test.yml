@@ -32,6 +32,7 @@ jobs:
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'DriverSeatView = false' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source INI' }
           if (-not (Select-String src/vr/settings.cpp -Pattern 'Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source defaults' }
           if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR R26 RESULT_HUD_STAGE_HR' -SimpleMatch -Quiet)) { throw 'R26 result HUD stage telemetry missing' }
+          if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR R26 RESULT_XYZRHW_PIXEL_PROBE' -SimpleMatch -Quiet)) { throw 'R26 source XYZRHW pixel evidence missing' }
       - name: Configure Win32 R26+HUD
         shell: pwsh
         run: |
