@@ -18,6 +18,8 @@ on:
       - 'tools/test_vr_reflection_frame_budget.cpp'
       - 'tools/Run-FinalScreenTest.ps1'
       - 'tools/START_FINAL_SCREEN_TEST.cmd'
+      - 'OutRun2006Tweaks.ini'
+      - 'tools/verify_vr_final_screen_ini.py'
       - 'src/vr/d3d9/gpu_water_profiler.hpp'
       - 'src/vr/d3d9/gpu_census_phase.hpp'
       - 'tools/test_vr_gpu_census_phase.cpp'
@@ -31,6 +33,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Enforce canonical test INI, negative duplicate-key check
+        shell: pwsh
+        run: |
+          python tools/verify_vr_final_screen_ini.py
+          if ($LASTEXITCODE -ne 0) { throw 'Packaged test INI validation FAILED' }
       - name: Configure Win32 R26+HUD
         shell: pwsh
         run: |
@@ -128,6 +135,7 @@ jobs:
             Copy-Item tools/START_FINAL_SCREEN_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
             Copy-Item tools/Run-FinalScreenTest.ps1 "$dir/Run-FinalScreenTest.ps1"
             Copy-Item docs/evidence/DX9EX_REVIEW_AB_20261024.md "$dir/DX9EX_REVIEW_MATRIX.md"
+            Copy-Item docs/evidence/DX9EX_FOUR_LOG_SCREEN_REGRESSION_20261024.md "$dir/DX9EX_FOUR_LOG_ANALYSIS.md"
             if ($mode -eq 'DEBUG') { Get-ChildItem $payload -Filter *.pdb | ForEach-Object { Copy-Item $_.FullName $dir } }
             Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant" -Encoding ascii
             Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
@@ -145,7 +153,7 @@ jobs:
               '8. Unverified visual review hypotheses were NOT automatically applied.'
               '9. Restore backups after testing; return DX9EX_LOGS ZIP and screenshots.'
             ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
-            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FinalScreenTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','START_HERE.txt','DX9EX_REVIEW_MATRIX.md')) {
+            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FinalScreenTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','START_HERE.txt','DX9EX_REVIEW_MATRIX.md','DX9EX_FOUR_LOG_ANALYSIS.md')) {
               if (-not (Test-Path (Join-Path $dir $required))) { throw "Missing packaged $mode file: $required" }
             }
             foreach ($binary in @('dinput8.dll','outrun-vr-host.exe')) {
