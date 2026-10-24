@@ -143,8 +143,8 @@ namespace Settings
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
-	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", true,
-		"Experimental test view: reuses the native bumper camera timing/smoothing, shows the full player car, hides the driver robot and offsets the VR camera into the cockpit." };
+	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,
+		"OFF by default: experimental native-camera cockpit translation; preserve the original game view for all camera modes unless explicitly enabled. No verified APK camera source has been transplanted." };
     Setting<float> VRDriverSeatVehicleScale{ "VR", "DriverSeatVehicleScale", 1.0f,
         "Experimental cockpit-only player-car visual model scale. 1.0 preserves stock geometry and is the safe default; affects neither game physics nor original asset bytes. F11 adjustable; applied to the original PC player's stack-local draw matrix only when the cockpit mode is eligible. Not an APK-proven scale.", Range<float>{ 0.85f, 1.35f } };
     Setting<float> VRDriverSeatGlassOpacity{ "VR", "DriverSeatGlassOpacity", 0.30f,
