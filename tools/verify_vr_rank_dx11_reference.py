@@ -60,10 +60,10 @@ for is_ordinal in (False, True):
         if not is_ordinal:
             assert not chosen_canted
 assert 'VRRankDx11ProducerReference{ "VR", "RankDx11ProducerReference", true,' in settings
-assert 'VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", true,' in settings
+assert 'VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", false,' in settings
 assert 'VRRankDesktopLift{ "VR", "RankDesktopLift", false,' in settings
 for name,expected in (("RankDx11ProducerReference", "true"),
-                      ("RivalDx11NativeRoute","true"),
+                      ("RivalDx11NativeRoute","false"),
                       ("RankDesktopLift","false")):
     assert f"{name} = {expected}" in ini
 assert "if (!Settings::VRRivalDx11NativeRoute.get())" in hook
@@ -84,4 +84,4 @@ for token in (
 assert "dx11OrdinalClipW" in wview and "marker.exactOrdinalEyeCant;" in wview
 for token in ("marker.exactOrdinalEyeCant", "std::fabs(clipW) <= 1.0e-6f"):
     assert token not in wview.replace(token, "/* forbidden broad W gate */", 1)
-print("PASS R26 DX11 rank direct projection, native rival + optional legacy routes, 0.55 HUD")
+print("PASS R26 DX11 rank direct projection, legacy R26 rival + optional stock route, 0.55 HUD")
