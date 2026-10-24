@@ -305,11 +305,13 @@ def _retry_same_five(st, active, root, reason, observed=None):
     being moved out of the active candidate namespace so the retry cannot
     accidentally overwrite or reuse them.
     """
-    if active.get("count") != 5:
-        return False, "RETRY_REQUIRES_FIVE_IMAGE_BATCH"
+    count=active.get("count")
+    if not isinstance(count,int) or not (1 <= count <= SIZE):
+        return False, "RETRY_REQUIRES_VALID_IMAGE_BATCH"
     retry=int(active.get("retry_count",0))
     if retry >= 2:
-        return False, "FIVE_IMAGE_RETRY_LIMIT_REACHED:"+reason
+        prefix="FIVE_IMAGE" if count==5 else "PARTIAL_IMAGE_BATCH"
+        return False, prefix+"_RETRY_LIMIT_REACHED:"+reason
     task=active["task_id"]
     qroot=Path(root)/STATE_DIR/"quarantine"/task
     qroot.mkdir(parents=True,exist_ok=True)
@@ -323,7 +325,7 @@ def _retry_same_five(st, active, root, reason, observed=None):
         except Exception:
             return False,"RETRY_EXPORT_EVIDENCE_INVALID"
         rows=doc.get("files")
-        if doc.get("task_id")!=task or not isinstance(rows,list) or len(rows)!=5:
+        if doc.get("task_id")!=task or not isinstance(rows,list) or len(rows)!=count:
             return False,"RETRY_EXPORT_EVIDENCE_BINDING_MISMATCH"
         outdir=Path(root)/STATE_DIR/"candidate_outputs"/active["role"]
         archived=qroot/"candidate_outputs"
@@ -352,7 +354,8 @@ def _retry_same_five(st, active, root, reason, observed=None):
         os.replace(library,qroot/"library_evidence.json")
 
     failed=dict(active)
-    failed["status"]="QUARANTINED_FOR_SAME_FIVE_RETRY"
+    failed["status"]=("QUARANTINED_FOR_SAME_FIVE_RETRY" if count==5
+                      else "QUARANTINED_FOR_SAME_BATCH_RETRY")
     failed["retry_reason"]=reason
     failed["observed_generated_images"]=observed
     failed["quarantined_at"]=_now().isoformat()
@@ -367,9 +370,11 @@ def _retry_same_five(st, active, root, reason, observed=None):
     replacement["source_chat_url"]=None
     replacement["created_at"]=_now().isoformat()
     st["active"]=replacement
-    st["status"]="STAGED_RETRY_EXACT_FIVE_OUTPUTS"
+    st["status"]=("STAGED_RETRY_EXACT_FIVE_OUTPUTS" if count==5
+                  else "STAGED_RETRY_EXACT_BATCH_OUTPUTS")
     _atomic_json(state_path(root,active["role"]),st)
-    return True,"FIVE_IMAGE_BATCH_RETRY_STAGED"
+    return True,("FIVE_IMAGE_BATCH_RETRY_STAGED" if count==5
+                 else "PARTIAL_IMAGE_BATCH_RETRY_STAGED")
 
 def _local_export_confirmed(root, active):
     """Require exact locally persisted generated PNG bytes before queue advance.
@@ -794,7 +799,7 @@ async def inspect_slot(role, page, root="/data/imagegen"):
             if await _recover_task_turn(page,task):
                 result=await _probe_imagegen_result(page,task,expected)
         if result.get("error")=="USER_TURN_MISSING":
-            if expected==5:
+            if isinstance(expected,int) and 1 <= expected <= SIZE:
                 retried,msg=_retry_same_five(
                     st,active,root,"IMAGEGEN_USER_TURN_MISSING",observed=None)
                 if retried:
@@ -812,10 +817,13 @@ async def inspect_slot(role, page, root="/data/imagegen"):
             # carousel duplication. Never guess which five belong to the five
             # source ROIs: quarantine the ambiguous turn and restage the exact
             # same ordinals under a new task id.
-            if expected == 5 and isinstance(observed,int):
+            if isinstance(expected,int) and 1 <= expected <= SIZE and isinstance(observed,int):
                 if observed > 0:
-                    reason=("IMAGEGEN_INCOMPLETE_FIVE" if observed < expected
-                            else "IMAGEGEN_AMBIGUOUS_EXTRA_FIVE")
+                    reason=(("IMAGEGEN_INCOMPLETE_FIVE" if expected==5
+                             else "IMAGEGEN_INCOMPLETE_BATCH")
+                            if observed < expected else
+                            ("IMAGEGEN_AMBIGUOUS_EXTRA_FIVE" if expected==5
+                             else "IMAGEGEN_AMBIGUOUS_EXTRA_BATCH"))
                     retried,msg=_retry_same_five(
                         st,active,root,reason,observed=observed)
                     if retried:
