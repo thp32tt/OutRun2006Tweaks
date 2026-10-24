@@ -11,6 +11,7 @@ on:
       - vr-d3d9ex-focus
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
+      - 'tools/Run-FocusOfficialTest.ps1'
   workflow_dispatch:
 
 jobs:
