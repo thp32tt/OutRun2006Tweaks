@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """01040: real game typed camera survives preflight; playback still proves view."""
 from pathlib import Path
+import re
 root = Path(__file__).resolve().parents[1]
 src = (root / "src/vr/d3d11/native_game_stereo_submission.cpp").read_text()
 hdr = (root / "src/vr/d3d11/native_game_typed_camera_postpass.hpp").read_text()
 start = src.index("bool NativeGameStereoSubmission::render_game_eye_passes(")
 preflight = src[start:src.index("// The shared-eye ring owns", start)]
 assert preflight.count("preflight_game_camera_shader_postpass(") == 2
-assert "native_game_typed_camera_preflight_formats(source.Format)" in src
+assert re.search(r"native_game_typed_camera_preflight_formats\(\s*source\.Format\)", src)
 assert "native_game_typed_camera_shader_format(source.Format, typed) != typed" in src
 assert "CheckFormatSupport(typed, &formatSupport)" in src
 assert "NativeGameStretchSourceTransfer::Reject" in src
