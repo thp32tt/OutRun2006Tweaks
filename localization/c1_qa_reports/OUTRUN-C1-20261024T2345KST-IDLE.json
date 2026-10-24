@@ -1,0 +1,49 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261024T2345KST-BYTE-AUDIT",
+  "role": "C1",
+  "checked_at_kst": "2026-10-24T23:48:13.803802+09:00",
+  "verdict": "IDLE",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_head_before_record": "535e733de40758b700e7107378c4d02405a57c4b",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_n100": "work/C1_QA_20261024_2345_byte_audit.json",
+  "existing_candidate_png_count": {
+    "A": 334,
+    "B": 389,
+    "total": 723
+  },
+  "existing_export_evidence_count": 148,
+  "existing_reviewed_sha_history_count": 728,
+  "new_unique_sha_count": 0,
+  "reviewed_new_png_count": 0,
+  "verdict_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "invalid_evidence_count": 0,
+  "missing_local_candidate_count": 0,
+  "missing_export_evidence_count": 0,
+  "no_duplicate_sha_review": true,
+  "actions": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "game_deployed": false,
+    "c2_c3_pass_created": false
+  },
+  "runtime_validation": "UNTESTED",
+  "score": {
+    "ai": "AI 1",
+    "previous_confirmed": 1768,
+    "delta": 0,
+    "current": 1768,
+    "scoreboard_repo": "thp32tt/ai-dev-lab"
+  },
+  "note_ko": "N100 A/B 후보 PNG 723개와 생성 export evidence 148건을 파일 바이트 SHA256으로 대조하고 기존 검수 SHA 이력 728개를 확인함. 신규 고유 SHA 0개, 증빙·파일 누락 및 해시 불일치 0개로 IDLE. 동일 SHA 반복 QA 또는 점수 재가산 없음."
+}
