@@ -182,7 +182,7 @@ class TextRoiQueueTests(unittest.TestCase):
         can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",page,self.root))
         self.assertFalse(can_continue)
         self.assertEqual(page.opened,[target])
-        self.assertTrue(status.startswith("IMAGEGEN_OUTPUT_COUNT_MISMATCH:"))
+        self.assertTrue(status.startswith("IMAGEGEN_ZERO_OUTPUT_GRACE_PERIOD:"))
 
     def test_five_input_zero_output_waits_during_grace_period(self):
         items=[]
@@ -631,6 +631,57 @@ class TextRoiQueueTests(unittest.TestCase):
         self.assertEqual(st["next_ordinal"],1)
         self.assertEqual(st["completed_files"],0)
         self.assertIsNotNone(st["active"])
+
+
+    def test_partial_final_batch_zero_output_stale_is_retried(self):
+        items=[]
+        for i in range(4):
+            name=f"Q228_PartialStale_{i}.png"
+            path=self.image_path.with_name(name)
+            Image.new("RGBA",(91+i,35),(0,0,0,0)).save(path)
+            items.append({
+                **self.item,
+                "id":f"Q228_PartialStale_{i}",
+                "role":"B",
+                "queue_index":"228",
+                "imagegen_input_png":name,
+                "imagegen_input_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+                "english":f"English {i}",
+                "korean":f"한글 {i}",
+            })
+        self.write_manifest(items)
+        binding,error=text_roi_queue.next_binding("B",self.root)
+        self.assertIsNone(error)
+        self.assertEqual(binding["expected_images"],4)
+        task=binding["task_id"]
+        text_roi_queue.stage_submission("B",task,self.root)
+        target="https://chatgpt.com/c/partial-stale"
+        text_roi_queue.record_chat_url("B",task,target,self.root)
+        sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
+        stale=(text_roi_queue._now()-dt.timedelta(
+            seconds=text_roi_queue.ZERO_OUTPUT_STALE_RETRY_SECONDS+1)).isoformat()
+        (sent/f"B_{task}.json").write_text(json.dumps({
+            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+            "task_id":task,"role":"B","submitted_at":stale,
+            "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
+        }),encoding="utf-8")
+
+        class Page:
+            url=target
+            async def evaluate(self,*args,**kwargs):
+                return {"count":0,"expected":4,"busy":False,
+                        "verified_by":"SINGLE_VISIBLE_PREVIEW_FALLBACK","error":None}
+
+        can_continue,status=asyncio.run(text_roi_queue.inspect_slot("B",Page(),self.root))
+        self.assertTrue(can_continue)
+        self.assertEqual(status,"PARTIAL_IMAGE_BATCH_RETRY_STAGED")
+        st=json.loads((self.root/"text_roi_batches/B_state.json").read_text())
+        self.assertEqual(st["active"]["task_id"],task+"-R1")
+        self.assertEqual(st["active"]["count"],4)
+        self.assertEqual(st["active"]["ordinals"],[1,2,3,4])
+        self.assertEqual(st["next_ordinal"],1)
+        self.assertEqual(st["completed_files"],0)
+        self.assertEqual(st["quarantined"][-1]["retry_reason"],"IMAGEGEN_ZERO_OUTPUT_STALE")
 
     def test_two_roles_do_not_share_state(self):
         b = dict(self.item, id="Q104_Second_Text", role="B", imagegen_input_png="Q104_OutRunModeB.png")
