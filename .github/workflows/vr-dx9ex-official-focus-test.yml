@@ -109,17 +109,7 @@ jobs:
             $ini = $ini.Replace('DriverSeatView = true', 'DriverSeatView = false')
             Set-Content "$dir/OutRun2006Tweaks.ini" $ini -Encoding utf8 -NoNewline
             $env:OFFICIAL_PACKAGE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
-            @'
-import configparser, os
-p = configparser.ConfigParser(strict=True, interpolation=None)
-with open(os.environ["OFFICIAL_PACKAGE_INI"], encoding="utf-8") as f:
-    p.read_file(f)
-assert p.getboolean("VR","DriverSeatView") is False
-assert p.getfloat("VR","HudScale") == 0.55
-assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0
-assert p.getboolean("VR","FollowGameResolution") is False
-print("Official focus packaged INI strict parser PASS")
-'@ | python -
+            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False'
             if ($LASTEXITCODE -ne 0) { throw 'Packaged INI strict parse failed' }
             Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
             Copy-Item tools/START_FOCUS_OFFICIAL_TEST.cmd "$dir/START_HERE.cmd"
