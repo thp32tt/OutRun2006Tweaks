@@ -67,6 +67,22 @@ struct GameNativePreDrawSurface {
             width==w && height==h && format==fmt && size_allowed(w,h) &&
             pixels.size()==static_cast<std::size_t>(w)*h*4u;
     }
+    // An authenticated D3D9 source backbuffer readback is disposable once
+    // the native first-Draw seed owns its pixels. Exchange its allocation
+    // with the previous seed instead of allocating and recopying a complete
+    // 1080p/1440p frame on every menu/car/race CPU/GDI surface mutation.
+    // Validation precedes the noexcept swap; failed captures keep the seed.
+    [[nodiscard]] bool record(std::uintptr_t device, std::uintptr_t surface,
+        std::uint32_t w, std::uint32_t h, std::uint32_t fmt,
+        std::vector<std::uint8_t>& source) noexcept {
+        if (!device || !surface || !fmt || !size_allowed(w,h) ||
+            &source == &pixels ||
+            source.size()!=static_cast<std::size_t>(w)*h*4u) return false;
+        pixels.swap(source);
+        owner=device; target=surface; width=w; height=h; format=fmt;
+        return true;
+    }
+    // Read-only source snapshots retain the previous deep-copy semantics.
     [[nodiscard]] bool record(std::uintptr_t device, std::uintptr_t surface,
         std::uint32_t w, std::uint32_t h, std::uint32_t fmt,
         const std::vector<std::uint8_t>& source) noexcept {

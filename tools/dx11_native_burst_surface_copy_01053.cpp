@@ -3,6 +3,9 @@
 #include "../src/vr/d3d11/native_game_surface_replay_budget.hpp"
 #include <cassert>
 #include <cstdint>
+#include <vector>
+#include <algorithm>
+#include "../src/vr/d3d11/native_game_pre_draw_surface.hpp"
 using outrun::vr::dx11::live_game_frame::GameNativeSurfaceReplayBudget;
 int main() {
     using B = GameNativeSurfaceReplayBudget;
@@ -42,4 +45,62 @@ int main() {
         runaway.note_success(1,1);
     }
     assert(!runaway.admits(1,1)); // reject pathological repeated tiny reads
+
+    // 01054: The SAME live bridge calls preDrawSurface.record() with the
+    // mutable GameNativeSurfaceReplayPixels, so overload selection recycles
+    // full-screen 1080p CPU/GDI/StretchRect snapshots before first DX11 Draw.
+    using S = outrun::vr::dx11::live_game_frame::GameNativePreDrawSurface;
+    constexpr std::uintptr_t owner=0x101u, surface=0x202u;
+    S nativeFirstDrawSeed{};
+    B sourceBudget{};
+    std::vector<std::uint8_t> readback;
+    const std::size_t fullBytes=std::size_t{1920}*1080u*4u;
+    const std::uint8_t* allocationA=nullptr;
+    const std::uint8_t* allocationB=nullptr;
+    for (std::uint32_t i=1u; i<=20u; ++i) {
+        assert(sourceBudget.admits(1920,1080));
+        readback.resize(fullBytes);
+        std::fill(readback.begin(),readback.end(),static_cast<std::uint8_t>(i));
+        const auto* candidate=readback.data();
+        if (i==1u) allocationA=candidate;
+        if (i==2u) allocationB=candidate;
+        if (i==3u) assert(candidate==allocationA);
+        assert(nativeFirstDrawSeed.record(owner,surface,1920,1080,21u,readback));
+        sourceBudget.note_success(1920,1080);
+        assert(nativeFirstDrawSeed.matches(owner,surface,1920,1080,21u));
+        assert(nativeFirstDrawSeed.pixels.data()==candidate);
+        assert(nativeFirstDrawSeed.pixels.front()==i);
+        assert(nativeFirstDrawSeed.pixels.back()==i);
+        if (i==2u) assert(readback.data()==allocationA);
+        if (i==3u) assert(readback.data()==allocationB);
+    }
+    assert(sourceBudget.operations==20u);
+    assert(nativeFirstDrawSeed.pixels.front()==20u);
+    // Rejected foreign, truncated or aliasing sources cannot corrupt the
+    // previously seeded native frame; D3D9 game fallback remains unchanged.
+    const auto* stable=nativeFirstDrawSeed.pixels.data();
+    std::vector<std::uint8_t> malformed(1u,13u);
+    assert(!nativeFirstDrawSeed.record(owner,surface,1920,1080,21u,malformed));
+    assert(!nativeFirstDrawSeed.record(owner,surface,1920,1080,21u,
+                                       nativeFirstDrawSeed.pixels));
+    assert(nativeFirstDrawSeed.pixels.data()==stable);
+    assert(nativeFirstDrawSeed.pixels.front()==20u);
+    assert(!nativeFirstDrawSeed.matches(owner+1u,surface,1920,1080,21u));
+    // Real cold start / Reset may change dimensions before the first Draw.
+    readback.resize(std::size_t{3440}*1440u*4u);
+    std::fill(readback.begin(),readback.end(),91u);
+    const auto* resizedData=readback.data();
+    assert(nativeFirstDrawSeed.record(owner,surface,3440,1440,22u,readback));
+    assert(nativeFirstDrawSeed.pixels.data()==resizedData);
+    assert(nativeFirstDrawSeed.matches(owner,surface,3440,1440,22u));
+    assert(!nativeFirstDrawSeed.matches(owner,surface,1920,1080,21u));
+    // Preserve const-source callers: they retain an independent deep copy.
+    const std::vector<std::uint8_t> immutable(16u,33u);
+    const auto* constPtr=immutable.data();
+    assert(nativeFirstDrawSeed.record(owner,surface,2,2,21u,immutable));
+    assert(immutable.data()==constPtr && immutable.front()==33u);
+    assert(nativeFirstDrawSeed.pixels.data()!=constPtr);
+    assert(nativeFirstDrawSeed.pixels==immutable);
+    nativeFirstDrawSeed.discard();
+    assert(!nativeFirstDrawSeed.active());
 }

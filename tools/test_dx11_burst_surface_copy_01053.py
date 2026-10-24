@@ -18,4 +18,17 @@ assert s.count('s.surfaceReplayBudget.reset();') == 6
 assert 'kMaxBytes - bytes' in h and 'kMaxOperations' in h
 assert 'GameNativePreDrawSurface::source_matches_canonical(' in copy
 assert 's.cpuSurfaceReplay.reset()' in s
+pre=(root/'src/vr/d3d11/native_game_pre_draw_surface.hpp').read_text(encoding='utf-8')
+# 01054 authentic D3D9 GetRenderTargetData writes mutable full-frame bytes.
+# The existing live-game bridge now resolves the new in-place overload.
+pre_draw=copy[copy.index('if (preDrawCopy) {'):copy.index('auto* device = s.backend.device();')]
+assert 's.preDrawSurface.record(owner,' in pre_draw
+assert 's.surfaceReplayPixels)) return false;' in pre_draw
+assert 'std::vector<std::uint8_t>& source) noexcept' in pre
+assert '&source == &pixels' in pre
+assert 'pixels.swap(source);' in pre
+assert pre.index('pixels.swap(source);') < pre.index('const std::vector<std::uint8_t>& source')
+assert pre_draw.index('s.preDrawSurface.record(') < pre_draw.index('s.surfaceReplayBudget.note_success(')
+assert pre_draw.index('s.preDrawFills.discard()') < pre_draw.index('s.cpuSurfaceReplay.reset()')
+print('01054 native first Draw source allocation rotation and fallback PASS')
 print('01053 canonical full-readback multi-copy continuity and fail-closed budget PASS')
