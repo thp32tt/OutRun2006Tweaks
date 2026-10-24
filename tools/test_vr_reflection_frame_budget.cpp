@@ -97,6 +97,24 @@ int main()
     assert(faces == 180);
     const auto late = Advance(0.75f, 0.5f, 2.0f, true, true);
     assert(late.faces <= 2 && late.pendingFaces <= 1.0f);
+    // Review-only A/B: the healthy 120 Hz 180-face budget stays identical.
+    const auto normal = Advance(0.0f, 0.5f, 0.5f, true, false, false);
+    const auto optNormal = Advance(0.0f, 0.5f, 0.5f, true, false, true);
+    assert(normal.faces == optNormal.faces);
+    assert(normal.pendingFaces == optNormal.pendingFaces);
+    // A late GPU frame no longer requests the same amount of cubemap work
+    // when the isolated review option is enabled.
+    const auto originalLate = Advance(0.0f, 0.5f, 0.5f, true, true, false);
+    const auto optedLate = Advance(0.0f, 0.5f, 0.5f, true, true, true);
+    assert(originalLate.faces == 1);
+    assert(optedLate.faces == 0);
+    assert(optedLate.pendingFaces > 0.f && optedLate.pendingFaces < originalLate.pendingFaces);
+    // No effect outside VR-normalized mode; malformed configuration and
+    // disabling reflection still clear debt on both variants.
+    const auto desktopA = Advance(0.0f, 0.5f, 1.0f, false, true, false);
+    const auto desktopB = Advance(0.0f, 0.5f, 1.0f, false, true, true);
+    assert(desktopA.faces == desktopB.faces);
+    assert(Advance(1.0f, 0.0f, 0.5f, true, true, true).faces == 0);
     const auto disabled = Advance(1.0f, 0.0f, 1.0f, true, false);
     assert(disabled.faces == 0 && disabled.pendingFaces == 0.0f);
     return 0;

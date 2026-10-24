@@ -141,6 +141,8 @@ namespace Settings
 		"Extra angular safety margin in VR Wide (StageCullingMode=1). Start at 8 degrees to reduce headset-edge scenery pop; larger margins render more stage nodes and may cost FPS. Can be tuned in F11. The original game render projection and HUD are not modified.", Range<float>{ 0.0f, 15.0f } };
 	Setting<bool> VRNormalizeReflectionRate{ "VR", "NormalizeReflectionRate", true,
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
+    Setting<bool> VRReflectionLateFrameThrottle{ "VR", "ReflectionLateFrameThrottle", false,
+        "R26 review 01466 opt-in A/B: halve queued reflection face requests on detected late frames only (0.25 vs 0.5 scale). May cause reflection lag or popping. Default off." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
 	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", true,

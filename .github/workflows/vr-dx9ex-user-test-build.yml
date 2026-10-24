@@ -1,4 +1,4 @@
-name: DX9Ex R26 User Test Build
+name: DX9Ex R26 Review A-B Test Build
 
 permissions:
   contents: read
@@ -7,8 +7,15 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - test/dx9ex-reviewed-01454-01467-20261024
     paths:
       - '.github/workflows/vr-dx9ex-user-test-build.yml'
+      - 'src/vr/game/reflection_frame_budget.hpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/plugin.hpp'
+      - 'src/vr/settings.cpp'
+      - 'tools/test_vr_reflection_frame_budget.cpp'
+      - 'tools/Run-DX9ExFocusTest.ps1'
   workflow_dispatch:
 
 jobs:
@@ -47,57 +54,59 @@ jobs:
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
           cmake --build build-host --config Release --target outrun-vr-host
 
-      - name: Assemble user test package
+      - name: Run portable reflection regression
+        shell: pwsh
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vs = (& $vswhere -latest -property installationPath)
+          if (-not $vs) { throw 'VS2022 missing' }
+          $dev = Join-Path $vs 'VC/Auxiliary/Build/vcvars64.bat'
+          $command = "`"$dev`" >nul && cl /nologo /std:c++17 /EHsc /W4 /Isrc tools\\test_vr_reflection_frame_budget.cpp /Fe:review_reflection_probe.exe && review_reflection_probe.exe"
+          cmd /c $command
+          if ($LASTEXITCODE -ne 0) { throw 'Reflection regression failed' }
+
+      - name: Assemble independent A-B packages
         shell: pwsh
         run: |
           $short = $env:GITHUB_SHA.Substring(0,12)
-          $dir = "OutRun2_VR_R26_TIME_GOAL_RIVAL_TEST_$short"
-          New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (-not $dll) { throw 'dinput8.dll missing' }
           $vrHostExe = Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
           if (-not $vrHostExe) { throw 'outrun-vr-host.exe missing' }
-          Copy-Item $dll.FullName "$dir/dinput8.dll"
-          Copy-Item $vrHostExe.FullName "$dir/outrun-vr-host.exe"
-          Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
-          Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
-          Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
-          Copy-Item tools/Run-DX9ExFocusTest.ps1 "$dir/Run-DX9ExFocusTest.ps1"
-          Set-Content "$dir/DX9EX_VARIANT.txt" 'variant=R26_TIME_GOAL_RIVAL_TEST' -Encoding ascii
-          Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
-          @(
-            'DX9Ex R26 + HUD user test build'
-            'Targets: +TIME / GOAL-result HUD / rival marker regression'
-            'Renderer: R26+HUD default'
-            'Runner: GitHub-hosted windows-2022'
-            'RUNTIME_VALIDATION=UNTESTED'
-            ''
-            'EXECUTION / 실행 방법'
-            '1. Extract ALL files directly into the folder containing OR2006C2C.EXE.'
-            '2. Double-click RUN_DX9EX_TEST.cmd.'
-            '3. Do NOT run outrun-vr-host.exe directly. It is a VR helper process and a white helper window is not the game.'
-            '4. Test +TIME, GOAL/result time/progress, and the RIVAL marker; then exit the game normally.'
-            '5. Upload DX9EX_LOGS/DX9EX_LOG_R26_TIME_GOAL_RIVAL_TEST_*.zip if a defect remains.'
-          ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
-          @(
-            'DX9Ex R26 + HUD user test build'
-            'Targets: +TIME / GOAL-result HUD / rival marker regression'
-            'Renderer: R26+HUD default'
-            'Runner: GitHub-hosted windows-2022'
-            'Launcher: RUN_DX9EX_TEST.cmd'
-            'RUNTIME_VALIDATION=UNTESTED'
-          ) | Set-Content "$dir/TEST_SCOPE.txt" -Encoding UTF8
-          foreach ($required in @(
-            'dinput8.dll','outrun-vr-host.exe','RUN_DX9EX_TEST.cmd',
-            'Run-DX9ExFocusTest.ps1','DX9EX_VARIANT.txt','START_HERE.txt')) {
-            if (-not (Test-Path (Join-Path $dir $required))) {
-              throw "user test package missing $required"
+          foreach ($variant in @('R26_REVIEW_CONTROL','R26_REVIEW_LATE_THROTTLE')) {
+            $dir = "OutRun2_VR_${variant}_$short"
+            New-Item -ItemType Directory -Force $dir | Out-Null
+            Copy-Item $dll.FullName "$dir/dinput8.dll"
+            Copy-Item $vrHostExe.FullName "$dir/outrun-vr-host.exe"
+            Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
+            Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
+            Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
+            Copy-Item tools/Run-DX9ExFocusTest.ps1 "$dir/Run-DX9ExFocusTest.ps1"
+            Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant" -Encoding ascii
+            Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
+            @(
+              'R26+HUD review 01454..01467, separate A/B source branch'
+              "Variant: $variant"
+              'Identical game DLL and host; only explicit 01466 command-line switch differs'
+              'CONTROL = stock reflection face budget; LATE_THROTTLE = 0.25 scale on detected late frames'
+              'Other optical/HUD candidate patches are NOT applied; no Quest3 outcome claimed'
+              'Renderer: R26+HUD; R84 not promoted; original game and source EXE not bundled'
+              'RUNTIME_VALIDATION=UNTESTED'
+              '1. Back up installed dinput8.dll and OutRun2006Tweaks.ini.'
+              '2. Unpack EXACTLY ONE variant ZIP beside OR2006C2C.EXE, never mix variants.'
+              '3. Start with RUN_DX9EX_TEST.cmd; do not run the host helper alone.'
+              '4. Test one matched beach/water scene plus +TIME/GOAL/result/rank/rival/menu/F11/flare.'
+              '5. Exit normally; upload the produced DX9EX_LOGS ZIP and frame-time observations.'
+              '6. Restore your backup before using the stable version.'
+            ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
+            foreach ($required in @('dinput8.dll','outrun-vr-host.exe','RUN_DX9EX_TEST.cmd','Run-DX9ExFocusTest.ps1','DX9EX_VARIANT.txt','SOURCE_SHA.txt','START_HERE.txt')) {
+              if (-not (Test-Path (Join-Path $dir $required))) { throw "missing $required" }
             }
+            Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
           }
-          Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-TIME-GOAL-RIVAL-TEST-${{ github.sha }}
-          path: OutRun2_VR_R26_TIME_GOAL_RIVAL_TEST_*.zip
+          name: OutRun2-VR-R26-REVIEW-AB-${{ github.sha }}
+          path: OutRun2_VR_R26_REVIEW_*.zip
           if-no-files-found: error

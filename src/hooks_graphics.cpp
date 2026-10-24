@@ -1643,7 +1643,9 @@ class ReflectionUpdateRate : public Hook
 		const auto budget = OutRunVR::ReflectionFrameBudget::Advance(
 			pendingFaces, Settings::ReflectionUpdateRate.get(), frameScale60,
 			Settings::VREnabled && Settings::VRNormalizeReflectionRate,
-			frameSpike);
+			frameSpike,
+            Settings::VREnabled && Settings::VRNormalizeReflectionRate &&
+                Settings::VRReflectionLateFrameThrottle);
 		pendingFaces = budget.pendingFaces;
 		ctx.eax = budget.faces;
 	}

@@ -87,6 +87,7 @@ namespace Settings
 	extern Setting<bool> VRCullingUnionFov;                 // vr/settings.cpp
 	extern Setting<float> VRCullingUnionMarginDegrees;      // vr/settings.cpp
 	extern Setting<bool> VRNormalizeReflectionRate;         // vr/settings.cpp
+    extern Setting<bool> VRReflectionLateFrameThrottle;     // vr/settings.cpp
 	extern Setting<float> VRNearPlane;                      // vr/settings.cpp
 
 	extern Setting<float> FramerateInterpolationDebugAlpha; // interpolation.cpp

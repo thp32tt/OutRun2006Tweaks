@@ -129,7 +129,8 @@ namespace OutRunVR::ReflectionFrameBudget
     // with a hard cap after a long/pause/loading frame; no accumulated
     // cubemap work may burst into the critical stereo submission frame.
     inline StepResult Advance(float previous, float requestedRate,
-        float elapsed60, bool vrNormalized, bool lateFrame) noexcept
+        float elapsed60, bool vrNormalized, bool lateFrame,
+        bool conservativeLateThrottle = false) noexcept
     {
         // A malformed hot-swapped INI value must never generate negative
         // faces or turn into an unbounded cube-map redraw.
@@ -146,8 +147,12 @@ namespace OutRunVR::ReflectionFrameBudget
         if (rate == 0.f)
             return {0.f, 0};
 
+        // Opt-in comparison only (01466): lower *requested* late-frame face
+        // work, not the healthy cadence or existing limit/retained-debt gates.
+        // An actual HMD/GPU benefit is not asserted by this source change.
         const float scaled = vrNormalized
-            ? (lateFrame ? 0.5f : std::clamp(elapsed60, 0.f, 1.f))
+            ? (lateFrame ? (conservativeLateThrottle ? 0.25f : 0.5f)
+                         : std::clamp(elapsed60, 0.f, 1.f))
             : 1.f;
         // Use double for long-running fractional accumulation. The old
         // visible 60 Hz steady-state cadence is preserved by this formula.
