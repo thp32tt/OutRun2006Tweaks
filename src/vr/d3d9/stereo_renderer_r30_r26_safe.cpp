@@ -3000,12 +3000,10 @@ namespace OutRunVRStereo
                     {
                         const float w = stockProjection.m[row][3];
                         projected.m[row][0] =
-                            stockProjection.m[row][0] *
-                                f11Affine[eye].scaleX +
+                            stockProjection.m[row][0] * f11Affine[eye].scaleX +
                             w * f11Affine[eye].offsetX;
                         projected.m[row][1] =
-                            stockProjection.m[row][1] *
-                                f11Affine[eye].scaleY +
+                            stockProjection.m[row][1] * f11Affine[eye].scaleY +
                             w * f11Affine[eye].offsetY;
                         projected.m[row][2] = 0.5f * w;
                         projected.m[row][3] = w;
