@@ -5,6 +5,7 @@
 #include "native_game_camera_view.hpp"
 #include "native_game_offscreen_mrt.hpp"
 #include "native_game_typed_camera_postpass.hpp"
+#include "native_game_color_fill.hpp"
 #include "native_game_partial_color_format.hpp"
 #include "native_game_stretch_source.hpp"
 #include "native_game_stereo_draw_evidence.hpp"
@@ -1321,6 +1322,13 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             // identical to a direct game callback Clear. Do not count a
             // queued full Clear twice or retain pre-Clear eye color evidence.
         } else if (clear.kind ==
+                   NativeGameEyePartialTargetClear::Kind::ColorFill) {
+            // Replay source color writes at the actual Draw ordinal, while
+            // retaining physical alpha and preceding pixel chronology.
+            if (!clear_target_argb(clear.argb,&clear.rect,true,
+                                   clear.opaqueDestinationAlpha))
+                return false;
+        } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
             const bool partial = clear.rect.left || clear.rect.top ||
                 clear.rect.right || clear.rect.bottom;
@@ -1567,15 +1575,29 @@ bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
 }
 
 bool NativeGameEyeDrawEncoder::clear_target_argb(
-    std::uint32_t argb, const D3D11_RECT* region) noexcept {
+    std::uint32_t argb, const D3D11_RECT* region,
+    bool ignoreRasterClip, bool opaqueDestinationAlpha) noexcept {
     lastTargetClearFull_ = false;
     if (!eye_targets_bound() || !targetWidth_ || !targetHeight_) return false;
     // D3D9 Clear clips even explicit TARGET rectangles to the live viewport
     // and (when enabled) scissor. D3D11 ClearRTV/ClearView ignore RS clips.
     // Do not erase another menu/HUD area of the native L/R eye, and do not
     // reset geometry evidence for a nominal full RECT that is actually cropped.
-    const auto covered = camera_clear_coverage(
-        context_, targetWidth_, targetHeight_, region);
+    const auto covered = [&]() noexcept -> NativeGameCameraClearRegion {
+        if (!ignoreRasterClip)
+            return camera_clear_coverage(context_,targetWidth_,targetHeight_,region);
+        // ColorFill clips to the PHYSICAL surface, never a Draw viewport.
+        const auto clip=native_game_color_fill_clip(
+            targetWidth_,targetHeight_,region!=nullptr,
+            region?region->left:0,region?region->top:0,
+            region?region->right:0,region?region->bottom:0);
+        NativeGameCameraClearRegion out{};
+        out.valid=clip.valid;out.empty=clip.empty;out.full=clip.full;
+        if (clip.valid && !clip.empty)
+            out.rect={static_cast<LONG>(clip.left),static_cast<LONG>(clip.top),
+                      static_cast<LONG>(clip.right),static_cast<LONG>(clip.bottom)};
+        return out;
+    }();
     if (!covered.valid) return false;
     if (covered.empty) return true; // genuine D3D9 clipped no-op
     const D3D11_RECT* actual = covered.full ? nullptr : &covered.rect;
@@ -1589,7 +1611,8 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         static_cast<float>((argb >> 16) & 0xffu) * kByte,
         static_cast<float>((argb >> 8) & 0xffu) * kByte,
         static_cast<float>(argb & 0xffu) * kByte,
-        static_cast<float>((argb >> 24) & 0xffu) * kByte};
+        opaqueDestinationAlpha ? 1.0f :
+            static_cast<float>((argb >> 24) & 0xffu) * kByte};
     const bool shaderSupported = cropped && !rectContext &&
         native_game_partial_color_shader_rtv(context_, eyeTarget_);
     const auto route = live_game_stereo::color_clear_route(
@@ -3049,6 +3072,14 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     needsClearView |= !live_game_stereo::full_eye_target_rect(
                         rect.left, rect.top, rect.right, rect.bottom,
                         ring_.width(), ring_.height());
+                } else if (event.kind ==
+                           NativeGameEyePartialTargetClear::Kind::ColorFill) {
+                    const auto clipped=native_game_color_fill_clip(
+                        ring_.width(),ring_.height(),true,
+                        event.rect.left,event.rect.top,
+                        event.rect.right,event.rect.bottom);
+                    if (!clipped.valid) return false;
+                    needsClearView |= !clipped.empty && !clipped.full;
                 } else if (event.kind ==
                            NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
                     // Empty RECT or an explicit entire-eye RECT maps

@@ -124,8 +124,11 @@ public:
     // Replay a game-authored TARGET Clear at its exact position between
     // menu/vehicle/race eye Draws, never as fabricated draw evidence. Partial
     // clears require D3D11.1 ClearView (no implicit full-eye fallback).
+    // ColorFill ignores the previous game Draw raster clip and honors X8.
     [[nodiscard]] bool clear_target_argb(
-        std::uint32_t argb, const D3D11_RECT* region = nullptr) noexcept;
+        std::uint32_t argb, const D3D11_RECT* region = nullptr,
+        bool ignoreRasterClip = false,
+        bool opaqueDestinationAlpha = false) noexcept;
     // A real D3D9 game Z/stencil Clear can occur between geometry commands.
     [[nodiscard]] bool clear_depth_stencil(
         float depth, std::uint8_t stencil,
@@ -318,7 +321,7 @@ struct NativeGameEyeColorSeed {
     std::uint32_t argb[2]{};
 };
 // Actual D3D9 game Clears and GPU intermediate postpasses can occur BETWEEN
-// source geometry draws. Keep TARGET, Z/stencil, Copy and Stretch events
+// source geometry draws. Keep TARGET, ColorFill, Z/stencil, Copy and Stretch events
 // in ONE original per-eye timeline: replaying separately would overwrite
 // earlier HUD/menu pixels or restore an older intermediate after a Clear.
 // This is source-authored GPU command replay, not synthetic Draw evidence.
@@ -328,10 +331,11 @@ struct NativeGameEyePartialTargetClear {
     // ordered GPU Copy/Stretch/clear postpasses between game Draws. Keep a
     // bounded per-eye command stream rather than dropping the entire frame.
     static constexpr std::uint32_t kMaxRectsPerEye = 32u;
-    enum class Kind : std::uint8_t { TargetRect, FullDepthStencil, SourceCopy, SourceStretch };
+    enum class Kind : std::uint8_t { TargetRect, FullDepthStencil, SourceCopy, SourceStretch, ColorFill };
     struct Entry {
         D3D11_RECT rect{};
         std::uint32_t argb{};
+        bool opaqueDestinationAlpha{}; // D3D9 X8 destination
         std::uint64_t afterDrawOrdinal{}; // source geometry Draws before Clear
         Kind kind{Kind::TargetRect};
         float depth{1.0f};
