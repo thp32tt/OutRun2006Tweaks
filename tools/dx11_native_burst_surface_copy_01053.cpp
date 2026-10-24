@@ -22,7 +22,8 @@ int main() {
     }
     assert(live.operations == 32u);
     assert(!live.admits(1920,1080)); // full readback bandwidth exhausted
-    const auto fixedCount = live.operations, fixedBytes = live.bytes;
+    const auto fixedCount = live.operations;
+    const auto fixedBytes = live.bytes;
     live.note_success(1920,1080);
     assert(live.operations == fixedCount && live.bytes == fixedBytes);
     // Present, Reset and authenticated new full Clear begin a fresh source

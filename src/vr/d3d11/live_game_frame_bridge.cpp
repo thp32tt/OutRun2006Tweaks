@@ -7787,8 +7787,8 @@ bool preserve_game_surface_copy(
         if (!readback || FAILED(readback->LockRect(
                 &locked, nullptr, D3DLOCK_READONLY))) return false;
         const std::size_t rowBytes = std::size_t(region.width()) * 4u;
-        const UINT readX=GameNativeSurfaceTilePlan::source_x(region,tileSucceeded);
-        const UINT readY=GameNativeSurfaceTilePlan::source_y(region,tileSucceeded);
+        const UINT readX=GameNativeSurfaceTilePlan::source_x(region, tileSucceeded);
+        const UINT readY=GameNativeSurfaceTilePlan::source_y(region, tileSucceeded);
         const bool readable = locked.pBits && locked.Pitch > 0 &&
             std::uint64_t(locked.Pitch) >=
                 (std::uint64_t(readX)+region.width())*4u;

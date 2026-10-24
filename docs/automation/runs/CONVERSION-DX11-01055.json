@@ -93,7 +93,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "blocking_evidence": "Original 01054 post-Draw preserve_game_surface_copy unconditionally calls GetRenderTargetData on entire 3440x1440 D3D9 backbuffer even for a 1px partial UpdateSurface/StretchRect, then sends only the patch to native D3D11."
+    "blocking_evidence": "Original 01054 post-Draw preserve_game_surface_copy unconditionally calls GetRenderTargetData on entire 3440x1440 D3D9 backbuffer even for a 1px partial UpdateSurface/StretchRect, then sends only the patch to native D3D11.; Exact SHA 3b5856 Fast Gate failed: inherited 01053 portable g++ probe declares two differently typed fields in one const auto (GCC -Werror compilation failure); 01055 structural Python check expected spaces in C++ call not present. Scoped repair on same TASK_ID."
   },
   "acceptance_results": {
     "authentic_postdraw_gpu_tile": {
@@ -115,6 +115,16 @@
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Exact real-game native draw and output counts remain UNTESTED.",
-  "next_implementation_action": "Complete exact-SHA GitHub five Gates; runtime test later checks menu/vehicle/race native partial postpasses, first Draw/Reset and original fallback.",
-  "runtime_note": "No real gameplay/Quest 3 executed. Simulated pixel parity does not establish native runtime output."
+  "next_implementation_action": "Run same five full required GitHub Gates at new repair SHA. Earlier SHA Fast failed; do not claim complete. HMD UNTESTED.",
+  "runtime_note": "No real gameplay/Quest 3 executed. Simulated pixel parity does not establish native runtime output.",
+  "validation_history": [
+    {
+      "exact_sha": "3b5856c67b798f33aaa60d99a4437f0bebfb5cb4",
+      "gate": "DX11 Fast Structural Checks",
+      "run_id": 40143422134,
+      "result": "FAIL",
+      "root_cause": "C++ probe mixed auto deduction and 01055 Python whitespace assertion",
+      "remediation": "Same-ID patch of affected C++ source spelling and inherited local test declaration; no safety check removed."
+    }
+  ]
 }
