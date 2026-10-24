@@ -2,6 +2,7 @@
 // Opt-in DX9Ex GPU timestamp + sparse blend-state measurement.
 // Timestamp intervals include possible GPU idle gaps; not water attribution.
 #include <d3d9.h>
+#include "gpu_census_sampling.hpp"
 #include <array>
 #include <algorithm>
 #include <cmath>
@@ -14,6 +15,12 @@ enum class DrawRoute : std::size_t {
     Xyzrhw = 0, ScreenHud, FastWorld, R29Fallback, RecordingRaw,
     Count
 };
+inline bool CensusDephaseEnabled() noexcept {
+    // Requires OUTRUN_VR_GPU_PROFILE=1 separately; no cost in normal gameplay.
+    static const bool on=[] { const char* v=std::getenv("OUTRUN_VR_GPU_CENSUS_DEPHASE");
+        return v && std::strcmp(v,"1")==0; }();
+    return on;
+}
 inline bool Enabled() noexcept {
     static const bool on=[] { const char* v=std::getenv("OUTRUN_VR_GPU_PROFILE"); return v && std::strcmp(v,"1")==0; }();
     return on;
@@ -23,7 +30,7 @@ struct Slot {
     bool pending=false,sampleSet=false,blend=false;
     unsigned draws=0, samples=0, blendSamples=0, alphaTestSamples=0, pick=0;
     unsigned noDepthWriteSamples=0, depthDisabledSamples=0, stencilSamples=0, pixelShaderSamples=0, fixedFunctionSamples=0;
-    unsigned rtSamples=0, offscreenRtSamples=0, multisampleRtSamples=0;
+    unsigned rtSamples=0, offscreenRtSamples=0, multisampleRtSamples=0, censusCandidates=0;
     void release() noexcept {
         for(IDirect3DQuery9** q : {&disjoint,&freq,&begin,&end,&sampleBegin,&sampleEnd}) {
             if(*q) { (*q)->Release(); *q=nullptr; }
@@ -51,7 +58,7 @@ class Meter {
     unsigned next_=0,lastDraws_=1024;
     std::uint64_t frame_=0, samples_=0, alpha_=0, alphaTest_=0, frames_=0, dropped_=0, invalid_=0, timedBlend_=0, timedOpaque_=0;
     std::uint64_t noDepthWrite_=0, depthDisabled_=0, stencil_=0, pixelShader_=0, fixedFunction_=0;
-    std::uint64_t rtSamples_=0, offscreenRtSamples_=0, multisampleRtSamples_=0;
+    std::uint64_t rtSamples_=0, offscreenRtSamples_=0, multisampleRtSamples_=0, censusCandidates_=0;
     // Logical R33 hook calls versus routes taken. Unclassified calls include
     // raster-guard bypasses; they must NOT be called glass/water by inference.
     std::uint64_t logicalDrawCalls_=0;
@@ -90,6 +97,7 @@ class Meter {
             fixedFunction_+=s.fixedFunctionSamples;
             rtSamples_+=s.rtSamples; offscreenRtSamples_+=s.offscreenRtSamples;
             multisampleRtSamples_+=s.multisampleRtSamples;
+            censusCandidates_+=s.censusCandidates;
             if(s.sampleSet) {
                 const double drawMs=double(y-x)*1000.0/double(f);
                 if(s.blend){++timedBlend_;sumBlend_+=drawMs;}else{++timedOpaque_;sumOpaque_+=drawMs;}
@@ -108,14 +116,16 @@ class Meter {
             return gpuSpans_[(std::max)(size_t{1},n)-1];
         };
         const char* scene=std::getenv("OUTRUN_VR_GPU_SCENE");
-        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} dropped={} invalid={} logicalDrawCalls={} xyzrhwRoutes={} hudRoutes={} fastWorldRoutes={} r29FallbackRoutes={} stateBlockRawRoutes={} otherGuardRoutes={} waterAttribution=UNPROVEN",
+        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} censusCandidates={} censusPhaseMode={} rtOwnership=FIRST_SAMPLED_DIMENSIONS_ONLY dropped={} invalid={} logicalDrawCalls={} xyzrhwRoutes={} hudRoutes={} fastWorldRoutes={} r29FallbackRoutes={} stateBlockRawRoutes={} otherGuardRoutes={} waterAttribution=UNPROVEN",
             scene?scene:"NONE",frames_,frames_?sumFrame_/frames_:0.0,
             percentile(0.50),percentile(0.95),percentile(0.99),maxFrame_,
             gpuSpanCount_,gpuSpanOverflow_,
             timedBlend_?sumBlend_/timedBlend_:0.0,timedOpaque_?sumOpaque_/timedOpaque_:0.0,
             timedBlend_,timedOpaque_,samples_,alpha_,alphaTest_,
             noDepthWrite_,depthDisabled_,stencil_,pixelShader_,fixedFunction_,
-            rtSamples_,offscreenRtSamples_,multisampleRtSamples_,dropped_,invalid_,
+            rtSamples_,offscreenRtSamples_,multisampleRtSamples_,censusCandidates_,
+            CensusDephaseEnabled() ? "DEPHASED_1_PER_64_EACH_FRAME" : "LEGACY_MOD16_ALIAS",
+            dropped_,invalid_,
             logicalDrawCalls_,routeCounts_[0],routeCounts_[1],routeCounts_[2],
             routeCounts_[3],routeCounts_[4],
             logicalDrawCalls_ >= (routeCounts_[0]+routeCounts_[1]+routeCounts_[2]+
@@ -124,7 +134,7 @@ class Meter {
                     routeCounts_[3]+routeCounts_[4]) : 0);
         samples_=alpha_=alphaTest_=frames_=dropped_=invalid_=timedBlend_=timedOpaque_=0;
         noDepthWrite_=depthDisabled_=stencil_=pixelShader_=fixedFunction_=0;
-        rtSamples_=offscreenRtSamples_=multisampleRtSamples_=0;
+        rtSamples_=offscreenRtSamples_=multisampleRtSamples_=censusCandidates_=0;
         sumFrame_=maxFrame_=sumBlend_=sumOpaque_=0;
         logicalDrawCalls_=0;
         routeCounts_.fill(0);
@@ -153,7 +163,7 @@ public:
         samples_=alpha_=alphaTest_=frames_=dropped_=invalid_=0;
         timedBlend_=timedOpaque_=0;
         noDepthWrite_=depthDisabled_=stencil_=pixelShader_=fixedFunction_=0;
-        rtSamples_=offscreenRtSamples_=multisampleRtSamples_=0;
+        rtSamples_=offscreenRtSamples_=multisampleRtSamples_=censusCandidates_=0;
         logicalDrawCalls_=0; routeCounts_.fill(0);
         sumFrame_=maxFrame_=sumBlend_=sumOpaque_=0.0;
         gpuSpanCount_=gpuSpanOverflow_=0;
@@ -180,7 +190,7 @@ public:
             s.draws=s.samples=s.blendSamples=s.alphaTestSamples=0;
             s.noDepthWriteSamples=s.depthDisabledSamples=s.stencilSamples=0;
             s.pixelShaderSamples=s.fixedFunctionSamples=0;
-            s.rtSamples=s.offscreenRtSamples=s.multisampleRtSamples=0;
+            s.rtSamples=s.offscreenRtSamples=s.multisampleRtSamples=s.censusCandidates=0;
             s.sampleSet=false;
             s.pick=static_cast<unsigned>((frame_*997u+13u)%lastDraws_);
             if(FAILED(s.disjoint->Issue(D3DISSUE_BEGIN))||FAILED(s.begin->Issue(D3DISSUE_END))) {
@@ -190,7 +200,7 @@ public:
         }
         Slot& s=*active_;
         const unsigned i=s.draws++;
-        const bool sample=((i+static_cast<unsigned>(frame_*7u))&15u)==0;
+        const bool sample=GpuCensusSampling::StateSample(i,frame_);
         const bool time=i==s.pick;
         if(!sample&&!time) return false;
         DWORD alpha=FALSE,test=FALSE;
@@ -202,7 +212,9 @@ public:
             if(SUCCEEDED(d->GetRenderState(D3DRS_ZWRITEENABLE,&zWrite))) s.noDepthWriteSamples+=(zWrite==FALSE);
             if(SUCCEEDED(d->GetRenderState(D3DRS_ZENABLE,&zEnable))) s.depthDisabledSamples+=(zEnable==D3DZB_FALSE);
             if(SUCCEEDED(d->GetRenderState(D3DRS_STENCILENABLE,&stencil))) s.stencilSamples+=(stencil!=FALSE);
-            if((i&63u)==0) {
+            const bool census=GpuCensusSampling::CensusSample(i,frame_,CensusDephaseEnabled());
+            if(census) ++s.censusCandidates;
+            if(census) {
                 // Sparse RT census distinguishes main-eye-sized and smaller
                 // offscreen effects. Dimensions alone cannot prove a water pass.
                 // COM GetRenderTarget AddRef must be balanced in every branch.
@@ -222,7 +234,7 @@ public:
                     target->Release();
                 }
             }
-            if((i&63u)==0) { // lower-rate shader sample: GetPixelShader AddRef must be released
+            if(census) { // same phase-consistent low-rate sample; GetPixelShader AddRef balanced
                 IDirect3DPixelShader9* ps=nullptr;
                 if(SUCCEEDED(d->GetPixelShader(&ps))) {
                     if(ps) { ++s.pixelShaderSamples; ps->Release(); }
