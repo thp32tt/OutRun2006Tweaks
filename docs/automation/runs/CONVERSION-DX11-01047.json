@@ -87,7 +87,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_ONLY_GAME_HMD_UNTESTED",
-    "activation_guard_and_fallback": "NativeDrawPathActive explicit opt-in only; D3D9 original input, FFB, Present preserved."
+    "activation_guard_and_fallback": "NativeDrawPathActive explicit opt-in only; D3D9 original input, FFB, Present preserved.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "acceptance_results": {
     "chained_native_draw_epochs": {
@@ -117,5 +122,6 @@
         ".github/workflows/dx11-fast-structural.yml"
       ]
     }
-  }
+  },
+  "ci_failure_repair": "Initial Fast Gate 40070852751 failed task-policy parser because the run strategy omitted the documented live_game_draw_path stage names; corrected metadata, retained all validation scripts and native renderer code unchanged."
 }
