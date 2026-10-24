@@ -1,0 +1,387 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0415KST-B0086-B0087-A0072-NEW-SHA8",
+  "scheduled_slot_kst": "2026-10-25T04:15:00+09:00",
+  "checked_at_kst": "2026-10-25T04:19:31+09:00",
+  "reviewer": "ChatGPT AI1",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "task_ids": [
+    "OUTRUN-ROI-B-0086-909580AA",
+    "OUTRUN-ROI-B-0087-C8917699",
+    "OUTRUN-ROI-A-0072-782D7CD5-R1"
+  ],
+  "previous_reviewed_unique_sha_count": 760,
+  "newly_reviewed_unique_sha_count": 8,
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "policy_paths": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "records": [
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0086-909580AA",
+      "ordinal": 414,
+      "candidate_file": "Q057_704e36c455dff145_source_k.png",
+      "source_file": "Q057_704e36c455dff145_source.png",
+      "candidate_sha256": "450f920dfeaf3e50893e91f053cc5746d99fa066673f117669465c981303e797",
+      "source_sha256": "1fff85748e717d69bbc1edeb69e58588aa1adfe5fa47c3b0049c0ab50577f741",
+      "english": "MISSION CLEARED!",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "approved_korean": "미션 성공!",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1737,
+        906
+      ],
+      "source_dimensions": [
+        2864,
+        1493
+      ],
+      "candidate_alpha_bbox": [
+        47,
+        114,
+        1725,
+        882
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "edge_assessment": "No canvas-edge alpha pixels",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Source/output side-by-side visual lettering and exact approved English→Korean mapping verified; final registration to original HD UI cell and adjacent protected art not demonstrated. Unverified native placement blocks independent full C1 PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0086-909580AA",
+      "ordinal": 415,
+      "candidate_file": "Q060_c8e7b9bbc33eab80_source_k.png",
+      "source_file": "Q060_c8e7b9bbc33eab80_source.png",
+      "candidate_sha256": "4a0ac6c9c22d4fe109ba6a877962863ffc9c0ff0d3494fc5eecf3b4ecab0bb7a",
+      "source_sha256": "5e407c7055905ad6182741ef194667245c0fed300848165f3d5bc301b21a2577",
+      "english": "PASS!!!",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "approved_korean": "통과!!!",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1575,
+        998
+      ],
+      "source_dimensions": [
+        680,
+        431
+      ],
+      "candidate_alpha_bbox": [
+        35,
+        55,
+        1557,
+        998
+      ],
+      "candidate_alpha_touches_canvas_edge": true,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "edge_assessment": "4 bottom-edge pixels at alpha=1 only; no evidence of visible glyph/effect clipping",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Source/output side-by-side visual lettering and exact approved English→Korean mapping verified; final registration to original HD UI cell and adjacent protected art not demonstrated. Unverified native placement blocks independent full C1 PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0086-909580AA",
+      "ordinal": 416,
+      "candidate_file": "Q060_9eea220cd6a7a4ab_source_k.png",
+      "source_file": "Q060_9eea220cd6a7a4ab_source.png",
+      "candidate_sha256": "d13a958abee3490b69f54a1ed9927017f0a6e7934f318707cd425a3b83e00203",
+      "source_sha256": "23cb72c8f449d58cc77ec2a4d38740fcaed854a93fee78140204fb639d9d126a",
+      "english": "Ranking",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "approved_korean": "순위",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1519,
+        1036
+      ],
+      "source_dimensions": [
+        732,
+        499
+      ],
+      "candidate_alpha_bbox": [
+        47,
+        100,
+        1489,
+        937
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "edge_assessment": "No canvas-edge alpha pixels",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Source/output side-by-side visual lettering and exact approved English→Korean mapping verified; final registration to original HD UI cell and adjacent protected art not demonstrated. Unverified native placement blocks independent full C1 PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0086-909580AA",
+      "ordinal": 417,
+      "candidate_file": "Q060_6285c0baec403b3c_source_k.png",
+      "source_file": "Q060_6285c0baec403b3c_source.png",
+      "candidate_sha256": "46328d074f6270715928699eb8bdb0be0934c79b56b6332cfdfdeb5ef862e383",
+      "source_sha256": "8887f264fa1611fd66340da5138358be6e2a76c3ad321365dfc7d0b1ed880b57",
+      "english": "STAGE CLEAR",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "approved_korean": "스테이지 클리어",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1759,
+        894
+      ],
+      "source_dimensions": [
+        988,
+        502
+      ],
+      "candidate_alpha_bbox": [
+        25,
+        69,
+        1731,
+        862
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "edge_assessment": "No canvas-edge alpha pixels",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Source/output side-by-side visual lettering and exact approved English→Korean mapping verified; final registration to original HD UI cell and adjacent protected art not demonstrated. Unverified native placement blocks independent full C1 PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0086-909580AA",
+      "ordinal": 418,
+      "candidate_file": "Q060_c0ec1551736ece11_source_k.png",
+      "source_file": "Q060_c0ec1551736ece11_source.png",
+      "candidate_sha256": "87a79788b8e3d9db811ccd90db5720119af8852e1bd3f0da5faee99abdeba493",
+      "source_sha256": "8aaa5f618cd1f9a1dec23c6983d8c1fe8d811a11b8784c520686bfc5cbed42b0",
+      "english": "Stage",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "approved_korean": "스테이지",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1689,
+        931
+      ],
+      "source_dimensions": [
+        880,
+        485
+      ],
+      "candidate_alpha_bbox": [
+        89,
+        135,
+        1611,
+        859
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "edge_assessment": "No canvas-edge alpha pixels",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Source/output side-by-side visual lettering and exact approved English→Korean mapping verified; final registration to original HD UI cell and adjacent protected art not demonstrated. Unverified native placement blocks independent full C1 PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0087-C8917699",
+      "ordinal": 419,
+      "candidate_file": "Q063_bc1b1d6af87612c1_source_k.png",
+      "source_file": "Q063_bc1b1d6af87612c1_source.png",
+      "candidate_sha256": "022d077c74831737a9246872a1f25708184b8eae7c5907207a703ae6d4242607",
+      "source_sha256": "1607318824cb530baa2897e284a040026ead4b782b6b20e3789aa51e7ea86167",
+      "english": "START",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "approved_korean": "출발",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1534,
+        1025
+      ],
+      "source_dimensions": [
+        356,
+        238
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        229,
+        1437,
+        921
+      ],
+      "candidate_alpha_touches_canvas_edge": true,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "edge_assessment": "7 left-edge pixels at alpha=1 only; no evidence of visible glyph/effect clipping",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Source/output side-by-side visual lettering and exact approved English→Korean mapping verified; final registration to original HD UI cell and adjacent protected art not demonstrated. Unverified native placement blocks independent full C1 PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0072-782D7CD5-R1",
+      "ordinal": 354,
+      "candidate_file": "Q057_338ba20f4d83ded1_source_k.png",
+      "source_file": "Q057_338ba20f4d83ded1_source.png",
+      "candidate_sha256": "f22067925b88e995c6fba85742d6594bb181dbf7af00abfb789bc5fc02ec98ff",
+      "source_sha256": "198e27086ace6b2596488efb38d5736833bfd4d19ec280541ff8c9fafecc2005",
+      "english": "STORING ONLINE RECORD...",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "approved_korean": "온라인 기록 저장 중...",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        2031,
+        471
+      ],
+      "candidate_alpha_bbox": [
+        25,
+        37,
+        2130,
+        700
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "edge_assessment": "No canvas-edge alpha pixels",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Source/output side-by-side visual lettering and exact approved English→Korean mapping verified; final registration to original HD UI cell and adjacent protected art not demonstrated. Unverified native placement blocks independent full C1 PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0072-782D7CD5-R1",
+      "ordinal": 355,
+      "candidate_file": "Q057_b08f38e59c274ef2_source_k.png",
+      "source_file": "Q057_b08f38e59c274ef2_source.png",
+      "candidate_sha256": "61aada32ef2b5f7ac5ef1c5902a73b0246452f725b7583204d165d802e9b9313",
+      "source_sha256": "61828be22aeeb9e0c007367e5b92be50feb07438a41d89802a127017c529a283",
+      "english": "START",
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "approved_korean": "시작",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1672,
+        941
+      ],
+      "source_dimensions": [
+        1333,
+        771
+      ],
+      "candidate_alpha_bbox": [
+        101,
+        29,
+        1671,
+        919
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_RGBA",
+      "edge_assessment": "No canvas-edge alpha pixels",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Source/output side-by-side visual lettering and exact approved English→Korean mapping verified; final registration to original HD UI cell and adjacent protected art not demonstrated. Unverified native placement blocks independent full C1 PASS.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "evidence": {
+    "preflight_n100": "work/C1_QA_20261025_0415_preflight.json",
+    "B_contact_sheet_n100": "work/C1_QA_20261025_0415_B_pairs.jpg",
+    "A_contact_sheet_n100": "work/C1_QA_20261025_0415_A_pairs.jpg",
+    "alpha_edge_proof_n100": "work/C1_QA_20261025_0415_edges.py",
+    "inspection_script_n100": "work/C1_QA_20261025_0415_inspect.py",
+    "export_evidence_tasks": [
+      "OUTRUN-ROI-B-0086-909580AA",
+      "OUTRUN-ROI-B-0087-C8917699",
+      "OUTRUN-ROI-A-0072-782D7CD5-R1"
+    ],
+    "mapping": "work/image-src/text_roi_batches/production_manifest.json"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "A_B_queues_consumed": false,
+    "new_DDS_written": false,
+    "final_deployment": false,
+    "C2_C3_or_game_PASS_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}
