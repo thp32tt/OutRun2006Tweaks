@@ -1,0 +1,44 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261024T1215KST-NEW-SHA",
+  "checked_at_kst": "2026-10-24T12:17:29.861461+09:00",
+  "role": "C1",
+  "status": "IDLE",
+  "reviewed_sha_history_count": 728,
+  "new_unique_sha_count": 0,
+  "producer_candidate_png_counts": {
+    "A": 334,
+    "B": 389
+  },
+  "producer_export_evidence_count": 148,
+  "local_outputs_without_export_evidence": {
+    "A": [],
+    "B": []
+  },
+  "export_evidence_without_local_outputs": {
+    "A": [],
+    "B": []
+  },
+  "verdict_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "evidence_n100": "work/C1_QA_20261024_1215_metrics.json",
+  "checker_n100": "work/C1_QA_20261024_1215_check.py",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_sha": {
+    "contract": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "glyph": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "controller_roles": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_game_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "VR_FFB_DX11_DXVK_touched": false
+  },
+  "note": "Current check has no newly exported SHA-unique A/B candidate PNG after C1 reviewed history. IDLE recorded without repetitive verdict or new work."
+}
