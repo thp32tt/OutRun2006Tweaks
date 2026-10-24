@@ -177,6 +177,8 @@ def main():
                         coverage_status={
                             "status":("C_CROP_COVERAGE_COMPLETE"
                                       if phrase_pending==0 and edge_pending==0
+                                      else "C_CROP_COVERAGE_OCR_EXHAUSTED"
+                                      if original108.get("status")=="HD108_CROP_COVERAGE_OCR_EXHAUSTED"
                                       else "C_CROP_COVERAGE_RUNNING"),
                             "reviewed_phrase_total":original108.get("reviewed_phrase_total"),
                             "located_phrase_count":original108.get("located_phrase_count"),
