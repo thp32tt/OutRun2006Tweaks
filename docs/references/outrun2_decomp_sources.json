@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "source_repo": "r4dius/outrun2-decomp",
+  "source_commit": "e1e1c592b802a6f3f7020a676abd3ba1be479e62",
+  "source_ref": "main",
+  "discovered_kst": "2026-10-14 13:40 KST",
+  "game_asset_code_imported": false,
+  "reference_only": true,
+  "upstream_acknowledgment": "r4dius and contributors",
+  "sources": [
+    {
+      "path": "src/platform/race_hud_navi.cpp",
+      "blob_sha": "ffd43ecde896e2e121034527c137af04c1d6ac62",
+      "purpose": "HUD rivals/markers/timers",
+      "priority": "P0",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/race_hud_navi.cpp"
+    },
+    {
+      "path": "src/platform/race_hud_runtime.cpp",
+      "blob_sha": "fa6350b43cad3fd272360f8e8dc03c2f0c0aa3a2",
+      "purpose": "glyph+sprite owner",
+      "priority": "P0",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/race_hud_runtime.cpp"
+    },
+    {
+      "path": "src/platform/race_hud.cpp",
+      "blob_sha": "3a828b9737b59d80d9e115032c724756461e8a45",
+      "purpose": "SPRANI matrix",
+      "priority": "P0",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/race_hud.cpp"
+    },
+    {
+      "path": "src/platform/pc_sprite_2d.cpp",
+      "blob_sha": "4a3ea1ca378d44373f0d9dffddc1400947cc3727",
+      "purpose": "2D sprite D3D9 draw",
+      "priority": "P0",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/pc_sprite_2d.cpp"
+    },
+    {
+      "path": "src/platform/frontend_sprites.cpp",
+      "blob_sha": "cb29a6ba946061d88056d85ce7dcabac48611d58",
+      "purpose": "animation lifetime",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/frontend_sprites.cpp"
+    },
+    {
+      "path": "src/platform/sprite_2d_runtime.cpp",
+      "blob_sha": "cacf587de21817d84a9e2ff28b867d9386e6e898",
+      "purpose": "asset banks",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/sprite_2d_runtime.cpp"
+    },
+    {
+      "path": "src/platform/pc_render_flush.cpp",
+      "blob_sha": "e6928a316ee4d503910cbe970b26f137e41c158e",
+      "purpose": "D3D9 pipeline state",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/pc_render_flush.cpp"
+    },
+    {
+      "path": "src/platform/pc_soft_d3d9.cpp",
+      "blob_sha": "935343e3be156cd2a661ff1b5da08f13dea05f13",
+      "purpose": "software reference",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/pc_soft_d3d9.cpp"
+    },
+    {
+      "path": "src/platform/native_race_effects.cpp",
+      "blob_sha": "90828074d4b29ebf3e6e3458a5dcc998989c9ec0",
+      "purpose": "flare producer",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/native_race_effects.cpp"
+    },
+    {
+      "path": "ps5/source/vk_d3d9.cpp",
+      "blob_sha": "eb0d49c1e7b488a22d29033e28e99ea4170481b9",
+      "purpose": "D3D9 to Vulkan Draw",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/ps5/source/vk_d3d9.cpp"
+    },
+    {
+      "path": "ps5/source/vk_context.cpp",
+      "blob_sha": "3f561a78a20c3aa14cda934902ef7745d91be044",
+      "purpose": "Vulkan pipeline key",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/ps5/source/vk_context.cpp"
+    },
+    {
+      "path": "ps5/source/renderer_present.inc",
+      "blob_sha": "682662e84cbc3dee60333ca011a82b26d028d526",
+      "purpose": "frame timing",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/ps5/source/renderer_present.inc"
+    },
+    {
+      "path": "switch/shaders/pc_ffp_fsh.glsl",
+      "blob_sha": "54db7204eeeefa45ac54c5068ded80e9265b3e08",
+      "purpose": "FFP operators",
+      "priority": "P0",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/switch/shaders/pc_ffp_fsh.glsl"
+    },
+    {
+      "path": "ps5/shaders/pc_ps11_uber_fsh.glsl",
+      "blob_sha": "5284c81c2227fbe8ad8610553cc278c936842d51",
+      "purpose": "PS1.1",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/ps5/shaders/pc_ps11_uber_fsh.glsl"
+    },
+    {
+      "path": "tests/test_frontend_sprites.cpp",
+      "blob_sha": "9678e3325f2cb46e028d31a726eb0c8b0460d9b4",
+      "purpose": "upstream sprite regression",
+      "priority": "P1",
+      "url": "https://github.com/r4dius/outrun2-decomp/blob/main/tests/test_frontend_sprites.cpp"
+    }
+  ]
+}
