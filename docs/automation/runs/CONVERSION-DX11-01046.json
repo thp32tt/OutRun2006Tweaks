@@ -10,10 +10,10 @@
   "classification": "A",
   "feature_id": "DX11:POST_DRAW_FULL_COLORFILL_NATIVE_EPOCH",
   "work_key": "DX11:COLORFILL_NATIVE_SCENE_EPOCH",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "feature_stage": "FEATURE_CANDIDATE",
-  "checkpoint": "C4_MATERIAL_PENDING_CI",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "FEATURE_READY",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -24,7 +24,7 @@
   "score_change": 0,
   "score_award_event": false,
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "8598a8adc5b03256ecb9ef1c28d48ba8d043d1af",
   "summary": "Authentic full-backbuffer D3D9 ColorFill after color-only native Draw retires the previous native scene and seeds a fresh contiguous same-Present Draw epoch. Later depth-dependent draws, missing original Draw coverage, poisoned batches and unowned ColorFill fall back to D3D9. Real game/HMD output untested.",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -130,5 +130,31 @@
       "validation_command": "five workflow gate same exact SHA"
     }
   },
-  "ci_failure_repair": "e46c5f0 Fast: inherited 00671 source-contiguity mutation required ordinal == consumed expression; changed to exact bounded sourceEpochStart shift, preserving rejection for skipped Draw and UINT64 overflow. Backend/Win32 source graph: historical first-frame safety check requires original depth predicate shape; preserved original expression preceded by stricter post-ColorFill depth refusal. Existing tests/gates not removed."
+  "ci_failure_repair": "e46c5f0 Fast: inherited 00671 source-contiguity mutation required ordinal == consumed expression; changed to exact bounded sourceEpochStart shift, preserving rejection for skipped Draw and UINT64 overflow. Backend/Win32 source graph: historical first-frame safety check requires original depth predicate shape; preserved original expression preceded by stricter post-ColorFill depth refusal. Existing tests/gates not removed.",
+  "feature_ready": true,
+  "c6_reconciliation_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_gate_results": {
+    "validation_sha": "8598a8adc5b03256ecb9ef1c28d48ba8d043d1af",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40069268805
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40069268816
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40069268828
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40069268850
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40069268809
+    },
+    "note": "GitHub Actions exact-SHA verification only; no matching game/Quest3 runtime verification."
+  }
 }
