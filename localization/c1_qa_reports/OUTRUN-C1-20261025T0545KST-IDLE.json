@@ -1,0 +1,78 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0545KST-IDLE",
+  "scheduled_slot_kst": "2026-10-25T05:45:00+09:00",
+  "checked_at_kst": "2026-10-25T05:50:45+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_LOCAL_KOREAN_PNG_CANDIDATES_FOUND",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "N100_candidate_output_files": {
+      "A": 365,
+      "B": 419,
+      "total": 784
+    },
+    "latest_committed_C1_record": "localization/qa_reports/C1_20261025_0515_A0068_A0069_A0074_SHA8.json",
+    "latest_committed_C1_total_unique_reviewed_sha256": 784,
+    "latest_committed_C1_previous_sha_count": 776,
+    "latest_committed_C1_new_sha_count": 8,
+    "A_state": {
+      "next_ordinal": 365,
+      "completed_files": 364,
+      "last_batch": 74
+    },
+    "B_state": {
+      "next_ordinal": 420,
+      "completed_files": 419,
+      "last_batch": 87
+    },
+    "last_export_evidence_A": "OUTRUN-ROI-A-0074-55F45974.json",
+    "last_export_evidence_B": "OUTRUN-ROI-B-0087-C8917699.json",
+    "spot_checked_unchanged_sha256": [
+      {
+        "file": "A/Q063_961450721720e810_source_k.png",
+        "sha256": "30bb230f912fc1a833b0c38245e54e552d8229e9caf33985ff0f7db381f5f5e9"
+      },
+      {
+        "file": "B/Q063_bc1b1d6af87612c1_source_k.png",
+        "sha256": "022d077c74831737a9246872a1f25708184b8eae7c5907207a703ae6d4242607"
+      },
+      {
+        "file": "A/Q054_08c520d352b032a0_source_k.png",
+        "sha256": "c02351133ca80618a9bd7d5ef71c227fb5f4677bb69e51d43721444f125e8237"
+      }
+    ],
+    "note": "File inventory counts and prior unique reviewed SHA total match. Last exporter manifests and selected last-saved file hashes were checked. No new candidate identified; a fresh full 784-file hash audit was not performed."
+  },
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "NEW_SHA_REVIEWED": 0,
+    "IDLE": 1
+  },
+  "restrictions": {
+    "imagegen_called": false,
+    "A_B_queue_consumed": false,
+    "C2_C3_or_game_pass_created": false,
+    "DDS_final_written": false,
+    "final_deployment": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_ssot": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md",
+    "previous_confirmed_AI1_cumulative": 1661,
+    "this_run_change": 0,
+    "new_AI1_cumulative": 1661,
+    "reason": "IDLE is status check only; no new independent QA achievement."
+  }
+}
