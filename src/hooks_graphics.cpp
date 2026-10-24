@@ -311,7 +311,11 @@ static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
             nowMs - owner.mismatchedSinceMs >= 100)
             owner.armed = false;
     }
-    if (!owner.armed)
+    // Quest-style native camera switching: while the game is changing
+    // views, NEVER displace another native camera even inside the release
+    // debounce. Retain the owner state but apply only on the selected view.
+    // No external APK bytecode was available to claim an exact port.
+    if (!owner.armed || !nativeModeMatches)
         return false;
     D3DVECTOR correctedPosition{}, correctedLook{};
     return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
