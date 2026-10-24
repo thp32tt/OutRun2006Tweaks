@@ -5,8 +5,11 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - 'vr-d3d9ex-candidate/**'
     paths:
       - 'tools/verify_vr_fullsource_impact.py'
+      - 'tools/verify_vr_r26_stage_fixedfn.py'
+      - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'tools/verify_dx9ex_r84_mainline.py'
       - 'tools/verify_dx9ex_r84_lens_source.py' # C993 exact physical draw provenance gate depends on this verifier.
       - 'tools/verify_vr_projected_marker_anchor.py' # Rank physical ownership negative mutations affect exact-SHA R84 acceptance.
@@ -45,6 +48,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Execute R26 exact plus-time physical draw regression
+        run: python3 tools/verify_vr_r26_stage_fixedfn.py
       - name: Verify Win32 clipboard and timer API failure guards
         run: python3 tools/verify_vr_win32_cross_domain_safety.py --self-test
       - name: Whole source inventory and unexpected cross-domain impacts
