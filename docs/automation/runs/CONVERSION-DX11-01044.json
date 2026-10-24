@@ -10,10 +10,10 @@
   "classification": "A",
   "feature_id": "DX11_NATIVE_FULL_COLORFILL_EPOCH_STEREO_ALPHA_01044",
   "work_key": "DX11:LIVE_COLORFILL_SOURCE_EPOCH_AND_NATIVE_STEREO_ALPHA",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "feature_stage": "C5_VALIDATION_WAIT",
-  "checkpoint": "C5_VALIDATION_WAIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "C6_STATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -24,10 +24,10 @@
   "feature_ready": false,
   "score_change": 0,
   "score_award_event": false,
-  "summary": "Fix observed source-code defect: after a genuine already-submitted native draw a successful whole D3D9 ColorFill must retire old GPU source draw evidence rather than publish erased geometry. Preserve original game fallback. Reuse one exact D3D9 ARGB/X8 converter for native stereo eye full seed, chronological ColorFill and live native partial ColorFill. Actual game and HMD remain UNTESTED.",
+  "summary": "Fix observed source-code defect: after a genuine already-submitted native draw a successful whole D3D9 ColorFill must retire old GPU source draw evidence rather than publish erased geometry. Preserve original game fallback. Reuse one exact D3D9 ARGB/X8 converter for native stereo eye full seed, chronological ColorFill and live native partial ColorFill. Actual game and HMD remain UNTESTED. C6 code/build verification succeeded on the exact SHA 709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed; hardware/visible actual game frame remain UNTESTED.",
   "feature_base_sha": "929495acbe8a9a13febad278d923802c23f73aeb",
   "material_result_sha": "4a47fd2bbc6ff24c41afde111fdf51124de3cee9",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_stereo_submission.cpp",
@@ -101,17 +101,83 @@
   },
   "acceptance_results": {
     "live_full_fill_epoch": {
-      "status": "PENDING_CI"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_color_fill.hpp",
+        "tools/dx11_native_full_colorfill_epoch_01044.cpp"
+      ],
+      "validation_command": "GitHub Actions: source-only g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_epoch_01044.cpp and five mandatory push workflows SUCCESS at 709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed"
     },
     "stereo_physical_alpha": {
-      "status": "PENDING_CI"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_stereo_submission.hpp",
+        "src/vr/d3d11/native_game_color_fill.hpp",
+        "tools/dx11_native_full_colorfill_epoch_01044.cpp"
+      ],
+      "validation_command": "GitHub Actions: source-only g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_epoch_01044.cpp and five mandatory push workflows SUCCESS at 709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed"
     },
     "dx9ex_fallback": {
-      "status": "PENDING_CI"
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_native_full_colorfill_epoch_01044.cpp"
+      ],
+      "validation_command": "GitHub Actions: source-only g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_epoch_01044.cpp and five mandatory push workflows SUCCESS at 709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed"
     },
     "final_gates": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_EXACT_SHA",
+      "validation_bearing_result_sha": "709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01044.json"
+      ],
+      "validation_command": "GitHub Actions five mandatory push workflows SUCCESS on exact SHA 709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed"
     }
   },
-  "ci_failure_repair": "Initial Fast/Backend source SHA 4a47fd2 failed before source probes: previous 01043 run-record lacked new policy strategy fields and acceptance proof commands. Added authentic source-stage metadata, kept earlier validated SHA and truthful runtime status unchanged."
+  "ci_failure_repair": "Initial Fast/Backend source SHA 4a47fd2 failed before source probes: previous 01043 run-record lacked new policy strategy fields and acceptance proof commands. Added authentic source-stage metadata, kept earlier validated SHA and truthful runtime status unchanged.",
+  "validation_gates": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 40058947048,
+      "head_sha": "709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40058947048"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 40058947053,
+      "head_sha": "709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40058947053"
+    },
+    "Build": {
+      "run_id": 40058947050,
+      "head_sha": "709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40058947050"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 40058947046,
+      "head_sha": "709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40058947046"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 40058947084,
+      "head_sha": "709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40058947084"
+    }
+  },
+  "c6_summary": "Five mandatory GitHub push Actions SUCCESS on exact material-bearing HEAD 709aa7a8dfa3b6a50ccbdccc437abc1c8a63e4ed; no HMD or real OutRun frame verified. DX9Ex fallback remains authoritative, native DX11 game frame and Quest3/VDXR RUNTIME_VALIDATION=UNTESTED."
 }
