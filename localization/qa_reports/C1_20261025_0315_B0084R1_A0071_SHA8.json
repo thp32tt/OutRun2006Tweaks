@@ -1,0 +1,379 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0315KST-B0084R1-A0071-NEW-SHA8",
+  "checked_at_kst": "2026-10-25T03:15:00+09:00",
+  "reviewer": "ChatGPT AI1",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "task_ids": [
+    "OUTRUN-ROI-B-0084-647AF19E-R1",
+    "OUTRUN-ROI-A-0071-9404538C"
+  ],
+  "previous_reviewed_unique_sha_count": 745,
+  "newly_reviewed_unique_sha_count": 8,
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8
+  },
+  "policy_paths": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "records": [
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0084-647AF19E-R1",
+      "ordinal": 404,
+      "source_file": "Q054_8873997be4cc5a53_source.png",
+      "source_sha256": "5df93caf1f25e926feca7ed8f6622ecb63233412d44aea18c8a32dbb2986545a",
+      "candidate_file": "Q054_8873997be4cc5a53_source_k.png",
+      "candidate_sha256": "664fa3564e392e607a65c01a71faff6293edf5839c3b57dfb6a33f509a95ebcd",
+      "english": "Hit the boost!",
+      "approved_korean": "부스트를 밟으세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1142,
+        310
+      ],
+      "candidate_alpha_bbox": [
+        93,
+        54,
+        2098,
+        648
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct, readable '부스트를 밟으세요!' with isolated transparent lettering; source contains other phrases and icons, and safe native placement is unverified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0084-647AF19E-R1",
+      "ordinal": 405,
+      "source_file": "Q054_f42ceca6e96d0831_source.png",
+      "source_sha256": "7ab2cf3c47cd3e3f90f3ff848f4658318eb3cb70638cb68126464b95426b7c67",
+      "candidate_file": "Q054_f42ceca6e96d0831_source_k.png",
+      "candidate_sha256": "acb8c849919505c3d6a32a2734ad771d91a5ce6c08d189f3ce6408bdaf1d9028",
+      "english": "Count Blue Cars!",
+      "approved_korean": "파란색 차를 세세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2079,
+        756
+      ],
+      "source_dimensions": [
+        1298,
+        471
+      ],
+      "candidate_alpha_bbox": [
+        90,
+        57,
+        2039,
+        684
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct, readable '파란색 차를 세세요!'; source is multi-instruction atlas with car illustrations, so protected-art overlap after native fit is not verified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0084-647AF19E-R1",
+      "ordinal": 406,
+      "source_file": "Q054_dbc7cb0f228408e1_source.png",
+      "source_sha256": "5df93caf1f25e926feca7ed8f6622ecb63233412d44aea18c8a32dbb2986545a",
+      "candidate_file": "Q054_dbc7cb0f228408e1_source_k.png",
+      "candidate_sha256": "5d6e89b8487e75404d4da59491620555e3a811a8a6e79ffa2ac0cc845b56a067",
+      "english": "Hit the boost!",
+      "approved_korean": "부스트를 밟으세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1142,
+        310
+      ],
+      "candidate_alpha_bbox": [
+        49,
+        37,
+        2134,
+        668
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct, readable '부스트를 밟으세요!'; shared source contains labels and sprites; registration to exact intended UI cell is unverified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0084-647AF19E-R1",
+      "ordinal": 407,
+      "source_file": "Q057_8f69d136b1ea0c66_source.png",
+      "source_sha256": "f40d4242bad913001d2d320fd080919ef8a9e098f37ca98705ed8f03fef73f22",
+      "candidate_file": "Q057_8f69d136b1ea0c66_source_k.png",
+      "candidate_sha256": "901c34dfd1e855a47fa29394232a94ffdb50c52a59a2868acdfc5baeab7345f6",
+      "english": "Total Rank",
+      "approved_korean": "종합 랭크",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1942,
+        809
+      ],
+      "source_dimensions": [
+        1453,
+        598
+      ],
+      "candidate_alpha_bbox": [
+        348,
+        49,
+        1886,
+        696
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct, readable '종합 랭크'; styling preserves blue-white contrast. Source contains pink rank panel and neighboring artwork; native panel fit is unverified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0084-647AF19E-R1",
+      "ordinal": 408,
+      "source_file": "Q057_9edbde6c234605be_source.png",
+      "source_sha256": "40687781990de34d25db188302f8eaf8f24407f3b23c11d0784b8ab7869cc514",
+      "candidate_file": "Q057_9edbde6c234605be_source_k.png",
+      "candidate_sha256": "18ec7bb546ac78416c3877d3fee271ddc03523243e76ba6ba8accd302dd3e7ee",
+      "english": "Hearts",
+      "approved_korean": "하트",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1986,
+        594
+      ],
+      "candidate_alpha_bbox": [
+        355,
+        29,
+        1577,
+        620
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct, readable '하트'; source contains various HUD sprites and graphic text; exact heart-label safe region is not evidenced.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0071-9404538C",
+      "ordinal": 349,
+      "source_file": "Q057_25a449f39b9e77ef_source.png",
+      "source_sha256": "256d21b87d8ce7e53ef2436e6d05f37551bba3d735e1e69d63b3eb932f0b1a89",
+      "candidate_file": "Q057_25a449f39b9e77ef_source_k.png",
+      "candidate_sha256": "410179ce5eceb71884302d97e5f0ed497612002bfc8ae6f84b83c4059be86d9c",
+      "english": "MISSION FAILED!",
+      "approved_korean": "미션 실패!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1650,
+        953
+      ],
+      "source_dimensions": [
+        3326,
+        1921
+      ],
+      "candidate_alpha_bbox": [
+        0,
+        160,
+        1650,
+        927
+      ],
+      "candidate_alpha_touches_canvas_edge": true,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct, readable '미션 실패!'; 3 left-edge pixels alpha<=1 and 28 right-edge pixels alpha<=7 (zero edge pixels alpha>=12), so no proven visible clipping. Native placement and protected-art fit remain unverified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0071-9404538C",
+      "ordinal": 350,
+      "source_file": "Q057_2bc7c5767adace22_source.png",
+      "source_sha256": "e05844490400701ebd9f86f8761ef5ec49f64de1933d598f2e6171b00a3e2520",
+      "candidate_file": "Q057_2bc7c5767adace22_source_k.png",
+      "candidate_sha256": "8dd43be139f128441a09e69c1a8652251af112e42c0fac93faff2de09df0ef1a",
+      "english": "Collect the stars!",
+      "approved_korean": "별을 모으세요!",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1792,
+        878
+      ],
+      "source_dimensions": [
+        962,
+        471
+      ],
+      "candidate_alpha_bbox": [
+        49,
+        56,
+        1758,
+        746
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct, readable '별을 모으세요!'; source includes EXIT, hearts and other instructions; target cell/native fit and protected-art exclusion are unverified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0071-9404538C",
+      "ordinal": 351,
+      "source_file": "Q057_92f6a27ac5007c0a_source.png",
+      "source_sha256": "61828be22aeeb9e0c007367e5b92be50feb07438a41d89802a127017c529a283",
+      "candidate_file": "Q057_92f6a27ac5007c0a_source_k.png",
+      "candidate_sha256": "095fd673c2afd0701ae6765c53558291ac9838fac132eba9b845368862deda2a",
+      "english": "START",
+      "approved_korean": "시작",
+      "source_sha_match": true,
+      "candidate_export_sha_match": true,
+      "already_reviewed_before_run": false,
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1649,
+        954
+      ],
+      "source_dimensions": [
+        1333,
+        771
+      ],
+      "candidate_alpha_bbox": [
+        215,
+        104,
+        1467,
+        893
+      ],
+      "candidate_alpha_touches_canvas_edge": false,
+      "mapping_and_readability": "PASS_VISUAL",
+      "transparent_rgba": "PASS_CANDIDATE_FILE_RGBA",
+      "protected_art_placement": "UNVERIFIED",
+      "result": "HOLD",
+      "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+      "reason": "Correct, readable '시작'; source contains other words/art and START-GOAL bar. Actual native cell registration is unverified.",
+      "native_fit_status": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only"
+    }
+  ],
+  "evidence": {
+    "preflight_n100": "work/C1_QA_20261025_0315_preflight.json",
+    "B_contact_sheet_n100": "work/C1_QA_20261025_0315_B_pairs.jpg",
+    "A_contact_sheet_n100": "work/C1_QA_20261025_0315_A_pairs.jpg",
+    "alpha_audit_script_n100": "work/C1_QA_20261025_0315_alpha_edges.py",
+    "B_export": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0084-647AF19E-R1.json",
+    "A_export": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0071-9404538C.json",
+    "mapping": "work/image-src/text_roi_batches/production_manifest.json"
+  },
+  "caveats": [
+    "Source inputs are composite atlas/UI-crop areas rather than isolated verified native target cell. Native overlay placement and protected pixels not demonstrated.",
+    "Generated candidate image dimensions differ from source image dimensions; resize itself is not automatic failure, but native fit requires verification.",
+    "A349 edge alpha at low values is not treated as proven visible clipping; no failure inferred solely from alpha bounding box.",
+    "No candidate failed solely for reduced Korean sentence width or smaller glyph size."
+  ],
+  "constraints": {
+    "imagegen_called": false,
+    "A_B_queues_consumed": false,
+    "new_DDS_written": false,
+    "final_deployment": false,
+    "C2_C3_or_game_PASS_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}
