@@ -61,6 +61,7 @@ def gate(env=None, policy_path=None, evidence_root=None):
     roi_queue = _enabled(env.get("OUTRUN_AB_TEXT_ROI_QUEUE", "false"))
     roi_bridge = _enabled(env.get("OUTRUN_ROI_BRIDGE_ENABLED", "false"))
     auto_generate = _enabled(env.get("OUTRUN_KR_V2_AUTO_GENERATE", "false"))
+    gpt_chat_ocr = _enabled(env.get("OUTRUN_GPT_CHAT_OCR_ENABLED", "false"))
     no_send = _enabled(env.get("OUTRUN_KR_V2_NO_SEND", "true"))
 
     # Retired/unqualified paths are never allowed during controlled activation.
@@ -86,7 +87,7 @@ def gate(env=None, policy_path=None, evidence_root=None):
         return False, "NO_SEND_INTERLOCK_CONFLICTS_WITH_AUTOSEND", phase
     if phase not in ("F2", "F3", "F4"):
         return False, "AUTOSEND_REQUIRES_CONTROLLED_PRODUCTION_PHASE", phase
-    if not (roi_queue and roi_bridge and auto_generate):
+    if not (roi_queue and roi_bridge and auto_generate and gpt_chat_ocr):
         return False, "CONTROLLED_ROI_PIPELINE_NOT_FULLY_ENABLED", phase
 
     if policy:
@@ -96,6 +97,8 @@ def gate(env=None, policy_path=None, evidence_root=None):
             or policy.get("controller_auto_send") is not True
             or policy.get("native_roi_dispatch_implemented") is not True
             or policy.get("browser_slots") != ["A", "B", "C1"]
+            or policy.get("requirements", {}).get("c1_gpt_chat_vision_ocr_fallback") is not True
+            or policy.get("requirements", {}).get("external_ocr_api_used") is not False
         ):
             return False, "ACTIVE_POLICY_NOT_APPROVED", phase
 
