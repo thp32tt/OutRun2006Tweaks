@@ -8576,12 +8576,12 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         // This covers menu->vehicle->race startup where TARGET and ZBUFFER
         // are cleared by separate successful game calls.
         const bool beforeFirstGameDraw = !s.pending &&
-            s.frameBatch.can_seed_pre_draw_depth(
+            (s.frameBatch.can_seed_pre_draw_depth(
                 s.clearColor.matches(owner, reinterpret_cast<std::uintptr_t>(
                     backbufferIdentity.Get())),
-                s.sourceDrawsThisFrame == 0u);
+                s.sourceDrawsThisFrame == 0u) || resumedGameZ);
         if ((s.frameBatch.submitted == 0u || s.frameBatch.stopped) &&
-            !beforeFirstGameDraw && !resumedGameZ) return false;
+            !beforeFirstGameDraw) return false;
         if (s.frameBatch.submitted != 0u && !continuingFullNativeDraw)
             return false;
         // The next real native depth Draw clears the DSV to the exact game

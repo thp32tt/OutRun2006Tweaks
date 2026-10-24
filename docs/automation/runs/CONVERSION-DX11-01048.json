@@ -124,5 +124,5 @@
       ]
     }
   },
-  "ci_failure_repair": "First exact-SHA Fast 40074875575 failed historical 00732 depth-only mutation because new recovery branch duplicated the original preDrawDepth.discard() operation; restructured source to route recovered whole-Z into the SAME verified existing clearZ discard+DSV seed (not weakening the existing 00732 mutation or any Gate)."
+  "ci_failure_repair": "First exact-SHA Fast 40074875575 failed historical 00732 depth-only mutation because new recovery branch duplicated the original preDrawDepth.discard() operation; restructured source to route recovered whole-Z into the SAME verified existing clearZ discard+DSV seed (not weakening the existing 00732 mutation or any Gate). Second exact-SHA Fast 40075069256 passed 00732 but 00734 required the historical !beforeFirstGameDraw conditional unchanged; folded recovered main-Z eligibility into the existing beforeFirstGameDraw predicate, retaining both mutation checks and the same real owner/coverage validation."
 }
