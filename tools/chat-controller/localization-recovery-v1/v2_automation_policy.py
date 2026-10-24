@@ -4,7 +4,7 @@
 Authorized automatic scope:
   verified unsplit/native HD English crop -> exact reviewed translation ->
   A/B ChatGPT ImageGen attachment/generation -> project Library SHA proof ->
-  C1 lightweight independent QA.
+  C1 browser-attached GPT vision OCR fallback, then lightweight independent QA.
 
 Explicitly NOT authorized here:
   legacy 986 split tiles, automatic DDS promotion/write, game PASS, game deploy,
@@ -120,7 +120,7 @@ def main(argv=None):
         "phase": phase,
         "AUTO_SEND": _enabled(env.get("AUTO_SEND", "false")),
         "A_B": "NATIVE_ROI_IMAGEGEN" if ok and _enabled(env.get("AUTO_SEND", "false")) else "NO_SEND",
-        "C1": "LIGHT_QA_ONLY",
+        "C1": "GPT_CHAT_VISION_OCR_FALLBACK_THEN_LIGHT_QA",
         "C": "NATIVE_CROP_BACKGROUND_WORKER",
         "AUTO_DDS_WRITE": False,
         "AUTO_GAME_PASS": False,
