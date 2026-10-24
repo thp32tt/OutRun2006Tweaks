@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01055",
+  "production_id": "CONVERSION-DX11-01055",
+  "event_id": "CONVERSION-DX11-01055-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01055",
+  "classification": "A",
+  "feature_id": "DX11:AUTHENTIC_PARTIAL_GAME_POSTDRAW_TRANSFER",
+  "work_key": "DX11:MENU_CAR_RACE_NATIVE_POSTDRAW_TILE_SOURCE",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_COMMITTED_AWAITING_EXACT_SHA_GATES",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Implement real D3D9 partial backbuffer RT0 StretchRect/UpdateSurface post-Draw tile crop on GPU before CPU sync and D3D11 GPU copy, retaining complete canonical pre-Draw source seed, bounded full-backbuffer fallback, original D3D9 renderer/input/FFB and Reset lifetime.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_surface_tile_plan.hpp",
+    "src/vr/d3d11/native_game_surface_tile_readback.hpp",
+    "tools/dx11_native_surface_tile_readback_01055.cpp",
+    "tools/test_dx11_surface_tile_readback_01055.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01055.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:AUTHENTIC_PARTIAL_GAME_POSTDRAW_TRANSFER",
+    "goal": "Preserve authentic D3D9 menu, vehicle-select and race partial surface-copy pixels in the contiguous native full-resolution frame without transferring an entire unchanged backbuffer per small post-Draw mutation.",
+    "acceptance_items": [
+      {
+        "id": "authentic_postdraw_gpu_tile",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_D3D9_POSTDRAW_TO_D3D11_GPU_COLOR",
+        "expected_behavior": "Partial original backbuffer copies use exact source game GPU tile RT readback and tightly packed D3D11 UpdateSubresource CopySubresourceRegion at the original destination coordinates."
+      },
+      {
+        "id": "first_draw_seed_and_reset",
+        "category": "end_to_end_behavior",
+        "behavior_area": "PRE_DRAW_FULL_SEED_AND_GAME_DEVICE_RESET",
+        "expected_behavior": "Cold/Reset pre-Draw first native SM3/FVF Draw receives the whole authenticated frame unchanged; cached DEFAULT pool readback scratch releases before the original device Reset."
+      },
+      {
+        "id": "driver_and_input_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_BACKBUFFER_INPUT_FFB",
+        "expected_behavior": "Unsupported StretchRect/GetRenderTargetData scratch operations fall back to original full readback or abort native-only publication; no source backbuffer write, input change, missing alpha normalization or unsafe frame promotion."
+      },
+      {
+        "id": "exact_sha_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector gates pass for one exact material SHA without CI skip."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_D3D9_POSTDRAW_STRETCHRECT_UPDATE_SURFACE",
+      "GPU_CROPPED_RT_TO_CPU_READBACK",
+      "D3D11_NATIVE_FULL_FRAME_TILE_COPY",
+      "UNCHANGED_D3D9_PRESENT_AND_INPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_surface_tile_readback.hpp",
+      "tools/dx11_native_surface_tile_readback_01055.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ full-versus-tile source pixels test; Python verifies live postdraw, tile-only and fallback integration. Windows Build validates D3D9 COM and D3D11 wiring.",
+      "negative_regression": "D3D9 GPU scratch rejection branches to original GetRenderTargetData, original D3D9 Draw/Present untouched, Reset frees cached default-pool tile.",
+      "component_integration": "Source game backbuffer identity/full clear -> original partial copy success -> exact GPU RT tile -> D3D9 readback -> D3D11 partial CopySubresourceRegion -> original Present fallback."
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_NATIVE_POSTDRAW_TILE_SOURCE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains opt-in; DX9Ex and original input/FFB/SkyGlow fallback retained; DXVK frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "blocking_evidence": "Original 01054 post-Draw preserve_game_surface_copy unconditionally calls GetRenderTargetData on entire 3440x1440 D3D9 backbuffer even for a 1px partial UpdateSurface/StretchRect, then sends only the patch to native D3D11."
+  },
+  "acceptance_results": {
+    "authentic_postdraw_gpu_tile": {
+      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+      "evidence": "Pure-source tile selection and byte offset probe; real game unavailable."
+    },
+    "first_draw_seed_and_reset": {
+      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+      "evidence": "Pre-Draw whole source path remains; D3D9 tile reset before device Reset."
+    },
+    "driver_and_input_fallback": {
+      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+      "evidence": "Bounded original full-backbuffer fallback retained; original D3D9 copy/input untouched."
+    },
+    "exact_sha_integrated_gates": {
+      "status": "PENDING",
+      "evidence": "Required exact-SHA CI after material commit."
+    }
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "Exact real-game native draw and output counts remain UNTESTED.",
+  "next_implementation_action": "Complete exact-SHA GitHub five Gates; runtime test later checks menu/vehicle/race native partial postpasses, first Draw/Reset and original fallback.",
+  "runtime_note": "No real gameplay/Quest 3 executed. Simulated pixel parity does not establish native runtime output."
+}

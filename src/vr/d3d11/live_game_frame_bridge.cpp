@@ -57,6 +57,7 @@
 #include "native_game_pre_draw_surface.hpp"
 #include "native_game_surface_replay_budget.hpp"
 #include "native_game_surface_copy_region.hpp"
+#include "native_game_surface_tile_readback.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_live_shader_cache.hpp"
 #include "native_game_gpu_handoff.hpp"
@@ -1337,6 +1338,7 @@ struct State {
     // D3D9 backbuffer, then GPU-copies only the affected region. It does not
     // falsely claim zero-copy D3D9->D3D11 or native offscreen Draw parity.
     ComPtr<IDirect3DSurface9> surfaceReplayReadback;
+    GameNativeSurfaceTileReadback surfaceReplayTile{};
     std::uintptr_t surfaceReplayOwner = 0u;
     UINT surfaceReplayWidth = 0u, surfaceReplayHeight = 0u;
     D3DFORMAT surfaceReplayFormat = D3DFMT_UNKNOWN;
@@ -7746,57 +7748,73 @@ bool preserve_game_surface_copy(
                 changedRegion.right, changedRegion.bottom)))
             return false;
 
-        // GetRenderTargetData synchronizes real D3D9 pixels. It is explicitly
-        // diagnostic/opt-in, never silently promoted as a performant shared
-        // GPU transport. Reuse the staging allocation for sustained gameplay.
-        if (!s.surfaceReplayReadback || s.surfaceReplayOwner != owner ||
-            s.surfaceReplayWidth != desc.Width ||
-            s.surfaceReplayHeight != desc.Height ||
-            s.surfaceReplayFormat != desc.Format) {
-            s.surfaceReplayReadback.Reset();
-            s.surfaceReplayOwner = 0u;
-            if (FAILED(game->CreateOffscreenPlainSurface(
-                    desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM,
-                    s.surfaceReplayReadback.GetAddressOf(), nullptr)) ||
-                !s.surfaceReplayReadback) return false;
-            s.surfaceReplayOwner = owner;
-            s.surfaceReplayWidth = desc.Width;
-            s.surfaceReplayHeight = desc.Height;
-            s.surfaceReplayFormat = desc.Format;
+        // Keep cold/Reset pre-Draw native seeds full-sized. After a real
+        // game SM3/FVF Draw, a partial StretchRect/UpdateSurface changes
+        // only region: crop on the D3D9 GPU BEFORE the synchronized CPU
+        // readback. This avoids copying unrelated 1080p/1440p backbuffer
+        // pixels across the bus just to update a menu/car/HUD rectangle.
+        // If D3D9 disallows the scratch RT blit, use the original bounded
+        // whole-backbuffer path, without touching original game pixels.
+        bool tileSucceeded = false;
+        IDirect3DSurface9* readback = nullptr;
+        if (!preDrawCopy &&
+            GameNativeSurfaceTilePlan::eligible(region,desc.Width,desc.Height)) {
+            tileSucceeded = s.surfaceReplayTile.capture(
+                game,destination,region,desc.Width,desc.Height,desc.Format);
+            if (tileSucceeded) readback=s.surfaceReplayTile.staging();
         }
-        if (FAILED(game->GetRenderTargetData(
-                destination, s.surfaceReplayReadback.Get()))) return false;
+        if (!tileSucceeded) {
+            if (!s.surfaceReplayReadback || s.surfaceReplayOwner != owner ||
+                s.surfaceReplayWidth != desc.Width ||
+                s.surfaceReplayHeight != desc.Height ||
+                s.surfaceReplayFormat != desc.Format) {
+                s.surfaceReplayReadback.Reset();
+                s.surfaceReplayOwner = 0u;
+                if (FAILED(game->CreateOffscreenPlainSurface(
+                        desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM,
+                        s.surfaceReplayReadback.GetAddressOf(), nullptr)) ||
+                    !s.surfaceReplayReadback) return false;
+                s.surfaceReplayOwner = owner;
+                s.surfaceReplayWidth = desc.Width;
+                s.surfaceReplayHeight = desc.Height;
+                s.surfaceReplayFormat = desc.Format;
+            }
+            if (FAILED(game->GetRenderTargetData(
+                    destination,s.surfaceReplayReadback.Get()))) return false;
+            readback=s.surfaceReplayReadback.Get();
+        }
         D3DLOCKED_RECT locked{};
-        if (FAILED(s.surfaceReplayReadback->LockRect(
+        if (!readback || FAILED(readback->LockRect(
                 &locked, nullptr, D3DLOCK_READONLY))) return false;
         const std::size_t rowBytes = std::size_t(region.width()) * 4u;
+        const UINT readX=GameNativeSurfaceTilePlan::source_x(region,tileSucceeded);
+        const UINT readY=GameNativeSurfaceTilePlan::source_y(region,tileSucceeded);
         const bool readable = locked.pBits && locked.Pitch > 0 &&
-            std::uint64_t(locked.Pitch) >= std::uint64_t(desc.Width) * 4u;
+            std::uint64_t(locked.Pitch) >=
+                (std::uint64_t(readX)+region.width())*4u;
         bool copied = readable;
         if (readable) {
-            // Always unlock D3D9 staging even when vector growth fails.
-            // A dangling LockRect would poison later gameplay readbacks.
+            // Both routes output tightly packed original postpass pixels.
+            // Even a failed vector resize must unlock the D3D9 surface.
             try {
                 s.surfaceReplayPixels.resize(
                     rowBytes * std::size_t(region.height()));
                 const auto* bytes = static_cast<const std::uint8_t*>(locked.pBits);
-                for (UINT y = 0u; y < region.height(); ++y) {
-                    auto* dst = s.surfaceReplayPixels.data() +
-                                std::size_t(y) * rowBytes;
-                    const auto* src = bytes +
-                        std::size_t(region.top + y) * std::size_t(locked.Pitch) +
-                        std::size_t(region.left) * 4u;
-                    std::memcpy(dst, src, rowBytes);
+                for (UINT y=0u; y<region.height(); ++y) {
+                    auto* dst=s.surfaceReplayPixels.data()+
+                        std::size_t(y)*rowBytes;
+                    const auto* src=bytes+
+                        std::size_t(readY+y)*std::size_t(locked.Pitch)+
+                        std::size_t(readX)*4u;
+                    std::memcpy(dst,src,rowBytes);
                     if (desc.Format == D3DFMT_X8R8G8B8) {
-                        // D3D9 X8 has no defined alpha. Never copy its X byte
-                        // into a native BGRA8 RTV as visible alpha.
-                        for (std::size_t x = 3u; x < rowBytes; x += 4u)
-                            dst[x] = 0xffu;
+                        for (std::size_t x=3u; x<rowBytes; x+=4u)
+                            dst[x]=0xffu; // original D3D9 X byte undefined
                     }
                 }
-            } catch (...) { copied = false; }
+            } catch (...) { copied=false; }
         }
-        const HRESULT unlocked = s.surfaceReplayReadback->UnlockRect();
+        const HRESULT unlocked=readback->UnlockRect();
         if (!copied || FAILED(unlocked)) return false;
         if (preDrawCopy) {
             if (!s.preDrawSurface.record_consuming(owner,
@@ -9827,6 +9845,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.preDrawFills.discard();
     s.preDrawDepth.discard();
     s.outputGeneration = 0u;
+    s.surfaceReplayTile.reset();
     s.surfaceReplayReadback.Reset();
     s.surfaceReplayOwner = 0u;
     s.surfaceReplayWidth = s.surfaceReplayHeight = 0u;
