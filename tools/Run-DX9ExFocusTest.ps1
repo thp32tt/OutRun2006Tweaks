@@ -52,7 +52,8 @@ $gameArgs = @(
     '-SkyGlowFactor=1',
     '-PreferD3D9Ex=true',
     '-DirectGpuOnly=false',
-    '-DisableDesktopDuplication=false'
+    '-DisableDesktopDuplication=false',
+    '-RivalDx11NativeRoute=false'
 )
 Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8
 Copy-Item $variantFile (Join-Path $session 'DX9EX_VARIANT.txt')
