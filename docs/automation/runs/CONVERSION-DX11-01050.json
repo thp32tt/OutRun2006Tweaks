@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:LIVE_PREDRAW_CPU_GDI_GAME_SURFACE",
   "work_key": "DX11:MENU_CAR_RACE_PRE_DRAW_CPU_GDI_BACKBUFFER",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_RESULT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -20,8 +20,8 @@
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "full_dx11_renderer_complete": false,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "c0fbc5d2447934b617724f28853bd08bb84ac442",
+  "validation_bearing_result_sha": "c0fbc5d2447934b617724f28853bd08bb84ac442",
   "score_change": 0,
   "score_award_event": false,
   "summary": "Support authentic pre-first-D3D11-Draw D3D9 backbuffer LockRect/UnlockRect and GetDC/ReleaseDC color writes after game full Clear: capture successful complete current D3D9 pixels and seed following native SM3/FVF Draw without stale writable tickets; reject foreign/open/failed writes and retain original D3D9 game/input/FFB/Present. Build and Quest3 runtime not yet proven.",
@@ -98,36 +98,76 @@
   },
   "acceptance_results": {
     "predraw_lock_capture": {
-      "status": "SOURCE_IMPLEMENTED",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/native_game_pre_draw_surface.hpp",
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "tools/dx11_native_predraw_cpu_surface_01050.cpp"
-      ]
+      ],
+      "validation_command": "g++ targeted regression 01050 and Windows Build #40082814911 PASS at exact SHA"
     },
     "predraw_gdi_chain": {
-      "status": "SOURCE_IMPLEMENTED",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "tools/dx11_native_predraw_cpu_surface_01050.cpp"
-      ]
+      ],
+      "validation_command": "DX11 Fast #40082814976 and Windows Build #40082814911 at exact SHA"
     },
     "fail_closed": {
-      "status": "SOURCE_IMPLEMENTED",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/native_game_pre_draw_surface.hpp",
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "tools/dx11_native_predraw_cpu_surface_01050.cpp"
-      ]
+      ],
+      "validation_command": "DX11 Fast 01050 and existing 01049/00887 negative tests #40082814976 PASS"
     },
     "exact_sha_gate": {
-      "status": "PENDING_EXACT_SHA",
+      "status": "PASS_EXACT_SHA",
       "evidence_paths": [
         ".github/workflows/dx11-fast-structural.yml"
-      ]
+      ],
+      "validation_command": "Fast #40082814976; Backend #40082815004; Build #40082814911; OpenXR #40082814923; HUD #40082814915"
     }
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Native pre-Draw LockRect/GetDC write did not admit an owned CPU ticket or close it after current full D3D9 snapshot.",
-  "next_implementation_action": "Resolve exact-SHA mandatory GitHub Gate if it reports an actual failure; runtime HMD remains UNTESTED."
+  "next_implementation_action": "Resolve exact-SHA mandatory GitHub Gate if it reports an actual failure; runtime HMD remains UNTESTED.",
+  "c6_reconciliation_reason": "FIVE_MANDATORY_GATES_EXACT_SHA_AFTER_MATERIAL_IMPLEMENTATION",
+  "c6_gate_results": {
+    "validation_sha": "c0fbc5d2447934b617724f28853bd08bb84ac442",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40082814976,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40082815004,
+      "event": "push"
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40082814911,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40082814923,
+      "event": "push"
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40082814915,
+      "event": "push"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "status": "SUCCESS",
+      "run_id": 40082814930,
+      "event": "push"
+    },
+    "note": "All five mandatory exact-SHA Gates PASS; separate WARP PASS. Actual menu/vehicle/race and Quest3/VDXR runtime UNTESTED; source implementation only. Bookkeeping [skip ci] separated from material SHA."
+  },
+  "runtime_note": "No actual OutRun desktop launch, Quest3/VDXR HMD session or native pixel/frame evidence at exact SHA; RUNTIME_VALIDATION=UNTESTED."
 }
