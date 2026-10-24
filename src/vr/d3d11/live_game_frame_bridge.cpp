@@ -55,6 +55,7 @@
 #include "native_game_pre_draw_replay.hpp"
 #include "native_game_pre_draw_depth.hpp"
 #include "native_game_pre_draw_surface.hpp"
+#include "native_game_surface_replay_budget.hpp"
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_live_shader_cache.hpp"
@@ -1343,7 +1344,7 @@ struct State {
     ComPtr<ID3D11Device> surfaceReplayScratchDevice;
     UINT surfaceReplayScratchWidth = 0u, surfaceReplayScratchHeight = 0u;
     std::vector<std::uint8_t> surfaceReplayPixels;
-    std::uint32_t surfaceReplayCount = 0u;
+    GameNativeSurfaceReplayBudget surfaceReplayBudget{};
     GameNativeCpuSurfaceTicket cpuSurfaceReplay{};
     NativeBackend backend;
     // Persistent native D3D11 upload buffers for a whole real game frame.
@@ -7674,7 +7675,7 @@ bool preserve_game_surface_copy(
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
-        if (s.sourceGameDevice != owner || s.surfaceReplayCount >= 8u) return false;
+        if (s.sourceGameDevice != owner) return false;
 
         ComPtr<IDirect3DSurface9> backbuffer;
         ComPtr<IUnknown> actualIdentity, backbufferIdentity;
@@ -7697,7 +7698,11 @@ bool preserve_game_surface_copy(
             !GameNativePreDrawSurface::source_matches_canonical(
                 desc.Width, desc.Height, static_cast<std::uint32_t>(desc.Format),
                 canonicalDesc.Width, canonicalDesc.Height,
-                static_cast<std::uint32_t>(canonicalDesc.Format)))
+                static_cast<std::uint32_t>(canonicalDesc.Format)) ||
+            // GetRenderTargetData reads the ENTIRE D3D9 backbuffer even
+            // when the subsequent native GPU copy covers a small rectangle.
+            // Budget actual synchronized full-frame bytes, not rect area.
+            !s.surfaceReplayBudget.admits(desc.Width, desc.Height))
             return false;
 
         const auto changedRegion = changedArea
@@ -7799,7 +7804,7 @@ bool preserve_game_surface_copy(
                     desc.Width,desc.Height,static_cast<std::uint32_t>(desc.Format),
                     s.surfaceReplayPixels)) return false;
             s.preDrawFills.discard(); // snapshot includes all earlier fills
-            ++s.surfaceReplayCount;
+            s.surfaceReplayBudget.note_success(desc.Width, desc.Height);
             // The successful original CPU/GDI completion is now part of the
             // native first-Draw seed. Release its ticket before the game's
             // next original Draw, Clear, or Present; never leave a false
@@ -7858,7 +7863,7 @@ bool preserve_game_surface_copy(
         }
         // D3D11 copy has no HRESULT; do not publish a removed-device frame.
         if (FAILED(device->GetDeviceRemovedReason())) return false;
-        ++s.surfaceReplayCount;
+        s.surfaceReplayBudget.note_success(desc.Width, desc.Height);
         if (completingCpuWrite) s.cpuSurfaceReplay.reset();
         // Neither a CPU readback nor its D3D11 GPU copy counts as a native
         // Draw/DrawIndexed or supplies invented left/right eye evidence.
@@ -7921,7 +7926,7 @@ bool begin_game_surface_cpu_write(IDirect3DDevice9* game,
             s.backend.ready() && s.backend.color_texture() &&
             s.nativeWidth == desc.Width && s.nativeHeight == desc.Height;
         if (s.sourceGameDevice != owner || !seededMainBackbuffer ||
-            s.surfaceReplayCount >= 8u ||
+            !s.surfaceReplayBudget.admits(desc.Width, desc.Height) ||
             (!preDrawWrite && !postDrawWrite)) return false;
         return s.cpuSurfaceReplay.begin(owner,
             reinterpret_cast<std::uintptr_t>(identity.Get()),
@@ -8342,7 +8347,7 @@ bool preserve_game_color_fill(
                 s.preDrawFills.discard();
                 s.preDrawDepth.discard();
                 s.cpuSurfaceReplay.reset();
-                s.surfaceReplayCount = 0u;
+                s.surfaceReplayBudget.reset();
                 s.sourceModeKnown = false;
                 s.eligibleThisFrame = 0u;
                 if (++s.outputGeneration == 0u) ++s.outputGeneration;
@@ -8443,7 +8448,7 @@ bool preserve_game_color_fill(
             s.preDrawFills.discard();
             s.preDrawDepth.discard();
             s.cpuSurfaceReplay.reset();
-            s.surfaceReplayCount = 0u;
+            s.surfaceReplayBudget.reset();
             if (++s.outputGeneration == 0u) ++s.outputGeneration;
             if (!restarted) {
                 s.frameBatch.abort();
@@ -8783,7 +8788,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.frameBatch.reset();
         s.preDrawSurface.discard();
             s.cpuSurfaceReplay.reset();
-            s.surfaceReplayCount = 0u; // a new verified full Clear starts a new source epoch
+            s.surfaceReplayBudget.reset(); // a new verified full Clear starts a new source epoch
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
     s.sourceModeKnown = false;
@@ -9736,7 +9741,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.sourceDrawsThisFrame = 0u;
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
-        s.surfaceReplayCount = 0u;
+        s.surfaceReplayBudget.reset();
         // Opt-in-only evidence: a hooked game Draw is not proof that the
         // restricted FVF subset was admitted, nor that GPU pixels became
         // visible in the game's backbuffer. Log both missing links explicitly.
@@ -9775,7 +9780,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.sourceDrawsThisFrame = 0u;
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
-        s.surfaceReplayCount = 0u;
+        s.surfaceReplayBudget.reset();
         s.previousOutput = {};
         s.clearColor.discard();
         s.preDrawFills.discard();
@@ -9830,7 +9835,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.surfaceReplayScratchDevice.Reset();
     s.surfaceReplayScratchWidth = s.surfaceReplayScratchHeight = 0u;
     s.surfaceReplayPixels.clear();
-    s.surfaceReplayCount = 0u;
+    s.surfaceReplayBudget.reset();
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     s.insetSurfaceDevice = 0u;
     s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;

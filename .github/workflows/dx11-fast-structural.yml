@@ -100,6 +100,9 @@ jobs:
           # 01052 canonical D3D9 pre-Draw CPU/GDI surface on cold start / Reset.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_cold_predraw_01052.cpp -o /tmp/dx11_cold_predraw_01052 && /tmp/dx11_cold_predraw_01052
           python tools/test_dx11_cold_predraw_01052.py
+          # 01053 bounded REAL full-backbuffer transfer budget for multiple menu/car/race CPU/GDI copies.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_burst_surface_copy_01053.cpp -o /tmp/dx11_burst_surface_01053 && /tmp/dx11_burst_surface_01053
+          python tools/test_dx11_burst_surface_copy_01053.py
           # 01048 authentic color overwrite -> full main Z Clear -> native race Draw.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_depth_epoch_recovery_01048.cpp -o /tmp/dx11_depth_epoch_01048 && /tmp/dx11_depth_epoch_01048
           # 01047 repeated REAL full ColorFill cycles with game Draw/no-op chronology.

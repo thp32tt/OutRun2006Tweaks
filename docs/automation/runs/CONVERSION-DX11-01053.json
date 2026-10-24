@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01053",
+  "production_id": "CONVERSION-DX11-01053",
+  "event_id": "CONVERSION-DX11-01053-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01053",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_MULTICOPY_BACKBUFFER_CONTIGUOUS_FRAME",
+  "work_key": "DX11:MENU_CAR_RACE_SURFACE_COPY_BURST_BUDGET",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Extend actual canonical D3D9 menu/car/race pre-/post-Draw UpdateSurface/StretchRect and CPU/GDI color staging beyond the fixed eight-copy cap when byte-safe. Charge every successful full-backbuffer GetRenderTargetData against an explicit per-source-epoch 256 MiB budget with 64-op ceiling; preserve strict identity/format/Reset checks and original D3D9 input/FFB fallback.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_surface_replay_budget.hpp",
+    "tools/dx11_native_burst_surface_copy_01053.cpp",
+    "tools/test_dx11_burst_surface_copy_01053.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01053.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_MULTICOPY_BACKBUFFER_CONTIGUOUS_FRAME",
+    "goal": "Keep a contiguous authentic game backbuffer pre-Draw seed and post-Draw native color during repeated menu/car/race CPU and StretchRect updates without dropping the native frame after eight successful copies at 1080p.",
+    "acceptance_items": [
+      {
+        "id": "burst_source_frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_BACKBUFFER_TO_NATIVE_DRAW",
+        "expected_behavior": "32 complete 1920x1080 canonical source snapshots can be charged in one menu/car source epoch without rejecting the ninth native game frame update."
+      },
+      {
+        "id": "bounded_full_readback",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_CPU_READBACK_AND_D3D11_COLOR_COPY",
+        "expected_behavior": "Both pre-Draw snapshot and post-Draw native GPU copy account synchronized FULL source bytes, reject overflow or 64-plus snapshots and reset only on source epoch/Present/Reset."
+      },
+      {
+        "id": "fallback_regression",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_PRESENT_INPUT_FFB",
+        "expected_behavior": "Unverified source identity, format, failed readback, byte/copy budget overflow and device removal never publish native pixels; original D3D9 paths remain authoritative."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "All five mandatory GitHub Actions pass at exact material source SHA without CI-skip."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "ACTUAL_D3D9_CPU_GDI_STRETCHRECT_RT0_MUTATION",
+      "CANONICAL_BACKBUFFER_FULL_READBACK_BUDGET",
+      "FIRST_NATIVE_SM3_FVF_SEED_AND_POSTDRAW_COLOR_COPY",
+      "NATIVE_FULL_FRAME_PRESENT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_surface_replay_budget.hpp",
+      "tools/dx11_native_burst_surface_copy_01053.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ checks 32 genuine 1080p full readbacks in one color epoch, 3440x1440 resolution transitions, budget reset across Present/Reset and successful native-stage bookkeeping.",
+      "negative_regression": "Reject bandwidth/copy-count exhaustion, integer overflow, invalid dimensions, unproven backbuffer and absent post-Draw target; original D3D9 fallback survives.",
+      "component_integration": "D3D9 canonical backbuffer readback -> CPU/GDI/StretchRect pre-Draw snapshot or post-Draw D3D11 GPU copy -> full-source-readback budget charge only on success -> native Draw/Present"
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_SURFACE_COPY_BURST_BUDGET"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive stays opt-in; original D3D9 rendering, input, FFB, DX9Ex fallback and DXVK frozen policy preserved.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "blocking_evidence": "At a752d261, preserve_game_surface_copy and begin_game_surface_cpu_write both hard-reject any ninth source copy via surfaceReplayCount>=8, despite full source captures being size dependent; the cap drops otherwise valid 1080p CPU/GDI and StretchRect frame history."
+  },
+  "acceptance_results": {
+    "burst_source_frame": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        "tools/dx11_native_burst_surface_copy_01053.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ]
+    },
+    "bounded_full_readback": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_surface_replay_budget.hpp",
+        "tools/dx11_native_burst_surface_copy_01053.cpp"
+      ]
+    },
+    "fallback_regression": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        "tools/test_dx11_burst_surface_copy_01053.py"
+      ]
+    },
+    "exact_sha_gate": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ]
+    }
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "Hard eight-copy ceiling rejects valid canonical game pre-/post-Draw backbuffer edits regardless of readback cost.",
+  "next_implementation_action": "Confirm exact material SHA five mandatory GitHub Actions, repair only causal failures under 01053; require separate matching real-game/Quest3 evidence for runtime promotion.",
+  "runtime_note": "No real game/HMD test performed; source and simulated copy semantics only; counts UNTESTED."
+}
