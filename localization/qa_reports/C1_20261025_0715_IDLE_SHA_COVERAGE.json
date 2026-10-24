@@ -1,0 +1,58 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261025T0715KST-IDLE-SHA-COVERED-784",
+  "scheduled_slot_kst": "2026-10-25T07:15:00+09:00",
+  "checked_at_kst": "2026-10-25T07:18:40+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policies_verified": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "candidate_outputs_A_count": 365,
+    "candidate_outputs_B_count": 419,
+    "total_output_files": 784,
+    "export_evidence_entries": 784,
+    "history_candidate_sha_count": 789,
+    "export_evidence_entries_found_in_review_history": 784,
+    "unreviewed_export_sha_count": 0,
+    "script": "work/C1_QA_20261025_0515_inventory.py",
+    "stdout": {
+      "seen_sha_count": 789,
+      "exported_entries": 784,
+      "reviewed_entries": 784,
+      "unreviewed_count": 0,
+      "missing": 0,
+      "sha_mismatch": 0,
+      "unreviewed_first": []
+    },
+    "audit_limit": "Already-reviewed entries are compared by recorded SHA only. Script does not rehash previously reviewed files; missing=0/mismatch=0 cover only unreviewed entries."
+  },
+  "summary": {
+    "status": "IDLE_NO_NEW_SHA",
+    "new_candidate_reviews": 0,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "reason": "No unreviewed exported candidate SHA. Repeat SHA QA prohibited. Previous 06:45 idle also recorded same inventory."
+  },
+  "qa_scope": {
+    "ImageGen_called": false,
+    "A_B_queue_consumed": false,
+    "C2_C3_game_PASS_created": false,
+    "DDS_deployed": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "scoring": {
+    "ssot": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md",
+    "previous_ai1_cumulative": 1662,
+    "this_run_change": 0,
+    "new_ai1_cumulative": 1662,
+    "reason": "No new QA achievement; IDLE status only."
+  }
+}
