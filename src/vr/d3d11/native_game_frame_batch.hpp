@@ -221,12 +221,15 @@ struct GameNativeFrameBatch {
     // prior COLOR contributions but preserves the original Z/stencil state.
     // Recover an independent mono native scene only when the observed source
     // has NO native depth history, every preceding source Draw was accounted
-    // for, and no batch was previously poisoned. A later depth-using Draw
-    // aborts rather than assuming ColorFill also cleared Z.
+    // for, and no batch was previously poisoned. Menu/car transition frames
+    // can do this repeatedly in ONE original Present: a second genuine full
+    // ColorFill retires the *current* native epoch as well, never resurrecting
+    // geometry from earlier epochs. A later depth-using Draw aborts rather
+    // than assuming any of these ColorFills also cleared Z.
     [[nodiscard]] constexpr bool restart_after_full_color_fill(
         std::uint64_t originalDrawsSeen) noexcept {
         if (stopped || submitted == 0u || depthReady ||
-            depthClearPending || colorFillEpoch ||
+            depthClearPending ||
             !hasSourceDraw || originalDrawsSeen == 0u ||
             lastSourceDraw == UINT64_MAX ||
             lastSourceDraw + 1u != originalDrawsSeen ||

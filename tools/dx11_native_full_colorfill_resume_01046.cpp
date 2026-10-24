@@ -21,7 +21,11 @@ int main() {
     b.record_source_draw(1); b.succeeded(false);
     assert(b.publishable_full(true, 2));
     assert(!b.publishable_full(true, 3));
-    assert(!b.restart_after_full_color_fill(2)); // Do not repeat unproven Z epoch.
+    assert(b.restart_after_full_color_fill(2)); // The second full COLOR overwrite is real.
+    assert(!b.publishable_full(true, 2)); // Neither prior GPU epoch may publish.
+    assert(b.sourceEpochStart == 2u && b.colorFillEpoch);
+    assert(b.accepts_full_on_source_target(2, true));
+    assert(!b.accepts_depth(true, false)); // Still no invented Z.
     b.abort();
     assert(!b.publishable_full(true, 2));
     // Source no-op after recovery consumes its absolute original ordinal.

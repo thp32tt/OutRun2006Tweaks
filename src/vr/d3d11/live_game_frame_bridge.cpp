@@ -8315,15 +8315,20 @@ bool preserve_game_color_fill(
             // Keep the original full Clear seed, depth and Draw ordinals.
             return true;
         }
-        const bool wholeTargetReady = !alreadyDrawn || targetReady;
+        // A previously submitted scene can be replaced only while its exact
+        // D3D11 GPU output remains pending and owned. An old/nonpending
+        // batch must not be revived by a later game ColorFill.
+        const bool wholeTargetReady =
+            !alreadyDrawn || (targetReady && s.pending);
         if (!GameNativeSourceMutation::mirrors_full_color_fill(
                 true, SUCCEEDED(originalResult), sameGameBackbuffer,
                 sameGameBackbuffer, true, !s.frameBatch.stopped,
                 wholeTargetReady)) return false;
         // A real post-Draw whole-backbuffer ColorFill overwrites all source
-        // COLOR. Start a new contiguous native Draw epoch only if all earlier
-        // source draws were mirrored, no depth writes survived and the
-        // authoritative game ColorFill target was fully verified above.
+        // COLOR, including an earlier ColorFill-started native scene. Permit
+        // consecutive menu/car transition epochs only while *each* prior
+        // source Draw was mirrored, no native depth writes survived and the
+        // current real game ColorFill is on the verified backbuffer.
         // ColorFill does NOT clear game Z: the epoch explicitly rejects
         // subsequent depth-dependent draws. Otherwise retire the candidate.
         if (native_game_color_fill_retires_draw_batch(
