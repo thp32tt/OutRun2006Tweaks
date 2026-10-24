@@ -32,5 +32,5 @@
   "runtime_validation": "UNTESTED",
   "score_delta": 0,
   "n100_audit_path": "work/C1_QA_20261024_2246_byte_audit.json",
-  "n100_audit_sha256": "{\n  \"path\": \"work/C1_QA_20261024_2246_byte_audit.json\",\n  \"size\": 749,\n  \"algorithm\": \"sha256\",\n  \"digest\": \"5253afb413c4048703b0b2d6b4df6ef7304fd1f530dfc85a7a65272f52e1d712\"\n}"
+  "n100_audit_sha256": "5253afb413c4048703b0b2d6b4df6ef7304fd1f530dfc85a7a65272f52e1d712"
 }
