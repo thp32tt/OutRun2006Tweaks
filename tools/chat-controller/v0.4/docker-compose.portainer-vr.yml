@@ -113,42 +113,6 @@ services:
       - outrun_chat_vr_data:/data
       - outrun_chat_vr_logs:/logs
 
-  # Independent Java-only preview; reuses the read-only, already-mirrored N100 files.
-  # No PHP runtime, no access to the VR controller's state or volumes.
-  kiwoompos-java-preview:
-    image: eclipse-temurin:21-jre-alpine
-    container_name: outrun-kiwoompos-preview
-    init: true
-    restart: unless-stopped
-    user: "10001:10001"
-    working_dir: /app
-    command: ["java", "-jar", "/app/app.jar"]
-    environment:
-      TZ: Asia/Seoul
-      APP_PORT: "8080"
-      SITE_DIR: "/app/site"
-      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=65 -Dfile.encoding=UTF-8"
-    ports:
-      - "192.168.0.48:18082:8080"
-    volumes:
-      - "/home/chatgpt-runner/apps/kiwoompos-java/app.jar:/app/app.jar:ro"
-      - "/home/chatgpt-runner/apps/kiwoompos-java/site:/app/site:ro"
-    read_only: true
-    tmpfs:
-      - /tmp:rw,nosuid,nodev,noexec,size=32m
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    pids_limit: 100
-    mem_limit: 256m
-    cpus: 0.50
-    healthcheck:
-      test: ["CMD", "java", "-cp", "/app/app.jar", "HealthCheck"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
 
 volumes:
   outrun_chat_vr_data:
