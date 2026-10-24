@@ -6,8 +6,8 @@
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "branch": "vr-d3d9ex-focus",
   "base_sha": "990158b51293b294033c2466558d637df74936d0",
-  "checkpoint": "C3_VALIDATE",
-  "status": "SOURCE_VALIDATED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C6_STATE",
+  "status": "BUILD_VERIFIED_REGRESSION_GATE_BLOCKED",
   "attempt": 1,
   "runtime_validation": "UNTESTED",
   "score_delta": 0,
@@ -22,7 +22,88 @@
     "baseline_numeric_counterexample": "FAIL_EXPECTED: same-NDC asymmetric eye ray mismatch",
     "hud_original_71_call_contract": "PASS, 22 mutation cases",
     "outer_CABE_fusion_contract": "PASS",
-    "legacy_R84_lens_guard": "FAIL on base and candidate: stale ScopedExactLensCentreGpuDraw requirement"
+    "legacy_R84_lens_guard": "FAIL on base and candidate: stale ScopedExactLensCentreGpuDraw requirement",
+    "windows_numeric_ray_smoke": "PASS Release and RelWithDebInfo"
   },
-  "next_action": "Read exact material SHA Windows official, Active, Inspector, Full Source and Domain CI; record failures without optical PASS. Inspect C993 RAY EYES runtime evidence in a new matching HMD capture."
+  "next_action": "Do not reimplement or rescore this source patch. Resolve the preexisting source-validator contract mismatches separately without changing unrelated visuals. For optical acceptance use the frozen 6c7b73a9 TEST or DEBUG package, START_HERE.cmd, and capture central sun while turning head; check VR LENS C993 RAY EYES actual eye HRESULT and restore evidence. Branch may contain later unrelated work; these artifact results apply only to material SHA.",
+  "material_result_sha": "6c7b73a9d163b3d336cd40845c3516627807a795",
+  "validation_bearing_result_sha": "6c7b73a9d163b3d336cd40845c3516627807a795",
+  "observed_branch_head_before_bookkeeping": "2de08e079d20612c2870957ef7027ea14c8fb5e2",
+  "automation_validation": "PARTIAL_PASS_EXACT_SHA",
+  "updated_at": "2026-10-25T07:24:00+09:00",
+  "blockers": [
+    {
+      "type": "PREEXISTING_VALIDATOR_DRIFT",
+      "run_id": 40116495441,
+      "check": "verify_dx9ex_gpu_visual_20261014.py",
+      "evidence": "requires LensCentreOwnerDepth == LensCentreDepth, absent at base and candidate"
+    },
+    {
+      "type": "PREEXISTING_VALIDATOR_DRIFT",
+      "run_id": 40116495494,
+      "check": "static-exe-analysis F11",
+      "evidence": "requires stockProjection.m[row][0] * f11Affine[eye].scaleX, absent at base and candidate"
+    },
+    {
+      "type": "RUNTIME_EVIDENCE_REQUIRED",
+      "evidence": "No matching Quest3/VDXR capture of corrected C993 direct-eye path"
+    }
+  ],
+  "ci": [
+    {
+      "run_id": 40116495444,
+      "name": "Official TEST/DEBUG",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40116495533,
+      "name": "GitHub General Build",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40116495498,
+      "name": "Full Source Impact Review",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40116495512,
+      "name": "Domain Isolation Guard",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40116495464,
+      "name": "Autodev Coordination",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40116495441,
+      "name": "Active Validation",
+      "conclusion": "failure",
+      "classification": "PREEXISTING_VALIDATOR_DRIFT"
+    },
+    {
+      "run_id": 40116495494,
+      "name": "HUD Inspector",
+      "conclusion": "failure",
+      "classification": "PREEXISTING_VALIDATOR_DRIFT"
+    }
+  ],
+  "artifacts": {
+    "official_id": 12570376154,
+    "official_sha256": "e1482947f5af160bc76fe2b965241a407d10122f0cf08f77319ff207eb8bf726",
+    "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40116495444/artifacts/12570376154",
+    "test": {
+      "name": "OutRun2_VR_R26_FOCUS_OFFICIAL_TEST_6c7b73a9d163.zip",
+      "sha256": "000c0e91c061979422ff5d3242e032a50ee83c00edf9cefc526c34fc3e02cfa5",
+      "dll_sha256": "fa008ce463b0b86e6d3a3865016ce1636d98ff7d20cfaf05009dd2d26da8f0a3",
+      "host_sha256": "d81ed809cf6634e931653bfbe90bc91d9803e39013c081752ccffe90d903641d"
+    },
+    "debug": {
+      "name": "OutRun2_VR_R26_FOCUS_OFFICIAL_DEBUG_6c7b73a9d163.zip",
+      "sha256": "91eb1d6dc80f2d641f4add75872ca12079619580ddea670a7a088096b8f3d6a5",
+      "dll_sha256": "b06e1c6803412060bba959544a0ff20732d083ec11a1af45f90e7851a2af29eb",
+      "host_sha256": "74525e56b9cacf65219c6b9381984f213dfb1614a38a99aa9981c9f32c1abf26"
+    },
+    "inspection": "Downloaded archive digest, both inner ZIP digests, exact SOURCE_SHA, batch/PowerShell/INI/x86 DLL/x64 host presence verified"
+  }
 }
