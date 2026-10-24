@@ -32,9 +32,12 @@ def digest(path):
 # change to OCR/safety policy. No silent endless re-scanning of exhausted inputs.
 POLICY_VERSION = "hd108-coverage-v5-20261022-pixel-recovery-channel-edge"
 EDGE_REVIEW_VERSION = "edge-safe-expand-v2-20261021-progressive"
-LEGACY_PIXEL_RECOVERY_VERSION = "master255-decoded-pixel-equal-v1-20261022"
+LEGACY_PIXEL_RECOVERY_VERSION = "master255-decoded-pixel-equal-v2-20261024-safe-id-alias"
+CROSS_VARIANT_EXACT_REGION_VERSION = "cross-variant-exact-rgba-v1-20261024"
+OCR_MAX_ATTEMPTS = ocr.OCR_STRATEGY_COUNT + 3
 EDGE_STAGES = ((.55,.30),(.90,.50),(1.40,.80),(2.00,1.20))
-LEGACY_POSITION_SUFFIXES = ("TOP","SECOND","BIG","SMALL","LEFT","RIGHT","UPPER","LOWER","TITLE","LABEL")
+LEGACY_POSITION_SUFFIXES = ("TOP","SECOND","BIG","SMALL","LEFT","RIGHT","UPPER","LOWER","TITLE","LABEL",
+                            "QUESTION","BUTTON","HEADER","HUD","TEXT","Q")
 LEGACY_HOME = Path("/home/chatgpt-runner2")
 LEGACY_ALLOWED_ROOTS = (
  LEGACY_HOME/"work/c_salvage_text_roi/source_full_20261012",
@@ -86,14 +89,22 @@ def _legacy_phrase_for_item(item):
   return None,None
  phrases=ocr.approved_phrases(q)
  tail=ocr.norm(item_id.split("-",1)[1])
- if tail in phrases:
-  return q,phrases[tail]
- for suffix in LEGACY_POSITION_SUFFIXES:
-  if tail.endswith(suffix):
-   base=tail[:-len(suffix)]
-   if base in phrases:
-    return q,phrases[base]
- return q,None
+ candidates=[tail]
+ no_digits=re.sub(r"[0-9]+$","",tail)
+ if no_digits and no_digits!=tail:
+  candidates.append(no_digits)
+ # MASTER_255 ids sometimes append layout-only tags such as BUTTON/HUD/TEXT
+ # or occurrence numbers. Strip only a fixed allowlist and accept the mapping
+ # only when exactly one reviewed phrase remains.
+ for base0 in list(candidates):
+  for suffix in LEGACY_POSITION_SUFFIXES:
+   if base0.endswith(suffix) and len(base0)>len(suffix):
+    candidates.append(base0[:-len(suffix)])
+ matches=[]
+ for candidate in candidates:
+  if candidate in phrases and phrases[candidate] not in matches:
+   matches.append(phrases[candidate])
+ return (q,matches[0]) if len(matches)==1 else (q,None)
 
 
 def _legacy_source_path(item):
@@ -275,6 +286,137 @@ def recover_legacy_pixel_equal(rows,max_new=1000,src_root=SRC,out_root=OUT):
  return result
 
 
+
+def recover_cross_variant_exact_regions(rows,max_new=1000,src_root=SRC,out_root=OUT):
+ """Reuse a reviewed sibling bbox only when the target RGBA crop is byte-identical.
+
+ This is intentionally stricter than visual similarity. Platform variants may
+ differ elsewhere in the atlas; only the exact candidate rectangle may transfer.
+ """
+ by_name={r.get("png_filename"):r for r in rows if isinstance(r,dict)}
+ refs={}
+ for mp in sorted(out_root.glob("*/*/manifest.json")):
+  try:
+   j=json.loads(mp.read_text(encoding="utf-8"))
+   name=j.get("source_png"); en=j.get("english"); box=j.get("bbox_xyxy")
+   if (name not in by_name or j.get("source_sha256")!=by_name[name].get("png_sha256") or
+       not isinstance(en,str) or not en.strip() or
+       not (isinstance(box,list) and len(box)==4 and all(type(v) is int for v in box))):
+    continue
+   crop=mp.parent/"english_original_native_crop.png"
+   if (not crop.is_file() or crop.is_symlink() or
+       digest(crop)!=j.get("crop_sha256")):
+    continue
+   q=name.split("_",1)[0].upper()
+   code=ocr.norm(ocr.searchable_phrase(en))
+   refs.setdefault((q,code),[]).append((mp,j,crop))
+  except (OSError,ValueError,TypeError,KeyError):
+   continue
+
+ result={"status":"CROSS_VARIANT_EXACT_REGION_RECOVERY",
+         "version":CROSS_VARIANT_EXACT_REGION_VERSION,
+         "recovered":0,"duplicates":0,"held":0,"details":[]}
+ for row in rows:
+  if result["recovered"]>=max_new:
+   break
+  name=row.get("png_filename","")
+  q=name.split("_",1)[0].upper()
+  unresolved=_coverage(row,out_root)[2]
+  if not unresolved:
+   continue
+  src=src_root/name
+  try:
+   if (not src.is_file() or src.is_symlink() or
+       src.stat().st_size!=int(row["png_size_bytes"]) or
+       digest(src)!=row["png_sha256"]):
+    raise ValueError("CROSS_VARIANT_TARGET_SOURCE_INVALID")
+   with Image.open(src) as im:
+    if im.format!="PNG" or im.mode!="RGBA" or im.size!=(int(row["width"]),int(row["height"])):
+     raise ValueError("CROSS_VARIANT_TARGET_FORMAT_INVALID")
+    target_image=im.copy()
+  except Exception as exc:
+   result["held"]+=1
+   result["details"].append({"target":name,"status":"HOLD",
+                             "reason":type(exc).__name__+":"+str(exc)[:160]})
+   continue
+
+  for code,phrase in list(unresolved.items()):
+   if result["recovered"]>=max_new:
+    break
+   recovered=False
+   for ref_mp,ref,ref_crop_path in refs.get((q,code),[]):
+    ref_name=ref.get("source_png")
+    if ref_name==name:
+     continue
+    box=ref.get("bbox_xyxy")
+    x0,y0,x1,y1=box
+    if not (0<=x0<x1<=target_image.width and 0<=y0<y1<=target_image.height):
+     continue
+    try:
+     with Image.open(ref_crop_path) as im:
+      if im.format!="PNG" or im.mode!="RGBA" or im.size!=(x1-x0,y1-y0):
+       continue
+      ref_crop=im.copy()
+     candidate=target_image.crop((x0,y0,x1,y1))
+     if candidate.tobytes()!=ref_crop.tobytes():
+      continue
+     bad=ocr.margin_check(target_image,box)
+     if bad and bad!="ALPHA_TOUCHES_CROP_BORDER_REVIEW":
+      continue
+     label=hashlib.sha256((name+"|"+phrase+"|"+str(box)+"|"+
+                           CROSS_VARIANT_EXACT_REGION_VERSION).encode()).hexdigest()[:16]
+     target=out_root/Path(name).stem/label
+     outfile=target/"english_original_native_crop.png"
+     if target.exists():
+      mp=target/"manifest.json"
+      if not mp.is_file():
+       raise ValueError("CROSS_VARIANT_TARGET_COLLISION")
+      old=json.loads(mp.read_text(encoding="utf-8"))
+      if old.get("cross_variant_exact_region_version")!=CROSS_VARIANT_EXACT_REGION_VERSION:
+       raise ValueError("CROSS_VARIANT_TARGET_COLLISION")
+      result["duplicates"]+=1
+      recovered=True
+      break
+     target.mkdir(parents=True,exist_ok=False)
+     candidate.save(outfile,format="PNG")
+     with Image.open(outfile) as proof:
+      if proof.mode!="RGBA" or proof.size!=candidate.size or proof.tobytes()!=candidate.tobytes():
+       raise ValueError("CROSS_VARIANT_CROP_ROUNDTRIP_MISMATCH")
+     manifest={
+       "status":"CROP_TEST_ONLY_REVIEW_REQUIRED",
+       "source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+       "source_png":name,"source_sha256":row["png_sha256"],
+       "reference_dds_path":row["source_dds_path"],
+       "reference_dds_sha256":row["dds_sha256"],
+       "independent_DDS_pixel_equality":"NOT_TESTED_FOR_THIS_PNG",
+       "queue_indexes":row["queue_indexes"],"english":phrase,
+       "ocr_confidence":None,"bbox_xyxy":box,
+       "source_dimensions":[int(row["width"]),int(row["height"])],
+       "crop_dimensions":list(candidate.size),"crop_sha256":digest(outfile),
+       "edge_warning":bad if bad else None,
+       "human_review_required":True,"runtime_validation":"UNTESTED",
+       "old_split_tiles_used":False,"A_B":"STOPPED_UNTOUCHED",
+       "cross_variant_exact_region_version":CROSS_VARIANT_EXACT_REGION_VERSION,
+       "cross_variant_reference_manifest":str(ref_mp),
+       "cross_variant_reference_source_png":ref_name,
+       "cross_variant_region_rgba_equality":True,
+     }
+     discover.save_json_atomic(target/"manifest.json",manifest)
+     result["recovered"]+=1
+     result["details"].append({"target":name,"english":phrase,"bbox":box,
+                               "reference":ref_name,"status":"RECOVERED_EXACT_RGBA"})
+     recovered=True
+     break
+    except Exception as exc:
+     result["held"]+=1
+     result["details"].append({"target":name,"english":phrase,"status":"HOLD",
+                               "reason":type(exc).__name__+":"+str(exc)[:160]})
+     break
+   if recovered:
+    continue
+ return result
+
+
 def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
  """Second-pass salvage for prior alpha-edge review crops.
 
@@ -443,6 +585,9 @@ def scan(max_sources=4,max_new=1000):
  REPORT.mkdir(parents=True,exist_ok=True)
  OUT.mkdir(parents=True,exist_ok=True)
  legacy_recovery=recover_legacy_pixel_equal(rows,max_new=max_new,src_root=SRC,out_root=OUT)
+ legacy_new=int(legacy_recovery.get("recovered_this_call",0))
+ cross_variant_recovery=recover_cross_variant_exact_regions(
+     rows,max_new=max(0,max_new-legacy_new),src_root=SRC,out_root=OUT)
  done_dir=REPORT/"processed_v3"
  done_dir.mkdir(parents=True,exist_ok=True)
 
@@ -464,11 +609,14 @@ def scan(max_sources=4,max_new=1000):
  cursorfile=REPORT/"cursor_v3.json"
  try:cursor=int(json.loads(cursorfile.read_text(encoding="utf-8")).get("next",0))%len(rows)
  except (OSError,ValueError,TypeError,KeyError):cursor=0
- # Source-level SCANNED is not completion. Keep rotating until every reviewed
- # phrase in every verified HD source has a crop manifest.
+ # Source-level SCANNED is not completion. Rotate OCR strategies only until
+ # each strategy has had a fuzzy-enabled opportunity; after that, stop burning
+ # CPU and expose the remainder as OCR_EXHAUSTED for the next recovery channel.
  order=list(range(cursor,len(rows)))+list(range(cursor))
  pending=[(i,rows[i]) for i in order if unresolved(rows[i])]
- selected=pending[:min(max_sources,len(pending))]
+ retryable=[pair for pair in pending if attempt_count(pair[1])<OCR_MAX_ATTEMPTS]
+ exhausted=[pair for pair in pending if attempt_count(pair[1])>=OCR_MAX_ATTEMPTS]
+ selected=retryable[:min(max_sources,len(retryable))]
  pending_phrase_count=sum(len(unresolved(r)) for _,r in pending)
  total_phrase_count=sum(len(_row_phrases(r)) for r in rows)
  located_phrase_count=total_phrase_count-pending_phrase_count
@@ -479,15 +627,29 @@ def scan(max_sources=4,max_new=1000):
          "located_phrase_count":located_phrase_count,
          "selected":[r["png_filename"] for _,r in selected],
          "scanned":0,"matched":0,
-         "new_crops":int(legacy_recovery.get("recovered_this_call",0)),
+         "new_crops":legacy_new+int(cross_variant_recovery.get("recovered",0)),
          "legacy_recovered":int(legacy_recovery.get("recovered",0)),
+         "legacy_recovered_this_cycle":legacy_new,
+         "cross_variant_recovered_this_cycle":int(cross_variant_recovery.get("recovered",0)),
+         "ocr_max_attempts":OCR_MAX_ATTEMPTS,
+         "ocr_retryable_sources_before":len(retryable),
+         "ocr_exhausted_sources_before":len(exhausted),
          "duplicates":0,"held":0,
          "edge_review_crops":int(legacy_recovery.get("edge_review_crops",0)),
          "details":[]}
  if not selected:
-  result["status"]="HD108_CROP_COVERAGE_COMPLETE"
-  result["pending_sources_after"]=0
-  result["pending_phrases_after"]=0
+  if pending:
+   result["status"]="HD108_CROP_COVERAGE_OCR_EXHAUSTED"
+   result["pending_sources_after"]=len(pending)
+   result["pending_phrases_after"]=pending_phrase_count
+   result["ocr_retryable_sources_after"]=0
+   result["ocr_exhausted_sources_after"]=len(pending)
+  else:
+   result["status"]="HD108_CROP_COVERAGE_COMPLETE"
+   result["pending_sources_after"]=0
+   result["pending_phrases_after"]=0
+   result["ocr_retryable_sources_after"]=0
+   result["ocr_exhausted_sources_after"]=0
   result["source_records"]=len(rows)
   discover.save_json_atomic(REPORT/"last_scan.json",result)
   return result
@@ -657,7 +819,12 @@ def scan(max_sources=4,max_new=1000):
  result["pending_sources_after"]=len(unresolved_rows)
  result["pending_phrases_after"]=pending_phrase_after
  result["located_phrase_count"]=result["reviewed_phrase_total"]-pending_phrase_after
+ retryable_after=[r for r in unresolved_rows if attempt_count(r)<OCR_MAX_ATTEMPTS]
+ result["ocr_retryable_sources_after"]=len(retryable_after)
+ result["ocr_exhausted_sources_after"]=len(unresolved_rows)-len(retryable_after)
  if not unresolved_rows:
   result["status"]="HD108_CROP_COVERAGE_COMPLETE"
+ elif not retryable_after:
+  result["status"]="HD108_CROP_COVERAGE_OCR_EXHAUSTED"
  discover.save_json_atomic(REPORT/"last_scan.json",result)
  return result
