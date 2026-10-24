@@ -1,0 +1,55 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261024T1045KST-IDLE",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "checked_at_kst": "2026-10-24T10:48:04.749763+09:00",
+  "source_branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "No new SHA-unique unreviewed A/B candidate PNG with matching production export evidence and local source/output; do not repeat previously reviewed SHAs.",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "reviewed_sha_history_count": 728,
+  "new_unique_sha_count": 0,
+  "counts": {
+    "C1_STATIC_PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "producer_png_counts": {
+    "A": 334,
+    "B": 389
+  },
+  "producer_export_evidence_count": 148,
+  "local_outputs_without_export_evidence": {
+    "A": [],
+    "B": []
+  },
+  "export_evidence_without_local_outputs": {
+    "A": [],
+    "B": []
+  },
+  "evidence_n100": {
+    "metrics": "work/C1_QA_20261024_1045_metrics.json",
+    "checker": "work/C1_QA_20261024_1045_check.py"
+  },
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "game_deployed": false,
+    "VR_FFB_DX11_DXVK_touched": false
+  },
+  "score": {
+    "previous_confirmed_ai1": 1768,
+    "delta": 0,
+    "new_confirmed_ai1": 1768,
+    "rule": "No new output or review; no double counting."
+  },
+  "records": []
+}
