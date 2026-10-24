@@ -793,8 +793,8 @@ def verify_exact_call_window_hud_scope(source):
         if kind == 'StageExtension':
             # +TIME's immediate source is a scoped producer; the old direct
             # CurrentScope assignment stole an active SpriteQueue's owner.
-            require('if (Settings::VREnabled &&', enter,
-                    kind+' scope only overrides in VR')
+            require('Settings::VREnabled && goalSummary', enter,
+                    kind+' scope only overrides in GOAL after stage table')
             require('GameSemantic::SpriteQueueDepth == 0', enter,
                     kind+' must not override a live queued sprite')
             require('StageExtensionDirectDrawOwner.emplace(', enter,
