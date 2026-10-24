@@ -1610,13 +1610,9 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
     if (cropped)
         (void)context_->QueryInterface(
             IID_PPV_ARGS(rectContext.GetAddressOf()));
-    constexpr float kByte = 1.0f / 255.0f;
-    const float rgba[4]{
-        static_cast<float>((argb >> 16) & 0xffu) * kByte,
-        static_cast<float>((argb >> 8) & 0xffu) * kByte,
-        static_cast<float>(argb & 0xffu) * kByte,
-        opaqueDestinationAlpha ? 1.0f :
-            static_cast<float>((argb >> 24) & 0xffu) * kByte};
+    const auto pixel = native_game_color_fill_rgba(
+        argb, opaqueDestinationAlpha);
+    const float rgba[4]{pixel[0], pixel[1], pixel[2], pixel[3]};
     const bool shaderSupported = cropped && !rectContext &&
         native_game_partial_color_shader_rtv(context_, eyeTarget_);
     const auto route = live_game_stereo::color_clear_route(
@@ -3293,13 +3289,10 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             if (invocation.fullTargetClear) {
                 const std::uint32_t argb =
                     invocation.fullTargetClear->argb[eyeIndex];
-                constexpr float normalize = 1.0f / 255.0f;
-                const float rgba[4]{
-                    static_cast<float>((argb >> 16) & 0xffu) * normalize,
-                    static_cast<float>((argb >> 8) & 0xffu) * normalize,
-                    static_cast<float>(argb & 0xffu) * normalize,
-                    static_cast<float>((argb >> 24) & 0xffu) * normalize};
-                ctx->ClearRenderTargetView(targets[eyeIndex], rgba);
+                const auto rgba = native_game_color_fill_rgba(
+                    argb, invocation.fullTargetClear
+                        ->opaqueDestinationAlpha[eyeIndex]);
+                ctx->ClearRenderTargetView(targets[eyeIndex], rgba.data());
             }
             // Replay the captured game Clear timeline inside Draw/DrawIndexed,
             // not as pre-draw seeds which overwrite out-of-order scene pixels.

@@ -69,6 +69,7 @@
 #include "native_game_partial_dirty_upload.hpp"
 #include "native_game_multi_dirty_upload.hpp"
 #include "native_game_clear_color.hpp"
+#include "native_game_color_fill.hpp"
 #include "native_game_masked_draw.hpp"
 #include "native_game_fragment_reject.hpp"
 #include "native_game_scissor_clip.hpp"
@@ -8224,14 +8225,10 @@ bool preserve_game_color_fill(
             if (partial_game_color_replay_route(
                     hasClearView, true, true) ==
                 PartialColorReplayRoute::reject) return false;
-            constexpr float scale = 1.0f / 255.0f;
-            const float rgba[4] = {
-                float((color >> 16) & 255u) * scale,
-                float((color >> 8) & 255u) * scale,
-                float(color & 255u) * scale,
-                desc.Format == D3DFMT_X8R8G8B8 ? 1.0f :
-                    float((color >> 24) & 255u) * scale
-            };
+            const auto rgbaPixel = native_game_color_fill_rgba(
+                color, desc.Format == D3DFMT_X8R8G8B8);
+            const float rgba[4]{
+                rgbaPixel[0], rgbaPixel[1], rgbaPixel[2], rgbaPixel[3]};
             const D3D11_RECT nativeRect{
                 static_cast<LONG>(clipped.left), static_cast<LONG>(clipped.top),
                 static_cast<LONG>(clipped.right), static_cast<LONG>(clipped.bottom)};
@@ -8251,6 +8248,22 @@ bool preserve_game_color_fill(
                 true, SUCCEEDED(originalResult), sameGameBackbuffer,
                 sameGameBackbuffer, true, !s.frameBatch.stopped,
                 wholeTargetReady)) return false;
+        // A full source ColorFill AFTER an authentic game Draw overwrote
+        // every source color pixel. Simply updating the seed/RTV leaves the
+        // OLD submitted Draws publishable, even though their GPU pixels were
+        // erased. Retire this source batch (and asynchronous publication)
+        // until a new verified full scene epoch; the original D3D9 result
+        // remains authoritative. Pre-Draw fills still update their seed.
+        if (native_game_color_fill_retires_draw_batch(
+                wholeSurface, alreadyDrawn)) {
+            s.frameBatch.abort();
+            s.pending = false;
+            s.preDrawFills.discard();
+            s.preDrawDepth.discard();
+            s.clearColor.discard();
+            if (++s.outputGeneration == 0u) ++s.outputGeneration;
+            return false;
+        }
         s.preDrawFills.discard(); // whole ColorFill supersedes prior tiles
         s.clearColor.argb = color;
         s.clearColor.opaqueDestinationAlpha =

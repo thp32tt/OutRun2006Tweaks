@@ -1,7 +1,31 @@
 #pragma once
+#include <array>
 #include <cstdint>
 #include <limits>
 namespace outrun::vr::dx11 {
+// A full D3D9 ColorFill AFTER GPU geometry erases the scene's color,
+// so the prior Draw count can no longer certify a published game frame.
+// Until a retained per-pixel draw epoch is available, fail closed to the
+// original D3D9 output instead of publishing a cleared DX11 scene.
+[[nodiscard]] constexpr bool native_game_color_fill_retires_draw_batch(
+    bool wholeSurface, bool nativeDrawAlreadySubmitted) noexcept {
+    return wholeSurface && nativeDrawAlreadySubmitted;
+}
+
+// Convert an actual D3D9 ARGB color for either the live native RTV or one
+// authored stereo-eye RTV. X8R8G8B8 has no alpha storage: D3D11 must seed
+// an opaque destination alpha to preserve later DESTALPHA blending.
+[[nodiscard]] constexpr std::array<float, 4> native_game_color_fill_rgba(
+    std::uint32_t argb, bool opaqueDestinationAlpha) noexcept {
+    constexpr float byteScale = 1.0f / 255.0f;
+    return {
+        static_cast<float>((argb >> 16u) & 255u) * byteScale,
+        static_cast<float>((argb >> 8u) & 255u) * byteScale,
+        static_cast<float>(argb & 255u) * byteScale,
+        opaqueDestinationAlpha ? 1.0f :
+            static_cast<float>((argb >> 24u) & 255u) * byteScale
+    };
+}
 // D3D9 ColorFill ignores source Draw viewport/scissor. Clip to target only.
 struct NativeGameColorFillClip {
     bool valid{}, empty{}, full{};

@@ -85,6 +85,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_postpass_coverage_00987.cpp -o /tmp/dx11_eye_coverage_00987 && /tmp/dx11_eye_coverage_00987
           # Source-authored ColorFill -> native stereo GPU fill regression.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_color_fill_01043.cpp -o /tmp/dx11_eye_color_fill_01043 && /tmp/dx11_eye_color_fill_01043
+          # 01044 complete-source ColorFill overwrites & per-eye X8/A8 seeds.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_epoch_01044.cpp -o /tmp/dx11_full_colorfill_01044 && /tmp/dx11_full_colorfill_01044
           python tools/test_dx11_native_eye_postpass_coverage_00987.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_postpass_overwrite_00988.cpp -o /tmp/dx11_eye_overwrite_00988 && /tmp/dx11_eye_overwrite_00988
           python tools/test_dx11_native_eye_postpass_overwrite_00988.py

@@ -319,6 +319,10 @@ struct NativeGameEyeDrawEvidence {
 // background or the previous frame. Partial RECT clears belong to the callback.
 struct NativeGameEyeColorSeed {
     std::uint32_t argb[2]{};
+    // Source D3DFMT_X8R8G8B8 carries no alpha byte. Preserve the observed
+    // per-eye physical format rather than interpreting undefined ARGB alpha.
+    // Appended for compatibility with older two-color aggregate producers.
+    bool opaqueDestinationAlpha[2]{};
 };
 // Actual D3D9 game Clears and GPU intermediate postpasses can occur BETWEEN
 // source geometry draws. Keep TARGET, ColorFill, Z/stencil, Copy and Stretch events
