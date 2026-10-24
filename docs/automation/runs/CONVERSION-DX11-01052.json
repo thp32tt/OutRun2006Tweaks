@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:LIVE_COLD_RESET_PREDRAW_SOURCE_TO_FIRST_NATIVE_DRAW",
   "work_key": "DX11:MENU_CAR_RACE_PREDRAW_NATIVE_FIRST_FRAME_EXTENT",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -96,35 +96,71 @@
   },
   "acceptance_results": {
     "cold_first_frame": {
-      "status": "PENDING_CI",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d11/native_game_pre_draw_surface.hpp",
         "tools/dx11_native_cold_predraw_01052.cpp"
-      ]
+      ],
+      "validation_command": "DX11 Fast #40088789289 plus Windows Build #40088792436 and Backend #40088789291 SUCCESS on exact SHA; real game/HMD not executed."
     },
     "reset_resolution": {
-      "status": "PENDING_CI",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "tools/dx11_native_cold_predraw_01052.cpp"
-      ]
+      ],
+      "validation_command": "DX11 Fast #40088789289 plus Windows Build #40088792436 and Backend #40088789291 SUCCESS on exact SHA; real game/HMD not executed."
     },
     "postdraw_fallback": {
-      "status": "PENDING_CI",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "tools/dx11_native_cold_predraw_01052.cpp",
         "tools/test_dx11_cold_predraw_01052.py"
-      ]
+      ],
+      "validation_command": "DX11 Fast #40088789289 plus Windows Build #40088792436 and Backend #40088789291 SUCCESS on exact SHA; real game/HMD not executed."
     },
     "exact_sha_gate": {
-      "status": "PENDING_CI",
+      "status": "PASS_EXACT_SHA",
       "evidence_paths": [
         ".github/workflows/dx11-fast-structural.yml"
-      ]
+      ],
+      "validation_command": "Five required GitHub Actions SUCCESS on exact source SHA 7b10d93fa9f645890a75fc3046a04198a7cead31."
     }
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Unconditional native dimension match drops authentic first pre-Draw game pixels before native target allocation or after source resolution change.",
-  "next_implementation_action": "Validate this exact source SHA against required GitHub Actions gates and repair real failures within CONVERSION-DX11-01052.",
-  "runtime_note": "No game/Quest3 VDXR test performed; native pixels and frame counts UNTESTED."
+  "next_implementation_action": "Source-stage completed; controller may select next independent game draw integration. Matching real-game and Quest3/VDXR runtime evidence remains required for promotion.",
+  "runtime_note": "Only exact-SHA GitHub CI passed. First actual live menu/car/race Draw/published frame and Quest3/VDXR tests remain UNTESTED.",
+  "material_result_sha": "7b10d93fa9f645890a75fc3046a04198a7cead31",
+  "validation_bearing_result_sha": "7b10d93fa9f645890a75fc3046a04198a7cead31",
+  "c6_reconciliation_reason": "EXACT_SHA_GATES_ALL_SUCCESS",
+  "c6_gate_results": {
+    "validation_sha": "7b10d93fa9f645890a75fc3046a04198a7cead31",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40088789289,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40088789291,
+      "event": "push"
+    },
+    "Build": {
+      "status": "SUCCESS",
+      "run_id": 40088792436,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40088792432,
+      "event": "push"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40088792452,
+      "event": "push"
+    },
+    "note": "All five mandatory GitHub Actions completed SUCCESS on exact source SHA; source code verified only, no game/HMD run. Bookkeeping separated [skip ci], no duplicate CI or score."
+  }
 }
