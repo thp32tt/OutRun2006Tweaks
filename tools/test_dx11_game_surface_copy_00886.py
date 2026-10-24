@@ -118,7 +118,15 @@ for token in (
     "++s.surfaceReplayCount;",
 ):
     assert token in replay_body, "replay guard absent before mutation: " + token
-    mutant_body = replay_body.replace(token, "/* removed native postpass */", 1)
+    # Pre-Draw snapshots have a separate bounded copy counter. The legacy
+    # post-Draw mutation must remove the LAST increment, which belongs to
+    # the real GPU CopySubresourceRegion replay, not the initial snapshot.
+    if token == "++s.surfaceReplayCount;":
+        at = replay_body.rfind(token)
+        mutant_body = (replay_body[:at] + "/* removed native postpass */" +
+                       replay_body[at + len(token):])
+    else:
+        mutant_body = replay_body.replace(token, "/* removed native postpass */", 1)
     mutant = bridge[:replay_begin] + mutant_body + bridge[replay_end:]
     assert mutant != bridge and not linked(mutant, hooks, region), token
 for token in (
