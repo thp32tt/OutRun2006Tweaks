@@ -78,7 +78,7 @@ namespace Settings
     // IPD/FOV. The R26 ordinal-only cant experiment is reversible.
     Setting<bool> VRRankDx11ProducerReference{ "VR", "RankDx11ProducerReference", true,
         "DX11 R57 mode6 direct original Calc3D2D output rank source; false restores the guarded R26 input check for A/B." };
-    Setting<bool> VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", true,
+    Setting<bool> VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", false,
         "DX11-equivalent stock rival: do not install additional R26 0xBB6F0 and 0xBB796 E8 detours. False restores old detours; requires restart." };
     Setting<bool> VRRankDesktopLift{ "VR", "RankDesktopLift", false,
         "Reversible optional +32 original UI pixel rank vertical lift, absent in tested DX11. Default off. Does not affect rival." };

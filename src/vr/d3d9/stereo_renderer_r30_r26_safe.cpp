@@ -3370,18 +3370,9 @@ namespace OutRunVRStereo
                 const float identityOrientation[4]{
                     0.0f, 0.0f, 0.0f, 1.0f
                 };
-                const bool exactResult = R30IsExactResultHudDraw();
-                float resultEyeOffset[2][3]{};
-                float resultEyeOrientation[2][4]{};
-                // HeadInverse already removes shared head motion once.
-                // Keep the remaining OpenXR eye-local rotations for the
-                // exact +TIME/result batch; preserve all other HUD math.
-                if (exactResult &&
-                    !OutRunVR::StageExtensionPlane::BuildStageEyePoses(
-                        state.stereo.eyeOffset, state.stereo.eyeOrientation,
-                        Settings::VRWorldScale * Settings::VRStereoDepth,
-                        resultEyeOffset, resultEyeOrientation))
-                    return false;
+                // R26 result HUD: do not apply a second eye-local
+                // orientation after the common HeadInverse. Keep exact
+                // producer tagging, use the same stereo plane for all HUD.
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const float relativeEye[3]{
@@ -3391,8 +3382,8 @@ namespace OutRunVRStereo
                     };
                     const D3DMATRIX eyePose =
                         MatrixFromQuaternionTranslation(
-                            exactResult ? resultEyeOrientation[eye] : identityOrientation,
-                            exactResult ? resultEyeOffset[eye] : relativeEye,
+                            identityOrientation,
+                            relativeEye,
                             Settings::VRWorldScale *
                                 Settings::VRStereoDepth);
                     const D3DMATRIX eyeInverse = InverseRigid(eyePose);
@@ -4943,16 +4934,10 @@ namespace OutRunVRStereo
             // the fixed-function/XYZRHW owner. HeadInverse already removes
             // shared head motion once; only exact result ownership receives
             // the eye cant. Generic HUD/menu math remains identity-eye.
-            const bool exactResult = R30IsExactResultHudDraw();
-            float resultEyeOffset[2][3]{};
-            float resultEyeOrientation[2][4]{};
+            // Shader-backed +TIME/GOAL uses the same recentered,
+            // finite-depth HUD plane as the fixed-function route.
             const float worldScale =
                 Settings::VRWorldScale * Settings::VRStereoDepth;
-            if (exactResult &&
-                !OutRunVR::StageExtensionPlane::BuildStageEyePoses(
-                    stereo.eyeOffset, stereo.eyeOrientation, worldScale,
-                    resultEyeOffset, resultEyeOrientation))
-                return false;
 
             // R40: turn all screen HUD into one finite, recentered view plane.
             // This removes head-lock. HudScale/contain is applied before the
@@ -5022,8 +5007,8 @@ namespace OutRunVRStereo
                 };
                 const D3DMATRIX eyePose =
                     MatrixFromQuaternionTranslation(
-                        exactResult ? resultEyeOrientation[eye] : identityOrientation,
-                        exactResult ? resultEyeOffset[eye] : relativeEye,
+                        identityOrientation,
+                        relativeEye,
                         worldScale);
                 const D3DMATRIX eyeInverse = InverseRigid(eyePose);
                 const D3DMATRIX eyeProjection =

@@ -66,8 +66,14 @@ for token in (
 eligible=code.split("static bool VRDriverSeatCameraEligible(",1)[1].split(
     "class VRDriverSeatRenderTest",1)[0]
 assert "PersistentDriverSeatSessionEligible(" in eligible
-for forbidden in ("cam_mode_timer_364","cam_mode_34A","word340","word344",
-                  "VRDriverSeatNativeMode","StableNativeViewEligible("):
+# Scope must be restricted to the selected original camera mode. Small
+# mode/timer pulses are debounced; no per-callback instant mode toggle.
+for token in ("VRDriverSeatNativeMode.get()", "camera->cam_mode_34A",
+              "camera->cam_mode_timer_364", "GetTickCount64()",
+              "owner.matchedSinceMs", "owner.mismatchedSinceMs",
+              "owner.armed", ">= 80", ">= 100"):
+    assert token in eligible, token
+for forbidden in ("word340", "word344", "StableNativeViewEligible("):
     assert forbidden not in eligible, forbidden
 assert "camera->cam_pos_F8 = savedPos;" in code
 assert "camera->look_pos_104 = savedLook;" in code

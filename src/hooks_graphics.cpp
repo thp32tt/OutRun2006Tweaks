@@ -259,18 +259,60 @@ static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
     // displace the camera, force a near plane, or hide any occupant.
     if (!camera || !Game::pl_car())
         return false;
-    // DriverSeatView owns the cockpit for the whole playable session.
-    // Do NOT use the game's native camera mode/timer/switch counters as an
-    // OFF switch: those values can change while the stock camera controller
-    // updates, which previously prevented entry or repeatedly bounced the
-    // view back to the native bumper camera.
+    // Only the explicitly selected native view may own the VR cockpit.
+    // The previous session-wide gate applied seat translation, player body
+    // and z-near to all 1/2/3 stock camera views, making them jump together.
+    // Time hysteresis rejects short native camera transition pulses without
+    // toggling seat/stock every rendering callback. Source camera vectors
+    // still receive their original values after CalcCameraMatrix.
+    struct ModeOwner
+    {
+        const EvWorkCamera* camera = nullptr;
+        int selectedMode = -1;
+        std::uint64_t matchedSinceMs = 0;
+        std::uint64_t mismatchedSinceMs = 0;
+        bool armed = false;
+    };
+    static thread_local ModeOwner owner{};
+    const int requestedMode = Settings::VRDriverSeatNativeMode.get();
     if (!OutRunVR::DriverSeatCamera::PersistentDriverSeatSessionEligible(
             Settings::VREnabled && Settings::VRDriverSeatView,
             VRDriverSeatGameplayActive()))
+    {
+        owner = {};
         return false;
-
-    // Validate the seat pose itself, but camera-mode transitions no longer
-    // deactivate the cockpit. Use the same result for camera/body/driver/near.
+    }
+    if (owner.camera != camera || owner.selectedMode != requestedMode)
+    {
+        owner = {};
+        owner.camera = camera;
+        owner.selectedMode = requestedMode;
+    }
+    const std::uint64_t nowMs =
+        static_cast<std::uint64_t>(GetTickCount64());
+    const bool nativeModeMatches =
+        static_cast<int>(camera->cam_mode_34A) == requestedMode &&
+        camera->cam_mode_timer_364 == 0;
+    if (nativeModeMatches)
+    {
+        owner.mismatchedSinceMs = 0;
+        if (!owner.matchedSinceMs)
+            owner.matchedSinceMs = nowMs;
+        if (!owner.armed && nowMs >= owner.matchedSinceMs &&
+            nowMs - owner.matchedSinceMs >= 80)
+            owner.armed = true;
+    }
+    else
+    {
+        owner.matchedSinceMs = 0;
+        if (!owner.mismatchedSinceMs)
+            owner.mismatchedSinceMs = nowMs;
+        if (owner.armed && nowMs >= owner.mismatchedSinceMs &&
+            nowMs - owner.mismatchedSinceMs >= 100)
+            owner.armed = false;
+    }
+    if (!owner.armed)
+        return false;
     D3DVECTOR correctedPosition{}, correctedLook{};
     return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
 }

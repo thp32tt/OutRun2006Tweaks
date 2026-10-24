@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Check the R26 result-only eye-pose/physical shader transaction wiring.
+"""Verify baseline R26 finite HUD pose and physical shader transaction.
 
-Numerical eye-pose behavior is covered by stage_extension_eye_plane_smoke.
-This contract prevents the compiled R26 owner silently retaining identity
-eyes or rejecting shaderless D3DX from an unrelated cached shader identity.
+The result +TIME/GOAL layer should not re-apply eye-local cant after the
+shared HeadInverse; exact producer tagging stays for batching.
 """
 from pathlib import Path
 
@@ -13,13 +12,10 @@ pose = src[src.index('bool R30ConfigureXyzrhwWorldEffect('):src.index('bool R30T
 fixed = src[src.index('HRESULT R62TryFixedFunctionSpriteIndexed('):src.index('HRESULT __stdcall DrawPrimitiveDestR30(')]
 shader_hud = src[src.index('bool R30BuildScreenSpaceEyeConstants('):src.index('template <typename ActualDraw>\n        HRESULT R30TryScreenSpaceFovDraw(')]
 xy_prepare = src[src.index('bool R30PrepareXyzrhwState('):src.index('bool R30XyzrhwHasProjectedDepthSignature(')]
-assert 'R30IsExactResultHudDraw()' in pose, 'R26 must scope eye cant to the exact result batch'
-assert 'BuildStageEyePoses(' in pose, 'R26 drops the OpenXR eye orientations'
-assert 'state.stereo.eyeOrientation' in pose
-assert 'resultEyeOrientation[eye] : identityOrientation' in pose, 'unrelated HUD must retain its existing math'
-assert 'const bool exactResult = R30IsExactResultHudDraw();' in shader_hud, 'shader HUD must scope eye cant to exact result ownership'
-assert 'BuildStageEyePoses(' in shader_hud and 'stereo.eyeOrientation' in shader_hud, 'shader result HUD drops head-local eye rotation'
-assert 'exactResult ? resultEyeOrientation[eye] : identityOrientation' in shader_hud, 'generic shader HUD must keep legacy identity-eye math'
+assert 'BuildStageEyePoses(' not in pose, 'fixed HUD must not apply extra eye-local cant'
+assert 'MatrixFromQuaternionTranslation(\n                            identityOrientation,\n                            relativeEye,' in pose, 'fixed result HUD must use the centered relative-eye offset'
+assert 'BuildStageEyePoses(' not in shader_hud, 'shader HUD must not apply extra eye-local cant'
+assert 'MatrixFromQuaternionTranslation(\n                        identityOrientation,\n                        relativeEye,' in shader_hud, 'shader and fixed result HUD must share the finite plane'
 assert 'const bool exactResult = R30IsExactResultHudDraw();' in xy_prepare, 'XYZRHW prepare must identify exact result before cached-VS gate'
 assert 'if (!exactResult &&' in xy_prepare and 'device->GetVertexShader(&shader)' in xy_prepare, 'exact XYZRHW result must use live VS as authority'
 assert 'if (!exactResult && CurrentVertexShaderIdentity.load(' in fixed, 'a stale cache must not veto an exact shaderless result'
