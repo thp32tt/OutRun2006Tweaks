@@ -1,0 +1,36 @@
+{
+  "schema": "OUTRUN_C1_INDEPENDENT_QA_IDLE_V1",
+  "run_key": "OUTRUN-C1-20261024T2246KST-BYTE-AUDIT",
+  "checked_at_kst": "2026-10-24T22:48:56.469789+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "No new candidate SHA256 after checking N100 local candidate_outputs against prior C1 QA history",
+  "checked_existing_candidate_sha_history_count": 728,
+  "candidate_outputs_count": {
+    "A": 334,
+    "B": 389
+  },
+  "export_evidence_count": 148,
+  "new_unique_sha_count": 0,
+  "new_candidates": [],
+  "local_without_evidence": {
+    "A": [],
+    "B": []
+  },
+  "evidence_without_local": {
+    "A": [],
+    "B": []
+  },
+  "invalid_evidence": [],
+  "c1_static_pass": 0,
+  "c1_fail": 0,
+  "c1_hold": 0,
+  "imagegen_called": false,
+  "ab_queue_consumed": false,
+  "dds_written": false,
+  "game_deployed": false,
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "n100_audit_path": "work/C1_QA_20261024_2246_byte_audit.json",
+  "n100_audit_sha256": "{\n  \"path\": \"work/C1_QA_20261024_2246_byte_audit.json\",\n  \"size\": 749,\n  \"algorithm\": \"sha256\",\n  \"digest\": \"5253afb413c4048703b0b2d6b4df6ef7304fd1f530dfc85a7a65272f52e1d712\"\n}"
+}
