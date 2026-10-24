@@ -1,0 +1,62 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "policies_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source": "N100 saved A/B PNGs + SHA-indexed C1 historical reviews + export evidence",
+  "run_key": "OUTRUN-C1-20261025T0115KST-BYTE-AUDIT",
+  "checked_at_kst": "2026-10-25T01:18:53.503189+09:00",
+  "status": "IDLE",
+  "reviewed_sha_history_count": 732,
+  "new_unique_sha_count": 0,
+  "new_unique_candidates": [],
+  "new_total": 0,
+  "candidate_outputs_count": {
+    "A": 334,
+    "B": 393
+  },
+  "export_evidence_count": 149,
+  "local_without_evidence": {
+    "A": [],
+    "B": []
+  },
+  "evidence_without_local": {
+    "A": [],
+    "B": []
+  },
+  "invalid_evidence": [],
+  "c1_static_pass": 0,
+  "c1_fail": 0,
+  "c1_hold": 0,
+  "imagegen_called": false,
+  "ab_queue_consumed": false,
+  "dds_written": false,
+  "game_deployed": false,
+  "runtime_validation": "UNTESTED",
+  "ai1_ssot_score_before": null,
+  "score_delta_pending": 0,
+  "score": {
+    "ai": "AI1",
+    "ssot_source": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md",
+    "previous_confirmed": 1769,
+    "delta": 0,
+    "cumulative": 1769
+  },
+  "constraints": {
+    "no_repeat_sha_qa": true,
+    "no_imagegen": true,
+    "no_ab_queue_consumption": true,
+    "no_dds_or_game_deploy": true,
+    "no_c2_c3_ingame_pass": true,
+    "exclude": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
+  }
+}
