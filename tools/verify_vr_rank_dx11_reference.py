@@ -60,10 +60,10 @@ for is_ordinal in (False, True):
         if not is_ordinal:
             assert not chosen_canted
 assert 'VRRankDx11ProducerReference{ "VR", "RankDx11ProducerReference", true,' in settings
-assert 'VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", true,' in settings
+assert 'VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", false,' in settings
 assert 'VRRankDesktopLift{ "VR", "RankDesktopLift", false,' in settings
 for name,expected in (("RankDx11ProducerReference", "true"),
-                      ("RivalDx11NativeRoute","true"),
+                      ("RivalDx11NativeRoute","false"),
                       ("RankDesktopLift","false")):
     assert f"{name} = {expected}" in ini
 assert "if (!Settings::VRRivalDx11NativeRoute.get())" in hook
