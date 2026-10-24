@@ -471,6 +471,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_overdraw_probe_01034.cpp -o /tmp/dx11_pre_draw_01034 && /tmp/dx11_pre_draw_01034
           # 01039 genuine game camera typed RTV -> GPU SRV/Resolve eye postpass.
           python tools/test_dx11_typed_camera_postpass_01039.py
+          # 01040: typed camera preflight -> exact live RTV GPU postpass path.
+          python tools/test_dx11_typed_camera_preflight_01040.py
           # 01038 independently authored offscreen MRT game Draw -> GPU color source.
           python tools/test_dx11_game_offscreen_mrt_01038.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_mrt_probe_01038.cpp -o /tmp/dx11_offscreen_mrt_01038 && /tmp/dx11_offscreen_mrt_01038

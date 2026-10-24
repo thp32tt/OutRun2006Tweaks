@@ -2923,6 +2923,46 @@ bool NativeGameStereoSubmission::capture_eye(
     return true;
 }
 
+
+// Source camera TYPELESS formats cannot be queried for SHADER_SAMPLE as if
+// they were concrete RTV/SRV types. Before either eye queues GPU commands,
+// check all *legal* color interpretations for device support, but NEVER pick
+// one as the actual game color. The later Copy/Stretch encoder resolves the
+// exact observed RTV view (resource + mip + array eye) and rejects missing,
+// mixed, depth or incompatible provenance before any eye publication.
+[[nodiscard]] bool preflight_game_camera_shader_postpass(
+    ID3D11Device* device, const D3D11_TEXTURE2D_DESC& source,
+    DXGI_FORMAT eyeFormat) noexcept {
+    if (!device || source.Format == DXGI_FORMAT_UNKNOWN) return false;
+    UINT eyeSupport = 0u;
+    if (FAILED(device->CheckFormatSupport(eyeFormat, &eyeSupport)) ||
+        (eyeSupport & D3D11_FORMAT_SUPPORT_RENDER_TARGET) == 0u)
+        return false;
+    for (const auto typed : native_game_typed_camera_preflight_formats(
+             source.Format)) {
+        if (typed == DXGI_FORMAT_UNKNOWN ||
+            native_game_typed_camera_shader_format(source.Format, typed) != typed)
+            continue;
+        UINT formatSupport = 0u;
+        if (FAILED(device->CheckFormatSupport(typed, &formatSupport)))
+            continue;
+        const auto transfer = native_game_stretch_source_transfer(
+            source.MipLevels, source.SampleDesc.Count,
+            source.SampleDesc.Quality,
+            (source.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u,
+            (source.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u,
+            (formatSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
+            true,
+            (formatSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
+            (source.BindFlags == 0u ||
+             (source.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&
+             source.SampleDesc.Count == 1u);
+        if (transfer != NativeGameStretchSourceTransfer::Reject)
+            return true;
+    }
+    return false;
+}
+
 bool NativeGameStereoSubmission::render_game_eye_passes(
     NativeGameEyePass pass, void* user,
     std::uint32_t sourcePoseSequence,
@@ -3065,31 +3105,10 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                             return false;
                         if (desc.Format != ring_.format()) {
                             needsPostpassShader = true;
-                            // Unscaled D3D9 StretchRect permits format
-                            // conversion; the native encoder implements it
-                            // via the same point-sampled GPU shader as Stretch.
-                            UINT sourceSupport = 0u, eyeSupport = 0u;
-                            if (FAILED(producer->CheckFormatSupport(
-                                    desc.Format, &sourceSupport)) ||
-                                FAILED(producer->CheckFormatSupport(
-                                    ring_.format(), &eyeSupport)) ||
-                                native_game_stretch_source_transfer(
-                                    desc.MipLevels, desc.SampleDesc.Count,
-                                    desc.SampleDesc.Quality,
-                                    (desc.BindFlags &
-                                     D3D11_BIND_RENDER_TARGET) != 0u,
-                                    (desc.BindFlags &
-                                     D3D11_BIND_SHADER_RESOURCE) != 0u,
-                                    (sourceSupport &
-                                     D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
-                                    (eyeSupport &
-                                     D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
-                                    (sourceSupport &
-                                     D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
-                                    (desc.BindFlags == 0u ||
-                                     (desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&
-                                    desc.SampleDesc.Count == 1u) ==
-                                    NativeGameStretchSourceTransfer::Reject)
+                            // Both real camera view families and the output
+                            // format must pass BEFORE either eye is touched.
+                            if (!preflight_game_camera_shader_postpass(
+                                    producer.Get(), desc, ring_.format()))
                                 return false;
                         } else if (desc.SampleDesc.Count > 1u) {
                             UINT support = 0u;
@@ -3114,26 +3133,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         // D3D9 game RTs may be RTV-only. The native postpass
                         // copies mip zero to an SRV; replay admission must
                         // also permit supported CopyToSampled/ResolveToSampled.
-                        UINT sourceSupport = 0u, eyeSupport = 0u;
-                        if (FAILED(producer->CheckFormatSupport(
-                                desc.Format, &sourceSupport)) ||
-                            FAILED(producer->CheckFormatSupport(
-                                ring_.format(), &eyeSupport)) ||
-                            native_game_stretch_source_transfer(
-                                desc.MipLevels, desc.SampleDesc.Count,
-                                desc.SampleDesc.Quality,
-                                (desc.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u,
-                                (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u,
-                                (sourceSupport &
-                                 D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
-                                (eyeSupport &
-                                 D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
-                                (sourceSupport &
-                                 D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
-                                (desc.BindFlags == 0u ||
-                                 (desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&
-                                desc.SampleDesc.Count == 1u) ==
-                                NativeGameStretchSourceTransfer::Reject ||
+                        if (!preflight_game_camera_shader_postpass(
+                                producer.Get(), desc, ring_.format()) ||
                             !native_game_stretch_clipped_region(
                                 sourceMip.width, sourceMip.height,
                                 b.left, b.top, b.right, b.bottom,

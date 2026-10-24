@@ -1,5 +1,6 @@
 #pragma once
 #include <dxgiformat.h>
+#include <array>
 
 namespace outrun::vr::dx11 {
 // A real D3D9 camera can be backed by a DXGI TYPELESS allocation whose
@@ -102,4 +103,76 @@ static_assert(native_game_typed_camera_shader_format(
 static_assert(native_game_typed_camera_shader_format(
     DXGI_FORMAT_BC1_TYPELESS, DXGI_FORMAT_UNKNOWN) ==
     DXGI_FORMAT_UNKNOWN);
+
+    
+// A TYPELESS allocation can have multiple *legal* RTV interpretations.
+// Preflight runs before the real per-eye camera Draw/Clear has provided its
+// typed RTV provenance, so it may only validate whether a compatible typed
+// GPU sample path exists. The encoder later requires the EXACT observed RTV
+// format from that eye/mip; this list alone never authenticates camera color.
+[[nodiscard]] constexpr std::array<DXGI_FORMAT, 3u>
+native_game_typed_camera_preflight_formats(DXGI_FORMAT allocation) noexcept {
+    using F = DXGI_FORMAT;
+    switch (allocation) {
+    case F::DXGI_FORMAT_R8G8B8A8_TYPELESS:
+        return {F::DXGI_FORMAT_R8G8B8A8_UNORM,
+                F::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_B8G8R8A8_TYPELESS:
+        return {F::DXGI_FORMAT_B8G8R8A8_UNORM,
+                F::DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_B8G8R8X8_TYPELESS:
+        return {F::DXGI_FORMAT_B8G8R8X8_UNORM,
+                F::DXGI_FORMAT_B8G8R8X8_UNORM_SRGB, F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_R16G16B16A16_TYPELESS:
+        return {F::DXGI_FORMAT_R16G16B16A16_FLOAT,
+                F::DXGI_FORMAT_R16G16B16A16_UNORM,
+                F::DXGI_FORMAT_R16G16B16A16_SNORM};
+    case F::DXGI_FORMAT_R10G10B10A2_TYPELESS:
+        return {F::DXGI_FORMAT_R10G10B10A2_UNORM,
+                F::DXGI_FORMAT_UNKNOWN, F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_R16G16_TYPELESS:
+        return {F::DXGI_FORMAT_R16G16_FLOAT,
+                F::DXGI_FORMAT_R16G16_UNORM,
+                F::DXGI_FORMAT_R16G16_SNORM};
+    case F::DXGI_FORMAT_R32G32B32A32_TYPELESS:
+        return {F::DXGI_FORMAT_R32G32B32A32_FLOAT,
+                F::DXGI_FORMAT_UNKNOWN, F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_R8G8_TYPELESS:
+        return {F::DXGI_FORMAT_R8G8_UNORM, F::DXGI_FORMAT_R8G8_SNORM,
+                F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_R8_TYPELESS:
+        return {F::DXGI_FORMAT_R8_UNORM, F::DXGI_FORMAT_R8_SNORM,
+                F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_R16_TYPELESS:
+        return {F::DXGI_FORMAT_R16_FLOAT, F::DXGI_FORMAT_R16_UNORM,
+                F::DXGI_FORMAT_R16_SNORM};
+    case F::DXGI_FORMAT_R32_TYPELESS:
+        return {F::DXGI_FORMAT_R32_FLOAT,
+                F::DXGI_FORMAT_UNKNOWN, F::DXGI_FORMAT_UNKNOWN};
+    default:
+        // Typed camera textures retain their original interpretation.
+        // Unknown/depth/BC typeless families may not be guessed as color.
+        return native_game_typed_camera_shader_format(
+            allocation, F::DXGI_FORMAT_UNKNOWN) == F::DXGI_FORMAT_UNKNOWN
+            ? std::array<F, 3u>{F::DXGI_FORMAT_UNKNOWN,
+                                 F::DXGI_FORMAT_UNKNOWN, F::DXGI_FORMAT_UNKNOWN}
+            : std::array<F, 3u>{allocation, F::DXGI_FORMAT_UNKNOWN,
+                                 F::DXGI_FORMAT_UNKNOWN};
+    }
+}
+static_assert(native_game_typed_camera_preflight_formats(
+    DXGI_FORMAT_B8G8R8A8_TYPELESS)[1] ==
+    DXGI_FORMAT_B8G8R8A8_UNORM_SRGB);
+static_assert(native_game_typed_camera_preflight_formats(
+    DXGI_FORMAT_R16G16B16A16_TYPELESS)[2] ==
+    DXGI_FORMAT_R16G16B16A16_SNORM);
+static_assert(native_game_typed_camera_preflight_formats(
+    DXGI_FORMAT_R32_TYPELESS)[0] == DXGI_FORMAT_R32_FLOAT);
+static_assert(native_game_typed_camera_preflight_formats(
+    DXGI_FORMAT_R24G8_TYPELESS)[0] == DXGI_FORMAT_UNKNOWN);
+static_assert(native_game_typed_camera_preflight_formats(
+    DXGI_FORMAT_BC1_TYPELESS)[0] == DXGI_FORMAT_UNKNOWN);
+static_assert(native_game_typed_camera_preflight_formats(
+    DXGI_FORMAT_R8G8B8A8_UNORM)[0] == DXGI_FORMAT_R8G8B8A8_UNORM);
+
 } // namespace outrun::vr::dx11
