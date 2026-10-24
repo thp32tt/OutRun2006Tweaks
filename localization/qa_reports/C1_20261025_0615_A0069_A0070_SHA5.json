@@ -1,0 +1,297 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261025T0615KST-A0069-A0070-NEW-SHA5",
+  "scheduled_slot_kst": "2026-10-25T06:15:00+09:00",
+  "checked_at_kst": "2026-10-25T06:20:23+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory_correction": "Previous 05:45 IDLE report incorrectly assumed that 784 candidate file entries and 784 cumulative review-count represented full coverage. SHA-level audit found 13 hashes missing from locally indexed C1 report sets. Eight were already reviewed in the GitHub 05:15 report, leaving these five genuinely new unique SHA reviews (A-0069 ordinals 341/342/343 and A-0070 ordinals 347/348). The prior IDLE report is retained as historical evidence.",
+  "candidate_inventory": {
+    "N100_output_counts": {
+      "A": 365,
+      "B": 419,
+      "total": 784
+    },
+    "N100_exported_entries": 784,
+    "local_history_sha_set_size": 776,
+    "local_history_unreviewed": 13,
+    "excluded_already_reviewed_in_Github_0515": 8,
+    "this_run_unique_sha": 5,
+    "previous_0515_report": "localization/qa_reports/C1_20261025_0515_A0068_A0069_A0074_SHA8.json"
+  },
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 5,
+    "NEW_SHA_REVIEWED": 5
+  },
+  "records": [
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0069-B88C35F9",
+      "source_ordinal": 341,
+      "source_file": "Q054_0924909a06e8bf29_source.png",
+      "candidate_file": "Q054_0924909a06e8bf29_source_k.png",
+      "candidate_sha256": "32d094c56906bfc0365b9d31b02a24e004ec4a79d43f51ba51783142006d58a1",
+      "source_sha256": "0a532cefb327b48dd97f8379bb403af6f0614863f7e59fba39430025e2944af4",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Memorize the sequence!",
+        "korean": "순서를 기억하세요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1888,
+          833
+        ],
+        "original_roi_dimensions": [
+          1106,
+          488
+        ],
+        "alpha_bbox": [
+          33,
+          32,
+          1870,
+          769
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glyph_clipping": "NOT_OBSERVED",
+        "english_residue": "NOT_OBSERVED",
+        "unneeded_background_frame": "NOT_OBSERVED",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Standalone translated glyph image visually legible with no observed obvious clipping/background. Exact native UV/UI cell registration and neighboring protected art safety cannot be proven from standalone image."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0069-B88C35F9",
+      "source_ordinal": 342,
+      "source_file": "Q054_4aa8a8b5dbe45cc5_source.png",
+      "candidate_file": "Q054_4aa8a8b5dbe45cc5_source_k.png",
+      "candidate_sha256": "01c977239cf4d78eb44f812b18f626eddb8c1d0389a279b52f5e8a8508ed1d00",
+      "source_sha256": "0a532cefb327b48dd97f8379bb403af6f0614863f7e59fba39430025e2944af4",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Memorize the sequence!",
+        "korean": "순서를 기억하세요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1888,
+          833
+        ],
+        "original_roi_dimensions": [
+          1106,
+          488
+        ],
+        "alpha_bbox": [
+          113,
+          119,
+          1842,
+          712
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glyph_clipping": "NOT_OBSERVED",
+        "english_residue": "NOT_OBSERVED",
+        "unneeded_background_frame": "NOT_OBSERVED",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Standalone translated glyph image visually legible with no observed obvious clipping/background. Exact native UV/UI cell registration and neighboring protected art safety cannot be proven from standalone image."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0069-B88C35F9",
+      "source_ordinal": 343,
+      "source_file": "Q054_09426bbee8a42f69_source.png",
+      "candidate_file": "Q054_09426bbee8a42f69_source_k.png",
+      "candidate_sha256": "39c6e3733158beb73b89d425e80a8976d24383bca9af522e61aac681f0e07d4e",
+      "source_sha256": "1bf57569788f81b42cb5efec2f16c376743e685e1bc29cac51812fafcc8c0c8d",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Drive above the speed!",
+        "korean": "지정 속도 이상으로 달리세요!"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1831,
+          859
+        ],
+        "original_roi_dimensions": [
+          2840,
+          1333
+        ],
+        "alpha_bbox": [
+          66,
+          181,
+          1799,
+          776
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glyph_clipping": "NOT_OBSERVED",
+        "english_residue": "NOT_OBSERVED",
+        "unneeded_background_frame": "NOT_OBSERVED",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Standalone translated glyph image visually legible with no observed obvious clipping/background. Exact native UV/UI cell registration and neighboring protected art safety cannot be proven from standalone image."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0070-4F31A100",
+      "source_ordinal": 347,
+      "source_file": "Q057_906a0915d1da69f5_source.png",
+      "candidate_file": "Q057_906a0915d1da69f5_source_k.png",
+      "candidate_sha256": "855f812919df8488622ea9489ad72f226450b74a4307529eba3aa4e0b57e009e",
+      "source_sha256": "61828be22aeeb9e0c007367e5b92be50feb07438a41d89802a127017c529a283",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "START",
+        "korean": "시작"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1649,
+          954
+        ],
+        "original_roi_dimensions": [
+          1333,
+          771
+        ],
+        "alpha_bbox": [
+          113,
+          60,
+          1627,
+          918
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glyph_clipping": "NOT_OBSERVED",
+        "english_residue": "NOT_OBSERVED",
+        "unneeded_background_frame": "NOT_OBSERVED",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Standalone translated glyph image visually legible with no observed obvious clipping/background. Exact native UV/UI cell registration and neighboring protected art safety cannot be proven from standalone image."
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0070-4F31A100",
+      "source_ordinal": 348,
+      "source_file": "Q057_8b5a6b948ea8a357_source.png",
+      "candidate_file": "Q057_8b5a6b948ea8a357_source_k.png",
+      "candidate_sha256": "43cc7f2dd0e68508a2c0e18896a31b32d941cb03a68ee97c94370892a15c9566",
+      "source_sha256": "2299243574be092854adfe7265d2f3e3454a002b9e99fa022edc6ea8d4b625f4",
+      "candidate_export_sha_match": true,
+      "source_sha_checked_against_mapping_manifest": true,
+      "approved_mapping": {
+        "english": "Total Rank",
+        "korean": "종합 랭크"
+      },
+      "image": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2022,
+          778
+        ],
+        "original_roi_dimensions": [
+          1414,
+          544
+        ],
+        "alpha_bbox": [
+          79,
+          27,
+          1912,
+          759
+        ],
+        "alpha_canvas_border_nonzero_count": 0,
+        "alpha_canvas_border_max": 0
+      },
+      "qa": {
+        "approved_text_match": "PASS_VISUAL",
+        "glyph_legibility": "PASS_VISUAL",
+        "transparency": "PASS",
+        "apparent_glyph_clipping": "NOT_OBSERVED",
+        "english_residue": "NOT_OBSERVED",
+        "unneeded_background_frame": "NOT_OBSERVED",
+        "text_length_difference_ignored": true,
+        "native_UI_cell_and_protected_art": "UNVERIFIED",
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Standalone translated glyph image visually legible with no observed obvious clipping/background. Exact native UV/UI cell registration and neighboring protected art safety cannot be proven from standalone image."
+      }
+    }
+  ],
+  "evidence_on_N100": [
+    "work/C1_QA_20261025_0615_inspect.py",
+    "work/C1_QA_20261025_0615_A0069_A0070_metrics.json",
+    "work/C1_QA_20261025_0615_A0069_A0070_pairs.jpg"
+  ],
+  "restrictions": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_auto_deployed": false,
+    "C2_C3_or_game_pass_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_ssot": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md",
+    "previous_AI1_cumulative": 1661,
+    "this_run_change": 1,
+    "new_AI1_cumulative": 1662,
+    "unique_event": true
+  }
+}
