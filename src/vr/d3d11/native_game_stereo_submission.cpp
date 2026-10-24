@@ -1739,10 +1739,17 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // Genuine game camera color in a TYPELESS allocation can be GPU-copied
     // byte-for-byte into a typed ring RTV ONLY when the actually observed
     // physical camera RTV format matches the XR eye. Never guess from family.
+    const DXGI_FORMAT observedCameraView = offscreen_color_view_format(
+        source, sourceArraySlice, sourceMipSlice);
     const bool rawTypedCameraCopy = native_game_raw_camera_copy_format(
-        sourceDesc.Format, eyeDesc.Format,
-        offscreen_color_view_format(
-            source, sourceArraySlice, sourceMipSlice));
+        sourceDesc.Format, eyeDesc.Format, observedCameraView);
+    // The choice is made from the observed GAME RTV, not the preflight
+    // TYPELESS family. A valid different RTV needs shader color conversion;
+    // unknown/mixed/depth views never reach GPU Copy or shader submission.
+    const auto copyRoute = native_game_camera_copy_route(
+        sourceDesc.Format, eyeDesc.Format, observedCameraView);
+    if (copyRoute == NativeGameCameraCopyRoute::Reject)
+        return false;
     // D3D9 StretchRect also performs format conversion for unscaled
     // menu/vehicle postpasses. CopySubresourceRegion cannot do that. Replay
     // the caller's exact mip-zero source rectangle with a native point-sampled
@@ -1750,7 +1757,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // or falling back to a CPU/desktop copy. The existing stretch admission
     // rejects unsupported/foreign resources before GPU mutation. This path
     // must never count its fullscreen shader triangle as game Draw evidence.
-    if (sourceDesc.Format != eyeDesc.Format && !rawTypedCameraCopy) {
+    if (sourceDesc.Format != eyeDesc.Format && !rawTypedCameraCopy &&
+        copyRoute == NativeGameCameraCopyRoute::ShaderConvert) {
         const UINT width = box.right - box.left;
         const UINT height = box.bottom - box.top;
         const UINT maxLong = static_cast<UINT>(
@@ -3121,14 +3129,21 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                             native_game_raw_camera_copy_candidate(
                                 desc.Format, ring_.format());
                         if (desc.Format != ring_.format() &&
-                            !rawCameraCandidate) {
+                            (!rawCameraCandidate ||
+                             native_game_camera_copy_needs_shader_fallback(
+                                 desc.Format, ring_.format()))) {
+                            // Raw format-family preflight is not proof that
+                            // the real Draw selects the matching typed RTV.
+                            // Ensure a full GPU shader fallback before eye L
+                            // can mutate an acquired shared-eye ring slot.
                             needsPostpassShader = true;
-                            // Both real camera view families and the output
-                            // format must pass BEFORE either eye is touched.
                             if (!preflight_game_camera_shader_postpass(
                                     producer.Get(), desc, ring_.format()))
                                 return false;
-                        } else if (desc.SampleDesc.Count > 1u) {
+                        }
+                        if (desc.SampleDesc.Count > 1u &&
+                            (desc.Format == ring_.format() ||
+                             rawCameraCandidate)) {
                             UINT support = 0u;
                             if (FAILED(producer->CheckFormatSupport(
                                     rawCameraCandidate

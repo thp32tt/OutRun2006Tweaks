@@ -195,6 +195,60 @@ static_assert(native_game_typed_camera_preflight_formats(
      return observedView == eyeFormat &&
             native_game_raw_camera_copy_candidate(allocation, eyeFormat);
  }
+
+ // The source game chooses the physical TYPELESS RTV during replay, AFTER
+ // camera preflight. A candidate direct GPU Copy can therefore turn into a
+ // GPU shader conversion when that Draw uses another legal color RTV.
+ // Preflight both possible routes before either stereo eye queues a write.
+ [[nodiscard]] constexpr bool native_game_camera_copy_needs_shader_fallback(
+     DXGI_FORMAT allocation, DXGI_FORMAT eyeFormat) noexcept {
+     if (!native_game_raw_camera_copy_candidate(allocation, eyeFormat))
+         return false;
+     for (const auto typed :
+          native_game_typed_camera_preflight_formats(allocation))
+         if (typed != DXGI_FORMAT_UNKNOWN && typed != eyeFormat &&
+             native_game_typed_camera_shader_format(allocation, typed) == typed)
+             return true;
+     return false;
+ }
+
+ enum class NativeGameCameraCopyRoute {
+     Reject, DirectGpuCopy, ShaderConvert
+ };
+ // Actual Copy/Resolve needs this eye's game-written mip/array RTV, not a
+ // speculative preflight candidate. Nonmatching observed color views use
+ // the existing GPU shader Stretch conversion (never CPU readback).
+ [[nodiscard]] constexpr NativeGameCameraCopyRoute native_game_camera_copy_route(
+     DXGI_FORMAT allocation, DXGI_FORMAT eyeFormat,
+     DXGI_FORMAT observedView) noexcept {
+     if (allocation == DXGI_FORMAT_UNKNOWN || eyeFormat == DXGI_FORMAT_UNKNOWN)
+         return NativeGameCameraCopyRoute::Reject;
+     if (allocation == eyeFormat ||
+         native_game_raw_camera_copy_format(allocation, eyeFormat, observedView))
+         return NativeGameCameraCopyRoute::DirectGpuCopy;
+     return native_game_typed_camera_shader_format(allocation, observedView) !=
+                    DXGI_FORMAT_UNKNOWN
+         ? NativeGameCameraCopyRoute::ShaderConvert
+         : NativeGameCameraCopyRoute::Reject;
+ }
+ static_assert(native_game_camera_copy_needs_shader_fallback(
+     DXGI_FORMAT_R8G8B8A8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM));
+ static_assert(native_game_camera_copy_needs_shader_fallback(
+     DXGI_FORMAT_R16G16B16A16_TYPELESS, DXGI_FORMAT_R16G16B16A16_FLOAT));
+ static_assert(!native_game_camera_copy_needs_shader_fallback(
+     DXGI_FORMAT_R10G10B10A2_TYPELESS, DXGI_FORMAT_R10G10B10A2_UNORM));
+ static_assert(native_game_camera_copy_route(
+     DXGI_FORMAT_B8G8R8A8_TYPELESS, DXGI_FORMAT_B8G8R8A8_UNORM,
+     DXGI_FORMAT_B8G8R8A8_UNORM) == NativeGameCameraCopyRoute::DirectGpuCopy);
+ static_assert(native_game_camera_copy_route(
+     DXGI_FORMAT_B8G8R8A8_TYPELESS, DXGI_FORMAT_B8G8R8A8_UNORM,
+     DXGI_FORMAT_B8G8R8A8_UNORM_SRGB) == NativeGameCameraCopyRoute::ShaderConvert);
+ static_assert(native_game_camera_copy_route(
+     DXGI_FORMAT_R8G8B8A8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM,
+     DXGI_FORMAT_UNKNOWN) == NativeGameCameraCopyRoute::Reject);
+ static_assert(native_game_camera_copy_route(
+     DXGI_FORMAT_R24G8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM,
+     DXGI_FORMAT_D24_UNORM_S8_UINT) == NativeGameCameraCopyRoute::Reject);
  static_assert(native_game_raw_camera_copy_candidate(
      DXGI_FORMAT_R8G8B8A8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM));
  static_assert(native_game_raw_camera_copy_candidate(
