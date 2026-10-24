@@ -3604,6 +3604,45 @@ namespace OutRunVRStereo
                     out.data() + static_cast<std::size_t>(i) * stride);
             };
 
+            // M5 evidence only. A game-presented XYZRHW pixel must not be
+            // assumed to share the backbuffer/eye viewport coordinate space.
+            // Preserve all existing projection math until actual producer
+            // source extent is proven from captures on the same physical draw.
+            if (Settings::VRTelemetry && !state.worldEffect)
+            {
+                const auto command =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
+                    command.IsExactFiniteResultHud() &&
+                    (!command.queued ||
+                     (command.queueNode && command.queueEpoch != 0)))
+                {
+                    static std::atomic<std::uint64_t> resultPixelProbes{ 0 };
+                    const auto n = resultPixelProbes.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 16 || (n & (n - 1)) == 0)
+                    {
+                        UINT firstUsed = 0;
+                        while (usedMask && firstUsed < vertexCount &&
+                               !(*usedMask)[firstUsed])
+                            ++firstUsed;
+                        if (firstUsed < vertexCount)
+                        {
+                            const float* v = sourceVertex(firstUsed);
+                            spdlog::info(
+                                "VR R26 RESULT_XYZRHW_PIXEL_PROBE: stage=TRANSFORM_CANDIDATE producer={} queued={} node={} epoch={} eye={} firstUsed={} xy={},{} vertices={} backbuffer={}x{} viewport={},{},{},{} sourceExtent=UNPROVEN hits={}",
+                                OutRunVR::GameSemantic::Name(command.producer),
+                                command.queued, command.queueNode,
+                                command.queueEpoch, eye, firstUsed,
+                                v[0], v[1], vertexCount,
+                                BackBufferDesc.Width, BackBufferDesc.Height,
+                                state.viewport.X, state.viewport.Y,
+                                state.viewport.Width, state.viewport.Height, n);
+                        }
+                    }
+                }
+            }
+
             if (state.worldEffect && state.fullWorldReprojection &&
                 allowFullReprojection)
             {
