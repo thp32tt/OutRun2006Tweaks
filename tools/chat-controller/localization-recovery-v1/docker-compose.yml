@@ -20,13 +20,14 @@ services:
       OUTRUN_KR_V2_AUTO_GENERATE: "true"
       OUTRUN_KR_V2_AUTO_COMPOSE: "false"
       OUTRUN_KR_V2_AUTO_DEPLOY: "false"
-      # A/B generate from verified native ROI; C1 independent QA runs at :15/:45.
+      # A/B generate from verified native ROI; C1 handles GPT chat OCR fallback first, then QA.
       SCHEDULE_MINUTES: "0,10,15,20,30,40,45,50"
       CHAT_SLOTS: "3" # One Chrome/profile, three persistent tabs: A/B/C1
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "false"
       OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Verified native-crop source-bound ImageGen queue
+      OUTRUN_GPT_CHAT_OCR_ENABLED: "true" # Normal ChatGPT image-attachment OCR fallback; no API
       # DDS compose/game PASS/deploy remain disabled; only PNG generation + C1 QA is automatic.
       OUTRUN_AB_BATCH_SIZE: "5"
       OUTRUN_AB_LIBRARY_FOLDER: "아웃런 한글화 신규" # Existing project Library; no separate folder.
