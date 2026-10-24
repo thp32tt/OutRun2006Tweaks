@@ -1,0 +1,53 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261025T0145KST-BYTE-AUDIT",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "checked_at_kst": "2026-10-25T01:50:33.471874+09:00",
+  "status": "IDLE",
+  "policies_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "backend": "GitHub connector for policy and evidence commit; N100 MCP for SHA-bound local candidates only",
+  "source": "N100 A/B candidate_outputs, export_evidence, B_state.json, C1 SHA-history and preceding reports",
+  "candidate_outputs_count": {
+    "A": 334,
+    "B": 393,
+    "total": 727
+  },
+  "export_evidence_count": 149,
+  "reviewed_sha_history_count": 732,
+  "new_unique_sha_count": 0,
+  "new_unique_candidates": [],
+  "already_reviewed_in_20261025T0051KST": [
+    "563efc720f7b089991d93fa041223fba2bf373a8921a1ef09dbb2d3d18491606",
+    "0492b6018583024b65bfb4de038f25bc125dc708def8a43f9fd772732f039f17",
+    "d02fcc72eae14e5c53b5814b8726b987e946275d7800dc7860cef0fb30afb413",
+    "939f9eb0d5f56052402dcae77963abe7d9a3086247fa38bb2ab6937974433d2e"
+  ],
+  "previous_C1_report_N100": "work/C1_QA_20261025_0051_report.json",
+  "previous_C1_verdicts_not_reissued": {
+    "PASS": 0,
+    "FAIL": 1,
+    "HOLD": 3
+  },
+  "qa_this_run": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "evidence_N100": "work/C1_QA_20261025_0145_preflight.json",
+  "constraints": {
+    "same_sha_repeated_QA": false,
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "game_deployed": false,
+    "c2_c3_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score_change": 0
+}
