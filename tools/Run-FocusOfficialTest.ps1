@@ -63,7 +63,8 @@ try {
         '-FrameCadenceMode=1','-FrameCadenceTargetHz=0',
         '-DisableDesktopVsync=true','-SkyGlowFactor=1',
         '-PreferD3D9Ex=true','-DirectGpuOnly=false','-DisableDesktopDuplication=false',
-        '-ReflectionLateFrameThrottle=false','-DriverSeatView=false'
+        '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
+        '-RivalDx11NativeRoute=false'
     )
     @("sourceSha=$(Get-Content (Join-Path $root 'SOURCE_SHA.txt') -ErrorAction SilentlyContinue)",
       "variant=$variant","debug=$debugMode","arguments=$($argsList -join ' ')",
