@@ -1,4 +1,4 @@
-name: DX9Ex R26 Review A-B Test Build
+name: DX9Ex R26 All Reviews A-B Test Build
 
 permissions:
   contents: read
@@ -8,6 +8,7 @@ on:
     branches:
       - vr-d3d9ex-focus
       - test/dx9ex-reviewed-01454-01467-20261024
+      - test/dx9ex-reviewed-01454-01468-20261024
     paths:
       - '.github/workflows/vr-dx9ex-user-test-build.yml'
       - 'src/vr/game/reflection_frame_budget.hpp'
@@ -16,6 +17,9 @@ on:
       - 'src/vr/settings.cpp'
       - 'tools/test_vr_reflection_frame_budget.cpp'
       - 'tools/Run-DX9ExFocusTest.ps1'
+      - 'src/vr/d3d9/gpu_water_profiler.hpp'
+      - 'src/vr/d3d9/gpu_census_phase.hpp'
+      - 'tools/test_vr_gpu_census_phase.cpp'
   workflow_dispatch:
 
 jobs:
@@ -65,6 +69,17 @@ jobs:
           cmd /c $command
           if ($LASTEXITCODE -ne 0) { throw 'Reflection regression failed' }
 
+      - name: Run GPU census phase alias regression
+        shell: pwsh
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vs = (& $vswhere -latest -property installationPath)
+          if (-not $vs) { throw 'VS2022 missing' }
+          $dev = Join-Path $vs 'VC/Auxiliary/Build/vcvars64.bat'
+          $command = "`"$dev`" >nul && cl /nologo /std:c++17 /EHsc /W4 tools\\test_vr_gpu_census_phase.cpp /Fe:review_gpu_census_probe.exe && review_gpu_census_probe.exe"
+          cmd /c $command
+          if ($LASTEXITCODE -ne 0) { throw 'GPU census regression failed' }
+
       - name: Assemble independent A-B packages
         shell: pwsh
         run: |
@@ -73,7 +88,7 @@ jobs:
           if (-not $dll) { throw 'dinput8.dll missing' }
           $vrHostExe = Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
           if (-not $vrHostExe) { throw 'outrun-vr-host.exe missing' }
-          foreach ($variant in @('R26_REVIEW_CONTROL','R26_REVIEW_LATE_THROTTLE','R26_REVIEW_PARTICLE_VB','R26_REVIEW_COMBINED')) {
+          foreach ($variant in @('R26_REVIEW_CONTROL','R26_REVIEW_LATE_THROTTLE','R26_REVIEW_PARTICLE_VB','R26_REVIEW_COMBINED','R26_REVIEW_PROFILER_LEGACY','R26_REVIEW_PROFILER_V2','R26_REVIEW_ALL')) {
             $dir = "OutRun2_VR_${variant}_$short"
             New-Item -ItemType Directory -Force $dir | Out-Null
             Copy-Item $dll.FullName "$dir/dinput8.dll"
@@ -82,25 +97,38 @@ jobs:
             Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
             Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
             Copy-Item tools/Run-DX9ExFocusTest.ps1 "$dir/Run-DX9ExFocusTest.ps1"
+            Copy-Item docs/evidence/DX9EX_REVIEW_AB_20261024.md "$dir/DX9EX_REVIEW_MATRIX.md"
+            New-Item -ItemType Directory -Force "$dir/reviews" | Out-Null
+            foreach ($reviewNumber in 1454..1468) {
+              $reviewName = "CONVERSION-DX9EX-{0:D5}.md" -f $reviewNumber
+              $reviewSource = Join-Path 'docs/reviews/dx9ex/automation' $reviewName
+              if (-not (Test-Path $reviewSource)) { throw "Missing audit review $reviewName" }
+              Copy-Item $reviewSource (Join-Path "$dir/reviews" $reviewName)
+            }
             Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant" -Encoding ascii
             Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
             @(
-              'R26+HUD review 01454..01467, separate A/B source branch'
+              'R26+HUD review 01454..01468, isolated experimental A/B source branch'
               "Variant: $variant"
               'Identical game DLL and host; 01465 particle DynamicVB and 01466 late-reflection are opt-in independently'
-              'CONTROL: both off; LATE_THROTTLE: reflection only; PARTICLE_VB: existing WorldParticle ring only; COMBINED: both'
+              'CONTROL: optional experiments disabled; LATE_THROTTLE: reflection; PARTICLE_VB: WorldParticle ring; COMBINED: both'
+              'PROFILER_LEGACY: old GPU RT census; PROFILER_V2: dephased and canonical COM backbuffer identity; ALL: all three opt-ins'
+              'GPU profiler measures logical draw spans, NOT water material, physical stereo eye Draw, or XR latency'
               'Particle ring uploads two eye payloads with one lock but still executes two GPU Draws.'
-              'Other optical/HUD candidate patches are NOT applied; no Quest3 outcome claimed'
+              'All 15 review documents are included as audit evidence, NOT 15 forced game renderer fixes'
+              'Unproven HUD/flare/sky/glass/rank/presentation hypotheses kept fail-closed; no Quest3 validation claimed'
               'Renderer: R26+HUD; R84 not promoted; original game and source EXE not bundled'
               'RUNTIME_VALIDATION=UNTESTED'
               '1. Back up installed dinput8.dll and OutRun2006Tweaks.ini.'
               '2. Unpack EXACTLY ONE variant ZIP beside OR2006C2C.EXE, never mix variants.'
               '3. Start with RUN_DX9EX_TEST.cmd; do not run the host helper alone.'
-              '4. Test one matched beach/water scene plus +TIME/GOAL/result/rank/rival/menu/F11/flare.'
-              '5. Exit normally; upload the produced DX9EX_LOGS ZIP and frame-time observations.'
-              '6. Restore your backup before using the stable version.'
+              '4. Test same beach/water/cockpit section plus +TIME/GOAL/result/rank/rival/F11/flare.'
+              '5. Compare PROFILER_LEGACY and PROFILER_V2; collect VR GPU WATER 5s with censusMode.'
+              '6. Compare CONTROL vs ALL for opt-in performance and optical regressions.'
+              '7. Exit normally, upload DX9EX_LOGS ZIP and p95/p99 readings.'
+              '8. Restore the backup before returning to stable version.'
             ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
-            foreach ($required in @('dinput8.dll','outrun-vr-host.exe','RUN_DX9EX_TEST.cmd','Run-DX9ExFocusTest.ps1','DX9EX_VARIANT.txt','SOURCE_SHA.txt','START_HERE.txt')) {
+            foreach ($required in @('dinput8.dll','outrun-vr-host.exe','RUN_DX9EX_TEST.cmd','Run-DX9ExFocusTest.ps1','DX9EX_VARIANT.txt','SOURCE_SHA.txt','START_HERE.txt','DX9EX_REVIEW_MATRIX.md')) {
               if (-not (Test-Path (Join-Path $dir $required))) { throw "missing $required" }
             }
             Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
@@ -108,6 +136,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-REVIEW-AB-${{ github.sha }}
+          name: OutRun2-VR-R26-ALL-REVIEWS-01468-${{ github.sha }}
           path: OutRun2_VR_R26_REVIEW_*.zip
           if-no-files-found: error

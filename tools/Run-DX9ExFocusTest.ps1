@@ -54,13 +54,24 @@ $gameArgs = @(
     '-DirectGpuOnly=false',
     '-DisableDesktopDuplication=false'
 )
-# Both builds use the same review DLL; only the explicit 01466 switch differs.
-# Do not silently opt in while running a control or an older variant.
+# All seven packages share binaries; launch variant enables each opt-in independently.
+# GPU profiling stays disabled unless an explicit profiler variant is selected.
 $reviewThrottle = $variant -in @('R26_REVIEW_LATE_THROTTLE','R26_REVIEW_COMBINED')
 $reviewParticle = $variant -in @('R26_REVIEW_PARTICLE_VB','R26_REVIEW_COMBINED')
-$env:OUTRUN_VR_R30_PARTICLE_VB = if ($reviewParticle) { '1' } else { '0' }
+$env:OUTRUN_VR_R30_PARTICLE_VB = if ($reviewParticle -or $variant -eq 'R26_REVIEW_ALL') { '1' } else { '0' }
+if ($variant -eq 'R26_REVIEW_ALL') { $reviewThrottle = $true }
+$reviewProfiler = $variant -in @('R26_REVIEW_PROFILER_LEGACY','R26_REVIEW_PROFILER_V2','R26_REVIEW_ALL')
+$reviewCensusV2 = $variant -in @('R26_REVIEW_PROFILER_V2','R26_REVIEW_ALL')
+$env:OUTRUN_VR_GPU_PROFILE = if ($reviewProfiler) { '1' } else { '0' }
+$env:OUTRUN_VR_GPU_PROFILE_CENSUS_V2 = if ($reviewCensusV2) { '1' } else { '0' }
+$env:OUTRUN_VR_GPU_SCENE = $variant
 $gameArgs += ('-ReflectionLateFrameThrottle=' + $reviewThrottle.ToString().ToLowerInvariant())
-Set-Content (Join-Path $session 'RUN_ENV.txt') "OUTRUN_VR_R30_PARTICLE_VB=$env:OUTRUN_VR_R30_PARTICLE_VB" -Encoding UTF8
+@(
+    "OUTRUN_VR_R30_PARTICLE_VB=$env:OUTRUN_VR_R30_PARTICLE_VB",
+    "OUTRUN_VR_GPU_PROFILE=$env:OUTRUN_VR_GPU_PROFILE",
+    "OUTRUN_VR_GPU_PROFILE_CENSUS_V2=$env:OUTRUN_VR_GPU_PROFILE_CENSUS_V2",
+    "OUTRUN_VR_GPU_SCENE=$env:OUTRUN_VR_GPU_SCENE"
+) | Set-Content (Join-Path $session 'RUN_ENV.txt') -Encoding UTF8
 Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8
 Copy-Item $variantFile (Join-Path $session 'DX9EX_VARIANT.txt')
 Copy-Item (Join-Path $root 'OutRun2006Tweaks.ini') (Join-Path $session 'OutRun2006Tweaks.ini')
