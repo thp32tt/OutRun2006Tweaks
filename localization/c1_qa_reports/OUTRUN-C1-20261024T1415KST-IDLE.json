@@ -1,0 +1,45 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261024T1415KST-NEW-SHA",
+  "role": "C1",
+  "checked_at_kst": "2026-10-24T14:18:19.900097+09:00",
+  "source_branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE",
+  "reason": "No new export-evidenced candidate SHA after excluding 728 previously reviewed SHA values; no new A/B output without matching export evidence.",
+  "prior_reviewed_sha_count": 728,
+  "new_candidate_count": 0,
+  "verdict_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "stored_png_counts": {
+    "A": 334,
+    "B": 389
+  },
+  "producer_export_evidence_count": 148,
+  "unmatched_local_outputs": {
+    "A": [],
+    "B": []
+  },
+  "missing_local_outputs": {
+    "A": [],
+    "B": []
+  },
+  "hash_check_scope": "Export-declared candidate SHA matched against prior C1 reviewed SHA history; previously seen PNG bytes were not rehashed in this IDLE run.",
+  "evidence_n100": "work/C1_QA_20261024_1415_metrics.json",
+  "constraints": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds_written": false,
+    "game_deployed": false,
+    "c2_c3_pass_created": false,
+    "runtime_validation": "UNTESTED",
+    "VR_FFB_DX11_DXVK_touched": false
+  }
+}
