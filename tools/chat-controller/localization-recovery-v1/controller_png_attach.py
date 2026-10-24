@@ -444,3 +444,43 @@ def mark_sent(binding, root=ROOT, status="CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFI
     with target.open("x", encoding="utf-8") as handle:
         json.dump(payload, handle, ensure_ascii=False, indent=2)
     return str(target)
+
+async def send_analysis_message_with_attachment(page, binding):
+    """Attach one original HD PNG and send an analysis-only prompt.
+
+    Unlike A/B ImageGen production, this deliberately does NOT select the
+    Create image tool. It uses the normal ChatGPT composer with one image
+    attachment so the assistant can visually inspect the source.
+    """
+    status = await attach_png(page, binding)
+    if status != "ATTACHMENT_UPLOAD_COMPLETED":
+        return "SOURCE_REFERENCE_NOT_BOUND:" + status
+    task_id = binding.get("task_id", "")
+    message = binding.get("prompt", "")
+    if not isinstance(task_id, str) or not TASK.fullmatch(task_id):
+        return "ANALYSIS_TASK_ID_INVALID"
+    if not isinstance(message, str) or not message.strip() or len(message) > 26000:
+        return "ANALYSIS_PROMPT_INVALID"
+    message += "\n\nUPLOAD_TASK_ID=" + task_id + " (분석 추적용이며 JSON task_id에도 동일하게 답하세요)"
+    try:
+        box = page.locator('[role="textbox"][contenteditable="true"]').first
+        await box.wait_for(state="visible", timeout=12000)
+        # Keep the already-uploaded attachment in the rich composer.
+        await box.click(timeout=5000)
+        await box.press("End", timeout=3000)
+        await page.keyboard.insert_text(message)
+        actual = await box.evaluate("el => (el.innerText ?? el.textContent ?? '')")
+        if ("UPLOAD_TASK_ID=" + task_id) not in (actual or ""):
+            return "ANALYSIS_COMPOSER_TASK_ID_MISSING"
+        try:
+            await box.press("Enter", timeout=5000)
+        except Exception:
+            await page.keyboard.press("Enter")
+        await page.wait_for_timeout(1500)
+        proof = await verify_submission_receipt(
+            page, task_id, Path(binding["path"]).name)
+        if proof != "PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED":
+            return "SEND_UNVERIFIED"
+        return "sent"
+    except Exception:
+        return "ANALYSIS_SEND_FAILED"
