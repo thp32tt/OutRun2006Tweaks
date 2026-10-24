@@ -28,7 +28,7 @@ jobs:
           if ($head -ne $env:GITHUB_SHA) { throw 'Wrong exact GitHub HEAD' }
           $lines = Get-Content OutRun2006Tweaks.ini
           $duplicates = @($lines | Where-Object { $_ -match '^\s*DriverSeatCarSpaceBasis\s*=\s*false' })
-          if ($duplicates.Count -ne 2) { throw 'Unexpected official INI original duplicate count' }
+          if ($duplicates.Count -ne 1) { throw 'Invalid official INI: DriverSeatCarSpaceBasis must occur exactly once' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'HudScale = 0.55' -SimpleMatch -Quiet)) { throw 'HUD scale changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'CullingUnionMarginDegrees = 8.0' -SimpleMatch -Quiet)) { throw 'Culling setting changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'DriverSeatView = false' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source INI' }
