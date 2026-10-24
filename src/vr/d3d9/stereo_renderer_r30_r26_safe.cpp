@@ -3947,11 +3947,24 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // Optional per-stage result-HUD evidence. The renderer still returns
+        // its historical left-eye HRESULT; right-eye failures poison the frame.
+        // Do not interpret the return value as both eyes having succeeded.
+        struct R30StereoPassTrace
+        {
+            HRESULT leftHr = E_PENDING;
+            HRESULT rightTargetHr = E_PENDING;
+            HRESULT rightDepthHr = E_PENDING;
+            HRESULT rightViewportHr = E_PENDING;
+            HRESULT rightHr = E_PENDING;
+            bool restoreOk = false;
+        };
+
         template <typename LeftDraw, typename RightDraw>
         HRESULT R30ExecuteXyzrhwStereo(
             IDirect3DDevice9* device, const R30XyzrhwState& state,
             LeftDraw&& leftDraw, RightDraw&& rightDraw,
-            const char* site)
+            const char* site, R30StereoPassTrace* trace = nullptr)
         {
             if (!state.worldEffect)
                 R30CaptureSkyGlowSceneBeforeHud(device);
@@ -3962,6 +3975,8 @@ namespace OutRunVRStereo
                 R9NoteMainDepthContentWrite();
 
             const HRESULT leftHr = leftDraw();
+            if (trace)
+                trace->leftHr = leftHr;
             if (FAILED(leftHr))
             {
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
@@ -3980,11 +3995,21 @@ namespace OutRunVRStereo
                 InternalPassScope guard;
                 rightHr = SetRenderTargetHook.stdcall<HRESULT>(
                     device, 0u, RightEyeSurface);
+                if (trace)
+                    trace->rightTargetHr = rightHr;
                 if (SUCCEEDED(rightHr))
+                {
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
                         device, TrackedDepthStencil ? RightEyeDepth : nullptr);
+                    if (trace)
+                        trace->rightDepthHr = rightHr;
+                }
                 if (SUCCEEDED(rightHr))
+                {
                     rightHr = device->SetViewport(&state.viewport);
+                    if (trace)
+                        trace->rightViewportHr = rightHr;
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure =
@@ -3993,6 +4018,11 @@ namespace OutRunVRStereo
                 }
                 restoreOk = RestoreRightPassState(device,
                     savedRt, savedDepth, state.viewport, nullptr, false);
+            }
+            if (trace)
+            {
+                trace->rightHr = rightHr;
+                trace->restoreOk = restoreOk;
             }
 
             FrameHadDuplicatedDraw = true;
@@ -5309,7 +5339,16 @@ namespace OutRunVRStereo
             // fixed-function XYZ|DIFFUSE|TEX1 indexed quad:
             // DrawIndexedPrimitive(TRIANGLELIST), FVF 0x142, no vertex shader.
             // Do not widen this to arbitrary fixed-function content.
-            const bool exactResult = R30IsExactResultHudDraw();
+            // Snapshot source identity once at the physical R62 entry.
+            // Later D3DX/COM calls may reenter, so diagnostic recapture
+            // must not replace the original draw's producer/node/epoch.
+            const auto sourceCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool exactResult =
+                OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
+                sourceCommand.IsExactFiniteResultHud() &&
+                (!sourceCommand.queued ||
+                 (sourceCommand.queueNode && sourceCommand.queueEpoch != 0));
             // D3DX StateBlocks may leave a stale shader tracking hint.
             // A proven result batch uses the live getter below; a real VS
             // still rejects this fixed-function path.
@@ -5436,32 +5475,41 @@ namespace OutRunVRStereo
             }
 
             HRESULT eyeHr[2]{ E_PENDING, E_PENDING };
+            HRESULT projectionSetHr[2]{ E_PENDING, E_PENDING };
+            HRESULT drawHr[2]{ E_PENDING, E_PENDING };
+            bool drawAttempted[2]{ false, false };
             auto drawEye = [&](int eye) -> HRESULT {
                 InternalPassScope guard;
-                eyeHr[eye] = device->SetTransform(
+                projectionSetHr[eye] = device->SetTransform(
                     D3DTS_PROJECTION, &eyeProjection[eye]);
-                if (FAILED(eyeHr[eye]))
+                eyeHr[eye] = projectionSetHr[eye];
+                if (FAILED(projectionSetHr[eye]))
                     return E_FAIL;
-                eyeHr[eye] = DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                drawAttempted[eye] = true;
+                drawHr[eye] = DrawIndexedPrimitiveHook.stdcall<HRESULT>(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
+                eyeHr[eye] = drawHr[eye];
                 return eyeHr[eye];
             };
             auto leftDraw = [&]() { return drawEye(0); };
             auto rightDraw = [&]() { return drawEye(1); };
 
+            R30StereoPassTrace passTrace{};
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
                 projected
                     ? "R62/D3DXSprite-ProjectedXYZ"
-                    : "R62/D3DXSprite-ScreenHudXYZ");
+                    : "R62/D3DXSprite-ScreenHudXYZ",
+                exactResult && Settings::VRTelemetry ? &passTrace : nullptr);
 
-            bool restored = false;
+            HRESULT projectionRestoreHr = E_PENDING;
             {
                 InternalPassScope guard;
-                restored = SUCCEEDED(device->SetTransform(
-                    D3DTS_PROJECTION, &originalProjection));
+                projectionRestoreHr = device->SetTransform(
+                    D3DTS_PROJECTION, &originalProjection);
             }
+            const bool restored = SUCCEEDED(projectionRestoreHr);
             if (!restored)
             {
                 NoteRestoreFailure(
@@ -5492,18 +5540,46 @@ namespace OutRunVRStereo
                     std::memory_order_relaxed) + 1;
                 if (n <= 16 || (n & (n - 1)) == 0)
                 {
-                    const auto command =
+                    // Source identity is the pre-draw snapshot. A recapture
+                    // here is a comparison only, not a new ownership proof.
+                    const auto afterCommand =
                         OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                    const bool identityStable =
+                        sourceCommand.producer == afterCommand.producer &&
+                        sourceCommand.queued == afterCommand.queued &&
+                        sourceCommand.queueNode == afterCommand.queueNode &&
+                        sourceCommand.queueEpoch == afterCommand.queueEpoch;
                     spdlog::info(
                         "VR R26 RESULT_HUD_EYES: route=FiniteHud api=DIP producer={} queued={} node={} epoch={} pose={} viewport={},{},{},{} fvf=0x{:X} VS=0 left=0x{:08X} right=0x{:08X} projectionRestored={} frameIncomplete={} hits={}",
-                        OutRunVR::GameSemantic::Name(command.producer),
-                        command.queued, command.queueNode, command.queueEpoch,
-                        state.stereo.poseSequence, state.viewport.X,
-                        state.viewport.Y, state.viewport.Width,
-                        state.viewport.Height, static_cast<unsigned>(fvf),
+                        OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        sourceCommand.queued, sourceCommand.queueNode,
+                        sourceCommand.queueEpoch, state.stereo.poseSequence,
+                        state.viewport.X, state.viewport.Y,
+                        state.viewport.Width, state.viewport.Height,
+                        static_cast<unsigned>(fvf),
                         static_cast<unsigned>(eyeHr[0]),
                         static_cast<unsigned>(eyeHr[1]), restored,
                         FrameStereoIncomplete, n);
+                    // Backbuffer/viewport values are evidence, not proof of
+                    // the producer's original sprite/source pixel extent.
+                    spdlog::info(
+                        "VR R26 RESULT_HUD_STAGE_HR: producer={} queued={} node={} epoch={} pose={} backbuffer={}x{} viewport={},{},{},{} projectionL=0x{:08X} drawAttemptL={} drawL=0x{:08X} projectionR=0x{:08X} drawAttemptR={} drawR=0x{:08X} rightTarget=0x{:08X} rightDepth=0x{:08X} rightViewport=0x{:08X} restoreRight={} projectionRestore=0x{:08X} identityStable={} frameIncomplete={}",
+                        OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        sourceCommand.queued, sourceCommand.queueNode,
+                        sourceCommand.queueEpoch, state.stereo.poseSequence,
+                        BackBufferDesc.Width, BackBufferDesc.Height,
+                        state.viewport.X, state.viewport.Y,
+                        state.viewport.Width, state.viewport.Height,
+                        static_cast<unsigned>(projectionSetHr[0]),
+                        drawAttempted[0], static_cast<unsigned>(drawHr[0]),
+                        static_cast<unsigned>(projectionSetHr[1]),
+                        drawAttempted[1], static_cast<unsigned>(drawHr[1]),
+                        static_cast<unsigned>(passTrace.rightTargetHr),
+                        static_cast<unsigned>(passTrace.rightDepthHr),
+                        static_cast<unsigned>(passTrace.rightViewportHr),
+                        passTrace.restoreOk,
+                        static_cast<unsigned>(projectionRestoreHr),
+                        identityStable, FrameStereoIncomplete);
                 }
             }
             return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;
