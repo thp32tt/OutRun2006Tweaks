@@ -38,7 +38,8 @@ jobs:
           foreach ($test in @('tools/verify_vr_driver_seat_basis_stability.py',
                                'tools/verify_vr_r26_result_hud_pose.py',
                                'tools/verify_vr_rank_dx11_reference.py',
-                               'tools/verify_vr_goal_final_seat_off_20261025.py')) {
+                               'tools/verify_vr_goal_final_seat_off_20261025.py',
+                               'tools/verify_vr_producer_provenance.py')) {
             python $test
             if ($LASTEXITCODE -ne 0) { throw "R26 critical source test failed: $test" }
           }
