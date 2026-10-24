@@ -840,8 +840,8 @@ def verify_stage_extension_direct_draw_owner(source, semantics):
             '+TIME direct semantic lifetime must be stack-style, not sticky')
     require('ScopedExactProducerSemantic>', source,
             '+TIME source must reuse queue-safe direct producer owner')
-    require_order(begin, '+TIME exact parent must scope direct glyphs in VR',
-                  'if (Settings::VREnabled &&',
+    require_order(begin, 'GOAL post-table exact parent must scope direct glyphs in VR',
+                  'Settings::VREnabled && goalSummary',
                   'GameSemantic::SpriteQueueDepth == 0',
                   'StageExtensionDirectDrawOwner.emplace(',
                   'RenderScope::ScreenHud,',
