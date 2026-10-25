@@ -37,7 +37,8 @@ int main() {
     assert(budget.operations==29u);
     // Driver failed GPU crop: full-source readback MUST be denied before
     // attempting GetRenderTargetData; original D3D9 result is untouched.
-    const auto stable=budget.bytes, operations=budget.operations;
+    const auto stable=budget.bytes;
+    const auto operations=budget.operations;
     assert(!budget.admits_bytes(fullCost));
     budget.note_success_bytes(fullCost);
     assert(budget.bytes==stable && budget.operations==operations);
