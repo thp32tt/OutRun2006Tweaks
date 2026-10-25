@@ -42,6 +42,7 @@
 #include "live_game_draw_mirror_cache.hpp"
 #include "live_game_float_vector_texture.hpp"
 #include "live_game_signed_normal_texture.hpp"
+#include "live_game_block_compressed_texture.hpp"
 #include "live_game_dynamic_texture.hpp"
 #include "live_game_10bit_texture.hpp"
 #include "live_game_extended_luminance_texture.hpp"
@@ -4355,9 +4356,20 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // A game-created mipmapped render target needs one D3D9 GPU readback per
     // sampled mip. Each source level is independently validated and captured
     // before creating the immutable DX11 SRV; failure stays on DX9Ex.
+    // Mirror genuine legacy compressed game materials in the native shader
+    // sampler path. Original premultiplied alpha and two-channel normals
+    // remain exact BC blocks; unverified sRGB modes stay on DX9Ex.
+    const auto blockLayout = block_texture::from_d3d9_format(
+        static_cast<std::uint32_t>(base.Format));
+    const bool legacyBlock = blockLayout != block_texture::Layout::unsupported;
+    if (legacyBlock && !block_texture::sampleable(blockLayout, capture.srgbTexture))
+        return false;
     const bool compressed = base.Format == D3DFMT_DXT1 ||
                             base.Format == D3DFMT_DXT3 ||
-                            base.Format == D3DFMT_DXT5;
+                            base.Format == D3DFMT_DXT5 || legacyBlock;
+    const UINT compressedBlockBytes = legacyBlock ?
+        block_texture::bytes_per_block(blockLayout) :
+        (base.Format == D3DFMT_DXT1 ? 8u : 16u);
     const bool packed16 = base.Format == D3DFMT_R5G6B5 ||
                           base.Format == D3DFMT_A1R5G5B5 ||
                           base.Format == D3DFMT_A4R4G4B4 ||
@@ -4454,7 +4466,14 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (capture.srgbTexture ? DXGI_FORMAT_BC1_UNORM_SRGB : DXGI_FORMAT_BC1_UNORM) :
             base.Format == D3DFMT_DXT3 ?
             (capture.srgbTexture ? DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM) :
-            (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM);
+            base.Format == D3DFMT_DXT5 ?
+            (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM) :
+            blockLayout == block_texture::Layout::premul_bc2 ? DXGI_FORMAT_BC2_UNORM :
+            blockLayout == block_texture::Layout::premul_bc3 ? DXGI_FORMAT_BC3_UNORM :
+            blockLayout == block_texture::Layout::bc4 ? DXGI_FORMAT_BC4_UNORM :
+            blockLayout == block_texture::Layout::bc5 ? DXGI_FORMAT_BC5_UNORM :
+            DXGI_FORMAT_UNKNOWN;
+        if (nativeFormat == DXGI_FORMAT_UNKNOWN) return false;
     } else if (base.Format == D3DFMT_A8R8G8B8 ||
                base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit || extendedLuma) {
         nativeFormat = capture.srgbTexture ?
@@ -4512,8 +4531,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         (nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ||
          nativeFormat == DXGI_FORMAT_R16G16B16A16_UNORM ||
          nativeFormat == DXGI_FORMAT_R32G32_FLOAT) ? 8u : 4u;
-    const UINT atlasBlockBytes = compressed ?
-        (base.Format == D3DFMT_DXT1 ? 8u : 16u) : 0u;
+    const UINT atlasBlockBytes = compressed ? compressedBlockBytes : 0u;
     if (!native_game_texture_upload_bytes(
             base.Width, base.Height, levels,
             compressed ? 0u : atlasTexelBytes, atlasBlockBytes))
@@ -4612,8 +4630,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         const UINT rows = compressed ? (std::max)(1u, (desc.Height + 3u) / 4u) : desc.Height;
         const UINT rowBytes = compressed ?
             (std::max)(1u, (desc.Width + 3u) / 4u) *
-                (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
-            desc.Width * sourceTexelBytes;
+                compressedBlockBytes : desc.Width * sourceTexelBytes;
         const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma || rgb332 || p8 ?
             desc.Width * 4u : rowBytes;
         // Preserve existing format pitch contracts and only widen A8P8
@@ -4652,6 +4669,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     if (!native_rt_readback::unpack_row(
                             source, destination, desc.Width, rtLayout)) {
                         readbackSurface->UnlockRect();
+                        return false;
+                    }
+                } else if (legacyBlock) {
+                    // Preserve the original 4x4 BC block payload with only
+                    // active bytes copied from the padded D3D9 LockRect row.
+                    if (!block_texture::copy_row(source, destination, desc.Width, blockLayout)) {
+                        capture.texture->UnlockRect(level);
                         return false;
                     }
                 } else if (packed16)
