@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""01056 prove source tile budget precedes native copy, fallback pays full."""
+"""01056/01058 prove original GPU tile, late staging retry and full-source budget."""
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 source=(root/'src/vr/d3d11/live_game_frame_bridge.cpp').read_text()
@@ -11,9 +11,13 @@ def linked(s):
         'const bool tileCandidate = !preDrawCopy',
         'if (!s.surfaceReplayBudget.admits_bytes(plannedReadbackBytes))',
         's.surfaceReplayTile.capture(',
-        'if (!tileSucceeded) {',
+        'auto prepareFullReadback = [&]() noexcept -> bool {',
         'if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))',
         'game->GetRenderTargetData(',
+        'if (!tileSucceeded && !prepareFullReadback()) return false;',
+        'if (!captureSourcePixels()) {',
+        'if (!tileSucceeded || !prepareFullReadback()) return false;',
+        'tileSucceeded=false;',
         'context->CopySubresourceRegion(',
         's.surfaceReplayBudget.note_success_bytes(')
     return all(s.find(x)>=0 for x in guards) and all(
@@ -26,6 +30,9 @@ for token in (
     'if (!s.surfaceReplayBudget.admits_bytes(plannedReadbackBytes))',
     'if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))',
     's.surfaceReplayTile.capture(',
+    'if (!tileSucceeded && !prepareFullReadback()) return false;',
+    'if (!tileSucceeded || !prepareFullReadback()) return false;',
+    'tileSucceeded=false;',
     'tileSucceeded ? plannedReadbackBytes :',
     's.surfaceReplayBudget.note_success_bytes('):
     assert not linked(body.replace(token,'/* destructive mutation */',1)),token
