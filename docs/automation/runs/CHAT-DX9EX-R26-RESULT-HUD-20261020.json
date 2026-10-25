@@ -65,5 +65,54 @@
     "Recenter, ESC resume, sky and vehicle ranks retain baseline behavior; compare same game source resolution and XR extent.",
     "Correlate matching build/session logs RESULT_HUD_EYES/REJECT. If rejects or headlock persist, perform source-specific Native/FiniteHud/ZeroDisparity optical probe before widening routes."
   ],
-  "next_action": "Run final exact-SHA DX9Ex Active Win32 game/x64 host/package plus Domain/Full Source/Inspector; then matching Quest3 build. Do not mark either visible feature complete before headset evidence."
+  "next_action": "Run final exact-SHA DX9Ex Active Win32 game/x64 host/package plus Domain/Full Source/Inspector; then matching Quest3 build. Do not mark either visible feature complete before headset evidence.",
+  "continuation_20261025": {
+    "attempt": 2,
+    "task_id": "CHAT-DX9EX-R26-RESULT-HUD-20261020",
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "source_mode": "CHAT_DIRECT",
+    "requested_scope": "Only +TIME double-image/head-follow. Lens flare belongs to another account and is excluded.",
+    "base_head": "990158b51293b294033c2466558d637df74936d0",
+    "target_branch": "vr-d3d9ex-focus",
+    "candidate_branch": "vr-d3d9ex-candidate/plus-time-20261025",
+    "status": "C3_CANONICAL_CI_BLOCKED_BY_EXISTING_LENS_GATES",
+    "runtime_validation": "UNTESTED",
+    "confirmed_source_defect": "R26 fixed-function FVF142 finite HUD accepted indexed DIP only. Exact stage DP/DPUP/DIPUP could not enter the existing finite-plane transaction despite proven stage ownership; XYZRHW rejects XYZ and shader path rejects null VS.",
+    "causal_limit": "The actual failing +TIME FVF/API has not been captured on this candidate. Closing the deterministic coverage gap is not headset optical proof.",
+    "changes": [
+      "Extract unchanged R62 projection/restore transaction and keep indexed owner unchanged.",
+      "Add DP/DPUP/DIPUP admission only for exact ScreenHud/StageExtensionTime with live queue node/epoch when queued; retain live-null VS, FVF142, TRIANGLELIST, main target, stereo safety and pose gates.",
+      "Keep original draw arguments and native UP post-state; no original timer/source hooks, eye-pose math, source resolution or lens changes.",
+      "Actual C++ core/dispatch harness: four APIs, direct/queued, argument identity, stale VS cache, foreign producers, live VS/FVF, pose, left/right failure and projection restore failure.",
+      "Repair pre-existing verifier whitespace/forward-declaration/F11 scale oracle drift without changing F11 runtime source."
+    ],
+    "validation": {
+      "before": "Actual-source harness compiled on base then failed stereoTransactions==1 at DP.",
+      "after": "Actual-source harness PASS; R26 result pose PASS; stage batch ownership 49 destructive mutations PASS; canonical HUD 71 calls plus mutation checks PASS; stage eye-plane portable C++ PASS; full source static inventory PASS.",
+      "known_gate_blocker": "verify_vr_visual_composition_p0.py reaches pre-existing centre-only independent actual draw: missing centreScope, nullptr, true. Current lens source diverged from the old lens verifier; lens behavior and gate are not weakened in this task.",
+      "first_candidate_ci": {
+        "sha": "72f35644638f9aa477086bf632325e12243d4ea7",
+        "active_run": 40116583093,
+        "active": "FAIL: verify_dx9ex_gpu_visual_20261014.py requires old LensCentreOwnerDepth predicate",
+        "inspector_run": 40116583125,
+        "inspector_static": "FAIL: old centreScope lens assertion",
+        "fullsource_run": 40116583087,
+        "source_cross_domain": "PASS including actual +TIME C++ harness",
+        "windows_compile": "RUNNING at checkpoint"
+      }
+    },
+    "protected": [
+      "Lens centre/outer/SkyGlow source and policy",
+      "GOAL/result and rank existing indexed entry",
+      "F11 runtime",
+      "VR input/FFB",
+      "native time/animation, D3DX batch boundaries",
+      "head/eye pose and HUD sizing"
+    ],
+    "result_sha": "Resolve from containing material commit; final exact SHA/run evidence is appended to issue #14 and PR.",
+    "next_action": "Read combined-candidate exact-SHA Windows FullSource game/host and Inspector build results. Keep PR #151 draft: required Active and Inspector static lens gates fail independently of +TIME. Resume same task after lens owner reconciles its gates; then matching Quest3 +TIME acceptance. No score.",
+    "parallel_base_sha": "6c7b73a9d163b3d336cd40845c3516627807a795",
+    "parallel_work": "Merged the other account lens commit without altering its hunks; +TIME CPU regression remains PASS on combined tree."
+  }
 }

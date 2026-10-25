@@ -21,6 +21,13 @@ def function_body(source, marker):
     if start < 0:
         raise SystemExit(f'P0 visual composition drift: missing function {marker!r}')
     brace = source.find('{', start)
+    # A forward declaration is not the body of the next unrelated function.
+    # R30ConfigureXyzrhwWorldEffect has both a prototype and a definition.
+    while brace >= 0 and 0 <= source.find(';', start, brace):
+        start = source.find(marker, start + len(marker))
+        if start < 0:
+            raise SystemExit(f'P0 visual composition drift: missing definition {marker!r}')
+        brace = source.find('{', start)
     if brace < 0:
         raise SystemExit(f'P0 visual composition drift: missing body for {marker!r}')
     depth = 0
@@ -451,7 +458,7 @@ def verify_pre_restart_hud_routes(source):
     for function_name, route in (
         ('R30ScreenSpaceKind R30ClassifyScreenSpacePass(', '0u'),
         ('bool R30ConfigureXyzrhwWorldEffect(', '1u'),
-        ('HRESULT R62TryFixedFunctionSpriteIndexed(', '2u'),
+        ('HRESULT R62TryFixedFunctionSpriteStereo(', '2u'),
     ):
         # R30ConfigureXyzrhwWorldEffect is forward-declared before
         # R30PrepareXyzrhwState; the first `{...` after that prototype
@@ -1160,7 +1167,7 @@ for label, bad in (
 # not an equivalent renderer. Pin the historical function and dispatch.
 def check_r62_hmd_fixed_function_owner(source):
     owner = function_body(source,
-                          'HRESULT R62TryFixedFunctionSpriteIndexed(')
+                          'HRESULT R62TryFixedFunctionSpriteStereo(')
     for marker in (
         'type != D3DPT_TRIANGLELIST',
         'CorroboratesProjectedWorldMarker(',
@@ -1265,14 +1272,15 @@ for label, old, changed in (
         raise SystemExit('P0 XMT overflow guard mutation survived: ' + label)
 
 # P0 F11 fork integration: upstream Dear ImGui DX9 is XYZ+orthographic and
-# cannot enter R30's XYZRHW/VS owners. The old finite head-relative HUD plane
-# doubled F11 on Quest3. Check FOV-only eye affine + scissor and full restore,
-# preserving fallback for ordinary game/menu 3D.
+# cannot enter R30's XYZRHW/VS owners. The 2026-10-22 implementation uses
+# an external-only finite plane with the FOV affine retained as fail-safe.
+# Check both routes and scissor/restore without changing runtime policy.
 def check_f11_xyz_owner(source):
     prepare = function_body(source, 'bool R30PrepareExternalImGuiProjection(')
     draw = function_body(source, 'HRESULT R30TryExternalImGuiIndexed(')
     indexed = function_body(source, 'HRESULT __stdcall DrawIndexedPrimitiveDestR30(')
-    world = function_body(source, 'bool R30ConfigureXyzrhwWorldEffect(')
+    world_marker = 'bool R30ConfigureXyzrhwWorldEffect('
+    world = function_body(source[source.rfind(world_marker):], world_marker)
     execute = function_body(source, 'HRESULT R30ExecuteXyzrhwStereo(')
     for token in (
         'ExternalOverlaySemanticDepth == 0',
@@ -1292,7 +1300,8 @@ def check_f11_xyz_owner(source):
         'eyeScissors[eye]',
         'FrameHadWorldStereo',
     ):
-        require(token, prepare, 'F11 explicitly scoped XYZ/orthographic FOV screen overlay')
+        require(token, re.sub(r'\s+', ' ', prepare),
+                'F11 explicitly scoped XYZ/orthographic FOV screen overlay')
     if 'GetLatchedHeadInverse(' in prepare or 'R30BuildHudPlaneCoefficients(state, false)' in prepare:
         raise SystemExit('P0 F11 regression: head pose / finite gameplay plane reintroduced')
     for token in (
@@ -1313,8 +1322,21 @@ def check_f11_xyz_owner(source):
             'F11 owner must be reached from actual indexed draw')
     require('if (externalImGui != E_NOTIMPL)', indexed,
             'F11 owner result must bypass stock R26')
-    require('R30BuildHudPlaneCoefficients(state, true)', world,
-            'regular game sprites must retain the configured HudScale')
+    for token in (
+        'const bool externalF11 =',
+        'ExternalOverlaySemanticDepth != 0 &&',
+        'semanticOverlay2D;',
+        'R30BuildHudPlaneCoefficients(state, !externalF11)',
+    ):
+        require(token, world, 'external F11 scale must stay separate from game HUD')
+    for token in (
+        'const bool finiteWorldLock =',
+        'state.hudWorldLockValid;',
+        'if (!finiteWorldLock)',
+        'R30HudPlaneViewZ(false)',
+        'MultiplyMatrix(stockProjection, clipMap)',
+    ):
+        require(token, prepare, 'F11 finite plane and affine fallback both retained')
     require('R30XyzrhwLooksLikeHudPlane(', world,
             'untagged flat RHW=1 world evidence must be checked')
     require('state.worldEvidenceAuthoritative', world,
@@ -1346,7 +1368,7 @@ for label, needle in (
     ('XYZ vertex gate', 'D3DFVF_XYZ'),
     ('per-eye scissor', 'device->SetScissorRect(&eyeScissors[eye])'),
     ('F11 eye affine', 'OutRunVRF11Screen2D::Build(bounds, f11Affine)'),
-    ('game sprite scale isolation', 'R30BuildHudPlaneCoefficients(state, true)'),
+    ('game sprite scale isolation', 'R30BuildHudPlaneCoefficients(state, !externalF11)'),
     ('host world authority', 'if (state.worldEvidenceAuthoritative)'),
     ('global shadow budget', 'R30TotalShadowBudgetBytes'),
 ):
