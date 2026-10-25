@@ -49,11 +49,11 @@ def check(hook: str, font: str, header: str) -> None:
     # optical-size cap. Test the ORIGINAL font-source guard separately:
     # a broad OR mutation must not survive only because the later cap
     # contains the same predicate text.
-    assert "if (f11VisibleThisFrame && vrGameplay &&" in density_guard
+    assert "if (f11VisibleThisFrame && vrUiPresentation &&" in density_guard
     assert "vrFontMultiplier = std::clamp(vrFontMultiplier, 1.0f, 1.25f);" in density_guard
     for target, needles in (
         (density_guard, (
-            "f11VisibleThisFrame && vrGameplay",
+            "f11VisibleThisFrame && vrUiPresentation",
             "R23TryGetPublishedEyeExtentPair(extent)",
             "R23TryGetPublishedEyeExtentPair(extent)",
             "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
@@ -91,7 +91,7 @@ def check(hook: str, font: str, header: str) -> None:
             "ImGui::SetWindowFontScale(externalVrShell ? responsiveFit.fontScale : 1.0f);",
             "shellStyle.GrabMinSize * styleDensity",
             "shellStyle.WindowPadding.x * styleDensity",
-            "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+            "const bool externalVrShell = Settings::VREnabled &&\n\t\t(Game::is_vr_gameplay_presentation() || !Game::is_in_game());",
             "const ImGuiCond initialPlacement = externalVrShell",
             "previousVrShell != externalVrShell ||",
             "previousVrShell = externalVrShell;",
@@ -250,7 +250,7 @@ def check_shell_vr_mode_transitions(font: str) -> None:
     shell = font.split("void Overlay::render_shell()", 1)[1].split(
         "void Overlay::init()", 1)[0]
     exact = (
-        "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+        "const bool externalVrShell = Settings::VREnabled &&\n\t\t(Game::is_vr_gameplay_presentation() || !Game::is_in_game());",
         "const ImGuiCond initialPlacement = externalVrShell",
         "previousVrShell != externalVrShell ||",
         "previousVrShell = externalVrShell;",
@@ -436,9 +436,9 @@ def check_transient_eye_extent_dropout(hook: str) -> None:
               "\\t\\t\\t\\t\\tOverlay::VrFontMultiplier, 1.0f, 3.0f);")
     # Exact owning control flow: retention only inside active VR gameplay and
     # before either eye lookup, not a permanent desktop fallback.
-    assert "f11VisibleThisFrame && vrGameplay" in density
+    assert "f11VisibleThisFrame && vrUiPresentation" in density
     assert retain.replace("\\n", "\n").replace("\\t", "\t") in density
-    assert (density.index("f11VisibleThisFrame && vrGameplay") <
+    assert (density.index("f11VisibleThisFrame && vrUiPresentation") <
             density.index(retain.replace("\\n", "\n").replace("\\t", "\t")) <
             density.index("R23TryGetPublishedEyeExtentPair(extent)"))
     assert "float vrFontMultiplier = 1.0f;" in hook
@@ -745,7 +745,7 @@ def check_external_vr_f11_canvas(font: str) -> None:
     shell = font.split("Overlay::ContentRect Overlay::content_rect()", 1)[1].split(
         "const std::vector<OverlayWindow*>& Overlay::windows()", 1)[0]
     required = (
-        "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+        "const bool externalVrShell = Settings::VREnabled &&\n\t\t(Game::is_vr_gameplay_presentation() || !Game::is_in_game());",
         "Game::is_vr_gameplay_presentation();",
         "if (externalVrShell)\n\t\treturn { 0.f, 0.f, screen.x, screen.y };",
         "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0",
@@ -792,7 +792,7 @@ def check_external_vr_f11_canvas(font: str) -> None:
 
     # Mutants must fail at the actual owner (not detached numeric fixtures).
     for original, bad in (
-        ("const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+        ("const bool externalVrShell = Settings::VREnabled &&\n\t\t(Game::is_vr_gameplay_presentation() || !Game::is_in_game());",
          "const bool externalVrShell = VrFontMultiplier > 1.0f && Game::is_vr_gameplay_presentation();"),
         ("Game::is_vr_gameplay_presentation();", "Game::is_in_game();"),
         ("if (externalVrShell)", "if (false)"),
@@ -1013,7 +1013,7 @@ def check_source_reset_atlas_hold(hook: str) -> None:
     """Same-frame F11 open retains XR atlas during temporary source loss."""
     area = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "// Quantised quarter-steps prevent continuous atlas churn", 1)[0]
-    active = "if (f11VisibleThisFrame && vrGameplay &&"
+    active = "if (f11VisibleThisFrame && vrUiPresentation &&"
     assert "!Settings::VRUnifiedEyeMenuSource)" in area
     size = "if (Game::screen_resolution &&"
     retain = ("vrFontMultiplier = std::clamp(\\n"
@@ -1043,7 +1043,7 @@ def check_first_visible_f11_frame(hook: str) -> None:
     assert hook.index(call) < hook.index("float vrFontMultiplier = 1.0f;")
     assert hook.index("float vrFontMultiplier = 1.0f;") < hook.index(
         "overlayActive = Overlay::render();")
-    assert "if (f11VisibleThisFrame && vrGameplay &&" in hook
+    assert "if (f11VisibleThisFrame && vrUiPresentation &&" in hook
     assert "!Settings::VRUnifiedEyeMenuSource)" in hook
     density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "R23TryGetPublishedEyeExtentPair(extent)", 1)[0]
@@ -1346,7 +1346,7 @@ def main():
     assert factor(0, 1440, 2496, 2688) == 1.0
     # Detect removal of either eye authority, desktop isolation or atlas rebuild.
     mutations = (
-        (hook, "f11VisibleThisFrame && vrGameplay",
+        (hook, "f11VisibleThisFrame && vrUiPresentation",
          "overlayActive || Game::is_vr_gameplay_presentation()", font, header),
         (hook, "R23TryGetPublishedEyeExtentPair(extent)",
          "true", font, header),
