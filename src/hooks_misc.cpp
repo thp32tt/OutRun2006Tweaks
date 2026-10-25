@@ -889,8 +889,11 @@ namespace
                 if (OutRunVR::EyeExtent::Valid(extent))
                 {
                     // A portrait OpenXR PER-EYE swapchain is not a game/menu
-                    // canvas. Feeding 2496x2688 into Game::screen_resolution
-                    // caused the 2026-10-26 F11/HUD regression and extra fill.
+                    // canvas. Keep the landscape D3D9 source as the sole
+                    // coordinate owner for title/F11/game HUD; the host keeps
+                    // the independently sized XR eyes for final composition.
+                    // Feeding 2496x2688 into Game::screen_resolution caused
+                    // the 2026-10-26 F11/HUD regression and extra fill.
                     if (extent.width <= extent.height)
                     {
                         spdlog::info(
