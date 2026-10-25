@@ -4661,7 +4661,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             dynamic_texture::readable_pitch(lock.Pitch, rowBytes);
         if (readable) {
             auto& pixels = copied[level];
-            pixels.resize(static_cast<std::size_t>(mixedBumpUploadPitch) * rows);
+            pixels.resize(static_cast<std::size_t>(uploadPitch) * rows);
+            // Original game BC/rgba/palette rows keep their prior pitch.
+            // Only the new mixed-bump SRV uses an eight-byte upload row.
+            if (mixedBump)
+                pixels.resize(static_cast<std::size_t>(mixedBumpUploadPitch) * rows);
             // Only palettized rows need widening beyond the source pitch.
             if (a8p8) pixels.resize(static_cast<std::size_t>(a8p8UploadPitch) * rows);
             const auto packing = base.Format == D3DFMT_R5G6B5 ?
@@ -4676,7 +4680,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             for (UINT y = 0; y < rows; ++y) {
                 const auto* source = static_cast<const std::uint8_t*>(lock.pBits) +
                                      static_cast<std::size_t>(y) * lock.Pitch;
-                auto* destination = pixels.data() + static_cast<std::size_t>(y) * mixedBumpUploadPitch;
+                auto* destination = pixels.data() + static_cast<std::size_t>(y) * uploadPitch;
+                if (mixedBump)
+                    destination = pixels.data() + static_cast<std::size_t>(y) * mixedBumpUploadPitch;
                 if (a8p8)
                     destination = pixels.data() + static_cast<std::size_t>(y) * a8p8UploadPitch;
                 if (gpuRenderTarget) {
