@@ -65,28 +65,61 @@ def patch(source):
                 save_registry(reg)
                 write_runtime(status="gpt_ocr_busy", last_action="C1 OCR: response still generating")
                 return
+            task_token = str(gpt_active.get("task_id") or "")
+            source_token = str(gpt_active.get("source_png") or "")
             answer = await last_assistant_text(page)
+            # Never consume an unrelated prior assistant turn.
+            if answer and not (task_token in answer and source_token in answer and '"detections"' in answer):
+                answer = ""
             if not answer:
-                # ChatGPT UI occasionally changes/removes data-message-author-role.
-                # For GPT OCR only, fall back to visible response containers and
-                # accept text only when it is bound to this exact task id.
-                task_token = str(gpt_active.get("task_id") or "")
-                for fallback_sel in (
-                    "pre", "code", "main .markdown", "main [class*='markdown']",
-                    "[data-testid^='conversation-turn-']", "article"
-                ):
-                    try:
-                        texts = await page.locator(fallback_sel).all_inner_texts()
-                    except Exception:
-                        continue
-                    for candidate in reversed(texts):
-                        candidate = (candidate or "").strip()
-                        if (task_token and task_token in candidate and
-                                '"detections"' in candidate and '"source_png"' in candidate):
-                            answer = candidate
-                            break
-                    if answer:
-                        break
+                # 2026 ChatGPT thread redesign: role is encoded in the final
+                # component of data-*-search-unit-key (e.g. :user/:assistant).
+                # Anchor on THIS task's uploaded user turn, then inspect only
+                # later assistant units. This avoids mistaking the JSON example
+                # embedded in the user prompt for the assistant response.
+                try:
+                    answer = await page.evaluate(
+                        """({task, source}) => {
+                          const role = el => {
+                            const key = el.getAttribute('data-chatgpt-search-unit-key') ||
+                                        el.getAttribute('data-content-search-unit-key') || '';
+                            const m = key.match(/:(user|assistant)$/);
+                            return m ? m[1] : '';
+                          };
+                          const raw = [...document.querySelectorAll(
+                            '[data-chatgpt-search-unit-key],[data-content-search-unit-key]')];
+                          const units = raw.filter((el, i) => raw.indexOf(el) === i);
+                          let userIndex = -1;
+                          const marker = 'UPLOAD_TASK_ID=' + task;
+                          for (let i = units.length - 1; i >= 0; i--) {
+                            const txt = units[i].innerText || units[i].textContent || '';
+                            if (role(units[i]) === 'user' && txt.includes(marker)) {
+                              userIndex = i;
+                              break;
+                            }
+                          }
+                          if (userIndex >= 0) {
+                            for (let i = userIndex + 1; i < units.length; i++) {
+                              if (role(units[i]) !== 'assistant') continue;
+                              const txt = (units[i].innerText || units[i].textContent || '').trim();
+                              if (txt.includes(task) && txt.includes(source) &&
+                                  txt.includes('"detections"')) return txt;
+                            }
+                          }
+                          // Some hydrated layouts expose only the assistant body.
+                          const bodies = [...document.querySelectorAll(
+                            '[data-markdown-text-style="assistant-message"],' +
+                            '[data-chatgpt-selection-message-id]')];
+                          for (let i = bodies.length - 1; i >= 0; i--) {
+                            const txt = (bodies[i].innerText || bodies[i].textContent || '').trim();
+                            if (txt.includes(task) && txt.includes(source) &&
+                                txt.includes('"detections"')) return txt;
+                          }
+                          return '';
+                        }""",
+                        {"task": task_token, "source": source_token})
+                except Exception:
+                    answer = ""
             if not answer:
                 stale = gpt_ocr_recover_stale_active()
                 if not stale.get("recovered"):
