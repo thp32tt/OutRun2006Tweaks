@@ -70,7 +70,12 @@ def qid(source_png: str):
     return ("Q" + m.group(1)) if m else None
 
 def source_manifests(croot: Path):
-    yield from sorted((croot / "hd108_outputs").glob("*/*/manifest.json"))
+    # Native/local OCR results remain under hd108_outputs. GPT chat vision OCR
+    # writes to a separate host-writable tree because older native output can
+    # be root-owned on the bind mount.
+    for root in (croot / "hd108_outputs", croot / "gpt_vision_chat_ocr_outputs"):
+        if root.is_dir():
+            yield from sorted(root.glob("*/*/manifest.json"))
 
 def fit_reference(src: Path, dst: Path):
     """Create only an ImageGen reference copy; the canonical native crop stays unchanged."""
