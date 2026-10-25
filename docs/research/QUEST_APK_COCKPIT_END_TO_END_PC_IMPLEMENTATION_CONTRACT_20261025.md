@@ -115,3 +115,22 @@ No project header or ABI offsets are implied by these *proposed* types. Preserve
 - Primary immediate target: **one immutable per-Present camera/vehicle/host-pose snapshot and field-owner separation**, then validate actual headset viewport before adding visuals.
 
 Status: `DOCS_ONLY=YES`; `GAME_SOURCE_CHANGED=NO`; `CI_BUILD=NOT_RUN`; `QUEST3_PC_RUNTIME=UNTESTED`.
+
+## 8. New precise XR contract: native strict vs current PC general recovery
+- **Original Quest:** `XrRig::locate` `0x2D69C8`: space-location flags `&3==3`, exactly two XR views, view-state flags `&3==3` before committing per-eye output. This is location *and* orientation validation.
+- **Current PC:** `src/vr/ipc/host_pose_v3.hpp:59-111` `HostStateUsable` requires `HostAlive|OrientationValid|SessionVisible|HostShouldRender`, **not** `PositionValid` or `StereoViewsValid`. Those two are optional and validated conditionally. `SnapshotFromValidatedHostState` exposes `positionValid` and `stereoValid` booleans; `OutRunVRRenderer::LatchFramePose` can construct an orientation-only pose.
+- The general PCVR permissive mode is intentional and should NOT be globally removed. **Proposed cockpit-specific** approval at the shared immutable frame decision: `sourceReadOK && v3PositionValid && v3StereoValid && nativeMode1Armed && validPlayerCar`, with reference-space generation, poseSequence and presentEpoch coherently linked. If only v2 is active, require equivalent checked fields rather than assuming v3 is mandatory.
+- Failure policy: preserve stock gameplay camera, avoid partial car/driver/near-plane override; invalidate a previously committed cockpit pose on host replacement/recenter, and never copy last-good camera across unrelated present epochs.
+
+## 9. One more implementation hazard: camera ownership while render culling is active
+- `outrun_renderer.cpp:1325-1371` calls `RestoreCullingCamera`, snapshots `cam_pos_F8/look_pos_104`, overwrites both with HMD-transformed `cameraWorld` and marks `CullingCameraOverridden=true` until `EndScene`.
+- `hooks_graphics.cpp:169-238` obtains **those same mutable two fields** as seat base. `Clr_SceneEffect_dest` can recalculate twice while the scene is active. The PC code does not pass either `CullingCameraOverridden` or the saved original camera directly to the seat math.
+- A potential duplicate HMD pose path therefore exists **only if the runtime chronology intersects**. Do not claim user-visible jitter root cause or fix before a frame log proves it. The implementable fix is to expose a render-only **originalNativeCamera** snapshot, not to globally disable culling or add yet another pose to an already HMD-adjusted matrix.
+- Record an original-camera snapshot **before** the culling borrow; give all cockpit draws a common `presentEpoch` and the same immutable derived world/eye matrices. SceneEffect draws see their own original near-plane camera without mutating that owner.
+
+## 10. Two-phase exact build gate
+Phase A (safe): GitHub Actions compiles an opt-in **diagnostic** with current `DriverSeatView=false` default; emit bounded single-frame traces showing `CalcCameraMatrix ↔ BeginScene ↔ ApplyCullingCameraSync ↔ Clr_SceneEffect ↔ EndScene` ordering and original/borrowed camera hashes, and track reset/override all exit edges.
+
+Phase B (conditionally safe): Only after chronology and physical seat math are established, put a coherent per-Present `CockpitFrameDecision` behind `DriverSeatView` and apply it atomically to camera/vehicle/driver/near, with all stereo draws from one XR poseId; glass and hand animation remain separately gated by proven PMT/rig identity. Never use the existing synthetic `DriverSeatVehicleScale=1.15` as proof of APK geometry scale.
+
+**This research appendix is evidence-based design, not an applied or HMD-verified patch.**
