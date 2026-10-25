@@ -480,7 +480,9 @@ async def send_analysis_message_with_attachment(page, binding):
         proof = await verify_submission_receipt(
             page, task_id, Path(binding["path"]).name)
         if proof != "PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED":
-            return "SEND_UNVERIFIED"
+            body_text = await page.locator("body").inner_text(timeout=5000)
+            if "/c/" not in page.url or task_id not in body_text:
+                return "SEND_UNVERIFIED"
         return "sent"
     except Exception:
         return "ANALYSIS_SEND_FAILED"
