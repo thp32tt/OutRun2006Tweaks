@@ -7366,11 +7366,14 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 s.frameBatch.abort();
             return;
         }
-        UINT expectedElements = 0;
-        if (!game_native_primitive_element_count(
-                static_cast<std::uint32_t>(type), primitives, expectedElements)) {
-            // The hook saw a real game source call even when native topology
-            // translation is impossible. It must break an active scene batch.
+        // Only known D3D9 topologies can be certified pixel-neutral. A
+        // malformed primitive type must still poison the source frame even
+        // when later render-state queries would report no target writes.
+        // A VALID large Draw, however, may write no backbuffer pixels at all;
+        // prove its offscreen/scissor/RT0-Z-stencil neutrality first, before
+        // attempting the bounded native VB/IB/UP geometry snapshot.
+        if (!game_native_empty_primitive_type(
+                static_cast<std::uint32_t>(type))) {
             if (s.frameBatch.must_abort_unsupported(fullMode, multiBatch))
                 s.frameBatch.abort();
             return;
@@ -7427,6 +7430,19 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                     reinterpret_cast<std::uintptr_t>(game);
             if (!s.frameBatch.absorb_empty_source_draw(
                     sourceOrdinal, sameSourceFullClear))
+                s.frameBatch.abort();
+            return;
+        }
+        // Pixel-producing commands must still pass the original bounded
+        // native mesh admission. Oversized/malformed GAME writers fail closed,
+        // while proven offscreen and no-write Draws already consumed their
+        // exact source ordinals above (never issuing a native GPU Draw).
+        UINT expectedElements = 0;
+        if (!game_native_primitive_element_count(
+                static_cast<std::uint32_t>(type), primitives, expectedElements)) {
+            // The hook saw a real game source call even when native topology
+            // translation is impossible. It must break an active scene batch.
+            if (s.frameBatch.must_abort_unsupported(fullMode, multiBatch))
                 s.frameBatch.abort();
             return;
         }

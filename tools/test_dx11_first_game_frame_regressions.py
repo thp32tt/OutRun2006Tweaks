@@ -126,7 +126,27 @@ def main() -> None:
     observer = bridge[bridge.find("void observe("):bridge.find("} // namespace", bridge.find("void observe("))]
     ordinal = observer.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;")
     primitive = observer.find("if (!game_native_primitive_element_count(")
-    assert ordinal >= 0 and primitive > ordinal, "bad native primitive must still count as game Draw"
+    topology = observer.find("if (!game_native_empty_primitive_type(")
+    clipped = observer.find("if (fullMode && isolated_offscreen_game_draw(")
+    neutral = observer.find("if (fullMode && proven_game_draw_no_target_writes(")
+    sm3 = observer.find("if (!submit_live_sm3_game_draw(")
+    assert 0 <= ordinal < topology < clipped < neutral < primitive < sm3, (
+        "neutral, real D3D9 draws must be classified before bounded geometry; "
+        "unknown topologies and actual pixel writers still fail closed"
+    )
+    # Destructive ordering regressions: a former pre-neutral mesh check
+    # discarded valid oversized game offscreen/fully-clipped source Draws.
+    prematurely_rejected = observer.replace(
+        "        // A successful game Draw/DrawIndexed whose enabled scissor",
+        "        if (!game_native_primitive_element_count(\n"
+        "                static_cast<std::uint32_t>(type), primitives, expectedElements)) return;\n"
+        "        // A successful game Draw/DrawIndexed whose enabled scissor", 1)
+    assert prematurely_rejected != observer and prematurely_rejected.find(
+        "if (!game_native_primitive_element_count(") < prematurely_rejected.find(
+        "if (fullMode && isolated_offscreen_game_draw(")
+    no_topology_gate = observer.replace("if (!game_native_empty_primitive_type(",
+                                        "if (false && !game_native_empty_primitive_type(", 1)
+    assert no_topology_gate != observer and "if (!game_native_empty_primitive_type(" not in no_topology_gate
     unavailable = bridge[bridge.find("void observe_unavailable_game_draw("):bridge.find("void before_game_present(")]
     # Exact raw-game source ordinal is now passed into offscreen no-pixel
     # accounting; preserve the ordering and fail-closed abort without matching

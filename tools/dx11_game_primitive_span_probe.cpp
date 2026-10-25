@@ -5,6 +5,14 @@
 
 int main() {
     using outrun::vr::dx11::live_game_frame::game_primitive_element_count;
+    using outrun::vr::dx11::live_game_frame::game_native_empty_primitive_type;
+    // 01071: topology legality is independent of geometry snapshot budget.
+    // A valid oversized Draw can be proven fully clipped/offscreen/no-write
+    // BEFORE source capture, but a writable one still rejects its mesh span.
+    static_assert(game_native_empty_primitive_type(4u));
+    static_assert(game_native_empty_primitive_type(6u));
+    static_assert(!game_native_empty_primitive_type(0u));
+    static_assert(!game_native_empty_primitive_type(7u));
     using outrun::vr::dx11::live_game_frame::kMaxNativeGamePrimitives;
     using outrun::vr::dx11::live_game_frame::kMaxNativeGameVertices;
     static_assert(kMaxNativeGamePrimitives == 2048u);
@@ -26,6 +34,9 @@ int main() {
     assert(!game_primitive_element_count(false, kMaxNativeGamePrimitives + 1u, elements) && elements == last);
     assert(!game_primitive_element_count(true, kMaxNativeGamePrimitives + 1u, elements) && elements == last);
     using outrun::vr::dx11::live_game_frame::game_native_primitive_element_count;
+    assert(!game_native_primitive_element_count(4u, kMaxNativeGamePrimitives + 1u, elements));
+    assert(!game_native_primitive_element_count(6u, kMaxNativeGamePrimitives + 1u, elements));
+    assert(!game_native_primitive_element_count(7u, 1u, elements));
     assert(game_native_primitive_element_count(1, 1, elements) && elements == 1);
     assert(game_native_primitive_element_count(1, 512, elements) && elements == 512);
     assert(game_native_primitive_element_count(2, 1, elements) && elements == 2);
