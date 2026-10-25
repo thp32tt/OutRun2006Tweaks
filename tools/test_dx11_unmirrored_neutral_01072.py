@@ -9,7 +9,7 @@ header = (root / "src/vr/d3d11/live_game_frame_bridge.hpp").read_text(encoding="
 
 def integrated(r30: str, native: str, contract: str) -> bool:
     start = r30.find("struct R30NativeGameSourceGuard {")
-    end = r30.find("void R30CaptureNativeAdditionalStreams(", start)
+    end = r30.find("bool R30CaptureNativeAdditionalStreams(", start)
     if start < 0 or end <= start:
         return False
     guard = r30[start:end]
