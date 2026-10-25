@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01073",
+  "production_id": "CONVERSION-DX11-01073",
+  "event_id": "CONVERSION-DX11-01073-E002",
+  "event_type": "c6_bookkeeping",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01073",
+  "classification": "A+B",
+  "work_key": "DX11:R30_LIVE_GAME_INSTANCE_RATE_CAPTURE",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "material_result_sha": "95fb068ce6b2b4594a456fda9bc1411b0a72105d",
+  "validation_bearing_result_sha": "b0adf2a7242ac144f0a383be6388039c89a2633b",
+  "implementation_commits": [
+    "95fb068ce6b2b4594a456fda9bc1411b0a72105d"
+  ],
+  "repair_commits": [
+    "8774e1939761b1a86e267f32f256bad5aff80c2f",
+    "b0adf2a7242ac144f0a383be6388039c89a2633b"
+  ],
+  "score_change": 0,
+  "score_award_event": false,
+  "score_note": "AI2 SSOT previous confirmed 1963 +0 bookkeeping/retry = 1963. No new independent feature achievement or duplicate score.",
+  "summary": "Source stage only: R30 captures D3D9 instanced secondary vertex streams by genuine indexed/instance-rate frequency, compact instance record domain and bounded CPU shadows for all four game Draw variants. Native SM3 real Draw/DrawIndexed assembly receives distinct source-order records; malformed states remain native fail-closed with D3D9Ex rendering/input/FFB/SkyGlow fallback. Source integration and five mandatory GitHub Actions PASS at exact SHA; OutRun 2006 game and Quest3/VDXR output UNTESTED.",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/native_game_instance_stream_capture.hpp",
+    "tools/dx11_instance_capture_probe_01073.cpp",
+    "tools/test_dx11_instance_capture_01073.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Continue the unfinished real-game menu, car-selection, and race D3D9 Draw/DrawIndexed to native D3D11 full-resolution frame path by correcting D3D9 indexed/instanced secondary-stream CPU shadow source addressing for all four game Draw routes, preserving shader-visible instance records, bounded mirror admission, DX9Ex fallback and exact-SHA five-gate build verification. Entire native gameplay/Quest3 screen parity remains untested.",
+    "acceptance_items": [
+      {
+        "id": "live_four_draw_instance_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R30_D3D9_VB_IB_UP_INSTANCE_CAPTURE",
+        "expected_behavior": "Linear VB/indexed VB/linear UP/indexed UP share source-frequency-aware secondary VB shadow capture with original instance-record indexing and bounded ranges."
+      },
+      {
+        "id": "native_sm3_instance_stream_integration",
+        "category": "end_to_end_behavior",
+        "behavior_area": "DX11_SM3_VERTEX_ASSEMBLY_AND_DRAW",
+        "expected_behavior": "Per-vertex indexed sparse source records and per-instance INSTANCEDATA records retain distinct source addressing and consistent instance-rate counts for the existing native SM3 shader Draw/DrawIndexed assembly."
+      },
+      {
+        "id": "invalid_frequency_and_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9EX_FALLBACK_AND_NEGATIVE_REGRESSIONS",
+        "expected_behavior": "Unknown stream frequencies, malformed capture slots and unmirrored shadow data fail closed without altering original D3D9Ex Draw, Present, input, FFB or SkyGlow."
+      },
+      {
+        "id": "exact_sha_five_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_BACKEND_WIN_OPENXR_HUD",
+        "expected_behavior": "All mandatory five GitHub Actions conclude success on the same unchanged 01073 validation-bearing SHA, with game/HMD runtime separately UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_FOUR_GAME_DRAW_ROUTES",
+      "INDEXED_INSTANCE_STREAM_FREQUENCY",
+      "R30_CPU_SHADOW_CAPTURE",
+      "D3D11_NATIVE_SM3_ASSEMBLY_AND_DRAW",
+      "FULL_RESOLUTION_VISIBLE_FRAME_OUTPUT",
+      "D3D9EX_FAIL_CLOSED"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d11/native_game_instance_stream_capture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.hpp",
+      "tools/test_dx11_instance_capture_01073.py",
+      "tools/dx11_instance_capture_probe_01073.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01073 C++ plan/instance count checks and four-route static linkage PASS under DX11 Fast 40222479658 at exact SHA.",
+      "negative_regression": "Unknown flags, zero frequency and malformed instances fail closed; source mutation controls and prior source continuity tests remain enforced. Original game/HMD not executed.",
+      "component_integration": "Real game R30 four entrypoint VB/IB/UP shadows -> source-frequency corrected per-instance shadow -> existing native SM3 GPU shader Draw/Indexed code path. Runtime video/frame/pixel evidence remains UNTESTED."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED; REAL_GAME_FULL_FRAME_AND_QUEST3_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive opt-in/fail closed; original D3D9Ex Draw/Present, gamepad, FFB and SkyGlow retain authority; DXVK frozen."
+  },
+  "acceptance_results": {
+    "live_four_draw_instance_source": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "R30 shared secondary capture plans 1..15 secondary streams by actual SetStreamSourceFreq; positive C++ tests and four-entrypoint integration source mutations completed in DX11 Fast at the exact SHA; not observed running in OutRun 2006.",
+      "validation_command": "GitHub Actions DX11 Fast 40222479658 (existing completed run)",
+      "evidence_paths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d11/native_game_instance_stream_capture.hpp",
+        "tools/dx11_instance_capture_probe_01073.cpp",
+        "tools/test_dx11_instance_capture_01073.py"
+      ]
+    },
+    "native_sm3_instance_stream_integration": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "R30 source capture publishes correctly sized instance-rate buffers consumed by the existing SM3 assembler with actual D3D9 frequency evidence; static integration and Windows Build exact-SHA checks succeeded. No real game native Draw count observed.",
+      "validation_command": "GitHub Actions DX11 Fast 40222479658; Windows Build 40222479553 (existing completed runs)",
+      "evidence_paths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.hpp",
+        "tools/test_dx11_instance_capture_01073.py"
+      ]
+    },
+    "invalid_frequency_and_source_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Portable negative stream-frequency cases and destructive source-link integration regression PASS at exact SHA. Invalid source remains fail closed in native mirror. Actual D3D9 game/HMD behavior not tested.",
+      "validation_command": "GitHub Actions DX11 Fast 40222479658; Backend Conversion Gate 40222479621 (existing completed runs)",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_instance_stream_capture.hpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "tools/dx11_instance_capture_probe_01073.cpp",
+        "tools/test_dx11_instance_capture_01073.py"
+      ]
+    },
+    "exact_sha_five_required_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Exact b0adf2a7242ac144f0a383be6388039c89a2633b: DX11 Fast 40222479658 SUCCESS, Backend Conversion 40222479621 SUCCESS, Windows Build 40222479553 SUCCESS, OpenXR 40222479572 SUCCESS, HUD Inspector 40222479541 SUCCESS. No new CI dispatched for C6 bookkeeping.",
+      "validation_command": "Read GitHub Actions existing five completed SUCCESS push runs for SHA b0adf2a7242ac144f0a383be6388039c89a2633b",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ]
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast",
+      "run_id": 40222479658,
+      "status": "success",
+      "sha": "b0adf2a7242ac144f0a383be6388039c89a2633b",
+      "source": "GitHub Actions completed/success, event=push"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40222479621,
+      "status": "success",
+      "sha": "b0adf2a7242ac144f0a383be6388039c89a2633b",
+      "source": "GitHub Actions completed/success, event=push"
+    },
+    {
+      "name": "Windows Build",
+      "run_id": 40222479553,
+      "status": "success",
+      "sha": "b0adf2a7242ac144f0a383be6388039c89a2633b",
+      "source": "GitHub Actions completed/success, event=push"
+    },
+    {
+      "name": "OpenXR",
+      "run_id": 40222479572,
+      "status": "success",
+      "sha": "b0adf2a7242ac144f0a383be6388039c89a2633b",
+      "source": "GitHub Actions completed/success, event=push"
+    },
+    {
+      "name": "HUD Inspector",
+      "run_id": 40222479541,
+      "status": "success",
+      "sha": "b0adf2a7242ac144f0a383be6388039c89a2633b",
+      "source": "GitHub Actions completed/success, event=push"
+    }
+  ],
+  "previous_failure_runs": [
+    {
+      "name": "Backend Conversion",
+      "run_id": 40222130021,
+      "at_sha": "95fb068ce6b2b4594a456fda9bc1411b0a72105d",
+      "conclusion": "failure"
+    },
+    {
+      "name": "DX11 Fast",
+      "run_id": 40222370076,
+      "at_sha": "8774e1939761b1a86e267f32f256bad5aff80c2f",
+      "conclusion": "failure"
+    }
+  ],
+  "c6_bookkeeping_only": true,
+  "bookkeeping_reason": "RUN_RECORD_NOT_FOUND",
+  "c6_record_created_after_exact_sha_pass": true,
+  "source_validation_result_sha_unchanged": true,
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "Exact physical game native_Draw count and complete menu/car/race published frame count remain UNTESTED; Quest3/VDXR requires separate runtime evidence.",
+  "next_implementation_action": "Continue native full-resolution frame integration and validate real game menu/vehicle/race and stereo GPU output separately; do not infer runtime PASS from CI.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no real OutRun game or Quest3/VDXR session performed in task 01073."
+}
