@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""Quest3 DX9Ex: 2D logical coordinates and 3D source share one target.
-Static guards plus pure geometry for landscape and XR portrait resolutions.
-HMD verification is intentionally separate.
+"""Quest3 DX9Ex: landscape D3D9 game/menu source and portrait XR eye are separated.
+Static guards plus pure geometry; HMD verification is intentionally separate.
 """
 from pathlib import Path
 import math
@@ -11,11 +10,14 @@ ex=(root/"src/vr/d3d9/ex_device_upgrade.cpp").read_text(encoding="utf-8")
 ui=(root/"src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
 settings=(root/"src/vr/settings.cpp").read_text(encoding="utf-8")
 policy=(root/"src/vr/ui/vr_logical_coordinate_space.hpp").read_text(encoding="utf-8")
-assert 'VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", true,' in settings
+assert 'VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,' in settings
+assert 'VRFollowGameResolution{ "VR", "FollowGameResolution", true,' in settings
+assert 'VRAutoRenderResolution{ "VR", "AutoRenderResolution", false,' in settings
 assert "Settings::VRUnifiedEyeMenuSource.needs_restart();" in settings
 ini=(root/"OutRun2006Tweaks.ini").read_text(encoding="utf-8")
-assert "UnifiedEyeMenuSource = true" in ini
-assert "FollowGameResolution = false" in ini
+assert "UnifiedEyeMenuSource = false" in ini
+assert "FollowGameResolution = true" in ini
+assert "AutoRenderResolution = false" in ini
 assert "Settings::VRUnifiedEyeMenuSource" in cfg and "Settings::VRUnifiedEyeMenuSource" in ex
 assert "vr_logical_coordinate_space.hpp" in ui
 overlay=(root/"src/overlay/hooks_overlay.cpp").read_text(encoding="utf-8")
@@ -29,8 +31,10 @@ def check_source(cfg,ex):
     guard=c.index("if (commandLineResolution)")
     manual=c.index("if (manualRequested)")
     unified=c.index("!Settings::VRUnifiedEyeMenuSource")
+    portrait=c.index("if (extent.width <= extent.height)")
     xr=c.index("Game::screen_resolution->x = static_cast<int>(extent.width);")
-    assert guard < manual < unified < xr
+    assert guard < manual < unified < portrait < xr
+    assert "VR SOURCE SPLIT:" in c
     # No post-config overwrite from a newly arrived host.
     e=ex.split("OutRunVR::EyeExtent::Size ReadyXrEyeSizeAtCreateDevice(",1)[1].split(
         "Direct3DCreate9Fn OriginalDirect3DCreate9",1)[0]
@@ -75,10 +79,13 @@ for width,height in [(640,480),(1280,720),(1920,1080),(3440,1440),
     assert s>0 and math.isclose(x+320*s,width/2) and math.isclose(y+240*s,height/2)
     assert 0<=x<=width/2 and 0<=y<=height/2
     assert x+640*s<=width+0.001 and y+480*s<=height+0.001
-# The chosen 3D source and 2D menu target are literally the same D3D9Ex
-# device extent; only logical sprite pixels undergo viewport mapping.
-for source in [(1920,1080),(3440,1440),(2496,2688)]:
+# The game 3D source and native 2D UI still share one landscape D3D9
+# target. Portrait XR eye dimensions are compositor-only and must not become
+# that source. The host can independently render/project its per-eye swapchains.
+for source in [(1920,1080),(3440,1440),(2560,1440)]:
     draw3d=source;draw2d=source
-    assert draw3d==draw2d
-print("PASS unified physical source/menu + independent 640x480 UI, no late XR override, six destructive controls")
+    assert draw3d==draw2d and source[0] > source[1]
+for eye in [(2016,2240),(2496,2688),(3072,3216)]:
+    assert eye[0] <= eye[1]
+print("PASS landscape game/menu source + independent portrait XR eye, 640x480 logical UI, no late XR override")
 

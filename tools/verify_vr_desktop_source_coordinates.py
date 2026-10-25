@@ -10,7 +10,9 @@ settings = (ROOT / "src/vr/settings.cpp").read_text(encoding="utf-8")
 config = (ROOT / "src/hooks_misc.cpp").read_text(encoding="utf-8")
 ex = (ROOT / "src/vr/d3d9/ex_device_upgrade.cpp").read_text(encoding="utf-8")
 
-assert 'VRFollowGameResolution{ "VR", "FollowGameResolution", false,' in settings
+assert 'VRFollowGameResolution{ "VR", "FollowGameResolution", true,' in settings
+assert 'VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,' in settings
+assert 'VRAutoRenderResolution{ "VR", "AutoRenderResolution", false,' in settings
 assert "Settings::VRFollowGameResolution.needs_restart();" in settings
 assert "extern Setting<bool> VRFollowGameResolution;" in config
 assert "extern Setting<bool> VRFollowGameResolution;" in ex
@@ -27,6 +29,8 @@ def assert_game_source_owner(text: str):
         "if (Settings::VRFollowGameResolution &&\n            !Settings::VRUnifiedEyeMenuSource)",
         "Game::screen_resolution->x, Game::screen_resolution->y);",
         "if (!Settings::VRAutoRenderResolution)",
+        "if (extent.width <= extent.height)",
+        "VR SOURCE SPLIT:",
         "Game::screen_resolution->x = static_cast<int>(extent.width);",
     )
     for token in tokens:
@@ -35,6 +39,7 @@ def assert_game_source_owner(text: str):
         "if (commandLineResolution)", "if (manualRequested)",
         "if (Settings::VRFollowGameResolution &&\n            !Settings::VRUnifiedEyeMenuSource)",
         "if (!Settings::VRAutoRenderResolution)",
+        "if (extent.width <= extent.height)",
         "Game::screen_resolution->x = static_cast<int>(extent.width);")]
     assert loc == sorted(loc), "manual/game priority must precede XR overwrite"
     follow = part.split("if (Settings::VRFollowGameResolution &&\n            !Settings::VRUnifiedEyeMenuSource)",1)[1].split(
@@ -60,6 +65,7 @@ for original, mutated in (
     ("if (manualRequested)", "if (false)"),
     ("Game::screen_resolution->x = manualW;", "Game::screen_resolution->x = 640;"),
     ("Game::screen_resolution->y = manualH;", "Game::screen_resolution->y = 480;"),
+    ("if (extent.width <= extent.height)", "if (false)"),
 ):
     assert original in config
     try:
@@ -76,10 +82,13 @@ except (AssertionError, ValueError):
 else:
     raise AssertionError("XR eye override escaped game-source protection")
 
-def route(game_source, xr_eye, *, explicit=None, manual=None, follow_game=True):
+def route(game_source, xr_eye, *, explicit=None, manual=None,
+          follow_game=True, unified=False, auto=False):
     if explicit is not None: return explicit
     if manual is not None: return manual
-    if follow_game: return game_source
+    if follow_game and not unified: return game_source
+    if not auto: return game_source
+    if xr_eye[0] <= xr_eye[1]: return game_source
     return xr_eye
 
 for game_source in ((640,480),(1280,720),(1920,1080),(2560,1440),(3440,1440)):
@@ -87,7 +96,9 @@ for game_source in ((640,480),(1280,720),(1920,1080),(2560,1440),(3440,1440)):
         assert route(game_source,xr_eye)==game_source
         assert route(game_source,xr_eye,explicit=(1600,900))==(1600,900)
         assert route(game_source,xr_eye,manual=(2304,1296))==(2304,1296)
-        assert route(game_source,xr_eye,follow_game=False)==xr_eye
+        # Portrait XR eye extents remain compositor-only even in experimental auto mode.
+        assert route(game_source,xr_eye,follow_game=False,auto=True)==game_source
+    assert route(game_source,(2560,1440),follow_game=False,auto=True)==(2560,1440)
 
 def map_menu_pixel(u,v,screen,logical=(640,480)):
     scale=min(screen[0]/logical[0],screen[1]/logical[1])
@@ -97,5 +108,5 @@ def map_menu_pixel(u,v,screen,logical=(640,480)):
 for screen in ((640,480),(1280,720),(1920,1080),(3440,1440)):
     cx,cy=map_menu_pixel(320,240,screen)
     assert abs(cx-screen[0]/2)<1e-6 and abs(cy-screen[1]/2)<1e-6
-print("PASS game-selected source/UI extent vs VD/XR per-eye independence; 5 source mutations; screen-space coordinate scaling")
+print("PASS landscape game/UI source vs portrait VD/XR per-eye independence; source mutations; screen-space coordinate scaling")
 
