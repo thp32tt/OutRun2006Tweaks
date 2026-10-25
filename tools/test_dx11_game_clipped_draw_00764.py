@@ -13,7 +13,7 @@ def wired(src, predicate):
     body = src.split("void observe(IDirect3DDevice9* game,", 1)[1]
     body = body.split("bool preserve_offscreen_color_only_clear(", 1)[0]
     sequence = [
-        "if (!game_native_primitive_element_count(",
+        "if (!game_native_empty_primitive_type(",
         "if (fullMode) {",
         "GetRenderState(D3DRS_SCISSORTESTENABLE, &scissorEnabled)",
         "scissorEnabled == TRUE",
@@ -23,6 +23,10 @@ def wired(src, predicate):
         "s.frameBatch.absorb_empty_source_draw(",
         "s.frameBatch.abort();",
         "return;",
+        # 01071: a provably clipped game source Draw consumes its ordinal
+        # before the bounded native GPU geometry snapshot. Actual pixel
+        # writers still pass the original mesh budget and fail closed.
+        "if (!game_native_primitive_element_count(",
         "if (!supported_game_state("
     ]
     # The zero-primitive path and topology-error branch legitimately contain
