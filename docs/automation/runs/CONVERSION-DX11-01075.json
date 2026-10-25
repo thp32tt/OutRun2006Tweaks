@@ -10,8 +10,8 @@
   "classification": "A+B",
   "work_key": "DX11:LIVE_SM3_LARGE_INDEXED_INSTANCE_LIST_GPU_DRAW",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
-  "status": "SOURCE_STAGE_BUILD_VERIFIED",
-  "checkpoint": "C6_SOURCE_STAGE_ONLY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
@@ -158,5 +158,7 @@
   "c6_bookkeeping_only": true,
   "c6_does_not_revalidate_source": true,
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED; game and Quest3 not executed; native published frames and input parity not measured.",
-  "next_implementation_action": "Continue full menu/car/race native D3D11 source graph and real-game frame/Quest3 output measurement independently; existing feature remains incomplete."
+  "next_implementation_action": "Continue full menu/car/race native D3D11 source graph and real-game frame/Quest3 output measurement independently; existing feature remains incomplete.",
+  "c6_previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_status_reconciliation": "Bookkeeping-only terminal classification of already-successful five exact-SHA GitHub Actions; no source revision, no CI rerun, no HMD runtime claim."
 }
