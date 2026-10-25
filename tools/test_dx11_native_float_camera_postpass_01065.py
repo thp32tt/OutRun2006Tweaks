@@ -49,7 +49,10 @@ for needle in ("(sourceSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D) == 0u",
                "eyeRequired = D3D11_FORMAT_SUPPORT_RENDER_TARGET |",
                "D3D11_FORMAT_SUPPORT_SHADER_SAMPLE |"):
     assert needle in source
-    assert not integrated(header, source.replace(needle, "/* format coverage missing */", 1))
+    # Remove all occurrences: SHADER_SAMPLE participates in both the
+    # required-capability test and its exact expected mask.
+    mutant = source.replace(needle, "/* format coverage missing */")
+    assert mutant != source and not integrated(header, mutant), needle
 workflow = (root / ".github/workflows/dx11-fast-structural.yml").read_text()
 assert "python tools/test_dx11_native_float_camera_postpass_01065.py" in workflow
 print("PASS 01065 native game float4 shader camera typed color and both-eye GPU preflight")
