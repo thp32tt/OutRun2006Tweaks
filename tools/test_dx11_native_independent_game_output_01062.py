@@ -36,7 +36,16 @@ for needle in ("nativeColorOwner.Get() == s.backend.device()",
                "independent_gpu_frame_ready(",
                "bb.Width, bb.Height, surfaceWidth, surfaceHeight",
                "nativeColorDesc.Width, nativeColorDesc.Height"):
-    broken = bridge.replace(needle, "/* detached native GPU source */", 1)
+    # Repeated geometry arguments can occur in other D3D9/CPU branches.
+    # Mutate ONLY the actual GPU-sink producer handoff under test.
+    prefix, block_and_after = bridge.split(
+        "// Authenticate the producer's actual GPU resource", 1)
+    block, suffix = block_and_after.split(
+        "// Optional real GPU-only desktop presentation", 1)
+    assert needle in block, needle
+    broken = (prefix + "// Authenticate the producer's actual GPU resource" +
+              block.replace(needle, "/* detached native GPU source */", 1) +
+              "// Optional real GPU-only desktop presentation" + suffix)
     assert broken != bridge and not integrated(broken, gpu), needle
 for needle in ("nativeWidth == textureWidth",
                "nativeHeight == textureHeight",
