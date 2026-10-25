@@ -10,6 +10,7 @@ SRC=C_ROOT/"hd_original_108_verified"
 ZIP=C_ROOT/"hd_original_108_zip_inbox/OutRun_ALL_HD_Korean_Source_PNG_PART01_of_05_20261013.zip"
 REPORT=C_ROOT/"hd108_ocr"
 OUT=C_ROOT/"hd108_outputs"
+GPT_OUT=C_ROOT/"gpt_vision_chat_ocr_outputs"
 QUEUE_DIR=C_ROOT/"gpt_vision_chat_ocr"
 STATE_PATH=QUEUE_DIR/"state.json"
 AUDIT_PATH=QUEUE_DIR/"audit.jsonl"
@@ -64,15 +65,22 @@ def _manifest_rows():
     if len(rows)!=108 or len({r["png_filename"] for r in rows})!=108: raise ValueError("HD108_SOURCE_MANIFEST_INVALID")
     return {r["png_filename"]:r for r in rows}
 
+def _output_roots():
+    return (OUT,GPT_OUT)
+
 def _covered_phrases(source_png,source_sha):
-    covered=set();sourceout=OUT/Path(source_png).stem
-    if not sourceout.is_dir(): return covered
-    for mp in sourceout.glob("*/manifest.json"):
-        try:
-            j=json.loads(mp.read_text(encoding="utf-8"))
-            if j.get("source_sha256")==source_sha and isinstance(j.get("english"),str):
-                covered.add(_norm(j["english"]))
-        except Exception: pass
+    covered=set()
+    for root in _output_roots():
+        sourceout=root/Path(source_png).stem
+        if not sourceout.is_dir():
+            continue
+        for mp in sourceout.glob("*/manifest.json"):
+            try:
+                j=json.loads(mp.read_text(encoding="utf-8"))
+                if j.get("source_sha256")==source_sha and isinstance(j.get("english"),str):
+                    covered.add(_norm(j["english"]))
+            except Exception:
+                pass
     return covered
 
 def _exhausted_candidates():
@@ -239,14 +247,21 @@ def apply_response(task_id,assistant_text):
             image=im.copy()
         targets={_norm(x):x for x in a["target_phrases"]}
         covered=_covered_phrases(a["source_png"],a["source_sha256"])
-        existing=[];sourceout=OUT/Path(a["source_png"]).stem
-        if sourceout.is_dir():
-            for mp in sourceout.glob("*/manifest.json"):
+        existing=[]
+        for root in _output_roots():
+            prior=root/Path(a["source_png"]).stem
+            if not prior.is_dir():
+                continue
+            for mp in prior.glob("*/manifest.json"):
                 try:
                     j=json.loads(mp.read_text(encoding="utf-8"));box=j.get("bbox_xyxy")
                     if j.get("source_sha256")==a["source_sha256"] and isinstance(box,list) and len(box)==4 and all(type(v) is int for v in box):
                         existing.append(box)
-                except Exception:pass
+                except Exception:
+                    pass
+        # GPT chat crops use a dedicated writable root. Legacy OCR output may be
+        # root-owned on the host bind mount and must remain read-only.
+        sourceout=GPT_OUT/Path(a["source_png"]).stem
         margin_check=_load_margin_check();applied=0;rejected=[];seen=set()
         response_sha=hashlib.sha256(assistant_text.encode("utf-8")).hexdigest()
         for det in detections:
