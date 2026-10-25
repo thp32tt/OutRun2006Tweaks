@@ -412,7 +412,7 @@ def main() -> None:
         present = code[code.find("void before_game_present("):code.find("void before_game_reset(")]
         return all(x in observe for x in (
             "const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;",
-            "if (!supported_game_state(game, type, vp, layout, transforms, capture, output)) {",
+            "if (!supported_game_state(game, type, vp, layout, transforms,\n                                  fixedClip, capture, output)) {",
             "s.frameBatch.abort();",
             "s.frameBatch.accepts_source_draw(sourceOrdinal, multiBatch)",
             "s.frameBatch.record_source_draw(sourceOrdinal);",
@@ -594,8 +594,8 @@ def main() -> None:
         return (all(x in state for x in required_state)
                 and all(x in vertices for x in required_vertices)
                 and "D3DPRIMITIVETYPE topology," in state
-                and "supported_game_state(game, type, vp, layout, transforms, capture, output)" in observe
-                and "layout, transforms, capture, vertices)" in observe)
+                and "supported_game_state(game, type, vp, layout, transforms,\n                                  fixedClip, capture, output)" in observe
+                and "layout, transforms, fixedClip, capture, vertices)" in observe)
 
     assert object_space_draw_safe(bridge)
     for good, bad in (
@@ -611,8 +611,8 @@ def main() -> None:
         ("if (!game_native_world_depth_clip(clip, vp.MinZ, vp.MaxZ) ||",
          "if (false ||"),
         ("!game_native_object_clip_position(clip))", "false)"),
-        ("supported_game_state(game, type, vp, layout, transforms, capture, output)",
-         "supported_game_state(game, D3DPT_TRIANGLELIST, vp, layout, transforms, capture, output)"),
+        ("supported_game_state(game, type, vp, layout, transforms,\n                                  fixedClip, capture, output)",
+         "supported_game_state(game, D3DPT_TRIANGLELIST, vp, layout, transforms,\n                                  fixedClip, capture, output)"),
     ):
         changed = bridge.replace(good, bad, 1)
         assert changed != bridge and not object_space_draw_safe(changed), (
@@ -1641,8 +1641,8 @@ def main() -> None:
             "const DWORD diffuse = decoded.diffuse;",
             "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
         )) and "D3DPRIMITIVETYPE topology," in body and all(v in observe for v in (
-            "supported_game_state(game, type, vp, layout, transforms, capture, output)",
-            "layout, transforms, capture, vertices)",
+            "supported_game_state(game, type, vp, layout, transforms,\n                                  fixedClip, capture, output)",
+            "layout, transforms, fixedClip, capture, vertices)",
         ))
     assert fvf_connected(bridge)
     for good,bad in (
