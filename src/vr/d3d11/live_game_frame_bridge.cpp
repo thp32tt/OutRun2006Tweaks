@@ -13,6 +13,7 @@
 #include "live_game_sm3_stream_assembly.hpp"
 #include "live_game_sm3_instance_batches.hpp"
 #include "live_game_sm3_connected_instances.hpp"
+#include "live_game_sm3_connected_submission.hpp"
 #include "live_game_sm3_polygon_raster.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
@@ -5484,9 +5485,24 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // enables ONE native DrawIndexed without joining adjacent instances.
     const bool compactListInstances = sourceInstancing && instanceCount > 1u &&
         game_sm3_independent_list(static_cast<std::uint32_t>(type));
-    const bool compactConnectedInstances = sourceInstancing && instanceCount > 1u &&
+    const bool connectedCandidate = sourceInstancing && instanceCount > 1u &&
         (type == D3DPT_LINESTRIP || type == D3DPT_TRIANGLESTRIP ||
          type == D3DPT_TRIANGLEFAN);
+    // The old all-in-one indexed expansion rejected source-valid game strips
+    // when the replicated IB exceeded kMaxIndices. Preserve that fast route
+    // for small batches, but submit larger strips/fans per authentic D3D9
+    // instance. The original source indices/fan triangles remain unchanged;
+    // each Draw receives its own base vertex and cannot connect instances.
+    const auto connectedSubmission = connectedCandidate
+        ? game_sm3_connected_submission_plan(
+              static_cast<std::uint32_t>(type), expected, vertexCount,
+              instanceCount, kMaxIndices)
+        : GameSm3ConnectedSubmissionPlan{};
+    if (connectedCandidate &&
+        connectedSubmission.mode == GameSm3ConnectedSubmissionMode::invalid)
+        return false;
+    const bool compactConnectedInstances = connectedCandidate &&
+        connectedSubmission.mode == GameSm3ConnectedSubmissionMode::compact_indexed;
     const bool compactInstancedGeometry =
         compactListInstances || compactConnectedInstances;
     std::vector<std::uint32_t> compactListIndices;
@@ -6191,8 +6207,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // One audited GPU Draw call site; independent indexed strip/fan lists
     // preserve exact source boundaries while merging all instances into one
     // DrawIndexed. Legacy one-instance and non-instanced paths are unchanged.
-    const UINT nativeSubmissionCount =
-        compactInstancedGeometry ? 1u : instanceCount;
+    const UINT nativeSubmissionCount = compactListInstances
+        ? 1u : (connectedCandidate ? connectedSubmission.drawCount : instanceCount);
     const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
     // The native API dispatch sites remain inside this guarded submit.

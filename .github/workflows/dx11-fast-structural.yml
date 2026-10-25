@@ -538,6 +538,9 @@ jobs:
           python tools/test_dx11_sm3_multistream_game_draw_01029.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_instance_list_batch_probe_01030.cpp -o /tmp/dx11_list_batch_01030 && /tmp/dx11_list_batch_01030
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_connected_instance_probe_01031.cpp -o /tmp/dx11_connected_instance_01031 && /tmp/dx11_connected_instance_01031
+          # 01074: source-valid large connected instances segment GPU submits, no draw loss.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_connected_submission_01074.cpp -o /tmp/dx11_connected_submission_01074 && /tmp/dx11_connected_submission_01074
+          python tools/test_dx11_sm3_connected_submission_01074.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_polygon_raster_probe_01032.cpp -o /tmp/dx11_polygon_raster_01032 && /tmp/dx11_polygon_raster_01032
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_colorfill_gpu_probe_01033.cpp -o /tmp/dx11_pre_draw_01033 && /tmp/dx11_pre_draw_01033
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_overdraw_probe_01034.cpp -o /tmp/dx11_pre_draw_01034 && /tmp/dx11_pre_draw_01034
