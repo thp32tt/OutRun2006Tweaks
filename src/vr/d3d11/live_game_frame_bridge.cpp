@@ -6,6 +6,7 @@
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_table_fog.hpp"
 #include "live_game_sm3_user_clip.hpp"
+#include "live_game_fixed_clip.hpp"
 #include "live_game_sm3_depth_output.hpp"
 #include "live_game_sm3_partial_color.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
@@ -505,8 +506,8 @@ constexpr float kMaxMipLodBias = 15.99f;
 
 constexpr std::array<float, 4> kBackground{0.035f, 0.035f, 0.08f, 1.0f};
 constexpr char kShader[] = R"(
-struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; float2 uvStage1 : TEXCOORD1; };
-struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; float2 uvStage1 : TEXCOORD1; };
+struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; float2 uvStage1 : TEXCOORD1; float4 clip0 : TEXCOORD2; float4 clip1 : TEXCOORD3; };
+struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; float2 uvStage1 : TEXCOORD1; float4 clip0 : SV_ClipDistance0; float4 clip1 : SV_ClipDistance1; };
 Texture2D gameTexture : register(t0);
 SamplerState gameSampler : register(s0);
 cbuffer AlphaParams : register(b0) { float4 alphaParams; };
@@ -523,7 +524,7 @@ void AlphaGate(float alpha) {
         clip(pass ? 1.0f : -1.0f);
     }
 }
-VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; o.specular = v.specular; o.uvStage1 = v.uvStage1; return o; }
+VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; o.specular = v.specular; o.uvStage1 = v.uvStage1; o.clip0 = v.clip0; o.clip1 = v.clip1; return o; }
 float4 PS(VOut v) : SV_Target { float4 c = v.diffuse; AlphaGate(c.a); return c; }
 float4 PSTextured(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv) * v.diffuse; AlphaGate(c.a); return c; }
 float4 PSTextureOnly(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv); AlphaGate(c.a); return c; }
@@ -1083,6 +1084,8 @@ struct NativeVertex {
     float uv[2];
     float specular[4]; // Packed D3D9 FVF SPECULAR, never aliased with DIFFUSE.
     float uvStage1[2]; // Independently selected and COUNT2-transformed game Stage1 UV.
+    float clip0[4]; // World-space FVF plane distances 0..3.
+    float clip1[4]; // World-space FVF plane distances 4..5.
 };
 
 // Narrow fixed-function stage-0 textured subset for real game menu/vehicle/race
@@ -2215,10 +2218,14 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
         {"COLOR", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 0, 56,
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 64,
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 80,
          D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
-    static_assert(sizeof(NativeVertex) == 64u, "Native vertex/IA Stage1 UV mismatch");
-    if (FAILED(dev->CreateInputLayout(elements, 5,
+    static_assert(sizeof(NativeVertex) == 96u, "Native FVF user-plane/IA mismatch");
+    if (FAILED(dev->CreateInputLayout(elements, 7,
         vcode->GetBufferPointer(), vcode->GetBufferSize(), s.layout.GetAddressOf())))
         return false;
     D3D11_RASTERIZER_DESC raster{};
@@ -2486,6 +2493,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                           D3DVIEWPORT9& viewport,
                           GameFvfLayout& layout,
                           std::array<D3DMATRIX, 3>& transforms,
+                          NativeGameFixedClipPlanes& fixedClip,
                           TextureCapture& capture, OutputCapture& output) noexcept {
     if (!game || FAILED(game->GetViewport(&viewport)) ||
         viewport.Width == 0 || viewport.Height == 0 ||
@@ -3824,12 +3832,25 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             static_cast<float>((stageConstant >> 24) & 255u) * kByteScale
         };
     }
-    // Custom clip planes are not implemented by the native shader. The
-    // object-space path must also reject D3D9 lighting and vertex blending.
+    // Fixed-function D3D9 plane coefficients use WORLD coordinates.
+    // Capture the real game plane for each Draw, not the SM3 clip-space path.
     DWORD clipPlanes = ~0u;
-    if (FAILED(game->GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)) ||
-        clipPlanes != 0u)
+    if (FAILED(game->GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)))
         return false;
+    D3DCAPS9 clipCaps{};
+    if (clipPlanes && FAILED(game->GetDeviceCaps(&clipCaps))) return false;
+    if (!native_game_fixed_clip_mask_admitted(
+            clipPlanes, clipPlanes ? clipCaps.MaxUserClipPlanes : 0u,
+            layout.pretransformed)) return false;
+    fixedClip = {};
+    fixedClip.mask = clipPlanes;
+    for (DWORD slot = 0u; slot < 6u; ++slot) {
+        if ((clipPlanes & (1u << slot)) == 0u) continue;
+        if (FAILED(game->GetClipPlane(slot, fixedClip.world[slot].data())))
+            return false;
+        for (float c : fixedClip.world[slot])
+            if (!std::isfinite(c)) return false;
+    }
     if (!layout.pretransformed) {
         DWORD lighting = TRUE, vertexBlend = ~0u;
         if (FAILED(game->GetRenderState(D3DRS_LIGHTING, &lighting)) ||
@@ -3847,6 +3868,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
 bool translate_vertices(const void* input, UINT count, UINT stride,
                         const D3DVIEWPORT9& vp, const GameFvfLayout& layout,
                         const std::array<D3DMATRIX, 3>& transforms,
+                        const NativeGameFixedClipPlanes& fixedClip,
                         const TextureCapture& capture,
                         std::vector<NativeVertex>& output) {
     if (!input || stride < layout.minStride || stride > 512u ||
@@ -3920,6 +3942,12 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             (layout.pretransformed && (!std::isfinite(xyz[3]) || xyz[3] <= 0.0f)))
             return false;
         NativeVertex& v = output[i];
+        std::array<float, 8> distances{};
+        if (!native_game_fixed_clip_distances(
+                decoded.position, transforms[0].m, fixedClip, distances))
+            return false;
+        std::copy_n(distances.begin(), 4u, v.clip0);
+        std::copy_n(distances.begin() + 4u, 4u, v.clip1);
         if (layout.pretransformed) {
             // D3D9 XYZRHW stores reciprocal homogeneous W. Preserve it for
             // perspective-correct UV interpolation instead of treating a menu
@@ -7338,9 +7366,11 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         D3DVIEWPORT9 vp{};
         GameFvfLayout layout{};
         std::array<D3DMATRIX, 3> transforms{};
+        NativeGameFixedClipPlanes fixedClip{};
         TextureCapture capture{};
         OutputCapture output{};
-        if (!supported_game_state(game, type, vp, layout, transforms, capture, output)) {
+        if (!supported_game_state(game, type, vp, layout, transforms,
+                                  fixedClip, capture, output)) {
             // Once a multi-draw scene starts, an unsupported real game Draw
             // is not a transparent hole in the native compositor. Cancel
             // publication without affecting the original D3D9 rendering.
@@ -7444,7 +7474,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         }
         std::vector<NativeVertex> vertices;
         if (!translate_vertices(bytes, vertexCount, stride, vp,
-                                layout, transforms, capture, vertices)) {
+                                layout, transforms, fixedClip, capture, vertices)) {
             s.frameBatch.abort();
             return;
         }
