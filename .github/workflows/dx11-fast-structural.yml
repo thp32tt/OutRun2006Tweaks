@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - vr-dx11-native-r71
+      - feature/dx11-01074-connected-gate-repair
       - feature/dx11-01045-first-full-colorfill-game-frame
       - feature/dx11-01037-offscreen-postpass-overflow
       - feature/dx11-01013-visible-game-frame
