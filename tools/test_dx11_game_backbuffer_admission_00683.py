@@ -20,7 +20,7 @@ def connected(code):
         "return env_full_game_opt_in()")) and all(p in draw for p in (
         "if (!game_native_backbuffer_ready(game, viewport)) return false;",
         "return true;")) and all(p in src for p in (
-        "if (!supported_game_state(game, type, vp, layout, transforms, capture, output))",
+        "if (!supported_game_state(game, type, vp, layout, transforms,\n                                  fixedClip, capture, output))",
         "ctx->DrawIndexed(indexCount, 0, 0);", "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")) and (
         "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in present and
         ": s.frameBatch.publishable(s.pending);" in present and
