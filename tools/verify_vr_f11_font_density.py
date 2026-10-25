@@ -741,11 +741,11 @@ def check_font_io_cache_contract(font: str) -> None:
 
 
 def check_external_vr_f11_canvas(font: str) -> None:
-    """Active VR F11 uses the whole source canvas even at density 1; game rails stay intact."""
+    """VR gameplay F11 uses the whole source canvas; front-end F11 retains the 4:3 menu content rect."""
     shell = font.split("Overlay::ContentRect Overlay::content_rect()", 1)[1].split(
         "const std::vector<OverlayWindow*>& Overlay::windows()", 1)[0]
     required = (
-        "const bool externalVrShell = Settings::VREnabled &&\n\t\t(Game::is_vr_gameplay_presentation() || !Game::is_in_game());",
+        "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
         "Game::is_vr_gameplay_presentation();",
         "if (externalVrShell)\n\t\treturn { 0.f, 0.f, screen.x, screen.y };",
         "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0",
@@ -792,7 +792,7 @@ def check_external_vr_f11_canvas(font: str) -> None:
 
     # Mutants must fail at the actual owner (not detached numeric fixtures).
     for original, bad in (
-        ("const bool externalVrShell = Settings::VREnabled &&\n\t\t(Game::is_vr_gameplay_presentation() || !Game::is_in_game());",
+        ("const bool externalVrShell = Game::is_vr_gameplay_presentation();",
          "const bool externalVrShell = VrFontMultiplier > 1.0f && Game::is_vr_gameplay_presentation();"),
         ("Game::is_vr_gameplay_presentation();", "Game::is_in_game();"),
         ("if (externalVrShell)", "if (false)"),
@@ -802,7 +802,7 @@ def check_external_vr_f11_canvas(font: str) -> None:
         assert shell.count(original) == 1, original
         changed = shell.replace(original, bad, 1)
         assert not all(x in changed for x in required), original
-    print("PASS F11 VR font-independent full-source canvas, desktop/menu 4:3 preserved, 5 sizes and 4 mutants")
+    print("PASS F11 gameplay full-source canvas + front-end 4:3 menu content rect, 5 sizes and 4 mutants")
 
 def check_first_run_vr_modal(font: str) -> None:
     """The actual XR first-run popup uses the portable modal fit and a fixed footer."""
