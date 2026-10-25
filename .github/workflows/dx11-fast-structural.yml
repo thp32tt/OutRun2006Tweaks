@@ -292,6 +292,9 @@ jobs:
           python tools/test_dx11_native_float_camera_pair_01066.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_live_fixed_clip_01067.cpp -o /tmp/dx11_live_fixed_clip_01067 && /tmp/dx11_live_fixed_clip_01067
           python tools/test_dx11_live_fixed_clip_01067.py
+          # 01068 signed D3D9 U/V/W/Q bump/normal-map textures through native VS/PS SRVs.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_signed_normal_game_probe_01068.cpp -o /tmp/dx11_signed_normal_01068 && /tmp/dx11_signed_normal_01068
+          python tools/test_dx11_signed_normal_texture_01068.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_reset_probe_00741.cpp -o /tmp/dx11_source_reset_00741 && /tmp/dx11_source_reset_00741
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_owner_handoff_probe_00740.cpp -o /tmp/dx11_source_owner_00740 && /tmp/dx11_source_owner_00740
           python tools/test_dx11_game_backbuffer_admission_00683.py

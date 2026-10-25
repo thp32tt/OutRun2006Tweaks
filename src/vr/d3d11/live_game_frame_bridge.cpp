@@ -41,6 +41,7 @@
 #include "live_game_mip_lod.hpp"
 #include "live_game_draw_mirror_cache.hpp"
 #include "live_game_float_vector_texture.hpp"
+#include "live_game_signed_normal_texture.hpp"
 #include "live_game_dynamic_texture.hpp"
 #include "live_game_10bit_texture.hpp"
 #include "live_game_extended_luminance_texture.hpp"
@@ -4391,6 +4392,14 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                              base.Format == D3DFMT_G16R16F ||
                              base.Format == D3DFMT_R32F ||
                              base.Format == D3DFMT_G32R32F;
+    // Signed-normal material UV gradients and per-pixel bump directions:
+    // preserve negative component bits and U/V/W/Q channel order through
+    // native SM3 texture sampling. Do not use an RGBA8/BGRA8 color decode.
+    const auto signedNormalLayout =
+        signed_normal_texture::from_d3d9_format(
+            static_cast<std::uint32_t>(base.Format));
+    const bool signedNormal = signed_normal_texture::sampleable(
+        signedNormalLayout, capture.srgbTexture);
     const auto floatVectorLayout =
         base.Format == D3DFMT_R16F ? float_vector_texture::Layout::r16f :
         base.Format == D3DFMT_G16R16F ? float_vector_texture::Layout::rg16f :
@@ -4428,6 +4437,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // FLOAT source textures have no DXGI sRGB view. Never reinterpret a
     // game-authored sRGB request as linear in the diagnostic output.
     if (capture.srgbTexture && floatVector) return false;
+    if (capture.srgbTexture &&
+        signedNormalLayout != signed_normal_texture::Layout::unsupported)
+        return false; // No sRGB SNORM view, do not reinterpret bump texels.
     // Palettized sRGB lookup/transfer parity is not proven on D3D9.
     if (capture.srgbTexture && a8p8) return false;
     if (capture.srgbTexture && p8) return false;
@@ -4447,6 +4459,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit || extendedLuma) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else if (signedNormal) {
+        // Original D3D9 memory is U then V (then W,Q): native R,G,B,A.
+        // DXGI SNORM sampling preserves the source's signed direction.
+        nativeFormat = signedNormalLayout == signed_normal_texture::Layout::uv8
+            ? DXGI_FORMAT_R8G8_SNORM :
+            signedNormalLayout == signed_normal_texture::Layout::uv16
+            ? DXGI_FORMAT_R16G16_SNORM : DXGI_FORMAT_R8G8B8A8_SNORM;
     } else if (floatVector) {
         // D3D9 R16F/G16R16F/R32F/G32R32F LockRect rows match the
         // little-endian DXGI R/RG FLOAT component ordering and precision.
@@ -4487,7 +4506,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // Budget the physical destination layout, not a guessed BGRA8 size:
     // an exact 4K x 2K R16F texture must not be rejected as 32 MiB.
     const UINT atlasTexelBytes =
-        nativeFormat == DXGI_FORMAT_R16_FLOAT ? 2u :
+        (nativeFormat == DXGI_FORMAT_R16_FLOAT ||
+         nativeFormat == DXGI_FORMAT_R8G8_SNORM) ? 2u :
         nativeFormat == DXGI_FORMAT_R32G32B32A32_FLOAT ? 16u :
         (nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ||
          nativeFormat == DXGI_FORMAT_R16G16B16A16_UNORM ||
@@ -4547,6 +4567,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const UINT sourceTexelBytes = packed16 ? 2u :
         floatRgba ? float_rgba_texture::source_bytes_per_texel(floatLayout) :
         floatVector ? float_vector_texture::source_bytes_per_texel(floatVectorLayout) :
+        signedNormal ? signed_normal_texture::source_bytes_per_texel(signedNormalLayout) :
         rgba16 ? rgba16_texture::source_bytes_per_texel() :
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
@@ -4649,6 +4670,15 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     float_rgba_texture::copy_row(source, destination, desc.Width, floatLayout);
                 else if (floatVector)
                     float_vector_texture::copy_row(source, destination, desc.Width, floatVectorLayout);
+                else if (signedNormal) {
+                    // Exact signed component bits; preserve negative normals.
+                    if (!signed_normal_texture::copy_row(
+                            source, destination, desc.Width, signedNormalLayout)) {
+                        if (gpuRenderTarget) readbackSurface->UnlockRect();
+                        else capture.texture->UnlockRect(level);
+                        return false;
+                    }
+                }
                 else if (rgb332)
                     rgb332_texture::unpack_row(source, destination, desc.Width, rgb332Layout);
                 else if (p8)
