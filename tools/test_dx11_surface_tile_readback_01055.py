@@ -10,7 +10,8 @@ assert 's.surfaceReplayTile.reset();' in s[s.index('void before_game_reset('):]
 assert copy.index('actualIdentity.Get() != backbufferIdentity.Get()') < copy.index('s.surfaceReplayTile.capture(')
 assert copy.index('s.frameBatch.publishable(s.pending)') < copy.index('s.surfaceReplayTile.capture(')
 assert copy.index('const auto region = preDrawCopy') < copy.index('s.surfaceReplayTile.capture(')
-assert 'if (!preDrawCopy &&' in copy
+assert 'const bool tileCandidate = !preDrawCopy' in copy
+assert 'if (tileCandidate) {' in copy
 assert 'tileSucceeded = s.surfaceReplayTile.capture(' in copy
 assert 'if (!tileSucceeded) {' in copy
 assert 'game->GetRenderTargetData(' in copy

@@ -30,7 +30,8 @@ int main() {
         b.note_success(3440,1440); // driver tile failure: full RT readback
     }
     assert(!b.admits(3440,1440) && b.admits_bytes(tileBytes));
-    const auto stable=b.bytes, count=b.operations;
+    const auto stable=b.bytes;
+    const auto count=b.operations;
     b.note_success_bytes(fullBytes); // denied fallback MUST be side-effect free
     assert(b.bytes==stable && b.operations==count);
     b.note_success_bytes(tileBytes);
