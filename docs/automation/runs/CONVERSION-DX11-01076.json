@@ -108,15 +108,15 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
-      "NATIVE_SM3_SHADER_AND_GPU_DRAW",
-      "FULL_RESOLUTION_NATIVE_TARGET"
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; physical menu/car/race native image, gameplay input parity, Quest3 and VDXR optical output remain UNTESTED.",
     "activation_guard_and_fallback": "Native full game GPU path remains opt-in/fail-closed. Real D3D9Ex Draw/Present/input/FFB/SkyGlow authoritative; DXVK frozen."
   },
   "acceptance_results": {
-    "segmented_live_sm3_gpu_draw": "PASS_SOURCE_AND_EXACT_SHA_CI_RUNTIME_UNTESTED",
-    "fallback_source_rejection": "PASS_SOURCE_AND_EXACT_SHA_CI_RUNTIME_UNTESTED",
+    "segmented_live_sm3_gpu_draw": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "fallback_source_rejection": "PASS_SOURCE_AND_EXACT_SHA_CI",
     "exact_sha_full_gate": "PASS_EXACT_SHA"
   },
   "mandatory_gate_results": [
@@ -161,5 +161,6 @@
   "c6_previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
   "c6_status_reconciliation": "Bookkeeping only: source stage validated on unchanged exact SHA with five mandatory GitHub Actions success; no additional build, source change, runtime proof or score award.",
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun 2006 / Quest 3 / VDXR gameplay session, physical native frame count, or FPS measurement.",
-  "next_implementation_action": "Continue the shared unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME feature using next owned safe development work; do not re-score or reconfirm unchanged exact-SHA CI."
+  "next_implementation_action": "Continue the shared unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME feature using next owned safe development work; do not re-score or reconfirm unchanged exact-SHA CI.",
+  "c6_policy_record_repair": "01077 exact-SHA DX11 Fast CI failed because legacy 01076 source-only C6 acceptance names conflated HMD runtime UNTESTED with BUILD acceptance and stage labels did not meet canonical source path. Preserve 01076 exact-SHA five verified Gate IDs/source SHA, set stage labels to real source-authored D3D9 callsite -> D3D11 GPU Draw -> guarded full-sized frame OUTPUT; never infer published physical game/Quest3 frames. Runtime stays UNTESTED, renderer_complete=false, score unchanged."
 }
