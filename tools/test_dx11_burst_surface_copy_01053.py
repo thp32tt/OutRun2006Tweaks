@@ -7,12 +7,14 @@ h=(root/'src/vr/d3d11/native_game_surface_replay_budget.hpp').read_text(encoding
 copy=s[s.index('bool preserve_game_surface_copy('):s.index('bool begin_game_surface_cpu_write(')]
 write=s[s.index('bool begin_game_surface_cpu_write('):s.index('void finish_game_surface_cpu_write(')]
 assert 'GameNativeSurfaceReplayBudget surfaceReplayBudget' in s
-assert 's.surfaceReplayBudget.admits(desc.Width, desc.Height)' in copy
+assert 's.surfaceReplayBudget.admits_bytes(plannedReadbackBytes)' in copy
+assert '!s.surfaceReplayBudget.admits(desc.Width,desc.Height)' in copy
 assert '!s.surfaceReplayBudget.admits(desc.Width, desc.Height)' in write
-assert copy.count('s.surfaceReplayBudget.note_success(desc.Width, desc.Height);') == 2
+assert copy.count('s.surfaceReplayBudget.note_success(desc.Width, desc.Height);') == 1
+assert copy.count('s.surfaceReplayBudget.note_success_bytes(') == 1
 assert copy.index('GetRenderTargetData(') < copy.index('s.surfaceReplayBudget.note_success(')
 assert copy.index('s.preDrawSurface.record_consuming(') < copy.index('s.surfaceReplayBudget.note_success(')
-assert copy.index('CopySubresourceRegion(') < copy.rindex('s.surfaceReplayBudget.note_success(')
+assert copy.index('CopySubresourceRegion(') < copy.rindex('s.surfaceReplayBudget.note_success_bytes(')
 assert 's.surfaceReplayCount' not in s
 assert s.count('s.surfaceReplayBudget.reset();') == 6
 assert 'kMaxBytes - bytes' in h and 'kMaxOperations' in h

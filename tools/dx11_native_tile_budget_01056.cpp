@@ -25,7 +25,7 @@ int main() {
         b.note_success_bytes(tileBytes);
     }
     assert(b.operations==31u && b.bytes==fullBytes+30u*tileBytes);
-    for(unsigned i=0;i<11u;++i) {
+    for(unsigned i=0;i<12u;++i) {
         assert(b.admits(3440,1440));
         b.note_success(3440,1440); // driver tile failure: full RT readback
     }

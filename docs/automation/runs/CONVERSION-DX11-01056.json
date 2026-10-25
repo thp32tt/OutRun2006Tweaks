@@ -31,7 +31,8 @@
     "src/vr/d3d11/native_game_surface_replay_budget.hpp",
     "tools/dx11_native_tile_budget_01056.cpp",
     "tools/test_dx11_tile_budget_01056.py",
-    "docs/automation/runs/CONVERSION-DX11-01056.json"
+    "docs/automation/runs/CONVERSION-DX11-01056.json",
+    "tools/test_dx11_burst_surface_copy_01053.py"
   ],
   "feature_contract": {
     "feature_id": "DX11:AUTHENTIC_GPU_TILE_BURST_FRAME_PRESERVATION",
@@ -94,7 +95,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "blocking_evidence": "01055 accurate GPU source tile capture still inherited 01053 unconditional full 19,814,400-byte charge for each successful 64x64 postdraw tile; 30 authentic mutations prematurely cut native output."
+    "blocking_evidence": "01055 accurate GPU source tile capture still inherited 01053 unconditional full 19,814,400-byte charge for each successful 64x64 postdraw tile; 30 authentic mutations prematurely cut native output. GitHub Fast exact SHA fcfcdb13 failed inherited 01053 structural test assuming every postdraw tile is a full readback. 01056 C++ negative budget test also required 12, not 11, full fallback transfers to exhaust a 256MiB budget; both corrected without removing assertions."
   },
   "acceptance_results": {
     "postdraw_tile_burst": {
@@ -119,5 +120,15 @@
   "next_implementation_action": "Validate five mandatory GitHub Actions on material SHA; fix any exact failure in same TASK_ID.",
   "runtime_note": "Actual game/Quest3 untested; source tests do not establish HMD performance or native full-frame gameplay.",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null
+  "validation_bearing_result_sha": null,
+  "validation_history": [
+    {
+      "exact_sha": "fcfcdb13f3e714821247b5ee7ab47c96128b5e82",
+      "gate": "DX11 Fast Structural Checks",
+      "run_id": 40147303180,
+      "result": "FAIL",
+      "root_cause": "01053 historical structural assertion assumed unconditional full-source budget; changed source correctly distinguishes GPU tile from full fallback; 01056 standalone C++ exhaustion fixture loop count off by one.",
+      "remediation": "Modify only inherited structural expected route + C++ negative fixture; keep full-source/preDraw, GPU-copy, fail-closed, 64-operation coverage."
+    }
+  ]
 }
