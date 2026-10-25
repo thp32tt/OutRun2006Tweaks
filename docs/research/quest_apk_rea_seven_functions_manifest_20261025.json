@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "native_elf_sha256": "fa0f9db9b744515a9a1439741bc9806ad007470b621b88d22a0b8cbced6120b6",
+  "tool": "REA 6.5.0 with Ghidra 12.1.4",
+  "mode": "function bounded AArch64 raw slices; not full ELF",
+  "full_elf_attempt": "REA analyze timed out after 260 seconds; no full-ELF REA result",
+  "runtime_validation": "UNTESTED",
+  "limitations": "Raw slices omit external symbols/calls and can truncate CFG; code returned is not original authored source.",
+  "results": [
+    {
+      "name": "race_camera_view_switch",
+      "elf_start": "0x119240c",
+      "input_size": 536,
+      "slice_sha256": "5de61214babea4aecac586b5f28ece5d44b0cac08a9f46d5113555df36fd6c84",
+      "rea_evidence_id": "ev_3b72ec32f824d53bb9fcda4eca7280e739ae2225322e426d885af05e1736e080",
+      "provider_version": "12.1.4",
+      "rea_function_body_ranges": [
+        {
+          "start": "0x0",
+          "end": "0x217"
+        }
+      ],
+      "rea_body_total_bytes": 536,
+      "rea_body_noncontiguous": false,
+      "rea_pseudocode_chars": 3262,
+      "rea_pseudocode_has_bad_instruction": true,
+      "rea_unresolved_call_count": 10,
+      "rea_outgoing_reference_count": 41,
+      "rea_relationship_coverage": "partial",
+      "local_rea_json_sha256": "790ebb9b8fbb5b7462ba6eb18bc04d35b5d7665149bea26dc26a41882c5d14b9"
+    },
+    {
+      "name": "glass_draw_404700",
+      "elf_start": "0x10b9894",
+      "input_size": 2664,
+      "slice_sha256": "b3c1351b93493df95250fc27d6308b9a64926441f48ea5c77e69daf4eecc616c",
+      "rea_evidence_id": "ev_1c9f2816e5235af64a8dee1623c2b60c04e645964f23772f9fac8b211e9a760d",
+      "provider_version": "12.1.4",
+      "rea_function_body_ranges": [
+        {
+          "start": "0x0",
+          "end": "0xa3f"
+        },
+        {
+          "start": "0xa50",
+          "end": "0xa67"
+        }
+      ],
+      "rea_body_total_bytes": 2648,
+      "rea_body_noncontiguous": true,
+      "rea_pseudocode_chars": 17173,
+      "rea_pseudocode_has_bad_instruction": true,
+      "rea_unresolved_call_count": 40,
+      "rea_outgoing_reference_count": 224,
+      "rea_relationship_coverage": "partial",
+      "local_rea_json_sha256": "420872e85fc34aaa792589fd9095d44c6d8a83fd7ac6b9440d6cad874d7e8af2"
+    },
+    {
+      "name": "cockpit_render_frame",
+      "elf_start": "0x10cbe9c",
+      "input_size": 2816,
+      "slice_sha256": "fe0bde5f22089fcac9a52bcb2c9f4a761a1f08578a09d3ed183e3610c9d5334e",
+      "rea_evidence_id": "ev_c15ec946f24f83736d9e9bb830054fef11d1019ac59fe423de85aca3267446da",
+      "provider_version": "12.1.4",
+      "rea_function_body_ranges": [
+        {
+          "start": "0x0",
+          "end": "0xa2f"
+        },
+        {
+          "start": "0xa74",
+          "end": "0xaff"
+        }
+      ],
+      "rea_body_total_bytes": 2748,
+      "rea_body_noncontiguous": true,
+      "rea_pseudocode_chars": 16341,
+      "rea_pseudocode_has_bad_instruction": true,
+      "rea_unresolved_call_count": 27,
+      "rea_outgoing_reference_count": 199,
+      "rea_relationship_coverage": "partial",
+      "local_rea_json_sha256": "b65d10ef1af552b784aecf868424491ccaf0c85178afe2d8904b2983fe0f6bb8"
+    },
+    {
+      "name": "driver_occupant_draw",
+      "elf_start": "0xd60fd4",
+      "input_size": 7676,
+      "slice_sha256": "a8d61d40eed2421d07349935da5c18c4aba3426531e77de3dd01b8e6e04322c3",
+      "rea_evidence_id": "ev_2ac0a21b4a7607f71d031aaf41a3b81c7e49a7bfc755c790a7825ead3ec3b10d",
+      "provider_version": "12.1.4",
+      "rea_function_body_ranges": [
+        {
+          "start": "0x0",
+          "end": "0x1c5f"
+        },
+        {
+          "start": "0x1ce4",
+          "end": "0x1cf3"
+        },
+        {
+          "start": "0x1dd8",
+          "end": "0x1dfb"
+        }
+      ],
+      "rea_body_total_bytes": 7316,
+      "rea_body_noncontiguous": true,
+      "rea_pseudocode_chars": 42763,
+      "rea_pseudocode_has_bad_instruction": true,
+      "rea_unresolved_call_count": 248,
+      "rea_outgoing_reference_count": 696,
+      "rea_relationship_coverage": "partial",
+      "local_rea_json_sha256": "7a603a1edf9bd9f621f0c4dd41437a282e703660026280c66f5ff376c1d93c18"
+    },
+    {
+      "name": "xr_locate_eyes",
+      "elf_start": "0x2d69c8",
+      "input_size": 656,
+      "slice_sha256": "06b91049efacba6a0a4acb4a8eeeee78d16afb86f0131a958b9f4cbeab4bc672",
+      "rea_evidence_id": "ev_870962117da11e023f98360893f89038a723020c0a4febae5cf62b5290b5e854",
+      "provider_version": "12.1.4",
+      "rea_function_body_ranges": [
+        {
+          "start": "0x0",
+          "end": "0x28f"
+        }
+      ],
+      "rea_body_total_bytes": 656,
+      "rea_body_noncontiguous": false,
+      "rea_pseudocode_chars": 5092,
+      "rea_pseudocode_has_bad_instruction": false,
+      "rea_unresolved_call_count": 10,
+      "rea_outgoing_reference_count": 71,
+      "rea_relationship_coverage": "partial",
+      "local_rea_json_sha256": "f40e9c8b9a1620df8272ad0a274809413dcc34f81559d9bf4f9c2c148e3e147d"
+    },
+    {
+      "name": "native_driver_character",
+      "elf_start": "0x39f33c",
+      "input_size": 444,
+      "slice_sha256": "031b5c634839b01bd7d2c61c032b6645a9a52530ba74b723014a12a1cee33450",
+      "rea_evidence_id": "ev_ec2a549fb087ce80f45bc136b1bbbfbb2bc9990597f3ed87042630db91ae978d",
+      "provider_version": "12.1.4",
+      "rea_function_body_ranges": [
+        {
+          "start": "0x0",
+          "end": "0x1bb"
+        }
+      ],
+      "rea_body_total_bytes": 444,
+      "rea_body_noncontiguous": false,
+      "rea_pseudocode_chars": 2233,
+      "rea_pseudocode_has_bad_instruction": true,
+      "rea_unresolved_call_count": 13,
+      "rea_outgoing_reference_count": 48,
+      "rea_relationship_coverage": "partial",
+      "local_rea_json_sha256": "6d301b5633db60bfb11b3cfba0b1d27613940b5631e0b7e5e9ea2df02129f4ba"
+    },
+    {
+      "name": "cockpit_fragment",
+      "elf_start": "0x2f7734",
+      "input_size": 376,
+      "slice_sha256": "a095d0bfded18ec835aa24e7d5036c6732a37e73298db893eaf8d7123a42925d",
+      "rea_evidence_id": "ev_ca6609f0db6d6de53fb9d98700e2ae129df7751268eaad2db603e143914f1ebe",
+      "provider_version": "12.1.4",
+      "rea_function_body_ranges": [
+        {
+          "start": "0x0",
+          "end": "0x14f"
+        },
+        {
+          "start": "0x174",
+          "end": "0x177"
+        }
+      ],
+      "rea_body_total_bytes": 340,
+      "rea_body_noncontiguous": true,
+      "rea_pseudocode_chars": 2492,
+      "rea_pseudocode_has_bad_instruction": true,
+      "rea_unresolved_call_count": 6,
+      "rea_outgoing_reference_count": 33,
+      "rea_relationship_coverage": "partial",
+      "local_rea_json_sha256": "4cea15f7777c43c0dc541d9e98f6f4b3450ad0a55364b7992f8db0a1ff5b275c"
+    }
+  ]
+}
