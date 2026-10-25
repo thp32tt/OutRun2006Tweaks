@@ -67,6 +67,27 @@ def patch(source):
                 return
             answer = await last_assistant_text(page)
             if not answer:
+                # ChatGPT UI occasionally changes/removes data-message-author-role.
+                # For GPT OCR only, fall back to visible response containers and
+                # accept text only when it is bound to this exact task id.
+                task_token = str(gpt_active.get("task_id") or "")
+                for fallback_sel in (
+                    "pre", "code", "main .markdown", "main [class*='markdown']",
+                    "[data-testid^='conversation-turn-']", "article"
+                ):
+                    try:
+                        texts = await page.locator(fallback_sel).all_inner_texts()
+                    except Exception:
+                        continue
+                    for candidate in reversed(texts):
+                        candidate = (candidate or "").strip()
+                        if (task_token and task_token in candidate and
+                                '"detections"' in candidate and '"source_png"' in candidate):
+                            answer = candidate
+                            break
+                    if answer:
+                        break
+            if not answer:
                 slot.last_result = "GPT_OCR_RESPONSE_NOT_READY"
                 save_registry(reg)
                 write_runtime(status="gpt_ocr_waiting", last_action="C1 OCR: assistant response not visible yet")
