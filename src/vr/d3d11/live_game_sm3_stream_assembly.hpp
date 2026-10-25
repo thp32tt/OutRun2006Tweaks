@@ -60,15 +60,19 @@ struct GameSm3ElementRef {
 // expanded vertices also support the D3D9 SM3 multi-stream packed formats
 // already decoded by game_sm3_unpack_attribute. The caller must issue one
 // Draw/DrawIndexed PER source instance for strip and fan topology boundaries.
+// firstInstance allows bounded GPU upload segments without resetting the
+// source's instance-frequency divisor or treating a later instance as zero.
 [[nodiscard]] inline bool game_sm3_assemble_instanced_streams(
     const std::vector<GameSm3ElementRef>& elements,
     const std::array<GameSm3StreamView,16>& streams,
     std::uint32_t verticesPerInstance, std::uint32_t instanceCount,
     const std::array<std::uint32_t,16>& instanceStep,
-    std::vector<std::uint8_t>& destination) noexcept {
+    std::vector<std::uint8_t>& destination,
+    std::uint32_t firstInstance = 0u) noexcept {
     constexpr std::uint64_t kMaxBytes = 1ull << 25u;
     if (elements.empty() || elements.size() > 32u ||
-        !verticesPerInstance || !instanceCount || instanceStep[0] != 0u)
+        !verticesPerInstance || !instanceCount || instanceStep[0] != 0u ||
+        firstInstance > UINT32_MAX - (instanceCount - 1u))
         return false;
     const auto stride = static_cast<std::uint64_t>(elements.size()) * 16u;
     const auto outputCount =
@@ -78,8 +82,12 @@ struct GameSm3ElementRef {
         if (element.stream >= streams.size()) return false;
         const auto& stream = streams[element.stream];
         const auto width = game_sm3_decl_width(element.type);
-        const auto required = instanceStep[element.stream]
-            ? (instanceCount - 1u) / instanceStep[element.stream] + 1u
+        // The partial segment uses the *original* global D3D9 instance
+        // ordinal; stream divisors must not restart at each GPU upload.
+        const std::uint64_t lastInstance =
+            std::uint64_t(firstInstance) + instanceCount - 1u;
+        const std::uint64_t required = instanceStep[element.stream]
+            ? lastInstance / instanceStep[element.stream] + 1u
             : verticesPerInstance;
         if (!stream.data || !stream.stride || !width ||
             stream.vertexCount < required ||
@@ -96,7 +104,8 @@ struct GameSm3ElementRef {
                     const auto& element = elements[elementIndex];
                     const auto& stream = streams[element.stream];
                     const auto sourceIndex = instanceStep[element.stream]
-                        ? inst / instanceStep[element.stream] : vertex;
+                        ? (firstInstance + inst) / instanceStep[element.stream]
+                        : vertex;
                     std::array<float,4> decoded{};
                     if (!game_sm3_unpack_attribute(
                             element.type,

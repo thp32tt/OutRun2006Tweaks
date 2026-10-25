@@ -544,6 +544,10 @@ jobs:
           # 01075: real source indexed independent lists preserve valid high-instance draws.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_list_submission_01075.cpp -o /tmp/dx11_list_submission_01075 && /tmp/dx11_list_submission_01075
           python tools/test_dx11_sm3_list_submission_01075.py
+          # 01076: real live D3D9 indexed/linear multi-stream instances
+          # survive one native VB budget with global frequency semantics.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_segmented_instances_01076.cpp -o /tmp/dx11_segmented_instances_01076 && /tmp/dx11_segmented_instances_01076
+          python tools/test_dx11_sm3_segmented_instances_01076.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_polygon_raster_probe_01032.cpp -o /tmp/dx11_polygon_raster_01032 && /tmp/dx11_polygon_raster_01032
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_colorfill_gpu_probe_01033.cpp -o /tmp/dx11_pre_draw_01033 && /tmp/dx11_pre_draw_01033
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_overdraw_probe_01034.cpp -o /tmp/dx11_pre_draw_01034 && /tmp/dx11_pre_draw_01034

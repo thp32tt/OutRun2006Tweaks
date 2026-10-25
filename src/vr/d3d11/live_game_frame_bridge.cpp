@@ -5454,7 +5454,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     const std::uint64_t expandedVertices =
         static_cast<std::uint64_t>(vertexCount) * instanceCount;
-    if (!expandedVertices || expandedVertices > kMaxVertices)
+    // R30 can capture a small genuine mesh with many D3D9 instance records.
+    // Rejecting its product against the *single upload* vertex budget drops
+    // an otherwise valid menu/car/race draw and poisons native publication.
+    // Keep the same bounded buffer and replay one source-authored instance
+    // at a time. The extra native submits have an explicit per-draw ceiling;
+    // original D3D9 remains authoritative for larger batches.
+    constexpr UINT kMaxSegmentedGameInstances = 128u;
+    const bool segmentedInstanceUpload = sourceInstancing &&
+        instanceCount > 1u && expandedVertices > kMaxVertices &&
+        instanceCount <= kMaxSegmentedGameInstances;
+    if (!expandedVertices ||
+        (expandedVertices > kMaxVertices && !segmentedInstanceUpload))
         return false;
     std::array<std::uint32_t,16> instanceSteps{};
     std::array<bool,16> referenced{};
@@ -5494,9 +5505,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         listSubmission.mode == GameSm3ListSubmissionMode::invalid)
         return false;
     const bool compactListInstances = listCandidate &&
+        !segmentedInstanceUpload &&
         (listSubmission.mode == GameSm3ListSubmissionMode::compact_indexed ||
          listSubmission.mode == GameSm3ListSubmissionMode::compact_linear);
     const bool compactListIndexedSubmission = listCandidate &&
+        !segmentedInstanceUpload &&
         listSubmission.mode == GameSm3ListSubmissionMode::compact_indexed;
     const bool connectedCandidate = sourceInstancing && instanceCount > 1u &&
         (type == D3DPT_LINESTRIP || type == D3DPT_TRIANGLESTRIP ||
@@ -5515,6 +5528,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         connectedSubmission.mode == GameSm3ConnectedSubmissionMode::invalid)
         return false;
     const bool compactConnectedInstances = connectedCandidate &&
+        !segmentedInstanceUpload &&
         connectedSubmission.mode == GameSm3ConnectedSubmissionMode::compact_indexed;
     const bool compactInstancedGeometry =
         compactListInstances || compactConnectedInstances;
@@ -5564,23 +5578,28 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     // Reject oversized, malformed or untranslatable data before any upload.
     std::vector<std::uint8_t> unpacked;
+    // Keep the validated original vertex/instance streams alive for later
+    // WRITE_DISCARD GPU segments within this one game-authored Draw.
+    std::array<GameSm3StreamView,16> instanceStreams{};
+    std::vector<GameSm3ElementRef> instanceElements;
     const void* nativeBytes = bytes;
     if (repack) {
-        std::array<GameSm3StreamView,16> streams{};
+        auto& streams = instanceStreams;
         streams[0]={static_cast<const std::uint8_t*>(bytes),stride,vertexCount};
         if (extra) for (UINT slot=1u; slot<16u; ++slot)
             streams[slot]={
                 static_cast<const std::uint8_t*>(extra->extra[slot-1u].bytes),
                 extra->extra[slot-1u].stride,
                 extra->extra[slot-1u].vertexCount};
-        std::vector<GameSm3ElementRef> elements;
+        auto& elements = instanceElements;
         for (std::size_t i=0u; i+1u<declaration.size(); ++i)
             elements.push_back({
                 static_cast<std::uint8_t>(declaration[i].Stream),
                 declaration[i].Offset, declaration[i].Type});
         if (sourceInstancing
                 ? !game_sm3_assemble_instanced_streams(
-                      elements, streams, vertexCount, instanceCount,
+                      elements, streams, vertexCount,
+                      segmentedInstanceUpload ? 1u : instanceCount,
                       instanceSteps, unpacked)
                 : !game_sm3_assemble_streams(
                       elements, streams, vertexCount, unpacked))
@@ -5983,7 +6002,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 (compactInstancedGeometry ? expandedVertices : vertexCount))
                 return false;
     }
-    const auto nativeByteCount = nativeStride * expandedVertices;
+    const auto nativeByteCount = static_cast<std::uint64_t>(nativeStride) *
+        (segmentedInstanceUpload ? vertexCount : expandedVertices);
     if (!nativeByteCount || nativeByteCount > (1ull << 25u)) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
     if (!ensure_full_game_upload_buffer(device, s.fullGameVertexUpload,
@@ -6220,9 +6240,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // One audited native submit site. Small indexed lists and connected
     // strips/fans merge safely; large indexed lists/strips/fans keep original
     // D3D9 IB + per-instance vertex bases and independent GPU Draw boundaries.
-    const UINT nativeSubmissionCount = compactListInstances
-        ? 1u : (listCandidate ? listSubmission.drawCount :
-                (connectedCandidate ? connectedSubmission.drawCount : instanceCount));
+    const UINT nativeSubmissionCount = segmentedInstanceUpload
+        ? instanceCount : (compactListInstances
+            ? 1u : (listCandidate ? listSubmission.drawCount :
+                (connectedCandidate ? connectedSubmission.drawCount : instanceCount)));
     const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
     // The native API dispatch sites remain inside this guarded submit.
@@ -6233,10 +6254,25 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         else
             context->Draw(vertexCount, base);
     };
-    for (UINT instance = 0u; instance < instanceCount; ++instance) {
-        if (instance >= nativeSubmissionCount) break;
-        const UINT base = compactInstancedGeometry ? 0u : instance * vertexCount;
-        issueNativeGameDraw(drawVertexCount, base);
+    for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance) {
+        if (segmentedInstanceUpload && instance != 0u) {
+            // Real D3D9 INSTANCEDATA records are addressed by their absolute
+            // step/divisor even when the native VB is renamed per segment.
+            // Any failed later Map/Unpack aborts publication of ALL earlier
+            // segments; original D3D9 GPU output and controls continue.
+            if (!game_sm3_assemble_instanced_streams(
+                    instanceElements, instanceStreams, vertexCount, 1u,
+                    instanceSteps, unpacked, instance) ||
+                unpacked.size() != vertexBytes ||
+                !upload_full_game_stream(context, s.fullGameVertexUpload.Get(),
+                                         s.fullGameVertexCapacity,
+                                         unpacked.data(), vertexBytes))
+                return false;
+        }
+        const UINT base = segmentedInstanceUpload ? 0u :
+            (compactInstancedGeometry ? 0u : instance * vertexCount);
+        issueNativeGameDraw(
+            segmentedInstanceUpload ? vertexCount : drawVertexCount, base);
     }
     s.pending = true;
     ++s.issued;
