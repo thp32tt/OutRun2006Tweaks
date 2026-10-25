@@ -66,7 +66,14 @@
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED_NOT_GAMEPLAY_COMPLETE"
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED_NOT_GAMEPLAY_COMPLETE",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "activation_guard_and_fallback": "Previously built mixed-bump native texture SRV integration is only a source stage; NativeDrawPathActive remains opt-in/fail-closed, complete game/Quest3 menu-car-race gameplay is UNTESTED, unsupported native mirrors preserve original D3D9Ex Draw/input/FFB."
   },
   "c6_validation_evidence": {
     "exact_sha": "3e333c51aa0a0cbcde7731cbce774e5f84a23063",
@@ -108,5 +115,35 @@
   "real_game_draw_blocker": "Real OutRun menu/vehicle/race live native geometry and published full-frame counters unobserved; full-frame native game acceptance incomplete",
   "next_implementation_action": "Continue genuine game frame/SM3/native GPU OpenXR source integration, obtain real desktop/HMD game pixel observation in separately authorized session.",
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED. Never promote full renderer/Quest3 gameplay on CI-only results.",
-  "c6_bookkeeping_only": true
+  "c6_bookkeeping_only": true,
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Connect actual game-authored mixed signed bump materials into native D3D11 game Draw/DrawIndexed shader sampler mips while preserving legacy texture row stride, fail-closed D3D9 fallback and exact-SHA five-gate build validation; whole gameplay frame remains unfinished and untested.",
+    "acceptance_items": [
+      {
+        "id": "mixed_bump_game_source_mips",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_D3D9_SAMPLER_MIP_CAPTURE",
+        "expected_behavior": "Actual D3D9 L6V5U5, X8L8V8U8, CxV8U8 LockRect signed vector and luminance mips decode with exact source pitch and bounded RGBA16_SNORM upload."
+      },
+      {
+        "id": "native_shader_srv_draw_indexed",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_LIVE_GAME_SM3_SHADER_DRAW_BIND",
+        "expected_behavior": "Bound game signed bump mip resources are consumed by D3D11 real game Draw/DrawIndexed with correct row pitch and preserved legacy texture handling."
+      },
+      {
+        "id": "invalid_sources_dx9_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9EX_ORIGINAL_GAME_RENDER_INPUT",
+        "expected_behavior": "Invalid computed C, illegal sRGB and unrepresentable data leave native publication disabled, retaining original D3D9Ex game drawing and gamepad/FFB."
+      },
+      {
+        "id": "five_mandatory_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_BACKEND_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "All five unchanged mandatory GitHub Actions checks passed for the existing 01070 validation-bearing SHA, while HMD remains UNTESTED."
+      }
+    ]
+  }
 }
