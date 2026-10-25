@@ -132,7 +132,23 @@ def next_binding():
         status=active.get("status")
         if status=="STAGED": return dict(active),None
         if status=="SENT_AWAITING_RESPONSE": return None,"ACTIVE_AWAITING_RESPONSE:"+str(active.get("task_id"))
-        if status=="SUBMITTING": return None,"ACTIVE_SUBMISSION_AMBIGUOUS:"+str(active.get("task_id"))
+        if status=="SUBMITTING":
+            try:
+                started=dt.datetime.fromisoformat(str(active.get("submitting_at","")))
+                if started.tzinfo is None: started=started.replace(tzinfo=dt.timezone.utc)
+                age=(dt.datetime.now(dt.timezone.utc)-started.astimezone(dt.timezone.utc)).total_seconds()
+            except Exception:
+                age=10**9
+            if age >= 300:
+                active["status"]="STAGED"
+                active["last_presend_failure"]="STALE_SUBMITTING_AUTO_RECOVERY"
+                active["last_presend_failure_at"]=_now()
+                active["stale_submission_recoveries"]=int(active.get("stale_submission_recoveries",0) or 0)+1
+                _save_state(st)
+                _audit({"status":"STALE_SUBMITTING_RECOVERED","task_id":active.get("task_id"),
+                        "source_png":active.get("source_png"),"external_api_used":False})
+                return dict(active),None
+            return None,"ACTIVE_SUBMISSION_AMBIGUOUS:"+str(active.get("task_id"))
         raise ValueError("GPT_OCR_ACTIVE_STATE_INVALID")
     for row,phrases in _exhausted_candidates():
         fp=_fingerprint(row,phrases);used=int(st["attempts"].get(fp,0) or 0)
