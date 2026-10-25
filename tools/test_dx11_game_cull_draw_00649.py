@@ -71,7 +71,11 @@ def sm3_fan_connected(src):
         "context->Draw(vertexCount, base);",
         "for (UINT instance = 0u; instance < instanceCount; ++instance)",
         "if (instance >= nativeSubmissionCount) break;",
-        "compactInstancedGeometry ? 1u : instanceCount",
+        "const UINT nativeSubmissionCount = compactListInstances",
+        "connectedCandidate ? connectedSubmission.drawCount : instanceCount",
+        "game_sm3_connected_submission_plan(",
+        "connectedSubmission.mode == GameSm3ConnectedSubmissionMode::invalid",
+        "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "game_sm3_expand_connected_instance_indices(",
         "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "liveBatch.record_source_draw(sourceOrdinal);",
@@ -85,6 +89,12 @@ for old, bad in (
     ("nativeFanTriangles.size() > kMaxIndices", "nativeFanTriangles.empty()"),
     ("context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
      "context->DrawIndexed(indexCount, 0u, static_cast<INT>(base));"),
+    ("connectedCandidate ? connectedSubmission.drawCount : instanceCount",
+     "instanceCount"),
+    ("game_sm3_connected_submission_plan(",
+     "game_sm3_connected_submission_plan_bypassed("),
+    ("compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+     "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST"),
 ):
     altered = c.replace(old, bad, 1)
     assert altered != c and not sm3_fan_connected(altered), old
