@@ -365,6 +365,7 @@ class D3DHooks : public Hook
 		{
 			const bool f11VisibleThisFrame = Overlay::will_be_visible_this_frame();
 			const bool vrGameplay = Game::is_vr_gameplay_presentation();
+			const bool vrUiPresentation = Settings::VREnabled;
 			// Desktop Duplication and DirectGPU stereo replay do not include
 			// the hardware cursor composited by Windows on the monitor.
 			// Draw ImGui's cursor into the same D3D9 backbuffer as the F11
@@ -390,7 +391,7 @@ class D3DHooks : public Hook
             // mapped to the headset once by the VR compositor. Applying a
             // second source-to-eye font aspect factor caused the oversized
             // upper-right F11 window observed at 3440x1440.
-            if (f11VisibleThisFrame && vrGameplay &&
+            if (f11VisibleThisFrame && vrUiPresentation &&
                 !Settings::VRUnifiedEyeMenuSource)
 			{
 				// A zero-sized/stale source publication during Reset is no more
@@ -471,7 +472,7 @@ class D3DHooks : public Hook
             // virtual screen-space window to the entire source viewport.
             // Keep the native menu/desktop untouched and keep the existing
             // FOV-only binocular overlay (which now appears as one image).
-            if (f11VisibleThisFrame && vrGameplay)
+            if (f11VisibleThisFrame && vrUiPresentation)
                 vrFontMultiplier = std::clamp(vrFontMultiplier, 1.0f, 1.25f);
             if (Overlay::VrFontMultiplier != vrFontMultiplier)
 			{

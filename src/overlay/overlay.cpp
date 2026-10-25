@@ -108,7 +108,8 @@ void Overlay::render_shell()
 	// VR shell ownership must not depend on the transient XR font atlas
 	// density: an active headset can legitimately render at 1x during
 	// resolution changes, without becoming a desktop F11 window.
-	const bool externalVrShell = Game::is_vr_gameplay_presentation();
+	const bool externalVrShell = Settings::VREnabled &&
+		(Game::is_vr_gameplay_presentation() || !Game::is_in_game());
 	// First-run F11 and later font-size edits change rasterised glyph height.
 	// The VR shell previously stayed at the original 2x-font canvas while
 	// its text grew (or shrank), clipping tabs/settings after a live edit.

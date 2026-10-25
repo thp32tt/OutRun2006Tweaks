@@ -29,6 +29,7 @@ namespace Settings
     extern Setting<bool> VRRankDx11ProducerReference;
     extern Setting<bool> VRRivalDx11NativeRoute;
     extern Setting<bool> VRRankDesktopLift;
+    extern Setting<bool> VRHud1080pReference;
 	Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,
 		"Adjusts the UI scaling applied by the game.",
 		{ "Vanilla, stretches to screen ratio", "Scaled UI, no stretching (Outrun Online Arcade)",
@@ -2495,9 +2496,17 @@ class UIScaling : public Hook
 				Game::screen_scale->x <= 1.0e-6f ||
 				Game::screen_scale->y <= 1.0e-6f)
 				return;
-			const float spacing = OutRunVrUiAspect::ContainedSidePaddingPixels(
+			float spacing = OutRunVrUiAspect::ContainedSidePaddingPixels(
 				Game::screen_resolution->x, Game::original_resolution.x,
 				Game::screen_scale->x, Game::screen_scale->y);
+			if (Settings::VREnabled && Settings::VRHud1080pReference)
+			{
+				// 1920x1080 OnlineArcade reference:
+				// sx=3.0, sy=2.25, side pad=240 physical px -> 80
+				// original logical X units. This is independent of the
+				// portrait XR render target and of a 1080p/1440p desktop.
+				spacing = 80.0f * Game::screen_scale->x;
+			}
 			if (!std::isfinite(spacing))
 				return;
 
@@ -2685,7 +2694,9 @@ class UIScaling : public Hook
 		float spacing = OutRunVrUiAspect::ContainedSidePaddingPixels(
 			Game::screen_resolution->x, Game::original_resolution.x,
 			Game::screen_scale->x, Game::screen_scale->y);
-		spacing /= Game::screen_scale->x;
+		spacing = (Settings::VREnabled && Settings::VRHud1080pReference)
+			? 80.0f
+			: spacing / Game::screen_scale->x;
 		if (!std::isfinite(spacing))
 			return;
 
