@@ -41,3 +41,35 @@ for item,where in [
     if where=='header': p=p.replace(item,'/* removed */',1)
     assert not linked(b,c,p), item
 print('PASS 01057 partial game CPU/GDI tile budget and complete fallback')
+
+# 01058: a late D3D9 GPU tile LockRect/row-pitch/UnlockRect failure
+# must retry exactly once through a *budgeted full-source* readback.
+# This is a source-link mutation check, not a game/HMD runtime assertion.
+def late_stage_recovery(c):
+    try:
+        admission=c.index('auto prepareFullReadback = [&]() noexcept -> bool {')
+        full_cost=c.index('if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))',admission)
+        full_gpu=c.index('game->GetRenderTargetData(',full_cost)
+        staging=c.index('auto captureSourcePixels = [&]() noexcept -> bool {',full_gpu)
+        tile_failure=c.index('if (!captureSourcePixels()) {',staging)
+        retry=c.index('if (!tileSucceeded || !prepareFullReadback()) return false;',tile_failure)
+        full_route=c.index('tileSucceeded=false;',retry)
+        second=c.index('if (!captureSourcePixels()) return false;',full_route)
+        upload=c.index('context->UpdateSubresource(',second)
+        charged=c.index('tileSucceeded ? plannedReadbackBytes :',upload)
+        return (admission<full_cost<full_gpu<staging<tile_failure<retry<
+                full_route<second<upload<charged and
+                'FAILED(readback->LockRect(' in c[staging:tile_failure] and
+                'return copied && SUCCEEDED(unlocked);' in c[staging:tile_failure])
+    except ValueError:
+        return False
+assert late_stage_recovery(copy)
+for expression in [
+    'if (!tileSucceeded || !prepareFullReadback()) return false;',
+    'tileSucceeded=false;',
+    'if (!captureSourcePixels()) return false;',
+    'return copied && SUCCEEDED(unlocked);',
+    'if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))',
+]:
+    assert not late_stage_recovery(copy.replace(expression,'/* removed */',1)), expression
+print('PASS 01058 late tile staging failure -> full authenticated readback -> native GPU region')

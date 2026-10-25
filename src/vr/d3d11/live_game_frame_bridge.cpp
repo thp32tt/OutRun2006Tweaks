@@ -7770,9 +7770,14 @@ bool preserve_game_surface_copy(
                 game,destination,region,desc.Width,desc.Height,desc.Format);
             if (tileSucceeded) readback=s.surfaceReplayTile.staging();
         }
-        if (!tileSucceeded) {
-            // Unsupported tile RT/GPU copy: require admission of the
-            // FULL original source before attempting full D3D9 readback.
+        // A successful GPU tile readback is not yet CPU-accessible pixels:
+        // LockRect may fail, return an unusable pitch, or UnlockRect may fail.
+        // 01058: recover those real late-stage failures with ONE authenticated
+        // full-source readback, preserving the original D3D9 pixels and
+        // never charging the cheap tile cost for a full-frame transfer.
+        auto prepareFullReadback = [&]() noexcept -> bool {
+            // Unsupported tile RT/GPU copy, or a late staging failure:
+            // require FULL source admission before GetRenderTargetData.
             if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))
                 return false;
             if (!s.surfaceReplayReadback || s.surfaceReplayOwner != owner ||
@@ -7793,40 +7798,55 @@ bool preserve_game_surface_copy(
             if (FAILED(game->GetRenderTargetData(
                     destination,s.surfaceReplayReadback.Get()))) return false;
             readback=s.surfaceReplayReadback.Get();
-        }
-        D3DLOCKED_RECT locked{};
-        if (!readback || FAILED(readback->LockRect(
-                &locked, nullptr, D3DLOCK_READONLY))) return false;
+            return true;
+        };
+        if (!tileSucceeded && !prepareFullReadback()) return false;
         const std::size_t rowBytes = std::size_t(region.width()) * 4u;
-        const UINT readX=GameNativeSurfaceTilePlan::source_x(region, tileSucceeded);
-        const UINT readY=GameNativeSurfaceTilePlan::source_y(region, tileSucceeded);
-        const bool readable = locked.pBits && locked.Pitch > 0 &&
-            std::uint64_t(locked.Pitch) >=
-                (std::uint64_t(readX)+region.width())*4u;
-        bool copied = readable;
-        if (readable) {
-            // Both routes output tightly packed original postpass pixels.
-            // Even a failed vector resize must unlock the D3D9 surface.
-            try {
-                s.surfaceReplayPixels.resize(
-                    rowBytes * std::size_t(region.height()));
-                const auto* bytes = static_cast<const std::uint8_t*>(locked.pBits);
-                for (UINT y=0u; y<region.height(); ++y) {
-                    auto* dst=s.surfaceReplayPixels.data()+
-                        std::size_t(y)*rowBytes;
-                    const auto* src=bytes+
-                        std::size_t(readY+y)*std::size_t(locked.Pitch)+
-                        std::size_t(readX)*4u;
-                    std::memcpy(dst,src,rowBytes);
-                    if (desc.Format == D3DFMT_X8R8G8B8) {
-                        for (std::size_t x=3u; x<rowBytes; x+=4u)
-                            dst[x]=0xffu; // original D3D9 X byte undefined
+        auto captureSourcePixels = [&]() noexcept -> bool {
+            D3DLOCKED_RECT locked{};
+            if (!readback || FAILED(readback->LockRect(
+                    &locked, nullptr, D3DLOCK_READONLY))) return false;
+            const UINT readX =
+                GameNativeSurfaceTilePlan::source_x(region, tileSucceeded);
+            const UINT readY =
+                GameNativeSurfaceTilePlan::source_y(region, tileSucceeded);
+            const bool readable = locked.pBits && locked.Pitch > 0 &&
+                std::uint64_t(locked.Pitch) >=
+                    (std::uint64_t(readX)+region.width())*4u;
+            bool copied = readable;
+            if (readable) {
+                // Read exactly the original changed pixels. Even an
+                // allocation failure MUST unlock the D3D9 staging surface.
+                try {
+                    s.surfaceReplayPixels.resize(
+                        rowBytes * std::size_t(region.height()));
+                    const auto* bytes =
+                        static_cast<const std::uint8_t*>(locked.pBits);
+                    for (UINT y=0u; y<region.height(); ++y) {
+                        auto* dst=s.surfaceReplayPixels.data()+
+                            std::size_t(y)*rowBytes;
+                        const auto* src=bytes+
+                            std::size_t(readY+y)*std::size_t(locked.Pitch)+
+                            std::size_t(readX)*4u;
+                        std::memcpy(dst,src,rowBytes);
+                        if (desc.Format == D3DFMT_X8R8G8B8) {
+                            for (std::size_t x=3u; x<rowBytes; x+=4u)
+                                dst[x]=0xffu; // D3D9 X byte is undefined
+                        }
                     }
-                }
-            } catch (...) { copied=false; }
+                } catch (...) { copied=false; }
+            }
+            const HRESULT unlocked=readback->UnlockRect();
+            return copied && SUCCEEDED(unlocked);
+        };
+        if (!captureSourcePixels()) {
+            // Retry only when a cropped GPU tile already succeeded but its
+            // CPU staging failed. A failed full-source attempt is terminal:
+            // leave the real game alone and invalidate native publication.
+            if (!tileSucceeded || !prepareFullReadback()) return false;
+            tileSucceeded=false;
+            if (!captureSourcePixels()) return false;
         }
-        const HRESULT unlocked=readback->UnlockRect();
-        if (!copied || FAILED(unlocked)) return false;
         if (preDrawCopy) {
             if (!s.preDrawSurface.record_consuming(owner,
                     reinterpret_cast<std::uintptr_t>(actualIdentity.Get()),
