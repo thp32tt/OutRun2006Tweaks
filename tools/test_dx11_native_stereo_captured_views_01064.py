@@ -17,6 +17,10 @@ def integrated(s, r, h=header, rh=ring_header, helper=admission):
         "bool NativeGameStereoSubmission::try_publish(", 1)[0]
     exact = r.split("const auto exact_source =", 1)[1].split(
         "// Validate both resource descriptors", 1)[0]
+    capture_header = h.split("bool capture_eye(", 1)[1].split(
+        "// Copy both genuine", 1)[0]
+    encoder_copy_header = h.split("[[nodiscard]] bool copy_game_surface(", 1)[1].split(
+        "// Per-eye native GPU replay", 1)[0]
     # The old C++ helper shares the same three-argument shape as the new
     # source_is_live entrypoint; never accidentally rewrite that helper
     # instead of NativeGameStereoSubmission's actual method declaration.
@@ -33,6 +37,9 @@ def integrated(s, r, h=header, rh=ring_header, helper=admission):
     return all((
         expected_source_signature in s,
         expected_existing_signature in s,
+        "ID3D11RenderTargetView* gameCapturedRtv = nullptr" in capture_header,
+        "gameCapturedRtv" not in encoder_copy_header,
+        "UINT sourceMipSlice = 0u) noexcept;" in encoder_copy_header,
         "capturedRtvs_[2]" in h,
         "gameCapturedRtv, true" in capture,
         "capturedRtvs_[eyeIndex] = gameCapturedRtv;" in capture,
@@ -56,6 +63,14 @@ def integrated(s, r, h=header, rh=ring_header, helper=admission):
     ))
 
 assert integrated(source, ring)
+# Public C++ declarations must match the correct member, not another
+# three-argument texture helper accidentally selected by an edit script.
+assert not integrated(source, ring, h=header.replace(
+    "ID3D11RenderTargetView* gameCapturedRtv = nullptr",
+    "/* missing real camera RTV */", 1))
+assert not integrated(source, ring, h=header.replace(
+    "UINT sourceMipSlice = 0u) noexcept;",
+    "UINT sourceMipSlice = 0u, ID3D11RenderTargetView* gameCapturedRtv = nullptr) noexcept;", 1))
 for needle in (
     "capturedRtvs_[eyeIndex] = gameCapturedRtv;",
     "if (view == gameCapturedRtv) boundAtCapture = true;",

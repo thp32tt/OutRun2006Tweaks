@@ -147,8 +147,7 @@ public:
     [[nodiscard]] bool copy_game_surface(
         ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
         std::int64_t destX, std::int64_t destY,
-        UINT sourceArraySlice = 0u, UINT sourceMipSlice = 0u,
-                      ID3D11RenderTargetView* gameCapturedRtv = nullptr) noexcept;
+        UINT sourceArraySlice = 0u, UINT sourceMipSlice = 0u) noexcept;
     // Per-eye native GPU replay for actual game StretchRect source crops
     // and changed-size destination rectangles (point or linear filter).
     // This never counts as a game-authored geometry draw.
@@ -422,7 +421,8 @@ public:
                      std::uint64_t eyeViewSignature,
                      std::uint32_t sourcePoseSequence,
                      UINT sourceArraySlice = 0u,
-                     UINT sourceMipSlice = 0u) noexcept;
+                     UINT sourceMipSlice = 0u,
+                     ID3D11RenderTargetView* gameCapturedRtv = nullptr) noexcept;
 
     // Copy both genuine game eyes on the producer's single GPU command stream,
     // then arm its asynchronous fence. Never advertise or ACK on mere enqueue.
