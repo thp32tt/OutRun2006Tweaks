@@ -4647,11 +4647,12 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 compressedBlockBytes : desc.Width * sourceTexelBytes;
         const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma || rgb332 || p8 ?
             desc.Width * 4u : rowBytes;
-        // Preserve validated base game format paths; only mixed-bump mips widen.
-        const UINT mixedBumpUploadPitch = mixedBump ? desc.Width * 8u : uploadPitch;
         // Preserve existing format pitch contracts and only widen A8P8
         // (two source bytes per texel) to four-byte decoded native pixels.
-        const UINT a8p8UploadPitch = a8p8 ? desc.Width * 4u : mixedBumpUploadPitch;
+        const UINT a8p8UploadPitch = a8p8 ? desc.Width * 4u : uploadPitch;
+        // Mixed signed bump mips alone require an additional RGBA16_SNORM
+        // eight-byte stride, without altering legacy palette/packed copy.
+        const UINT mixedBumpUploadPitch = mixedBump ? desc.Width * 8u : uploadPitch;
         D3DLOCKED_RECT lock{};
         const HRESULT lockResult = gpuRenderTarget ?
             readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY) :
@@ -4757,6 +4758,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 for (std::size_t p = 3; p < pixels.size(); p += 4)
                     pixels[p] = 0xffu;
             pitches[level] = a8p8UploadPitch;
+            if (mixedBump) pitches[level] = mixedBumpUploadPitch;
         }
         const HRESULT unlockResult = gpuRenderTarget ?
             readbackSurface->UnlockRect() : capture.texture->UnlockRect(level);
