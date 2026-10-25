@@ -39,7 +39,12 @@ assert integrated(ring,helper,bridge)
 for needle in ("viewIdentity.Get() == sourceIdentity.Get()",
                "D3D11_RTV_DIMENSION_TEXTURE2DARRAY",
                "return viewProven;","view->Release();"):
-    b=ring.replace(needle,"/* broken source-to-RTV proof */",1)
+    # Mutate the legacy OM-bound view proof, not the new earlier
+    # captured-camera RTV proof: both must remain independently enforced.
+    prefix, legacy = ring.split("ID3D11RenderTargetView* bound[",1)
+    assert needle in legacy, needle
+    b=prefix+"ID3D11RenderTargetView* bound["+legacy.replace(
+        needle,"/* broken source-to-RTV proof */",1)
     assert b!=ring and not integrated(b,helper,bridge),needle
 for needle in ("typedView == ringFormat","sampleCount == 1u"):
     prefix, format_logic=helper.split(

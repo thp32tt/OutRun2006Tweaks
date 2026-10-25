@@ -109,8 +109,11 @@ def verify_eye_pair_submission(body: str) -> None:
             "const auto extent = native_game_postpass_mip_extent(",
             "!extent.valid || extent.width != width_",
             "extent.height != height_",
-            "left_mip_slice, left_array_slice)",
-            "right_mip_slice, right_array_slice)",
+            # 01064 passes the captured OM-bound typed view alongside the
+            # selected physical mip/array. Keep proving that both values
+            # reach exact_source BEFORE any GPU resource copy is queued.
+            "left_mip_slice, left_array_slice, captured_left_rtv)",
+            "right_mip_slice, right_array_slice, captured_right_rtv)",
             "(leftDesc.SampleDesc.Count > 1u && leftDesc.MipLevels != 1u)",
             "(rightDesc.SampleDesc.Count > 1u && rightDesc.MipLevels != 1u)",
         )
