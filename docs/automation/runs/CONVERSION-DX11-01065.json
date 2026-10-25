@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01065",
+  "production_id": "CONVERSION-DX11-01065",
+  "event_id": "CONVERSION-DX11-01065-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01065",
+  "classification": "A",
+  "feature_id": null,
+  "work_key": "DX11:NATIVE_STEREO_FLOAT4_TYPED_GAME_CAMERA_POSTPASS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "score_note": "C6-only run record recovery: no new source change, no new CI, no duplicate achievement/score.",
+  "c6_recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "summary": "For the existing 01065 material change, game-authored D3D11 L/R camera GPU postpass now admits float4-sampleable typed normalized/floating/sRGB formats while rejecting integer/depth/video/BC sources, and checks Texture2D support in both-eye preflight and actual shader replay. DX9Ex Draw/Present/gamepad/FFB fallback remains intact. Exact-SHA GitHub CI passed; no actual OutRun/Quest3 runtime evidence.",
+  "material_result_sha": "c9b54df120c9d0bdea12cf5b81f1057e50d8cc87",
+  "validation_bearing_result_sha": "e1ab7959bce34b316af04a4031e26e35facd2d25",
+  "changed_files": [
+    "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/test_dx11_native_float_camera_postpass_01065.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Keep native GPU menu/car/race typed camera Copy/Stretch conversion float4-safe with matching two-eye device capability preflight; reject unsupported sources without affecting original D3D9Ex rendering, inputs, FFB, owner leases, or stereo GPU fence/ACK.",
+    "acceptance_items": [
+      {
+        "id": "float4_game_camera_sampling",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_NATIVE_CAMERA_GPU_SHADER_POSTPASS",
+        "expected_behavior": "Only D3D11 float4-compatible typed color is sampled by the actual native game camera postpass, preserving supported normalized, float and sRGB color."
+      },
+      {
+        "id": "unsupported_color_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "INTEGER_DEPTH_VIDEO_FORMAT_REJECTION",
+        "expected_behavior": "Reject integer, depth/stencil, video and block-compressed game camera formats; original D3D9Ex Present/gamepad/FFB remains authoritative."
+      },
+      {
+        "id": "both_eye_texture2d_admission",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_LEFT_RIGHT_GPU_PREFLIGHT_AND_REPLAY",
+        "expected_behavior": "Native L/R GPU camera preflight checks 2D texture support and the same capability is enforced in actual Stretch/Copy shader replay before native publication."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "FIVE_MANDATORY_EXACT_SHA_ACTIONS",
+        "expected_behavior": "All five GitHub Actions Gates succeed on the exact code-bearing SHA without CI bypass, alongside destructive source-link regressions."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "GAME_AUTHORED_D3D11_CAMERA_COLOR",
+      "TYPED_FLOAT4_FORMAT_SELECTION",
+      "BOTH_EYE_TEXTURE2D_CAPABILITY_PREFLIGHT",
+      "NATIVE_GPU_CAMERA_SHADER_COPY_STRETCH",
+      "SHARED_STEREO_EYE_GPU_FRAME_AND_ACK",
+      "ORIGINAL_D3D9EX_RENDER_AND_INPUT_FFB_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/test_dx11_native_float_camera_postpass_01065.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast run 40186051582 SUCCESS at exact e1ab7959: new 01065 native float4 typed game camera source assertions and integrated GPU capability admission.",
+      "negative_regression": "01065 destructive Python mutation checks revoke float4 typing and texture format admission; after causal mutation-scope repair all pass in Fast on the validation-bearing SHA.",
+      "component_integration": "typed camera view helper -> real game Stretch/Copy float4 sample and texture-support enforcement -> both-eye preflight -> unchanged XR eye transport/fence/ACK; original D3D9 rendering/inputs/FFB remain fail-closed."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_FLOAT4_TYPED_GAME_CAMERA_POSTPASS",
+      "DX11:STEREO_NATIVE_GAME_CAMERA_GPU_RING"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "No unverified native backend promotion, no DXVK modification. Unsupported game camera typed colors retain original D3D9Ex/gamepad/FFB output."
+  },
+  "acceptance_results": {
+    "float4_game_camera_sampling": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01065 typed format helper and its actual camera Stretch/Copy source linkage included in exact-SHA DX11 Fast 40186051582 SUCCESS; real game/VR display UNTESTED.",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "src/vr/d3d11/native_game_stereo_submission.cpp"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast 40186051582 at exact result SHA"
+    },
+    "unsupported_color_fail_closed": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01065 destructive regression rejects integer, signed-integer, depth, NV12, and BC color interpretations; exact-SHA Fast SUCCESS. Physical D3D9 fallback not device-tested.",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_typed_camera_postpass.hpp",
+        "tools/test_dx11_native_float_camera_postpass_01065.py"
+      ],
+      "validation_command": "DX11 Fast 40186051582: python tools/test_dx11_native_float_camera_postpass_01065.py"
+    },
+    "both_eye_texture2d_admission": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Native source replay and stereo L/R preflight both require the device's TEXTURE2D capability in addition to existing shader sample/render target checks. Exact-SHA Fast and Windows Build SUCCESS.",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/test_dx11_native_float_camera_postpass_01065.py"
+      ],
+      "validation_command": "DX11 Fast 40186051582 and Windows Build 40186051591 at exact SHA"
+    },
+    "exact_sha_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX11 Fast 40186051582; Backend 40186051584; Windows Build 40186051591; OpenXR 40186051650; HUD Inspector 40186051658 all concluded success for exact e1ab7959bce34b316af04a4031e26e35facd2d25.",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01065.json"
+      ],
+      "validation_command": "Five existing GitHub Actions runs; no C6 CI rerun"
+    }
+  },
+  "validation_history": [
+    {
+      "exact_sha": "9182f5c4b49a6828f2c87eb1cf7d630089230bc1",
+      "result": "FAIL",
+      "cause": "DX11 Fast 40185816877 destructive source assertion and Build 40185816904 source-graph signature policy mismatch on original candidate; repaired under same TASK_ID."
+    },
+    {
+      "exact_sha": "71961b56cebbf110cae37c1971c67384210ba214",
+      "result": "FAIL",
+      "cause": "DX11 Fast 40185959515 revealed an incomplete negative mutation of a repeated capability token; repaired under same TASK_ID."
+    },
+    {
+      "exact_sha": "e1ab7959bce34b316af04a4031e26e35facd2d25",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Exact-SHA mandatory DX11 Fast/Backend/Windows Build/OpenXR/HUD all SUCCESS; no gameplay/HMD runtime validation."
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "e1ab7959bce34b316af04a4031e26e35facd2d25",
+    "dx11_fast_run_id": 40186051582,
+    "backend_gate_run_id": 40186051584,
+    "windows_build_run_id": 40186051591,
+    "openxr_architecture_run_id": 40186051650,
+    "hud_inspector_run_id": 40186051658,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_conclusion": "success",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/native_game_stereo_submission.cpp",
+  "real_game_draw_blocker": "No measured physical OutRun menu/car/race native frame, per-eye pixel evidence, Quest3/VDXR visual parity or FFB/gamepad hardware test on exact validation SHA.",
+  "next_implementation_action": "This TASK_ID is C6 build-verified; controller may select another independent unresolved native frame feature, with HMD outcomes separately requiring hardware evidence.",
+  "runtime_note": "PASS_EXACT_SHA verifies CI/build integration only; RUNTIME_VALIDATION=UNTESTED. Native gameplay/HMD PASS not claimed, DXVK frozen.",
+  "c6_bookkeeping_only": true
+}
