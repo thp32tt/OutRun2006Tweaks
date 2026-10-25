@@ -15,7 +15,8 @@ def integrated(s, h, u):
     p = s.split("void before_game_present(", 1)[-1].split(
         "void before_game_reset(", 1)[0]
     select = p.find("const auto multiDirty = GameNativeMultiDirtyUpload::select(")
-    snapshot = p.find("game->GetRenderTargetData(", select)
+    seed_begin = p.find("auto seedMultiTileFromGame = [&]() noexcept -> bool {", select)
+    snapshot = p.find("game->GetRenderTargetData(", seed_begin)
     fence = p.find("const NativeOutputUploadScope internalMultiSeedCopyScope{};", snapshot)
     capture = p.find("return s.surfaceReplayFull.capture(", fence)
     admitted = p.find("seedMultiTileFromGame() &&", capture)
@@ -34,13 +35,13 @@ def integrated(s, h, u):
         "r.top < p.bottom && p.top < r.bottom" in h,
         "minX != boundLeft || minY != boundTop" in h,
         "bufferBytes < rectangleCount * 16u" in h,
-        0 <= select < snapshot < fence < capture < admitted < locks < copies < bound < upload,
+        0 <= select < seed_begin < snapshot < fence < capture < admitted < locks < copies < bound < upload,
         "true /* overlapping game dirty tiles are identical native pixels */"
             in p[select:snapshot],
         # 01060 preserves original pixels when direct D3D9 backbuffer
         # readback fails. Guarded StretchRect must precede ANY dirty tile
         # CPU lock/upload, and both failures must veto partial publication.
-        "if (!multiNativeUpload) return true;" in p[snapshot:fence],
+        "if (!multiNativeUpload) return true;" in p[seed_begin:snapshot],
         "back.Get(), s.insetSurface.Get()))) return true;" in p[snapshot:fence],
         "game, back.Get(), s.insetSurface.Get()," in p[capture:admitted],
         "bb.Width, bb.Height, bb.Format);" in p[capture:admitted],
@@ -70,6 +71,7 @@ for before, after in (
     ("const NativeOutputUploadScope internalMultiSeedCopyScope{};", "/* removed multi-tile R30 scope */"),
     ("return s.surfaceReplayFull.capture(", "return no_private_gpu_readback("),
     ("seedMultiTileFromGame() &&", "true && /* skipped game seed */"),
+    ("if (!multiNativeUpload) return true;", "if (false) return true;"),
 ):
     # 00886 added an earlier real-game D3D9 postpass readback. Mutate the
     # 00769 dirty-tile seed inside Present itself, not the independent
