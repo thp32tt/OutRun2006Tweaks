@@ -131,8 +131,22 @@ assert removed_ordinal != observer and source_ordinal not in removed_ordinal
 assert "observe_unavailable_game_draw(IDirect3DDevice9* game)" in bridge
 linear = bridge.split("void observe_linear(", 1)[1].split("void observe_indexed(", 1)[0]
 assert "if (!game_native_primitive_element_count(" in linear
-assert "observe_unavailable_game_draw(game);" in linear
-assert linear.index("if (!game_native_primitive_element_count(") < linear.index("observe_unavailable_game_draw(game);")
+# 01072: oversized/expired UP geometry can be a genuinely clipped or
+# no-target-write original game call. Authenticate it in the full observer
+# instead of silently dropping its source ordinal. Unsupported pixel writers
+# still abort before any native Draw, leaving D3D9Ex authoritative.
+no_shadow = "observe_unmirrored_game_draw(game, type, primitives);"
+assert no_shadow in linear
+assert linear.index("if (!game_native_primitive_element_count(") < linear.index(no_shadow)
+no_geometry = "if (!bytes || !stride)"
+assert no_geometry in observer
+assert observer.index(primitive_gate) < observer.index(no_geometry)
+assert "s.frameBatch.must_abort_unsupported(fullMode, multiBatch)" in observer[
+    observer.index(no_geometry):]
+# Guarding against accidental promotion of a null IA source to native SM3.
+assert observer.index(no_geometry) < observer.index("if (!submit_live_sm3_game_draw(")
+mutated = linear.replace(no_shadow, "/* silently lost source ordinal */", 1)
+assert mutated != linear and no_shadow not in mutated
 missing = bridge.split("void observe_unavailable_game_draw(", 1)[1].split(
     "void before_game_present(", 1)[0]
 # 00765 preserves the same exact raw-game ordinal, but also passes it
