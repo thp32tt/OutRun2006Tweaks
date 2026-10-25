@@ -41,7 +41,10 @@ assert integrated(header, source)
 for needle in ("return native_game_float4_camera_sample_format(allocation)",
                "DXGI_FORMAT_R16G16B16A16_FLOAT:"):
     assert needle in header
-    assert not integrated(header.replace(needle, "/* unsafe format path */", 1), source)
+    # This helper is called from both the exact-view and the typed default
+    # branch. Remove both occurrences to prove neither route is optional.
+    mutant = header.replace(needle, "/* unsafe format path */")
+    assert mutant != header and not integrated(mutant, source), needle
 for needle in ("(sourceSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D) == 0u",
                "eyeRequired = D3D11_FORMAT_SUPPORT_RENDER_TARGET |",
                "D3D11_FORMAT_SUPPORT_SHADER_SAMPLE |"):

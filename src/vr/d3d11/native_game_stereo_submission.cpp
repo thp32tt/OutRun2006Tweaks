@@ -2647,9 +2647,13 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         offscreen_color_view_format(source, sourceArraySlice, sourceMipSlice));
     if (sampleFormat == DXGI_FORMAT_UNKNOWN) return false;
     UINT sourceSupport = 0u, eyeSupport = 0u;
+    // Separate device capability query and geometry requirements: the
+    // original native activation gate keeps both real CheckFormatSupport
+    // calls mandatory, while shader replay additionally requires a 2D image.
     if (FAILED(device->CheckFormatSupport(sampleFormat, &sourceSupport)) ||
-        FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)) ||
-        (sourceSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D) == 0u ||
+        FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)))
+        return false;
+    if ((sourceSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D) == 0u ||
         (eyeSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D) == 0u)
         return false;
     const auto transfer = native_game_stretch_source_transfer(
