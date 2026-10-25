@@ -7,7 +7,9 @@ header = (root / "src/vr/d3d11/live_game_sm3_stream_assembly.hpp").read_text(enc
 scope = bridge.split("bool submit_live_sm3_game_draw(", 1)[1].split("// Reuse geometric", 1)[0]
 for token in (
     "game_sm3_plan_native_instance_upload(",
-    "sourceInstancing, vertexCount, instanceCount, nativeStride,",
+    "const UINT plannedNativeStride = sourceInstancing && !repack",
+    "input.size() * 16u) : nativeStride",
+    "sourceInstancing, vertexCount, instanceCount, plannedNativeStride,",
     "uploadPlan.mode == GameSm3NativeUploadMode::segmented",
     "uploadPlan.mode == GameSm3NativeUploadMode::invalid",
     "segmentedInstanceUpload ? 1u : instanceCount",

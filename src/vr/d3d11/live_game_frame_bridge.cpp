@@ -5464,8 +5464,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // A declared FLOAT4 layout may exceed the GPU's 32 MiB transient upload
     // even when the source instance product is within kMaxVertices. Choose
     // bounded per-instance GPU uploads before unpacking large CPU shadows.
+    // Even when the original D3D9 stream is already float-compatible, the
+    // instance assembler emits one FLOAT4 per declaration element. Budget
+    // that actual GPU stride now; the later input-layout promotion must not
+    // silently turn an admitted flat Draw into an oversized upload.
+    const UINT plannedNativeStride = sourceInstancing && !repack
+        ? static_cast<UINT>(input.size() * 16u) : nativeStride;
     const auto uploadPlan = game_sm3_plan_native_instance_upload(
-        sourceInstancing, vertexCount, instanceCount, nativeStride,
+        sourceInstancing, vertexCount, instanceCount, plannedNativeStride,
         kMaxVertices, 1u << 25u, kMaxSegmentedGameInstances);
     const bool segmentedInstanceUpload = sourceInstancing &&
         uploadPlan.mode == GameSm3NativeUploadMode::segmented;

@@ -9,6 +9,15 @@ constexpr auto bytesOnly = game_sm3_plan_native_instance_upload(
     true, 65536u, 2u, 384u, 100000u, 1u << 25u, 128u);
 static_assert(bytesOnly.mode == GameSm3NativeUploadMode::segmented);
 static_assert(bytesOnly.vertexBytes == 65536u * 384u);
+// D3D9 float3 stride 12 is promoted to native FLOAT4 stride 16 for source
+// instancing. Using 12 would incorrectly choose a flat GPU upload.
+constexpr auto rawStrideDecision = game_sm3_plan_native_instance_upload(
+    true, 500u, 2u, 12u, 10000u, 13000u, 128u);
+constexpr auto nativeStrideDecision = game_sm3_plan_native_instance_upload(
+    true, 500u, 2u, 16u, 10000u, 13000u, 128u);
+static_assert(rawStrideDecision.mode == GameSm3NativeUploadMode::flat);
+static_assert(nativeStrideDecision.mode == GameSm3NativeUploadMode::segmented);
+static_assert(nativeStrideDecision.vertexBytes == 8000u);
 constexpr auto countOnly = game_sm3_plan_native_instance_upload(
     true, 60000u, 2u, 32u, 100000u, 1u << 25u, 128u);
 static_assert(countOnly.mode == GameSm3NativeUploadMode::segmented);
