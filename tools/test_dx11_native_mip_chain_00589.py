@@ -87,7 +87,11 @@ def main() -> None:
     ]
     for old, new in mutations:
         assert old in s, old
-        assert not wired(s.replace(old, new, 1)), old
+        # New signed-normal error handling adds another safe UnlockRect site.
+        # Mutate the complete unlock family rather than the first occurrence:
+        # a surviving cleanup branch cannot certify the original mip lifetime.
+        changed = s.replace(old, new) if old == "capture.texture->UnlockRect(level)" else s.replace(old, new, 1)
+        assert changed != s and not wired(changed), old
     # DXT1 / DXT5: tiny tail mips occupy one complete 4x4 compressed block.
     for width in (1024, 512, 128, 16, 8, 4, 2, 1):
         for height in (512, 64, 8, 4, 2, 1):

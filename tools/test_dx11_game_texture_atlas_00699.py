@@ -20,7 +20,10 @@ def integrated(src, budget):
         "base.Height > kMaxNativeGameAtlasDimension" in mirror,
         "if (gpuRenderTarget && !native_rt_readback::bounded_gpu_snapshot(" in mirror,
         "base.Width, base.Height, levels, rtLayout))" in mirror,
-        "nativeFormat == DXGI_FORMAT_R16_FLOAT ? 2u" in mirror,
+        # Signed V8U8 native SNORM is also two bytes per texel. The real
+        # GPU atlas budget must keep both supported 2-byte format routes.
+        "(nativeFormat == DXGI_FORMAT_R16_FLOAT ||" in mirror,
+        "nativeFormat == DXGI_FORMAT_R8G8_SNORM) ? 2u" in mirror,
         "nativeFormat == DXGI_FORMAT_R32G32B32A32_FLOAT ? 16u" in mirror,
         "nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT" in mirror,
         "nativeFormat == DXGI_FORMAT_R16G16B16A16_UNORM" in mirror,
