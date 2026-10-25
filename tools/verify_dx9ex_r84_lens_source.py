@@ -378,22 +378,33 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert "e.nextDraw - e.writtenDraw <= 128u" in proof
     assert "static_assert(!OwnsRawWvp(" in proof
     assert "run: python tools/verify_dx9ex_r84_lens_source.py" in workflow
-    # The original C993 game draw can enter inner SceneEffect helper scopes
-    # after its parent producer was tagged. The GPU submission and c64
-    # provenance must keep the exact centre identity for the whole call.
+    # Current C993 uses the exact projected-sun family with an explicit
+    # render scope. Keep legacy world-route provenance checks above/below as
+    # comparison coverage, but do not require reactivating its retired hook.
     c993 = hooks.split("static void __cdecl DrawObjectAlphaCentre(", 1)[1].split(
         "public:", 1)[0]
     for marker in (
         "objectId == 0x570002",
         "!OutRunVR::GameSemantic::QueueRenderActive()",
         "ScopedExactProducerSemantic semantic(",
-        "ScopedExactLensCentreGpuDraw centreGpuOwner(",
+        "ScopedRenderSemantic sunDrawScope(",
         "Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);",
     ):
         assert marker in c993, "exact original C993 GPU lifetime lost: " + marker
     assert (c993.index("ScopedExactProducerSemantic semantic(") <
-            c993.index("ScopedExactLensCentreGpuDraw centreGpuOwner(") <
-            c993.index("Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);"))
+            c993.index("ScopedRenderSemantic sunDrawScope(") <
+            c993.rindex("Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);"))
+    admission = c993.split("const bool projectedSun =", 1)[1].split("if (!projectedSun)", 1)[0]
+    for marker in ("Settings::VREnabled &&", "!OutRunVR::GameSemantic::QueueRenderActive() &&",
+                   "IsProjectedSunScreenObject(objectId);"):
+        assert marker in admission, marker
+    exact = c993.split("ScopedExactProducerSemantic semantic(", 1)[1]
+    assert "RenderScope::ProjectedScreenEffect2D," in exact
+    assert "ProducerToken::LensFlareCentre" in exact
+    assert "RenderScope::ProjectedScreenEffect2D);" in exact
+    fallback = c993.split("if (!projectedSun)", 1)[1].split("if (Settings::VRTelemetry)", 1)[0]
+    assert "Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);" in fallback
+    assert "return;" in fallback
     for marker in (
         "DirectLensCentreOwnsGpuDraw(",
         "static_assert(!DirectLensCentreOwnsGpuDraw(true, true, false))",
@@ -599,7 +610,8 @@ def main():
         (7, "OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(",
              "OutRunVR::StageExtensionPhysical::NeverSameAfterLeft("),
         (8, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo BYPASS"),
-        (9, "ScopedExactLensCentreGpuDraw centreGpuOwner(", "/*lost owner*/ centreGpuOwner("),
+        (9, "ScopedRenderSemantic sunDrawScope(", "/*lost owner*/ sunDrawScope("),
+        (9, "IsProjectedSunScreenObject(objectId);", "true;"),
         (10, "!queued && scope == RenderScope::WorldBillboard",
              "scope == RenderScope::WorldBillboard"),
         (10, "producer == ProducerToken::LensFlareCentre",
@@ -660,7 +672,7 @@ def main():
         except (AssertionError, ValueError, IndexError):
             continue
         raise AssertionError("C993 unsafe world reprojection mutation escaped: " + old)
-    print(f"R84 exact C993 stereo route PASS ({len(mutants)} negative mutations); "
+    print(f"R84 legacy world-route guards and current C993 projected source PASS ({len(mutants)} negative mutations); "
           "R26-approved matrix order and GPU c64 restore; HMD UNTESTED")
 
 
