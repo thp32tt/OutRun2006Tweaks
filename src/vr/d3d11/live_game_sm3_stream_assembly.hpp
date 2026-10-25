@@ -8,6 +8,41 @@
 #include <cstring>
 #include <vector>
 namespace outrun::vr::dx11::live_game_frame {
+enum class GameSm3NativeUploadMode : std::uint8_t {
+    invalid, flat, segmented
+};
+struct GameSm3NativeUploadPlan {
+    GameSm3NativeUploadMode mode = GameSm3NativeUploadMode::invalid;
+    std::uint32_t vertexBytes = 0u;
+};
+// A genuine D3D9 instanced Draw can fit the vertex COUNT limit yet exceed
+// the D3D11 dynamic GPU upload BYTE limit after FLOAT4 declaration packing.
+// Reuse the original per-instance vertex/IB and shader submit path instead
+// of rejecting the whole menu/car/race draw or allocating an unbounded VB.
+[[nodiscard]] constexpr GameSm3NativeUploadPlan
+game_sm3_plan_native_instance_upload(
+    bool sourceInstancing, std::uint32_t vertexCount,
+    std::uint32_t instanceCount, std::uint32_t nativeStride,
+    std::uint32_t maxVertices, std::uint32_t maxBytes,
+    std::uint32_t maxSegmentedInstances) noexcept {
+    if (!vertexCount || !instanceCount || !nativeStride ||
+        !maxVertices || !maxBytes || vertexCount > maxVertices ||
+        vertexCount > maxBytes / nativeStride ||
+        (!sourceInstancing && instanceCount != 1u))
+        return {};
+    const auto expanded = std::uint64_t(vertexCount) * instanceCount;
+    const bool needsSegments = expanded > maxVertices ||
+        expanded > maxBytes / nativeStride;
+    if (needsSegments) {
+        if (!sourceInstancing || instanceCount < 2u ||
+            instanceCount > maxSegmentedInstances) return {};
+        return {GameSm3NativeUploadMode::segmented,
+                static_cast<std::uint32_t>(std::uint64_t(vertexCount) *
+                                           nativeStride)};
+    }
+    return {GameSm3NativeUploadMode::flat,
+            static_cast<std::uint32_t>(expanded * nativeStride)};
+}
 struct GameSm3StreamView {
     const std::uint8_t* data{};
     std::uint32_t stride{};

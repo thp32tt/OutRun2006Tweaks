@@ -5461,11 +5461,15 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // at a time. The extra native submits have an explicit per-draw ceiling;
     // original D3D9 remains authoritative for larger batches.
     constexpr UINT kMaxSegmentedGameInstances = 128u;
+    // A declared FLOAT4 layout may exceed the GPU's 32 MiB transient upload
+    // even when the source instance product is within kMaxVertices. Choose
+    // bounded per-instance GPU uploads before unpacking large CPU shadows.
+    const auto uploadPlan = game_sm3_plan_native_instance_upload(
+        sourceInstancing, vertexCount, instanceCount, nativeStride,
+        kMaxVertices, 1u << 25u, kMaxSegmentedGameInstances);
     const bool segmentedInstanceUpload = sourceInstancing &&
-        instanceCount > 1u && expandedVertices > kMaxVertices &&
-        instanceCount <= kMaxSegmentedGameInstances;
-    if (!expandedVertices ||
-        (expandedVertices > kMaxVertices && !segmentedInstanceUpload))
+        uploadPlan.mode == GameSm3NativeUploadMode::segmented;
+    if (uploadPlan.mode == GameSm3NativeUploadMode::invalid)
         return false;
     std::array<std::uint32_t,16> instanceSteps{};
     std::array<bool,16> referenced{};
@@ -6004,7 +6008,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     const auto nativeByteCount = static_cast<std::uint64_t>(nativeStride) *
         (segmentedInstanceUpload ? vertexCount : expandedVertices);
-    if (!nativeByteCount || nativeByteCount > (1ull << 25u)) return false;
+    // Actual single-submit or per-instance GPU bytes must equal the source
+    // planner's admission; a partial/oversized allocation never reaches Draw.
+    if (!nativeByteCount || nativeByteCount > (1ull << 25u) ||
+        nativeByteCount != uploadPlan.vertexBytes) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
     if (!ensure_full_game_upload_buffer(device, s.fullGameVertexUpload,
                                         s.fullGameVertexCapacity, vertexBytes,

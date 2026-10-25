@@ -8,7 +8,7 @@ scope=bridge.split("bool submit_live_sm3_game_draw(",1)[1].split("// Reuse geome
 for token in (
     "constexpr UINT kMaxSegmentedGameInstances = 128u;",
     "const bool segmentedInstanceUpload = sourceInstancing &&",
-    "expandedVertices > kMaxVertices &&",
+    "game_sm3_plan_native_instance_upload(",
     "segmentedInstanceUpload ? 1u : instanceCount",
     "segmentedInstanceUpload ? vertexCount : expandedVertices",
     "const UINT nativeSubmissionCount = segmentedInstanceUpload",
