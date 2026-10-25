@@ -70,3 +70,31 @@ width; enter/leave race without Reset; HUD/F11/rival positions; desktop resoluti
 changes do not change the 4:3 optical size; inspect VR EYE RESOLUTION / VR UNIFIED
 SOURCE, VR PC MIRROR and VR MENU ASPECT logs. Compare FPS at the actual selected
 source extent: choosing more pixels can cost GPU time. No FPS claim is made.
+
+## Resume / CI gate repairs (2026-10-25)
+
+Initial material b65c346da8481706f4bf80a42e41f011065950f2 passed General Test
+Build run 40173837070 (Windows R26 game + host + package), while Active
+40173837089 stopped on a stale lens verifier. The remaining policy tests exposed
+a stale F11 verifier. These now assert the existing projected-sun C993 scope and
+finite F11 projection plus bilateral affine fallback; neither runtime owner was
+modified. Intermediate source-only success is not the final Active gate.
+
+Correction to the initial provider finding: the official test launchers force
+PreferD3D9Ex=true. The shipped INI false value therefore does not establish the
+root cause of the user's observed menu issue. Provider-independent startup
+selection still makes direct and launcher startup policies consistent.
+
+Follow-up review CONVERSION-DX9EX-01484 identified same-owner refresh failures
+resetting the new MenuScale to 1. A failed process/path lookup or absence of both
+config files now retains the previous accepted scale/crop for that HWND/PID.
+New owners reset to defaults. Base/user values are staged before publication.
+This does not claim an atomic filesystem snapshot across simultaneous INI writes
+or preservation of an unreadable individual user INI when the base is readable.
+Changed-area regression failed before and passes after the new refresh logic.
+
+Baseline delta: protected user-tested R26+HUD 0cff83cf remains the immutable
+hardware baseline. This task changes startup source selection and host title/menu
+optical sizing; race HUD scale, selectors, world draw ownership, input/FFB and
+DriverSeatView defaults are unchanged. Title/menu optics and selected source
+performance require new exact-package Quest3/VDXR acceptance, not baseline promotion.

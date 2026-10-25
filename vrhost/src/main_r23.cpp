@@ -117,30 +117,37 @@ namespace
                 nextCheckMs, reinterpret_cast<std::uintptr_t>(gameWindow),
                 gamePid, now))
             return cachedLetterbox;
+        const bool sameOwner = gamePid != 0 &&
+            cachedWindow == gameWindow && cachedPid == gamePid;
         cachedWindow = gameWindow;
         cachedPid = gamePid;
         nextCheckMs = now + 2500;
-        cachedLetterbox = false;
-        R23ConfiguredMenuScale = 1.0f;
+        // A failed poll of the same game must not resize a valid menu.
+        // Another HWND/PID never inherits the previous owner's settings.
+        if (!sameOwner)
+        {
+            cachedLetterbox = false;
+            R23ConfiguredMenuScale = 1.0f;
+        }
         if (!gamePid)
-            return false;
+            return cachedLetterbox;
         HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION,
             FALSE, gamePid);
         if (!process)
-            return false;
+            return cachedLetterbox;
         wchar_t path[MAX_PATH]{};
         DWORD pathChars = MAX_PATH;
         const bool haveImagePath = QueryFullProcessImageNameW(
             process, 0, path, &pathChars) != 0;
         CloseHandle(process);
         if (!haveImagePath)
-            return false;
+            return cachedLetterbox;
         wchar_t* filename = std::wcsrchr(path, L'\\');
         constexpr wchar_t configName[] = L"OutRun2006Tweaks.ini";
         if (!filename ||
             static_cast<std::size_t>(filename + 1 - path) +
                 std::size(configName) > MAX_PATH)
-            return false;
+            return cachedLetterbox;
         std::memcpy(filename + 1, configName, sizeof(configName));
         // Match Settings::UIScalingMode and Settings::UILetterboxing
         // compiled game defaults (both 1), including a first launch whose
@@ -151,13 +158,14 @@ namespace
         int effectiveScalingMode = 1;
         int letterboxingMode = 1;
         bool foundConfig = false;
+        float candidateMenuScale = 1.0f;
         const DWORD attributes = GetFileAttributesW(path);
         if (attributes != INVALID_FILE_ATTRIBUTES &&
             (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
         {
             foundConfig = true;
-            R23ConfiguredMenuScale =
-                ReadMenuScaleOverride(path, R23ConfiguredMenuScale);
+            candidateMenuScale =
+                ReadMenuScaleOverride(path, candidateMenuScale);
             effectiveScalingMode = static_cast<int>(GetPrivateProfileIntW(
                 L"Graphics", L"UIScalingMode", effectiveScalingMode, path));
             letterboxingMode = static_cast<int>(GetPrivateProfileIntW(
@@ -178,8 +186,8 @@ namespace
                 (userAttrs & FILE_ATTRIBUTE_DIRECTORY) == 0)
             {
                 foundConfig = true;
-                R23ConfiguredMenuScale =
-                    ReadMenuScaleOverride(path, R23ConfiguredMenuScale);
+                candidateMenuScale =
+                    ReadMenuScaleOverride(path, candidateMenuScale);
                 effectiveScalingMode = static_cast<int>(
                     GetPrivateProfileIntW(L"Graphics", L"UIScalingMode",
                         effectiveScalingMode, path));
@@ -188,10 +196,11 @@ namespace
                         letterboxingMode, path));
             }
         }
-        // Without either trusted game-adjacent INI, keep the historical
-        // fail-closed theater path rather than guessing a mod installation.
+        // Publish only a recognized game-adjacent config. A failed same-owner
+        // poll retains the last accepted snapshot; a new owner stays default.
         if (!foundConfig)
-            return false;
+            return cachedLetterbox;
+        R23ConfiguredMenuScale = candidateMenuScale;
         cachedLetterbox = OutRunVrMenuAspect::ShouldCropConfiguredMenu(
             effectiveScalingMode, letterboxingMode);
         return cachedLetterbox;

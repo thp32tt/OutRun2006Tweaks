@@ -286,13 +286,14 @@ def check_shell_vr_mode_transitions(font: str) -> None:
 
 
 def check_packaged_f11_plane_scale() -> None:
-    """R26+HUD F11 is screen-only FOV affine; gameplay HUD remains finite."""
+    """Preserve current finite F11 projection and its bilateral affine fallback."""
     source=(ROOT/"src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(
         encoding="utf-8")
     f11=source.split("bool R30PrepareExternalImGuiProjection(",1)[1].split(
         "template <typename ActualDraw>",1)[0]
     gameplay=source.split("bool R30ConfigureXyzrhwWorldEffect(",1)[1].split(
         "bool R30TransformXyzrhwVertices(",1)[0]
+    f11 = " ".join(f11.split())
     hdr=(ROOT/"src/vr/d3d9/f11_screen_2d.hpp").read_text(encoding="utf-8")
     assert '#include "f11_screen_2d.hpp"' in source
     assert "OutRunVRF11Screen2D::Build(bounds, f11Affine)" in f11
@@ -308,7 +309,8 @@ def check_packaged_f11_plane_scale() -> None:
     assert "R30BuildHudPlaneCoefficients(state, false)" not in f11
     assert "GetLatchedHeadInverse(" not in f11
     assert "MatrixFromQuaternionTranslation(" not in f11
-    assert "R30BuildHudPlaneCoefficients(state, true)" in gameplay
+    assert "R30BuildHudPlaneCoefficients(state, !externalF11)" in gameplay
+    assert "const bool externalF11 =" in gameplay
     assert "!R30SafeStereoBase(device)" in f11
     assert "ExternalOverlaySemanticDepth == 0" in f11
     assert "CurrentVertexShaderIdentity.load(" in f11
@@ -316,9 +318,20 @@ def check_packaged_f11_plane_scale() -> None:
     assert "SetScissorRect(&eyeScissors[eye])" in source
     assert "TestAsymmetricEyes()" in hdr
     assert "TestInvalidRightKeepsBoth()" in hdr
-    # Source-owned destructive controls ensure this is not an accidental
-    # unguarded mono ImGui draw or legacy finite-depth headset billboard.
+    # Pin both current branches, not the superseded FOV-only implementation.
     for token in (
+        "const bool finiteWorldLock = R30ConfigureXyzrhwWorldEffect( device, nullptr, 0, 0, state, nullptr) && state.hudWorldLockValid;",
+        "if (!finiteWorldLock)", "if (finiteWorldLock)",
+        "const float hudPlaneViewZ = R30HudPlaneViewZ(false);",
+        "projected = MultiplyMatrix(stockProjection, clipMap);",
+        "clipMap._14 = state.hudClipW[eye][0];",
+        "clipMap._24 = state.hudClipW[eye][1];",
+        "clipMap._44 = state.hudClipW[eye][2];",
+    ):
+        assert token in f11, token
+    # Source-owned destructive controls guard both projection routes.
+    for token in (
+        "projected = MultiplyMatrix(stockProjection, clipMap);",
         "OutRunVRF11Screen2D::Build(bounds, f11Affine)",
         "stockProjection.m[row][0] * f11Affine[eye].scaleX",
         "stockProjection.m[row][1] * f11Affine[eye].scaleY",
@@ -328,7 +341,7 @@ def check_packaged_f11_plane_scale() -> None:
         assert f11.count(token) == 1, token
         broken = f11.replace(token, "/* rejected F11 source mutation */", 1)
         assert token not in broken
-    print("PASS packaged R26 F11 uses FOV-only bilateral screen affine; world/HUD independent")
+    print("PASS packaged R26 F11 finite plane and bilateral affine fallback; gameplay HUD independent")
 
 
 def check_projection(renderer: str, semantic: str) -> None:
@@ -1483,3 +1496,4 @@ def check_f11_desktop_vr_geometry_lifecycle() -> None:
 if __name__ == "__main__":
     check_f11_desktop_vr_geometry_lifecycle()
     main()
+

@@ -35,12 +35,19 @@ def verify(g, r, u, s, f):
     assert "device, startRegister, constantData, vector4fCount);" in b
     centre = g.split("static void __cdecl DrawObjectAlphaCentre(", 1)[1].split(
         "public:", 1)[0]
-    assert "LensCentreOwnerDepth == LensCentreDepth" in centre
+    # C993 now uses the exact projected-screen sun-family owner. The former
+    # depth-equality/WorldBillboard branch was superseded before this task.
+    # Verify the real current guard, including the unrelated-object fallback.
+    assert "IsProjectedSunScreenObject(objectId)" in centre
     assert "!OutRunVR::GameSemantic::QueueRenderActive()" in centre
     assert "objectId == 0x570002" in centre
     assert centre.index("ScopedExactProducerSemantic semantic(") < centre.index(
-        "ScopedRenderSemantic centreDrawScope(") < centre.index("Game::DrawObjectAlpha_Internal(")
-    assert "centreScope : OutRunVR::GameSemantic::CurrentScope" in centre
+        "ScopedRenderSemantic sunDrawScope(") < centre.rindex("Game::DrawObjectAlpha_Internal(")
+    assert "ProducerToken::LensFlareCentre" in centre
+    assert "RenderScope::ProjectedScreenEffect2D" in centre
+    fallback = centre.split("if (!projectedSun)", 1)[1].split("if (Settings::VRTelemetry)", 1)[0]
+    assert "Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);" in fallback
+    assert "return;" in fallback
     aniso = g.split("class AnisotropicFiltering : public Hook", 1)[1].split(
         "class VSyncOverride", 1)[0]
     d2 = aniso.split("static void destination2(", 1)[1].split("public:", 1)[0]
@@ -69,7 +76,7 @@ for name, gg, rr in (
     # not the independent exact C993 split-WVP gating expression.
     ("target owner", g, r.replace("if (!OutRunVRStereo::R23GameWvpTargetEligible())",
                                   "if (WrongTargetOwner())", 1)),
-    ("centre", g.replace("ScopedRenderSemantic centreDrawScope(", "ScopedRenderSemantic lostScope(", 1), r),
+    ("centre", g.replace("ScopedRenderSemantic sunDrawScope(", "ScopedRenderSemantic lostScope(", 1), r),
     ("MAG", g.replace("if (ctx.edi == D3DSAMP_MINFILTER)\n\t\t\tctx.esi",
                        "if (ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER)\n\t\t\tctx.esi", 1), r),
 ):
@@ -80,3 +87,4 @@ for name, gg, rr in (
     else:
         raise AssertionError("unsafe mutation survived: " + name)
 print("PASS new DX9Ex optical/GPU guards and 4 destructive checks; HMD UNTESTED")
+

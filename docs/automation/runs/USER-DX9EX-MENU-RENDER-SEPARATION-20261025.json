@@ -13,8 +13,35 @@
   "automation_validation": "LOCAL_TARGETED_PASS_CI_PENDING",
   "runtime_validation": "UNTESTED",
   "evidence": "docs/automation/reviews/MENU_RENDER_SEPARATION_20261025.md",
-  "protected": ["R26_HUD_DEFAULT", "HUD_1920x1080_SCALE_0.55", "WIDE_SELECTOR", "RANK_RIVAL", "INPUT_FFB", "DRIVER_SEAT_DEFAULT_OFF"],
+  "protected": [
+    "R26_HUD_DEFAULT",
+    "HUD_1920x1080_SCALE_0.55",
+    "WIDE_SELECTOR",
+    "RANK_RIVAL",
+    "INPUT_FFB",
+    "DRIVER_SEAT_DEFAULT_OFF"
+  ],
   "scope": "Independent 4:3 menu optical sizing plus startup VR game source selection independent of desktop/provider preference. Existing physical game target remains shared; no separate fixed-resolution menu texture claim.",
-  "local_validation": ["production C++ menu_content_aspect_smoke PASS", "menu resolution split red-before/green-after PASS", "menu letterbox/mutation PASS", "unified source/manual source precedence PASS", "mirror aspect fit PASS"],
-  "next_action": "Verify exact material SHA GitHub Actions Active game/host/package, Domain and affected Inspector/Full Source runs; repair actual failures in this same task; persist CI URLs and result SHA."
+  "local_validation": [
+    "production C++ menu_content_aspect_smoke PASS",
+    "menu resolution split red-before/green-after PASS",
+    "menu letterbox/mutation PASS",
+    "unified source/manual source precedence PASS",
+    "mirror aspect fit PASS"
+  ],
+  "next_action": "Verify final exact SHA Active, Domain, Inspector and Full Source; record package identity and runtime UNTESTED.",
+  "latest_verified_head": "c0bd73a333ded2056be37025c6ff652160acb39a",
+  "initial_material_sha": "b65c346da8481706f4bf80a42e41f011065950f2",
+  "initial_ci": {
+    "general": {
+      "run_id": 40173837070,
+      "conclusion": "success"
+    },
+    "active": {
+      "run_id": 40173837089,
+      "conclusion": "failure",
+      "reason": "superseded lens assertion; repaired alongside stale F11 assertion"
+    }
+  },
+  "followup": "same-owner config poll preserves accepted menu snapshot on process/path/no-config failure; no owner leakage"
 }

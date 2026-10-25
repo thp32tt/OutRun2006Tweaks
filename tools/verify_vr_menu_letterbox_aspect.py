@@ -1058,7 +1058,7 @@ def check_menu_ini_defaults(code: str) -> None:
         'L"Graphics", L"UIScalingMode",',
         'L"Graphics", L"UILetterboxing",',
         "if (!foundConfig)",
-        "return false;",
+        "return cachedLetterbox;",
         "ShouldCropConfiguredMenu(",
         "effectiveScalingMode, letterboxingMode);"
     ]
