@@ -29,7 +29,7 @@ def integrated(c, v, h, ps, a):
         ps.count("stage1GameTexture.Sample(stage1GameSampler, v.uvStage1)") == 3
     ) and all(x in a for x in (
         '{"TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 0, 56,',
-        "CreateInputLayout(elements, 5,")) and "stage1_game_uv_supported(" in header
+        "CreateInputLayout(elements, 7,")) and "stage1_game_uv_supported(" in header
 assert integrated(capture, vertex, shader, stage1, ia)
 for poison in ("stage1_game_uv_supported(uv1, layout.texcoordCount, transform1)",
                "samplerDiff || stage1AlternateUv"):
@@ -38,7 +38,7 @@ for poison in ("game_fvf_select_uv(decoded, layout, capture.stage1CoordIndex,",
                "!std::isfinite(output[i].uvStage1[0])"):
     assert not integrated(capture,vertex.replace(poison,"",1),shader,stage1,ia)
 assert not integrated(capture,vertex,shader,stage1.replace("v.uvStage1","v.uv"),ia)
-assert not integrated(capture,vertex,shader,stage1,ia.replace("CreateInputLayout(elements, 5,","CreateInputLayout(elements, 4,"))
+assert not integrated(capture,vertex,shader,stage1,ia.replace("CreateInputLayout(elements, 7,","CreateInputLayout(elements, 4,"))
 assert "test_dx11_stage1_uv_00715.py" in flow
 assert "dx11_game_stage1_uv_probe_00715.cpp" in flow
 print("PASS 00715: independent game FVF UV1/COUNT2 -> HLSL t1/s1 native Draw and DX9Ex fallback")
