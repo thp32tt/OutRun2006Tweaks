@@ -25,5 +25,6 @@ assert "sourceCount > maxExpandedIndices" in helper
 assert "std::uint64_t(sourceCount) <= allowed / instanceCount" in helper
 assert "game_sm3_expand_list_instance_indices(" in source
 assert "if (compactListInstances && nativeIndices)" not in source
-assert source.index("listSubmission.mode == GameSm3ListSubmissionMode::invalid") < source.index("upload_full_game_stream(")
+submit = source.split("bool submit_live_sm3_game_draw(", 1)[1].split("// Reuse geometric", 1)[0]
+assert submit.index("listSubmission.mode == GameSm3ListSubmissionMode::invalid") < submit.index("upload_full_game_stream(")
 print("01075 list GPU Draw + source rejection/fallback: PASS_STATIC")
