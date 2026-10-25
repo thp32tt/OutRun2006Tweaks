@@ -10,8 +10,8 @@
   "classification": "A+B",
   "work_key": "DX11:LIVE_SM3_BOUNDED_SEGMENTED_INSTANCE_GPU_SUBMISSION",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
-  "status": "SOURCE_STAGE_BUILD_VERIFIED",
-  "checkpoint": "C6_SOURCE_STAGE_ONLY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
@@ -158,6 +158,8 @@
   ],
   "c6_bookkeeping_only": true,
   "c6_does_not_revalidate_source": true,
+  "c6_previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_status_reconciliation": "Bookkeeping only: source stage validated on unchanged exact SHA with five mandatory GitHub Actions success; no additional build, source change, runtime proof or score award.",
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun 2006 / Quest 3 / VDXR gameplay session, physical native frame count, or FPS measurement.",
   "next_implementation_action": "Continue the shared unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME feature using next owned safe development work; do not re-score or reconfirm unchanged exact-SHA CI."
 }
