@@ -13,7 +13,9 @@ checks={
 "all draw callsites": capture.count("std::array<std::vector<std::uint8_t>,15> owned{};")==5,
 "source lifetime": "std::array<View, 15> extra{};" in api,
 "native IA declaration": "if (in.Stream >= 16u" in bridge,
-"native packed streams": "std::array<GameSm3StreamView,16> streams{};" in bridge,
+"native packed streams": "std::array<GameSm3StreamView,16> instanceStreams{};" in bridge and
+    "auto& streams = instanceStreams;" in bridge and
+    "instanceElements, instanceStreams, vertexCount, 1u," in bridge,
 "instance rate and indexed GPU draw": "std::array<std::uint32_t,16> instanceSteps{};" in bridge and
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge,
 "16 stream IA consumer": assembly.count("const std::array<GameSm3StreamView,16>& streams")==2,
