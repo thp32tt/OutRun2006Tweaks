@@ -10,7 +10,7 @@
   "classification": "A",
   "work_key": "DX11:NATIVE_BLOCK_COMPRESSED_GAME_TEXTURE_MIRROR",
   "feature_id": "DX11:NATIVE_BLOCK_COMPRESSED_GAME_TEXTURE_MIRROR",
-  "status": "SOURCE_STAGE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "feature_stage": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
