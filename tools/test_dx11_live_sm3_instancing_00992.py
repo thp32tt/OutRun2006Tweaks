@@ -11,9 +11,9 @@ assert "(frequency & ~kStreamFrequencyMask) == kStreamInstanced" in bridge
 assert "instance * vertexCount" in bridge
 assert "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge
 assert "context->Draw(vertexCount, base)" in bridge
-assert "issueNativeGameDraw(drawVertexCount, base);" in bridge
-assert "if (instance >= nativeSubmissionCount) break;" in bridge
-assert "const UINT nativeSubmissionCount = compactListInstances" in bridge
+assert "issueNativeGameDraw(" in bridge
+assert "if (segmentedInstanceUpload && instance != 0u)" in bridge
+assert "const UINT nativeSubmissionCount = segmentedInstanceUpload" in bridge
 assert "connectedCandidate ? connectedSubmission.drawCount : instanceCount" in bridge
 assert "game_sm3_connected_submission_plan(" in bridge
 assert "game_sm3_expand_connected_instance_indices(" in bridge

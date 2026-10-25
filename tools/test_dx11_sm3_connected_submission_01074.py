@@ -8,7 +8,7 @@ required = (
     "connectedSubmission.mode == GameSm3ConnectedSubmissionMode::invalid",
     "connectedSubmission.mode == GameSm3ConnectedSubmissionMode::compact_indexed",
     "connectedSubmission.drawCount",
-    "const UINT base = compactInstancedGeometry ? 0u : instance * vertexCount;",
+    "const UINT base = segmentedInstanceUpload ? 0u :",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
     "context->Draw(vertexCount, base);",
     "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
