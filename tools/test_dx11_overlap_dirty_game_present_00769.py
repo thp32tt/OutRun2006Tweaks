@@ -16,7 +16,10 @@ def integrated(s, h, u):
         "void before_game_reset(", 1)[0]
     select = p.find("const auto multiDirty = GameNativeMultiDirtyUpload::select(")
     snapshot = p.find("game->GetRenderTargetData(", select)
-    locks = p.find("s.insetSurface->LockRect(", snapshot)
+    fence = p.find("const NativeOutputUploadScope internalMultiSeedCopyScope{};", snapshot)
+    capture = p.find("return s.surfaceReplayFull.capture(", fence)
+    admitted = p.find("seedMultiTileFromGame() &&", capture)
+    locks = p.find("s.insetSurface->LockRect(", admitted)
     copies = p.find("for (std::uint32_t i = 0u; i < multiDirty.count; ++i)", locks)
     bound = p.find("const auto& bounds = multiDirty.uploadBounds;", copies)
     upload = p.find("game->UpdateSurface(", bound)
@@ -31,10 +34,17 @@ def integrated(s, h, u):
         "r.top < p.bottom && p.top < r.bottom" in h,
         "minX != boundLeft || minY != boundTop" in h,
         "bufferBytes < rectangleCount * 16u" in h,
-        0 <= select < snapshot < locks < copies < bound < upload,
+        0 <= select < snapshot < fence < capture < admitted < locks < copies < bound < upload,
         "true /* overlapping game dirty tiles are identical native pixels */"
             in p[select:snapshot],
-        "(!multiNativeUpload || SUCCEEDED(game->GetRenderTargetData(" in p,
+        # 01060 preserves original pixels when direct D3D9 backbuffer
+        # readback fails. Guarded StretchRect must precede ANY dirty tile
+        # CPU lock/upload, and both failures must veto partial publication.
+        "if (!multiNativeUpload) return true;" in p[snapshot:fence],
+        "back.Get(), s.insetSurface.Get()))) return true;" in p[snapshot:fence],
+        "game, back.Get(), s.insetSurface.Get()," in p[capture:admitted],
+        "bb.Width, bb.Height, bb.Format);" in p[capture:admitted],
+        "seedMultiTileFromGame() &&" in p[admitted:locks],
         "GameNativeFrameUpload::copy_rect(" in p[copies:bound],
         "s.insetSurface.Get(), &sourceTiles," in p[upload:],
         "back.Get(), &targetTiles" in p[upload:],
@@ -57,6 +67,9 @@ for before, after in (
     ("const auto& bounds = multiDirty.uploadBounds;",
      "const auto& bounds = presentRegion;"),
     ("back.Get(), &targetTiles", "back.Get(), &destination"),
+    ("const NativeOutputUploadScope internalMultiSeedCopyScope{};", "/* removed multi-tile R30 scope */"),
+    ("return s.surfaceReplayFull.capture(", "return no_private_gpu_readback("),
+    ("seedMultiTileFromGame() &&", "true && /* skipped game seed */"),
 ):
     # 00886 added an earlier real-game D3D9 postpass readback. Mutate the
     # 00769 dirty-tile seed inside Present itself, not the independent
