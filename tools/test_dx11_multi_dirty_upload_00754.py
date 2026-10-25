@@ -13,8 +13,12 @@ def connected(s,h):
     select=p.find("const auto multiDirty = GameNativeMultiDirtyUpload::select(")
     admit=p.find("const bool multiNativeUpload =",select)
     bound=p.find("const bool outputWritable =",admit)
-    snapshot=p.find("game->GetRenderTargetData(\n",bound)
-    locked=p.find("SUCCEEDED(s.insetSurface->LockRect(",snapshot)
+    seed=p.find("auto seedMultiTileFromGame = [&]() noexcept -> bool {",bound)
+    snapshot=p.find("game->GetRenderTargetData(\n",seed)
+    guard=p.find("const NativeOutputUploadScope internalMultiSeedCopyScope{};",snapshot)
+    fallback=p.find("return s.surfaceReplayFull.capture(",guard)
+    seeded=p.find("seedMultiTileFromGame() &&",fallback)
+    locked=p.find("SUCCEEDED(s.insetSurface->LockRect(",seeded)
     copy=p.find("for (std::uint32_t i = 0u; i < multiDirty.count; ++i)",locked)
     unlock=p.find("const HRESULT unlockStatus",copy)
     branch=p.find("if (!multiNativeUpload)",unlock)
@@ -22,11 +26,18 @@ def connected(s,h):
     single=p.find("uploaded = SUCCEEDED(game->UpdateSurface(",gpu)
     return all((
         '#include "native_game_multi_dirty_upload.hpp"' in s,
-        0<=select<admit<bound<snapshot<locked<copy<unlock<branch<gpu<single,
+        0<=select<admit<bound<seed<snapshot<guard<fallback<seeded<locked<copy<unlock<branch<gpu<single,
         "fullMode && backbufferKnown &&" in p[admit:bound],
         "multiDirty.valid" in p[admit:bound],
         "(multiNativeUpload && fullPlacement.valid)" in p[bound:snapshot],
-        "(!multiNativeUpload || SUCCEEDED(game->GetRenderTargetData(" in p[bound:locked],
+        # The full multi-dirty upload preserves game-authored gap pixels;
+        # direct D3D9 backbuffer readback or a guarded private-GPU RT
+        # fallback MUST finish before locking/uploading any dirty tile.
+        "if (!multiNativeUpload) return true;" in p[seed:snapshot],
+        "back.Get(), s.insetSurface.Get()))) return true;" in p[snapshot:guard],
+        "game, back.Get(), s.insetSurface.Get()," in p[fallback:seeded],
+        "bb.Width, bb.Height, bb.Format);" in p[fallback:seeded],
+        "seedMultiTileFromGame() &&" in p[seeded:locked],
         "GameNativeFrameUpload::copy_rect(" in p[copy:unlock],
         "!copied || FAILED(unlockStatus)" in p[unlock:branch],
         "s.insetSurface.Get(), &sourceTiles," in p[single:],
@@ -48,6 +59,10 @@ for before,after in (
     ("const bool multiNativeUpload = fullMode && backbufferKnown &&",
      "const bool multiNativeUpload = true /* unchecked */ &&"),
     ("game->GetRenderTargetData(","game->DisabledReadback("),
+    ("const NativeOutputUploadScope internalMultiSeedCopyScope{};", "/* removed R30 recursion guard */"),
+    ("return s.surfaceReplayFull.capture(", "return skipPrivateGpuRt("),
+    ("seedMultiTileFromGame() &&", "true && /* skipped game seed */"),
+    ("if (!multiNativeUpload) return true;", "if (false) return true;"),
     ("const auto& bounds = multiDirty.uploadBounds;","const auto& bounds = presentRegion;"),
     ("back.Get(), &targetTiles","back.Get(), &destination"),
     ("s.insetSurface.Get(), &sourceTiles,","s.insetSurface.Get(), nullptr,"),
