@@ -1,0 +1,76 @@
+{
+  "source_sha256": "5ae6a5f6d1d6ac0259cda307fa9bdd7729ba733e74a5591f845694c7fdba4d0f",
+  "evaluated_cases": [
+    {
+      "test": "identity_identity",
+      "generated_statements": 240,
+      "result": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "all_finite": true
+    },
+    {
+      "test": "identity_translation",
+      "generated_statements": 240,
+      "result": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        -3.0,
+        -4.0,
+        -5.0,
+        1.0
+      ],
+      "all_finite": true
+    },
+    {
+      "test": "identity_rotation",
+      "generated_statements": 240,
+      "result": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "all_finite": true
+    }
+  ],
+  "verification": "PASS_SYNTHETIC_ONLY",
+  "note": "Python f32 after every operation, fma approximated as multiply-add before one result rounding; C++ std::fma remains canonical for fused FP semantics."
+}
