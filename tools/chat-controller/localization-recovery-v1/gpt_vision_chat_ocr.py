@@ -18,6 +18,7 @@ VERSION="gpt-chat-vision-ocr-v1-20261025"
 OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
 RESPONSE_STALL_SECONDS=max(120,int(os.environ.get("OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS","600")))
+RESPONSE_EXTRACTOR_VERSION="search-unit-assistant-v2-20261026"
 TASK_RE=re.compile(r"^OUTRUN-GPT-OCR-Q\d{3}-[A-F0-9]{8}(?:-R[12])?$")
 
 def _now():
@@ -58,6 +59,31 @@ def _state():
 
 def _save_state(obj):
     obj["updated_at"]=_now();_atomic_json(STATE_PATH,obj)
+
+def _migrate_response_extractor_state(st):
+    """Give timeout-only tasks a fresh chance after a response-DOM extractor upgrade."""
+    if st.get("response_extractor_version")==RESPONSE_EXTRACTOR_VERSION:
+        return []
+    success=set()
+    timed_out=set()
+    for rec in st.get("completed",[]):
+        if not isinstance(rec,dict):
+            continue
+        fp=rec.get("fingerprint")
+        if not isinstance(fp,str):
+            continue
+        status=rec.get("status")
+        if status in ("APPLIED","APPLIED_MCP_BRIDGE") and int(rec.get("applied",0) or 0)>0:
+            success.add(fp)
+        elif status in ("RESPONSE_TIMEOUT_RETRY","RESPONSE_TIMEOUT_MAX_ATTEMPTS"):
+            timed_out.add(fp)
+    reset=sorted(timed_out-success)
+    for fp in reset:
+        st["attempts"][fp]=0
+    st["response_extractor_version"]=RESPONSE_EXTRACTOR_VERSION
+    st["response_extractor_migrated_at"]=_now()
+    st["response_extractor_retry_reset_count"]=len(reset)
+    return reset
 
 def _manifest_rows():
     if not ZIP.is_file() or ZIP.is_symlink(): raise ValueError("HD108_ZIP_MISSING")
@@ -136,7 +162,16 @@ IMAGE_SIZE={row["width"]}x{row["height"]}
 def next_binding():
     if os.environ.get("OUTRUN_GPT_CHAT_OCR_ENABLED","true").lower()!="true":
         return None,"GPT_CHAT_OCR_DISABLED"
-    st=_state();active=st.get("active")
+    st=_state()
+    reset=_migrate_response_extractor_state(st)
+    if reset:
+        _save_state(st)
+        _audit({"status":"RESPONSE_EXTRACTOR_UPGRADE_RETRY_RESET",
+                "response_extractor_version":RESPONSE_EXTRACTOR_VERSION,
+                "fingerprints_reset":len(reset),"external_api_used":False})
+    elif st.get("response_extractor_version")!=RESPONSE_EXTRACTOR_VERSION:
+        _save_state(st)
+    active=st.get("active")
     if isinstance(active,dict):
         status=active.get("status")
         if status=="STAGED": return dict(active),None
