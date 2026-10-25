@@ -96,6 +96,12 @@ static_assert(!native_game_float4_camera_sample_format(DXGI_FORMAT_BC1_UNORM));
     case DXGI_FORMAT_R32G32B32A32_TYPELESS:
         return renderedView == DXGI_FORMAT_R32G32B32A32_FLOAT
             ? renderedView : DXGI_FORMAT_UNKNOWN;
+    case DXGI_FORMAT_R32G32B32_TYPELESS:
+        return renderedView == DXGI_FORMAT_R32G32B32_FLOAT
+            ? renderedView : DXGI_FORMAT_UNKNOWN;
+    case DXGI_FORMAT_R32G32_TYPELESS:
+        return renderedView == DXGI_FORMAT_R32G32_FLOAT
+            ? renderedView : DXGI_FORMAT_UNKNOWN;
     case DXGI_FORMAT_R8G8_TYPELESS:
         return renderedView == DXGI_FORMAT_R8G8_UNORM ||
                renderedView == DXGI_FORMAT_R8G8_SNORM
@@ -113,8 +119,6 @@ static_assert(!native_game_float4_camera_sample_format(DXGI_FORMAT_BC1_UNORM));
         return renderedView == DXGI_FORMAT_R32_FLOAT
             ? renderedView : DXGI_FORMAT_UNKNOWN;
     // Unhandled typeless families are never implicitly shader-readable.
-    case DXGI_FORMAT_R32G32B32_TYPELESS:
-    case DXGI_FORMAT_R32G32_TYPELESS:
     case DXGI_FORMAT_R32G8X24_TYPELESS:
     case DXGI_FORMAT_R24G8_TYPELESS:
     case DXGI_FORMAT_BC1_TYPELESS:
@@ -197,6 +201,12 @@ native_game_typed_camera_preflight_formats(DXGI_FORMAT allocation) noexcept {
     case F::DXGI_FORMAT_R32G32B32A32_TYPELESS:
         return {F::DXGI_FORMAT_R32G32B32A32_FLOAT,
                 F::DXGI_FORMAT_UNKNOWN, F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_R32G32B32_TYPELESS:
+        return {F::DXGI_FORMAT_R32G32B32_FLOAT,
+                F::DXGI_FORMAT_UNKNOWN, F::DXGI_FORMAT_UNKNOWN};
+    case F::DXGI_FORMAT_R32G32_TYPELESS:
+        return {F::DXGI_FORMAT_R32G32_FLOAT,
+                F::DXGI_FORMAT_UNKNOWN, F::DXGI_FORMAT_UNKNOWN};
     case F::DXGI_FORMAT_R8G8_TYPELESS:
         return {F::DXGI_FORMAT_R8G8_UNORM, F::DXGI_FORMAT_R8G8_SNORM,
                 F::DXGI_FORMAT_UNKNOWN};
@@ -226,6 +236,28 @@ static_assert(native_game_typed_camera_preflight_formats(
 static_assert(native_game_typed_camera_preflight_formats(
     DXGI_FORMAT_R16G16B16A16_TYPELESS)[2] ==
     DXGI_FORMAT_R16G16B16A16_SNORM);
+// Genuine floating-point road/vehicle camera RTVs (2 and 3 channels)
+// sample through Texture2D<float4> in BOTH independent GPU eye passes.
+// Missing channels receive D3D11's defined (0,1) vector expansion; no
+// signed/unsigned integer, depth or typeless source is reinterpreted.
+static_assert(native_game_float4_camera_sample_format(DXGI_FORMAT_R32G32_FLOAT));
+static_assert(native_game_float4_camera_sample_format(DXGI_FORMAT_R32G32B32_FLOAT));
+static_assert(native_game_typed_camera_shader_format(
+    DXGI_FORMAT_R32G32_TYPELESS, DXGI_FORMAT_R32G32_FLOAT) ==
+    DXGI_FORMAT_R32G32_FLOAT);
+static_assert(native_game_typed_camera_shader_format(
+    DXGI_FORMAT_R32G32B32_TYPELESS, DXGI_FORMAT_R32G32B32_FLOAT) ==
+    DXGI_FORMAT_R32G32B32_FLOAT);
+static_assert(native_game_typed_camera_shader_format(
+    DXGI_FORMAT_R32G32_TYPELESS, DXGI_FORMAT_R32G32_UINT) ==
+    DXGI_FORMAT_UNKNOWN);
+static_assert(native_game_typed_camera_shader_format(
+    DXGI_FORMAT_R32G32B32_TYPELESS, DXGI_FORMAT_R32G32B32_UINT) ==
+    DXGI_FORMAT_UNKNOWN);
+static_assert(native_game_typed_camera_preflight_formats(
+    DXGI_FORMAT_R32G32_TYPELESS)[0] == DXGI_FORMAT_R32G32_FLOAT);
+static_assert(native_game_typed_camera_preflight_formats(
+    DXGI_FORMAT_R32G32B32_TYPELESS)[0] == DXGI_FORMAT_R32G32B32_FLOAT);
 static_assert(native_game_typed_camera_preflight_formats(
     DXGI_FORMAT_R32_TYPELESS)[0] == DXGI_FORMAT_R32_FLOAT);
 static_assert(native_game_typed_camera_preflight_formats(
@@ -291,6 +323,17 @@ static_assert(native_game_typed_camera_preflight_formats(
          ? NativeGameCameraCopyRoute::ShaderConvert
          : NativeGameCameraCopyRoute::Reject;
  }
+ // FLOAT32 camera RTVs differing from XR BGRA8 are GPU shader converted,
+ // not RAW-copied (which would reinterpret 64/96-bit pixels as 32-bit).
+ static_assert(native_game_camera_copy_route(
+     DXGI_FORMAT_R32G32_TYPELESS, DXGI_FORMAT_B8G8R8A8_UNORM,
+     DXGI_FORMAT_R32G32_FLOAT) == NativeGameCameraCopyRoute::ShaderConvert);
+ static_assert(native_game_camera_copy_route(
+     DXGI_FORMAT_R32G32B32_TYPELESS, DXGI_FORMAT_B8G8R8A8_UNORM,
+     DXGI_FORMAT_R32G32B32_FLOAT) == NativeGameCameraCopyRoute::ShaderConvert);
+ static_assert(native_game_camera_copy_route(
+     DXGI_FORMAT_R32G32_TYPELESS, DXGI_FORMAT_B8G8R8A8_UNORM,
+     DXGI_FORMAT_UNKNOWN) == NativeGameCameraCopyRoute::Reject);
  static_assert(native_game_camera_copy_needs_shader_fallback(
      DXGI_FORMAT_R8G8B8A8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM));
  static_assert(native_game_camera_copy_needs_shader_fallback(

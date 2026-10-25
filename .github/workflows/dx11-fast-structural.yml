@@ -289,6 +289,7 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_native_stereo_captured_views_01064.cpp -o /tmp/dx11_stereo_views_01064 && /tmp/dx11_stereo_views_01064
           python tools/test_dx11_native_stereo_captured_views_01064.py
           python tools/test_dx11_native_float_camera_postpass_01065.py
+          python tools/test_dx11_native_float_camera_pair_01066.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_reset_probe_00741.cpp -o /tmp/dx11_source_reset_00741 && /tmp/dx11_source_reset_00741
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_owner_handoff_probe_00740.cpp -o /tmp/dx11_source_owner_00740 && /tmp/dx11_source_owner_00740
           python tools/test_dx11_game_backbuffer_admission_00683.py
