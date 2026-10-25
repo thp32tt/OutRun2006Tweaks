@@ -13,7 +13,17 @@ assert "game_native_primitive_element_count" in probe
 assert bridge.count("game_native_primitive_element_count(") == 2
 for topology in ("LINELIST", "LINESTRIP", "TRIANGLELIST", "TRIANGLESTRIP"):
     assert "D3D11_PRIMITIVE_TOPOLOGY_" + topology in bridge
-assert "supported_game_state(game, type, vp, layout, transforms, capture, output)" in bridge
+# Keep verifying original line/Draw integration across the new
+# per-Draw fixed-function world clip capture, rather than an old argument list.
+import re
+call = re.compile(
+    r"if\s*\(\s*!supported_game_state\(\s*game,\s*type,\s*vp,\s*layout,"
+    r"\s*transforms,\s*fixedClip,\s*capture,\s*output\s*\)\s*\)"
+)
+assert call.search(bridge)
+assert not call.search(
+    bridge.replace("fixedClip, capture, output", "capture, output", 1))
+assert "game->GetClipPlane(slot, fixedClip.world[slot].data())" in bridge
 assert "D3DRS_ANTIALIASEDLINEENABLE" in bridge and "lineAA != FALSE" in bridge
 assert "D3DRS_LASTPIXEL" in bridge and "lastPixel != TRUE" in bridge
 # Native source ordinals are recorded before primitive topology admission:
