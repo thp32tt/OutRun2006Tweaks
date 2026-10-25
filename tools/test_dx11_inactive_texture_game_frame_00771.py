@@ -21,7 +21,7 @@ def joined(b):
         "capture.inactiveStage0TextureBypass" in decode,
         "game_fvf_decode_vertex(data, stride, layout, decoded)" in decode,
         "if (capture.enabled &&" in decode,
-        "if (!supported_game_state(game, type, vp, layout, transforms, capture, output))" in draw,
+        "if (!supported_game_state(game, type, vp, layout, transforms,\n                                  fixedClip, capture, output))" in draw,
         "translate_vertices(bytes, vertexCount, stride, vp," in draw,
         "if (!submit(s, vertices, indices, indexCount, type, capture, output))" in draw,
         "ctx->PSSetShader(capture.stage1Enabled ?" in submit,
