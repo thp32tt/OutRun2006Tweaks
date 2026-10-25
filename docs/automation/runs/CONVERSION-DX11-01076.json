@@ -1,0 +1,163 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01076",
+  "production_id": "CONVERSION-DX11-01076",
+  "event_id": "CONVERSION-DX11-01076-E002",
+  "event_type": "retry_after_exact_ci_failure",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01076",
+  "classification": "A+B",
+  "work_key": "DX11:LIVE_SM3_BOUNDED_SEGMENTED_INSTANCE_GPU_SUBMISSION",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "SOURCE_STAGE_BUILD_VERIFIED",
+  "checkpoint": "C6_SOURCE_STAGE_ONLY",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "material_result_sha": "1b4fd63d79d5f29327b90220efa7f3a472ae1a1e",
+  "validation_bearing_result_sha": "8d870e5ffb8440a92b89d932d81de069f293ac9d",
+  "implementation_commits": [
+    "1b4fd63d79d5f29327b90220efa7f3a472ae1a1e"
+  ],
+  "repair_commits": [
+    "3eab4fbcb84ec7175ac4a347c6530dcbaeb4d32b",
+    "7ba5105d71c9c20fbf41937b3d4cd8d841eaab02",
+    "3e914b6394c65e931c7d0df9dca6aa4bf3583822",
+    "8d870e5ffb8440a92b89d932d81de069f293ac9d"
+  ],
+  "score_change": 0,
+  "score_award_event": false,
+  "ai2_previous_confirmed_cumulative_score": 1963,
+  "ai2_new_confirmed_cumulative_score": 1963,
+  "score_note": "AI 2 scoreboard SSOT 1963 + source-stage progress / dependent CI repairs +0 = 1963. No fully verified new independent gameplay capability or HMD runtime evidence, no duplicate scoring.",
+  "summary": "Genuine live D3D9 SM3 multi-stream INDEXEDDATA/INSTANCEDATA Draw and DrawIndexed can exceed a single bounded native vertex upload. This C++ source stage retains original instance frequency and source vertex order, materializes one original source instance at a time into a renamed D3D11 GPU VB, and issues guarded Draw/DrawIndexed with the same authentic VB/IB shader state and fail-closed D3D9Ex game/input/FFB/SkyGlow fallback. Positive/negative C++ and connected source regressions plus exact-SHA five mandatory GitHub Actions PASS. Physical OutRun 2006, menu/car/race full frame and Quest3/VDXR remain UNTESTED.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+    "tools/dx11_sm3_segmented_instances_01076.cpp",
+    "tools/test_dx11_sm3_segmented_instances_01076.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_sm3_dynamic_texture_flow_00962.py",
+    "tools/test_dx11_live_sm3_instancing_00992.py",
+    "tools/test_dx11_live_sm3_vertex_decl_00929.py",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "tools/test_dx11_game_cull_draw_00649.py",
+    "tools/test_dx11_sm3_connected_submission_01074.py",
+    "tools/test_dx11_sm3_list_submission_01075.py",
+    "tools/test_dx11_instance_capture_01073.py",
+    "tools/test_dx11_sm3_multistream_game_draw_01029.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Advance unfinished actual OutRun menu/car/race SM3 game native Draw/DrawIndexed beyond single VB upload budget without changing original D3D9Ex authoritative rendering, gamepad/input, FFB, SkyGlow or frozen DXVK lane.",
+    "acceptance_items": [
+      {
+        "id": "segmented_live_sm3_gpu_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_INSTANCE_RATE_SOURCE_TO_D3D11_IA_DRAW",
+        "expected_behavior": "Authentic captured D3D9 instanced streams beyond one native VB budget preserve original absolute instance period and reach bounded per-instance actual D3D11 Draw/DrawIndexed."
+      },
+      {
+        "id": "fallback_source_rejection",
+        "category": "fallback_regression",
+        "behavior_area": "DX11_NATIVE_SOURCE_ADMISSION_AND_DX9EX_FALLBACK",
+        "expected_behavior": "Invalid source count, unsupported topology, insufficient secondary records, overflow or failed native GPU Map prevents publication without suppressing original game Draw, Present, input or FFB."
+      },
+      {
+        "id": "exact_sha_full_gate",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_BACKEND_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "Five mandatory GitHub Actions completed SUCCESS for the identical validation-bearing exact source SHA, not a gameplay/HMD optical validation."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "R30_LIVE_D3D9_SM3_INSTANCED_DRAW_SOURCE",
+      "ABSOLUTE_D3D9_INSTANCE_RATE_RECORDS",
+      "BOUNDED_D3D11_DYNAMIC_GPU_VERTEX_SEGMENTS",
+      "NATIVE_SHADER_DRAW_OR_DRAWINDEXED",
+      "GUARDED_NATIVE_FULL_GAME_FRAME_PUBLICATION",
+      "D3D9EX_FAIL_CLOSED_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+      "tools/dx11_sm3_segmented_instances_01076.cpp",
+      "tools/test_dx11_sm3_segmented_instances_01076.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast 40237293301 compiled and executed segmented instance positive C++ probe and source integration linked to actual native GPU Draw/DrawIndexed.",
+      "negative_regression": "A global instance step/divisor mismatch, overflow, malformed VB/record stream and native Map failure reject native publication while original D3D9Ex path survives; existing 01073/01029/01074/01075 destructive and source checks remain enabled.",
+      "component_integration": "R30 genuine D3D9 SM3 source capture -> persistent 16-stream assembly with global firstInstance -> repeated bounded D3D11 WRITE_DISCARD VB, original IB and shader bound GPU Draw/DrawIndexed -> opt-in full frame; no runtime claims."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:LIVE_SM3_BOUNDED_SEGMENTED_INSTANCE_GPU_SUBMISSION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "NATIVE_SM3_SHADER_AND_GPU_DRAW",
+      "FULL_RESOLUTION_NATIVE_TARGET"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; physical menu/car/race native image, gameplay input parity, Quest3 and VDXR optical output remain UNTESTED.",
+    "activation_guard_and_fallback": "Native full game GPU path remains opt-in/fail-closed. Real D3D9Ex Draw/Present/input/FFB/SkyGlow authoritative; DXVK frozen."
+  },
+  "acceptance_results": {
+    "segmented_live_sm3_gpu_draw": "PASS_SOURCE_AND_EXACT_SHA_CI_RUNTIME_UNTESTED",
+    "fallback_source_rejection": "PASS_SOURCE_AND_EXACT_SHA_CI_RUNTIME_UNTESTED",
+    "exact_sha_full_gate": "PASS_EXACT_SHA"
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast",
+      "run_id": 40237293301,
+      "status": "success",
+      "sha": "8d870e5ffb8440a92b89d932d81de069f293ac9d",
+      "event": "push"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40237293300,
+      "status": "success",
+      "sha": "8d870e5ffb8440a92b89d932d81de069f293ac9d",
+      "event": "push"
+    },
+    {
+      "name": "Windows Build",
+      "run_id": 40237293292,
+      "status": "success",
+      "sha": "8d870e5ffb8440a92b89d932d81de069f293ac9d",
+      "event": "push"
+    },
+    {
+      "name": "OpenXR",
+      "run_id": 40237293293,
+      "status": "success",
+      "sha": "8d870e5ffb8440a92b89d932d81de069f293ac9d",
+      "event": "push"
+    },
+    {
+      "name": "HUD Inspector",
+      "run_id": 40237293283,
+      "status": "success",
+      "sha": "8d870e5ffb8440a92b89d932d81de069f293ac9d",
+      "event": "push"
+    }
+  ],
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun 2006 / Quest 3 / VDXR gameplay session, physical native frame count, or FPS measurement.",
+  "next_implementation_action": "Continue the shared unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME feature using next owned safe development work; do not re-score or reconfirm unchanged exact-SHA CI."
+}
