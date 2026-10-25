@@ -65,7 +65,7 @@ def main():
         ("paletteDevice->GetCurrentTexturePalette(&paletteNumber)", "false"),
         ("paletteDevice->GetPaletteEntries(paletteNumber, entries.data())", "false"),
         ("a8p8 ? a8p8_texture::source_bytes_per_texel() :", "4u :"),
-        ("const UINT a8p8UploadPitch = a8p8 ? desc.Width * 4u : uploadPitch;",
+        ("const UINT a8p8UploadPitch = a8p8 ? desc.Width * 4u : mixedBumpUploadPitch;",
          "const UINT a8p8UploadPitch = mixedBumpUploadPitch;"),
         ("pitches[level] = a8p8UploadPitch;", "pitches[level] = uploadPitch;"),
         ("if (a8p8) pixels.resize(static_cast<std::size_t>(a8p8UploadPitch) * rows);", "if (false) pixels.resize(static_cast<std::size_t>(a8p8UploadPitch) * rows);"),
