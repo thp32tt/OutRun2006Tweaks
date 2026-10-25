@@ -32,6 +32,8 @@ bool diagnostic_enabled() noexcept;
 // Source-owned, epoch-valid secondary D3D9 VB shadows for all 16
 // D3D9 stream slots. Unavailable epochs must abort native publication. Each stream shares
 // stream-0's exact physical vertex order (including indexed sparse gathers).
+// Each instance-rate INSTANCEDATA stream instead uses the compact original
+// instance record order 0..ceil(instanceCount/step)-1; native SM3 expands it.
 // Borrowed pointers are valid only during the synchronous observe call.
 struct NativeGameAdditionalStreams {
     struct View { const void* bytes{}; UINT stride{}; UINT vertexCount{}; };

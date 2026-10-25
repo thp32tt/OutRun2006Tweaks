@@ -18,6 +18,7 @@
 #include "vr/d3d11/native_game_surface_copy_region.hpp"
 #include "vr/d3d11/live_game_primitive_span.hpp"
 #include "vr/d3d11/live_game_source_stride.hpp"
+#include "vr/d3d11/native_game_instance_stream_capture.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <array>
@@ -3468,20 +3469,46 @@ namespace OutRunVRStereo
                 if (elements[i].Stream>=used.size()) return false;
                 used[elements[i].Stream]=true;
             }
+            // Shader-bound live instancing uses a SECOND address domain:
+            // stream zero consumes original vertex slots; INSTANCEDATA streams
+            // consume record 0..ceil(instanceCount/step)-1, not VB vertex IDs.
+            // This shared capture feeds all four real game Draw hook routes.
+            UINT streamZeroFrequency = 0u;
+            if (FAILED(device->GetStreamSourceFreq(0u, &streamZeroFrequency)))
+                return false;
             std::uint64_t capturedExtraBytes = 0u;
             for (UINT slot=1u; slot<used.size(); ++slot) {
                 if (!used[slot]) continue;
                 IDirect3DVertexBuffer9* vb=nullptr;
-                UINT offset=0u,stride=0u;
+                UINT offset=0u,stride=0u,secondaryFrequency=0u;
                 if (FAILED(device->GetStreamSource(slot,&vb,&offset,&stride)) ||
-                    !vb || !outrun::vr::dx11::game_native_source_stride_valid(stride)) {
+                    !vb || !outrun::vr::dx11::game_native_source_stride_valid(stride) ||
+                    FAILED(device->GetStreamSourceFreq(slot, &secondaryFrequency))) {
                     if (vb) vb->Release();
                     return false;
+                }
+                const auto capturePlan =
+                    outrun::vr::dx11::live_game_frame::game_native_instance_stream_capture(
+                        streamZeroFrequency, secondaryFrequency,
+                        static_cast<UINT>(physical.size()));
+                if (!capturePlan.valid ||
+                    capturePlan.sourceSlots >
+                        outrun::vr::dx11::live_game_frame::kMaxNativeGameVertices) {
+                    vb->Release();
+                    return false;
+                }
+                std::vector<std::uint32_t> instancePhysical;
+                const std::vector<std::uint32_t>* sourcePhysical = &physical;
+                if (capturePlan.instanceRate) {
+                    instancePhysical.resize(capturePlan.sourceSlots);
+                    for (UINT i=0u; i<capturePlan.sourceSlots; ++i)
+                        instancePhysical[i] = i;
+                    sourcePhysical = &instancePhysical;
                 }
                 R30EnsureVertexBufferHooks(vb);
                 R30EnsureVertexShadow(vb);
                 const bool captured=R30CopySparseVertexShadow(
-                    vb,offset,stride,physical,owned[slot-1u]);
+                    vb,offset,stride,*sourcePhysical,owned[slot-1u]);
                 vb->Release();
                 if (!captured) return false;
                 // Limit per-Draw total high-stream shadow staging when the
@@ -3489,8 +3516,7 @@ namespace OutRunVRStereo
                 capturedExtraBytes += owned[slot-1u].size();
                 if (capturedExtraBytes > (1ull << 27u)) return false;
                 extra.extra[slot-1u]={
-                    owned[slot-1u].data(),stride,
-                    static_cast<UINT>(physical.size())};
+                    owned[slot-1u].data(),stride,capturePlan.sourceSlots};
             }
             return true;
         }
