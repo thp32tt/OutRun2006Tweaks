@@ -618,9 +618,10 @@ class VRLensFlareProjected2D : public Hook
         LensCentreSavedProducer = OutRunVR::GameSemantic::ProducerToken::None;
     inline static thread_local std::uint64_t LensCentreSavedEpoch = 0;
     // r4dius/outrun2-decomp race_course_passes.cpp proves 0x570008 is
-    // emitted twice per visible sun-flare sequence: first as a normal outer
-    // child at +0.16*spread, then after the queue flush at along=-0.003,
-    // size=1.5 as the near-centre glow. C993/0x570002 cannot suppress it.
+    // emitted twice per visible sun-flare sequence. Fresh Quest3 logs still
+    // show the visible duplicate after suppressing only ordinal 2, so the
+    // VR path now removes both 0x570008 children while preserving the actual
+    // 0x570002 sun and every non-570008 outer flare disc.
     inline static thread_local std::uint64_t LensFlareSequence = 0;
     inline static thread_local std::uint64_t LensOuter570008Sequence = 0;
     inline static thread_local unsigned LensOuter570008Ordinal = 0;
@@ -690,7 +691,7 @@ class VRLensFlareProjected2D : public Hook
                 LensOuter570008Ordinal = 0;
             }
             const unsigned ordinal = ++LensOuter570008Ordinal;
-            if (ordinal == 2)
+            if (ordinal <= 2)
             {
                 if (Settings::VRTelemetry)
                 {
@@ -699,9 +700,9 @@ class VRLensFlareProjected2D : public Hook
                         1, std::memory_order_relaxed) + 1;
                     if (n <= 8 || (n & (n - 1)) == 0)
                         spdlog::info(
-                            "VR LENS DECOMP CENTER GLOW HIDDEN: "
+                            "VR LENS 570008 CHILD HIDDEN: "
                             "id=0x{:X} ordinal={} sequence={} hits={} "
-                            "(first 0x570008 outer child preserved)",
+                            "(sun 0x570002 and non-570008 outer discs preserved)",
                             static_cast<unsigned>(objectId), ordinal,
                             LensFlareSequence, n);
                 }

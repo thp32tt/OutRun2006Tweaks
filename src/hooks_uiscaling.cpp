@@ -1328,12 +1328,25 @@ class UIScaling : public Hook
                 // execution. The old tail may be valid under a DIFFERENT
                 // root after rebuild/reuse: such nodes belong to that new
                 // queue and must not inherit StageExtensionTime ownership.
-                node = sourceRoots
-                    ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot(
-                        (*sourceRoots)[prio], root, before[prio],
-                        tailAfter, Game::SpriteNodeMax)
-                    : StageFirstAppendedNode(
-                        root, before[prio], tailAfter, Game::SpriteNodeMax);
+                // Fresh Quest trace proves BB6F0/BB796 has a valid rival
+                // anchor but zero projected queue draws. The rival producer
+                // can replace the priority-list root while retaining its
+                // own old tail. For this ONE exact producer, prove the old
+                // tail and terminal new tail on the CURRENT live chain.
+                // All other HUD/GOAL/+TIME/rank producers keep strict
+                // pre/post root identity.
+                const bool exactRivalRootRebuild =
+                    sourceRoots &&
+                    producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani;
+                node = exactRivalRootRebuild
+                    ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
+                        root, before[prio], tailAfter, Game::SpriteNodeMax)
+                    : sourceRoots
+                        ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot(
+                            (*sourceRoots)[prio], root, before[prio],
+                            tailAfter, Game::SpriteNodeMax)
+                        : StageFirstAppendedNode(
+                            root, before[prio], tailAfter, Game::SpriteNodeMax);
             }
             else
             {
@@ -2337,10 +2350,25 @@ class UIScaling : public Hook
         }
 		// The prior HMD-accepted queued rival nodes retain exactly the same
 		// scope and anchor, with no widening to generic world/HUD sprites.
+		const auto registeredBefore =
+            OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+                std::memory_order_relaxed);
 		TagAppendedNodes(before, scope,
 			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
 			projected ? &projectedAnchor : nullptr,
             &rootsBefore, entrySerial);
+        if (Settings::VREnabled && Settings::VRTelemetry)
+        {
+            const auto registeredAfter =
+                OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+                    std::memory_order_relaxed);
+            static thread_local std::uint64_t rivalQueuePublishes = 0;
+            const auto n = ++rivalQueuePublishes;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL QUEUE PUBLICATION: hits={} registeredDelta={} anchorValid={} policy=EXACT_CURRENT_CHAIN",
+                    n, registeredAfter - registeredBefore, projected ? 1 : 0);
+        }
 		return result;
 	}
 

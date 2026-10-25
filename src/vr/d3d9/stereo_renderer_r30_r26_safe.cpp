@@ -5844,6 +5844,39 @@ namespace OutRunVRStereo
                 device, actual, r29, "R30/DrawIndexedPrimitive");
         }
 
+
+        bool R30IsUnownedGoalFinalGraphPrimitiveUP(
+            IDirect3DDevice9* device,
+            OutRunVR::GameSemantic::RenderScope scope,
+            UINT primitiveCount, const void* data, UINT stride) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            if (!device || !data || primitiveCount == 0 || stride < 24u ||
+                !Game::current_mode ||
+                *Game::current_mode != GameState::STATE_GOAL ||
+                scope != RenderScope::ScreenOverlay2D ||
+                CurrentRenderProducerToken() != ProducerToken::None ||
+                ExternalOverlaySemanticDepth != 0)
+                return false;
+            DWORD fvf = 0, alpha = 0, src = 0, dst = 0;
+            if (FAILED(device->GetFVF(&fvf)) || fvf != 0x00000144u ||
+                FAILED(device->GetRenderState(D3DRS_ALPHABLENDENABLE, &alpha)) ||
+                FAILED(device->GetRenderState(D3DRS_SRCBLEND, &src)) ||
+                FAILED(device->GetRenderState(D3DRS_DESTBLEND, &dst)) ||
+                alpha == 0 || src != D3DBLEND_SRCALPHA ||
+                dst != D3DBLEND_INVSRCALPHA)
+                return false;
+            IDirect3DVertexShader9* shader = nullptr;
+            if (FAILED(device->GetVertexShader(&shader)))
+                return false;
+            if (shader)
+            {
+                shader->Release();
+                return false;
+            }
+            return true;
+        }
+
         HRESULT __stdcall DrawPrimitiveUPDestR30(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
@@ -5856,6 +5889,31 @@ namespace OutRunVRStereo
                 drawSemanticValue);
             R30TracePreRestartHudEligibility(device, 2u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
+            // 2026-10-26 Quest log: before the exact 0-99% result owner,
+            // the final graph appears as one unowned alpha-blended FVF144
+            // DrawPrimitiveUP in STATE_GOAL. Promote only this observed
+            // physical form to the finite ScreenHud plane; never reinstate
+            // the crash-prone 0x97xxx return-site hooks.
+            if (R30IsUnownedGoalFinalGraphPrimitiveUP(
+                    device, drawSemanticValue, primitiveCount, data, stride))
+            {
+                OutRunVR::GameSemantic::ScopedRenderSemantic goalGraphScope(
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud);
+                const HRESULT goalGraph = R30TryXyzrhwPrimitiveUP(
+                    device, type, primitiveCount, data, stride);
+                if (goalGraph != E_NOTIMPL)
+                {
+                    static std::atomic<std::uint64_t> goalGraphDraws{ 0 };
+                    const auto n = goalGraphDraws.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (Settings::VRTelemetry &&
+                        (n <= 8 || (n & (n - 1)) == 0))
+                        spdlog::info(
+                            "VR GOAL FINAL GRAPH: FVF144 DPUP -> finite SCREEN_HUD stereo hits={}",
+                            n);
+                    return goalGraph;
+                }
+            }
             // FVF142 is XYZ(12) + diffuse(4) + UV(8). Native D3D9 owns
             // validation of the caller's memory; never reinterpret XYZRHW.
             if (data && stride >= 24u)
