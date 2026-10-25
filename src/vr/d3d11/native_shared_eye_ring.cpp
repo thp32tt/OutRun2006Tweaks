@@ -354,7 +354,7 @@ namespace outrun::vr::dx11
                 desc.ArraySize, arraySlice, desc.SampleDesc.Count);
             if (!extent.valid || extent.width != width_ ||
                 extent.height != height_ ||
-                desc.Format != format_ || desc.MipLevels == 0 ||
+                desc.MipLevels == 0 ||
                 desc.ArraySize == 0 || desc.SampleDesc.Count == 0 ||
                 (desc.SampleDesc.Count == 1 && desc.SampleDesc.Quality != 0) ||
                 desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
@@ -388,7 +388,69 @@ namespace outrun::vr::dx11
                 return false;
             Microsoft::WRL::ComPtr<ID3D11Device> owner;
             source->GetDevice(owner.GetAddressOf());
-            return owner && owner.Get() == producer_device_.Get();
+            if (!owner || owner.Get() != producer_device_.Get()) return false;
+            // Exact typed storage is always accepted. TYPELESS single-sample
+            // native cameras need an actual matching RTV for their selected
+            // physical mip/slice. Capturing another camera's bound RTV (or
+            // assuming every typeless BGRA image is linear) would contaminate
+            // left/right OpenXR pixels; reject before either GPU command.
+            if (desc.Format == format_) return true;
+            if (!native_game_eye_format_transfer_admitted(
+                    desc.Format, DXGI_FORMAT_UNKNOWN, format_,
+                    desc.SampleDesc.Count, DXGI_FORMAT_B8G8R8A8_UNORM,
+                    DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+                    DXGI_FORMAT_B8G8R8A8_TYPELESS) &&
+                !(desc.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS &&
+                  desc.SampleDesc.Count == 1u))
+                return false;
+            if (desc.Format != DXGI_FORMAT_B8G8R8A8_TYPELESS ||
+                desc.SampleDesc.Count != 1u) return false;
+
+            Microsoft::WRL::ComPtr<IUnknown> sourceIdentity;
+            if (FAILED(source->QueryInterface(
+                    __uuidof(IUnknown), reinterpret_cast<void**>(
+                        sourceIdentity.GetAddressOf()))) || !sourceIdentity)
+                return false;
+            ID3D11RenderTargetView* bound[
+                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+            context->OMGetRenderTargets(
+                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, bound, nullptr);
+            bool viewProven = false;
+            for (auto* view : bound) {
+                if (!view) continue;
+                if (!viewProven) {
+                    D3D11_RENDER_TARGET_VIEW_DESC viewDesc{};
+                    view->GetDesc(&viewDesc);
+                    const bool selected2d =
+                        viewDesc.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2D &&
+                        native_game_eye_rtv_subresource_matches(
+                            mipSlice, arraySlice,
+                            viewDesc.Texture2D.MipSlice, 0u, 1u);
+                    const bool selectedArray =
+                        viewDesc.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2DARRAY &&
+                        native_game_eye_rtv_subresource_matches(
+                            mipSlice, arraySlice,
+                            viewDesc.Texture2DArray.MipSlice,
+                            viewDesc.Texture2DArray.FirstArraySlice,
+                            viewDesc.Texture2DArray.ArraySize);
+                    if ((selected2d || selectedArray) &&
+                        native_game_eye_format_transfer_admitted(
+                            desc.Format, viewDesc.Format, format_,
+                            desc.SampleDesc.Count, DXGI_FORMAT_B8G8R8A8_UNORM,
+                            DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+                            DXGI_FORMAT_B8G8R8A8_TYPELESS)) {
+                        Microsoft::WRL::ComPtr<ID3D11Resource> viewResource;
+                        Microsoft::WRL::ComPtr<IUnknown> viewIdentity;
+                        view->GetResource(viewResource.GetAddressOf());
+                        if (viewResource &&
+                            SUCCEEDED(viewResource.As(&viewIdentity)) &&
+                            viewIdentity.Get() == sourceIdentity.Get())
+                            viewProven = true;
+                    }
+                }
+                view->Release();
+            }
+            return viewProven;
         };
 
         // Validate both resource descriptors and owning devices up front.

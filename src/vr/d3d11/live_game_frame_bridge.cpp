@@ -9306,7 +9306,15 @@ void before_game_present(IDirect3DDevice9* game,
                 const NativeFullGameGpuFrame frame{
                     ctx, s.backend.color_texture(), surfaceWidth, surfaceHeight,
                     s.presents, s.sourceDrawsThisFrame, s.outputGeneration};
-                gpuHandoffQueued = s.gpuFrameSink(s.gpuFrameSinkUser, frame);
+                // The producer's native color RTV or compute/UAV output may
+                // still be bound at Present. A GPU sink copies this image on
+                // the SAME immediate context, so restore game OM/CS outputs
+                // after its synchronous GPU commands, not after D3D9 Present.
+                // This does not admit a mono frame as genuine L/R OpenXR eyes.
+                if (ctx->GetType() == D3D11_DEVICE_CONTEXT_IMMEDIATE) {
+                    ScopedNativeGameGpuTransferOutputs preserveGameOutputs(ctx);
+                    gpuHandoffQueued = s.gpuFrameSink(s.gpuFrameSinkUser, frame);
+                }
             }
             // Optional real GPU-only desktop presentation, without staging
             // D3D11 pixels through system memory. Require an actual D3D9Ex

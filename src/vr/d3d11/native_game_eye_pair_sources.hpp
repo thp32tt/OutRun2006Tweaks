@@ -67,6 +67,34 @@ namespace outrun::vr::dx11 {
         (bindFlags & (renderTargetFlag | depthFlag)) == 0u &&
         sampleCount == 1u && (miscFlags & sharedFlags) == 0u;
 }
+// Real native game color targets may use TYPELESS BGRA8 storage with a
+// specific typed RTV. Permit GPU-only transfer to the matching typed XR ring
+// when the currently bound game RTV proves BOTH the exact mip/array selection
+// and color-space interpretation. An unbound/foreign view or SRGB -> UNORM
+// reinterpretation must never silently alter game-camera gamma. MSAA typed
+// resolves remain restricted to their exact original format.
+[[nodiscard]] constexpr bool native_game_eye_format_transfer_admitted(
+    std::uint32_t sourceStorage, std::uint32_t typedView,
+    std::uint32_t ringFormat, std::uint32_t sampleCount,
+    std::uint32_t bgraUnorm, std::uint32_t bgraSrgb,
+    std::uint32_t bgraTypeless) noexcept {
+    if (sourceStorage == ringFormat) return true;
+    return sampleCount == 1u &&
+        sourceStorage == bgraTypeless &&
+        (ringFormat == bgraUnorm || ringFormat == bgraSrgb) &&
+        typedView == ringFormat;
+}
+// Only a view containing the *selected* physical color subresource can
+// attest to typeless storage. A different mip or array slice is not proof
+// of the game-authored left/right camera's pixel interpretation.
+[[nodiscard]] constexpr bool native_game_eye_rtv_subresource_matches(
+    std::uint32_t selectedMip, std::uint32_t selectedSlice,
+    std::uint32_t viewMip, std::uint32_t firstSlice,
+    std::uint32_t sliceCount) noexcept {
+    return sliceCount != 0u && selectedMip == viewMip &&
+        selectedSlice >= firstSlice &&
+        selectedSlice - firstSlice < sliceCount;
+}
 enum class NativeGameEyeTransfer : std::uint8_t { Reject, Copy, Resolve };
 // Same-generation cumulative ACKs may retire frames with lower frame IDs.
 // Disallow frame-ID reuse or a new ID already covered by a supplied ACK:
