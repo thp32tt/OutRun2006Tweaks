@@ -32,4 +32,42 @@ namespace outrun::vr::dx11::live_game_frame {
         return true;
     } catch (...) { return false; }
 }
+// Source-authored independent D3D9 POINT/LINE/TRIANGLE lists may reuse
+// their same source IB across many instances. If duplicating the entire IB
+// would exceed the bounded native upload, submit independent native indexed
+// draws using each instance's materialized vertex base instead of rejecting
+// valid game geometry. Non-indexed lists can still use one contiguous Draw.
+enum class GameSm3ListSubmissionMode : std::uint8_t {
+    invalid, compact_indexed, compact_linear, per_instance
+};
+struct GameSm3ListSubmissionPlan {
+    GameSm3ListSubmissionMode mode = GameSm3ListSubmissionMode::invalid;
+    std::uint32_t drawCount = 0u;
+};
+[[nodiscard]] constexpr GameSm3ListSubmissionPlan
+game_sm3_list_submission_plan(std::uint32_t primitiveType, bool indexed,
+    std::uint32_t sourceCount, std::uint32_t verticesPerInstance,
+    std::uint32_t instanceCount, std::uint32_t maxExpandedIndices) noexcept {
+    const bool list = game_sm3_independent_list(primitiveType);
+    const std::uint32_t group = primitiveType == 2u ? 2u :
+                                primitiveType == 4u ? 3u : 1u;
+    if (!list || !sourceCount || sourceCount % group != 0u ||
+        !verticesPerInstance || instanceCount < 2u || !maxExpandedIndices ||
+        (indexed && sourceCount > maxExpandedIndices))
+        return {};
+    const auto expandedVertices =
+        std::uint64_t(verticesPerInstance) * instanceCount;
+    if (expandedVertices > (std::numeric_limits<std::int32_t>::max)())
+        return {};  // a D3D11 BaseVertexLocation cannot represent it
+    if (!indexed)
+        return {GameSm3ListSubmissionMode::compact_linear, 1u};
+    constexpr std::uint64_t maxTemporaryIndices =
+        (1ull << 25u) / sizeof(std::uint32_t);
+    const std::uint64_t allowed =
+        maxExpandedIndices < maxTemporaryIndices ?
+        maxExpandedIndices : maxTemporaryIndices;
+    if (std::uint64_t(sourceCount) <= allowed / instanceCount)
+        return {GameSm3ListSubmissionMode::compact_indexed, 1u};
+    return {GameSm3ListSubmissionMode::per_instance, instanceCount};
+}
 } // namespace outrun::vr::dx11::live_game_frame

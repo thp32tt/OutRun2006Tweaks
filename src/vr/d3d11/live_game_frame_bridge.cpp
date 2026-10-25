@@ -5479,12 +5479,25 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         }
     }
-    // D3D9 lists are already independently connected. For strip/fan source
-    // instances, materialize an indexed list for each instance, preserving
-    // triangle-strip alternating winding and fan/line boundaries. This
-    // enables ONE native DrawIndexed without joining adjacent instances.
-    const bool compactListInstances = sourceInstancing && instanceCount > 1u &&
+    // Source-authored independent lists preserve one contiguous Draw when
+    // representable, or independent indexed GPU draws if a replicated IB
+    // would exhaust the bounded upload. Source strip/fan instances are
+    // separately lowered to lists without joining primitive boundaries.
+    const bool listCandidate = sourceInstancing && instanceCount > 1u &&
         game_sm3_independent_list(static_cast<std::uint32_t>(type));
+    const auto listSubmission = listCandidate
+        ? game_sm3_list_submission_plan(
+              static_cast<std::uint32_t>(type), nativeIndices != nullptr,
+              expected, vertexCount, instanceCount, kMaxIndices)
+        : GameSm3ListSubmissionPlan{};
+    if (listCandidate &&
+        listSubmission.mode == GameSm3ListSubmissionMode::invalid)
+        return false;
+    const bool compactListInstances = listCandidate &&
+        (listSubmission.mode == GameSm3ListSubmissionMode::compact_indexed ||
+         listSubmission.mode == GameSm3ListSubmissionMode::compact_linear);
+    const bool compactListIndices = listCandidate &&
+        listSubmission.mode == GameSm3ListSubmissionMode::compact_indexed;
     const bool connectedCandidate = sourceInstancing && instanceCount > 1u &&
         (type == D3DPT_LINESTRIP || type == D3DPT_TRIANGLESTRIP ||
          type == D3DPT_TRIANGLEFAN);
@@ -5507,7 +5520,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         compactListInstances || compactConnectedInstances;
     std::vector<std::uint32_t> compactListIndices;
     std::vector<std::uint32_t> compactConnectedIndices;
-    if (compactListInstances && nativeIndices) {
+    if (compactListIndices && nativeIndices) {
         if (!game_sm3_expand_list_instance_indices(
                 nativeIndices, nativeIndexCount, vertexCount, instanceCount,
                 compactListIndices)) return false;
@@ -6204,11 +6217,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     context->VSSetSamplers(0u, 4u, boundVertexSamplers.data());
     context->PSSetShaderResources(0u, 16u, boundViews.data());
     context->PSSetSamplers(0u, 16u, boundSamplers.data());
-    // One audited GPU Draw call site; independent indexed strip/fan lists
-    // preserve exact source boundaries while merging all instances into one
-    // DrawIndexed. Legacy one-instance and non-instanced paths are unchanged.
+    // One audited native submit site. Small indexed lists and connected
+    // strips/fans merge safely; large indexed lists/strips/fans keep original
+    // D3D9 IB + per-instance vertex bases and independent GPU Draw boundaries.
     const UINT nativeSubmissionCount = compactListInstances
-        ? 1u : (connectedCandidate ? connectedSubmission.drawCount : instanceCount);
+        ? 1u : (listCandidate ? listSubmission.drawCount :
+                (connectedCandidate ? connectedSubmission.drawCount : instanceCount));
     const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
     // The native API dispatch sites remain inside this guarded submit.
