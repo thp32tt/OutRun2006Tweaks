@@ -13,6 +13,7 @@ on:
       - 'tools/verify_vr_r26_stage_fixedfn.py'
       - 'tools/verify_vr_desktop_source_coordinates.py'
       - 'tools/verify_vr_unified_menu_source.py'
+      - 'tools/verify_vr_menu_resolution_split.py'
       - 'tools/verify_vr_f11_font_density.py'
       - 'tools/verify_vr_r26_landscape_visual_recovery.py'
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
@@ -42,6 +43,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'XR physical target/logical UI split failed' }
           python tools/verify_vr_unified_menu_source.py
           if ($LASTEXITCODE -ne 0) { throw 'VR UI reference split failed' }
+          python tools/verify_vr_menu_resolution_split.py
+          if ($LASTEXITCODE -ne 0) { throw 'Menu/XR render-target split failed' }
           python tools/verify_vr_f11_font_density.py
           if ($LASTEXITCODE -ne 0) { throw 'F11 VR density/layout contract failed' }
           python tools/verify_vr_r26_landscape_visual_recovery.py
