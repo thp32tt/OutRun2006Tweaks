@@ -25,6 +25,7 @@ assert 'source, &area, gpu_.Get(), nullptr, D3DTEXF_NONE' in t
 assert 'game->CreateRenderTarget(' in t
 assert 'game->CreateOffscreenPlainSurface(' in t
 assert 'void reset() noexcept' in t
-assert 's.surfaceReplayBudget.note_success(desc.Width, desc.Height);' in copy
+assert 's.surfaceReplayBudget.note_success_bytes(' in copy
+assert 'if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))' in copy
 assert 's.preDrawSurface.record_consuming(' in copy
 print('01055 cropped post-Draw game tile + original full readback fallback PASS')

@@ -30,7 +30,7 @@ def linked(b, h, r):
         "FAILED(originalResult)",
         "s.sourceGameDevice != owner",
         "s.frameBatch.publishable(s.pending)",
-        "!s.surfaceReplayBudget.admits(desc.Width, desc.Height)",
+        "!s.surfaceReplayBudget.admits_bytes(plannedReadbackBytes)",
         "actualIdentity.Get() != backbufferIdentity.Get()",
         "s.clearColor.matches(",
         "GameNativeSurfaceCopyRegion::destination(",
@@ -38,6 +38,7 @@ def linked(b, h, r):
         "game->GetRenderTargetData(",
         "tileSucceeded = s.surfaceReplayTile.capture(",
         "if (!tileSucceeded) {",
+        "if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))",
         "if (tileSucceeded) readback=s.surfaceReplayTile.staging();",
         "readback=s.surfaceReplayReadback.Get();",
         "GameNativeSurfaceTilePlan::source_x(region, tileSucceeded)",
@@ -54,7 +55,7 @@ def linked(b, h, r):
         "context->CopySubresourceRegion(",
         "s.backend.color_texture(), 0u, region.left, region.top, 0u,",
         "if (FAILED(device->GetDeviceRemovedReason())) return false;",
-        "s.surfaceReplayBudget.note_success(desc.Width, desc.Height);",
+        "s.surfaceReplayBudget.note_success_bytes(",
     )) and (
         '#include "native_game_gpu_output_preserve.hpp"' in b
         and "ScopedNativeGameGpuTransferInputs shaderInputs(\n                context, s.backend.color_texture());" in replay
@@ -77,7 +78,7 @@ def linked(b, h, r):
         # The pre-Draw snapshot has a separate successful replay charge before native
         # CopySubresourceRegion; prove the REAL post-Draw replay is counted
         # after the GPU copy, not just anywhere in this function.
-        and replay.rfind("s.surfaceReplayBudget.note_success(desc.Width, desc.Height);")
+        and replay.rfind("s.surfaceReplayBudget.note_success_bytes(")
             > replay.index("context->CopySubresourceRegion(")
         and replay.index("ScopedNativeGameGpuTransferOutputs outputs(context);")
             < replay.index("context->CopySubresourceRegion(")
@@ -130,15 +131,15 @@ for token in (
     "ScopedNativeGameGpuTransferInputs shaderInputs(",
     "ScopedNativeGameGpuTransferOutputs outputs(context);",
     "context->CopySubresourceRegion(",
-    "if (FAILED(device->GetDeviceRemovedReason())) return false;\n        s.surfaceReplayBudget.note_success(desc.Width, desc.Height);",
+    "if (FAILED(device->GetDeviceRemovedReason())) return false;\n        s.surfaceReplayBudget.note_success_bytes(",
     "readback->UnlockRect()",
-    "s.surfaceReplayBudget.note_success(desc.Width, desc.Height);",
+    "s.surfaceReplayBudget.note_success_bytes(",
 ):
     assert token in replay_body, "replay guard absent before mutation: " + token
     # Pre-Draw snapshots have a separate bounded copy counter. The legacy
     # post-Draw mutation must remove the LAST charge, which belongs to
     # the real GPU CopySubresourceRegion replay, not the initial snapshot.
-    if token == "s.surfaceReplayBudget.note_success(desc.Width, desc.Height);":
+    if token == "s.surfaceReplayBudget.note_success_bytes(":
         at = replay_body.rfind(token)
         mutant_body = (replay_body[:at] + "/* removed native postpass */" +
                        replay_body[at + len(token):])

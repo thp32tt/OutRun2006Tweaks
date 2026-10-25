@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01056",
+  "production_id": "CONVERSION-DX11-01056",
+  "event_id": "CONVERSION-DX11-01056-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01056",
+  "classification": "A",
+  "feature_id": "DX11:AUTHENTIC_GPU_TILE_BURST_FRAME_PRESERVATION",
+  "work_key": "DX11:MENU_CAR_RACE_POSTDRAW_TILE_BURST",
+  "status": "SOURCE_IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Preserve contiguous menu/car/race full-frame native source across authentic small GPU D3D9 tile updates by budgeting the pixels truly synchronized. Pre-Draw or driver fallback still charges full original source and cannot corrupt original D3D9 game/FFB.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_game_surface_copy_00886.py",
+    "tools/test_dx11_surface_tile_readback_01055.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_surface_replay_budget.hpp",
+    "tools/dx11_native_tile_budget_01056.cpp",
+    "tools/test_dx11_tile_budget_01056.py",
+    "docs/automation/runs/CONVERSION-DX11-01056.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:AUTHENTIC_GPU_TILE_BURST_FRAME_PRESERVATION",
+    "goal": "Carry 30 authentic postdraw D3D9 partial surface-copy mutations through one 3440x1440 native full-frame source without exhausting full-backbuffer budget; keep exact full-size fallback.",
+    "acceptance_items": [
+      {
+        "id": "postdraw_tile_burst",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_D3D9_GPU_CROP_TO_D3D11_POSTDRAW",
+        "expected_behavior": "Successful source RT tile readback uses actual synchronized tile bytes while native output receives exact original partial rectangle."
+      },
+      {
+        "id": "predraw_full_fallback",
+        "category": "end_to_end_behavior",
+        "behavior_area": "SOURCE_CANONICAL_COLD_FIRST_DRAW_AND_DRIVER_FALLBACK",
+        "expected_behavior": "Cold first Draw, Reset and failed tile GPU crop preserve complete full readback admission and source pixels."
+      },
+      {
+        "id": "input_and_gpu_safety",
+        "category": "fallback_regression",
+        "behavior_area": "GAMEPAD_FFB_D3D9_PRESENT_NATIVE_RESET",
+        "expected_behavior": "Reject unbudgeted full readback; never alter original D3D9 Draw/Present, input/FFB or native stereoscopic evidence; keep mutation cap."
+      },
+      {
+        "id": "required_five_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "Five mandatory GitHub Actions gates pass on exact material source SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "ORIGINAL_D3D9_POSTDRAW_COPY",
+      "D3D9_GPU_TILE_READBACK_OR_FULL_FALLBACK",
+      "ACTUAL_BYTES_ACCOUNTED_D3D11_FULL_FRAME_COPY",
+      "DX9EX_GAMEPAD_FFB_PRESENT_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_surface_replay_budget.hpp",
+      "tools/dx11_native_tile_budget_01056.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source-level C++ synthetic 3440x1440 cold full seed + 30 postdraw 64x64 tiles and byte charges.",
+      "negative_regression": "C++ full-backbuffer fallback exhausted and 64-operation limit; destructive Python checks reject missing guard, crop, fallback or postcopy charge.",
+      "component_integration": "Actual source game D3D9 GPU cropped tile -> readback -> native DX11 GPU CopySubresourceRegion -> matching original game coordinates with valid fallback."
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_POSTDRAW_TILE_BURST"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains opt-in; unchanged D3D9 game Draw/Present/input/FFB; DXVK frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "blocking_evidence": "01055 accurate GPU source tile capture still inherited 01053 unconditional full 19,814,400-byte charge for each successful 64x64 postdraw tile; 30 authentic mutations prematurely cut native output."
+  },
+  "acceptance_results": {
+    "postdraw_tile_burst": {
+      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+      "evidence": "C++ + destructive Python targeted regression pending GitHub Gates"
+    },
+    "predraw_full_fallback": {
+      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+      "evidence": "Unchanged full-source preDraw charge; fallback now explicitly checks full budget after tile rejection."
+    },
+    "input_and_gpu_safety": {
+      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+      "evidence": "Original D3D9/DX9Ex routing unchanged; no real hardware run."
+    },
+    "required_five_exact_sha": {
+      "status": "PENDING",
+      "evidence": "Material source SHA awaits exact GitHub Actions Gates."
+    }
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "Real game native Draw/published frame counts UNTESTED",
+  "next_implementation_action": "Validate five mandatory GitHub Actions on material SHA; fix any exact failure in same TASK_ID.",
+  "runtime_note": "Actual game/Quest3 untested; source tests do not establish HMD performance or native full-frame gameplay.",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null
+}

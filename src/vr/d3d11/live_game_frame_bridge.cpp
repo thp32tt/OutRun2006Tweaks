@@ -7700,11 +7700,7 @@ bool preserve_game_surface_copy(
             !GameNativePreDrawSurface::source_matches_canonical(
                 desc.Width, desc.Height, static_cast<std::uint32_t>(desc.Format),
                 canonicalDesc.Width, canonicalDesc.Height,
-                static_cast<std::uint32_t>(canonicalDesc.Format)) ||
-            // GetRenderTargetData reads the ENTIRE D3D9 backbuffer even
-            // when the subsequent native GPU copy covers a small rectangle.
-            // Budget actual synchronized full-frame bytes, not rect area.
-            !s.surfaceReplayBudget.admits(desc.Width, desc.Height))
+                static_cast<std::uint32_t>(canonicalDesc.Format)))
             return false;
 
         const auto changedRegion = changedArea
@@ -7739,6 +7735,17 @@ bool preserve_game_surface_copy(
                 0,0,desc.Width,desc.Height,desc.Width,desc.Height)
             : changedRegion;
         if (!region.valid) return false;
+        // The D3D9 synchronized readback source is cropped on GPU only
+        // after the first real native Draw. Cold menu seeds remain full.
+        const bool tileCandidate = !preDrawCopy &&
+            GameNativeSurfaceTilePlan::eligible(region,desc.Width,desc.Height);
+        const std::uint64_t plannedReadbackBytes = tileCandidate
+            ? GameNativeSurfaceReplayBudget::full_readback_bytes(
+                region.width(),region.height())
+            : GameNativeSurfaceReplayBudget::full_readback_bytes(
+                desc.Width,desc.Height);
+        if (!s.surfaceReplayBudget.admits_bytes(plannedReadbackBytes))
+            return false;
         // No other D3D9 postpass may consume pixels from an open CPU/GDI
         // write. Only the exact locked surface/rectangle may finish it.
         if (s.cpuSurfaceReplay.active() != completingCpuWrite ||
@@ -7757,13 +7764,16 @@ bool preserve_game_surface_copy(
         // whole-backbuffer path, without touching original game pixels.
         bool tileSucceeded = false;
         IDirect3DSurface9* readback = nullptr;
-        if (!preDrawCopy &&
-            GameNativeSurfaceTilePlan::eligible(region,desc.Width,desc.Height)) {
+        if (tileCandidate) {
             tileSucceeded = s.surfaceReplayTile.capture(
                 game,destination,region,desc.Width,desc.Height,desc.Format);
             if (tileSucceeded) readback=s.surfaceReplayTile.staging();
         }
         if (!tileSucceeded) {
+            // Unsupported tile RT/GPU copy: require admission of the
+            // FULL original source before attempting full D3D9 readback.
+            if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))
+                return false;
             if (!s.surfaceReplayReadback || s.surfaceReplayOwner != owner ||
                 s.surfaceReplayWidth != desc.Width ||
                 s.surfaceReplayHeight != desc.Height ||
@@ -7881,7 +7891,10 @@ bool preserve_game_surface_copy(
         }
         // D3D11 copy has no HRESULT; do not publish a removed-device frame.
         if (FAILED(device->GetDeviceRemovedReason())) return false;
-        s.surfaceReplayBudget.note_success(desc.Width, desc.Height);
+        s.surfaceReplayBudget.note_success_bytes(
+            tileSucceeded ? plannedReadbackBytes :
+            GameNativeSurfaceReplayBudget::full_readback_bytes(
+                desc.Width,desc.Height));
         if (completingCpuWrite) s.cpuSurfaceReplay.reset();
         // Neither a CPU readback nor its D3D11 GPU copy counts as a native
         // Draw/DrawIndexed or supplies invented left/right eye evidence.

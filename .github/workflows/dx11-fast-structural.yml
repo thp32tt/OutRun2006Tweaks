@@ -103,6 +103,9 @@ jobs:
           # 01053 bounded REAL full-backbuffer transfer budget for multiple menu/car/race CPU/GDI copies.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_burst_surface_copy_01053.cpp -o /tmp/dx11_burst_surface_01053 && /tmp/dx11_burst_surface_01053
           python tools/test_dx11_burst_surface_copy_01053.py
+          # 01056 actual D3D9 GPU tile-source budget + full fallback safety.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_tile_budget_01056.cpp -o /tmp/dx11_tile_budget_01056 && /tmp/dx11_tile_budget_01056
+          python tools/test_dx11_tile_budget_01056.py
           # 01055: actual source partial post-Draw D3D9 GPU tile readback and whole-frame fallback.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_surface_tile_readback_01055.cpp -o /tmp/dx11_tile_01055 && /tmp/dx11_tile_01055
           python tools/test_dx11_surface_tile_readback_01055.py
