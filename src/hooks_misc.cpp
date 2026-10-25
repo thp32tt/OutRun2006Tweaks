@@ -888,11 +888,23 @@ namespace
                     OutRunVR::HostProcess::IsAlive);
                 if (OutRunVR::EyeExtent::Valid(extent))
                 {
+                    // A portrait OpenXR PER-EYE swapchain is not a game/menu
+                    // canvas. Feeding 2496x2688 into Game::screen_resolution
+                    // caused the 2026-10-26 F11/HUD regression and extra fill.
+                    if (extent.width <= extent.height)
+                    {
+                        spdlog::info(
+                            "VR SOURCE SPLIT: XR eye {}x{} is portrait/per-eye; keep landscape game/menu source {}x{} and use XR extent only in the host compositor",
+                            extent.width, extent.height,
+                            Game::screen_resolution->x,
+                            Game::screen_resolution->y);
+                        return;
+                    }
                     Game::screen_resolution->x = static_cast<int>(extent.width);
                     Game::screen_resolution->y = static_cast<int>(extent.height);
                     *Game::D3DWindowed = 1;
                     spdlog::info(
-                        "VR UNIFIED SOURCE: XR eye {}x{} selected for 3D + 2D menu before logical UI scale initialization, waited={}ms",
+                        "VR UNIFIED SOURCE: landscape XR extent {}x{} selected for explicit game-source auto mode, waited={}ms",
                         extent.width, extent.height,
                         static_cast<unsigned>(GetTickCount64() - startTick));
                     return;

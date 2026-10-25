@@ -40,8 +40,8 @@ namespace Settings
 		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
     // VR quality is independent of the original game's [DX] ANTIALIASING.
     // D3D9Ex MSAA buffer allocations only change after a game restart.
-    Setting<int> VRAntiAliasing{ "VR", "AntiAliasing", 2,
-        "VR-only MSAA level: Off/2x/4x or optional 8x (fallback 4x/2x); 8x may worsen crowded-stage GPU frame drops. Use Game AA restores 2D request. Restart required.",
+    Setting<int> VRAntiAliasing{ "VR", "AntiAliasing", 0,
+        "VR-only MSAA level: Off/2x/4x or optional 8x (fallback 4x/2x). Default Off preserves the R26 performance baseline; enable explicitly after visual correctness is confirmed. Use Game AA restores 2D request. Restart required.",
         { "Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA", "8x MSAA (fallback 4x/2x; costly)" } };
     Setting<bool> VRTransparencySupersampling{ "VR", "TransparencySupersampling", false,
         "Enable extra NVIDIA transparency SSAA in VR (costly). Off by default; the original 2D Graphics setting is unchanged. Restart required." };
@@ -50,13 +50,12 @@ namespace Settings
     // per-eye render extent are independent. Never hard-code the primary
     // monitor's current pixels into Game::screen_resolution after game config.
     // A paired VR RenderWidth/RenderHeight is still an explicit game override.
-    Setting<bool> VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", true,
-        "Quest3/VDXR default: select the VDXR/OpenXR recommended eye extent before original graphics/UI initialization so the D3D9Ex source no longer follows the desktop resolution. Current menu containment keeps the original 640x480 logical UI independent from physical source pixels. Manual RenderWidth/Height and -width/-height still win. Restart required." };
-    Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", false,
-        "Compatibility fallback only. When enabled, keep the configured game/desktop resolution as the VR source. Default off so VDXR/OpenXR recommended eye resolution is preferred; -width/-height or paired VR manual source settings take precedence. Restart required." };
-    Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
-        "At launch, match the actual VDXR/OpenXR allocated per-eye render extent (not desktop or 2x eye width). "
-        "Manual RenderWidth/RenderHeight take precedence; when host startup fails, use existing game resolution." };
+    Setting<bool> VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,
+        "Compatibility experiment only. The game/menu source normally stays landscape at the configured game resolution; the OpenXR eye extent is compositor-only. Manual RenderWidth/Height and -width/-height still win. Restart required." };
+    Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", true,
+        "Keep the configured landscape game resolution as the D3D9/menu/HUD coordinate source while OpenXR uses its independent eye extent. Disable only for explicit source-resolution experiments. Restart required." };
+    Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", false,
+        "Experimental game-source auto sizing. Portrait OpenXR per-eye extents are never copied into the D3D9 game/menu source; manual RenderWidth/RenderHeight take precedence." };
 	// Optional explicit internal render resolution independent of the PC monitor.
     // Auto (0/0) waits at the original game configuration hook for the
     // live OpenXR host extent. If unavailable, keep the original game size;

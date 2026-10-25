@@ -53,7 +53,17 @@ $gameArgs = @(
     '-PreferD3D9Ex=true',
     '-DirectGpuOnly=false',
     '-DisableDesktopDuplication=false',
-    '-RivalDx11NativeRoute=false'
+    '-RivalDx11NativeRoute=false',
+    '-AutoRenderResolution=false',
+    '-FollowGameResolution=true',
+    '-UnifiedEyeMenuSource=false',
+    '-AntiAliasing=0',
+    '-Hud1080pReference=true',
+    '-HudResponsiveLayout=true',
+    '-HudScale=0.55',
+    '-MenuScale=1.00',
+    '-CullingUnionFov=true',
+    '-CullingUnionMarginDegrees=8.0'
 )
 Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8
 Copy-Item $variantFile (Join-Path $session 'DX9EX_VARIANT.txt')
