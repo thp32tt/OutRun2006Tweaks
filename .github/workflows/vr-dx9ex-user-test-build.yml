@@ -10,6 +10,8 @@ on:
     paths:
       - '.github/workflows/vr-dx9ex-user-test-build.yml'
       - 'tools/Run-DX9ExFocusTest.ps1'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/hooks_uiscaling.cpp'
   workflow_dispatch:
 
 jobs:
@@ -71,7 +73,7 @@ jobs:
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
           @(
             'DX9Ex R26 + HUD user test build'
-            'Targets: +TIME / GOAL-result HUD / rival marker regression'
+            'Targets: +TIME four-API finite HUD / GOAL-result HUD / rival marker / lens-sun regression'
             'Renderer: R26+HUD default'
             'Runner: GitHub-hosted windows-2022'
             'RUNTIME_VALIDATION=UNTESTED'

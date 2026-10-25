@@ -458,7 +458,7 @@ def verify_pre_restart_hud_routes(source):
     for function_name, route in (
         ('R30ScreenSpaceKind R30ClassifyScreenSpacePass(', '0u'),
         ('bool R30ConfigureXyzrhwWorldEffect(', '1u'),
-        ('HRESULT R62TryFixedFunctionSpriteIndexed(', '2u'),
+        ('HRESULT R62TryFixedFunctionSpriteStereo(', '2u'),
     ):
         # R30ConfigureXyzrhwWorldEffect is forward-declared before
         # R30PrepareXyzrhwState; the first `{...` after that prototype
@@ -1167,7 +1167,7 @@ for label, bad in (
 # not an equivalent renderer. Pin the historical function and dispatch.
 def check_r62_hmd_fixed_function_owner(source):
     owner = function_body(source,
-                          'HRESULT R62TryFixedFunctionSpriteIndexed(')
+                          'HRESULT R62TryFixedFunctionSpriteStereo(')
     for marker in (
         'type != D3DPT_TRIANGLELIST',
         'CorroboratesProjectedWorldMarker(',

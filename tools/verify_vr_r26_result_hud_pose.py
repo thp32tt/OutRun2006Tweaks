@@ -10,7 +10,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 src = (root / 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp').read_text()
 pose = src[src.index('bool R30ConfigureXyzrhwWorldEffect('):src.index('bool R30TransformXyzrhwVertices(')]
-fixed = src[src.index('HRESULT R62TryFixedFunctionSpriteIndexed('):src.index('HRESULT __stdcall DrawPrimitiveDestR30(')]
+fixed = src[src.index('HRESULT R62TryFixedFunctionSpriteStereo('):src.index('HRESULT __stdcall DrawPrimitiveDestR30(')]
 shader_hud = src[src.index('bool R30BuildScreenSpaceEyeConstants('):src.index('template <typename ActualDraw>\n        HRESULT R30TryScreenSpaceFovDraw(')]
 xy_prepare = src[src.index('bool R30PrepareXyzrhwState('):src.index('bool R30XyzrhwHasProjectedDepthSignature(')]
 assert 'BuildStageEyePoses(' not in pose, 'result HUD must not re-apply eye-local rotation'
