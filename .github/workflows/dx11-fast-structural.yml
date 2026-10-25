@@ -277,6 +277,10 @@ jobs:
           # cropped/dirty region copy; distinct from real D3D9Ex/HMD execution.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_shared_desktop_source_layout_01061.cpp -o /tmp/dx11_shared_layout_01061 && /tmp/dx11_shared_layout_01061
           python tools/test_dx11_shared_desktop_source_layout_01061.py
+          # An actual native game frame may have independent XR/theater
+          # resolution; only same-sized desktop overlay paths remain gated.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_native_independent_game_output_01062.cpp -o /tmp/dx11_native_independent_01062 && /tmp/dx11_native_independent_01062
+          python tools/test_dx11_native_independent_game_output_01062.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_reset_probe_00741.cpp -o /tmp/dx11_source_reset_00741 && /tmp/dx11_source_reset_00741
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_owner_handoff_probe_00740.cpp -o /tmp/dx11_source_owner_00740 && /tmp/dx11_source_owner_00740
           python tools/test_dx11_game_backbuffer_admission_00683.py

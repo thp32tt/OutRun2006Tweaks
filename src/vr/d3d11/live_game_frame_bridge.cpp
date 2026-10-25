@@ -9267,10 +9267,36 @@ void before_game_present(IDirect3DDevice9* game,
             // non-MSAA D3D9 surface or CPU dirty-tile upload. It DOES require
             // a real complete native game frame at the current Present,
             // matching output geometry, and an allowed mono publication scope.
-            const bool gpuOutputAdmissible = GameNativeGpuHandoff::gpu_frame_output_ready(
-                monoNativePublicationAllowed,
-                backbufferKnown && outputNow.valid(),
-                nativeExtentMatches, fullPlacement.valid);
+            // Authenticate the producer's actual GPU resource rather than
+            // borrowing the D3D9 desktop placement proof. An XR/theater
+            // consumer can receive a full 4:3 or independent-resolution native
+            // frame without stretching it to the 3440x1440 game backbuffer.
+            // Desktop GPU sharing and CPU UploadSurface below still require
+            // the old exact-size / visible-crop / rollback proof.
+            D3D11_TEXTURE2D_DESC nativeColorDesc{};
+            ComPtr<ID3D11Device> nativeColorOwner;
+            if (s.backend.color_texture()) {
+                s.backend.color_texture()->GetDesc(&nativeColorDesc);
+                s.backend.color_texture()->GetDevice(
+                    nativeColorOwner.GetAddressOf());
+            }
+            const bool nativeColorResourceProven =
+                nativeColorOwner.Get() == s.backend.device() &&
+                (nativeColorDesc.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
+                 nativeColorDesc.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS) &&
+                nativeColorDesc.Usage == D3D11_USAGE_DEFAULT &&
+                nativeColorDesc.CPUAccessFlags == 0u &&
+                (nativeColorDesc.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u &&
+                nativeColorDesc.ArraySize == 1u &&
+                nativeColorDesc.MipLevels == 1u &&
+                nativeColorDesc.SampleDesc.Count == 1u;
+            const bool gpuOutputAdmissible =
+                GameNativeGpuHandoff::independent_gpu_frame_ready(
+                    monoNativePublicationAllowed,
+                    backbufferKnown && outputNow.valid(),
+                    nativeColorResourceProven,
+                    bb.Width, bb.Height, surfaceWidth, surfaceHeight,
+                    nativeColorDesc.Width, nativeColorDesc.Height);
             if (GameNativeGpuHandoff::may_offer(
                     fullMode, complete, gpuOutputAdmissible,
                     s.sourceGameDevice == presentDevice,

@@ -15,6 +15,24 @@ struct GameNativeGpuHandoff {
         return monoPublicationAllowed && outputKnown &&
                nativeExtentMatches && fullPlacementValid;
     }
+    // A native GPU sink owns its own consumer geometry (for example an XR
+    // compositor or theater surface). Only the D3D9Ex desktop readback and
+    // backbuffer overwrite require the native render size to equal the
+    // physical game window. Require the actual GPU texture to match the
+    // producer's complete frame, while the original D3D9 Present remains
+    // authoritative regardless of sink success or different dimensions.
+    [[nodiscard]] static constexpr bool independent_gpu_frame_ready(
+        bool monoPublicationAllowed, bool gameOutputKnown,
+        bool nativeColorResourceProven,
+        std::uint32_t desktopWidth, std::uint32_t desktopHeight,
+        std::uint32_t nativeWidth, std::uint32_t nativeHeight,
+        std::uint32_t textureWidth, std::uint32_t textureHeight) noexcept {
+        return monoPublicationAllowed && gameOutputKnown &&
+            nativeColorResourceProven && desktopWidth != 0u &&
+            desktopHeight != 0u && nativeWidth != 0u &&
+            nativeHeight != 0u && nativeWidth == textureWidth &&
+            nativeHeight == textureHeight;
+    }
     // Disallow partial game Draw coverage, foreign/cropped output, unbound
     // producer source, zero generation and inset-only diagnostic frames.
     [[nodiscard]] static constexpr bool may_offer(
