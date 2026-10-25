@@ -10,7 +10,7 @@ for token in (
     "listSubmission.mode == GameSm3ListSubmissionMode::invalid",
     "listSubmission.mode == GameSm3ListSubmissionMode::compact_indexed",
     "listSubmission.mode == GameSm3ListSubmissionMode::compact_linear",
-    "if (compactListIndices && nativeIndices) {",
+    "if (compactListIndexedSubmission && nativeIndices) {",
     "listCandidate ? listSubmission.drawCount",
     "const UINT base = compactInstancedGeometry ? 0u : instance * vertexCount;",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",

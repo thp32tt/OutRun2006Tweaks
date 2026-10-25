@@ -5496,7 +5496,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     const bool compactListInstances = listCandidate &&
         (listSubmission.mode == GameSm3ListSubmissionMode::compact_indexed ||
          listSubmission.mode == GameSm3ListSubmissionMode::compact_linear);
-    const bool compactListIndices = listCandidate &&
+    const bool compactListIndexedSubmission = listCandidate &&
         listSubmission.mode == GameSm3ListSubmissionMode::compact_indexed;
     const bool connectedCandidate = sourceInstancing && instanceCount > 1u &&
         (type == D3DPT_LINESTRIP || type == D3DPT_TRIANGLESTRIP ||
@@ -5520,7 +5520,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         compactListInstances || compactConnectedInstances;
     std::vector<std::uint32_t> compactListIndices;
     std::vector<std::uint32_t> compactConnectedIndices;
-    if (compactListIndices && nativeIndices) {
+    if (compactListIndexedSubmission && nativeIndices) {
         if (!game_sm3_expand_list_instance_indices(
                 nativeIndices, nativeIndexCount, vertexCount, instanceCount,
                 compactListIndices)) return false;
