@@ -22,6 +22,11 @@ def connected(r30: str, native: str, iface: str) -> bool:
     if any(s not in capture for s in required): return False
     if capture.index("game_native_instance_stream_capture(") > capture.index("R30CopySparseVertexShadow("):
         return False
+    # Both the bounded source-slot plan and the published compact record
+    # count must survive. Removing one while retaining the other is unsafe.
+    if ("capturePlan.sourceSlots >" not in capture or
+            "owned[slot-1u].data(),stride,capturePlan.sourceSlots" not in capture):
+        return False
     if 'native_game_instance_stream_capture.hpp' not in r30: return False
     sections = [
         ("void R30ObserveNativeLinearVB(", "void R30ObserveNativeIndexedVB("),
@@ -43,7 +48,9 @@ for mutation in (
     "capturePlan.instanceRate",
     "capturePlan.sourceSlots",
 ):
-    changed = hooks.replace(mutation, "REMOVED_FOR_NEGATIVE_REGRESSION", 1)
+    # Mutate every occurrence of shared slot accounting; it is referenced
+    # by the range cap AND by the assembler's captured record count.
+    changed = hooks.replace(mutation, "REMOVED_FOR_NEGATIVE_REGRESSION")
     assert changed != hooks and not connected(changed, bridge, contract), mutation
 assert not connected(hooks, bridge.replace(
     "game_sm3_assemble_instanced_streams(", "REMOVED_ASSEMBLER(", 1), contract)
