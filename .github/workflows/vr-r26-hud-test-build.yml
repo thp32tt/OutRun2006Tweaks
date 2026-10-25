@@ -1,0 +1,81 @@
+name: R26 HUD Test Build
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - test-r26-hud-rival-20261023
+  pull_request:
+    branches:
+      - vr-d3d9ex-focus
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure Win32 R26+HUD
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32
+          $cache = Get-Content build-game/CMakeCache.txt
+          if ($cache -notcontains 'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON') {
+            throw 'R26+HUD default owner is not enabled'
+          }
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 R26+HUD game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+
+      - name: Configure x64 OpenXR host
+        run: cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+
+      - name: Build x64 OpenXR host
+        run: cmake --build build-host --config Release --target outrun-vr-host
+
+      - name: Assemble test package
+        shell: pwsh
+        run: |
+          $dir = 'package'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw 'dinput8.dll missing' }
+          $hostExe = Get-Item build-host/bin/outrun-vr-host.exe
+          if (-not $hostExe) { throw 'outrun-vr-host.exe missing' }
+          Copy-Item $dll.FullName (Join-Path $dir 'dinput8.dll')
+          Copy-Item $hostExe.FullName (Join-Path $dir 'outrun-vr-host.exe')
+          Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
+          Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
+          Set-Content (Join-Path $dir 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          @(
+            'R26+HUD TEST BUILD'
+            'Focus: +TIME / GOAL-result HUD / rival marker regression check'
+            'RivalDx11NativeRoute remains default=true (stock BB6F0/BB796 route).'
+            '+TIME/GOAL finite HUD uses identity eye orientation + head-relative IPD.'
+            'Runtime validation: UNTESTED until Quest 3 test.'
+          ) | Set-Content (Join-Path $dir 'TEST_NOTES.txt') -Encoding utf8
+          $zip = "OutRun2_VR_R26_HUD_TEST_$($env:GITHUB_SHA.Substring(0,12)).zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+          $bytes = [IO.File]::ReadAllBytes((Join-Path $dir 'dinput8.dll'))
+          if ($bytes.Length -lt 512 -or $bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw 'dinput8.dll PE header invalid' }
+          Get-FileHash $zip -Algorithm SHA256 | Format-List
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-R26-HUD-TEST-${{ github.sha }}
+          path: OutRun2_VR_R26_HUD_TEST_*.zip
+          if-no-files-found: error
