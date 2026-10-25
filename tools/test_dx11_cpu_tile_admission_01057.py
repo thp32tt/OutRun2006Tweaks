@@ -115,3 +115,56 @@ for token in ('game->StretchRect(', 'game->GetRenderTargetData(',
     assert not game_full_readback_is_integrated(
         copy,full.replace(token,'/* MUTATED */',1)),token
 print('PASS 01059 native game full backbuffer staging and nested R30 hook suppression')
+
+
+# 01060: multi-dirty native menu/car/race output is an atomic WHOLE-frame
+# merge, including drivers which reject direct D3D9 backbuffer readback.
+# The private RT retry must run under R30 recursion fencing because the
+# bridge owns State::mutex. No native pixel is uploaded if BOTH paths fail.
+# This is a structural source-link regression; HMD/game are UNTESTED.
+def multi_tile_seed_is_safe(src, fallback):
+    try:
+        begin = src.index('const bool outputWritable =')
+        output = src.index('if (outputWritable) {', begin)
+        seed = src.index('auto seedMultiTileFromGame = [&]() noexcept -> bool {', output)
+        guard = src.index('const NativeOutputUploadScope internalMultiSeedCopyScope{};', seed)
+        capture = src.index('return s.surfaceReplayFull.capture(', guard)
+        ready = src.index('seedMultiTileFromGame() &&', capture)
+        lock = src.index('SUCCEEDED(s.insetSurface->LockRect(', ready)
+        upload = src.index('GameNativeFrameUpload::copy_rect(', lock)
+        segment = src[seed:lock]
+        return (output < seed < guard < capture < ready < lock < upload and
+            'if (!multiNativeUpload) return true;' in segment and
+            'if (SUCCEEDED(game->GetRenderTargetData(' in segment and
+            'back.Get(), s.insetSurface.Get()))) return true;' in segment and
+            'game, back.Get(), s.insetSurface.Get(),' in segment and
+            'bb.Width, bb.Height, bb.Format);' in segment and
+            '(!multiNativeUpload || SUCCEEDED(game->GetRenderTargetData(' not in segment and
+            'game->CreateRenderTarget(' in fallback and
+            'game->StretchRect(' in fallback and
+            'game->GetRenderTargetData(' in fallback and
+            'src.Width != width || src.Height != height' in fallback and
+            'dst.Width != width || dst.Height != height' in fallback and
+            'owner_ != game' in fallback and
+            'src.MultiSampleType != D3DMULTISAMPLE_NONE' in fallback and
+            'void reset() noexcept' in fallback and
+            's.surfaceReplayFull.reset();' in src)
+    except ValueError:
+        return False
+
+assert multi_tile_seed_is_safe(s,full), '01060 multi-tile original game source recovery disconnected'
+for needle in (
+    'if (!multiNativeUpload) return true;',
+    'if (SUCCEEDED(game->GetRenderTargetData(',
+    'const NativeOutputUploadScope internalMultiSeedCopyScope{};',
+    'return s.surfaceReplayFull.capture(',
+    'seedMultiTileFromGame() &&',
+    'game, back.Get(), s.insetSurface.Get(),',
+):
+    start=s.index('auto seedMultiTileFromGame = [&]() noexcept -> bool {')
+    mutated=s[:start]+s[start:].replace(needle,'/* removed 01060 */',1)
+    assert not multi_tile_seed_is_safe(mutated,full), '01060 mutation escaped: '+needle
+for needle in ('game->StretchRect(', 'owner_ != game',
+               'src.MultiSampleType != D3DMULTISAMPLE_NONE'):
+    assert not multi_tile_seed_is_safe(s,full.replace(needle,'/* removed */',1)), needle
+print('PASS 01060 multi-region original game seed -> protected private RT readback -> native frame upload')

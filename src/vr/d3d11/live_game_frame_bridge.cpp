@@ -9580,6 +9580,22 @@ void before_game_present(IDirect3DDevice9* game,
                                     }
                                 }
                                 D3DLOCKED_RECT lockRect{};
+                                // Before merging multiple native dirty regions, seed
+                                // untouched pixels from this Present's REAL D3D9
+                                // backbuffer. Direct readback can fail on swapchains;
+                                // the private same-format GPU RT recovers the entire
+                                // game frame without touching original source pixels.
+                                // StretchRect re-enters R30: fence the observer while
+                                // this bridge holds State::mutex (as in tile replay).
+                                auto seedMultiTileFromGame = [&]() noexcept -> bool {
+                                    if (!multiNativeUpload) return true;
+                                    if (SUCCEEDED(game->GetRenderTargetData(
+                                            back.Get(), s.insetSurface.Get()))) return true;
+                                    const NativeOutputUploadScope internalMultiSeedCopyScope{};
+                                    return s.surfaceReplayFull.capture(
+                                        game, back.Get(), s.insetSurface.Get(),
+                                        bb.Width, bb.Height, bb.Format);
+                                };
                                 if (s.insetSurface && s.insetFormat == bb.Format &&
                                     s.insetSurfaceDevice == presentDevice &&
                                     GameNativeFramePublication::matching_upload_extent(
@@ -9590,8 +9606,7 @@ void before_game_present(IDirect3DDevice9* game,
                                     // frame. Seed every untouched gap from the *current*
                                     // original D3D9 backbuffer, then publish once. If the
                                     // backbuffer cannot be read, keep D3D9/input unchanged.
-                                    (!multiNativeUpload || SUCCEEDED(game->GetRenderTargetData(
-                                        back.Get(), s.insetSurface.Get()))) &&
+                                    seedMultiTileFromGame() &&
                                     SUCCEEDED(s.insetSurface->LockRect(&lockRect, nullptr, 0))) {
                                     // Refuse malformed D3D9 lock pitches
                                     // before copying a full game backbuffer.
