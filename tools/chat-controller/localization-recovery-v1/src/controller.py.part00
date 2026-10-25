@@ -112,6 +112,9 @@ RETRY_SELECTORS = [
     "button:has-text('재시도')",
 ]
 ASSISTANT_MESSAGE_SELECTORS = [
+    "[data-chatgpt-search-unit-key$=':assistant']",
+    "[data-content-search-unit-key$=':assistant']",
+    "[data-markdown-text-style='assistant-message']",
     "[data-message-author-role='assistant']",
 ]
 
@@ -523,4 +526,3 @@ async def ensure_logged_in(page: Page) -> bool:
         current_url=page.url,
     )
     return False
-
