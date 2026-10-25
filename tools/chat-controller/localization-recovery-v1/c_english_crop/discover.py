@@ -33,6 +33,7 @@ def save_json_atomic(path,obj):
         json.dump(obj,f,ensure_ascii=False,indent=2)
         f.write("\n")
         tmp=f.name
+    os.chmod(tmp,0o644)
     os.replace(tmp,path)
 
 def overlap(a,b):
