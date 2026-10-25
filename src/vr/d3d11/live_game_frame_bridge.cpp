@@ -58,6 +58,7 @@
 #include "native_game_surface_replay_budget.hpp"
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_surface_tile_readback.hpp"
+#include "native_game_surface_full_readback.hpp"
 #include "native_game_cpu_tile_admission.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_live_shader_cache.hpp"
@@ -1340,6 +1341,7 @@ struct State {
     // falsely claim zero-copy D3D9->D3D11 or native offscreen Draw parity.
     ComPtr<IDirect3DSurface9> surfaceReplayReadback;
     GameNativeSurfaceTileReadback surfaceReplayTile{};
+    GameNativeFullSurfaceReadback surfaceReplayFull{};
     std::uintptr_t surfaceReplayOwner = 0u;
     UINT surfaceReplayWidth = 0u, surfaceReplayHeight = 0u;
     D3DFORMAT surfaceReplayFormat = D3DFMT_UNKNOWN;
@@ -7766,6 +7768,10 @@ bool preserve_game_surface_copy(
         bool tileSucceeded = false;
         IDirect3DSurface9* readback = nullptr;
         if (tileCandidate) {
+            // Internal D3D9 StretchRect re-enters the game's R30 hook.
+            // Suppress observer recursion while State::mutex is held;
+            // the original game pixel source remains unchanged.
+            const NativeOutputUploadScope internalTileCopyScope{};
             tileSucceeded = s.surfaceReplayTile.capture(
                 game,destination,region,desc.Width,desc.Height,desc.Format);
             if (tileSucceeded) readback=s.surfaceReplayTile.staging();
@@ -7796,7 +7802,17 @@ bool preserve_game_surface_copy(
                 s.surfaceReplayFormat = desc.Format;
             }
             if (FAILED(game->GetRenderTargetData(
-                    destination,s.surfaceReplayReadback.Get()))) return false;
+                    destination,s.surfaceReplayReadback.Get()))) {
+                // Some D3D9 paths cannot directly read the swapchain
+                // backbuffer. Preserve authentic game pixels through a
+                // private same-format GPU render target, then stage them.
+                // Guard the internal StretchRect against our R30 observer:
+                // it executes beneath this State::mutex and must not recurse.
+                const NativeOutputUploadScope internalFullCopyScope{};
+                if (!s.surfaceReplayFull.capture(
+                        game,destination,s.surfaceReplayReadback.Get(),
+                        desc.Width,desc.Height,desc.Format)) return false;
+            }
             readback=s.surfaceReplayReadback.Get();
             return true;
         };
@@ -9892,6 +9908,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.preDrawDepth.discard();
     s.outputGeneration = 0u;
     s.surfaceReplayTile.reset();
+    s.surfaceReplayFull.reset();
     s.surfaceReplayReadback.Reset();
     s.surfaceReplayOwner = 0u;
     s.surfaceReplayWidth = s.surfaceReplayHeight = 0u;

@@ -73,3 +73,45 @@ for expression in [
 ]:
     assert not late_stage_recovery(copy.replace(expression,'/* removed */',1)), expression
 print('PASS 01058 late tile staging failure -> full authenticated readback -> native GPU region')
+
+# 01059: read back a genuine full-sized menu/car/race backbuffer through a
+# private D3D9 RT if direct readback fails. Internal StretchRect MUST be guarded
+# because the hooked R30 observer would otherwise reacquire State::mutex.
+# Source-link/mutation validation only, NOT an HMD/game playback claim.
+full=(root/'src/vr/d3d11/native_game_surface_full_readback.hpp').read_text(encoding='utf-8')
+def game_full_readback_is_integrated(c, f):
+    try:
+        tile=c.index('const NativeOutputUploadScope internalTileCopyScope{};')
+        captured=c.index('tileSucceeded = s.surfaceReplayTile.capture(',tile)
+        admitted=c.index('if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))',captured)
+        direct=c.index('if (FAILED(game->GetRenderTargetData(',admitted)
+        guard=c.index('const NativeOutputUploadScope internalFullCopyScope{};',direct)
+        fallback=c.index('s.surfaceReplayFull.capture(',guard)
+        return (captured-tile < 180 and direct<guard<fallback and
+                fallback-guard < 250 and
+                'GameNativeFullSurfaceReadback surfaceReplayFull{};' in s and
+                's.surfaceReplayFull.reset();' in s and
+                '#include "native_game_surface_full_readback.hpp"' in s and
+                'game->StretchRect(' in f and
+                'game->GetRenderTargetData(' in f and
+                'src.Pool != D3DPOOL_DEFAULT' in f and
+                'dst.Pool != D3DPOOL_SYSTEMMEM' in f and
+                'owner_ != game' in f and
+                'width_ != width' in f and
+                'format_ != format' in f)
+    except ValueError:
+        return False
+assert game_full_readback_is_integrated(copy,full)
+for token in (
+    'const NativeOutputUploadScope internalTileCopyScope{};',
+    'const NativeOutputUploadScope internalFullCopyScope{};',
+    's.surfaceReplayFull.capture(',
+):
+    assert not game_full_readback_is_integrated(
+        copy.replace(token,'/* MUTATED */',1),full), token
+for token in ('game->StretchRect(', 'game->GetRenderTargetData(',
+              'src.Pool != D3DPOOL_DEFAULT', 'dst.Pool != D3DPOOL_SYSTEMMEM',
+              'owner_ != game', 'format_ != format'):
+    assert not game_full_readback_is_integrated(
+        copy,full.replace(token,'/* MUTATED */',1)),token
+print('PASS 01059 native game full backbuffer staging and nested R30 hook suppression')
