@@ -298,6 +298,9 @@ jobs:
           # 01069 original D3D9 BC legacy alpha/normal material -> D3D11 native shader sampler.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_block_compressed_game_probe_01069.cpp -o /tmp/dx11_bc_01069 && /tmp/dx11_bc_01069
           python tools/test_dx11_block_compressed_game_01069.py
+          # 01070 original mixed bump game material to native shader Draw/Indexed.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_mixed_bump_game_probe_01070.cpp -o /tmp/dx11_mixed_01070 && /tmp/dx11_mixed_01070
+          python tools/test_dx11_mixed_bump_game_01070.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_reset_probe_00741.cpp -o /tmp/dx11_source_reset_00741 && /tmp/dx11_source_reset_00741
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_owner_handoff_probe_00740.cpp -o /tmp/dx11_source_owner_00740 && /tmp/dx11_source_owner_00740
           python tools/test_dx11_game_backbuffer_admission_00683.py

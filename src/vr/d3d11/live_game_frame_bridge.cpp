@@ -42,6 +42,7 @@
 #include "live_game_draw_mirror_cache.hpp"
 #include "live_game_float_vector_texture.hpp"
 #include "live_game_signed_normal_texture.hpp"
+#include "live_game_mixed_bump_texture.hpp"
 #include "live_game_block_compressed_texture.hpp"
 #include "live_game_dynamic_texture.hpp"
 #include "live_game_10bit_texture.hpp"
@@ -4412,6 +4413,12 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             static_cast<std::uint32_t>(base.Format));
     const bool signedNormal = signed_normal_texture::sampleable(
         signedNormalLayout, capture.srgbTexture);
+    // Game material signed bump UV/L or computed C feeds the same actual
+    // per-Draw/DrawIndexed SM3 sampler, not a BGRA UNORM approximation.
+    const auto mixedBumpLayout = mixed_bump_texture::from_d3d9_format(
+        static_cast<std::uint32_t>(base.Format));
+    const bool mixedBump = mixed_bump_texture::sampleable(
+        mixedBumpLayout, capture.srgbTexture);
     const auto floatVectorLayout =
         base.Format == D3DFMT_R16F ? float_vector_texture::Layout::r16f :
         base.Format == D3DFMT_G16R16F ? float_vector_texture::Layout::rg16f :
@@ -4457,6 +4464,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (capture.srgbTexture && p8) return false;
     // No verified legacy sRGB equivalence for 3:3:2 packed color.
     if (capture.srgbTexture && rgb332) return false;
+    if (capture.srgbTexture &&
+        mixedBumpLayout != mixed_bump_texture::Layout::unsupported)
+        return false; // No mixed signed/unsigned sRGB view.
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
     if (compressed) {
         // A full-sized BC base level is required, but its final mips may
@@ -4485,6 +4495,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             ? DXGI_FORMAT_R8G8_SNORM :
             signedNormalLayout == signed_normal_texture::Layout::uv16
             ? DXGI_FORMAT_R16G16_SNORM : DXGI_FORMAT_R8G8B8A8_SNORM;
+    } else if (mixedBump) {
+        nativeFormat = DXGI_FORMAT_R16G16B16A16_SNORM;
     } else if (floatVector) {
         // D3D9 R16F/G16R16F/R32F/G32R32F LockRect rows match the
         // little-endian DXGI R/RG FLOAT component ordering and precision.
@@ -4530,6 +4542,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         nativeFormat == DXGI_FORMAT_R32G32B32A32_FLOAT ? 16u :
         (nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ||
          nativeFormat == DXGI_FORMAT_R16G16B16A16_UNORM ||
+          nativeFormat == DXGI_FORMAT_R16G16B16A16_SNORM ||
          nativeFormat == DXGI_FORMAT_R32G32_FLOAT) ? 8u : 4u;
     const UINT atlasBlockBytes = compressed ? compressedBlockBytes : 0u;
     if (!native_game_texture_upload_bytes(
@@ -4586,6 +4599,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         floatRgba ? float_rgba_texture::source_bytes_per_texel(floatLayout) :
         floatVector ? float_vector_texture::source_bytes_per_texel(floatVectorLayout) :
         signedNormal ? signed_normal_texture::source_bytes_per_texel(signedNormalLayout) :
+        mixedBump ? mixed_bump_texture::source_bytes_per_texel(mixedBumpLayout) :
         rgba16 ? rgba16_texture::source_bytes_per_texel() :
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
@@ -4631,8 +4645,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         const UINT rowBytes = compressed ?
             (std::max)(1u, (desc.Width + 3u) / 4u) *
                 compressedBlockBytes : desc.Width * sourceTexelBytes;
-        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma || rgb332 || p8 ?
-            desc.Width * 4u : rowBytes;
+        const UINT uploadPitch = mixedBump ? desc.Width * 8u :
+            (((packed16 || luminance) || rgb24 || rgbaSwizzle) ||
+              extendedLuma || rgb332 || p8 ? desc.Width * 4u : rowBytes);
         // Preserve existing format pitch contracts and only widen A8P8
         // (two source bytes per texel) to four-byte decoded native pixels.
         const UINT a8p8UploadPitch = a8p8 ? desc.Width * 4u : uploadPitch;
@@ -4694,6 +4709,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     float_rgba_texture::copy_row(source, destination, desc.Width, floatLayout);
                 else if (floatVector)
                     float_vector_texture::copy_row(source, destination, desc.Width, floatVectorLayout);
+                else if (mixedBump) {
+                    if (!mixed_bump_texture::unpack_row(
+                            source, destination, desc.Width, mixedBumpLayout)) {
+                        capture.texture->UnlockRect(level);
+                        return false;
+                    }
+                }
                 else if (signedNormal) {
                     // Exact signed component bits; preserve negative normals.
                     if (!signed_normal_texture::copy_row(
