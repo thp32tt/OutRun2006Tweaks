@@ -147,7 +147,8 @@ public:
     [[nodiscard]] bool copy_game_surface(
         ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
         std::int64_t destX, std::int64_t destY,
-        UINT sourceArraySlice = 0u, UINT sourceMipSlice = 0u) noexcept;
+        UINT sourceArraySlice = 0u, UINT sourceMipSlice = 0u,
+                      ID3D11RenderTargetView* gameCapturedRtv = nullptr) noexcept;
     // Per-eye native GPU replay for actual game StretchRect source crops
     // and changed-size destination rectangles (point or linear filter).
     // This never counts as a game-authored geometry draw.
@@ -483,11 +484,15 @@ private:
     void release_local() noexcept;
     [[nodiscard]] bool source_is_live(
         ID3D11Texture2D* source, UINT arraySlice,
-        UINT mipSlice) const noexcept;
+        UINT mipSlice, ID3D11RenderTargetView* gameCapturedRtv,
+        bool requireCurrentlyBound) const noexcept;
 
     NativeSharedEyeRing& ring_;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> context_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> eyes_[2];
+    // Actual typed RTVs captured while their game camera pass was bound,
+    // retained across sequential left/right GPU Draw submissions.
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> capturedRtvs_[2];
     std::uint64_t eyeViews_[2]{};
     UINT eyeArraySlices_[2]{};
     UINT eyeMipSlices_[2]{};

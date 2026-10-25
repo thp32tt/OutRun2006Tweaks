@@ -285,6 +285,9 @@ jobs:
           # OpenXR L/R shared GPU copy, with scoped game output-state restore.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_native_stereo_source_transfer_01063.cpp -o /tmp/dx11_stereo_transfer_01063 && /tmp/dx11_stereo_transfer_01063
           python tools/test_dx11_native_stereo_source_transfer_01063.py
+          # Sequential authentic left/right game camera RTV capture across OM switch.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_native_stereo_captured_views_01064.cpp -o /tmp/dx11_stereo_views_01064 && /tmp/dx11_stereo_views_01064
+          python tools/test_dx11_native_stereo_captured_views_01064.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_reset_probe_00741.cpp -o /tmp/dx11_source_reset_00741 && /tmp/dx11_source_reset_00741
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_owner_handoff_probe_00740.cpp -o /tmp/dx11_source_owner_00740 && /tmp/dx11_source_owner_00740
           python tools/test_dx11_game_backbuffer_admission_00683.py

@@ -118,7 +118,11 @@ namespace outrun::vr::dx11
             UINT left_array_slice = 0u,
             UINT right_array_slice = 0u,
             UINT left_mip_slice = 0u,
-            UINT right_mip_slice = 0u) noexcept;
+            UINT right_mip_slice = 0u,
+            // Per-eye RTVs captured while each actual game camera was bound.
+            // They remain valid after the other eye changes OM bindings.
+            ID3D11RenderTargetView* captured_left_rtv = nullptr,
+            ID3D11RenderTargetView* captured_right_rtv = nullptr) noexcept;
 
         // The native game renderer can draw two genuine, independently posed
         // views directly into the shared ring RTs, avoiding the extra GPU

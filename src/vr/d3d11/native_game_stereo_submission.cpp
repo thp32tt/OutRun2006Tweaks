@@ -722,7 +722,9 @@ bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
 }
 
 DXGI_FORMAT NativeGameEyeDrawEncoder::offscreen_color_view_format(
-    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept {
+    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
+    ID3D11RenderTargetView* gameCapturedRtv,
+    bool requireCurrentlyBound) const noexcept {
     if (!source || offscreenColorProvenance_.untrackedGpuWrite)
         return DXGI_FORMAT_UNKNOWN;
     DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
@@ -2872,6 +2874,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
 
 void NativeGameStereoSubmission::release_local() noexcept {
     for (auto& eye : eyes_) eye.Reset();
+    for (auto& view : capturedRtvs_) view.Reset();
     context_.Reset();
     eyeViews_[0] = eyeViews_[1] = 0;
     eyeArraySlices_[0] = eyeArraySlices_[1] = 0u;
@@ -2918,9 +2921,56 @@ bool NativeGameStereoSubmission::source_is_live(
     const auto mip = native_game_postpass_mip_extent(
         desc.Width, desc.Height, desc.MipLevels, mipSlice,
         desc.ArraySize, arraySlice, desc.SampleDesc.Count);
+    // Native L and R can be two successive game camera Draw passes.
+    // A TYPELESS allocation is valid only when its exact typed RTV was
+    // bound in OM during that eye's own render and remains retained.
+    bool colorAdmitted = desc.Format == ring_.format();
+    if (gameCapturedRtv) {
+        D3D11_RENDER_TARGET_VIEW_DESC vd{};
+        gameCapturedRtv->GetDesc(&vd);
+        UINT viewMip = 0u, viewFirstSlice = 0u, viewSliceCount = 0u;
+        if (vd.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2D &&
+            desc.ArraySize == 1u) {
+            viewMip = vd.Texture2D.MipSlice;
+            viewSliceCount = 1u;
+        } else if (vd.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2DARRAY) {
+            viewMip = vd.Texture2DArray.MipSlice;
+            viewFirstSlice = vd.Texture2DArray.FirstArraySlice;
+            viewSliceCount = vd.Texture2DArray.ArraySize;
+        }
+        Microsoft::WRL::ComPtr<ID3D11Resource> viewResource;
+        Microsoft::WRL::ComPtr<IUnknown> sourceIdentity, viewIdentity;
+        gameCapturedRtv->GetResource(viewResource.GetAddressOf());
+        const bool sameAllocation = viewResource &&
+            SUCCEEDED(source->QueryInterface(__uuidof(IUnknown),
+                reinterpret_cast<void**>(sourceIdentity.GetAddressOf()))) &&
+            SUCCEEDED(viewResource.As(&viewIdentity)) &&
+            sourceIdentity.Get() == viewIdentity.Get();
+        bool boundAtCapture = !requireCurrentlyBound;
+        if (requireCurrentlyBound) {
+            ID3D11RenderTargetView* bound[
+                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+            context_->OMGetRenderTargets(
+                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, bound, nullptr);
+            for (auto* view : bound) {
+                if (view == gameCapturedRtv) boundAtCapture = true;
+                if (view) view->Release();
+            }
+        }
+        if (!native_game_eye_captured_rtv_admitted(
+                static_cast<std::uint32_t>(desc.Format),
+                static_cast<std::uint32_t>(vd.Format),
+                static_cast<std::uint32_t>(ring_.format()),
+                desc.SampleDesc.Count, sameAllocation, boundAtCapture,
+                mipSlice, arraySlice, viewMip, viewFirstSlice, viewSliceCount,
+                DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+                DXGI_FORMAT_B8G8R8A8_TYPELESS))
+            return false;
+        colorAdmitted = true;
+    }
     return mip.valid && mip.width == ring_.width() &&
         mip.height == ring_.height() &&
-        desc.Format == ring_.format() &&
+        colorAdmitted &&
         (desc.SampleDesc.Count == 1u || desc.MipLevels == 1u) &&
         desc.Usage == D3D11_USAGE_DEFAULT && desc.CPUAccessFlags == 0u &&
         (native_game_eye_local_render_target_admitted(
@@ -2952,14 +3002,16 @@ bool NativeGameStereoSubmission::capture_eye(
     std::uint32_t eyeIndex, ID3D11Texture2D* nativeColor,
     std::uint64_t nativeDrawCount, std::uint64_t eyeViewSignature,
     std::uint32_t sourcePoseSequence, UINT sourceArraySlice,
-    UINT sourceMipSlice) noexcept
+    UINT sourceMipSlice, ID3D11RenderTargetView* gameCapturedRtv) noexcept
 {
     if (state_ != State::Acquired || eyeIndex >= 2u ||
         eyes_[eyeIndex] || !nativeDrawCount || !eyeViewSignature ||
         sourcePoseSequence != poseSequence_ ||
-        !source_is_live(nativeColor, sourceArraySlice, sourceMipSlice))
+        !source_is_live(nativeColor, sourceArraySlice, sourceMipSlice,
+                         gameCapturedRtv, true))
         return false;
     eyes_[eyeIndex] = nativeColor;
+    capturedRtvs_[eyeIndex] = gameCapturedRtv;
     eyeViews_[eyeIndex] = eyeViewSignature;
     eyeArraySlices_[eyeIndex] = sourceArraySlice;
     eyeMipSlices_[eyeIndex] = sourceMipSlice;
@@ -3426,8 +3478,10 @@ bool NativeGameStereoSubmission::submit() noexcept
     if (state_ != State::Acquired || !eyes_[0] || !eyes_[1] ||
         eyeViews_[0] == 0u || eyeViews_[1] == 0u ||
         eyeViews_[0] == eyeViews_[1] ||
-        !source_is_live(eyes_[0].Get(), eyeArraySlices_[0], eyeMipSlices_[0]) ||
-        !source_is_live(eyes_[1].Get(), eyeArraySlices_[1], eyeMipSlices_[1]))
+        !source_is_live(eyes_[0].Get(), eyeArraySlices_[0], eyeMipSlices_[0],
+                         capturedRtvs_[0].Get(), false) ||
+        !source_is_live(eyes_[1].Get(), eyeArraySlices_[1], eyeMipSlices_[1],
+                         capturedRtvs_[1].Get(), false))
         return false;
 
     // submit_eye_pair itself checks canonical COM identities, every ring-owned
@@ -3437,10 +3491,13 @@ bool NativeGameStereoSubmission::submit() noexcept
     if (!ring_.submit_eye_pair(context_.Get(), slot_, frameId_,
                                eyes_[0].Get(), eyes_[1].Get(),
                                eyeArraySlices_[0], eyeArraySlices_[1],
-                               eyeMipSlices_[0], eyeMipSlices_[1]))
+                               eyeMipSlices_[0], eyeMipSlices_[1],
+                                capturedRtvs_[0].Get(), capturedRtvs_[1].Get()))
         return false;
     eyes_[0].Reset();
     eyes_[1].Reset();
+    capturedRtvs_[0].Reset();
+    capturedRtvs_[1].Reset();
     state_ = State::GpuPending;
     return true;
 }

@@ -95,6 +95,26 @@ namespace outrun::vr::dx11 {
         selectedSlice >= firstSlice &&
         selectedSlice - firstSlice < sliceCount;
 }
+// A sequential L/R native camera can change OM output between real Draws.
+// Only one EXACT game-bound typed RTV can attest to each physical eye's color
+// interpretation, so retain that RTV until both GPU transfers are fenced.
+[[nodiscard]] constexpr bool native_game_eye_captured_rtv_admitted(
+    std::uint32_t storage, std::uint32_t observedFormat,
+    std::uint32_t ringFormat, std::uint32_t sampleCount,
+    bool sameAllocation, bool boundAtCapture,
+    std::uint32_t selectedMip, std::uint32_t selectedSlice,
+    std::uint32_t viewMip, std::uint32_t firstSlice,
+    std::uint32_t viewSliceCount,
+    std::uint32_t bgraUnorm, std::uint32_t bgraSrgb,
+    std::uint32_t bgraTypeless) noexcept {
+    return sameAllocation && boundAtCapture &&
+        observedFormat == ringFormat && viewSliceCount == 1u &&
+        native_game_eye_rtv_subresource_matches(
+            selectedMip, selectedSlice, viewMip, firstSlice, viewSliceCount) &&
+        native_game_eye_format_transfer_admitted(
+            storage, observedFormat, ringFormat, sampleCount,
+            bgraUnorm, bgraSrgb, bgraTypeless);
+}
 enum class NativeGameEyeTransfer : std::uint8_t { Reject, Copy, Resolve };
 // Same-generation cumulative ACKs may retire frames with lower frame IDs.
 // Disallow frame-ID reuse or a new ID already covered by a supplied ACK:

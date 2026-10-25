@@ -332,7 +332,9 @@ namespace outrun::vr::dx11
         ID3D11Texture2D* left_source,
         ID3D11Texture2D* right_source,
         UINT left_array_slice, UINT right_array_slice,
-        UINT left_mip_slice, UINT right_mip_slice) noexcept
+        UINT left_mip_slice, UINT right_mip_slice,
+        ID3D11RenderTargetView* captured_left_rtv,
+        ID3D11RenderTargetView* captured_right_rtv) noexcept
     {
         if (!activation_ready() || same_producer_context(context) == false ||
             slot >= slots_.size() || frame_id == 0 ||
@@ -347,7 +349,8 @@ namespace outrun::vr::dx11
 
         const auto exact_source = [&](ID3D11Texture2D* source,
                                       D3D11_TEXTURE2D_DESC& desc,
-                                      UINT mipSlice, UINT arraySlice) noexcept {
+                                      UINT mipSlice, UINT arraySlice,
+                                      ID3D11RenderTargetView* capturedRtv) noexcept {
             source->GetDesc(&desc);
             const auto extent = native_game_postpass_mip_extent(
                 desc.Width, desc.Height, desc.MipLevels, mipSlice,
@@ -411,6 +414,39 @@ namespace outrun::vr::dx11
                     __uuidof(IUnknown), reinterpret_cast<void**>(
                         sourceIdentity.GetAddressOf()))) || !sourceIdentity)
                 return false;
+            // Sequential native L/R game camera: the left typed RTV need
+            // no longer be OM-bound after the right eye's Draw. Capture
+            // admission already proved it was bound for its original pass.
+            // Re-authenticate allocation, mip/slice and gamma before GPU work.
+            if (capturedRtv) {
+                D3D11_RENDER_TARGET_VIEW_DESC viewDesc{};
+                capturedRtv->GetDesc(&viewDesc);
+                UINT viewMip = 0u, firstSlice = 0u, sliceCount = 0u;
+                if (viewDesc.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2D &&
+                    desc.ArraySize == 1u) {
+                    viewMip = viewDesc.Texture2D.MipSlice;
+                    sliceCount = 1u;
+                } else if (viewDesc.ViewDimension ==
+                           D3D11_RTV_DIMENSION_TEXTURE2DARRAY) {
+                    viewMip = viewDesc.Texture2DArray.MipSlice;
+                    firstSlice = viewDesc.Texture2DArray.FirstArraySlice;
+                    sliceCount = viewDesc.Texture2DArray.ArraySize;
+                }
+                Microsoft::WRL::ComPtr<ID3D11Resource> viewResource;
+                Microsoft::WRL::ComPtr<IUnknown> viewIdentity;
+                capturedRtv->GetResource(viewResource.GetAddressOf());
+                const bool sameAllocation = viewResource &&
+                    SUCCEEDED(viewResource.As(&viewIdentity)) &&
+                    viewIdentity.Get() == sourceIdentity.Get();
+                return native_game_eye_captured_rtv_admitted(
+                    static_cast<std::uint32_t>(desc.Format),
+                    static_cast<std::uint32_t>(viewDesc.Format),
+                    static_cast<std::uint32_t>(format_),
+                    desc.SampleDesc.Count, sameAllocation, true,
+                    mipSlice, arraySlice, viewMip, firstSlice, sliceCount,
+                    DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+                    DXGI_FORMAT_B8G8R8A8_TYPELESS);
+            }
             ID3D11RenderTargetView* bound[
                 D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
             context->OMGetRenderTargets(
@@ -458,9 +494,9 @@ namespace outrun::vr::dx11
         // native GPU commands, so the original DX9Ex frame remains usable.
         D3D11_TEXTURE2D_DESC leftDesc{}, rightDesc{};
         if (!exact_source(left_source, leftDesc,
-                          left_mip_slice, left_array_slice) ||
+                          left_mip_slice, left_array_slice, captured_left_rtv) ||
             !exact_source(right_source, rightDesc,
-                          right_mip_slice, right_array_slice))
+                          right_mip_slice, right_array_slice, captured_right_rtv))
             return false;
         // Game-authored L/R cameras can occupy independently selected array
         // slices and physical mip levels of the same local GPU image.
