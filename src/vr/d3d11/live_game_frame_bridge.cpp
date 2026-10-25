@@ -58,6 +58,7 @@
 #include "native_game_surface_replay_budget.hpp"
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_surface_tile_readback.hpp"
+#include "native_game_cpu_tile_admission.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_live_shader_cache.hpp"
 #include "native_game_gpu_handoff.hpp"
@@ -7739,11 +7740,11 @@ bool preserve_game_surface_copy(
         // after the first real native Draw. Cold menu seeds remain full.
         const bool tileCandidate = !preDrawCopy &&
             GameNativeSurfaceTilePlan::eligible(region,desc.Width,desc.Height);
-        const std::uint64_t plannedReadbackBytes = tileCandidate
-            ? GameNativeSurfaceReplayBudget::full_readback_bytes(
-                region.width(),region.height())
-            : GameNativeSurfaceReplayBudget::full_readback_bytes(
-                desc.Width,desc.Height);
+        // Use the same authentic GPU tile-vs-full-source cost as the
+        // matching CPU/GDI write ticket opened before LockRect/GetDC.
+        const std::uint64_t plannedReadbackBytes =
+            GameNativeCpuTileAdmission::planned_bytes(
+                region, desc.Width, desc.Height, preDrawCopy);
         if (!s.surfaceReplayBudget.admits_bytes(plannedReadbackBytes))
             return false;
         // No other D3D9 postpass may consume pixels from an open CPU/GDI
@@ -7956,9 +7957,21 @@ bool begin_game_surface_cpu_write(IDirect3DDevice9* game,
         const bool postDrawWrite = s.frameBatch.publishable(s.pending) &&
             s.backend.ready() && s.backend.color_texture() &&
             s.nativeWidth == desc.Width && s.nativeHeight == desc.Height;
+        // A post-Draw LockRect covering a small game/HUD tile does not
+        // require another synchronized full-backbuffer transfer when its
+        // original completed write can be cropped on the D3D9 GPU.
+        // A cold first-Draw seed, whole-surface GetDC, or unavailable
+        // post-Draw target still requires full-frame budget admission.
+        // On a failed tile RT readback, preserve_game_surface_copy checks
+        // full-source budget again before attempting its fallback.
+        const std::uint64_t plannedReadbackBytes =
+            GameNativeCpuTileAdmission::planned_bytes(
+                region, desc.Width, desc.Height,
+                preDrawWrite || !postDrawWrite);
         if (s.sourceGameDevice != owner || !seededMainBackbuffer ||
-            !s.surfaceReplayBudget.admits(desc.Width, desc.Height) ||
-            (!preDrawWrite && !postDrawWrite)) return false;
+            (!preDrawWrite && !postDrawWrite) ||
+            !s.surfaceReplayBudget.admits_bytes(plannedReadbackBytes))
+            return false;
         return s.cpuSurfaceReplay.begin(owner,
             reinterpret_cast<std::uintptr_t>(identity.Get()),
             region.left, region.top, region.right, region.bottom,

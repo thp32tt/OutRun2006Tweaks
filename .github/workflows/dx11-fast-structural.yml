@@ -106,6 +106,9 @@ jobs:
           # 01056 actual D3D9 GPU tile-source budget + full fallback safety.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_tile_budget_01056.cpp -o /tmp/dx11_tile_budget_01056 && /tmp/dx11_tile_budget_01056
           python tools/test_dx11_tile_budget_01056.py
+          # 01057 partial original LockRect -> cropped GPU tile, GetDC full fallback.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_cpu_tile_admission_01057.cpp -o /tmp/dx11_cpu_tile_01057 && /tmp/dx11_cpu_tile_01057
+          python tools/test_dx11_cpu_tile_admission_01057.py
           # 01055: actual source partial post-Draw D3D9 GPU tile readback and whole-frame fallback.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_surface_tile_readback_01055.cpp -o /tmp/dx11_tile_01055 && /tmp/dx11_tile_01055
           python tools/test_dx11_surface_tile_readback_01055.py

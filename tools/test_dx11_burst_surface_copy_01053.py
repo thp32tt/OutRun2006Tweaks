@@ -9,7 +9,10 @@ write=s[s.index('bool begin_game_surface_cpu_write('):s.index('void finish_game_
 assert 'GameNativeSurfaceReplayBudget surfaceReplayBudget' in s
 assert 's.surfaceReplayBudget.admits_bytes(plannedReadbackBytes)' in copy
 assert '!s.surfaceReplayBudget.admits(desc.Width,desc.Height)' in copy
-assert '!s.surfaceReplayBudget.admits(desc.Width, desc.Height)' in write
+# The 01057 post-Draw CPU ticket is now admitted at the EXACT planned tile
+# cost; the full-source fallback must still be rechecked at completion.
+assert '!s.surfaceReplayBudget.admits_bytes(plannedReadbackBytes)' in write
+assert 'preDrawWrite || !postDrawWrite' in write
 assert copy.count('s.surfaceReplayBudget.note_success(desc.Width, desc.Height);') == 1
 assert copy.count('s.surfaceReplayBudget.note_success_bytes(') == 1
 assert copy.index('GetRenderTargetData(') < copy.index('s.surfaceReplayBudget.note_success(')
