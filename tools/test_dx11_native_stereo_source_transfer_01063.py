@@ -9,12 +9,14 @@ workflow=(r/".github/workflows/dx11-fast-structural.yml").read_text()
 def integrated(rr,hh,bb):
     source=rr.split("const auto exact_source =",1)[1].split(
         "// Validate both resource descriptors",1)[0]
+    format_logic=hh.split("native_game_eye_format_transfer_admitted(",1)[1].split(
+        "// Only a view containing",1)[0]
     caller=bb.split("// Authenticate the producer's actual GPU resource",1)[1].split(
         "// Optional real GPU-only desktop presentation",1)[0]
     return all((
         "native_game_eye_format_transfer_admitted(" in hh,
-        "typedView == ringFormat" in hh,
-        "sampleCount == 1u" in hh,
+        "typedView == ringFormat" in format_logic,
+        "sampleCount == 1u" in format_logic,
         "native_game_eye_rtv_subresource_matches(" in hh,
         "desc.Format == format_" in source,
         "D3D11_RTV_DIMENSION_TEXTURE2DARRAY" in source,
@@ -40,7 +42,11 @@ for needle in ("viewIdentity.Get() == sourceIdentity.Get()",
     b=ring.replace(needle,"/* broken source-to-RTV proof */",1)
     assert b!=ring and not integrated(b,helper,bridge),needle
 for needle in ("typedView == ringFormat","sampleCount == 1u"):
-    b=helper.replace(needle,"false /* unsafe gamma */",1)
+    prefix, format_logic=helper.split(
+        "native_game_eye_format_transfer_admitted(",1)
+    assert needle in format_logic.split("// Only a view containing",1)[0]
+    b=prefix+"native_game_eye_format_transfer_admitted("+format_logic.replace(
+        needle,"false /* unsafe gamma */",1)
     assert b!=helper and not integrated(ring,b,bridge),needle
 for needle in ("ScopedNativeGameGpuTransferOutputs preserveGameOutputs(ctx);",
                "s.gpuFrameSink(s.gpuFrameSinkUser, frame)"):
