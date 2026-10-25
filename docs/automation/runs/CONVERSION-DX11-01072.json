@@ -10,8 +10,8 @@
   "classification": "A+B",
   "work_key": "DX11:R30_UNMIRRORED_PIXEL_NEUTRAL_SOURCE",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_STATE",
+  "status": "SOURCE_STAGE_BUILD_VERIFIED",
+  "checkpoint": "C6_SOURCE_STAGE_ONLY",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
@@ -31,7 +31,7 @@
   ],
   "score_change": 0,
   "score_award_event": false,
-  "score_note": "Same unfinished full-frame renderer feature; no independent playable result or new AI2 points. Latest AI_SCOREBOARD.md: previous 1963 +0 = 1963.",
+  "score_note": "Previous 01072 was a verified source/CI checkpoint, not a complete gameplay renderer feature. Exact 081509e... five Gates remain recorded; no runtime draw/frame count observed and no separate score.",
   "summary": "R30 actual game linear VB/indexed VB/linear UP/indexed UP Draw source guards forward topology/count when original CPU shadow capture fails. DX11 live observer preserves source ordinals only for proven scissor-clipped, isolated offscreen or color/depth/stencil-neutral draws; genuine pixel writers with missing vertex bytes abort native frame before IA/SM3 Draw. Oversized UP is also classified before mesh budget. Original D3D9Ex game Present/draw/input/FFB/SkyGlow remain fallback; DXVK frozen. Five exact-SHA source/compile/OpenXR/HUD GitHub Actions PASS; no real game/HMD output observed.",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -98,8 +98,14 @@
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_RUNTIME_UNTESTED",
-    "activation_guard_and_fallback": "NativeDrawPathActive opt-in/fail-closed; original D3D9Ex game input/render/FFB retained."
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_RUNTIME_UNTESTED__TARGET_FULL_RESOLUTION_FRAME__NO_TERMINAL_GAMEPLAY_CLAIM",
+    "activation_guard_and_fallback": "NativeDrawPathActive opt-in/fail-closed; original D3D9Ex game input/render/FFB retained.",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "mandatory_gate_results": [
     {
@@ -137,5 +143,21 @@
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Actual real-game native frame output counters and L/R GPU OpenXR gameplay unobserved.",
   "next_implementation_action": "Continue real native game full-frame source path, acquire actual menu/vehicle/race and Quest3 rendering evidence separately.",
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no Quest3 or game screen verification performed."
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no Quest3 or game screen verification performed.",
+  "terminal_feature_complete": false,
+  "feature_acceptance_status": "PENDING_REAL_GAME_FRAME_EVIDENCE",
+  "acceptance_results": {
+    "four_d3d9_draw_routes": "SOURCE_AND_EXACT_SHA_GATE_VERIFIED_RUNTIME_UNTESTED",
+    "pixel_neutral_native_source_continuity": "SOURCE_AND_EXACT_SHA_GATE_VERIFIED_RUNTIME_UNTESTED",
+    "pixel_writer_fallback": "SOURCE_AND_EXACT_SHA_GATE_VERIFIED_RUNTIME_UNTESTED",
+    "five_required_exact_sha_gates": "PASS_EXACT_SHA_AT_081509eeb5b20c8bec9d62107ce248756663a77f"
+  },
+  "ci_failure_repair": {
+    "owning_task_id": "CONVERSION-DX11-01073",
+    "failure_run": 40222130021,
+    "companion_fast_failure_run": 40222130028,
+    "reason": "Policy rejected terminal COMPLETE status without fully verified feature acceptance and absent gameplay_delivery_target.",
+    "correction": "Nonterminal SOURCE_STAGE_BUILD_VERIFIED, explicit full-frame target, source path, and bounded acceptance evidence; no invented runtime PASS.",
+    "prior_01072_validation_bearing_sha_unchanged": true
+  }
 }
