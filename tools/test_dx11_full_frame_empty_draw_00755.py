@@ -22,11 +22,12 @@ def integrated(b: str, h: str) -> bool:
     # Only the ORIGINAL zero-count branch proves a zero primitive is safe;
     # inspecting the entire prefix up to mesh validation let a destructive
     # mutation of that first call escape via a later identical source string.
-    zero_end = section.find("        UINT expectedElements = 0;", consume)
+    zero_end = section.find(
+        "        // A successful game Draw/DrawIndexed whose enabled scissor", consume)
     if zero_end < 0:
-        # 01071: full-frame mesh admission moved after real pixel-neutral
-        # offscreen and clipped Draws. The zero primitive branch is unchanged.
-        zero_end = section.find("        // A successful game Draw/DrawIndexed whose enabled scissor", consume)
+        # Preserve the 00755 empty-draw branch boundary on older layouts,
+        # but never include following offscreen/no-write matches after 01071.
+        zero_end = section.find("        UINT expectedElements = 0;", consume)
     zero_case = section[zero_branch:zero_end] if 0 <= zero_branch < zero_end else ""
     return (0 <= section.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++")
             < valid_type < zero_branch <= consume < before_span and
