@@ -1,6 +1,6 @@
 name: DX9Ex OFFICIAL FOCUS R26 HUD Test and Debug
 
-# USER-DX9EX-LENS-CENTRE-20261025: isolated central-sun ray correction.
+# USER-DX9EX-LOG-FOLLOWTHROUGH-20261026: full-eye F11 raster and exact-source validation.
 
 permissions:
   contents: read
@@ -45,6 +45,12 @@ jobs:
           if ($cache -notcontains 'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON') {
             throw 'R26+HUD default renderer is not active'
           }
+
+      - name: Verify runnable diagnostic profile
+        run: python tools/verify_focus_official_diagnostics.py
+
+      - name: Execute F11 raster transaction regression
+        run: python tools/verify_vr_f11_eye_viewport.py
 
       - name: Verify protected outer flare path
         run: python tools/verify_dx9ex_r26_projected_flare_fusion.py
@@ -121,7 +127,7 @@ jobs:
             Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant" -Encoding ascii
             Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
             @(
-              'OFFICIAL FOCUS R26+HUD: October 25 R62 stage/identity diagnostic build'
+              'OFFICIAL FOCUS R26+HUD: October 26 F11 full-eye raster and source-identified diagnostics'
               "Variant: $mode; TEST=Release; DEBUG=RelWithDebInfo and opt-in GPU diagnostics"
               'Original game EXE is not bundled. Backup your current DLL, host, and all INIs before unpacking.'
               '1. Unpack EXACTLY ONE variant ZIP into the original OR2006C2C.EXE directory.'
@@ -148,7 +154,7 @@ jobs:
           }
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-OFFICIAL-FOCUS-20261025
+          name: OutRun2-VR-R26-OFFICIAL-FOCUS-20261026
           path: OutRun2_VR_R26_FOCUS_OFFICIAL_*.zip
           if-no-files-found: error
 

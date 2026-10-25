@@ -51,7 +51,7 @@ try {
             }
         }
     }
-    $debugMode = $variant -eq 'R26_FINAL_DEBUG'
+    $debugMode = $variant -eq 'R26_FOCUS_OFFICIAL_DEBUG'
     # Debug gathers diagnostic logical GPU Draw sampling, never enables experimental VB/throttle render changes.
     $env:OUTRUN_VR_R30_PARTICLE_VB = '0'
     $env:OUTRUN_VR_GPU_PROFILE = if ($debugMode) { '1' } else { '0' }
@@ -64,13 +64,23 @@ try {
         '-DisableDesktopVsync=true','-SkyGlowFactor=1',
         '-PreferD3D9Ex=true','-DirectGpuOnly=false','-DisableDesktopDuplication=false',
         '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
-        '-RivalDx11NativeRoute=false'
+        '-RivalDx11NativeRoute=false',
+        '-AutoRenderResolution=true','-FollowGameResolution=false',
+        '-UnifiedEyeMenuSource=false','-AntiAliasing=0',
+        '-Hud1080pReference=true','-HudScale=0.55',
+        '-MenuScale=1.00','-CullingUnionMarginDegrees=8.0'
     )
     @("sourceSha=$(Get-Content (Join-Path $root 'SOURCE_SHA.txt') -ErrorAction SilentlyContinue)",
       "variant=$variant","debug=$debugMode","arguments=$($argsList -join ' ')",
       "OUTRUN_VR_GPU_PROFILE=$env:OUTRUN_VR_GPU_PROFILE",
       "OUTRUN_VR_GPU_PROFILE_CENSUS_V2=$env:OUTRUN_VR_GPU_PROFILE_CENSUS_V2",
       "runtimeValidation=UNTESTED") | Set-Content -LiteralPath (Join-Path $session 'RUN_CONFIG.txt') -Encoding UTF8
+    # Record the actual installed payload, not only a package-label SHA.
+    $binaryIdentity = @('dinput8.dll','outrun-vr-host.exe') | ForEach-Object {
+        $binaryPath = Join-Path $root $_
+        [PSCustomObject]@{ name = $_; sha256 = (Get-FileHash -LiteralPath $binaryPath -Algorithm SHA256).Hash; bytes = (Get-Item -LiteralPath $binaryPath).Length }
+    }
+    ConvertTo-Json -InputObject @($binaryIdentity) | Set-Content -LiteralPath (Join-Path $session 'BINARY_IDENTITY.json') -Encoding UTF8
     Write-Host "Launching $variant; cockpit is disabled by default because DriverSeatView=true was reported unstable."
     $gameProcess = Start-Process -FilePath $gamePath -WorkingDirectory $root -ArgumentList $argsList -PassThru
     $firstLaunch = Get-Date

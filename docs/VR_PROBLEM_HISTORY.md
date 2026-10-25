@@ -1,3 +1,7 @@
+# 2026-10-26 F11 raster regression reopened from uploaded log
+
+Fresh user regression and 00:04 session show XR target 2496x2688 while F11 uses client viewport 1337x1440. `VR-F11-OVERLAY-DIPLOPIA-001` keeps historical 2026-10-09 acceptance; current candidate adds full-eye raster/scissor and exact source viewport restore. Actual-function red/green tests pass; HMD UNTESTED. Prior B9200 warning-only interpretation is corrected: entry wrapper installed, actual hit evidence absent. See [log follow-through](automation/reviews/LOG_FOLLOWTHROUGH_20261026.md); rival/+TIME/final graph/flare optics remain unresolved.
+
 # 2026-10-15 lens/+TIME source-path development handoff
 
 User request at 01:36:52 KST. See [development guide](DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md). Reuses DX9EX:SYMPTOM:LENS_FLARE_CENTRE and DX9EX:SYMPTOM:EXTENDED_TIME; preserves prior HMD failures and known-good categories. No new HMD observation, recurrence count or optical FIXED claim.

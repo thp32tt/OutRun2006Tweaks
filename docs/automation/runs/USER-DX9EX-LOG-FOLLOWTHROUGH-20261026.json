@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "task_id": "USER-DX9EX-LOG-FOLLOWTHROUGH-20261026",
+  "source_mode": "CHAT_DIRECT",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "92222985b9ebd81475bd52e59c923af241e6f59a",
+  "attempt": 1,
+  "status": "VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "LOCAL_STATIC_PASS_WINDOWS_PENDING",
+  "runtime_validation": "UNTESTED",
+  "evidence": "docs/automation/reviews/LOG_FOLLOWTHROUGH_20261026.md",
+  "input_sha256": "1e46f1d1a74c42a474f5aa76bed5f1226ece33d4766cccf290123f0144e18dce",
+  "unresolved": [
+    "rival physical ownership after post-session patch",
+    "+TIME actual execution/source-to-GPU evidence",
+    "final graph exact producer/optics",
+    "whole flare-family optics"
+  ],
+  "next_action": "Verify exact material SHA Active, Full Source, Domain and official TEST/DEBUG Windows build; inspect artifact contents then persist C6.",
+  "updated_kst": "2026-10-26T07:38:10.467385+09:00"
+}

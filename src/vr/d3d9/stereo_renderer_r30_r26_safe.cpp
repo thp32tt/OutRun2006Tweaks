@@ -2875,7 +2875,8 @@ namespace OutRunVRStereo
         bool R30PrepareExternalImGuiProjection(
             IDirect3DDevice9* device, R30XyzrhwState& state,
             D3DMATRIX& stockProjection, D3DMATRIX eyes[2],
-            RECT& stockScissor, RECT eyeScissors[2]) noexcept
+            RECT& stockScissor, RECT eyeScissors[2],
+            D3DVIEWPORT9& eyeViewport) noexcept
         {
             if (!device || !R30SafeStereoBase(device) ||
                 !FrameHadWorldStereo || !FrameHadDuplicatedDraw ||
@@ -2921,6 +2922,19 @@ namespace OutRunVRStereo
                 FAILED(device->GetViewport(&state.viewport)) ||
                 !state.viewport.Width || !state.viewport.Height)
                 return false;
+
+            // ImGui's Win32 backend authors pixels in the desktop client.
+            // Its DX9 backend installs that client-sized viewport even when
+            // the main VR render target is a larger OpenXR eye. Preserve the
+            // source orthographic projection/scissor input, but rasterize the
+            // transformed content over the FULL eye on both submissions.
+            // Keep state.viewport unchanged for exact caller restoration.
+            if (!BackBufferDesc.Width || !BackBufferDesc.Height)
+                return false;
+            eyeViewport = state.viewport;
+            eyeViewport.X = eyeViewport.Y = 0;
+            eyeViewport.Width = BackBufferDesc.Width;
+            eyeViewport.Height = BackBufferDesc.Height;
 
             // F11 is an external 2D screen overlay, not a gameplay HUD at
             // finite view-Z. The old R26 finite HeadInverse/IPD route placed
@@ -3038,12 +3052,12 @@ namespace OutRunVRStereo
                         !std::isfinite(clipY) ||
                         !std::isfinite(clipW) || clipW <= 1.0e-5f)
                         return false;
-                    const float px = state.viewport.X +
+                    const float px = eyeViewport.X +
                         (clipX / clipW + 1.0f) * 0.5f *
-                        state.viewport.Width;
-                    const float py = state.viewport.Y +
+                        eyeViewport.Width;
+                    const float py = eyeViewport.Y +
                         (1.0f - clipY / clipW) * 0.5f *
-                        state.viewport.Height;
+                        eyeViewport.Height;
                     if (!std::isfinite(px) || !std::isfinite(py))
                         return false;
                     minX = std::min(minX, px);
@@ -3051,10 +3065,10 @@ namespace OutRunVRStereo
                     maxX = std::max(maxX, px);
                     maxY = std::max(maxY, py);
                 }
-                const float xMin = static_cast<float>(state.viewport.X);
-                const float yMin = static_cast<float>(state.viewport.Y);
-                const float xMax = xMin + state.viewport.Width;
-                const float yMax = yMin + state.viewport.Height;
+                const float xMin = static_cast<float>(eyeViewport.X);
+                const float yMin = static_cast<float>(eyeViewport.Y);
+                const float xMax = xMin + eyeViewport.Width;
+                const float yMax = yMin + eyeViewport.Height;
                 eyeScissors[eye] = {
                     static_cast<LONG>(std::floor(std::clamp(minX, xMin, xMax))),
                     static_cast<LONG>(std::floor(std::clamp(minY, yMin, yMax))),
@@ -3075,14 +3089,17 @@ namespace OutRunVRStereo
             R30XyzrhwState state{};
             D3DMATRIX stockProjection{}, eyeProjection[2]{};
             RECT stockScissor{}, eyeScissors[2]{};
+            D3DVIEWPORT9 eyeViewport{};
             if (!R30PrepareExternalImGuiProjection(device, state,
-                    stockProjection, eyeProjection, stockScissor, eyeScissors))
+                    stockProjection, eyeProjection, stockScissor, eyeScissors,
+                    eyeViewport))
                 return E_NOTIMPL;
 
             R30CaptureSkyGlowSceneBeforeHud(device);
             auto setEye = [&](int eye) {
                 InternalPassScope guard;
-                return SUCCEEDED(device->SetTransform(
+                return SUCCEEDED(device->SetViewport(&eyeViewport)) &&
+                       SUCCEEDED(device->SetTransform(
                            D3DTS_PROJECTION, &eyeProjection[eye])) &&
                        SUCCEEDED(device->SetScissorRect(&eyeScissors[eye]));
             };
@@ -3092,7 +3109,9 @@ namespace OutRunVRStereo
                     D3DTS_PROJECTION, &stockProjection));
                 const bool scissors = SUCCEEDED(
                     device->SetScissorRect(&stockScissor));
-                return proj && scissors;
+                const bool viewport = SUCCEEDED(
+                    device->SetViewport(&state.viewport));
+                return proj && scissors && viewport;
             };
             if (!setEye(0))
             {
@@ -3130,8 +3149,6 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr))
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
                         device, savedDepth ? RightEyeDepth : nullptr);
-                if (SUCCEEDED(rightHr))
-                    rightHr = device->SetViewport(&state.viewport);
                 if (SUCCEEDED(rightHr) && !setEye(1))
                     rightHr = E_FAIL;
                 if (SUCCEEDED(rightHr))
@@ -3164,6 +3181,7 @@ namespace OutRunVRStereo
                 spdlog::info(
                     "VR F11 SOURCE-ASPECT PROBE: hits={} game={}x{} "
                     "viewport={},{},{},{} mode={} "
+                    "eyeViewport={},{},{},{} "
                     "scissorL={},{},{},{} scissorR={},{},{},{} "
                     "leftHr=0x{:08X} rightHr=0x{:08X}",
                     R30ExternalImGuiStereoDraws,
@@ -3173,6 +3191,8 @@ namespace OutRunVRStereo
                     state.hudWorldLockValid
                         ? "FINITE_WORLD_LOCK_065"
                         : "FOV_ONLY_FAILSAFE",
+                    eyeViewport.X, eyeViewport.Y,
+                    eyeViewport.Width, eyeViewport.Height,
                     eyeScissors[0].left, eyeScissors[0].top,
                     eyeScissors[0].right, eyeScissors[0].bottom,
                     eyeScissors[1].left, eyeScissors[1].top,

@@ -29,9 +29,9 @@ assert wnd.count("ImGui_ImplWin32_WndProcHandler(") == 1
 # stereo-eye replay), not a Windows hardware cursor absent from capture.
 cursor_policy = routing.split("constexpr bool ShouldDrawSoftwareCursor(", 1)[1].split(
     "static_assert(", 1)[0]
-assert "return f11Visible && vrGameplay;" in cursor_policy
-assert "return f11Visible && vrGameplay;" not in cursor_policy.replace(
-    "return f11Visible && vrGameplay;", "return f11Visible;", 1)
+assert "return f11Visible && vrPresentation;" in cursor_policy
+assert "return f11Visible && vrPresentation;" not in cursor_policy.replace(
+    "return f11Visible && vrPresentation;", "return f11Visible;", 1)
 for f11, vr, drawn in ((True, True, True), (True, False, False),
                       (False, True, False), (False, False, False)):
     assert (f11 and vr) is drawn
@@ -40,7 +40,7 @@ cursor_setup = hook.split("const bool f11VisibleThisFrame =", 1)[1].split(
 assert "const bool vrGameplay = Game::is_vr_gameplay_presentation();" in cursor_setup
 assert "ImGui::GetIO().MouseDrawCursor =" in cursor_setup
 assert "OutRunF11Input::ShouldDrawSoftwareCursor(" in cursor_setup
-assert "f11VisibleThisFrame, vrGameplay" in cursor_setup
+assert "f11VisibleThisFrame, vrUiPresentation" in cursor_setup
 assert hook.index("ImGui::GetIO().MouseDrawCursor =") < hook.index(
     "ImGui_ImplDX9_NewFrame();") < hook.index("overlayActive = Overlay::render();")
 assert "if (overlayActive && vrGameplay)" in hook

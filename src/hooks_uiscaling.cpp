@@ -3130,7 +3130,7 @@ public:
             "VR P0 RESULT CRASH GUARD 20261011: 19 B9200 original E8 "
             "calls unmodified, all rva+5 midhooks disabled "
             "(minidump EIPs 0x97C5F and 0x97E75); "
-            "stock result graph preserved, stereo correction still pending");
+            "unsafe return-site hooks remain disabled; safe function-entry wrapper status follows; HMD validation pending");
 
         // Safe replacement for the retired CALL+5 hooks: the original
         // sub_4B9200 entry is intercepted once, then the unmodified return

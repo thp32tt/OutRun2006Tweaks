@@ -374,7 +374,7 @@ class D3DHooks : public Hook
 			// including opening/closing edges, to avoid a one-frame mismatch.
 			ImGui::GetIO().MouseDrawCursor =
 				OutRunF11Input::ShouldDrawSoftwareCursor(
-					f11VisibleThisFrame, vrGameplay);
+					f11VisibleThisFrame, vrUiPresentation);
 			// ImGui draws into the desktop-sized D3D9 backbuffer before the
 			// asymmetric portrait XR eye transfer. A source-aspect-sized font
 			// is visually reduced by that transfer. When the F11 shell is open

@@ -6,12 +6,12 @@ namespace OutRunF11Input
     // The Windows hardware cursor is a separate OS composition plane, not
     // part of the D3D9 game backbuffer replayed to the OpenXR stereo eyes.
     // Rasterize it inside ImGui's draw data only while the F11 shell is
-    // visible during VR gameplay. Native desktop and closed F11 keep their
+    // visible during VR presentation (menus included). Native desktop and closed F11 keep their
     // original hardware-cursor/game-input ownership.
     constexpr bool ShouldDrawSoftwareCursor(bool f11Visible,
-        bool vrGameplay) noexcept
+        bool vrPresentation) noexcept
     {
-        return f11Visible && vrGameplay;
+        return f11Visible && vrPresentation;
     }
 
     static_assert(ShouldDrawSoftwareCursor(true, true),

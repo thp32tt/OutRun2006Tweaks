@@ -435,11 +435,11 @@
     {
       "key": "VR-F11-OVERLAY-DIPLOPIA-001",
       "title": "F11 Tweaks ImGui overlay doubles after entering gameplay",
-      "status": "USER_REPORTED_PASS_EXACT_BUILD_SHA_UNCONFIRMED",
+      "status": "REOPENED_SOURCE_FIXED_NEED_EXACT_CI_AND_HMD",
       "severity": "visual-correctness",
       "firstKnownWindowKst": "2026-10-04",
-      "lastObservedKst": "2026-10-09",
-      "evidenceLevel": "USER_DIRECT_RUNTIME_PASS_REPORT__EXACT_PACKAGE_UNPINNED",
+      "lastObservedKst": "2026-10-26",
+      "evidenceLevel": "USER_REPORTED_REGRESSION_AND_LOG_RASTER_MISMATCH_EXACT_BUILD_UNPINNED",
       "symptomFingerprint": {
         "primary": "F11 OutRun2006Tweaks overlay is normal/single in menus but becomes two images after entering gameplay",
         "boundary": "front-end/menu rendering is correct; defect begins only when gameplay VR stereo ownership is active"
@@ -487,7 +487,7 @@
         "artifactDigestSha256": "4ddf370d1de7b3aaf62141e25832f305bc798e3dad2df226fe058560ae2b51aa",
         "innerPackageSha256": "a9719897662bd5bf5ede74724c1f74bedda95f051213fe586932bd22bdc1aa65"
       },
-      "nextAction": "Protect F11 known-good gameplay/menu overlay. Do not ask for a standalone repeat F11 test, re-open, or modify its render ownership without fresh regression evidence. Opportunistically correlate source/game DLL identity if the user later supplies a broader exact-package Quest3 test. Other HUD/GOAL/+TIME/rank/lens items are independent.",
+      "nextAction": "Validate current full-eye raster candidate with exact-SHA hosted CI, then correlate packaged DEBUG identity and F11 eyeViewport in user Quest3 test. Prior 2026-10-09 acceptance remains historical.",
       "userAcceptance20261009": {
         "reported_result": "F11 is now normal",
         "source": "direct user statement 2026-10-09 KST",
@@ -495,6 +495,15 @@
         "status": "USER_REPORTED_PASS_PROTECT",
         "exactBuildSha": null,
         "noSeparateRetestRequest": true
+      },
+      "logFollowthrough20261026": {
+        "task_id": "USER-DX9EX-LOG-FOLLOWTHROUGH-20261026",
+        "input_sha256": "1e46f1d1a74c42a474f5aa76bed5f1226ece33d4766cccf290123f0144e18dce",
+        "evidence": "docs/automation/reviews/LOG_FOLLOWTHROUGH_20261026.md",
+        "runtime_validation": "UNTESTED",
+        "known_original_viewport": "1337x1440",
+        "eye_target": "2496x2688",
+        "verifier": "tools/verify_vr_f11_eye_viewport.py"
       }
     },
     {

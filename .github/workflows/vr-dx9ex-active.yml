@@ -437,6 +437,7 @@ jobs:
             'tools/verify_vr_menu_letterbox_aspect.py',
             'tools/verify_vr_f11_font_density.py',
             'tools/verify_vr_f11_toggle_frame.py',
+            'tools/verify_vr_f11_eye_viewport.py',
             'tools/verify_vr_f11_wndproc_shell.py',
             'tools/verify_vr_custom_sprite_descriptor.py',
             'tools/verify_vr_projected_marker_telemetry.py',
