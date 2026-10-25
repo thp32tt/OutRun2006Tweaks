@@ -828,103 +828,60 @@ namespace
     {
         if (!Settings::VREnabled)
             return;
-        const int manualW = Settings::VRRenderWidth;
-        const int manualH = Settings::VRRenderHeight;
-        const bool manualRequested = manualW > 0 || manualH > 0;
+
+        // -width/-height remain an explicit logical/game-window choice. They
+        // are not allowed to cap the headset target unless FollowGameResolution
+        // is deliberately enabled.
         if (commandLineResolution)
-            return; // Explicit -width/-height always wins.
-        if (manualRequested)
-        {
-            if (manualW >= 640 && manualH >= 480 &&
-                static_cast<std::int64_t>(manualW) * manualH <= 16777216LL)
-            {
-                Game::screen_resolution->x = manualW;
-                Game::screen_resolution->y = manualH;
-                spdlog::info("VR EYE RESOLUTION: manual {}x{} after game config", manualW, manualH);
-            }
-            return; // Invalid manual values do not silently activate auto.
-        }
-        // The unified source is selected once, at this original configuration
-        // hook, BEFORE the game's 640x480-to-source UI scale is computed.
-        // Never resize the D3D9Ex game source again when CreateDevice runs:
-        // doing so after menu scale creation displaced both title glyphs
-        // and HUD/rival sprites by a stale second coordinate transform.
-        // Manual and explicit game sizes already returned above.
-        if (Settings::VRFollowGameResolution &&
-            !Settings::VRUnifiedEyeMenuSource)
         {
             spdlog::info(
-                "VR SOURCE COORDINATES: follow original game config {}x{}; XR recommended eye resolution remains independent",
+                "VR RESOLUTION SPLIT: explicit game/UI resolution {}x{} retained; physical VR target remains independently selected",
                 Game::screen_resolution->x, Game::screen_resolution->y);
             return;
         }
-        // Source resolution is a game/render policy, not a D3D9Ex transport
-        // preference. Classic D3D9 also renders at the requested extent.
-        // In particular the shipped PreferD3D9Ex=false must not silently
-        // make VR quality and the logical menu canvas follow the desktop.
+
+        if (Settings::VRFollowGameResolution)
+        {
+            spdlog::info(
+                "VR RESOLUTION SPLIT: compatibility FollowGameResolution=true; physical target may follow game/UI {}x{}",
+                Game::screen_resolution->x, Game::screen_resolution->y);
+            return;
+        }
+
+        const int manualW = Settings::VRRenderWidth;
+        const int manualH = Settings::VRRenderHeight;
+        const bool manualRequested = manualW > 0 || manualH > 0;
+        if (manualRequested)
+        {
+            const bool valid = manualW >= 640 && manualH >= 480 &&
+                static_cast<std::int64_t>(manualW) * manualH <= 16777216LL;
+            if (valid)
+                spdlog::info(
+                    "VR RESOLUTION SPLIT: logical UI stays {}x{}; physical VR target override {}x{} will be applied at CreateDevice",
+                    Game::screen_resolution->x, Game::screen_resolution->y,
+                    manualW, manualH);
+            else
+                spdlog::warn(
+                    "VR RESOLUTION SPLIT: invalid physical VR target {}x{}; logical UI stays {}x{}",
+                    manualW, manualH,
+                    Game::screen_resolution->x, Game::screen_resolution->y);
+            return;
+        }
+
         if (!Settings::VRAutoRenderResolution)
             return;
 
-        // The same physical D3D9Ex source must be chosen BEFORE the game
-        // builds its 640x480 -> source UI scale. The host starts asynchronously
-        // and may need a brief time to publish the VDXR eye extent. Only the
-        // opt-in unified source path waits (bounded 1250 ms); legacy configs
-        // keep their original zero-wait behavior. Never change game resolution
-        // later at CreateDevice: that path cannot replay the UI scale init.
+        // Start the host early so its eye extent is normally ready by
+        // Direct3DCreate9/CreateDevice, but never wait here and never copy the
+        // portrait eye dimensions into Game::screen_resolution. That variable
+        // is still consumed by original 2D/menu/HUD code.
         OutRunVR::RequestVRHostStartup();
-        OutRunVR::IpcV3::HostStateReader reader;
-        const ULONGLONG startTick = GetTickCount64();
-        for (;;)
-        {
-            OutRunVR::IpcV3::HostState host{};
-            if (reader.Read(host))
-            {
-                // Crashed hosts can leave stale dimensions in shared memory.
-                const auto extent = OutRunVR::EyeExtent::ResolveStartupForLiveHost(
-                    {host.recommendedWidth[0], host.recommendedHeight[0]},
-                    {host.recommendedWidth[1], host.recommendedHeight[1]},
-                    host.hostPid,
-                    (host.flags & OutRunVR::IpcV3::HostAlive) != 0,
-                    OutRunVR::HostProcess::IsAlive);
-                if (OutRunVR::EyeExtent::Valid(extent))
-                {
-                    // A portrait OpenXR PER-EYE swapchain is not a game/menu
-                    // canvas. Keep the landscape D3D9 source as the sole
-                    // coordinate owner for title/F11/game HUD; the host keeps
-                    // the independently sized XR eyes for final composition.
-                    // Feeding 2496x2688 into Game::screen_resolution caused
-                    // the 2026-10-26 F11/HUD regression and extra fill.
-                    if (extent.width <= extent.height)
-                    {
-                        spdlog::info(
-                            "VR SOURCE SPLIT: XR eye {}x{} is portrait/per-eye; keep landscape game/menu source {}x{} and use XR extent only in the host compositor",
-                            extent.width, extent.height,
-                            Game::screen_resolution->x,
-                            Game::screen_resolution->y);
-                        return;
-                    }
-                    Game::screen_resolution->x = static_cast<int>(extent.width);
-                    Game::screen_resolution->y = static_cast<int>(extent.height);
-                    *Game::D3DWindowed = 1;
-                    spdlog::info(
-                        "VR UNIFIED SOURCE: landscape XR extent {}x{} selected for explicit game-source auto mode, waited={}ms",
-                        extent.width, extent.height,
-                        static_cast<unsigned>(GetTickCount64() - startTick));
-                    return;
-                }
-            }
-            if (!Settings::VRUnifiedEyeMenuSource ||
-                GetTickCount64() - startTick >= 1250ull)
-                break;
-            Sleep(25);
-        }
         spdlog::info(
-            "VR UNIFIED SOURCE: XR eye not ready at game-config scale initialization; keep game source/menu {}x{} for this launch (no late CreateDevice resize)",
+            "VR RESOLUTION SPLIT: logical game/UI source stays {}x{}; physical D3D9Ex target will use live OpenXR eye extent at CreateDevice",
             Game::screen_resolution->x, Game::screen_resolution->y);
     }
-}
 
-class CommandLineArguments : public Hook
+class CommandLineArguments : public Hookclass CommandLineArguments : public Hook
 {
 	const static int Win32_CfgRead_Addr = 0xE4D0;
 

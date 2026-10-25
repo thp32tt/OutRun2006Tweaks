@@ -76,23 +76,42 @@ namespace OutRunVRD3D9ExUpgrade
             IDirect3D9Ex* ex, UINT adapter, D3DDEVTYPE type,
             const D3DPRESENT_PARAMETERS& params) noexcept
         {
-            // XR recommended per-eye size is NOT the game's source/backbuffer
-            // size. Keep menu/HUD/gameplay in the selected game coordinates
-            // and let the OpenXR host allocate and project each eye separately.
+            // This function resolves the PHYSICAL VR render target only.
+            // Game::screen_resolution remains the logical game/UI coordinate
+            // source so HUD/menu/F11 layout never inherits a portrait eye size.
             if (!ex || !Settings::VREnabled ||
-                (Settings::VRFollowGameResolution ||
-                 Settings::VRUnifiedEyeMenuSource) ||
-                !Settings::VRPreferD3D9Ex || !Settings::VRAutoRenderResolution ||
-                Settings::VRRenderWidth > 0 || Settings::VRRenderHeight > 0 ||
+                Settings::VRFollowGameResolution ||
+                !Settings::VRPreferD3D9Ex ||
                 !params.Windowed || GameResolutionExplicitOnCommandLine())
+                return {};
+
+            D3DCAPS9 caps{};
+            if (FAILED(ex->GetDeviceCaps(adapter, type, &caps)))
+                return {};
+            const OutRunVR::EyeExtent::Size capsSize{
+                caps.MaxTextureWidth, caps.MaxTextureHeight
+            };
+
+            const int manualW = Settings::VRRenderWidth;
+            const int manualH = Settings::VRRenderHeight;
+            const bool manualRequested = manualW > 0 || manualH > 0;
+            if (manualRequested)
+            {
+                if (manualW < 640 || manualH < 480 ||
+                    static_cast<std::int64_t>(manualW) * manualH > 16777216LL)
+                    return {};
+                return OutRunVR::EyeExtent::ResolveGame(
+                    {static_cast<std::uint32_t>(manualW),
+                     static_cast<std::uint32_t>(manualH)}, capsSize);
+            }
+
+            if (!Settings::VRAutoRenderResolution)
                 return {};
 
             OutRunVR::IpcV3::HostStateReader reader;
             OutRunVR::IpcV3::HostState host{};
             if (!reader.Read(host))
                 return {};
-            // Identical zero-wait admission at menu config and device init.
-            // Keep the additional GPU caps check only at CreateDevice.
             const auto extent = OutRunVR::EyeExtent::ResolveStartupForLiveHost(
                 {host.recommendedWidth[0], host.recommendedHeight[0]},
                 {host.recommendedWidth[1], host.recommendedHeight[1]},
@@ -101,14 +120,10 @@ namespace OutRunVRD3D9ExUpgrade
                 OutRunVR::HostProcess::IsAlive);
             if (!OutRunVR::EyeExtent::Valid(extent))
                 return {};
-            D3DCAPS9 caps{};
-            if (FAILED(ex->GetDeviceCaps(adapter, type, &caps)))
-                return {};
-            return OutRunVR::EyeExtent::ResolveGame(
-                extent, {caps.MaxTextureWidth, caps.MaxTextureHeight});
+            return OutRunVR::EyeExtent::ResolveGame(extent, capsSize);
         }
 
-        Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
+        Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;        Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
         std::atomic<bool> FirstUpgradeLogged{false};
         std::atomic<bool> FirstFallbackLogged{false};
         std::atomic<bool> ThirdPartyLogged{false};
@@ -873,11 +888,11 @@ namespace OutRunVRD3D9ExUpgrade
                     *device = static_cast<IDirect3DDevice9*>(deviceEx);
                     if (bindVrSource)
                     {
-                        Game::screen_resolution->x = static_cast<int>(xrSize.width);
-                        Game::screen_resolution->y = static_cast<int>(xrSize.height);
                         spdlog::info(
-                            "VR EYE RESOLUTION: 3D D3D9Ex render SOURCE uses XR eye {}x{} (previous 2D {}x{}) without waiting",
+                            "VR RESOLUTION SPLIT: physical D3D9Ex target={}x{} logical game/UI={}x{} originalCreate={}x{}",
                             xrSize.width, xrSize.height,
+                            Game::screen_resolution->x,
+                            Game::screen_resolution->y,
                             originalParams.BackBufferWidth,
                             originalParams.BackBufferHeight);
                     }

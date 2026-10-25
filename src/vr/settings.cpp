@@ -45,25 +45,21 @@ namespace Settings
         { "Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA", "8x MSAA (fallback 4x/2x; costly)" } };
     Setting<bool> VRTransparencySupersampling{ "VR", "TransparencySupersampling", false,
         "Enable extra NVIDIA transparency SSAA in VR (costly). Off by default; the original 2D Graphics setting is unchanged. Restart required." };
-    // Use the game's requested D3D9 backbuffer as the 2D/menu/HUD coordinate
-    // system. Virtual Desktop's streaming desktop resolution and OpenXR
-    // per-eye render extent are independent. Never hard-code the primary
-    // monitor's current pixels into Game::screen_resolution after game config.
-    // A paired VR RenderWidth/RenderHeight is still an explicit game override.
+    // VR render quality must never depend on the monitor/mirror resolution.
+    // Keep the game's logical 2D coordinate system separate from the physical
+    // D3D9Ex render target selected from OpenXR at CreateDevice.
     Setting<bool> VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,
-        "Compatibility experiment only. The game/menu source normally stays landscape at the configured game resolution; the OpenXR eye extent is compositor-only. Manual RenderWidth/Height and -width/-height still win. Restart required." };
-    Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", true,
-        "Keep the configured landscape game resolution as the D3D9/menu/HUD coordinate source while OpenXR uses its independent eye extent. Disable only for explicit source-resolution experiments. Restart required." };
-    Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", false,
-        "Experimental game-source auto sizing. Portrait OpenXR per-eye extents are never copied into the D3D9 game/menu source; manual RenderWidth/RenderHeight take precedence." };
-	// Optional explicit internal render resolution independent of the PC monitor.
-    // Auto (0/0) waits at the original game configuration hook for the
-    // live OpenXR host extent. If unavailable, keep the original game size;
-    // never change the source later after logical UI initialization.
+        "Legacy compatibility switch. Default off: menu/HUD/F11 coordinates are not replaced by the portrait OpenXR eye extent. Restart required." };
+    Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", false,
+        "Compatibility fallback. True makes the physical VR render target follow the game/desktop resolution. Default false so FHD monitors do not cap VR quality. Restart required." };
+    Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
+        "Default VR render policy: allocate the physical D3D9Ex render target from the live OpenXR/VDXR recommended per-eye extent, independent of the desktop mirror. Restart required." };
+	// Optional explicit physical VR render target, independent of PC monitor
+    // and independent of the logical 2D/HUD/menu coordinate reference.
     Setting<int> VRRenderWidth{ "VR", "RenderWidth", 0,
-        "Game/eye render width, independent of MenuScale. 0/0 = OpenXR startup auto (game size if unavailable); set with RenderHeight. Restart required.", Range<int>{ 0, 8192 } };
+        "Physical VR render-target width. 0/0 = OpenXR recommended eye extent; set with RenderHeight for an explicit override. Restart required.", Range<int>{ 0, 8192 } };
     Setting<int> VRRenderHeight{ "VR", "RenderHeight", 0,
-        "Game/eye render height, independent of MenuScale. 0/0 = OpenXR startup auto (game size if unavailable); set with RenderWidth. Restart required.", Range<int>{ 0, 8192 } };
+        "Physical VR render-target height. 0/0 = OpenXR recommended eye extent; set with RenderWidth for an explicit override. Restart required.", Range<int>{ 0, 8192 } };
     Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", true,
         "Fits the borderless PC mirror within the monitor even when the internal D3D9Ex source is larger. The game and OpenXR eye images are not resized." };
     Setting<bool> VRMirrorPreserveAspect{ "VR", "MirrorPreserveAspect", true,
