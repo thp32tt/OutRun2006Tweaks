@@ -27,8 +27,8 @@ def integrated(layout,header,bridge,producer,decoder,vs,ps):
         "float specular[4];",
         "DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40",
         "\"TEXCOORD\", 1, DXGI_FORMAT_R32G32_FLOAT, 0, 56",
-        "CreateInputLayout(elements, 5",
-        "static_assert(sizeof(NativeVertex) == 64u")) and
+        "CreateInputLayout(elements, 7",
+        "static_assert(sizeof(NativeVertex) == 96u")) and
       all(s in producer for s in (
         "!layout.hasSpecular",
         "stage1_operation_reads_specular(nextColorOp, color1, color2)",
