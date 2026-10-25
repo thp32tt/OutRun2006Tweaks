@@ -51,26 +51,9 @@ namespace OutRunVRD3D9ExUpgrade
         constexpr std::size_t CreateIndexBufferVtableIndex = 27;
 
         // No OpenXR calls or waits on the D3D9 thread. Both VDXR view
-        // slices must agree before choosing the real render source size.
-        bool GameResolutionExplicitOnCommandLine() noexcept
-        {
-            int argc = 0;
-            LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-            if (!argv)
-                return true;
-            bool explicitResolution = false;
-            for (int i = 1; i < argc; ++i)
-            {
-                if (_wcsicmp(argv[i], L"-width") == 0 ||
-                    _wcsicmp(argv[i], L"-height") == 0)
-                {
-                    explicitResolution = true;
-                    break;
-                }
-            }
-            LocalFree(argv);
-            return explicitResolution;
-        }
+        // slices must agree before choosing the real physical render target.
+        // Game -width/-height is deliberately NOT consulted here: it owns the
+        // logical/mirror presentation and must not cap headset render quality.
 
         OutRunVR::EyeExtent::Size ReadyXrEyeSizeAtCreateDevice(
             IDirect3D9Ex* ex, UINT adapter, D3DDEVTYPE type,
@@ -82,7 +65,7 @@ namespace OutRunVRD3D9ExUpgrade
             if (!ex || !Settings::VREnabled ||
                 Settings::VRFollowGameResolution ||
                 !Settings::VRPreferD3D9Ex ||
-                !params.Windowed || GameResolutionExplicitOnCommandLine())
+                !params.Windowed)
                 return {};
 
             D3DCAPS9 caps{};

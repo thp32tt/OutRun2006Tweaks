@@ -34,6 +34,7 @@ for token in ("Settings::VRFollowGameResolution",
 success=ex.split("if (SUCCEEDED(hr) && deviceEx)",1)[1].split(
     "UpdateCompatPresentationState",1)[0]
 assert "physical D3D9Ex target=" in success
+assert "GameResolutionExplicitOnCommandLine" not in resolver
 assert "Game::screen_resolution->x = static_cast<int>(xrSize.width)" not in success
 assert "Game::screen_resolution->y = static_cast<int>(xrSize.height)" not in success
 

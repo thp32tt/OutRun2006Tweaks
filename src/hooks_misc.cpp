@@ -834,8 +834,11 @@ namespace
         // is deliberately enabled.
         if (commandLineResolution)
         {
+            if (Settings::VRAutoRenderResolution &&
+                !Settings::VRFollowGameResolution)
+                OutRunVR::RequestVRHostStartup();
             spdlog::info(
-                "VR RESOLUTION SPLIT: explicit game/UI resolution {}x{} retained; physical VR target remains independently selected",
+                "VR RESOLUTION SPLIT: explicit game/UI resolution {}x{} retained; physical VR target remains independently selected from OpenXR",
                 Game::screen_resolution->x, Game::screen_resolution->y);
             return;
         }
