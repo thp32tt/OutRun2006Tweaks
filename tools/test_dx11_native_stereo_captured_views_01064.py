@@ -21,15 +21,15 @@ def integrated(s, r, h=header, rh=ring_header, helper=admission):
     # source_is_live entrypoint; never accidentally rewrite that helper
     # instead of NativeGameStereoSubmission's actual method declaration.
     expected_source_signature = (
-        "bool NativeGameStereoSubmission::source_is_live(\\n"
-        "    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,\\n"
-        "    ID3D11RenderTargetView* gameCapturedRtv,\\n"
+        "bool NativeGameStereoSubmission::source_is_live(\n"
+        "    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,\n"
+        "    ID3D11RenderTargetView* gameCapturedRtv,\n"
         "    bool requireCurrentlyBound) const noexcept"
-    ).replace("\\\\n", "\\n")
+    )
     expected_existing_signature = (
-        "DXGI_FORMAT NativeGameEyeDrawEncoder::offscreen_color_view_format(\\n"
+        "DXGI_FORMAT NativeGameEyeDrawEncoder::offscreen_color_view_format(\n"
         "    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept"
-    ).replace("\\\\n", "\\n")
+    )
     return all((
         expected_source_signature in s,
         expected_existing_signature in s,
