@@ -10,7 +10,7 @@
   "classification": "A+B",
   "work_key": "DX11:LIVE_GAME_PIXEL_NEUTRAL_BEFORE_MESH_ADMISSION",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
-  "status": "SOURCE_STAGE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -140,5 +140,45 @@
       "status": "success",
       "sha": "44a2133c649c1559a0f352000f5b4d5e9feb8852"
     }
-  ]
+  ],
+  "acceptance_results": {
+    "game_authored_source_continuity": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Existing exact-SHA DX11 Fast source regressions 00755/00764, first-game frame regressions and Win32 compilation passed. D3D9 source ordinals and native GPU behavior were not observed in an actual game session.",
+      "validation_command": "DX11 Fast 40213446254; Windows Build 40213449946",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_full_frame_empty_draw_00755.py",
+        "tools/test_dx11_game_clipped_draw_00764.py"
+      ]
+    },
+    "native_bounded_gpu_geometry": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Code-level native bounded mesh admission, shader/resource binding and Draw/DrawIndexed integration compiled and source regressions passed at validation SHA. No measured game-authored native Draw count or real scene parity.",
+      "validation_command": "DX11 Fast 40213446254; Windows Build 40213449946; Backend Conversion 40213446260",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_game_primitive_span_probe.cpp",
+        "tools/test_dx11_first_game_frame_regressions.py"
+      ]
+    },
+    "unsupported_writer_original_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Negative source tests preserve fail-closed native frame admission for invalid topologies and oversized pixel-producing draws. Original D3D9Ex, input and FFB unchanged by the submitted observer patch; physical fallback not retested.",
+      "validation_command": "DX11 Fast 40213446254; Backend Conversion 40213446260",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_first_game_frame_regressions.py",
+        "tools/test_dx11_game_clipped_draw_00764.py"
+      ]
+    },
+    "exact_sha_five_actions": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "The five required Actions concluded SUCCESS against exact SHA 44a2133c649c1559a0f352000f5b4d5e9feb8852: DX11 Fast 40213446254, Backend 40213446260, Windows Build 40213449946, OpenXR 40213449945, HUD 40213449964. No repeated build or real-game/HMD test.",
+      "validation_command": "GitHub Actions five required workflow runs at unchanged validation SHA",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01071.json"
+      ]
+    }
+  }
 }
