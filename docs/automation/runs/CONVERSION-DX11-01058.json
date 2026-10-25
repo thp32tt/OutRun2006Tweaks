@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:GAME_CPU_TILE_WRITE_TO_NATIVE_FRAME_CONTINUITY",
   "work_key": "DX11:GAME_CPU_GPU_TILE_WRITE_COHERENCE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "FEATURE_READY",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -93,8 +93,8 @@
   },
   "acceptance_results": {
     "late_gpu_tile_staging_recovery": {
-      "status": "PENDING_CI",
-      "evidence": "Source implementation committed at 192c19543b39ddbcdd81ae405e51691446b3a833; exact-SHA full Actions and runtime verification pending",
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Late D3D9 GPU cropped tile staging failure, full-source admission and native rectangle upload survive destructive source mutations; Fast Structural 40155776799 SUCCESS at exact SHA. Game/HMD UNTESTED.",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "tools/test_dx11_cpu_tile_admission_01057.py"
@@ -102,39 +102,91 @@
       "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
     },
     "full_source_budget_and_fail_closed": {
-      "status": "PENDING_CI",
-      "evidence": "Source implementation committed at 192c19543b39ddbcdd81ae405e51691446b3a833; exact-SHA full Actions and runtime verification pending",
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Original full readback cost/denial, late staging retry and original game fallback source-link regressions passed; Fast Structural 40155776799 SUCCESS. No runtime frame publication asserted.",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
-        "tools/test_dx11_cpu_tile_admission_01057.py"
+        "tools/test_dx11_tile_budget_01056.py",
+        "tools/test_dx11_surface_tile_readback_01055.py"
       ],
-      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+      "validation_command": "python tools/test_dx11_tile_budget_01056.py && python tools/test_dx11_surface_tile_readback_01055.py"
     },
     "tile_and_original_fallback_integration": {
-      "status": "PENDING_CI",
-      "evidence": "Source implementation committed at 192c19543b39ddbcdd81ae405e51691446b3a833; exact-SHA full Actions and runtime verification pending",
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Real-game D3D9 surface-copy to native D3D11 update/CopySubresourceRegion source integration and destructive fallback checks passed on exact SHA; runtime/FFB/HMD UNTESTED.",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_game_surface_copy_00886.py",
         "tools/test_dx11_cpu_tile_admission_01057.py"
       ],
-      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+      "validation_command": "python tools/test_dx11_game_surface_copy_00886.py && python tools/test_dx11_cpu_tile_admission_01057.py"
     },
     "mandatory_five_exact_sha": {
-      "status": "PENDING_CI",
-      "evidence": "Source implementation committed at 192c19543b39ddbcdd81ae405e51691446b3a833; exact-SHA full Actions and runtime verification pending",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX11 Fast 40155776799, Backend 40155776800, Windows Build 40155776804, OpenXR 40155776793 and HUD Inspector 40155776844 are all completed SUCCESS with exact validation-bearing SHA f941d0146f833b6bf1bab1d3e13ae316d1f9061d.",
       "evidence_paths": [
-        "src/vr/d3d11/live_game_frame_bridge.cpp",
-        "tools/test_dx11_cpu_tile_admission_01057.py"
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "docs/automation/runs/CONVERSION-DX11-01058.json"
       ],
-      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+      "validation_command": "GitHub Actions exact SHA readback: 40155776799 40155776800 40155776804 40155776793 40155776844"
     }
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "real_game_draw_blocker": "Actual native game menu/car/race draw, published frame and Quest3 playability UNTESTED",
-  "next_implementation_action": "Run five mandatory GitHub Actions on one exact SHA after 01057 historical metadata CI repair, then C6 bookkeeping only if all pass; keep runtime UNTESTED.",
+  "real_game_draw_blocker": "Live menu/car/race native D3D11 rendered frames and Quest3 hardware playback remain UNTESTED; C6 demonstrates built source, not playable VR.",
+  "next_implementation_action": "Source/C6 complete for 01058. Obtain an actual OutRun game/Quest3 run before asserting visible native frame gameplay; R175 TEXCOORD6 remains separately owned by 00477.",
   "runtime_note": "No real OutRun game, driver/FFB hardware or Quest3 HMD run. Source static regression is not visible native gameplay evidence.",
   "material_result_sha": "192c19543b39ddbcdd81ae405e51691446b3a833",
-  "validation_bearing_result_sha": null,
-  "feature_stage": "FEATURE_READY",
-  "ci_policy_repair_note": "Historical 01057 C6 acceptance had stale PENDING despite 5 SUCCESS, triggering 01058 backend gate 40155077386. Reconciled as an actual failing CI contract repair, not an additional 01057 scoring event."
+  "validation_bearing_result_sha": "f941d0146f833b6bf1bab1d3e13ae316d1f9061d",
+  "feature_stage": "C6_STATE",
+  "ci_policy_repair_note": "Historical 01057 C6 acceptance had stale PENDING despite 5 SUCCESS, triggering 01058 backend gate 40155077386. Reconciled as an actual failing CI contract repair, not an additional 01057 scoring event.",
+  "resolved_hold_reason": "C6_EXACT_SHA_GATES_SUCCESS",
+  "validation_history": [
+    {
+      "exact_sha": "192c19543b39ddbcdd81ae405e51691446b3a833",
+      "backend_run_id": 40155077386,
+      "result": "FAIL",
+      "cause": "01057 historical acceptance metadata remained PENDING after actual five exact-SHA success"
+    },
+    {
+      "exact_sha": "e71c758decd93009bf463eb818d67a3bd5e9940b",
+      "fast_run_id": 40155458838,
+      "result": "FAIL",
+      "cause": "01056 obsolete structural assertion rejected late full-readback helper"
+    },
+    {
+      "exact_sha": "35845d3327fdbcbe65a2cd7e5aca2cbd65624f47",
+      "fast_run_id": 40155610049,
+      "result": "FAIL",
+      "cause": "01055 obsolete tile fallback branch assertion"
+    },
+    {
+      "exact_sha": "07fda407d18d15e7717ab55460a36501548e699d",
+      "fast_run_id": 40155689672,
+      "result": "FAIL",
+      "cause": "00886 obsolete real-game surface-copy structural branch assertion"
+    },
+    {
+      "exact_sha": "f941d0146f833b6bf1bab1d3e13ae316d1f9061d",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Source integration and 5 mandatory GitHub Actions successful"
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "f941d0146f833b6bf1bab1d3e13ae316d1f9061d",
+    "dx11_fast_run_id": 40155776799,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 40155776800,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 40155776804,
+    "windows_build_conclusion": "success",
+    "openxr_architecture_run_id": 40155776793,
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_run_id": 40155776844,
+    "hud_inspector_conclusion": "success",
+    "windows_build_artifact_id": 12585015090,
+    "openxr_game_frame_artifact_id": 12584670712,
+    "validation_scope": "Five mandatory GitHub Actions and listed artifacts are confirmed on exact source SHA; separate VR PC Fast Test Build skipped. Original real-game frame / Quest3 runtime is UNTESTED. Material source SHA preserved from 01058's first commit; [skip ci] C6 metadata update does not change it.",
+    "runtime_validation": "UNTESTED"
+  }
 }
