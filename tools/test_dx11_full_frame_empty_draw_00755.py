@@ -17,12 +17,22 @@ def integrated(b: str, h: str) -> bool:
     before_span = section.find("game_native_primitive_element_count(")
     consume = section.find("s.frameBatch.absorb_empty_source_draw(")
     valid_type = section.find("type >= D3DPT_POINTLIST && type <= D3DPT_TRIANGLEFAN")
+    zero_branch = section.find("if (fullMode && primitives == 0u &&")
+    # A later proven offscreen/no-write Draw also consumes an empty ordinal.
+    # Only the ORIGINAL zero-count branch proves a zero primitive is safe;
+    # inspecting the entire prefix up to mesh validation let a destructive
+    # mutation of that first call escape via a later identical source string.
+    zero_end = section.find("        UINT expectedElements = 0;", consume)
+    if zero_end < 0:
+        # 01071: full-frame mesh admission moved after real pixel-neutral
+        # offscreen and clipped Draws. The zero primitive branch is unchanged.
+        zero_end = section.find("        // A successful game Draw/DrawIndexed whose enabled scissor", consume)
+    zero_case = section[zero_branch:zero_end] if 0 <= zero_branch < zero_end else ""
     return (0 <= section.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++")
-            < valid_type < consume < before_span and
-            "if (fullMode && primitives == 0u &&" in section and
-            "sourceOrdinal, sameSourceFullClear))" in section[consume:before_span] and
-            "s.clearColor.sourceDevice ==" in section and
-            "s.frameBatch.abort();" in section[consume:before_span] and
+            < valid_type < zero_branch <= consume < before_span and
+            "sourceOrdinal, sameSourceFullClear))" in zero_case and
+            "s.clearColor.sourceDevice ==" in zero_case and
+            "s.frameBatch.abort();" in zero_case and
             "s.frameBatch.abort();" in b[failed:present] and
             "if (!accepts_full(ordinal) ||" in h and
             "if (!sameSourceFullClear) return false;" in h and
