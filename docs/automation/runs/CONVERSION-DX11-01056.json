@@ -10,9 +10,9 @@
   "classification": "A",
   "feature_id": "DX11:AUTHENTIC_GPU_TILE_BURST_FRAME_PRESERVATION",
   "work_key": "DX11:MENU_CAR_RACE_POSTDRAW_TILE_BURST",
-  "status": "SOURCE_IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -120,7 +120,7 @@
   "next_implementation_action": "Validate five mandatory GitHub Actions on material SHA; fix any exact failure in same TASK_ID.",
   "runtime_note": "Actual game/Quest3 untested; source tests do not establish HMD performance or native full-frame gameplay.",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "adc1535bd13cdbfa65f385d5e44675da0fca6c7b",
   "validation_history": [
     {
       "exact_sha": "fcfcdb13f3e714821247b5ee7ab47c96128b5e82",
@@ -130,5 +130,21 @@
       "root_cause": "01053 historical structural assertion assumed unconditional full-source budget; changed source correctly distinguishes GPU tile from full fallback; 01056 standalone C++ exhaustion fixture loop count off by one.",
       "remediation": "Modify only inherited structural expected route + C++ negative fixture; keep full-source/preDraw, GPU-copy, fail-closed, 64-operation coverage."
     }
-  ]
+  ],
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_validation_evidence": {
+    "exact_sha": "adc1535bd13cdbfa65f385d5e44675da0fca6c7b",
+    "dx11_fast_run_id": 40147480499,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 40147480488,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 40147483931,
+    "windows_build_conclusion": "success",
+    "openxr_architecture_run_id": 40147483962,
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_run_id": 40147484032,
+    "hud_inspector_conclusion": "success",
+    "validation_scope": "Five mandatory GitHub Actions gates completed successfully on identical validation-bearing SHA; optional VR PC Fast Test Build skipped; no gameplay/Quest3/HMD run or source rebuild during C6 bookkeeping",
+    "runtime_validation": "UNTESTED"
+  }
 }
