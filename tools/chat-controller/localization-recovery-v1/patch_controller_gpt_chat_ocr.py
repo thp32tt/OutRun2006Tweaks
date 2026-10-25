@@ -24,7 +24,7 @@ def patch(source):
     old_import='from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool\n'
     new_import=(
       'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool, send_analysis_message_with_attachment\n'
-      'from app.gpt_vision_chat_ocr import next_binding as gpt_ocr_next_binding, stage_submission as gpt_ocr_stage_submission, rollback_submission as gpt_ocr_rollback_submission, record_chat_url as gpt_ocr_record_chat_url, active_task as gpt_ocr_active_task, apply_response as gpt_ocr_apply_response, summary as gpt_ocr_summary\n'
+      'from app.gpt_vision_chat_ocr import next_binding as gpt_ocr_next_binding, stage_submission as gpt_ocr_stage_submission, rollback_submission as gpt_ocr_rollback_submission, record_chat_url as gpt_ocr_record_chat_url, active_task as gpt_ocr_active_task, apply_response as gpt_ocr_apply_response, summary as gpt_ocr_summary, recover_stale_active as gpt_ocr_recover_stale_active\n'
     )
     s=replace_once(s,old_import,new_import,"imports")
     old='''    elif CONTROLLER_MODE == "localization" and slot.name == "C1":
@@ -88,20 +88,31 @@ def patch(source):
                     if answer:
                         break
             if not answer:
-                slot.last_result = "GPT_OCR_RESPONSE_NOT_READY"
+                stale = gpt_ocr_recover_stale_active()
+                if not stale.get("recovered"):
+                    slot.last_result = "GPT_OCR_RESPONSE_NOT_READY"
+                    save_registry(reg)
+                    write_runtime(status="gpt_ocr_waiting", last_action="C1 OCR: assistant response not visible yet")
+                    return
+                slot.last_result = "GPT_OCR_AUTO_RECOVERED:" + str(stale.get("status"))
                 save_registry(reg)
-                write_runtime(status="gpt_ocr_waiting", last_action="C1 OCR: assistant response not visible yet")
-                return
-            # The exact saved GPT-OCR chat is open, so a completed malformed
-            # answer is consumed as a failed attempt instead of stalling forever.
-            # apply_response still requires exact task_id/source_png binding.
-            applied = gpt_ocr_apply_response(gpt_active["task_id"], answer)
-            write_runtime(
-                status="gpt_ocr_response_applied",
-                last_action="C1 OCR applied " + str(applied.get("applied", 0)) + " crop(s)",
-                gpt_ocr_result=applied,
-                gpt_ocr_summary=gpt_ocr_summary(),
-            )
+                write_runtime(
+                    status="gpt_ocr_auto_recovered",
+                    last_action="C1 OCR auto-recovered stale response wait",
+                    gpt_ocr_recovery=stale,
+                    gpt_ocr_summary=gpt_ocr_summary(),
+                )
+            else:
+                # The exact saved GPT-OCR chat is open, so a completed malformed
+                # answer is consumed as a failed attempt instead of stalling forever.
+                # apply_response still requires exact task_id/source_png binding.
+                applied = gpt_ocr_apply_response(gpt_active["task_id"], answer)
+                write_runtime(
+                    status="gpt_ocr_response_applied",
+                    last_action="C1 OCR applied " + str(applied.get("applied", 0)) + " crop(s)",
+                    gpt_ocr_result=applied,
+                    gpt_ocr_summary=gpt_ocr_summary(),
+                )
 
         gpt_binding, gpt_reason = gpt_ocr_next_binding()
         if gpt_binding is not None:
