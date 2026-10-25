@@ -4645,12 +4645,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         const UINT rowBytes = compressed ?
             (std::max)(1u, (desc.Width + 3u) / 4u) *
                 compressedBlockBytes : desc.Width * sourceTexelBytes;
-        const UINT uploadPitch = mixedBump ? desc.Width * 8u :
-            (((packed16 || luminance) || rgb24 || rgbaSwizzle) ||
-              extendedLuma || rgb332 || p8 ? desc.Width * 4u : rowBytes);
+        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma || rgb332 || p8 ?
+            desc.Width * 4u : rowBytes;
+        // Preserve validated base game format paths; only mixed-bump mips widen.
+        const UINT mixedBumpUploadPitch = mixedBump ? desc.Width * 8u : uploadPitch;
         // Preserve existing format pitch contracts and only widen A8P8
         // (two source bytes per texel) to four-byte decoded native pixels.
-        const UINT a8p8UploadPitch = a8p8 ? desc.Width * 4u : uploadPitch;
+        const UINT a8p8UploadPitch = a8p8 ? desc.Width * 4u : mixedBumpUploadPitch;
         D3DLOCKED_RECT lock{};
         const HRESULT lockResult = gpuRenderTarget ?
             readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY) :
@@ -4660,7 +4661,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             dynamic_texture::readable_pitch(lock.Pitch, rowBytes);
         if (readable) {
             auto& pixels = copied[level];
-            pixels.resize(static_cast<std::size_t>(uploadPitch) * rows);
+            pixels.resize(static_cast<std::size_t>(mixedBumpUploadPitch) * rows);
             // Only palettized rows need widening beyond the source pitch.
             if (a8p8) pixels.resize(static_cast<std::size_t>(a8p8UploadPitch) * rows);
             const auto packing = base.Format == D3DFMT_R5G6B5 ?
@@ -4675,7 +4676,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             for (UINT y = 0; y < rows; ++y) {
                 const auto* source = static_cast<const std::uint8_t*>(lock.pBits) +
                                      static_cast<std::size_t>(y) * lock.Pitch;
-                auto* destination = pixels.data() + static_cast<std::size_t>(y) * uploadPitch;
+                auto* destination = pixels.data() + static_cast<std::size_t>(y) * mixedBumpUploadPitch;
                 if (a8p8)
                     destination = pixels.data() + static_cast<std::size_t>(y) * a8p8UploadPitch;
                 if (gpuRenderTarget) {

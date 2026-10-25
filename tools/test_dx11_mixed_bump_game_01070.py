@@ -11,7 +11,7 @@ def integrated(s,h):
         'nativeFormat = DXGI_FORMAT_R16G16B16A16_SNORM;',
         'nativeFormat == DXGI_FORMAT_R16G16B16A16_SNORM ||',
         'mixed_bump_texture::source_bytes_per_texel(mixedBumpLayout)',
-        'const UINT uploadPitch = mixedBump ? desc.Width * 8u :',
+        'const UINT mixedBumpUploadPitch = mixedBump ? desc.Width * 8u : uploadPitch;',
         'mixed_bump_texture::unpack_row(',
         'mirrorLiveSampler(capture, views[slot], samplers[slot])',
         'mirror_texture(device, captured, view, sampler)',
@@ -26,7 +26,7 @@ def integrated(s,h):
 assert integrated(src,hdr),"01070 native Draw material source graph not connected"
 negative=[
  (src.replace('nativeFormat = DXGI_FORMAT_R16G16B16A16_SNORM;','nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;',1),hdr),
- (src.replace('const UINT uploadPitch = mixedBump ? desc.Width * 8u :','const UINT uploadPitch = mixedBump ? desc.Width * 4u :',1),hdr),
+ (src.replace('const UINT mixedBumpUploadPitch = mixedBump ? desc.Width * 8u : uploadPitch;','const UINT mixedBumpUploadPitch = mixedBump ? desc.Width * 4u : uploadPitch;',1),hdr),
  (src.replace('mixed_bump_texture::unpack_row(','std::memcpy(',1),hdr),
  (src.replace('mixed_bump_texture::sampleable(','unsafe_sampleable(',1),hdr),
  (src,hdr.replace('f==117u ? Layout::cxv8u8','f==117u ? Layout::unsupported',1)),
