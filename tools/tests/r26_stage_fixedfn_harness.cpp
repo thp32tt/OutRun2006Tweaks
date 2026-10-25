@@ -16,6 +16,10 @@ using D3DPRIMITIVETYPE=int; using D3DFORMAT=int;
 constexpr int D3DPT_TRIANGLELIST=4, D3DFMT_INDEX16=101, D3DFMT_INDEX32=102;
 constexpr HRESULT E_NOTIMPL=-1, E_FAIL=-2, E_PENDING=-3, D3D_OK=0;
 constexpr int D3DZB_FALSE=0,D3DRS_ZENABLE=7,D3DTS_PROJECTION=3;
+constexpr int D3DRS_ALPHABLENDENABLE=27,D3DRS_SRCBLEND=19,D3DRS_DESTBLEND=20;
+constexpr DWORD D3DBLEND_SRCALPHA=5,D3DBLEND_INVSRCALPHA=6;
+enum class GameState { STATE_GAME=0, STATE_GOAL=20 };
+namespace Game { inline GameState goalState=GameState::STATE_GAME; inline GameState* current_mode=&goalState; }
 bool FAILED(HRESULT h){return h<0;} bool SUCCEEDED(HRESULT h){return h>=0;}
 struct D3DMATRIX { union {float m[4][4]; struct {float _11,_12,_13,_14,_21,_22,_23,_24,_31,_32,_33,_34,_41,_42,_43,_44;};};};
 D3DMATRIX IdentityMatrix(){D3DMATRIX x{};for(int i=0;i<4;++i)x.m[i][i]=1;return x;}
@@ -23,7 +27,7 @@ D3DMATRIX MultiplyMatrix(const D3DMATRIX&a,const D3DMATRIX&b){D3DMATRIX c{};for(
 bool MatrixFinite(const D3DMATRIX&m){for(auto&r:m.m)for(float v:r)if(!std::isfinite(v))return false;return true;}
 struct Viewport {DWORD X=0,Y=0,Width=1920,Height=1080;};
 namespace OutRunVR::GameSemantic {
-enum class RenderScope {None,ScreenHud,World,Projected};
+enum class RenderScope {None,ScreenHud,World,Projected,ScreenOverlay2D};
 enum class ProducerToken {None,StageExtensionTime,Goal,Rank,Lens};
 struct Command {RenderScope scope=RenderScope::ScreenHud;ProducerToken producer=ProducerToken::StageExtensionTime;bool queued=false;void*queueNode=nullptr;unsigned queueEpoch=0;
 bool IsExactFiniteResultHud()const{return scope==RenderScope::ScreenHud&&(producer==ProducerToken::StageExtensionTime||producer==ProducerToken::Goal);}};
@@ -35,6 +39,7 @@ bool CorroboratesHud(RenderScope s){return s==RenderScope::ScreenHud;}
 bool CorroboratesProjectedWorldMarker(RenderScope s){return s==RenderScope::Projected;}
 struct ScopedRenderSemantic {explicit ScopedRenderSemantic(RenderScope){}};
 ProducerToken CurrentQueueProducerToken(){return command.producer;}
+ProducerToken CurrentRenderProducerToken(){return command.producer;}
 void*CurrentProjectedMarker(){return nullptr;}
 const char*Name(ProducerToken){return "test";}
 }
@@ -47,6 +52,7 @@ struct IDirect3DDevice9 {
  int sets=0,failSet=0;bool failVs=false,failFvf=false;std::vector<D3DMATRIX>setMatrices;
  HRESULT GetVertexShader(IDirect3DVertexShader9**s){*s=vs;return failVs?E_FAIL:D3D_OK;}
  HRESULT GetFVF(DWORD*f){*f=fvf;return failFvf?E_FAIL:D3D_OK;}
+ HRESULT GetRenderState(int state,DWORD*v){if(state==D3DRS_ALPHABLENDENABLE)*v=1;else if(state==D3DRS_SRCBLEND)*v=D3DBLEND_SRCALPHA;else if(state==D3DRS_DESTBLEND)*v=D3DBLEND_INVSRCALPHA;else *v=0;return D3D_OK;}
  HRESULT GetViewport(Viewport*v){*v={};return D3D_OK;}
  HRESULT GetTransform(int,D3DMATRIX*m){*m=projection;return D3D_OK;}
  HRESULT SetTransform(int,const D3DMATRIX*m){++sets;setMatrices.push_back(*m);if(sets==failSet)return E_FAIL;projection=*m;return D3D_OK;}
@@ -90,7 +96,7 @@ template<class A,class B>HRESULT R30GuardScreenSpace(IDirect3DDevice9*,A,B b,con
 unsigned TopLevelDrawSerial(){return 1;}
 bool R30IsExactResultHudDraw(){return OutRunVR::GameSemantic::command.IsExactFiniteResultHud();}
 // @ACTUAL_R26_SOURCE@
-void reset(IDirect3DDevice9&d){d={};gameDevice=&d;receipts.clear();stereoTransactions=0;restoreFailures=0;currentEye=0;failEye=-1;FrameStereoIncomplete=false;InternalStereoPass=false;backbuffer=true;safeBase=true;configureValid=true;FrameStereoPoseSequence=7;OutRunVRRenderer::poseValid=true;CurrentVertexShaderIdentity=0;OutRunVR::GameSemantic::command={};OutRunVR::GameSemantic::ExternalOverlaySemanticDepth=0;}
+void reset(IDirect3DDevice9&d){d={};gameDevice=&d;receipts.clear();stereoTransactions=0;restoreFailures=0;currentEye=0;failEye=-1;FrameStereoIncomplete=false;InternalStereoPass=false;backbuffer=true;safeBase=true;configureValid=true;FrameStereoPoseSequence=7;OutRunVRRenderer::poseValid=true;CurrentVertexShaderIdentity=0;OutRunVR::GameSemantic::command={};OutRunVR::GameSemantic::ExternalOverlaySemanticDepth=0;Game::goalState=GameState::STATE_GAME;}
 float vertices[24]{};std::uint16_t indices[6]{};
 HRESULT call(int api,IDirect3DDevice9&d,UINT stride=24,D3DFORMAT fmt=D3DFMT_INDEX16){switch(api){case 0:return DrawPrimitiveDestR30(&d,4,11,2);case 1:return DrawIndexedPrimitiveDestR30(&d,4,9,3,8,7,2);case 2:return DrawPrimitiveUPDestR30(&d,4,2,vertices,stride);default:return DrawIndexedPrimitiveUPDestR30(&d,4,3,8,2,indices,fmt,vertices,stride);}}
 int main(){using namespace OutRunVR::GameSemantic;IDirect3DDevice9 d;int node=1;

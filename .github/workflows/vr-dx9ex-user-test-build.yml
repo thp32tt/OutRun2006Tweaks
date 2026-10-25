@@ -10,6 +10,8 @@ on:
     paths:
       - '.github/workflows/vr-dx9ex-user-test-build.yml'
       - 'tools/Run-DX9ExFocusTest.ps1'
+      - 'tools/verify_vr_r26_stage_fixedfn.py'
+      - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/hooks_uiscaling.cpp'
       - 'src/hooks_misc.cpp'
