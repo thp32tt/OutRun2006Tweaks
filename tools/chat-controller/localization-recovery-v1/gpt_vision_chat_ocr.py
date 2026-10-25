@@ -17,6 +17,7 @@ AUDIT_PATH=QUEUE_DIR/"audit.jsonl"
 VERSION="gpt-chat-vision-ocr-v1-20261025"
 OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
+RESPONSE_STALL_SECONDS=max(120,int(os.environ.get("OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS","600")))
 TASK_RE=re.compile(r"^OUTRUN-GPT-OCR-Q\d{3}-[A-F0-9]{8}(?:-R[12])?$")
 
 def _now():
@@ -160,6 +161,16 @@ def next_binding():
         raise ValueError("GPT_OCR_ACTIVE_STATE_INVALID")
     for row,phrases in _exhausted_candidates():
         fp=_fingerprint(row,phrases);used=int(st["attempts"].get(fp,0) or 0)
+        bridged=any(
+            isinstance(rec,dict) and rec.get("fingerprint")==fp and
+            rec.get("status")=="APPLIED_MCP_BRIDGE" and
+            int(rec.get("applied",0) or 0)>=len(phrases)
+            for rec in st.get("completed",[])
+        )
+        if bridged:
+            if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT:
+                st["attempts"][fp]=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT;_save_state(st)
+            continue
         if used>=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT: continue
         suffix="" if used==0 else f"-R{used}"
         task=f"OUTRUN-GPT-OCR-{row['png_filename'][:4]}-{fp[:8].upper()}{suffix}"
@@ -199,6 +210,30 @@ def record_chat_url(task_id,url):
 
 def active_task():
     a=_state().get("active");return dict(a) if isinstance(a,dict) else None
+
+def recover_stale_active(max_age_seconds=None):
+    """Release a stale ChatGPT response wait so one bad chat cannot stop the queue."""
+    threshold=RESPONSE_STALL_SECONDS if max_age_seconds is None else max(1,int(max_age_seconds))
+    st=_state();a=st.get("active")
+    if not isinstance(a,dict) or a.get("status")!="SENT_AWAITING_RESPONSE":
+        return {"status":"NO_STALE_RESPONSE_WAIT","recovered":False}
+    raw=a.get("sent_at") or a.get("submitting_at") or a.get("created_at")
+    try:
+        started=dt.datetime.fromisoformat(str(raw))
+        if started.tzinfo is None:started=started.replace(tzinfo=dt.timezone.utc)
+        age=(dt.datetime.now(dt.timezone.utc)-started.astimezone(dt.timezone.utc)).total_seconds()
+    except Exception:
+        age=threshold+1
+    if age<threshold:
+        return {"status":"RESPONSE_WAIT_WITHIN_LIMIT","recovered":False,"age_seconds":int(max(0,age))}
+    fp=a.get("fingerprint");used=int(st.get("attempts",{}).get(fp,0) or 0)
+    status="RESPONSE_TIMEOUT_RETRY" if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT else "RESPONSE_TIMEOUT_MAX_ATTEMPTS"
+    completed={"task_id":a.get("task_id"),"source_png":a.get("source_png"),"fingerprint":fp,
+      "status":status,"applied":0,"completed_at":_now(),"chat_url":a.get("chat_url"),
+      "age_seconds":int(max(0,age)),"attempts_used":used}
+    st["completed"].append(completed);st["completed"]=st["completed"][-500:];st["active"]=None
+    _save_state(st);_audit(completed)
+    return {**completed,"recovered":True}
 
 def _extract_json(text):
     if not isinstance(text,str) or not text.strip(): raise ValueError("GPT_OCR_RESPONSE_EMPTY")
