@@ -14,7 +14,18 @@ probe = root / "tools/dx11_extended_dirty_batch_probe_00767.cpp"
 
 def linked(text, hdr, selector):
     p = text.split("void before_game_present(", 1)[-1].split("void before_game_reset(", 1)[0]
+    # The original game readback and the guarded GPU RT fallback must
+    # BOTH occur before mapping native dirty tiles for atomic publication.
+    order = [p.find(token) for token in (
+        "auto seedMultiTileFromGame = [&]() noexcept -> bool {",
+        "if (!multiNativeUpload) return true;",
+        "game->GetRenderTargetData(",
+        "const NativeOutputUploadScope internalMultiSeedCopyScope{};",
+        "return s.surfaceReplayFull.capture(",
+        "seedMultiTileFromGame() &&",
+        "SUCCEEDED(s.insetSurface->LockRect(")]
     return all((
+        all(v >= 0 for v in order) and order == sorted(order),
         "kMaxPartitionRects = 32u" in hdr,
         "rectangleCount > kMaxPartitionRects" in hdr,
         "rectangleCount > GameNativeDirtyRegionCoverage::kMaxPartitionRects" in selector,
@@ -23,7 +34,9 @@ def linked(text, hdr, selector):
         "GameNativeDirtyRegionCoverage::covers_partition(" in p,
         "GameNativeDirtyRegionCoverage::covers_partition_crop(" in p,
         "const auto multiDirty = GameNativeMultiDirtyUpload::select(" in p,
-        "(!multiNativeUpload || SUCCEEDED(game->GetRenderTargetData(" in p,
+        "back.Get(), s.insetSurface.Get()))) return true;" in p,
+        "game, back.Get(), s.insetSurface.Get()," in p,
+        "bb.Width, bb.Height, bb.Format);" in p,
         "for (std::uint32_t i = 0u; i < multiDirty.count; ++i)" in p,
         "GameNativeFrameUpload::copy_rect(" in p,
         "s.insetSurface.Get(), &sourceTiles," in p,
@@ -37,9 +50,18 @@ assert not linked(bridge, dirty.replace("kMaxPartitionRects = 32u", "kMaxPartiti
 assert not linked(bridge.replace(
     "dirtyRegion->rdh.nCount <= GameNativeDirtyRegionCoverage::kMaxPartitionRects",
     "dirtyRegion->rdh.nCount <= 8u"), dirty, multi)
-assert not linked(bridge.replace(
-    "(!multiNativeUpload || SUCCEEDED(game->GetRenderTargetData(",
-    "(true || SUCCEEDED(game->GetRenderTargetData("), dirty, multi)
+# Reject removal of any real D3D9 source, scratch RT, hook-fence or
+# success-conditioned seed; a compile-only positive check is insufficient.
+for before, after in (
+    ("if (!multiNativeUpload) return true;", "if (true) return true;"),
+    ("game->GetRenderTargetData(", "game->NoD3D9Seed("),
+    ("const NativeOutputUploadScope internalMultiSeedCopyScope{};", "/* no R30 fence */"),
+    ("return s.surfaceReplayFull.capture(", "return skipReadback("),
+    ("seedMultiTileFromGame() &&", "true &&"),
+):
+    start = bridge.index("auto seedMultiTileFromGame = [&]() noexcept -> bool {")
+    changed = bridge[:start] + bridge[start:].replace(before, after, 1)
+    assert changed != bridge and not linked(changed, dirty, multi), before
 assert "python tools/test_dx11_extended_dirty_batch_00767.py" in workflow
 
 cxx = shutil.which("g++") or shutil.which("clang++")
