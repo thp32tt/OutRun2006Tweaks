@@ -1,0 +1,180 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01069",
+  "production_id": "CONVERSION-DX11-01069",
+  "event_id": "CONVERSION-DX11-01069-E001",
+  "event_type": "c6_bookkeeping",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01069",
+  "classification": "A",
+  "work_key": "DX11:NATIVE_BLOCK_COMPRESSED_GAME_TEXTURE_MIRROR",
+  "feature_id": "DX11:NATIVE_BLOCK_COMPRESSED_GAME_TEXTURE_MIRROR",
+  "status": "SOURCE_STAGE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "score_note": "DX11 BC texture extension is a source stage toward complete native rendering, not an independently completed full-frame menu/car/race functionality. Repairs, tests and C6 have no additional score.",
+  "summary": "Genuine game D3D9 shader-sampler DXT2/DXT4 premultiplied BC2/BC3 and ATI1/ATI2 BC4/BC5 BlockCompressed LockRect mip data admitted through per-Draw mirrored native D3D11 SRVs with byte/pitch and GPU budgets. Unsupported legacy sRGB remains fail closed, original game DX9Ex/input/FFB unchanged. Five mandatory GitHub Actions all succeeded on exact validation SHA; physical game/Quest3 untested.",
+  "material_result_sha": "f7eda5b8497dddac5f5809ac8c3f66527b34e79d",
+  "validation_bearing_result_sha": "ad29175b30afe0e87f38b0d52f7a38869ce27a59",
+  "implementation_commits": [
+    "f7eda5b8497dddac5f5809ac8c3f66527b34e79d"
+  ],
+  "repair_commits": [
+    "b0c96c1d9f65cf935f8b7563dd06e4763bb6935f",
+    "ad29175b30afe0e87f38b0d52f7a38869ce27a59"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_block_compressed_texture.hpp",
+    "tools/dx11_block_compressed_game_probe_01069.cpp",
+    "tools/test_dx11_block_compressed_game_01069.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01068.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_BLOCK_COMPRESSED_GAME_TEXTURE_MIRROR",
+    "goal": "Integrate source-authored D3D9 DXT2/DXT4/ATI1/ATI2 compressed game texture blocks into native D3D11 SM3/FVF game Draw/Indexed sampler resources with exact format, row/mip pitch and per-Draw budget, while retaining the original D3D9 fallback and no runtime promotion.",
+    "acceptance_items": [
+      {
+        "id": "block_pitch_and_gpu_format",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_FOURCC_TO_NATIVE_BC_GPU_MIP_UPLOAD",
+        "expected_behavior": "Preserve exact BC2/3/4/5 block data, padded row and mips through native shader sampler SRV upload."
+      },
+      {
+        "id": "live_shader_draw_bind",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_SM3_AND_FVF_DRAW_SAMPLER_BINDING",
+        "expected_behavior": "Per-game Draw and DrawIndexed use the genuine game texture's native BC SRV with exact copy budget."
+      },
+      {
+        "id": "fail_closed_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9EX_GAME_INPUT_AND_UNSUPPORTED_SRGB",
+        "expected_behavior": "Unknown FOURCC and legacy sRGB requests must never assert native equivalence; DX9Ex/input/FFB remains authoritative."
+      },
+      {
+        "id": "full_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_FIVE_GITHUB_ACTIONS",
+        "expected_behavior": "Unchanged DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD checks all pass at the exact validation-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "block_pitch_and_gpu_format": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Portable C++ BC block/mip/pitch probe and source-linked destructive negatives completed in 40203735242; no physical GPU/game visual parity asserted.",
+      "validation_command": "DX11 Fast Structural Checks 40203735242",
+      "evidence_paths": [
+        "tools/dx11_block_compressed_game_probe_01069.cpp",
+        "src/vr/d3d11/live_game_block_compressed_texture.hpp"
+      ]
+    },
+    "live_shader_draw_bind": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Native game bridge source graph via mirror_texture and real Draw/DrawIndexed paths passed full Windows/Backend CI. Runtime native draw count not observed.",
+      "validation_command": "Windows Build 40203735270 and Backend 40203735264",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_block_compressed_game_01069.py"
+      ]
+    },
+    "fail_closed_source_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Legacy sRGB rejection and destructive source regressions passed DX11 Fast on exact SHA; actual DX9Ex fallback/gamepad physical operation not retested.",
+      "validation_command": "DX11 Fast Structural Checks 40203735242",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_block_compressed_texture.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ]
+    },
+    "full_exact_sha_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Five mandatory GitHub Actions push runs concluded success on exact ad29175b30afe0e87f38b0d52f7a38869ce27a59, PC Fast skipped by design.",
+      "validation_command": "GitHub Actions exact SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml"
+      ]
+    }
+  },
+  "c6_validation_evidence": {
+    "exact_sha": "ad29175b30afe0e87f38b0d52f7a38869ce27a59",
+    "dx11_fast_run_id": 40203735242,
+    "backend_gate_run_id": 40203735264,
+    "windows_build_run_id": 40203735270,
+    "openxr_architecture_run_id": 40203735256,
+    "hud_inspector_run_id": 40203735232,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_conclusion": "success",
+    "runtime_validation": "UNTESTED"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_SHADER_TEXTURE_CAPTURE",
+      "BLOCK_EXACT_MIP_MIRROR",
+      "NATIVE_VS_PS_SAMPLER_SRV",
+      "NATIVE_DRAW_DRAWINDEXED",
+      "D3D9EX_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_block_compressed_texture.hpp",
+      "tools/dx11_block_compressed_game_probe_01069.cpp",
+      "tools/test_dx11_block_compressed_game_01069.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01069 portable C++ row/mip probe, source integration and five gates PASS",
+      "negative_regression": "01069 destructive sRGB/format/pitch/channel tests; inherited DXT source matcher real failure repaired without dropping negative mutations",
+      "component_integration": "D3D9 game GetTexture/LockRect -> BC SRV -> SM3/FVF native shader Draw/Indexed, rollback stays with source game D3D9Ex"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_BLOCK_COMPRESSED_GAME_TEXTURE_MIRROR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED_NOT_FULL_GAMEPLAY",
+    "activation_guard_and_fallback": "DX9Ex owns unknown formats and sRGB, original input/FFB unchanged; source native candidate not promoted without game/HMD validation."
+  },
+  "validation_history": [
+    {
+      "exact_sha": "f7eda5b8497dddac5f5809ac8c3f66527b34e79d",
+      "result": "FAIL_FAST_C6_PRIOR_RECORD",
+      "cause": "01068 inherited C6 source path list lacked required canonical graph stages"
+    },
+    {
+      "exact_sha": "b0c96c1d9f65cf935f8b7563dd06e4763bb6935f",
+      "result": "FAIL_BUILD_INHERITED_DXT_ASSERT",
+      "cause": "old DXT-only source string regression mismatched expanded legacy BC code; existing DXT support preserved"
+    },
+    {
+      "exact_sha": "ad29175b30afe0e87f38b0d52f7a38869ce27a59",
+      "result": "PASS_EXACT_SHA",
+      "cause": "all five required GitHub Actions concluded success; no runtime test performed"
+    }
+  ],
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; actual OutRun menu, car, race frame and Quest 3/VDXR gameplay not observed.",
+  "c6_bookkeeping_only": true
+}
