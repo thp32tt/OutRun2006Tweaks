@@ -134,3 +134,21 @@ Phase A (safe): GitHub Actions compiles an opt-in **diagnostic** with current `D
 Phase B (conditionally safe): Only after chronology and physical seat math are established, put a coherent per-Present `CockpitFrameDecision` behind `DriverSeatView` and apply it atomically to camera/vehicle/driver/near, with all stereo draws from one XR poseId; glass and hand animation remain separately gated by proven PMT/rig identity. Never use the existing synthetic `DriverSeatVehicleScale=1.15` as proof of APK geometry scale.
 
 **This research appendix is evidence-based design, not an applied or HMD-verified patch.**
+
+
+## 11. New end-to-end draw ownership oracle: PC event callback → player model → PMT leaf → glass state
+The public **PC-origin reconstruction**, **not the Quest author's original source**, now provides the missing typed route in `r4dius/outrun2-decomp`:
+- `src/platform/pc_scene_renderer.cpp::render_frame` builds `PcSceneDisplayServices`, dispatching the recorded event callback **`0x49F3E0` to `display_race_car()`**. A separate `0x49F500` callback invokes `display_car()`; ghost/robot/scene-effect callbacks are separate. It then delegates to `frame_render_449050`. This is a better **player-owner instrumentation point** than global material `EXE+0x4901`.
+- In the same source, `display_race_car` fetches separate **vehicle/camera/body** bytes from `vehicle_camera` and `body_view`, looks up `vehicle.u8(0x11)` for resource/model selection, ensures `VehicleResourceIds[model]` and shared bank `0xBB` are loaded, and calls `vehicle_race_display_46bd30` with `PcVehicleDisplayContext`.
+- The public `src/platform/pc_pmt_records.hpp` explicitly describes `DrawEntry` as 60 bytes: `+0x10 resource`, `+0x14 object`, `+0x18 node`, `+0x1C mesh`, `+0x20 pass`, `+0x24 colour_list`, `+0x28 colour`, `+0x34 flags`, `+0x38 id`. Quest AArch64 independently confirms **+0x20 pass==1** and **+0x34 flags bit1** are checked in its glass-specialized `Flush::draw_404700`; other field names are currently *PC-layout-correlated*, not separately byte-verified Quest ABI.
+- The public `src/platform/pc_render_flush.cpp::draw_404700` resolves `PmtObject` and `PmtMesh`; for each mesh primitive (`0x14` stride), reads `PmtPrimitive` then `PmtDraw` (`0x20` stride) by `e.pass`, resolves the material and group/shader, and submits the draw. Existing Quest glass alpha comparison resolves a `0x58` material and `0x48` colour record, consistent with PC PMT structures.
+- **Proposed exact diagnostic owner key**: `(presentEpoch, playerIdentity, resourceId, objectOffset, nodeOffset, meshOffset, primitiveIndex, pass, materialOffset, colourIndex, textureIdentifier, effectiveSrcBlend19, effectiveDstBlend20)`. Only a draw demonstrably descending from player `0x49F3E0` and qualifying the Quest glass gate can receive a candidate transparency adjustment; a raw material pointer by itself does not prove ownership.
+- Required separate verifications: native Quest's display dispatch really selects the same event role, flag bit1 writer/identity, polygon/UV of front and side windows, correct colour+texture alpha and per-eye depth. The public PC reconstruction alone is **not** a substitute for headset or original Quest binary tracing.
+
+Public comparison sources:
+- https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/pc_scene_renderer.cpp
+- https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/pc_pmt_records.hpp
+- https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/pc_render_flush.cpp
+- https://github.com/r4dius/outrun2-decomp/blob/main/src/driving/pc_race_camera.cpp
+
+This newly resolved queue path makes **per-car glass material ownership testable**, but is not yet proof of which triangle is windshield. `CODE_CHANGE=NO, BUILD=NOT_RUN, RUNTIME_VALIDATION=UNTESTED`.
