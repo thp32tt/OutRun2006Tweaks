@@ -139,7 +139,12 @@
       "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; actual OutRun game frames, native publication count, menu/car/race parity, Quest3/VDXR and FPS all UNTESTED.",
-    "activation_guard_and_fallback": "Native full game rendering remains opt-in/fail-closed, original D3D9Ex game/input/FFB/SkyGlow authoritative; DXVK frozen."
+    "activation_guard_and_fallback": "Native full game rendering remains opt-in/fail-closed, original D3D9Ex game/input/FFB/SkyGlow authoritative; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Existing 01077 exact-SHA DX11 Fast Gate 40242040791 compiled and exercised packed-FLOAT4 native instance byte budget C++ and real game source integration regression at validation SHA 8e7472e447f7b507863820c24f671938e0705ae1; no new runtime claim.",
+      "negative_regression": "Existing 01076/01077 negative tests reject invalid source stride, oversized one-instance native byte budget, invalid instance products and missing D3D9 source records; original D3D9Ex fallback remains authoritative.",
+      "component_integration": "Genuine source D3D9 SM3 INDEXEDDATA/INSTANCEDATA -> promoted FLOAT4 packed IA admission -> bounded native D3D11 VB/IB Draw or DrawIndexed; fail-closed D3D9Ex game/input/FFB/SkyGlow preserved. Full game and Quest3/VDXR UNTESTED."
+    }
   },
   "c6_bookkeeping_only": true,
   "c6_does_not_revalidate_source": true,

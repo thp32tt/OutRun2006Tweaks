@@ -2,6 +2,7 @@
 // Original D3D9 SM3 declaration streams, already shadowed in one physical
 // index order, become a single shader-visible D3D11 FLOAT4 vertex stream.
 #include "live_game_sm3_vertex_unpack.hpp"
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
