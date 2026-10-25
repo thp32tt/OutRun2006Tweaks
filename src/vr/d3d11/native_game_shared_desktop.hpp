@@ -84,8 +84,19 @@ public:
 
         D3D11_TEXTURE2D_DESC desc{};
         source->GetDesc(&desc);
+        // The game can render through a mipmapped BGRA camera texture or
+        // through an SRGB/typeless view of the same BGRA8 pixel storage.
+        // Its actual *mip-zero* game frame is the only valid desktop source.
+        // Typeless MSAA cannot be resolved without a proven typed view.
+        // Do not accept depth, unknown formats, CPU resources or an array
+        // with an ambiguous menu/race eye slice.
+        const bool typedBgra = desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
+            desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+        const bool compatibleColor = typedBgra ||
+            (desc.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS &&
+             desc.SampleDesc.Count == 1u);
         if (desc.Width != width || desc.Height != height ||
-            desc.Format != DXGI_FORMAT_B8G8R8A8_UNORM ||
+            !compatibleColor ||
             desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
             context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE)
             return false;
@@ -295,6 +306,16 @@ public:
             // Cache one non-MSAA GPU intermediate per output generation. The
             // existing EVENT fence protects it and the shared D3D9 allocation
             // from premature reuse; no CPU Map or readback is introduced.
+            // Source view format may change without replacing the original
+            // D3D9Ex backbuffer. Never reuse a differently typed resolve
+            // intermediate after a menu/car/race render-target transition.
+            if (resolvedSource_) {
+                D3D11_TEXTURE2D_DESC cached{};
+                resolvedSource_->GetDesc(&cached);
+                if (cached.Width != desc.Width || cached.Height != desc.Height ||
+                    cached.Format != desc.Format)
+                    resolvedSource_.Reset();
+            }
             if (!resolvedSource_) {
                 D3D11_TEXTURE2D_DESC resolved = desc;
                 resolved.MipLevels = 1u;
@@ -314,11 +335,22 @@ public:
                 resolvedSource_.Get(), 0u, source, 0u, desc.Format);
             readySource = resolvedSource_.Get();
         }
-        if (entire) {
+        // Whole-resource copies require an identical one-mip layout; a
+        // mipmapped game camera contains extra subresources and CopyResource
+        // would fail without copying any visible pixels. Transfer mip0
+        // explicitly, with the exact same bounded source rectangles used
+        // by cropped/dirty menu, selection and race Presents. BGRA8 SRGB
+        // and typeless sources share the UNORM destination's byte layout.
+        const bool exactWholeCopy = entire &&
+            desc.MipLevels == 1u &&
+            desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM;
+        if (exactWholeCopy) {
             context->CopyResource(source_.Get(), readySource);
         } else {
             for (std::uint32_t i = 0; i < regionCount; ++i) {
-                const RECT& tile = visibleRegions[i];
+                const RECT tile = entire
+                    ? RECT{0, 0, static_cast<LONG>(width), static_cast<LONG>(height)}
+                    : visibleRegions[i];
                 const D3D11_BOX region{
                     static_cast<UINT>(tile.left),
                     static_cast<UINT>(tile.top), 0u,
