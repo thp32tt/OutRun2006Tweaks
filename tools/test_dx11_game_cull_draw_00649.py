@@ -75,7 +75,6 @@ def sm3_fan_connected(src):
         "connectedCandidate ? connectedSubmission.drawCount : instanceCount",
         "game_sm3_connected_submission_plan(",
         "connectedSubmission.mode == GameSm3ConnectedSubmissionMode::invalid",
-        "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "game_sm3_expand_connected_instance_indices(",
         "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "liveBatch.record_source_draw(sourceOrdinal);",
