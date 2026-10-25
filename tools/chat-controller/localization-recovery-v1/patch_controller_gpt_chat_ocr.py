@@ -112,7 +112,9 @@ def patch(source):
                     else:
                         slot.url = new_url
                         save_registry(reg)
-            elif send_result.startswith("SOURCE_REFERENCE_NOT_BOUND:") or send_result.startswith("ANALYSIS_"):
+            elif (send_result == "SEND_UNVERIFIED" or
+                  send_result.startswith("SOURCE_REFERENCE_NOT_BOUND:") or
+                  send_result.startswith("ANALYSIS_")):
                 rb = gpt_ocr_rollback_submission(gpt_binding["task_id"], send_result)
                 if rb != "ROLLED_BACK_TO_STAGED":
                     send_result += ":ROLLBACK_FAILED:" + rb
