@@ -131,6 +131,25 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertIsNone(nxt)
         self.assertEqual(reason,"GPT_CHAT_OCR_QUEUE_EMPTY_OR_EXHAUSTED")
 
+    def test_response_extractor_upgrade_retries_timeout_only_fingerprint(self):
+        binding,_=g.next_binding()
+        fp=binding["fingerprint"]
+        st=g._state()
+        st["active"]=None
+        st["attempts"][fp]=2
+        st["completed"].append({
+            "task_id":binding["task_id"],"source_png":self.name,"fingerprint":fp,
+            "status":"RESPONSE_TIMEOUT_MAX_ATTEMPTS","applied":0
+        })
+        st["response_extractor_version"]="legacy-selector-v1"
+        g._save_state(st)
+        retry,reason=g.next_binding()
+        self.assertIsNone(reason)
+        self.assertEqual(retry["fingerprint"],fp)
+        self.assertEqual(retry["attempt_index"],0)
+        migrated=g._state()
+        self.assertEqual(migrated["response_extractor_version"],g.RESPONSE_EXTRACTOR_VERSION)
+
     def test_fenced_json_parser(self):
         ticks=chr(96)*3
         raw=ticks+"json\n"+json.dumps({"task_id":"X","source_png":"Y","detections":[]})+"\n"+ticks
