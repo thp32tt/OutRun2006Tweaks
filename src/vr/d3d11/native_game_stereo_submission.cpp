@@ -722,9 +722,7 @@ bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
 }
 
 DXGI_FORMAT NativeGameEyeDrawEncoder::offscreen_color_view_format(
-    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
-    ID3D11RenderTargetView* gameCapturedRtv,
-    bool requireCurrentlyBound) const noexcept {
+    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept {
     if (!source || offscreenColorProvenance_.untrackedGpuWrite)
         return DXGI_FORMAT_UNKNOWN;
     DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
@@ -2906,7 +2904,9 @@ bool NativeGameStereoSubmission::begin(
 }
 
 bool NativeGameStereoSubmission::source_is_live(
-    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept
+    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
+    ID3D11RenderTargetView* gameCapturedRtv,
+    bool requireCurrentlyBound) const noexcept
 {
     if (!context_ || !source) return false;
     Microsoft::WRL::ComPtr<ID3D11Device> contextDevice, sourceDevice;
