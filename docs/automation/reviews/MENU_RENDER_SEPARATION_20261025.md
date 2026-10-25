@@ -108,3 +108,30 @@ is unchanged. The actual host config function was additionally extracted and
 compiled against deterministic Win32 API shims: same-owner OpenProcess/path/
 missing-files failure, new PID/HWND reset, user precedence, explicit 1.0 and NaN
 cases pass. Final integrated CI remains required on the validation SHA.
+
+## Final build-verified result
+
+Validation SHA: `8b7e06ce68eff3cb74847a6a4ff88449913fda7d`.
+The final standalone R84 lens checker also referenced the retired C993 world
+hook; its current projected-source assertions and 73 destructive cases pass.
+No production lens/F11 changes were made during these validation-gate repairs.
+
+All exact-SHA gates succeeded:
+- DX9Ex Active 40195919150: policy, x86 R26 game, independent R84 comparison,
+  x64 host/no-HMD smoke and package.
+- Domain 40195919128; HUD Inspector 40195919024; Full Source 40195919174.
+- Whole-source inventory: 518 files scanned; cross-domain contract PASS.
+
+Active artifact 12599727417 (8,654,635 bytes) contains
+`OutRun2_VR_DX9EX_ACTIVE_8b7e06ce68ef.zip`.
+Inner ZIP SHA256: `BAB9E0CAF2C433368DFF1B067190F7E9310FE54F9CCEE83895B64A4EC61E98F0`.
+Artifact archive digest: `5280de8682368d27eb162e9c28dae9438c924c9747f186f69dd18663e3306409`.
+Package CI confirms the visible root START_DX9EX_TEST.cmd, required PS1 helpers,
+INI, same-source x86 game/x64 host, profile identity and rollback checks.
+This is a test candidate, not USER_RUNTIME_VERIFIED or a promoted HMD baseline.
+
+Extract the Active artifact's inner ZIP in the game folder and run
+START_DX9EX_TEST.cmd. Default R26+HUD/CURRENT_FOCUS is intended. Existing
+OutRun2006Tweaks.user.ini overrides base settings; use VR.MenuScale=1.00 or
+0.85 for optical A/B. Changing RenderWidth/RenderHeight requires restart.
+Submit the generated analysis ZIP after the Quest3/VDXR acceptance checks above.

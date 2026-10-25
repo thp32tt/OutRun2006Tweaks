@@ -8,9 +8,9 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "attempt": 1,
-  "status": "SOURCE_IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "LOCAL_TARGETED_PASS_CI_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "evidence": "docs/automation/reviews/MENU_RENDER_SEPARATION_20261025.md",
   "protected": [
@@ -31,8 +31,8 @@
     "73 of 75 resumed Active scripts PASS; composite now PASS; whole-source inventory deferred to complete GitHub checkout",
     "Extracted actual host config function compiled with deterministic Win32 API shims: same-owner OpenProcess/image-path/no-config failure, new HWND/PID reset, user precedence, explicit 1.0 and NaN PASS"
   ],
-  "next_action": "Verify final exact SHA Active, Domain, Inspector and Full Source; record package identity and runtime UNTESTED.",
-  "latest_verified_head": "c0bd73a333ded2056be37025c6ff652160acb39a",
+  "next_action": "User Quest3/VDXR test this exact Active ZIP: title/main MenuScale 1.0/0.85, selector width, race/HUD/F11, reset/recenter and selected source performance; attach generated analysis ZIP. Do not promote HMD baseline without matching evidence.",
+  "latest_verified_head": "86ad68c0e89fc2657f1d4b990ee13d27220ae924",
   "initial_material_sha": "b65c346da8481706f4bf80a42e41f011065950f2",
   "initial_ci": {
     "general": {
@@ -47,5 +47,106 @@
   },
   "followup": "same-owner config poll preserves accepted menu snapshot on process/path/no-config failure; no owner leakage",
   "implementation_sha": "74fdf953b197a0109fc83a807b5396e75f3b5aed",
-  "validation_gate_repair": "P0 composite verifier also contained superseded F11/C993 expectations and parsed a forward declaration as the next unrelated body. Updated current branches, retained negative controls, and fixed definition selection. Runtime lens/F11 code unchanged."
+  "validation_gate_repair": "P0 composite verifier also contained superseded F11/C993 expectations and parsed a forward declaration as the next unrelated body. Updated current branches, retained negative controls, and fixed definition selection. Runtime lens/F11 code unchanged.",
+  "result_sha": "8b7e06ce68eff3cb74847a6a4ff88449913fda7d",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "goal": "Decouple title/main menu optical size from game/XR source resolution without transition Reset",
+    "behavior_areas": [
+      "startup game source resolution",
+      "host title/main optical composition"
+    ],
+    "acceptance_items": [
+      {
+        "id": "resolution",
+        "description": "XR startup auto independent of provider preference, manual/CLI precedence and bounded fallback preserved",
+        "state": "TARGETED_PASS"
+      },
+      {
+        "id": "menu",
+        "description": "4:3 title/main optical MenuScale independent of source aspect; selectors and HUD preserved",
+        "state": "TARGETED_PASS"
+      },
+      {
+        "id": "failure",
+        "description": "same-owner failed lookup retains accepted menu config; new HWND/PID never inherits it",
+        "state": "TARGETED_PASS"
+      },
+      {
+        "id": "integration",
+        "description": "Exact-SHA Windows R26 game, R84 compile comparison, x64 host, Active package, Domain, Inspector and Full Source",
+        "state": "PASS_EXACT_SHA"
+      }
+    ]
+  },
+  "superseded_validation_runs": [
+    {
+      "sha": "b65c346da8481706f4bf80a42e41f011065950f2",
+      "run_id": 40173837089,
+      "reason": "legacy C993 GPU verifier expected retired world owner"
+    },
+    {
+      "sha": "74fdf953b197a0109fc83a807b5396e75f3b5aed",
+      "run_id": 40195398274,
+      "reason": "composite P0 duplicated superseded F11/C993 assertions"
+    },
+    {
+      "sha": "a6fbfac651484313a8d77fe2163efd756f3968bf",
+      "run_id": 40195699375,
+      "reason": "final standalone R84 lens checker expected retired C993 world hook"
+    }
+  ],
+  "validation_runs": {
+    "active": {
+      "run_id": 40195919150,
+      "head_sha": "8b7e06ce68eff3cb74847a6a4ff88449913fda7d",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40195919150"
+    },
+    "domain": {
+      "run_id": 40195919128,
+      "head_sha": "8b7e06ce68eff3cb74847a6a4ff88449913fda7d",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40195919128"
+    },
+    "hud_inspector": {
+      "run_id": 40195919024,
+      "head_sha": "8b7e06ce68eff3cb74847a6a4ff88449913fda7d",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40195919024"
+    },
+    "full_source": {
+      "run_id": 40195919174,
+      "head_sha": "8b7e06ce68eff3cb74847a6a4ff88449913fda7d",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40195919174"
+    }
+  },
+  "updated_utc": "2026-10-25T13:15:06.808496+00:00",
+  "remaining_limitations": [
+    "No separate fixed-resolution physical menu render target; Desktop Duplication still bounds menu sampling quality.",
+    "INI filesystem reads are not atomic across simultaneous base/user writes.",
+    "No headset optical, reset/recenter or FPS acceptance claimed."
+  ],
+  "package": {
+    "artifact_id": 12599727417,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-8b7e06ce68eff3cb74847a6a4ff88449913fda7d",
+    "artifact_archive_sha256": "5280de8682368d27eb162e9c28dae9438c924c9747f186f69dd18663e3306409",
+    "zip": "OutRun2_VR_DX9EX_ACTIVE_8b7e06ce68ef.zip",
+    "zip_sha256": "BAB9E0CAF2C433368DFF1B067190F7E9310FE54F9CCEE83895B64A4EC61E98F0",
+    "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40195919150/artifacts/12599727417",
+    "validation": "Active package job 121178681747 PASS; CMD/PS1/INI/x86 R26 DLL/x64 host, exact source SHA, selected DLL and rollback contracts",
+    "default": "R26_HUD_DEFAULT_CMAKE_OPTIONS",
+    "runtime": "UNTESTED"
+  },
+  "score_event": {
+    "key": "USER-DX9EX-MENU-RENDER-SEPARATION-20261025",
+    "delta": 1,
+    "basis": "one completed menu/source separation functional outcome; no separate credit for cache/test/CI repairs",
+    "ledger": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md",
+    "publication": "CONFIRMED",
+    "previous": 1961,
+    "cumulative": 1962,
+    "ledger_commit": "9ac1f027898b7800ef2362ea5ced1d19768bbf26"
+  }
 }
