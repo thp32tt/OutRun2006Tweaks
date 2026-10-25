@@ -13,7 +13,11 @@ assert copy.index('const auto region = preDrawCopy') < copy.index('s.surfaceRepl
 assert 'const bool tileCandidate = !preDrawCopy' in copy
 assert 'if (tileCandidate) {' in copy
 assert 'tileSucceeded = s.surfaceReplayTile.capture(' in copy
-assert 'if (!tileSucceeded) {' in copy
+assert 'auto prepareFullReadback = [&]() noexcept -> bool {' in copy
+assert 'if (!tileSucceeded && !prepareFullReadback()) return false;' in copy
+assert 'if (!tileSucceeded || !prepareFullReadback()) return false;' in copy
+assert copy.index('if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))') < copy.index('game->GetRenderTargetData(')
+assert copy.index('game->GetRenderTargetData(') < copy.index('if (!tileSucceeded && !prepareFullReadback()) return false;')
 assert 'game->GetRenderTargetData(' in copy
 assert 'readback->LockRect(' in copy
 assert 'readback->UnlockRect()' in copy
