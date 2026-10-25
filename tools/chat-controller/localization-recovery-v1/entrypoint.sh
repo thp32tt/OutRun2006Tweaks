@@ -10,6 +10,14 @@ python /opt/outrun/app/v2_automation_policy.py \
 
 mkdir -p /data/browser-profile /data/state /logs /tmp/.X11-unix
 
+# Repair read permissions left by older root-run C workers. These JSON files
+# contain localization/OCR metadata only; no browser credentials or secrets.
+C_OCR_REPORT="/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd108_ocr"
+if [[ -d "$C_OCR_REPORT" ]]; then
+  find "$C_OCR_REPORT" -type d -exec chmod 0755 {} + 2>/dev/null || true
+  find "$C_OCR_REPORT" -type f -name '*.json' -exec chmod 0644 {} + 2>/dev/null || true
+fi
+
 # Only clean after the previous container's Chrome is gone.
 # Do not delete Cookies, Local Storage, IndexedDB or the saved registry.
 if [[ "${CHROME_RECYCLE_ENABLED:-false}" == "true" ]]; then
