@@ -37,8 +37,10 @@ def linked(b, h, r):
         "desc.MultiSampleType != D3DMULTISAMPLE_NONE",
         "game->GetRenderTargetData(",
         "tileSucceeded = s.surfaceReplayTile.capture(",
-        "if (!tileSucceeded) {",
+        "if (!tileSucceeded && !prepareFullReadback()) return false;",
         "if (!s.surfaceReplayBudget.admits(desc.Width,desc.Height))",
+        "if (!tileSucceeded || !prepareFullReadback()) return false;",
+        "tileSucceeded=false;",
         "if (tileSucceeded) readback=s.surfaceReplayTile.staging();",
         "readback=s.surfaceReplayReadback.Get();",
         "GameNativeSurfaceTilePlan::source_x(region, tileSucceeded)",
@@ -121,7 +123,7 @@ replay_body = bridge[replay_begin:replay_end]
 for token in (
     # Mutation of either crop or fallback disconnects native integration.
     "tileSucceeded = s.surfaceReplayTile.capture(",
-    "if (!tileSucceeded) {",
+    "if (!tileSucceeded && !prepareFullReadback()) return false;",
     "GameNativeSurfaceTilePlan::source_x(region, tileSucceeded)",
     "GameNativeSurfaceTilePlan::source_y(region, tileSucceeded)",
     "readback=s.surfaceReplayReadback.Get();",
