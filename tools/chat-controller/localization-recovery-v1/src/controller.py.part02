@@ -1,4 +1,4 @@
-        log.exception("failed to inspect previous slot")
+log.exception("failed to inspect previous slot")
         return True
 
 
@@ -12,8 +12,10 @@ async def last_assistant_text(page: Page) -> str:
         try:
             loc = page.locator(sel)
             count = await loc.count()
-            if count:
-                return (await loc.nth(count - 1).inner_text(timeout=2000)).strip()
+            for idx in range(count - 1, -1, -1):
+                text = (await loc.nth(idx).inner_text(timeout=2000)).strip()
+                if text:
+                    return text
         except Exception:
             continue
     return ""
@@ -627,5 +629,3 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page], scheduled_m
         slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
     )
     log.info("sent slot=%s fresh=%s runs=%s url=%s", slot.name, FRESH_CHAT_EACH_RUN, slot.runs, slot.url)
-
-
