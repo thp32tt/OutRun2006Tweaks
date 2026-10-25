@@ -127,6 +127,15 @@ if [[ "${OUTRUN_CROP_ENABLED:-true}" == "true" ]]; then
   ) &
 fi
 
+# GPT OCR response watchdog: never let one browser response wait block the queue.
+if [[ "${OUTRUN_GPT_CHAT_OCR_ENABLED:-true}" == "true" ]]; then
+  (
+    while sleep "${OUTRUN_GPT_OCR_WATCHDOG_SECONDS:-60}"; do
+      python -c 'from app.gpt_vision_chat_ocr import recover_stale_active; import json; print(json.dumps(recover_stale_active(), ensure_ascii=False))'         >>/logs/gpt-ocr-watchdog.log 2>&1 || true
+    done
+  ) &
+fi
+
 if [[ "${OUTRUN_ROI_BRIDGE_ENABLED:-true}" == "true" ]]; then
   echo "$(date -Is) verifying initial native crop -> ImageGen queue sync" >>/logs/roi-bridge.log
   # Complete one fail-closed sync before AUTO_SEND controller startup. This
