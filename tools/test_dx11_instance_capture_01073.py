@@ -53,5 +53,5 @@ for mutation in (
     changed = hooks.replace(mutation, "REMOVED_FOR_NEGATIVE_REGRESSION")
     assert changed != hooks and not connected(changed, bridge, contract), mutation
 assert not connected(hooks, bridge.replace(
-    "game_sm3_assemble_instanced_streams(", "REMOVED_ASSEMBLER(", 1), contract)
+    "game_sm3_assemble_instanced_streams(", "REMOVED_ASSEMBLER("), contract)
 print("01073 real game four-route instance-rate capture + native SM3 integration PASS")
