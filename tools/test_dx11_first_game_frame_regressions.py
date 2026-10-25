@@ -1419,9 +1419,11 @@ def main() -> None:
         return all(token in producer for token in (
             "const bool compressed = base.Format == D3DFMT_DXT1 ||",
             "base.Format == D3DFMT_DXT3 ||",
-            "base.Format == D3DFMT_DXT5;",
+            "base.Format == D3DFMT_DXT5 || legacyBlock;",
             "if ((base.Width & 3u) || (base.Height & 3u)) return false;",
-            "(base.Format == D3DFMT_DXT1 ? 8u : 16u) :",
+            "const UINT compressedBlockBytes = legacyBlock ?",
+            "(base.Format == D3DFMT_DXT1 ? 8u : 16u);",
+            "const UINT atlasBlockBytes = compressed ? compressedBlockBytes : 0u;",
             "(std::max)(1u, (desc.Width + 3u) / 4u) *",
             "const UINT rows = compressed ? (std::max)(1u, (desc.Height + 3u) / 4u) : desc.Height;",
             "DXGI_FORMAT_BC1_UNORM",
