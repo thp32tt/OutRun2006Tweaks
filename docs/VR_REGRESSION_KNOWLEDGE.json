@@ -435,7 +435,7 @@
     {
       "key": "VR-F11-OVERLAY-DIPLOPIA-001",
       "title": "F11 Tweaks ImGui overlay doubles after entering gameplay",
-      "status": "REOPENED_SOURCE_FIXED_NEED_EXACT_CI_AND_HMD",
+      "status": "REOPENED_CANDIDATE_NEED_EXACT_CI_AND_HMD",
       "severity": "visual-correctness",
       "firstKnownWindowKst": "2026-10-04",
       "lastObservedKst": "2026-10-26",

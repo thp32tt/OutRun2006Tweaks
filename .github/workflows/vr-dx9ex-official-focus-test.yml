@@ -1,6 +1,6 @@
 name: DX9Ex OFFICIAL FOCUS R26 HUD Test and Debug
 
-# USER-DX9EX-LOG-FOLLOWTHROUGH-20261026: full-eye F11 raster and exact-source validation.
+# USER-DX9EX-LOG-FOLLOWTHROUGH-20261026: full-eye F11 raster, reopened-runtime status and exact-source validation.
 
 permissions:
   contents: read
