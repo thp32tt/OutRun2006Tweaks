@@ -155,3 +155,21 @@ Public comparison sources:
 - https://github.com/r4dius/outrun2-decomp/blob/main/src/driving/pc_race_camera.cpp
 
 This newly resolved queue path makes **per-car glass material ownership testable**, but is not yet proof of which triangle is windshield. `CODE_CHANGE=NO, BUILD=NOT_RUN, RUNTIME_VALIDATION=UNTESTED`.
+
+
+## 12. Quest tracked controller → cockpit hand input (bounded Ghidra output, partially reconstructed)
+Native `outrun::quest::XrRig::locate_hands(long,TouchFrame&)` ELF `0x2D67CC` (Ghidra +0x100000); local corrected Ghidra output `apk/_analysis_focus/correctbase_more_20261025/locate_hands.c.txt`:
+- The function **first clears both hand-valid bytes** at `TouchFrame +0x74/+0x75`. It requires active XR session and prior XR-centering state; a lost hand does not intentionally preserve a previous valid flag.
+- Independently reads left/right action spaces at `XrRig+0x98` and `XrRig+0xA0`, and calls space-location logic for predicted sample time.
+- For each successful locate with tested location flag mask **`(flags & 0xB)==0xB`** (this is the exact native code predicate; OpenXR bit semantics must be read against the actual flags), it applies the same XR origin inverse/composition helpers and writes one transformed hand pose into the `TouchFrame`.
+- The left/right output pose ranges are approximately `TouchFrame+0x3C..0x57` and `+0x58..0x73`; after successful commit it sets `TouchFrame[0x74]=1` or `TouchFrame[0x75]=1` separately. These are game-specific frame offsets, **not Windows EVWORK offsets**.
+- This proves a *two-hand location producer* with per-hand validity checks. It does **not** by itself prove the mapping from those poses to driver skeleton joints, steering wheel rotation or MOZA wheel feedback. Trace the `TouchFrame` reader(s) in native occupant draw next; do not infer that hand tracking can be enabled from these output fields alone.
+
+## 13. Research-only typed car/camera ABI bridge now available
+`docs/research/quest_cockpit_vehicle_b0_f0_typed_bridge_20261025.hpp`:
+- C++ `static_assert` checks `sizeof(D3DMATRIX)==64`, `offsetof(EVWORK_CAR,matrix_B0)==0xB0`, `offsetof(EVWORK_CAR,matrix_F0)==0xF0`, `offsetof(EvWorkCamera,cam_mode_34A)==0x34A`.
+- `CaptureVehicleMatrices` reads both immutable matrices from **one** player and validates finite elements + camera mode1 **without modifying the game data**.
+- `ComputeNativeBodyCorrection` delegates to the separately recorded 211-operation Quest source reconstruction, making the physical data owner explicit.
+- The type checks and bridge file have **not** been compiled here. They are not a live hook, not an HMD runtime feature, and cannot resolve the Quest vtable's exact identity alone.
+
+**Current implementation boundary:** snapshot/source ownership and correction input types are strongly cross-verified; the remaining work is Quest provider concrete vtable confirmation, matching render-frame timing and guest-to-PC layout, tracking per-eye view and occupant consumer order, runtime visual calibration and vehicle-specific glass mesh classification.
