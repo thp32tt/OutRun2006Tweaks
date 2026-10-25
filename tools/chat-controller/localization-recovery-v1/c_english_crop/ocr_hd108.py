@@ -21,6 +21,7 @@ ZIP=BASE/"hd_original_108_zip_inbox/OutRun_ALL_HD_Korean_Source_PNG_PART01_of_05
 RECEIPT=BASE/"hd108_import_receipt.json"
 REPORT=BASE/"hd108_ocr"
 OUT=BASE/"hd108_outputs"
+GPT_OUT=BASE/"gpt_vision_chat_ocr_outputs"
 
 def digest(path):
  h=hashlib.sha256()
@@ -56,22 +57,27 @@ def _row_phrases(row):
 
 
 def _covered_codes(row, out_root=OUT):
- sourceout=out_root/Path(row["png_filename"]).stem
+ roots=[Path(out_root)]
+ # Production coverage includes accepted GPT chat vision crops.
+ # Explicit test/custom roots remain isolated from host GPT state.
+ if Path(out_root)==OUT:
+  roots.append(GPT_OUT)
  covered=set()
- if not sourceout.is_dir():
-  return covered
- for saved in sourceout.glob("*/manifest.json"):
-  try:
-   j=json.loads(saved.read_text(encoding="utf-8"))
-   if j.get("source_sha256")!=row["png_sha256"]:
-    continue
-   en=j.get("english")
-   if isinstance(en,str) and en.strip():
-    covered.add(ocr.norm(ocr.searchable_phrase(en)))
-  except (OSError,ValueError,TypeError):
+ for root in roots:
+  sourceout=root/Path(row["png_filename"]).stem
+  if not sourceout.is_dir():
    continue
+  for saved in sourceout.glob("*/manifest.json"):
+   try:
+    j=json.loads(saved.read_text(encoding="utf-8"))
+    if j.get("source_sha256")!=row["png_sha256"]:
+     continue
+    en=j.get("english")
+    if isinstance(en,str) and en.strip():
+     covered.add(ocr.norm(ocr.searchable_phrase(en)))
+   except (OSError,ValueError,TypeError):
+    continue
  return covered
-
 
 def _coverage(row, out_root=OUT):
  phrases=_row_phrases(row)
