@@ -98,20 +98,45 @@
   },
   "acceptance_results": {
     "postdraw_cpu_ticket": {
-      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
-      "evidence": "C++ modeled source bytes plus destructive source integration check; exact full CI pending"
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Source-link plus C++ ticket fixture PASS on DX11 Fast Structural Checks 40151267938 at exact source SHA 5b96310396ef824fb9ac67b66d01d5ffe6858026. Does not assert real game/HMD.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_cpu_tile_admission.hpp",
+        "tools/dx11_native_cpu_tile_admission_01057.cpp",
+        "tools/test_dx11_cpu_tile_admission_01057.py"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
     },
     "full_source_and_rejection": {
-      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
-      "evidence": "Exact full fallback after cropped RT failure preserved"
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Authenticated full-source fallback and denial check covered by 01057 source regression in exact-SHA fast run 40151267938. Hardware untested.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_cpu_tile_admission_01057.py",
+        "tools/test_dx11_burst_surface_copy_01053.py"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
     },
     "input_compatibility": {
-      "status": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
-      "evidence": "Original D3D9 game HRESULT and fallback unaffected; HMD not run"
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Buildable source fixture and unchanged original D3D9-fallback source path validated in 40151267938; runtime controller/FFB/Quest3 not exercised.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_native_cpu_tile_admission_01057.cpp",
+        "tools/test_dx11_cpu_tile_admission_01057.py"
+      ],
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_cpu_tile_admission_01057.cpp -o /tmp/dx11_cpu_tile_01057 && /tmp/dx11_cpu_tile_01057"
     },
     "required_five_exact_sha": {
-      "status": "PENDING",
-      "evidence": "Material SHA awaits GitHub Actions"
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Five completed SUCCESS workflow runs independently read back at 5b96310396ef824fb9ac67b66d01d5ffe6858026; separate RUNTIME_VALIDATION UNTESTED.",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01057.json",
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml"
+      ],
+      "validation_command": "GitHub Actions exact-SHA run checks: 40151267938 40151268055 40151267946 40151268024 40151267923"
     }
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -135,5 +160,6 @@
     "hud_inspector_conclusion": "success",
     "validation_scope": "Five mandatory GitHub Actions passed on the exact validation-bearing source SHA; optional VR PC Fast Test Build skipped; no game/Quest3/HMD execution, source changes or CI reruns during C6 bookkeeping.",
     "runtime_validation": "UNTESTED"
-  }
+  },
+  "ci_policy_repair_note": "01058 Backend Gate 40155077386 failed solely on stale 01057 terminal acceptance statuses after genuine five-SHA SUCCESS. This field reconciles source/CI proof only; runtime and playability remain UNTESTED."
 }

@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01058",
+  "production_id": "CONVERSION-DX11-01058",
+  "event_id": "CONVERSION-DX11-01058-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01058",
+  "classification": "A",
+  "feature_id": "DX11:GAME_CPU_TILE_WRITE_TO_NATIVE_FRAME_CONTINUITY",
+  "work_key": "DX11:GAME_CPU_GPU_TILE_WRITE_COHERENCE",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "FEATURE_READY",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "After a real D3D9 GPU tile capture succeeds but LockRect, staging row pitch, or UnlockRect fails, retry through one budget-admitted full original D3D9 source readback before publishing the native D3D11 frame.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_cpu_tile_admission_01057.py",
+    "docs/automation/runs/CONVERSION-DX11-01058.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:GAME_CPU_TILE_WRITE_TO_NATIVE_FRAME_CONTINUITY",
+    "goal": "Recover a late CPU staging failure in the authentic D3D9 tile capture by a properly budgeted full readback so native game menu-to-race frame copying cannot silently drop that valid game region.",
+    "acceptance_items": [
+      {
+        "id": "late_gpu_tile_staging_recovery",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_GAME_TO_NATIVE_FRAME",
+        "expected_behavior": "Late LockRect, pitch, or UnlockRect failure in a successful GPU tile capture retries once from original D3D9 full source before native UpdateSubresource"
+      },
+      {
+        "id": "full_source_budget_and_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "GPU_READBACK_BUDGET_ORIGINAL_GAME",
+        "expected_behavior": "If the full readback byte budget or actual transfer is unavailable no native frame is published and the original D3D9 game output remains intact"
+      },
+      {
+        "id": "tile_and_original_fallback_integration",
+        "category": "fallback_regression",
+        "behavior_area": "NATIVE_GAME_TICKET_AND_DX9EX_FALLBACK",
+        "expected_behavior": "A successful tile uses cropped bytes but a fallback costs full-source bytes without inventing game or VR runtime proof"
+      },
+      {
+        "id": "mandatory_five_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "Required DX11 Fast, Backend Gate, Windows Build, OpenXR and HUD Inspector pass together on one exact SHA"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_D3D9_GAME_POSTDRAW_CPU_OR_GPU_TILE",
+      "D3D9_GPU_CROP_CAPTURE_AND_CPU_STAGING",
+      "BUDGETED_FULL_D3D9_READBACK_IF_TILE_STAGING_FAILS",
+      "NATIVE_D3D11_UPDATE_SUBRESOURCE_AND_RECT_COPY",
+      "ORIGINAL_D3D9_GAME_DX9EX_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_cpu_tile_admission_01057.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Destructive source-link regression finds ordered original GPU tile staging failure, full-source fallback and native region publication",
+      "negative_regression": "Missing budget, retry or tileSucceeded switch causes regression failure, while false native frame publication stays fail-closed",
+      "component_integration": "D3D9 LockRect/staging captured original tile or admitted full source reaches D3D11 native game frame CopySubresourceRegion"
+    },
+    "conflict_keys": [
+      "DX11:GAME_CPU_GPU_TILE_WRITE_COHERENCE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains explicit opt-in; original D3D9 game and DX9Ex FFB fallback preserved",
+    "blocking_evidence": "Genuine 01057 tile capture can pass on GPU yet late staging LockRect, invalid pitch or UnlockRect failure formerly returned false without a full source retry. Source commit 192c19543b39ddbcdd81ae405e51691446b3a833 addresses it; 01058 backend CI 40155077386 blocked by stale historical 01057 acceptance metadata."
+  },
+  "acceptance_results": {
+    "late_gpu_tile_staging_recovery": {
+      "status": "PENDING_CI",
+      "evidence": "Source implementation committed at 192c19543b39ddbcdd81ae405e51691446b3a833; exact-SHA full Actions and runtime verification pending",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_cpu_tile_admission_01057.py"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    },
+    "full_source_budget_and_fail_closed": {
+      "status": "PENDING_CI",
+      "evidence": "Source implementation committed at 192c19543b39ddbcdd81ae405e51691446b3a833; exact-SHA full Actions and runtime verification pending",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_cpu_tile_admission_01057.py"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    },
+    "tile_and_original_fallback_integration": {
+      "status": "PENDING_CI",
+      "evidence": "Source implementation committed at 192c19543b39ddbcdd81ae405e51691446b3a833; exact-SHA full Actions and runtime verification pending",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_cpu_tile_admission_01057.py"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    },
+    "mandatory_five_exact_sha": {
+      "status": "PENDING_CI",
+      "evidence": "Source implementation committed at 192c19543b39ddbcdd81ae405e51691446b3a833; exact-SHA full Actions and runtime verification pending",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_cpu_tile_admission_01057.py"
+      ],
+      "validation_command": "python tools/test_dx11_cpu_tile_admission_01057.py"
+    }
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "Actual native game menu/car/race draw, published frame and Quest3 playability UNTESTED",
+  "next_implementation_action": "Run five mandatory GitHub Actions on one exact SHA after 01057 historical metadata CI repair, then C6 bookkeeping only if all pass; keep runtime UNTESTED.",
+  "runtime_note": "No real OutRun game, driver/FFB hardware or Quest3 HMD run. Source static regression is not visible native gameplay evidence.",
+  "material_result_sha": "192c19543b39ddbcdd81ae405e51691446b3a833",
+  "validation_bearing_result_sha": null,
+  "feature_stage": "FEATURE_READY",
+  "ci_policy_repair_note": "Historical 01057 C6 acceptance had stale PENDING despite 5 SUCCESS, triggering 01058 backend gate 40155077386. Reconciled as an actual failing CI contract repair, not an additional 01057 scoring event."
+}

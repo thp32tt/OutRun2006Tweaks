@@ -290,6 +290,28 @@ for label, mutate in (
     mutate(bad)
     assert validate_task(bad, p), "01015 metadata guard bypassed: " + label
 
+# 01058 causal CI repair: completed 01057 source/CI acceptance must have
+# auditable paths and commands. Do not convert HMD/FFB into runtime PASS.
+historical_01057 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01057.json").read_text(encoding="utf-8"))
+assert historical_01057["runtime_validation"] == "UNTESTED"
+assert historical_01057["hmd_test_performed"] is False
+assert historical_01057["gameplay_test_performed"] is False
+assert historical_01057["validation_bearing_result_sha"] == "5b96310396ef824fb9ac67b66d01d5ffe6858026"
+assert not validate_task(historical_01057, p), validate_task(historical_01057, p)
+for label, change in (
+    ("no source evidence", lambda e: e.update(evidence_paths=[])),
+    ("missing command", lambda e: e.update(validation_command="")),
+    ("pending acceptance after five gates", lambda e: e.update(status="PENDING")),
+    ("runtime UNTESTED falsely counted as acceptance", lambda e: e.update(status="PASS_UNTESTED")),
+):
+    broken = copy.deepcopy(historical_01057)
+    change(broken["acceptance_results"]["postdraw_cpu_ticket"])
+    assert validate_task(broken, p), "01057 policy failure unguarded: " + label
+failed_c6_01057 = copy.deepcopy(historical_01057)
+failed_c6_01057["automation_validation"] = "FAIL_EXACT_SHA"
+assert validate_task(failed_c6_01057, p), "01057 gate failure admitted"
+
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
 print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")
