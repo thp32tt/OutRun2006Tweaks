@@ -8,10 +8,65 @@ namespace outrun::vr::dx11 {
 // Reuse ONLY that observed RTV interpretation when the GPU postpass later
 // samples the exact source mip/array. Never reinterpret integer/depth pixels
 // as float4 or infer a view for an unobserved camera.
+// The GPU game postpass uses Texture2D<float4>, not an integer or depth
+// Texture2D. A typed UINT/SINT, depth, video or block-compressed allocation
+// cannot be silently fed into that pixel shader merely because it advertises
+// generic DXGI SHADER_SAMPLE support. Preserve the real game's D3D9 output
+// rather than publish a blank/wrong-colored native menu/race eye.
+[[nodiscard]] constexpr bool native_game_float4_camera_sample_format(
+    DXGI_FORMAT format) noexcept {
+    switch (format) {
+    case DXGI_FORMAT_R32G32B32A32_FLOAT:
+    case DXGI_FORMAT_R32G32B32_FLOAT:
+    case DXGI_FORMAT_R32G32_FLOAT:
+    case DXGI_FORMAT_R32_FLOAT:
+    case DXGI_FORMAT_R16G16B16A16_FLOAT:
+    case DXGI_FORMAT_R16G16B16A16_UNORM:
+    case DXGI_FORMAT_R16G16B16A16_SNORM:
+    case DXGI_FORMAT_R16G16_FLOAT:
+    case DXGI_FORMAT_R16G16_UNORM:
+    case DXGI_FORMAT_R16G16_SNORM:
+    case DXGI_FORMAT_R16_FLOAT:
+    case DXGI_FORMAT_R16_UNORM:
+    case DXGI_FORMAT_R16_SNORM:
+    case DXGI_FORMAT_R11G11B10_FLOAT:
+    case DXGI_FORMAT_R10G10B10A2_UNORM:
+    case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:
+    case DXGI_FORMAT_R9G9B9E5_SHAREDEXP:
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+    case DXGI_FORMAT_R8G8B8A8_SNORM:
+    case DXGI_FORMAT_R8G8_UNORM:
+    case DXGI_FORMAT_R8G8_SNORM:
+    case DXGI_FORMAT_R8_UNORM:
+    case DXGI_FORMAT_R8_SNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
+    case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:
+    case DXGI_FORMAT_B5G6R5_UNORM:
+    case DXGI_FORMAT_B5G5R5A1_UNORM:
+    case DXGI_FORMAT_B4G4R4A4_UNORM:
+        return true;
+    default:
+        return false;
+    }
+}
+static_assert(native_game_float4_camera_sample_format(DXGI_FORMAT_B8G8R8A8_UNORM));
+static_assert(native_game_float4_camera_sample_format(DXGI_FORMAT_R16G16B16A16_FLOAT));
+static_assert(!native_game_float4_camera_sample_format(DXGI_FORMAT_R8G8B8A8_UINT));
+static_assert(!native_game_float4_camera_sample_format(DXGI_FORMAT_R8G8B8A8_SINT));
+static_assert(!native_game_float4_camera_sample_format(DXGI_FORMAT_D32_FLOAT));
+static_assert(!native_game_float4_camera_sample_format(DXGI_FORMAT_D24_UNORM_S8_UINT));
+static_assert(!native_game_float4_camera_sample_format(DXGI_FORMAT_NV12));
+static_assert(!native_game_float4_camera_sample_format(DXGI_FORMAT_BC1_UNORM));
+
 [[nodiscard]] constexpr DXGI_FORMAT native_game_typed_camera_shader_format(
     DXGI_FORMAT allocation, DXGI_FORMAT renderedView) noexcept {
     if (allocation == DXGI_FORMAT_UNKNOWN) return DXGI_FORMAT_UNKNOWN;
-    if (allocation == renderedView) return allocation;
+    if (allocation == renderedView)
+        return native_game_float4_camera_sample_format(allocation)
+            ? allocation : DXGI_FORMAT_UNKNOWN;
     switch (allocation) {
     case DXGI_FORMAT_R8G8B8A8_TYPELESS:
         return renderedView == DXGI_FORMAT_R8G8B8A8_UNORM ||
@@ -71,11 +126,16 @@ namespace outrun::vr::dx11 {
     case DXGI_FORMAT_BC7_TYPELESS:
         return DXGI_FORMAT_UNKNOWN;
     default:
-        // Typed GPU copy/SRV/compute intermediates need no prior RTV
-        // color evidence. Keep the original native postpass fast path.
-        return allocation;
+        // Preserve sampled typed game-color intermediates, but never let
+        // integer/depth/video formats masquerade as float4 camera color.
+        return native_game_float4_camera_sample_format(allocation)
+            ? allocation : DXGI_FORMAT_UNKNOWN;
     }
 }
+static_assert(native_game_typed_camera_shader_format(
+    DXGI_FORMAT_R8G8B8A8_UINT, DXGI_FORMAT_UNKNOWN) == DXGI_FORMAT_UNKNOWN);
+static_assert(native_game_typed_camera_shader_format(
+    DXGI_FORMAT_D32_FLOAT, DXGI_FORMAT_UNKNOWN) == DXGI_FORMAT_UNKNOWN);
 static_assert(native_game_typed_camera_shader_format(
     DXGI_FORMAT_R8G8B8A8_TYPELESS, DXGI_FORMAT_R8G8B8A8_UNORM) ==
     DXGI_FORMAT_R8G8B8A8_UNORM);

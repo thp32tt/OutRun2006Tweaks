@@ -2648,7 +2648,9 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     if (sampleFormat == DXGI_FORMAT_UNKNOWN) return false;
     UINT sourceSupport = 0u, eyeSupport = 0u;
     if (FAILED(device->CheckFormatSupport(sampleFormat, &sourceSupport)) ||
-        FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)))
+        FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)) ||
+        (sourceSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D) == 0u ||
+        (eyeSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D) == 0u)
         return false;
     const auto transfer = native_game_stretch_source_transfer(
         sd.MipLevels, sd.SampleDesc.Count, sd.SampleDesc.Quality,
@@ -3030,8 +3032,10 @@ bool NativeGameStereoSubmission::capture_eye(
     DXGI_FORMAT eyeFormat) noexcept {
     if (!device || source.Format == DXGI_FORMAT_UNKNOWN) return false;
     UINT eyeSupport = 0u;
+    constexpr UINT eyeRequired = D3D11_FORMAT_SUPPORT_RENDER_TARGET |
+        D3D11_FORMAT_SUPPORT_TEXTURE2D;
     if (FAILED(device->CheckFormatSupport(eyeFormat, &eyeSupport)) ||
-        (eyeSupport & D3D11_FORMAT_SUPPORT_RENDER_TARGET) == 0u)
+        (eyeSupport & eyeRequired) != eyeRequired)
         return false;
     for (const auto typed : native_game_typed_camera_preflight_formats(
              source.Format)) {
@@ -3046,7 +3050,10 @@ bool NativeGameStereoSubmission::capture_eye(
             source.SampleDesc.Quality,
             (source.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u,
             (source.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u,
-            (formatSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
+            (formatSupport & (D3D11_FORMAT_SUPPORT_SHADER_SAMPLE |
+                              D3D11_FORMAT_SUPPORT_TEXTURE2D)) ==
+                (D3D11_FORMAT_SUPPORT_SHADER_SAMPLE |
+                 D3D11_FORMAT_SUPPORT_TEXTURE2D),
             true,
             (formatSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
             (source.BindFlags == 0u ||
