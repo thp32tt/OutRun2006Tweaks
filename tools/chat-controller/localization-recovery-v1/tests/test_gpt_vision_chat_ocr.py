@@ -14,10 +14,11 @@ class GPTChatOCRTests(unittest.TestCase):
         root=Path(self.tmp.name)
         self.src=root/"src";self.src.mkdir()
         self.out=root/"out";self.out.mkdir()
+        self.gpt_out=root/"gpt_out";self.gpt_out.mkdir()
         self.report=root/"report";(self.report/"processed_v3").mkdir(parents=True)
         self.queue=root/"queue";self.queue.mkdir()
-        self.old={k:getattr(g,k) for k in ("SRC","OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH")}
-        g.SRC=self.src;g.OUT=self.out;g.REPORT=self.report;g.QUEUE_DIR=self.queue
+        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH")}
+        g.SRC=self.src;g.OUT=self.out;g.GPT_OUT=self.gpt_out;g.REPORT=self.report;g.QUEUE_DIR=self.queue
         g.STATE_PATH=self.queue/"state.json";g.AUDIT_PATH=self.queue/"audit.jsonl"
         self.addCleanup(self.restore)
         self.name="Q001_TEST_BASE_READABLE_FLIPY.png"
@@ -58,7 +59,7 @@ class GPTChatOCRTests(unittest.TestCase):
         result=g.apply_response(binding["task_id"],response)
         self.assertEqual(result["status"],"APPLIED")
         self.assertEqual(result["applied"],1)
-        manifests=list(self.out.glob("*/*/manifest.json"))
+        manifests=list(self.gpt_out.glob("*/*/manifest.json"))
         self.assertEqual(len(manifests),1)
         m=json.loads(manifests[0].read_text())
         self.assertEqual(m["english"],"HELLO")
@@ -102,7 +103,7 @@ class GPTChatOCRTests(unittest.TestCase):
         result=g.apply_response(binding["task_id"],response)
         self.assertEqual(result["status"],"NO_VALID_DETECTIONS")
         self.assertIn("CONFIDENCE_TOO_LOW",result["rejected"])
-        self.assertEqual(list(self.out.glob("*/*/manifest.json")),[])
+        self.assertEqual(list(self.gpt_out.glob("*/*/manifest.json")),[])
 
     def test_fenced_json_parser(self):
         ticks=chr(96)*3
