@@ -76,6 +76,24 @@
 
 namespace
 {
+    float R23ConfiguredMenuScale = 1.0f;
+
+    float ReadMenuScaleOverride(const wchar_t* path, float fallback) noexcept
+    {
+        wchar_t text[64]{};
+        GetPrivateProfileStringW(L"VR", L"MenuScale", L"", text,
+            static_cast<DWORD>(std::size(text)), path);
+        if (!text[0]) return fallback;
+        wchar_t* end = nullptr;
+        const float value = std::wcstof(text, &end);
+        // Match the game setting range. Never let NaN/garbage config
+        // produce an empty menu or invalidate the two-eye projection.
+        if (end == text || !end || *end != L'\0' ||
+            !std::isfinite(value) || value < 0.50f || value > 1.0f)
+            return fallback;
+        return value;
+    }
+
     // Read the GAME process's UI settings, not the x64 host's working
     // directory. The game can live in another folder/drive. Missing config,
     // inaccessible process, or a transient Reset never guesses letterboxing.
@@ -103,6 +121,7 @@ namespace
         cachedPid = gamePid;
         nextCheckMs = now + 2500;
         cachedLetterbox = false;
+        R23ConfiguredMenuScale = 1.0f;
         if (!gamePid)
             return false;
         HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION,
@@ -137,6 +156,8 @@ namespace
             (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
         {
             foundConfig = true;
+            R23ConfiguredMenuScale =
+                ReadMenuScaleOverride(path, R23ConfiguredMenuScale);
             effectiveScalingMode = static_cast<int>(GetPrivateProfileIntW(
                 L"Graphics", L"UIScalingMode", effectiveScalingMode, path));
             letterboxingMode = static_cast<int>(GetPrivateProfileIntW(
@@ -157,6 +178,8 @@ namespace
                 (userAttrs & FILE_ATTRIBUTE_DIRECTORY) == 0)
             {
                 foundConfig = true;
+                R23ConfiguredMenuScale =
+                    ReadMenuScaleOverride(path, R23ConfiguredMenuScale);
                 effectiveScalingMode = static_cast<int>(
                     GetPrivateProfileIntW(L"Graphics", L"UIScalingMode",
                         effectiveScalingMode, path));
@@ -1699,7 +1722,7 @@ namespace
         const float opticalCoverage =
             OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState(
                 std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),
-                clientGameState);
+                clientGameState, R23ConfiguredMenuScale);
         const auto requestedPlacement =
             OutRunVrMenuAspect::PlanOpticallyCenteredClip(
                 common, sourceAspect, opticalCoverage);
@@ -1717,9 +1740,12 @@ namespace
             return false;
 
         static std::uint32_t lastMenuDecisionState = 0xFFFFFFFFu;
-        if (lastMenuDecisionState != clientGameState)
+        static float lastMenuDecisionScale = -1.0f;
+        if (lastMenuDecisionState != clientGameState ||
+            lastMenuDecisionScale != R23ConfiguredMenuScale)
         {
             lastMenuDecisionState = clientGameState;
+            lastMenuDecisionScale = R23ConfiguredMenuScale;
             // R23 is an independent x64 host TU; unlike the x86 game it
             // does not link spdlog. Keep this state-change diagnostic on
             // the host's existing std::cout logging transport.
@@ -1729,6 +1755,7 @@ namespace
                       << " crop43=" << (cropCentered43 ? 1 : 0)
                       << " wideSelector=" << (wideVehicleSelector ? 1 : 0)
                       << " nativeAspect=" << (useNativeMenuAspect ? 1 : 0)
+                      << " menuScale=" << R23ConfiguredMenuScale
                       << " sourceAspect=" << sourceAspect
                       << " uv=" << whole.x << ',' << whole.y
                       << ',' << whole.w << ',' << whole.h
@@ -2676,6 +2703,7 @@ int main(int argc, char** argv)
             cachedMenuProjectionViews{};
         bool cachedMenuProjectionValid = false;
         std::uint32_t cachedMenuGameState = 0xFFFFFFFFu;
+        float cachedMenuScale = -1.0f;
         bool awaitingFirstGameplayStereo = false;
         XrPosef menuProjectionAnchor{};
         menuProjectionAnchor.orientation.w = 1.0f;
@@ -3519,9 +3547,15 @@ int main(int argc, char** argv)
                     // reports an unchanged/stale source frame. Do not reuse
                     // the previous state's cached two-eye menu projection.
                     const std::uint32_t clientGameState = shared.GameState();
-                    if (cachedMenuGameState != clientGameState)
+                    // Refresh the bounded game-adjacent INI cache even when
+                    // Desktop Duplication has no new pixels. A saved F11 size
+                    // change must recompose the same captured menu image.
+                    R23GameMenuIsLetterboxed(compositor.hwnd_);
+                    if (cachedMenuGameState != clientGameState ||
+                        cachedMenuScale != R23ConfiguredMenuScale)
                     {
                         cachedMenuGameState = clientGameState;
+                        cachedMenuScale = R23ConfiguredMenuScale;
                         cachedMenuProjectionValid = false;
                     }
                     if (capture.available &&

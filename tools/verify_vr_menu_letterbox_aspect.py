@@ -825,7 +825,7 @@ def verify_visible_menu_fragment(code: str) -> None:
         "useNativeMenuAspect || wideVehicleSelector,",
         "imageMatteVerified);",
         'OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState(',
-        'std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),\n                clientGameState);',
+        'std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),\n                clientGameState, R23ConfiguredMenuScale);',
         "common, sourceAspect, opticalCoverage);",
         "visibleOffsetX = plan.visibleOffsetX;",
         "visibleOffsetY = plan.visibleOffsetY;",
@@ -992,7 +992,7 @@ for old, bad in (
      "sourceAspect, clientAspect, false,"),
     ('OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState(',
      '1.0f /* bypass bounded menu coverage */'),
-    ('std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),\n                clientGameState);',
+    ('std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),\n                clientGameState, R23ConfiguredMenuScale);',
      'std::getenv("UNKNOWN_MENU_COVERAGE"));'),
     ("common, sourceAspect, opticalCoverage);",
      "common, sourceAspect, 1.0f);"),
@@ -1152,3 +1152,4 @@ for removed in (
     else:
         raise AssertionError("external menu GPU owner mutation survived: " + removed)
 print("PASS R84 native menu bar two-draw screen owner and 3 negative mutations")
+

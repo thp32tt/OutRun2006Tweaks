@@ -134,6 +134,46 @@ static_assert(!ShouldRefreshMenuLetterboxConfig(
 
 int main()
 {
+    // MenuScale is optical size, never a game/source/XR pixel count.
+    // Title/main consume it; selectors, unknown states and gameplay do not.
+    using OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState;
+    if (ResolveMenuOpticalCoverageForState(nullptr, 0x04u, 0.65f) != 0.65f ||
+        ResolveMenuOpticalCoverageForState(nullptr, 0x09u, 0.75f) != 0.75f ||
+        ResolveMenuOpticalCoverageForState(nullptr, 0x0Au, 0.65f) != 1.0f ||
+        ResolveMenuOpticalCoverageForState(nullptr, 0x0Bu, 0.65f) != 1.0f ||
+        ResolveMenuOpticalCoverageForState(nullptr, 0x0Cu, 0.65f) != 1.0f ||
+        ResolveMenuOpticalCoverageForState(nullptr, 0xFFFFFFFFu, 0.65f) != 1.0f ||
+        ResolveMenuOpticalCoverageForState("0.8", 0x09u, 0.65f) != 0.8f ||
+        ResolveMenuOpticalCoverageForState("bad", 0x09u, 0.65f) != 0.65f ||
+        ResolveMenuOpticalCoverageForState(nullptr, 0x09u,
+            std::numeric_limits<float>::quiet_NaN()) != 1.0f ||
+        ResolveMenuOpticalCoverageForState(nullptr, 0x09u, 2.0f) != 1.0f)
+        return 120;
+    const auto independentFov = OutRunVrMenuAspect::PlanCommonFovTangents(
+        -0.9f, 0.8f, -0.8f, 0.85f, -0.8f, 0.9f, -0.85f, 0.8f);
+    const auto independentFull = OutRunVrMenuAspect::PlanOpticallyCenteredClip(
+        independentFov, 4.0f / 3.0f, 1.0f);
+    const auto independentSmall = OutRunVrMenuAspect::PlanOpticallyCenteredClip(
+        independentFov, 4.0f / 3.0f,
+        ResolveMenuOpticalCoverageForState(nullptr, 0x09u, 0.65f));
+    if (!independentFull.valid || !independentSmall.valid ||
+        std::fabs(independentSmall.halfWidth / independentFull.halfWidth - 0.65f) > 0.0001f ||
+        std::fabs(independentSmall.halfHeight / independentFull.halfHeight - 0.65f) > 0.0001f ||
+        independentFull.centerX != independentSmall.centerX ||
+        independentFull.centerY != independentSmall.centerY)
+        return 121;
+    // Full-source landscape/ultrawide/portrait crop changes only sampled UV;
+    // the resulting 4:3 optical canvas must have exactly the same extent.
+    for (const auto aspect : {1920.0f/1080.0f, 3440.0f/1440.0f, 2496.0f/2688.0f})
+    {
+        const auto content = OutRunVrMenuAspect::PlanCenteredContent(aspect, 4.0f/3.0f);
+        const auto placed = OutRunVrMenuAspect::PlanOpticallyCenteredClip(
+            independentFov, content.aspect, 1.0f);
+        if (!content.crop || !placed.valid ||
+            placed.halfWidth != independentFull.halfWidth ||
+            placed.halfHeight != independentFull.halfHeight)
+            return 122;
+    }
     // Old ~75/78% default inset is gone for the whole VR front-end,
     // including wide Ferrari selector, exit/reset and unknown states.
     // Manual optical A/B remains an explicit opt-in only.

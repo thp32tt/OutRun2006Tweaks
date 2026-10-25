@@ -58,19 +58,21 @@ namespace Settings
         "At launch, match the actual VDXR/OpenXR allocated per-eye render extent (not desktop or 2x eye width). "
         "Manual RenderWidth/RenderHeight take precedence; when host startup fails, use existing game resolution." };
 	// Optional explicit internal render resolution independent of the PC monitor.
-    // Auto (0/0) retains the original desktop-sized behavior. The x64 host
-    // starts later than GameDefaultConfigOverride, so do NOT mistake a desktop
-    // resolution for OpenXR's per-eye recommended image size.
+    // Auto (0/0) waits at the original game configuration hook for the
+    // live OpenXR host extent. If unavailable, keep the original game size;
+    // never change the source later after logical UI initialization.
     Setting<int> VRRenderWidth{ "VR", "RenderWidth", 0,
-        "Optional game/eye render width. 0 = use original desktop default; set with RenderHeight. Higher resolution increases GPU load.", Range<int>{ 0, 8192 } };
+        "Game/eye render width, independent of MenuScale. 0/0 = OpenXR startup auto (game size if unavailable); set with RenderHeight. Restart required.", Range<int>{ 0, 8192 } };
     Setting<int> VRRenderHeight{ "VR", "RenderHeight", 0,
-        "Optional game/eye render height. 0 = use original desktop default; set with RenderWidth. Not an OpenXR runtime autodetection.", Range<int>{ 0, 8192 } };
+        "Game/eye render height, independent of MenuScale. 0/0 = OpenXR startup auto (game size if unavailable); set with RenderWidth. Restart required.", Range<int>{ 0, 8192 } };
     Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", true,
         "Fits the borderless PC mirror within the monitor even when the internal D3D9Ex source is larger. The game and OpenXR eye images are not resized." };
     Setting<bool> VRMirrorPreserveAspect{ "VR", "MirrorPreserveAspect", true,
         "Keep the original 2D menu/game pixel aspect when displaying a portrait VDXR 3D/2D source on an ultrawide desktop. The PC mirror is centered with unused desktop space instead of vertically squashing the image. VR eye buffers and all source UI pixels stay unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
+    Setting<float> VRMenuScale{ "VR", "MenuScale", 1.0f,
+        "Title/main menu size as a fraction of the binocular-safe 4:3 canvas (1 = maximum). Independent of game RenderWidth/Height, desktop resolution and HudScale. Saved changes are read by the host within 2.5 seconds; vehicle selection is unchanged.", Range<float>{ 0.50f, 1.0f } };
 	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
 	// HMD-proven DX11 R57 mode 6 projects car ordinal and rival markers
@@ -320,6 +322,8 @@ namespace OutRunVR
             Settings::VRAntiAliasing.needs_restart();
             Settings::VRTransparencySupersampling.needs_restart();
             Settings::VRUnifiedEyeMenuSource.needs_restart();
+            Settings::VRRenderWidth.needs_restart();
+            Settings::VRRenderHeight.needs_restart();
             // Exact x86 rival detours are installed at startup only.
             // Treat F11 edits as pending until the next game launch.
             Settings::VRRivalDx11NativeRoute.needs_restart();

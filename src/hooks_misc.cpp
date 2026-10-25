@@ -858,7 +858,11 @@ namespace
                 Game::screen_resolution->x, Game::screen_resolution->y);
             return;
         }
-        if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)
+        // Source resolution is a game/render policy, not a D3D9Ex transport
+        // preference. Classic D3D9 also renders at the requested extent.
+        // In particular the shipped PreferD3D9Ex=false must not silently
+        // make VR quality and the logical menu canvas follow the desktop.
+        if (!Settings::VRAutoRenderResolution)
             return;
 
         // The same physical D3D9Ex source must be chosen BEFORE the game
@@ -1148,3 +1152,4 @@ public:
 	static EnableLevelSelect instance;
 };
 EnableLevelSelect EnableLevelSelect::instance;
+

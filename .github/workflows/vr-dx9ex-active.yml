@@ -428,6 +428,7 @@ jobs:
             'tools/verify_vr_ui_matrix_safety.py',
             'tools/verify_vr_desktop_source_coordinates.py',
             'tools/verify_vr_unified_menu_source.py',
+            'tools/verify_vr_menu_resolution_split.py',
             'tools/verify_vr_pc_fast_package_contract.py',
             'tools/verify_vr_20261020_hmd_baseline.py',
             'tools/verify_vr_mirror_aspect_fit.py',
@@ -1146,3 +1147,4 @@ jobs:
           name: OutRun2-VR-DX9EX-ACTIVE-${{ github.sha }}
           path: OutRun2_VR_DX9EX_ACTIVE_*.zip
           if-no-files-found: error
+

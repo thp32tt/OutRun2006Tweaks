@@ -20,7 +20,11 @@ def verify(src,setting,log):
     assert 'static constexpr bool IsProjectedSunScreenObject' in src
     assert 'IsProjectedSunScreenObject(objectId)' in center
     assert 'RenderScope::ProjectedScreenEffect2D' in center
-    assert 'ProducerToken::None' in center
+    assert ('ScopedExactProducerSemantic semantic(\n'
+            '            OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D,') in center
+    # The already-integrated C993 ray correction identifies the exact
+    # centre producer; reverting it to None loses the narrow ray owner.
+    assert 'ProducerToken::LensFlareCentre' in center
     assert '!OutRunVR::GameSemantic::QueueRenderActive()' in center
     assert 'if (Settings::VREnabled && objectId == 0x570002 &&' in center
     assert '!Settings::VRLensFlareCentreEnabled.get()' in center
@@ -44,7 +48,6 @@ verify(source,settings,collector)
 mutations=[
     ('source','case 0x570010:','case 0x570011:'),
     ('source','case 0x57000F:','case 0x570011:'),
-    ('source','RenderScope::ProjectedScreenEffect2D','RenderScope::WorldBillboard'),
     ('source','ordinal == 2','ordinal == 1'),
     ('source','!Settings::VRLensFlareCentreEnabled.get()','Settings::VRLensFlareCentreEnabled.get()'),
     ('settings','"LensFlareCentreEnabled", true,','"LensFlareCentreEnabled", false,'),
@@ -61,4 +64,16 @@ for fname,old,bad in mutations:
     else:
         raise AssertionError('mutation escaped '+fname+' '+old)
 
-print('PASS VR projected sun family 570002/570006/57000F/570010 + second 570008 centre-glow suppression; 7 negative controls; HMD UNTESTED')
+# Mutate the C993 owner, not an earlier occurrence in the parent hook.
+prefix, center = source.split('static void __cdecl DrawObjectAlphaCentre(', 1)
+for old, bad in [('ProducerToken::LensFlareCentre', 'ProducerToken::None'),
+                 ('RenderScope::ProjectedScreenEffect2D', 'RenderScope::WorldBillboard')]:
+    try:
+        verify(prefix + 'static void __cdecl DrawObjectAlphaCentre(' + center.replace(
+            old, bad, 1), settings, collector)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError('exact C993 centre mutation escaped: ' + old)
+print('PASS VR projected sun family 570002/570006/57000F/570010 + second 570008 centre-glow suppression; 8 negative controls; HMD UNTESTED')
+

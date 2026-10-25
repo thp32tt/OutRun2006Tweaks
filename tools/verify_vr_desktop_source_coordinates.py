@@ -10,7 +10,7 @@ settings = (ROOT / "src/vr/settings.cpp").read_text(encoding="utf-8")
 config = (ROOT / "src/hooks_misc.cpp").read_text(encoding="utf-8")
 ex = (ROOT / "src/vr/d3d9/ex_device_upgrade.cpp").read_text(encoding="utf-8")
 
-assert 'VRFollowGameResolution{ "VR", "FollowGameResolution", true,' in settings
+assert 'VRFollowGameResolution{ "VR", "FollowGameResolution", false,' in settings
 assert "Settings::VRFollowGameResolution.needs_restart();" in settings
 assert "extern Setting<bool> VRFollowGameResolution;" in config
 assert "extern Setting<bool> VRFollowGameResolution;" in ex
@@ -26,7 +26,7 @@ def assert_game_source_owner(text: str):
         "Game::screen_resolution->y = manualH;",
         "if (Settings::VRFollowGameResolution &&\n            !Settings::VRUnifiedEyeMenuSource)",
         "Game::screen_resolution->x, Game::screen_resolution->y);",
-        "if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)",
+        "if (!Settings::VRAutoRenderResolution)",
         "Game::screen_resolution->x = static_cast<int>(extent.width);",
     )
     for token in tokens:
@@ -34,7 +34,7 @@ def assert_game_source_owner(text: str):
     loc = [part.index(token) for token in (
         "if (commandLineResolution)", "if (manualRequested)",
         "if (Settings::VRFollowGameResolution &&\n            !Settings::VRUnifiedEyeMenuSource)",
-        "if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)",
+        "if (!Settings::VRAutoRenderResolution)",
         "Game::screen_resolution->x = static_cast<int>(extent.width);")]
     assert loc == sorted(loc), "manual/game priority must precede XR overwrite"
     follow = part.split("if (Settings::VRFollowGameResolution &&\n            !Settings::VRUnifiedEyeMenuSource)",1)[1].split(
@@ -98,3 +98,4 @@ for screen in ((640,480),(1280,720),(1920,1080),(3440,1440)):
     cx,cy=map_menu_pixel(320,240,screen)
     assert abs(cx-screen[0]/2)<1e-6 and abs(cy-screen[1]/2)<1e-6
 print("PASS game-selected source/UI extent vs VD/XR per-eye independence; 5 source mutations; screen-space coordinate scaling")
+

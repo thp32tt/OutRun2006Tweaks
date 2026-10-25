@@ -194,10 +194,16 @@ namespace OutRunVrMenuAspect
     // Retain the state argument for the original game ABI/callers, but
     // do not quietly reinstate the old 0.78 car-selector fallback.
     inline float ResolveMenuOpticalCoverageForState(
-        const char* requested, std::uint32_t gameState) noexcept
+        const char* requested, std::uint32_t gameState,
+        float menuScale = 1.0f) noexcept
     {
-        (void)gameState;
-        return ResolveMenuOpticalCoverage(requested, 1.0f);
+        // Only title/main-menu own this setting. Vehicle selection, pause,
+        // gameplay, results and unknown transitions keep their old policy.
+        // Scale is a fraction of the binocular-safe 4:3 canvas, independent
+        // of desktop pixels, game render extent and XR swapchain resolution.
+        const float defaultCoverage = gameState == 0x04u || gameState == 0x09u
+            ? menuScale : 1.0f;
+        return ResolveMenuOpticalCoverage(requested, defaultCoverage);
     }
 
     inline OpticalClipPlan PlanOpticallyCenteredClip(

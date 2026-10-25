@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "task_id": "USER-DX9EX-MENU-RENDER-SEPARATION-20261025",
+  "source_mode": "CHAT_DIRECT",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "2c37e2ff76012283c1028de90e5ca757b1f6dbba",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "attempt": 1,
+  "status": "SOURCE_IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "LOCAL_TARGETED_PASS_CI_PENDING",
+  "runtime_validation": "UNTESTED",
+  "evidence": "docs/automation/reviews/MENU_RENDER_SEPARATION_20261025.md",
+  "protected": ["R26_HUD_DEFAULT", "HUD_1920x1080_SCALE_0.55", "WIDE_SELECTOR", "RANK_RIVAL", "INPUT_FFB", "DRIVER_SEAT_DEFAULT_OFF"],
+  "scope": "Independent 4:3 menu optical sizing plus startup VR game source selection independent of desktop/provider preference. Existing physical game target remains shared; no separate fixed-resolution menu texture claim.",
+  "local_validation": ["production C++ menu_content_aspect_smoke PASS", "menu resolution split red-before/green-after PASS", "menu letterbox/mutation PASS", "unified source/manual source precedence PASS", "mirror aspect fit PASS"],
+  "next_action": "Verify exact material SHA GitHub Actions Active game/host/package, Domain and affected Inspector/Full Source runs; repair actual failures in this same task; persist CI URLs and result SHA."
+}
