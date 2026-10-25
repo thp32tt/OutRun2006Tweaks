@@ -95,9 +95,8 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
-      "GAME_AUTHORED_D3D9_DRAW",
-      "NATIVE_D3D11_GPU_TARGET",
-      "INDEPENDENT_STEREO_EYE_GPU_HANDOFF"
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
     ],
     "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED",
     "activation_guard_and_fallback": "No automatic DXVK/backends promotion; original D3D9Ex Draw/Present/gamepad/FFB intact. Mono is not copied to both eyes; game eye source provenance checked."
@@ -105,19 +104,38 @@
   "acceptance_results": {
     "typed_real_stereo_native_gpu_copy": {
       "status": "PASS_FEATURE_CI",
-      "evidence": "DX11 Fast 40177607780 includes 01063 native typeless/camera physical source positive and negative tests. Actual game/HMD UNTESTED."
+      "evidence": "DX11 Fast 40177607780 includes 01063 native typeless/camera physical source positive and negative tests. Actual game/HMD UNTESTED.",
+      "evidence_paths": [
+        "src/vr/d3d11/native_shared_eye_ring.cpp",
+        "tests/vr/dx11_native_stereo_source_transfer_01063.cpp"
+      ],
+      "validation_command": "DX11 Fast run 40177607780: g++ tests/vr/dx11_native_stereo_source_transfer_01063.cpp and python tools/test_dx11_native_stereo_source_transfer_01063.py"
     },
     "owner_and_subresource_fail_closed": {
       "status": "PASS_FEATURE_CI",
-      "evidence": "01063 source-linked mutation and 01063 portable C++ checks succeeded on final SHA. Physical game execution UNTESTED."
+      "evidence": "01063 source-linked mutation and 01063 portable C++ checks succeeded on final SHA. Physical game execution UNTESTED.",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+        "tools/test_dx11_native_stereo_source_transfer_01063.py"
+      ],
+      "validation_command": "DX11 Fast run 40177607780: negative mutation in tools/test_dx11_native_stereo_source_transfer_01063.py"
     },
     "mono_sink_gpu_state_preservation": {
       "status": "PASS_FEATURE_CI",
-      "evidence": "Full frame GPU callback now uses ScopedNativeGameGpuTransferOutputs on immediate context, 01063 structural source regression PASS. Runtime game/FFB UNTESTED."
+      "evidence": "Full frame GPU callback now uses ScopedNativeGameGpuTransferOutputs on immediate context, 01063 structural source regression PASS. Runtime game/FFB UNTESTED.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_gpu_output_preserve.hpp"
+      ],
+      "validation_command": "DX11 Fast run 40177607780: source-linked output state assertions in tools/test_dx11_native_stereo_source_transfer_01063.py"
     },
     "exact_sha_gate": {
       "status": "PASS_EXACT_SHA",
-      "evidence": "DX11 Fast 40177607780; Backend 40177607633; Windows Build 40177607719; OpenXR 40177610379; HUD Inspector 40177610288 all success for d15329a5b901bbc369b0fa3e943d1938717fb2b0."
+      "evidence": "DX11 Fast 40177607780; Backend 40177607633; Windows Build 40177607719; OpenXR 40177610379; HUD Inspector 40177610288 all success for d15329a5b901bbc369b0fa3e943d1938717fb2b0.",
+      "evidence_paths": [
+        "docs/automation/runs/CONVERSION-DX11-01063.json"
+      ],
+      "validation_command": "GitHub Actions exact d15329a5: DX11 Fast 40177607780; Backend 40177607633; Windows Build 40177607719; OpenXR 40177610379; HUD Inspector 40177610288"
     }
   },
   "validation_history": [
