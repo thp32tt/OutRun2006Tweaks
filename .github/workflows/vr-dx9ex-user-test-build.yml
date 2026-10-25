@@ -12,6 +12,11 @@ on:
       - 'tools/Run-DX9ExFocusTest.ps1'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/hooks_uiscaling.cpp'
+      - 'src/hooks_misc.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/settings.cpp'
+      - 'OutRun2006Tweaks.ini'
+      - 'tools/Run-DX9ExFocusTest.ps1'
   workflow_dispatch:
 
 jobs:
@@ -54,7 +59,7 @@ jobs:
         shell: pwsh
         run: |
           $short = $env:GITHUB_SHA.Substring(0,12)
-          $dir = "OutRun2_VR_R26_TIME_GOAL_RIVAL_TEST_$short"
+          $dir = "OutRun2_VR_R26_LANDSCAPE_VISUAL_RECOVERY_TEST_$short"
           New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (-not $dll) { throw 'dinput8.dll missing' }
@@ -69,11 +74,11 @@ jobs:
           Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
           Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
           Copy-Item tools/Run-DX9ExFocusTest.ps1 "$dir/Run-DX9ExFocusTest.ps1"
-          Set-Content "$dir/DX9EX_VARIANT.txt" 'variant=R26_TIME_GOAL_RIVAL_TEST' -Encoding ascii
+          Set-Content "$dir/DX9EX_VARIANT.txt" 'variant=R26_LANDSCAPE_VISUAL_RECOVERY_TEST' -Encoding ascii
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
           @(
             'DX9Ex R26 + HUD user test build'
-            'Targets: +TIME four-API finite HUD / GOAL-result HUD / rival marker / lens-sun regression'
+            'Targets: landscape game source / F11 / HUD 1080p / rival / +TIME / GOAL final graph / lens flare'
             'Renderer: R26+HUD default'
             'Runner: GitHub-hosted windows-2022'
             'RUNTIME_VALIDATION=UNTESTED'
@@ -82,12 +87,12 @@ jobs:
             '1. Extract ALL files directly into the folder containing OR2006C2C.EXE.'
             '2. Double-click RUN_DX9EX_TEST.cmd.'
             '3. Do NOT run outrun-vr-host.exe directly. It is a VR helper process and a white helper window is not the game.'
-            '4. Test +TIME, GOAL/result time/progress, and the RIVAL marker; then exit the game normally.'
-            '5. Upload DX9EX_LOGS/DX9EX_LOG_R26_TIME_GOAL_RIVAL_TEST_*.zip if a defect remains.'
+            '4. Test title/F11, in-race F11, HUD positions, rival, +TIME, GOAL/final graph and lens flare; then exit normally.'
+            '5. Upload DX9EX_LOGS/DX9EX_LOG_R26_LANDSCAPE_VISUAL_RECOVERY_TEST_*.zip if a defect remains.'
           ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
           @(
             'DX9Ex R26 + HUD user test build'
-            'Targets: +TIME / GOAL-result HUD / rival marker regression'
+            'Targets: landscape/F11/HUD/rival/+TIME/GOAL/lens visual recovery'
             'Renderer: R26+HUD default'
             'Runner: GitHub-hosted windows-2022'
             'Launcher: RUN_DX9EX_TEST.cmd'
@@ -104,6 +109,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-TIME-GOAL-RIVAL-TEST-${{ github.sha }}
-          path: OutRun2_VR_R26_TIME_GOAL_RIVAL_TEST_*.zip
+          name: OutRun2-VR-R26-LANDSCAPE-VISUAL-RECOVERY-TEST-${{ github.sha }}
+          path: OutRun2_VR_R26_LANDSCAPE_VISUAL_RECOVERY_TEST_*.zip
           if-no-files-found: error

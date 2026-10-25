@@ -34,9 +34,9 @@ def verify(src,setting,log):
 
     projected=src.split('static void __cdecl DrawObjectAlphaProjected(',1)[1].split('static void __cdecl DrawObjectAlphaCentre(',1)[0]
     assert 'objectId == 0x570008' in projected
-    assert 'ordinal == 2' in projected
-    assert 'VR LENS DECOMP CENTER GLOW HIDDEN:' in projected
-    assert 'first 0x570008 outer child preserved' in projected
+    assert 'ordinal <= 2' in projected
+    assert 'VR LENS 570008 CHILD HIDDEN:' in projected
+    assert 'sun 0x570002 and non-570008 outer discs preserved' in projected
 
     assert 'Get-Content $active' in log
     assert "$kv.ContainsKey('gameDllSha256')" in log
@@ -48,7 +48,7 @@ verify(source,settings,collector)
 mutations=[
     ('source','case 0x570010:','case 0x570011:'),
     ('source','case 0x57000F:','case 0x570011:'),
-    ('source','ordinal == 2','ordinal == 1'),
+    ('source','ordinal <= 2','ordinal == 2'),
     ('source','!Settings::VRLensFlareCentreEnabled.get()','Settings::VRLensFlareCentreEnabled.get()'),
     ('settings','"LensFlareCentreEnabled", true,','"LensFlareCentreEnabled", false,'),
     ('collector',"$kv.ContainsKey('gameDllSha256')","$kv.gameDllSha256"),
@@ -75,5 +75,5 @@ for old, bad in [('ProducerToken::LensFlareCentre', 'ProducerToken::None'),
         pass
     else:
         raise AssertionError('exact C993 centre mutation escaped: ' + old)
-print('PASS VR projected sun family 570002/570006/57000F/570010 + second 570008 centre-glow suppression; 8 negative controls; HMD UNTESTED')
+print('PASS VR projected sun family 570002/570006/57000F/570010 + both 570008 child suppression; 8 negative controls; HMD UNTESTED')
 
