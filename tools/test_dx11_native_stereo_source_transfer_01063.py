@@ -9,6 +9,10 @@ workflow=(r/".github/workflows/dx11-fast-structural.yml").read_text()
 def integrated(rr,hh,bb):
     source=rr.split("const auto exact_source =",1)[1].split(
         "// Validate both resource descriptors",1)[0]
+    # The newest captured-game RTV proof and the older live-OM fallback
+    # have separate identical ownership terms. Both must be proven, and a
+    # mutation to either route must independently break this integration.
+    legacy=source.split("ID3D11RenderTargetView* bound[",1)[1]
     format_logic=hh.split("native_game_eye_format_transfer_admitted(",1)[1].split(
         "// Only a view containing",1)[0]
     caller=bb.split("// Authenticate the producer's actual GPU resource",1)[1].split(
@@ -19,13 +23,13 @@ def integrated(rr,hh,bb):
         "sampleCount == 1u" in format_logic,
         "native_game_eye_rtv_subresource_matches(" in hh,
         "desc.Format == format_" in source,
-        "D3D11_RTV_DIMENSION_TEXTURE2DARRAY" in source,
-        "D3D11_RTV_DIMENSION_TEXTURE2D" in source,
-        "viewIdentity.Get() == sourceIdentity.Get()" in source,
-        "viewDesc.Format, format_" in source,
-        "context->OMGetRenderTargets(" in source,
-        "view->Release();" in source,
-        "return viewProven;" in source,
+        "D3D11_RTV_DIMENSION_TEXTURE2DARRAY" in legacy,
+        "D3D11_RTV_DIMENSION_TEXTURE2D" in legacy,
+        "viewIdentity.Get() == sourceIdentity.Get()" in legacy,
+        "viewDesc.Format, format_" in legacy,
+        "context->OMGetRenderTargets(" in legacy,
+        "view->Release();" in legacy,
+        "return viewProven;" in legacy,
         "leftIdentity.Get() == rightIdentity.Get()" in rr,
         "if (transfer == NativeGameEyeTransfer::Resolve)" in rr,
         "entry.gpu_copy_queued = true;" in rr,
