@@ -1,5 +1,8 @@
 # Quest APK → PCVR 운전석 모드: 전 구간 소스 추적 및 구현 명세 (2026-10-25)
 
+> **2026-10-25 critical correction:** Quest `render_frame` obtains two **separate** guest buffers: first **vehicle** (contains `EVWORK_CAR::matrix_B0` at +0xB0 and `EVWORK_CAR::matrix_F0` at +0xF0), second **camera** (`EvWorkCamera::cam_mode_34A`). Earlier descriptions of a “camera +0xF0 matrix” are misleading; the 16×float identity/restore applies to **vehicle matrix_F0** in the verified native render scope. See [full evidence and Windows player-model connection](QUEST_APK_COCKPIT_CAR_B0_F0_IDENTITY_ERRATUM_20261025.md). The Quest provider's exact vtable implementation still requires an independent type proof.
+
+
 ## 0. 목적, 증거, 상태
 - 사용자 소유 Quest APK의 ELF `liboutrun_quest_core.so`: SHA256 `fa0f9db9b744515a9a1439741bc9806ad007470b621b88d22a0b8cbced6120b6`.
 - PC 대상 `thp32tt/OutRun2006Tweaks`, `vr-d3d9ex-focus`, R26+HUD 안정화 기준. 이 문서는 게임/런타임 소스를 변경하지 않은 `REVIEW_ONLY` 분석과 이행 계획이다.
@@ -13,8 +16,8 @@
 |---|---|---|
 | 1. 프레임 진입 | `PcSceneRenderer::render_frame` `0x10CBE9C` | 프레임 인자 `(renderFlags & ~2) == 0x10`, 렌더러 `+0x2AD4` 활성, 게임 메모리 getter `+0x80` vtable `+0x30` 성공. 이 렌더러 플래그는 게임 STATE enum과 1:1로 단정 금지 |
 | 2. 운전석 소유 모드 | `0x10CBF3C..0x10CBF58` | guest control length `>0x34A`, game camera `[+0x34A] == 1` 조건에서만 native cockpit correction 활성. Windows 카메라 0/1/2 모두 오프셋되는 현행 정책과 다름 |
-| 3. 차체 보정 생성 | `0x10CBF6C..0x10CC2FC` | guest frame `+0xB0..+0xEC`와 `+0xF0..+0x12C`의 각각 16개 float로 16-float `cockpit_body_correction` TLS 계산. 별도 211-operation C++ 연구용 복원본 및 3개 합성 fixture 존재 |
-| 4. 일시적 변환 중립화 | `0x10CC300..0x10CC36C` | guest `+0xF0..+0x12C` 16 float를 정확한 identity로 바꿔 해당 render 호출 범위에 한정. 게임 시뮬레이션 카메라를 영구 덮어쓰지 않음 |
+| 3. 차체 보정 생성 | `0x10CBF6C..0x10CC2FC` | **vehicle guest** `matrix_B0 +0xB0..+0xEC`와 `matrix_F0 +0xF0..+0x12C`의 각각 16개 float로 16-float `cockpit_body_correction` TLS 계산. 별도 211-operation C++ 연구용 복원본 및 3개 합성 fixture 존재 |
+| 4. 일시적 변환 중립화 | `0x10CC300..0x10CC36C` | **vehicle** `matrix_F0 +0xF0..+0x12C` 16 float를 정확한 identity로 바꿔 해당 render 호출 범위에 한정. 게임 시뮬레이션 카메라를 영구 덮어쓰지 않음 |
 | 5. 차체 렌더링 | `PcSceneRenderer::display_race_car` `0x10C8D00`, `0x10C9288/0x10C929C` | `cockpit_render_active` / `cockpit_vehicle_draw` TLS로 소유권 구분. 표시 객체가 정확한 player인지 원본 mesh/draw 별 추적 필요 |
 | 6. 운전자·승객 | `Draw::disp_514c30` `0xD60FD4`, `0xD610E8/0xD61124` | `cockpit_occupant_draw` 별도 TLS, 16-float correction 소비. 운전자만 선택적으로 숨기고 동승자 유지; 실제 본 인덱스/리그 연결 미복원 |
 | 7. 유리 렌더링 | `Flush::draw_404700` `0x10B9894`, 핵심 조건 `0x10B9F68..0x10BA05C` | `DrawEntry.flags&2`, `pass==1`, DSTBLEND 20==6, 알파 0.55/0.425 ±0.001, SRCBLEND 19==2/5. 조건 충족 시 per-draw opacity=0.25, premult flag 별도; 모두 reset. **비트2 생산자 및 유리 메시는 미확정** |
