@@ -3426,10 +3426,22 @@ namespace OutRunVRStereo
         // Draw. Do not splice the next captured VB/IB draw into a native scene.
         struct R30NativeGameSourceGuard {
             IDirect3DDevice9* device = nullptr;
+            D3DPRIMITIVETYPE topology = D3DPT_FORCE_DWORD;
+            UINT primitives = 0u;
             bool forwarded = false;
             ~R30NativeGameSourceGuard() noexcept {
-                if (!forwarded)
-                    outrun::vr::dx11::live_game_frame::observe_unavailable_game_draw(device);
+                if (!forwarded) {
+                    // Even if a game VB/IB shadow/UP stream cannot be captured,
+                    // an authentic pixel-neutral draw must retain its source
+                    // ordinal. Only the shared observer may prove that using
+                    // current RT/scissor/depth/stencil state; never invent mesh.
+                    if (topology >= D3DPT_POINTLIST &&
+                        topology <= D3DPT_TRIANGLEFAN)
+                        outrun::vr::dx11::live_game_frame::
+                            observe_unmirrored_game_draw(device, topology, primitives);
+                    else
+                        outrun::vr::dx11::live_game_frame::observe_unavailable_game_draw(device);
+                }
             }
         };
 
@@ -3494,6 +3506,8 @@ namespace OutRunVRStereo
             // per-Draw CPU shadow capture and redundant D3D11 GPU workload.
             if (StereoWanted()) return;
             R30NativeGameSourceGuard nativeSource{device};
+            nativeSource.topology = topology;
+            nativeSource.primitives = primitiveCount;
             // Successful zero-count game draws have no VB/IB/UP bytes to
             // snapshot. Record their exact native source slot before D3D9
             // executes; failed original HRESULT still aborts at completion.
@@ -3564,6 +3578,8 @@ namespace OutRunVRStereo
             // per-Draw CPU shadow capture and redundant D3D11 GPU workload.
             if (StereoWanted()) return;
             R30NativeGameSourceGuard nativeSource{device};
+            nativeSource.topology = topology;
+            nativeSource.primitives = primitiveCount;
             // Successful zero-count game draws have no VB/IB/UP bytes to
             // snapshot. Record their exact native source slot before D3D9
             // executes; failed original HRESULT still aborts at completion.
@@ -3711,6 +3727,8 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             if (!live::diagnostic_enabled() || !device || StereoWanted()) return;
             R30NativeGameSourceGuard nativeSource{device};
+            nativeSource.topology = topology;
+            nativeSource.primitives = primitiveCount;
             if (primitiveCount == 0u &&
                 live::game_native_empty_primitive_type(
                     static_cast<std::uint32_t>(topology))) {
@@ -3750,6 +3768,8 @@ namespace OutRunVRStereo
             // per-Draw CPU shadow capture and redundant D3D11 GPU workload.
             if (StereoWanted()) return;
             R30NativeGameSourceGuard nativeSource{device};
+            nativeSource.topology = topology;
+            nativeSource.primitives = primitiveCount;
             // Successful zero-count game draws have no VB/IB/UP bytes to
             // snapshot. Record their exact native source slot before D3D9
             // executes; failed original HRESULT still aborts at completion.

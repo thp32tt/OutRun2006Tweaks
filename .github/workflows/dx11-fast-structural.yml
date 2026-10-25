@@ -346,6 +346,10 @@ jobs:
           python tools/test_dx11_dynamic_stream_game_frame_00774.py
           python tools/test_dx11_rejected_fragments_game_frame_00775.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_dynamic_stream_probe_00774.cpp -o /tmp/dx11_dynamic_stream_00774 && /tmp/dx11_dynamic_stream_00774
+          # 01072 real VB/IB/UP source-shadow miss: pixel-neutral Draws keep
+          # exact ordinals across all four hooks; pixel writers fail closed.
+          python tools/test_dx11_unmirrored_neutral_01072.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_unmirrored_neutral_probe_01072.cpp -o /tmp/dx11_unmirrored_01072 && /tmp/dx11_unmirrored_01072
           python tools/test_dx11_full_frame_empty_draw_00755.py
           python tools/test_dx11_zero_source_hook_00756.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_zero_source_hook_probe_00756.cpp -o /tmp/dx11_zero_hook_00756 && /tmp/dx11_zero_hook_00756

@@ -7446,6 +7446,16 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 s.frameBatch.abort();
             return;
         }
+        // Missing/expired original CPU shadow cannot create a native GPU
+        // Draw. A genuine geometry-less game source can only pass the strict
+        // scissor/offscreen/no-target-write classification above. Any pixel
+        // writer here invalidates publication, retaining original D3D9Ex
+        // Draw, input, FFB and menu/car/race Present unchanged.
+        if (!bytes || !stride) {
+            if (s.frameBatch.must_abort_unsupported(fullMode, multiBatch))
+                s.frameBatch.abort();
+            return;
+        }
         // Actual game VS/PS must never be submitted as the diagnostic FVF
         // fixed-function shader. Attempt the real SM3->DX11 IA/VS/PS path
         // first, with original D3D9 rendering/input/FFB always authoritative.
@@ -7706,9 +7716,11 @@ void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
     UINT nativeElements = 0;
     if (!game_native_primitive_element_count(static_cast<std::uint32_t>(type),
                                              primitives, nativeElements)) {
-        // Oversized/invalid DrawPrimitiveUP still belongs to the original
-        // D3D9 game stream: never splice native batches across that call.
-        observe_unavailable_game_draw(game);
+        // UP capture budget can reject a genuine game Draw whose scissor
+        // excludes the viewport or whose bound targets cannot be written.
+        // Preserve its source ordinal ONLY after the full observer proves
+        // pixel neutrality; oversized pixel writers still abort publication.
+        observe_unmirrored_game_draw(game, type, primitives);
         return;
     }
     observe(game, type, primitives, vertices, stride, nativeElements, nullptr, 0,
@@ -7721,6 +7733,23 @@ void observe_indexed(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
                      UINT indexCount, const NativeGameAdditionalStreams* extra) noexcept {
     observe(game, type, primitives, vertices, stride, vertexCount, indices,
             indexCount, extra);
+}
+
+// Called by all four original D3D9 Draw hook routes when their epoch-owned
+// VB/IB/UP bytes cannot be captured. This does not assume missing geometry
+// is a no-op: observe() authenticates current scissor, isolated offscreen
+// targets and no-color/depth/stencil writes BEFORE any geometry admission.
+// If any pixels may be written, its null source is rejected BEFORE native
+// shader/IA/GPU submission. Original D3D9 HRESULT is checked separately.
+void observe_unmirrored_game_draw(IDirect3DDevice9* game,
+                                 D3DPRIMITIVETYPE type,
+                                 UINT primitives) noexcept {
+    if (!diagnostic_enabled() || !game) return;
+    if (!env_full_game_opt_in()) {
+        observe_unavailable_game_draw(game);
+        return;
+    }
+    observe(game, type, primitives, nullptr, 0u, 0u, nullptr, 0u, nullptr);
 }
 
 bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,

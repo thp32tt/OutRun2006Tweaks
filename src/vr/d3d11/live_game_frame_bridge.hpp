@@ -55,6 +55,14 @@ void observe_indexed(IDirect3DDevice9* gameDevice, D3DPRIMITIVETYPE topology,
 void observe_empty_game_draw(IDirect3DDevice9* gameDevice,
                              D3DPRIMITIVETYPE topology) noexcept;
 
+// A real game VB/IB/UP Draw whose CPU snapshot failed may still be proven
+// pixel-neutral by live RT/viewport/scissor/Z/stencil state. The complete
+// source ordinal survives without generating any D3D11 Draw. A pixel writer
+// with missing geometry aborts native publication; original D3D9 continues.
+void observe_unmirrored_game_draw(IDirect3DDevice9* gameDevice,
+                                 D3DPRIMITIVETYPE topology,
+                                 UINT primitiveCount) noexcept;
+
 // An existing game VB/IB/UP Draw whose CPU snapshot cannot be mirrored still
 // advances the raw source stream. Multi-Draw inset publication fails closed;
 // this never alters the original D3D9 HRESULT or input path.
