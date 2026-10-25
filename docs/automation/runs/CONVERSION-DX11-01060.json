@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01060",
+  "production_id": "CONVERSION-DX11-01060",
+  "event_id": "CONVERSION-DX11-01060-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01060",
+  "classification": "A",
+  "feature_id": "DX11:MULTI_DIRTY_PRESENT_REAL_GAME_BACKBUFFER_RECOVERY",
+  "work_key": "DX11:NATIVE_MULTI_DIRTY_GAME_FRAME_ATOMIC_READBACK",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "A complete multi-dirty native D3D11 menu/car/race frame now seeds its untouched pixels from the authentic current D3D9 backbuffer using guarded same-format scratch-GPU-RT readback if direct GetRenderTargetData is rejected. R30 nested hook suppression protects the bridge mutex; both failures veto any partial native upload; game D3D9 input, FFB and original fallback are unchanged. Runtime/HMD still UNTESTED.",
+  "material_result_sha": "06990acebcfd7e518374d48d3c88e5d07745d89e",
+  "validation_bearing_result_sha": "73e2e57a3e100a381eff13068f971b5b887340e3",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_cpu_tile_admission_01057.py",
+    "tools/test_dx11_overlap_dirty_game_present_00769.py",
+    "tools/test_dx11_multi_dirty_upload_00754.py",
+    "tools/test_dx11_extended_dirty_batch_00767.py"
+  ],
+  "feature_contract": {
+    "goal": "Preserve real D3D9 menu/car/race backbuffer pixels outside each native dirty region even if direct source GetRenderTargetData fails, while rejecting partial native publication and preserving original game fallback.",
+    "acceptance_items": [
+      "Actual D3D9 backbuffer owned multi-dirty-frame staging with direct readback",
+      "Same-format private GPU RT fallback with R30 recursion suppression under State::mutex",
+      "No native dirty copy/UpdateSurface before successful full game background seed",
+      "Real Windows/OpenXR build and structural regression on one exact SHA",
+      "Quest3 and physical game runtime assessed separately"
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_D3D9_BACKBUFFER",
+      "DIRECT_OR_PRIVATE_GPU_RT_READBACK",
+      "CURRENT_FULL_FRAME_CPU_SEED",
+      "NATIVE_D3D11_DIRTY_REGION_ATOMIC_UPLOAD",
+      "ORIGINAL_D3D9_GAME_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_cpu_tile_admission_01057.py",
+      "tools/test_dx11_overlap_dirty_game_present_00769.py",
+      "tools/test_dx11_multi_dirty_upload_00754.py",
+      "tools/test_dx11_extended_dirty_batch_00767.py"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_MULTI_DIRTY_GAME_FRAME_ATOMIC_READBACK"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains opt-in. Any failure leaves original D3D9 Present/input untouched. DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "01060 source mutation regression PASS; 00754, 00769, 00767 and older fallback tests PASS in DX11 Fast",
+      "negative_regression": "Removing real backbuffer seed, nested R30 scope, private RT transfer, or success-gated frame upload makes source tests fail",
+      "component_integration": "R30 D3D9 Backbuffer -> private GPU RT + SYSTEMMEM full-frame seed -> dirty D3D11 pixels -> guarded D3D9 Present"
+    }
+  },
+  "validation_history": [
+    {
+      "sha": "06990acebcfd7e518374d48d3c88e5d07745d89e",
+      "fast_run_id": 40165940471,
+      "result": "FAIL",
+      "cause": "Pre-existing 00769 structural regression only accepted old inline direct-readback"
+    },
+    {
+      "sha": "160fcea5d828e13c6957f8a090015fac7e7a17ab",
+      "fast_run_id": 40166032034,
+      "result": "FAIL",
+      "cause": "00769 new source-order assertion excluded pre-direct fallback admission"
+    },
+    {
+      "sha": "831c7a77b0b08f631f69963599568ab0708d4424",
+      "fast_run_id": 40166145628,
+      "result": "FAIL",
+      "cause": "Pre-existing 00754 structural regression only accepted old inline direct-readback"
+    },
+    {
+      "sha": "5646d147ec5f99091d18e19991a9d8d41c70dbac",
+      "result": "SUPERSEDED_BY_CAUSAL_CI_REPAIR",
+      "cause": "Proactively repaired analogous inherited 00767 source-link assertion in same task"
+    },
+    {
+      "sha": "73e2e57a3e100a381eff13068f971b5b887340e3",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Five mandatory GitHub Actions completed SUCCESS on this exact source+test SHA"
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "73e2e57a3e100a381eff13068f971b5b887340e3",
+    "dx11_fast_run_id": 40166287560,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 40166287542,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 40166292412,
+    "windows_build_conclusion": "success",
+    "openxr_architecture_run_id": 40166292416,
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_run_id": 40166292398,
+    "hud_inspector_conclusion": "success",
+    "validation_scope": "Five mandatory GitHub Actions SUCCESS at one exact SHA; real OutRun menu/car/race, gamepad/FFB and Quest3 HMD remain UNTESTED",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/native_backend.cpp",
+  "real_game_draw_blocker": "Live complete menu->vehicle->race native D3D11 source Draw count, pixels and Quest3/VDXR playability are UNTESTED",
+  "next_implementation_action": "Continue native SM3/FVF Draw/DrawIndexed full game-frame source integration in a separately allocated feature, without promoting runtime until actual game/Quest3 test.",
+  "runtime_note": "No game/HMD hardware executed; source and exact-SHA builds do not establish visual or performance parity."
+}
