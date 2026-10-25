@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01075",
+  "production_id": "CONVERSION-DX11-01075",
+  "event_id": "CONVERSION-DX11-01075-E001",
+  "event_type": "c6_bookkeeping_after_implementation",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01075",
+  "classification": "A+B",
+  "work_key": "DX11:LIVE_SM3_LARGE_INDEXED_INSTANCE_LIST_GPU_DRAW",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "SOURCE_STAGE_BUILD_VERIFIED",
+  "checkpoint": "C6_SOURCE_STAGE_ONLY",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "material_result_sha": "3aaf6682b33dc698977f3be15926b023124a6fa8",
+  "validation_bearing_result_sha": "44094663a2205e144518b048df63c4937819e2a4",
+  "implementation_commits": [
+    "3aaf6682b33dc698977f3be15926b023124a6fa8"
+  ],
+  "repair_commits": [
+    "d69ff90937937e138467a7d3dd793b5fbb9f3afd",
+    "44094663a2205e144518b048df63c4937819e2a4"
+  ],
+  "score_change": 0,
+  "score_award_event": false,
+  "ai2_previous_confirmed_cumulative_score": 1963,
+  "ai2_new_confirmed_cumulative_score": 1963,
+  "score_note": "AI 2 scoreboard latest confirmed 1963 + this unfinished integrated SOURCE stage +0 = 1963; no duplicate point for CI repair or bookkeeping.",
+  "summary": "Source stage only: genuine game SM3 indexed POINTLIST, LINELIST and TRIANGLELIST instancing now preserves valid over-budget replicated IBs through original per-instance DX11 GPU DrawIndexed using authentic base vertices, while small indexed instances and contiguous non-indexed instances retain compact GPU Draw. Source range and upload checks are kept fail-closed; original DX9Ex output/input/FFB/SkyGlow preserved. Five mandatory exact-SHA Actions PASS; no OutRun 2006 / Quest3 VDXR session or measured native screen publication.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_instance_batches.hpp",
+    "tools/dx11_sm3_list_submission_01075.cpp",
+    "tools/test_dx11_sm3_list_submission_01075.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01074.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Continue unfinished genuine OutRun menu, vehicle and race source Draw/DrawIndexed to native D3D11 full-resolution frame by completing bounded independent indexed-list instancing and safe fallback without confusing CI with HMD verification.",
+    "acceptance_items": [
+      {
+        "id": "native_list_gpu_submission",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_SM3_GAME_DRAW_AND_INDEXED_INSTANCE_ASSEMBLY",
+        "expected_behavior": "Actual captured game source indexed independent lists use compact native GPU DrawIndexed when bounded and separated per-instance GPU DrawIndexed when replicated IB exceeds limit; non-indexed lists remain contiguous."
+      },
+      {
+        "id": "bad_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "NATIVE_GPU_INPUT_ADMISSION_AND_D3D9EX_FALLBACK",
+        "expected_behavior": "Out of range source indices, incompatible primitive counts, overflowed instance batches and failed GPU upload reject native submission and retain original D3D9Ex output/control path."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_BACKEND_WIN32_OPENXR_HUD",
+        "expected_behavior": "Five mandatory GitHub Actions produce completed success on same exact validation-bearing source SHA, without runtime playability claim."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW_INDEXED_INSTANCE_SOURCE",
+      "NATIVE_SM3_LIST_INSTANCE_PLAN",
+      "NATIVE_D3D11_DRAW_INDEXED_OR_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9EX_FAIL_CLOSED_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_instance_batches.hpp",
+      "tools/dx11_sm3_list_submission_01075.cpp",
+      "tools/test_dx11_sm3_list_submission_01075.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source-authored index reuse/multiplicity in POINT/LINE/TRIANGLE native instancing exercised by compiled 01075 C++ portable probe and integrated source static check, DX11 Fast run 40232176591 SUCCESS.",
+      "negative_regression": "Invalid list/count/index/overbudget source and guarded source pre-upload checks preserved by 01075 negative C++/Python tests, plus existing exact-SHA DX11 Backend/Windows/HUD gates.",
+      "component_integration": "Captured game R30 SM3 indexed data -> bounded instance-list planner -> authentic source index buffer / instance-mapped vertex streams -> actual existing native D3D11 DrawIndexed call -> opt-in full resolution native target; not yet a verified real game/HMD frame."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:LIVE_SM3_LARGE_INDEXED_INSTANCE_LIST_GPU_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED; real-game native draw count, full frame publication, menu/car/race optical parity, Quest3 VDXR and FPS all RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive=false by default, opt-in and malformed native source fails closed, original D3D9Ex game rendering/input/FFB/SkyGlow authoritative; DXVK frozen."
+  },
+  "acceptance_results": {
+    "native_list_gpu_submission": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "bad_source_fallback": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "five_exact_sha_gates": "PASS_EXACT_SHA"
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast",
+      "run_id": 40232176591,
+      "status": "success",
+      "sha": "44094663a2205e144518b048df63c4937819e2a4",
+      "event": "push"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40232176594,
+      "status": "success",
+      "sha": "44094663a2205e144518b048df63c4937819e2a4",
+      "event": "push"
+    },
+    {
+      "name": "Windows Build",
+      "run_id": 40232176602,
+      "status": "success",
+      "sha": "44094663a2205e144518b048df63c4937819e2a4",
+      "event": "push"
+    },
+    {
+      "name": "OpenXR",
+      "run_id": 40232176595,
+      "status": "success",
+      "sha": "44094663a2205e144518b048df63c4937819e2a4",
+      "event": "push"
+    },
+    {
+      "name": "HUD Inspector",
+      "run_id": 40232176623,
+      "status": "success",
+      "sha": "44094663a2205e144518b048df63c4937819e2a4",
+      "event": "push"
+    }
+  ],
+  "causal_repairs": [
+    {
+      "sha": "d69ff90937937e138467a7d3dd793b5fbb9f3afd",
+      "reason": "DX11 Fast inherited C6 01074 missing structural-policy fields; narrow 01075 source probe scope correction."
+    },
+    {
+      "sha": "44094663a2205e144518b048df63c4937819e2a4",
+      "reason": "HUD Windows MSVC C2373 compactListIndices boolean/index-vector collision; rename routing flag without weakening guard."
+    }
+  ],
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; game and Quest3 not executed; native published frames and input parity not measured.",
+  "next_implementation_action": "Continue full menu/car/race native D3D11 source graph and real-game frame/Quest3 output measurement independently; existing feature remains incomplete."
+}
