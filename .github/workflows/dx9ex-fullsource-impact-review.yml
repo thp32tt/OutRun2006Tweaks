@@ -11,6 +11,7 @@ on:
       - 'tools/verify_vr_r26_landscape_visual_recovery.py'
       - 'tools/verify_vr_desktop_source_coordinates.py'
       - 'tools/verify_vr_unified_menu_source.py'
+      - 'tools/verify_vr_f11_font_density.py'
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'tools/verify_dx9ex_r84_mainline.py'
       - 'tools/verify_dx9ex_r84_lens_source.py' # C993 exact physical draw provenance gate depends on this verifier.
@@ -52,8 +53,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Execute R26 exact plus-time physical draw regression
         run: python3 tools/verify_vr_r26_stage_fixedfn.py
-      - name: Verify R26 landscape visual recovery contract
-        run: python3 tools/verify_vr_r26_landscape_visual_recovery.py
+      - name: Verify R26 XR-render/UI-split visual recovery contract
+        run: |
+          python3 tools/verify_vr_desktop_source_coordinates.py
+          python3 tools/verify_vr_unified_menu_source.py
+          python3 tools/verify_vr_f11_font_density.py
+          python3 tools/verify_vr_r26_landscape_visual_recovery.py
       - name: Verify Win32 clipboard and timer API failure guards
         run: python3 tools/verify_vr_win32_cross_domain_safety.py --self-test
       - name: Whole source inventory and unexpected cross-domain impacts
