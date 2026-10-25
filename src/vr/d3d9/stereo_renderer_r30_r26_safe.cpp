@@ -3183,7 +3183,7 @@ namespace OutRunVRStereo
                     "viewport={},{},{},{} mode={} "
                     "eyeViewport={},{},{},{} "
                     "scissorL={},{},{},{} scissorR={},{},{},{} "
-                    "leftHr=0x{:08X} rightHr=0x{:08X}",
+                    "leftHr=0x{:08X} rightHr=0x{:08X} restored={}",
                     R30ExternalImGuiStereoDraws,
                     BackBufferDesc.Width, BackBufferDesc.Height,
                     state.viewport.X, state.viewport.Y,
@@ -3198,7 +3198,7 @@ namespace OutRunVRStereo
                     eyeScissors[1].left, eyeScissors[1].top,
                     eyeScissors[1].right, eyeScissors[1].bottom,
                     static_cast<unsigned>(leftHr),
-                    static_cast<unsigned>(rightHr));
+                    static_cast<unsigned>(rightHr), restored);
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;

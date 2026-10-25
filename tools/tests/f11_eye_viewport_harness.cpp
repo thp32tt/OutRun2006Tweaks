@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>
 #include <vector>
 using HRESULT=int; using DWORD=unsigned; using LONG=long;
 constexpr int E_NOTIMPL=-1,E_FAIL=-2,D3D_OK=0;
