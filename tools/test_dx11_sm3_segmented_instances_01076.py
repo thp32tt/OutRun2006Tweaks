@@ -9,22 +9,22 @@ for token in (
     "constexpr UINT kMaxSegmentedGameInstances = 128u;",
     "const bool segmentedInstanceUpload = sourceInstancing &&",
     "game_sm3_plan_native_instance_upload(",
-    "segmentedInstanceUpload ? 1u : instanceCount",
-    "segmentedInstanceUpload ? vertexCount : expandedVertices",
+    "firstChunkInstances",
+    "vertexCount * firstChunkInstances",
     "const UINT nativeSubmissionCount = segmentedInstanceUpload",
-    "if (segmentedInstanceUpload && instance != 0u)",
-    "instanceElements, instanceStreams, vertexCount, 1u,",
+    "instance % chunkPlan.instancesPerChunk == 0u",
+    "instanceElements, instanceStreams, vertexCount,",
     "instanceSteps, unpacked, instance)",
-    "unpacked.size() != vertexBytes",
+    "unpacked.size() != chunkBytes",
     "upload_full_game_stream(context, s.fullGameVertexUpload.Get()",
-    "segmentedInstanceUpload ? 0u :",
+    "instance % chunkPlan.instancesPerChunk) * vertexCount",
     "issueNativeGameDraw(",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))",
     "context->Draw(vertexCount, base)",
     "s.pending = true;",
 ):
     assert token in scope, "01076 real native path missing: "+token
-assert scope.index("unpacked.size() != vertexBytes") < scope.index("issueNativeGameDraw(")
+assert scope.index("unpacked.size() != chunkBytes") < scope.index("issueNativeGameDraw(")
 assert scope.index("context->DrawIndexed(nativeIndexCount") < scope.index("s.pending = true;")
 assert "firstInstance + inst" in streams
 assert "lastInstance / instanceStep[element.stream] + 1u" in streams

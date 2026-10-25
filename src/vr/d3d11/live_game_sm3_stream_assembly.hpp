@@ -43,6 +43,33 @@ game_sm3_plan_native_instance_upload(
     return {GameSm3NativeUploadMode::flat,
             static_cast<std::uint32_t>(expanded * nativeStride)};
 }
+// Group consecutive source-authored instances in bounded D3D11 dynamic VB
+// uploads. A connected strip/fan still requires separate Draws per original
+// instance; chunking only changes how often GPU storage is renamed.
+// Admission uses the *actual* packed FLOAT4 IA stride, never the D3D9 stride.
+struct GameSm3NativeChunkPlan {
+    std::uint32_t instancesPerChunk = 0u;
+    std::uint32_t firstUploadBytes = 0u;
+};
+[[nodiscard]] constexpr GameSm3NativeChunkPlan
+game_sm3_plan_native_instance_chunk(
+    std::uint32_t verticesPerInstance, std::uint32_t instanceCount,
+    std::uint32_t nativeStride, std::uint32_t maxVertices,
+    std::uint32_t maxBytes) noexcept {
+    if (!verticesPerInstance || !instanceCount || !nativeStride ||
+        !maxVertices || !maxBytes) return {};
+    const std::uint64_t bytesPerInstance =
+        std::uint64_t(verticesPerInstance) * nativeStride;
+    if (bytesPerInstance > maxBytes || verticesPerInstance > maxVertices)
+        return {};
+    const std::uint64_t count = (std::min)(
+        std::uint64_t(instanceCount),
+        (std::min)(std::uint64_t(maxVertices / verticesPerInstance),
+                   std::uint64_t(maxBytes) / bytesPerInstance));
+    if (!count || count > UINT32_MAX) return {};
+    return {static_cast<std::uint32_t>(count),
+            static_cast<std::uint32_t>(count * bytesPerInstance)};
+}
 struct GameSm3StreamView {
     const std::uint8_t* data{};
     std::uint32_t stride{};

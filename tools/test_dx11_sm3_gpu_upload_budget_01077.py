@@ -12,10 +12,10 @@ for token in (
     "sourceInstancing, vertexCount, instanceCount, plannedNativeStride,",
     "uploadPlan.mode == GameSm3NativeUploadMode::segmented",
     "uploadPlan.mode == GameSm3NativeUploadMode::invalid",
-    "segmentedInstanceUpload ? 1u : instanceCount",
-    "segmentedInstanceUpload ? vertexCount : expandedVertices",
-    "nativeByteCount != uploadPlan.vertexBytes",
-    "if (segmentedInstanceUpload && instance != 0u)",
+    "firstChunkInstances",
+    "vertexCount * firstChunkInstances",
+    "chunkPlan.firstUploadBytes : uploadPlan.vertexBytes",
+    "instance % chunkPlan.instancesPerChunk == 0u",
     "instanceSteps, unpacked, instance)",
     "upload_full_game_stream(context, s.fullGameVertexUpload.Get()",
     "issueNativeGameDraw(",
@@ -26,7 +26,7 @@ for token in (
     assert token in scope, "01077 missing native integration: " + token
 assert scope.index("game_sm3_plan_native_instance_upload(") < scope.index(
     "game_sm3_assemble_instanced_streams(")
-assert scope.index("nativeByteCount != uploadPlan.vertexBytes") < scope.index(
+assert scope.index("chunkPlan.firstUploadBytes : uploadPlan.vertexBytes") < scope.index(
     "issueNativeGameDraw(")
 for token in (
     "expanded > maxVertices ||",

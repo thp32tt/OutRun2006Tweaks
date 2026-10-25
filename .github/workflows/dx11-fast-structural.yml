@@ -552,6 +552,10 @@ jobs:
           # upload bytes (not only vertex count) use bounded native segments.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_gpu_upload_budget_01077.cpp -o /tmp/dx11_sm3_gpu_budget_01077 && /tmp/dx11_sm3_gpu_budget_01077
           python tools/test_dx11_sm3_gpu_upload_budget_01077.py
+          # 01078: contiguous original D3D9 instances share bounded GPU
+          # uploads while independent native strip/fan Draws remain exact.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_chunk_upload_01078.cpp -o /tmp/dx11_sm3_chunk_01078 && /tmp/dx11_sm3_chunk_01078
+          python tools/test_dx11_sm3_chunk_upload_01078.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_polygon_raster_probe_01032.cpp -o /tmp/dx11_polygon_raster_01032 && /tmp/dx11_polygon_raster_01032
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_colorfill_gpu_probe_01033.cpp -o /tmp/dx11_pre_draw_01033 && /tmp/dx11_pre_draw_01033
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_overdraw_probe_01034.cpp -o /tmp/dx11_pre_draw_01034 && /tmp/dx11_pre_draw_01034

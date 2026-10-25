@@ -5477,6 +5477,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         uploadPlan.mode == GameSm3NativeUploadMode::segmented;
     if (uploadPlan.mode == GameSm3NativeUploadMode::invalid)
         return false;
+    // Pack as many original source instances as one 32 MiB native VB permits.
+    // Submit connected strips/fans independently even inside the same chunk.
+    // The exact source instance ordinal remains the stream-frequency address.
+    const auto chunkPlan = segmentedInstanceUpload
+        ? game_sm3_plan_native_instance_chunk(
+              vertexCount, instanceCount, plannedNativeStride,
+              kMaxVertices, 1u << 25u)
+        : GameSm3NativeChunkPlan{};
+    if (segmentedInstanceUpload && !chunkPlan.instancesPerChunk)
+        return false;
+    const UINT firstChunkInstances = segmentedInstanceUpload
+        ? chunkPlan.instancesPerChunk : instanceCount;
     std::array<std::uint32_t,16> instanceSteps{};
     std::array<bool,16> referenced{};
     for (std::size_t i = 0u; i + 1u < declaration.size(); ++i)
@@ -5609,7 +5621,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (sourceInstancing
                 ? !game_sm3_assemble_instanced_streams(
                       elements, streams, vertexCount,
-                      segmentedInstanceUpload ? 1u : instanceCount,
+                      firstChunkInstances,
                       instanceSteps, unpacked)
                 : !game_sm3_assemble_streams(
                       elements, streams, vertexCount, unpacked))
@@ -6013,11 +6025,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 return false;
     }
     const auto nativeByteCount = static_cast<std::uint64_t>(nativeStride) *
-        (segmentedInstanceUpload ? vertexCount : expandedVertices);
+        vertexCount * firstChunkInstances;
     // Actual single-submit or per-instance GPU bytes must equal the source
     // planner's admission; a partial/oversized allocation never reaches Draw.
     if (!nativeByteCount || nativeByteCount > (1ull << 25u) ||
-        nativeByteCount != uploadPlan.vertexBytes) return false;
+        nativeByteCount != (segmentedInstanceUpload
+            ? chunkPlan.firstUploadBytes : uploadPlan.vertexBytes)) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
     if (!ensure_full_game_upload_buffer(device, s.fullGameVertexUpload,
                                         s.fullGameVertexCapacity, vertexBytes,
@@ -6268,21 +6281,29 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             context->Draw(vertexCount, base);
     };
     for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance) {
-        if (segmentedInstanceUpload && instance != 0u) {
-            // Real D3D9 INSTANCEDATA records are addressed by their absolute
-            // step/divisor even when the native VB is renamed per segment.
-            // Any failed later Map/Unpack aborts publication of ALL earlier
-            // segments; original D3D9 GPU output and controls continue.
+        if (segmentedInstanceUpload && instance != 0u &&
+            instance % chunkPlan.instancesPerChunk == 0u) {
+            // A subsequent GPU WRITE_DISCARD uploads only the next bounded
+            // group. Original INSTANCEDATA divisors never restart at zero.
+            // On a failed Map or missing source record the containing source
+            // Draw aborts publication, preserving D3D9Ex fallback.
+            const UINT remaining = instanceCount - instance;
+            const UINT chunkInstances = (std::min)(
+                remaining, chunkPlan.instancesPerChunk);
+            const UINT chunkBytes = chunkInstances * uploadPlan.vertexBytes;
             if (!game_sm3_assemble_instanced_streams(
-                    instanceElements, instanceStreams, vertexCount, 1u,
-                    instanceSteps, unpacked, instance) ||
-                unpacked.size() != vertexBytes ||
+                    instanceElements, instanceStreams, vertexCount,
+                    chunkInstances, instanceSteps, unpacked, instance) ||
+                unpacked.size() != chunkBytes ||
                 !upload_full_game_stream(context, s.fullGameVertexUpload.Get(),
                                          s.fullGameVertexCapacity,
-                                         unpacked.data(), vertexBytes))
+                                         unpacked.data(), chunkBytes))
                 return false;
         }
-        const UINT base = segmentedInstanceUpload ? 0u :
+        // Original per-instance Draw/DrawIndexed boundaries remain intact
+        // for connected geometry. The local base advances inside one chunk.
+        const UINT base = segmentedInstanceUpload
+            ? (instance % chunkPlan.instancesPerChunk) * vertexCount :
             (compactInstancedGeometry ? 0u : instance * vertexCount);
         issueNativeGameDraw(
             segmentedInstanceUpload ? vertexCount : drawVertexCount, base);
