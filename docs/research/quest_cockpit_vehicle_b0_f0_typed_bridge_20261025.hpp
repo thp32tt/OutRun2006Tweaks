@@ -21,6 +21,12 @@
 #include <cstring>
 #include <type_traits>
 
+namespace quest_research {
+std::array<float,16> body_correction_from_guest_matrices(
+    const std::array<float,16>& earlier,
+    const std::array<float,16>& later);
+} // namespace quest_research
+
 namespace quest_cockpit_research {
 static_assert(sizeof(D3DMATRIX) == 64u, "Expected D3D9 16xfloat matrix");
 static_assert(std::is_standard_layout_v<EVWORK_CAR>,
@@ -57,16 +63,12 @@ inline bool CaptureVehicleMatrices(const EVWORK_CAR* player,
     return true;
 }
 
-// Implemented in research file quest_cockpit_body_correction_reconstructed_20261025.cpp.
-// This is an arithmetic experiment, NOT a proven complete eye/world-view pose.
-std::array<float,16> NativeCorrectionReference(
-    const std::array<float,16>& vehicle_B0,
-    const std::array<float,16>& vehicle_F0);
-
-// Actual native arithmetic symbol (not linked into the game by this header):
-namespace implementation {
-    // quest_research::body_correction_from_guest_matrices(...) is the
-    // separately generated research implementation under docs/research.
+// Typed bridge to the separately generated, 211-operation Quest arithmetic.
+// Linking requires that research .cpp; no production translation unit includes it.
+inline std::array<float,16> ComputeNativeBodyCorrection(
+    const VehicleFrameMatrices& frame) {
+    return quest_research::body_correction_from_guest_matrices(
+        frame.matrix_B0, frame.matrix_F0);
 }
 
 // Implementation contract for subsequent production patch:
