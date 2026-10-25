@@ -154,12 +154,15 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "FULL_RESOLUTION_GAME_FRAME"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED",
-    "activation_guard_and_fallback": "Unproven signed mapping and sRGB fail closed to D3D9Ex; existing gamepad/FFB unchanged; no Quest3 native promotion."
+    "activation_guard_and_fallback": "Unproven signed mapping and sRGB fail closed to D3D9Ex; existing gamepad/FFB unchanged; no Quest3 native promotion.",
+    "gameplay_path_evidence_boundary": "Source callsite, native shader draw and full-resolution frame publication linkage only. No real game or Quest3/VDXR observation; RUNTIME_VALIDATION=UNTESTED."
   },
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No physical OutRun menu/car/race or Quest3/VDXR output verified.",
-  "c6_bookkeeping_only": true
+  "c6_bookkeeping_only": true,
+  "c6_repair_note_01069": "Existing 01068 C6 record omitted canonical policy-required source-stage names; corrected in same 01069 actual Fast Gate failure repair, without re-awarding prior feature or changing original validation-bearing SHA."
 }
