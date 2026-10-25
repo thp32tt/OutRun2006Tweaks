@@ -76,7 +76,9 @@ require("compactInstancedGeometry ? expandedVertices : vertexCount" in p and
         "nativeIndexCount > kMaxIndices" in p and
         "game_sm3_expand_list_instance_indices(" in p and
         "game_sm3_expand_connected_instance_indices(" in p and
-        "compactInstancedGeometry ? 1u : instanceCount" in p and
+        "const UINT nativeSubmissionCount = compactListInstances" in p and
+        "connectedCandidate ? connectedSubmission.drawCount : instanceCount" in p and
+        "game_sm3_connected_submission_plan(" in p and
         "if (instance >= nativeSubmissionCount) break;" in p and
         "issueNativeGameDraw(drawVertexCount, base);" in p and
         "liveBatch.accepts_source_draw(" in p and

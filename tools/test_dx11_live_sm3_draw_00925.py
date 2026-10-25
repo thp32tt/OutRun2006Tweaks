@@ -142,7 +142,9 @@ check("game_sm3_expand_list_instance_indices(" in source and
       "compactListInstances" in source and
       "game_sm3_expand_connected_instance_indices(" in source and
       "nativeIndexCount > kMaxIndices" in source and
-      "compactInstancedGeometry ? 1u : instanceCount" in source and
+      "const UINT nativeSubmissionCount = compactListInstances" in source and
+      "connectedCandidate ? connectedSubmission.drawCount : instanceCount" in source and
+      "game_sm3_connected_submission_plan(" in source and
       "if (instance >= nativeSubmissionCount) break;" in source,
       "SM3 indexed game instance expansion/fallback contract missing")
 
