@@ -758,7 +758,16 @@ def main() -> None:
         ("capture.selectTexture ? s.textureOnlyPs.Get() :\n                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get()",
          "s.sampledPs.Get()"),
     ):
-        mutated = bridge.replace(old, bad, 1)
+        # The signed-normal-map Draw path adds a separate error cleanup
+        # UnlockRect without replacing the existing successful completion.
+        # Destroy EVERY identical unlock when testing whether lifetime release
+        # is required, or one safe sibling keeps the text-only proof intact.
+        # Other mutations still affect only their first actual source site.
+        if old == "capture.texture->UnlockRect(level)":
+            assert bridge.count(old) >= 2
+            mutated = bridge.replace(old, bad)
+        else:
+            mutated = bridge.replace(old, bad, 1)
         assert mutated != bridge and not texture_path_complete(mutated), (
             "texture-stage native-D3D11 negative mutation escaped: " + old
         )
