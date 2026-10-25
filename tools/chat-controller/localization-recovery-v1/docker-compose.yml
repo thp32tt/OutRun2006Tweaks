@@ -28,13 +28,16 @@ services:
       OUTRUN_AB_BATCH_QUEUE: "false"
       OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Verified native-crop source-bound ImageGen queue
       OUTRUN_GPT_CHAT_OCR_ENABLED: "true" # Normal ChatGPT image-attachment OCR fallback; no API
+      OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "600" # 10m stale wait -> retry/skip automatically
+      OUTRUN_GPT_OCR_WATCHDOG_SECONDS: "60"
       # DDS compose/game PASS/deploy remain disabled; only PNG generation + C1 QA is automatic.
       OUTRUN_AB_BATCH_SIZE: "5"
       OUTRUN_AB_LIBRARY_FOLDER: "아웃런 한글화 신규" # Existing project Library; no separate folder.
       OUTRUN_AB_PROJECT_LIBRARY_NAME: "아웃런 한글화 신규"
       OUTRUN_AB_PROJECT_NAME: "아웃런 한글화 신규"
       OUTRUN_LIBRARY_MAX_SCAN: "500" # Library grows during long unattended production; keep SHA gate, scan deeper.
-      OUTRUN_LIBRARY_VERIFY_SECONDS: "90" # Never let one Library scan block later A/B/C1 schedule slots.\n      OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
+      OUTRUN_LIBRARY_VERIFY_SECONDS: "90" # Never let one Library scan block later A/B/C1 schedule slots.
+      OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
