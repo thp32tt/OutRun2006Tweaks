@@ -30,7 +30,7 @@ def integrated(b: str, h: str) -> bool:
         zero_end = section.find("        UINT expectedElements = 0;", consume)
     zero_case = section[zero_branch:zero_end] if 0 <= zero_branch < zero_end else ""
     return (0 <= section.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++")
-            < valid_type < zero_branch <= consume < before_span and
+            < zero_branch < valid_type < consume < before_span and
             "sourceOrdinal, sameSourceFullClear))" in zero_case and
             "s.clearColor.sourceDevice ==" in zero_case and
             "s.frameBatch.abort();" in zero_case and
