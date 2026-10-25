@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01063",
+  "production_id": "CONVERSION-DX11-01063",
+  "event_id": "CONVERSION-DX11-01063-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01063",
+  "classification": "A",
+  "feature_id": "DX11:NATIVE_STEREO_TYPED_GAME_CAMERA_GPU_HANDOFF",
+  "work_key": "DX11:STEREO_NATIVE_GAME_CAMERA_GPU_RING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Real game-created native D3D11 mono/full GPU sink now scopes OM/CS output detachment/restoration when synchronously copying a frame. Authentic two-eye native GPU sources with typeless BGRA8 storage may be copied into typed same-colorspace XR ring textures only when actual RTV physical mip/array selection and COM identity are proven, preserving source identity, fence/ACK and fail-closed original D3D9Ex Draw/Present/input/FFB. HMD and live OutRun results untested.",
+  "material_result_sha": "edae1b3a4262d542882a3157e583ac6fafffadd1",
+  "validation_bearing_result_sha": "d15329a5b901bbc369b0fa3e943d1938717fb2b0",
+  "changed_files": [
+    "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/vr/dx11_native_stereo_source_transfer_01063.cpp",
+    "tools/test_dx11_native_stereo_source_transfer_01063.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_TYPED_GAME_CAMERA_GPU_HANDOFF",
+    "goal": "Bridge authentic two independent game-created GPU camera eyes (including typeless BGRA8 with typed RTV color-space evidence) to an existing OpenXR ring and preserve live mono GPU sink game OM/CS state without changing original D3D9Ex gameplay or claiming HMD acceptance.",
+    "acceptance_items": [
+      {
+        "id": "typed_real_stereo_native_gpu_copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_NATIVE_EYE_SOURCE_TO_XR_GPU_RING",
+        "expected_behavior": "A real local D3D11 game camera typeless BGRA8 source with matching typed RTV physical selected subresource can enter existing native L/R ring GPU CopySubresourceRegion, producer fence and exact transport ACK; never merge L/R or reinterpret gamma."
+      },
+      {
+        "id": "owner_and_subresource_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "STEREO_PHYSICAL_SOURCE_OWNERSHIP",
+        "expected_behavior": "Foreign device, mismatched RTV resource, wrong mip or slice, color space mismatch, unresolved typeless MSAA and shared ring alias are rejected prior to GPU work."
+      },
+      {
+        "id": "mono_sink_gpu_state_preservation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_MONO_GAME_GPU_SINK",
+        "expected_behavior": "Immediate-context GPU consumer call preserves original game-owned MRT/depth/OM and CS UAV outputs across source copy; D3D9 Present/input/FFB remain authoritative."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "FIVE_MANDATORY_EXACT_SHA_ACTIONS",
+        "expected_behavior": "C++ positive/negative source test and source-link destructive regressions plus unchanged DX11 Fast/Backend/Windows Build/OpenXR/HUD Actions all succeed at same exact SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "REAL_GAME_D3D11_CAMERA_TEXTURE_WITH_TYPED_VIEW",
+      "SOURCE_IDENTITY_MIP_ARRAY_COLORSPACE_EVIDENCE",
+      "GPU_COPY_INDEPENDENT_LEFT_RIGHT_TO_NATIVE_SHARED_EYE_RING",
+      "EXACT_PRODUCER_EVENT_FENCE_IPC_ACK",
+      "SYNCHRONOUS_MONO_GPU_SINK_PRESERVE_OM_CS",
+      "ORIGINAL_D3D9EX_DRAW_PRESENT_INPUT_FFB_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tests/vr/dx11_native_stereo_source_transfer_01063.cpp",
+      "tools/test_dx11_native_stereo_source_transfer_01063.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast 40177607780 compiled/ran tests/vr/dx11_native_stereo_source_transfer_01063.cpp and Python source-link test, PASS output at exact d15329a5.",
+      "negative_regression": "Source-link destructive mutations break source-to-RTV identity, mip/slice, gamma match and mono callback output scope while original unchanged DX9Ex guards remain.",
+      "component_integration": "Game native GPU source on producer immediate context -> physical typed-RTV proof -> actual GPU eye pair Copy/Resolve/fence with owner+ACK; mono native GPU consumer restores game OM/CS output state on return."
+    },
+    "conflict_keys": [
+      "DX11:EYE_XR_HANDOFF",
+      "DX11:STEREO_NATIVE_GAME_CAMERA_GPU_RING"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "GAME_AUTHORED_D3D9_DRAW",
+      "NATIVE_D3D11_GPU_TARGET",
+      "INDEPENDENT_STEREO_EYE_GPU_HANDOFF"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "No automatic DXVK/backends promotion; original D3D9Ex Draw/Present/gamepad/FFB intact. Mono is not copied to both eyes; game eye source provenance checked."
+  },
+  "acceptance_results": {
+    "typed_real_stereo_native_gpu_copy": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "DX11 Fast 40177607780 includes 01063 native typeless/camera physical source positive and negative tests. Actual game/HMD UNTESTED."
+    },
+    "owner_and_subresource_fail_closed": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01063 source-linked mutation and 01063 portable C++ checks succeeded on final SHA. Physical game execution UNTESTED."
+    },
+    "mono_sink_gpu_state_preservation": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Full frame GPU callback now uses ScopedNativeGameGpuTransferOutputs on immediate context, 01063 structural source regression PASS. Runtime game/FFB UNTESTED."
+    },
+    "exact_sha_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX11 Fast 40177607780; Backend 40177607633; Windows Build 40177607719; OpenXR 40177610379; HUD Inspector 40177610288 all success for d15329a5b901bbc369b0fa3e943d1938717fb2b0."
+    }
+  },
+  "validation_history": [
+    {
+      "exact_sha": "edae1b3a4262d542882a3157e583ac6fafffadd1",
+      "result": "FAIL",
+      "cause": "The new Python destructive mutation targeted an earlier repeated sampleCount == 1u in the old eye-source helper, not the newly integrated format admission helper. No game C++ source failure established."
+    },
+    {
+      "exact_sha": "d15329a5b901bbc369b0fa3e943d1938717fb2b0",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Under same TASK_ID, negative mutation restricted to the new typed-source function; five mandatory Actions SUCCESS on the same exact SHA, no safety assertions suppressed."
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "d15329a5b901bbc369b0fa3e943d1938717fb2b0",
+    "dx11_fast_run_id": 40177607780,
+    "backend_gate_run_id": 40177607633,
+    "windows_build_run_id": 40177607719,
+    "openxr_architecture_run_id": 40177610379,
+    "hud_inspector_run_id": 40177610288,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_conclusion": "success",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "No same-SHA physical OutRun menu/car/race native Draw counters, successful published native GPU/eye frames, or Quest3/VDXR visual evidence observed.",
+  "next_implementation_action": "Continue real native menu->car selection->race full Draw/DrawIndexed coverage and shared eye GPU source registration only after clean independent game launch evidence; hardware HMD/FFB remains separate.",
+  "runtime_note": "Five GitHub CI gates prove source build/integration only; actual VR/game/HMD physical and 4:3 menu theater output UNTESTED. DXVK branch unchanged."
+}
