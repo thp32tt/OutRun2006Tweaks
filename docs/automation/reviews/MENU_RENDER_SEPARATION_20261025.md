@@ -98,3 +98,13 @@ hardware baseline. This task changes startup source selection and host title/men
 optical sizing; race HUD scale, selectors, world draw ownership, input/FFB and
 DriverSeatView defaults are unchanged. Title/menu optics and selected source
 performance require new exact-package Quest3/VDXR acceptance, not baseline promotion.
+
+Active run 40195398274 at 74fdf953 stopped on the composite P0 verifier's duplicate
+superseded F11/C993 assertions. Updated those to current finite+affine F11,
+exact projected-sun admission/token/fallback and all three bounded raw-WVP
+callsites. Function extraction/injection now skips forward declarations. Full
+composite positive and destructive tests pass locally; production lens/F11 source
+is unchanged. The actual host config function was additionally extracted and
+compiled against deterministic Win32 API shims: same-owner OpenProcess/path/
+missing-files failure, new PID/HWND reset, user precedence, explicit 1.0 and NaN
+cases pass. Final integrated CI remains required on the validation SHA.

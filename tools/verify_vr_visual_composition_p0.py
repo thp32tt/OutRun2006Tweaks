@@ -21,6 +21,13 @@ def function_body(source, marker):
     if start < 0:
         raise SystemExit(f'P0 visual composition drift: missing function {marker!r}')
     brace = source.find('{', start)
+    # A forward declaration is not the function body. Skip it rather than
+    # accidentally examining the next unrelated helper's braces.
+    while brace >= 0 and 0 <= source.find(';', start, brace) < brace:
+        start = source.find(marker, start + len(marker))
+        if start < 0:
+            raise SystemExit(f'P0 visual composition drift: no definition for {marker!r}')
+        brace = source.find('{', start)
     if brace < 0:
         raise SystemExit(f'P0 visual composition drift: missing body for {marker!r}')
     depth = 0
@@ -1265,14 +1272,14 @@ for label, old, changed in (
         raise SystemExit('P0 XMT overflow guard mutation survived: ' + label)
 
 # P0 F11 fork integration: upstream Dear ImGui DX9 is XYZ+orthographic and
-# cannot enter R30's XYZRHW/VS owners. The old finite head-relative HUD plane
-# doubled F11 on Quest3. Check FOV-only eye affine + scissor and full restore,
-# preserving fallback for ordinary game/menu 3D.
+# cannot enter R30's XYZRHW/VS owners directly. Preserve the current guarded
+# finite plane, bilateral FOV fallback, scissor and full state restoration.
 def check_f11_xyz_owner(source):
-    prepare = function_body(source, 'bool R30PrepareExternalImGuiProjection(')
+    prepare = ' '.join(function_body(source, 'bool R30PrepareExternalImGuiProjection(').split())
     draw = function_body(source, 'HRESULT R30TryExternalImGuiIndexed(')
     indexed = function_body(source, 'HRESULT __stdcall DrawIndexedPrimitiveDestR30(')
-    world = function_body(source, 'bool R30ConfigureXyzrhwWorldEffect(')
+    world = function_body(source[source.rindex('bool R30ConfigureXyzrhwWorldEffect('):],
+                          'bool R30ConfigureXyzrhwWorldEffect(')
     execute = function_body(source, 'HRESULT R30ExecuteXyzrhwStereo(')
     for token in (
         'ExternalOverlaySemanticDepth == 0',
@@ -1283,6 +1290,13 @@ def check_f11_xyz_owner(source):
         'GetTransform(D3DTS_PROJECTION',
         'stockProjection._34',
         'stockProjection._44',
+        'const bool finiteWorldLock = R30ConfigureXyzrhwWorldEffect( device, nullptr, 0, 0, state, nullptr) && state.hudWorldLockValid;',
+        'if (!finiteWorldLock)',
+        'if (finiteWorldLock)',
+        'projected = MultiplyMatrix(stockProjection, clipMap);',
+        'clipMap._14 = state.hudClipW[eye][0];',
+        'clipMap._24 = state.hudClipW[eye][1];',
+        'clipMap._44 = state.hudClipW[eye][2];',
         'OutRunVRF11Screen2D::Build(bounds, f11Affine)',
         'stockProjection.m[row][0] * f11Affine[eye].scaleX',
         'stockProjection.m[row][1] * f11Affine[eye].scaleY',
@@ -1292,9 +1306,9 @@ def check_f11_xyz_owner(source):
         'eyeScissors[eye]',
         'FrameHadWorldStereo',
     ):
-        require(token, prepare, 'F11 explicitly scoped XYZ/orthographic FOV screen overlay')
+        require(token, prepare, 'F11 scoped finite projection and bilateral FOV fallback')
     if 'GetLatchedHeadInverse(' in prepare or 'R30BuildHudPlaneCoefficients(state, false)' in prepare:
-        raise SystemExit('P0 F11 regression: head pose / finite gameplay plane reintroduced')
+        raise SystemExit('P0 F11 regression: bypassed shared projection owner')
     for token in (
         'R30CaptureSkyGlowSceneBeforeHud(device)',
         'device->SetTransform(',
@@ -1313,8 +1327,10 @@ def check_f11_xyz_owner(source):
             'F11 owner must be reached from actual indexed draw')
     require('if (externalImGui != E_NOTIMPL)', indexed,
             'F11 owner result must bypass stock R26')
-    require('R30BuildHudPlaneCoefficients(state, true)', world,
+    require('R30BuildHudPlaneCoefficients(state, !externalF11)', world,
             'regular game sprites must retain the configured HudScale')
+    require('const bool externalF11 =', world, 'finite plane isolates external overlay scale')
+    require('semanticOverlay2D;', world, 'finite plane external scale requires overlay semantics')
     require('R30XyzrhwLooksLikeHudPlane(', world,
             'untagged flat RHW=1 world evidence must be checked')
     require('state.worldEvidenceAuthoritative', world,
@@ -1345,8 +1361,9 @@ for label, needle in (
     ('broad external scope', 'ExternalOverlaySemanticDepth == 0'),
     ('XYZ vertex gate', 'D3DFVF_XYZ'),
     ('per-eye scissor', 'device->SetScissorRect(&eyeScissors[eye])'),
+    ('F11 finite projection', 'projected = MultiplyMatrix(stockProjection, clipMap);'),
     ('F11 eye affine', 'OutRunVRF11Screen2D::Build(bounds, f11Affine)'),
-    ('game sprite scale isolation', 'R30BuildHudPlaneCoefficients(state, true)'),
+    ('game sprite scale isolation', 'R30BuildHudPlaneCoefficients(state, !externalF11)'),
     ('host world authority', 'if (state.worldEvidenceAuthoritative)'),
     ('global shadow budget', 'R30TotalShadowBudgetBytes'),
 ):
@@ -2544,64 +2561,48 @@ def verify_centre_actual_draw_owner(source):
     section = source.split('class VRLensFlareProjected2D : public Hook', 1)[1]
     section = section.split('VRLensFlareProjected2D::instance;', 1)[0]
     for required in ('static void __cdecl DrawObjectAlphaCentre(',
-                     'ScopedExactProducerSemantic semantic(',
-                     'centreScope, nullptr, true,',
-                     'ProducerToken::LensFlareCentre',
                      'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',
                      'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected'):
-        require(required, section, 'centre-only independent actual draw')
-    draw = function_body(section, 'static void __cdecl DrawObjectAlphaCentre(')
-    for required in ('Settings::VREnabled && LensCentreDepth != 0',
-                     'LensCentreOwnerDepth == LensCentreDepth',
-                     '!OutRunVR::GameSemantic::QueueRenderActive() &&',
-                     'objectId == 0x570002',
-                     'RenderScope::WorldBillboard',
-                     'RenderScope::None',
-                     ': OutRunVR::GameSemantic::RenderScope::None;',
-                     'ScopedExactProducerSemantic semantic(',
-                     'centreScope, nullptr, true,',
-                     'ProducerToken::LensFlareCentre',
-                     'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);'):
-        require(required, draw, 'central-only world-owner and desktop fallback')
-    if 'RenderScope::ProjectedScreenEffect2D' in draw:
-        raise SystemExit('centre must not inherit the outer projection scope')
-    if draw.count('Game::DrawObjectAlpha_Internal(') != 1:
-        raise SystemExit('centre draw must submit the original game once')
-    require_order(draw, 'central predicate before exact original draw',
-                  'Settings::VREnabled && LensCentreDepth != 0',
-                  'objectId == 0x570002',
-                  'RenderScope::WorldBillboard',
-                  'RenderScope::None',
+        require(required, section, 'exact C993 source separate from outer CABE')
+    family = function_body(section, 'static constexpr bool IsProjectedSunScreenObject(')
+    for object_id in ('0x570002', '0x570006', '0x57000F', '0x570010'):
+        require('case ' + object_id + ':', family, 'exact projected sun family')
+    require('default:', family, 'unknown sun object rejected')
+    require('return false;', family, 'unknown sun object rejected')
+    draw = ' '.join(function_body(section, 'static void __cdecl DrawObjectAlphaCentre(').split())
+    require('const bool projectedSun = Settings::VREnabled && !OutRunVR::GameSemantic::QueueRenderActive() && IsProjectedSunScreenObject(objectId);',
+            draw, 'VR/direct/known-object projected sun admission')
+    fallback = function_body(draw, 'if (!projectedSun)')
+    require('Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);',
+            fallback, 'desktop/queued/unrelated original draw')
+    require('return;', fallback, 'fallback must not submit twice')
+    require('if (Settings::VREnabled && objectId == 0x570002 && !Settings::VRLensFlareCentreEnabled.get())',
+            draw, 'disc-only existing A/B opt-out')
+    exact = draw[draw.index('ScopedExactProducerSemantic semantic('):]
+    require_order(exact, 'C993 projected scope and token before actual original draw',
                   'ScopedExactProducerSemantic semantic(',
-                  'centreScope, nullptr, true,',
-                  'ProducerToken::LensFlareCentre',
-                  'Game::DrawObjectAlpha_Internal(')
+                  'RenderScope::ProjectedScreenEffect2D, nullptr, true,',
+                  'ProducerToken::LensFlareCentre);',
+                  'ScopedRenderSemantic sunDrawScope(',
+                  'RenderScope::ProjectedScreenEffect2D);',
+                  'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);')
+    if draw.count('Game::DrawObjectAlpha_Internal(') != 2:
+        raise SystemExit('C993 requires one original call in each exclusive branch')
 verify_centre_actual_draw_owner(graphics)
-# Negative tests isolate the single central sun while the original CABE
-# projected outer-ring draw remains protected by its separate verifier.
+# Mutate actual C993 admission/ownership/fallback, not superseded WorldBillboard math.
 for label, before, after in (
-    ('VR disabled gate', 'Settings::VREnabled && LensCentreDepth != 0',
-     'LensCentreDepth != 0'),
-    ('original parent depth gate', 'Settings::VREnabled && LensCentreDepth != 0',
-     'Settings::VREnabled'),
-    ('original object identity', 'objectId == 0x570002', 'objectId != 0'),
-    ('unowned nested original parent',
-     'LensCentreOwnerDepth == LensCentreDepth', 'LensCentreDepth > 0'),
-    ('direct owner failed pending token isolation',
-     'centreScope, nullptr, true,',
-     'centreScope, nullptr, false,'),
-    ('prevent queued semantic hijack',
-     '!OutRunVR::GameSemantic::QueueRenderActive() &&', ''),
-    ('centre C993 direct token lost', 'ProducerToken::LensFlareCentre',
-     'ProducerToken::None'),
-    ('centre C993 direct token aliased', 'ProducerToken::LensFlareCentre',
-     'ProducerToken::RivalMarkerSprani'),
-    ('restore flat/headlocked scope', 'RenderScope::WorldBillboard',
-     'RenderScope::ProjectedScreenEffect2D'),
-    ('remove desktop fallback', 'RenderScope::None;', 'RenderScope::WorldBillboard;'),
-    ('drop original game alpha draw',
-     'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);',
-     '(void)objectId;'),
+    ('VR disabled gate', 'Settings::VREnabled &&\n            !OutRunVR::GameSemantic::QueueRenderActive()',
+     '!OutRunVR::GameSemantic::QueueRenderActive()'),
+    ('exact family', 'IsProjectedSunScreenObject(objectId);', 'true;'),
+    ('disc-only opt-out', 'objectId == 0x570002', 'objectId != 0'),
+    ('pending token isolation', 'nullptr, true,', 'nullptr, false,'),
+    ('queued semantic hijack', '!OutRunVR::GameSemantic::QueueRenderActive() &&', ''),
+    ('C993 token lost', 'ProducerToken::LensFlareCentre', 'ProducerToken::None'),
+    ('C993 token aliased', 'ProducerToken::LensFlareCentre', 'ProducerToken::RivalMarkerSprani'),
+    ('projected family split', 'RenderScope::ProjectedScreenEffect2D,', 'RenderScope::WorldBillboard,'),
+    ('fallback double draw', 'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);\n            return;',
+     'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);'),
+    ('drop original fallback', 'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);', '(void)objectId;'),
 ):
     start = graphics.index('static void __cdecl DrawObjectAlphaCentre(')
     end = graphics.index('\npublic:', start)
@@ -2614,7 +2615,7 @@ for label, before, after in (
     except SystemExit:
         pass
     else:
-        raise SystemExit('central sun negative mutation survived: ' + label)
+        raise SystemExit('C993 negative mutation survived: ' + label)
 try:
     verify_centre_actual_draw_owner(graphics.replace(
         'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',
@@ -2926,6 +2927,9 @@ check_time_goal_lens_owner(r30, ui)
 def inject_one_function_token(source, signature, token, replacement):
     begin = source.index(signature)
     brace = source.index('{', begin)
+    while 0 <= source.find(';', begin, brace) < brace:
+        begin = source.index(signature, begin + len(signature))
+        brace = source.index('{', begin)
     depth = 0
     end = None
     for i in range(brace, len(source)):
@@ -3250,7 +3254,10 @@ def check_exact_scene_effect_raw_wvp(source):
         'if (!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'GetVertexShaderConstantF('
     )
-    if fallback.count('R30GetExtendedRawWvpForExactSceneEffect(original)') != 3:
+    # Projected CABE now owns an earlier exclusive branch; two generic
+    # fallbacks remain below, with three checked callsites across the owner.
+    if (fallback.count('R30GetExtendedRawWvpForExactSceneEffect(original)') != 2 or
+            eye.count('R30GetExtendedRawWvpForExactSceneEffect(original)') != 3):
         raise SystemExit('P0 exact SceneEffect/CABE raw-WVP coverage mismatch')
 
 check_exact_scene_effect_raw_wvp(r30)

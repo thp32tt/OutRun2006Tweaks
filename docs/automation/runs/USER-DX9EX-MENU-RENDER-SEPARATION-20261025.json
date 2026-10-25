@@ -27,7 +27,9 @@
     "menu resolution split red-before/green-after PASS",
     "menu letterbox/mutation PASS",
     "unified source/manual source precedence PASS",
-    "mirror aspect fit PASS"
+    "mirror aspect fit PASS",
+    "73 of 75 resumed Active scripts PASS; composite now PASS; whole-source inventory deferred to complete GitHub checkout",
+    "Extracted actual host config function compiled with deterministic Win32 API shims: same-owner OpenProcess/image-path/no-config failure, new HWND/PID reset, user precedence, explicit 1.0 and NaN PASS"
   ],
   "next_action": "Verify final exact SHA Active, Domain, Inspector and Full Source; record package identity and runtime UNTESTED.",
   "latest_verified_head": "c0bd73a333ded2056be37025c6ff652160acb39a",
@@ -43,5 +45,7 @@
       "reason": "superseded lens assertion; repaired alongside stale F11 assertion"
     }
   },
-  "followup": "same-owner config poll preserves accepted menu snapshot on process/path/no-config failure; no owner leakage"
+  "followup": "same-owner config poll preserves accepted menu snapshot on process/path/no-config failure; no owner leakage",
+  "implementation_sha": "74fdf953b197a0109fc83a807b5396e75f3b5aed",
+  "validation_gate_repair": "P0 composite verifier also contained superseded F11/C993 expectations and parsed a forward declaration as the next unrelated body. Updated current branches, retained negative controls, and fixed definition selection. Runtime lens/F11 code unchanged."
 }
