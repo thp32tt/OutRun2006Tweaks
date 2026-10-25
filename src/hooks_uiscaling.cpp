@@ -1273,7 +1273,7 @@ class UIScaling : public Hook
     }
 	// 1st, 2nd and 3rd are each a single sprite, and this call takes its
 	// position as floats, so the discarded fraction goes straight back on.
-	static void TagAppendedNodes(
+	static unsigned TagAppendedNodes(
 		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
 		OutRunVR::GameSemantic::RenderScope scope,
 		OutRunVR::GameSemantic::ProducerToken producer =
@@ -1284,6 +1284,7 @@ class UIScaling : public Hook
             nullptr,
         std::uint64_t preserveNewerExactSince = 0)
 	{
+        unsigned taggedNodes = 0;
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
@@ -1346,11 +1347,13 @@ class UIScaling : public Hook
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 					node, scope, producer, projectedMarker,
                     preserveNewerExactSince);
+                ++taggedNodes;
 				if (node == tailAfter)
 					break;
 				node = node->next_0;
 			}
 		}
+        return taggedNodes;
 	}
 
 
@@ -1707,11 +1710,23 @@ class UIScaling : public Hook
         {
             // Nested exact producers keep the newer serial/token; only
             // new stable-root siblings inherit the full result-graph owner.
-            TagAppendedNodes(before,
+            const unsigned taggedNodes = TagAppendedNodes(before,
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 OutRunVR::GameSemantic::ProducerToken::ResultProgress,
-                nullptr, &rootsBefore, entrySerial);
+                nullptr, nullptr, entrySerial);
             FlushD3DXAtDirectGoalSourceExit();
+            if (Settings::VRTelemetry)
+            {
+                static thread_local std::uint64_t fullGraphCalls = 0;
+                const auto n = ++fullGraphCalls;
+                if (n <= 8 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR P0 RESULT FULL GRAPH SOURCE: calls={} taggedNodes={} "
+                        "state={} mode={} exactScope=SCREEN_HUD policy=LIVE_ROOT_REACHABILITY",
+                        n, taggedNodes,
+                        Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                        Game::game_mode ? *Game::game_mode : -1);
+            }
         }
         return result;
     }
@@ -1816,15 +1831,16 @@ class UIScaling : public Hook
         // The source may toggle VR or reenter the renderer during the E8:
         // only an unchanged, direct VR source is eligible for eye semantics.
         // Unknown or mixed native D3DX buffers still use their original End.
+        unsigned stageTaggedNodes = 0;
         if (StageExtensionAdmission.mayPublish(
                 Settings::VREnabled,
                 OutRunVR::GameSemantic::SpriteQueueDepth == 0,
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
         {
-            TagAppendedNodes(StageExtensionBefore,
+            stageTaggedNodes = TagAppendedNodes(StageExtensionBefore,
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 OutRunVR::GameSemantic::ProducerToken::StageExtensionTime,
-                nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial);
+                nullptr, nullptr, StageExtensionEntrySerial);
             FlushD3DXAtDirectStageSourceExit();
         }
         // Always restore the exact direct-draw queue cursor/anchor even if
@@ -1836,8 +1852,8 @@ class UIScaling : public Hook
         const auto hit = ++StageExtensionCompleted;
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
             spdlog::info(
-                "VR P0 STAGE EXTENSION SOURCES: calls={} gameState={} mode={} exactScope=SCREEN_HUD",
-                hit,
+                "VR P0 STAGE EXTENSION SOURCES: calls={} taggedNodes={} gameState={} mode={} exactScope=SCREEN_HUD policy=LIVE_ROOT_REACHABILITY",
+                hit, stageTaggedNodes,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1);
         StageExtensionBefore = {};
@@ -2337,10 +2353,20 @@ class UIScaling : public Hook
         }
 		// The prior HMD-accepted queued rival nodes retain exactly the same
 		// scope and anchor, with no widening to generic world/HUD sprites.
-		TagAppendedNodes(before, scope,
+		const unsigned taggedNodes = TagAppendedNodes(before, scope,
 			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
 			projected ? &projectedAnchor : nullptr,
-            &rootsBefore, entrySerial);
+            nullptr, entrySerial);
+        if (Settings::VREnabled && Settings::VRTelemetry)
+        {
+            static thread_local std::uint64_t rivalQueueTags = 0;
+            const auto n = ++rivalQueueTags;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL QUEUE TAG: calls={} taggedNodes={} anchorValid={} "
+                    "policy=LIVE_ROOT_REACHABILITY",
+                    n, taggedNodes, projected ? 1 : 0);
+        }
 		return result;
 	}
 
@@ -3091,7 +3117,7 @@ public:
             "VR P0 RESULT CRASH GUARD 20261011: 19 B9200 original E8 "
             "calls unmodified, all rva+5 midhooks disabled "
             "(minidump EIPs 0x97C5F and 0x97E75); "
-            "stock result graph preserved, stereo correction still pending");
+            "stock result E8 calls preserved; safe B9200-entry and full-graph wrappers remain active below");
 
         // Safe replacement for the retired CALL+5 hooks: the original
         // sub_4B9200 entry is intercepted once, then the unmodified return
