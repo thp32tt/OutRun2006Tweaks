@@ -12,7 +12,7 @@ for token in (
     "listSubmission.mode == GameSm3ListSubmissionMode::compact_linear",
     "if (compactListIndexedSubmission && nativeIndices) {",
     "listCandidate ? listSubmission.drawCount",
-    "const UINT base = segmentedInstanceUpload ? 0u :",
+    "const UINT base = segmentedInstanceUpload",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
     "context->Draw(vertexCount, base);",
     "if (nativeIndices[i] >=",

@@ -70,7 +70,7 @@ def sm3_fan_connected(src):
         "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
         "context->Draw(vertexCount, base);",
         "for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance)",
-        "if (segmentedInstanceUpload && instance != 0u)",
+        "instance % chunkPlan.instancesPerChunk == 0u",
         "const UINT nativeSubmissionCount = segmentedInstanceUpload",
         "connectedCandidate ? connectedSubmission.drawCount : instanceCount",
         "game_sm3_connected_submission_plan(",

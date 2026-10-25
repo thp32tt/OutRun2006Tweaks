@@ -79,7 +79,7 @@ require("compactInstancedGeometry ? expandedVertices : vertexCount" in p and
         "const UINT nativeSubmissionCount = segmentedInstanceUpload" in p and
         "connectedCandidate ? connectedSubmission.drawCount : instanceCount" in p and
         "game_sm3_connected_submission_plan(" in p and
-        "if (segmentedInstanceUpload && instance != 0u)" in p and
+        "instance % chunkPlan.instancesPerChunk == 0u" in p and
         "issueNativeGameDraw(" in p and
         "liveBatch.accepts_source_draw(" in p and
         "if (!env_full_game_opt_in()" in p and

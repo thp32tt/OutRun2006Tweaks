@@ -145,7 +145,7 @@ check("game_sm3_expand_list_instance_indices(" in source and
       "const UINT nativeSubmissionCount = segmentedInstanceUpload" in source and
       "connectedCandidate ? connectedSubmission.drawCount : instanceCount" in source and
       "game_sm3_connected_submission_plan(" in source and
-      "if (segmentedInstanceUpload && instance != 0u)" in source,
+      "instance % chunkPlan.instancesPerChunk == 0u" in source,
       "SM3 indexed game instance expansion/fallback contract missing")
 
 # 01032: actual captured polygon fill is no longer SOLID-only. Native
