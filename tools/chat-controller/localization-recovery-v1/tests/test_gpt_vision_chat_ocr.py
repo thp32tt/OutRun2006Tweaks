@@ -105,6 +105,32 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertIn("CONFIDENCE_TOO_LOW",result["rejected"])
         self.assertEqual(list(self.gpt_out.glob("*/*/manifest.json")),[])
 
+    def test_stale_response_auto_retries_then_skips(self):
+        import datetime as dt
+        binding,_=g.next_binding()
+        g.stage_submission(binding["task_id"])
+        g.record_chat_url(binding["task_id"],"https://chatgpt.com/c/12345678-1234-1234-1234-123456789abc")
+        st=g._state()
+        st["active"]["sent_at"]=(dt.datetime.now(dt.timezone.utc)-dt.timedelta(seconds=700)).isoformat()
+        g._save_state(st)
+        first=g.recover_stale_active(600)
+        self.assertEqual(first["status"],"RESPONSE_TIMEOUT_RETRY")
+        self.assertIsNone(g.active_task())
+        retry,reason=g.next_binding()
+        self.assertIsNone(reason)
+        self.assertTrue(retry["task_id"].endswith("-R1"))
+        g.stage_submission(retry["task_id"])
+        g.record_chat_url(retry["task_id"],"https://chatgpt.com/c/22345678-1234-1234-1234-123456789abc")
+        st=g._state()
+        st["active"]["sent_at"]=(dt.datetime.now(dt.timezone.utc)-dt.timedelta(seconds=700)).isoformat()
+        g._save_state(st)
+        second=g.recover_stale_active(600)
+        self.assertEqual(second["status"],"RESPONSE_TIMEOUT_MAX_ATTEMPTS")
+        self.assertIsNone(g.active_task())
+        nxt,reason=g.next_binding()
+        self.assertIsNone(nxt)
+        self.assertEqual(reason,"GPT_CHAT_OCR_QUEUE_EMPTY_OR_EXHAUSTED")
+
     def test_fenced_json_parser(self):
         ticks=chr(96)*3
         raw=ticks+"json\n"+json.dumps({"task_id":"X","source_png":"Y","detections":[]})+"\n"+ticks
