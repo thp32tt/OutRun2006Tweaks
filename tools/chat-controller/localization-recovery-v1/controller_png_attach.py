@@ -318,8 +318,111 @@ async def ensure_image_tool(page):
         return "CREATE_IMAGE_TOOL_NOT_VERIFIED:"+type(exc).__name__
 
 
+async def _attachment_input(page):
+    """Return the composer file input across current ChatGPT label variants."""
+    selectors = (
+        'input[type="file"][aria-label="Attach files"]',
+        'input[type="file"][aria-label="Attach photos or videos"]',
+        'input[type="file"][aria-label="Attach photos"]',
+        'input[type="file"][accept*="image"]',
+    )
+    for selector in selectors:
+        loc = page.locator(selector)
+        count = await loc.count()
+        if count == 1:
+            return loc
+        if count > 1:
+            # Hidden file inputs are expected. Prefer the last hydrated composer
+            # input instead of failing merely because responsive duplicates exist.
+            return loc.last
+    return None
+
+
+async def _attachment_snapshot(page):
+    """Count completed attachment witnesses inside the active composer only."""
+    return await page.evaluate(
+        r"""() => {
+          const visible=e=>!!(e && e.getClientRects && e.getClientRects().length);
+          const box=[...document.querySelectorAll('[role="textbox"][contenteditable="true"]')]
+            .find(visible);
+          if(!box)return {ready:0,loading:0};
+          const scope=box.closest('form') || box.parentElement?.parentElement || document;
+          const images=[...scope.querySelectorAll(
+            'img[src^="blob:"], img[alt="User attachment"], '+
+            '[data-testid*="attachment"] img, [data-testid*="upload-preview"] img, '+
+            '[data-testid*="file-upload"] img'
+          )].filter(e=>visible(e) && e.complete && e.naturalWidth>0 && e.naturalHeight>0);
+          const removers=[...scope.querySelectorAll('button[aria-label]')].filter(e=>{
+            if(!visible(e))return false;
+            const a=(e.getAttribute('aria-label')||'').toLowerCase();
+            return a.startsWith('remove ') || a.includes('remove attachment') ||
+                   a.includes('remove file') || a.includes('remove image') ||
+                   a.includes('첨부') && a.includes('제거');
+          });
+          const loading=[...scope.querySelectorAll(
+            '[aria-label*="Uploading"], [aria-label*="uploading"], '+
+            '[data-testid*="uploading"], [data-testid*="upload-progress"], [role="progressbar"]'
+          )].filter(visible);
+          return {ready:Math.max(images.length,removers.length),loading:loading.length};
+        }"""
+    )
+
+
+async def _wait_attachment_ready(page, filenames, baseline, timeout):
+    """Accept either legacy filename proof or a new modern composer preview."""
+    await page.wait_for_function(
+        r"""({files,baseline})=>{
+          const visible=e=>!!(e && e.getClientRects && e.getClientRects().length);
+          const box=[...document.querySelectorAll('[role="textbox"][contenteditable="true"]')]
+            .find(visible);
+          if(!box)return false;
+          const scope=box.closest('form') || box.parentElement?.parentElement || document;
+          const images=[...scope.querySelectorAll('img[alt]')].filter(e=>
+            visible(e)&&e.complete&&e.naturalWidth>0&&e.naturalHeight>0);
+          const buttons=[...scope.querySelectorAll('button[aria-label]')].filter(visible);
+          const uploading=[...scope.querySelectorAll(
+            '[aria-label*="Uploading"], [aria-label*="uploading"], '+
+            '[data-testid*="uploading"], [data-testid*="upload-progress"], [role="progressbar"]'
+          )].filter(visible);
+          if(uploading.length)return false;
+
+          const named=files.every(name=>{
+            const stem=name.replace(/\.png$/i,'');
+            const same=x=>x===name ||
+              (x.startsWith(stem+'(')&&x.endsWith(').png') &&
+               /^[0-9]+$/.test(x.slice(stem.length+1,-5)));
+            return images.some(e=>same(e.alt||'')) &&
+              buttons.some(e=>{
+                const a=e.getAttribute('aria-label')||'';
+                return same(a.replace(/^Remove /,''));
+              });
+          });
+          if(named)return true;
+
+          // Current ChatGPT composer no longer guarantees filename-bearing
+          // alt/remove labels. Count only attachment-like preview witnesses in
+          // the active composer and require a delta caused by this upload.
+          const modernImages=[...scope.querySelectorAll(
+            'img[src^="blob:"], img[alt="User attachment"], '+
+            '[data-testid*="attachment"] img, [data-testid*="upload-preview"] img, '+
+            '[data-testid*="file-upload"] img'
+          )].filter(e=>visible(e)&&e.complete&&e.naturalWidth>0&&e.naturalHeight>0);
+          const removers=buttons.filter(e=>{
+            const a=(e.getAttribute('aria-label')||'').toLowerCase();
+            return a.startsWith('remove ') || a.includes('remove attachment') ||
+                   a.includes('remove file') || a.includes('remove image') ||
+                   a.includes('첨부') && a.includes('제거');
+          });
+          const ready=Math.max(modernImages.length,removers.length);
+          return ready >= baseline + files.length;
+        }""",
+        arg={"files":filenames,"baseline":int(baseline)},
+        timeout=timeout,
+    )
+
+
 async def attach_batch_pngs(page, binding):
-    """Upload exactly five individual files in one composer attachment operation."""
+    """Upload 2-5 individual files and prove completed composer attachments."""
     paths = binding["paths"]
     expected = [Path(s).name for s in paths]
     if not (2 <= len(paths) <= 5) or len(set(expected)) != len(paths):
@@ -329,66 +432,42 @@ async def attach_batch_pngs(page, binding):
             return "TARGET_ORIGIN_NOT_CHATGPT"
         await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(
             state="visible", timeout=12000)
-        inp = page.locator('input[type="file"][aria-label="Attach files"]')
-        if await inp.count() != 1:
+        inp = await _attachment_input(page)
+        if inp is None:
             return "ATTACH_FILES_INPUT_NOT_FOUND"
+        before = await _attachment_snapshot(page)
         await inp.set_input_files(paths, timeout=40000)
-        await page.wait_for_function(
-            r"""files=>{
-              const visible=e=>!!e.getClientRects().length;
-              const images=[...document.querySelectorAll('img[alt]')].filter(e=>
-                  visible(e)&&e.complete&&e.naturalWidth>0);
-              const buttons=[...document.querySelectorAll('button[aria-label]')].filter(visible);
-              const uploading=[...document.querySelectorAll('[aria-label^="Uploading "]')].filter(visible);
-              return files.every(name=>{
-                 const stem=name.replace(/\.png$/i,'');
-                 const same=x=>x===name||(x.startsWith(stem+'(')&&x.endsWith(').png'));
-                 return images.some(e=>same(e.alt))&&
-                        buttons.some(e=>same((e.getAttribute('aria-label')||'').replace(/^Remove /,'')))&&
-                        !uploading.some(e=>same((e.getAttribute('aria-label')||'').replace(/^Uploading /,'')));
-              });
-            }""", arg=expected, timeout=120000)
+        await _wait_attachment_ready(page, expected, before.get("ready", 0), 120000)
         return "ATTACHMENT_UPLOAD_COMPLETED"
     except Exception:
         return "ATTACHMENT_UPLOAD_NOT_VERIFIED"
 
 
 async def attach_png(page,binding):
-    """Wait for a completed visible named file upload, not only a spinner."""
+    """Upload one PNG and prove a completed attachment without filename-only DOM assumptions."""
     if len(binding.get("paths", [])) > 1:
         return await attach_batch_pngs(page, binding)
     filename=Path(binding["path"]).name
     try:
-        await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
+        await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(
+            state="visible",timeout=12000)
         if not page.url.startswith("https://chatgpt.com/"):
             return "TARGET_ORIGIN_NOT_CHATGPT"
+
+        # Best-effort removal of a stale legacy filename-bearing preview.
         previous=page.locator('button[aria-label^="Remove '+filename[:-4]+'"]')
         for _ in range(8):
             if not await previous.count():
                 break
             await previous.first.dispatch_event("click")
             await page.wait_for_timeout(350)
-        inp=page.locator('input[type="file"][aria-label="Attach files"]')
-        if await inp.count()!=1:
+
+        inp=await _attachment_input(page)
+        if inp is None:
             return "ATTACH_FILES_INPUT_NOT_FOUND"
+        before=await _attachment_snapshot(page)
         await inp.set_input_files(binding["path"],timeout=25000)
-        await page.wait_for_function(
-            """filename => {
-             const visible=e=>!!e.getClientRects().length;
-             const stem=filename.slice(0,-4);
-             const sameName=name=>name===filename ||
-               (name.startsWith(stem+'(') && name.endsWith(').png') &&
-                /^[0-9]+$/.test(name.slice(stem.length+1,-5)));
-             const image=[...document.querySelectorAll('img[alt]')].some(e=>
-                  visible(e) && sameName(e.alt) && e.complete && e.naturalWidth>0);
-             const remove=[...document.querySelectorAll('button[aria-label]')].some(e=>
-                  (e.getAttribute('aria-label')||'').startsWith('Remove ') &&
-                  sameName((e.getAttribute('aria-label')||'').slice(7)));
-             const loading=[...document.querySelectorAll('[aria-label]')].some(e=>
-                  (e.getAttribute('aria-label')||'').startsWith('Uploading ') &&
-                  sameName((e.getAttribute('aria-label')||'').slice(10)));
-             return image && remove && !loading;
-            }""",arg=filename,timeout=90000)
+        await _wait_attachment_ready(page,[filename],before.get("ready",0),90000)
         return "ATTACHMENT_UPLOAD_COMPLETED"
     except Exception:
         return "ATTACHMENT_UPLOAD_NOT_VERIFIED"
