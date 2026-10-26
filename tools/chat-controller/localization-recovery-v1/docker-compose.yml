@@ -26,7 +26,7 @@ services:
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "false"
-      OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Verified native-crop source-bound ImageGen queue
+      OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Legacy ROI + GPT OCR full-HD direct-reference ImageGen queue
       OUTRUN_GPT_CHAT_OCR_ENABLED: "true" # Normal ChatGPT image-attachment OCR fallback; no API
       OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "2400" # 10m stale wait -> retry/skip automatically
       OUTRUN_GPT_OCR_WATCHDOG_SECONDS: "60"
@@ -71,7 +71,7 @@ services:
       RATE_LIMIT_BACKOFF_SECONDS: "120,300,600,1200"
       MIN_SEND_GAP_SECONDS: "60"
       SLOT_DEDUP_SECONDS: "180"
-      OUTRUN_CROP_ENABLED: "true"
+      OUTRUN_CROP_ENABLED: "false"
       OUTRUN_CROP_INTERVAL_SECONDS: "60"
       OUTRUN_CROP_MAX_PER_CYCLE: "10"
       OUTRUN_ROI_BRIDGE_ENABLED: "true"
