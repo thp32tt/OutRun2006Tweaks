@@ -13,8 +13,8 @@ for token in (
     "uploadPlan.mode == GameSm3NativeUploadMode::segmented",
     "uploadPlan.mode == GameSm3NativeUploadMode::invalid",
     "firstChunkInstances",
-    "vertexCount * firstChunkInstances",
-    "chunkPlan.firstUploadBytes : uploadPlan.vertexBytes",
+    "firstChunkVertices * firstChunkInstances",
+    "chunkPlan.firstUploadBytes : (linearChunkUpload",
     "instance % chunkPlan.instancesPerChunk == 0u",
     "instanceSteps, unpacked, instance)",
     "upload_full_game_stream(context, s.fullGameVertexUpload.Get()",
@@ -26,7 +26,7 @@ for token in (
     assert token in scope, "01077 missing native integration: " + token
 assert scope.index("game_sm3_plan_native_instance_upload(") < scope.index(
     "game_sm3_assemble_instanced_streams(")
-assert scope.index("chunkPlan.firstUploadBytes : uploadPlan.vertexBytes") < scope.index(
+assert scope.index("chunkPlan.firstUploadBytes : (linearChunkUpload") < scope.index(
     "issueNativeGameDraw(")
 for token in (
     "expanded > maxVertices ||",

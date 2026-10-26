@@ -10,7 +10,7 @@ for token in (
     "const bool segmentedInstanceUpload = sourceInstancing &&",
     "game_sm3_plan_native_instance_upload(",
     "firstChunkInstances",
-    "vertexCount * firstChunkInstances",
+    "firstChunkVertices * firstChunkInstances",
     "const UINT nativeSubmissionCount = segmentedInstanceUpload",
     "instance % chunkPlan.instancesPerChunk == 0u",
     "instanceElements, instanceStreams, vertexCount,",

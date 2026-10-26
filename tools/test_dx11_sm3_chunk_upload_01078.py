@@ -8,8 +8,8 @@ scope=bridge.split("bool submit_live_sm3_game_draw(",1)[1].split("// Reuse geome
 for key in (
     "game_sm3_plan_native_instance_chunk(",
     "firstChunkInstances",
-    "vertexCount * firstChunkInstances",
-    "chunkPlan.firstUploadBytes : uploadPlan.vertexBytes",
+    "firstChunkVertices * firstChunkInstances",
+    "chunkPlan.firstUploadBytes : (linearChunkUpload",
     "instance % chunkPlan.instancesPerChunk == 0u",
     "const UINT chunkInstances =",
     "instanceStreams, vertexCount,",
@@ -23,7 +23,7 @@ for key in (
 ):
     assert key in scope or (key=="s.frameBatch.abort();" and key in bridge), key
 assert scope.index("game_sm3_plan_native_instance_chunk(") < scope.index("game_sm3_assemble_instanced_streams(")
-assert scope.index("chunkPlan.firstUploadBytes : uploadPlan.vertexBytes") < scope.index("issueNativeGameDraw(")
+assert scope.index("chunkPlan.firstUploadBytes : (linearChunkUpload") < scope.index("issueNativeGameDraw(")
 assert scope.index("unpacked.size() != chunkBytes") < scope.index("issueNativeGameDraw(")
 assert "lastInstance / instanceStep[element.stream] + 1u" in header
 assert "destination.swap(candidate)" in header
