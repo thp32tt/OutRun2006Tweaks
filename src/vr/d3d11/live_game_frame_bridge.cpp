@@ -5095,14 +5095,21 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     std::vector<std::uint32_t> nativeFanTriangles;
     const std::uint32_t* nativeIndices = indices;
     UINT nativeIndexCount = indexCount;
+    // A genuine large fan can exceed the bounded fully-expanded triangle IB.
+    // Defer that conversion until the later shader-visible GPU window planner
+    // can select center/rim chunks. Never truncate a source fan silently.
+    const bool deferredFanTriangles = type == D3DPT_TRIANGLEFAN &&
+        expected >= 3u && std::uint64_t(expected - 2u) * 3u > kMaxIndices;
     if (type == D3DPT_TRIANGLEFAN) {
-        if (expected < 3u ||
-            !game_fan_to_triangle_list(expected - 2u, indices, indexCount,
-                                       vertexCount, nativeFanTriangles) ||
-            nativeFanTriangles.size() > kMaxIndices)
-            return false;
-        nativeIndices = nativeFanTriangles.data();
-        nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());
+        if (expected < 3u) return false;
+        if (!deferredFanTriangles) {
+            if (!game_fan_to_triangle_list(
+                    expected - 2u, indices, indexCount, vertexCount,
+                    nativeFanTriangles) ||
+                nativeFanTriangles.size() > kMaxIndices) return false;
+            nativeIndices = nativeFanTriangles.data();
+            nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());
+        }
     }
     rejectionStage = 1u;
     DWORD blend = TRUE, alpha = TRUE, stencil = TRUE, depth = TRUE;
@@ -5495,13 +5502,30 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // A genuine programmable, nonindexed source fan retains its center and
     // previous rim at every packed GPU upload boundary. Other polygon fill
     // modes, indexed fans and instancing remain on the established path.
-    const auto fanChunkPlan = !sourceInstancing && !indices &&
+    const auto fanChunkPlan = !sourceInstancing &&
         !pointFill && !wireFill && type == D3DPT_TRIANGLEFAN
-        ? game_sm3_plan_native_fan_chunks(
-              vertexCount, plannedNativeStride, kMaxVertices, 1u << 25u,
-              kMaxIndices, 128u)
+        ? (indices
+            ? game_sm3_plan_native_indexed_fan_chunks(
+                  vertexCount, indexCount, plannedNativeStride,
+                  kMaxVertices, 1u << 25u, kMaxIndices, 128u, 1ull << 27u)
+            : game_sm3_plan_native_fan_chunks(
+                  vertexCount, plannedNativeStride, kMaxVertices, 1u << 25u,
+                  kMaxIndices, 128u))
         : GameSm3FanChunkPlan{};
     const bool fanChunkUpload = fanChunkPlan.chunkCount > 1u;
+    const bool indexedFanChunkUpload = fanChunkUpload && indices != nullptr;
+    if (fanChunkUpload) {
+        if (indexedFanChunkUpload) {
+            // Validate the complete IB before a single native GPU mutation.
+            // A bad late rim index must not publish an earlier good chunk.
+            for (UINT i = 0u; i < indexCount; ++i)
+                if (indices[i] >= vertexCount) return false;
+        }
+        nativeIndices = nullptr;
+        nativeIndexCount = 0u; // each fan window owns its local triangle IB
+    } else if (deferredFanTriangles) {
+        return false; // unsupported large fan retains authoritative D3D9
+    }
     // Real indexed POINT/LINELIST/TRIANGLELIST game geometry may fit in its
     // source VB but overflow a packed shader-visible native VB. Reassemble
     // actual D3D9 index occurrences into bounded independent GPU submits.
@@ -5744,7 +5768,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             elements.push_back({
                 static_cast<std::uint8_t>(declaration[i].Stream),
                 declaration[i].Offset, declaration[i].Type});
-        if ((indexedChunkUpload || indexedConnectedChunkUpload)
+        if (indexedFanChunkUpload
+                ? !game_sm3_assemble_indexed_fan_window(
+                      elements, streams, indices, indexCount, 1u,
+                      firstChunkVertices, unpacked)
+                : ((indexedChunkUpload || indexedConnectedChunkUpload)
                 ? !game_sm3_assemble_indexed_window(
                       elements, streams, indices, indexCount, 0u,
                       firstChunkVertices, unpacked)
@@ -5754,9 +5782,20 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                       firstChunkInstances,
                       instanceSteps, unpacked)
                 : !game_sm3_assemble_streams(
-                      elements, streams, firstChunkVertices, unpacked)))
+                      elements, streams, firstChunkVertices, unpacked))))
             return false;
         nativeBytes=unpacked.data();
+    }
+    // An unmodified D3D9 native-format indexed fan still needs original
+    // center/rim index selection when its full triangle IB exceeds budget.
+    std::vector<std::uint8_t> indexedFanFirstWindow;
+    if (indexedFanChunkUpload && !repack) {
+        if (!game_sm3_copy_native_indexed_fan_window(
+                static_cast<const std::uint8_t*>(bytes), stride,
+                vertexCount, indices, indexCount, 1u,
+                firstChunkVertices, indexedFanFirstWindow))
+            return false;
+        nativeBytes = indexedFanFirstWindow.data();
     }
     rejectionStage = 6u;
     ProgrammableShaderFunctionSourceEvidence vertexEvidence, pixelEvidence;
@@ -6570,22 +6609,34 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             // vertices. Every triangle retains the source (0,i,i+1) winding
             // and its original programmable shader attributes.
             const UINT firstRim = 1u + submit * fanChunkPlan.advanceRimVertices;
+            const UINT sourceFanVertices =
+                indexedFanChunkUpload ? indexCount : vertexCount;
             const UINT drawCount = (std::min)(
-                fanChunkPlan.verticesPerChunk, 1u + vertexCount - firstRim);
+                fanChunkPlan.verticesPerChunk, 1u + sourceFanVertices - firstRim);
             if (drawCount < 3u) {
                 s.frameBatch.abort();
                 return false;
             }
             if (submit != 0u) {
                 std::vector<std::uint8_t> fanWindow;
-                const bool packed = repack
-                    ? game_sm3_assemble_fan_window(
-                          instanceElements, instanceStreams,
-                          firstRim, drawCount, fanWindow)
-                    : game_sm3_copy_native_fan_window(
-                          static_cast<const std::uint8_t*>(bytes),
-                          stride, vertexCount, firstRim,
-                          drawCount, fanWindow);
+                const bool packed = indexedFanChunkUpload
+                    ? (repack
+                        ? game_sm3_assemble_indexed_fan_window(
+                              instanceElements, instanceStreams,
+                              indices, indexCount, firstRim, drawCount,
+                              fanWindow)
+                        : game_sm3_copy_native_indexed_fan_window(
+                              static_cast<const std::uint8_t*>(bytes),
+                              stride, vertexCount, indices, indexCount,
+                              firstRim, drawCount, fanWindow))
+                    : (repack
+                        ? game_sm3_assemble_fan_window(
+                              instanceElements, instanceStreams,
+                              firstRim, drawCount, fanWindow)
+                        : game_sm3_copy_native_fan_window(
+                              static_cast<const std::uint8_t*>(bytes),
+                              stride, vertexCount, firstRim,
+                              drawCount, fanWindow));
                 const UINT chunkBytes = drawCount * nativeStride;
                 if (!packed || fanWindow.size() != chunkBytes ||
                     !upload_full_game_stream(

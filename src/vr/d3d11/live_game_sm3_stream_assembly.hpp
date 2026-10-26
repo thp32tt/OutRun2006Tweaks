@@ -222,6 +222,30 @@ game_sm3_plan_native_indexed_connected_chunks(
      if (count > maxChunks) return {};
      return {capacity, advance, static_cast<std::uint32_t>(count)};
  }
+// D3D9 indexed TRIANGLEFAN source indices are a center plus a connected rim.
+// Build bounded shader-visible native windows from ORIGINAL index occurrences;
+// full-fan triangle expansion can overflow the bounded native IB even though
+// each D3D9 source index and each window is individually valid.
+[[nodiscard]] constexpr GameSm3FanChunkPlan
+game_sm3_plan_native_indexed_fan_chunks(
+    std::uint32_t sourceVertices, std::uint32_t sourceIndices,
+    std::uint32_t nativeStride, std::uint32_t maxVertices,
+    std::uint32_t maxBytes, std::uint32_t maxIndices,
+    std::uint32_t maxChunks, std::uint64_t maxTotalBytes) noexcept {
+    if (!sourceVertices || sourceVertices > maxVertices ||
+        sourceIndices < 3u || !nativeStride || !maxTotalBytes)
+        return {};
+    const auto plan = game_sm3_plan_native_fan_chunks(
+        sourceIndices, nativeStride, maxVertices, maxBytes,
+        maxIndices, maxChunks);
+    if (plan.chunkCount < 2u) return {};
+    // Each continuation reuploads the center and one common rim vertex.
+    const std::uint64_t uploadVertices =
+        std::uint64_t(sourceIndices) + 2u * (plan.chunkCount - 1u);
+    if (uploadVertices > maxTotalBytes / nativeStride) return {};
+    return plan;
+}
+
  // Convert one complete center+rim GPU window to D3D11 triangle-list indices.
  [[nodiscard]] inline bool game_sm3_fan_window_indices(
      std::uint32_t vertices, std::uint32_t maxIndices,
@@ -369,6 +393,57 @@ struct GameSm3ElementRef {
                 std::memcpy(staged.data() + std::size_t(v)*stride + a*16u,
                             value.data(), sizeof(value));
             }
+        output.swap(staged);
+        return true;
+    } catch (...) { return false; }
+}
+
+// Resolve an indexed fan's original center and rim *before* any GPU upload.
+// Both packed SM3 attributes and unmodified native-format source streams
+// use the same index-selection semantics, retaining repeated source indices.
+[[nodiscard]] inline bool game_sm3_assemble_indexed_fan_window(
+    const std::vector<GameSm3ElementRef>& elements,
+    const std::array<GameSm3StreamView,16>& streams,
+    const std::uint32_t* indices, std::uint32_t sourceIndices,
+    std::uint32_t firstRim, std::uint32_t windowVertices,
+    std::vector<std::uint8_t>& output) noexcept {
+    if (!indices || !firstRim || windowVertices < 3u ||
+        firstRim > sourceIndices ||
+        windowVertices - 1u > sourceIndices - firstRim)
+        return false;
+    try {
+        std::vector<std::uint32_t> selected;
+        selected.reserve(windowVertices);
+        selected.push_back(indices[0u]);
+        for (std::uint32_t i = 1u; i < windowVertices; ++i)
+            selected.push_back(indices[firstRim + i - 1u]);
+        return game_sm3_assemble_indexed_window(
+            elements, streams, selected.data(), windowVertices,
+            0u, windowVertices, output);
+    } catch (...) { return false; }
+}
+[[nodiscard]] inline bool game_sm3_copy_native_indexed_fan_window(
+    const std::uint8_t* source, std::uint32_t stride,
+    std::uint32_t sourceVertices,
+    const std::uint32_t* indices, std::uint32_t sourceIndices,
+    std::uint32_t firstRim, std::uint32_t windowVertices,
+    std::vector<std::uint8_t>& output) noexcept {
+    if (!source || !stride || !indices || !sourceVertices ||
+        !firstRim || windowVertices < 3u || firstRim > sourceIndices ||
+        windowVertices - 1u > sourceIndices - firstRim ||
+        std::uint64_t(windowVertices) * stride > (1ull << 25u))
+        return false;
+    for (std::uint32_t v = 0u; v < windowVertices; ++v)
+        if (indices[v ? firstRim + v - 1u : 0u] >= sourceVertices)
+            return false;
+    try {
+        std::vector<std::uint8_t> staged(
+            static_cast<std::size_t>(windowVertices) * stride);
+        for (std::uint32_t v = 0u; v < windowVertices; ++v) {
+            const auto sourceIndex = indices[v ? firstRim + v - 1u : 0u];
+            std::memcpy(staged.data() + std::size_t(v) * stride,
+                        source + std::size_t(sourceIndex) * stride, stride);
+        }
         output.swap(staged);
         return true;
     } catch (...) { return false; }

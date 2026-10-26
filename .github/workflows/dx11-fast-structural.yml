@@ -583,6 +583,10 @@ jobs:
           python tools/test_dx11_sm3_indexed_chunk_01085.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_indexed_connected_01086.cpp -o /tmp/dx11_sm3_indexed_connected_01086 && /tmp/dx11_sm3_indexed_connected_01086
           python tools/test_dx11_sm3_indexed_connected_01086.py
+          # Full-size programmable game TRIANGLEFAN source center/rim:
+          # bounded indexed GPU windows and oversized fan-IB preservation.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_indexed_fan_01087.cpp -o /tmp/dx11_sm3_indexed_fan_01087 && /tmp/dx11_sm3_indexed_fan_01087
+          python tools/test_dx11_sm3_indexed_fan_01087.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_polygon_raster_probe_01032.cpp -o /tmp/dx11_polygon_raster_01032 && /tmp/dx11_polygon_raster_01032
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_colorfill_gpu_probe_01033.cpp -o /tmp/dx11_pre_draw_01033 && /tmp/dx11_pre_draw_01033
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_overdraw_probe_01034.cpp -o /tmp/dx11_pre_draw_01034 && /tmp/dx11_pre_draw_01034
