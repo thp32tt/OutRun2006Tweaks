@@ -2467,6 +2467,13 @@ class UIScaling : public Hook
         const auto entrySerial =
             OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
                 std::memory_order_acquire);
+        // Read before the original 0xBB796 animation call. The legacy
+        // registeredDelta counter reads after that call and therefore
+        // cannot prove whether the ORIGINAL native producer registered
+        // any nested nodes. These two samples distinguish those phases.
+        const auto registrationsAtSourceEntry =
+            OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
+                std::memory_order_relaxed);
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
@@ -2523,6 +2530,10 @@ class UIScaling : public Hook
         }
 		// The prior HMD-accepted queued rival nodes retain exactly the same
 		// scope and anchor, with no widening to generic world/HUD sprites.
+        // This snapshot is immediately AFTER the native rival E8 including
+        // its scoped direct submission. It excludes any later nodes tagged
+        // by this wrapper and prevents old 'registeredDelta=0' from being
+        // mistaken for no work performed by the original game.
 		const auto registeredBefore =
             OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
                 std::memory_order_relaxed);
@@ -2573,12 +2584,14 @@ class UIScaling : public Hook
                     n, registeredAfter - registeredBefore, projected ? 1 : 0);
             if (n <= 8 || (n & (n - 1)) == 0)
                 spdlog::info(
-                    "VR RIVAL A22 CURRENT QUEUE COMPARE: hits={} nativeReturn={} projected={} directFlush={} rootChanges={} tailChanges={} stableRootTailChanges={} replacedRootTailChanges={} newlyPopulatedPriorities={} entrySerial={}",
+                    "VR RIVAL A22 CURRENT QUEUE COMPARE: hits={} nativeReturn={} projected={} directFlush={} rootChanges={} tailChanges={} stableRootTailChanges={} replacedRootTailChanges={} newlyPopulatedPriorities={} entrySerial={} nativeRegisteredDelta={} wrapperRegisteredDelta={}",
                     n, result, projected ? 1 : 0,
                     directRivalOwner ? 1 : 0,
                     changedRoots, changedTails, stableRootTailChanges,
                     replacedRootTailChanges, newlyPopulatedPriorities,
-                    entrySerial);
+                    entrySerial,
+                    registeredBefore - registrationsAtSourceEntry,
+                    registeredAfter - registeredBefore);
         }
 		return result;
 	}
@@ -4278,6 +4291,27 @@ private:
         const auto command = CapturePhysicalDrawCommand();
         const auto scope = command.scope;
         const auto source = command.producer;
+        // Stronger than the BB796 wrapper counter: this is an actual
+        // native ID3DXSprite::Draw call. A valid original rival projector
+        // without this row may enqueue ordinary SpriteNodes or use another
+        // renderer; never infer a D3DX submission from the parent E8.
+        const bool exactRivalNativeDraw = Settings::VREnabled &&
+            Settings::VRTelemetry &&
+            source == ProducerToken::RivalMarkerSprani;
+        if (exactRivalNativeDraw)
+        {
+            static std::atomic<std::uint64_t> actualRivalD3dxDraws{0};
+            const auto n = actualRivalD3dxDraws.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL ACTUAL D3DX DRAW: hits={} scope={} queued={} projectedValid={} isGameSprite={} sameTrackedSprite={}",
+                    n, Name(scope), command.queued ? 1 : 0,
+                    CurrentProjectedMarker() &&
+                        CurrentProjectedMarker()->valid ? 1 : 0,
+                    self == *Module::exe_ptr<void*>(0x55B218) ? 1 : 0,
+                    self == HudBatch.sprite ? 1 : 0);
+        }
         // Prove the original 19 E8 parent stack at CPU Draw, before D3DX
         // defers its GPU submission. Never inherit a queued node identity.
         // An unowned original caller already passed the expensive stack
@@ -4290,6 +4324,19 @@ private:
         const auto submission = HudBatch.snapshot();
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
+        if (exactRivalNativeDraw)
+        {
+            static std::atomic<std::uint64_t> returns{0};
+            const auto n = returns.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL D3DX DRAW RETURN: hits={} hr=0x{:08X} batchActive={} pendingDraws={} homogeneous={} batchScope={} batchProducer={}",
+                    n, static_cast<unsigned>(hr),
+                    HudBatch.active ? 1 : 0, HudBatch.drawCount,
+                    HudBatch.homogeneous ? 1 : 0,
+                    Name(HudBatch.scope), Name(HudBatch.producer));
+        }
         // D3DXSprite::Draw can call its own hooked Flush before returning.
         // If that native Flush completed successfully, the newly queued
         // Draw is the FIRST command of the next texture batch, not a failed
