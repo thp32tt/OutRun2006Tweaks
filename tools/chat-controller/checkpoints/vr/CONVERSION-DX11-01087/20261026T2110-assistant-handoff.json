@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "assistant_rollover_handoff",
+  "captured_at_kst": "2026-10-26T21:10:06+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "task_id": "CONVERSION-DX11-01087",
+  "production_id": "CONVERSION-DX11-01087",
+  "event_id": "CONVERSION-DX11-01087-E004",
+  "event_type": "retry",
+  "attempt": 3,
+  "lane": "DX11",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_branch": "feature/dx11-01087-gate-repair",
+  "target_branch": "vr-dx11-native-r71",
+  "source_base_sha": "d6a3381cc7d0ff68480322f171a55098f3c0f2bb",
+  "source_implementation_sha": "4325b6f886e2a206f176b47c5dc5b38fac0016dd",
+  "target_result_sha": "5b08d135a3a97db26913bf9b4858407da9ab65f2",
+  "last_feature_head": "5b08d135a3a97db26913bf9b4858407da9ab65f2",
+  "status": "EXACT_SHA_GATES_IN_PROGRESS",
+  "completed": {
+    "source": true,
+    "regression_repair": true,
+    "target_promotion": true,
+    "fast": {
+      "id": 40319113273,
+      "conclusion": "success",
+      "sha": "5b08d135a3a97db26913bf9b4858407da9ab65f2"
+    },
+    "build": {
+      "id": 40319113433,
+      "conclusion": "success",
+      "sha": "5b08d135a3a97db26913bf9b4858407da9ab65f2",
+      "artifact_id": 12648572879
+    },
+    "hud": {
+      "id": 40319113270,
+      "conclusion": "success",
+      "sha": "5b08d135a3a97db26913bf9b4858407da9ab65f2"
+    },
+    "warp": {
+      "id": 40319113272,
+      "conclusion": "success",
+      "sha": "5b08d135a3a97db26913bf9b4858407da9ab65f2"
+    }
+  },
+  "incomplete": {
+    "openxr": {
+      "id": 40319113267,
+      "status": "in_progress",
+      "conclusion": null
+    },
+    "backend": {
+      "id": 40319113347,
+      "status": "in_progress",
+      "conclusion": null
+    },
+    "c6_result_record": "NOT_WRITTEN",
+    "ai2_score": "UNCHANGED_PENDING_GATES"
+  },
+  "score_snapshot": {
+    "ssot": "thp32tt/ai-dev-lab@main:AI_SCOREBOARD.md",
+    "confirmed_ai2": 1982,
+    "score_change_for_task": 0
+  },
+  "runtime_validation": "UNTESTED",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "next_action": "Read exact-SHA OpenXR 40319113267 and Backend 40319113347 final outcomes; if failures, repair under SAME CONVERSION-DX11-01087 ID and nonforce promote changed source/test SHA. Only when five mandatory push exact-SHA Gates success, persist 01087 C6 docs-only without disturbing validated SHA, and update scoreboard once against latest SSOT. Preserve fail-closed DX9Ex input/FFB and frozen DXVK.",
+  "notes": "Build artifact contains START_HERE_DX11_TEST.cmd, Run-DX9ExFocusTest.ps1, dinput8.dll, outrun-vr-host.exe. Source/CI are not original game or Quest3 runtime proof. Workflow trigger paths repaired for numbered SM3 source C++ fixtures."
+}
