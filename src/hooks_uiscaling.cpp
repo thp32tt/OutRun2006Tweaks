@@ -258,6 +258,8 @@ namespace
 // ScreenHud ownership, not after its Draw may have submitted old triangles.
 static void FlushD3DXBeforeDirectStageSource() noexcept;
 static void FlushD3DXAtDirectStageSourceExit() noexcept;
+static void BeginD3DXDirectStageSource() noexcept;
+static void CompleteD3DXDirectStageSource(bool admitted) noexcept;
 static void FlushD3DXBeforeDirectGoalSource() noexcept;
 static void FlushD3DXAtDirectGoalSourceExit() noexcept;
 
@@ -1822,6 +1824,7 @@ class UIScaling : public Hook
             // homogeneous batch belongs to the outgoing producer; flush it
             // before the new ScreenHud scope can relabel its GPU submission.
             FlushD3DXBeforeDirectStageSource();
+            BeginD3DXDirectStageSource();
             StageExtensionDirectDrawOwner.emplace(
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 nullptr, true,
@@ -1837,10 +1840,11 @@ class UIScaling : public Hook
         // The source may toggle VR or reenter the renderer during the E8:
         // only an unchanged, direct VR source is eligible for eye semantics.
         // Unknown or mixed native D3DX buffers still use their original End.
-        if (StageExtensionAdmission.mayPublish(
+        const bool admitted = StageExtensionAdmission.mayPublish(
                 Settings::VREnabled,
                 OutRunVR::GameSemantic::SpriteQueueDepth == 0,
-            OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+        if (admitted)
         {
             // AUTO 01504: a rebuilt current root can interpose an untagged
             // foreign node between the old +TIME tail and current terminal
@@ -1854,6 +1858,7 @@ class UIScaling : public Hook
                 nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial);
             FlushD3DXAtDirectStageSourceExit();
         }
+        CompleteD3DXDirectStageSource(admitted);
         // Always restore the exact direct-draw queue cursor/anchor even if
         // VR enablement changes inside the original +TIME E8 call.
         StageExtensionDirectDrawOwner.reset();
@@ -3493,6 +3498,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     // Single coherent Quest-style HUD command ledger. The live original
     // ID3DXSprite is still authoritative for physical draw/Flush/End.
     inline static thread_local OutRunVR::HudCommandBatch::Ledger HudBatch{};
+    inline static thread_local std::uint64_t NextDirectStageTicket = 0;
+    inline static thread_local std::uint64_t DirectStageTicket = 0;
 
     static bool IsExactSprite(void* self) noexcept
     {
@@ -3689,6 +3696,28 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     }
 
 public:
+    static void BeginDirectStageSource() noexcept
+    {
+        // Saturation fails closed instead of recycling a live ticket.
+        DirectStageTicket = NextDirectStageTicket == UINT64_MAX
+            ? 0 : ++NextDirectStageTicket;
+    }
+
+    static void CompleteDirectStageSource(bool admitted) noexcept
+    {
+        if (!admitted && HudBatch.revokeDirectStageTicket(DirectStageTicket) &&
+            Settings::VRTelemetry)
+        {
+            static std::uint64_t rejected = 0;
+            const auto hit = ++rejected;
+            if (hit <= 8 || (hit & (hit - 1)) == 0)
+                spdlog::info(
+                    "VR STAGE D3DX SOURCE REJECTED: ticket={} generation={} pending={} hits={} nativeCommandsPreserved=1",
+                    DirectStageTicket, HudBatch.generation, HudBatch.drawCount, hit);
+        }
+        DirectStageTicket = 0;
+    }
+
     // Direct +TIME numeric glyphs do not pass through QueueNode. D3DX may
     // submit the previous Draw batch while the first new glyph is queued.
     // Split only a complete, homogeneous, already-tracked batch with the
@@ -4045,6 +4074,7 @@ private:
             source == ProducerToken::ResultTextB9200 &&
             (exactB9200Direct || OriginalB9200GoalStackActive());
         const auto submission = HudBatch.snapshot();
+        const auto sourceTicket = DirectStageTicket;
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
         // D3DXSprite::Draw can call its own hooked Flush before returning.
@@ -4058,7 +4088,9 @@ private:
             afterNative.producer == command.producer &&
             afterNative.queued == command.queued &&
             afterNative.queueNode == command.queueNode &&
-            afterNative.queueEpoch == command.queueEpoch;
+            afterNative.queueEpoch == command.queueEpoch &&
+            (command.queued || source != ProducerToken::StageExtensionTime ||
+             sourceTicket == DirectStageTicket);
         if (self && self == submission.sprite &&
             !HudBatch.completeNativeDraw(
                 submission, SUCCEEDED(hr), scope, source,
@@ -4066,6 +4098,9 @@ private:
                 command.queueNode, command.queueEpoch,
                 provenDirectB9200))
             return hr;
+        if (self && self == submission.sprite && SUCCEEDED(hr) &&
+            !command.queued && source == ProducerToken::StageExtensionTime)
+            HudBatch.recordDirectStageTicket(sourceTicket);
         if (FAILED(hr) || !self)
             return hr;
 
@@ -4266,6 +4301,16 @@ static void FlushD3DXBeforeDirectStageSource() noexcept
 static void FlushD3DXAtDirectStageSourceExit() noexcept
 {
     VRProjectedD3DXSpriteIsolationR64::AfterDirectStageSource();
+}
+
+static void BeginD3DXDirectStageSource() noexcept
+{
+    VRProjectedD3DXSpriteIsolationR64::BeginDirectStageSource();
+}
+
+static void CompleteD3DXDirectStageSource(bool admitted) noexcept
+{
+    VRProjectedD3DXSpriteIsolationR64::CompleteDirectStageSource(admitted);
 }
 
 static void FlushD3DXBeforeDirectGoalSource() noexcept

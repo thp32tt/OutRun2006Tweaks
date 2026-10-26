@@ -71,7 +71,7 @@ stage_leave=ui[ui.index('static void StageExtensionLeave'):ui.index('// The orig
 assert 'StageExtensionEntrySerial,\n                true' not in stage_leave
 assert 'StageExtensionEntrySerial);' in stage_leave
 # Lens: first authored 570008 stays, second near-centre duplicate is suppressed,
-# and all exact C993 centre objects share one head-corrected centre-eye matrix.
+# and exact C993 objects encode one world ray in each runtime eye's FOV.
 assert 'if (ordinal == 2)' in gfx
-assert 'identityEye = IdentityMatrix()' in r30
-assert 'mode=CENTRE_EYE_MONO_WORLD_LOCK' in r30
+assert 'mode=COMMON_RAY_PER_EYE_WORLD_LOCK' in r30
+# Numerical acceptance is executed separately by verify_vr_r26_lens_projection.py.

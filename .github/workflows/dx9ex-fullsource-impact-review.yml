@@ -9,6 +9,10 @@ on:
       - 'tools/verify_vr_fullsource_impact.py'
       - 'tools/verify_vr_r26_stage_fixedfn.py'
       - 'tools/verify_vr_r26_landscape_visual_recovery.py'
+      - 'tools/verify_vr_r26_lens_projection.py'
+      - 'tools/verify_vr_stage_source_ticket.py'
+      - 'tools/tests/r26_lens_projection_harness.cpp'
+      - 'tools/tests/stage_source_ticket_harness.cpp'
       - 'tools/verify_vr_desktop_source_coordinates.py'
       - 'tools/verify_vr_unified_menu_source.py'
       - 'tools/verify_vr_menu_resolution_split.py'
@@ -54,6 +58,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Execute R26 exact plus-time physical draw regression
         run: python3 tools/verify_vr_r26_stage_fixedfn.py
+      - name: Execute C993 eye rays and rejected plus-time source-ticket regressions
+        run: |
+          python3 tools/verify_vr_r26_lens_projection.py
+          python3 tools/verify_vr_stage_source_ticket.py
       - name: Verify R26 XR-render/UI-split visual recovery contract
         run: |
           python3 tools/verify_vr_desktop_source_coordinates.py

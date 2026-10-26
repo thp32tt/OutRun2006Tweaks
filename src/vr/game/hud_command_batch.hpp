@@ -29,6 +29,9 @@ namespace OutRunVR::HudCommandBatch
         bool provenDirectB9200 = false;
         const void* queueNode = nullptr;
         std::uint64_t queueEpoch = 0;
+        // Exact direct +TIME E8 ticket, stamped only after a successful native
+        // Draw in this ledger generation. Queue nodes have separate authority.
+        std::uint64_t directStageTicket = 0;
         std::uint64_t generation = 0;
         // Every native Begin/Draw/Flush/End transition must be tied to the
         // batch that was active BEFORE the D3DX call. The original D3DX
@@ -227,6 +230,7 @@ namespace OutRunVR::HudCommandBatch
             provenDirectB9200 = false;
             queueNode = nullptr;
             queueEpoch = 0;
+            directStageTicket = 0;
         }
 
         // Successful physical Flush leaves Begin active for the next batch.
@@ -282,5 +286,32 @@ namespace OutRunVR::HudCommandBatch
             return active && homogeneous && drawCount != 0 &&
                 scope != Scope::None && producer != Producer::None;
         }
+
+        void recordDirectStageTicket(std::uint64_t ticket) noexcept
+        {
+            if (!active || queued || drawCount == 0 ||
+                scope != Scope::ScreenHud || producer != Producer::StageExtensionTime)
+                return;
+            if (drawCount == 1)
+                directStageTicket = ticket;
+            if (ticket == 0 || directStageTicket != ticket)
+                homogeneous = false;
+            touch();
+        }
+
+        bool revokeDirectStageTicket(std::uint64_t rejected) noexcept
+        {
+            if (!rejected || !active || queued || drawCount == 0 ||
+                directStageTicket != rejected || scope != Scope::ScreenHud ||
+                producer != Producer::StageExtensionTime)
+                return false;
+            // Revoke only optical provenance. Do not erase native commands,
+            // change Begin generation, call Flush, or alter native HRESULT.
+            homogeneous = false;
+            boundaryReady = false;
+            touch();
+            return true;
+        }
+
     };
 }

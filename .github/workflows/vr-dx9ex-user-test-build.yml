@@ -16,6 +16,14 @@ on:
       - 'tools/verify_vr_menu_resolution_split.py'
       - 'tools/verify_vr_f11_font_density.py'
       - 'tools/verify_vr_r26_landscape_visual_recovery.py'
+      - 'tools/verify_vr_r26_lens_projection.py'
+      - 'tools/verify_vr_stage_source_ticket.py'
+      - 'tools/tests/r26_lens_projection_harness.cpp'
+      - 'tools/tests/stage_source_ticket_harness.cpp'
+      - 'src/vr/d3d9/projected_sun_ray.hpp'
+      - 'src/vr/d3d9/lens_centre_relative_eye_pose.hpp'
+      - 'src/vr/game/hud_command_batch.hpp'
+      - 'src/vr/game/stage_extension_source_admission.hpp'
       - 'tools/verify_focus_official_diagnostics.py'
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
@@ -52,6 +60,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'R26 visual recovery bundle contract failed' }
           python tools/verify_vr_r26_stage_fixedfn.py
           if ($LASTEXITCODE -ne 0) { throw '+TIME four-API source regression failed' }
+          python tools/verify_vr_r26_lens_projection.py
+          if ($LASTEXITCODE -ne 0) { throw 'C993 submitted-eye ray regression failed' }
+          python tools/verify_vr_stage_source_ticket.py
+          if ($LASTEXITCODE -ne 0) { throw '+TIME source-ticket batch regression failed' }
 
       - name: Configure Win32 R26+HUD
         shell: pwsh

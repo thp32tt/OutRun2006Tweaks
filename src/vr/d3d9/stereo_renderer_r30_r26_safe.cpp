@@ -4899,23 +4899,39 @@ namespace OutRunVRStereo
                         return false;
                     D3DMATRIX headInverse{};
                     std::memcpy(&headInverse, headRaw, sizeof(headInverse));
-                    // The C993 sun family is one projected optical effect.
-                    // Per-eye asymmetric projection made the same visual
-                    // centre diverge into two points. Rebuild ONE centre-eye
-                    // world-locked ray from the latched HeadInverse and copy
-                    // that exact matrix to both eye RTs: head movement stays
-                    // compensated while binocular disparity for the flare
-                    // centre is exactly zero.
-                    const D3DMATRIX identityEye = IdentityMatrix();
-                    D3DMATRIX fused{};
-                    if (!OutRunVR::LensCentre::BuildProjectedSunRay(
-                            stockWvp, inverseBaseProjection, headInverse,
-                            identityEye, baseProjection, fused,
-                            OutRunVRRenderer::GetLastRawGameWvpCameraSynced()))
+                    // One world direction must be encoded in EACH submitted
+                    // OpenXR eye's coordinates. Equal clip coordinates are not
+                    // equal rays when the runtime uses asymmetric FOV/cant.
+                    // The artificial source plane has no physical IPD depth;
+                    // BuildProjectedSunRay removes head/eye translation and
+                    // avoids a second head rotation for camera-synced sources.
+                    float relativeOffsets[2][3]{};
+                    float relativeOrientations[2][4]{};
+                    if (!OutRunVR::LensCentre::BuildHeadRelativeEyePose(
+                            stereo.eyeOffset, stereo.eyeOrientation,
+                            relativeOffsets, relativeOrientations))
                         return false;
-                    const D3DMATRIX fusedT = TransposeMatrix(fused);
-                    std::memcpy(eyeConstants[0], &fusedT, sizeof(fusedT));
-                    std::memcpy(eyeConstants[1], &fusedT, sizeof(fusedT));
+                    const bool cameraSynced =
+                        OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
+                    D3DMATRIX correctedT[2]{};
+                    const float zeroTranslation[3]{};
+                    for (int eye = 0; eye < 2; ++eye)
+                    {
+                        const D3DMATRIX eyeInverse = InverseRigid(
+                            MatrixFromQuaternionTranslation(
+                                relativeOrientations[eye], zeroTranslation, 1.0f));
+                        const D3DMATRIX eyeProjection = ProjectionFromFov(
+                            baseProjection, stereo.eyeFov[eye]);
+                        D3DMATRIX corrected{};
+                        if (!OutRunVR::LensCentre::BuildProjectedSunRay(
+                                stockWvp, inverseBaseProjection, headInverse,
+                                eyeInverse, eyeProjection, corrected, cameraSynced))
+                            return false;
+                        correctedT[eye] = TransposeMatrix(corrected);
+                    }
+                    // Publish neither eye until both transforms are valid.
+                    std::memcpy(eyeConstants[0], &correctedT[0], sizeof(D3DMATRIX));
+                    std::memcpy(eyeConstants[1], &correctedT[1], sizeof(D3DMATRIX));
                     return true;
                 }
                 // R69 HMD-proven DX11 behavior: CABE's Calc3D2D result is
@@ -5367,7 +5383,7 @@ namespace OutRunVRStereo
                     const auto n = ++centreDraws;
                     if (n <= 8 || (n & (n - 1)) == 0)
                         spdlog::info(
-                            "VR LENS C993 RAY EYES: pose={} draw={} left=0x{:08X} right=0x{:08X} restore={} cameraSynced={} hits={} mode=CENTRE_EYE_MONO_WORLD_LOCK",
+                            "VR LENS C993 RAY EYES: pose={} draw={} left=0x{:08X} right=0x{:08X} restore={} cameraSynced={} hits={} mode=COMMON_RAY_PER_EYE_WORLD_LOCK",
                             stereo.poseSequence, TopLevelDrawSerial(),
                             static_cast<unsigned>(leftHr),
                             static_cast<unsigned>(rightHr), restoreOk ? 1 : 0,
@@ -5378,7 +5394,7 @@ namespace OutRunVRStereo
                 {
                     firstProjectedScreenEffectLogged = true;
                     spdlog::info(
-                        "VR R69 FLARE FIX: complete projected-screen flare family uses head-corrected centre-eye mono fusion in both eyes");
+                        "VR R69 FLARE FIX: exact C993 uses common world ray with per-eye FOV/cant; CABE retains reference path");
                 }
             }
             if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
