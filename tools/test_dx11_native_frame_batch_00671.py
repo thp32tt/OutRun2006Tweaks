@@ -28,12 +28,18 @@ for symbol in ("R30UpdateSurfaceHook = {};","R30StretchRectHook = {};",
     assert symbol in r30, symbol
 for marker in ('#include "native_game_frame_batch.hpp"',
  'OUTRUN_DX11_FRAME_BATCH', 's.frameBatch.accepts(candidateOrdinal, s.probeSlot,',
- 'if (s.frameBatch.first_draw()) {',
+ 'if (initializeFrame && s.frameBatch.first_draw()) {',
  's.backend.begin_frame(env_full_game_opt_in()',
  's.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)',
  ': kBackground);',
  'if (s.frameBatch.clear_depth())', 's.frameBatch.succeeded(output.nativeDepthTest,',
  's.frameBatch.abort()', 's.frameBatch.reset()',
+ # One game-authored indexed window batch seeds once; a later window
+ # cannot destroy previously rendered triangles, and the original
+ # D3D9 source ordinal is committed only after every GPU window succeeds.
+ 'if (oversizedFan || oversizedPointStrip) {',
+ 'first == 0u)) {',
+ 'if (!success) {',
  'if (!submit(s, vertices, fanTriangles.data(),',
  'if (!submit(s, vertices, indices, indexCount, type, capture, output))',
  's.frameBatch.accepts_depth(output.nativeDepthTest,',
