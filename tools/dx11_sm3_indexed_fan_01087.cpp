@@ -1,5 +1,6 @@
 // 01087: authentic indexed SM3 fan center/rim across bounded GPU windows.
 #include "live_game_sm3_stream_assembly.hpp"
+#include "live_game_sm3_polygon_raster.hpp"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -77,5 +78,50 @@ int main() {
         sourceVertices,ib.size(),32u,64u,2048u,90u,8u,4096u).chunkCount);
     // Nonindexed oversized fan index expansion also remains streamable.
     assert(game_sm3_plan_native_fan_chunks(17u,12u,64u,2048u,18u,8u).chunkCount==3u);
+
+    // 01088: windowed REAL shader-bound fans preserve every triangle
+    // occurrence under SOLID/WIREFRAME/POINT, indexed and nonindexed.
+    // POINTLIST must replay shared vertices, not deduplicate fan center.
+    const auto multi=game_sm3_plan_native_indexed_fan_chunks(
+        sourceVertices,ib.size(),32u,64u,256u,18u,8u,4096u);
+    std::vector<std::uint32_t> expectedPoints;
+    assert(game_sm3_expand_polygon_points(
+        6u,ib.data(),ib.size(),sourceVertices,128u,expectedPoints));
+    std::vector<std::uint32_t> expectedLinear;
+    assert(game_sm3_expand_polygon_points(
+        6u,nullptr,ib.size(),sourceVertices,128u,expectedLinear));
+    for(const std::uint32_t fill : {1u,2u,3u}) {
+        std::vector<std::uint32_t> emittedIndexed, emittedLinear;
+        std::uint32_t covered=0u;
+        for(std::uint32_t chunk=0u;chunk<multi.chunkCount;++chunk) {
+            const auto firstRim=1u+chunk*multi.advanceRimVertices;
+            const auto count=(std::min)(
+                multi.verticesPerChunk,std::uint32_t(1u+ib.size()-firstRim));
+            const auto window=game_sm3_fan_fill_window_plan(
+                fill,ib.size(),firstRim,count,18u);
+            assert(window.supported);
+            assert(window.nativeIndexCount==3u*window.sourceTriangles);
+            covered+=window.sourceTriangles;
+            std::vector<std::uint32_t> local;
+            assert(game_sm3_fan_window_indices(count,18u,local));
+            assert(local.size()==window.nativeIndexCount);
+            for(const auto v : local) {
+                const auto sourceOrdinal=v?firstRim+v-1u:0u;
+                emittedIndexed.push_back(ib[sourceOrdinal]);
+                emittedLinear.push_back(sourceOrdinal);
+            }
+        }
+        assert(covered==ib.size()-2u);
+        assert(emittedIndexed==expectedPoints);
+        assert(emittedLinear==expectedLinear);
+    }
+    // Fail closed on source-tail overrun, unsupported fill, or native IB
+    // budget underflow, without ever issuing a partial point/wire draw.
+    assert(!game_sm3_fan_fill_window_plan(
+        1u,ib.size(),16u,3u,18u).supported);
+    assert(!game_sm3_fan_fill_window_plan(
+        4u,ib.size(),1u,8u,18u).supported);
+    assert(!game_sm3_fan_fill_window_plan(
+        2u,ib.size(),1u,8u,17u).supported);
     return 0;
 }

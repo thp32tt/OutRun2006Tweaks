@@ -5499,11 +5499,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
               plannedNativeStride, kMaxVertices, 1u << 25u, 128u)
         : GameSm3ConnectedChunkPlan{};
     const bool connectedChunkUpload = connectedChunkPlan.chunkCount > 1u;
-    // A genuine programmable, nonindexed source fan retains its center and
-    // previous rim at every packed GPU upload boundary. Other polygon fill
-    // modes, indexed fans and instancing remain on the established path.
+    // Large real-game fans retain center/rim continuity for all three
+    // polygon fill modes. Wireframe uses the same rasterized triangles,
+    // while point fill emits each source triangle's three vertex points.
+    // Source instancing still uses its separate bounded submission path.
     const auto fanChunkPlan = !sourceInstancing &&
-        !pointFill && !wireFill && type == D3DPT_TRIANGLEFAN
+        type == D3DPT_TRIANGLEFAN
         ? (indices
             ? game_sm3_plan_native_indexed_fan_chunks(
                   vertexCount, indexCount, plannedNativeStride,
@@ -5693,7 +5694,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // connected-instance helpers above have already preserved their order;
     // lower these triangles to a genuine GPU POINTLIST before IA/OM binding.
     std::vector<std::uint32_t> pointFillIndices;
-    if (pointFill) {
+    // Windowed fans already lower each original triangle to a local
+    // three-index occurrence stream. POINTLIST consumes that same stream
+    // directly; expanding the *whole* fan would exceed kMaxIndices.
+    if (pointFill && !fanChunkUpload) {
         const UINT logicalVertexCount = static_cast<UINT>(
             compactInstancedGeometry ? expandedVertices : vertexCount);
         const UINT sourceCount = nativeIndices ? nativeIndexCount : logicalVertexCount;
@@ -6613,7 +6617,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 indexedFanChunkUpload ? indexCount : vertexCount;
             const UINT drawCount = (std::min)(
                 fanChunkPlan.verticesPerChunk, 1u + sourceFanVertices - firstRim);
-            if (drawCount < 3u) {
+            const auto fillWindow = game_sm3_fan_fill_window_plan(
+                static_cast<std::uint32_t>(fill), sourceFanVertices,
+                firstRim, drawCount, kMaxIndices);
+            if (!fillWindow.supported) {
                 s.frameBatch.abort();
                 return false;
             }
@@ -6648,7 +6655,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             }
             std::vector<std::uint32_t> fanIndices;
             if (!game_sm3_fan_window_indices(
-                    drawCount, kMaxIndices, fanIndices)) {
+                    drawCount, kMaxIndices, fanIndices) ||
+                fanIndices.size() != fillWindow.nativeIndexCount) {
                 s.frameBatch.abort();
                 return false;
             }
@@ -6665,7 +6673,13 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             }
             context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
                                       DXGI_FORMAT_R32_UINT, 0u);
-            context->DrawIndexed(static_cast<UINT>(fanIndices.size()), 0u, 0);
+            // D3DFILL_POINT uses one 1-pixel point per triangle vertex
+            // occurrence; WIREFRAME/SOLID rasterize exactly the same
+            // per-window triangles with their already bound raster states.
+            context->IASetPrimitiveTopology(pointFill
+                ? D3D11_PRIMITIVE_TOPOLOGY_POINTLIST
+                : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            context->DrawIndexed(fillWindow.nativeIndexCount, 0u, 0);
             continue;
         }
         if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {

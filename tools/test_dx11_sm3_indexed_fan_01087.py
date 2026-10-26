@@ -22,3 +22,12 @@ for item in ("uploadVertices", "maxTotalBytes / nativeStride",
 assert live.index("if (fanChunkUpload) {") < live.index("if (repack) {")
 assert live.index("if (indexedFanChunkUpload && !repack)") < live.index("rejectionStage = 6u;")
 print("01087 indexed SM3 fan center/rim/oversized-IB native integration PASS")
+
+# 01088 must enter the *same* shader-bound fan native GPU source path.
+assert "game_sm3_fan_fill_window_plan(" in live
+assert "if (pointFill && !fanChunkUpload)" in live
+assert "context->DrawIndexed(fillWindow.nativeIndexCount" in live
+assert "type == D3DPT_TRIANGLEFAN" in live
+assert "D3D11_PRIMITIVE_TOPOLOGY_POINTLIST" in live
+assert "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in live
+print("01088 indexed/nonindexed fan point/wire/solid GPU windows PASS")

@@ -6,6 +6,32 @@
 #include <limits>
 #include <vector>
 namespace outrun::vr::dx11::live_game_frame {
+
+ // A bounded native fan window represents a contiguous set of authentic
+ // source triangles, regardless of its D3D9 polygon fill mode. In point
+ // mode the 3*N index occurrences are GPU POINTLIST vertices (including
+ // shared center/seam duplicates), not a deduplicated vertex cloud.
+ // Wire/solid mode interprets those same indices as native TRIANGLELIST.
+ // Validate before any GPU upload so no malformed tail publishes a frame.
+ struct GameSm3FanFillWindowPlan {
+     bool supported = false;
+     std::uint32_t nativeIndexCount = 0u;
+     std::uint32_t sourceTriangles = 0u;
+ };
+ [[nodiscard]] constexpr GameSm3FanFillWindowPlan
+ game_sm3_fan_fill_window_plan(
+     std::uint32_t fill, std::uint32_t sourceElements,
+     std::uint32_t firstRim, std::uint32_t windowElements,
+     std::uint32_t maxNativeIndices) noexcept {
+     if ((fill != 1u && fill != 2u && fill != 3u) ||
+         sourceElements < 3u || firstRim == 0u ||
+         firstRim >= sourceElements || windowElements < 3u ||
+         windowElements - 1u > sourceElements - firstRim ||
+         windowElements - 2u > maxNativeIndices / 3u)
+         return {};
+     const std::uint32_t triangles = windowElements - 2u;
+     return {true, triangles * 3u, triangles};
+ }
 [[nodiscard]] constexpr bool game_sm3_polygon_fill_admitted(
     std::uint32_t fill, std::uint32_t topology, std::uint32_t cull,
     bool lineAA, bool lastPixel, bool unitPoint) noexcept {
