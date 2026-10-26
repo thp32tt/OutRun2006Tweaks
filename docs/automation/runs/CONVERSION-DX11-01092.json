@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01092",
+  "production_id": "CONVERSION-DX11-01092",
+  "event_id": "CONVERSION-DX11-01092-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01092",
+  "classification": "A_REAL_GAME_SM3_INHERITED_POLYGON_POINT_LINE_GPU_DRAW_PLUS_B_CAUSAL_FAST_GATE_REPAIRS",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SM3_INHERITED_POLYGON_POINT_LINE_NATIVE_GPU_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_base_sha": "8f8fd8093696c35affeab0f38515310250941770",
+  "source_change_sha": "69af537b80887f4e87a588a17b78398849fedd16",
+  "material_result_sha": "69af537b80887f4e87a588a17b78398849fedd16",
+  "validation_bearing_result_sha": "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f",
+  "result_sha": "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f",
+  "implementation_commits": [
+    "69af537b80887f4e87a588a17b78398849fedd16"
+  ],
+  "repair_commits": [
+    "693057ff69062519f403d6a21b1aa40c776c5934",
+    "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f"
+  ],
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
+    "tests/vr/dx11_live_game_inherited_polygon_state.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Admit real shader-bound D3D9 POINTLIST/LINELIST/LINESTRIP native D3D11 GPU draws even when they inherit polygon POINT/WIREFRAME fill; preserve triangle fill semantics, strict enum domains, safety guards and unchanged D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "point_line_inherited_fill_native_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_RENDER_DRAW",
+        "expected_behavior": "Point and line GPU Draw/DrawIndexed topology remains authentic under inherited triangle polygon fill; triangle topology continues using point/wire/solid raster as appropriate."
+      },
+      {
+        "id": "enum_preflight_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GAME_VERTEX_INPUT_FFB_FALLBACK",
+        "expected_behavior": "Invalid fill/topology enum values, unsafe raster guards, and late-invalid indexed source reject native admission without partial source mutation; original D3D9/DX9Ex remains authoritative."
+      },
+      {
+        "id": "full_same_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "NATIVE_BUILD_EXACT_SHA",
+        "expected_behavior": "Five mandatory push workflow gates all complete successfully on one exact validation-bearing SHA; original game/HMD runtime is separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "point_line_inherited_fill_native_draw": {
+      "status": "PASS_FEATURE_CI",
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_game_inherited_polygon_state.cpp -o /tmp/dx11_fill_01092 && /tmp/dx11_fill_01092",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
+        "tests/vr/dx11_live_game_inherited_polygon_state.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "note": "Exact-source DX11 Fast Structural Checks push success; point/line inherited polygon fill is covered by a checked-in C++ source regression, not by observed Quest3 frame output."
+    },
+    "enum_preflight_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "validation_command": "python tools/test_dx11_live_sm3_draw_00925.py; g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_game_inherited_polygon_state.cpp -o /tmp/dx11_fill_01092 && /tmp/dx11_fill_01092",
+      "evidence_paths": [
+        "tools/test_dx11_live_sm3_draw_00925.py",
+        "tests/vr/dx11_live_game_inherited_polygon_state.cpp",
+        "src/vr/d3d11/live_game_sm3_polygon_raster.hpp"
+      ],
+      "note": "Source/test review shows distinct fill/topology domains, invalid-state guards, existing list/strip index preflight and repair of the 00925 gate; exact SHA Fast Structural push run succeeded."
+    },
+    "full_same_sha_ci": {
+      "status": "PASS_EXACT_SHA",
+      "validation_command": "GitHub Actions push at 322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f: Fast 40363694525; Backend 40363694549; Build 40363694629; OpenXR 40363694415; HUD 40363694513",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694525",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694549",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694629",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694415",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694513"
+      ],
+      "note": "All five required GitHub Actions completed/success for exactly the supplied validation SHA; this separate [skip ci] C6 bookkeeping commit does not change the verified SHA."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40363694525,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694525"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40363694549,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694549"
+    },
+    {
+      "name": "Build",
+      "run_id": 40363694629,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694629"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40363694415,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694415"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40363694513,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40363694513"
+    }
+  ],
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "task_new_source_achievement_score_for_c6": 0,
+  "score_note": "C6 reconstruction of a missing run record is bookkeeping only and must not double-score source changes. AI2 scoreboard SSOT remains at 1990; 1990 + 0 = 1990. No scoreboard edit.",
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "c6_source_validation_sha": "322a1c9ff75f01095c9c98e0a80be8c6a7e59f8f",
+  "blocked_reason_resolved": "RUN_RECORD_NOT_FOUND",
+  "c6_record_recovery_note": "No prior docs/automation/runs/CONVERSION-DX11-01092.json existed at the validation/branch HEAD. Original material source SHA and feature contract/acceptance evidence are reconstructed from the 01092 source/repair commits, checked-in C++/workflow and confirmed push workflow outcomes; there were no preexisting JSON values to preserve.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun menu/car/race, Quest3/VDXR eye parity, native published-frame count or FPS test was performed in this C6 operation.",
+  "next_implementation_action": "Separately obtain actual game native menu->car->race Draw/frame and Quest3/VDXR evidence before promoting runtime verification. No source/CI rerun is needed for C6 metadata."
+}
