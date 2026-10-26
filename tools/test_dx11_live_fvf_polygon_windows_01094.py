@@ -12,6 +12,15 @@ def safe(src_submit: str, src_observer: str) -> bool:
         "bool initializeFrame = true) noexcept" in src_submit
         and "if (initializeFrame && s.frameBatch.first_draw())" in src_submit
         and "s.backend.begin_frame(env_full_game_opt_in()" in src_submit
+        # 01097: extending the authentic connected polygon source span to
+        # the full 6144-element VB/IB requires BOTH source topologies to
+        # cross the same bounded native multi-window GPU submit. Losing the
+        # large-fan entry or full original-index preflight must fail this CI.
+        and "const bool oversizedFan = type == D3DPT_TRIANGLEFAN &&" in src_observer
+        and "const bool oversizedPointStrip = type == D3DPT_TRIANGLESTRIP &&" in src_observer
+        and "std::uint64_t(primitives) * 3u > kMaxIndices" in src_observer
+        and "for (UINT i=0; i<indexCount; ++i) {" in src_observer
+        and "if (indices[i] >= vertexCount)" in src_observer
         and "if (oversizedFan || oversizedPointStrip)" in src_observer
         and "game_fvf_build_polygon_window(" in src_observer
         and "D3DPT_TRIANGLELIST, capture, output,\n"
@@ -28,9 +37,15 @@ mutations = [
                     "bool initializeFrame = false) noexcept", 1), observer),
     (submit, observer.replace("first == 0u))", "true))", 1)),
     (submit, observer.replace("first == 0u))", "false))", 1)),
+    (submit, observer.replace(
+        "const bool oversizedFan = type == D3DPT_TRIANGLEFAN &&",
+        "const bool oversizedFan = false &&", 1)),
+    (submit, observer.replace(
+        "for (UINT i=0; i<indexCount; ++i) {",
+        "for (UINT i=0; i<0u; ++i) {", 1)),
     (submit, observer.replace("s.frameBatch.abort();", "/* lost abort */", 1)),
 ]
-for a, b in mutations[:4]:
+for a, b in mutations:
     assert not safe(a, b), "deleted native window source frame isolation"
 # The preflight/error branch must not disappear even when another abort exists.
 failure = observer[observer.index("if (oversizedFan || oversizedPointStrip)"):]
