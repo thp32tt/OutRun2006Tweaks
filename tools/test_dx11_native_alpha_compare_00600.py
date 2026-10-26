@@ -61,7 +61,14 @@ def linked(s):
         and "if (!submit(s, vertices, fanTriangles.data()," in observer
         and "D3DPT_TRIANGLELIST, capture, output)) {" in observer
         and "if (!submit(s, vertices, indices, indexCount, type, capture, output)) {" in observer
-        and observer.count("s.frameBatch.succeeded(output.nativeDepthTest,") == 2
+        # Large game-authored FVF fan/point-strip IBs now have a third,
+        # bounded indexed GPU window success path. Every accepted window
+        # still uses the same alpha-test b0/AlphaGate as other native Draws.
+        and "if (oversizedFan || oversizedPointStrip)" in observer
+        and "if (!game_fvf_build_polygon_window(" in observer
+        and "!submit(s, vertices, window.data()," in observer
+        and "if (!success) {" in observer
+        and observer.count("s.frameBatch.succeeded(output.nativeDepthTest,") == 3
         and observer.count("s.frameBatch.abort();") >= 3
         and "return optedIn;" in s
     )
@@ -89,6 +96,12 @@ def main():
          "if (false /* fan native submit removed */"),
         ("if (!submit(s, vertices, indices, indexCount, type, capture, output)) {",
          "if (false /* indexed native submit removed */) {"),
+        ("if (oversizedFan || oversizedPointStrip)",
+         "if (false /* window draw deleted */)"),
+        ("if (!game_fvf_build_polygon_window(",
+         "if (false /* window index preflight deleted */"),
+        ("!submit(s, vertices, window.data(),",
+         "false /* GPU indexed window omitted */"),
         ("s.frameBatch.succeeded(output.nativeDepthTest,",
          "/* success path removed */"),
     ]
