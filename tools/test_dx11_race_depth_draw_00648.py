@@ -40,7 +40,13 @@ assert 0 <= reset_guard < reset_clear < reset_shutdown, "Reset ownership must pr
 assert 's.previousOutput.valid() ? s.previousOutput.device : 0u' in reset[reset_guard:reset_clear]
 assert 'return;' in reset[reset_guard:reset_clear]
 assert 's.diagnosticDepthView.Reset(); s.diagnosticDepth.Reset();' in reset[reset_clear:reset_shutdown]
-assert 'if (s.frameBatch.first_draw()) {' in cpp
+# A large source-authored FVF polygon can span multiple indexed GPU windows.
+# The first window seeds the real color/Z frame; subsequent windows must
+# accumulate without a second begin_frame erasing prior GPU triangles.
+assert 'if (initializeFrame && s.frameBatch.first_draw()) {' in cpp
+assert 'bool initializeFrame = true) noexcept' in cpp
+assert 'D3DPT_TRIANGLELIST, capture, output,\n                            first == 0u))' in cpp
+assert 'if (s.frameBatch.first_draw()) {' not in cpp
 assert 's.backend.begin_frame(env_full_game_opt_in()' in cpp
 assert 's.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)' in cpp
 assert ': kBackground);' in cpp
