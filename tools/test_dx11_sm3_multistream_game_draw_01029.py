@@ -20,7 +20,8 @@ checks={
     "chunkInstances, instanceSteps, unpacked, instance" in bridge,
 "instance rate and indexed GPU draw": "std::array<std::uint32_t,16> instanceSteps{};" in bridge and
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge,
-"16 stream IA consumer": assembly.count("const std::array<GameSm3StreamView,16>& streams")==3 and
+"16 stream IA consumer": assembly.count("const std::array<GameSm3StreamView,16>& streams")>=4 and
+    "game_sm3_assemble_indexed_window(" in assembly and
     "game_sm3_assemble_fan_window(" in assembly and
     "game_sm3_assemble_streams(elements, streams, 1u, center)" in assembly and
     "game_sm3_assemble_streams(elements, streams," in assembly and
