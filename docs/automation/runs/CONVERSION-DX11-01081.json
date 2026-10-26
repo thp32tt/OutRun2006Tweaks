@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01081",
+  "production_id": "CONVERSION-DX11-01081",
+  "event_id": "CONVERSION-DX11-01081-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01081",
+  "classification": "B",
+  "original_implementation_classification": "A",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SM3_SEGMENTED_CONNECTED_GPU_CHUNKS",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_GATE_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "quest3_playable": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "material_result_sha": "061a49f1f7c137c30150761cd6ee909dcd173c67",
+  "source_change_sha": "061a49f1f7c137c30150761cd6ee909dcd173c67",
+  "validation_bearing_result_sha": null,
+  "implementation_commits": [
+    "061a49f1f7c137c30150761cd6ee909dcd173c67"
+  ],
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_connected_instances.hpp",
+    "src/vr/d3d11/live_game_sm3_connected_submission.hpp",
+    "tools/dx11_sm3_segmented_connected_batch_01081.cpp",
+    "tools/test_dx11_sm3_segmented_connected_01081.py"
+  ],
+  "summary": "Original 01081 C++ implementation lowers authentic segmented SM3 LINESTRIP/TRIANGLESTRIP/TRIANGLEFAN source instancing to independently bounded native D3D11 DrawIndexed GPU chunks. The first mandatory Backend Conversion Gate failed before Windows compile because historical 01080 C6 metadata omitted required strategy. This retry repairs the causal 01080 metadata in the same commit and records current implementation as CI-pending; runtime is untested.",
+  "failure_evidence": {
+    "run_id": 40259915137,
+    "workflow": "Backend Conversion Gate",
+    "original_sha": "061a49f1f7c137c30150761cd6ee909dcd173c67",
+    "failed_step": "Verify DX11 integration-first auto-development acceptance",
+    "error": "CONVERSION-DX11-01080.json: development_strategy missing after structural policy effective date",
+    "completed": false
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Allow authentic source-instanced shader-bound connected game strips and triangle fans to submit as bounded indexed native D3D11 GPU chunks without joining per-instance topology; preserve original D3D9Ex fallback and require five full SHA-bound CI gates before any build claim.",
+    "acceptance_items": [
+      {
+        "id": "connected_segmented_native_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_SM3_GAME_NATIVE_DRAWINDEXED",
+        "expected_behavior": "True D3D9 SM3 connected strip/fan source Draw instances generate legal local per-upload indices and bounded D3D11 GPU chunk DrawIndexed without incorrectly joining neighbor instances."
+      },
+      {
+        "id": "safe_source_bounds_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9EX_RENDER_AND_INPUT_FALLBACK",
+        "expected_behavior": "Bad indices, over-budget temporary GPU indices, point/wire topology and aborted native uploads fail closed, keeping original source D3D9Ex drawing and input/FFB intact."
+      },
+      {
+        "id": "exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "FIVE_MANDATORY_GITHUB_ACTIONS",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD checks must succeed on the source-and-metadata repair final exact commit SHA, separate from Quest3 runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "connected_segmented_native_draw": "PENDING_EXACT_SHA",
+    "safe_source_bounds_fallback": "PENDING_EXACT_SHA",
+    "exact_sha_required_gates": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_SM3_CONNECTED_INSTANCED_GAME_DRAW",
+      "INDEXED_STRIP_FAN_LOCAL_CHUNK_EXPANSION",
+      "BOUNDED_VERTEX_AND_INDEX_UPLOAD",
+      "D3D11_NATIVE_DRAWINDEXED",
+      "VISIBLE_FRAME_OUTPUT",
+      "DX9EX_FAIL_CLOSED_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_connected_submission.hpp",
+      "src/vr/d3d11/live_game_sm3_connected_instances.hpp",
+      "tools/dx11_sm3_segmented_connected_batch_01081.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Authentic 01081 native segmented connected source implementation and C++ portable regression were committed at 061a49f1f7c137c30150761cd6ee909dcd173c67; final five-gate source-and-metadata repair commit CI remains pending.",
+      "negative_regression": "01081 unit test covers independent strip/fan winding, local chunk index bases and malformed index rollback; previous backend gate was blocked by 01080 policy record before compilation, therefore build success is not claimed.",
+      "component_integration": "Intercepted live shader-bound SM3 source instancing -> split and expand original connected strip/fan indices per GPU upload -> D3D11 DrawIndexed/native frame guarded by existing opt-in path -> preserve original D3D9Ex fallback."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_SEGMENTED_CONNECTED_GPU_CHUNKS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_CI_PENDING, not gameplay verified: complete menu/car/race, native published-frame observation, Quest3 stereo and fps UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive opt-in/fail-closed; source-game D3D9Ex Draw/Present, input/FFB/SkyGlow, reset and frozen DXVK remain protected."
+  },
+  "score_change": 0,
+  "score_award_event": false,
+  "ai2_previous_confirmed_cumulative_score": 1969,
+  "ai2_new_confirmed_cumulative_score": 1969,
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no game launch, Quest3/VDXR optics, input/FFB or performance measurement.",
+  "next_implementation_action": "After exact-SHA CI success, complete remaining full-resolution menu-to-race native draw and L/R native GPU OpenXR transport within unfinished feature; keep safe DX9Ex fallback."
+}

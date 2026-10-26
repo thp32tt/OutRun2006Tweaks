@@ -66,7 +66,27 @@
       "DX11:SM3_SEGMENTED_INDEPENDENT_LIST_NATIVE_GPU_CHUNKS"
     ],
     "feature_ready_scope": "SOURCE_INTEGRATION_AND_EXACT_SHA_CI_ONLY",
-    "activation_guard_and_fallback": "Native opt-in, fail-closed publication, original DX9Ex Draw/Present and wheel/FFB untouched. No R175 TEXCOORD6/00477 ownership rework or WARP-only replacement feature."
+    "activation_guard_and_fallback": "Native opt-in, fail-closed publication, original DX9Ex Draw/Present and wheel/FFB untouched. No R175 TEXCOORD6/00477 ownership rework or WARP-only replacement feature.",
+    "acceptance_items": [
+      {
+        "id": "authentic_independent_list_chunk_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "SM3_INSTANCED_NATIVE_GPU_DRAW",
+        "expected_behavior": "Actual shader-bound source-independent POINT/LINELIST/TRIANGLELIST instances are repacked into bounded original-order D3D11 Draw or DrawIndexed chunks."
+      },
+      {
+        "id": "safe_connected_and_index_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "CONNECTED_TOPOLOGY_AND_D3D9EX_FALLBACK",
+        "expected_behavior": "Do not join connected strip or fan instance edges; reject malformed indices and over-budget uploads before publishing, retaining original D3D9Ex input and render fallback."
+      },
+      {
+        "id": "five_mandatory_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS_EXACT_SHA",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector all completed successfully for the same material source SHA, without runtime gameplay claims."
+      }
+    ]
   },
   "acceptance_results": {
     "authentic_independent_list_chunk_draw": {
@@ -224,5 +244,46 @@
     "Quest 3 stereo, controls/FFB, 120fps and bundled launcher contents UNTESTED.",
     "Continue the same full native game frame feature on next new task; coordinate 00477 TEXCOORD6 ownership without duplicate work."
   ],
-  "next_implementation_action": "Resume original live D3D9 game draw to independently visible D3D11 native game frame/VR eye transfer; pursue R175 TEXCOORD6 only after verifying 00477 ownership. Keep fail-closed opt-in and original DX9Ex fallback."
+  "next_implementation_action": "Resume original live D3D9 game draw to independently visible D3D11 native game frame/VR eye transfer; pursue R175 TEXCOORD6 only after verifying 00477 ownership. Keep fail-closed opt-in and original DX9Ex fallback.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_SM3_INDEXEDDATA_AND_INSTANCEDATA",
+      "BOUNDED_GPU_VERTEX_UPLOAD",
+      "D3D11_NATIVE_DRAW_OR_DRAWINDEXED",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9EX_FAIL_CLOSED_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_instance_batches.hpp",
+      "tools/dx11_sm3_segmented_list_batch_01080.cpp",
+      "tools/test_dx11_sm3_segmented_list_batch_01080.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01080 exact-SHA DX11 Fast Structural Checks 40256651113 completed success at d3d123cce08f54d32bf05925c54789461dd1f543 for genuine game SM3 segmented independent-list native GPU chunk source integration.",
+      "negative_regression": "01080 guarded connected line/triangle/fan primitive exclusion, GPU index capacity and missing instance fallback assertions; no gameplay/HMD test claimed.",
+      "component_integration": "Live original game SM3 instanced D3D9 Draw/DrawIndexed into per-GPU-chunk D3D11 IA/VS/PS native Draw with original indexed boundaries, opt-in and DX9Ex fallback, validated only at source and CI level."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_SEGMENTED_INDEPENDENT_LIST_NATIVE_GPU_CHUNKS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED SOURCE_ONLY on 01080 exact SHA; real menu/car/race display and Quest3/VDXR output UNTESTED.",
+    "activation_guard_and_fallback": "Native game drawing remains opt-in/fail-closed; original D3D9Ex game Draw/Present, input/FFB/SkyGlow fallback and DXVK freeze retained."
+  },
+  "ci_failure_followup": {
+    "repair_task_id": "CONVERSION-DX11-01081",
+    "original_failed_run": 40259915137,
+    "reason": "01080 C6 record omitted development_strategy and feature acceptance_items; restore existing evidence with no change to previous 01080 source exact-SHA CI claims.",
+    "notes": "Metadata contract repair under 01081 existing source implementation, not a second 01080 feature or new score."
+  }
 }
