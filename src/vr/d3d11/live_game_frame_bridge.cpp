@@ -1262,6 +1262,8 @@ struct OutputCapture {
     bool nativeDepthAlways = false;
     std::uint32_t nativeDepthEqualityMode = 0u;
     std::uint32_t nativeDepthOrderingMode = 0u;
+    bool nativePointFill = false; // FVF triangle corners become 1-pixel GPU points.
+    bool nativeWireFill = false; // FVF triangles use a native wireframe rasterizer.
     DWORD nativeCullMode = D3DCULL_NONE; // live game face exclusion
     DWORD alphaRef = 0;
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
@@ -2587,7 +2589,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     DWORD blend=TRUE, alpha=TRUE, stencil=TRUE, depth=TRUE, clip=TRUE;
     DWORD fog=TRUE, scissor=TRUE, srgbWrite=~0u;
     DWORD colorMask=0, cullMode=0, fillMode=0;
-    // Keep the diagnostic raster conservative: no cull/fill/fog translation.
+    // Fail closed on unmirrored fog/clipping while retaining real source raster state.
     // The source color-write channels are mirrored into the D3D11 OM blend
     // descriptor, never converted to an all-channel write by accident.
     // Scissoring is mirrored via RSSetScissorRects.
@@ -2602,9 +2604,20 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        !clip || fog || fillMode != D3DFILL_SOLID ||
-        !GameNativeSrgbDraw::admit(srgbWrite, fullFrame))
+        !clip || fog || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame))
         return false;
+    // D3D9 polygon fill does not change the topology of a POINTLIST or
+    // LINESTRIP inherited from an earlier triangle. The live SM3 GPU path
+    // already uses these exact enum domains. Extend the full-game FVF path
+    // without altering the bounded legacy diagnostic/inset.
+    const auto polygonMode = game_sm3_effective_polygon_mode(
+        static_cast<std::uint32_t>(fillMode),
+        static_cast<std::uint32_t>(topology));
+    if (!polygonMode.admitted ||
+        (!fullFrame && fillMode != D3DFILL_SOLID))
+        return false;
+    output.nativePointFill = fullFrame && polygonMode.pointTriangles;
+    output.nativeWireFill = fullFrame && polygonMode.wireTriangles;
     // FVF UI/HUD fades may request sRGB output without a texture; preserve
     // their exact RT encoding independently of the SM3 state from prior Draws.
     output.nativeSrgbWrite = GameNativeSrgbDraw::uses_srgb(srgbWrite);
@@ -2652,6 +2665,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             cullMode, static_cast<std::uint32_t>(topology), admittedCull))
         return false;
     output.nativeCullMode = admittedCull.d3d9Mode;
+    // A point-filled triangle is generated as individual 1-pixel vertices.
+    // Face culling has no corresponding D3D11 POINTLIST primitive, so source
+    // culling must be disabled before its draw is promoted.
+    if (output.nativePointFill && output.nativeCullMode != D3DCULL_NONE)
+        return false;
     // Mirror only one isolated game-authored Z draw. The newly cleared DSV
     // omits earlier D3D9 occluders: this is diagnostic, NOT scene parity.
     // W-buffering, depth-bias and missing depth fail closed; depth-read-only
@@ -2682,7 +2700,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     // Only native one-pixel points without sprites or per-vertex point sizes.
     // All larger/scaled point raster states continue to the original D3D9
     // Draw only; do not display a misleading native menu/effect inset.
-    if (topology == D3DPT_POINTLIST) {
+    if (topology == D3DPT_POINTLIST || output.nativePointFill) {
         DWORD size = 0u, minSize = 0u, maxSize = 0u;
         DWORD sprite = TRUE, scale = TRUE;
         if (FAILED(game->GetRenderState(D3DRS_POINTSIZE, &size)) ||
@@ -2696,7 +2714,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     }
     // Lines with D3D9-specific AA/last-pixel behavior cannot be represented
     // exactly by this single-sample native diagnostic target: fail closed.
-    if (topology == D3DPT_LINELIST || topology == D3DPT_LINESTRIP) {
+    if (topology == D3DPT_LINELIST || topology == D3DPT_LINESTRIP ||
+        output.nativeWireFill) {
         DWORD lineAA = TRUE, lastPixel = FALSE;
         if (FAILED(game->GetRenderState(D3DRS_ANTIALIASEDLINEENABLE, &lineAA)) ||
             FAILED(game->GetRenderState(D3DRS_LASTPIXEL, &lastPixel)) ||
@@ -6929,6 +6948,27 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             const std::uint32_t* indices, UINT indexCount,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
             const OutputCapture& output) noexcept {
+    // Convert actual FVF TRIANGLESTRIP fill-POINT corner occurrences into
+    // indexed native POINTLIST BEFORE any GPU mutation. Triangle lists and
+    // already expanded real-game fans have the same corner ordering; neither
+    // requires an invented vertex or a deduplicated point cloud. Reject
+    // oversized/invalid late IB entries and preserve the original D3D9 Draw.
+    std::vector<std::uint32_t> pointIndices;
+    if (output.nativePointFill) {
+        if (topology == D3DPT_TRIANGLESTRIP) {
+            const UINT sourceCount = indices ? indexCount :
+                static_cast<UINT>(vertices.size());
+            if (!game_sm3_expand_polygon_points(
+                    D3DPT_TRIANGLESTRIP, indices, sourceCount,
+                    static_cast<UINT>(vertices.size()), kMaxIndices,
+                    pointIndices)) return false;
+            indices = pointIndices.data();
+            indexCount = static_cast<UINT>(pointIndices.size());
+        } else if (topology != D3DPT_TRIANGLELIST) {
+            return false;
+        }
+        topology = D3DPT_POINTLIST;
+    }
     if (!ensure_pipeline(s, output.nativeWidth, output.nativeHeight)) return false;
     // Missing paired RTV is not permission to encode sRGB into linear UNORM.
     if (!s.backend.color_rtv() ||
@@ -7579,6 +7619,23 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             : output.nativeCullMode == D3DCULL_CCW
                 ? s.diagnosticCullRasters[output.scissor ? 3u : 1u].Get()
                 : (output.scissor ? s.scissorRaster.Get() : s.raster.Get());
+    // The real FVF menu/vehicle/race wireframe polygon has D3D11 triangle
+    // IA topology but a per-Draw wire raster. Never change global solid
+    // raster caches or leak this state into the next shader-bound SM3 Draw.
+    ComPtr<ID3D11RasterizerState> wireRaster;
+    if (output.nativeWireFill) {
+        D3D11_RASTERIZER_DESC desc{};
+        desc.FillMode = D3D11_FILL_WIREFRAME;
+        desc.CullMode = output.nativeCullMode == D3DCULL_NONE
+            ? D3D11_CULL_NONE : D3D11_CULL_BACK;
+        desc.FrontCounterClockwise =
+            output.nativeCullMode == D3DCULL_CW ? TRUE : FALSE;
+        desc.ScissorEnable = output.scissor ? TRUE : FALSE;
+        desc.DepthClipEnable = TRUE;
+        if (FAILED(dev->CreateRasterizerState(
+                &desc, wireRaster.GetAddressOf()))) return false;
+        nativeRaster = wireRaster.Get();
+    }
     ctx->RSSetState(nativeRaster);
     ctx->VSSetShader(s.vs.Get(), nullptr, 0);
     ctx->PSSetShader(capture.stage1Enabled ?
