@@ -50,8 +50,10 @@ namespace OutRunVRD3D9ExUpgrade
         constexpr std::size_t CreateVertexBufferVtableIndex = 26;
         constexpr std::size_t CreateIndexBufferVtableIndex = 27;
 
-        // No OpenXR calls or waits on the D3D9 thread. Both VDXR view
-        // slices must agree before choosing the real physical render target.
+        // Quest3 evidence: the host's true 2496x2688 eyes were published AFTER
+        // the previous 3.5-second CreateDevice timeout. Wait only for this
+        // initial allocation, not Present/frame, and accept ONLY matching
+        // real per-eye extents from a live OpenXR PID.
         // Game -width/-height is deliberately NOT consulted here: it owns the
         // logical/mirror presentation and must not cap headset render quality.
 
@@ -92,18 +94,37 @@ namespace OutRunVRD3D9ExUpgrade
                 return {};
 
             OutRunVR::IpcV3::HostStateReader reader;
-            OutRunVR::IpcV3::HostState host{};
-            if (!reader.Read(host))
-                return {};
-            const auto extent = OutRunVR::EyeExtent::ResolveStartupForLiveHost(
-                {host.recommendedWidth[0], host.recommendedHeight[0]},
-                {host.recommendedWidth[1], host.recommendedHeight[1]},
-                host.hostPid,
-                (host.flags & OutRunVR::IpcV3::HostAlive) != 0,
-                OutRunVR::HostProcess::IsAlive);
-            if (!OutRunVR::EyeExtent::Valid(extent))
-                return {};
-            return OutRunVR::EyeExtent::ResolveGame(extent, capsSize);
+            const ULONGLONG deadline = GetTickCount64() + 8000ULL;
+            unsigned attempts = 0;
+            do
+            {
+                ++attempts;
+                OutRunVR::IpcV3::HostState host{};
+                if (reader.Read(host))
+                {
+                    const auto extent = OutRunVR::EyeExtent::ResolveStartupForLiveHost(
+                        {host.recommendedWidth[0], host.recommendedHeight[0]},
+                        {host.recommendedWidth[1], host.recommendedHeight[1]},
+                        host.hostPid,
+                        (host.flags & OutRunVR::IpcV3::HostAlive) != 0,
+                        OutRunVR::HostProcess::IsAlive);
+                    const auto accepted =
+                        OutRunVR::EyeExtent::ResolveGame(extent, capsSize);
+                    if (OutRunVR::EyeExtent::Valid(accepted))
+                    {
+                        spdlog::info(
+                            "VR XR EYE STARTUP: accepted {}x{} after {} probes",
+                            accepted.width, accepted.height, attempts);
+                        return accepted;
+                    }
+                }
+                if (GetTickCount64() >= deadline) break;
+                Sleep(50);
+            } while (true);
+            spdlog::warn(
+                "VR XR EYE STARTUP: host eye extent unavailable after {} probes; using fixed logical 1080p fallback",
+                attempts);
+            return {};
         }
 
         Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;

@@ -177,7 +177,7 @@ def check_goal_full_result_graph(ui, contracts):
         "using ResultProgressFullParentFn = bool(__cdecl*)();",
         "Module::exe_ptr(ResultProgressFullParentTarget)",
         "if (!Settings::VREnabled || !Game::current_mode ||",
-        "*Game::current_mode != GameState::STATE_GOAL ||",
+        "ResultPresentationState() ||",
         "OutRunVR::GameSemantic::QueueRenderActive())",
         "return original();",
         "rootsBefore[p] = root;",

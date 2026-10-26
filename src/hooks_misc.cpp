@@ -851,6 +851,16 @@ namespace
             return;
         }
 
+        // Quest source trace had desktop-selected 1920x1080 and 3440x1440
+        // with identical 2496x2688 XR eye extents. Keep R26's game/UI
+        // logical reference independent of desktop and XR eye target.
+        const int oldW = Game::screen_resolution->x;
+        const int oldH = Game::screen_resolution->y;
+        Game::screen_resolution->x = 1920;
+        Game::screen_resolution->y = 1080;
+        spdlog::info(
+            "VR R26 LOGICAL SOURCE LOCK: {}x{} -> 1920x1080 independent of desktop/game INI; OpenXR eye source separate",
+            oldW, oldH);
         const int manualW = Settings::VRRenderWidth;
         const int manualH = Settings::VRRenderHeight;
         const bool manualRequested = manualW > 0 || manualH > 0;
@@ -1058,10 +1068,13 @@ public:
             // Explicit VR internal backbuffer dimensions supersede primary
             // monitor size ONLY if both values are valid. Preserve legacy
             // desktop behavior and original 2D installations by default.
-            const int width = vrResolutionValid
-                ? requestedWidth : GetSystemMetrics(SM_CXSCREEN);
-            const int height = vrResolutionValid
-                ? requestedHeight : GetSystemMetrics(SM_CYSCREEN);
+            const bool fixedLogicalVr =
+                Settings::VREnabled && !Settings::VRFollowGameResolution &&
+                Settings::VRAutoRenderResolution && !vrResolutionValid;
+            const int width = vrResolutionValid ? requestedWidth :
+                fixedLogicalVr ? 1920 : GetSystemMetrics(SM_CXSCREEN);
+            const int height = vrResolutionValid ? requestedHeight :
+                fixedLogicalVr ? 1080 : GetSystemMetrics(SM_CYSCREEN);
             if (width < 640 || height < 480)
                 return false;
 
@@ -1073,7 +1086,8 @@ public:
 			*Game::D3DAntialiasing = 2;
 			*Game::CfgLanguage = 0;
 
-			spdlog::info("GameDefaultConfigOverride: default resolution set to {}x{}, windowed enabled, fog enabled, antialiasing 2; source={}", width, height, vrResolutionValid ? "VR_INTERNAL_OVERRIDE" : "DESKTOP_AUTO");
+			spdlog::info("GameDefaultConfigOverride: default resolution set to {}x{}, windowed enabled, fog enabled, antialiasing 2; source={}", width, height, vrResolutionValid ? "VR_INTERNAL_OVERRIDE" :
+                fixedLogicalVr ? "VR_1080P_LOGICAL_SOURCE" : "DESKTOP_AUTO");
 		}
 
 		return true;

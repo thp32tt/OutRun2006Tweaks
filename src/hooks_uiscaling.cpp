@@ -1615,7 +1615,17 @@ class UIScaling : public Hook
     inline static thread_local OutRunVR::GoalProgress::SourceAdmission
         ResultProgressAdmission{};
     inline static thread_local bool ResultProgressAdmittedAfterDrain = false;
-	static void ResultProgressEnter(safetyhook::Context&)
+	static bool ResultPresentationState() noexcept
+    {
+        if (!Game::current_mode) return false;
+        const auto state = *Game::current_mode;
+        // 2026-10-26 real Quest log proved 0x2D200 runs in state=20
+        // (STATE_TIMEUP), rejected by the earlier STATE_GOAL-only gate.
+        return state == GameState::STATE_GOAL ||
+            state == GameState::STATE_TIMEUP ||
+            state == GameState::STATE_RESULT;
+    }
+    static void ResultProgressEnter(safetyhook::Context&)
 	{
         // MSVC evaluates member constexpr only in a complete-class context.
         // Keep the positive/negative ownership checks compile-time and
@@ -1626,7 +1636,7 @@ class UIScaling : public Hook
 			return;
         ResultProgressAdmission = {
             Settings::VREnabled,
-            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+            ResultPresentationState(),
             !OutRunVR::GameSemantic::QueueRenderActive(),
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
         };
@@ -1653,7 +1663,7 @@ class UIScaling : public Hook
             FlushD3DXBeforeDirectGoalSource();
             ResultProgressAdmittedAfterDrain = ResultProgressAdmission.mayPublish(
                 Settings::VREnabled,
-                Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+                ResultPresentationState(),
                 !OutRunVR::GameSemantic::QueueRenderActive(),
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
             if (ResultProgressAdmittedAfterDrain)
@@ -1686,8 +1696,7 @@ class UIScaling : public Hook
         }
         const std::uint64_t exitQueueEpoch =
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
-        const bool goalAtExit =
-            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL;
+        const bool goalAtExit = ResultPresentationState();
         const bool outsideQueueAtExit =
             !OutRunVR::GameSemantic::QueueRenderActive();
         const bool admitted = ResultProgressAdmittedAfterDrain &&
@@ -1742,8 +1751,7 @@ class UIScaling : public Hook
     {
         const auto original = reinterpret_cast<ResultProgressFullParentFn>(
             Module::exe_ptr(ResultProgressFullParentTarget));
-        if (!Settings::VREnabled || !Game::current_mode ||
-            *Game::current_mode != GameState::STATE_GOAL ||
+        if (!Settings::VREnabled || !ResultPresentationState() ||
             OutRunVR::GameSemantic::QueueRenderActive())
             return original();
 
@@ -1757,13 +1765,14 @@ class UIScaling : public Hook
         FlushD3DXBeforeDirectGoalSource();
         if (!parentAdmission.mayPublish(
                 Settings::VREnabled,
-                Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+                ResultPresentationState(),
                 !OutRunVR::GameSemantic::QueueRenderActive(),
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
             return original();
 
         std::array<SpriteNode*, Game::SpritePriorityCount> before{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
+        std::array<bool, Game::SpritePriorityCount> emptyBefore{};
         const auto entrySerial =
             OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
                 std::memory_order_acquire);
@@ -1772,6 +1781,8 @@ class UIScaling : public Hook
             SpriteNode* root = Game::sprite_prio_root[p];
             rootsBefore[p] = root;
             before[p] = root ? root->tail_4 : nullptr;
+            emptyBefore[p] = root && before[p] == root &&
+                root->next_0 == nullptr;
         }
 
         OutRunVR::GameSemantic::ScopedExactProducerSemantic parentOwner(
@@ -1780,7 +1791,7 @@ class UIScaling : public Hook
         const bool result = original(); // original stage animation once
         const bool parentAdmittedAtExit = parentAdmission.mayPublish(
             Settings::VREnabled,
-            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+            ResultPresentationState(),
             !OutRunVR::GameSemantic::QueueRenderActive(),
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
         if (parentAdmittedAtExit)
@@ -1796,6 +1807,37 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 OutRunVR::GameSemantic::ProducerToken::ResultProgress,
                 nullptr, &rootsBefore, entrySerial, true);
+            // ABC-C ONLY: the old empty root sentinel can be detached when
+            // native FUN_004979E0 replaces the priority root. Standard
+            // current-chain proof then cannot find its old tail, losing
+            // the single full-result graph node. Do NOT expand to general
+            // rebuilt queues, +TIME or rival sources. Parent epoch admission
+            // above guarantees no intervening physical queue selection.
+            unsigned recoveredSingleChildren = 0;
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* currentRoot = Game::sprite_prio_root[p];
+                SpriteNode* currentTail =
+                    currentRoot ? currentRoot->tail_4 : nullptr;
+                SpriteNode* onlyChild =
+                    OutRunVR::SpriteQueue::FirstVerifiedRebuiltEmptySingleChild(
+                        rootsBefore[p], before[p], emptyBefore[p],
+                        currentRoot, currentTail, Game::SpriteNodeMax);
+                if (onlyChild)
+                {
+                    OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+                        onlyChild, OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                        OutRunVR::GameSemantic::ProducerToken::ResultProgress,
+                        nullptr, entrySerial);
+                    ++recoveredSingleChildren;
+                }
+            }
+            if (Settings::VRTelemetry && recoveredSingleChildren)
+                spdlog::info(
+                    "VR ABC C GOAL REBUILT EMPTY ROOT: recoveredSingleChildren={} "
+                    "queueEpoch={} exactParent=0x979E0",
+                    recoveredSingleChildren,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
             FlushD3DXAtDirectGoalSourceExit();
         }
         return result;
@@ -2448,6 +2490,17 @@ class UIScaling : public Hook
 		const auto scope = projected
 			? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 			: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+        // Recent real Quest trace: projected anchorValid=1 but zero
+        // registered queued nodes at 8,192 producers. The first physical
+        // D3DX sprite can instead be submitted synchronously inside this
+        // native E8. Drain an OLD owner's D3DX batch, then keep THIS
+        // exact projected rival producer as direct owner through its
+        // native source-exit flush. Never widen generic rank/GOAL/2D
+        // sprites and never drain an active queue.
+        const bool directRivalOwner = Settings::VREnabled && projected &&
+            !OutRunVR::GameSemantic::QueueRenderActive();
+        if (directRivalOwner)
+            FlushD3DXBeforeDirectGoalSource();
 		int result = 0;
 		{
 			OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
@@ -2455,6 +2508,8 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);
 			result = Game::sprani_play_ae_auth_alpha(
 				spriteId, x, y, a4, a5, alpha);
+            if (directRivalOwner)
+                FlushD3DXAtDirectGoalSourceExit();
 		}
         if (Settings::VREnabled && Settings::VRTelemetry)
         {

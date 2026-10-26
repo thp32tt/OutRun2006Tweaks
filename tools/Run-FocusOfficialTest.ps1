@@ -66,6 +66,7 @@ try {
         '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
         '-RivalDx11NativeRoute=false',
         '-AutoRenderResolution=true','-FollowGameResolution=false',
+        '-MirrorPreserveAspect=true',
         '-UnifiedEyeMenuSource=false','-AntiAliasing=2',
         '-Hud1080pReference=true','-HudScale=0.55',
         '-MenuScale=1.00','-CullingUnionMarginDegrees=8.0'

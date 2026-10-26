@@ -36,6 +36,70 @@ namespace OutRunVR::SpriteQueue
         }
         return nullptr; // detached old tail, foreign node or cyclic/long list
     }
+
+    // ABC C experiment: a *single* new child under a replaced root can be
+    // recovered only when the old root was an EMPTY sentinel at source entry.
+    // The caller must separately prove same GOAL, same queue epoch and one
+    // exact original full-result E8 (never a generic HUD or rival callback).
+    // Never dereference oldRoot/oldTail: the old list may have been freed.
+    template<class Node>
+    constexpr Node* FirstVerifiedRebuiltEmptySingleChild(
+        Node* oldRoot, Node* oldTail, bool wasEmptyAtEntry,
+        Node* currentRoot, Node* newTail, unsigned bound) noexcept
+    {
+        if (!wasEmptyAtEntry || !oldRoot || oldTail != oldRoot ||
+            !currentRoot || currentRoot == oldRoot || !newTail ||
+            newTail == currentRoot || newTail == oldRoot || bound < 1)
+            return nullptr;
+        // Requiring EXACTLY one child rejects foreign leading/trailing
+        // siblings and cycles; the game source itself is unchanged.
+        return currentRoot->next_0 == newTail &&
+               newTail->next_0 == nullptr ? newTail : nullptr;
+    }
+
+    namespace AbcGoalExperiment
+    {
+        struct Node { Node* next_0 = nullptr; };
+        constexpr bool SingleChildOwnerProof() noexcept
+        {
+            Node oldRoot{}, newRoot{}, one{}, two{}, foreign{};
+            newRoot.next_0 = &one;
+            if (FirstVerifiedRebuiltEmptySingleChild(
+                    &oldRoot, &oldRoot, true, &newRoot, &one, 2) != &one)
+                return false;
+            if (FirstVerifiedRebuiltEmptySingleChild(
+                    &oldRoot, &oldRoot, false, &newRoot, &one, 2))
+                return false;
+            if (FirstVerifiedRebuiltEmptySingleChild(
+                    &oldRoot, &foreign, true, &newRoot, &one, 2))
+                return false;
+            if (FirstVerifiedRebuiltEmptySingleChild(
+                    &oldRoot, &oldRoot, true, &oldRoot, &one, 2))
+                return false;
+            if (FirstVerifiedRebuiltEmptySingleChild(
+                    &oldRoot, &oldRoot, true, &newRoot, &one, 0))
+                return false;
+            one.next_0 = &two; // second sibling: no global GOAL adoption
+            if (FirstVerifiedRebuiltEmptySingleChild(
+                    &oldRoot, &oldRoot, true, &newRoot, &one, 2))
+                return false;
+            one.next_0 = nullptr;
+            newRoot.next_0 = &foreign; // a foreign head: cannot prove owner
+            foreign.next_0 = &one;
+            if (FirstVerifiedRebuiltEmptySingleChild(
+                    &oldRoot, &oldRoot, true, &newRoot, &one, 2))
+                return false;
+            one.next_0 = &one; // terminal tail must not be cyclic
+            newRoot.next_0 = &one;
+            if (FirstVerifiedRebuiltEmptySingleChild(
+                    &oldRoot, &oldRoot, true, &newRoot, &one, 2))
+                return false;
+            return true;
+        }
+        static_assert(SingleChildOwnerProof(),
+            "ABC C GOAL root-rebuild needs proven single terminal child");
+    }
+
     // Native SpriteNode tails may be recycled or moved when an original
     // producer rebuilds a priority list. Even a currently linked new tail
     // proves nothing about a DIFFERENT root captured before the producer.

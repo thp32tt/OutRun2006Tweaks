@@ -11,8 +11,9 @@ ini = (root / 'OutRun2006Tweaks.ini').read_text(encoding='utf-8')
 source = cfg.split('void ApplyVrEyeResolutionAfterConfig(', 1)[1].split('class CommandLineArguments', 1)[0]
 
 # Game/menu logical coordinates are never replaced by the XR eye size.
-assert 'Game::screen_resolution->x =' not in source
-assert 'Game::screen_resolution->y =' not in source
+assert 'Game::screen_resolution->x = 1920;' in source
+assert 'Game::screen_resolution->y = 1080;' in source
+assert 'VR R26 LOGICAL SOURCE LOCK:' in source
 assert 'GetTickCount64()' not in source and 'Sleep(' not in source
 assert 'physical D3D9Ex target will use live OpenXR eye extent at CreateDevice' in source
 assert 'explicit game/UI resolution' in source
