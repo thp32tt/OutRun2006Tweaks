@@ -884,7 +884,7 @@ namespace
             Game::screen_resolution->x, Game::screen_resolution->y);
     }
 
-class CommandLineArguments : public Hookclass CommandLineArguments : public Hook
+class CommandLineArguments : public Hook
 {
 	const static int Win32_CfgRead_Addr = 0xE4D0;
 

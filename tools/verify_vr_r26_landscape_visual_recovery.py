@@ -41,3 +41,9 @@ assert 'VR GOAL FINAL GRAPH: FVF144 DPUP -> finite SCREEN_HUD stereo' in r30
 assert 'ordinal <= 2' in gfx
 assert 'VR LENS 570008 CHILD HIDDEN:' in gfx
 print('PASS R26 XR-render/UI-split + F11/HUD/rival/GOAL/lens recovery source contract; HMD UNTESTED')
+
+# Compile-shape guards for the XR/UI split source owner.
+assert 'Hookclass CommandLineArguments' not in misc
+assert 'OriginalDirect3DCreate9 = nullptr;        Direct3DCreate9Fn' not in ex
+assert misc.count('class CommandLineArguments : public Hook') == 1
+assert ex.count('Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;') == 1

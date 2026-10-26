@@ -106,7 +106,7 @@ namespace OutRunVRD3D9ExUpgrade
             return OutRunVR::EyeExtent::ResolveGame(extent, capsSize);
         }
 
-        Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;        Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
+        Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
         std::atomic<bool> FirstUpgradeLogged{false};
         std::atomic<bool> FirstFallbackLogged{false};
         std::atomic<bool> ThirdPartyLogged{false};
