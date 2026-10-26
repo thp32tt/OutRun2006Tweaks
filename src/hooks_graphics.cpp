@@ -810,7 +810,9 @@ class VRLensFlareProjected2D : public Hook
         }
 
         // C993's four central objects are already projected by the game to
-        // one centre-eye screen ray. AUTO 01493/01473 follow-through keeps
+        // one centre-eye screen ray. R84 verifier keeps the legacy spatial
+        // route as a fail-closed reference but validates this active mono path.
+        // AUTO 01493/01473 follow-through keeps
         // broad GOAL/lifecycle changes out of this optical fix. Keep the exact
         // ProjectedScreenEffect2D
         // scope but clear D3A5's spatial LensFlareCentre token for the actual

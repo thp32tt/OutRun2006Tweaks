@@ -400,7 +400,11 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         assert marker in admission, marker
     exact = c993.split("ScopedExactProducerSemantic semantic(", 1)[1]
     assert "RenderScope::ProjectedScreenEffect2D," in exact
-    assert "ProducerToken::LensFlareCentre" in exact
+    # Shared C993 producer is already screen-projected. The legacy spatial
+    # LensFlareCentre route remains tested above as a dormant fail-closed
+    # contract, but the active C993 family must clear that direct token so
+    # R26/R69 centre-eye mono fusion owns the projected draw.
+    assert "ProducerToken::None" in exact
     assert "RenderScope::ProjectedScreenEffect2D);" in exact
     fallback = c993.split("if (!projectedSun)", 1)[1].split("if (Settings::VRTelemetry)", 1)[0]
     assert "Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);" in fallback
