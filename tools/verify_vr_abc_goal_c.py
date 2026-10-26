@@ -26,6 +26,11 @@ require = [
  ("not old reused root","currentRoot == oldRoot" in head and "oldTail != oldRoot" in head),
  ("not missing first-write evidence","!wasEmptyAtEntry" in head),
  ("TEST/DEBUG both deliver", "foreach ($mode in @('TEST','DEBUG'))" in flow),
+ ("variant strict write", 'Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant" -Encoding ascii' in flow),
+ ("no additional metadata in variant", 'variant=$variant; abc=C' not in flow),
+ ("variant line count and exact parser guard", '$variantLines.Count -ne 1' in flow and
+                                            '$parsedVariant -cne $variant' in flow),
+ ("experiment metadata separate", 'Set-Content "$dir/ABC_COMPARE.txt"' in flow),
  ("zip start batch preserved","START_HERE.cmd" in flow and "Run-FocusOfficialTest.ps1" in flow),
 ]
 for desc, good in require:
