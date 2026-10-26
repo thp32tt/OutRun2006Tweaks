@@ -86,7 +86,42 @@
     "positive_probe": "PASS_STATIC_CXX_FAN_TRIANGLE_AND_FLOAT4_WINDOW",
     "negative_regression": "PASS_STATIC_INVALID_WINDOW_INDEX_LIMIT_AND_FALLBACK",
     "component_integration": "PASS_SOURCE_GRAPH_AND_FIVE_EXACT_SHA_ACTIONS",
-    "gameplay": "UNTESTED"
+    "gameplay": "UNTESTED",
+    "real_game_native_fan_draw": {
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_sm3_fan_chunk_01084.cpp"
+      ],
+      "validation_command": "Verified historical push Actions at exact source SHA 00e6879a67471cc5e628a7328240c3394a2a30b8; source/static C++ checks only, game and HMD still UNTESTED."
+    },
+    "packed_stream_parity": {
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+        "tools/test_dx11_sm3_fan_chunk_01084.py"
+      ],
+      "validation_command": "Verified historical push Actions at exact source SHA 00e6879a67471cc5e628a7328240c3394a2a30b8; source/static C++ checks only, game and HMD still UNTESTED."
+    },
+    "unsupported_fallback": {
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_sm3_fan_chunk_01084.cpp"
+      ],
+      "validation_command": "Verified historical push Actions at exact source SHA 00e6879a67471cc5e628a7328240c3394a2a30b8; source/static C++ checks only, game and HMD still UNTESTED."
+    },
+    "five_ci_gates": {
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Verified historical push Actions at exact source SHA 00e6879a67471cc5e628a7328240c3394a2a30b8; source/static C++ checks only, game and HMD still UNTESTED."
+    }
   },
   "development_strategy": {
     "work_class": "integration",
@@ -114,7 +149,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_IMPLEMENTED_BUILD_VERIFIED; actual live game pixels/menu-car-race/Quest3 UNTESTED",
-    "activation_guard_and_fallback": "Explicit native diagnostic opt-in; original D3D9Ex renderer, gamepad, FFB and SkyGlow preserved, DXVK branch frozen."
+    "activation_guard_and_fallback": "Explicit native diagnostic opt-in; original D3D9Ex renderer, gamepad, FFB and SkyGlow preserved, DXVK branch frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "mandatory_gate_results": [
     {
@@ -179,5 +219,6 @@
   "runtime_note": "No game launch, menu/car/race frame capture, native Draw/frame telemetry, Quest3/VDXR or performance measurement. RUNTIME_VALIDATION=UNTESTED",
   "next_implementation_action": "Controller to select next independent DX11 coverage after terminal exact-SHA build; no automatic gameplay/HMD promotion.",
   "c6_previous_hold_reason": "C6_NOT_COMPLETE",
-  "c6_previous_hold_resolved": true
+  "c6_previous_hold_resolved": true,
+  "c6_policy_record_repair": "CONVERSION-DX11-01085: normalize existing verified 01084 source-stage acceptance IDs and explicit real-game native draw integration path; do not change original exact-SHA Gates or runtime observation; no new 01084 score."
 }
