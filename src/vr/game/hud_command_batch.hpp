@@ -29,6 +29,9 @@ namespace OutRunVR::HudCommandBatch
         bool provenDirectB9200 = false;
         const void* queueNode = nullptr;
         std::uint64_t queueEpoch = 0;
+        // CPU Draw registrations from the same original +TIME E8 must
+        // carry the same ticket until native physical Flush/End.
+        std::uint64_t stageSourceTicket = 0;
         std::uint64_t generation = 0;
         // Every native Begin/Draw/Flush/End transition must be tied to the
         // batch that was active BEFORE the D3DX call. The original D3DX
@@ -103,7 +106,8 @@ namespace OutRunVR::HudCommandBatch
                                 bool drawQueued = false,
                                 const void* drawQueueNode = nullptr,
                                 std::uint64_t drawQueueEpoch = 0,
-                                bool exactDirectB9200Parent = false) noexcept
+                                bool exactDirectB9200Parent = false,
+                                std::uint64_t directStageTicket = 0) noexcept
         {
             if (!sameGeneration(previous))
                 return false;
@@ -137,7 +141,7 @@ namespace OutRunVR::HudCommandBatch
             }
             recordDraw(drawScope, drawProducer,
                 drawQueued, drawQueueNode, drawQueueEpoch,
-                exactDirectB9200Parent);
+                exactDirectB9200Parent, directStageTicket);
             return true;
         }
 
@@ -180,7 +184,8 @@ namespace OutRunVR::HudCommandBatch
                         bool drawQueued = false,
                         const void* drawQueueNode = nullptr,
                         std::uint64_t drawQueueEpoch = 0,
-                        bool exactDirectB9200Parent = false) noexcept
+                        bool exactDirectB9200Parent = false,
+                        std::uint64_t directStageTicket = 0) noexcept
         {
             if (!active)
                 return;
@@ -191,6 +196,8 @@ namespace OutRunVR::HudCommandBatch
             {
                 scope = newScope;
                 producer = newProducer;
+                stageSourceTicket = newProducer == Producer::StageExtensionTime &&
+                    !drawQueued ? directStageTicket : 0;
                 queued = drawQueued;
                 queueNode = drawQueued ? drawQueueNode : nullptr;
                 queueEpoch = drawQueued ? drawQueueEpoch : 0;
@@ -200,7 +207,10 @@ namespace OutRunVR::HudCommandBatch
                     (newProducer != Producer::ResultTextB9200 ||
                      provenDirectB9200 || drawQueued);
             }
-            else if (!validQueue || scope != newScope ||
+            else if (!validQueue ||
+                     (newProducer == Producer::StageExtensionTime &&
+                      !drawQueued && stageSourceTicket != directStageTicket) ||
+                     scope != newScope ||
                      producer != newProducer || queued != drawQueued ||
                      (drawQueued && (queueNode != drawQueueNode ||
                                      queueEpoch != drawQueueEpoch)) ||
@@ -227,6 +237,17 @@ namespace OutRunVR::HudCommandBatch
             provenDirectB9200 = false;
             queueNode = nullptr;
             queueEpoch = 0;
+            stageSourceTicket = 0;
+        }
+
+        // A failed source only revokes its own ledger, never a completed
+        // predecessor or the game's original native D3DX command buffer.
+        void revokeDirectStageTicket(std::uint64_t ticket) noexcept
+        {
+            if (ticket != 0 && active && !queued &&
+                producer == Producer::StageExtensionTime &&
+                stageSourceTicket == ticket)
+                onFlushFailure();
         }
 
         // Successful physical Flush leaves Begin active for the next batch.
