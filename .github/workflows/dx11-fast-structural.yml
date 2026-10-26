@@ -36,6 +36,10 @@ on:
       # must trigger every exact-SHA Gate after a causal compiler/test repair.
       - 'tools/dx11_sm3_*_010*.cpp'
       - 'tools/dx11_pre_draw_*_probe_*.cpp'
+      # The real source-span GPU-window regression must retrigger Fast when
+      # either its production boundary probe or checked-in C++ fixture changes.
+      - 'tools/dx11_game_primitive_span_probe.cpp'
+      - 'tests/vr/dx11_live_sm3_native_point_strip_windows.cpp'
       - 'tools/dx11_native_frame_batch_probe.cpp'
       # The real desktop GPU output restoration probe must trigger exact-SHA Fast.
       - 'tools/dx11_native_desktop_gpu_output_probe.cpp'
