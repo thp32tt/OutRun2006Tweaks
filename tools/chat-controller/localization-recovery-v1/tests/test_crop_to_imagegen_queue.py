@@ -53,6 +53,33 @@ class BridgeTests(unittest.TestCase):
         }
         (folder/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
 
+    def make_direct(self, q, english, dds_sha="a"*64):
+        srcdir=self.croot/"hd_original_108_verified"
+        srcdir.mkdir(parents=True,exist_ok=True)
+        source=srcdir/f"{q}_SOURCE.png"
+        Image.new("RGBA",(256,128),(0,0,0,0)).save(source)
+        source_sha=bridge.digest(source)
+        folder=self.croot/"gpt_vision_chat_ocr_outputs"/f"{q}_SOURCE"/hashlib.sha256(english.encode()).hexdigest()[:16]
+        folder.mkdir(parents=True)
+        manifest={
+            "status":"DIRECT_IMAGEGEN_READY",
+            "source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+            "source_png":source.name,
+            "source_png_path":str(source),
+            "source_sha256":source_sha,
+            "reference_dds_path":f"textures/{q}.dds",
+            "reference_dds_sha256":dds_sha,
+            "english":english,
+            "bbox_xyxy":[10,20,130,60],
+            "source_dimensions":[256,128],
+            "target_dimensions":[120,40],
+            "direct_full_hd_reference":True,
+            "crop_created":False,
+            "old_split_tiles_used":False,
+        }
+        (folder/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
+        return source,source_sha
+
     def test_verified_odd_even_crops_become_ab_queue(self):
         self.make_crop("Q051","Total Time")
         self.make_crop("Q052","Extra Time",dds_sha="c"*64,source_sha="d"*64)
@@ -73,6 +100,20 @@ class BridgeTests(unittest.TestCase):
             p=self.ig/"text_roi_batches/inputs"/item["imagegen_input_png"]
             self.assertTrue(p.is_file())
             self.assertEqual(bridge.digest(p),item["imagegen_input_sha256"])
+
+    def test_gpt_direct_target_uses_full_hd_source_without_crop_copy(self):
+        source,source_sha=self.make_direct("Q051","Total Time")
+        result=bridge.scan_once(self.croot,self.trans,self.ig)
+        self.assertEqual(result["added"],1)
+        manifest=json.loads((self.ig/"text_roi_batches/production_manifest.json").read_text())
+        item=next(x for x in manifest["items"] if x["english"]=="Total Time")
+        self.assertEqual(item["imagegen_input_mode"],"FULL_HD_DIRECT_REFERENCE")
+        self.assertEqual(item["imagegen_input_path"],str(source))
+        self.assertEqual(item["imagegen_input_sha256"],source_sha)
+        self.assertEqual(item["target_dimensions"],[120,40])
+        self.assertTrue(item["direct_bbox_validated"])
+        self.assertFalse(item["alpha_crop_margin_checked"])
+        self.assertFalse((self.ig/"text_roi_batches/inputs"/item["imagegen_input_png"]).exists())
 
     def test_duplicate_scan_does_not_requeue(self):
         self.make_crop("Q051","Total Time")
