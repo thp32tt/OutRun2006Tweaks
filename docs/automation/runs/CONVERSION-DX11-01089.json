@@ -85,9 +85,9 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
-      "GAME_CREATED_D3D9_SM3_DRAW",
-      "GPU_NATIVE_D3D11_DRAW",
-      "SOURCE_FULLSCREEN_GAME_FRAME_UNTESTED"
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "Source/CI verified separately; Quest3/VDXR native pixels UNTESTED.",
     "activation_guard_and_fallback": "NativeDrawPathActive=false by default; original D3D9/DX9Ex gamepad/FFB/SkyGlow and DXVK freeze preserved."
@@ -98,5 +98,5 @@
   "RUNTIME_VALIDATION": "UNTESTED",
   "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
   "next_implementation_action": "After exact-SHA mandatory source gate, produce runtime native draw/frame evidence with OutRun menu/car/race and Quest3/VDXR separately; no gameplay claim before observed.",
-  "notes": "01089 source material at c59adafe; source graph validation failed due to old fixed native Draw count and outdated pointFill fan-only token. Exact scoped 01089 C++ native strip submissions registered without weakening negative fallback checks; original 01088 C6 remains separate."
+  "notes": "01089 source material at c59adafe; source graph validation failed due to old fixed native Draw count and outdated pointFill fan-only token. Exact scoped 01089 C++ native strip submissions registered without weakening negative fallback checks; original 01088 C6 remains separate. Same-task exact failure repair: required canonical source-to-native-to-visible-frame contract stages (visual runtime remains UNTESTED)."
 }
