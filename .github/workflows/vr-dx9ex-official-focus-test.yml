@@ -17,6 +17,8 @@ on:
       - 'src/hooks_uiscaling.cpp'
       - 'src/vr/game/hud_command_batch.hpp'
       - 'src/vr/game/stage_extension_source_admission.hpp'
+      - 'src/vr/game/goal_progress_source_admission.hpp'
+      - 'tools/verify_vr_goal_progress_source_admission.py'
   workflow_dispatch:
 
 jobs:
@@ -47,6 +49,12 @@ jobs:
         run: |
           python tools/verify_vr_stage_extension_d3dx_batch_owner.py
           if ($LASTEXITCODE -ne 0) { throw 'Native +TIME ticket/epoch regression failed' }
+
+      - name: Verify GOAL inner/full exact source and queue epoch admission
+        shell: pwsh
+        run: |
+          python tools/verify_vr_goal_progress_source_admission.py
+          if ($LASTEXITCODE -ne 0) { throw 'GOAL progress source admission contract failed' }
 
       - name: Configure Win32 R26+HUD
         shell: pwsh

@@ -7,6 +7,7 @@
 #include "vr/game/sprite_queue_tail_proof.hpp"
 #include "vr/d3d9/pause_menu_eye_affine.hpp"
 #include "vr/game/stage_extension_source_admission.hpp"
+#include "vr/game/goal_progress_source_admission.hpp"
 #include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
@@ -1611,6 +1612,9 @@ class UIScaling : public Hook
     inline static thread_local
         std::array<SpriteNode*, Game::SpritePriorityCount> ResultProgressRootsBefore{};
     inline static thread_local std::uint64_t ResultProgressEntrySerial = 0;
+    inline static thread_local OutRunVR::GoalProgress::SourceAdmission
+        ResultProgressAdmission{};
+    inline static thread_local bool ResultProgressAdmittedAfterDrain = false;
 	static void ResultProgressEnter(safetyhook::Context&)
 	{
         // MSVC evaluates member constexpr only in a complete-class context.
@@ -1620,6 +1624,13 @@ class UIScaling : public Hook
             "GOAL SpriteNodes require stable priority root and nested owner proof");
 		if (ResultProgressDepth++ != 0)
 			return;
+        ResultProgressAdmission = {
+            Settings::VREnabled,
+            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+            !OutRunVR::GameSemantic::QueueRenderActive(),
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
+        };
+        ResultProgressAdmittedAfterDrain = false;
         // Queue ownership belongs to this exact 0-99% parent ONLY if the
         // priority root is still the same after the native E8 returns.
         ResultProgressEntrySerial =
@@ -1634,17 +1645,22 @@ class UIScaling : public Hook
         // 0x97BE4/0x97DEC submit synchronous animated digits plus queued
         // siblings. Shield stale world Draws; reentrant live queues retain
         // their semantic authority, and old pending state is restored.
-        if (Settings::VREnabled)
+        if (ResultProgressAdmission.mayBeginDirect())
         {
-            // An existing homogeneous D3DX buffer belongs to its outgoing
-            // producer. Split it BEFORE the exact 0-99% progress E8 takes
-            // ScreenHud ownership. The SpriteNode queue has its own boundary.
-            if (!OutRunVR::GameSemantic::QueueRenderActive())
-                FlushD3DXBeforeDirectGoalSource();
-            ResultProgressDirectDrawOwner.emplace(
-                OutRunVR::GameSemantic::RenderScope::ScreenHud,
-                nullptr, true,
-                OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+            // Native old-owner D3DX Flush can reenter a queue pass or toggle
+            // VR. Admit this exact GOAL E8 only after it returns and the
+            // original queue epoch is still unchanged.
+            FlushD3DXBeforeDirectGoalSource();
+            ResultProgressAdmittedAfterDrain = ResultProgressAdmission.mayPublish(
+                Settings::VREnabled,
+                Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+                !OutRunVR::GameSemantic::QueueRenderActive(),
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+            if (ResultProgressAdmittedAfterDrain)
+                ResultProgressDirectDrawOwner.emplace(
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                    nullptr, true,
+                    OutRunVR::GameSemantic::ProducerToken::ResultProgress);
         }
 	}
 	static void ResultProgressLeave(safetyhook::Context&)
@@ -1668,28 +1684,55 @@ class UIScaling : public Hook
                     ++changedPriorities;
             }
         }
-		TagAppendedNodes(ResultProgressTailsBefore,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::ResultProgress,
-            nullptr, &ResultProgressRootsBefore, ResultProgressEntrySerial);
-        // D3DXSprite::Draw can defer submission past this original E8.
-        // Submit only a proven homogeneous ResultProgress batch while its
-        // exact source is live, before restoring the previous semantic.
-        // Unknown/mixed buffers retain native D3DX End/Flush behavior.
-        FlushD3DXAtDirectGoalSourceExit();
+        const std::uint64_t exitQueueEpoch =
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+        const bool goalAtExit =
+            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL;
+        const bool outsideQueueAtExit =
+            !OutRunVR::GameSemantic::QueueRenderActive();
+        const bool admitted = ResultProgressAdmittedAfterDrain &&
+            ResultProgressAdmission.mayPublish(
+                Settings::VREnabled, goalAtExit, outsideQueueAtExit,
+                exitQueueEpoch);
+        if (admitted)
+        {
+            // Only this original E8's proven stable-root children get
+            // ResultProgress. Never grant ScreenHud to a VR-disabled,
+            // wrong-state or reentered queue source.
+            TagAppendedNodes(ResultProgressTailsBefore,
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                OutRunVR::GameSemantic::ProducerToken::ResultProgress,
+                nullptr, &ResultProgressRootsBefore, ResultProgressEntrySerial);
+            // Native D3DX still owns the actual draw and its HRESULT.
+            FlushD3DXAtDirectGoalSourceExit();
+        }
         ResultProgressDirectDrawOwner.reset();
         const std::uint64_t hits = ++ResultProgressCompletedCalls;
         if (Settings::VRTelemetry && (hits & (hits - 1u)) == 0)
         {
             spdlog::info(
-                "VR P0 RESULT PROGRESS SOURCE: completedCalls={} changedPriorities={} state={} mode={} exactScope=SCREEN_HUD",
+                "VR P0 RESULT PROGRESS SOURCE: completedCalls={} changedPriorities={} "
+                "state={} mode={} exactScope={} admitted={} entryEpoch={} exitEpoch={} reason={}",
                 hits, changedPriorities,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
-                Game::game_mode ? *Game::game_mode : -1);
+                Game::game_mode ? *Game::game_mode : -1,
+                admitted ? "SCREEN_HUD" : "NONE", admitted,
+                ResultProgressAdmission.queueEpochAtEntry, exitQueueEpoch,
+                admitted ? "ok" :
+                    !ResultProgressAdmission.vrAtEntry ? "vr-disabled-at-entry" :
+                    !ResultProgressAdmission.goalAtEntry ? "not-goal-at-entry" :
+                    !ResultProgressAdmission.outsideQueueAtEntry ? "queue-at-entry" :
+                    !Settings::VREnabled ? "vr-disabled-at-exit" :
+                    !goalAtExit ? "not-goal-at-exit" :
+                    !outsideQueueAtExit ? "queue-at-exit" :
+                    exitQueueEpoch != ResultProgressAdmission.queueEpochAtEntry ?
+                        "queue-epoch-changed" : "pre-drain-rejected");
         }
 		ResultProgressTailsBefore = {};
         ResultProgressRootsBefore = {};
         ResultProgressEntrySerial = 0;
+        ResultProgressAdmission = {};
+        ResultProgressAdmittedAfterDrain = false;
 	}
 
     // Canonical FUN_004979E0: no arguments, boolean in AL, plain RET.
@@ -1704,8 +1747,21 @@ class UIScaling : public Hook
             OutRunVR::GameSemantic::QueueRenderActive())
             return original();
 
-        // The previous deferred D3DX batch must leave under its OLD owner.
+        // The original full-result E8 owns one queue epoch. A native
+        // pre-source drain may itself reenter the queue before the game's
+        // graph builder begins; the source must not acquire stale ownership.
+        const OutRunVR::GoalProgress::SourceAdmission parentAdmission{
+            Settings::VREnabled, true, true,
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
+        };
         FlushD3DXBeforeDirectGoalSource();
+        if (!parentAdmission.mayPublish(
+                Settings::VREnabled,
+                Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+                !OutRunVR::GameSemantic::QueueRenderActive(),
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
+            return original();
+
         std::array<SpriteNode*, Game::SpritePriorityCount> before{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
         const auto entrySerial =
@@ -1722,8 +1778,12 @@ class UIScaling : public Hook
             OutRunVR::GameSemantic::RenderScope::ScreenHud, nullptr, true,
             OutRunVR::GameSemantic::ProducerToken::ResultProgress);
         const bool result = original(); // original stage animation once
-        if (Settings::VREnabled && Game::current_mode &&
-            *Game::current_mode == GameState::STATE_GOAL)
+        const bool parentAdmittedAtExit = parentAdmission.mayPublish(
+            Settings::VREnabled,
+            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+            !OutRunVR::GameSemantic::QueueRenderActive(),
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+        if (parentAdmittedAtExit)
         {
             // Bound only to the two REA-proven original full-result graph
             // calls 0x98924/0x992AC -> 0x979E0. HUD Inspector validates that
