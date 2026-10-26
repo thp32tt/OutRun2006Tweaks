@@ -60,7 +60,11 @@ assert "connectedCandidate ? connectedSubmission.drawCount : instanceCount" in b
 assert "game_sm3_connected_submission_plan(" in bridge
 assert "game_sm3_expand_connected_instance_indices(" in bridge
 assert "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in bridge
-assert "for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance)" in bridge
+assert "for (UINT submit = 0u; submit < nativeSubmissionCount; ++submit)" in bridge
+assert "const UINT instance = segmentedListPlan.grouped" in bridge
+assert "segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount" in bridge
+assert "if (segmentedListPlan.grouped) {" in bridge
+assert "instance % chunkPlan.instancesPerChunk == 0u" in bridge
 assert "instance % chunkPlan.instancesPerChunk == 0u" in bridge
 assert "const UINT base = segmentedInstanceUpload" in bridge
 print("Native game shader TEXLDD / TEXLDL conditional translation + fail-closed sampler path linked; HMD untested")
