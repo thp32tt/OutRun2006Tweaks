@@ -678,9 +678,10 @@ class VRLensFlareProjected2D : public Hook
 	static void __cdecl DrawObjectAlphaProjected(
 		int objectId, float alpha, void* work, int flags)
 	{
-        // Decomp-backed centre-glow fix: keep the first 0x570008 outer flare
-        // and suppress only the second 0x570008 from the same sun sequence.
-        // Desktop and unrelated 0x570008 draws are untouched.
+        // User Quest3 confirmed the "missing" tiny end-of-flare point
+        // is NOT explained by hiding this child. Restore BOTH original
+        // 0x570008 draws. Preserve their exact scene/projection semantics
+        // and log source ordinals for diagnosing eye-space duplication.
         if (Settings::VREnabled && objectId == 0x570008 &&
             LensFlareSequence != 0)
         {
@@ -690,22 +691,16 @@ class VRLensFlareProjected2D : public Hook
                 LensOuter570008Ordinal = 0;
             }
             const unsigned ordinal = ++LensOuter570008Ordinal;
-            if (ordinal == 2)
+            if (Settings::VRTelemetry)
             {
-                if (Settings::VRTelemetry)
-                {
-                    static std::atomic<std::uint64_t> hidden{ 0 };
-                    const auto n = hidden.fetch_add(
-                        1, std::memory_order_relaxed) + 1;
-                    if (n <= 8 || (n & (n - 1)) == 0)
-                        spdlog::info(
-                            "VR LENS 570008 CENTER GLOW HIDDEN: "
-                            "id=0x{:X} ordinal={} sequence={} hits={} "
-                            "(first outer 0x570008 preserved)",
-                            static_cast<unsigned>(objectId), ordinal,
-                            LensFlareSequence, n);
-                }
-                return;
+                static std::atomic<std::uint64_t> originalDraws{0};
+                const auto n = originalDraws.fetch_add(1, std::memory_order_relaxed) + 1;
+                if (n <= 12 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS 570008 ORIGINAL BOTH DRAWN: id=0x{:X} ordinal={} sequence={} hits={} alpha={} flags=0x{:X}",
+                        static_cast<unsigned>(objectId), ordinal,
+                        LensFlareSequence, n, alpha,
+                        static_cast<unsigned>(flags));
             }
         }
 
@@ -766,26 +761,9 @@ class VRLensFlareProjected2D : public Hook
             LensOuter570008Ordinal = 0;
         }
 
-        // Retain the existing A/B switch for the disc only. It is no longer
-        // used as the optical fix: the real fix below keeps the complete
-        // original centre family in one projected-screen coordinate space.
-        if (Settings::VREnabled && objectId == 0x570002 &&
-            !Settings::VRLensFlareCentreEnabled.get())
-        {
-            if (Settings::VRTelemetry)
-            {
-                static std::atomic<std::uint64_t> hits{ 0 };
-                const auto n = hits.fetch_add(
-                    1, std::memory_order_relaxed) + 1;
-                if (n <= 8 || (n & (n - 1)) == 0)
-                    spdlog::info(
-                        "VR LENS C993 CENTER HIDDEN: count={} "
-                        "parent={} owner={} queue={} (screen-family intact)",
-                        n, LensCentreDepth, LensCentreOwnerDepth,
-                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
-            }
-            return;
-        }
+        // No VR flare/sun child may be hidden as an optical workaround.
+        // Even a stale LensFlareCentreEnabled=false INI must preserve the
+        // exact original 0x570002 central sun object.
 
         const bool projectedSun =
             Settings::VREnabled &&
