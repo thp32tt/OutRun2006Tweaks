@@ -1,0 +1,206 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01082",
+  "production_id": "CONVERSION-DX11-01082",
+  "event_id": "CONVERSION-DX11-01082-E001",
+  "event_type": "c6_bookkeeping_after_exact_sha_gate",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01082",
+  "classification": "A",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SM3_NONINSTANCED_LINEAR_GPU_CHUNK_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "quest3_playable": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_change_sha": "3dfb1ae419cad7649682be63edebe3021fd06676",
+  "material_result_sha": "f8868b5fa0600fa77f8828a6d8685d06747c251e",
+  "validation_bearing_result_sha": "f8868b5fa0600fa77f8828a6d8685d06747c251e",
+  "source_base_sha": "2a36ff69e030a9ffa84ec97cae22d2d0541b8813",
+  "implementation_commits": [
+    "3dfb1ae419cad7649682be63edebe3021fd06676"
+  ],
+  "repair_commits": [
+    "27ed813e9633e070d436805f063b9ef7cab728ec",
+    "7565585299146873a2d9e8639f9f7054ffd3fcbc",
+    "f8868b5fa0600fa77f8828a6d8685d06747c251e"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_sm3_linear_chunk_01082.cpp",
+    "tools/test_dx11_sm3_linear_chunk_01082.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_sm3_interface_draw_00964.py",
+    "tools/test_dx11_live_sm3_vertex_decl_00929.py",
+    "tools/test_dx11_sm3_segmented_instances_01076.py",
+    "tools/test_dx11_sm3_gpu_upload_budget_01077.py",
+    "tools/test_dx11_sm3_chunk_upload_01078.py"
+  ],
+  "summary": "Integrated live shader-bound D3D9 noninstanced unindexed independent game point/line/triangle list multi-stream FLOAT4 native GPU segment submission in real D3D11 Draw path, preserving whole primitive boundaries and DX9Ex fail-closed fallback. One cohesive source commit and same-task causal CI repair commits. Five mandatory push Actions SUCCESS at exact validation-bearing SHA. Quest3/VDXR game execution UNTESTED.",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Bring genuine menu/car/race source SM3 Draw independent lists whose repacked native vertex data exceeds a single GPU upload into the bounded native full-resolution color/depth frame, while preserving D3D9Ex fallback and shader-bound source ownership.",
+    "acceptance_items": [
+      {
+        "id": "native_unindexed_linear_gpu_chunks",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_SM3_NATIVE_IA_DRAW",
+        "expected_behavior": "Existing SM3 game bridge admits repacked 32MiB-overbudget true unindexed independent point/line/triangle lists via bounded whole-primitive multi-upload GPU native Draw path."
+      },
+      {
+        "id": "source_vertex_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_GAME_DRAW_AND_INPUT_FALLBACK",
+        "expected_behavior": "Repack honors full original multi-stream offsets; indexed/connected/malformed/too-many-chunk inputs are excluded; aborted partial GPU uploads never publish a native frame; original D3D9Ex rendering and gamepad/FFB retain authority."
+      },
+      {
+        "id": "exact_sha_five_gate",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_GITHUB_ACTIONS",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector push workflow runs succeed on identical material validation SHA, without CI-skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_unindexed_linear_gpu_chunks": {
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+        "tools/dx11_sm3_linear_chunk_01082.cpp",
+        "tools/test_dx11_sm3_linear_chunk_01082.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 40265391734 success; Windows Build 40265391703 success; game GPU/Quest3 runtime UNTESTED."
+    },
+    "source_vertex_and_fallback": {
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
+      "evidence_paths": [
+        "tools/dx11_sm3_linear_chunk_01082.cpp",
+        "tools/test_dx11_live_sm3_vertex_decl_00929.py",
+        "tools/verify_dx11_first_game_frame_boundary.py"
+      ],
+      "validation_command": "Portable C++ negative source chunk bounds test and safety/activation checks retained; five gates success exact SHA. No game/HMD claim."
+    },
+    "exact_sha_five_gate": {
+      "status": "PASS_EXACT_SHA",
+      "validation_command": "Five push Actions completed success on f8868b5fa0600fa77f8828a6d8685d06747c251e",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ]
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "REAL_GAME_D3D9_SHADER_BOUND_UNINDEXED_DRAW",
+      "SOURCE_MULTI_STREAM_FLOAT4_WINDOW_PACK",
+      "PRIMITIVE_ALIGNED_BOUNDED_NATIVE_GPU_VERTEX_UPLOAD",
+      "LIVE_D3D11_NATIVE_DRAW",
+      "FULL_RESOLUTION_FRAME_PENDING_GAME_PROOF",
+      "ORIGINAL_D3D9EX_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+      "tools/dx11_sm3_linear_chunk_01082.cpp",
+      "tools/test_dx11_sm3_linear_chunk_01082.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ portable source planner/absolute dual-stream window test plus actual live shader-bound GPU submit wiring; DX11 Fast source regression and Windows Build success.",
+      "negative_regression": "Original indexed and connected cases excluded; malformed primitive/byte/chunk/source offsets fail closed and preserve previous destination; native publisher aborted on late stream upload failure.",
+      "component_integration": "Authentic R30 D3D9 SM3 source Draw -> original multi-stream repack chunk -> D3D11 GPU upload and shader/IA guarded original Draw -> native candidate full frame."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_NONINSTANCED_LINEAR_GPU_CHUNK_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_exact_sha_after_confirmed_ci_repairs",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT_PENDING_RUNTIME"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_BUILD_VERIFIED; complete game menu/car/race, actual native published frames and Quest3 HMD UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive disabled unless explicit opt-in; original game D3D9Ex rendering, input/FFB/SkyGlow, frozen DXVK unchanged."
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40265391734,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f8868b5fa0600fa77f8828a6d8685d06747c251e",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40265391734"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40265391755,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f8868b5fa0600fa77f8828a6d8685d06747c251e",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40265391755"
+    },
+    {
+      "name": "Build",
+      "run_id": 40265391703,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f8868b5fa0600fa77f8828a6d8685d06747c251e",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40265391703"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40265391717,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f8868b5fa0600fa77f8828a6d8685d06747c251e",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40265391717"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40265391738,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f8868b5fa0600fa77f8828a6d8685d06747c251e",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40265391738"
+    }
+  ],
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "c6_source_validation_sha": "f8868b5fa0600fa77f8828a6d8685d06747c251e",
+  "source_implementation_time_ratio": "NOT_MEASURED",
+  "analysis_time_ratio": "NOT_MEASURED",
+  "ci_time_ratio": "NOT_MEASURED",
+  "ai2_previous_confirmed_cumulative_score": 1970,
+  "ai2_new_confirmed_cumulative_score": 1971,
+  "task_new_source_achievement_score": 1,
+  "score_change": 0,
+  "score_award_event": false,
+  "score_note": "New independently completed source+five-Gate milestone credited once on thp32tt/ai-dev-lab main AI_SCOREBOARD.md commit 6f7fe03b08e5ca286319b4a5f22b75d6d8933d17: previous 1970 + task +1 = AI2 1971; this C6 bookkeeping/retry contributes +0.",
+  "score_ssot_ref": "thp32tt/ai-dev-lab@main:AI_SCOREBOARD.md",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no OutRun 2006 game launch, native published frame count, Quest3/VDXR eye output or observed gamepad/FFB/fps. Five-gate source/build PASS is not an in-game/HMD PASS.",
+  "next_implementation_action": "Continue integrated native full-resolution real menu/car/race draw coverage and native L/R GPU-to-OpenXR handoff under owner coordination; do not repeat the 01082 verified exact-SHA Gates or award another score."
+}
