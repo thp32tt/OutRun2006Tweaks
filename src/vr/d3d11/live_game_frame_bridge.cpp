@@ -5554,12 +5554,13 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         return false;
     const UINT firstChunkInstances = segmentedInstanceUpload
         ? chunkPlan.instancesPerChunk : instanceCount;
-    const UINT firstChunkVertices = indexedChunkUpload
-        ? (std::min)(indexedChunkPlan.verticesPerChunk, indexCount) :
-        linearChunkUpload
+    const UINT firstChunkVertices = linearChunkUpload
         ? linearChunkPlan.verticesPerChunk : (connectedChunkUpload
             ? connectedChunkPlan.verticesPerChunk :
-            (fanChunkUpload ? fanChunkPlan.verticesPerChunk : vertexCount));
+            (fanChunkUpload ? fanChunkPlan.verticesPerChunk :
+             (indexedChunkUpload
+                ? (std::min)(indexedChunkPlan.verticesPerChunk, indexCount)
+                : vertexCount)));
     std::array<std::uint32_t,16> instanceSteps{};
     std::array<bool,16> referenced{};
     for (std::size_t i = 0u; i + 1u < declaration.size(); ++i)
