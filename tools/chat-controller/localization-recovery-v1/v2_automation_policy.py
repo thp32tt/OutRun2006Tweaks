@@ -2,7 +2,7 @@
 """Fail-closed activation policy for controlled OutRun Korean ImageGen automation.
 
 Authorized automatic scope:
-  verified unsplit/native HD English crop -> exact reviewed translation ->
+  verified unsplit/native HD full-image reference + GPT OCR target metadata -> exact reviewed translation ->
   A/B ChatGPT ImageGen attachment/generation -> project Library SHA proof ->
   C1 browser-attached GPT vision OCR fallback, then lightweight independent QA.
 
@@ -50,7 +50,7 @@ def gate(env=None, policy_path=None, evidence_root=None):
             policy.get("schema") != SCHEMA
             or policy.get("native_source_only") is not True
             or policy.get("legacy_986_tiles_forbidden") is not True
-            or policy.get("c_role") != "ORIGINAL_HD_NATIVE_CROP_ONLY"
+            or policy.get("c_role") != "GPT_OCR_METADATA_ONLY_NO_CROP"
             or policy.get("auto_dds_write") is not False
             or policy.get("auto_game_pass") is not False
             or policy.get("auto_deploy") is not False
@@ -99,6 +99,8 @@ def gate(env=None, policy_path=None, evidence_root=None):
             or policy.get("browser_slots") != ["A", "B", "C1"]
             or policy.get("requirements", {}).get("c1_gpt_chat_vision_ocr_fallback") is not True
             or policy.get("requirements", {}).get("external_ocr_api_used") is not False
+            or policy.get("requirements", {}).get("gpt_ocr_direct_full_hd_imagegen") is not True
+            or policy.get("requirements", {}).get("crop_file_required") is not False
         ):
             return False, "ACTIVE_POLICY_NOT_APPROVED", phase
 
@@ -122,9 +124,9 @@ def main(argv=None):
         "reason": reason,
         "phase": phase,
         "AUTO_SEND": _enabled(env.get("AUTO_SEND", "false")),
-        "A_B": "NATIVE_ROI_IMAGEGEN" if ok and _enabled(env.get("AUTO_SEND", "false")) else "NO_SEND",
+        "A_B": "FULL_HD_DIRECT_REFERENCE_IMAGEGEN" if ok and _enabled(env.get("AUTO_SEND", "false")) else "NO_SEND",
         "C1": "GPT_CHAT_VISION_OCR_FALLBACK_THEN_LIGHT_QA",
-        "C": "NATIVE_CROP_BACKGROUND_WORKER",
+        "C": "DISABLED_NO_CROP_FILE_PIPELINE",
         "AUTO_DDS_WRITE": False,
         "AUTO_GAME_PASS": False,
         "RUNTIME_VALIDATION": "UNTESTED",
