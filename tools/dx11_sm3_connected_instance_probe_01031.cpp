@@ -35,8 +35,17 @@ int main() {
     assert(!game_sm3_expand_connected_instance_indices(3u,nullptr,4u,4u,2u,10u,indices));
     assert(!game_sm3_expand_connected_instance_indices(6u,nullptr,2u,4u,2u,1024u,indices));
     assert(!game_sm3_expand_connected_instance_indices(4u,nullptr,4u,4u,2u,1024u,indices));
-    assert(!game_sm3_expand_connected_instance_indices(5u,nullptr,4u,4u,1u,1024u,indices));
+    // One physical instance is legal for the last WRITE_DISCARD GPU chunk
+    // of a segmented authentic source strip/fan. It must preserve winding
+    // and use indices local to that chunk, without splicing its predecessor.
+    assert(indices==good); // Earlier rejected inputs preserve the destination.
+    assert(game_sm3_expand_connected_instance_indices(
+        5u,nullptr,4u,4u,1u,1024u,indices));
+    assert((indices==std::vector<std::uint32_t>{0,1,2,2,1,3}));
+    const auto oneInstance=indices;
+    assert(!game_sm3_expand_connected_instance_indices(
+        5u,nullptr,4u,4u,0u,1024u,indices));
     assert(!game_sm3_expand_connected_instance_indices(3u,nullptr,3u,4u,
         (std::numeric_limits<std::uint32_t>::max)(),1024u,indices));
-    assert(indices==good);
+    assert(indices==oneInstance);
 }
