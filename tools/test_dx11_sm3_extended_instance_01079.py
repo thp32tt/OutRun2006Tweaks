@@ -17,7 +17,9 @@ for token in (
     "instance % chunkPlan.instancesPerChunk",
     "issueNativeGameDraw(",
     "context->DrawIndexed(",
-    "context->Draw(vertexCount, base)",
+    "context->Draw(vertices, base)",
+    "context->Draw(chunkInstances * vertexCount, 0u)",
+    "context->DrawIndexed(sourceIndexCount, 0u, 0)",
 ):
     assert token in scope, "01079 integration missing: " + token
 assert scope.index("game_sm3_extended_instance_upload_allowed(") < scope.index(

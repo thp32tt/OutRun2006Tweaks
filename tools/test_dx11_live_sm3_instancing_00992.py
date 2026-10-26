@@ -10,7 +10,9 @@ assert "sourceFrequency != 1u" in bridge
 assert "(frequency & ~kStreamFrequencyMask) == kStreamInstanced" in bridge
 assert "instance * vertexCount" in bridge
 assert "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge
-assert "context->Draw(vertexCount, base)" in bridge
+assert "context->Draw(vertices, base)" in bridge
+assert "context->Draw(chunkInstances * vertexCount, 0u)" in bridge
+assert "context->DrawIndexed(sourceIndexCount, 0u, 0)" in bridge
 assert "issueNativeGameDraw(" in bridge
 assert "instance % chunkPlan.instancesPerChunk == 0u" in bridge
 assert "const UINT nativeSubmissionCount = segmentedInstanceUpload" in bridge
