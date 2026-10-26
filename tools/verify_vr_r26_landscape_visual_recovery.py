@@ -54,3 +54,25 @@ assert misc.count('class CommandLineArguments : public Hook') == 1
 assert ex.count('Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;') == 1
 
 assert 'Game::screen_resolution->x, Game::screen_resolution->y);\n    }\n}\n\nclass CommandLineArguments : public Hook' in misc
+
+# Reviewed visual fixes merged from Quest logs + DX9Ex automation reviews.
+ui=(R/'src/hooks_uiscaling.cpp').read_text()
+r30=(R/'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp').read_text()
+gfx=(R/'src/hooks_graphics.cpp').read_text()
+# AUTO 01473: foreign shared-vtable Flush/End cannot consume the tracked ledger.
+assert 'if (self && self == submission.sprite)\n            HudBatch.completeNativeFlush' in ui
+assert 'if (self && self == submission.sprite)\n            HudBatch.completeNativeEnd' in ui
+# AUTO 01493/01476: no broad unowned GOAL/FVF144 promotion.
+assert 'R30IsUnownedGoalFinalGraphPrimitiveUP' not in r30
+assert 'VR GOAL FINAL GRAPH: FVF144 DPUP' not in r30
+# Exact full-result parent remains the only bounded current-root result exception.
+assert 'ProducerToken::ResultProgress,\n                nullptr, &rootsBefore, entrySerial, true' in ui
+# AUTO 01504: +TIME itself must NOT use current-root rebuild ownership.
+stage_leave=ui[ui.index('static void StageExtensionLeave'):ui.index('// The original GOAL animations')]
+assert 'StageExtensionEntrySerial,\n                true' not in stage_leave
+assert 'StageExtensionEntrySerial);' in stage_leave
+# Lens: first authored 570008 stays, second near-centre duplicate is suppressed,
+# and all exact C993 centre objects share one head-corrected centre-eye matrix.
+assert 'if (ordinal == 2)' in gfx
+assert 'identityEye = IdentityMatrix()' in r30
+assert 'mode=CENTRE_EYE_MONO_WORLD_LOCK' in r30

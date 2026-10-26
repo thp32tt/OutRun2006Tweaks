@@ -1842,16 +1842,16 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::SpriteQueueDepth == 0,
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
         {
-            // These five REA-proven +TIME parents are exact source owners.
-            // Like the verified rival/full-result producers, the native call
-            // may rebuild a priority root while retaining the old tail. Admit
-            // only the old-tail -> current-terminal chain; nested newer exact
-            // tags remain protected by StageExtensionEntrySerial.
+            // AUTO 01504: a rebuilt current root can interpose an untagged
+            // foreign node between the old +TIME tail and current terminal
+            // tail. Do not grant StageExtensionTime from reachability alone.
+            // +TIME queued ownership therefore requires the original root to
+            // remain stable; direct D3DX ownership and PR151's four physical
+            // API coverage remain unchanged.
             TagAppendedNodes(StageExtensionBefore,
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 OutRunVR::GameSemantic::ProducerToken::StageExtensionTime,
-                nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial,
-                true);
+                nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial);
             FlushD3DXAtDirectStageSourceExit();
         }
         // Always restore the exact direct-draw queue cursor/anchor even if
