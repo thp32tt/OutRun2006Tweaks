@@ -101,6 +101,32 @@ class BridgeTests(unittest.TestCase):
             self.assertTrue(p.is_file())
             self.assertEqual(bridge.digest(p),item["imagegen_input_sha256"])
 
+    def test_legacy_gpt_crop_edge_warning_promotes_to_direct_full_hd(self):
+        source,source_sha=self.make_direct("Q051","Total Time")
+        # Rewrite the direct metadata as a legacy GPT OCR crop manifest with an
+        # edge warning. The crop must be ignored and the full HD source used.
+        mp=next((self.croot/"gpt_vision_chat_ocr_outputs").glob("*/*/manifest.json"))
+        j=json.loads(mp.read_text())
+        j.pop("direct_full_hd_reference",None)
+        j.pop("crop_created",None)
+        j["status"]="CROP_TEST_ONLY_REVIEW_REQUIRED"
+        j["edge_warning"]="ALPHA_TOUCHES_CROP_BORDER_REVIEW"
+        j["gpt_chat_task_id"]="OUTRUN-GPT-OCR-Q051-LEGACY"
+        j["gpt_chat_bbox_source"]="CHATGPT_ATTACHED_ORIGINAL_HD_IMAGE"
+        j["external_api_used"]=False
+        j["image_generation_used"]=False
+        mp.write_text(json.dumps(j),encoding="utf-8")
+        result=bridge.scan_once(self.croot,self.trans,self.ig)
+        self.assertEqual(result["added"],1)
+        manifest=json.loads((self.ig/"text_roi_batches/production_manifest.json").read_text())
+        item=next(x for x in manifest["items"] if x["english"]=="Total Time")
+        self.assertEqual(item["imagegen_input_mode"],"FULL_HD_DIRECT_REFERENCE")
+        self.assertEqual(item["imagegen_input_path"],str(source))
+        self.assertEqual(item["imagegen_input_sha256"],source_sha)
+        self.assertTrue(item["legacy_crop_ignored"])
+        self.assertEqual(item["auto_admission"],
+                         "LEGACY_GPT_OCR_PROMOTED_TO_FULL_HD_DIRECT_NO_CROP")
+
     def test_gpt_direct_target_uses_full_hd_source_without_crop_copy(self):
         source,source_sha=self.make_direct("Q051","Total Time")
         result=bridge.scan_once(self.croot,self.trans,self.ig)
