@@ -3,7 +3,7 @@
 - TASK_ID: USER-DX9EX-VISUAL-REPAIR-20261026 (continuation; no duplicate score).
 - Base: `b3ee3fbeaa48139eff4b22e33e68e63ee5a76760` on vr-d3d9ex-focus. Source result: `d32407578fba9797dd91728cc84518a0144b9795`.
 - Review branch: `fix/r26-eye-projection-stage-ticket-20261026`. Source is NOT merged into focus.
-- User requested source fixes now, additional chat review before the Windows build. No workflow dispatch, Windows game/host build or new test ZIP was performed in this continuation.
+- User requested source fixes now, additional chat review before the Windows build. No workflow was manually dispatched and no new user test ZIP was made. Creating the review branch automatically triggered generic Build and HUD Inspector under the existing repository push rules; status is recorded below.
 - Local targeted validation PASS; GitHub exact-SHA build/package PENDING_USER_REREVIEW; RUNTIME_VALIDATION=UNTESTED.
 
 ## Changes
@@ -48,3 +48,10 @@ Both new scripts accept `--source` for a pinned pre-fix source replay. New diagn
 - Compare the candidate with the then-current focus HEAD; preserve concurrent source and review work. This review branch is a candidate, not an accepted runtime baseline.
 - After chat review, merge/rebase as appropriate and pin the resulting HEAD. Use GitHub-hosted Windows only for R26+HUD DLL, x64 host, runnable package, Domain and Full Source gates. Verify required CMD/PS1/INI/x86 DLL/x64 EXE and archive identity.
 - Matching Quest3/VDXR evidence is still required for visible fixes. Do not transfer older successful builds or optics to this commit.
+
+## Automatically triggered CI observed after publication
+
+- Source SHA d32407578fba9797dd91728cc84518a0144b9795; no manual workflow dispatch.
+- Generic Build [40279744507](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40279744507): FAIL before Configure/Compile. `verify_wheel_ffb_current.py` requires `docs/reverse/LINDBERGH_FFB_MAP.md`, which is absent in the pinned base tree as well. No FFB files or the generic workflow were changed by this candidate. This failed check is not reported as a renderer compile failure or as a pass.
+- HUD Inspector [40279744562](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40279744562): source/EXE static job SUCCESS, Windows inspector DLL build IN_PROGRESS at handoff. Requery its final status before claiming success. This workflow is not the runnable user test package or x64-host validation.
+- Dedicated R26 User Test/Full Source/Domain and user package acceptance remain pending the requested chat re-review. Do not patch unrelated FFB documentation merely to turn this generic check green.

@@ -18,9 +18,26 @@
       "C993 asymmetric XY FOV recovered-ray mismatch",
       "Rejected E8 deferred direct D3DX owner remains restorable"
     ],
-    "github_windows_ci": "NOT_RUN_USER_DEFERRED_UNTIL_REREVIEW",
+    "github_windows_ci": "DEDICATED_R26_USER_TEST_AND_FULL_SOURCE_DEFERRED; AUTO_INSPECTOR_IN_PROGRESS",
     "package": "NOT_CREATED",
-    "runtime": "UNTESTED"
+    "runtime": "UNTESTED",
+    "automatic_github_runs": {
+      "source_sha": "d32407578fba9797dd91728cc84518a0144b9795",
+      "generic_build": {
+        "run_id": 40279744507,
+        "status": "FAIL_PRECOMPILE_EXISTING_MISSING_FFB_DOCUMENT",
+        "missing_path": "docs/reverse/LINDBERGH_FFB_MAP.md",
+        "baseline_missing_verified": true,
+        "game_compile": "SKIPPED"
+      },
+      "hud_inspector": {
+        "run_id": 40279744562,
+        "static_job": "SUCCESS",
+        "windows_inspector_compile": "IN_PROGRESS_AT_HANDOFF"
+      },
+      "manual_dispatch": "NONE",
+      "full_user_test_package": "DEFERRED_USER_REREVIEW"
+    }
   },
   "changed_paths": [
     ".github/workflows/dx9ex-fullsource-impact-review.yml",
