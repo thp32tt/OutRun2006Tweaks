@@ -218,7 +218,9 @@ for token in (
     "D3DRS_POINTSCALEENABLE, &scaled",
     "declaration[i].Usage == D3DDECLUSAGE_PSIZE",
     "!game_native_unit_point_raster(",
-    "context->Draw(vertexCount, base);",
+    "context->Draw(vertices, base);",
+    "context->Draw(chunkInstances * vertexCount, 0u);",
+    "context->DrawIndexed(sourceIndexCount, 0u, 0);",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
 ):
     check(token in source, "real game SM3 point/fallback integration missing: " + token)
