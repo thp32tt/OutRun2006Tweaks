@@ -5158,11 +5158,47 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, ActualDraw&& actualDraw,
             const char* site)
         {
-            if (!R30SafeStereoBase(device))
+            // Rival-only physical raster evidence, independent of rank's
+            // aggregated projected counters. No producer token changes
+            // render-route eligibility; this samples what the GPU draw
+            // *actually* inherited from the original native source.
+            const bool rivalGpuProbe = Settings::VRTelemetry &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani;
+            const bool baseAdmitted = R30SafeStereoBase(device);
+            if (rivalGpuProbe)
+            {
+                static std::atomic<std::uint64_t> rivalR30Entries{0};
+                const auto n = rivalR30Entries.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 8 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR RIVAL R30 GPU ENTRY: hits={} baseAdmitted={} scope={} queue={} anchorValid={} site={}",
+                        n, baseAdmitted ? 1 : 0,
+                        OutRunVR::GameSemantic::Name(
+                            OutRunVR::GameSemantic::EffectiveScope()),
+                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                        OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
+                        site ? site : "unknown");
+            }
+            if (!baseAdmitted)
                 return E_NOTIMPL;
 
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
+            if (rivalGpuProbe)
+            {
+                static std::atomic<std::uint64_t> rivalR30Classes{0};
+                const auto n = rivalR30Classes.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 8 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR RIVAL R30 GPU CLASS: hits={} kind={} projected={} site={}",
+                        n, static_cast<unsigned>(screenKind),
+                        screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D
+                            ? 1 : 0,
+                        site ? site : "unknown");
+            }
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
 
@@ -5240,6 +5276,19 @@ namespace OutRunVRStereo
                     eyeScale, eyeOffset))
             {
                 ++R30ScreenSpaceBuildFailures;
+                if (rivalGpuProbe)
+                {
+                    static std::atomic<std::uint64_t> rivalBuildFailed{0};
+                    const auto n = rivalBuildFailed.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 8 || (n & (n - 1)) == 0)
+                        spdlog::info(
+                            "VR RIVAL R30 GPU REJECT: hits={} reason=EYE_WVP_BUILD_FAILED kind={} pose={} markerValid={}",
+                            n, static_cast<unsigned>(screenKind),
+                            stereo.poseSequence,
+                            OutRunVR::GameSemantic::CurrentProjectedMarker()
+                                ? 1 : 0);
+                }
                 return E_NOTIMPL;
             }
 
@@ -5396,6 +5445,20 @@ namespace OutRunVRStereo
                     "VR R45 PERSPECTIVE HUD: outer-hook draw serial fixed; 6th/6 and flat white overlays use the raw game c64 before stereo head correction, then uniform HudScale on the world-locked finite HUD plane");
             }
 
+            if (rivalGpuProbe)
+            {
+                static std::atomic<std::uint64_t> rivalStereoCompletions{0};
+                const auto n = rivalStereoCompletions.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 8 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR RIVAL R30 GPU EYES: hits={} kind={} left=0x{:08X} right=0x{:08X} restore={} pose={} site={}",
+                        n, static_cast<unsigned>(screenKind),
+                        static_cast<unsigned>(leftHr),
+                        static_cast<unsigned>(rightHr),
+                        restoreOk ? 1 : 0, stereo.poseSequence,
+                        site ? site : "unknown");
+            }
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;
