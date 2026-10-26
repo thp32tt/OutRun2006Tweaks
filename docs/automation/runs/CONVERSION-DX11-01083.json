@@ -11,10 +11,10 @@
   "classification": "A_REAL_GAME_DRAW_COVERAGE",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:SM3_NONINSTANCED_LINEAR_GPU_CHUNK_DRAW",
-  "status": "SOURCE_INTEGRATED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_IMPLEMENTATION_COMMITTED",
-  "automation_validation": "PENDING",
-  "AUTOMATION_VALIDATION": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_EXACT_SHA_VERIFIED_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -25,13 +25,15 @@
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "source_change_sha": "34658b9be8204ef5374c94215b2e416150e8a2fa",
-  "material_result_sha": "34658b9be8204ef5374c94215b2e416150e8a2fa",
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+  "validation_bearing_result_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
   "source_base_sha": "ba185aaf9b36a1295514a745080a2fe140d2dacd",
   "implementation_commits": [
     "34658b9be8204ef5374c94215b2e416150e8a2fa"
   ],
-  "repair_commits": [],
+  "repair_commits": [
+    "0b92706497098316a49f24b10e0c84d6a0725f4d"
+  ],
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
@@ -66,29 +68,33 @@
   },
   "acceptance_results": {
     "live_connected_strip_native_gpu": {
-      "status": "PENDING_CI",
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
-        "src/vr/d3d11/live_game_sm3_stream_assembly.hpp"
+        "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+        "tools/dx11_sm3_connected_chunk_01083.cpp"
       ],
-      "validation_command": "Portable unit probe, DX11 Fast, Windows Build pending; runtime untested."
+      "validation_command": "DX11 Fast C++ real-source strip-window primitive parity and Windows Build both SUCCESS at exact SHA; no actual HMD/game runtime."
     },
     "connected_strip_source_fallback": {
-      "status": "PENDING_CI",
-      "evidence_paths": [
-        "tools/dx11_sm3_connected_chunk_01083.cpp",
-        "tools/test_dx11_sm3_connected_chunk_01083.py"
-      ],
-      "validation_command": "Positive/negative original parity and absolute multi-stream source window regression pending."
-    },
-    "exact_sha_five_gate": {
-      "status": "PENDING_CI",
+      "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
       "evidence_paths": [
         "tools/dx11_sm3_connected_chunk_01083.cpp",
         "tools/test_dx11_sm3_connected_chunk_01083.py",
-        ".github/workflows/dx11-fast-structural.yml"
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
       ],
-      "validation_command": "Five exact-SHA push Actions pending on repaired material commit."
+      "validation_command": "Portable strip seam/triangle parity and absolute dual-stream input, negative indexed/fan/malformed tests in Fast SUCCESS. Native runtime remains untested."
+    },
+    "exact_sha_five_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Five required push GitHub Actions completed/success on 0b92706497098316a49f24b10e0c84d6a0725f4d."
     }
   },
   "development_strategy": {
@@ -127,20 +133,66 @@
     "visible_frame_acceptance": "Implemented native source path only: no matching game menu/car/race capture or native published frame evidence; user Quest3/VDXR test required.",
     "activation_guard_and_fallback": "NativeDrawPathActive opt-in only; D3D9/DX9Ex source renderer, original input/FFB, SkyGlow, DXVK frozen branch unchanged."
   },
-  "mandatory_gate_results": [],
-  "c6_bookkeeping_only": false,
-  "c6_does_not_revalidate_source": false,
-  "c6_source_validation_sha": null,
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40270195582,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195582"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40270195691,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195691"
+    },
+    {
+      "name": "Build",
+      "run_id": 40270195651,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195651"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40270195626,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195626"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40270195604,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195604"
+    }
+  ],
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "c6_source_validation_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
   "source_implementation_time_ratio": "NOT_MEASURED",
   "analysis_time_ratio": "NOT_MEASURED",
   "ci_time_ratio": "NOT_MEASURED",
   "ai2_previous_confirmed_cumulative_score": 1971,
-  "ai2_new_confirmed_cumulative_score": 1971,
-  "task_new_source_achievement_score": 0,
+  "ai2_new_confirmed_cumulative_score": 1972,
+  "task_new_source_achievement_score": 1,
   "score_change": 0,
   "score_award_event": false,
-  "score_note": "No new score before five required exact-SHA CI gates succeed; previous AI2 confirmed 1971 remains SSOT.",
+  "score_note": "AI2 independent original implementation + five exact-SHA Gate achievement credited once separately at thp32tt/ai-dev-lab main AI_SCOREBOARD.md commit 01be14ebb9947b9c0a251defb4e06193794750d0: 1971 + 1 = 1972. This C6-only readback is +0; no duplicate accomplishment.",
   "score_ssot_ref": "thp32tt/ai-dev-lab@main:AI_SCOREBOARD.md",
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. Neither OutRun executable nor Quest3/VDXR or native game-frame count was measured.",
-  "next_implementation_action": "Repair only actual CI failures under same 01083 identity; after exact-SHA five-Gate success record C6 without re-running those gates. Do not claim full menu/race or Quest3 output."
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No OutRun game/HMD/Quest3/VDXR session, no live native frame or FPS measured. No complete menu-to-race gameplay PASS claimed.",
+  "next_implementation_action": "Continue full source-wide real game menu/vehicle/race native Draw coverage and L/R OpenXR GPU handoff under new independent owner, preserving DXVK freeze/DX9Ex fallback and original input/FFB. Do not rerun this 01083 SHA Gates or score C6."
 }
