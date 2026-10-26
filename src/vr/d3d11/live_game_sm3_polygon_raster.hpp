@@ -32,6 +32,31 @@ namespace outrun::vr::dx11::live_game_frame {
      const std::uint32_t triangles = windowElements - 2u;
      return {true, triangles * 3u, triangles};
  }
+// A shader-bound real-game triangle strip may be split across dynamic GPU
+// uploads in every D3D9 fill mode. Each chunk starts at an even source
+// triangle ordinal; a POINTLIST must replay three occurrences per source
+// triangle, while WIREFRAME/SOLID retain the true TRIANGLESTRIP raster.
+struct GameSm3StripFillWindowPlan {
+    bool supported = false;
+    std::uint32_t sourceTriangles = 0u;
+    std::uint32_t pointIndexCount = 0u;
+};
+[[nodiscard]] constexpr GameSm3StripFillWindowPlan
+game_sm3_strip_fill_window_plan(
+    std::uint32_t fill, std::uint32_t sourceElements,
+    std::uint32_t firstElement, std::uint32_t windowElements,
+    std::uint32_t maxPointIndices) noexcept {
+    if ((fill != 1u && fill != 2u && fill != 3u) ||
+        sourceElements < 3u || firstElement > sourceElements - 3u ||
+        (firstElement & 1u) != 0u || windowElements < 3u ||
+        windowElements > sourceElements - firstElement)
+        return {};
+    const auto triangles = windowElements - 2u;
+    if (fill == 1u && triangles > maxPointIndices / 3u)
+        return {};
+    return {true, triangles, fill == 1u ? 3u * triangles : 0u};
+}
+
 [[nodiscard]] constexpr bool game_sm3_polygon_fill_admitted(
     std::uint32_t fill, std::uint32_t topology, std::uint32_t cull,
     bool lineAA, bool lastPixel, bool unitPoint) noexcept {

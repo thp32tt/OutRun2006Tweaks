@@ -5488,15 +5488,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
               plannedNativeStride, kMaxVertices, 1u << 25u, 128u)
         : GameSm3LinearChunkPlan{};
     const bool linearChunkUpload = linearChunkPlan.chunkCount > 1u;
-    // A connected source strip larger than one packed D3D11 upload can
-    // still draw at full native resolution. Repeat seam vertices on each
-    // GPU chunk and keep triangle-strip parity (even original start index).
-    // Do not change indexed, instanced, point-fill or wireframe paths.
+    // Continue authentic line/triangle strips across bounded GPU uploads.
+    // WIREFRAME retains triangle-strip winding; POINT rasterizes each source
+    // triangle as three one-pixel occurrences, requiring a smaller chunk
+    // budget than a normal triangle-strip vertex upload.
     const auto connectedChunkPlan = !sourceInstancing && !indices &&
-        !pointFill && !wireFill
+        (!pointFill || type == D3DPT_TRIANGLESTRIP)
         ? game_sm3_plan_native_connected_chunks(
               static_cast<std::uint32_t>(type), false, vertexCount,
-              plannedNativeStride, kMaxVertices, 1u << 25u, 128u)
+              plannedNativeStride,
+              pointFill ? (std::min)(kMaxVertices, kMaxIndices / 3u + 2u)
+                        : kMaxVertices,
+              1u << 25u, 128u)
         : GameSm3ConnectedChunkPlan{};
     const bool connectedChunkUpload = connectedChunkPlan.chunkCount > 1u;
     // Large real-game fans retain center/rim continuity for all three
@@ -5548,10 +5551,19 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // shader-visible FLOAT4 packing exceeds 32 MiB. The D3D11 path must
     // preserve the ORIGINAL index occurrence sequence and seam winding.
     const auto indexedConnectedChunkPlan = !sourceInstancing && indices &&
-        repack && !pointFill && !wireFill
-        ? game_sm3_plan_native_indexed_connected_chunks(
-              static_cast<std::uint32_t>(type), vertexCount, indexCount,
-              plannedNativeStride, kMaxVertices, 1u << 25u, 128u, 1ull << 27u)
+        repack && (!pointFill || type == D3DPT_TRIANGLESTRIP) &&
+        (!pointFill ||
+         std::uint64_t(indexCount) * plannedNativeStride <= (1ull << 27u))
+        ? (pointFill
+            ? game_sm3_plan_native_connected_chunks(
+                  static_cast<std::uint32_t>(type), false, indexCount,
+                  plannedNativeStride,
+                  (std::min)(kMaxVertices, kMaxIndices / 3u + 2u),
+                  1u << 25u, 128u)
+            : game_sm3_plan_native_indexed_connected_chunks(
+                  static_cast<std::uint32_t>(type), vertexCount, indexCount,
+                  plannedNativeStride, kMaxVertices, 1u << 25u, 128u,
+                  1ull << 27u))
         : GameSm3ConnectedChunkPlan{};
     const bool indexedConnectedChunkUpload =
         indexedConnectedChunkPlan.chunkCount > 1u;
@@ -5697,7 +5709,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // Windowed fans already lower each original triangle to a local
     // three-index occurrence stream. POINTLIST consumes that same stream
     // directly; expanding the *whole* fan would exceed kMaxIndices.
-    if (pointFill && !fanChunkUpload) {
+    if (pointFill && !fanChunkUpload &&
+        !connectedChunkUpload && !indexedConnectedChunkUpload) {
         const UINT logicalVertexCount = static_cast<UINT>(
             compactInstancedGeometry ? expandedVertices : vertexCount);
         const UINT sourceCount = nativeIndices ? nativeIndexCount : logicalVertexCount;
@@ -6518,7 +6531,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             const UINT drawCount = (std::min)(
                 indexCount - firstIndex,
                 indexedConnectedChunkPlan.verticesPerChunk);
-            if (drawCount < (type == D3DPT_LINESTRIP ? 2u : 3u)) {
+            if (drawCount < (type == D3DPT_LINESTRIP ? 2u : 3u) ||
+                (type == D3DPT_TRIANGLESTRIP &&
+                 !game_sm3_strip_fill_window_plan(
+                     static_cast<std::uint32_t>(fill), indexCount,
+                     firstIndex, drawCount, kMaxIndices).supported)) {
                 s.frameBatch.abort();
                 return false;
             }
@@ -6537,7 +6554,39 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                     return false;
                 }
             }
-            issueNativeGameDraw(drawCount, 0u);
+            if (pointFill) {
+                // Local indices preserve original indexed-strip vertex
+                // occurrence order, including repeated vertices and even
+                // source-triangle parity at every GPU upload seam.
+                std::vector<std::uint32_t> points;
+                const auto window = game_sm3_strip_fill_window_plan(
+                    static_cast<std::uint32_t>(fill), indexCount,
+                    firstIndex, drawCount, kMaxIndices);
+                if (!window.supported ||
+                    !game_sm3_expand_polygon_points(
+                        D3DPT_TRIANGLESTRIP, nullptr, drawCount, drawCount,
+                        kMaxIndices, points) ||
+                    points.size() != window.pointIndexCount) {
+                    s.frameBatch.abort();
+                    return false;
+                }
+                const UINT bytes = static_cast<UINT>(
+                    points.size() * sizeof(std::uint32_t));
+                if (!ensure_full_game_upload_buffer(
+                        device, s.fullGameIndexUpload,
+                        s.fullGameIndexCapacity, bytes, D3D11_BIND_INDEX_BUFFER) ||
+                    !upload_full_game_stream(
+                        context, s.fullGameIndexUpload.Get(),
+                        s.fullGameIndexCapacity, points.data(), bytes)) {
+                    s.frameBatch.abort();
+                    return false;
+                }
+                context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
+                                          DXGI_FORMAT_R32_UINT, 0u);
+                context->DrawIndexed(window.pointIndexCount, 0u, 0);
+            } else {
+                issueNativeGameDraw(drawCount, 0u);
+            }
             continue;
         }
         if (linearChunkUpload) {
@@ -6581,6 +6630,13 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             const UINT firstVertex = submit * connectedChunkPlan.advanceVertices;
             const UINT drawCount = (std::min)(
                 vertexCount - firstVertex, connectedChunkPlan.verticesPerChunk);
+            if (type == D3DPT_TRIANGLESTRIP &&
+                !game_sm3_strip_fill_window_plan(
+                    static_cast<std::uint32_t>(fill), vertexCount,
+                    firstVertex, drawCount, kMaxIndices).supported) {
+                s.frameBatch.abort();
+                return false;
+            }
             if (submit != 0u) {
                 const UINT chunkBytes = drawCount * nativeStride;
                 const void* sourceChunk =
@@ -6603,7 +6659,39 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                     return false;
                 }
             }
-            issueNativeGameDraw(drawCount, 0u);
+            if (pointFill) {
+                // D3DFILL_POINT replays each strip triangle's three vertex
+                // occurrences, including seam duplicates, through the
+                // original shader-bound POINTLIST GPU path.
+                std::vector<std::uint32_t> points;
+                const auto window = game_sm3_strip_fill_window_plan(
+                    static_cast<std::uint32_t>(fill), vertexCount,
+                    firstVertex, drawCount, kMaxIndices);
+                if (!window.supported ||
+                    !game_sm3_expand_polygon_points(
+                        D3DPT_TRIANGLESTRIP, nullptr, drawCount, drawCount,
+                        kMaxIndices, points) ||
+                    points.size() != window.pointIndexCount) {
+                    s.frameBatch.abort();
+                    return false;
+                }
+                const UINT bytes = static_cast<UINT>(
+                    points.size() * sizeof(std::uint32_t));
+                if (!ensure_full_game_upload_buffer(
+                        device, s.fullGameIndexUpload,
+                        s.fullGameIndexCapacity, bytes, D3D11_BIND_INDEX_BUFFER) ||
+                    !upload_full_game_stream(
+                        context, s.fullGameIndexUpload.Get(),
+                        s.fullGameIndexCapacity, points.data(), bytes)) {
+                    s.frameBatch.abort();
+                    return false;
+                }
+                context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
+                                          DXGI_FORMAT_R32_UINT, 0u);
+                context->DrawIndexed(window.pointIndexCount, 0u, 0);
+            } else {
+                issueNativeGameDraw(drawCount, 0u);
+            }
             continue;
         }
 

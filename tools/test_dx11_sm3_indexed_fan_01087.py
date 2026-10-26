@@ -25,9 +25,18 @@ print("01087 indexed SM3 fan center/rim/oversized-IB native integration PASS")
 
 # 01088 must enter the *same* shader-bound fan native GPU source path.
 assert "game_sm3_fan_fill_window_plan(" in live
-assert "if (pointFill && !fanChunkUpload)" in live
+assert "if (pointFill && !fanChunkUpload &&" in live
 assert "context->DrawIndexed(fillWindow.nativeIndexCount" in live
 assert "type == D3DPT_TRIANGLEFAN" in live
 assert "D3D11_PRIMITIVE_TOPOLOGY_POINTLIST" in live
 assert "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in live
 print("01088 indexed/nonindexed fan point/wire/solid GPU windows PASS")
+
+# 01089: source-joined point/wire/solid triangle strips with original D3D9
+# indexed and unindexed geometry through shader-bound native GPU Draws.
+assert "game_sm3_strip_fill_window_plan(" in live
+assert "!connectedChunkUpload && !indexedConnectedChunkUpload" in live
+assert "std::uint64_t(indexCount) * plannedNativeStride" in live
+assert live.count("context->DrawIndexed(window.pointIndexCount, 0u, 0);")==2
+assert "game_sm3_plan_native_connected_chunks(" in live
+print("01089 SM3 indexed/unindexed connected polygon strips native point/wire/solid PASS")

@@ -123,5 +123,58 @@ int main() {
         4u,ib.size(),1u,8u,18u).supported);
     assert(!game_sm3_fan_fill_window_plan(
         2u,ib.size(),1u,8u,17u).supported);
+
+    // 01089: stitched real indexed/nonindexed TRIANGLESTRIP windows retain
+    // winding, point occurrences and shader-visible original source order.
+    constexpr std::uint32_t maxPointIndices=18u;
+    const auto stripPlan=game_sm3_plan_native_connected_chunks(
+        5u,false,sourceVertices,12u,8u,128u,8u);
+    assert(stripPlan.verticesPerChunk==8u);
+    assert(stripPlan.advanceVertices==6u && stripPlan.chunkCount==3u);
+    std::vector<std::uint32_t> expectedStripIndexed,expectedStripLinear;
+    assert(game_sm3_expand_polygon_points(
+        5u,ib.data(),ib.size(),sourceVertices,128u,expectedStripIndexed));
+    assert(game_sm3_expand_polygon_points(
+        5u,nullptr,ib.size(),sourceVertices,128u,expectedStripLinear));
+    for(const auto fillMode:{1u,2u,3u}) {
+        std::vector<std::uint32_t> streamedIndexed,streamedLinear;
+        std::uint32_t coveredTriangles=0u;
+        for(std::uint32_t part=0u;part<stripPlan.chunkCount;++part) {
+            const auto first=part*stripPlan.advanceVertices;
+            const auto count=(std::min)(
+                stripPlan.verticesPerChunk,sourceVertices-first);
+            const auto window=game_sm3_strip_fill_window_plan(
+                fillMode,ib.size(),first,count,maxPointIndices);
+            assert(window.supported);
+            coveredTriangles+=window.sourceTriangles;
+            if(fillMode==1u)
+                assert(window.pointIndexCount==3u*window.sourceTriangles);
+            else
+                assert(window.pointIndexCount==0u);
+            std::vector<std::uint32_t> local;
+            assert(game_sm3_expand_polygon_points(
+                5u,nullptr,count,count,maxPointIndices,local));
+            for(auto localVertex:local) {
+                streamedIndexed.push_back(ib[first+localVertex]);
+                streamedLinear.push_back(first+localVertex);
+            }
+        }
+        assert(coveredTriangles==ib.size()-2u);
+        assert(streamedIndexed==expectedStripIndexed);
+        assert(streamedLinear==expectedStripLinear);
+    }
+    assert(!game_sm3_strip_fill_window_plan(
+        1u,ib.size(),1u,8u,maxPointIndices).supported);
+    assert(!game_sm3_strip_fill_window_plan(
+        1u,ib.size(),12u,8u,maxPointIndices).supported);
+    assert(!game_sm3_strip_fill_window_plan(
+        1u,ib.size(),0u,9u,maxPointIndices).supported);
+    assert(!game_sm3_strip_fill_window_plan(
+        4u,ib.size(),0u,8u,maxPointIndices).supported);
+    // The actual entire source IB is checked before any indexed GPU mutation.
+    auto damaged=ib;damaged.back()=sourceVertices;
+    bool validFullSource=true;
+    for(auto index:damaged)validFullSource&=index<sourceVertices;
+    assert(!validFullSource);
     return 0;
 }
