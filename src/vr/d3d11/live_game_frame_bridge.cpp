@@ -5471,12 +5471,23 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // silently turn an admitted flat Draw into an oversized upload.
     const UINT plannedNativeStride = sourceInstancing && !repack
         ? static_cast<UINT>(input.size() * 16u) : nativeStride;
+    // True game-created unindexed independent lists remain drawable even
+    // when their source VB fits but FLOAT4 declaration packing exceeds one
+    // 32 MiB D3D11 upload. Split only at complete primitive boundaries.
+    // An indexed stream or connected strip/fan still fails closed.
+    const auto linearChunkPlan = !sourceInstancing && !indices && !pointFill
+        ? game_sm3_plan_native_linear_chunks(
+              static_cast<std::uint32_t>(type), false, vertexCount,
+              plannedNativeStride, kMaxVertices, 1u << 25u, 128u)
+        : GameSm3LinearChunkPlan{};
+    const bool linearChunkUpload = linearChunkPlan.chunkCount > 1u;
     const auto uploadPlan = game_sm3_plan_native_instance_upload(
         sourceInstancing, vertexCount, instanceCount, plannedNativeStride,
         kMaxVertices, 1u << 25u, kMaxExtendedSegmentedGameInstances);
     const bool segmentedInstanceUpload = sourceInstancing &&
         uploadPlan.mode == GameSm3NativeUploadMode::segmented;
-    if (uploadPlan.mode == GameSm3NativeUploadMode::invalid ||
+    if ((uploadPlan.mode == GameSm3NativeUploadMode::invalid &&
+         !linearChunkUpload) ||
         (segmentedInstanceUpload &&
          !game_sm3_extended_instance_upload_allowed(
              vertexCount, instanceCount, plannedNativeStride,
@@ -5498,6 +5509,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         return false;
     const UINT firstChunkInstances = segmentedInstanceUpload
         ? chunkPlan.instancesPerChunk : instanceCount;
+    const UINT firstChunkVertices = linearChunkUpload
+        ? linearChunkPlan.verticesPerChunk : vertexCount;
     std::array<std::uint32_t,16> instanceSteps{};
     std::array<bool,16> referenced{};
     for (std::size_t i = 0u; i + 1u < declaration.size(); ++i)
@@ -5666,7 +5679,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                       firstChunkInstances,
                       instanceSteps, unpacked)
                 : !game_sm3_assemble_streams(
-                      elements, streams, vertexCount, unpacked))
+                      elements, streams, firstChunkVertices, unpacked))
             return false;
         nativeBytes=unpacked.data();
     }
@@ -6067,12 +6080,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 return false;
     }
     const auto nativeByteCount = static_cast<std::uint64_t>(nativeStride) *
-        vertexCount * firstChunkInstances;
+        firstChunkVertices * firstChunkInstances;
     // Actual single-submit or per-instance GPU bytes must equal the source
     // planner's admission; a partial/oversized allocation never reaches Draw.
     if (!nativeByteCount || nativeByteCount > (1ull << 25u) ||
         nativeByteCount != (segmentedInstanceUpload
-            ? chunkPlan.firstUploadBytes : uploadPlan.vertexBytes)) return false;
+            ? chunkPlan.firstUploadBytes : (linearChunkUpload
+                ? static_cast<std::uint64_t>(firstChunkVertices) * nativeStride
+                : uploadPlan.vertexBytes))) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
     if (!ensure_full_game_upload_buffer(device, s.fullGameVertexUpload,
                                         s.fullGameVertexCapacity, vertexBytes,
@@ -6311,9 +6326,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     const UINT nativeSubmissionCount = segmentedInstanceUpload
         ? (segmentedListPlan.grouped ? segmentedListPlan.batches :
            (segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount))
-        : (compactListInstances
+        : (linearChunkUpload ? linearChunkPlan.chunkCount :
+           (compactListInstances
             ? 1u : (listCandidate ? listSubmission.drawCount :
-                (connectedCandidate ? connectedSubmission.drawCount : instanceCount)));
+                (connectedCandidate ? connectedSubmission.drawCount : instanceCount))));
     const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
     // One audited submit site for the original game Draw; grouped lists keep
@@ -6344,6 +6360,37 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                          s.fullGameVertexCapacity,
                                          unpacked.data(), chunkBytes))
                 return false;
+        }
+        if (linearChunkUpload) {
+            // Original unindexed source primitive #N becomes native Draw #N
+            // across consecutive uploads. Each firstVertex is group-aligned,
+            // so no line/triangle is cut by a WRITE_DISCARD or GPU Draw.
+            const UINT firstVertex = submit * linearChunkPlan.verticesPerChunk;
+            const UINT drawCount = (std::min)(
+                vertexCount - firstVertex, linearChunkPlan.verticesPerChunk);
+            if (submit != 0u) {
+                const UINT chunkBytes = drawCount * nativeStride;
+                const void* sourceChunk = static_cast<const std::uint8_t*>(bytes) +
+                    static_cast<std::size_t>(firstVertex) * stride;
+                if (repack) {
+                    if (!game_sm3_assemble_streams(
+                            instanceElements, instanceStreams, drawCount,
+                            unpacked, firstVertex) ||
+                        unpacked.size() != chunkBytes) {
+                        s.frameBatch.abort();
+                        return false;
+                    }
+                    sourceChunk = unpacked.data();
+                }
+                if (!upload_full_game_stream(
+                        context, s.fullGameVertexUpload.Get(),
+                        s.fullGameVertexCapacity, sourceChunk, chunkBytes)) {
+                    s.frameBatch.abort();
+                    return false;
+                }
+            }
+            context->Draw(drawCount, 0u);
+            continue;
         }
         if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {
             const UINT chunkInstances = (std::min)(

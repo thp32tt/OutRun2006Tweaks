@@ -71,6 +71,36 @@ game_sm3_plan_native_instance_chunk(
     return {static_cast<std::uint32_t>(count),
             static_cast<std::uint32_t>(count * bytesPerInstance)};
 }
+// A real, non-instanced D3D9 point/line/triangle list can be valid in the
+// original source VB yet exceed the 32 MiB native FLOAT4 upload after a
+// multi-stream/packed-declaration expansion. Preserve the exact primitive
+// order with several bounded GPU uploads; never split a line or triangle.
+// Indexed draws and connected strips/fans cannot be sliced this way.
+struct GameSm3LinearChunkPlan {
+    std::uint32_t verticesPerChunk = 0u;
+    std::uint32_t chunkCount = 0u;
+};
+[[nodiscard]] constexpr GameSm3LinearChunkPlan
+game_sm3_plan_native_linear_chunks(
+    std::uint32_t primitiveType, bool indexed, std::uint32_t sourceVertices,
+    std::uint32_t nativeStride, std::uint32_t maxVerticesPerChunk,
+    std::uint32_t maxBytesPerChunk, std::uint32_t maxChunks) noexcept {
+    const std::uint32_t group = primitiveType == 1u ? 1u :
+                                primitiveType == 2u ? 2u :
+                                primitiveType == 4u ? 3u : 0u;
+    if (!group || indexed || !nativeStride || !sourceVertices ||
+        sourceVertices % group != 0u || !maxChunks)
+        return {};
+    const std::uint32_t limit = (std::min)(
+        maxVerticesPerChunk, maxBytesPerChunk / nativeStride);
+    const std::uint32_t aligned = limit - limit % group;
+    if (!aligned || sourceVertices <= aligned) return {};
+    const std::uint64_t chunks =
+        (std::uint64_t(sourceVertices) + aligned - 1u) / aligned;
+    if (chunks > maxChunks) return {};
+    return {aligned, static_cast<std::uint32_t>(chunks)};
+}
+
 // A high-instance-count game mesh can exceed the historical 128 native
 // submissions even though its original D3D9 stream is complete and each
 // packed FLOAT4 GPU chunk fits. Admit a bounded continuation without ever
@@ -105,7 +135,8 @@ struct GameSm3ElementRef {
 [[nodiscard]] inline bool game_sm3_assemble_streams(
     const std::vector<GameSm3ElementRef>& elements,
     const std::array<GameSm3StreamView,16>& streams,
-    std::uint32_t count, std::vector<std::uint8_t>& destination) noexcept {
+    std::uint32_t count, std::vector<std::uint8_t>& destination,
+    std::uint32_t firstVertex = 0u) noexcept {
     constexpr std::uint64_t kMaxBytes = 1ull << 25u;
     if (elements.empty() || elements.size() > 32u || !count) return false;
     const auto nativeStride = static_cast<std::uint64_t>(elements.size()) * 16u;
@@ -114,8 +145,8 @@ struct GameSm3ElementRef {
         if (e.stream >= streams.size()) return false;
         const auto& src = streams[e.stream];
         const auto width = game_sm3_decl_width(e.type);
-        if (!src.data || !src.stride || src.vertexCount < count ||
-            !width || static_cast<std::uint32_t>(e.offset) + width > src.stride)
+        if (!src.data || !src.stride || firstVertex > src.vertexCount ||
+            count > src.vertexCount - firstVertex || !width || static_cast<std::uint32_t>(e.offset) + width > src.stride)
             return false;
     }
     try {
@@ -127,7 +158,7 @@ struct GameSm3ElementRef {
                 const auto& src = streams[e.stream];
                 std::array<float,4> decoded{};
                 if (!game_sm3_unpack_attribute(e.type,
-                        src.data + static_cast<std::size_t>(v) * src.stride +
+                        src.data + static_cast<std::size_t>(firstVertex + v) * src.stride +
                             e.offset, decoded)) return false;
                 std::memcpy(candidate.data() +
                     static_cast<std::size_t>(v) * nativeStride + i * 16u,
