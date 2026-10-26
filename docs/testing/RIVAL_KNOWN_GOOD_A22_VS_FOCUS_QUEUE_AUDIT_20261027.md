@@ -17,10 +17,12 @@
 - `VR RIVAL QUEUE PUBLICATION`: `registeredDelta=0` through hit 8192 — the post-source queue publication did **not** register any exact nodes. This does **not** by itself prove the native function drew zero triangles or that the pointer was invalid.
 - User Quest reports for a later original-route D test (`RivalDx11NativeRoute=true`) also remain visually wrong, so merely setting the INI back to true is insufficient evidence of a fix.
 
-## Two mutually exclusive causal hypotheses: prove before altering the render policy
+## Three render-delivery hypotheses: prove before altering the render policy
 
 1. **Native animation defers sprite emission**. `sprani_play_ae_auth_alpha` returns without appending to the per-priority linked list. Then both old/new tagging methods see no new nodes; exact producer owner ends before the actual physical GPU submission. Need to attach identity to the actual animation renderer, not globally classify random HUD primitives.
 2. **It appends nodes but strict queue proof rejects them**. Current `TagAppendedNodes` requires an old tail reachable on the current root or exact live-chain. A re-rooted/recycled priority list or changed terminal tail can invalidate proof. The a22 code would blindly dereference `oldTail->next_0`, which could now be an invalid/reused node: **never simply restore this unsafe pointer path.**
+
+3. **Rival draws synchronously into a D3DXSprite batch, but its exit gate rejects the batch**. The E wrapper uses `FlushD3DXAtDirectGoalSourceExit()`, whose `CanFlushD3DXDirectGoalAtExit` explicitly accepts `RenderScope::ScreenHud` and GOAL/RESULT/Pause producer tokens only; **it cannot approve `ProjectedWorldMarker2D` + `RivalMarkerSprani`**. This code-level condition is certain. Whether native `sprani_play_ae_auth_alpha` actually emitted a D3DX Draw into that batch on a failing frame is not yet proven. NEVER infer a physical Draw from a producer call.
 
 ## Implemented safe diagnostic (no optics change)
 
@@ -28,9 +30,11 @@ The current focus `src/hooks_uiscaling.cpp` writes a sampled `VR RIVAL A22 CURRE
 
 Interpret with `registeredDelta`:
 
-- `tailChanges=0`, `rootChanges=0`, `registeredDelta=0`: points strongly to deferred animation source (neither prior nor current wrapper observes a new queue node at exact 0xBB796 return).
+- `tailChanges=0`, `rootChanges=0`, `registeredDelta=0`: no new queued nodes were published at this exact 0xBB796 call. It may be deferred animation **or an immediate native D3DX draw**; check the direct-batch probe below before inferring one.
 - `tailChanges>0`, `registeredDelta=0`: the live queue changed, so current strict owner proof rejected registration; discriminate stable versus replaced root before selecting a bounded safe fallback.
 - `registeredDelta>0`, but Quest marker remains flat: downstream semantic consumption/projection or deferred renderer ownership is likely lost, not this source queue publisher.
+
+A second sampled line, `VR RIVAL DIRECT D3DX GOAL-GATE PROBE`, records whether an exact rival producer has `batchActive=1`, `pendingDraws>0`, matching D3DX sprite, and the physical recorded `batchProducer/batchScope`. If the pending batch is genuinely `RIVAL_MARKER_SPRANI` under `PROJECTED_WORLD_MARKER_2D`, then the GOAL exit whitelist is demonstrably the wrong submission gate and warrants a strictly rival-specific gate (without changing GOAL/other HUD). If no batch is tracked, a new flush would do nothing: find the deferred original animated sprite output instead.
 
 ## Contract and next action
 
