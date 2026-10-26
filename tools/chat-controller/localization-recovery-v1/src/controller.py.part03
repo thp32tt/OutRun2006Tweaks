@@ -1,3 +1,5 @@
+
+
 class StatusHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
