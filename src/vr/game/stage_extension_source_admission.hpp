@@ -7,6 +7,15 @@
 // queue/render mode changes while the original game call is executing.
 namespace OutRunVR::StageExtension
 {
+    struct LiveSource final
+    {
+        bool vr;
+        bool outsideQueue;
+        std::uint64_t epoch;
+    };
+
+    // The installed +TIME entry hook uses this same callback-based gate:
+    // a native D3DX flush may reenter the game queue before it returns.
     struct SourceAdmission final
     {
         bool vrAtEntry = false;
@@ -26,7 +35,27 @@ namespace OutRunVR::StageExtension
             return mayBeginDirect() && vrAtLeave && outsideQueueAtLeave &&
                 queueEpochAtLeave == queueEpochAtEntry;
         }
+
+        template<class Drain, class ReadLive>
+        constexpr bool admitAfterDrain(Drain drain, ReadLive readLive) const
+        {
+            if (!mayBeginDirect())
+                return false;
+            drain();
+            const LiveSource now = readLive();
+            return mayPublish(now.vr, now.outsideQueue, now.epoch);
+        }
     };
+
+    // Ticket of a previously completed homogeneous batch must survive an
+    // unrelated later source's queue epoch. Zero has no direct source proof.
+    constexpr bool AllowDirectBatchTicket(
+        std::uint64_t batchTicket, std::uint64_t liveTicket,
+        bool liveSourceAdmitted) noexcept
+    {
+        return batchTicket != 0 &&
+            (batchTicket != liveTicket || liveSourceAdmitted);
+    }
 
     namespace Regression
     {
@@ -43,5 +72,39 @@ namespace OutRunVR::StageExtension
             "Queue reentry during source exit must keep native ownership");
         static_assert(SourceAdmission{true, true, 9}.mayPublish(true, true, 9));
         static_assert(!SourceAdmission{true, true, 9}.mayPublish(true, true, 10));
+
+        // Entry, pre-entry native Flush callback, and source-exit/physical
+        // submission all exercise the same policy used by the real hooks.
+        constexpr auto StableDrain = [] {
+            std::uint64_t epoch = 9;
+            const SourceAdmission source{true, true, epoch};
+            return source.admitAfterDrain(
+                [&] {}, [&] { return LiveSource{true, true, epoch}; }) &&
+                AllowDirectBatchTicket(77, 77,
+                    source.mayPublish(true, true, epoch));
+        };
+        constexpr auto ChangedAtDrain = [] {
+            std::uint64_t epoch = 9;
+            const SourceAdmission source{true, true, epoch};
+            return source.admitAfterDrain(
+                [&] { ++epoch; }, // native Flush reentered the queue
+                [&] { return LiveSource{true, true, epoch}; });
+        };
+        constexpr auto ChangedDuringSource = [] {
+            std::uint64_t epoch = 9;
+            const SourceAdmission source{true, true, epoch};
+            const bool admitted = source.admitAfterDrain(
+                [&] {}, [&] { return LiveSource{true, true, epoch}; });
+            ++epoch; // native +TIME call reentered after admission
+            return admitted && AllowDirectBatchTicket(
+                77, 77, source.mayPublish(true, true, epoch));
+        };
+        static_assert(StableDrain());
+        static_assert(!ChangedAtDrain());
+        static_assert(!ChangedDuringSource());
+        static_assert(AllowDirectBatchTicket(76, 77, false),
+            "Prior completed delayed batch must keep its proven ownership");
+        static_assert(!AllowDirectBatchTicket(77, 77, false));
+        static_assert(!AllowDirectBatchTicket(0, 77, true));
     }
 }
