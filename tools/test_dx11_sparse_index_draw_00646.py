@@ -56,7 +56,9 @@ assert "kMaxNativeGameVertices == kMaxNativeGamePrimitives * 3u" in probe
 assert "const auto limit = kind == 5u" in probe
 assert "kMaxNativeGameStripPrimitives : kMaxNativeGamePrimitives" in probe
 assert "game_native_primitive_element_count(kind, limit + 1u, elements)" in probe
-assert "game_native_primitive_element_count(5u, kMaxNativeGamePrimitives + 1u, elements)" in probe
+# Source wraps the positive assert argument across two lines. Validate
+# the exact original D3D9 strip boundary values, not its whitespace layout.
+assert "5u, kMaxNativeGamePrimitives + 1u, elements)" in probe
 assert "game_native_primitive_element_count(5u, kMaxNativeGameStripPrimitives, elements)" in probe
 assert "kMaxNativeGameStripPrimitives = 4096u" in span
 assert "primitiveCount > kMaxNativeGameStripPrimitives" in span
