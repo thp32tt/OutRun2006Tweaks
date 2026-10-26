@@ -21,9 +21,9 @@ def patch(source):
     if MARKER in source:return source
     if "# OUTRUN_C1_SLOT_V2" not in source:raise ValueError("GPT OCR patch must run after C1 patch")
     s=source
-    old_import='from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool\n'
+    old_import='from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool, clear_attachment_previews\n'
     new_import=(
-      'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool, send_analysis_message_with_attachment\n'
+      'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool, clear_attachment_previews, send_analysis_message_with_attachment\n'
       'from app.gpt_vision_chat_ocr import next_binding as gpt_ocr_next_binding, stage_submission as gpt_ocr_stage_submission, rollback_submission as gpt_ocr_rollback_submission, record_chat_url as gpt_ocr_record_chat_url, active_task as gpt_ocr_active_task, apply_response as gpt_ocr_apply_response, summary as gpt_ocr_summary, recover_stale_active as gpt_ocr_recover_stale_active\n'
     )
     s=replace_once(s,old_import,new_import,"imports")
