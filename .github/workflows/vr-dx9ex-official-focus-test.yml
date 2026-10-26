@@ -10,12 +10,19 @@ on:
     branches:
       - vr-d3d9ex-focus
       - vr-d3d9ex-abc-c-goal-emptyroot-20261026
+      - vr-d3d9ex-d-logfix-20261026
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
       - 'tools/Run-FocusOfficialTest.ps1'
       - 'tools/verify_focus_official_diagnostics.py'
       - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py'
       - 'src/hooks_uiscaling.cpp'
+      - 'src/hooks_misc.cpp'
+      - 'src/vr/d3d9/ex_device_upgrade.cpp'
+      - 'src/vr/settings.cpp'
+      - 'OutRun2006Tweaks.ini'
+      - 'tools/verify_vr_menu_resolution_split.py'
+      - 'tools/verify_vr_d_logfix_20261026.py'
       - 'src/vr/game/hud_command_batch.hpp'
       - 'src/vr/game/stage_extension_source_admission.hpp'
       - 'src/vr/game/goal_progress_source_admission.hpp'
@@ -67,6 +74,12 @@ jobs:
         run: |
           python tools/verify_vr_abc_goal_c.py
           if ($LASTEXITCODE -ne 0) { throw 'ABC C GOAL source fallback contract failed' }
+
+      - name: Verify Quest DEBUG log-derived source fixes
+        shell: pwsh
+        run: |
+          python tools/verify_vr_d_logfix_20261026.py
+          if ($LASTEXITCODE -ne 0) { throw 'Quest D log-derived source contract failed' }
 
       - name: Configure Win32 R26+HUD
         shell: pwsh
@@ -149,7 +162,7 @@ jobs:
             # repair duplicate keys only in one packaging workflow.
             Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
             $env:OFFICIAL_PACKAGE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
-            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False; assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getint("VR","AntiAliasing") == 2'
+            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False; assert p.getboolean("VR","RivalDx11NativeRoute") is True; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getboolean("VR","MirrorPreserveAspect") is False; assert p.getint("VR","AntiAliasing") == 2'
             if ($LASTEXITCODE -ne 0) { throw 'Packaged INI strict parse failed' }
             Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
             Copy-Item tools/START_FOCUS_OFFICIAL_TEST.cmd "$dir/START_HERE.cmd"
