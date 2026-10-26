@@ -20,10 +20,17 @@ checks={
     "chunkInstances, instanceSteps, unpacked, instance" in bridge,
 "instance rate and indexed GPU draw": "std::array<std::uint32_t,16> instanceSteps{};" in bridge and
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge,
-"16 stream IA consumer": assembly.count("const std::array<GameSm3StreamView,16>& streams")==4 and
-    # Original instance/fan helpers plus the new indexed source-window
-    # assembler MUST all bind complete original game stream slots.
+"16 stream IA consumer": assembly.count("const std::array<GameSm3StreamView,16>& streams")>=5 and
+    # Every original instance/fan, indexed-window and indexed-fan assembler
+    # uses the full 16-slot live D3D9 view instead of dropping stream 1..15.
+    # Adding one source-backed helper must not invalidate older negative tests.
     "game_sm3_assemble_indexed_window(" in assembly and
+    "game_sm3_assemble_indexed_fan_window(" in assembly and
+    "selected.push_back(indices[0u]);" in assembly and
+    "selected.push_back(indices[firstRim + i - 1u]);" in assembly and
+    "return game_sm3_assemble_indexed_window(" in assembly and
+    "game_sm3_copy_native_indexed_fan_window(" in assembly and
+    "indices[v ? firstRim + v - 1u : 0u] >= sourceVertices" in assembly and
     "indices[firstIndex+v] >= stream.vertexCount" in assembly and
     "output.swap(staged)" in assembly and
     "game_sm3_assemble_fan_window(" in assembly and
