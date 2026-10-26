@@ -44,6 +44,9 @@ class FakePage:
         return FakeLocator(selector, self, 1 if selector == self.accepted_selector else 0)
 
     async def evaluate(self, expression):
+        if "buttons.forEach" in expression:
+            self.events.append(("clear",))
+            return 0
         self.events.append(("snapshot",))
         return {"ready": 0, "loading": 0}
 
@@ -57,6 +60,12 @@ class FakePage:
 
 
 class AttachmentDomFallbackTests(unittest.IsolatedAsyncioTestCase):
+    async def test_stale_attachment_cleanup_is_fail_closed_before_tool_selection(self):
+        page = FakePage('input[type="file"][aria-label="Attach files"]')
+        result = await MOD.clear_attachment_previews(page)
+        self.assertEqual(result, "COMPOSER_ATTACHMENTS_CLEAR")
+        self.assertIn(("clear",), page.events)
+
     async def test_single_png_accepts_modern_attach_photos_input(self):
         page = FakePage('input[type="file"][aria-label="Attach photos"]')
         result = await MOD.attach_png(page, {"path": "/tmp/roi.png"})
