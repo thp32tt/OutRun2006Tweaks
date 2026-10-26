@@ -132,13 +132,13 @@
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
       "DX11:SM3_NONINSTANCED_LINEAR_GPU_CHUNK_DRAW"
     ],
-    "full_gate_plan": "one_validation_bearing_exact_sha_after_confirmed_ci_repairs",
+    "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "VISIBLE_FRAME_OUTPUT_PENDING_RUNTIME"
+      "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_BUILD_VERIFIED; complete game menu/car/race, actual native published frames and Quest3 HMD UNTESTED.",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_BUILD_VERIFIED; complete game menu/car/race, actual native published frames and Quest3 HMD UNTESTED. Architecture integration token VISIBLE_FRAME_OUTPUT denotes source routing, not observed real-game output.",
     "activation_guard_and_fallback": "NativeDrawPathActive disabled unless explicit opt-in; original game D3D9Ex rendering, input/FFB/SkyGlow, frozen DXVK unchanged."
   },
   "mandatory_gate_results": [
