@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "kind": "ai2_dx11_rollover_recovery_checkpoint",
+  "capture_kst": "2026-10-26T18:56:09+09:00",
+  "task_id": "CONVERSION-DX11-01085",
+  "production_id": "CONVERSION-DX11-01085",
+  "event_id": "CONVERSION-DX11-01085-E003",
+  "event_type": "rollover",
+  "attempt": 2,
+  "chat_rollovers": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "source_implementation_sha": "f45b9ea3d817ea9ac7cfc6a8796f22edcba59a21",
+  "latest_target_head_at_capture": "74fe2239652250754cb0a8e470f7ea6ba6d5d41f",
+  "repaired_source_contract_commits": [
+    "d9f14df17caa666931a4e16f58ef23f1d60332e9",
+    "a19cf6e55a270da906913fcdc7672f877270fc5b",
+    "990fecfa5c2bab024453640be165ced9aa0748b3",
+    "74fe2239652250754cb0a8e470f7ea6ba6d5d41f"
+  ],
+  "mandatory_push_actions_at_capture": [
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40302596395,
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "74fe2239652250754cb0a8e470f7ea6ba6d5d41f",
+      "run_attempt": 1
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40302596447,
+      "status": "pending",
+      "conclusion": null,
+      "head_sha": "74fe2239652250754cb0a8e470f7ea6ba6d5d41f",
+      "run_attempt": 2
+    },
+    {
+      "name": "Build",
+      "run_id": 40302596382,
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "74fe2239652250754cb0a8e470f7ea6ba6d5d41f",
+      "run_attempt": 1
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40302596414,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "74fe2239652250754cb0a8e470f7ea6ba6d5d41f",
+      "run_attempt": 1
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40302596461,
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "74fe2239652250754cb0a8e470f7ea6ba6d5d41f",
+      "run_attempt": 1
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "duplicate_isolated_feature_branch": {
+    "name": "feature/dx11-01085-ci-01029-regression",
+    "sha": "cc11143440e51ca254081ab5d2d898ee415cadf5",
+    "status": "DIVERGED_DUPLICATE_DO_NOT_PROMOTE",
+    "ahead": 1,
+    "behind": 1,
+    "reason": "01029 equivalent stronger source regression was already independently repaired on target at 74fe223; no separate achievement or score."
+  },
+  "incomplete": [
+    "Required five distinct push Actions must conclude success at one validation-bearing source SHA",
+    "Check all CI outputs and artifact bundle after GitHub Actions complete",
+    "Write 01085 C6 run JSON on game target only after exact-SHA validation",
+    "Runtime game/HMD not executed; retain UNTESTED",
+    "Update ai-dev-lab scoreboard only on newly verified unique source achievement and exactly once"
+  ],
+  "next_action": "Re-read current target HEAD and docs/automation/runs/CONVERSION-DX11-01085.json before any edit. If 01085 C6 exists and feature CI is PASS, do not duplicate. Otherwise resolve only genuinely failing same-SHA CI, do not repeat 01029 duplicate or change source pointlessly; keep fail-closed opt-in native and DX9Ex fallback.",
+  "ai2_last_verified_score_at_capture": 1977,
+  "task_score_awarded_in_this_resume": 0
+}
