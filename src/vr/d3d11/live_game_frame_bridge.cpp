@@ -6523,18 +6523,21 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // One audited native submit site. Small indexed lists and connected
     // strips/fans merge safely; large indexed lists/strips/fans keep original
     // D3D9 IB + per-instance vertex bases and independent GPU Draw boundaries.
-    const UINT nativeSubmissionCount = nativeIndexedPointStripWindows
-        ? nativeIndexedPointStripPlan.windows : segmentedInstanceUpload
+    // Retain the established full native SM3 batch planner for all existing
+    // instanced/segmented submissions; the indexed POINT-strip variant is
+    // another source-authored window count inside its noninstanced arm.
+    const UINT nativeSubmissionCount = segmentedInstanceUpload
         ? (segmentedListPlan.grouped ? segmentedListPlan.batches :
            (segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount))
-        : (indexedConnectedChunkUpload ? indexedConnectedChunkPlan.chunkCount :
+        : (nativeIndexedPointStripWindows ? nativeIndexedPointStripPlan.windows :
+           (indexedConnectedChunkUpload ? indexedConnectedChunkPlan.chunkCount :
            (indexedChunkUpload ? indexedChunkPlan.chunkCount :
            (linearChunkUpload ? linearChunkPlan.chunkCount :
            (connectedChunkUpload ? connectedChunkPlan.chunkCount :
            (fanChunkUpload ? fanChunkPlan.chunkCount :
            (compactListInstances
             ? 1u : (listCandidate ? listSubmission.drawCount :
-                (connectedCandidate ? connectedSubmission.drawCount : instanceCount))))))));
+                (connectedCandidate ? connectedSubmission.drawCount : instanceCount)))))))));
     const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
     // One audited submit site for the original game Draw; grouped lists keep
