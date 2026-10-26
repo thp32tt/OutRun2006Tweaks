@@ -325,7 +325,14 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "accepts_full_seeded(ordinal, matchesClearedBackbuffer);" in batch_source and
             "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in code and
             "kMaxFullFrameDraws = 4096u" in batch_source and
-            "if (s.frameBatch.first_draw()) {" in code and
+            # 01094: a single game-authored source Draw may emit several
+            # native indexed polygon GPU windows. Only its FIRST window
+            # seeds game color/depth; later DrawIndexed calls must accumulate
+            # without resetting the target before source-ordinal commit.
+            "if (initializeFrame && s.frameBatch.first_draw()) {" in code and
+            "bool initializeFrame = true) noexcept" in code and
+            "first == 0u)) {" in code and
+            "if (!success) {" in code and
             "s.backend.begin_frame(env_full_game_opt_in()" in code and
             "s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)" in code and
             ": kBackground);" in code and
