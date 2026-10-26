@@ -48,6 +48,7 @@ A second sampled line, `VR RIVAL DIRECT D3DX GOAL-GATE PROBE`, records whether a
 - `VR RIVAL ACTUAL D3DX DRAW` and `VR RIVAL D3DX DRAW RETURN` report whether the physical native D3DX API is entered in an exact rival source scope.
 - `VR RIVAL NATIVE GPU FLUSH SINK` and `VR RIVAL NATIVE GPU END SINK` indicate whether a homogeneous exact rival batch reaches physical native submission after the original source exits, and whether the existing restore guard rejected it.
 - `VR RIVAL DIRECT D3DX GOAL-GATE PROBE` correlates the direct source-exit (GOAL-only) Flush rejection.
+- `VR RIVAL R30 GPU ENTRY` / `GPU CLASS` / `GPU REJECT` / `GPU EYES` are sampled at the actual R30 physical DrawPrimitive/DrawIndexed path. They distinguish a lost physical producer, a non-projected render class, raw eye-WVP failure, and successful separate left/right GPU submissions. These counters are rival-only, unlike prior global `R57Projected*` telemetry.
 - All rows are sampled first 8 and powers of two; D3DX draw/Flush/End call path remains the **same**. No additional Flush was granted. No visual PASS claimed.
 
 ### Decision table after one Quest DEBUG run
@@ -59,7 +60,10 @@ A second sampled line, `VR RIVAL DIRECT D3DX GOAL-GATE PROBE`, records whether a
 | `pendingDraws>0`, `batchScope=PROJECTED_WORLD_MARKER_2D`, `restore=0` | Exact rival producer deferred and current result-only restore intentionally rejects it | Separate bounded rival restore predicate with game sprite+homogeneous+queue-negative checks |
 | `tailChanges>0`, no registrations | Strict current root/tail ownership rejected an appended queue | Recover exact new nodes only with bounded current-chain proof |
 | No actual Draw, no queue delta | This original E8 can schedule later animation; need *later native render* identity | Trace animation queue consumer, do not force GOAL Flush |
-| `registeredDelta>0` with both-eyes zero | Downstream R30 physical submission or WVP/raster gate, not source tagging | Per-rival physical eye trace |
+| `registeredDelta>0` with no `R30 GPU ENTRY` | Source tags exist, physical raster lost its rival token or uses a different draw API | Check the actual queue/select producer and D3DX Flush/End ownership |
+| `R30 GPU ENTRY` but `GPU CLASS` not projected | Physical command saw the rival token but did not inherit valid projected marker scope | Trace current SpriteNode semantic or exact source scope |
+| `R30 GPU CLASS` projected but `GPU REJECT` | WVP or pose provenance failed, after source ownership succeeded | Inspect recent raw c64 and R57 projected eye derivation |
+| `R30 GPU EYES` both HRESULT success, yet flat | GPU issued two eye draws; projection/delta/eye target content may still be wrong | Compare L/R eye constants, game anchor and actual captured images |
 
 ## Contract and next action
 
