@@ -85,7 +85,7 @@ jobs:
         shell: pwsh
         run: |
           $short = $env:GITHUB_SHA.Substring(0,12)
-          $dir = "OutRun2_VR_R26_XR_UI_SPLIT_VISUAL_RECOVERY_TEST_$short"
+          $dir = "OutRun2_VR_R26_VISUAL_OWNER_REPAIR_AA2_TEST_$short"
           New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (-not $dll) { throw 'dinput8.dll missing' }
@@ -100,11 +100,11 @@ jobs:
           Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
           Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
           Copy-Item tools/Run-DX9ExFocusTest.ps1 "$dir/Run-DX9ExFocusTest.ps1"
-          Set-Content "$dir/DX9EX_VARIANT.txt" 'variant=R26_XR_UI_SPLIT_VISUAL_RECOVERY_TEST' -Encoding ascii
+          Set-Content "$dir/DX9EX_VARIANT.txt" 'variant=R26_VISUAL_OWNER_REPAIR_AA2_TEST' -Encoding ascii
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
           @(
             'DX9Ex R26 + HUD user test build'
-            'Targets: OpenXR/VDXR physical render target + independent 4:3 menu / 1920x1080 HUD / F11 / rival / +TIME / GOAL final graph / lens flare'
+            'Targets: AA2 + OpenXR render/UI split + rival current-chain / +TIME exact-owner / GOAL exact-parent / lens centre-eye fusion'
             'Renderer: R26+HUD default'
             'VR physical target: OpenXR/VDXR recommended eye extent (desktop-independent)'
             'Gameplay HUD reference: 1920x1080 widescreen, HudScale=0.55'
@@ -117,12 +117,12 @@ jobs:
             '1. Extract ALL files directly into the folder containing OR2006C2C.EXE.'
             '2. Double-click RUN_DX9EX_TEST.cmd.'
             '3. Do NOT run outrun-vr-host.exe directly. It is a VR helper process and a white helper window is not the game.'
-            '4. Confirm VR render quality does NOT follow desktop resolution; test title/F11, in-race F11, HUD edge positions, rival, +TIME, GOAL/final graph and lens flare; then exit normally.'
-            '5. Upload DX9EX_LOGS/DX9EX_LOG_R26_XR_UI_SPLIT_VISUAL_RECOVERY_TEST_*.zip if a defect remains.'
+            '4. Confirm XR render quality is desktop-independent, then test rival depth, +TIME, GOAL rising/final graph separately, and lens flare centre/outer discs; then exit normally.'
+            '5. Upload DX9EX_LOGS/DX9EX_LOG_R26_VISUAL_OWNER_REPAIR_AA2_TEST_*.zip if a defect remains.'
           ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
           @(
             'DX9Ex R26 + HUD user test build'
-            'Targets: XR render target + independent UI/F11/HUD/rival/+TIME/GOAL/lens recovery'
+            'Targets: XR/UI + AA2 + rival/+TIME/GOAL/lens exact-owner recovery'
             'Renderer: R26+HUD default'
             'Runner: GitHub-hosted windows-2022'
             'Launcher: RUN_DX9EX_TEST.cmd'
@@ -139,6 +139,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-XR-UI-SPLIT-VISUAL-RECOVERY-TEST-${{ github.sha }}
-          path: OutRun2_VR_R26_XR_UI_SPLIT_VISUAL_RECOVERY_TEST_*.zip
+          name: OutRun2-VR-R26-VISUAL-OWNER-REPAIR-AA2-TEST-${{ github.sha }}
+          path: OutRun2_VR_R26_VISUAL_OWNER_REPAIR_AA2_TEST_*.zip
           if-no-files-found: error

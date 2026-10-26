@@ -39,12 +39,13 @@ assert 'ResultProgressFullParentCallA = 0x98924' in ui
 assert 'ResultProgressFullParentCallB = 0x992AC' in ui
 assert 'ResultProgressFullParentTarget = 0x979E0' in ui
 assert 'nullptr, &rootsBefore, entrySerial, true);' in ui
+assert 'nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial,\n                true);' in ui
 assert ui.count('if (self && self == submission.sprite)') >= 2
 assert 'ordinal == 2' in gfx
 assert 'VR LENS 570008 CENTER GLOW HIDDEN:' in gfx
 assert 'ProducerToken::None);' in gfx
 assert 'VR R69 FLARE FUSION:' in r30
-print('PASS R26 XR-render/UI-split + F11/HUD/rival/GOAL/lens recovery source contract; HMD UNTESTED')
+print('PASS R26 XR/UI + AA2 + rival/+TIME/GOAL/lens exact-owner recovery source contract; HMD UNTESTED')
 
 # Compile-shape guards for the XR/UI split source owner.
 assert 'Hookclass CommandLineArguments' not in misc

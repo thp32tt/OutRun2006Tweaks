@@ -1842,10 +1842,16 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::SpriteQueueDepth == 0,
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
         {
+            // These five REA-proven +TIME parents are exact source owners.
+            // Like the verified rival/full-result producers, the native call
+            // may rebuild a priority root while retaining the old tail. Admit
+            // only the old-tail -> current-terminal chain; nested newer exact
+            // tags remain protected by StageExtensionEntrySerial.
             TagAppendedNodes(StageExtensionBefore,
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 OutRunVR::GameSemantic::ProducerToken::StageExtensionTime,
-                nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial);
+                nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial,
+                true);
             FlushD3DXAtDirectStageSourceExit();
         }
         // Always restore the exact direct-draw queue cursor/anchor even if
