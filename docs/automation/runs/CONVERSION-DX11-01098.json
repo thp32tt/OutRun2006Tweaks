@@ -11,19 +11,21 @@
   "classification": "A_LIVE_GAME_POINT_LINE_SOURCE_FULL_NATIVE_GPU_DRAW",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:FULL_WIDTH_GAME_POINT_LINE_SOURCE_TO_NATIVE_GPU_DRAW",
-  "status": "IN_PROGRESS_CI_VALIDATION",
-  "checkpoint": "C3_CAUSAL_GATE_REPAIR",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "source_base_sha": "11834825b64a5ffac2289483791b9d4cb44aa16e",
   "source_change_sha": "b3c147dbffe72d6e2a4be026f6addc93077cbc61",
   "material_result_sha": "b3c147dbffe72d6e2a4be026f6addc93077cbc61",
-  "validation_bearing_result_sha": null,
-  "result_sha": "b3c147dbffe72d6e2a4be026f6addc93077cbc61",
+  "validation_bearing_result_sha": "ac759d27506675562e5f49051da65b33010c0114",
+  "result_sha": "ac759d27506675562e5f49051da65b33010c0114",
   "implementation_commits": [
     "b3c147dbffe72d6e2a4be026f6addc93077cbc61"
   ],
-  "repair_commits": [],
+  "repair_commits": [
+    "ac759d27506675562e5f49051da65b33010c0114"
+  ],
   "changed_files": [
     "src/vr/d3d11/live_game_primitive_span.hpp",
     "tools/dx11_game_primitive_span_probe.cpp",
@@ -89,51 +91,109 @@
   },
   "acceptance_results": {
     "full_source_native_points_lines": {
-      "status": "PENDING_GATE",
+      "status": "PASS_BUILD",
       "evidence_paths": [
         "src/vr/d3d11/live_game_primitive_span.hpp",
-        "tools/dx11_game_primitive_span_probe.cpp"
+        "tools/dx11_game_primitive_span_probe.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
       ],
-      "validation_command": "DX11 Fast Structural Checks awaiting causal record repair"
+      "validation_command": "DX11 Fast Structural Checks 40414455494 completed/success on exact ac759d27506675562e5f49051da65b33010c0114; original real game source admission and existing FVF/SM3 Draw graph statically/compiled checked, runtime pixels not tested"
     },
     "source_budget_and_fallback": {
-      "status": "PENDING_GATE",
+      "status": "PASS_BUILD",
       "evidence_paths": [
+        "src/vr/d3d11/live_game_primitive_span.hpp",
         "tools/test_dx11_sparse_index_draw_00646.py",
         "src/vr/d3d9/stereo_renderer_r30.cpp"
       ],
-      "validation_command": "Existing Fast/Backend negative controls unchanged"
+      "validation_command": "DX11 Fast 40414455494 and Backend 40414455186 both completed/success at exact ac759d27506675562e5f49051da65b33010c0114, strict cap+1 negative/unchanged span, source-ordinal and R30 fallback preserved"
     },
     "five_required_gates_exact_sha": {
-      "status": "PENDING_GATE",
+      "status": "PASS_EXACT_SHA",
       "evidence_paths": [
-        ".github/workflows/dx11-fast-structural.yml"
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455494",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455186",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455073",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455019",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455237"
       ],
-      "validation_command": "Final exact-SHA full five push gate validation pending"
+      "validation_command": "Five mandatory GitHub push workflows all completed/success on exact ac759d27506675562e5f49051da65b33010c0114: DX11 Fast Structural Checks 40414455494; Backend Conversion Gate 40414455186; Build 40414455073; OpenXR VR architecture 40414455019; OutRun EXE HUD Inspector CI 40414455237"
     }
   },
   "pipeline": {
     "C0_RECOVER": "PASS GitHub HEAD and 01097 C6 read; no conflicting 01098 claim",
     "C1_SCOPE": "PASS original game point and line captures unnecessarily restricted to 2048 primitives despite 6144 source/IA budget",
     "C2_IMPLEMENT": "PASS new real C++ primitive source limits committed b3c147dbffe72d6e2a4be026f6addc93077cbc61",
-    "C3_VALIDATE": "FAST GATE FAIL 40414176336 was inherited invalid 01097 latest-run JSON: missing batch_components, acceptance_proof and conflict_keys; THIS 01098 valid run record is same-task causal repair, not extra feature",
-    "C4_COMMIT": "PASS original source implementation b3c147dbffe72d6e2a4be026f6addc93077cbc61; next SHA validation-bearing after record repair",
-    "C5_PACKAGE": "NOT_READY",
-    "C6_STATE": "PENDING exact 5 GitHub Actions"
+    "C3_VALIDATE": "PASS_EXACT_SHA five required push GitHub Actions at ac759d27506675562e5f49051da65b33010c0114; original first Fast failure 40414176336 repaired under same TASK_ID, without disabling policies",
+    "C4_COMMIT": "PASS source implementation b3c147dbffe72d6e2a4be026f6addc93077cbc61, same-TASK causal CI record repair ac759d27506675562e5f49051da65b33010c0114; exact SHA ac759d27506675562e5f49051da65b33010c0114 retains every required Gate",
+    "C5_PACKAGE": "NOT_REQUIRED: no new user release requested or Quest3/hardware validation performed.",
+    "C6_STATE": "PASS bookkeeping-only after exact-SHA five push Gates; no CI repeat, source result ac759d27506675562e5f49051da65b33010c0114"
   },
-  "mandatory_gate_results": [],
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40414455494,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "ac759d27506675562e5f49051da65b33010c0114",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455494"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40414455186,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "ac759d27506675562e5f49051da65b33010c0114",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455186"
+    },
+    {
+      "name": "Build",
+      "run_id": 40414455073,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "ac759d27506675562e5f49051da65b33010c0114",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455073"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40414455019,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "ac759d27506675562e5f49051da65b33010c0114",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455019"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40414455237,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "ac759d27506675562e5f49051da65b33010c0114",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40414455237"
+    }
+  ],
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "score_change": 0,
-  "ai2_previous_confirmed_cumulative_score": 1996,
-  "ai2_new_confirmed_cumulative_score": 1996,
+  "ai2_previous_confirmed_cumulative_score": 1997,
+  "ai2_new_confirmed_cumulative_score": 1997,
   "scoreboard_ssot_repo": "thp32tt/ai-dev-lab",
   "ci_repair_reason": "Actual Fast Gate 40414176336: previous 01097 record is latest and lacks 3 required policy fields; writing current 01098 truthful, complete integration-first run record makes --check-latest validate current source feature without modifying old 01097 scoreboard/C6.",
-  "next_implementation_action": "Validate final exact-SHA five push CI; fix only proven failures under same TASK_ID. Real game/HMD remains UNTESTED.",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "next_implementation_action": "Next independent game-frame source feature selected by controller only after this C6; maintain native-only DX11 priority, DX9Ex fallback, DXVK frozen, real HMD runtime evidence separate.",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "terminal_gameplay_verified": false
+  "terminal_gameplay_verified": false,
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "ac759d27506675562e5f49051da65b33010c0114",
+  "c6_does_not_revalidate_source": true,
+  "scoreboard_verified_commit": "de8acecabb616f7bdfcf925f28694d813cda5d5b",
+  "score_note": "Prior independent material implementation + exact five-Gate score recorded ONCE in GitHub SSOT de8acecabb616f7bdfcf925f28694d813cda5d5b: 1996 +1 = 1997. This later C6/checkpoint commit is +0.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: original game, visible menu/car/race images, Quest3/VDXR stereo, native draw/published frame counters, FPS and gamepad in headset were not run."
 }
