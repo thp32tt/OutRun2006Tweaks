@@ -61,7 +61,7 @@ for token in ("referenced[declaration[i].Stream] = true",
               "GetStreamSourceFreq(slot, &frequency)",
               "frequency != 1u", "extra->extra[slot - 1u].vertexCount < vertexCount",
               "static_cast<std::uint8_t>(declaration[i].Stream)",
-              "elements, streams, vertexCount, unpacked)"):
+              "elements, streams, firstChunkVertices, unpacked)"):
     require(token in p, "missing multistream VB/IB native admission " + token)
 # The C2397 repair narrows only after exact source bounds validation.
 # The game supports all sixteen D3D9 streams; stream 16 remains rejected.
@@ -69,7 +69,8 @@ require("in.Stream >= 16u" in layout and
         "static_cast<std::uint8_t>(declaration[i].Stream)" in p,
         "multistream narrowing requires exact validated D3D9 stream bounds")
 assembly = (ROOT / "src/vr/d3d11/live_game_sm3_stream_assembly.hpp").read_text()
-for token in ("game_sm3_decl_width(e.type)", "src.vertexCount < count",
+for token in ("game_sm3_decl_width(e.type)", "firstVertex > src.vertexCount",
+              "count > src.vertexCount - firstVertex",
               "e.offset, decoded", "destination.swap(candidate)",
               "catch (...) { return false; }"):
     require(token in assembly, "missing safe SM3 VB stream assembly " + token)

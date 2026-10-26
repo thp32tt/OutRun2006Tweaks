@@ -6389,7 +6389,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                     return false;
                 }
             }
-            context->Draw(drawCount, 0u);
+            // Keep all source-authored GPU submissions inside the audited
+            // Draw/DrawIndexed dispatch; no third unguarded Draw callsite.
+            issueNativeGameDraw(drawCount, 0u);
             continue;
         }
         if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {

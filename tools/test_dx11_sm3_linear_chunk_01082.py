@@ -15,7 +15,7 @@ for token in (
     "instanceElements, instanceStreams, drawCount,",
     "unpacked, firstVertex",
     "upload_full_game_stream(",
-    "context->Draw(drawCount, 0u);",
+    "issueNativeGameDraw(drawCount, 0u);",
     "s.frameBatch.abort();",
 ):
     assert token in live, token
