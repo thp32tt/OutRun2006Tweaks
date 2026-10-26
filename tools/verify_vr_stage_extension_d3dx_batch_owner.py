@@ -599,6 +599,20 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "FlushD3DXAtDirectStageSourceExit();" in pre and
          "StageExtensionDirectDrawOwner.reset();" in pre,
          "direct +TIME Begin/exit must split and restore owner")
+    entry = scope(pre, "static void StageExtensionEnter(safetyhook::Context&)",
+                  "static void StageExtensionLeave(safetyhook::Context&)")
+    leave = scope(pre, "static void StageExtensionLeave(safetyhook::Context&)",
+                  "// The original GOAL animations")
+    need("StageExtensionAdmission.admitAfterDrain(" in entry and
+         "FlushD3DXBeforeDirectStageSource();" in entry and
+         entry.index("admitAfterDrain(") <
+         entry.index("StageExtensionDirectDrawOwner.emplace(") and
+         "StageTimeLiveTicket = StageTimeTicketSerial;" in entry and
+         "const bool admitted = sourceTicket != 0 &&" in leave and
+         "RevokeD3DXDirectStageTicket(sourceTicket);" in leave and
+         leave.index("RevokeD3DXDirectStageTicket(sourceTicket);") <
+         leave.index("StageExtensionDirectDrawOwner.reset();"),
+         "installed original E8 entry/exit must reject changed epoch before GPU owner")
     need("ProducerToken::ResultProgress" in pre and
          "ProducerToken::GoalTime020" in pre and
          "ProducerToken::GoalTime150" in pre and
@@ -653,6 +667,12 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "homogeneous = false;" in ledger_draw and "++drawCount;" in ledger_draw and
          "std::numeric_limits<unsigned>::max" in ledger_draw,
          "Ledger must quarantine mixed token, direct/queue and distinct node/epoch Draws")
+    need("stageSourceTicket != directStageTicket" in ledger_draw and
+         "stageSourceTicket = newProducer == Producer::StageExtensionTime" in ledger_draw and
+         "stageSourceTicket = 0;" in ledger_forget and
+         "revokeDirectStageTicket(" in ledger_forget and
+         "stageSourceTicket == ticket" in ledger_forget,
+         "Ledger must quarantine changed +TIME E8 tickets and revoke only rejected ticket")
     need("drawCount = 0;" in ledger_forget and "homogeneous = true;" in ledger_forget and
          "scope = Scope::None;" in ledger_forget and "producer = Producer::None;" in ledger_forget,
          "Ledger forget must withdraw old source, not silently promote it")
@@ -676,6 +696,13 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          flush.index("if (self && self == submission.sprite)") <
          flush.index("HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));"),
          "native Flush must retire only matching exact batch generation")
+    need("StageTicketAllowsSubmission()" in flush and
+         flush.index("StageTicketAllowsSubmission()") <
+         flush.index("Flush_hk.stdcall<HRESULT>(self)") and
+         "StageTicketAllowsSubmission()" in end and
+         end.index("StageTicketAllowsSubmission()") <
+         end.index("End_hk.stdcall<HRESULT>(self)"),
+         "physical native Flush/End must reject live invalid +TIME source ticket")
     need("CanRestoreDeferredResultOwner(" in end and
          "ScopedExactProducerSemantic owned(" in end and
          "HudBatch.provenDirectB9200 && !HudBatch.queued" in end and
@@ -731,7 +758,9 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "HudBatch.completeNativeDraw(" in draw and
          "submission, SUCCEEDED(hr), scope, source," in draw and
          "sameSourceAfterNative, command.queued," in draw and
-         "command.queueNode, command.queueEpoch,\n                provenDirectB9200))" in draw and
+         "command.queueNode, command.queueEpoch,\n                provenDirectB9200,\n" in draw and
+         "source == ProducerToken::StageExtensionTime && !command.queued" in draw and
+         "? StageTimeLiveTicket : 0))" in draw and
          "source == ProducerToken::ResultTextB9200 &&\n            (exactB9200Direct || OriginalB9200GoalStackActive());" in draw and
          "if (FAILED(hr) || !self)" in draw and
          draw.index("const auto command = CapturePhysicalDrawCommand();") <
@@ -819,7 +848,7 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "if (!cleanInternalFlush)" in cd and
          "onFlushFailure();" in cd and
          "recordDraw(drawScope, drawProducer," in cd and
-         "drawQueued, drawQueueNode, drawQueueEpoch,\n                exactDirectB9200Parent);" in cd and
+         "drawQueued, drawQueueNode, drawQueueEpoch,\n                exactDirectB9200Parent, directStageTicket);" in cd and
          cd.find("if (!succeeded || !sourceStillMatches)") < cd.find("if (!unchanged(previous))") <
          cd.find("if (!cleanInternalFlush)") <
          cd.rfind("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer,") and
