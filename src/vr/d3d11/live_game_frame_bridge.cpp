@@ -9146,7 +9146,7 @@ bool preserve_game_partial_target_clear(
         (flags & ~(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
                    D3DCLEAR_STENCIL)) != 0u ||
         (clearZ && !(z >= 0.0f && z <= 1.0f)) ||
-        count > GameNativeSourceMutation::kMaxPartialTargetClearRects ||
+        count > GameNativePreDrawFills::kMaxPreDrawTargetClearSourceRects ||
         (count != 0u && !rects)) return false;
     try {
         State& s = state();
@@ -9192,13 +9192,14 @@ bool preserve_game_partial_target_clear(
         // or car-select pixels. Record its viewport-clipped source rectangles
         // in the SAME ordered pre-Draw transaction as actual ColorFills.
         // Whole game Clears are new seeds and must use observe_game_clear.
-        // Reject Z/stencil, foreign, unowned and over-capacity commands
-        // without modifying any native GPU pixels or original D3D9 output.
+        // Preserve multi-rectangle source writes when their viewport-clipped
+        // ordered pixels fit the 16-tile transaction; unrepresentable writes
+        // and foreign owners still leave original D3D9 output authoritative.
         if (!clearZ && !clearStencil && sameBackbuffer &&
             s.sourceGameDevice == owner && !s.pending &&
             s.frameBatch.submitted == 0u && !s.frameBatch.stopped &&
             s.frameBatch.accepts_full(s.sourceDrawsThisFrame) &&
-            count <= GameNativePreDrawFills::kCapacity &&
+            count <= GameNativePreDrawFills::kMaxPreDrawTargetClearSourceRects &&
             !GameNativeClearCoverage::covers_whole(
                 backbufferDesc.Width, backbufferDesc.Height,
                 vp.X, vp.Y, vp.Width, vp.Height, count, rects)) {
@@ -9207,6 +9208,10 @@ bool preserve_game_partial_target_clear(
                 backbufferDesc.Width, backbufferDesc.Height,
                 vp.X, vp.Y, vp.Width, vp.Height, count, rects, color);
         }
+        // Post-Draw D3D11.1 ClearView still has a separate 32-region GPU
+        // budget. Never allocate/write it using the larger pre-Draw limit.
+        if (count > GameNativeSourceMutation::kMaxPartialTargetClearRects)
+            return false;
         if (!GameNativeSourceMutation::mirrors_partial_target_clear(
                 true, true, s.sourceGameDevice == owner, sameBackbuffer,
                 s.pending && !s.frameBatch.stopped &&

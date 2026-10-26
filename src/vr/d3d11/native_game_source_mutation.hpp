@@ -143,6 +143,9 @@ struct GameNativePreDrawFills {
         std::uint32_t argb{};
     };
     static constexpr std::uint32_t kCapacity = 16u;
+    // D3D9 source Clear rectangles may clip or overwrite into fewer replay
+    // tiles. Bound source processing separately from the 16 stored GPU tiles.
+    static constexpr std::uint32_t kMaxPreDrawTargetClearSourceRects = 128u;
     std::array<Fill, kCapacity> entries{};
     std::uintptr_t device{}, backbuffer{};
     std::uint32_t count{};
@@ -236,7 +239,8 @@ struct GameNativePreDrawFills {
         std::uint32_t rectCount, const Rect* rects,
         std::uint32_t color) noexcept {
         if (!currentDevice || !currentBackbuffer ||
-            rectCount > kCapacity || (rectCount && !rects) ||
+            rectCount > kMaxPreDrawTargetClearSourceRects ||
+            (rectCount && !rects) ||
             (count && !belongs_to(currentDevice, currentBackbuffer)))
             return false;
         // D3DRECT uses signed LONG. Cast before the conditional operator:

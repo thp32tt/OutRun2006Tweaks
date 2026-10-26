@@ -52,6 +52,16 @@ int main() {
         0xff123456u));
     paint(expected,2,0,32,16,0xff123456u);
     assert(replay(pending)==expected);
+    // The 24 authentic source writes reduce to one ordered opaque tile.
+    // A count above the storage limit must not discard a valid game Clear.
+    std::array<D3DRect,24> nested{};
+    for (std::size_t i=0;i<nested.size();++i)
+        nested[i]={0,0,static_cast<int>(i%12u+1u),5};
+    assert(pending.record_target_clear(
+        17u,19u,W,H,0,0,W,H,
+        static_cast<std::uint32_t>(nested.size()),nested.data(),0xffdead11u));
+    paint(expected,0,0,12,5,0xffdead11u);
+    assert(replay(pending)==expected);
     const auto prior=pending;
     const D3DRect bad[]={{1,2,4,8},{7,10,3,12}};
     assert(!pending.record_target_clear(
@@ -60,7 +70,7 @@ int main() {
     assert(!pending.record_target_clear(
         17u,20u,W,H,0,0,W,H,2,partial,0xff010203u));
     assert(!pending.record_target_clear(
-        17u,19u,W,H,0,0,W,H,17,partial,0xff010203u));
+        17u,19u,W,H,0,0,W,H,129u,partial,0xff010203u));
     assert(pending.count==prior.count && replay(pending)==replay(prior));
     // Entirely disjoint successful D3D9 Clear writes zero pixels.
     const D3DRect outside[]={{100,100,120,120}};
@@ -81,4 +91,14 @@ int main() {
         17u,19u,W,H,0,0,W,H,2,overflow,0xffabcdefu));
     assert(pending.count==15u && replay(pending)==replay(saved));
     assert(replay(pending)==expected);
+    // A bounded multi-rect Clear that needs 24 independent tiles must fail
+    // atomically with original game D3D9 pixels still authoritative.
+    pending.discard();
+    std::array<D3DRect,24> distinct{};
+    for (std::size_t i=0;i<distinct.size();++i)
+        distinct[i]={static_cast<int>(i),2,static_cast<int>(i+1u),3};
+    assert(!pending.record_target_clear(
+        17u,19u,W,H,0,0,W,H,
+        static_cast<std::uint32_t>(distinct.size()),distinct.data(),0xffaabbccu));
+    assert(pending.count==0u && replay(pending)==Frame{});
 }
