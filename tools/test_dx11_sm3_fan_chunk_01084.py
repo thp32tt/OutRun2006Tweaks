@@ -12,10 +12,18 @@ for token in (
     "game_sm3_assemble_fan_window(",
     "game_sm3_copy_native_fan_window(",
     "game_sm3_fan_window_indices(",
-    "context->DrawIndexed(static_cast<UINT>(fanIndices.size()), 0u, 0);",
+    # The same fan center/rim GPU windows now cover all three D3D9 fill
+    # modes. The validated count (not an unbounded whole-fan expansion)
+    # must drive native DrawIndexed, with point mode using POINTLIST.
+    "if (!fillWindow.supported) {",
+    "fanIndices.size() != fillWindow.nativeIndexCount",
+    "context->IASetPrimitiveTopology(pointFill",
+    "D3D11_PRIMITIVE_TOPOLOGY_POINTLIST",
+    "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+    "context->DrawIndexed(fillWindow.nativeIndexCount, 0u, 0);",
     "s.frameBatch.abort();",
-    "!sourceInstancing && !indices &&",
-    "!pointFill && !wireFill && type == D3DPT_TRIANGLEFAN",
+    "!sourceInstancing &&",
+    "type == D3DPT_TRIANGLEFAN",
 ):
     assert token in live, token
 assert "sourceVertices <= capacity" in header
