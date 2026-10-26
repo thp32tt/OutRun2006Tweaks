@@ -24,8 +24,14 @@ static_assert(!game_sm3_segmented_list_submission_plan(
     5u, false, false, kInstances, kChunk.instancesPerChunk, 0u, 1000000u).grouped);
 static_assert(!game_sm3_segmented_list_submission_plan(
     6u, true, false, kInstances, kChunk.instancesPerChunk, 6u, 1000000u).grouped);
-static_assert(!game_sm3_segmented_list_submission_plan(
+// A validated source TRIANGLELIST point-fill IB is the same exact
+// point-occurrence stream in each bounded native instance batch.
+static_assert(game_sm3_segmented_list_submission_plan(
     4u, true, true, kInstances, kChunk.instancesPerChunk, 6u, 1000000u).grouped);
+static_assert(!game_sm3_segmented_list_submission_plan(
+    4u, false, true, kInstances, kChunk.instancesPerChunk, 0u, 1000000u).grouped);
+static_assert(!game_sm3_segmented_list_submission_plan(
+    2u, true, true, kInstances, kChunk.instancesPerChunk, 6u, 1000000u).grouped);
 static_assert(!game_sm3_segmented_list_submission_plan(
     4u, true, false, kInstances, kChunk.instancesPerChunk, 90000u, 1000000u).grouped);
 static_assert(!game_sm3_segmented_list_submission_plan(

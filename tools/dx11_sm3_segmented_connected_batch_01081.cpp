@@ -55,12 +55,20 @@ int main() {
             type, bad.data(), 5u, 5u, 2u, 128u, expanded));
         assert(expanded == snapshot);
     }
-    // No false positive for point/wire fill, independent list, one chunk,
-    // inadequate index capacity, or arithmetic overflow.
+    // An authentic strip/fan triangle expansion now supports both POINT
+    // occurrence and wireframe batching without cross-instance seams.
+    for (const auto type : {5u, 6u}) {
+        assert(game_sm3_segmented_connected_submission_plan(
+            type, true, false, 5u, 5u, 8u, 3u, 128u).grouped);
+        assert(game_sm3_segmented_connected_submission_plan(
+            type, false, true, 5u, 5u, 8u, 3u, 128u).grouped);
+    }
+    // Unsupported line polygon fill, independent list, one chunk,
+    // inadequate IB capacity, and arithmetic overflow still fail closed.
     assert(!game_sm3_segmented_connected_submission_plan(
-        5u, true, false, 5u, 5u, 8u, 3u, 128u).grouped);
+        3u, true, false, 5u, 5u, 8u, 3u, 128u).grouped);
     assert(!game_sm3_segmented_connected_submission_plan(
-        5u, false, true, 5u, 5u, 8u, 3u, 128u).grouped);
+        3u, false, true, 5u, 5u, 8u, 3u, 128u).grouped);
     assert(!game_sm3_segmented_connected_submission_plan(
         4u, false, false, 5u, 5u, 8u, 3u, 128u).grouped);
     assert(!game_sm3_segmented_connected_submission_plan(

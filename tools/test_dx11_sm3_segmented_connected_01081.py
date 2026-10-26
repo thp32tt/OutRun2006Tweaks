@@ -20,6 +20,7 @@ for token in (
 ):
     assert token in submission, token
 assert "limit / instancesPerUpload" in helper
-assert "pointFill || wireFill" in helper
+assert "(line && (pointFill || wireFill))" in helper
+assert "(pointFill && wireFill)" in helper
 assert "const UINT nativeSubmissionCount = segmentedInstanceUpload" in submission
 print("01081 segmented connected GPU DrawIndexed source contract: PASS")
