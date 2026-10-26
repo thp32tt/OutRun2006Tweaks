@@ -181,6 +181,12 @@ jobs:
                 $parsedVariant -cnotin @('R26_FOCUS_OFFICIAL_TEST','R26_FOCUS_OFFICIAL_DEBUG')) {
               throw "Packaged C $mode unexpected test variant"
             }
+            # Quest D is isolated from C and carries an exact SHA.
+            Set-Content "$dir/QUEST_D_VARIANT.txt" @(
+              "D: $env:GITHUB_SHA (TIMEUP result/stock rival/1080p logical/XR startup)"
+              'Original HMD stereo validation remains UNTESTED.'
+              'Desktop aspect mirror intentionally fills the screen to hide Windows taskbar.'
+            ) -Encoding UTF8
             Set-Content "$dir/ABC_COMPARE.txt" @(
               'A: 456642108a4c0bd86c337bc14ead561b3c376cdc (+TIME repair)'
               'B: bda6b12078528265a8157d842a7c825883fb629c (+ GOAL source queue epoch)'
@@ -205,7 +211,7 @@ jobs:
               '8. No experimental test-branch COMBINED/ALL visual or performance patches.'
               '9. Restore backups after testing; return DX9EX_LOGS ZIP and screenshots.'
             ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
-            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FocusOfficialTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','ABC_COMPARE.txt','START_HERE.txt')) {
+            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FocusOfficialTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','ABC_COMPARE.txt','QUEST_D_VARIANT.txt','START_HERE.txt')) {
               if (-not (Test-Path (Join-Path $dir $required))) { throw "Missing packaged $mode file: $required" }
             }
             foreach ($binary in @('dinput8.dll','outrun-vr-host.exe')) {
@@ -218,7 +224,7 @@ jobs:
           }
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-ABC-C-GOAL-EMPTYROOT-${{ github.sha }}
+          name: OutRun2-VR-R26-QUEST-D-LOGFIX-${{ github.sha }}
           path: OutRun2_VR_R26_FOCUS_OFFICIAL_*.zip
           if-no-files-found: error
 
