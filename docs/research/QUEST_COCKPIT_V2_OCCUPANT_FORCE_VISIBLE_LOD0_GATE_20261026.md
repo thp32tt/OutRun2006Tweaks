@@ -17,7 +17,7 @@ The existing `QUEST_APK_COCKPIT_RUNTIME_PROVIDER_TLS_GLASS_CHAIN_20261025.md` on
 4. `0x10AA3E8`: `x23=*(x20+0x10)`. `0x10AA3F0`: `ldrb w8,[x23,#53]` reads **view/service object byte +0x35**, not `PmtNode+0x35`. `0x10AA3F4` branches to the normal near/frustum path `0x10AA578` if zero.
 5. If view/service byte nonzero, `0x10AA3F8..0x10AA404` resolves the native TLS address via an indirect getter; `0x10AA408` reads its byte. Cross-reference to existing TLS symbol mapping identifies **`cockpit_occupant_draw`**. `0x10AA40C` branches to `0x10AA94C` if TLS zero.
 6. If **both** conditions are nonzero, `0x10AA410` writes **`lod_out=0`** (`str wzr,[x19]`), `0x10AA414` sets **return `w0=1`**, and `0x10AA424` goes to common function epilogue `0x10AAB6C` after stack-cookie check. The normal near/far/plane and LOD calculations are not executed.
-7. When view/service byte is zero, `0x10AA578..0x10AA928` executes the normal near/side/far frustum checks and `0x10AAB30..0x10AAB58` computes LOD and compares threshold. When TLS is zero but view/service byte is set, `0x10AA94C` additionally offers an optional callback at view/service `+0x20` before falling into normal checks. **The forced-visible path bypasses that callback too.**
+7. When view/service byte is zero, `0x10AA578..0x10AA928` executes the normal near/side/far frustum checks and `0x10AAB30..0x10AAB58` computes LOD and compares threshold. When TLS is zero but view/service byte is set, `0x10AA94C` additionally offers an optional callback at view/service `+0x20`. If this callback exists and its result bit 0 is clear (`0x10AA984`), the function returns false at `0x10AA9B4` instead of proceeding to the normal tests; an accepted callback proceeds to an additional radius/distance check before the remaining path. **The forced-visible path bypasses that callback too.**
 
 The bypass occurs **after** initial node-centre transform and bounding-radius calculation (`0x10AA1B8..0x10AA3E4`), so it is not a free zero-cost path. It does not prove the resulting mesh is rendered: later queue code can still reject an absent `mesh[0]` or exhausted queue capacity.
 
@@ -27,7 +27,7 @@ The bypass occurs **after** initial node-centre transform and bounding-radius ca
 |---|---|---|
 | 0 | 0 | Normal frustum + LOD route |
 | 0 | 1 | Normal frustum + LOD route |
-| nonzero | 0 | Optional view callback, then normal visibility/LOD route |
+| nonzero | 0 | Optional view callback can reject immediately; otherwise additional radius/distance and normal visibility/LOD route |
 | **nonzero** | **nonzero** | **Force `visible=true`, `lod_out=0`; skip normal frustum/LOD and optional callback** |
 
 The exact **semantic name and writer** of view/service byte `+0x35` are **UNKNOWN**. Do not relabel it as an HMD mode flag, player ID, node flag, or globally enable it without proving its writer. Likewise, the original native code does not establish which precise driver/passenger/hand meshes encounter the gate.
