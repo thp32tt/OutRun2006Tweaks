@@ -3987,6 +3987,26 @@ public:
     static void AfterDirectGoalSource() noexcept
     {
         using namespace OutRunVR::GameSemantic;
+        // The a22be86a HMD-correct rival had no GOAL D3DX exit flush.
+        // The newer E rival wrapper calls this GOAL-only gate, but its
+        // ScreenHud/GOAL producer whitelist EXCLUDES RivalMarkerSprani.
+        // Observe whether a real rival D3DX batch exists; do NOT force
+        // a new physical Flush or accidentally promote generic 2D sprites.
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            CurrentRenderProducerToken() == ProducerToken::RivalMarkerSprani)
+        {
+            static std::atomic<std::uint64_t> probes{0};
+            const auto n = probes.fetch_add(1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL DIRECT D3DX GOAL-GATE PROBE: hits={} batchActive={} pendingDraws={} homogeneous={} batchScope={} batchProducer={} queueActive={} stageTicketAllows={} physicalSprite={}",
+                    n, HudBatch.active ? 1 : 0, HudBatch.drawCount,
+                    HudBatch.homogeneous ? 1 : 0,
+                    Name(HudBatch.scope), Name(HudBatch.producer),
+                    QueueRenderActive() ? 1 : 0,
+                    StageTicketAllowsSubmission() ? 1 : 0,
+                    HudBatch.sprite == *Module::exe_ptr<void*>(0x55B218) ? 1 : 0);
+        }
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
         if (!StageTicketAllowsSubmission() ||
             !HudBatch.matchesGpuOwner(false, nullptr, 0) ||
