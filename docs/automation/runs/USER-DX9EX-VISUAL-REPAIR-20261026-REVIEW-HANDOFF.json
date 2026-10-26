@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "TASK_ID": "USER-DX9EX-VISUAL-REPAIR-20261026",
+  "attempt": 1,
+  "sourceMode": "CHAT_DIRECT",
+  "lane": "DX9EX_R26_HUD",
+  "updated_at_kst": "2026-10-26T15:26:00+09:00",
+  "target_branch": "vr-d3d9ex-focus",
+  "review_branch": "fix/r26-eye-projection-stage-ticket-20261026",
+  "base_sha": "b3ee3fbeaa48139eff4b22e33e68e63ee5a76760",
+  "result_sha": "d32407578fba9797dd91728cc84518a0144b9795",
+  "checkpoint": "C4_SOURCE_COMMITTED_C6_REVIEW_HANDOFF",
+  "status": "SOURCE_READY_FOR_USER_REREVIEW",
+  "integration": "NOT_MERGED",
+  "validation": {
+    "local": "PASS_8_TARGETED_CHECKS",
+    "red_before_fix": [
+      "C993 asymmetric XY FOV recovered-ray mismatch",
+      "Rejected E8 deferred direct D3DX owner remains restorable"
+    ],
+    "github_windows_ci": "NOT_RUN_USER_DEFERRED_UNTIL_REREVIEW",
+    "package": "NOT_CREATED",
+    "runtime": "UNTESTED"
+  },
+  "changed_paths": [
+    ".github/workflows/dx9ex-fullsource-impact-review.yml",
+    ".github/workflows/vr-dx9ex-user-test-build.yml",
+    "src/hooks_uiscaling.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/game/hud_command_batch.hpp",
+    "tools/verify_vr_r26_landscape_visual_recovery.py",
+    "tools/tests/r26_lens_projection_harness.cpp",
+    "tools/tests/stage_source_ticket_harness.cpp",
+    "tools/verify_vr_r26_lens_projection.py",
+    "tools/verify_vr_stage_source_ticket.py"
+  ],
+  "preserved": [
+    "R26 world path",
+    "CABE reference path",
+    "first 0x570008 retained, second suppressed",
+    "rival/GOAL queue policies",
+    "AA2/XR eye extent/HUD1080p .55/culling8",
+    "original D3DX commands/HRESULT and native Flush/End"
+  ],
+  "next_action": "Review the two source changes and executable regressions on review_branch; compare current focus and rebase/merge only after review. Then build the exact chosen HEAD using GitHub-hosted Windows R26 DLL+x64 host/user-test package+Domain+Full Source. Include CMD/PS1/INI/DLL/EXE and record exact SHA and archive hash. Never use PC Fast/self-hosted runner.",
+  "score_delta": 0
+}

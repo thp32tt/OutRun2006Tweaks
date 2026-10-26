@@ -301,3 +301,8 @@ ownership, excludes artificial-plane IPD, and retains CABE/HUD/GOAL paths.
 Local numerical and 71-CALL guards pass; exact-SHA Windows CI is pending.
 The old R84 C993 verifier already fails on the base due to the earlier projected
 screen-family change, so do not claim full-suite PASS. RUNTIME_VALIDATION=UNTESTED.
+
+
+## 2026-10-26 — R26 C993 eye projection / direct +TIME rejected ticket candidate
+
+CHAT_DIRECT continuation USER-DX9EX-VISUAL-REPAIR-20261026; source d32407578fba9797dd91728cc84518a0144b9795, review branch fix/r26-eye-projection-stage-ticket-20261026, base b3ee3fbeaa48139eff4b22e33e68e63ee5a76760. Source fixes and eight targeted local checks completed; focus integration, Windows CI/package and Quest3 optics remain pending user re-review. Existing DX9EX:VIS:LENS_FLARE_CENTRE and VR-RESULT-EXTTIME-MISSING-EXACT-PRODUCER-FINGERPRINT-20261009/CONVERSION-DX9EX-01505 are reused. Both pre-fix defects reproduced under synthetic inputs; no new natural runtime failure is asserted. See [review handoff](automation/reviews/R26_EYE_PROJECTION_STAGE_TICKET_20261026.md). Score +0 pending later build; no duplicate review credit.

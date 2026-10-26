@@ -868,6 +868,16 @@
           "Exact Quest3 session: inspect VR P0 RESULT DRAW ROUTE per parent plus VR R51 c64 DRAW FINGERPRINT and VR R62 FIXEDFN KIND0",
           "Determine result/+TIME optical single-frame binocular correctness independently of telemetry; no optical success claim without HMD"
         ]
+      },
+      "directStageTicketCandidate20261026": {
+        "task_id": "USER-DX9EX-VISUAL-REPAIR-20261026",
+        "source_sha": "d32407578fba9797dd91728cc84518a0144b9795",
+        "review_branch": "fix/r26-eye-projection-stage-ticket-20261026",
+        "finding": "CONVERSION-DX9EX-01505",
+        "status": "SOURCE_READY_FOR_USER_REREVIEW",
+        "evidence": "docs/automation/reviews/R26_EYE_PROJECTION_STAGE_TICKET_20261026.md",
+        "runtime_validation": "UNTESTED",
+        "synthetic_validation": "REJECTED_SOURCE_CANNOT_RESTORE_MATCHING_DIRECT_BATCH; OTHER_NATIVE_BATCHES_PRESERVED"
       }
     },
     {
@@ -1042,6 +1052,16 @@
     "status": "SOURCE_VALIDATED_AWAITING_EXACT_SHA_CI",
     "runtime_validation": "UNTESTED",
     "evidence": "docs/automation/reviews/LENS_CENTRE_RAY_20261025.md",
-    "confirmed_static": "Identical NDC in asymmetric eye projections reconstructs different sun directions. Correct only direct C993 projected sun rays; retain source camera-sync ownership to avoid double head rotation."
+    "confirmed_static": "Identical NDC in asymmetric eye projections reconstructs different sun directions. Correct only direct C993 projected sun rays; retain source camera-sync ownership to avoid double head rotation.",
+    "reviewFollowup20261026": {
+      "task_id": "USER-DX9EX-VISUAL-REPAIR-20261026",
+      "source_sha": "d32407578fba9797dd91728cc84518a0144b9795",
+      "review_branch": "fix/r26-eye-projection-stage-ticket-20261026",
+      "status": "SOURCE_READY_FOR_USER_REREVIEW",
+      "local_validation": "ACTUAL_C993_RAY_REGRESSION_PASS",
+      "ci": "DEFERRED_USER_REREVIEW",
+      "runtime_validation": "UNTESTED",
+      "evidence": "docs/automation/reviews/R26_EYE_PROJECTION_STAGE_TICKET_20261026.md"
+    }
   }
 }
