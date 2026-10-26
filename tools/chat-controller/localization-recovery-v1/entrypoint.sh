@@ -137,11 +137,11 @@ if [[ "${OUTRUN_GPT_CHAT_OCR_ENABLED:-true}" == "true" ]]; then
 fi
 
 if [[ "${OUTRUN_ROI_BRIDGE_ENABLED:-true}" == "true" ]]; then
-  echo "$(date -Is) verifying initial native crop -> ImageGen queue sync" >>/logs/roi-bridge.log
+  echo "$(date -Is) verifying initial legacy/direct OCR -> ImageGen queue sync" >>/logs/roi-bridge.log
   # Complete one fail-closed sync before AUTO_SEND controller startup. This
   # prevents a deployment exactly on a schedule minute from consuming stale Q104 state.
   python -u /opt/outrun/app/crop_to_imagegen_queue.py --once >>/logs/roi-bridge.log 2>&1
-  echo "$(date -Is) starting native crop -> ImageGen queue bridge loop" >>/logs/roi-bridge.log
+  echo "$(date -Is) starting legacy/direct OCR -> ImageGen queue bridge loop" >>/logs/roi-bridge.log
   python -u /opt/outrun/app/crop_to_imagegen_queue.py \
     --interval-seconds "${OUTRUN_ROI_BRIDGE_INTERVAL_SECONDS:-60}" \
     >>/logs/roi-bridge.log 2>&1 &
