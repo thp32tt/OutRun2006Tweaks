@@ -11,8 +11,10 @@ required = (
     "const UINT base = segmentedInstanceUpload",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
     "context->Draw(vertices, base);",
-    "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
-    "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST",
+    "((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+    "((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST",
+    "game_sm3_segmented_connected_submission_plan(",
+    "context->DrawIndexed(static_cast<UINT>(chunkIndices.size()),",
 )
 for entry in required:
     assert entry in source, f"Native SM3 connected-instance integration missing: {entry}"

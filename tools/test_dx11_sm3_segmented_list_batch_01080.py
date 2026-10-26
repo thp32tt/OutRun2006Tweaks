@@ -8,8 +8,10 @@ scope = source.split("bool submit_live_sm3_game_draw(", 1)[1].split(
     "// Reuse geometric", 1)[0]
 for token in (
     "game_sm3_segmented_list_submission_plan(",
-    "segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount",
-    "const UINT instance = segmentedListPlan.grouped",
+    "segmentedListPlan.grouped ? segmentedListPlan.batches :",
+    "(segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount)",
+    "const UINT instance = (segmentedListPlan.grouped ||",
+    "segmentedConnectedPlan.grouped)",
     "instanceSteps, unpacked, instance",
     "context->Draw(chunkInstances * vertexCount, 0u)",
     "game_sm3_expand_list_instance_indices(",
