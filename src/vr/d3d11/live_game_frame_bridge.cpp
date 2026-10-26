@@ -5482,7 +5482,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // when their source VB fits but FLOAT4 declaration packing exceeds one
     // 32 MiB D3D11 upload. Split only at complete primitive boundaries.
     // An indexed stream or connected strip/fan still fails closed.
-    const auto linearChunkPlan = !sourceInstancing && !indices && !pointFill
+    // Independent TRIANGLELIST polygons can preserve each complete source
+    // triangle across dynamic VB windows in SOLID, WIREFRAME and POINT mode.
+    // POINT still requires the earlier game-authored no-cull/unit-point gate;
+    // three source corner occurrences remain three GPU point vertices.
+    const auto linearChunkPlan = !sourceInstancing && !indices &&
+        (!pointFill || type == D3DPT_TRIANGLELIST)
         ? game_sm3_plan_native_linear_chunks(
               static_cast<std::uint32_t>(type), false, vertexCount,
               plannedNativeStride, kMaxVertices, 1u << 25u, 128u)
@@ -5533,8 +5538,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // Real indexed POINT/LINELIST/TRIANGLELIST game geometry may fit in its
     // source VB but overflow a packed shader-visible native VB. Reassemble
     // actual D3D9 index occurrences into bounded independent GPU submits.
+    // Polygon TRIANGLELIST POINT/WIREFRAME also stays splittable because each
+    // exact three-index source triangle is an independent native GPU group:
+    // POINT consumes all three original corner occurrences, WIREFRAME runs
+    // the same ordered triangles through its already validated rasterizer.
     const auto indexedChunkPlan = !sourceInstancing && indices && repack &&
-        !pointFill && !wireFill
+        ((!pointFill && !wireFill) || type == D3DPT_TRIANGLELIST)
         ? game_sm3_plan_native_indexed_chunks(
               static_cast<std::uint32_t>(type), vertexCount, indexCount,
               plannedNativeStride, kMaxVertices, 1u << 25u, 128u, 1ull << 27u)
@@ -5709,8 +5718,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // Windowed fans already lower each original triangle to a local
     // three-index occurrence stream. POINTLIST consumes that same stream
     // directly; expanding the *whole* fan would exceed kMaxIndices.
+    // Streamed independent TRIANGLELIST windows already carry each authentic
+    // vertex/index occurrence. Never pre-expand a whole-list point IB and
+    // then bind it to only the FIRST native VB window.
     if (pointFill && !fanChunkUpload &&
-        !connectedChunkUpload && !indexedConnectedChunkUpload) {
+        !connectedChunkUpload && !indexedConnectedChunkUpload &&
+        !linearChunkUpload && !indexedChunkUpload) {
         const UINT logicalVertexCount = static_cast<UINT>(
             compactInstancedGeometry ? expandedVertices : vertexCount);
         const UINT sourceCount = nativeIndices ? nativeIndexCount : logicalVertexCount;
@@ -6502,6 +6515,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (indexedChunkUpload) {
             // A new GPU draw starts only at a real D3D9 primitive boundary.
             // Each IB occurrence becomes one exact shader-visible vertex.
+            // In D3DFILL_POINT, every original TRIANGLELIST corner is one
+            // point (never deduplicated). WIREFRAME keeps three corners
+            // together for the existing triangle rasterizer and cull mode.
             const UINT firstIndex = submit * indexedChunkPlan.verticesPerChunk;
             const UINT drawCount = (std::min)(
                 indexCount - firstIndex, indexedChunkPlan.verticesPerChunk);
@@ -6591,6 +6607,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         }
         if (linearChunkUpload) {
             // Original unindexed source primitive #N becomes native Draw #N
+            // including complete point-filled / wireframe TRIANGLELIST
+            // triangles, with no cross-chunk seam or point deduplication.
             // across consecutive uploads. Each firstVertex is group-aligned,
             // so no line/triangle is cut by a WRITE_DISCARD or GPU Draw.
             const UINT firstVertex = submit * linearChunkPlan.verticesPerChunk;

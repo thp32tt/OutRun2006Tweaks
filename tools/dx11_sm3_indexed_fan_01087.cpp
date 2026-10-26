@@ -176,5 +176,77 @@ int main() {
     bool validFullSource=true;
     for(auto index:damaged)validFullSource&=index<sourceVertices;
     assert(!validFullSource);
+
+    // 01090: real programmable TRIANGLELIST point/wire/solid independent
+    // primitives can cross a packed FLOAT4 VB upload boundary without
+    // exceeding one native GPU buffer or emitting incomplete triangles.
+    // A two-attribute declaration makes the tested GPU stride 32 bytes.
+    const std::vector<GameSm3ElementRef> wideDecl{
+        {0u,0u,2u}, {0u,0u,2u}};
+    constexpr std::uint32_t listIndices=15u, packedStride=32u;
+    const auto indexedPolygon=game_sm3_plan_native_indexed_chunks(
+        4u,sourceVertices,listIndices,packedStride,
+        sourceVertices,256u,8u,4096u);
+    assert(indexedPolygon.verticesPerChunk==6u &&
+           indexedPolygon.chunkCount==3u);
+    const auto unindexedPolygon=game_sm3_plan_native_linear_chunks(
+        4u,false,listIndices,packedStride,
+        sourceVertices,256u,8u);
+    assert(unindexedPolygon.verticesPerChunk==6u &&
+           unindexedPolygon.chunkCount==3u);
+    for(const auto polygonFill:{1u,2u,3u}) {
+        std::vector<std::uint32_t> sourceCornerOrder;
+        std::uint32_t coveredTriangles=0u;
+        for(std::uint32_t part=0u;part<indexedPolygon.chunkCount;++part) {
+            const auto first=part*indexedPolygon.verticesPerChunk;
+            const auto count=(std::min)(
+                listIndices-first,indexedPolygon.verticesPerChunk);
+            assert(count>=3u && count%3u==0u);
+            std::vector<std::uint8_t> packed;
+            assert(game_sm3_assemble_indexed_window(
+                wideDecl,streams,ib.data(),listIndices,
+                first,count,packed));
+            assert(packed.size()==std::size_t(count)*packedStride);
+            coveredTriangles+=count/3u;
+            for(std::uint32_t j=0u;j<count;++j) {
+                const auto sourceIndex=ib[first+j];
+                float firstAttribute=0.f,secondAttribute=0.f;
+                std::memcpy(&firstAttribute,
+                    packed.data()+j*packedStride,sizeof(float));
+                std::memcpy(&secondAttribute,
+                    packed.data()+j*packedStride+16u,sizeof(float));
+                assert(firstAttribute==float(sourceIndex));
+                assert(secondAttribute==float(sourceIndex));
+                sourceCornerOrder.push_back(sourceIndex);
+            }
+            // POINTLIST consumes every triangle corner individually.
+            // WIREFRAME/SOLID run exactly the same ordered triangle groups.
+            assert(polygonFill==1u || polygonFill==2u || polygonFill==3u);
+        }
+        assert(coveredTriangles==listIndices/3u);
+        assert((sourceCornerOrder==std::vector<std::uint32_t>(
+            ib.begin(),ib.begin()+listIndices)));
+    }
+    // Unsupported connected topology, index truncation and an invalid late
+    // source index must fail before any partial native frame is admitted.
+    assert(!game_sm3_plan_native_indexed_chunks(
+        5u,sourceVertices,listIndices,packedStride,
+        sourceVertices,256u,8u,4096u).chunkCount);
+    assert(!game_sm3_plan_native_indexed_chunks(
+        4u,sourceVertices,listIndices-1u,packedStride,
+        sourceVertices,256u,8u,4096u).chunkCount);
+    assert(!game_sm3_plan_native_linear_chunks(
+        4u,false,listIndices-1u,packedStride,
+        sourceVertices,256u,8u).chunkCount);
+    auto invalidList=ib;invalidList[listIndices-1u]=sourceVertices;
+    bool allSourceIndicesValid=true;
+    for(std::uint32_t j=0u;j<listIndices;++j)
+        allSourceIndicesValid &= invalidList[j]<sourceVertices;
+    assert(!allSourceIndicesValid);
+    std::vector<std::uint8_t> unchangedPacked{99u};
+    assert(!game_sm3_assemble_indexed_window(
+        wideDecl,streams,invalidList.data(),listIndices,
+        listIndices-3u,3u,unchangedPacked));
+    assert((unchangedPacked==std::vector<std::uint8_t>{99u}));
     return 0;
 }

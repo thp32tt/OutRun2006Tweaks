@@ -40,3 +40,19 @@ assert "std::uint64_t(indexCount) * plannedNativeStride" in live
 assert live.count("context->DrawIndexed(window.pointIndexCount, 0u, 0);")==2
 assert "game_sm3_plan_native_connected_chunks(" in live
 print("01089 SM3 indexed/unindexed connected polygon strips native point/wire/solid PASS")
+
+# 01090: source-visible independent TRIANGLELIST POINT/WIREFRAME GPU
+# uploads are real per-window Draw submissions, not only metadata/planners.
+assert "(!pointFill || type == D3DPT_TRIANGLELIST)" in live
+assert "((!pointFill && !wireFill) || type == D3DPT_TRIANGLELIST)" in live
+assert "!linearChunkUpload && !indexedChunkUpload" in live
+indexed=live[live.index("        if (indexedChunkUpload) {",live.index("const UINT nativeSubmissionCount")):
+             live.index("        if (indexedConnectedChunkUpload) {",live.index("const UINT nativeSubmissionCount"))]
+linear=live[live.index("        if (linearChunkUpload) {",live.index("const UINT nativeSubmissionCount")):
+            live.index("        if (connectedChunkUpload) {",live.index("const UINT nativeSubmissionCount"))]
+assert "issueNativeGameDraw(drawCount, 0u);" in indexed
+assert "game_sm3_assemble_indexed_window(" in indexed
+assert "issueNativeGameDraw(drawCount, 0u);" in linear
+assert "game_sm3_assemble_streams(" in linear
+assert live.index("for (UINT i=0u;i<indexCount;++i)",live.index("const bool indexedChunkUpload")) < live.index("rejectionStage = 6u;")
+print("01090 shader-bound SM3 indexed/unindexed polygon POINT/WIREFRAME GPU windows PASS")
