@@ -23,6 +23,9 @@ on:
       - 'tools/test_dx11_*.py'
       # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
       - 'tools/dx11_sm3_*_probe.cpp'
+      # Numbered SM3 live-game C++ source fixtures (e.g. indexed fan 01087)
+      # must trigger every exact-SHA Gate after a causal compiler/test repair.
+      - 'tools/dx11_sm3_*_010*.cpp'
       - 'tools/dx11_live_sm3_texkill_01013.cpp'
       - 'docs/VR_ARCHITECTURE.md'
       - 'tools/package_dx11_first_game_frame.py'
@@ -60,6 +63,9 @@ on:
       - 'tools/test_dx11_*.py'
       # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
       - 'tools/dx11_sm3_*_probe.cpp'
+      # Numbered SM3 live-game C++ source fixtures (e.g. indexed fan 01087)
+      # must trigger every exact-SHA Gate after a causal compiler/test repair.
+      - 'tools/dx11_sm3_*_010*.cpp'
       - 'tools/dx11_live_sm3_texkill_01013.cpp'
       - 'docs/VR_ARCHITECTURE.md'
       - 'tools/package_dx11_first_game_frame.py'
