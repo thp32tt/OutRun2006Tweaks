@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01088",
+  "production_id": "CONVERSION-DX11-01088",
+  "event_id": "CONVERSION-DX11-01088-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01088",
+  "classification": "A_INCOMPLETE_USER_VISIBLE_NATIVE_GAME_RENDERING_PATH",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SM3_FAN_POLYGON_FILL_NATIVE_GPU_WINDOWS",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C5_EXACT_SHA_GATE_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "quest3_playable": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_base_sha": "2a422c5b726f4b339bfad1ae7ff750cf6f61fe95",
+  "source_change_sha": "3274ae647c787a4ffb51ab80a6c035c300879c8a",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "implementation_commits": [
+    "3274ae647c787a4ffb51ab80a6c035c300879c8a"
+  ],
+  "repair_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
+    "tools/dx11_sm3_indexed_fan_01087.cpp",
+    "tools/test_dx11_sm3_indexed_fan_01087.py",
+    "docs/automation/runs/CONVERSION-DX11-01088.json"
+  ],
+  "summary": "Native full-frame shader-bound indexed and linear D3D9 Triangle Fan GPU upload windows now emit SOLID and WIREFRAME native triangle occurrences or POINTLIST triangle-vertex occurrences without full-fan point expansion. Reuses original full-source IB validation and D3D9/DX9Ex input/render fallback. Gate failure at preceding material source SHA was inherited 01087 latest-record required schema fields; create the proper 01088 feature-sized acceptance record without altering older C6 or disabling checks.",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Connect actual game-authored shader-bound indexed/nonindexed D3D9 Triangle Fan SOLID/WIREFRAME/POINT fill across multiple full-resolution native D3D11 GPU DrawIndexed windows while retaining frame integrity and input fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_polygon_fan_gpu_windows",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_RENDER_DRAW",
+        "expected_behavior": "Shader-bound native fan windows emit complete original SOLID/WIREFRAME triangle geometry or POINTLIST three-vertex polygon point occurrences with correct original center/rim sequence."
+      },
+      {
+        "id": "full_source_fan_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GAME_VERTEX_INPUT_FFB_FALLBACK",
+        "expected_behavior": "Full original IB bounds, GPU window limits and final seam window are validated; unsupported point size/cull or invalid later source remains original D3D9/DX9Ex rendering and input."
+      },
+      {
+        "id": "full_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "NATIVE_BUILD_EXACT_SHA",
+        "expected_behavior": "Mandatory five push Github Actions workflows completed successfully on identical final validation-bearing SHA, not previous failed source commit."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_polygon_fan_gpu_windows": {
+      "status": "PENDING_EXACT_SHA",
+      "validation_command": "Build and run C++ tools/dx11_sm3_indexed_fan_01087.cpp with full fan polygon fill tests."
+    },
+    "full_source_fan_fallback": {
+      "status": "PENDING_EXACT_SHA",
+      "validation_command": "Python tools/test_dx11_sm3_indexed_fan_01087.py and source HMD-safe fallback tests."
+    },
+    "full_exact_sha_gates": {
+      "status": "PENDING_EXACT_SHA",
+      "validation_command": "Read GitHub Actions push runs and match final 5 completed/success head_sha."
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_SM3_INDEXED_OR_LINEAR_TRIANGLEFAN_CALLSITE",
+      "AUTHENTIC_SOURCE_CENTER_RIM_WINDOW_ASSEMBLY",
+      "NATIVE_D3D11_GPU_DRAW_INDEXED_POINT_OR_WIRE_OR_SOLID",
+      "VISIBLE_FULL_RESOLUTION_FRAME_OUTPUT_RUNTIME_UNTESTED"
+    ],
+    "batch_components": [
+      "LIVE_GAME_SHADER_BOUND_DRAW_BRIDGE",
+      "POLYGON_FILL_PER_WINDOW_INDEX_SELECTION_AND_TOPOLOGY",
+      "CXX_AND_PYTHON_POSITIVE_NEGATIVE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original D3D9 indexed and non-indexed fan source triangles are replayed with exact 3-vertex point/wire/solid windows under D3D11 DrawIndexed and original SM3 IA/VS/PS textures.",
+      "negative_regression": "Invalid tail window, unsupported polygon mode, expired original index and local index-budget overflow all reject before native publication with original D3D9 fallback.",
+      "component_integration": "Real R30 game Draw and indexed fan input owners through D3D11 IA/RS/OM/VS/PS and local GPU DrawIndexed, guarded opt-in and original D3D9 game input/FFB."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_FAN_POLYGON_FILL_NATIVE_GPU_WINDOWS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Only source implementation pending exact SHA automated Gates; real OutRun menu/car/race pixels, Quest3/VDXR and performance UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive=false default; fail-closed original D3D9/DX9Ex graphics and gamepad/FFB/SkyGlow unchanged; DXVK frozen."
+  },
+  "mandatory_gate_results": [],
+  "score_change": 0,
+  "score_note": "C5 acceptance record and same-task CI repair +0; do not claim unique scored implementation until mandatory exact SHA Gates PASS.",
+  "source_implementation_time_ratio": "NOT_MEASURED",
+  "analysis_time_ratio": "NOT_MEASURED",
+  "ci_time_ratio": "NOT_MEASURED",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no real matching game/HMD/Quest3/VDXR performance or visuals observed.",
+  "next_implementation_action": "Resolve any causal gate failure under CONVERSION-DX11-01088; then record C6 separately on same validated material result SHA."
+}
