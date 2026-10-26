@@ -889,8 +889,8 @@ def queue_rollover_prompt(active: dict) -> str:
             "retry 사유로 취급하지 마.",
             "게임/런타임 C++/HLSL/CMake/CI/배포 소스 자동 수정, "
             "FEATURE_READY/브랜치 승격/패키징을 금지한다.",
-            "아직 이 TASK_ID의 검토 문서가 없을 때만 R26+HUD를 기본으로 "
-            "실제 화면오류·최적화 자료와 코드 경로를 정적 분석하고 "
+            "아직 이 TASK_ID의 검토 문서가 없을 때만 REVIEW_SCOPE=LENS_FLARE_ONLY로 R26+HUD를 기준 삼아 "
+            "기존 렌즈플레어 가설을 반증·보강하고 관련 소스/로그·양안 투영·중복 제출만 정적 분석하며 NEXT_REVIEW=LENS_FLARE:<구체적 검증>과 "
             "PATCH_CANDIDATE_ONLY를 기록해.",
             "문서 외 수정 없는 [AUTO:" + active['task_id'] +
             "] 리뷰 커밋만 허용한다. Quest3 실기가 없다면 RUNTIME_VALIDATION=UNTESTED.",
