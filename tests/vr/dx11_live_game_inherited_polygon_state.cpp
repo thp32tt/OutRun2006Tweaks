@@ -24,10 +24,12 @@ int main() {
         assert(!game_sm3_polygon_fill_admitted(
             2u, primitive, 1u, true, true, false)); // still line-AA-safe
     }
-    for (std::uint32_t bad : {0u, 4u, 0xffffffffu}) {
-        assert(!game_sm3_effective_polygon_mode(bad, 2u).admitted);
-        assert(!game_sm3_effective_polygon_mode(2u, bad).admitted);
-    }
+    // 4 is invalid as D3DFILLMODE but is a valid TRIANGLELIST topology.
+    // Keep the two independent D3D9 enum domains distinct.
+    for (std::uint32_t badFill : {0u, 4u, 0xffffffffu})
+        assert(!game_sm3_effective_polygon_mode(badFill, 2u).admitted);
+    for (std::uint32_t badTopology : {0u, 7u, 0xffffffffu})
+        assert(!game_sm3_effective_polygon_mode(2u, badTopology).admitted);
     // An authentic indexed LINESTRIP across D3D9 instances remains
     // three independent GPU LINELIST groups regardless of inherited FILL.
     const std::uint32_t source[] = {3u, 1u, 4u, 0u};

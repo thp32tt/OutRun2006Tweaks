@@ -75,6 +75,19 @@ game_sm3_effective_polygon_mode(
     return {true, polygon && fill == 1u, polygon && fill == 2u};
 }
 
+// Compile-time native IA routing parity: D3D9 inherited FILLMODE must not
+// convert point/line geometry, while genuine polygons retain POINT/WIRE.
+static_assert(game_sm3_effective_polygon_mode(1u, 1u).admitted &&
+    !game_sm3_effective_polygon_mode(1u, 1u).pointTriangles &&
+    !game_sm3_effective_polygon_mode(2u, 2u).wireTriangles &&
+    !game_sm3_effective_polygon_mode(1u, 3u).pointTriangles &&
+    game_sm3_effective_polygon_mode(1u, 4u).pointTriangles &&
+    game_sm3_effective_polygon_mode(2u, 5u).wireTriangles &&
+    !game_sm3_effective_polygon_mode(3u, 6u).wireTriangles &&
+    !game_sm3_effective_polygon_mode(4u, 1u).admitted &&
+    !game_sm3_effective_polygon_mode(2u, 7u).admitted,
+    "Authentic game point/line topology and triangle fill separation");
+
 [[nodiscard]] constexpr bool game_sm3_polygon_fill_admitted(
     std::uint32_t fill, std::uint32_t topology, std::uint32_t cull,
     bool lineAA, bool lastPixel, bool unitPoint) noexcept {
