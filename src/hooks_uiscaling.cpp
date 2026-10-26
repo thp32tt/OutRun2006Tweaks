@@ -2535,12 +2535,50 @@ class UIScaling : public Hook
             const auto registeredAfter =
                 OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
                     std::memory_order_relaxed);
+            // Legacy a22be86a tagged oldTail->next directly; modern R26
+            // validates current live priority roots before reading old
+            // recycled pointers. Keep all current safety checks intact and
+            // distinguish an animation call with NO queue append from a
+            // queue append rejected by the provenance checker.
+            unsigned changedRoots = 0;
+            unsigned changedTails = 0;
+            unsigned stableRootTailChanges = 0;
+            unsigned replacedRootTailChanges = 0;
+            unsigned newlyPopulatedPriorities = 0;
+            for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+            {
+                SpriteNode* currentRoot = Game::sprite_prio_root[prio];
+                const bool rootChanged = currentRoot != rootsBefore[prio];
+                if (rootChanged)
+                    ++changedRoots;
+                SpriteNode* tailAfter = currentRoot
+                    ? currentRoot->tail_4 : nullptr;
+                if (tailAfter != before[prio])
+                {
+                    ++changedTails;
+                    if (rootChanged)
+                        ++replacedRootTailChanges;
+                    else
+                        ++stableRootTailChanges;
+                }
+                if (!before[prio] && currentRoot && tailAfter &&
+                    tailAfter != currentRoot)
+                    ++newlyPopulatedPriorities;
+            }
             static thread_local std::uint64_t rivalQueuePublishes = 0;
             const auto n = ++rivalQueuePublishes;
             if (n <= 8 || (n & (n - 1)) == 0)
                 spdlog::info(
                     "VR RIVAL QUEUE PUBLICATION: hits={} registeredDelta={} anchorValid={} policy=EXACT_CURRENT_CHAIN",
                     n, registeredAfter - registeredBefore, projected ? 1 : 0);
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL A22 CURRENT QUEUE COMPARE: hits={} nativeReturn={} projected={} directFlush={} rootChanges={} tailChanges={} stableRootTailChanges={} replacedRootTailChanges={} newlyPopulatedPriorities={} entrySerial={}",
+                    n, result, projected ? 1 : 0,
+                    directRivalOwner ? 1 : 0,
+                    changedRoots, changedTails, stableRootTailChanges,
+                    replacedRootTailChanges, newlyPopulatedPriorities,
+                    entrySerial);
         }
 		return result;
 	}
