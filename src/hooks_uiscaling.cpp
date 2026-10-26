@@ -1615,7 +1615,17 @@ class UIScaling : public Hook
     inline static thread_local OutRunVR::GoalProgress::SourceAdmission
         ResultProgressAdmission{};
     inline static thread_local bool ResultProgressAdmittedAfterDrain = false;
-	static void ResultProgressEnter(safetyhook::Context&)
+	static bool ResultPresentationState() noexcept
+    {
+        if (!Game::current_mode) return false;
+        const auto state = *Game::current_mode;
+        // 2026-10-26 real Quest log proved 0x2D200 runs in state=20
+        // (STATE_TIMEUP), rejected by the earlier STATE_GOAL-only gate.
+        return state == GameState::STATE_GOAL ||
+            state == GameState::STATE_TIMEUP ||
+            state == GameState::STATE_RESULT;
+    }
+    static void ResultProgressEnter(safetyhook::Context&)
 	{
         // MSVC evaluates member constexpr only in a complete-class context.
         // Keep the positive/negative ownership checks compile-time and
@@ -1626,7 +1636,7 @@ class UIScaling : public Hook
 			return;
         ResultProgressAdmission = {
             Settings::VREnabled,
-            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+            ResultPresentationState(),
             !OutRunVR::GameSemantic::QueueRenderActive(),
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
         };
@@ -1653,7 +1663,7 @@ class UIScaling : public Hook
             FlushD3DXBeforeDirectGoalSource();
             ResultProgressAdmittedAfterDrain = ResultProgressAdmission.mayPublish(
                 Settings::VREnabled,
-                Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+                ResultPresentationState(),
                 !OutRunVR::GameSemantic::QueueRenderActive(),
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
             if (ResultProgressAdmittedAfterDrain)
@@ -1686,8 +1696,7 @@ class UIScaling : public Hook
         }
         const std::uint64_t exitQueueEpoch =
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
-        const bool goalAtExit =
-            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL;
+        const bool goalAtExit = ResultPresentationState();
         const bool outsideQueueAtExit =
             !OutRunVR::GameSemantic::QueueRenderActive();
         const bool admitted = ResultProgressAdmittedAfterDrain &&
@@ -1742,8 +1751,7 @@ class UIScaling : public Hook
     {
         const auto original = reinterpret_cast<ResultProgressFullParentFn>(
             Module::exe_ptr(ResultProgressFullParentTarget));
-        if (!Settings::VREnabled || !Game::current_mode ||
-            *Game::current_mode != GameState::STATE_GOAL ||
+        if (!Settings::VREnabled || !ResultPresentationState() ||
             OutRunVR::GameSemantic::QueueRenderActive())
             return original();
 
@@ -1757,7 +1765,7 @@ class UIScaling : public Hook
         FlushD3DXBeforeDirectGoalSource();
         if (!parentAdmission.mayPublish(
                 Settings::VREnabled,
-                Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+                ResultPresentationState(),
                 !OutRunVR::GameSemantic::QueueRenderActive(),
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
             return original();
@@ -1783,7 +1791,7 @@ class UIScaling : public Hook
         const bool result = original(); // original stage animation once
         const bool parentAdmittedAtExit = parentAdmission.mayPublish(
             Settings::VREnabled,
-            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL,
+            ResultPresentationState(),
             !OutRunVR::GameSemantic::QueueRenderActive(),
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
         if (parentAdmittedAtExit)
