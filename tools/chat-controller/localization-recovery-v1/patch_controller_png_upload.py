@@ -69,6 +69,9 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         '''async def send_message(page: Page, message: str, png_binding=None) -> str:
     """Send the source PNG first; never submit a text-only ImageGen producer task."""
     if png_binding is not None:
+        clear_status = await clear_attachment_previews(page)
+        if clear_status != "COMPOSER_ATTACHMENTS_CLEAR":
+            return "SOURCE_REFERENCE_NOT_BOUND:" + clear_status
         tool_status = await ensure_image_tool(page)
         if tool_status != "CREATE_IMAGE_TOOL_SELECTED":
             return "IMAGE_TOOL_NOT_SELECTED:" + tool_status
@@ -200,7 +203,7 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
     )
     # The import must be part of controller code itself; no executable startup
     # shell monkey-patching and no separate daemon.
-    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool\nfrom app.ab_batch_queue import inspect_slot, stage_submission, record_chat_url, rollback_submission\nimport os as _outrun_smoke_os\n'
+    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool, clear_attachment_previews\nfrom app.ab_batch_queue import inspect_slot, stage_submission, record_chat_url, rollback_submission\nimport os as _outrun_smoke_os\n'
     lines = source.splitlines(keepends=True)
     future_imports = [i for i, line in enumerate(lines)
                       if line.startswith("from __future__ import ")]
