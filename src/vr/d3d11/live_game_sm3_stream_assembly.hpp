@@ -167,6 +167,35 @@ game_sm3_plan_native_connected_chunks(
 }
 
 
+// Real-game indexed LINESTRIP/TRIANGLESTRIP: expand source IB occurrences
+// into bounded FLOAT4 native GPU stream windows. Repeat one line endpoint
+// or two triangle endpoints; triangle starts advance by an EVEN ordinal
+// so the native alternating winding remains identical to the source.
+[[nodiscard]] constexpr GameSm3ConnectedChunkPlan
+game_sm3_plan_native_indexed_connected_chunks(
+    std::uint32_t primitiveType, std::uint32_t sourceVertices,
+    std::uint32_t sourceIndices, std::uint32_t nativeStride,
+    std::uint32_t maxVertices, std::uint32_t maxBytes,
+    std::uint32_t maxChunks, std::uint64_t maxTotalBytes) noexcept {
+    const bool line = primitiveType == 3u;
+    if ((!line && primitiveType != 5u) || !sourceVertices ||
+        sourceIndices < (line ? 3u : 4u) || !nativeStride ||
+        sourceVertices > maxVertices ||
+        std::uint64_t(sourceVertices) * nativeStride <= maxBytes)
+        return {};
+    const auto plan = game_sm3_plan_native_connected_chunks(
+        primitiveType, false, sourceIndices, nativeStride,
+        maxVertices, maxBytes, maxChunks);
+    if (plan.chunkCount < 2u) return {};
+    // GPU traffic includes each reuploaded seam. Limit both one upload
+    // and total transient traffic before any native Draw is admitted.
+    const std::uint64_t uploadedVertices =
+        std::uint64_t(sourceIndices) +
+        std::uint64_t(line ? 1u : 2u) * (plan.chunkCount - 1u);
+    if (uploadedVertices > maxTotalBytes / nativeStride) return {};
+    return plan;
+}
+
  // A D3D9 nonindexed TRIANGLEFAN has a permanent center vertex (source 0).
  // Each bounded native GPU segment contains that original center plus the
  // previous rim endpoint and new rim vertices. Each native chunk gets its
