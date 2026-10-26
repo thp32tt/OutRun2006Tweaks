@@ -304,10 +304,11 @@ def check_stage_extension_direct_owner(text: str) -> None:
         "StageExtensionAdmission.mayPublish(" in leave and
         "if (admitted)" in leave and
         "RevokeD3DXDirectStageTicket(sourceTicket);" in leave and
-        leave.index("if (admitted)") <
-        leave.index("TagAppendedNodes(StageExtensionBefore,") <
-        leave.index("RevokeD3DXDirectStageTicket(sourceTicket);") <
-        leave.index("StageExtensionDirectDrawOwner.reset();")
+        "StageExtensionDirectDrawOwner.reset();" in leave and
+        leave.find("if (admitted)") <
+        leave.find("TagAppendedNodes(StageExtensionBefore,") <
+        leave.find("RevokeD3DXDirectStageTicket(sourceTicket);") <
+        leave.find("StageExtensionDirectDrawOwner.reset();")
     ):
         fail("stage +TIME queued sibling/native flush exit admission lost")
     if "GameSemantic::CurrentScope =" in enter:

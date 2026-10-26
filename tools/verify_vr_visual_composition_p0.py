@@ -829,7 +829,11 @@ def verify_exact_call_window_hud_scope(source):
                 raise SystemExit(kind+' restoration became conditional')
             if 'StageExtensionAdmission.mayPublish(' not in leave:
                 raise SystemExit(kind+' +TIME GPU/queue owner guard lost')
-            cleanup = leave[leave.find('StageExtensionDirectDrawOwner.reset();'):]
+            # The later diagnostic formatter legitimately prints VR state.
+            # Inspect only the actual native RAII/queue restoration segment,
+            # never the telemetry that follows the completed cleanup.
+            cleanup = leave[leave.find('StageExtensionDirectDrawOwner.reset();'):
+                            leave.find('const auto hit = ++StageExtensionCompleted;')]
             if 'Settings::VREnabled' in cleanup:
                 raise SystemExit(kind+' restoration now VR gated')
         elif 'Settings::VREnabled' in leave:
