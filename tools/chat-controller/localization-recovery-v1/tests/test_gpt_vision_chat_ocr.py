@@ -44,7 +44,7 @@ class GPTChatOCRTests(unittest.TestCase):
     def restore(self):
         for k,v in self.old.items():setattr(g,k,v)
 
-    def test_end_to_end_chat_response_to_crop_manifest(self):
+    def test_end_to_end_chat_response_to_direct_manifest(self):
         binding,reason=g.next_binding()
         self.assertIsNone(reason)
         self.assertEqual(binding["role"],"C1OCR")
@@ -66,8 +66,12 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertEqual(m["bbox_xyxy"],[10,10,50,30])
         self.assertFalse(m["external_api_used"])
         self.assertFalse(m["image_generation_used"])
+        self.assertEqual(m["status"],"DIRECT_IMAGEGEN_READY")
+        self.assertTrue(m["direct_full_hd_reference"])
+        self.assertFalse(m["crop_created"])
+        self.assertEqual(m["target_dimensions"],[40,20])
         crop=manifests[0].parent/"english_original_native_crop.png"
-        self.assertTrue(crop.is_file())
+        self.assertFalse(crop.exists())
 
     def test_wrong_task_response_is_held_and_retryable(self):
         binding,_=g.next_binding()
@@ -94,7 +98,7 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertIn("PHRASE_NOT_APPROVED",result["rejected"])
         self.assertIn("BBOX_OUT_OF_RANGE",result["rejected"])
 
-    def test_low_confidence_is_not_auto_cropped(self):
+    def test_low_confidence_is_not_auto_queued(self):
         binding,_=g.next_binding();g.stage_submission(binding["task_id"])
         g.record_chat_url(binding["task_id"],"https://chatgpt.com/c/12345678-1234-1234-1234-123456789abc")
         response=json.dumps({"task_id":binding["task_id"],"source_png":self.name,
