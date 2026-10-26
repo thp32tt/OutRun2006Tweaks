@@ -47,3 +47,5 @@ assert 'Hookclass CommandLineArguments' not in misc
 assert 'OriginalDirect3DCreate9 = nullptr;        Direct3DCreate9Fn' not in ex
 assert misc.count('class CommandLineArguments : public Hook') == 1
 assert ex.count('Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;') == 1
+
+assert 'Game::screen_resolution->x, Game::screen_resolution->y);\n    }\n}\n\nclass CommandLineArguments : public Hook' in misc

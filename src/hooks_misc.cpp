@@ -883,6 +883,7 @@ namespace
             "VR RESOLUTION SPLIT: logical game/UI source stays {}x{}; physical D3D9Ex target will use live OpenXR eye extent at CreateDevice",
             Game::screen_resolution->x, Game::screen_resolution->y);
     }
+}
 
 class CommandLineArguments : public Hook
 {
