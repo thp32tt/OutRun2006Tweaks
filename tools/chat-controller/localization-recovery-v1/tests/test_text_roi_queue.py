@@ -71,6 +71,43 @@ class TextRoiQueueTests(unittest.TestCase):
         self.assertIsNone(blocked)
         self.assertIn("BATCH_AWAITING_RESULT_AND_LIBRARY", reason)
 
+    def test_direct_full_hd_reference_stages_single_target_without_crop(self):
+        direct_root=self.root/"direct_sources"
+        direct_root.mkdir()
+        source=direct_root/"Q043_FULL.png"
+        Image.new("RGBA",(2048,2048),(0,0,0,0)).save(source)
+        old_root=text_roi_queue.DIRECT_SOURCE_ROOT
+        text_roi_queue.DIRECT_SOURCE_ROOT=direct_root
+        self.addCleanup(lambda:setattr(text_roi_queue,"DIRECT_SOURCE_ROOT",old_root))
+        sha=hashlib.sha256(source.read_bytes()).hexdigest()
+        direct=dict(self.item,
+            id="Q043_direct_congrats",
+            imagegen_input_mode="FULL_HD_DIRECT_REFERENCE",
+            imagegen_input_png=source.name,
+            imagegen_input_path=str(source),
+            imagegen_input_sha256=sha,
+            source_png_sha256=sha,
+            source_dimensions=[2048,2048],
+            target_dimensions=[500,120],
+            bbox_xyxy=[100,200,600,320],
+            direct_bbox_validated=True,
+            alpha_crop_margin_checked=False,
+            english="CONGRATULATIONS!",
+            korean="축하합니다!",
+        )
+        self.write_manifest([direct])
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        self.assertEqual(binding["expected_images"],1)
+        self.assertEqual(binding["paths"],[str(source)])
+        self.assertIn("크롭이 아니라 검증된 원본 HD 전체 이미지",binding["prompt"])
+        self.assertIn("CONGRATULATIONS!",binding["prompt"])
+        self.assertIn("축하합니다!",binding["prompt"])
+        self.assertIn("[100,200,600,320]",binding["prompt"])
+        self.assertEqual(binding["items"][0]["output_filename"],"Q043_direct_congrats_k.png")
+        self.assertEqual(binding["items"][0]["width"],500)
+        self.assertEqual(binding["items"][0]["height"],120)
+
     def test_presend_failure_rolls_submitting_back_to_same_staged_task(self):
         binding,error=text_roi_queue.next_binding("A",self.root)
         self.assertIsNone(error)
