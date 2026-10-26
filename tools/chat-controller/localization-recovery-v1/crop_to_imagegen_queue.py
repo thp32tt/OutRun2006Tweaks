@@ -269,11 +269,21 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
                 continue
             if j.get("old_split_tiles_used") is not False:
                 continue
-            if j.get("edge_warning") not in (None, ""):
+            legacy_gpt_direct = (
+                j.get("status") == "CROP_TEST_ONLY_REVIEW_REQUIRED"
+                and isinstance(j.get("gpt_chat_task_id"), str)
+                and j["gpt_chat_task_id"].startswith("OUTRUN-GPT-OCR-")
+                and j.get("gpt_chat_bbox_source") == "CHATGPT_ATTACHED_ORIGINAL_HD_IMAGE"
+                and j.get("external_api_used") is False
+                and j.get("image_generation_used") is False
+            )
+            direct = j.get("status") == "DIRECT_IMAGEGEN_READY" or legacy_gpt_direct
+            # Crop-edge warnings are relevant only when the crop itself is the
+            # ImageGen reference. Full-HD direct mode never consumes that crop.
+            if j.get("edge_warning") not in (None, "") and not direct:
                 continue
             source_sha = j.get("source_sha256")
             dds_sha = j.get("reference_dds_sha256")
-            direct = j.get("status") == "DIRECT_IMAGEGEN_READY"
             crop_sha = j.get("crop_sha256")
             required_shas = (source_sha, dds_sha) if direct else (source_sha, dds_sha, crop_sha)
             if not all(isinstance(x, str) and HEX64.fullmatch(x) for x in required_shas):
@@ -292,7 +302,9 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
             if len(kos) != 1:
                 continue
             if direct:
-                if j.get("direct_full_hd_reference") is not True or j.get("crop_created") is not False:
+                if not legacy_gpt_direct and (
+                        j.get("direct_full_hd_reference") is not True or
+                        j.get("crop_created") is not False):
                     held += 1
                     continue
                 source = croot / "hd_original_108_verified" / j.get("source_png", "")
@@ -342,7 +354,12 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
                     "korean": next(iter(kos)),
                     "source_key": key,
                     "old_split_tiles_used": False,
-                    "auto_admission": "GPT_OCR_DIRECT_FULL_HD_REFERENCE_NO_CROP",
+                    "auto_admission": (
+                        "LEGACY_GPT_OCR_PROMOTED_TO_FULL_HD_DIRECT_NO_CROP"
+                        if legacy_gpt_direct else
+                        "GPT_OCR_DIRECT_FULL_HD_REFERENCE_NO_CROP"
+                    ),
+                    "legacy_crop_ignored": bool(legacy_gpt_direct),
                     "runtime_validation": "UNTESTED",
                 })
             else:
