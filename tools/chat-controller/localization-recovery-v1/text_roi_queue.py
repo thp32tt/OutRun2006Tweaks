@@ -35,6 +35,10 @@ SLOTS = {"A": (0, 10, 20, 30, 40, 50), "B": (5, 15, 25, 35, 45, 55)}
 SIZE = 5
 MAX_ROLLING_UPLOADS = 75  # Account upload cap may be stricter.
 ZERO_OUTPUT_STALE_RETRY_SECONDS = 30 * 60
+DIRECT_SOURCE_ROOT = Path(os.environ.get(
+    "OUTRUN_DIRECT_SOURCE_ROOT",
+    "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified",
+))
 
 def state_path(root, role):
     return Path(root) / STATE_DIR / (role + "_state.json")
@@ -67,9 +71,17 @@ def _read_sources(root):
         if role not in groups:
             raise ValueError("ROI_UNKNOWN_ROLE")
         png = e.get("imagegen_input_png")
-        if not isinstance(png, str) or not png.endswith(".png") or png in paths:
+        direct = e.get("imagegen_input_mode") == "FULL_HD_DIRECT_REFERENCE"
+        if not isinstance(png, str) or not png.endswith(".png"):
             raise ValueError("ROI_INPUT_DUPLICATE_OR_INVALID")
-        paths.add(png)
+        if not direct:
+            if png in paths:
+                raise ValueError("ROI_INPUT_DUPLICATE_OR_INVALID")
+            paths.add(png)
+        else:
+            direct_path=e.get("imagegen_input_path")
+            if not isinstance(direct_path,str) or not direct_path.endswith(".png"):
+                raise ValueError("ROI_DIRECT_SOURCE_PATH_INVALID")
         for field in ("english", "korean", "imagegen_input_sha256", "source_dds_sha256",
                       "source_png_sha256", "source_dds_path"):
             if not isinstance(e.get(field), str) or not e[field]:
@@ -82,7 +94,16 @@ def _read_sources(root):
         if not (isinstance(bbox, list) and len(bbox) == 4 and all(type(v) is int for v in bbox) and
                 bbox[0] >= 0 and bbox[1] >= 0 and bbox[2] > bbox[0] and bbox[3] > bbox[1]):
             raise ValueError("ROI_INVALID_SOURCE_BBOX")
-        if e.get("alpha_crop_margin_checked") is not True:
+        if direct:
+            if e.get("direct_bbox_validated") is not True:
+                raise ValueError("ROI_DIRECT_BBOX_NOT_VERIFIED")
+            dims=e.get("source_dimensions")
+            target=e.get("target_dimensions")
+            if not (isinstance(dims,list) and len(dims)==2 and all(type(v) is int and v>0 for v in dims)):
+                raise ValueError("ROI_DIRECT_SOURCE_DIMENSIONS_INVALID")
+            if not (isinstance(target,list) and len(target)==2 and all(type(v) is int and v>0 for v in target)):
+                raise ValueError("ROI_DIRECT_TARGET_DIMENSIONS_INVALID")
+        elif e.get("alpha_crop_margin_checked") is not True:
             raise ValueError("ROI_CROP_EDGE_NOT_VERIFIED")
         groups[role].append(e)
     return groups, None, None
@@ -125,13 +146,21 @@ def _count_recent(root):
 
 def _filemap(source_row, ordinal, src, original):
     from PIL import Image
-    p = Path(src).resolve()
+    direct=source_row.get("imagegen_input_mode")=="FULL_HD_DIRECT_REFERENCE"
     filename = source_row["imagegen_input_png"]
     if Path(filename).name != filename or not re.fullmatch(r"[A-Za-z0-9_.-]+\.png", filename):
         raise ValueError("ROI_UNSAFE_IMAGE_FILENAME")
-    srcpath = p / filename
-    if not srcpath.is_file() or srcpath.is_symlink() or not srcpath.resolve().is_relative_to(p):
-        raise ValueError("ROI_IMAGE_MISSING")
+    if direct:
+        srcpath=Path(source_row.get("imagegen_input_path","")).resolve()
+        allowed=DIRECT_SOURCE_ROOT.resolve()
+        if (not srcpath.is_file() or srcpath.is_symlink() or not srcpath.is_relative_to(allowed)
+                or srcpath.name!=filename):
+            raise ValueError("ROI_DIRECT_IMAGE_MISSING_OR_UNSAFE")
+    else:
+        p = Path(src).resolve()
+        srcpath = p / filename
+        if not srcpath.is_file() or srcpath.is_symlink() or not srcpath.resolve().is_relative_to(p):
+            raise ValueError("ROI_IMAGE_MISSING")
     raw = srcpath.read_bytes()
     if hashlib.sha256(raw).hexdigest() != source_row["imagegen_input_sha256"]:
         raise ValueError("ROI_IMAGE_SHA_MISMATCH")
@@ -140,16 +169,27 @@ def _filemap(source_row, ordinal, src, original):
     with Image.open(srcpath) as im:
         if im.format != "PNG" or im.mode != "RGBA" or not (8 <= im.width <= 8192 and 8 <= im.height <= 8192):
             raise ValueError("ROI_INVALID_RGBA_OR_SIZE")
-        w,h=im.size
+        ref_w,ref_h=im.size
+    if direct:
+        if [ref_w,ref_h] != source_row.get("source_dimensions"):
+            raise ValueError("ROI_DIRECT_SOURCE_DIMENSIONS_CHANGED")
+        w,h=source_row["target_dimensions"]
+        output_filename=source_row["id"]+"_k.png"
+    else:
+        w,h=ref_w,ref_h
+        output_filename=filename[:-4] + "_k.png"
     return {
         "ordinal": ordinal, "filename": filename,
-        "output_filename": filename[:-4] + "_k.png", "path": str(srcpath),
+        "output_filename": output_filename, "path": str(srcpath),
         "sha256": source_row["imagegen_input_sha256"],
         "source_dds_sha256": source_row["source_dds_sha256"],
         "source_png_sha256": source_row["source_png_sha256"],
         "source_dds_path": source_row["source_dds_path"],
         "working_orientation": "READABLE_UPRIGHT",
         "width": w, "height": h,
+        "reference_width": ref_w, "reference_height": ref_h,
+        "input_mode": source_row.get("imagegen_input_mode","ROI_CROP_REFERENCE"),
+        "bbox_xyxy": source_row["bbox_xyxy"],
         "queue_indexes": source_row.get("queue_index", ""),
         "x": source_row["bbox_xyxy"][0], "y": source_row["bbox_xyxy"][1],
         "english": source_row["english"], "korean": source_row["korean"],
@@ -158,23 +198,46 @@ def _filemap(source_row, ordinal, src, original):
 
 
 def _prompt(role, batch_id, tiles, translations):
-    lines = [
-        "@Create image — OutRun 2006 HD UI 문구별 투명 PNG 한글화",
-        f"RUN_SLOT={role}; BATCH_ID={batch_id}; BATCH_COUNT={len(tiles)}; LIBRARY_FOLDER={LIBRARY_FOLDER}",
-        "입력 이미지는 검증된 원본 HD 전체 이미지에서 추출한 서로 독립된 한 문구 ROI입니다.",
-        f"입력 {len(tiles)}개 → 투명 RGBA 한글 글자/외곽선/그림자 결과 {len(tiles)}개, 각각 완전히 분리하여 생성하세요.",
-        f"중요: 이미지 생성 도구 호출의 출력 개수(n)를 반드시 BATCH_COUNT={len(tiles)}로 설정하세요. 결과 이미지 파일은 정확히 {len(tiles)}개여야 합니다.",
-        f"한 장만 생성하거나 한 장 안에 {len(tiles)}개를 합치는 것은 실패입니다. 입력 1개당 독립 출력 1개씩 총 {len(tiles)}장을 생성하세요.",
-        "원문 문구의 채움, 기울기 방향, 외곽선, 광택과 그림자를 가능한 보존하면서 표시된 한국어 정확한 텍스트만 생성하세요.",
-        "결과에 영문 원문, 다른 이미지의 글자, 차량, 배경, 버튼/아이콘, 합본·콜라주, 구석에 설명/번호를 넣지 마세요.",
-        "글자와 그림자는 PNG 가장자리에서 잘리지 않으며, 글자 사이 충돌/가짜 글자가 없어야 합니다.",
-        "한글 이미지 개수와 입력 파일 순서/개별 대응을 보존하세요.",
-        f"기존 프로젝트 '{LIBRARY_FOLDER}'의 라이브러리에 각각 실제로 저장하고, 확인 없는 저장 성공 주장은 하지 마세요.",
-        "영문→승인 한글 대상:",
-    ]
-    for i,item in enumerate(tiles,1):
-        lines.append(f"[{i}/{len(tiles)}] {item['filename']} : {item['english']} → {item['korean']}; {item['width']}×{item['height']} px; 출력 {item['output_filename']}")
-    lines.append("전송과 결과 검증은 각 PNG 실제 첨부·생성물 수량·저장 SHA 증빙이 필요합니다. 게임 DDS/실게임 PASS를 주장하지 마세요.")
+    direct=all(x.get("input_mode")=="FULL_HD_DIRECT_REFERENCE" for x in tiles)
+    if direct and len(tiles)!=1:
+        raise ValueError("DIRECT_FULL_HD_BATCH_MUST_BE_SINGLE_TARGET")
+    if direct:
+        item=tiles[0]
+        box=item["bbox_xyxy"]
+        lines=[
+            "@Create image — OutRun 2006 HD UI 원본 전체 이미지 직접 참조 한글화",
+            f"RUN_SLOT={role}; BATCH_ID={batch_id}; BATCH_COUNT=1; LIBRARY_FOLDER={LIBRARY_FOLDER}",
+            "첨부 이미지는 크롭이 아니라 검증된 원본 HD 전체 이미지입니다.",
+            f"대상 영문 문구는 정확히 '{item['english']}'이며 위치 bbox는 [{box[0]},{box[1]},{box[2]},{box[3]}] 입니다.",
+            f"원본 전체 크기는 {item['reference_width']}×{item['reference_height']} px이고 대상 문구 영역 크기는 {item['width']}×{item['height']} px입니다.",
+            f"이 대상 문구의 모양만 참고하여 승인 한국어 '{item['korean']}' 한 문구만 생성하세요.",
+            "원본 전체 이미지나 bbox 영역의 배경을 재생성하지 마세요. 차량, 배경, 버튼, 아이콘, 다른 영문/일문/한글은 출력하지 마세요.",
+            "결과는 배경이 완전히 투명한 RGBA PNG 한 장이며, 한국어 글자/원문의 외곽선/광택/그림자만 포함해야 합니다.",
+            "원문 문구의 채움, 기울기 방향, 외곽선, 광택과 그림자를 가능한 보존하고 한국어의 시각적 폭/높이는 원래 bbox 범위를 넘지 않게 하세요.",
+            "bbox는 원본에서 스타일과 위치를 찾기 위한 참조값일 뿐입니다. 결과 PNG에 원본 전체 캔버스나 빈 투명 여백을 그대로 복제하지 마세요.",
+            "중요: 이미지 생성 도구 호출의 출력 개수(n)는 반드시 1이어야 하며 합본·콜라주·설명·번호를 넣지 마세요.",
+            f"출력 파일 대응: {item['output_filename']}",
+            f"기존 프로젝트 '{LIBRARY_FOLDER}'의 라이브러리에 실제 생성 결과를 저장하고 확인 없는 저장 성공 주장은 하지 마세요.",
+            "게임 DDS/실게임 PASS를 주장하지 마세요.",
+        ]
+    else:
+        lines = [
+            "@Create image — OutRun 2006 HD UI 문구별 투명 PNG 한글화",
+            f"RUN_SLOT={role}; BATCH_ID={batch_id}; BATCH_COUNT={len(tiles)}; LIBRARY_FOLDER={LIBRARY_FOLDER}",
+            "입력 이미지는 검증된 원본 HD 전체 이미지에서 추출한 서로 독립된 한 문구 ROI입니다.",
+            f"입력 {len(tiles)}개 → 투명 RGBA 한글 글자/외곽선/그림자 결과 {len(tiles)}개, 각각 완전히 분리하여 생성하세요.",
+            f"중요: 이미지 생성 도구 호출의 출력 개수(n)를 반드시 BATCH_COUNT={len(tiles)}로 설정하세요. 결과 이미지 파일은 정확히 {len(tiles)}개여야 합니다.",
+            f"한 장만 생성하거나 한 장 안에 {len(tiles)}개를 합치는 것은 실패입니다. 입력 1개당 독립 출력 1개씩 총 {len(tiles)}장을 생성하세요.",
+            "원문 문구의 채움, 기울기 방향, 외곽선, 광택과 그림자를 가능한 보존하면서 표시된 한국어 정확한 텍스트만 생성하세요.",
+            "결과에 영문 원문, 다른 이미지의 글자, 차량, 배경, 버튼/아이콘, 합본·콜라주, 구석에 설명/번호를 넣지 마세요.",
+            "글자와 그림자는 PNG 가장자리에서 잘리지 않으며, 글자 사이 충돌/가짜 글자가 없어야 합니다.",
+            "한글 이미지 개수와 입력 파일 순서/개별 대응을 보존하세요.",
+            f"기존 프로젝트 '{LIBRARY_FOLDER}'의 라이브러리에 각각 실제로 저장하고, 확인 없는 저장 성공 주장은 하지 마세요.",
+            "영문→승인 한글 대상:",
+        ]
+        for i,item in enumerate(tiles,1):
+            lines.append(f"[{i}/{len(tiles)}] {item['filename']} : {item['english']} → {item['korean']}; {item['width']}×{item['height']} px; 출력 {item['output_filename']}")
+        lines.append("전송과 결과 검증은 각 PNG 실제 첨부·생성물 수량·저장 SHA 증빙이 필요합니다. 게임 DDS/실게임 PASS를 주장하지 마세요.")
     prompt="\n".join(lines)
     if len(prompt) > 26000:
         raise ValueError("ROI_PROMPT_TOO_LONG")
@@ -210,8 +273,17 @@ def next_binding(role, root="/data/imagegen"):
         else:
             first=st["next_ordinal"]
             allowed=min(SIZE,MAX_ROLLING_UPLOADS-_count_recent(root))
+            first_direct=rows[first-1].get("imagegen_input_mode")=="FULL_HD_DIRECT_REFERENCE"
+            if first_direct:
+                allowed=1
             for idx in range(first,min(len(rows),first+allowed-1)+1):
-                selected.append(_filemap(rows[idx-1],idx,root/SOURCE_DIR,None))
+                row=rows[idx-1]
+                row_direct=row.get("imagegen_input_mode")=="FULL_HD_DIRECT_REFERENCE"
+                if selected and row_direct!=first_direct:
+                    break
+                if first_direct and selected:
+                    break
+                selected.append(_filemap(row,idx,root/SOURCE_DIR,None))
             if not selected:
                 return None,"SHARED_ROLLING_UPLOAD_QUOTA_HOLD"
             ordinals=[x["ordinal"] for x in selected]
