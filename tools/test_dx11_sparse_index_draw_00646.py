@@ -64,7 +64,12 @@ assert "5u, kMaxNativeGameStripPrimitives, elements)" in probe
 assert "kMaxNativeGameStripPrimitives =" in span
 assert "kMaxNativeGameFanPrimitives =" in span
 assert "kMaxNativeGameVertices - 2u" in span
-assert "primitiveCount > kMaxNativeGameStripPrimitives" in span
+# Two connected polygon source admission routes share the same checked
+# vertex cap; assert both caps and their *rejection* before native draw.
+assert "primitiveCount > cap" in span
+assert "d3d9Type == 5u" in span
+assert "kMaxNativeGameStripPrimitives : kMaxNativeGameFanPrimitives" in span
+assert "!game_native_primitive_element_count(6u, kMaxNativeGameFanPrimitives + 1u, n)" in span
 assert "primitiveCount > kMaxNativeGamePrimitives" in span
 assert "sourceElements > kMaxNativeGameVertices" in span
 assert "game_compact_sparse_indices(distant, kMaxNativeGameVertices + 1u" in probe
