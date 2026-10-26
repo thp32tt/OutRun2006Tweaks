@@ -332,7 +332,7 @@ def apply_response(task_id,assistant_text):
         # GPT chat crops use a dedicated writable root. Legacy OCR output may be
         # root-owned on the host bind mount and must remain read-only.
         sourceout=GPT_OUT/Path(a["source_png"]).stem
-        margin_check=_load_margin_check();applied=0;rejected=[];seen=set()
+        applied=0;rejected=[];seen=set()
         response_sha=hashlib.sha256(assistant_text.encode("utf-8")).hexdigest()
         for det in detections:
             if not isinstance(det,dict):rejected.append("DETECTION_NOT_OBJECT");continue
@@ -350,27 +350,29 @@ def apply_response(task_id,assistant_text):
                 rejected.append("CONFIDENCE_INVALID");continue
             if float(conf) < 0.60:
                 rejected.append("CONFIDENCE_TOO_LOW");continue
-            phrase=targets[code];bad=margin_check(image,box)
-            if bad and bad!="ALPHA_TOUCHES_CROP_BORDER_REVIEW":rejected.append("MARGIN_"+str(bad));continue
+            phrase=targets[code]
             label=hashlib.sha256((a["source_png"]+"|"+phrase+"|"+json.dumps(box)+"|"+VERSION+"|"+task_id).encode()).hexdigest()[:16]
-            target=sourceout/label;outfile=target/"english_original_native_crop.png"
+            target=sourceout/label;mp=target/"manifest.json"
             if target.exists():
-                mp=target/"manifest.json"
-                if not mp.is_file() or json.loads(mp.read_text(encoding="utf-8")).get("gpt_chat_task_id")!=task_id:raise ValueError("GPT_OCR_TARGET_COLLISION")
+                if not mp.is_file():
+                    raise ValueError("GPT_OCR_TARGET_COLLISION")
+                prior=json.loads(mp.read_text(encoding="utf-8"))
+                if prior.get("gpt_chat_task_id")!=task_id or prior.get("status")!="DIRECT_IMAGEGEN_READY":
+                    raise ValueError("GPT_OCR_TARGET_COLLISION")
                 seen.add(code);continue
-            target.mkdir(parents=True,exist_ok=False);crop=image.crop((x0,y0,x1,y1));crop.save(outfile,format="PNG")
-            with Image.open(outfile) as proof:
-                if proof.mode!="RGBA" or proof.size!=crop.size or proof.tobytes()!=crop.tobytes():raise ValueError("GPT_OCR_CROP_ROUNDTRIP_MISMATCH")
-            manifest={"status":"CROP_TEST_ONLY_REVIEW_REQUIRED","source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
-              "source_png":a["source_png"],"source_sha256":a["source_sha256"],"reference_dds_path":row["source_dds_path"],
-              "reference_dds_sha256":row["dds_sha256"],"independent_DDS_pixel_equality":"NOT_TESTED_FOR_THIS_PNG",
-              "queue_indexes":row["queue_indexes"],"english":phrase,"ocr_confidence":conf,"bbox_xyxy":box,
-              "source_dimensions":list(image.size),"crop_dimensions":list(crop.size),"crop_sha256":_digest(outfile),
-              "edge_warning":bad if bad else None,"human_review_required":True,"runtime_validation":"UNTESTED",
-              "old_split_tiles_used":False,"A_B":"STOPPED_UNTOUCHED","gpt_chat_ocr_version":VERSION,
+            target.mkdir(parents=True,exist_ok=False)
+            manifest={"status":"DIRECT_IMAGEGEN_READY","source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+              "source_png":a["source_png"],"source_png_path":str(src),"source_sha256":a["source_sha256"],
+              "reference_dds_path":row["source_dds_path"],"reference_dds_sha256":row["dds_sha256"],
+              "independent_DDS_pixel_equality":"NOT_TESTED_FOR_THIS_PNG","queue_indexes":row["queue_indexes"],
+              "english":phrase,"ocr_confidence":conf,"bbox_xyxy":box,"source_dimensions":list(image.size),
+              "target_dimensions":[x1-x0,y1-y0],"direct_full_hd_reference":True,"crop_created":False,
+              "human_review_required":True,"runtime_validation":"UNTESTED","old_split_tiles_used":False,
+              "A_B":"DIRECT_FULL_HD_REFERENCE_PENDING","gpt_chat_ocr_version":VERSION,
               "gpt_chat_task_id":task_id,"gpt_chat_response_sha256":response_sha,
-              "gpt_chat_bbox_source":"CHATGPT_ATTACHED_ORIGINAL_HD_IMAGE","external_api_used":False,"image_generation_used":False}
-            _atomic_json(target/"manifest.json",manifest);existing.append(box);seen.add(code);applied+=1
+              "gpt_chat_bbox_source":"CHATGPT_ATTACHED_ORIGINAL_HD_IMAGE","external_api_used":False,
+              "image_generation_used":False}
+            _atomic_json(mp,manifest);existing.append(box);seen.add(code);applied+=1
         completed={"task_id":task_id,"source_png":a["source_png"],"fingerprint":a["fingerprint"],
           "status":"APPLIED" if applied else "NO_VALID_DETECTIONS","applied":applied,"rejected":rejected[:50],
           "response_sha256":response_sha,"completed_at":_now(),"chat_url":a.get("chat_url")}
