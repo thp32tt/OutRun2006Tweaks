@@ -2490,6 +2490,17 @@ class UIScaling : public Hook
 		const auto scope = projected
 			? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 			: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+        // Recent real Quest trace: projected anchorValid=1 but zero
+        // registered queued nodes at 8,192 producers. The first physical
+        // D3DX sprite can instead be submitted synchronously inside this
+        // native E8. Drain an OLD owner's D3DX batch, then keep THIS
+        // exact projected rival producer as direct owner through its
+        // native source-exit flush. Never widen generic rank/GOAL/2D
+        // sprites and never drain an active queue.
+        const bool directRivalOwner = Settings::VREnabled && projected &&
+            !OutRunVR::GameSemantic::QueueRenderActive();
+        if (directRivalOwner)
+            FlushD3DXBeforeDirectGoalSource();
 		int result = 0;
 		{
 			OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
@@ -2497,6 +2508,8 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);
 			result = Game::sprani_play_ae_auth_alpha(
 				spriteId, x, y, a4, a5, alpha);
+            if (directRivalOwner)
+                FlushD3DXAtDirectGoalSourceExit();
 		}
         if (Settings::VREnabled && Settings::VRTelemetry)
         {
