@@ -19,7 +19,10 @@ assert "outputs <= 12u" in header and "outputs == 0u" in header
 assert "native_sm3_interface_decl_capacity(" in backend
 assert "inputs.size() > 8u" not in backend
 assert "native_sm3_ia_element_capacity(layout.size() + 1u)" in bridge
-assert "elements, streams, vertexCount, unpacked)" in bridge
+# An authentic large unindexed list may now upload firstChunkVertices
+# rather than the entire game VB. Retain the original multistream IA path.
+assert "const UINT firstChunkVertices = linearChunkUpload" in bridge
+assert "elements, streams, firstChunkVertices, unpacked)" in bridge
 assert "device->CreateInputLayout(" in bridge
 assert "context->IASetInputLayout(pipeline.inputLayout.Get())" in bridge
 assert "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge
