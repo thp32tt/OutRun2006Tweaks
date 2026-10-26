@@ -88,3 +88,43 @@ N100 ephemeral review files under `apk/_analysis_focus/`:
 - Two new research-only C++ contracts: `quest_touchframe_wheelpoints_recovered_20261026.hpp` and `quest_virtual_wheel_hand_entry_tables_20261026.hpp`.
 
 **CODE_CHANGED=NO | RESEARCH_CPP_CREATED=YES | COMPILED=NO | GITHUB_ACTIONS_BUILD=NOT_RUN | HMD_RUNTIME=UNTESTED | COMPLETE_ORIGINAL_SOURCE=NO.**
+
+
+## 6. NEW cross-verification: A/B are **Pa/Gu** tables, and 448CD0 resolves object NAMES
+
+After the initial review commit, a direct GitHub source search located the independent reconstructed original PC renderer `r4dius/outrun2-decomp`, files:
+- `src/platform/rob_disp.cpp`, `src/platform/rob_disp.hpp`;
+- `src/platform/object_db.cpp` and `src/platform/object_db.hpp`.
+
+**All 30 native 12-byte table records** independently match the PC decomp's `HandsPa513ba0` and `HandsGu513a30` definitions:
+
+| Verified Quest ELF table | Public reconstruction designation | Separate PC hand callback |
+|---|---|---|
+| **0x1AD558**, A | `HandsPa513ba0` | `rob_disp_hand_pa_5148f0` |
+| **0x1AD4A4**, B | `HandsGu513a30` | `rob_disp_hand_gu_5148d0` |
+
+**Important correction:** A/B are **Pa/Gu character/display variants**, NOT a left-hand vs right-hand designation. *Each* row has two handles/names for first/second hand objects. The table names and record values match external reconstructed Windows game data; semantics of the letters PA/GU need not be invented.
+
+Previously unresolved guest callback **0x448CD0** in `HandEntry` lambda is identified by `object_db`: it delegates to the PC object-name hash lookup (`448B10`) over the game's object database. Name hash uses `h = 0x83*h + uppercase(char)`; success returns the **object handle** (resource in upper 16 bits and object in lower 16 bits), otherwise `0xFFFFFFFF`. Thus the dynamic records' numbers `0x5E****` are **EXE .rdata pointers to object-name strings**, not final bone indices.
+
+### Exact eight name pairs from original PC executable
+
+The name pointers from both native tables were independently decoded from the user-owned canonical PC PE `.rdata`. These are the requested hand-object *identifiers* (not original mesh geometry):
+
+| Guest kind (5..19) | Pa 1st / 2nd object names | Gu 1st / 2nd object names |
+|---|---|---|
+| **7** | `TEL_DR_GH00_PA` / `TER_DR_GH00_PA` | `TEL_DR_GH00_GU` / `TER_DR_GH00_GU` |
+| **8** | `TEL_DR_GH00_PA_USA` / `TER_DR_GH00_PA_USA` | `TEL_DR_GH00_GU_USA` / `TER_DR_GH00_GU_USA` |
+| **10** | `TEL_DR_LH00_PA` / `TER_DR_LH00_PA` | `TEL_DR_LH00_GU` / `TER_DR_LH00_GU` |
+| **12** | `TEL_DR_MH00_DF` / `TER_DR_MH00_DF` | `TEL_DR_MH00_GU` / `TER_DR_MH00_GU` |
+
+The source hand name `TEL/TER` has left/right-like naming but a concrete mesh/rig ownership binding must be checked before asserting an anatomical interpretation. For all other kinds 5..19 the table entries are either already numeric game handles or `0xFFFFFFFF` placeholders.
+
+Confirmed PC display memory owner: `PcRobDispState::Works` `0x8577D8 + id*0x60`, `+0x58/+0x5C` contain the two resolved hand object handles. `Draw::hand_513e40`'s matrix path can use these handles after the separate guest motion/bone lookup. This means the complete hand display port needs **object DB loaded before dynamic name resolution**, then existing motion-bone matrices; do not assume a hardcoded 32-bit name-address is itself drawable.
+
+**Status update:** guest name-to-handle stage is now identified and cross-verified, but the actual skeletal hand-bone transform and per-vehicle avatar placement are still not fully reconstructed; headset runtime remains UNTESTED.
+
+Public references:
+- https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/rob_disp.cpp
+- https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/rob_disp.hpp
+- https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/object_db.cpp
