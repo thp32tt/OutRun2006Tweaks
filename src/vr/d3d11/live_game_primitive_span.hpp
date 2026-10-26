@@ -8,12 +8,16 @@
 #include "live_game_source_stride.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
-// Game-authored mesh snapshots can span 2048 primitives. One shared,
- // bounded 6144-element budget covers linear, indexed, sparse shadows and
- // native Draw/DrawIndexed. Original DX9Ex rendering stays authoritative.
+// The 6144-element game VB/IB snapshot and GPU single-submit budget stays
+// fixed. D3D9 indexed/unindexed TRIANGLESTRIP can describe 4096 triangles
+// with only 4098 source elements; unlike TRIANGLELIST, its POINT fill needs
+// *multiple* bounded D3D11 GPU submissions. Retain the original 2048-triangle
+// limit for all other topology families and authoritative DX9Ex fallback.
 inline constexpr std::uint32_t kMaxNativeGamePrimitives = 2048u;
 inline constexpr std::uint32_t kMaxNativeGameVertices =
     kMaxNativeGamePrimitives * 3u;
+inline constexpr std::uint32_t kMaxNativeGameStripPrimitives = 4096u;
+static_assert(kMaxNativeGameStripPrimitives + 2u <= kMaxNativeGameVertices);
 // Common bound for actual D3D9 VB/IB/UP snapshots and D3D11 Draw/DrawIndexed.
 // A strip has P+2 source elements; a list has P*3. Never infer either from
 // the other: overreading a live game pointer could break the original draw.
@@ -57,7 +61,15 @@ constexpr bool game_native_primitive_element_count(
         return true;
     }
     case 4u: return game_primitive_element_count(false, primitiveCount, elements); // TRIANGLELIST
-    case 5u: // TRIANGLESTRIP
+    case 5u: { // TRIANGLESTRIP: compact source, windowed POINT/WIRE/SOLID GPU
+        if (primitiveCount == 0u ||
+            primitiveCount > kMaxNativeGameStripPrimitives) return false;
+        const std::uint64_t sourceElements =
+            static_cast<std::uint64_t>(primitiveCount) + 2u;
+        if (sourceElements > kMaxNativeGameVertices) return false;
+        elements = static_cast<std::uint32_t>(sourceElements);
+        return true;
+    }
     case 6u: return game_primitive_element_count(true, primitiveCount, elements); // TRIANGLEFAN
     default: return false; // Unknown primitive modes remain DX9Ex-only.
     }
@@ -76,6 +88,10 @@ constexpr bool game_native_mesh_span_contract() noexcept {
            n == kMaxNativeGameVertices &&
            game_native_primitive_element_count(5u, kMaxNativeGamePrimitives, n) &&
            n == kMaxNativeGamePrimitives + 2u &&
+           game_native_primitive_element_count(5u, kMaxNativeGameStripPrimitives, n) &&
+           n == kMaxNativeGameStripPrimitives + 2u &&
+           !game_native_primitive_element_count(5u, kMaxNativeGameStripPrimitives + 1u, n) &&
+           !game_native_primitive_element_count(6u, kMaxNativeGamePrimitives + 1u, n) &&
            game_native_primitive_element_count(6u, kMaxNativeGamePrimitives, n) &&
            n == kMaxNativeGamePrimitives + 2u &&
            !game_native_primitive_element_count(4u, kMaxNativeGamePrimitives + 1u, n) &&

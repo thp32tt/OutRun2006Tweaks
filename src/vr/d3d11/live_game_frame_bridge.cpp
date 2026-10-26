@@ -5608,6 +5608,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         nativeIndices = nullptr;
         nativeIndexCount = 0u;
     }
+    // The observer accepts up to 4096 authentic strip triangles in a
+    // <=6144-element source VB/IB. Unlike a 2048-triangle list, their POINT
+    // raster can require >6144 GPU indices; the source and native upload
+    // budgets must not be conflated. Original D3D9 stays authoritative.
     // An authentic shader-bound, already-native-layout indexed strip can
     // fit its D3D9 VB yet exceed the native POINTLIST index upload when
     // D3DFILL_POINT expands every triangle into three corner occurrences.
@@ -8381,8 +8385,10 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 }
             }
         }
-        // A genuine FVF menu/vehicle/race fan, or a POINT-filled strip,
-        // may expand to more native indices than one dynamic GPU IB permits.
+        // A genuine FVF menu/vehicle/race fan, or a 2049..4096 triangle
+        // POINT-filled strip, may expand past one GPU IB although its compact
+        // original game source is valid. Never reduce the D3D9 source span
+        // to the D3D11 per-Draw budget here.
         // Keep every source triangle occurrence, with global strip winding,
         // in bounded native DrawIndexed windows. The entire source IB was
         // validated above BEFORE the first GPU mutation. Failed later GPU
