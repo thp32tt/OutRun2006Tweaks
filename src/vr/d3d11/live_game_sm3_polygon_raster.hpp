@@ -57,6 +57,24 @@ game_sm3_strip_fill_window_plan(
     return {true, triangles, fill == 1u ? 3u * triangles : 0u};
 }
 
+// D3DRS_FILLMODE controls triangle polygons, not D3D9 POINTLIST/
+// LINELIST/LINESTRIP. Those game Draws can inherit POINT/WIREFRAME from
+// preceding triangles without changing their own primitive/raster semantics.
+// Keep genuine shader-bound points and lines on native IA/VS/PS Draw paths.
+struct GameSm3EffectivePolygonMode {
+    bool admitted = false;
+    bool pointTriangles = false;
+    bool wireTriangles = false;
+};
+[[nodiscard]] constexpr GameSm3EffectivePolygonMode
+game_sm3_effective_polygon_mode(
+    std::uint32_t fill, std::uint32_t topology) noexcept {
+    if (fill < 1u || fill > 3u || topology < 1u || topology > 6u)
+        return {}; // Invalid source state remains D3D9-authoritative.
+    const bool polygon = topology >= 4u;
+    return {true, polygon && fill == 1u, polygon && fill == 2u};
+}
+
 [[nodiscard]] constexpr bool game_sm3_polygon_fill_admitted(
     std::uint32_t fill, std::uint32_t topology, std::uint32_t cull,
     bool lineAA, bool lastPixel, bool unitPoint) noexcept {

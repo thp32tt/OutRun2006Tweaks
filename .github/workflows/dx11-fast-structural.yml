@@ -590,6 +590,8 @@ jobs:
           # bounded indexed GPU windows and oversized fan-IB preservation.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_indexed_fan_01087.cpp -o /tmp/dx11_sm3_indexed_fan_01087 && /tmp/dx11_sm3_indexed_fan_01087
           python tools/test_dx11_sm3_indexed_fan_01087.py
+          # 01092: real point/line GPU paths survive inherited polygon fill.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_game_inherited_polygon_state.cpp -o /tmp/dx11_fill_01092 && /tmp/dx11_fill_01092
           # 01091 authentic game SM3 instanced POINT/WIREFRAME GPU batch
           # with source corner order, negative late-index, and budget proofs.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_game_segmented_polygon_fill.cpp -o /tmp/dx11_poly_fill_01091 && /tmp/dx11_poly_fill_01091

@@ -5197,14 +5197,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         }
     }
-    const bool pointFill = fill == D3DFILL_POINT;
-    const bool wireFill = fill == D3DFILL_WIREFRAME;
-    const bool triangleFamily = type == D3DPT_TRIANGLELIST ||
-        type == D3DPT_TRIANGLESTRIP || type == D3DPT_TRIANGLEFAN;
-    if (fill != D3DFILL_SOLID && (!(pointFill || wireFill) || !triangleFamily)) {
-        ++s.liveSm3StateRejectReasons[3]; // unsupported game polygon raster
+    // D3D9 FILLMODE is inherited between game Draws but applies only to
+    // triangles. A preceding POINT/WIREFRAME triangle must not reject actual
+    // native shader-bound point/line Draws or reinterpret their topology.
+    // Point-size and line-AA/LASTPIXEL gates below remain authoritative.
+    const auto polygonMode = game_sm3_effective_polygon_mode(
+        static_cast<std::uint32_t>(fill), static_cast<std::uint32_t>(type));
+    if (!polygonMode.admitted) {
+        ++s.liveSm3StateRejectReasons[3]; // invalid source fill/topology
         return false;
     }
+    const bool pointFill = polygonMode.pointTriangles;
+    const bool wireFill = polygonMode.wireTriangles;
     if ((colorMask & ~0x0fu) != 0u) {
         ++s.liveSm3StateRejectReasons[4]; // invalid RT0 write mask
         return false;
