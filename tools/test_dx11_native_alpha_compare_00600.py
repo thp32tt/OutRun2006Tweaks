@@ -107,7 +107,19 @@ def main():
     ]
     for good, bad in cases:
         assert s.count(good) >= 1, good
-        assert not linked(s.replace(good, bad, 1)), "undetected destructive mutation: " + good
+        # 01095 also uses the genuine indexed polygon-window builder in the
+        # earlier SM3 source path. This alpha-test regression owns the LATER
+        # FVF observer path; destructive mutation of the unrelated earlier
+        # SM3 occurrence must not incorrectly count as breaking FVF safety.
+        # Preserve the mutation and still demand that deleting the actual
+        # FVF index-preflight call disconnects the guarded native GPU path.
+        if good == "if (!game_fvf_build_polygon_window(":
+            assert s.count(good) == 2, "expected independent SM3/FVF preflights"
+            cut = s.rfind(good)
+            mutated = s[:cut] + bad + s[cut + len(good):]
+        else:
+            mutated = s.replace(good, bad, 1)
+        assert not linked(mutated), "undetected destructive mutation: " + good
 
     comparisons = {
         1: lambda a, b: False,
