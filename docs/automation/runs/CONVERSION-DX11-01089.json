@@ -11,9 +11,9 @@
   "classification": "B_EXACT_SHA_CI_GRAPH_CONTRACT_REPAIR_AFTER_A_NATIVE_SM3_POLYGON_STRIP_IMPLEMENTATION",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:SM3_CONNECTED_STRIP_POINT_WIRE_SOLID_NATIVE_GPU_WINDOWS",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_RESULT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "terminal_gameplay_verified": false,
@@ -24,9 +24,9 @@
   "native_published_frame_count": "UNTESTED",
   "source_base_sha": "94e3f0cb8ff35e6a8ffbaae4be58992195781eca",
   "source_change_sha": "c59adafe2e9a8446e626d5c7f99b52ac22afa606",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "score_change": 0,
+  "material_result_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+  "validation_bearing_result_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+  "score_change": 1,
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
@@ -96,7 +96,101 @@
   "analysis_time_ratio": "NOT_MEASURED",
   "ci_time_ratio": "NOT_MEASURED",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "next_implementation_action": "After exact-SHA mandatory source gate, produce runtime native draw/frame evidence with OutRun menu/car/race and Quest3/VDXR separately; no gameplay claim before observed.",
-  "notes": "01089 source material at c59adafe; source graph validation failed due to old fixed native Draw count and outdated pointFill fan-only token. Exact scoped 01089 C++ native strip submissions registered without weakening negative fallback checks; original 01088 C6 remains separate. Same-task exact failure repair: required canonical source-to-native-to-visible-frame contract stages (visual runtime remains UNTESTED)."
+  "notes": "01089 source material at c59adafe; source graph validation failed due to old fixed native Draw count and outdated pointFill fan-only token. Exact scoped 01089 C++ native strip submissions registered without weakening negative fallback checks; original 01088 C6 remains separate. Same-task exact failure repair: required canonical source-to-native-to-visible-frame contract stages (visual runtime remains UNTESTED). C6: mandatory five push Gate SUCCESS at 87628eed; bookkeeping-only follow-up independent of validation-bearing source SHA.",
+  "result_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+  "implementation_commits": [
+    "c59adafe2e9a8446e626d5c7f99b52ac22afa606"
+  ],
+  "repair_commits": [
+    "4f5ef4d5848943ab7b91370b3320978cb8b3faec",
+    "87628eedf2f6351b738b0205d2a6a7eab51dad32"
+  ],
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40332918794,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918794"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40332918879,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918879"
+    },
+    {
+      "name": "Build",
+      "run_id": 40332918849,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918849"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40332918730,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918730"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40332918765,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918765"
+    }
+  ],
+  "acceptance_results": {
+    "sm3_strip_polygon_windows": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
+        "tools/dx11_sm3_indexed_fan_01087.cpp"
+      ],
+      "note": "Native SM3 original-indexed and linear triangle strip point/wire/solid source geometry/window code and C++ regression verified by exact-SHA CI; real game native pixels remain UNTESTED."
+    },
+    "strip_validated_safe_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/dx11_sm3_indexed_fan_01087.cpp",
+        "tools/test_dx11_sm3_indexed_fan_01087.py",
+        "tools/verify_dx11_first_game_frame_boundary.py"
+      ],
+      "note": "Original indexed IB scan before GPU submission, aligned strip seams and bounded native point occurrences with D3D9 fallback; standalone HMD/game UNTESTED."
+    },
+    "full_same_sha_ci": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918794",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918879",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918849",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918730",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918765"
+      ],
+      "note": "Five named push Actions all completed/success at exactly the same 87628eed source/repair SHA; subsequent C6 commit intentionally separate."
+    }
+  },
+  "ai2_previous_confirmed_cumulative_score": 1984,
+  "task_new_source_achievement_score": 1,
+  "ai2_new_confirmed_cumulative_score": 1985,
+  "score_note": "Prior SSOT confirmed AI2 1984 + one new completed integrated native SM3 indexed/nonindexed strip source achievement +1 = 1985; 01089 two same-task CI/metadata repairs, retry/rollover/C6 +0; not Quest3 gameplay PASS.",
+  "c6_bookkeeping_only": true,
+  "c6_does_not_revalidate_source": true,
+  "c6_source_validation_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no original game, Quest3, VDXR, fps, actual native Draw or published game frame observed."
 }
