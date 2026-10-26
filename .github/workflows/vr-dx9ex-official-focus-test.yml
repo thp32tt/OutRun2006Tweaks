@@ -19,6 +19,8 @@ on:
       - 'tools/verify_vr_e_flare_unhidden.py'
       - 'src/hooks_misc.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/vr/game/render_semantics.hpp'
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
       - 'tools/verify_vr_menu_resolution_split.py'
@@ -57,6 +59,9 @@ jobs:
           if (-not (Select-String src/vr/settings.cpp -Pattern 'Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source defaults' }
           if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR R26 RESULT_HUD_STAGE_HR' -SimpleMatch -Quiet)) { throw 'R26 result HUD stage telemetry missing' }
           if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR R26 RESULT_XYZRHW_PIXEL_PROBE' -SimpleMatch -Quiet)) { throw 'R26 source XYZRHW pixel evidence missing' }
+          if (-not (Select-String src/hooks_uiscaling.cpp -Pattern 'VR RIVAL A22 CURRENT QUEUE COMPARE' -SimpleMatch -Quiet)) { throw 'Rival pre/post-native queue comparison missing' }
+          if (-not (Select-String src/hooks_uiscaling.cpp -Pattern 'VR RIVAL NATIVE GPU FLUSH SINK' -SimpleMatch -Quiet)) { throw 'Rival actual D3DX Flush sink evidence missing' }
+          if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR RIVAL R30 GPU EYES' -SimpleMatch -Quiet)) { throw 'Rival physical stereo eye receipt missing' }
       - name: Validate +TIME entry/reentry/exit plus four destructive ticket regressions
         shell: pwsh
         run: |
