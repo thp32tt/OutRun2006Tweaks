@@ -24,7 +24,10 @@ static_assert(sizeof(HandEntryWire) == 12);
 static_assert(offsetof(HandEntryWire, target0) == 4);
 static_assert(offsetof(HandEntryWire, target1) == 8);
 // These 30 numeric records are transcribed from two verified original ELF
-// read-only table windows; A/B represent call order, not proven left/right.
+// read-only table windows. Cross-verified against the PC reconstruction:
+// A is HandsPa513ba0, B is HandsGu513a30. Neither A nor B is simply
+// a left-hand/right-hand label; each row contains two hand object handles
+// or source name pointers to be resolved via the game's object database.
 inline constexpr std::array<HandEntryRecord, 15> kHandEntriesA = {{
     /* guest index 5 */ { false, 0x00C40020u, 0x00C40022u },
     /* guest index 6 */ { false, 0x00CA0021u, 0x00CA0023u },
@@ -59,6 +62,12 @@ inline constexpr std::array<HandEntryRecord, 15> kHandEntriesB = {{
     /* guest index 18 */ { false, 0x01EC001Fu, 0x01EC0021u },
     /* guest index 19 */ { false, 0x01ED001Cu, 0x01ED001Du },
 }};
+inline constexpr const auto& kHandsPa513ba0 = kHandEntriesA;
+inline constexpr const auto& kHandsGu513a30 = kHandEntriesB;
+// For requiresGuestResolve=true, target0/target1 are original PC EXE
+// .rdata object-name pointers; the game callback 0x448CD0 resolves each
+// to an object handle through the loaded object-name database. A dynamic
+// lookup failure returns 0xFFFFFFFF. Other rows already contain handles.
 constexpr bool IsGuestHandEntryIndex(std::uint32_t guestValue) noexcept {
     return guestValue >= 5u && guestValue <= 19u;
 }
