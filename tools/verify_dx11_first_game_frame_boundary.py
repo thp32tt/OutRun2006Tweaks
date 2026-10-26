@@ -172,11 +172,11 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     require("bool initialize(const NativeBackendConfig& config)" in native and
             "ID3D11RenderTargetView* color_rtv()" in native,
             "native device and render target ownership missing")
-    # Native Draw dispatch remains confined to the same TWO game-source
-    # admitted functions: 2 FVF and 6 SM3 physical Draw/DrawIndexed sites.
-    # The additional SM3 DrawIndexed must be nested inside the validated
-    # nonindexed TRIANGLEFAN chunk branch, with exact center/rim attributes,
-    # source-pixel parity, original fallback and per-chunk bounded IB.
+    # Native Draw dispatch remains in exactly TWO game-source-admitted
+    # functions: 2 FVF and 8 SM3 physical Draw/DrawIndexed sites.
+    # The additional two DrawIndexed submits are admitted ONLY inside the
+    # indexed and nonindexed SM3 connected-strip GPU branches. Preserve the
+    # old bounded fan GPU callsite, original live-state gates and fallback.
     # Global counting alone never admits an arbitrary Draw elsewhere.
     match = re.search(r"bool submit\s*\(.*?\) noexcept \{(.*?)\n\}\n\nbool observe_source_device\(", code, re.S)
     sm3 = re.search(r"bool submit_live_sm3_game_draw\s*\(.*?\) noexcept \{(.*?)\n\}\n\n// Reuse geometric growth", code, re.S)
@@ -225,11 +225,46 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "nativeIndices = nullptr;" not in sm3.group(1).partition(
                 "    const auto fanChunkPlan =")[0] and
             # POINTLIST on windowed fans must not pre-expand the entire fan.
-            "if (pointFill && !fanChunkUpload)" in sm3.group(1),
+            "if (pointFill && !fanChunkUpload &&" in sm3.group(1) and
+            "!connectedChunkUpload && !indexedConnectedChunkUpload" in sm3.group(1),
             "chunked fan GPU draw must remain under original source/fallback admission")
-    require(len(dispatch) == len(scoped) + len(sm3_scoped) == 8 and
+    # 01089: the two new source-stripped POINTLIST submits are verified
+    # within their own per-window source-validated branches, not globally.
+    draw_loop = sm3.group(1).partition(
+        "    for (UINT submit = 0u; submit < nativeSubmissionCount; ++submit) {")[2]
+    indexed_strip = draw_loop.partition(
+        "        if (indexedConnectedChunkUpload) {")[2].partition(
+        "        if (linearChunkUpload) {")[0]
+    linear_strip = draw_loop.partition(
+        "        if (connectedChunkUpload) {")[2].partition(
+        "        if (fanChunkUpload) {")[0]
+    require(bool(indexed_strip) and bool(linear_strip) and
+            all(token in indexed_strip for token in (
+                "game_sm3_strip_fill_window_plan(", "indexCount,",
+                "firstIndex, drawCount, kMaxIndices", "s.frameBatch.abort();",
+                "game_sm3_assemble_indexed_window(",
+                "game_sm3_expand_polygon_points(",
+                "points.size() != window.pointIndexCount",
+                "D3D11_BIND_INDEX_BUFFER",
+                "context->DrawIndexed(window.pointIndexCount, 0u, 0);",
+                "issueNativeGameDraw(drawCount, 0u);")) and
+            all(token in linear_strip for token in (
+                "game_sm3_strip_fill_window_plan(", "vertexCount,",
+                "firstVertex, drawCount, kMaxIndices",
+                "game_sm3_assemble_streams(",
+                "upload_full_game_stream(",
+                "game_sm3_expand_polygon_points(",
+                "points.size() != window.pointIndexCount",
+                "D3D11_BIND_INDEX_BUFFER",
+                "context->DrawIndexed(window.pointIndexCount, 0u, 0);",
+                "issueNativeGameDraw(drawCount, 0u);")) and
+            "indices[i] >= vertexCount" in sm3.group(1) and
+            "std::uint64_t(indexCount) * plannedNativeStride" in sm3.group(1),
+            "indexed/nonindexed strip GPU submits escaped original bounds")
+    require(len(dispatch) == len(scoped) + len(sm3_scoped) == 10 and
             len(scoped) == 2 and
             sm3_scoped == ["->DrawIndexed(", "->Draw(",
+                           "->DrawIndexed(", "->DrawIndexed(",
                            "->DrawIndexed(", "->DrawIndexed(",
                            "->Draw(", "->DrawIndexed("] and
             all(token in sm3.group(1) for token in (

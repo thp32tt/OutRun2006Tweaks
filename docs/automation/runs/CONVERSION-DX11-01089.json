@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01089",
+  "production_id": "CONVERSION-DX11-01089",
+  "event_id": "CONVERSION-DX11-01089-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01089",
+  "classification": "B_EXACT_SHA_CI_GRAPH_CONTRACT_REPAIR_AFTER_A_NATIVE_SM3_POLYGON_STRIP_IMPLEMENTATION",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SM3_CONNECTED_STRIP_POINT_WIRE_SOLID_NATIVE_GPU_WINDOWS",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_RESULT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "terminal_gameplay_verified": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_base_sha": "94e3f0cb8ff35e6a8ffbaae4be58992195781eca",
+  "source_change_sha": "c59adafe2e9a8446e626d5c7f99b52ac22afa606",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
+    "tools/dx11_sm3_indexed_fan_01087.cpp",
+    "tools/test_dx11_sm3_indexed_fan_01087.py",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-01089.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate actual game-authored programmable SM3 indexed and unindexed triangle-strip POINT/WIREFRAME/SOLID GPU-window native Draw submission preserving original shader inputs and DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "sm3_strip_polygon_windows",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_RENDER_DRAW",
+        "expected_behavior": "Render polygon point occurrences and wire/solid source strip across multiple D3D11 bounded native GPU Draw/DrawIndexed windows, maintaining true strip winding."
+      },
+      {
+        "id": "strip_validated_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GAME_VERTEX_INPUT_FFB_FALLBACK",
+        "expected_behavior": "Reject misaligned seam, invalid source index or native budget before publication and preserve original D3D9/DX9Ex/input/FFB."
+      },
+      {
+        "id": "full_same_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "NATIVE_BUILD_EXACT_SHA",
+        "expected_behavior": "Five mandatory exact-SHA GitHub Actions push workflows completed success on the final validation-bearing source commit."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_SM3_INDEXED_AND_NONINDEXED_TRIANGLESTRIP",
+      "SOURCE_ATTRIBUTE_PRESERVING_BOUNDED_STRIP_WINDOWS",
+      "NATIVE_D3D11_SHADER_BOUND_POINT_OR_TRIANGLE_GPU_SUBMISSIONS",
+      "VISIBLE_MENU_CAR_RACE_FRAME_RUNTIME_UNTESTED"
+    ],
+    "batch_components": [
+      "LIVE_GAME_SM3_DRAW_GPU_INTERCEPT",
+      "NATIVE_CONNECTED_POLYGON_STRIP_WINDOW_TRANSLATION",
+      "POSITIVE_NEGATIVE_CXX_STATIC_CI_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Chunked original indexed and nonindexed triangle-strip point/wire/solid source windows verified for source winding and full occurrence coverage.",
+      "negative_regression": "Out-of-bounds final strip index, odd seam, unsupported fill, index budget and invalid source path fail closed.",
+      "component_integration": "D3D9 shader bound genuine Draw to D3D11 IA, VS/PS, authentic GPU Draw/DrawIndexed and preserved original D3D9 gameplay input."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_CONNECTED_STRIP_POINT_WIRE_SOLID_NATIVE_GPU_WINDOWS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "GAME_CREATED_D3D9_SM3_DRAW",
+      "GPU_NATIVE_D3D11_DRAW",
+      "SOURCE_FULLSCREEN_GAME_FRAME_UNTESTED"
+    ],
+    "visible_frame_acceptance": "Source/CI verified separately; Quest3/VDXR native pixels UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive=false by default; original D3D9/DX9Ex gamepad/FFB/SkyGlow and DXVK freeze preserved."
+  },
+  "source_implementation_time_ratio": "NOT_MEASURED",
+  "analysis_time_ratio": "NOT_MEASURED",
+  "ci_time_ratio": "NOT_MEASURED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "next_implementation_action": "After exact-SHA mandatory source gate, produce runtime native draw/frame evidence with OutRun menu/car/race and Quest3/VDXR separately; no gameplay claim before observed.",
+  "notes": "01089 source material at c59adafe; source graph validation failed due to old fixed native Draw count and outdated pointFill fan-only token. Exact scoped 01089 C++ native strip submissions registered without weakening negative fallback checks; original 01088 C6 remains separate."
+}
