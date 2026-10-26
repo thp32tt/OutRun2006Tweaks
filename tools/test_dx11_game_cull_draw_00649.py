@@ -58,7 +58,11 @@ def sm3_fan_connected(src):
         "// Reuse geometric growth buffers", 1)[0]
     return all(token in live for token in (
         "type != D3DPT_TRIANGLEFAN",
-        "game_fan_to_triangle_list(expected - 2u, indices, indexCount,",
+        "if (!deferredFanTriangles) {",
+        "game_fan_to_triangle_list(",
+        "expected - 2u, indices, indexCount, vertexCount,",
+        "game_sm3_plan_native_indexed_fan_chunks(",
+        "const bool indexedFanChunkUpload = fanChunkUpload && indices != nullptr;",
         "nativeFanTriangles.size() > kMaxIndices",
         "nativeIndices = nativeFanTriangles.data();",
         "nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());",
@@ -85,6 +89,14 @@ def sm3_fan_connected(src):
         "game_sm3_expand_connected_instance_indices(",
         "((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "liveBatch.record_source_draw(sourceOrdinal);",
+    )) and all(token in live.split("    const auto fanChunkPlan =", 1)[1].split(
+        "    const auto uploadPlan =", 1)[0] for token in (
+        "if (indexedFanChunkUpload) {",
+        "for (UINT i = 0u; i < indexCount; ++i)",
+        "indices[i] >= vertexCount",
+        "nativeIndices = nullptr;",
+        "} else if (deferredFanTriangles) {",
+        "return false; // unsupported large fan retains authoritative D3D9",
     ))
 assert sm3_fan_connected(c)
 for old, bad in (
@@ -93,6 +105,12 @@ for old, bad in (
     ("nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());",
      "nativeIndexCount = indexCount;"),
     ("nativeFanTriangles.size() > kMaxIndices", "nativeFanTriangles.empty()"),
+    ("if (!deferredFanTriangles) {", "if (true) {"),
+    ("game_sm3_plan_native_indexed_fan_chunks(",
+     "game_sm3_plan_native_invalid_fan_chunks("),
+    ("const bool indexedFanChunkUpload = fanChunkUpload && indices != nullptr;",
+     "const bool indexedFanChunkUpload = false;"),
+    ("} else if (deferredFanTriangles) {", "} else if (false) {"),
     ("context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
      "context->DrawIndexed(indexCount, 0u, static_cast<INT>(base));"),
     ("context->Draw(vertices, base);",
