@@ -24,8 +24,16 @@ int main() {
         5u, kMaxNativeGameStripPrimitives + 1u, admitted));
     assert(!game_native_primitive_element_count(
         4u, kMaxNativeGamePrimitives + 1u, admitted));
-    assert(!game_native_primitive_element_count(
+    // This fan limit was independently extended by 01097: the original
+    // connected center/rim source fits while D3D11 splits native GPU indices.
+    assert(game_native_primitive_element_count(
         6u, kMaxNativeGamePrimitives + 1u, admitted));
+    assert(admitted == kMaxNativeGamePrimitives + 3u);
+    assert(game_native_primitive_element_count(
+        6u, kMaxNativeGameFanPrimitives, admitted));
+    assert(admitted == kMaxNativeGameFanPrimitives + 2u);
+    assert(!game_native_primitive_element_count(
+        6u, kMaxNativeGameFanPrimitives + 1u, admitted));
     // The real GPU budget stays 6144 indices; oversized point strips must
     // use at least two DrawIndexed windows in both FVF and shader-bound paths.
     constexpr std::uint32_t nativeGpuIndices = kMaxNativeGameVertices;
