@@ -26,7 +26,7 @@ SCHEMA = "outrun-text-roi-production-v1"
 ACTIVATION = "AUTO_NATIVE_CROP_TO_IMAGEGEN_20261019"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 SAFE = re.compile(r"^[A-Za-z0-9_-]{4,96}$")
-ACCEPT_STATUS = {"TEST_ONLY_UNTESTED_IN_GAME", "CROP_TEST_ONLY_REVIEW_REQUIRED"}
+ACCEPT_STATUS = {"TEST_ONLY_UNTESTED_IN_GAME", "CROP_TEST_ONLY_REVIEW_REQUIRED", "DIRECT_IMAGEGEN_READY"}
 
 def digest(path: Path) -> str:
     h = hashlib.sha256()
@@ -273,8 +273,10 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
                 continue
             source_sha = j.get("source_sha256")
             dds_sha = j.get("reference_dds_sha256")
+            direct = j.get("status") == "DIRECT_IMAGEGEN_READY"
             crop_sha = j.get("crop_sha256")
-            if not all(isinstance(x, str) and HEX64.fullmatch(x) for x in (source_sha, dds_sha, crop_sha)):
+            required_shas = (source_sha, dds_sha) if direct else (source_sha, dds_sha, crop_sha)
+            if not all(isinstance(x, str) and HEX64.fullmatch(x) for x in required_shas):
                 held += 1
                 continue
             q = qid(j.get("source_png", ""))
@@ -289,10 +291,21 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
             kos = tr.get((q, normalized(en)), set())
             if len(kos) != 1:
                 continue
-            crop = mp.parent / "english_original_native_crop.png"
-            if not crop.is_file() or crop.is_symlink() or digest(crop) != crop_sha:
-                held += 1
-                continue
+            if direct:
+                if j.get("direct_full_hd_reference") is not True or j.get("crop_created") is not False:
+                    held += 1
+                    continue
+                source = croot / "hd_original_108_verified" / j.get("source_png", "")
+                if (not source.is_file() or source.is_symlink() or
+                        not source.resolve().is_relative_to((croot / "hd_original_108_verified").resolve()) or
+                        digest(source) != source_sha):
+                    held += 1
+                    continue
+            else:
+                crop = mp.parent / "english_original_native_crop.png"
+                if not crop.is_file() or crop.is_symlink() or digest(crop) != crop_sha:
+                    held += 1
+                    continue
             key = hashlib.sha256((source_sha + "|" + en + "|" + ",".join(map(str, bbox))).encode()).hexdigest()
             if key in existing:
                 continue
@@ -300,36 +313,69 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
             if not SAFE.fullmatch(ident):
                 raise ValueError("UNSAFE_GENERATED_ID")
             role = choose_role(data, imagegen_root, q)
-            outname = ident + "_source.png"
-            outpath = inputs / outname
-            if outpath.exists():
-                # A pre-existing file must be byte-identical to our generated reference.
-                outpath.unlink()
-            scale, dimensions = fit_reference(crop, outpath)
-            in_sha = digest(outpath)
-            data["items"].append({
-                "id": ident,
-                "role": role,
-                "queue_index": q[1:],
-                "status": "ROI_APPROVED_FOR_IMAGEGEN",
-                "source_provenance": "SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
-                "source_dds_path": j.get("reference_dds_path"),
-                "source_dds_sha256": dds_sha,
-                "source_png_sha256": source_sha,
-                "bbox_xyxy": bbox,
-                "imagegen_input_png": outname,
-                "imagegen_input_sha256": in_sha,
-                "alpha_crop_margin_checked": True,
-                "english": en.strip(),
-                "korean": next(iter(kos)),
-                "source_key": key,
-                "native_crop_sha256": crop_sha,
-                "reference_scale": scale,
-                "reference_dimensions": list(dimensions),
-                "old_split_tiles_used": False,
-                "auto_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
-                "runtime_validation": "UNTESTED",
-            })
+            if direct:
+                src_dims=j.get("source_dimensions")
+                if not (isinstance(src_dims,list) and len(src_dims)==2 and
+                        all(type(v) is int and v>0 for v in src_dims)):
+                    held += 1
+                    continue
+                target_dims=[bbox[2]-bbox[0],bbox[3]-bbox[1]]
+                data["items"].append({
+                    "id": ident,
+                    "role": role,
+                    "queue_index": q[1:],
+                    "status": "ROI_APPROVED_FOR_IMAGEGEN",
+                    "source_provenance": "SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+                    "source_dds_path": j.get("reference_dds_path"),
+                    "source_dds_sha256": dds_sha,
+                    "source_png_sha256": source_sha,
+                    "bbox_xyxy": bbox,
+                    "imagegen_input_mode": "FULL_HD_DIRECT_REFERENCE",
+                    "imagegen_input_png": source.name,
+                    "imagegen_input_path": str(source),
+                    "imagegen_input_sha256": source_sha,
+                    "source_dimensions": src_dims,
+                    "target_dimensions": target_dims,
+                    "direct_bbox_validated": True,
+                    "alpha_crop_margin_checked": False,
+                    "english": en.strip(),
+                    "korean": next(iter(kos)),
+                    "source_key": key,
+                    "old_split_tiles_used": False,
+                    "auto_admission": "GPT_OCR_DIRECT_FULL_HD_REFERENCE_NO_CROP",
+                    "runtime_validation": "UNTESTED",
+                })
+            else:
+                outname = ident + "_source.png"
+                outpath = inputs / outname
+                if outpath.exists():
+                    # A pre-existing file must be byte-identical to our generated reference.
+                    outpath.unlink()
+                scale, dimensions = fit_reference(crop, outpath)
+                in_sha = digest(outpath)
+                data["items"].append({
+                    "id": ident,
+                    "role": role,
+                    "queue_index": q[1:],
+                    "status": "ROI_APPROVED_FOR_IMAGEGEN",
+                    "source_provenance": "SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+                    "source_dds_path": j.get("reference_dds_path"),
+                    "source_dds_sha256": dds_sha,
+                    "source_png_sha256": source_sha,
+                    "bbox_xyxy": bbox,
+                    "imagegen_input_png": outname,
+                    "imagegen_input_sha256": in_sha,
+                    "alpha_crop_margin_checked": True,
+                    "english": en.strip(),
+                    "korean": next(iter(kos)),
+                    "source_key": key,
+                    "native_crop_sha256": crop_sha,
+                    "reference_scale": scale,
+                    "reference_dimensions": list(dimensions),
+                    "old_split_tiles_used": False,
+                    "auto_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+                    "runtime_validation": "UNTESTED",
+                })
             existing.add(key)
             added += 1
         except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
