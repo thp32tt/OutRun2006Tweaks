@@ -34,7 +34,8 @@ for condition in (
 for rejection in (
     "if (fog != FALSE) {",
     "if (clipPlanes != 0u) {",
-    "fill != D3DFILL_SOLID && (!(pointFill || wireFill) || !triangleFamily)",
+    "const auto polygonMode = game_sm3_effective_polygon_mode(",
+    "if (!polygonMode.admitted) {",
     "D3DRS_ALPHAFUNC", "D3DRS_ALPHAREF", "alphaRef > 255u",
     "alphaFunc < D3DCMP_NEVER", "alphaFunc > D3DCMP_ALWAYS",
     "pipeline.alphaCompare != alphaFunc", "pipeline.alphaReference",
@@ -154,9 +155,9 @@ check("game_sm3_expand_list_instance_indices(" in source and
 # only after point-size/sprite/culling and source bounds are checked. This is
 # source-to-GPU regression coverage, not proof of real game/HMD parity.
 for token in (
-    "const bool pointFill = fill == D3DFILL_POINT;",
-    "const bool wireFill = fill == D3DFILL_WIREFRAME;",
-    "fill != D3DFILL_SOLID && (!(pointFill || wireFill) || !triangleFamily)",
+    "const bool pointFill = polygonMode.pointTriangles;",
+    "const bool wireFill = polygonMode.wireTriangles;",
+    "if (!polygonMode.admitted) {",
     "game_sm3_polygon_fill_admitted(fill, type, cull,",
     "game_sm3_expand_polygon_points(pointTopology, nativeIndices,",
     "nativeIndices = pointFillIndices.data();",
@@ -177,6 +178,21 @@ for token in (
         check(token not in source.replace(token, "", 1),
               "polygon source mutation escaped: " + token)
 
+# 01092: inherited polygon fill must not consume line/point geometry.
+# Unknown D3D9 fill/topology values still fail BEFORE the native GPU Draw.
+raster = (ROOT / "src/vr/d3d11/live_game_sm3_polygon_raster.hpp").read_text()
+for token in (
+    "if (fill < 1u || fill > 3u || topology < 1u || topology > 6u)",
+    "const bool polygon = topology >= 4u;",
+    "polygon && fill == 1u", "polygon && fill == 2u",
+):
+    check(token in raster, "unsafe inherited D3D9 raster admission: " + token)
+    check(token not in raster.replace(token, "", 1),
+          "negative polygon raster mutation escaped: " + token)
+check(source.index("if (!polygonMode.admitted)") <
+      source.index("if (!game_native_backbuffer_ready(game, viewport)") <
+      source.index("context->IASetPrimitiveTopology("),
+      "inherited fill must be checked before native GPU submission")
 # The SM3 real-game fan expansion changes the physical index buffer owner.
 # The exact post-conversion pointer/count must be checked before the dynamic
 # D3D11 upload; do not silently validate only the old D3D9 index pointer.
