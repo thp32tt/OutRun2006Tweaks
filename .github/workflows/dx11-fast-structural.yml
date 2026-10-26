@@ -595,6 +595,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_fvf_polygon_modes.cpp -o /tmp/dx11_fvf_01093 && /tmp/dx11_fvf_01093
           # 01094: large real-game FVF fan and point-strip native indexed GPU windows.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_fvf_polygon_windows.cpp -o /tmp/dx11_fvf_windows_01094 && /tmp/dx11_fvf_windows_01094
+          # 01095: shader-bound indexed POINT-strip GPU window continuity with unrepacked original VB.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_sm3_native_point_strip_windows.cpp -o /tmp/dx11_sm3_point_strip_01095 && /tmp/dx11_sm3_point_strip_01095
           python tools/test_dx11_live_fvf_polygon_windows_01094.py
           # 01091 authentic game SM3 instanced POINT/WIREFRAME GPU batch
           # with source corner order, negative late-index, and budget proofs.

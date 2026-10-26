@@ -5608,6 +5608,29 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         nativeIndices = nullptr;
         nativeIndexCount = 0u;
     }
+    // An authentic shader-bound, already-native-layout indexed strip can
+    // fit its D3D9 VB yet exceed the native POINTLIST index upload when
+    // D3DFILL_POINT expands every triangle into three corner occurrences.
+    // The repacked strip path above already streams indexed vertex windows;
+    // for this distinct no-repack route retain the original VB and upload
+    // bounded source-indexed POINTLIST windows. Validate the WHOLE source IB
+    // before the first native GPU command, preserving fail-closed D3D9 input.
+    const bool nativeIndexedPointStripWindows =
+        !sourceInstancing && !repack && indices &&
+        type == D3DPT_TRIANGLESTRIP && pointFill && indexCount >= 3u &&
+        std::uint64_t(indexCount - 2u) * 3u > kMaxIndices;
+    const auto nativeIndexedPointStripPlan = nativeIndexedPointStripWindows
+        ? game_fvf_polygon_window_plan(
+              static_cast<std::uint32_t>(type), indexCount,
+              kMaxIndices, 128u)
+        : GameFvfPolygonWindowPlan{};
+    if (nativeIndexedPointStripWindows) {
+        if (nativeIndexedPointStripPlan.windows < 2u) return false;
+        for (UINT i = 0u; i < indexCount; ++i)
+            if (indices[i] >= vertexCount) return false;
+        nativeIndices = nullptr;
+        nativeIndexCount = 0u;
+    }
     if (fanChunkUpload) {
         // Original full-fan IB was checked above. Each bounded DrawIndexed
         // instead binds a window-local IB with true original VB inputs.
@@ -5762,7 +5785,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     if (pointFill && !fanChunkUpload &&
         !connectedChunkUpload && !indexedConnectedChunkUpload &&
         !linearChunkUpload && !indexedChunkUpload &&
-        !segmentedConnectedPlan.grouped) {
+        !segmentedConnectedPlan.grouped &&
+        !nativeIndexedPointStripWindows) {
         const UINT logicalVertexCount = static_cast<UINT>(
             compactInstancedGeometry ? expandedVertices : vertexCount);
         const UINT sourceCount = nativeIndices ? nativeIndexCount : logicalVertexCount;
@@ -6499,7 +6523,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // One audited native submit site. Small indexed lists and connected
     // strips/fans merge safely; large indexed lists/strips/fans keep original
     // D3D9 IB + per-instance vertex bases and independent GPU Draw boundaries.
-    const UINT nativeSubmissionCount = segmentedInstanceUpload
+    const UINT nativeSubmissionCount = nativeIndexedPointStripWindows
+        ? nativeIndexedPointStripPlan.windows : segmentedInstanceUpload
         ? (segmentedListPlan.grouped ? segmentedListPlan.batches :
            (segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount))
         : (indexedConnectedChunkUpload ? indexedConnectedChunkPlan.chunkCount :
@@ -6540,6 +6565,40 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                          s.fullGameVertexCapacity,
                                          unpacked.data(), chunkBytes))
                 return false;
+        }
+        if (nativeIndexedPointStripWindows) {
+            // The original shader-visible VB is uploaded once. Each genuine
+            // source triangle emits its three indexed point occurrences in
+            // global D3D9 strip order, including odd-window winding and
+            // repeated corners; do not reset VS/PS, Z or the native frame.
+            const UINT firstTriangle =
+                submit * nativeIndexedPointStripPlan.trianglesPerWindow;
+            const UINT triangles = (std::min)(
+                nativeIndexedPointStripPlan.trianglesPerWindow,
+                indexCount - 2u - firstTriangle);
+            std::vector<std::uint32_t> pointWindow;
+            if (!game_fvf_build_polygon_window(
+                    static_cast<std::uint32_t>(type), indices, indexCount,
+                    vertexCount, firstTriangle, triangles,
+                    kMaxIndices, pointWindow) || pointWindow.empty()) {
+                s.frameBatch.abort();
+                return false;
+            }
+            const UINT pointBytes =
+                static_cast<UINT>(pointWindow.size() * sizeof(std::uint32_t));
+            if (!ensure_full_game_upload_buffer(
+                    device, s.fullGameIndexUpload, s.fullGameIndexCapacity,
+                    pointBytes, D3D11_BIND_INDEX_BUFFER) ||
+                !upload_full_game_stream(
+                    context, s.fullGameIndexUpload.Get(),
+                    s.fullGameIndexCapacity, pointWindow.data(), pointBytes)) {
+                s.frameBatch.abort();
+                return false;
+            }
+            context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
+                                      DXGI_FORMAT_R32_UINT, 0u);
+            context->DrawIndexed(static_cast<UINT>(pointWindow.size()), 0u, 0);
+            continue;
         }
         if (indexedChunkUpload) {
             // A new GPU draw starts only at a real D3D9 primitive boundary.
