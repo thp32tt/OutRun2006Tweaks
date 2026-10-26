@@ -55,13 +55,19 @@ int main() {
             ib[0],ib[i+1u],ib[i+2u]}));
     // Bad late rim index: both assemblers fail transactionally.
     auto invalid=ib; invalid[16u]=sourceVertices;
+    // A four-vertex window intentionally stops at IB[15], so the invalid
+    // IB[16] is not inside that upload. The five-vertex tail must reject it.
+    std::vector<std::uint8_t> preceding;
+    assert(game_sm3_assemble_indexed_fan_window(
+        decl,streams,invalid.data(),invalid.size(),13u,4u,preceding));
+    assert(preceding.size()==4u*16u);
     std::vector<std::uint8_t> unchanged{42u};
     assert(!game_sm3_assemble_indexed_fan_window(
-        decl,streams,invalid.data(),invalid.size(),13u,4u,unchanged));
+        decl,streams,invalid.data(),invalid.size(),13u,5u,unchanged));
     assert(unchanged==std::vector<std::uint8_t>{42u});
     assert(!game_sm3_copy_native_indexed_fan_window(
         streams[0].data,stride,sourceVertices,invalid.data(),invalid.size(),
-        13u,4u,unchanged));
+        13u,5u,unchanged));
     assert(unchanged==std::vector<std::uint8_t>{42u});
     assert(!game_sm3_plan_native_indexed_fan_chunks(
         sourceVertices,ib.size(),32u,64u,256u,18u,2u,4096u).chunkCount);
