@@ -45,7 +45,10 @@ mutations = [
         "for (UINT i=0; i<0u; ++i) {", 1)),
     (submit, observer.replace("s.frameBatch.abort();", "/* lost abort */", 1)),
 ]
-for a, b in mutations:
+# The seventh historical abort-only mutation is exercised separately below:
+# other valid abort branches exist, so global first-occurrence removal is not
+# itself a proof that the native GPU-window failure path disappeared.
+for a, b in mutations[:6]:
     assert not safe(a, b), "deleted native window source frame isolation"
 # The preflight/error branch must not disappear even when another abort exists.
 failure = observer[observer.index("if (oversizedFan || oversizedPointStrip)"):]
