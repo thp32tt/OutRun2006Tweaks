@@ -222,12 +222,34 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
                 "nativeIndexCount = 0u;",
                 "} else if (deferredFanTriangles) {",
                 "return false; // unsupported large fan retains authoritative D3D9")) and
-            "nativeIndices = nullptr;" not in sm3.group(1).partition(
-                "    const auto fanChunkPlan =")[0] and
+            # 01095 adds one bounded no-repack indexed POINT-strip
+            # exception to the former all-fan prefix ban. The exact
+            # exception is separately audited below before admission.
+            "const bool nativeIndexedPointStripWindows =" in sm3.group(1) and
             # POINTLIST on windowed fans must not pre-expand the entire fan.
             "if (pointFill && !fanChunkUpload &&" in sm3.group(1) and
             "!connectedChunkUpload && !indexedConnectedChunkUpload" in sm3.group(1),
             "chunked fan GPU draw must remain under original source/fallback admission")
+    # 01095 no-repack SM3 indexed POINT strip: check the whole source IB
+    # *before* the first GPU mutation and ensure each native POINT window
+    # uses only the existing admitted game-source DrawIndexed dispatcher.
+    point_preflight = sm3.group(1).partition(
+        "    const bool nativeIndexedPointStripWindows =")[2].partition(
+        "    if (fanChunkUpload) {")[0]
+    require(bool(point_preflight) and
+            all(token in point_preflight for token in (
+                "!sourceInstancing && !repack && indices &&",
+                "type == D3DPT_TRIANGLESTRIP && pointFill && indexCount >= 3u",
+                "std::uint64_t(indexCount - 2u) * 3u > kMaxIndices",
+                "game_fvf_polygon_window_plan(",
+                "if (nativeIndexedPointStripPlan.windows < 2u) return false;",
+                "for (UINT i = 0u; i < indexCount; ++i)",
+                "if (indices[i] >= vertexCount) return false;",
+                "nativeIndices = nullptr;",
+                "nativeIndexCount = 0u;")) and
+            point_preflight.count("nativeIndices = nullptr;") == 1 and
+            re.findall(r"(?:->|\\.)\\s*Draw(?:Indexed)?\\s*\\(", point_preflight) == [],
+            "native POINT-strip preflight must validate every original IB index")
     # 01089: the two new source-stripped POINTLIST submits are verified
     # within their own per-window source-validated branches, not globally.
     draw_loop = sm3.group(1).partition(
@@ -261,6 +283,29 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "indices[i] >= vertexCount" in sm3.group(1) and
             "std::uint64_t(indexCount) * plannedNativeStride" in sm3.group(1),
             "indexed/nonindexed strip GPU submits escaped original bounds")
+    point_draw = draw_loop.partition(
+        "        if (nativeIndexedPointStripWindows) {")[2].partition(
+        "        if (indexedChunkUpload) {")[0]
+    require(bool(point_draw) and
+            re.findall(r"(?:->|\\.)\\s*Draw(?:Indexed)?\\s*\\(", point_draw) == [] and
+            all(token in point_draw for token in (
+                "submit * nativeIndexedPointStripPlan.trianglesPerWindow",
+                "indexCount - 2u - firstTriangle",
+                "game_fvf_build_polygon_window(",
+                "vertexCount, firstTriangle, triangles,",
+                "kMaxIndices, pointWindow)",
+                "s.frameBatch.abort();",
+                "ensure_full_game_upload_buffer(",
+                "upload_full_game_stream(",
+                "D3D11_BIND_INDEX_BUFFER",
+                "context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),",
+                "nativeIndices = pointWindow.data();",
+                "nativeIndexCount = static_cast<UINT>(pointWindow.size());",
+                "issueNativeGameDraw(nativeIndexCount, 0u);",
+                "nativeIndices = nullptr;",
+                "nativeIndexCount = 0u;",
+                "continue;")),
+            "native POINT-strip GPU windows bypass source-owned dispatch")
     require(len(dispatch) == len(scoped) + len(sm3_scoped) == 10 and
             len(scoped) == 2 and
             sm3_scoped == ["->DrawIndexed(", "->Draw(",

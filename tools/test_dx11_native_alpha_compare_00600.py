@@ -107,7 +107,15 @@ def main():
     ]
     for good, bad in cases:
         assert s.count(good) >= 1, good
-        assert not linked(s.replace(good, bad, 1)), "undetected destructive mutation: " + good
+        # 01095 added a separate SM3 polygon preflight. The 00600
+        # negative mutation must target its own FVF observer, not that
+        # earlier and unrelated SM3 occurrence.
+        if good == "if (!game_fvf_build_polygon_window(":
+            observer_at = s.index("void observe(")
+            changed = s[:observer_at] + s[observer_at:].replace(good, bad, 1)
+        else:
+            changed = s.replace(good, bad, 1)
+        assert not linked(changed), "undetected destructive mutation: " + good
 
     comparisons = {
         1: lambda a, b: False,
