@@ -6948,7 +6948,8 @@ bool upload_full_game_stream(ID3D11DeviceContext* context,
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
             const std::uint32_t* indices, UINT indexCount,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
-            const OutputCapture& output) noexcept {
+            const OutputCapture& output,
+            bool initializeFrame = true) noexcept {
     // Convert actual FVF TRIANGLESTRIP fill-POINT corner occurrences into
     // indexed native POINTLIST BEFORE any GPU mutation. Triangle lists and
     // already expanded real-game fans have the same corner ordering; neither
@@ -7457,7 +7458,12 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // The first real game Draw consumes a whole Clear and any intervening
     // game-authored partial ColorFills in their original order. Do not issue
     // native commands if the remembered fills cannot be replayed atomically.
-    if (s.frameBatch.first_draw()) {
+    // A single game Draw may become several indexed native GPU windows.
+    // Its original source ordinal stays uncommitted until ALL windows succeed,
+    // so frameBatch.first_draw() remains true during each window. Seed/copy
+    // the authentic game frame exactly once, before the first GPU window;
+    // never clear earlier native triangles while submitting later windows.
+    if (initializeFrame && s.frameBatch.first_draw()) {
         ComPtr<ID3D11DeviceContext1> replayContext;
         if (s.preDrawFills.count != 0u) {
             if (!env_full_game_opt_in() ||
@@ -8337,7 +8343,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                         kMaxIndices, window) ||
                     !submit(s, vertices, window.data(),
                             static_cast<UINT>(window.size()),
-                            D3DPT_TRIANGLELIST, capture, output)) {
+                            D3DPT_TRIANGLELIST, capture, output,
+                            first == 0u)) {
                     success = false;
                     break;
                 }
