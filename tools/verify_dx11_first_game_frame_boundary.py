@@ -194,17 +194,25 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
                 ["->DrawIndexed("] and
             all(token in fan_chunk for token in (
                 "firstRim = 1u + submit * fanChunkPlan.advanceRimVertices",
-                "drawCount < 3u",
+                # 01088 admits point/wire/solid large real-game fans with
+                # per-window bounded indices, not a whole-fan point cloud.
+                "const auto fillWindow = game_sm3_fan_fill_window_plan(",
+                "firstRim, drawCount, kMaxIndices);",
+                "if (!fillWindow.supported) {",
                 "game_sm3_assemble_fan_window(",
                 "game_sm3_copy_native_fan_window(",
                 "game_sm3_fan_window_indices(",
                 "fanWindow.size() != chunkBytes",
+                "fanIndices.size() != fillWindow.nativeIndexCount",
                 "s.frameBatch.abort();",
                 "DXGI_FORMAT_R32_UINT",
-                "context->DrawIndexed(static_cast<UINT>(fanIndices.size()), 0u, 0);")) and
+                "context->IASetPrimitiveTopology(pointFill",
+                "? D3D11_PRIMITIVE_TOPOLOGY_POINTLIST",
+                ": D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+                "context->DrawIndexed(fillWindow.nativeIndexCount, 0u, 0);")) and
             all(token in fan_admission for token in (
                 "!sourceInstancing &&",
-                "!pointFill && !wireFill && type == D3DPT_TRIANGLEFAN",
+                "type == D3DPT_TRIANGLEFAN",
                 "game_sm3_plan_native_indexed_fan_chunks(",
                 "game_sm3_plan_native_fan_chunks(",
                 "const bool indexedFanChunkUpload = fanChunkUpload && indices != nullptr;",
@@ -215,7 +223,9 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
                 "} else if (deferredFanTriangles) {",
                 "return false; // unsupported large fan retains authoritative D3D9")) and
             "nativeIndices = nullptr;" not in sm3.group(1).partition(
-                "    const auto fanChunkPlan =")[0],
+                "    const auto fanChunkPlan =")[0] and
+            # POINTLIST on windowed fans must not pre-expand the entire fan.
+            "if (pointFill && !fanChunkUpload)" in sm3.group(1),
             "chunked fan GPU draw must remain under original source/fallback admission")
     require(len(dispatch) == len(scoped) + len(sm3_scoped) == 8 and
             len(scoped) == 2 and
