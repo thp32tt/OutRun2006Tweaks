@@ -195,8 +195,15 @@ def check_goal_full_result_graph(ui, contracts):
             "TagAppendedNodes(before,",
             "FlushD3DXAtDirectGoalSourceExit();",
             "return result;")
-    if body.count("original()") != 2 or body.count("TagAppendedNodes(before,") != 1:
-        fail("full GOAL progress must not duplicate the original or global-tag unrelated nodes")
+    # Three mutually exclusive exact native E8 execution routes: early
+    # stock fallback, rejected pre-source drain, and fully admitted graph.
+    if (body.count("original()") != 3 or
+        body.count("return original();") != 2 or
+        body.count("const bool result = original();") != 1 or
+        body.count("TagAppendedNodes(before,") != 1 or
+        body.count("if (!parentAdmission.mayPublish(") != 1 or
+        body.count("if (parentAdmittedAtExit)") != 1):
+        fail("full GOAL progress must invoke original once per exclusive path")
     if "Module::exe_ptr(ResultProgressFullParentTarget + " in ui:
         fail("full GOAL progress must never detour post-call/return instructions")
 

@@ -297,13 +297,18 @@ def check_stage_extension_direct_owner(text: str) -> None:
         enter,
     ) is None:
         fail("stage +TIME live VR/queue direct ownership fence lost")
-    if re.search(
-        r"if\s*\(\s*StageExtensionAdmission\.mayPublish\(\s*"
-        r"Settings::VREnabled\s*,\s*"
-        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*,\s*"
-        r"OutRunVR::GameSemantic::CurrentQueueNodeEpoch\(\)\s*\)\s*\)",
-        leave,
-    ) is None:
+    # Ticket-aware gate in the installed exact +TIME exit hook. A changed
+    # queue epoch suppresses native D3DX HUD ownership for this source only.
+    if not (
+        "const bool admitted = sourceTicket != 0 &&" in leave and
+        "StageExtensionAdmission.mayPublish(" in leave and
+        "if (admitted)" in leave and
+        "RevokeD3DXDirectStageTicket(sourceTicket);" in leave and
+        leave.index("if (admitted)") <
+        leave.index("TagAppendedNodes(StageExtensionBefore,") <
+        leave.index("RevokeD3DXDirectStageTicket(sourceTicket);") <
+        leave.index("StageExtensionDirectDrawOwner.reset();")
+    ):
         fail("stage +TIME queued sibling/native flush exit admission lost")
     if "GameSemantic::CurrentScope =" in enter:
         fail("stage +TIME immediate parent overrides an active sprite queue")
