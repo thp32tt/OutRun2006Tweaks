@@ -9,11 +9,11 @@ run=(R/'tools/Run-DX9ExFocusTest.ps1').read_text()
 ui=(R/'src/hooks_uiscaling.cpp').read_text()
 r30=(R/'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp').read_text()
 gfx=(R/'src/hooks_graphics.cpp').read_text()
-assert 'VRAntiAliasing{ "VR", "AntiAliasing", 0,' in settings
+assert 'VRAntiAliasing{ "VR", "AntiAliasing", 2,' in settings
 assert 'VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,' in settings
 assert 'VRFollowGameResolution{ "VR", "FollowGameResolution", false,' in settings
 assert 'VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,' in settings
-for x in ('AntiAliasing = 0','AutoRenderResolution = true',
+for x in ('AntiAliasing = 2','AutoRenderResolution = true',
           'FollowGameResolution = false','UnifiedEyeMenuSource = false',
           'Hud1080pReference = true','HudScale = 0.55','MenuScale = 1.00'):
     assert x in ini, x
@@ -22,7 +22,7 @@ assert 'Game::screen_resolution->x = static_cast<int>(xrSize.width)' not in ex
 assert 'Game::screen_resolution->y = static_cast<int>(xrSize.height)' not in ex
 assert 'physical D3D9Ex target=' in ex
 for x in ("'-AutoRenderResolution=true'","'-FollowGameResolution=false'",
-          "'-UnifiedEyeMenuSource=false'","'-AntiAliasing=0'",
+          "'-UnifiedEyeMenuSource=false'","'-AntiAliasing=2'",
           "'-Hud1080pReference=true'","'-HudScale=0.55'",
           "'-MenuScale=1.00'","'-CullingUnionMarginDegrees=8.0'"):
     assert x in run, x

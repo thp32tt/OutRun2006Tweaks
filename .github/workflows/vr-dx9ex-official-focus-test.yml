@@ -31,6 +31,7 @@ jobs:
           $duplicates = @($lines | Where-Object { $_ -match '^\s*DriverSeatCarSpaceBasis\s*=\s*false' })
           if ($duplicates.Count -ne 1) { throw 'Invalid official INI: DriverSeatCarSpaceBasis must occur exactly once' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'HudScale = 0.55' -SimpleMatch -Quiet)) { throw 'HUD scale changed unexpectedly' }
+          if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'AntiAliasing = 2' -SimpleMatch -Quiet)) { throw 'VR MSAA baseline changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'CullingUnionMarginDegrees = 8.0' -SimpleMatch -Quiet)) { throw 'Culling setting changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'DriverSeatView = false' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source INI' }
           if (-not (Select-String src/vr/settings.cpp -Pattern 'Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source defaults' }
@@ -117,7 +118,7 @@ jobs:
             # repair duplicate keys only in one packaging workflow.
             Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
             $env:OFFICIAL_PACKAGE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
-            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False; assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False'
+            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False; assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getint("VR","AntiAliasing") == 2'
             if ($LASTEXITCODE -ne 0) { throw 'Packaged INI strict parse failed' }
             Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
             Copy-Item tools/START_FOCUS_OFFICIAL_TEST.cmd "$dir/START_HERE.cmd"

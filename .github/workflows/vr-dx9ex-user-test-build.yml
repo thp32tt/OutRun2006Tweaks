@@ -94,7 +94,7 @@ jobs:
           Copy-Item $vrHostExe.FullName "$dir/outrun-vr-host.exe"
           Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
           $env:R26_USER_TEST_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
-          python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["R26_USER_TEST_INI"],encoding="utf-8"); assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False'
+          python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["R26_USER_TEST_INI"],encoding="utf-8"); assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getint("VR","AntiAliasing") == 2'
           if ($LASTEXITCODE -ne 0) { throw 'User test package INI is duplicated or does not select the restored rival route' }
           Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
           Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
@@ -108,7 +108,7 @@ jobs:
             'VR physical target: OpenXR/VDXR recommended eye extent (desktop-independent)'
             'Gameplay HUD reference: 1920x1080 widescreen, HudScale=0.55'
             'Title/main menu: independent 4:3 composition; F11: independent VR shell'
-            'Baseline AA: VR AntiAliasing=0 for performance/correctness isolation'
+            'Baseline AA: VR AntiAliasing=2 (4x MSAA with 2x fallback)'
             'Runner: GitHub-hosted windows-2022'
             'RUNTIME_VALIDATION=UNTESTED'
             ''

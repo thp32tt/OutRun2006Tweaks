@@ -40,8 +40,8 @@ namespace Settings
 		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
     // VR quality is independent of the original game's [DX] ANTIALIASING.
     // D3D9Ex MSAA buffer allocations only change after a game restart.
-    Setting<int> VRAntiAliasing{ "VR", "AntiAliasing", 0,
-        "VR-only MSAA level: Off/2x/4x or optional 8x (fallback 4x/2x). Default Off preserves the R26 performance baseline; enable explicitly after visual correctness is confirmed. Use Game AA restores 2D request. Restart required.",
+    Setting<int> VRAntiAliasing{ "VR", "AntiAliasing", 2,
+        "VR-only MSAA level: Off/2x/4x or optional 8x (fallback 4x/2x). Default 2 selects 4x MSAA with 2x fallback, matching the established VR baseline. Use Game AA restores 2D request. Restart required.",
         { "Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA", "8x MSAA (fallback 4x/2x; costly)" } };
     Setting<bool> VRTransparencySupersampling{ "VR", "TransparencySupersampling", false,
         "Enable extra NVIDIA transparency SSAA in VR (costly). Off by default; the original 2D Graphics setting is unchanged. Restart required." };
