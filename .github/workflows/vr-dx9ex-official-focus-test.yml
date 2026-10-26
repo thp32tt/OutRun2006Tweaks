@@ -13,6 +13,10 @@ on:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
       - 'tools/Run-FocusOfficialTest.ps1'
       - 'tools/verify_focus_official_diagnostics.py'
+      - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py'
+      - 'src/hooks_uiscaling.cpp'
+      - 'src/vr/game/hud_command_batch.hpp'
+      - 'src/vr/game/stage_extension_source_admission.hpp'
   workflow_dispatch:
 
 jobs:
@@ -38,6 +42,12 @@ jobs:
           if (-not (Select-String src/vr/settings.cpp -Pattern 'Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source defaults' }
           if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR R26 RESULT_HUD_STAGE_HR' -SimpleMatch -Quiet)) { throw 'R26 result HUD stage telemetry missing' }
           if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR R26 RESULT_XYZRHW_PIXEL_PROBE' -SimpleMatch -Quiet)) { throw 'R26 source XYZRHW pixel evidence missing' }
+      - name: Validate installed +TIME entry, exit and physical submission
+        shell: pwsh
+        run: |
+          python tools/verify_vr_stage_extension_d3dx_batch_owner.py
+          if ($LASTEXITCODE -ne 0) { throw 'Native +TIME ticket/epoch regression failed' }
+
       - name: Configure Win32 R26+HUD
         shell: pwsh
         run: |
@@ -129,7 +139,7 @@ jobs:
             Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant" -Encoding ascii
             Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
             @(
-              'OFFICIAL FOCUS R26+HUD: October 26 F11 full-eye raster and source-identified diagnostics'
+              'OFFICIAL FOCUS R26+HUD: October 26 exact +TIME ticket isolation and diagnostics'
               "Variant: $mode; TEST=Release; DEBUG=RelWithDebInfo and opt-in GPU diagnostics"
               'Original game EXE is not bundled. Backup your current DLL, host, and all INIs before unpacking.'
               '1. Unpack EXACTLY ONE variant ZIP into the original OR2006C2C.EXE directory.'
