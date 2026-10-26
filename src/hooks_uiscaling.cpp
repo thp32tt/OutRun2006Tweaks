@@ -258,6 +258,10 @@ namespace
 // ScreenHud ownership, not after its Draw may have submitted old triangles.
 static void FlushD3DXBeforeDirectStageSource() noexcept;
 static void FlushD3DXAtDirectStageSourceExit() noexcept;
+static void RevokeD3DXDirectStageTicket(std::uint64_t ticket) noexcept;
+static thread_local std::uint64_t StageTimeTicketSerial = 0;
+static thread_local std::uint64_t StageTimeLiveTicket = 0;
+static thread_local OutRunVR::StageExtension::SourceAdmission StageTimeLiveAdmission{};
 static void FlushD3DXBeforeDirectGoalSource() noexcept;
 static void FlushD3DXAtDirectGoalSourceExit() noexcept;
 
@@ -1770,6 +1774,7 @@ class UIScaling : public Hook
     {
         if (StageExtensionDepth++ != 0)
             return;
+        StageTimeLiveTicket = 0;
         // QueueRenderActive() is the original node dispatcher predicate
         // (SpriteQueueDepth != 0). Snapshot that admission at source
         // entry; the live depth guard remains at direct GPU ownership.
@@ -1778,6 +1783,7 @@ class UIScaling : public Hook
             !OutRunVR::GameSemantic::QueueRenderActive(),
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
         };
+        StageTimeLiveAdmission = StageExtensionAdmission;
         // The original E8 may execute while VR is disabled. In that case,
         // do not snapshot or later label desktop glyphs as ScreenHud if the
         // user enables VR before the CALL returns. Reentrant queue draws
@@ -1821,11 +1827,27 @@ class UIScaling : public Hook
             // submit D3DX work synchronously. Any *proven* preexisting
             // homogeneous batch belongs to the outgoing producer; flush it
             // before the new ScreenHud scope can relabel its GPU submission.
-            FlushD3DXBeforeDirectStageSource();
-            StageExtensionDirectDrawOwner.emplace(
-                OutRunVR::GameSemantic::RenderScope::ScreenHud,
-                nullptr, true,
-                OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
+            // Previous native Flush may reenter the queue: re-check the
+            // original admission immediately after the drain callback.
+            const bool admittedAfterFlush = StageExtensionAdmission.admitAfterDrain(
+                [] { FlushD3DXBeforeDirectStageSource(); },
+                [] {
+                    return OutRunVR::StageExtension::LiveSource{
+                        Settings::VREnabled,
+                        OutRunVR::GameSemantic::SpriteQueueDepth == 0,
+                        OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
+                    };
+                });
+            if (admittedAfterFlush)
+            {
+                if (++StageTimeTicketSerial == 0)
+                    ++StageTimeTicketSerial;
+                StageTimeLiveTicket = StageTimeTicketSerial;
+                StageExtensionDirectDrawOwner.emplace(
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                    nullptr, true,
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
+            }
         }
     }
 
@@ -1837,10 +1859,15 @@ class UIScaling : public Hook
         // The source may toggle VR or reenter the renderer during the E8:
         // only an unchanged, direct VR source is eligible for eye semantics.
         // Unknown or mixed native D3DX buffers still use their original End.
-        if (StageExtensionAdmission.mayPublish(
-                Settings::VREnabled,
-                OutRunVR::GameSemantic::SpriteQueueDepth == 0,
-            OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
+        const std::uint64_t sourceTicket = StageTimeLiveTicket;
+        const std::uint64_t currentEpoch =
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+        const bool outsideQueue =
+            OutRunVR::GameSemantic::SpriteQueueDepth == 0;
+        const bool admitted = sourceTicket != 0 &&
+            StageExtensionAdmission.mayPublish(
+                Settings::VREnabled, outsideQueue, currentEpoch);
+        if (admitted)
         {
             // AUTO 01504: a rebuilt current root can interpose an untagged
             // foreign node between the old +TIME tail and current terminal
@@ -1854,19 +1881,36 @@ class UIScaling : public Hook
                 nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial);
             FlushD3DXAtDirectStageSourceExit();
         }
+        else
+        {
+            RevokeD3DXDirectStageTicket(sourceTicket);
+        }
         // Always restore the exact direct-draw queue cursor/anchor even if
         // VR enablement changes inside the original +TIME E8 call.
         StageExtensionDirectDrawOwner.reset();
+        StageTimeLiveTicket = 0;
+        StageTimeLiveAdmission = {};
         OutRunVR::GameSemantic::CurrentScope = StageExtensionSavedScope;
         StageExtensionSavedScope =
             OutRunVR::GameSemantic::RenderScope::None;
         const auto hit = ++StageExtensionCompleted;
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
             spdlog::info(
-                "VR P0 STAGE EXTENSION SOURCES: calls={} gameState={} mode={} exactScope=SCREEN_HUD",
+                "VR P0 STAGE EXTENSION SOURCES: calls={} gameState={} mode={} "
+                "exactScope={} admitted={} reason={} ticket={} entryEpoch={} currentEpoch={}",
                 hit,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
-                Game::game_mode ? *Game::game_mode : -1);
+                Game::game_mode ? *Game::game_mode : -1,
+                admitted ? "SCREEN_HUD" : "NONE", admitted,
+                admitted ? "ok" :
+                    !StageExtensionAdmission.vrAtEntry ? "vr-disabled-at-entry" :
+                    !StageExtensionAdmission.outsideQueueAtEntry ? "queue-at-entry" :
+                    !Settings::VREnabled ? "vr-disabled-at-leave" :
+                    !outsideQueue ? "queue-at-leave" :
+                    currentEpoch != StageExtensionAdmission.queueEpochAtEntry ?
+                        "queue-epoch-changed" : "pre-flush-rejected",
+                sourceTicket, StageExtensionAdmission.queueEpochAtEntry,
+                currentEpoch);
         StageExtensionBefore = {};
         StageExtensionRootsBefore = {};
         StageExtensionEntrySerial = 0;
@@ -3528,6 +3572,19 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static void ForgetBatch() noexcept { HudBatch.forget(); }
 
+    static bool StageTicketAllowsSubmission() noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        if (HudBatch.producer != ProducerToken::StageExtensionTime ||
+            HudBatch.queued)
+            return true;
+        return OutRunVR::StageExtension::AllowDirectBatchTicket(
+            HudBatch.stageSourceTicket, StageTimeLiveTicket,
+            StageTimeLiveAdmission.mayPublish(
+                Settings::VREnabled, SpriteQueueDepth == 0,
+                CurrentQueueNodeEpoch()));
+    }
+
     static HRESULT __stdcall BeginDest(void* self, DWORD flags)
     {
         const auto beforeBegin = HudBatch.snapshot();
@@ -3563,7 +3620,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // Unknown, mixed, foreign, Reset, and live-queue batches remain
         // untouched. ScopedExactProducerSemantic restores every prior scope
         // (including a pending marker) even when the game Flush fails.
-        const bool restore = HudBatch.matchesGpuOwner(false, nullptr, 0) &&
+        const bool restore = StageTicketAllowsSubmission() &&
+            HudBatch.matchesGpuOwner(false, nullptr, 0) &&
             DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
             HudBatch.active, QueueRenderActive(), HudBatch.homogeneous,
             HudBatch.drawCount,
@@ -3603,7 +3661,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // a source-exit nor a queue boundary was able to flush safely.
         // Preserve the exact homogeneous producer only until End returns;
         // the native HRESULT and normal batch teardown are unchanged.
-        const bool restore = HudBatch.matchesGpuOwner(false, nullptr, 0) &&
+        const bool restore = StageTicketAllowsSubmission() &&
+            HudBatch.matchesGpuOwner(false, nullptr, 0) &&
             DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
             HudBatch.active, QueueRenderActive(), HudBatch.homogeneous,
             HudBatch.drawCount,
@@ -3689,6 +3748,11 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     }
 
 public:
+    static void RevokeDirectStageTicket(std::uint64_t ticket) noexcept
+    {
+        HudBatch.revokeDirectStageTicket(ticket);
+    }
+
     // Direct +TIME numeric glyphs do not pass through QueueNode. D3DX may
     // submit the previous Draw batch while the first new glyph is queued.
     // Split only a complete, homogeneous, already-tracked batch with the
@@ -3703,7 +3767,8 @@ public:
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
         if (!HudBatch.active || sprite != HudBatch.sprite || HudBatch.drawCount == 0)
             return;
-        if (!HudBatch.matchesGpuOwner(false, nullptr, 0) ||
+        if (!StageTicketAllowsSubmission() ||
+            !HudBatch.matchesGpuOwner(false, nullptr, 0) ||
             !CanFlushD3DXPreQueueStageBatch(
                 false, true, HudBatch.homogeneous,
                 HudBatch.scope, HudBatch.producer,
@@ -3724,7 +3789,8 @@ public:
     {
         using namespace OutRunVR::GameSemantic;
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
-        if (!HudBatch.matchesGpuOwner(false, nullptr, 0) ||
+        if (!StageTicketAllowsSubmission() ||
+            !HudBatch.matchesGpuOwner(false, nullptr, 0) ||
             !CanFlushD3DXDirectStageAtExit(
                 QueueRenderActive(), HudBatch.active,
                 sprite != nullptr && sprite == HudBatch.sprite,
@@ -3752,7 +3818,8 @@ public:
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
         if (!HudBatch.active || sprite != HudBatch.sprite || HudBatch.drawCount == 0)
             return;
-        if (!HudBatch.matchesGpuOwner(false, nullptr, 0) ||
+        if (!StageTicketAllowsSubmission() ||
+            !HudBatch.matchesGpuOwner(false, nullptr, 0) ||
             !CanFlushD3DXPreQueueStageBatch(
                 false, true, HudBatch.homogeneous, HudBatch.scope, HudBatch.producer,
                 EffectiveScope(), CurrentRenderProducerToken()) ||
@@ -3768,7 +3835,8 @@ public:
     {
         using namespace OutRunVR::GameSemantic;
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
-        if (!HudBatch.matchesGpuOwner(false, nullptr, 0) ||
+        if (!StageTicketAllowsSubmission() ||
+            !HudBatch.matchesGpuOwner(false, nullptr, 0) ||
             !CanFlushD3DXDirectGoalAtExit(
                 QueueRenderActive(), HudBatch.active,
                 sprite != nullptr && sprite == HudBatch.sprite,
@@ -3814,7 +3882,8 @@ public:
                     firstQueueSprite, HudBatch.sprite, firstQueueSprite),
                 HudBatch.scope, HudBatch.producer,
                 HudBatch.provenDirectB9200);
-        if (provenDirectResultText ||
+        if (StageTicketAllowsSubmission() &&
+            (provenDirectResultText ||
             CanDrainDirectResultBeforeFirstQueueNode(
                 QueueRenderActive(), HudBatch.active,
                 DX9ExD3DXSpriteLifetime::CanFlush(
@@ -3822,7 +3891,7 @@ public:
                 HudBatch.drawCount, HudBatch.homogeneous,
                 HudBatch.scope, HudBatch.producer, nextScope, nextProducer,
                 !HudBatch.queued && HudBatch.queueNode == nullptr &&
-                    HudBatch.queueEpoch == 0))
+                    HudBatch.queueEpoch == 0)))
         {
             const auto outgoingScope = HudBatch.scope;
             const auto outgoingProducer = HudBatch.producer;
@@ -3967,7 +4036,8 @@ private:
         // flush the earlier exact +TIME/GOAL batch BEFORE we can tag this
         // incoming Draw. Separate it under its original GPU owner now.
         // Queued, mixed and foreign buffers remain untouched/fail-closed.
-        if (HudBatch.matchesGpuOwner(false, nullptr, 0) &&
+        if (StageTicketAllowsSubmission() &&
+            HudBatch.matchesGpuOwner(false, nullptr, 0) &&
             DX9ExD3DXSpriteLifetime::CanDrainDeferredResultBeforeForeignDraw(
                 HudBatch.active, OutRunVR::GameSemantic::QueueRenderActive(),
                 HudBatch.homogeneous,
@@ -4053,7 +4123,13 @@ private:
         // reentrant batch. The ledger checks the exact Flush mutation and
         // original scope, while changed/foreign callbacks remain fail closed.
         const auto afterNative = CapturePhysicalDrawCommand();
-        const bool sameSourceAfterNative =
+        const bool stageStillAdmitted =
+            source != ProducerToken::StageExtensionTime || command.queued ||
+            (StageTimeLiveTicket != 0 &&
+             StageTimeLiveAdmission.mayPublish(
+                 Settings::VREnabled, SpriteQueueDepth == 0,
+                 CurrentQueueNodeEpoch()));
+        const bool sameSourceAfterNative = stageStillAdmitted &&
             afterNative.scope == command.scope &&
             afterNative.producer == command.producer &&
             afterNative.queued == command.queued &&
@@ -4064,7 +4140,9 @@ private:
                 submission, SUCCEEDED(hr), scope, source,
                 sameSourceAfterNative, command.queued,
                 command.queueNode, command.queueEpoch,
-                provenDirectB9200))
+                provenDirectB9200,
+                source == ProducerToken::StageExtensionTime && !command.queued
+                    ? StageTimeLiveTicket : 0))
             return hr;
         if (FAILED(hr) || !self)
             return hr;
@@ -4266,6 +4344,11 @@ static void FlushD3DXBeforeDirectStageSource() noexcept
 static void FlushD3DXAtDirectStageSourceExit() noexcept
 {
     VRProjectedD3DXSpriteIsolationR64::AfterDirectStageSource();
+}
+
+static void RevokeD3DXDirectStageTicket(std::uint64_t ticket) noexcept
+{
+    VRProjectedD3DXSpriteIsolationR64::RevokeDirectStageTicket(ticket);
 }
 
 static void FlushD3DXBeforeDirectGoalSource() noexcept
