@@ -3795,6 +3795,28 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
             HudBatch.scope, HudBatch.producer,
             HudBatch.provenDirectB9200 && !HudBatch.queued);
+        // Rival-specific forensic sink: a deferred 0xBB796 D3DX Draw can
+        // remain in this ledger after the native source-call scope ended.
+        // The +TIME/GOAL restore whitelist intentionally excludes that
+        // projected-world rival; prove a REAL physical Flush occurred
+        // before considering any isolated rival owner restoration.
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            HudBatch.producer == ProducerToken::RivalMarkerSprani)
+        {
+            static std::atomic<std::uint64_t> rivalSinkProbes{0};
+            const auto n = rivalSinkProbes.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL NATIVE GPU FLUSH SINK: hits={} pendingDraws={} batchActive={} homogeneous={} scope={} queueActive={} restore={} exactLiveSprite={}",
+                    n, HudBatch.drawCount, HudBatch.active ? 1 : 0,
+                    HudBatch.homogeneous ? 1 : 0,
+                    Name(HudBatch.scope), QueueRenderActive() ? 1 : 0,
+                    restore ? 1 : 0,
+                    DX9ExD3DXSpriteLifetime::CanFlush(
+                        self, HudBatch.sprite,
+                        *Module::exe_ptr<void*>(0x55B218)) ? 1 : 0);
+        }
         // A mixed/unknown older native batch must not borrow a currently
         // active +TIME or GOAL direct source at PHYSICAL Flush/End. Verified
         // homogeneous owner batches still restore their exact producer;
@@ -3836,6 +3858,28 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
             HudBatch.scope, HudBatch.producer,
             HudBatch.provenDirectB9200 && !HudBatch.queued);
+        // Rival-specific forensic sink: a deferred 0xBB796 D3DX Draw can
+        // remain in this ledger after the native source-call scope ended.
+        // The +TIME/GOAL restore whitelist intentionally excludes that
+        // projected-world rival; prove a REAL physical End occurred
+        // before considering any isolated rival owner restoration.
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            HudBatch.producer == ProducerToken::RivalMarkerSprani)
+        {
+            static std::atomic<std::uint64_t> rivalSinkProbes{0};
+            const auto n = rivalSinkProbes.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL NATIVE GPU END SINK: hits={} pendingDraws={} batchActive={} homogeneous={} scope={} queueActive={} restore={} exactLiveSprite={}",
+                    n, HudBatch.drawCount, HudBatch.active ? 1 : 0,
+                    HudBatch.homogeneous ? 1 : 0,
+                    Name(HudBatch.scope), QueueRenderActive() ? 1 : 0,
+                    restore ? 1 : 0,
+                    DX9ExD3DXSpriteLifetime::CanFlush(
+                        self, HudBatch.sprite,
+                        *Module::exe_ptr<void*>(0x55B218)) ? 1 : 0);
+        }
         // A mixed/unknown older native batch must not borrow a currently
         // active +TIME or GOAL direct source at PHYSICAL Flush/End. Verified
         // homogeneous owner batches still restore their exact producer;
