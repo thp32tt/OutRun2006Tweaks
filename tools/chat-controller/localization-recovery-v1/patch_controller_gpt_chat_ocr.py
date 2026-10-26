@@ -142,7 +142,7 @@ def patch(source):
                 applied = gpt_ocr_apply_response(gpt_active["task_id"], answer)
                 write_runtime(
                     status="gpt_ocr_response_applied",
-                    last_action="C1 OCR applied " + str(applied.get("applied", 0)) + " crop(s)",
+                    last_action="C1 OCR queued " + str(applied.get("applied", 0)) + " direct target(s)",
                     gpt_ocr_result=applied,
                     gpt_ocr_summary=gpt_ocr_summary(),
                 )
