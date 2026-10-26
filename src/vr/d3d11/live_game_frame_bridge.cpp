@@ -5605,6 +5605,31 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         static_cast<std::uint32_t>(type), nativeIndices != nullptr, pointFill,
         instanceCount, segmentedInstanceUpload ? chunkPlan.instancesPerChunk : 0u,
         nativeIndexCount, kMaxIndices);
+    // Connected game strips/fans previously issued one GPU Draw per source
+    // instance after a segmented FLOAT4 upload. Prebuild independent primitive
+    // indices for each native upload chunk and submit one DrawIndexed per chunk.
+    // Preflight BOTH full and trailing chunk before any frame/GPU mutation.
+    const auto segmentedConnectedPlan =
+        game_sm3_segmented_connected_submission_plan(
+            static_cast<std::uint32_t>(type), pointFill, wireFill, expected,
+            vertexCount, instanceCount,
+            segmentedInstanceUpload ? chunkPlan.instancesPerChunk : 0u,
+            kMaxIndices);
+    std::vector<std::uint32_t> fullConnectedChunkIndices;
+    std::vector<std::uint32_t> tailConnectedChunkIndices;
+    if (segmentedConnectedPlan.grouped) {
+        const UINT chunkInstances = chunkPlan.instancesPerChunk;
+        const UINT trailing = instanceCount % chunkInstances;
+        if (!game_sm3_expand_connected_instance_indices(
+                static_cast<std::uint32_t>(type), indices, expected,
+                vertexCount, chunkInstances, kMaxIndices,
+                fullConnectedChunkIndices) ||
+            (trailing && !game_sm3_expand_connected_instance_indices(
+                static_cast<std::uint32_t>(type), indices, expected,
+                vertexCount, trailing, kMaxIndices,
+                tailConnectedChunkIndices)))
+            return false; // original D3D9 gameplay and input remain valid
+    }
     // Keep input-layout cache identity separate when an instanced draw
     // requires source FLOAT4 packing even for already-float declarations.
     if (sourceInstancing && !repack) {
@@ -6262,10 +6287,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         D3D11_PRIMITIVE_TOPOLOGY_POINTLIST :
         type == D3DPT_LINELIST ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
         type == D3DPT_LINESTRIP ?
-        (compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
+        ((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
             D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP) :
         type == D3DPT_TRIANGLESTRIP ?
-        (compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST :
+        ((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST :
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP) :
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     if (nativeIndices)
@@ -6284,7 +6309,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // strips/fans merge safely; large indexed lists/strips/fans keep original
     // D3D9 IB + per-instance vertex bases and independent GPU Draw boundaries.
     const UINT nativeSubmissionCount = segmentedInstanceUpload
-        ? (segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount)
+        ? (segmentedListPlan.grouped ? segmentedListPlan.batches :
+           (segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount))
         : (compactListInstances
             ? 1u : (listCandidate ? listSubmission.drawCount :
                 (connectedCandidate ? connectedSubmission.drawCount : instanceCount)));
@@ -6299,7 +6325,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             context->Draw(vertices, base);
     };
     for (UINT submit = 0u; submit < nativeSubmissionCount; ++submit) {
-        const UINT instance = segmentedListPlan.grouped
+        const UINT instance = (segmentedListPlan.grouped ||
+            segmentedConnectedPlan.grouped)
             ? submit * chunkPlan.instancesPerChunk : submit;
         if (segmentedInstanceUpload && instance != 0u &&
             instance % chunkPlan.instancesPerChunk == 0u) {
@@ -6318,10 +6345,32 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                          unpacked.data(), chunkBytes))
                 return false;
         }
-        if (segmentedListPlan.grouped) {
+        if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {
             const UINT chunkInstances = (std::min)(
                 instanceCount - instance, chunkPlan.instancesPerChunk);
-            if (!nativeIndices) {
+            if (segmentedConnectedPlan.grouped) {
+                // Prevalidated indices use a local vertex base for EACH
+                // WRITE_DISCARD chunk, even for a one-instance tail. Never
+                // connect two source strips or invert odd strip winding.
+                const auto& chunkIndices =
+                    chunkInstances == chunkPlan.instancesPerChunk
+                        ? fullConnectedChunkIndices : tailConnectedChunkIndices;
+                const UINT indexBytes = static_cast<UINT>(
+                    chunkIndices.size() * sizeof(std::uint32_t));
+                if (!ensure_full_game_upload_buffer(
+                        device, s.fullGameIndexUpload, s.fullGameIndexCapacity,
+                        indexBytes, D3D11_BIND_INDEX_BUFFER) ||
+                    !upload_full_game_stream(
+                        context, s.fullGameIndexUpload.Get(),
+                        s.fullGameIndexCapacity, chunkIndices.data(), indexBytes)) {
+                    s.frameBatch.abort();
+                    return false;
+                }
+                context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
+                                          DXGI_FORMAT_R32_UINT, 0u);
+                context->DrawIndexed(static_cast<UINT>(chunkIndices.size()),
+                                     0u, 0);
+            } else if (!nativeIndices) {
                 // POINT/LINELIST/TRIANGLELIST have no cross-instance edges.
                 context->Draw(chunkInstances * vertexCount, 0u);
             } else {

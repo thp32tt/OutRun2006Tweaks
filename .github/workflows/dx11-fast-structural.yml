@@ -564,6 +564,10 @@ jobs:
           # instance upload, preserving indexed locals and connected fallback.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_segmented_list_batch_01080.cpp -o /tmp/dx11_sm3_segmented_list_01080 && /tmp/dx11_sm3_segmented_list_01080
           python tools/test_dx11_sm3_segmented_list_batch_01080.py
+          # Genuine connected LINESTRIP/TRIANGLESTRIP/TRIANGLEFAN instanced
+          # game draws must keep their source primitive boundaries per GPU chunk.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_segmented_connected_batch_01081.cpp -o /tmp/dx11_sm3_segmented_connected_01081 && /tmp/dx11_sm3_segmented_connected_01081
+          python tools/test_dx11_sm3_segmented_connected_01081.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_polygon_raster_probe_01032.cpp -o /tmp/dx11_polygon_raster_01032 && /tmp/dx11_polygon_raster_01032
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_colorfill_gpu_probe_01033.cpp -o /tmp/dx11_pre_draw_01033 && /tmp/dx11_pre_draw_01033
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_overdraw_probe_01034.cpp -o /tmp/dx11_pre_draw_01034 && /tmp/dx11_pre_draw_01034

@@ -2,6 +2,7 @@
 // Convert D3D9 instanced line strips, triangle strips and triangle fans to
 // independent indexed lists for a single native D3D11 DrawIndexed.
 // Never connect neighboring source-instance primitive boundaries.
+// Also handles a single trailing instance in the final segmented GPU upload.
 #include <cstdint>
 #include <limits>
 #include <vector>
@@ -16,7 +17,7 @@ namespace outrun::vr::dx11::live_game_frame {
     const bool triangleFan = primitiveType == 6u;
     if ((!lineStrip && !triangleStrip && !triangleFan) ||
         sourceCount < (lineStrip ? 2u : 3u) ||
-        !verticesPerInstance || instanceCount < 2u || !maxIndices)
+        !verticesPerInstance || !instanceCount || !maxIndices)
         return false;
     const std::uint64_t vertices =
         std::uint64_t(verticesPerInstance) * instanceCount;
