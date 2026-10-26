@@ -53,7 +53,9 @@ assert "kMaxNativeGameVertices == kMaxNativeGamePrimitives * 3u" in probe
 # 01096: preserve the original negative probe for all OTHER topologies,
 # and independently require both positive 4096-strip source capture and
 # exact oversized-strip rejection (not a regex-only acceptance bypass).
-assert "const auto limit = kind == 5u" in probe
+assert "const auto limit = kind == 1u" in probe
+assert "kind == 2u ? kMaxNativeGameLinePrimitives :" in probe
+assert "kind == 3u ? kMaxNativeGameLineStripPrimitives :" in probe
 assert "kind == 5u ? kMaxNativeGameStripPrimitives :" in probe
 assert "kind == 6u ? kMaxNativeGameFanPrimitives :" in probe
 assert "game_native_primitive_element_count(kind, limit + 1u, elements)" in probe
@@ -64,6 +66,17 @@ assert "5u, kMaxNativeGameStripPrimitives, elements)" in probe
 assert "kMaxNativeGameStripPrimitives =" in span
 assert "kMaxNativeGameFanPrimitives =" in span
 assert "kMaxNativeGameVertices - 2u" in span
+# 01098: original point/line VB/IB/UP -> bounded real-game IA submit.
+# Keep each positive source boundary AND the destructive cap+1 rejection.
+for token in ("kMaxNativeGamePointPrimitives =","kMaxNativeGameLinePrimitives =",
+              "kMaxNativeGameLineStripPrimitives =",
+              "primitiveCount > kMaxNativeGamePointPrimitives",
+              "kMaxNativeGameLinePrimitives : kMaxNativeGameLineStripPrimitives"):
+    assert token in span, token
+for token in ("game_native_primitive_element_count(topology, cap, elements)",
+              "!game_native_primitive_element_count(topology, cap + 1u, elements)",
+              "assert(elements == prior)"):
+    assert token in probe, token
 # Two connected polygon source admission routes share the same checked
 # vertex cap; assert both caps and their *rejection* before native draw.
 assert "primitiveCount > cap" in span

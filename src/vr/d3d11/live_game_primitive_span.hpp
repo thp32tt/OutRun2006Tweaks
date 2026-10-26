@@ -12,11 +12,25 @@ namespace outrun::vr::dx11::live_game_frame {
 // stay fixed. Connected TRIANGLESTRIP and TRIANGLEFAN can describe up to
 // 6142 triangles in just 6144 authentic source elements; their POINT or
 // fan-to-list expansion requires multiple bounded D3D11 GPU submissions.
-// Independent lists/points/lines retain their 2048-primitive admission.
+// Real game points and lines admit their complete 6144-element D3D9 VB/IB/UP
+// source and bounded D3D11 IA Draw/DrawIndexed. Independent triangle lists
+// retain 2048 primitives; connected polygons retain their GPU windows.
 // The original DX9Ex Draw/input/FFB remains authoritative.
 inline constexpr std::uint32_t kMaxNativeGamePrimitives = 2048u;
 inline constexpr std::uint32_t kMaxNativeGameVertices =
     kMaxNativeGamePrimitives * 3u;
+// A live point or line uses only 1 / 2 / P+1 authored source elements.
+// Both the intercepted shadow and each native GPU submission stay bounded
+// to the existing 6144 elements, without fabricating extra geometry.
+inline constexpr std::uint32_t kMaxNativeGamePointPrimitives =
+    kMaxNativeGameVertices;
+inline constexpr std::uint32_t kMaxNativeGameLinePrimitives =
+    kMaxNativeGameVertices / 2u;
+inline constexpr std::uint32_t kMaxNativeGameLineStripPrimitives =
+    kMaxNativeGameVertices - 1u;
+static_assert(kMaxNativeGamePointPrimitives == kMaxNativeGameVertices);
+static_assert(kMaxNativeGameLinePrimitives * 2u == kMaxNativeGameVertices);
+static_assert(kMaxNativeGameLineStripPrimitives + 1u == kMaxNativeGameVertices);
 inline constexpr std::uint32_t kMaxNativeGameStripPrimitives =
     kMaxNativeGameVertices - 2u;
 inline constexpr std::uint32_t kMaxNativeGameFanPrimitives =
@@ -52,12 +66,15 @@ constexpr bool game_native_primitive_element_count(
     std::uint32_t& elements) noexcept {
     switch (d3d9Type) {
     case 1u: // D3DPT_POINTLIST: one source vertex per point
-        if (primitiveCount == 0u || primitiveCount > kMaxNativeGamePrimitives) return false;
+        if (primitiveCount == 0u ||
+            primitiveCount > kMaxNativeGamePointPrimitives) return false;
         elements = primitiveCount;
         return true;
     case 2u: // D3DPT_LINELIST: P * 2 source elements
     case 3u: { // D3DPT_LINESTRIP: P + 1 source elements
-        if (primitiveCount == 0u || primitiveCount > kMaxNativeGamePrimitives) return false;
+        const auto cap = d3d9Type == 2u
+            ? kMaxNativeGameLinePrimitives : kMaxNativeGameLineStripPrimitives;
+        if (primitiveCount == 0u || primitiveCount > cap) return false;
         const std::uint64_t required = d3d9Type == 2u
             ? static_cast<std::uint64_t>(primitiveCount) * 2u
             : static_cast<std::uint64_t>(primitiveCount) + 1u;
@@ -90,6 +107,15 @@ constexpr bool game_native_mesh_span_contract() noexcept {
            n == 2u * kMaxNativeGamePrimitives &&
            game_native_primitive_element_count(3u, kMaxNativeGamePrimitives, n) &&
            n == kMaxNativeGamePrimitives + 1u &&
+           game_native_primitive_element_count(1u, kMaxNativeGamePointPrimitives, n) &&
+           n == kMaxNativeGameVertices &&
+           !game_native_primitive_element_count(1u, kMaxNativeGamePointPrimitives + 1u, n) &&
+           game_native_primitive_element_count(2u, kMaxNativeGameLinePrimitives, n) &&
+           n == kMaxNativeGameVertices &&
+           !game_native_primitive_element_count(2u, kMaxNativeGameLinePrimitives + 1u, n) &&
+           game_native_primitive_element_count(3u, kMaxNativeGameLineStripPrimitives, n) &&
+           n == kMaxNativeGameVertices &&
+           !game_native_primitive_element_count(3u, kMaxNativeGameLineStripPrimitives + 1u, n) &&
            game_native_primitive_element_count(4u, kMaxNativeGamePrimitives, n) &&
            n == kMaxNativeGameVertices &&
            game_native_primitive_element_count(5u, kMaxNativeGamePrimitives, n) &&

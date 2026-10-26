@@ -56,9 +56,32 @@ int main() {
     for (unsigned rejected : {0u, 7u, 0xffffffffu})
         assert(!game_native_primitive_element_count(rejected, 1, elements) &&
                elements == retained);
+    // 01098: original game POINTLIST/LINELIST/LINESTRIP use the full
+    // 6144-element shared capture and GPU IA Draw/DrawIndexed span through
+    // both live FVF and programmable SM3 observers. One extra source point
+    // or line must reject before any native GPU mutation, without changing
+    // the original game's input/FFB or its D3D9 Draw.
+    using outrun::vr::dx11::live_game_frame::kMaxNativeGamePointPrimitives;
+    using outrun::vr::dx11::live_game_frame::kMaxNativeGameLinePrimitives;
+    using outrun::vr::dx11::live_game_frame::kMaxNativeGameLineStripPrimitives;
+    assert(kMaxNativeGamePointPrimitives == kMaxNativeGameVertices);
+    assert(kMaxNativeGameLinePrimitives * 2u == kMaxNativeGameVertices);
+    assert(kMaxNativeGameLineStripPrimitives + 1u == kMaxNativeGameVertices);
+    for (const auto topology : {1u, 2u, 3u}) {
+        const auto cap = topology == 1u ? kMaxNativeGamePointPrimitives :
+                         topology == 2u ? kMaxNativeGameLinePrimitives :
+                                          kMaxNativeGameLineStripPrimitives;
+        assert(game_native_primitive_element_count(
+            topology, kMaxNativeGamePrimitives + 1u, elements));
+        assert(game_native_primitive_element_count(topology, cap, elements));
+        assert(elements == kMaxNativeGameVertices);
+        const auto prior = elements;
+        assert(!game_native_primitive_element_count(topology, cap + 1u, elements));
+        assert(elements == prior);
+    }
     // 01097: authentic connected strip AND fan can fill the entire original
     // 6144-vertex capture without allocating unbounded GPU point/list IBs.
-    // Only the two connected polygon types exceed independent 2048 caps.
+    // Polygon primitive limits remain independent of the new point/line source.
     using outrun::vr::dx11::live_game_frame::kMaxNativeGameStripPrimitives;
     using outrun::vr::dx11::live_game_frame::kMaxNativeGameFanPrimitives;
     assert(kMaxNativeGameStripPrimitives == kMaxNativeGameVertices - 2u);
@@ -76,7 +99,10 @@ int main() {
     for (unsigned kind : {1u, 2u, 3u, 4u, 5u, 6u}) {
         assert(!game_native_primitive_element_count(kind, 0, elements) &&
                elements == retainedAfterConnected);
-        const auto limit = kind == 5u ? kMaxNativeGameStripPrimitives :
+        const auto limit = kind == 1u ? kMaxNativeGamePointPrimitives :
+                           kind == 2u ? kMaxNativeGameLinePrimitives :
+                           kind == 3u ? kMaxNativeGameLineStripPrimitives :
+                           kind == 5u ? kMaxNativeGameStripPrimitives :
                            kind == 6u ? kMaxNativeGameFanPrimitives :
                                         kMaxNativeGamePrimitives;
         assert(!game_native_primitive_element_count(kind, limit + 1u, elements) &&
