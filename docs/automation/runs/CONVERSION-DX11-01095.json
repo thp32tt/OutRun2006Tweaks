@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01095",
+  "production_id": "CONVERSION-DX11-01095",
+  "event_id": "CONVERSION-DX11-01095-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01095",
+  "classification": "A_LIVE_SM3_INDEXED_POINT_STRIP_GPU_WINDOWS_WITH_CAUSAL_CI_RECORD_REPAIR",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SM3_INDEXED_POINT_STRIP_WINDOWED_NATIVE_DRAW",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_GATE_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "b489dca831c2a99760f9d92cb31ec1cae40ca147",
+  "source_change_sha": "a2e9843f50143d93ec74da9c9731958ccf021bfe",
+  "material_result_sha": "a2e9843f50143d93ec74da9c9731958ccf021bfe",
+  "validation_bearing_result_sha": null,
+  "source_implementation_commits": [
+    "a2e9843f50143d93ec74da9c9731958ccf021bfe"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01095.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate authentic D3D9 shader-bound indexed POINT triangle strips across full-size D3D11 GPU DrawIndexed windows without expanding an over-budget whole index buffer; preserve real game primitive order, programmable shader bindings, frame seed, and D3D9/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_game_sm3_gpu_windows",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_D3D9_TO_D3D11_NATIVE_DRAW",
+        "expected_behavior": "Original-game shader-bound indexed POINT TRIANGLESTRIP uses the existing game-owned VB and exact source triangle corner order across bounded native D3D11 GPU DrawIndexed windows."
+      },
+      {
+        "id": "source_fallback_and_safety",
+        "category": "fallback_regression",
+        "behavior_area": "DX9EX_INPUT_FFB_AND_DRAW_FALLBACK",
+        "expected_behavior": "Whole source index preflight, invalid index and budget rejection, failed late GPU window frame abort; original D3D9 game Draw, input, FFB and DX9Ex render remain unchanged."
+      },
+      {
+        "id": "one_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "NATIVE_BUILD_AND_FRAME_GATES",
+        "expected_behavior": "Five mandatory push GitHub Actions pass on the same final validation-bearing result commit, including C++ index-window continuity regression and existing shader/host/HUD structural safety."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_SM3_INDEXED_SOURCE_PREFLIGHT",
+      "NATIVE_D3D11_POINTLIST_GPU_WINDOWS",
+      "GUARDED_GAME_FRAME_PRESENT"
+    ],
+    "batch_components": [
+      "ACTUAL_SM3_GPU_WINDOW_SUBMISSION",
+      "ALL_SOURCE_INDEX_PREFLIGHT_AND_FALLBACK",
+      "CHECKED_IN_CXX_POSITIVE_NEGATIVE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real shader-bound SM3 indexed POINT strip branch issues GPU DrawIndexed per source-ordered window and C++ test generates expected global-index triangles.",
+      "negative_regression": "Whole original IB validated before any GPU mutation, over-budget/no-window and late-invalid indices fail closed, while original game D3D9 fallback is preserved.",
+      "component_integration": "D3D9 original game DrawIndexedPrimitive source -> true bound VS/PS/vertex buffer -> D3D11 POINTLIST DrawIndexed windows -> existing owned full frame -> guarded publish; original D3D9 input unaffected."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_INDEXED_POINT_STRIP_WINDOWED_NATIVE_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native full-size source/CI only: actual OutRun menu/car/race pixels, headset stereo and FPS unobserved; RUNTIME_VALIDATION=UNTESTED.",
+    "activation_guard_and_fallback": "Original source D3D9 Draw/Present/gamepad/FFB/SkyGlow unchanged, DXVK frozen, native game path strictly opt-in and failed native fragment aborts only diagnostic publication."
+  },
+  "acceptance_results": {
+    "live_game_sm3_gpu_windows": {
+      "status": "PENDING_EXACT_SHA"
+    },
+    "source_fallback_and_safety": {
+      "status": "PENDING_EXACT_SHA"
+    },
+    "one_exact_sha_gates": {
+      "status": "PENDING_EXACT_SHA"
+    }
+  },
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "score_change": 0,
+  "ai2_previous_confirmed_cumulative_score": 1991,
+  "ai2_new_confirmed_cumulative_score": 1991,
+  "ci_repair_reason": "Previous highest run 01094 C6 integration_path lacks mandatory literal LIVE_D3D9_CALLSITE, D3D11_NATIVE_DRAW, VISIBLE_FRAME_OUTPUT, causing current Fast --check-latest failure before C++ tests. This run 01095 records accurately implemented new game source path rather than rewriting previous terminal source/C6 evidence.",
+  "next_implementation_action": "If a mandatory exact-SHA Gate fails due to code or authentic safety probe, repair under 01095 and check new SHA; no HMD success claims."
+}
