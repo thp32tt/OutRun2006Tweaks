@@ -12,7 +12,7 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:SM3_NONINSTANCED_FAN_NATIVE_CHUNK_DRAW",
   "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_RECORDED_AFTER_C5_FULL_EXACT_SHA_GATES",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -177,5 +177,7 @@
   "score_note": "1976 + 1 = 1977; same TASK retry, causal CI repairs, C6 and readbacks score +0",
   "score_ssot_ref": "thp32tt/ai-dev-lab@b63284113f728b6f788b0098a3614691d9f40410",
   "runtime_note": "No game launch, menu/car/race frame capture, native Draw/frame telemetry, Quest3/VDXR or performance measurement. RUNTIME_VALIDATION=UNTESTED",
-  "next_implementation_action": "Controller to select next independent DX11 coverage after terminal exact-SHA build; no automatic gameplay/HMD promotion."
+  "next_implementation_action": "Controller to select next independent DX11 coverage after terminal exact-SHA build; no automatic gameplay/HMD promotion.",
+  "c6_previous_hold_reason": "C6_NOT_COMPLETE",
+  "c6_previous_hold_resolved": true
 }
