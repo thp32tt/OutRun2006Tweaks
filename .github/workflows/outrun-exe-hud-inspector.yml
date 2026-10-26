@@ -25,6 +25,8 @@ on:
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
       - 'tools/test_dx11_first_game_frame_regressions.py'
+      # Causal full-game activation repairs must trigger exact-SHA HUD Gate.
+      - 'tools/verify_dx11_first_game_frame_boundary.py'
       - 'tools/test_dx11_*.py'
       # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
       - 'tools/dx11_sm3_*_probe.cpp'
@@ -73,6 +75,8 @@ on:
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
       - 'tools/test_dx11_first_game_frame_regressions.py'
+      # Causal full-game activation repairs must trigger exact-SHA HUD Gate.
+      - 'tools/verify_dx11_first_game_frame_boundary.py'
       - 'tools/test_dx11_*.py'
       # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
       - 'tools/dx11_sm3_*_probe.cpp'

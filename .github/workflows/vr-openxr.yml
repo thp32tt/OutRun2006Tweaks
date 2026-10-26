@@ -20,6 +20,8 @@ on:
       - 'tools/verify_vr_r32_review.py'
       - 'tools/verify_vr_proven_baseline.py'
       - 'tools/test_dx11_first_game_frame_regressions.py'
+      # Causal full-game activation repairs must trigger exact-SHA XR Gate.
+      - 'tools/verify_dx11_first_game_frame_boundary.py'
       - 'tools/test_dx11_*.py'
       # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
       - 'tools/dx11_sm3_*_probe.cpp'
@@ -60,6 +62,8 @@ on:
       - 'tools/verify_vr_r32_review.py'
       - 'tools/verify_vr_proven_baseline.py'
       - 'tools/test_dx11_first_game_frame_regressions.py'
+      # Causal full-game activation repairs must trigger exact-SHA XR Gate.
+      - 'tools/verify_dx11_first_game_frame_boundary.py'
       - 'tools/test_dx11_*.py'
       # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
       - 'tools/dx11_sm3_*_probe.cpp'
