@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01096",
+  "production_id": "CONVERSION-DX11-01096",
+  "event_id": "CONVERSION-DX11-01096-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01096",
+  "classification": "A_LIVE_GAME_STRIP_SOURCE_TO_NATIVE_WINDOWED_DRAW",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_GAME_LARGE_TRIANGLESTRIP_SOURCE_GPU_WINDOWS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "377e23a92bc868263076c1633ada08bbfaf43043",
+  "source_change_sha": "d5040d605471299044ec9351c64ee821be4ca2e6",
+  "material_result_sha": "d5040d605471299044ec9351c64ee821be4ca2e6",
+  "validation_bearing_result_sha": "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd",
+  "result_sha": "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd",
+  "implementation_commits": [
+    "d5040d605471299044ec9351c64ee821be4ca2e6"
+  ],
+  "repair_commits": [
+    "a13fc1581860a52fd0a12ffc425f16c1707eeb25",
+    "871e1a17679b04525d81f9a1b7b4f31a6c2a4317",
+    "8bd8f939a2216530e02dc1d48920741652a15472",
+    "647367b72cd072f9518772725125476a756f06f1",
+    "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    "tools/test_dx11_sparse_index_draw_00646.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Allow authentic 2049-4096 triangle source TRIANGLESTRIP in original-game D3D9 -> native D3D11 full-frame FVF and SM3 GPU point-window draws while retaining exact source ordering and 6144-index per-submit budget; original D3D9 rendering/input fallback remains authoritative.",
+    "acceptance_items": [
+      {
+        "id": "large_original_game_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_TO_NATIVE_GPU_SUBMITS",
+        "expected_behavior": "The original 4096-triangle indexed source strip passes compact 4098-element source validation and is submitted through bounded FVF/SM3 DrawIndexed windows in original global winding, without one unbounded GPU index allocation."
+      },
+      {
+        "id": "other_topologies_and_corrupt_tail",
+        "category": "fallback_regression",
+        "behavior_area": "DX9EX_FALLBACK_AND_SOURCE_SAFETY",
+        "expected_behavior": "POINT/LINE/LIST/FAN primitive caps remain 2048, source strip rejects 4097, invalid late source indices prevent partial native publication, original D3D9 input/FFB and DX9Ex stay unchanged."
+      },
+      {
+        "id": "final_five_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "NATIVE_BUILD_AND_HUD_HOST",
+        "expected_behavior": "Five mandatory push GitHub Actions completed/success on exactly c8404ae3, including C++ checked-in source-window regressions and unchanged safety gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_COMPACT_SOURCE_SPAN",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "ORIGINAL_D3D9_TRIANGLESTRIP_SOURCE_SPAN_ADMISSION",
+      "NATIVE_FVF_SM3_INDEXED_GPU_WINDOW_LINK",
+      "POSITIVE_NEGATIVE_CXX_SOURCE_SPAN_REGRESSIONS",
+      "CAUSAL_FAST_GATE_ORACLE_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Fast C++ dx11_game_primitive_span_probe and dx11_live_sm3_native_point_strip_windows exercise 2049 and 4096 genuine source triangles, GPU window seams, global parity and repeated vertex corners.",
+      "negative_regression": "Other five D3D9 topology caps unchanged, over-budget strip rejected, late invalid index destination unchanged and prior destructive sparse index capture invariants retained.",
+      "component_integration": "Real D3D9 game Draw/DrawIndexed source observer (common compact span) -> shader-bound/FVF native D3D11 multi-window DrawIndexed -> guarded frame output; original D3D9 Draw/input/FFB remains authoritative."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:LIVE_GAME_LARGE_TRIANGLESTRIP_SOURCE_GPU_WINDOWS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI integration only. Actual OutRun menu/car/race pixels, native GPU draw counts, OpenXR Quest3/VDXR eye output and FPS UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains opt-in; failure aborts native frame; original D3D9 draw, gamepad, FFB and SkyGlow unchanged; DXVK frozen."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: checked GitHub branch HEAD 377e23a9 and latest completed 01095 C6, policy and owner/path boundaries.",
+    "C1_REVIEW": "PASS: found common D3D9 source TRIANGLESTRIP 2048-primitive limit made preexisting >2048 native POINT GPU window code unreachable; chose live source-to-GPU integration.",
+    "C2_IMPLEMENT": "PASS: C++ source span extended for up to 4096 authentic strip triangles (<=4098 indices) in bounded per-Draw 6144 GPU budget; checked-in positive/negative seam/corrupt-tail regressions; real source integration preserved original D3D9 fallback.",
+    "C3_VALIDATE": "PASS: full unchanged mandatory five push GitHub Actions completed/success at exact final result SHA c8404ae3; actual game/HMD UNTESTED.",
+    "C4_COMMIT": "PASS: d5040d material source implementation and causal compiler/oracle/workflow repair commits, no CI skip on result.",
+    "C5_PACKAGE": "NOT_REQUIRED: integrated source/gate task only. No user-runtime HMD promotion or new independent binary test package requested; existing Build workflow owns packages.",
+    "C6_STATE": "PASS: post-Gate docs-only bookkeeping; validation-bearing SHA c8404ae3 retained and no Gate rerun."
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40398409931,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40398409931"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40398410021,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40398410021"
+    },
+    {
+      "name": "Build",
+      "run_id": 40398409955,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40398409955"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40398409920,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40398409920"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40398410060,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40398410060"
+    }
+  ],
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 1,
+  "ai2_previous_confirmed_cumulative_score": 1993,
+  "ai2_new_confirmed_cumulative_score": 1994,
+  "scoreboard_ssot_repo": "thp32tt/ai-dev-lab",
+  "scoreboard_verified_commit": "5ced61280d08dc623119fdc0b520b0f066ebbdfd",
+  "score_note": "One distinct C++/GPU integration +1; 01096 test repairs/retries/checkpoint +0. AI1 remains 1666. Scoreboard main GitHub SSOT 1994 readback required.",
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd",
+  "c6_does_not_revalidate_source": true,
+  "terminal_gameplay_verified": false,
+  "save_time_kst": "2026-10-27T06:00:54+09:00",
+  "next_implementation_action": "Controller chooses a distinct unfinished full native source/frame/HMD handoff capability after this build-verified integration; actual menu/car/race screen, native GPU count, Quest3/VDXR eye parity and FPS require real runtime test. Do not rescore/replay 01096."
+}
