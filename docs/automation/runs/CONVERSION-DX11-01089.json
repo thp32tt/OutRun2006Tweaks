@@ -162,7 +162,8 @@
         "src/vr/d3d11/live_game_sm3_polygon_raster.hpp",
         "tools/dx11_sm3_indexed_fan_01087.cpp"
       ],
-      "note": "Native SM3 original-indexed and linear triangle strip point/wire/solid source geometry/window code and C++ regression verified by exact-SHA CI; real game native pixels remain UNTESTED."
+      "note": "Native SM3 original-indexed and linear triangle strip point/wire/solid source geometry/window code and C++ regression verified by exact-SHA CI; real game native pixels remain UNTESTED.",
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_indexed_fan_01087.cpp -o /tmp/dx11_sm3_indexed_fan_01087 && /tmp/dx11_sm3_indexed_fan_01087"
     },
     "strip_validated_safe_fallback": {
       "status": "PASS_FEATURE_CI",
@@ -171,7 +172,8 @@
         "tools/test_dx11_sm3_indexed_fan_01087.py",
         "tools/verify_dx11_first_game_frame_boundary.py"
       ],
-      "note": "Original indexed IB scan before GPU submission, aligned strip seams and bounded native point occurrences with D3D9 fallback; standalone HMD/game UNTESTED."
+      "note": "Original indexed IB scan before GPU submission, aligned strip seams and bounded native point occurrences with D3D9 fallback; standalone HMD/game UNTESTED.",
+      "validation_command": "python tools/test_dx11_sm3_indexed_fan_01087.py && python tools/verify_dx11_first_game_frame_boundary.py"
     },
     "full_same_sha_ci": {
       "status": "PASS_EXACT_SHA",
@@ -182,7 +184,8 @@
         "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918730",
         "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40332918765"
       ],
-      "note": "Five named push Actions all completed/success at exactly the same 87628eed source/repair SHA; subsequent C6 commit intentionally separate."
+      "note": "Five named push Actions all completed/success at exactly the same 87628eed source/repair SHA; subsequent C6 commit intentionally separate.",
+      "validation_command": "GitHub Actions push: DX11 Fast 40332918794, Backend 40332918879, Windows Build 40332918849, OpenXR 40332918730, HUD 40332918765; validation-bearing SHA 87628eedf2f6351b738b0205d2a6a7eab51dad32"
     }
   },
   "ai2_previous_confirmed_cumulative_score": 1984,
@@ -192,5 +195,6 @@
   "c6_bookkeeping_only": true,
   "c6_does_not_revalidate_source": true,
   "c6_source_validation_sha": "87628eedf2f6351b738b0205d2a6a7eab51dad32",
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no original game, Quest3, VDXR, fps, actual native Draw or published game frame observed."
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no original game, Quest3, VDXR, fps, actual native Draw or published game frame observed.",
+  "c6_policy_compatibility_repair": "2026-10-26: Complete-stage acceptance records retain their original exact-SHA evidence and now name the existing validation commands required by the stricter live DX11 policy. No additional 01089 score, gameplay claim, or CI rerun credited."
 }
