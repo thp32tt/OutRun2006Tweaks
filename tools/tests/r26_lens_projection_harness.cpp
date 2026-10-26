@@ -1,50 +1,28 @@
 // The C993 production branch is inserted verbatim by the verifier.
-// D3D/XR boundary adapters use row-vector matrices. Expected rays below
-// are reconstructed independently from the submitted FOV and eye rotation.
+// R7 projection/quaternion/transpose functions are inserted verbatim too.
+// Expected rays use independent scalar quaternion algebra and shader-layout
+// decoding. D3D/XR boundaries are fakes, not physical GPU/HMD acceptance.
 #include "vr/d3d9/projected_sun_ray.hpp"
 #include "vr/d3d9/lens_centre_relative_eye_pose.hpp"
 #include <cstdint>
 #include <cstring>
 #include <cstdio>
 #include <limits>
+#include <initializer_list>
 
-struct D3DMATRIX { float m[4][4]{}; };
+struct D3DMATRIX { union { float m[4][4]; struct {
+    float _11,_12,_13,_14,_21,_22,_23,_24,
+          _31,_32,_33,_34,_41,_42,_43,_44;
+}; }; };
 struct Fov { float angleLeft, angleRight, angleUp, angleDown; };
+namespace OutRunVR { using SharedFov = Fov; }
 struct Stereo {
     std::uint32_t poseSequence = 7;
     float eyeOffset[2][3]{};
     float eyeOrientation[2][4]{{0,0,0,1},{0,0,0,1}};
     Fov eyeFov[2]{};
 };
-D3DMATRIX IdentityMatrix() {
-    D3DMATRIX m{}; for(int i=0;i<4;++i) m.m[i][i]=1; return m;
-}
-D3DMATRIX TransposeMatrix(const D3DMATRIX& a) {
-    D3DMATRIX m{}; for(int i=0;i<4;++i) for(int j=0;j<4;++j) m.m[i][j]=a.m[j][i]; return m;
-}
-D3DMATRIX MatrixFromQuaternionTranslation(const float* q,const float* t,float scale) {
-    const float x=q[0],y=q[1],z=q[2],w=q[3];
-    D3DMATRIX m=IdentityMatrix();
-    m.m[0][0]=1-2*y*y-2*z*z; m.m[0][1]=2*x*y+2*z*w; m.m[0][2]=2*x*z-2*y*w;
-    m.m[1][0]=2*x*y-2*z*w; m.m[1][1]=1-2*x*x-2*z*z; m.m[1][2]=2*y*z+2*x*w;
-    m.m[2][0]=2*x*z+2*y*w; m.m[2][1]=2*y*z-2*x*w; m.m[2][2]=1-2*x*x-2*y*y;
-    for(int i=0;i<3;++i) m.m[3][i]=t[i]*scale;
-    return m;
-}
-D3DMATRIX InverseRigid(const D3DMATRIX& a) {
-    D3DMATRIX m=IdentityMatrix();
-    for(int i=0;i<3;++i) for(int j=0;j<3;++j) m.m[i][j]=a.m[j][i];
-    for(int j=0;j<3;++j) for(int k=0;k<3;++k) m.m[3][j]-=a.m[3][k]*m.m[k][j];
-    return m;
-}
-D3DMATRIX ProjectionFromFov(const D3DMATRIX& base,const Fov& f) {
-    D3DMATRIX m=base;
-    const float l=std::tan(f.angleLeft),r=std::tan(f.angleRight);
-    const float d=std::tan(f.angleDown),u=std::tan(f.angleUp);
-    m.m[0][0]=2/(r-l); m.m[1][1]=2/(u-d);
-    m.m[2][0]=(r+l)/(r-l); m.m[2][1]=(u+d)/(u-d);
-    return m;
-}
+// @ACTUAL_RENDER_MATH@
 namespace OutRunVR::GameSemantic {
 enum class ProducerToken { None, LensFlareCentre };
 bool queued=false;
@@ -68,10 +46,66 @@ bool actual(const Stereo& stereo,const D3DMATRIX& stockWvp,
     return false;
 }
 bool same(float x,float y){ return std::fabs(x-y)<0.0001f; }
+struct V { double x,y,z; };
+struct Q { double x,y,z,w; };
+V cross(V a,V b){return {a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x};}
+V rotate(Q q,V v) {
+    const double n=std::sqrt(q.x*q.x+q.y*q.y+q.z*q.z+q.w*q.w);
+    q={q.x/n,q.y/n,q.z/n,q.w/n};
+    const V t=cross({q.x,q.y,q.z},v),u=cross({q.x,q.y,q.z},t);
+    return {v.x+2*(q.w*t.x+u.x),v.y+2*(q.w*t.y+u.y),v.z+2*(q.w*t.z+u.z)};
+}
+Q product(Q a,Q b) {
+    return {a.w*b.x+a.x*b.w+a.y*b.z-a.z*b.y,
+            a.w*b.y-a.x*b.z+a.y*b.w+a.z*b.x,
+            a.w*b.z+a.x*b.y-a.y*b.x+a.z*b.w,
+            a.w*b.w-a.x*b.x-a.y*b.y-a.z*b.z};
+}
+Q euler(double yaw,double pitch,double roll) {
+    return product(product({0,std::sin(yaw/2),0,std::cos(yaw/2)},
+                           {std::sin(pitch/2),0,0,std::cos(pitch/2)}),
+                           {0,0,std::sin(roll/2),std::cos(roll/2)});
+}
+bool sameDirection(V a,V b) {
+    const double na=std::sqrt(a.x*a.x+a.y*a.y+a.z*a.z);
+    const double nb=std::sqrt(b.x*b.x+b.y*b.y+b.z*b.z);
+    return std::fabs(a.x/na-b.x/nb)<0.00002 &&
+           std::fabs(a.y/na-b.y/nb)<0.00002 &&
+           std::fabs(a.z/na-b.z/nb)<0.00002;
+}
+bool rays3d(const Stereo& s,const float (&constants)[2][16],Q head) {
+    const V points[]={{.25,-.125,-1},{-.03,.018,-.2},{12,-5,-100}};
+    for(const auto p:points) for(int e=0;e<2;++e) {
+        D3DMATRIX t{}; std::memcpy(&t,constants[e],sizeof(t));
+        D3DMATRIX m{};
+        for(int r=0;r<4;++r) for(int c=0;c<4;++c) m.m[r][c]=t.m[c][r];
+        const double point[4]{p.x,p.y,p.z,1}; double clip[4]{};
+        for(int j=0;j<4;++j) for(int k=0;k<4;++k) clip[j]+=point[k]*m.m[k][j];
+        if(!std::isfinite(clip[3]) || clip[3]<=0) return false;
+        const auto& f=s.eyeFov[e];
+        const double l=std::tan(f.angleLeft),r=std::tan(f.angleRight);
+        const double d=std::tan(f.angleDown),u=std::tan(f.angleUp);
+        const V eyeRay{(clip[0]/clip[3]*(r-l)+r+l)*.5,
+                       (clip[1]/clip[3]*(u-d)+u+d)*.5,-1};
+        const auto* q=s.eyeOrientation[e];
+        const V recovered=rotate({q[0],q[1],q[2],q[3]},eyeRay);
+        const V expected=OutRunVRRenderer::synced?p:rotate(head,p);
+        if(!sameDirection(recovered,expected)) return false;
+    }
+    return true;
+}
+void setEye(Stereo& s,int e,Q q) {
+    const float scale=e?1.3f:.7f;
+    s.eyeOrientation[e][0]=static_cast<float>(q.x)*scale;
+    s.eyeOrientation[e][1]=static_cast<float>(q.y)*scale;
+    s.eyeOrientation[e][2]=static_cast<float>(q.z)*scale;
+    s.eyeOrientation[e][3]=static_cast<float>(q.w)*scale;
+}
 bool rays(const Stereo& s,const float (&constants)[2][16],float wantX,float wantY) {
     for(int e=0;e<2;++e) {
         D3DMATRIX t{}; std::memcpy(&t,constants[e],sizeof(t));
-        const auto m=TransposeMatrix(t);
+        D3DMATRIX m{};
+        for(int r=0;r<4;++r) for(int c=0;c<4;++c) m.m[r][c]=t.m[c][r];
         const float point[4]{.25f,-.125f,-1,1}; float clip[4]{};
         for(int j=0;j<4;++j) for(int k=0;k<4;++k) clip[j]+=point[k]*m.m[k][j];
         const auto& f=s.eyeFov[e];
@@ -124,5 +158,25 @@ int main() {
     OutRunVR::GameSemantic::queued=false;
     OutRunVR::GameSemantic::producer=OutRunVR::GameSemantic::ProducerToken::None;
     if(actual(s,base,base,inv,output)||!unchanged()) return 8;
-    std::puts("PASS actual C993: asymmetric XY FOV, eye cant, head rotation, translation exclusion, camera sync, atomic rejection and exact scope");
+    OutRunVR::GameSemantic::producer=OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
+    const Q rotations[]={{0,0,0,1},euler(.18,0,0),euler(0,-.16,0),
+                         euler(0,0,.23),euler(.15,-.12,.21)};
+    unsigned cases=0;
+    for(const auto head:rotations) for(const auto eye:rotations) {
+        setEye(s,0,eye);
+        setEye(s,1,product(euler(-.04,.03,-.02),eye));
+        const float q[]{static_cast<float>(head.x),static_cast<float>(head.y),
+                        static_cast<float>(head.z),static_cast<float>(head.w)};
+        const float translation[]{10,-8,4};
+        OutRunVRRenderer::head=MatrixFromQuaternionTranslation(q,translation,1);
+        for(bool sync:{false,true}) {
+            OutRunVRRenderer::synced=sync;
+            if(!actual(s,base,base,inv,output)||!rays3d(s,output,head)) {
+                std::puts("FAIL production C993/R7: recovered 3D eye rays disagree"); return 9;
+            }
+            ++cases;
+        }
+    }
+    std::printf("PASS production C993 + R7 math: %u yaw/pitch/roll/combined/camera-sync pairs, 3 depths, normalized eye cant, translation exclusion, atomic rejection\n",cases);
 }
+

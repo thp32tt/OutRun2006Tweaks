@@ -21,6 +21,7 @@ on:
       - 'tools/tests/r26_lens_projection_harness.cpp'
       - 'tools/tests/stage_source_ticket_harness.cpp'
       - 'src/vr/d3d9/projected_sun_ray.hpp'
+      - 'src/vr/d3d9/stereo_renderer_r7.inc'
       - 'src/vr/d3d9/lens_centre_relative_eye_pose.hpp'
       - 'src/vr/game/hud_command_batch.hpp'
       - 'src/vr/game/stage_extension_source_admission.hpp'
@@ -60,9 +61,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'R26 visual recovery bundle contract failed' }
           python tools/verify_vr_r26_stage_fixedfn.py
           if ($LASTEXITCODE -ne 0) { throw '+TIME four-API source regression failed' }
-          python tools/verify_vr_r26_lens_projection.py
+          python tools/verify_vr_r26_lens_projection.py --mutations
           if ($LASTEXITCODE -ne 0) { throw 'C993 submitted-eye ray regression failed' }
-          python tools/verify_vr_stage_source_ticket.py
+          python tools/verify_vr_stage_source_ticket.py --mutations
           if ($LASTEXITCODE -ne 0) { throw '+TIME source-ticket batch regression failed' }
 
       - name: Configure Win32 R26+HUD
@@ -154,3 +155,4 @@ jobs:
           name: OutRun2-VR-R26-VISUAL-OWNER-REPAIR-AA2-TEST-${{ github.sha }}
           path: OutRun2_VR_R26_VISUAL_OWNER_REPAIR_AA2_TEST_*.zip
           if-no-files-found: error
+

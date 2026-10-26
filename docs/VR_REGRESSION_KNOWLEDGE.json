@@ -877,7 +877,7 @@
         "status": "SOURCE_READY_FOR_USER_REREVIEW",
         "evidence": "docs/automation/reviews/R26_EYE_PROJECTION_STAGE_TICKET_20261026.md",
         "runtime_validation": "UNTESTED",
-        "synthetic_validation": "REJECTED_SOURCE_CANNOT_RESTORE_MATCHING_DIRECT_BATCH; OTHER_NATIVE_BATCHES_PRESERVED"
+        "synthetic_validation": "ACTUAL_NATIVE_DRAW_FLUSH_END_AND_5_MUTATIONS_PASS; REJECTED_SOURCE_CANNOT_RESTORE_MATCHING_DIRECT_BATCH; OTHER_NATIVE_BATCHES_PRESERVED"
       }
     },
     {
@@ -1058,7 +1058,7 @@
       "source_sha": "d32407578fba9797dd91728cc84518a0144b9795",
       "review_branch": "fix/r26-eye-projection-stage-ticket-20261026",
       "status": "SOURCE_READY_FOR_USER_REREVIEW",
-      "local_validation": "ACTUAL_C993_RAY_REGRESSION_PASS",
+      "local_validation": "ACTUAL_C993_AND_PRODUCTION_R7_50_ROTATION_SYNC_PAIRS_3_DEPTHS_3_MUTATIONS_PASS",
       "ci": "DEFERRED_USER_REREVIEW",
       "runtime_validation": "UNTESTED",
       "evidence": "docs/automation/reviews/R26_EYE_PROJECTION_STAGE_TICKET_20261026.md"

@@ -4,21 +4,21 @@
   "attempt": 1,
   "sourceMode": "CHAT_DIRECT",
   "lane": "DX9EX_R26_HUD",
-  "updated_at_kst": "2026-10-26T15:26:00+09:00",
+  "updated_at_kst": "2026-10-26T17:14:00+09:00",
   "target_branch": "vr-d3d9ex-focus",
   "review_branch": "fix/r26-eye-projection-stage-ticket-20261026",
   "base_sha": "b3ee3fbeaa48139eff4b22e33e68e63ee5a76760",
   "result_sha": "d32407578fba9797dd91728cc84518a0144b9795",
-  "checkpoint": "C4_SOURCE_COMMITTED_C6_REVIEW_HANDOFF",
+  "checkpoint": "C3_RESUMED_ACTUAL_SOURCE_REGRESSIONS_PASS_C4_PUBLISHING",
   "status": "SOURCE_READY_FOR_USER_REREVIEW",
   "integration": "NOT_MERGED",
   "validation": {
-    "local": "PASS_8_TARGETED_CHECKS",
+    "local": "PASS_RESUMED_PRODUCTION_MATH_NATIVE_HOOKS_AND_EXISTING_SUITES",
     "red_before_fix": [
       "C993 asymmetric XY FOV recovered-ray mismatch",
       "Rejected E8 deferred direct D3DX owner remains restorable"
     ],
-    "github_windows_ci": "DEDICATED_R26_USER_TEST_AND_FULL_SOURCE_DEFERRED; AUTO_INSPECTOR_IN_PROGRESS",
+    "github_windows_ci": "NEW_HEAD_DEFERRED_USER_REREVIEW",
     "package": "NOT_CREATED",
     "runtime": "UNTESTED",
     "automatic_github_runs": {
@@ -60,5 +60,23 @@
     "original D3DX commands/HRESULT and native Flush/End"
   ],
   "next_action": "Review the two source changes and executable regressions on review_branch; compare current focus and rebase/merge only after review. Then build the exact chosen HEAD using GitHub-hosted Windows R26 DLL+x64 host/user-test package+Domain+Full Source. Include CMD/PS1/INI/DLL/EXE and record exact SHA and archive hash. Never use PC Fast/self-hosted runner.",
-  "score_delta": 0
+  "score_delta": 0,
+  "resume": {
+    "base_sha": "605e73b5e20c8a3985dedce08427b68d9ee04cc6",
+    "focus_observed_sha": "616787e6564f89400dda5bb6f227c6368b62343b",
+    "runtime_source_sha": "d32407578fba9797dd91728cc84518a0144b9795",
+    "status": "REGRESSION_HARDENING_COMPLETE",
+    "local_validation": [
+      "actual C993 + production R7 math: 50 rotation/sync pairs at 3 depths",
+      "3 compiled lens mutations rejected",
+      "actual DrawDest/FlushDest/EndDest native-boundary lifecycle",
+      "5 compiled native-hook mutations rejected",
+      "existing R26 four-API actual-source suite PASS",
+      "existing +TIME/GOAL ledger and 49 mutations PASS"
+    ],
+    "production_runtime_changes_this_resume": false,
+    "new_windows_build": "DEFERRED_USER_REREVIEW",
+    "runtime": "UNTESTED",
+    "score_delta": 0
+  }
 }
