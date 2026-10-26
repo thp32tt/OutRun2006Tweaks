@@ -17,7 +17,9 @@ In `Draw::disp_514c30` at native **`0xD60FD4`**, the original first:
 
 This proves a **conditional local model-space matrix substitution**, not a HMD camera-position offset. The fact that both positive and negative branches reach the same `pc_matrix_push_load` (0xD6128C) is important: normal NPC/other-character display retains its original matrix. Do not globally inject the correction into `EvWorkCamera`, GPU view matrices, scene effects or all robot draws.
 
-**Exact full 4×4 multiplication operands/order** in the big inline ARM64 FMADD block still requires numerical opcode emulation or an independent REA-based formula comparison; the original stack stores establish the output location but do NOT alone certify a general equation `M*C` versus `C*M`. Avoid inventing the order from transposed register names.
+**Update (2026-10-26 ~15:03 KST): this operand-order question has since been RESOLVED.** An independent exact-opcode interpreter of ELF `0xD61100..0xD61288` demonstrated `W × C` (original model matrix RIGHT-multiplied by TLS correction) on 80/80 noncommuting matrix pairs. See [`QUEST_COCKPIT_V2_OCCUPANT_RIGHT_COMPOSITION_PROVEN_20261026.md`](QUEST_COCKPIT_V2_OCCUPANT_RIGHT_COMPOSITION_PROVEN_20261026.md). The previously stated uncertainty below is preserved for audit history only:
+
+~~**Exact full 4×4 multiplication operands/order** in the big inline ARM64 FMADD block still requires numerical opcode emulation or an independent REA-based formula comparison; the original stack stores establish the output location but do NOT alone certify a general equation `M*C` versus `C*M`. Avoid inventing the order from transposed register names.~~
 
 ## New finding 2 — native vehicle owner flag has a shorter lifetime than the containing frame
 
