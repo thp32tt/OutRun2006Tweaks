@@ -70,9 +70,12 @@ def sm3_fan_connected(src):
         "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
         "context->Draw(vertices, base);",
         "for (UINT submit = 0u; submit < nativeSubmissionCount; ++submit)",
-        "const UINT instance = segmentedListPlan.grouped",
-        "segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount",
-        "if (segmentedListPlan.grouped) {",
+        "const UINT instance = (segmentedListPlan.grouped ||",
+        "segmentedListPlan.grouped ? segmentedListPlan.batches :",
+        "(segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount)",
+        "if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {",
+        "if (segmentedConnectedPlan.grouped) {",
+        "context->DrawIndexed(static_cast<UINT>(chunkIndices.size()),",
         "context->Draw(chunkInstances * vertexCount, 0u);",
         "context->DrawIndexed(sourceIndexCount, 0u, 0);",
         "instance % chunkPlan.instancesPerChunk == 0u",
@@ -80,7 +83,7 @@ def sm3_fan_connected(src):
         "connectedCandidate ? connectedSubmission.drawCount : instanceCount",
         "game_sm3_connected_submission_plan(",
         "game_sm3_expand_connected_instance_indices(",
-        "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+        "((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "liveBatch.record_source_draw(sourceOrdinal);",
     ))
 assert sm3_fan_connected(c)
@@ -94,9 +97,11 @@ for old, bad in (
      "context->DrawIndexed(indexCount, 0u, static_cast<INT>(base));"),
     ("context->Draw(vertices, base);",
      "context->Draw(vertices, 0u);"),
-    ("segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount",
+    ("segmentedListPlan.grouped ? segmentedListPlan.batches :",
      "instanceCount"),
-    ("if (segmentedListPlan.grouped) {", "if (false) {"),
+    ("if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {", "if (false) {"),
+    ("context->DrawIndexed(static_cast<UINT>(chunkIndices.size()),",
+     "context->DrawIndexed(0u,"),
 ):
     altered = c.replace(old, bad, 1)
     assert altered != c and not sm3_fan_connected(altered), old

@@ -172,10 +172,11 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     require("bool initialize(const NativeBackendConfig& config)" in native and
             "ID3D11RenderTargetView* color_rtv()" in native,
             "native device and render target ownership missing")
-    # Native Draw dispatch is confined to two independently source-admitted
-    # functions. The SM3 source draw owns two legacy per-instance dispatches
-    # plus two independent-list chunk dispatches. Never globally bless a new
-    # Draw* site outside these exact scoped paths.
+    # Native Draw dispatch is confined to the original two source-admitted
+    # functions: 2 FVF and 5 SM3 physical Draw/DrawIndexed sites. The fifth
+    # SM3 site is the prevalidated segmented connected strip/fan DrawIndexed;
+    # it must remain nested in the same source-gated function. Do not admit
+    # arbitrary native GPU Draws elsewhere by relaxing the global count.
     match = re.search(r"bool submit\s*\(.*?\) noexcept \{(.*?)\n\}\n\nbool observe_source_device\(", code, re.S)
     sm3 = re.search(r"bool submit_live_sm3_game_draw\s*\(.*?\) noexcept \{(.*?)\n\}\n\n// Reuse geometric growth", code, re.S)
     require(match is not None and sm3 is not None,
@@ -183,18 +184,27 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     dispatch = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", code)
     scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", match.group(1))
     sm3_scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", sm3.group(1))
-    require(len(dispatch) == len(scoped) + len(sm3_scoped) == 6 and
+    require(len(dispatch) == len(scoped) + len(sm3_scoped) == 7 and
             len(scoped) == 2 and
             sm3_scoped == ["->DrawIndexed(", "->Draw(",
-                           "->Draw(", "->DrawIndexed("] and
+                           "->DrawIndexed(", "->Draw(",
+                           "->DrawIndexed("] and
             all(token in sm3.group(1) for token in (
                 "game_sm3_segmented_list_submission_plan(",
-                "segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount",
-                "if (segmentedListPlan.grouped) {",
+                "game_sm3_segmented_connected_submission_plan(",
+                "segmentedListPlan.grouped ? segmentedListPlan.batches :",
+                "(segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount)",
+                "if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {",
+                "if (segmentedConnectedPlan.grouped) {",
                 "context->Draw(chunkInstances * vertexCount, 0u);",
                 "game_sm3_expand_list_instance_indices(",
+                "game_sm3_expand_connected_instance_indices(",
                 "context->DrawIndexed(sourceIndexCount, 0u, 0);",
-                "const UINT instance = segmentedListPlan.grouped")),
+                "context->DrawIndexed(static_cast<UINT>(chunkIndices.size()),",
+                "chunkInstances == chunkPlan.instancesPerChunk",
+                "? fullConnectedChunkIndices : tailConnectedChunkIndices",
+                "const UINT instance = (segmentedListPlan.grouped ||",
+                "s.frameBatch.abort();")),
             "native Draw escapes the two admitted game source submits")
     require(all(token in sm3.group(1) for token in (
                 "env_full_game_opt_in()", "game_native_backbuffer_ready(game, viewport)",

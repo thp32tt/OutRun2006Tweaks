@@ -19,8 +19,12 @@ assert "const UINT nativeSubmissionCount = segmentedInstanceUpload" in bridge
 assert "connectedCandidate ? connectedSubmission.drawCount : instanceCount" in bridge
 assert "game_sm3_connected_submission_plan(" in bridge
 assert "game_sm3_expand_connected_instance_indices(" in bridge
-assert "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST" in bridge
-assert "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in bridge
+assert "((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST" in bridge
+assert "D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP" in bridge
+assert "((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in bridge
+assert "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP" in bridge
+assert "game_sm3_segmented_connected_submission_plan(" in bridge
+assert "context->DrawIndexed(static_cast<UINT>(chunkIndices.size())," in bridge
 assert "game_sm3_expand_list_instance_indices(" in bridge
 assert "hashBytes(&packedFloat4, sizeof(packedFloat4));" in bridge
 assert "sourceInstancing && !repack" in bridge
