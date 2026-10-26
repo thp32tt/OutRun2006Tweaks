@@ -54,13 +54,16 @@ assert "kMaxNativeGameVertices == kMaxNativeGamePrimitives * 3u" in probe
 # and independently require both positive 4096-strip source capture and
 # exact oversized-strip rejection (not a regex-only acceptance bypass).
 assert "const auto limit = kind == 5u" in probe
-assert "kMaxNativeGameStripPrimitives : kMaxNativeGamePrimitives" in probe
+assert "kind == 5u ? kMaxNativeGameStripPrimitives :" in probe
+assert "kind == 6u ? kMaxNativeGameFanPrimitives :" in probe
 assert "game_native_primitive_element_count(kind, limit + 1u, elements)" in probe
 # Source wraps the positive assert argument across two lines. Validate
 # the exact original D3D9 strip boundary values, not its whitespace layout.
 assert "5u, kMaxNativeGamePrimitives + 1u, elements)" in probe
 assert "5u, kMaxNativeGameStripPrimitives, elements)" in probe
-assert "kMaxNativeGameStripPrimitives = 4096u" in span
+assert "kMaxNativeGameStripPrimitives =" in span
+assert "kMaxNativeGameFanPrimitives =" in span
+assert "kMaxNativeGameVertices - 2u" in span
 assert "primitiveCount > kMaxNativeGameStripPrimitives" in span
 assert "primitiveCount > kMaxNativeGamePrimitives" in span
 assert "sourceElements > kMaxNativeGameVertices" in span

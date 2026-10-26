@@ -8,16 +8,21 @@
 #include "live_game_source_stride.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
-// The 6144-element game VB/IB snapshot and GPU single-submit budget stays
-// fixed. D3D9 indexed/unindexed TRIANGLESTRIP can describe 4096 triangles
-// with only 4098 source elements; unlike TRIANGLELIST, its POINT fill needs
-// *multiple* bounded D3D11 GPU submissions. Retain the original 2048-triangle
-// limit for all other topology families and authoritative DX9Ex fallback.
+// The 6144-element game VB/IB snapshot and native per-submit index budget
+// stay fixed. Connected TRIANGLESTRIP and TRIANGLEFAN can describe up to
+// 6142 triangles in just 6144 authentic source elements; their POINT or
+// fan-to-list expansion requires multiple bounded D3D11 GPU submissions.
+// Independent lists/points/lines retain their 2048-primitive admission.
+// The original DX9Ex Draw/input/FFB remains authoritative.
 inline constexpr std::uint32_t kMaxNativeGamePrimitives = 2048u;
 inline constexpr std::uint32_t kMaxNativeGameVertices =
     kMaxNativeGamePrimitives * 3u;
-inline constexpr std::uint32_t kMaxNativeGameStripPrimitives = 4096u;
-static_assert(kMaxNativeGameStripPrimitives + 2u <= kMaxNativeGameVertices);
+inline constexpr std::uint32_t kMaxNativeGameStripPrimitives =
+    kMaxNativeGameVertices - 2u;
+inline constexpr std::uint32_t kMaxNativeGameFanPrimitives =
+    kMaxNativeGameVertices - 2u;
+static_assert(kMaxNativeGameStripPrimitives + 2u == kMaxNativeGameVertices);
+static_assert(kMaxNativeGameFanPrimitives + 2u == kMaxNativeGameVertices);
 // Common bound for actual D3D9 VB/IB/UP snapshots and D3D11 Draw/DrawIndexed.
 // A strip has P+2 source elements; a list has P*3. Never infer either from
 // the other: overreading a live game pointer could break the original draw.
@@ -61,16 +66,17 @@ constexpr bool game_native_primitive_element_count(
         return true;
     }
     case 4u: return game_primitive_element_count(false, primitiveCount, elements); // TRIANGLELIST
-    case 5u: { // TRIANGLESTRIP: compact source, windowed POINT/WIRE/SOLID GPU
-        if (primitiveCount == 0u ||
-            primitiveCount > kMaxNativeGameStripPrimitives) return false;
+    case 5u: // TRIANGLESTRIP: compact VB/IB, windowed POINT fill
+    case 6u: { // TRIANGLEFAN: shared center/rim, windowed list GPU indices
+        const auto cap = d3d9Type == 5u
+            ? kMaxNativeGameStripPrimitives : kMaxNativeGameFanPrimitives;
+        if (primitiveCount == 0u || primitiveCount > cap) return false;
         const std::uint64_t sourceElements =
             static_cast<std::uint64_t>(primitiveCount) + 2u;
         if (sourceElements > kMaxNativeGameVertices) return false;
         elements = static_cast<std::uint32_t>(sourceElements);
         return true;
     }
-    case 6u: return game_primitive_element_count(true, primitiveCount, elements); // TRIANGLEFAN
     default: return false; // Unknown primitive modes remain DX9Ex-only.
     }
 }
@@ -91,7 +97,11 @@ constexpr bool game_native_mesh_span_contract() noexcept {
            game_native_primitive_element_count(5u, kMaxNativeGameStripPrimitives, n) &&
            n == kMaxNativeGameStripPrimitives + 2u &&
            !game_native_primitive_element_count(5u, kMaxNativeGameStripPrimitives + 1u, n) &&
-           !game_native_primitive_element_count(6u, kMaxNativeGamePrimitives + 1u, n) &&
+           game_native_primitive_element_count(6u, kMaxNativeGamePrimitives + 1u, n) &&
+           n == kMaxNativeGamePrimitives + 3u &&
+           game_native_primitive_element_count(6u, kMaxNativeGameFanPrimitives, n) &&
+           n == kMaxNativeGameFanPrimitives + 2u &&
+           !game_native_primitive_element_count(6u, kMaxNativeGameFanPrimitives + 1u, n) &&
            game_native_primitive_element_count(6u, kMaxNativeGamePrimitives, n) &&
            n == kMaxNativeGamePrimitives + 2u &&
            !game_native_primitive_element_count(4u, kMaxNativeGamePrimitives + 1u, n) &&
@@ -296,8 +306,9 @@ constexpr bool game_native_unit_point_raster(
            spriteEnabled == 0u && scaleEnabled == 0u;
 }
 
-// D3D9 fan (P+2 source elements) becomes P*3 indexed D3D11 triangles.
-// Bounds and winding are preserved. On a bad source, output stays unchanged.
+// Small D3D9 fan (P+2 source elements) becomes P*3 native indices. Fans
+// above 2048 primitives MUST use the separate windowed FVF/SM3 GPU routes;
+// never allocate one unbounded P*3 list. On failure output is unchanged.
 inline bool game_fan_to_triangle_list(std::uint32_t primitiveCount,
                                      const std::uint32_t* sourceIndices,
                                      std::uint32_t sourceIndexCount,

@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include "vr/d3d11/live_game_fvf_polygon_windows.hpp"
+#include "vr/d3d11/live_game_primitive_span.hpp"
 
 using namespace outrun::vr::dx11::live_game_frame;
 int main() {
@@ -49,6 +50,49 @@ int main() {
                 assert(composed.size() == (elements - 2u) * 3u);
             }
         }
+    }
+    // Production full-size game source ceiling: 6142 authentic connected
+    // triangles (6144 original VB/IB elements) in fan AND strip. Both must
+    // reach their bounded four-window native GPU submit, with the exact
+    // center/rim or alternating strip winding intact at every seam.
+    for (std::uint32_t topology : {5u, 6u}) {
+        const auto maximum = topology == 5u
+            ? kMaxNativeGameStripPrimitives : kMaxNativeGameFanPrimitives;
+        std::uint32_t elements = 0u;
+        assert(game_native_primitive_element_count(topology, maximum, elements));
+        assert(elements == kMaxNativeGameVertices);
+        const auto plan = game_fvf_polygon_window_plan(
+            topology, elements, kMaxNativeGameVertices, 128u);
+        assert(plan.trianglesPerWindow == kMaxNativeGamePrimitives);
+        assert(plan.windows == 3u); // ceil(6142/2048)
+        std::vector<std::uint32_t> index(elements);
+        for (std::uint32_t i = 0u; i < elements; ++i)
+            index[i] = (i * 19u + 1u) % elements;
+        std::vector<std::uint32_t> composed, output;
+        for (std::uint32_t first = 0u; first < maximum;
+             first += plan.trianglesPerWindow) {
+            const auto count = (std::min)(
+                plan.trianglesPerWindow, maximum - first);
+            assert(game_fvf_build_polygon_window(topology, index.data(),
+                elements, elements, first, count, kMaxNativeGameVertices, output));
+            composed.insert(composed.end(), output.begin(), output.end());
+        }
+        assert(composed.size() == std::size_t(maximum) * 3u);
+        for (std::uint32_t t = 0u; t < maximum; ++t) {
+            const auto pos = std::size_t(t) * 3u;
+            const auto a = topology == 6u ? 0u : t + (t & 1u);
+            const auto b = topology == 6u ? t + 1u : t + 1u - (t & 1u);
+            assert(composed[pos] == index[a]);
+            assert(composed[pos + 1u] == index[b]);
+            assert(composed[pos + 2u] == index[t + 2u]);
+        }
+        const auto previous = output;
+        index.back() = elements; // invalid source tail: no destination mutation
+        assert(!game_fvf_build_polygon_window(topology, index.data(),
+            elements, elements, maximum - 1u, 1u,
+            kMaxNativeGameVertices, output));
+        assert(output == previous);
+        assert(!game_native_primitive_element_count(topology, maximum + 1u, elements));
     }
     // Malformed late IB entries, rejected budgets and unknown source
     // topologies must not clobber previous GPU-window geometry.

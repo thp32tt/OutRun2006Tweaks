@@ -35,7 +35,9 @@ int main() {
     assert(!game_primitive_element_count(true, kMaxNativeGamePrimitives + 1u, elements) && elements == last);
     using outrun::vr::dx11::live_game_frame::game_native_primitive_element_count;
     assert(!game_native_primitive_element_count(4u, kMaxNativeGamePrimitives + 1u, elements));
-    assert(!game_native_primitive_element_count(6u, kMaxNativeGamePrimitives + 1u, elements));
+    // Large authentic connected fans use the existing native GPU fan windows.
+    assert(game_native_primitive_element_count(6u, kMaxNativeGamePrimitives + 1u, elements));
+    assert(elements == kMaxNativeGamePrimitives + 3u);
     assert(!game_native_primitive_element_count(7u, 1u, elements));
     assert(game_native_primitive_element_count(1, 1, elements) && elements == 1);
     assert(game_native_primitive_element_count(1, 512, elements) && elements == 512);
@@ -54,25 +56,31 @@ int main() {
     for (unsigned rejected : {0u, 7u, 0xffffffffu})
         assert(!game_native_primitive_element_count(rejected, 1, elements) &&
                elements == retained);
-    // 01096: connected TRIANGLESTRIP uses compact P+2 source indices.
-    // Its true native GPU point expansion is windowed above the 2048
-    // list/fan/line budget; all OTHER D3D9 primitive caps remain strict.
+    // 01097: authentic connected strip AND fan can fill the entire original
+    // 6144-vertex capture without allocating unbounded GPU point/list IBs.
+    // Only the two connected polygon types exceed independent 2048 caps.
     using outrun::vr::dx11::live_game_frame::kMaxNativeGameStripPrimitives;
-    assert(kMaxNativeGameStripPrimitives > kMaxNativeGamePrimitives);
+    using outrun::vr::dx11::live_game_frame::kMaxNativeGameFanPrimitives;
+    assert(kMaxNativeGameStripPrimitives == kMaxNativeGameVertices - 2u);
+    assert(kMaxNativeGameFanPrimitives == kMaxNativeGameVertices - 2u);
     assert(game_native_primitive_element_count(
         5u, kMaxNativeGamePrimitives + 1u, elements));
     assert(elements == kMaxNativeGamePrimitives + 3u);
     assert(game_native_primitive_element_count(
         5u, kMaxNativeGameStripPrimitives, elements));
     assert(elements == kMaxNativeGameStripPrimitives + 2u);
-    const auto retainedAfterStrip = elements;
+    assert(game_native_primitive_element_count(
+        6u, kMaxNativeGameFanPrimitives, elements));
+    assert(elements == kMaxNativeGameFanPrimitives + 2u);
+    const auto retainedAfterConnected = elements;
     for (unsigned kind : {1u, 2u, 3u, 4u, 5u, 6u}) {
         assert(!game_native_primitive_element_count(kind, 0, elements) &&
-               elements == retainedAfterStrip);
-        const auto limit = kind == 5u
-            ? kMaxNativeGameStripPrimitives : kMaxNativeGamePrimitives;
+               elements == retainedAfterConnected);
+        const auto limit = kind == 5u ? kMaxNativeGameStripPrimitives :
+                           kind == 6u ? kMaxNativeGameFanPrimitives :
+                                        kMaxNativeGamePrimitives;
         assert(!game_native_primitive_element_count(kind, limit + 1u, elements) &&
-               elements == retainedAfterStrip);
+               elements == retainedAfterConnected);
     }
     // 00941: shader-bound game line list/strip admission and fallback.
     using outrun::vr::dx11::live_game_frame::game_native_sm3_line_raster;
