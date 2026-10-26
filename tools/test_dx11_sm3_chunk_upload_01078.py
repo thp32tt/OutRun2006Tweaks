@@ -18,7 +18,7 @@ for key in (
     "unpacked.data(), chunkBytes",
     "(instance % chunkPlan.instancesPerChunk) * vertexCount",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))",
-    "context->Draw(vertexCount, base)",
+    "context->Draw(vertices, base)",
     "s.frameBatch.abort();",
 ):
     assert key in scope or (key=="s.frameBatch.abort();" and key in bridge), key

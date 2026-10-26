@@ -10,7 +10,7 @@ required = (
     "connectedSubmission.drawCount",
     "const UINT base = segmentedInstanceUpload",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
-    "context->Draw(vertexCount, base);",
+    "context->Draw(vertices, base);",
     "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
     "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST",
 )

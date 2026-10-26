@@ -20,7 +20,7 @@ for token in (
     "instance % chunkPlan.instancesPerChunk) * vertexCount",
     "issueNativeGameDraw(",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))",
-    "context->Draw(vertexCount, base)",
+    "context->Draw(vertices, base)",
     "s.pending = true;",
 ):
     assert token in scope, "01076 real native path missing: "+token

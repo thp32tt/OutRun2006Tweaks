@@ -20,7 +20,7 @@ for token in (
     "upload_full_game_stream(context, s.fullGameVertexUpload.Get()",
     "issueNativeGameDraw(",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))",
-    "context->Draw(vertexCount, base)",
+    "context->Draw(vertices, base)",
     "s.pending = true;",
 ):
     assert token in scope, "01077 missing native integration: " + token

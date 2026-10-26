@@ -14,7 +14,7 @@ for token in (
     "listCandidate ? listSubmission.drawCount",
     "const UINT base = segmentedInstanceUpload",
     "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
-    "context->Draw(vertexCount, base);",
+    "context->Draw(vertices, base);",
     "if (nativeIndices[i] >=",
     "if (!ensure_full_game_upload_buffer(device, s.fullGameVertexUpload,",
     "s.pending = true;",
