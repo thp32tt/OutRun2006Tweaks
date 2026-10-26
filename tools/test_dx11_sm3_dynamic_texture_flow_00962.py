@@ -59,11 +59,26 @@ assert "const UINT nativeSubmissionCount = segmentedInstanceUpload" in bridge
 assert "connectedCandidate ? connectedSubmission.drawCount : instanceCount" in bridge
 assert "game_sm3_connected_submission_plan(" in bridge
 assert "game_sm3_expand_connected_instance_indices(" in bridge
-assert "compactConnectedInstances ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in bridge
+# Compact and segmented genuine connected triangle strips BOTH lower to
+# TRIANGLELIST; otherwise the original STRIP topology is preserved.
+assert "((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST" in bridge
+assert "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP" in bridge
+assert "((compactConnectedInstances || segmentedConnectedPlan.grouped) ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST" in bridge
+assert "D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP" in bridge
 assert "for (UINT submit = 0u; submit < nativeSubmissionCount; ++submit)" in bridge
-assert "const UINT instance = segmentedListPlan.grouped" in bridge
-assert "segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount" in bridge
-assert "if (segmentedListPlan.grouped) {" in bridge
+assert "const UINT instance = (segmentedListPlan.grouped ||" in bridge
+assert "segmentedConnectedPlan.grouped)" in bridge
+assert "? submit * chunkPlan.instancesPerChunk : submit;" in bridge
+assert "segmentedListPlan.grouped ? segmentedListPlan.batches :" in bridge
+assert "(segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount)" in bridge
+assert "if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {" in bridge
+# Each connected GPU chunk (including a short tail) must use independent
+# prevalidated local indices, not the source's cross-instance strip indices.
+assert "if (segmentedConnectedPlan.grouped) {" in bridge
+assert "chunkInstances == chunkPlan.instancesPerChunk" in bridge
+assert "? fullConnectedChunkIndices : tailConnectedChunkIndices" in bridge
+assert "context->DrawIndexed(static_cast<UINT>(chunkIndices.size())," in bridge
+assert "s.frameBatch.abort();" in bridge
 assert "instance % chunkPlan.instancesPerChunk == 0u" in bridge
 assert "instance % chunkPlan.instancesPerChunk == 0u" in bridge
 assert "const UINT base = segmentedInstanceUpload" in bridge
