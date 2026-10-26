@@ -1,4 +1,4 @@
-log.exception("failed to inspect previous slot")
+        log.exception("failed to inspect previous slot")
         return True
 
 
