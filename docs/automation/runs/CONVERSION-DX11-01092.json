@@ -158,5 +158,38 @@
   "blocked_reason_resolved": "RUN_RECORD_NOT_FOUND",
   "c6_record_recovery_note": "No prior docs/automation/runs/CONVERSION-DX11-01092.json existed at the validation/branch HEAD. Original material source SHA and feature contract/acceptance evidence are reconstructed from the 01092 source/repair commits, checked-in C++/workflow and confirmed push workflow outcomes; there were no preexisting JSON values to preserve.",
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun menu/car/race, Quest3/VDXR eye parity, native published-frame count or FPS test was performed in this C6 operation.",
-  "next_implementation_action": "Separately obtain actual game native menu->car->race Draw/frame and Quest3/VDXR evidence before promoting runtime verification. No source/CI rerun is needed for C6 metadata."
+  "next_implementation_action": "Separately obtain actual game native menu->car->race Draw/frame and Quest3/VDXR evidence before promoting runtime verification. No source/CI rerun is needed for C6 metadata.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "REAL_GAME_D3D9_SM3_POINT_AND_LINE_CALLSITE",
+      "D3D9_FILLMODE_AND_TOPOLOGY_SEPARATE_ENUM_PREFLIGHT",
+      "NATIVE_D3D11_IA_VS_PS_DRAW_OR_DRAWINDEXED",
+      "SAFE_FULL_RESOLUTION_COLOR_OUTPUT_UNTESTED_IN_GAME"
+    ],
+    "batch_components": [
+      "SM3_LIVE_GAME_GPU_DRAW_AND_RASTER_ADMISSION",
+      "INHERITED_POLYGON_FILL_AND_POINT_LINE_TOPOLOGY",
+      "NEGATIVE_SOURCE_REGRESSION_AND_EXACT_SHA_GATE"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source-level integrated SM3 real-game POINTLIST/LINELIST/LINESTRIP native IA Draw with inherited polygon POINT/WIREFRAME fill, covered by checked-in C++ source regression and previous exact-SHA GitHub build verification.",
+      "negative_regression": "Unknown D3D9 enum domains, unsafe point size/line AA/last-pixel source states and invalid later indexed vertices reject native submission without changing the original game D3D9 Draw/input/FFB.",
+      "component_integration": "Actual intercepted D3D9 game SM3 draw and primitive topology -> exact inherited raster preflight -> D3D11 shader-bound IA and GPU Draw/DrawIndexed, within guarded full-frame pipeline."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:SM3_INHERITED_POLYGON_POINT_LINE_NATIVE_GPU_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Prior 01092 C++ source and five exact-SHA build gates verified, no actual game menu/car/race or Quest3 image observed; RUNTIME_VALIDATION=UNTESTED.",
+    "activation_guard_and_fallback": "Explicit diagnostic full-game opt-in only. Original D3D9/DX9Ex Present, gamepad, FFB, SkyGlow and frozen DXVK remain untouched; unsupported D3D9 render states reject native publication."
+  }
 }
