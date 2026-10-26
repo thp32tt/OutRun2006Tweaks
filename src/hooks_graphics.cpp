@@ -810,7 +810,9 @@ class VRLensFlareProjected2D : public Hook
         }
 
         // C993's four central objects are already projected by the game to
-        // one centre-eye screen ray. Keep the exact ProjectedScreenEffect2D
+        // one centre-eye screen ray. AUTO 01493/01473 follow-through keeps
+        // broad GOAL/lifecycle changes out of this optical fix. Keep the exact
+        // ProjectedScreenEffect2D
         // scope but clear D3A5's spatial LensFlareCentre token for the actual
         // C993 draw. R30 then uses the existing identical-L/R centre-eye WVP
         // fusion instead of independently reprojecting the same ray through

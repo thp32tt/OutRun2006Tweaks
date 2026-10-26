@@ -43,7 +43,9 @@ def verify(g, r, u, s, f):
     assert "objectId == 0x570002" in centre
     assert centre.index("ScopedExactProducerSemantic semantic(") < centre.index(
         "ScopedRenderSemantic sunDrawScope(") < centre.rindex("Game::DrawObjectAlpha_Internal(")
-    assert "ProducerToken::LensFlareCentre" in centre
+    # The exact C993 family must clear D3A5's spatial direct token and keep
+    # only the projected-screen scope; R26 then selects centre-eye mono fusion.
+    assert "ProducerToken::None" in centre
     assert "RenderScope::ProjectedScreenEffect2D" in centre
     fallback = centre.split("if (!projectedSun)", 1)[1].split("if (Settings::VRTelemetry)", 1)[0]
     assert "Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);" in fallback
