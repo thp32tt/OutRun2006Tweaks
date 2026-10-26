@@ -29,7 +29,7 @@ for x in ("'-AutoRenderResolution=true'","'-FollowGameResolution=false'",
 assert 'VRHud1080pReference' in ui
 assert 'spacing = 80.0f * Game::screen_scale->x;' in ui
 assert '? 80.0f' in ui
-assert 'exactRivalRootRebuild' in ui
+assert 'exactCurrentChainOwner' in ui
 assert 'FirstVerifiedAppendedNode(\n                        root, before[prio], tailAfter' in ui
 assert 'VR RIVAL QUEUE PUBLICATION:' in ui
 assert 'policy=EXACT_CURRENT_CHAIN' in ui
