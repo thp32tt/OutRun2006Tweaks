@@ -986,7 +986,25 @@ def verify_goal_transient_direct_hud_scope(ui_source, semantics_source):
     ):
         enter = function_body(ui_source, begin)
         leave = function_body(ui_source, end)
-        require('if (Settings::VREnabled)', enter, name + ' desktop fallback')
+        if name == 'GOAL 0-99 progress':
+            # Direct 0-99 owns a stricter entry/exit lease than the sibling
+            # Sumo_Printf. The native pre-source D3DX Flush can reenter the
+            # queue, so only a stable original GOAL epoch may promote HUD.
+            require('ResultProgressAdmission.mayBeginDirect()', enter,
+                    name + ' exact source entry admission')
+            require('ResultProgressAdmittedAfterDrain = ResultProgressAdmission.mayPublish(',
+                    enter, name + ' post-drain admission')
+            require('if (ResultProgressAdmittedAfterDrain)', enter,
+                    name + ' direct owner guard')
+            require('const bool admitted = ResultProgressAdmittedAfterDrain &&',
+                    leave, name + ' exit epoch admission')
+            require('if (admitted)', leave,
+                    name + ' queued child scope guard')
+            require_order(leave, name + ' condition before tagged siblings',
+                          'if (admitted)', 'TagAppendedNodes(',
+                          owner + '.reset();')
+        else:
+            require('if (Settings::VREnabled)', enter, name + ' desktop fallback')
         require(owner + '.emplace(', enter, name + ' direct draw activation')
         require('RenderScope::ScreenHud', enter, name + ' exact HUD scope')
         require('TagAppendedNodes(', leave, name + ' queued siblings')
