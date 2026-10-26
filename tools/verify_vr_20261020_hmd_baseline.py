@@ -22,9 +22,9 @@ def verify(src,setting,log):
     assert 'RenderScope::ProjectedScreenEffect2D' in center
     assert ('ScopedExactProducerSemantic semantic(\n'
             '            OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D,') in center
-    # The already-integrated C993 ray correction identifies the exact
-    # centre producer; reverting it to None loses the narrow ray owner.
-    assert 'ProducerToken::LensFlareCentre' in center
+    # C993 is already projected to a centre-eye ray by the game. The exact
+    # family clears D3A5's spatial token so R69 mono fusion owns the draw.
+    assert 'ProducerToken::None' in center
     assert '!OutRunVR::GameSemantic::QueueRenderActive()' in center
     assert 'if (Settings::VREnabled && objectId == 0x570002 &&' in center
     assert '!Settings::VRLensFlareCentreEnabled.get()' in center
@@ -34,9 +34,9 @@ def verify(src,setting,log):
 
     projected=src.split('static void __cdecl DrawObjectAlphaProjected(',1)[1].split('static void __cdecl DrawObjectAlphaCentre(',1)[0]
     assert 'objectId == 0x570008' in projected
-    assert 'ordinal <= 2' in projected
-    assert 'VR LENS 570008 CHILD HIDDEN:' in projected
-    assert 'sun 0x570002 and non-570008 outer discs preserved' in projected
+    assert 'ordinal == 2' in projected
+    assert 'VR LENS 570008 CENTER GLOW HIDDEN:' in projected
+    assert 'first outer 0x570008 preserved' in projected
 
     assert 'Get-Content $active' in log
     assert "$kv.ContainsKey('gameDllSha256')" in log
@@ -48,7 +48,7 @@ verify(source,settings,collector)
 mutations=[
     ('source','case 0x570010:','case 0x570011:'),
     ('source','case 0x57000F:','case 0x570011:'),
-    ('source','ordinal <= 2','ordinal == 2'),
+    ('source','ordinal == 2','ordinal <= 2'),
     ('source','!Settings::VRLensFlareCentreEnabled.get()','Settings::VRLensFlareCentreEnabled.get()'),
     ('settings','"LensFlareCentreEnabled", true,','"LensFlareCentreEnabled", false,'),
     ('collector',"$kv.ContainsKey('gameDllSha256')","$kv.gameDllSha256"),
@@ -66,7 +66,7 @@ for fname,old,bad in mutations:
 
 # Mutate the C993 owner, not an earlier occurrence in the parent hook.
 prefix, center = source.split('static void __cdecl DrawObjectAlphaCentre(', 1)
-for old, bad in [('ProducerToken::LensFlareCentre', 'ProducerToken::None'),
+for old, bad in [('ProducerToken::None', 'ProducerToken::LensFlareCentre'),
                  ('RenderScope::ProjectedScreenEffect2D', 'RenderScope::WorldBillboard')]:
     try:
         verify(prefix + 'static void __cdecl DrawObjectAlphaCentre(' + center.replace(
@@ -75,5 +75,5 @@ for old, bad in [('ProducerToken::LensFlareCentre', 'ProducerToken::None'),
         pass
     else:
         raise AssertionError('exact C993 centre mutation escaped: ' + old)
-print('PASS VR projected sun family 570002/570006/57000F/570010 + both 570008 child suppression; 8 negative controls; HMD UNTESTED')
+print('PASS VR C993 centre-eye mono fusion + second 570008 centre-glow suppression; negative controls; HMD UNTESTED')
 

@@ -33,13 +33,17 @@ assert 'exactRivalRootRebuild' in ui
 assert 'FirstVerifiedAppendedNode(\n                        root, before[prio], tailAfter' in ui
 assert 'VR RIVAL QUEUE PUBLICATION:' in ui
 assert 'policy=EXACT_CURRENT_CHAIN' in ui
-assert 'R30IsUnownedGoalFinalGraphPrimitiveUP' in r30
-assert 'fvf != 0x00000144u' in r30
-assert 'src != D3DBLEND_SRCALPHA' in r30
-assert 'dst != D3DBLEND_INVSRCALPHA' in r30
-assert 'VR GOAL FINAL GRAPH: FVF144 DPUP -> finite SCREEN_HUD stereo' in r30
-assert 'ordinal <= 2' in gfx
-assert 'VR LENS 570008 CHILD HIDDEN:' in gfx
+assert 'R30IsUnownedGoalFinalGraphPrimitiveUP' not in r30
+assert 'VR GOAL FINAL GRAPH: FVF144 DPUP -> finite SCREEN_HUD stereo' not in r30
+assert 'ResultProgressFullParentCallA = 0x98924' in ui
+assert 'ResultProgressFullParentCallB = 0x992AC' in ui
+assert 'ResultProgressFullParentTarget = 0x979E0' in ui
+assert 'nullptr, &rootsBefore, entrySerial, true);' in ui
+assert ui.count('if (self && self == submission.sprite)') >= 2
+assert 'ordinal == 2' in gfx
+assert 'VR LENS 570008 CENTER GLOW HIDDEN:' in gfx
+assert 'ProducerToken::None);' in gfx
+assert 'VR R69 FLARE FUSION:' in r30
 print('PASS R26 XR-render/UI-split + F11/HUD/rival/GOAL/lens recovery source contract; HMD UNTESTED')
 
 # Compile-shape guards for the XR/UI split source owner.

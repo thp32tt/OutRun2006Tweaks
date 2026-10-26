@@ -1283,7 +1283,8 @@ class UIScaling : public Hook
 			nullptr,
         const std::array<SpriteNode*, Game::SpritePriorityCount>* sourceRoots =
             nullptr,
-        std::uint64_t preserveNewerExactSince = 0)
+        std::uint64_t preserveNewerExactSince = 0,
+        bool allowCurrentRootRebuild = false)
 	{
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -1336,10 +1337,11 @@ class UIScaling : public Hook
                 // tail and terminal new tail on the CURRENT live chain.
                 // All other HUD/GOAL/+TIME/rank producers keep strict
                 // pre/post root identity.
-                const bool exactRivalRootRebuild =
+                const bool exactCurrentChainOwner =
                     sourceRoots &&
-                    producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani;
-                node = exactRivalRootRebuild
+                    (producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani ||
+                     allowCurrentRootRebuild);
+                node = exactCurrentChainOwner
                     ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
                         root, before[prio], tailAfter, Game::SpriteNodeMax)
                     : sourceRoots
@@ -1719,12 +1721,15 @@ class UIScaling : public Hook
         if (Settings::VREnabled && Game::current_mode &&
             *Game::current_mode == GameState::STATE_GOAL)
         {
-            // Nested exact producers keep the newer serial/token; only
-            // new stable-root siblings inherit the full result-graph owner.
+            // Bound only to the two REA-proven original full-result graph
+            // calls 0x98924/0x992AC -> 0x979E0. This parent can rebuild the
+            // priority-list root while retaining its old tail, so accept only
+            // nodes proven between that old tail and the CURRENT terminal
+            // tail. Newer nested exact owners remain protected by entrySerial.
             TagAppendedNodes(before,
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 OutRunVR::GameSemantic::ProducerToken::ResultProgress,
-                nullptr, &rootsBefore, entrySerial);
+                nullptr, &rootsBefore, entrySerial, true);
             FlushD3DXAtDirectGoalSourceExit();
         }
         return result;
@@ -3574,10 +3579,11 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 restore ? HudBatch.producer : ProducerToken::None);
             hr = Flush_hk.stdcall<HRESULT>(self);
         }
-        // A new Begin/Draw may have reentered D3DX during this Flush.
-        // Never clear that NEW generation; a changed same-generation batch
-        // cannot safely keep its old exact +TIME/GOAL GPU owner either.
-        HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));
+        // The inline vtable hook can receive a foreign ID3DXSprite sharing
+        // this method address. Preserve its native Flush/HRESULT, but never
+        // let it complete the tracked game-sprite +TIME/GOAL ledger.
+        if (self && self == submission.sprite)
+            HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));
         return hr;
     }
 
@@ -3613,9 +3619,11 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 restore ? HudBatch.producer : ProducerToken::None);
             hr = End_hk.stdcall<HRESULT>(self);
         }
-        // End consumed the previous native session, not a reentrant new
-        // Begin issued from within the driver's original End callback.
-        HudBatch.completeNativeEnd(submission);
+        // A foreign ID3DXSprite End must not tear down the tracked game
+        // sprite ledger. Exact-object generation/reentrancy handling remains
+        // inside completeNativeEnd.
+        if (self && self == submission.sprite)
+            HudBatch.completeNativeEnd(submission);
         return hr;
     }
 

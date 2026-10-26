@@ -668,10 +668,12 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "HudBatch.provenDirectB9200 && !HudBatch.queued" in flush and
          "const auto submission = HudBatch.snapshot();" in flush and
          "Flush_hk.stdcall<HRESULT>(self)" in flush and
+         "if (self && self == submission.sprite)" in flush and
          "HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));" in flush and
          "return hr;" in flush and
          flush.index("const auto submission = HudBatch.snapshot();") <
          flush.index("Flush_hk.stdcall<HRESULT>(self)") <
+         flush.index("if (self && self == submission.sprite)") <
          flush.index("HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));"),
          "native Flush must retire only matching exact batch generation")
     need("CanRestoreDeferredResultOwner(" in end and
@@ -679,10 +681,12 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "HudBatch.provenDirectB9200 && !HudBatch.queued" in end and
          "const auto submission = HudBatch.snapshot();" in end and
          "End_hk.stdcall<HRESULT>(self)" in end and
+         "if (self && self == submission.sprite)" in end and
          "HudBatch.completeNativeEnd(submission);" in end and
          "return hr;" in end and
          end.index("const auto submission = HudBatch.snapshot();") <
          end.index("End_hk.stdcall<HRESULT>(self)") <
+         end.index("if (self && self == submission.sprite)") <
          end.index("HudBatch.completeNativeEnd(submission);"),
          "native End must preserve newer nested Begin")
     need("if (!wasTrackedOrExactGameSprite)" in lifecycle and

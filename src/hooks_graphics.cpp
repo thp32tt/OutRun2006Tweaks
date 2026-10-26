@@ -618,10 +618,9 @@ class VRLensFlareProjected2D : public Hook
         LensCentreSavedProducer = OutRunVR::GameSemantic::ProducerToken::None;
     inline static thread_local std::uint64_t LensCentreSavedEpoch = 0;
     // r4dius/outrun2-decomp race_course_passes.cpp proves 0x570008 is
-    // emitted twice per visible sun-flare sequence. Fresh Quest3 logs still
-    // show the visible duplicate after suppressing only ordinal 2, so the
-    // VR path now removes both 0x570008 children while preserving the actual
-    // 0x570002 sun and every non-570008 outer flare disc.
+    // emitted twice per visible sun-flare sequence: ordinal 1 is an outer
+    // flare child and ordinal 2 is the near-centre glow. Preserve the outer
+    // child and suppress only the duplicated centre glow in VR.
     inline static thread_local std::uint64_t LensFlareSequence = 0;
     inline static thread_local std::uint64_t LensOuter570008Sequence = 0;
     inline static thread_local unsigned LensOuter570008Ordinal = 0;
@@ -691,7 +690,7 @@ class VRLensFlareProjected2D : public Hook
                 LensOuter570008Ordinal = 0;
             }
             const unsigned ordinal = ++LensOuter570008Ordinal;
-            if (ordinal <= 2)
+            if (ordinal == 2)
             {
                 if (Settings::VRTelemetry)
                 {
@@ -700,9 +699,9 @@ class VRLensFlareProjected2D : public Hook
                         1, std::memory_order_relaxed) + 1;
                     if (n <= 8 || (n & (n - 1)) == 0)
                         spdlog::info(
-                            "VR LENS 570008 CHILD HIDDEN: "
+                            "VR LENS 570008 CENTER GLOW HIDDEN: "
                             "id=0x{:X} ordinal={} sequence={} hits={} "
-                            "(sun 0x570002 and non-570008 outer discs preserved)",
+                            "(first outer 0x570008 preserved)",
                             static_cast<unsigned>(objectId), ordinal,
                             LensFlareSequence, n);
                 }
@@ -810,15 +809,16 @@ class VRLensFlareProjected2D : public Hook
                     LensCentreDepth, LensCentreOwnerDepth);
         }
 
-        // Keep C993 distinct from the already-working CABE outer discs.
-        // ProjectedScreenEffect2D remains the coordinate-space authority;
-        // the exact centre token selects rotation-only eye reprojection in
-        // R26 instead of copying identical NDC into asymmetric eye frusta.
-        // It cannot enter WorldBillboard while this projected scope is active.
+        // C993's four central objects are already projected by the game to
+        // one centre-eye screen ray. Keep the exact ProjectedScreenEffect2D
+        // scope but clear D3A5's spatial LensFlareCentre token for the actual
+        // C993 draw. R30 then uses the existing identical-L/R centre-eye WVP
+        // fusion instead of independently reprojecting the same ray through
+        // asymmetric eye frusta. CABE outer discs remain on their own path.
         OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
             OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D,
             nullptr, true,
-            OutRunVR::GameSemantic::ProducerToken::LensFlareCentre);
+            OutRunVR::GameSemantic::ProducerToken::None);
         OutRunVR::GameSemantic::ScopedRenderSemantic sunDrawScope(
             OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
