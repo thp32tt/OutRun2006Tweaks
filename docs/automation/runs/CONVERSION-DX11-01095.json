@@ -11,21 +11,22 @@
   "classification": "A_LIVE_SM3_INDEXED_POINT_STRIP_GPU_WINDOWS_WITH_CAUSAL_CI_RECORD_REPAIR",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:SM3_INDEXED_POINT_STRIP_WINDOWED_NATIVE_DRAW",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_GATE_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "source_base_sha": "b489dca831c2a99760f9d92cb31ec1cae40ca147",
   "source_change_sha": "a2e9843f50143d93ec74da9c9731958ccf021bfe",
   "material_result_sha": "a2e9843f50143d93ec74da9c9731958ccf021bfe",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f40286cf304bde5d02e7116ead4ad09d11ae0a77",
   "source_implementation_commits": [
     "a2e9843f50143d93ec74da9c9731958ccf021bfe"
   ],
   "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp",
-    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_native_alpha_compare_00600.py",
     "docs/automation/runs/CONVERSION-DX11-01095.json"
   ],
   "feature_contract": {
@@ -87,13 +88,33 @@
   },
   "acceptance_results": {
     "live_game_sm3_gpu_windows": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_FEATURE_CI",
+      "validation_command": "DX11 Fast Structural Checks C++ test dx11_live_sm3_native_point_strip_windows.cpp, shader-bound GPU Draw/DrawIndexed structural assertions",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ]
     },
     "source_fallback_and_safety": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_FEATURE_CI",
+      "validation_command": "Fast/Backend/Build source guards including destructive FVF alpha negative regression and whole source IB preflight",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_native_alpha_compare_00600.py",
+        "tools/verify_dx11_source_graph.py"
+      ]
     },
     "one_exact_sha_gates": {
-      "status": "PENDING_EXACT_SHA"
+      "status": "PASS_EXACT_SHA",
+      "validation_command": "Five push GitHub Actions all completed/success on exact SHA f40286cf304bde5d02e7116ead4ad09d11ae0a77",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389665855",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389666184",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389666094",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389666097",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389665816"
+      ]
     }
   },
   "full_dx11_renderer_complete": false,
@@ -101,9 +122,75 @@
   "hmd_test_performed": false,
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
-  "score_change": 0,
+  "score_change": 1,
   "ai2_previous_confirmed_cumulative_score": 1991,
-  "ai2_new_confirmed_cumulative_score": 1991,
+  "ai2_new_confirmed_cumulative_score": 1992,
   "ci_repair_reason": "Previous highest run 01094 C6 integration_path lacks mandatory literal LIVE_D3D9_CALLSITE, D3D11_NATIVE_DRAW, VISIBLE_FRAME_OUTPUT, causing current Fast --check-latest failure before C++ tests. This run 01095 records accurately implemented new game source path rather than rewriting previous terminal source/C6 evidence.",
-  "next_implementation_action": "If a mandatory exact-SHA Gate fails due to code or authentic safety probe, repair under 01095 and check new SHA; no HMD success claims."
+  "next_implementation_action": "If a mandatory exact-SHA Gate fails due to code or authentic safety probe, repair under 01095 and check new SHA; no HMD success claims.",
+  "result_sha": "f40286cf304bde5d02e7116ead4ad09d11ae0a77",
+  "implementation_commits": [
+    "a2e9843f50143d93ec74da9c9731958ccf021bfe"
+  ],
+  "repair_commits": [
+    "cd659e89dd5338bc9516dfa21aa6eb5b6f861de5",
+    "c67240b391a9830bf404a53f91de3687d17c0b63",
+    "aa15884a3dcae428ec2c3d52cae06a58a48a80e4",
+    "f40286cf304bde5d02e7116ead4ad09d11ae0a77"
+  ],
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40389665855,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f40286cf304bde5d02e7116ead4ad09d11ae0a77",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389665855"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40389666184,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f40286cf304bde5d02e7116ead4ad09d11ae0a77",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389666184"
+    },
+    {
+      "name": "Build",
+      "run_id": 40389666094,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f40286cf304bde5d02e7116ead4ad09d11ae0a77",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389666094"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40389666097,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f40286cf304bde5d02e7116ead4ad09d11ae0a77",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389666097"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40389665816,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "f40286cf304bde5d02e7116ead4ad09d11ae0a77",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40389665816"
+    }
+  ],
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "terminal_gameplay_verified": false,
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "f40286cf304bde5d02e7116ead4ad09d11ae0a77",
+  "c6_does_not_revalidate_source": true,
+  "c6_note": "Validation-bearing result is f40286cf (new live C++ implementation and causal test/source repairs). This later C6 docs-only checkpoint is not a replacement validation-bearing SHA and must not trigger/restart required GitHub Actions.",
+  "score_note": "GitHub ai-dev-lab scoreboard e1664272fc8b3309c2638fbd932abde98eb8476c readback pending: previously confirmed AI2 1991 + unique new integrated 01095 source implementation +1 = 1992; retries/repairs/checkpoint +0.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no game, Quest3 HMD, VDXR eye, menu-to-race native pixels, frame timings or FPS tested."
 }
