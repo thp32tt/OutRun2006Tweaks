@@ -6600,7 +6600,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             }
             context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
                                       DXGI_FORMAT_R32_UINT, 0u);
-            context->DrawIndexed(static_cast<UINT>(pointWindow.size()), 0u, 0);
+            // Dispatch the new window through the same audited native GPU
+            // DrawIndexed callsite used by the original shader-bound source.
+            // No extra unchecked Draw site may escape frame admission.
+            nativeIndices = pointWindow.data();
+            nativeIndexCount = static_cast<UINT>(pointWindow.size());
+            issueNativeGameDraw(nativeIndexCount, 0u);
+            nativeIndices = nullptr;
+            nativeIndexCount = 0u;
             continue;
         }
         if (indexedChunkUpload) {
