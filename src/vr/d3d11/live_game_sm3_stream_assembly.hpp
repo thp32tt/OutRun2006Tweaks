@@ -101,6 +101,40 @@ game_sm3_plan_native_linear_chunks(
     return {aligned, static_cast<std::uint32_t>(chunks)};
 }
 
+// A source-authored LINESTRIP or TRIANGLESTRIP is connected across all
+// vertices. Native WRITE_DISCARD segments repeat the preceding 1/2 vertices
+// at each boundary; for triangle strips the advance must be even so the
+// rasterizer's alternating winding matches the original global strip.
+// D3D9 TRIANGLEFAN and indexed strips still use the authoritative fallback.
+struct GameSm3ConnectedChunkPlan {
+    std::uint32_t verticesPerChunk = 0u;
+    std::uint32_t advanceVertices = 0u;
+    std::uint32_t chunkCount = 0u;
+};
+[[nodiscard]] constexpr GameSm3ConnectedChunkPlan
+game_sm3_plan_native_connected_chunks(
+    std::uint32_t primitiveType, bool indexed, std::uint32_t sourceVertices,
+    std::uint32_t nativeStride, std::uint32_t maxVerticesPerChunk,
+    std::uint32_t maxBytesPerChunk, std::uint32_t maxChunks) noexcept {
+    const bool line = primitiveType == 3u;
+    const bool triangle = primitiveType == 5u;
+    if ((!line && !triangle) || indexed || !nativeStride ||
+        !maxVerticesPerChunk || !maxBytesPerChunk || !maxChunks ||
+        sourceVertices < (line ? 2u : 3u)) return {};
+    std::uint32_t capacity = (std::min)(
+        maxVerticesPerChunk, maxBytesPerChunk / nativeStride);
+    // For a TRIANGLESTRIP every segment begins on an EVEN original
+    // triangle ordinal; its first two vertices are the previous tail.
+    if (triangle) capacity -= capacity % 2u;
+    if (capacity < (line ? 2u : 4u) || sourceVertices <= capacity)
+        return {};
+    const std::uint32_t advance = capacity - (line ? 1u : 2u);
+    const std::uint64_t remaining = std::uint64_t(sourceVertices) - capacity;
+    const std::uint64_t chunks = 1u + (remaining + advance - 1u) / advance;
+    if (chunks > maxChunks) return {};
+    return {capacity, advance, static_cast<std::uint32_t>(chunks)};
+}
+
 // A high-instance-count game mesh can exceed the historical 128 native
 // submissions even though its original D3D9 stream is complete and each
 // packed FLOAT4 GPU chunk fits. Admit a bounded continuation without ever
