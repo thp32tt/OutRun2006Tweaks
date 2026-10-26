@@ -207,10 +207,9 @@ namespace OutRunVR::HudCommandBatch
                     (newProducer != Producer::ResultTextB9200 ||
                      provenDirectB9200 || drawQueued);
             }
-            else if (!validQueue ||
+            else if (!validQueue || scope != newScope ||
                      (newProducer == Producer::StageExtensionTime &&
                       !drawQueued && stageSourceTicket != directStageTicket) ||
-                     scope != newScope ||
                      producer != newProducer || queued != drawQueued ||
                      (drawQueued && (queueNode != drawQueueNode ||
                                      queueEpoch != drawQueueEpoch)) ||
