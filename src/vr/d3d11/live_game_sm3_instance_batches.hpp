@@ -86,7 +86,12 @@ game_sm3_segmented_list_submission_plan(
     std::uint32_t primitiveType, bool indexed, bool pointFill,
     std::uint32_t instanceCount, std::uint32_t instancesPerUpload,
     std::uint32_t sourceIndexCount, std::uint32_t maxExpandedIndices) noexcept {
-    if (!game_sm3_independent_list(primitiveType) || pointFill ||
+    // Point-filled source TRIANGLELIST is already converted to an exact
+    // three-corner GPU POINTLIST IB. Replicate those occurrences for each
+    // bounded native instance upload instead of issuing one Draw per mesh.
+    // Never group point-filled LINE/POINT primitives or an absent index IB.
+    if (!game_sm3_independent_list(primitiveType) ||
+        (pointFill && (primitiveType != 4u || !indexed)) ||
         !instanceCount || instancesPerUpload < 2u ||
         instanceCount <= instancesPerUpload)
         return {};

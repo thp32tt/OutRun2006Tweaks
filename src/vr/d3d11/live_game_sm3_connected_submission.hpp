@@ -54,8 +54,14 @@ game_sm3_segmented_connected_submission_plan(
     std::uint32_t instanceCount, std::uint32_t instancesPerUpload,
     std::uint32_t maxIndices) noexcept {
     const bool line = primitiveType == 3u;
+    // D3D9 POINT and WIREFRAME triangle strips/fans have exactly the
+    // same authentic ordered triangle corners as SOLID. Expand them to
+    // bounded per-instance triangle lists, then submit the generated IB
+    // with the already admitted POINTLIST or wireframe rasterizer.
+    // LINESTRIP has no triangle polygon fill and must remain unmodified.
     if ((!line && primitiveType != 5u && primitiveType != 6u) ||
-        pointFill || wireFill || !verticesPerInstance ||
+        (line && (pointFill || wireFill)) || (pointFill && wireFill) ||
+        !verticesPerInstance ||
         sourceCount < (line ? 2u : 3u) ||
         instancesPerUpload < 2u || instanceCount <= instancesPerUpload ||
         !maxIndices) return {};

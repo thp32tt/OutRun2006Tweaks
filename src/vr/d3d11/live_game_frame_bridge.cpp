@@ -5710,20 +5710,35 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         nativeIndices = compactConnectedIndices.data();
         nativeIndexCount = static_cast<UINT>(compactConnectedIndices.size());
     }
+    // A segmented GPU batch can directly generate POINTLIST/WIREFRAME
+    // triangles for every original connected instance. Plan before the
+    // old per-instance point IB to avoid allocating a duplicate, possibly
+    // over-budget whole-mesh expansion that is never submitted.
+    // Connected game strips/fans previously issued one GPU Draw per source
+    // instance after a segmented FLOAT4 upload. Prebuild independent primitive
+    // indices for each native upload chunk and submit one DrawIndexed per chunk.
+    // Preflight BOTH full and trailing chunk before any frame/GPU mutation.
+    const auto segmentedConnectedPlan =
+        game_sm3_segmented_connected_submission_plan(
+            static_cast<std::uint32_t>(type), pointFill, wireFill, expected,
+            vertexCount, instanceCount,
+            segmentedInstanceUpload ? chunkPlan.instancesPerChunk : 0u,
+            kMaxIndices);
     // D3DFILL_POINT produces one point per triangle occurrence, including
     // repeated vertices shared by adjacent triangles. The source fan and
     // connected-instance helpers above have already preserved their order;
     // lower these triangles to a genuine GPU POINTLIST before IA/OM binding.
     std::vector<std::uint32_t> pointFillIndices;
-    // Windowed fans already lower each original triangle to a local
-    // three-index occurrence stream. POINTLIST consumes that same stream
-    // directly; expanding the *whole* fan would exceed kMaxIndices.
+    // Windowed fans and grouped source instances already lower each original
+    // triangle to local three-index occurrences. POINTLIST consumes those
+    // directly; expanding the *whole* fan/instanced mesh could exceed budget.
     // Streamed independent TRIANGLELIST windows already carry each authentic
     // vertex/index occurrence. Never pre-expand a whole-list point IB and
     // then bind it to only the FIRST native VB window.
     if (pointFill && !fanChunkUpload &&
         !connectedChunkUpload && !indexedConnectedChunkUpload &&
-        !linearChunkUpload && !indexedChunkUpload) {
+        !linearChunkUpload && !indexedChunkUpload &&
+        !segmentedConnectedPlan.grouped) {
         const UINT logicalVertexCount = static_cast<UINT>(
             compactInstancedGeometry ? expandedVertices : vertexCount);
         const UINT sourceCount = nativeIndices ? nativeIndexCount : logicalVertexCount;
@@ -5743,16 +5758,6 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         static_cast<std::uint32_t>(type), nativeIndices != nullptr, pointFill,
         instanceCount, segmentedInstanceUpload ? chunkPlan.instancesPerChunk : 0u,
         nativeIndexCount, kMaxIndices);
-    // Connected game strips/fans previously issued one GPU Draw per source
-    // instance after a segmented FLOAT4 upload. Prebuild independent primitive
-    // indices for each native upload chunk and submit one DrawIndexed per chunk.
-    // Preflight BOTH full and trailing chunk before any frame/GPU mutation.
-    const auto segmentedConnectedPlan =
-        game_sm3_segmented_connected_submission_plan(
-            static_cast<std::uint32_t>(type), pointFill, wireFill, expected,
-            vertexCount, instanceCount,
-            segmentedInstanceUpload ? chunkPlan.instancesPerChunk : 0u,
-            kMaxIndices);
     std::vector<std::uint32_t> fullConnectedChunkIndices;
     std::vector<std::uint32_t> tailConnectedChunkIndices;
     if (segmentedConnectedPlan.grouped) {
