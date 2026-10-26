@@ -182,7 +182,7 @@ def check_goal_full_result_graph(ui, contracts):
         "return original();",
         "rootsBefore[p] = root;",
         "OutRunVR::GameSemantic::ProducerToken::ResultProgress",
-        "nullptr, &rootsBefore, entrySerial);",
+        "nullptr, &rootsBefore, entrySerial, true);",
     ):
         if required not in (ui if required.startswith("using ") else body):
             fail("full GOAL progress lost bounded exact parent protection: " + required)
@@ -760,12 +760,12 @@ def test_mutations(ui, manifest):
     full_start = ui.index('static bool __cdecl ResultProgressFullParent(')
     full_end = ui.index('inline static SafetyHookMid StageExtensionEnterHooks[', full_start)
     full = ui[full_start:full_end]
-    if full.count('nullptr, &rootsBefore, entrySerial);') != 1:
-        fail('full GOAL progress exact-node mutation anchor missing')
-    must_fail('full result-progress loses live root lease',
+    if full.count('nullptr, &rootsBefore, entrySerial, true);') != 1:
+        fail('full GOAL progress exact current-chain mutation anchor missing')
+    must_fail('full result-progress loses exact current-chain lease',
               ui[:full_start] + full.replace(
-                  'nullptr, &rootsBefore, entrySerial);',
-                  'nullptr, nullptr, entrySerial);', 1) + ui[full_end:])
+                  'nullptr, &rootsBefore, entrySerial, true);',
+                  'nullptr, &rootsBefore, entrySerial, false);', 1) + ui[full_end:])
     corrupt = copy.deepcopy(manifest)
     next(x for x in corrupt['contracts']
          if int(x['rva'], 16) == 0x992AC)['expectedBytes'] = 'e800000000'

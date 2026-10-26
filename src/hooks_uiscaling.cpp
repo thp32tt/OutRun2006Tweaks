@@ -1722,7 +1722,9 @@ class UIScaling : public Hook
             *Game::current_mode == GameState::STATE_GOAL)
         {
             // Bound only to the two REA-proven original full-result graph
-            // calls 0x98924/0x992AC -> 0x979E0. This parent can rebuild the
+            // calls 0x98924/0x992AC -> 0x979E0. HUD Inspector validates that
+            // ordinary GOAL helpers remain stable-root while only this parent
+            // receives the bounded current-chain exception. This parent can rebuild the
             // priority-list root while retaining its old tail, so accept only
             // nodes proven between that old tail and the CURRENT terminal
             // tail. Newer nested exact owners remain protected by entrySerial.
