@@ -101,6 +101,37 @@ game_sm3_plan_native_linear_chunks(
     return {aligned, static_cast<std::uint32_t>(chunks)};
 }
 
+// Indexed real-game independent lists may exceed the native 32 MiB FLOAT4
+// buffer after declaration unpacking although their original D3D9 VB fits.
+// Expand original index occurrences in primitive-aligned native GPU windows;
+// connected topologies, source instancing and point/wire polygon fill remain
+// outside the opt-in indexed streaming admission.
+struct GameSm3IndexedChunkPlan {
+    std::uint32_t verticesPerChunk = 0u;
+    std::uint32_t chunkCount = 0u;
+};
+[[nodiscard]] constexpr GameSm3IndexedChunkPlan
+game_sm3_plan_native_indexed_chunks(
+    std::uint32_t primitiveType, std::uint32_t sourceVertices,
+    std::uint32_t indexCount, std::uint32_t nativeStride,
+    std::uint32_t maxVertices, std::uint32_t maxBytes,
+    std::uint32_t maxChunks, std::uint64_t maxTotalBytes) noexcept {
+    const std::uint32_t group = primitiveType == 1u ? 1u :
+                                primitiveType == 2u ? 2u :
+                                primitiveType == 4u ? 3u : 0u;
+    if (!group || !sourceVertices || !indexCount || !nativeStride ||
+        !maxVertices || !maxBytes || !maxChunks || indexCount % group ||
+        sourceVertices > maxVertices ||
+        std::uint64_t(sourceVertices) * nativeStride <= maxBytes ||
+        std::uint64_t(indexCount) * nativeStride > maxTotalBytes) return {};
+    const auto limit = (std::min)(maxVertices, maxBytes / nativeStride);
+    const auto capacity = limit - limit % group;
+    if (!capacity) return {};
+    const auto chunks = (std::uint64_t(indexCount) + capacity - 1u) / capacity;
+    if (chunks > maxChunks) return {};
+    return {capacity, static_cast<std::uint32_t>(chunks)};
+}
+
 // A source-authored LINESTRIP or TRIANGLESTRIP is connected across all
 // vertices. Native WRITE_DISCARD segments repeat the preceding 1/2 vertices
 // at each boundary; for triangle strips the advance must be even so the
@@ -272,7 +303,49 @@ struct GameSm3ElementRef {
 }
 
 
- // FLOAT4 declaration expansion for the same center+rim fan windows. Decode
+ // Assemble actual indexed D3D9 stream attributes in exact IB occurrence order.
+// All bounds are checked before staged writes; a failed source never replaces
+// a previously valid native vertex window.
+[[nodiscard]] inline bool game_sm3_assemble_indexed_window(
+    const std::vector<GameSm3ElementRef>& elements,
+    const std::array<GameSm3StreamView,16>& streams,
+    const std::uint32_t* indices, std::uint32_t totalIndices,
+    std::uint32_t firstIndex, std::uint32_t count,
+    std::vector<std::uint8_t>& output) noexcept {
+    if (!indices || elements.empty() || elements.size() > 32u ||
+        !count || firstIndex > totalIndices ||
+        count > totalIndices - firstIndex) return false;
+    const std::uint64_t stride = std::uint64_t(elements.size()) * 16u;
+    if (std::uint64_t(count) * stride > (1ull << 25u)) return false;
+    for (const auto& element : elements) {
+        if (element.stream >= streams.size()) return false;
+        const auto& stream = streams[element.stream];
+        const auto width = game_sm3_decl_width(element.type);
+        if (!stream.data || !stream.stride || !width ||
+            std::uint32_t(element.offset) + width > stream.stride) return false;
+        for (std::uint32_t v=0u;v<count;++v)
+            if (indices[firstIndex+v] >= stream.vertexCount) return false;
+    }
+    try {
+        std::vector<std::uint8_t> staged(
+            static_cast<std::size_t>(std::uint64_t(count) * stride));
+        for (std::uint32_t v=0u;v<count;++v)
+            for (std::size_t a=0u;a<elements.size();++a) {
+                const auto& element=elements[a];
+                const auto& stream=streams[element.stream];
+                std::array<float,4> value{};
+                if (!game_sm3_unpack_attribute(element.type,
+                    stream.data + std::size_t(indices[firstIndex+v]) *
+                    stream.stride + element.offset, value)) return false;
+                std::memcpy(staged.data() + std::size_t(v)*stride + a*16u,
+                            value.data(), sizeof(value));
+            }
+        output.swap(staged);
+        return true;
+    } catch (...) { return false; }
+}
+
+// FLOAT4 declaration expansion for the same center+rim fan windows. Decode
  // actual source 0 once and a contiguous original rim slice; never reinterpret
  // packed D3D9 attributes or replace a seam by an adjacent shader input.
  [[nodiscard]] inline bool game_sm3_assemble_fan_window(
