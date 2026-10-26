@@ -12,6 +12,7 @@ on:
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
       - 'tools/Run-FocusOfficialTest.ps1'
+      - 'tools/verify_focus_official_diagnostics.py'
   workflow_dispatch:
 
 jobs:

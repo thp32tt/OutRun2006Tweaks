@@ -16,6 +16,7 @@ on:
       - 'tools/verify_vr_menu_resolution_split.py'
       - 'tools/verify_vr_f11_font_density.py'
       - 'tools/verify_vr_r26_landscape_visual_recovery.py'
+      - 'tools/verify_focus_official_diagnostics.py'
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
