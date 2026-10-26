@@ -83,6 +83,9 @@ class PolicyTests(unittest.TestCase):
         self.assertFalse(p["auto_game_pass"])
         self.assertFalse(p["auto_deploy"])
         self.assertEqual(p["browser_slots"], ["A","B","C1"])
+        self.assertEqual(p["c_role"], "GPT_OCR_METADATA_ONLY_NO_CROP")
+        self.assertTrue(p["requirements"]["gpt_ocr_direct_full_hd_imagegen"])
+        self.assertFalse(p["requirements"]["crop_file_required"])
 
         s = (HERE / "docker-compose.yml").read_text(encoding="utf-8")
         self.assertIn('AUTO_SEND: "true"', s)
@@ -93,6 +96,8 @@ class PolicyTests(unittest.TestCase):
         self.assertIn('OUTRUN_AB_BATCH_QUEUE: "false"', s)
         self.assertIn('OUTRUN_KR_V2_AUTO_COMPOSE: "false"', s)
         self.assertIn('OUTRUN_KR_V2_AUTO_DEPLOY: "false"', s)
+        self.assertIn('OUTRUN_CROP_ENABLED: "false"', s)
+        self.assertIn('OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "2400"', s)
 
 
 if __name__ == "__main__":
