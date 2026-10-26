@@ -12,7 +12,7 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:SM3_NONINSTANCED_LINEAR_GPU_CHUNK_DRAW",
   "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_EXACT_SHA_VERIFIED_RUNTIME_UNTESTED",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -26,7 +26,7 @@
   "native_published_frame_count": "UNTESTED",
   "source_change_sha": "34658b9be8204ef5374c94215b2e416150e8a2fa",
   "material_result_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
-  "validation_bearing_result_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+  "validation_bearing_result_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
   "source_base_sha": "ba185aaf9b36a1295514a745080a2fe140d2dacd",
   "implementation_commits": [
     "34658b9be8204ef5374c94215b2e416150e8a2fa"
@@ -136,53 +136,53 @@
   "mandatory_gate_results": [
     {
       "name": "DX11 Fast Structural Checks",
-      "run_id": 40270195582,
+      "run_id": 40271478943,
       "status": "completed",
       "conclusion": "success",
       "event": "push",
-      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
-      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195582"
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478943"
     },
     {
       "name": "Backend Conversion Gate",
-      "run_id": 40270195691,
+      "run_id": 40271478952,
       "status": "completed",
       "conclusion": "success",
       "event": "push",
-      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
-      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195691"
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478952"
     },
     {
       "name": "Build",
-      "run_id": 40270195651,
+      "run_id": 40271478977,
       "status": "completed",
       "conclusion": "success",
       "event": "push",
-      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
-      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195651"
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478977"
     },
     {
       "name": "OpenXR VR architecture",
-      "run_id": 40270195626,
+      "run_id": 40271478933,
       "status": "completed",
       "conclusion": "success",
       "event": "push",
-      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
-      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195626"
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478933"
     },
     {
       "name": "OutRun EXE HUD Inspector CI",
-      "run_id": 40270195604,
+      "run_id": 40271478958,
       "status": "completed",
       "conclusion": "success",
       "event": "push",
-      "head_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
-      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40270195604"
+      "head_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40271478958"
     }
   ],
   "c6_bookkeeping_only": true,
   "c6_does_not_revalidate_source": true,
-  "c6_source_validation_sha": "0b92706497098316a49f24b10e0c84d6a0725f4d",
+  "c6_source_validation_sha": "c361c71d7c8145769f180fe0e054ce43cc926ab9",
   "source_implementation_time_ratio": "NOT_MEASURED",
   "analysis_time_ratio": "NOT_MEASURED",
   "ci_time_ratio": "NOT_MEASURED",
@@ -191,8 +191,10 @@
   "task_new_source_achievement_score": 1,
   "score_change": 0,
   "score_award_event": false,
-  "score_note": "AI2 independent original implementation + five exact-SHA Gate achievement credited once separately at thp32tt/ai-dev-lab main AI_SCOREBOARD.md commit 01be14ebb9947b9c0a251defb4e06193794750d0: 1971 + 1 = 1972. This C6-only readback is +0; no duplicate accomplishment.",
+  "score_note": "C6_NOT_COMPLETE hold resolved at exact-SHA GitHub Actions push PASS on c361c71d7c8145769f180fe0e054ce43cc926ab9. This is a C6-only bookkeeping update, not a new source achievement. AI2 already earned 01083 +1 exactly once; no additional points. AI2 cumulative 1972.",
   "score_ssot_ref": "thp32tt/ai-dev-lab@main:AI_SCOREBOARD.md",
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No OutRun game/HMD/Quest3/VDXR session, no live native frame or FPS measured. No complete menu-to-race gameplay PASS claimed.",
-  "next_implementation_action": "Continue full source-wide real game menu/vehicle/race native Draw coverage and L/R OpenXR GPU handoff under new independent owner, preserving DXVK freeze/DX9Ex fallback and original input/FFB. Do not rerun this 01083 SHA Gates or score C6."
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real OutRun menu/car/race or Quest3/VDXR HMD gameplay test; exact-SHA GitHub CI success does not prove real VR output.",
+  "next_implementation_action": "Continue full source-wide real game menu/vehicle/race native Draw coverage and L/R OpenXR GPU handoff under new independent owner, preserving DXVK freeze/DX9Ex fallback and original input/FFB. Do not rerun this 01083 SHA Gates or score C6.",
+  "c6_previous_hold_reason": "C6_NOT_COMPLETE",
+  "c6_previous_hold_resolved": true
 }
