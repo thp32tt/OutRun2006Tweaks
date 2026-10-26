@@ -15,6 +15,7 @@
 #include "live_game_sm3_connected_instances.hpp"
 #include "live_game_sm3_connected_submission.hpp"
 #include "live_game_sm3_polygon_raster.hpp"
+#include "live_game_fvf_polygon_windows.hpp"
 #include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
@@ -8305,7 +8306,51 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 }
             }
         }
-        if (type == D3DPT_TRIANGLEFAN) {
+        // A genuine FVF menu/vehicle/race fan, or a POINT-filled strip,
+        // may expand to more native indices than one dynamic GPU IB permits.
+        // Keep every source triangle occurrence, with global strip winding,
+        // in bounded native DrawIndexed windows. The entire source IB was
+        // validated above BEFORE the first GPU mutation. Failed later GPU
+        // windows abort native frame publication; D3D9 still renders.
+        const bool oversizedFan = type == D3DPT_TRIANGLEFAN &&
+            std::uint64_t(primitives) * 3u > kMaxIndices;
+        const bool oversizedPointStrip = type == D3DPT_TRIANGLESTRIP &&
+            output.nativePointFill &&
+            std::uint64_t(primitives) * 3u > kMaxIndices;
+        if (oversizedFan || oversizedPointStrip) {
+            const auto windowPlan = game_fvf_polygon_window_plan(
+                static_cast<std::uint32_t>(type), expectedElements,
+                kMaxIndices, 128u);
+            if (!windowPlan.windows) {
+                s.frameBatch.abort();
+                return;
+            }
+            bool success = true;
+            for (UINT first = 0u; first < primitives;
+                 first += windowPlan.trianglesPerWindow) {
+                const UINT count = (std::min)(
+                    windowPlan.trianglesPerWindow, primitives - first);
+                std::vector<std::uint32_t> window;
+                if (!game_fvf_build_polygon_window(
+                        static_cast<std::uint32_t>(type), indices,
+                        expectedElements, vertexCount, first, count,
+                        kMaxIndices, window) ||
+                    !submit(s, vertices, window.data(),
+                            static_cast<UINT>(window.size()),
+                            D3DPT_TRIANGLELIST, capture, output)) {
+                    success = false;
+                    break;
+                }
+            }
+            if (!success) {
+                s.frameBatch.abort();
+                ++s.failed;
+                return;
+            }
+            s.frameBatch.succeeded(output.nativeDepthTest,
+                                   output.nativeDepthOrderingMode != 0u);
+            s.frameBatch.record_source_draw(sourceOrdinal);
+        } else if (type == D3DPT_TRIANGLEFAN) {
             // Real game VB/IB/UP data, rebased by R30. No fixture substitution.
             std::vector<std::uint32_t> fanTriangles;
             if (!game_fan_to_triangle_list(primitives, indices, indexCount,

@@ -593,6 +593,8 @@ jobs:
           # 01092: real point/line GPU paths survive inherited polygon fill.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_game_inherited_polygon_state.cpp -o /tmp/dx11_fill_01092 && /tmp/dx11_fill_01092
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_fvf_polygon_modes.cpp -o /tmp/dx11_fvf_01093 && /tmp/dx11_fvf_01093
+          # 01094: large real-game FVF fan and point-strip native indexed GPU windows.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_fvf_polygon_windows.cpp -o /tmp/dx11_fvf_windows_01094 && /tmp/dx11_fvf_windows_01094
           # 01091 authentic game SM3 instanced POINT/WIREFRAME GPU batch
           # with source corner order, negative late-index, and budget proofs.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_game_segmented_polygon_fill.cpp -o /tmp/dx11_poly_fill_01091 && /tmp/dx11_poly_fill_01091
