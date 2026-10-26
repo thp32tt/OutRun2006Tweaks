@@ -30,7 +30,7 @@ require = [
  ("no additional metadata in variant", 'variant=$variant; abc=C' not in flow),
  ("variant line count and exact parser guard", '$variantLines.Count -ne 1' in flow and
                                             '$parsedVariant -cne $variant' in flow),
- ("experiment metadata separate", 'Set-Content "$dir/ABC_COMPARE.txt"' in flow),
+ ("build provenance metadata separate", 'Set-Content "$dir/FOCUS_BUILD.txt"' in flow),
  ("zip start batch preserved","START_HERE.cmd" in flow and "Run-FocusOfficialTest.ps1" in flow),
 ]
 for desc, good in require:
