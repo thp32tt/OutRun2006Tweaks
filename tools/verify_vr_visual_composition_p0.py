@@ -2598,8 +2598,10 @@ def verify_centre_actual_draw_owner(source):
     require('Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);',
             fallback, 'desktop/queued/unrelated original draw')
     require('return;', fallback, 'fallback must not submit twice')
-    require('if (Settings::VREnabled && objectId == 0x570002 && !Settings::VRLensFlareCentreEnabled.get())',
-            draw, 'disc-only existing A/B opt-out')
+    require('No VR flare/sun child may be hidden', draw,
+            'central original C993 draw must not be masked by A/B opt-out')
+    if '!Settings::VRLensFlareCentreEnabled.get()' in draw:
+        raise AssertionError('Original 0x570002 C993 sun must remain visible')
     exact = draw[draw.index('ScopedExactProducerSemantic semantic('):]
     require_order(exact, 'C993 projected scope and token before actual original draw',
                   'ScopedExactProducerSemantic semantic(',
