@@ -1172,13 +1172,13 @@ def queue_dynamic_prefix() -> str:
     ]
     if lane == "DX9EX":
         lines += [
-            "DX9EX_REVIEW_ONLY=ON. 2026-10-20 사용자 최신 지시가 모든 과거 DX9Ex 자동개발·자동수정·자동승격 지시보다 우선한다.",
+            "DX9EX_REVIEW_ONLY=ON. REVIEW_SUBJECT=LENS_FLARE_ONLY. 2026-10-27 사용자 단일 주제 고정 지시가 과거 모든 DX9Ex 종합 검토·자동개발·자동수정 지시보다 우선한다. 매 신규 작업·retry·rollover에서도 렌즈플레어만 조사해.",
             "production source/C++/HLSL/CMake/workflow/runtime config를 자동으로 수정하지 마. source patch/refactor/merge/update_ref/branch/release/package 생성도 금지한다.",
-            "GitHub 최신 vr-d3d9ex-focus HEAD와 source/REA/디스어셈블리/로그/Issue를 읽고 화면오류·최적화 관점에서 producer→semantic→queue→D3DX/native draw→R30/R62→L/R eye→restore→Present/OpenXR 경로를 시뮬레이션해.",
+            "GitHub 최신 vr-d3d9ex-focus HEAD와 이전 렌즈플레어 기록·source/REA/디스어셈블리/로그를 읽고 오직 렌즈플레어 emitter→sprite/texture→queue/D3DX/native draw→L/R eye→host/OpenXR 경로를 추적해. 다른 화면오류·일반 성능 주제로 이동 금지.",
             "실제 수정이 필요해 보여도 코드를 고치지 말고 PATCH_CANDIDATE_ONLY로 정확한 파일/함수/라인 범위, 근거, 반증조건, 회귀경계를 docs/reviews/dx9ex/automation/<TASK_ID>.md에 기록해.",
             "R26+HUD baseline 0cff83cf509c2acd6f3391b3a46c4dec1403a0d9를 기준으로 하고 R84를 자동 기본값으로 승격하지 마. 최근 result HUD 후보 aab9e02bcb2ad2e6253840e6267e5c5ad5040854는 비교 자료이며 HMD PASS가 아니다.",
             "B9200 post-CALL/+5 등 과거 크래시 원인이 된 위험한 훅을 재도입하지 마. 실기 없으면 RUNTIME_VALIDATION=UNTESTED, 게임 소스 변경은 CODE_CHANGE=NO로 유지해.",
-            "매 TASK_ID는 docs-only [AUTO:TASK_ID] 커밋으로 durable 결과를 남겨. 새 finding이 없으면 NEW_FINDING=NONE과 실제 검토한 경로·근거·NEXT_REVIEW를 기록하되 같은 내용을 반복하지 마.",
+            "매 TASK_ID는 docs-only [AUTO:TASK_ID] 커밋으로 durable 결과를 남겨. 기존 렌즈플레어 가설을 다른 증거로 반증·강화하며 HYPOTHESIS_LEDGER와 NEXT_REVIEW=LENS_FLARE:<구체적 검증>을 기록해. 새 finding이 없으면 NEW_FINDING=NONE으로 쓰고 재탕을 새 성과라 주장하지 마.",
         ]
     if lane == "DX11":
         lines += [
