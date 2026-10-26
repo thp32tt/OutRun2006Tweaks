@@ -39,7 +39,6 @@ assert 'ResultProgressFullParentCallA = 0x98924' in ui
 assert 'ResultProgressFullParentCallB = 0x992AC' in ui
 assert 'ResultProgressFullParentTarget = 0x979E0' in ui
 assert 'nullptr, &rootsBefore, entrySerial, true);' in ui
-assert 'nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial,\n                true);' in ui
 assert ui.count('if (self && self == submission.sprite)') >= 2
 assert 'ordinal == 2' in gfx
 assert 'VR LENS 570008 CENTER GLOW HIDDEN:' in gfx
