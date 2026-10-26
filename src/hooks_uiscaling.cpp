@@ -1764,6 +1764,7 @@ class UIScaling : public Hook
 
         std::array<SpriteNode*, Game::SpritePriorityCount> before{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
+        std::array<bool, Game::SpritePriorityCount> emptyBefore{};
         const auto entrySerial =
             OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
                 std::memory_order_acquire);
@@ -1772,6 +1773,8 @@ class UIScaling : public Hook
             SpriteNode* root = Game::sprite_prio_root[p];
             rootsBefore[p] = root;
             before[p] = root ? root->tail_4 : nullptr;
+            emptyBefore[p] = root && before[p] == root &&
+                root->next_0 == nullptr;
         }
 
         OutRunVR::GameSemantic::ScopedExactProducerSemantic parentOwner(
@@ -1796,6 +1799,37 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 OutRunVR::GameSemantic::ProducerToken::ResultProgress,
                 nullptr, &rootsBefore, entrySerial, true);
+            // ABC-C ONLY: the old empty root sentinel can be detached when
+            // native FUN_004979E0 replaces the priority root. Standard
+            // current-chain proof then cannot find its old tail, losing
+            // the single full-result graph node. Do NOT expand to general
+            // rebuilt queues, +TIME or rival sources. Parent epoch admission
+            // above guarantees no intervening physical queue selection.
+            unsigned recoveredSingleChildren = 0;
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* currentRoot = Game::sprite_prio_root[p];
+                SpriteNode* currentTail =
+                    currentRoot ? currentRoot->tail_4 : nullptr;
+                SpriteNode* onlyChild =
+                    OutRunVR::SpriteQueue::FirstVerifiedRebuiltEmptySingleChild(
+                        rootsBefore[p], before[p], emptyBefore[p],
+                        currentRoot, currentTail, Game::SpriteNodeMax);
+                if (onlyChild)
+                {
+                    OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+                        onlyChild, OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                        OutRunVR::GameSemantic::ProducerToken::ResultProgress,
+                        nullptr, entrySerial);
+                    ++recoveredSingleChildren;
+                }
+            }
+            if (Settings::VRTelemetry && recoveredSingleChildren)
+                spdlog::info(
+                    "VR ABC C GOAL REBUILT EMPTY ROOT: recoveredSingleChildren={} "
+                    "queueEpoch={} exactParent=0x979E0",
+                    recoveredSingleChildren,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
             FlushD3DXAtDirectGoalSourceExit();
         }
         return result;

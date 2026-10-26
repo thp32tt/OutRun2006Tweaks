@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - vr-d3d9ex-abc-c-goal-emptyroot-20261026
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
       - 'tools/Run-FocusOfficialTest.ps1'
@@ -18,6 +19,8 @@ on:
       - 'src/vr/game/hud_command_batch.hpp'
       - 'src/vr/game/stage_extension_source_admission.hpp'
       - 'src/vr/game/goal_progress_source_admission.hpp'
+      - 'src/vr/game/sprite_queue_tail_proof.hpp'
+      - 'tools/verify_vr_abc_goal_c.py'
       - 'tools/verify_vr_goal_progress_source_admission.py'
       - 'tools/verify_vr_producer_provenance.py'
       - 'tools/verify_vr_hud_exact_callsite_contract.py'
@@ -58,6 +61,12 @@ jobs:
         run: |
           python tools/verify_vr_goal_progress_source_admission.py
           if ($LASTEXITCODE -ne 0) { throw 'GOAL progress source admission contract failed' }
+
+      - name: Check ABC C single-child experimental safety
+        shell: pwsh
+        run: |
+          python tools/verify_vr_abc_goal_c.py
+          if ($LASTEXITCODE -ne 0) { throw 'ABC C GOAL source fallback contract failed' }
 
       - name: Configure Win32 R26+HUD
         shell: pwsh
@@ -147,7 +156,15 @@ jobs:
             Copy-Item tools/START_FOCUS_OFFICIAL_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
             Copy-Item tools/Run-FocusOfficialTest.ps1 "$dir/Run-FocusOfficialTest.ps1"
             if ($mode -eq 'DEBUG') { Get-ChildItem $payload -Filter *.pdb | ForEach-Object { Copy-Item $_.FullName $dir } }
-            Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant" -Encoding ascii
+            Set-Content "$dir/DX9EX_VARIANT.txt" "variant=$variant; abc=C; experimental=GOAL_REBUILT_EMPTY_SINGLE_CHILD" -Encoding ascii
+            Set-Content "$dir/ABC_COMPARE.txt" @(
+              'A: 456642108a4c0bd86c337bc14ead561b3c376cdc (+TIME repair)'
+              'B: bda6b12078528265a8157d842a7c825883fb629c (+ GOAL source queue epoch)'
+              "C: $env:GITHUB_SHA (+ GOAL single-child replaced-empty-root experiment)"
+              'Compare final GOAL only. Native VR HMD effect is UNTESTED.'
+              'Quest3: +TIME, GOAL 0-99, final graph, rank, rival, F11, frame rate.'
+              'Restore backup between A/B/C; never overlay two build ZIPs.'
+            ) -Encoding UTF8
             Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
             @(
               'OFFICIAL FOCUS R26+HUD: October 26 exact +TIME ticket isolation and diagnostics'
@@ -164,7 +181,7 @@ jobs:
               '8. No experimental test-branch COMBINED/ALL visual or performance patches.'
               '9. Restore backups after testing; return DX9EX_LOGS ZIP and screenshots.'
             ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
-            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FocusOfficialTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','START_HERE.txt')) {
+            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FocusOfficialTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','ABC_COMPARE.txt','START_HERE.txt')) {
               if (-not (Test-Path (Join-Path $dir $required))) { throw "Missing packaged $mode file: $required" }
             }
             foreach ($binary in @('dinput8.dll','outrun-vr-host.exe')) {
@@ -177,7 +194,7 @@ jobs:
           }
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-OFFICIAL-FOCUS-20261026
+          name: OutRun2-VR-R26-ABC-C-GOAL-EMPTYROOT-${{ github.sha }}
           path: OutRun2_VR_R26_FOCUS_OFFICIAL_*.zip
           if-no-files-found: error
 
