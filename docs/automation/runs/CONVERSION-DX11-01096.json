@@ -38,6 +38,34 @@
     "tools/test_dx11_sparse_index_draw_00646.py",
     ".github/workflows/dx11-fast-structural.yml"
   ],
+  "acceptance_results": {
+    "large_original_game_source": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_primitive_span.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks push run 40398409931 at c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd; checked-in game source cap / indexed native GPU window C++ probes (historical 01096 exact SHA, not live game pixels)"
+    },
+    "other_topologies_and_corrupt_tail": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_game_primitive_span_probe.cpp",
+        "tests/vr/dx11_live_sm3_native_point_strip_windows.cpp",
+        "tools/test_dx11_sparse_index_draw_00646.py"
+      ],
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks push run 40398409931 at c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd; historical 01096 source regression boundary (not current 01097 expanded fan cap)"
+    },
+    "final_five_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01096.json"
+      ],
+      "validation_command": "GitHub Actions push completed/success for c8404ae3abc85bbcb80f156baeb80fc8bb8bf5bd: DX11 Fast 40398409931, Backend 40398410021, Build 40398409955, OpenXR 40398409920, HUD 40398410060"
+    }
+  },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
     "goal": "Allow authentic 2049-4096 triangle source TRIANGLESTRIP in original-game D3D9 -> native D3D11 full-frame FVF and SM3 GPU point-window draws while retaining exact source ordering and 6144-index per-submit budget; original D3D9 rendering/input fallback remains authoritative.",
