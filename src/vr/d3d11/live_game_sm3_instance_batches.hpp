@@ -70,4 +70,35 @@ game_sm3_list_submission_plan(std::uint32_t primitiveType, bool indexed,
         return {GameSm3ListSubmissionMode::compact_indexed, 1u};
     return {GameSm3ListSubmissionMode::per_instance, instanceCount};
 }
+// The game's genuine INDEXEDDATA/INSTANCEDATA mesh has already been packed
+// into consecutive FLOAT4 D3D11 vertices. Independent D3D9 point, line and
+// triangle *lists* may be submitted once per bounded GPU upload rather than
+// issuing a Draw for every source instance. Connected strips/fans and point
+// fill are not lists: they retain separate source primitive boundaries.
+// If an expanded indexed list cannot fit the original transient index budget,
+// fall back to one indexed Draw per source instance without enlarging buffers.
+struct GameSm3SegmentedListSubmission {
+    bool grouped = false;
+    std::uint32_t batches = 0u;
+};
+[[nodiscard]] constexpr GameSm3SegmentedListSubmission
+game_sm3_segmented_list_submission_plan(
+    std::uint32_t primitiveType, bool indexed, bool pointFill,
+    std::uint32_t instanceCount, std::uint32_t instancesPerUpload,
+    std::uint32_t sourceIndexCount, std::uint32_t maxExpandedIndices) noexcept {
+    if (!game_sm3_independent_list(primitiveType) || pointFill ||
+        !instanceCount || instancesPerUpload < 2u ||
+        instanceCount <= instancesPerUpload)
+        return {};
+    if (indexed && (!sourceIndexCount || !maxExpandedIndices ||
+                    std::uint64_t(sourceIndexCount) * instancesPerUpload >
+                        maxExpandedIndices ||
+                    std::uint64_t(sourceIndexCount) * instancesPerUpload >
+                        (1ull << 25u) / sizeof(std::uint32_t)))
+        return {};
+    return {true, static_cast<std::uint32_t>(
+        (std::uint64_t(instanceCount) + instancesPerUpload - 1u) /
+        instancesPerUpload)};
+}
+
 } // namespace outrun::vr::dx11::live_game_frame

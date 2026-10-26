@@ -5597,6 +5597,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         nativeIndices = pointFillIndices.data();
         nativeIndexCount = static_cast<UINT>(pointFillIndices.size());
     }
+    // A list is a collection of independent source primitives. One native
+    // Draw/DrawIndexed per packed GPU chunk preserves all of its boundaries.
+    // Preserve separate source Draws for strips/fans, point fill and indexed
+    // meshes whose expanded IB cannot fit the existing bounded upload.
+    const auto segmentedListPlan = game_sm3_segmented_list_submission_plan(
+        static_cast<std::uint32_t>(type), nativeIndices != nullptr, pointFill,
+        instanceCount, segmentedInstanceUpload ? chunkPlan.instancesPerChunk : 0u,
+        nativeIndexCount, kMaxIndices);
     // Keep input-layout cache identity separate when an instanced draw
     // requires source FLOAT4 packing even for already-float declarations.
     if (sourceInstancing && !repack) {
@@ -6276,26 +6284,27 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // strips/fans merge safely; large indexed lists/strips/fans keep original
     // D3D9 IB + per-instance vertex bases and independent GPU Draw boundaries.
     const UINT nativeSubmissionCount = segmentedInstanceUpload
-        ? instanceCount : (compactListInstances
+        ? (segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount)
+        : (compactListInstances
             ? 1u : (listCandidate ? listSubmission.drawCount :
                 (connectedCandidate ? connectedSubmission.drawCount : instanceCount)));
     const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
-    // The native API dispatch sites remain inside this guarded submit.
-    // GPU source counts and batch indices are captured only for this Draw.
-    const auto issueNativeGameDraw = [&](UINT vertexCount, UINT base) noexcept {
+    // One audited submit site for the original game Draw; grouped lists keep
+    // primitive order, while strips/fans retain one Draw per source instance.
+    const auto issueNativeGameDraw = [&](UINT vertices, UINT base) noexcept {
         if (nativeIndices)
             context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));
         else
-            context->Draw(vertexCount, base);
+            context->Draw(vertices, base);
     };
-    for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance) {
+    for (UINT submit = 0u; submit < nativeSubmissionCount; ++submit) {
+        const UINT instance = segmentedListPlan.grouped
+            ? submit * chunkPlan.instancesPerChunk : submit;
         if (segmentedInstanceUpload && instance != 0u &&
             instance % chunkPlan.instancesPerChunk == 0u) {
-            // A subsequent GPU WRITE_DISCARD uploads only the next bounded
-            // group. Original INSTANCEDATA divisors never restart at zero.
-            // On a failed Map or missing source record the containing source
-            // Draw aborts publication, preserving D3D9Ex fallback.
+            // GPU WRITE_DISCARD uploads the next bounded source chunk.
+            // The absolute D3D9 INSTANCEDATA divisor is never restarted.
             const UINT remaining = instanceCount - instance;
             const UINT chunkInstances = (std::min)(
                 remaining, chunkPlan.instancesPerChunk);
@@ -6309,8 +6318,40 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                          unpacked.data(), chunkBytes))
                 return false;
         }
-        // Original per-instance Draw/DrawIndexed boundaries remain intact
-        // for connected geometry. The local base advances inside one chunk.
+        if (segmentedListPlan.grouped) {
+            const UINT chunkInstances = (std::min)(
+                instanceCount - instance, chunkPlan.instancesPerChunk);
+            if (!nativeIndices) {
+                // POINT/LINELIST/TRIANGLELIST have no cross-instance edges.
+                context->Draw(chunkInstances * vertexCount, 0u);
+            } else {
+                // Index values remain relative to each original source mesh.
+                // Expand only the current chunk, never all game instances.
+                std::vector<std::uint32_t> chunkIndices;
+                const std::uint32_t* sourceIndices = nativeIndices;
+                UINT sourceIndexCount = nativeIndexCount;
+                if (chunkInstances > 1u) {
+                    if (!game_sm3_expand_list_instance_indices(
+                            nativeIndices, nativeIndexCount, vertexCount,
+                            chunkInstances, chunkIndices))
+                        return false;
+                    sourceIndices = chunkIndices.data();
+                    sourceIndexCount = static_cast<UINT>(chunkIndices.size());
+                }
+                const UINT indexBytes = sourceIndexCount * sizeof(std::uint32_t);
+                if (!ensure_full_game_upload_buffer(
+                        device, s.fullGameIndexUpload, s.fullGameIndexCapacity,
+                        indexBytes, D3D11_BIND_INDEX_BUFFER) ||
+                    !upload_full_game_stream(
+                        context, s.fullGameIndexUpload.Get(),
+                        s.fullGameIndexCapacity, sourceIndices, indexBytes))
+                    return false;
+                context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
+                                          DXGI_FORMAT_R32_UINT, 0u);
+                context->DrawIndexed(sourceIndexCount, 0u, 0);
+            }
+            continue;
+        }
         const UINT base = segmentedInstanceUpload
             ? (instance % chunkPlan.instancesPerChunk) * vertexCount :
             (compactInstancedGeometry ? 0u : instance * vertexCount);
