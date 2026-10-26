@@ -36,6 +36,31 @@ Interpret with `registeredDelta`:
 
 A second sampled line, `VR RIVAL DIRECT D3DX GOAL-GATE PROBE`, records whether an exact rival producer has `batchActive=1`, `pendingDraws>0`, matching D3DX sprite, and the physical recorded `batchProducer/batchScope`. If the pending batch is genuinely `RIVAL_MARKER_SPRANI` under `PROJECTED_WORLD_MARKER_2D`, then the GOAL exit whitelist is demonstrably the wrong submission gate and warrants a strictly rival-specific gate (without changing GOAL/other HUD). If no batch is tracked, a new flush would do nothing: find the deferred original animated sprite output instead.
 
+## 2026-10-27 08:5x additional source verification
+
+1. **The old 8192× queue-publication counter is post-native-only.** `registeredBefore` was captured after `sprani_play_ae_auth_alpha` and after the E direct exit attempt. Therefore `registeredAfter - registeredBefore = 0` does **not** prove that the native animation failed to register any sprite. Exact current focus source now also records `nativeRegisteredDelta` sampled from **before** the native source and `wrapperRegisteredDelta` separately.
+2. **D3DX deferred GPU ownership explicitly excludes rivals.** `VRProjectedD3DXSpriteIsolationR64::FlushDest/EndDest` calls `DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner`; the guard only permits finite result ScreenHud producer families via `CanReprojectFiniteResultHudPlane` or exact pause-arrow token. It excludes `ProjectedWorldMarker2D/RivalMarkerSprani`. The same GOAL-only restriction affects `AfterDirectGoalSource`. Thus a homogeneous rival D3DX batch **if confirmed to exist** will be submitted with original native fallback, not the source-time projected marker in the wrapper. Existing code intentionally leaves an unknown batch native rather than assuming stereo.
+3. Historical `a6f8497c` (2026-10-09 tested-accepted rival lineage) and recent focus R30 projected marker both require a positive clip-W, and both rely on `R30GetRecentRawWvpForQueueSprite`. The exact 3D eye-reprojection functions therefore are not a clear newly introduced difference; producer ownership is a higher-value failure hypothesis.
+
+### Instrumentation added without altering pixels
+
+- `VR RIVAL A22 CURRENT QUEUE COMPARE` now reports native versus wrapper semantic-registration counts.
+- `VR RIVAL ACTUAL D3DX DRAW` and `VR RIVAL D3DX DRAW RETURN` report whether the physical native D3DX API is entered in an exact rival source scope.
+- `VR RIVAL NATIVE GPU FLUSH SINK` and `VR RIVAL NATIVE GPU END SINK` indicate whether a homogeneous exact rival batch reaches physical native submission after the original source exits, and whether the existing restore guard rejected it.
+- `VR RIVAL DIRECT D3DX GOAL-GATE PROBE` correlates the direct source-exit (GOAL-only) Flush rejection.
+- All rows are sampled first 8 and powers of two; D3DX draw/Flush/End call path remains the **same**. No additional Flush was granted. No visual PASS claimed.
+
+### Decision table after one Quest DEBUG run
+
+| Source / physical evidence | Interpretation | Safe code cursor |
+| --- | --- | --- |
+| `nativeRegisteredDelta>0` while `wrapperRegisteredDelta=0` | Nested native queue ownership exists despite earlier 0 publication statistic | Trace exact nested owner & queue semantic selection |
+| Both 0; `ACTUAL D3DX DRAW` increments | Native direct D3DX source exists without queued node | Observe `FLUSH/END SINK` and restore gate |
+| `pendingDraws>0`, `batchScope=PROJECTED_WORLD_MARKER_2D`, `restore=0` | Exact rival producer deferred and current result-only restore intentionally rejects it | Separate bounded rival restore predicate with game sprite+homogeneous+queue-negative checks |
+| `tailChanges>0`, no registrations | Strict current root/tail ownership rejected an appended queue | Recover exact new nodes only with bounded current-chain proof |
+| No actual Draw, no queue delta | This original E8 can schedule later animation; need *later native render* identity | Trace animation queue consumer, do not force GOAL Flush |
+| `registeredDelta>0` with both-eyes zero | Downstream R30 physical submission or WVP/raster gate, not source tagging | Per-rival physical eye trace |
+
 ## Contract and next action
 
 First user Quest3 DEBUG run of exact focus SHA with a rival car should produce these lines. Compare projected marker/R30 stereo draw counters to determine where semantics disappear. Keep R26+HUD, Rank and other HUD sources unchanged, do not declare RUNTIME_VALIDATION=PASS from CI, and do not force the legacy unsafe old-tail dereference. Only then make the smallest corrected render-owner patch, with GitHub Actions TEST+DEBUG and one real Quest3 run.
