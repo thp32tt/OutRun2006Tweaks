@@ -5492,13 +5492,29 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
               plannedNativeStride, kMaxVertices, 1u << 25u, 128u)
         : GameSm3ConnectedChunkPlan{};
     const bool connectedChunkUpload = connectedChunkPlan.chunkCount > 1u;
+    // A genuine programmable, nonindexed source fan retains its center and
+    // previous rim at every packed GPU upload boundary. Other polygon fill
+    // modes, indexed fans and instancing remain on the established path.
+    const auto fanChunkPlan = !sourceInstancing && !indices &&
+        !pointFill && !wireFill && type == D3DPT_TRIANGLEFAN
+        ? game_sm3_plan_native_fan_chunks(
+              vertexCount, plannedNativeStride, kMaxVertices, 1u << 25u,
+              kMaxIndices, 128u)
+        : GameSm3FanChunkPlan{};
+    const bool fanChunkUpload = fanChunkPlan.chunkCount > 1u;
+    if (fanChunkUpload) {
+        // Original full-fan IB was checked above. Each bounded DrawIndexed
+        // instead binds a window-local IB with true original VB inputs.
+        nativeIndices = nullptr;
+        nativeIndexCount = 0u;
+    }
     const auto uploadPlan = game_sm3_plan_native_instance_upload(
         sourceInstancing, vertexCount, instanceCount, plannedNativeStride,
         kMaxVertices, 1u << 25u, kMaxExtendedSegmentedGameInstances);
     const bool segmentedInstanceUpload = sourceInstancing &&
         uploadPlan.mode == GameSm3NativeUploadMode::segmented;
     if ((uploadPlan.mode == GameSm3NativeUploadMode::invalid &&
-         !linearChunkUpload && !connectedChunkUpload) ||
+         !linearChunkUpload && !connectedChunkUpload && !fanChunkUpload) ||
         (segmentedInstanceUpload &&
          !game_sm3_extended_instance_upload_allowed(
              vertexCount, instanceCount, plannedNativeStride,
@@ -5522,7 +5538,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         ? chunkPlan.instancesPerChunk : instanceCount;
     const UINT firstChunkVertices = linearChunkUpload
         ? linearChunkPlan.verticesPerChunk : (connectedChunkUpload
-            ? connectedChunkPlan.verticesPerChunk : vertexCount);
+            ? connectedChunkPlan.verticesPerChunk :
+            (fanChunkUpload ? fanChunkPlan.verticesPerChunk : vertexCount));
     std::array<std::uint32_t,16> instanceSteps{};
     std::array<bool,16> referenced{};
     for (std::size_t i = 0u; i + 1u < declaration.size(); ++i)
@@ -6099,7 +6116,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         nativeByteCount != (segmentedInstanceUpload
             ? chunkPlan.firstUploadBytes : (linearChunkUpload
                 ? static_cast<std::uint64_t>(firstChunkVertices) * nativeStride
-                : (connectedChunkUpload
+                : (connectedChunkUpload || fanChunkUpload
                     ? static_cast<std::uint64_t>(firstChunkVertices) * nativeStride
                     : uploadPlan.vertexBytes)))) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
@@ -6342,9 +6359,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
            (segmentedConnectedPlan.grouped ? segmentedConnectedPlan.batches : instanceCount))
         : (linearChunkUpload ? linearChunkPlan.chunkCount :
            (connectedChunkUpload ? connectedChunkPlan.chunkCount :
+           (fanChunkUpload ? fanChunkPlan.chunkCount :
            (compactListInstances
             ? 1u : (listCandidate ? listSubmission.drawCount :
-                (connectedCandidate ? connectedSubmission.drawCount : instanceCount)))));
+                (connectedCandidate ? connectedSubmission.drawCount : instanceCount))))));
     const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
     // One audited submit site for the original game Draw; grouped lists keep
@@ -6440,6 +6458,60 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 }
             }
             issueNativeGameDraw(drawCount, 0u);
+            continue;
+        }
+
+        if (fanChunkUpload) {
+            // Chunk 0 was uploaded from the real source above. Later chunks
+            // re-upload center 0, the previous rim endpoint, and new rim
+            // vertices. Every triangle retains the source (0,i,i+1) winding
+            // and its original programmable shader attributes.
+            const UINT firstRim = 1u + submit * fanChunkPlan.advanceRimVertices;
+            const UINT drawCount = (std::min)(
+                fanChunkPlan.verticesPerChunk, 1u + vertexCount - firstRim);
+            if (drawCount < 3u) {
+                s.frameBatch.abort();
+                return false;
+            }
+            if (submit != 0u) {
+                std::vector<std::uint8_t> fanWindow;
+                const bool packed = repack
+                    ? game_sm3_assemble_fan_window(
+                          instanceElements, instanceStreams,
+                          firstRim, drawCount, fanWindow)
+                    : game_sm3_copy_native_fan_window(
+                          static_cast<const std::uint8_t*>(bytes),
+                          stride, vertexCount, firstRim,
+                          drawCount, fanWindow);
+                const UINT chunkBytes = drawCount * nativeStride;
+                if (!packed || fanWindow.size() != chunkBytes ||
+                    !upload_full_game_stream(
+                        context, s.fullGameVertexUpload.Get(),
+                        s.fullGameVertexCapacity, fanWindow.data(), chunkBytes)) {
+                    s.frameBatch.abort();
+                    return false;
+                }
+            }
+            std::vector<std::uint32_t> fanIndices;
+            if (!game_sm3_fan_window_indices(
+                    drawCount, kMaxIndices, fanIndices)) {
+                s.frameBatch.abort();
+                return false;
+            }
+            const UINT indexBytes = static_cast<UINT>(
+                fanIndices.size() * sizeof(std::uint32_t));
+            if (!ensure_full_game_upload_buffer(
+                    device, s.fullGameIndexUpload, s.fullGameIndexCapacity,
+                    indexBytes, D3D11_BIND_INDEX_BUFFER) ||
+                !upload_full_game_stream(
+                    context, s.fullGameIndexUpload.Get(),
+                    s.fullGameIndexCapacity, fanIndices.data(), indexBytes)) {
+                s.frameBatch.abort();
+                return false;
+            }
+            context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
+                                      DXGI_FORMAT_R32_UINT, 0u);
+            context->DrawIndexed(static_cast<UINT>(fanIndices.size()), 0u, 0);
             continue;
         }
         if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {

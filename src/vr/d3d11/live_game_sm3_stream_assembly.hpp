@@ -135,6 +135,74 @@ game_sm3_plan_native_connected_chunks(
     return {capacity, advance, static_cast<std::uint32_t>(chunks)};
 }
 
+
+ // A D3D9 nonindexed TRIANGLEFAN has a permanent center vertex (source 0).
+ // Each bounded native GPU segment contains that original center plus the
+ // previous rim endpoint and new rim vertices. Each native chunk gets its
+ // own triangle-list IB; no D3D11 fan topology or duplicated fan triangles.
+ struct GameSm3FanChunkPlan {
+     std::uint32_t verticesPerChunk = 0u;
+     std::uint32_t advanceRimVertices = 0u;
+     std::uint32_t chunkCount = 0u;
+ };
+ [[nodiscard]] constexpr GameSm3FanChunkPlan game_sm3_plan_native_fan_chunks(
+     std::uint32_t sourceVertices, std::uint32_t nativeStride,
+     std::uint32_t maxVerticesPerChunk, std::uint32_t maxBytesPerChunk,
+     std::uint32_t maxIndicesPerChunk, std::uint32_t maxChunks) noexcept {
+     if (sourceVertices < 3u || !nativeStride || !maxIndicesPerChunk ||
+         !maxVerticesPerChunk || !maxBytesPerChunk || !maxChunks)
+         return {};
+     const std::uint32_t capacity = (std::min)(
+         (std::min)(maxVerticesPerChunk, maxBytesPerChunk / nativeStride),
+         maxIndicesPerChunk / 3u + 2u);
+     if (capacity < 3u || sourceVertices <= capacity) return {};
+     const std::uint32_t advance = capacity - 2u;
+     const std::uint64_t remaining = std::uint64_t(sourceVertices) - capacity;
+     const std::uint64_t count = 1u + (remaining + advance - 1u) / advance;
+     if (count > maxChunks) return {};
+     return {capacity, advance, static_cast<std::uint32_t>(count)};
+ }
+ // Convert one complete center+rim GPU window to D3D11 triangle-list indices.
+ [[nodiscard]] inline bool game_sm3_fan_window_indices(
+     std::uint32_t vertices, std::uint32_t maxIndices,
+     std::vector<std::uint32_t>& output) noexcept {
+     if (vertices < 3u || vertices - 2u > maxIndices / 3u)
+         return false;
+     try {
+         std::vector<std::uint32_t> candidate;
+         candidate.reserve(static_cast<std::size_t>(vertices - 2u) * 3u);
+         for (std::uint32_t i = 1u; i + 1u < vertices; ++i) {
+             candidate.push_back(0u);
+             candidate.push_back(i);
+             candidate.push_back(i + 1u);
+         }
+         output.swap(candidate);
+         return true;
+     } catch (...) { return false; }
+ }
+ // Preserve original center and seam attributes for an already native-format
+ // shader input stream. All failures leave the caller's previous data intact.
+ [[nodiscard]] inline bool game_sm3_copy_native_fan_window(
+     const std::uint8_t* source, std::uint32_t stride,
+     std::uint32_t sourceVertices, std::uint32_t firstRim,
+     std::uint32_t windowVertices, std::vector<std::uint8_t>& output) noexcept {
+     if (!source || !stride || firstRim == 0u ||
+         windowVertices < 3u || firstRim > sourceVertices ||
+         windowVertices - 1u > sourceVertices - firstRim ||
+         std::uint64_t(windowVertices) * stride > (1ull << 25u))
+         return false;
+     try {
+         std::vector<std::uint8_t> candidate(
+             static_cast<std::size_t>(windowVertices) * stride);
+         std::memcpy(candidate.data(), source, stride);
+         std::memcpy(candidate.data() + stride,
+             source + static_cast<std::size_t>(firstRim) * stride,
+             static_cast<std::size_t>(windowVertices - 1u) * stride);
+         output.swap(candidate);
+         return true;
+     } catch (...) { return false; }
+ }
+
 // A high-instance-count game mesh can exceed the historical 128 native
 // submissions even though its original D3D9 stream is complete and each
 // packed FLOAT4 GPU chunk fits. Admit a bounded continuation without ever
@@ -202,6 +270,34 @@ struct GameSm3ElementRef {
         return true;
     } catch (...) { return false; }
 }
+
+
+ // FLOAT4 declaration expansion for the same center+rim fan windows. Decode
+ // actual source 0 once and a contiguous original rim slice; never reinterpret
+ // packed D3D9 attributes or replace a seam by an adjacent shader input.
+ [[nodiscard]] inline bool game_sm3_assemble_fan_window(
+     const std::vector<GameSm3ElementRef>& elements,
+     const std::array<GameSm3StreamView,16>& streams,
+     std::uint32_t firstRim, std::uint32_t windowVertices,
+     std::vector<std::uint8_t>& output) noexcept {
+     if (!firstRim || windowVertices < 3u || elements.empty() ||
+         elements.size() > 32u ||
+         std::uint64_t(windowVertices) * elements.size() * 16u >
+             (1ull << 25u)) return false;
+     std::vector<std::uint8_t> center, rim;
+     if (!game_sm3_assemble_streams(elements, streams, 1u, center) ||
+         !game_sm3_assemble_streams(elements, streams,
+                                  windowVertices - 1u, rim, firstRim))
+         return false;
+     try {
+         std::vector<std::uint8_t> candidate;
+         candidate.reserve(center.size() + rim.size());
+         candidate.insert(candidate.end(), center.begin(), center.end());
+         candidate.insert(candidate.end(), rim.begin(), rim.end());
+         output.swap(candidate);
+         return true;
+     } catch (...) { return false; }
+ }
 
 // CPU flattening for authentic D3D9 SetStreamSourceFreq indexed instances.
 // Stream zero advances with each vertex; an instance-rate stream advances
