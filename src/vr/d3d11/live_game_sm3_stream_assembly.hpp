@@ -71,6 +71,27 @@ game_sm3_plan_native_instance_chunk(
     return {static_cast<std::uint32_t>(count),
             static_cast<std::uint32_t>(count * bytesPerInstance)};
 }
+// A high-instance-count game mesh can exceed the historical 128 native
+// submissions even though its original D3D9 stream is complete and each
+// packed FLOAT4 GPU chunk fits. Admit a bounded continuation without ever
+// allocating all expanded instances together. Historical <=128 submits retain
+// their previous admission; additional draws are limited to 256 and 64 MiB
+// of total CPU-packed/GPU-streamed vertex data per source Draw.
+[[nodiscard]] constexpr bool game_sm3_extended_instance_upload_allowed(
+    std::uint32_t verticesPerInstance, std::uint32_t instanceCount,
+    std::uint32_t nativeStride, std::uint32_t legacyDrawLimit,
+    std::uint32_t extendedDrawLimit,
+    std::uint64_t extraTotalByteLimit) noexcept {
+    if (!verticesPerInstance || !instanceCount || !nativeStride ||
+        !legacyDrawLimit || extendedDrawLimit < legacyDrawLimit)
+        return false;
+    if (instanceCount <= legacyDrawLimit) return true;
+    // Divide before multiplying: even malicious 32-bit source counts cannot
+    // wrap an allocation or turn an oversized Draw into valid geometry.
+    return instanceCount <= extendedDrawLimit &&
+        std::uint64_t(verticesPerInstance) * instanceCount <=
+            extraTotalByteLimit / nativeStride;
+}
 struct GameSm3StreamView {
     const std::uint8_t* data{};
     std::uint32_t stride{};

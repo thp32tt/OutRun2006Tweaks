@@ -5461,6 +5461,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // at a time. The extra native submits have an explicit per-draw ceiling;
     // original D3D9 remains authoritative for larger batches.
     constexpr UINT kMaxSegmentedGameInstances = 128u;
+    constexpr UINT kMaxExtendedSegmentedGameInstances = 256u;
     // A declared FLOAT4 layout may exceed the GPU's 32 MiB transient upload
     // even when the source instance product is within kMaxVertices. Choose
     // bounded per-instance GPU uploads before unpacking large CPU shadows.
@@ -5472,11 +5473,19 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         ? static_cast<UINT>(input.size() * 16u) : nativeStride;
     const auto uploadPlan = game_sm3_plan_native_instance_upload(
         sourceInstancing, vertexCount, instanceCount, plannedNativeStride,
-        kMaxVertices, 1u << 25u, kMaxSegmentedGameInstances);
+        kMaxVertices, 1u << 25u, kMaxExtendedSegmentedGameInstances);
     const bool segmentedInstanceUpload = sourceInstancing &&
         uploadPlan.mode == GameSm3NativeUploadMode::segmented;
-    if (uploadPlan.mode == GameSm3NativeUploadMode::invalid)
+    if (uploadPlan.mode == GameSm3NativeUploadMode::invalid ||
+        (segmentedInstanceUpload &&
+         !game_sm3_extended_instance_upload_allowed(
+             vertexCount, instanceCount, plannedNativeStride,
+             kMaxSegmentedGameInstances, kMaxExtendedSegmentedGameInstances,
+             1ull << 26u)))
         return false;
+    // The additional high-count game instances use the same original
+    // D3D9 source shadows, per-Draw strip/fan boundaries and absolute
+    // instance-frequency divisors as the previously supported 128.
     // Pack as many original source instances as one 32 MiB native VB permits.
     // Submit connected strips/fans independently even inside the same chunk.
     // The exact source instance ordinal remains the stream-frequency address.
