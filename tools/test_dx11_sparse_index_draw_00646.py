@@ -50,7 +50,18 @@ assert "game_compact_sparse_indices(distant, 5u, 3u" in probe
 assert "game_compact_sparse_indices(distant, 5u, 2u" in probe
 assert "kMaxNativeGamePrimitives == 2048u" in probe
 assert "kMaxNativeGameVertices == kMaxNativeGamePrimitives * 3u" in probe
-assert "game_native_primitive_element_count(kind, kMaxNativeGamePrimitives + 1u, elements)" in probe
+# 01096: preserve the original negative probe for all OTHER topologies,
+# and independently require both positive 4096-strip source capture and
+# exact oversized-strip rejection (not a regex-only acceptance bypass).
+assert "const auto limit = kind == 5u" in probe
+assert "kMaxNativeGameStripPrimitives : kMaxNativeGamePrimitives" in probe
+assert "game_native_primitive_element_count(kind, limit + 1u, elements)" in probe
+assert "game_native_primitive_element_count(5u, kMaxNativeGamePrimitives + 1u, elements)" in probe
+assert "game_native_primitive_element_count(5u, kMaxNativeGameStripPrimitives, elements)" in probe
+assert "kMaxNativeGameStripPrimitives = 4096u" in span
+assert "primitiveCount > kMaxNativeGameStripPrimitives" in span
+assert "primitiveCount > kMaxNativeGamePrimitives" in span
+assert "sourceElements > kMaxNativeGameVertices" in span
 assert "game_compact_sparse_indices(distant, kMaxNativeGameVertices + 1u" in probe
 assert "fullMesh.data()" in probe
 assert "kMaxNativeGameVertices - 1u, uniqueSlots, remapped" in probe
