@@ -72,7 +72,8 @@
         "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
         "tools/dx11_sm3_indexed_connected_01086.cpp"
       ],
-      "note": "No real OutRun native Draw count observed."
+      "note": "No real OutRun native Draw count observed.",
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_indexed_connected_01086.cpp -o /tmp/dx11_sm3_indexed_connected_01086 && /tmp/dx11_sm3_indexed_connected_01086"
     },
     "source_ib_seam_fallback": {
       "status": "PASS_SOURCE_AND_EXACT_SHA_CI",
@@ -80,7 +81,8 @@
         "tools/dx11_sm3_indexed_connected_01086.cpp",
         "tools/test_dx11_sm3_indexed_connected_01086.py"
       ],
-      "note": "Tested indexed seam coverage, multi-stream attributes, winding parity, malformed-late-index transaction and limits."
+      "note": "Tested indexed seam coverage, multi-stream attributes, winding parity, malformed-late-index transaction and limits.",
+      "validation_command": "python tools/test_dx11_sm3_indexed_connected_01086.py"
     },
     "five_exact_sha_gates": {
       "status": "PASS_EXACT_SHA",
@@ -90,7 +92,8 @@
         ".github/workflows/build.yml",
         ".github/workflows/vr-openxr.yml",
         ".github/workflows/outrun-exe-hud-inspector.yml"
-      ]
+      ],
+      "validation_command": "GitHub Actions: verify five named push runs completed/success on 4f7331f01323c5b21e0a8cf5bd49313ddfafdf78"
     }
   },
   "development_strategy": {
@@ -119,7 +122,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "BUILD_VERIFIED only; native menu/car/race and Quest3 frames unobserved.",
-    "activation_guard_and_fallback": "NativeDrawPathActive=false by default; original D3D9/DX9Ex renderer, input/FFB, SkyGlow unchanged; DXVK frozen."
+    "activation_guard_and_fallback": "NativeDrawPathActive=false by default; original D3D9/DX9Ex renderer, input/FFB, SkyGlow unchanged; DXVK frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "mandatory_gate_results": [
     {
@@ -187,5 +195,6 @@
   "score_note": "1979 + 1 = 1980; C6/retry/status +0.",
   "score_ssot_ref": "thp32tt/ai-dev-lab@9f67a308a1d9d4bf1e2e388ed2d543f5ec6351bc",
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No actual game/HMD/Quest3/VDXR FPS/input/FFB tests.",
-  "next_implementation_action": "Controller selects next disjoint incomplete full DX11 game frame + input/eye integration, retaining this unique build-verified result and separate Quest3 runtime gate."
+  "next_implementation_action": "Controller selects next disjoint incomplete full DX11 game frame + input/eye integration, retaining this unique build-verified result and separate Quest3 runtime gate.",
+  "c6_record_policy_repair": "2026-10-26: restore schema-required ordered live D3D9->native Draw->visible output SOURCE path and the validation_command evidence for all three existing 01086 acceptance items. Does not alter validated SHA, CI result or score."
 }

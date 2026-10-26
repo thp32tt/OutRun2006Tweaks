@@ -203,11 +203,17 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
                 "DXGI_FORMAT_R32_UINT",
                 "context->DrawIndexed(static_cast<UINT>(fanIndices.size()), 0u, 0);")) and
             all(token in fan_admission for token in (
-                "!sourceInstancing && !indices &&",
+                "!sourceInstancing &&",
                 "!pointFill && !wireFill && type == D3DPT_TRIANGLEFAN",
+                "game_sm3_plan_native_indexed_fan_chunks(",
                 "game_sm3_plan_native_fan_chunks(",
+                "const bool indexedFanChunkUpload = fanChunkUpload && indices != nullptr;",
+                "if (indexedFanChunkUpload) {",
+                "indices[i] >= vertexCount",
                 "nativeIndices = nullptr;",
-                "nativeIndexCount = 0u;")) and
+                "nativeIndexCount = 0u;",
+                "} else if (deferredFanTriangles) {",
+                "return false; // unsupported large fan retains authoritative D3D9")) and
             "nativeIndices = nullptr;" not in sm3.group(1).partition(
                 "    const auto fanChunkPlan =")[0],
             "chunked fan GPU draw must remain under original source/fallback admission")
