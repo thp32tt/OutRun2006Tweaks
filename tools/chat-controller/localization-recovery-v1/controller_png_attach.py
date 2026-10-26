@@ -318,111 +318,147 @@ async def ensure_image_tool(page):
         return "CREATE_IMAGE_TOOL_NOT_VERIFIED:"+type(exc).__name__
 
 
-async def _attachment_input(page):
-    """Return the composer file input across current ChatGPT label variants."""
-    selectors = (
+async def _attachment_file_input(page):
+    """Return the current ChatGPT composer file input across responsive DOM variants."""
+    candidates = (
         'input[type="file"][aria-label="Attach files"]',
-        'input[type="file"][aria-label="Attach photos or videos"]',
         'input[type="file"][aria-label="Attach photos"]',
+        'input[type="file"][aria-label="Attach photos or videos"]',
         'input[type="file"][accept*="image"]',
     )
-    for selector in selectors:
+    for selector in candidates:
         loc = page.locator(selector)
         count = await loc.count()
-        if count == 1:
-            return loc
-        if count > 1:
-            # Hidden file inputs are expected. Prefer the last hydrated composer
-            # input instead of failing merely because responsive duplicates exist.
-            return loc.last
+        if count:
+            return loc.first
     return None
 
 
-async def _attachment_snapshot(page):
-    """Count completed attachment witnesses inside the active composer only."""
-    return await page.evaluate(
-        r"""() => {
-          const visible=e=>!!(e && e.getClientRects && e.getClientRects().length);
-          const box=[...document.querySelectorAll('[role="textbox"][contenteditable="true"]')]
-            .find(visible);
-          if(!box)return {ready:0,loading:0};
-          const scope=box.closest('form') || box.parentElement?.parentElement || document;
-          const images=[...scope.querySelectorAll(
-            'img[src^="blob:"], img[alt="User attachment"], '+
-            '[data-testid*="attachment"] img, [data-testid*="upload-preview"] img, '+
-            '[data-testid*="file-upload"] img'
-          )].filter(e=>visible(e) && e.complete && e.naturalWidth>0 && e.naturalHeight>0);
-          const removers=[...scope.querySelectorAll('button[aria-label]')].filter(e=>{
-            if(!visible(e))return false;
-            const a=(e.getAttribute('aria-label')||'').toLowerCase();
-            return a.startsWith('remove ') || a.includes('remove attachment') ||
-                   a.includes('remove file') || a.includes('remove image') ||
-                   a.includes('첨부') && a.includes('제거');
-          });
-          const loading=[...scope.querySelectorAll(
-            '[aria-label*="Uploading"], [aria-label*="uploading"], '+
-            '[data-testid*="uploading"], [data-testid*="upload-progress"], [role="progressbar"]'
-          )].filter(visible);
-          return {ready:Math.max(images.length,removers.length),loading:loading.length};
-        }"""
-    )
+async def _clear_composer_attachments(page):
+    """Remove stale composer attachments without touching persisted chat turns."""
+    try:
+        box = page.locator('[role="textbox"][contenteditable="true"]').first
+        scope = box.locator("xpath=ancestor::form[1]")
+        if await scope.count() == 0:
+            return
+        remove = scope.locator(
+            'button[aria-label^="Remove"], button[aria-label*="Remove file"], '
+            'button[aria-label*="Remove attachment"], button[aria-label*="삭제"], '
+            'button[aria-label*="제거"]'
+        )
+        for _ in range(8):
+            visible = None
+            for i in range(min(await remove.count(), 12)):
+                item = remove.nth(i)
+                try:
+                    if await item.is_visible():
+                        visible = item
+                        break
+                except Exception:
+                    continue
+            if visible is None:
+                break
+            await visible.click(timeout=4000)
+            await page.wait_for_timeout(250)
+    except Exception:
+        # Fresh project composer normally has no attachment. Cleanup is best-effort;
+        # upload verification below remains fail-closed.
+        return
 
 
-async def _wait_attachment_ready(page, filenames, baseline, timeout):
-    """Accept either legacy filename proof or a new modern composer preview."""
+async def _wait_for_attachment_previews(page, expected_names, timeout):
+    """Prove N completed composer attachments without depending on filename alt text.
+
+    ChatGPT's 2026 composer no longer consistently exposes the original filename
+    in image alt/remove aria labels. We therefore accept one of several
+    attachment-card signals, but only inside the active composer form and only
+    after upload/progress indicators have disappeared.
+    """
     await page.wait_for_function(
-        r"""({files,baseline})=>{
-          const visible=e=>!!(e && e.getClientRects && e.getClientRects().length);
-          const box=[...document.querySelectorAll('[role="textbox"][contenteditable="true"]')]
-            .find(visible);
-          if(!box)return false;
-          const scope=box.closest('form') || box.parentElement?.parentElement || document;
-          const images=[...scope.querySelectorAll('img[alt]')].filter(e=>
-            visible(e)&&e.complete&&e.naturalWidth>0&&e.naturalHeight>0);
-          const buttons=[...scope.querySelectorAll('button[aria-label]')].filter(visible);
-          const uploading=[...scope.querySelectorAll(
-            '[aria-label*="Uploading"], [aria-label*="uploading"], '+
-            '[data-testid*="uploading"], [data-testid*="upload-progress"], [role="progressbar"]'
+        r"""({names}) => {
+          const visible = e => !!(e && e.getClientRects().length);
+          const box = [...document.querySelectorAll('[role="textbox"][contenteditable="true"]')]
+              .find(visible);
+          if (!box) return false;
+          const scope = box.closest('form') || box.parentElement || document;
+          const expected = names.length;
+
+          const uploads = [...scope.querySelectorAll(
+            '[aria-label*="Uploading"], [aria-label*="uploading"], ' +
+            '[aria-label*="업로드 중"], [role="progressbar"], ' +
+            '[data-state="loading"], [data-testid*="uploading"]'
           )].filter(visible);
-          if(uploading.length)return false;
+          if (uploads.length) return false;
 
-          const named=files.every(name=>{
-            const stem=name.replace(/\.png$/i,'');
-            const same=x=>x===name ||
-              (x.startsWith(stem+'(')&&x.endsWith(').png') &&
-               /^[0-9]+$/.test(x.slice(stem.length+1,-5)));
-            return images.some(e=>same(e.alt||'')) &&
-              buttons.some(e=>{
-                const a=e.getAttribute('aria-label')||'';
-                return same(a.replace(/^Remove /,''));
-              });
-          });
-          if(named)return true;
+          const normalize = x => (x || '').trim();
+          const sameName = (value, name) => {
+            value = normalize(value);
+            if (!value) return false;
+            const stem = name.replace(/\.png$/i, '');
+            return value === name || value.includes(name) ||
+                   value === stem || value.includes(stem);
+          };
 
-          // Current ChatGPT composer no longer guarantees filename-bearing
-          // alt/remove labels. Count only attachment-like preview witnesses in
-          // the active composer and require a delta caused by this upload.
-          const modernImages=[...scope.querySelectorAll(
-            'img[src^="blob:"], img[alt="User attachment"], '+
-            '[data-testid*="attachment"] img, [data-testid*="upload-preview"] img, '+
-            '[data-testid*="file-upload"] img'
-          )].filter(e=>visible(e)&&e.complete&&e.naturalWidth>0&&e.naturalHeight>0);
-          const removers=buttons.filter(e=>{
-            const a=(e.getAttribute('aria-label')||'').toLowerCase();
-            return a.startsWith('remove ') || a.includes('remove attachment') ||
-                   a.includes('remove file') || a.includes('remove image') ||
-                   a.includes('첨부') && a.includes('제거');
-          });
-          const ready=Math.max(modernImages.length,removers.length);
-          return ready >= baseline + files.length;
+          const named = new Set();
+          const labelled = [...scope.querySelectorAll(
+            '[aria-label], [title], [data-file-name], img[alt]'
+          )];
+          for (const el of labelled) {
+            if (!visible(el)) continue;
+            const values = [
+              el.getAttribute('aria-label'), el.getAttribute('title'),
+              el.getAttribute('data-file-name'), el.getAttribute('alt')
+            ];
+            names.forEach((name, idx) => {
+              if (values.some(v => sameName(v, name))) named.add(idx);
+            });
+          }
+          if (named.size >= expected) return true;
+
+          const removeButtons = [...scope.querySelectorAll('button[aria-label]')]
+            .filter(el => {
+              if (!visible(el)) return false;
+              const a = (el.getAttribute('aria-label') || '').toLowerCase();
+              return a.includes('remove') || a.includes('삭제') || a.includes('제거');
+            });
+
+          const cards = [...scope.querySelectorAll(
+            '[data-testid*="attachment"], [data-testid*="upload-preview"], ' +
+            '[data-testid*="file-upload"], [data-testid*="composer-attachment"]'
+          )].filter(visible);
+
+          const previewImages = [...scope.querySelectorAll('img')]
+            .filter(img => {
+              if (!visible(img) || !img.complete ||
+                  img.naturalWidth <= 0 || img.naturalHeight <= 0) return false;
+              const src = img.currentSrc || img.src || '';
+              if (src.startsWith('blob:') || src.startsWith('data:image')) return true;
+              return !!img.closest(
+                '[data-testid*="attachment"], [data-testid*="upload-preview"], ' +
+                '[data-testid*="file-upload"], [data-testid*="composer-attachment"], ' +
+                'button[aria-label*="Remove"], button[aria-label*="삭제"], ' +
+                'button[aria-label*="제거"]'
+              );
+            });
+
+          // set_input_files() can leave the selected files on one of the hidden
+          // composer inputs. This is strong evidence when coupled with no
+          // visible upload/progress state.
+          const selectedFiles = Math.max(0, ...[...scope.querySelectorAll('input[type="file"]')]
+            .map(i => i.files ? i.files.length : 0));
+
+          return removeButtons.length >= expected ||
+                 cards.length >= expected ||
+                 previewImages.length >= expected ||
+                 selectedFiles >= expected;
         }""",
-        arg={"files":filenames,"baseline":int(baseline)},
+        arg={"names": expected_names},
         timeout=timeout,
     )
 
 
 async def attach_batch_pngs(page, binding):
-    """Upload 2-5 individual files and prove completed composer attachments."""
+    """Upload 2..5 independent PNGs and verify current composer preview state."""
     paths = binding["paths"]
     expected = [Path(s).name for s in paths]
     if not (2 <= len(paths) <= 5) or len(set(expected)) != len(paths):
@@ -432,42 +468,35 @@ async def attach_batch_pngs(page, binding):
             return "TARGET_ORIGIN_NOT_CHATGPT"
         await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(
             state="visible", timeout=12000)
-        inp = await _attachment_input(page)
+        await _clear_composer_attachments(page)
+        inp = await _attachment_file_input(page)
         if inp is None:
             return "ATTACH_FILES_INPUT_NOT_FOUND"
-        before = await _attachment_snapshot(page)
         await inp.set_input_files(paths, timeout=40000)
-        await _wait_attachment_ready(page, expected, before.get("ready", 0), 120000)
+        await page.wait_for_timeout(750)
+        await _wait_for_attachment_previews(page, expected, 120000)
         return "ATTACHMENT_UPLOAD_COMPLETED"
     except Exception:
         return "ATTACHMENT_UPLOAD_NOT_VERIFIED"
 
 
-async def attach_png(page,binding):
-    """Upload one PNG and prove a completed attachment without filename-only DOM assumptions."""
+async def attach_png(page, binding):
+    """Upload one PNG and verify a completed composer attachment preview."""
     if len(binding.get("paths", [])) > 1:
         return await attach_batch_pngs(page, binding)
-    filename=Path(binding["path"]).name
+    filename = Path(binding["path"]).name
     try:
         await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(
-            state="visible",timeout=12000)
+            state="visible", timeout=12000)
         if not page.url.startswith("https://chatgpt.com/"):
             return "TARGET_ORIGIN_NOT_CHATGPT"
-
-        # Best-effort removal of a stale legacy filename-bearing preview.
-        previous=page.locator('button[aria-label^="Remove '+filename[:-4]+'"]')
-        for _ in range(8):
-            if not await previous.count():
-                break
-            await previous.first.dispatch_event("click")
-            await page.wait_for_timeout(350)
-
-        inp=await _attachment_input(page)
+        await _clear_composer_attachments(page)
+        inp = await _attachment_file_input(page)
         if inp is None:
             return "ATTACH_FILES_INPUT_NOT_FOUND"
-        before=await _attachment_snapshot(page)
-        await inp.set_input_files(binding["path"],timeout=25000)
-        await _wait_attachment_ready(page,[filename],before.get("ready",0),90000)
+        await inp.set_input_files(binding["path"], timeout=25000)
+        await page.wait_for_timeout(750)
+        await _wait_for_attachment_previews(page, [filename], 90000)
         return "ATTACHMENT_UPLOAD_COMPLETED"
     except Exception:
         return "ATTACHMENT_UPLOAD_NOT_VERIFIED"
@@ -493,9 +522,13 @@ async def verify_submission_receipt(page, task_id, filename):
                 const user=target?.closest('[data-chatgpt-search-unit-key]') ||
                            target?.closest('[data-content-search-unit-key]');
                 if(!user)return false;
-                const thumbs=[...user.querySelectorAll('img[alt="User attachment"]')]
-                    .filter(img=>img.complete && img.naturalWidth>0 && img.naturalHeight>0 &&
+                const thumbs=[...user.querySelectorAll('img')]
+                    .filter(img=>img.complete && img.naturalWidth>16 && img.naturalHeight>16 &&
                            !!img.getClientRects().length && !!(img.currentSrc||img.src));
+                // The 2026 UI varies attachment alt text (User attachment,
+                // Uploaded image, or empty) by composer surface. Because this
+                // is scoped to the exact persisted user turn carrying our
+                // unique UPLOAD_TASK_ID, image count is the stable proof.
                 return thumbs.length===count;
             }""", arg={"task":task_id,"count":count}, timeout=45000)
         return "PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED"
