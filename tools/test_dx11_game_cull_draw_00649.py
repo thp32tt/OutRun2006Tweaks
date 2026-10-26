@@ -68,8 +68,13 @@ def sm3_fan_connected(src):
         "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),",
         "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
-        "context->Draw(vertexCount, base);",
-        "for (UINT instance = 0u; instance < nativeSubmissionCount; ++instance)",
+        "context->Draw(vertices, base);",
+        "for (UINT submit = 0u; submit < nativeSubmissionCount; ++submit)",
+        "const UINT instance = segmentedListPlan.grouped",
+        "segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount",
+        "if (segmentedListPlan.grouped) {",
+        "context->Draw(chunkInstances * vertexCount, 0u);",
+        "context->DrawIndexed(sourceIndexCount, 0u, 0);",
         "instance % chunkPlan.instancesPerChunk == 0u",
         "const UINT nativeSubmissionCount = segmentedInstanceUpload",
         "connectedCandidate ? connectedSubmission.drawCount : instanceCount",
@@ -87,6 +92,11 @@ for old, bad in (
     ("nativeFanTriangles.size() > kMaxIndices", "nativeFanTriangles.empty()"),
     ("context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
      "context->DrawIndexed(indexCount, 0u, static_cast<INT>(base));"),
+    ("context->Draw(vertices, base);",
+     "context->Draw(vertices, 0u);"),
+    ("segmentedListPlan.grouped ? segmentedListPlan.batches : instanceCount",
+     "instanceCount"),
+    ("if (segmentedListPlan.grouped) {", "if (false) {"),
 ):
     altered = c.replace(old, bad, 1)
     assert altered != c and not sm3_fan_connected(altered), old
