@@ -172,11 +172,12 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     require("bool initialize(const NativeBackendConfig& config)" in native and
             "ID3D11RenderTargetView* color_rtv()" in native,
             "native device and render target ownership missing")
-    # Native Draw dispatch is confined to the original two source-admitted
-    # functions: 2 FVF and 5 SM3 physical Draw/DrawIndexed sites. The fifth
-    # SM3 site is the prevalidated segmented connected strip/fan DrawIndexed;
-    # it must remain nested in the same source-gated function. Do not admit
-    # arbitrary native GPU Draws elsewhere by relaxing the global count.
+    # Native Draw dispatch remains confined to the same TWO game-source
+    # admitted functions: 2 FVF and 6 SM3 physical Draw/DrawIndexed sites.
+    # The additional SM3 DrawIndexed must be nested inside the validated
+    # nonindexed TRIANGLEFAN chunk branch, with exact center/rim attributes,
+    # source-pixel parity, original fallback and per-chunk bounded IB.
+    # Global counting alone never admits an arbitrary Draw elsewhere.
     match = re.search(r"bool submit\s*\(.*?\) noexcept \{(.*?)\n\}\n\nbool observe_source_device\(", code, re.S)
     sm3 = re.search(r"bool submit_live_sm3_game_draw\s*\(.*?\) noexcept \{(.*?)\n\}\n\n// Reuse geometric growth", code, re.S)
     require(match is not None and sm3 is not None,
@@ -184,11 +185,37 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     dispatch = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", code)
     scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", match.group(1))
     sm3_scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", sm3.group(1))
-    require(len(dispatch) == len(scoped) + len(sm3_scoped) == 7 and
+    fan_chunk = sm3.group(1).partition("        if (fanChunkUpload) {\n")[2].partition(
+        "        if (segmentedListPlan.grouped || segmentedConnectedPlan.grouped) {")[0]
+    fan_admission = sm3.group(1).partition("    const auto fanChunkPlan =")[2].partition(
+        "    const auto uploadPlan =")[0]
+    require(fan_chunk and
+            re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", fan_chunk) ==
+                ["->DrawIndexed("] and
+            all(token in fan_chunk for token in (
+                "firstRim = 1u + submit * fanChunkPlan.advanceRimVertices",
+                "drawCount < 3u",
+                "game_sm3_assemble_fan_window(",
+                "game_sm3_copy_native_fan_window(",
+                "game_sm3_fan_window_indices(",
+                "fanWindow.size() != chunkBytes",
+                "s.frameBatch.abort();",
+                "DXGI_FORMAT_R32_UINT",
+                "context->DrawIndexed(static_cast<UINT>(fanIndices.size()), 0u, 0);")) and
+            all(token in fan_admission for token in (
+                "!sourceInstancing && !indices &&",
+                "!pointFill && !wireFill && type == D3DPT_TRIANGLEFAN",
+                "game_sm3_plan_native_fan_chunks(",
+                "nativeIndices = nullptr;",
+                "nativeIndexCount = 0u;")) and
+            "nativeIndices = nullptr;" not in sm3.group(1).partition(
+                "    const auto fanChunkPlan =")[0],
+            "chunked fan GPU draw must remain under original source/fallback admission")
+    require(len(dispatch) == len(scoped) + len(sm3_scoped) == 8 and
             len(scoped) == 2 and
             sm3_scoped == ["->DrawIndexed(", "->Draw(",
-                           "->DrawIndexed(", "->Draw(",
-                           "->DrawIndexed("] and
+                           "->DrawIndexed(", "->DrawIndexed(",
+                           "->Draw(", "->DrawIndexed("] and
             all(token in sm3.group(1) for token in (
                 "game_sm3_segmented_list_submission_plan(",
                 "game_sm3_segmented_connected_submission_plan(",
