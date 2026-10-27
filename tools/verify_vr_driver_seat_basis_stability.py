@@ -66,6 +66,23 @@ for token in (
 eligible=code.split("static bool VRDriverSeatCameraEligible(",1)[1].split(
     "class VRDriverSeatRenderTest",1)[0]
 assert "PersistentDriverSeatSessionEligible(" in eligible
+assert "VRDriverSeatPoseSessionEpoch" in code
+assert "VRDriverSeatObservePoseSession(" in code
+assert "lastPoseSessionEpoch" in body
+assert "lastPoseSessionEpoch != VRDriverSeatPoseSessionEpoch" in body
+assert "lastPoseSessionEpoch = VRDriverSeatPoseSessionEpoch;" in body
+assert "VRDriverSeatObservePoseSession(driverSeatEnabled && gameplayActive);" in eligible
+assert eligible.index("VRDriverSeatObservePoseSession(") < eligible.index(
+    "IsWorldOrCockpitPass()")
+assert "driverSeatEnabled, gameplayActive" in eligible
+# Removing the epoch comparison must be rejected: same EVWORK_CAR pointers
+# cannot carry a last-good absolute pose across a disabled/non-gameplay gap.
+mutated_epoch = code.replace(
+    " ||\n        lastPoseSessionEpoch != VRDriverSeatPoseSessionEpoch", "", 1)
+assert mutated_epoch != code
+mutated_body = mutated_epoch.split("static bool VRDriverSeatCameraPose(",1)[1].split(
+    "// START includes cinematics",1)[0]
+assert "lastPoseSessionEpoch != VRDriverSeatPoseSessionEpoch" not in mutated_body
 for forbidden in ("cam_mode_timer_364","cam_mode_34A","word340","word344",
                   "VRDriverSeatNativeMode","StableNativeViewEligible("):
     assert forbidden not in eligible, forbidden
@@ -80,4 +97,4 @@ assert stock_vehicle_scale(ini), "shipped cockpit scale must be stock"
 assert not stock_vehicle_scale(ini.replace("DriverSeatVehicleScale = 1.00",
                                       "DriverSeatVehicleScale = 1.15", 1))
 assert '"DriverSeatVehicleScale", 1.0f' in settings
-print("PASS Quest-style car-owned cockpit anchor + last-valid hold + source camera restore; HMD untested")
+print("PASS Quest-style cockpit anchor + last-valid hold scoped to enabled gameplay session epoch + source camera restore; HMD untested")

@@ -166,6 +166,24 @@ UseHiDefCharacters UseHiDefCharacters::instance;
 // of cockpit-active, vehicle and occupant rendering responsibilities.
 static bool VRDriverSeatGameplayActive() noexcept;
 
+// The last-valid camera pose belongs to one continuous DriverSeat session.
+// Track only the true enabled+gameplay boundary; never use native camera
+// mode/timer pulses, which previously caused cockpit/bumper oscillation.
+static thread_local bool VRDriverSeatPoseSessionActive = false;
+static thread_local std::uint64_t VRDriverSeatPoseSessionEpoch = 1;
+
+static void VRDriverSeatObservePoseSession(bool active) noexcept
+{
+    if (active == VRDriverSeatPoseSessionActive)
+        return;
+    VRDriverSeatPoseSessionActive = active;
+    if (!active)
+    {
+        if (++VRDriverSeatPoseSessionEpoch == 0)
+            ++VRDriverSeatPoseSessionEpoch;
+    }
+}
+
 static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     D3DVECTOR& translatedPosition, D3DVECTOR& translatedLook) noexcept
 {
@@ -199,11 +217,14 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     static thread_local OutRunVR::DriverSeatCamera::Vec3 lastPosition{};
     static thread_local OutRunVR::DriverSeatCamera::Vec3 lastLook{};
     static thread_local const EVWORK_CAR* lastPlayer = nullptr;
+    static thread_local std::uint64_t lastPoseSessionEpoch = 0;
 
-    if (!VRDriverSeatGameplayActive() || player != lastPlayer)
+    if (!VRDriverSeatGameplayActive() || player != lastPlayer ||
+        lastPoseSessionEpoch != VRDriverSeatPoseSessionEpoch)
     {
         hasLastValidPose = false;
         lastPlayer = player;
+        lastPoseSessionEpoch = VRDriverSeatPoseSessionEpoch;
     }
 
     OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
@@ -253,6 +274,15 @@ static bool VRDriverSeatGameplayActive() noexcept
 
 static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
 {
+    const bool gameplayActive = VRDriverSeatGameplayActive();
+    const bool driverSeatEnabled =
+        Settings::VREnabled && Settings::VRDriverSeatView;
+    // Observe the session even when the later render-pass/camera gates reject.
+    // This closes the old stale-pose lifetime where the normal caller returned
+    // before VRDriverSeatCameraPose could clear its same-player cache.
+    VRDriverSeatObservePoseSession(driverSeatEnabled && gameplayActive);
+    if (!driverSeatEnabled || !gameplayActive)
+        return false;
     if (!OutRunVR::DriverSeatRenderPass::IsWorldOrCockpitPass())
         return false;
     // A missing player vehicle has no seat geometry to render. Do not
@@ -265,8 +295,7 @@ static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
     // updates, which previously prevented entry or repeatedly bounced the
     // view back to the native bumper camera.
     if (!OutRunVR::DriverSeatCamera::PersistentDriverSeatSessionEligible(
-            Settings::VREnabled && Settings::VRDriverSeatView,
-            VRDriverSeatGameplayActive()))
+            driverSeatEnabled, gameplayActive))
         return false;
 
     // Validate the seat pose itself, but camera-mode transitions no longer
