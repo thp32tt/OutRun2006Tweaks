@@ -1,6 +1,7 @@
 #include "../src/vr/d3d11/native_game_clear_coverage.hpp"
 #include "../src/vr/d3d11/native_game_clear_color.hpp"
 #include "../src/vr/d3d11/native_game_frame_batch.hpp"
+#include <array>
 #include <cassert>
 using namespace outrun::vr::dx11::live_game_frame;
 struct Rect { int x1,y1,x2,y2; };
@@ -26,8 +27,20 @@ constexpr bool test() {
         C::covers_whole(640,480,0,0,640,480,1,&half) ||
         C::covers_whole(640,480,1,0,639,480,1,&full) ||
         C::covers_whole(640,480,0,0,640,480,1,&reversed) ||
-        C::covers_whole(640,480,0,0,640,480,1,static_cast<const Rect*>(nullptr)) ||
-        C::covers_whole(640,480,0,0,640,480,17,&full)) return false;
+        C::covers_whole(640,480,0,0,640,480,1,static_cast<const Rect*>(nullptr))) return false;
+    // 01108 raised the authentic source rectangle bound from 16 to 128.
+    // A 17-strip game Clear is now positive coverage; a 129-region source
+    // is rejected by its real count, not by reading past a single Rect.
+    std::array<Rect, 17> strips{};
+    for (int i = 0; i < 17; ++i)
+        strips[static_cast<std::size_t>(i)] = {
+            640 * i / 17, 0, 640 * (i + 1) / 17, 480};
+    if (!C::covers_whole(640,480,0,0,640,480,
+                         17,strips.data())) return false;
+    std::array<Rect, 129> overLimit{};
+    for (auto& r : overLimit) r = full;
+    if (C::covers_whole(640,480,0,0,640,480,
+                        129,overLimit.data())) return false;
     // The live Clear hook resets an aborted pre-Clear scene only when
     // full coverage is proven; post-Clear native Draw begins at ordinal 0.
     GameNativeFrameBatch batch{};
