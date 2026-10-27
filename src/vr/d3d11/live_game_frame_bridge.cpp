@@ -58,6 +58,7 @@
 #include "native_game_frame_batch.hpp"
 #include "native_game_cpu_surface_ticket.hpp"
 #include "native_game_source_mutation.hpp"
+#include "native_game_post_draw_clear_batch.hpp"
 #include "native_game_pre_draw_replay.hpp"
 #include "native_game_pre_draw_depth.hpp"
 #include "native_game_pre_draw_combined_clear.hpp"
@@ -9263,7 +9264,7 @@ bool preserve_game_partial_target_clear(
         }
         // Post-Draw D3D11.1 ClearView still has a separate 32-region GPU
         // budget. Never allocate/write it using the larger pre-Draw limit.
-        if (count > GameNativeSourceMutation::kMaxPartialTargetClearRects)
+        if (count > GameNativePostDrawClearBatch::kMaxSourceRects)
             return false;
         if (!GameNativeSourceMutation::mirrors_partial_target_clear(
                 true, true, s.sourceGameDevice == owner, sameBackbuffer,
@@ -9275,31 +9276,24 @@ bool preserve_game_partial_target_clear(
         // touching the GPU. Fully disjoint rectangles are D3D9 no-ops, not
         // reasons to abandon the native menu/car/race frame. ClearView must
         // receive only populated, nonempty rectangles (never empty extents).
-        std::array<D3D11_RECT,
-            GameNativeSourceMutation::kMaxPartialTargetClearRects> regions{};
-        const std::uint32_t n = count ? count : 1u;
+        // D3D9 Clear may submit 17..128 ordered rectangles AFTER native
+        // game Draws. Their uniform TARGET/Z value permits lossless exact
+        // unions without allocating >32 GPU regions or clearing sprite gaps.
+        std::array<GameNativePostDrawClearBatch::Region,
+            GameNativePostDrawClearBatch::kMaxGpuRegions> compact{};
         std::uint32_t nativeRegionCount = 0u;
-        for (std::uint32_t i = 0u; i < n; ++i) {
-            const std::int64_t l = count ? rects[i].x1 : vp.X;
-            const std::int64_t t = count ? rects[i].y1 : vp.Y;
-            const std::int64_t r = count ? rects[i].x2 :
-                static_cast<std::int64_t>(vp.X) + vp.Width;
-            const std::int64_t b = count ? rects[i].y2 :
-                static_cast<std::int64_t>(vp.Y) + vp.Height;
-            GameNativeSourceMutation::TargetClearRect clipped{};
-            const auto coverage = GameNativeSourceMutation::classify_target_clear_rect(
-                l,t,r,b,vp.X,vp.Y,vp.Width,vp.Height,
-                backbufferDesc.Width,backbufferDesc.Height,clipped);
-            if (coverage == GameNativeSourceMutation::TargetClearClip::Invalid)
-                return false;
-            if (coverage == GameNativeSourceMutation::TargetClearClip::Empty)
-                continue;
-            regions[nativeRegionCount++] = {
-                static_cast<LONG>(clipped.left),
-                static_cast<LONG>(clipped.top),
-                static_cast<LONG>(clipped.right),
-                static_cast<LONG>(clipped.bottom)};
-        }
+        if (!GameNativePostDrawClearBatch::build(
+                backbufferDesc.Width, backbufferDesc.Height,
+                vp.X, vp.Y, vp.Width, vp.Height,
+                count, rects, compact, nativeRegionCount))
+            return false;
+        std::array<D3D11_RECT,
+            GameNativePostDrawClearBatch::kMaxGpuRegions> regions{};
+        for (std::uint32_t i = 0u; i < nativeRegionCount; ++i)
+            regions[i] = {static_cast<LONG>(compact[i].left),
+                          static_cast<LONG>(compact[i].top),
+                          static_cast<LONG>(compact[i].right),
+                          static_cast<LONG>(compact[i].bottom)};
         // Check the D3D9 main Z owner, extents and native D32 attachment
         // before changing even the color RTV of a combined TARGET|Z Clear.
         const bool nativeDepthReady = !clearZ || native_game_partial_depth_ready(
@@ -9730,7 +9724,7 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                 GameNativeMainStencilClear::may_ignore_cropped(
                     true, seededMainColor, sameMainDepthStencil,
                     continuingFullNativeDraw,
-                    count <= GameNativeSourceMutation::kMaxPartialTargetClearRects &&
+                    count <= GameNativePostDrawClearBatch::kMaxSourceRects &&
                         (count == 0u || rects != nullptr),
                     native_game_partial_depth_ready(
                         s, game, bbDesc.Width, bbDesc.Height));
@@ -9771,32 +9765,27 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                     s.frameBatch.depthReady,
                     native_game_partial_depth_ready(s, game, bbDesc.Width, bbDesc.Height),
                     s.backend.context() != nullptr) ||
-                count > GameNativeSourceMutation::kMaxPartialTargetClearRects ||
+                count > GameNativePostDrawClearBatch::kMaxSourceRects ||
                 (count != 0u && !rects))
                 return false;
-            std::array<D3D11_RECT,
-                GameNativeSourceMutation::kMaxPartialTargetClearRects> regions{};
-            const std::uint32_t n = count ? count : 1u;
+            // Use the SAME exact union as the paired TARGET|Z path.
+            // No DSV pixel may be skipped or overwritten outside the real
+            // source viewport, including 128-rect car/race depth strips.
+            std::array<GameNativePostDrawClearBatch::Region,
+                GameNativePostDrawClearBatch::kMaxGpuRegions> compact{};
             std::uint32_t used = 0u;
-            for (std::uint32_t i = 0u; i < n; ++i) {
-                const std::int64_t l = count ? rects[i].x1 : vp.X;
-                const std::int64_t t = count ? rects[i].y1 : vp.Y;
-                const std::int64_t r = count ? rects[i].x2 :
-                    static_cast<std::int64_t>(vp.X) + vp.Width;
-                const std::int64_t b = count ? rects[i].y2 :
-                    static_cast<std::int64_t>(vp.Y) + vp.Height;
-                GameNativeSourceMutation::TargetClearRect clipped{};
-                const auto kind = GameNativeSourceMutation::classify_target_clear_rect(
-                    l, t, r, b, vp.X, vp.Y, vp.Width, vp.Height,
-                    bbDesc.Width, bbDesc.Height, clipped);
-                if (kind == GameNativeSourceMutation::TargetClearClip::Invalid)
-                    return false;
-                if (kind == GameNativeSourceMutation::TargetClearClip::Empty)
-                    continue;
-                regions[used++] = {
-                    static_cast<LONG>(clipped.left), static_cast<LONG>(clipped.top),
-                    static_cast<LONG>(clipped.right), static_cast<LONG>(clipped.bottom)};
-            }
+            if (!GameNativePostDrawClearBatch::build(
+                    bbDesc.Width, bbDesc.Height,
+                    vp.X, vp.Y, vp.Width, vp.Height,
+                    count, rects, compact, used))
+                return false;
+            std::array<D3D11_RECT,
+                GameNativePostDrawClearBatch::kMaxGpuRegions> regions{};
+            for (std::uint32_t i = 0u; i < used; ++i)
+                regions[i] = {static_cast<LONG>(compact[i].left),
+                              static_cast<LONG>(compact[i].top),
+                              static_cast<LONG>(compact[i].right),
+                              static_cast<LONG>(compact[i].bottom)};
             if (used == 0u) return true;
             ComPtr<ID3D11DeviceContext1> context1;
             const bool hasClearView = SUCCEEDED(
