@@ -27,8 +27,8 @@ D3DMATRIX MultiplyMatrix(const D3DMATRIX&a,const D3DMATRIX&b){D3DMATRIX c{};for(
 bool MatrixFinite(const D3DMATRIX&m){for(auto&r:m.m)for(float v:r)if(!std::isfinite(v))return false;return true;}
 struct Viewport {DWORD X=0,Y=0,Width=1920,Height=1080;};
 namespace OutRunVR::GameSemantic {
-enum class RenderScope {None,ScreenHud,World,Projected,ScreenOverlay2D};
-enum class ProducerToken {None,StageExtensionTime,Goal,Rank,Lens};
+enum class RenderScope {None,ScreenHud,World,Projected,ProjectedWorldMarker2D,ScreenOverlay2D};
+enum class ProducerToken {None,StageExtensionTime,Goal,Rank,Lens,RivalMarkerSprani};
 struct Command {RenderScope scope=RenderScope::ScreenHud;ProducerToken producer=ProducerToken::StageExtensionTime;bool queued=false;void*queueNode=nullptr;unsigned queueEpoch=0;
 bool IsExactFiniteResultHud()const{return scope==RenderScope::ScreenHud&&(producer==ProducerToken::StageExtensionTime||producer==ProducerToken::Goal);}};
 Command command; unsigned ExternalOverlaySemanticDepth=0;
@@ -81,7 +81,7 @@ void R30ArmSafeFallback(){FrameStereoIncomplete=true;}
 struct R30StereoPassTrace {HRESULT rightTargetHr=0,rightDepthHr=0,rightViewportHr=0;bool restoreOk=true;};
 // The unchanged outer transaction has its own GPU integration tests. Emulate
 // its left HRESULT/right failure poisoning contract, never replay a failed eye.
-template<class L,class R>HRESULT R30ExecuteXyzrhwStereo(IDirect3DDevice9*,const R30XyzrhwState&,L l,R r,const char*,R30StereoPassTrace*){++stereoTransactions;currentEye=0;auto h=l();if(FAILED(h)){FrameStereoIncomplete=true;return h;}currentEye=1;if(FAILED(r()))FrameStereoIncomplete=true;currentEye=0;return h;}
+template<class L,class R>HRESULT R30ExecuteXyzrhwStereo(IDirect3DDevice9*,const R30XyzrhwState&,L l,R r,const char*,R30StereoPassTrace*,const bool* = nullptr){++stereoTransactions;currentEye=0;auto h=l();if(FAILED(h)){FrameStereoIncomplete=true;return h;}currentEye=1;if(FAILED(r()))FrameStereoIncomplete=true;currentEye=0;return h;}
 struct Receipt{int api,eye;std::vector<std::uintptr_t>args;};std::vector<Receipt>receipts;int failEye=-1;
 template<class T>std::uintptr_t arg(T v){if constexpr(std::is_pointer_v<T>)return reinterpret_cast<std::uintptr_t>(v);else return static_cast<std::uintptr_t>(v);}
 struct Hook{int api;template<class R,class...A>R stdcall(A...a){receipts.push_back({api,currentEye,{arg(a)...}});return currentEye==failEye?E_FAIL:D3D_OK;}};
