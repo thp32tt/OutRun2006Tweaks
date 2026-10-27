@@ -1,0 +1,199 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01107",
+  "production_id": "CONVERSION-DX11-01107",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01107",
+  "classification": "A_REAL_GAME_NATIVE_PREDRAW_LEADING_EMPTY_SOURCE_ORDINAL",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "requested_feature_id": null,
+  "feature_work_key": "DX11:NATIVE_GAME_FIRST_RASTER_COLOR_Z_STENCIL_SOURCE_ORDER",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "903e10e8b444bbd4c9094f390503b02cff825def",
+  "source_change_sha": "eaee1f978a19c6669d01b49baaaea1a8090e7315",
+  "material_result_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+  "validation_bearing_result_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+  "result_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+  "implementation_commits": [
+    "eaee1f978a19c6669d01b49baaaea1a8090e7315"
+  ],
+  "repair_commits": [
+    "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_main_stencil_clear.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_pre_draw_leading_empty_probe_01107.cpp",
+    "tools/test_dx11_pre_draw_leading_empty_01107.py",
+    "tools/test_dx11_pre_draw_depth_clear_00734.py",
+    "tools/test_dx11_pre_draw_stencil_clear_01101.py",
+    "tools/test_dx11_pre_draw_z_stencil_01102.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve actual game-native full-frame menu/car/race initial RTV and D32 source clear chronology after leading successful pixel-neutral D3D9 Draw/DrawIndexed calls, across absolute ColorFill source epochs, without admitting missing Draws or foreign depth owners.",
+    "acceptance_items": [
+      {
+        "id": "source_ordinal_to_predraw_native_color_depth",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_LEADING_EMPTY_DRAW_SOURCE_TO_NATIVE_FIRST_RTV_D32",
+        "expected_behavior": "Track exactly contiguous leading no-pixel game Draw ordinals, then replay genuine TARGET|Z|STENCIL and standalone Z clear pixels before first native raster; handle nonzero ColorFill game epoch."
+      },
+      {
+        "id": "postdraw_gap_depth_identity_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "PIXEL_PARITY_AND_SOURCE_OWNER_FAIL_CLOSED",
+        "expected_behavior": "Reject skipped Draw ordinals, stopped or GPU-submitted batches and foreign COM depth; retain atomic ordered main-owner color/Z tiles and untouched original D3D9Ex gamepad/FFB fallback."
+      },
+      {
+        "id": "same_sha_five_mandatory_push_gates",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_SOURCE_BUILD_AND_ARCHITECTURE",
+        "expected_behavior": "All five mandatory push workflow gates complete successfully on the same validation-bearing source+repair SHA; runtime Quest3/VDXR remains explicitly untested."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_D3D9_LEADING_ZERO_PIXEL_SOURCE_DRAW",
+      "EXACT_SOURCE_EPOCH_AND_MAIN_DEPTH_PROOF",
+      "ORDERED_NATIVE_RTV_D32_FIRST_RASTER_REPLAY",
+      "ORIGINAL_D3D9EX_FAIL_CLOSED_FALLBACK"
+    ],
+    "batch_components": [
+      "GAME_CPP_SOURCE_EPOCH_ADMISSION_AND_D3D9_CLEAR_HOOK_INTEGRATION",
+      "PRODUCTION_HEADER_CXX_PIXEL_COLOR_DEPTH_AND_FOREIGN_OWNER_PROBE",
+      "SOURCE_GRAPH_NEGATIVE_ORACLE_AND_CAUSAL_CI_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "GitHub Fast exact-SHA run 40469706537 success: 01107 compiled C++ production-header source Draw ordinal and exact native color/Z pixel parity fixture, including nonzero ColorFill source epoch; static real D3D9->DX11 hook graph PASS.",
+      "negative_regression": "Compiled 01107 C++ test rejects missed game Draw ordinal, foreign depth owner, post-first-GPU-Draw pre-clear and stopped batch. Inherited 00734/01101/01102 source-graph oracles retain destructive missing-ordinal, canonical depth and Z seed negatives.",
+      "component_integration": "GameNativeFrameBatch sourceEpochStart / leadingEmptySourceDraws -> live_game_frame_bridge preserve_game_partial_target_clear and observe_game_depth_clear -> preDrawFills / preDrawDepth genuine first D3D11 Draw replay; original game Render/FFB/inputs unaffected."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "PASS_EXACT_SHA build/source-only; no actual live original OutRun menu, vehicle selection, race/HMD frame published or visually inspected, no FPS/FFB/input runtime observation. Source gap fix is not full DX11 renderer completion.",
+    "activation_guard_and_fallback": "Original D3D9Ex remains authoritative for foreign depth/RT owners, noncontiguous source Draws, stopped native batch, capacity or missing GPU output; DXVK unchanged.",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:NATIVE_GAME_FIRST_RASTER_COLOR_Z_STENCIL_SOURCE_ORDER"
+    ]
+  },
+  "acceptance_results": {
+    "source_ordinal_to_predraw_native_color_depth": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_frame_batch.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_pre_draw_leading_empty_probe_01107.cpp",
+        "tools/test_dx11_pre_draw_leading_empty_01107.py"
+      ],
+      "validation_command": "DX11 Fast completed/success push 40469706537 on 77c5557e3e69f44b061db251f2f80cb6f0fb2a7f; 01107 production-header C++ pixel oracle and source graph checker."
+    },
+    "postdraw_gap_depth_identity_original_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_pre_draw_leading_empty_probe_01107.cpp",
+        "tools/test_dx11_pre_draw_depth_clear_00734.py",
+        "tools/test_dx11_pre_draw_stencil_clear_01101.py",
+        "tools/test_dx11_pre_draw_z_stencil_01102.py"
+      ],
+      "validation_command": "DX11 Fast completed/success push 40469706537 on exact SHA after actual 00734 assertion failure in first eaee1f978a19c6669d01b49baaaea1a8090e7315 run 40468420248; preserved foreign owner/missed ordinal and canonical Z fail-closed negatives."
+    },
+    "same_sha_five_mandatory_push_gates": {
+      "status": "PASS_EXACT_SHA",
+      "sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706537",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706486",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706507",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706479",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706494"
+      ],
+      "validation_command": "Five mandatory GitHub push Actions completed/success at exact 77c5557e3e69f44b061db251f2f80cb6f0fb2a7f; no HMD/game session and C6 does not revalidate source."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40469706537,
+      "head_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706537"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40469706486,
+      "head_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706486"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40469706507,
+      "head_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706507"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40469706479,
+      "head_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706479"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40469706494,
+      "head_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40469706494"
+    }
+  ],
+  "pipeline": {
+    "C0": "GITHUB_HEAD_903e10_POLICY_OWNER_INSPECTED",
+    "C1": "SOURCE_EPOCH_GAP_TARGET_Z_STENCIL_LEADING_EMPTY_BLOCKER",
+    "C2": "ACTUAL_CPP_SOURCE_AND_PIXEL_REGRESSION_eaee1f978a19c6669d01b49baaaea1a8090e7315",
+    "C3": "PASS_ALL_FIVE_EXACT_SHA_PUSH_GATES_77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+    "C4": "VALIDATION_BEARING_CAUSAL_REPAIR_77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+    "C5": "NOT_REQUESTED_NO_PACKAGE",
+    "C6": "SEPARATE_DOCS_ONLY_AFTER_EXACT_SHA_PASS"
+  },
+  "previous_hold_reason": "NONE",
+  "run_record_recovery": "Not a past PASS recovery: original substantive code and three inherited static validator assertion repairs under same 01107; final run evidence read live from GitHub, without any CI bypass or HMD assertion.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "terminal_gameplay_verified": false,
+  "score_change": 0,
+  "score_note": "Same native full-frame feature source stage/ordinal gap. CI legacy assertion repair, same task retry and C6 do not earn independent score. GitHub scoreboard latest must remain authoritative; no phantom user-visible game runtime validation.",
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "77c5557e3e69f44b061db251f2f80cb6f0fb2a7f",
+  "c6_does_not_revalidate_source": true,
+  "runtime_note": "Original OutRun x86, Quest 3/VDXR, game menu/car/race GPU frame, input, FFB and framerate not observed by user/HMD; workflow success only, RUNTIME_VALIDATION=UNTESTED."
+}
