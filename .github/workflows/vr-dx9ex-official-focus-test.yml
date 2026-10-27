@@ -33,6 +33,8 @@ on:
       - 'src/vr/game/sprite_queue_tail_proof.hpp'
       - 'tools/verify_vr_abc_goal_c.py'
       - 'tools/verify_vr_r26_review_apply_20261027.py'
+      - 'src/vr/game/outrun_renderer.cpp'
+      - 'tools/verify_dx9ex_c993_native_span.py'
       - 'tools/verify_vr_f11_eye_viewport.py'
       - 'tools/verify_dx9ex_r84_lens_source.py'
       - 'tools/tests/f11_eye_viewport_harness.cpp'
@@ -79,6 +81,12 @@ jobs:
         run: |
           python tools/verify_vr_r26_review_apply_20261027.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex review 01516/01521 regression failed' }
+
+      - name: Guard exact C993 native c64 source length
+        shell: pwsh
+        run: |
+          python tools/verify_dx9ex_c993_native_span.py
+          if ($LASTEXITCODE -ne 0) { throw 'Lens c64 source-span guard failed' }
 
       - name: Check C993 lens source and original flare preservation
         shell: pwsh
