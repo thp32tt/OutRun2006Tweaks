@@ -2714,6 +2714,7 @@ int main(int argc, char** argv)
         std::uint32_t cachedMenuGameState = 0xFFFFFFFFu;
         float cachedMenuScale = -1.0f;
         bool cachedMenuLetterbox = false;
+        std::uint64_t cachedMenuCaptureGeneration = 0;
         bool awaitingFirstGameplayStereo = false;
         XrPosef menuProjectionAnchor{};
         menuProjectionAnchor.orientation.w = 1.0f;
@@ -3562,11 +3563,17 @@ int main(int argc, char** argv)
                     // change must recompose the same captured menu image.
                     const bool currentMenuLetterbox =
                         R23GameMenuIsLetterboxed(compositor.hwnd_);
+                    const std::uint64_t currentMenuCaptureGeneration =
+                        compositor.captureOutputGeneration_;
                     if (cachedMenuGameState != clientGameState ||
-                        cachedMenuScale != R23ConfiguredMenuScale)
+                        cachedMenuScale != R23ConfiguredMenuScale ||
+                        cachedMenuCaptureGeneration !=
+                            currentMenuCaptureGeneration)
                     {
                         cachedMenuGameState = clientGameState;
                         cachedMenuScale = R23ConfiguredMenuScale;
+                        cachedMenuCaptureGeneration =
+                            currentMenuCaptureGeneration;
                         cachedMenuProjectionValid = false;
                     }
                     // Review 01490: an accepted letterbox-only config change

@@ -2061,8 +2061,78 @@ namespace
 
         bool BindCaptureOutput(bool initial)
         {
-            if(HWND replacement=FindGameWindow(gamePid_))hwnd_=replacement;if(!IsWindow(hwnd_))return false;targetMonitor_=MonitorFromWindow(hwnd_,MONITOR_DEFAULTTONEAREST);if(!targetMonitor_)return false;ReleaseCom(duplication_);ReleaseCom(output5_);ReleaseCom(output1_);
-            IDXGIDevice*dxgi=nullptr;if(FAILED(device_->QueryInterface(__uuidof(IDXGIDevice),reinterpret_cast<void**>(&dxgi)))||!dxgi)return false;IDXGIAdapter*adapter=nullptr;const HRESULT ah=dxgi->GetAdapter(&adapter);dxgi->Release();if(FAILED(ah)||!adapter)return false;IDXGIOutput*selected=nullptr;DXGI_OUTPUT_DESC desc{};for(UINT i=0;;++i){IDXGIOutput*out=nullptr;if(adapter->EnumOutputs(i,&out)==DXGI_ERROR_NOT_FOUND)break;DXGI_OUTPUT_DESC d{};out->GetDesc(&d);if(d.Monitor==targetMonitor_){selected=out;desc=d;break;}out->Release();}adapter->Release();if(!selected)return false;selected->QueryInterface(__uuidof(IDXGIOutput1),reinterpret_cast<void**>(&output1_));selected->QueryInterface(__uuidof(IDXGIOutput5),reinterpret_cast<void**>(&output5_));selected->Release();if(!output1_)return false;outputDesktop_=desc.DesktopCoordinates;sdrWhiteScale_=QuerySdrWhiteScale(targetMonitor_);haveFrame_=false;stereoSourceValid_=false;lastCapturePresentQpc_=0;lastCapturePresentQpcLow_=0;return RecreateDuplication(initial);
+            if (HWND replacement = FindGameWindow(gamePid_))
+                hwnd_ = replacement;
+            if (!IsWindow(hwnd_))
+                return false;
+            const HMONITOR nextMonitor =
+                MonitorFromWindow(hwnd_, MONITOR_DEFAULTTONEAREST);
+            if (!nextMonitor)
+                return false;
+
+            targetMonitor_ = nextMonitor;
+
+            // Rebinding retires the previous Desktop Duplication ownership
+            // before any fallible DXGI query/enumeration. A failure after the
+            // old duplication is released must never leave old pixels marked
+            // available for a different or unbound output.
+            haveFrame_ = false;
+            stereoSourceValid_ = false;
+            lastCapturePresentQpc_ = 0;
+            lastCapturePresentQpcLow_ = 0;
+            if (++captureOutputGeneration_ == 0)
+                ++captureOutputGeneration_;
+
+            ReleaseCom(duplication_);
+            ReleaseCom(output5_);
+            ReleaseCom(output1_);
+
+            IDXGIDevice* dxgi = nullptr;
+            if (FAILED(device_->QueryInterface(
+                    __uuidof(IDXGIDevice),
+                    reinterpret_cast<void**>(&dxgi))) || !dxgi)
+                return false;
+
+            IDXGIAdapter* adapter = nullptr;
+            const HRESULT ah = dxgi->GetAdapter(&adapter);
+            dxgi->Release();
+            if (FAILED(ah) || !adapter)
+                return false;
+
+            IDXGIOutput* selected = nullptr;
+            DXGI_OUTPUT_DESC desc{};
+            for (UINT i = 0;; ++i)
+            {
+                IDXGIOutput* out = nullptr;
+                if (adapter->EnumOutputs(i, &out) == DXGI_ERROR_NOT_FOUND)
+                    break;
+                DXGI_OUTPUT_DESC d{};
+                out->GetDesc(&d);
+                if (d.Monitor == targetMonitor_)
+                {
+                    selected = out;
+                    desc = d;
+                    break;
+                }
+                out->Release();
+            }
+            adapter->Release();
+            if (!selected)
+                return false;
+
+            selected->QueryInterface(
+                __uuidof(IDXGIOutput1),
+                reinterpret_cast<void**>(&output1_));
+            selected->QueryInterface(
+                __uuidof(IDXGIOutput5),
+                reinterpret_cast<void**>(&output5_));
+            selected->Release();
+            if (!output1_)
+                return false;
+
+            outputDesktop_ = desc.DesktopCoordinates;
+            sdrWhiteScale_ = QuerySdrWhiteScale(targetMonitor_);
+            return RecreateDuplication(initial);
         }
 
         bool RecreateDuplication(bool initial)
@@ -2281,6 +2351,7 @@ namespace
         DWORD gamePid_ = 0;
         HANDLE gameProcess_ = nullptr;
         HMONITOR targetMonitor_ = nullptr;
+        std::uint64_t captureOutputGeneration_ = 1;
         RECT outputDesktop_{};
         IDXGIOutput1* output1_ = nullptr;
         IDXGIOutput5* output5_ = nullptr;
