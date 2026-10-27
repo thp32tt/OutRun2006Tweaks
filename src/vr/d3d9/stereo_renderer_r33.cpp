@@ -1167,8 +1167,8 @@ namespace OutRunVRStereo
                     spdlog::info(
                         "VR RIVAL R33 RAW C64 FENCE: hits={} coherent={} mode={} age={} physicalNode={} physicalEpoch={} rawNode={} rawEpoch={} rawProducer={} shaderMatch={} poseMatch={}",
                         n, coherentRaw ? 1 : 0,
-                        sameRawNode ? "EXACT_NODE" :
-                            (coherentRaw ? "SHARED_RIVAL_BATCH" : "REJECT"),
+                        sameRawNode && coherentRaw
+                            ? "EXACT_NODE" : "REJECT",
                         rawAge, rankBeforeLeft.queueNode,
                         rankBeforeLeft.queueEpoch,
                         rankRawBeforeLeft.queueNode,
