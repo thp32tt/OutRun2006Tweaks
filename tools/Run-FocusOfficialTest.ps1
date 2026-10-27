@@ -70,7 +70,6 @@ try {
         '-MirrorPreserveAspect=false',
         '-UnifiedEyeMenuSource=false','-AntiAliasing=2',
         '-Hud1080pReference=true','-HudScale=0.55',
-        '-HudLogicalWidth=1920','-HudLogicalHeight=1080',
         '-MenuScale=1.00','-CullingUnionMarginDegrees=8.0'
     )
     @("sourceSha=$(Get-Content (Join-Path $root 'SOURCE_SHA.txt') -ErrorAction SilentlyContinue)",
