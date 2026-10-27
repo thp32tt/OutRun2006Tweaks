@@ -367,5 +367,49 @@
     "unfinished_task_policy": "keep existing task/feature ID and active owner lease; no new independently scored microtask",
     "external_controller_adoption": "NOT_VERIFIED",
     "policy_update_credit": 0
+  },
+  "user_override_20261028_raw_visual": {
+    "status": "ACTIVE",
+    "effective_date_kst": "2026-10-28",
+    "latest_user_goal": "DISPLAY_EXPERIMENTAL_NATIVE_D3D11_GAME_PIXELS_EVEN_IF_VISUALLY_WRONG",
+    "supersedes": "full-scene-fidelity-required-before-any-visible diagnostic",
+    "native_vs_compatibility": "Native D3D11 GPU Draw/pixels must be evidenced; D3D9Ex->D3D11 OpenXR host is not native game renderer.",
+    "mode": "OPT_IN_DIAGNOSTIC_ONLY_DEFAULT_OFF",
+    "name": "DX11_RAW_VISUAL_DIAGNOSTIC",
+    "allowed_visual_mismatch": [
+      "partial geometry",
+      "wrong fog/no fog",
+      "wrong material/texture/colors",
+      "wrong depth/alpha",
+      "incomplete menu/race scene"
+    ],
+    "hard_safety_guards": [
+      "valid live source and resource COM identity",
+      "bounded buffer/vertex/index reads",
+      "no invalid GPU states/resource hazard",
+      "correct device/reset/fence ownership",
+      "original D3D9Ex render/input/FFB preserved",
+      "DXVK and DX9Ex branches unchanged",
+      "no global game Fog change"
+    ],
+    "first_source_action": "Implement opt-in draw admission for observed Fog visual mismatch only, with original state/caps logs and semantic deviation marker; create separately owned diagnostic GPU output/region presenting partial native pixels without falsifying full-source coverage.",
+    "first_test_package": [
+      "RUN_DX11_RAW_VISUAL.cmd",
+      "RUN_DX9EX_CONTROL.cmd",
+      "build SHA identity",
+      "log origin and skipped predicates",
+      "actual native GPU Draw counter and published diagnostic pixel frame counter"
+    ],
+    "gates": "required five GitHub exact-SHA tests unchanged; pass does not imply desktop/HMD native runtime pass",
+    "first_runtime_goal": "actual native D3D11 GPU Draw >0 and visually attributable real game GPU pixels in user game run",
+    "later_goals": [
+      "full_source_coverage_and_correct_pixels",
+      "menu_car_race_correctness",
+      "distinct_native_left_right_OpenXR",
+      "Quest3_VDXR_runtime_validation"
+    ],
+    "task_policy": "continue same unfinished feature and owner lease; no new independent score for guard/retry/review",
+    "external_controller_adoption": "NOT_VERIFIED",
+    "policy_only_score_change": 0
   }
 }
