@@ -4929,8 +4929,21 @@ namespace OutRunVRStereo
                 // Diagnostics only: R13 can intentionally mask the tracked
                 // shader during a fragile effect. A live VS by itself is
                 // never permission to borrow a shader/c64 epoch or reroute
-                // an exact result draw. Keep the established native fallback.
-                if (Settings::VRTelemetry && R30IsExactResultHudDraw())
+                // an exact result/rival draw. Keep the established fallback
+                // until live runtime evidence proves a stale-negative cache.
+                const auto command =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                const bool exactRival =
+                    Settings::VRTelemetry &&
+                    command.scope ==
+                        OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                    command.producer ==
+                        OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
+                    command.queued && command.queueNode &&
+                    command.queueEpoch != 0 &&
+                    OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
+                if (Settings::VRTelemetry &&
+                    (R30IsExactResultHudDraw() || exactRival))
                 {
                     static std::atomic<std::uint64_t> cacheZeroHits{ 0 };
                     const auto n = cacheZeroHits.fetch_add(
@@ -4940,16 +4953,27 @@ namespace OutRunVRStereo
                         IDirect3DVertexShader9* liveVs = nullptr;
                         const HRESULT vsHr =
                             device->GetVertexShader(&liveVs);
-                        const auto command =
-                            OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
-                        spdlog::info(
-                            "VR R26 RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO cachedVS=0 liveVS={} vsHr=0x{:08X} producer={} queued={} node={} epoch={} poseSeq={} drawSerial={} hits={}",
-                            static_cast<const void*>(liveVs),
-                            static_cast<unsigned>(vsHr),
-                            OutRunVR::GameSemantic::Name(command.producer),
-                            command.queued, command.queueNode,
-                            command.queueEpoch, stereo.poseSequence,
-                            TopLevelDrawSerial() + 1u, n);
+                        if (exactRival)
+                        {
+                            spdlog::info(
+                                "VR RIVAL R30 SHADER CACHE ZERO: decision=FALLBACK cachedVS=0 liveVS={} vsHr=0x{:08X} queued={} node={} epoch={} poseSeq={} drawSerial={} hits={}",
+                                static_cast<const void*>(liveVs),
+                                static_cast<unsigned>(vsHr),
+                                command.queued, command.queueNode,
+                                command.queueEpoch, stereo.poseSequence,
+                                TopLevelDrawSerial() + 1u, n);
+                        }
+                        else
+                        {
+                            spdlog::info(
+                                "VR R26 RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO cachedVS=0 liveVS={} vsHr=0x{:08X} producer={} queued={} node={} epoch={} poseSeq={} drawSerial={} hits={}",
+                                static_cast<const void*>(liveVs),
+                                static_cast<unsigned>(vsHr),
+                                OutRunVR::GameSemantic::Name(command.producer),
+                                command.queued, command.queueNode,
+                                command.queueEpoch, stereo.poseSequence,
+                                TopLevelDrawSerial() + 1u, n);
+                        }
                         if (liveVs)
                             liveVs->Release();
                     }
