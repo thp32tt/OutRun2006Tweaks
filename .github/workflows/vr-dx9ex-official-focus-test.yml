@@ -36,6 +36,7 @@ on:
       - 'src/vr/game/sprite_queue_tail_proof.hpp'
       - 'tools/verify_vr_abc_goal_c.py'
       - 'tools/verify_vr_r26_review_apply_20261027.py'
+      - 'tools/verify_vr_r7_two_strip_coverage.py'
       - 'tools/audit_dx9ex_review_backlog.py'
       - 'src/vr/game/outrun_renderer.cpp'
       - 'tools/verify_dx9ex_c993_native_span.py'
@@ -90,6 +91,12 @@ jobs:
         run: |
           python tools/verify_vr_r26_review_apply_20261027.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex review 01516/01521 regression failed' }
+
+      - name: Verify R7 two-strip Clear union proof
+        shell: pwsh
+        run: |
+          python tools/verify_vr_r7_two_strip_coverage.py
+          if ($LASTEXITCODE -ne 0) { throw 'R7 two-strip depth-clear coverage failed' }
 
       - name: Guard exact C993 native c64 source length
         shell: pwsh
