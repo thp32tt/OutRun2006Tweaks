@@ -23,7 +23,7 @@ def admissible(t=target, d=depth, header=h, rect_union=union):
         "used > kMaxSourceRects" in rect_union,
         "gpu_chunk_size(" in rect_union,
         "remaining < kMaxGpuRegions" in rect_union,
-        "regions.data() + start, chunk" in t,
+        t.count("regions.data() + start, chunk") == 2,
         "regions.data() + start, chunk" in d,
         "nativeStencilDepthReady = !clearStencil ||" in t,
         "native_game_partial_depth_ready(" in t,
