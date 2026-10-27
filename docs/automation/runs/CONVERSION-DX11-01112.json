@@ -56,9 +56,9 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
-      "D3D9_SUCCESSFUL_CLEAR_SOURCE",
-      "CLIPPED_ZERO_PIXEL_UNION",
-      "D3D11_NATIVE_FRAME_STILL_PUBLISHABLE"
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "integration_path": [
       "SOURCE_CANONICAL_MAIN_RT_AND_MAIN_DSV_AUTHENTICATION",
@@ -77,7 +77,7 @@
       "component_integration": "real src/vr/d3d11/live_game_frame_bridge.cpp preserve_game_partial_target_clear + observe_game_depth_clear now classify full source union before optional native DSV/raster requirements; no new native Draw claim and no headset screenshot."
     },
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "Build only; no actual OutRun menu/car/race frame evidence or Quest 3/VDXR hardware test.",
+    "visible_frame_acceptance": "Build only; no actual OutRun menu/car/race frame evidence or Quest 3/VDXR hardware test. The integration path names source callsite -> D3D11 native Draw -> publishable output architecture only; no measured game pixels.",
     "activation_guard_and_fallback": "Existing opt-in native route, canonical COM/device/RT/DSV owner checks, no MRT, original D3D9Ex Draw/Present/input/FFB fallback, no DXVK changes.",
     "conflict_keys": [
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -87,15 +87,32 @@
   "acceptance_results": {
     "target_z_zero_pixel_frame_continuity": {
       "status": "PASS_BUILD",
-      "validation_command": "Compiled sparse positive pixel mask plus source graph checks; Fast 40505682714."
+      "validation_command": "Compiled sparse positive pixel mask plus source graph checks; Fast 40505682714.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_post_draw_sparse_clear_01110.cpp",
+        "tools/test_dx11_post_draw_sparse_clear_01110.py"
+      ]
     },
     "main_depth_owner_and_sparse_negative": {
       "status": "PASS_BUILD",
-      "validation_command": "128 offscreen source and 127+1 on-screen authentic source negative/mixed; malformed 128th atomic negative, Fast 40505682714."
+      "validation_command": "128 offscreen source and 127+1 on-screen authentic source negative/mixed; malformed 128th atomic negative, Fast 40505682714.",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_post_draw_clear_batch.hpp",
+        "tools/dx11_post_draw_sparse_clear_01110.cpp"
+      ]
     },
     "five_exact_sha_integrated_gates": {
       "status": "PASS_EXACT_SHA",
-      "validation_command": "Five push workflow runs on cc56319dd37d9661a8b1b42f7d8aed69c005627f all completed/success."
+      "validation_command": "Five push workflow runs on cc56319dd37d9661a8b1b42f7d8aed69c005627f all completed/success.",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682714",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505683011",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682576",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682691",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40505682566"
+      ]
     }
   },
   "mandatory_gate_results": [
@@ -150,5 +167,5 @@
     "native_published_frame_count": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "c6_note": "C6 is docs-only [skip ci] bookkeeping descendant, never source result. Material C++ implementation/result SHA cc56319d five exact push Gates PASS. No duplicate CI and no game/HMD runtime claim; source patch still requires real OutRun menu/car/race and Quest3/VDXR testing."
+  "c6_note": "C6 is docs-only [skip ci] bookkeeping descendant, never source result. Material C++ implementation/result SHA cc56319d five exact push Gates PASS. No duplicate CI and no game/HMD runtime claim; source patch still requires real OutRun menu/car/race and Quest3/VDXR testing. In 01113 same-feature failing CI, repair documented contract metadata to enumerated actual code integration path and per-acceptance existing artifact URLs; no new claims, no new task score, original exact-SHA 01112 validation and runtime UNTESTED unchanged."
 }
