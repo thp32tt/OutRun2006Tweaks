@@ -2857,6 +2857,7 @@ namespace OutRunVRStereo
         // the explicit F11 external overlay may enter this path. The normal
         // game/selector XYZ geometry remains owned by R26/R23.
         std::uint64_t R30ExternalImGuiStereoDraws = 0;
+        std::uint64_t R30ExternalImGuiEyeAttempts = 0;
         std::uint64_t R30AmbiguousFlatWorldDraws = 0;
         bool R30ExternalImGuiIdentity(const D3DMATRIX& m) noexcept
         {
@@ -3160,12 +3161,21 @@ namespace OutRunVRStereo
                     savedRt, savedDepth, state.viewport, nullptr, false);
             }
             restored = restoreRaster() && restored;
-            FrameHadDuplicatedDraw = true;
-            ++DuplicatedDraws;
-            ++NonWorldDuplicatedDraws;
-            ++R30SafeTwoEyeDraws;
-            ++R30ExternalImGuiStereoDraws;
-            if (R30ExternalImGuiStereoDraws == 1)
+            // Review 01499: a failed RIGHT setter/draw or raster restore did
+            // not submit a complete stereo pair. Preserve the existing
+            // caller HRESULT and Present poison; only fix false success
+            // accounting without replaying ImGui's LEFT draw.
+            const bool f11PairComplete = SUCCEEDED(rightHr) && restored;
+            const auto f11Attempt = ++R30ExternalImGuiEyeAttempts;
+            if (f11PairComplete)
+            {
+                FrameHadDuplicatedDraw = true;
+                ++DuplicatedDraws;
+                ++NonWorldDuplicatedDraws;
+                ++R30SafeTwoEyeDraws;
+                ++R30ExternalImGuiStereoDraws;
+            }
+            if (f11PairComplete && R30ExternalImGuiStereoDraws == 1)
                 spdlog::info(
                     "VR R30 F11 IMGUI SCREEN2D: exact external XYZ/orthographic UI "
                     "uses finite world-locked L/R HUD-plane projection at independent "
@@ -3175,16 +3185,15 @@ namespace OutRunVRStereo
             // Trace actual SOURCE and per-eye raster placement after the
             // landscape-game-source fix, without changing render routing.
             if (Settings::VRTelemetry &&
-                (R30ExternalImGuiStereoDraws <= 8 ||
-                 (R30ExternalImGuiStereoDraws &
-                  (R30ExternalImGuiStereoDraws - 1)) == 0))
+                (f11Attempt <= 8 ||
+                 (f11Attempt & (f11Attempt - 1)) == 0))
                 spdlog::info(
                     "VR F11 SOURCE-ASPECT PROBE: hits={} game={}x{} "
                     "viewport={},{},{},{} mode={} "
                     "eyeViewport={},{},{},{} "
                     "scissorL={},{},{},{} scissorR={},{},{},{} "
-                    "leftHr=0x{:08X} rightHr=0x{:08X} restored={}",
-                    R30ExternalImGuiStereoDraws,
+                    "leftHr=0x{:08X} rightHr=0x{:08X} restored={} pairComplete={}",
+                    f11Attempt,
                     BackBufferDesc.Width, BackBufferDesc.Height,
                     state.viewport.X, state.viewport.Y,
                     state.viewport.Width, state.viewport.Height,
@@ -3198,7 +3207,8 @@ namespace OutRunVRStereo
                     eyeScissors[1].left, eyeScissors[1].top,
                     eyeScissors[1].right, eyeScissors[1].bottom,
                     static_cast<unsigned>(leftHr),
-                    static_cast<unsigned>(rightHr), restored);
+                    static_cast<unsigned>(rightHr), restored,
+                    f11PairComplete ? 1 : 0);
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;
