@@ -50,7 +50,7 @@ namespace OutRunVRRenderer {struct Fov{float angleLeft=-.7f,angleRight=.7f,angle
 namespace OutRunVRF11Screen2D {struct EyeAffine{float scaleX=1,scaleY=1,offsetX=0,offsetY=0;};struct TangentBounds{float l,r,d,u;};bool Build(const TangentBounds*,EyeAffine*){return true;}}
 struct R30XyzrhwState {D3DVIEWPORT9 viewport;OutRunVRRenderer::Stereo stereo;bool hudWorldLockValid=false;D3DMATRIX baseProjection=Identity();float hudClipX[2][3]{},hudClipY[2][3]{},hudClipW[2][3]{};};
 bool FrameHadWorldStereo=true,FrameHadDuplicatedDraw=true,FrameRightDrawFailed=false;
-unsigned FrameStereoPoseSequence=7,DuplicatedDraws=0,NonWorldDuplicatedDraws=0,R30SafeTwoEyeDraws=0,R30ExternalImGuiStereoDraws=0;
+unsigned FrameStereoPoseSequence=7,DuplicatedDraws=0,NonWorldDuplicatedDraws=0,R30SafeTwoEyeDraws=0,R30ExternalImGuiStereoDraws=0,R30ExternalImGuiEyeAttempts=0;
 std::atomic<unsigned>CurrentVertexShaderIdentity{0};
 bool safeBase=true;bool R30SafeStereoBase(IDirect3DDevice9*){return safeBase;}
 bool R30ConfigureXyzrhwWorldEffect(IDirect3DDevice9*,const void*,unsigned,unsigned,R30XyzrhwState&,void*){return false;}
@@ -72,6 +72,9 @@ void restored(const IDirect3DDevice9&d,const IDirect3DDevice9&before){require(st
 int main(){
  for(int failure=0;failure<5;failure++){
   IDirect3DDevice9 d;auto before=d;int draws=0;
+  FrameHadDuplicatedDraw=false;FrameRightDrawFailed=false;
+  DuplicatedDraws=NonWorldDuplicatedDraws=R30SafeTwoEyeDraws=R30ExternalImGuiStereoDraws=R30ExternalImGuiEyeAttempts=0;
+  poisons=restoreFailures=fallbacks=0;
   if(failure==1)d.failViewport=1;
   if(failure==4)d.failViewport=2;
   auto hr=R30TryExternalImGuiIndexed(&d,[&](){
@@ -86,6 +89,9 @@ int main(){
   if(failure==2)require(hr==E_FAIL&&draws==1,"left draw failure must not duplicate");
   if(failure==3)require(hr!=E_NOTIMPL&&draws==2&&FrameRightDrawFailed,"right draw failure poisons without native replay");
   if(failure==4)require(hr!=E_NOTIMPL&&draws==1,"right viewport failure cannot replay completed left");
+  if(failure==0)require(DuplicatedDraws==1&&NonWorldDuplicatedDraws==1&&R30SafeTwoEyeDraws==1&&R30ExternalImGuiStereoDraws==1&&FrameHadDuplicatedDraw,"only successful F11 eye pair increments all stereo counters");
+  if(failure>=1)require(DuplicatedDraws==0&&NonWorldDuplicatedDraws==0&&R30SafeTwoEyeDraws==0&&R30ExternalImGuiStereoDraws==0&&!FrameHadDuplicatedDraw,"failed F11 attempt cannot count a binocular success");
+  if(failure==3||failure==4)require(R30ExternalImGuiEyeAttempts==1&&poisons==1&&fallbacks==1,"right failure preserves poison and one attempted pair");
   restored(d,before);
  }
  safeBase=false;IDirect3DDevice9 d;int draws=0;require(R30TryExternalImGuiIndexed(&d,[&](){++draws;return 0;})==E_NOTIMPL&&draws==0,"non-stereo path untouched");
