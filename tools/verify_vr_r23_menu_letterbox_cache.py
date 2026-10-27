@@ -29,7 +29,7 @@ def verify(text: str) -> None:
         "if (capture.available &&",
         "menuProjectionAnchorValid &&",
         "(!cachedMenuProjectionValid || capture.fresh ||",
-        "letterboxPolicyChanged))",
+        "letterboxPolicyChanged || menuFovChanged))",
         "if (R23RenderWorldLockedMenuProjection(",
         "cachedMenuProjectionViews = refreshed;",
         "cachedMenuLetterbox = currentMenuLetterbox;",
