@@ -100,8 +100,12 @@ def main():
                      "if (false || false ||", 1), r29, "outer guard"),
         (r33.replace("return drawCall(false);",
                      "return drawCall(true);", 1), r29, "mono bypass"),
-        (r33.replace("ProducerToken::RivalMarkerSprani",
-                     "ProducerToken::None", 1), r29, "rival producer"),
+        (r33.replace(
+            "OutRunVR::GameSemantic::CurrentRenderProducerToken() ==\\n"
+            "                        OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&",
+            "OutRunVR::GameSemantic::CurrentRenderProducerToken() ==\\n"
+            "                        OutRunVR::GameSemantic::ProducerToken::None &&", 1),
+         r29, "rival producer"),
         (r33.replace("CurrentProjectedMarker() != nullptr",
                      "true", 1), r29, "rival anchor"),
         (r33.replace("(exactProjectedRival ||",
