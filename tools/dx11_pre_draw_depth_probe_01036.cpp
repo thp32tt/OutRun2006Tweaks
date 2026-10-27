@@ -39,10 +39,13 @@ int main() {
  assert(d.count==2);
  d.discard();
  assert(d.count==0);
+ // An actual 32-GPU-tile overflow must contain 32 *non-fusible*
+ // overwrites. Consecutive equal-depth game pixels now combine exactly.
  for(unsigned i=0;i<33;++i) {
   Rect r={long(i%8),long((i/8)%6),long(i%8+1),long((i/8)%6+1)};
-  if(i<32)assert(d.record(7,11,13,8,6,0,0,8,6,1,&r,.3f));
-  else assert(!d.record(7,11,13,8,6,0,0,8,6,1,&r,.3f));
+  const float z=(i%2u)? .3f : .6f;
+  if(i<32)assert(d.record(7,11,13,8,6,0,0,8,6,1,&r,z));
+  else assert(!d.record(7,11,13,8,6,0,0,8,6,1,&r,z));
  }
  assert(d.count==32);
 }
