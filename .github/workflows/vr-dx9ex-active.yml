@@ -69,6 +69,7 @@ on:
       - 'tools/verify_vr_hook_graph.py'
       - 'tools/verify_vr_refactor_contract.py'
       - 'tools/verify_vr_r26_review_apply_20261027.py'
+      - 'tools/verify_vr_r7_two_strip_coverage.py'
       - 'tools/audit_dx9ex_review_backlog.py'
       - 'tools/verify_dx9ex_c993_native_span.py'
       - 'tools/verify_vr_f11_eye_viewport.py'
@@ -332,6 +333,7 @@ jobs:
             'tools/verify_vr_hook_graph.py',
             'tools/verify_vr_refactor_contract.py',
             'tools/verify_vr_r26_review_apply_20261027.py',
+            'tools/verify_vr_r7_two_strip_coverage.py',
             'tools/verify_dx9ex_c993_native_span.py',
             'tools/verify_vr_r84_focus_inventory.py',
             'tools/verify_vr_r29_owner_api_seam.py',
