@@ -5502,16 +5502,32 @@ namespace OutRunVRStereo
                 const auto n = lensClassSamples.fetch_add(1,
                     std::memory_order_relaxed) + 1;
                 if (n <= 32 || (n & (n - 1)) == 0)
+                {
+                    // Query only on sampled, telemetry-enabled physical
+                    // entries. The COM getter AddRefs the live VS; Release
+                    // it immediately and never touch renderer state.
+                    IDirect3DVertexShader9* liveVs = nullptr;
+                    const HRESULT vsHr = device->GetVertexShader(&liveVs);
+                    const bool shaderBound = SUCCEEDED(vsHr) && liveVs;
+                    if (liveVs)
+                        liveVs->Release();
+                    DWORD liveFvf = 0;
+                    const HRESULT fvfHr = device->GetFVF(&liveFvf);
                     spdlog::info(
                         "VR LENS R30 PHYSICAL CLASS: sample={} serial={} site={} "
                         "kind={} scope={} producer={} spriteQueue={} "
-                        "opaqueObject=UNLINKED shaderForm=UNOBSERVED",
+                        "vsHr=0x{:08X} vsBound={} fvfHr=0x{:08X} "
+                        "fvf=0x{:08X} opaqueObject=UNLINKED",
                         n, TopLevelDrawSerial(), site ? site : "unknown",
                         static_cast<unsigned>(screenKind),
                         OutRunVR::GameSemantic::Name(lensPhysicalScope),
                         static_cast<unsigned>(
                             OutRunVR::GameSemantic::CurrentRenderProducerToken()),
-                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                        static_cast<unsigned>(vsHr), shaderBound ? 1 : 0,
+                        static_cast<unsigned>(fvfHr),
+                        static_cast<unsigned>(liveFvf));
+                }
             }
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
