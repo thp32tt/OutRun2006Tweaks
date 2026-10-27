@@ -54,5 +54,9 @@ int main() {
     assert(!GameNativeMainStencilClear::may_ignore_pre_draw(
         true,true,true,false,true));
     batch.consume_depth_clear();
-    assert(!batch.can_seed_pre_draw_depth(true,false));
+    // The batch helper validates Draw ordinals and source continuity only.
+    // The live hook additionally requires the authentic pending full Z seed.
+    assert(!batch.depthClearPending);
+    assert(!(batch.depthClearPending &&
+             batch.can_seed_pre_draw_depth(true,false)));
 }
