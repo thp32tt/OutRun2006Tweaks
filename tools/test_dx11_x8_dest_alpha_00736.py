@@ -22,8 +22,9 @@ def linked(cpp, hdr):
         "s.frameBatch.reset();",
     )) and all(token in hdr for token in (
         "bool opaqueDestinationAlpha = false;",
-        "argb = 0u;\n        opaqueDestinationAlpha = false;\n        valid = false;",
+        "argb = 0u;\n        opaqueDestinationAlpha = false;\n        copySnapshotRequired = false;\n        valid = false;",
         "opaqueDestinationAlpha = opaqueBackbuffer;",
+        "copySnapshotRequired = false;",
         "opaqueDestinationAlpha ? 1.0f :",
         "native_write_mask(",
         "requested & ~std::uint32_t{0x08u}",
@@ -60,8 +61,10 @@ for before, after in (
 for before, after in (
     ("opaqueDestinationAlpha = opaqueBackbuffer;", "opaqueDestinationAlpha = false;"),
     ("opaqueDestinationAlpha ? 1.0f :", "float((argb >> 24) & 255u) * (1.0f/255.0f) :"),
-    ("opaqueDestinationAlpha = false;\n        valid = false;", "valid = false;"),
+    ("opaqueDestinationAlpha = false;\n        copySnapshotRequired = false;\n        valid = false;",
+     "copySnapshotRequired = false;\n        valid = false;"),
     ("requested & ~std::uint32_t{0x08u}", "requested"),
+    ("copySnapshotRequired = false;", "copySnapshotRequired = true;"),
 ):
     bad = helper.replace(before, after, 1)
     assert bad != helper and not linked(bridge, bad), before
