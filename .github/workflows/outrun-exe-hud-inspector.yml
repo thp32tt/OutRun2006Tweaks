@@ -33,6 +33,9 @@ on:
       # Ensure real pre-Draw native GPU replay probe repairs also run the
       # OpenXR/HUD Gate on the exact validation-bearing pushed source SHA.
       - 'tools/dx11_pre_draw_*_probe_*.cpp'
+      - 'tools/dx11_full_clear_resume_probe_00728.cpp'
+      # Authentic 17..128 source Clear regression must re-run this Gate at the exact repair SHA.
+      - 'tools/dx11_full_clear_resume_probe_00728.cpp'
       # Numbered SM3 live-game C++ source fixtures (e.g. indexed fan 01087)
       # must trigger every exact-SHA Gate after a causal compiler/test repair.
       - 'tools/dx11_sm3_*_010*.cpp'
