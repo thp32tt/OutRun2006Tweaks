@@ -85,6 +85,10 @@ assert 'VR RIVAL R33 RAW C64 FENCE:' in r33
 assert 'GetLastGameWvpProjectedMarker' in r33
 assert 'rawAnchorValid={}' in r33
 assert 'rawAnchorMatch={}' in r33
+assert 'VR RIVAL R33 OUTER GUARD:' in r33
+assert 'STATEBLOCK_RECORDING' in r33
+assert 'STEREO_NOT_WANTED' in r33
+assert 'NOT_BACKBUFFER' in r33
 
 # D3DX/FVF142 projected rival uses the same exact-source exception: cached
 # shader shadow may not veto the route, but live VS and exact FVF 0x142 remain
