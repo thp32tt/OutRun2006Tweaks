@@ -40,6 +40,7 @@ namespace Settings
     extern Setting<float> VRHudPlaneDistance;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
+    extern Setting<bool> VRDisableSkyGlow;
     extern Setting<bool> SkyGlowTwoStep;
 }
 
@@ -945,6 +946,15 @@ namespace OutRunVRStereo
         constexpr std::uint64_t R30NoSkyGlowEpoch =
             static_cast<std::uint64_t>(-1);
         std::uint64_t R30SkyGlowSceneCaptureEpoch = R30NoSkyGlowEpoch;
+        // Independent of Graphics.SkyGlowFactor: only the VR path opts out.
+        // This suppresses expensive R30 eye extraction/blur even if an
+        // existing user's desktop INI still sets the original factor to 4.
+        bool R30SkyGlowWanted() noexcept
+        {
+            return Settings::SkyGlowFactor > 0 &&
+                !(Settings::VREnabled && Settings::VRDisableSkyGlow);
+        }
+
         std::uint64_t R30SkyGlowScreenDrawEpoch = R30NoSkyGlowEpoch;
         std::uint64_t R30SkyGlowUiCaptureSkips = 0;
         bool R30FirstSkyGlowLogged = false;
@@ -1189,7 +1199,7 @@ namespace OutRunVRStereo
         bool R30CaptureSkyGlowSceneBeforeHud(
             IDirect3DDevice9* device)
         {
-            if (!device || Settings::SkyGlowFactor <= 0 ||
+            if (!device || !R30SkyGlowWanted() ||
                 !FrameHadWorldStereo || !FrameHadDuplicatedDraw ||
                 FrameRightDrawFailed || FrameStereoIncomplete ||
                 !BackBuffer || !RightEyeSurface)
@@ -1230,7 +1240,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device,
             OutRunVR::GameSemantic::RenderScope scope)
         {
-            if (!device || Settings::SkyGlowFactor <= 0 ||
+            if (!device || !R30SkyGlowWanted() ||
                 !IsGameDevice(device) || InternalStereoPass ||
                 !TargetIsBackBuffer() ||
                 !OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(scope) ||
@@ -1245,7 +1255,7 @@ namespace OutRunVRStereo
 
         bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
         {
-            if (!device || Settings::SkyGlowFactor <= 0 ||
+            if (!device || !R30SkyGlowWanted() ||
                 !StereoWanted() || !FrameHadWorldStereo ||
                 !FrameHadDuplicatedDraw || FrameRightDrawFailed ||
                 FrameStereoIncomplete || !BackBuffer ||
@@ -1538,7 +1548,7 @@ namespace OutRunVRStereo
             const RGNDATA* dirtyRegion)
         {
             R30MaybeLogTelemetry();
-            if (Settings::SkyGlowFactor > 0 &&
+            if (R30SkyGlowWanted() &&
                 StereoWanted() && FrameHadWorldStereo &&
                 FrameHadDuplicatedDraw &&
                 !FrameRightDrawFailed && !FrameStereoIncomplete)
