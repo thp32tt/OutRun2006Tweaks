@@ -109,6 +109,20 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertIn("CONFIDENCE_TOO_LOW",result["rejected"])
         self.assertEqual(list(self.gpt_out.glob("*/*/manifest.json")),[])
 
+    def test_stale_submitting_watchdog_recovers_to_staged(self):
+        import datetime as dt
+        binding,_=g.next_binding()
+        self.assertEqual(g.stage_submission(binding["task_id"]),"SUBMITTING")
+        st=g._state()
+        st["active"]["submitting_at"]=(dt.datetime.now(dt.timezone.utc)-dt.timedelta(seconds=g.SUBMISSION_STALL_SECONDS+5)).isoformat()
+        g._save_state(st)
+        result=g.recover_stale_active()
+        self.assertEqual(result["status"],"STALE_SUBMITTING_RECOVERED")
+        self.assertTrue(result["recovered"])
+        active=g.active_task()
+        self.assertEqual(active["status"],"STAGED")
+        self.assertEqual(active["last_presend_failure"],"STALE_SUBMITTING_WATCHDOG_RECOVERY")
+
     def test_stale_response_auto_retries_then_skips(self):
         import datetime as dt
         binding,_=g.next_binding()
