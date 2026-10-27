@@ -123,6 +123,7 @@ def verify_r9_query_color_skip(source: str) -> None:
         "ReadTrackedRenderState(",
         "device, D3DRS_COLORWRITEENABLE, colorWriteMask);",
         "if (!colorMaskKnown || colorWriteMask != 0)",
+        "InvalidateRightDepthStencilIfLeftMayWrite(device);",
         "R9MonoBackupGap = true;",
         "R9Poison(OutRunVR::StereoFailureOcclusionQueryActive,",
         "++R9OcclusionBackupSkips;",
@@ -132,6 +133,7 @@ def verify_r9_query_color_skip(source: str) -> None:
         assert item in query, item
     assert query.index("ReadTrackedRenderState(") < query.index(
         "if (!colorMaskKnown || colorWriteMask != 0)") < query.index(
+        "InvalidateRightDepthStencilIfLeftMayWrite(device);") < query.index(
         "R9MonoBackupGap = true;") < query.index(
         "R9Poison(OutRunVR::StereoFailureOcclusionQueryActive,") < query.index(
         "return true; // never duplicate a live occlusion-query Draw")
@@ -206,6 +208,9 @@ def main() -> None:
         "bool R9ReplayMonoDraw(", "if (!colorMaskKnown || colorWriteMask != 0)",
         "if (colorMaskKnown && colorWriteMask != 0)")
     rejects_in_function(verify_r9_query_color_skip, r9,
+        "bool R9ReplayMonoDraw(", "InvalidateRightDepthStencilIfLeftMayWrite(device);",
+        "/* RIGHT depth content erroneously trusted */")
+    rejects_in_function(verify_r9_query_color_skip, r9,
         "bool R9ReplayMonoDraw(", "R9MonoBackupGap = true;",
         "/* corrupt mono history allowed */")
     rejects_in_function(verify_r9_query_color_skip, r9,
@@ -214,7 +219,7 @@ def main() -> None:
     rejects_in_function(verify_r9_query_color_skip, r9,
         "bool R9ReplayMonoDraw(", "return true; // never duplicate a live occlusion-query Draw",
         "return false; // query accidentally replayed")
-    print("PASS R26/R7/R9: 01511,01513,01515,01516,01519,01520,01521 guards; 20 destructive mutations")
+    print("PASS R26/R7/R9: 01511,01513,01515,01516,01519,01520,01521 guards; 21 destructive mutations")
     print("RUNTIME_VALIDATION=UNTESTED")
 
 
