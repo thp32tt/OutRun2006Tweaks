@@ -640,7 +640,21 @@ def main():
         # R84 has a separately source-owned HUD plane ahead of C993.
         # Whole-file first-occurrence replacement can mutate that HUD
         # instead, falsely reporting that a broken lens guard survived.
-        if idx == 2 and old in (
+        # R33 also has a rank source probe *before* R33TryHud. A global
+        # first-occurrence mutation of the pre-LEFT veto hits that unrelated
+        # probe, leaving the actual physical stereo veto unchanged. Scope
+        # this negative mutation to the single native two-eye owner.
+        if idx == 7 and old.startswith(
+            "!OutRunVR::RankMarker::CoherentOriginalRankWvp("
+        ):
+            start = mod[7].index("R32ReviewOwnedResult R33TryHud(")
+            end = mod[7].index(
+                "template <typename ActualDraw, typename LowerR29Draw>", start)
+            owned = mod[7][start:end]
+            assert owned.count(old) == 1, (
+                "R33 pre-LEFT source veto must have one exact mutation site")
+            mod[7] = mod[7][:start] + owned.replace(old, new, 1) + mod[7][end:]
+        elif idx == 2 and old in (
             "!drawCommand.IsDirectWorldLensCentre()",
             "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)",
             "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),",
