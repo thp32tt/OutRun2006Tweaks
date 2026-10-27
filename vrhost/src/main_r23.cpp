@@ -2713,6 +2713,7 @@ int main(int argc, char** argv)
         bool cachedMenuProjectionValid = false;
         std::uint32_t cachedMenuGameState = 0xFFFFFFFFu;
         float cachedMenuScale = -1.0f;
+        bool cachedMenuLetterbox = false;
         bool awaitingFirstGameplayStereo = false;
         XrPosef menuProjectionAnchor{};
         menuProjectionAnchor.orientation.w = 1.0f;
@@ -3559,7 +3560,8 @@ int main(int argc, char** argv)
                     // Refresh the bounded game-adjacent INI cache even when
                     // Desktop Duplication has no new pixels. A saved F11 size
                     // change must recompose the same captured menu image.
-                    R23GameMenuIsLetterboxed(compositor.hwnd_);
+                    const bool currentMenuLetterbox =
+                        R23GameMenuIsLetterboxed(compositor.hwnd_);
                     if (cachedMenuGameState != clientGameState ||
                         cachedMenuScale != R23ConfiguredMenuScale)
                     {
@@ -3567,9 +3569,18 @@ int main(int argc, char** argv)
                         cachedMenuScale = R23ConfiguredMenuScale;
                         cachedMenuProjectionValid = false;
                     }
+                    // Review 01490: an accepted letterbox-only config change
+                    // changes title/menu source UVs even when menu scale,
+                    // game state and Desktop Duplication pixel freshness stay
+                    // unchanged. Rebuild only from an available capture; keep
+                    // the last valid pair if the refresh itself fails.
+                    const bool letterboxPolicyChanged =
+                        cachedMenuProjectionValid &&
+                        cachedMenuLetterbox != currentMenuLetterbox;
                     if (capture.available &&
                         menuProjectionAnchorValid &&
-                        (!cachedMenuProjectionValid || capture.fresh))
+                        (!cachedMenuProjectionValid || capture.fresh ||
+                         letterboxPolicyChanged))
                     {
                         std::array<XrCompositionLayerProjectionView, 2>
                             refreshed{};
@@ -3578,6 +3589,7 @@ int main(int argc, char** argv)
                                 clientGameState, refreshed))
                         {
                             cachedMenuProjectionViews = refreshed;
+                            cachedMenuLetterbox = currentMenuLetterbox;
                             cachedMenuProjectionValid = true;
                         }
                     }
