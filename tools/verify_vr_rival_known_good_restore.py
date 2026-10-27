@@ -39,6 +39,7 @@ assert 'VR RIVAL NATIVE QUEUE CONSUMER:' in ui
 assert 'RivalDx11NativeRoute = false' in ini
 assert 'UIScalingMode = 1' in ini
 assert "'-RivalDx11NativeRoute=false'" in run
+assert "'-UIScalingMode=1'" in run
 assert 'VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", false,' in settings
 # Keep rival on historical identity-eye/IPD math. Rank-only experiments must
 # remain guarded by exactOrdinalEyeCant, not RivalMarkerSprani token.
