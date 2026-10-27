@@ -1142,6 +1142,31 @@ namespace OutRunVRStereo
 				const auto&r=rects[i];
 				if(r.x1<=0&&r.y1<=0&&r.x2>=static_cast<LONG>(BackBufferDesc.Width)&&r.y2>=static_cast<LONG>(BackBufferDesc.Height))return true;
 			}
+			// Review 01514: a full depth/stencil clear split into exactly
+			// two contiguous full-height or full-width bands is still
+			// whole-surface. Avoid an unbounded/general rectangle-union
+			// algorithm on the 120-Hz Draw/Clear path; reject other tilings.
+			if(count==2)
+			{
+				const auto&a=rects[0],&c=rects[1];
+				const LONG width=static_cast<LONG>(BackBufferDesc.Width);
+				const LONG height=static_cast<LONG>(BackBufferDesc.Height);
+				const bool validA=a.x2>a.x1&&a.y2>a.y1;
+				const bool validC=c.x2>c.x1&&c.y2>c.y1;
+				if(validA&&validC)
+				{
+					const bool fullHeight=a.y1<=0&&c.y1<=0&&
+						a.y2>=height&&c.y2>=height;
+					const bool fullWidth=a.x1<=0&&c.x1<=0&&
+						a.x2>=width&&c.x2>=width;
+					if(fullHeight&&
+						((a.x1<=0&&c.x2>=width&&a.x2>=c.x1)||
+						 (c.x1<=0&&a.x2>=width&&c.x2>=a.x1)))return true;
+					if(fullWidth&&
+						((a.y1<=0&&c.y2>=height&&a.y2>=c.y1)||
+						 (c.y1<=0&&a.y2>=height&&c.y2>=a.y1)))return true;
+				}
+			}
 			return false;
 		}
 		bool DepthDescMatches(const D3DSURFACE_DESC&a,const D3DSURFACE_DESC&b)
