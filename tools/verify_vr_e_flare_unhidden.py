@@ -14,6 +14,8 @@ c = gfx[gfx.index('static void __cdecl DrawObjectAlphaCentre('):gfx.index('publi
 rv = ui[ui.index('static int __cdecl RivalMarker_sprani('):ui.index('static bool IsOriginalB9200GoalGlyph()')]
 checks = {
   'both original 570008 children drawn': 'VR LENS 570008 ORIGINAL BOTH DRAWN' in l and 'LensOuter570008Ordinal' in l and 'return;' not in l,
+  'CABE source is not mistaken for physical draw': 'physicalDraw=UNOBSERVED' in l and 'ambientScope={}' in l and 'spriteQueue={}' in l,
+  'C993 projected-or-native source admission logged without hiding': 'VR LENS C993 SOURCE ADMISSION:' in c and 'projected={} spriteQueue={}' in c and 'opaqueFlush=UNOBSERVED' in c,
   'original CABE alpha draw retained': 'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);' in l,
   'central C993 cannot be suppressed': 'VRLensFlareCentreEnabled.get()' not in c and 'IsProjectedSunScreenObject(objectId)' in c,
   'four unique sun objects preserved': all(v in c for v in ['0x570002','0x57000F','0x570010','0x570006']) is False or 'IsProjectedSunScreenObject(objectId)' in c,
