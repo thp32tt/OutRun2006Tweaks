@@ -23,7 +23,8 @@ def valid(s,h):
         "s.sourceDrawsThisFrame = 0u;" in body[k:],
         "s.eligibleThisFrame = 0u;" in body[k:],
         "s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)" in s,
-        "if (!rects || count > 16u) return false;" in h,
+        "kMaxFullSourceRects = 128u" in h,
+        "if (!rects || count > kMaxFullSourceRects) return false;" in h,
         "if (nextX==x) return false;" in h,
     ))
 assert valid(src,cov), "game Clear->full native Draw source link missing"
@@ -38,7 +39,7 @@ for old,new in (
     body=src[a:b];changed=body.replace(old,new,1)
     assert changed!=body and not valid(src[:a]+changed+src[b:],cov),old
 for old,new in (("if (nextX==x) return false;","if (false) return false;"),
-                ("if (!rects || count > 16u) return false;","if (false) return false;")):
+                ("if (!rects || count > kMaxFullSourceRects) return false;","if (false) return false;")):
     changed=cov.replace(old,new,1)
     assert changed!=cov and not valid(src,changed),old
 assert "python tools/test_dx11_full_clear_resume_00728.py" in wf

@@ -2,6 +2,7 @@
 #include "../src/vr/d3d11/native_game_clear_color.hpp"
 #include "../src/vr/d3d11/native_game_frame_batch.hpp"
 #include <cassert>
+#include <array>
 #include <cstdint>
 #include <limits>
 using namespace outrun::vr::dx11::live_game_frame;
@@ -18,6 +19,11 @@ constexpr bool coverage_contract() {
     const Rect incomplete[]{{-16,-16,319,490},{320,-16,700,490}};
     const Rect badOrder[]{{0,0,640,480},{640,400,10,479}};
     const Rect outside[]{{-100,-100,-1,-1}};
+    // 00762 legacy 17-rectangle rejection became incorrect when genuine
+    // 17..128 tiled whole Clears were integrated into the native main RTV/Z
+    // seed. Keep a real over-budget negative with 129 VALID full rects.
+    std::array<Rect,GameNativeClearCoverage::kMaxFullSourceRects+1u> tooMany{};
+    for(auto& rect : tooMany) rect = Rect{-16,-48,700,520};
     if (!full(nullptr,0u) || !full(oversize,1u) ||
         !full(verticalTiles,2u) || !full(horizontalTiles,2u) ||
         !full(unrelated,2u)) return false;
@@ -26,7 +32,9 @@ constexpr bool coverage_contract() {
     if (GameNativeClearCoverage::covers_whole(
             640u,480u,0u,0u,639u,480u,1u,oversize)) return false;
     if (GameNativeClearCoverage::covers_whole(
-            640u,480u,0u,0u,640u,480u,17u,oversize)) return false;
+            640u,480u,0u,0u,640u,480u,
+            static_cast<std::uint32_t>(tooMany.size()),
+            tooMany.data())) return false;
     return true;
 }
 constexpr bool native_game_draw_contract() {
