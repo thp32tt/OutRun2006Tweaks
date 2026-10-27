@@ -657,6 +657,9 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_post_draw_sparse_clear_01110.cpp -o /tmp/dx11_sparse_clear_01110 && /tmp/dx11_sparse_clear_01110
           # 01111 authentic 128 sparse pre-first-Draw TARGET|Z GPU replay:
           # atomic C++ color/depth ledger and D3D11.1 32-rect Z ClearView batches.
+          # 01113: full real D3D9 backbuffer copy starts a native menu frame.
+          python tools/test_dx11_full_copy_seed_01113.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_full_copy_seed_01113.cpp -o /tmp/dx11_full_copy_01113 && /tmp/dx11_full_copy_01113
           python tools/test_dx11_pre_draw_long_sparse_replay_01111.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_long_sparse_replay_01111.cpp -o /tmp/dx11_predraw_sparse_01111 && /tmp/dx11_predraw_sparse_01111
           # 01109: full-game post-Draw 128-rect TARGET/Z exact GPU union,

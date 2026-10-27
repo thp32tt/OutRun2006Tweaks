@@ -18,11 +18,15 @@ struct GameNativeClearColor {
     // initialize alpha as opaque for subsequent DESTALPHA blending.
     bool opaqueDestinationAlpha = false;
     bool valid = false;
+    // A real full D3D9 surface-copy seed requires its captured pixels at
+    // first Draw. Never silently replace lost pixels with a flat color.
+    bool copySnapshotRequired = false;
     constexpr void discard() noexcept {
         sourceDevice = backbufferIdentity = mainDepthIdentity = 0u;
         auxiliaryDepthCleared = false;
         argb = 0u;
         opaqueDestinationAlpha = false;
+        copySnapshotRequired = false;
         valid = false;
     }
     constexpr void record(std::uintptr_t device, std::uintptr_t backbuffer,

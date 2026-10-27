@@ -84,6 +84,7 @@
 #include "native_game_clear_color.hpp"
 #include "native_game_color_fill.hpp"
 #include "native_game_color_fill_seed.hpp"
+#include "native_game_full_copy_seed.hpp"
 #include "native_game_masked_draw.hpp"
 #include "native_game_fragment_reject.hpp"
 #include "native_game_scissor_clip.hpp"
@@ -5030,7 +5031,9 @@ bool upload_full_game_stream(ID3D11DeviceContext* context,
 bool replay_native_game_pre_draw_surface(State& s, ID3D11DeviceContext* ctx,
     std::uintptr_t owner, std::uintptr_t target,
     std::uint32_t w, std::uint32_t h, std::uint32_t fmt) noexcept {
-    if (!s.preDrawSurface.active()) return true;
+    // A full-source D3D9 copy has no valid synthetic color fallback.
+    // Without its exact snapshot the first GPU Draw MUST fail closed.
+    if (!s.preDrawSurface.active()) return !s.clearColor.copySnapshotRequired;
     if (!ctx || !s.backend.device() || !s.backend.color_texture() ||
         !s.preDrawSurface.matches(owner,target,w,h,fmt)) return false;
     {
@@ -5041,6 +5044,7 @@ bool replay_native_game_pre_draw_surface(State& s, ID3D11DeviceContext* ctx,
     }
     if (FAILED(s.backend.device()->GetDeviceRemovedReason())) return false;
     s.preDrawSurface.discard();
+    s.clearColor.copySnapshotRequired = false;
     return true;
 }
 bool replay_native_game_pre_draw_depth(State& s,ID3D11DeviceContext* ctx,
@@ -8695,7 +8699,6 @@ bool preserve_game_surface_copy(
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
-        if (s.sourceGameDevice != owner) return false;
 
         ComPtr<IDirect3DSurface9> backbuffer;
         ComPtr<IUnknown> actualIdentity, backbufferIdentity;
@@ -8729,9 +8732,39 @@ bool preserve_game_surface_copy(
             : GameNativeSurfaceCopyRegion::destination(
                 0,0,desc.Width,desc.Height,desc.Width,desc.Height);
         if (!changedRegion.valid) return false;
+        // Menu/vehicle/race may begin with a whole authentic D3D9 GPU
+        // StretchRect/UpdateSurface instead of TARGET Clear. Admit that
+        // exact source only if it completely overwrites the bound main RT0
+        // and no earlier game Draw or unmatched source write exists.
+        const bool wholeCopiedBackbuffer =
+            changedRegion.left == 0u && changedRegion.top == 0u &&
+            changedRegion.right == desc.Width &&
+            changedRegion.bottom == desc.Height;
+        ComPtr<IDirect3DSurface9> boundTarget;
+        ComPtr<IUnknown> boundIdentity;
+        const bool boundMain =
+            SUCCEEDED(game->GetRenderTarget(0u, boundTarget.GetAddressOf())) &&
+            boundTarget && SUCCEEDED(boundTarget.As(&boundIdentity)) &&
+            boundIdentity.Get() == backbufferIdentity.Get();
+        const bool eligibleOwner = GameNativeFrameBatch::admits_game_source(
+            owner, s.sourceGameDevice,
+            s.previousOutput.valid() ? s.previousOutput.device : 0u);
+        const bool bootstrapCopy = native_game_full_surface_copy_can_seed(
+            wholeCopiedBackbuffer, !s.clearColor.valid,
+            s.sourceDrawsThisFrame == 0u && !s.frameBatch.hasSourceDraw &&
+                s.frameBatch.accepts_full(s.sourceDrawsThisFrame),
+            s.frameBatch.submitted == 0u && !s.frameBatch.stopped &&
+                !s.pending && !s.cpuSurfaceReplay.active(),
+            eligibleOwner && (s.sourceGameDevice == 0u ||
+                              s.sourceGameDevice == owner),
+            boundMain, !s.preDrawSurface.active() &&
+                s.preDrawFills.count == 0u &&
+                s.preDrawDepth.count == 0u);
+        if (s.sourceGameDevice != owner && !bootstrapCopy) return false;
         const bool preDrawCopy = GameNativePreDrawSurface::capture_allowed(
             s.clearColor.matches(owner,
-                reinterpret_cast<std::uintptr_t>(actualIdentity.Get())),
+                reinterpret_cast<std::uintptr_t>(actualIdentity.Get())) ||
+                bootstrapCopy,
             s.frameBatch.accepts_full(s.sourceDrawsThisFrame),
             s.frameBatch.submitted==0u && !s.frameBatch.stopped,
             s.pending,s.cpuSurfaceReplay.active(),completingCpuWrite);
@@ -8883,6 +8916,28 @@ bool preserve_game_surface_copy(
                     reinterpret_cast<std::uintptr_t>(actualIdentity.Get()),
                     desc.Width,desc.Height,static_cast<std::uint32_t>(desc.Format),
                     s.surfaceReplayPixels)) return false;
+            if (bootstrapCopy) {
+                // Only AFTER an authentic full D3D9 readback is captured may
+                // the native first Draw acquire color ownership. The black
+                // placeholder is never a substitute for the full snapshot.
+                ComPtr<IDirect3DSurface9> depth;
+                ComPtr<IUnknown> depthIdentity;
+                std::uintptr_t mainDepth = 0u;
+                if (SUCCEEDED(game->GetDepthStencilSurface(
+                        depth.GetAddressOf())) && depth &&
+                    SUCCEEDED(depth.As(&depthIdentity)) && depthIdentity)
+                    mainDepth = reinterpret_cast<std::uintptr_t>(
+                        depthIdentity.Get());
+                s.clearColor.record(owner,
+                    reinterpret_cast<std::uintptr_t>(actualIdentity.Get()),
+                    0u, true, desc.Format == D3DFMT_X8R8G8B8, mainDepth);
+                s.clearColor.copySnapshotRequired = true;
+                s.sourceGameDevice = owner;
+                s.frameBatch.reset();
+                s.sourceModeKnown = false;
+                s.eligibleThisFrame = 0u;
+                if (++s.outputGeneration == 0u) ++s.outputGeneration;
+            }
             s.preDrawFills.discard(); // snapshot includes all earlier fills
             s.surfaceReplayBudget.note_success(desc.Width, desc.Height);
             // The successful original CPU/GDI completion is now part of the
