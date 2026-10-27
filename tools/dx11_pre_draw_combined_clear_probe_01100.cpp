@@ -89,8 +89,10 @@ int main() {
     GameNativePreDrawDepth stagedDepth{};
     for(int i=0;i<128;++i){
         Rect r{long(i%40),long(i/40),long(i%40+1),long(i/40+1)};
+        // Unique authentic Z per source tile is a negative compaction
+        // control: same-column vertical strips must NOT accidentally fuse.
         assert(stagedDepth.record(7,11,13,W,H,0,0,W,H,1,&r,
-                                  (i&1)? .5f : .6f));
+                                  float(i+1)/256.f));
     }
     const Rect novel[]={{0,10,3,11}};
     const auto priorDepth=stagedDepth.count;

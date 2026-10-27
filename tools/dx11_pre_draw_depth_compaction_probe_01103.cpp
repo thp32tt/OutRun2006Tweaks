@@ -100,8 +100,9 @@ int main() {
     colors.discard();depth.discard();
     for(long i=0;i<128;++i){
         Rect r{i%48,i/48,i%48+1,i/48+1};
+        // Different source Z at every pixel defeats vertical row coalescing.
         assert(depth.record(7,11,13,W,H,0,0,W,H,1,&r,
-                            (i&1L)? .65f : .75f));
+                            float(i+1)/256.f));
     }
     const Rect disjoint{0,15,1,16};
     assert(!GameNativePreDrawCombinedClear::record(
