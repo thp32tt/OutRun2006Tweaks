@@ -53,10 +53,27 @@ for token in (
 ):
     assert token in dpup, token
 assert 'const bool exactProjectedRival =' not in plain
-assert 'const bool exactProjectedRival =' in r30
+assert r30.count('const bool exactProjectedRival =') >= 2
 assert '!exactResult && !exactProjectedRival' in r30
 assert 'R30XyzrhwPrepareRejectName' in r30
 assert 'LIVE_VS_BOUND' in r30 and 'FVF_NOT_XYZRHW' in r30
+
+# D3DX/FVF142 projected rival uses the same exact-source exception: cached
+# shader shadow may not veto the route, but live VS and exact FVF 0x142 remain
+# mandatory before any eye draw.
+r62_a=r30.index('HRESULT R62TryFixedFunctionSpriteStereo(')
+r62_b=r30.index('HRESULT R62TryFixedFunctionSpriteIndexed(',r62_a)
+r62=r30[r62_a:r62_b]
+for token in (
+    'const bool exactProjectedRival =',
+    'ProducerToken::RivalMarkerSprani',
+    'sourceCommand.queued && sourceCommand.queueNode',
+    '!exactResult && !exactProjectedRival',
+    'device->GetVertexShader(&shader)',
+    'fvf != 0x00000142u',
+    'VR RIVAL R62 FIXEDFN PREPARE:',
+):
+    assert token in r62, token
 
 # Do not restore the old per-Draw rival Flush. Modern D3DX may defer an exact
 # rival command, so submit only while its current queue node/epoch/anchor are
@@ -73,4 +90,4 @@ for token in (
     assert token in ui, token
 assert 'VR RIVAL R84 RAW C64 PROOF:' in r84
 
-print('PASS rival known-good native-first + null-root + live DPUP probe + exact D3DX queue-boundary ownership; HMD UNTESTED')
+print('PASS rival known-good native-first + null-root + live DPUP/R62 probes + exact D3DX queue-boundary ownership; HMD UNTESTED')
