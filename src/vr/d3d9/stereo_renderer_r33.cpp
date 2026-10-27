@@ -49,6 +49,8 @@ namespace OutRunVRRenderer {
         OutRunVR::GameSemantic::RenderScope& semanticScope,
         std::uint64_t& queueNodeEpoch, const void*& queueNode,
         OutRunVR::GameSemantic::ProducerToken& producerToken) noexcept;
+    bool GetLastGameWvpProjectedMarker(
+        OutRunVR::GameSemantic::ProjectedMarkerInfo& marker) noexcept;
 }
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -1143,6 +1145,12 @@ namespace OutRunVRStereo
             const auto rankRawBeforeLeft = exactRankEye
                 ? captureRankOriginalWvp()
                 : OutRunVR::RankMarker::OriginalRankWvpSource{};
+            OutRunVR::GameSemantic::ProjectedMarkerInfo
+                rankRawProjectedMarker{};
+            const bool rankRawProjectedMarkerValid =
+                exactRankEye &&
+                OutRunVRRenderer::GetLastGameWvpProjectedMarker(
+                    rankRawProjectedMarker);
             if (R33TelemetryEnabled() && exactRankEye &&
                 rankBeforeLeft.producer ==
                     OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani)
@@ -1155,6 +1163,18 @@ namespace OutRunVRStereo
                 const bool coherentRaw =
                     OutRunVR::RankMarker::CoherentOriginalRankWvp(
                         rankBeforeLeft, rankRawBeforeLeft);
+                const bool rawAnchorMatch =
+                    rankRawProjectedMarkerValid &&
+                    rankRawProjectedMarker.valid &&
+                    rankBeforeLeft.marker.valid &&
+                    rankRawProjectedMarker.viewX ==
+                        rankBeforeLeft.marker.viewX &&
+                    rankRawProjectedMarker.viewY ==
+                        rankBeforeLeft.marker.viewY &&
+                    rankRawProjectedMarker.viewZ ==
+                        rankBeforeLeft.marker.viewZ &&
+                    rankRawProjectedMarker.exactOrdinalEyeCant ==
+                        rankBeforeLeft.marker.exactOrdinalEyeCant;
                 const std::uint64_t rawAge =
                     rankRawBeforeLeft.writtenDraw != 0 &&
                     rankBeforeLeft.drawSerial > rankRawBeforeLeft.writtenDraw
@@ -1165,7 +1185,7 @@ namespace OutRunVRStereo
                     1, std::memory_order_relaxed) + 1;
                 if (n <= 8 || (n & (n - 1)) == 0)
                     spdlog::info(
-                        "VR RIVAL R33 RAW C64 FENCE: hits={} coherent={} mode={} age={} physicalNode={} physicalEpoch={} rawNode={} rawEpoch={} rawProducer={} shaderMatch={} poseMatch={}",
+                        "VR RIVAL R33 RAW C64 FENCE: hits={} coherent={} mode={} age={} physicalNode={} physicalEpoch={} rawNode={} rawEpoch={} rawProducer={} shaderMatch={} poseMatch={} rawAnchorValid={} rawAnchorMatch={} currentAnchor=[{:.5f},{:.5f},{:.5f}] rawAnchor=[{:.5f},{:.5f},{:.5f}]",
                         n, coherentRaw ? 1 : 0,
                         sameRawNode && coherentRaw
                             ? "EXACT_NODE" : "REJECT",
@@ -1179,7 +1199,15 @@ namespace OutRunVRStereo
                             rankRawBeforeLeft.shaderEpoch ==
                                 rankBeforeLeft.shaderEpoch ? 1 : 0,
                         rankRawBeforeLeft.poseEpoch ==
-                            rankBeforeLeft.poseEpoch ? 1 : 0);
+                            rankBeforeLeft.poseEpoch ? 1 : 0,
+                        rankRawProjectedMarkerValid ? 1 : 0,
+                        rawAnchorMatch ? 1 : 0,
+                        rankBeforeLeft.marker.viewX,
+                        rankBeforeLeft.marker.viewY,
+                        rankBeforeLeft.marker.viewZ,
+                        rankRawProjectedMarker.viewX,
+                        rankRawProjectedMarker.viewY,
+                        rankRawProjectedMarker.viewZ);
             }
             // The full original +TIME family has a distinct physical owner
             // from GOAL, including direct numeric glyphs and queued sprites.
