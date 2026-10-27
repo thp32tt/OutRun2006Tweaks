@@ -551,7 +551,7 @@ namespace OutRunVRStereo
 					R9CurrentDepthCanMirror() && TrackedDepthStencil,
 					(flags & D3DCLEAR_ZBUFFER) != 0,
 					(flags & D3DCLEAR_STENCIL) != 0,
-					R9TrackedMainDepthHasStencil(),
+					FormatHasStencil(R9MainDepthDesc.Format),
 					RightDepthSynchronized, RightStencilSynchronized);
 				if (lineage.mainContentChanged)
 				{
@@ -559,7 +559,7 @@ namespace OutRunVRStereo
 						RightDepthSynchronized = false;
 					if (lineage.invalidateStencil)
 						RightStencilSynchronized = false;
-					R9NoteMainDepthContentWrite();
+					++R9MainDepthContentSerial;
 				}
 				return originalHr;
 			}

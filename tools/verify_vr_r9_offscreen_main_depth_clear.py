@@ -24,14 +24,14 @@ def safe_clear(s: str) -> bool:
         "R9CurrentDepthCanMirror() && TrackedDepthStencil,",
         "(flags & D3DCLEAR_ZBUFFER) != 0,",
         "(flags & D3DCLEAR_STENCIL) != 0,",
-        "R9TrackedMainDepthHasStencil(),",
+        "FormatHasStencil(R9MainDepthDesc.Format),",
         "RightDepthSynchronized, RightStencilSynchronized);",
         "if (lineage.mainContentChanged)",
         "if (lineage.invalidateDepth)",
         "RightDepthSynchronized = false;",
         "if (lineage.invalidateStencil)",
         "RightStencilSynchronized = false;",
-        "R9NoteMainDepthContentWrite();",
+        "++R9MainDepthContentSerial;",
         "return originalHr;",
     )
     pos = [s.find(x) for x in markers]
@@ -48,7 +48,7 @@ for name, old, bad in (
     ("lose stencil clear flag", "(flags & D3DCLEAR_STENCIL) != 0,", "true,"),
     ("lose right-depth invalidation", "RightDepthSynchronized = false;", "/* depth unchanged */"),
     ("lose right-stencil invalidation", "RightStencilSynchronized = false;", "/* stencil unchanged */"),
-    ("advance no content serial", "R9NoteMainDepthContentWrite();", "/* missing serial */"),
+    ("advance no content serial", "++R9MainDepthContentSerial;", "/* missing serial */"),
     ("lose original HRESULT", "return originalHr;", "return S_OK;"),
 ):
     assert old in clear, name+" test setup"
