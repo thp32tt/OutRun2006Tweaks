@@ -1539,8 +1539,6 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				return drawCall();
 			}
 
-			const bool occlusionActive=ActiveOcclusionQueries.load(std::memory_order_acquire)>0||
-				OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire);
 			DrawStereoState draw{};
 			if(!PrepareDuplicatedDraw(device,draw))
 			{
