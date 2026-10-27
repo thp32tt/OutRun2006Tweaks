@@ -30,7 +30,7 @@ def wired(b, h):
         # ARGB rects can fuse; capacity and owner failure stay transactional.
         "if (!covers(next, saved)) staged.entries[output++] = saved;" in rec,
         "if (output >= kCapacity) return false;" in rec,
-        "game_native_merge_ordered_overwrite(" in rec,
+        rec.count("game_native_merge_ordered_overwrite(") == 2,
         "staged.entries[output++] = next;" in rec,
         "*this = staged;" in rec,
     ))
