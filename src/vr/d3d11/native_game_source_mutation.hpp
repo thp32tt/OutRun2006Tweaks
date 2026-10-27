@@ -223,6 +223,12 @@ struct GameNativePreDrawFills {
             game_native_merge_ordered_overwrite(
                 staged.entries[output - 1u], next)) {
             staged.count = output;
+        } else if (game_native_merge_noninterfering_overwrite(
+                       staged.entries, output, next,
+                       [](const Fill& a, const Fill& b) constexpr {
+                           return a.argb == b.argb;
+                       })) {
+            staged.count = output;
         } else {
             if (output >= kCapacity) return false;
             staged.entries[output++] = next;

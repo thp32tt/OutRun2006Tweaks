@@ -81,7 +81,13 @@ struct GameNativePreDrawDepth {
                 staged.tiles[staged.count-1u].z==z &&
                 game_native_merge_ordered_overwrite(
                     staged.tiles[staged.count-1u],next);
-            if(!merged) {
+            const bool recovered = !merged &&
+                game_native_merge_noninterfering_overwrite(
+                    staged.tiles, staged.count, next,
+                    [](const Tile& a, const Tile& b) constexpr {
+                        return a.z == b.z;
+                    });
+            if(!merged && !recovered) {
                 if(retained>=kCapacity)return false;
                 if(staged.count==kCapacity)return false;
                 staged.tiles[staged.count++]=next;

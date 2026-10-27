@@ -639,6 +639,10 @@ jobs:
           # 01104 exact ordered source RTV/DSV rectangular fusion, real first-Draw GPU replay.
           python tools/test_dx11_pre_draw_tile_fusion_01104.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_tile_fusion_probe_01104.cpp -o /tmp/dx11_pre_draw_tile_fusion_01104 && /tmp/dx11_pre_draw_tile_fusion_01104
+          # 01105: interleaved original-game color/Z native GPU bands and
+          # strict overlap/overflow negative regression on first real Draw.
+          python tools/test_dx11_pre_draw_disjoint_bands_01105.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_disjoint_bands_probe_01105.cpp -o /tmp/dx11_disjoint_bands_01105 && /tmp/dx11_disjoint_bands_01105
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
           # Native L/R partial-depth GPU Draw is a separate non-evidence
