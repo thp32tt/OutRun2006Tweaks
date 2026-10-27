@@ -64,7 +64,8 @@ for before, after in (
     ("opaqueDestinationAlpha = false;\n        copySnapshotRequired = false;\n        valid = false;",
      "copySnapshotRequired = false;\n        valid = false;"),
     ("requested & ~std::uint32_t{0x08u}", "requested"),
-    ("copySnapshotRequired = false;", "copySnapshotRequired = true;"),
+    ("        copySnapshotRequired = false;\n        valid = false;",
+     "        copySnapshotRequired = true;\n        valid = false;"),
 ):
     bad = helper.replace(before, after, 1)
     assert bad != helper and not linked(bridge, bad), before
