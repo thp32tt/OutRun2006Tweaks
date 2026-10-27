@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R26+HUD exact source guards for DX9Ex reviews 01516 and 01521.
+"""R26+HUD exact source guards for DX9Ex reviews 01511, 01516 and 01521.
 
 Static regression and destructive mutations only: not a Quest3/GPU test.
 """
@@ -55,6 +55,15 @@ def verify_r7(source: str) -> None:
     assert "return false;" in prepare
 
 
+def verify_sbs(source: str) -> None:
+    fn = function_block(source, "bool ComposeSbs(")
+    assert fn.count("setupOk = SUCCEEDED(device->Set") == 25
+    assert "bool setupOk=true;" in fn
+    assert "const bool stateOk=setupOk&&SUCCEEDED(device->SetViewport(&full))" in fn
+    assert "success=leftOk&&rightOk&&SUCCEEDED(endHr);" in fn
+    assert "if(!restoreOk)NoteRestoreFailure(" in fn
+
+
 def rejects(check, source: str, before: str, after: str) -> None:
     assert before in source, "source mutation anchor missing: " + before
     mutant = source.replace(before, after, 1)
@@ -82,6 +91,7 @@ def main() -> None:
     r7 = R7_PATH.read_text(encoding="utf-8")
     verify_r30(r30)
     verify_r7(r7)
+    verify_sbs(r7)
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9NoteStereoDrawWithoutMonoBackup();", "/* missing R9 gap */")
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9NoteMainDepthContentWrite();", "/* missing R9 depth serial */")
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "return E_NOTIMPL;\n            }\n\n            // The first physical LEFT Draw", "return E_NOTIMPL;\n            }\n\n            R9NoteStereoDrawWithoutMonoBackup();\n            // The first physical LEFT Draw")
@@ -89,7 +99,9 @@ def main() -> None:
     rejects_in_function(verify_r7, r7, "HRESULT ExecuteStereoDraw(", "if(StereoWanted()&&TargetIsBackBuffer())", "if(StereoWanted()&&TargetIsBackBuffer()&&!occlusionActive)")
     rejects_in_function(verify_r7, r7, "HRESULT ExecuteStereoDraw(", "InvalidateRightDepthStencilIfLeftMayWrite(device);\n\t\t\t\treturn drawCall();", "/* omitted invalidation */\n\t\t\t\treturn drawCall();")
     rejects_in_function(verify_r7, r7, "bool PrepareDuplicatedDraw(", "ActiveOcclusionQueries.load(std::memory_order_acquire)>0", "false")
-    print("PASS R26 01521 R9 WVP fallthrough + 01516 R7 query-depth guard; 7 destructive mutations")
+    rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "const bool stateOk=setupOk&&SUCCEEDED(device->SetViewport(&full))", "const bool stateOk=SUCCEEDED(device->SetViewport(&full))")
+    rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "setupOk = SUCCEEDED(device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE)) && setupOk;", "device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE);")
+    print("PASS R26 01521 mono WVP + R7 01516 query-depth + 01511 SBS setup HRESULT; 9 destructive mutations")
     print("RUNTIME_VALIDATION=UNTESTED")
 
 
