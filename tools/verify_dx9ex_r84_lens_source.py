@@ -384,7 +384,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     c993 = hooks.split("static void __cdecl DrawObjectAlphaCentre(", 1)[1].split(
         "public:", 1)[0]
     for marker in (
-        "objectId == 0x570002",
+        "static_cast<unsigned>(objectId) == 0x570002u",
         "!OutRunVR::GameSemantic::QueueRenderActive()",
         "ScopedExactProducerSemantic semantic(",
         "ScopedRenderSemantic sunDrawScope(",
