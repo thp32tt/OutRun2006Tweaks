@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - test/dx9ex-final-20261027-visual-fps-repair
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
       - '.github/workflows/vr-dx9ex-active.yml' # Latest pair of focus CI workflows must validate one exact SHA.
@@ -69,6 +70,11 @@ jobs:
           if ($duplicates.Count -ne 1) { throw 'Invalid official INI: DriverSeatCarSpaceBasis must occur exactly once' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'HudScale = 0.55' -SimpleMatch -Quiet)) { throw 'HUD scale changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'AntiAliasing = 2' -SimpleMatch -Quiet)) { throw 'VR MSAA baseline changed unexpectedly' }
+          if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'PreserveLogicalBackBuffer = true' -SimpleMatch -Quiet)) { throw 'Final recovery logical UI source guard missing' }
+          if (-not (Select-String src/vr/settings.cpp -Pattern 'VRPreserveLogicalBackBuffer' -SimpleMatch -Quiet)) { throw 'Final recovery source setting missing' }
+          if (-not (Select-String src/vr/d3d9/ex_device_upgrade.cpp -Pattern 'Settings::VRPreserveLogicalBackBuffer ||' -SimpleMatch -Quiet)) { throw 'Final recovery CreateDevice guard missing' }
+          if (-not (Select-String tools/Run-FocusOfficialTest.ps1 -Pattern "'-SkyGlowFactor=4'" -SimpleMatch -Quiet)) { throw 'SkyGlow full-resolution regression detected' }
+          if (-not (Select-String tools/Run-FocusOfficialTest.ps1 -Pattern "'-PreserveLogicalBackBuffer=true'" -SimpleMatch -Quiet)) { throw 'Recovery launcher override missing' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'CullingUnionMarginDegrees = 8.0' -SimpleMatch -Quiet)) { throw 'Culling setting changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'DriverSeatView = false' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source INI' }
           if (-not (Select-String src/vr/settings.cpp -Pattern 'Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source defaults' }
