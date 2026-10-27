@@ -11,6 +11,7 @@
 #include "native_game_raw_gpu_capture_epoch.hpp"
 #include "native_game_raw_pixel_delta.hpp"
 #include "native_game_raw_draw_tile.hpp"
+#include "native_game_raw_draw_pair.hpp"
 
 namespace outrun::vr::dx11 {
 enum class NativeRawPreviewResult {
@@ -22,7 +23,7 @@ public:
     static constexpr UINT width = 256, height = 144;
     void reset() noexcept {
         staging_.Reset(); baseline_.Reset(); event_.Reset(); surface_.Reset();
-        preDrawArmed_ = false; armedSerial_ = 0; colorIdentity_ = nullptr;
+        drawPair_.reset();
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; lastDraws_ = 0;
         captureEpoch_.reset();
@@ -148,7 +149,7 @@ public:
         // Never infer a new GPU pixel from the post-Draw texture alone:
         // a clear or earlier native Draw may already have colored the region.
         // Discard any unpaired pre-copy (e.g. an aborted source submission).
-        preDrawArmed_ = false;
+        drawPair_.reset();
         return output;
     }
     void begin_real_native_draw(
@@ -162,24 +163,27 @@ public:
         }
         // One source-owned pair per frame; a GPU event still in flight blocks
         // allocation/reuse of BOTH before/after staging resources.
-        if (preDrawArmed_ || !captureEpoch_.can_queue(presentingSerial, pending_))
+        // A previous source Draw can fail *after* its BEFORE copy. Discard
+        // the unpaired capture before selecting a new genuine source Draw,
+        // or a later POST copy could falsely inherit the old baseline.
+        drawPair_.reset();
+        if (!captureEpoch_.can_queue(presentingSerial, pending_))
             return;
-        if (queue_before_draw(dev, ctx, color) == NativeRawPreviewResult::CopyQueued) {
-            preDrawArmed_ = true;
-            armedSerial_ = presentingSerial;
-            colorIdentity_ = color;
-        }
+        if (queue_before_draw(dev, ctx, color) == NativeRawPreviewResult::CopyQueued)
+            drawPair_.arm(presentingSerial, color);
     }
-    void sample_real_native_draw(
+    void abort_real_native_draw() noexcept { drawPair_.reset(); }
+    [[nodiscard]] bool sample_real_native_draw(
         IDirect3DDevice9* game, ID3D11Device* dev,
         ID3D11DeviceContext* ctx, ID3D11Texture2D* color,
         std::uint64_t presentingSerial) noexcept {
-        if (!preDrawArmed_) return;
-        preDrawArmed_ = false;
-        if (!game || game != gameOwner_ || dev != gpuOwner_ ||
-            !ctx || !color || color != colorIdentity_ ||
+        // Consume the source token exactly once, even on an invalid device.
+        // Never attribute pixels from a failed Draw to a later Draw.
+        if (!drawPair_.consume(presentingSerial, color) ||
+            !game || game != gameOwner_ || dev != gpuOwner_ ||
+            !ctx || !color ||
             ctx->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
-            armedSerial_ != presentingSerial || pending_) return;
+            pending_) return false;
         // D3D11 immediate-context order guarantees this GPU copy follows
         // exactly the original game's native Draw(s). The paired BEFORE copy
         // preceded that draw, using the identical, source-owned GPU box.
@@ -189,6 +193,7 @@ public:
         ctx->Flush();
         pending_ = true;
         captureEpoch_.queued(presentingSerial);
+        return true;
     }
 private:
     NativeRawPreviewResult queue_before_draw(
@@ -275,9 +280,7 @@ private:
     }
     Microsoft::WRL::ComPtr<ID3D11Texture2D> staging_, baseline_;
     D3D11_BOX region_{};
-    ID3D11Texture2D* colorIdentity_ = nullptr;
-    std::uint64_t armedSerial_ = 0;
-    bool preDrawArmed_ = false;
+    NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_;
     IDirect3DDevice9* gameOwner_ = nullptr;

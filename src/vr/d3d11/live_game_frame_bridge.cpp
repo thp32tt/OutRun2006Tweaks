@@ -5174,10 +5174,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         std::array<std::uint64_t, 11>& counters;
         unsigned& stage;
         bool& succeeded;
+        NativeRawVisualPreview& preview;
         ~RejectionAudit() noexcept {
-            if (!succeeded) ++counters[stage < counters.size() ? stage : 0u];
+            if (!succeeded) {
+                // SM3 may fail inside a grouped Draw after pre-copy; discard
+                // its incomplete source pair rather than splicing it to a
+                // subsequent successful shader-bound game Draw.
+                preview.abort_real_native_draw();
+                ++counters[stage < counters.size() ? stage : 0u];
+            }
         }
-    } rejectionAudit{s.liveSm3RejectStages, rejectionStage, submitted};
+    } rejectionAudit{s.liveSm3RejectStages, rejectionStage, submitted,
+                     s.rawPreview};
     try {
     if (!env_full_game_opt_in() || !game || !bytes ||
         !game_native_source_stride_valid(stride) ||
@@ -7124,9 +7132,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         ScopedNativeGameGpuTransferInputs savedInputs(
             gpuContext, s.backend.color_texture());
         ScopedNativeGameGpuTransferOutputs savedOutputs(gpuContext);
-        s.rawPreview.sample_real_native_draw(
-            game, s.backend.device(), gpuContext,
-            s.backend.color_texture(), s.presents);
+        if (s.rawPreview.sample_real_native_draw(
+                game, s.backend.device(), gpuContext,
+                s.backend.color_texture(), s.presents))
+            ++s.rawPreviewCopies;
     }
     ++s.eligible;
     if (s.eligibleThisFrame != (std::numeric_limits<UINT>::max)())
@@ -8028,10 +8037,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         // submit() has no original game COM parameter: use the non-owning
     // game-device identity captured by observe_source_device() under this
     // State mutex. It is reset at owner Present/Reset; no COM retention.
-    s.rawPreview.sample_real_native_draw(
-            reinterpret_cast<IDirect3DDevice9*>(s.sourceGameDevice),
-            s.backend.device(), gpuContext,
-            s.backend.color_texture(), s.presents);
+        if (s.rawPreview.sample_real_native_draw(
+                reinterpret_cast<IDirect3DDevice9*>(s.sourceGameDevice),
+                s.backend.device(), gpuContext,
+                s.backend.color_texture(), s.presents))
+            ++s.rawPreviewCopies;
     }
     return true;
 }
@@ -11268,8 +11278,6 @@ void before_game_present(IDirect3DDevice9* game,
                 game, presentBackbuffer.Get(), presentDesc, sourceRect,
                 dirtyRegion != nullptr, s.backend.device(), s.backend.context(),
                 s.backend.color_texture(), s.issued, rawChangedPixels);
-            if (status == NativeRawPreviewResult::CopyQueued)
-                ++s.rawPreviewCopies;
             if (status == NativeRawPreviewResult::VisibleGpuPixels) {
                 ++s.rawPreviewFrames;
                 spdlog::info(
