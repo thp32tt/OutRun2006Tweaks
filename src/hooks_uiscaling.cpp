@@ -4612,11 +4612,21 @@ class VRHudQueueSemanticBridge : public Hook
             if (n <= 8 || (n & (n - 1)) == 0)
             {
                 const auto* live = reinterpret_cast<const SpriteNode*>(node);
+                const auto rawAnimationFlags =
+                    live->kind_C != 0
+                    ? *reinterpret_cast<const std::uint32_t*>(
+                        reinterpret_cast<const std::uint8_t*>(live) + 0x60)
+                    : 0u;
                 spdlog::info(
-                    "VR RIVAL NATIVE QUEUE CONSUMER: hits={} node={} kind={} class={} projected={} epoch={}",
+                    "VR RIVAL NATIVE QUEUE CONSUMER: hits={} node={} kind={} class={} animFlags=0x{:08X} masked={} stateSave={} alternateState={} projected={} epoch={}",
                     n, node, live->kind_C,
                     live->kind_C == 0 ? "SPRITE_D3DX_OR_UP" :
-                                        "ANIMATION_QUAD_OR_MASK",
+                        ((rawAnimationFlags & 0x40000u) ? "ANIMATION_MASKED_42A800" :
+                                                        "ANIMATION_QUAD_42A3A0"),
+                    rawAnimationFlags,
+                    (rawAnimationFlags & 0x40000u) ? 1 : 0,
+                    (rawAnimationFlags & 0x100000u) ? 1 : 0,
+                    (rawAnimationFlags & 0x200000u) ? 1 : 0,
                     OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
                     OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
             }
