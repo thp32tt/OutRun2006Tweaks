@@ -2,13 +2,13 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01119",
   "production_id": "CONVERSION-DX11-01119",
-  "event_id": "CONVERSION-DX11-01119-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-01119-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01119",
-  "classification": "A_INCOMPLETE_LIVE_NATIVE_GAME_GPU_SOURCE_TO_PRESENT",
+  "classification": "A_SOURCE_COHESIVE_BATCH_AND_B_CAUSAL_GPU_EPOCH_OVERFLOW_REPAIR",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
   "status": "SOURCE_IMPLEMENTED_CI_PENDING",
@@ -89,7 +89,7 @@
     "C0_RECOVER": "PASS: latest d7cc3868 sealed 01118 five-gate success, no 01119 material commit found at start",
     "C1_REVIEW": "PASS: confirmed Present-time GPU pixel sampling after possible intervening native output mutations",
     "C2_IMPLEMENT": "DRAW-time GPU source snapshot, SM3/FVF integration, one-copy-per-epoch producer/consumer and portable regression",
-    "C3_VALIDATE": "PENDING five mandatory exact-SHA push Actions",
+    "C3_VALIDATE": "First exact-SHA a3c36e8 Fast 40571023226 FAILED: positive C++17 epoch max-uint64 Present serial equals reset sentinel; repaired runtime header with explicit everQueued bit, no weakening of tests; new exact SHA Gate PENDING.",
     "C4_COMMIT": "PENDING material GitHub commit",
     "C5_PACKAGE": "NOT_REQUIRED: diagnostic-only, no HMD/desktop distribution",
     "C6_STATE": "PENDING final exact-SHA Gate proof"
@@ -100,5 +100,17 @@
     "complete_native_frame": "UNTESTED",
     "quest3_stereo": "UNTESTED"
   },
-  "next_action": "Verify five exact-SHA GitHub Actions; repair any concrete build/contract failure in same TASK_ID; never claim full frame or HMD runtime."
+  "next_action": "Run five exact-SHA push Gates on repair SHA; preserve any already superseded push jobs as previous SHA results; complete C6 only on all-five success.",
+  "ci_failures": [
+    {
+      "validation_bearing_sha": "a3c36e8eb103f9237eaec4a9cb6da36688131dd1",
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 40571023226,
+      "failure": "tests/native_raw_gpu_source_epoch_test.cpp:30: Assertion e.can_queue(UINT64_MAX, false) failed",
+      "root_cause": "UINT64_MAX sentinel collided with a legal maximal Present serial",
+      "fix": "separate everQueued_ lifetime state from lastQueuedSerial_ actual value"
+    }
+  ],
+  "fix_type": "SOURCE_CAUSAL_REPAIR",
+  "repair_parent_sha": "a3c36e8eb103f9237eaec4a9cb6da36688131dd1"
 }
