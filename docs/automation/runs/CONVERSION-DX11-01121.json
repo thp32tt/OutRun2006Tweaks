@@ -11,16 +11,16 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
   "classification": "A_REAL_NATIVE_DRAW_DIAGNOSTIC_SOURCE_AND_B_CI_METADATA_REPAIR",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
-  "score_change": 0,
+  "score_change": 1,
   "source_base_sha": "a0e1748d3d51f19fa62537c9a68326697fe174a1",
   "source_change_sha": "39483fb80622e532f8f00cf18154d9c89ee7db3a",
   "material_result_sha": "39483fb80622e532f8f00cf18154d9c89ee7db3a",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "935cc93cd29283a60ec36b4cdb3c153ce39ca929",
   "changed_files": [
     "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
     "src/vr/d3d11/native_game_raw_draw_tile.hpp",
@@ -86,18 +86,106 @@
       }
     ]
   },
-  "acceptance_results": {},
+  "acceptance_results": {
+    "raster_bound_gpu_copy": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_draw_tile.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_draw_tile_test.cpp"
+      ],
+      "runtime_validation": "UNTESTED"
+    },
+    "safe_fallback_and_bounds": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_draw_tile_test.cpp"
+      ],
+      "runtime_validation": "UNTESTED"
+    },
+    "source_integration_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40588379646",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40588379674",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40588379688",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40588379614",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40588379649"
+      ],
+      "runtime_validation": "UNTESTED"
+    }
+  },
   "pipeline": {
-    "C2_IMPLEMENT": "PASS source SHA 39483fb80622e532f8f00cf18154d9c89ee7db3a",
-    "C3_VALIDATE": "PENDING five exact-SHA push Gates; inherited 01120 missing development_strategy repaired in same task",
-    "C4_COMMIT": "PASS GitHub material source",
-    "C5_PACKAGE": "NOT_REQUIRED no runtime/HMD promotion",
-    "C6_STATE": "PENDING"
+    "C0_RECOVER": "PASS pinned a0e1748, active owner checked and 01120 five Gate validated",
+    "C1_REVIEW": "PASS prior fixed RAW region anchors not correlated with raster viewport/scissor",
+    "C2_IMPLEMENT": "PASS authentic D3D11 bound raster tile capture source 39483fb80622e532f8f00cf18154d9c89ee7db3a",
+    "C3_VALIDATE": "PASS five mandatory push workflows on exact SHA 935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+    "C4_COMMIT": "PASS source material SHA 39483fb80622e532f8f00cf18154d9c89ee7db3a and causal CI-record repair 935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+    "C5_PACKAGE": "PASS GitHub Build user artifact 12772729945; original game/HMD runtime UNTESTED",
+    "C6_STATE": "PASS exact SHA Gates recorded; C6 checkpoint does not own or retrigger Gates"
   },
   "runtime_evidence": {
     "native_draws": "UNTESTED",
     "native_gpu_pixel_output": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "next_action": "Complete all five exact-SHA push CI Gates at one consolidated validation-bearing commit, repair genuine failure if any. Quest3 original game UNTESTED."
+  "next_action": "New matching game log required to establish native GPU pixel delta and visible RAW diagnostic across menu/car/race. Complete native mono/stereo renderer not claimed.",
+  "result_sha": "935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+  "implementation_commits": [
+    "39483fb80622e532f8f00cf18154d9c89ee7db3a"
+  ],
+  "repair_commits": [
+    "935cc93cd29283a60ec36b4cdb3c153ce39ca929"
+  ],
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40588379646,
+      "event": "push",
+      "head_sha": "935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40588379674,
+      "event": "push",
+      "head_sha": "935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40588379688,
+      "event": "push",
+      "head_sha": "935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40588379614,
+      "event": "push",
+      "head_sha": "935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40588379649,
+      "event": "push",
+      "head_sha": "935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+    "artifact_id": 12772729945,
+    "run_id": 40588379688
+  },
+  "scoreboard_commit": "46694b12cbb980aeb21789f440bbb160ec568558",
+  "c6_note": "Follow-up bookkeeping ONLY: save exact-SHA 5/5 success; not a second functional result. Build CI and source material remain at 935cc93cd29283a60ec36b4cdb3c153ce39ca929 and 39483fb80622e532f8f00cf18154d9c89ee7db3a respectively. Runtime game/HMD UNTESTED. External controller adoption UNVERIFIED."
 }
