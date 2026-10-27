@@ -196,6 +196,7 @@ namespace OutRunVRRenderer
 		std::uint64_t LastGameWvpShaderSerial = 0;
 		OutRunVR::GameSemantic::RenderScope LastGameWvpSemanticScope =
 			OutRunVR::GameSemantic::RenderScope::None;
+		OutRunVR::GameSemantic::ProjectedMarkerInfo LastGameWvpProjectedMarker{};
 		std::uint64_t LastGameWvpQueueNodeEpoch = 0;
 		const void* LastGameWvpQueueNode = nullptr;
 		std::uint64_t LastGameWvpLensCentreCallEpoch = 0;
@@ -1654,6 +1655,7 @@ namespace OutRunVRRenderer
 			LastGameWvpShaderIdentity = 0;
 			LastGameWvpShaderSerial = 0;
 			LastGameWvpSemanticScope = OutRunVR::GameSemantic::RenderScope::None;
+			LastGameWvpProjectedMarker = {};
 			LastGameWvpQueueNodeEpoch = 0;
 			LastGameWvpQueueNode = nullptr;
 			LastGameWvpLensCentreCallEpoch = 0;
@@ -1688,6 +1690,11 @@ namespace OutRunVRRenderer
 			LastGameWvpShaderIdentity = shaderIdentity;
 			LastGameWvpShaderSerial = shaderSerial;
 			LastGameWvpSemanticScope = OutRunVR::GameSemantic::EffectiveScope();
+			const auto* projectedMarker =
+				OutRunVR::GameSemantic::CurrentProjectedMarker();
+			LastGameWvpProjectedMarker =
+				projectedMarker ? *projectedMarker :
+					OutRunVR::GameSemantic::ProjectedMarkerInfo{};
 			LastGameWvpQueueNodeEpoch =
 				OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
 			LastGameWvpQueueNode =
@@ -2374,6 +2381,15 @@ namespace OutRunVRRenderer
 		queueNode = LastGameWvpQueueNode;
 		producerToken = LastGameWvpProducerToken;
 		return true;
+	}
+
+	bool GetLastGameWvpProjectedMarker(
+		OutRunVR::GameSemantic::ProjectedMarkerInfo& marker) noexcept
+	{
+		if (!LastGameWvpWriteValid || LastGameWvpWriteSerial == 0)
+			return false;
+		marker = LastGameWvpProjectedMarker;
+		return marker.valid;
 	}
 
 	std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept
