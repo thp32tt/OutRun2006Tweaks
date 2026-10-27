@@ -36,7 +36,7 @@ Interpret with `registeredDelta`:
 
 A second sampled line, `VR RIVAL DIRECT D3DX GOAL-GATE PROBE`, records whether an exact rival producer has `batchActive=1`, `pendingDraws>0`, matching D3DX sprite, and the physical recorded `batchProducer/batchScope`. If the pending batch is genuinely `RIVAL_MARKER_SPRANI` under `PROJECTED_WORLD_MARKER_2D`, then the GOAL exit whitelist is demonstrably the wrong submission gate and warrants a strictly rival-specific gate (without changing GOAL/other HUD). If no batch is tracked, a new flush would do nothing: find the deferred original animated sprite output instead.
 
-## 2026-10-27 08:5x additional source verification
+## 2026-10-27 additional source verification
 
 1. **The old 8192× queue-publication counter is post-native-only.** `registeredBefore` was captured after `sprani_play_ae_auth_alpha` and after the E direct exit attempt. Therefore `registeredAfter - registeredBefore = 0` does **not** prove that the native animation failed to register any sprite. Exact current focus source now also records `nativeRegisteredDelta` sampled from **before** the native source and `wrapperRegisteredDelta` separately.
 2. **D3DX deferred GPU ownership explicitly excludes rivals.** `VRProjectedD3DXSpriteIsolationR64::FlushDest/EndDest` calls `DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner`; the guard only permits finite result ScreenHud producer families via `CanReprojectFiniteResultHudPlane` or exact pause-arrow token. It excludes `ProjectedWorldMarker2D/RivalMarkerSprani`. The same GOAL-only restriction affects `AfterDirectGoalSource`. Thus a homogeneous rival D3DX batch **if confirmed to exist** will be submitted with original native fallback, not the source-time projected marker in the wrapper. Existing code intentionally leaves an unknown batch native rather than assuming stereo.
@@ -44,7 +44,7 @@ A second sampled line, `VR RIVAL DIRECT D3DX GOAL-GATE PROBE`, records whether a
 
 ### Instrumentation added without altering pixels
 
-- `VR RIVAL A22 CURRENT QUEUE COMPARE` now reports native versus wrapper semantic-registration counts.
+- `VR RIVAL A22 CURRENT QUEUE COMPARE` now reports native versus wrapper semantic-registration counts **and** `lateAnchorValid/lateAnchorZ/earlierAnchorZ`. The a6f8497c known-good rival wrapper captured `RivalMarkerProjectedInfo` AFTER the native animation, while the current wrapper consumes it BEFORE. A newly valid or significantly different late anchor would prove a real semantic ordering regression; absence would rule this specific theory down.
 - `VR RIVAL ACTUAL D3DX DRAW` and `VR RIVAL D3DX DRAW RETURN` report whether the physical native D3DX API is entered in an exact rival source scope.
 - `VR RIVAL NATIVE GPU FLUSH SINK` and `VR RIVAL NATIVE GPU END SINK` indicate whether a homogeneous exact rival batch reaches physical native submission after the original source exits, and whether the existing restore guard rejected it.
 - `VR RIVAL DIRECT D3DX GOAL-GATE PROBE` correlates the direct source-exit (GOAL-only) Flush rejection.
