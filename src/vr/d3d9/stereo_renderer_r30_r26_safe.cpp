@@ -37,6 +37,8 @@ namespace Settings
     extern Setting<bool> VRRankDx11ReferenceEyePose;
     extern Setting<bool> VRRankDx11ProducerReference;
     extern Setting<bool> VRHud1080pReference;
+    extern Setting<int> VRHudLogicalWidth;
+    extern Setting<int> VRHudLogicalHeight;
     extern Setting<float> VRHudPlaneDistance;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
@@ -1837,12 +1839,15 @@ namespace OutRunVRStereo
             // so HudScale=0.55 became X=0.55/Y=0.214 and visibly squashed the
             // complete HUD. Keep HUD scale uniform; projection handles aspect.
             // Original UIScaling handles 640x480 sprite positions first.
-            // Fit the *final VR HUD* into the virtual 1920x1080 viewing
-            // canvas without changing original positions or eye resolution.
+            // Fit the final HUD into the user-controlled LOGICAL canvas,
+            // never the portrait OpenXR backbuffer (2496x2688 on Quest3).
+            // This holds 1080p-tested HUD scale/position when source 3D rises
+            // to native eye resolution; it remains independently adjustable.
             const float referenceFit =
                 Settings::VRHud1080pReference.get()
                     ? OutRunVRHud1080p::ContainedScale(
-                        BackBufferDesc.Width, BackBufferDesc.Height)
+                        static_cast<std::uint32_t>(Settings::VRHudLogicalWidth.get()),
+                        static_cast<std::uint32_t>(Settings::VRHudLogicalHeight.get()))
                     : 1.0f;
             scaleX = userScale * referenceFit;
             scaleY = userScale * referenceFit;
