@@ -30,6 +30,7 @@ on:
       - 'src/vr/game/goal_progress_source_admission.hpp'
       - 'src/vr/game/sprite_queue_tail_proof.hpp'
       - 'tools/verify_vr_abc_goal_c.py'
+      - 'tools/verify_vr_r26_review_apply_20261027.py'
       - 'tools/verify_vr_goal_progress_source_admission.py'
       - 'tools/verify_vr_producer_provenance.py'
       - 'tools/verify_vr_hud_exact_callsite_contract.py'
@@ -67,6 +68,12 @@ jobs:
         run: |
           python tools/verify_vr_stage_extension_d3dx_batch_owner.py
           if ($LASTEXITCODE -ne 0) { throw 'Native +TIME ticket/epoch regression failed' }
+
+      - name: Validate R9 physical pre-Draw and R7 occlusion depth guards
+        shell: pwsh
+        run: |
+          python tools/verify_vr_r26_review_apply_20261027.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex review 01516/01521 regression failed' }
 
       - name: Verify GOAL inner/full exact source and queue epoch admission
         shell: pwsh
