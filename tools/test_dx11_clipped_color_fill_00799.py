@@ -28,7 +28,12 @@ def wired(b, h):
         # rectangles, but overflow of genuinely distinct pixels stays closed.
         # 01104: source remains overwrite-equivalent when adjacent same
         # ARGB rects can fuse; capacity and owner failure stay transactional.
-        "if (!covers(next, saved)) staged.entries[output++] = saved;" in rec,
+        # 01106: exact edge removal does not change the atomic native
+        # ColorFill transaction, and interior/split overlap stays ordered.
+        "Fill saved = entries[i];" in rec,
+        "if (!covers(next, saved)) {" in rec,
+        "(void)game_native_trim_partially_overwritten(saved, next);" in rec,
+        "staged.entries[output++] = saved;" in rec,
         "if (output >= kCapacity) return false;" in rec,
         rec.count("game_native_merge_ordered_overwrite(") == 2,
         "staged.entries[output++] = next;" in rec,
@@ -45,7 +50,8 @@ for original, broken in (
     assert not wired(region.replace(original, broken, 1), header), original
 # Reject mutations that drop the actual capacity/transaction boundary.
 for original in ("if (output >= kCapacity) return false;",
-                 "*this = staged;", "game_native_merge_ordered_overwrite("):
+                 "*this = staged;", "game_native_merge_ordered_overwrite(",
+                 "(void)game_native_trim_partially_overwritten(saved, next);"):
     assert original in header
     assert not wired(region, header.replace(original, "/* omitted */", 1)), original
 print("00799 clipped D3D9 ColorFill native game frame source integration PASS")
