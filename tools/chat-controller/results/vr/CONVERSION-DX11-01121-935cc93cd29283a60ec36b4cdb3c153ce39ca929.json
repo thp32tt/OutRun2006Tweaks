@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01121",
+  "production_id": "CONVERSION-DX11-01121",
+  "event_id": "CONVERSION-DX11-01121-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01121",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
+  "classification": "A_REAL_NATIVE_DRAW_DIAGNOSTIC_SOURCE_AND_B_CI_METADATA_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "source_base_sha": "a0e1748d3d51f19fa62537c9a68326697fe174a1",
+  "source_change_sha": "39483fb80622e532f8f00cf18154d9c89ee7db3a",
+  "material_result_sha": "39483fb80622e532f8f00cf18154d9c89ee7db3a",
+  "validation_bearing_result_sha": "935cc93cd29283a60ec36b4cdb3c153ce39ca929",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_draw_tile.hpp",
+    "tests/native_raw_draw_tile_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "ACTUAL_NATIVE_SM3_AND_FVF_GPU_DRAW",
+      "BOUND_NATIVE_VIEWPORT_AND_SCISSOR",
+      "PAIRED_PRE_POST_GPU_TILE_COPY",
+      "SOURCE_D3D9_DIAGNOSTIC_PRESENT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "GPU_DRAW_RASTER_AWARE_SOURCE_TILE_COPY",
+      "PORTABLE_POSITIVE_NEGATIVE_RASTER_TESTS",
+      "DX11_FAST_INTEGRATED_REGRESSION",
+      "CAUSAL_INHERITED_01120_GATE_RECORD_REPAIR"
+    ],
+    "visible_frame_acceptance": "Diagnostic RAW pixel tile inside authentic native raster region only; native complete full frame and Quest3/HMD runtime UNTESTED.",
+    "activation_guard_and_fallback": "Source game Draw, input/FFB, DX9Ex fallback, complete-scene gate and frozen DXVK remain protected. Diagnostic explicitly opt-in.",
+    "acceptance_proof": {
+      "positive_probe": "Native SM3/FVF Draw source copies RGB both before and after the exact Draw from a tile intersecting genuine bound viewport/scissor, with honest GPU source evidence.",
+      "negative_regression": "Empty/out-of-range scissor, invalid/undersized GPU target cannot create a fake tile; no changes to native frame gating or legacy Draw/FFB.",
+      "component_integration": "Source D3D9 Draw -> native D3D11 RS viewport+scissor -> authenticated D3D11 pre/post GPU sampling -> original D3D9 opt-in tile at Present."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Improve actual native D3D11 Draw GPU pixel evidence in the game diagnostic tile by selecting source-authenticated bound raster regions rather than sampling unrelated fixed backbuffer anchors.",
+    "acceptance_items": [
+      {
+        "id": "raster_bound_gpu_copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ACTUAL_SOURCE_NATIVE_GPU_DRAW",
+        "expected_behavior": "SM3/FVF native GPU Draw paired copy chooses region intersecting native bound viewport and scissor."
+      },
+      {
+        "id": "safe_fallback_and_bounds",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_INPUT_AND_NEGATIVE_RASTER",
+        "expected_behavior": "Invalid or empty raster fails without a false GPU pixel; original D3D9 game/input/FFB unaffected."
+      },
+      {
+        "id": "source_integration_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_AND_FIVE_GATES",
+        "expected_behavior": "New portable C++ viewport/scissor regression and existing five exact-SHA GitHub Actions all PASS."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "pipeline": {
+    "C2_IMPLEMENT": "PASS source SHA 39483fb80622e532f8f00cf18154d9c89ee7db3a",
+    "C3_VALIDATE": "PENDING five exact-SHA push Gates; inherited 01120 missing development_strategy repaired in same task",
+    "C4_COMMIT": "PASS GitHub material source",
+    "C5_PACKAGE": "NOT_REQUIRED no runtime/HMD promotion",
+    "C6_STATE": "PENDING"
+  },
+  "runtime_evidence": {
+    "native_draws": "UNTESTED",
+    "native_gpu_pixel_output": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "next_action": "Complete all five exact-SHA push CI Gates at one consolidated validation-bearing commit, repair genuine failure if any. Quest3 original game UNTESTED.",
+  "controller_terminal": true,
+  "controller_finalize_reason": "LEGACY_EXACT_SHA_GATE_SUCCESS"
+}
