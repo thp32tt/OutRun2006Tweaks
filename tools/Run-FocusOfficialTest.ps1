@@ -71,7 +71,20 @@ try {
         '-Hud1080pReference=true','-HudScale=0.55',
         '-MenuScale=1.00','-CullingUnionMarginDegrees=8.0'
     )
-    @("sourceSha=$(Get-Content (Join-Path $root 'SOURCE_SHA.txt') -ErrorAction SilentlyContinue)",
+    # Opt-in negative-control: the original 1080p game backbuffer is preserved.
+    # The OpenXR host still publishes its recommended eye size for the shared
+    # transport, but source 3D is upscaled rather than natively rasterized.
+    # A/B this against START_HERE.cmd; never silently enable in normal testing.
+    $recovery1080 = $env:OUTRUN_VR_1080P_BACKBUFFER_AB -eq '1'
+    if ($recovery1080) {
+        $argsList = @($argsList | ForEach-Object {
+            if ($_ -eq '-FollowGameResolution=false') { '-FollowGameResolution=true' }
+            else { $_ }
+        })
+        Write-Host '[A/B] Native game 1080p backbuffer preserved; XR transport scales to headset extent.'
+    }
+    @("recoveryBackbufferAB=$recovery1080",
+       "sourceSha=$(Get-Content (Join-Path $root 'SOURCE_SHA.txt') -ErrorAction SilentlyContinue)",
       "variant=$variant","debug=$debugMode","arguments=$($argsList -join ' ')",
       "OUTRUN_VR_GPU_PROFILE=$env:OUTRUN_VR_GPU_PROFILE",
       "OUTRUN_VR_GPU_PROFILE_CENSUS_V2=$env:OUTRUN_VR_GPU_PROFILE_CENSUS_V2",
