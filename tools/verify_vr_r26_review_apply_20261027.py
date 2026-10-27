@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R26+HUD exact source guards for DX9Ex reviews 01511, 01516 and 01521.
+"""R26+HUD exact source guards for DX9Ex reviews 01511, 01516, 01519 and 01521.
 
 Static regression and destructive mutations only: not a Quest3/GPU test.
 """
@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 R30_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
 R7_PATH = ROOT / "src/vr/d3d9/stereo_renderer_r7.inc"
+R9_PATH = ROOT / "src/vr/d3d9/stereo_renderer.cpp"
 
 
 def function_block(source: str, signature: str) -> str:
@@ -64,6 +65,23 @@ def verify_sbs(source: str) -> None:
     assert "if(!restoreOk)NoteRestoreFailure(" in fn
 
 
+def verify_r9(source: str) -> None:
+    fn = function_block(source, "HRESULT __stdcall PresentDestR9(")
+    recovery = fn.split("if (!composedStereo || FrameStereoIncomplete)", 1)[1].split(
+        "R9MaybeLogSummary();", 1)[0]
+    assert "if (R9MonoSeeded && !R9MonoBackupGap &&" in recovery
+    assert "!R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason))" in recovery
+    assert recovery.index("!R9RestoreMonoBeforePresent(") < recovery.index(
+        "R9MonoBackupGap = true;") < recovery.index(
+        "R9Poison(OutRunVR::StereoFailureRestoreFailed,")
+    assert "Present/mono-shadow-restore" in recovery
+    # The game still physically Presents once; no retry/copy or fabricated
+    # mono frame is allowed after an unsuccessful GPU StretchRect.
+    assert fn.count("const HRESULT rawPresentHr = PresentHook.stdcall<HRESULT>(") == 1
+    assert fn.index("R9Poison(OutRunVR::StereoFailureRestoreFailed,") < fn.index(
+        "const HRESULT rawPresentHr = PresentHook.stdcall<HRESULT>(")
+
+
 def rejects(check, source: str, before: str, after: str) -> None:
     assert before in source, "source mutation anchor missing: " + before
     mutant = source.replace(before, after, 1)
@@ -89,9 +107,11 @@ def rejects_in_function(check, source: str, signature: str,
 def main() -> None:
     r30 = R30_PATH.read_text(encoding="utf-8")
     r7 = R7_PATH.read_text(encoding="utf-8")
+    r9 = R9_PATH.read_text(encoding="utf-8")
     verify_r30(r30)
     verify_r7(r7)
     verify_sbs(r7)
+    verify_r9(r9)
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9NoteStereoDrawWithoutMonoBackup();", "/* missing R9 gap */")
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9NoteMainDepthContentWrite();", "/* missing R9 depth serial */")
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "return E_NOTIMPL;\n            }\n\n            // The first physical LEFT Draw", "return E_NOTIMPL;\n            }\n\n            R9NoteStereoDrawWithoutMonoBackup();\n            // The first physical LEFT Draw")
@@ -101,7 +121,10 @@ def main() -> None:
     rejects_in_function(verify_r7, r7, "bool PrepareDuplicatedDraw(", "ActiveOcclusionQueries.load(std::memory_order_acquire)>0", "false")
     rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "const bool stateOk=setupOk&&SUCCEEDED(device->SetViewport(&full))", "const bool stateOk=SUCCEEDED(device->SetViewport(&full))")
     rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "setupOk = SUCCEEDED(device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE)) && setupOk;", "device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE);")
-    print("PASS R26 01521 mono WVP + R7 01516 query-depth + 01511 SBS setup HRESULT; 9 destructive mutations")
+    rejects_in_function(verify_r9, r9, "HRESULT __stdcall PresentDestR9(", "!R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason))", "R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason))")
+    rejects_in_function(verify_r9, r9, "HRESULT __stdcall PresentDestR9(", "R9MonoBackupGap = true;", "/* lost recovery fence */")
+    rejects_in_function(verify_r9, r9, "HRESULT __stdcall PresentDestR9(", 'R9Poison(OutRunVR::StereoFailureRestoreFailed,', '/* lost failure propagation */ (')
+    print("PASS R26/R7/R9: 01511,01516,01519,01521 guards; 12 destructive mutations")
     print("RUNTIME_VALIDATION=UNTESTED")
 
 
