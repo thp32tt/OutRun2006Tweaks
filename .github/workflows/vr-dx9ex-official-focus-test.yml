@@ -9,11 +9,13 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - test/dx9ex-2324-recovery-20261027
       - vr-d3d9ex-abc-c-goal-emptyroot-20261026
       - vr-d3d9ex-d-logfix-20261026
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
       - 'tools/Run-FocusOfficialTest.ps1'
+      - 'tools/START_R26_1080P_BACKBUFFER_AB.cmd'
       - 'tools/verify_focus_official_diagnostics.py'
       - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py'
       - 'src/hooks_uiscaling.cpp'
@@ -168,6 +170,7 @@ jobs:
             Copy-Item tools/START_FOCUS_OFFICIAL_TEST.cmd "$dir/START_HERE.cmd"
             Copy-Item tools/START_FOCUS_OFFICIAL_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
             Copy-Item tools/Run-FocusOfficialTest.ps1 "$dir/Run-FocusOfficialTest.ps1"
+            Copy-Item tools/START_R26_1080P_BACKBUFFER_AB.cmd "$dir/START_1080P_BACKBUFFER_AB.cmd"
             if ($mode -eq 'DEBUG') { Get-ChildItem $payload -Filter *.pdb | ForEach-Object { Copy-Item $_.FullName $dir } }
             # Run-FocusOfficialTest.ps1 requires an exact stand-alone variant
             # token. Keep all A/B/C annotations in the separate compare file.
@@ -202,6 +205,7 @@ jobs:
               'Original game EXE is not bundled. Backup your current DLL, host, and all INIs before unpacking.'
               '1. Unpack EXACTLY ONE variant ZIP into the original OR2006C2C.EXE directory.'
               '2. Double-click START_HERE.cmd, never launch outrun-vr-host.exe alone.'
+              '2a. For a 2D/FPS control run only, use START_1080P_BACKBUFFER_AB.cmd. It preserves a 1080p game backbuffer; Quest output is upscaled, not native eye-resolution raster.'
               '3. Check DX9EX_LAUNCH_HEALTH.txt and DX9EX_LOGS after game exit.'
               '4. Test menu 4:3, car selection, +TIME, GOAL graph, rank/rival, F11 and cursor, flare/sun/sky.'
               '5. DriverSeatView=false is the default to prevent reported cockpit oscillation.'
@@ -211,7 +215,7 @@ jobs:
               '8. No experimental test-branch COMBINED/ALL visual or performance patches.'
               '9. Restore backups after testing; return DX9EX_LOGS ZIP and screenshots.'
             ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
-            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FocusOfficialTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','ABC_COMPARE.txt','QUEST_D_VARIANT.txt','START_HERE.txt')) {
+            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FocusOfficialTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','ABC_COMPARE.txt','QUEST_D_VARIANT.txt','START_HERE.txt','START_1080P_BACKBUFFER_AB.cmd')) {
               if (-not (Test-Path (Join-Path $dir $required))) { throw "Missing packaged $mode file: $required" }
             }
             foreach ($binary in @('dinput8.dll','outrun-vr-host.exe')) {
