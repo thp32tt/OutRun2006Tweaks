@@ -34,6 +34,7 @@ on:
       - 'tools/verify_vr_abc_goal_c.py'
       - 'tools/verify_vr_r26_review_apply_20261027.py'
       - 'tools/verify_vr_f11_eye_viewport.py'
+      - 'tools/verify_dx9ex_r84_lens_source.py'
       - 'tools/tests/f11_eye_viewport_harness.cpp'
       - 'tools/verify_vr_goal_progress_source_admission.py'
       - 'tools/verify_vr_producer_provenance.py'
@@ -78,6 +79,12 @@ jobs:
         run: |
           python tools/verify_vr_r26_review_apply_20261027.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex review 01516/01521 regression failed' }
+
+      - name: Check C993 lens source and original flare preservation
+        shell: pwsh
+        run: |
+          python tools/verify_dx9ex_r84_lens_source.py
+          if ($LASTEXITCODE -ne 0) { throw 'C993 conservative optics/source guard failed' }
 
       - name: Verify GOAL inner/full exact source and queue epoch admission
         shell: pwsh
