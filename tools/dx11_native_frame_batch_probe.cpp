@@ -37,12 +37,12 @@ constexpr bool native_predraw_color_fill_regression() {
         if (!queue.record(11, 101, x, 200, x + 2, 202, 640, 480, i))
             return false;
     }
-    // The 17th unrelated write still fails closed without modifying the
-    // source ledger; a new covering write instead retires its 12 older tiles.
+    // A 129th unrelated write still fails closed without modifying the
+    // source ledger; a new covering write retires all 124 staged old tiles.
     if (queue.count != GameNativePreDrawFills::kCapacity ||
-        queue.record(11, 101, 240, 200, 242, 202, 640, 480, 999) ||
+        queue.record(11, 101, 580, 200, 582, 202, 640, 480, 999) ||
         queue.count != GameNativePreDrawFills::kCapacity ||
-        !queue.record(11, 101, 200, 200, 236, 202, 640, 480, 0xff445566u) ||
+        !queue.record(11, 101, 200, 200, 571, 202, 640, 480, 0xff445566u) ||
         queue.count != 5u || queue.entries[4].argb != 0xff445566u)
         return false;
     queue.discard(); // new full TARGET Clear / Reset / Present
