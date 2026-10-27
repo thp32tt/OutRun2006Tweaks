@@ -147,21 +147,42 @@ if ("QueueRenderActive()" not in pause_arrow or
     fail("pause-arrow exact VR producer must not borrow an unrelated owner")
 
 rival_body = function_body(uiscale, "static int __cdecl RivalMarker_sprani(")
-rival_markers = [
-    "const auto projectedAnchor = RivalMarkerProjectedInfo;",
-    "RivalMarkerProjectedInfo = {};",
-    "OutRunVR::GameSemantic::RenderScope::WorldBillboard",
-    "ScopedExactProducerSemantic producerScope(",
-    "Game::sprani_play_ae_auth_alpha(",
-    "TagAppendedNodes(before, scope,",
-]
-rival_pos = [rival_body.find(m) for m in rival_markers]
-if min(rival_pos) < 0 or rival_pos != sorted(rival_pos):
-    fail("rival must consume exact view anchor, scope original draw and then tag queued children")
-if rival_body.count("projected ? &projectedAnchor : nullptr") != 2:
-    fail("rival must preserve one frozen exact projected anchor for direct and queued draws")
-if "ScreenHud" in rival_body or "ScreenOverlay2D" in rival_body:
-    fail("rival marker wrapper must remain spatial and exact-only")
+# An older contract required anchor consumption before the original sprite
+# call. That ordering was superseded by the current known-good native-first
+# source on R26: no scoped direct-draw takeover, then bounded queue tagging
+# with the exact projected anchor. Keep BOTH that ordering and exact ownership.
+def native_first_rival_safe(body: str) -> bool:
+    markers = [
+        "before[prio] = root ? root->tail_4 : nullptr;",
+        "const int result = Game::sprani_play_ae_auth_alpha(",
+        "const auto projectedAnchor = RivalMarkerProjectedInfo;",
+        "RivalMarkerProjectedInfo = {};",
+        "const bool projected = projectedAnchor.valid;",
+        "TagAppendedNodes(",
+        "OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,",
+        "projected ? &projectedAnchor : nullptr,",
+        "&rootsBefore, entrySerial);",
+    ]
+    positions = [body.find(m) for m in markers]
+    return (min(positions) >= 0 and positions == sorted(positions) and
+            "RenderScope::WorldBillboard" in body and
+            "RenderScope::ProjectedWorldMarker2D" in body and
+            "ScopedExactProducerSemantic" not in body and
+            "FlushD3DXBeforeDirectGoalSource" not in body and
+            body.count("projected ? &projectedAnchor : nullptr") == 1)
+if not native_first_rival_safe(rival_body):
+    fail("rival native-first original draw, anchor consume and bounded queue ownership changed")
+for label, original, damaged in (
+    ("native draw", "const int result = Game::sprani_play_ae_auth_alpha(",
+     "const int result = Game::other_sprani("),
+    ("consume anchor", "RivalMarkerProjectedInfo = {};", "/* stale rival anchor */"),
+    ("exact token", "OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,",
+     "OutRunVR::GameSemantic::ProducerToken::None,"),
+    ("queue root", "&rootsBefore, entrySerial);", "nullptr, entrySerial);"),
+):
+    altered = rival_body.replace(original, damaged, 1)
+    if altered == rival_body or native_first_rival_safe(altered):
+        fail("rival native-first negative mutation escaped: " + label)
 
 glyph_body = function_body(uiscale, "static int __cdecl TextGlyph_putSprite(")
 # The previous one-branch order check mistook the new exact B9200 branch
