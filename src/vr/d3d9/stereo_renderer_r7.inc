@@ -1544,7 +1544,12 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			DrawStereoState draw{};
 			if(!PrepareDuplicatedDraw(device,draw))
 			{
-				if(StereoWanted()&&TargetIsBackBuffer()&&!occlusionActive)InvalidateRightDepthStencilIfLeftMayWrite(device);
+				// Keep occlusion-query Draw single-execution, but an original
+				// LEFT depth/stencil write still invalidates the RIGHT content.
+				// Otherwise a later eligible Draw may trust stale RIGHT sync
+				// after query END (review 01516). No extra query Draw is issued.
+				if(StereoWanted()&&TargetIsBackBuffer())
+					InvalidateRightDepthStencilIfLeftMayWrite(device);
 				return drawCall();
 			}
 			D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport))){InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);return drawCall();}
