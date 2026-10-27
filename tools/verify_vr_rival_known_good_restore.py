@@ -57,6 +57,12 @@ assert r30.count('const bool exactProjectedRival =') >= 2
 assert '!exactResult && !exactProjectedRival' in r30
 assert 'R30XyzrhwPrepareRejectName' in r30
 assert 'LIVE_VS_BOUND' in r30 and 'FVF_NOT_XYZRHW' in r30
+assert 'MaxOriginalRankWvpDrawAge' in (R/'src/vr/game/rank_marker_physical_source.hpp').read_text()
+rank_phys=(R/'src/vr/game/rank_marker_physical_source.hpp').read_text()
+assert 'ProducerToken::RivalMarkerSprani' in rank_phys
+assert '? 128u : 12u' in rank_phys
+assert 'CompatibleOriginalRankWvpProvenance' in rank_phys
+assert 'raw.queueNode != nullptr && raw.queueEpoch != 0' in rank_phys
 
 # D3DX/FVF142 projected rival uses the same exact-source exception: cached
 # shader shadow may not veto the route, but live VS and exact FVF 0x142 remain
@@ -93,4 +99,4 @@ for token in (
     assert token in ui, token
 assert 'VR RIVAL R84 RAW C64 PROOF:' in r84
 
-print('PASS rival known-good native-first + null-root + live DPUP/R62 probes + exact D3DX queue-boundary ownership; HMD UNTESTED')
+print('PASS rival known-good native-first + null-root + live DPUP/R62 probes + R30/R33 shared-c64 alignment + exact D3DX queue-boundary ownership; HMD UNTESTED')
