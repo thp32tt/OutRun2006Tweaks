@@ -342,8 +342,23 @@ namespace OutRunVRStereo
 				return false;
 			if (ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
 			{
+				// Review 01520: query draws must execute only once. If that
+				// native main-target draw may write any RT0 color, however, the
+				// independent mono shadow did NOT receive those pixels. Never
+				// copy that shadow back as though it were a complete frame.
+				// The tracked state avoids GPU GetRenderState on this path;
+				// unknown mask is conservatively treated as color writable.
+				DWORD colorWriteMask = 0;
+				const bool colorMaskKnown = ReadTrackedRenderState(
+					device, D3DRS_COLORWRITEENABLE, colorWriteMask);
+				if (!colorMaskKnown || colorWriteMask != 0)
+				{
+					R9MonoBackupGap = true;
+					R9Poison(OutRunVR::StereoFailureOcclusionQueryActive,
+						"Draw/occlusion-query-color-mono-gap");
+				}
 				++R9OcclusionBackupSkips;
-				return true; // query-only pass is intentionally not replayed
+				return true; // never duplicate a live occlusion-query Draw
 			}
 			IDirect3DSurface9* savedRt = nullptr;
 			IDirect3DSurface9* savedDepth = nullptr;
