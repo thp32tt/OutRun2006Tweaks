@@ -18,6 +18,7 @@ on:
       - 'src/hooks_uiscaling.cpp'
       - 'src/hooks_graphics.cpp'
       - 'tools/verify_vr_e_flare_unhidden.py'
+      - 'tools/verify_vr_rival_known_good_restore.py'
       - 'src/hooks_misc.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
@@ -139,6 +140,12 @@ jobs:
         run: |
           python tools/verify_vr_e_flare_unhidden.py
           if ($LASTEXITCODE -ne 0) { throw 'Original flare and Quest E contract failed' }
+
+      - name: Verify rival HMD-known-good native-first restoration
+        shell: pwsh
+        run: |
+          python tools/verify_vr_rival_known_good_restore.py
+          if ($LASTEXITCODE -ne 0) { throw 'Rival known-good restoration contract failed' }
 
       - name: Configure Win32 R26+HUD
         shell: pwsh
