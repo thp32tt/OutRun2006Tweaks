@@ -5304,13 +5304,9 @@ namespace OutRunVRStereo
             if (OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(semanticScope))
                 R30CaptureSkyGlowSceneBeforeHud(device);
 
-            // From this point the draw is owned by R30. The steady-state frame
-            // intentionally has no complete independent mono history.
-            R9NoteStereoDrawWithoutMonoBackup();
-            if (LeftDrawMayWriteDepth(device) ||
-                LeftDrawMayWriteStencil(device))
-                R9NoteMainDepthContentWrite();
-
+            // This candidate still has no native GPU Draw until the LEFT WVP
+            // upload succeeds. Do not dirty R9's mono history on a clean
+            // E_NOTIMPL fallthrough into the lower renderer (review 01521).
             bool leftWvpOk = false;
             {
                 InternalPassScope guard;
@@ -5331,9 +5327,15 @@ namespace OutRunVRStereo
                     R30ArmSafeFallback();
                     return E_FAIL;
                 }
-                R9UndoStereoDrawCount();
                 return E_NOTIMPL;
             }
+
+            // The first physical LEFT Draw is now imminent: from this point
+            // the R30-owned path has no independent mono-shadow backup.
+            R9NoteStereoDrawWithoutMonoBackup();
+            if (LeftDrawMayWriteDepth(device) ||
+                LeftDrawMayWriteStencil(device))
+                R9NoteMainDepthContentWrite();
 
             const HRESULT leftHr = actualDraw();
             if (FAILED(leftHr))
