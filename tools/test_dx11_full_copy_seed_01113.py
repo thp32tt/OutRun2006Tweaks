@@ -15,5 +15,9 @@ assert source.index("s.clearColor.copySnapshotRequired = true;") < source.index(
 assert "if (!s.preDrawSurface.active()) return !s.clearColor.copySnapshotRequired;" in replay
 assert replay.index("GetDeviceRemovedReason()") < replay.index("s.clearColor.copySnapshotRequired = false;")
 assert "copySnapshotRequired = false;" in clear
-assert bridge.count("replay_native_game_pre_draw_surface(s,ctx,") >= 2
+# Both REAL first-Draw paths must upload the authenticated GPU seed.
+# Programmable SM3 names its immediate context 'context'; the fixed-function
+# FVF path names it 'ctx'. Their differing locals are not missing callsites.
+assert bridge.count("replay_native_game_pre_draw_surface(s,context,") == 1
+assert bridge.count("replay_native_game_pre_draw_surface(s,ctx,") == 1
 print("01113 native first-Draw full-copy source graph PASS")
