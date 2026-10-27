@@ -43,3 +43,11 @@
 
 - Source edits are not an HMD optical fix. CI source/gate and PC build may PASS independently; they do not prove user-visible flare has been corrected. All conditions should be checked at the exact material SHA, not on later docs-only descendants.
 - Score accounting: no second point for each follow-up verifier repair, CI rerun, docs bookkeeping, or previous 01522..01532 reviews. New achievement may be scored once only after independently verified material task completion and authoritative AI_SCOREBOARD.md update.
+
+## Verified GitHub CI receipts (2026-10-27 KST)
+
+- `a439d53e7ac6099c68ba015d29d59485f14b1ac6`: `VR GitHub General Test Build` run `40493161409` **COMPLETED/SUCCESS**, Win32 game DLL + x64 OpenXR host + test ZIP; artifact ID `12730550743` read back (source compilation including new lens telemetry).
+- `c794347b45d61e685bae2274c89ed5dd505272bd`: `VR PC Fast Test Build` run `40493341236` **COMPLETED/SUCCESS**, exact-SHA artifact `12730101382`, includes all same-task verifier edits.
+- `e22513f7dda81db4ddba6280f5d60799068b90cb`: `DX9Ex OFFICIAL FOCUS R26 HUD Test and Debug` run `40492984744` **COMPLETED/SUCCESS**, artifact `12730546152`. This precedes read-only source telemetry and is not a separate live-HMD validation. Official focus run at later diagnostic source SHA `9f6bdcab8158dc1484e18e5f71000cc003eed8ba` was still running at the time of this note.
+- Separately `DX9Ex Active Validation` at `c794347b...` failed in its architecture policy path on `tools/verify_vr_rank_dx11_reference.py`; `DX9Ex R26 User Test Build` at `a439d53e...` failed in the independent +TIME `r26_stage_fixedfn_harness.cpp` receipt count. Neither is silently relabeled PASS; they need separate work outside this lens-specific patch.
+- All successful Windows source gates are software/static/build validation. `QUEST3_VDXR=NOT_TESTED`; `HEAD_LOCK_ROOT_CAUSE=UNRESOLVED`.
