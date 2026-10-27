@@ -3555,7 +3555,7 @@ int main(int argc, char** argv)
                         // fallback capture against stable frame history; stale
                         // or pointer-only reuse may inherit only the receipt
                         // attached to that exact capture QPC/output generation.
-                        const bool receiptMatchesCapture = [&]() noexcept {
+                        const auto receiptMatchesCapture = [&]() noexcept {
                             return fallbackCapture.available &&
                                 compositor.capturedLayoutKnown_ &&
                                 compositor.capturedLayoutSbs_ &&
