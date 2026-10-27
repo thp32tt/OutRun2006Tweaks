@@ -4141,21 +4141,46 @@ namespace OutRunVRStereo
         HRESULT R30ExecuteXyzrhwStereo(
             IDirect3DDevice9* device, const R30XyzrhwState& state,
             LeftDraw&& leftDraw, RightDraw&& rightDraw,
-            const char* site, R30StereoPassTrace* trace = nullptr)
+            const char* site, R30StereoPassTrace* trace = nullptr,
+            const bool* physicalLeftDrawAttempted = nullptr)
         {
             if (!state.worldEffect)
                 R30CaptureSkyGlowSceneBeforeHud(device);
 
-            R9NoteStereoDrawWithoutMonoBackup();
-            if (LeftDrawMayWriteDepth(device) ||
-                LeftDrawMayWriteStencil(device))
-                R9NoteMainDepthContentWrite();
+            // Most routes enter with a physical LEFT Draw next. R62 can fail
+            // its private projection SetTransform before the raw Draw, so let
+            // that caller defer accounting until an actual GPU submission.
+            const bool deferLeftAccounting =
+                physicalLeftDrawAttempted != nullptr;
+            if (!deferLeftAccounting)
+            {
+                R9NoteStereoDrawWithoutMonoBackup();
+                if (LeftDrawMayWriteDepth(device) ||
+                    LeftDrawMayWriteStencil(device))
+                    R9NoteMainDepthContentWrite();
+            }
 
             const HRESULT leftHr = leftDraw();
+            const bool leftWasPhysicallyAttempted =
+                !physicalLeftDrawAttempted || *physicalLeftDrawAttempted;
+            if (deferLeftAccounting && leftWasPhysicallyAttempted)
+            {
+                R9NoteStereoDrawWithoutMonoBackup();
+                if (LeftDrawMayWriteDepth(device) ||
+                    LeftDrawMayWriteStencil(device))
+                    R9NoteMainDepthContentWrite();
+            }
             if (trace)
                 trace->leftHr = leftHr;
             if (FAILED(leftHr))
             {
+                if (!leftWasPhysicallyAttempted)
+                {
+                    // No driver Draw occurred. R62 restores its original
+                    // projection and may delegate the untouched command to
+                    // the original fixed-function path.
+                    return leftHr;
+                }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
                 R30ArmSafeFallback();
@@ -5973,7 +5998,8 @@ namespace OutRunVRStereo
                 projected
                     ? "R62/D3DXSprite-ProjectedXYZ"
                     : "R62/D3DXSprite-ScreenHudXYZ",
-                tracePhysicalEyes ? &passTrace : nullptr);
+                tracePhysicalEyes ? &passTrace : nullptr,
+                &drawAttempted[0]);
 
             HRESULT projectionRestoreHr = E_PENDING;
             {
@@ -6076,6 +6102,13 @@ namespace OutRunVRStereo
                         identityStable, FrameStereoIncomplete);
                 }
             }
+            // A failed LEFT projection setter submitted no GPU primitive.
+            // Once the original projection is restored, return E_NOTIMPL so
+            // the upper dispatcher can execute the untouched native command
+            // exactly once instead of poisoning the frame with a fake LEFT
+            // draw failure. Any restore failure remains caller-visible.
+            if (!drawAttempted[0] && FAILED(projectionSetHr[0]))
+                return restored ? E_NOTIMPL : E_FAIL;
             return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;
         }
 
