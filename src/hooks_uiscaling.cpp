@@ -3640,6 +3640,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     inline static std::atomic<std::uint64_t> StageFallbacks{ 0 };
     inline static std::atomic<std::uint64_t> GoalFlushes{ 0 };
     inline static std::atomic<std::uint64_t> GoalFallbacks{ 0 };
+    inline static std::atomic<std::uint64_t> RivalBoundaryFlushes{ 0 };
+    inline static std::atomic<std::uint64_t> RivalBoundaryFailures{ 0 };
 
     // A D3DXSprite::Draw may queue triangles until Flush/End. A source-call
     // scope is NOT sufficient ownership for a deferred GPU Draw. We only
@@ -3679,6 +3681,55 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
              source == ProducerToken::OutRunStagePrintf ||
              source == ProducerToken::ResultTextB9200 ||
              source == ProducerToken::PauseOptionArrow);
+    }
+
+    static bool RivalProjectedOwner(
+        OutRunVR::GameSemantic::RenderScope scope,
+        OutRunVR::GameSemantic::ProducerToken source) noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        return scope == RenderScope::ProjectedWorldMarker2D &&
+            source == ProducerToken::RivalMarkerSprani;
+    }
+
+    // Unlike the known-good a22be86a post-Draw policy, do NOT force a rival
+    // Flush after every D3DX Draw. Modern HudBatch can defer an exact queued
+    // rival command past the source callback, however, and its generic
+    // Flush/End owner restoration intentionally excludes RivalMarkerSprani.
+    // Submit only at the native queue boundary while the exact SpriteNode,
+    // selection epoch and Calc3D2D marker are still the current owner.
+    static bool FlushExactRivalAtQueueBoundary(const char* boundary) noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        if (!QueueRenderActive() || !HudBatch.active ||
+            !HudBatch.homogeneous || HudBatch.drawCount == 0 ||
+            !RivalProjectedOwner(HudBatch.scope, HudBatch.producer) ||
+            !HudBatch.matchesGpuOwner(
+                true, CurrentQueueNode(), CurrentQueueNodeEpoch()) ||
+            !RivalProjectedOwner(
+                EffectiveScope(), CurrentRenderProducerToken()))
+            return false;
+
+        const auto* marker = CurrentProjectedMarker();
+        if (!marker || !marker->valid)
+            return false;
+
+        void* sprite = *Module::exe_ptr<void*>(0x55B218);
+        if (!sprite || sprite != HudBatch.sprite)
+            return false;
+
+        const bool flushed = FlushTracked(sprite);
+        auto& counter = flushed ? RivalBoundaryFlushes : RivalBoundaryFailures;
+        const auto n = counter.fetch_add(1, std::memory_order_relaxed) + 1;
+        if (Settings::VRTelemetry &&
+            (n <= 8 || (n & (n - 1)) == 0))
+        {
+            spdlog::info(
+                "VR RIVAL D3DX QUEUE BOUNDARY FLUSH: boundary={} success={} hits={} node={} epoch={} markerValid=1",
+                boundary ? boundary : "unknown", flushed ? 1 : 0, n,
+                CurrentQueueNode(), CurrentQueueNodeEpoch());
+        }
+        return flushed;
     }
 
     static void ForgetBatch() noexcept { HudBatch.forget(); }
@@ -4094,6 +4145,13 @@ public:
                     1, std::memory_order_relaxed);
             }
         }
+        // A rival D3DX Draw may remain buffered after the original 0xBB796
+        // producer callback. Flush it BEFORE SelectSpriteQueueNode switches the
+        // queue owner; this preserves the exact current marker/node provenance
+        // without reintroducing R64's old per-Draw rival Flush.
+        if (QueueRenderActive() && CurrentQueueNode() != nextNode)
+            FlushExactRivalAtQueueBoundary("NEXT_NODE");
+
         const bool enteringStage = StageOwner(nextScope, nextProducer);
         const bool leavingStage = QueueRenderActive() &&
             StageOwner(EffectiveScope(), CurrentRenderProducerToken());
@@ -4181,6 +4239,10 @@ public:
     static void BeforeQueueEnd() noexcept
     {
         using namespace OutRunVR::GameSemantic;
+        // The final rival node has no following QueueNode callback. Submit any
+        // exact deferred D3DX commands while its current node/epoch/marker are
+        // still alive, immediately before EndSpriteQueueRender clears them.
+        FlushExactRivalAtQueueBoundary("QUEUE_END");
         if (HudBatch.boundaryReady && QueueRenderActive() &&
             HudBatch.matchesGpuOwner(
                 true, CurrentQueueNode(), CurrentQueueNodeEpoch()) &&
