@@ -211,6 +211,7 @@ on:
       - 'tools/verify_vr_cross_thread_semantic_registry.py'
       - 'tools/verify_vr_projected_marker_anchor.py'
       - 'tools/verify_vr_rank_dx11_reference.py'
+      - 'tools/verify_vr_rival_known_good_restore.py'
       - 'tools/verify_vr_r30_disprank_postrt_source_fence.py'
       - 'tools/verify_vr_driver_seat_basis_stability.py'
       - 'tools/verify_vr_projected_marker_telemetry.py'
@@ -445,6 +446,7 @@ jobs:
             'tools/verify_vr_cross_thread_semantic_registry.py',
             'tools/verify_vr_projected_marker_anchor.py',
             'tools/verify_vr_rank_dx11_reference.py',
+            'tools/verify_vr_rival_known_good_restore.py',
             'tools/verify_vr_r30_disprank_postrt_source_fence.py',
             'tools/verify_vr_driver_seat_basis_stability.py',
             'tools/verify_vr_ui_matrix_safety.py',
