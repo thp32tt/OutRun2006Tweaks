@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01117",
+  "production_id": "CONVERSION-DX11-01117",
+  "event_id": "CONVERSION-DX11-01117-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01117",
+  "classification": "A_EARLY_VISIBLE_DX11_RAW_NATIVE_GPU_DIAGNOSTIC",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA_5_GATES",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "ea92873533964b204b11cab973ae652e5b4daa4d",
+  "source_change_sha": "cb80c0ca5df4025acc62a1c4423ff2828816a649",
+  "material_result_sha": "1db7d8c42d9ee4d9da6d7dd0ce7d7ca11f239b58",
+  "validation_bearing_result_sha": "1db7d8c42d9ee4d9da6d7dd0ce7d7ca11f239b58",
+  "result_sha": "1db7d8c42d9ee4d9da6d7dd0ce7d7ca11f239b58",
+  "implementation_commits": [
+    "cb80c0ca5df4025acc62a1c4423ff2828816a649",
+    "1db7d8c42d9ee4d9da6d7dd0ce7d7ca11f239b58"
+  ],
+  "repair_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tools/package_dx11_first_game_frame.py",
+    "tools/test_package_dx11_first_game_frame.py"
+  ],
+  "feature_contract": {
+    "goal": "Provide an explicit non-production, user-visible D3D11 actual GPU partial game tile while preserving original D3D9Ex render, gamepad/FFB, protected DXVK and native L/R OpenXR provenance.",
+    "positive": [
+      "source-authenticated sampled native Draw after prior full-scene poison only within RAW opt-in",
+      "nonblocking D3D11 color tile copy and marked 256x144 D3D9 diagnostic inset",
+      "separate source-matched RAW and DX9Ex control CMD packaged on validated SHA"
+    ],
+    "negative": [
+      "ordinary/full native production path remains fail-closed",
+      "invalid real source COM/format/RT/depth and any device/texture lifetime boundaries retain rejection",
+      "GPU tile does not become native OpenXR eye or a full native frame",
+      "RAW runtime visualization remains untested"
+    ]
+  },
+  "github_actions_gates": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40554202396,
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40554202537,
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40554202503,
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40554202424,
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40554202487,
+      "conclusion": "success"
+    }
+  ],
+  "source_matched_artifact": {
+    "workflow_run": 40554202424,
+    "artifact_id": 12757890069,
+    "name": "feature-dx11-first-game-frame-1db7d8c42d9ee4d9da6d7dd0ce7d7ca11f239b58",
+    "run_raw": "RUN_DX11_RAW_VISUAL.cmd",
+    "run_control": "RUN_DX9EX_CONTROL.cmd",
+    "evidence": "DX11_RAW_VISUAL_EVIDENCE.txt"
+  },
+  "runtime_observations": {
+    "native_draws": "UNTESTED",
+    "native_gpu_pixel_output": "UNTESTED",
+    "native_gpu_tile_visible": "UNTESTED",
+    "full_native_frame": "UNTESTED",
+    "quest3_stereo": "UNTESTED"
+  },
+  "scoreboard": {
+    "ssot_repo": "thp32tt/ai-dev-lab",
+    "file": "AI_SCOREBOARD.md",
+    "scoreboard_commit": "73999b4cbe6c8f2d12919b3132ac2e5c85c8f96e",
+    "ai": "AI2",
+    "previous_cumulative": 2046,
+    "score_change": 1,
+    "new_cumulative": 2047
+  },
+  "release_promotion": false,
+  "external_controller_adoption": "UNVERIFIED",
+  "next_action": "Run the exact-SHA RAW desktop game session and DX9Ex control, confirm authentic native_draws/native_gpu_pixel_output/visible marked tile, then repair evidenced missing GPU stage and extend complete menu->car->race native L/R OpenXR."
+}
