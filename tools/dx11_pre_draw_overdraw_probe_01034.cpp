@@ -72,13 +72,16 @@ int main() {
     assert(append(batch,expected,0,0,5,5,0xff555555u));
     assert(batch.count == 4u && replay(batch) == expected);
 
-    // Over capacity with 17 actually distinct writes must fail transactionally.
+    // Authentic 128 nonfusible source ColorFill writes remain admitted.
+    // The 129th separate game tile must fail without changing prior pixels.
     batch.discard(); expected = {};
-    for (std::uint32_t i=0; i<16u; ++i)
-        assert(append(batch,expected,i*2u,0,i*2u+1u,1,0xff000000u+i));
+    for (std::uint32_t i=0; i<128u; ++i) {
+        const auto x=std::int64_t((i%20u)*2u),y=std::int64_t((i/20u)*2u);
+        assert(append(batch,expected,x,y,x+1,y+1,0xff000000u+i));
+    }
     const auto before = batch.entries;
-    assert(!batch.record(77u,88u,34,0,35,1,W,H,0xffabcdefu));
-    assert(batch.count == 16u);
+    assert(!batch.record(77u,88u,0,15,1,16,W,H,0xffabcdefu));
+    assert(batch.count == 128u);
     for (std::size_t i=0; i<before.size(); ++i) {
         assert(batch.entries[i].left==before[i].left);
         assert(batch.entries[i].right==before[i].right);
@@ -86,9 +89,9 @@ int main() {
     }
     assert(replay(batch) == expected);
     assert(!batch.record(79u,88u,0,0,40,16,W,H,0xffffffffu));
-    assert(batch.count == 16u && replay(batch) == expected);
+    assert(batch.count == 128u && replay(batch) == expected);
     assert(!batch.record(77u,88u,7,1,7,2,W,H,0xffffffffu));
-    assert(batch.count == 16u);
+    assert(batch.count == 128u);
     // No-op clipped offscreen write is allowed and consumes no tile.
     assert(batch.record(77u,88u,41,0,45,2,W,H,0xffffffffu));
     assert(batch.count == 16u);
