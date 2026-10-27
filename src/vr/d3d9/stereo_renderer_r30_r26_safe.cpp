@@ -4206,8 +4206,49 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
+            // Original 0x42A3A0 rival animation is a 28-byte DPUP quad.
+            // Sample the LIVE FVF/VS before any XYZRHW admission. This proves
+            // whether it uses the historical fixed-function path or reaches
+            // the later R33 shader/c64 transaction; no state is changed.
+            const auto rivalCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool exactRival =
+                Settings::VRTelemetry &&
+                rivalCommand.scope ==
+                    OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                rivalCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani;
+            DWORD rivalFvf = 0xFFFFFFFFu;
+            bool rivalFvfOk = false;
+            bool rivalVsReadOk = false;
+            bool rivalVsBound = false;
+            if (exactRival && device)
+            {
+                rivalFvfOk = SUCCEEDED(device->GetFVF(&rivalFvf));
+                IDirect3DVertexShader9* liveVs = nullptr;
+                rivalVsReadOk = SUCCEEDED(device->GetVertexShader(&liveVs));
+                rivalVsBound = rivalVsReadOk && liveVs != nullptr;
+                if (liveVs)
+                    liveVs->Release();
+            }
+
             R30XyzrhwState state{};
-            if (!R30PrepareXyzrhwState(device, state))
+            const bool prepared = R30PrepareXyzrhwState(device, state);
+            if (exactRival)
+            {
+                static std::atomic<std::uint64_t> rivalPrepare{0};
+                const auto hit = rivalPrepare.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (hit <= 8 || (hit & (hit - 1)) == 0)
+                    spdlog::info(
+                        "VR RIVAL XYZRHW PREPARE: hits={} prepared={} stride={} primitives={} fvfOk={} fvf=0x{:08X} vsReadOk={} vsBound={} queued={} node={} epoch={}",
+                        hit, prepared ? 1 : 0, stride, primitiveCount,
+                        rivalFvfOk ? 1 : 0, static_cast<unsigned>(rivalFvf),
+                        rivalVsReadOk ? 1 : 0, rivalVsBound ? 1 : 0,
+                        rivalCommand.queued ? 1 : 0, rivalCommand.queueNode,
+                        rivalCommand.queueEpoch);
+            }
+            if (!prepared)
                 return E_NOTIMPL;
             const UINT vertexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
