@@ -315,3 +315,30 @@ unhooked masked renderer.
 - `ADMITTED`: proceed to projected-delta and physical two-eye receipts.
 
 This remains diagnostic only; no render route is widened.
+
+## 2026-10-27 15:xx correction: "stock rival" was not the Oct-9 HMD-known-good VR route
+
+A direct source comparison corrects an earlier A/B assumption:
+
+- HMD-known-good `a22be86a` did **not** leave rival completely stock. The
+  shared `Calc3D2D_dest` inline hook recognized the original return site
+  `0xBB6F5` and captured `RivalMarkerProjectedInfo`; the original
+  `0xBB796` CALL was also unconditionally replaced by
+  `RivalMarker_sprani`, which tagged the newly queued nodes as
+  `ProjectedWorldMarker2D/RivalMarkerSprani`.
+- Modern `RivalDx11NativeRoute=true` deliberately skips the exact
+  `0xBB6F0` call wrapper **and** skips the `0xBB796` sprani wrapper.
+  Even if the shared Calc3D2D inline hook can still observe the original
+  return site, no rival-specific sprani wrapper consumes that anchor and
+  publishes it to SpriteNode semantics.
+- Therefore the prior D experiment that set
+  `RivalDx11NativeRoute=true` was a *stock/original control*, not a restore
+  of the Oct-9 VR-correct implementation. Its failure does not refute the
+  a22 ownership model.
+- Current focus `RivalDx11NativeRoute=false` is the appropriate lineage:
+  the exact BB6F0 bridge preserves the same shared Calc3D2D recovery while
+  the BB796 wrapper again tags the native animation nodes. Its native-first
+  ordering and null-root first-writer handling now match the known-good
+  behavior without unsafe stale-tail dereferences.
+
+This correction removes "try stock rival again" from the repair plan.
