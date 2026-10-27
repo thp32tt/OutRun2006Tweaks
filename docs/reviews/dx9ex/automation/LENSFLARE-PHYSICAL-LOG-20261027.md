@@ -43,3 +43,10 @@
 - Independent pinned source review: `LENSFLARE-R26-LOWER-OWNER-20261027-2042.md` proves that the **default R26+HUD lower target is R26/R23** even though R30 uses a local callback named `r29Draw`. R84 opt-in has a different owner. Earlier references to default lower R29 were incorrect and are superseded by this correction.
 - Important limitation: `R30SafeStereoBase` may reject before the lens physical CLASS event; deferred opaque CABE can also reach the native draw with `EffectiveScope::None`, which the new CLASS/EYES/LOWER log deliberately does not attribute to lens. A missing lens log cannot exclude physical rendering, nor does it refute deferred semantic loss.
 - More unconditional logs of *all* scope-None world draws would create enormous noise without proving a CABE/C993 source link. Keep that incomplete provenance explicit. The next meaningful escalation is a vetted exact source-descriptor-to-physical-draw correlation, not a guessed persistent TLS token or unsafe new EXE hook.
+
+## Exact-SHA CI verification (2026-10-27 KST)
+
+- **Material SHA**: `36a117c889b07048afd4576d25474a9a7317e80a`. Later branch HEAD changes to this reviewed source were docs-only.
+- GitHub Actions `VR PC Fast Test Build` run `40497661770`: **COMPLETED / SUCCESS**, native Win32 package artifact ID `12731147861` and exact-SHA named ZIP.
+- GitHub Actions `DX9Ex OFFICIAL FOCUS R26 HUD Test and Debug` run `40497661789`: **COMPLETED / SUCCESS**, source checks, physical diagnostic verifier, Win32 game DLL, x64 OpenXR host, RelWithDebInfo and TEST/DEBUG package; artifact `12731862150`, ~20.58 MB. No Quest3/VDXR real-world frame claim.
+- Same-task CI verifier repairs and documentation are score +0; `AI_SCOREBOARD.md` SSOT accounts for this one independent source accomplishment once.
