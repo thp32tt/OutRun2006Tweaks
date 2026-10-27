@@ -19,7 +19,7 @@ def connected(b,r,h):
         "count > GameNativeSourceMutation::kMaxPartialTargetClearRects" in b,
         "rectCount > kMaxPreDrawTargetClearSourceRects" in r,
         "!GameNativeClearCoverage::covers_whole(" in b,
-        "if (!clearStencil && sameBackbuffer &&" in b,
+        "if (sameBackbuffer &&" in b,
         "if (clearZ)" in b,
         "GameNativePreDrawCombinedClear::record(" in b,
         "s.frameBatch.accepts_full(s.sourceDrawsThisFrame)" in b,
@@ -32,7 +32,7 @@ def connected(b,r,h):
 assert connected(region,source,hook)
 for old,new in (
     ("s.preDrawFills.record_target_clear(","s.preDrawFills.reject_clear("),
-    ("if (!clearStencil && sameBackbuffer &&","if (sameBackbuffer &&"),
+    ("if (sameBackbuffer &&","if (false && sameBackbuffer &&"),
     ("s.frameBatch.accepts_full(s.sourceDrawsThisFrame)","true"),
     ("!GameNativeClearCoverage::covers_whole(","GameNativeClearCoverage::covers_whole("),
 ):

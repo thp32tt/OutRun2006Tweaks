@@ -23,6 +23,21 @@ struct GameNativeMainStencilClear {
                sameMainDepthStencil && fullClearCoverage && nativeBatchOpen;
     }
 
+    // Before the FIRST native Draw, stencil-only or TARGET|Z|STENCIL
+    // partial Clears can retain an owned full-frame color/Z seed. Unlike
+    // post-Draw ClearView, no native DSV exists yet: require the verified
+    // canonical D3D9 Z/S COM surface, a pristine source Draw ordinal,
+    // bounded rectangles and fail-closed native stencil-free admission.
+    // Actual Z rectangles are staged separately and atomically with color.
+    [[nodiscard]] static constexpr bool may_ignore_pre_draw(
+        bool nativeFullFrame, bool originalMainColorSeed,
+        bool sameMainDepthStencil, bool beforeFirstSourceDraw,
+        bool boundedSourceRects) noexcept {
+        return nativeFullFrame && originalMainColorSeed &&
+               sameMainDepthStencil && beforeFirstSourceDraw &&
+               boundedSourceRects;
+    }
+
     // A clipped main TARGET/Z/STENCIL Clear is stencil-neutral to admitted
     // native Draws (whose stencil test and writes are disabled). The caller
     // must FIRST prove a live Draw, canonical main depth owner, bounded game

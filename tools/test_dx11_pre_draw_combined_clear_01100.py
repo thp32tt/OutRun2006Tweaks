@@ -5,7 +5,7 @@ assert '#include "native_game_pre_draw_combined_clear.hpp"' in bridge
 start=bridge.index("bool preserve_game_partial_target_clear(")
 end=bridge.index("void observe_game_clear(",start)
 hook=bridge[start:end]
-assert "if (!clearStencil && sameBackbuffer &&" in hook
+assert "if (sameBackbuffer &&" in hook
 assert "s.frameBatch.depthClearPending" in hook
 assert "s.clearColor.main_depth_still_bound(" in hook
 assert "depthDesc.MultiSampleType != D3DMULTISAMPLE_NONE" in hook

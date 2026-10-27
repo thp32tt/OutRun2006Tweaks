@@ -9196,7 +9196,7 @@ bool preserve_game_partial_target_clear(
         // Preserve multi-rectangle source writes when their viewport-clipped
         // ordered pixels fit the 16-tile transaction; unrepresentable writes
         // and foreign owners still leave original D3D9 output authoritative.
-        if (!clearStencil && sameBackbuffer &&
+        if (sameBackbuffer &&
             s.sourceGameDevice == owner && !s.pending &&
             s.frameBatch.submitted == 0u && !s.frameBatch.stopped &&
             s.frameBatch.accepts_full(s.sourceDrawsThisFrame) &&
@@ -9205,35 +9205,56 @@ bool preserve_game_partial_target_clear(
                 backbufferDesc.Width, backbufferDesc.Height,
                 vp.X, vp.Y, vp.Width, vp.Height, count, rects)) {
             const auto mainRt = reinterpret_cast<std::uintptr_t>(bbIdentity.Get());
-            if (clearZ) {
-                // An authentic clipped TARGET|ZBUFFER pre-Draw Clear changes
-                // TWO independent native attachments. The color-only route
-                // must not drop Z, nor apply half of a failed D3D9 batch.
-                // Both seed identities and the pending full Z epoch are
-                // proved before staging either native GPU replay ledger.
+            if (clearZ || clearStencil) {
+                // The original D3D9 source can combine cropped TARGET with
+                // STENCIL, Z or both before any native Draw. The native
+                // full-frame SM3/FVF path admits no stencil testing/writes,
+                // but the D3D9 Z/S surface still requires exact main-owner
+                // proof. Never confuse an offscreen/foreign stencil Clear
+                // with a legal write to this native game frame.
                 ComPtr<IDirect3DSurface9> gameDepth;
                 ComPtr<IUnknown> depthIdentity;
                 D3DSURFACE_DESC depthDesc{};
-                if (!s.frameBatch.depthClearPending ||
-                    !s.frameBatch.can_seed_pre_draw_depth(
+                const bool canonicalDepth =
+                    SUCCEEDED(game->GetDepthStencilSurface(
+                        gameDepth.GetAddressOf())) && gameDepth &&
+                    SUCCEEDED(gameDepth->GetDesc(&depthDesc)) &&
+                    SUCCEEDED(gameDepth.As(&depthIdentity)) && depthIdentity &&
+                    s.clearColor.main_depth_still_bound(
+                        reinterpret_cast<std::uintptr_t>(depthIdentity.Get())) &&
+                    depthDesc.Width == backbufferDesc.Width &&
+                    depthDesc.Height == backbufferDesc.Height &&
+                    depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE;
+                if (!canonicalDepth) return false;
+                if (clearStencil &&
+                    !GameNativeMainStencilClear::may_ignore_pre_draw(
+                        env_full_game_opt_in(),
                         s.clearColor.matches(owner, mainRt),
-                        s.sourceDrawsThisFrame == 0u) ||
-                    FAILED(game->GetDepthStencilSurface(
-                        gameDepth.GetAddressOf())) || !gameDepth ||
-                    FAILED(gameDepth->GetDesc(&depthDesc)) ||
-                    FAILED(gameDepth.As(&depthIdentity)) || !depthIdentity ||
-                    !s.clearColor.main_depth_still_bound(
-                        reinterpret_cast<std::uintptr_t>(depthIdentity.Get())) ||
-                    depthDesc.Width != backbufferDesc.Width ||
-                    depthDesc.Height != backbufferDesc.Height ||
-                    depthDesc.MultiSampleType != D3DMULTISAMPLE_NONE)
+                        canonicalDepth,
+                        !s.pending && s.frameBatch.submitted == 0u &&
+                            s.sourceDrawsThisFrame == 0u,
+                        count <= GameNativePreDrawFills::
+                            kMaxPreDrawTargetClearSourceRects))
                     return false;
-                return GameNativePreDrawCombinedClear::record(
-                    s.preDrawFills, s.preDrawDepth, owner, mainRt,
-                    reinterpret_cast<std::uintptr_t>(depthIdentity.Get()),
-                    backbufferDesc.Width, backbufferDesc.Height,
-                    vp.X, vp.Y, vp.Width, vp.Height,
-                    count, rects, static_cast<std::uint32_t>(color), z);
+                if (clearZ) {
+                    // Z has actual native D32 pixels. Preserve the previous
+                    // full-depth seed requirement and stage COLOR+Z together;
+                    // stencil-neutrality must never disguise absent Z replay.
+                    if (!s.frameBatch.depthClearPending ||
+                        !s.frameBatch.can_seed_pre_draw_depth(
+                            s.clearColor.matches(owner, mainRt),
+                            s.sourceDrawsThisFrame == 0u))
+                        return false;
+                    return GameNativePreDrawCombinedClear::record(
+                        s.preDrawFills, s.preDrawDepth, owner, mainRt,
+                        reinterpret_cast<std::uintptr_t>(depthIdentity.Get()),
+                        backbufferDesc.Width, backbufferDesc.Height,
+                        vp.X, vp.Y, vp.Width, vp.Height,
+                        count, rects, static_cast<std::uint32_t>(color), z);
+                }
+                // TARGET|STENCIL mutates no D3D11 depth pixels in the
+                // admitted stencil-disabled subset. The real D3D9 Clear
+                // already executed; stage only its genuine color rectangles.
             }
             return s.preDrawFills.record_target_clear(
                 owner, mainRt, backbufferDesc.Width, backbufferDesc.Height,
