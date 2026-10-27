@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "stereo_renderer_r7.inc"
+#include "vr/game/offscreen_depth_clear_lineage.hpp"
 
 namespace OutRunVRStereo
 {
@@ -538,7 +539,30 @@ namespace OutRunVRStereo
 			const bool wanted = StereoWanted();
 			const bool mainTarget = TargetIsBackBuffer();
 			if (!wanted || !mainTarget)
-				return R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+			{
+				// Original offscreen Clear runs once with its normal target and
+				// HRESULT. A successful Z/stencil clear can still mutate the EXACT
+				// main depth bound under an auxiliary RT0 while RIGHT keeps its
+				// previous depth snapshot (R9/R7 review 01517).
+				const HRESULT originalHr = R9ClearCallbackHook.stdcall<HRESULT>(
+					device, count, rects, flags, color, z, stencil);
+				const auto lineage = OutRunVR::OffscreenDepthClearLineage::Decide(
+					SUCCEEDED(originalHr), wanted, !mainTarget, R9StereoSeeded,
+					R9CurrentDepthCanMirror() && TrackedDepthStencil,
+					(flags & D3DCLEAR_ZBUFFER) != 0,
+					(flags & D3DCLEAR_STENCIL) != 0,
+					R9TrackedMainDepthHasStencil(),
+					RightDepthSynchronized, RightStencilSynchronized);
+				if (lineage.mainContentChanged)
+				{
+					if (lineage.invalidateDepth)
+						RightDepthSynchronized = false;
+					if (lineage.invalidateStencil)
+						RightStencilSynchronized = false;
+					R9NoteMainDepthContentWrite();
+				}
+				return originalHr;
+			}
 
 			if (R9DeferredDepth || !R9CurrentDepthCanMirror())
 			{
