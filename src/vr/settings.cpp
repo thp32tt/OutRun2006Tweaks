@@ -75,8 +75,8 @@ namespace Settings
     // IPD/FOV. The R26 ordinal-only cant experiment is reversible.
     Setting<bool> VRRankDx11ProducerReference{ "VR", "RankDx11ProducerReference", true,
         "DX11 R57 mode6 direct original Calc3D2D output rank source; false restores the guarded R26 input check for A/B." };
-    Setting<bool> VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", true,
-        "A/B test of stock original rival marker after exact projector produced anchorValid=1 but registeredDelta=0 for 8192 calls. Set false to retry the experimental hook. Restart required." };
+    Setting<bool> VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", false,
+        "Restores the HMD-known-good R26 0xBB6F0/0xBB796 projected producer: native sprani runs first, then its recovered Calc3D2D anchor tags the appended live queue nodes. No GOAL D3DX flush is used. True bypasses both hooks for stock comparison. Restart required." };
     Setting<bool> VRRankDesktopLift{ "VR", "RankDesktopLift", false,
         "Reversible optional +32 original UI pixel rank vertical lift, absent in tested DX11. Default off. Does not affect rival." };
     Setting<bool> VRRankDx11ReferenceEyePose{ "VR", "RankDx11ReferenceEyePose", true,
@@ -125,7 +125,7 @@ namespace Settings
     // EXE+CABE lens discs, actual sky/lighting and desktop remain unchanged.
     // User confirmed hiding C993 did not remove duplicate sun; A/B hiding is optional only.
     Setting<bool> VRLensFlareCentreEnabled{ "VR", "LensFlareCentreEnabled", true,
-        "VR only: render the central 0x570002 flare at the exact original C993 call. Default true keeps the real sun visible for exact stereo repair; false hides only this draw for explicit optical A/B, not as a fix. Outer CABE discs and sky remain intact." };
+        "Legacy compatibility option: all real flare/sun children render unconditionally in VR. False is deliberately ignored; hiding any sun part masked the underlying stereo problem." };
     // F11 VR PMT visibility policy; the desktop/legacy gate stays unchanged.
     Setting<int> VRStageCullingMode{ "VR", "StageCullingMode", 1,
         "VR PMT culling: Legacy follows Graphics/DisableStageCulling; VR Wide keeps culling with a stereo FOV and safety margin; Off disables PMT culling. HMD validation required.",

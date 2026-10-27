@@ -64,9 +64,9 @@ try {
         '-DisableDesktopVsync=true','-SkyGlowFactor=1',
         '-PreferD3D9Ex=true','-DirectGpuOnly=false','-DisableDesktopDuplication=false',
         '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
-        '-RivalDx11NativeRoute=true',
+        '-RivalDx11NativeRoute=false',
         '-AutoRenderResolution=true','-FollowGameResolution=false',
-        '-MirrorPreserveAspect=false',
+        '-MirrorPreserveAspect=true',
         '-UnifiedEyeMenuSource=false','-AntiAliasing=2',
         '-Hud1080pReference=true','-HudScale=0.55',
         '-MenuScale=1.00','-CullingUnionMarginDegrees=8.0'

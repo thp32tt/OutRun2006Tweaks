@@ -1346,10 +1346,19 @@ class UIScaling : public Hook
                     sourceRoots &&
                     (producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani ||
                      allowCurrentRootRebuild);
-                node = exactCurrentChainOwner
-                    ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
-                        root, before[prio], tailAfter, Game::SpriteNodeMax)
-                    : sourceRoots
+                const bool rivalCreatedFreshRoot =
+                    sourceRoots &&
+                    producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
+                    (*sourceRoots)[prio] == nullptr &&
+                    before[prio] == nullptr;
+                node = rivalCreatedFreshRoot
+                    ? OutRunVR::SpriteQueue::FirstVerifiedNewRootAppendedChain(
+                        (*sourceRoots)[prio], before[prio], root, tailAfter,
+                        Game::SpriteNodeMax)
+                    : exactCurrentChainOwner
+                        ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
+                            root, before[prio], tailAfter, Game::SpriteNodeMax)
+                        : sourceRoots
                         ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot(
                             (*sourceRoots)[prio], root, before[prio],
                             tailAfter, Game::SpriteNodeMax)
@@ -2462,11 +2471,6 @@ class UIScaling : public Hook
 	static int __cdecl RivalMarker_sprani(
 		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
-        // Preserve this native source's registration boundary: a nested
-        // exact producer must retain its newer SpriteNode stereo owner.
-        const auto entrySerial =
-            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
-                std::memory_order_acquire);
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
@@ -2476,62 +2480,42 @@ class UIScaling : public Hook
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
 
-		// The original exact 0xBB796 rival CALL may draw immediately before
-		// queueing animated siblings. Consume the preceding 0xBB6F5 anchor
-		// once and use it for BOTH source-time and queued draw ownership.
-		// Keep the game's original coordinates, alpha and sprite calls intact.
+		const int result = Game::sprani_play_ae_auth_alpha(
+			spriteId, x, y, a4, a5, alpha);
+		// R71 HMD evidence binds this exact 0xBB796 producer to the
+		// vehicle-relative rival marker. Reuse its proven Calc3D2D anchor when
+		// available; fail softly to the current strict WorldBillboard route.
 		const auto projectedAnchor = RivalMarkerProjectedInfo;
+		// Only the first marker from the matching 0xBB6F5 Calc3D2D producer
+		// can consume this anchor. No subsequent vehicle or frame may inherit it.
 		RivalMarkerProjectedInfo = {};
 		const bool projected = projectedAnchor.valid;
         OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
             OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
             OutRunVR::GameSemantic::ProjectedMarkerProbeStage::Producer,
             projected);
-		const auto scope = projected
-			? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-			: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-		int result = 0;
-		{
-			OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
-                scope, projected ? &projectedAnchor : nullptr, Settings::VREnabled,
-                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);
-			result = Game::sprani_play_ae_auth_alpha(
-				spriteId, x, y, a4, a5, alpha);
-		}
-        if (Settings::VREnabled && Settings::VRTelemetry)
-        {
-            static thread_local std::uint64_t rivalDraws = 0;
-            const auto n = ++rivalDraws;
-            if (n <= 8 || (n & (n - 1)) == 0)
-                spdlog::info(
-                    "VR RIVAL PHYSICAL PRODUCER: hits={} anchorValid={} "
-                    "viewZ={} spriteId={}",
-                    n, projected ? 1 : 0, projectedAnchor.viewZ, spriteId);
-        }
-		// The prior HMD-accepted queued rival nodes retain exactly the same
-		// scope and anchor, with no widening to generic world/HUD sprites.
-		const auto registeredBefore =
-            OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
-                std::memory_order_relaxed);
-		TagAppendedNodes(before, scope,
+        // Keep the 2026 current-chain safety proof: unlike the historical
+        // oldTail->next dereference this tolerates a rebuilt live priority root
+        // without reading a detached/recycled node.
+		TagAppendedNodes(
+			before,
+			projected
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard,
 			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
 			projected ? &projectedAnchor : nullptr,
-            &rootsBefore, entrySerial);
+            &rootsBefore);
         if (Settings::VREnabled && Settings::VRTelemetry)
         {
-            const auto registeredAfter =
-                OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
-                    std::memory_order_relaxed);
-            static thread_local std::uint64_t rivalQueuePublishes = 0;
-            const auto n = ++rivalQueuePublishes;
+            static thread_local std::uint64_t restoredHits = 0;
+            const auto n = ++restoredHits;
             if (n <= 8 || (n & (n - 1)) == 0)
                 spdlog::info(
-                    "VR RIVAL QUEUE PUBLICATION: hits={} registeredDelta={} anchorValid={} policy=EXACT_CURRENT_CHAIN",
-                    n, registeredAfter - registeredBefore, projected ? 1 : 0);
+                    "VR RIVAL KNOWN-GOOD ORDER RESTORED: hits={} anchorValid={} viewZ={} nativeFirst=1 directGoalFlush=0",
+                    n, projected ? 1 : 0, projectedAnchor.viewZ);
         }
 		return result;
 	}
-
     // 2026-10-11 Quest3 dumps proved that hooking any of the nineteen
     // original GOAL B9200 E8 return sites can corrupt a legal branch target.
     // Recover the source from its exact return address on the call stack of
@@ -3731,6 +3715,28 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
             HudBatch.scope, HudBatch.producer,
             HudBatch.provenDirectB9200 && !HudBatch.queued);
+        // Rival-specific forensic sink: a deferred 0xBB796 D3DX Draw can
+        // remain in this ledger after the native source-call scope ended.
+        // The +TIME/GOAL restore whitelist intentionally excludes that
+        // projected-world rival; prove a REAL physical Flush occurred
+        // before considering any isolated rival owner restoration.
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            HudBatch.producer == ProducerToken::RivalMarkerSprani)
+        {
+            static std::atomic<std::uint64_t> rivalSinkProbes{0};
+            const auto n = rivalSinkProbes.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL NATIVE GPU FLUSH SINK: hits={} pendingDraws={} batchActive={} homogeneous={} scope={} queueActive={} restore={} exactLiveSprite={}",
+                    n, HudBatch.drawCount, HudBatch.active ? 1 : 0,
+                    HudBatch.homogeneous ? 1 : 0,
+                    Name(HudBatch.scope), QueueRenderActive() ? 1 : 0,
+                    restore ? 1 : 0,
+                    DX9ExD3DXSpriteLifetime::CanFlush(
+                        self, HudBatch.sprite,
+                        *Module::exe_ptr<void*>(0x55B218)) ? 1 : 0);
+        }
         // A mixed/unknown older native batch must not borrow a currently
         // active +TIME or GOAL direct source at PHYSICAL Flush/End. Verified
         // homogeneous owner batches still restore their exact producer;
@@ -3772,6 +3778,28 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
             HudBatch.scope, HudBatch.producer,
             HudBatch.provenDirectB9200 && !HudBatch.queued);
+        // Rival-specific forensic sink: a deferred 0xBB796 D3DX Draw can
+        // remain in this ledger after the native source-call scope ended.
+        // The +TIME/GOAL restore whitelist intentionally excludes that
+        // projected-world rival; prove a REAL physical End occurred
+        // before considering any isolated rival owner restoration.
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            HudBatch.producer == ProducerToken::RivalMarkerSprani)
+        {
+            static std::atomic<std::uint64_t> rivalSinkProbes{0};
+            const auto n = rivalSinkProbes.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL NATIVE GPU END SINK: hits={} pendingDraws={} batchActive={} homogeneous={} scope={} queueActive={} restore={} exactLiveSprite={}",
+                    n, HudBatch.drawCount, HudBatch.active ? 1 : 0,
+                    HudBatch.homogeneous ? 1 : 0,
+                    Name(HudBatch.scope), QueueRenderActive() ? 1 : 0,
+                    restore ? 1 : 0,
+                    DX9ExD3DXSpriteLifetime::CanFlush(
+                        self, HudBatch.sprite,
+                        *Module::exe_ptr<void*>(0x55B218)) ? 1 : 0);
+        }
         // A mixed/unknown older native batch must not borrow a currently
         // active +TIME or GOAL direct source at PHYSICAL Flush/End. Verified
         // homogeneous owner batches still restore their exact producer;
@@ -3936,6 +3964,26 @@ public:
     static void AfterDirectGoalSource() noexcept
     {
         using namespace OutRunVR::GameSemantic;
+        // The a22be86a HMD-correct rival had no GOAL D3DX exit flush.
+        // The newer E rival wrapper calls this GOAL-only gate, but its
+        // ScreenHud/GOAL producer whitelist EXCLUDES RivalMarkerSprani.
+        // Observe whether a real rival D3DX batch exists; do NOT force
+        // a new physical Flush or accidentally promote generic 2D sprites.
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            CurrentRenderProducerToken() == ProducerToken::RivalMarkerSprani)
+        {
+            static std::atomic<std::uint64_t> probes{0};
+            const auto n = probes.fetch_add(1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL DIRECT D3DX GOAL-GATE PROBE: hits={} batchActive={} pendingDraws={} homogeneous={} batchScope={} batchProducer={} queueActive={} stageTicketAllows={} physicalSprite={}",
+                    n, HudBatch.active ? 1 : 0, HudBatch.drawCount,
+                    HudBatch.homogeneous ? 1 : 0,
+                    Name(HudBatch.scope), Name(HudBatch.producer),
+                    QueueRenderActive() ? 1 : 0,
+                    StageTicketAllowsSubmission() ? 1 : 0,
+                    HudBatch.sprite == *Module::exe_ptr<void*>(0x55B218) ? 1 : 0);
+        }
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
         if (!StageTicketAllowsSubmission() ||
             !HudBatch.matchesGpuOwner(false, nullptr, 0) ||
@@ -4207,6 +4255,27 @@ private:
         const auto command = CapturePhysicalDrawCommand();
         const auto scope = command.scope;
         const auto source = command.producer;
+        // Stronger than the BB796 wrapper counter: this is an actual
+        // native ID3DXSprite::Draw call. A valid original rival projector
+        // without this row may enqueue ordinary SpriteNodes or use another
+        // renderer; never infer a D3DX submission from the parent E8.
+        const bool exactRivalNativeDraw = Settings::VREnabled &&
+            Settings::VRTelemetry &&
+            source == ProducerToken::RivalMarkerSprani;
+        if (exactRivalNativeDraw)
+        {
+            static std::atomic<std::uint64_t> actualRivalD3dxDraws{0};
+            const auto n = actualRivalD3dxDraws.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL ACTUAL D3DX DRAW: hits={} scope={} queued={} projectedValid={} isGameSprite={} sameTrackedSprite={}",
+                    n, Name(scope), command.queued ? 1 : 0,
+                    CurrentProjectedMarker() &&
+                        CurrentProjectedMarker()->valid ? 1 : 0,
+                    self == *Module::exe_ptr<void*>(0x55B218) ? 1 : 0,
+                    self == HudBatch.sprite ? 1 : 0);
+        }
         // Prove the original 19 E8 parent stack at CPU Draw, before D3DX
         // defers its GPU submission. Never inherit a queued node identity.
         // An unowned original caller already passed the expensive stack
@@ -4219,6 +4288,19 @@ private:
         const auto submission = HudBatch.snapshot();
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
+        if (exactRivalNativeDraw)
+        {
+            static std::atomic<std::uint64_t> returns{0};
+            const auto n = returns.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL D3DX DRAW RETURN: hits={} hr=0x{:08X} batchActive={} pendingDraws={} homogeneous={} batchScope={} batchProducer={}",
+                    n, static_cast<unsigned>(hr),
+                    HudBatch.active ? 1 : 0, HudBatch.drawCount,
+                    HudBatch.homogeneous ? 1 : 0,
+                    Name(HudBatch.scope), Name(HudBatch.producer));
+        }
         // D3DXSprite::Draw can call its own hooked Flush before returning.
         // If that native Flush completed successfully, the newly queued
         // Draw is the FIRST command of the next texture batch, not a failed
@@ -4487,6 +4569,29 @@ class VRHudQueueSemanticBridge : public Hook
         const void* node = reinterpret_cast<const void*>(ctx.edi);
         VRProjectedD3DXSpriteIsolationR64::BeforeQueueNode(node);
 		OutRunVR::GameSemantic::SelectSpriteQueueNode(node);
+        // The original 0x42D710 selects the live SpriteNode before
+        // dispatching one of four physical paths. For the exact rival
+        // tag only, capture its native kind_C (0 D3DX/UP; !=0 animation).
+        // Unlike speculative post-source tail dereferences, ctx.edi is
+        // the original game's CURRENT queue-consumer node.
+        if (Settings::VREnabled && Settings::VRTelemetry && node &&
+            OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
+                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani)
+        {
+            static thread_local std::uint64_t rivalSelections = 0;
+            const auto n = ++rivalSelections;
+            if (n <= 8 || (n & (n - 1)) == 0)
+            {
+                const auto* live = reinterpret_cast<const SpriteNode*>(node);
+                spdlog::info(
+                    "VR RIVAL NATIVE QUEUE CONSUMER: hits={} node={} kind={} class={} projected={} epoch={}",
+                    n, node, live->kind_C,
+                    live->kind_C == 0 ? "SPRITE_D3DX_OR_UP" :
+                                        "ANIMATION_QUAD_OR_MASK",
+                    OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+            }
+        }
 	}
 
 	static void QueueEnd(SafetyHookContext&)

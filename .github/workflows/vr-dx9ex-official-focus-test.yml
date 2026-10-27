@@ -11,12 +11,16 @@ on:
       - vr-d3d9ex-focus
       - vr-d3d9ex-abc-c-goal-emptyroot-20261026
       - vr-d3d9ex-d-logfix-20261026
+      - vr-d3d9ex-e-xr-rival-flare-20261026
+      - test/dx9ex-2324-selective-20261027
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
       - 'tools/Run-FocusOfficialTest.ps1'
       - 'tools/verify_focus_official_diagnostics.py'
       - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py'
       - 'src/hooks_uiscaling.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'tools/verify_vr_e_flare_unhidden.py'
       - 'src/hooks_misc.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
       - 'src/vr/settings.cpp'
@@ -80,6 +84,12 @@ jobs:
         run: |
           python tools/verify_vr_d_logfix_20261026.py
           if ($LASTEXITCODE -ne 0) { throw 'Quest D log-derived source contract failed' }
+
+      - name: Confirm no flare hiding and exact XR/rival source isolation
+        shell: pwsh
+        run: |
+          python tools/verify_vr_e_flare_unhidden.py
+          if ($LASTEXITCODE -ne 0) { throw 'Original flare and Quest E contract failed' }
 
       - name: Configure Win32 R26+HUD
         shell: pwsh
@@ -162,7 +172,7 @@ jobs:
             # repair duplicate keys only in one packaging workflow.
             Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
             $env:OFFICIAL_PACKAGE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
-            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False; assert p.getboolean("VR","RivalDx11NativeRoute") is True; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getboolean("VR","MirrorPreserveAspect") is False; assert p.getint("VR","AntiAliasing") == 2'
+            python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["OFFICIAL_PACKAGE_INI"],encoding="utf-8"); assert p.getboolean("VR","DriverSeatView") is False; assert p.getfloat("VR","HudScale") == 0.55; assert p.getfloat("VR","CullingUnionMarginDegrees") == 8.0; assert p.getboolean("VR","FollowGameResolution") is False; assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getboolean("VR","MirrorPreserveAspect") is True; assert p.getint("VR","AntiAliasing") == 2'
             if ($LASTEXITCODE -ne 0) { throw 'Packaged INI strict parse failed' }
             Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
             Copy-Item tools/START_FOCUS_OFFICIAL_TEST.cmd "$dir/START_HERE.cmd"
@@ -181,23 +191,23 @@ jobs:
                 $parsedVariant -cnotin @('R26_FOCUS_OFFICIAL_TEST','R26_FOCUS_OFFICIAL_DEBUG')) {
               throw "Packaged C $mode unexpected test variant"
             }
-            # Quest D is isolated from C and carries an exact SHA.
-            Set-Content "$dir/QUEST_D_VARIANT.txt" @(
-              "D: $env:GITHUB_SHA (TIMEUP result/stock rival/1080p logical/XR startup)"
+            # Quest E is a separate log-driven experiment (all flares original).
+            Set-Content "$dir/QUEST_E_VARIANT.txt" @(
+              "E: $env:GITHUB_SHA (all flare sprites unhidden/owned rival/XR startup)"
               'Original HMD stereo validation remains UNTESTED.'
-              'Desktop aspect mirror intentionally fills the screen to hide Windows taskbar.'
+              'Mirror aspect restored. VR eyes always independent; desktop sidebars are possible.'
             ) -Encoding UTF8
             Set-Content "$dir/ABC_COMPARE.txt" @(
               'A: 456642108a4c0bd86c337bc14ead561b3c376cdc (+TIME repair)'
               'B: bda6b12078528265a8157d842a7c825883fb629c (+ GOAL source queue epoch)'
-              "C: $env:GITHUB_SHA (+ GOAL single-child replaced-empty-root experiment)"
+              "E: $env:GITHUB_SHA (+ all flare originals, rival source owner, XR readiness)"
               'Compare final GOAL only. Native VR HMD effect is UNTESTED.'
               'Quest3: +TIME, GOAL 0-99, final graph, rank, rival, F11, frame rate.'
               'Restore backup between A/B/C; never overlay two build ZIPs.'
             ) -Encoding UTF8
             Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
             @(
-              'OFFICIAL FOCUS R26+HUD: October 26 exact +TIME ticket isolation and diagnostics'
+              'R26 QUEST E EXPERIMENT (NOT MAIN FOCUS): all lens elements drawn, rival owned, XR startup'
               "Variant: $mode; TEST=Release; DEBUG=RelWithDebInfo and opt-in GPU diagnostics"
               'Original game EXE is not bundled. Backup your current DLL, host, and all INIs before unpacking.'
               '1. Unpack EXACTLY ONE variant ZIP into the original OR2006C2C.EXE directory.'
@@ -211,7 +221,7 @@ jobs:
               '8. No experimental test-branch COMBINED/ALL visual or performance patches.'
               '9. Restore backups after testing; return DX9EX_LOGS ZIP and screenshots.'
             ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
-            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FocusOfficialTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','ABC_COMPARE.txt','QUEST_D_VARIANT.txt','START_HERE.txt')) {
+            foreach ($required in @('START_HERE.cmd','RUN_DX9EX_TEST.cmd','Run-FocusOfficialTest.ps1','dinput8.dll','outrun-vr-host.exe','OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini','SOURCE_SHA.txt','DX9EX_VARIANT.txt','ABC_COMPARE.txt','QUEST_E_VARIANT.txt','START_HERE.txt')) {
               if (-not (Test-Path (Join-Path $dir $required))) { throw "Missing packaged $mode file: $required" }
             }
             foreach ($binary in @('dinput8.dll','outrun-vr-host.exe')) {
@@ -224,7 +234,7 @@ jobs:
           }
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun2-VR-R26-QUEST-D-LOGFIX-${{ github.sha }}
+          name: OutRun2-VR-R26-QUEST-E-FLARE-UNHIDDEN-${{ github.sha }}
           path: OutRun2_VR_R26_FOCUS_OFFICIAL_*.zip
           if-no-files-found: error
 

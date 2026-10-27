@@ -37,6 +37,62 @@ namespace OutRunVR::SpriteQueue
         return nullptr; // detached old tail, foreign node or cyclic/long list
     }
 
+    // Rival R26 known-good recovery: the original queue consumer clears
+    // sprite_prio_root[prio] to nullptr after each priority pass. Therefore an
+    // exact 0xBB796 sprani producer can legitimately be the FIRST writer into
+    // a priority with no pre-existing root/tail. Historical R26 handled this
+    // with root->next_0. Recover that case without dereferencing any stale
+    // pointer: the caller must prove BOTH old root and old tail were null.
+    template<class Node>
+    constexpr Node* FirstVerifiedNewRootAppendedChain(
+        Node* oldRoot, Node* oldTail,
+        Node* currentRoot, Node* newTail, unsigned bound) noexcept
+    {
+        if (oldRoot || oldTail || !currentRoot || !newTail ||
+            newTail == currentRoot || bound == 0)
+            return nullptr;
+        Node* first = currentRoot->next_0;
+        if (!first)
+            return nullptr;
+        for (Node* node = first;
+             node && bound != 0; node = node->next_0, --bound)
+        {
+            if (node == newTail)
+                return node->next_0 == nullptr ? first : nullptr;
+        }
+        return nullptr;
+    }
+
+    namespace RivalNewRootRegression
+    {
+        struct Node { Node* next_0 = nullptr; };
+        constexpr bool Proof() noexcept
+        {
+            Node root{}, one{}, two{}, foreign{}, cycle{};
+            root.next_0 = &one;
+            one.next_0 = &two;
+            if (FirstVerifiedNewRootAppendedChain(
+                    nullptr, nullptr, &root, &two, 3) != &one)
+                return false;
+            if (FirstVerifiedNewRootAppendedChain(
+                    &root, nullptr, &root, &two, 3))
+                return false;
+            if (FirstVerifiedNewRootAppendedChain(
+                    nullptr, &root, &root, &two, 3))
+                return false;
+            if (FirstVerifiedNewRootAppendedChain(
+                    nullptr, nullptr, &root, &foreign, 3))
+                return false;
+            two.next_0 = &cycle;
+            if (FirstVerifiedNewRootAppendedChain(
+                    nullptr, nullptr, &root, &two, 3))
+                return false;
+            return true;
+        }
+        static_assert(Proof(),
+            "Rival new-root recovery must require null pre-root and terminal live tail");
+    }
+
     // ABC C experiment: a *single* new child under a replaced root can be
     // recovered only when the old root was an EMPTY sentinel at source entry.
     // The caller must separately prove same GOAL, same queue epoch and one

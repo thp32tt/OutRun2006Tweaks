@@ -50,9 +50,10 @@ namespace OutRunVRD3D9ExUpgrade
         constexpr std::size_t CreateVertexBufferVtableIndex = 26;
         constexpr std::size_t CreateIndexBufferVtableIndex = 27;
 
-        // No OpenXR calls on the D3D9 thread. At startup the host can
-        // become live AFTER CreateDevice; use a strictly bounded wait for
-        // a real, two-eye-consistent live HostState before falling back.
+        // Quest3 evidence: the host's true 2496x2688 eyes were published AFTER
+        // the previous 3.5-second CreateDevice timeout. Wait only for this
+        // initial allocation, not Present/frame, and accept ONLY matching
+        // real per-eye extents from a live OpenXR PID.
         // Game -width/-height is deliberately NOT consulted here: it owns the
         // logical/mirror presentation and must not cap headset render quality.
 
@@ -93,7 +94,7 @@ namespace OutRunVRD3D9ExUpgrade
                 return {};
 
             OutRunVR::IpcV3::HostStateReader reader;
-            const ULONGLONG deadline = GetTickCount64() + 3500ULL;
+            const ULONGLONG deadline = GetTickCount64() + 8000ULL;
             unsigned attempts = 0;
             do
             {

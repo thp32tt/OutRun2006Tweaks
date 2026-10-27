@@ -12,12 +12,12 @@ assert "Game::screen_resolution->x = 1920;" in misc and "Game::screen_resolution
 assert "fixedLogicalVr ? 1920" in misc and "fixedLogicalVr ? 1080" in misc
 assert misc.index("if (commandLineResolution)") < misc.index("VR R26 LOGICAL SOURCE LOCK:")
 assert "ResolveStartupForLiveHost(" in ex and "ResolveGame(extent, capsSize)" in ex
-assert "GetTickCount64() + 3500ULL" in ex and "Sleep(50);" in ex
+assert "GetTickCount64() + 8000ULL" in ex and "Sleep(50);" in ex
 assert "state == GameState::STATE_TIMEUP" in ui and "ResultPresentationState()" in ui
 assert "ResultProgressAdmission.mayPublish(" in ui and "parentAdmission.mayPublish(" in ui
-assert "RivalDx11NativeRoute = true" in ini and "'-RivalDx11NativeRoute=true'" in run
-assert "MirrorPreserveAspect = false" in ini and "'-MirrorPreserveAspect=false'" in run
-assert 'getboolean("VR","RivalDx11NativeRoute") is True' in flow
-assert 'getboolean("VR","MirrorPreserveAspect") is False' in flow
+assert "RivalDx11NativeRoute = false" in ini and "'-RivalDx11NativeRoute=false'" in run
+assert "MirrorPreserveAspect = true" in ini and "'-MirrorPreserveAspect=true'" in run
+assert 'getboolean("VR","RivalDx11NativeRoute") is False' in flow
+assert 'getboolean("VR","MirrorPreserveAspect") is True' in flow
 assert "foreach ($mode in @(\'TEST\',\'DEBUG\'))" in flow
 print("Quest D log/source/packaging static PASS; HMD untested")
