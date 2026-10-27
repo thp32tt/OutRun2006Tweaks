@@ -57,6 +57,7 @@ assert r30.count('const bool exactProjectedRival =') >= 2
 assert '!exactResult && !exactProjectedRival' in r30
 assert 'R30XyzrhwPrepareRejectName' in r30
 assert 'LIVE_VS_BOUND' in r30 and 'FVF_NOT_XYZRHW' in r30
+assert 'VR RIVAL R30 SHADER CACHE ZERO:' in r30
 assert 'MaxOriginalRankWvpDrawAge' in (R/'src/vr/game/rank_marker_physical_source.hpp').read_text()
 rank_phys=(R/'src/vr/game/rank_marker_physical_source.hpp').read_text()
 assert 'ProducerToken::RivalMarkerSprani' in rank_phys
