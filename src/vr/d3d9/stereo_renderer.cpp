@@ -594,7 +594,27 @@ namespace OutRunVRStereo
 			const bool wanted = StereoWanted();
 			const bool mainTarget = TargetIsBackBuffer();
 			if (!wanted || !mainTarget)
+			{
+				// Review 01517: an offscreen RT0 may keep the *exact* main
+				// depth/stencil allocation bound. An original single-execution
+				// Draw may then change LEFT depth while RIGHT depth still claims
+				// to be synchronized. Never duplicate the offscreen Draw, and
+				// do not invalidate for unrelated transient depth resources.
+				if (wanted && !mainTarget && R9StereoSeeded &&
+					R9MainDepthKnown && !R9DeferredDepth &&
+					TrackedDepthStencil &&
+					TrackedDepthStencil == R9MainDepthIdentity &&
+					(RightDepthSynchronized || RightStencilSynchronized))
+				{
+					const bool wasDepthSync = RightDepthSynchronized;
+					const bool wasStencilSync = RightStencilSynchronized;
+					InvalidateRightDepthStencilIfLeftMayWrite(device);
+					if ((wasDepthSync && !RightDepthSynchronized) ||
+						(wasStencilSync && !RightStencilSynchronized))
+						++R9MainDepthContentSerial;
+				}
 				return legacyDraw();
+			}
 
 			// Do not start stereo in the middle of a frame.  Wait for a verified
 			// full MAIN clear so no depth/color history can be missing.
