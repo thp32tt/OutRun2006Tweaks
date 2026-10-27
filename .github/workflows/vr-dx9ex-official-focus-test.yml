@@ -70,11 +70,17 @@ jobs:
           if ($duplicates.Count -ne 1) { throw 'Invalid official INI: DriverSeatCarSpaceBasis must occur exactly once' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'HudScale = 0.55' -SimpleMatch -Quiet)) { throw 'HUD scale changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'AntiAliasing = 2' -SimpleMatch -Quiet)) { throw 'VR MSAA baseline changed unexpectedly' }
-          if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'PreserveLogicalBackBuffer = true' -SimpleMatch -Quiet)) { throw 'Final recovery logical UI source guard missing' }
+          if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'PreserveLogicalBackBuffer = false' -SimpleMatch -Quiet)) { throw 'Final recovery logical UI source guard missing' }
           if (-not (Select-String src/vr/settings.cpp -Pattern 'VRPreserveLogicalBackBuffer' -SimpleMatch -Quiet)) { throw 'Final recovery source setting missing' }
           if (-not (Select-String src/vr/d3d9/ex_device_upgrade.cpp -Pattern 'Settings::VRPreserveLogicalBackBuffer ||' -SimpleMatch -Quiet)) { throw 'Final recovery CreateDevice guard missing' }
-          if (-not (Select-String tools/Run-FocusOfficialTest.ps1 -Pattern "'-SkyGlowFactor=4'" -SimpleMatch -Quiet)) { throw 'SkyGlow full-resolution regression detected' }
-          if (-not (Select-String tools/Run-FocusOfficialTest.ps1 -Pattern "'-PreserveLogicalBackBuffer=true'" -SimpleMatch -Quiet)) { throw 'Recovery launcher override missing' }
+          if (-not (Select-String tools/Run-FocusOfficialTest.ps1 -Pattern "'-SkyGlowFactor=0'" -SimpleMatch -Quiet)) { throw 'SkyGlow full-resolution regression detected' }
+          if (-not (Select-String tools/Run-FocusOfficialTest.ps1 -Pattern "'-PreserveLogicalBackBuffer=false'" -SimpleMatch -Quiet)) { throw 'Recovery launcher override missing' }
+          if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'MirrorPreserveAspect = false' -SimpleMatch -Quiet)) { throw 'PC mirror must fill whole monitor' }
+          if (-not (Select-String src/vr/settings.cpp -Pattern 'VRHudLogicalWidth' -SimpleMatch -Quiet)) { throw 'Logical HUD reference width missing' }
+          if (-not (Select-String src/vr/settings.cpp -Pattern 'VRHudLogicalHeight' -SimpleMatch -Quiet)) { throw 'Logical HUD reference height missing' }
+          if (-not (Select-String src/hooks_uiscaling.cpp -Pattern 'OutRunVR::LogicalUI::Contain(' -SimpleMatch -Quiet)) { throw 'Physical-to-logical 2D remap missing' }
+          if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'bool R30SkyGlowWanted() noexcept' -SimpleMatch -Quiet)) { throw 'VR-only stereo SkyGlow bypass missing' }
+          if (-not (Select-String tools/Run-FocusOfficialTest.ps1 -Pattern "'-DisableSkyGlow=true'" -SimpleMatch -Quiet)) { throw 'VR SkyGlow forced-off launcher setting missing' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'CullingUnionMarginDegrees = 8.0' -SimpleMatch -Quiet)) { throw 'Culling setting changed unexpectedly' }
           if (-not (Select-String OutRun2006Tweaks.ini -Pattern 'DriverSeatView = false' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source INI' }
           if (-not (Select-String src/vr/settings.cpp -Pattern 'Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,' -SimpleMatch -Quiet)) { throw 'Unstable cockpit mode enabled in source defaults' }
