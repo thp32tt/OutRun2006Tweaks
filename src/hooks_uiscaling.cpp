@@ -2462,181 +2462,52 @@ class UIScaling : public Hook
 	static int __cdecl RivalMarker_sprani(
 		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
-        // Preserve this native source's registration boundary: a nested
-        // exact producer must retain its newer SpriteNode stereo owner.
-        const auto entrySerial =
-            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
-                std::memory_order_acquire);
-        // Read before the original 0xBB796 animation call. The legacy
-        // registeredDelta counter reads after that call and therefore
-        // cannot prove whether the ORIGINAL native producer registered
-        // any nested nodes. These two samples distinguish those phases.
-        const auto registrationsAtSourceEntry =
-            OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
-                std::memory_order_relaxed);
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
-        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
-            rootsBefore[prio] = root;
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
 
-		// The original exact 0xBB796 rival CALL may draw immediately before
-		// queueing animated siblings. Consume the preceding 0xBB6F5 anchor
-		// once and use it for BOTH source-time and queued draw ownership.
-		// Keep the game's original coordinates, alpha and sprite calls intact.
+		const int result = Game::sprani_play_ae_auth_alpha(
+			spriteId, x, y, a4, a5, alpha);
+		// R71 HMD evidence binds this exact 0xBB796 producer to the
+		// vehicle-relative rival marker. Reuse its proven Calc3D2D anchor when
+		// available; fail softly to the current strict WorldBillboard route.
 		const auto projectedAnchor = RivalMarkerProjectedInfo;
+		// Only the first marker from the matching 0xBB6F5 Calc3D2D producer
+		// can consume this anchor. No subsequent vehicle or frame may inherit it.
 		RivalMarkerProjectedInfo = {};
 		const bool projected = projectedAnchor.valid;
         OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
             OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
             OutRunVR::GameSemantic::ProjectedMarkerProbeStage::Producer,
             projected);
-		const auto scope = projected
-			? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-			: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-        // Recent real Quest trace: projected anchorValid=1 but zero
-        // registered queued nodes at 8,192 producers. The first physical
-        // D3DX sprite can instead be submitted synchronously inside this
-        // native E8. Drain an OLD owner's D3DX batch, then keep THIS
-        // exact projected rival producer as direct owner through its
-        // native source-exit flush. Never widen generic rank/GOAL/2D
-        // sprites and never drain an active queue.
-        const bool directRivalOwner = Settings::VREnabled && projected &&
-            !OutRunVR::GameSemantic::QueueRenderActive();
-        if (directRivalOwner)
-            FlushD3DXBeforeDirectGoalSource();
-		int result = 0;
-		{
-			OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
-                scope, projected ? &projectedAnchor : nullptr, Settings::VREnabled,
-                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);
-			result = Game::sprani_play_ae_auth_alpha(
-				spriteId, x, y, a4, a5, alpha);
-            if (directRivalOwner)
-                FlushD3DXAtDirectGoalSourceExit();
-		}
-        // a6f8497c known-good captured the projected anchor AFTER
-        // sprani_play_ae_auth_alpha(), whereas current code captures and
-        // clears it BEFORE that native E8. Check if the original function
-        // ever writes a newer anchor during its call. No ownership changes.
-        const auto lateProjectedAnchor = RivalMarkerProjectedInfo;
-        if (Settings::VREnabled && Settings::VRTelemetry)
-        {
-            static thread_local std::uint64_t rivalDraws = 0;
-            const auto n = ++rivalDraws;
-            if (n <= 8 || (n & (n - 1)) == 0)
-                spdlog::info(
-                    "VR RIVAL PHYSICAL PRODUCER: hits={} anchorValid={} "
-                    "viewZ={} spriteId={}",
-                    n, projected ? 1 : 0, projectedAnchor.viewZ, spriteId);
-        }
-		// The prior HMD-accepted queued rival nodes retain exactly the same
-		// scope and anchor, with no widening to generic world/HUD sprites.
-        // This snapshot is immediately AFTER the native rival E8 including
-        // its scoped direct submission. It excludes any later nodes tagged
-        // by this wrapper and prevents old 'registeredDelta=0' from being
-        // mistaken for no work performed by the original game.
-		const auto registeredBefore =
-            OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
-                std::memory_order_relaxed);
-		TagAppendedNodes(before, scope,
+        // Keep the 2026 current-chain safety proof: unlike the historical
+        // oldTail->next dereference this tolerates a rebuilt live priority root
+        // without reading a detached/recycled node.
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
+        for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+            rootsBefore[prio] = Game::sprite_prio_root[prio];
+		TagAppendedNodes(
+			before,
+			projected
+				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+				: OutRunVR::GameSemantic::RenderScope::WorldBillboard,
 			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
 			projected ? &projectedAnchor : nullptr,
-            &rootsBefore, entrySerial);
+            &rootsBefore);
         if (Settings::VREnabled && Settings::VRTelemetry)
         {
-            const auto registeredAfter =
-                OutRunVR::GameSemantic::SpriteNodeSemanticRegistered.load(
-                    std::memory_order_relaxed);
-            // Legacy a22be86a tagged oldTail->next directly; modern R26
-            // validates current live priority roots before reading old
-            // recycled pointers. Keep all current safety checks intact and
-            // distinguish an animation call with NO queue append from a
-            // queue append rejected by the provenance checker.
-            unsigned changedRoots = 0;
-            unsigned changedTails = 0;
-            unsigned stableRootTailChanges = 0;
-            unsigned replacedRootTailChanges = 0;
-            unsigned newlyPopulatedPriorities = 0;
-            static thread_local std::uint64_t rivalQueuePublishes = 0;
-            const auto n = ++rivalQueuePublishes;
-            const bool sampled = n <= 8 || (n & (n - 1)) == 0;
-            unsigned verifiedKind0 = 0;
-            unsigned verifiedKind1 = 0;
-            unsigned verifiedKindsChecked = 0;
-            for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
-            {
-                SpriteNode* currentRoot = Game::sprite_prio_root[prio];
-                const bool rootChanged = currentRoot != rootsBefore[prio];
-                if (rootChanged)
-                    ++changedRoots;
-                SpriteNode* tailAfter = currentRoot
-                    ? currentRoot->tail_4 : nullptr;
-                if (tailAfter != before[prio])
-                {
-                    ++changedTails;
-                    if (rootChanged)
-                        ++replacedRootTailChanges;
-                    else
-                        ++stableRootTailChanges;
-                }
-                if (!before[prio] && currentRoot && tailAfter &&
-                    tailAfter != currentRoot)
-                    ++newlyPopulatedPriorities;
-                // The rival's original sprani_play_ae_auth_alpha uses an
-                // animation-node producer. On sparse sample events, walk
-                // ONLY the proven live current-root append chain (bounded
-                // at the game's ring size), never an old dangling tail.
-                // Do not tag or modify any node from this probe.
-                if (sampled && currentRoot && tailAfter &&
-                    tailAfter != before[prio])
-                {
-                    SpriteNode* first =
-                        OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
-                            currentRoot, before[prio], tailAfter,
-                            Game::SpriteNodeMax);
-                    unsigned budget = Game::SpriteNodeMax;
-                    for (auto* live = first; live && budget; --budget)
-                    {
-                        ++verifiedKindsChecked;
-                        if (live->kind_C == 0)
-                            ++verifiedKind0;
-                        else
-                            ++verifiedKind1;
-                        if (live == tailAfter)
-                            break;
-                        live = live->next_0;
-                    }
-                }
-            }
-            if (sampled)
+            static thread_local std::uint64_t restoredHits = 0;
+            const auto n = ++restoredHits;
+            if (n <= 8 || (n & (n - 1)) == 0)
                 spdlog::info(
-                    "VR RIVAL QUEUE PUBLICATION: hits={} registeredDelta={} anchorValid={} policy=EXACT_CURRENT_CHAIN",
-                    n, registeredAfter - registeredBefore, projected ? 1 : 0);
-            if (sampled)
-                spdlog::info(
-                    "VR RIVAL A22 CURRENT QUEUE COMPARE: hits={} nativeReturn={} projected={} directFlush={} rootChanges={} tailChanges={} stableRootTailChanges={} replacedRootTailChanges={} newlyPopulatedPriorities={} entrySerial={} nativeRegisteredDelta={} wrapperRegisteredDelta={} lateAnchorValid={} lateAnchorZ={} earlierAnchorZ={}",
-                    n, result, projected ? 1 : 0,
-                    directRivalOwner ? 1 : 0,
-                    changedRoots, changedTails, stableRootTailChanges,
-                    replacedRootTailChanges, newlyPopulatedPriorities,
-                    entrySerial,
-                    registeredBefore - registrationsAtSourceEntry,
-                    registeredAfter - registeredBefore,
-                    lateProjectedAnchor.valid ? 1 : 0,
-                    lateProjectedAnchor.viewZ,
-                    projectedAnchor.viewZ);
-            if (sampled)
-                spdlog::info(
-                    "VR RIVAL SOURCE NATIVE NODE TYPES: hits={} liveVerified={} kind0={} kind1={} nextConsumer=0x42D710 animationA=0x42A3A0 animationMasked=0x42A800",
-                    n, verifiedKindsChecked, verifiedKind0, verifiedKind1);
+                    "VR RIVAL KNOWN-GOOD ORDER RESTORED: hits={} anchorValid={} viewZ={} nativeFirst=1 directGoalFlush=0",
+                    n, projected ? 1 : 0, projectedAnchor.viewZ);
         }
 		return result;
 	}
-
     // 2026-10-11 Quest3 dumps proved that hooking any of the nineteen
     // original GOAL B9200 E8 return sites can corrupt a legal branch target.
     // Recover the source from its exact return address on the call stack of
