@@ -76,7 +76,7 @@ namespace Settings
     Setting<bool> VRRankDx11ProducerReference{ "VR", "RankDx11ProducerReference", true,
         "DX11 R57 mode6 direct original Calc3D2D output rank source; false restores the guarded R26 input check for A/B." };
     Setting<bool> VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", false,
-        "Quest E restores the exact R26 0xBB6F0/0xBB796 projected producer; synchronous source D3DX flush now keeps its world-marker owner. True bypasses both hooks for stock comparison. Restart required." };
+        "Restores the HMD-known-good R26 0xBB6F0/0xBB796 projected producer: native sprani runs first, then its recovered Calc3D2D anchor tags the appended live queue nodes. No GOAL D3DX flush is used. True bypasses both hooks for stock comparison. Restart required." };
     Setting<bool> VRRankDesktopLift{ "VR", "RankDesktopLift", false,
         "Reversible optional +32 original UI pixel rank vertical lift, absent in tested DX11. Default off. Does not affect rival." };
     Setting<bool> VRRankDx11ReferenceEyePose{ "VR", "RankDx11ReferenceEyePose", true,
