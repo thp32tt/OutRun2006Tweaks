@@ -3142,9 +3142,22 @@ public:
         // anchor/producer identity reaches the SpriteNode queue. Disabling
         // BB796 turns "native route" into an unowned stock draw and bypasses
         // every fresh-root/R30/R33 rival repair downstream.
-        if (!Settings::VRRivalDx11NativeRoute.get())
+        const bool rivalExactEdgeRequested =
+            !Settings::VRRivalDx11NativeRoute.get();
+        bool rivalExactEdgeInstalled = false;
+        if (rivalExactEdgeRequested && Calc3D2D_hk)
+        {
             Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
                 Calc3D2D_RivalExactCall, Memory::HookType::Call);
+            rivalExactEdgeInstalled = true;
+            spdlog::info(
+                "VR RIVAL BB6F0 EXACT EDGE: installed=1");
+        }
+        else if (rivalExactEdgeRequested)
+        {
+            spdlog::error(
+                "VR RIVAL BB6F0 EXACT EDGE: installed=0 reason=CALC3D2D_TRAMPOLINE_UNAVAILABLE; stock call preserved");
+        }
         else
             spdlog::info(
                 "VR RIVAL NATIVE A/B: stock BB6F0 call edge retained; "
@@ -3185,8 +3198,9 @@ public:
             Module::exe_ptr(RivalMarker_SpraniCall),
             RivalMarker_sprani, Memory::HookType::Call);
         spdlog::info(
-            "VR RIVAL BB796 OWNERSHIP: installed=1 exactEdge={} stockProjectorAB={}",
-            Settings::VRRivalDx11NativeRoute.get() ? 0 : 1,
+            "VR RIVAL BB796 OWNERSHIP: installed=1 exactEdgeRequested={} exactEdgeInstalled={} stockProjectorAB={}",
+            rivalExactEdgeRequested ? 1 : 0,
+            rivalExactEdgeInstalled ? 1 : 0,
             Settings::VRRivalDx11NativeRoute.get() ? 1 : 0);
 		for (int addr : TextGlyph_PutSpriteCalls)
 			Memory::VP::InjectHook(
