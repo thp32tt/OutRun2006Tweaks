@@ -94,7 +94,8 @@
         "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
         "tests/native_raw_draw_tile_test.cpp"
       ],
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_draw_tile_test.cpp -o /tmp/dx11_raw_draw_tile_01121 && /tmp/dx11_raw_draw_tile_01121"
     },
     "safe_fallback_and_bounds": {
       "status": "PASS_BUILD",
@@ -102,7 +103,8 @@
         "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
         "tests/native_raw_draw_tile_test.cpp"
       ],
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_draw_tile_test.cpp -o /tmp/dx11_raw_draw_tile_01121 && /tmp/dx11_raw_draw_tile_01121"
     },
     "source_integration_exact_sha": {
       "status": "PASS_EXACT_SHA",
@@ -114,7 +116,8 @@
         "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40588379614",
         "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40588379649"
       ],
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "validation_command": "GitHub Actions push@935cc93cd29283a60ec36b4cdb3c153ce39ca929: DX11 Fast Structural Checks 40588379646; Backend Conversion Gate 40588379674; Build 40588379688; OpenXR VR architecture 40588379614; OutRun EXE HUD Inspector CI 40588379649"
     }
   },
   "pipeline": {
@@ -187,5 +190,5 @@
     "run_id": 40588379688
   },
   "scoreboard_commit": "46694b12cbb980aeb21789f440bbb160ec568558",
-  "c6_note": "Follow-up bookkeeping ONLY: save exact-SHA 5/5 success; not a second functional result. Build CI and source material remain at 935cc93cd29283a60ec36b4cdb3c153ce39ca929 and 39483fb80622e532f8f00cf18154d9c89ee7db3a respectively. Runtime game/HMD UNTESTED. External controller adoption UNVERIFIED."
+  "c6_note": "Follow-up bookkeeping ONLY: save exact-SHA 5/5 success; not a second functional result. Build CI and source material remain at 935cc93cd29283a60ec36b4cdb3c153ce39ca929 and 39483fb80622e532f8f00cf18154d9c89ee7db3a respectively. Runtime game/HMD UNTESTED. External controller adoption UNVERIFIED. 01122 inherited CI metadata cause repair: per-acceptance validation_command restored without altering 01121 already-verified 5/5 results or runtime UNTESTED."
 }
