@@ -75,6 +75,7 @@
 #include "native_game_shared_desktop.hpp"
 #include "native_game_cpu_upload_transaction.hpp"
 #include "native_game_shared_desktop_admission.hpp"
+#include "native_game_raw_visual_diagnostic.hpp"
 #include "native_game_frame_upload.hpp"
 #include "native_game_dirty_region.hpp"
 #include "native_game_readback_provenance.hpp"
@@ -1365,6 +1366,10 @@ struct State {
     GameNativeSurfaceReplayBudget surfaceReplayBudget{};
     GameNativeCpuSurfaceTicket cpuSurfaceReplay{};
     NativeBackend backend;
+    NativeRawVisualPreview rawPreview;
+    std::uint64_t rawPreviewFrames = 0u;
+    std::uint64_t rawPreviewCopies = 0u;
+    std::uint64_t rawFogVisualBypasses = 0u;
     // Persistent native D3D11 upload buffers for a whole real game frame.
     // Re-upload every Draw to preserve game-authored mutable VB/IB content.
     ComPtr<ID3D11Buffer> fullGameVertexUpload;
@@ -1580,6 +1585,12 @@ bool env_full_game_opt_in() noexcept {
     return env_opt_in() &&
         GetEnvironmentVariableW(L"OUTRUN_DX11_FULL_GAME_FRAME", value, 8) == 1 &&
         value[0] == L'1';
+}
+bool env_raw_visual_opt_in() noexcept {
+    wchar_t flag[8]{};
+    return env_full_game_opt_in() &&
+        GetEnvironmentVariableW(L"OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC", flag, 8) == 1 &&
+        flag[0] == L'1';
 }
 bool env_shared_desktop_opt_in() noexcept {
     wchar_t value[8]{};
@@ -1869,6 +1880,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.liveSm3Pipelines.clear();
     s.liveSm3BlendStates.clear();
     s.liveSm3UseOrdinal = 0u;
+    s.rawPreview.reset();
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
@@ -5283,12 +5295,43 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                     (fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
                     fogColor, fogStart, fogEnd, fogDensity, tableZFog,
                     &fogCause)) {
-                ++s.liveSm3StateRejectReasons[1];
-                trace_live_sm3_fog_rejection(
-                    s, game, sourceOrdinal, fogCause, 0u, fog,
-                    tableMode, vertexMode, rangeFog, srgbWrite, fogCaps,
-                    fogStart, fogEnd, fogDensity);
-                return false;
+                // Only explicitly marked RAW visual tiles may omit an
+                // otherwise valid but unsupported source fog *appearance*.
+                // Do not admit unknown enums, invalid floats, missing COM
+                // source identity or resource/RT safety failures.
+                const bool supportedSourceModes =
+                    tableMode <= D3DFOG_LINEAR &&
+                    vertexMode <= D3DFOG_LINEAR;
+                const bool boundedPayload =
+                    std::isfinite(fogStart) && std::isfinite(fogEnd) &&
+                    std::isfinite(fogDensity) && fogDensity >= 0.0f;
+                const bool visualMismatch =
+                    fogCause == NativeSm3FogReject::VertexFog ||
+                    fogCause == NativeSm3FogReject::RangeFog ||
+                    fogCause == NativeSm3FogReject::Srgb ||
+                    fogCause == NativeSm3FogReject::MissingZCapability ||
+                    fogCause == NativeSm3FogReject::WCapability;
+                if (!(env_raw_visual_opt_in() && supportedSourceModes &&
+                      boundedPayload && visualMismatch)) {
+                    ++s.liveSm3StateRejectReasons[1];
+                    trace_live_sm3_fog_rejection(
+                        s, game, sourceOrdinal, fogCause, 0u, fog,
+                        tableMode, vertexMode, rangeFog, srgbWrite, fogCaps,
+                        fogStart, fogEnd, fogDensity);
+                    return false;
+                }
+                ++s.rawFogVisualBypasses;
+                if (s.rawFogVisualBypasses <= 3u ||
+                    s.rawFogVisualBypasses % 1024u == 0u)
+                    spdlog::warn(
+                        "DX11_VISUAL_MISMATCH_FOG reason={} bypass_count={} "
+                        "source_ordinal={} table={} vertex={} range={} srgb={} "
+                        "raster_caps={:#x}; RAW TILE ONLY; original D3D9 unchanged",
+                        static_cast<unsigned>(fogCause), s.rawFogVisualBypasses,
+                        sourceOrdinal, tableMode, vertexMode, rangeFog,
+                        srgbWrite, fogCaps.RasterCaps);
+                // No native fog controls are issued for a raw partial tile.
+
             }
         }
     }
@@ -10296,6 +10339,7 @@ void before_game_present(IDirect3DDevice9* game,
                                       presentBackbufferIdentity.Get())}
             : GameOutputSignature{};
         const bool fullMode = env_full_game_opt_in();
+        const bool rawVisual = env_raw_visual_opt_in();
         outputNow.nativeFullFrame = fullMode;
         // D3D9 can crop Present during menu, car selection and race transitions.
         // An UpdateSurface into the backbuffer is not proof of a visible inset
@@ -10504,7 +10548,7 @@ void before_game_present(IDirect3DDevice9* game,
             s.frameBatch.abort();
             s.pending = false; // original Present stays authoritative
         }
-        const bool currentFullFrameComplete =
+        const bool currentFullFrameComplete = !rawVisual &&
             s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame) &&
             s.sourceGameDevice == presentDevice;
         if (GameReadbackProvenance::quarantine_full_frame(
@@ -11115,6 +11159,39 @@ void before_game_present(IDirect3DDevice9* game,
                 }
             }
         } else if (s.pending) ++s.failed;
+        // RAW preview is independently owned and intentionally NOT a native
+        // complete frame. It can sample a genuine DX11 Draw which preceded a
+        // later rejected source draw, while production publication stays shut.
+        if (rawVisual && monoNativePublicationAllowed && backbufferKnown &&
+            s.sourceGameDevice == presentDevice && s.backend.ready()) {
+            UINT rawChangedPixels = 0u;
+            const NativeOutputUploadScope observerScope{};
+            ScopedNativeGameGpuTransferOutputs saveOutputs(s.backend.context());
+            const auto status = s.rawPreview.present(
+                game, presentBackbuffer.Get(), presentDesc, sourceRect,
+                dirtyRegion != nullptr, s.backend.device(), s.backend.context(),
+                s.backend.color_texture(), s.issued, rawChangedPixels);
+            if (status == NativeRawPreviewResult::CopyQueued)
+                ++s.rawPreviewCopies;
+            if (status == NativeRawPreviewResult::VisibleGpuPixels) {
+                ++s.rawPreviewFrames;
+                spdlog::info(
+                    "DX11 RAW_VISUAL native_gpu_pixel_output={} "
+                    "magenta_preview_frames={} gpu_tile_copies={} "
+                    "native_draws={} original_D3D9=preserved "
+                    "full_native_frame=NO OpenXR_native_stereo=NO",
+                    rawChangedPixels, s.rawPreviewFrames,
+                    s.rawPreviewCopies, s.issued);
+            } else if (s.presents % 300u == 0u) {
+                spdlog::info(
+                    "DX11 RAW_VISUAL stage={} native_draws={} "
+                    "gpu_tile_copies={} magenta_preview_frames={} "
+                    "fog_visual_bypass={} runtime_visual_NOT_VERIFIED",
+                    static_cast<unsigned>(status), s.issued,
+                    s.rawPreviewCopies, s.rawPreviewFrames,
+                    s.rawFogVisualBypasses);
+            }
+        }
         s.pending = false;
         s.frameBatch.reset();
         s.preDrawSurface.discard();
@@ -11280,6 +11357,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.liveSm3Pipelines.clear();
     s.liveSm3BlendStates.clear();
     s.liveSm3UseOrdinal = 0u;
+    s.rawPreview.reset();
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
 }
