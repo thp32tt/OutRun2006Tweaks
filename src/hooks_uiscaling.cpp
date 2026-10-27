@@ -3131,17 +3131,22 @@ public:
 			Module::exe_ptr(0xBAD20), RankMarkerSub_dest);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
-        // The rival marker was already HMD-correct before the ordinal rank
-        // recovery work. Keep the DX11-equivalent stock BB6F0 projector when
-        // RivalDx11NativeRoute=true (the shipped/default policy), and retain
-        // the R26 exact projector only as an explicit A/B fallback.
+        // RivalDx11NativeRoute controls only the exact BB6F0 CALL-edge
+        // wrapper. The shared 0x49940 Calc3D2D hook still observes the stock
+        // BB6F0 return at BB6F5 and captures the same rival anchor.
+        //
+        // BB796 ownership is NOT optional: known-good a22be86a also hooks the
+        // native sprani producer so that recovered ProjectedWorldMarker2D
+        // anchor/producer identity reaches the SpriteNode queue. Disabling
+        // BB796 turns "native route" into an unowned stock draw and bypasses
+        // every fresh-root/R30/R33 rival repair downstream.
         if (!Settings::VRRivalDx11NativeRoute.get())
             Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
                 Calc3D2D_RivalExactCall, Memory::HookType::Call);
         else
             spdlog::info(
-                "VR RIVAL NATIVE: stock BB6F0 projector retained; "
-                "ordinal rank projected-marker hooks remain independent");
+                "VR RIVAL NATIVE: stock BB6F0 call edge retained; "
+                "shared Calc3D2D + BB796 ownership hooks remain active");
 		for (int addr : RankMarkerSubScreenHudCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), RankMarkerSubSemanticDest,
@@ -3171,10 +3176,12 @@ public:
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite,
 				Memory::HookType::Call);
-        if (!Settings::VRRivalDx11NativeRoute.get())
-            Memory::VP::InjectHook(
-                Module::exe_ptr(RivalMarker_SpraniCall),
-                RivalMarker_sprani, Memory::HookType::Call);
+        // Always preserve the known-good BB796 producer ownership. The
+        // stock-vs-exact BB6F0 A/B above changes only how the same anchor
+        // reaches Calc3D2D_dest, never whether the queued rival is tagged.
+        Memory::VP::InjectHook(
+            Module::exe_ptr(RivalMarker_SpraniCall),
+            RivalMarker_sprani, Memory::HookType::Call);
 		for (int addr : TextGlyph_PutSpriteCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), TextGlyph_putSprite,
