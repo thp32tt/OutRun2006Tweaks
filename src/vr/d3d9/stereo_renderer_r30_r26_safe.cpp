@@ -5739,10 +5739,21 @@ namespace OutRunVRStereo
                 sourceCommand.IsExactFiniteResultHud() &&
                 (!sourceCommand.queued ||
                  (sourceCommand.queueNode && sourceCommand.queueEpoch != 0));
+            const bool exactProjectedRival =
+                OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
+                sourceCommand.scope ==
+                    OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
+                sourceCommand.queued && sourceCommand.queueNode &&
+                sourceCommand.queueEpoch != 0 &&
+                OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
             // D3DX StateBlocks may leave a stale shader tracking hint.
-            // A proven result batch uses the live getter below; a real VS
-            // still rejects this fixed-function path.
-            if (!exactResult && CurrentVertexShaderIdentity.load(
+            // A proven result batch and an exact queue-owned rival marker use
+            // the authoritative live getter below; a real VS still rejects
+            // this fixed-function path before any stereo GPU submission.
+            if (!exactResult && !exactProjectedRival &&
+                CurrentVertexShaderIdentity.load(
                     std::memory_order_acquire) != 0)
                 return E_NOTIMPL;
             IDirect3DVertexShader9* shader = nullptr;
@@ -5750,13 +5761,59 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             if (shader)
             {
+                if (Settings::VRTelemetry && exactProjectedRival)
+                {
+                    static std::atomic<std::uint64_t> rivalLiveVsRejects{0};
+                    const auto n = rivalLiveVsRejects.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 8 || (n & (n - 1)) == 0)
+                        spdlog::info(
+                            "VR RIVAL R62 FIXEDFN PREPARE: admitted=0 reject=LIVE_VS_BOUND cachedVs=0x{:X} node={} epoch={} hits={}",
+                            static_cast<unsigned long long>(
+                                CurrentVertexShaderIdentity.load(
+                                    std::memory_order_acquire)),
+                            sourceCommand.queueNode, sourceCommand.queueEpoch, n);
+                }
                 shader->Release();
                 return E_NOTIMPL;
             }
 
             DWORD fvf = 0;
-            if (FAILED(device->GetFVF(&fvf)) || fvf != 0x00000142u)
+            const HRESULT fvfHr = device->GetFVF(&fvf);
+            if (FAILED(fvfHr) || fvf != 0x00000142u)
+            {
+                if (Settings::VRTelemetry && exactProjectedRival)
+                {
+                    static std::atomic<std::uint64_t> rivalFvfRejects{0};
+                    const auto n = rivalFvfRejects.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 8 || (n & (n - 1)) == 0)
+                        spdlog::info(
+                            "VR RIVAL R62 FIXEDFN PREPARE: admitted=0 reject={} cachedVs=0x{:X} fvfHr=0x{:08X} fvf=0x{:08X} node={} epoch={} hits={}",
+                            FAILED(fvfHr) ? "FVF_READ_FAILED" : "FVF_NOT_0X142",
+                            static_cast<unsigned long long>(
+                                CurrentVertexShaderIdentity.load(
+                                    std::memory_order_acquire)),
+                            static_cast<unsigned>(fvfHr),
+                            static_cast<unsigned>(fvf),
+                            sourceCommand.queueNode, sourceCommand.queueEpoch, n);
+                }
                 return E_NOTIMPL;
+            }
+            if (Settings::VRTelemetry && exactProjectedRival)
+            {
+                static std::atomic<std::uint64_t> rivalFixedFnAdmissions{0};
+                const auto n = rivalFixedFnAdmissions.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 8 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR RIVAL R62 FIXEDFN PREPARE: admitted=1 reject=ADMITTED cachedVs=0x{:X} fvf=0x{:08X} node={} epoch={} hits={}",
+                        static_cast<unsigned long long>(
+                            CurrentVertexShaderIdentity.load(
+                                std::memory_order_acquire)),
+                        static_cast<unsigned>(fvf),
+                        sourceCommand.queueNode, sourceCommand.queueEpoch, n);
+            }
             R30TracePreRestartHudDrawForm(device, 2u);
 
             R30XyzrhwState state{};
