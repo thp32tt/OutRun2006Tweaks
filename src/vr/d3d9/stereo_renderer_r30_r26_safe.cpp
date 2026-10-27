@@ -4229,6 +4229,8 @@ namespace OutRunVRStereo
             bool rivalFvfOk = false;
             bool rivalVsReadOk = false;
             bool rivalVsBound = false;
+            const auto rivalCachedVs =
+                CurrentVertexShaderIdentity.load(std::memory_order_acquire);
             if (exactRival && device)
             {
                 rivalFvfOk = SUCCEEDED(device->GetFVF(&rivalFvf));
@@ -4247,11 +4249,21 @@ namespace OutRunVRStereo
                 const auto hit = rivalPrepare.fetch_add(
                     1, std::memory_order_relaxed) + 1;
                 if (hit <= 8 || (hit & (hit - 1)) == 0)
+                    const char* rejectClass = prepared ? "ADMITTED"
+                        : rivalCachedVs != 0 ? "CACHED_VS_IDENTITY"
+                        : rivalVsBound ? "LIVE_VS_BOUND"
+                        : !rivalFvfOk ? "FVF_READ_FAILED"
+                        : (rivalFvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW
+                            ? "FVF_NOT_XYZRHW"
+                            : "LATE_STEREO_VIEWPORT_OR_DEPTH_GATE";
                     spdlog::info(
-                        "VR RIVAL XYZRHW PREPARE: hits={} prepared={} stride={} primitives={} fvfOk={} fvf=0x{:08X} vsReadOk={} vsBound={} queued={} node={} epoch={}",
-                        hit, prepared ? 1 : 0, stride, primitiveCount,
+                        "VR RIVAL XYZRHW PREPARE: hits={} prepared={} reject={} stride={} primitives={} fvfOk={} fvf=0x{:08X} posMask=0x{:03X} vsReadOk={} vsBound={} cachedVs=0x{:X} queued={} node={} epoch={}",
+                        hit, prepared ? 1 : 0, rejectClass,
+                        stride, primitiveCount,
                         rivalFvfOk ? 1 : 0, static_cast<unsigned>(rivalFvf),
+                        static_cast<unsigned>(rivalFvf & D3DFVF_POSITION_MASK),
                         rivalVsReadOk ? 1 : 0, rivalVsBound ? 1 : 0,
+                        static_cast<unsigned long long>(rivalCachedVs),
                         rivalCommand.queued ? 1 : 0, rivalCommand.queueNode,
                         rivalCommand.queueEpoch);
             }
