@@ -11,6 +11,7 @@ on:
       - vr-d3d9ex-focus
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
+      - '.github/workflows/vr-dx9ex-active.yml' # Latest pair of focus CI workflows must validate one exact SHA.
       - 'tools/Run-FocusOfficialTest.ps1'
       - 'tools/verify_focus_official_diagnostics.py'
       - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py'
