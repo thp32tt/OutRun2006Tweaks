@@ -80,11 +80,12 @@ def main():
             "title": title,
         }
         rows.append(row)
-    assert len(rows) == 447, "Expected 447 review documents: got " + str(len(rows))
+    # The hourly REVIEW_ONLY writer continues to append distinct new IDs;
+    # inventory every document in this exact checkout, never pin a count.
+    assert len(rows) >= 447, "Earlier review history disappeared"
     assert rows[0]["task_id"] == "CONVERSION-DX9EX-01075"
-    assert rows[-1]["task_id"] == "CONVERSION-DX9EX-01521"
     ids = [int(row["task_id"][-5:]) for row in rows]
-    assert ids == list(range(1075, 1522)), "Duplicate/missing review IDs"
+    assert ids == list(range(1075, ids[-1] + 1)), "Duplicate/missing review IDs"
 
     with (OUT / "review_inventory.csv").open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=rows[0].keys())
@@ -102,7 +103,7 @@ def main():
     lines = [
         "# DX9Ex automation review inventory — 2026-10-27",
         "",
-        "All 447 review bodies read. Source status outside separately verified patches",
+        f"All {len(rows)} review bodies read, ending at {rows[-1]['task_id']}. Source status outside separately verified patches",
         "requires a current source diff; historical REVIEW_ONLY does not equal",
         "current unpatched code. Quest3/HMD runtime UNTESTED.",
         "",
@@ -119,11 +120,11 @@ def main():
     lines += ["", "## Source status counts"]
     for group, count in sorted(stats["source_status_counts"].items()):
         lines.append(f"- {group}: {count}")
-    lines += ["", "See review_inventory.csv for 447 independent IDs, findings and links.",
+    lines += ["", f"See review_inventory.csv for {len(rows)} independent IDs, findings and links.",
               "SOURCE_BUILD_GATE=GitHub Actions; Quest3 runtime UNTESTED."]
     (OUT / "README.md").write_text("\n".join(lines)+"\n", encoding="utf-8")
     print(json.dumps(stats, ensure_ascii=False))
-    print("PASS complete DX9Ex REVIEW_ONLY document inventory: 01075..01521")
+    print(f"PASS complete DX9Ex REVIEW_ONLY document inventory: 01075..{ids[-1]:05d}")
 
 
 if __name__ == "__main__":
