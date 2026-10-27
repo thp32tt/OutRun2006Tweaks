@@ -26,17 +26,20 @@ def verify(src,setting,log):
     # family clears D3A5's spatial token so R69 mono fusion owns the draw.
     assert 'ProducerToken::None' in center
     assert '!OutRunVR::GameSemantic::QueueRenderActive()' in center
-    assert 'if (Settings::VREnabled && objectId == 0x570002 &&' in center
-    assert '!Settings::VRLensFlareCentreEnabled.get()' in center
-    assert 'VR LENS C993 CENTER HIDDEN:' in center
-    assert center.index('if (Settings::VREnabled && objectId == 0x570002 &&') < center.index('IsProjectedSunScreenObject(objectId)')
+    # Quest E intentionally restores every original sun/flare child: a
+    # disabled INI toggle may not hide the C993 centre object.
+    assert 'static_cast<unsigned>(objectId) == 0x570002u' in center
+    assert '!Settings::VRLensFlareCentreEnabled.get()' not in center
+    assert 'VR LENS C993 CENTER HIDDEN:' not in center
+    assert center.index('static_cast<unsigned>(objectId) == 0x570002u') < center.index('IsProjectedSunScreenObject(objectId)')
     assert 'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);' in center
 
     projected=src.split('static void __cdecl DrawObjectAlphaProjected(',1)[1].split('static void __cdecl DrawObjectAlphaCentre(',1)[0]
     assert 'objectId == 0x570008' in projected
-    assert 'ordinal == 2' in projected
-    assert 'VR LENS 570008 CENTER GLOW HIDDEN:' in projected
-    assert 'first outer 0x570008 preserved' in projected
+    assert 'const unsigned ordinal = ++LensOuter570008Ordinal;' in projected
+    assert 'VR LENS 570008 ORIGINAL BOTH DRAWN:' in projected
+    assert 'if (ordinal == 2)' not in projected
+    assert 'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);' in projected
 
     assert 'Get-Content $active' in log
     assert "$kv.ContainsKey('gameDllSha256')" in log
@@ -48,8 +51,8 @@ verify(source,settings,collector)
 mutations=[
     ('source','case 0x570010:','case 0x570011:'),
     ('source','case 0x57000F:','case 0x570011:'),
-    ('source','ordinal == 2','ordinal <= 2'),
-    ('source','!Settings::VRLensFlareCentreEnabled.get()','Settings::VRLensFlareCentreEnabled.get()'),
+    ('source','const unsigned ordinal = ++LensOuter570008Ordinal;','const unsigned ordinal = LensOuter570008Ordinal;'),
+    ('source','static_cast<unsigned>(objectId) == 0x570002u','static_cast<unsigned>(objectId) == 0x570003u'),
     ('settings','"LensFlareCentreEnabled", true,','"LensFlareCentreEnabled", false,'),
     ('collector',"$kv.ContainsKey('gameDllSha256')","$kv.gameDllSha256"),
 ]
@@ -75,5 +78,5 @@ for old, bad in [('ProducerToken::None', 'ProducerToken::LensFlareCentre'),
         pass
     else:
         raise AssertionError('exact C993 centre mutation escaped: ' + old)
-print('PASS VR C993 centre-eye mono fusion + second 570008 centre-glow suppression; negative controls; HMD UNTESTED')
+print('PASS VR C993 centre-eye mono fusion + both original 570008 draws preserved; negative controls; HMD UNTESTED')
 
