@@ -2463,9 +2463,11 @@ class UIScaling : public Hook
 		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+            rootsBefore[prio] = root;
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
 
@@ -2486,9 +2488,6 @@ class UIScaling : public Hook
         // Keep the 2026 current-chain safety proof: unlike the historical
         // oldTail->next dereference this tolerates a rebuilt live priority root
         // without reading a detached/recycled node.
-        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
-        for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
-            rootsBefore[prio] = Game::sprite_prio_root[prio];
 		TagAppendedNodes(
 			before,
 			projected
