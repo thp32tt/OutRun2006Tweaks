@@ -2518,6 +2518,11 @@ class UIScaling : public Hook
             if (directRivalOwner)
                 FlushD3DXAtDirectGoalSourceExit();
 		}
+        // a6f8497c known-good captured the projected anchor AFTER
+        // sprani_play_ae_auth_alpha(), whereas current code captures and
+        // clears it BEFORE that native E8. Check if the original function
+        // ever writes a newer anchor during its call. No ownership changes.
+        const auto lateProjectedAnchor = RivalMarkerProjectedInfo;
         if (Settings::VREnabled && Settings::VRTelemetry)
         {
             static thread_local std::uint64_t rivalDraws = 0;
@@ -2584,14 +2589,17 @@ class UIScaling : public Hook
                     n, registeredAfter - registeredBefore, projected ? 1 : 0);
             if (n <= 8 || (n & (n - 1)) == 0)
                 spdlog::info(
-                    "VR RIVAL A22 CURRENT QUEUE COMPARE: hits={} nativeReturn={} projected={} directFlush={} rootChanges={} tailChanges={} stableRootTailChanges={} replacedRootTailChanges={} newlyPopulatedPriorities={} entrySerial={} nativeRegisteredDelta={} wrapperRegisteredDelta={}",
+                    "VR RIVAL A22 CURRENT QUEUE COMPARE: hits={} nativeReturn={} projected={} directFlush={} rootChanges={} tailChanges={} stableRootTailChanges={} replacedRootTailChanges={} newlyPopulatedPriorities={} entrySerial={} nativeRegisteredDelta={} wrapperRegisteredDelta={} lateAnchorValid={} lateAnchorZ={} earlierAnchorZ={}",
                     n, result, projected ? 1 : 0,
                     directRivalOwner ? 1 : 0,
                     changedRoots, changedTails, stableRootTailChanges,
                     replacedRootTailChanges, newlyPopulatedPriorities,
                     entrySerial,
                     registeredBefore - registrationsAtSourceEntry,
-                    registeredAfter - registeredBefore);
+                    registeredAfter - registeredBefore,
+                    lateProjectedAnchor.valid ? 1 : 0,
+                    lateProjectedAnchor.viewZ,
+                    projectedAnchor.viewZ);
         }
 		return result;
 	}
