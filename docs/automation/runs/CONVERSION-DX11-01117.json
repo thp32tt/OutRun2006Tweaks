@@ -12,7 +12,7 @@
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
-  "automation_validation": "PASS_EXACT_SHA_5_GATES",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "source_base_sha": "ea92873533964b204b11cab973ae652e5b4daa4d",
@@ -32,17 +32,27 @@
     "tools/test_package_dx11_first_game_frame.py"
   ],
   "feature_contract": {
-    "goal": "Provide an explicit non-production, user-visible D3D11 actual GPU partial game tile while preserving original D3D9Ex render, gamepad/FFB, protected DXVK and native L/R OpenXR provenance.",
-    "positive": [
-      "source-authenticated sampled native Draw after prior full-scene poison only within RAW opt-in",
-      "nonblocking D3D11 color tile copy and marked 256x144 D3D9 diagnostic inset",
-      "separate source-matched RAW and DX9Ex control CMD packaged on validated SHA"
-    ],
-    "negative": [
-      "ordinary/full native production path remains fail-closed",
-      "invalid real source COM/format/RT/depth and any device/texture lifetime boundaries retain rejection",
-      "GPU tile does not become native OpenXR eye or a full native frame",
-      "RAW runtime visualization remains untested"
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Provide a separately opted-in visual raw D3D11 game Draw GPU pixel preview while retaining authoritative D3D9 game rendering and inputs, stable native buffer/resource lifetimes, and a source-matched DX9Ex control runner; incomplete scene rendering is diagnostic only.",
+    "acceptance_items": [
+      {
+        "id": "source_authenticated_raw_gpu_preview",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_D3D9_DRAW_TO_D3D11_GPU_PIXEL_SAMPLE",
+        "expected_behavior": "Opt-in samples real D3D9 game Draws via guarded native DX11 target and copies a bounded GPU-produced region as a visibly marked diagnostic tile."
+      },
+      {
+        "id": "guarded_fallback_and_runtime_boundary",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_INPUT_GPU_LIFETIME_AND_SAFETY",
+        "expected_behavior": "Non-opted production path and invalid source/device/surface identity remain original D3D9 fallback; native tile is not a full frame or OpenXR stereo."
+      },
+      {
+        "id": "source_matched_test_package_and_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_FAST_BACKEND_WINDOWS_OPENXR_HUD_PACKAGE",
+        "expected_behavior": "Source-matched RAW and DX9Ex control launchers, negative package regressions and mandatory five GitHub workflow gates succeed at one original source SHA."
+      }
     ]
   },
   "github_actions_gates": [
@@ -98,5 +108,66 @@
   },
   "release_promotion": false,
   "external_controller_adoption": "UNVERIFIED",
-  "next_action": "Run the exact-SHA RAW desktop game session and DX9Ex control, confirm authentic native_draws/native_gpu_pixel_output/visible marked tile, then repair evidenced missing GPU stage and extend complete menu->car->race native L/R OpenXR."
+  "next_action": "Run the exact-SHA RAW desktop game session and DX9Ex control, confirm authentic native_draws/native_gpu_pixel_output/visible marked tile, then repair evidenced missing GPU stage and extend complete menu->car->race native L/R OpenXR.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_D3D9_DRAW_AND_SM3_FOG_STATE",
+      "GUARDED_NATIVE_D3D11_DRAW_TO_INCOMPLETE_VISUAL_SURFACE",
+      "MARKED_NONBLOCKING_GPU_PREVIEW_AND_SEPARATE_SOURCE_MATCHED_RUNNERS"
+    ],
+    "batch_components": [
+      "CXX_OPT_IN_RAW_SOURCE_SAMPLE_ADMISSION",
+      "CXX_D3D11_GPU_STAGING_COPY_AND_BOUNDED_D3D9_PREVIEW_TILE",
+      "EXPLICIT_NATIVE_VS_DX9EX_TEST_PACKAGING_AND_NEGATIVE_REGRESSIONS"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED for an opt-in partial magenta raw tile only at 1db7d8c42d9ee4d9da6d7dd0ce7d7ca11f239b58. Real native_draws, native_gpu_pixel_output, user visible game frame, and HMD remain UNTESTED. Never claim full native coverage.",
+    "activation_guard_and_fallback": "Production native scene stays fail-closed; RAW experimental option only; preserve authentic D3D9 source bindings, device lifetimes, RT and DSV safety, original D3D9 Draw, input, FFB, and DX9Ex. No DXVK activation.",
+    "acceptance_proof": {
+      "positive_probe": "Exact-SHA source/CI validation of 256x144 native GPU staging readback and magenta bounded partial D3D9 preview, separate DX11 RAW and DX9Ex CMD runners.",
+      "negative_regression": "RAW opt-in off by default; false RT/device identity, unsupported COM/fog payload, unsafe backbuffer or in-flight fence cannot be promoted; complete game output and OpenXR stereo explicitly not certified.",
+      "component_integration": "Original D3D9 real game source Draw bridge -> native backend Draw/texture -> nonblocking partial GPU tile -> original D3D9 authoritative display, plus package tests and five mandatory exact-SHA gates."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ]
+  },
+  "acceptance_results": {
+    "source_authenticated_raw_gpu_preview": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "GitHub exact-SHA five mandatory gates at 1db7d8c42d9ee4d9da6d7dd0ce7d7ca11f239b58; source-stage only and actual GPU pixel runtime UNTESTED"
+    },
+    "guarded_fallback_and_runtime_boundary": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_package_dx11_first_game_frame.py"
+      ],
+      "validation_command": "DX11 Fast and Backend Conversion Gate original result SHA compile and targeted regression success; Quest3 and real game runtime UNTESTED"
+    },
+    "source_matched_test_package_and_exact_sha_ci": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40554202396",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40554202537",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40554202503",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40554202424",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40554202487"
+      ],
+      "validation_command": "Mandatory five push workflows completed success at original result SHA 1db7d8c42d9ee4d9da6d7dd0ce7d7ca11f239b58"
+    }
+  }
 }
