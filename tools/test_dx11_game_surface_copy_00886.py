@@ -28,7 +28,11 @@ def linked(b, h, r):
         "nativeOutputUploadDepth != 0u",
         "!env_full_game_opt_in()",
         "FAILED(originalResult)",
-        "s.sourceGameDevice != owner",
+        # Cold no-Clear full-copy bootstraps must no longer be rejected
+        # by the old unconditional source-owner/seed guard.
+        "native_game_full_surface_copy_can_continue(",
+        "s.sourceGameDevice == owner",
+        "seededMainBackbuffer || bootstrapCopy",
         "s.frameBatch.publishable(s.pending)",
         "!s.surfaceReplayBudget.admits_bytes(plannedReadbackBytes)",
         "actualIdentity.Get() != backbufferIdentity.Get()",
@@ -129,6 +133,7 @@ for token in (
     "readback=s.surfaceReplayReadback.Get();",
     "game->GetRenderTargetData(",
     "s.frameBatch.publishable(s.pending)",
+    "native_game_full_surface_copy_can_continue(",
     "actualIdentity.Get() != backbufferIdentity.Get()",
     "ScopedNativeGameGpuTransferInputs shaderInputs(",
     "ScopedNativeGameGpuTransferOutputs outputs(context);",
