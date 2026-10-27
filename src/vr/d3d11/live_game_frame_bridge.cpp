@@ -6694,6 +6694,17 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 (connectedCandidate ? connectedSubmission.drawCount : instanceCount)))))))));
     const UINT drawVertexCount = compactInstancedGeometry
         ? static_cast<UINT>(expandedVertices) : vertexCount;
+    // RAW pixel evidence needs the same native color region BEFORE and AFTER
+    // a genuine shader-bound game Draw; no full-frame or XR promotion.
+    if (env_raw_visual_opt_in() && s.backend.ready()) {
+        auto* gpuContext = s.backend.context();
+        ScopedNativeGameGpuTransferInputs savedInputs(
+            gpuContext, s.backend.color_texture());
+        ScopedNativeGameGpuTransferOutputs savedOutputs(gpuContext);
+        s.rawPreview.begin_real_native_draw(
+            game, s.backend.device(), gpuContext,
+            s.backend.color_texture(), s.presents);
+    }
     // One audited submit site for the original game Draw; grouped lists keep
     // primitive order, while strips/fans retain one Draw per source instance.
     const auto issueNativeGameDraw = [&](UINT vertices, UINT base) noexcept {
@@ -7989,6 +8000,17 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ID3D11SamplerState* boundStage1Sampler = stage1Sampler.Get();
     ctx->PSSetShaderResources(1, 1, &boundStage1View);
     ctx->PSSetSamplers(1, 1, &boundStage1Sampler);
+    // Mirror the exact D3D9 source FVF Draw region before dispatch, not a
+    // remembered clear color or a previously rendered source frame.
+    if (env_raw_visual_opt_in() && s.backend.ready()) {
+        auto* gpuContext = s.backend.context();
+        ScopedNativeGameGpuTransferInputs savedInputs(
+            gpuContext, s.backend.color_texture());
+        ScopedNativeGameGpuTransferOutputs savedOutputs(gpuContext);
+        s.rawPreview.begin_real_native_draw(
+            reinterpret_cast<IDirect3DDevice9*>(s.sourceGameDevice),
+            s.backend.device(), gpuContext, s.backend.color_texture(), s.presents);
+    }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
     else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
     // GPU submission is paired with the queued readback at Present.
