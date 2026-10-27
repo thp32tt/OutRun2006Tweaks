@@ -167,8 +167,13 @@ def check_mono_aux_fastpath(text: str) -> None:
         "const bool internalPass = gameDevice && R32ReviewInternalStereoPass();",
         "(gameDevice && !internalPass)",
         "if (!gameDevice || internalPass ||",
-        "StateBlockTracker::Recording()", "!R32ReviewStereoWanted()",
-        "!R32ReviewTargetIsBackBuffer()",
+        # R33 snapshots the predicate once so diagnostics and routing use
+        # the same decision. Verify the captured inputs AND their fail-closed
+        # bypass instead of demanding an obsolete duplicated function call.
+        "const bool stateBlockRecording =", "StateBlockTracker::Recording()",
+        "const bool stereoWanted = R32ReviewStereoWanted();",
+        "const bool targetBackBuffer = R32ReviewTargetIsBackBuffer();",
+        "stateBlockRecording ||", "!stereoWanted || !targetBackBuffer",
     ):
         assert required in guard, f"raster bypass lost {required}"
     assert guard.index("if (!gameDevice || internalPass ||") < guard.index(
