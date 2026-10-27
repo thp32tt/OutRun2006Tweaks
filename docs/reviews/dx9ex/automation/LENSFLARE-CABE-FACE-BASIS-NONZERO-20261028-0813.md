@@ -1,0 +1,53 @@
+# LENSFLARE-CABE-FACE-BASIS-NONZERO-20261028-0813 — CABE second-glow rotation-basis zero-length/collinearity negative control (LENS_FLARE_ONLY / REVIEW_ONLY)
+
+- DATE=2026-10-28 KST; RUN_KEY=LENSFLARE-CABE-FACE-BASIS-NONZERO-20261028-0813; TARGET=thp32tt/OutRun2006Tweaks@vr-d3d9ex-focus; SOURCE_HEAD=327020c9449ceb3e19d8c5617ddc4702a206cbea; SOURCE_SSOT=GITHUB_PINNED; MODE=DX9EX_REVIEW_ONLY; CODE_CHANGE=NO.
+- BASELINE=R26+HUD 0cff83cf509c2acd6f3391b3a46c4dec1403a0d9 IMMUTABLE; R84=COMPARISON_ONLY; B9200_POST_CALL_PLUS5_HOOK=FORBIDDEN; CI_SKIP=NONE; SOURCE_BUILD_GATE=NOT_REQUIRED_DOCS_ONLY; RUNTIME_VALIDATION=UNTESTED.
+- INHERITED=CONVERSION-DX9EX-01529/01530/01532/01533/01539/01540/01541/01542/01543; LENSFLARE-ZENABLE-TWO-ORDINAL-CONTROL-20261028-0725; LENSFLARE-MATERIAL-ALPHA-SPLIT-20261028-0528. Prior reviews established two legitimate 570008 ordinals, distinct along/size/alpha, deferred/immediate physical ownership, projected equal-L/R stock-WVP policy, and stage/facing ring gain. This review does NOT rescore those.
+- DISTINCT_FALSIFICATION_AXIS=Exact source rotation *basis* of the CABE ring/second glow before 4056D0: nonzero normalization inputs and explicit 40A6D0 collinearity guard. This is NOT an observation of the affected headset pixel or a new optical correction.
+- EVIDENCE_KIND=PINNED_INDEPENDENT_ORIGINAL_RECONSTRUCTION_AND_CURRENT_BASELINE_MOD_SOURCE; RETAIL_EXE_BYTE_MATCH_THIS_RUN=NO; PMT_TEXTURE_OR_NATIVE_GPU_PIXELS=NONE; LIVE_HMD_LOG=NONE; QUEST3_VDXR=NOT_RUN.
+
+## NEW_FINDING — ordinary finite source geometry cannot collapse the CABE facing basis through a zero vector
+
+NEW_FINDING=STATIC_CONDITIONAL_CABE_FACE_40CAE0_HAS_STRICTLY_NONZERO_NORMALIZATION_INPUTS_AND_40A6D0_HANDLES_PARALLEL_ALIGNMENT; SECOND_ONLY_GHOST_NOT_PROVEN.
+ROOT_CAUSE_DOUBLE_IMAGE_HEAD_LOCK_DEPTH=UNCONFIRMED.
+
+1. Original reconstructed `sun_flare_40cbc0:613,646-649` fixes `glow_offset={0,0,-0.2}` and `axis.z=-1` even while the projected `axis.x/y` vary with the source sun position. The subtraction `glow_dir=glow_offset-axis` therefore gives `glow_dir=(-axis.x,-axis.y,+0.8)` for any ordinary finite projected `P.z!=0`. In particular `glow_dir.z=+0.8` is not a camera-dependent near-zero denominator.
+2. `Sun::face_40cae0:455-465` normalizes `flat=(glow_dir.x,0,glow_dir.z)` and `up=(glow_dir.y,0,sqrt(glow_dir.z^2+glow_dir.x^2))`. Their Euclidean lengths satisfy `|flat|>=0.8` and `|up|>=0.8` for finite x/y. Hence the source's two **input vector normalizations** cannot encounter a zero-length input simply because the sun approaches the centre of the screen.
+3. The separately inspected original `car_reflection_align_40a6d0:93-105` computes the cross-product magnitude and explicitly branches when it is below epsilon or unordered. The parallel case does **not** normalize a zero cross product: if `dot>=0` it leaves orientation unchanged; if `dot<0` it rotates by pi about a fallback axis. This is a bounded reconstructed-source negative control for an alleged 40CAE0/40A6D0 zero-axis divide-by-zero at an exactly centred sun; not a blanket proof against every floating-point or GPU/driver issue.
+4. `sun_flare_40cbc0:680-715` calls `face_40cae0(glow_dir)` exactly once before the CABE ring sequence; both intentional `0x570008` source ordinals are later passed through `flare_40c9a0`. That helper `push`es and `pop`s the matrix stack around each distinct along/size/alpha submission (:441-453). The intervening `4052C0` opaque flush at :714 changes renderer queue/undo/immediate state, not the original `PcMatrixStack` via its reconstructed `render_queue_flush_4052c0:970-980` signature/body. Thus **a zero-length or unhandled parallel source-facing basis cannot selectively arise only for ordinal2 on the normal finite path**; different positions, gain, queue owner, c64 or eye projection remain possible.
+5. This conclusion is deliberately narrower than “both physical sprites have the same GPU WVP”. Their original along/size/alpha differ; ordinal1 can be deferred until after CABE's scoped semantic exits, while ordinal2 may flush inline. The current `DrawObjectAlphaProjected:731-793` forwards the source calls without modifying `face_40cae0`; `R30BuildScreenSpaceEyeConstants:5175-5226` can apply an equal-L/R projected policy to an admitted physical draw. No source-to-PMT-to-eye-RT join exists. The user's **visually second** doubled element is not identified as CABE ordinal2 and may instead involve C993 `0x570006` or another material/texture.
+6. This is original reconstructed game math, not a fresh retail EXE byte-match. The original zero-length/parallel control is not a focus-only regression: protected baseline's CABE wrapper also delegates to the same original 4056D0 without replacing 40CAE0; that does not establish baseline HMD correctness.
+
+## SOURCE_TRACE (one-based, connected GitHub reads)
+
+- ORIGINAL_SECONDARY=`r4dius/outrun2-decomp@e1e1c592b802a6f3f7020a676abd3ba1be479e62/src/platform/race_course_passes.cpp` blob `22985e118c172467c566fe58d5b08f280c565ee2`: `Sun::flare_40c9a0:438-453`, `Sun::face_40cae0:455-465`, `sun_flare_40cbc0:613,646-649,678-715`.
+- ORIGINAL_SECONDARY=`src/platform/pc_car_reflection.cpp` blob `bf830839062305992fd8d1cb4fdfb401f644158c`: `car_reflection_align_40a6d0:93-105` (epsilon/unordered/parallel branch).
+- ORIGINAL_SECONDARY=`src/platform/pc_render_flush.cpp` blob `e6928a316ee4d503910cbe970b26f137e41c158e`: `render_queue_flush_4052c0:970-980`.
+- FOCUS=`thp32tt/OutRun2006Tweaks@327020c9449ceb3e19d8c5617ddc4702a206cbea/src/hooks_graphics.cpp` blob `640e0438f82922f5488770c46451caa712bfbde1`: `DrawObjectAlphaProjected:731-793`, `DrawObjectAlphaCentre:816-907`; `src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp` blob `400664d0740e86a9a29181d6f1954eb90ec549d2`: `R30BuildScreenSpaceEyeConstants:5175-5226`.
+- PROTECTED_BASELINE=`thp32tt/OutRun2006Tweaks@0cff83cf509c2acd6f3391b3a46c4dec1403a0d9/src/hooks_graphics.cpp` blob `5651e2239ed2c894d65a0d140d0c1d0a170b96e7`: `DrawObjectAlphaProjected:625-648`.
+
+## HYPOTHESIS_LEDGER / FALSIFICATION
+
+| Axis | Status and distinct discriminator |
+| --- | --- |
+| A extra original emitter | OPEN. A nondegenerate facing basis neither adds nor removes an original 570008 or C993 call. Require an unexpected sun-invocation source object plus actual same-eye colour pixels. |
+| B duplicate native/D3DX/opaque submission | OPEN. First deferred/second immediate remains; require excess **same** descriptor+PMT pass+primitive+texture+eye RT colour-write, not two intended source calls or two eyes. |
+| C wrong c64/WVP/zero binocular depth | OPEN. Original nonzero face basis cannot validate later original c64, R30 kind, projected equal-L/R WVP, lower R26/R13 fallback or actual eye pixels. |
+| D intended overlapping source halo | OPEN/CONDITIONAL. Same nondegenerate facing basis with distinct ordinal along/size/alpha may yield intentional spatially different source discs; stage/facing and flicker gain inherited from 01543/2204. Confirm only with texture/material and per-eye pixel centroid. |
+| E host OpenXR fresh/cached/projection | OPEN_RUNTIME. Original face-basis math is upstream; per-eye host SRV/RTV rebinding inherited 01542. Match fresh source and XR pose/views; no new host claim. |
+| F HMD head-lock from source-camera yaw | OPEN. This test excludes only a zero-input/parallel source-basis failure on finite normal path. It does not prove that game View140 and XR latched yaw are coherent. |
+| G CABE 40CAE0 zero-length/parallel basis singularity specifically causes ordinal2-only ghost | RULED_DOWN_STATIC_CONDITIONAL. Both input norms are >=0.8; 40A6D0 explicitly handles collinear axes; both ordinals share the source-facing call. A measured nonfinite input or retail-byte divergence would invalidate the finite/reconstructed premise. |
+
+## EVIDENCE_GAPS / FALSIFICATION
+
+- EVIDENCE_GAPS=No installed retail EXE byte-equivalence of 40CBC0/40CAE0/40A6D0, actual finite `P` and `axis` values, PMT geometry/texture/alpha for visually second element, original 405360 descriptor→4052C0 flush→physical Draw mapping, native c64/eyeWVP/eyeRT pixel hashes, source game camera vs fresh HMD yaw, or host OpenXR fresh/cached matching view pose/FOV. Real Quest3/VDXR runtime and previous ZIP's internal log values not available in this run.
+- POSITIVE_STATIC_CONTROL=For finite `axis.x/y`, reconstruct `w=(-axis.x,-axis.y,0.8)` and confirm both normalized input lengths >=0.8; for exact screen centre `axis.x=axis.y=0`, 40A6D0 must take the near-zero-cross-product guard with nonnegative dot and no axis normalization. These are source arithmetic controls, not recorded gameplay samples.
+- NEGATIVE_CONTROL=If a live retail trace shows nonfinite axis/camera matrix, an unexpected branch in original 40A6D0, or different original facing rotations between ordinal1 and ordinal2 despite no intervening source-face call, re-open the original-basis hypothesis and verify retail bytes; do not infer this from an R30 physical log alone.
+- DECISIVE_OPTICAL_TEST=One **fresh** game Present with a stable visible sun: correlate `sunInvocationId,stage,P,axis,glow_dir,faceRotation,570006,CABE570008ordinal,alpha,along,size,405360descriptorId,4052C0flushId,PMTpass/primitive/texture/colourWrite,originalC64,actualR30Kind/eyeWvp,physicalLeftRightRT+pixelCentroid,sourceFrameId,freshCached,xrPoseSequence,XRviewPose/Fov`; compare matched HMD yaw-only and translation-only sweeps. Identify the *visually second* blob from actual source pixels before assigning CABE ordinal2.
+- NEXT_REVIEW=LENS_FLARE:IDENTIFY_VISUAL_SECOND_BLOB_AS_C993570006_VS_CABE570008_ORDINAL1_2_BY_PMT_TEXTURE_RGB_CENTROID_THEN_COMPARE_ORIGINAL_FACE_BASIS_TO_FRESH_LR_EYE_WVP_AND_XR_YAW.
+
+## PATCH_CANDIDATE_ONLY / REGRESSION
+
+- PATCH_CANDIDATE_ONLY=NONE. No zero-basis fix is justified. A later separately authorized diagnostic-only plan may correlate existing original source and actual native eye receipts without touching forbidden B9200 post-CALL/+5; this REVIEW_ONLY run changes no C++/HLSL/CMake/config/workflow/branch/release/package.
+- REGRESSION=HIGH_IF_PREMATURE: changing shared 40CAE0 rotation, original 570008 alpha/size/along, 4052C0 timing, R30 projected stereo policy or OpenXR source pose may destroy intentional optical discs, sky, occlusion and HUD. Preserve both original 570008 calls, C993 family, 570010 colour-disabled query, R26+HUD immutable baseline, R84 comparison-only, native L/R restore/fallback.
+- CODE_CHANGE=NO; RUNTIME_VALIDATION=UNTESTED; DOCS_ONLY_BUILD_GATE=NOT_REQUIRED; CI_SKIP=NONE; EXPECTED_CHANGED_PATHS=ONLY_THIS_NEW_DOC; COMMIT_MARKER=[AUTO:LENSFLARE-CABE-FACE-BASIS-NONZERO-20261028-0813].
