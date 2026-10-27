@@ -58,6 +58,10 @@ SOURCE_PATCH_RECEIPTS = {
               "Complete c64..c67 bounds before 16-float source copy"),
 }
 PARTIAL_PATCH_RECEIPTS = {
+    "01514": ("src/vr/d3d9/stereo_renderer_r7.inc",
+              "if(count==2)",
+              "Bounded full-surface 2-strip tiled Clear proof; "
+              "general N-rectangle union intentionally unsupported"),
     "01517": ("src/vr/d3d9/stereo_renderer.cpp",
               "TrackedDepthStencil == R9MainDepthIdentity &&",
               "Scoped R9-only offscreen shared-main-depth invalidation; "
