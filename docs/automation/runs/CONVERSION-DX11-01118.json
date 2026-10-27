@@ -10,15 +10,15 @@
   "classification": "A_COHESIVE_RAW_DX11_NATIVE_DRAW_SOURCE_CONTINUATION_AND_B_CAUSAL_CI_REPAIR",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
-  "status": "IN_PROGRESS_SOURCE_INTEGRATED_CI_PENDING",
-  "checkpoint": "C4_SOURCE_COMMITTED",
-  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "source_base_sha": "b9bcee1e6e7abaf4d50fcaffb2ab16f1af4b1e9f",
   "source_change_sha": "bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0",
   "material_result_sha": "bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
   "implementation_commits": [
     "bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0"
   ],
@@ -91,5 +91,47 @@
     "complete_native_frame": "UNTESTED",
     "quest3_stereo": "UNTESTED"
   },
-  "c6_note": "CI pending. First candidate bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0 failed DX11 Fast 40561438382 and Backend 40561438437 solely on inherited malformed 01117 task record; repair writes schema-compliant 01117 + active 01118 record without weakening validators. Any further failures must be independently inspected."
+  "c6_note": "2026-10-28 KST E002 C6-only bookkeeping: validation-bearing source/record repair SHA 30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8 confirmed five original push GitHub Actions completed/success (DX11 Fast 40562027136, Backend 40562027074, Build 40562026974, OpenXR 40562027079, HUD 40562027764). Do not rerun unchanged SHA. Source implementation remains bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0; this later [skip ci] record-only commit is not a new validation-bearing SHA or development score. Game/Quest3/VDXR runtime remains UNTESTED; RAW partial tile is not a proven full native frame.",
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40562027136,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40562027074,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    },
+    {
+      "name": "Build",
+      "run_id": 40562026974,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40562027079,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40562027764,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    }
+  ]
 }
