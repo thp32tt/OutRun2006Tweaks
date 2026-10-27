@@ -1665,10 +1665,16 @@ if(WaitForEventQuery(slot.fence,1,0u))
 							leftDesc.MultiSampleQuality==rightDesc.MultiSampleQuality;
 						if(compatible)
 						{
+							// Descriptor compatibility proves only that the existing RIGHT
+							// allocation can be reused. A different LEFT COM surface has
+							// independent contents, so the previous synchronization proof
+							// must not survive this identity transition (review 01512).
+							RightDepthSynchronized=false;
+							RightStencilSynchronized=!FormatHasStencil(leftDesc.Format);
 							if(!FirstMainDepthReuseLogged)
 							{
 								FirstMainDepthReuseLogged=true;
-								spdlog::info("VR stereo: compatible main depth restored after auxiliary pass; reusing right-eye depth without desynchronizing");
+								spdlog::info("VR stereo: compatible main depth identity changed; reusing right-eye allocation with content sync invalidated");
 							}
 						}
 						else
