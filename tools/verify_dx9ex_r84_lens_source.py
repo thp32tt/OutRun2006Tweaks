@@ -400,7 +400,10 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert (c993.index("ScopedExactProducerSemantic semantic(") <
             c993.index("ScopedRenderSemantic sunDrawScope(") <
             c993.rindex("Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);"))
-    admission = c993.split("const bool projectedSun =", 1)[1].split("if (!projectedSun)", 1)[0]
+    # Isolate the one executable admission expression, not following
+    # source-only telemetry predicates that can mention the same object ID.
+    # Otherwise an unsafe edit of projectedSun escapes the negative mutant.
+    admission = c993.split("const bool projectedSun =", 1)[1].split(";", 1)[0]
     for marker in ("Settings::VREnabled &&", "!OutRunVR::GameSemantic::QueueRenderActive() &&",
                    "IsProjectedSunScreenObject(objectId);"):
         assert marker in admission, marker
