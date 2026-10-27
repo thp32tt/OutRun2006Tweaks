@@ -1,0 +1,185 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01123",
+  "production_id": "CONVERSION-DX11-01123",
+  "event_id": "CONVERSION-DX11-01123-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01123",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_PRESENT_COVERAGE",
+  "classification": "A_SOURCE_IMPLEMENTATION_AND_B_ACTUAL_CI_FAILURE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "c6_score_change": 0,
+  "source_base_sha": "c31c518cc74f63fb35c06295579ad076c4cd1165",
+  "source_change_sha": "de1a0ad3b7a783b886a34fb8f3230c7576a58aa3",
+  "material_result_sha": "de1a0ad3b7a783b886a34fb8f3230c7576a58aa3",
+  "validation_bearing_result_sha": "afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+  "result_sha": "afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+  "implementation_commits": [
+    "de1a0ad3b7a783b886a34fb8f3230c7576a58aa3"
+  ],
+  "repair_commits": [
+    "afa345ae7d33fad8f62784fee1ebf57a85d7c3b1"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_present_coverage_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "VERIFIED_PARTIAL_RAW_GPU_TILE_NOT_FULL_NATIVE_FRAME",
+    "integration_path": [
+      "AUTHENTIC_D3D9_PRESENT_DIRTY_SOURCE_CROP",
+      "BOUNDED_DIRTY_REGION_COVERAGE",
+      "SOURCE_OWNED_NATIVE_GPU_DRAW_PAIR",
+      "OPT_IN_RAW_DIAGNOSTIC_GPU_PIXEL_TILE"
+    ],
+    "batch_components": [
+      "CXX_PRESENT_CROP_COVERAGE_ADMISSION",
+      "CXX_SAFE_RAW_UPLOAD_GATE",
+      "PORTABLE_POSITIVE_NEGATIVE_DIRTY_SOURCE_COVERAGE_TEST"
+    ],
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Explicit opt-in diagnostic, original D3D9 Draw/Present and input/FFB untouched; dirty rectangle safety and complete-frame publication stay fail-closed; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Show authenticated real native D3D11 GPU pixel tiles during proven source D3D9 Present crops, without publishing an incomplete production backbuffer.",
+    "acceptance_items": [
+      {
+        "id": "source_crop_coverage",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_RAW_GPU_PRESENT",
+        "expected_behavior": "Allow absent dirty list or proven full/cropped/partition-union repaint; reject partial/unverified dirty crops."
+      },
+      {
+        "id": "safe_partial_output",
+        "category": "fallback_regression",
+        "behavior_area": "NATIVE_GPU_DIAGNOSTIC",
+        "expected_behavior": "Only opt-in, source-owned 256x144 tile may be copied; preserve original D3D9 game Draw/input/FFB and complete-frame shutdown."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_ACTIONS",
+        "expected_behavior": "All five required push workflows completed/success on exactly the same validation-bearing SHA without CI-skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_crop_coverage": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_present_coverage_test.cpp"
+      ],
+      "validation_command": "GitHub DX11 Fast Structural Checks #40603017023",
+      "runtime_validation": "UNTESTED"
+    },
+    "safe_partial_output": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "GitHub Build #40603016993",
+      "runtime_validation": "UNTESTED"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "validation_command": "Five required GitHub Actions push runs on validation-bearing SHA afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS provided failed Backend #40602923852 inspected; original source and current HEAD checked",
+    "C1_REVIEW": "PASS inherited prior task 01122 noncanonical full_gate_plan metadata caused actual policy rejection",
+    "C2_IMPLEMENT": "PASS source crop-aware native GPU RAW tile C++ and regression integrated in material commit de1a0ad3",
+    "C3_VALIDATE": "PASS required five exact-SHA GitHub Actions on afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+    "C4_COMMIT": "PASS source de1a0ad3; causal schema policy repair afa345ae7; no CI-skip on gate commit",
+    "C5_PACKAGE": "PASS source-matched Build #40603016993 artifact 12780161183; native game/HMD UNTESTED",
+    "C6_STATE": "PASS separate bookkeeping record after five exact-SHA gates; no independent award or second result SHA"
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40603017023,
+      "event": "push",
+      "head_sha": "afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40603016987,
+      "event": "push",
+      "head_sha": "afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40603016993,
+      "event": "push",
+      "head_sha": "afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40603017024,
+      "event": "push",
+      "head_sha": "afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40603017079,
+      "event": "push",
+      "head_sha": "afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
+    "artifact_id": 12780161183,
+    "run_id": 40603016993
+  },
+  "runtime_evidence": {
+    "native_draws": "UNTESTED_AT_THIS_SHA",
+    "native_gpu_pixel_output": "UNTESTED_AT_THIS_SHA",
+    "publishedBackbufferFrames": "UNTESTED_AT_THIS_SHA",
+    "gpu_desktop_frames": "UNTESTED_AT_THIS_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "next_action": "Request source-matched real desktop DX11 RAW visual opt-in session; verify native Draw>0 and GPU-generated pixel tile, then full-frame game scene and separate Quest3/VDXR stereo. Do not conflate diagnostic tile with complete native frame.",
+  "scoreboard_authority": {
+    "repository": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "path": "AI_SCOREBOARD.md",
+    "commit": "4486c544c40ef049573f15a176a8fa9de87cf9fc",
+    "ai2_cumulative": 2059,
+    "score_increment_for_source_and_validated_work": 1,
+    "score_increment_for_this_c6": 0
+  },
+  "c6_note": "Implementation and causal actual CI repair were already committed under exact [AUTO:CONVERSION-DX11-01123]; this separate checkpoint does not own GitHub Gate or new score. Runtime/HMD evidence not supplied. No measured development-time percentages claimed."
+}
