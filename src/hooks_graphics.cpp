@@ -816,10 +816,6 @@ class VRLensFlareProjected2D : public Hook
     static void __cdecl DrawObjectAlphaCentre(
         int objectId, float alpha, void* work, int flags)
     {
-        const bool trackedSource = Settings::VREnabled &&
-            IsProjectedSunScreenObject(objectId);
-        const std::uint64_t sourceCallSerial =
-            trackedSource ? NextLensSourceCallSerial() : 0;
         // Begin one exact sun-flare sequence before any optional C993
         // suppression. The following C9A0 path emits 0x570008 twice.
         if (Settings::VREnabled &&
@@ -839,6 +835,13 @@ class VRLensFlareProjected2D : public Hook
             Settings::VREnabled &&
             !OutRunVR::GameSemantic::QueueRenderActive() &&
             IsProjectedSunScreenObject(objectId);
+        // This source-only serial does not grant physical render ownership.
+        // Keep the protected projected admission as the first exact-ID check
+        // so its destructive negative-control test targets the real route.
+        const bool trackedSource = Settings::VREnabled &&
+            IsProjectedSunScreenObject(objectId);
+        const std::uint64_t sourceCallSerial =
+            trackedSource ? NextLensSourceCallSerial() : 0;
         // 4056D0 may only enqueue the original opaque object. Do NOT
         // interpret this hook's call counter as a native Draw or an eye RT.
         // The mod SpriteNode/D3DX queue flag is separate from that game's
