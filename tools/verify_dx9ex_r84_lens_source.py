@@ -299,7 +299,10 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
             "C993 coherent source pair veto lost: " + label)
     assert "centreBeforeLeft, centreRawBeforeLeft)) ||" in before_native_left
     assert "centreAfterLeft, centreRawAfterLeft));" in after_native_left
-    assert "OutRunVR::RankMarker::CoherentOriginalRankWvp(" in before_native_left
+    # Negative mutation must remove the *veto* (not merely the name);
+    # a non-negated coherence call cannot reject a foreign left-eye c64.
+    assert ("!OutRunVR::RankMarker::CoherentOriginalRankWvp(" + chr(10) +
+            "                     rankBeforeLeft, rankRawBeforeLeft)) ||") in before_native_left
     assert "rankBeforeLeft, rankRawBeforeLeft)) ||" in before_native_left
     assert "const bool rankSourceChanged = exactRankEye &&" in after_native_left
     assert "OutRunVR::RankMarker::SameOriginalRankWvp(" in after_native_left
