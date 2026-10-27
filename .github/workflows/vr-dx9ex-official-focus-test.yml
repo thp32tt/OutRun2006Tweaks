@@ -29,6 +29,7 @@ on:
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
       - 'tools/verify_vr_menu_resolution_split.py'
+      - 'tools/verify_vr_native_logical_ui_20261028.py'
       - 'vrhost/src/main_r23.cpp'
       - 'tools/verify_vr_r23_menu_letterbox_cache.py'
       - 'tools/verify_vr_d_logfix_20261026.py'
@@ -94,6 +95,11 @@ jobs:
           $rb = $rv.Substring($rs, $re-$rs)
           if ($rb.Contains('FlushD3DXBeforeDirectGoalSource') -or $rb.Contains('FlushD3DXAtDirectGoalSourceExit')) { throw 'Rival wrapper regressed to GOAL D3DX flush' }
           if (-not (Select-String src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp -Pattern 'VR RIVAL R30 GPU EYES' -SimpleMatch -Quiet)) { throw 'Rival physical stereo eye receipt missing' }
+      - name: Verify native VDXR 3D and logical 2D HUD/menu source geometry
+        shell: pwsh
+        run: |
+          python tools/verify_vr_native_logical_ui_20261028.py
+          if ($LASTEXITCODE -ne 0) { throw 'Native VDXR eye / logical UI canvas regression failed' }
       - name: Validate +TIME entry/reentry/exit plus four destructive ticket regressions
         shell: pwsh
         run: |
