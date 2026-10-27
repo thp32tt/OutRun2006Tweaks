@@ -6403,6 +6403,19 @@ namespace OutRunVRStereo
                         rightHr = E_FAIL;
                     }
                 }
+                // DispRank's fixed-function FVF142 route needs the same
+                // RIGHT-edge ownership fence as +TIME/GOAL/projected rank.
+                // The RT/depth/viewport setters above can reenter game code;
+                // a post-LEFT stamp alone must not authorize a different
+                // SpriteNode/pose/draw serial to receive the transformed eye.
+                if (SUCCEEDED(rightHr) && protectFixedFnRankHud &&
+                    !OutRunVR::HudNativeSource::SameFixedFnRankHudAfterLeft(
+                        fixedRankBefore, captureFixedRankHud()))
+                {
+                    rightFailure =
+                        OutRunVR::StereoFailureRightStateFailed;
+                    rightHr = E_FAIL;
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure =
