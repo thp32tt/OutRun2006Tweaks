@@ -4242,9 +4242,39 @@ namespace OutRunVRStereo
                     device, type, primitiveCount,
                     scratch.right.data(), stride);
             };
-            return R30ExecuteXyzrhwStereo(
+            const auto sourceCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool exactRival =
+                Settings::VRTelemetry &&
+                sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
+                sourceCommand.scope ==
+                    OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+            R30StereoPassTrace rivalTrace{};
+            const HRESULT stereoHr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.6/DrawPrimitiveUP-XYZRHW");
+                "R30.6/DrawPrimitiveUP-XYZRHW",
+                exactRival ? &rivalTrace : nullptr);
+            if (exactRival)
+            {
+                static std::atomic<std::uint64_t> rivalXyzReceipts{0};
+                const auto hit = rivalXyzReceipts.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (hit <= 8 || (hit & (hit - 1)) == 0)
+                    spdlog::info(
+                        "VR RIVAL XYZRHW EYE RECEIPT: hits={} stride={} primitives={} left=0x{:08X} rightTarget=0x{:08X} rightDepth=0x{:08X} rightViewport=0x{:08X} right=0x{:08X} restore={} projected={} worldAuth={} node={} epoch={}",
+                        hit, stride, primitiveCount,
+                        static_cast<unsigned>(rivalTrace.leftHr),
+                        static_cast<unsigned>(rivalTrace.rightTargetHr),
+                        static_cast<unsigned>(rivalTrace.rightDepthHr),
+                        static_cast<unsigned>(rivalTrace.rightViewportHr),
+                        static_cast<unsigned>(rivalTrace.rightHr),
+                        rivalTrace.restoreOk ? 1 : 0,
+                        state.projectedWorldMarker ? 1 : 0,
+                        state.worldEvidenceAuthoritative ? 1 : 0,
+                        sourceCommand.queueNode, sourceCommand.queueEpoch);
+            }
+            return stereoHr;
         }
 
         HRESULT R30TryXyzrhwIndexedPrimitiveUP(
