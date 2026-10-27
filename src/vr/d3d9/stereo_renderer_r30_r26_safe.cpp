@@ -2627,7 +2627,19 @@ namespace OutRunVRStereo
             // device getter below is still authoritative and a real shader
             // always rejects the XYZRHW fixed-function route.
             const bool exactResult = R30IsExactResultHudDraw();
-            if (!exactResult &&
+            const bool exactProjectedRival =
+                OutRunVR::GameSemantic::QueueRenderActive() &&
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
+                OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
+            // Known-good a22be86a always reached the live VS/FVF XYZRHW probe
+            // for DPUP. The newer R33 cached-state fast gate can be stale after
+            // D3DX StateBlock traffic. Exact rival ownership has source+node+
+            // Calc3D2D anchor proof, so ignore only the cached VS hint here and
+            // retain the authoritative live GetVertexShader/GetFVF rejection.
+            if (!exactResult && !exactProjectedRival &&
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire) != 0)
                 return reject(R30XyzrhwPrepareReject::CachedVsIdentity);
 
