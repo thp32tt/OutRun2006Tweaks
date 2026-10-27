@@ -19,11 +19,15 @@ for condition in ("const bool partialDepth = clearZ && !coversDepth;",
                   "for (std::uint32_t i = 0u; i < used; ++i)",
                   "if (!native_game_raster_partial_backbuffer_depth_clear("):
     assert condition in source, condition
+assert "regions.data() + start, chunk" in source
+assert "start += GameNativePostDrawClearBatch::gpu_chunk_size(" in source
 # The real game D3DRECT signed clipping now lives in the shared
 # post-Draw production batch used by both TARGET and depth; validate that
-# the true implementation still clips and refuses over-budget GPU regions.
+# the true implementation clips and chunks GPU regions without accepting malformed originals.
 for guard in ("GameNativeSourceMutation::classify_target_clear_rect(",
-              "used > kMaxGpuRegions",
+              "used > kMaxSourceRects",
+              "remaining < kMaxGpuRegions",
+              "gpu_chunk_size(",
               "game_native_merge_ordered_overwrite("):
     assert guard in source_rects, guard
 assert "GameNativePostDrawClearBatch::build(" in bridge[
