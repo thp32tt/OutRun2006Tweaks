@@ -1506,7 +1506,34 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			const bool depthOk=SUCCEEDED(depthHr)||depthHr==D3DERR_NOTFOUND;
 			if(FAILED(rtHr)||!savedRt||!depthOk||FAILED(viewportHr)){if(savedRt)savedRt->Release();if(savedDepth)savedDepth->Release();stateBlock->Release();return false;}
 			bool success=false,beganScene=false;
-			{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,BackBuffer))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,static_cast<IDirect3DSurface9*>(nullptr)))&&SUCCEEDED(device->BeginScene())){beganScene=true;device->SetVertexShader(nullptr);device->SetPixelShader(nullptr);device->SetFVF(D3DFVF_XYZRHW|D3DFVF_TEX1);device->SetRenderState(D3DRS_ZENABLE,FALSE);device->SetRenderState(D3DRS_ZWRITEENABLE,FALSE);device->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE);device->SetRenderState(D3DRS_ALPHATESTENABLE,FALSE);device->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);device->SetRenderState(D3DRS_LIGHTING,FALSE);device->SetRenderState(D3DRS_FOGENABLE,FALSE);device->SetRenderState(D3DRS_STENCILENABLE,FALSE);device->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE);device->SetRenderState(D3DRS_SRGBWRITEENABLE,FALSE);device->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_SELECTARG1);device->SetTextureStageState(0,D3DTSS_COLORARG1,D3DTA_TEXTURE);device->SetTextureStageState(0,D3DTSS_ALPHAOP,D3DTOP_SELECTARG1);device->SetTextureStageState(0,D3DTSS_ALPHAARG1,D3DTA_TEXTURE);device->SetTextureStageState(0,D3DTSS_TEXCOORDINDEX,0);device->SetTextureStageState(0,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);device->SetTextureStageState(1,D3DTSS_COLOROP,D3DTOP_DISABLE);device->SetSamplerState(0,D3DSAMP_MINFILTER,D3DTEXF_LINEAR);device->SetSamplerState(0,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR);device->SetSamplerState(0,D3DSAMP_ADDRESSU,D3DTADDRESS_CLAMP);device->SetSamplerState(0,D3DSAMP_ADDRESSV,D3DTADDRESS_CLAMP);device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE);D3DVIEWPORT9 full{0,0,BackBufferDesc.Width,BackBufferDesc.Height,0.0f,1.0f};const bool stateOk=SUCCEEDED(device->SetViewport(&full))&&SUCCEEDED(device->Clear(0,nullptr,D3DCLEAR_TARGET,D3DCOLOR_XRGB(0,0,0),1.0f,0));const bool leftOk=stateOk&&DrawTextureHalf(device,LeftResolveTexture,false);const bool rightOk=leftOk&&DrawTextureHalf(device,RightResolveTexture,true);device->SetTexture(0,nullptr);const HRESULT endHr=device->EndScene();beganScene=false;success=leftOk&&rightOk&&SUCCEEDED(endHr);}if(beganScene)device->EndScene();}
+			{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,BackBuffer))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,static_cast<IDirect3DSurface9*>(nullptr)))&&SUCCEEDED(device->BeginScene())){beganScene=true;bool setupOk=true;
+				// Preserve every state submission, but do not publish stereo if any
+				// setup HRESULT fails: the original SBS pixels are not proven (01511).
+				setupOk = SUCCEEDED(device->SetVertexShader(nullptr)) && setupOk;
+				setupOk = SUCCEEDED(device->SetPixelShader(nullptr)) && setupOk;
+				setupOk = SUCCEEDED(device->SetFVF(D3DFVF_XYZRHW|D3DFVF_TEX1)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_ZENABLE,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_ZWRITEENABLE,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_ALPHATESTENABLE,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_LIGHTING,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_FOGENABLE,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_STENCILENABLE,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetRenderState(D3DRS_SRGBWRITEENABLE,FALSE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_SELECTARG1)) && setupOk;
+				setupOk = SUCCEEDED(device->SetTextureStageState(0,D3DTSS_COLORARG1,D3DTA_TEXTURE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetTextureStageState(0,D3DTSS_ALPHAOP,D3DTOP_SELECTARG1)) && setupOk;
+				setupOk = SUCCEEDED(device->SetTextureStageState(0,D3DTSS_ALPHAARG1,D3DTA_TEXTURE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetTextureStageState(0,D3DTSS_TEXCOORDINDEX,0)) && setupOk;
+				setupOk = SUCCEEDED(device->SetTextureStageState(0,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetTextureStageState(1,D3DTSS_COLOROP,D3DTOP_DISABLE)) && setupOk;
+				setupOk = SUCCEEDED(device->SetSamplerState(0,D3DSAMP_MINFILTER,D3DTEXF_LINEAR)) && setupOk;
+				setupOk = SUCCEEDED(device->SetSamplerState(0,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR)) && setupOk;
+				setupOk = SUCCEEDED(device->SetSamplerState(0,D3DSAMP_ADDRESSU,D3DTADDRESS_CLAMP)) && setupOk;
+				setupOk = SUCCEEDED(device->SetSamplerState(0,D3DSAMP_ADDRESSV,D3DTADDRESS_CLAMP)) && setupOk;
+				setupOk = SUCCEEDED(device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE)) && setupOk;;D3DVIEWPORT9 full{0,0,BackBufferDesc.Width,BackBufferDesc.Height,0.0f,1.0f};const bool stateOk=setupOk&&SUCCEEDED(device->SetViewport(&full))&&SUCCEEDED(device->Clear(0,nullptr,D3DCLEAR_TARGET,D3DCOLOR_XRGB(0,0,0),1.0f,0));const bool leftOk=stateOk&&DrawTextureHalf(device,LeftResolveTexture,false);const bool rightOk=leftOk&&DrawTextureHalf(device,RightResolveTexture,true);device->SetTexture(0,nullptr);const HRESULT endHr=device->EndScene();beganScene=false;success=leftOk&&rightOk&&SUCCEEDED(endHr);}if(beganScene)device->EndScene();}
 			const HRESULT applyHr=stateBlock->Apply();stateBlock->Release();bool restoreOk=SUCCEEDED(applyHr);
 			if(FAILED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,savedRt)))restoreOk=false;
 			if(FAILED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,savedDepth)))restoreOk=false;
