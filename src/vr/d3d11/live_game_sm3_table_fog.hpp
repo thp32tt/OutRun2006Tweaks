@@ -14,6 +14,12 @@ struct NativeSm3TableFog {
     std::array<float, 4> controls{}; // start, end, density, D3DFOGMODE
     bool enabled{};
 };
+// The FVF and SM3 game source pipelines share this exact inert-equation test.
+// Range fog has no visible contribution when neither equation is enabled.
+[[nodiscard]] inline bool native_game_inert_fog_modes(
+    unsigned tableMode, unsigned vertexMode) noexcept {
+    return tableMode == 0u && vertexMode == 0u; // D3DFOG_NONE
+}
 // Stable bounded runtime rejection codes: never collapse source state failures
 // into an ambiguous "fog" aggregate. Code 12 is reserved for COM query failure.
 enum class NativeSm3FogReject : unsigned {
@@ -41,7 +47,7 @@ enum class NativeSm3FogReject : unsigned {
     // Do not require a capability, float payload, sRGB mode or inactive
     // range-fog flag for a genuine source no-fog Draw. In particular, this
     // fixes false rejection of live FOGENABLE=1/NONE/NONE/RANGEFOG=1.
-    if (tableMode == 0u && vertexMode == 0u) return true;
+    if (native_game_inert_fog_modes(tableMode, vertexMode)) return true;
     // An active equation still needs an exactly mirrored GPU fog pipeline.
     // Preserve conservative Z/W and sRGB restrictions for real fog.
     if (vertexMode != 0u) return fail(NativeSm3FogReject::VertexFog);

@@ -34,6 +34,12 @@ require(source.index("native_sm3_table_zfog_admission(") <
 for token in ("append_native_sm3_table_zfog(pixelHlsl, tableZFog)",
               "append_native_sm3_alpha_test(pixelHlsl, alphaCompare)"):
     require(token in backend, "native HLSL compile stage disconnected: " + token)
+for token in ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
+              "D3DRS_FOGTABLEMODE", "D3DRS_FOGVERTEXMODE",
+              "if (!sourceFogInactive) return false"):
+    require(token in bridge, "fixed-function live D3D9 fog fallback missing: " + token)
+require("native_game_inert_fog_modes(tableMode, vertexMode)" in header,
+        "shared programmable and FVF source equation classification absent")
 for token in ("LIVE_SM3_FOG_REJECT", "liveSm3FogRejectReasons",
               "NativeSm3FogReject::SourceQuery",
               "D3DRS_RANGEFOGENABLE", "sourceOrdinal"):

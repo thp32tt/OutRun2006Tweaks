@@ -2611,8 +2611,21 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        !clip || fog || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame))
+        !clip || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame))
         return false;
+    // FVF fixed-function game draws use the same actual source NONE/NONE
+    // equation as SM3, not the inherited RANGEFOGENABLE flag. A genuine
+    // vertex or table fog equation is still unsupported for this shader
+    // family: do not substitute an un-fogged native output for colored fog.
+    bool sourceFogInactive = fog == FALSE;
+    if (!sourceFogInactive) {
+        DWORD sourceTableFog = 0xffffffffu, sourceVertexFog = 0xffffffffu;
+        sourceFogInactive =
+            SUCCEEDED(game->GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)) &&
+            SUCCEEDED(game->GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)) &&
+            native_game_inert_fog_modes(sourceTableFog, sourceVertexFog);
+    }
+    if (!sourceFogInactive) return false; // DX9Ex source fallback is authoritative.
     // D3D9 polygon fill does not change the topology of a POINTLIST or
     // LINESTRIP inherited from an earlier triangle. The live SM3 GPU path
     // already uses these exact enum domains. Extend the full-game FVF path

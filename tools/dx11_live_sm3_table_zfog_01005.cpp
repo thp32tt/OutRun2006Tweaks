@@ -5,6 +5,12 @@
 using namespace outrun::vr::dx11;
 int main() {
     NativeSm3TableFog fog{};
+    // D3D9 equation NONE/NONE is shared across fixed-function and SM3
+    // game-authored draws. Any active equation still requires exact coverage.
+    assert(native_game_inert_fog_modes(0u, 0u));
+    assert(!native_game_inert_fog_modes(1u, 0u));
+    assert(!native_game_inert_fog_modes(0u, 1u));
+    assert(!native_game_inert_fog_modes(3u, 3u));
     // Genuine exponential, squared-exponential and linear game fog inputs.
     for (unsigned mode : {1u, 2u, 3u}) {
         assert(native_sm3_table_zfog_admission(
