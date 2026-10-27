@@ -94,7 +94,7 @@ int main() {
     assert(batch.count == 128u);
     // No-op clipped offscreen write is allowed and consumes no tile.
     assert(batch.record(77u,88u,41,0,45,2,W,H,0xffffffffu));
-    assert(batch.count == 16u);
+    assert(batch.count == 128u);
     assert(!game_native_replay_pre_draw_fills(
         batch,77u,89u,W,H,false,false,
         [](const GameNativePreDrawTile&) { return true; },
