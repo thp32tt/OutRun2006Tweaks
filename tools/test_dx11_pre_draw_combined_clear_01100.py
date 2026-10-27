@@ -8,7 +8,7 @@ hook=bridge[start:end]
 assert "if (sameBackbuffer &&" in hook
 assert "s.frameBatch.depthClearPending" in hook
 assert "s.clearColor.main_depth_still_bound(" in hook
-assert "depthDesc.MultiSampleType != D3DMULTISAMPLE_NONE" in hook
+assert "depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE" in hook
 assert "GameNativePreDrawCombinedClear::record(" in hook
 assert "s.preDrawFills, s.preDrawDepth, owner, mainRt" in hook
 assert "return s.preDrawFills.record_target_clear(" in hook
