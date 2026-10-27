@@ -1663,15 +1663,12 @@ class UIScaling : public Hook
         ResultProgressAdmittedAfterDrain = false;
         // Queue ownership belongs to this exact 0-99% parent ONLY if the
         // priority root is still the same after the native E8 returns.
-        ResultProgressEntrySerial =
-            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
-                std::memory_order_acquire);
-		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
-		{
-			SpriteNode* root = Game::sprite_prio_root[prio];
-            ResultProgressRootsBefore[prio] = root;
-			ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;
-		}
+        // Any old-owner Flush callback runs BEFORE we capture GOAL children;
+        // otherwise a foreign queue append during that Flush could be
+        // misattributed to the following original 0x2D200 producer.
+        ResultProgressEntrySerial = 0;
+        ResultProgressRootsBefore = {};
+        ResultProgressTailsBefore = {};
         // 0x97BE4/0x97DEC submit synchronous animated digits plus queued
         // siblings. Shield stale world Draws; reentrant live queues retain
         // their semantic authority, and old pending state is restored.
@@ -1687,10 +1684,24 @@ class UIScaling : public Hook
                 !OutRunVR::GameSemantic::QueueRenderActive(),
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
             if (ResultProgressAdmittedAfterDrain)
+            {
+                // Freeze the live priority boundary AFTER the old D3DX batch
+                // has drained and admission survived. Only native children
+                // enqueued by this original E8 may inherit ResultProgress.
+            ResultProgressEntrySerial =
+                OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                    std::memory_order_acquire);
+    		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+    		{
+    			SpriteNode* root = Game::sprite_prio_root[prio];
+                ResultProgressRootsBefore[prio] = root;
+    			ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;
+    		}
                 ResultProgressDirectDrawOwner.emplace(
                     OutRunVR::GameSemantic::RenderScope::ScreenHud,
                     nullptr, true,
                     OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+            }
         }
 	}
 	static void ResultProgressLeave(safetyhook::Context&)

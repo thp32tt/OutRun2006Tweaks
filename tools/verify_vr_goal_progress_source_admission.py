@@ -14,7 +14,33 @@ def body(a,b):
 inner=body("static void ResultProgressEnter(safetyhook::Context&)", "static void ResultProgressLeave(safetyhook::Context&)")
 leave=body("static void ResultProgressLeave(safetyhook::Context&)", "using ResultProgressFullParentFn")
 parent=body("static bool __cdecl ResultProgressFullParent()", "inline static SafetyHookMid StageExtensionEnterHooks")
+def goal_snapshot_guard(code: str) -> bool:
+    """Old D3DX producers must finish BEFORE GOAL takes its queue boundary."""
+    needles = [
+        "FlushD3DXBeforeDirectGoalSource();",
+        "ResultProgressAdmittedAfterDrain = ResultProgressAdmission.mayPublish(",
+        "if (ResultProgressAdmittedAfterDrain)",
+        "ResultProgressEntrySerial =\\n",
+        "ResultProgressRootsBefore[prio] = root;",
+        "ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;",
+        "ResultProgressDirectDrawOwner.emplace(",
+    ]
+    offsets = [code.find(needle) for needle in needles]
+    return all(i >= 0 for i in offsets) and offsets == sorted(offsets)
+
 tests=[
+    ("GOAL inner post-drain producer queue ownership",
+        goal_snapshot_guard(inner)),
+    ("reject unadmitted snapshot mutation",
+        not goal_snapshot_guard(inner.replace(
+            "if (ResultProgressAdmittedAfterDrain)", "if (true)", 1))),
+    ("reject missing old-owner Flush mutation",
+        not goal_snapshot_guard(inner.replace(
+            "FlushD3DXBeforeDirectGoalSource();", "/* no flush */", 1))),
+    ("reject missing live tail boundary mutation",
+        not goal_snapshot_guard(inner.replace(
+            "ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;",
+            "/* stale old tail */", 1))),
     ("true native inner enter admission", "ResultProgressAdmission = {" in inner and
         "ResultProgressAdmission.mayBeginDirect()" in inner),
     ("inner pre-drain recheck",inner.index("FlushD3DXBeforeDirectGoalSource();") <

@@ -71,4 +71,13 @@ for forbidden in ("cam_mode_timer_364","cam_mode_34A","word340","word344",
     assert forbidden not in eligible, forbidden
 assert "camera->cam_pos_F8 = savedPos;" in code
 assert "camera->look_pos_104 = savedLook;" in code
+ini=(root/"OutRun2006Tweaks.ini").read_text(encoding="utf-8")
+settings=(root/"src/vr/settings.cpp").read_text(encoding="utf-8")
+import re
+def stock_vehicle_scale(config: str) -> bool:
+    return len(re.findall(r"(?m)^\\s*DriverSeatVehicleScale\\s*=\\s*1\\.0+\\s*$", config)) == 1
+assert stock_vehicle_scale(ini), "shipped cockpit scale must be stock"
+assert not stock_vehicle_scale(ini.replace("DriverSeatVehicleScale = 1.00",
+                                      "DriverSeatVehicleScale = 1.15", 1))
+assert '"DriverSeatVehicleScale", 1.0f' in settings
 print("PASS Quest-style car-owned cockpit anchor + last-valid hold + source camera restore; HMD untested")
