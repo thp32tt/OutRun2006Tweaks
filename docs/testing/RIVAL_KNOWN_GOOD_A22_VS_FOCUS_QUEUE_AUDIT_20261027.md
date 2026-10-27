@@ -183,3 +183,41 @@ Decision:
    bypassed this DPUP hook or was masked; trace `0x42A800` next.
 
 This remains `RUNTIME_VALIDATION=UNTESTED` until a Quest3 DEBUG run.
+
+
+## 2026-10-27 14:xx regression-introduction bisect
+
+A Git-history bisect identifies the first high-confidence ownership regression:
+- `5366b7d7f3dac1d23f75c9df461925719887c35d` (2026-10-18 13:45 UTC,
+  `AUTO:CONVERSION-DX9EX-01045`) changed `RivalMarker_sprani` to snapshot
+  `rootsBefore` and pass `sourceRoots + entrySerial` into
+  `TagAppendedNodes`.
+- That moved rival from the historical null-old-tail append rule into the
+  stable/current-root proof designed to prevent recycled queue ownership.
+- The change was safety-motivated and valid for many existing lists, but it
+  did not model the original executable's normal `0x42D710` lifecycle:
+  the priority root is explicitly nulled after consumption and `0x42D0C0`
+  creates a fresh sentinel on the next writer.
+- Current `FirstVerifiedNewRootAppendedChain` is therefore a targeted repair
+  of a regression introduced by 01045, not a heuristic relaxation.
+
+A second candidate was checked and reduced:
+- The cached `CurrentVertexShaderIdentity != 0` pre-gate in
+  `R30PrepareXyzrhwState` already exists unchanged in the Oct-9
+  HMD-known-good `a6f8497c/a22be86a`. It is **not a newly introduced rival
+  regression by itself**.
+- Current R57 projected-marker eye math is also identical for rival; only
+  exact ordinal rank can opt into the newer canted-eye formula.
+
+A later R33 difference remains conditional:
+- Oct-17 `a46f540d` and Oct-18 `113c97cf` added projected-marker physical
+  source/c64 fences that did not exist in the Oct-9 working build.
+- However original rival `0x42A3A0` is a 28-byte DPUP animation quad and
+  current R33 tries null-VS XYZRHW before the shader/c64 transaction. Therefore
+  the R33 c64 fence is **not yet a confirmed rival regression**; it only matters
+  if runtime `VR RIVAL XYZRHW PREPARE` says the fixed-function route was
+  bypassed.
+
+This narrows the primary static fix to 01045's first-writer ownership loss,
+with physical-route telemetry used only to prove the restored node reaches
+both eyes.
