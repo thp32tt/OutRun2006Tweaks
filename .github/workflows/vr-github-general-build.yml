@@ -55,6 +55,12 @@ jobs:
           clean: true
           fetch-depth: 1
 
+      - name: Verify rival known-good source contract
+        shell: pwsh
+        run: |
+          python tools/verify_vr_rival_known_good_restore.py
+          if($LASTEXITCODE -ne 0){throw 'rival known-good verifier failed'}
+
       - name: Configure clean R26+HUD Win32 game
         shell: pwsh
         run: |
