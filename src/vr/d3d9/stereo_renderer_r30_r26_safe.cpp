@@ -5488,6 +5488,31 @@ namespace OutRunVRStereo
                             ? 1 : 0,
                         site ? site : "unknown");
             }
+            // Observe only the effective semantic at the actual GPU entry.
+            // Original 4056D0 may queue a CABE/C993 draw past its wrapper;
+            // therefore this event NEVER attests an original object ID.
+            const auto lensPhysicalScope =
+                OutRunVR::GameSemantic::EffectiveScope();
+            const bool lensPhysicalCandidate = Settings::VRTelemetry &&
+                (lensPhysicalScope == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
+                 lensPhysicalScope == OutRunVR::GameSemantic::RenderScope::SceneEffect);
+            if (lensPhysicalCandidate)
+            {
+                static std::atomic<std::uint64_t> lensClassSamples{0};
+                const auto n = lensClassSamples.fetch_add(1,
+                    std::memory_order_relaxed) + 1;
+                if (n <= 32 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS R30 PHYSICAL CLASS: sample={} serial={} site={} "
+                        "kind={} scope={} producer={} spriteQueue={} "
+                        "opaqueObject=UNLINKED shaderForm=UNOBSERVED",
+                        n, TopLevelDrawSerial(), site ? site : "unknown",
+                        static_cast<unsigned>(screenKind),
+                        OutRunVR::GameSemantic::Name(lensPhysicalScope),
+                        static_cast<unsigned>(
+                            OutRunVR::GameSemantic::CurrentRenderProducerToken()),
+                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+            }
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
 
@@ -5673,6 +5698,36 @@ namespace OutRunVRStereo
                 }
                 restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
                     savedViewport, original, true);
+            }
+
+            // Observational L/R receipt for this specific R30 transaction.
+            // Equal c64 matrices may be correct for a directional infinity
+            // sun; native eye targets alone do not establish flare origin.
+            if (lensPhysicalCandidate)
+            {
+                static std::atomic<std::uint64_t> lensEyeSamples{0};
+                const auto n = lensEyeSamples.fetch_add(1,
+                    std::memory_order_relaxed) + 1;
+                if (n <= 32 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS R30 PHYSICAL EYES: sample={} serial={} site={} "
+                        "kind={} scope={} pose={} cameraSynced={} "
+                        "leftHr=0x{:08X} rightHr=0x{:08X} restore={} "
+                        "wvpEqual={} wvpT_L={:.5f},{:.5f},{:.5f} "
+                        "wvpT_R={:.5f},{:.5f},{:.5f} "
+                        "eyeRT=LEFT_RIGHT_TRANSACTION object=UNLINKED",
+                        n, TopLevelDrawSerial(), site ? site : "unknown",
+                        static_cast<unsigned>(screenKind),
+                        OutRunVR::GameSemantic::Name(lensPhysicalScope),
+                        stereo.poseSequence,
+                        OutRunVRRenderer::GetLastRawGameWvpCameraSynced() ? 1 : 0,
+                        static_cast<unsigned>(leftHr),
+                        static_cast<unsigned>(rightHr), restoreOk ? 1 : 0,
+                        std::memcmp(eyeConstants[0], eyeConstants[1],
+                            sizeof(eyeConstants[0])) == 0 ? 1 : 0,
+                        eyeConstants[0][12], eyeConstants[0][13],
+                        eyeConstants[0][14], eyeConstants[1][12],
+                        eyeConstants[1][13], eyeConstants[1][14]);
             }
 
             // Only a submitted RIGHT Draw with the original state restored
