@@ -20,9 +20,12 @@ must=[
     "s.frameBatch.depthClearPending",
     "GameNativePreDrawCombinedClear::record(",
     "return s.preDrawFills.record_target_clear(",
-    "if (count > GameNativeSourceMutation::kMaxPartialTargetClearRects)"
+    "if (count > GameNativePostDrawClearBatch::kMaxSourceRects)"
 ]
 assert all(term in hook for term in must),[x for x in must if x not in hook]
+# Post-Draw TARGET|Z/STENCIL still requires exact bounded GPU region
+# compaction and canonical D3D9 depth owner before either output view writes.
+assert "GameNativePostDrawClearBatch::build(" in hook
 assert helper.count("may_ignore_pre_draw(")==1
 assert "sameMainDepthStencil && beforeFirstSourceDraw" in helper
 assert hook.index("if (!canonicalDepth) return false;") < hook.index(

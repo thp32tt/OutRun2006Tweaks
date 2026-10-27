@@ -12,7 +12,10 @@ assert "depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE" in hook
 assert "GameNativePreDrawCombinedClear::record(" in hook
 assert "s.preDrawFills, s.preDrawDepth, owner, mainRt" in hook
 assert "return s.preDrawFills.record_target_clear(" in hook
-assert "if (count > GameNativeSourceMutation::kMaxPartialTargetClearRects)" in hook
+# Intra-call GPU rects are now losslessly compacted from up to 128
+# original game rectangles; existing 32 native output budget is unchanged.
+assert "if (count > GameNativePostDrawClearBatch::kMaxSourceRects)" in hook
+assert "GameNativePostDrawClearBatch::build(" in hook
 assert "auto stagedColor = colors;" in helper
 assert "auto stagedDepth = depths;" in helper
 assert helper.index("stagedDepth.record(")<helper.index("colors = stagedColor;")
