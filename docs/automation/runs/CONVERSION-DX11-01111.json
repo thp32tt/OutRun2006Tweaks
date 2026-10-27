@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01111",
+  "production_id": "CONVERSION-DX11-01111",
+  "event_id": "CONVERSION-DX11-01111-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01111",
+  "classification": "A_REAL_GAME_PREDRAW_SPARSE_TARGET_Z_GPU_REPLAY",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:GAME_PREDRAW_128_SPARSE_TARGET_Z_SOURCE_REPLAY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "1543a56a721e933ac57f982544e93af48c20c835",
+  "source_change_sha": "6ae7ce3368319148cedce4af33b86078ad0c14d1",
+  "material_result_sha": "88eac24e5821b444290248505ae50a54e8cf6637",
+  "validation_bearing_result_sha": "88eac24e5821b444290248505ae50a54e8cf6637",
+  "result_sha": "88eac24e5821b444290248505ae50a54e8cf6637",
+  "implementation_commits": [
+    "6ae7ce3368319148cedce4af33b86078ad0c14d1"
+  ],
+  "repair_commits": [
+    "561db2472c8fe6a1e73097585be2aa9b9f828657",
+    "8862ea808e8c1d62512dceb250add7236332adcf",
+    "dd1b64019f023191f2675a6b06d88d1a7388d3d6",
+    "ca82800c5159e2869b5488109a407fcb081364d1",
+    "630d9a88e0cad9c494a505727acc0aef5f672402",
+    "5e92fda577b993e9373f7186b979b046060535df",
+    "88eac24e5821b444290248505ae50a54e8cf6637"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_pre_draw_depth_probe_01036.cpp",
+    "tools/dx11_pre_draw_depth_compaction_probe_01103.cpp",
+    "tools/dx11_pre_draw_combined_clear_probe_01100.cpp",
+    "tools/dx11_pre_draw_tile_fusion_probe_01104.cpp",
+    "tools/dx11_pre_draw_disjoint_bands_probe_01105.cpp",
+    "tools/dx11_pre_draw_target_clear_probe_01035.cpp",
+    "tools/dx11_pre_draw_long_sparse_replay_01111.cpp",
+    "tools/test_dx11_pre_draw_long_sparse_replay_01111.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01110.json",
+    "tools/dx11_native_frame_batch_probe.cpp",
+    "tools/dx11_pre_draw_overdraw_probe_01034.cpp",
+    "tools/test_dx11_pre_draw_depth_01036.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Capture up to 128 authentic game-authored pre-first-Draw TARGET and D32 partial clears, retain final pixels and source order, replay bounded native D3D11.1 ClearView GPU regions or D3D11.0 raster before game native Draw, and refuse stale source frame dimensions without changing original DX9Ex input or fallback.",
+    "acceptance_items": [
+      {
+        "id": "sparse_predraw_gpu_pixel_replay",
+        "category": "end_to_end_behavior",
+        "behavior_area": "REAL_GAME_FIRST_NATIVE_DRAW_PREDRAW_COLOR_Z_GPU",
+        "expected_behavior": "128 disjoint authentic TARGET and Z tiles survive in order; GPU D32 emits bounded <=32 same-Z regions and both ClearView/raster paths preserve source gaps and pixels."
+      },
+      {
+        "id": "source_extent_owner_atomic_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_CLEAR_OWNER_EXTENT_INPUT_SAFETY",
+        "expected_behavior": "Stale width/height, foreign color/depth owners, malformed 129th source, aborted GPU submit and offscreen no-op never admit speculative native pixels; DX9Ex original draw, gamepad, FFB remain authoritative."
+      },
+      {
+        "id": "five_exact_sha_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "SOURCE_GRAPH_NATIVE_CPP_WIN32_BACKEND_OPENXR_HUD",
+        "expected_behavior": "DX11 Fast, Backend, Build, OpenXR and HUD complete successfully as push events for exactly the final native source/result SHA; game and Quest3/VDXR remain separately untested."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "REAL_GAME_D3D9_PREDRAW_COLOR_AND_DEPTH_CLEAR",
+      "ATOMIC_128_TILES_WITH_CANONICAL_SOURCE_EXTENT",
+      "D3D11_32_RECT_CLEARVIEW_OR_ORDERED_DEPTH_RASTER",
+      "NATIVE_DRAW_FULL_FRAME_PUBLICATION_WITH_DX9EX_FALLBACK"
+    ],
+    "batch_components": [
+      "CXX_SOURCE_COLOR_DEPTH_128_TILE_COM_EXTENT_LEDGER",
+      "LIVE_GAME_FIRST_DRAW_D3D11_DSV_RTV_GPU_REPLAY",
+      "COMPILED_PIXEL_GAP_OVERFLOW_OWNER_NEGATIVES_AND_FIVE_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01111 true C++ source GPU path implements 128 pre-Draw RTV/D32 tiles and batched D3D11.1 ClearView; compiled tools/dx11_pre_draw_long_sparse_replay_01111.cpp and inherited source/compaction probes passed exact-SHA DX11 Fast #40500162478.",
+      "negative_regression": "Exact-extent COM provenance, 129th tile atomic rejection, malformed rects, no-op color, L-shaped/gap pixel oracle, interrupted depth GPU replay, two source owner negatives; Windows Build #40500161621, Backend #40500161550, OpenXR #40500161303 and HUD #40500161519 success on same SHA.",
+      "component_integration": "Real D3D9 ColorFill / TARGET|Z source hooks in live_game_frame_bridge.cpp record pre-first-Draw color/depth; native GPU replay verifies original owner plus canonical width/height and sends up to 32 equal-depth RECTs through ClearView, with D3D11.0 serial raster and existing native game Draw/DrawIndexed then game Present. HMD output not viewed."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Automated source, compiler, probes, Windows Build and GitHub CI only; no OutRun 2006 actual menu/car/race screenshot or Quest3/VDXR HMD session. RUNTIME_VALIDATION=UNTESTED.",
+    "activation_guard_and_fallback": "Preserve original game Draw/Present/FFB/input and DX9Ex fallback; strict source device, color RT, D32 owner and exact source width/height; no partial speculative native GPU writes on malformed records; DXVK frozen.",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:GAME_PREDRAW_128_SPARSE_TARGET_Z_SOURCE_REPLAY"
+    ]
+  },
+  "acceptance_results": {
+    "sparse_predraw_gpu_pixel_replay": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_source_mutation.hpp",
+        "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_pre_draw_long_sparse_replay_01111.cpp"
+      ],
+      "validation_command": "DX11 Fast exact SHA run 40500162478 completed success including compiled 128 authentic sparse pre-Draw TARGET/Z GPU region pixel parity and 32-deep batch tests."
+    },
+    "source_extent_owner_atomic_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_source_mutation.hpp",
+        "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+        "tools/dx11_pre_draw_long_sparse_replay_01111.cpp"
+      ],
+      "validation_command": "DX11 Fast 40500162478 compiled canonical source extent, foreign owner, 129 overflow, no-op and interrupted submission original source fallback controls."
+    },
+    "five_exact_sha_integrated_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500162478",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500161550",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500161621",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500161303",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500161519"
+      ],
+      "validation_command": "Five GitHub push workflows all completed/success at exact 88eac24e5821b444290248505ae50a54e8cf6637. No HMD runtime testing."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40500162478,
+      "head_sha": "88eac24e5821b444290248505ae50a54e8cf6637",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500162478"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40500161550,
+      "head_sha": "88eac24e5821b444290248505ae50a54e8cf6637",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500161550"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40500161621,
+      "head_sha": "88eac24e5821b444290248505ae50a54e8cf6637",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500161621"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40500161303,
+      "head_sha": "88eac24e5821b444290248505ae50a54e8cf6637",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500161303"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40500161519,
+      "head_sha": "88eac24e5821b444290248505ae50a54e8cf6637",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40500161519"
+    }
+  ],
+  "runtime_evidence": {
+    "native_game_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "c6_note": "C6 is bookkeeping only and not a new validation-bearing material SHA. Source implementation 6ae7ce3 and same-task source extent and causal CI repairs lead to validation-bearing 88eac24e. Five push Actions PASS exact SHA, HMD runtime UNTESTED, DXVK untouched. Same TASK_ID CI fixes/retries/C6 are +0."
+}
