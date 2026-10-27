@@ -20,7 +20,7 @@ def goal_snapshot_guard(code: str) -> bool:
         "FlushD3DXBeforeDirectGoalSource();",
         "ResultProgressAdmittedAfterDrain = ResultProgressAdmission.mayPublish(",
         "if (ResultProgressAdmittedAfterDrain)",
-        "ResultProgressEntrySerial =\\n",
+        "ResultProgressEntrySerial =\n",
         "ResultProgressRootsBefore[prio] = root;",
         "ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;",
         "ResultProgressDirectDrawOwner.emplace(",
