@@ -3976,7 +3976,10 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 self, HudBatch.sprite, liveSprite))
         {
             if (self && self == HudBatch.sprite && self != liveSprite)
-                InvalidateForDeviceLifecycle(true);
+            {
+                const auto staleEntry = HudBatch.snapshot();
+                InvalidateForDeviceLifecycle(true, staleEntry);
+            }
             return false;
         }
         void** vtable = *reinterpret_cast<void***>(self);
