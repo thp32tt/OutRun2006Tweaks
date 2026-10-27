@@ -114,6 +114,41 @@ def verify_r9(source: str) -> None:
         "const HRESULT rawPresentHr = PresentHook.stdcall<HRESULT>(")
 
 
+def verify_r9_query_color_skip(source: str) -> None:
+    fn = function_block(source, "bool R9ReplayMonoDraw(")
+    query = fn.split(
+        "if (ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)", 1
+    )[1].split("IDirect3DSurface9* savedRt", 1)[0]
+    required = (
+        "ReadTrackedRenderState(",
+        "device, D3DRS_COLORWRITEENABLE, colorWriteMask);",
+        "if (!colorMaskKnown || colorWriteMask != 0)",
+        "R9MonoBackupGap = true;",
+        "R9Poison(OutRunVR::StereoFailureOcclusionQueryActive,",
+        "++R9OcclusionBackupSkips;",
+        "return true; // never duplicate a live occlusion-query Draw",
+    )
+    for item in required:
+        assert item in query, item
+    assert query.index("ReadTrackedRenderState(") < query.index(
+        "if (!colorMaskKnown || colorWriteMask != 0)") < query.index(
+        "R9MonoBackupGap = true;") < query.index(
+        "R9Poison(OutRunVR::StereoFailureOcclusionQueryActive,") < query.index(
+        "return true; // never duplicate a live occlusion-query Draw")
+    assert "actualDraw()" not in query
+    # R9's caller executes one original draw after the query skip is
+    # recognized. A poisoned frame never routes that draw back to stereo.
+    caller = function_block(source, "HRESULT R9ExecuteDraw(")
+    assert "if (FrameStereoIncomplete)" in caller
+    assert caller.index("if (FrameStereoIncomplete)") < caller.index(
+        "const auto before = FrameFailureReason;")
+    assert "return actualDraw();" in caller
+
+
+def query_gap_if_color_write(mask_known: bool, mask: int) -> bool:
+    return not mask_known or mask != 0
+
+
 def rejects(check, source: str, before: str, after: str) -> None:
     assert before in source, "source mutation anchor missing: " + before
     mutant = source.replace(before, after, 1)
@@ -146,6 +181,10 @@ def main() -> None:
     verify_r7_bootstrap_coverage(r7)
     verify_sbs(r7)
     verify_r9(r9)
+    verify_r9_query_color_skip(r9)
+    for known, mask, gap in ((True, 0, False), (True, 0xF, True),
+                             (True, 0x8, True), (False, 0, True)):
+        assert query_gap_if_color_write(known, mask) == gap
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9NoteStereoDrawWithoutMonoBackup();", "/* missing R9 gap */")
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9NoteMainDepthContentWrite();", "/* missing R9 depth serial */")
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "return E_NOTIMPL;\n            }\n\n            // The first physical LEFT Draw", "return E_NOTIMPL;\n            }\n\n            R9NoteStereoDrawWithoutMonoBackup();\n            // The first physical LEFT Draw")
@@ -163,7 +202,19 @@ def main() -> None:
     rejects_in_function(verify_r7_bootstrap_coverage, r7, "bool TryBootstrapRightDepthFromRecentClear(", "savedViewport.Width!=BackBufferDesc.Width||", "savedViewport.Width>BackBufferDesc.Width||")
     rejects_in_function(verify_r7_resource_initialization, r7, "bool EnsureStereoResources(", "device->SetViewport(&initViewport)", "device->SetViewport(&savedViewport)")
     rejects_in_function(verify_r7_resource_initialization, r7, "bool EnsureStereoResources(", "initViewport.Width=desc.Width;initViewport.Height=desc.Height;", "initViewport.Width=savedViewport.Width;initViewport.Height=savedViewport.Height;")
-    print("PASS R26/R7/R9: 01511,01513,01515,01516,01519,01521 guards; 16 destructive mutations")
+    rejects_in_function(verify_r9_query_color_skip, r9,
+        "bool R9ReplayMonoDraw(", "if (!colorMaskKnown || colorWriteMask != 0)",
+        "if (colorMaskKnown && colorWriteMask != 0)")
+    rejects_in_function(verify_r9_query_color_skip, r9,
+        "bool R9ReplayMonoDraw(", "R9MonoBackupGap = true;",
+        "/* corrupt mono history allowed */")
+    rejects_in_function(verify_r9_query_color_skip, r9,
+        "bool R9ReplayMonoDraw(", "R9Poison(OutRunVR::StereoFailureOcclusionQueryActive,",
+        "/* loss of fail-closed poison */(")
+    rejects_in_function(verify_r9_query_color_skip, r9,
+        "bool R9ReplayMonoDraw(", "return true; // never duplicate a live occlusion-query Draw",
+        "return false; // query accidentally replayed")
+    print("PASS R26/R7/R9: 01511,01513,01515,01516,01519,01520,01521 guards; 20 destructive mutations")
     print("RUNTIME_VALIDATION=UNTESTED")
 
 
