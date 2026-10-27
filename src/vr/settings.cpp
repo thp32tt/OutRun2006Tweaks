@@ -54,8 +54,8 @@ namespace Settings
     // untransformed XYZRHW/UI sprites use the wrong pixel coordinate system.
     // Preserve the game's stable logical 1080p source while OpenXR retains
     // its independent HMD swapchain eye extent. Reversible until validated.
-    Setting<bool> VRPreserveLogicalBackBuffer{ "VR", "PreserveLogicalBackBuffer", true,
-        "R26 visual/FPS recovery: keep the D3D9Ex game backbuffer at logical 1920x1080; headset OpenXR swapchain stays at recommended eye resolution and scales source pixels. Avoids 2D upper-left coordinates and reduces game GPU raster work. False restores native eye-sized game source (sharper but currently broken). Restart required." };
+    Setting<bool> VRPreserveLogicalBackBuffer{ "VR", "PreserveLogicalBackBuffer", false,
+        "False: native OpenXR/VDXR full-resolution 3D source plus independent 2D UI canvas. True: fallback to 1080p game source upscaled to Quest. Restart required." };
     Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", false,
         "Compatibility fallback. True makes the physical VR render target follow the game/desktop resolution. Default false so FHD monitors do not cap VR quality. Restart required." };
     Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
@@ -87,7 +87,14 @@ namespace Settings
         "Reversible optional +32 original UI pixel rank vertical lift, absent in tested DX11. Default off. Does not affect rival." };
     Setting<bool> VRRankDx11ReferenceEyePose{ "VR", "RankDx11ReferenceEyePose", true,
         "Use the DX11 HMD-proven R57 mode-6 eye pose for car-attached rank markers. True keeps identity eye orientation and relative IPD with head inverse. False restores the R26 ordinal-only canted-eye experiment for A/B. World and rival producers are unchanged." };
-	Setting<bool> VRHud1080pReference{ "VR", "Hud1080pReference", true,
+	// Keep the 2D/HUD layout canvas configurable and independent of the HMD eye source.
+    Setting<int> VRHudLogicalWidth{ "VR", "HudLogicalWidth", 1920,
+        "2D HUD virtual layout reference width (not headset render resolution).", Range<int>{ 640, 8192 } };
+    Setting<int> VRHudLogicalHeight{ "VR", "HudLogicalHeight", 1080,
+        "2D HUD virtual layout reference height (not headset render resolution).", Range<int>{ 480, 8192 } };
+    Setting<bool> VRDisableSkyGlow{ "VR", "DisableSkyGlow", true,
+        "Disable original and stereo SkyGlow only during VR, preserving normal desktop Graphics settings." };
+    Setting<bool> VRHud1080pReference{ "VR", "Hud1080pReference", true,
         "R26 VR gameplay HUD only: uniform 1920x1080 viewing reference for ultrawide game sources. Never rewrite native OutRun 640x480 sprite coordinates, rank/rival anchors, front-end, or F11." };
     Setting<float> VRHudPlaneDistance{ "VR", "HudPlaneDistance", 4.0f,
         "R26 VR gameplay HUD plane distance. Old reference 2.50, default 4.00 for less face-close HUD. External ImGui F11 and front-end are unchanged.", Range<float>{ 2.50f, 8.00f } };
