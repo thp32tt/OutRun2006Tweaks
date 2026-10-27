@@ -1467,7 +1467,15 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			D3DSURFACE_DESC leftDesc{},rightDesc{};if(FAILED(TrackedDepthStencil->GetDesc(&leftDesc))||FAILED(RightEyeDepth->GetDesc(&rightDesc)))return false;
 			if(!DepthDescMatches(leftDesc,rightDesc)||!DepthDescMatches(leftDesc,LastMainDepthClearDesc))return false;
 			DWORD replayFlags=0;if(!RightDepthSynchronized&&(LastMainDepthClearFlags&D3DCLEAR_ZBUFFER))replayFlags|=D3DCLEAR_ZBUFFER;if(!RightStencilSynchronized&&(LastMainDepthClearFlags&D3DCLEAR_STENCIL)&&FormatHasStencil(leftDesc.Format))replayFlags|=D3DCLEAR_STENCIL;if(!replayFlags)return false;
-			D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport)))return false;IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT clearHr=E_FAIL;bool restoreOk=true;{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&SUCCEEDED(device->SetViewport(&savedViewport)))clearHr=ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),replayFlags,0,LastMainDepthClearZ,LastMainDepthClearStencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}if(FAILED(clearHr)||!restoreOk)return false;
+			D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport)))return false;
+			// 01513: Clear(count=0) covers only the active viewport. Never
+			// certify whole-surface RIGHT depth/stencil sync from a cropped
+			// replay. Preserve the original viewport and fail closed instead
+			// of adding GPU Clears or altering an already-live depth buffer.
+			if(savedViewport.X!=0||savedViewport.Y!=0||
+				savedViewport.Width!=BackBufferDesc.Width||
+				savedViewport.Height!=BackBufferDesc.Height)return false;
+			IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT clearHr=E_FAIL;bool restoreOk=true;{InternalPassScope guard;if(SUCCEEDED(SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface))&&SUCCEEDED(SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth))&&SUCCEEDED(device->SetViewport(&savedViewport)))clearHr=ClearHook.stdcall<HRESULT>(device,0u,static_cast<const D3DRECT*>(nullptr),replayFlags,0,LastMainDepthClearZ,LastMainDepthClearStencil);restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,nullptr,false);}if(FAILED(clearHr)||!restoreOk)return false;
 			if(replayFlags&D3DCLEAR_ZBUFFER)RightDepthSynchronized=true;if(replayFlags&D3DCLEAR_STENCIL)RightStencilSynchronized=true;++DepthBootstrapSuccesses;if(!FirstDepthBootstrapLogged){FirstDepthBootstrapLogged=true;spdlog::info("VR stereo: bootstrapped right-eye depth from same-Present full main clear flags=0x{:x} epoch={}",static_cast<unsigned>(replayFlags),PresentEpoch);}return true;
 		}
 		std::uint32_t NextStereoFrameId(){if(++StereoFrameCounter==0)++StereoFrameCounter;return StereoFrameCounter;}
