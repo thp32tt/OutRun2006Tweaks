@@ -547,17 +547,26 @@ def check(ui, manifest, fraction_header=None):
             "RankMarkerProjectedInfo = saved;")
     if "RankMarkerSub_hk = safetyhook::create_inline(" not in ui:
         fail("rank sub_4BAD20 entry hook is not installed")
-    ordered(rival, "rival anchor must be consumed before exact direct draw",
+    # The known-good R26 rival submits its native original E8 first, then
+    # consumes the recovered exact anchor for proven live queue siblings.
+    # Do not bring back the older direct scope that displaced Quest3 rivals.
+    ordered(rival, "rival original first and exact sibling queue tag",
+            "Game::sprani_play_ae_auth_alpha(",
             "const auto projectedAnchor = RivalMarkerProjectedInfo;",
             "RivalMarkerProjectedInfo = {};",
-            "ScopedExactProducerSemantic producerScope(",
-            "Game::sprani_play_ae_auth_alpha(",
-            "TagAppendedNodes(before, scope,")
-    if rival.count("projected ? &projectedAnchor : nullptr") != 2:
-        fail("rival original Draw and newly queued siblings must share exact anchor")
+            "TagAppendedNodes(",
+            "projected ? &projectedAnchor : nullptr,",
+            "&rootsBefore, entrySerial);")
+    if (rival.count("projected ? &projectedAnchor : nullptr") != 1 or
+            rival.count("OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,") != 2 or
+            "ScopedExactProducerSemantic producerScope(" in rival or
+            "RenderScope::ProjectedWorldMarker2D" not in rival or
+            "RenderScope::WorldBillboard" not in rival):
+        fail("rival native-first exact source/queue proof lost")
     tag_nodes = function_body(ui, "static void TagAppendedNodes(")
-    ordered(tag_nodes, "rival multi-node producer tagging",
-            "tailAfter", "node = before[prio]", "RegisterSpriteNodeScope(")
+    ordered(tag_nodes, "rival multi-node producer live-root tagging",
+            "tailAfter", "FirstVerifiedAppendedNodeOnStableRoot(",
+            "RegisterSpriteNodeScope(")
     return len(owned)
 
 
@@ -678,9 +687,10 @@ def test_mutations(ui, manifest):
               changed_fraction=fraction.replace(
                   "if (!std::isfinite(nextX) || !std::isfinite(nextY))",
                   "if (false)", 1))
-    must_fail("rival exact source-time semantic removed",
-              ui.replace("ScopedExactProducerSemantic producerScope(\n                scope, projected ? &projectedAnchor : nullptr, Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);",
-                         "ScopedRenderSemantic producerScope(\n                scope);", 1))
+    must_fail("rival native-first projected queue payload removed",
+               ui[:rival_start] +
+               rival_region.replace("projected ? &projectedAnchor : nullptr,",
+                                    "nullptr,", 1) + ui[rival_end:])
     must_fail("R64 DispRank source accidentally shares TimeAttack owner",
               ui.replace("IsExactDispRankRightClipRva(addr)",
                          "false", 1))

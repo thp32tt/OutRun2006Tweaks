@@ -30,7 +30,12 @@ assert 'VRHud1080pReference' in ui
 assert 'spacing = 80.0f * Game::screen_scale->x;' in ui
 assert '? 80.0f' in ui
 assert 'exactCurrentChainOwner' in ui
-assert 'FirstVerifiedAppendedNode(\n                        root, before[prio], tailAfter' in ui
+# Native-first rival current-root proof remains separate from strict
+# stable-root GOAL/+TIME/HUD source guards (no oldTail dereference).
+assert 'const bool exactCurrentChainOwner =' in ui
+assert 'FirstVerifiedNewRootAppendedChain(' in ui
+assert 'FirstVerifiedAppendedNodeOnStableRoot(' in ui
+assert 'FirstVerifiedAppendedNode(' in ui
 assert 'VR RIVAL KNOWN-GOOD ORDER RESTORED:' in ui
 rival=ui[ui.index('static int __cdecl RivalMarker_sprani('):ui.index('// 2026-10-11 Quest3', ui.index('static int __cdecl RivalMarker_sprani('))]
 assert rival.index('Game::sprani_play_ae_auth_alpha') < rival.index('const auto projectedAnchor = RivalMarkerProjectedInfo')
