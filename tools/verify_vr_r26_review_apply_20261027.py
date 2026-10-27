@@ -257,8 +257,9 @@ def main() -> None:
         "HRESULT R9ExecuteDraw(", "InvalidateRightDepthStencilIfLeftMayWrite(device);",
         "/* stale RIGHT depth allowed */")
     rejects_in_function(verify_r9_shared_offscreen_depth, r9,
-        "HRESULT R9ExecuteDraw(", "return legacyDraw();",
-        "return actualDraw();")
+        "HRESULT R9ExecuteDraw(",
+        "return legacyDraw();\n\t\t\t}\n\n\t\t\t// Do not start stereo",
+        "return actualDraw();\n\t\t\t}\n\n\t\t\t// Do not start stereo")
     print("PASS R26/R7/R9 01517 exact offscreen depth-lineage guard; 25 destructive mutations")
     print("RUNTIME_VALIDATION=UNTESTED")
 
