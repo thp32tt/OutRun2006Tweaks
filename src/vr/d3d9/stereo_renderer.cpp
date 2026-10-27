@@ -353,6 +353,10 @@ namespace OutRunVRStereo
 					device, D3DRS_COLORWRITEENABLE, colorWriteMask);
 				if (!colorMaskKnown || colorWriteMask != 0)
 				{
+					// The poisoned caller executes the original Draw directly,
+					// bypassing R7's single-eye depth invalidation (01516).
+					// Preserve that right-eye depth/stencil lineage here.
+					InvalidateRightDepthStencilIfLeftMayWrite(device);
 					R9MonoBackupGap = true;
 					R9Poison(OutRunVR::StereoFailureOcclusionQueryActive,
 						"Draw/occlusion-query-color-mono-gap");
