@@ -70,8 +70,14 @@ struct GameNativePreDrawDepth {
                 if(!covers(next,staged.tiles[j]))++retained;
             std::uint32_t output=0u;
             for(std::uint32_t j=0u;j<staged.count;++j) {
-                const Tile prior=staged.tiles[j];
-                if(!covers(next,prior))staged.tiles[output++]=prior;
+                Tile prior=staged.tiles[j];
+                if(!covers(next,prior)) {
+                    // Same opaque edge subtraction as authentic RTV color:
+                    // the native first-Draw D32 replay never needs pixels
+                    // covered by this newer D3D9 source Clear.
+                    (void)game_native_trim_partially_overwritten(prior,next);
+                    staged.tiles[output++]=prior;
+                }
             }
             staged.count=output;
             // Adjacent/overlapping equal-Z strips form one exact rectangle.

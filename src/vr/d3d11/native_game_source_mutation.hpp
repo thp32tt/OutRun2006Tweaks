@@ -216,8 +216,13 @@ struct GameNativePreDrawFills {
         auto staged = *this;
         std::uint32_t output = 0u;
         for (std::uint32_t i = 0u; i < count; ++i) {
-            const Fill saved = entries[i];
-            if (!covers(next, saved)) staged.entries[output++] = saved;
+            Fill saved = entries[i];
+            if (!covers(next, saved)) {
+                // D3D9's later opaque source write supersedes an exact
+                // rectangular edge. Retain split/interior coverage in order.
+                (void)game_native_trim_partially_overwritten(saved, next);
+                staged.entries[output++] = saved;
+            }
         }
         if (output && staged.entries[output - 1u].argb == color &&
             game_native_merge_ordered_overwrite(

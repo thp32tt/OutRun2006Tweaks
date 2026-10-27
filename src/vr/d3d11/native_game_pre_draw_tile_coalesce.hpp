@@ -24,6 +24,38 @@ template<class Tile>
     if (next.bottom > prior.bottom) prior.bottom = next.bottom;
     return true;
 }
+
+// When a later opaque game Clear erases a side of an earlier tile,
+// replay only the remaining actual source pixels. A single exact residual
+// rectangle is safe without allocating extra GPU tiles. Interior overlap
+// or a split into multiple rectangles deliberately keeps the older tile;
+// the newer write will overwrite its obsolete pixels in source order.
+template<class Tile>
+[[nodiscard]] constexpr bool game_native_trim_partially_overwritten(
+    Tile& prior, const Tile& next) noexcept {
+    const auto l = prior.left > next.left ? prior.left : next.left;
+    const auto t = prior.top > next.top ? prior.top : next.top;
+    const auto r = prior.right < next.right ? prior.right : next.right;
+    const auto b = prior.bottom < next.bottom ? prior.bottom : next.bottom;
+    if (l >= r || t >= b) return false;
+    if (l <= prior.left && r >= prior.right) {
+        if (t <= prior.top && b < prior.bottom) {
+            prior.top = b; return true;
+        }
+        if (b >= prior.bottom && t > prior.top) {
+            prior.bottom = t; return true;
+        }
+    }
+    if (t <= prior.top && b >= prior.bottom) {
+        if (l <= prior.left && r < prior.right) {
+            prior.left = r; return true;
+        }
+        if (r >= prior.right && l > prior.left) {
+            prior.right = l; return true;
+        }
+    }
+    return false;
+}
 } // namespace outrun::vr::dx11::live_game_frame
 
 /*
