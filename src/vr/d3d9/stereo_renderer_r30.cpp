@@ -6400,6 +6400,38 @@ namespace OutRunVRStereo
                 }
             }
 
+            // The original LEFT Draw is allowed to reenter game code. Its
+            // viewport is part of the physical source state just as much as
+            // queue/pose/FVF. Reuse the tracked setter/StateBlock shadow on
+            // the hot path and fall back to GetViewport only when coverage is
+            // unavailable. Never replay LEFT if that viewport changed.
+            D3DVIEWPORT9 postLeftViewport{};
+            const bool postLeftViewportKnown =
+                R29OwnerTryGetTrackedViewport(postLeftViewport) ||
+                SUCCEEDED(device->GetViewport(&postLeftViewport));
+            const bool postLeftViewportStable =
+                postLeftViewportKnown &&
+                postLeftViewport.X == state.viewport.X &&
+                postLeftViewport.Y == state.viewport.Y &&
+                postLeftViewport.Width == state.viewport.Width &&
+                postLeftViewport.Height == state.viewport.Height &&
+                postLeftViewport.MinZ == state.viewport.MinZ &&
+                postLeftViewport.MaxZ == state.viewport.MaxZ;
+            if (!postLeftViewportStable)
+            {
+                R29OwnerMarkRightDrawFailed();
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerReportStereoFailure(
+                    postLeftViewportKnown
+                        ? OutRunVR::StereoFailureRightStateFailed
+                        : OutRunVR::StereoFailureViewportUnavailable,
+                    site, E_FAIL);
+                R29OwnerArmMonoSafety();
+                OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                    true, false, false);
+                return leftHr;
+            }
+
             // Capture after the left-eye draw; reuse one coherent R29 owner view.
             const auto frame = R29OwnerCaptureFrameSnapshot();
             IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget();
@@ -8341,6 +8373,44 @@ namespace OutRunVRStereo
                     R29OwnerArmMonoSafety();
                     return leftHr;
                 }
+            }
+
+            // The LEFT native HUD draw may synchronously change viewport
+            // state. Do not render RIGHT with the pre-LEFT viewport or restore
+            // that stale viewport over a legitimate game change. The tracked
+            // shadow keeps the normal path driver-query free.
+            D3DVIEWPORT9 postLeftViewport{};
+            const bool postLeftViewportKnown =
+                R29OwnerTryGetTrackedViewport(postLeftViewport) ||
+                SUCCEEDED(device->GetViewport(&postLeftViewport));
+            const bool postLeftViewportStable =
+                postLeftViewportKnown &&
+                postLeftViewport.X == savedViewport.X &&
+                postLeftViewport.Y == savedViewport.Y &&
+                postLeftViewport.Width == savedViewport.Width &&
+                postLeftViewport.Height == savedViewport.Height &&
+                postLeftViewport.MinZ == savedViewport.MinZ &&
+                postLeftViewport.MaxZ == savedViewport.MaxZ;
+            if (!postLeftViewportStable)
+            {
+                bool restored = false;
+                {
+                    R30ScopedInternalPass guard;
+                    restored = R29OwnerSetWvpOneRegisterAtATime(
+                        device, original);
+                }
+                R29OwnerMarkRightDrawFailed();
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerReportStereoFailure(
+                    postLeftViewportKnown
+                        ? OutRunVR::StereoFailureRightStateFailed
+                        : OutRunVR::StereoFailureViewportUnavailable,
+                    site, E_FAIL);
+                if (!restored)
+                    R29OwnerNoteRestoreFailure(
+                        "R30 HUD post-left viewport fence c64");
+                R29OwnerArmMonoSafety();
+                return leftHr;
             }
 
             // Game left-eye draw may update tracked surfaces.
