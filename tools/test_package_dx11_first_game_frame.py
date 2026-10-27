@@ -171,8 +171,11 @@ def verify_native_sm3_reject_diagnostics(source):
     body = source.split(name, 1)[1].split(
         "// Reuse geometric growth buffers", 1)[0]
     for required in ("struct RejectionAudit",
-                     "rejectionAudit{s.liveSm3RejectStages, rejectionStage, submitted}",
-                     "if (!succeeded) ++counters[",
+                     "rejectionAudit{s.liveSm3RejectStages, rejectionStage, submitted,",
+                     "NativeRawVisualPreview& preview;",
+                     "if (!succeeded) {",
+                     "preview.abort_real_native_draw();",
+                     "++counters[stage < counters.size() ? stage : 0u];",
                      "submitted = true;"):
         if required not in body:
             raise ValueError("SM3 failure instrumentation incomplete")
@@ -200,6 +203,11 @@ def test_native_sm3_reject_diagnostics():
     verify_native_sm3_reject_diagnostics(source)
     for old, bad, reason in (
         ("submitted = true;", "submitted = false;", "native success is never counted"),
+        ("preview.abort_real_native_draw();", "/* missing rollback */",
+         "failed native SM3 Draw leaves stale pre-copy pair"),
+        ("++counters[stage < counters.size() ? stage : 0u];",
+         "/* missing source rejection counter */",
+         "source rejection stage silently lost"),
         ("sm3_reject=[source:{}", "sm3_reject=[absent:{}", "no runtime failure evidence"),
         ("if (fullMode && s.frameBatch.stopped) {",
          "if (false && s.frameBatch.stopped) {", "redundant poisoned-frame conversions"),
@@ -226,6 +234,8 @@ def test_raw_visual_native_source_contract():
         "if (rawVisual && monoNativePublicationAllowed && backbufferKnown &&",
         "DX11_VISUAL_MISMATCH_FOG",
         "native_gpu_pixel_output={}",
+        "if (s.rawPreview.sample_real_native_draw(",
+        "++s.rawPreviewCopies;",
     ):
         if required not in source:
             raise AssertionError("RAW native source safety missing: " + required)
