@@ -3009,7 +3009,7 @@ for label, broken_r30, broken_ui in (
 def check_skyglow_clean_screen_source(source):
     observe = function_body(source, 'void R30BeforeScreenDrawForSkyGlow(')
     for token in (
-        'Settings::SkyGlowFactor <= 0',
+        '!R30SkyGlowWanted()',
         '!IsGameDevice(device)',
         'InternalStereoPass',
         '!TargetIsBackBuffer()',
@@ -3097,6 +3097,30 @@ for label, before, bad in (
         pass
     else:
         raise SystemExit('P0 SkyGlow final-stage mutation survived: ' + label)
+
+# VR headset glow is intentionally disabled, but original desktop factor
+# must retain its normal 2D path. Reject mutations to either owner gate.
+glow_predicate = function_body(r30, 'bool R30SkyGlowWanted()')
+for token in ('Settings::SkyGlowFactor > 0',
+              'Settings::VREnabled && Settings::VRDisableSkyGlow'):
+    require(token, glow_predicate, 'VR-only glow source bypass')
+for broken in ('Settings::VRDisableSkyGlow',
+               'Settings::SkyGlowFactor > 0'):
+    damaged = glow_predicate.replace(broken, 'false /* mutated VR glow owner */', 1)
+    if damaged == glow_predicate:
+        raise SystemExit('P0 VR SkyGlow negative mutation could not be staged')
+    if broken in damaged:
+        # The full expression may retain a separate token; the original
+        # expression and positive proof must both be present.
+        pass
+    try:
+        for token in ('Settings::SkyGlowFactor > 0',
+                      'Settings::VREnabled && Settings::VRDisableSkyGlow'):
+            require(token, damaged, 'VR-only glow negative case')
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 VR SkyGlow disable mutation survived')
 
 check_skyglow_clean_screen_source(r30)
 for label, damaged in (
