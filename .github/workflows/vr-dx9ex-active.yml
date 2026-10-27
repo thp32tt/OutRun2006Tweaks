@@ -69,6 +69,8 @@ on:
       - 'tools/verify_vr_hook_graph.py'
       - 'tools/verify_vr_refactor_contract.py'
       - 'tools/verify_vr_r26_review_apply_20261027.py'
+      - 'tools/verify_vr_f11_eye_viewport.py'
+      - 'tools/tests/f11_eye_viewport_harness.cpp'
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
       - 'tools/verify_vr_r84_focus_inventory.py'
       - 'tools/verify_dx9ex_r84_mainline.py'
