@@ -5243,14 +5243,23 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             }
             return true;
         };
-        if (!readFog(D3DRS_FOGTABLEMODE, tableMode, 1u) ||
-            !readFog(D3DRS_FOGVERTEXMODE, vertexMode, 2u) ||
-            !readFog(D3DRS_RANGEFOGENABLE, rangeFog, 3u) ||
-            !readFog(D3DRS_FOGCOLOR, fogColor, 4u) ||
-            !readFog(D3DRS_FOGSTART, fogStartBits, 5u) ||
-            !readFog(D3DRS_FOGEND, fogEndBits, 6u) ||
-            !readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u) ||
-            FAILED(game->GetDeviceCaps(&fogCaps))) {
+        // Read both real source equations before deciding which fog payload
+        // is consumed. Inert NONE/NONE (including inherited RANGEFOG) must
+        // not depend on unused fog floats, color or driver caps. This is the
+        // same per-Draw semantic decision already used for the native FVF path.
+        const bool modesKnown =
+            readFog(D3DRS_FOGTABLEMODE, tableMode, 1u) &&
+            readFog(D3DRS_FOGVERTEXMODE, vertexMode, 2u);
+        const bool activeEquation = modesKnown &&
+            native_sm3_fog_needs_parameters(true, tableMode, vertexMode);
+        const bool parametersKnown = !activeEquation ||
+            (readFog(D3DRS_RANGEFOGENABLE, rangeFog, 3u) &&
+             readFog(D3DRS_FOGCOLOR, fogColor, 4u) &&
+             readFog(D3DRS_FOGSTART, fogStartBits, 5u) &&
+             readFog(D3DRS_FOGEND, fogEndBits, 6u) &&
+             readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u) &&
+             SUCCEEDED(game->GetDeviceCaps(&fogCaps)));
+        if (!modesKnown || !parametersKnown) {
             if (!failedFogGetter) failedFogGetter = 8u; // GetDeviceCaps
             ++s.liveSm3StateRejectReasons[1];
             trace_live_sm3_fog_rejection(
@@ -5259,24 +5268,28 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 srgbWrite, fogCaps, 0.0f, 0.0f, 0.0f);
             return false;
         }
-        float fogStart = 0.0f, fogEnd = 0.0f, fogDensity = 0.0f;
-        std::memcpy(&fogStart, &fogStartBits, sizeof(float));
-        std::memcpy(&fogEnd, &fogEndBits, sizeof(float));
-        std::memcpy(&fogDensity, &fogDensityBits, sizeof(float));
-        NativeSm3FogReject fogCause = NativeSm3FogReject::None;
-        if (!native_sm3_table_zfog_admission(
-                true, tableMode, vertexMode, rangeFog != FALSE,
-                srgbWrite != FALSE,
-                (fogCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
-                (fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
-                fogColor, fogStart, fogEnd, fogDensity, tableZFog,
-                &fogCause)) {
-            ++s.liveSm3StateRejectReasons[1];
-            trace_live_sm3_fog_rejection(
-                s, game, sourceOrdinal, fogCause, 0u, fog,
-                tableMode, vertexMode, rangeFog, srgbWrite, fogCaps,
-                fogStart, fogEnd, fogDensity);
-            return false;
+        if (activeEquation) {
+            // Active equations still require every genuine source getter,
+            // safe Z capabilities and the unchanged native HLSL fog shader.
+            float fogStart = 0.0f, fogEnd = 0.0f, fogDensity = 0.0f;
+            std::memcpy(&fogStart, &fogStartBits, sizeof(float));
+            std::memcpy(&fogEnd, &fogEndBits, sizeof(float));
+            std::memcpy(&fogDensity, &fogDensityBits, sizeof(float));
+            NativeSm3FogReject fogCause = NativeSm3FogReject::None;
+            if (!native_sm3_table_zfog_admission(
+                    true, tableMode, vertexMode, rangeFog != FALSE,
+                    srgbWrite != FALSE,
+                    (fogCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
+                    (fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
+                    fogColor, fogStart, fogEnd, fogDensity, tableZFog,
+                    &fogCause)) {
+                ++s.liveSm3StateRejectReasons[1];
+                trace_live_sm3_fog_rejection(
+                    s, game, sourceOrdinal, fogCause, 0u, fog,
+                    tableMode, vertexMode, rangeFog, srgbWrite, fogCaps,
+                    fogStart, fogEnd, fogDensity);
+                return false;
+            }
         }
     }
     // The native rasterizer always performs homogeneous clipping. Source

@@ -49,6 +49,35 @@ for token in ("r283_color.rgb = lerp(", "r283_fogPosition : SV_Position",
               "r283_fogControls.w == 1.0f", "r283_fogControls.w == 2.0f",
               "float4 r283_fogColor;", "register(b4)"):
     require(token in header, "actual native GPU fog missing: " + token)
+# Positive and destructive source regression for genuine per-Draw COM query
+# ordering. A mode-query failure must not be promoted as NONE/NONE; active
+# table/vertex fog still requires its complete original payload and caps.
+fog_gate = source.partition("const bool modesKnown =")[2].partition(
+    "// The native rasterizer always performs homogeneous clipping.")[0]
+require(bool(fog_gate), "missing live mode-first fog gate")
+require("readFog(D3DRS_FOGTABLEMODE, tableMode, 1u)" in fog_gate and
+        "readFog(D3DRS_FOGVERTEXMODE, vertexMode, 2u)" in fog_gate,
+        "both authentic D3D9 mode getters required")
+require("native_sm3_fog_needs_parameters(true, tableMode, vertexMode)" in fog_gate and
+        "const bool parametersKnown = !activeEquation ||" in fog_gate and
+        "if (!modesKnown || !parametersKnown)" in fog_gate and
+        "if (activeEquation) {" in fog_gate,
+        "inactive query skip / active fog fail-closed linkage missing")
+require(fog_gate.index("native_sm3_fog_needs_parameters(") <
+        fog_gate.index("readFog(D3DRS_RANGEFOGENABLE") <
+        fog_gate.index("native_sm3_table_zfog_admission("),
+        "mode, conditional payload, native GPU shader order broken")
+for wrong, correct in (
+    ("!modesKnown || !parametersKnown", "if (!modesKnown || !parametersKnown)"),
+    ("!activeEquation ||", "const bool parametersKnown = !activeEquation ||"),
+    ("if (activeEquation) {", "if (activeEquation) {"),
+):
+    mutant = fog_gate.replace(wrong, "false /* destructive unsafe mutation */", 1)
+    require(mutant != fog_gate and not all(t in mutant for t in (
+        "if (!modesKnown || !parametersKnown)",
+        "const bool parametersKnown = !activeEquation ||",
+        "if (activeEquation) {")),
+        "destructive source mutation slipped through admission contract")
 compiler = shutil.which("g++") or shutil.which("clang++")
 if compiler:
     with tempfile.TemporaryDirectory() as folder:

@@ -20,6 +20,13 @@ struct NativeSm3TableFog {
     unsigned tableMode, unsigned vertexMode) noexcept {
     return tableMode == 0u && vertexMode == 0u; // D3DFOG_NONE
 }
+// D3D9 NONE/NONE equations cannot consume fog float/color/caps state.
+// Verify both actual source modes before deciding whether those extra
+// getters are necessary. Never infer NONE from a failed mode query.
+[[nodiscard]] inline bool native_sm3_fog_needs_parameters(
+    bool fogEnabled, unsigned tableMode, unsigned vertexMode) noexcept {
+    return fogEnabled && !native_game_inert_fog_modes(tableMode, vertexMode);
+}
 // Stable bounded runtime rejection codes: never collapse source state failures
 // into an ambiguous "fog" aggregate. Code 12 is reserved for COM query failure.
 enum class NativeSm3FogReject : unsigned {

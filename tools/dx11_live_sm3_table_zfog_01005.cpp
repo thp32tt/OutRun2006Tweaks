@@ -11,6 +11,13 @@ int main() {
     assert(!native_game_inert_fog_modes(1u, 0u));
     assert(!native_game_inert_fog_modes(0u, 1u));
     assert(!native_game_inert_fog_modes(3u, 3u));
+    // Mode-only NONE/NONE must not require inactive payload/caps reads;
+    // active shader/table/vertex fog still requires all of them.
+    assert(!native_sm3_fog_needs_parameters(false, 3u, 3u));
+    assert(!native_sm3_fog_needs_parameters(true, 0u, 0u));
+    assert(native_sm3_fog_needs_parameters(true, 1u, 0u));
+    assert(native_sm3_fog_needs_parameters(true, 0u, 2u));
+    assert(native_sm3_fog_needs_parameters(true, 3u, 3u));
     // Genuine exponential, squared-exponential and linear game fog inputs.
     for (unsigned mode : {1u, 2u, 3u}) {
         assert(native_sm3_table_zfog_admission(
