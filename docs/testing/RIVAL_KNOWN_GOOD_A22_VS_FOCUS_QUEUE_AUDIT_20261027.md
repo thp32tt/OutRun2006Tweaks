@@ -142,3 +142,44 @@ The rival wrapper also restores historical ordering: call native sprani first, t
 Runtime receipt: `VR RIVAL FRESH ROOT RECOVERED` proves this exact first-writer branch was used. `VR RIVAL NATIVE QUEUE CONSUMER` plus `ProjectedMarkerProbeStage::NativeSprite` proves the recovered tag later reached original `0x42D710`.
 
 **Static confidence: high. Quest3 optical validation: UNTESTED.**
+
+
+## 2026-10-27 14:xx physical-route discrimination
+
+After the first-writer/native-first restoration, the remaining static question is
+**which physical API route the recovered rival actually takes**.
+
+- Original `0x42A3A0` constructs a four-vertex animation quad and calls D3D9
+  `DrawPrimitiveUP(TRIANGLESTRIP, 2, ..., stride=0x1c)`. It does not invoke
+  D3DXSprite. This is the normal `kind_C=1`, non-masked rival candidate.
+- Current R33 checks `R30SupportTryFixedFunctionOriginalSpritePrimitiveUP`,
+  then the generic null-VS XYZRHW route, **before** entering R33's later
+  shader/c64 HUD transaction. Therefore the Oct-18 `CoherentOriginalRankWvp`
+  fence is only a rival regression if the live animation draw bypasses the
+  fixed-function XYZRHW route (for example because a VS is actually bound or
+  FVF/source state is not admitted).
+- Historical and current `R57BuildProjectedMarkerDelta` are equivalent for
+  the rival: current extra canted-eye branch is gated by
+  `marker->exactOrdinalEyeCant`; rival retains the original identity-eye +
+  relative-IPD/FOV formula. Thus no new rival-specific eye-math regression was
+  found in that function.
+
+New diagnostics, no pixel changes:
+- `VR RIVAL XYZRHW PREPARE`: actual live FVF, VS-bound state, stride=28,
+  queue node/epoch, and whether R30 XYZRHW preparation admitted the draw.
+- `VR RIVAL XYZRHW PROJECTED`: whether the valid projected marker and base
+  projection produced per-eye deltas.
+- `VR RIVAL XYZRHW EYE RECEIPT`: physical LEFT/RIGHT target/depth/viewport/
+  Draw HRESULTs plus restore status for the exact rival producer.
+
+Decision:
+1. `PREPARE prepared=1` + `PROJECTED ADMITTED` + both-eye receipt success:
+   R30 has restored the known-good fixed-function stereo route; any remaining
+   visual problem is in computed delta/anchor/image content, not R33 c64.
+2. `PREPARE prepared=0, vsBound=1`: investigate R33 shader transaction and
+   whether the Oct-17/18 rank-only shader fences were over-broadened to rival.
+3. `prepared=0, vsBound=0`: inspect live FVF/viewport/stereo readiness, not c64.
+4. No PREPARE after a `NATIVE QUEUE CONSUMER`: the original animation route
+   bypassed this DPUP hook or was masked; trace `0x42A800` next.
+
+This remains `RUNTIME_VALIDATION=UNTESTED` until a Quest3 DEBUG run.
