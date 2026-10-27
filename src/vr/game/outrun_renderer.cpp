@@ -2044,8 +2044,12 @@ namespace OutRunVRRenderer
                          lensBefore, CaptureLensUploadSource())) &&
                     OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(
                         hudBefore, CaptureHudUploadSource());
-				if (SUCCEEDED(result) && sourceUnchanged)
+				if (SUCCEEDED(result) && sourceUnchanged &&
+					UploadContainsOutRunWvp(startRegister, vector4fCount))
 				{
+					// 01523: never offset/read 16 source floats unless native
+					// input actually carries the complete c64..c67 register span.
+					// Partial uploads still execute the unchanged native setter.
 					const UINT wvpOffsetRegisters =
 						OutRunWvpRegister - startRegister;
 					const float* nativeGameWvp =
