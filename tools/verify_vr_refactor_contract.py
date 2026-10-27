@@ -1233,7 +1233,7 @@ if "R9DrawCallCount()" not in r9:
 # R84's accepted physical left draw now accounts only AFTER source/FVF
 # admission and a successful shader c64 upload. An early E_NOTIMPL must not
 # decrement a count which was never incremented, or leave the mono-backup gap
-# poisoned. Preserve the separate R26_SAFE rollback and the R9 owner API.
+# poisoned. R26_SAFE instead defers R9 accounting to the physical draw; retain the unused R9 owner API for older callers.
 for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
     if "--R9DrawCalls;" in source:
         errors.append(f"{rel} retained direct R9 draw-count rollback")
@@ -1242,6 +1242,21 @@ for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
                          "R9UndoStereoDrawCount();"):
             if obsolete in source:
                 errors.append("R84 R30 reintroduced a pre-GPU rollback: " + obsolete)
+    elif rel == "R30_SAFE":
+        # R26+HUD 01521 marks R9 history only after a successful LEFT WVP
+        # upload. The pre-Draw E_NOTIMPL fallback now has nothing to undo.
+        # Require source ordering rather than the obsolete rollback call.
+        if "R9UndoStereoDrawCount();" in source:
+            errors.append("R30_SAFE reintroduced pre-GPU draw count rollback")
+        try:
+            scoped = source.split("HRESULT R30TryScreenSpaceFovDraw(", 1)[1].split(
+                "const HRESULT leftHr = actualDraw();", 1)[0]
+            if not (scoped.index("if (!leftWvpOk)") <
+                    scoped.index("return E_NOTIMPL;", scoped.index("if (!leftWvpOk)")) <
+                    scoped.index("R9NoteStereoDrawWithoutMonoBackup();")):
+                errors.append("R30_SAFE marks mono gap before clean WVP fallback")
+        except (ValueError, IndexError):
+            errors.append("R30_SAFE lost physical LEFT draw accounting fence")
     elif "R9UndoStereoDrawCount();" not in source:
         errors.append(f"{rel} missing draw-count rollback owner API: R9UndoStereoDrawCount();")
 if "R9UndoStereoDrawCount()" not in r9:
