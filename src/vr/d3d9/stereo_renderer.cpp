@@ -461,7 +461,10 @@ namespace OutRunVRStereo
 			{
 				++R9NullDepthBinds;
 				// Null depth is a legitimate main-backbuffer state (typically UI).
-				// The draw wrappers temporarily make the right eye null as well.
+				// A preceding auxiliary depth bind must not leave the deferred flag
+				// sticky; null depth is an explicitly mirrorable state.
+				R9DeferredDepth = false;
+				ReleaseCom(R9DeferredDepthIdentity);
 				return hr;
 			}
 
