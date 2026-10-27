@@ -95,21 +95,26 @@ def main():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert workflow.count("tools/verify_vr_r33_mono_bypass_xyzrhw_fastpath.py") == 2
     assert check(r33, r29), "R33 stereo eligibility / mono bypass contract"
+    dpup = body(r33, "HRESULT __stdcall DrawPrimitiveUPDestR33(")
+    def mutate_dpup(old, new):
+        assert old in dpup, ("missing PrimitiveUP mutation fixture", old)
+        changed = dpup.replace(old, new, 1)
+        assert changed != dpup
+        return r33.replace(dpup, changed, 1)
+
     cases = [
         (r33.replace("if (!gameDevice || internalPass ||",
                      "if (false || false ||", 1), r29, "outer guard"),
         (r33.replace("return drawCall(false);",
                      "return drawCall(true);", 1), r29, "mono bypass"),
-        (r33.replace(
-            "OutRunVR::GameSemantic::CurrentRenderProducerToken() ==\\n"
-            "                        OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&",
-            "OutRunVR::GameSemantic::CurrentRenderProducerToken() ==\\n"
-            "                        OutRunVR::GameSemantic::ProducerToken::None &&", 1),
+        (mutate_dpup(
+            "OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&",
+            "OutRunVR::GameSemantic::ProducerToken::None &&"),
          r29, "rival producer"),
-        (r33.replace("CurrentProjectedMarker() != nullptr",
-                     "true", 1), r29, "rival anchor"),
-        (r33.replace("(exactProjectedRival ||",
-                     "(true ||", 1), r29, "rival cache bypass"),
+        (mutate_dpup("CurrentProjectedMarker() != nullptr",
+                     "true"), r29, "rival anchor"),
+        (mutate_dpup("(exactProjectedRival ||",
+                     "(true ||"), r29, "rival cache bypass"),
     ]
     for candidate, candidate29, label in cases:
         assert candidate != r33, ("unchanged mutation", label)
