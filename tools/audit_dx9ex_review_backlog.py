@@ -58,6 +58,10 @@ SOURCE_PATCH_RECEIPTS = {
               "Complete c64..c67 bounds before 16-float source copy"),
 }
 PARTIAL_PATCH_RECEIPTS = {
+    "01517": ("src/vr/d3d9/stereo_renderer.cpp",
+              "TrackedDepthStencil == R9MainDepthIdentity &&",
+              "Scoped R9-only offscreen shared-main-depth invalidation; "
+              "pre-R9 and R7-only admission remain unverified"),
     "01518": ("src/vr/d3d9/stereo_renderer_r7.inc",
               "if(stateBlock)stateBlock->Release();return false;",
               "Partial fix: COM cleanup on failed CreateStateBlock; "
