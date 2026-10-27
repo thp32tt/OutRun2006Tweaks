@@ -17,7 +17,7 @@ AUDIT_PATH=QUEUE_DIR/"audit.jsonl"
 VERSION="gpt-chat-vision-ocr-v1-20261025"
 OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
-RESPONSE_STALL_SECONDS=max(2400,int(os.environ.get("OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS","2400")))
+RESPONSE_STALL_SECONDS=max(2400,int(os.environ.get("OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS","2400")))\nSUBMISSION_STALL_SECONDS=max(60,int(os.environ.get("OUTRUN_GPT_OCR_SUBMIT_STALL_SECONDS","300")))
 RESPONSE_EXTRACTOR_VERSION="search-unit-assistant-v3-slot-aligned-20261026"
 TASK_RE=re.compile(r"^OUTRUN-GPT-OCR-Q\d{3}-[A-F0-9]{8}(?:-R[12])?$")
 
@@ -247,10 +247,33 @@ def active_task():
     a=_state().get("active");return dict(a) if isinstance(a,dict) else None
 
 def recover_stale_active(max_age_seconds=None):
-    """Release a stale ChatGPT response wait so one bad chat cannot stop the queue."""
-    threshold=RESPONSE_STALL_SECONDS if max_age_seconds is None else max(1,int(max_age_seconds))
+    """Release stale pre-send or response-wait state so one browser interruption cannot stop the queue."""
+    response_threshold=RESPONSE_STALL_SECONDS if max_age_seconds is None else max(1,int(max_age_seconds))
     st=_state();a=st.get("active")
-    if not isinstance(a,dict) or a.get("status")!="SENT_AWAITING_RESPONSE":
+    if not isinstance(a,dict):
+        return {"status":"NO_STALE_ACTIVE","recovered":False}
+    active_status=a.get("status")
+    if active_status=="SUBMITTING":
+        raw=a.get("submitting_at") or a.get("created_at")
+        try:
+            started=dt.datetime.fromisoformat(str(raw))
+            if started.tzinfo is None:started=started.replace(tzinfo=dt.timezone.utc)
+            age=(dt.datetime.now(dt.timezone.utc)-started.astimezone(dt.timezone.utc)).total_seconds()
+        except Exception:
+            age=SUBMISSION_STALL_SECONDS+1
+        if age<SUBMISSION_STALL_SECONDS:
+            return {"status":"SUBMISSION_WITHIN_LIMIT","recovered":False,"age_seconds":int(max(0,age))}
+        a["status"]="STAGED"
+        a["last_presend_failure"]="STALE_SUBMITTING_WATCHDOG_RECOVERY"
+        a["last_presend_failure_at"]=_now()
+        a["stale_submission_recoveries"]=int(a.get("stale_submission_recoveries",0) or 0)+1
+        _save_state(st)
+        recovered={"status":"STALE_SUBMITTING_RECOVERED","recovered":True,
+                   "task_id":a.get("task_id"),"source_png":a.get("source_png"),
+                   "age_seconds":int(max(0,age))}
+        _audit({**recovered,"external_api_used":False})
+        return recovered
+    if active_status!="SENT_AWAITING_RESPONSE":
         return {"status":"NO_STALE_RESPONSE_WAIT","recovered":False}
     raw=a.get("sent_at") or a.get("submitting_at") or a.get("created_at")
     try:
@@ -258,8 +281,8 @@ def recover_stale_active(max_age_seconds=None):
         if started.tzinfo is None:started=started.replace(tzinfo=dt.timezone.utc)
         age=(dt.datetime.now(dt.timezone.utc)-started.astimezone(dt.timezone.utc)).total_seconds()
     except Exception:
-        age=threshold+1
-    if age<threshold:
+        age=response_threshold+1
+    if age<response_threshold:
         return {"status":"RESPONSE_WAIT_WITHIN_LIMIT","recovered":False,"age_seconds":int(max(0,age))}
     fp=a.get("fingerprint");used=int(st.get("attempts",{}).get(fp,0) or 0)
     status="RESPONSE_TIMEOUT_RETRY" if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT else "RESPONSE_TIMEOUT_MAX_ATTEMPTS"
