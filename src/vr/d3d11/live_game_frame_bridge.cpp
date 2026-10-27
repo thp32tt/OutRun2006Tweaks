@@ -76,6 +76,7 @@
 #include "native_game_cpu_upload_transaction.hpp"
 #include "native_game_shared_desktop_admission.hpp"
 #include "native_game_raw_visual_diagnostic.hpp"
+#include "native_game_raw_source_probe.hpp"
 #include "native_game_frame_upload.hpp"
 #include "native_game_dirty_region.hpp"
 #include "native_game_readback_provenance.hpp"
@@ -1370,7 +1371,7 @@ struct State {
     std::uint64_t rawPreviewFrames = 0u;
     std::uint64_t rawPreviewCopies = 0u;
     std::uint64_t rawFogVisualBypasses = 0u;
-    bool rawProbeAttemptedThisFrame = false;
+    NativeRawSourceProbeSchedule rawSourceProbe;
     std::uint64_t rawProbeRestarts = 0u;
     // Persistent native D3D11 upload buffers for a whole real game frame.
     // Re-upload every Draw to preserve game-authored mutable VB/IB content.
@@ -8287,13 +8288,12 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             // source Draw per Present after an earlier unsupported Draw.
             // Sample different positions across menu, car and race calls.
             const bool rawProbe = env_raw_visual_opt_in() &&
-                !s.rawProbeAttemptedThisFrame &&
-                sourceOrdinal >= (s.presents % 24u) * 64u;
+                s.rawSourceProbe.should_attempt(sourceOrdinal, s.presents);
             if (!rawProbe) {
                 ++s.skippedPoisonedDraws;
                 return;
             }
-            s.rawProbeAttemptedThisFrame = true;
+            s.rawSourceProbe.record_attempt(sourceOrdinal);
             ComPtr<IDirect3DSurface9> currentTarget, gameBackbuffer;
             ComPtr<IUnknown> currentIdentity, backIdentity;
             if (FAILED(game->GetRenderTarget(
@@ -8321,8 +8321,11 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 s.rawProbeRestarts % 512u == 0u)
                 spdlog::info(
                     "DX11 RAW_VISUAL sampled_source_ordinal={} raw_restarts={} "
+                    "sample_attempts={} next_ordinal={} "
                     "source_RT_authentic=1 full_frame_coverage=NO",
-                    sourceOrdinal, s.rawProbeRestarts);
+                    sourceOrdinal, s.rawProbeRestarts,
+                    s.rawSourceProbe.attempts(),
+                    s.rawSourceProbe.next_ordinal());
         }
         const bool multiBatch = fullMode || env_batch_opt_in();
         // A successful zero-primitive game Draw changes no target pixels.
@@ -10216,7 +10219,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.surfaceReplayBudget.reset(); // a new verified full Clear starts a new source epoch
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
-        s.rawProbeAttemptedThisFrame = false;
+        s.rawSourceProbe.reset();
     s.sourceModeKnown = false;
             s.eligibleThisFrame = 0u;
             // After a successful full TARGET|ZBUFFER game Clear, initialize
@@ -11248,7 +11251,7 @@ void before_game_present(IDirect3DDevice9* game,
             s.probeSlot, s.eligibleThisFrame);
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
-        s.rawProbeAttemptedThisFrame = false;
+        s.rawSourceProbe.reset();
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
         s.surfaceReplayBudget.reset();
@@ -11299,7 +11302,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.cpuSurfaceReplay.reset();
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
-        s.rawProbeAttemptedThisFrame = false;
+        s.rawSourceProbe.reset();
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
         s.surfaceReplayBudget.reset();
