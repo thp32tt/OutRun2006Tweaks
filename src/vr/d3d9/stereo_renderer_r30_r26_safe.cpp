@@ -3302,6 +3302,12 @@ namespace OutRunVRStereo
             {
                 if (Settings::VRTelemetry)
                     ++R57ProjectedSemanticObserved;
+                const auto command =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                const bool exactRival =
+                    Settings::VRTelemetry &&
+                    command.producer ==
+                        OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani;
                 const auto* marker =
                     OutRunVR::GameSemantic::CurrentProjectedMarker();
                 if (!marker || !marker->valid ||
@@ -3309,16 +3315,46 @@ namespace OutRunVRStereo
                 {
                     if (Settings::VRTelemetry)
                         ++R57ProjectedPayloadMissing;
+                    if (exactRival)
+                    {
+                        static std::atomic<std::uint64_t> rivalMissing{0};
+                        const auto hit = rivalMissing.fetch_add(
+                            1, std::memory_order_relaxed) + 1;
+                        if (hit <= 8 || (hit & (hit - 1)) == 0)
+                            spdlog::info(
+                                "VR RIVAL XYZRHW PROJECTED: hits={} stage=REJECT_SOURCE marker={} baseProjection={} queued={} node={} epoch={}",
+                                hit, marker && marker->valid ? 1 : 0,
+                                haveBaseProjection && MatrixFinite(baseProjection) ? 1 : 0,
+                                command.queued ? 1 : 0, command.queueNode,
+                                command.queueEpoch);
+                    }
                     return false;
                 }
 
                 state.baseProjection = baseProjection;
                 if (Settings::VRTelemetry)
                     ++R57ProjectedBuildAttempts;
-                if (!R57BuildProjectedMarkerDelta(
+                const bool projectedBuilt =
+                    R57BuildProjectedMarkerDelta(
                         state.stereo, baseProjection,
                         state.projectedDeltaX, state.projectedDeltaY,
-                        &state.projectedBaseX, &state.projectedBaseY))
+                        &state.projectedBaseX, &state.projectedBaseY);
+                if (exactRival)
+                {
+                    static std::atomic<std::uint64_t> rivalProjected{0};
+                    const auto hit = rivalProjected.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (hit <= 8 || (hit & (hit - 1)) == 0)
+                        spdlog::info(
+                            "VR RIVAL XYZRHW PROJECTED: hits={} stage={} queued={} node={} epoch={} viewZ={} leftDelta={},{} rightDelta={},{} base={},{}",
+                            hit, projectedBuilt ? "ADMITTED" : "REJECT_DELTA",
+                            command.queued ? 1 : 0, command.queueNode,
+                            command.queueEpoch, marker->viewZ,
+                            state.projectedDeltaX[0], state.projectedDeltaY[0],
+                            state.projectedDeltaX[1], state.projectedDeltaY[1],
+                            state.projectedBaseX, state.projectedBaseY);
+                }
+                if (!projectedBuilt)
                 {
                     if (Settings::VRTelemetry)
                         ++R57ProjectedBuildFailures;
