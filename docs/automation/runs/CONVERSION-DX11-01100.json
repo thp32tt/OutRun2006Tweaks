@@ -91,7 +91,7 @@
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
       "DX11:NATIVE_GAME_PREDRAW_PAIRED_TARGET_Z_CLEAR"
     ],
-    "full_gate_plan": "one_validation_bearing_sha_after_causal_CI_repairs",
+    "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "Real game native Draw count, published output, HMD/Quest3/VDXR parity and FPS are UNTESTED; source-level menu/car/race integration and Build PASS are not gameplay evidence.",
     "activation_guard_and_fallback": "Native path stays opt-in/fail-closed; unsupported original game Clear/Draw and D3D9/DX9Ex Present/gamepad/FFB/SkyGlow stay authoritative; DXVK remains frozen."
   },
