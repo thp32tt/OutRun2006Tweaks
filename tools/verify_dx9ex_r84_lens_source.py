@@ -304,7 +304,10 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert "const bool rankSourceChanged = exactRankEye &&" in after_native_left
     assert "OutRunVR::RankMarker::SameOriginalRankWvp(" in after_native_left
     assert "rankRawBeforeLeft, rankRawAfterLeft)" in after_native_left
-    assert physical.count("OutRunVR::RankMarker::CoherentOriginalRankWvp(") == 3
+    for marker in ("rankBeforeLeft, rankRawBeforeLeft)) ||",
+                   "rankAfterLeft, rankRawAfterLeft));",
+                   "rankAtRight, rawAtRight))"):
+        assert marker in physical, "projected rank coherent WVP fence missing: " + marker
     assert physical.count("OutRunVR::RankMarker::SameOriginalRankWvp(") == 2
     # Both the post-native-LEFT and post-right-state setter physical marker
     # comparisons are mandatory. A first-occurrence mutation must not be
@@ -600,8 +603,10 @@ def main():
              "const bool rankSourceChanged = false &&"),
         (7, "OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(",
              "OutRunVR::RankMarker::NeverCheckPhysicalRankSource("),
-        (7, "OutRunVR::RankMarker::CoherentOriginalRankWvp(",
-             "OutRunVR::RankMarker::NeverCheckOriginalCarWvp("),
+        (7, "!OutRunVR::RankMarker::CoherentOriginalRankWvp(" + chr(10) +
+             "                     rankBeforeLeft, rankRawBeforeLeft)",
+             "!OutRunVR::RankMarker::NeverCheckOriginalCarWvp(" + chr(10) +
+             "                     rankBeforeLeft, rankRawBeforeLeft)"),
         (7, "rankRawBeforeLeft, rankRawAfterLeft)",
              "rankRawBeforeLeft, rankRawBeforeLeft)"),
         (7, "if (SUCCEEDED(rightHr) && exactRankEye)",
