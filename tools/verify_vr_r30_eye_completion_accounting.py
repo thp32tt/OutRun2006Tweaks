@@ -9,7 +9,6 @@ def region(source, begin, end):
     return source[start:source.index(end,start+len(begin))]
 xy=region(code,"HRESULT R30ExecuteXyzrhwStereo(","HRESULT R30TryXyzrhwPrimitiveUP(")
 hud=region(code,"HRESULT R30TryScreenSpaceFovDraw(","HRESULT R30GuardScreenSpace(")
-f11=region(code,"HRESULT R30TryExternalImGui","HRESULT R30")
 def check(s, kind):
     marker="const bool pairComplete = SUCCEEDED(rightHr) && restoreOk;"
     gate="if (pairComplete)\n            {"
