@@ -71,20 +71,20 @@ namespace OutRunVR::SpriteQueue
             Node root{}, one{}, two{}, foreign{}, cycle{};
             root.next_0 = &one;
             one.next_0 = &two;
-            if (FirstVerifiedNewRootAppendedChain(
+            if (FirstVerifiedNewRootAppendedChain<Node>(
                     nullptr, nullptr, &root, &two, 3) != &one)
                 return false;
-            if (FirstVerifiedNewRootAppendedChain(
+            if (FirstVerifiedNewRootAppendedChain<Node>(
                     &root, nullptr, &root, &two, 3))
                 return false;
-            if (FirstVerifiedNewRootAppendedChain(
+            if (FirstVerifiedNewRootAppendedChain<Node>(
                     nullptr, &root, &root, &two, 3))
                 return false;
-            if (FirstVerifiedNewRootAppendedChain(
+            if (FirstVerifiedNewRootAppendedChain<Node>(
                     nullptr, nullptr, &root, &foreign, 3))
                 return false;
             two.next_0 = &cycle;
-            if (FirstVerifiedNewRootAppendedChain(
+            if (FirstVerifiedNewRootAppendedChain<Node>(
                     nullptr, nullptr, &root, &two, 3))
                 return false;
             return true;
