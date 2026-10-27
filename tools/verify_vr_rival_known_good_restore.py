@@ -79,6 +79,9 @@ assert 'raw.queueNode == physical.queueNode' in rank_phys
 assert 'raw.queueEpoch == physical.queueEpoch' in rank_phys
 assert 'physical.drawSerial - raw.writtenDraw <= 12u' in rank_phys
 assert 'VR RIVAL R33 RAW C64 FENCE:' in r33
+assert 'GetLastGameWvpProjectedMarker' in r33
+assert 'rawAnchorValid={}' in r33
+assert 'rawAnchorMatch={}' in r33
 
 # D3DX/FVF142 projected rival uses the same exact-source exception: cached
 # shader shadow may not veto the route, but live VS and exact FVF 0x142 remain
