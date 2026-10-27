@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R26+HUD exact source guards for DX9Ex reviews 01511, 01516, 01519 and 01521.
+"""R26+HUD exact source guards for DX9Ex reviews 01511, 01513, 01515, 01516, 01519 and 01521.
 
 Static regression and destructive mutations only: not a Quest3/GPU test.
 """
@@ -65,6 +65,37 @@ def verify_sbs(source: str) -> None:
     assert "if(!restoreOk)NoteRestoreFailure(" in fn
 
 
+def verify_r7_resource_initialization(source: str) -> None:
+    fn = function_block(source, "bool EnsureStereoResources(")
+    for marker in (
+        "D3DVIEWPORT9 initViewport=savedViewport;",
+        "initViewport.X=0;initViewport.Y=0;",
+        "initViewport.Width=desc.Width;initViewport.Height=desc.Height;",
+        "device->SetViewport(&initViewport)",
+    ):
+        assert marker in fn, marker
+    assert fn.index("device->SetViewport(&initViewport)") < fn.index(
+        "if(initOk&&FAILED(ClearHook.stdcall<HRESULT>(") < fn.rindex(
+        "device->SetViewport(&savedViewport)")
+    assert "if(!initOk){ReleaseStereoResources();return false;}" in fn
+    assert fn.index("if(!initOk){ReleaseStereoResources();return false;}") < fn.index(
+        "StereoResourcesReady=true;")
+
+
+def verify_r7_bootstrap_coverage(source: str) -> None:
+    fn = function_block(source, "bool TryBootstrapRightDepthFromRecentClear(")
+    for marker in (
+        "savedViewport.X!=0||savedViewport.Y!=0||",
+        "savedViewport.Width!=BackBufferDesc.Width||",
+        "savedViewport.Height!=BackBufferDesc.Height)return false;",
+    ):
+        assert marker in fn, marker
+    assert fn.index("savedViewport.X!=0||savedViewport.Y!=0||") < fn.index(
+        "SetRenderTargetHook.stdcall<HRESULT>(")
+    assert fn.index("savedViewport.Height!=BackBufferDesc.Height)return false;") < fn.index(
+        "RightDepthSynchronized=true;")
+
+
 def verify_r9(source: str) -> None:
     fn = function_block(source, "HRESULT __stdcall PresentDestR9(")
     recovery = fn.split("if (!composedStereo || FrameStereoIncomplete)", 1)[1].split(
@@ -110,6 +141,8 @@ def main() -> None:
     r9 = R9_PATH.read_text(encoding="utf-8")
     verify_r30(r30)
     verify_r7(r7)
+    verify_r7_resource_initialization(r7)
+    verify_r7_bootstrap_coverage(r7)
     verify_sbs(r7)
     verify_r9(r9)
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9NoteStereoDrawWithoutMonoBackup();", "/* missing R9 gap */")
@@ -124,7 +157,11 @@ def main() -> None:
     rejects_in_function(verify_r9, r9, "HRESULT __stdcall PresentDestR9(", "!R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason))", "R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason))")
     rejects_in_function(verify_r9, r9, "HRESULT __stdcall PresentDestR9(", "R9MonoBackupGap = true;", "/* lost recovery fence */")
     rejects_in_function(verify_r9, r9, "HRESULT __stdcall PresentDestR9(", 'R9Poison(OutRunVR::StereoFailureRestoreFailed,', '/* lost failure propagation */ (')
-    print("PASS R26/R7/R9: 01511,01516,01519,01521 guards; 12 destructive mutations")
+    rejects_in_function(verify_r7_bootstrap_coverage, r7, "bool TryBootstrapRightDepthFromRecentClear(", "savedViewport.X!=0||savedViewport.Y!=0||", "savedViewport.X!=0 && savedViewport.Y!=0||")
+    rejects_in_function(verify_r7_bootstrap_coverage, r7, "bool TryBootstrapRightDepthFromRecentClear(", "savedViewport.Width!=BackBufferDesc.Width||", "savedViewport.Width>BackBufferDesc.Width||")
+    rejects_in_function(verify_r7_resource_initialization, r7, "bool EnsureStereoResources(", "device->SetViewport(&initViewport)", "device->SetViewport(&savedViewport)")
+    rejects_in_function(verify_r7_resource_initialization, r7, "bool EnsureStereoResources(", "initViewport.Width=desc.Width;initViewport.Height=desc.Height;", "initViewport.Width=savedViewport.Width;initViewport.Height=savedViewport.Height;")
+    print("PASS R26/R7/R9: 01511,01513,01515,01516,01519,01521 guards; 16 destructive mutations")
     print("RUNTIME_VALIDATION=UNTESTED")
 
 
