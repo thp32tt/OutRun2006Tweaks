@@ -6,7 +6,7 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01105",
   "classification": "A_LIVE_GAME_INTERLEAVED_PREDRAW_COLOR_Z_SOURCE_TILES",
-  "feature_id": null,
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:NATIVE_GAME_PREDRAW_NONINTERFERING_COLOR_Z_BANDS",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
@@ -33,7 +33,7 @@
     "tools/dx11_pre_draw_depth_probe_01036.cpp"
   ],
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
     "goal": "Preserve authentic interleaved D3D9 game pre-first-Draw TARGET|Z color and depth writes through order-safe, noninterfering same-value rectangular tile coalescing for bounded native RTV/DSV GPU replay.",
     "acceptance_items": [
       {
@@ -85,7 +85,11 @@
     },
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "Exact-SHA build workflow success only; native frame publication, actual game pixels, VR stereo, Quest3/VDXR visuals, FPS, original input and FFB remain UNTESTED.",
-    "activation_guard_and_fallback": "Original D3D9Ex renderer/input/FFB remains authoritative on guard or capacity failure; DXVK remains frozen. No renderer source change in C6."
+    "activation_guard_and_fallback": "Original D3D9Ex renderer/input/FFB remains authoritative on guard or capacity failure; DXVK remains frozen. No renderer source change in C6.",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:NATIVE_GAME_PREDRAW_NONINTERFERING_COLOR_Z_BANDS"
+    ]
   },
   "acceptance_results": {
     "interleaved_color_z_pixel_parity": {
@@ -189,5 +193,6 @@
   "c6_bookkeeping_only": true,
   "c6_source_validation_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
   "c6_does_not_revalidate_source": true,
-  "runtime_note": "Original OutRun game/Quest 3/VDXR HMD was not executed. Build and CI verification do not prove live gameplay, stereo, visuals or performance; RUNTIME_VALIDATION=UNTESTED."
+  "runtime_note": "Original OutRun game/Quest 3/VDXR HMD was not executed. Build and CI verification do not prove live gameplay, stereo, visuals or performance; RUNTIME_VALIDATION=UNTESTED.",
+  "c6_integrity_repair": "01106 inherited 01105 C6 record omitted feature identity/conflict_keys; DX11 Fast 40462051814 and Backend 40462051895 rejected this prior-run JSON before renderer/build execution. Restore identical immutable 01105 material SHA, source proof and CI artifacts; this is no new 01105 feature score."
 }
