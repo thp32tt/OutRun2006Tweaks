@@ -2564,11 +2564,63 @@ namespace OutRunVRStereo
             UINT vertexCount, UINT stride, R30XyzrhwState& state,
             const std::vector<std::uint8_t>* usedMask) noexcept;
 
-        bool R30PrepareXyzrhwState(
-            IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
+        enum class R30XyzrhwPrepareReject : std::uint8_t
         {
-            if (!R30SafeStereoBase(device))
+            None = 0,
+            SafeStereoBase,
+            CachedVsIdentity,
+            LiveVsReadFailed,
+            LiveVsBound,
+            FvfReadFailed,
+            FvfNotXyzrhw,
+            StereoResources,
+            ViewportReadFailed,
+            ViewportInvalid,
+            ZStateReadFailed,
+            StereoFrameUnavailable,
+            PoseSequenceInvalid,
+            PoseSequenceMismatch,
+            EyeAffineInvalid
+        };
+
+        const char* R30XyzrhwPrepareRejectName(
+            R30XyzrhwPrepareReject reason) noexcept
+        {
+            switch (reason)
+            {
+            case R30XyzrhwPrepareReject::None: return "ADMITTED";
+            case R30XyzrhwPrepareReject::SafeStereoBase: return "SAFE_STEREO_BASE";
+            case R30XyzrhwPrepareReject::CachedVsIdentity: return "CACHED_VS_IDENTITY";
+            case R30XyzrhwPrepareReject::LiveVsReadFailed: return "LIVE_VS_READ_FAILED";
+            case R30XyzrhwPrepareReject::LiveVsBound: return "LIVE_VS_BOUND";
+            case R30XyzrhwPrepareReject::FvfReadFailed: return "FVF_READ_FAILED";
+            case R30XyzrhwPrepareReject::FvfNotXyzrhw: return "FVF_NOT_XYZRHW";
+            case R30XyzrhwPrepareReject::StereoResources: return "STEREO_RESOURCES";
+            case R30XyzrhwPrepareReject::ViewportReadFailed: return "VIEWPORT_READ_FAILED";
+            case R30XyzrhwPrepareReject::ViewportInvalid: return "VIEWPORT_INVALID";
+            case R30XyzrhwPrepareReject::ZStateReadFailed: return "ZSTATE_READ_FAILED";
+            case R30XyzrhwPrepareReject::StereoFrameUnavailable: return "STEREO_FRAME_UNAVAILABLE";
+            case R30XyzrhwPrepareReject::PoseSequenceInvalid: return "POSE_SEQUENCE_INVALID";
+            case R30XyzrhwPrepareReject::PoseSequenceMismatch: return "POSE_SEQUENCE_MISMATCH";
+            case R30XyzrhwPrepareReject::EyeAffineInvalid: return "EYE_AFFINE_INVALID";
+            }
+            return "UNKNOWN";
+        }
+
+        bool R30PrepareXyzrhwState(
+            IDirect3DDevice9* device, R30XyzrhwState& state,
+            R30XyzrhwPrepareReject* rejectReason = nullptr) noexcept
+        {
+            if (rejectReason)
+                *rejectReason = R30XyzrhwPrepareReject::None;
+            const auto reject = [&](R30XyzrhwPrepareReject reason) noexcept {
+                if (rejectReason)
+                    *rejectReason = reason;
                 return false;
+            };
+
+            if (!R30SafeStereoBase(device))
+                return reject(R30XyzrhwPrepareReject::SafeStereoBase);
 
             // D3DX StateBlocks can leave CurrentVertexShaderIdentity stale.
             // Only an exact result batch may bypass that cache hint; the live
@@ -2577,42 +2629,48 @@ namespace OutRunVRStereo
             const bool exactResult = R30IsExactResultHudDraw();
             if (!exactResult &&
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire) != 0)
-                return false;
+                return reject(R30XyzrhwPrepareReject::CachedVsIdentity);
 
             IDirect3DVertexShader9* shader = nullptr;
             if (FAILED(device->GetVertexShader(&shader)))
-                return false;
+                return reject(R30XyzrhwPrepareReject::LiveVsReadFailed);
             if (shader)
             {
                 shader->Release();
-                return false;
+                return reject(R30XyzrhwPrepareReject::LiveVsBound);
             }
 
             DWORD fvf = 0;
-            if (FAILED(device->GetFVF(&fvf)) ||
-                (fvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW)
-                return false;
+            if (FAILED(device->GetFVF(&fvf)))
+                return reject(R30XyzrhwPrepareReject::FvfReadFailed);
+            if ((fvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW)
+                return reject(R30XyzrhwPrepareReject::FvfNotXyzrhw);
 
-            if (!EnsureStereoResources(device) ||
-                FAILED(device->GetViewport(&state.viewport)) ||
-                state.viewport.Width == 0 || state.viewport.Height == 0 ||
+            if (!EnsureStereoResources(device))
+                return reject(R30XyzrhwPrepareReject::StereoResources);
+            if (FAILED(device->GetViewport(&state.viewport)))
+                return reject(R30XyzrhwPrepareReject::ViewportReadFailed);
+            if (state.viewport.Width == 0 || state.viewport.Height == 0 ||
                 !std::isfinite(state.viewport.MinZ) ||
                 !std::isfinite(state.viewport.MaxZ) ||
                 state.viewport.MaxZ <= state.viewport.MinZ)
-                return false;
+                return reject(R30XyzrhwPrepareReject::ViewportInvalid);
 
             DWORD zEnable = D3DZB_FALSE;
             if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable))
-                return false;
+                return reject(R30XyzrhwPrepareReject::ZStateReadFailed);
             state.depthTestEnabled = zEnable != D3DZB_FALSE;
 
-            if (!OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
-                state.stereo.poseSequence == 0 ||
-                (FrameStereoPoseSequence != 0 &&
-                 FrameStereoPoseSequence != state.stereo.poseSequence) ||
-                !R30BuildEyeAffine(state.stereo,
+            if (!OutRunVRRenderer::GetLatchedStereoFrame(state.stereo))
+                return reject(R30XyzrhwPrepareReject::StereoFrameUnavailable);
+            if (state.stereo.poseSequence == 0)
+                return reject(R30XyzrhwPrepareReject::PoseSequenceInvalid);
+            if (FrameStereoPoseSequence != 0 &&
+                FrameStereoPoseSequence != state.stereo.poseSequence)
+                return reject(R30XyzrhwPrepareReject::PoseSequenceMismatch);
+            if (!R30BuildEyeAffine(state.stereo,
                     state.eyeScale, state.eyeOffset))
-                return false;
+                return reject(R30XyzrhwPrepareReject::EyeAffineInvalid);
 
             return true;
         }
@@ -4242,7 +4300,10 @@ namespace OutRunVRStereo
             }
 
             R30XyzrhwState state{};
-            const bool prepared = R30PrepareXyzrhwState(device, state);
+            R30XyzrhwPrepareReject rivalPrepareReject =
+                R30XyzrhwPrepareReject::None;
+            const bool prepared = R30PrepareXyzrhwState(
+                device, state, exactRival ? &rivalPrepareReject : nullptr);
             if (exactRival)
             {
                 static std::atomic<std::uint64_t> rivalPrepare{0};
@@ -4250,13 +4311,8 @@ namespace OutRunVRStereo
                     1, std::memory_order_relaxed) + 1;
                 if (hit <= 8 || (hit & (hit - 1)) == 0)
                 {
-                    const char* rejectClass = prepared ? "ADMITTED"
-                        : rivalCachedVs != 0 ? "CACHED_VS_IDENTITY"
-                        : rivalVsBound ? "LIVE_VS_BOUND"
-                        : !rivalFvfOk ? "FVF_READ_FAILED"
-                        : (rivalFvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW
-                            ? "FVF_NOT_XYZRHW"
-                            : "LATE_STEREO_VIEWPORT_OR_DEPTH_GATE";
+                    const char* rejectClass =
+                        R30XyzrhwPrepareRejectName(rivalPrepareReject);
                     spdlog::info(
                         "VR RIVAL XYZRHW PREPARE: hits={} prepared={} reject={} stride={} primitives={} fvfOk={} fvf=0x{:08X} posMask=0x{:03X} vsReadOk={} vsBound={} cachedVs=0x{:X} queued={} node={} epoch={}",
                         hit, prepared ? 1 : 0, rejectClass,
