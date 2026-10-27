@@ -10,6 +10,7 @@
 #include <cstring>
 #include "native_game_raw_gpu_capture_epoch.hpp"
 #include "native_game_raw_pixel_delta.hpp"
+#include "native_game_raw_draw_tile.hpp"
 
 namespace outrun::vr::dx11 {
 enum class NativeRawPreviewResult {
@@ -226,13 +227,48 @@ private:
             if (FAILED(dev->CreateQuery(&desc, event_.GetAddressOf())))
                 return NativeRawPreviewResult::GpuFailure;
         }
-        const UINT index = static_cast<UINT>(capture_++ % 5u);
-        const UINT rangeX = src.Width - width, rangeY = src.Height - height;
-        const UINT x = index == 0 ? rangeX/2u :
-                       index == 1 || index == 3 ? 0u : rangeX;
-        const UINT y = index == 0 ? rangeY/2u :
-                       index == 1 || index == 2 ? 0u : rangeY;
-        region_ = D3D11_BOX{x,y,0u,x+width,y+height,1u};
+        // Capture the actual bound native Draw viewport/scissor, not a
+        // whole-backbuffer anchor that can miss game menu/HUD raster output.
+        UINT viewCount=1u;
+        D3D11_VIEWPORT view{};
+        ctx->RSGetViewports(&viewCount,&view);
+        const float right=view.TopLeftX+view.Width;
+        const float bottom=view.TopLeftY+view.Height;
+        if(viewCount!=1u||!std::isfinite(view.TopLeftX)||
+           !std::isfinite(view.TopLeftY)||!std::isfinite(view.Width)||
+           !std::isfinite(view.Height)||!std::isfinite(right)||
+           !std::isfinite(bottom)||view.Width<=0.f||view.Height<=0.f)
+            return NativeRawPreviewResult::NoDraw;
+        const auto clip=[](float value,UINT limit) noexcept {
+            return static_cast<std::int64_t>((std::max)(0.f,
+                (std::min)(value,static_cast<float>(limit))));
+        };
+        NativeRawDrawExtent draw{clip(view.TopLeftX,src.Width),
+            clip(view.TopLeftY,src.Height),clip(right,src.Width),
+            clip(bottom,src.Height)};
+        Microsoft::WRL::ComPtr<ID3D11RasterizerState> raster;
+        ctx->RSGetState(raster.GetAddressOf());
+        if(raster){
+            D3D11_RASTERIZER_DESC desc{};
+            raster->GetDesc(&desc);
+            if(desc.ScissorEnable){
+                UINT count=1u;
+                D3D11_RECT rect{};
+                ctx->RSGetScissorRects(&count,&rect);
+                if(count!=1u) return NativeRawPreviewResult::NoDraw;
+                draw.left=(std::max)(draw.left,std::int64_t{rect.left});
+                draw.top=(std::max)(draw.top,std::int64_t{rect.top});
+                draw.right=(std::min)(draw.right,std::int64_t{rect.right});
+                draw.bottom=(std::min)(draw.bottom,std::int64_t{rect.bottom});
+            }
+        }
+        NativeRawTileOrigin tile{};
+        if(!native_raw_draw_tile(src.Width,src.Height,width,height,
+                                 draw,static_cast<std::uint32_t>(capture_),tile))
+            return NativeRawPreviewResult::NoDraw;
+        ++capture_;
+        region_=D3D11_BOX{tile.x,tile.y,0u,
+                          tile.x+width,tile.y+height,1u};
         ctx->CopySubresourceRegion(baseline_.Get(), 0, 0, 0, 0,
                                    color, 0, &region_);
         return NativeRawPreviewResult::CopyQueued;

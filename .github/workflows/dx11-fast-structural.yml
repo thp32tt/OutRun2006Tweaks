@@ -676,6 +676,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_gpu_source_epoch_test.cpp -o /tmp/dx11_raw_gpu_epoch_01119 && /tmp/dx11_raw_gpu_epoch_01119
           # Real D3D11 RGB evidence compares the same region on either side of the Draw.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_pixel_provenance_test.cpp -o /tmp/dx11_raw_pixel_01120 && /tmp/dx11_raw_pixel_01120
+          # Native RAW GPU tile follows the genuine rasterized viewport/scissor.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_draw_tile_test.cpp -o /tmp/dx11_raw_draw_tile_01121 && /tmp/dx11_raw_draw_tile_01121
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
           # Native L/R partial-depth GPU Draw is a separate non-evidence
