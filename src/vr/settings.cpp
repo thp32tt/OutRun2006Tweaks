@@ -76,7 +76,7 @@ namespace Settings
     Setting<bool> VRRankDx11ProducerReference{ "VR", "RankDx11ProducerReference", true,
         "DX11 R57 mode6 direct original Calc3D2D output rank source; false restores the guarded R26 input check for A/B." };
     Setting<bool> VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", false,
-        "Rival projector A/B only. False uses the exact BB6F0 call-edge wrapper; true retains the stock BB6F0 call edge. Both modes keep the shared Calc3D2D capture and the known-good BB796 SpriteNode ownership hook active. Restart required." };
+        "Rival projector A/B only. False is the correctness route and uses the exact BB6F0 call-edge wrapper. True retains the stock BB6F0 call edge for comparison and does not guarantee exact-edge anchor provenance on current SafetyHook builds. BB796 SpriteNode ownership remains active in both modes. Restart required." };
     Setting<bool> VRRankDesktopLift{ "VR", "RankDesktopLift", false,
         "Reversible optional +32 original UI pixel rank vertical lift, absent in tested DX11. Default off. Does not affect rival." };
     Setting<bool> VRRankDx11ReferenceEyePose{ "VR", "RankDx11ReferenceEyePose", true,
@@ -347,8 +347,9 @@ namespace OutRunVR
 				Settings::VRFrameCadenceTargetHz.get(),
 				Settings::VRFrameCadenceMaxHz.get());
             spdlog::info(
-                "VR RIVAL CONFIG: nativeProjectorAB={} BB796Ownership=ALWAYS",
-                Settings::VRRivalDx11NativeRoute.get() ? 1 : 0);
+                "VR RIVAL CONFIG: stockProjectorAB={} exactEdge={} BB796Ownership=ALWAYS",
+                Settings::VRRivalDx11NativeRoute.get() ? 1 : 0,
+                Settings::VRRivalDx11NativeRoute.get() ? 0 : 1);
             RequestVRHostStartup();
 			return true;
 		}
