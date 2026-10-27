@@ -461,9 +461,11 @@ def verify_outer_lens_c64_owner(renderer):
     """CABE only: synced Calc3D2D camera and shader c64 must not both rotate."""
     outer = renderer.split("const auto semanticScope =", 1)[1].split(
         "// The subsequent game world write", 1)[0]
+    # Stop at the end of the actual camera-sync expression. Read-only
+    # telemetry follows it and must not satisfy an unsafe-mutated gate.
     gate = outer.split(
         "const bool projectedLensWithSyncedCamera =", 1)[1].split(
-        "const bool semanticOverlay =", 1)[0]
+        "semanticScope);", 1)[0] + "semanticScope);"
     for required in (
         "CullingCameraOverridden &&",
         "!OutRunVR::GameSemantic::QueueRenderActive() &&",
