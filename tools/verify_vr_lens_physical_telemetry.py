@@ -25,7 +25,12 @@ def check(r30: str, game: str, hook: str) -> None:
     for phrase in (
         "VR LENS R30 PHYSICAL CLASS:",
         "VR LENS R30 PHYSICAL EYES:",
-        "opaqueObject=UNLINKED shaderForm=UNOBSERVED",
+        "opaqueObject=UNLINKED",
+        "vsHr=0x{:08X} vsBound={} fvfHr=0x{:08X}",
+        "fvf=0x{:08X}",
+        "device->GetVertexShader(&liveVs)",
+        "device->GetFVF(&liveFvf)",
+        "liveVs->Release()",
         "eyeRT=LEFT_RIGHT_TRANSACTION object=UNLINKED",
         "Settings::VRTelemetry",
         "n <= 32 || (n & (n - 1)) == 0",
@@ -74,7 +79,8 @@ def main() -> None:
     hook = HOOK.read_text(encoding="utf-8-sig")
     check(r30, game, hook)
     mutations = [
-        (0, "opaqueObject=UNLINKED shaderForm=UNOBSERVED", "object=570008"),
+        (0, "opaqueObject=UNLINKED", "object=570008"),
+        (0, "device->GetFVF(&liveFvf)", "D3D_OK"),
         (0, "eyeRT=LEFT_RIGHT_TRANSACTION object=UNLINKED", "object=570002"),
         (0, "std::memcmp(eyeConstants[0], eyeConstants[1],", "true /* fake eye equality */("),
         (0, "const bool lensPhysicalCandidate = Settings::VRTelemetry &&",
