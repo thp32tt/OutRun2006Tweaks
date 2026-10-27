@@ -1832,9 +1832,22 @@ namespace OutRunVRStereo
                 // Reliable setter/StateBlock tracking proves a bound VS is
                 // not an XYZRHW fixed-function draw. Unreliable tracking must
                 // retain R30's live shader fallback, never assume VS identity.
+                const bool exactProjectedRival =
+                    OutRunVR::GameSemantic::QueueRenderActive() &&
+                    OutRunVR::GameSemantic::EffectiveScope() ==
+                        OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                        OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
+                    OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
                 const bool tryXyzrhw = resyncAlreadyFlushed &&
-                    (!OutRunVR::State::StateBlockTracker::Reliable() ||
+                    (exactProjectedRival ||
+                     !OutRunVR::State::StateBlockTracker::Reliable() ||
                      R32ReviewCurrentVertexShaderIdentity() == 0);
+                // Known-good a22be86a always live-probed DPUP before shader
+                // dispatch. Keep the optimized cached-VS gate for ordinary
+                // draws, but exact rival source+anchor ownership may bypass
+                // only that cache hint; R30 still requires live VS=null and
+                // an actual XYZRHW FVF before any stereo GPU draw.
                 // FVF142 original sprite sources are not XYZRHW. Do not
                 // depend on the cached VS shadow: R30 checks live FVF/VS,
                 // exact producer, target and stereo pose before GPU writes.
