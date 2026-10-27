@@ -511,8 +511,17 @@ def main():
         ("projectedLensWithSyncedCamera;", "false;"),
     ):
         assert old in outer, "outer CABE mutation fixture missing: " + old
-        modified = (renderer[:outer_begin] + outer.replace(old, altered, 1) +
-                    renderer[outer_end:])
+        # Observational logging between the gate and semanticOverlay uses
+        # CorroboratesProjectedScreenEffect too. Mutate only the actual
+        # camera-sync eligibility expression, not the new log predicate.
+        gate_end = outer.index("const bool semanticOverlay =")
+        if old == "projectedLensWithSyncedCamera;":
+            changed = outer.replace(old, altered, 1)
+        else:
+            gate = outer[:gate_end]
+            assert old in gate, "original c64 camera gate changed: " + old
+            changed = gate.replace(old, altered, 1) + outer[gate_end:]
+        modified = renderer[:outer_begin] + changed + renderer[outer_end:]
         try:
             verify_outer_lens_c64_owner(modified)
         except AssertionError:
