@@ -1364,6 +1364,17 @@ class UIScaling : public Hook
                             tailAfter, Game::SpriteNodeMax)
                         : StageFirstAppendedNode(
                             root, before[prio], tailAfter, Game::SpriteNodeMax);
+                if (rivalCreatedFreshRoot && node &&
+                    Settings::VREnabled && Settings::VRTelemetry)
+                {
+                    static std::atomic<std::uint64_t> freshRootHits{0};
+                    const auto n = freshRootHits.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 8 || (n & (n - 1)) == 0)
+                        spdlog::info(
+                            "VR RIVAL FRESH ROOT RECOVERED: hits={} prio={} kind={} entrySerial={}",
+                            n, prio, node->kind_C, preserveNewerExactSince);
+                }
             }
             else
             {
@@ -2471,6 +2482,9 @@ class UIScaling : public Hook
 	static int __cdecl RivalMarker_sprani(
 		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
+        const auto entrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
@@ -2504,7 +2518,7 @@ class UIScaling : public Hook
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard,
 			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
 			projected ? &projectedAnchor : nullptr,
-            &rootsBefore);
+            &rootsBefore, entrySerial);
         if (Settings::VREnabled && Settings::VRTelemetry)
         {
             static thread_local std::uint64_t restoredHits = 0;
@@ -4578,6 +4592,10 @@ class VRHudQueueSemanticBridge : public Hook
             OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
                 OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani)
         {
+            OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
+                OutRunVR::GameSemantic::ProjectedMarkerProbeStage::NativeSprite,
+                OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr);
             static thread_local std::uint64_t rivalSelections = 0;
             const auto n = ++rivalSelections;
             if (n <= 8 || (n & (n - 1)) == 0)
