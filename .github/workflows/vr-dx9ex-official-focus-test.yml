@@ -43,6 +43,7 @@ on:
       - 'tools/verify_dx9ex_c993_native_span.py'
       - 'tools/verify_vr_f11_eye_viewport.py'
       - 'tools/verify_dx9ex_r84_lens_source.py'
+      - 'tools/verify_vr_lens_physical_telemetry.py'
       - 'tools/tests/f11_eye_viewport_harness.cpp'
       - 'tools/verify_vr_goal_progress_source_admission.py'
       - 'tools/verify_vr_producer_provenance.py'
@@ -110,6 +111,12 @@ jobs:
         run: |
           python tools/verify_dx9ex_r84_lens_source.py
           if ($LASTEXITCODE -ne 0) { throw 'C993 conservative optics/source guard failed' }
+
+      - name: Verify C993/CABE game-to-eye diagnostic provenance
+        shell: pwsh
+        run: |
+          python tools/verify_vr_lens_physical_telemetry.py
+          if ($LASTEXITCODE -ne 0) { throw 'Lens source/native eye evidence guard failed' }
 
       - name: Validate accepted R23 menu letterbox cache refresh
         shell: pwsh
