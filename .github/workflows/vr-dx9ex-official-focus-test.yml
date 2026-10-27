@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - test/dx9ex-ui1080p-only-20261027
       - vr-d3d9ex-abc-c-goal-emptyroot-20261026
     paths:
       - '.github/workflows/vr-dx9ex-official-focus-test.yml'
