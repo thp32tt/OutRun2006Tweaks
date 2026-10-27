@@ -1715,7 +1715,7 @@ class UIScaling : public Hook
         // This bounded trace distinguishes a live progress producer from an
         // early generic-screen-overlay fallback without altering pixels.
         unsigned changedPriorities = 0;
-        if (Settings::VRTelemetry)
+        if (Settings::VRTelemetry && ResultProgressAdmittedAfterDrain)
         {
             for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
             {

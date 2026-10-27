@@ -309,13 +309,32 @@ if "VehicleAnchorDesktopLiftPixels(" in rival:
 
 if "&projectedAnchor" not in rival or "RivalMarkerProjectedInfo = {};" not in rival:
     fail("rival marker must consume one exact recovered anchor and copy it to all sibling nodes")
-# Both immediate (pre-queue) and deferred SpriteNode draws for each exact
-# vehicle marker must use the *same* anchor. The old rival wrapper captured
-# its anchor after the original sprani CALL and tagged only new SpriteNodes,
-# allowing a synchronous Draw to inherit the previous queue semantic.
+# Rank's exact direct Draw scope and sibling queue ownership are separate
+# from the HMD-proven native-first rival E8. Do not promote a later rival
+# anchor into its already-submitted original physical Draw.
 def require_exact_marker_source_and_queue(body: str, label: str,
                                           is_rival: bool = False) -> None:
     frozen = body.find("const auto projectedAnchor =")
+    if is_rival:
+        # R26 known-good rival makes the original native Draw first; only
+        # afterward does it consume the anchor and tag verified queue siblings.
+        # Rank sprani/clip retain their separate scoped direct owner.
+        direct = body.find("Game::sprani_play_ae_auth_alpha(")
+        consume = body.find("RivalMarkerProjectedInfo = {};")
+        queued = body.find("TagAppendedNodes(")
+        if min(direct, frozen, consume, queued) < 0 or not (
+            direct < frozen < consume < queued):
+            fail(label + " native-first rival anchor or queue order changed")
+        tag = body[queued:]
+        if ("RenderScope::ProjectedWorldMarker2D" not in tag or
+            "RenderScope::WorldBillboard" not in tag or
+            "OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani," not in tag or
+            "projected ? &projectedAnchor : nullptr," not in tag or
+            "&rootsBefore, entrySerial);" not in tag or
+            body.count("OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,") != 2 or
+            "ScopedExactProducerSemantic producerScope(" in body):
+            fail(label + " lost separate native and exact stable-root queue authority")
+        return
     owner = body.find("ScopedExactProducerSemantic producerScope(")
     direct = body.find("Game::sprani_play_ae_auth_alpha(") if label != "rank clip" else body.find("Game::put_clip_sprite(")
     queued = body.find("TagAppendedNodes(")
@@ -347,7 +366,7 @@ for label, body, old, new in (
     ("rank sprani", rank13, "const auto projectedAnchor =", "const auto removedAnchor ="),
     ("rank clip", rank46, "ScopedExactProducerSemantic producerScope(", "ScopedRenderSemantic producerScope("),
     ("rival sprani", rival, "RivalMarkerProjectedInfo = {};", "/* consume lost */"),
-    ("rival sprani", rival, "TagAppendedNodes(before, scope,", "TagAppendedNodes(before, RenderScope::ScreenHud,"),
+    ("rival sprani", rival, "projected ? &projectedAnchor : nullptr,", "nullptr,"),
 ):
     mutant = body.replace(old, new, 1)
     if mutant == body:
@@ -653,6 +672,11 @@ def require_rank_direct_isolation(source: str, helper: str = rank_fraction) -> N
         ("static int __cdecl RivalMarker_sprani(", "RivalMarkerSprani"),
     ):
         body = function_body(source, func)
+        if token == "RivalMarkerSprani":
+            # Preserve the native-first physical draw rather than reviving
+            # the historical scope takeover that regressed tested rivals.
+            require_exact_marker_source_and_queue(body, "rival sprani", True)
+            continue
         begin = body.find("ScopedExactProducerSemantic producerScope(")
         end = body.find(");", begin)
         direct = body.find("Game::put_clip_sprite(" if token ==
@@ -767,7 +791,7 @@ for name, source_old, source_new, helper_old, helper_new in (
 for name, original, replacement in (
     ("rank sprani pending", "Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani", "false,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani"),
     ("rank clip direct", "ProducerToken::RankMarkerClipSprite);", "ProducerToken::RivalMarkerSprani);"),
-    ("rival direct", "ProducerToken::RivalMarkerSprani);", "ProducerToken::RankMarkerSprani);"),
+    ("rival native-first consume", "RivalMarkerProjectedInfo = {};", "/* consume lost */"),
     ("digit producer frozen X", "frozenFractionX, frozenFractionY);", "RankMarkerFracX, frozenFractionY);"),
     ("digit producer frozen Y", "frozenFractionX, frozenFractionY);", "frozenFractionX, RankMarkerFracY);"),
 ):
