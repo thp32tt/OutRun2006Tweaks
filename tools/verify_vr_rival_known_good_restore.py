@@ -9,6 +9,7 @@ r84=(R/'src/vr/d3d9/stereo_renderer_r30.cpp').read_text()
 r33=(R/'src/vr/d3d9/stereo_renderer_r33.cpp').read_text()
 ini=(R/'OutRun2006Tweaks.ini').read_text()
 run=(R/'tools/Run-FocusOfficialTest.ps1').read_text()
+profiles=(R/'tools/OutRunVR-TestProfiles.ps1').read_text()
 settings=(R/'src/vr/settings.cpp').read_text()
 a=ui.index('static int __cdecl RivalMarker_sprani(')
 b=ui.index('// 2026-10-11 Quest3',a)
@@ -40,6 +41,8 @@ assert 'RivalDx11NativeRoute = false' in ini
 assert 'UIScalingMode = 1' in ini
 assert "'-RivalDx11NativeRoute=false'" in run
 assert "'-UIScalingMode=1'" in run
+assert "'-RivalDx11NativeRoute=false'" in profiles
+assert "'-UIScalingMode=1'" in profiles
 assert 'VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", false,' in settings
 # Keep rival on historical identity-eye/IPD math. Rank-only experiments must
 # remain guarded by exactOrdinalEyeCant, not RivalMarkerSprani token.
