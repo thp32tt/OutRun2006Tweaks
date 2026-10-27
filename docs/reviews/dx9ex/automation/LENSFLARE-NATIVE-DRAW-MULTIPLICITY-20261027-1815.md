@@ -45,7 +45,7 @@ STATIC_CONFIRMED=EXACT_ORIGINAL_RECONSTRUCTION_BRANCHES_AND_RENDER_STATES; CURRE
 1. Original reconstructed emitter `r4dius/outrun2-decomp@e1e1c592b802a6f3f7020a676abd3ba1be479e62/src/platform/race_course_passes.cpp:431-453,493-531,649-675,695-718`, blob `22985e118c172467c566fe58d5b08f280c565ee2`.
 2. Original reconstructed queue `src/platform/pc_render_queue.cpp:169-179,216-246,288-305`, blob `95e5709c69e22b5bee653786c85b86024e6fc9d1`.
 3. Original reconstructed native passes/query `src/platform/pc_render_flush.cpp:174-181,761-801,803-889,970-980,1024-1057,1081-1087`, blob `e6928a316ee4d503910cbe970b26f137e41c158e`; state IDs `src/platform/pc_d3d9_state.hpp:17-23`.
-4. Current mod C993/CABE source scopes `src/hooks_graphics.cpp:620-655,707-756,766-836,844-874`, blob `1a8b3acfcf24e2a088b6fb6b7065463abe9be737`. R30 actual L/R eye submission and stereo counters `src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp:5445-5528,5660-5731`, blob `b9a7874c36ae2e0bac48bf2cc395b1e092470a3c`. Protected baseline `0cff83cf509c2acd6f3391b3a46c4dec1403a0d9`; R84 nondefault.
+4. Current mod C993/CABE source scopes `src/hooks_graphics.cpp:620-655,707-756,766-836,844-874`, blob `1a8b3acfcf24e2a088b6fb6b7065463abe9be737`. R30 actual L/R eye submission and stereo counters `src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp:5445-5528,5660-5731`, blob `b9a7874c36ae2e0bac48bf2cc395b1c092470a3c`. Protected baseline `0cff83cf509c2acd6f3391b3a46c4dec1403a0d9`; R84 nondefault.
 
 ## EVIDENCE_GAPS / FALSIFICATION / NEXT_REVIEW
 
