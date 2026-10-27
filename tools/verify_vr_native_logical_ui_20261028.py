@@ -29,10 +29,12 @@ for token in (
     "'-SkyGlowFactor=0'",
     "'-DisableSkyGlow=true'",
     "'-MirrorPreserveAspect=false'",
-    "'-HudLogicalWidth=1920'",
-    "'-HudLogicalHeight=1080'",
 ):
     require(token, launcher, "launcher policy")
+# Launcher must not silently override F11/user.ini logical HUD canvas edits.
+for key in ("-HudLogicalWidth=", "-HudLogicalHeight="):
+    if key in launcher:
+        raise SystemExit("HUD canvas setting is command-line pinned: " + key)
 for token in (
     "PreserveLogicalBackBuffer = false",
     "DisableSkyGlow = true",
