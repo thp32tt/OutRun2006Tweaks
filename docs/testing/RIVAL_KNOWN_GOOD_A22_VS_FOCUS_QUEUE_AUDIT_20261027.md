@@ -100,3 +100,45 @@ The saved `rea-analysis/SPRITE_PIPELINE_PROVENANCE_REVIEW_20261018.md` and `REA_
 5. If only 2D original fallback renders, do not claim the original rival is stereo; seek the first point that drops its projected semantic.
 
 Everything in this section is source/static analysis or runtime instrumentation, **not Quest3 optical PASS**.
+
+## 2026-10-27 11:2x first-writer root regression identified
+
+This review now has a concrete static regression matching the user's HMD symptom and the older `registeredDelta=0` trace.
+
+### Original executable facts
+
+Ghidra export `004bb640.c` is the exact rival display loop:
+- original `0xBB6F0` calls Calc3D2D on the rival car-relative view point;
+- later original `0xBB796` calls `FUN_00429580(0x2c00cb, x, y, ordinal, 0, 0.8)`;
+- `0x429580 -> 0x428A10 -> 0x429460 -> 0x429350 -> 0x428BD0 -> 0x42D0C0`;
+- `0x42D0C0` allocates a new priority sentinel when `sprite_prio_root[prio] == 0`, then `0x42DD50` appends a `kind_C=1` animation node;
+- original queue consumer `0x42D710` sets `sprite_prio_root[prio] = 0` after consuming that priority.
+
+Therefore, a perfectly normal rival producer can enter `RivalMarker_sprani` with:
+`oldRoot == nullptr`, `oldTail == nullptr`, and leave it with a brand-new sentinel root plus one or more animation nodes.
+
+### Historical vs regressed tagging
+
+HMD-known-good `a6f8497c/a22be86a` used:
+`before[prio] ? before[prio]->next_0 : root->next_0`.
+When the priority did not exist before the rival call, this deliberately began at the new root's first child.
+
+The later safe queue proof `FirstVerifiedAppendedNode` rejects `oldTail == nullptr` before walking the current chain. That is correct for an unknown/recycled list, but it accidentally rejected this **canonical first-writer** case. Since `0x42D710` regularly nulls the root after consumption, this can repeat every frame and explains valid `Calc3D2D anchorValid=1` with zero rival node registrations.
+
+### Applied bounded recovery
+
+Current focus now uses `FirstVerifiedNewRootAppendedChain` **only** when:
+- producer is exactly `RivalMarkerSprani`;
+- pre-native `oldRoot == nullptr`;
+- pre-native `oldTail == nullptr`;
+- post-native current root/tail exist;
+- the new tail is reachable from `currentRoot->next_0` within `Game::SpriteNodeMax`;
+- the tail is terminal.
+
+It does not dereference a stale pre-native pointer and does not enable this exception for rank, GOAL, +TIME or generic HUD. `entrySerial` protects newer nested exact owners.
+
+The rival wrapper also restores historical ordering: call native sprani first, then consume `RivalMarkerProjectedInfo`, then tag the appended nodes. The later experimental GOAL D3DX pre/post flush is removed from the rival wrapper.
+
+Runtime receipt: `VR RIVAL FRESH ROOT RECOVERED` proves this exact first-writer branch was used. `VR RIVAL NATIVE QUEUE CONSUMER` plus `ProjectedMarkerProbeStage::NativeSprite` proves the recovered tag later reached original `0x42D710`.
+
+**Static confidence: high. Quest3 optical validation: UNTESTED.**
