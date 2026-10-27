@@ -40,8 +40,10 @@ assert 'ResultProgressFullParentCallB = 0x992AC' in ui
 assert 'ResultProgressFullParentTarget = 0x979E0' in ui
 assert 'nullptr, &rootsBefore, entrySerial, true);' in ui
 assert ui.count('if (self && self == submission.sprite)') >= 2
-assert 'ordinal == 2' in gfx
-assert 'VR LENS 570008 CENTER GLOW HIDDEN:' in gfx
+# Quest E deliberately restores both original 570008 children.
+assert 'VR LENS 570008 ORIGINAL BOTH DRAWN:' in gfx
+assert 'LensOuter570008Ordinal' in gfx
+assert 'if (Settings::VREnabled && objectId == 0x570008' in gfx
 assert 'ProducerToken::None);' in gfx
 assert 'VR R69 FLARE FUSION:' in r30
 print('PASS R26 XR/UI + AA2 + rival/+TIME/GOAL/lens exact-owner recovery source contract; HMD UNTESTED')
@@ -70,8 +72,9 @@ assert 'ProducerToken::ResultProgress,\n                nullptr, &rootsBefore, e
 stage_leave=ui[ui.index('static void StageExtensionLeave'):ui.index('// The original GOAL animations')]
 assert 'StageExtensionEntrySerial,\n                true' not in stage_leave
 assert 'StageExtensionEntrySerial);' in stage_leave
-# Lens: first authored 570008 stays, second near-centre duplicate is suppressed,
-# and all exact C993 centre objects share one head-corrected centre-eye matrix.
-assert 'if (ordinal == 2)' in gfx
+# Quest E restores both original 570008 draw submissions; C993 retains
+# the independent head-corrected centre-eye matrix.
+assert 'VR LENS 570008 ORIGINAL BOTH DRAWN:' in gfx
+assert 'if (ordinal == 2)' not in gfx
 assert 'identityEye = IdentityMatrix()' in r30
 assert 'mode=CENTRE_EYE_MONO_WORLD_LOCK' in r30
