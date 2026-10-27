@@ -182,7 +182,7 @@
     "C5": "NOT_REQUESTED_NO_PACKAGE",
     "C6": "SEPARATE_DOCS_ONLY_AFTER_EXACT_SHA_PASS"
   },
-  "previous_hold_reason": "NONE",
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
   "run_record_recovery": "Not a past PASS recovery: original substantive code and three inherited static validator assertion repairs under same 01107; final run evidence read live from GitHub, without any CI bypass or HMD assertion.",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
