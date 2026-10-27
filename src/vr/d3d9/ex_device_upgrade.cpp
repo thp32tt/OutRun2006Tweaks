@@ -29,6 +29,7 @@ namespace Settings
     extern Setting<bool> VREnabled;
     extern Setting<bool> VRAutoRenderResolution;
     extern Setting<bool> VRFollowGameResolution;
+    extern Setting<bool> VRPreserveLogicalBackBuffer;
     extern Setting<bool> VRUnifiedEyeMenuSource;
     extern Setting<int> VRRenderWidth;
     extern Setting<int> VRRenderHeight;
@@ -66,6 +67,7 @@ namespace OutRunVRD3D9ExUpgrade
             // source so HUD/menu/F11 layout never inherits a portrait eye size.
             if (!ex || !Settings::VREnabled ||
                 Settings::VRFollowGameResolution ||
+                Settings::VRPreserveLogicalBackBuffer ||
                 !Settings::VRPreferD3D9Ex ||
                 !params.Windowed)
                 return {};
@@ -798,6 +800,14 @@ namespace OutRunVRD3D9ExUpgrade
                 const auto xrSize = ReadyXrEyeSizeAtCreateDevice(
                     ex_, adapter, type, *params);
                 const bool bindVrSource = OutRunVR::EyeExtent::Valid(xrSize);
+                if (Settings::VREnabled && Settings::VRPreserveLogicalBackBuffer)
+                {
+                    static std::atomic<bool> visualRecoveryLogged{ false };
+                    if (!visualRecoveryLogged.exchange(true))
+                        spdlog::info(
+                            "VR VISUAL/FPS RECOVERY: preserve logical game D3D9Ex backbuffer {}x{}; OpenXR recommended physical eye swapchain remains independent (upscaled game source); native eye-sized game backbuffer opt-in by PreserveLogicalBackBuffer=false",
+                            params->BackBufferWidth, params->BackBufferHeight);
+                }
 
                 // D3DPRESENT_PARAMETERS is an in/out contract. Preserve the
                 // game's original request so a failed Ex attempt cannot poison
