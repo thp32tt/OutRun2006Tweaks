@@ -20,8 +20,13 @@ owner=cfg.split("void ApplyVrEyeResolutionAfterConfig(",1)[1].split(
     "class CommandLineArguments",1)[0]
 assert "OutRunVR::RequestVRHostStartup();" in owner
 assert "physical D3D9Ex target will use live OpenXR eye extent at CreateDevice" in owner
-assert "Game::screen_resolution->x =" not in owner
-assert "Game::screen_resolution->y =" not in owner
+# R26+HUD now explicitly locks the logical HUD/game reference at 1080p,
+# independently of physical XR eye size. Never assign portrait eye extent
+# to the original 2D/menu resolution owner.
+assert "Game::screen_resolution->x = 1920;" in owner
+assert "Game::screen_resolution->y = 1080;" in owner
+assert "Game::screen_resolution->x = static_cast<int>(xrSize.width)" not in owner
+assert "Game::screen_resolution->y = static_cast<int>(xrSize.height)" not in owner
 assert "GetTickCount64()" not in owner and "Sleep(" not in owner
 
 resolver=ex.split("OutRunVR::EyeExtent::Size ReadyXrEyeSizeAtCreateDevice(",1)[1].split(
