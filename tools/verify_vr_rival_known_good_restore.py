@@ -20,6 +20,12 @@ assert 'FlushD3DXBeforeDirectGoalSource' not in rv
 assert 'FlushD3DXAtDirectGoalSourceExit' not in rv
 assert 'rootsBefore[prio] = root;' in rv and '&rootsBefore, entrySerial' in rv
 assert 'VR RIVAL KNOWN-GOOD ORDER RESTORED:' in rv
+# Native-projector A/B may keep stock BB6F0, but BB796 ownership is
+# mandatory in both modes; otherwise all projected/fresh-root fixes are bypassed.
+assert 'BB796 ownership is NOT optional' in ui
+assert 'shared Calc3D2D + BB796 ownership hooks remain active' in ui
+assert 'if (!Settings::VRRivalDx11NativeRoute.get())\n            Memory::VP::InjectHook(\n                Module::exe_ptr(RivalMarker_SpraniCall)' not in ui
+assert 'BB796Ownership=ALWAYS' in settings
 assert 'FirstVerifiedNewRootAppendedChain' in tail
 assert 'RivalNewRootRegression' in tail
 assert 'rivalCreatedFreshRoot' in ui
@@ -103,4 +109,4 @@ for token in (
     assert token in ui, token
 assert 'VR RIVAL R84 RAW C64 PROOF:' in r84
 
-print('PASS rival known-good native-first + null-root + live DPUP/R62 probes + R30/R33 shared-c64 alignment/fence telemetry + exact D3DX queue-boundary ownership; HMD UNTESTED')
+print('PASS rival known-good BB796 ownership + native-first + null-root + live DPUP/R62 probes + R30/R33 shared-c64 alignment/fence telemetry + exact D3DX queue-boundary ownership; HMD UNTESTED')
