@@ -21,6 +21,7 @@ on:
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/d3d9/stereo_renderer_r7.inc' # Shared compositor/query-depth guards must revalidate packaged R26.
+      - 'src/vr/d3d9/stereo_renderer.cpp' # R9 mono restore failure provenance.
       - 'src/vr/game/render_semantics.hpp'
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
