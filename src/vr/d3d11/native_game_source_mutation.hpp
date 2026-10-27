@@ -228,6 +228,16 @@ struct GameNativePreDrawFills {
             staged.entries[output++] = next;
             staged.count = output;
         }
+        // A row of contiguous same-ARGB strips may later become an
+        // identical-width adjacent row. Fold the last two surviving GPU
+        // tiles recursively; only adjacent source-order overwrites can fuse.
+        while (staged.count >= 2u &&
+               staged.entries[staged.count - 2u].argb ==
+                   staged.entries[staged.count - 1u].argb &&
+               game_native_merge_ordered_overwrite(
+                   staged.entries[staged.count - 2u],
+                   staged.entries[staged.count - 1u]))
+            --staged.count;
         if (!count) {
             staged.device = currentDevice;
             staged.backbuffer = currentBackbuffer;

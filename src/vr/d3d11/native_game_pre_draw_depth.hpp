@@ -86,6 +86,15 @@ struct GameNativePreDrawDepth {
                 if(staged.count==kCapacity)return false;
                 staged.tiles[staged.count++]=next;
             }
+            // Compact consecutive rows once both have become identical
+            // rectangular strips. No cross-value/source-order merging.
+            while(staged.count>=2u &&
+                  staged.tiles[staged.count-2u].z==
+                      staged.tiles[staged.count-1u].z &&
+                  game_native_merge_ordered_overwrite(
+                      staged.tiles[staged.count-2u],
+                      staged.tiles[staged.count-1u]))
+                --staged.count;
             if(!count){staged.device=owner;staged.backbuffer=rt;staged.depth=ds;}
         }
         *this=staged;

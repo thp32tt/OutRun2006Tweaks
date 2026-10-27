@@ -9,6 +9,7 @@ src=(root/"src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 header=(root/"src/vr/d3d11/native_game_frame_batch.hpp").read_text()
 region=(root/"src/vr/d3d11/native_game_present_region.hpp").read_text()
 mutation=(root/"src/vr/d3d11/native_game_source_mutation.hpp").read_text()
+coalescing=(root/"src/vr/d3d11/native_game_pre_draw_tile_coalesce.hpp").read_text()
 observer_header=(root/"src/vr/d3d11/live_game_frame_bridge.hpp").read_text()
 r30=(root/"src/vr/d3d9/stereo_renderer_r30.cpp").read_text()
 # 00789: original D3D9 non-Draw writes must terminate only a native
@@ -87,6 +88,9 @@ with TemporaryDirectory(prefix="dx11-native-frame-") as work:
     # Portable probes are compiled against temporary mutated headers, not
     # the repository include tree; carry every legitimate new dependency.
     (folder/"native_game_source_mutation.hpp").write_text(mutation)
+    # 01104: source mutation now shares a production exact-rect coalescer;
+    # keep the portable positive/negative mutant probes compile-equivalent.
+    (folder/"native_game_pre_draw_tile_coalesce.hpp").write_text(coalescing)
     for tag,text,region_text,passes in (("positive",header,region,True),
                             ("negative_mutant",header.replace("kMaxDraws = 8u","kMaxDraws = 1u"),region,False),
                             ("full_limit_mutant",header.replace("kMaxFullFrameDraws = 4096u","kMaxFullFrameDraws = 8u"),region,False),
