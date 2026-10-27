@@ -10,8 +10,12 @@ assert "GameNativePreDrawFills::kMaxPreDrawTargetClearSourceRects" in header
 assert "n>kMaxSourceRects" in header
 assert "std::uint32_t retained=0u;" in header
 assert "if(retained>=kCapacity)return false;" in header
-assert "const Tile prior=staged.tiles[j];" in header
-assert "if(!covers(next,prior))staged.tiles[output++]=prior;" in header
+# 01106 keeps the immutable 01103 transaction staging but trims a
+# superseded outer edge exactly; interior overlaps remain ordered.
+assert "Tile prior=staged.tiles[j];" in header
+assert "if(!covers(next,prior)) {" in header
+assert "(void)game_native_trim_partially_overwritten(prior,next);" in header
+assert "staged.tiles[output++]=prior;" in header
 assert "if(staged.count==kCapacity)return false;" in header
 assert "auto staged=*this;" in header
 assert "if(staged.count && staged.tiles[staged.count-1u].z==z &&" in header
