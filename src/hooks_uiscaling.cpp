@@ -3132,8 +3132,10 @@ public:
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
         // RivalDx11NativeRoute controls only the exact BB6F0 CALL-edge
-        // wrapper. The shared 0x49940 Calc3D2D hook still observes the stock
-        // BB6F0 return at BB6F5 and captures the same rival anchor.
+        // wrapper. False is the correctness route: the wrapper carries exact
+        // rival projector identity through the SafetyHook trampoline. True is
+        // a stock-call-edge A/B only and must not be treated as equivalent
+        // anchor provenance on current SafetyHook builds.
         //
         // BB796 ownership is NOT optional: known-good a22be86a also hooks the
         // native sprani producer so that recovered ProjectedWorldMarker2D
@@ -3145,8 +3147,8 @@ public:
                 Calc3D2D_RivalExactCall, Memory::HookType::Call);
         else
             spdlog::info(
-                "VR RIVAL NATIVE: stock BB6F0 call edge retained; "
-                "shared Calc3D2D + BB796 ownership hooks remain active");
+                "VR RIVAL NATIVE A/B: stock BB6F0 call edge retained; "
+                "BB796 ownership remains active but exact-edge anchor provenance is not forced");
 		for (int addr : RankMarkerSubScreenHudCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), RankMarkerSubSemanticDest,
