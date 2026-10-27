@@ -2,9 +2,9 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01119",
   "production_id": "CONVERSION-DX11-01119",
-  "event_id": "CONVERSION-DX11-01119-E002",
+  "event_id": "CONVERSION-DX11-01119-E003",
   "event_type": "retry",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-01119",
@@ -89,7 +89,7 @@
     "C0_RECOVER": "PASS: latest d7cc3868 sealed 01118 five-gate success, no 01119 material commit found at start",
     "C1_REVIEW": "PASS: confirmed Present-time GPU pixel sampling after possible intervening native output mutations",
     "C2_IMPLEMENT": "DRAW-time GPU source snapshot, SM3/FVF integration, one-copy-per-epoch producer/consumer and portable regression",
-    "C3_VALIDATE": "First exact-SHA a3c36e8 Fast 40571023226 FAILED: positive C++17 epoch max-uint64 Present serial equals reset sentinel; repaired runtime header with explicit everQueued bit, no weakening of tests; new exact SHA Gate PENDING.",
+    "C3_VALIDATE": "Fast 40571479578 PASS at bca7462; actual OpenXR Win32 C1 40571479500 job 122426987146 FAIL C2065 undeclared game at live_game_frame_bridge.cpp:8007; cause FVF helper submit did not carry the original source game device pointer; added explicit game argument from three original caller paths, preserving SM3 source pointer. Revalidate next exact SHA.",
     "C4_COMMIT": "PENDING material GitHub commit",
     "C5_PACKAGE": "NOT_REQUIRED: diagnostic-only, no HMD/desktop distribution",
     "C6_STATE": "PENDING final exact-SHA Gate proof"
@@ -100,7 +100,7 @@
     "complete_native_frame": "UNTESTED",
     "quest3_stereo": "UNTESTED"
   },
-  "next_action": "Run five exact-SHA push Gates on repair SHA; preserve any already superseded push jobs as previous SHA results; complete C6 only on all-five success.",
+  "next_action": "Same-task C++ compile repair; verify five mandatory push Actions success on exact updated material SHA, then minimal C6 with HMD UNTESTED.",
   "ci_failures": [
     {
       "validation_bearing_sha": "a3c36e8eb103f9237eaec4a9cb6da36688131dd1",
@@ -109,8 +109,17 @@
       "failure": "tests/native_raw_gpu_source_epoch_test.cpp:30: Assertion e.can_queue(UINT64_MAX, false) failed",
       "root_cause": "UINT64_MAX sentinel collided with a legal maximal Present serial",
       "fix": "separate everQueued_ lifetime state from lastQueuedSerial_ actual value"
+    },
+    {
+      "validation_bearing_sha": "bca746209cb1beb33d7a149fd2d432bfb3f533c4",
+      "workflow": "OpenXR VR architecture",
+      "run_id": 40571479500,
+      "job_id": 122426987146,
+      "failure": "live_game_frame_bridge.cpp(8007,13): error C2065: 'game': undeclared identifier",
+      "root_cause": "FVF submit(State&,...) helper lacks source game COM pointer unlike SM3; added GPU sampling call used unbound game variable",
+      "fix": "thread original observer IDirect3DDevice9* game explicitly through FVF submit signature and all three callers"
     }
   ],
   "fix_type": "SOURCE_CAUSAL_REPAIR",
-  "repair_parent_sha": "a3c36e8eb103f9237eaec4a9cb6da36688131dd1"
+  "repair_parent_sha": "bca746209cb1beb33d7a149fd2d432bfb3f533c4"
 }
