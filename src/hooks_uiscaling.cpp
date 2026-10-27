@@ -31,6 +31,7 @@ namespace Settings
     extern Setting<bool> VRRivalDx11NativeRoute;
     extern Setting<bool> VRRankDesktopLift;
     extern Setting<bool> VRHud1080pReference;
+    extern Setting<bool> VRPreserveLogicalBackBuffer;
 	Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,
 		"Adjusts the UI scaling applied by the game.",
 		{ "Vanilla, stretches to screen ratio", "Scaled UI, no stretching (Outrun Online Arcade)",
@@ -575,9 +576,68 @@ class UIScaling : public Hook
             }
             // The old owned D3DX path never promoted nullable/rotation-only
             // matrices and never applied a second 4:3 optical affine.
-            return D3DXMatrixTransformation2D.stdcall<int>(
+            const int result = D3DXMatrixTransformation2D.stdcall<int>(
                 pOut, pScalingCenter, pScalingRotation,
                 inputScale, pRotationCenter, Rotation, inputTranslation);
+
+            // 2026-10-28 Quest3: original title and HUD sprites were emitted
+            // in logical 1920x1080 pixels while the game backbuffer was
+            // native 2496x2688. With no final mapping, all flat sprites
+            // appear in the upper left. Rescale ONLY proven 2D producers
+            // into a centered, aspect-preserving physical viewport.
+            // Never move rival/rank 3D anchors, sun, flare or world billboards.
+            if (result && pOut && !Settings::VRPreserveLogicalBackBuffer &&
+                Game::screen_resolution)
+            {
+                const bool frontEnd = Game::current_mode &&
+                    (*Game::current_mode == GameState::STATE_TITLE ||
+                     *Game::current_mode == GameState::STATE_MENU ||
+                     *Game::current_mode == GameState::STATE_SELECTOR ||
+                     *Game::current_mode == GameState::STATE_SELEXIT ||
+                     *Game::current_mode == GameState::STATE_SELRESET);
+                const auto semantic = OutRunVR::GameSemantic::EffectiveScope();
+                const bool provenScreen2D = frontEnd ||
+                    OutRunVR::GameSemantic::CorroboratesHud(semantic) ||
+                    OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(semantic);
+                if (provenScreen2D)
+                {
+                    IDirect3DDevice9* device = Game::D3DDevice();
+                    D3DVIEWPORT9 vp{};
+                    if (device && SUCCEEDED(device->GetViewport(&vp)) &&
+                        vp.X == 0 && vp.Y == 0 &&
+                        vp.Width >= 640 && vp.Height >= 480)
+                    {
+                        const float logicalW = Game::screen_resolution->x;
+                        const float logicalH = Game::screen_resolution->y;
+                        if (std::isfinite(logicalW) &&
+                            std::isfinite(logicalH) &&
+                            logicalW >= 640.0f && logicalH >= 480.0f &&
+                            (static_cast<float>(vp.Width) != logicalW ||
+                             static_cast<float>(vp.Height) != logicalH))
+                        {
+                            const auto map = OutRunVR::LogicalUI::Contain(
+                                static_cast<float>(vp.Width),
+                                static_cast<float>(vp.Height),
+                                logicalW, logicalH);
+                            if (map.valid &&
+                                pOut->_44 == 1.0f &&
+                                pOut->_14 == 0.0f &&
+                                pOut->_24 == 0.0f)
+                            {
+                                // D3DX uses row-vector affine matrices:
+                                // translate AFTER uniform scale, never before.
+                                pOut->_11 *= map.scale;
+                                pOut->_12 *= map.scale;
+                                pOut->_21 *= map.scale;
+                                pOut->_22 *= map.scale;
+                                pOut->_41 = pOut->_41 * map.scale + map.x;
+                                pOut->_42 = pOut->_42 * map.scale + map.y;
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
         }
 		// D3DX treats these input vectors as read-only. The game may reuse
 		// the same source sprite matrix across menu/car-selection draws;
