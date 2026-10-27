@@ -81,6 +81,10 @@ try {
             if ($_ -eq '-FollowGameResolution=false') { '-FollowGameResolution=true' }
             else { $_ }
         })
+        # FollowGameResolution=true alone could select the desktop's 3440x1440
+        # AutoDetectResolution. Explicit original-game CLI dimensions keep
+        # this A/B control at actual 1920x1080 independent of desktop.
+        $argsList += @('-width','1920','-height','1080')
         Write-Host '[A/B] Native game 1080p backbuffer preserved; XR transport scales to headset extent.'
     }
     @("recoveryBackbufferAB=$recovery1080",
