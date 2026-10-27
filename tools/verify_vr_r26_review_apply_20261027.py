@@ -65,6 +65,18 @@ def rejects(check, source: str, before: str, after: str) -> None:
     raise AssertionError("unsafe mutation survived: " + before)
 
 
+def rejects_in_function(check, source: str, signature: str,
+                        before: str, after: str) -> None:
+    fn = function_block(source, signature)
+    assert before in fn, "function mutation anchor missing: " + before
+    mutant = source.replace(fn, fn.replace(before, after, 1), 1)
+    try:
+        check(mutant)
+    except (AssertionError, ValueError):
+        return
+    raise AssertionError("unsafe function mutation survived: " + before)
+
+
 def main() -> None:
     r30 = R30_PATH.read_text(encoding="utf-8")
     r7 = R7_PATH.read_text(encoding="utf-8")
@@ -73,10 +85,10 @@ def main() -> None:
     rejects(verify_r30, r30, "R9NoteStereoDrawWithoutMonoBackup();", "/* missing R9 gap */")
     rejects(verify_r30, r30, "R9NoteMainDepthContentWrite();", "/* missing R9 depth serial */")
     rejects(verify_r30, r30, "return E_NOTIMPL;\n            }\n\n            // The first physical LEFT Draw", "return E_NOTIMPL;\n            }\n\n            R9NoteStereoDrawWithoutMonoBackup();\n            // The first physical LEFT Draw")
-    rejects(verify_r30, r30, "R9Poison(OutRunVR::StereoFailureRestoreFailed,", "/* failure not poisoned */ (")
-    rejects(verify_r7, r7, "if(StereoWanted()&&TargetIsBackBuffer())", "if(StereoWanted()&&TargetIsBackBuffer()&&!occlusionActive)")
-    rejects(verify_r7, r7, "InvalidateRightDepthStencilIfLeftMayWrite(device);\n\t\t\t\treturn drawCall();", "/* omitted invalidation */\n\t\t\t\treturn drawCall();")
-    rejects(verify_r7, r7, "ActiveOcclusionQueries.load(std::memory_order_acquire)>0", "false")
+    rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9Poison(OutRunVR::StereoFailureRestoreFailed,", "/* failure not poisoned */ (")
+    rejects_in_function(verify_r7, r7, "HRESULT ExecuteStereoDraw(", "if(StereoWanted()&&TargetIsBackBuffer())", "if(StereoWanted()&&TargetIsBackBuffer()&&!occlusionActive)")
+    rejects_in_function(verify_r7, r7, "HRESULT ExecuteStereoDraw(", "InvalidateRightDepthStencilIfLeftMayWrite(device);\n\t\t\t\treturn drawCall();", "/* omitted invalidation */\n\t\t\t\treturn drawCall();")
+    rejects_in_function(verify_r7, r7, "bool PrepareDuplicatedDraw(", "ActiveOcclusionQueries.load(std::memory_order_acquire)>0", "false")
     print("PASS R26 01521 R9 WVP fallthrough + 01516 R7 query-depth guard; 7 destructive mutations")
     print("RUNTIME_VALIDATION=UNTESTED")
 
