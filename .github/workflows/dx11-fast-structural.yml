@@ -681,6 +681,7 @@ jobs:
           # 01122: failed SM3 Draw cannot lend its pre-copy to a later Draw;
           # count only genuine paired GPU post-copies and preserve D3D9 fallback.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_draw_pair_test.cpp -o /tmp/dx11_raw_draw_pair_01122 && /tmp/dx11_raw_draw_pair_01122
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_present_coverage_test.cpp -o /tmp/dx11_raw_present_01123 && /tmp/dx11_raw_present_01123
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
           # Native L/R partial-depth GPU Draw is a separate non-evidence

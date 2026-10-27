@@ -76,6 +76,7 @@
 #include "native_game_cpu_upload_transaction.hpp"
 #include "native_game_shared_desktop_admission.hpp"
 #include "native_game_raw_visual_diagnostic.hpp"
+#include "native_game_raw_present_coverage.hpp"
 #include "native_game_raw_source_probe.hpp"
 #include "native_game_frame_upload.hpp"
 #include "native_game_dirty_region.hpp"
@@ -11266,9 +11267,15 @@ void before_game_present(IDirect3DDevice9* game,
                 }
             }
         } else if (s.pending) ++s.failed;
-        // RAW preview is independently owned and intentionally NOT a native
-        // complete frame. It can sample a genuine DX11 Draw which preceded a
-        // later rejected source draw, while production publication stays shut.
+        // RAW preview owns a diagnostic tile, not a native full frame. Unlike
+        // full-frame publication, only its small destination requires a
+        // verified source-crop repaint. Accept full/cropped/partitioned dirty
+        // regions only after the existing bounded coverage checks above;
+        // malformed/partial/unknown dirty lists cannot show an invisible or
+        // unowned GPU tile. The D3D9 Draw/Present and input stay authoritative.
+        const bool rawPresentCovered = native_raw_preview_present_coverage(
+            dirtyRegion != nullptr, fullDirtyCoverage,
+            cropDirtyCoverage, partitionCropCoverage);
         if (rawVisual && monoNativePublicationAllowed && backbufferKnown &&
             s.sourceGameDevice == presentDevice && s.backend.ready()) {
             UINT rawChangedPixels = 0u;
@@ -11276,7 +11283,7 @@ void before_game_present(IDirect3DDevice9* game,
             ScopedNativeGameGpuTransferOutputs saveOutputs(s.backend.context());
             const auto status = s.rawPreview.present(
                 game, presentBackbuffer.Get(), presentDesc, sourceRect,
-                dirtyRegion != nullptr, s.backend.device(), s.backend.context(),
+                rawPresentCovered, s.backend.device(), s.backend.context(),
                 s.backend.color_texture(), s.issued, rawChangedPixels);
             if (status == NativeRawPreviewResult::VisibleGpuPixels) {
                 ++s.rawPreviewFrames;
