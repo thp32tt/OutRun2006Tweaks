@@ -81,7 +81,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "activation_guard_and_fallback": "Native game renderer stays opt-in/fail-closed; original D3D9 and DX9Ex Draw/Present/input/FFB/SkyGlow remain authoritative; DXVK frozen.",
-    "visible_frame_acceptance": "Actual OutRun menu/car/race, native game draw count, published frame count, Quest3/VDXR visual output and FPS UNTESTED."
+    "visible_frame_acceptance": "Actual OutRun menu/car/race, native game draw count, published frame count, Quest3/VDXR visual output and FPS UNTESTED.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "acceptance_results": {
     "multi_rect_source_replay": {
@@ -90,14 +95,16 @@
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d11/native_game_source_mutation.hpp",
         "tools/dx11_pre_draw_target_clear_probe_01035.cpp"
-      ]
+      ],
+      "validation_command": "python tools/test_dx11_pre_draw_target_clear_01035.py && g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_target_clear_probe_01035.cpp -o /tmp/dx11_pre_draw_01035 && /tmp/dx11_pre_draw_01035"
     },
     "rollback_and_post_draw_cap": {
       "status": "PASS_BUILD",
       "evidence_paths": [
         "tools/dx11_pre_draw_target_clear_probe_01035.cpp",
         "tools/test_dx11_pre_draw_target_clear_01035.py"
-      ]
+      ],
+      "validation_command": "python tools/test_dx11_pre_draw_target_clear_01035.py && g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_target_clear_probe_01035.cpp -o /tmp/dx11_pre_draw_01035 && /tmp/dx11_pre_draw_01035"
     },
     "required_exact_sha_gates": {
       "status": "PASS_EXACT_SHA",
@@ -107,7 +114,8 @@
         "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40421027713",
         "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40421027716",
         "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40421027823"
-      ]
+      ],
+      "validation_command": "GitHub REST GET actions/runs/{40421027707,40421027838,40421027713,40421027716,40421027823}; confirm all completed/success with event=push and head_sha=1647b8321a55793355812b064c920cc84b146622"
     }
   },
   "pipeline": {
