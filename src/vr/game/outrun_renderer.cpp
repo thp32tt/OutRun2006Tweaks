@@ -2032,6 +2032,29 @@ namespace OutRunVRRenderer
 				!OutRunVR::GameSemantic::QueueRenderActive() &&
 				OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(
 					semanticScope);
+            // This is a game c64 upload, not an object-to-GPU Draw join.
+            // Sampling the native-vs-injection decision distinguishes the
+            // pre-R30 camera-sync fork without mutating shader constants.
+            if (Settings::VRTelemetry &&
+                OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(
+                    semanticScope))
+            {
+                static std::atomic<std::uint64_t> lensUploads{0};
+                const auto n = lensUploads.fetch_add(1,
+                    std::memory_order_relaxed) + 1;
+                if (n <= 32 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS GAME C64 GATE: sample={} serial={} "
+                        "start={} vectors={} scope={} queue={} "
+                        "cameraOverridden={} projectedRawEligible={} "
+                        "physicalDraw=UNLINKED nativeResult=NOT_YET_OBSERVED",
+                        n, OutRunVRStereo::GetTopLevelDrawSerial(),
+                        startRegister, vector4fCount,
+                        OutRunVR::GameSemantic::Name(semanticScope),
+                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                        CullingCameraOverridden ? 1 : 0,
+                        projectedLensWithSyncedCamera ? 1 : 0);
+            }
 			const bool semanticOverlay =
 				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
 				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
