@@ -204,7 +204,8 @@ def main() -> None:
 
     # Fixed-function modifiers (COMPLEMENT/ALPHAREPLICATE) change the
     # stage-0 color even when the SELECTMASK bits still equal DIFFUSE.
-    # Fog stays unsupported; scissor is mapped in a separate native raster path.
+    # Active Fog stays unsupported; NONE/NONE source equations are inert even
+    # with an inherited RANGEFOGENABLE. Scissor uses the native raster path.
     # Static negative controls are not live-device parity evidence.
     def exact_diffuse_state_gate(code: str) -> bool:
         start = code.find("bool supported_game_state(")
@@ -217,7 +218,11 @@ def main() -> None:
             "nextColorOp, layout.hasDiffuse",
             "GetRenderState(D3DRS_FOGENABLE, &fog)",
             "GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
-            "!clip || fog || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame)",
+            "!clip || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame)",
+            "GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)",
+            "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)",
+            "native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
+            "if (!sourceFogInactive) return false;",
             "const auto polygonMode = game_sm3_effective_polygon_mode(",
             "if (!polygonMode.admitted ||",
             "(!fullFrame && fillMode != D3DFILL_SOLID))",
@@ -242,6 +247,14 @@ def main() -> None:
          "if (false && !game_fvf_untextured_stage0("),
         ("GetRenderState(D3DRS_FOGENABLE, &fog)",
          "GetRenderState(D3DRS_FOGENABLE, &clip)"),
+        ("GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)",
+         "GetRenderState(D3DRS_FOGTABLEMODE, &clip)"),
+        ("GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)",
+         "GetRenderState(D3DRS_FOGVERTEXMODE, &clip)"),
+        ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
+         "true /* unchecked active fog */"),
+        ("if (!sourceFogInactive) return false;",
+         "/* failed source fog fallback removed */"),
         ("GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
          "GetRenderState(D3DRS_SCISSORTESTENABLE, &clip)"),
         ("const auto polygonMode = game_sm3_effective_polygon_mode(",

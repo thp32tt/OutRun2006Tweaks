@@ -26,7 +26,11 @@ def valid(bridge,hook,guard):
       "GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)" in raster,
       "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)" in raster,
       "stencil_equivalent_to_disabled(" in raster,
-      "!clip || fog || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame)" in raster,
+      "!clip || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame)" in raster,
+      "GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)" in raster,
+      "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)" in raster,
+      "native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)" in raster,
+      "if (!sourceFogInactive) return false;" in raster,
       "const auto polygonMode = game_sm3_effective_polygon_mode(" in raster,
       "if (!polygonMode.admitted ||" in raster,
       "(!fullFrame && fillMode != D3DFILL_SOLID))" in raster,
@@ -71,6 +75,19 @@ unsafeRaster = prefix + rasterStart + raster.replace(
     "stencil_equivalent_to_disabled(",
     "stencil_unconditionally_ignored(", 1) + rasterEnd + suffix
 assert not valid(unsafeRaster, h, g)
+# Do not accept active fixed-function fog or a failed getter as if the
+# inherited source RANGEFOG were a proven inactive equation.
+for token, disabled in (
+    ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
+     "true /* unchecked active fog */"),
+    ("if (!sourceFogInactive) return false;",
+     "/* lost live source fog fallback */"),
+    ("GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)",
+     "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceTableFog)"),
+):
+    assert token in raster
+    unsafe = prefix + rasterStart + raster.replace(token, disabled, 1) + rasterEnd + suffix
+    assert not valid(unsafe, h, g), token
 assert not valid(b,h,g.replace("sameMainDepthStencil && fullClearCoverage && nativeBatchOpen;","true; /* unproved */"))
 assert not valid(b,h.replace("live_game_frame::observe_game_depth_clear(","live_game_frame::skip_clear(",1),g)
 print("00781 real game main STENCIL, Z|STENCIL, menu-race Draw+Present fallback PASS")
