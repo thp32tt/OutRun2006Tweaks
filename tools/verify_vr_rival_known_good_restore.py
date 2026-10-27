@@ -26,6 +26,7 @@ assert 'BB796 ownership is NOT optional' in ui
 assert 'BB796 ownership remains active but exact-edge anchor provenance is not forced' in ui
 assert 'if (!Settings::VRRivalDx11NativeRoute.get())\n            Memory::VP::InjectHook(\n                Module::exe_ptr(RivalMarker_SpraniCall)' not in ui
 assert 'stockProjectorAB={} exactEdge={} BB796Ownership=ALWAYS' in settings
+assert 'VR RIVAL BB796 OWNERSHIP: installed=1 exactEdge={} stockProjectorAB={}' in ui
 assert 'FirstVerifiedNewRootAppendedChain' in tail
 assert 'RivalNewRootRegression' in tail
 assert 'rivalCreatedFreshRoot' in ui
