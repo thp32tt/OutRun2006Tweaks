@@ -3329,14 +3329,37 @@ def check_r30_pre_draw_accounting(xyz, shader):
     ):
         if 'R29OwnerUndoStereoDrawCount(' in body:
             raise SystemExit(f'{label}: retired pre-GPU rollback returned')
+        expected_accounting = 2 if label == 'R30 XYZRHW/FVF142' else 1
         for token in ('R29OwnerNoteStereoDrawWithoutMonoBackup();',
                       'R29OwnerNoteMainDepthContentWrite();'):
-            if body.count(token) != 1:
+            if body.count(token) != expected_accounting:
                 raise SystemExit(f'{label}: missing/duplicated physical accounting {token}')
-        require_order(body, label + ' source/WVP before GPU accounting',
-                      start,
-                      'R29OwnerNoteStereoDrawWithoutMonoBackup();',
-                      'R29OwnerNoteMainDepthContentWrite();', draw)
+        if label == 'R30 XYZRHW/FVF142':
+            # DynamicVB may fail SetStreamSource before a physical LEFT Draw.
+            # R30 therefore has two mutually exclusive accounting sites:
+            # immediate for ordinary sources, deferred until the attempt bit
+            # proves LEFT actually reached the driver.
+            for token in (
+                'const bool deferLeftAccounting =',
+                'if (!deferLeftAccounting)',
+                'const bool leftWasPhysicallyAttempted =',
+                'if (deferLeftAccounting && leftWasPhysicallyAttempted)',
+                'if (!leftWasPhysicallyAttempted)',
+            ):
+                require(token, body, label + ' deferred physical accounting')
+            if body.index('R29OwnerNoteStereoDrawWithoutMonoBackup();') < body.index(start):
+                raise SystemExit(label + ': accounting moved before exact source proof')
+            require_order(body, label + ' source/proof before ordinary LEFT accounting',
+                          start, 'if (!deferLeftAccounting)',
+                          'R29OwnerNoteStereoDrawWithoutMonoBackup();', draw)
+            require_order(body, label + ' attempted LEFT before deferred accounting',
+                          draw, 'const bool leftWasPhysicallyAttempted =',
+                          'if (deferLeftAccounting && leftWasPhysicallyAttempted)')
+        else:
+            require_order(body, label + ' source/WVP before GPU accounting',
+                          start,
+                          'R29OwnerNoteStereoDrawWithoutMonoBackup();',
+                          'R29OwnerNoteMainDepthContentWrite();', draw)
     if 'R29OwnerUndoStereoDrawCount();' in shader:
         raise SystemExit('R30 shader: pre-GPU rollback must not undo a non-existent Draw')
     failed_upload = shader[shader.index('if (!leftWvpOk)'):]
