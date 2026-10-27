@@ -209,9 +209,46 @@ def test_native_sm3_reject_diagnostics():
             source.replace(old, bad, 1)), reason)
 
 
+def test_raw_visual_native_source_contract():
+    """A partial RAW tile must not enable production-frame publication."""
+    root = Path(__file__).resolve().parents[1]
+    source = (root / "src" / "vr" / "d3d11" /
+              "live_game_frame_bridge.cpp").read_text(encoding="utf-8")
+    header = (root / "src" / "vr" / "d3d11" /
+              "native_game_raw_visual_diagnostic.hpp").read_text(encoding="utf-8")
+    for required in (
+        'GetEnvironmentVariableW(L"OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC"',
+        "return env_full_game_opt_in() &&",
+        "const bool currentFullFrameComplete = !rawVisual &&",
+        "source_RT_authentic=1 full_frame_coverage=NO",
+        "s.frameBatch.sourceEpochStart = sourceOrdinal;",
+        "s.rawPreview.present(",
+        "if (rawVisual && monoNativePublicationAllowed && backbufferKnown &&",
+        "DX11_VISUAL_MISMATCH_FOG",
+        "native_gpu_pixel_output={}",
+    ):
+        if required not in source:
+            raise AssertionError("RAW native source safety missing: " + required)
+    for required in (
+        "D3D11_MAP_FLAG_DO_NOT_WAIT",
+        "D3D11_ASYNC_GETDATA_DONOTFLUSH",
+        "GetDevice(actual.GetAddressOf())",
+        "CopySubresourceRegion(",
+        "NativeRawPreviewResult::VisibleGpuPixels",
+        "D3DPOOL_SYSTEMMEM",
+        "D3DFMT_X8R8G8B8",
+        "D3DFMT_A8R8G8B8",
+        "dst[x*4u] = 255",
+    ):
+        if required not in header:
+            raise AssertionError("RAW preview independent GPU tile missing: " + required)
+
+
 def main():
     a = "a" * 40
-    game = fake_pe(0x14c, 1000500, MARKER + "OUTRUN_DX11_FULL_GAME_FRAME".encode("utf-16-le"))
+    game = fake_pe(0x14c, 1000500, MARKER +
+                   "OUTRUN_DX11_FULL_GAME_FRAME".encode("utf-16-le") +
+                   "OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC".encode("utf-16-le"))
     host = fake_pe(0x8664, 12000)
     runner = (b"$variant = ($variantLine -split '=',2)[1].Trim()\n"
               b"Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8\n"
@@ -225,6 +262,10 @@ def main():
     must_fail(lambda: construct(game.replace("OUTRUN_DX11_FULL_GAME_FRAME".encode("utf-16-le"),
                                              b"x"*len("OUTRUN_DX11_FULL_GAME_FRAME".encode("utf-16-le"))),
                                 *args[1:]), "full-frame marker absent")
+    must_fail(lambda: construct(game.replace(
+                  "OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC".encode("utf-16-le"),
+                  b"x"*len("OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC".encode("utf-16-le"))),
+                  *args[1:]), "raw visual source marker absent")
     must_fail(lambda: construct(*args[:-1], "bad"), "invalid identity")
     must_fail(lambda: construct(*args[:4], b"renamed collector", *args[5:]),
               "changed log collector cannot silently lose session labels")
@@ -244,6 +285,13 @@ def main():
     assert b"OUTRUN_DX11_FIRST_GAME_FRAME=1" in payload["RUN_DX11_FIRST_GAME_FRAME.cmd"]
     assert b"OUTRUN_DX11_FULL_GAME_FRAME=1" in payload["RUN_DX11_FIRST_GAME_FRAME.cmd"]
     assert b'OUTRUN_DX11_GPU_SHARED_DESKTOP=1' in payload["RUN_DX11_GPU_DESKTOP.cmd"]
+    raw_visual = payload["RUN_DX11_RAW_VISUAL.cmd"]
+    assert b'OUTRUN_DX11_FIRST_GAME_FRAME=1' in raw_visual
+    assert b'OUTRUN_DX11_FULL_GAME_FRAME=1' in raw_visual
+    assert b'OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC=1' in raw_visual
+    assert b'OUTRUN_DX11_TEST_CASE=RAW_VISUAL' in raw_visual
+    assert b'OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC="' in payload["RUN_DX9EX_CONTROL.cmd"]
+    assert b'OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC="' in payload["RUN_DX11_FIRST_GAME_FRAME.cmd"]
     assert b'OUTRUN_DX11_TEST_CASE=NATIVE_GPU_DESKTOP' in payload["RUN_DX11_GPU_DESKTOP.cmd"]
     assert b'OUTRUN_DX11_GPU_SHARED_DESKTOP="' in payload["RUN_DX11_FIRST_GAME_FRAME.cmd"]
     assert b'OUTRUN_DX11_GPU_SHARED_DESKTOP="' in payload["RUN_DX9EX_CONTROL.cmd"]
@@ -255,6 +303,11 @@ def main():
     assert packaged_runner.count(b'$variant = "${variant}-${dx11TestCase}"') == 1
     assert b"OUTRUN_DX11_TEST_CASE" in packaged_runner
     assert b"DX11_NATIVE_EVIDENCE.txt" in packaged_runner
+    assert b"DX11_RAW_VISUAL_EVIDENCE.txt" in packaged_runner
+    assert b"$rawDraws -gt 0" in packaged_runner
+    assert b"$rawPixels -gt 0" in packaged_runner
+    assert b"$rawFrames -gt 0" in packaged_runner
+    assert b"NO_RAW_NATIVE_GPU_TILE_EVIDENCE" in packaged_runner
     assert b"$dx11TestCase -ne 'NATIVE_FULL_FRAME'" in packaged_runner
     assert b"$dx11TestCase -ne 'NATIVE_GPU_DESKTOP'" in packaged_runner
     assert b"gpuDesktopFrames -gt 0" in packaged_runner
@@ -272,6 +325,8 @@ def main():
     assert b"published -gt 0" in packaged_runner
     assert b"throw 'DX11 full native game frame NOT observed" in packaged_runner
     assert b"D3D11 -> CPU -> D3D9 Present" in payload["DX11_TEST_README.txt"]
+    assert b"Never treat a RAW tile as a full native frame" in payload["DX11_TEST_README.txt"]
+    assert "RAW_VISUAL" in json.loads(payload["BUILD_IDENTITY.json"])["available_test_modes"]
     assert b"D3D11 -> shared resource -> D3D9Ex Present" in payload["DX11_TEST_README.txt"]
     assert b"-Stereo=false" in payload["DX11_TEST_README.txt"]
     assert b"-antialiasing 0" in payload["DX11_TEST_README.txt"]
@@ -286,6 +341,7 @@ def main():
     test_bundle_ci_route()
     test_native_mono_shadow_capture_source()
     test_native_sm3_reject_diagnostics()
+    test_raw_visual_native_source_contract()
     print("DX11 first-game-frame packaging PE/SHA/tamper/opt-in tests: PASS (synthetic)")
 
 

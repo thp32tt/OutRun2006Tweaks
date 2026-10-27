@@ -1370,6 +1370,8 @@ struct State {
     std::uint64_t rawPreviewFrames = 0u;
     std::uint64_t rawPreviewCopies = 0u;
     std::uint64_t rawFogVisualBypasses = 0u;
+    bool rawProbeAttemptedThisFrame = false;
+    std::uint64_t rawProbeRestarts = 0u;
     // Persistent native D3D11 upload buffers for a whole real game frame.
     // Re-upload every Draw to preserve game-authored mutable VB/IB content.
     ComPtr<ID3D11Buffer> fullGameVertexUpload;
@@ -8280,8 +8282,47 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // No later draw can revive it before a new true Clear or Present.
         // Skip expensive repeated SM3 conversion but preserve D3D9 drawing.
         if (fullMode && s.frameBatch.stopped) {
-            ++s.skippedPoisonedDraws;
-            return;
+            // Production never revives a poisoned full source frame. RAW is
+            // a separate partial GPU pixel probe: one bounded real original
+            // source Draw per Present after an earlier unsupported Draw.
+            // Sample different positions across menu, car and race calls.
+            const bool rawProbe = env_raw_visual_opt_in() &&
+                !s.rawProbeAttemptedThisFrame &&
+                sourceOrdinal >= (s.presents % 24u) * 64u;
+            if (!rawProbe) {
+                ++s.skippedPoisonedDraws;
+                return;
+            }
+            s.rawProbeAttemptedThisFrame = true;
+            ComPtr<IDirect3DSurface9> currentTarget, gameBackbuffer;
+            ComPtr<IUnknown> currentIdentity, backIdentity;
+            if (FAILED(game->GetRenderTarget(
+                    0u, currentTarget.GetAddressOf())) || !currentTarget ||
+                FAILED(game->GetBackBuffer(
+                    0u, 0u, D3DBACKBUFFER_TYPE_MONO,
+                    gameBackbuffer.GetAddressOf())) || !gameBackbuffer ||
+                FAILED(currentTarget.As(&currentIdentity)) ||
+                FAILED(gameBackbuffer.As(&backIdentity)) ||
+                !currentIdentity || currentIdentity.Get() != backIdentity.Get() ||
+                !s.clearColor.matches(
+                    reinterpret_cast<std::uintptr_t>(game),
+                    reinterpret_cast<std::uintptr_t>(currentIdentity.Get()))) {
+                ++s.skippedPoisonedDraws;
+                return;
+            }
+            // Fresh diagnostic-only native source epoch. No full-scene or
+            // VR publication credit; ALL later source identity/RT/DS/VS/PS
+            // and GPU lifetime checks remain unchanged.
+            s.frameBatch.reset();
+            s.frameBatch.sourceEpochStart = sourceOrdinal;
+            s.pending = false;
+            ++s.rawProbeRestarts;
+            if (s.rawProbeRestarts <= 3u ||
+                s.rawProbeRestarts % 512u == 0u)
+                spdlog::info(
+                    "DX11 RAW_VISUAL sampled_source_ordinal={} raw_restarts={} "
+                    "source_RT_authentic=1 full_frame_coverage=NO",
+                    sourceOrdinal, s.rawProbeRestarts);
         }
         const bool multiBatch = fullMode || env_batch_opt_in();
         // A successful zero-primitive game Draw changes no target pixels.
@@ -10175,6 +10216,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.surfaceReplayBudget.reset(); // a new verified full Clear starts a new source epoch
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
+        s.rawProbeAttemptedThisFrame = false;
     s.sourceModeKnown = false;
             s.eligibleThisFrame = 0u;
             // After a successful full TARGET|ZBUFFER game Clear, initialize
@@ -11206,6 +11248,7 @@ void before_game_present(IDirect3DDevice9* game,
             s.probeSlot, s.eligibleThisFrame);
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
+        s.rawProbeAttemptedThisFrame = false;
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
         s.surfaceReplayBudget.reset();
@@ -11256,6 +11299,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.cpuSurfaceReplay.reset();
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
+        s.rawProbeAttemptedThisFrame = false;
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
         s.surfaceReplayBudget.reset();

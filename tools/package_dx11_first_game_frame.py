@@ -15,6 +15,7 @@ MARKER = b"DX11 FIRST_GAME_DRAW_FRAME progress:"
 REQUIRED = ("dinput8.dll", "outrun-vr-host.exe", "OutRun2006Tweaks.ini",
             "OutRun2006Tweaks.lods.ini", "Run-DX9ExFocusTest.ps1",
             "RUN_DX11_FIRST_GAME_FRAME.cmd", "RUN_DX11_GPU_DESKTOP.cmd",
+            "RUN_DX11_RAW_VISUAL.cmd",
             "RUN_DX9EX_CONTROL.cmd",
             "DX9EX_VARIANT.txt", "DX11_TEST_README.txt", "BUILD_IDENTITY.json")
 
@@ -41,7 +42,8 @@ def session_labeled_runner(runner):
         b"\n$dx11TestCase = $env:OUTRUN_DX11_TEST_CASE\n"
         b"if ($dx11TestCase -ne 'CONTROL' -and "
         b"$dx11TestCase -ne 'NATIVE_FULL_FRAME' -and "
-        b"$dx11TestCase -ne 'NATIVE_GPU_DESKTOP') { "
+        b"$dx11TestCase -ne 'NATIVE_GPU_DESKTOP' -and "
+        b"$dx11TestCase -ne 'RAW_VISUAL') { "
         b"throw 'DX11 test session selector missing or invalid' }\n"
         b'$variant = "${variant}-${dx11TestCase}"'
     )
@@ -126,16 +128,56 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -or $dx11TestCase -eq 'NATIVE_GPU_DESK
     ) | Set-Content (Join-Path $session 'DX11_NATIVE_EVIDENCE.txt') -Encoding UTF8
 }
 """.encode("ascii")
+    raw_evidence = r"""
+$rawVisualEvidenceOk = $false
+if ($dx11TestCase -eq 'RAW_VISUAL') {
+    $rawPixels = 0L
+    $rawFrames = 0L
+    $rawDraws = 0L
+    foreach ($file in @(Get-ChildItem -Path $session -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue)) {
+        foreach ($line in [System.IO.File]::ReadLines($file.FullName)) {
+            $progress = [regex]::Match($line, 'DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws=\d+ native_draws=(\d+)')
+            if ($progress.Success) { $rawDraws = [Math]::Max($rawDraws, [long]$progress.Groups[1].Value) }
+            $sample = [regex]::Match($line, 'DX11 RAW_VISUAL native_gpu_pixel_output=(\d+) magenta_preview_frames=(\d+) gpu_tile_copies=\d+ native_draws=(\d+)')
+            if ($sample.Success) {
+                $rawPixels = [Math]::Max($rawPixels, [long]$sample.Groups[1].Value)
+                $rawFrames = [Math]::Max($rawFrames, [long]$sample.Groups[2].Value)
+                $rawDraws = [Math]::Max($rawDraws, [long]$sample.Groups[3].Value)
+            }
+        }
+    }
+    $rawVisualEvidenceOk = $env:OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC -eq '1' -and
+        $env:OUTRUN_DX11_FIRST_GAME_FRAME -eq '1' -and
+        $env:OUTRUN_DX11_FULL_GAME_FRAME -eq '1' -and
+        $rawDraws -gt 0 -and $rawPixels -gt 0 -and $rawFrames -gt 0
+    $rawVerdict = if ($rawVisualEvidenceOk) { 'RAW_NATIVE_GPU_TILE_VISIBLE' }
+        else { 'NO_RAW_NATIVE_GPU_TILE_EVIDENCE' }
+    @(
+        "verdict=$rawVerdict",
+        "testCase=RAW_VISUAL",
+        "nativeDraws=$rawDraws",
+        "nativeGpuPixelExtent=$rawPixels",
+        "magentaTileFrames=$rawFrames",
+        "fullNativeFrame=NOT_CLAIMED",
+        "nativeOpenXR=NOT_CLAIMED",
+        "quest3Stereo=UNTESTED",
+        "note=Only a partial bounded native GPU tile; not complete scene, not HMD PASS"
+    ) | Set-Content (Join-Path $session 'DX11_RAW_VISUAL_EVIDENCE.txt') -Encoding UTF8
+}
+""".encode("ascii")
     failure = b"\nif (($dx11TestCase -eq 'NATIVE_FULL_FRAME' -or $dx11TestCase -eq 'NATIVE_GPU_DESKTOP') -and -not $nativeFrameEvidenceOk) { Write-Host ('Evidence log ZIP preserved: ' + $zip); throw 'DX11 full native game frame NOT observed; examine DX11_NATIVE_EVIDENCE.txt inside the saved log ZIP.' }\n"
-    return staged.replace(archiver, evidence + b"\n" + archiver + failure, 1)
+    raw_failure = b"\nif ($dx11TestCase -eq 'RAW_VISUAL' -and -not $rawVisualEvidenceOk) { Write-Host ('Evidence log ZIP preserved: ' + $zip); throw 'Raw DX11 GPU diagnostic tile NOT observed; examine DX11_RAW_VISUAL_EVIDENCE.txt inside the saved ZIP.' }\n"
+    return staged.replace(archiver, evidence + b"\n" + raw_evidence +
+                          b"\n" + archiver + failure + raw_failure, 1)
 
 
 def construct(game, host, ini, lods, runner, build_sha, feature_sha):
     # D3D11 full-frame opt-in is a UTF-16 Windows environment-variable literal.
     # Reject stale binaries that only implement the old 256x144 inset path.
     full_frame_marker = "OUTRUN_DX11_FULL_GAME_FRAME".encode("utf-16-le")
+    raw_marker = "OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC".encode("utf-16-le")
     if (pe_machine(game) != 0x14c or len(game) < 1000000 or
-            MARKER not in game or full_frame_marker not in game):
+            MARKER not in game or full_frame_marker not in game or raw_marker not in game):
         raise ValueError("missing x86 native full-frame game implementation")
     if pe_machine(host) != 0x8664 or len(host) < 10000:
         raise ValueError("missing valid x64 host")
@@ -145,15 +187,17 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
     if b"PreferD3D9Ex" not in ini:
         raise ValueError("game config must retain DX9Ex")
     def launcher(mode):
-        if mode not in ("CONTROL", "NATIVE_FULL_FRAME", "NATIVE_GPU_DESKTOP"):
+        if mode not in ("CONTROL", "NATIVE_FULL_FRAME", "NATIVE_GPU_DESKTOP", "RAW_VISUAL"):
             raise ValueError("invalid DX11 test mode")
         native = "1" if mode != "CONTROL" else ""
         gpu_desktop = "1" if mode == "NATIVE_GPU_DESKTOP" else ""
+        raw_visual = "1" if mode == "RAW_VISUAL" else ""
         return ("\r\n".join((
             "@echo off", "setlocal", 'cd /d "%~dp0"',
             'set "OUTRUN_DX11_FIRST_GAME_FRAME=' + native + '"',
             'set "OUTRUN_DX11_FULL_GAME_FRAME=' + native + '"',
             'set "OUTRUN_DX11_GPU_SHARED_DESKTOP=' + gpu_desktop + '"',
+            'set "OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC=' + raw_visual + '"',
             'set "OUTRUN_DX11_TEST_CASE=' + mode + '"',
             'powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Run-DX9ExFocusTest.ps1"',
             "exit /b %ERRORLEVEL%", ""
@@ -169,7 +213,7 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
         gpu_desktop_test_environment=["OUTRUN_DX11_FIRST_GAME_FRAME=1",
                                       "OUTRUN_DX11_FULL_GAME_FRAME=1",
                                       "OUTRUN_DX11_GPU_SHARED_DESKTOP=1"],
-        available_test_modes=["CONTROL", "NATIVE_FULL_FRAME", "NATIVE_GPU_DESKTOP"],
+        available_test_modes=["CONTROL", "NATIVE_FULL_FRAME", "NATIVE_GPU_DESKTOP", "RAW_VISUAL"],
         native_desktop_mono_required=True,
         native_desktop_single_sample_required=True,
         native_desktop_fog_disabled_diagnostic=True,
@@ -180,6 +224,7 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
         "Run-DX9ExFocusTest.ps1": session_labeled_runner(runner),
         "RUN_DX11_FIRST_GAME_FRAME.cmd": launcher("NATIVE_FULL_FRAME"),
         "RUN_DX11_GPU_DESKTOP.cmd": launcher("NATIVE_GPU_DESKTOP"),
+        "RUN_DX11_RAW_VISUAL.cmd": launcher("RAW_VISUAL"),
         "RUN_DX9EX_CONTROL.cmd": launcher("CONTROL"),
         "DX9EX_VARIANT.txt": ("variant=DX11_NATIVE_FULL_FRAME\n"
             "buildSourceSha=" + build_sha + "\nfeatureHeadSha=" + feature_sha +
@@ -201,6 +246,11 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
             "Extract all files beside your OWN OR2006C2C.EXE (not bundled).\n"
             "RUN_DX9EX_CONTROL.cmd: stock D3D9/DX9Ex reference, native OFF.\n"
             "RUN_DX11_FIRST_GAME_FRAME.cmd: CPU-copyback test.\n"
+            "RUN_DX11_RAW_VISUAL.cmd: opt-in incomplete 256x144\n"
+            "magenta-bordered D3D11 GPU tile inside original D3D9 desktop.\n"
+            "Never treat a RAW tile as a full native frame, native OpenXR,\n"
+            "or correct Fog/HUD/race colors. Log: DX11_RAW_VISUAL_EVIDENCE.txt.\n"
+            "RAW native pixels are EXPLICITLY marked in the D3D9 desktop.\n"
             "RUN_DX11_GPU_DESKTOP.cmd: real native D3D11 shared-GPU desktop\n"
             "test; requires working D3D9Ex GPU sharing. If sharing fails\n"
             "the game preserves its D3D9/CPU fallback, NOT a GPU PASS.\n"
@@ -249,6 +299,7 @@ def verify(blob):
         native = z.read("RUN_DX11_FIRST_GAME_FRAME.cmd")
         gpu_native = z.read("RUN_DX11_GPU_DESKTOP.cmd")
         control = z.read("RUN_DX9EX_CONTROL.cmd")
+        raw = z.read("RUN_DX11_RAW_VISUAL.cmd")
         runner = z.read("Run-DX9ExFocusTest.ps1")
         if (b'OUTRUN_DX11_FIRST_GAME_FRAME=1' not in native or
                 b'OUTRUN_DX11_FULL_GAME_FRAME=1' not in native or
@@ -257,10 +308,19 @@ def verify(blob):
                 b'OUTRUN_DX11_TEST_CASE=NATIVE_GPU_DESKTOP' not in gpu_native or
                 b'OUTRUN_DX11_FULL_GAME_FRAME=1' not in gpu_native or
                 b'OUTRUN_DX11_GPU_SHARED_DESKTOP="' not in native or
+                b'OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC=1' not in raw or
+                b'OUTRUN_DX11_TEST_CASE=RAW_VISUAL' not in raw or
+                b'OUTRUN_DX11_FULL_GAME_FRAME=1' not in raw or
+                b'OUTRUN_DX11_FIRST_GAME_FRAME=1' not in raw or
+                b'OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC="' not in control or
+                b'OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC="' not in native or
                 b'OUTRUN_DX11_GPU_SHARED_DESKTOP="' not in control or
                 b'OUTRUN_DX11_FULL_GAME_FRAME="' not in control or
                 b'OUTRUN_DX11_FIRST_GAME_FRAME="' not in control or
                 b'DX11_NATIVE_EVIDENCE.txt' not in runner or
+                b'DX11_RAW_VISUAL_EVIDENCE.txt' not in runner or
+                b'$rawDraws -gt 0' not in runner or
+                b'$rawPixels -gt 0' not in runner or
                 b'fullFrameModeObserved' not in runner or
                 b'gpuDesktopFrames -gt 0' not in runner or
                 b"$gameArgs += '-Stereo=false'" not in runner or
