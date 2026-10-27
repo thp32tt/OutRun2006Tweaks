@@ -40,7 +40,9 @@ def verify(g, r, u, s, f):
     # Verify the real current guard, including the unrelated-object fallback.
     assert "IsProjectedSunScreenObject(objectId)" in centre
     assert "!OutRunVR::GameSemantic::QueueRenderActive()" in centre
-    assert "objectId == 0x570002" in centre
+    # Quest E restored the original central sun using the unsigned exact-ID
+    # comparison, while all projected C993 sun-family children remain live.
+    assert "static_cast<unsigned>(objectId) == 0x570002u" in centre
     assert centre.index("ScopedExactProducerSemantic semantic(") < centre.index(
         "ScopedRenderSemantic sunDrawScope(") < centre.rindex("Game::DrawObjectAlpha_Internal(")
     # The exact C993 family must clear D3A5's spatial direct token and keep
