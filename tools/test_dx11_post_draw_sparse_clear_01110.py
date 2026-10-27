@@ -26,4 +26,13 @@ assert "native_game_raster_partial_backbuffer_target_depth_clear(" in color
 assert "native_game_raster_partial_backbuffer_color_clear(" in color
 assert "native_game_raster_partial_backbuffer_depth_clear(" in depth
 assert "source[i].x1" in header
+# Both real D3D9 game Clear entrypoints must classify an authenticated
+# all-clipped original transaction BEFORE demanding any native Z/DSV resource.
+assert color.index("if (nativeRegionCount == 0u) return true;") < color.index(
+    "const bool nativeDepthReady =")
+assert depth.index("if (used == 0u) return true;") < depth.index(
+    "if (clearStencil) {")
+assert depth.count("GameNativePostDrawClearBatch::build(") == 1
+assert depth.index("sameMainDepthStencil =") < depth.index(
+    "if (used == 0u) return true;")
 print("01110 authentic sparse TARGET/Z native GPU segmented source graph PASS")

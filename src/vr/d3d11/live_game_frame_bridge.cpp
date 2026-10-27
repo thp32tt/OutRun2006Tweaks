@@ -9313,6 +9313,12 @@ bool preserve_game_partial_target_clear(
                           static_cast<LONG>(compact[i].top),
                           static_cast<LONG>(compact[i].right),
                           static_cast<LONG>(compact[i].bottom)};
+        // A successful original Clear whose ENTIRE viewport-clipped union
+        // is empty modified neither RTV, D32 nor stencil. Preserve the exact
+        // native game Draw stream without requiring an otherwise unused DSV,
+        // ClearView or depth raster. COM/backbuffer/MRT/viewport provenance
+        // and all 128 source rectangles were already checked above.
+        if (nativeRegionCount == 0u) return true;
         // Check the D3D9 main Z owner, extents and native D32 attachment
         // before changing even the color RTV of a combined TARGET|Z Clear.
         const bool nativeDepthReady = !clearZ || native_game_partial_depth_ready(
@@ -9332,9 +9338,6 @@ bool preserve_game_partial_target_clear(
                 nativeStencilDepthReady && ready);
         if (!nativeDepthReady || !nativeStencilDepthReady ||
             !canonicalStencilClear) return false;
-        // An entirely off-viewport successful D3D9 Clear wrote neither
-        // color nor Z. Retain the native frame and exact Draw ordinals.
-        if (nativeRegionCount == 0u) return true;
         ComPtr<ID3D11DeviceContext1> ctx1;
         const bool hasClearView = SUCCEEDED(s.backend.context()->QueryInterface(
                 IID_PPV_ARGS(ctx1.GetAddressOf()))) && ctx1;
@@ -9731,6 +9734,25 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         if (!sameMainDepthStencil ||
             (clearZ && !compatibleCoverage && !partialDepth))
             return false;
+        // Stage and authenticate the whole cropped post-Draw D3D9 Z
+        // transaction before consulting native depth resources. A valid
+        // zero-pixel union changes neither game Z nor stencil: it must not
+        // discard real menu/car/race native pixels merely because the D32
+        // mirror is absent or needs recreation. The color/depth owner and
+        // source viewport have already been authenticated.
+        std::array<GameNativePostDrawClearBatch::Region,
+            GameNativePostDrawClearBatch::kMaxSourceRects> compact{};
+        std::uint32_t used = 0u;
+        if (partialDepth && continuingFullNativeDraw) {
+            if (count > GameNativePostDrawClearBatch::kMaxSourceRects ||
+                (count != 0u && !rects) ||
+                !GameNativePostDrawClearBatch::build(
+                    bbDesc.Width, bbDesc.Height,
+                    vp.X, vp.Y, vp.Width, vp.Height,
+                    count, rects, compact, used))
+                return false;
+            if (used == 0u) return true; // No native GPU operation required.
+        }
         // A successful partial Z|STENCIL Clear changes real game Z too.
         // Before first native GPU Draw, mirror those clipped D3D9 depth
         // rectangles in the existing ordered D32 first-Draw replay ledger.
@@ -9799,17 +9821,9 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                 count > GameNativePostDrawClearBatch::kMaxSourceRects ||
                 (count != 0u && !rects))
                 return false;
-            // Use the SAME exact union as the paired TARGET|Z path.
-            // No DSV pixel may be skipped or overwritten outside the real
-            // source viewport, including 128-rect car/race depth strips.
-            std::array<GameNativePostDrawClearBatch::Region,
-                GameNativePostDrawClearBatch::kMaxSourceRects> compact{};
-            std::uint32_t used = 0u;
-            if (!GameNativePostDrawClearBatch::build(
-                    bbDesc.Width, bbDesc.Height,
-                    vp.X, vp.Y, vp.Width, vp.Height,
-                    count, rects, compact, used))
-                return false;
+            // Reuse the already authenticated, exact post-Draw Z union.
+            // A D3D9 call's 128 sparse regions are validated once, before
+            // any D3D11 ClearView or raster write, and all pixel gaps survive.
             std::array<D3D11_RECT,
                 GameNativePostDrawClearBatch::kMaxSourceRects> regions{};
             for (std::uint32_t i = 0u; i < used; ++i)
@@ -9817,7 +9831,6 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                               static_cast<LONG>(compact[i].top),
                               static_cast<LONG>(compact[i].right),
                               static_cast<LONG>(compact[i].bottom)};
-            if (used == 0u) return true;
             ComPtr<ID3D11DeviceContext1> context1;
             const bool hasClearView = SUCCEEDED(
                 s.backend.context()->QueryInterface(

@@ -60,8 +60,28 @@ int main() {
     assert(!Batch::build(width,height,0,0,width,height,128u,
                          bad.data(),output,used));
     assert(used==7u && output[0].left==5);
-    // Fully cropped (valid) source is a zero-pixel no-op.
-    Rect outside{400,0,410,3};
-    assert(Batch::build(width,height,0,0,width,height,1u,
-                        &outside,output,used) && used==0u);
+    // Authentic 128-rectangle post-Draw TARGET|Z can be entirely outside
+    // the viewport even though a native menu/race Draw is pending. Both
+    // attachments must remain untouched, regardless of native DSV readiness.
+    std::array<Rect,128> outside{};
+    for(std::uint32_t i=0;i<outside.size();++i)
+        outside[i]={long(width+2u*i),0,long(width+2u*i+1u),3};
+    const auto beforeColor=color,beforeDepth=depth;
+    assert(Batch::build(width,height,0,0,width,height,128u,
+                        outside.data(),output,used) && used==0u);
+    assert(color==beforeColor && depth==beforeDepth);
+    // A mixed source transaction is NOT a no-op: exactly one clipped native
+    // pixel is updated, while the other 127 regions write nothing.
+    outside[87]={7,1,8,2};
+    assert(Batch::build(width,height,0,0,width,height,128u,
+                        outside.data(),output,used) && used==1u);
+    assert(output[0].left==7 && output[0].right==8 &&
+           output[0].top==1 && output[0].bottom==2);
+    // Malformed late source rectangle remains atomic even with earlier
+    // valid regions (the caller's ledger is unchanged on failure).
+    outside[126].x2=outside[126].x1;
+    const auto previous=output[0];
+    assert(!Batch::build(width,height,0,0,width,height,128u,
+                         outside.data(),output,used));
+    assert(used==1u && output[0].left==previous.left);
 }
