@@ -26,6 +26,8 @@ on:
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
       - 'tools/verify_vr_menu_resolution_split.py'
+      - 'vrhost/src/main_r23.cpp'
+      - 'tools/verify_vr_r23_menu_letterbox_cache.py'
       - 'tools/verify_vr_d_logfix_20261026.py'
       - 'src/vr/game/hud_command_batch.hpp'
       - 'src/vr/game/stage_extension_source_admission.hpp'
@@ -93,6 +95,12 @@ jobs:
         run: |
           python tools/verify_dx9ex_r84_lens_source.py
           if ($LASTEXITCODE -ne 0) { throw 'C993 conservative optics/source guard failed' }
+
+      - name: Validate accepted R23 menu letterbox cache refresh
+        shell: pwsh
+        run: |
+          python tools/verify_vr_r23_menu_letterbox_cache.py
+          if ($LASTEXITCODE -ne 0) { throw 'R23 menu crop-cache guard failed' }
 
       - name: Verify GOAL inner/full exact source and queue epoch admission
         shell: pwsh
