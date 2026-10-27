@@ -48,8 +48,9 @@ int main() {
     // one later authentic full-viewport Z rectangle, reclaiming GPU slots.
     for(long i=0;i<32;++i){
         const Rect r{i,0,i+1,1};
-        assert(depth.record(7,11,13,W,H,0,0,W,H,1,&r,.65f));
-        paint(expected,r,.65f);
+        const float z=(i&1L)? .55f : .65f;
+        assert(depth.record(7,11,13,W,H,0,0,W,H,1,&r,z));
+        paint(expected,r,z);
     }
     assert(depth.count==32u);
     const Rect supersede{0,0,32,1};
@@ -98,7 +99,7 @@ int main() {
     colors.discard();depth.discard();
     for(long i=0;i<32;++i){
         Rect r{i,0,i+1,1};
-        assert(depth.record(7,11,13,W,H,0,0,W,H,1,&r,.75f));
+        assert(depth.record(7,11,13,W,H,0,0,W,H,1,&r,(i&1L)? .65f : .75f));
     }
     const Rect disjoint{0,15,1,16};
     assert(!GameNativePreDrawCombinedClear::record(

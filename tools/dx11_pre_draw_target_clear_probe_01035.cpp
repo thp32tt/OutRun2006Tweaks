@@ -96,7 +96,10 @@ int main() {
     pending.discard();
     std::array<D3DRect,24> distinct{};
     for (std::size_t i=0;i<distinct.size();++i)
-        distinct[i]={static_cast<int>(i),2,static_cast<int>(i+1u),3};
+        distinct[i]={static_cast<int>((i%8u)*2u),
+                    static_cast<int>(2u+(i/8u)*2u),
+                    static_cast<int>((i%8u)*2u+1u),
+                    static_cast<int>(3u+(i/8u)*2u)};
     assert(!pending.record_target_clear(
         17u,19u,W,H,0,0,W,H,
         static_cast<std::uint32_t>(distinct.size()),distinct.data(),0xffaabbccu));

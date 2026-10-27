@@ -89,7 +89,7 @@ int main() {
     GameNativePreDrawDepth stagedDepth{};
     for(int i=0;i<32;++i){
         Rect r{long(i),0,long(i+1),1};
-        assert(stagedDepth.record(7,11,13,W,H,0,0,W,H,1,&r,.6f));
+        assert(stagedDepth.record(7,11,13,W,H,0,0,W,H,1,&r,(i&1)? .5f : .6f));
     }
     const Rect novel[]={{0,4,3,7}};
     const auto priorDepth=stagedDepth.count;

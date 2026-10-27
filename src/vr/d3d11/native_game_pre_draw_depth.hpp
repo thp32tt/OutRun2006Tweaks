@@ -68,16 +68,25 @@ struct GameNativePreDrawDepth {
             std::uint32_t retained=0u;
             for(std::uint32_t j=0u;j<staged.count;++j)
                 if(!covers(next,staged.tiles[j]))++retained;
-            if(retained>=kCapacity)return false;
             std::uint32_t output=0u;
             for(std::uint32_t j=0u;j<staged.count;++j) {
                 const Tile prior=staged.tiles[j];
                 if(!covers(next,prior))staged.tiles[output++]=prior;
             }
             staged.count=output;
-            if(staged.count==kCapacity)return false;
-            if(!staged.count){staged.device=owner;staged.backbuffer=rt;staged.depth=ds;}
-            staged.tiles[staged.count++]=next;
+            // Adjacent/overlapping equal-Z strips form one exact rectangle.
+            // Unlike bounding-box packing, the merge never paints unowned
+            // pixels or elides an intervening different-Z source write.
+            const bool merged=staged.count &&
+                staged.tiles[staged.count-1u].z==z &&
+                game_native_merge_ordered_overwrite(
+                    staged.tiles[staged.count-1u],next);
+            if(!merged) {
+                if(retained>=kCapacity)return false;
+                if(staged.count==kCapacity)return false;
+                staged.tiles[staged.count++]=next;
+            }
+            if(!count){staged.device=owner;staged.backbuffer=rt;staged.depth=ds;}
         }
         *this=staged;
         return true;

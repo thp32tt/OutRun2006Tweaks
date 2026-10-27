@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include "native_game_pre_draw_tile_coalesce.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
 // The original D3D9 game may write directly into its canonical backbuffer
@@ -208,21 +209,30 @@ struct GameNativePreDrawFills {
         // The latest opaque D3D9 ColorFill wins over every *fully* enclosed
         // earlier tile, regardless of intervening writes or earlier colors.
         // Determine capacity before mutating the recorded source transaction.
-        std::uint32_t retained = 0u;
-        for (std::uint32_t i = 0u; i < count; ++i)
-            if (!covers(next, entries[i])) ++retained;
-        if (retained >= kCapacity) return false;
-        if (!count) {
-            device = currentDevice;
-            backbuffer = currentBackbuffer;
-        }
+        // The game's 128-rectangle Clear may consist of many adjacent
+        // strips. Compact ONLY an exact same-ARGB rectangular union while
+        // preserving every surviving earlier overwrite in source order.
+        // Stage the entire ledger so capacity failure cannot lose a pixel.
+        auto staged = *this;
         std::uint32_t output = 0u;
         for (std::uint32_t i = 0u; i < count; ++i) {
             const Fill saved = entries[i];
-            if (!covers(next, saved)) entries[output++] = saved;
+            if (!covers(next, saved)) staged.entries[output++] = saved;
         }
-        entries[output++] = next;
-        count = output;
+        if (output && staged.entries[output - 1u].argb == color &&
+            game_native_merge_ordered_overwrite(
+                staged.entries[output - 1u], next)) {
+            staged.count = output;
+        } else {
+            if (output >= kCapacity) return false;
+            staged.entries[output++] = next;
+            staged.count = output;
+        }
+        if (!count) {
+            staged.device = currentDevice;
+            staged.backbuffer = currentBackbuffer;
+        }
+        *this = staged;
         return true;
     }
 
