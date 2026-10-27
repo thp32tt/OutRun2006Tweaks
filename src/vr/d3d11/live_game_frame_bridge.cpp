@@ -8712,8 +8712,6 @@ bool preserve_game_surface_copy(
             FAILED(backbuffer.As(&backbufferIdentity)) || !actualIdentity ||
             !backbufferIdentity ||
             actualIdentity.Get() != backbufferIdentity.Get() ||
-            !s.clearColor.matches(
-                owner, reinterpret_cast<std::uintptr_t>(actualIdentity.Get())) ||
             desc.Pool != D3DPOOL_DEFAULT ||
             desc.MultiSampleType != D3DMULTISAMPLE_NONE ||
             (desc.Format != D3DFMT_A8R8G8B8 &&
@@ -8723,6 +8721,11 @@ bool preserve_game_surface_copy(
                 canonicalDesc.Width, canonicalDesc.Height,
                 static_cast<std::uint32_t>(canonicalDesc.Format)))
             return false;
+        // This surface is authenticated before either branch, but an
+        // authentic whole-copy bootstrap starts WITHOUT an earlier Clear.
+        // Do not require a pre-existing seed until bootstrap is assessed.
+        const bool seededMainBackbuffer = s.clearColor.matches(
+            owner, reinterpret_cast<std::uintptr_t>(actualIdentity.Get()));
 
         const auto changedRegion = changedArea
             ? GameNativeSurfaceCopyRegion::destination(
@@ -8760,11 +8763,14 @@ bool preserve_game_surface_copy(
             boundMain, !s.preDrawSurface.active() &&
                 s.preDrawFills.count == 0u &&
                 s.preDrawDepth.count == 0u);
-        if (s.sourceGameDevice != owner && !bootstrapCopy) return false;
+        // Preserve the original seeded path and its exact source owner.
+        // Independently accept a verified whole-copy bootstrap without
+        // demanding the very Clear it is intended to replace.
+        if (!native_game_full_surface_copy_can_continue(
+                s.sourceGameDevice == owner, seededMainBackbuffer,
+                bootstrapCopy)) return false;
         const bool preDrawCopy = GameNativePreDrawSurface::capture_allowed(
-            s.clearColor.matches(owner,
-                reinterpret_cast<std::uintptr_t>(actualIdentity.Get())) ||
-                bootstrapCopy,
+            seededMainBackbuffer || bootstrapCopy,
             s.frameBatch.accepts_full(s.sourceDrawsThisFrame),
             s.frameBatch.submitted==0u && !s.frameBatch.stopped,
             s.pending,s.cpuSurfaceReplay.active(),completingCpuWrite);

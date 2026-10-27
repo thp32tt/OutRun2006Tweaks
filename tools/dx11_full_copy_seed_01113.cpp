@@ -18,6 +18,17 @@ int main() {
     for (std::size_t i=0;i<admission.size();++i) {
         auto denied=admission; denied[i]=false; assert(!admits(denied));
     }
+    // A real menu can begin with StretchRect/UpdateSurface without a
+    // D3D9 TARGET Clear: previously this case was always rejected before
+    // the whole-copy bootstrap predicate was reached.
+    assert(native_game_full_surface_copy_can_continue(false,false,true));
+    assert(native_game_full_surface_copy_can_continue(true,true,false));
+    assert(!native_game_full_surface_copy_can_continue(false,false,false));
+    assert(!native_game_full_surface_copy_can_continue(true,false,false));
+    assert(!native_game_full_surface_copy_can_continue(false,true,false));
+    assert(!native_game_full_surface_copy_can_continue(false,false,false));
+    // Even a previously seeded Clear cannot move to a different source.
+    assert(!native_game_full_surface_copy_can_continue(false,true,false));
     GameNativeClearColor color;
     color.record(0x11u,0x22u,0u,true,true,0x33u);
     color.copySnapshotRequired=true;

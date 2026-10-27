@@ -9,6 +9,16 @@ replay=bridge[bridge.index("bool replay_native_game_pre_draw_surface("):bridge.i
 assert "native_game_full_surface_copy_can_seed(" in source
 assert "boundIdentity.Get() == backbufferIdentity.Get()" in source
 assert "wholeCopiedBackbuffer" in source
+# Regression for the live 01114 bug: requiring clearColor.matches in the
+# initial preflight made a no-Clear bootstrap unreachable.
+seeded = source.index("const bool seededMainBackbuffer = s.clearColor.matches(")
+bootstrap = source.index("const bool bootstrapCopy = native_game_full_surface_copy_can_seed(")
+continued = source.index("native_game_full_surface_copy_can_continue(")
+predraw = source.index("const bool preDrawCopy = GameNativePreDrawSurface::capture_allowed(")
+assert seeded < bootstrap < continued < predraw
+assert "seededMainBackbuffer || bootstrapCopy" in source
+assert "!s.clearColor.matches(" not in source[:bootstrap]
+assert "s.sourceGameDevice != owner && !bootstrapCopy" not in source
 assert "s.sourceDrawsThisFrame == 0u && !s.frameBatch.hasSourceDraw" in source
 assert source.index("s.preDrawSurface.record_consuming(") < source.index("s.clearColor.copySnapshotRequired = true;")
 assert source.index("s.clearColor.copySnapshotRequired = true;") < source.index("s.surfaceReplayBudget.note_success(desc.Width, desc.Height);")
