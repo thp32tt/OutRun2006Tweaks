@@ -5941,12 +5941,15 @@ namespace OutRunVRStereo
             auto rightDraw = [&]() { return drawEye(1); };
 
             R30StereoPassTrace passTrace{};
+            const bool tracePhysicalEyes =
+                Settings::VRTelemetry &&
+                (exactResult || exactProjectedRival);
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
                 projected
                     ? "R62/D3DXSprite-ProjectedXYZ"
                     : "R62/D3DXSprite-ScreenHudXYZ",
-                exactResult && Settings::VRTelemetry ? &passTrace : nullptr);
+                tracePhysicalEyes ? &passTrace : nullptr);
 
             HRESULT projectionRestoreHr = E_PENDING;
             {
@@ -5977,6 +5980,28 @@ namespace OutRunVRStereo
                     primitiveCount,
                     OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
                     hit);
+            if (exactProjectedRival && Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> rivalEyeReceipts{0};
+                const auto n = rivalEyeReceipts.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 8 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR RIVAL R62 FIXEDFN EYE RECEIPT: hits={} api={} fvf=0x{:08X} leftProjection=0x{:08X} leftDrawAttempt={} leftDraw=0x{:08X} rightTarget=0x{:08X} rightDepth=0x{:08X} rightViewport=0x{:08X} rightProjection=0x{:08X} rightDrawAttempt={} rightDraw=0x{:08X} restoreRight={} projectionRestore=0x{:08X} node={} epoch={}",
+                        n, drawApi, static_cast<unsigned>(fvf),
+                        static_cast<unsigned>(projectionSetHr[0]),
+                        drawAttempted[0] ? 1 : 0,
+                        static_cast<unsigned>(drawHr[0]),
+                        static_cast<unsigned>(passTrace.rightTargetHr),
+                        static_cast<unsigned>(passTrace.rightDepthHr),
+                        static_cast<unsigned>(passTrace.rightViewportHr),
+                        static_cast<unsigned>(projectionSetHr[1]),
+                        drawAttempted[1] ? 1 : 0,
+                        static_cast<unsigned>(drawHr[1]),
+                        passTrace.restoreOk ? 1 : 0,
+                        static_cast<unsigned>(projectionRestoreHr),
+                        sourceCommand.queueNode, sourceCommand.queueEpoch);
+            }
             if (exactResult && Settings::VRTelemetry)
             {
                 // Ordinary HUD/rank traffic must not consume result samples.
