@@ -60,6 +60,7 @@ def verify_sbs(source: str) -> None:
     fn = function_block(source, "bool ComposeSbs(")
     assert fn.count("setupOk = SUCCEEDED(device->Set") == 25
     assert "bool setupOk=true;" in fn
+    assert "if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&stateBlock))||!stateBlock){if(stateBlock)stateBlock->Release();return false;}" in fn
     assert "const bool stateOk=setupOk&&SUCCEEDED(device->SetViewport(&full))" in fn
     assert "success=leftOk&&rightOk&&SUCCEEDED(endHr);" in fn
     assert "if(!restoreOk)NoteRestoreFailure(" in fn
@@ -152,6 +153,7 @@ def main() -> None:
     rejects_in_function(verify_r7, r7, "HRESULT ExecuteStereoDraw(", "if(StereoWanted()&&TargetIsBackBuffer())", "if(StereoWanted()&&TargetIsBackBuffer()&&!occlusionActive)")
     rejects_in_function(verify_r7, r7, "HRESULT ExecuteStereoDraw(", "InvalidateRightDepthStencilIfLeftMayWrite(device);\n\t\t\t\treturn drawCall();", "/* omitted invalidation */\n\t\t\t\treturn drawCall();")
     rejects_in_function(verify_r7, r7, "bool PrepareDuplicatedDraw(", "ActiveOcclusionQueries.load(std::memory_order_acquire)>0", "false")
+    rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "if(stateBlock)stateBlock->Release();return false;", "return false;")
     rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "const bool stateOk=setupOk&&SUCCEEDED(device->SetViewport(&full))", "const bool stateOk=SUCCEEDED(device->SetViewport(&full))")
     rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "setupOk = SUCCEEDED(device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE)) && setupOk;", "device->SetSamplerState(0,D3DSAMP_SRGBTEXTURE,FALSE);")
     rejects_in_function(verify_r9, r9, "HRESULT __stdcall PresentDestR9(", "!R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason))", "R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason))")
