@@ -142,8 +142,54 @@
     "C5_PACKAGE": "BUILD_VERIFIED runtime UNTESTED",
     "C6_STATE": "PASS_EXACT_SHA"
   },
-  "c6_note": "RUN_RECORD_NOT_FOUND: created missing run record only. This docs-only [skip ci] bookkeeping commit is NOT a validation-bearing result. Original material_result_sha and the existing feature contract identity and acceptance evidence retained. No CI rerun.",
+  "c6_note": "RUN_RECORD_NOT_FOUND: created missing run record only. This docs-only [skip ci] bookkeeping commit is NOT a validation-bearing result. Original material_result_sha and the existing feature contract identity and acceptance evidence retained. No CI rerun. CI acceptance metadata repair by following task 01121: add missing authoritative 01120 strategy/changed_files without changing prior exact-SHA build or score.",
   "score_change": 0,
   "external_controller_adoption": "UNVERIFIED",
-  "next_action": "Need matching original-game/HMD session before any runtime/pass or native full-renderer promotion."
+  "next_action": "Need matching original-game/HMD session before any runtime/pass or native full-renderer promotion.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_pixel_delta.hpp",
+    "tests/native_raw_pixel_provenance_test.cpp",
+    "tools/RUN_DX11_RAW_VISUAL.cmd",
+    "tools/RUN_DX9EX_CONTROL.cmd",
+    "tools/Run-DX9ExFocusTest.ps1",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/build.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_NATIVE_D3D11_GPU_DRAW",
+      "PAIRED_BEFORE_AFTER_GPU_TEXTURE_COPY",
+      "ASYNC_READBACK_AND_SOURCE_D3D9_VISIBLE_DIAGNOSTIC_TILE",
+      "SPLIT_RUN_DX11_RAW_AND_DX9EX_CONTROL"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "SM3_FVF_PAIRED_PRE_POST_NATIVE_GPU_DRAW_COPY",
+      "ACTUAL_GPU_RGB_DELTA_EVIDENCE",
+      "DISTINCT_NATIVE_RAW_VS_DX9EX_CONTROL_PACKAGE",
+      "PORTABLE_GPU_PIXEL_POSITIVE_NEGATIVE_REGRESSION"
+    ],
+    "visible_frame_acceptance": "Source/build-verified opt-in RAW 256x144 GPU tile ONLY; real native game display and Quest3 stereo remain RUNTIME_VALIDATION=UNTESTED.",
+    "activation_guard_and_fallback": "Original D3D9 game, input/FFB, DX9Ex and DXVK freeze protected; diagnostic must be explicitly enabled, complete native frame publication remains fail-closed.",
+    "acceptance_proof": {
+      "positive_probe": "Native source SM3/FVF Draw paired D3D11 GPU pre/post texture copies compare real RGB changes and expose opt-in magenta tile; original source game Draw remains authoritative.",
+      "negative_regression": "No fake pixel output from static clear, unchanged RGB or alpha-only mutation; original DX9Ex control runner keeps native flags disabled and original input/FFB.",
+      "component_integration": "live_game_frame_bridge SM3/FVF -> paired D3D11 GPU readback -> raw original-game tile -> distinct RAW and DX9Ex control launchers packaged by Build."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  }
 }
