@@ -226,12 +226,21 @@ for marker in (
 ):
     if marker not in classify:
         fail(f"draw-time producer correlation missing: {marker}")
+# Current R30 records the actual RivalMarkerSprani physical-GPU boundary in
+# opt-in telemetry. Exact producer tags still must not steer the screen-space
+# classification function or grant binocular draw admission.
 for token in required_tokens:
-    if f"ProducerToken::{token}" in r30:
+    if f"ProducerToken::{token}" in classify:
         fail(
-            f"R30 must not classify rendering from exact producer token {token}; "
+            f"R30 screen-space classifier gained exact-producer token {token}; "
             "producer identity is diagnostic-only"
         )
+rival = function_body(r30, "HRESULT R30TryScreenSpaceFovDraw(")
+if "ProducerToken::RivalMarkerSprani" in rival:
+    if ("const bool rivalGpuProbe = Settings::VRTelemetry &&" not in rival or
+            "if (rivalGpuProbe)" not in rival or
+            "const bool baseAdmitted = R30SafeStereoBase(device);" not in rival):
+        fail("R30 rival diagnostic may not replace shared stereo admission")
 if re.search(r"c64Producer\s*==\s*OutRunVR::GameSemantic::ProducerToken::", classify):
     fail("draw classifier gained producer-specific equality authority")
 if "existing RenderScope + projection/world gates remain authoritative" not in classify:
