@@ -43,7 +43,9 @@ int main() {
  // overwrites. Consecutive equal-depth game pixels now combine exactly.
  for(unsigned i=0;i<33;++i) {
   Rect r={long(i%8),long((i/8)%6),long(i%8+1),long((i/8)%6+1)};
-  const float z=(i%2u)? .3f : .6f;
+  // Each source write has a distinct depth: no old tile can legally
+  // fuse across an independent band or an intervening color/Z writer.
+  const float z=float(i+1u)/64.0f;
   if(i<32)assert(d.record(7,11,13,8,6,0,0,8,6,1,&r,z));
   else assert(!d.record(7,11,13,8,6,0,0,8,6,1,&r,z));
  }
