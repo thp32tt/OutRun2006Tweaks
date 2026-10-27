@@ -760,8 +760,17 @@ namespace OutRunVRStereo
 			// restore the independently rendered normal mono frame before Present.
 			if (!composedStereo || FrameStereoIncomplete)
 			{
-				if (R9MonoSeeded && !R9MonoBackupGap)
-					R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason));
+				if (R9MonoSeeded && !R9MonoBackupGap &&
+					!R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason)))
+				{
+					// 01519: a failed mono copy is not a recovered frame. Keep
+					// the original Present contract and do not retry a lost
+					// device or invent a clean backbuffer; poison metadata and
+					// invalidate this frame's mono-shadow proof instead.
+					R9MonoBackupGap = true;
+					R9Poison(OutRunVR::StereoFailureRestoreFailed,
+						"Present/mono-shadow-restore");
+				}
 			}
 
 			R9MaybeLogSummary();
