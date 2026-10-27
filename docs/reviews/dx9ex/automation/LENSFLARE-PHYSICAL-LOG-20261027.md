@@ -15,7 +15,7 @@
 | `VR LENS GAME C64 GATE` | Observed c64 upload entry, captured draw serial/scope, camera override and projected raw eligibility | Native upload success, physical source/object correlation, final WVP |
 | `VR LENS R30 PHYSICAL CLASS` | Actual R30 native call serial/site, semantic at GPU entry, R30 class, *sampled* live VS binding/FVF HRESULT and values | An actual CABE/C993 object ID; the cached shader and original PMT identity |
 | `VR LENS R30 PHYSICAL EYES` | R30 admitted native draw left/right HRESULTs, restore, latched pose, source cameraSync flag, exact left/right WVP equality and translation terms | Final GPU pixels, actual per-object alpha, source mesh identity, correct angular optical alignment |
-| `VR LENS R30 LOWER FALLBACK` | R30 rejected that classified screen candidate (`E_NOTIMPL`) and delegated to R29 | Whether subsequent R29 physically rendered/duplicated the primitive |
+| `VR LENS R30 LOWER FALLBACK` | R30 rejected that classified screen candidate (`E_NOTIMPL`) and delegated to the *compiled lower owner* (R26/R23 in default R26+HUD, not the misleading local `r29Draw` variable name) | Whether subsequent R29 physically rendered/duplicated the primitive |
 | existing R7/R26 occlusion query logs | Tracked query per-original-native-Draw single-exec condition | A single Draw per BEGIN/END; original PMT walker can contain multiple legitimate Draws |
 
 ## What counts as a root-cause confirmation
@@ -37,3 +37,9 @@
 
 - No forced new stereo depths, opacity/visibility changes, child suppression, R26 query replay, host XR layer duplication, GL/DX11/DXVK changes, or production/performance improvement claims.
 - Static/CI PASS is not Quest3 optical PASS; final `RUNTIME_VALIDATION` stays `UNTESTED` until game/HMD evidence.
+
+## Additional lower-owner / scope-None finding incorporated
+
+- Independent pinned source review: `LENSFLARE-R26-LOWER-OWNER-20261027-2042.md` proves that the **default R26+HUD lower target is R26/R23** even though R30 uses a local callback named `r29Draw`. R84 opt-in has a different owner. Earlier references to default lower R29 were incorrect and are superseded by this correction.
+- Important limitation: `R30SafeStereoBase` may reject before the lens physical CLASS event; deferred opaque CABE can also reach the native draw with `EffectiveScope::None`, which the new CLASS/EYES/LOWER log deliberately does not attribute to lens. A missing lens log cannot exclude physical rendering, nor does it refute deferred semantic loss.
+- More unconditional logs of *all* scope-None world draws would create enormous noise without proving a CABE/C993 source link. Keep that incomplete provenance explicit. The next meaningful escalation is a vetted exact source-descriptor-to-physical-draw correlation, not a guessed persistent TLS token or unsafe new EXE hook.
