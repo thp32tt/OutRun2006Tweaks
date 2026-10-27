@@ -38,8 +38,12 @@ def check(r33, r29):
         assert "const bool internalPass = gameDevice && R32ReviewInternalStereoPass();" in guard
         assert "(gameDevice && !internalPass)" in guard
         assert "if (!gameDevice || internalPass ||" in guard
+        assert "const bool stateBlockRecording =" in guard
         assert "StateBlockTracker::Recording()" in guard
-        assert "!R32ReviewStereoWanted() || !R32ReviewTargetIsBackBuffer()" in guard
+        assert "const bool stereoWanted = R32ReviewStereoWanted();" in guard
+        assert "const bool targetBackBuffer = R32ReviewTargetIsBackBuffer();" in guard
+        assert "stateBlockRecording ||" in guard
+        assert "!stereoWanted || !targetBackBuffer" in guard
         assert "return drawCall(false);" in guard
         assert "return drawCall(true);" in guard
         # The lower R29 gate must reject every reason the outer guard bypasses.
