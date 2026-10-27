@@ -195,6 +195,7 @@ on:
       - 'tools/verify_vr_menu_letterbox_aspect.py'
       - 'tools/verify_vr_r23_menu_letterbox_cache.py'
       - 'tools/verify_vr_r23_capture_output_generation.py'
+      - 'tools/verify_vr_r23_capture_bound_client_uv.py'
       - 'tools/verify_vr_r23_menu_fov_cache_provenance.py'
       - 'tools/verify_vr_f11_font_density.py'
       - 'src/overlay/overlay_toggle_frame.hpp'
@@ -456,6 +457,7 @@ jobs:
             'tools/verify_vr_unified_menu_source.py',
             'tools/verify_vr_r23_menu_letterbox_cache.py',
             'tools/verify_vr_r23_capture_output_generation.py',
+            'tools/verify_vr_r23_capture_bound_client_uv.py',
             'tools/verify_vr_r23_menu_fov_cache_provenance.py',
             'tools/verify_vr_menu_resolution_split.py',
             'tools/verify_vr_pc_fast_package_contract.py',

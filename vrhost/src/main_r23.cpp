@@ -962,7 +962,7 @@ namespace
             if (sourcePending || now - lastSourceScheduleMs < R23PixelIntervalMs ||
                 !c.source_ || !c.device_ || !c.context_) return;
             UvRect uv{};
-            if (!c.GetGameUv(uv)) return;
+            if (!c.GetCapturedGameUv(uv)) return;
             if (!EnsureStage(c.device_, sourceStage, sourceFormat,
                     c.sourceFormat_, R23SourceSamples)) return;
 
@@ -1153,6 +1153,13 @@ namespace
         // Avoid two DXGI metadata round-trips and per-frame heap allocations
         // in the 72 Hz XR capture path; neither metadata list gates stereo.
 
+        UvRect acquiredGameUv{};
+        RECT acquiredGameClient{};
+        bool acquiredGameClientFullyVisible = false;
+        const bool acquiredGameUvValid = c.GetGameUv(
+            acquiredGameUv, false, &acquiredGameClient,
+            &acquiredGameClientFullyVisible);
+
         ID3D11Texture2D* texture = nullptr;
         const HRESULT qi = resource->QueryInterface(
             __uuidof(ID3D11Texture2D),
@@ -1212,6 +1219,22 @@ namespace
 
         if (copied)
         {
+            c.capturedGameUvValid_ = acquiredGameUvValid;
+            c.capturedGameOutputGeneration_ =
+                c.captureOutputGeneration_;
+            if (acquiredGameUvValid)
+            {
+                c.capturedGameUv_ = acquiredGameUv;
+                c.capturedGameClient_ = acquiredGameClient;
+                c.capturedGameClientFullyVisible_ =
+                    acquiredGameClientFullyVisible;
+            }
+            else
+            {
+                c.capturedGameUv_ = {};
+                c.capturedGameClient_ = {};
+                c.capturedGameClientFullyVisible_ = false;
+            }
             c.haveFrame_ = true;
             if (fi.LastPresentTime.QuadPart != 0)
             {
@@ -1228,6 +1251,8 @@ namespace
             status.lastPresentQpcLow =
                 c.lastCapturePresentQpcLow_;
             status.accumulatedFrames = fi.AccumulatedFrames;
+            status.fullGameClientVisible =
+                c.capturedGameClientFullyVisible_;
             OutRunVrSbsCaptureOverride::PublishProductionCapture(
                 c.source_, c.outputDesktop_, c.targetMonitor_,
                 c.sdrWhiteScale_,
@@ -1489,7 +1514,7 @@ namespace
         else
         {
             UvRect whole{};
-            if (!c.GetGameUv(whole)) return false;
+            if (!c.GetStereoSourceGameUv(whole, true)) return false;
             eyes[0] = { whole.x, whole.y, whole.w * 0.5f, whole.h };
             eyes[1] = { whole.x + whole.w * 0.5f, whole.y, whole.w * 0.5f, whole.h };
             srv[0] = srv[1] = c.stereoSourceSrv_;
@@ -1555,7 +1580,7 @@ namespace
         UvRect whole{};
         RECT capturedClient{};
         bool capturedClientFullyVisible = false;
-        if (!c.GetGameUv(
+        if (!c.GetCapturedGameUv(
                 whole, false, &capturedClient, &capturedClientFullyVisible))
             return false;
 
@@ -1879,7 +1904,8 @@ namespace
         if (!c.haveFrame_ || !c.sourceSrv_) return false;
         UvRect whole{};
         RECT capturedTheaterClient{};
-        if (!c.GetGameUv(whole, false, &capturedTheaterClient))
+        if (!c.GetCapturedGameUv(
+                whole, false, &capturedTheaterClient))
             return false;
         UvRect theaterUv = whole;
         if (sourceIsSbs)

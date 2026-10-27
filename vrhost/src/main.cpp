@@ -1398,7 +1398,10 @@ namespace
 
         bool CommitStereoSource()
         {
-            if (!source_ || !sourceSrv_ || !sourceWidth_ || !sourceHeight_) return false;
+            if (!source_ || !sourceSrv_ || !sourceWidth_ || !sourceHeight_ ||
+                !capturedGameUvValid_ ||
+                capturedGameOutputGeneration_ != captureOutputGeneration_)
+                return false;
             if (!stereoSource_ || stereoSourceWidth_ != sourceWidth_ ||
                 stereoSourceHeight_ != sourceHeight_ || stereoSourceFormat_ != sourceFormat_)
             {
@@ -1428,6 +1431,13 @@ namespace
                 stereoSourceFormat_ = sourceFormat_;
             }
             context_->CopyResource(stereoSource_, source_);
+            stereoSourceGameUv_ = capturedGameUv_;
+            stereoSourceGameClient_ = capturedGameClient_;
+            stereoSourceGameClientFullyVisible_ =
+                capturedGameClientFullyVisible_;
+            stereoSourceGameOutputGeneration_ =
+                capturedGameOutputGeneration_;
+            stereoSourceGameUvValid_ = true;
             stereoSourceValid_ = true;
             return true;
         }
@@ -1450,7 +1460,7 @@ namespace
             else
             {
                 UvRect whole{};
-                if (!GetGameUv(whole, true)) return false;
+                if (!GetStereoSourceGameUv(whole, true)) return false;
                 eyes[0] = { whole.x, whole.y, whole.w * 0.5f, whole.h };
                 eyes[1] = { whole.x + whole.w * 0.5f, whole.y, whole.w * 0.5f, whole.h };
                 eyeSrv[0] = eyeSrv[1] = stereoSourceSrv_;
@@ -1572,11 +1582,10 @@ namespace
                 return false;
 
             UvRect whole{};
-            if (!GetGameUv(whole))
+            RECT cr{};
+            if (!GetCapturedGameUv(whole, false, &cr))
                 return false;
 
-            RECT cr{};
-            GetClientRect(hwnd_, &cr);
             const float aspect = (cr.bottom > cr.top)
                 ? static_cast<float>(cr.right - cr.left) /
                     static_cast<float>(cr.bottom - cr.top)
@@ -1682,7 +1691,8 @@ namespace
         {
             if (!haveFrame_ || !sourceSrv_) return false;
             UvRect whole{};
-            if (!GetGameUv(whole)) return false;
+            RECT cr{};
+            if (!GetCapturedGameUv(whole, false, &cr)) return false;
             std::uint32_t image = 0;
             Acquire(theater_, image);
             const bool ok = RenderTo(theater_.rtvs[image][0], theater_.width, theater_.height,
@@ -1700,8 +1710,6 @@ namespace
                 static_cast<int32_t>(theater_.width),
                 static_cast<int32_t>(theater_.height)
             };
-            RECT cr{};
-            GetClientRect(hwnd_, &cr);
             const float aspect = (cr.bottom > cr.top)
                 ? static_cast<float>(cr.right - cr.left) / static_cast<float>(cr.bottom - cr.top)
                 : 16.f / 9.f;
@@ -1893,6 +1901,8 @@ namespace
             ReleaseCom(output1_);
             haveFrame_ = false;
             stereoSourceValid_ = false;
+            capturedGameUvValid_ = false;
+            stereoSourceGameUvValid_ = false;
             lastPixelDiagnosticMs_ = 0;
         }
 
@@ -2078,6 +2088,8 @@ namespace
             // available for a different or unbound output.
             haveFrame_ = false;
             stereoSourceValid_ = false;
+            capturedGameUvValid_ = false;
+            stereoSourceGameUvValid_ = false;
             lastCapturePresentQpc_ = 0;
             lastCapturePresentQpcLow_ = 0;
             if (++captureOutputGeneration_ == 0)
@@ -2164,6 +2176,7 @@ namespace
         {
             if (source_ && d.Width == sourceWidth_ && d.Height == sourceHeight_ && d.Format == sourceFormat_)
                 return true;
+            capturedGameUvValid_ = false;
             ReleaseCom(sourceSrv_);
             ReleaseCom(source_);
             D3D11_TEXTURE2D_DESC s{};
@@ -2249,6 +2262,42 @@ namespace
                 *capturedClientFullyVisible = plan.fullyVisible;
             return true;
         }
+
+        bool GetCapturedGameUv(UvRect& uv, bool requireFullyVisible = false,
+            RECT* capturedClient = nullptr,
+            bool* capturedClientFullyVisible = nullptr) const
+        {
+            if (capturedClient) *capturedClient = {};
+            if (capturedClientFullyVisible) *capturedClientFullyVisible = false;
+            if (!capturedGameUvValid_ ||
+                capturedGameOutputGeneration_ != captureOutputGeneration_ ||
+                (requireFullyVisible && !capturedGameClientFullyVisible_))
+                return false;
+            uv = capturedGameUv_;
+            if (capturedClient)
+                *capturedClient = capturedGameClient_;
+            if (capturedClientFullyVisible)
+                *capturedClientFullyVisible =
+                    capturedGameClientFullyVisible_;
+            return true;
+        }
+
+        bool GetStereoSourceGameUv(UvRect& uv,
+            bool requireFullyVisible = false,
+            RECT* capturedClient = nullptr) const
+        {
+            if (capturedClient) *capturedClient = {};
+            if (!stereoSourceGameUvValid_ ||
+                stereoSourceGameOutputGeneration_ != captureOutputGeneration_ ||
+                (requireFullyVisible &&
+                 !stereoSourceGameClientFullyVisible_))
+                return false;
+            uv = stereoSourceGameUv_;
+            if (capturedClient)
+                *capturedClient = stereoSourceGameClient_;
+            return true;
+        }
+
 
         bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t w, std::uint32_t h,
             const UvRect& uv, ID3D11ShaderResourceView* sourceSrv,
@@ -2362,6 +2411,11 @@ namespace
         std::uint32_t sourceWidth_ = 0, sourceHeight_ = 0;
         DXGI_FORMAT sourceFormat_ = DXGI_FORMAT_UNKNOWN;
         bool haveFrame_=false;std::int64_t lastCapturePresentQpc_=0;std::uint32_t lastCapturePresentQpcLow_=0;
+        UvRect capturedGameUv_{};
+        RECT capturedGameClient_{};
+        bool capturedGameUvValid_ = false;
+        bool capturedGameClientFullyVisible_ = false;
+        std::uint64_t capturedGameOutputGeneration_ = 0;
         ULONGLONG lastPixelDiagnosticMs_ = 0;
 
         ID3D11Texture2D* stereoSource_ = nullptr;
@@ -2369,6 +2423,11 @@ namespace
         std::uint32_t stereoSourceWidth_ = 0, stereoSourceHeight_ = 0;
         DXGI_FORMAT stereoSourceFormat_ = DXGI_FORMAT_UNKNOWN;
         bool stereoSourceValid_ = false;
+        UvRect stereoSourceGameUv_{};
+        RECT stereoSourceGameClient_{};
+        bool stereoSourceGameUvValid_ = false;
+        bool stereoSourceGameClientFullyVisible_ = false;
+        std::uint64_t stereoSourceGameOutputGeneration_ = 0;
 
         std::array<ID3D11Texture2D*, OutRunVR::RenderFrameRingSize> directLeft_{};
         std::array<ID3D11Texture2D*, OutRunVR::RenderFrameRingSize> directRight_{};
