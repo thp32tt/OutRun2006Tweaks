@@ -35,6 +35,7 @@ on:
       - 'src/vr/game/sprite_queue_tail_proof.hpp'
       - 'tools/verify_vr_abc_goal_c.py'
       - 'tools/verify_vr_r26_review_apply_20261027.py'
+      - 'tools/audit_dx9ex_review_backlog.py'
       - 'src/vr/game/outrun_renderer.cpp'
       - 'tools/verify_dx9ex_c993_native_span.py'
       - 'tools/verify_vr_f11_eye_viewport.py'
