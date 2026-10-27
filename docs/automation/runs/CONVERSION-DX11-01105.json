@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01105",
+  "production_id": "CONVERSION-DX11-01105",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01105",
+  "classification": "A_LIVE_GAME_INTERLEAVED_PREDRAW_COLOR_Z_SOURCE_TILES",
+  "feature_id": null,
+  "feature_work_key": "DX11:NATIVE_GAME_PREDRAW_NONINTERFERING_COLOR_Z_BANDS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "6cf3668512120f43431db8a78926d9ef8cac42c5",
+  "source_change_sha": "badb53de18a155171490eac1145989df1c84d49e",
+  "material_result_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+  "validation_bearing_result_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+  "result_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+  "implementation_commits": [
+    "badb53de18a155171490eac1145989df1c84d49e"
+  ],
+  "repair_commits": [
+    "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d"
+  ],
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+    "src/vr/d3d11/native_game_pre_draw_tile_coalesce.hpp",
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "tools/dx11_pre_draw_disjoint_bands_probe_01105.cpp",
+    "tools/test_dx11_pre_draw_disjoint_bands_01105.py",
+    "tools/dx11_pre_draw_depth_probe_01036.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Preserve authentic interleaved D3D9 game pre-first-Draw TARGET|Z color and depth writes through order-safe, noninterfering same-value rectangular tile coalescing for bounded native RTV/DSV GPU replay.",
+    "acceptance_items": [
+      {
+        "id": "interleaved_color_z_pixel_parity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_CLEAR_TO_FIRST_NATIVE_RTV_DSV_REPLAY",
+        "expected_behavior": "48 authentic alternating source color/Z bands coalesce to two nonoverlapping RTV and two DSV tiles without changing final color/depth pixels or introducing overpaint."
+      },
+      {
+        "id": "ordered_negative_and_atomic_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "CHRONOLOGY_OWNER_CAPACITY_ATOMIC_FALLBACK",
+        "expected_behavior": "Intervening overlapping writer blocks nonconsecutive fusion; L-shaped union remains unfused; foreign depth COM and true 17th color or 33rd depth capacity overflow fail closed while source original D3D9 fallback remains authoritative."
+      },
+      {
+        "id": "same_sha_five_mandatory_push_gates",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_ACTIONS",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Build, OpenXR architecture, and HUD Inspector push workflows all complete successfully for exactly one validation SHA, without implying HMD runtime validation."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_D3D9_GAME_PREDRAW_TARGET_Z",
+      "CANONICAL_RTV_DSV_SOURCE_OWNER",
+      "NONINTERFERING_ORDERED_GPU_TILE_COALESCING",
+      "NATIVE_COLOR_AND_D32_FIRST_DRAW_REPLAY",
+      "FAIL_CLOSED_ORIGINAL_D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "PRODUCTION_COLOR_AND_DEPTH_TILE_RECORDERS",
+      "NONINTERFERING_RECTANGULAR_MERGE",
+      "DETERMINISTIC_48_WRITE_PIXEL_PARITY",
+      "CHRONOLOGY_OVERFLOW_AND_OWNER_NEGATIVES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01105 production-header C++ oracle builds 48 interleaved TARGET|Z writes and asserts two color/two depth tiles and exact final pixel parity; exact-SHA DX11 Fast completed/success.",
+      "negative_regression": "01105 C++ test asserts intermediate overlapping writer barrier, L-shape nonmerge, foreign DSV owner and atomic overflow rejection. Exact-SHA 01036 correction uses 33 distinct Z values to retain genuine 32-depth-tile negative test.",
+      "component_integration": "Native game combined Clear records -> source-ordered noninterfering Color/Depth rectangle compaction -> existing pre-first-Draw native GPU replay path, subject to prior activation and owner guards."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Exact-SHA build workflow success only; native frame publication, actual game pixels, VR stereo, Quest3/VDXR visuals, FPS, original input and FFB remain UNTESTED.",
+    "activation_guard_and_fallback": "Original D3D9Ex renderer/input/FFB remains authoritative on guard or capacity failure; DXVK remains frozen. No renderer source change in C6."
+  },
+  "acceptance_results": {
+    "interleaved_color_z_pixel_parity": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_pre_draw_disjoint_bands_probe_01105.cpp",
+        "src/vr/d3d11/native_game_pre_draw_tile_coalesce.hpp",
+        "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+        "src/vr/d3d11/native_game_source_mutation.hpp"
+      ],
+      "validation_command": "DX11 Fast C++ pixel parity and source path integration test PASS via push run 40456791089 on a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d"
+    },
+    "ordered_negative_and_atomic_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_pre_draw_disjoint_bands_probe_01105.cpp",
+        "tools/test_dx11_pre_draw_disjoint_bands_01105.py",
+        "tools/dx11_pre_draw_depth_probe_01036.cpp"
+      ],
+      "validation_command": "DX11 Fast 01105 C++ overlap, owner, capacity and rollback regressions plus repaired authentic 01036 33-distinct-depth overflow PASS on a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d"
+    },
+    "same_sha_five_mandatory_push_gates": {
+      "status": "PASS_EXACT_SHA",
+      "sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791089",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791114",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791079",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791082",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791095"
+      ],
+      "validation_command": "Five mandatory push GitHub Actions completed/success at exact a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d; no new build or CI triggered by this C6 record."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40456791089,
+      "head_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791089"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40456791114,
+      "head_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791114"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40456791079,
+      "head_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791079"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40456791082,
+      "head_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791082"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40456791095,
+      "head_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40456791095"
+    }
+  ],
+  "pipeline": {
+    "C0": "EXISTING_VALIDATION_SHA_EQUALS_BRANCH_HEAD",
+    "C1": "PREVIOUS_01105_SOURCE_AND_CONTRACT_RECOVERED_FROM_MATERIAL_COMMIT_AND_PROBES",
+    "C2": "PREEXISTING_SOURCE_IMPLEMENTATION_badb53de18a155171490eac1145989df1c84d49e",
+    "C3": "PASS_FIVE_EXISTING_EXACT_SHA_PUSH_ACTIONS",
+    "C4": "EXISTING_VALIDATION_BEARING_COMMIT_a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+    "C5": "NOT_REQUESTED_NO_PACKAGE",
+    "C6": "CHECKPOINT_ONLY_AFTER_EXACT_SHA_PASS"
+  },
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "run_record_recovery": "The specified run JSON was absent at validation SHA; this C6-only file recreates the record using the existing 01105 implementation commit, regression probes, prior schema and verified Actions. Contract and acceptance fields are recovered from source/probes rather than an existing 01105 JSON.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "terminal_gameplay_verified": false,
+  "score_change": 0,
+  "score_note": "C6 bookkeeping/recovery only. No new material development milestone, no repeat credit for 01105 and no AI_SCOREBOARD.md update.",
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "a89acf6e9ebdff19f2ca97a93ecb8c0ffea9be3d",
+  "c6_does_not_revalidate_source": true,
+  "runtime_note": "Original OutRun game/Quest 3/VDXR HMD was not executed. Build and CI verification do not prove live gameplay, stereo, visuals or performance; RUNTIME_VALIDATION=UNTESTED."
+}
