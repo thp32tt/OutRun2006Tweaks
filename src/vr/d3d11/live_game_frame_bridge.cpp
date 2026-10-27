@@ -60,6 +60,7 @@
 #include "native_game_source_mutation.hpp"
 #include "native_game_pre_draw_replay.hpp"
 #include "native_game_pre_draw_depth.hpp"
+#include "native_game_pre_draw_combined_clear.hpp"
 #include "native_game_pre_draw_surface.hpp"
 #include "native_game_surface_replay_budget.hpp"
 #include "native_game_surface_copy_region.hpp"
@@ -9195,7 +9196,7 @@ bool preserve_game_partial_target_clear(
         // Preserve multi-rectangle source writes when their viewport-clipped
         // ordered pixels fit the 16-tile transaction; unrepresentable writes
         // and foreign owners still leave original D3D9 output authoritative.
-        if (!clearZ && !clearStencil && sameBackbuffer &&
+        if (!clearStencil && sameBackbuffer &&
             s.sourceGameDevice == owner && !s.pending &&
             s.frameBatch.submitted == 0u && !s.frameBatch.stopped &&
             s.frameBatch.accepts_full(s.sourceDrawsThisFrame) &&
@@ -9203,9 +9204,39 @@ bool preserve_game_partial_target_clear(
             !GameNativeClearCoverage::covers_whole(
                 backbufferDesc.Width, backbufferDesc.Height,
                 vp.X, vp.Y, vp.Width, vp.Height, count, rects)) {
+            const auto mainRt = reinterpret_cast<std::uintptr_t>(bbIdentity.Get());
+            if (clearZ) {
+                // An authentic clipped TARGET|ZBUFFER pre-Draw Clear changes
+                // TWO independent native attachments. The color-only route
+                // must not drop Z, nor apply half of a failed D3D9 batch.
+                // Both seed identities and the pending full Z epoch are
+                // proved before staging either native GPU replay ledger.
+                ComPtr<IDirect3DSurface9> gameDepth;
+                ComPtr<IUnknown> depthIdentity;
+                D3DSURFACE_DESC depthDesc{};
+                if (!s.frameBatch.depthClearPending ||
+                    !s.frameBatch.can_seed_pre_draw_depth(
+                        s.clearColor.matches(owner, mainRt),
+                        s.sourceDrawsThisFrame == 0u) ||
+                    FAILED(game->GetDepthStencilSurface(
+                        gameDepth.GetAddressOf())) || !gameDepth ||
+                    FAILED(gameDepth->GetDesc(&depthDesc)) ||
+                    FAILED(gameDepth.As(&depthIdentity)) || !depthIdentity ||
+                    !s.clearColor.main_depth_still_bound(
+                        reinterpret_cast<std::uintptr_t>(depthIdentity.Get())) ||
+                    depthDesc.Width != backbufferDesc.Width ||
+                    depthDesc.Height != backbufferDesc.Height ||
+                    depthDesc.MultiSampleType != D3DMULTISAMPLE_NONE)
+                    return false;
+                return GameNativePreDrawCombinedClear::record(
+                    s.preDrawFills, s.preDrawDepth, owner, mainRt,
+                    reinterpret_cast<std::uintptr_t>(depthIdentity.Get()),
+                    backbufferDesc.Width, backbufferDesc.Height,
+                    vp.X, vp.Y, vp.Width, vp.Height,
+                    count, rects, static_cast<std::uint32_t>(color), z);
+            }
             return s.preDrawFills.record_target_clear(
-                owner, reinterpret_cast<std::uintptr_t>(bbIdentity.Get()),
-                backbufferDesc.Width, backbufferDesc.Height,
+                owner, mainRt, backbufferDesc.Width, backbufferDesc.Height,
                 vp.X, vp.Y, vp.Width, vp.Height, count, rects, color);
         }
         // Post-Draw D3D11.1 ClearView still has a separate 32-region GPU

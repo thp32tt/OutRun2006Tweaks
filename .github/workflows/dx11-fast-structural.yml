@@ -624,6 +624,9 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_depth_probe_01036.cpp -o /tmp/dx11_predraw_depth_01036 && /tmp/dx11_predraw_depth_01036
           python tools/test_dx11_pre_draw_target_clear_01035.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_target_clear_probe_01035.cpp -o /tmp/dx11_pre_draw_01035 && /tmp/dx11_pre_draw_01035
+          # 01100 paired actual D3D9 TARGET|Z partial pre-Draw native replay.
+          python tools/test_dx11_pre_draw_combined_clear_01100.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_combined_clear_probe_01100.cpp -o /tmp/dx11_pre_draw_combined_01100 && /tmp/dx11_pre_draw_combined_01100
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
           # Native L/R partial-depth GPU Draw is a separate non-evidence
