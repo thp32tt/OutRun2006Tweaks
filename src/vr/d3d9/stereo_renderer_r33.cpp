@@ -266,10 +266,38 @@ namespace OutRunVRStereo
             // previous one-shot HUD semantic to label the new physical draw.
             OutRunVR::UniversalTrace::ScopedDraw::RefreshAfterSemanticSelection();
 
-            if (!gameDevice || internalPass ||
-                OutRunVR::State::StateBlockTracker::Recording() ||
-                !R32ReviewStereoWanted() || !R32ReviewTargetIsBackBuffer())
+            const bool stateBlockRecording =
+                OutRunVR::State::StateBlockTracker::Recording();
+            const bool stereoWanted = R32ReviewStereoWanted();
+            const bool targetBackBuffer = R32ReviewTargetIsBackBuffer();
+            const bool exactRivalOuter =
+                R33TelemetryEnabled() && gameDevice && !internalPass &&
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
+                OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
+            if (!gameDevice || internalPass || stateBlockRecording ||
+                !stereoWanted || !targetBackBuffer)
             {
+                if (exactRivalOuter)
+                {
+                    const char* reason =
+                        stateBlockRecording ? "STATEBLOCK_RECORDING" :
+                        !stereoWanted ? "STEREO_NOT_WANTED" :
+                        !targetBackBuffer ? "NOT_BACKBUFFER" :
+                        internalPass ? "INTERNAL_STEREO_PASS" :
+                        !gameDevice ? "NOT_GAME_DEVICE" : "UNKNOWN";
+                    static std::atomic<std::uint64_t> rivalOuterRejects{0};
+                    const auto n = rivalOuterRejects.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 8 || (n & (n - 1)) == 0)
+                        spdlog::info(
+                            "VR RIVAL R33 OUTER GUARD: hits={} decision=RAW reason={} stateBlockRecording={} stereoWanted={} backBuffer={} internalPass={}",
+                            n, reason, stateBlockRecording ? 1 : 0,
+                            stereoWanted ? 1 : 0, targetBackBuffer ? 1 : 0,
+                            internalPass ? 1 : 0);
+                }
                 return drawCall(false);
             }
 
