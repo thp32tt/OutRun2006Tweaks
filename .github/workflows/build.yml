@@ -256,6 +256,8 @@ jobs:
         run: |
           Copy-Item tools/START_HERE_DX11_TEST.cmd build/bin/START_HERE_DX11_TEST.cmd -Force
           Copy-Item tools/Run-DX9ExFocusTest.ps1 build/bin/Run-DX9ExFocusTest.ps1 -Force
+          Copy-Item tools/RUN_DX11_RAW_VISUAL.cmd build/bin/RUN_DX11_RAW_VISUAL.cmd -Force
+          Copy-Item tools/RUN_DX9EX_CONTROL.cmd build/bin/RUN_DX9EX_CONTROL.cmd -Force
           Set-Content build/bin/DX9EX_VARIANT.txt 'variant=DX11_BRANCH_VR_COMPAT_TEST' -Encoding ascii
           @(
             'OUTRUN 2006 DX11 BRANCH - USER TEST PACKAGE'
@@ -263,8 +265,8 @@ jobs:
             '2. Extract the entire archive into the folder holding your original game assets.'
             '3. Double-click START_HERE_DX11_TEST.cmd. Do NOT open outrun-vr-host.exe.'
             '4. The ordinary launcher tests this branch with DX9Ex-compatible fallback.'
-            '5. For experimental native DX11 desktop full-frame use the separately'
-            '   named feature-dx11-first-game-frame-* ZIP and its dedicated CMD files.'
+            '5. Experimental RAW GPU tile: RUN_DX11_RAW_VISUAL.cmd (not full stereo).'
+            '   Compare against RUN_DX9EX_CONTROL.cmd; logs are separately tagged.'
             '6. If launch fails, read the console and upload DX9EX_LOGS/DX9EX_LOG_*.zip.'
             'GitHub build/packaging does not prove actual Quest3/VDXR runtime success.'
             'RUNTIME_VALIDATION=UNTESTED'
@@ -273,7 +275,8 @@ jobs:
             'OR2006C2C.exe','dinput8.dll','outrun-vr-host.exe',
             'OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini',
             'START_HERE_DX11_TEST.cmd','Run-DX9ExFocusTest.ps1',
-            'DX9EX_VARIANT.txt','START_HERE_DX11_TEST.txt'
+            'RUN_DX11_RAW_VISUAL.cmd','RUN_DX9EX_CONTROL.cmd',
+             'DX9EX_VARIANT.txt','START_HERE_DX11_TEST.txt'
           )) {
             if (-not (Test-Path (Join-Path build/bin $item))) {
               throw "DX11 user test package FAIL: missing $item"
@@ -286,7 +289,16 @@ jobs:
               throw "DX11 user test entrypoint missing required guard: $marker"
             }
           }
-          $tokens=$null; $errors=$null
+          foreach ($launcher in @('RUN_DX11_RAW_VISUAL.cmd','RUN_DX9EX_CONTROL.cmd')) {
+             $text = Get-Content (Join-Path build/bin $launcher) -Raw
+             foreach ($marker in @('OUTRUN_DX11_TEST_MODE','OUTRUN_DX11_FIRST_GAME_FRAME',
+                                  'OUTRUN_DX11_FULL_GAME_FRAME',
+                                  'OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC',
+                                  'Run-DX9ExFocusTest.ps1')) {
+               if (-not $text.Contains($marker)) { throw "DX11 package $launcher missing $marker" }
+             }
+           }
+           $tokens=$null; $errors=$null
           [void][System.Management.Automation.Language.Parser]::ParseFile(
             (Resolve-Path build/bin/Run-DX9ExFocusTest.ps1),
             [ref]$tokens,[ref]$errors)
