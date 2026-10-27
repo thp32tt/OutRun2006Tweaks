@@ -37,6 +37,7 @@ def check(r30: str, game: str, hook: str) -> None:
         "leftHr=0x{:08X} rightHr=0x{:08X} restore={}",
     ):
         assert phrase in body, "missing physical receipt contract: " + phrase
+    assert "const bool lensPhysicalCandidate = Settings::VRTelemetry &&" in body
     assert body.index("VR LENS R30 PHYSICAL CLASS:") < body.index(
         "if (screenKind == R30ScreenSpaceKind::None)")
     assert body.index("const HRESULT leftHr = actualDraw();") < body.index(
