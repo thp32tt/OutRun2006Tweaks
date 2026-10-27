@@ -221,3 +221,46 @@ A later R33 difference remains conditional:
 This narrows the primary static fix to 01045's first-writer ownership loss,
 with physical-route telemetry used only to prove the restored node reaches
 both eyes.
+
+## 2026-10-27 15:xx masked-animation physical sink proof
+
+Direct decompilation of the canonical original EXE functions on the N100 REA
+archive closes another uncertainty:
+
+- `FUN_0042a3a0` (normal kind-1 animation) ends in D3D9 device vtable
+  slot `0x53` with primitive type `5`, count `2`, stride `0x1c`.
+  For IDirect3DDevice9 this is `DrawPrimitiveUP(TRIANGLESTRIP,2,...,28)`.
+- `FUN_0042a800` (masked/composite kind-1 animation) also reaches the SAME
+  vtable slot `0x53` at three original callsites; observed strides are
+  `0x24`, `0x2c`, and `0x34` depending its composite variant.
+- Therefore both branches chosen by original `0x42D710` after
+  `kind_C!=0` are physically observable by the current
+  `R30TryXyzrhwPrimitiveUP` / DPUP interception. A recovered rival node
+  cannot legitimately disappear into an unhooked *different* D3D9 primitive
+  API merely because bit `0x40000` selects `0x42A800`.
+- The queue log already publishes `node`, `epoch`, `animFlags`,
+  `masked`; the physical `VR RIVAL XYZRHW PREPARE/PROJECTED/EYE RECEIPT`
+  logs publish the same queue node/epoch and the live stride. These records
+  now form an end-to-end correlation without adding a new rendering path.
+
+### Consequence for the remaining hypotheses
+
+The static ownership regression from `01045` remains the only
+high-confidence **introduced** rival break found so far:
+the known-good null-root first writer was rejected and could never reach
+`ProjectedWorldMarker2D`. The targeted
+`FirstVerifiedNewRootAppendedChain` repair restores exactly that case and
+the native-first ordering is again identical to `a22be86a`.
+
+After that repair there are only runtime-discriminated possibilities:
+1. `FRESH ROOT RECOVERED` never occurs for the visible marker: another
+   priority/root shape is used and must be proven, not guessed.
+2. queue consumer sees projected rival but DPUP `PREPARE=0`: inspect its
+   actual FVF/VS/raster state.
+3. DPUP prepares and projects but no two-eye receipt: physical target/depth/
+   viewport or draw failure.
+4. both-eye receipt succeeds yet image is flat: inspect left/right projected
+   deltas and marker anchor content, not queue ownership.
+
+No new pixel behavior is justified by the masked branch: both original
+animation branches already converge on the hooked DPUP API.
