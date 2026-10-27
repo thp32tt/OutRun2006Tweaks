@@ -651,6 +651,10 @@ jobs:
           # TARGET|Z|STENCIL pre-first-native color/depth source pixels.
           # 01108 authentic 17..128 tiled full Clear seeds native RTV/D32,
           # with original main-Z preservation after post-Draw TARGET-only Clear.
+          # 01110: authentic sparse 33..128 post-Draw game TARGET/Z
+          # regions, bounded 32-rect GPU ClearView batches and 11.0 fallback.
+          python tools/test_dx11_post_draw_sparse_clear_01110.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_post_draw_sparse_clear_01110.cpp -o /tmp/dx11_sparse_clear_01110 && /tmp/dx11_sparse_clear_01110
           # 01109: full-game post-Draw 128-rect TARGET/Z exact GPU union,
           # with fail-closed fragmented/invalid source and original DX9Ex input.
           python tools/test_dx11_post_draw_clear_union_01109.py

@@ -17,10 +17,12 @@ for section in (color,depth):
     assert "regions.data()" in section
     assert "GameNativePostDrawClearBatch::build(" in section
 assert "game_native_merge_ordered_overwrite(" in header
-assert "used > kMaxGpuRegions" in header
+assert "used > kMaxSourceRects" in header
 assert "GameNativeSourceMutation::classify_target_clear_rect(" in header
 assert "source[i].x1" in header
 assert "ClearView(s.backend.color_rtv()" in color
+assert "regions.data() + start" in color
+assert "regions.data() + start" in depth
 assert "ClearView(s.diagnosticDepthView.Get()" in color
 assert "ClearView(s.diagnosticDepthView.Get()" in depth
 assert "native_game_raster_partial_backbuffer_depth_clear(" in depth

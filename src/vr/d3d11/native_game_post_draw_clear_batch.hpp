@@ -2,8 +2,9 @@
 // Lossless union of one successful game-authored post-Draw D3D9 Clear call.
 // All rectangles in the call have the SAME TARGET color and/or Z value:
 // only exact rectangular unions may be coalesced before D3D11 GPU replay.
-// This keeps large menu/car/race tiled Clears inside the existing 32 GPU
-// region budget, without clearing bounding-box gaps or changing D3D9 input.
+// Preserve sparse game menu/car/race Clears even if their disjoint union
+// requires several bounded 32-rectangle ClearView calls. Fully stage, clip
+// and validate before the FIRST GPU write. Never clear bounding-box gaps.
 #include "native_game_source_mutation.hpp"
 #include <array>
 #include <cstdint>
@@ -14,6 +15,12 @@ struct GameNativePostDrawClearBatch {
     static constexpr std::uint32_t kMaxSourceRects = 128u;
     static constexpr std::uint32_t kMaxGpuRegions =
         GameNativeSourceMutation::kMaxPartialTargetClearRects;
+    // The output ledger can hold every valid source rectangle, while each
+    // D3D11.1 ClearView invocation remains bounded to the original 32.
+    [[nodiscard]] static constexpr std::uint32_t gpu_chunk_size(
+        std::uint32_t remaining) noexcept {
+        return remaining < kMaxGpuRegions ? remaining : kMaxGpuRegions;
+    }
 
     template<class SourceRect>
     [[nodiscard]] static constexpr bool build(
@@ -21,7 +28,7 @@ struct GameNativePostDrawClearBatch {
         std::uint32_t vx, std::uint32_t vy,
         std::uint32_t vw, std::uint32_t vh,
         std::uint32_t count, const SourceRect* source,
-        std::array<Region, kMaxGpuRegions>& output,
+        std::array<Region, kMaxSourceRects>& output,
         std::uint32_t& outputCount) noexcept {
         if (count > kMaxSourceRects || (count && !source))
             return false;
@@ -84,7 +91,7 @@ struct GameNativePostDrawClearBatch {
         }
         // Unrepresentable fragmented source remains owned by D3D9. A failed
         // transaction has not changed the caller's existing native ledger.
-        if (used > kMaxGpuRegions) return false;
+        if (used > kMaxSourceRects) return false;
         for (std::uint32_t i = 0u; i < used; ++i)
             output[i] = staged[i];
         outputCount = used;

@@ -9262,8 +9262,9 @@ bool preserve_game_partial_target_clear(
                 owner, mainRt, backbufferDesc.Width, backbufferDesc.Height,
                 vp.X, vp.Y, vp.Width, vp.Height, count, rects, color);
         }
-        // Post-Draw D3D11.1 ClearView still has a separate 32-region GPU
-        // budget. Never allocate/write it using the larger pre-Draw limit.
+        // Post-Draw ClearView is bounded to 32 rectangles PER GPU call.
+        // Stage up to 128 authentic regions and issue ordered bounded calls
+        // instead of discarding a sparse menu/car/race native scene.
         if (count > GameNativePostDrawClearBatch::kMaxSourceRects)
             return false;
         if (!GameNativeSourceMutation::mirrors_partial_target_clear(
@@ -9276,11 +9277,11 @@ bool preserve_game_partial_target_clear(
         // touching the GPU. Fully disjoint rectangles are D3D9 no-ops, not
         // reasons to abandon the native menu/car/race frame. ClearView must
         // receive only populated, nonempty rectangles (never empty extents).
-        // D3D9 Clear may submit 17..128 ordered rectangles AFTER native
-        // game Draws. Their uniform TARGET/Z value permits lossless exact
-        // unions without allocating >32 GPU regions or clearing sprite gaps.
+        // D3D9 Clear can submit sparse 33..128 regions AFTER game Draws.
+        // Validate the whole source transaction before the first GPU write,
+        // then replay every disconnected region without clearing sprite gaps.
         std::array<GameNativePostDrawClearBatch::Region,
-            GameNativePostDrawClearBatch::kMaxGpuRegions> compact{};
+            GameNativePostDrawClearBatch::kMaxSourceRects> compact{};
         std::uint32_t nativeRegionCount = 0u;
         if (!GameNativePostDrawClearBatch::build(
                 backbufferDesc.Width, backbufferDesc.Height,
@@ -9288,7 +9289,7 @@ bool preserve_game_partial_target_clear(
                 count, rects, compact, nativeRegionCount))
             return false;
         std::array<D3D11_RECT,
-            GameNativePostDrawClearBatch::kMaxGpuRegions> regions{};
+            GameNativePostDrawClearBatch::kMaxSourceRects> regions{};
         for (std::uint32_t i = 0u; i < nativeRegionCount; ++i)
             regions[i] = {static_cast<LONG>(compact[i].left),
                           static_cast<LONG>(compact[i].top),
@@ -9336,8 +9337,14 @@ bool preserve_game_partial_target_clear(
                 float((color >> 24) & 255u) * scale
         };
         if (hasClearView) {
-            ctx1->ClearView(s.backend.color_rtv(), rgba, regions.data(),
-                            nativeRegionCount);
+            for (UINT start = 0u; start < nativeRegionCount;
+                 start += GameNativePostDrawClearBatch::gpu_chunk_size(
+                     nativeRegionCount - start)) {
+                const UINT chunk = GameNativePostDrawClearBatch::gpu_chunk_size(
+                    nativeRegionCount - start);
+                ctx1->ClearView(s.backend.color_rtv(), rgba,
+                                regions.data() + start, chunk);
+            }
         } else if (pairedDepthRaster) {
             // Original TARGET|Z Clear succeeds atomically on D3D9. Replay
             // both mutations in order for each region, never a color-only
@@ -9363,8 +9370,14 @@ bool preserve_game_partial_target_clear(
             // D32_FLOAT has no stencil component, which is required for
             // ClearView's depth-rectangle support. Preserve all other Z.
             const float depthValue[4] = {z, 0.0f, 0.0f, 0.0f};
-            ctx1->ClearView(s.diagnosticDepthView.Get(), depthValue,
-                            regions.data(), nativeRegionCount);
+            for (UINT start = 0u; start < nativeRegionCount;
+                 start += GameNativePostDrawClearBatch::gpu_chunk_size(
+                     nativeRegionCount - start)) {
+                const UINT chunk = GameNativePostDrawClearBatch::gpu_chunk_size(
+                    nativeRegionCount - start);
+                ctx1->ClearView(s.diagnosticDepthView.Get(), depthValue,
+                                regions.data() + start, chunk);
+            }
         }
         // Neither command consumes a game Draw ordinal or alters D3D9 input.
         return true;
@@ -9772,7 +9785,7 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
             // No DSV pixel may be skipped or overwritten outside the real
             // source viewport, including 128-rect car/race depth strips.
             std::array<GameNativePostDrawClearBatch::Region,
-                GameNativePostDrawClearBatch::kMaxGpuRegions> compact{};
+                GameNativePostDrawClearBatch::kMaxSourceRects> compact{};
             std::uint32_t used = 0u;
             if (!GameNativePostDrawClearBatch::build(
                     bbDesc.Width, bbDesc.Height,
@@ -9780,7 +9793,7 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                     count, rects, compact, used))
                 return false;
             std::array<D3D11_RECT,
-                GameNativePostDrawClearBatch::kMaxGpuRegions> regions{};
+                GameNativePostDrawClearBatch::kMaxSourceRects> regions{};
             for (std::uint32_t i = 0u; i < used; ++i)
                 regions[i] = {static_cast<LONG>(compact[i].left),
                               static_cast<LONG>(compact[i].top),
@@ -9793,8 +9806,14 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                     IID_PPV_ARGS(context1.GetAddressOf()))) && context1;
             if (hasClearView) {
                 const float depthValue[4] = {z, 0.0f, 0.0f, 0.0f};
-                context1->ClearView(s.diagnosticDepthView.Get(), depthValue,
-                                    regions.data(), used);
+                for (UINT start = 0u; start < used;
+                     start += GameNativePostDrawClearBatch::gpu_chunk_size(
+                         used - start)) {
+                    const UINT chunk = GameNativePostDrawClearBatch::gpu_chunk_size(
+                        used - start);
+                    context1->ClearView(s.diagnosticDepthView.Get(), depthValue,
+                                        regions.data() + start, chunk);
+                }
             } else {
                 // Preserve the original game Clear order on 11.0. Any
                 // unsupported GPU write retires native output, not DX9Ex.
