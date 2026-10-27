@@ -60,7 +60,8 @@ for old, new in (
     assert old in segment, old
     # Main STENCIL safety also probes this owner's color identity earlier.
     # Mutate this test's exact pre-first-Draw Z seed, not the stencil gate.
-    if old == "s.clearColor.matches(owner,":
+    if old in ("s.clearColor.matches(owner,",
+                  "s.sourceDrawsThisFrame == 0u"):
         anchor = segment.index("const bool beforeFirstGameDraw = !s.pending &&")
         segment = segment[:anchor] + segment[anchor:].replace(old, new, 1)
     else:
