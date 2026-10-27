@@ -50,6 +50,12 @@ namespace Settings
     // D3D9Ex render target selected from OpenXR at CreateDevice.
     Setting<bool> VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,
         "Legacy compatibility switch. Default off: menu/HUD/F11 coordinates are not replaced by the portrait OpenXR eye extent. Restart required." };
+    // Quest 3 Oct 27: physical 2496x2688 D3D9Ex backbuffer made original
+    // untransformed XYZRHW/UI sprites use the wrong pixel coordinate system.
+    // Preserve the game's stable logical 1080p source while OpenXR retains
+    // its independent HMD swapchain eye extent. Reversible until validated.
+    Setting<bool> VRPreserveLogicalBackBuffer{ "VR", "PreserveLogicalBackBuffer", true,
+        "R26 visual/FPS recovery: keep the D3D9Ex game backbuffer at logical 1920x1080; headset OpenXR swapchain stays at recommended eye resolution and scales source pixels. Avoids 2D upper-left coordinates and reduces game GPU raster work. False restores native eye-sized game source (sharper but currently broken). Restart required." };
     Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", false,
         "Compatibility fallback. True makes the physical VR render target follow the game/desktop resolution. Default false so FHD monitors do not cap VR quality. Restart required." };
     Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
@@ -323,6 +329,7 @@ namespace OutRunVR
             // Treat F11 edits as pending until the next game launch.
             Settings::VRRivalDx11NativeRoute.needs_restart();
             Settings::VRFollowGameResolution.needs_restart();
+            Settings::VRPreserveLogicalBackBuffer.needs_restart();
     Settings::VRAutoRenderResolution.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
