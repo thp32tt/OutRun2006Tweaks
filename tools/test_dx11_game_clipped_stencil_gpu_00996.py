@@ -24,8 +24,10 @@ def admissible(t=target, d=depth, header=h):
         "native_game_raster_partial_backbuffer_color_clear(" in t,
         "if (clearZ && hasClearView)" in t,
         "const bool clippedStencilSafe = partialDepth &&" in d,
+        "const bool preDrawStencilSafe = beforeFirstDepth &&" in d,
+        "GameNativeMainStencilClear::may_ignore_pre_draw(" in d,
         "GameNativeMainStencilClear::may_ignore_cropped(" in d,
-        "if (!wholeStencilSafe && !clippedStencilSafe) return false;" in d,
+        "if (!wholeStencilSafe && !clippedStencilSafe &&\n                !preDrawStencilSafe) return false;" in d,
         "if (!continuingFullNativeDraw ||" in d,
         "native_game_raster_partial_backbuffer_depth_clear(" in d,
         "sameMainDepthStencil && liveNativeDraw &&" in header,
@@ -41,7 +43,7 @@ for key, old, new in (
     ("target","GameNativeSourceMutation::classify_target_clear_rect(","GameNativeSourceMutation::skip_rect_clip("),
     ("target","native_game_raster_partial_backbuffer_target_depth_clear(","native_game_raster_partial_backbuffer_color_clear_only("),
     ("depth","const bool clippedStencilSafe = partialDepth &&","const bool clippedStencilSafe = true &&"),
-    ("depth","if (!wholeStencilSafe && !clippedStencilSafe) return false;","/* ignore wrong-owner stencil */"),
+    ("depth","if (!wholeStencilSafe && !clippedStencilSafe &&\n                !preDrawStencilSafe) return false;","/* ignore wrong-owner stencil */"),
     ("depth","native_game_raster_partial_backbuffer_depth_clear(","noop_native_depth("),
 ):
     section = target if key == "target" else depth
