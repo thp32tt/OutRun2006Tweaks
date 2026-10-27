@@ -18,7 +18,12 @@ function Get-OutRunVRTestProfile {
         # the user must be able to tune VR PMT wide-FOV margin in F11.
         # Runtime defaults to 8 degrees; this profile keeps it writable.
         '-NormalizeReflectionRate=true',
-        '-NearPlane=0.10'
+        '-NearPlane=0.10',
+        # Rival correctness must not depend on a stale user.ini from an older
+        # stock-projector A/B test. All packaged DX9Ex profiles keep the exact
+        # BB6F0 route and the UIScaling/BB796 hook owner enabled.
+        '-RivalDx11NativeRoute=false',
+        '-UIScalingMode=1'
     )
 
     # Correctness must remain usable when the game device stays plain D3D9.
