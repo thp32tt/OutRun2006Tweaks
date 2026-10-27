@@ -1,0 +1,31 @@
+name: DX9Ex 447 Review Document Audit
+
+on:
+  push:
+    branches:
+      - vr-d3d9ex-focus
+    paths:
+      - '.github/workflows/dx9ex-review-backlog-audit.yml'
+      - 'tools/audit_dx9ex_review_backlog.py'
+      - 'docs/reviews/dx9ex/automation/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Read all 447 review documents
+        run: python3 tools/audit_dx9ex_review_backlog.py
+      - name: Archive exact-SHA review evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-review-inventory-${{ github.sha }}
+          path: out/reviews/dx9ex/
+          if-no-files-found: error
+          retention-days: 90
