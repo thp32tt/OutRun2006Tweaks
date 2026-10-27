@@ -1516,7 +1516,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			if(!StereoResourcesReady||!BackBuffer||!RightEyeSurface||!LeftResolveSurface||!RightResolveSurface)return false;
 			if(FAILED(device->StretchRect(BackBuffer,nullptr,LeftResolveSurface,nullptr,D3DTEXF_NONE))||FAILED(device->StretchRect(RightEyeSurface,nullptr,RightResolveSurface,nullptr,D3DTEXF_NONE)))return false;
 			IDirect3DStateBlock9*stateBlock=nullptr;
-			if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&stateBlock))||!stateBlock)return false;
+			if(FAILED(device->CreateStateBlock(D3DSBT_ALL,&stateBlock))||!stateBlock){if(stateBlock)stateBlock->Release();return false;}
 			IDirect3DSurface9*savedRt=nullptr,*savedDepth=nullptr;D3DVIEWPORT9 savedViewport{};
 			const HRESULT rtHr=device->GetRenderTarget(0,&savedRt),depthHr=device->GetDepthStencilSurface(&savedDepth),viewportHr=device->GetViewport(&savedViewport);
 			const bool depthOk=SUCCEEDED(depthHr)||depthHr==D3DERR_NOTFOUND;
