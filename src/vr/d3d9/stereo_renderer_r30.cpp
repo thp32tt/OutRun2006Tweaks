@@ -2767,29 +2767,69 @@ namespace OutRunVRStereo
             RenderScope writtenScope=RenderScope::None;
             const void* writtenNode=nullptr;
             ProducerToken writtenProducer=ProducerToken::None;
-            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
-                    out, writeSerial, writeDraw, writeShader, writeShaderEpoch) ||
-                !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
-                    writtenScope, writeQueueEpoch, writtenNode, writtenProducer) ||
-                !R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch))
-                return false;
-            const bool sameQueueOwner = QueueRenderActive()
-                ? (CurrentQueueNode() != nullptr &&
-                   CurrentQueueNode() == writtenNode &&
-                   CurrentQueueNodeEpoch() != 0 &&
-                   CurrentQueueNodeEpoch() == writeQueueEpoch)
-                : writtenNode == nullptr;
-            return OutRunVR::RankMarker::OwnsRawGameWvp({
-                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
-                OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
-                R29OwnerTopLevelDrawSerial() + 1u, writeDraw,
-                currentShader, writeShader,
-                currentShaderEpoch, writeShaderEpoch,
-                isRank(producer),
+            const bool rawCaptured =
+                OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    out, writeSerial, writeDraw, writeShader, writeShaderEpoch);
+            const bool provenanceCaptured =
+                OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    writtenScope, writeQueueEpoch, writtenNode, writtenProducer);
+            const bool shaderCaptured =
+                R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch);
+            const bool sameQueueOwner = provenanceCaptured &&
+                (QueueRenderActive()
+                    ? (CurrentQueueNode() != nullptr &&
+                       CurrentQueueNode() == writtenNode &&
+                       CurrentQueueNodeEpoch() != 0 &&
+                       CurrentQueueNodeEpoch() == writeQueueEpoch)
+                    : writtenNode == nullptr);
+            const auto currentPose =
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch();
+            const auto writtenPose =
+                OutRunVRRenderer::GetLastGameWvpPoseEpoch();
+            const auto nextDraw = R29OwnerTopLevelDrawSerial() + 1u;
+            const bool exactUploadedRank = provenanceCaptured &&
                 writtenScope == RenderScope::ProjectedWorldMarker2D &&
-                    writtenProducer == producer,
-                sameQueueOwner
-            });
+                writtenProducer == producer;
+            const bool owned = rawCaptured && provenanceCaptured &&
+                shaderCaptured && OutRunVR::RankMarker::OwnsRawGameWvp({
+                    currentPose, writtenPose,
+                    nextDraw, writeDraw,
+                    currentShader, writeShader,
+                    currentShaderEpoch, writeShaderEpoch,
+                    isRank(producer), exactUploadedRank, sameQueueOwner
+                });
+
+            if (Settings::VRTelemetry &&
+                producer == ProducerToken::RivalMarkerSprani)
+            {
+                static std::atomic<std::uint64_t> rivalRawProofs{0};
+                const auto hit = rivalRawProofs.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (hit <= 8 || (hit & (hit - 1)) == 0)
+                {
+                    const auto drawAge =
+                        nextDraw > writeDraw ? nextDraw - writeDraw : 0u;
+                    spdlog::info(
+                        "VR RIVAL R84 RAW C64 PROOF: hits={} owned={} raw={} provenance={} shaderEpoch={} scopeMatch={} producerMatch={} queueMatch={} poseMatch={} shaderMatch={} shaderEpochMatch={} drawAge={} writeSerial={} writtenDraw={} nextDraw={} writtenNode={} currentNode={} writtenQueueEpoch={} currentQueueEpoch={}",
+                        hit, owned ? 1 : 0,
+                        rawCaptured ? 1 : 0,
+                        provenanceCaptured ? 1 : 0,
+                        shaderCaptured ? 1 : 0,
+                        provenanceCaptured &&
+                            writtenScope == RenderScope::ProjectedWorldMarker2D ? 1 : 0,
+                        provenanceCaptured && writtenProducer == producer ? 1 : 0,
+                        sameQueueOwner ? 1 : 0,
+                        currentPose != 0 && currentPose == writtenPose ? 1 : 0,
+                        shaderCaptured && currentShader != 0 &&
+                            currentShader == writeShader ? 1 : 0,
+                        shaderCaptured && currentShaderEpoch != 0 &&
+                            currentShaderEpoch == writeShaderEpoch ? 1 : 0,
+                        drawAge, writeSerial, writeDraw, nextDraw,
+                        writtenNode, CurrentQueueNode(),
+                        writeQueueEpoch, CurrentQueueNodeEpoch());
+                }
+            }
+            return owned;
         }
 
         // Port the HMD-proven R26+HUD original-c64 admission to R84.
