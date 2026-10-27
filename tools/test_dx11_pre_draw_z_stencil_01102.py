@@ -16,7 +16,7 @@ required=[
     "GameNativeMainStencilClear::may_ignore_pre_draw(",
     "s.frameBatch.leadingEmptySourceDraws ==",
     "!preDrawStencilSafe) return false;",
-    "if (beforeFirstDepth)",
+    "if(beforeFirstDepth)",
     "return s.preDrawDepth.record(owner,",
     "native_game_partial_depth_ready(",
     "s.preDrawDepth.discard();",
