@@ -9716,7 +9716,7 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
             !s.pending && s.frameBatch.depthClearPending &&
             s.frameBatch.can_seed_pre_draw_depth(
                 seededMainColor, s.sourceDrawsThisFrame == 0u) &&
-            count <= GameNativePreDrawDepth::kCapacity &&
+            count <= GameNativePreDrawDepth::kMaxSourceRects &&
             (count == 0u || rects != nullptr);
         if (clearStencil) {
             // Whole-main stencil semantics remain unchanged. For clipped
@@ -9745,7 +9745,7 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                          (s.frameBatch.hasSourceDraw &&
                           s.frameBatch.leadingEmptySourceDraws ==
                               s.sourceDrawsThisFrame)),
-                    count <= GameNativePreDrawDepth::kCapacity &&
+                    count <= GameNativePreDrawDepth::kMaxSourceRects &&
                         (count == 0u || rects != nullptr));
             if (!wholeStencilSafe && !clippedStencilSafe &&
                 !preDrawStencilSafe) return false;
