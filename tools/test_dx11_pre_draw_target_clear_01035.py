@@ -17,7 +17,10 @@ def connected(b,r,h):
         "s.preDrawFills.record_target_clear(" in b,
         "count <= GameNativePreDrawFills::kMaxPreDrawTargetClearSourceRects" in b,
         "count > GameNativePreDrawFills::kMaxPreDrawTargetClearSourceRects" in b,
-        "count > GameNativeSourceMutation::kMaxPartialTargetClearRects" in b,
+        # The post-Draw original D3D9 rect intake was widened to 128 only
+        # when an exact union fits the unchanged 32 native GPU regions.
+        "count > GameNativePostDrawClearBatch::kMaxSourceRects" in b,
+        "GameNativePostDrawClearBatch::build(" in b,
         "rectCount > kMaxPreDrawTargetClearSourceRects" in r,
         "!GameNativeClearCoverage::covers_whole(" in b,
         "if (sameBackbuffer &&" in b,
