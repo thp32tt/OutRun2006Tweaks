@@ -16,7 +16,7 @@
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
-  "score_change": 0,
+  "score_change": 1,
   "source_base_sha": "6bb35d2c816521506baf9d37ca8c72ad0b6d0860",
   "source_change_sha": "2fdc543bd7783e9f1acec3352c630262396fe47b",
   "material_result_sha": "2fdc543bd7783e9f1acec3352c630262396fe47b",
@@ -136,7 +136,7 @@
     "C3_VALIDATE": "PASS all five mandatory push workflow runs at exact validation SHA c31c518cc74f63fb35c06295579ad076c4cd1165",
     "C4_COMMIT": "PASS material source 2fdc543bd7783e9f1acec3352c630262396fe47b; inherited previous 01121 metadata correction 142349131; native OpenXR bundle negative assertion repair c31c518cc74f63fb35c06295579ad076c4cd1165",
     "C5_PACKAGE": "PASS Build workflow 40597059263 artifact outrun2006tweaks-c31c518cc74f63fb35c06295579ad076c4cd1165 ID 12776637902; original game/HMD UNTESTED",
-    "C6_STATE": "PASS result record after exact SHA Gates; checkpoint has no new functionality or points"
+    "C6_STATE": "PASS result record after exact SHA Gates; qualifying new material source achievement already entered SSOT once as +1; checkpoint/retry has +0"
   },
   "mandatory_gate_results": [
     {
@@ -191,5 +191,15 @@
     "quest3_vdxr": "UNTESTED"
   },
   "next_action": "Need source-matched real game desktop session showing native_draws>0 and actual RAW GPU pixel tile, then recover complete native menu/car/race backbuffer and independent Quest3 stereo. No new runtime PASS claimed. Full-frame renderer not completed.",
-  "c6_note": "Record only, after verified exact SHA push Gates. Not material/new award. Production validation-bearing SHA remains c31c518cc74f63fb35c06295579ad076c4cd1165 even if controller HEAD advances to this checkpoint."
+  "c6_note": "Record only, after verified exact SHA push Gates. Not material/new award. Production validation-bearing SHA remains c31c518cc74f63fb35c06295579ad076c4cd1165 even if controller HEAD advances to this checkpoint. Scoreboard authoritative remote 2026-10-28 07:59 KST confirmed prior 2054 + qualifying material DX11 task source achievement +1 = 2055; bookkeeping itself remains +0 and does not award twice.",
+  "scoreboard_authority": {
+    "repository": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "path": "AI_SCOREBOARD.md",
+    "previous_confirmed": 2054,
+    "qualifying_source_task_score": 1,
+    "new_confirmed": 2055,
+    "status": "REMOTE_SSOT_CONFIRMED",
+    "no_additional_c6_or_retry_score": true
+  }
 }
