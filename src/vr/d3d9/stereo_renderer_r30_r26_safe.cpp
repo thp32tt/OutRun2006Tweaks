@@ -74,23 +74,50 @@ namespace OutRunVRStereo
                 R13ForceMonoShadow = true;
         }
 
-        bool R30SafeStereoBase(IDirect3DDevice9* device) noexcept
+        bool R30SafeStereoBase(
+            IDirect3DDevice9* device,
+            const char** rejectReason = nullptr) noexcept
         {
-            if (!IsGameDevice(device) || InternalStereoPass ||
-                !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded)
+            if (rejectReason)
+                *rejectReason = "ADMITTED";
+            const auto reject = [&](const char* reason) noexcept {
+                if (rejectReason)
+                    *rejectReason = reason;
                 return false;
-            if (!OutRunVR::RuntimeEligibility::MayInjectStereo() ||
-                OutRunVR::RuntimeEligibility::RecoveryPending.load(
-                    std::memory_order_acquire) ||
-                OutRunVR::RuntimeEligibility::PoseWarmupAllowed())
-                return false;
-            if (FrameStereoIncomplete || R9DeferredDepth ||
-                !R9CurrentDepthCanMirror() || AnyAuxRenderTargetActive() ||
-                R13ForceMonoShadow ||
-                OcclusionQueryTrackingUnavailable.load(
-                    std::memory_order_acquire) ||
-                ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
-                return false;
+            };
+
+            if (!IsGameDevice(device))
+                return reject("NOT_GAME_DEVICE");
+            if (InternalStereoPass)
+                return reject("INTERNAL_STEREO_PASS");
+            if (!TargetIsBackBuffer())
+                return reject("NOT_BACKBUFFER");
+            if (!StereoWanted())
+                return reject("STEREO_NOT_WANTED");
+            if (!R9StereoSeeded)
+                return reject("R9_NOT_SEEDED");
+            if (!OutRunVR::RuntimeEligibility::MayInjectStereo())
+                return reject("RUNTIME_NOT_ELIGIBLE");
+            if (OutRunVR::RuntimeEligibility::RecoveryPending.load(
+                    std::memory_order_acquire))
+                return reject("RECOVERY_PENDING");
+            if (OutRunVR::RuntimeEligibility::PoseWarmupAllowed())
+                return reject("POSE_WARMUP");
+            if (FrameStereoIncomplete)
+                return reject("FRAME_STEREO_INCOMPLETE");
+            if (R9DeferredDepth)
+                return reject("R9_DEFERRED_DEPTH");
+            if (!R9CurrentDepthCanMirror())
+                return reject("DEPTH_NOT_MIRRORABLE");
+            if (AnyAuxRenderTargetActive())
+                return reject("AUX_RENDER_TARGET");
+            if (R13ForceMonoShadow)
+                return reject("FORCE_MONO_SHADOW");
+            if (OcclusionQueryTrackingUnavailable.load(
+                    std::memory_order_acquire))
+                return reject("OCCLUSION_TRACKING_UNAVAILABLE");
+            if (ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
+                return reject("ACTIVE_OCCLUSION_QUERY");
             return true;
         }
 
@@ -2609,17 +2636,20 @@ namespace OutRunVRStereo
 
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state,
-            R30XyzrhwPrepareReject* rejectReason = nullptr) noexcept
+            R30XyzrhwPrepareReject* rejectReason = nullptr,
+            const char** safeBaseRejectReason = nullptr) noexcept
         {
             if (rejectReason)
                 *rejectReason = R30XyzrhwPrepareReject::None;
+            if (safeBaseRejectReason)
+                *safeBaseRejectReason = "ADMITTED";
             const auto reject = [&](R30XyzrhwPrepareReject reason) noexcept {
                 if (rejectReason)
                     *rejectReason = reason;
                 return false;
             };
 
-            if (!R30SafeStereoBase(device))
+            if (!R30SafeStereoBase(device, safeBaseRejectReason))
                 return reject(R30XyzrhwPrepareReject::SafeStereoBase);
 
             // D3DX StateBlocks can leave CurrentVertexShaderIdentity stale.
@@ -4339,8 +4369,11 @@ namespace OutRunVRStereo
             R30XyzrhwState state{};
             R30XyzrhwPrepareReject rivalPrepareReject =
                 R30XyzrhwPrepareReject::None;
+            const char* rivalSafeBaseReject = "ADMITTED";
             const bool prepared = R30PrepareXyzrhwState(
-                device, state, exactRival ? &rivalPrepareReject : nullptr);
+                device, state,
+                exactRival ? &rivalPrepareReject : nullptr,
+                exactRival ? &rivalSafeBaseReject : nullptr);
             if (exactRival)
             {
                 static std::atomic<std::uint64_t> rivalPrepare{0};
@@ -4351,8 +4384,9 @@ namespace OutRunVRStereo
                     const char* rejectClass =
                         R30XyzrhwPrepareRejectName(rivalPrepareReject);
                     spdlog::info(
-                        "VR RIVAL XYZRHW PREPARE: hits={} prepared={} reject={} stride={} primitives={} fvfOk={} fvf=0x{:08X} posMask=0x{:03X} vsReadOk={} vsBound={} cachedVs=0x{:X} queued={} node={} epoch={}",
+                        "VR RIVAL XYZRHW PREPARE: hits={} prepared={} reject={} safeBase={} stride={} primitives={} fvfOk={} fvf=0x{:08X} posMask=0x{:03X} vsReadOk={} vsBound={} cachedVs=0x{:X} queued={} node={} epoch={}",
                         hit, prepared ? 1 : 0, rejectClass,
+                        rivalSafeBaseReject ? rivalSafeBaseReject : "UNKNOWN",
                         stride, primitiveCount,
                         rivalFvfOk ? 1 : 0, static_cast<unsigned>(rivalFvf),
                         static_cast<unsigned>(rivalFvf & D3DFVF_POSITION_MASK),
