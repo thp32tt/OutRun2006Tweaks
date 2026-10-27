@@ -1,0 +1,202 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01106",
+  "production_id": "CONVERSION-DX11-01106",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01106",
+  "classification": "A_LIVE_GAME_PREDRAW_COLOR_Z_PARTIAL_EDGE_OVERWRITE",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "requested_feature_id": null,
+  "feature_work_key": "DX11:NATIVE_GAME_PREDRAW_PARTIAL_EDGE_OVERWRITE_COLOR_Z",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "76dad6dfa4a3fac2c5eb013eb8924cd9a33e5089",
+  "source_change_sha": "c413217524dbe156d95ac7e054d8c29abc737028",
+  "material_result_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+  "validation_bearing_result_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+  "result_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+  "implementation_commits": [
+    "c413217524dbe156d95ac7e054d8c29abc737028"
+  ],
+  "repair_commits": [
+    "cea03b729b8ac531c6fff6d894e7bedbb570044d",
+    "4bd78242c5603ad59090587ef72d5334586b20bb",
+    "819e66063a1d1a07f42e1571c924d1db7b54efd3"
+  ],
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_pre_draw_tile_coalesce.hpp",
+    "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "tools/dx11_pre_draw_edge_overwrite_probe_01106.cpp",
+    "tools/test_dx11_pre_draw_edge_overwrite_01106.py",
+    "tools/test_dx11_clipped_color_fill_00799.py",
+    "tools/test_dx11_pre_draw_depth_compaction_01103.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Replay authentic interleaved D3D9 pre-first-Draw TARGET|Z opaque partial-edge source overwrites in native RTV/D32 tile replay without painting superseded source pixels; preserve chronological semantics and fail-closed original D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "color_depth_four_edge_pixel_parity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "AUTHENTIC_PRE_DRAW_TARGET_Z_SOURCE_TO_FIRST_NATIVE_RTV_DSV_REPLAY",
+        "expected_behavior": "Sequential top/right/bottom/left edge overwrites trim only exactly representable obsolete sides of earlier color and depth tiles, with pixel-for-pixel parity against source-ordered original D3D9 Clears."
+      },
+      {
+        "id": "interior_overlap_and_atomic_owner_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "INTERIOR_OVERLAP_SPLIT_FOREIGN_DSV_TRANSACTION",
+        "expected_behavior": "Interior overlaps which would split tiles stay in original draw order, not reduced to inaccurate rectangles; foreign depth owner and capacity failures reject without partial mutation, retaining original D3D9 fallback."
+      },
+      {
+        "id": "same_sha_five_mandatory_push_gates",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_ACTIONS",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Build, OpenXR architecture and HUD Inspector push workflows all complete successfully at exactly one validation-bearing SHA without claiming runtime HMD validation."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_D3D9_GAME_PREDRAW_TARGET_Z",
+      "CANONICAL_RTV_DSV_SOURCE_OWNER",
+      "OPAQUE_PARTIAL_EDGE_SUBTRACTION",
+      "CHRONOLOGICAL_NATIVE_COLOR_D32_REPLAY",
+      "FAIL_CLOSED_ORIGINAL_D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "PRODUCTION_COLOR_AND_DEPTH_EDGE_TRIM",
+      "EXACT_COLOR_AND_DEPTH_PIXEL_PARITY",
+      "INTERIOR_SPLIT_AND_FOREIGN_DEPTH_OWNER_NEGATIVES",
+      "LEGACY_SOURCE_GRAPH_ORACLE_REPAIRS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled production-header 01106 C++ probe checks top/right/bottom/left partial edge source overwrite parity for both native color and depth replay; DX11 Fast push run 40462605952 success on exact SHA.",
+      "negative_regression": "01106 production-header probe retains interior split in chronological order and verifies foreign DSV ownership fails atomically; 00799 and 01103 inherited structural checkers repaired to track actual production transactions.",
+      "component_integration": "Existing combined D3D9 pre-Draw Clear source record to native color/D32 replay path, using single-rectangle trims and original-game fallback guards."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Exact-SHA GitHub structural/build workflow success only; native frame publication and original-game menu/car/race pixels, Quest3/VDXR stereo, FPS, input and FFB remain UNTESTED.",
+    "activation_guard_and_fallback": "Original D3D9Ex draw/input/FFB remains authoritative on guard, foreign owner or unrepresentable capacity failure; DXVK frozen. No renderer source modified in C6.",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:NATIVE_GAME_PREDRAW_PARTIAL_EDGE_OVERWRITE_COLOR_Z"
+    ]
+  },
+  "acceptance_results": {
+    "color_depth_four_edge_pixel_parity": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_pre_draw_edge_overwrite_probe_01106.cpp",
+        "src/vr/d3d11/native_game_pre_draw_tile_coalesce.hpp",
+        "src/vr/d3d11/native_game_pre_draw_depth.hpp",
+        "src/vr/d3d11/native_game_source_mutation.hpp"
+      ],
+      "validation_command": "DX11 Fast 40462605952 completed/success at exact SHA; workflow compiles/runs 01106 production-header C++ source-pixel parity oracle."
+    },
+    "interior_overlap_and_atomic_owner_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_pre_draw_edge_overwrite_probe_01106.cpp",
+        "tools/test_dx11_pre_draw_edge_overwrite_01106.py",
+        "tools/test_dx11_clipped_color_fill_00799.py",
+        "tools/test_dx11_pre_draw_depth_compaction_01103.py"
+      ],
+      "validation_command": "DX11 Fast 40462605952 completed/success on exact SHA after inherited 00799/01103 source-graph assertions were repaired; 01106 negative checks test split-order and atomic foreign depth owner rejection."
+    },
+    "same_sha_five_mandatory_push_gates": {
+      "status": "PASS_EXACT_SHA",
+      "sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462605952",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462605850",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462605936",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462606113",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462606145"
+      ],
+      "validation_command": "Five mandatory push Actions completed/success at exact 819e66063a1d1a07f42e1571c924d1db7b54efd3; C6 itself does not rerun CI."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40462605952,
+      "head_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462605952"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40462605850,
+      "head_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462605850"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40462605936,
+      "head_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462605936"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40462606113,
+      "head_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462606113"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40462606145,
+      "head_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40462606145"
+    }
+  ],
+  "pipeline": {
+    "C0": "EXACT_VALIDATION_SHA_IS_BRANCH_HEAD",
+    "C1": "MISSING_RUN_RECORD_RECOVERED_FROM_SOURCE_COMMITS_AND_EXISTING_SCHEMA",
+    "C2": "PREEXISTING_CPP_SOURCE_IMPLEMENTED_c413217524dbe156d95ac7e054d8c29abc737028",
+    "C3": "PASS_FIVE_EXISTING_EXACT_SHA_PUSH_WORKFLOWS",
+    "C4": "PREEXISTING_VALIDATION_BEARING_COMMIT_819e66063a1d1a07f42e1571c924d1db7b54efd3",
+    "C5": "NOT_REQUESTED_NO_PACKAGE",
+    "C6": "BOOKKEEPING_ONLY_AFTER_EXACT_SHA_PASS"
+  },
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "run_record_recovery": "The 01106 run JSON did not exist at the verified validation HEAD. Its contract, acceptance evidence and material-result attribution are reconstructed from the existing 01106 source implementation/repair commits, 01106 probes, 01105/01103 run schema, and five preexisting push workflow results; no preexisting 01106 contract fields were overwritten.",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "terminal_gameplay_verified": false,
+  "score_change": 0,
+  "score_note": "C6-only missing-record recovery; prior 01106 implementation/CI success not scored again. No scoreboard edit.",
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "819e66063a1d1a07f42e1571c924d1db7b54efd3",
+  "c6_does_not_revalidate_source": true,
+  "runtime_note": "Quest 3/VDXR and original OutRun game HMD not executed; workflow pass does not prove native gameplay, real stereo, visual quality, FPS or user input. RUNTIME_VALIDATION=UNTESTED."
+}
