@@ -71,7 +71,7 @@
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
       "DX11:RAW_VISUAL_DIAGNOSTIC"
     ],
-    "full_gate_plan": "one_validation_bearing_sha_after_causal_repair"
+    "full_gate_plan": "one_validation_bearing_sha"
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -191,7 +191,7 @@
     "quest3_vdxr": "UNTESTED"
   },
   "next_action": "Need source-matched real game desktop session showing native_draws>0 and actual RAW GPU pixel tile, then recover complete native menu/car/race backbuffer and independent Quest3 stereo. No new runtime PASS claimed. Full-frame renderer not completed.",
-  "c6_note": "Record only, after verified exact SHA push Gates. Not material/new award. Production validation-bearing SHA remains c31c518cc74f63fb35c06295579ad076c4cd1165 even if controller HEAD advances to this checkpoint. Scoreboard authoritative remote 2026-10-28 07:59 KST confirmed prior 2054 + qualifying material DX11 task source achievement +1 = 2055; bookkeeping itself remains +0 and does not award twice.",
+  "c6_note": "Record only, after verified exact SHA push Gates. Not material/new award. Production validation-bearing SHA remains c31c518cc74f63fb35c06295579ad076c4cd1165 even if controller HEAD advances to this checkpoint. Scoreboard authoritative remote 2026-10-28 07:59 KST confirmed prior 2054 + qualifying material DX11 task source achievement +1 = 2055; bookkeeping itself remains +0 and does not award twice. Subsequent task 01123 repaired an inherited schema-only full_gate_plan label; previous exact-SHA 01122 five push Gates and score remain unchanged.",
   "scoreboard_authority": {
     "repository": "thp32tt/ai-dev-lab",
     "branch": "main",
