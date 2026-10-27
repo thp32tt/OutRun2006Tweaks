@@ -16,6 +16,8 @@ on:
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
       - 'tools/Run-FocusOfficialTest.ps1'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/OutRunVR-TestProfiles.ps1'
       - 'tools/verify_vr_rival_known_good_restore.py'
       - 'tools/verify_vr_r26_result_hud_pose.py'
       - 'vrhost/**'
