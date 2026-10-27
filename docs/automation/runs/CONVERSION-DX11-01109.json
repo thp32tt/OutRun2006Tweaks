@@ -9,25 +9,37 @@
   "classification": "A_REAL_GAME_POSTDRAW_PARTIAL_COLOR_DEPTH_GPU_UNION",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:GAME_POSTDRAW_128_RECT_TARGET_Z_PIXEL_PARITY",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_EXACT_SHA_GATES_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "source_base_sha": "665aad17f1e0884719bf946b49267927b6f77407",
   "source_change_sha": "8ddc7c8539faada6d9a2173f959a0ec2f989aa8b",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+  "validation_bearing_result_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+  "result_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
   "implementation_commits": [
     "8ddc7c8539faada6d9a2173f959a0ec2f989aa8b"
   ],
-  "repair_commits": [],
+  "repair_commits": [
+    "cb9254abad57ec5bc12cc4cdcd58cdac3443a907",
+    "f4d5bc33694a5b3ddd336770cf1ab1197c627a42",
+    "b25ceb7ff47ada9d120a339a1eb24845781079b7",
+    "b319b4ac7419660c67224a2264767d1426e9811c",
+    "6dbbdac87c785c35c882f6a8c15bd372ef89abec",
+    "dcd063a9ef36f1a1375610f87f702b2530524c5b",
+    "983266f5be558cb6714f92ac9093ad504a96df5b"
+  ],
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_post_draw_clear_batch.hpp",
     "tools/dx11_post_draw_clear_union_probe_01109.cpp",
     "tools/test_dx11_post_draw_clear_union_01109.py",
-    ".github/workflows/dx11-fast-structural.yml"
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_full_clear_resume_probe_00728.cpp",
+    ".github/workflows/vr-openxr.yml",
+    ".github/workflows/outrun-exe-hud-inspector.yml",
+    "docs/automation/runs/CONVERSION-DX11-01108.json"
   ],
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -74,7 +86,7 @@
       "COMPILED_PIXEL_UNION_NEGATIVES_AND_PRESERVED_FIVE_GATES"
     ],
     "acceptance_proof": {
-      "positive_probe": "At source SHA 8ddc7c8, new 01109 C++ probe models actual original D3D9 128-rect vertical/interleaved 2-row source to exact 1 native color/Z rectangle and signed clipping; GitHub Fast gate compilation still pending.",
+      "positive_probe": "01109 actual source 8ddc7c8 post-Draw 17..128 D3D9 Clear -> lossless native RTV/D32 GPU region union; compiled positive 128 vertical+interleaved rows and signed clipping test succeeded at exact 983266f5be558cb6714f92ac9093ad504a96df5b Fast 40484806846.",
       "negative_regression": "New 01109 C++ probe rejects 33 disconnected live-source rectangles, 129 source rects, invalid D3DRECT and cropped viewport, and verifies failed transaction preserves prior output; inherited DX9Ex input, FFB, depth and owner checks unchanged.",
       "component_integration": "GameNativePostDrawClearBatch::build is called from preserve_game_partial_target_clear (real D3D9 TARGET, TARGET|Z) and observe_game_depth_clear (real Z, Z|STENCIL) before any native D3D11 ClearView or D3D11.0 raster."
     },
@@ -87,11 +99,83 @@
     ]
   },
   "acceptance_results": {
-    "postdraw_target_depth_integrated_gpu_regions": "PENDING_EXACT_SHA",
-    "original_game_fallback_on_fragmented_or_bad_coverage": "PENDING_EXACT_SHA",
-    "same_exact_sha_five_required_gate_integration": "PENDING_EXACT_SHA"
+    "postdraw_target_depth_integrated_gpu_regions": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_post_draw_clear_batch.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_post_draw_clear_union_probe_01109.cpp"
+      ],
+      "validation_command": "DX11 Fast completed/success push run 40484806846 on exact 983266f5be558cb6714f92ac9093ad504a96df5b; compiled authentic 128-source color/Z union C++ regression and live game source graph."
+    },
+    "original_game_fallback_on_fragmented_or_bad_coverage": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_post_draw_clear_union_probe_01109.cpp",
+        "tools/dx11_full_clear_resume_probe_00728.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "DX11 Fast run 40484806846 checked malformed, fragmented 33, over-limit 129, and DX9Ex fail-closed source, verified the formerly masked 00728 C++ constexpr compile error is gone with fatal exit on recurrence."
+    },
+    "same_exact_sha_five_required_gate_integration": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806846",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806851",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806966",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806785",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806834"
+      ],
+      "validation_command": "Five GitHub push workflows completed/success with exact head_sha 983266f5be558cb6714f92ac9093ad504a96df5b; additional WARP 40484806817 PASS. Hardware/game runtime remains UNTESTED."
+    }
   },
-  "mandatory_gate_results": [],
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40484806846,
+      "head_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806846"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40484806851,
+      "head_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806851"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40484806966,
+      "head_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806966"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40484806785,
+      "head_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806785"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40484806834,
+      "head_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806834"
+    }
+  ],
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
@@ -99,18 +183,31 @@
   "native_published_frame_count": "UNTESTED",
   "terminal_gameplay_verified": false,
   "score_change": 0,
-  "ci_failure_cause": "First source SHA 8ddc7c8 DX11 Fast 40482244592 failed before C++ tests: highest-numbered historical 01108 C6 metadata missing policy acceptance proof and structured acceptance contract. This task 01109 run record is necessary for policy --check-latest to inspect the current independent implemented source feature, not prior invalid bookkeeping. No policy assertions removed.",
+  "ci_failure_cause": "Backend 40482244599 first failed inherited 01108 missing feature contract and proof; 01109 same-task contract repair cb9254ab corrected without relaxing policy. Fast runs then found inherited stale 00996/00995/01035/01100/01101 source-graph predicates; same-task repairs f4d5bc,b25ceb,b319b4,6dbbdac. Fast 6db status success nevertheless masked real 00728 constexpr OOB compile error; actual compiled fixture repaired dcd063a9 and workflow exact-SHA triggers plus fatal exit corrected 983266f5. All five mandatory push gates and WARP on final 983266f5 pass.",
   "pipeline": {
     "C0": "HEAD_665aad17_OWNER_AND_POLICY_INSPECTED",
     "C1": "POSTDRAW_128_GAME_TARGET_Z_SOURCE_AND_GPU_REGION_LIMIT",
     "C2": "CPP_SOURCE_IMPLEMENTED_8ddc7c8539faada6d9a2173f959a0ec2f989aa8b",
-    "C3": "FIVE_EXACT_SHA_GATES_RUNNING",
-    "C4": "GIT_MATERIAL_IMPLEMENTATION_WITH_CI_REPAIR_PENDING",
+    "C3": "PASS_FIVE_PUSH_EXACT_SHA_983266f5be558cb6714f92ac9093ad504a96df5b",
+    "C4": "GIT_MATERIAL_VALIDATION_BEARING_SOURCE_AND_CAUSAL_REPAIRS_983266f5be558cb6714f92ac9093ad504a96df5b",
     "C5": "NO_SEPARATE_PACKAGE_REQUIRED_SOURCE_DLL_BUILT_BY_GITHUB_ACTIONS",
-    "C6": "PENDING_AFTER_VALIDATED_RESULT"
+    "C6": "SEPARATE_DOCS_ONLY_AFTER_EXACT_SHA_PASS"
   },
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "UNTESTED_REAL_GAME_GPU_DRAW_AND_FRAME_OBSERVATION",
-  "next_implementation_action": "Repair only actual missing exact-SHA CI error then record source-only outcome without HMD assertion.",
-  "runtime_note": "Quest3/VDXR real game desktop screen and original input/FFB not observed; unchanged original renderer is fallback."
+  "next_implementation_action": "Separate Quest3/VDXR desktop/menu/car/race runtime visual and gamepad/FFB tests remain pending; current native source verified only; controller selects next independent item.",
+  "runtime_note": "Exact-SHA GitHub source, Windows build, WARP and OpenXR architecture PASS do not establish actual OutRun 2006 x86 menu/car/race screen output, Quest3/VDXR visuals or gamepad/FFB runtime. Unmodified original D3D9/DX9Ex game path remains fallback.",
+  "additional_gate_result": {
+    "name": "DX11 Native Transport Isolated WARP",
+    "event": "push",
+    "run_id": 40484806817,
+    "head_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40484806817"
+  },
+  "score_note": "This C6 is bookkeeping-only; independently scored source achievement is awarded at most once in ai-dev-lab GitHub scoreboard after five exact-SHA PASS; same-task CI repair, metadata, recheck, retry and rollover +0.",
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "983266f5be558cb6714f92ac9093ad504a96df5b",
+  "c6_does_not_revalidate_source": true
 }
