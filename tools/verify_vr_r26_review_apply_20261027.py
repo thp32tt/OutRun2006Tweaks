@@ -147,6 +147,33 @@ def verify_r9_query_color_skip(source: str) -> None:
     assert "return actualDraw();" in caller
 
 
+def verify_r9_shared_offscreen_depth(source: str) -> None:
+    # 01517: recognize exact COM identity only, never descriptor similarity;
+    # preserve a single original offscreen draw and normal return HRESULT.
+    fn = function_block(source, "HRESULT R9ExecuteDraw(")
+    branch = fn.split("if (!wanted || !mainTarget)", 1)[1].split(
+        "// Do not start stereo in the middle of a frame.", 1)[0]
+    for marker in (
+        "if (wanted && !mainTarget && R9StereoSeeded &&",
+        "R9MainDepthKnown && !R9DeferredDepth &&",
+        "TrackedDepthStencil == R9MainDepthIdentity &&",
+        "(RightDepthSynchronized || RightStencilSynchronized))",
+        "InvalidateRightDepthStencilIfLeftMayWrite(device);",
+        "++R9MainDepthContentSerial;",
+        "return legacyDraw();",
+    ):
+        assert marker in branch, marker
+    assert "GetDesc(" not in branch and "CreateDepthStencilSurface(" not in branch
+    assert "R9Poison(" not in branch
+    assert branch.count("return legacyDraw();") == 1
+    assert branch.index("TrackedDepthStencil == R9MainDepthIdentity &&") < (
+        branch.index("InvalidateRightDepthStencilIfLeftMayWrite(device);"))
+    assert branch.index("InvalidateRightDepthStencilIfLeftMayWrite(device);") < (
+        branch.index("++R9MainDepthContentSerial;"))
+    assert branch.index("++R9MainDepthContentSerial;") < branch.index(
+        "return legacyDraw();")
+
+
 def query_gap_if_color_write(mask_known: bool, mask: int) -> bool:
     return not mask_known or mask != 0
 
@@ -184,6 +211,7 @@ def main() -> None:
     verify_sbs(r7)
     verify_r9(r9)
     verify_r9_query_color_skip(r9)
+    verify_r9_shared_offscreen_depth(r9)
     for known, mask, gap in ((True, 0, False), (True, 0xF, True),
                              (True, 0x8, True), (False, 0, True)):
         assert query_gap_if_color_write(known, mask) == gap
@@ -219,7 +247,19 @@ def main() -> None:
     rejects_in_function(verify_r9_query_color_skip, r9,
         "bool R9ReplayMonoDraw(", "return true; // never duplicate a live occlusion-query Draw",
         "return false; // query accidentally replayed")
-    print("PASS R26/R7/R9: 01511,01513,01515,01516,01519,01520,01521 guards; 21 destructive mutations")
+    rejects_in_function(verify_r9_shared_offscreen_depth, r9,
+        "HRESULT R9ExecuteDraw(", "TrackedDepthStencil == R9MainDepthIdentity &&",
+        "TrackedDepthStencil != R9MainDepthIdentity &&")
+    rejects_in_function(verify_r9_shared_offscreen_depth, r9,
+        "HRESULT R9ExecuteDraw(", "R9MainDepthKnown && !R9DeferredDepth &&",
+        "R9MainDepthKnown &&")
+    rejects_in_function(verify_r9_shared_offscreen_depth, r9,
+        "HRESULT R9ExecuteDraw(", "InvalidateRightDepthStencilIfLeftMayWrite(device);",
+        "/* stale RIGHT depth allowed */")
+    rejects_in_function(verify_r9_shared_offscreen_depth, r9,
+        "HRESULT R9ExecuteDraw(", "return legacyDraw();",
+        "return actualDraw();")
+    print("PASS R26/R7/R9 01517 exact offscreen depth-lineage guard; 25 destructive mutations")
     print("RUNTIME_VALIDATION=UNTESTED")
 
 
