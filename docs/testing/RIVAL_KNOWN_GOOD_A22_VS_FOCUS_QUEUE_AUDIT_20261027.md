@@ -264,3 +264,54 @@ After that repair there are only runtime-discriminated possibilities:
 
 No new pixel behavior is justified by the masked branch: both original
 animation branches already converge on the hooked DPUP API.
+
+## 2026-10-27 15:xx original queue allocator proof
+
+Direct Ghidra decompilation of the canonical original EXE confirms the fresh-root
+repair against the actual allocator, not only against historic C++ behavior:
+
+- `FUN_0042d710` clears `DAT_00956c00[priority] = 0` after consuming a
+  priority list.
+- `FUN_0042d0c0` (kind-1 animation-node enqueue) checks that slot and, when
+  zero, allocates a new 0x110-byte list head from the 0x230-slot ring, zeros
+  its links, stores self-owner metadata, and publishes it as the new priority
+  root before allocating the drawable child.
+- `FUN_0042dd50` appends the new child: when the head has no first child it
+  writes `head->next_0 = child`, updates `head->tail_4 = child`, and links
+  the child back to that current head.
+- Thus the exact historical case `oldRoot=null, oldTail=null,
+  currentRoot!=null, currentRoot->next_0...newTail` is an ordinary first
+  writer after a prior queue consume. It is not a heuristic root-rebuild.
+  `FirstVerifiedNewRootAppendedChain` matches this allocator shape and
+  proves the new terminal tail on the CURRENT live chain without reading a
+  recycled old pointer.
+
+This strengthens the 01045 regression finding: its stable-root proof could
+reject a normal original first-writer rival every time the relevant priority
+had just been consumed.
+
+### Masked path is not a hidden API escape
+
+Canonical `FUN_0042a800` (bit 0x40000 masked/composite animation) contains
+three physical IDirect3DDevice9 vtable-slot-0x53 submissions, i.e.
+`DrawPrimitiveUP`; observed vertex strides are 0x24, 0x2c and 0x34.
+Canonical `FUN_0042a3a0` uses the same slot with stride 0x1c. Therefore both
+kind-1 rival outcomes converge on the current DPUP hook. If the restored
+queue owner reaches `0x42D710`, an absent `VR RIVAL XYZRHW PREPARE` is
+itself evidence of a dispatch/semantic loss before R30, not proof of an
+unhooked masked renderer.
+
+### New reject classifier
+
+`VR RIVAL XYZRHW PREPARE` now additionally emits `reject=` and
+`cachedVs=`:
+- `CACHED_VS_IDENTITY`: current software shader cache blocked the
+  fixed-function path before the authoritative live getter.
+- `LIVE_VS_BOUND`: real device VS is bound.
+- `FVF_READ_FAILED` or `FVF_NOT_XYZRHW`: original animation raster state
+  does not match the known 0x42A3A0 XYZRHW route.
+- `LATE_STEREO_VIEWPORT_OR_DEPTH_GATE`: FVF and VS are acceptable; the
+  remaining rejection is stereo resource/viewport/depth/pose admission.
+- `ADMITTED`: proceed to projected-delta and physical two-eye receipts.
+
+This remains diagnostic only; no render route is widened.
