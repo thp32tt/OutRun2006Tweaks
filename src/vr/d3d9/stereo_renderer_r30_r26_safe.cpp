@@ -4132,60 +4132,67 @@ namespace OutRunVRStereo
                 trace->restoreOk = restoreOk;
             }
 
-            FrameHadDuplicatedDraw = true;
-            ++DuplicatedDraws;
-            ++R30SafeTwoEyeDraws;
-            if (state.worldEffect)
+            // Only a submitted RIGHT Draw with the original state restored
+            // completes a physical stereo pair. The existing failure path
+            // still poisons the frame and retains the LEFT HRESULT.
+            const bool pairComplete = SUCCEEDED(rightHr) && restoreOk;
+            if (pairComplete)
             {
-                ++R30XyzrhwWorldEffectDraws;
-                // Only verified world evidence may mark this Present as
-                // world-stereo ready for host packet publication.
-                if (state.worldEvidenceAuthoritative)
+                FrameHadDuplicatedDraw = true;
+                ++DuplicatedDraws;
+                ++R30SafeTwoEyeDraws;
+                if (state.worldEffect)
                 {
-                    if (FrameStereoPoseSequence == 0)
+                    ++R30XyzrhwWorldEffectDraws;
+                    // Only verified world evidence may mark this Present as
+                    // world-stereo ready for host packet publication.
+                    if (state.worldEvidenceAuthoritative)
                     {
-                        FrameStereoPoseSequence = state.stereo.poseSequence;
-                        FrameStereoMetadata = state.stereo;
+                        if (FrameStereoPoseSequence == 0)
+                        {
+                            FrameStereoPoseSequence = state.stereo.poseSequence;
+                            FrameStereoMetadata = state.stereo;
+                        }
+                        else if (FrameStereoPoseSequence != state.stereo.poseSequence)
+                        {
+                            FrameRightDrawFailed = true;
+                            PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
+                        }
+                        FrameHadWorldStereo = true;
+                        ++WorldStereoDraws;
+                        if (!R30FirstXyzrhwWorldLogged)
+                        {
+                            R30FirstXyzrhwWorldLogged = true;
+                            spdlog::info(
+                                "VR R30.4 XYZRHW WORLD: verified depth/semantic evidence yielded per-eye projected effect");
+                        }
                     }
-                    else if (FrameStereoPoseSequence != state.stereo.poseSequence)
+                    else
                     {
-                        FrameRightDrawFailed = true;
-                        PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
-                    }
-                    FrameHadWorldStereo = true;
-                    ++WorldStereoDraws;
-                    if (!R30FirstXyzrhwWorldLogged)
-                    {
-                        R30FirstXyzrhwWorldLogged = true;
-                        spdlog::info(
-                            "VR R30.4 XYZRHW WORLD: verified depth/semantic evidence yielded per-eye projected effect");
+                        ++R30AmbiguousFlatWorldDraws;
+                        if (R30AmbiguousFlatWorldDraws == 1)
+                            spdlog::info(
+                                "VR R30 XYZRHW: untagged flat RHW=1 depth "
+                                "effect rendered but cannot seed host WorldStereo");
                     }
                 }
                 else
                 {
-                    ++R30AmbiguousFlatWorldDraws;
-                    if (R30AmbiguousFlatWorldDraws == 1)
+                    ++NonWorldDuplicatedDraws;
+                    ++R30XyzrhwHudDraws;
+                    if (state.hudWorldLockValid)
+                        ++R30XyzrhwWorldLockedHudDraws;
+                    if (state.screenOverlay2D)
+                        ++R50ScreenOverlay2DDraws;
+                    if (!R30FirstXyzrhwHudLogged)
+                    {
+                        R30FirstXyzrhwHudLogged = true;
                         spdlog::info(
-                            "VR R30 XYZRHW: untagged flat RHW=1 depth "
-                            "effect rendered but cannot seed host WorldStereo");
+                            "VR R50 XYZRHW 2D: generic SpriteNode content uses asymmetric-FOV common-ray affine only; exact SCREEN_HUD may still use the finite recentered world-locked plane");
+                    }
                 }
-            }
-            else
-            {
-                ++NonWorldDuplicatedDraws;
-                ++R30XyzrhwHudDraws;
-                if (state.hudWorldLockValid)
-                    ++R30XyzrhwWorldLockedHudDraws;
-                if (state.screenOverlay2D)
-                    ++R50ScreenOverlay2DDraws;
-                if (!R30FirstXyzrhwHudLogged)
-                {
-                    R30FirstXyzrhwHudLogged = true;
-                    spdlog::info(
-                        "VR R50 XYZRHW 2D: generic SpriteNode content uses asymmetric-FOV common-ray affine only; exact SCREEN_HUD may still use the finite recentered world-locked plane");
-                }
-            }
 
+            }
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;
@@ -5503,26 +5510,33 @@ namespace OutRunVRStereo
                     savedViewport, original, true);
             }
 
-            FrameHadDuplicatedDraw = true;
-            ++DuplicatedDraws;
-            ++NonWorldDuplicatedDraws;
-            ++R30SafeTwoEyeDraws;
-            ++R30ScreenSpaceFovDraws;
-            if (screenKind == R30ScreenSpaceKind::Hud2D)
-                ++R30Hud2DDraws;
-            else if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
-                ++R30PerspectiveHudDraws;
-            else if (screenKind == R30ScreenSpaceKind::WorldBillboard ||
-                     screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
-                ++R30WorldBillboardDraws;
-
-            if (!R30FirstScreenSpaceLogged)
+            // Only a submitted RIGHT Draw with the original state restored
+            // completes a physical stereo pair. The existing failure path
+            // still poisons the frame and retains the LEFT HRESULT.
+            const bool pairComplete = SUCCEEDED(rightHr) && restoreOk;
+            if (pairComplete)
             {
-                R30FirstScreenSpaceLogged = true;
-                spdlog::info(
-                    "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
-                    eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
-                    R30HudAspectCompensation(stereo));
+                FrameHadDuplicatedDraw = true;
+                ++DuplicatedDraws;
+                ++NonWorldDuplicatedDraws;
+                ++R30SafeTwoEyeDraws;
+                ++R30ScreenSpaceFovDraws;
+                if (screenKind == R30ScreenSpaceKind::Hud2D)
+                    ++R30Hud2DDraws;
+                else if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
+                    ++R30PerspectiveHudDraws;
+                else if (screenKind == R30ScreenSpaceKind::WorldBillboard ||
+                         screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
+                    ++R30WorldBillboardDraws;
+
+                if (!R30FirstScreenSpaceLogged)
+                {
+                    R30FirstScreenSpaceLogged = true;
+                    spdlog::info(
+                        "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
+                        eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
+                        R30HudAspectCompensation(stereo));
+                }
             }
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
@@ -5542,21 +5556,21 @@ namespace OutRunVRStereo
                             OutRunVRRenderer::GetLastRawGameWvpCameraSynced() ? 1 : 0, n);
                 }
                 static bool firstProjectedScreenEffectLogged = false;
-                if (!firstProjectedScreenEffectLogged)
+                if (pairComplete && !firstProjectedScreenEffectLogged)
                 {
                     firstProjectedScreenEffectLogged = true;
                     spdlog::info(
                         "VR R69 FLARE FIX: complete projected-screen flare family uses head-corrected centre-eye mono fusion in both eyes");
                 }
             }
-            if (screenKind == R30ScreenSpaceKind::WorldBillboard &&
+            if (pairComplete && screenKind == R30ScreenSpaceKind::WorldBillboard &&
                 !R30FirstFlatPerspectiveLogged)
             {
                 R30FirstFlatPerspectiveLogged = true;
                 spdlog::info(
                     "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane; R45 spatial vehicle/rank billboards use corrected outer-hook c64 ownership and rebuild stock WorldView with head+eye transform");
             }
-            if (screenKind == R30ScreenSpaceKind::PerspectiveHud &&
+            if (pairComplete && screenKind == R30ScreenSpaceKind::PerspectiveHud &&
                 !R30FirstPerspectiveHudLogged)
             {
                 R30FirstPerspectiveHudLogged = true;

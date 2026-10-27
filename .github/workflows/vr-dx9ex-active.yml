@@ -118,6 +118,7 @@ on:
       - 'tools/verify_vr_r30_rhw_perspective_fastpath.py'
       - 'tools/verify_vr_r30_world_seed_fastpath.py'
       - 'tools/verify_vr_r30_screen_hud_finite_plane.py'
+      - 'tools/verify_vr_r30_eye_completion_accounting.py'
       - 'tools/verify_vr_r30_queue_overlay_hud_plane.py'
       - 'tools/verify_vr_r30_generic_shader_overlay.py'
       - 'tools/verify_vr_pause_sky_source_owner.py'
@@ -371,6 +372,7 @@ jobs:
             'tools/verify_vr_r30_rhw_perspective_fastpath.py',
             'tools/verify_vr_r30_world_seed_fastpath.py',
             'tools/verify_vr_r30_screen_hud_finite_plane.py',
+            'tools/verify_vr_r30_eye_completion_accounting.py',
             'tools/verify_vr_r30_queue_overlay_hud_plane.py',
             'tools/verify_vr_r30_generic_shader_overlay.py',
             'tools/verify_vr_pause_sky_source_owner.py',
