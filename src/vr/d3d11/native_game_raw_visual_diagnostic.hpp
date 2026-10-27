@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include "native_game_raw_gpu_capture_epoch.hpp"
 
 namespace outrun::vr::dx11 {
 enum class NativeRawPreviewResult {
@@ -21,6 +22,7 @@ public:
         staging_.Reset(); event_.Reset(); surface_.Reset();
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; lastDraws_ = 0;
+        captureEpoch_.reset();
     }
     NativeRawPreviewResult present(
         IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,
@@ -35,6 +37,7 @@ public:
         }
         const bool newDraw = draws > lastDraws_;
         lastDraws_ = draws;
+        const bool capturedFromAuthenticDraw = captureEpoch_.consume();
         const LONG l = crop ? crop->left : 0, t = crop ? crop->top : 0;
         const LONG r = crop ? crop->right : static_cast<LONG>(back.Width);
         const LONG b = crop ? crop->bottom : static_cast<LONG>(back.Height);
@@ -118,7 +121,35 @@ public:
                 return NativeRawPreviewResult::GpuFailure;
             }
         }
-        if (!newDraw || pending_) return output;
+        // Prefer immutable GPU pixels copied IMMEDIATELY after the authentic
+        // D3D9-authored native Draw. A subsequent rejected source Draw, Clear
+        // or RenderTarget switch can no longer change the captured tile.
+        // Legacy Present-time sampling remains diagnostic fallback only if
+        // no Draw-time GPU copy was queued and its old conditions still hold.
+        if (!newDraw || pending_ || capturedFromAuthenticDraw) return output;
+        const auto queued = queue_sample(dev, ctx, color);
+        return output == NativeRawPreviewResult::VisibleGpuPixels
+            ? output : queued;
+    }
+    void sample_real_native_draw(
+        IDirect3DDevice9* game, ID3D11Device* dev,
+        ID3D11DeviceContext* ctx, ID3D11Texture2D* color,
+        std::uint64_t presentingSerial) noexcept {
+        if (!game || !dev || !ctx || !color ||
+            ctx->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE) return;
+        if (gameOwner_ != game || gpuOwner_ != dev) {
+            reset(); gameOwner_ = game; gpuOwner_ = dev;
+        }
+        if (!captureEpoch_.can_queue(presentingSerial, pending_)) return;
+        if (queue_sample(dev, ctx, color) == NativeRawPreviewResult::CopyQueued)
+            captureEpoch_.queued(presentingSerial);
+    }
+private:
+    NativeRawPreviewResult queue_sample(
+        ID3D11Device* dev, ID3D11DeviceContext* ctx,
+        ID3D11Texture2D* color) noexcept {
+        if (!dev || !ctx || !color || pending_)
+            return NativeRawPreviewResult::GpuFailure;
         D3D11_TEXTURE2D_DESC src{};
         color->GetDesc(&src);
         Microsoft::WRL::ComPtr<ID3D11Device> actual;
@@ -158,10 +189,8 @@ public:
         ctx->End(event_.Get());
         ctx->Flush();
         pending_ = true;
-        return output == NativeRawPreviewResult::VisibleGpuPixels
-            ? output : NativeRawPreviewResult::CopyQueued;
+        return NativeRawPreviewResult::CopyQueued;
     }
-private:
     Microsoft::WRL::ComPtr<ID3D11Texture2D> staging_;
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_;
@@ -170,5 +199,6 @@ private:
     D3DFORMAT format_ = D3DFMT_UNKNOWN;
     std::uint64_t lastDraws_ = 0, capture_ = 0;
     bool pending_ = false;
+    NativeRawGpuCaptureEpoch captureEpoch_{};
 };
 } // namespace outrun::vr::dx11

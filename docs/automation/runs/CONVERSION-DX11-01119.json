@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01119",
+  "production_id": "CONVERSION-DX11-01119",
+  "event_id": "CONVERSION-DX11-01119-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01119",
+  "classification": "A_INCOMPLETE_LIVE_NATIVE_GAME_GPU_SOURCE_TO_PRESENT",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "source_base_sha": "d7cc3868a0017b380707ee39badef9fe714830c5",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_gpu_source_epoch_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_NATIVE_D3D11_GPU_DRAW",
+      "DRAW_TIME_SOURCE_TEXTURE_COPY",
+      "ASYNC_GPU_FENCE_AND_D3D9_VISIBLE_TILE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "SM3_AND_FVF_GPU_DRAW_SOURCE_HOOKS",
+      "IMMEDIATE_GPU_SOURCE_SNAPSHOT",
+      "ASYNC_PRESENT_READBACK_CONSUMER",
+      "PORTABLE_CPP17_EPOCH_REGRESSION"
+    ],
+    "visible_frame_acceptance": "Actual menu/car/race real-game GPU pixels HMD UNTESTED; explicit opt-in diagnostic 256x144 tile only, never a full native frame or independent stereo.",
+    "activation_guard_and_fallback": "Original D3D9 Draw/Present, DX9Ex gamepad/FFB/SkyGlow fallback unchanged. RAW opt-in captures one authentic native source Draw per Present via bounded GPU copy. No new production native activation, DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Native SM3 and FVF real game Draw submit queues immediate GPU CopySubresourceRegion source snapshot before other game Draws or Clears, and bounded portable epoch regression exercises menu/car/race sequencing.",
+      "negative_regression": "No duplicate per-Present copy; pending GPU EVENT blocks overwrite; Reset/device change clears epoch; original fallback and full-scene continuity checks remain unchanged.",
+      "component_integration": "R30 real game Draw -> live_game_frame_bridge SM3/FVF submit -> native visual source GPU snapshot -> event+staging readback -> original game D3D9 diagnostic tile at Present."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Capture a proven live game authored native Draw output at source submission rather than sampling an overwritten native texture at Present, with async GPU copy and unchanged native full frame admission/DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "immediate_authentic_source_gpu_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_SOURCE_NATIVE_GPU",
+        "expected_behavior": "Both programmable and fixed-function real source GPU Draw completions queue an authentic D3D11 texture region before later unsupported source Draw or Clear."
+      },
+      {
+        "id": "bounded_fence_and_input_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GPU_PRESENT_ORIGINAL_D3D9_INPUT",
+        "expected_behavior": "Asynchronous staging never overwritten while pending and original D3D9 menu/vehicle/race drawing, gamepad, FFB and fallback preserved."
+      },
+      {
+        "id": "exact_sha_integrated_build",
+        "category": "integrated_validation",
+        "behavior_area": "SOURCE_TEST_CI_GATE",
+        "expected_behavior": "Portable C++ positive/negative epoch regression and five unchanged mandatory GitHub Actions succeed against same source-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest d7cc3868 sealed 01118 five-gate success, no 01119 material commit found at start",
+    "C1_REVIEW": "PASS: confirmed Present-time GPU pixel sampling after possible intervening native output mutations",
+    "C2_IMPLEMENT": "DRAW-time GPU source snapshot, SM3/FVF integration, one-copy-per-epoch producer/consumer and portable regression",
+    "C3_VALIDATE": "PENDING five mandatory exact-SHA push Actions",
+    "C4_COMMIT": "PENDING material GitHub commit",
+    "C5_PACKAGE": "NOT_REQUIRED: diagnostic-only, no HMD/desktop distribution",
+    "C6_STATE": "PENDING final exact-SHA Gate proof"
+  },
+  "runtime_evidence": {
+    "native_draws": "UNTESTED",
+    "native_gpu_pixel_output": "UNTESTED",
+    "complete_native_frame": "UNTESTED",
+    "quest3_stereo": "UNTESTED"
+  },
+  "next_action": "Verify five exact-SHA GitHub Actions; repair any concrete build/contract failure in same TASK_ID; never claim full frame or HMD runtime."
+}

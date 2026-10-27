@@ -672,6 +672,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_pre_draw_leading_empty_probe_01107.cpp -o /tmp/dx11_predraw_empty_01107 && /tmp/dx11_predraw_empty_01107
           python tools/test_dx11_pre_draw_edge_overwrite_01106.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_edge_overwrite_probe_01106.cpp -o /tmp/dx11_edge_overwrite_01106 && /tmp/dx11_edge_overwrite_01106
+          # Draw-time GPU source copy survives later rejected/poisoned D3D9 Draws.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_gpu_source_epoch_test.cpp -o /tmp/dx11_raw_gpu_epoch_01119 && /tmp/dx11_raw_gpu_epoch_01119
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
           # Native L/R partial-depth GPU Draw is a separate non-evidence

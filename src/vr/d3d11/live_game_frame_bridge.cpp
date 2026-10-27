@@ -7104,6 +7104,19 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     s.pending = true;
     ++s.issued;
+    // An actual D3D11 GPU Draw has just completed its CPU-side submission.
+    // Capture source-owned pixels while this draw's output still exists, not
+    // after later unsupported D3D9 menu/car/race Draws mutate the native RT.
+    // This opt-in tile is never a full-frame or Quest stereo publication.
+    if (env_raw_visual_opt_in() && s.backend.ready()) {
+        auto* gpuContext = s.backend.context();
+        ScopedNativeGameGpuTransferInputs savedInputs(
+            gpuContext, s.backend.color_texture());
+        ScopedNativeGameGpuTransferOutputs savedOutputs(gpuContext);
+        s.rawPreview.sample_real_native_draw(
+            game, s.backend.device(), gpuContext,
+            s.backend.color_texture(), s.presents);
+    }
     ++s.eligible;
     if (s.eligibleThisFrame != (std::numeric_limits<UINT>::max)())
         ++s.eligibleThisFrame;
@@ -7981,6 +7994,19 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // GPU submission is paired with the queued readback at Present.
     s.pending = true;
     ++s.issued;
+    // An actual D3D11 GPU Draw has just completed its CPU-side submission.
+    // Capture source-owned pixels while this draw's output still exists, not
+    // after later unsupported D3D9 menu/car/race Draws mutate the native RT.
+    // This opt-in tile is never a full-frame or Quest stereo publication.
+    if (env_raw_visual_opt_in() && s.backend.ready()) {
+        auto* gpuContext = s.backend.context();
+        ScopedNativeGameGpuTransferInputs savedInputs(
+            gpuContext, s.backend.color_texture());
+        ScopedNativeGameGpuTransferOutputs savedOutputs(gpuContext);
+        s.rawPreview.sample_real_native_draw(
+            game, s.backend.device(), gpuContext,
+            s.backend.color_texture(), s.presents);
+    }
     return true;
 }
 
