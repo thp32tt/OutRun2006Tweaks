@@ -143,7 +143,10 @@ struct GameNativePreDrawFills {
         std::int64_t left{}, top{}, right{}, bottom{};
         std::uint32_t argb{};
     };
-    static constexpr std::uint32_t kCapacity = 16u;
+    static constexpr std::uint32_t kCapacity = 128u;
+    // Real game sparse pre-first-Draw color writes can cover 128 separated
+    // regions; keep every ordered tile until native RTV replay. The source
+    // Clear count remains bounded independently to 128 per original call.
     // D3D9 source Clear rectangles may clip or overwrite into fewer replay
     // tiles. Bound source processing separately from the 16 stored GPU tiles.
     static constexpr std::uint32_t kMaxPreDrawTargetClearSourceRects = 128u;

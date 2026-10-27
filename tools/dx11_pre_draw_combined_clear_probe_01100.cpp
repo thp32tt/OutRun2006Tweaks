@@ -83,26 +83,29 @@ int main() {
     assert(GameNativePreDrawCombinedClear::record(
         c,d,7,11,13,W,H,0,0,W,H,1,outside,0xff010203u,.1f));
     assert(cc==c.count&&dc==d.count);
-    // Color transaction succeeds, but depth has only 32 GPU replay slots.
-    // Failure of the second recorder must roll back FIRST recorder too.
+    // Color transaction would succeed, but a 129th depth tile is not
+    // representable. Roll back both ledgers without partial ownership.
     GameNativePreDrawFills stagedColor{};
     GameNativePreDrawDepth stagedDepth{};
-    for(int i=0;i<32;++i){
-        Rect r{long(i),0,long(i+1),1};
-        assert(stagedDepth.record(7,11,13,W,H,0,0,W,H,1,&r,(i&1)? .5f : .6f));
+    for(int i=0;i<128;++i){
+        Rect r{long(i%40),long(i/40),long(i%40+1),long(i/40+1)};
+        assert(stagedDepth.record(7,11,13,W,H,0,0,W,H,1,&r,
+                                  (i&1)? .5f : .6f));
     }
-    const Rect novel[]={{0,4,3,7}};
+    const Rect novel[]={{0,10,3,11}};
     const auto priorDepth=stagedDepth.count;
     assert(!GameNativePreDrawCombinedClear::record(
         stagedColor,stagedDepth,7,11,13,W,H,0,0,W,H,1,novel,
         0xffa0b0c0u,.4f));
     assert(stagedColor.count==0&&stagedDepth.count==priorDepth);
-    // Color tile budget overflow must likewise preserve existing depth.
+    // The color ledger has its own 128 independent ordered tiles.
     stagedColor.discard();stagedDepth.discard();
-    for(int i=0;i<16;++i)
-        assert(stagedColor.record(7,11,i*2,0,i*2+1,1,W,H,0xff121212u));
+    for(int i=0;i<128;++i)
+        assert(stagedColor.record(7,11,i%40,i/40,i%40+1,i/40+1,W,H,
+                                  0xff100000u+std::uint32_t(i)));
+    const Rect colorExtra[]={{0,16,1,17}};
     assert(!GameNativePreDrawCombinedClear::record(
-        stagedColor,stagedDepth,7,11,13,W,H,0,0,W,H,1,novel,
+        stagedColor,stagedDepth,7,11,13,W,H,0,0,W,H,1,colorExtra,
         0xff454545u,.4f));
-    assert(stagedDepth.count==0u&&stagedColor.count==16u);
+    assert(stagedDepth.count==0u&&stagedColor.count==128u);
 }

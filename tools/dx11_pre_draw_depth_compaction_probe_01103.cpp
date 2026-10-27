@@ -95,16 +95,18 @@ int main() {
     paint(expectedColor,repeated[0],red);
     assert(depth.count==1u && colors.count==1u);
     assert(gpu(depth)==expected && gpu(colors)==expectedColor);
-    // A depth-only budget overflow cannot leak any staged color write.
+    // All 128 native D32 tiles are now admitted, but a 129th real Z write
+    // must not leak the paired color transaction.
     colors.discard();depth.discard();
-    for(long i=0;i<32;++i){
-        Rect r{i,0,i+1,1};
-        assert(depth.record(7,11,13,W,H,0,0,W,H,1,&r,(i&1L)? .65f : .75f));
+    for(long i=0;i<128;++i){
+        Rect r{i%48,i/48,i%48+1,i/48+1};
+        assert(depth.record(7,11,13,W,H,0,0,W,H,1,&r,
+                            (i&1L)? .65f : .75f));
     }
     const Rect disjoint{0,15,1,16};
     assert(!GameNativePreDrawCombinedClear::record(
         colors,depth,7,11,13,W,H,0,0,W,H,1,&disjoint,red,.2f));
-    assert(colors.count==0u && depth.count==32u);
+    assert(colors.count==0u && depth.count==128u);
     // Different-value intervening writes must not be elided by an older Z.
     depth.discard();expected.fill(1.f);
     Rect block{2,2,12,12};

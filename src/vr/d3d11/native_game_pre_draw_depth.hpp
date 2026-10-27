@@ -7,7 +7,9 @@ namespace outrun::vr::dx11::live_game_frame {
 // Native GPU depth is only allocated on the first real game Draw.
 struct GameNativePreDrawDepth {
     struct Tile { std::int64_t left{}, top{}, right{}, bottom{}; float z{}; };
-    static constexpr std::uint32_t kCapacity=32u;
+    static constexpr std::uint32_t kCapacity=128u;
+    static constexpr std::uint32_t kGpuChunkCapacity =
+        GameNativeSourceMutation::kMaxPartialTargetClearRects;
     // One original D3D9 Clear may contain more source rectangles than the
     // bounded GPU replay ledger. Fully hidden older depth writes are retired
     // while preserving the final per-pixel Z value and source order.
@@ -28,6 +30,26 @@ struct GameNativePreDrawDepth {
             const auto& p=tiles[i];
             if(p.left<0||p.top<0||p.right<=p.left||p.bottom<=p.top||
                p.right>w||p.bottom>h||!(p.z>=0.f&&p.z<=1.f))return false;
+        }
+        return true;
+    }
+    // Replay 33..128 authentic sparse game Z regions in source order. D3D11.1
+    // groups consecutive equal-Z rectangles into at most 32 ClearView regions;
+    // D3D11.0 uses the same ordered batches with per-tile depth-only raster.
+    // Validate the entire ledger and COM owners BEFORE the first GPU write.
+    template<class Submit>
+    [[nodiscard]] bool replay_batched(
+        std::uintptr_t owner, std::uintptr_t rt, std::uintptr_t ds,
+        std::uint32_t w, std::uint32_t h, Submit&& submit) const noexcept {
+        if (!replay_ready(owner,rt,ds,w,h)) return false;
+        std::uint32_t start=0u;
+        while (start<count) {
+            const float z=tiles[start].z;
+            std::uint32_t used=1u;
+            while (start+used<count && used<kGpuChunkCapacity &&
+                   tiles[start+used].z==z) ++used;
+            if (!submit(tiles.data()+start,used,z)) return false;
+            start+=used;
         }
         return true;
     }

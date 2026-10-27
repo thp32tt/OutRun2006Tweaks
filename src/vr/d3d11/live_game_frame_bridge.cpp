@@ -5055,17 +5055,35 @@ bool replay_native_game_pre_draw_depth(State& s,ID3D11DeviceContext* ctx,
        !s.preDrawDepth.replay_ready(owner,rt,ds,width,height))return false;
     ComPtr<ID3D11DeviceContext1> context1;
     (void)ctx->QueryInterface(IID_PPV_ARGS(context1.GetAddressOf()));
-    for(std::uint32_t i=0;i<s.preDrawDepth.count;++i){
-        const auto& tile=s.preDrawDepth.tiles[i];
-        const D3D11_RECT rect{static_cast<LONG>(tile.left),
-            static_cast<LONG>(tile.top),static_cast<LONG>(tile.right),
-            static_cast<LONG>(tile.bottom)};
-        if(context1){
-            const float value[4]={tile.z,0.f,0.f,0.f};
-            context1->ClearView(s.diagnosticDepthView.Get(),value,&rect,1u);
-        }else if(!native_game_raster_partial_backbuffer_depth_clear(
-            ctx,s.diagnosticDepthView.Get(),width,height,rect,tile.z))return false;
-    }
+    const bool replayed=s.preDrawDepth.replay_batched(
+        owner,rt,ds,width,height,
+        [&](const GameNativePreDrawDepth::Tile* tiles,
+            std::uint32_t count,float z) noexcept -> bool {
+            if(context1){
+                D3D11_RECT rects[GameNativePreDrawDepth::kGpuChunkCapacity]{};
+                for(std::uint32_t i=0u;i<count;++i)
+                    rects[i]={static_cast<LONG>(tiles[i].left),
+                        static_cast<LONG>(tiles[i].top),
+                        static_cast<LONG>(tiles[i].right),
+                        static_cast<LONG>(tiles[i].bottom)};
+                const float value[4]={z,0.f,0.f,0.f};
+                context1->ClearView(s.diagnosticDepthView.Get(),
+                                    value,rects,count);
+            }else{
+                for(std::uint32_t i=0u;i<count;++i){
+                    const D3D11_RECT rect{
+                        static_cast<LONG>(tiles[i].left),
+                        static_cast<LONG>(tiles[i].top),
+                        static_cast<LONG>(tiles[i].right),
+                        static_cast<LONG>(tiles[i].bottom)};
+                    if(!native_game_raster_partial_backbuffer_depth_clear(
+                        ctx,s.diagnosticDepthView.Get(),width,height,rect,z))
+                        return false;
+                }
+            }
+            return true;
+        });
+    if(!replayed)return false;
     s.preDrawDepth.discard();
     return true;
 }

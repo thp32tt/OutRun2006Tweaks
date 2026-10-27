@@ -70,14 +70,16 @@ int main() {
     }
     assert(bc.count==3u && bd.count==3u);
     verify(bc,bd,expectedC,expectedZ);
-    // Seventeen nonfusible source regions must still fail atomically:
-    // original D3D9 is authoritative; neither native ledger can change.
+    // 128 nonfusible pre-first-Draw COLOR regions remain representable;
+    // a 129th paired call must fail transactionally with no depth write.
     GameNativePreDrawFills saturated{};
     GameNativePreDrawDepth untouched{};
-    for(long i=0;i<16;++i)
-        assert(saturated.record(7,11,2*i,27,2*i+1,28,W,H,A));
+    for(long i=0;i<128;++i)
+        assert(saturated.record(7,11,2*(i%40),i/40,
+                                2*(i%40)+1,i/40+1,W,H,
+                                A+std::uint32_t(i)));
     const auto before=saturated;
-    assert(!record(saturated,untouched,{34,27,35,28},B,.2f));
+    assert(!record(saturated,untouched,{0,12,1,13},B,.2f));
     assert(untouched.count==0u && saturated.count==before.count);
     for(unsigned i=0;i<before.count;++i) {
         const auto& a=saturated.entries[i];

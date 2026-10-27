@@ -77,31 +77,24 @@ int main() {
     assert(pending.record_target_clear(
         17u,19u,W,H,0,0,W,H,1,outside,0xffaabbccu));
     assert(replay(pending)==expected);
-    // Capacity overflow within a multi-rectangle game Clear is all-or-none.
+    // 128 independent authentic color regions are now staged intact for
+    // D3D11 first-Draw RTV replay; the 129th fails without partial writes.
     pending.discard(); expected={};
-    for(int i=0;i<15;++i) {
-        assert(pending.record(17u,19u,i*2,0,i*2+1,1,W,H,
-                              0xff000000u+static_cast<std::uint32_t>(i)));
-        paint(expected,i*2,0,i*2+1,1,
-              0xff000000u+static_cast<std::uint32_t>(i));
+    for(int i=0;i<128;++i) {
+        const int x=(i%20)*2,y=(i/20)*2;
+        const auto argb=0xff000000u+static_cast<std::uint32_t>(i);
+        assert(pending.record(17u,19u,x,y,x+1,y+1,W,H,argb));
+        paint(expected,x,y,x+1,y+1,argb);
     }
     const auto saved=pending;
-    const D3DRect overflow[]={{31,0,32,1},{33,0,34,1}};
+    const D3DRect overflow[]={{0,16,1,17}};
     assert(!pending.record_target_clear(
-        17u,19u,W,H,0,0,W,H,2,overflow,0xffabcdefu));
-    assert(pending.count==15u && replay(pending)==replay(saved));
+        17u,19u,W,H,0,0,W,H,1,overflow,0xffabcdefu));
+    assert(pending.count==128u && replay(pending)==replay(saved));
     assert(replay(pending)==expected);
-    // A bounded multi-rect Clear that needs 24 independent tiles must fail
-    // atomically with original game D3D9 pixels still authoritative.
-    pending.discard();
-    std::array<D3DRect,24> distinct{};
-    for (std::size_t i=0;i<distinct.size();++i)
-        distinct[i]={static_cast<int>((i%8u)*2u),
-                    static_cast<int>(2u+(i/8u)*2u),
-                    static_cast<int>((i%8u)*2u+1u),
-                    static_cast<int>(3u+(i/8u)*2u)};
+    // The per-original-call source guard also rejects malformed 129 input
+    // without any attempt at native GPU pixels.
     assert(!pending.record_target_clear(
-        17u,19u,W,H,0,0,W,H,
-        static_cast<std::uint32_t>(distinct.size()),distinct.data(),0xffaabbccu));
-    assert(pending.count==0u && replay(pending)==Frame{});
+        17u,19u,W,H,0,0,W,H,129u,overflow,0xffabcdefu));
+    assert(replay(pending)==expected);
 }

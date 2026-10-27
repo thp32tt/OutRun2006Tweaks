@@ -79,16 +79,16 @@ int main(){
     }
     assert(lcolor.count==2u && ldepth.count==2u);
     equal(lcolor,ldepth,lc,lz);
-    // 17 separated color writes are not fake-fused. The failed combined
-    // game Clear must leave BOTH recording ledgers unmodified.
+    // Seventeen distinct game COLOR writes now remain intact for their
+    // first-Draw native RTV/DSV replay rather than failing at old tile 16.
     GameNativePreDrawFills fullColor{};
     GameNativePreDrawDepth isolatedZ{};
     for(unsigned i=0;i<16u;++i)
         assert(fullColor.record(7,11,i*2,17,i*2+1,18,W,H,red));
     const Rect seventeenth{34,17,35,18};
-    assert(!GameNativePreDrawCombinedClear::record(
+    assert(GameNativePreDrawCombinedClear::record(
         fullColor,isolatedZ,7,11,13,W,H,0,0,W,H,1,&seventeenth,red,.6f));
-    assert(fullColor.count==16u && isolatedZ.count==0u);
+    assert(fullColor.count==17u && isolatedZ.count==1u);
     // A foreign device must not consolidate or change original owner tiles.
     assert(!colors.record(8,11,72,0,73,1,W,H,red));
     assert(!depths.record(7,11,14,W,H,0,0,W,H,1,&middle,.5f));

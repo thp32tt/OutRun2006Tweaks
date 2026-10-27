@@ -39,15 +39,15 @@ int main() {
  assert(d.count==2);
  d.discard();
  assert(d.count==0);
- // An actual 32-GPU-tile overflow must contain 32 *non-fusible*
- // overwrites. Consecutive equal-depth game pixels now combine exactly.
- for(unsigned i=0;i<33;++i) {
-  Rect r={long(i%8),long((i/8)%6),long(i%8+1),long((i/8)%6+1)};
-  // Each source write has a distinct depth: no old tile can legally
-  // fuse across an independent band or an intervening color/Z writer.
-  const float z=float(i+1u)/64.0f;
-  if(i<32)assert(d.record(7,11,13,8,6,0,0,8,6,1,&r,z));
-  else assert(!d.record(7,11,13,8,6,0,0,8,6,1,&r,z));
+ // Full sparse game Z epoch: accept 128 independent native D32 tiles,
+ // reject a 129th without losing any successfully staged old depth.
+ for(unsigned i=0;i<128;++i) {
+  Rect r={long(i*3),0,long(i*3+2),1};
+  const float z=(i&1u)? .25f : .75f;
+  assert(d.record(7,11,13,390,4,0,0,390,4,1,&r,z));
  }
- assert(d.count==32);
+ assert(d.count==128);
+ const Rect extra={0,2,1,3};
+ assert(!d.record(7,11,13,390,4,0,0,390,4,1,&extra,.35f));
+ assert(d.count==128);
 }
