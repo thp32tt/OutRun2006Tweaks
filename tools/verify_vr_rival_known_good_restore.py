@@ -23,9 +23,9 @@ assert 'VR RIVAL KNOWN-GOOD ORDER RESTORED:' in rv
 # Native-projector A/B may keep stock BB6F0, but BB796 ownership is
 # mandatory in both modes; otherwise all projected/fresh-root fixes are bypassed.
 assert 'BB796 ownership is NOT optional' in ui
-assert 'shared Calc3D2D + BB796 ownership hooks remain active' in ui
+assert 'BB796 ownership remains active but exact-edge anchor provenance is not forced' in ui
 assert 'if (!Settings::VRRivalDx11NativeRoute.get())\n            Memory::VP::InjectHook(\n                Module::exe_ptr(RivalMarker_SpraniCall)' not in ui
-assert 'BB796Ownership=ALWAYS' in settings
+assert 'stockProjectorAB={} exactEdge={} BB796Ownership=ALWAYS' in settings
 assert 'FirstVerifiedNewRootAppendedChain' in tail
 assert 'RivalNewRootRegression' in tail
 assert 'rivalCreatedFreshRoot' in ui
