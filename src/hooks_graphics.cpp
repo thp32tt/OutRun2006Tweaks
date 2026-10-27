@@ -726,10 +726,12 @@ class VRLensFlareProjected2D : public Hook
                 const auto n = originalDraws.fetch_add(1, std::memory_order_relaxed) + 1;
                 if (n <= 12 || (n & (n - 1)) == 0)
                     spdlog::info(
-                        "VR LENS 570008 ORIGINAL BOTH DRAWN: id=0x{:X} ordinal={} sequence={} hits={} alpha={} flags=0x{:X}",
+                        "VR LENS 570008 ORIGINAL BOTH DRAWN: id=0x{:X} ordinal={} sequence={} hits={} alpha={} flags=0x{:X} ambientScope={} spriteQueue={} physicalDraw=UNOBSERVED",
                         static_cast<unsigned>(objectId), ordinal,
                         LensFlareSequence, n, alpha,
-                        static_cast<unsigned>(flags));
+                        static_cast<unsigned>(flags),
+                        static_cast<int>(OutRunVR::GameSemantic::EffectiveScope()),
+                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
             }
         }
 
@@ -798,6 +800,27 @@ class VRLensFlareProjected2D : public Hook
             Settings::VREnabled &&
             !OutRunVR::GameSemantic::QueueRenderActive() &&
             IsProjectedSunScreenObject(objectId);
+        // 4056D0 may only enqueue the original opaque object. Do NOT
+        // interpret this hook's call counter as a native Draw or an eye RT.
+        // The mod SpriteNode/D3DX queue flag is separate from that game's
+        // opaque 405360/4052C0 transaction. Log its value as a control,
+        // not as a claim about deferred or immediate opaque submission.
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            IsProjectedSunScreenObject(objectId))
+        {
+            static std::atomic<std::uint64_t> sourceAdmissions{0};
+            const auto n = sourceAdmissions.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 16 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR LENS C993 SOURCE ADMISSION: id=0x{:06X} hits={} "
+                    "sequence={} projected={} spriteQueue={} "
+                    "ambientScope={} physicalDraw=UNOBSERVED opaqueFlush=UNOBSERVED",
+                    static_cast<unsigned>(objectId), n,
+                    LensFlareSequence, projectedSun ? 1 : 0,
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    static_cast<int>(OutRunVR::GameSemantic::EffectiveScope()));
+        }
         if (!projectedSun)
         {
             Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
