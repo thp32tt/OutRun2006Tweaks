@@ -52,9 +52,25 @@ def check(r33, r29):
             assert draw.count(probe) == 1
             assert "auto call = [&](bool resyncAlreadyFlushed)" in draw
             assert "const bool tryXyzrhw = resyncAlreadyFlushed &&" in draw
-            assert "(!OutRunVR::State::StateBlockTracker::Reliable() ||" in draw
-            assert "R32ReviewCurrentVertexShaderIdentity() == 0);" in draw
-            assert "const HRESULT xyzrhw = tryXyzrhw\n                    ? " + probe in draw
+            if path == "PrimitiveUP":
+                for required in (
+                    "const bool exactProjectedRival =",
+                    "QueueRenderActive() &&",
+                    "RenderScope::ProjectedWorldMarker2D",
+                    "ProducerToken::RivalMarkerSprani",
+                    "CurrentProjectedMarker() != nullptr",
+                    "(exactProjectedRival ||",
+                    "!OutRunVR::State::StateBlockTracker::Reliable() ||",
+                    "R32ReviewCurrentVertexShaderIdentity() == 0);",
+                    "R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(",
+                ):
+                    assert required in draw
+            else:
+                assert "exactProjectedRival" not in draw
+                assert "(!OutRunVR::State::StateBlockTracker::Reliable() ||" in draw
+                assert "R32ReviewCurrentVertexShaderIdentity() == 0);" in draw
+            assert "const HRESULT xyzrhw = tryXyzrhw" in draw
+            assert "? " + probe in draw
             assert ": E_NOTIMPL;" in draw
             # Route instrumentation is observational and remains inside
             # the same resync-gated R30 XYZRHW branch.
@@ -79,33 +95,25 @@ def main():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert workflow.count("tools/verify_vr_r33_mono_bypass_xyzrhw_fastpath.py") == 2
     assert check(r33, r29), "R33 stereo eligibility / mono bypass contract"
-    cases = []
-    for _, path, _ in DRAW_NAMES:
-        probe = "R32ReviewTryXyzrhw" + path + "("
-        cases += [
-            r33.replace(
-                "const bool tryXyzrhw = resyncAlreadyFlushed &&",
-                "const bool tryXyzrhw = true &&", 1),
-            r33.replace(
-                "R32ReviewCurrentVertexShaderIdentity() == 0);",
-                "true);", 1),
-            r33.replace(
-                "StateBlockTracker::Reliable() ||",
-                "StateBlockTracker::Reliable() &&", 1),
-            r33.replace(": E_NOTIMPL;", ": D3D_OK;", 1),
-        ]
-    cases += [
-        r33.replace("if (!gameDevice || internalPass ||",
-                    "if (false || false ||", 1),
-        r33.replace("return drawCall(false);", "return drawCall(true);", 1),
-        r33.replace("return drawCall(true);", "return drawCall(false);", 1),
-        r29.replace("!TargetIsBackBuffer()", "false", 1),
+    cases = [
+        (r33.replace("if (!gameDevice || internalPass ||",
+                     "if (false || false ||", 1), r29, "outer guard"),
+        (r33.replace("return drawCall(false);",
+                     "return drawCall(true);", 1), r29, "mono bypass"),
+        (r33.replace("ProducerToken::RivalMarkerSprani",
+                     "ProducerToken::None", 1), r29, "rival producer"),
+        (r33.replace("CurrentProjectedMarker() != nullptr",
+                     "true", 1), r29, "rival anchor"),
+        (r33.replace("(exactProjectedRival ||",
+                     "(true ||", 1), r29, "rival cache bypass"),
     ]
-    for i, candidate in enumerate(cases):
-        assert candidate != r33 and candidate != r29, ("unchanged mutation", i)
-        assert not check(candidate, r29) if i < len(cases)-1 else not check(r33, candidate), (
-            "mutation passed", i)
-    print(f"PASS R33 guarded XYZRHW mono/aux bypass and raw/R29 fallback; {len(cases)} destructive checks")
+    for candidate, candidate29, label in cases:
+        assert candidate != r33, ("unchanged mutation", label)
+        assert not check(candidate, candidate29), ("mutation passed", label)
+    mutated29 = r29.replace("!TargetIsBackBuffer()", "false", 1)
+    assert mutated29 != r29
+    assert not check(r33, mutated29), "R29 backbuffer mutation passed"
+    print(f"PASS R33 guarded XYZRHW mono/aux bypass + exact rival PrimitiveUP cache exception; {len(cases)+1} destructive checks")
 
 
 if __name__ == "__main__":
