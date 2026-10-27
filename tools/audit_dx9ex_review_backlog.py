@@ -23,8 +23,37 @@ CATEGORIES = (
     ("PERFORMANCE_PARTICLES", r"PERF|PARTICLE|SMOKE|SAND|GLASS|WATER|TRANSPAREN|CACHE|HOTPATH"),
     ("OTHER", r"."),
 )
-EXACT_APPLIED = {"01516": "R7 query-main-depth sync invalidation",
-                 "01521": "R30 pre-WVP R9 mono-gap deferral"}
+# Receipt = (live source path, exact retained marker, bounded patch scope).
+# A review note alone is never evidence of a current implementation.
+SOURCE_PATCH_RECEIPTS = {
+    "01490": ("vrhost/src/main_r23.cpp",
+              "cachedMenuLetterbox != currentMenuLetterbox;",
+              "Menu cache redraw on accepted letterbox-only policy change"),
+    "01499": ("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+              "const bool f11PairComplete = SUCCEEDED(rightHr) && restored;",
+              "F11 complete-eye-pair success counters only"),
+    "01511": ("src/vr/d3d9/stereo_renderer_r7.inc",
+              "setupOk = SUCCEEDED(device->SetVertexShader(nullptr)) && setupOk;",
+              "SBS compositor setter HRESULT accounting"),
+    "01516": ("src/vr/d3d9/stereo_renderer_r7.inc",
+              "LEFT depth/stencil write still invalidates the RIGHT content.",
+              "Occlusion-query single LEFT depth sync invalidation"),
+    "01519": ("src/vr/d3d9/stereo_renderer.cpp",
+              "Present/mono-shadow-restore",
+              "Failed mono-shadow restore metadata propagation only"),
+    "01521": ("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+              "The first physical LEFT Draw is now imminent:",
+              "R30 clean pre-WVP fallback does not dirty R9 mono gap"),
+    "01523": ("src/vr/game/outrun_renderer.cpp",
+              "UploadContainsOutRunWvp(startRegister, vector4fCount))",
+              "Complete c64..c67 bounds before 16-float source copy"),
+}
+PARTIAL_PATCH_RECEIPTS = {
+    "01518": ("src/vr/d3d9/stereo_renderer_r7.inc",
+              "if(stateBlock)stateBlock->Release();return false;",
+              "Partial fix: COM cleanup on failed CreateStateBlock; "
+              "no failed-SBS color rollback implemented"),
+}
 MANUAL_OVERLAP = {"01350": "R26 SkyGlow capture generation manual integration",
                   "01418": "R26 SkyGlow capture generation manual integration"}
 
@@ -44,6 +73,12 @@ def category(text: str) -> str:
 def main():
     files = sorted(DOCS.glob("CONVERSION-DX9EX-*.md"))
     rows = []
+    verified_receipts = {}
+    for ident, (relative, marker, note) in {
+            **SOURCE_PATCH_RECEIPTS, **PARTIAL_PATCH_RECEIPTS}.items():
+        code = (ROOT / relative).read_text(encoding="utf-8-sig")
+        assert marker in code, f"stale patch receipt {ident}: {relative}"
+        verified_receipts[ident] = note
     for file in files:
         content = file.read_text(encoding="utf-8")
         identity = re.search(r"CONVERSION-DX9EX-(\d{5})\.md$", file.name)
@@ -55,9 +90,12 @@ def main():
         if not finding:
             # Legacy records may not have the later structured NEW_FINDING key.
             finding = "UNSTRUCTURED_REVIEW"
-        if ident in EXACT_APPLIED:
-            status = "SOURCE_PATCH_APPLIED_CI_RUNTIME_UNTESTED"
-            note = EXACT_APPLIED[ident]
+        if ident in SOURCE_PATCH_RECEIPTS:
+            status = "SOURCE_PATCH_PRESENT_RUNTIME_UNTESTED"
+            note = verified_receipts[ident]
+        elif ident in PARTIAL_PATCH_RECEIPTS:
+            status = "PARTIAL_PATCH_PRESENT_OTHER_RISKS_OPEN"
+            note = verified_receipts[ident]
         elif ident in MANUAL_OVERLAP:
             status = "MANUAL_INTEGRATION_OVERLAP_REVIEW"
             note = MANUAL_OVERLAP[ident]
@@ -107,10 +145,14 @@ def main():
         "requires a current source diff; historical REVIEW_ONLY does not equal",
         "current unpatched code. Quest3/HMD runtime UNTESTED.",
         "",
-        "## Source review patch receipts (this task)",
+        "## Source-verified review patch receipts (runtime untested)",
         "",
-        "- CONVERSION-DX9EX-01516: R7 occlusion query write invalidation.",
-        "- CONVERSION-DX9EX-01521: R30 pre-WVP failed upload mono-gap deferral.",
+    ]
+    for ident in sorted(SOURCE_PATCH_RECEIPTS):
+        lines.append(f"- {ident}: {verified_receipts[ident]}")
+    for ident in sorted(PARTIAL_PATCH_RECEIPTS):
+        lines.append(f"- {ident}: {verified_receipts[ident]}")
+    lines += [
         "- 01350/01418: overlapping SkyGlow manual integration; not double-counted.",
         "",
         "## Counts",
