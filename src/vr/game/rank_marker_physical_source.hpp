@@ -60,6 +60,43 @@ namespace OutRunVR::RankMarker
         const void* queueNode = nullptr;
         std::uint64_t queueEpoch = 0;
     };
+    inline constexpr std::uint64_t MaxOriginalRankWvpDrawAge(
+        GameSemantic::ProducerToken producer) noexcept
+    {
+        // R30 deliberately permits projected markers to reuse the original
+        // same-shader game c64 for up to 128 draws. Keep ordinary rank's
+        // stricter historical fence, but do not make RivalMarkerSprani fail
+        // downstream after R30 already admitted that exact projected source.
+        return producer == GameSemantic::ProducerToken::RivalMarkerSprani
+            ? 128u : 12u;
+    }
+
+    inline bool CompatibleOriginalRankWvpProvenance(
+        const PhysicalRankSource& physical,
+        const OriginalRankWvpSource& raw) noexcept
+    {
+        const bool exactNode =
+            raw.scope == physical.scope &&
+            raw.producer == physical.producer &&
+            raw.queueNode == physical.queueNode &&
+            raw.queueEpoch == physical.queueEpoch;
+        if (exactNode)
+            return true;
+
+        // One rival animation can emit several sibling/mask SpriteNodes while
+        // the game reuses the same original c64. R30 already proves the same
+        // live shader/epoch, pose, bounded draw age and current Calc3D2D anchor.
+        // Permit only another queue-owned RivalMarkerSprani node; foreign
+        // producer/scope, unqueued provenance and missing epochs still fail.
+        return physical.producer ==
+                GameSemantic::ProducerToken::RivalMarkerSprani &&
+            physical.queued && physical.queueNode &&
+            physical.queueEpoch != 0 &&
+            raw.scope == physical.scope &&
+            raw.producer == physical.producer &&
+            raw.queueNode != nullptr && raw.queueEpoch != 0;
+    }
+
     inline bool CoherentOriginalRankWvp(
         const PhysicalRankSource& physical,
         const OriginalRankWvpSource& raw) noexcept
@@ -68,14 +105,12 @@ namespace OutRunVR::RankMarker
             physical.shader != 0 && physical.shaderEpoch != 0 &&
             raw.writeSerial != 0 && raw.writtenDraw != 0 &&
             raw.writtenDraw < physical.drawSerial &&
-            physical.drawSerial - raw.writtenDraw <= 12u &&
+            physical.drawSerial - raw.writtenDraw <=
+                MaxOriginalRankWvpDrawAge(physical.producer) &&
             raw.poseEpoch == physical.poseEpoch &&
             raw.shader == physical.shader &&
             raw.shaderEpoch == physical.shaderEpoch &&
-            raw.scope == physical.scope &&
-            raw.producer == physical.producer &&
-            raw.queueNode == physical.queueNode &&
-            raw.queueEpoch == physical.queueEpoch;
+            CompatibleOriginalRankWvpProvenance(physical, raw);
     }
     inline bool SameOriginalRankWvp(
         const OriginalRankWvpSource& a,
