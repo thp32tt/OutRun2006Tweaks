@@ -1143,6 +1143,44 @@ namespace OutRunVRStereo
             const auto rankRawBeforeLeft = exactRankEye
                 ? captureRankOriginalWvp()
                 : OutRunVR::RankMarker::OriginalRankWvpSource{};
+            if (R33TelemetryEnabled() && exactRankEye &&
+                rankBeforeLeft.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani)
+            {
+                const bool sameRawNode =
+                    rankRawBeforeLeft.scope == rankBeforeLeft.scope &&
+                    rankRawBeforeLeft.producer == rankBeforeLeft.producer &&
+                    rankRawBeforeLeft.queueNode == rankBeforeLeft.queueNode &&
+                    rankRawBeforeLeft.queueEpoch == rankBeforeLeft.queueEpoch;
+                const bool coherentRaw =
+                    OutRunVR::RankMarker::CoherentOriginalRankWvp(
+                        rankBeforeLeft, rankRawBeforeLeft);
+                const std::uint64_t rawAge =
+                    rankRawBeforeLeft.writtenDraw != 0 &&
+                    rankBeforeLeft.drawSerial > rankRawBeforeLeft.writtenDraw
+                    ? rankBeforeLeft.drawSerial - rankRawBeforeLeft.writtenDraw
+                    : 0;
+                static std::atomic<std::uint64_t> rivalRawFence{0};
+                const auto n = rivalRawFence.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 8 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR RIVAL R33 RAW C64 FENCE: hits={} coherent={} mode={} age={} physicalNode={} physicalEpoch={} rawNode={} rawEpoch={} rawProducer={} shaderMatch={} poseMatch={}",
+                        n, coherentRaw ? 1 : 0,
+                        sameRawNode ? "EXACT_NODE" :
+                            (coherentRaw ? "SHARED_RIVAL_BATCH" : "REJECT"),
+                        rawAge, rankBeforeLeft.queueNode,
+                        rankBeforeLeft.queueEpoch,
+                        rankRawBeforeLeft.queueNode,
+                        rankRawBeforeLeft.queueEpoch,
+                        OutRunVR::GameSemantic::Name(
+                            rankRawBeforeLeft.producer),
+                        rankRawBeforeLeft.shader == rankBeforeLeft.shader &&
+                            rankRawBeforeLeft.shaderEpoch ==
+                                rankBeforeLeft.shaderEpoch ? 1 : 0,
+                        rankRawBeforeLeft.poseEpoch ==
+                            rankBeforeLeft.poseEpoch ? 1 : 0);
+            }
             // The full original +TIME family has a distinct physical owner
             // from GOAL, including direct numeric glyphs and queued sprites.
             // R30 checks fixedfn/XYZRHW, but shader/c64 uses this R33 path;
