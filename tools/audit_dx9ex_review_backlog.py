@@ -16,7 +16,7 @@ OUT = ROOT / "out/reviews/dx9ex"
 OUT.mkdir(parents=True, exist_ok=True)
 
 CATEGORIES = (
-    ("SOURCE_QUEUE_D3DX", r"\\+TIME|GOAL|SPIRITENODE|SPRITENODE|D3DX|PRODUCER|QUEUE|BATCH"),
+    ("SOURCE_QUEUE_D3DX", r"\+TIME|GOAL|SPIRITENODE|SPRITENODE|D3DX|PRODUCER|QUEUE|BATCH"),
     ("COMPOSITION_MONO_DEPTH", r"DEPTH|STENCIL|OCCLUSION|RIGHT.EYE|SBS|PRESENT|MONO.SHADOW|COMPOSIT|RESTOR"),
     ("SKY_LENS_EFFECT", r"SKYGLOW|LENS|FLARE|SUN|CABE|C993|SKY"),
     ("MENU_F11_HUD_RANK", r"MENU|F11|HUD|RANK|RIVAL|OVERLAY|GLYPH|SPRITE"),
@@ -30,7 +30,7 @@ MANUAL_OVERLAP = {"01350": "R26 SkyGlow capture generation manual integration",
 
 
 def field(content: str, key: str) -> str:
-    match = re.search(r"(?m)^-\\s*"+re.escape(key)+r"=([^\\n]+)", content)
+    match = re.search(r"(?m)^-\s*"+re.escape(key)+r"=([^\n]+)", content)
     return match.group(1).strip() if match else ""
 
 
@@ -46,7 +46,7 @@ def main():
     rows = []
     for file in files:
         content = file.read_text(encoding="utf-8")
-        identity = re.search(r"CONVERSION-DX9EX-(\\d{5})\\.md$", file.name)
+        identity = re.search(r"CONVERSION-DX9EX-(\d{5})\.md$", file.name)
         assert identity, file
         ident = identity.group(1)
         title = next((s.lstrip("# ").strip() for s in content.splitlines() if s.startswith("# ")), "")
@@ -98,7 +98,7 @@ def main():
         "source_scope": "vr-d3d9ex-focus / R26+HUD",
         "caveat": "Source status unknown for unverified historical findings. No bulk auto-apply.",
     }
-    (OUT / "summary.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2)+"\\n", encoding="utf-8")
+    (OUT / "summary.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     lines = [
         "# DX9Ex automation review inventory — 2026-10-27",
         "",
@@ -121,7 +121,7 @@ def main():
         lines.append(f"- {group}: {count}")
     lines += ["", "See review_inventory.csv for 447 independent IDs, findings and links.",
               "SOURCE_BUILD_GATE=GitHub Actions; Quest3 runtime UNTESTED."]
-    (OUT / "README.md").write_text("\\n".join(lines)+"\\n", encoding="utf-8")
+    (OUT / "README.md").write_text("\n".join(lines)+"\n", encoding="utf-8")
     print(json.dumps(stats, ensure_ascii=False))
     print("PASS complete DX9Ex REVIEW_ONLY document inventory: 01075..01521")
 
