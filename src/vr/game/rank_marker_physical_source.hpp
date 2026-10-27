@@ -44,10 +44,10 @@ namespace OutRunVR::RankMarker
     }
 
 
-    // The original GPU c64 admitted by R30 must retain the same projected
-    // marker family, pose and shader at each R33 physical eye submission.
-    // Ordinary rank remains exact-SpriteNode. Rival animation may reuse one
-    // proven game c64 across sibling/mask SpriteNodes from the same producer.
+    // The original GPU c64 admitted by R30 must belong to the same car,
+    // SpriteNode, pose and shader at each R33 physical eye submission.
+    // Native Draw and right-eye state setters may synchronously reenter a
+    // different game c64 producer without changing the projected marker.
     struct OriginalRankWvpSource
     {
         std::uint64_t writeSerial = 0;
@@ -60,87 +60,6 @@ namespace OutRunVR::RankMarker
         const void* queueNode = nullptr;
         std::uint64_t queueEpoch = 0;
     };
-    inline constexpr std::uint64_t MaxOriginalRankWvpDrawAge(
-        GameSemantic::ProducerToken producer) noexcept
-    {
-        // R30 deliberately permits projected markers to reuse the original
-        // same-shader game c64 for up to 128 draws. Keep ordinary rank's
-        // stricter historical fence, but do not make RivalMarkerSprani fail
-        // downstream after R30 already admitted that exact projected source.
-        return producer == GameSemantic::ProducerToken::RivalMarkerSprani
-            ? 128u : 12u;
-    }
-
-    inline constexpr bool CompatibleOriginalRankWvpProvenance(
-        const PhysicalRankSource& physical,
-        const OriginalRankWvpSource& raw) noexcept
-    {
-        const bool exactNode =
-            raw.scope == physical.scope &&
-            raw.producer == physical.producer &&
-            raw.queueNode == physical.queueNode &&
-            raw.queueEpoch == physical.queueEpoch;
-        if (exactNode)
-            return true;
-
-        // One rival animation can emit several sibling/mask SpriteNodes while
-        // the game reuses the same original c64. R30 already proves the same
-        // live shader/epoch, pose, bounded draw age and current Calc3D2D anchor.
-        // Permit only another queue-owned RivalMarkerSprani node; foreign
-        // producer/scope, unqueued provenance and missing epochs still fail.
-        return physical.producer ==
-                GameSemantic::ProducerToken::RivalMarkerSprani &&
-            physical.queued && physical.queueNode &&
-            physical.queueEpoch != 0 &&
-            raw.scope == physical.scope &&
-            raw.producer == physical.producer &&
-            raw.queueNode != nullptr && raw.queueEpoch != 0;
-    }
-
-    namespace Regression
-    {
-        inline constexpr unsigned char RivalNodeA = 1;
-        inline constexpr unsigned char RivalNodeB = 2;
-
-        constexpr bool RivalSharedC64Policy() noexcept
-        {
-            PhysicalRankSource rival{};
-            rival.scope = GameSemantic::RenderScope::ProjectedWorldMarker2D;
-            rival.producer = GameSemantic::ProducerToken::RivalMarkerSprani;
-            rival.queued = true;
-            rival.queueNode = &RivalNodeB;
-            rival.queueEpoch = 22;
-
-            OriginalRankWvpSource raw{};
-            raw.scope = GameSemantic::RenderScope::ProjectedWorldMarker2D;
-            raw.producer = GameSemantic::ProducerToken::RivalMarkerSprani;
-            raw.queueNode = &RivalNodeA;
-            raw.queueEpoch = 21;
-            if (!CompatibleOriginalRankWvpProvenance(rival, raw))
-                return false;
-
-            // Ordinary rank still requires the exact physical SpriteNode.
-            rival.producer = GameSemantic::ProducerToken::RankMarkerSprani;
-            raw.producer = GameSemantic::ProducerToken::RankMarkerSprani;
-            if (CompatibleOriginalRankWvpProvenance(rival, raw))
-                return false;
-
-            // A foreign projected producer can never donate rival c64.
-            rival.producer = GameSemantic::ProducerToken::RivalMarkerSprani;
-            raw.producer = GameSemantic::ProducerToken::RankMarkerSprani;
-            if (CompatibleOriginalRankWvpProvenance(rival, raw))
-                return false;
-
-            return MaxOriginalRankWvpDrawAge(
-                       GameSemantic::ProducerToken::RivalMarkerSprani) == 128u &&
-                MaxOriginalRankWvpDrawAge(
-                       GameSemantic::ProducerToken::RankMarkerSprani) == 12u;
-        }
-
-        static_assert(RivalSharedC64Policy(),
-            "Rival sibling c64 reuse must stay narrow and ordinary rank exact-node");
-    }
-
     inline bool CoherentOriginalRankWvp(
         const PhysicalRankSource& physical,
         const OriginalRankWvpSource& raw) noexcept
@@ -149,12 +68,14 @@ namespace OutRunVR::RankMarker
             physical.shader != 0 && physical.shaderEpoch != 0 &&
             raw.writeSerial != 0 && raw.writtenDraw != 0 &&
             raw.writtenDraw < physical.drawSerial &&
-            physical.drawSerial - raw.writtenDraw <=
-                MaxOriginalRankWvpDrawAge(physical.producer) &&
+            physical.drawSerial - raw.writtenDraw <= 12u &&
             raw.poseEpoch == physical.poseEpoch &&
             raw.shader == physical.shader &&
             raw.shaderEpoch == physical.shaderEpoch &&
-            CompatibleOriginalRankWvpProvenance(physical, raw);
+            raw.scope == physical.scope &&
+            raw.producer == physical.producer &&
+            raw.queueNode == physical.queueNode &&
+            raw.queueEpoch == physical.queueEpoch;
     }
     inline bool SameOriginalRankWvp(
         const OriginalRankWvpSource& a,
