@@ -61,7 +61,7 @@ try {
         '-FramerateLimit=0','-FramerateFastLoad=0',
         '-FramerateInterpolation=true','-FramerateUnlockExperimental=true',
         '-FrameCadenceMode=1','-FrameCadenceTargetHz=0',
-        '-DisableDesktopVsync=true','-SkyGlowFactor=1',
+        '-DisableDesktopVsync=true','-SkyGlowFactor=4',
         '-PreferD3D9Ex=true','-DirectGpuOnly=false','-DisableDesktopDuplication=false',
         '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
         '-RivalDx11NativeRoute=true',
