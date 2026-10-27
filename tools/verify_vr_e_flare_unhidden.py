@@ -17,7 +17,7 @@ checks = {
   'original CABE alpha draw retained': 'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);' in l,
   'central C993 cannot be suppressed': 'VRLensFlareCentreEnabled.get()' not in c and 'IsProjectedSunScreenObject(objectId)' in c,
   'four unique sun objects preserved': all(v in c for v in ['0x570002','0x57000F','0x570010','0x570006']) is False or 'IsProjectedSunScreenObject(objectId)' in c,
-  'exact projected rival native owner': 'ScopedExactProducerSemantic producerScope' in rv and 'FlushD3DXAtDirectGoalSourceExit();' in rv and 'FlushD3DXBeforeDirectGoalSource();' in rv,
+  'known-good rival native-first owner': 'VR RIVAL KNOWN-GOOD ORDER RESTORED' in rv and 'Game::sprani_play_ae_auth_alpha' in rv and 'TagAppendedNodes(' in rv and 'FlushD3DXAtDirectGoalSourceExit();' not in rv and 'FlushD3DXBeforeDirectGoalSource();' not in rv,
   'rival no generic hook': 'RivalDx11NativeRoute = false' in ini and "'-RivalDx11NativeRoute=false'" in runner,
   'late actual XR eye startup': 'GetTickCount64() + 8000ULL' in ex and 'ResolveStartupForLiveHost(' in ex and 'Sleep(50);' in ex,
   'menu aspect restored': 'MirrorPreserveAspect = true' in ini and "'-MirrorPreserveAspect=true'" in runner,
