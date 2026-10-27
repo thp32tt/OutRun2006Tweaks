@@ -347,7 +347,7 @@ namespace OutRunVR
 				Settings::VRFrameCadenceTargetHz.get(),
 				Settings::VRFrameCadenceMaxHz.get());
             spdlog::info(
-                "VR RIVAL CONFIG: stockProjectorAB={} exactEdge={} BB796Ownership=ALWAYS",
+                "VR RIVAL CONFIG: stockProjectorAB={} exactEdgeRequested={} BB796Ownership=ALWAYS",
                 Settings::VRRivalDx11NativeRoute.get() ? 1 : 0,
                 Settings::VRRivalDx11NativeRoute.get() ? 0 : 1);
             RequestVRHostStartup();
