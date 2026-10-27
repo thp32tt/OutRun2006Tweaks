@@ -68,3 +68,35 @@ A second sampled line, `VR RIVAL DIRECT D3DX GOAL-GATE PROBE`, records whether a
 ## Contract and next action
 
 First user Quest3 DEBUG run of exact focus SHA with a rival car should produce these lines. Compare projected marker/R30 stereo draw counters to determine where semantics disappear. Keep R26+HUD, Rank and other HUD sources unchanged, do not declare RUNTIME_VALIDATION=PASS from CI, and do not force the legacy unsafe old-tail dereference. Only then make the smallest corrected render-owner patch, with GitHub Actions TEST+DEBUG and one real Quest3 run.
+
+## 2026-10-27 10:5x deeper original-EXE animation-path reconciliation
+
+### Static evidence from N100 REA/Ghidra
+
+The saved `rea-analysis/SPRITE_PIPELINE_PROVENANCE_REVIEW_20261018.md` and `REA_SPRITE_4PATH_E8_AUDIT_20261018.md` identify:
+- `sprani_play_ae_auth_alpha` animation lineage: `0x429580 -> 0x428A10 -> 0x429460 -> 0x429350 -> 0x428BD0 -> 0x42D0C0 -> 0x42DD50` (animation node, source `kind_C=1` family).
+- Original sprite queue consumer `0x42D710` dispatches **four** physical alternatives, not one: `kind_C=0` normal D3DX `0x42A0A0`, `kind_C=0` direct UP `0x42C0F0`, `kind_C!=0` animation quad `0x42A3A0`, and `kind_C!=0` masked/composite `0x42A800`.
+- The consumer can execute multiple queue passes per frame, including conditional partial pass via `0x4C50A0`; SpriteNode addresses are recycled from a 560-slot ring. Do not rely on one Present or old-tail pointer as unique animated sprite identity.
+- Source original `game.hpp::SpriteNode::kind_C` is at offset `0xC`; `next_0`, `tail_4` at offsets 0 and 4.
+
+**Implication:** The earlier D3DX-only theory is not sufficient. The original rival `0xBB796` uses `sprani_play_ae_auth_alpha`; the actual queued geometry may travel down the **kind-1 animation** branches which do not use D3DXSprite::Draw/Flush at all. Thus `RivalMarkerSprani` in a valid CPU producer is **not** proof that our D3DX ledger or Flush/End gate is the failing physical consumer.
+
+### Exact current implementation gap
+
+`GameSemantic::ProjectedMarkerProbeStage::NativeSprite` is declared, but no caller emits `NoteProjectedMarkerProbe(...NativeSprite)`; an apparently valid `CalcCapture -> Producer` trace is not evidence of actual animation rendering. Likewise old `registeredDelta=0` measures only nodes tagged *after* the original native sprani call. The highest-value discriminator is **kind_C of the originally appended node**, and the selected `0x42D710` consumer's token/scope/anchor when it reaches actual D3D GPU Draw.
+
+### New strictly non-rendering probes
+
+- `VR RIVAL SOURCE NATIVE NODE TYPES`: after the exact `0xBB796` producer, inspects only append chains proven reachable from the CURRENT live root using `FirstVerifiedAppendedNode`; samples `kind_C==0` versus `kind_C!=0` first 8 plus powers of two. A 0 count **cannot** rule out another deferred animation or replaced-root path.
+- `VR RIVAL NATIVE QUEUE CONSUMER`: captures the actual `0x2D762` selected node's kind and current projected semantic/queue epoch, but **only** when the source token equals `RivalMarkerSprani`. This proves that a registered rival node reached the original queue consumer. No change to the node's GPU routing.
+- Existing `VR RIVAL R30 GPU ENTRY/CLASS/REJECT/EYES` can distinguish whether that consumer's eventual physical GPU draw retained its projected-world source and reached both HMD targets.
+
+### Minimal safe repair once runtime branch is measured
+
+1. If source kind-1 append exists but `RIVAL NATIVE QUEUE CONSUMER` absent: inspect exact tag cutoff, `RegisterSpriteNodeScope` return and reused pointer generation, not D3DX.
+2. If kind-1 queue consumer has correct token+valid anchor but `RIVAL R30 GPU ENTRY` absent: follow masked/animation direct Draw path and its R33 fail-closed conditions (avoid widening generic D3D alpha).
+3. If R30 class is projected but eye build fails, diagnose original c64/FVF/R57 pose and targeted rank owner proof.
+4. If actual selected node is kind-0: *then* test D3DX Draw/Flush/End delayed-source ownership; no unconditional restoration without valid exact marker, a homogeneous batch and matching live sprite.
+5. If only 2D original fallback renders, do not claim the original rival is stereo; seek the first point that drops its projected semantic.
+
+Everything in this section is source/static analysis or runtime instrumentation, **not Quest3 optical PASS**.
