@@ -67,8 +67,8 @@
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
-      "NATIVE_D3D11_GPU_REPLAY",
-      "GAME_FRAME_PRESENT"
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "integration_path": [
       "SUCCESSFUL_D3D9_POSTDRAW_CLEAR",
@@ -81,9 +81,18 @@
       "REAL_GAME_TARGET_DEPTH_CLEAR_HOOK",
       "COMPILED_POSITIVE_NEGATIVE_PIXEL_GAP_TESTS_AND_FIVE_GATES"
     ],
-    "full_gate_plan": "one_final_exact_sha_after_causal_repair",
+    "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "No real OutRun 2006 menu/vehicle/race screen session captured; game and Quest 3/VDXR remain UNTESTED.",
-    "activation_guard_and_fallback": "Existing explicit opt-in, canonical source-owner and native D32 checks preserved; no source draw/input/FFB interception change; DXVK frozen."
+    "activation_guard_and_fallback": "Existing explicit opt-in, canonical source-owner and native D32 checks preserved; no source draw/input/FFB interception change; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "01110 native source commit 00cf46bd012d1c43002e5fd38c90e389f4171263 and causal repairs ca27c6fc2c1000f5dbff352fd67abea695accd40: compiled 33..128 sparse original-game post-Draw TARGET/Z Clear GPU region replay and disjoint-gap pixel oracle passed DX11 Fast push run 40490637001.",
+      "negative_regression": "01110 exact-SHA DX11 Fast 40490637001 validates 129 original source, malformed D3DRECT, invalid game backbuffer/depth ownership, D3D11.0 fallback and non-painted gaps; unchanged original D3D9Ex Draw/Present/input/FFB.",
+      "component_integration": "Actual D3D9 Clear interception in live_game_frame_bridge.cpp calls GameNativePostDrawClearBatch::build to replay native RTV/D32 GPU region chunks, followed by existing source-ordinal full-frame native Draw/DrawIndexed and bounded presentation; runtime gameplay output not asserted (UNTESTED)."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:GAME_POSTDRAW_SPARSE_TARGET_Z_REGION_REPLAY"
+    ]
   },
   "acceptance_results": {
     "sparse_target_depth_gpu_fullframe": {
