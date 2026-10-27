@@ -72,6 +72,9 @@ for token in (
     'device->GetVertexShader(&shader)',
     'fvf != 0x00000142u',
     'VR RIVAL R62 FIXEDFN PREPARE:',
+    'const bool tracePhysicalEyes =',
+    '(exactResult || exactProjectedRival)',
+    'VR RIVAL R62 FIXEDFN EYE RECEIPT:',
 ):
     assert token in r62, token
 
