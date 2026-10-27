@@ -716,24 +716,30 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          end.index("if (self && self == submission.sprite)") <
          end.index("HudBatch.completeNativeEnd(submission);"),
          "native End must preserve newer nested Begin")
-    need("if (!wasTrackedOrExactGameSprite)" in lifecycle and
+    need("const OutRunVR::HudCommandBatch::Ledger::NativeSnapshot& entry" in lifecycle and
+         "if (!wasTrackedOrExactGameSprite ||" in lifecycle and
+         "!HudBatch.sameGeneration(entry)" in lifecycle and
          "HudBatch.invalidate();" in lifecycle and
+         "const auto entry = HudBatch.snapshot();" in lifecycle and
          "DX9ExD3DXSpriteLifetime::OwnsLifecycle(" in lifecycle and
+         "self, entry.sprite, *Module::exe_ptr<void*>(0x55B218)" in lifecycle and
          "LostDevice_hk.stdcall<HRESULT>(self)" in lifecycle and
          "ResetDevice_hk.stdcall<HRESULT>(self)" in lifecycle and
-         lifecycle.count("InvalidateForDeviceLifecycle(ownsBatch);") == 2 and
+         lifecycle.count("InvalidateForDeviceLifecycle(ownsBatch, entry);") == 2 and
          lifecycle.count("return hr;") >= 2,
-         "OnLost/OnReset must invalidate old/live sprite and propagate HRESULT")
+         "OnLost/OnReset must retire only the entry generation and preserve original HRESULT")
     need("void* liveSprite = *Module::exe_ptr<void*>(0x55B218);" in live_flush and
          "!HudBatch.active ||" in live_flush and
          "self, HudBatch.sprite, liveSprite" in live_flush and
          "if (self && self == HudBatch.sprite && self != liveSprite)" in live_flush and
-         "InvalidateForDeviceLifecycle(true);" in live_flush and
+         "const auto staleEntry = HudBatch.snapshot();" in live_flush and
+         "InvalidateForDeviceLifecycle(true, staleEntry);" in live_flush and
          "void** vtable = *reinterpret_cast<void***>(self);" in live_flush and
          live_flush.index("liveSprite =") < live_flush.index("CanFlush(") <
-         live_flush.index("InvalidateForDeviceLifecycle(true)") <
+         live_flush.index("const auto staleEntry = HudBatch.snapshot();") <
+         live_flush.index("InvalidateForDeviceLifecycle(true, staleEntry)") <
          live_flush.index("reinterpret_cast<void***>(self)"),
-         "stale D3DX pointer must not be dereferenced before live identity")
+         "stale D3DX pointer must be generation-bound before live identity dereference")
     need("CanDrainDeferredResultBeforeForeignDraw(" in draw and
          "HudBatch.active, OutRunVR::GameSemantic::QueueRenderActive()" in draw and
          "HudBatch.homogeneous" in draw and
@@ -1074,7 +1080,10 @@ def main_current_ledger(code: str, header: str) -> int:
         ("end-clears-reentrant-Begin", "code", "HudBatch.completeNativeEnd(submission);", "HudBatch.end();"),
         ("begin-clears-reentrant-Begin", "code", "if (HudBatch.generation == beforeBegin.generation)", "if (true)"),
         ("draw-mutation-not-counted", "ledger", "            touch();\n        }\n\n        void forget()", "            // no mutation counted\n        }\n\n        void forget()"),
-        ("lost-retains-batch", "code", "InvalidateForDeviceLifecycle(ownsBatch);", "(void)ownsBatch;"),
+        ("lost-retains-batch", "code",
+         "InvalidateForDeviceLifecycle(ownsBatch, entry);", "(void)ownsBatch;"),
+        ("lost-removes-generation-fence", "code",
+         "!HudBatch.sameGeneration(entry)", "false"),
     ]
     for name, source, before, after in mutations:
         orig = {"code": code, "ledger": ledger, "header": header}[source]
