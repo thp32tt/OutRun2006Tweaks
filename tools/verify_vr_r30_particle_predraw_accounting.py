@@ -17,9 +17,9 @@ def body(source: str, signature: str) -> str:
             if depth==0: return source[start:pos+1]
     raise AssertionError('unclosed '+signature)
 
+assert 'const bool* physicalLeftDrawAttempted = nullptr' in SRC
 execute=body(SRC, 'HRESULT R30ExecuteXyzrhwStereo(')
 required=(
- 'const bool* physicalLeftDrawAttempted = nullptr',
  'const bool deferLeftAccounting =',
  'physicalLeftDrawAttempted != nullptr;',
  'const HRESULT leftHr = leftDraw();',
