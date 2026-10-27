@@ -3911,31 +3911,37 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     // D3D9 Reset. OnLostDevice can fail or arrive without a successful End;
     // neither event proves the prior Draws were submitted. Never let stale
     // +TIME/GOAL ownership trigger a Flush after the device changes.
-    static void InvalidateForDeviceLifecycle(bool wasTrackedOrExactGameSprite) noexcept
+    static void InvalidateForDeviceLifecycle(
+        bool wasTrackedOrExactGameSprite,
+        const OutRunVR::HudCommandBatch::Ledger::NativeSnapshot& entry) noexcept
     {
-        // The original OnLost/OnReset may replace the global sprite pointer.
-        // The callback's object can still be the old tracked batch owner even
-        // when 0x55B218 has already become null or a new sprite instance.
-        if (!wasTrackedOrExactGameSprite)
+        // The original OnLost/OnReset may replace the global sprite pointer
+        // or synchronously reenter a successful Begin. Retire only the batch
+        // generation that owned the lifecycle callback at entry; a newer
+        // generation is independent and must survive the stale outer return.
+        if (!wasTrackedOrExactGameSprite ||
+            !HudBatch.sameGeneration(entry))
             return;
         HudBatch.invalidate();
     }
 
     static HRESULT __stdcall LostDeviceDest(void* self)
     {
+        const auto entry = HudBatch.snapshot();
         const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
-            self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218));
+            self, entry.sprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);
-        InvalidateForDeviceLifecycle(ownsBatch);
+        InvalidateForDeviceLifecycle(ownsBatch, entry);
         return hr;
     }
 
     static HRESULT __stdcall ResetDeviceDest(void* self)
     {
+        const auto entry = HudBatch.snapshot();
         const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
-            self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218));
+            self, entry.sprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);
-        InvalidateForDeviceLifecycle(ownsBatch);
+        InvalidateForDeviceLifecycle(ownsBatch, entry);
         return hr;
     }
 
