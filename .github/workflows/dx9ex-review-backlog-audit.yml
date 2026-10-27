@@ -1,4 +1,4 @@
-name: DX9Ex 447 Review Document Audit
+name: DX9Ex Review Source Audit
 
 on:
   push:
@@ -7,6 +7,12 @@ on:
     paths:
       - '.github/workflows/dx9ex-review-backlog-audit.yml'
       - 'tools/audit_dx9ex_review_backlog.py'
+      # Re-evaluate live source receipts whenever their implementations move.
+      - 'src/vr/d3d9/stereo_renderer.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r7.inc'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/vr/game/outrun_renderer.cpp'
+      - 'vrhost/src/main_r23.cpp'
       - 'docs/reviews/dx9ex/automation/**'
   workflow_dispatch:
 
@@ -20,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-      - name: Read all 447 review documents
+      - name: Read all available review documents
         run: python3 tools/audit_dx9ex_review_backlog.py
       - name: Archive exact-SHA review evidence
         uses: actions/upload-artifact@v4
