@@ -14,7 +14,7 @@ must=[
     "s.clearColor.main_depth_still_bound(",
     "desc.MultiSampleType" if False else "depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE",
     "GameNativeMainStencilClear::may_ignore_pre_draw(",
-    "s.sourceDrawsThisFrame == 0u",
+    "s.frameBatch.before_first_native_raster(",
     "if (!canonicalDepth) return false;",
     "if (clearZ) {",
     "s.frameBatch.depthClearPending",
@@ -32,7 +32,7 @@ assert hook.index("GameNativeMainStencilClear::may_ignore_pre_draw(") < hook.ind
 for old,new in [
     ("if (!canonicalDepth) return false;","if (false) return false;"),
     ("s.clearColor.main_depth_still_bound(","true /* owner bypass */ && ("),
-    ("s.sourceDrawsThisFrame == 0u","true /* ordinal bypass */"),
+    ("s.frameBatch.before_first_native_raster(","true /* ordinal bypass */ && ("),
     ("s.frameBatch.depthClearPending","true /* Z seed bypass */"),
 ]:
     assert old in hook

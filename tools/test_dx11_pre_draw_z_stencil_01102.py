@@ -10,11 +10,11 @@ hook=bridge[start:end]
 required=[
     "const bool beforeFirstDepth = partialDepth &&",
     "s.frameBatch.depthClearPending",
-    "s.frameBatch.can_seed_pre_draw_depth(",
+    "s.frameBatch.can_seed_pre_draw_depth_at_ordinal(",
     "s.clearColor.main_depth_still_bound(",
     "const bool preDrawStencilSafe = beforeFirstDepth &&",
     "GameNativeMainStencilClear::may_ignore_pre_draw(",
-    "s.frameBatch.leadingEmptySourceDraws ==",
+    "s.frameBatch.before_first_native_raster(",
     "!preDrawStencilSafe) return false;",
     "if(beforeFirstDepth)",
     "return s.preDrawDepth.record(owner,",
@@ -30,7 +30,7 @@ assert "sameMainDepthStencil && beforeFirstSourceDraw" in guard
 for old,unsafe in (
     ("s.frameBatch.depthClearPending","true /* fake original Z seed */"),
     ("s.clearColor.main_depth_still_bound(","true /* foreign depth owner */"),
-    ("s.frameBatch.can_seed_pre_draw_depth(","true /* skipped source ordinal */"),
+    ("s.frameBatch.can_seed_pre_draw_depth_at_ordinal(","true /* skipped source ordinal */"),
     ("!preDrawStencilSafe) return false;","true /* skip stencil proof */) return false;"),
     ("return s.preDrawDepth.record(owner,","return true /* Z was discarded */; //"),
 ):

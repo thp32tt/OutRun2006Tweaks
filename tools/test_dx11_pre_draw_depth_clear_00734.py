@@ -15,7 +15,7 @@ def linked(b, h, r):
     if "const bool beforeFirstGameDraw = !s.pending &&" not in observer:
         return False  # Destructive mutation removed this necessary source-Z seed.
     canonical = observer.split("const bool beforeFirstGameDraw = !s.pending &&",1)[1]
-    pre_seed = canonical.split("s.frameBatch.can_seed_pre_draw_depth(",1)[1].split(");",1)[0]
+    pre_seed = canonical.split("s.frameBatch.can_seed_pre_draw_depth_at_ordinal(",1)[1].split(");",1)[0]
     color = b[b.index("void observe_game_clear("):b.index("void observe_unavailable_game_draw(")]
     draw = b[b.index("bool submit("):b.index("bool observe_source_device(")]
     entry = r[r.index("HRESULT __stdcall ClearDestR9("):r.index(
@@ -27,10 +27,10 @@ def linked(b, h, r):
         "s.clearColor.record(sourceDevice," in color,
         "s.frameBatch.reset();" in color,
         "const bool beforeFirstGameDraw = !s.pending &&" in observer,
-        "s.frameBatch.can_seed_pre_draw_depth(" in observer,
+        "s.frameBatch.can_seed_pre_draw_depth_at_ordinal(" in observer,
         "s.clearColor.matches(owner," in pre_seed,
         "backbufferIdentity.Get()))" in pre_seed,
-        "s.sourceDrawsThisFrame == 0u" in pre_seed,
+        "s.sourceDrawsThisFrame)" in pre_seed,
         "if ((s.frameBatch.submitted == 0u || s.frameBatch.stopped) &&" in observer,
         "!beforeFirstGameDraw) return false;" in observer,
         "s.frameBatch.submitted != 0u && !continuingFullNativeDraw" in observer,
@@ -39,7 +39,10 @@ def linked(b, h, r):
         "s.frameBatch.note_full_depth_clear(z);" in observer,
         "s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u)" in draw,
         "s.frameBatch.consume_depth_clear();" in draw,
-        "return sameSourceFullColorClear &&" in h,
+        "return sameSourceFullColorClear && !depthReady &&" in h,
+        "before_first_native_raster(observedSourceDraws)" in h,
+        "observedSourceDraws - sourceEpochStart !=" in h,
+        "lastSourceDraw + 1u == observedSourceDraws" in h,
         "((noSourceDraws && !hasSourceDraw) ||" in h,
         "(!noSourceDraws && onlyLeadingEmpty)) && !stopped &&" in h,
         "submitted == 0u && !depthReady;" in h,
@@ -48,7 +51,7 @@ def linked(b, h, r):
 assert linked(bridge, batch, hook), "TARGET -> separate full Z -> real Draw disconnected"
 for old, new in (
     ("s.clearColor.matches(owner,", "s.clearColor.matches(0u,"),
-    ("s.sourceDrawsThisFrame == 0u", "true"),
+    ("s.sourceDrawsThisFrame)", "0u /* ignore actual ordinal */)"),
     ("const bool beforeFirstGameDraw = !s.pending &&",
      "const bool beforeFirstGameDraw = s.pending &&"),
     ("!beforeFirstGameDraw) return false;", "beforeFirstGameDraw) return false;"),
@@ -61,17 +64,23 @@ for old, new in (
     # Main STENCIL safety also probes this owner's color identity earlier.
     # Mutate this test's exact pre-first-Draw Z seed, not the stencil gate.
     if old in ("s.clearColor.matches(owner,",
-                  "s.sourceDrawsThisFrame == 0u"):
+                  "s.sourceDrawsThisFrame)"):
         anchor = segment.index("const bool beforeFirstGameDraw = !s.pending &&")
         segment = segment[:anchor] + segment[anchor:].replace(old, new, 1)
     else:
         segment = segment.replace(old, new, 1)
     mutated = bridge[:a] + segment + bridge[z:]
     assert not linked(mutated, batch, hook), old
+# Keep the legacy seed guard, but prove the actual bridge calls the
+# new source-epoch-aware version. Never bypass a missing ordinal or fabricate
+# the first native raster after a real successful game Draw.
 assert "(!noSourceDraws && onlyLeadingEmpty)) && !stopped &&" in batch
 assert not linked(bridge, batch.replace(
-    "(!noSourceDraws && onlyLeadingEmpty)) && !stopped &&",
-    "(!noSourceDraws && false)) && !stopped &&"), hook)
+    "observedSourceDraws - sourceEpochStart !=",
+    "observedSourceDraws - sourceEpochStart =="), hook)
+assert not linked(bridge, batch.replace(
+    "before_first_native_raster(observedSourceDraws)",
+    "true /* skip source draw continuity */"), hook)
 assert not linked(bridge, batch, hook.replace(
     "live_game_frame::observe_game_depth_clear(",
     "live_game_frame::ignored_depth_clear(", 1))
