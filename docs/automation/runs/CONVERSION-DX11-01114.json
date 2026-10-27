@@ -79,7 +79,15 @@
     "conflict_keys": [
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
       "DX11:AUTHENTIC_NO_CLEAR_GAME_BACKBUFFER_BOOTSTRAP"
-    ]
+    ],
+    "blocking_evidence": "Observed C++ source defect: an authentic no-Clear whole game-backbuffer copy was rejected before the same-owner/whole-source bootstrap test; 01114 code changes plus exact-SHA Gates already verify this repair. This backfilled field records existing evidence only; native gameplay remains UNTESTED.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source path requirement: admitted original D3D9 backbuffer pixels seed a guarded native Draw/DrawIndexed and eligible full-size output, but no matching native game-frame runtime verification exists. RUNTIME_VALIDATION=UNTESTED; no fabricated publication claim.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME and OUTRUN_DX11_FULL_GAME_FRAME are opt-in; validate same D3D9 owner/extent, authentic pixels, supported shader/targets. On any failure retain original D3D9Ex drawing, gamepad and FFB with no native promotion."
   },
   "acceptance_results": {
     "no_clear_whole_copy_bootstrap": {

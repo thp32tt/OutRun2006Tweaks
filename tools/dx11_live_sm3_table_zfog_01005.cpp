@@ -40,6 +40,26 @@ int main() {
     assert(native_sm3_table_zfog_admission(
         false, 3u, 1u, true, true, false, true,
         0u, 0.0f, 1.0f, -1.0f, fog) && !fog.enabled);
+    // Source FOGENABLE=TRUE with no active TABLE or VERTEX equation is
+    // pixel-equivalent to no fog, even if RANGEFOG/sRGB/caps are inherited.
+    // This is NOT permission to ignore an active vertex or W table fog.
+    NativeSm3FogReject cause = NativeSm3FogReject::SourceQuery;
+    assert(native_sm3_table_zfog_admission(
+        true, 0u, 0u, true, true, false, true,
+        0u, std::nanf(""), std::nanf(""), -1.0f, fog, &cause));
+    assert(!fog.enabled && cause == NativeSm3FogReject::None);
+    assert(!native_sm3_table_zfog_admission(
+        true, 0u, 2u, true, true, false, true,
+        0u, 0.0f, 1.0f, 1.0f, fog, &cause));
+    assert(!fog.enabled && cause == NativeSm3FogReject::VertexFog);
+    assert(!native_sm3_table_zfog_admission(
+        true, 3u, 0u, false, false, true, true,
+        0u, 0.0f, 1.0f, 1.0f, fog, &cause));
+    assert(!fog.enabled && cause == NativeSm3FogReject::WCapability);
+    assert(!native_sm3_table_zfog_admission(
+        true, 3u, 0u, false, false, true, false,
+        0u, 0.9f, 0.3f, 1.0f, fog, &cause));
+    assert(!fog.enabled && cause == NativeSm3FogReject::LinearRange);
     std::string ps = "float4 main(R283Input input) : SV_Target0 {\n"
                      "    float4 r283_color = float4(0,0,0,0);\n"
                      "    return r283_color;\n}\n";

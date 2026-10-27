@@ -1560,6 +1560,9 @@ struct State {
     // Exclusive first-failed contract in the live SM3 state admission.
     // Preserve all original fail-closed conditions and game HRESULTs.
     std::array<std::uint64_t, 8> liveSm3StateRejectReasons{};
+    // Strictly nested within sm3_state_reject.fog; 1..11 translation,
+    // 12 COM getter/caps failure. Codes represent LIVE game source data.
+    std::array<std::uint64_t, 13> liveSm3FogRejectReasons{};
     std::uint64_t skippedPoisonedDraws = 0;
     UINT failed = 0;
 };
@@ -5098,6 +5101,37 @@ bool replay_native_game_pre_draw_depth(State& s,ID3D11DeviceContext* ctx,
 // Unknown stencil, alpha-test, fog and blend states still fail closed.
 // Live programmable geometry can now share the native DSV and scissor path
 // with full-frame fixed-function Draws without reusing D3D9 GPU resources.
+void trace_live_sm3_fog_rejection(
+    State& s, IDirect3DDevice9* game, std::uint64_t sourceOrdinal,
+    NativeSm3FogReject reason, unsigned failedGetter, DWORD fog,
+    DWORD tableMode, DWORD vertexMode, DWORD rangeFog, DWORD srgbWrite,
+    const D3DCAPS9& caps, float start, float end, float density) noexcept {
+    const auto code = static_cast<unsigned>(reason);
+    if (code >= s.liveSm3FogRejectReasons.size()) return;
+    const std::uint64_t observations = ++s.liveSm3FogRejectReasons[code];
+    // At most three records per distinct reason across one process.
+    // Do not repeatedly query COM on all rejected game Draws.
+    if (observations != 1u && observations != 64u && observations != 1024u)
+        return;
+    ComPtr<IDirect3DVertexShader9> vs;
+    ComPtr<IDirect3DPixelShader9> ps;
+    ComPtr<IDirect3DSurface9> rt;
+    (void)game->GetVertexShader(vs.GetAddressOf());
+    (void)game->GetPixelShader(ps.GetAddressOf());
+    (void)game->GetRenderTarget(0u, rt.GetAddressOf());
+    spdlog::warn(
+        "DX11 LIVE_SM3_FOG_REJECT reason={} getter={} repeat={} source_ordinal={} "
+        "fog={} table={} vertex={} range={} srgb={} raster_caps={:#x} "
+        "start={} end={} density={} vs={:#x} ps={:#x} rt={:#x}; "
+        "native source rejected; original D3D9/input remains authoritative",
+        code, failedGetter, observations, sourceOrdinal, fog, tableMode,
+        vertexMode, rangeFog, srgbWrite, caps.RasterCaps,
+        start, end, density,
+        reinterpret_cast<std::uintptr_t>(vs.Get()),
+        reinterpret_cast<std::uintptr_t>(ps.Get()),
+        reinterpret_cast<std::uintptr_t>(rt.Get()));
+}
+
 bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                D3DPRIMITIVETYPE type, UINT expected,
                                const void* bytes, UINT stride, UINT vertexCount,
@@ -5187,28 +5221,48 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         DWORD rangeFog = TRUE, fogColor = 0u;
         DWORD fogStartBits = 0u, fogEndBits = 0u, fogDensityBits = 0u;
         D3DCAPS9 fogCaps{};
-        if (FAILED(game->GetRenderState(D3DRS_FOGTABLEMODE, &tableMode)) ||
-            FAILED(game->GetRenderState(D3DRS_FOGVERTEXMODE, &vertexMode)) ||
-            FAILED(game->GetRenderState(D3DRS_RANGEFOGENABLE, &rangeFog)) ||
-            FAILED(game->GetRenderState(D3DRS_FOGCOLOR, &fogColor)) ||
-            FAILED(game->GetRenderState(D3DRS_FOGSTART, &fogStartBits)) ||
-            FAILED(game->GetRenderState(D3DRS_FOGEND, &fogEndBits)) ||
-            FAILED(game->GetRenderState(D3DRS_FOGDENSITY, &fogDensityBits)) ||
+        unsigned failedFogGetter = 0u;
+        const auto readFog = [&](D3DRENDERSTATETYPE key, DWORD& output,
+                                 unsigned getterId) noexcept {
+            if (FAILED(game->GetRenderState(key, &output))) {
+                failedFogGetter = getterId;
+                return false;
+            }
+            return true;
+        };
+        if (!readFog(D3DRS_FOGTABLEMODE, tableMode, 1u) ||
+            !readFog(D3DRS_FOGVERTEXMODE, vertexMode, 2u) ||
+            !readFog(D3DRS_RANGEFOGENABLE, rangeFog, 3u) ||
+            !readFog(D3DRS_FOGCOLOR, fogColor, 4u) ||
+            !readFog(D3DRS_FOGSTART, fogStartBits, 5u) ||
+            !readFog(D3DRS_FOGEND, fogEndBits, 6u) ||
+            !readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u) ||
             FAILED(game->GetDeviceCaps(&fogCaps))) {
+            if (!failedFogGetter) failedFogGetter = 8u; // GetDeviceCaps
             ++s.liveSm3StateRejectReasons[1];
+            trace_live_sm3_fog_rejection(
+                s, game, sourceOrdinal, NativeSm3FogReject::SourceQuery,
+                failedFogGetter, fog, tableMode, vertexMode, rangeFog,
+                srgbWrite, fogCaps, 0.0f, 0.0f, 0.0f);
             return false;
         }
         float fogStart = 0.0f, fogEnd = 0.0f, fogDensity = 0.0f;
         std::memcpy(&fogStart, &fogStartBits, sizeof(float));
         std::memcpy(&fogEnd, &fogEndBits, sizeof(float));
         std::memcpy(&fogDensity, &fogDensityBits, sizeof(float));
+        NativeSm3FogReject fogCause = NativeSm3FogReject::None;
         if (!native_sm3_table_zfog_admission(
                 true, tableMode, vertexMode, rangeFog != FALSE,
                 srgbWrite != FALSE,
                 (fogCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
                 (fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
-                fogColor, fogStart, fogEnd, fogDensity, tableZFog)) {
+                fogColor, fogStart, fogEnd, fogDensity, tableZFog,
+                &fogCause)) {
             ++s.liveSm3StateRejectReasons[1];
+            trace_live_sm3_fog_rejection(
+                s, game, sourceOrdinal, fogCause, 0u, fog,
+                tableMode, vertexMode, rangeFog, srgbWrite, fogCaps,
+                fogStart, fogEnd, fogDensity);
             return false;
         }
     }
@@ -11076,6 +11130,17 @@ void before_game_present(IDirect3DDevice9* game,
                 s.liveSm3StateRejectReasons[4], s.liveSm3StateRejectReasons[5],
                 s.liveSm3StateRejectReasons[6], s.liveSm3StateRejectReasons[7],
                 s.skippedPoisonedDraws);
+            spdlog::info(
+                "DX11 LIVE_SM3_FOG_REASONS vertex={} range={} srgb={} no_z={} "
+                "w_cap={} mode={} start_nan={} end_nan={} density_nan={} "
+                "negative_density={} linear_bounds={} query={}; "
+                "source fog flags and capabilities are logged on first rejection",
+                s.liveSm3FogRejectReasons[1], s.liveSm3FogRejectReasons[2],
+                s.liveSm3FogRejectReasons[3], s.liveSm3FogRejectReasons[4],
+                s.liveSm3FogRejectReasons[5], s.liveSm3FogRejectReasons[6],
+                s.liveSm3FogRejectReasons[7], s.liveSm3FogRejectReasons[8],
+                s.liveSm3FogRejectReasons[9], s.liveSm3FogRejectReasons[10],
+                s.liveSm3FogRejectReasons[11], s.liveSm3FogRejectReasons[12]);
         }
     } catch (...) {
         // Preserve DX9Ex Present and recover on the next game frame.

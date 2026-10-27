@@ -34,6 +34,11 @@ require(source.index("native_sm3_table_zfog_admission(") <
 for token in ("append_native_sm3_table_zfog(pixelHlsl, tableZFog)",
               "append_native_sm3_alpha_test(pixelHlsl, alphaCompare)"):
     require(token in backend, "native HLSL compile stage disconnected: " + token)
+for token in ("LIVE_SM3_FOG_REJECT", "liveSm3FogRejectReasons",
+              "NativeSm3FogReject::SourceQuery",
+              "D3DRS_RANGEFOGENABLE", "sourceOrdinal"):
+    require(token in source or token in bridge,
+            "real game fog rejection telemetry/fallback missing: " + token)
 for token in ("r283_color.rgb = lerp(", "r283_fogPosition : SV_Position",
               "r283_fogControls.w == 1.0f", "r283_fogControls.w == 2.0f",
               "float4 r283_fogColor;", "register(b4)"):

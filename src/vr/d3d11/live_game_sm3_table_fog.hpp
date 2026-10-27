@@ -14,21 +14,49 @@ struct NativeSm3TableFog {
     std::array<float, 4> controls{}; // start, end, density, D3DFOGMODE
     bool enabled{};
 };
+// Stable bounded runtime rejection codes: never collapse source state failures
+// into an ambiguous "fog" aggregate. Code 12 is reserved for COM query failure.
+enum class NativeSm3FogReject : unsigned {
+    None = 0u, VertexFog = 1u, RangeFog = 2u, Srgb = 3u,
+    MissingZCapability = 4u, WCapability = 5u, TableMode = 6u,
+    StartNotFinite = 7u, EndNotFinite = 8u,
+    DensityNotFinite = 9u, NegativeDensity = 10u,
+    LinearRange = 11u, SourceQuery = 12u
+};
 [[nodiscard]] inline bool native_sm3_table_zfog_admission(
     bool fogEnabled, unsigned tableMode, unsigned vertexMode,
     bool rangeFog, bool srgbOutput, bool zFogCapable, bool wFogCapable,
     std::uint32_t color, float start, float end, float density,
-    NativeSm3TableFog& result) noexcept {
+    NativeSm3TableFog& result,
+    NativeSm3FogReject* rejected = nullptr) noexcept {
     result = {};
-    if (!fogEnabled) return true; // Native state is unchanged.
-    // A real source FOGENABLE can be set with no active equation.
-    if (tableMode == 0u && vertexMode == 0u && !rangeFog) return true;
-    if (vertexMode != 0u || rangeFog || srgbOutput ||
-        !zFogCapable || wFogCapable ||
-        (tableMode != 1u && tableMode != 2u && tableMode != 3u) ||
-        !std::isfinite(start) || !std::isfinite(end) ||
-        !std::isfinite(density) || density < 0.0f ||
-        (tableMode == 3u && !(end > start))) return false;
+    if (rejected) *rejected = NativeSm3FogReject::None;
+    const auto fail = [&](NativeSm3FogReject cause) noexcept {
+        if (rejected) *rejected = cause;
+        return false;
+    };
+    if (!fogEnabled) return true; // The source explicitly disables all fog.
+    // RANGEFOGENABLE only changes VERTEX-fog distance calculation. When both
+    // actual D3D9 fog equations are NONE it has no influence on source pixels.
+    // Do not require a capability, float payload, sRGB mode or inactive
+    // range-fog flag for a genuine source no-fog Draw. In particular, this
+    // fixes false rejection of live FOGENABLE=1/NONE/NONE/RANGEFOG=1.
+    if (tableMode == 0u && vertexMode == 0u) return true;
+    // An active equation still needs an exactly mirrored GPU fog pipeline.
+    // Preserve conservative Z/W and sRGB restrictions for real fog.
+    if (vertexMode != 0u) return fail(NativeSm3FogReject::VertexFog);
+    if (rangeFog) return fail(NativeSm3FogReject::RangeFog);
+    if (srgbOutput) return fail(NativeSm3FogReject::Srgb);
+    if (!zFogCapable) return fail(NativeSm3FogReject::MissingZCapability);
+    if (wFogCapable) return fail(NativeSm3FogReject::WCapability);
+    if (tableMode != 1u && tableMode != 2u && tableMode != 3u)
+        return fail(NativeSm3FogReject::TableMode);
+    if (!std::isfinite(start)) return fail(NativeSm3FogReject::StartNotFinite);
+    if (!std::isfinite(end)) return fail(NativeSm3FogReject::EndNotFinite);
+    if (!std::isfinite(density)) return fail(NativeSm3FogReject::DensityNotFinite);
+    if (density < 0.0f) return fail(NativeSm3FogReject::NegativeDensity);
+    if (tableMode == 3u && !(end > start))
+        return fail(NativeSm3FogReject::LinearRange);
     constexpr float kScale = 1.0f / 255.0f;
     result.rgba = {{
         float((color >> 16u) & 255u) * kScale,
