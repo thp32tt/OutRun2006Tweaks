@@ -4285,7 +4285,7 @@ namespace OutRunVRStereo
             };
             const auto sourceCommand =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
-            const bool exactRival =
+            const bool exactRivalReceipt =
                 Settings::VRTelemetry &&
                 sourceCommand.producer ==
                     OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
@@ -4295,8 +4295,8 @@ namespace OutRunVRStereo
             const HRESULT stereoHr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
                 "R30.6/DrawPrimitiveUP-XYZRHW",
-                exactRival ? &rivalTrace : nullptr);
-            if (exactRival)
+                exactRivalReceipt ? &rivalTrace : nullptr);
+            if (exactRivalReceipt)
             {
                 static std::atomic<std::uint64_t> rivalXyzReceipts{0};
                 const auto hit = rivalXyzReceipts.fetch_add(
