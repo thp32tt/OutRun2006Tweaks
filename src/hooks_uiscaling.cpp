@@ -3184,6 +3184,10 @@ public:
         Memory::VP::InjectHook(
             Module::exe_ptr(RivalMarker_SpraniCall),
             RivalMarker_sprani, Memory::HookType::Call);
+        spdlog::info(
+            "VR RIVAL BB796 OWNERSHIP: installed=1 exactEdge={} stockProjectorAB={}",
+            Settings::VRRivalDx11NativeRoute.get() ? 0 : 1,
+            Settings::VRRivalDx11NativeRoute.get() ? 1 : 0);
 		for (int addr : TextGlyph_PutSpriteCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), TextGlyph_putSprite,
