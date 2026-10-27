@@ -17,14 +17,18 @@ struct GameNativePreDrawDepth {
         GameNativePreDrawFills::kMaxPreDrawTargetClearSourceRects;
     std::array<Tile,kCapacity> tiles{};
     std::uintptr_t device{},backbuffer{},depth{};
-    std::uint32_t count{};
-    constexpr void discard() noexcept { device=backbuffer=depth=0u;count=0u; }
+    std::uint32_t count{},sourceWidth{},sourceHeight{};
+    constexpr void discard() noexcept {
+        device=backbuffer=depth=0u;count=sourceWidth=sourceHeight=0u;
+    }
     [[nodiscard]] constexpr bool replay_ready(
         std::uintptr_t owner,std::uintptr_t rt,std::uintptr_t ds,
         std::uint32_t w,std::uint32_t h) const noexcept {
         if(!count)return true;
         if(count>kCapacity||!owner||!rt||!ds||owner!=device||
-           rt!=backbuffer||ds!=depth||!w||!h||w>0x7fffffffu||h>0x7fffffffu)
+           rt!=backbuffer||ds!=depth||!w||!h||
+           w!=sourceWidth||h!=sourceHeight||
+           w>0x7fffffffu||h>0x7fffffffu)
             return false;
         for(std::uint32_t i=0;i<count;++i){
             const auto& p=tiles[i];
@@ -129,7 +133,10 @@ struct GameNativePreDrawDepth {
                       staged.tiles[staged.count-2u],
                       staged.tiles[staged.count-1u]))
                 --staged.count;
-            if(!count){staged.device=owner;staged.backbuffer=rt;staged.depth=ds;}
+            if(!count){
+                staged.device=owner;staged.backbuffer=rt;staged.depth=ds;
+                staged.sourceWidth=w;staged.sourceHeight=h;
+            }
         }
         *this=staged;
         return true;

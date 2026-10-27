@@ -81,6 +81,17 @@ int main(){
     assert(color.count==128u&&depth.count==128u);
     assert(replayColor(color,true)==expectedColor);
     assert(replayColor(color,false)==expectedColor);
+    // Provenance includes exact source dimensions, not merely the maximum
+    // clipped pixel coordinate. A narrower backbuffer with all tiles inside
+    // its bounds is still a foreign frame and must not emit a GPU write.
+    std::uint32_t colorCalls=0u;
+    auto colorWriter=[&](const GameNativePreDrawTile&) noexcept {
+        ++colorCalls;return true;
+    };
+    assert(!game_native_replay_pre_draw_fills(
+        color,7,11,W-1u,H,false,true,colorWriter,colorWriter));
+    assert(colorCalls==0u);
+    assert(!color.record(7,11,0,4,1,5,W-1u,H,0xff202020u));
     std::uint32_t batches=0,largest=0;
     assert(replayDepth(depth,batches,largest)==expectedDepth);
     assert(batches==128u&&largest==1u); // interleaved Z may not group.
@@ -92,6 +103,7 @@ int main(){
     assert(!depth.replay_batched(7,11,14,W,H,accept));
     assert(!depth.replay_batched(7,12,13,W,H,accept));
     assert(!depth.replay_batched(7,11,13,W-1u,H,accept));
+    assert(!depth.record(7,11,13,W-1u,H,0,0,W-1u,H,1,&rects[0],.5f));
     assert(calls==0u);
     const auto oldColor=color.count,oldDepth=depth.count;
     const Rect extra{0,4,1,5};

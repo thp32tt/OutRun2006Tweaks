@@ -148,14 +148,14 @@ struct GameNativePreDrawFills {
     // regions; keep every ordered tile until native RTV replay. The source
     // Clear count remains bounded independently to 128 per original call.
     // D3D9 source Clear rectangles may clip or overwrite into fewer replay
-    // tiles. Bound source processing separately from the 16 stored GPU tiles.
+    // tiles. Bound source processing separately from the 128 stored GPU tiles.
     static constexpr std::uint32_t kMaxPreDrawTargetClearSourceRects = 128u;
     std::array<Fill, kCapacity> entries{};
     std::uintptr_t device{}, backbuffer{};
-    std::uint32_t count{};
+    std::uint32_t count{}, sourceWidth{}, sourceHeight{};
     constexpr void discard() noexcept {
         device = backbuffer = 0u;
-        count = 0u;
+        count = sourceWidth = sourceHeight = 0u;
     }
     [[nodiscard]] constexpr bool belongs_to(
         std::uintptr_t currentDevice, std::uintptr_t currentBackbuffer) const noexcept {
@@ -170,6 +170,7 @@ struct GameNativePreDrawFills {
         if (count == 0u) return true;
         if (!belongs_to(currentDevice, currentBackbuffer) ||
             count > kCapacity || width == 0u || height == 0u ||
+            width != sourceWidth || height != sourceHeight ||
             width > 0x7fffffffu || height > 0x7fffffffu)
             return false;
         for (std::uint32_t i = 0u; i < count; ++i) {
@@ -189,7 +190,8 @@ struct GameNativePreDrawFills {
         std::uint32_t width, std::uint32_t height,
         std::uint32_t color) noexcept {
         if (!currentDevice || !currentBackbuffer || count > kCapacity ||
-            (count && !belongs_to(currentDevice, currentBackbuffer)))
+            (count && (!belongs_to(currentDevice, currentBackbuffer) ||
+                       width != sourceWidth || height != sourceHeight)))
             return false;
         GameNativeSourceMutation::ColorFillRect clipped{};
         const auto coverage = GameNativeSourceMutation::classify_color_fill_rect(
@@ -255,6 +257,8 @@ struct GameNativePreDrawFills {
         if (!count) {
             staged.device = currentDevice;
             staged.backbuffer = currentBackbuffer;
+            staged.sourceWidth = width;
+            staged.sourceHeight = height;
         }
         *this = staged;
         return true;
