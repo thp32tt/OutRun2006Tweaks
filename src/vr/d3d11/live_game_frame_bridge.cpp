@@ -9705,9 +9705,20 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         if (!sameMainDepthStencil ||
             (clearZ && !compatibleCoverage && !partialDepth))
             return false;
+        // A successful partial Z|STENCIL Clear changes real game Z too.
+        // Before first native GPU Draw, mirror those clipped D3D9 depth
+        // rectangles in the existing ordered D32 first-Draw replay ledger.
+        // Preserve the original full Z seed and exact COM surface owners.
+        const bool seededMainColor = s.clearColor.matches(
+            owner, reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()));
+        const bool beforeFirstDepth = partialDepth &&
+            !continuingFullNativeDraw && s.sourceGameDevice == owner &&
+            !s.pending && s.frameBatch.depthClearPending &&
+            s.frameBatch.can_seed_pre_draw_depth(
+                seededMainColor, s.sourceDrawsThisFrame == 0u) &&
+            count <= GameNativePreDrawDepth::kCapacity &&
+            (count == 0u || rects != nullptr);
         if (clearStencil) {
-            const bool seededMainColor = s.clearColor.matches(
-                owner, reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()));
             // Whole-main stencil semantics remain unchanged. For clipped
             // Z|STENCIL, the stencil portion is neutral only when the exact
             // source Z rects can be mirrored on an owned live native D32.
@@ -9722,7 +9733,22 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                         (count == 0u || rects != nullptr),
                     native_game_partial_depth_ready(
                         s, game, bbDesc.Width, bbDesc.Height));
-            if (!wholeStencilSafe && !clippedStencilSafe) return false;
+            // The original D3D9 stencil component is neutral only because
+            // native game Draws reject stencil testing and stencil writes.
+            // Source leading zero-primitive Draws consume ordinals, not GPU Z.
+            const bool preDrawStencilSafe = beforeFirstDepth &&
+                GameNativeMainStencilClear::may_ignore_pre_draw(
+                    env_full_game_opt_in(), seededMainColor,
+                    sameMainDepthStencil,
+                    s.frameBatch.submitted == 0u &&
+                        (s.sourceDrawsThisFrame == 0u ||
+                         (s.frameBatch.hasSourceDraw &&
+                          s.frameBatch.leadingEmptySourceDraws ==
+                              s.sourceDrawsThisFrame)),
+                    count <= GameNativePreDrawDepth::kCapacity &&
+                        (count == 0u || rects != nullptr));
+            if (!wholeStencilSafe && !clippedStencilSafe &&
+                !preDrawStencilSafe) return false;
         }
         // Game-authored partial Z Clears must preserve untouched menu/race
         // depth: D3D11.1 ClearView or bounded D3D11.0 depth-only GPU Draw,
@@ -9731,14 +9757,8 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         if (partialDepth) {
             // Full original D3D9 Z seed followed by partial Z before any GPU
             // Draw. Record source rectangles until first real SM3/FVF Z Draw.
-            const bool beforeFirstDepth= !clearStencil &&
-                !continuingFullNativeDraw && s.sourceGameDevice==owner &&
-                !s.pending && s.frameBatch.depthClearPending &&
-                s.frameBatch.can_seed_pre_draw_depth(
-                    s.clearColor.matches(owner,reinterpret_cast<std::uintptr_t>(
-                        backbufferIdentity.Get())),s.sourceDrawsThisFrame==0u) &&
-                count<=GameNativePreDrawDepth::kCapacity &&
-                (count==0u||rects!=nullptr);
+            // Admission and stencil-neutrality already precede any record
+            // mutation; a failed multi-rect Z replay preserves prior tiles.
             if(beforeFirstDepth)
                 return s.preDrawDepth.record(owner,
                     reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),

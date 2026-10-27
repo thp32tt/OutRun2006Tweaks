@@ -29,6 +29,9 @@ struct GameNativeMainStencilClear {
     // canonical D3D9 Z/S COM surface, a pristine source Draw ordinal,
     // bounded rectangles and fail-closed native stencil-free admission.
     // Actual Z rectangles are staged separately and atomically with color.
+    // For Z|STENCIL without TARGET, the existing first-Draw depth-only tile
+    // recorder applies the Z pixels. Stencil neutrality never implies that
+    // a real D3D9 depth write can be discarded.
     [[nodiscard]] static constexpr bool may_ignore_pre_draw(
         bool nativeFullFrame, bool originalMainColorSeed,
         bool sameMainDepthStencil, bool beforeFirstSourceDraw,

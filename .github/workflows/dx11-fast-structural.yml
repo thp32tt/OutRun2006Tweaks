@@ -630,6 +630,9 @@ jobs:
           # 01101 authentic clipped TARGET|STENCIL / TARGET|Z|STENCIL.
           python tools/test_dx11_pre_draw_stencil_clear_01101.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_stencil_clear_probe_01101.cpp -o /tmp/dx11_pre_draw_stencil_01101 && /tmp/dx11_pre_draw_stencil_01101
+          # 01102 clipped Z|STENCIL successful D3D9 game Clear -> first-Draw D32.
+          python tools/test_dx11_pre_draw_z_stencil_01102.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_z_stencil_probe_01102.cpp -o /tmp/dx11_z_stencil_01102 && /tmp/dx11_z_stencil_01102
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
           # Native L/R partial-depth GPU Draw is a separate non-evidence
