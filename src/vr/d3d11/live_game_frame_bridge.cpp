@@ -9198,7 +9198,8 @@ bool preserve_game_partial_target_clear(
         // and foreign owners still leave original D3D9 output authoritative.
         if (sameBackbuffer &&
             s.sourceGameDevice == owner && !s.pending &&
-            s.frameBatch.submitted == 0u && !s.frameBatch.stopped &&
+            s.frameBatch.before_first_native_raster(
+                s.sourceDrawsThisFrame) &&
             s.frameBatch.accepts_full(s.sourceDrawsThisFrame) &&
             count <= GameNativePreDrawFills::kMaxPreDrawTargetClearSourceRects &&
             !GameNativeClearCoverage::covers_whole(
@@ -9231,8 +9232,8 @@ bool preserve_game_partial_target_clear(
                         env_full_game_opt_in(),
                         s.clearColor.matches(owner, mainRt),
                         canonicalDepth,
-                        !s.pending && s.frameBatch.submitted == 0u &&
-                            s.sourceDrawsThisFrame == 0u,
+                        !s.pending && s.frameBatch.before_first_native_raster(
+                            s.sourceDrawsThisFrame),
                         count <= GameNativePreDrawFills::
                             kMaxPreDrawTargetClearSourceRects))
                     return false;
@@ -9241,9 +9242,9 @@ bool preserve_game_partial_target_clear(
                     // full-depth seed requirement and stage COLOR+Z together;
                     // stencil-neutrality must never disguise absent Z replay.
                     if (!s.frameBatch.depthClearPending ||
-                        !s.frameBatch.can_seed_pre_draw_depth(
+                        !s.frameBatch.can_seed_pre_draw_depth_at_ordinal(
                             s.clearColor.matches(owner, mainRt),
-                            s.sourceDrawsThisFrame == 0u))
+                            s.sourceDrawsThisFrame))
                         return false;
                     return GameNativePreDrawCombinedClear::record(
                         s.preDrawFills, s.preDrawDepth, owner, mainRt,
@@ -9714,8 +9715,8 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         const bool beforeFirstDepth = partialDepth &&
             !continuingFullNativeDraw && s.sourceGameDevice == owner &&
             !s.pending && s.frameBatch.depthClearPending &&
-            s.frameBatch.can_seed_pre_draw_depth(
-                seededMainColor, s.sourceDrawsThisFrame == 0u) &&
+            s.frameBatch.can_seed_pre_draw_depth_at_ordinal(
+                seededMainColor, s.sourceDrawsThisFrame) &&
             count <= GameNativePreDrawDepth::kMaxSourceRects &&
             (count == 0u || rects != nullptr);
         if (clearStencil) {
@@ -9740,11 +9741,8 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                 GameNativeMainStencilClear::may_ignore_pre_draw(
                     env_full_game_opt_in(), seededMainColor,
                     sameMainDepthStencil,
-                    s.frameBatch.submitted == 0u &&
-                        (s.sourceDrawsThisFrame == 0u ||
-                         (s.frameBatch.hasSourceDraw &&
-                          s.frameBatch.leadingEmptySourceDraws ==
-                              s.sourceDrawsThisFrame)),
+                    s.frameBatch.before_first_native_raster(
+                        s.sourceDrawsThisFrame),
                     count <= GameNativePreDrawDepth::kMaxSourceRects &&
                         (count == 0u || rects != nullptr));
             if (!wholeStencilSafe && !clippedStencilSafe &&
@@ -9836,10 +9834,10 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         // This covers menu->vehicle->race startup where TARGET and ZBUFFER
         // are cleared by separate successful game calls.
         const bool beforeFirstGameDraw = !s.pending &&
-            (s.frameBatch.can_seed_pre_draw_depth(
+            (s.frameBatch.can_seed_pre_draw_depth_at_ordinal(
                 s.clearColor.matches(owner, reinterpret_cast<std::uintptr_t>(
                     backbufferIdentity.Get())),
-                s.sourceDrawsThisFrame == 0u) || resumedGameZ);
+                s.sourceDrawsThisFrame) || resumedGameZ);
         if ((s.frameBatch.submitted == 0u || s.frameBatch.stopped) &&
             !beforeFirstGameDraw) return false;
         if (s.frameBatch.submitted != 0u && !continuingFullNativeDraw)

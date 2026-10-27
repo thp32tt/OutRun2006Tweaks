@@ -26,7 +26,8 @@ struct GameNativeMainStencilClear {
     // Before the FIRST native Draw, stencil-only or TARGET|Z|STENCIL
     // partial Clears can retain an owned full-frame color/Z seed. Unlike
     // post-Draw ClearView, no native DSV exists yet: require the verified
-    // canonical D3D9 Z/S COM surface, a pristine source Draw ordinal,
+    // canonical D3D9 Z/S COM surface, an exact first-raster source ordinal
+    // (zero Draws or exclusively leading proven pixel-neutral Draws),
     // bounded rectangles and fail-closed native stencil-free admission.
     // Actual Z rectangles are staged separately and atomically with color.
     // For Z|STENCIL without TARGET, the existing first-Draw depth-only tile

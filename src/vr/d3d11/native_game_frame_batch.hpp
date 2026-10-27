@@ -186,6 +186,33 @@ struct GameNativeFrameBatch {
         record_source_draw(ordinal);
         return true;
     }
+    // A source Draw with zero effective pixels consumes an ordinal but has not
+    // initialized native RTV/DSV. Legitimate game Clears between such calls
+    // and the FIRST GPU Draw must remain in the original ordered color/Z
+    // source replay. Never accept a gap, post-Draw call or abandoned epoch.
+    [[nodiscard]] constexpr bool before_first_native_raster(
+        std::uint64_t observedSourceDraws) const noexcept {
+        if (stopped || awaitingColorFillDepthReset || submitted != 0u ||
+            depthReady || postDrawEmptySourceDraws != 0u ||
+            sourceEpochStart > observedSourceDraws ||
+            observedSourceDraws - sourceEpochStart !=
+                static_cast<std::uint64_t>(leadingEmptySourceDraws))
+            return false;
+        if (leadingEmptySourceDraws == 0u)
+            return !hasSourceDraw;
+        return hasSourceDraw && lastSourceDraw != UINT64_MAX &&
+            lastSourceDraw + 1u == observedSourceDraws;
+    }
+    // A real game full TARGET seed can be followed by empty Draws and then
+    // separate whole/partial Z or TARGET|Z Clears. Validate the actual
+    // absolute game ordinal (including ColorFill-started source epochs),
+    // rather than treating 'no Draws' as equivalent to 'source ordinal 0'.
+    [[nodiscard]] constexpr bool can_seed_pre_draw_depth_at_ordinal(
+        bool sameSourceFullColorClear,
+        std::uint64_t observedSourceDraws) const noexcept {
+        return sameSourceFullColorClear && !depthReady &&
+            before_first_native_raster(observedSourceDraws);
+    }
     // Whole game TARGET then separate whole ZBUFFER Clear can initialize DSV
     // before the first native Draw/DrawIndexed. Never cross an unsupported
     // source Draw or a stopped/partial/foreign game scene.

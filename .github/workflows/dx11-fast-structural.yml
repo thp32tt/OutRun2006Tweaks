@@ -645,6 +645,10 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_disjoint_bands_probe_01105.cpp -o /tmp/dx11_disjoint_bands_01105 && /tmp/dx11_disjoint_bands_01105
           # 01106 real game partial-edge source overwrites, color and depth
           # bounded first-Draw D3D11 GPU tile replay and unchanged fallback.
+          # 01107 leading pixel-neutral game Draws must preserve authentic
+          # TARGET|Z|STENCIL pre-first-native color/depth source pixels.
+          python tools/test_dx11_pre_draw_leading_empty_01107.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_pre_draw_leading_empty_probe_01107.cpp -o /tmp/dx11_predraw_empty_01107 && /tmp/dx11_predraw_empty_01107
           python tools/test_dx11_pre_draw_edge_overwrite_01106.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_edge_overwrite_probe_01106.cpp -o /tmp/dx11_edge_overwrite_01106 && /tmp/dx11_edge_overwrite_01106
           python tools/verify_dx11_source_graph.py
