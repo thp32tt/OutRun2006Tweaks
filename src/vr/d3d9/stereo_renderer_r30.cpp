@@ -6198,7 +6198,8 @@ namespace OutRunVRStereo
         HRESULT R30ExecuteXyzrhwStereo(
             IDirect3DDevice9* device, const R30XyzrhwState& state,
             LeftDraw&& leftDraw, RightDraw&& rightDraw,
-            const char* site, bool protectFixedFnRankHud = false)
+            const char* site, bool protectFixedFnRankHud = false,
+            const bool* physicalLeftDrawAttempted = nullptr)
         {
             // R26+HUD protected the lens centre from prematurely freezing
             // the pre-HUD SkyGlow source. The independent R84 renderer must
@@ -6272,18 +6273,44 @@ namespace OutRunVRStereo
 
             // A failed native source admission has submitted no eye and must
             // not mark a missing mono backup or a modified game depth buffer.
-            // Account only after all exact producer/FVF gates have passed.
-            R29OwnerNoteStereoDrawWithoutMonoBackup();
-            if (R29OwnerLeftDrawMayWriteDepth(device) ||
-                R29OwnerLeftDrawMayWriteStencil(device))
-                R29OwnerNoteMainDepthContentWrite();
+            // Most routes call the physical LEFT directly, so preserve the
+            // historical pre-draw accounting. The optional DynamicVB particle
+            // route passes an attempt bit because SetStreamSource can fail
+            // before any GPU Draw; that exact case must remain eligible for
+            // native DrawPrimitiveUP fallback without poisoning this Present.
+            const bool deferLeftAccounting =
+                physicalLeftDrawAttempted != nullptr;
+            if (!deferLeftAccounting)
+            {
+                R29OwnerNoteStereoDrawWithoutMonoBackup();
+                if (R29OwnerLeftDrawMayWriteDepth(device) ||
+                    R29OwnerLeftDrawMayWriteStencil(device))
+                    R29OwnerNoteMainDepthContentWrite();
+            }
 
             const HRESULT leftHr = leftDraw();
+            const bool leftWasPhysicallyAttempted =
+                !physicalLeftDrawAttempted || *physicalLeftDrawAttempted;
+            if (deferLeftAccounting && leftWasPhysicallyAttempted)
+            {
+                R29OwnerNoteStereoDrawWithoutMonoBackup();
+                if (R29OwnerLeftDrawMayWriteDepth(device) ||
+                    R29OwnerLeftDrawMayWriteStencil(device))
+                    R29OwnerNoteMainDepthContentWrite();
+            }
             if (FAILED(leftHr))
             {
-                // The left draw was already submitted but did not complete.
-                // There is no valid same-frame right eye to publish at Present,
-                // even if the following fallback/recovery path is successful.
+                if (!leftWasPhysicallyAttempted)
+                {
+                    // No DrawPrimitive reached the driver. The caller may
+                    // restore stream 0 and delegate the untouched source to
+                    // the original UP path; do not latch a false stereo fault.
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                        false, false, false);
+                    return leftHr;
+                }
+                // A physical left draw was attempted and may have rasterized
+                // fragments even when its HRESULT failed: retain fail-closed.
                 R29OwnerMarkRightDrawFailed();
                 R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 R29OwnerReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed,
@@ -6607,7 +6634,8 @@ namespace OutRunVRStereo
                             device, state,
                             [&]() { return physicalEye(0); },
                             [&]() { return physicalEye(1); },
-                            "R30/WorldParticle-DynamicVB");
+                            "R30/WorldParticle-DynamicVB", false,
+                            &physicalDrawAttempted);
                         // Native DrawPrimitiveUP leaves stream-0 NULL. No
                         // caller-visible D3D9 stream state may leak.
                         if (!R30ParticleGpuRing.finishUp())
