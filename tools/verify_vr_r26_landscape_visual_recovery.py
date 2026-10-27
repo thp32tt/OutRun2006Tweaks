@@ -31,8 +31,12 @@ assert 'spacing = 80.0f * Game::screen_scale->x;' in ui
 assert '? 80.0f' in ui
 assert 'exactCurrentChainOwner' in ui
 assert 'FirstVerifiedAppendedNode(\n                        root, before[prio], tailAfter' in ui
-assert 'VR RIVAL QUEUE PUBLICATION:' in ui
-assert 'policy=EXACT_CURRENT_CHAIN' in ui
+assert 'VR RIVAL KNOWN-GOOD ORDER RESTORED:' in ui
+rival=ui[ui.index('static int __cdecl RivalMarker_sprani('):ui.index('// 2026-10-11 Quest3', ui.index('static int __cdecl RivalMarker_sprani('))]
+assert rival.index('Game::sprani_play_ae_auth_alpha') < rival.index('const auto projectedAnchor = RivalMarkerProjectedInfo')
+assert 'FlushD3DXBeforeDirectGoalSource' not in rival
+assert 'FlushD3DXAtDirectGoalSourceExit' not in rival
+assert '&rootsBefore' in rival
 assert 'R30IsUnownedGoalFinalGraphPrimitiveUP' not in r30
 assert 'VR GOAL FINAL GRAPH: FVF144 DPUP -> finite SCREEN_HUD stereo' not in r30
 assert 'ResultProgressFullParentCallA = 0x98924' in ui
