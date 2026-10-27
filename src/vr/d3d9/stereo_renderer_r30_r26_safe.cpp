@@ -5853,6 +5853,23 @@ namespace OutRunVRStereo
                 device, std::forward<ActualDraw>(actualDraw), site);
             if (hr != E_NOTIMPL)
                 return hr;
+            const auto lensFallbackScope =
+                OutRunVR::GameSemantic::EffectiveScope();
+            if (Settings::VRTelemetry &&
+                (lensFallbackScope == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
+                 lensFallbackScope == OutRunVR::GameSemantic::RenderScope::SceneEffect))
+            {
+                static std::atomic<std::uint64_t> lensLowerSamples{0};
+                const auto n = lensLowerSamples.fetch_add(1,
+                    std::memory_order_relaxed) + 1;
+                if (n <= 32 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS R30 LOWER FALLBACK: sample={} serial={} "
+                        "site={} scope={} reason=R30_NOT_ADMITTED "
+                        "lowerActualDraw=NOT_YET_OBSERVED object=UNLINKED",
+                        n, TopLevelDrawSerial(), site ? site : "unknown",
+                        OutRunVR::GameSemantic::Name(lensFallbackScope));
+            }
             ++R30ScreenSpaceFallbacks;
             return r29Draw();
         }
