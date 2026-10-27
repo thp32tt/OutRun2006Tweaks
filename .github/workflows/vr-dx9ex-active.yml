@@ -240,6 +240,7 @@ on:
       - 'tools/verify_vr_r9_null_depth_clears_deferred.py'
       - 'tools/verify_vr_desktop_capture_reuse.py'
       - 'tools/verify_vr_theater_capture_once.py'
+      - 'tools/verify_vr_recovery_theater_capture_layout_receipt.py'
       - 'vrhost/src/runtime/theater_capture_reuse.hpp'
       - 'tools/verify_vr_final_submission_contract.py'
       - 'docs/VR_REFACTOR_STATE.json'
@@ -494,6 +495,7 @@ jobs:
             'tools/verify_vr_r21_host_clock_fastpath.py',
             'tools/verify_vr_desktop_capture_reuse.py',
             'tools/verify_vr_theater_capture_once.py',
+            'tools/verify_vr_recovery_theater_capture_layout_receipt.py',
             'tools/verify_vr_final_submission_contract.py',
             'tools/verify_vr_dx9ex_launch_paths.py',
             'tools/verify_vr_dx9ex_launch_batch.py'

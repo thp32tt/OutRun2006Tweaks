@@ -2090,6 +2090,10 @@ namespace
             stereoSourceValid_ = false;
             capturedGameUvValid_ = false;
             stereoSourceGameUvValid_ = false;
+            capturedLayoutKnown_ = false;
+            capturedLayoutSbs_ = false;
+            capturedLayoutPresentQpc_ = 0;
+            capturedLayoutOutputGeneration_ = 0;
             lastCapturePresentQpc_ = 0;
             lastCapturePresentQpcLow_ = 0;
             if (++captureOutputGeneration_ == 0)
@@ -2177,6 +2181,10 @@ namespace
             if (source_ && d.Width == sourceWidth_ && d.Height == sourceHeight_ && d.Format == sourceFormat_)
                 return true;
             capturedGameUvValid_ = false;
+            capturedLayoutKnown_ = false;
+            capturedLayoutSbs_ = false;
+            capturedLayoutPresentQpc_ = 0;
+            capturedLayoutOutputGeneration_ = 0;
             ReleaseCom(sourceSrv_);
             ReleaseCom(source_);
             D3D11_TEXTURE2D_DESC s{};
@@ -2416,6 +2424,13 @@ namespace
         bool capturedGameUvValid_ = false;
         bool capturedGameClientFullyVisible_ = false;
         std::uint64_t capturedGameOutputGeneration_ = 0;
+        // Layout receipt for the exact currently copied desktop pixels.
+        // A new CopyResource/rebind/source recreation invalidates it; only a
+        // Frame.v2/QPC match in R23 may certify SBS cropping for recovery.
+        bool capturedLayoutKnown_ = false;
+        bool capturedLayoutSbs_ = false;
+        std::int64_t capturedLayoutPresentQpc_ = 0;
+        std::uint64_t capturedLayoutOutputGeneration_ = 0;
         ULONGLONG lastPixelDiagnosticMs_ = 0;
 
         ID3D11Texture2D* stereoSource_ = nullptr;

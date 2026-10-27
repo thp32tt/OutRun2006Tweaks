@@ -1219,6 +1219,13 @@ namespace
 
         if (copied)
         {
+            // These are new desktop pixels. Any prior SBS/mono receipt was
+            // tied to the previous copied image and must be re-established
+            // from Frame.v2/QPC before recovery theater may crop it.
+            c.capturedLayoutKnown_ = false;
+            c.capturedLayoutSbs_ = false;
+            c.capturedLayoutPresentQpc_ = 0;
+            c.capturedLayoutOutputGeneration_ = 0;
             c.capturedGameUvValid_ = acquiredGameUvValid;
             c.capturedGameOutputGeneration_ =
                 c.captureOutputGeneration_;
@@ -3229,6 +3236,18 @@ int main(int argc, char** argv)
                                     need, candidate, maxSkewTicks);
                             if (candidateReady)
                             {
+                                // This exact copied desktop image is now
+                                // correlated to a completed classic SBS frame.
+                                // Keep the receipt with the capture QPC/output
+                                // generation so stale/pointer-only reuse can be
+                                // cropped safely without consulting a newer
+                                // unrelated Frame.v2 snapshot.
+                                compositor.capturedLayoutKnown_ = true;
+                                compositor.capturedLayoutSbs_ = true;
+                                compositor.capturedLayoutPresentQpc_ =
+                                    capture.lastPresentQpc;
+                                compositor.capturedLayoutOutputGeneration_ =
+                                    compositor.captureOutputGeneration_;
                                 candidateGameFrameId = candidate.frameId;
                                 candidatePoseSequence =
                                     candidate.sourcePoseSequence;
@@ -3530,14 +3549,45 @@ int main(int argc, char** argv)
                         QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
 
                         LARGE_INTEGER frs{}, fre{}; QueryPerformanceCounter(&frs);
-                        // Only crop the left half when the shared frame state says
-                        // the desktop source is a completed SBS frame. If stereo
-                        // never became active (for example SAFE transport policy
-                        // mismatch), the desktop contains a normal full-width mono
-                        // frame; cropping it caused the observed half-screen zoom.
-                        const bool fallbackSourceIsSbs = have &&
-                            before.state == OutRunVR::StereoSbsActive &&
-                            (before.flags & OutRunVR::RenderFrameStereoComplete) != 0;
+                        // Recovery cropping belongs to the copied desktop
+                        // image, not to whichever Frame.v2 snapshot happened
+                        // to be read earlier this XR tick. Certify a fresh
+                        // fallback capture against stable frame history; stale
+                        // or pointer-only reuse may inherit only the receipt
+                        // attached to that exact capture QPC/output generation.
+                        const bool receiptMatchesCapture = [&]() noexcept {
+                            return fallbackCapture.available &&
+                                compositor.capturedLayoutKnown_ &&
+                                compositor.capturedLayoutSbs_ &&
+                                compositor.capturedLayoutPresentQpc_ > 0 &&
+                                compositor.capturedLayoutPresentQpc_ ==
+                                    fallbackCapture.lastPresentQpc &&
+                                compositor.capturedLayoutOutputGeneration_ ==
+                                    compositor.captureOutputGeneration_;
+                        };
+                        if (fallbackCapture.available &&
+                            fallbackCapture.fresh &&
+                            !receiptMatchesCapture())
+                        {
+                            OutRunVR::SharedRenderFrameState layoutFrame{};
+                            const std::int64_t layoutSkewTicks =
+                                qpcFrequency.QuadPart > 0
+                                ? qpcFrequency.QuadPart / 10
+                                : 0;
+                            if (R23SelectClassicFrameForCapture(
+                                    renderFrames, fallbackCapture, 0u,
+                                    need, layoutFrame, layoutSkewTicks))
+                            {
+                                compositor.capturedLayoutKnown_ = true;
+                                compositor.capturedLayoutSbs_ = true;
+                                compositor.capturedLayoutPresentQpc_ =
+                                    fallbackCapture.lastPresentQpc;
+                                compositor.capturedLayoutOutputGeneration_ =
+                                    compositor.captureOutputGeneration_;
+                            }
+                        }
+                        const bool fallbackSourceIsSbs =
+                            receiptMatchesCapture();
                         if (fallbackCapture.available &&
                             R23RenderTheater(compositor, viewSpace, localSpace,
                                 fs.predictedDisplayTime, quad, fallbackSourceIsSbs))
