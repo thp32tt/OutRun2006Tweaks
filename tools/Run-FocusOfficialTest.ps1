@@ -64,7 +64,7 @@ try {
         '-DisableDesktopVsync=true','-SkyGlowFactor=1',
         '-PreferD3D9Ex=true','-DirectGpuOnly=false','-DisableDesktopDuplication=false',
         '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
-        '-RivalDx11NativeRoute=false',
+        '-RivalDx11NativeRoute=false','-UIScalingMode=1',
         '-AutoRenderResolution=true','-FollowGameResolution=false',
         '-MirrorPreserveAspect=true',
         '-UnifiedEyeMenuSource=false','-AntiAliasing=2',
