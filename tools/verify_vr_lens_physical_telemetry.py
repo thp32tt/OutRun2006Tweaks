@@ -50,7 +50,15 @@ def check(r30: str, game: str, hook: str) -> None:
         "const bool pairComplete = SUCCEEDED(rightHr) && restoreOk;")
     assert body.count("rightHr = actualDraw();") == 1
     assert body.count("const HRESULT leftHr = actualDraw();") == 1
-    assert "return r29Draw();" in r30.split("HRESULT R30GuardScreenSpace(", 1)[1][:750]
+    lower = r30.split("HRESULT R30GuardScreenSpace(", 1)[1].split(
+        "// Share the existing R62", 1
+    )[0]
+    assert "VR LENS R30 LOWER FALLBACK:" in lower
+    assert "reason=R30_NOT_ADMITTED" in lower
+    assert "lowerActualDraw=NOT_YET_OBSERVED object=UNLINKED" in lower
+    assert lower.index("VR LENS R30 LOWER FALLBACK:") < lower.index(
+        "return r29Draw();")
+    assert "return r29Draw();" in lower
 
     for phrase in (
         "VR LENS GAME C64 GATE:",
