@@ -1,0 +1,183 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01113",
+  "production_id": "CONVERSION-DX11-01113",
+  "event_id": "CONVERSION-DX11-01113-E002",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01113",
+  "classification": "A_AUTHENTIC_GAME_FULL_SURFACE_COPY_NATIVE_FIRST_DRAW",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_FULL_D3D9_SURFACE_COPY_NATIVE_FIRST_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "8704cf457a62ebbcb6190a521366fa5720753408",
+  "source_change_sha": "eec35d5080eff8d539081adfe4ad712cefb6609f",
+  "material_result_sha": "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d",
+  "validation_bearing_result_sha": "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d",
+  "result_sha": "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d",
+  "implementation_commits": [
+    "eec35d5080eff8d539081adfe4ad712cefb6609f"
+  ],
+  "repair_commits": [
+    "a848aec96b692608b500fe8b382f22a074072478",
+    "a575b120f5eb9a44ac5b384be55504129f6d412e",
+    "26e02105bc9171f8f256f2f23175c245d1b5bdc3",
+    "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_clear_color.hpp",
+    "src/vr/d3d11/native_game_full_copy_seed.hpp",
+    "tools/dx11_full_copy_seed_01113.cpp",
+    "tools/test_dx11_full_copy_seed_01113.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01112.json",
+    "tools/test_dx11_x8_dest_alpha_00736.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve authentic full-resolution menu/vehicle/race source color when a successful original D3D9 StretchRect/UpdateSurface wholly overwrites the canonical backbuffer without a previous TARGET Clear: capture actual full source pixels before native first Draw, never publish synthetic seed pixels, fail closed to DX9Ex original input/FFB when source ownership or transfer fails.",
+    "acceptance_items": [
+      {
+        "id": "authentic_whole_surface_native_frame_seed",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_WHOLE_BACKBUFFER_COPY_TO_NATIVE_SM3_FVF_DRAW",
+        "expected_behavior": "Successful canonical whole D3D9 surface-copy can initialize genuine game color; native first Draw requires the authenticated readback and uploads it for both real SM3 and FVF game Draw paths."
+      },
+      {
+        "id": "foreign_partial_missing_snapshot_reject",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_OWNER_PIXEL_PROVENANCE_AND_X8_ALPHA",
+        "expected_behavior": "Partial/foreign/prior-Draw/unproven copy or lost source snapshot never seeds a fabricated native black frame; original D3D9, input and FFB remain authoritative and X8 opaque alpha remains strict."
+      },
+      {
+        "id": "five_exact_sha_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "SOURCE_CXX_BUILD_BACKEND_OPENXR_HUD",
+        "expected_behavior": "Five existing mandatory push GitHub Actions complete success on the exact validation-bearing material SHA while game menu/race/Quest3 pixels remain explicitly UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "SUCCESSFUL_REAL_D3D9_FULL_BACKBUFFER_STRETCHRECT_OR_UPDATESURFACE",
+      "EXACT_MAIN_RT_OWNER_EXTENT_AND_PRISTINE_SOURCE_ORDINAL",
+      "WHOLE_BGRA_READBACK_RECORD_THEN_NATIVE_FIRST_DRAW_GPU_UPLOAD",
+      "NATIVE_SM3_OR_FVF_GPU_DRAW_AND_FALLBACK_SAFE_PRESENT"
+    ],
+    "batch_components": [
+      "CXX_D3D9_SOURCE_COPY_BOOTSTRAP_TO_NATIVE_COLOR_LEDGER",
+      "CXX_AUTHENTIC_PIXEL_REQUIRED_AT_FIRST_GPU_DRAW_WITH_X8_ALPHA",
+      "COMPILED_CXX_SOURCE_REGRESSION_AND_INTEGRATED_FIVE_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast #40515450965 compiled whole source-copy admission and pixel-provenance source test, verified real SM3 context and FVF ctx first-native-Draw replay callsites on the exact material SHA.",
+      "negative_regression": "C++ 7 independent source-admission negatives, missing/mismatched game pixel snapshot, original X8 alpha destructive reset, inherited source guards and unchanged fail-closed DX9Ex renderer/gamepad/FFB; DX11 Fast and Windows Build success.",
+      "component_integration": "Real live_game_frame_bridge.cpp preserve_game_surface_copy authentic D3D9 copy hook captures canonical full game pixels; GameNativeClearColor copySnapshotRequired makes both actual SM3/FVF GPU first Draw upload the exact staged image or refuse native output; original game copy/D3D9 Present untouched."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Source and Win32/x64 GitHub build-only evidence; game-source optical menu/car/race frames and Quest3/VDXR were not physically tested or observed. No full gameplay or HMD promotion.",
+    "activation_guard_and_fallback": "Original D3D9Ex Draw/Present, input, force-feedback, SkyGlow, opt-in native ownership fences, live CPU-write tickets and DXVK freeze protected.",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:AUTHENTIC_FULL_D3D9_SURFACE_COPY_NATIVE_FIRST_DRAW"
+    ]
+  },
+  "acceptance_results": {
+    "authentic_whole_surface_native_frame_seed": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_full_copy_seed.hpp",
+        "tools/dx11_full_copy_seed_01113.cpp",
+        "tools/test_dx11_full_copy_seed_01113.py"
+      ],
+      "validation_command": "DX11 Fast #40515450965 completed success and Windows Build #40515450844 completed success on validation-bearing material SHA."
+    },
+    "foreign_partial_missing_snapshot_reject": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_clear_color.hpp",
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+        "tools/test_dx11_x8_dest_alpha_00736.py",
+        "tools/dx11_full_copy_seed_01113.cpp"
+      ],
+      "validation_command": "DX11 Fast #40515450965 completed success with seven negative predicate cases, X8 alpha reset mutation and source snapshot mismatch regressions."
+    },
+    "five_exact_sha_integrated_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515450965",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515451244",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515450844",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515450838",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515450813"
+      ],
+      "validation_command": "Five mandatory push workflows completed success at exact SHA 64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d; physical game/HMD UNTESTED."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40515450965,
+      "head_sha": "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515450965"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40515451244,
+      "head_sha": "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515451244"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40515450844,
+      "head_sha": "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515450844"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40515450838,
+      "head_sha": "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515450838"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40515450813,
+      "head_sha": "64c6bebbc583a1c3c42905e2a5d6c53695ec7d7d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40515450813"
+    }
+  ],
+  "runtime_evidence": {
+    "native_game_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "c6_note": "C6 docs-only descendant separate from source implementation and validation-bearing material SHA; same TASK_ID E002 retries, inherited 01112 acceptance schema repair and X8/SM3-FVF test fixes are not independent score-bearing achievements. Five exact SHA push Gates completed success. Original DXVK branch untouched, no HMD test."
+}
