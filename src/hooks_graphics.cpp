@@ -653,6 +653,30 @@ class VRLensFlareProjected2D : public Hook
     inline static thread_local std::uint64_t LensFlareSequence = 0;
     inline static thread_local std::uint64_t LensOuter570008Sequence = 0;
     inline static thread_local unsigned LensOuter570008Ordinal = 0;
+    // This serial counts *source wrapper admissions*, not physical GPU draws.
+    // A 0x570002 anchor can be absent when original 40CBC0 spread <= 0;
+    // never use the last-C993 sequence as a Present or sun-invocation ID.
+    inline static thread_local std::uint64_t LensSourceCallSerial = 0;
+    static std::uint64_t NextLensSourceCallSerial() noexcept
+    {
+        if (++LensSourceCallSerial == 0)
+            ++LensSourceCallSerial;
+        return LensSourceCallSerial;
+    }
+    static constexpr bool IsOuterLensSource(int id) noexcept
+    {
+        switch (id)
+        {
+        case 0x570003: case 0x570004: case 0x570005:
+        case 0x570007: case 0x570008: case 0x570009:
+        case 0x57000A: case 0x57000B: case 0x57000C:
+        case 0x57000D: case 0x57000E:
+            return true;
+        default:
+            return false;
+        }
+    }
+
 
     static void LensCentreEnter(safetyhook::Context&)
     {
@@ -707,31 +731,39 @@ class VRLensFlareProjected2D : public Hook
 	static void __cdecl DrawObjectAlphaProjected(
 		int objectId, float alpha, void* work, int flags)
 	{
+        const bool trackedSource = Settings::VREnabled && IsOuterLensSource(objectId);
+        const std::uint64_t sourceCallSerial =
+            trackedSource ? NextLensSourceCallSerial() : 0;
         // User Quest3 confirmed the "missing" tiny end-of-flare point
         // is NOT explained by hiding this child. Restore BOTH original
         // 0x570008 draws. Preserve their exact scene/projection semantics
         // and log source ordinals for diagnosing eye-space duplication.
-        if (Settings::VREnabled && objectId == 0x570008 &&
-            LensFlareSequence != 0)
+        if (Settings::VREnabled && objectId == 0x570008)
         {
-            if (LensOuter570008Sequence != LensFlareSequence)
+            unsigned ordinal = 0;
+            if (LensFlareSequence != 0)
             {
-                LensOuter570008Sequence = LensFlareSequence;
-                LensOuter570008Ordinal = 0;
+                if (LensOuter570008Sequence != LensFlareSequence)
+                {
+                    LensOuter570008Sequence = LensFlareSequence;
+                    LensOuter570008Ordinal = 0;
+                }
+                ordinal = ++LensOuter570008Ordinal;
             }
-            const unsigned ordinal = ++LensOuter570008Ordinal;
             if (Settings::VRTelemetry)
             {
                 static std::atomic<std::uint64_t> originalDraws{0};
                 const auto n = originalDraws.fetch_add(1, std::memory_order_relaxed) + 1;
                 if (n <= 12 || (n & (n - 1)) == 0)
                     spdlog::info(
-                        "VR LENS 570008 ORIGINAL BOTH DRAWN: id=0x{:X} ordinal={} sequence={} hits={} alpha={} flags=0x{:X} ambientScope={} spriteQueue={} physicalDraw=UNOBSERVED",
+                        "VR LENS 570008 ORIGINAL BOTH DRAWN: id=0x{:X} ordinal={} sequence={} hits={} alpha={} flags=0x{:X} ambientScope={} spriteQueue={} physicalDraw=UNOBSERVED sourceCallSerial={} anchorKnown={} ordinalMaySpanSunCalls={}",
                         static_cast<unsigned>(objectId), ordinal,
                         LensFlareSequence, n, alpha,
                         static_cast<unsigned>(flags),
                         static_cast<int>(OutRunVR::GameSemantic::EffectiveScope()),
-                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                        sourceCallSerial, LensFlareSequence != 0 ? 1 : 0,
+                        ordinal > 2 ? 1 : 0);
             }
         }
 
@@ -754,6 +786,9 @@ class VRLensFlareProjected2D : public Hook
         }
 		OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
 			OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
+        OutRunVR::GameSemantic::ScopedLensOriginalCall inlineSource(
+            {sourceCallSerial, LensFlareSequence,
+             static_cast<std::uint32_t>(objectId), 2});
 		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
 	}
 
@@ -781,6 +816,10 @@ class VRLensFlareProjected2D : public Hook
     static void __cdecl DrawObjectAlphaCentre(
         int objectId, float alpha, void* work, int flags)
     {
+        const bool trackedSource = Settings::VREnabled &&
+            IsProjectedSunScreenObject(objectId);
+        const std::uint64_t sourceCallSerial =
+            trackedSource ? NextLensSourceCallSerial() : 0;
         // Begin one exact sun-flare sequence before any optional C993
         // suppression. The following C9A0 path emits 0x570008 twice.
         if (Settings::VREnabled &&
@@ -814,15 +853,19 @@ class VRLensFlareProjected2D : public Hook
             if (n <= 16 || (n & (n - 1)) == 0)
                 spdlog::info(
                     "VR LENS C993 SOURCE ADMISSION: id=0x{:06X} hits={} "
-                    "sequence={} projected={} spriteQueue={} "
+                    "sequence={} projected={} spriteQueue={} sourceCallSerial={} "
                     "ambientScope={} physicalDraw=UNOBSERVED opaqueFlush=UNOBSERVED",
                     static_cast<unsigned>(objectId), n,
                     LensFlareSequence, projectedSun ? 1 : 0,
                     OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    sourceCallSerial,
                     static_cast<int>(OutRunVR::GameSemantic::EffectiveScope()));
         }
         if (!projectedSun)
         {
+            OutRunVR::GameSemantic::ScopedLensOriginalCall inlineSource(
+                {sourceCallSerial, LensFlareSequence,
+                 static_cast<std::uint32_t>(objectId), 1});
             Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
             return;
         }
@@ -855,6 +898,9 @@ class VRLensFlareProjected2D : public Hook
             OutRunVR::GameSemantic::ProducerToken::None);
         OutRunVR::GameSemantic::ScopedRenderSemantic sunDrawScope(
             OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
+        OutRunVR::GameSemantic::ScopedLensOriginalCall inlineSource(
+            {sourceCallSerial, LensFlareSequence,
+             static_cast<std::uint32_t>(objectId), 1});
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
     }
 

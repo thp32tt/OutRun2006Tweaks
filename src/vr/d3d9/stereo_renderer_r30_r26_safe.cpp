@@ -5470,6 +5470,30 @@ namespace OutRunVRStereo
                         OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
                         site ? site : "unknown");
             }
+            // Scoped source identity is a bounded *inline call stack* hint.
+            // A queued 405360 descriptor can flush after wrapper return, and
+            // even a synchronous nested call does not prove PMT mesh lineage.
+            const auto lensInline = OutRunVR::GameSemantic::CurrentLensOriginalCall;
+            if (Settings::VRTelemetry && lensInline.sourceSerial != 0)
+            {
+                static std::atomic<std::uint64_t> lensInlineSamples{0};
+                const auto n = lensInlineSamples.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 32 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS R30 INLINE SOURCE ENTRY: sample={} serial={} "
+                        "sourceCallSerial={} sourceObj=0x{:X} sourceSite={} "
+                        "lastC993Seq={} scope={} baseAdmitted={} site={} "
+                        "nativeExecuted=UNOBSERVED opaqueDescriptor=UNLINKED "
+                        "provenance=CALL_STACK_ONLY",
+                        n, TopLevelDrawSerial(),
+                        lensInline.sourceSerial, lensInline.objectId,
+                        static_cast<unsigned>(lensInline.callsite),
+                        lensInline.lastC993Sequence,
+                        OutRunVR::GameSemantic::Name(
+                            OutRunVR::GameSemantic::EffectiveScope()),
+                        baseAdmitted ? 1 : 0, site ? site : "unknown");
+            }
             if (!baseAdmitted)
                 return E_NOTIMPL;
 

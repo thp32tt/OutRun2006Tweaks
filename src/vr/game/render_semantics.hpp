@@ -868,6 +868,34 @@ namespace OutRunVR::GameSemantic
         RenderScope::ScreenHud, ProducerToken::GoalTime020,
         RenderScope::ScreenHud, ProducerToken::GoalTime020));
 
+    // CALL-STACK ONLY: an observed original C993/CABE wrapper, never an
+    // opaque 405360 descriptor, physical native Draw, eye RT or flushed object.
+    struct LensOriginalCallReceipt
+    {
+        std::uint64_t sourceSerial = 0;
+        std::uint64_t lastC993Sequence = 0;
+        std::uint32_t objectId = 0;
+        std::uint8_t callsite = 0; // 1=C993, 2=CABE
+    };
+    inline thread_local LensOriginalCallReceipt CurrentLensOriginalCall{};
+    class ScopedLensOriginalCall
+    {
+        LensOriginalCallReceipt previous_{};
+    public:
+        explicit ScopedLensOriginalCall(
+            LensOriginalCallReceipt receipt) noexcept
+            : previous_(CurrentLensOriginalCall)
+        {
+            CurrentLensOriginalCall = receipt;
+        }
+        ~ScopedLensOriginalCall() noexcept
+        {
+            CurrentLensOriginalCall = previous_;
+        }
+        ScopedLensOriginalCall(const ScopedLensOriginalCall&) = delete;
+        ScopedLensOriginalCall& operator=(const ScopedLensOriginalCall&) = delete;
+    };
+
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     // An explicit SpriteNode producer owns its render space through the
     // complete queue draw. Temporary helper scopes must not replace it.

@@ -73,6 +73,16 @@ def check(r30: str, game: str, hook: str) -> None:
         "const bool projectedLensWithSyncedCamera =")
     assert game_body.index("VR LENS GAME C64 GATE:") < game_body.index(
         "const bool semanticOverlay =")
+    # A wrapper can overlap a native entry; retain the explicit "candidate"
+    # qualifier until the original opaque descriptor and flush generation join.
+    assert "VR LENS R30 INLINE SOURCE ENTRY:" in body
+    assert "opaqueDescriptor=UNLINKED" in body
+    assert "provenance=CALL_STACK_ONLY" in body
+    assert "lensInline.sourceSerial != 0" in body
+    assert "ScopedLensOriginalCall inlineSource(" in projected
+    assert centre.count("ScopedLensOriginalCall inlineSource(") == 2
+    assert "sourceCallSerial" in centre and "sourceCallSerial" in projected
+    assert "ordinalMaySpanSunCalls={}" in projected
     assert "VR LENS C993 SOURCE ADMISSION:" in centre
     assert "physicalDraw=UNOBSERVED opaqueFlush=UNOBSERVED" in centre
     assert "VR LENS 570008 ORIGINAL BOTH DRAWN" in projected
@@ -97,6 +107,9 @@ def main() -> None:
         (1, "physicalDraw=UNLINKED", "physicalDraw=C993"),
         (2, "physicalDraw=UNOBSERVED opaqueFlush=UNOBSERVED", "physicalDraw=CONFIRMED opaqueFlush=CONFIRMED"),
         (2, "VR LENS 570008 ORIGINAL BOTH DRAWN", "VR LENS ONE ONLY"),
+        (0, "provenance=CALL_STACK_ONLY", "provenance=OPAQUE_MATCH"),
+        (0, "opaqueDescriptor=UNLINKED", "opaqueDescriptor=570008"),
+        (2, "ordinalMaySpanSunCalls={}", "ordinalIsFrameProof=1"),
     ]
     values = [r30, game, hook]
     for idx, old, new in mutations:
@@ -108,8 +121,9 @@ def main() -> None:
         except AssertionError:
             continue
         raise AssertionError("unsafe lens provenance mutation escaped: " + old)
-    print("PASS lens C993/CABE source+game-c64+R30 native eye receipts; "
-          "8 negative mutations, no game optics changes; HMD UNTESTED")
+    print("PASS lens C993/CABE inline source candidate + R30 native receipts; "
+          f"{len(mutations)} destructive negative controls; "
+          "no game optics changes; HMD UNTESTED")
 
 
 if __name__ == "__main__":
