@@ -474,7 +474,10 @@ def verify_outer_lens_c64_owner(renderer):
         "return result;", 1)[0]
     assert "SetVertexShaderConstantFHook.stdcall<HRESULT>(" in original
     assert "device, startRegister, constantData, vector4fCount);" in original
-    assert "if (SUCCEEDED(result) && sourceUnchanged)" in original
+    assert ("if (SUCCEEDED(result) && sourceUnchanged &&" in original and
+            "UploadContainsOutRunWvp(startRegister, vector4fCount))" in original)
+    # 01523 requires a full four-register source before native raw WVP
+    # publication; partial writes still reach the original GPU setter.
     assert "RecordGameWvpWrite(nativeGameWvp, nativeGameWvp);" in original
     assert "TryPrepareOutRunWvp(" not in original
     # Camera-sync-disabled mode deliberately uses the pre-existing
