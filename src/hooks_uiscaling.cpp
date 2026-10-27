@@ -1346,10 +1346,19 @@ class UIScaling : public Hook
                     sourceRoots &&
                     (producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani ||
                      allowCurrentRootRebuild);
-                node = exactCurrentChainOwner
-                    ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
-                        root, before[prio], tailAfter, Game::SpriteNodeMax)
-                    : sourceRoots
+                const bool rivalCreatedFreshRoot =
+                    sourceRoots &&
+                    producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
+                    (*sourceRoots)[prio] == nullptr &&
+                    before[prio] == nullptr;
+                node = rivalCreatedFreshRoot
+                    ? OutRunVR::SpriteQueue::FirstVerifiedNewRootAppendedChain(
+                        (*sourceRoots)[prio], before[prio], root, tailAfter,
+                        Game::SpriteNodeMax)
+                    : exactCurrentChainOwner
+                        ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
+                            root, before[prio], tailAfter, Game::SpriteNodeMax)
+                        : sourceRoots
                         ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot(
                             (*sourceRoots)[prio], root, before[prio],
                             tailAfter, Game::SpriteNodeMax)
