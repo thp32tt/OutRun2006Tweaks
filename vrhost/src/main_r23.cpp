@@ -2715,6 +2715,8 @@ int main(int argc, char** argv)
         float cachedMenuScale = -1.0f;
         bool cachedMenuLetterbox = false;
         std::uint64_t cachedMenuCaptureGeneration = 0;
+        std::array<XrFovf, 2> cachedMenuSourceFov{};
+        bool cachedMenuSourceFovValid = false;
         bool awaitingFirstGameplayStereo = false;
         XrPosef menuProjectionAnchor{};
         menuProjectionAnchor.orientation.w = 1.0f;
@@ -3565,6 +3567,30 @@ int main(int argc, char** argv)
                         R23GameMenuIsLetterboxed(compositor.hwnd_);
                     const std::uint64_t currentMenuCaptureGeneration =
                         compositor.captureOutputGeneration_;
+                    const bool currentMenuViewsValid =
+                        vc >= 2 &&
+                        (vs.viewStateFlags & neededViews) == neededViews;
+                    const auto sameFov = [](const XrFovf& a,
+                        const XrFovf& b) noexcept {
+                        constexpr float epsilon = 1.0e-5f;
+                        const float values[]{
+                            a.angleLeft, a.angleRight, a.angleDown, a.angleUp,
+                            b.angleLeft, b.angleRight, b.angleDown, b.angleUp
+                        };
+                        for (const float value : values)
+                            if (!std::isfinite(value))
+                                return false;
+                        return std::fabs(a.angleLeft - b.angleLeft) <= epsilon &&
+                            std::fabs(a.angleRight - b.angleRight) <= epsilon &&
+                            std::fabs(a.angleDown - b.angleDown) <= epsilon &&
+                            std::fabs(a.angleUp - b.angleUp) <= epsilon;
+                    };
+                    const bool menuFovChanged =
+                        cachedMenuProjectionValid &&
+                        cachedMenuSourceFovValid &&
+                        currentMenuViewsValid &&
+                        (!sameFov(cachedMenuSourceFov[0], views[0].fov) ||
+                         !sameFov(cachedMenuSourceFov[1], views[1].fov));
                     if (cachedMenuGameState != clientGameState ||
                         cachedMenuScale != R23ConfiguredMenuScale ||
                         cachedMenuCaptureGeneration !=
@@ -3575,19 +3601,22 @@ int main(int argc, char** argv)
                         cachedMenuCaptureGeneration =
                             currentMenuCaptureGeneration;
                         cachedMenuProjectionValid = false;
+                        cachedMenuSourceFovValid = false;
                     }
                     // Review 01490: an accepted letterbox-only config change
                     // changes title/menu source UVs even when menu scale,
                     // game state and Desktop Duplication pixel freshness stay
-                    // unchanged. Rebuild only from an available capture; keep
-                    // the last valid pair if the refresh itself fails.
+                    // unchanged. A valid FOV-only change also recomposes the
+                    // retained source pixels so the shared LOCAL menu remains
+                    // contained by the current binocular intersection.
                     const bool letterboxPolicyChanged =
                         cachedMenuProjectionValid &&
                         cachedMenuLetterbox != currentMenuLetterbox;
                     if (capture.available &&
                         menuProjectionAnchorValid &&
+                        currentMenuViewsValid &&
                         (!cachedMenuProjectionValid || capture.fresh ||
-                         letterboxPolicyChanged))
+                         letterboxPolicyChanged || menuFovChanged))
                     {
                         std::array<XrCompositionLayerProjectionView, 2>
                             refreshed{};
@@ -3597,6 +3626,9 @@ int main(int argc, char** argv)
                         {
                             cachedMenuProjectionViews = refreshed;
                             cachedMenuLetterbox = currentMenuLetterbox;
+                            cachedMenuSourceFov[0] = views[0].fov;
+                            cachedMenuSourceFov[1] = views[1].fov;
+                            cachedMenuSourceFovValid = true;
                             cachedMenuProjectionValid = true;
                         }
                     }
