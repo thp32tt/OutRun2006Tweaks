@@ -2561,6 +2561,12 @@ class UIScaling : public Hook
             unsigned stableRootTailChanges = 0;
             unsigned replacedRootTailChanges = 0;
             unsigned newlyPopulatedPriorities = 0;
+            static thread_local std::uint64_t rivalQueuePublishes = 0;
+            const auto n = ++rivalQueuePublishes;
+            const bool sampled = n <= 8 || (n & (n - 1)) == 0;
+            unsigned verifiedKind0 = 0;
+            unsigned verifiedKind1 = 0;
+            unsigned verifiedKindsChecked = 0;
             for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
             {
                 SpriteNode* currentRoot = Game::sprite_prio_root[prio];
@@ -2580,14 +2586,37 @@ class UIScaling : public Hook
                 if (!before[prio] && currentRoot && tailAfter &&
                     tailAfter != currentRoot)
                     ++newlyPopulatedPriorities;
+                // The rival's original sprani_play_ae_auth_alpha uses an
+                // animation-node producer. On sparse sample events, walk
+                // ONLY the proven live current-root append chain (bounded
+                // at the game's ring size), never an old dangling tail.
+                // Do not tag or modify any node from this probe.
+                if (sampled && currentRoot && tailAfter &&
+                    tailAfter != before[prio])
+                {
+                    SpriteNode* first =
+                        OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
+                            currentRoot, before[prio], tailAfter,
+                            Game::SpriteNodeMax);
+                    unsigned budget = Game::SpriteNodeMax;
+                    for (auto* live = first; live && budget; --budget)
+                    {
+                        ++verifiedKindsChecked;
+                        if (live->kind_C == 0)
+                            ++verifiedKind0;
+                        else
+                            ++verifiedKind1;
+                        if (live == tailAfter)
+                            break;
+                        live = live->next_0;
+                    }
+                }
             }
-            static thread_local std::uint64_t rivalQueuePublishes = 0;
-            const auto n = ++rivalQueuePublishes;
-            if (n <= 8 || (n & (n - 1)) == 0)
+            if (sampled)
                 spdlog::info(
                     "VR RIVAL QUEUE PUBLICATION: hits={} registeredDelta={} anchorValid={} policy=EXACT_CURRENT_CHAIN",
                     n, registeredAfter - registeredBefore, projected ? 1 : 0);
-            if (n <= 8 || (n & (n - 1)) == 0)
+            if (sampled)
                 spdlog::info(
                     "VR RIVAL A22 CURRENT QUEUE COMPARE: hits={} nativeReturn={} projected={} directFlush={} rootChanges={} tailChanges={} stableRootTailChanges={} replacedRootTailChanges={} newlyPopulatedPriorities={} entrySerial={} nativeRegisteredDelta={} wrapperRegisteredDelta={} lateAnchorValid={} lateAnchorZ={} earlierAnchorZ={}",
                     n, result, projected ? 1 : 0,
@@ -2600,6 +2629,10 @@ class UIScaling : public Hook
                     lateProjectedAnchor.valid ? 1 : 0,
                     lateProjectedAnchor.viewZ,
                     projectedAnchor.viewZ);
+            if (sampled)
+                spdlog::info(
+                    "VR RIVAL SOURCE NATIVE NODE TYPES: hits={} liveVerified={} kind0={} kind1={} nextConsumer=0x42D710 animationA=0x42A3A0 animationMasked=0x42A800",
+                    n, verifiedKindsChecked, verifiedKind0, verifiedKind1);
         }
 		return result;
 	}
@@ -4657,6 +4690,29 @@ class VRHudQueueSemanticBridge : public Hook
         const void* node = reinterpret_cast<const void*>(ctx.edi);
         VRProjectedD3DXSpriteIsolationR64::BeforeQueueNode(node);
 		OutRunVR::GameSemantic::SelectSpriteQueueNode(node);
+        // The original 0x42D710 selects the live SpriteNode before
+        // dispatching one of four physical paths. For the exact rival
+        // tag only, capture its native kind_C (0 D3DX/UP; !=0 animation).
+        // Unlike speculative post-source tail dereferences, ctx.edi is
+        // the original game's CURRENT queue-consumer node.
+        if (Settings::VREnabled && Settings::VRTelemetry && node &&
+            OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
+                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani)
+        {
+            static thread_local std::uint64_t rivalSelections = 0;
+            const auto n = ++rivalSelections;
+            if (n <= 8 || (n & (n - 1)) == 0)
+            {
+                const auto* live = reinterpret_cast<const SpriteNode*>(node);
+                spdlog::info(
+                    "VR RIVAL NATIVE QUEUE CONSUMER: hits={} node={} kind={} class={} projected={} epoch={}",
+                    n, node, live->kind_C,
+                    live->kind_C == 0 ? "SPRITE_D3DX_OR_UP" :
+                                        "ANIMATION_QUAD_OR_MASK",
+                    OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+            }
+        }
 	}
 
 	static void QueueEnd(SafetyHookContext&)
