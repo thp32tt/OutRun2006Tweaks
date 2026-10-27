@@ -89,7 +89,7 @@
     "C0_RECOVER": "PASS: latest d7cc3868 sealed 01118 five-gate success, no 01119 material commit found at start",
     "C1_REVIEW": "PASS: confirmed Present-time GPU pixel sampling after possible intervening native output mutations",
     "C2_IMPLEMENT": "DRAW-time GPU source snapshot, SM3/FVF integration, one-copy-per-epoch producer/consumer and portable regression",
-    "C3_VALIDATE": "Fast 40571479578 PASS at bca7462; actual OpenXR Win32 C1 40571479500 job 122426987146 FAIL C2065 undeclared game at live_game_frame_bridge.cpp:8007; cause FVF helper submit did not carry the original source game device pointer; added explicit game argument from three original caller paths, preserving SM3 source pointer. Revalidate next exact SHA.",
+    "C3_VALIDATE": "Previous ff2e03f Fast 40572697114 failed inherited 00671 fixture's two stale static source strings after genuine FVF submit source-game argument wiring; updated exact expected signatures and added live game-pointer signature and 3-call count constraints. C++ positive/negative native frame probe remains unchanged; exact SHA five Gate revalidation pending.",
     "C4_COMMIT": "PENDING material GitHub commit",
     "C5_PACKAGE": "NOT_REQUIRED: diagnostic-only, no HMD/desktop distribution",
     "C6_STATE": "PENDING final exact-SHA Gate proof"
@@ -100,7 +100,7 @@
     "complete_native_frame": "UNTESTED",
     "quest3_stereo": "UNTESTED"
   },
-  "next_action": "Same-task C++ compile repair; verify five mandatory push Actions success on exact updated material SHA, then minimal C6 with HMD UNTESTED.",
+  "next_action": "Check all five exact-SHA mandatory Gate results on next material CI contract repair; same TASK_ID, no new point or HMD claim.",
   "ci_failures": [
     {
       "validation_bearing_sha": "a3c36e8eb103f9237eaec4a9cb6da36688131dd1",
@@ -118,6 +118,14 @@
       "failure": "live_game_frame_bridge.cpp(8007,13): error C2065: 'game': undeclared identifier",
       "root_cause": "FVF submit(State&,...) helper lacks source game COM pointer unlike SM3; added GPU sampling call used unbound game variable",
       "fix": "thread original observer IDirect3DDevice9* game explicitly through FVF submit signature and all three callers"
+    },
+    {
+      "validation_bearing_sha": "ff2e03fec57e91f7b5463a0646b32a2e69437c91",
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 40572697114,
+      "failure": "tools/test_dx11_native_frame_batch_00671.py: static marker if (!submit(s, vertices, fanTriangles.data() not found",
+      "root_cause": "intentional FVF submit function signature changed for authentic D3D9 source device; old static fixture assumes old submit call",
+      "fix": "match new explicit source-pointer overload and all three FVF submit callsites, strengthen count and signature assertions, retain all destructive C++ regressions"
     }
   ],
   "fix_type": "SOURCE_CAUSAL_REPAIR",
