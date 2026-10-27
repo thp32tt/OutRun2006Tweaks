@@ -4249,6 +4249,7 @@ namespace OutRunVRStereo
                 const auto hit = rivalPrepare.fetch_add(
                     1, std::memory_order_relaxed) + 1;
                 if (hit <= 8 || (hit & (hit - 1)) == 0)
+                {
                     const char* rejectClass = prepared ? "ADMITTED"
                         : rivalCachedVs != 0 ? "CACHED_VS_IDENTITY"
                         : rivalVsBound ? "LIVE_VS_BOUND"
@@ -4266,6 +4267,7 @@ namespace OutRunVRStereo
                         static_cast<unsigned long long>(rivalCachedVs),
                         rivalCommand.queued ? 1 : 0, rivalCommand.queueNode,
                         rivalCommand.queueEpoch);
+                }
             }
             if (!prepared)
                 return E_NOTIMPL;
