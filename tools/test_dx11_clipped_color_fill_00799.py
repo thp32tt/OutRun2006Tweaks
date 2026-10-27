@@ -21,10 +21,13 @@ def wired(b, h):
         "classify_color_fill_rect(" in h,
         # 01034: newer ColorFill can fully supersede older game-authored
         # rectangles, but overflow of genuinely distinct pixels stays closed.
-        "if (!covers(next, entries[i])) ++retained;" in h,
-        "if (retained >= kCapacity) return false;" in h,
-        "if (!covers(next, saved)) entries[output++] = saved;" in h,
-        "entries[output++] = next;" in h,
+        # 01104: source remains overwrite-equivalent when adjacent same
+        # ARGB rects can fuse; capacity and owner failure stay transactional.
+        "if (!covers(next, saved)) staged.entries[output++] = saved;" in h,
+        "if (output >= kCapacity) return false;" in h,
+        "game_native_merge_ordered_overwrite(" in h,
+        "staged.entries[output++] = next;" in h,
+        "*this = staged;" in h,
     ))
 assert wired(region, header)
 for original, broken in (
@@ -35,4 +38,9 @@ for original, broken in (
 ):
     assert original in region
     assert not wired(region.replace(original, broken, 1), header), original
+# Reject mutations that drop the actual capacity/transaction boundary.
+for original in ("if (output >= kCapacity) return false;",
+                 "*this = staged;", "game_native_merge_ordered_overwrite("):
+    assert original in header
+    assert not wired(region, header.replace(original, "/* omitted */", 1)), original
 print("00799 clipped D3D9 ColorFill native game frame source integration PASS")
