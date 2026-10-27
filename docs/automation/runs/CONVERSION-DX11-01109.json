@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01109",
+  "production_id": "CONVERSION-DX11-01109",
+  "event_id": "CONVERSION-DX11-01109-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01109",
+  "classification": "A_REAL_GAME_POSTDRAW_PARTIAL_COLOR_DEPTH_GPU_UNION",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:GAME_POSTDRAW_128_RECT_TARGET_Z_PIXEL_PARITY",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_EXACT_SHA_GATES_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "665aad17f1e0884719bf946b49267927b6f77407",
+  "source_change_sha": "8ddc7c8539faada6d9a2173f959a0ec2f989aa8b",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "implementation_commits": [
+    "8ddc7c8539faada6d9a2173f959a0ec2f989aa8b"
+  ],
+  "repair_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_post_draw_clear_batch.hpp",
+    "tools/dx11_post_draw_clear_union_probe_01109.cpp",
+    "tools/test_dx11_post_draw_clear_union_01109.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve an actual live D3D9 game menu/vehicle/race post-Draw 17..128-rectangle partial TARGET, Z and TARGET|Z Clear in the full native D3D11 RTV/D32 scene through exact lossless GPU region union without smearing unowned backbuffer pixels.",
+    "acceptance_items": [
+      {
+        "id": "postdraw_target_depth_integrated_gpu_regions",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ORIGINAL_D3D9_CLEAR_TO_LIVE_NATIVE_COLOR_AND_DEPTH_GPU",
+        "expected_behavior": "A successful original game post-Draw 128-rectangle Clear produces identical clipped RTV and D32 GPU regions under both D3D11.1 ClearView and D3D11.0 ordered native raster."
+      },
+      {
+        "id": "original_game_fallback_on_fragmented_or_bad_coverage",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_GAP_CLIP_AND_DX9EX_INPUT_SAFETY",
+        "expected_behavior": "Malformed, foreign, 129 source, or over-32 nonmergeable color/Z rectangles cannot fabricate native pixels; source D3D9 result and gamepad/FFB remain authoritative."
+      },
+      {
+        "id": "same_exact_sha_five_required_gate_integration",
+        "category": "integrated_validation",
+        "behavior_area": "SOURCE_GRAPH_CPP_TESTS_WINDOWS_BUILD_OPENXR_HUD",
+        "expected_behavior": "All existing five mandatory GitHub Actions push Gates pass on the same material implementation+causal repair SHA; real Quest3 and OutRun game pixels are separate runtime UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "ORIGINAL_LIVE_GAME_POST_DRAW_CLEAR",
+      "EXACT_RECTANGULAR_COLOR_Z_UNION",
+      "NATIVE_D3D11_RTV_D32_CLEARVIEW_OR_11_0_RASTER",
+      "SOURCE_CONTIGUOUS_GAME_PRESENT_WITH_ORIGINAL_FALLBACK"
+    ],
+    "batch_components": [
+      "CXX_PRODUCTION_128_RECT_SOURCE_CLEAR_TRANSACTION_AND_GPU_REGION_COMPATION",
+      "LIVE_D3D9_COLOR_AND_DEPTH_HOOK_INTEGRATION_WITH_ZERO_GPU_WRITE_BEFORE_VALIDATION",
+      "COMPILED_PIXEL_UNION_NEGATIVES_AND_PRESERVED_FIVE_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "At source SHA 8ddc7c8, new 01109 C++ probe models actual original D3D9 128-rect vertical/interleaved 2-row source to exact 1 native color/Z rectangle and signed clipping; GitHub Fast gate compilation still pending.",
+      "negative_regression": "New 01109 C++ probe rejects 33 disconnected live-source rectangles, 129 source rects, invalid D3DRECT and cropped viewport, and verifies failed transaction preserves prior output; inherited DX9Ex input, FFB, depth and owner checks unchanged.",
+      "component_integration": "GameNativePostDrawClearBatch::build is called from preserve_game_partial_target_clear (real D3D9 TARGET, TARGET|Z) and observe_game_depth_clear (real Z, Z|STENCIL) before any native D3D11 ClearView or D3D11.0 raster."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Only source-level full-native real-game TARGET/Z replay implementation; no actual OutRun 2006 desktop menu/car/race visible output, HMD or OpenXR framebuffer viewed. RUNTIME_VALIDATION UNTESTED.",
+    "activation_guard_and_fallback": "Native opt-in only and same game owner/main RTV/D32/COM identity; unmergeable 33+ or malformed source yields no speculative GPU Clear, original D3D9Ex frames, gamepad and FFB remain authoritative, DXVK branch untouched.",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:GAME_POSTDRAW_128_RECT_TARGET_Z_PIXEL_PARITY"
+    ]
+  },
+  "acceptance_results": {
+    "postdraw_target_depth_integrated_gpu_regions": "PENDING_EXACT_SHA",
+    "original_game_fallback_on_fragmented_or_bad_coverage": "PENDING_EXACT_SHA",
+    "same_exact_sha_five_required_gate_integration": "PENDING_EXACT_SHA"
+  },
+  "mandatory_gate_results": [],
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "terminal_gameplay_verified": false,
+  "score_change": 0,
+  "ci_failure_cause": "First source SHA 8ddc7c8 DX11 Fast 40482244592 failed before C++ tests: highest-numbered historical 01108 C6 metadata missing policy acceptance proof and structured acceptance contract. This task 01109 run record is necessary for policy --check-latest to inspect the current independent implemented source feature, not prior invalid bookkeeping. No policy assertions removed.",
+  "pipeline": {
+    "C0": "HEAD_665aad17_OWNER_AND_POLICY_INSPECTED",
+    "C1": "POSTDRAW_128_GAME_TARGET_Z_SOURCE_AND_GPU_REGION_LIMIT",
+    "C2": "CPP_SOURCE_IMPLEMENTED_8ddc7c8539faada6d9a2173f959a0ec2f989aa8b",
+    "C3": "FIVE_EXACT_SHA_GATES_RUNNING",
+    "C4": "GIT_MATERIAL_IMPLEMENTATION_WITH_CI_REPAIR_PENDING",
+    "C5": "NO_SEPARATE_PACKAGE_REQUIRED_SOURCE_DLL_BUILT_BY_GITHUB_ACTIONS",
+    "C6": "PENDING_AFTER_VALIDATED_RESULT"
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "UNTESTED_REAL_GAME_GPU_DRAW_AND_FRAME_OBSERVATION",
+  "next_implementation_action": "Repair only actual missing exact-SHA CI error then record source-only outcome without HMD assertion.",
+  "runtime_note": "Quest3/VDXR real game desktop screen and original input/FFB not observed; unchanged original renderer is fallback."
+}
