@@ -159,17 +159,28 @@ def native_first_rival_safe(body: str) -> bool:
         "RivalMarkerProjectedInfo = {};",
         "const bool projected = projectedAnchor.valid;",
         "TagAppendedNodes(",
+    ]
+    positions = [body.find(m) for m in markers]
+    tag = body.find("TagAppendedNodes(")
+    # The source deliberately records the same exact token twice: once in
+    # NoteProjectedMarkerProbe and again in the final queued-node tag.
+    # Only the SECOND occurrence is the physical-queue ownership assertion.
+    tag_body = body[tag:] if tag >= 0 else ""
+    tag_order = [
         "OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,",
         "projected ? &projectedAnchor : nullptr,",
         "&rootsBefore, entrySerial);",
     ]
-    positions = [body.find(m) for m in markers]
+    tag_positions = [tag_body.find(m) for m in tag_order]
     return (min(positions) >= 0 and positions == sorted(positions) and
-            "RenderScope::WorldBillboard" in body and
-            "RenderScope::ProjectedWorldMarker2D" in body and
+            min(tag_positions) >= 0 and tag_positions == sorted(tag_positions) and
+            body.count("OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,") == 2 and
+            "RenderScope::WorldBillboard" in tag_body and
+            "RenderScope::ProjectedWorldMarker2D" in tag_body and
             "ScopedExactProducerSemantic" not in body and
             "FlushD3DXBeforeDirectGoalSource" not in body and
             body.count("projected ? &projectedAnchor : nullptr") == 1)
+
 if not native_first_rival_safe(rival_body):
     fail("rival native-first original draw, anchor consume and bounded queue ownership changed")
 for label, original, damaged in (
