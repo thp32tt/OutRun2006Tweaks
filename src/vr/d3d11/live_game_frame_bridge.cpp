@@ -7181,8 +7181,7 @@ bool upload_full_game_stream(ID3D11DeviceContext* context,
     return copied;
 }
 
-bool submit(State& s, IDirect3DDevice9* game,
-            const std::vector<NativeVertex>& vertices,
+bool submit(State& s, const std::vector<NativeVertex>& vertices,
             const std::uint32_t* indices, UINT indexCount,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
             const OutputCapture& output,
@@ -8004,8 +8003,12 @@ bool submit(State& s, IDirect3DDevice9* game,
         ScopedNativeGameGpuTransferInputs savedInputs(
             gpuContext, s.backend.color_texture());
         ScopedNativeGameGpuTransferOutputs savedOutputs(gpuContext);
-        s.rawPreview.sample_real_native_draw(
-            game, s.backend.device(), gpuContext,
+        // submit() has no original game COM parameter: use the non-owning
+    // game-device identity captured by observe_source_device() under this
+    // State mutex. It is reset at owner Present/Reset; no COM retention.
+    s.rawPreview.sample_real_native_draw(
+            reinterpret_cast<IDirect3DDevice9*>(s.sourceGameDevice),
+            s.backend.device(), gpuContext,
             s.backend.color_texture(), s.presents);
     }
     return true;
@@ -8634,7 +8637,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                         static_cast<std::uint32_t>(type), indices,
                         expectedElements, vertexCount, first, count,
                         kMaxIndices, window) ||
-                    !submit(s, game, vertices, window.data(),
+                    !submit(s, vertices, window.data(),
                             static_cast<UINT>(window.size()),
                             D3DPT_TRIANGLELIST, capture, output,
                             first == 0u)) {
@@ -8658,7 +8661,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 s.frameBatch.abort();
                 return;
             }
-            if (!submit(s, game, vertices, fanTriangles.data(),
+            if (!submit(s, vertices, fanTriangles.data(),
                         static_cast<UINT>(fanTriangles.size()),
                         D3DPT_TRIANGLELIST, capture, output)) {
                 s.frameBatch.abort();
@@ -8669,7 +8672,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 s.frameBatch.record_source_draw(sourceOrdinal);
             }
         } else {
-            if (!submit(s, game, vertices, indices, indexCount, type, capture, output)) {
+            if (!submit(s, vertices, indices, indexCount, type, capture, output)) {
                 s.frameBatch.abort();
                 ++s.failed;
             } else {

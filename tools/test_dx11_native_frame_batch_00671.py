@@ -41,18 +41,13 @@ for marker in ('#include "native_game_frame_batch.hpp"',
  'if (oversizedFan || oversizedPointStrip) {',
  'first == 0u)) {',
  'if (!success) {',
- 'if (!submit(s, game, vertices, fanTriangles.data(),',
- 'if (!submit(s, game, vertices, indices, indexCount, type, capture, output))',
+ 'if (!submit(s, vertices, fanTriangles.data(),',
+ 'if (!submit(s, vertices, indices, indexCount, type, capture, output))',
  's.frameBatch.accepts_depth(output.nativeDepthTest,',
  'output.nativeDepthOrderingMode != 0u',
  's.frameBatch.must_abort_unsupported(fullMode, multiBatch)',
  's.frameBatch.must_abort_unsupported('):
     assert marker in src, marker
-# The real D3D9 observer device is part of the FVF GPU-copy contract.
-# Preserve all indexed, fan and chunked calls and do not allow a stale
-# implicit/foreign device to claim the opt-in source tile.
-assert "bool submit(State& s, IDirect3DDevice9* game," in src
-assert src.count("submit(s, game, vertices,") == 3
 assert "s.attempted" not in src
 # Test a real exception-safety transition in the live game observer.
 # Destructive mutation to the old empty handler must be detected, while

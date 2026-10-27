@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-01119",
   "production_id": "CONVERSION-DX11-01119",
-  "event_id": "CONVERSION-DX11-01119-E003",
+  "event_id": "CONVERSION-DX11-01119-E004",
   "event_type": "retry",
   "attempt": "3/3",
   "lane": "DX11",
@@ -89,7 +89,7 @@
     "C0_RECOVER": "PASS: latest d7cc3868 sealed 01118 five-gate success, no 01119 material commit found at start",
     "C1_REVIEW": "PASS: confirmed Present-time GPU pixel sampling after possible intervening native output mutations",
     "C2_IMPLEMENT": "DRAW-time GPU source snapshot, SM3/FVF integration, one-copy-per-epoch producer/consumer and portable regression",
-    "C3_VALIDATE": "Previous ff2e03f Fast 40572697114 failed inherited 00671 fixture's two stale static source strings after genuine FVF submit source-game argument wiring; updated exact expected signatures and added live game-pointer signature and 3-call count constraints. C++ positive/negative native frame probe remains unchanged; exact SHA five Gate revalidation pending.",
+    "C3_VALIDATE": "True Win32 C2065 from FVF helper lacking game pointer; corrected via existing owner-authenticated State::sourceGameDevice rather than invasive public FVF helper signature. Earlier c1f1ec4 ABI/plumbing change caused stale regression scripts (Win Build 40572921125, Fast 40572921174, Backend 40572921274). Restore original known-compatible function signature and original destructive scripts, then verify next exact SHA.",
     "C4_COMMIT": "PENDING material GitHub commit",
     "C5_PACKAGE": "NOT_REQUIRED: diagnostic-only, no HMD/desktop distribution",
     "C6_STATE": "PENDING final exact-SHA Gate proof"
@@ -100,7 +100,7 @@
     "complete_native_frame": "UNTESTED",
     "quest3_stereo": "UNTESTED"
   },
-  "next_action": "Check all five exact-SHA mandatory Gate results on next material CI contract repair; same TASK_ID, no new point or HMD claim.",
+  "next_action": "Five mandatory same-exact-SHA push Gates after C++ source correction and original negative-contract restoration; C6 only after all completed/success. Runtime HMD UNTESTED.",
   "ci_failures": [
     {
       "validation_bearing_sha": "a3c36e8eb103f9237eaec4a9cb6da36688131dd1",
@@ -126,6 +126,14 @@
       "failure": "tools/test_dx11_native_frame_batch_00671.py: static marker if (!submit(s, vertices, fanTriangles.data() not found",
       "root_cause": "intentional FVF submit function signature changed for authentic D3D9 source device; old static fixture assumes old submit call",
       "fix": "match new explicit source-pointer overload and all three FVF submit callsites, strengthen count and signature assertions, retain all destructive C++ regressions"
+    },
+    {
+      "validation_bearing_sha": "c1f1ec42034517acecaebc22b8b99a1d7715207a",
+      "workflow": "Build / DX11 Fast / Backend Conversion Gate",
+      "run_id": 40572921125,
+      "failure": "Build first_game_frame_regressions strip_tokens stale; Fast object_clip_draw connected() stale; Backend native_alpha_compare linked() stale",
+      "root_cause": "changing legacy FVF submit(State&,...) signature triggers broadly anchored source contract scripts unrelated to GPU capture feature",
+      "fix": "restore original signature and regression files; resolve source ownership inside FVF submit through existing State::sourceGameDevice which is recorded by observe_source_device"
     }
   ],
   "fix_type": "SOURCE_CAUSAL_REPAIR",
