@@ -8,6 +8,12 @@ namespace outrun::vr::dx11::live_game_frame {
 // backbuffer color/depth seeds when game-authored Clear rectangles extend
 // beyond the physical target, but never accept a gap after clipping.
 struct GameNativeClearCoverage {
+    // The native partial TARGET and pre-first-raster Z replay observers
+    // already admit up to 128 original D3D9 D3DRECTs. A game-authored full
+    // Clear made of 17..128 nonoverlapping strips is likewise a FULL scene
+    // seed, not an unrepresentable partial write. Keep the same bounded
+    // source budget, with no allocations and no speculative GPU writes.
+    static constexpr std::uint32_t kMaxFullSourceRects = 128u;
     template<typename Rect>
     [[nodiscard]] static constexpr bool covers_whole(
         std::uint32_t w, std::uint32_t h,
@@ -17,11 +23,11 @@ struct GameNativeClearCoverage {
         if (!w || !h || w > 0x7fffffffU || h > 0x7fffffffU ||
             vx != 0u || vy != 0u || vw != w || vh != h) return false;
         if (count == 0u) return true; // D3D9 ignores pRects when Count==0.
-        if (!rects || count > 16u) return false;
+        if (!rects || count > kMaxFullSourceRects) return false;
         struct ClippedRect {
             std::int64_t x1, y1, x2, y2;
         };
-        std::array<ClippedRect, 16u> clipped{};
+        std::array<ClippedRect, kMaxFullSourceRects> clipped{};
         std::uint32_t validCount = 0u;
         const auto clamp = [](std::int64_t coordinate, std::int64_t extent) constexpr {
             return coordinate < 0 ? std::int64_t{0} :

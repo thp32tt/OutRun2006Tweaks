@@ -9871,6 +9871,14 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         const bool foreignSource = s.sourceGameDevice != 0u &&
             s.sourceGameDevice != sourceDevice;
         if (foreignSource && !env_full_game_opt_in()) return;
+        // Clear(TARGET) does not touch the original D3D9 depth surface.
+        // Capture depth uncertainty BEFORE the source scene reset discards
+        // it: a depth-bearing/aborted earlier game Draw cannot be reseeded
+        // with a fabricated native D32 default after a color-only Clear.
+        const bool precedingSourceMayHaveDepth = !foreignSource &&
+            s.sourceGameDevice == sourceDevice &&
+            (s.frameBatch.depthReady || s.frameBatch.depthClearPending ||
+             (s.frameBatch.stopped && s.sourceDrawsThisFrame != 0u));
         // The previous owner's seed survives an unverified foreign Clear;
         // the real owner still invalidates its own old seed immediately.
         // Only a successful whole-backbuffer Clear may rebind ownership.
@@ -9936,6 +9944,9 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             // post-Clear Draw/DrawIndexed on this SAME game device/Present.
             // Never revive a batch after a partial or foreign Clear.
             s.frameBatch.reset();
+            s.frameBatch.preserve_depth_provenance_after_target_seed(
+                precedingSourceMayHaveDepth,
+                (flags & D3DCLEAR_ZBUFFER) != 0u);
         s.preDrawSurface.discard();
             s.cpuSurfaceReplay.reset();
             s.surfaceReplayBudget.reset(); // a new verified full Clear starts a new source epoch

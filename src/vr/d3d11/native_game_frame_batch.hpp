@@ -213,6 +213,19 @@ struct GameNativeFrameBatch {
         return sameSourceFullColorClear && !depthReady &&
             before_first_native_raster(observedSourceDraws);
     }
+    // A whole TARGET-only Clear after a depth-bearing game Draw does NOT
+    // reset the original D3D9 main Z/S surface. Resetting our first native
+    // D32 view to its default value would fabricate depth for the next car
+    // or race Draw. Defer native game draw admission until a proved whole
+    // main-Z Clear follows with no intervening game Draw; original D3D9
+    // continues normally. A combined TARGET|Z Clear needs no deferral.
+    constexpr void preserve_depth_provenance_after_target_seed(
+        bool precedingSourceMayHaveDepth, bool targetClearIncludesZ) noexcept {
+        if (precedingSourceMayHaveDepth && !targetClearIncludesZ) {
+            awaitingColorFillDepthReset = true;
+            colorFillEpoch = true;
+        }
+    }
     // Whole game TARGET then separate whole ZBUFFER Clear can initialize DSV
     // before the first native Draw/DrawIndexed. Never cross an unsupported
     // source Draw or a stopped/partial/foreign game scene.
