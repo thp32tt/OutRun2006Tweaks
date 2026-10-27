@@ -81,8 +81,8 @@ for available, anchored, valid, fresh, old, new, expected in fixtures:
 mutations = (
     ("cachedMenuLetterbox != currentMenuLetterbox;",
      "cachedMenuLetterbox == currentMenuLetterbox;"),
-    ("(!cachedMenuProjectionValid || capture.fresh ||\n                         letterboxPolicyChanged)",
-     "(!cachedMenuProjectionValid || capture.fresh)"),
+    ("(!cachedMenuProjectionValid || capture.fresh ||\n                         letterboxPolicyChanged || menuFovChanged)",
+     "(!cachedMenuProjectionValid || capture.fresh ||\n                         menuFovChanged)"),
     ("cachedMenuLetterbox = currentMenuLetterbox;",
      "cachedMenuLetterbox = !currentMenuLetterbox;"),
     ("if (capture.available &&", "if (true &&"),
