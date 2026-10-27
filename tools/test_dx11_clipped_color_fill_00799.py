@@ -8,6 +8,11 @@ header = (root / "src/vr/d3d11/native_game_source_mutation.hpp").read_text(encod
 region = bridge.split("bool preserve_game_color_fill(", 1)[1].split(
     "\nvoid observe_scene_boundary(", 1)[0]
 def wired(b, h):
+    # The production header contains two different atomic records; the
+    # negative mutation must inspect the ColorFill recorder itself rather
+    # than pass on a second unrelated target-clear commit.
+    rec = h.split("constexpr bool record(", 1)[1].split(
+        "constexpr bool record_target_clear(", 1)[0]
     return all((
         "GameNativeSourceMutation::classify_color_fill_rect(" in b,
         "clipped.left == 0 && clipped.top == 0" in b,
@@ -23,11 +28,11 @@ def wired(b, h):
         # rectangles, but overflow of genuinely distinct pixels stays closed.
         # 01104: source remains overwrite-equivalent when adjacent same
         # ARGB rects can fuse; capacity and owner failure stay transactional.
-        "if (!covers(next, saved)) staged.entries[output++] = saved;" in h,
-        "if (output >= kCapacity) return false;" in h,
-        "game_native_merge_ordered_overwrite(" in h,
-        "staged.entries[output++] = next;" in h,
-        "*this = staged;" in h,
+        "if (!covers(next, saved)) staged.entries[output++] = saved;" in rec,
+        "if (output >= kCapacity) return false;" in rec,
+        "game_native_merge_ordered_overwrite(" in rec,
+        "staged.entries[output++] = next;" in rec,
+        "*this = staged;" in rec,
     ))
 assert wired(region, header)
 for original, broken in (
