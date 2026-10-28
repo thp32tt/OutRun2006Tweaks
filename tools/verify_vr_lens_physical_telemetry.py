@@ -120,6 +120,9 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
         "DEFERRED_WINDOW_CANDIDATE",
     ):
         assert phrase in body, "missing candidate-only deferred provenance: " + phrase
+    assert "lensInlineLinked ? lensInline.sourceSerial : 0" in body
+    assert "lensInlineLinked ? lensInline.objectId : 0" in body
+    assert body.count("lensInlineLinked ? 1 : 0") >= 3
     assert centre.count("ScopedLensOriginalCall inlineSource(") == 2
     assert "sourceCallSerial" in centre and "sourceCallSerial" in projected
     assert "ordinalMaySpanSunCalls={}" in projected
@@ -140,7 +143,7 @@ def main() -> None:
     mutations = [
         (0, "opaqueObject=WINDOW_LINKED_ONLY", "opaqueObject=PROVEN_DESCRIPTOR"),
         (0, "DEFERRED_WINDOW_CANDIDATE", "OPAQUE_DESCRIPTOR_PROOF"),
-        (0, "exactSourceLinked={}", "exactSourceLinked=1"),
+        (0, "lensInlineLinked ? 1 : 0", "1 /* unsafe exact source claim */"),
         (0, "device->GetFVF(&liveFvf)", "D3D_OK"),
         (0, "eyeRT=LEFT_RIGHT_TRANSACTION", "eyeRT=FAKE_SINGLE_RT"),
         (0, "std::memcmp(eyeConstants[0], eyeConstants[1],", "true /* fake eye equality */("),
