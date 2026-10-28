@@ -21,7 +21,8 @@ assert 'resultEyeOrientation' not in shader_hud and 'resultEyeOffset' not in sha
 assert 'identityOrientation, relativeEye, worldScale' in shader_hud, 'shader result HUD must use stable R26 eye transform'
 assert 'const bool exactResult = R30IsExactResultHudDraw();' in xy_prepare, 'XYZRHW prepare must identify exact result before cached-VS gate'
 assert 'if (!exactResult &&' in xy_prepare and 'device->GetVertexShader(&shader)' in xy_prepare, 'exact XYZRHW result must use live VS as authority'
-assert 'if (!exactResult && CurrentVertexShaderIdentity.load(' in fixed, 'a stale cache must not veto an exact shaderless result'
+assert 'const bool exactProjectedRival =' in fixed, 'R62 must identify the exact queue-owned projected rival before cached-VS gate'
+assert 'if (!exactResult && !exactProjectedRival &&' in fixed and 'CurrentVertexShaderIdentity.load(' in fixed, 'stale cache must not veto exact result or exact projected rival'
 assert 'device->GetVertexShader(&shader)' in fixed and 'shader->Release()' in fixed
 assert 'fvf != 0x00000142u' in fixed, 'do not widen the live physical draw format'
 assert 'VR R26 RESULT_HUD_EYES:' in fixed, 'record actual eye attempts and restoration'
