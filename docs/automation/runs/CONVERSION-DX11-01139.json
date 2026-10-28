@@ -8,8 +8,8 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:DUAL_GPU_REGION_VISIBLE_PRESENT",
   "classification": "A_REAL_NATIVE_GAME_GPU_DUAL_REGION_VISUAL_PRESENT",
-  "status": "SOURCE_IMPLEMENTED_CAUSAL_CI_REPAIR_PENDING",
-  "automation_validation": "PENDING_NEW_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "source_base_sha": "d896b7a124ef8a9efc94547eb2e93fa35cb7fcee",
@@ -37,7 +37,7 @@
       }
     ]
   },
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "7e9319977397eecb81548a65c5b43672c0e7edeb",
   "material_result_sha": null,
   "desktop_native_game": "UNTESTED",
   "quest3_vdxr": "UNTESTED",
@@ -92,5 +92,48 @@
       "reason": "Legacy whitespace-specific dst[x*4u] = 255 regex falsely rejects preserved guarded magenta RAW border in newly factored two-tile painter."
     }
   ],
-  "material_source_commit_sha": "6b2f282dc4f66a29cd8fae6fbb789b99cb7b2af7"
+  "material_source_commit_sha": "6b2f282dc4f66a29cd8fae6fbb789b99cb7b2af7",
+  "checkpoint": "C6_STATE",
+  "previous_pending_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "source_implementation_commit_sha": "6b2f282dc4f66a29cd8fae6fbb789b99cb7b2af7",
+  "causal_ci_repair_commit_sha": "7e9319977397eecb81548a65c5b43672c0e7edeb",
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40729207133,
+        "head_sha": "7e9319977397eecb81548a65c5b43672c0e7edeb",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40729207460,
+        "head_sha": "7e9319977397eecb81548a65c5b43672c0e7edeb",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40729207359,
+        "head_sha": "7e9319977397eecb81548a65c5b43672c0e7edeb",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40729207377,
+        "head_sha": "7e9319977397eecb81548a65c5b43672c0e7edeb",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40729207430,
+        "head_sha": "7e9319977397eecb81548a65c5b43672c0e7edeb",
+        "conclusion": "success"
+      }
+    ],
+    "full_native_game_frame_complete": false,
+    "runtime_evidence": "UNTESTED: no source-matched real game menu/car/race display or Quest3/VDXR optical run was performed.",
+    "initial_failed_sha": "6b2f282dc4f66a29cd8fae6fbb789b99cb7b2af7",
+    "causal_repair": "OpenXR RAW border marker legacy string-negative rewritten to validate real guarded RGB, without changing renderer safety or suppressing mandatory CI.",
+    "duplicate_task_score_change": 0
+  }
 }
