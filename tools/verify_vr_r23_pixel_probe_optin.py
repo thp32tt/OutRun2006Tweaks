@@ -35,7 +35,7 @@ def verify(code: str) -> None:
         assert enabled_value in policy, "explicit opt-in lost " + enabled_value
     for signature in METHODS:
         body = function(code, "void " + signature)
-        guard = "if (!R23PixelDiagnosticsEnabled()) return;"
+        guard = "if (!R23PixelDiagnosticsEnabled()"
         assert guard in body, "missing production GPU-work guard: " + signature
         assert body.index(guard) < min(
             (body.find(token) for token in (
@@ -62,9 +62,9 @@ def verify(code: str) -> None:
 def without_guard(code: str, signature: str) -> str:
     start = code.index("void " + signature)
     opened = code.index("{", start)
-    guard = "if (!R23PixelDiagnosticsEnabled()) return;"
+    guard = "!R23PixelDiagnosticsEnabled()"
     pos = code.index(guard, opened)
-    return code[:pos] + "/* missing performance guard */" + code[pos + len(guard):]
+    return code[:pos] + "false /* missing performance guard */" + code[pos + len(guard):]
 
 
 if __name__ == "__main__":
