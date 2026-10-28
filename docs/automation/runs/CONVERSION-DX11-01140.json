@@ -8,13 +8,13 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_DIRTY_TILE_VISIBLE",
   "classification": "A_REAL_NATIVE_GAME_GPU_SOURCE_DIRTY_VISIBLE_PATH",
-  "status": "SOURCE_IMPLEMENTED_GATE_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "source_base_sha": "6fddac94aedb0366fd3aa75582e59b5a4a048115",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+  "validation_bearing_result_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
   "development_time_percentages": "UNMEASURED",
   "development_strategy": {
     "work_class": "integration",
@@ -58,12 +58,47 @@
     "docs/automation/runs/CONVERSION-DX11-01140.json"
   ],
   "real_game_draw_blocker": "Source-matched native GPU Draw and visual dirty-Present counts UNTESTED; no gameplay/HMD claims",
-  "checkpoint": "C4_MATERIAL_CANDIDATE",
+  "checkpoint": "C6_STATE",
   "evidence": {
     "desktop_native_game": "UNTESTED",
     "quest3_vdxr": "UNTESTED",
     "full_native_game_frame_complete": false,
-    "causal_policy_repair": "Add required feature-sized acceptance contract and ordered canonical actual D3D9 -> D3D11 Draw -> visible output path; preserve incomplete frame and unchanged Gate policy."
+    "causal_policy_repair": "Add required feature-sized acceptance contract and ordered canonical actual D3D9 -> D3D11 Draw -> visible output path; preserve incomplete frame and unchanged Gate policy.",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40737459372,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40737459663,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40737459761,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40737459883,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40737459716,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_evidence": "UNTESTED: no source-matched real menu/car/race visual, native_draws, native_gpu_pixel_output or Quest3/VDXR optical evidence; incomplete RAW GPU tiles are build-validated only",
+    "source_implementation": "C++ real D3D9 Present dirty rectangles integrated with per-native-GPU RGB tile visibility; functional source commit 334d6fff; include repair 827e6e8f; exact-SHA test-policy contract repair 747c938e",
+    "duplicate_task_score_change": 0
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -88,5 +123,15 @@
         "expected_behavior": "The C++17 positive and negative union regression and the five unmodified exact-SHA CI gates validate the renderer code candidate separately from untested game and HMD output."
       }
     ]
-  }
+  },
+  "source_implementation_commit_sha": "334d6fff56b010e0f362f790af18a32f6b4b78a3",
+  "causal_source_compile_repair_sha": "827e6e8f2c315a94e677ab56ac747660fa198ce6",
+  "causal_policy_contract_repair_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+  "acceptance_results": {
+    "partial_dirty_gpu_output": "PASS_BUILD",
+    "independent_tile_source_fallback": "PASS_BUILD",
+    "exact_sha_integrated_regression": "PASS_EXACT_SHA"
+  },
+  "desktop_native_game": "UNTESTED",
+  "quest3_vdxr": "UNTESTED"
 }
