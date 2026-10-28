@@ -168,6 +168,18 @@ int main() {
     assert(e.can_queue(86u, false));
     e.queued(86u);
     assert(e.consume_for_present(86u));
+    // Failed and empty source writes do not supersede a valid native tile.
+    // Keep the capture consumable on this SAME original game Present.
+    e.reset(); e.queued(855u);
+    if (native_raw_source_color_write_matches(
+            false, true, 0x11u, 0x11u, 0x22u, 0x22u,
+            3440u, 1440u, 3440u, 1440u))
+        (void)e.invalidate_for_full_source_clear(true);
+    if (native_raw_source_color_write_matches(
+            true, false, 0x11u, 0x11u, 0x22u, 0x22u,
+            3440u, 1440u, 3440u, 1440u))
+        (void)e.invalidate_for_full_source_clear(true);
+    assert(e.consume_for_present(855u));
     // An offscreen or foreign Clear never runs the invalidation path.
     e.reset(); e.queued(87u);
     if (native_raw_source_color_clear_matches(

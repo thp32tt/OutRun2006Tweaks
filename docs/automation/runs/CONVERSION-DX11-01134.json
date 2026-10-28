@@ -42,13 +42,60 @@
     ],
     "activation_guard_and_fallback": "Explicit RAW_VISUAL_DIAGNOSTIC opt in only. Original game D3D9 render/input/FFB and DX9Ex fallback untouched, DXVK frozen; no full-frame publication safety relaxation.",
     "test_command": "portable C++17 source epoch regression included in exact-SHA DX11 Fast Gate",
-    "development_time_percentages": "UNMEASURED"
+    "development_time_percentages": "UNMEASURED",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_TILE_NOT_FULL_GAME"
+    ],
+    "batch_components": [
+      "CPP_LIVE_SOURCE_CLEAR_CANONICAL_AUTHENTICATION",
+      "CPP_GPU_READBACK_EPOCH_RETIRE_AND_REARM",
+      "CPP17_POSITIVE_NEGATIVE_CLEAR_CASES",
+      "EXACT_SHA_FIVE_GATE_INTEGRATION"
+    ],
+    "visible_frame_acceptance": "Partial RAW capture correctness verified in source/CI only; no real-game full native frame or visible GPU pixel proof; Quest3/VDXR UNTESTED.",
+    "acceptance_proof": {
+      "positive_probe": "tests/native_raw_gpu_source_epoch_test.cpp demonstrates real same-owner canonical clipped and full TARGET Clear invalidation and fenced post-Clear rearm.",
+      "negative_regression": "Foreign/offscreen/wrong-size Clear cannot revoke RAW capture; outstanding GPU EVENT blocks staging reuse and stale copy publication.",
+      "component_integration": "live_game_frame_bridge.cpp authenticates game Clear and ties the preview epoch to canonical D3D9 backbuffer and native D3D11 captured Draw, regression test linked to existing DX11 Fast exact 9cb8da96 and all five confirmed Gates."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
   },
   "acceptance_results": {
-    "source_ownership": "PASS_SOURCE_AND_FAST_GATE",
-    "safe_event_reuse": "PASS_SOURCE_AND_FAST_GATE",
-    "whole_scene_native_runtime": "UNTESTED",
-    "quest3_stereo": "UNTESTED"
+    "canonical_partial_clear_capture_retirement": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "DX11 Fast #40673195813 success exact 9cb8da965cdfab0b1082d8634a71b44871c6ee58; HMD UNTESTED"
+    },
+    "event_owner_fallback_safety": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp"
+      ],
+      "validation_command": "Backend #40673195766 and Build #40673195677 success exact 9cb8da965cdfab0b1082d8634a71b44871c6ee58"
+    },
+    "exact_source_sha_integrated_validation": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tests/native_raw_gpu_source_epoch_test.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Fast #40673195813, Backend #40673195766, Build #40673195677, OpenXR #40673195904, HUD #40673195882 successful on 9cb8da965cdfab0b1082d8634a71b44871c6ee58"
+    }
   },
   "mandatory_gate_results": [
     {
@@ -100,5 +147,29 @@
     }
   ],
   "score_policy": "One independent source-integrated repair candidate may count only after exact-SHA five-Gate PASS; C6, retries, checks and documentation carry +0.",
-  "runtime_note": "No actual game desktop/HMD run for this SHA. Previous pinned SHA zero-native-draw evidence is not extrapolated. RUNTIME_VALIDATION=UNTESTED."
+  "runtime_note": "No actual game desktop/HMD run for this SHA. Previous pinned SHA zero-native-draw evidence is not extrapolated. RUNTIME_VALIDATION=UNTESTED.",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Retire stale real native D3D11 GPU RAW pixel evidence after clipped D3D9 source TARGET Clears while retaining ordered event-fenced, source-owned post-Clear Draws.",
+    "acceptance_items": [
+      {
+        "id": "canonical_partial_clear_capture_retirement",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 source TARGET Clear to native GPU Draw pixel preview",
+        "expected_behavior": "A successful canonical partial or full TARGET Clear revokes earlier RGB capture, and a later native game Draw may recapture after the pending EVENT retires."
+      },
+      {
+        "id": "event_owner_fallback_safety",
+        "category": "fallback_regression",
+        "behavior_area": "Original DX9Ex game/input and native asynchronous staging lifetime",
+        "expected_behavior": "Foreign/offscreen/wrong-sized Clears cannot invalidate another game owner; in-flight GPU staging remains fenced while original D3D9 game and FFB continue unchanged."
+      },
+      {
+        "id": "exact_source_sha_integrated_validation",
+        "category": "integrated_validation",
+        "behavior_area": "C++17 source regressions and five exact-SHA GitHub Actions",
+        "expected_behavior": "The source and regression files are covered by successful mandatory Fast, Backend, Win32 Build, OpenXR, and HUD checks on one source-matched SHA."
+      }
+    ]
+  }
 }
