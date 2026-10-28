@@ -8359,7 +8359,15 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 ++s.skippedPoisonedDraws;
                 return;
             }
-            s.rawSourceProbe.record_attempt(sourceOrdinal);
+            // Never spend the bounded real native Draw budget on no-op,
+            // unshadowed or malformed source geometry. Such calls may be
+            // numerous between menu/car/race backbuffer draws.
+            if (primitives == 0u || !bytes || !stride ||
+                type < D3DPT_POINTLIST || type > D3DPT_TRIANGLEFAN) {
+                s.rawSourceProbe.record_ineligible(sourceOrdinal);
+                ++s.skippedPoisonedDraws;
+                return;
+            }
             ComPtr<IDirect3DSurface9> currentTarget, gameBackbuffer;
             ComPtr<IUnknown> currentIdentity, backIdentity;
             if (FAILED(game->GetRenderTarget(
@@ -8373,9 +8381,14 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 !s.clearColor.matches(
                     reinterpret_cast<std::uintptr_t>(game),
                     reinterpret_cast<std::uintptr_t>(currentIdentity.Get()))) {
+                // Render-to-texture and failed source identity checks are
+                // NOT native backbuffer attempt failures. Maintain a bounded
+                // sampling cadence without exhausting the four real tries.
+                s.rawSourceProbe.record_ineligible(sourceOrdinal);
                 ++s.skippedPoisonedDraws;
                 return;
             }
+            s.rawSourceProbe.record_attempt(sourceOrdinal);
             // Fresh diagnostic-only native source epoch. No full-scene or
             // VR publication credit; ALL later source identity/RT/DS/VS/PS
             // and GPU lifetime checks remain unchanged.

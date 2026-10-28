@@ -24,12 +24,17 @@ public:
         const std::uint64_t first = first_ordinal(presentSerial);
         return sourceOrdinal >= first && sourceOrdinal >= nextOrdinal_;
     }
+    // A source Draw from a foreign RT or without usable geometry cannot
+    // produce a diagnostic backbuffer pixel. Throttle its next COM/RT probe,
+    // but preserve the four expensive native conversion attempts for genuine
+    // source-backed backbuffer candidates later in the SAME Present.
+    void record_ineligible(std::uint64_t sourceOrdinal) noexcept {
+        advance_ordinal(sourceOrdinal);
+    }
     void record_attempt(std::uint64_t sourceOrdinal) noexcept {
         if (attempts_ >= kMaxAttemptsPerFrame) return;
         ++attempts_;
-        constexpr auto maximum = (std::numeric_limits<std::uint64_t>::max)();
-        nextOrdinal_ = sourceOrdinal > maximum - kMinimumSourceDrawGap
-            ? maximum : sourceOrdinal + kMinimumSourceDrawGap;
+        advance_ordinal(sourceOrdinal);
     }
     [[nodiscard]] std::uint32_t attempts() const noexcept { return attempts_; }
     [[nodiscard]] std::uint64_t next_ordinal() const noexcept { return nextOrdinal_; }
@@ -37,6 +42,11 @@ public:
         return previousSourceDraws_;
     }
 private:
+    void advance_ordinal(std::uint64_t sourceOrdinal) noexcept {
+        constexpr auto maximum = (std::numeric_limits<std::uint64_t>::max)();
+        nextOrdinal_ = sourceOrdinal > maximum - kMinimumSourceDrawGap
+            ? maximum : sourceOrdinal + kMinimumSourceDrawGap;
+    }
     [[nodiscard]] std::uint64_t first_ordinal(
         std::uint64_t presentSerial) const noexcept {
         constexpr std::uint64_t kPhases = 24u;

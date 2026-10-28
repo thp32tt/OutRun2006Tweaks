@@ -29,6 +29,27 @@ int main() {
     assert(probe.next_ordinal() == max);
     assert(!probe.should_attempt(max - 1u, 0u));
     assert(probe.should_attempt(max, 0u));
+    // A poisoned scene can have numerous render-to-texture / unshadowed
+    // source Draws. Such candidates advance the bounded query cadence but
+    // must not consume the four real native backbuffer Draw attempts.
+    probe.reset();
+    probe.finish_present(2400u);
+    assert(probe.should_attempt(500u, 5u));
+    probe.record_ineligible(500u); // foreign D3D9 RT, no GPU draw
+    assert(probe.attempts() == 0u && probe.next_ordinal() == 596u);
+    assert(!probe.should_attempt(595u, 5u));
+    assert(probe.should_attempt(596u, 5u));
+    probe.record_ineligible(596u); // unavailable genuine CPU shadow
+    assert(probe.attempts() == 0u && probe.next_ordinal() == 692u);
+    assert(probe.should_attempt(692u, 5u));
+    probe.record_attempt(692u); // source-authentic backbuffer candidate
+    assert(probe.attempts() == 1u && probe.next_ordinal() == 788u);
+    probe.restart_epoch();
+    assert(probe.attempts() == 0u && probe.next_ordinal() == 0u);
+    probe.record_ineligible(max - 4u);
+    assert(probe.next_ordinal() == max && probe.attempts() == 0u);
+    probe.finish_present(2400u);
+    assert(probe.attempts() == 0u && probe.next_ordinal() == 0u);
     // Previous real game's 2,400 Draws are sampled across the entire
     // source population, not only a fixed first-1,536-Draw window.
     probe.reset();
