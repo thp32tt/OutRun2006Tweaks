@@ -960,14 +960,14 @@ def main_current_ledger(code: str, header: str) -> int:
     if mutant == code or not check_current_ledger(mutant, header, ledger):
         print("DX9Ex +TIME REA FAIL: mode=2 animation relabel mutation escaped")
         return 1
-        live_mutant = code.replace(
+    live_mutant = code.replace(
         "LiveStageExtensionCallRva = 0xBD217",
         "LiveStageExtensionCallRva = 0xBD216", 1)
     if live_mutant == code or not check_current_ledger(
             live_mutant, header, ledger):
         print("DX9Ex +TIME LIVE FAIL: BD217 source mutation escaped")
         return 1
-# Deliberately remove the *physical* raw-game WVP source stamp in
+    # Deliberately remove the *physical* raw-game WVP source stamp in
     # R30 only. R33 remaining intact cannot mask loss of XYZRHW stereo proof.
     capture_begin = renderer.find("        bool R30CaptureStagePhysicalSource(")
     capture_end = renderer.find("        bool R30CaptureGoalPhysicalSource(", capture_begin)
