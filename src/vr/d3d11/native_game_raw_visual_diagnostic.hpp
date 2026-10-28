@@ -48,12 +48,19 @@ public:
     // Whole AND clipped source-backbuffer TARGET Clears supersede a queued
     // native RGB sample. A foreign D3D9 device cannot retire its GPU copy;
     // in-flight staging remains owned by the original EVENT fence.
-    [[nodiscard]] bool invalidate_source_target_clear(
+    [[nodiscard]] bool invalidate_source_color_write(
         IDirect3DDevice9* game) noexcept {
         if (!game || gameOwner_ != game) return false;
+        // A native BEFORE/AFTER pair must not survive a later real D3D9
+        // backbuffer write, even when its asynchronous GPU EVENT is pending.
+        // Keep both GPU readback resources owned until EVENT completion.
         drawPair_.reset();
         rgbEvidenceConfirmed_ = false;
         return captureEpoch_.invalidate_for_full_source_clear(pending_);
+    }
+    [[nodiscard]] bool invalidate_source_target_clear(
+        IDirect3DDevice9* game) noexcept {
+        return invalidate_source_color_write(game);
     }
     NativeRawPreviewResult present(
         IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,

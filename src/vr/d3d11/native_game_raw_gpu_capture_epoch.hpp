@@ -20,6 +20,20 @@ namespace outrun::vr::dx11 {
            targetWidth != 0u && targetHeight != 0u &&
            targetWidth == backWidth && targetHeight == backHeight;
 }
+// SOURCE writes other than Clear (successful ColorFill/StretchRect/UpdateSurface)
+// supersede a queued native RGB tile under the same canonical backbuffer identity.
+// A failed or empty operation has no source pixels to supersede.
+[[nodiscard]] constexpr bool native_raw_source_color_write_matches(
+    bool succeeded, bool nonempty,
+    std::uintptr_t capturedDevice, std::uintptr_t writingDevice,
+    std::uintptr_t target, std::uintptr_t backbuffer,
+    std::uint32_t targetWidth, std::uint32_t targetHeight,
+    std::uint32_t backWidth, std::uint32_t backHeight) noexcept {
+    return succeeded && nonempty &&
+        native_raw_source_color_clear_matches(
+            capturedDevice, writingDevice, target, backbuffer,
+            targetWidth, targetHeight, backWidth, backHeight);
+}
 class NativeRawGpuCaptureEpoch final {
 public:
     [[nodiscard]] bool can_queue(std::uint64_t presentSerial,

@@ -1376,6 +1376,7 @@ struct State {
     std::uint64_t rawZeroRgbRetiredLogged = 0u;
     std::uint64_t rawFogVisualBypasses = 0u;
     std::uint64_t rawClearCaptureInvalidations = 0u;
+    std::uint64_t rawSurfaceWriteCaptureInvalidations = 0u;
     NativeRawSourceProbeSchedule rawSourceProbe;
     std::uint64_t rawProbeRestarts = 0u;
     // Persistent native D3D11 upload buffers for a whole real game frame.
@@ -8932,6 +8933,46 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
 }
 
 
+// Preserve the explicit RAW diagnostic's SOURCE chronology: after the native
+// BEFORE/Draw/AFTER capture, a successful real D3D9 ColorFill, StretchRect or
+// UpdateSurface to the identical canonical backbuffer supersedes those pixels.
+// This is evidence retirement only; native full-frame routing, original D3D9
+// HRESULT, rendering, gamepad and FFB remain unchanged. Caller holds s.mutex.
+void invalidate_raw_preview_on_source_surface_write(
+    State& s, IDirect3DDevice9* game, IDirect3DSurface9* destination,
+    bool hasWrittenPixels, const char* operation) noexcept {
+    if (!env_raw_visual_opt_in() || !hasWrittenPixels || !game ||
+        !destination || !s.sourceGameDevice) return;
+    ComPtr<IDirect3DSurface9> canonical;
+    ComPtr<IUnknown> canonicalId, destinationId;
+    D3DSURFACE_DESC sourceDesc{}, canonicalDesc{};
+    if (FAILED(game->GetBackBuffer(0u, 0u, D3DBACKBUFFER_TYPE_MONO,
+                                  canonical.GetAddressOf())) || !canonical ||
+        FAILED(canonical->GetDesc(&canonicalDesc)) ||
+        FAILED(destination->GetDesc(&sourceDesc)) ||
+        FAILED(canonical.As(&canonicalId)) ||
+        FAILED(destination->QueryInterface(
+            IID_PPV_ARGS(destinationId.GetAddressOf()))) ||
+        !canonicalId || !destinationId ||
+        sourceDesc.Format != canonicalDesc.Format ||
+        sourceDesc.Pool != D3DPOOL_DEFAULT ||
+        !native_raw_source_color_write_matches(
+            true, hasWrittenPixels, s.sourceGameDevice,
+            reinterpret_cast<std::uintptr_t>(game),
+            reinterpret_cast<std::uintptr_t>(destinationId.Get()),
+            reinterpret_cast<std::uintptr_t>(canonicalId.Get()),
+            sourceDesc.Width, sourceDesc.Height,
+            canonicalDesc.Width, canonicalDesc.Height)) return;
+    if (s.rawPreview.invalidate_source_color_write(game)) {
+        const auto discarded = ++s.rawSurfaceWriteCaptureInvalidations;
+        if (discarded <= 3u || discarded % 128u == 0u)
+            spdlog::info(
+                "DX11 RAW_VISUAL source_surface_write_invalidated_capture={} "
+                "operation={} present_serial={} stale_native_rgb_discarded=1",
+                discarded, operation, s.presents);
+    }
+}
+
 bool preserve_game_surface_copy(
     IDirect3DDevice9* game, IDirect3DSurface9* destination,
     const RECT* changedArea, HRESULT originalResult,
@@ -8982,6 +9023,8 @@ bool preserve_game_surface_copy(
             : GameNativeSurfaceCopyRegion::destination(
                 0,0,desc.Width,desc.Height,desc.Width,desc.Height);
         if (!changedRegion.valid) return false;
+        invalidate_raw_preview_on_source_surface_write(
+            s, game, destination, true, "surface_copy");
         // Menu/vehicle/race may begin with a whole authentic D3D9 GPU
         // StretchRect/UpdateSurface instead of TARGET Clear. Admit that
         // exact source only if it completely overwrites the bound main RT0
@@ -9404,6 +9447,10 @@ void observe_game_surface_mutation(
         if (FAILED(surface.As(&identity)) || !identity) return;
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
+        // Full-frame abort is not enough: RAW tiles also need to retire
+        // stale GPU evidence even when there is no valid native frame seed.
+        invalidate_raw_preview_on_source_surface_write(
+            s, game, destination, true, "surface_mutation");
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
         const bool knownOwner = s.clearColor.valid &&
             s.clearColor.sourceDevice == owner &&
@@ -9749,6 +9796,12 @@ bool preserve_game_color_fill(
             !surfaceIdentity) return false;
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
+        // Successful partial or whole ColorFill can replace a sampled RAW
+        // native tile. An empty clipped source rectangle changes no pixels.
+        invalidate_raw_preview_on_source_surface_write(
+            s, game, destination,
+            !rect || coverage == GameNativeSourceMutation::ColorFillClip::Pixels,
+            "color_fill");
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
         // Original D3D9 can establish an entire frame with ColorFill instead
         // of a prior TARGET Clear. Only the CANONICAL bound game RT0/backbuffer

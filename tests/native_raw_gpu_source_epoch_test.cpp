@@ -5,6 +5,7 @@
 #include <limits>
 using outrun::vr::dx11::NativeRawGpuCaptureEpoch;
 using outrun::vr::dx11::native_raw_source_color_clear_matches;
+using outrun::vr::dx11::native_raw_source_color_write_matches;
 int main() {
     // A clipped color Clear on this exact game backbuffer is as capable of
     // superseding a captured native pixel as a full color Clear. Only genuine
@@ -24,6 +25,28 @@ int main() {
     static_assert(!native_raw_source_color_clear_matches(
         0u, 0x11u, 0x22u, 0x22u, 3440u, 1440u, 3440u, 1440u),
         "unowned diagnostic source cannot invalidate capture");
+    // Distinct from TARGET Clear: a successful canonical backbuffer
+    // StretchRect/UpdateSurface or ColorFill supersedes prior RAW samples.
+    // Empty/failed/foreign/offscreen/mismatched writes cannot revoke evidence.
+    constexpr auto copied = native_raw_source_color_write_matches(
+        true, true, 0x11u, 0x11u, 0x22u, 0x22u,
+        3440u, 1440u, 3440u, 1440u);
+    static_assert(copied, "source ColorFill/surface copy must retire RAW RGB");
+    static_assert(!native_raw_source_color_write_matches(
+        false, true, 0x11u, 0x11u, 0x22u, 0x22u,
+        3440u, 1440u, 3440u, 1440u), "failed API cannot retire capture");
+    static_assert(!native_raw_source_color_write_matches(
+        true, false, 0x11u, 0x11u, 0x22u, 0x22u,
+        3440u, 1440u, 3440u, 1440u), "empty fill cannot retire capture");
+    static_assert(!native_raw_source_color_write_matches(
+        true, true, 0x11u, 0x12u, 0x22u, 0x22u,
+        3440u, 1440u, 3440u, 1440u), "foreign writer cannot retire capture");
+    static_assert(!native_raw_source_color_write_matches(
+        true, true, 0x11u, 0x11u, 0x23u, 0x22u,
+        3440u, 1440u, 3440u, 1440u), "offscreen copy cannot retire capture");
+    static_assert(!native_raw_source_color_write_matches(
+        true, true, 0x11u, 0x11u, 0x22u, 0x22u,
+        1280u, 720u, 3440u, 1440u), "wrong-sized destination cannot retire capture");
     NativeRawGpuCaptureEpoch e;
     // Cold-start menu real Draw can queue even at Present serial zero.
     assert(e.can_queue(0u, false));
@@ -121,6 +144,17 @@ int main() {
     assert(e.invalidate_for_full_source_clear(false));
     assert(!e.consume_for_present(85u));
     assert(e.can_queue(85u, false));
+    // A genuine source Copy/ColorFill also invalidates the queued RGB pair,
+    // without freeing its asynchronous GPU resources before the EVENT fence.
+    e.reset(); e.queued(854u);
+    assert(copied && e.invalidate_for_full_source_clear(true));
+    assert(!e.consume_for_present(854u));
+    assert(!e.can_queue(854u, true));
+    assert(e.retire_invalidated_source_clear(true, [] {
+        return GPU::Complete;
+    }) == GPU::Complete);
+    assert(e.can_queue(854u, false));
+    e.queued(854u); assert(e.consume_for_present(854u));
     // Partial menu/HUD TARGET Clears must revoke a captured pixel even if
     // the copy already finished; post-Clear Draws remain eligible without
     // staging resource reuse while an EVENT is still outstanding.
