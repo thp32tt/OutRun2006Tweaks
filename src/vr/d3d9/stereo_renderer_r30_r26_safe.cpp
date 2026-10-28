@@ -6367,6 +6367,30 @@ namespace OutRunVRStereo
                     lensMatrixHash(eyeConstants[0]);
                 const std::uint64_t rightWvpHash =
                     lensMatrixHash(eyeConstants[1]);
+                const bool resetViewportProof =
+                    lensResetTrace.readStable &&
+                    lensResetTrace.resetSerial != 0 &&
+                    lensResetTrace.has(
+                        OutRunVR::D3D9ResetTrace::ResetSucceeded) &&
+                    lensResetTrace.has(
+                        OutRunVR::D3D9ResetTrace::ViewportValid);
+                const bool resetViewportExtentMatchesPre =
+                    resetViewportProof &&
+                    lensResetTrace.viewportWidth == savedViewport.Width &&
+                    lensResetTrace.viewportHeight == savedViewport.Height;
+                const bool resetViewportRectMatchesPre =
+                    resetViewportExtentMatchesPre &&
+                    lensResetTrace.viewportX == savedViewport.X &&
+                    lensResetTrace.viewportY == savedViewport.Y;
+                const bool resetScissorMatchesPre =
+                    lensResetTrace.readStable &&
+                    lensResetTrace.has(
+                        OutRunVR::D3D9ResetTrace::ScissorValid) &&
+                    lensPreDrawScissorValid &&
+                    lensResetTrace.scissorLeft == lensPreDrawScissor.left &&
+                    lensResetTrace.scissorTop == lensPreDrawScissor.top &&
+                    lensResetTrace.scissorRight == lensPreDrawScissor.right &&
+                    lensResetTrace.scissorBottom == lensPreDrawScissor.bottom;
                 static std::atomic<std::uint64_t> lensEyeSamples{0};
                 const auto n = lensEyeSamples.fetch_add(1,
                     std::memory_order_relaxed) + 1;
@@ -6389,8 +6413,11 @@ namespace OutRunVRStereo
                         "preViewport={},{},{}x{} preScissorValid={} "
                         "preScissor={},{},{},{} "
                         "resetEpoch={} resetQpc={} resetFlags=0x{:X} "
-                        "resetRequested={}x{} resetEffective={}x{} resetActual={}x{} "
-                        "resetViewport={}x{} resetViewportMatchesPre={} "
+                        "resetSnapshotStable={} resetRequested={}x{} "
+                        "resetEffective={}x{} resetActual={}x{} "
+                        "resetViewport={},{},{}x{} "
+                        "resetViewportExtentMatchesPre={} "
+                        "resetViewportRectMatchesPre={} resetScissorMatchesPre={} "
                         "eyeRT=LEFT_RIGHT_TRANSACTION",
                         n, TopLevelDrawSerial(), site ? site : "unknown",
                         static_cast<unsigned>(screenKind),
@@ -6425,17 +6452,20 @@ namespace OutRunVRStereo
                         lensPreDrawScissor.right, lensPreDrawScissor.bottom,
                         lensResetTrace.resetSerial, lensResetTrace.qpc,
                         lensResetTrace.flags,
+                        lensResetTrace.readStable ? 1 : 0,
                         lensResetTrace.requestedWidth,
                         lensResetTrace.requestedHeight,
                         lensResetTrace.effectiveWidth,
                         lensResetTrace.effectiveHeight,
                         lensResetTrace.actualWidth,
                         lensResetTrace.actualHeight,
+                        lensResetTrace.viewportX,
+                        lensResetTrace.viewportY,
                         lensResetTrace.viewportWidth,
                         lensResetTrace.viewportHeight,
-                        lensResetTrace.resetSerial != 0 &&
-                            lensResetTrace.viewportWidth == savedViewport.Width &&
-                            lensResetTrace.viewportHeight == savedViewport.Height ? 1 : 0);
+                        resetViewportExtentMatchesPre ? 1 : 0,
+                        resetViewportRectMatchesPre ? 1 : 0,
+                        resetScissorMatchesPre ? 1 : 0);
             }
 
             if (lensPhysicalCandidate)
