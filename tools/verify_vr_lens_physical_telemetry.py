@@ -68,6 +68,15 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
     assert "return r29Draw();" in lower
 
     for phrase in (
+        "VR LENS CAMERA SYNC:",
+        "fieldD4={:.5f},{:.5f},{:.5f}",
+        "vector3A8={:.5f},{:.5f},{:.5f}",
+        "view140OriginValid={}",
+        "correctedViewOrigin={:.5f},{:.5f},{:.5f}",
+    ):
+        assert phrase in game, "missing lens camera provenance: " + phrase
+
+    for phrase in (
         "VR LENS GAME C64 GATE:",
         "nativeResult=NOT_YET_OBSERVED",
         "physicalDraw=UNLINKED",
@@ -125,6 +134,8 @@ def main() -> None:
         (0, "std::memcmp(eyeConstants[0], eyeConstants[1],", "true /* fake eye equality */("),
         (0, "const bool lensPhysicalCandidate = Settings::VRTelemetry &&",
             "const bool lensPhysicalCandidate = true &&"),
+        (1, "VR LENS CAMERA SYNC:", "VR CAMERA GENERIC:"),
+        (1, "fieldD4={:.5f},{:.5f},{:.5f}", "fieldD4=OMITTED"),
         (1, "nativeResult=NOT_YET_OBSERVED", "nativeResult=SUCCESS"),
         (1, "physicalDraw=UNLINKED", "physicalDraw=C993"),
         (2, "physicalDraw=UNOBSERVED opaqueFlush=UNOBSERVED", "physicalDraw=CONFIRMED opaqueFlush=CONFIRMED"),
