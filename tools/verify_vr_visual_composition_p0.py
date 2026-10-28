@@ -933,15 +933,17 @@ def verify_result_progress_source_trace(source):
         'TagAppendedNodes(ResultProgressTailsBefore,',
         'RenderScope::ScreenHud',
         'ProducerToken::ResultProgress',
-        '++ResultProgressCompletedCalls',
+        'const std::uint64_t hits = ++ResultProgressCompletedCalls',
         '(hits & (hits - 1u)) == 0',
-        'VR P0 RESULT PROGRESS SOURCE:',
+        'VR TRACE GOAL_PERCENT SOURCE EXIT:',
+        'entryEpoch={} exitEpoch={}',
+        'producerAtExit={} reason={}',
     ):
         require(needle, body, 'bounded GOAL progress origin telemetry')
     require_order(body, 'result E8 ownership must precede bounded trace',
                   'TagAppendedNodes(ResultProgressTailsBefore,',
-                  '++ResultProgressCompletedCalls',
-                  'VR P0 RESULT PROGRESS SOURCE:',
+                  'const std::uint64_t hits = ++ResultProgressCompletedCalls',
+                  'VR TRACE GOAL_PERCENT SOURCE EXIT:',
                   'ResultProgressTailsBefore = {};')
     for forbidden in ('SetRenderState(', 'SetTransform(',
                       'SetVertexShaderConstantF(', 'Game::put_clip_sprite(',
@@ -952,8 +954,8 @@ def verify_result_progress_source_trace(source):
 verify_result_progress_source_trace(ui)
 for label, corrupted in (
     ('remove bounded exact progress source trace', ui.replace(
-        'VR P0 RESULT PROGRESS SOURCE:',
-        'VR P0 RESULT PROGRESS NOT_RECORDED:', 1)),
+        'VR TRACE GOAL_PERCENT SOURCE EXIT:',
+        'VR TRACE GOAL_PERCENT SOURCE NOT_RECORDED:', 1)),
     ('drop original progress sibling classification', ui.replace(
         'TagAppendedNodes(ResultProgressTailsBefore,',
         'TagAppendedNodes(ResultProgressWrongBefore,', 1)),
