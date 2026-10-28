@@ -69,7 +69,7 @@
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
       "DX11:RAW_VISUAL_DIAGNOSTIC"
     ],
-    "full_gate_plan": "one_validation_bearing_sha_with_real_causal_repair"
+    "full_gate_plan": "one_validation_bearing_sha"
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
