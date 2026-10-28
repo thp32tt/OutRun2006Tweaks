@@ -1,0 +1,148 @@
+name: R26 Performance Test Build
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - perf/r26-copy-math-aa-20261028
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify XR render target and independent UI contracts
+        shell: pwsh
+        run: |
+          python tools/verify_vr_desktop_source_coordinates.py
+          if ($LASTEXITCODE -ne 0) { throw 'XR physical target/logical UI split failed' }
+          python tools/verify_vr_unified_menu_source.py
+          if ($LASTEXITCODE -ne 0) { throw 'VR UI reference split failed' }
+          python tools/verify_vr_menu_resolution_split.py
+          if ($LASTEXITCODE -ne 0) { throw 'Menu/XR render-target split failed' }
+          python tools/verify_vr_f11_font_density.py
+          if ($LASTEXITCODE -ne 0) { throw 'F11 VR density/layout contract failed' }
+          python tools/verify_vr_r26_landscape_visual_recovery.py
+          if ($LASTEXITCODE -ne 0) { throw 'R26 visual recovery bundle contract failed' }
+          python tools/verify_vr_r26_stage_fixedfn.py
+          if ($LASTEXITCODE -ne 0) { throw '+TIME four-API source regression failed' }
+          python tools/verify_dx9ex_full_visual_trace_contract.py
+          if ($LASTEXITCODE -ne 0) { throw 'One-pass FULL visual trace contract failed' }
+
+      - name: Verify production performance equivalence
+        shell: pwsh
+        run: |
+          python tools/verify_vr_r26_performance.py
+          if ($LASTEXITCODE -ne 0) { throw 'Performance differential regression failed' }
+          python tools/verify_vr_r26_perf_profile.py
+          if ($LASTEXITCODE -ne 0) { throw 'Performance package/profile invariant failed' }
+
+      - name: Configure Win32 R26+HUD
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32
+          $cache = Get-Content build-game/CMakeCache.txt
+          if ($cache -notcontains 'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON') {
+            throw 'R26+HUD default renderer is not active'
+          }
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+
+      - name: Build x64 OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+
+      - name: Assemble user test package
+        shell: pwsh
+        run: |
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $dir = "OutRun2_VR_R26_PERF_COPY_MATH_AA2_TEST_$short"
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw 'dinput8.dll missing' }
+          $vrHostExe = Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
+          if (-not $vrHostExe) { throw 'outrun-vr-host.exe missing' }
+          Copy-Item $dll.FullName "$dir/dinput8.dll"
+          Copy-Item $vrHostExe.FullName "$dir/outrun-vr-host.exe"
+          Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
+          $env:R26_USER_TEST_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
+          python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["R26_USER_TEST_INI"],encoding="utf-8"); assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getint("VR","AntiAliasing") == 2'
+          if ($LASTEXITCODE -ne 0) { throw 'User test package INI is duplicated or does not select the restored rival route' }
+          Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
+          Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
+          Copy-Item tools/Run-DX9ExFocusTest.ps1 "$dir/Run-DX9ExFocusTest.ps1"
+          Set-Content "$dir/DX9EX_VARIANT.txt" 'variant=R26_PERF_COPY_MATH_AA2_TEST' -Encoding ascii
+          Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
+          @(
+            'DX9Ex R26 + HUD user test build'
+            'Targets: cached eye math, shared particle reconstruction, sparse vertex copy, bilateral fallback, transfer filter policy'
+            'Renderer: R26+HUD default'
+            'VR physical target: OpenXR/VDXR recommended eye extent (desktop-independent)'
+            'Gameplay HUD reference: 1920x1080 widescreen, HudScale=0.55'
+            'Title/main menu: independent 4:3 composition; F11: independent VR shell'
+            'Baseline AA: VR AntiAliasing=2 (4x MSAA with 2x fallback)'
+            'ReflectionResolution=512; VR and Graphics transparency supersampling OFF; culling margin 8 degrees unchanged'
+            'Runner: GitHub-hosted windows-2022'
+            'RUNTIME_VALIDATION=UNTESTED'
+            ''
+            'EXECUTION / 실행 방법'
+            '1. Extract ALL files directly into the folder containing OR2006C2C.EXE.'
+            '2. Double-click RUN_DX9EX_TEST.cmd.'
+            '3. Do NOT run outrun-vr-host.exe directly. It is a VR helper process and a white helper window is not the game.'
+            '4. Confirm XR render quality is desktop-independent, then test rival depth, +TIME, GOAL rising/final graph separately, and lens flare centre/outer discs; then exit normally.'
+            '5. Upload DX9EX_LOGS/DX9EX_LOG_R26_PERF_COPY_MATH_AA2_TEST_*.zip if a defect remains.'
+          ) | Set-Content "$dir/START_HERE.txt" -Encoding UTF8
+          @(
+            'DX9Ex R26 + HUD user test build'
+            'Targets: R26 CPU/copy performance experiment; visual repairs inherited from base'
+            'Renderer: R26+HUD default'
+            'Runner: GitHub-hosted windows-2022'
+            'Launcher: RUN_DX9EX_TEST.cmd'
+            'RUNTIME_VALIDATION=UNTESTED'
+          ) | Set-Content "$dir/TEST_SCOPE.txt" -Encoding UTF8
+          foreach ($required in @(
+            'dinput8.dll','outrun-vr-host.exe','RUN_DX9EX_TEST.cmd',
+            'Run-DX9ExFocusTest.ps1','DX9EX_VARIANT.txt','START_HERE.txt')) {
+            if (-not (Test-Path (Join-Path $dir $required))) {
+              throw "user test package missing $required"
+            }
+          }
+          Copy-Item docs/automation/reviews/R26_PERFORMANCE_TEST_20261028.md "$dir/PERFORMANCE_TEST_NOTES.md"
+          Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
+          (Get-FileHash "$dir.zip" -Algorithm SHA256).Hash.ToLower() | Set-Content "$dir.zip.sha256" -Encoding ascii
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-R26-PERF-COPY-MATH-AA2-TEST-${{ github.sha }}
+          path: |
+            OutRun2_VR_R26_PERF_COPY_MATH_AA2_TEST_*.zip
+            OutRun2_VR_R26_PERF_COPY_MATH_AA2_TEST_*.zip.sha256
+          if-no-files-found: error
+
+  domain-isolation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply VR domain rules to isolated performance candidate
+        run: python3 tools/verify_domain_isolation.py --base cffec078b50debec5b8a95e5b0fb4a6653cec272 --head ${{ github.sha }} --branch vr-d3d9ex-focus

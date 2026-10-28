@@ -745,6 +745,43 @@ namespace OutRunVRStereo
 			OutRunVRRenderer::LatchedStereoFrame stereoFrame{};
 		};
 
+        struct R26EyeMathPair { D3DMATRIX inverse[2]{}, projection[2]{}; };
+        const R26EyeMathPair* R26CachedEyeMath(const D3DMATRIX& projection,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            const float scale = Settings::VRWorldScale * Settings::VRStereoDepth;
+            constexpr std::size_t KeyBytes = sizeof(projection) + sizeof(stereo.eyeOrientation) +
+                sizeof(stereo.eyeOffset) + sizeof(stereo.eyeFov) + sizeof(scale);
+            std::array<unsigned char, KeyBytes> key{};
+            std::size_t offset = 0;
+            auto append = [&](const void* value, std::size_t bytes) {
+                std::memcpy(key.data() + offset, value, bytes); offset += bytes;
+            };
+            append(&projection, sizeof(projection));
+            append(stereo.eyeOrientation, sizeof(stereo.eyeOrientation));
+            append(stereo.eyeOffset, sizeof(stereo.eyeOffset));
+            append(stereo.eyeFov, sizeof(stereo.eyeFov));
+            append(&scale, sizeof(scale));
+            static thread_local std::array<unsigned char, KeyBytes> previous{};
+            static thread_local R26EyeMathPair cached{};
+            static thread_local bool valid = false;
+            if (valid && key == previous) return &cached;
+            R26EyeMathPair candidate{};
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const D3DMATRIX pose = MatrixFromQuaternionTranslation(
+                    stereo.eyeOrientation[eye], stereo.eyeOffset[eye], scale);
+                candidate.inverse[eye] = InverseRigid(pose);
+                candidate.projection[eye] = ProjectionFromFov(projection, stereo.eyeFov[eye]);
+                if (!MatrixFinite(candidate.inverse[eye]) || !MatrixFinite(candidate.projection[eye]))
+                    return nullptr;
+            }
+            // Recenter, Reset and pose/FOV changes need no resource lifetime
+            // assumption: every mathematical input is included in the key.
+            previous = key; cached = candidate; valid = true;
+            return &cached;
+        }
+
 		EyeBuildResult BuildEyeConstants(IDirect3DDevice9* device, const OutRunVRRenderer::LatchedStereoFrame& stereo, DrawStereoState& state)
 		{
 			const std::uintptr_t trackedShader =
@@ -946,11 +983,12 @@ namespace OutRunVRStereo
 			const D3DMATRIX currentWvp = TransposeMatrix(uploadedT);
 			const D3DMATRIX correctedWorldView = MultiplyMatrix(currentWvp, invProjection);
 			if (!MatrixFinite(correctedWorldView)) return EyeBuildResult::FatalError;
+            const auto* eyeMath = R26CachedEyeMath(projection, stereo);
+            if (!eyeMath) return EyeBuildResult::FatalError;
 			for (int eye = 0; eye < 2; ++eye)
 			{
-				const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(stereo.eyeOrientation[eye], stereo.eyeOffset[eye], Settings::VRWorldScale * Settings::VRStereoDepth);
-				const D3DMATRIX eyeInverse = InverseRigid(eyePose);
-				const D3DMATRIX eyeProjection = ProjectionFromFov(projection, stereo.eyeFov[eye]);
+                const D3DMATRIX& eyeInverse = eyeMath->inverse[eye];
+                const D3DMATRIX& eyeProjection = eyeMath->projection[eye];
 				const D3DMATRIX eyeWvp = MultiplyMatrix(MultiplyMatrix(correctedWorldView, eyeInverse), eyeProjection);
 				if (!MatrixFinite(eyeWvp)) return EyeBuildResult::FatalError;
 				const D3DMATRIX eyeWvpT = TransposeMatrix(eyeWvp); std::memcpy(state.eyeConstants[eye], &eyeWvpT, sizeof(eyeWvpT));
@@ -1371,10 +1409,26 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
             height = exact.height;
             return true;
         }
-		HRESULT StretchDirectEye(IDirect3DDevice9* device,IDirect3DSurface9* source,IDirect3DSurface9* target)
-		{
-			if(!device||!source||!target)return D3DERR_INVALIDCALL;HRESULT hr=device->StretchRect(source,nullptr,target,nullptr,D3DTEXF_LINEAR);if(FAILED(hr))hr=device->StretchRect(source,nullptr,target,nullptr,D3DTEXF_NONE);return hr;
-		}
+        HRESULT StretchDirectEye(IDirect3DDevice9* device, IDirect3DSurface9* source,
+            IDirect3DSurface9* target)
+        {
+            if (!device || !source || !target) return D3DERR_INVALIDCALL;
+            struct Choice { IDirect3DDevice9* device = nullptr; std::uint32_t generation = 0; bool none = false; };
+            static thread_local Choice choice{};
+            if (choice.device != device || choice.generation != DirectTransportGeneration)
+                choice = {device, DirectTransportGeneration, false};
+            // Same-size resolve/copy needs no resampling filter.
+            const bool exactSize = BackBufferDesc.Width == DirectTransportWidth &&
+                BackBufferDesc.Height == DirectTransportHeight;
+            if (exactSize || choice.none)
+                return device->StretchRect(source, nullptr, target, nullptr, D3DTEXF_NONE);
+            const HRESULT hr = device->StretchRect(source, nullptr, target, nullptr, D3DTEXF_LINEAR);
+            if (SUCCEEDED(hr)) return hr;
+            const HRESULT fallback = device->StretchRect(source, nullptr, target, nullptr, D3DTEXF_NONE);
+            if (hr == D3DERR_INVALIDCALL && SUCCEEDED(fallback)) choice.none = true;
+            return fallback;
+        }
+
 		bool EnsureDirectTransportResources(IDirect3DDevice9* device)
 		{
 			if(!device||!BackBufferDesc.Width||!BackBufferDesc.Height||!EnsureRenderFrameState()||!EnsureDirectInteropProbe(device))return false;UINT targetWidth=0,targetHeight=0;if(!DirectTransportTargetSize(device,targetWidth,targetHeight))return false;if(DirectTransportResourcesReady&&DirectEyeExtentGeneration.Matches({targetWidth,targetHeight})&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true;if(DirectTransportResourcesReady)ReleaseDirectTransportSlots();DirectTransportFormat=ChooseDirectTransportFormat(BackBufferDesc.Format);if(!CanConvertForDirectTransport(device,BackBufferDesc.Format,DirectTransportFormat))return false;for(auto&slot:DirectTransportSlots){HANDLE leftHandle=nullptr,rightHandle=nullptr;const HRESULT leftHr=device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.leftTexture,&leftHandle);const HRESULT rightHr=SUCCEEDED(leftHr)?device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.rightTexture,&rightHandle):E_FAIL;if(FAILED(leftHr)||FAILED(rightHr)||!leftHandle||!rightHandle||FAILED(slot.leftTexture->GetSurfaceLevel(0,&slot.leftSurface))||FAILED(slot.rightTexture->GetSurfaceLevel(0,&slot.rightSurface))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&slot.fence))||!slot.fence){ReleaseDirectTransportSlots();return false;}slot.leftHandle=leftHandle;slot.rightHandle=rightHandle;}DirectTransportWidth=targetWidth;DirectTransportHeight=targetHeight;DirectEyeExtentGeneration.Commit({targetWidth,targetHeight});if(!DirectTransportGeneration)DirectTransportGeneration=RenderFrameRunGeneration;if(++DirectTransportGeneration==0)++DirectTransportGeneration;DirectTransportResourcesReady=true;spdlog::info("VR stereo: verified 4-slot D3D9Ex shared eye ring ready {}x{} from desktop {}x{} (VDXR/OpenXR recommended) format={} generation={}",DirectTransportWidth,DirectTransportHeight,BackBufferDesc.Width,BackBufferDesc.Height,static_cast<int>(DirectTransportFormat),DirectTransportGeneration);return true;
@@ -1964,3 +2018,4 @@ if(WaitForEventQuery(slot.fence,1,0u))
 	};
 	VRStereoHook VRStereoHook::instance;
 }
+

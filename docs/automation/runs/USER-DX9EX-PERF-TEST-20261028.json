@@ -1,0 +1,18 @@
+{
+  "task_id": "USER-DX9EX-PERF-TEST-20261028",
+  "branch": "perf/r26-copy-math-aa-20261028",
+  "base_sha": "cffec078b50debec5b8a95e5b0fb4a6653cec272",
+  "lane": "DX9Ex C",
+  "attempt": 1,
+  "checkpoint": "C3_LOCAL_VALIDATED",
+  "source_mode": "CHAT_DIRECT",
+  "validation": {
+    "cpu_differential": "PASS",
+    "profile": "PASS",
+    "stage_four_api": "PASS",
+    "windows": "PENDING",
+    "runtime": "UNTESTED"
+  },
+  "next_action": "Push isolated candidate; inspect exact-SHA performance build and full-source results; deliver ZIP with digest; no focus merge",
+  "score_delta": 0
+}

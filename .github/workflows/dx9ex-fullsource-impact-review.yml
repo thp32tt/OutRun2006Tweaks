@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - perf/r26-copy-math-aa-20261028
     paths:
       - 'tools/verify_vr_fullsource_impact.py'
       - 'tools/verify_vr_r26_stage_fixedfn.py'
@@ -155,3 +156,4 @@ jobs:
           path: fullsource-msvc-output/
           if-no-files-found: warn
           retention-days: 90
+

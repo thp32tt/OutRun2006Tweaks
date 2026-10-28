@@ -58,6 +58,9 @@ $gameArgs = @(
     '-FollowGameResolution=false',
     '-UnifiedEyeMenuSource=false',
     '-AntiAliasing=2',
+    '-Graphics.ReflectionResolution=512',
+    '-Graphics.TransparencySupersampling=false',
+    '-VR.TransparencySupersampling=false',
     '-Hud1080pReference=true',
     '-HudResponsiveLayout=true',
     '-HudScale=0.55',
@@ -116,3 +119,4 @@ Write-Host "Log ZIP created:"
 Write-Host $zip
 Write-Host ""
 Write-Host "Upload that ZIP with a short note about graphics correctness, stereo depth, and stutter."
+

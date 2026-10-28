@@ -301,3 +301,8 @@ ownership, excludes artificial-plane IPD, and retains CABE/HUD/GOAL paths.
 Local numerical and 71-CALL guards pass; exact-SHA Windows CI is pending.
 The old R84 C993 verifier already fails on the base due to the earlier projected
 screen-family change, so do not claim full-suite PASS. RUNTIME_VALIDATION=UNTESTED.
+
+
+## 2026-10-29 — isolated R26 performance experiment
+
+USER-DX9EX-PERF-TEST-20261028 preserves VR-R50-FRAME-STABILITY-PRESERVE-001, MSAA/culling and exact stereo semantics. See docs/automation/reviews/R26_PERFORMANCE_TEST_20261028.md for five CPU/copy optimizations and transparent-AA OFF/reflection512 test profile. Differential CPU output passes; performance and HMD are UNTESTED. No runtime baseline promotion.

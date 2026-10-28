@@ -74,7 +74,7 @@ namespace Settings
 		Range<int>{ 0, 8192 } };
 	Setting<float> ReflectionUpdateRate{ "Graphics", "ReflectionUpdateRate", 0.5f,
 		"How much of the car reflection to redraw each frame: 1.0 redraws all faces every frame, 0.5 spreads it over two frames (games default).", Range<float>{ 0.0f, 1.0f } };
-	Setting<bool> TransparencySupersampling{ "Graphics", "TransparencySupersampling", true,
+	Setting<bool> TransparencySupersampling{ "Graphics", "TransparencySupersampling", false,
 		"Allows game to enable 4x transparency supersampling, heavily reducing aliasing on things like barriers or cloth "
 		"around the track edge. For best results use this with \"DX/ANTIALIASING = 2\" inside outrun2006.ini." };
 	Setting<bool> ScreenEdgeCullFix{ "Graphics", "ScreenEdgeCullFix", true,
@@ -2931,3 +2931,4 @@ public:
 	static VSyncOverride instance;
 };
 VSyncOverride VSyncOverride::instance;
+
