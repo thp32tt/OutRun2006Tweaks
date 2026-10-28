@@ -1469,6 +1469,22 @@ namespace
 
             std::uint32_t image = 0;
             Acquire(projection_, image);
+            std::cout
+                << "[VR TRACE HOST PROJECTION BLIT FULL]"
+                << " image=" << image
+                << " direct=" << (directFrameValid_ ? 1 : 0)
+                << " projection=" << projection_.width << "x" << projection_.height
+                << " leftSrv=" << static_cast<const void*>(eyeSrv[0])
+                << " rightSrv=" << static_cast<const void*>(eyeSrv[1])
+                << " leftRtv=" << static_cast<const void*>(projection_.rtvs[image][0])
+                << " rightRtv=" << static_cast<const void*>(projection_.rtvs[image][1])
+                << " leftFmt=" << static_cast<int>(eyeFormat[0])
+                << " rightFmt=" << static_cast<int>(eyeFormat[1])
+                << " leftUv=" << eyes[0].x << "," << eyes[0].y << ","
+                << eyes[0].w << "," << eyes[0].h
+                << " rightUv=" << eyes[1].x << "," << eyes[1].y << ","
+                << eyes[1].w << "," << eyes[1].h
+                << "\n";
             const bool firstEyeOk = RenderTo(
                 projection_.rtvs[image][0], projection_.width, projection_.height,
                 eyes[0], eyeSrv[0], eyeFormat[0], 0);

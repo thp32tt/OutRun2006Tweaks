@@ -3757,6 +3757,73 @@ int main(int argc, char** argv)
                     std::memory_order_acquire);
             R23Pixels.NoteFinalSubmission();
             CheckXr(endResult, "xrEndFrame");
+            {
+                static std::uint64_t fullTraceXrTick = 0;
+                ++fullTraceXrTick;
+                std::cout
+                    << "[VR TRACE XR FRAME FULL]"
+                    << " tick=" << fullTraceXrTick
+                    << " predictedDisplayTime=" << fs.predictedDisplayTime
+                    << " predictedDisplayPeriod=" << fs.predictedDisplayPeriod
+                    << " shouldRender=" << (fs.shouldRender == XR_TRUE ? 1 : 0)
+                    << " viewCount=" << vc
+                    << " presentation=" << static_cast<unsigned>(presentation)
+                    << " candidateFrameId=" << candidateGameFrameId
+                    << " candidatePoseSequence=" << candidatePoseSequence
+                    << " rejectReason=" << candidateRejectReason
+                    << " requestedLayer=" << finalLayerKind
+                    << " actualFinal=" << actualFinalLayerKind
+                    << " actualFrameId=" << actualSubmittedFrameId
+                    << " actualSourceKind=" << actualSubmittedSourceKind
+                    << " actualLayer=" << (actualSubmittedLayer ? 1 : 0)
+                    << " layerReady=" << (layerReady ? 1 : 0)
+                    << " freshProjection=" << (frameFreshProjection ? 1 : 0)
+                    << " cachedProjection=" << (frameCachedProjection ? 1 : 0)
+                    << " intentionalMono=" << (intentionalMonoProjection ? 1 : 0)
+                    << " captureMs=" << candidateCaptureMs
+                    << " copyMs=" << candidateCommitCopyMs
+                    << " renderMs=" << frameRenderMs
+                    << " xrWaitMs=" << xrWaitFrameMs
+                    << "\n";
+                if (vc >= 2)
+                {
+                    for (int eye = 0; eye < 2; ++eye)
+                    {
+                        const auto& live = views[eye];
+                        const auto& submitted = pv[eye];
+                        std::cout
+                            << "[VR TRACE XR EYE FULL]"
+                            << " tick=" << fullTraceXrTick
+                            << " eye=" << eye
+                            << " livePos=" << live.pose.position.x << ","
+                            << live.pose.position.y << "," << live.pose.position.z
+                            << " liveOri=" << live.pose.orientation.x << ","
+                            << live.pose.orientation.y << ","
+                            << live.pose.orientation.z << ","
+                            << live.pose.orientation.w
+                            << " liveFov=" << live.fov.angleLeft << ","
+                            << live.fov.angleRight << ","
+                            << live.fov.angleUp << "," << live.fov.angleDown
+                            << " submittedPos=" << submitted.pose.position.x << ","
+                            << submitted.pose.position.y << ","
+                            << submitted.pose.position.z
+                            << " submittedOri=" << submitted.pose.orientation.x << ","
+                            << submitted.pose.orientation.y << ","
+                            << submitted.pose.orientation.z << ","
+                            << submitted.pose.orientation.w
+                            << " submittedFov=" << submitted.fov.angleLeft << ","
+                            << submitted.fov.angleRight << ","
+                            << submitted.fov.angleUp << ","
+                            << submitted.fov.angleDown
+                            << " arrayIndex=" << submitted.subImage.imageArrayIndex
+                            << " rect=" << submitted.subImage.imageRect.offset.x << ","
+                            << submitted.subImage.imageRect.offset.y << ","
+                            << submitted.subImage.imageRect.extent.width << ","
+                            << submitted.subImage.imageRect.extent.height
+                            << "\n";
+                    }
+                }
+            }
             const double endFrameMs = timings.Ms(es, ee);
             timings.end.Add(endFrameMs);
             cadence.NoteFrame(frameFreshProjection,
