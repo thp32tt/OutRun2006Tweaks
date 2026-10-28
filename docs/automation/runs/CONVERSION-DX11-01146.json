@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01146",
+  "production_id": "CONVERSION-DX11-01146",
+  "event_id": "CONVERSION-DX11-01146-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT:CONVERSION-DX11-01146",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:STACKED_ROWS_SOURCE_REPAINT",
+  "classification": "A_SOURCE_VISIBLE_REPAINT_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "b1cc7418fc10f124e3fd9da2040475570cb9ddc5",
+  "source_implementation_commit_sha": "8f79abd24df1a4d926b5e40fe381c67730912033",
+  "material_result_sha": "8f79abd24df1a4d926b5e40fe381c67730912033",
+  "validation_bearing_result_sha": "8f79abd24df1a4d926b5e40fe381c67730912033",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_GAME_D3D9_DRAW",
+      "PAIRED_NATIVE_D3D11_GPU_RGB",
+      "X_SWEEP_AUTHENTIC_STACKED_SOURCE_REPAINT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CXX_BOUNDED_X_EDGE_VERTICAL_SOURCE_UNION",
+      "SOURCE_PIXEL_EXACT_AUTHENTICATION",
+      "SOURCE_TO_GPU_RGB_CROP_POSITIVE_AND_NEGATIVE_INTEGRATION_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable constexpr three 48x16 vertically stacked game dirty strips plus 252x8 attached right tail select authentic 32x32 tile at (608,308); RGB source-crop integration checks 64 changed real-buffer RGB pixels with no replacement of genuine border RGB.",
+      "negative_regression": "One-pixel unpainted source row, forged rcBound, out-of-bounds tail, unknown header all fail closed; original RGNDATA union per-pixel proof unchanged.",
+      "component_integration": "D3D9 source dirty rectangle union -> native RAW placement X-edge sweep -> genuine paired D3D11 before/after RGB crop -> original source-bounded desktop diagnostic. No full-frame or HMD promotion."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "tests/native_raw_present_coverage_test.cpp",
+      "tests/native_raw_changed_pixel_window_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "RAW opt-in only and default OFF; preserve original game D3D9 Draw/Present, input/FFB, DX9Ex rollback, DXVK freeze, protected original full-frame fail-closed."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_present_coverage_test.cpp",
+    "tests/native_raw_changed_pixel_window_test.cpp"
+  ],
+  "real_game_draw_blocker": "No matching real OutRun session for 8f79abd2. Historical zero-native-Draw negative pinned to b8dab362; first full-resolution native menu/car/race frame remains unproven.",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40788056275,
+        "head_sha": "8f79abd24df1a4d926b5e40fe381c67730912033",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40788056275"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40788056328,
+        "head_sha": "8f79abd24df1a4d926b5e40fe381c67730912033",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40788056328"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40788056306,
+        "head_sha": "8f79abd24df1a4d926b5e40fe381c67730912033",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40788056306"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40788056270,
+        "head_sha": "8f79abd24df1a4d926b5e40fe381c67730912033",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40788056270"
+      },
+      {
+        "name": "Build",
+        "run_id": 40788056326,
+        "head_sha": "8f79abd24df1a4d926b5e40fe381c67730912033",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40788056326"
+      }
+    ],
+    "local_tests": "NOT_RUN: local runtime cannot fetch GitHub assets or compile Windows DLL; actual exact-SHA DX11 Fast source-only regression check PASS.",
+    "runtime_evidence": "UNTESTED: neither actual game desktop nor Quest3/VDXR launched",
+    "full_native_game_frame_complete": false,
+    "build_artifacts": [
+      {
+        "id": 12860427702,
+        "name": "feature-dx11-first-game-frame-8f79abd24df1a4d926b5e40fe381c67730912033",
+        "digest": "sha256:5ee378b7adb55f43bb4ce75184b29b6d36691909a090407fc8f9fe78ac8d174b"
+      },
+      {
+        "id": 12859424713,
+        "name": "outrun2006tweaks-8f79abd24df1a4d926b5e40fe381c67730912033",
+        "digest": "sha256:8458d4152317fba1995620ce1093d3858a45b39d96d9fb2c11a7864196fecffc"
+      },
+      {
+        "id": 12860457332,
+        "name": "backend-autovalidated-8f79abd24df1a4d926b5e40fe381c67730912033",
+        "digest": "sha256:70f70486f09a60d8a772c6c1dc658cff2ca120a8fc0b4e1960164b36ff4219b3"
+      }
+    ]
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Recover experimental authentic native D3D11 GPU RGB in real source D3D9 stacked-row dirty Presents, without expansion or production frame promotion.",
+    "acceptance_items": [
+      {
+        "id": "stacked_source_repaint",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real D3D9 dirty geometry",
+        "expected_behavior": "Vertical union of three painted short rows is considered when long thin source tail prevents safe whole-component placement."
+      },
+      {
+        "id": "source_safety",
+        "category": "fallback_regression",
+        "behavior_area": "dirty source RGB admission",
+        "expected_behavior": "Pixel gaps, invalid members and forged rect bounds remain rejected; original DX9Ex path untouched."
+      },
+      {
+        "id": "exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "all five mandatory push Actions",
+        "expected_behavior": "Five successful runs on exact source material SHA; no fake game/HMD runtime proof."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stacked_source_repaint": "PASS_EXACT_SHA_FAST",
+    "source_safety": "PASS_EXACT_SHA_FAST",
+    "exact_sha_gates": "PASS_FIVE"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS pinned HEAD, AGENTS.md, policy and earlier completed material/gate identity",
+    "C1_REVIEW": "PASS source-verified stacked-row failure of prior Y-sweep with rightward tail",
+    "C2_IMPLEMENT": "PASS substantive native RAW source-X sweep plus positive/negative source/pixel integration regressions",
+    "C3_VALIDATE": "PASS all five unchanged mandatory exact-SHA push Gates; no HMD test",
+    "C4_COMMIT": "PASS material 8f79abd24df1a4d926b5e40fe381c67730912033 with exact [AUTO:CONVERSION-DX11-01146] marker and no CI skip",
+    "C5_PACKAGE": "SOURCE_MATCHED_BUILD_ARTIFACTS_AVAILABLE; DO_NOT_PROMOTE_AS_GAMEPLAY_PASS",
+    "C6_STATE": "PASS post-validation docs-only checkpoint, no new point"
+  },
+  "c6": {
+    "reason": "EXACT_SHA_FIVE_GATES_PASS_RUNTIME_UNTESTED",
+    "next_action": "Continue same unfinished native full game frame feature: validate matched opt-in real game desktop evidence, then address native draw/complete frame blockers before native L/R Quest3 promotion. No new score for this incremental same-feature repair."
+  }
+}
