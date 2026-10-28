@@ -1,0 +1,194 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01136",
+  "production_id": "CONVERSION-DX11-01136",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01136",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:CANONICAL_SOURCE_RECTANGLE_OVERLAP",
+  "classification": "A_SOURCE_IMPLEMENTATION_RENDER_PIXEL_PROVENANCE_CORRECTION",
+  "status": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_EXACT_SHA_FIVE_GATES_COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "71d38dd74a0e3f27034e5e0afbca633df4e51c59",
+  "source_change_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+  "material_result_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+  "implementation_commits": [
+    "cd9058b0f6414de1f9ec552a43487140459bca11"
+  ],
+  "causal_ci_repair_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_gpu_source_epoch_test.cpp"
+  ],
+  "implementation_summary": "Actual D3D9 source canonical TARGET Clear, successful clipped ColorFill and StretchRect/UpdateSurface now retire a real D3D11 BEFORE/AFTER GPU tile ONLY when their fully bounded authored color-write rectangles overlap its 256x144 source capture region. Disjoint authentic menu/HUD source writes preserve native RGB evidence; full/unknown/excessive/malformed source regions conservatively retire it. Original game HRESULT, DX9Ex FFB/input/fallback, D3D11 asynchronous GPU EVENT, full native-frame safety and DXVK freeze preserved. No real-game/HMD observation.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CANONICAL_TARGET_CLEAR_COLORFILL_SURFACE_COPY",
+      "SOURCE_WRITE_RECT_TO_REAL_NATIVE_D3D11_CAPTURE_TILE",
+      "DISJOINT_RGB_PRESERVE_OR_OVERLAP_RETIRE",
+      "GPU_EVENT_SAFE_NATIVE_DRAW_RECAPTURE",
+      "EXPLICIT_OPT_IN_RAW_PARTIAL_GPU_VISUAL"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "REAL_GPU_BEFORE_AFTER_PIXEL_CAPTURE",
+      "RAW_PARTIAL_TILE_NOT_FULL_GAME"
+    ],
+    "batch_components": [
+      "CPP_RECTANGULAR_SOURCE_WRITE_PROVENANCE",
+      "CPP_GPU_RAW_PAIR_AND_EVENT_SAFE_INVALIDATION",
+      "CPP_D3D9_CLEAR_COLORFILL_COPY_SITE_INTEGRATION",
+      "CPP17_POSITIVE_NEGATIVE_REAL_SOURCE_REGION_CASES"
+    ],
+    "visible_frame_acceptance": "Not a complete native frame; no real-game visible RAW diagnostic pixels or Quest3/VDXR gameplay observed. Source+CI only.",
+    "activation_guard_and_fallback": "Explicit RAW opt-in; only proven disjoint canonical D3D9 source region may preserve native tile; unknown/malformed regions fail closed. D3D9 Draw, input/FFB and fallback intact.",
+    "acceptance_proof": {
+      "positive_probe": "Portable C++17 disjoint Clear/Copy/ColorFill source region retains same-Present authentic GPU capture epoch.",
+      "negative_regression": "One-pixel overlap, missing/bad/over-limit regions, foreign/offscreen/failed/empty source writes and outstanding EVENT require safe source invalidation or preserve fallback.",
+      "component_integration": "D3D9 source Clear, ColorFill and surface-copy hooks integrate precise authored rectangles into native RAW producer epoch; same native tile provenance owns GPU fence and Present; five original push exact-SHA Gates all success."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "development_time_percentages": "UNMEASURED"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve real D3D11 partial GPU RGB evidence through nonoverlapping original game backbuffer updates while retiring stale overlapping capture with fenced lifetime.",
+    "acceptance_items": [
+      {
+        "id": "disjoint_source_writes_preserve_real_gpu_tile",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 Clear/ColorFill/Surface copy to native D3D11 GPU tile chronology",
+        "expected_behavior": "Source-proven disjoint pixel rectangles preserve a real same-Present native RGB capture; positive overlap retires it."
+      },
+      {
+        "id": "unknown_source_and_gpu_fence_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 source identity, region bounds and D3D11 EVENT ownership",
+        "expected_behavior": "Unknown, malformed or overlapping original source writes revoke earlier GPU pixels without reusing in-flight staging, while gameplay/input/FFB remains D3D9-owned."
+      },
+      {
+        "id": "cpp_source_positive_negative_and_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Portable C++17 changed-region regressions and 5 required push GitHub Actions",
+        "expected_behavior": "One exact implementation commit passes DX11 Fast, Backend, Windows Build, OpenXR and HUD; gameplay/HMD acceptance remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "disjoint_source_writes_preserve_real_gpu_tile": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "DX11 Fast #40689007367 success exact cd9058b0; real native gameplay UNTESTED"
+    },
+    "unknown_source_and_gpu_fence_fallback": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "Backend #40689007665 and Windows Build #40689007583 success exact cd9058b0"
+    },
+    "cpp_source_positive_negative_and_exact_sha_ci": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "All five push Gates success exact cd9058b0, runtime UNTESTED"
+    }
+  },
+  "score_change": 1,
+  "work_time_ratio": "NOT_MEASURED",
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40689007367,
+      "event": "push",
+      "head_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40689007665,
+      "event": "push",
+      "head_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40689007583,
+      "event": "push",
+      "head_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40689007712,
+      "event": "push",
+      "head_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40689007679,
+      "event": "push",
+      "head_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "runtime_evidence": {
+    "real_game_draw_output": "UNTESTED",
+    "visible_native_rgb_pixels": "UNTESTED",
+    "full_native_game_frame": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "causal_ci_note": "No causal CI repair was required. All five unchanged required push Gates passed on the first non-CI-skipped material source SHA; no duplicate full Gate run was initiated.",
+  "validation_bearing_result_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+  "result_sha": "cd9058b0f6414de1f9ec552a43487140459bca11",
+  "build_artifacts": [
+    {
+      "name": "outrun2006tweaks-cd9058b0f6414de1f9ec552a43487140459bca11",
+      "id": 12817046211,
+      "digest": "sha256:dcf23b9b81faa5f57a6faeb3de8421a30905b4d585c2ce9a95e58865de52ee7e"
+    }
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS pinned latest DX11 HEAD 71d38dd7, 01135 finished and owner collision absent",
+    "C1_REVIEW": "PASS source-authentic disjoint ColorFill/copy/Clear conservatively revoked unrelated real GPU tile",
+    "C2_IMPLEMENT": "PASS cohesive 4-file real C++ source-write rectangle + capture provenance + positive/negative C++17 regressions",
+    "C3_VALIDATE": "PASS five required push GitHub Actions same exact cd9058b0, no CI skip on material commit",
+    "C4_COMMIT": "PASS non-forced, one validation-bearing material commit cd9058b0",
+    "C5_PACKAGE": "PASS matched Windows artifact 12817046211; real game, actual GPU pixels and Quest3/HMD UNTESTED",
+    "C6_STATE": "PASS separate docs-only record after five-Gate completion, no source modification and no duplicate Gate"
+  },
+  "c6_score_change": 0,
+  "c6_note": "C6 status-only file on top of unchanged five-Gate exact-source material_result_sha, explicitly skip CI on docs-only. Independent material source score accounted exactly once; game/HMD untested."
+}
