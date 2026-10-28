@@ -10,12 +10,65 @@ namespace outrun::vr::dx11 {
     return !hasDirtyRegion || fullBackbufferCovered ||
            sourceCropCovered || sourceCropPartitionCovered;
 }
+
+ // When a D3D9 menu/car Present updates only a subset, the default
+ // top-right RAW diagnostic tile may be outside ALL genuine dirty pixels.
+ // Keep it when fully covered; otherwise find the largest tile inside a
+ // real intersecting dirty rectangle. Never expand the game's repaint.
+ [[nodiscard]] constexpr bool native_raw_dirty_region_place_tile(
+     std::uint32_t backWidth, std::uint32_t backHeight,
+     std::int64_t cropLeft, std::int64_t cropTop,
+     std::int64_t cropRight, std::int64_t cropBottom,
+     const NativeRawPresentDirtyRegion& dirty,
+     std::uint32_t sourceWidth, std::uint32_t sourceHeight,
+     NativeRawPresentTile& placed) noexcept {
+     placed = {};
+     NativeRawPresentTile ordinary{};
+     if (!native_raw_partial_present_tile(
+             backWidth, backHeight, cropLeft, cropTop,
+             cropRight, cropBottom, sourceWidth, sourceHeight, ordinary))
+         return false;
+     if (native_raw_dirty_region_covers_tile(
+             backWidth, backHeight, dirty, ordinary)) {
+         placed = ordinary;
+         return true;
+     }
+     // Each candidate is verified against the WHOLE bounded region, not
+     // against rcBound or merely an intersecting rectangle. A malformed
+     // member anywhere in the region prevents publication.
+     bool found = false;
+     std::uint64_t largestArea = 0u;
+     for (std::uint32_t i = 0u;
+          i < dirty.count && i < NativeRawPresentDirtyRegion::kMaxRects; ++i) {
+         const auto& rect = dirty.rectangles[i];
+         const auto left = (std::max)(cropLeft, rect.left);
+         const auto top = (std::max)(cropTop, rect.top);
+         const auto right = (std::min)(cropRight, rect.right);
+         const auto bottom = (std::min)(cropBottom, rect.bottom);
+         NativeRawPresentTile candidate{};
+         if (!native_raw_partial_present_tile(
+                 backWidth, backHeight, left, top, right, bottom,
+                 sourceWidth, sourceHeight, candidate) ||
+             !native_raw_dirty_region_covers_tile(
+                 backWidth, backHeight, dirty, candidate))
+             continue;
+         const auto area = std::uint64_t{candidate.copyWidth} *
+                           candidate.copyHeight;
+         if (!found || area > largestArea) {
+             found = true;
+             largestArea = area;
+             placed = candidate;
+         }
+     }
+     return found;
+ }
 } // namespace outrun::vr::dx11
 
 // A D3D9 Present may repaint only a small menu/car/race dirty subset.
 // In RAW mode, check the ACTUAL selected diagnostic destination tile rather
 // than requiring the full game crop to be dirty. This grants no full-frame
 // or OpenXR publication and cannot accept a bounding RECT with holes.
+#include <algorithm>
 #include <cstdint>
 #include <limits>
 #include "native_game_raw_partial_present_tile.hpp"

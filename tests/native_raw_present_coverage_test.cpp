@@ -62,3 +62,58 @@ constexpr bool kRawDirtyTileProof = []() constexpr {
     return true;
 }();
 static_assert(kRawDirtyTileProof, "RAW dirty-region tile proof must fail closed");
+
+ // Partial dirty menu/car Present: a real 48x48 repaint cannot show the
+ // usual 256x144 top-right tile, but safely admits a 32x32 RAW GPU crop.
+ constexpr bool kRawDirtyPlacementProof = []() constexpr {
+     using namespace outrun::vr::dx11;
+     NativeRawPresentDirtyRegion dirty{};
+     dirty.headerVerified = true;
+     dirty.count = 1u;
+     dirty.rectangles[0] = {600, 300, 648, 348};
+     dirty.boundLeft = 600; dirty.boundTop = 300;
+     dirty.boundRight = 648; dirty.boundBottom = 348;
+     NativeRawPresentTile placed{};
+     if (!native_raw_dirty_region_place_tile(
+             1920, 1080, 0, 0, 1920, 1080, dirty,
+             256, 144, placed) ||
+         placed.copyWidth != 32u || placed.copyHeight != 32u ||
+         placed.destinationX != 608 || placed.destinationY != 308 ||
+         !native_raw_dirty_region_covers_tile(1920, 1080, dirty, placed))
+         return false;
+     // Two partial regions: pick the largest authenticated available crop.
+     dirty.count = 2u;
+     dirty.rectangles[1] = {700, 350, 780, 410};
+     dirty.boundRight = 780; dirty.boundBottom = 410;
+     if (!native_raw_dirty_region_place_tile(
+             1920, 1080, 0, 0, 1920, 1080, dirty,
+             256, 144, placed) ||
+         placed.copyWidth != 64u || placed.copyHeight != 44u ||
+         placed.destinationX != 708 || placed.destinationY != 358)
+         return false;
+     // An rcBound forgery, hole, unknown header, out-of-bounds rect, and
+     // a repaint too small for the labeled RAW tile must all fail closed.
+     dirty.boundRight = 781;
+     if (native_raw_dirty_region_place_tile(
+             1920, 1080, 0, 0, 1920, 1080, dirty,
+             256, 144, placed)) return false;
+     dirty.boundRight = 780;
+     dirty.rectangles[1] = {700, 350, 2000, 410};
+     if (native_raw_dirty_region_place_tile(
+             1920, 1080, 0, 0, 1920, 1080, dirty,
+             256, 144, placed)) return false;
+     dirty.count = 1u;
+     dirty.rectangles[0] = {600, 300, 620, 320};
+     dirty.boundLeft = 600; dirty.boundTop = 300;
+     dirty.boundRight = 620; dirty.boundBottom = 320;
+     if (native_raw_dirty_region_place_tile(
+             1920, 1080, 0, 0, 1920, 1080, dirty,
+             256, 144, placed)) return false;
+     dirty.headerVerified = false;
+     if (native_raw_dirty_region_place_tile(
+             1920, 1080, 0, 0, 1920, 1080, dirty,
+             256, 144, placed)) return false;
+     return true;
+ }();
+ static_assert(kRawDirtyPlacementProof,
+               "RAW GPU visibility requires actual D3D9 dirty repaint");

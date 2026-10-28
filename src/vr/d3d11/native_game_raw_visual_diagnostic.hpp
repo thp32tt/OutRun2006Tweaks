@@ -117,6 +117,18 @@ public:
                 back.Width, back.Height, l, t, r, b,
                 width, height, visibleTile))
             return NativeRawPreviewResult::UnsafePresent;
+        // Partial D3D9 dirty Presents frequently omit the normal top-right
+        // diagnostic destination. Retarget the visible RAW GPU tile INSIDE
+        // authenticated game-painted pixels, never outside source crop.
+        // Full source-repaint proof still uses the original fixed location.
+        if (sourceDirty && !sourceCropRepaintVerified) {
+            NativeRawPresentTile dirtyPlaced{};
+            if (!native_raw_dirty_region_place_tile(
+                    back.Width, back.Height, l, t, r, b,
+                    *sourceDirty, width, height, dirtyPlaced))
+                return NativeRawPreviewResult::UnsafePresent;
+            visibleTile = dirtyPlaced;
+        }
         NativeRawPreviewResult output = NativeRawPreviewResult::NoDraw;
         if (pending_) {
             // RAW is an explicitly opted-in visual test. Prefer the SAME
