@@ -174,3 +174,67 @@ constexpr bool kRawDirtyFragmentUnionProof = []() constexpr {
 }();
 static_assert(kRawDirtyFragmentUnionProof,
               "RAW tiles require a painted D3D9 dirty union without gaps");
+
+
+// Real RGNDATA often splits a repaint into three or more thin strips.
+// The native RAW diagnostic must find a TRUE painted component even with
+// unrelated dirty islands, but never cross a one-pixel unpainted seam.
+// This is source-to-native GPU visibility only, not full-frame promotion.
+constexpr bool kRawConnectedDirtyRepaintProof = []() constexpr {
+    using namespace outrun::vr::dx11;
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true;
+    dirty.count = 3u;
+    dirty.boundLeft = 600; dirty.boundTop = 300;
+    dirty.boundRight = 648; dirty.boundBottom = 348;
+    dirty.rectangles[0] = {600, 300, 616, 348};
+    dirty.rectangles[1] = {616, 300, 632, 348};
+    dirty.rectangles[2] = {632, 300, 648, 348};
+    NativeRawPresentTile tile{};
+    const auto place = [&]() constexpr {
+        return native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080,
+            dirty, 256, 144, tile);
+    };
+    if (!place() || tile.copyWidth != 32u ||
+        tile.copyHeight != 32u ||
+        tile.destinationX != 608 || tile.destinationY != 308 ||
+        !native_raw_dirty_region_covers_tile(1920, 1080, dirty, tile))
+        return false;
+    // A real unpainted 1px source seam cannot become a native tile.
+    dirty.rectangles[1] = {617, 300, 632, 348};
+    if (place()) return false;
+    dirty.rectangles[1] = {616, 300, 632, 348};
+    // Fragmented islands plus a distant dirty outlier: all 21 members
+    // are authenticated; the connected 20-strip component still paints
+    // a 24x32 crop without expanding the D3D9 Present source.
+    dirty.count = 21u;
+    for (std::uint32_t i = 0u; i < 20u; ++i) {
+        const auto x = static_cast<std::int64_t>(600 + 2 * i);
+        dirty.rectangles[i] = {x, 300, x + 2, 348};
+    }
+    dirty.rectangles[20] = {1500, 700, 1516, 716};
+    dirty.boundRight = 1516; dirty.boundBottom = 716;
+    if (!place() || tile.copyWidth != 24u ||
+        tile.copyHeight != 32u || tile.destinationX != 608 ||
+        tile.destinationY != 308 ||
+        !native_raw_dirty_region_covers_tile(1920, 1080, dirty, tile))
+        return false;
+    // Even one missing strip breaks component coverage; an isolated
+    // sub-40px remainder cannot individually authorize a RAW crop.
+    dirty.rectangles[10] = {621, 300, 622, 348};
+    if (place()) return false;
+    dirty.rectangles[10] = {620, 300, 622, 348};
+    // A malformed outlier invalidates the entire claimed RGNDATA union.
+    dirty.rectangles[20] = {1500, 700, 2000, 716};
+    if (place()) return false;
+    dirty.rectangles[20] = {1500, 700, 1516, 716};
+    dirty.boundRight = 1517; // forged rcBound
+    if (place()) return false;
+    dirty.boundRight = 1516;
+    dirty.headerVerified = false;
+    if (place()) return false;
+    return true;
+}();
+static_assert(kRawConnectedDirtyRepaintProof,
+              "fragmented source repaint cannot fabricate native GPU pixels");

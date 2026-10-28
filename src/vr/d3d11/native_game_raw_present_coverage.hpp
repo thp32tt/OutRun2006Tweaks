@@ -160,20 +160,53 @@ struct NativeRawPresentDirtyRegion {
                   (std::min)(cropRight, rect.right),
                   (std::min)(cropBottom, rect.bottom));
      }
-     // A separate dirty outlier can make rcBound too wide to contain an
-     // admissible tile. Recover adjoining pairs, with a strict bound of
-     // 28 additional candidates and the same per-pixel union proof.
-     if (dirty.count >= 2u && dirty.count <= 8u) {
-         for (std::uint32_t i = 0u; i < dirty.count; ++i) {
-             for (std::uint32_t j = i + 1u; j < dirty.count; ++j) {
-                 const auto& a = dirty.rectangles[i];
-                 const auto& b = dirty.rectangles[j];
-                 consider((std::max)(cropLeft, (std::min)(a.left, b.left)),
-                          (std::max)(cropTop, (std::min)(a.top, b.top)),
-                          (std::min)(cropRight, (std::max)(a.right, b.right)),
-                          (std::min)(cropBottom, (std::max)(a.bottom, b.bottom)));
+     // RGNDATA may fragment a genuine menu/car repaint into more than
+     // two adjoining pieces (including >8 total members with outliers).
+     // Enumerating pairs misses a valid native GPU tile in that case.
+     // Discover each edge/overlap-connected repaint component in a bounded
+     // flood fill (at most 32 rectangles and 32*32 adjacency probes overall).
+     // The component bounds only propose a location: every candidate still
+     // requires strict ORIGINAL full-region bounds and per-pixel union proof.
+     // A gap, malformed member, or fabricated rcBound never earns coverage.
+     if (!dirty.headerVerified || dirty.count == 0u ||
+         dirty.count > NativeRawPresentDirtyRegion::kMaxRects)
+         return false;
+     bool visited[NativeRawPresentDirtyRegion::kMaxRects]{};
+     for (std::uint32_t seed = 0u; seed < dirty.count; ++seed) {
+         if (visited[seed]) continue;
+         std::uint32_t queue[NativeRawPresentDirtyRegion::kMaxRects]{};
+         std::uint32_t read = 0u, size = 1u;
+         queue[0] = seed;
+         visited[seed] = true;
+         auto componentLeft = dirty.rectangles[seed].left;
+         auto componentTop = dirty.rectangles[seed].top;
+         auto componentRight = dirty.rectangles[seed].right;
+         auto componentBottom = dirty.rectangles[seed].bottom;
+         while (read < size) {
+             const auto& current = dirty.rectangles[queue[read++]];
+             for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+                 if (visited[i]) continue;
+                 const auto& next = dirty.rectangles[i];
+                 // Touching edges are contiguous D3D9 source pixels; a
+                 // shared corner may widen bounds but cannot pass the
+                 // independent exact per-pixel coverage test if hollow.
+                 if (next.left > current.right ||
+                     next.right < current.left ||
+                     next.top > current.bottom ||
+                     next.bottom < current.top)
+                     continue;
+                 visited[i] = true;
+                 queue[size++] = i; // each source member enqueued once
+                 componentLeft = (std::min)(componentLeft, next.left);
+                 componentTop = (std::min)(componentTop, next.top);
+                 componentRight = (std::max)(componentRight, next.right);
+                 componentBottom = (std::max)(componentBottom, next.bottom);
              }
          }
+         consider((std::max)(cropLeft, componentLeft),
+                  (std::max)(cropTop, componentTop),
+                  (std::min)(cropRight, componentRight),
+                  (std::min)(cropBottom, componentBottom));
      }
      return found;
  }
