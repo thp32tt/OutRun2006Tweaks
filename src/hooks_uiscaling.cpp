@@ -2492,7 +2492,7 @@ class UIScaling : public Hook
             spdlog::info(
                 "VR TRACE GOAL_TIME SOURCE: helperRva=0x{:X} producer={} "
                 "admittedAfterDrain=1 admittedAtExit={} entrySerial={} "
-                "entryEpoch={} exitEpoch={} queueActive={} contract=GOAL_DRAIN_REVALIDATE_V1",
+                "entryEpoch={} exitEpoch={} queueActive={} contract=GOAL_DRAIN_REVALIDATE_V1 verifier=FALLBACK_SPLIT",
                 helperRva,
                 OutRunVR::GameSemantic::Name(producer),
                 admittedAtExit ? 1 : 0, entrySerial,
