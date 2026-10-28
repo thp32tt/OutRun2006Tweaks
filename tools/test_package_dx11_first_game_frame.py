@@ -239,8 +239,22 @@ def test_raw_visual_native_source_contract():
     ):
         if required not in source:
             raise AssertionError("RAW native source safety missing: " + required)
+    # The legacy readback required DO_NOT_WAIT for every staging Map. RAW
+    # now permits a synchronous Map ONLY after the real native Draw's ordered
+    # GPU-copy completion event, and only with a bounded 24ms diagnostic wait.
+    # Preserve this stronger ready-before-Map invariant rather than requiring
+    # the older exact flag string that now rejects a legal implementation.
+    if not (header.find("native_raw_wait_gpu_copy(") <
+            header.find("if (done == NativeRawGpuWaitResult::Complete)") <
+            header.find("ctx->Map(baseline_.Get()") <
+            header.find("ctx->Map(staging_.Get()")):
+        raise AssertionError("RAW staging Map must follow bounded GPU event completion")
     for required in (
-        "D3D11_MAP_FLAG_DO_NOT_WAIT",
+        "native_raw_wait_gpu_copy(",
+        "NativeRawGpuWaitResult::Complete",
+        "NativeRawGpuWaitResult::Pending",
+        "D3D11_MAP_READ, 0u",
+        "24000u",
         "D3D11_ASYNC_GETDATA_DONOTFLUSH",
         "GetDevice(actual.GetAddressOf())",
         "CopySubresourceRegion(",
