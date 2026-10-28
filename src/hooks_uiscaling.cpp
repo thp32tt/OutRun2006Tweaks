@@ -383,10 +383,10 @@ class UIScaling : public Hook
     // sibling HUD owner at source, never by promoting all generic 2D draws.
     // This group is wholly inside the original 0x97000..0x98000 result
     // presentation code, not world decals or the final static GOAL helpers.
-    // REA and SHA-pinned E8 disassembly: mode 1/9 uses 0x2C00B4,
-    // mode 0/7/8 uses 0x2C00B5. 0x98AC6 instead creates the mode=2
-    // 0x2C006C animation and MUST NOT inherit +TIME ScreenHud ownership.
-    // Other modes and the separate 0x97xxx GOAL producers stay untouched.
+    // 2026-10-29 correction: the 0x989xx group below belongs to the
+    // 0x498670 GOAL result time/score panel.  It remains temporarily wired
+    // to the historical owner to avoid a GOAL regression before HMD retest.
+    // True live checkpoint +TIME is separately bracketed at BD217/BD221.
     static constexpr int StageExtensionSpraniCalls[] = {
         0x9898E, 0x98A36
     };
@@ -400,6 +400,13 @@ class UIScaling : public Hook
     static constexpr int StageExtensionPrintCalls[] = {
         0x989AD, 0x98A10, 0x98A89
     };
+    // Canonical 2026-10-29 EXE proof: 4BD0A0 first checks 8446E8 > 0.
+    // Its variant 0/1 live checkpoint popup then executes the exact
+    // E8 at EXE+0xBD217 -> 0x4B9320.  EXE+0xBD21C is a shared branch
+    // target, so never place a CALL+5 leave hook there.  The common
+    // function exit is the isolated RET at EXE+0xBD221.
+    static constexpr int LiveStageExtensionCallRva = 0xBD217;
+    static constexpr int LiveStageExtensionLeaveRva = 0xBD221;
     static constexpr int ResultTextB9200Calls[] = {
         0x973AF, 0x97422, 0x974D0, 0x97544,
         0x97664, 0x97675, 0x9769E, 0x976B2, 0x976F4,
@@ -2108,6 +2115,9 @@ class UIScaling : public Hook
         std::size(StageExtensionPrintCalls)]{};
     inline static SafetyHookMid StageExtensionPrintLeaveHooks[
         std::size(StageExtensionPrintCalls)]{};
+    inline static SafetyHookMid LiveStageExtensionEnterHook{};
+    inline static SafetyHookMid LiveStageExtensionLeaveHook{};
+    inline static thread_local bool StageExtensionLiveNaviSource = false;
     inline static thread_local unsigned StageExtensionDepth = 0;
     inline static thread_local OutRunVR::GameSemantic::RenderScope
         StageExtensionSavedScope = OutRunVR::GameSemantic::RenderScope::None;
@@ -2365,6 +2375,24 @@ class UIScaling : public Hook
         StageExtensionRootsBefore = {};
         StageExtensionEntrySerial = 0;
         StageExtensionAdmission = {};
+    }
+
+    static void LiveStageExtensionEnter(safetyhook::Context& ctx)
+    {
+        StageExtensionLiveNaviSource = true;
+        if (Settings::VRTelemetry)
+            spdlog::info(
+                "VR TRACE PLUS_TIME LIVE NAVI ENTRY: callRva=0xBD217 target=0xB9320 leaveRva=0xBD221");
+        StageExtensionEnter(ctx);
+    }
+
+    static void LiveStageExtensionLeave(safetyhook::Context& ctx)
+    {
+        StageExtensionLeave(ctx);
+        if (Settings::VRTelemetry)
+            spdlog::info(
+                "VR TRACE PLUS_TIME LIVE NAVI EXIT: leaveRva=0xBD221");
+        StageExtensionLiveNaviSource = false;
     }
 
     // The original GOAL animations print the large white record and
@@ -3677,6 +3705,26 @@ public:
         else
             spdlog::info(
                 "VR P0 +TIME: 2 extension sprani + 3 print E8 parents -> SCREEN_HUD; mode2 0x2C006C untouched");
+
+        // True live checkpoint +TIME source.  The old 0x989xx group above
+        // is retained only as existing GOAL result-panel compatibility until
+        // HMD retest; it is not the source proof for this Navi popup.
+        LiveStageExtensionEnterHook = safetyhook::create_mid(
+            Module::exe_ptr(LiveStageExtensionCallRva),
+            LiveStageExtensionEnter);
+        LiveStageExtensionLeaveHook = safetyhook::create_mid(
+            Module::exe_ptr(LiveStageExtensionLeaveRva),
+            LiveStageExtensionLeave);
+        if (!LiveStageExtensionEnterHook || !LiveStageExtensionLeaveHook)
+        {
+            LiveStageExtensionEnterHook = {};
+            LiveStageExtensionLeaveHook = {};
+            spdlog::error(
+                "VR P0 +TIME LIVE: exact BD217->4B9320 / BD221 RET boundary incomplete; native path retained");
+        }
+        else
+            spdlog::info(
+                "VR P0 +TIME LIVE: exact EXE+0xBD217 -> 0x4B9320 bracketed through safe EXE+0xBD221 RET");
 
         // Exact source RVA comparison against 2026-10-11 user minidump:
         // first result crash EIP 0x97C5F = inside old E9 displacement from
