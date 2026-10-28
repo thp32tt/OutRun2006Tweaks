@@ -139,7 +139,8 @@ required = {
     ]),
     "Reset epoch join": (reset_trace + ex_upgrade + renderer + graphics + ui, [
         "struct Snapshot",
-        "trace.resetSerial = OutRunVR::D3D9ResetTrace::Publish(trace);",
+        "trace.resetSerial =",
+        "OutRunVR::D3D9ResetTrace::Publish(trace);",
         "VR D3D9Ex RESET TRACE: resetEpoch=",
         "contract=XR_RESET_EPOCH_V3",
         "OutRunVR::D3D9ResetTrace::Read()",
@@ -187,6 +188,7 @@ for label, (body, needles) in required.items():
 assert "resetViewportMatchesPre" not in renderer
 assert "NextResetSerial()" not in reset_trace
 assert "NextResetSerial()" not in ex_upgrade
+assert ex_upgrade.index("trace.resetSerial =") < ex_upgrade.index("OutRunVR::D3D9ResetTrace::Publish(trace);")
 for token in (
     "lensResetTrace.readStable",
     "resetViewportExtentMatchesPre",
