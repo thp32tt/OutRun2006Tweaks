@@ -17,6 +17,7 @@ on:
       - 'tools/verify_vr_f11_font_density.py'
       - 'tools/verify_vr_r26_landscape_visual_recovery.py'
       - 'tools/verify_focus_official_diagnostics.py'
+      - 'tools/verify_dx9ex_full_visual_trace_contract.py'
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
@@ -54,6 +55,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'R26 visual recovery bundle contract failed' }
           python tools/verify_vr_r26_stage_fixedfn.py
           if ($LASTEXITCODE -ne 0) { throw '+TIME four-API source regression failed' }
+          python tools/verify_dx9ex_full_visual_trace_contract.py
+          if ($LASTEXITCODE -ne 0) { throw 'One-pass FULL visual trace contract failed' }
 
       - name: Configure Win32 R26+HUD
         shell: pwsh

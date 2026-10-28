@@ -125,8 +125,8 @@ try {
     @(
       "hostFullTracePresent=$([int](Test-Path -LiteralPath $hostFullTrace))",
       "hostFullTraceBytes=$((if (Test-Path -LiteralPath $hostFullTrace) { (Get-Item -LiteralPath $hostFullTrace).Length } else { 0 }))",
-      'expectedHostMarkers=HOST PROJECTION BLIT FULL; XR FRAME FULL; XR EYE FULL actual FRESH/CACHED submitted view with source frame/pose',
-      'expectedGameMarkers=LENS SOURCE/C64/R30/GPU/MATRIX/PIPELINE/STEREO_POSE/DRAW_CALL; PLUS_TIME/GOAL_PERCENT QUEUE/R62/GPU/MATRIX/EYES/PIPELINE/STEREO_POSE; FRAME_PUBLISH_FULL',
+      'expectedHostMarkers=HOST PROJECTION BLIT FULL; XR FRAME FULL; XR EYE FULL actual FRESH/CACHED submitted view with source frame/pose/QPC/head/reference-space',
+      'expectedGameMarkers=LENS SOURCE/C64/R30/GPU/MATRIX/DRAW_CALL + PIPELINE/FIXEDFN/TARGET/TEXTURE/SHADER_CONSTANTS/STEREO_POSE; PLUS_TIME/GOAL_PERCENT SOURCE/QUEUE/HUD_NODE/D3DX/R62/GPU/MATRIX/EYES; GOAL_TEXT; FRAME_PUBLISH_FULL',
       'performancePolicy=VISUAL_FIX_FIRST_UNTHROTTLED_TRACE'
     ) | Set-Content -LiteralPath (Join-Path $session 'FULL_TRACE_STATUS.txt') -Encoding UTF8
     $logZip = Join-Path $logRoot ("DX9EX_LOG_{0}_{1}.zip" -f $variant,$stamp)
