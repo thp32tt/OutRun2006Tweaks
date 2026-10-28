@@ -5845,6 +5845,40 @@ namespace OutRunVRStereo
 
             IDirect3DSurface9* savedRt = TrackedRenderTarget;
             IDirect3DSurface9* savedDepth = TrackedDepthStencil;
+            std::uintptr_t lensLeftRtPtr = 0;
+            std::uintptr_t lensRightRtPtr = 0;
+            UINT lensLeftRtWidth = 0;
+            UINT lensLeftRtHeight = 0;
+            UINT lensRightRtWidth = 0;
+            UINT lensRightRtHeight = 0;
+            D3DFORMAT lensLeftRtFormat = D3DFMT_UNKNOWN;
+            D3DFORMAT lensRightRtFormat = D3DFMT_UNKNOWN;
+            if (lensPhysicalCandidate)
+            {
+                if (savedRt)
+                {
+                    lensLeftRtPtr = reinterpret_cast<std::uintptr_t>(savedRt);
+                    D3DSURFACE_DESC desc{};
+                    if (SUCCEEDED(savedRt->GetDesc(&desc)))
+                    {
+                        lensLeftRtWidth = desc.Width;
+                        lensLeftRtHeight = desc.Height;
+                        lensLeftRtFormat = desc.Format;
+                    }
+                }
+                if (RightEyeSurface)
+                {
+                    lensRightRtPtr =
+                        reinterpret_cast<std::uintptr_t>(RightEyeSurface);
+                    D3DSURFACE_DESC desc{};
+                    if (SUCCEEDED(RightEyeSurface->GetDesc(&desc)))
+                    {
+                        lensRightRtWidth = desc.Width;
+                        lensRightRtHeight = desc.Height;
+                        lensRightRtFormat = desc.Format;
+                    }
+                }
+            }
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -5913,7 +5947,10 @@ namespace OutRunVRStereo
                         "rightWvpHash=0x{:016X} sourceCallSerial={} "
                         "sequence={} sourceObj=0x{:X} sourceSite={} ordinal={} "
                         "provenance={} tex0=0x{:X} vb0=0x{:X} ib=0x{:X} "
-                        "colorWrite=0x{:X} eyeRT=LEFT_RIGHT_TRANSACTION",
+                        "colorWrite=0x{:X} "
+                        "leftRT=0x{:X} leftRTDesc={}x{}:{} "
+                        "rightRT=0x{:X} rightRTDesc={}x{}:{} sameRT={} "
+                        "eyeRT=LEFT_RIGHT_TRANSACTION",
                         n, TopLevelDrawSerial(), site ? site : "unknown",
                         static_cast<unsigned>(screenKind),
                         OutRunVR::GameSemantic::Name(lensPhysicalScope),
@@ -5931,7 +5968,13 @@ namespace OutRunVRStereo
                         lensSourceObject, lensSourceSite,
                         lensSourceOrdinal, lensSourceProvenance,
                         lensTexture0Ptr, lensVb0Ptr, lensIbPtr,
-                        static_cast<unsigned>(lensColorWrite));
+                        static_cast<unsigned>(lensColorWrite),
+                        lensLeftRtPtr, lensLeftRtWidth, lensLeftRtHeight,
+                        static_cast<unsigned>(lensLeftRtFormat),
+                        lensRightRtPtr, lensRightRtWidth, lensRightRtHeight,
+                        static_cast<unsigned>(lensRightRtFormat),
+                        lensLeftRtPtr != 0 &&
+                            lensLeftRtPtr == lensRightRtPtr ? 1 : 0);
             }
 
             // Only a submitted RIGHT Draw with the original state restored
