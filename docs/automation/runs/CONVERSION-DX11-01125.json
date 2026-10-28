@@ -1,0 +1,199 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01125",
+  "production_id": "CONVERSION-DX11-01125",
+  "event_id": "CONVERSION-DX11-01125-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01125",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:AUTHENTIC_CHANGED_PIXEL_SMALL_CROP",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "c6_score_change": 0,
+  "source_base_sha": "06b636b10fbe6808cad48302047a35a198fb28a2",
+  "source_change_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+  "material_result_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+  "validation_bearing_result_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+  "result_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+  "implementation_commits": [
+    "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1"
+  ],
+  "repair_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_partial_present_tile.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_D3D9_GAME_DRAW",
+      "PAIRED_NATIVE_D3D11_PRE_POST_GPU_READBACK",
+      "REAL_CHANGED_PIXEL_AWARE_SMALL_CROP_RETARGET",
+      "VISIBLE_INCOMPLETE_RAW_GPU_DIAGNOSTIC"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "NATIVE_D3D11_GPU_DRAW",
+      "VISIBLE_SOURCE_OWNED_PARTIAL_GPU_PIXELS"
+    ],
+    "batch_components": [
+      "CXX_GPU_CHANGED_PIXEL_SELECTION",
+      "CXX_SOURCE_SUBTILE_RETARGET_WITHOUT_DESTINATION_OVERFLOW",
+      "CXX_NON_OCCLUSIVE_INCOMPLETE_BORDER",
+      "PORTABLE_POSITIVE_NEGATIVE_CHANGED_CROP_REGRESSION"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED only: opt-in authentic changed GPU Draw pixels can select a valid small D3D9 Present subsection; real game visible pixels, full native game frame and HMD stereo UNTESTED.",
+    "activation_guard_and_fallback": "Original D3D9 render/input/FFB and DX9Ex fallback unchanged; RAW diagnostic opt-in only, no full-frame/native OpenXR promotion and no DXVK edit.",
+    "acceptance_proof": {
+      "positive_probe": "Native 256x144 GPU before/after changed pixel at (250,130) retargets source subcrop from (112,56) to (224,112) inside authentic 48x48 game Present; actual changed GPU RGB is not overwritten by magenta.",
+      "negative_regression": "Reject invalid changed coordinates and source bounds; keep original Present destination and only report sampled source-authentic GPU RGB deltas, never a stale clear or extrapolated region.",
+      "component_integration": "Live Draw pre/post paired native GPU copy -> bounded real changed source crop -> D3D9 opt-in UpdateSurface; five required exact-SHA Gates passed."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve visible source-authentic native GPU pixel evidence within the smallest safe cropped D3D9 game Presents, without obscuring real changed pixels with the INCOMPLETE marker.",
+    "acceptance_items": [
+      {
+        "id": "authentic_changed_pixel_visible_small_crop",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_GPU_DRAW_SMALL_GAME_PRESENT",
+        "expected_behavior": "Retarget source tile if center misses all genuine changed GPU Draw pixels."
+      },
+      {
+        "id": "label_and_fallback_regression",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_PRESENT_INPUT_FFB_PROTECTION",
+        "expected_behavior": "Preserve actual source pixel RGB against magenta border overwrite; fixed destination/source bounds, original renderer/input/FFB unchanged."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_GITHUB_ACTIONS",
+        "expected_behavior": "All five required push workflow runs success on identical validation-bearing material SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "authentic_changed_pixel_visible_small_crop": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_partial_present_tile.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #40615891430; changed-pixel constexpr positive/negative regression",
+      "runtime_validation": "UNTESTED"
+    },
+    "label_and_fallback_regression": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_partial_present_tile.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "Windows Build #40615891467",
+      "runtime_validation": "UNTESTED"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40615891430",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40615891556"
+      ],
+      "validation_command": "Five required push GitHub Actions completed/success at d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS remote HEAD 06b636b + 01124 finished owner/C6",
+    "C1_REVIEW": "PASS original small source crop sampled center and GPU changed pixel lost in source subrectangle or magenta border",
+    "C2_IMPLEMENT": "PASS substantive C++ source retarget + authentic RGB preservation, regression d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+    "C3_VALIDATE": "PASS all five required exact-SHA GitHub Actions on d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+    "C4_COMMIT": "PASS non-force material push d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1, contains marker [AUTO:CONVERSION-DX11-01125]",
+    "C5_PACKAGE": "PASS source matched Build artifact 12785691242; game/HMD UNTESTED",
+    "C6_STATE": "PASS separate bookkeeping after all five Gates; no second task score"
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40615891430,
+      "event": "push",
+      "head_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40615891556,
+      "event": "push",
+      "head_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40615891467,
+      "event": "push",
+      "head_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40615891434,
+      "event": "push",
+      "head_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40615891608,
+      "event": "push",
+      "head_sha": "d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-d5d34678ba30eb20ea9ba3dde2243012c0b5f7d1",
+    "artifact_id": 12785691242,
+    "run_id": 40615891467
+  },
+  "runtime_evidence": {
+    "native_draws": "UNTESTED_AT_THIS_SHA",
+    "native_gpu_pixel_output": "UNTESTED_AT_THIS_SHA",
+    "publishedBackbufferFrames": "UNTESTED_AT_THIS_SHA",
+    "gpu_desktop_frames": "UNTESTED_AT_THIS_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "next_action": "Use this exact source-matched RAW desktop package for real menu/car/race game GPU draw pixels and source crop visibility, then complete native full frame and separate L/R Quest3/VDXR; never present raw partial tile as full native game frame.",
+  "scoreboard_authority": {
+    "repository": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "path": "AI_SCOREBOARD.md",
+    "previous_confirmed_ai2": 2063,
+    "score_increment_for_this_distinct_source_and_gate_achievement": 1,
+    "score_increment_for_this_c6": 0
+  },
+  "c6_note": "Only one independent source-integrated result; readback, C6, retry, baseline regressions and CI bookkeeping add 0. No real-game/HMD PASS or measured developer-time percentages claimed."
+}
