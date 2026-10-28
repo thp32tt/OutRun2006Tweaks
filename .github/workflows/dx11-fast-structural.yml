@@ -684,6 +684,7 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_present_coverage_test.cpp -o /tmp/dx11_raw_present_01123 && /tmp/dx11_raw_present_01123
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_partial_present_tile_test.cpp -o /tmp/dx11_raw_partial_01124 && /tmp/dx11_raw_partial_01124
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_changed_crop_present_test.cpp -o /tmp/dx11_raw_changed_crop_01125 && /tmp/dx11_raw_changed_crop_01125
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_changed_pixel_window_test.cpp -o /tmp/dx11_raw_changed_window_01126 && /tmp/dx11_raw_changed_window_01126
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
           # Native L/R partial-depth GPU Draw is a separate non-evidence

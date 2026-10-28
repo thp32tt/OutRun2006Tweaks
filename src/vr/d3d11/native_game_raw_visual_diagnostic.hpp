@@ -14,6 +14,7 @@
 #include "native_game_raw_draw_tile.hpp"
 #include "native_game_raw_draw_pair.hpp"
 #include "native_game_raw_partial_present_tile.hpp"
+#include "native_game_raw_changed_pixel_window.hpp"
 
 namespace outrun::vr::dx11 {
 enum class NativeRawPreviewResult {
@@ -91,68 +92,21 @@ public:
                     ctx->Unmap(baseline_.Get(), 0);
                     return NativeRawPreviewResult::GpuFailure;
                 }
-                // Match the visible crop to real pre/post native GPU pixel
-                // changes, not a fixed center that may miss every small
-                // vehicle/menu fragment. Read only already-mapped snapshots.
-                bool sawChangedGpuPixel = false;
-                UINT closestChangedX = 0u, closestChangedY = 0u;
-                std::uint64_t closestDistance =
-                    (std::numeric_limits<std::uint64_t>::max)();
-                const std::uint32_t centerX =
-                    visibleTile.sourceX + visibleTile.copyWidth / 2u;
-                const std::uint32_t centerY =
-                    visibleTile.sourceY + visibleTile.copyHeight / 2u;
-                for (UINT y = 0; y < height; ++y) {
-                    const auto* afterRow = static_cast<const std::uint8_t*>(mapped.pData) +
-                        static_cast<std::size_t>(y) * mapped.RowPitch;
-                    const auto* beforeRow = static_cast<const std::uint8_t*>(before.pData) +
-                        static_cast<std::size_t>(y) * before.RowPitch;
-                    for (UINT x = 0; x < width; ++x) {
-                        if (!native_raw_rgb_changed(beforeRow + 4u * x,
-                                                    afterRow + 4u * x))
-                            continue;
-                        sawChangedGpuPixel = true;
-                        const auto dx = x > centerX ? x - centerX : centerX - x;
-                        const auto dy = y > centerY ? y - centerY : centerY - y;
-                        const auto distance = std::uint64_t{dx} + dy;
-                        if (distance < closestDistance) {
-                            closestDistance = distance;
-                            closestChangedX = x;
-                            closestChangedY = y;
-                        }
-                        if (x >= visibleTile.sourceX &&
-                            x - visibleTile.sourceX < visibleTile.copyWidth &&
-                            y >= visibleTile.sourceY &&
-                            y - visibleTile.sourceY < visibleTile.copyHeight)
-                            ++nativePixels;
-                    }
+                // The centered crop can contain one changed GPU pixel while
+                // the actual vehicle/menu Draw produced hundreds elsewhere.
+                // Choose the densest source-authentic GPU RGB subset, without
+                // scaling, inventing pixels, moving the D3D9 destination, or
+                // treating this incomplete RAW tile as a whole native frame.
+                changedWindow_.capture(before.pData, before.RowPitch,
+                                       mapped.pData, mapped.RowPitch);
+                NativeRawPresentTile bestVisibleTile{};
+                if (!changedWindow_.select(visibleTile, bestVisibleTile,
+                                           nativePixels)) {
+                    ctx->Unmap(baseline_.Get(), 0);
+                    ctx->Unmap(staging_.Get(), 0);
+                    return NativeRawPreviewResult::UnsafePresent;
                 }
-                // A tiny authenticated D3D9 Present crop can intersect only
-                // 32x32 of a 256x144 native GPU tile. Do not report no native
-                // Draw merely because the genuine changed pixels fell outside
-                // the originally centered, yet otherwise valid, subsection.
-                if (!nativePixels && sawChangedGpuPixel) {
-                    NativeRawPresentTile retargeted{};
-                    if (native_raw_retarget_present_tile(
-                            visibleTile, width, height,
-                            closestChangedX, closestChangedY, retargeted)) {
-                        visibleTile = retargeted;
-                        for (UINT y = visibleTile.sourceY;
-                             y < visibleTile.sourceY + visibleTile.copyHeight; ++y) {
-                            const auto* afterRow =
-                                static_cast<const std::uint8_t*>(mapped.pData) +
-                                static_cast<std::size_t>(y) * mapped.RowPitch;
-                            const auto* beforeRow =
-                                static_cast<const std::uint8_t*>(before.pData) +
-                                static_cast<std::size_t>(y) * before.RowPitch;
-                            for (UINT x = visibleTile.sourceX;
-                                 x < visibleTile.sourceX + visibleTile.copyWidth; ++x)
-                                if (native_raw_rgb_changed(beforeRow + 4u * x,
-                                                           afterRow + 4u * x))
-                                    ++nativePixels;
-                        }
-                    }
-                }
+                visibleTile = bestVisibleTile;
                 if (nativePixels) {
                     if (!surface_ || format_ != back.Format) {
                         surface_.Reset();
@@ -363,5 +317,6 @@ private:
     std::uint64_t lastDraws_ = 0, capture_ = 0;
     bool pending_ = false;
     NativeRawGpuCaptureEpoch captureEpoch_{};
+    NativeRawChangedPixelWindow changedWindow_{};
 };
 } // namespace outrun::vr::dx11
