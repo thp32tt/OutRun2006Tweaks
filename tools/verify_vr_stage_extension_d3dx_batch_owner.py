@@ -58,6 +58,14 @@ def check(code: str, header: str) -> list[str]:
          "StageExtensionPrintCalls[]" in source and
          "0x989AD, 0x98A10, 0x98A89" in source,
          "five original +TIME source edges or REA mode ownership changed")
+    need("LiveStageExtensionCallRva = 0xBD217" in source and
+         "LiveStageExtensionLeaveRva = 0xBD221" in source and
+         "Module::exe_ptr(LiveStageExtensionCallRva)" in source and
+         "Module::exe_ptr(LiveStageExtensionLeaveRva)" in source and
+         "LiveStageExtensionEnter" in source and
+         "LiveStageExtensionLeave" in source and
+         "VR TRACE PLUS_TIME LIVE NAVI ENTRY:" in source,
+         "canonical live Navi +TIME BD217/BD221 boundary missing")
     stage_enter = source[source.find("static void StageExtensionEnter("):
                          source.find("static void StageExtensionLeave(")]
     need("FlushD3DXBeforeDirectStageSource();" in stage_enter and
@@ -952,7 +960,14 @@ def main_current_ledger(code: str, header: str) -> int:
     if mutant == code or not check_current_ledger(mutant, header, ledger):
         print("DX9Ex +TIME REA FAIL: mode=2 animation relabel mutation escaped")
         return 1
-    # Deliberately remove the *physical* raw-game WVP source stamp in
+        live_mutant = code.replace(
+        "LiveStageExtensionCallRva = 0xBD217",
+        "LiveStageExtensionCallRva = 0xBD216", 1)
+    if live_mutant == code or not check_current_ledger(
+            live_mutant, header, ledger):
+        print("DX9Ex +TIME LIVE FAIL: BD217 source mutation escaped")
+        return 1
+# Deliberately remove the *physical* raw-game WVP source stamp in
     # R30 only. R33 remaining intact cannot mask loss of XYZRHW stereo proof.
     capture_begin = renderer.find("        bool R30CaptureStagePhysicalSource(")
     capture_end = renderer.find("        bool R30CaptureGoalPhysicalSource(", capture_begin)

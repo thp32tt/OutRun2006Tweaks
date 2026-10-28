@@ -55,6 +55,9 @@ STAGE_CALL_EDGES = (
     (0x98AC6, 0x29530, "mode-2 animated sprite (not B4/B5)"),
 )
 STAGE_MODE2_JUMP_CASES = (0x98ABC, 0x98C42, 0x98C97, 0x98CD9)
+LIVE_STAGE_CALL_RVA = 0xBD217
+LIVE_STAGE_TARGET_RVA = 0xB9320
+LIVE_STAGE_LEAVE_RVA = 0xBD221
 
 
 def verify_stage_source_hook_boundary(source: str) -> None:
@@ -70,6 +73,10 @@ def verify_stage_source_hook_boundary(source: str) -> None:
         "REA mode-2 0x98AC6 must NOT inherit +TIME ScreenHud ownership")
     assert "0x98AC6" in source, "REA mode-2 source separation context missing"
     assert "0x989AD, 0x98A10, 0x98A89" in source
+    assert "LiveStageExtensionCallRva = 0xBD217" in source
+    assert "LiveStageExtensionLeaveRva = 0xBD221" in source
+    assert "Module::exe_ptr(LiveStageExtensionCallRva)" in source
+    assert "Module::exe_ptr(LiveStageExtensionLeaveRva)" in source
 
 
 def verify_stage_original_binary(pe, source: str) -> list[str]:
@@ -105,7 +112,14 @@ def verify_stage_original_binary(pe, source: str) -> list[str]:
         f"mode-2 selector jump table changed: {actual_cases!r}")
     assert 0x98ABC < 0x98AC6 < 0x98C42, (
         "0x98AC6 no longer belongs to the mode-2 branch")
+    live = read(LIVE_STAGE_CALL_RVA, 5)
+    assert len(live) == 5 and live[0] == 0xE8, "live +TIME expected E8 at 0xBD217"
+    live_target = (LIVE_STAGE_CALL_RVA + 5 + unpack("<i", live[1:])[0]) & 0xFFFFFFFF
+    assert live_target == LIVE_STAGE_TARGET_RVA, f"live +TIME expected 0xB9320, found {live_target:#x}"
+    assert read(LIVE_STAGE_LEAVE_RVA, 5) == bytes((0xC3, 0xCC, 0xCC, 0xCC, 0xCC)), "live +TIME safe leave RET/padding changed"
     facts.extend((
+        "- Live checkpoint +TIME: RVA 0xBD217 -> 0xB9320 after 4BD0A0 proves 8446E8 > 0 and variant 0/1.",
+        "- Safe live +TIME leave is RVA 0xBD221 RET plus INT3 padding; 0xBD21C is a shared branch target.",
         "- 0x98958 JNZ lands at RVA 0x98A18, inside an unsafe 5-byte "
         "detour beginning at 0x98A15; current source uses the safe 0x98A18 hook.",
         "- 0x98FFC mode-2 state jump table is 0x98ABC / 0x98C42 / "
