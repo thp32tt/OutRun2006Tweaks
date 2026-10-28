@@ -609,7 +609,14 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
     need("0x9898E, 0x98A36"  in pre and
          "0x989AD, 0x98A10, 0x98A89" in pre and
          "TagAppendedNodes(StageExtensionBefore" in pre,
-         "five exact +TIME sprite/numeric parents survive")
+         "legacy GOAL result-panel compatibility owners survive")
+    need("LiveStageExtensionCallRva = 0xBD217" in pre and
+         "LiveStageExtensionLeaveRva = 0xBD221" in pre and
+         "Module::exe_ptr(LiveStageExtensionCallRva)" in pre and
+         "Module::exe_ptr(LiveStageExtensionLeaveRva)" in pre and
+         "VR TRACE PLUS_TIME LIVE NAVI ENTRY:" in pre and
+         "VR TRACE PLUS_TIME LIVE NAVI EXIT:" in pre,
+         "true live Navi +TIME BD217/BD221 boundary missing")
     need("FlushD3DXBeforeDirectStageSource();" in pre and
          "FlushD3DXAtDirectStageSourceExit();" in pre and
          "StageExtensionDirectDrawOwner.reset();" in pre,
