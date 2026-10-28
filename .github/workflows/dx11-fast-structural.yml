@@ -42,6 +42,10 @@ on:
       # either its production boundary probe or checked-in C++ fixture changes.
       - 'tools/dx11_game_primitive_span_probe.cpp'
       - 'tests/vr/dx11_live_sm3_native_point_strip_windows.cpp'
+      # RAW same-Present TARGET Clear ownership and per-Present attempt budget
+      # regressions must trigger all required checks at their exact repaired SHA.
+      - 'tests/native_raw_source_probe_schedule_test.cpp'
+      - 'tests/native_raw_gpu_source_epoch_test.cpp'
       - 'tools/dx11_native_frame_batch_probe.cpp'
       # The real desktop GPU output restoration probe must trigger exact-SHA Fast.
       - 'tools/dx11_native_desktop_gpu_output_probe.cpp'
