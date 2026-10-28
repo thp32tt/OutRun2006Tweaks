@@ -122,26 +122,57 @@ struct NativeRawPresentDirtyRegion {
      // member anywhere in the region prevents publication.
      bool found = false;
      std::uint64_t largestArea = 0u;
-     for (std::uint32_t i = 0u;
-          i < dirty.count && i < NativeRawPresentDirtyRegion::kMaxRects; ++i) {
-         const auto& rect = dirty.rectangles[i];
-         const auto left = (std::max)(cropLeft, rect.left);
-         const auto top = (std::max)(cropTop, rect.top);
-         const auto right = (std::min)(cropRight, rect.right);
-         const auto bottom = (std::min)(cropBottom, rect.bottom);
+     // D3D9 RGNDATA can split one repainted menu area into several
+     // adjacent rectangles. The individual rectangles may each be too
+     // small for a 24x24 RAW crop even when their authenticated UNION is
+     // sufficient. The candidate is NEVER trusted just because its
+     // bounding box intersects the Present: check every painted pixel
+     // through native_raw_dirty_region_covers_tile before accepting it.
+     const auto consider = [&](std::int64_t left, std::int64_t top,
+                               std::int64_t right,
+                               std::int64_t bottom) noexcept {
          NativeRawPresentTile candidate{};
          if (!native_raw_partial_present_tile(
                  backWidth, backHeight, left, top, right, bottom,
-                 sourceWidth, sourceHeight, candidate) ||
-             !native_raw_dirty_region_covers_tile(
-                 backWidth, backHeight, dirty, candidate))
-             continue;
+                 sourceWidth, sourceHeight, candidate))
+             return;
          const auto area = std::uint64_t{candidate.copyWidth} *
                            candidate.copyHeight;
-         if (!found || area > largestArea) {
-             found = true;
-             largestArea = area;
-             placed = candidate;
+         if ((found && area <= largestArea) ||
+             !native_raw_dirty_region_covers_tile(
+                 backWidth, backHeight, dirty, candidate))
+             return;
+         found = true;
+         largestArea = area;
+         placed = candidate;
+     };
+     // Fast path for a complete, possibly fragmented source repaint.
+     // A forged rcBound, gap or out-of-bounds member fails the union test.
+     consider((std::max)(cropLeft, dirty.boundLeft),
+              (std::max)(cropTop, dirty.boundTop),
+              (std::min)(cropRight, dirty.boundRight),
+              (std::min)(cropBottom, dirty.boundBottom));
+     for (std::uint32_t i = 0u;
+          i < dirty.count && i < NativeRawPresentDirtyRegion::kMaxRects; ++i) {
+         const auto& rect = dirty.rectangles[i];
+         consider((std::max)(cropLeft, rect.left),
+                  (std::max)(cropTop, rect.top),
+                  (std::min)(cropRight, rect.right),
+                  (std::min)(cropBottom, rect.bottom));
+     }
+     // A separate dirty outlier can make rcBound too wide to contain an
+     // admissible tile. Recover adjoining pairs, with a strict bound of
+     // 28 additional candidates and the same per-pixel union proof.
+     if (dirty.count >= 2u && dirty.count <= 8u) {
+         for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+             for (std::uint32_t j = i + 1u; j < dirty.count; ++j) {
+                 const auto& a = dirty.rectangles[i];
+                 const auto& b = dirty.rectangles[j];
+                 consider((std::max)(cropLeft, (std::min)(a.left, b.left)),
+                          (std::max)(cropTop, (std::min)(a.top, b.top)),
+                          (std::min)(cropRight, (std::max)(a.right, b.right)),
+                          (std::min)(cropBottom, (std::max)(a.bottom, b.bottom)));
+             }
          }
      }
      return found;

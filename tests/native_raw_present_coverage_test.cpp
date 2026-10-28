@@ -117,3 +117,60 @@ static_assert(kRawDirtyTileProof, "RAW dirty-region tile proof must fail closed"
  }();
  static_assert(kRawDirtyPlacementProof,
                "RAW GPU visibility requires actual D3D9 dirty repaint");
+
+
+// A legitimate D3D9 dirty UNION can show native GPU RGB where every member
+// rectangle by itself is too narrow/short. A missing pixel must still block
+// the whole RAW diagnostic tile, regardless of a plausible rcBound.
+constexpr bool kRawDirtyFragmentUnionProof = []() constexpr {
+    using namespace outrun::vr::dx11;
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true;
+    dirty.count = 2u;
+    dirty.boundLeft = 600; dirty.boundTop = 300;
+    dirty.boundRight = 648; dirty.boundBottom = 348;
+    NativeRawPresentTile tile{};
+    // Horizontal split: each 24x48 rect fails the individual minimum.
+    dirty.rectangles[0] = {600, 300, 624, 348};
+    dirty.rectangles[1] = {624, 300, 648, 348};
+    const auto goodTile = [&]() constexpr {
+        return native_raw_dirty_region_place_tile(
+                   1920, 1080, 0, 0, 1920, 1080,
+                   dirty, 256, 144, tile) &&
+               tile.copyWidth == 32u && tile.copyHeight == 32u &&
+               tile.destinationX == 608 && tile.destinationY == 308 &&
+               native_raw_dirty_region_covers_tile(
+                   1920, 1080, dirty, tile);
+    };
+    if (!goodTile()) return false;
+    // Vertical split and exact-edge overlap are equally source-authentic.
+    dirty.rectangles[0] = {600, 300, 648, 324};
+    dirty.rectangles[1] = {600, 324, 648, 348};
+    if (!goodTile()) return false;
+    // Gap in the horizontal union cannot be treated as painted pixels.
+    dirty.rectangles[0] = {600, 300, 624, 348};
+    dirty.rectangles[1] = {625, 300, 648, 348};
+    if (native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080, dirty,
+            256, 144, tile)) return false;
+    // Two real adjoining fragments amid an unrelated small repaint:
+    // rcBound is too large, but the exact pair union still qualifies.
+    dirty.count = 3u;
+    dirty.rectangles[1] = {624, 300, 648, 348};
+    dirty.rectangles[2] = {1500, 700, 1516, 716};
+    dirty.boundRight = 1516; dirty.boundBottom = 716;
+    if (!goodTile()) return false;
+    // Extra unrelated rectangle must not conceal forged or missing paint.
+    dirty.rectangles[1] = {625, 300, 648, 348};
+    if (native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080, dirty,
+            256, 144, tile)) return false;
+    dirty.rectangles[1] = {624, 300, 648, 348};
+    dirty.rectangles[2] = {1500, 700, 2000, 716};
+    if (native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080, dirty,
+            256, 144, tile)) return false;
+    return true;
+}();
+static_assert(kRawDirtyFragmentUnionProof,
+              "RAW tiles require a painted D3D9 dirty union without gaps");
