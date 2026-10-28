@@ -54,7 +54,7 @@ assert 'VR LENS 570008 ORIGINAL BOTH DRAWN:' in gfx
 assert 'LensOuter570008Ordinal' in gfx
 assert 'if (Settings::VREnabled && objectId == 0x570008' in gfx
 assert 'ProducerToken::None);' in gfx
-assert 'VR R69 FLARE FUSION:' in r30
+assert 'VR R85 FLARE RAY:' in r30
 print('PASS R26 XR/UI + AA2 + rival/+TIME/GOAL/lens exact-owner recovery source contract; HMD UNTESTED')
 
 # Compile-shape guards for the XR/UI split source owner.
@@ -81,9 +81,10 @@ assert 'ProducerToken::ResultProgress,\n                nullptr, &rootsBefore, e
 stage_leave=ui[ui.index('static void StageExtensionLeave'):ui.index('// The original GOAL animations')]
 assert 'StageExtensionEntrySerial,\n                true' not in stage_leave
 assert 'StageExtensionEntrySerial);' in stage_leave
-# Quest E restores both original 570008 draw submissions; C993 retains
-# the independent head-corrected centre-eye matrix.
+# Quest E restores both original 570008 draw submissions; projected flare
+# families now retain one angular source while using each eye's asymmetric FOV.
 assert 'VR LENS 570008 ORIGINAL BOTH DRAWN:' in gfx
 assert 'if (ordinal == 2)' not in gfx
 assert 'identityEye = IdentityMatrix()' in r30
-assert 'mode=CENTRE_EYE_MONO_WORLD_LOCK' in r30
+assert 'stereo.eyeFov[eye]' in r30
+assert 'ProjectionFromFov(' in r30
