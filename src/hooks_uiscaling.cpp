@@ -2012,28 +2012,7 @@ class UIScaling : public Hook
         {
             StageExtensionEntrySerial = 0;
             StageExtensionRootsBefore = {};
-            if (Settings::VRTelemetry)
-        {
-            for (int p = 0; p < Game::SpritePriorityCount; ++p)
-            {
-                SpriteNode* root = Game::sprite_prio_root[p];
-                SpriteNode* after = root ? root->tail_4 : nullptr;
-                spdlog::info(
-                    "VR TRACE PLUS_TIME QUEUE EXIT FULL: priority={} "
-                    "entryRoot=0x{:X} entryTail=0x{:X} exitRoot=0x{:X} exitTail=0x{:X} "
-                    "changed={} entrySerial={} entryEpoch={} exitEpoch={} ticket={} admitted={}",
-                    p,
-                    reinterpret_cast<std::uintptr_t>(StageExtensionRootsBefore[p]),
-                    reinterpret_cast<std::uintptr_t>(StageExtensionBefore[p]),
-                    reinterpret_cast<std::uintptr_t>(root),
-                    reinterpret_cast<std::uintptr_t>(after),
-                    after && after != StageExtensionBefore[p] ? 1 : 0,
-                    StageExtensionEntrySerial,
-                    StageExtensionAdmission.queueEpochAtEntry,
-                    currentEpoch, sourceTicket, admitted ? 1 : 0);
-            }
-        }
-        StageExtensionBefore = {};
+            StageExtensionBefore = {};
         }
         // These five exact +TIME source E8 CALLs can synchronously draw text as
         // well as enqueue sprites. Post-call node tags only cover the latter.
@@ -2206,6 +2185,27 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
                 OutRunVR::GameSemantic::Name(stageScopeAtExit),
                 OutRunVR::GameSemantic::Name(stageProducerAtExit));
+        if (Settings::VRTelemetry)
+        {
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* root = Game::sprite_prio_root[p];
+                SpriteNode* after = root ? root->tail_4 : nullptr;
+                spdlog::info(
+                    "VR TRACE PLUS_TIME QUEUE EXIT FULL: priority={} "
+                    "entryRoot=0x{:X} entryTail=0x{:X} exitRoot=0x{:X} exitTail=0x{:X} "
+                    "changed={} entrySerial={} entryEpoch={} exitEpoch={} ticket={} admitted={}",
+                    p,
+                    reinterpret_cast<std::uintptr_t>(StageExtensionRootsBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(StageExtensionBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(root),
+                    reinterpret_cast<std::uintptr_t>(after),
+                    after && after != StageExtensionBefore[p] ? 1 : 0,
+                    StageExtensionEntrySerial,
+                    StageExtensionAdmission.queueEpochAtEntry,
+                    currentEpoch, sourceTicket, admitted ? 1 : 0);
+            }
+        }
         StageExtensionBefore = {};
         StageExtensionRootsBefore = {};
         StageExtensionEntrySerial = 0;
