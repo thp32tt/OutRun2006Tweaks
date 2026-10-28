@@ -10,6 +10,8 @@ renderer = read("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 present = read("src/vr/d3d9/stereo_renderer.cpp")
 graphics = read("src/hooks_graphics.cpp")
 ui = read("src/hooks_uiscaling.cpp")
+reset_trace = read("src/vr/d3d9/reset_trace.hpp")
+ex_upgrade = read("src/vr/d3d9/ex_device_upgrade.cpp")
 host_main = read("vrhost/src/main.cpp")
 host_r23 = read("vrhost/src/main_r23.cpp")
 host_r24 = read("vrhost/src/runtime/r24_black_screen_guard.hpp")
@@ -25,6 +27,9 @@ required = {
         "sequence={}",
         "ordinal={}",
         "alpha={:.9g}",
+        "resetEpoch={}",
+        "resetQpc={}",
+        "resetFlags=0x{:X}",
     ]),
     "lens ownership/GPU": (renderer, [
         "VR TRACE LENS C64 PROOF FULL:",
@@ -33,6 +38,9 @@ required = {
         "VR TRACE LENS GPU STATE FULL:",
         "VR TRACE LENS MATRIX FULL:",
         "VR TRACE LENS DRAW CALL FULL:",
+        "VR LENS R30 PHYSICAL EYES:",
+        "preViewport={},{},{}x{}",
+        "resetViewportMatchesPre={}",
     ]),
     "full D3D9 pipeline": (renderer, [
         "VR TRACE STEREO POSE FULL:",
@@ -61,6 +69,10 @@ required = {
         "VR TRACE HUD NODE0 FULL:",
         "VR TRACE HUD NODE1 FULL:",
         "VR TRACE D3DX DRAW FULL:",
+        "VR TRACE PLUS_TIME SOURCE EXIT:",
+        "VR TRACE GOAL_TIME SOURCE:",
+        "VR P0 GOAL B9200 ENTRY:",
+        "resetEpoch={}",
     ]),
     "time/goal physical eyes": (renderer, [
         "VR TRACE RESULT R62 ENTRY FULL:",
@@ -114,6 +126,16 @@ required = {
         "receiptAdvanced=",
         "r19ReceiptSerial=",
         "r19PoseSequence=",
+    ]),
+    "Reset epoch join": (reset_trace + ex_upgrade + renderer + graphics + ui, [
+        "struct Snapshot",
+        "NextResetSerial()",
+        "VR D3D9Ex RESET TRACE: resetEpoch=",
+        "contract=XR_RESET_EPOCH_V2",
+        "OutRunVR::D3D9ResetTrace::Read()",
+        "resetEpoch={}",
+        "resetQpc={}",
+        "resetFlags=0x{:X}",
     ]),
     "R19/R24 final receipt": (host_r19 + host_r24, [
         "LastEndFrameReceiptSerial",
