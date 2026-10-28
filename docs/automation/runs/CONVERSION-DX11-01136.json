@@ -8,8 +8,8 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:CANONICAL_SOURCE_RECTANGLE_OVERLAP",
   "classification": "A_SOURCE_IMPLEMENTATION_RENDER_PIXEL_PROVENANCE_CORRECTION",
-  "status": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
-  "checkpoint": "C6_EXACT_SHA_FIVE_GATES_COMPLETE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
@@ -190,5 +190,6 @@
     "C6_STATE": "PASS separate docs-only record after five-Gate completion, no source modification and no duplicate Gate"
   },
   "c6_score_change": 0,
-  "c6_note": "C6 status-only file on top of unchanged five-Gate exact-source material_result_sha, explicitly skip CI on docs-only. Independent material source score accounted exactly once; game/HMD untested."
+  "c6_note": "C6 status-only file on top of unchanged five-Gate exact-source material_result_sha, explicitly skip CI on docs-only. Independent material source score accounted exactly once; game/HMD untested.",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
