@@ -34,10 +34,19 @@ require(source.index("native_sm3_table_zfog_admission(") <
 for token in ("append_native_sm3_table_zfog(pixelHlsl, tableZFog)",
               "append_native_sm3_alpha_test(pixelHlsl, alphaCompare)"):
     require(token in backend, "native HLSL compile stage disconnected: " + token)
+# FVF active fog remains rejected in production. The only alternative
+# requires real D3D9 source getters + explicit RAW opt-in + bounded floats,
+# then poisons complete-frame publication after the authentic native Draw.
 for token in ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
               "D3DRS_FOGTABLEMODE", "D3DRS_FOGVERTEXMODE",
-              "if (!sourceFogInactive) return false"):
+              "sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&",
+              "native_raw_fvf_fog_visual_admission(",
+              "if (!output.rawFogVisualMismatch) return false;",
+              "if (output.rawFogVisualMismatch && s.issued > issuedBeforeFvf)",
+              "s.frameBatch.abort();"):
     require(token in bridge, "fixed-function live D3D9 fog fallback missing: " + token)
+require("if (rawFogOmitted) liveBatch.abort();" in source,
+        "SM3 incomplete RAW Fog Draw cannot certify a full native game frame")
 require("native_game_inert_fog_modes(tableMode, vertexMode)" in header,
         "shared programmable and FVF source equation classification absent")
 for token in ("LIVE_SM3_FOG_REJECT", "liveSm3FogRejectReasons",
