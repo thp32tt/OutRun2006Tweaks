@@ -35,6 +35,7 @@ namespace OutRunVR::D3D9ResetTrace
         std::int32_t scissorRight{};
         std::int32_t scissorBottom{};
         std::uint32_t flags{};
+        bool readStable{};
 
         constexpr bool has(Flags flag) const noexcept
         {
@@ -44,8 +45,10 @@ namespace OutRunVR::D3D9ResetTrace
 
     // Small lock-free cross-TU diagnostic snapshot. Generation is a seqlock:
     // odd means a Reset publisher is updating fields; even is stable.
+    inline std::atomic_flag Writer = ATOMIC_FLAG_INIT;
     inline std::atomic<std::uint64_t> Generation{0};
-    inline std::atomic<std::uint64_t> ResetSerial{0};
+    inline std::atomic<std::uint64_t> NextSerial{0};
+    inline std::atomic<std::uint64_t> PublishedResetSerial{0};
     inline std::atomic<std::int64_t> Qpc{0};
     inline std::atomic<std::uint32_t> RequestedWidth{0};
     inline std::atomic<std::uint32_t> RequestedHeight{0};
@@ -65,13 +68,18 @@ namespace OutRunVR::D3D9ResetTrace
 
     inline std::uint64_t NextResetSerial() noexcept
     {
-        return ResetSerial.fetch_add(1, std::memory_order_relaxed) + 1;
+        return NextSerial.fetch_add(1, std::memory_order_relaxed) + 1;
     }
 
     inline void Publish(const Snapshot& snapshot) noexcept
     {
+        // Reset is rare. Serialize publishers so Generation can never become
+        // even while another writer is still mutating the diagnostic fields.
+        while (Writer.test_and_set(std::memory_order_acquire))
+        {
+        }
         Generation.fetch_add(1, std::memory_order_acq_rel); // stable -> odd
-        ResetSerial.store(snapshot.resetSerial, std::memory_order_relaxed);
+        PublishedResetSerial.store(snapshot.resetSerial, std::memory_order_relaxed);
         Qpc.store(snapshot.qpc, std::memory_order_relaxed);
         RequestedWidth.store(snapshot.requestedWidth, std::memory_order_relaxed);
         RequestedHeight.store(snapshot.requestedHeight, std::memory_order_relaxed);
@@ -89,6 +97,7 @@ namespace OutRunVR::D3D9ResetTrace
         ScissorBottom.store(snapshot.scissorBottom, std::memory_order_relaxed);
         SnapshotFlags.store(snapshot.flags, std::memory_order_relaxed);
         Generation.fetch_add(1, std::memory_order_release); // odd -> stable
+        Writer.clear(std::memory_order_release);
     }
 
     inline Snapshot Read() noexcept
@@ -100,7 +109,8 @@ namespace OutRunVR::D3D9ResetTrace
                 continue;
 
             Snapshot snapshot{};
-            snapshot.resetSerial = ResetSerial.load(std::memory_order_relaxed);
+            snapshot.resetSerial =
+                PublishedResetSerial.load(std::memory_order_relaxed);
             snapshot.qpc = Qpc.load(std::memory_order_relaxed);
             snapshot.requestedWidth = RequestedWidth.load(std::memory_order_relaxed);
             snapshot.requestedHeight = RequestedHeight.load(std::memory_order_relaxed);
@@ -120,7 +130,10 @@ namespace OutRunVR::D3D9ResetTrace
 
             const auto after = Generation.load(std::memory_order_acquire);
             if (before == after && (after & 1u) == 0)
+            {
+                snapshot.readStable = true;
                 return snapshot;
+            }
         }
         return {};
     }
