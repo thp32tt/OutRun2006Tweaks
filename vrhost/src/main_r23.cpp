@@ -1112,9 +1112,11 @@ namespace
                 << " finalReceiptSerial=" << projectionFinalReceiptSerial
                 << " format=" << static_cast<unsigned>(projectionFormat)
                 << " transfer=" << (srgb ? "SRGB" : "LINEAR_OR_UNORM")
-                << " traceRevision=LENS_POST01549_R8"
+                << " traceRevision=LENS_POST01549_R9"
                 << " metricRole=SAME_INDEX_CONTROL_NOT_STEREO_CORRESPONDENCE"
                 << " coverage=UNIFORM_GRID_NOT_FLARE_CENSUS"
+                << " brightMetricRole=GLOBAL_BRIGHT_NEGATIVE_CONTROL_NOT_FLARE_ROI"
+                << " rawGridRetainedForOfflineFlareRoi=1"
                 << " grid=" << R23ProjectionSamplesX << "x"
                 << R23ProjectionSamplesY
                 << " finiteL=" << finite[0]
