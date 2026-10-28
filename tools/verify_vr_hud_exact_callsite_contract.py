@@ -763,11 +763,13 @@ def test_mutations(ui, manifest):
               ui.replace(goal_original,
                          '            return; // skipped exact original helper', 1))
     must_fail('GOAL post-drain admission bypassed',
-              ui.replace('        if (!admittedAfterDrain)\n',
-                         '        if (false)\n', 1))
+              ui[:goal_start] + goal_region.replace(
+                  '        if (!admittedAfterDrain)\n',
+                  '        if (false)\n', 1) + ui[goal_end:])
     must_fail('GOAL exit admission bypassed',
-              ui.replace('            if (admittedAtExit)\n',
-                         '            if (true)\n', 1))
+              ui[:goal_start] + goal_region.replace(
+                  '            if (admittedAtExit)\n',
+                  '            if (true)\n', 1) + ui[goal_end:])
     corrupt = copy.deepcopy(manifest)
     next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0x97BE4)['expectedBytes'] = 'e800000000' + '00'*11
     must_fail('original result E8 destination corrupted', changed_manifest=corrupt)
