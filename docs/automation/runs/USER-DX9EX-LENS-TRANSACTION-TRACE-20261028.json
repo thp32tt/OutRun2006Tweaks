@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "task_id": "USER-DX9EX-LENS-TRANSACTION-TRACE-20261028",
+  "source_mode": "CHAT_DIRECT",
+  "owner": "ChatGPT direct user session",
+  "lane": "DX9EX",
+  "attempt": 1,
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "006a44cf0185f260df04a25d3e63646a08154707",
+  "initial_base_sha": "c6b4140f1edfa714c7ef13a1ce261d0c9bd8fb1c",
+  "material_result_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+  "validation_bearing_result_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "score_delta": 0,
+  "scope": "Diagnostic-only lens per-eye state/failure receipt and Reset/source timestamp disambiguation; stale capture-bound menu assertion repair. No optical routing change.",
+  "verified_local": [
+    "FULL visual trace contract",
+    "15 destructive lens-transaction controls including telemetry sample guard removal",
+    "20 destructive physical lens provenance controls",
+    "desktop/source coordinates",
+    "Reset transport",
+    "menu letterbox aspect and capture-bound UV",
+    "post-left viewport fence",
+    "WorldParticle pre-draw accounting",
+    "git diff --check"
+  ],
+  "independent_review": "No remaining blocking findings; initial missing sample-guard test mutations added and rerun.",
+  "known_blockers": [
+    {
+      "operation": "DX9Ex Active Validation",
+      "run_id": 40700989774,
+      "job_id": 122860426137,
+      "status": "FAILURE",
+      "signature": "verify_vr_visual_composition_p0.py: missing VR P0 RESULT PROGRESS SOURCE",
+      "classification": "PRE_EXISTING_CONTRACT_FAILURE",
+      "dependency": "Reconcile GOAL progress diagnostic contract with existing hooks_uiscaling.cpp in a separate authorized follow-up; do not weaken assertions.",
+      "independent_action": "Complete changed-area diagnostics and independent Windows User/Official builds."
+    },
+    {
+      "operation": "OutRun EXE HUD Inspector static-exe-analysis",
+      "run_id": 40700989773,
+      "job_id": 122860426012,
+      "status": "FAILURE",
+      "signature": "verify_vr_hud_exact_callsite_contract.py --self-test: undetected mutation GOAL exit admission bypassed",
+      "classification": "PRE_EXISTING_CONTRACT_FAILURE",
+      "dependency": "Repair GOAL exit admission mutation targeting/verification under its own narrow task.",
+      "independent_action": "Preserve failed test; finish direct user requested diagnostic work without further scope expansion."
+    }
+  ],
+  "checkpoint": "C6",
+  "status": "IMPLEMENTED_USER_BUILD_VERIFIED_FULL_VALIDATION_BLOCKED",
+  "automation_validation": "CHANGED_AREA_PASS_FULL_GATE_FAIL",
+  "updated_at_kst": "2026-10-28T23:04:09.233+09:00",
+  "workflow_runs": [
+    {
+      "id": 40700990486,
+      "name": "VR PC Fast Test Build",
+      "status": "completed",
+      "conclusion": "skipped",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700990486"
+    },
+    {
+      "id": 40700989946,
+      "name": "DX9Ex OFFICIAL FOCUS R26 HUD Test and Debug",
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989946"
+    },
+    {
+      "id": 40700989842,
+      "name": "DX9Ex Full Source Impact Review",
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989842"
+    },
+    {
+      "id": 40700989751,
+      "name": "DX9Ex Review Source Audit",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989751"
+    },
+    {
+      "id": 40700989849,
+      "name": "VR Autodev Coordination",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989849"
+    },
+    {
+      "id": 40700989736,
+      "name": "VR Evening Unified Test Build",
+      "status": "completed",
+      "conclusion": "skipped",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989736"
+    },
+    {
+      "id": 40700989810,
+      "name": "Domain Isolation Guard",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989810"
+    },
+    {
+      "id": 40700989774,
+      "name": "DX9Ex Active Validation",
+      "status": "completed",
+      "conclusion": "failure",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989774"
+    },
+    {
+      "id": 40700989773,
+      "name": "OutRun EXE HUD Inspector CI",
+      "status": "completed",
+      "conclusion": "failure",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989773"
+    },
+    {
+      "id": 40700989841,
+      "name": "DX9Ex R26 User Test Build",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989841"
+    },
+    {
+      "id": 40700989909,
+      "name": "VR GitHub General Test Build",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40700989909"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 12820969686,
+      "name": "OutRun2-VR-R26-VISUAL-OWNER-REPAIR-AA2-TEST-0fda2c1a4a098175c256c85ad0131a97a6e99e0e",
+      "digest": "sha256:3784143be17b69fdf1376eca083987baa95ca90066f4f9a3e259f5465ef6100e",
+      "size": 2925797
+    }
+  ],
+  "next_action": "No further source work in this user-requested closeout. Inspect pending Official/Full Source results by exact SHA; separately repair the two pre-existing GOAL contract failures before claiming full acceptance. Matching Quest3/VDXR evidence remains required for optical/runtime claims."
+}
