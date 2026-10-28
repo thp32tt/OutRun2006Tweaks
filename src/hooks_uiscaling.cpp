@@ -404,7 +404,8 @@ class UIScaling : public Hook
         0x973AF, 0x97422, 0x974D0, 0x97544,
         0x97664, 0x97675, 0x9769E, 0x976B2, 0x976F4,
         0x9784F, 0x9787D, 0x9788E, 0x978B4, 0x978C8, 0x978EC,
-        0x97C31, 0x97C57, 0x97E47, 0x97E6D
+        0x97C31, 0x97C57, 0x97E47, 0x97E6D,
+        0x98D37, 0xBE009
     };
     // Two user minidumps (23:33:04 and 23:35:50 KST, exact test SHA
     // 9e393cfd) both faulted with 0xC0000096 at EXE+0x97C5F.
@@ -563,6 +564,24 @@ class UIScaling : public Hook
 		D3DXVECTOR2* pScaling, D3DXVECTOR2* pRotationCenter, float Rotation, D3DXVECTOR2* pTranslation)
 	{
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+        const bool vrFrontEndProducer = Game::current_mode &&
+            (*Game::current_mode == GameState::STATE_TITLE ||
+             *Game::current_mode == GameState::STATE_MENU ||
+             *Game::current_mode == GameState::STATE_SELECTOR ||
+             *Game::current_mode == GameState::STATE_SELEXIT ||
+             *Game::current_mode == GameState::STATE_SELRESET);
+        const bool vrContainedMode =
+            mode == ScalingMode::KeepCentered ||
+            mode == ScalingMode::OnlineArcade;
+        const bool vrFrontEndPartial = vrFrontEndProducer &&
+            ((pScaling == nullptr) != (pTranslation == nullptr));
+        const bool vrFrontEndPivot = NeedsFrontEndAffineContain(
+            vrFrontEndProducer, vrContainedMode,
+            pScaling != nullptr, pTranslation != nullptr,
+            pScalingCenter != nullptr, pRotationCenter != nullptr,
+            pScalingRotation, Rotation);
+        const bool vrFrontEndNeedsModernAffine =
+            vrFrontEndPartial || vrFrontEndPivot;
         // Quest3 optical regression 2026-10-19: The shared R84/R26_SAFE
         // front-end rewrite promoted title/mode ownership into permission to
         // remap partial and pivoted D3DX matrices. The original letterbox
@@ -570,9 +589,8 @@ class UIScaling : public Hook
         // space. Restore the known-good 2026-10-09 full-vector-only mapping
         // while VR is enabled; do not rewrite the game's input pointers.
         // This is a bounded compatibility rollback, NOT proof of HMD PASS.
-        if (Settings::VREnabled &&
-            (mode == ScalingMode::KeepCentered ||
-             mode == ScalingMode::OnlineArcade))
+        if (Settings::VREnabled && vrContainedMode &&
+            !vrFrontEndNeedsModernAffine)
         {
             D3DXVECTOR2 legacyScale{}, legacyTranslation{};
             D3DXVECTOR2* inputScale = pScaling;
@@ -5153,6 +5171,68 @@ class VRHudQueueSemanticBridge : public Hook
         const void* node = reinterpret_cast<const void*>(ctx.edi);
         VRProjectedD3DXSpriteIsolationR64::BeforeQueueNode(node);
 		OutRunVR::GameSemantic::SelectSpriteQueueNode(node);
+        // 2026-10-29: the historical 0x989xx StageExtension group is a
+        // GOAL result panel, not proof of the live checkpoint +TIME popup.
+        // Record unique unowned GAME/GOAL nodes without changing ownership.
+        if (Settings::VREnabled && Settings::VRTelemetry && node &&
+            Game::current_mode &&
+            (*Game::current_mode == GameState::STATE_GAME ||
+             *Game::current_mode == GameState::STATE_GOAL) &&
+            OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
+                OutRunVR::GameSemantic::ProducerToken::None)
+        {
+            const auto* live = reinterpret_cast<const SpriteNode*>(node);
+            const auto rawAnimationFlags =
+                live->kind_C != 0
+                ? *reinterpret_cast<const std::uint32_t*>(
+                    reinterpret_cast<const std::uint8_t*>(live) + 0x60)
+                : 0u;
+            std::uint32_t xst = 0;
+            std::uintptr_t texture = 0;
+            if (live->kind_C == 0)
+                xst = static_cast<std::uint32_t>(live->args_10.xstnum_0);
+            else if (live->kind_C == 1)
+            {
+                xst = static_cast<std::uint32_t>(live->args2_58.xstnum_0);
+                texture = reinterpret_cast<std::uintptr_t>(
+                    live->args2_58.d3dtexture_ptr_C);
+            }
+            std::uint64_t signature = 1469598103934665603ull;
+            const std::uint64_t fields[] {
+                static_cast<std::uint64_t>(*Game::current_mode),
+                static_cast<std::uint64_t>(live->kind_C),
+                static_cast<std::uint64_t>(xst),
+                static_cast<std::uint64_t>(rawAnimationFlags),
+                static_cast<std::uint64_t>(texture)
+            };
+            for (const auto value : fields)
+            {
+                signature ^= value;
+                signature *= 1099511628211ull;
+            }
+            static thread_local std::array<std::uint64_t, 192>
+                unownedSignatures{};
+            static thread_local unsigned unownedSignatureCount = 0;
+            bool seen = false;
+            for (unsigned i = 0; i < unownedSignatureCount; ++i)
+                seen = seen || unownedSignatures[i] == signature;
+            if (!seen && unownedSignatureCount < unownedSignatures.size())
+            {
+                unownedSignatures[unownedSignatureCount++] = signature;
+                spdlog::info(
+                    "VR TRACE UNOWNED QUEUE SIGNATURE: state={} mode={} "
+                    "node=0x{:X} kind={} xst=0x{:X} texture=0x{:X} "
+                    "animFlags=0x{:08X} queueEpoch={} scope={} signature=0x{:016X}",
+                    static_cast<int>(*Game::current_mode),
+                    Game::game_mode ? *Game::game_mode : -1,
+                    reinterpret_cast<std::uintptr_t>(node),
+                    live->kind_C, xst, texture, rawAnimationFlags,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::EffectiveScope()),
+                    static_cast<unsigned long long>(signature));
+            }
+        }
         // The original 0x42D710 selects the live SpriteNode before
         // dispatching one of four physical paths. For the exact rival
         // tag only, capture its native kind_C (0 D3DX/UP; !=0 animation).

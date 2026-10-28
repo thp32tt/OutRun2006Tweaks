@@ -5191,54 +5191,45 @@ namespace OutRunVRStereo
 
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
-                // Only exact, nonqueued C993 sun objects use this correction.
-                // CABE outer discs retain their existing R69 path below.
-                if (!OutRunVR::GameSemantic::QueueRenderActive() &&
-                    OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                        OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
+                // Quest/VDXR uses asymmetric per-eye FOVs. One centre-eye
+                // clip/WVP copied byte-for-byte to both eye RTs is not one
+                // angular ray. Preserve one source ray and zero IPD
+                // translation, but project it through each eye's real FOV.
+                float headRaw[16]{};
+                std::uint32_t headSequence = 0;
+                if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headSequence) ||
+                    headSequence != stereo.poseSequence)
+                    return false;
+                D3DMATRIX headInverse{};
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                if (!MatrixFinite(headInverse))
+                    return false;
+
+                const D3DMATRIX identityEye = IdentityMatrix();
+                const bool sourceCameraSynced =
+                    OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
+                for (int eye = 0; eye < 2; ++eye)
                 {
-                    float headRaw[16]{};
-                    std::uint32_t headSequence = 0;
-                    if (!OutRunVRRenderer::GetLatchedHeadInverse(
-                            headRaw, headSequence) ||
-                        headSequence != stereo.poseSequence)
-                        return false;
-                    D3DMATRIX headInverse{};
-                    std::memcpy(&headInverse, headRaw, sizeof(headInverse));
-                    // The C993 sun family is one projected optical effect.
-                    // Per-eye asymmetric projection made the same visual
-                    // centre diverge into two points. Rebuild ONE centre-eye
-                    // world-locked ray from the latched HeadInverse and copy
-                    // that exact matrix to both eye RTs: head movement stays
-                    // compensated while binocular disparity for the flare
-                    // centre is exactly zero.
-                    const D3DMATRIX identityEye = IdentityMatrix();
-                    D3DMATRIX fused{};
+                    const D3DMATRIX eyeProjection =
+                        ProjectionFromFov(
+                            baseProjection, stereo.eyeFov[eye]);
+                    D3DMATRIX projected{};
                     if (!OutRunVR::LensCentre::BuildProjectedSunRay(
                             stockWvp, inverseBaseProjection, headInverse,
-                            identityEye, baseProjection, fused,
-                            OutRunVRRenderer::GetLastRawGameWvpCameraSynced()))
+                            identityEye, eyeProjection, projected,
+                            sourceCameraSynced))
                         return false;
-                    const D3DMATRIX fusedT = TransposeMatrix(fused);
-                    std::memcpy(eyeConstants[0], &fusedT, sizeof(fusedT));
-                    std::memcpy(eyeConstants[1], &fusedT, sizeof(fusedT));
-                    return true;
+                    const D3DMATRIX projectedT = TransposeMatrix(projected);
+                    std::memcpy(eyeConstants[eye], &projectedT,
+                        sizeof(projectedT));
                 }
-                // R69 HMD-proven DX11 behavior: CABE's Calc3D2D result is
-                // already a centre-eye screen position. Independent L/R world
-                // reprojection makes the flare split into two images. Submit
-                // the same original centre-eye WVP to both eye render targets;
-                // the eye surfaces still remain separate, but this effect gets
-                // zero binocular disparity and fuses into one visible flare.
-                const D3DMATRIX stockT = TransposeMatrix(stockWvp);
-                std::memcpy(eyeConstants[0], &stockT, sizeof(stockT));
-                std::memcpy(eyeConstants[1], &stockT, sizeof(stockT));
-                static bool firstFlareMonoFusionLogged = false;
-                if (!firstFlareMonoFusionLogged)
+                static bool firstAsymmetricFlareRayLogged = false;
+                if (!firstAsymmetricFlareRayLogged)
                 {
-                    firstFlareMonoFusionLogged = true;
+                    firstAsymmetricFlareRayLogged = true;
                     spdlog::info(
-                        "VR R69 FLARE FUSION: exact Calc3D2D centre-eye WVP copied identically to L/R; per-eye flare reprojection disabled");
+                        "VR R85 FLARE RAY: one source angular ray projected separately through L/R asymmetric FOV; IPD translation suppressed");
                 }
                 return true;
             }

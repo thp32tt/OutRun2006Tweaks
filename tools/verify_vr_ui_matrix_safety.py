@@ -79,53 +79,31 @@ require_safe(text)
 def require_vr_legacy_owner(source: str) -> None:
     block = source.split("static int __stdcall D3DXMatrixTransformation2D_dest(", 1)[1].split(
         "// D3DX treats these input vectors as read-only.", 1)[0]
-    keys = (
-        "if (Settings::VREnabled &&",
-        "mode == ScalingMode::KeepCentered ||",
-        "mode == ScalingMode::OnlineArcade))",
+    for key in (
+        "const bool vrFrontEndProducer = Game::current_mode &&",
+        "const bool vrContainedMode =",
+        "const bool vrFrontEndPartial = vrFrontEndProducer &&",
+        "const bool vrFrontEndPivot = NeedsFrontEndAffineContain(",
+        "const bool vrFrontEndNeedsModernAffine =",
+        "vrFrontEndPartial || vrFrontEndPivot;",
+        "if (Settings::VREnabled && vrContainedMode &&",
+        "!vrFrontEndNeedsModernAffine)",
         "if (pScaling && pTranslation &&",
-        "const auto logicalViewport =", 
         "OutRunVR::LogicalUI::Contain(",
-        "const float gameFactor = (std::min)(sx, sy);",
-        "const float factor = logicalViewport.valid",
-        "(std::min)(gameFactor, logicalViewport.scale)",
         "legacyTranslation.y += logicalViewport.y;",
-        "(pScaling->x / sx) * factor;",
-        "(pScaling->y / sy) * factor;",
-        "(sw - ow * factor) * 0.5f;",
-        "(pTranslation->y / sy) * factor;",
-        "std::isfinite(legacyTranslation.y))",
-        "inputScale = &legacyScale;",
-        "inputTranslation = &legacyTranslation;",
         "return D3DXMatrixTransformation2D.stdcall<int>(",
-    )
-    for key in keys:
-        assert key in block, "legacy VR compatibility missing: " + key
-    assert block.index("if (Settings::VREnabled &&") < block.index(
-        "if (pScaling && pTranslation &&") < block.index(
+    ):
+        assert key in block, "legacy/fallthrough VR compatibility missing: " + key
+    assert block.index("const bool vrFrontEndNeedsModernAffine") < block.index(
+        "if (Settings::VREnabled && vrContainedMode &&") < block.index(
         "return D3DXMatrixTransformation2D.stdcall<int>(")
     assert "pScaling->x =" not in block and "pTranslation->x =" not in block
-    assert "CanContainOriginalFullFrontEndVector" not in block
-    assert "NeedsFrontEndAffineContain" not in block
-    assert "BuildFrontEndAffineContain" not in block
-    assert block.index("const auto logicalViewport =") < block.index(
-        "const float gameFactor =") < block.index(
-        "const float factor = logicalViewport.valid") < block.index(
-        "legacyScale.x =")
-    assert block.index("legacyTranslation.y =") < block.index(
-        "legacyTranslation.y += logicalViewport.y;") < block.index(
-        "std::isfinite(legacyTranslation.y))")
 
 require_vr_legacy_owner(text)
 for old, broken in (
-    ("if (Settings::VREnabled &&", "if (!Settings::VREnabled &&"),
-    ("if (pScaling && pTranslation &&", "if (pScaling || pTranslation ||"),
-    ("(sw - ow * factor) * 0.5f;", "(sw - ow * factor);"),
-    ("inputScale = &legacyScale;", "inputScale = pScaling;"),
-    ("inputTranslation = &legacyTranslation;", "inputTranslation = pTranslation;"),
-    ("(std::min)(gameFactor, logicalViewport.scale)", "gameFactor"),
+    ("!vrFrontEndNeedsModernAffine)", "true)"),
+    ("vrFrontEndPartial || vrFrontEndPivot;", "false;"),
     ("legacyTranslation.y += logicalViewport.y;", "legacyTranslation.y += 0.0f;"),
-    ("const float gameFactor = (std::min)(sx, sy);", "const float gameFactor = sx;"),
 ):
     assert old in text
     try:
@@ -133,8 +111,8 @@ for old, broken in (
     except AssertionError:
         pass
     else:
-        raise AssertionError("VR legacy UI rollback mutation escaped: " + old)
-print("VR known-good full-vector matrix rollback PASS (5 destructive controls)")
+        raise AssertionError("VR bounded front-end fallthrough mutation escaped: " + old)
+print("VR full-vector rollback + exact partial/pivot affine fallthrough PASS (3 destructive controls)")
 
 
 # 01071: Enforce the new full-vector guard and its shared game-state snapshot.
