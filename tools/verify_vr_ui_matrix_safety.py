@@ -129,16 +129,16 @@ def require_frontend_owner(source: str) -> None:
         "static_assert(!CanContainOriginalFullFrontEndVector(true, false, true, true)",
     ):
         assert required in predicate, "full-vector safety missing: " + required
-    owner = source.split("const bool originalFrontEndProducer =", 1)[1].split(
+    hook = source.split(
+        "static int __stdcall D3DXMatrixTransformation2D_dest(", 1)[1].split(
+        "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)[0]
+    owner = hook.split("const bool originalFrontEndProducer =", 1)[1].split(
         "const bool centredPhysicalMenuFill =", 1)[0]
     assert "Game::current_mode &&" in owner
     for state in ("TITLE", "MENU", "SELECTOR", "SELEXIT", "SELRESET"):
         assert "GameState::STATE_" + state in owner, "frontend missing: " + state
     for excluded in ("GOAL", "RACE"):
         assert "GameState::STATE_" + excluded not in owner, "foreign HUD owner: " + excluded
-    hook = source.split(
-        "static int __stdcall D3DXMatrixTransformation2D_dest(", 1)[1].split(
-        "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)[0]
     for required in (
         "mode == ScalingMode::KeepCentered && originalFrontEndProducer;",
         "const bool frontEndPivot = NeedsFrontEndAffineContain(\n            originalFrontEndProducer,",
