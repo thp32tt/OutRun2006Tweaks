@@ -496,17 +496,29 @@ def verify_b9200_owner(source: str) -> None:
     for marker in required:
         if marker not in body:
             fail("B9200 post-drain provenance lost: " + marker)
-    order = (
-        "FlushD3DXBeforeDirectGoalSource();",
-        "const bool admittedAfterDrain = admission.mayPublish(",
-        "ScopedExactProducerSemantic owner(",
-        "ResultTextB9200InlineHook.call<void>(text, x, y, step);",
-        "admittedAtExit = admission.mayPublish(",
-        "FlushD3DXAtDirectGoalSourceExit();",
-    )
-    if [body.index(marker) for marker in order] != sorted(
-            body.index(marker) for marker in order):
+    drain = body.index("FlushD3DXBeforeDirectGoalSource();")
+    admitted = body.index(
+        "const bool admittedAfterDrain = admission.mayPublish(", drain)
+    owner = body.index("ScopedExactProducerSemantic owner(", admitted)
+    accepted_draw = body.index(
+        "ResultTextB9200InlineHook.call<void>(text, x, y, step);", owner)
+    exit_admission = body.index(
+        "admittedAtExit = admission.mayPublish(", accepted_draw)
+    final_flush = body.index(
+        "FlushD3DXAtDirectGoalSourceExit();", exit_admission)
+    if not (drain < admitted < owner < accepted_draw <
+            exit_admission < final_flush):
         fail("B9200 drain/admission/owner order regressed")
+    # The earlier call is the intentional native fallback after a rejected
+    # post-drain admission; it must remain before the accepted owner and
+    # terminate immediately rather than being mistaken for the owned draw.
+    fallback_gate = body.index("if (!admittedAfterDrain)", admitted)
+    fallback_draw = body.index(
+        "ResultTextB9200InlineHook.call<void>(text, x, y, step);",
+        fallback_gate)
+    fallback_return = body.index("return;", fallback_draw)
+    if not (admitted < fallback_gate < fallback_draw < fallback_return < owner):
+        fail("B9200 rejected post-drain fallback ordering regressed")
 
 
 verify_b9200_owner(ui)
