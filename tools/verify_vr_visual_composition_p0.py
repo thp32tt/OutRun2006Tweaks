@@ -1163,6 +1163,12 @@ def verify_r64_exact_sprite_isolation(ui_source, sem_source):
                   ': ExactScreenHudRight_putClipSprite'):
         require(token, install, 'R64 exact callsite selection')
     draw = function_body(ui_source, 'static HRESULT __stdcall DrawDest(')
+    # DrawDest now contains earlier exact GOAL/+TIME batching and diagnostics.
+    # The R64 negative scope applies only to the final rank/DispRank isolation
+    # tail, not to those independently owned sections.
+    r64_marker = '// Preserve HMD-verified R64 rank isolation unchanged in scope.'
+    require(r64_marker, draw, 'R64 isolation section marker')
+    r64 = draw[draw.index(r64_marker):]
     for token in ('QueueRenderActive()',
                   'CurrentProjectedMarker()',
                   'CorroboratesProjectedWorldMarker(',
@@ -1172,16 +1178,15 @@ def verify_r64_exact_sprite_isolation(ui_source, sem_source):
                   'vtable[10]',
                   'reinterpret_cast<FlushFn>(vtable[10])(self)',
                   'VR R64 D3DX ISOLATE RESTORED:'):
-        require(token, draw, 'HMD proven R64 D3DXSprite isolation')
-    require_order(draw, 'original D3DXSprite Draw before bounded Flush',
-                  'Draw_hk.stdcall<HRESULT>(',
-                  'if (FAILED(hr)',
+        require(token, r64, 'HMD proven R64 D3DXSprite isolation')
+    require_order(r64, 'R64 rank gates before bounded Flush',
                   'const bool projectedRank',
                   'const bool dispRankHud',
+                  'if (!projectedRank && !dispRankHud)',
                   'reinterpret_cast<FlushFn>(vtable[10])(self)')
-    if 'ProducerToken::TextGlyphPutSprite' in draw or (
-            'ProducerToken::ResultProgress' in draw) or (
-            'ProducerToken::GoalTime020' in draw):
+    if 'ProducerToken::TextGlyphPutSprite' in r64 or (
+            'ProducerToken::ResultProgress' in r64) or (
+            'ProducerToken::GoalTime020' in r64):
         raise SystemExit('R64 flush accidentally widened to result/font')
     for token in ('        DispRankClipSprite,',
                   'case ProducerToken::DispRankClipSprite:'):
