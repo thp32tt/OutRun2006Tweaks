@@ -193,6 +193,7 @@ on:
       - 'tools/verify_vr_sumo_replay_semantics.py'
       - 'tools/verify_vr_hud_cadence_restore.py'
       - 'tools/verify_vr_ui_matrix_safety.py'
+      - 'tools/verify_vr_r26_result_hud_pose.py'
       - 'tools/verify_vr_menu_letterbox_aspect.py'
       - 'tools/verify_vr_r23_menu_letterbox_cache.py'
       - 'tools/verify_vr_r23_capture_output_generation.py'
