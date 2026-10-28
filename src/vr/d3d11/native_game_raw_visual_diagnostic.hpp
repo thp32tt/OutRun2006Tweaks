@@ -17,6 +17,7 @@
 #include "native_game_raw_dual_tile.hpp"
 #include "native_game_raw_draw_pair.hpp"
 #include "native_game_raw_partial_present_tile.hpp"
+#include "native_game_raw_present_coverage.hpp"
 #include "native_game_raw_changed_pixel_window.hpp"
 #include "native_game_raw_gpu_wait.hpp"
 
