@@ -13,10 +13,14 @@
 #define __stdcall
 using HRESULT=int; using UINT=unsigned; using INT=int; using DWORD=unsigned;
 using D3DPRIMITIVETYPE=int; using D3DFORMAT=int;
-constexpr int D3DPT_TRIANGLELIST=4, D3DFMT_INDEX16=101, D3DFMT_INDEX32=102;
+constexpr int D3DPT_TRIANGLELIST=4, D3DFMT_UNKNOWN=0,
+    D3DFMT_INDEX16=101, D3DFMT_INDEX32=102;
+constexpr int D3DRTYPE_TEXTURE=3;
 constexpr HRESULT E_NOTIMPL=-1, E_FAIL=-2, E_PENDING=-3, D3D_OK=0;
 constexpr int D3DZB_FALSE=0,D3DRS_ZENABLE=7,D3DTS_PROJECTION=3;
 constexpr int D3DRS_ALPHABLENDENABLE=27,D3DRS_SRCBLEND=19,D3DRS_DESTBLEND=20;
+constexpr int D3DRS_ZWRITEENABLE=14,D3DRS_ALPHATESTENABLE=15,
+    D3DRS_COLORWRITEENABLE=168;
 constexpr DWORD D3DBLEND_SRCALPHA=5,D3DBLEND_INVSRCALPHA=6;
 enum class GameState { STATE_GAME=0, STATE_GOAL=20 };
 namespace Game { inline GameState goalState=GameState::STATE_GAME; inline GameState* current_mode=&goalState; }
@@ -28,9 +32,9 @@ bool MatrixFinite(const D3DMATRIX&m){for(auto&r:m.m)for(float v:r)if(!std::isfin
 struct Viewport {DWORD X=0,Y=0,Width=1920,Height=1080;};
 namespace OutRunVR::GameSemantic {
 enum class RenderScope {None,ScreenHud,World,Projected,ProjectedWorldMarker2D,ScreenOverlay2D};
-enum class ProducerToken {None,StageExtensionTime,Goal,Rank,Lens,RivalMarkerSprani};
+enum class ProducerToken {None,StageExtensionTime,ResultProgress,Goal,Rank,Lens,RivalMarkerSprani};
 struct Command {RenderScope scope=RenderScope::ScreenHud;ProducerToken producer=ProducerToken::StageExtensionTime;bool queued=false;void*queueNode=nullptr;unsigned queueEpoch=0;
-bool IsExactFiniteResultHud()const{return scope==RenderScope::ScreenHud&&(producer==ProducerToken::StageExtensionTime||producer==ProducerToken::Goal);}};
+bool IsExactFiniteResultHud()const{return scope==RenderScope::ScreenHud&&(producer==ProducerToken::StageExtensionTime||producer==ProducerToken::ResultProgress||producer==ProducerToken::Goal);}};
 Command command; unsigned ExternalOverlaySemanticDepth=0;
 Command CapturePhysicalDrawCommand(){return command;}
 RenderScope EffectiveScope(){return command.scope;}
@@ -46,18 +50,29 @@ const char*Name(ProducerToken){return "test";}
 namespace Settings {bool VRTelemetry=true;}
 namespace spdlog {template<class...T>void info(T&&...){}}
 namespace OutRunVRRenderer {struct LatchedStereoFrame{unsigned poseSequence=7;};bool poseValid=true;bool GetLatchedStereoFrame(LatchedStereoFrame&f){f.poseSequence=7;return poseValid;}}
+struct D3DSURFACE_DESC {UINT Width=0,Height=0;D3DFORMAT Format=D3DFMT_UNKNOWN;};
+struct IDirect3DBaseTexture9 {int released=0;int GetType(){return D3DRTYPE_TEXTURE;}void Release(){++released;}};
+struct IDirect3DTexture9 : IDirect3DBaseTexture9 {HRESULT GetLevelDesc(UINT,D3DSURFACE_DESC*d){*d={64,64,21};return D3D_OK;}};
+struct IDirect3DVertexBuffer9 {int released=0;void Release(){++released;}};
+struct IDirect3DIndexBuffer9 {int released=0;void Release(){++released;}};
+struct IDirect3DSurface9 {int released=0;void Release(){++released;}HRESULT GetDesc(D3DSURFACE_DESC*d){*d={1920,1080,21};return D3D_OK;}};
 struct IDirect3DVertexShader9 {int released=0;void Release(){++released;}};
 struct IDirect3DDevice9 {
  DWORD fvf=0x142; IDirect3DVertexShader9*vs=nullptr; D3DMATRIX projection=IdentityMatrix();
  int sets=0,failSet=0;bool failVs=false,failFvf=false;std::vector<D3DMATRIX>setMatrices;
  HRESULT GetVertexShader(IDirect3DVertexShader9**s){*s=vs;return failVs?E_FAIL:D3D_OK;}
  HRESULT GetFVF(DWORD*f){*f=fvf;return failFvf?E_FAIL:D3D_OK;}
- HRESULT GetRenderState(int state,DWORD*v){if(state==D3DRS_ALPHABLENDENABLE)*v=1;else if(state==D3DRS_SRCBLEND)*v=D3DBLEND_SRCALPHA;else if(state==D3DRS_DESTBLEND)*v=D3DBLEND_INVSRCALPHA;else *v=0;return D3D_OK;}
+ HRESULT GetTexture(DWORD,IDirect3DBaseTexture9**t){*t=nullptr;return D3D_OK;}
+ HRESULT GetStreamSource(UINT,IDirect3DVertexBuffer9**v,UINT*o,UINT*s){*v=nullptr;*o=0;*s=24;return D3D_OK;}
+ HRESULT GetIndices(IDirect3DIndexBuffer9**i){*i=nullptr;return D3D_OK;}
+ HRESULT GetRenderTarget(DWORD,IDirect3DSurface9**s){*s=nullptr;return D3D_OK;}
+ HRESULT GetRenderState(int state,DWORD*v){if(state==D3DRS_ALPHABLENDENABLE)*v=1;else if(state==D3DRS_SRCBLEND)*v=D3DBLEND_SRCALPHA;else if(state==D3DRS_DESTBLEND)*v=D3DBLEND_INVSRCALPHA;else if(state==D3DRS_COLORWRITEENABLE)*v=0xF;else *v=0;return D3D_OK;}
  HRESULT GetViewport(Viewport*v){*v={};return D3D_OK;}
  HRESULT GetTransform(int,D3DMATRIX*m){*m=projection;return D3D_OK;}
  HRESULT SetTransform(int,const D3DMATRIX*m){++sets;setMatrices.push_back(*m);if(sets==failSet)return E_FAIL;projection=*m;return D3D_OK;}
 };
 IDirect3DDevice9*gameDevice=nullptr;
+IDirect3DSurface9*RightEyeSurface=nullptr;
 bool InternalStereoPass=false,backbuffer=true,safeBase=true,R9StereoSeeded=true,FrameStereoIncomplete=false;
 unsigned FrameStereoPoseSequence=7; std::atomic<std::uintptr_t>CurrentVertexShaderIdentity{0};
 struct {unsigned Width=1920,Height=1080;}BackBufferDesc;
