@@ -7,6 +7,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 src = (root/"src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
 hdr = (root/"src/vr/game/goal_progress_source_admission.hpp").read_text(encoding="utf-8")
+renderer = (root/"src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(encoding="utf-8")
 def body(a,b):
     start=src.index(a)
     end=src.index(b,start+len(a))
@@ -64,6 +65,17 @@ tests=[
     ("queue negative constexpr", "static_assert(!PreSourceFlushReenter());" in hdr and
         "static_assert(!InsideParentQueueReenter());" in hdr),
     ("reject epoch mutation", "queueEpoch == queueEpochAtEntry" in hdr),
+    ("detailed GOAL percent source telemetry",
+        "VR TRACE GOAL_PERCENT SOURCE ENTRY:" in inner and
+        "VR TRACE GOAL_PERCENT SOURCE EXIT:" in leave and
+        "entrySerial={}" in leave and "changedPriorities={}" in leave),
+    ("detailed +TIME/GOAL physical telemetry",
+        "VR TRACE RESULT PHYSICAL PRE:" in renderer and
+        "VR TRACE RESULT PHYSICAL EYES:" in renderer and
+        '"PLUS_TIME"' in renderer and '"GOAL_PERCENT"' in renderer and
+        "projHashRaw=0x{:016X}" in renderer and
+        "tex0=0x{:X} tex={}x{}" in renderer and
+        "rightRt=0x{:X}" in renderer),
     ("original installed E8s preserved",
         "Module::exe_ptr(ResultProgressCallA), ResultProgressEnter" in src and
         "Module::exe_ptr(ResultProgressCallB), ResultProgressEnter" in src and

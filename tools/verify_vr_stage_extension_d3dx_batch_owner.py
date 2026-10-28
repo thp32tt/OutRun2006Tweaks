@@ -77,6 +77,13 @@ def check(code: str, header: str) -> list[str]:
          "ProducerToken::StageExtensionTime" in source and
          "TagAppendedNodes(StageExtensionBefore" in source,
          "immediate print and queued sprite producer owners missing")
+    need("VR TRACE PLUS_TIME SOURCE ENTRY:" in stage_enter and
+         "admittedAfterDrain={}" in stage_enter and
+         "snapshotPriorities={}" in stage_enter and
+         "VR TRACE PLUS_TIME SOURCE EXIT:" in stage_leave and
+         "changedPriorities={}" in stage_leave and
+         "entrySerial={}" in stage_leave,
+         "detailed +TIME source telemetry contract missing")
     for method, number in (("BeginDest", 8), ("DrawDest", 9),
                            ("FlushDest", 10), ("EndDest", 11)):
         need(f"static HRESULT __stdcall {method}(" in hook,

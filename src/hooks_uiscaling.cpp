@@ -1703,6 +1703,37 @@ class UIScaling : public Hook
                     OutRunVR::GameSemantic::ProducerToken::ResultProgress);
             }
         }
+        if (Settings::VRTelemetry)
+        {
+            unsigned snapshotPriorities = 0;
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+                if (ResultProgressRootsBefore[p])
+                    ++snapshotPriorities;
+            static std::atomic<std::uint64_t> progressSourceEntries{0};
+            const auto n = progressSourceEntries.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 64 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR TRACE GOAL_PERCENT SOURCE ENTRY: sample={} state={} mode={} "
+                    "vr={} queueActive={} mayBegin={} admittedAfterDrain={} "
+                    "entrySerial={} entryEpoch={} liveEpoch={} "
+                    "snapshotPriorities={} scope={} producer={}",
+                    n,
+                    Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                    Game::game_mode ? *Game::game_mode : -1,
+                    Settings::VREnabled ? 1 : 0,
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    ResultProgressAdmission.mayBeginDirect() ? 1 : 0,
+                    ResultProgressAdmittedAfterDrain ? 1 : 0,
+                    ResultProgressEntrySerial,
+                    ResultProgressAdmission.queueEpochAtEntry,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                    snapshotPriorities,
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::EffectiveScope()),
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken()));
+        }
 	}
 	static void ResultProgressLeave(safetyhook::Context&)
 	{
@@ -1746,18 +1777,28 @@ class UIScaling : public Hook
             // Native D3DX still owns the actual draw and its HRESULT.
             FlushD3DXAtDirectGoalSourceExit();
         }
+        const auto progressScopeAtExit =
+            OutRunVR::GameSemantic::EffectiveScope();
+        const auto progressProducerAtExit =
+            OutRunVR::GameSemantic::CurrentRenderProducerToken();
         ResultProgressDirectDrawOwner.reset();
         const std::uint64_t hits = ++ResultProgressCompletedCalls;
         if (Settings::VRTelemetry && (hits & (hits - 1u)) == 0)
         {
             spdlog::info(
-                "VR P0 RESULT PROGRESS SOURCE: completedCalls={} changedPriorities={} "
-                "state={} mode={} exactScope={} admitted={} entryEpoch={} exitEpoch={} reason={}",
+                "VR TRACE GOAL_PERCENT SOURCE EXIT: completedCalls={} changedPriorities={} "
+                "state={} mode={} exactScope={} admitted={} entrySerial={} "
+                "entryEpoch={} exitEpoch={} queueActive={} scopeAtExit={} "
+                "producerAtExit={} reason={}",
                 hits, changedPriorities,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1,
                 admitted ? "SCREEN_HUD" : "NONE", admitted,
+                ResultProgressEntrySerial,
                 ResultProgressAdmission.queueEpochAtEntry, exitQueueEpoch,
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                OutRunVR::GameSemantic::Name(progressScopeAtExit),
+                OutRunVR::GameSemantic::Name(progressProducerAtExit),
                 admitted ? "ok" :
                     !ResultProgressAdmission.vrAtEntry ? "vr-disabled-at-entry" :
                     !ResultProgressAdmission.goalAtEntry ? "not-goal-at-entry" :
@@ -1946,6 +1987,7 @@ class UIScaling : public Hook
         // Keep the original live VR/queue admission at the direct GPU
         // entrance as well as the earlier source ticket. The second test
         // closes a reentrant toggle between snapshot and owner creation.
+        bool stageAdmittedAfterFlush = false;
         if (Settings::VREnabled &&
             OutRunVR::GameSemantic::SpriteQueueDepth == 0 &&
             StageExtensionAdmission.mayBeginDirect())
@@ -1962,7 +2004,7 @@ class UIScaling : public Hook
             // before the new ScreenHud scope can relabel its GPU submission.
             // Previous native Flush may reenter the queue: re-check the
             // original admission immediately after the drain callback.
-            const bool admittedAfterFlush = StageExtensionAdmission.admitAfterDrain(
+            stageAdmittedAfterFlush = StageExtensionAdmission.admitAfterDrain(
                 [] { FlushD3DXBeforeDirectStageSource(); },
                 [] {
                     return OutRunVR::StageExtension::LiveSource{
@@ -1971,7 +2013,7 @@ class UIScaling : public Hook
                         OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
                     };
                 });
-            if (admittedAfterFlush)
+            if (stageAdmittedAfterFlush)
             {
                 if (++StageTimeTicketSerial == 0)
                     ++StageTimeTicketSerial;
@@ -1981,6 +2023,37 @@ class UIScaling : public Hook
                     nullptr, true,
                     OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
             }
+        }
+        if (Settings::VRTelemetry)
+        {
+            unsigned snapshotPriorities = 0;
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+                if (StageExtensionRootsBefore[p])
+                    ++snapshotPriorities;
+            static std::atomic<std::uint64_t> stageSourceEntries{0};
+            const auto n = stageSourceEntries.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n <= 64 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR TRACE PLUS_TIME SOURCE ENTRY: sample={} state={} mode={} "
+                    "vr={} queueActive={} mayBegin={} admittedAfterDrain={} "
+                    "ticket={} entrySerial={} entryEpoch={} liveEpoch={} "
+                    "snapshotPriorities={} scope={} producer={}",
+                    n,
+                    Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                    Game::game_mode ? *Game::game_mode : -1,
+                    Settings::VREnabled ? 1 : 0,
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    StageExtensionAdmission.mayBeginDirect() ? 1 : 0,
+                    stageAdmittedAfterFlush ? 1 : 0,
+                    StageTimeLiveTicket, StageExtensionEntrySerial,
+                    StageExtensionAdmission.queueEpochAtEntry,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                    snapshotPriorities,
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::EffectiveScope()),
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken()));
         }
     }
 
@@ -2000,6 +2073,17 @@ class UIScaling : public Hook
         const bool admitted = sourceTicket != 0 &&
             StageExtensionAdmission.mayPublish(
                 Settings::VREnabled, outsideQueue, currentEpoch);
+        unsigned changedPriorities = 0;
+        if (Settings::VRTelemetry && admitted)
+        {
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* root = Game::sprite_prio_root[p];
+                SpriteNode* after = root ? root->tail_4 : nullptr;
+                if (after && after != StageExtensionBefore[p])
+                    ++changedPriorities;
+            }
+        }
         if (admitted)
         {
             // AUTO 01504: a rebuilt current root can interpose an untagged
@@ -2018,6 +2102,10 @@ class UIScaling : public Hook
         {
             RevokeD3DXDirectStageTicket(sourceTicket);
         }
+        const auto stageScopeAtExit =
+            OutRunVR::GameSemantic::EffectiveScope();
+        const auto stageProducerAtExit =
+            OutRunVR::GameSemantic::CurrentRenderProducerToken();
         // Always restore the exact direct-draw queue cursor/anchor even if
         // VR enablement changes inside the original +TIME E8 call.
         StageExtensionDirectDrawOwner.reset();
@@ -2029,8 +2117,10 @@ class UIScaling : public Hook
         const auto hit = ++StageExtensionCompleted;
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
             spdlog::info(
-                "VR P0 STAGE EXTENSION SOURCES: calls={} gameState={} mode={} "
-                "exactScope={} admitted={} reason={} ticket={} entryEpoch={} currentEpoch={}",
+                "VR TRACE PLUS_TIME SOURCE EXIT: calls={} gameState={} mode={} "
+                "exactScope={} admitted={} reason={} ticket={} entrySerial={} "
+                "entryEpoch={} currentEpoch={} changedPriorities={} "
+                "queueActive={} scopeAtExit={} producerAtExit={}",
                 hit,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1,
@@ -2042,8 +2132,12 @@ class UIScaling : public Hook
                     !outsideQueue ? "queue-at-leave" :
                     currentEpoch != StageExtensionAdmission.queueEpochAtEntry ?
                         "queue-epoch-changed" : "pre-flush-rejected",
-                sourceTicket, StageExtensionAdmission.queueEpochAtEntry,
-                currentEpoch);
+                sourceTicket, StageExtensionEntrySerial,
+                StageExtensionAdmission.queueEpochAtEntry,
+                currentEpoch, changedPriorities,
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                OutRunVR::GameSemantic::Name(stageScopeAtExit),
+                OutRunVR::GameSemantic::Name(stageProducerAtExit));
         StageExtensionBefore = {};
         StageExtensionRootsBefore = {};
         StageExtensionEntrySerial = 0;

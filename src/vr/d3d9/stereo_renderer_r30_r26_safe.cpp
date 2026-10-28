@@ -6347,6 +6347,157 @@ namespace OutRunVRStereo
                 }
             }
 
+            const bool detailedTimeGoalTrace =
+                Settings::VRTelemetry && exactResult &&
+                (sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
+                 sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+            const char* detailedTimeGoalFamily =
+                sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime
+                    ? "PLUS_TIME" :
+                sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::ResultProgress
+                    ? "GOAL_PERCENT" : "OTHER";
+
+            std::uintptr_t resultTex0Ptr = 0;
+            std::uintptr_t resultVb0Ptr = 0;
+            std::uintptr_t resultIbPtr = 0;
+            std::uintptr_t resultRt0Ptr = 0;
+            UINT resultVb0Offset = 0;
+            UINT resultVb0Stride = 0;
+            UINT resultTexWidth = 0;
+            UINT resultTexHeight = 0;
+            D3DFORMAT resultTexFormat = D3DFMT_UNKNOWN;
+            UINT resultRtWidth = 0;
+            UINT resultRtHeight = 0;
+            D3DFORMAT resultRtFormat = D3DFMT_UNKNOWN;
+            DWORD resultColorWrite = 0;
+            DWORD resultAlphaBlend = 0;
+            DWORD resultSrcBlend = 0;
+            DWORD resultDstBlend = 0;
+            DWORD resultZEnable = 0;
+            DWORD resultZWrite = 0;
+            DWORD resultAlphaTest = 0;
+            std::uint64_t resultProjectionHash[3]{};
+
+            auto resultMatrixHash = [](const D3DMATRIX& matrix) noexcept
+            {
+                const auto* bytes =
+                    reinterpret_cast<const unsigned char*>(&matrix);
+                std::uint64_t hash = 1469598103934665603ull;
+                for (unsigned i = 0; i < sizeof(D3DMATRIX); ++i)
+                {
+                    hash ^= bytes[i];
+                    hash *= 1099511628211ull;
+                }
+                return hash;
+            };
+
+            if (detailedTimeGoalTrace)
+            {
+                resultProjectionHash[0] = resultMatrixHash(originalProjection);
+                resultProjectionHash[1] = resultMatrixHash(eyeProjection[0]);
+                resultProjectionHash[2] = resultMatrixHash(eyeProjection[1]);
+
+                IDirect3DBaseTexture9* texture0 = nullptr;
+                if (SUCCEEDED(device->GetTexture(0, &texture0)) && texture0)
+                {
+                    resultTex0Ptr = reinterpret_cast<std::uintptr_t>(texture0);
+                    if (texture0->GetType() == D3DRTYPE_TEXTURE)
+                    {
+                        D3DSURFACE_DESC desc{};
+                        if (SUCCEEDED(static_cast<IDirect3DTexture9*>(
+                                texture0)->GetLevelDesc(0, &desc)))
+                        {
+                            resultTexWidth = desc.Width;
+                            resultTexHeight = desc.Height;
+                            resultTexFormat = desc.Format;
+                        }
+                    }
+                    texture0->Release();
+                }
+
+                IDirect3DVertexBuffer9* vb0 = nullptr;
+                if (SUCCEEDED(device->GetStreamSource(
+                        0, &vb0, &resultVb0Offset, &resultVb0Stride)) && vb0)
+                {
+                    resultVb0Ptr = reinterpret_cast<std::uintptr_t>(vb0);
+                    vb0->Release();
+                }
+                IDirect3DIndexBuffer9* ib = nullptr;
+                if (SUCCEEDED(device->GetIndices(&ib)) && ib)
+                {
+                    resultIbPtr = reinterpret_cast<std::uintptr_t>(ib);
+                    ib->Release();
+                }
+                IDirect3DSurface9* rt0 = nullptr;
+                if (SUCCEEDED(device->GetRenderTarget(0, &rt0)) && rt0)
+                {
+                    resultRt0Ptr = reinterpret_cast<std::uintptr_t>(rt0);
+                    D3DSURFACE_DESC desc{};
+                    if (SUCCEEDED(rt0->GetDesc(&desc)))
+                    {
+                        resultRtWidth = desc.Width;
+                        resultRtHeight = desc.Height;
+                        resultRtFormat = desc.Format;
+                    }
+                    rt0->Release();
+                }
+
+                device->GetRenderState(
+                    D3DRS_COLORWRITEENABLE, &resultColorWrite);
+                device->GetRenderState(
+                    D3DRS_ALPHABLENDENABLE, &resultAlphaBlend);
+                device->GetRenderState(D3DRS_SRCBLEND, &resultSrcBlend);
+                device->GetRenderState(D3DRS_DESTBLEND, &resultDstBlend);
+                device->GetRenderState(D3DRS_ZENABLE, &resultZEnable);
+                device->GetRenderState(D3DRS_ZWRITEENABLE, &resultZWrite);
+                device->GetRenderState(
+                    D3DRS_ALPHATESTENABLE, &resultAlphaTest);
+
+                static std::atomic<std::uint64_t> detailedTimeGoalPre{0};
+                const auto n = detailedTimeGoalPre.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 64 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR TRACE RESULT PHYSICAL PRE: sample={} family={} api={} "
+                        "producer={} queued={} node={} epoch={} pose={} prim={} "
+                        "fvf=0x{:08X} viewport={},{},{},{} "
+                        "tex0=0x{:X} tex={}x{} texFmt={} vb0=0x{:X} "
+                        "vbOffset={} vbStride={} ib=0x{:X} rt0=0x{:X} "
+                        "rt={}x{} rtFmt={} rightRt=0x{:X} "
+                        "colorWrite=0x{:X} alphaBlend={} srcBlend={} dstBlend={} "
+                        "zEnable={} zWrite={} alphaTest={} "
+                        "projHashRaw=0x{:016X} projHashL=0x{:016X} projHashR=0x{:016X}",
+                        n, detailedTimeGoalFamily, drawApi,
+                        OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        sourceCommand.queued ? 1 : 0,
+                        sourceCommand.queueNode, sourceCommand.queueEpoch,
+                        state.stereo.poseSequence, primitiveCount,
+                        static_cast<unsigned>(fvf),
+                        state.viewport.X, state.viewport.Y,
+                        state.viewport.Width, state.viewport.Height,
+                        resultTex0Ptr, resultTexWidth, resultTexHeight,
+                        static_cast<unsigned>(resultTexFormat),
+                        resultVb0Ptr, resultVb0Offset, resultVb0Stride,
+                        resultIbPtr, resultRt0Ptr,
+                        resultRtWidth, resultRtHeight,
+                        static_cast<unsigned>(resultRtFormat),
+                        reinterpret_cast<std::uintptr_t>(RightEyeSurface),
+                        static_cast<unsigned>(resultColorWrite),
+                        resultAlphaBlend ? 1 : 0,
+                        static_cast<unsigned>(resultSrcBlend),
+                        static_cast<unsigned>(resultDstBlend),
+                        static_cast<unsigned>(resultZEnable),
+                        resultZWrite ? 1 : 0,
+                        resultAlphaTest ? 1 : 0,
+                        static_cast<unsigned long long>(resultProjectionHash[0]),
+                        static_cast<unsigned long long>(resultProjectionHash[1]),
+                        static_cast<unsigned long long>(resultProjectionHash[2]));
+            }
+
             HRESULT eyeHr[2]{ E_PENDING, E_PENDING };
             HRESULT projectionSetHr[2]{ E_PENDING, E_PENDING };
             HRESULT drawHr[2]{ E_PENDING, E_PENDING };
@@ -6478,6 +6629,48 @@ namespace OutRunVRStereo
                         static_cast<unsigned>(projectionRestoreHr),
                         identityStable, FrameStereoIncomplete);
                 }
+            }
+            if (detailedTimeGoalTrace)
+            {
+                static std::atomic<std::uint64_t> detailedTimeGoalEyes{0};
+                const auto n = detailedTimeGoalEyes.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 64 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR TRACE RESULT PHYSICAL EYES: sample={} family={} api={} "
+                        "producer={} queued={} node={} epoch={} pose={} "
+                        "projectionL=0x{:08X} drawAttemptL={} drawL=0x{:08X} "
+                        "projectionR=0x{:08X} drawAttemptR={} drawR=0x{:08X} "
+                        "rightTarget=0x{:08X} rightDepth=0x{:08X} "
+                        "rightViewport=0x{:08X} restoreRight={} "
+                        "projectionRestore=0x{:08X} frameIncomplete={} "
+                        "sourceRt=0x{:X} rightRt=0x{:X} tex0=0x{:X} "
+                        "vb0=0x{:X} ib=0x{:X} colorWrite=0x{:X} "
+                        "projHashRaw=0x{:016X} projHashL=0x{:016X} projHashR=0x{:016X}",
+                        n, detailedTimeGoalFamily, drawApi,
+                        OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        sourceCommand.queued ? 1 : 0,
+                        sourceCommand.queueNode, sourceCommand.queueEpoch,
+                        state.stereo.poseSequence,
+                        static_cast<unsigned>(projectionSetHr[0]),
+                        drawAttempted[0] ? 1 : 0,
+                        static_cast<unsigned>(drawHr[0]),
+                        static_cast<unsigned>(projectionSetHr[1]),
+                        drawAttempted[1] ? 1 : 0,
+                        static_cast<unsigned>(drawHr[1]),
+                        static_cast<unsigned>(passTrace.rightTargetHr),
+                        static_cast<unsigned>(passTrace.rightDepthHr),
+                        static_cast<unsigned>(passTrace.rightViewportHr),
+                        passTrace.restoreOk ? 1 : 0,
+                        static_cast<unsigned>(projectionRestoreHr),
+                        FrameStereoIncomplete ? 1 : 0,
+                        resultRt0Ptr,
+                        reinterpret_cast<std::uintptr_t>(RightEyeSurface),
+                        resultTex0Ptr, resultVb0Ptr, resultIbPtr,
+                        static_cast<unsigned>(resultColorWrite),
+                        static_cast<unsigned long long>(resultProjectionHash[0]),
+                        static_cast<unsigned long long>(resultProjectionHash[1]),
+                        static_cast<unsigned long long>(resultProjectionHash[2]));
             }
             // A failed LEFT projection setter submitted no GPU primitive.
             // Once the original projection is restored, return E_NOTIMPL so
