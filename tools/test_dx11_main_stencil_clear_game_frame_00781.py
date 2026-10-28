@@ -30,7 +30,9 @@ def valid(bridge,hook,guard):
       "GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)" in raster,
       "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)" in raster,
       "native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)" in raster,
-      "if (!sourceFogInactive) return false;" in raster,
+      "sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&" in raster,
+      "native_raw_fvf_fog_visual_admission(" in raster,
+      "if (!output.rawFogVisualMismatch) return false;" in raster,
       "const auto polygonMode = game_sm3_effective_polygon_mode(" in raster,
       "if (!polygonMode.admitted ||" in raster,
       "(!fullFrame && fillMode != D3DFILL_SOLID))" in raster,
@@ -75,13 +77,18 @@ unsafeRaster = prefix + rasterStart + raster.replace(
     "stencil_equivalent_to_disabled(",
     "stencil_unconditionally_ignored(", 1) + rasterEnd + suffix
 assert not valid(unsafeRaster, h, g)
-# Do not accept active fixed-function fog or a failed getter as if the
-# inherited source RANGEFOG were a proven inactive equation.
+# Default-off production still rejects active fixed-function fog.
+# RAW approximation requires actual source Fog getters and guarded payload;
+# removing either fallback or its opt-in makes this regression fail.
 for token, disabled in (
     ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
      "true /* unchecked active fog */"),
-    ("if (!sourceFogInactive) return false;",
+    ("if (!output.rawFogVisualMismatch) return false;",
      "/* lost live source fog fallback */"),
+    ("sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&",
+     "sourceKnown = true && /* unverified raw source */"),
+    ("native_raw_fvf_fog_visual_admission(",
+     "native_raw_fvf_fog_visual_unchecked("),
     ("GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)",
      "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceTableFog)"),
 ):
