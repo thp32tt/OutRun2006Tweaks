@@ -674,6 +674,7 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_edge_overwrite_probe_01106.cpp -o /tmp/dx11_edge_overwrite_01106 && /tmp/dx11_edge_overwrite_01106
           # Draw-time GPU source copy survives later rejected/poisoned D3D9 Draws.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_gpu_source_epoch_test.cpp -o /tmp/dx11_raw_gpu_epoch_01119 && /tmp/dx11_raw_gpu_epoch_01119
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_source_probe_schedule_test.cpp -o /tmp/dx11_raw_source_schedule_01131 && /tmp/dx11_raw_source_schedule_01131
           # Real D3D11 RGB evidence compares the same region on either side of the Draw.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_pixel_provenance_test.cpp -o /tmp/dx11_raw_pixel_01120 && /tmp/dx11_raw_pixel_01120
           # Native RAW GPU tile follows the genuine rasterized viewport/scissor.
