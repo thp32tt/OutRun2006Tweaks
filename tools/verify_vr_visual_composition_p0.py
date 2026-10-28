@@ -2696,28 +2696,51 @@ except SystemExit:
     pass
 else:
     raise SystemExit('central actual-draw source collision escaped')
+lens_enter_start = graphics.index('static void LensCentreEnter(')
+lens_enter_end = graphics.index('static void LensCentreLeave(', lens_enter_start)
+lens_leave_start = lens_enter_end
+lens_leave_end = graphics.index('static constexpr bool IsProjectedSunScreenObject(', lens_leave_start)
+lens_enter_region = graphics[lens_enter_start:lens_enter_end]
+lens_leave_region = graphics[lens_leave_start:lens_leave_end]
+
+def mutate_lens_region(region_start, region_end, region, before, after, label):
+    if before not in region:
+        raise SystemExit('centre-only lens mutation fixture missing: ' + label)
+    damaged_region = region.replace(before, after, 1)
+    return graphics[:region_start] + damaged_region + graphics[region_end:]
+
 for label, mutant in (
     ('central hook widen 0xD3A5 to outer D5F5', graphics.replace(
         'Module::exe_ptr(0xD3A5), LensCentreEnter',
         'Module::exe_ptr(0xD5F5), LensCentreEnter', 1)),
-    ('central producer queue bypass', graphics.replace(
+    ('central producer queue bypass', mutate_lens_region(
+        lens_enter_start, lens_enter_end, lens_enter_region,
         'OutRunVR::GameSemantic::QueueRenderActive() ||\n            LensCentreDepth != 1',
-        'LensCentreDepth != 1', 1)),
-    ('skipped nested enter unbalanced', graphics.replace(
-        '++LensCentreDepth;', '/* unbalanced enter */', 1)),
-    ('nested scope popped early', graphics.replace(
+        'LensCentreDepth != 1', 'central producer queue bypass')),
+    ('skipped nested enter unbalanced', mutate_lens_region(
+        lens_enter_start, lens_enter_end, lens_enter_region,
+        '++LensCentreDepth;', '/* unbalanced enter */',
+        'skipped nested enter unbalanced')),
+    ('nested scope popped early', mutate_lens_region(
+        lens_leave_start, lens_leave_end, lens_leave_region,
         'LensCentreOwnerDepth == LensCentreDepth',
-        'LensCentreDepth > 0', 1)),
-    ('skipped nested leave unbalanced', graphics.replace(
-        '--LensCentreDepth;', '/* unbalanced leave */', 1)),
+        'LensCentreDepth > 0', 'nested scope popped early')),
+    ('skipped nested leave unbalanced', mutate_lens_region(
+        lens_leave_start, lens_leave_end, lens_leave_region,
+        '--LensCentreDepth;', '/* unbalanced leave */',
+        'skipped nested leave unbalanced')),
     ('central leave hook lost', graphics.replace(
         'Module::exe_ptr(0xD3AA), LensCentreLeave',
         'Module::exe_ptr(0xD3A9), LensCentreLeave', 1)),
-    ('VR toggled off before central leave', graphics.replace(
+    ('VR toggled off before central leave', mutate_lens_region(
+        lens_leave_start, lens_leave_end, lens_leave_region,
         'if (!LensCentreDepth)',
-        'if (!Settings::VREnabled || !LensCentreDepth)', 1)),
-    ('world scope lost', graphics.replace(
-        'RenderScope::WorldBillboard;', 'RenderScope::ScreenHud;', 1)),
+        'if (!Settings::VREnabled || !LensCentreDepth)',
+        'VR toggled off before central leave')),
+    ('world scope lost', mutate_lens_region(
+        lens_enter_start, lens_enter_end, lens_enter_region,
+        'RenderScope::WorldBillboard;', 'RenderScope::ScreenHud;',
+        'world scope lost')),
 ):
     if mutant == graphics:
         raise SystemExit('centre-only lens negative mutation not applied')
