@@ -61,9 +61,14 @@ public:
         // complete D3D9 scene. An explicitly bounded disjoint color write
         // elsewhere cannot supersede these pixels. Unknown/full writes still
         // invalidate conservatively. Never release an in-flight GPU EVENT.
-        if (!native_raw_source_write_overlaps_tile(
-                region_.left, region_.top, region_.right, region_.bottom,
-                changedRects, changedCount)) return false;
+        // Either of the two GPU-authentic RGB regions can be superseded by
+        // an original D3D9 color write. A write touching only the SECOND
+        // tile must also revoke both pairs: we cannot expose stale pixels.
+        if (!native_raw_dual_source_write_overlaps(
+                region_.left, region_.top, alternateActive_,
+                regionAlternate_.left, regionAlternate_.top,
+                width, height, changedRects, changedCount))
+            return false;
         drawPair_.reset();
         rgbEvidenceConfirmed_ = false;
         return captureEpoch_.invalidate_for_full_source_clear(pending_);

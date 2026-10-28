@@ -21,4 +21,21 @@ int main() {
     assert(native_raw_dual_draw_tile(3440, 1440, 256, 144,
         NativeRawDrawExtent{100,100,900,600}, 4, t));
     assert(t.hasSecond);
+    // A source color fill that only overlaps the alternate GPU tile
+    // must revoke the entire pair. Unknown/full writes remain fail closed.
+    constexpr NativeRawSourcePixelRect onlySecond[] = {{500, 500, 650, 650}};
+    constexpr NativeRawSourcePixelRect noHit[] = {{0, 0, 80, 80}};
+    constexpr NativeRawSourcePixelRect onlyFirst[] = {{105, 105, 140, 140}};
+    assert(native_raw_dual_source_write_overlaps(
+        100, 100, true, 500, 500, 256, 144, onlySecond, 1));
+    assert(native_raw_dual_source_write_overlaps(
+        100, 100, true, 500, 500, 256, 144, onlyFirst, 1));
+    assert(!native_raw_dual_source_write_overlaps(
+        100, 100, true, 500, 500, 256, 144, noHit, 1));
+    assert(!native_raw_dual_source_write_overlaps(
+        100, 100, false, 500, 500, 256, 144, onlySecond, 1));
+    assert(native_raw_dual_source_write_overlaps(
+        100, 100, true, 500, 500, 256, 144, nullptr, 0));
+    assert(native_raw_dual_source_write_overlaps(
+        0xffffffffu, 0, true, 500, 500, 256, 144, noHit, 1));
 }
