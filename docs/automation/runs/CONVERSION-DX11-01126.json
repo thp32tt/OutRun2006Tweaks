@@ -1,0 +1,205 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01126",
+  "production_id": "CONVERSION-DX11-01126",
+  "event_id": "CONVERSION-DX11-01126-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01126",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:DENSE_AUTHENTIC_GPU_PIXEL_WINDOW",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "c6_score_change": 0,
+  "source_base_sha": "9afb62dce8a16a7b94f2c1c640a7a64c43c5bf68",
+  "source_change_sha": "b5d4ebc983ce9898284a9228cb61dffc1c162c4b",
+  "material_result_sha": "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+  "validation_bearing_result_sha": "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+  "result_sha": "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+  "implementation_commits": [
+    "b5d4ebc983ce9898284a9228cb61dffc1c162c4b"
+  ],
+  "repair_commits": [
+    "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_changed_pixel_window_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01125.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_INTERCEPTED_D3D9_GAME_DRAW",
+      "NATIVE_D3D11_REAL_DRAW_PREPOST_PIXEL_CAPTURE",
+      "INTEGRAL_CHANGED_RGB_SOURCE_WINDOW",
+      "BOUNDED_OPT_IN_D3D9_PRESENT_RAW_TILE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_DIAGNOSTIC_NOT_FULL_NATIVE_GAME_FRAME"
+    ],
+    "batch_components": [
+      "CXX_INTEGRAL_AUTHENTIC_RGB_DIFFERENCE_WINDOW",
+      "CXX_UNSCALED_DENSITY_OPTIMIZED_CROPPED_PRESENT_INTEGRATION",
+      "PORTABLE_POSITIVE_NEGATIVE_PIXEL_SELECTION_REGRESSION",
+      "INHERITED_01125_GATE_PATH_CAUSAL_REPAIR"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED only: real-game D3D9 draw -> native D3D11 Draw -> authentic post-/pre-Draw GPU pixels -> bounded opt-in partial RAW tile source crop. Actual game visual pixels, full native scene and headset NOT TESTED.",
+    "activation_guard_and_fallback": "RAW diagnostic requires explicit opt-in; original D3D9 Draw, menu/gamepad/FFB and DX9Ex fallback untouched. Full native publication and stereo remain fail closed; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Portable deterministic paired GPU RGB sample with one central changed pixel and 64 authentic off-center changed pixels selects maximum 64 pixels within a 32x32 safe D3D9 crop, preserving unchanged game destination.",
+      "negative_regression": "Empty RGB and alpha-only samples must yield zero changed pixels; ties keep original tile stable; invalid source tile fails closed and cannot read beyond mapped source.",
+      "component_integration": "NativeRawVisualPreview::present receives GPU Map pre/post authenticated Draw staging, computes integral prefix and densest unscaled source subsection, uploads only authenticated true changed RGB; five unchanged exact-SHA GitHub Gates successful."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Make source-authentic dense native D3D11 real-game Draw RGB pixels as visible as possible in a safe opt-in cropped D3D9 Present RAW tile while refusing full-frame/stereo promotion.",
+    "acceptance_items": [
+      {
+        "id": "densest_real_native_gpu_rgb_region",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_DRAW_PREPOST_GPU_CAPTURE",
+        "expected_behavior": "Select valid 24x24+ unscaled source tile maximizing genuine changed pre/post native GPU RGB pixels even if center contains one fragment."
+      },
+      {
+        "id": "native_tile_original_renderer_protection",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_PRESENT_GAMEPAD_FFB_FALLBACK",
+        "expected_behavior": "Keep D3D9 destination/crop fixed, stable ties and no alpha-only or fabricated RGB; original Draw, input and FFB unchanged."
+      },
+      {
+        "id": "one_exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "MANDATORY_ACTIONS_BUILD",
+        "expected_behavior": "All five required unmodified push GitHub Actions Gate workflows succeed on one causal-repaired material result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "densest_real_native_gpu_rgb_region": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_pixel_window_test.cpp"
+      ],
+      "validation_command": "DX11 Fast #40621870269 success at 8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+      "runtime_validation": "UNTESTED"
+    },
+    "native_tile_original_renderer_protection": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "tests/native_raw_changed_pixel_window_test.cpp"
+      ],
+      "validation_command": "Windows Build #40621870061 and Backend #40621870038 success",
+      "runtime_validation": "UNTESTED"
+    },
+    "one_exact_sha_five_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40621870269",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40621870038"
+      ],
+      "validation_command": "All five required push workflows concluded success on 8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS remote HEAD 9afb62d (01125 C6) and no active source collision detected at actual non-force claim",
+    "C1_REVIEW": "PASS original 01125 first/nearest-source crop can contain one center changed RGB while missing dense vehicle or menu fragments elsewhere",
+    "C2_IMPLEMENT": "PASS C++ integral authentic GPU delta region and RAW Draw pixel-source integration + 15-assert regression, commit b5d4ebc983ce9898284a9228cb61dffc1c162c4b",
+    "C3_VALIDATE": "PASS exact-SHA five required GitHub push Gates on 8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+    "C4_COMMIT": "PASS material C++ b5d4ebc983ce9898284a9228cb61dffc1c162c4b then causal inherited task JSON Gate repair 8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b both exact [AUTO:CONVERSION-DX11-01126] non-force; no CI skip",
+    "C5_PACKAGE": "PASS Build artifact outrun2006tweaks-8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b id 12787354539; no HMD game run",
+    "C6_STATE": "PASS separate bookkeeping-only after five exact-SHA Gates; same TASK_ID E002 retry +0"
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40621870269,
+      "event": "push",
+      "head_sha": "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40621870038,
+      "event": "push",
+      "head_sha": "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40621870061,
+      "event": "push",
+      "head_sha": "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40621870282,
+      "event": "push",
+      "head_sha": "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40621870011,
+      "event": "push",
+      "head_sha": "8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-8a2adedd36ee9d8bdbf3acfcd57a44ea43235d9b",
+    "artifact_id": 12787354539,
+    "run_id": 40621870061
+  },
+  "runtime_evidence": {
+    "native_draws": "UNTESTED_AT_THIS_SHA",
+    "native_gpu_pixel_output": "UNTESTED_AT_THIS_SHA",
+    "publishedBackbufferFrames": "UNTESTED_AT_THIS_SHA",
+    "gpu_desktop_frames": "UNTESTED_AT_THIS_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "next_action": "Run one exact-source desktop OutRun 2006 menu -> car -> race RAW visual test using opt-in mode and inspect genuine native pixel counts; continue complete D3D11 full frame and real L/R direct GPU OpenXR after visual evidence, never treat partial tile as full/native HMD pass.",
+  "scoreboard_authority": {
+    "repository": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "path": "AI_SCOREBOARD.md",
+    "scoreboard_commit": "74955506e1ae4c1b94029ac87d375d92a127aa7f",
+    "previous_confirmed_ai2": 2066,
+    "score_increment_for_distinct_source_and_exact_sha_gate": 1,
+    "score_increment_for_retry_repair_and_c6": 0,
+    "new_confirmed_ai2": 2067
+  },
+  "c6_note": "One independent integrated source feature with five exact-SHA Gates. Existing 01125 legacy strategy repair under same 01126, CI revalidation and C6 +0. Original D3D9 renderer/input/FFB, fallback, DXVK frozen. RUNTIME_VALIDATION=UNTESTED. External Portainer controller adoption not independently verified. No measured time percentage."
+}
