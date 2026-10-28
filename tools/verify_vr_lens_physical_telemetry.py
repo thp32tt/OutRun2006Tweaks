@@ -161,8 +161,8 @@ def main() -> None:
         (2, "ArmLensDeferredPhysical(", "/* removed deferred bridge */"),
         (0, "rawWvpHash=0x{:016X}", "rawWvpHash=OMITTED"),
         (0, "sameRT={}", "sameRT=ASSUMED_ZERO"),
-        (3, "CurrentLensDeferredPhysical is diagnostic-only.",
-            "CurrentLensDeferredPhysical may override rendering."),
+        (3, "if (ExactLensCentreDrawOwnsSemantic())",
+            "if (CurrentLensDeferredPhysical.sourceSerial != 0) return RenderScope::ProjectedScreenEffect2D;\n        if (ExactLensCentreDrawOwnsSemantic())"),
     ]
     values = [r30, game, hook, sem]
     for idx, old, new in mutations:
