@@ -1371,6 +1371,7 @@ struct State {
     NativeRawVisualPreview rawPreview;
     std::uint64_t rawPreviewFrames = 0u;
     std::uint64_t rawPreviewCopies = 0u;
+    std::uint64_t rawPreviewLateCopies = 0u;
     std::uint64_t rawFogVisualBypasses = 0u;
     NativeRawSourceProbeSchedule rawSourceProbe;
     std::uint64_t rawProbeRestarts = 0u;
@@ -11284,7 +11285,8 @@ void before_game_present(IDirect3DDevice9* game,
             const auto status = s.rawPreview.present(
                 game, presentBackbuffer.Get(), presentDesc, sourceRect,
                 rawPresentCovered, s.backend.device(), s.backend.context(),
-                s.backend.color_texture(), s.issued, rawChangedPixels);
+                s.backend.color_texture(), s.issued, s.presents,
+                rawChangedPixels);
             if (status == NativeRawPreviewResult::VisibleGpuPixels) {
                 ++s.rawPreviewFrames;
                 spdlog::info(
@@ -11294,6 +11296,15 @@ void before_game_present(IDirect3DDevice9* game,
                     "full_native_frame=NO OpenXR_native_stereo=NO",
                     rawChangedPixels, s.rawPreviewFrames,
                     s.rawPreviewCopies, s.issued);
+            } else if (status == NativeRawPreviewResult::StaleGpuCopy) {
+                ++s.rawPreviewLateCopies;
+                if (s.rawPreviewLateCopies == 1u ||
+                    s.rawPreviewLateCopies % 128u == 0u)
+                    spdlog::info(
+                        "DX11 RAW_VISUAL stale_gpu_copy_discarded={} "
+                        "present_serial={} native_gpu_pixel_output=0 "
+                        "source_epoch_mismatch=1 DX9Ex_preserved=1",
+                        s.rawPreviewLateCopies, s.presents);
             } else if (s.presents % 300u == 0u) {
                 spdlog::info(
                     "DX11 RAW_VISUAL stage={} native_draws={} "

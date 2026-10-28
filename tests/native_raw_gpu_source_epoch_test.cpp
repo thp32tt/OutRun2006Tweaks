@@ -21,6 +21,22 @@ int main() {
     assert(e.can_queue(1u, false));
     e.queued(1u);
     assert(e.consume());
+    // A finished source GPU copy may paint only its matching original
+    // Present; a consumed ticket cannot be reused on a second Present.
+    e.reset();
+    e.queued(7u);
+    assert(e.consume_for_present(7u));
+    assert(!e.consume_for_present(7u));
+    // Once an async copy times out at Present 8, completion at Present 9
+    // must discard the old game pixels while preserving in-flight storage.
+    e.reset();
+    e.queued(8u);
+    assert(!e.consume_for_present(9u));
+    assert(!e.consume_for_present(8u));
+    assert(!e.can_queue(9u, true));
+    assert(e.can_queue(9u, false)); // only after GPU fence retired
+    e.queued(9u);
+    assert(e.consume_for_present(9u));
     e.reset(); // genuine Reset/new D3D9 or D3D11 owner
     assert(e.can_queue(0u, false));
     assert(!e.consume());
@@ -30,5 +46,6 @@ int main() {
     assert(e.can_queue(max, false));
     e.queued(max);
     assert(!e.can_queue(max, false));
+    assert(!e.consume_for_present(0u)); // wrapped serial is NOT a match
     return 0;
 }

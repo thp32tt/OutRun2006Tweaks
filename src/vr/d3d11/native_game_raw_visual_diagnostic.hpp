@@ -22,7 +22,8 @@
 namespace outrun::vr::dx11 {
 enum class NativeRawPreviewResult {
     NoDraw, CopyQueued, GpuPending, VisibleGpuPixels, NoChangedPixels,
-    UnsafePresent, InvalidNativeColor, GpuFailure, UploadFailure
+    UnsafePresent, InvalidNativeColor, GpuFailure, UploadFailure,
+    StaleGpuCopy
 };
 class NativeRawVisualPreview final {
 public:
@@ -39,7 +40,8 @@ public:
         const D3DSURFACE_DESC& back, const RECT* crop,
         bool sourceCropRepaintVerified,
         ID3D11Device* dev, ID3D11DeviceContext* ctx, ID3D11Texture2D* color,
-        std::uint64_t draws, UINT& nativePixels) noexcept {
+        std::uint64_t draws, std::uint64_t presentingSerial,
+        UINT& nativePixels) noexcept {
         nativePixels = 0;
         if (!game || !backbuffer || !dev || !ctx || !color)
             return NativeRawPreviewResult::UnsafePresent;
@@ -47,7 +49,10 @@ public:
             reset(); gameOwner_ = game; gpuOwner_ = dev;
         }
         lastDraws_ = draws;
-        (void)captureEpoch_.consume();
+        // A timeout preserves staging ownership but not permission to paint
+        // the subsequent D3D9 Present with the earlier Draw's GPU result.
+        const bool matchingPresent = captureEpoch_.consume_for_present(
+            presentingSerial);
         const LONG l = crop ? crop->left : 0, t = crop ? crop->top : 0;
         const LONG r = crop ? crop->right : static_cast<LONG>(back.Width);
         const LONG b = crop ? crop->bottom : static_cast<LONG>(back.Height);
@@ -89,6 +94,13 @@ public:
                 []() noexcept { std::this_thread::yield(); },
                 24000u);
             if (done == NativeRawGpuWaitResult::Complete) {
+                if (!matchingPresent) {
+                    // Retire finished GPU staging without any CPU Map or
+                    // UpdateSurface: this is an older game's source frame.
+                    pending_ = false;
+                    drawPair_.reset();
+                    return NativeRawPreviewResult::StaleGpuCopy;
+                }
                 // Only a paired pre-Draw and post-Draw copy is GPU pixel
                 // evidence. A static clear or last frame's pixels is not.
                 D3D11_MAPPED_SUBRESOURCE before{}, mapped{};

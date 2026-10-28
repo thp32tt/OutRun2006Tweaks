@@ -17,6 +17,13 @@ public:
         everQueued_ = true;
         unconsumed_ = true;
     }
+    // A GPU capture is valid only for its exact original game's Present
+    // serial. Late GPU completion can retire staging but cannot publish it.
+    [[nodiscard]] bool consume_for_present(std::uint64_t presentingSerial) noexcept {
+        const bool matched = unconsumed_ && lastQueuedSerial_ == presentingSerial;
+        unconsumed_ = false;
+        return matched;
+    }
     [[nodiscard]] bool consume() noexcept {
         const bool hadCopy = unconsumed_;
         unconsumed_ = false;
