@@ -238,3 +238,58 @@ constexpr bool kRawConnectedDirtyRepaintProof = []() constexpr {
 }();
 static_assert(kRawConnectedDirtyRepaintProof,
               "fragmented source repaint cannot fabricate native GPU pixels");
+
+// Distinct authentic D3D9 dirty islands must be able to display both
+// independent source Draw GPU captures, not an imaginary contiguous frame.
+constexpr bool kRawDisjointRepaintPairProof = []() constexpr {
+    using namespace outrun::vr::dx11;
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true;
+    dirty.count = 2u;
+    dirty.rectangles[0] = {600, 300, 648, 348};
+    dirty.rectangles[1] = {900, 300, 948, 348};
+    dirty.boundLeft = 600; dirty.boundTop = 300;
+    dirty.boundRight = 948; dirty.boundBottom = 348;
+    const NativeRawPresentTile first{0u, 0u, 32u, 32u, 608, 308};
+    NativeRawPresentTile second{};
+    const auto findSecond = [&]() constexpr {
+        return native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080,
+            dirty, 32, 32, second, &first);
+    };
+    if (!native_raw_dirty_region_covers_tile(1920, 1080, dirty, first) ||
+        !findSecond() || second.destinationX != 908 ||
+        second.destinationY != 308 ||
+        !native_raw_disjoint_equal_tiles(first, second) ||
+        !native_raw_dirty_region_covers_tile(1920, 1080, dirty, second))
+        return false;
+    const NativeRawPresentTile unpainted{0u, 0u, 32u, 32u, 568, 308};
+    if (native_raw_dirty_region_covers_tile(1920, 1080, dirty, unpainted))
+        return false;
+    // No second island large enough to hold the same genuine GPU window.
+    dirty.rectangles[1] = {900, 300, 923, 348};
+    dirty.boundRight = 923;
+    if (findSecond()) return false;
+    dirty.rectangles[1] = {900, 300, 948, 348};
+    dirty.boundRight = 949; // source rcBound forgery
+    if (findSecond()) return false;
+    dirty.boundRight = 948;
+    dirty.rectangles[1].right = 2000; // invalid member
+    if (findSecond()) return false;
+    dirty.rectangles[1].right = 948;
+    dirty.headerVerified = false;
+    if (findSecond()) return false;
+    dirty.headerVerified = true;
+    // Present source crop exposes only first island; never paint a second.
+    if (native_raw_dirty_region_place_tile(
+            1920, 1080, 580, 280, 660, 360,
+            dirty, 32, 32, second, &first)) return false;
+    // A guessed first tile cannot reserve or authorize pixels.
+    const NativeRawPresentTile forgedFirst{0u, 0u, 32u, 32u, 400, 308};
+    if (native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080,
+            dirty, 32, 32, second, &forgedFirst)) return false;
+    return true;
+}();
+static_assert(kRawDisjointRepaintPairProof,
+    "RAW paired GPU pixels need two genuine nonoverlapping dirty islands");

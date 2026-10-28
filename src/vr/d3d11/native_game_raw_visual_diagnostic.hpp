@@ -246,9 +246,29 @@ public:
                     }
                 }
                 NativeRawPresentTile secondaryPlacement{};
-                const bool canShowBoth = alternateActive_ && firstPixels &&
-                    secondPixels && native_raw_secondary_present_tile(
+                bool canShowBoth = false;
+                if (alternateActive_ && firstPixels && secondPixels) {
+                    // A game Present may repaint two distant menu/car islands.
+                    // First try the familiar adjacent layout, but only when
+                    // that destination itself is known to reach the screen.
+                    const bool adjacent = native_raw_secondary_present_tile(
                         originalTile, l, t, r, b, secondaryPlacement);
+                    canShowBoth = adjacent &&
+                        (sourceCropRepaintVerified ||
+                         (sourceDirty && native_raw_dirty_region_covers_tile(
+                             back.Width, back.Height, *sourceDirty,
+                             secondaryPlacement)));
+                    if (!canShowBoth && sourceDirty) {
+                        // Reposition ONLY the second display crop. Its GPU
+                        // BEFORE/AFTER pixels and RGB count remain untouched.
+                        // Reuse identical source dimensions; no downscale,
+                        // fabricated image or overlapping D3D9 source paint.
+                        canShowBoth = native_raw_dirty_region_place_tile(
+                            back.Width, back.Height, l, t, r, b, *sourceDirty,
+                            originalTile.copyWidth, originalTile.copyHeight,
+                            secondaryPlacement, &originalTile);
+                    }
+                }
                 if (canShowBoth) {
                     secondTile.destinationX = secondaryPlacement.destinationX;
                     secondTile.destinationY = secondaryPlacement.destinationY;

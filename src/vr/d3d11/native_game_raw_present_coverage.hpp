@@ -95,6 +95,19 @@ struct NativeRawPresentDirtyRegion {
     }
     return true;
 }
+// Allow two independently captured native Draw images in separate ORIGINAL
+// game repaint islands, without overlapping either image or claiming a
+// complete scene. Their pixel counts require identical tile dimensions.
+[[nodiscard]] constexpr bool native_raw_disjoint_equal_tiles(
+    const NativeRawPresentTile& a, const NativeRawPresentTile& b) noexcept {
+    if (!a.copyWidth || !a.copyHeight ||
+        a.copyWidth != b.copyWidth || a.copyHeight != b.copyHeight)
+        return false;
+    return a.destinationX + std::int64_t{a.copyWidth} <= b.destinationX ||
+           b.destinationX + std::int64_t{b.copyWidth} <= a.destinationX ||
+           a.destinationY + std::int64_t{a.copyHeight} <= b.destinationY ||
+           b.destinationY + std::int64_t{b.copyHeight} <= a.destinationY;
+}
  // When a D3D9 menu/car Present updates only a subset, the default
  // top-right RAW diagnostic tile may be outside ALL genuine dirty pixels.
  // Keep it when fully covered; otherwise find the largest tile inside a
@@ -105,14 +118,19 @@ struct NativeRawPresentDirtyRegion {
      std::int64_t cropRight, std::int64_t cropBottom,
      const NativeRawPresentDirtyRegion& dirty,
      std::uint32_t sourceWidth, std::uint32_t sourceHeight,
-     NativeRawPresentTile& placed) noexcept {
+     NativeRawPresentTile& placed,
+     const NativeRawPresentTile* exclude = nullptr) noexcept {
      placed = {};
+     // Only an authenticated first image may reserve painted D3D9 pixels.
+     if (exclude && !native_raw_dirty_region_covers_tile(
+             backWidth, backHeight, dirty, *exclude)) return false;
      NativeRawPresentTile ordinary{};
      if (!native_raw_partial_present_tile(
              backWidth, backHeight, cropLeft, cropTop,
              cropRight, cropBottom, sourceWidth, sourceHeight, ordinary))
          return false;
-     if (native_raw_dirty_region_covers_tile(
+     if ((!exclude || native_raw_disjoint_equal_tiles(ordinary, *exclude)) &&
+         native_raw_dirty_region_covers_tile(
              backWidth, backHeight, dirty, ordinary)) {
          placed = ordinary;
          return true;
@@ -139,6 +157,7 @@ struct NativeRawPresentDirtyRegion {
          const auto area = std::uint64_t{candidate.copyWidth} *
                            candidate.copyHeight;
          if ((found && area <= largestArea) ||
+             (exclude && !native_raw_disjoint_equal_tiles(candidate, *exclude)) ||
              !native_raw_dirty_region_covers_tile(
                  backWidth, backHeight, dirty, candidate))
              return;
