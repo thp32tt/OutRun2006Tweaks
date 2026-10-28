@@ -92,6 +92,10 @@ required = {
         "headFlags=0x",
         "refSpacePending=",
         "fullTraceQpc.QuadPart",
+        "VR TRACE XR PIXEL GRID FULL",
+        "R23ProjectionSamplesX = 5",
+        "R23ProjectionSamplesY = 3",
+        "R23PixelIntervalMs = 100",
     ]),
     "game log flush": (dllmain, [
         "spdlog::flush_on(spdlog::level::debug)",
@@ -100,11 +104,13 @@ required = {
         "outrun-vr-host*.log",
         "FULL_TRACE_STATUS.txt",
         "FULL_TRACE_CONTRACT.txt",
+        "OUTRUN_VR_R23_PIXEL_PROBE = '1'",
     ]),
     "official collection": (official_runner, [
         "outrun-vr-host*.log",
         "FULL_TRACE_STATUS.txt",
         "outrun-vr-host-full-trace.log",
+        "OUTRUN_VR_R23_PIXEL_PROBE = '1'",
     ]),
 }
 

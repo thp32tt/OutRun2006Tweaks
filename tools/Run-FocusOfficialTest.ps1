@@ -60,6 +60,7 @@ try {
     $env:OUTRUN_VR_GPU_PROFILE = if ($debugMode) { '1' } else { '0' }
     $env:OUTRUN_VR_GPU_PROFILE_CENSUS_V2 = if ($debugMode) { '1' } else { '0' }
     $env:OUTRUN_VR_GPU_SCENE = $variant
+    $env:OUTRUN_VR_R23_PIXEL_PROBE = '1'
     $argsList = @(
         '-FramerateLimit=0','-FramerateFastLoad=0',
         '-FramerateInterpolation=true','-FramerateUnlockExperimental=true',
@@ -78,6 +79,7 @@ try {
       "variant=$variant","debug=$debugMode","arguments=$($argsList -join ' ')",
       "OUTRUN_VR_GPU_PROFILE=$env:OUTRUN_VR_GPU_PROFILE",
       "OUTRUN_VR_GPU_PROFILE_CENSUS_V2=$env:OUTRUN_VR_GPU_PROFILE_CENSUS_V2",
+      "OUTRUN_VR_R23_PIXEL_PROBE=$env:OUTRUN_VR_R23_PIXEL_PROBE",
       "runtimeValidation=UNTESTED") | Set-Content -LiteralPath (Join-Path $session 'RUN_CONFIG.txt') -Encoding UTF8
     # Record the actual installed payload, not only a package-label SHA.
     $binaryIdentity = @('dinput8.dll','outrun-vr-host.exe') | ForEach-Object {

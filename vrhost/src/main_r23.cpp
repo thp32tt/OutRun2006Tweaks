@@ -206,7 +206,13 @@ namespace
         return cachedLetterbox;
     }
 
-    constexpr ULONGLONG R23PixelIntervalMs = 5000;
+    // FULL visual diagnosis intentionally samples often. This path remains
+    // process-start opt-in via OUTRUN_VR_R23_PIXEL_PROBE.
+    constexpr ULONGLONG R23PixelIntervalMs = 100;
+    constexpr UINT R23ProjectionSamplesX = 5;
+    constexpr UINT R23ProjectionSamplesY = 3;
+    constexpr UINT R23ProjectionSamplesPerEye =
+        R23ProjectionSamplesX * R23ProjectionSamplesY;
     // Opt-in only: staging copies and Map polling are diagnostic GPU work.
     // A fixed process-start decision avoids environment queries per XR tick.
     bool R23PixelDiagnosticsEnabled() noexcept
@@ -865,33 +871,130 @@ namespace
             if (hr == DXGI_ERROR_WAS_STILL_DRAWING) { ++projectionMapDefers; return; }
             if (FAILED(hr) || !mapped.pData)
             {
-                std::cerr << "[R23 pixel] projection async Map failed hr=0x"
-                          << std::hex << static_cast<unsigned long>(hr) << std::dec << "\n";
+                std::ostringstream out;
+                out << "[VR TRACE XR PIXEL GRID FULL] phase=MAP_FAILED hr=0x"
+                    << std::hex << static_cast<unsigned long>(hr) << std::dec
+                    << " frame=" << projectionFrameId
+                    << " mapDefers=" << projectionMapDefers << "\n";
+                OutRunVrEmitFullTrace(out.str());
                 projectionPending = false;
                 return;
             }
 
             const UINT bpp = R23BytesPerPixel(projectionFormat);
             const auto* row = static_cast<const std::uint8_t*>(mapped.pData);
-            float left[3]{}, right[3]{};
-            const bool leftDecoded = R23DecodeRgb(row, projectionFormat, left);
-            const bool rightDecoded = R23DecodeRgb(row + bpp, projectionFormat, right);
-            const bool leftFinite = leftDecoded && std::isfinite(left[0]) &&
-                std::isfinite(left[1]) && std::isfinite(left[2]);
-            const bool rightFinite = rightDecoded && std::isfinite(right[0]) &&
-                std::isfinite(right[1]) && std::isfinite(right[2]);
+            float minRgb[2][3]{
+                {1.0e30f,1.0e30f,1.0e30f},
+                {1.0e30f,1.0e30f,1.0e30f}};
+            float maxRgb[2][3]{
+                {-1.0e30f,-1.0e30f,-1.0e30f},
+                {-1.0e30f,-1.0e30f,-1.0e30f}};
+            double sumRgb[2][3]{};
+            std::uint32_t finite[2]{};
+            std::uint64_t rawHash[2]{
+                1469598103934665603ull,
+                1469598103934665603ull};
+            float decoded[2][R23ProjectionSamplesPerEye][3]{};
+            bool valid[2][R23ProjectionSamplesPerEye]{};
+
+            for (UINT eye=0; eye<2; ++eye)
+            {
+                for (UINT i=0; i<R23ProjectionSamplesPerEye; ++i)
+                {
+                    const auto* pixel=row+
+                        static_cast<std::size_t>(
+                            eye*R23ProjectionSamplesPerEye+i)*bpp;
+                    for(UINT byte=0;byte<bpp;++byte)
+                    {
+                        rawHash[eye]^=pixel[byte];
+                        rawHash[eye]*=1099511628211ull;
+                    }
+                    float rgb[3]{};
+                    const bool ok=R23DecodeRgb(
+                        pixel,projectionFormat,rgb) &&
+                        std::isfinite(rgb[0]) &&
+                        std::isfinite(rgb[1]) &&
+                        std::isfinite(rgb[2]);
+                    valid[eye][i]=ok;
+                    if(!ok) continue;
+                    ++finite[eye];
+                    for(int c=0;c<3;++c)
+                    {
+                        decoded[eye][i][c]=rgb[c];
+                        minRgb[eye][c]=std::min(minRgb[eye][c],rgb[c]);
+                        maxRgb[eye][c]=std::max(maxRgb[eye][c],rgb[c]);
+                        sumRgb[eye][c]+=rgb[c];
+                    }
+                }
+            }
+
+            double pairAbsSum=0.0;
+            double pairAbsMax=0.0;
+            std::uint32_t pairChannels=0;
+            for(UINT i=0;i<R23ProjectionSamplesPerEye;++i)
+            {
+                if(!valid[0][i]||!valid[1][i]) continue;
+                for(int c=0;c<3;++c)
+                {
+                    const double d=std::fabs(
+                        static_cast<double>(decoded[0][i][c])-
+                        static_cast<double>(decoded[1][i][c]));
+                    pairAbsSum+=d;
+                    pairAbsMax=std::max(pairAbsMax,d);
+                    ++pairChannels;
+                }
+            }
             context->Unmap(projectionStage, 0);
             projectionPending = false;
 
-            std::cout << "[R23 pixel] projection frame=" << projectionFrameId
-                      << " source=" << R23SourceKindName(projectionKind)
-                      << " finalSubmissionKnown=" << (projectionFinalKnown ? 1 : 0)
-                      << " finalSubmitted=" << (projectionFinalSubmitted ? 1 : 0)
-                      << " leftFinite=" << (leftFinite ? 1 : 0)
-                      << " leftRgb=" << left[0] << "," << left[1] << "," << left[2]
-                      << " rightFinite=" << (rightFinite ? 1 : 0)
-                      << " rightRgb=" << right[0] << "," << right[1] << "," << right[2]
-                      << " mapDefers=" << projectionMapDefers << "\n";
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            std::ostringstream out;
+            out << "[VR TRACE XR PIXEL GRID FULL]"
+                << " qpc=" << qpc.QuadPart
+                << " frame=" << projectionFrameId
+                << " source=" << R23SourceKindName(projectionKind)
+                << " finalSubmissionKnown=" << (projectionFinalKnown ? 1 : 0)
+                << " finalSubmitted=" << (projectionFinalSubmitted ? 1 : 0)
+                << " format=" << static_cast<unsigned>(projectionFormat)
+                << " grid=" << R23ProjectionSamplesX << "x"
+                << R23ProjectionSamplesY
+                << " finiteL=" << finite[0]
+                << " finiteR=" << finite[1]
+                << " hashL=0x" << std::hex << rawHash[0]
+                << " hashR=0x" << rawHash[1] << std::dec
+                << " minL=" << minRgb[0][0] << "," << minRgb[0][1] << "," << minRgb[0][2]
+                << " maxL=" << maxRgb[0][0] << "," << maxRgb[0][1] << "," << maxRgb[0][2]
+                << " meanL="
+                << sumRgb[0][0]/(finite[0]?finite[0]:1) << ","
+                << sumRgb[0][1]/(finite[0]?finite[0]:1) << ","
+                << sumRgb[0][2]/(finite[0]?finite[0]:1)
+                << " minR=" << minRgb[1][0] << "," << minRgb[1][1] << "," << minRgb[1][2]
+                << " maxR=" << maxRgb[1][0] << "," << maxRgb[1][1] << "," << maxRgb[1][2]
+                << " meanR="
+                << sumRgb[1][0]/(finite[1]?finite[1]:1) << ","
+                << sumRgb[1][1]/(finite[1]?finite[1]:1) << ","
+                << sumRgb[1][2]/(finite[1]?finite[1]:1)
+                << " pairAbsMean="
+                << (pairChannels ? pairAbsSum/pairChannels : 0.0)
+                << " pairAbsMax=" << pairAbsMax
+                << " mapDefers=" << projectionMapDefers
+                << " samplesL=";
+            for(UINT i=0;i<R23ProjectionSamplesPerEye;++i)
+            {
+                if(i) out << ";";
+                out << i << ":" << decoded[0][i][0] << ","
+                    << decoded[0][i][1] << "," << decoded[0][i][2];
+            }
+            out << " samplesR=";
+            for(UINT i=0;i<R23ProjectionSamplesPerEye;++i)
+            {
+                if(i) out << ";";
+                out << i << ":" << decoded[1][i][0] << ","
+                    << decoded[1][i][1] << "," << decoded[1][i][2];
+            }
+            out << "\n";
+            OutRunVrEmitFullTrace(out.str());
         }
 
         void ConsumeTheater(ID3D11DeviceContext* context)
@@ -995,16 +1098,36 @@ namespace
             if (projectionPending || now - lastProjectionScheduleMs < R23PixelIntervalMs ||
                 image >= c.projection_.images.size() || !c.device_ || !c.context_) return;
             if (!EnsureStage(c.device_, projectionStage, projectionFormat,
-                    c.projection_.format, 2)) return;
+                    c.projection_.format, 2 * R23ProjectionSamplesPerEye)) return;
             ID3D11Texture2D* texture = c.projection_.images[image].texture;
             if (!texture) return;
-            for (UINT eye = 0; eye < 2; ++eye)
+
+            const float xs[R23ProjectionSamplesX]{
+                0.10f,0.30f,0.50f,0.70f,0.90f};
+            const float ys[R23ProjectionSamplesY]{
+                0.20f,0.50f,0.80f};
+            for (UINT eye=0;eye<2;++eye)
             {
-                const UINT sx = c.projection_.width / 2;
-                const UINT sy = c.projection_.height / 2;
-                D3D11_BOX box{ sx, sy, 0, sx + 1, sy + 1, 1 };
-                c.context_->CopySubresourceRegion(projectionStage, 0, eye, 0, 0,
-                    texture, D3D11CalcSubresource(0, eye, 1), &box);
+                UINT local=0;
+                for(float yf:ys)
+                {
+                    for(float xf:xs)
+                    {
+                        const UINT sx=std::min(
+                            c.projection_.width-1,
+                            static_cast<UINT>(xf*c.projection_.width));
+                        const UINT sy=std::min(
+                            c.projection_.height-1,
+                            static_cast<UINT>(yf*c.projection_.height));
+                        D3D11_BOX box{sx,sy,0,sx+1,sy+1,1};
+                        c.context_->CopySubresourceRegion(
+                            projectionStage,0,
+                            eye*R23ProjectionSamplesPerEye+local,
+                            0,0,texture,
+                            D3D11CalcSubresource(0,eye,1),&box);
+                        ++local;
+                    }
+                }
             }
             OutRunVrR23VerifiedBundle::Snapshot verified{};
             if (OutRunVrR23VerifiedBundle::ReadFresh(verified))
