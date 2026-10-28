@@ -1050,12 +1050,6 @@ for label, original in (
      'ResultProgressDirectDrawOwner.reset();'),
     ('stage time text direct owner lost',
      'OutRunStagePrintfDirectDrawOwner.emplace('),
-    ('GOAL time helper direct owner lost',
-     'ScopedExactProducerSemantic owner('),
-    ('GOAL time helper exit admission lost',
-     'if (admittedAtExit)'),
-    ('GOAL time helper queued sibling tagging lost',
-     'TagAppendedNodes(before,\n\t\t\tOutRunVR::GameSemantic::RenderScope::ScreenHud, producer,\n            nullptr, &rootsBefore, entrySerial);'),
 ):
     if original not in ui:
         raise SystemExit('GOAL direct owner mutation fixture missing: ' + label)
@@ -1066,6 +1060,31 @@ for label, original in (
         pass
     else:
         raise SystemExit('GOAL direct owner mutation escaped: ' + label)
+
+# GoalTime_TagHelper has tokens shared by other direct HUD owners. Mutate the
+# exact helper body so an unrelated earlier ScopedExactProducerSemantic / exit
+# guard cannot make the negative control a false pass.
+goal_helper_start = ui.index('static void GoalTime_TagHelper(')
+goal_helper_end = ui.index('static void __cdecl GoalTime_Help020', goal_helper_start)
+goal_helper_region = ui[goal_helper_start:goal_helper_end]
+for label, original in (
+    ('GOAL time helper direct owner lost',
+     'ScopedExactProducerSemantic owner('),
+    ('GOAL time helper exit admission lost',
+     'if (admittedAtExit)'),
+    ('GOAL time helper queued sibling tagging lost',
+     'TagAppendedNodes(before,'),
+):
+    if original not in goal_helper_region:
+        raise SystemExit('GOAL helper mutation fixture missing: ' + label)
+    damaged_region = goal_helper_region.replace(original, '/* fault injected */', 1)
+    damaged = ui[:goal_helper_start] + damaged_region + ui[goal_helper_end:]
+    try:
+        verify_goal_transient_direct_hud_scope(damaged, sem)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('GOAL helper mutation escaped: ' + label)
 
 # Shader and R62 fixed-function both need the exact originating family in
 # telemetry; without this, +TIME vs final-result ambiguity returns.
