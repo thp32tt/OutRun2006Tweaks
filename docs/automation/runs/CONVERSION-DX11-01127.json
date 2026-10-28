@@ -51,14 +51,24 @@
       "PORTABLE_POSITIVE_NEGATIVE_TIMING_REGRESSION",
       "INHERITED_OPENXR_PACKAGE_NEGATIVE_CAUSAL_REPAIR"
     ],
-    "positive_probe": "Deterministic ready-now and ready-within-timeout GPU event sequences return Complete and permit same-Present copy.",
-    "negative_regression": "Pending beyond 24ms, GPU failure, stopped clock and zero wait budget remain fail-closed; original renderer, input and FFB unaffected.",
-    "component_integration": "Actual D3D11 Draw paired GPU staging readback integrates bounded event-ready Map with existing authentic changed pixel crop; mandatory five exact-SHA push gates PASS.",
     "conflict_keys": [
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
       "DX11:RAW_VISUAL_DIAGNOSTIC"
     ],
-    "full_gate_plan": "one_validation_bearing_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_DIAGNOSTIC_NOT_FULL_NATIVE_GAME_FRAME"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_BUILD_VERIFIED ONLY: real intercepted D3D9 game Draw -> native D3D11 GPU Draw -> paired before/after source-authentic RGB -> bounded same-Present RAW diagnostic partial tile. Actual visible real-game pixels and full native menu/car/race scene NOT TESTED, no HMD verification.",
+    "activation_guard_and_fallback": "Explicit RAW visual diagnostic opt-in only; original D3D9 Draw/Present, DX9Ex fallback, gamepad/input and FFB preserved; full-frame native publication and OpenXR stereo promotion fail-closed; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Deterministic ready-now and ready-within-timeout GPU event sequences return Complete and permit same-Present copy.",
+      "negative_regression": "Pending beyond 24ms, GPU failure, stopped clock and zero wait budget remain fail-closed; original renderer, input and FFB unaffected.",
+      "component_integration": "Actual D3D11 Draw paired GPU staging readback integrates bounded event-ready Map with existing authentic changed pixel crop; mandatory five exact-SHA push gates PASS."
+    }
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -67,17 +77,20 @@
       {
         "id": "same_present_native_raw_pixels",
         "category": "end_to_end_behavior",
-        "expected_behavior": "Bounded 24ms GPU event-complete readback and source-authentic RGB crop on matching original Present."
+        "expected_behavior": "Bounded 24ms GPU event-complete readback and source-authentic RGB crop on matching original Present.",
+        "behavior_area": "NATIVE_D3D11_DRAW_GPU_EVENT_READBACK"
       },
       {
         "id": "failed_gpu_original_game_fallback",
         "category": "fallback_regression",
-        "expected_behavior": "Never block indefinitely, use event completion before staging Map and preserve original D3D9/FFB/gamepad."
+        "expected_behavior": "Never block indefinitely, use event completion before staging Map and preserve original D3D9/FFB/gamepad.",
+        "behavior_area": "D3D9_PRESENT_FALLBACK_GAMEPAD_FFB"
       },
       {
         "id": "five_exact_sha_actions",
         "category": "integrated_validation",
-        "expected_behavior": "All five mandatory push workflows SUCCESS at the repaired material SHA."
+        "expected_behavior": "All five mandatory push workflows SUCCESS at the repaired material SHA.",
+        "behavior_area": "EXACT_SHA_GITHUB_ACTIONS_BUILD"
       }
     ]
   },
@@ -89,7 +102,8 @@
         "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
         "src/vr/d3d11/native_game_raw_gpu_wait.hpp",
         "tests/native_raw_gpu_wait_test.cpp"
-      ]
+      ],
+      "validation_command": "Portable ready/timeout/fail/stalled-clock regression; DX11 Fast Structural Checks #40628277706 at 35a02c82bb62677326a0d67b849ce9459973eaf7"
     },
     "failed_gpu_original_game_fallback": {
       "status": "PASS_BUILD",
@@ -97,11 +111,19 @@
       "evidence_paths": [
         "tools/test_package_dx11_first_game_frame.py",
         "tests/native_raw_gpu_wait_test.cpp"
-      ]
+      ],
+      "validation_command": "GitHub Build #40628277594 and OpenXR #40628277530 at 35a02c82bb62677326a0d67b849ce9459973eaf7"
     },
     "five_exact_sha_actions": {
       "status": "PASS_EXACT_SHA",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40628277706",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40628277545"
+      ],
+      "validation_command": "Five original required push Gates completed success at 35a02c82bb62677326a0d67b849ce9459973eaf7 (historical verification unchanged)"
     }
   },
   "pipeline": {
@@ -164,5 +186,6 @@
     "same-SHA desktop native_draws>0, genuine native_gpu_pixel_output>0",
     "publishedBackbufferFrames>0 for full native frame",
     "separate native L/R OpenXR Quest3/VDXR HMD optical verification"
-  ]
+  ],
+  "causal_ci_repair_01128": "Historical 01127 task record's proof nesting, source path and structured build evidence aligned with pre-existing real sources/CI after DX11 Fast/Backend rejected 01128 material SHA 92fff241933cc5cb599ed86fbb42599090291bfc. No new gameplay runtime proof, no new historical score; same 01128 CI repair."
 }
