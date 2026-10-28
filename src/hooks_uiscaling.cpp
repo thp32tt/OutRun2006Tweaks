@@ -511,7 +511,8 @@ class UIScaling : public Hook
                 spdlog::info(
                     "VR P0 GOAL B9200 ENTRY: exactParent=1 calls={} "
                     "callerRva=0x{:X} scope={} admittedAfterDrain=1 "
-                    "admittedAtExit={} entryEpoch={} exitEpoch={}",
+                    "admittedAtExit={} entryEpoch={} exitEpoch={} "
+                    "contract=GOAL_DRAIN_REVALIDATE_V1",
                     n, caller - base,
                     admittedAtExit ? "SCREEN_HUD" : "NATIVE_FALLBACK",
                     admittedAtExit ? 1 : 0,
@@ -2491,7 +2492,7 @@ class UIScaling : public Hook
             spdlog::info(
                 "VR TRACE GOAL_TIME SOURCE: helperRva=0x{:X} producer={} "
                 "admittedAfterDrain=1 admittedAtExit={} entrySerial={} "
-                "entryEpoch={} exitEpoch={} queueActive={}",
+                "entryEpoch={} exitEpoch={} queueActive={} contract=GOAL_DRAIN_REVALIDATE_V1",
                 helperRva,
                 OutRunVR::GameSemantic::Name(producer),
                 admittedAtExit ? 1 : 0, entrySerial,
