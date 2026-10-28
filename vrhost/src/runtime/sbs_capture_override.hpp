@@ -419,6 +419,31 @@ float4 PSMain(VSOut input) : SV_Target
     inline std::uint64_t ProjectionSuccess = 0;
     inline std::uint64_t TheaterAttempts = 0;
     inline std::uint64_t TheaterSuccess = 0;
+
+    // Immediate R19 -> R24 diagnostic receipt. This records what R19 actually
+    // handed to the final OpenXR call; it never changes the submitted layers.
+    inline std::uint64_t LastEndFrameReceiptSerial = 0;
+    inline bool LastEndFrameReceiptReplaced = false;
+    inline bool LastEndFrameReceiptProjection = false;
+    inline std::uint32_t LastEndFrameReceiptFrameId = 0;
+    inline std::uint32_t LastEndFrameReceiptPoseSequence = 0;
+    inline std::uint32_t LastEndFrameReceiptLayerCount = 0;
+    inline XrResult LastEndFrameReceiptResult = XR_SUCCESS;
+
+    inline void RecordEndFrameReceipt(
+        bool replaced, bool projection,
+        std::uint32_t frameId, std::uint32_t poseSequence,
+        std::uint32_t layerCount, XrResult result) noexcept
+    {
+        ++LastEndFrameReceiptSerial;
+        LastEndFrameReceiptReplaced = replaced;
+        LastEndFrameReceiptProjection = projection;
+        LastEndFrameReceiptFrameId = projection ? frameId : 0;
+        LastEndFrameReceiptPoseSequence = projection ? poseSequence : 0;
+        LastEndFrameReceiptLayerCount = layerCount;
+        LastEndFrameReceiptResult = result;
+    }
+
     inline std::uint64_t MainProjectionSeen = 0;
     inline std::uint64_t MainQuadSeen = 0;
     inline ULONGLONG LastSummaryMs = 0;
@@ -1221,7 +1246,14 @@ float4 PSMain(VSOut input) : SV_Target
         ++EndFrames;
         if (!Enabled() || !endInfo || !OutRunVrFinalTest::Device ||
             !OutRunVrFinalTest::Context)
-            return OutRunVrFinalTest::EndFrame(session, endInfo);
+        {
+            const XrResult result =
+                OutRunVrFinalTest::EndFrame(session, endInfo);
+            RecordEndFrameReceipt(
+                false, false, 0, 0,
+                endInfo ? endInfo->layerCount : 0, result);
+            return result;
+        }
 
         UpdateStereoFrameCache();
         const bool gameplay = LastStereoFrameValid &&
@@ -1233,6 +1265,9 @@ float4 PSMain(VSOut input) : SV_Target
         std::array<XrCompositionLayerProjectionView, 2> views{};
         XrCompositionLayerQuad quad{};
         bool replaced = false;
+        bool replacementProjection = false;
+        std::uint32_t replacementFrameId = 0;
+        std::uint32_t replacementPoseSequence = 0;
 
         if (gameplay)
         {
@@ -1242,6 +1277,9 @@ float4 PSMain(VSOut input) : SV_Target
                 patched.layerCount = 1;
                 patched.layers = &layerPtr;
                 replaced = true;
+                replacementProjection = true;
+                replacementFrameId = LastStereoFrame.frameId;
+                replacementPoseSequence = LastStereoFrame.sourcePoseSequence;
             }
         }
         else
@@ -1259,7 +1297,14 @@ float4 PSMain(VSOut input) : SV_Target
         }
 
         MaybeLogSummary();
-        return OutRunVrFinalTest::EndFrame(session, replaced ? &patched : endInfo);
+        const XrFrameEndInfo* submittedInfo = replaced ? &patched : endInfo;
+        const XrResult result =
+            OutRunVrFinalTest::EndFrame(session, submittedInfo);
+        RecordEndFrameReceipt(
+            replaced, replacementProjection,
+            replacementFrameId, replacementPoseSequence,
+            submittedInfo ? submittedInfo->layerCount : 0, result);
+        return result;
     }
 
     inline XrResult XRAPI_CALL DestroySession(XrSession session)
