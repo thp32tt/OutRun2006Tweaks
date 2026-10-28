@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -31,6 +32,7 @@ required = {
         "resetQpc={}",
         "resetFlags=0x{:X}",
         "resetSnapshotStable={}",
+        "sourceEventQpc={} thread={} resetQpcRole=RESET_ENTRY",
     ]),
     "lens ownership/GPU": (renderer, [
         "VR TRACE LENS C64 PROOF FULL:",
@@ -210,6 +212,23 @@ for token in (
 ):
     assert token in reset_trace, token
 
+# Reset epoch is publish-ordered; the inherited QPC is entry time. Keep
+# separate real event clocks, and bracket publication without claiming its
+# pre-lock timestamp is the exact serialized publish instant.
+assert graphics.count("sourceEventQpc={} thread={} resetQpcRole=RESET_ENTRY") == 2
+assert graphics.count("QueryPerformanceCounter(&sourceEventQpc);") == 2
+reset_body = ex_upgrade.split("HRESULT __stdcall ResetCompatDest(", 1)[1].split(
+    "HRESULT __stdcall CreateVertexBufferCompatDest(", 1)[0]
+for token in ("qpcRole=RESET_ENTRY", "resetReturnQpc={}",
+              "snapshotReadyQpc={}", "publishReturnQpc={}", "qpcFrequency={}"):
+    assert token in reset_body, token
+assert reset_body.index("deviceEx->ResetEx(") < reset_body.index(
+    "QueryPerformanceCounter(&resetReturnQpc);") < reset_body.index(
+    "RestoreClassicResetState(device)")
+assert reset_body.index("QueryPerformanceCounter(&snapshotReadyQpc);") < reset_body.index(
+    "OutRunVR::D3D9ResetTrace::Publish(trace);") < reset_body.index(
+    "QueryPerformanceCounter(&publishReturnQpc);")
+
 # Critical correctness regression: cached projection must report the actually
 # submitted cached XrCompositionLayerProjectionView, never unconditional pv[].
 cached_select = """const auto* submitted =
@@ -251,5 +270,6 @@ assert "preservedHasLayer" in host_r24
 assert "if (!Settings::VRTelemetry || !device)" in renderer
 assert "Telemetry = true" in read("OutRun2006Tweaks.ini")
 
+runpy.run_path(str(ROOT / "tools/verify_vr_lens_transaction_trace.py"), run_name="__main__")
 print("PASS DX9Ex one-pass FULL visual trace contract: source -> queue -> D3DX -> D3D9 -> frame -> OpenXR -> collected ZIP")
 print("RUNTIME_VALIDATION=UNTESTED")

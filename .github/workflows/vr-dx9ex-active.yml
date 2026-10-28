@@ -14,6 +14,7 @@ on:
       - vr-d3d9ex-focus
       - 'vr-d3d9ex-candidate/**'
     paths:
+      - 'tools/verify_vr_lens_transaction_trace.py'
       - 'src/**'
       - 'external/imgui' # Pinned ImGui DX9 F11 runtime code is compiled into the game.
       - '.gitmodules' # Whole-source changes can affect VR runtime, reset, input and frame pacing.
@@ -462,6 +463,7 @@ jobs:
             'tools/verify_vr_driver_seat_basis_stability.py',
             'tools/verify_vr_ui_matrix_safety.py',
             'tools/verify_vr_desktop_source_coordinates.py',
+            'tools/verify_dx9ex_full_visual_trace_contract.py',
             'tools/verify_vr_unified_menu_source.py',
             'tools/verify_vr_r23_menu_letterbox_cache.py',
             'tools/verify_vr_r23_capture_output_generation.py',

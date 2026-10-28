@@ -842,13 +842,13 @@ def verify_visible_menu_fragment(code: str) -> None:
         assert token in body, token
     # Reject a secondary HWND read that could diverge from the UV snapshot.
     # Both physical client extents and capture UV must originate in one call.
-    # One authoritative ClipClient/GetGameUv snapshot now publishes both
+    # One authoritative capture-time GetCapturedGameUv snapshot publishes both
     # the client RECT and the full-visibility bit. Do not resurrect the
     # older pixel-difference approximation for a partially captured menu.
     visibility_call = (
         "RECT capturedClient{};\n"
         "        bool capturedClientFullyVisible = false;\n"
-        "        if (!c.GetGameUv(\n"
+        "        if (!c.GetCapturedGameUv(\n"
         "                whole, false, &capturedClient, &capturedClientFullyVisible))\n"
         "            return false;"
     )
@@ -956,6 +956,20 @@ for old, bad in (
         raise AssertionError("title/menu state or configured-crop mutation escaped: " + old)
 
 verify_visible_menu_fragment(r23)
+for old, bad in (
+    ("if (!c.GetCapturedGameUv(\n", "if (!c.GetGameUv(\n"),
+    ("whole, false, &capturedClient, &capturedClientFullyVisible)",
+     "whole, false, &capturedClient, nullptr)"),
+    ("whole, false, &capturedClient, &capturedClientFullyVisible)",
+     "whole, false, nullptr, &capturedClientFullyVisible)"),
+):
+    assert old in r23, old
+    try:
+        verify_visible_menu_fragment(r23.replace(old, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("capture-time menu snapshot mutation survived: " + old)
 verify_visible_fragment_source(menu_geometry)
 for old, bad in (
     ("cropCentered43 ? 4.0f / 3.0f : clientAspect;",

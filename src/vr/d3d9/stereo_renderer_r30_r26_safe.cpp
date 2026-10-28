@@ -5505,6 +5505,142 @@ namespace OutRunVRStereo
                 stereo.effectiveEyePosition[1][2]);
         }
 
+        // Observational only. Failed/not-attempted queries remain explicit;
+        // target pointers are transient identities, never ownership proofs.
+        struct R30LensRasterTrace
+        {
+            bool captured = false;
+            std::int64_t qpc = 0;
+            D3DVIEWPORT9 viewport{};
+            RECT scissor{};
+            DWORD scissorEnabled = 0;
+            HRESULT viewportHr = E_PENDING;
+            HRESULT scissorHr = E_PENDING;
+            HRESULT scissorEnableHr = E_PENDING;
+            HRESULT rtHr = E_PENDING;
+            HRESULT depthHr = E_PENDING;
+            std::uintptr_t rt = 0, depth = 0;
+
+            void Capture(IDirect3DDevice9* device)
+            {
+                captured = true;
+                LARGE_INTEGER now{};
+                QueryPerformanceCounter(&now);
+                qpc = now.QuadPart;
+                viewportHr = device->GetViewport(&viewport);
+                scissorHr = device->GetScissorRect(&scissor);
+                scissorEnableHr = device->GetRenderState(D3DRS_SCISSORTESTENABLE, &scissorEnabled);
+                IDirect3DSurface9* surface = nullptr;
+                rtHr = device->GetRenderTarget(0, &surface);
+                if (SUCCEEDED(rtHr)) rt = reinterpret_cast<std::uintptr_t>(surface);
+                if (surface) surface->Release();
+                surface = nullptr;
+                depthHr = device->GetDepthStencilSurface(&surface);
+                if (SUCCEEDED(depthHr)) depth = reinterpret_cast<std::uintptr_t>(surface);
+                if (surface) surface->Release();
+            }
+
+            void Log(const char* phase, std::uint64_t serial) const
+            {
+                spdlog::info(
+                    "VR LENS R30 EYE RASTER: schema=1 serial={} phase={} "
+                    "thread={} captured={} qpc={} viewportHr=0x{:08X} "
+                    "viewport={},{},{}x{} viewportZ={:.9g},{:.9g} "
+                    "scissorHr=0x{:08X} scissor={},{},{},{} "
+                    "scissorEnableHr=0x{:08X} scissorEnabled={} "
+                    "rtHr=0x{:08X} rt=0x{:X} depthHr=0x{:08X} depth=0x{:X}",
+                    serial, phase, GetCurrentThreadId(), captured ? 1 : 0, qpc,
+                    static_cast<unsigned>(viewportHr), viewport.X, viewport.Y,
+                    viewport.Width, viewport.Height, viewport.MinZ, viewport.MaxZ,
+                    static_cast<unsigned>(scissorHr), scissor.left, scissor.top,
+                    scissor.right, scissor.bottom,
+                    static_cast<unsigned>(scissorEnableHr), scissorEnabled,
+                    static_cast<unsigned>(rtHr), rt,
+                    static_cast<unsigned>(depthHr), depth);
+            }
+        };
+
+        struct R30LensTransactionTrace
+        {
+            bool enabled = false, sample = false;
+            std::uint64_t serial = 0, pose = 0, sourceSerial = 0;
+            const char* site = "unknown";
+            const char* rightStage = "NOT_ATTEMPTED";
+            OutRunVR::D3D9ResetTrace::Snapshot reset{};
+            R30LensRasterTrace left{}, right{}, post{};
+            bool leftWvpOk = false, rightWvpAttempted = false, rightWvpOk = false;
+            bool leftDrawAttempted = false, rightDrawAttempted = false;
+            bool restoreAttempted = false, restoreOk = false;
+            HRESULT leftDrawHr = E_PENDING;
+            HRESULT rightDrawHr = E_PENDING;
+            HRESULT rightResultHr = E_PENDING;
+
+            void Begin(bool traceEnabled, std::uint64_t drawSerial,
+                std::uint64_t poseSequence, std::uint64_t sourceCallSerial,
+                const char* drawSite)
+            {
+                enabled = traceEnabled;
+                if (!enabled) return;
+                serial = drawSerial;
+                pose = poseSequence;
+                sourceSerial = sourceCallSerial;
+                site = drawSite ? drawSite : "unknown";
+                reset = OutRunVR::D3D9ResetTrace::Read();
+                static thread_local std::uint64_t total = 0;
+                static thread_local std::uint64_t sampledEpoch = 0;
+                static thread_local unsigned epochSamples = 0;
+                if (reset.readStable && reset.resetSerial != sampledEpoch)
+                {
+                    sampledEpoch = reset.resetSerial;
+                    epochSamples = 0;
+                }
+                if (epochSamples < 9) ++epochSamples;
+                const auto n = ++total;
+                sample = n <= 32 || (n & (n - 1)) == 0 || epochSamples <= 8;
+            }
+
+            void Emit(const char* stage, HRESULT returnHr) const
+            {
+                if (!enabled) return;
+                const bool pairComplete = leftDrawAttempted && rightDrawAttempted &&
+                    SUCCEEDED(leftDrawHr) && SUCCEEDED(rightDrawHr) &&
+                    restoreAttempted && restoreOk;
+                bool failureSample = false;
+                if (!pairComplete)
+                {
+                    static thread_local std::uint64_t failures = 0;
+                    ++failures;
+                    failureSample = failures <= 16 || (failures & (failures - 1)) == 0;
+                }
+                if (!sample && !failureSample) return;
+                LARGE_INTEGER now{};
+                QueryPerformanceCounter(&now);
+                const auto endReset = OutRunVR::D3D9ResetTrace::Read();
+                spdlog::info(
+                    "VR LENS R30 TRANSACTION: schema=1 serial={} pose={} sourceCallSerial={} "
+                    "site={} thread={} qpc={} stage={} rasterSample={} "
+                    "leftWvpOk={} leftDrawAttempted={} leftDrawHr=0x{:08X} "
+                    "rightWvpAttempted={} rightWvpOk={} rightDrawAttempted={} "
+                    "rightDrawHr=0x{:08X} rightResultHr=0x{:08X} "
+                    "restoreAttempted={} restore={} pairComplete={} returnHr=0x{:08X} "
+                    "resetEpoch={} resetSnapshotStable={} resetEpochEnd={} "
+                    "resetSnapshotStableEnd={} evidence=R30_TRANSACTION_NOT_PIXEL_PROOF",
+                    serial, pose, sourceSerial, site, GetCurrentThreadId(), now.QuadPart,
+                    stage, sample ? 1 : 0, leftWvpOk ? 1 : 0,
+                    leftDrawAttempted ? 1 : 0, static_cast<unsigned>(leftDrawHr),
+                    rightWvpAttempted ? 1 : 0, rightWvpOk ? 1 : 0,
+                    rightDrawAttempted ? 1 : 0, static_cast<unsigned>(rightDrawHr),
+                    static_cast<unsigned>(rightResultHr), restoreAttempted ? 1 : 0,
+                    restoreOk ? 1 : 0, pairComplete ? 1 : 0,
+                    static_cast<unsigned>(returnHr), reset.resetSerial,
+                    reset.readStable ? 1 : 0, endReset.resetSerial,
+                    endReset.readStable ? 1 : 0);
+                left.Log("LEFT_PRE_DRAW", serial);
+                right.Log("RIGHT_PRE_DRAW", serial);
+                post.Log("POST_RESTORE", serial);
+            }
+        };
+
         void R30TraceVisualPipelineFull(
             IDirect3DDevice9* device, const char* family,
             std::uint64_t serial)
@@ -6220,6 +6356,10 @@ namespace OutRunVRStereo
                     SUCCEEDED(device->GetScissorRect(&lensPreDrawScissor));
             }
 
+            R30LensTransactionTrace lensTransaction{};
+            lensTransaction.Begin(lensPhysicalCandidate, TopLevelDrawSerial(),
+                stereo.poseSequence, lensSourceSerial, site);
+
             // The screen's first exact HUD/overlay draw is the bloom cutoff.
             // The outer hook also guards delegated draws, but this owned-eye
             // path must NOT snapshot world billboards such as the central sun
@@ -6237,6 +6377,7 @@ namespace OutRunVRStereo
                 leftWvpOk = SetWvpOneRegisterAtATime(
                     device, eyeConstants[0]);
             }
+            lensTransaction.leftWvpOk = leftWvpOk;
             if (!leftWvpOk)
             {
                 bool restored = false;
@@ -6244,13 +6385,18 @@ namespace OutRunVRStereo
                     InternalPassScope guard;
                     restored = SetWvpOneRegisterAtATime(device, original);
                 }
+                lensTransaction.restoreAttempted = true;
+                lensTransaction.restoreOk = restored;
+                if (lensTransaction.sample) lensTransaction.post.Capture(device);
                 if (!restored)
                 {
+                    lensTransaction.Emit("LEFT_WVP", E_FAIL);
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R30/HUD-left-WVP-rollback");
                     R30ArmSafeFallback();
                     return E_FAIL;
                 }
+                lensTransaction.Emit("LEFT_WVP", E_NOTIMPL);
                 return E_NOTIMPL;
             }
 
@@ -6261,7 +6407,10 @@ namespace OutRunVRStereo
                 LeftDrawMayWriteStencil(device))
                 R9NoteMainDepthContentWrite();
 
+            if (lensTransaction.sample) lensTransaction.left.Capture(device);
+            lensTransaction.leftDrawAttempted = true;
             const HRESULT leftHr = actualDraw();
+            lensTransaction.leftDrawHr = leftHr;
             if (FAILED(leftHr))
             {
                 bool restored = false;
@@ -6269,6 +6418,10 @@ namespace OutRunVRStereo
                     InternalPassScope guard;
                     restored = SetWvpOneRegisterAtATime(device, original);
                 }
+                lensTransaction.restoreAttempted = true;
+                lensTransaction.restoreOk = restored;
+                if (lensTransaction.sample) lensTransaction.post.Capture(device);
+                lensTransaction.Emit("LEFT_DRAW", leftHr);
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
                 if (!restored)
@@ -6319,30 +6472,50 @@ namespace OutRunVRStereo
             bool restoreOk = true;
             {
                 InternalPassScope guard;
+                lensTransaction.rightStage = "RIGHT_RT";
                 rightHr = SetRenderTargetHook.stdcall<HRESULT>(
                     device, 0u, RightEyeSurface);
                 if (SUCCEEDED(rightHr))
                 {
+                    lensTransaction.rightStage = "RIGHT_DEPTH";
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
                         device, TrackedDepthStencil ? RightEyeDepth : nullptr);
                 }
                 if (SUCCEEDED(rightHr))
-                    rightHr = device->SetViewport(&savedViewport);
-                if (SUCCEEDED(rightHr) &&
-                    !SetWvpOneRegisterAtATime(device, eyeConstants[1]))
                 {
-                    rightFailure =
-                        OutRunVR::StereoFailureRightWvpUploadFailed;
-                    rightHr = E_FAIL;
+                    lensTransaction.rightStage = "RIGHT_VIEWPORT";
+                    rightHr = device->SetViewport(&savedViewport);
+                }
+                if (SUCCEEDED(rightHr))
+                {
+                    lensTransaction.rightStage = "RIGHT_WVP";
+                    lensTransaction.rightWvpAttempted = true;
+                    lensTransaction.rightWvpOk =
+                        SetWvpOneRegisterAtATime(device, eyeConstants[1]);
+                    if (!lensTransaction.rightWvpOk)
+                    {
+                        rightFailure =
+                            OutRunVR::StereoFailureRightWvpUploadFailed;
+                        rightHr = E_FAIL;
+                    }
                 }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
+                    lensTransaction.rightStage = "RIGHT_DRAW";
+                    if (lensTransaction.sample) lensTransaction.right.Capture(device);
+                    lensTransaction.rightDrawAttempted = true;
                     rightHr = actualDraw();
+                    lensTransaction.rightDrawHr = rightHr;
                 }
+                lensTransaction.rightResultHr = rightHr;
                 restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
                     savedViewport, original, true);
+                lensTransaction.restoreAttempted = true;
+                lensTransaction.restoreOk = restoreOk;
+                if (lensTransaction.sample) lensTransaction.post.Capture(device);
             }
+            lensTransaction.Emit(lensTransaction.rightStage, leftHr);
 
             // Observational L/R receipt for this specific R30 transaction.
             // Equal c64 matrices may be correct for a directional infinity

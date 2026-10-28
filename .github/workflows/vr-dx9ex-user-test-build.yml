@@ -19,6 +19,7 @@ on:
       - 'tools/verify_focus_official_diagnostics.py'
       - 'tools/verify_dx9ex_full_visual_trace_contract.py'
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
+      - 'tools/verify_vr_lens_transaction_trace.py'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
       - 'src/hooks_uiscaling.cpp'

@@ -846,6 +846,8 @@ class VRLensFlareProjected2D : public Hook
 
         if (trackedSource && Settings::VRTelemetry)
         {
+            LARGE_INTEGER sourceEventQpc{};
+            QueryPerformanceCounter(&sourceEventQpc);
             const auto deferred =
                 OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
             spdlog::info(
@@ -854,7 +856,8 @@ class VRLensFlareProjected2D : public Hook
                 "scope={} producer={} queueActive={} queueEpoch={} lensCentreEpoch={} "
                 "centreDepth={} centreOwnerDepth={} deferredSerial={} "
                 "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={} "
-                "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={}",
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={} "
+                "sourceEventQpc={} thread={} resetQpcRole=RESET_ENTRY",
                 static_cast<unsigned>(objectId), alpha,
                 static_cast<unsigned>(flags),
                 reinterpret_cast<std::uintptr_t>(work),
@@ -870,7 +873,8 @@ class VRLensFlareProjected2D : public Hook
                 deferred.sourceSerial, deferred.sequence,
                 deferred.objectId, static_cast<unsigned>(deferred.ordinal),
                 resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
-                resetTrace.readStable ? 1 : 0);
+                resetTrace.readStable ? 1 : 0,
+                sourceEventQpc.QuadPart, GetCurrentThreadId());
         }
 
         // One original 0xCABE call occurs for each source effect object,
@@ -977,6 +981,8 @@ class VRLensFlareProjected2D : public Hook
             : OutRunVR::D3D9ResetTrace::Snapshot{};
         if (trackedSource && Settings::VRTelemetry)
         {
+            LARGE_INTEGER sourceEventQpc{};
+            QueryPerformanceCounter(&sourceEventQpc);
             const auto deferred =
                 OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
             spdlog::info(
@@ -985,7 +991,8 @@ class VRLensFlareProjected2D : public Hook
                 "scope={} producer={} queueActive={} queueEpoch={} lensCentreEpoch={} "
                 "centreDepth={} centreOwnerDepth={} deferredSerial={} "
                 "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={} "
-                "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={}",
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={} "
+                "sourceEventQpc={} thread={} resetQpcRole=RESET_ENTRY",
                 static_cast<unsigned>(objectId), alpha,
                 static_cast<unsigned>(flags),
                 reinterpret_cast<std::uintptr_t>(work),
@@ -1001,7 +1008,8 @@ class VRLensFlareProjected2D : public Hook
                 deferred.sourceSerial, deferred.sequence,
                 deferred.objectId, static_cast<unsigned>(deferred.ordinal),
                 resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
-                resetTrace.readStable ? 1 : 0);
+                resetTrace.readStable ? 1 : 0,
+                sourceEventQpc.QuadPart, GetCurrentThreadId());
         }
         // 4056D0 may only enqueue the original opaque object. Do NOT
         // interpret this hook's call counter as a native Draw or an eye RT.

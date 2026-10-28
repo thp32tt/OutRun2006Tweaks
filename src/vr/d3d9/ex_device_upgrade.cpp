@@ -487,6 +487,8 @@ namespace OutRunVRD3D9ExUpgrade
                 BuildFullscreenMode(deviceEx, &effective, fullscreen);
             const HRESULT hr =
                 deviceEx->ResetEx(&effective, fullscreenPtr);
+            LARGE_INTEGER resetReturnQpc{};
+            QueryPerformanceCounter(&resetReturnQpc);
             deviceEx->Release();
 
             bool classicReplaySucceeded = false;
@@ -551,8 +553,14 @@ namespace OutRunVRD3D9ExUpgrade
                     trace.flags |= OutRunVR::D3D9ResetTrace::ScissorValid;
                 }
             }
+            // Entry time is not completion/publication time. Bracket Publish:
+            // its writer lock may wait behind another completed Reset.
+            LARGE_INTEGER snapshotReadyQpc{}, publishReturnQpc{}, qpcFrequency{};
+            QueryPerformanceFrequency(&qpcFrequency);
+            QueryPerformanceCounter(&snapshotReadyQpc);
             trace.resetSerial =
                 OutRunVR::D3D9ResetTrace::Publish(trace);
+            QueryPerformanceCounter(&publishReturnQpc);
 
             ++ResetExRedirects;
             spdlog::info(
@@ -560,6 +568,8 @@ namespace OutRunVRD3D9ExUpgrade
                 "requested={}x{} effective={}x{} actual={}x{} "
                 "viewport={},{},{}x{} scissor={},{},{},{} "
                 "preserveXrPhysical={} classicReplay={} flags=0x{:X} "
+                "qpcRole=RESET_ENTRY resetReturnQpc={} snapshotReadyQpc={} "
+                "publishReturnQpc={} qpcFrequency={} thread={} "
                 "publishOrder=COMPLETION_MONOTONIC contract=XR_RESET_EPOCH_V3",
                 trace.resetSerial, trace.qpc, static_cast<unsigned>(hr),
                 trace.requestedWidth, trace.requestedHeight,
@@ -571,7 +581,8 @@ namespace OutRunVRD3D9ExUpgrade
                 trace.scissorRight, trace.scissorBottom,
                 preserveVrPhysical ? 1 : 0,
                 classicReplaySucceeded ? 1 : 0,
-                trace.flags);
+                trace.flags, resetReturnQpc.QuadPart, snapshotReadyQpc.QuadPart,
+                publishReturnQpc.QuadPart, qpcFrequency.QuadPart, GetCurrentThreadId());
             return hr;
         }
 

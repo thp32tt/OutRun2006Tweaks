@@ -21,6 +21,7 @@ on:
       - 'tools/verify_vr_rival_known_good_restore.py'
       - 'src/hooks_misc.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
+      - 'tools/verify_vr_lens_transaction_trace.py'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/d3d9/stereo_renderer_r7.inc' # Shared compositor/query-depth guards must revalidate packaged R26.
       - 'src/vr/d3d9/stereo_renderer.cpp' # R9 mono restore failure provenance.
