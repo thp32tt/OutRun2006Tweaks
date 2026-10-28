@@ -41,4 +41,45 @@ struct NativeRawPresentTile {
     return out.destinationX >= left + kMargin &&
            out.destinationY + height <= bottom - kMargin;
 }
+// When a real GPU Draw changed pixels away from the initially centered
+// source subsection, move the RAW diagnostic crop to those authentic pixels.
+// A source pixel never becomes a guessed/extrapolated destination pixel.
+[[nodiscard]] constexpr bool native_raw_retarget_present_tile(
+    const NativeRawPresentTile& original, std::uint32_t tileWidth,
+    std::uint32_t tileHeight, std::uint32_t changedX,
+    std::uint32_t changedY, NativeRawPresentTile& out) noexcept {
+    out = {};
+    if (!original.copyWidth || !original.copyHeight ||
+        original.copyWidth > tileWidth || original.copyHeight > tileHeight ||
+        original.sourceX > tileWidth - original.copyWidth ||
+        original.sourceY > tileHeight - original.copyHeight ||
+        changedX >= tileWidth || changedY >= tileHeight)
+        return false;
+    out = original;
+    const auto centeredX = changedX > original.copyWidth / 2u
+        ? changedX - original.copyWidth / 2u : 0u;
+    const auto centeredY = changedY > original.copyHeight / 2u
+        ? changedY - original.copyHeight / 2u : 0u;
+    out.sourceX = (std::min)(centeredX, tileWidth - original.copyWidth);
+    out.sourceY = (std::min)(centeredY, tileHeight - original.copyHeight);
+    return changedX >= out.sourceX &&
+           changedX - out.sourceX < out.copyWidth &&
+           changedY >= out.sourceY &&
+           changedY - out.sourceY < out.copyHeight;
+}
+// Magenta INCOMPLETE frame labels an unconverted picture. Preserve genuine
+// GPU-changed RGB even at that frame, or a single edge fragment could be
+// entirely painted over and falsely counted as visible native Draw pixels.
+[[nodiscard]] constexpr bool native_raw_present_border_pixel(
+    const NativeRawPresentTile& tile, std::uint32_t x, std::uint32_t y,
+    bool genuineGpuRgbChanged) noexcept {
+    if (genuineGpuRgbChanged || x < tile.sourceX || y < tile.sourceY ||
+        x - tile.sourceX >= tile.copyWidth ||
+        y - tile.sourceY >= tile.copyHeight)
+        return false;
+    const auto dx = x - tile.sourceX;
+    const auto dy = y - tile.sourceY;
+    return dx < 3u || tile.copyWidth - dx <= 3u ||
+           dy < 4u || tile.copyHeight - dy <= 4u;
+}
 } // namespace outrun::vr::dx11

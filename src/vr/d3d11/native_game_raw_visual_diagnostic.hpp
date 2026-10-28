@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include "native_game_raw_gpu_capture_epoch.hpp"
 #include "native_game_raw_pixel_delta.hpp"
 #include "native_game_raw_draw_tile.hpp"
@@ -90,21 +91,66 @@ public:
                     ctx->Unmap(baseline_.Get(), 0);
                     return NativeRawPreviewResult::GpuFailure;
                 }
+                // Match the visible crop to real pre/post native GPU pixel
+                // changes, not a fixed center that may miss every small
+                // vehicle/menu fragment. Read only already-mapped snapshots.
+                bool sawChangedGpuPixel = false;
+                UINT closestChangedX = 0u, closestChangedY = 0u;
+                std::uint64_t closestDistance =
+                    (std::numeric_limits<std::uint64_t>::max)();
+                const std::uint32_t centerX =
+                    visibleTile.sourceX + visibleTile.copyWidth / 2u;
+                const std::uint32_t centerY =
+                    visibleTile.sourceY + visibleTile.copyHeight / 2u;
                 for (UINT y = 0; y < height; ++y) {
                     const auto* afterRow = static_cast<const std::uint8_t*>(mapped.pData) +
                         static_cast<std::size_t>(y) * mapped.RowPitch;
                     const auto* beforeRow = static_cast<const std::uint8_t*>(before.pData) +
                         static_cast<std::size_t>(y) * before.RowPitch;
                     for (UINT x = 0; x < width; ++x) {
-                        // Only changed GPU pixels inside the actually visible
-                        // D3D9 source crop can certify a RAW diagnostic.
+                        if (!native_raw_rgb_changed(beforeRow + 4u * x,
+                                                    afterRow + 4u * x))
+                            continue;
+                        sawChangedGpuPixel = true;
+                        const auto dx = x > centerX ? x - centerX : centerX - x;
+                        const auto dy = y > centerY ? y - centerY : centerY - y;
+                        const auto distance = std::uint64_t{dx} + dy;
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            closestChangedX = x;
+                            closestChangedY = y;
+                        }
                         if (x >= visibleTile.sourceX &&
-                            x < visibleTile.sourceX + visibleTile.copyWidth &&
+                            x - visibleTile.sourceX < visibleTile.copyWidth &&
                             y >= visibleTile.sourceY &&
-                            y < visibleTile.sourceY + visibleTile.copyHeight &&
-                            native_raw_rgb_changed(beforeRow + 4u * x,
-                                                   afterRow + 4u * x))
+                            y - visibleTile.sourceY < visibleTile.copyHeight)
                             ++nativePixels;
+                    }
+                }
+                // A tiny authenticated D3D9 Present crop can intersect only
+                // 32x32 of a 256x144 native GPU tile. Do not report no native
+                // Draw merely because the genuine changed pixels fell outside
+                // the originally centered, yet otherwise valid, subsection.
+                if (!nativePixels && sawChangedGpuPixel) {
+                    NativeRawPresentTile retargeted{};
+                    if (native_raw_retarget_present_tile(
+                            visibleTile, width, height,
+                            closestChangedX, closestChangedY, retargeted)) {
+                        visibleTile = retargeted;
+                        for (UINT y = visibleTile.sourceY;
+                             y < visibleTile.sourceY + visibleTile.copyHeight; ++y) {
+                            const auto* afterRow =
+                                static_cast<const std::uint8_t*>(mapped.pData) +
+                                static_cast<std::size_t>(y) * mapped.RowPitch;
+                            const auto* beforeRow =
+                                static_cast<const std::uint8_t*>(before.pData) +
+                                static_cast<std::size_t>(y) * before.RowPitch;
+                            for (UINT x = visibleTile.sourceX;
+                                 x < visibleTile.sourceX + visibleTile.copyWidth; ++x)
+                                if (native_raw_rgb_changed(beforeRow + 4u * x,
+                                                           afterRow + 4u * x))
+                                    ++nativePixels;
+                        }
                     }
                 }
                 if (nativePixels) {
@@ -128,18 +174,17 @@ public:
                         auto* dst = static_cast<std::uint8_t*>(locked.pBits) +
                             static_cast<std::size_t>(y) * locked.Pitch;
                         std::memcpy(dst, src, width * 4u);
-                        // Unmistakable magenta INCOMPLETE GPU tile border.
+                        // Preserve source-authentic changed GPU RGB,
+                        // including a fragment on the marker border. Paint
+                        // INCOMPLETE magenta only over unchanged background.
+                        const auto* beforeRow =
+                            static_cast<const std::uint8_t*>(before.pData) +
+                            static_cast<std::size_t>(y) * before.RowPitch;
                         for (UINT x = 0; x < width; ++x) {
-                            // Magenta INCOMPLETE border on the visible
-                            // subsection, including small menu Present crops.
-                            if (x >= visibleTile.sourceX &&
-                                x < visibleTile.sourceX + visibleTile.copyWidth &&
-                                y >= visibleTile.sourceY &&
-                                y < visibleTile.sourceY + visibleTile.copyHeight &&
-                                (x - visibleTile.sourceX < 3u ||
-                                 visibleTile.sourceX + visibleTile.copyWidth - x <= 3u ||
-                                 y - visibleTile.sourceY < 4u ||
-                                 visibleTile.sourceY + visibleTile.copyHeight - y <= 4u)) {
+                            if (native_raw_present_border_pixel(
+                                    visibleTile, x, y,
+                                    native_raw_rgb_changed(beforeRow + 4u * x,
+                                                           src + 4u * x))) {
                                 dst[x*4u] = 255; dst[x*4u+1u] = 0;
                                 dst[x*4u+2u] = 255;
                             }
