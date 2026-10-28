@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01140",
+  "production_id": "CONVERSION-DX11-01140",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01140",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_DIRTY_TILE_VISIBLE",
+  "classification": "A_REAL_NATIVE_GAME_GPU_SOURCE_DIRTY_VISIBLE_PATH",
+  "status": "SOURCE_IMPLEMENTED_GATE_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "source_base_sha": "6fddac94aedb0366fd3aa75582e59b5a4a048115",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "development_time_percentages": "UNMEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "INTERCEPTED_D3D9_GAME_DRAW",
+      "D3D11_NATIVE_GPU_BEFORE_AFTER_PIXEL_CAPTURE",
+      "AUTHENTIC_D3D9_SOURCE_DIRTY_RECT_UNION",
+      "RAW_TILE_PARTIAL_VISIBLE_PRESENT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "NATIVE_D3D11_DRAW",
+      "VISIBLE_PARTIAL_RAW_GPU_TILE"
+    ],
+    "batch_components": [
+      "REGION_UNION_TILE_VISIBILITY",
+      "REAL_D3D9_DIRTY_REGION_TO_PREVIEW_INTEGRATION",
+      "DUAL_TILE_VISIBLE_FALLBACK",
+      "CXX17_POSITIVE_NEGATIVE_DIRTY_RECT_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "One/two real GPU RGB tiles visibly painted only when exactly covered by actual D3D9 Present dirty rectangles, including multipart coverage",
+      "negative_regression": "Holes, forged rcBound, unverified/oversize regions, and any unmapped native RGB remain original D3D9-only without claiming a native frame",
+      "component_integration": "Live D3D9 dirty region -> bounded source copy -> real D3D11 GPU Draw pair -> independent tile destination coverage -> D3D9 partial diagnostic UpdateSurface"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_DIRTY_TILE_VISIBLE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "A genuine opt-in partial GPU diagnostic tile, NOT a full native game or stereo frame",
+    "activation_guard_and_fallback": "RAW mode opt-in only; original D3D9 Draw/gamepad/FFB and DX9Ex fallback remain; DXVK unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_present_coverage_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01140.json"
+  ],
+  "real_game_draw_blocker": "Source-matched native GPU Draw and visual dirty-Present counts UNTESTED; no gameplay/HMD claims",
+  "checkpoint": "C4_MATERIAL_CANDIDATE",
+  "evidence": {
+    "desktop_native_game": "UNTESTED",
+    "quest3_vdxr": "UNTESTED",
+    "full_native_game_frame_complete": false
+  }
+}

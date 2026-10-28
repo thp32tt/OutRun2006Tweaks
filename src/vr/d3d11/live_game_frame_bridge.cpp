@@ -11444,6 +11444,34 @@ void before_game_present(IDirect3DDevice9* game,
         const bool rawPresentCovered = native_raw_preview_present_coverage(
             dirtyRegion != nullptr, fullDirtyCoverage,
             cropDirtyCoverage, partitionCropCoverage);
+        // RAW is intentionally only a partial visible diagnostic. Unlike
+        // production frame publication, it may display an authenticated GPU
+        // tile inside a smaller game-authored dirty rectangle. Copy the
+        // bounded source list for tile-by-tile proof after GPU RGB selection.
+        NativeRawPresentDirtyRegion rawDirty{};
+        if (rawVisual && backbufferKnown && dirtyRegion &&
+            dirtyRegion->rdh.dwSize == sizeof(RGNDATAHEADER) &&
+            dirtyRegion->rdh.iType == RDH_RECTANGLES &&
+            dirtyRegion->rdh.nCount >= 1u &&
+            dirtyRegion->rdh.nCount <= NativeRawPresentDirtyRegion::kMaxRects &&
+            dirtyRegion->rdh.nRgnSize >=
+                dirtyRegion->rdh.nCount * sizeof(RECT)) {
+            rawDirty.headerVerified = true;
+            rawDirty.count = dirtyRegion->rdh.nCount;
+            rawDirty.boundLeft = dirtyRegion->rdh.rcBound.left;
+            rawDirty.boundTop = dirtyRegion->rdh.rcBound.top;
+            rawDirty.boundRight = dirtyRegion->rdh.rcBound.right;
+            rawDirty.boundBottom = dirtyRegion->rdh.rcBound.bottom;
+            for (std::uint32_t i = 0u; i < rawDirty.count; ++i) {
+                RECT sourcePart{};
+                std::memcpy(&sourcePart,
+                    dirtyRegion->Buffer + i * sizeof(RECT),
+                    sizeof(sourcePart));
+                rawDirty.rectangles[i] = {
+                    sourcePart.left, sourcePart.top,
+                    sourcePart.right, sourcePart.bottom};
+            }
+        }
         if (rawVisual && monoNativePublicationAllowed && backbufferKnown &&
             s.sourceGameDevice == presentDevice && s.backend.ready()) {
             UINT rawChangedPixels = 0u;
@@ -11451,7 +11479,9 @@ void before_game_present(IDirect3DDevice9* game,
             ScopedNativeGameGpuTransferOutputs saveOutputs(s.backend.context());
             const auto status = s.rawPreview.present(
                 game, presentBackbuffer.Get(), presentDesc, sourceRect,
-                rawPresentCovered, s.backend.device(), s.backend.context(),
+                rawPresentCovered,
+                rawDirty.headerVerified ? &rawDirty : nullptr,
+                s.backend.device(), s.backend.context(),
                 s.backend.color_texture(), s.issued, s.presents,
                 rawChangedPixels);
             if (status == NativeRawPreviewResult::VisibleGpuPixels) {

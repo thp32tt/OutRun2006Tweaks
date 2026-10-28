@@ -84,6 +84,7 @@ public:
         IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,
         const D3DSURFACE_DESC& back, const RECT* crop,
         bool sourceCropRepaintVerified,
+        const NativeRawPresentDirtyRegion* sourceDirty,
         ID3D11Device* dev, ID3D11DeviceContext* ctx, ID3D11Texture2D* color,
         std::uint64_t draws, std::uint64_t presentingSerial,
         UINT& nativePixels) noexcept {
@@ -101,7 +102,7 @@ public:
         const LONG l = crop ? crop->left : 0, t = crop ? crop->top : 0;
         const LONG r = crop ? crop->right : static_cast<LONG>(back.Width);
         const LONG b = crop ? crop->bottom : static_cast<LONG>(back.Height);
-        if (!sourceCropRepaintVerified ||
+        if ((!sourceCropRepaintVerified && !sourceDirty) ||
             ctx->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
             back.MultiSampleType != D3DMULTISAMPLE_NONE ||
             (back.Format != D3DFMT_A8R8G8B8 &&
@@ -235,6 +236,25 @@ public:
                 const bool canShowBoth = alternateActive_ && firstPixels &&
                     secondPixels && native_raw_secondary_present_tile(
                         originalTile, l, t, r, b, secondaryPlacement);
+                if (canShowBoth) {
+                    secondTile.destinationX = secondaryPlacement.destinationX;
+                    secondTile.destinationY = secondaryPlacement.destinationY;
+                }
+                // Use original D3D9 dirty geometry rather than a broad rcBound
+                // as visibility evidence. Menu and vehicle Presents can dirty
+                // only one real GPU diagnostic tile; paint just that tile.
+                const auto covered = [&](const NativeRawPresentTile& tile) noexcept {
+                    return sourceCropRepaintVerified ||
+                        (sourceDirty && native_raw_dirty_region_covers_tile(
+                            back.Width, back.Height, *sourceDirty, tile));
+                };
+                const bool firstVisible = firstPixels && covered(firstTile);
+                const bool secondVisible = alternateActive_ && secondPixels &&
+                    covered(secondTile);
+                if (!firstVisible && !secondVisible) {
+                    unmapPairs();
+                    return NativeRawPreviewResult::UnsafePresent;
+                }
                 if (format_ != back.Format) {
                     surface_.Reset();
                     surfaceAlternate_.Reset();
@@ -295,20 +315,18 @@ public:
                     return SUCCEEDED(game->UpdateSurface(
                         target.Get(), &srcRect, backbuffer, &dstPoint));
                 };
-                if (canShowBoth) {
-                    secondTile.destinationX = secondaryPlacement.destinationX;
-                    secondTile.destinationY = secondaryPlacement.destinationY;
+                if (canShowBoth && firstVisible && secondVisible) {
                     if (paint(surface_, before, mapped, firstTile))
                         nativePixels += firstPixels;
                     if (paint(surfaceAlternate_, beforeAlternate,
                               afterAlternate, secondTile))
                         nativePixels += secondPixels;
-                } else if (alternateActive_ &&
-                           native_raw_choose_second_tile(
-                               firstPixels, secondPixels, true)) {
+                } else if (secondVisible &&
+                           (!firstVisible || native_raw_choose_second_tile(
+                               firstPixels, secondPixels, true))) {
                     if (paint(surface_, beforeAlternate, afterAlternate, secondTile))
                         nativePixels = secondPixels;
-                } else if (firstPixels) {
+                } else if (firstVisible) {
                     if (paint(surface_, before, mapped, firstTile))
                         nativePixels = firstPixels;
                 }
