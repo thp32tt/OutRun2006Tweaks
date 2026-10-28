@@ -66,18 +66,18 @@ namespace OutRunVR::D3D9ResetTrace
     inline std::atomic<std::int32_t> ScissorBottom{0};
     inline std::atomic<std::uint32_t> SnapshotFlags{0};
 
-    inline std::uint64_t NextResetSerial() noexcept
-    {
-        return NextSerial.fetch_add(1, std::memory_order_relaxed) + 1;
-    }
-
-    inline void Publish(const Snapshot& snapshot) noexcept
+    inline std::uint64_t Publish(Snapshot snapshot) noexcept
     {
         // Reset is rare. Serialize publishers so Generation can never become
         // even while another writer is still mutating the diagnostic fields.
+        // Allocate the externally visible epoch only after taking this writer
+        // lock: concurrent Reset calls can finish out of entry order, but the
+        // published epoch must always increase in actual completion order.
         while (Writer.test_and_set(std::memory_order_acquire))
         {
         }
+        snapshot.resetSerial =
+            NextSerial.fetch_add(1, std::memory_order_relaxed) + 1;
         Generation.fetch_add(1, std::memory_order_acq_rel); // stable -> odd
         PublishedResetSerial.store(snapshot.resetSerial, std::memory_order_relaxed);
         Qpc.store(snapshot.qpc, std::memory_order_relaxed);
@@ -98,6 +98,7 @@ namespace OutRunVR::D3D9ResetTrace
         SnapshotFlags.store(snapshot.flags, std::memory_order_relaxed);
         Generation.fetch_add(1, std::memory_order_release); // odd -> stable
         Writer.clear(std::memory_order_release);
+        return snapshot.resetSerial;
     }
 
     inline Snapshot Read() noexcept
