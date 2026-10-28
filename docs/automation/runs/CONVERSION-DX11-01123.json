@@ -39,7 +39,7 @@
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
-    "gameplay_delivery_target": "VERIFIED_PARTIAL_RAW_GPU_TILE_NOT_FULL_NATIVE_FRAME",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "integration_path": [
       "AUTHENTIC_D3D9_PRESENT_DIRTY_SOURCE_CROP",
       "BOUNDED_DIRTY_REGION_COVERAGE",
@@ -56,7 +56,18 @@
       "DX11:RAW_VISUAL_DIAGNOSTIC"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "activation_guard_and_fallback": "Explicit opt-in diagnostic, original D3D9 Draw/Present and input/FFB untouched; dirty rectangle safety and complete-frame publication stay fail-closed; DXVK frozen."
+    "activation_guard_and_fallback": "Explicit opt-in diagnostic, original D3D9 Draw/Present and input/FFB untouched; dirty rectangle safety and complete-frame publication stay fail-closed; DXVK frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Target remains a native source-matched GPU Draw diagnostic tile during real D3D9 Present; actual desktop menu/race pixels, contiguous full frame and Quest3 stereo are NOT runtime verified. Source and five exact-SHA CI gates only.",
+    "acceptance_proof": {
+      "positive_probe": "A verified D3D9 Present source crop or complete/partitioned dirty source region admits source-owned D3D11 real-Draw pixel tile upload, never a synthetic full frame.",
+      "negative_regression": "Malformed partial dirty region, unknown source crop and unsupported D3D9 state cannot publish RAW native tile or replace D3D9 fallback.",
+      "component_integration": "Actual D3D9 Draw->D3D11 GPU pre/post Copy->bounded cropped D3D9 Present diagnostic UpdateSurface->five source-matched GitHub Actions Gates, not Quest3 runtime."
+    }
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -105,7 +116,13 @@
     "five_exact_sha_gates": {
       "status": "PASS_EXACT_SHA",
       "validation_command": "Five required GitHub Actions push runs on validation-bearing SHA afa345ae7d33fad8f62784fee1ebf57a85d7c3b1",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_present_coverage_test.cpp",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40603017023"
+      ]
     }
   },
   "pipeline": {
