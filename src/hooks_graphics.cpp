@@ -69,8 +69,8 @@ namespace Settings
 
 	Setting<int> AnisotropicFiltering{ "Graphics", "AnisotropicFiltering", 16,
 		"1 - 16, 0 to leave it at games default.", Range<int>{ 0, 16 } };
-	Setting<int> ReflectionResolution{ "Graphics", "ReflectionResolution", 1024,
-		"Resolution used for car reflections, games default is 128x128, 1024x1024 seems a reasonable improvement.",
+	Setting<int> ReflectionResolution{ "Graphics", "ReflectionResolution", 512,
+		"Resolution used for car reflections, games default is 128x128; 512x512 balances reflection detail and rendering cost.",
 		Range<int>{ 0, 8192 } };
 	Setting<float> ReflectionUpdateRate{ "Graphics", "ReflectionUpdateRate", 0.5f,
 		"How much of the car reflection to redraw each frame: 1.0 redraws all faces every frame, 0.5 spreads it over two frames (games default).", Range<float>{ 0.0f, 1.0f } };
