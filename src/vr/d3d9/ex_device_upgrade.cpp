@@ -136,6 +136,12 @@ namespace OutRunVRD3D9ExUpgrade
         std::atomic<bool> FirstOverlayUnavailableLogged{false};
         std::atomic<bool> FinalCompatOverlayReady{false};
         std::atomic<IDirect3DDevice9*> CompatDevice{nullptr};
+        // The physical XR backbuffer is independent of the game's logical
+        // 1920x1080 UI source. Preserve the exact CreateDevice eye extent
+        // across legacy Reset -> ResetEx so a resolution/device-loss reset
+        // cannot silently collapse VR back to the desktop/game size.
+        std::atomic<std::uint32_t> CompatVrPhysicalWidth{0};
+        std::atomic<std::uint32_t> CompatVrPhysicalHeight{0};
 
         SafetyHookInline TestCooperativeLevelCompatHook{};
         SafetyHookInline EvictManagedResourcesCompatHook{};
@@ -453,19 +459,47 @@ namespace OutRunVRD3D9ExUpgrade
             if (FAILED(qi) || !deviceEx)
                 return ResetCompatHook.stdcall<HRESULT>(device, params);
 
+            const D3DPRESENT_PARAMETERS requested = *params;
+            D3DPRESENT_PARAMETERS effective = requested;
+            const std::uint32_t vrWidth =
+                CompatVrPhysicalWidth.load(std::memory_order_acquire);
+            const std::uint32_t vrHeight =
+                CompatVrPhysicalHeight.load(std::memory_order_acquire);
+            const bool preserveVrPhysical =
+                Settings::VREnabled &&
+                !Settings::VRFollowGameResolution &&
+                Settings::VRPreferD3D9Ex &&
+                effective.Windowed &&
+                vrWidth >= 640u && vrHeight >= 480u &&
+                static_cast<std::uint64_t>(vrWidth) * vrHeight <= 16777216ULL;
+            if (preserveVrPhysical)
+            {
+                effective.BackBufferWidth = vrWidth;
+                effective.BackBufferHeight = vrHeight;
+            }
+
             D3DDISPLAYMODEEX fullscreen{};
-            D3DDISPLAYMODEEX* fullscreenPtr = BuildFullscreenMode(deviceEx, params, fullscreen);
-            const HRESULT hr = deviceEx->ResetEx(params, fullscreenPtr);
+            D3DDISPLAYMODEEX* fullscreenPtr =
+                BuildFullscreenMode(deviceEx, &effective, fullscreen);
+            const HRESULT hr =
+                deviceEx->ResetEx(&effective, fullscreenPtr);
             deviceEx->Release();
             if (SUCCEEDED(hr))
             {
+                // Preserve D3D9's in/out presentation contract, but publish
+                // the effective physical target rather than the game's
+                // logical reset request.
+                *params = effective;
                 UpdateCompatPresentationState(device, params);
                 RestoreClassicResetState(device);
             }
             ++ResetExRedirects;
             spdlog::info(
-                "VR D3D9Ex compat: IDirect3DDevice9::Reset redirected to ResetEx hr=0x{:08X}; emulated MANAGED resources remain persistent",
-                static_cast<unsigned>(hr));
+                "VR D3D9Ex compat: Reset -> ResetEx hr=0x{:08X} requested={}x{} effective={}x{} preserveXrPhysical={}; emulated MANAGED resources remain persistent",
+                static_cast<unsigned>(hr),
+                requested.BackBufferWidth, requested.BackBufferHeight,
+                effective.BackBufferWidth, effective.BackBufferHeight,
+                preserveVrPhysical ? 1 : 0);
             return hr;
         }
 
@@ -642,6 +676,8 @@ namespace OutRunVRD3D9ExUpgrade
         {
             CompatDevice.store(nullptr, std::memory_order_release);
             CompatFocusWindow.store(nullptr, std::memory_order_release);
+            CompatVrPhysicalWidth.store(0, std::memory_order_release);
+            CompatVrPhysicalHeight.store(0, std::memory_order_release);
             TestCooperativeLevelCompatHook = {};
             EvictManagedResourcesCompatHook = {};
             ResetCompatHook = {};
@@ -892,19 +928,28 @@ namespace OutRunVRD3D9ExUpgrade
                     *device = static_cast<IDirect3DDevice9*>(deviceEx);
                     if (bindVrSource)
                     {
+                        CompatVrPhysicalWidth.store(
+                            xrSize.width, std::memory_order_release);
+                        CompatVrPhysicalHeight.store(
+                            xrSize.height, std::memory_order_release);
                         spdlog::info(
-                            "VR RESOLUTION SPLIT: physical D3D9Ex target={}x{} logical game/UI={}x{} originalCreate={}x{}",
+                            "VR RESOLUTION SPLIT: physical D3D9Ex target={}x{} logical game/UI={}x{} originalCreate={}x{}; ResetEx will preserve this XR target",
                             xrSize.width, xrSize.height,
                             Game::screen_resolution->x,
                             Game::screen_resolution->y,
                             originalParams.BackBufferWidth,
                             originalParams.BackBufferHeight);
                     }
-                    else if (Settings::VREnabled && Settings::VRAutoRenderResolution)
+                    else
                     {
-                        spdlog::info(
-                            "VR EYE RESOLUTION: XR eye not available at CreateDevice or explicitly overridden; 3D SOURCE keeps {}x{} (VR transport may scale, no startup wait)",
-                            params->BackBufferWidth, params->BackBufferHeight);
+                        CompatVrPhysicalWidth.store(0, std::memory_order_release);
+                        CompatVrPhysicalHeight.store(0, std::memory_order_release);
+                        if (Settings::VREnabled && Settings::VRAutoRenderResolution)
+                        {
+                            spdlog::info(
+                                "VR EYE RESOLUTION: XR eye unavailable/overridden at CreateDevice; 3D source keeps {}x{} and ResetEx will not invent an eye extent",
+                                params->BackBufferWidth, params->BackBufferHeight);
+                        }
                     }
                     UpdateCompatPresentationState(*device, params);
                     if (!FirstUpgradeLogged.exchange(true))
