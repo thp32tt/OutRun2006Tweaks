@@ -6,6 +6,8 @@
 #include <dxgi.h>
 #include <wrl/client.h>
 #include <cmath>
+#include <chrono>
+#include <thread>
 #include <cstdint>
 #include <cstring>
 #include <limits>
@@ -15,6 +17,7 @@
 #include "native_game_raw_draw_pair.hpp"
 #include "native_game_raw_partial_present_tile.hpp"
 #include "native_game_raw_changed_pixel_window.hpp"
+#include "native_game_raw_gpu_wait.hpp"
 
 namespace outrun::vr::dx11 {
 enum class NativeRawPreviewResult {
@@ -64,16 +67,36 @@ public:
             return NativeRawPreviewResult::UnsafePresent;
         NativeRawPreviewResult output = NativeRawPreviewResult::NoDraw;
         if (pending_) {
-            const HRESULT done = ctx->GetData(
-                event_.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
-            if (done == S_OK) {
+            // RAW is an explicitly opted-in visual test. Prefer the SAME
+            // original game's Present epoch over presenting a late GPU tile
+            // on an unrelated following frame. The producer already Flush()ed
+            // its source-ordered BEFORE/Draw/AFTER/event sequence.
+            // Wait is strictly bounded: a busy or lost GPU never stalls DX9Ex.
+            const auto waitStart = std::chrono::steady_clock::now();
+            const auto done = native_raw_wait_gpu_copy(
+                [&]() noexcept {
+                    const HRESULT hr = ctx->GetData(event_.Get(), nullptr, 0,
+                        D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                    return hr == S_OK ? NativeRawGpuWaitResult::Complete :
+                           hr == S_FALSE ? NativeRawGpuWaitResult::Pending :
+                                           NativeRawGpuWaitResult::Failed;
+                },
+                [&]() noexcept -> std::uint64_t {
+                    return static_cast<std::uint64_t>(
+                        std::chrono::duration_cast<std::chrono::microseconds>(
+                            std::chrono::steady_clock::now() - waitStart).count());
+                },
+                []() noexcept { std::this_thread::yield(); },
+                24000u);
+            if (done == NativeRawGpuWaitResult::Complete) {
                 // Only a paired pre-Draw and post-Draw copy is GPU pixel
                 // evidence. A static clear or last frame's pixels is not.
                 D3D11_MAPPED_SUBRESOURCE before{}, mapped{};
+                // Event completion orders BOTH staging copies after the
+                // genuine native Draw. Map may therefore wait for completed
+                // readback without losing the current D3D9 Present epoch.
                 const HRESULT beforeHr = ctx->Map(baseline_.Get(), 0,
-                    D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &before);
-                if (beforeHr == DXGI_ERROR_WAS_STILL_DRAWING)
-                    return NativeRawPreviewResult::GpuPending;
+                    D3D11_MAP_READ, 0u, &before);
                 if (beforeHr != S_OK || !before.pData ||
                     before.RowPitch < width * 4u) {
                     if (beforeHr == S_OK) ctx->Unmap(baseline_.Get(), 0);
@@ -81,11 +104,7 @@ public:
                     return NativeRawPreviewResult::GpuFailure;
                 }
                 const HRESULT hr = ctx->Map(staging_.Get(), 0,
-                    D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
-                if (hr == DXGI_ERROR_WAS_STILL_DRAWING) {
-                    ctx->Unmap(baseline_.Get(), 0);
-                    return NativeRawPreviewResult::GpuPending;
-                }
+                    D3D11_MAP_READ, 0u, &mapped);
                 pending_ = false;
                 if (hr != S_OK || !mapped.pData || mapped.RowPitch < width * 4u) {
                     if (hr == S_OK) ctx->Unmap(staging_.Get(), 0);
@@ -167,7 +186,7 @@ public:
                         ctx->Unmap(staging_.Get(), 0);
                     output = NativeRawPreviewResult::NoChangedPixels;
                 }
-            } else if (done == S_FALSE) {
+            } else if (done == NativeRawGpuWaitResult::Pending) {
                 return NativeRawPreviewResult::GpuPending;
             } else {
                 pending_ = false;
