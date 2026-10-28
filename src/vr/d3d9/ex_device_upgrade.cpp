@@ -495,7 +495,7 @@ namespace OutRunVRD3D9ExUpgrade
             }
             ++ResetExRedirects;
             spdlog::info(
-                "VR D3D9Ex compat: Reset -> ResetEx hr=0x{:08X} requested={}x{} effective={}x{} preserveXrPhysical={}; emulated MANAGED resources remain persistent",
+                "VR D3D9Ex compat: Reset -> ResetEx hr=0x{:08X} requested={}x{} effective={}x{} preserveXrPhysical={} contract=XR_RESET_PERSIST_V1; emulated MANAGED resources remain persistent",
                 static_cast<unsigned>(hr),
                 requested.BackBufferWidth, requested.BackBufferHeight,
                 effective.BackBufferWidth, effective.BackBufferHeight,
