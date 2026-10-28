@@ -53,7 +53,7 @@ def verify(code: str) -> None:
         "R23Pixels.NoteFinalSubmission(",
         "submissionSerialBefore, submissionSerialAfter",
         "CopySubresourceRegion(sourceStage,",
-        "CopySubresourceRegion(projectionStage,",
+        "projectionStage,0,",
         "CopySubresourceRegion(theaterStage,",
     ):
         assert required in code, "opt-in functionality regressed: " + required
