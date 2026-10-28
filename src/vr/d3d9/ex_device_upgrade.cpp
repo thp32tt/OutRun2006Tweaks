@@ -933,7 +933,7 @@ namespace OutRunVRD3D9ExUpgrade
                         CompatVrPhysicalHeight.store(
                             xrSize.height, std::memory_order_release);
                         spdlog::info(
-                            "VR RESOLUTION SPLIT: physical D3D9Ex target={}x{} logical game/UI={}x{} originalCreate={}x{}; ResetEx will preserve this XR target",
+                            "VR RESOLUTION SPLIT: physical D3D9Ex target={}x{} logical game/UI={}x{} originalCreate={}x{}; ResetEx will preserve this XR target sourceOwner=CREATEDEVICE_XR_EXTENT",
                             xrSize.width, xrSize.height,
                             Game::screen_resolution->x,
                             Game::screen_resolution->y,
