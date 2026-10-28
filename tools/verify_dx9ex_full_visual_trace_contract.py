@@ -139,9 +139,9 @@ required = {
     ]),
     "Reset epoch join": (reset_trace + ex_upgrade + renderer + graphics + ui, [
         "struct Snapshot",
-        "NextResetSerial()",
+        "trace.resetSerial = OutRunVR::D3D9ResetTrace::Publish(trace);",
         "VR D3D9Ex RESET TRACE: resetEpoch=",
-        "contract=XR_RESET_EPOCH_V2",
+        "contract=XR_RESET_EPOCH_V3",
         "OutRunVR::D3D9ResetTrace::Read()",
         "resetEpoch={}",
         "resetQpc={}",
@@ -185,6 +185,8 @@ for label, (body, needles) in required.items():
 # A same-size viewport is not evidence of the same X/Y origin, and a bounded
 # read failure must remain distinguishable from "no Reset has happened".
 assert "resetViewportMatchesPre" not in renderer
+assert "NextResetSerial()" not in reset_trace
+assert "NextResetSerial()" not in ex_upgrade
 for token in (
     "lensResetTrace.readStable",
     "resetViewportExtentMatchesPre",
