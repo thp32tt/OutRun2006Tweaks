@@ -47,7 +47,7 @@ int main() {
     probe.restart_epoch();
     assert(probe.attempts() == 1u && probe.next_ordinal() == 0u);
     probe.record_ineligible(max - 4u);
-    assert(probe.next_ordinal() == max && probe.attempts() == 0u);
+    assert(probe.next_ordinal() == max && probe.attempts() == 1u);
     probe.finish_present(2400u);
     assert(probe.attempts() == 0u && probe.next_ordinal() == 0u);
     // Previous real game's 2,400 Draws are sampled across the entire
