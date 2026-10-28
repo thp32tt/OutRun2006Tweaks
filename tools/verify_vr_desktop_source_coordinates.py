@@ -43,6 +43,31 @@ assert "GameResolutionExplicitOnCommandLine" not in resolver
 assert "Game::screen_resolution->x = static_cast<int>(xrSize.width)" not in success
 assert "Game::screen_resolution->y = static_cast<int>(xrSize.height)" not in success
 
+# A successful XR-sized CreateDevice must keep the same physical target across
+# the game's later legacy Reset calls. Otherwise a menu/resolution/device-loss
+# Reset silently returns the HMD source to the logical 1920x1080 request.
+reset=ex.split("HRESULT __stdcall ResetCompatDest(",1)[1].split(
+    "HRESULT __stdcall CreateVertexBufferCompatDest(",1)[0]
+for token in (
+    "CompatVrPhysicalWidth.load(std::memory_order_acquire)",
+    "CompatVrPhysicalHeight.load(std::memory_order_acquire)",
+    "const bool preserveVrPhysical =",
+    "!Settings::VRFollowGameResolution",
+    "effective.BackBufferWidth = vrWidth;",
+    "effective.BackBufferHeight = vrHeight;",
+    "deviceEx->ResetEx(&effective, fullscreenPtr)",
+    "*params = effective;",
+    "preserveXrPhysical={}",
+):
+    assert token in reset, token
+assert reset.index("const D3DPRESENT_PARAMETERS requested = *params;") < reset.index(
+    "effective.BackBufferWidth = vrWidth;") < reset.index(
+    "deviceEx->ResetEx(&effective, fullscreenPtr)") < reset.index(
+    "*params = effective;")
+assert "CompatVrPhysicalWidth.store(0" in ex
+assert "CompatVrPhysicalHeight.store(0" in ex
+assert "ResetEx will preserve this XR target" in ex
+
 def choose(logical, eye, follow=False, auto=True, manual=None):
     physical=logical
     if follow: return logical, logical
@@ -55,4 +80,17 @@ for logical in ((1920,1080),(3440,1440)):
         assert ui==logical and rt==eye
         assert choose(logical,eye,manual=(2304,2592))==(logical,(2304,2592))
         assert choose(logical,eye,follow=True)==(logical,logical)
-print("PASS logical UI resolution is monitor/game-owned while physical VR D3D9Ex target follows XR eye; HMD UNTESTED")
+
+def reset_target(requested, created_eye, vr=True, follow=False,
+                 prefer_ex=True, windowed=True):
+    w,h=created_eye
+    preserve=(vr and not follow and prefer_ex and windowed and
+              w>=640 and h>=480 and w*h<=16777216)
+    return created_eye if preserve else requested
+
+assert reset_target((1920,1080),(2496,2688)) == (2496,2688)
+assert reset_target((3440,1440),(2496,2688)) == (2496,2688)
+assert reset_target((1920,1080),(2496,2688),follow=True) == (1920,1080)
+assert reset_target((1920,1080),(2496,2688),windowed=False) == (1920,1080)
+assert reset_target((1920,1080),(0,0)) == (1920,1080)
+print("PASS logical UI resolution is monitor/game-owned while physical VR D3D9Ex target follows XR eye and survives ResetEx; HMD UNTESTED")
