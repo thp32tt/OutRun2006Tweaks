@@ -9,7 +9,7 @@
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:FVF_ACTIVE_FOG_SOURCE_TO_GPU_TILE",
   "classification": "A_REAL_NATIVE_GAME_FVF_DRAW_SOURCE_IMPLEMENTATION",
   "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_DURABLE_RESULT_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 1,
