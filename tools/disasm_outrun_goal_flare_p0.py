@@ -16,7 +16,13 @@ from analyze_outrun_exe import parse_pe
 EXPECTED_SHA = "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3"
 WINDOWS = (
     ("goal-result-stage", 0x00097000, 0x00098000),
-    ("stage-extension-animation", 0x00098000, 0x00099000),
+    ("goal-result-time-panel", 0x00098000, 0x00099000),
+    # Live race time-extension path: 450CC0 sets manager flag3/time, the
+    # Navi control/display pair turns that into the 8446E8 HUD lifetime,
+    # and 4B9320/4B9250 emit the split/time sprites and glyphs.
+    ("race-time-extend-state", 0x00050C80, 0x00050E20),
+    ("navi-time-extend-split", 0x000B9200, 0x000B9480),
+    ("navi-race-display", 0x000BEA80, 0x000BEE20),
     ("goal-record-helpers", 0x000BE000, 0x000BEB20),
     ("lens-objects", 0x0000C900, 0x0000D950),
     ("sprite-glyph-queue", 0x0002C800, 0x0002D300),
@@ -31,9 +37,10 @@ ANCHORS = (
 
 
 
-# Exact x86 relationships independently checked with N100 REA/Ghidra
-# against the canonical SHA. The sixth CALL is inside the *mode-2*
-# jump-table case; B4/B5 animation/text are distinct +TIME paths.
+# Exact x86 relationships independently checked against the canonical SHA.
+# IMPORTANT 2026-10-29 correction: these 0x989xx edges belong to the
+# GAD_PUB GOAL/result-time panel in 0x498670. They are NOT the live in-race
+# checkpoint +TIME popup. The sixth CALL remains a separate mode-2 result case.
 STAGE_CALL_EDGES = (
     (0x9898E, 0x29530, "B4 animated sprite"),
     (0x989AD, 0x973C0, "B4 text"),
@@ -61,7 +68,7 @@ def verify_stage_source_hook_boundary(source: str) -> None:
 
 
 def verify_stage_original_binary(pe, source: str) -> list[str]:
-    """Pin six CALL edges + original branch and mode-2 jump-table origin."""
+    """Pin GOAL/result panel CALL edges + original branch/jump-table origin."""
     from struct import unpack
     verify_stage_source_hook_boundary(source)
     read = pe.bytes_at_rva
@@ -134,7 +141,15 @@ def main():
            f"SHA256={digest}", "Only the source-to-target function relationships",
            "and disassembled command flow are used for actionable code changes.",
            ""]
-    out.extend(["## REA exact +TIME / mode-2 source and branch guard", *stage_facts, ""])
+    out.extend(["## Exact GOAL result-time panel / mode-2 branch guard", *stage_facts, "",
+                "## Live +TIME investigation contract",
+                "- Race-manager 0x450CC0 is the actual time-extension state transition.",
+                "- Navi 0x4B93E0 observes manager flag3 and arms HUD timer 0x8446E8.",
+                "- Navi display 0x4BEB00 consumes 0x8446E8; OutRun variants route to 0x4B9320.",
+                "- 0x4B9320 -> 0x4B9250 emits the split/time glyphs and 0x2C00BC frame; "
+                "variant 0 can also create 0x2C00BD on the extension flash.",
+                "- Exact original E8 call RVAs are read from the new disassembly windows below; "
+                "no source owner is inferred from the old 0x989xx hooks.", ""])
     for title, start, end in WINDOWS:
         blob = pe.bytes_at_rva(start, end - start)
         if len(blob) != end - start:
