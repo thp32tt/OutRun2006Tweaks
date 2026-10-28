@@ -22,6 +22,11 @@ WINDOWS = (
     # and 4B9320/4B9250 emit the split/time sprites and glyphs.
     ("race-time-extend-state", 0x00050C80, 0x00050E20),
     ("navi-time-extend-split", 0x000B9200, 0x000B9480),
+    # 4BD0A0 is called from Navi display at 0xBEDE0 every frame, but it
+    # conditionally emits the live timer/split popup only while 8446E8 > 0.
+    # Disassemble its body so we can hook the conditional display edge rather
+    # than the unconditional outer display call.
+    ("navi-live-time-popup-dispatch", 0x000BD080, 0x000BD1A0),
     ("navi-race-display", 0x000BEA80, 0x000BEE20),
     ("goal-record-helpers", 0x000BE000, 0x000BEB20),
     ("lens-objects", 0x0000C900, 0x0000D950),
