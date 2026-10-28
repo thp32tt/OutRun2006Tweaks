@@ -45,6 +45,18 @@ public:
             unconsumed_ = false; // orphaned copy cannot ever be published
         return state;
     }
+    // A completed, RGB-inert source Draw can release its staging pair BEFORE
+    // Present, allowing a later real Draw from the same source frame to be
+    // captured. A pending fence or any true RGB delta forbids replacement.
+    [[nodiscard]] bool retire_same_present_zero_rgb(
+        std::uint64_t serial, bool copyPending, bool gpuComplete,
+        bool rgbChanged) noexcept {
+        if (!copyPending || !gpuComplete || rgbChanged || !unconsumed_ ||
+            !everQueued_ || lastQueuedSerial_ != serial) return false;
+        unconsumed_ = false;
+        everQueued_ = false; // permit a fresh GPU pair for this serial only
+        return true;
+    }
     void reset() noexcept {
         lastQueuedSerial_ = 0u;
         everQueued_ = false;

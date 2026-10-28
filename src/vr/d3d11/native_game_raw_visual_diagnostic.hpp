@@ -34,10 +34,16 @@ public:
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; quarantined_ = false; lastDraws_ = 0;
         recoveredLateCopies_ = 0u;
+        zeroRgbRetiredCopies_ = 0u; zeroRgbRearmsThisPresent_ = 0u;
+        rearmSerial_ = (std::numeric_limits<std::uint64_t>::max)();
+        rgbEvidenceConfirmed_ = false;
         captureEpoch_.reset();
     }
     [[nodiscard]] std::uint64_t recovered_late_copies() const noexcept {
         return recoveredLateCopies_;
+    }
+    [[nodiscard]] std::uint64_t zero_rgb_retired_copies() const noexcept {
+        return zeroRgbRetiredCopies_;
     }
     NativeRawPreviewResult present(
         IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,
@@ -227,6 +233,10 @@ public:
         if (gameOwner_ != game || gpuOwner_ != dev) {
             reset(); gameOwner_ = game; gpuOwner_ = dev;
         }
+        if (rearmSerial_ != presentingSerial) {
+            rearmSerial_ = presentingSerial;
+            zeroRgbRearmsThisPresent_ = 0u;
+        }
         // A cropped/dirty/incompatible D3D9 Present may never enter present(),
         // leaving an orphaned GPU staging pair across menus/car/race frames.
         // Recover on a later genuine source Draw, with NO Map/UpdateSurface
@@ -251,6 +261,12 @@ public:
             }
         }
         if (quarantined_) return;
+        // The first authentic native Draw may modify depth/alpha only.
+        // Once its EVENT completes, abandon an RGB-inert copy and admit a
+        // later real game Draw in THIS Present. Keep any RGB-positive pair.
+        if (pending_ && !captureEpoch_.previous_present_copy(presentingSerial))
+            retire_same_present_zero_rgb_capture(ctx, presentingSerial);
+        if (quarantined_) return;
         // One source-owned pair per frame; a GPU event still in flight blocks
         // allocation/reuse of BOTH before/after staging resources.
         // A previous source Draw can fail *after* its BEFORE copy. Discard
@@ -259,8 +275,10 @@ public:
         drawPair_.reset();
         if (!captureEpoch_.can_queue(presentingSerial, pending_))
             return;
-        if (queue_before_draw(dev, ctx, color) == NativeRawPreviewResult::CopyQueued)
+        if (queue_before_draw(dev, ctx, color) == NativeRawPreviewResult::CopyQueued) {
+            rgbEvidenceConfirmed_ = false;
             drawPair_.arm(presentingSerial, color);
+        }
     }
     void abort_real_native_draw() noexcept { drawPair_.reset(); }
     [[nodiscard]] bool sample_real_native_draw(
@@ -286,6 +304,60 @@ public:
         return true;
     }
 private:
+    void retire_same_present_zero_rgb_capture(
+        ID3D11DeviceContext* ctx, std::uint64_t presentSerial) noexcept {
+        // Bound the extra readbacks: three different native GPU Draws at most
+        // per original game Present. Never retry a positive RGB capture.
+        if (!ctx || !pending_ || rgbEvidenceConfirmed_ ||
+            zeroRgbRearmsThisPresent_ >= 2u || !event_ ||
+            !baseline_ || !staging_) return;
+        const HRESULT ready = ctx->GetData(event_.Get(), nullptr, 0,
+            D3D11_ASYNC_GETDATA_DONOTFLUSH);
+        if (ready == S_FALSE) return; // the GPU owns both staging images
+        if (ready != S_OK) {
+            pending_ = false; quarantined_ = true;
+            return;
+        }
+        D3D11_MAPPED_SUBRESOURCE before{}, after{};
+        const HRESULT beforeHr = ctx->Map(baseline_.Get(), 0,
+            D3D11_MAP_READ, 0u, &before);
+        if (beforeHr != S_OK || !before.pData ||
+            before.RowPitch < width * 4u) {
+            if (beforeHr == S_OK) ctx->Unmap(baseline_.Get(), 0);
+            pending_ = false; quarantined_ = true;
+            return;
+        }
+        const HRESULT afterHr = ctx->Map(staging_.Get(), 0,
+            D3D11_MAP_READ, 0u, &after);
+        if (afterHr != S_OK || !after.pData ||
+            after.RowPitch < width * 4u) {
+            if (afterHr == S_OK) ctx->Unmap(staging_.Get(), 0);
+            ctx->Unmap(baseline_.Get(), 0);
+            pending_ = false; quarantined_ = true;
+            return;
+        }
+        bool changed = false;
+        const bool valid = native_raw_has_rgb_delta(
+            before.pData, before.RowPitch, after.pData, after.RowPitch,
+            width, height, changed);
+        ctx->Unmap(staging_.Get(), 0);
+        ctx->Unmap(baseline_.Get(), 0);
+        if (!valid) {
+            pending_ = false; quarantined_ = true;
+            return;
+        }
+        if (changed) {
+            rgbEvidenceConfirmed_ = true; // preserve for the actual Present
+            return;
+        }
+        if (captureEpoch_.retire_same_present_zero_rgb(
+                presentSerial, pending_, true, false)) {
+            pending_ = false;
+            drawPair_.reset();
+            ++zeroRgbRearmsThisPresent_;
+            ++zeroRgbRetiredCopies_;
+        }
+    }
     NativeRawPreviewResult queue_before_draw(
         ID3D11Device* dev, ID3D11DeviceContext* ctx,
         ID3D11Texture2D* color) noexcept {
@@ -380,6 +452,10 @@ private:
     bool pending_ = false;
     bool quarantined_ = false;
     std::uint64_t recoveredLateCopies_ = 0u;
+    std::uint64_t zeroRgbRetiredCopies_ = 0u;
+    std::uint64_t rearmSerial_ = (std::numeric_limits<std::uint64_t>::max)();
+    std::uint32_t zeroRgbRearmsThisPresent_ = 0u;
+    bool rgbEvidenceConfirmed_ = false;
     NativeRawGpuCaptureEpoch captureEpoch_{};
     NativeRawChangedPixelWindow changedWindow_{};
 };

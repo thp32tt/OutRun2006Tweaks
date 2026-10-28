@@ -64,6 +64,20 @@ int main() {
         ++polls; return GPU::Complete;
     }) == GPU::Pending);
     assert(polls == 2u); // no outstanding GPU copy, no event query
+    // A depth-only/alpha-only first native Draw must not occupy the sole
+    // RGB diagnostic capture opportunity for every later Draw this Present.
+    e.reset(); e.queued(81u);
+    assert(!e.retire_same_present_zero_rgb(82u, true, true, false));
+    assert(!e.retire_same_present_zero_rgb(81u, false, true, false));
+    assert(!e.retire_same_present_zero_rgb(81u, true, false, false));
+    assert(!e.retire_same_present_zero_rgb(81u, true, true, true));
+    assert(!e.can_queue(81u, false));
+    assert(e.retire_same_present_zero_rgb(81u, true, true, false));
+    assert(!e.consume_for_present(81u)); // discarded RGB-inert copy
+    assert(e.can_queue(81u, false));
+    e.queued(81u); // new native game Draw, same D3D9 Present
+    assert(e.consume_for_present(81u));
+    assert(!e.can_queue(81u, false)); // one positive pair preserved
     e.reset(); // genuine Reset/new D3D9 or D3D11 owner
     assert(e.can_queue(0u, false));
     assert(!e.consume());

@@ -1373,6 +1373,7 @@ struct State {
     std::uint64_t rawPreviewCopies = 0u;
     std::uint64_t rawPreviewLateCopies = 0u;
     std::uint64_t rawPreviewRecoveredLogged = 0u;
+    std::uint64_t rawZeroRgbRetiredLogged = 0u;
     std::uint64_t rawFogVisualBypasses = 0u;
     NativeRawSourceProbeSchedule rawSourceProbe;
     std::uint64_t rawProbeRestarts = 0u;
@@ -11326,6 +11327,14 @@ void before_game_present(IDirect3DDevice9* game,
                 "full_native_frame=NO DX9Ex_preserved=1",
                 recoveredRaw, s.presents);
         s.rawPreviewRecoveredLogged = recoveredRaw;
+        const auto retiredZeroRgb = s.rawPreview.zero_rgb_retired_copies();
+        if (rawVisual && retiredZeroRgb != s.rawZeroRgbRetiredLogged)
+            spdlog::info(
+                "DX11 RAW_VISUAL zero_rgb_capture_retired={} "
+                "present_serial={} new_source_draw_eligible=1 "
+                "native_gpu_pixel_output=0 full_native_frame=NO",
+                retiredZeroRgb, s.presents);
+        s.rawZeroRgbRetiredLogged = retiredZeroRgb;
         s.pending = false;
         s.frameBatch.reset();
         s.preDrawSurface.discard();
