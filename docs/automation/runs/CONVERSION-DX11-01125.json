@@ -45,8 +45,9 @@
     ],
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
-      "NATIVE_D3D11_GPU_DRAW",
-      "VISIBLE_SOURCE_OWNED_PARTIAL_GPU_PIXELS"
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_GPU_TILE_NOT_FULL_NATIVE_GAME_FRAME"
     ],
     "batch_components": [
       "CXX_GPU_CHANGED_PIXEL_SELECTION",
@@ -54,7 +55,7 @@
       "CXX_NON_OCCLUSIVE_INCOMPLETE_BORDER",
       "PORTABLE_POSITIVE_NEGATIVE_CHANGED_CROP_REGRESSION"
     ],
-    "visible_frame_acceptance": "BUILD_VERIFIED only: opt-in authentic changed GPU Draw pixels can select a valid small D3D9 Present subsection; real game visible pixels, full native game frame and HMD stereo UNTESTED.",
+    "visible_frame_acceptance": "BUILD_VERIFIED only: live D3D9 source Draw -> authentic D3D11 native GPU Draw -> real paired pre/post pixel output in opt-in partial RAW Present tile. This VISIBLE_FRAME_OUTPUT is a code-path goal for the source-owned partial GPU tile, not runtime proof of visible screen, complete full native game frame or Quest3/VDXR stereo; all runtime UNTESTED.",
     "activation_guard_and_fallback": "Original D3D9 render/input/FFB and DX9Ex fallback unchanged; RAW diagnostic opt-in only, no full-frame/native OpenXR promotion and no DXVK edit.",
     "acceptance_proof": {
       "positive_probe": "Native 256x144 GPU before/after changed pixel at (250,130) retargets source subcrop from (112,56) to (224,112) inside authentic 48x48 game Present; actual changed GPU RGB is not overwritten by magenta.",
@@ -195,5 +196,5 @@
     "score_increment_for_this_distinct_source_and_gate_achievement": 1,
     "score_increment_for_this_c6": 0
   },
-  "c6_note": "Only one independent source-integrated result; readback, C6, retry, baseline regressions and CI bookkeeping add 0. No real-game/HMD PASS or measured developer-time percentages claimed."
+  "c6_note": "Only one independent source-integrated result; readback, C6, retry, baseline regressions and CI bookkeeping add 0. No real-game/HMD PASS or measured developer-time percentages claimed. 2026-10-28 11:35 KST: mandatory 01126 exact-SHA Fast #40621686211 and Backend #40621686042 both failed inherited 01125 legacy path vocabulary; canonicalized real D3D9->D3D11 Draw->visible partial RAW source path as 01126 causal CI repair. No alteration to 01125 material/result SHA, historical exact-SHA Gates, source feature, prior score, or Quest3 evidence."
 }
