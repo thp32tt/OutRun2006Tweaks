@@ -5478,22 +5478,33 @@ namespace OutRunVRStereo
             const auto lensDeferred =
                 OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
             const bool lensInlineLinked = lensInline.sourceSerial != 0;
-            const bool lensDeferredLinked =
+            const bool lensDeferredCandidate =
                 !lensInlineLinked && lensDeferred.sourceSerial != 0;
-            const std::uint64_t lensSourceSerial = lensInlineLinked
-                ? lensInline.sourceSerial : lensDeferred.sourceSerial;
-            const std::uint64_t lensSourceSequence = lensInlineLinked
-                ? lensInline.lastC993Sequence : lensDeferred.sequence;
-            const std::uint32_t lensSourceObject = lensInlineLinked
-                ? lensInline.objectId : lensDeferred.objectId;
-            const unsigned lensSourceOrdinal = lensInlineLinked
-                ? static_cast<unsigned>(lensInline.ordinal)
-                : static_cast<unsigned>(lensDeferred.ordinal);
-            const unsigned lensSourceSite = lensInlineLinked
-                ? static_cast<unsigned>(lensInline.callsite) : 2u;
+            // Only the inline wrapper is an exact source-call receipt. A
+            // deferred interval spans a multi-object 4052C0 queue and must
+            // never be relabeled as an exact 570008 physical identity.
+            const std::uint64_t lensSourceSerial =
+                lensInlineLinked ? lensInline.sourceSerial : 0;
+            const std::uint64_t lensSourceSequence =
+                lensInlineLinked ? lensInline.lastC993Sequence : 0;
+            const std::uint32_t lensSourceObject =
+                lensInlineLinked ? lensInline.objectId : 0;
+            const unsigned lensSourceOrdinal =
+                lensInlineLinked ? static_cast<unsigned>(lensInline.ordinal) : 0;
+            const unsigned lensSourceSite =
+                lensInlineLinked ? static_cast<unsigned>(lensInline.callsite) : 0;
+            const std::uint64_t lensWindowAnchorSerial =
+                lensDeferredCandidate ? lensDeferred.sourceSerial : 0;
+            const std::uint64_t lensWindowAnchorSequence =
+                lensDeferredCandidate ? lensDeferred.sequence : 0;
+            const std::uint32_t lensWindowAnchorObject =
+                lensDeferredCandidate ? lensDeferred.objectId : 0;
+            const unsigned lensWindowAnchorOrdinal = lensDeferredCandidate
+                ? static_cast<unsigned>(lensDeferred.ordinal) : 0;
             const char* lensSourceProvenance = lensInlineLinked
                 ? "CALL_STACK_INLINE"
-                : (lensDeferredLinked ? "DEFERRED_SOURCE_WINDOW" : "NONE");
+                : (lensDeferredCandidate
+                    ? "DEFERRED_WINDOW_CANDIDATE" : "NONE");
             if (Settings::VRTelemetry && lensInline.sourceSerial != 0)
             {
                 static std::atomic<std::uint64_t> lensInlineSamples{0};
@@ -5515,7 +5526,7 @@ namespace OutRunVRStereo
                         baseAdmitted ? 1 : 0, site ? site : "unknown");
             }
             if (Settings::VRTelemetry &&
-                (lensInlineLinked || lensDeferredLinked))
+                (lensInlineLinked || lensDeferredCandidate))
             {
                 static std::atomic<std::uint64_t> lensJoinSamples{0};
                 const auto n = lensJoinSamples.fetch_add(
@@ -5524,11 +5535,16 @@ namespace OutRunVRStereo
                     spdlog::info(
                         "VR LENS R30 SOURCE JOIN: sample={} serial={} "
                         "sourceCallSerial={} sequence={} sourceObj=0x{:X} "
-                        "sourceSite={} ordinal={} provenance={} "
-                        "scope={} baseAdmitted={} site={}",
+                        "sourceSite={} ordinal={} exactSourceLinked={} "
+                        "windowAnchorSerial={} windowAnchorSequence={} "
+                        "windowAnchorObj=0x{:X} windowAnchorOrdinal={} "
+                        "provenance={} scope={} baseAdmitted={} site={}",
                         n, TopLevelDrawSerial(), lensSourceSerial,
                         lensSourceSequence, lensSourceObject,
                         lensSourceSite, lensSourceOrdinal,
+                        lensInlineLinked ? 1 : 0,
+                        lensWindowAnchorSerial, lensWindowAnchorSequence,
+                        lensWindowAnchorObject, lensWindowAnchorOrdinal,
                         lensSourceProvenance,
                         OutRunVR::GameSemantic::Name(
                             OutRunVR::GameSemantic::EffectiveScope()),
@@ -5659,7 +5675,9 @@ namespace OutRunVRStereo
                         "kind={} scope={} producer={} spriteQueue={} "
                         "vsHr=0x{:08X} vsBound={} fvfHr=0x{:08X} "
                         "fvf=0x{:08X} sourceCallSerial={} sequence={} "
-                        "sourceObj=0x{:X} sourceSite={} ordinal={} provenance={} "
+                        "sourceObj=0x{:X} sourceSite={} ordinal={} "
+                        "exactSourceLinked={} windowAnchorSerial={} "
+                        "windowAnchorObj=0x{:X} windowAnchorOrdinal={} provenance={} "
                         "tex0=0x{:X} tex={}x{} fmt={} vb0=0x{:X} offset={} stride={} "
                         "ib=0x{:X} rt0=0x{:X} rt={}x{} rtfmt={} "
                         "colorWrite=0x{:X} alphaBlend={} srcBlend={} dstBlend={} "
@@ -5675,7 +5693,9 @@ namespace OutRunVRStereo
                         static_cast<unsigned>(liveFvf),
                         lensSourceSerial, lensSourceSequence,
                         lensSourceObject, lensSourceSite,
-                        lensSourceOrdinal, lensSourceProvenance,
+                        lensSourceOrdinal, lensInlineLinked ? 1 : 0,
+                        lensWindowAnchorSerial, lensWindowAnchorObject,
+                        lensWindowAnchorOrdinal, lensSourceProvenance,
                         lensTexture0Ptr, lensTexWidth, lensTexHeight,
                         static_cast<unsigned>(lensTexFormat),
                         lensVb0Ptr, lensVb0Offset, lensVb0Stride, lensIbPtr,
@@ -5946,7 +5966,9 @@ namespace OutRunVRStereo
                         "rawWvpHash=0x{:016X} leftWvpHash=0x{:016X} "
                         "rightWvpHash=0x{:016X} sourceCallSerial={} "
                         "sequence={} sourceObj=0x{:X} sourceSite={} ordinal={} "
-                        "provenance={} tex0=0x{:X} vb0=0x{:X} ib=0x{:X} "
+                        "exactSourceLinked={} windowAnchorSerial={} "
+                        "windowAnchorObj=0x{:X} windowAnchorOrdinal={} provenance={} "
+                        "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} "
                         "colorWrite=0x{:X} "
                         "leftRT=0x{:X} leftRTDesc={}x{}:{} "
                         "rightRT=0x{:X} rightRTDesc={}x{}:{} sameRT={} "
@@ -5966,7 +5988,9 @@ namespace OutRunVRStereo
                         originalWvpHash, leftWvpHash, rightWvpHash,
                         lensSourceSerial, lensSourceSequence,
                         lensSourceObject, lensSourceSite,
-                        lensSourceOrdinal, lensSourceProvenance,
+                        lensSourceOrdinal, lensInlineLinked ? 1 : 0,
+                        lensWindowAnchorSerial, lensWindowAnchorObject,
+                        lensWindowAnchorOrdinal, lensSourceProvenance,
                         lensTexture0Ptr, lensVb0Ptr, lensIbPtr,
                         static_cast<unsigned>(lensColorWrite),
                         lensLeftRtPtr, lensLeftRtWidth, lensLeftRtHeight,

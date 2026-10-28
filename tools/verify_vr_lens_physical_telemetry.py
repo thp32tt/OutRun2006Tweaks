@@ -28,7 +28,7 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
         "VR LENS R30 PHYSICAL EYES:",
         "opaqueObject=WINDOW_LINKED_ONLY",
         "VR LENS R30 SOURCE JOIN:",
-        "DEFERRED_SOURCE_WINDOW",
+        "DEFERRED_WINDOW_CANDIDATE",
         "tex0=0x{:X} tex={}x{} fmt={}",
         "vb0=0x{:X} offset={} stride={}",
         "colorWrite=0x{:X} alphaBlend={}",
@@ -103,14 +103,23 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
     assert "sourceOrdinal == 1" in projected
     assert "VR LENS 570008 DEFERRED WINDOW ARM:" in projected
     assert "VR LENS 570008 DEFERRED WINDOW CLOSE:" in projected
+    assert "struct LensDeferredPhysicalReceipt" in sem
+    assert "CurrentLensDeferredPhysical" in sem
+    # The original 4052C0 queue is multi-object: the interval receipt is
+    # diagnostics only and must never gain EffectiveScope/render authority.
+    assert "DeferredLensProjectedOwnsPhysicalDraw" not in sem
+    effective = sem.split("inline RenderScope EffectiveScope()", 1)[1].split(
+        "inline void ArmNextDraw", 1)[0]
+    assert "CurrentLensDeferredPhysical" in effective
+    assert "return RenderScope::ProjectedScreenEffect2D;" not in effective
     for phrase in (
-        "struct LensDeferredPhysicalReceipt",
-        "DeferredLensProjectedOwnsPhysicalDraw()",
-        "CurrentLensDeferredPhysical.objectId == 0x570008u",
-        "CurrentLensDeferredPhysical.ordinal == 1u",
-        "return RenderScope::ProjectedScreenEffect2D;",
+        "exactSourceLinked={}",
+        "windowAnchorSerial={}",
+        "windowAnchorObj=0x{:X}",
+        "windowAnchorOrdinal={}",
+        "DEFERRED_WINDOW_CANDIDATE",
     ):
-        assert phrase in sem, "missing bounded deferred lens semantic: " + phrase
+        assert phrase in body, "missing candidate-only deferred provenance: " + phrase
     assert centre.count("ScopedLensOriginalCall inlineSource(") == 2
     assert "sourceCallSerial" in centre and "sourceCallSerial" in projected
     assert "ordinalMaySpanSunCalls={}" in projected
@@ -130,7 +139,8 @@ def main() -> None:
     check(r30, game, hook, sem)
     mutations = [
         (0, "opaqueObject=WINDOW_LINKED_ONLY", "opaqueObject=PROVEN_DESCRIPTOR"),
-        (0, "DEFERRED_SOURCE_WINDOW", "OPAQUE_DESCRIPTOR_PROOF"),
+        (0, "DEFERRED_WINDOW_CANDIDATE", "OPAQUE_DESCRIPTOR_PROOF"),
+        (0, "exactSourceLinked={}", "exactSourceLinked=1"),
         (0, "device->GetFVF(&liveFvf)", "D3D_OK"),
         (0, "eyeRT=LEFT_RIGHT_TRANSACTION", "eyeRT=FAKE_SINGLE_RT"),
         (0, "std::memcmp(eyeConstants[0], eyeConstants[1],", "true /* fake eye equality */("),
@@ -148,8 +158,8 @@ def main() -> None:
         (2, "ArmLensDeferredPhysical(", "/* removed deferred bridge */"),
         (0, "rawWvpHash=0x{:016X}", "rawWvpHash=OMITTED"),
         (0, "sameRT={}", "sameRT=ASSUMED_ZERO"),
-        (3, "CurrentLensDeferredPhysical.ordinal == 1u",
-            "CurrentLensDeferredPhysical.ordinal == 2u"),
+        (3, "diagnostics only and must never gain EffectiveScope/render authority.",
+            "diagnostics may override EffectiveScope."),
     ]
     values = [r30, game, hook, sem]
     for idx, old, new in mutations:
@@ -161,7 +171,7 @@ def main() -> None:
         except AssertionError:
             continue
         raise AssertionError("unsafe lens provenance mutation escaped: " + old)
-    print("PASS lens C993/CABE inline + bounded deferred source-to-R30 receipts; "
+    print("PASS lens C993/CABE inline + candidate-only deferred window receipts; "
           f"{len(mutations)} destructive negative controls; "
           "no game optics changes; HMD UNTESTED")
 

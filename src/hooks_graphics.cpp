@@ -751,9 +751,10 @@ class VRLensFlareProjected2D : public Hook
                 sourceOrdinal = ++LensOuter570008Ordinal;
             }
 
-            // The first original CABE is deferred into the opaque queue.
-            // Close a previously armed ordinal1 window exactly when the
-            // second original CABE enters, before its synchronous Draw path.
+            // The first original CABE is deferred into a multi-object opaque
+            // queue. Close the diagnostic-only ordinal1 interval exactly when
+            // the second original CABE enters. This window is NOT object or
+            // render-policy authority for any native Draw inside the flush.
             if (sourceOrdinal >= 2)
             {
                 const auto deferred =
@@ -809,11 +810,10 @@ class VRLensFlareProjected2D : public Hook
              static_cast<std::uint8_t>(sourceOrdinal)});
 		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
 
-        // Preserve only ordinal1's projected ownership across the known
-        // source-wrapper-to-4052C0 deferred interval. The next 570008 entry
-        // clears this receipt before its immediate physical draw. This makes
-        // the two intentional CABE siblings use one projection policy without
-        // changing their source call count, alpha, matrix, PMT or queue order.
+        // Record only the source-order interval after ordinal1 returns and
+        // before ordinal2 enters. Original 4052C0 flushes a multi-object CABE
+        // queue here, so this receipt must remain diagnostic-only and cannot
+        // change EffectiveScope or claim a physical 570008 identity.
         if (Settings::VREnabled && objectId == 0x570008 &&
             sourceOrdinal == 1 && sourceCallSerial != 0)
         {
@@ -824,7 +824,7 @@ class VRLensFlareProjected2D : public Hook
                 spdlog::info(
                     "VR LENS 570008 DEFERRED WINDOW ARM: sequence={} "
                     "sourceCallSerial={} ordinal=1 scope={} "
-                    "provenance=SOURCE_ORDER_BOUNDED",
+                    "provenance=SOURCE_ORDER_WINDOW_CANDIDATE",
                     LensFlareSequence, sourceCallSerial,
                     OutRunVR::GameSemantic::Name(
                         OutRunVR::GameSemantic::EffectiveScope()));
