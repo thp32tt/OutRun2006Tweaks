@@ -32,7 +32,8 @@ assert 'return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;' in fixe
 # bounded opt-in probe, but never promote live device VS to original c64 proof.
 shader_gate = shader_hud.split('if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||', 1)[0]
 assert 'CurrentVertexShaderIdentity.load(' in shader_gate, 'do not bypass original shader identity guard'
-assert 'if (Settings::VRTelemetry && R30IsExactResultHudDraw())' in shader_gate, 'probe only source-proven exact result with telemetry on'
+assert 'const bool exactRival =' in shader_gate, 'shader-cache probe must identify the exact projected rival separately'
+assert 'if (Settings::VRTelemetry &&\n                    (R30IsExactResultHudDraw() || exactRival))' in shader_gate, 'probe only source-proven exact result or exact projected rival with telemetry on'
 assert 'RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO' in shader_gate, 'diagnose zero-cache physical shader ambiguity'
 assert 'poseSeq={} drawSerial={}' in shader_gate and 'TopLevelDrawSerial() + 1u' in shader_gate, 'correlate one exact GPU draw with a single pose and serial'
 assert 'device->GetVertexShader(&liveVs)' in shader_gate and 'liveVs->Release()' in shader_gate, 'release any observed live shader'
