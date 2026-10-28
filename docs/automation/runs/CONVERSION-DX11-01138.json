@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01138",
+  "production_id": "CONVERSION-DX11-01138",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01138",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:DUAL_GPU_DRAW_REGION_CAPTURE",
+  "classification": "A_REAL_NATIVE_GAME_GPU_PIXEL_CAPTURE_SOURCE_IMPLEMENTATION",
+  "status": "SOURCE_IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "source_base_sha": "d782d87618b430f03884ad1ea0970ed4d2fe4df7",
+  "feature_contract": {
+    "goal": "An actual native D3D11 game Draw now captures distinct source-authorized GPU viewport regions using two BEFORE/AFTER staging pairs and one EVENT, selecting only the largest genuine RGB delta without treating partial pixels as full native frame.",
+    "acceptance": [
+      "native GPU Draw paired dual-region capture",
+      "same-Present event and Clear/Reset/fence quarantine intact",
+      "portable C++ positive/negative tile tests",
+      "all five mandatory exact-SHA CI Gates"
+    ]
+  },
+  "validation_bearing_result_sha": null,
+  "material_result_sha": null,
+  "desktop_native_game": "UNTESTED",
+  "quest3_vdxr": "UNTESTED",
+  "development_time_percentages": "UNMEASURED"
+}

@@ -14,6 +14,7 @@
 #include "native_game_raw_gpu_capture_epoch.hpp"
 #include "native_game_raw_pixel_delta.hpp"
 #include "native_game_raw_draw_tile.hpp"
+#include "native_game_raw_dual_tile.hpp"
 #include "native_game_raw_draw_pair.hpp"
 #include "native_game_raw_partial_present_tile.hpp"
 #include "native_game_raw_changed_pixel_window.hpp"
@@ -29,8 +30,11 @@ class NativeRawVisualPreview final {
 public:
     static constexpr UINT width = 256, height = 144;
     void reset() noexcept {
-        staging_.Reset(); baseline_.Reset(); event_.Reset(); surface_.Reset();
-        drawPair_.reset(); region_ = {};
+        staging_.Reset(); baseline_.Reset();
+        stagingAlternate_.Reset(); baselineAlternate_.Reset();
+        event_.Reset(); surface_.Reset();
+        drawPair_.reset(); region_ = {}; regionAlternate_ = {};
+        alternateActive_ = false;
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; quarantined_ = false; lastDraws_ = 0;
         recoveredLateCopies_ = 0u;
@@ -160,6 +164,46 @@ public:
                     ctx->Unmap(baseline_.Get(), 0);
                     return NativeRawPreviewResult::GpuFailure;
                 }
+                // Both authenticated source Draw regions share one GPU EVENT.
+                // Never show pixels from a different Present or unsafe Map.
+                D3D11_MAPPED_SUBRESOURCE beforeAlternate{}, afterAlternate{};
+                if (alternateActive_) {
+                    const HRESULT a = ctx->Map(baselineAlternate_.Get(), 0,
+                        D3D11_MAP_READ, 0u, &beforeAlternate);
+                    if (a != S_OK || !beforeAlternate.pData ||
+                        beforeAlternate.RowPitch < width * 4u) {
+                        if (a == S_OK) ctx->Unmap(baselineAlternate_.Get(), 0);
+                        ctx->Unmap(baseline_.Get(), 0);
+                        ctx->Unmap(staging_.Get(), 0);
+                        quarantined_ = true;
+                        return NativeRawPreviewResult::GpuFailure;
+                    }
+                    const HRESULT b = ctx->Map(stagingAlternate_.Get(), 0,
+                        D3D11_MAP_READ, 0u, &afterAlternate);
+                    if (b != S_OK || !afterAlternate.pData ||
+                        afterAlternate.RowPitch < width * 4u) {
+                        if (b == S_OK) ctx->Unmap(stagingAlternate_.Get(), 0);
+                        ctx->Unmap(baselineAlternate_.Get(), 0);
+                        ctx->Unmap(baseline_.Get(), 0);
+                        ctx->Unmap(staging_.Get(), 0);
+                        quarantined_ = true;
+                        return NativeRawPreviewResult::GpuFailure;
+                    }
+                }
+                const auto unmapPairs = [&]() noexcept {
+                    if (alternateActive_) {
+                        ctx->Unmap(stagingAlternate_.Get(), 0);
+                        ctx->Unmap(baselineAlternate_.Get(), 0);
+                    }
+                    ctx->Unmap(staging_.Get(), 0);
+                    ctx->Unmap(baseline_.Get(), 0);
+                };
+                const std::uint8_t* selectedBefore =
+                    static_cast<const std::uint8_t*>(before.pData);
+                const std::uint8_t* selectedAfter =
+                    static_cast<const std::uint8_t*>(mapped.pData);
+                std::size_t selectedBeforePitch = before.RowPitch;
+                std::size_t selectedAfterPitch = mapped.RowPitch;
                 // The centered crop can contain one changed GPU pixel while
                 // the actual vehicle/menu Draw produced hundreds elsewhere.
                 // Choose the densest source-authentic GPU RGB subset, without
@@ -170,11 +214,34 @@ public:
                 NativeRawPresentTile bestVisibleTile{};
                 if (!changedWindow_.select(visibleTile, bestVisibleTile,
                                            nativePixels)) {
-                    ctx->Unmap(baseline_.Get(), 0);
-                    ctx->Unmap(staging_.Get(), 0);
+                    unmapPairs();
                     return NativeRawPreviewResult::UnsafePresent;
                 }
                 visibleTile = bestVisibleTile;
+                if (alternateActive_) {
+                    NativeRawPresentTile secondTile{};
+                    UINT secondPixels = 0u;
+                    changedWindow_.capture(beforeAlternate.pData,
+                        beforeAlternate.RowPitch, afterAlternate.pData,
+                        afterAlternate.RowPitch);
+                    if (!changedWindow_.select(visibleTile, secondTile,
+                                               secondPixels)) {
+                        unmapPairs();
+                        quarantined_ = true;
+                        return NativeRawPreviewResult::GpuFailure;
+                    }
+                    if (native_raw_choose_second_tile(
+                            nativePixels, secondPixels, true)) {
+                        nativePixels = secondPixels;
+                        visibleTile = secondTile;
+                        selectedBefore =
+                            static_cast<const std::uint8_t*>(beforeAlternate.pData);
+                        selectedAfter =
+                            static_cast<const std::uint8_t*>(afterAlternate.pData);
+                        selectedBeforePitch = beforeAlternate.RowPitch;
+                        selectedAfterPitch = afterAlternate.RowPitch;
+                    }
+                }
                 if (nativePixels) {
                     if (!surface_ || format_ != back.Format) {
                         surface_.Reset();
@@ -186,13 +253,12 @@ public:
                     }
                     D3DLOCKED_RECT locked{};
                     if (!surface_ || FAILED(surface_->LockRect(&locked, nullptr, 0))) {
-                        ctx->Unmap(baseline_.Get(), 0);
-                        ctx->Unmap(staging_.Get(), 0);
+                        unmapPairs();
                         return NativeRawPreviewResult::UploadFailure;
                     }
                     for (UINT y = 0; y < height; ++y) {
-                        const auto* src = static_cast<const std::uint8_t*>(mapped.pData) +
-                            static_cast<std::size_t>(y) * mapped.RowPitch;
+                        const auto* src = selectedAfter +
+                            static_cast<std::size_t>(y) * selectedAfterPitch;
                         auto* dst = static_cast<std::uint8_t*>(locked.pBits) +
                             static_cast<std::size_t>(y) * locked.Pitch;
                         std::memcpy(dst, src, width * 4u);
@@ -200,8 +266,8 @@ public:
                         // including a fragment on the marker border. Paint
                         // INCOMPLETE magenta only over unchanged background.
                         const auto* beforeRow =
-                            static_cast<const std::uint8_t*>(before.pData) +
-                            static_cast<std::size_t>(y) * before.RowPitch;
+                            selectedBefore +
+                            static_cast<std::size_t>(y) * selectedBeforePitch;
                         for (UINT x = 0; x < width; ++x) {
                             if (native_raw_present_border_pixel(
                                     visibleTile, x, y,
@@ -215,8 +281,7 @@ public:
                         }
                     }
                     const HRESULT unlocked = surface_->UnlockRect();
-                    ctx->Unmap(baseline_.Get(), 0);
-                        ctx->Unmap(staging_.Get(), 0);
+                    unmapPairs();
                     const RECT sourceTile{
                         static_cast<LONG>(visibleTile.sourceX),
                         static_cast<LONG>(visibleTile.sourceY),
@@ -231,8 +296,7 @@ public:
                         output = NativeRawPreviewResult::VisibleGpuPixels;
                     else output = NativeRawPreviewResult::UploadFailure;
                 } else {
-                    ctx->Unmap(baseline_.Get(), 0);
-                        ctx->Unmap(staging_.Get(), 0);
+                    unmapPairs();
                     output = NativeRawPreviewResult::NoChangedPixels;
                 }
             } else if (done == NativeRawGpuWaitResult::Pending) {
@@ -343,6 +407,9 @@ public:
         // preceded that draw, using the identical, source-owned GPU box.
         ctx->CopySubresourceRegion(staging_.Get(), 0, 0, 0, 0,
                                    color, 0, &region_);
+        if (alternateActive_)
+            ctx->CopySubresourceRegion(stagingAlternate_.Get(), 0, 0, 0, 0,
+                                       color, 0, &regionAlternate_);
         ctx->End(event_.Get());
         ctx->Flush();
         pending_ = true;
@@ -386,13 +453,41 @@ private:
         const bool valid = native_raw_has_rgb_delta(
             before.pData, before.RowPitch, after.pData, after.RowPitch,
             width, height, changed);
+        bool alternateValid = true, alternateChanged = false;
+        if (valid && alternateActive_) {
+            // RGB pixels in the second genuine GPU region also prevent
+            // discarding the completed SAME-Present Draw capture.
+            D3D11_MAPPED_SUBRESOURCE beforeAlt{}, afterAlt{};
+            const HRESULT a = ctx->Map(baselineAlternate_.Get(), 0,
+                D3D11_MAP_READ, 0u, &beforeAlt);
+            if (a != S_OK || !beforeAlt.pData ||
+                beforeAlt.RowPitch < width * 4u) {
+                if (a == S_OK) ctx->Unmap(baselineAlternate_.Get(), 0);
+                alternateValid = false;
+            } else {
+                const HRESULT b = ctx->Map(stagingAlternate_.Get(), 0,
+                    D3D11_MAP_READ, 0u, &afterAlt);
+                if (b != S_OK || !afterAlt.pData ||
+                    afterAlt.RowPitch < width * 4u) {
+                    if (b == S_OK) ctx->Unmap(stagingAlternate_.Get(), 0);
+                    alternateValid = false;
+                } else {
+                    alternateValid = native_raw_has_rgb_delta(
+                        beforeAlt.pData, beforeAlt.RowPitch,
+                        afterAlt.pData, afterAlt.RowPitch,
+                        width, height, alternateChanged);
+                    ctx->Unmap(stagingAlternate_.Get(), 0);
+                }
+                ctx->Unmap(baselineAlternate_.Get(), 0);
+            }
+        }
         ctx->Unmap(staging_.Get(), 0);
         ctx->Unmap(baseline_.Get(), 0);
-        if (!valid) {
+        if (!valid || !alternateValid) {
             pending_ = false; quarantined_ = true;
             return;
         }
-        if (changed) {
+        if (changed || alternateChanged) {
             rgbEvidenceConfirmed_ = true; // preserve for the actual Present
             return;
         }
@@ -435,6 +530,16 @@ private:
                     &dst, nullptr, baseline_.GetAddressOf())))
                 return NativeRawPreviewResult::GpuFailure;
         }
+        if (!stagingAlternate_ || !baselineAlternate_) {
+            D3D11_TEXTURE2D_DESC dst{};
+            staging_->GetDesc(&dst);
+            if (!stagingAlternate_ && FAILED(dev->CreateTexture2D(
+                    &dst, nullptr, stagingAlternate_.GetAddressOf())))
+                return NativeRawPreviewResult::GpuFailure;
+            if (!baselineAlternate_ && FAILED(dev->CreateTexture2D(
+                    &dst, nullptr, baselineAlternate_.GetAddressOf())))
+                return NativeRawPreviewResult::GpuFailure;
+        }
         if (!event_) {
             const D3D11_QUERY_DESC desc{D3D11_QUERY_EVENT, 0u};
             if (FAILED(dev->CreateQuery(&desc, event_.GetAddressOf())))
@@ -475,19 +580,30 @@ private:
                 draw.bottom=(std::min)(draw.bottom,std::int64_t{rect.bottom});
             }
         }
-        NativeRawTileOrigin tile{};
-        if(!native_raw_draw_tile(src.Width,src.Height,width,height,
-                                 draw,static_cast<std::uint32_t>(capture_),tile))
+        NativeRawDualTile tiles{};
+        if (!native_raw_dual_draw_tile(
+                src.Width, src.Height, width, height, draw,
+                static_cast<std::uint32_t>(capture_), tiles))
             return NativeRawPreviewResult::NoDraw;
         ++capture_;
-        region_=D3D11_BOX{tile.x,tile.y,0u,
-                          tile.x+width,tile.y+height,1u};
+        region_ = D3D11_BOX{tiles.first.x, tiles.first.y, 0u,
+                            tiles.first.x + width, tiles.first.y + height, 1u};
+        alternateActive_ = tiles.hasSecond;
+        regionAlternate_ = alternateActive_
+            ? D3D11_BOX{tiles.second.x, tiles.second.y, 0u,
+                        tiles.second.x + width, tiles.second.y + height, 1u}
+            : D3D11_BOX{};
         ctx->CopySubresourceRegion(baseline_.Get(), 0, 0, 0, 0,
                                    color, 0, &region_);
+        if (alternateActive_)
+            ctx->CopySubresourceRegion(baselineAlternate_.Get(), 0, 0, 0, 0,
+                                       color, 0, &regionAlternate_);
         return NativeRawPreviewResult::CopyQueued;
     }
     Microsoft::WRL::ComPtr<ID3D11Texture2D> staging_, baseline_;
-    D3D11_BOX region_{};
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> stagingAlternate_, baselineAlternate_;
+    D3D11_BOX region_{}, regionAlternate_{};
+    bool alternateActive_ = false;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_;

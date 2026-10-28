@@ -96,6 +96,8 @@ jobs:
           python tools/dx11_autodev_policy.py --check-latest
       - name: Run focused DX11 source-only regression checks
         run: |
+          # 01138 dual authentic source-native GPU tile capture.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tests/native_raw_dual_tile_test.cpp -o /tmp/dx11_raw_dual_tile && /tmp/dx11_raw_dual_tile
           # 01137 real FVF fog RAW-only RGB admission; malformed/missing-state fallback.
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tests/native_raw_fvf_fog_visual_test.cpp -o /tmp/dx11_raw_fvf_fog && /tmp/dx11_raw_fvf_fog
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_postpass_coverage_00987.cpp -o /tmp/dx11_eye_coverage_00987 && /tmp/dx11_eye_coverage_00987
