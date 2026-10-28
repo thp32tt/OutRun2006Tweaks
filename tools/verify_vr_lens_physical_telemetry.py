@@ -38,7 +38,7 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
         "device->GetVertexShader(&liveVs)",
         "device->GetFVF(&liveFvf)",
         "liveVs->Release()",
-        "eyeRT=LEFT_RIGHT_TRANSACTION object=UNLINKED",
+        "eyeRT=LEFT_RIGHT_TRANSACTION",
         "Settings::VRTelemetry",
         "n <= 32 || (n & (n - 1)) == 0",
         "OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D",
