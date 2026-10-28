@@ -103,5 +103,39 @@ int main() {
     dirty.rectangles[1].left = 617;
     assert(!native_raw_dirty_region_place_tile(
         1920, 1080, 0, 0, 1920, 1080, dirty, W, H, original));
+    // End-to-end source-to-RGB crop across vertically stacked D3D9
+    // repaint rows. No generated pixels, repaint widening or scaling.
+    dirty.rectangles[0] = {600, 300, 648, 316};
+    dirty.rectangles[1] = {600, 316, 648, 332};
+    dirty.rectangles[2] = {600, 332, 648, 348};
+    dirty.rectangles[3] = {648, 332, 900, 340};
+    assert(native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, dirty, W, H, original));
+    assert(original.copyWidth == 32u && original.copyHeight == 32u);
+    assert(original.destinationX == 608 && original.destinationY == 308);
+    after.fill(0u);
+    for (std::uint32_t y = 100u; y < 108u; ++y)
+        for (std::uint32_t x = 200u; x < 208u; ++x)
+            after[(y * W + x) * 4u + 2u] = 170u;
+    chooser.capture(before.data(), W*4u, after.data(), W*4u);
+    assert(chooser.select(original, selected, changed) && changed == 64u);
+    assert(selected.copyWidth == 32u && selected.copyHeight == 32u);
+    assert(native_raw_dirty_region_covers_tile(1920, 1080, dirty, selected));
+    std::uint32_t shownRgb = 0u;
+    for (std::uint32_t y = 0u; y < selected.copyHeight; ++y)
+        for (std::uint32_t x = 0u; x < selected.copyWidth; ++x) {
+            const auto sx = selected.sourceX + x, sy = selected.sourceY + y;
+            const auto off = (sy * W + sx) * 4u;
+            if (native_raw_rgb_changed(
+                    before.data() + off, after.data() + off)) {
+                assert(!native_raw_present_border_pixel(selected, sx, sy, true));
+                ++shownRgb;
+            }
+        }
+    assert(shownRgb == changed);
+    // A single uncovered source row cannot inherit the valid GPU count.
+    dirty.rectangles[1].top = 317;
+    assert(!native_raw_dirty_region_covers_tile(
+        1920, 1080, dirty, selected));
 }
 

@@ -333,3 +333,52 @@ constexpr bool kRawTailedRepaintProof = []() constexpr {
 static_assert(kRawTailedRepaintProof,
     "connected thin tails must not hide authentic native GPU repaint islands");
 
+
+
+// The horizontal-strip complement to the original Y sweep: three short
+// menu rows paint a real 48x48 island, while an attached thin right-hand
+// tail makes the whole connected-component bounds unsafe. All observed
+// source RECTs must still authenticate each destination pixel.
+constexpr bool kRawStackedRowsAndTailProof = []() constexpr {
+    using namespace outrun::vr::dx11;
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true;
+    dirty.count = 4u;
+    dirty.boundLeft = 600; dirty.boundTop = 300;
+    dirty.boundRight = 900; dirty.boundBottom = 348;
+    dirty.rectangles[0] = {600, 300, 648, 316};
+    dirty.rectangles[1] = {600, 316, 648, 332};
+    dirty.rectangles[2] = {600, 332, 648, 348};
+    dirty.rectangles[3] = {648, 332, 900, 340};
+    NativeRawPresentTile tile{};
+    const auto place = [&]() constexpr {
+        return native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080,
+            dirty, 256, 144, tile);
+    };
+    if (!place() || tile.copyWidth != 32u || tile.copyHeight != 32u ||
+        tile.destinationX != 608 || tile.destinationY != 308 ||
+        !native_raw_dirty_region_covers_tile(1920, 1080, dirty, tile))
+        return false;
+    // A clipped source Present must not silently widen authentic coverage.
+    if (!native_raw_dirty_region_place_tile(
+            1920, 1080, 590, 290, 850, 360,
+            dirty, 256, 144, tile) ||
+        !native_raw_dirty_region_covers_tile(1920, 1080, dirty, tile))
+        return false;
+    // An actual one-pixel horizontal gap must NEVER pass union proof.
+    dirty.rectangles[1].top = 317;
+    if (place()) return false;
+    dirty.rectangles[1].top = 316;
+    dirty.boundRight = 901; // forged source rcBound
+    if (place()) return false;
+    dirty.boundRight = 900;
+    dirty.rectangles[3].right = 2000; // malformed tail poisons all
+    if (place()) return false;
+    dirty.rectangles[3].right = 900;
+    dirty.headerVerified = false;
+    if (place()) return false;
+    return true;
+}();
+static_assert(kRawStackedRowsAndTailProof,
+    "stacked source repaint must show only authentic native RGB pixels");

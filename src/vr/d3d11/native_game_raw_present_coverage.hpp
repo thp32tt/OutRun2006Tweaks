@@ -285,6 +285,63 @@ struct NativeRawPresentDirtyRegion {
              }
          }
      }
+     // The dual case is common in original D3D9 RGNDATA: a menu/car
+     // repaint is sliced into short HORIZONTAL rows. None spans the
+     // complete Y band above, and an attached rightward tail invalidates
+     // the whole connected-component candidate. Sweep source-authored
+     // X boundaries and merge vertically touching intervals instead.
+     // This changes placement only in explicit RAW opt-in diagnostics.
+     for (std::uint32_t leftIndex = 0u; leftIndex < dirty.count; ++leftIndex) {
+         const auto left = (std::max)(cropLeft, dirty.rectangles[leftIndex].left);
+         bool duplicateLeft = false;
+         for (std::uint32_t i = 0u; i < leftIndex; ++i)
+             if ((std::max)(cropLeft, dirty.rectangles[i].left) == left)
+                 duplicateLeft = true;
+         if (duplicateLeft) continue;
+         for (std::uint32_t rightIndex = 0u;
+              rightIndex < dirty.count; ++rightIndex) {
+             const auto right = (std::min)(
+                 cropRight, dirty.rectangles[rightIndex].right);
+             // The native crop needs 24 source pixels plus two 8px margins.
+             if (right - left < 40) continue;
+             bool duplicateRight = false;
+             for (std::uint32_t i = 0u; i < rightIndex; ++i)
+                 if ((std::min)(cropRight, dirty.rectangles[i].right) == right)
+                     duplicateRight = true;
+             if (duplicateRight) continue;
+             NativeRawPresentDirtyRect spans[NativeRawPresentDirtyRegion::kMaxRects]{};
+             std::uint32_t count = 0u;
+             for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+                 const auto& rect = dirty.rectangles[i];
+                 if (rect.left > left || rect.right < right) continue;
+                 const auto top = (std::max)(cropTop, rect.top);
+                 const auto bottom = (std::min)(cropBottom, rect.bottom);
+                 if (top >= bottom) continue;
+                 std::uint32_t slot = count++;
+                 while (slot && spans[slot - 1u].top > top) {
+                     spans[slot] = spans[slot - 1u];
+                     --slot;
+                 }
+                 spans[slot] = {left, top, right, bottom};
+             }
+             if (!count) continue;
+             auto top = spans[0].top, bottom = spans[0].bottom;
+             for (std::uint32_t i = 1u; i <= count; ++i) {
+                 if (i < count && spans[i].top <= bottom) {
+                     bottom = (std::max)(bottom, spans[i].bottom);
+                     continue;
+                 }
+                 // These intervals are only CANDIDATES. Authentic D3D9
+                 // bounds and every source-painted pixel are independently
+                 // rechecked before the first GPU RGB byte is displayed.
+                 consider(left, top, right, bottom);
+                 if (i < count) {
+                     top = spans[i].top;
+                     bottom = spans[i].bottom;
+                 }
+             }
+         }
+     }
      return found;
  }
 } // namespace outrun::vr::dx11
