@@ -28,6 +28,7 @@ on:
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
       - 'tools/verify_vr_menu_resolution_split.py'
+      - 'vrhost/src/main.cpp'
       - 'vrhost/src/main_r23.cpp'
       - 'tools/verify_vr_r23_menu_letterbox_cache.py'
       - 'tools/verify_vr_d_logfix_20261026.py'

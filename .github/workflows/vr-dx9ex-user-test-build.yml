@@ -26,6 +26,8 @@ on:
       - 'src/hooks_misc.cpp'
       - 'src/hooks_graphics.cpp'
       - 'src/vr/settings.cpp'
+      - 'vrhost/src/main.cpp'
+      - 'vrhost/src/main_r23.cpp'
       - 'OutRun2006Tweaks.ini'
   workflow_dispatch:
 

@@ -2734,12 +2734,16 @@ int main(int argc, char** argv)
         OutRunVR::ClientPresentationMode lastPresentation = OutRunVR::PresentationUnknown;
         std::array<XrView, 2> matchedViews{};
         bool matchedStereoValid = false;
+        std::uint32_t matchedStereoFrameId = 0;
+        std::uint32_t matchedStereoPoseSequence = 0;
         std::uint32_t lastProcessedStereoFrame = 0;
         OutRunVrDirectRunEpoch::Cursor directRunEpoch{};
         ULONGLONG lastStereoMatchMs = 0;
         std::array<XrCompositionLayerProjectionView, 2>
             cachedProjectionViews{};
         bool cachedProjectionValid = false;
+        std::uint32_t cachedProjectionFrameId = 0;
+        std::uint32_t cachedProjectionPoseSequence = 0;
         ULONGLONG cachedProjectionRenderedMs = 0;
         std::array<XrCompositionLayerProjectionView, 2>
             cachedMenuProjectionViews{};
@@ -3348,6 +3352,9 @@ int main(int argc, char** argv)
                             // GetData reports completion.
                             R23CopyMatchedViews(candidate, matchedViews);
                             matchedStereoValid = true;
+                            matchedStereoFrameId = candidate.frameId;
+                            matchedStereoPoseSequence =
+                                candidate.sourcePoseSequence;
                             newStereoCommitted = true;
                             candidateRejectReason = "committed-pending-render";
                             if (candidate.presentQpc > 0 && qpcFrequency.QuadPart > 0)
@@ -3417,6 +3424,9 @@ int main(int argc, char** argv)
                         frameFreshProjection = true;
                         cachedProjectionViews = pv;
                         cachedProjectionValid = true;
+                        cachedProjectionFrameId = matchedStereoFrameId;
+                        cachedProjectionPoseSequence =
+                            matchedStereoPoseSequence;
                         // Track source freshness, not repeated XR redraws. This
                         // lets gameplay->menu/loading debounce expire normally.
                         if (newStereoCommitted || !hadCachedProjection)
@@ -3760,10 +3770,18 @@ int main(int argc, char** argv)
             {
                 static std::uint64_t fullTraceXrTick = 0;
                 ++fullTraceXrTick;
+                LARGE_INTEGER fullTraceQpc{};
+                QueryPerformanceCounter(&fullTraceQpc);
+                const ULONGLONG fullTraceTickMs = GetTickCount64();
                 std::ostringstream fullTraceFrame;
                 fullTraceFrame
                     << "[VR TRACE XR FRAME FULL]"
                     << " tick=" << fullTraceXrTick
+                    << " qpc=" << fullTraceQpc.QuadPart
+                    << " tickMs=" << fullTraceTickMs
+                    << " viewStateFlags=0x" << std::hex
+                    << static_cast<unsigned long long>(vs.viewStateFlags)
+                    << std::dec
                     << " predictedDisplayTime=" << fs.predictedDisplayTime
                     << " predictedDisplayPeriod=" << fs.predictedDisplayPeriod
                     << " shouldRender=" << (fs.shouldRender == XR_TRUE ? 1 : 0)
@@ -3771,6 +3789,13 @@ int main(int argc, char** argv)
                     << " presentation=" << static_cast<unsigned>(presentation)
                     << " candidateFrameId=" << candidateGameFrameId
                     << " candidatePoseSequence=" << candidatePoseSequence
+                    << " matchedValid=" << (matchedStereoValid ? 1 : 0)
+                    << " matchedFrameId=" << matchedStereoFrameId
+                    << " matchedPoseSequence=" << matchedStereoPoseSequence
+                    << " cachedValid=" << (cachedProjectionValid ? 1 : 0)
+                    << " cachedFrameId=" << cachedProjectionFrameId
+                    << " cachedPoseSequence=" << cachedProjectionPoseSequence
+                    << " lastProcessedFrameId=" << lastProcessedStereoFrame
                     << " rejectReason=" << candidateRejectReason
                     << " requestedLayer=" << finalLayerKind
                     << " actualFinal=" << actualFinalLayerKind
@@ -3792,7 +3817,22 @@ int main(int argc, char** argv)
                     for (int eye = 0; eye < 2; ++eye)
                     {
                         const auto& live = views[eye];
-                        const auto& submitted = pv[eye];
+                        const bool submittedProjectionValid =
+                            frameFreshProjection || frameCachedProjection;
+                        const auto* submitted =
+                            frameCachedProjection
+                                ? &cachedProjectionViews[eye]
+                                : (frameFreshProjection ? &pv[eye] : nullptr);
+                        const std::uint32_t submittedSourceFrameId =
+                            frameCachedProjection
+                                ? cachedProjectionFrameId
+                                : (frameFreshProjection
+                                    ? matchedStereoFrameId : 0);
+                        const std::uint32_t submittedSourcePoseSequence =
+                            frameCachedProjection
+                                ? cachedProjectionPoseSequence
+                                : (frameFreshProjection
+                                    ? matchedStereoPoseSequence : 0);
                         std::ostringstream fullTraceEye;
                         fullTraceEye
                             << "[VR TRACE XR EYE FULL]"
@@ -3807,22 +3847,38 @@ int main(int argc, char** argv)
                             << " liveFov=" << live.fov.angleLeft << ","
                             << live.fov.angleRight << ","
                             << live.fov.angleUp << "," << live.fov.angleDown
-                            << " submittedPos=" << submitted.pose.position.x << ","
-                            << submitted.pose.position.y << ","
-                            << submitted.pose.position.z
-                            << " submittedOri=" << submitted.pose.orientation.x << ","
-                            << submitted.pose.orientation.y << ","
-                            << submitted.pose.orientation.z << ","
-                            << submitted.pose.orientation.w
-                            << " submittedFov=" << submitted.fov.angleLeft << ","
-                            << submitted.fov.angleRight << ","
-                            << submitted.fov.angleUp << ","
-                            << submitted.fov.angleDown
-                            << " arrayIndex=" << submitted.subImage.imageArrayIndex
-                            << " rect=" << submitted.subImage.imageRect.offset.x << ","
-                            << submitted.subImage.imageRect.offset.y << ","
-                            << submitted.subImage.imageRect.extent.width << ","
-                            << submitted.subImage.imageRect.extent.height
+                            << " submittedValid="
+                            << (submittedProjectionValid && submitted ? 1 : 0)
+                            << " submittedSource="
+                            << (frameCachedProjection ? "CACHED" :
+                                (frameFreshProjection ? "FRESH" : "NONE"))
+                            << " sourceFrameId=" << submittedSourceFrameId
+                            << " sourcePoseSequence="
+                            << submittedSourcePoseSequence
+                            << " submittedPos="
+                            << (submitted ? submitted->pose.position.x : 0.0f) << ","
+                            << (submitted ? submitted->pose.position.y : 0.0f) << ","
+                            << (submitted ? submitted->pose.position.z : 0.0f)
+                            << " submittedOri="
+                            << (submitted ? submitted->pose.orientation.x : 0.0f) << ","
+                            << (submitted ? submitted->pose.orientation.y : 0.0f) << ","
+                            << (submitted ? submitted->pose.orientation.z : 0.0f) << ","
+                            << (submitted ? submitted->pose.orientation.w : 0.0f)
+                            << " submittedFov="
+                            << (submitted ? submitted->fov.angleLeft : 0.0f) << ","
+                            << (submitted ? submitted->fov.angleRight : 0.0f) << ","
+                            << (submitted ? submitted->fov.angleUp : 0.0f) << ","
+                            << (submitted ? submitted->fov.angleDown : 0.0f)
+                            << " arrayIndex="
+                            << (submitted ? submitted->subImage.imageArrayIndex : 0u)
+                            << " rect="
+                            << (submitted ? submitted->subImage.imageRect.offset.x : 0)
+                            << ","
+                            << (submitted ? submitted->subImage.imageRect.offset.y : 0)
+                            << ","
+                            << (submitted ? submitted->subImage.imageRect.extent.width : 0)
+                            << ","
+                            << (submitted ? submitted->subImage.imageRect.extent.height : 0)
                             << "\n";
                         OutRunVrEmitFullTrace(fullTraceEye.str());
                     }
