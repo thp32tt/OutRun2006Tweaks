@@ -4257,26 +4257,6 @@ namespace OutRunVRStereo
                 trace->restoreOk = restoreOk;
             }
 
-            if (lensPhysicalCandidate)
-                spdlog::info(
-                    "VR TRACE LENS MATRIX FULL: serial={} pose={} "
-                    "raw=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
-                    "left=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
-                    "right=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}]",
-                    TopLevelDrawSerial(), stereo.poseSequence,
-                    original[0],original[1],original[2],original[3],
-                    original[4],original[5],original[6],original[7],
-                    original[8],original[9],original[10],original[11],
-                    original[12],original[13],original[14],original[15],
-                    eyeConstants[0][0],eyeConstants[0][1],eyeConstants[0][2],eyeConstants[0][3],
-                    eyeConstants[0][4],eyeConstants[0][5],eyeConstants[0][6],eyeConstants[0][7],
-                    eyeConstants[0][8],eyeConstants[0][9],eyeConstants[0][10],eyeConstants[0][11],
-                    eyeConstants[0][12],eyeConstants[0][13],eyeConstants[0][14],eyeConstants[0][15],
-                    eyeConstants[1][0],eyeConstants[1][1],eyeConstants[1][2],eyeConstants[1][3],
-                    eyeConstants[1][4],eyeConstants[1][5],eyeConstants[1][6],eyeConstants[1][7],
-                    eyeConstants[1][8],eyeConstants[1][9],eyeConstants[1][10],eyeConstants[1][11],
-                    eyeConstants[1][12],eyeConstants[1][13],eyeConstants[1][14],eyeConstants[1][15]);
-
             // Only a submitted RIGHT Draw with the original state restored
             // completes a physical stereo pair. The existing failure path
             // still poisons the frame and retains the LEFT HRESULT.
@@ -6065,6 +6045,26 @@ namespace OutRunVRStereo
                         lensLeftRtPtr != 0 &&
                             lensLeftRtPtr == lensRightRtPtr ? 1 : 0);
             }
+
+            if (lensPhysicalCandidate)
+                spdlog::info(
+                    "VR TRACE LENS MATRIX FULL: serial={} pose={} "
+                    "raw=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                    "left=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                    "right=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}]",
+                    TopLevelDrawSerial(), stereo.poseSequence,
+                    original[0],original[1],original[2],original[3],
+                    original[4],original[5],original[6],original[7],
+                    original[8],original[9],original[10],original[11],
+                    original[12],original[13],original[14],original[15],
+                    eyeConstants[0][0],eyeConstants[0][1],eyeConstants[0][2],eyeConstants[0][3],
+                    eyeConstants[0][4],eyeConstants[0][5],eyeConstants[0][6],eyeConstants[0][7],
+                    eyeConstants[0][8],eyeConstants[0][9],eyeConstants[0][10],eyeConstants[0][11],
+                    eyeConstants[0][12],eyeConstants[0][13],eyeConstants[0][14],eyeConstants[0][15],
+                    eyeConstants[1][0],eyeConstants[1][1],eyeConstants[1][2],eyeConstants[1][3],
+                    eyeConstants[1][4],eyeConstants[1][5],eyeConstants[1][6],eyeConstants[1][7],
+                    eyeConstants[1][8],eyeConstants[1][9],eyeConstants[1][10],eyeConstants[1][11],
+                    eyeConstants[1][12],eyeConstants[1][13],eyeConstants[1][14],eyeConstants[1][15]);
 
             // Only a submitted RIGHT Draw with the original state restored
             // completes a physical stereo pair. The existing failure path
