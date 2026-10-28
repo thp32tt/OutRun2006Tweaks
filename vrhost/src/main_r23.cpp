@@ -209,8 +209,10 @@ namespace
     // FULL visual diagnosis intentionally samples often. This path remains
     // process-start opt-in via OUTRUN_VR_R23_PIXEL_PROBE.
     constexpr ULONGLONG R23PixelIntervalMs = 100;
-    constexpr UINT R23ProjectionSamplesX = 5;
-    constexpr UINT R23ProjectionSamplesY = 3;
+    // FULL trace deliberately uses a denser grid than the old 5x3 probe.
+    // It is still a diagnostic control, not a complete flare pixel census.
+    constexpr UINT R23ProjectionSamplesX = 17;
+    constexpr UINT R23ProjectionSamplesY = 11;
     constexpr UINT R23ProjectionSamplesPerEye =
         R23ProjectionSamplesX * R23ProjectionSamplesY;
     // Opt-in only: staging copies and Map polling are diagnostic GPU work.
@@ -756,6 +758,43 @@ namespace
         return false;
     }
 
+    bool R23DecodeAlpha(const std::uint8_t* p, DXGI_FORMAT format, float& alpha)
+    {
+        if (!p) return false;
+        if (format == DXGI_FORMAT_B8G8R8A8_UNORM ||
+            format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB ||
+            format == DXGI_FORMAT_R8G8B8A8_UNORM ||
+            format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB)
+        {
+            alpha = p[3] / 255.0f;
+            return true;
+        }
+        if (format == DXGI_FORMAT_R16G16B16A16_FLOAT)
+        {
+            const auto* h = reinterpret_cast<const std::uint16_t*>(p);
+            alpha = R23HalfToFloat(h[3]);
+            return std::isfinite(alpha);
+        }
+        return false;
+    }
+
+    bool R23ProjectionFormatIsSrgb(DXGI_FORMAT format) noexcept
+    {
+        return format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB ||
+            format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    }
+
+    float R23SrgbToLinear(float value) noexcept
+    {
+        if (!std::isfinite(value) || value <= 0.0f)
+            return 0.0f;
+        if (value >= 1.0f)
+            return 1.0f;
+        return value <= 0.04045f
+            ? value / 12.92f
+            : std::pow((value + 0.055f) / 1.055f, 2.4f);
+    }
+
     UINT R23BytesPerPixel(DXGI_FORMAT format)
     {
         return format == DXGI_FORMAT_R16G16B16A16_FLOAT ? 8u : 4u;
@@ -779,10 +818,15 @@ namespace
         std::uint64_t projectionMapDefers = 0;
         std::uint64_t theaterMapDefers = 0;
         std::uint32_t projectionFrameId = 0;
+        std::uint32_t projectionPoseSequence = 0;
         OutRunVrR23VerifiedBundle::SourceKind projectionKind =
             OutRunVrR23VerifiedBundle::SourceKind::None;
+        std::uint64_t projectionFinalReceiptSerial = 0;
         bool projectionFinalKnown = false;
         bool projectionFinalSubmitted = false;
+        bool projectionViewMetadataValid = false;
+        std::array<XrPosef, 2> projectionViewPose{};
+        std::array<XrFovf, 2> projectionViewFov{};
         bool theaterFinalKnown = false;
         bool theaterFinalSubmitted = false;
 
@@ -875,6 +919,7 @@ namespace
                 out << "[VR TRACE XR PIXEL GRID FULL] phase=MAP_FAILED hr=0x"
                     << std::hex << static_cast<unsigned long>(hr) << std::dec
                     << " frame=" << projectionFrameId
+                    << " poseSequence=" << projectionPoseSequence
                     << " mapDefers=" << projectionMapDefers << "\n";
                 OutRunVrEmitFullTrace(out.str());
                 projectionPending = false;
@@ -883,6 +928,7 @@ namespace
 
             const UINT bpp = R23BytesPerPixel(projectionFormat);
             const auto* row = static_cast<const std::uint8_t*>(mapped.pData);
+            const bool srgb = R23ProjectionFormatIsSrgb(projectionFormat);
             float minRgb[2][3]{
                 {1.0e30f,1.0e30f,1.0e30f},
                 {1.0e30f,1.0e30f,1.0e30f}};
@@ -894,9 +940,20 @@ namespace
             std::uint64_t rawHash[2]{
                 1469598103934665603ull,
                 1469598103934665603ull};
+            std::uint64_t rgbHash[2]{
+                1469598103934665603ull,
+                1469598103934665603ull};
+            std::uint64_t alphaHash[2]{
+                1469598103934665603ull,
+                1469598103934665603ull};
             float decoded[2][R23ProjectionSamplesPerEye][3]{};
+            float decodedAlpha[2][R23ProjectionSamplesPerEye]{};
             bool valid[2][R23ProjectionSamplesPerEye]{};
+            bool alphaValid[2][R23ProjectionSamplesPerEye]{};
 
+            const bool bgra =
+                projectionFormat == DXGI_FORMAT_B8G8R8A8_UNORM ||
+                projectionFormat == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
             for (UINT eye=0; eye<2; ++eye)
             {
                 for (UINT i=0; i<R23ProjectionSamplesPerEye; ++i)
@@ -909,6 +966,32 @@ namespace
                         rawHash[eye]^=pixel[byte];
                         rawHash[eye]*=1099511628211ull;
                     }
+                    if (bpp == 4)
+                    {
+                        const UINT rgbBytes[3]{
+                            bgra ? 2u : 0u, 1u, bgra ? 0u : 2u};
+                        for (UINT byte : rgbBytes)
+                        {
+                            rgbHash[eye]^=pixel[byte];
+                            rgbHash[eye]*=1099511628211ull;
+                        }
+                        alphaHash[eye]^=pixel[3];
+                        alphaHash[eye]*=1099511628211ull;
+                    }
+                    else
+                    {
+                        for (UINT byte=0; byte<6; ++byte)
+                        {
+                            rgbHash[eye]^=pixel[byte];
+                            rgbHash[eye]*=1099511628211ull;
+                        }
+                        for (UINT byte=6; byte<8; ++byte)
+                        {
+                            alphaHash[eye]^=pixel[byte];
+                            alphaHash[eye]*=1099511628211ull;
+                        }
+                    }
+
                     float rgb[3]{};
                     const bool ok=R23DecodeRgb(
                         pixel,projectionFormat,rgb) &&
@@ -916,34 +999,103 @@ namespace
                         std::isfinite(rgb[1]) &&
                         std::isfinite(rgb[2]);
                     valid[eye][i]=ok;
+                    float alpha=0.0f;
+                    alphaValid[eye][i]=R23DecodeAlpha(
+                        pixel,projectionFormat,alpha);
+                    decodedAlpha[eye][i]=alpha;
                     if(!ok) continue;
                     ++finite[eye];
-                    for(int c=0;c<3;++c)
+                    for(int channel=0;channel<3;++channel)
                     {
-                        decoded[eye][i][c]=rgb[c];
-                        minRgb[eye][c]=std::min(minRgb[eye][c],rgb[c]);
-                        maxRgb[eye][c]=std::max(maxRgb[eye][c],rgb[c]);
-                        sumRgb[eye][c]+=rgb[c];
+                        decoded[eye][i][channel]=rgb[channel];
+                        minRgb[eye][channel]=std::min(
+                            minRgb[eye][channel],rgb[channel]);
+                        maxRgb[eye][channel]=std::max(
+                            maxRgb[eye][channel],rgb[channel]);
+                        sumRgb[eye][channel]+=rgb[channel];
                     }
                 }
             }
 
-            double pairAbsSum=0.0;
-            double pairAbsMax=0.0;
+            double pairAbsEncodedSum=0.0;
+            double pairAbsEncodedMax=0.0;
+            double pairAbsLinearSum=0.0;
+            double pairAbsLinearMax=0.0;
             std::uint32_t pairChannels=0;
             for(UINT i=0;i<R23ProjectionSamplesPerEye;++i)
             {
                 if(!valid[0][i]||!valid[1][i]) continue;
-                for(int c=0;c<3;++c)
+                for(int channel=0;channel<3;++channel)
                 {
-                    const double d=std::fabs(
-                        static_cast<double>(decoded[0][i][c])-
-                        static_cast<double>(decoded[1][i][c]));
-                    pairAbsSum+=d;
-                    pairAbsMax=std::max(pairAbsMax,d);
+                    const double left=decoded[0][i][channel];
+                    const double right=decoded[1][i][channel];
+                    const double encodedDelta=std::fabs(left-right);
+                    pairAbsEncodedSum+=encodedDelta;
+                    pairAbsEncodedMax=std::max(
+                        pairAbsEncodedMax,encodedDelta);
+                    const double leftLinear=srgb
+                        ? R23SrgbToLinear(static_cast<float>(left)) : left;
+                    const double rightLinear=srgb
+                        ? R23SrgbToLinear(static_cast<float>(right)) : right;
+                    const double linearDelta=
+                        std::fabs(leftLinear-rightLinear);
+                    pairAbsLinearSum+=linearDelta;
+                    pairAbsLinearMax=std::max(
+                        pairAbsLinearMax,linearDelta);
                     ++pairChannels;
                 }
             }
+
+            double brightMax[2]{};
+            double brightWeight[2]{};
+            double brightX[2]{};
+            double brightY[2]{};
+            for (UINT eye=0; eye<2; ++eye)
+            {
+                for (UINT i=0; i<R23ProjectionSamplesPerEye; ++i)
+                {
+                    if (!valid[eye][i]) continue;
+                    const double r=srgb ? R23SrgbToLinear(decoded[eye][i][0])
+                                        : decoded[eye][i][0];
+                    const double g=srgb ? R23SrgbToLinear(decoded[eye][i][1])
+                                        : decoded[eye][i][1];
+                    const double b=srgb ? R23SrgbToLinear(decoded[eye][i][2])
+                                        : decoded[eye][i][2];
+                    const double lum=0.2126*r+0.7152*g+0.0722*b;
+                    brightMax[eye]=std::max(brightMax[eye],lum);
+                }
+                const double threshold=brightMax[eye]*0.65;
+                if (brightMax[eye] > 0.0)
+                {
+                    for (UINT i=0; i<R23ProjectionSamplesPerEye; ++i)
+                    {
+                        if (!valid[eye][i]) continue;
+                        const double r=srgb ? R23SrgbToLinear(decoded[eye][i][0])
+                                            : decoded[eye][i][0];
+                        const double g=srgb ? R23SrgbToLinear(decoded[eye][i][1])
+                                            : decoded[eye][i][1];
+                        const double b=srgb ? R23SrgbToLinear(decoded[eye][i][2])
+                                            : decoded[eye][i][2];
+                        const double lum=0.2126*r+0.7152*g+0.0722*b;
+                        if (lum < threshold) continue;
+                        const UINT ix=i%R23ProjectionSamplesX;
+                        const UINT iy=i/R23ProjectionSamplesX;
+                        const double x=(static_cast<double>(ix)+1.0)/
+                            (static_cast<double>(R23ProjectionSamplesX)+1.0);
+                        const double y=(static_cast<double>(iy)+1.0)/
+                            (static_cast<double>(R23ProjectionSamplesY)+1.0);
+                        brightWeight[eye]+=lum;
+                        brightX[eye]+=x*lum;
+                        brightY[eye]+=y*lum;
+                    }
+                }
+                if (brightWeight[eye] > 0.0)
+                {
+                    brightX[eye]/=brightWeight[eye];
+                    brightY[eye]/=brightWeight[eye];
+                }
+            }
+
             context->Unmap(projectionStage, 0);
             projectionPending = false;
 
@@ -953,16 +1105,25 @@ namespace
             out << "[VR TRACE XR PIXEL GRID FULL]"
                 << " qpc=" << qpc.QuadPart
                 << " frame=" << projectionFrameId
+                << " poseSequence=" << projectionPoseSequence
                 << " source=" << R23SourceKindName(projectionKind)
                 << " finalSubmissionKnown=" << (projectionFinalKnown ? 1 : 0)
                 << " finalSubmitted=" << (projectionFinalSubmitted ? 1 : 0)
+                << " finalReceiptSerial=" << projectionFinalReceiptSerial
                 << " format=" << static_cast<unsigned>(projectionFormat)
+                << " transfer=" << (srgb ? "SRGB" : "LINEAR_OR_UNORM")
+                << " metricRole=SAME_INDEX_CONTROL_NOT_STEREO_CORRESPONDENCE"
+                << " coverage=UNIFORM_GRID_NOT_FLARE_CENSUS"
                 << " grid=" << R23ProjectionSamplesX << "x"
                 << R23ProjectionSamplesY
                 << " finiteL=" << finite[0]
                 << " finiteR=" << finite[1]
-                << " hashL=0x" << std::hex << rawHash[0]
-                << " hashR=0x" << rawHash[1] << std::dec
+                << " rgbaHashL=0x" << std::hex << rawHash[0]
+                << " rgbaHashR=0x" << rawHash[1]
+                << " rgbHashL=0x" << rgbHash[0]
+                << " rgbHashR=0x" << rgbHash[1]
+                << " alphaHashL=0x" << alphaHash[0]
+                << " alphaHashR=0x" << alphaHash[1] << std::dec
                 << " minL=" << minRgb[0][0] << "," << minRgb[0][1] << "," << minRgb[0][2]
                 << " maxL=" << maxRgb[0][0] << "," << maxRgb[0][1] << "," << maxRgb[0][2]
                 << " meanL="
@@ -975,23 +1136,56 @@ namespace
                 << sumRgb[1][0]/(finite[1]?finite[1]:1) << ","
                 << sumRgb[1][1]/(finite[1]?finite[1]:1) << ","
                 << sumRgb[1][2]/(finite[1]?finite[1]:1)
-                << " pairAbsMean="
-                << (pairChannels ? pairAbsSum/pairChannels : 0.0)
-                << " pairAbsMax=" << pairAbsMax
-                << " mapDefers=" << projectionMapDefers
+                << " pairAbsEncodedMean="
+                << (pairChannels ? pairAbsEncodedSum/pairChannels : 0.0)
+                << " pairAbsEncodedMax=" << pairAbsEncodedMax
+                << " pairAbsLinearMean="
+                << (pairChannels ? pairAbsLinearSum/pairChannels : 0.0)
+                << " pairAbsLinearMax=" << pairAbsLinearMax
+                << " brightMaxL=" << brightMax[0]
+                << " brightMaxR=" << brightMax[1]
+                << " brightCentroidL=" << brightX[0] << "," << brightY[0]
+                << " brightCentroidR=" << brightX[1] << "," << brightY[1]
+                << " brightDisparity="
+                << (brightX[1]-brightX[0]) << ","
+                << (brightY[1]-brightY[0])
+                << " sampleViewValid="
+                << (projectionViewMetadataValid ? 1 : 0);
+            if (projectionViewMetadataValid)
+            {
+                for (UINT eye=0; eye<2; ++eye)
+                {
+                    out << " samplePose" << eye << "="
+                        << projectionViewPose[eye].position.x << ","
+                        << projectionViewPose[eye].position.y << ","
+                        << projectionViewPose[eye].position.z << ","
+                        << projectionViewPose[eye].orientation.x << ","
+                        << projectionViewPose[eye].orientation.y << ","
+                        << projectionViewPose[eye].orientation.z << ","
+                        << projectionViewPose[eye].orientation.w
+                        << " sampleFov" << eye << "="
+                        << projectionViewFov[eye].angleLeft << ","
+                        << projectionViewFov[eye].angleRight << ","
+                        << projectionViewFov[eye].angleUp << ","
+                        << projectionViewFov[eye].angleDown;
+                }
+            }
+            out << " mapDefers=" << projectionMapDefers
                 << " samplesL=";
             for(UINT i=0;i<R23ProjectionSamplesPerEye;++i)
             {
                 if(i) out << ";";
                 out << i << ":" << decoded[0][i][0] << ","
-                    << decoded[0][i][1] << "," << decoded[0][i][2];
+                    << decoded[0][i][1] << "," << decoded[0][i][2] << ","
+                    << (alphaValid[0][i] ? decodedAlpha[0][i] : -1.0f);
             }
             out << " samplesR=";
             for(UINT i=0;i<R23ProjectionSamplesPerEye;++i)
             {
                 if(i) out << ";";
                 out << i << ":" << decoded[1][i][0] << ","
-                    << decoded[1][i][1] << "," << decoded[1][i][2];
+                    << decoded[1][i][1] << "," << decoded[1][i][2] << ","
+                    << (alphaValid[1][i] ? decodedAlpha[1][i] : -1.0f);
             }
             out << "\n";
             OutRunVrEmitFullTrace(out.str());
@@ -1034,9 +1228,13 @@ namespace
             ConsumeTheater(context);
         }
 
-        void NoteFinalSubmission()
+        void NoteFinalSubmission(
+            std::uint64_t submissionSerialBefore,
+            std::uint64_t submissionSerialAfter)
         {
-            if (!R23PixelDiagnosticsEnabled()) return;
+            if (!R23PixelDiagnosticsEnabled() ||
+                submissionSerialAfter <= submissionSerialBefore)
+                return;
             const bool submitted =
                 OutRunVrR23RuntimeHardening::LastSubmittedLayer.load(std::memory_order_acquire);
             const std::uint32_t frameId =
@@ -1049,6 +1247,7 @@ namespace
             {
                 projectionFinalKnown = true;
                 projectionFinalSubmitted = submitted;
+                projectionFinalReceiptSerial = submissionSerialAfter;
             }
             if (theaterPending && !theaterFinalKnown &&
                 kind == OutRunVrR23VerifiedBundle::SourceKind::None)
@@ -1091,7 +1290,13 @@ namespace
                       << uv.x << "," << uv.y << "," << uv.w << "," << uv.h << "]\n";
         }
 
-        void ScheduleProjection(StereoCompositor& c, std::uint32_t image)
+        void ScheduleProjection(
+            StereoCompositor& c, std::uint32_t image,
+            std::uint32_t sourceFrameId = 0,
+            std::uint32_t sourcePoseSequence = 0,
+            OutRunVrR23VerifiedBundle::SourceKind sourceKind =
+                OutRunVrR23VerifiedBundle::SourceKind::None,
+            const std::array<XrView, 2>* sourceViews = nullptr)
         {
             if (!R23PixelDiagnosticsEnabled()) return;
             const ULONGLONG now = GetTickCount64();
@@ -1102,17 +1307,17 @@ namespace
             ID3D11Texture2D* texture = c.projection_.images[image].texture;
             if (!texture) return;
 
-            const float xs[R23ProjectionSamplesX]{
-                0.10f,0.30f,0.50f,0.70f,0.90f};
-            const float ys[R23ProjectionSamplesY]{
-                0.20f,0.50f,0.80f};
             for (UINT eye=0;eye<2;++eye)
             {
                 UINT local=0;
-                for(float yf:ys)
+                for(UINT iy=0; iy<R23ProjectionSamplesY; ++iy)
                 {
-                    for(float xf:xs)
+                    const float yf=(static_cast<float>(iy)+1.0f)/
+                        (static_cast<float>(R23ProjectionSamplesY)+1.0f);
+                    for(UINT ix=0; ix<R23ProjectionSamplesX; ++ix)
                     {
+                        const float xf=(static_cast<float>(ix)+1.0f)/
+                            (static_cast<float>(R23ProjectionSamplesX)+1.0f);
                         const UINT sx=std::min(
                             c.projection_.width-1,
                             static_cast<UINT>(xf*c.projection_.width));
@@ -1129,19 +1334,22 @@ namespace
                     }
                 }
             }
-            OutRunVrR23VerifiedBundle::Snapshot verified{};
-            if (OutRunVrR23VerifiedBundle::ReadFresh(verified))
-            {
-                projectionFrameId = verified.frameId;
-                projectionKind = verified.kind;
-            }
-            else
-            {
-                projectionFrameId = 0;
-                projectionKind = OutRunVrR23VerifiedBundle::SourceKind::None;
-            }
+
+            projectionFrameId = sourceFrameId;
+            projectionPoseSequence = sourcePoseSequence;
+            projectionKind = sourceKind;
+            projectionFinalReceiptSerial = 0;
             projectionFinalKnown = false;
             projectionFinalSubmitted = false;
+            projectionViewMetadataValid = sourceViews != nullptr;
+            if (sourceViews)
+            {
+                for (UINT eye=0; eye<2; ++eye)
+                {
+                    projectionViewPose[eye] = (*sourceViews)[eye].pose;
+                    projectionViewFov[eye] = (*sourceViews)[eye].fov;
+                }
+            }
             projectionPending = true;
             lastProjectionScheduleMs = now;
         }
@@ -1626,7 +1834,9 @@ namespace
 
     bool R23RenderProjection(StereoCompositor& c,
         const std::array<XrView, 2>& views,
-        std::array<XrCompositionLayerProjectionView, 2>& pv)
+        std::array<XrCompositionLayerProjectionView, 2>& pv,
+        std::uint32_t sourceFrameId,
+        std::uint32_t sourcePoseSequence)
     {
         R23Pixels.TryConsume(c.context_);
         if (!c.HasStereoSource()) return false;
@@ -1681,7 +1891,15 @@ namespace
             c.context_->OMSetRenderTargets(1, &nullRtv, nullptr);
         }
         const bool ok = firstEyeOk && secondEyeOk;
-        if (ok) R23Pixels.ScheduleProjection(c, image);
+        if (ok)
+        {
+            const auto sourceKind = c.directFrameValid_
+                ? OutRunVrR23VerifiedBundle::SourceKind::DirectGpu
+                : OutRunVrR23VerifiedBundle::SourceKind::ClassicSbs;
+            R23Pixels.ScheduleProjection(
+                c, image, sourceFrameId, sourcePoseSequence,
+                sourceKind, &views);
+        }
         c.Release(c.projection_);
         if (!ok) return false;
 
@@ -3533,7 +3751,10 @@ int main(int argc, char** argv)
                     const bool projectionRefreshNeeded =
                         newStereoCommitted || !cachedProjectionValid;
                     if (grace && projectionRefreshNeeded &&
-                        R23RenderProjection(compositor, matchedViews, pv))
+                        R23RenderProjection(
+                            compositor, matchedViews, pv,
+                            matchedStereoFrameId,
+                            matchedStereoPoseSequence))
                     {
                         ++R42ProjectionRefreshes;
                         projection.space = localSpace;
@@ -3869,9 +4090,15 @@ int main(int argc, char** argv)
             OutRunVrR24BlackScreenGuard::IntentionalMonoProjection.store(
                 intentionalMonoProjection, std::memory_order_release);
             LARGE_INTEGER es{}, ee{};
+            const std::uint64_t submissionSerialBefore =
+                OutRunVrR23RuntimeHardening::SubmissionSerial.load(
+                    std::memory_order_acquire);
             QueryPerformanceCounter(&es);
             const XrResult endResult = xrEndFrame(session, &end);
             QueryPerformanceCounter(&ee);
+            const std::uint64_t submissionSerialAfter =
+                OutRunVrR23RuntimeHardening::SubmissionSerial.load(
+                    std::memory_order_acquire);
             OutRunVrR24BlackScreenGuard::IntentionalMonoProjection.store(
                 false, std::memory_order_release);
             const R23FinalCounters finalAfter =
@@ -3888,7 +4115,8 @@ int main(int argc, char** argv)
             const bool actualSubmittedLayer =
                 OutRunVrR23RuntimeHardening::LastSubmittedLayer.load(
                     std::memory_order_acquire);
-            R23Pixels.NoteFinalSubmission();
+            R23Pixels.NoteFinalSubmission(
+                submissionSerialBefore, submissionSerialAfter);
             CheckXr(endResult, "xrEndFrame");
             {
                 static std::uint64_t fullTraceXrTick = 0;
@@ -3940,6 +4168,10 @@ int main(int argc, char** argv)
                     << " actualFrameId=" << actualSubmittedFrameId
                     << " actualSourceKind=" << actualSubmittedSourceKind
                     << " actualLayer=" << (actualSubmittedLayer ? 1 : 0)
+                    << " submissionSerialBefore=" << submissionSerialBefore
+                    << " submissionSerialAfter=" << submissionSerialAfter
+                    << " receiptAdvanced="
+                    << (submissionSerialAfter > submissionSerialBefore ? 1 : 0)
                     << " layerReady=" << (layerReady ? 1 : 0)
                     << " freshProjection=" << (frameFreshProjection ? 1 : 0)
                     << " cachedProjection=" << (frameCachedProjection ? 1 : 0)
