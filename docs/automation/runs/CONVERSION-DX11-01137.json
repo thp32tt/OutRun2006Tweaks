@@ -8,17 +8,20 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:FVF_ACTIVE_FOG_SOURCE_TO_GPU_TILE",
   "classification": "A_REAL_NATIVE_GAME_FVF_DRAW_SOURCE_IMPLEMENTATION",
-  "status": "SOURCE_INTEGRATED_PENDING_EXACT_SHA_GATE",
-  "checkpoint": "C4_MATERIAL_PENDING_GATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_DURABLE_RESULT_BUILD_VERIFIED_NEED_HMD_TEST",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_change": 0,
+  "score_change": 1,
   "source_base_sha": "fbd6163f53e27dc8d0af6ec1df5e35a127097a75",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp",
     "tests/native_raw_fvf_fog_visual_test.cpp",
-    ".github/workflows/dx11-fast-structural.yml"
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py"
   ],
   "development_strategy": {
     "work_class": "integration",
@@ -78,13 +81,96 @@
       }
     ]
   },
-  "acceptance_results": {},
-  "validation_bearing_result_sha": null,
-  "material_result_sha": null,
+  "acceptance_results": {
+    "fvf_genuine_fog_raw_gpu_draw": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp",
+        "tests/native_raw_fvf_fog_visual_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks push run 40709496955 success at exact 887d36ce01d9bff91b01a7a045b59e0e2cf3e003; native GPU visuals remain UNTESTED"
+    },
+    "production_fog_and_full_frame_fail_closed": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_first_game_frame_regressions.py",
+        "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "validation_command": "Fast 40709496955 and Windows Build 40709496866 success at exact 887d36ce01d9bff91b01a7a045b59e0e2cf3e003; both FVF/SM3 RAW omitted Fog frame invalidation retained"
+    },
+    "exact_sha_source_regression_and_gates": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp",
+        "tests/native_raw_fvf_fog_visual_test.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "All five mandatory push workflows succeeded at one exact 887d36ce01d9bff91b01a7a045b59e0e2cf3e003; runs 40709496955,40709496910,40709496866,40709496870,40709496865"
+    }
+  },
+  "validation_bearing_result_sha": "887d36ce01d9bff91b01a7a045b59e0e2cf3e003",
+  "material_result_sha": "887d36ce01d9bff91b01a7a045b59e0e2cf3e003",
   "runtime_evidence": {
     "desktop_real_game": "UNTESTED",
     "gpu_native_pixels": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "development_time_percentages": "UNMEASURED"
+  "development_time_percentages": "UNMEASURED",
+  "source_implementation_commit_sha": "da71c1b519b1283993800a458035d1e15cc167d4",
+  "causal_ci_repair_shas": [
+    "0589a7edc2838208e2d275d98e6ee39d67fa1957",
+    "a0f4d53cd13f50b5d9d4d65851d8d502a8752f24",
+    "887d36ce01d9bff91b01a7a045b59e0e2cf3e003"
+  ],
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40709496955,
+        "head_sha": "887d36ce01d9bff91b01a7a045b59e0e2cf3e003",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40709496910,
+        "head_sha": "887d36ce01d9bff91b01a7a045b59e0e2cf3e003",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40709496866,
+        "head_sha": "887d36ce01d9bff91b01a7a045b59e0e2cf3e003",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40709496870,
+        "head_sha": "887d36ce01d9bff91b01a7a045b59e0e2cf3e003",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40709496865,
+        "head_sha": "887d36ce01d9bff91b01a7a045b59e0e2cf3e003",
+        "conclusion": "success"
+      }
+    ],
+    "windows_build_artifact": {
+      "id": 12826191709,
+      "name": "outrun2006tweaks-887d36ce01d9bff91b01a7a045b59e0e2cf3e003",
+      "digest": "sha256:fa5f5e6d0441c8a454edb6383e7d188e8c2bd0eacaed56628043ffd9eee58cab",
+      "bytes": 5808094
+    },
+    "full_native_game_frame_complete": false,
+    "gameplay_visual_pass": false,
+    "runtime_evidence": "UNTESTED: original desktop game draw pixels / menu car race / Quest3 VDXR not performed",
+    "development_time_distribution": "UNMEASURED"
+  },
+  "completed_at_kst": "2026-10-29"
 }
