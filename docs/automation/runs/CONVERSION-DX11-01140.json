@@ -28,8 +28,8 @@
     ],
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
-      "NATIVE_D3D11_DRAW",
-      "VISIBLE_PARTIAL_RAW_GPU_TILE"
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "batch_components": [
       "REGION_UNION_TILE_VISIBILITY",
@@ -62,6 +62,31 @@
   "evidence": {
     "desktop_native_game": "UNTESTED",
     "quest3_vdxr": "UNTESTED",
-    "full_native_game_frame_complete": false
+    "full_native_game_frame_complete": false,
+    "causal_policy_repair": "Add required feature-sized acceptance contract and ordered canonical actual D3D9 -> D3D11 Draw -> visible output path; preserve incomplete frame and unchanged Gate policy."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate real game-authored D3D11 RAW Draw GPU RGB into original D3D9 partially dirty menu/car/race Presents with exact authentic rectangle-union visibility and fail-closed unchanged full native gameplay fallback.",
+    "acceptance_items": [
+      {
+        "id": "partial_dirty_gpu_output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native game GPU Draw RGB to original D3D9 Present",
+        "expected_behavior": "The opt-in RAW game diagnostic paints genuine native GPU Draw pixels where the game's partial dirty RECT union covers the actual diagnostic tile, including adjacent rectangles."
+      },
+      {
+        "id": "independent_tile_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Source dirty region and original input-safe D3D9 output",
+        "expected_behavior": "If only one of two real GPU regions is covered, show that region exclusively; unknown, malformed or incomplete dirty regions do not paint, preserving original D3D9 rendering and input."
+      },
+      {
+        "id": "exact_sha_integrated_regression",
+        "category": "integrated_validation",
+        "behavior_area": "Bounded D3D9 region-to-GPU-staging source chronology and compile",
+        "expected_behavior": "The C++17 positive and negative union regression and the five unmodified exact-SHA CI gates validate the renderer code candidate separately from untested game and HMD output."
+      }
+    ]
   }
 }
