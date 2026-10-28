@@ -262,10 +262,27 @@ def test_raw_visual_native_source_contract():
         "D3DPOOL_SYSTEMMEM",
         "D3DFMT_X8R8G8B8",
         "D3DFMT_A8R8G8B8",
-        "dst[x*4u] = 255",
     ):
         if required not in header:
             raise AssertionError("RAW preview independent GPU tile missing: " + required)
+
+    # RAW border pixels must remain magenta ONLY where they do not cover
+    # genuine source-native RGB changes. Check the actual guard and all BGR
+    # writes together, not a historical whitespace-specific assignment.
+    border_guard = "if (native_raw_present_border_pixel("
+    guard_start = header.find(border_guard)
+    if guard_start < 0:
+        raise AssertionError("RAW border must protect genuine RGB pixels")
+    guard_end = header.find("}", guard_start)
+    guarded_writes = header[guard_start:guard_end]
+    for required in (
+        "native_raw_rgb_changed(",
+        "dst[x * 4u] = 255u;",
+        "dst[x * 4u + 1u] = 0u;",
+        "dst[x * 4u + 2u] = 255u;",
+    ):
+        if required not in guarded_writes:
+            raise AssertionError("RAW protected magenta pixel missing: " + required)
 
 
 def main():

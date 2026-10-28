@@ -8,8 +8,8 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:DUAL_GPU_REGION_VISIBLE_PRESENT",
   "classification": "A_REAL_NATIVE_GAME_GPU_DUAL_REGION_VISUAL_PRESENT",
-  "status": "SOURCE_IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "SOURCE_IMPLEMENTED_CAUSAL_CI_REPAIR_PENDING",
+  "automation_validation": "PENDING_NEW_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "source_base_sha": "d896b7a124ef8a9efc94547eb2e93fa35cb7fcee",
@@ -80,7 +80,17 @@
     "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
     "src/vr/d3d11/native_game_raw_dual_tile.hpp",
     "tests/native_raw_dual_tile_test.cpp",
-    "docs/automation/runs/CONVERSION-DX11-01139.json"
+    "docs/automation/runs/CONVERSION-DX11-01139.json",
+    "tools/test_package_dx11_first_game_frame.py"
   ],
-  "real_game_draw_blocker": "New dual-tile RAW output needs matching game runtime counts; earlier zero Draw baseline and later 01138 exact-SHA CI are not proof of current binary display."
+  "real_game_draw_blocker": "New dual-tile RAW output needs matching game runtime counts; earlier zero Draw baseline and later 01138 exact-SHA CI are not proof of current binary display.",
+  "initial_causal_ci_failures": [
+    {
+      "run_id": 40727158205,
+      "job_id": 122958461419,
+      "stage": "Verify opt-in package negatives",
+      "reason": "Legacy whitespace-specific dst[x*4u] = 255 regex falsely rejects preserved guarded magenta RAW border in newly factored two-tile painter."
+    }
+  ],
+  "material_source_commit_sha": "6b2f282dc4f66a29cd8fae6fbb789b99cb7b2af7"
 }
