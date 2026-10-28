@@ -574,6 +574,31 @@ namespace OutRunVrR24BlackScreenGuard
             result, 0, OutRunVrR23VerifiedBundle::SourceKind::None, true);
     }
 
+    inline XrResult SubmitClassicFallbackWithReceipt(
+        XrSession session, const XrFrameEndInfo* endInfo) noexcept
+    {
+        using OutRunVrR23VerifiedBundle::SourceKind;
+        const std::uint64_t receiptBefore =
+            OutRunVrSbsCaptureOverride::LastEndFrameReceiptSerial;
+        const XrResult result =
+            OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
+        const bool receiptCurrent =
+            OutRunVrSbsCaptureOverride::LastEndFrameReceiptSerial >
+            receiptBefore;
+        const bool projection =
+            receiptCurrent &&
+            OutRunVrSbsCaptureOverride::LastEndFrameReceiptProjection;
+        const std::uint32_t frameId = projection
+            ? OutRunVrSbsCaptureOverride::LastEndFrameReceiptFrameId : 0;
+        const SourceKind kind = projection
+            ? SourceKind::ClassicSbs : SourceKind::None;
+        const bool hasLayer =
+            receiptCurrent &&
+            OutRunVrSbsCaptureOverride::LastEndFrameReceiptLayerCount > 0;
+        return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+            result, frameId, kind, hasLayer);
+    }
+
     inline XrResult XRAPI_CALL EndFrame(
         XrSession session, const XrFrameEndInfo* endInfo) noexcept
     {
@@ -633,8 +658,33 @@ namespace OutRunVrR24BlackScreenGuard
                 result, verified.frameId, verified.kind, true);
         }
         if (hasNonProjection)
-            return OutRunVrR23RuntimeHardening::SubmitNonProjectionOnly(
-                session, endInfo);
+        {
+            bool preservedHasLayer = false;
+            if (endInfo && endInfo->layers)
+            {
+                constexpr std::uint32_t MaxPreservedLayers = 16;
+                std::uint32_t preserved = 0;
+                bool overflow = false;
+                for (std::uint32_t i = 0; i < endInfo->layerCount; ++i)
+                {
+                    const auto* layer = endInfo->layers[i];
+                    if (!layer ||
+                        layer->type == XR_TYPE_COMPOSITION_LAYER_PROJECTION)
+                        continue;
+                    if (++preserved > MaxPreservedLayers)
+                    {
+                        overflow = true;
+                        break;
+                    }
+                }
+                preservedHasLayer = !overflow && preserved > 0;
+            }
+            const XrResult result =
+                OutRunVrR23RuntimeHardening::SubmitNonProjectionOnly(
+                    session, endInfo);
+            return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
+                result, 0, SourceKind::None, preservedHasLayer);
+        }
 
         if (exactBundle)
         {
@@ -661,10 +711,8 @@ namespace OutRunVrR24BlackScreenGuard
                 OutRunVrReviewHardening::FreshClassicFallbackAvailable())
             {
                 OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
-                const XrResult result =
-                    OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
-                return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
-                    result, verified.frameId, verified.kind, true);
+                return SubmitClassicFallbackWithReceipt(
+                    session, endInfo);
             }
 
             return SubmitVisibleFallback(
@@ -698,7 +746,7 @@ namespace OutRunVrR24BlackScreenGuard
         if (OutRunVrReviewHardening::FreshClassicFallbackAvailable())
         {
             OutRunVrR21RuntimeHardening::BindLegacyBlitConstantBufferToVs();
-            return OutRunVrSbsCaptureOverride::EndFrame(session, endInfo);
+            return SubmitClassicFallbackWithReceipt(session, endInfo);
         }
 
         return SubmitVisibleFallback(
