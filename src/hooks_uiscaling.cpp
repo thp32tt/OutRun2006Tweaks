@@ -459,19 +459,48 @@ class UIScaling : public Hook
             return;
         }
 
-        // The previous D3DX texture batch belongs to the previous producer.
-        // Split it before changing semantic ownership, keep the complete
-        // 4B9200 string under one exact source token, then submit that batch
-        // before restoring its caller.  This avoids late GPU submission
-        // losing the original 0x97xxx parent from the call stack.
+        const OutRunVR::GoalProgress::SourceAdmission admission{
+            true, true, true,
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
+        };
+
+        // The previous D3DX batch belongs to the previous producer. Flush it,
+        // then prove this exact parent is still outside a queue and in GOAL
+        // before assigning ScreenHud ownership to the final result text.
         FlushD3DXBeforeDirectGoalSource();
+        const bool admittedAfterDrain = admission.mayPublish(
+            Settings::VREnabled,
+            ResultPresentationState(),
+            !OutRunVR::GameSemantic::QueueRenderActive(),
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+        if (!admittedAfterDrain)
+        {
+            if (Settings::VRTelemetry)
+                spdlog::info(
+                    "VR TRACE GOAL TEXT ADMISSION: callerRva=0x{:X} "
+                    "admittedAfterDrain=0 entryEpoch={} liveEpoch={} queueActive={} "
+                    "action=NATIVE_ORIGINAL_ONCE",
+                    caller - base, admission.queueEpochAtEntry,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+            ResultTextB9200InlineHook.call<void>(text, x, y, step);
+            return;
+        }
+
+        bool admittedAtExit = false;
         {
             OutRunVR::GameSemantic::ScopedExactProducerSemantic owner(
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 nullptr, true,
                 OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
             ResultTextB9200InlineHook.call<void>(text, x, y, step);
-            FlushD3DXAtDirectGoalSourceExit();
+            admittedAtExit = admission.mayPublish(
+                Settings::VREnabled,
+                ResultPresentationState(),
+                !OutRunVR::GameSemantic::QueueRenderActive(),
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+            if (admittedAtExit)
+                FlushD3DXAtDirectGoalSourceExit();
         }
 
         if (Settings::VRTelemetry)
@@ -481,8 +510,13 @@ class UIScaling : public Hook
             if (n <= 8 || (n & (n - 1)) == 0)
                 spdlog::info(
                     "VR P0 GOAL B9200 ENTRY: exactParent=1 calls={} "
-                    "callerRva=0x{:X} scope=SCREEN_HUD",
-                    n, caller - base);
+                    "callerRva=0x{:X} scope={} admittedAfterDrain=1 "
+                    "admittedAtExit={} entryEpoch={} exitEpoch={}",
+                    n, caller - base,
+                    admittedAtExit ? "SCREEN_HUD" : "NATIVE_FALLBACK",
+                    admittedAtExit ? 1 : 0,
+                    admission.queueEpochAtEntry,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
         }
     }
 
@@ -2372,6 +2406,54 @@ class UIScaling : public Hook
 	using GoalTimeHelperFn = void(__cdecl*)();
 	static void GoalTime_TagHelper(int helperRva)
 	{
+        auto original = reinterpret_cast<GoalTimeHelperFn>(
+            Module::exe_ptr(helperRva));
+        const auto producer = helperRva == 0xBE020
+            ? OutRunVR::GameSemantic::ProducerToken::GoalTime020
+            : (helperRva == 0xBE150
+                ? OutRunVR::GameSemantic::ProducerToken::GoalTime150
+                : OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper);
+
+        // The exact GOAL time/title helper is a direct source only when it
+        // enters outside the native SpriteNode queue. A preceding D3DX Flush
+        // can reenter the queue or advance its selection epoch, so admission
+        // must survive that drain before this helper can own GPU/queued output.
+        const OutRunVR::GoalProgress::SourceAdmission admission{
+            Settings::VREnabled,
+            ResultPresentationState(),
+            !OutRunVR::GameSemantic::QueueRenderActive(),
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
+        };
+        if (!admission.mayBeginDirect())
+        {
+            original();
+            return;
+        }
+
+        FlushD3DXBeforeDirectGoalSource();
+        const bool admittedAfterDrain = admission.mayPublish(
+            Settings::VREnabled,
+            ResultPresentationState(),
+            !OutRunVR::GameSemantic::QueueRenderActive(),
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+        if (!admittedAfterDrain)
+        {
+            if (Settings::VRTelemetry)
+                spdlog::info(
+                    "VR TRACE GOAL_TIME SOURCE: helperRva=0x{:X} producer={} "
+                    "admittedAfterDrain=0 entryEpoch={} liveEpoch={} queueActive={} "
+                    "action=NATIVE_ORIGINAL_ONCE",
+                    helperRva,
+                    OutRunVR::GameSemantic::Name(producer),
+                    admission.queueEpochAtEntry,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+            original();
+            return;
+        }
+
+        // Freeze the queue boundary AFTER the outgoing batch drain. Nodes
+        // created by a reentrant Flush can no longer be tagged as GOAL time.
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
         const auto entrySerial =
@@ -2383,42 +2465,39 @@ class UIScaling : public Hook
             rootsBefore[prio] = root;
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
-		// Current R84 queue authority has no ScopedProducerSemantic class.
-		// The original helper is synchronous; tag its appended nodes after it
-		// returns, preserving the exact parent producer identity.
-		auto original = reinterpret_cast<GoalTimeHelperFn>(
-			Module::exe_ptr(helperRva));
-        // The two original GOAL E8 helper calls are independent title/time
-        // outputs. The same exact token must cover both synchronous glyph
-        // Draws and deferred sibling SpriteNodes; never deduplicate them.
-        const auto producer = helperRva == 0xBE020
-            ? OutRunVR::GameSemantic::ProducerToken::GoalTime020
-            : (helperRva == 0xBE150
-                ? OutRunVR::GameSemantic::ProducerToken::GoalTime150
-                : OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper);
-        // An old world/GOAL pending Draw must not steal the current exact
-        // time/title glyph. Active SpriteNode queue ownership outranks us.
-        std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
-            goalDirectDrawOwner;
-        // Split a tracked previous-owner D3DX batch before GOAL takes
-        // producer ownership; submit this helper's exact remaining batch
-        // before its original scope is restored. Queued sprites remain
-        // tagged separately by the existing SpriteNode path.
-        const bool directGoal = Settings::VREnabled &&
-            !OutRunVR::GameSemantic::QueueRenderActive();
-        if (directGoal)
-            FlushD3DXBeforeDirectGoalSource();
-        if (Settings::VREnabled)
-            goalDirectDrawOwner.emplace(
+
+        bool admittedAtExit = false;
+        {
+            OutRunVR::GameSemantic::ScopedExactProducerSemantic owner(
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 nullptr, true, producer);
-        original();
-        if (directGoal)
-            FlushD3DXAtDirectGoalSourceExit();
-        goalDirectDrawOwner.reset();
-		TagAppendedNodes(before,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer,
-            nullptr, &rootsBefore, entrySerial);
+            original(); // exact original helper once
+
+            admittedAtExit = admission.mayPublish(
+                Settings::VREnabled,
+                ResultPresentationState(),
+                !OutRunVR::GameSemantic::QueueRenderActive(),
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+            if (admittedAtExit)
+            {
+                TagAppendedNodes(before,
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud, producer,
+                    nullptr, &rootsBefore, entrySerial);
+                FlushD3DXAtDirectGoalSourceExit();
+            }
+        }
+
+        if (Settings::VRTelemetry)
+            spdlog::info(
+                "VR TRACE GOAL_TIME SOURCE: helperRva=0x{:X} producer={} "
+                "admittedAfterDrain=1 admittedAtExit={} entrySerial={} "
+                "entryEpoch={} exitEpoch={} queueActive={}",
+                helperRva,
+                OutRunVR::GameSemantic::Name(producer),
+                admittedAtExit ? 1 : 0, entrySerial,
+                admission.queueEpochAtEntry,
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
 	}
 	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
 	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
