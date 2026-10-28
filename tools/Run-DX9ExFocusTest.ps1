@@ -68,6 +68,14 @@ $gameArgs = @(
 Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8
 Copy-Item $variantFile (Join-Path $session 'DX9EX_VARIANT.txt')
 Copy-Item (Join-Path $root 'OutRun2006Tweaks.ini') (Join-Path $session 'OutRun2006Tweaks.ini')
+@(
+    'FULL_TRACE_POLICY=VISUAL_FIX_FIRST'
+    'VR_TELEMETRY_EXPECTED=true'
+    'HOST_FULL_TRACE=outrun-vr-host-full-trace.log'
+    'GAME_MARKERS=LENS SOURCE/C64/R30/GPU/MATRIX; PLUS_TIME QUEUE/R62/GPU/MATRIX/EYES; GOAL_PERCENT QUEUE/R62/GPU/MATRIX/EYES'
+    'HOST_MARKERS=HOST PROJECTION BLIT FULL; XR FRAME FULL; XR EYE FULL'
+    'PERFORMANCE=INTENTIONALLY_UNTHROTTLED_FOR_DIAGNOSIS'
+) | Set-Content (Join-Path $session 'FULL_TRACE_CONTRACT.txt') -Encoding UTF8
 
 Write-Host "Starting DX9Ex variant $variant"
 Write-Host "Test the same short gameplay section, then exit normally."
@@ -82,6 +90,14 @@ foreach ($pattern in $logPatterns) {
     Get-ChildItem -Path $root -Filter $pattern -File -ErrorAction SilentlyContinue |
         ForEach-Object { Copy-Item $_.FullName (Join-Path $session $_.Name) -Force }
 }
+$hostFullTrace = Join-Path $root 'outrun-vr-host-full-trace.log'
+$gameTrace = Join-Path $root 'OutRun2006Tweaks.log'
+@(
+    "hostFullTracePresent=$([int](Test-Path -LiteralPath $hostFullTrace))"
+    "hostFullTraceBytes=$((if (Test-Path -LiteralPath $hostFullTrace) { (Get-Item -LiteralPath $hostFullTrace).Length } else { 0 }))"
+    "gameTracePresent=$([int](Test-Path -LiteralPath $gameTrace))"
+    "gameTraceBytes=$((if (Test-Path -LiteralPath $gameTrace) { (Get-Item -LiteralPath $gameTrace).Length } else { 0 }))"
+) | Set-Content (Join-Path $session 'FULL_TRACE_STATUS.txt') -Encoding UTF8
 
 $result = @(
     "variant=$variant",

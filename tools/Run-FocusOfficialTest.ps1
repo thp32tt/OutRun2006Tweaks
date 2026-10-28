@@ -25,6 +25,9 @@ try {
     if ($variant -notin @('R26_FOCUS_OFFICIAL_TEST','R26_FOCUS_OFFICIAL_DEBUG')) { throw "Unexpected test variant: $variant" }
     if (Get-Process -Name OR2006C2C -ErrorAction SilentlyContinue) { throw 'Original game is already running. Exit it before launching this test.' }
     Get-Process -Name outrun-vr-host -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    # Dedicated FULL host trace is append-capable inside the host. Remove a
+    # prior session before launch so the returned ZIP contains this run only.
+    Remove-Item -LiteralPath (Join-Path $root 'outrun-vr-host-full-trace.log') -Force -ErrorAction SilentlyContinue
     New-Item -ItemType Directory -Force -Path $session | Out-Null
     # Refuse to run with an invalid INI. Prior 2026-10-24 packages shipped
     # duplicated [VR].DriverSeatCarSpaceBasis and silently fell back to defaults.
@@ -118,6 +121,14 @@ try {
             else { Add-Content (Join-Path $session 'LARGE_LOGS_NOT_COPIED.txt') $_.FullName }
         }
     }
+    $hostFullTrace = Join-Path $root 'outrun-vr-host-full-trace.log'
+    @(
+      "hostFullTracePresent=$([int](Test-Path -LiteralPath $hostFullTrace))",
+      "hostFullTraceBytes=$((if (Test-Path -LiteralPath $hostFullTrace) { (Get-Item -LiteralPath $hostFullTrace).Length } else { 0 }))",
+      'expectedHostMarkers=HOST PROJECTION BLIT FULL; XR FRAME FULL; XR EYE FULL',
+      'expectedGameMarkers=LENS SOURCE/C64/R30/GPU/MATRIX; PLUS_TIME/GOAL_PERCENT QUEUE/R62/GPU/MATRIX/EYES',
+      'performancePolicy=VISUAL_FIX_FIRST_UNTHROTTLED_TRACE'
+    ) | Set-Content -LiteralPath (Join-Path $session 'FULL_TRACE_STATUS.txt') -Encoding UTF8
     $logZip = Join-Path $logRoot ("DX9EX_LOG_{0}_{1}.zip" -f $variant,$stamp)
     Compress-Archive -Path (Join-Path $session '*') -DestinationPath $logZip -Force
     Write-Host "Log ZIP: $logZip"
