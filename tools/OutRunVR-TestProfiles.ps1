@@ -12,7 +12,7 @@ function Get-OutRunVRTestProfile {
         '-DirectGpuOnly=false',
         '-DisableDesktopDuplication=false',
         '-TargetRefreshRateHz=0',
-        '-SkyGlowFactor=4',
+        '-SkyGlowFactor=0',
         '-CullingUnionFov=true',
         # Do not force CullingUnionMarginDegrees on the command line:
         # the user must be able to tune VR PMT wide-FOV margin in F11.
