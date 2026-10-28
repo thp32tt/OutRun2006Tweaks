@@ -1343,6 +1343,21 @@ namespace OutRunVRRenderer
 				return;
 			const D3DMATRIX cameraWorld = InverseRigid(correctedView);
 
+			// Lens-only camera provenance: the original directional sun producer
+			// consumes field_D4/vector_3A8 plus cam_pos_F8/look_pos_104 and
+			// d3dmatrix140. Capture all of them before the VR camera override so
+			// a single HMD run can distinguish source-camera incoherence from a
+			// later R30/OpenXR projection error. This is telemetry only.
+			const D3DVECTOR lensSourceD4 = cam->field_D4;
+			const D3DVECTOR lensSource3A8 = cam->vector_3A8;
+			const D3DVECTOR lensSourceOrigE0 = cam->cam_pos_orig_E0;
+			const D3DVECTOR lensBeforeF8 = cam->cam_pos_F8;
+			const D3DVECTOR lensBeforeLook104 = cam->look_pos_104;
+			const D3DMATRIX lensView140 = cam->d3dmatrix140;
+			const bool lensView140Finite = MatrixFinite(lensView140);
+			const D3DMATRIX lensView140World = lensView140Finite
+				? InverseRigid(lensView140) : IdentityMatrix();
+
 			const float dx = cam->look_pos_104.x - cam->cam_pos_F8.x;
 			const float dy = cam->look_pos_104.y - cam->cam_pos_F8.y;
 			const float dz = cam->look_pos_104.z - cam->cam_pos_F8.z;
@@ -1370,6 +1385,40 @@ namespace OutRunVRRenderer
 				cameraWorld._43 + forward.z * lookDistance
 			};
 			CullingCameraOverridden = true;
+
+			if (Settings::VRTelemetry)
+			{
+				static std::atomic<std::uint64_t> lensCameraSyncSamples{0};
+				const auto sample = lensCameraSyncSamples.fetch_add(
+					1, std::memory_order_relaxed) + 1;
+				if (sample <= 64 || (sample & (sample - 1)) == 0)
+					spdlog::info(
+						"VR LENS CAMERA SYNC: sample={} pose={} poseEpoch={} "
+						"fieldD4={:.5f},{:.5f},{:.5f} "
+						"vector3A8={:.5f},{:.5f},{:.5f} "
+						"origE0={:.5f},{:.5f},{:.5f} "
+						"f8Before={:.5f},{:.5f},{:.5f} "
+						"look104Before={:.5f},{:.5f},{:.5f} "
+						"view140OriginValid={} view140Origin={:.5f},{:.5f},{:.5f} "
+						"f8After={:.5f},{:.5f},{:.5f} "
+						"look104After={:.5f},{:.5f},{:.5f} "
+						"correctedViewOrigin={:.5f},{:.5f},{:.5f} "
+						"correctedForward={:.6f},{:.6f},{:.6f}",
+						sample, LatchedPoseSequence, LatchedPoseEpoch,
+						lensSourceD4.x, lensSourceD4.y, lensSourceD4.z,
+						lensSource3A8.x, lensSource3A8.y, lensSource3A8.z,
+						lensSourceOrigE0.x, lensSourceOrigE0.y, lensSourceOrigE0.z,
+						lensBeforeF8.x, lensBeforeF8.y, lensBeforeF8.z,
+						lensBeforeLook104.x, lensBeforeLook104.y, lensBeforeLook104.z,
+						lensView140Finite ? 1 : 0,
+						lensView140World._41, lensView140World._42,
+						lensView140World._43,
+						cam->cam_pos_F8.x, cam->cam_pos_F8.y, cam->cam_pos_F8.z,
+						cam->look_pos_104.x, cam->look_pos_104.y,
+						cam->look_pos_104.z,
+						cameraWorld._41, cameraWorld._42, cameraWorld._43,
+						forward.x, forward.y, forward.z);
+			}
 			if (Settings::VRCullingUnionFov && !CullingUnionFovDeferredLogged)
 			{
 				CullingUnionFovDeferredLogged = true;
