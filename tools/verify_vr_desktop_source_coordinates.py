@@ -81,7 +81,7 @@ for token in (
     "actualWidth",
     "viewportWidth",
     "scissorRight",
-    "inline void Publish(",
+    "inline std::uint64_t Publish(Snapshot snapshot) noexcept",
     "inline Snapshot Read()",
     "Generation.fetch_add(1",
     "Writer.test_and_set(std::memory_order_acquire)",
@@ -92,19 +92,20 @@ for token in (
 ):
     assert token in reset_trace, token
 for token in (
-    "OutRunVR::D3D9ResetTrace::NextResetSerial()",
-    "OutRunVR::D3D9ResetTrace::Publish(trace);",
+    "trace.resetSerial = OutRunVR::D3D9ResetTrace::Publish(trace);",
     "device->GetBackBuffer(",
     "device->GetViewport(&viewport)",
     "device->GetScissorRect(&scissor)",
     "VR D3D9Ex RESET TRACE: resetEpoch=",
-    "contract=XR_RESET_EPOCH_V2",
+    "contract=XR_RESET_EPOCH_V3",
 ):
     assert token in reset, token
 assert reset.index("deviceEx->ResetEx(&effective, fullscreenPtr)") < reset.index(
     "classicReplaySucceeded = RestoreClassicResetState(device);") < reset.index(
-    "OutRunVR::D3D9ResetTrace::Publish(trace);")
+    "trace.resetSerial = OutRunVR::D3D9ResetTrace::Publish(trace);")
 assert "resetViewportMatchesPre" not in renderer
+assert "NextResetSerial()" not in reset_trace
+assert "NextResetSerial()" not in reset
 for token in (
     "lensResetTrace.readStable",
     "lensResetTrace.viewportX == savedViewport.X",
