@@ -31,7 +31,7 @@
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "OPT_IN_RAW_VISIBLE_OUTPUT"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "batch_components": [
       "CXX_32_MEMBER_CONNECTED_COMPONENT_BFS",
