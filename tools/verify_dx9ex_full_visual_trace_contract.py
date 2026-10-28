@@ -12,6 +12,8 @@ graphics = read("src/hooks_graphics.cpp")
 ui = read("src/hooks_uiscaling.cpp")
 host_main = read("vrhost/src/main.cpp")
 host_r23 = read("vrhost/src/main_r23.cpp")
+host_r24 = read("vrhost/src/runtime/r24_black_screen_guard.hpp")
+host_r19 = read("vrhost/src/runtime/sbs_capture_override.hpp")
 dllmain = read("src/dllmain.cpp")
 user_runner = read("tools/Run-DX9ExFocusTest.ps1")
 official_runner = read("tools/Run-FocusOfficialTest.ps1")
@@ -93,9 +95,33 @@ required = {
         "refSpacePending=",
         "fullTraceQpc.QuadPart",
         "VR TRACE XR PIXEL GRID FULL",
-        "R23ProjectionSamplesX = 5",
-        "R23ProjectionSamplesY = 3",
+        "R23ProjectionSamplesX = 17",
+        "R23ProjectionSamplesY = 11",
         "R23PixelIntervalMs = 100",
+        "projectionFrameId = sourceFrameId;",
+        "projectionPoseSequence = sourcePoseSequence;",
+        "rgbHashL=0x",
+        "alphaHashL=0x",
+        "pairAbsLinearMean=",
+        "brightCentroidL=",
+        "brightDisparity=",
+        "metricRole=SAME_INDEX_CONTROL_NOT_STEREO_CORRESPONDENCE",
+        "coverage=UNIFORM_GRID_NOT_FLARE_CENSUS",
+        "submissionSerialBefore=",
+        "submissionSerialAfter=",
+        "receiptAdvanced=",
+        "r19ReceiptSerial=",
+        "r19PoseSequence=",
+    ]),
+    "R19/R24 final receipt": (host_r19 + host_r24, [
+        "LastEndFrameReceiptSerial",
+        "LastEndFrameReceiptProjection",
+        "LastEndFrameReceiptFrameId",
+        "LastEndFrameReceiptPoseSequence",
+        "LastEndFrameReceiptLayerCount",
+        "RecordEndFrameReceipt(",
+        "SubmitClassicFallbackWithReceipt(",
+        "preservedHasLayer",
     ]),
     "game log flush": (dllmain, [
         "spdlog::flush_on(spdlog::level::debug)",
@@ -128,6 +154,31 @@ assert cached_select in host_r23, "cached XR submission source selection regress
 assert "cachedProjectionFrameId = matchedStereoFrameId;" in host_r23
 assert "cachedProjectionPoseSequence =" in host_r23
 assert "matchedStereoPoseSequence =" in host_r23
+
+# Fresh projection pixels must be tagged with the render-time source identity.
+# Reading the pre-publication verified global from ScheduleProjection recreates
+# the A-labelled/B-pixels bug documented by the lens-flare review.
+schedule_start = host_r23.index("void ScheduleProjection(")
+schedule_end = host_r23.index("void ScheduleTheater(", schedule_start)
+schedule_body = host_r23[schedule_start:schedule_end]
+assert "ReadFresh(" not in schedule_body, "pixel probe regressed to stale verified-bundle attribution"
+assert "projectionFrameId = sourceFrameId;" in schedule_body
+assert "projectionPoseSequence = sourcePoseSequence;" in schedule_body
+assert "sourceKind, &views" in host_r23
+
+# A pixel-grid final-submission join is valid only when this xrEndFrame advanced
+# the final receipt serial. Matching a previous frame/kind is not enough.
+note_start = host_r23.index("void NoteFinalSubmission(")
+note_end = host_r23.index("void ScheduleSource(", note_start)
+note_body = host_r23[note_start:note_end]
+assert "submissionSerialAfter <= submissionSerialBefore" in note_body
+assert "projectionFinalReceiptSerial = submissionSerialAfter;" in note_body
+
+# R24 fallback paths must write a current receipt rather than leaving a prior
+# successful projection receipt visible to XR FRAME FULL.
+assert "SubmitClassicFallbackWithReceipt" in host_r24
+assert "LastEndFrameReceiptFrameId" in host_r24
+assert "preservedHasLayer" in host_r24
 
 # Full tracing is intentionally performance-heavy and must remain opt-in under
 # the already-enabled VR telemetry switch, not silently promoted to all users.
