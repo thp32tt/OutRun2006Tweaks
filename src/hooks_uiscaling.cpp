@@ -2235,6 +2235,7 @@ class UIScaling : public Hook
                     "vr={} queueActive={} mayBegin={} admittedAfterDrain={} "
                     "ticket={} entrySerial={} entryEpoch={} liveEpoch={} "
                     "snapshotPriorities={} scope={} producer={}",
+                    StageExtensionLiveNaviSource ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY",
                     n,
                     Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                     Game::game_mode ? *Game::game_mode : -1,
