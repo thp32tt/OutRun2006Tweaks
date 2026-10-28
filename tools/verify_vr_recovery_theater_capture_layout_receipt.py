@@ -25,7 +25,7 @@ def check(main: str, r23: str) -> bool:
         select = r23.index('R23SelectClassicFrameForCapture(')
         receipt = r23.index('compositor.capturedLayoutKnown_ = true;', select)
         assert receipt > select
-        fallback = r23[r23.index('const bool receiptMatchesCapture'):r23.index('if (fallbackCapture.available &&\n                            R23RenderTheater', r23.index('const bool receiptMatchesCapture'))]
+        fallback = r23[r23.index('const auto receiptMatchesCapture'):r23.index('if (fallbackCapture.available &&\n                            R23RenderTheater', r23.index('const auto receiptMatchesCapture'))]
         for token in (
             'compositor.capturedLayoutKnown_',
             'compositor.capturedLayoutSbs_',
