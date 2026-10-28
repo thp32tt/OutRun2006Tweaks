@@ -15,6 +15,7 @@
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
+#include "vr/d3d9/reset_trace.hpp"
 #include <algorithm>
 #include <iostream>
 #include <array>
@@ -789,6 +790,9 @@ class VRLensFlareProjected2D : public Hook
         const bool trackedSource = Settings::VREnabled && IsOuterLensSource(objectId);
         const std::uint64_t sourceCallSerial =
             trackedSource ? NextLensSourceCallSerial() : 0;
+        const auto resetTrace = trackedSource
+            ? OutRunVR::D3D9ResetTrace::Read()
+            : OutRunVR::D3D9ResetTrace::Snapshot{};
         unsigned sourceOrdinal = 0;
         // User Quest3 confirmed the "missing" tiny end-of-flare point
         // is NOT explained by hiding this child. Restore BOTH original
@@ -849,7 +853,8 @@ class VRLensFlareProjected2D : public Hook
                 "flags=0x{:08X} work=0x{:X} sourceCallSerial={} sequence={} ordinal={} "
                 "scope={} producer={} queueActive={} queueEpoch={} lensCentreEpoch={} "
                 "centreDepth={} centreOwnerDepth={} deferredSerial={} "
-                "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={}",
+                "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={} "
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X}",
                 static_cast<unsigned>(objectId), alpha,
                 static_cast<unsigned>(flags),
                 reinterpret_cast<std::uintptr_t>(work),
@@ -863,7 +868,8 @@ class VRLensFlareProjected2D : public Hook
                 OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
                 LensCentreDepth, LensCentreOwnerDepth,
                 deferred.sourceSerial, deferred.sequence,
-                deferred.objectId, static_cast<unsigned>(deferred.ordinal));
+                deferred.objectId, static_cast<unsigned>(deferred.ordinal),
+                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
         }
 
         // One original 0xCABE call occurs for each source effect object,
@@ -965,6 +971,9 @@ class VRLensFlareProjected2D : public Hook
             IsProjectedSunScreenObject(objectId);
         const std::uint64_t sourceCallSerial =
             trackedSource ? NextLensSourceCallSerial() : 0;
+        const auto resetTrace = trackedSource
+            ? OutRunVR::D3D9ResetTrace::Read()
+            : OutRunVR::D3D9ResetTrace::Snapshot{};
         if (trackedSource && Settings::VRTelemetry)
         {
             const auto deferred =
@@ -974,7 +983,8 @@ class VRLensFlareProjected2D : public Hook
                 "flags=0x{:08X} work=0x{:X} sourceCallSerial={} sequence={} projected={} "
                 "scope={} producer={} queueActive={} queueEpoch={} lensCentreEpoch={} "
                 "centreDepth={} centreOwnerDepth={} deferredSerial={} "
-                "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={}",
+                "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={} "
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X}",
                 static_cast<unsigned>(objectId), alpha,
                 static_cast<unsigned>(flags),
                 reinterpret_cast<std::uintptr_t>(work),
@@ -988,7 +998,8 @@ class VRLensFlareProjected2D : public Hook
                 OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
                 LensCentreDepth, LensCentreOwnerDepth,
                 deferred.sourceSerial, deferred.sequence,
-                deferred.objectId, static_cast<unsigned>(deferred.ordinal));
+                deferred.objectId, static_cast<unsigned>(deferred.ordinal),
+                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
         }
         // 4056D0 may only enqueue the original opaque object. Do NOT
         // interpret this hook's call counter as a native Draw or an eye RT.
