@@ -2105,6 +2105,22 @@ namespace OutRunVRStereo
             });
             if (Settings::VRTelemetry)
             {
+                spdlog::info(
+                    "VR TRACE LENS C64 PROOF FULL: owned={} scope={} producer={} "
+                    "currentCall={} writtenCall={} currentDraw={} writtenDraw={} "
+                    "currentShader=0x{:X} writtenShader=0x{:X} "
+                    "currentShaderEpoch={} writtenShaderEpoch={} "
+                    "currentPoseEpoch={} writtenPoseEpoch={} spatialCentreSource={} "
+                    "producerMatch={} noQueue={}",
+                    owned ? 1 : 0, static_cast<unsigned>(sourceScope),
+                    OutRunVR::GameSemantic::Name(sourceProducer),
+                    currentLensCentreCallEpoch, writtenCall, currentDraw, writeDraw,
+                    currentShader, writeShader, currentShaderEpoch, writeShaderEpoch,
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                    OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                    spatialCentreSource ? 1 : 0,
+                    sourceProducer == ProducerToken::LensFlareCentre ? 1 : 0,
+                    queueNode == nullptr ? 1 : 0);
                 static std::atomic<std::uint64_t> proofChecks{ 0 };
                 const auto n = proofChecks.fetch_add(
                     1, std::memory_order_relaxed) + 1;
@@ -5550,6 +5566,26 @@ namespace OutRunVRStereo
                             OutRunVR::GameSemantic::EffectiveScope()),
                         baseAdmitted ? 1 : 0, site ? site : "unknown");
             }
+            if (Settings::VRTelemetry &&
+                (lensInlineLinked || lensDeferredCandidate))
+                spdlog::info(
+                    "VR TRACE LENS R30 ENTRY FULL: serial={} sourceCallSerial={} "
+                    "sequence={} sourceObj=0x{:06X} sourceSite={} ordinal={} "
+                    "exactSourceLinked={} windowAnchorSerial={} "
+                    "windowAnchorSequence={} windowAnchorObj=0x{:06X} "
+                    "windowAnchorOrdinal={} provenance={} scope={} baseAdmitted={} "
+                    "queueActive={} queueEpoch={} site={}",
+                    TopLevelDrawSerial(), lensSourceSerial, lensSourceSequence,
+                    lensSourceObject, lensSourceSite, lensSourceOrdinal,
+                    lensInlineLinked ? 1 : 0, lensWindowAnchorSerial,
+                    lensWindowAnchorSequence, lensWindowAnchorObject,
+                    lensWindowAnchorOrdinal, lensSourceProvenance,
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::EffectiveScope()),
+                    baseAdmitted ? 1 : 0,
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                    site ? site : "unknown");
             if (!baseAdmitted)
                 return E_NOTIMPL;
 
@@ -6179,6 +6215,15 @@ namespace OutRunVRStereo
                 (lensFallbackScope == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
                  lensFallbackScope == OutRunVR::GameSemantic::RenderScope::SceneEffect))
             {
+                spdlog::info(
+                    "VR TRACE LENS LOWER FALLBACK FULL: serial={} site={} scope={} "
+                    "producer={} queueActive={} queueEpoch={} reason=R30_NOT_ADMITTED",
+                    TopLevelDrawSerial(), site ? site : "unknown",
+                    OutRunVR::GameSemantic::Name(lensFallbackScope),
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken()),
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
                 static std::atomic<std::uint64_t> lensLowerSamples{0};
                 const auto n = lensLowerSamples.fetch_add(1,
                     std::memory_order_relaxed) + 1;
@@ -6230,6 +6275,25 @@ namespace OutRunVRStereo
                 sourceCommand.IsExactFiniteResultHud() &&
                 (!sourceCommand.queued ||
                  (sourceCommand.queueNode && sourceCommand.queueEpoch != 0));
+            const bool resultTraceCandidate =
+                Settings::VRTelemetry &&
+                sourceCommand.IsExactFiniteResultHud();
+            if (resultTraceCandidate)
+                spdlog::info(
+                    "VR TRACE RESULT R62 ENTRY FULL: serial={} api={} scope={} "
+                    "producer={} queued={} node=0x{:X} epoch={} exactResult={} "
+                    "externalDepth={} cachedVs=0x{:X} primitiveCount={}",
+                    TopLevelDrawSerial(), drawApi,
+                    OutRunVR::GameSemantic::Name(sourceCommand.scope),
+                    OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                    sourceCommand.queued ? 1 : 0,
+                    reinterpret_cast<std::uintptr_t>(sourceCommand.queueNode),
+                    sourceCommand.queueEpoch, exactResult ? 1 : 0,
+                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth,
+                    static_cast<unsigned long long>(
+                        CurrentVertexShaderIdentity.load(
+                            std::memory_order_acquire)),
+                    primitiveCount);
             const bool exactProjectedRival =
                 OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
                 sourceCommand.scope ==
@@ -6248,8 +6312,18 @@ namespace OutRunVRStereo
                     std::memory_order_acquire) != 0)
                 return E_NOTIMPL;
             IDirect3DVertexShader9* shader = nullptr;
-            if (FAILED(device->GetVertexShader(&shader)))
+            const HRESULT liveVsHr = device->GetVertexShader(&shader);
+            if (FAILED(liveVsHr))
+            {
+                if (resultTraceCandidate)
+                    spdlog::info(
+                        "VR TRACE RESULT R62 REJECT FULL: serial={} api={} producer={} "
+                        "reason=LIVE_VS_READ_FAILED hr=0x{:08X}",
+                        TopLevelDrawSerial(), drawApi,
+                        OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        static_cast<unsigned>(liveVsHr));
                 return E_NOTIMPL;
+            }
             if (shader)
             {
                 if (Settings::VRTelemetry && exactProjectedRival)
@@ -6265,6 +6339,13 @@ namespace OutRunVRStereo
                                     std::memory_order_acquire)),
                             sourceCommand.queueNode, sourceCommand.queueEpoch, n);
                 }
+                if (resultTraceCandidate)
+                    spdlog::info(
+                        "VR TRACE RESULT R62 REJECT FULL: serial={} api={} producer={} "
+                        "reason=LIVE_VS_BOUND vs=0x{:X}",
+                        TopLevelDrawSerial(), drawApi,
+                        OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        reinterpret_cast<std::uintptr_t>(shader));
                 shader->Release();
                 return E_NOTIMPL;
             }
@@ -6289,8 +6370,24 @@ namespace OutRunVRStereo
                             static_cast<unsigned>(fvf),
                             sourceCommand.queueNode, sourceCommand.queueEpoch, n);
                 }
+                if (resultTraceCandidate)
+                    spdlog::info(
+                        "VR TRACE RESULT R62 REJECT FULL: serial={} api={} producer={} "
+                        "reason={} fvfHr=0x{:08X} fvf=0x{:08X}",
+                        TopLevelDrawSerial(), drawApi,
+                        OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        FAILED(fvfHr) ? "FVF_READ_FAILED" : "FVF_NOT_0X142",
+                        static_cast<unsigned>(fvfHr),
+                        static_cast<unsigned>(fvf));
                 return E_NOTIMPL;
             }
+            if (resultTraceCandidate)
+                spdlog::info(
+                    "VR TRACE RESULT R62 LIVE STATE FULL: serial={} api={} producer={} "
+                    "admitted=1 fvf=0x{:08X} poseGate=PENDING",
+                    TopLevelDrawSerial(), drawApi,
+                    OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                    static_cast<unsigned>(fvf));
             if (Settings::VRTelemetry && exactProjectedRival)
             {
                 static std::atomic<std::uint64_t> rivalFixedFnAdmissions{0};

@@ -93,6 +93,9 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
         "const bool semanticOverlay =")
     # A wrapper can overlap a native entry; retain the explicit "candidate"
     # qualifier until the original opaque descriptor and flush generation join.
+    assert "VR TRACE LENS C64 PROOF FULL:" in body
+    assert "VR TRACE LENS R30 ENTRY FULL:" in body
+    assert "VR TRACE LENS LOWER FALLBACK FULL:" in lower
     assert "VR TRACE LENS GPU STATE FULL:" in body
     assert "VR TRACE LENS MATRIX FULL:" in body
     assert "VR TRACE LENS SOURCE FULL:" in hook
