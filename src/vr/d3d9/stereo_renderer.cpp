@@ -850,6 +850,27 @@ namespace OutRunVRStereo
 			const HRESULT rawPresentHr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
 			const HRESULT hr = OutRunVRD3D9ExUpgradeR13::NormalizeLegacyPresentResult(
 				device, rawPresentHr);
+			if (Settings::VRTelemetry)
+				spdlog::info(
+					"VR TRACE FRAME PUBLISH FULL: presentEpoch={} beginScenes={} "
+					"stereoRequested={} frameEligible={} composed={} directOnly={} "
+					"directTransport={} pendingFrameId={} pendingPose={} framePose={} "
+					"metadataValid={} worldStereo={} duplicated={} rightFailed={} "
+					"incomplete={} failure={} rawPresentHr=0x{:08X} presentHr=0x{:08X} "
+					"presentQpc={}",
+					PresentEpoch, beginDelta, stereoRequested ? 1 : 0,
+					frameEligible ? 1 : 0, composedStereo ? 1 : 0,
+					directOnly ? 1 : 0, directTransport ? 1 : 0,
+					pendingFrameId, pendingPoseSequence, FrameStereoPoseSequence,
+					FrameStereoMetadata.valid ? 1 : 0,
+					FrameHadWorldStereo ? 1 : 0,
+					FrameHadDuplicatedDraw ? 1 : 0,
+					FrameRightDrawFailed ? 1 : 0,
+					FrameStereoIncomplete ? 1 : 0,
+					static_cast<unsigned>(FrameFailureReason),
+					static_cast<unsigned>(rawPresentHr),
+					static_cast<unsigned>(hr), presentStart.QuadPart);
+
 			if (composedStereo && SUCCEEDED(hr) && !FrameStereoIncomplete)
 			{
 				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence, pendingFrameId);

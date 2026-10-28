@@ -50,7 +50,9 @@ const char*Name(RenderScope){return "test-scope";}
 }
 namespace Settings {bool VRTelemetry=true;}
 namespace spdlog {template<class...T>void info(T&&...){}}
+void R30TraceVisualPipelineFull(IDirect3DDevice9*, const char*, std::uint64_t){}
 namespace OutRunVRRenderer {struct LatchedStereoFrame{unsigned poseSequence=7;};bool poseValid=true;bool GetLatchedStereoFrame(LatchedStereoFrame&f){f.poseSequence=7;return poseValid;}}
+void R30TraceLatchedStereoFull(const char*, std::uint64_t, const OutRunVRRenderer::LatchedStereoFrame&){}
 struct D3DSURFACE_DESC {UINT Width=0,Height=0;D3DFORMAT Format=D3DFMT_UNKNOWN;};
 struct IDirect3DBaseTexture9 {int released=0;int GetType(){return D3DRTYPE_TEXTURE;}void Release(){++released;}};
 struct IDirect3DTexture9 : IDirect3DBaseTexture9 {HRESULT GetLevelDesc(UINT,D3DSURFACE_DESC*d){*d={64,64,21};return D3D_OK;}};

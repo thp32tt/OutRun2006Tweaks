@@ -5458,6 +5458,242 @@ namespace OutRunVRStereo
             return true;
         }
 
+
+        void R30TraceLatchedStereoFull(
+            const char* family, std::uint64_t serial,
+            const OutRunVRRenderer::LatchedStereoFrame& stereo)
+        {
+            if (!Settings::VRTelemetry)
+                return;
+            spdlog::info(
+                "VR TRACE STEREO POSE FULL: family={} serial={} pose={} framePose={} "
+                "fovL={:.9g},{:.9g},{:.9g},{:.9g} fovR={:.9g},{:.9g},{:.9g},{:.9g} "
+                "eyeOffsetL={:.9g},{:.9g},{:.9g} eyeOffsetR={:.9g},{:.9g},{:.9g} "
+                "eyeOriL={:.9g},{:.9g},{:.9g},{:.9g} eyeOriR={:.9g},{:.9g},{:.9g},{:.9g} "
+                "effectiveOriL={:.9g},{:.9g},{:.9g},{:.9g} "
+                "effectiveOriR={:.9g},{:.9g},{:.9g},{:.9g} "
+                "effectivePosL={:.9g},{:.9g},{:.9g} effectivePosR={:.9g},{:.9g},{:.9g}",
+                family ? family : "UNKNOWN", serial, stereo.poseSequence,
+                FrameStereoPoseSequence,
+                stereo.eyeFov[0].angleLeft, stereo.eyeFov[0].angleRight,
+                stereo.eyeFov[0].angleUp, stereo.eyeFov[0].angleDown,
+                stereo.eyeFov[1].angleLeft, stereo.eyeFov[1].angleRight,
+                stereo.eyeFov[1].angleUp, stereo.eyeFov[1].angleDown,
+                stereo.eyeOffset[0][0], stereo.eyeOffset[0][1],
+                stereo.eyeOffset[0][2], stereo.eyeOffset[1][0],
+                stereo.eyeOffset[1][1], stereo.eyeOffset[1][2],
+                stereo.eyeOrientation[0][0], stereo.eyeOrientation[0][1],
+                stereo.eyeOrientation[0][2], stereo.eyeOrientation[0][3],
+                stereo.eyeOrientation[1][0], stereo.eyeOrientation[1][1],
+                stereo.eyeOrientation[1][2], stereo.eyeOrientation[1][3],
+                stereo.effectiveEyeOrientation[0][0],
+                stereo.effectiveEyeOrientation[0][1],
+                stereo.effectiveEyeOrientation[0][2],
+                stereo.effectiveEyeOrientation[0][3],
+                stereo.effectiveEyeOrientation[1][0],
+                stereo.effectiveEyeOrientation[1][1],
+                stereo.effectiveEyeOrientation[1][2],
+                stereo.effectiveEyeOrientation[1][3],
+                stereo.effectiveEyePosition[0][0],
+                stereo.effectiveEyePosition[0][1],
+                stereo.effectiveEyePosition[0][2],
+                stereo.effectiveEyePosition[1][0],
+                stereo.effectiveEyePosition[1][1],
+                stereo.effectiveEyePosition[1][2]);
+        }
+
+        void R30TraceVisualPipelineFull(
+            IDirect3DDevice9* device, const char* family,
+            std::uint64_t serial)
+        {
+            if (!Settings::VRTelemetry || !device)
+                return;
+
+            D3DVIEWPORT9 viewport{};
+            RECT scissor{};
+            const HRESULT viewportHr = device->GetViewport(&viewport);
+            const HRESULT scissorHr = device->GetScissorRect(&scissor);
+
+            IDirect3DPixelShader9* ps = nullptr;
+            const HRESULT psHr = device->GetPixelShader(&ps);
+            const std::uintptr_t psPtr =
+                reinterpret_cast<std::uintptr_t>(ps);
+            if (ps) ps->Release();
+
+            IDirect3DVertexDeclaration9* decl = nullptr;
+            const HRESULT declHr = device->GetVertexDeclaration(&decl);
+            const std::uintptr_t declPtr =
+                reinterpret_cast<std::uintptr_t>(decl);
+            if (decl) decl->Release();
+
+            DWORD alphaRef=0, alphaFunc=0, blendOp=0;
+            DWORD sepAlpha=0, srcAlpha=0, dstAlpha=0, blendOpAlpha=0;
+            DWORD cull=0, fogEnable=0, fogColor=0, stencilEnable=0;
+            DWORD stencilFunc=0, stencilRef=0, stencilMask=0, stencilWriteMask=0;
+            DWORD scissorEnable=0, srgbWrite=0, multisample=0;
+            DWORD depthBias=0, slopeDepthBias=0, textureFactor=0;
+            DWORD clipEnable=0, lighting=0, ambient=0;
+            device->GetRenderState(D3DRS_ALPHAREF,&alphaRef);
+            device->GetRenderState(D3DRS_ALPHAFUNC,&alphaFunc);
+            device->GetRenderState(D3DRS_BLENDOP,&blendOp);
+            device->GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE,&sepAlpha);
+            device->GetRenderState(D3DRS_SRCBLENDALPHA,&srcAlpha);
+            device->GetRenderState(D3DRS_DESTBLENDALPHA,&dstAlpha);
+            device->GetRenderState(D3DRS_BLENDOPALPHA,&blendOpAlpha);
+            device->GetRenderState(D3DRS_CULLMODE,&cull);
+            device->GetRenderState(D3DRS_FOGENABLE,&fogEnable);
+            device->GetRenderState(D3DRS_FOGCOLOR,&fogColor);
+            device->GetRenderState(D3DRS_STENCILENABLE,&stencilEnable);
+            device->GetRenderState(D3DRS_STENCILFUNC,&stencilFunc);
+            device->GetRenderState(D3DRS_STENCILREF,&stencilRef);
+            device->GetRenderState(D3DRS_STENCILMASK,&stencilMask);
+            device->GetRenderState(D3DRS_STENCILWRITEMASK,&stencilWriteMask);
+            device->GetRenderState(D3DRS_SCISSORTESTENABLE,&scissorEnable);
+            device->GetRenderState(D3DRS_SRGBWRITEENABLE,&srgbWrite);
+            device->GetRenderState(D3DRS_MULTISAMPLEANTIALIAS,&multisample);
+            device->GetRenderState(D3DRS_DEPTHBIAS,&depthBias);
+            device->GetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,&slopeDepthBias);
+            device->GetRenderState(D3DRS_TEXTUREFACTOR,&textureFactor);
+            device->GetRenderState(D3DRS_CLIPPLANEENABLE,&clipEnable);
+            device->GetRenderState(D3DRS_LIGHTING,&lighting);
+            device->GetRenderState(D3DRS_AMBIENT,&ambient);
+
+            spdlog::info(
+                "VR TRACE PIPELINE FULL: family={} serial={} psHr=0x{:08X} ps=0x{:X} "
+                "declHr=0x{:08X} decl=0x{:X} viewportHr=0x{:08X} "
+                "viewport={},{},{},{},{:.9g},{:.9g} scissorHr=0x{:08X} "
+                "scissor={},{},{},{} scissorEnable={} alphaRef={} alphaFunc={} "
+                "blendOp={} separateAlpha={} srcAlpha={} dstAlpha={} blendOpAlpha={} "
+                "cull={} fog={} fogColor=0x{:08X} stencil={} stencilFunc={} "
+                "stencilRef={} stencilMask=0x{:08X} stencilWriteMask=0x{:08X} "
+                "sRGBWrite={} multisample={} depthBiasBits=0x{:08X} "
+                "slopeDepthBiasBits=0x{:08X} textureFactor=0x{:08X} "
+                "clipEnable=0x{:08X} lighting={} ambient=0x{:08X}",
+                family ? family : "UNKNOWN", serial,
+                static_cast<unsigned>(psHr), psPtr,
+                static_cast<unsigned>(declHr), declPtr,
+                static_cast<unsigned>(viewportHr),
+                viewport.X, viewport.Y, viewport.Width, viewport.Height,
+                viewport.MinZ, viewport.MaxZ,
+                static_cast<unsigned>(scissorHr),
+                scissor.left, scissor.top, scissor.right, scissor.bottom,
+                scissorEnable ? 1 : 0, alphaRef, alphaFunc, blendOp,
+                sepAlpha ? 1 : 0, srcAlpha, dstAlpha, blendOpAlpha,
+                cull, fogEnable ? 1 : 0, fogColor,
+                stencilEnable ? 1 : 0, stencilFunc, stencilRef,
+                stencilMask, stencilWriteMask, srgbWrite ? 1 : 0,
+                multisample ? 1 : 0, depthBias, slopeDepthBias,
+                textureFactor, clipEnable, lighting ? 1 : 0, ambient);
+
+            std::uintptr_t texPtr[4]{};
+            UINT texW[4]{}, texH[4]{};
+            D3DFORMAT texFmt[4]{
+                D3DFMT_UNKNOWN,D3DFMT_UNKNOWN,
+                D3DFMT_UNKNOWN,D3DFMT_UNKNOWN};
+            for (DWORD stage=0; stage<4; ++stage)
+            {
+                IDirect3DBaseTexture9* tex=nullptr;
+                if (SUCCEEDED(device->GetTexture(stage,&tex)) && tex)
+                {
+                    texPtr[stage]=reinterpret_cast<std::uintptr_t>(tex);
+                    if (tex->GetType()==D3DRTYPE_TEXTURE)
+                    {
+                        D3DSURFACE_DESC d{};
+                        if (SUCCEEDED(static_cast<IDirect3DTexture9*>(tex)
+                            ->GetLevelDesc(0,&d)))
+                        {
+                            texW[stage]=d.Width; texH[stage]=d.Height;
+                            texFmt[stage]=d.Format;
+                        }
+                    }
+                    tex->Release();
+                }
+            }
+
+            DWORD samp[2][9]{};
+            DWORD tss[2][8]{};
+            for (DWORD stage=0; stage<2; ++stage)
+            {
+                device->GetSamplerState(stage,D3DSAMP_ADDRESSU,&samp[stage][0]);
+                device->GetSamplerState(stage,D3DSAMP_ADDRESSV,&samp[stage][1]);
+                device->GetSamplerState(stage,D3DSAMP_ADDRESSW,&samp[stage][2]);
+                device->GetSamplerState(stage,D3DSAMP_MINFILTER,&samp[stage][3]);
+                device->GetSamplerState(stage,D3DSAMP_MAGFILTER,&samp[stage][4]);
+                device->GetSamplerState(stage,D3DSAMP_MIPFILTER,&samp[stage][5]);
+                device->GetSamplerState(stage,D3DSAMP_MAXANISOTROPY,&samp[stage][6]);
+                device->GetSamplerState(stage,D3DSAMP_MIPMAPLODBIAS,&samp[stage][7]);
+                device->GetSamplerState(stage,D3DSAMP_SRGBTEXTURE,&samp[stage][8]);
+                device->GetTextureStageState(stage,D3DTSS_COLOROP,&tss[stage][0]);
+                device->GetTextureStageState(stage,D3DTSS_COLORARG1,&tss[stage][1]);
+                device->GetTextureStageState(stage,D3DTSS_COLORARG2,&tss[stage][2]);
+                device->GetTextureStageState(stage,D3DTSS_ALPHAOP,&tss[stage][3]);
+                device->GetTextureStageState(stage,D3DTSS_ALPHAARG1,&tss[stage][4]);
+                device->GetTextureStageState(stage,D3DTSS_ALPHAARG2,&tss[stage][5]);
+                device->GetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,&tss[stage][6]);
+                device->GetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,&tss[stage][7]);
+            }
+            spdlog::info(
+                "VR TRACE TEXTURE FULL: family={} serial={} "
+                "t0=0x{:X}:{}x{}:{} t1=0x{:X}:{}x{}:{} "
+                "t2=0x{:X}:{}x{}:{} t3=0x{:X}:{}x{}:{} "
+                "s0={},{},{},{},{},{},{},0x{:08X},{} "
+                "s1={},{},{},{},{},{},{},0x{:08X},{} "
+                "tss0={},{},{},{},{},{},{},{} tss1={},{},{},{},{},{},{},{}",
+                family ? family : "UNKNOWN", serial,
+                texPtr[0],texW[0],texH[0],static_cast<unsigned>(texFmt[0]),
+                texPtr[1],texW[1],texH[1],static_cast<unsigned>(texFmt[1]),
+                texPtr[2],texW[2],texH[2],static_cast<unsigned>(texFmt[2]),
+                texPtr[3],texW[3],texH[3],static_cast<unsigned>(texFmt[3]),
+                samp[0][0],samp[0][1],samp[0][2],samp[0][3],samp[0][4],
+                samp[0][5],samp[0][6],samp[0][7],samp[0][8],
+                samp[1][0],samp[1][1],samp[1][2],samp[1][3],samp[1][4],
+                samp[1][5],samp[1][6],samp[1][7],samp[1][8],
+                tss[0][0],tss[0][1],tss[0][2],tss[0][3],tss[0][4],
+                tss[0][5],tss[0][6],tss[0][7],
+                tss[1][0],tss[1][1],tss[1][2],tss[1][3],tss[1][4],
+                tss[1][5],tss[1][6],tss[1][7]);
+
+            float vsConstants[32]{}, psConstants[32]{};
+            const HRESULT vsConstHr =
+                device->GetVertexShaderConstantF(0,vsConstants,8);
+            const HRESULT psConstHr =
+                device->GetPixelShaderConstantF(0,psConstants,8);
+            auto hashFloats=[](const float* values,std::size_t count) noexcept
+            {
+                const auto* bytes=
+                    reinterpret_cast<const unsigned char*>(values);
+                std::uint64_t hash=1469598103934665603ull;
+                for (std::size_t i=0;i<count*sizeof(float);++i)
+                {
+                    hash^=bytes[i]; hash*=1099511628211ull;
+                }
+                return hash;
+            };
+            const auto vsHash=hashFloats(vsConstants,32);
+            const auto psHash=hashFloats(psConstants,32);
+            spdlog::info(
+                "VR TRACE SHADER CONSTANTS FULL: family={} serial={} "
+                "vsHr=0x{:08X} vsC0C7Hash=0x{:016X} "
+                "psHr=0x{:08X} psC0C7Hash=0x{:016X} "
+                "vsC0C3=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},"
+                "{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                "psC0C3=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},"
+                "{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}]",
+                family ? family : "UNKNOWN", serial,
+                static_cast<unsigned>(vsConstHr),
+                static_cast<unsigned long long>(vsHash),
+                static_cast<unsigned>(psConstHr),
+                static_cast<unsigned long long>(psHash),
+                vsConstants[0],vsConstants[1],vsConstants[2],vsConstants[3],
+                vsConstants[4],vsConstants[5],vsConstants[6],vsConstants[7],
+                vsConstants[8],vsConstants[9],vsConstants[10],vsConstants[11],
+                vsConstants[12],vsConstants[13],vsConstants[14],vsConstants[15],
+                psConstants[0],psConstants[1],psConstants[2],psConstants[3],
+                psConstants[4],psConstants[5],psConstants[6],psConstants[7],
+                psConstants[8],psConstants[9],psConstants[10],psConstants[11],
+                psConstants[12],psConstants[13],psConstants[14],psConstants[15]);
+        }
+
         template <typename ActualDraw>
         HRESULT R30TryScreenSpaceFovDraw(
             IDirect3DDevice9* device, ActualDraw&& actualDraw,
@@ -5789,6 +6025,8 @@ namespace OutRunVRStereo
                     static_cast<unsigned>(lensZEnable),
                     lensZWrite ? 1 : 0, lensAlphaTest ? 1 : 0,
                     OutRunVR::GameSemantic::CurrentLensCentreCallEpoch);
+                R30TraceVisualPipelineFull(
+                    device, "LENS", TopLevelDrawSerial());
             }
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
@@ -5851,6 +6089,10 @@ namespace OutRunVRStereo
             if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
                 stereo.poseSequence == 0)
                 return E_NOTIMPL;
+
+            if (lensPhysicalCandidate)
+                R30TraceLatchedStereoFull(
+                    "LENS", TopLevelDrawSerial(), stereo);
 
             // If perspective world geometry already established this Present's
             // pose sequence, screen-space correction must use that exact packet.
@@ -6523,6 +6765,14 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::ProducerToken::ResultProgress
                     ? "GOAL_PERCENT" : "OTHER";
 
+            if (detailedTimeGoalTrace)
+            {
+                R30TraceLatchedStereoFull(
+                    detailedTimeGoalFamily, TopLevelDrawSerial(), state.stereo);
+                R30TraceVisualPipelineFull(
+                    device, detailedTimeGoalFamily, TopLevelDrawSerial());
+            }
+
             std::uintptr_t resultTex0Ptr = 0;
             std::uintptr_t resultVb0Ptr = 0;
             std::uintptr_t resultIbPtr = 0;
@@ -7004,6 +7254,17 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
+            const auto lensDrawScopeDP =
+                OutRunVR::GameSemantic::EffectiveScope();
+            if (Settings::VRTelemetry &&
+                (lensDrawScopeDP == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
+                 lensDrawScopeDP == OutRunVR::GameSemantic::RenderScope::SceneEffect))
+                spdlog::info(
+                    "VR TRACE LENS DRAW CALL FULL: serial={} api=DP type={} "
+                    "startVertex={} primitiveCount={} scope={}",
+                    TopLevelDrawSerial(), static_cast<unsigned>(type),
+                    startVertex, primitiveCount,
+                    OutRunVR::GameSemantic::Name(lensDrawScopeDP));
             return R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawPrimitive");
         }
@@ -7091,6 +7352,19 @@ namespace OutRunVRStereo
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
+            const auto lensDrawScopeDIP =
+                OutRunVR::GameSemantic::EffectiveScope();
+            if (Settings::VRTelemetry &&
+                (lensDrawScopeDIP == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
+                 lensDrawScopeDIP == OutRunVR::GameSemantic::RenderScope::SceneEffect))
+                spdlog::info(
+                    "VR TRACE LENS DRAW CALL FULL: serial={} api=DIP type={} "
+                    "baseVertex={} minVertex={} numVertices={} startIndex={} "
+                    "primitiveCount={} scope={}",
+                    TopLevelDrawSerial(), static_cast<unsigned>(type),
+                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
+                    primitiveCount,
+                    OutRunVR::GameSemantic::Name(lensDrawScopeDIP));
             return R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawIndexedPrimitive");
         }
@@ -7133,6 +7407,17 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
+            const auto lensDrawScopeDPUP =
+                OutRunVR::GameSemantic::EffectiveScope();
+            if (Settings::VRTelemetry &&
+                (lensDrawScopeDPUP == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
+                 lensDrawScopeDPUP == OutRunVR::GameSemantic::RenderScope::SceneEffect))
+                spdlog::info(
+                    "VR TRACE LENS DRAW CALL FULL: serial={} api=DPUP type={} "
+                    "primitiveCount={} vertexData=0x{:X} stride={} scope={}",
+                    TopLevelDrawSerial(), static_cast<unsigned>(type),
+                    primitiveCount, reinterpret_cast<std::uintptr_t>(data),
+                    stride, OutRunVR::GameSemantic::Name(lensDrawScopeDPUP));
             return R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawPrimitiveUP");
         }
@@ -7179,6 +7464,21 @@ namespace OutRunVRStereo
                     type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
             };
+            const auto lensDrawScopeDIPUP =
+                OutRunVR::GameSemantic::EffectiveScope();
+            if (Settings::VRTelemetry &&
+                (lensDrawScopeDIPUP == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
+                 lensDrawScopeDIPUP == OutRunVR::GameSemantic::RenderScope::SceneEffect))
+                spdlog::info(
+                    "VR TRACE LENS DRAW CALL FULL: serial={} api=DIPUP type={} "
+                    "minVertex={} numVertices={} primitiveCount={} indexData=0x{:X} "
+                    "indexFormat={} vertexData=0x{:X} stride={} scope={}",
+                    TopLevelDrawSerial(), static_cast<unsigned>(type),
+                    minVertexIndex, numVertices, primitiveCount,
+                    reinterpret_cast<std::uintptr_t>(indexData),
+                    static_cast<unsigned>(indexFormat),
+                    reinterpret_cast<std::uintptr_t>(vertexData), stride,
+                    OutRunVR::GameSemantic::Name(lensDrawScopeDIPUP));
             return R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawIndexedPrimitiveUP");
         }
