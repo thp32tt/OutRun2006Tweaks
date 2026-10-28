@@ -854,7 +854,7 @@ class VRLensFlareProjected2D : public Hook
                 "scope={} producer={} queueActive={} queueEpoch={} lensCentreEpoch={} "
                 "centreDepth={} centreOwnerDepth={} deferredSerial={} "
                 "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={} "
-                "resetEpoch={} resetQpc={} resetFlags=0x{:X}",
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={}",
                 static_cast<unsigned>(objectId), alpha,
                 static_cast<unsigned>(flags),
                 reinterpret_cast<std::uintptr_t>(work),
@@ -869,7 +869,8 @@ class VRLensFlareProjected2D : public Hook
                 LensCentreDepth, LensCentreOwnerDepth,
                 deferred.sourceSerial, deferred.sequence,
                 deferred.objectId, static_cast<unsigned>(deferred.ordinal),
-                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
+                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
+                resetTrace.readStable ? 1 : 0);
         }
 
         // One original 0xCABE call occurs for each source effect object,
@@ -984,7 +985,7 @@ class VRLensFlareProjected2D : public Hook
                 "scope={} producer={} queueActive={} queueEpoch={} lensCentreEpoch={} "
                 "centreDepth={} centreOwnerDepth={} deferredSerial={} "
                 "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={} "
-                "resetEpoch={} resetQpc={} resetFlags=0x{:X}",
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={}",
                 static_cast<unsigned>(objectId), alpha,
                 static_cast<unsigned>(flags),
                 reinterpret_cast<std::uintptr_t>(work),
@@ -999,7 +1000,8 @@ class VRLensFlareProjected2D : public Hook
                 LensCentreDepth, LensCentreOwnerDepth,
                 deferred.sourceSerial, deferred.sequence,
                 deferred.objectId, static_cast<unsigned>(deferred.ordinal),
-                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
+                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
+                resetTrace.readStable ? 1 : 0);
         }
         // 4056D0 may only enqueue the original opaque object. Do NOT
         // interpret this hook's call counter as a native Draw or an eye RT.
