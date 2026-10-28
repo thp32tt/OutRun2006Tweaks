@@ -8,10 +8,10 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:DUAL_GPU_DRAW_REGION_CAPTURE",
   "classification": "A_REAL_NATIVE_GAME_GPU_PIXEL_CAPTURE_SOURCE_IMPLEMENTATION",
-  "status": "SOURCE_IMPLEMENTED_CI_REPAIR_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_change": 0,
+  "score_change": 1,
   "source_base_sha": "d782d87618b430f03884ad1ea0970ed4d2fe4df7",
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -37,8 +37,8 @@
       }
     ]
   },
-  "validation_bearing_result_sha": null,
-  "material_result_sha": null,
+  "validation_bearing_result_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+  "material_result_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
   "desktop_native_game": "UNTESTED",
   "quest3_vdxr": "UNTESTED",
   "development_time_percentages": "UNMEASURED",
@@ -93,5 +93,85 @@
       "run_id": 40717769246,
       "reason": "same task JSON policy failure before Backend compile"
     }
-  ]
+  ],
+  "checkpoint": "C6_STATE",
+  "full_dx11_renderer_complete": false,
+  "source_implementation_commit_sha": "d462cf76cb82590815d0a732c5c91423c98d9d8e",
+  "causal_source_safety_ci_repair_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+  "acceptance_results": {
+    "native_dual_game_gpu_capture": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp"
+      ],
+      "validation_command": "Build exact SHA 40dca25b70815d8226e4ecee6f99bbd9255d2324 run 40718424891 success; game/HMD not observed"
+    },
+    "source_write_lifetime_fallback": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate exact SHA 40dca25b70815d8226e4ecee6f99bbd9255d2324 run 40718423869 success; game/HMD not observed"
+    },
+    "cxx_ci_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "DX11 Fast Structural Checks exact SHA 40dca25b70815d8226e4ecee6f99bbd9255d2324 run 40718424613 success; game/HMD not observed"
+    }
+  },
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40718424613,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40718423869,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40718424891,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40718425135,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40718423294,
+        "head_sha": "40dca25b70815d8226e4ecee6f99bbd9255d2324",
+        "conclusion": "success"
+      }
+    ],
+    "windows_build_artifact": {
+      "id": 12829967710,
+      "name": "outrun2006tweaks-40dca25b70815d8226e4ecee6f99bbd9255d2324",
+      "digest": "sha256:29819e5740c95f92932117fcc8508abdb5f9a446c05155e3f42d050b4a7bbcb6",
+      "bytes": 5803503
+    },
+    "full_native_game_frame_complete": false,
+    "gameplay_visual_pass": false,
+    "runtime_evidence": "UNTESTED: real desktop menu/vehicle/race native pixel output and Quest 3 / VDXR were NOT run on this binary",
+    "development_time_distribution": "UNMEASURED",
+    "retries": "E001 initial CI record policy fail, E002 source safety and acceptance policy repair; one source feature with no duplicate point"
+  },
+  "completed_at_kst": "2026-10-29"
 }
