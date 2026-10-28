@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01143",
+  "production_id": "CONVERSION-DX11-01143",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01143",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:CONNECTED_DIRTY_COMPONENTS",
+  "classification": "A_SOURCE_MATCHED_RAW_GPU_CONNECTED_REPAINT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "source_base_sha": "f4e0431e98b62492799eb5cd46e5164787ac90e0",
+  "source_implementation_commit_sha": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+  "material_result_sha": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+  "validation_bearing_result_sha": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+  "development_time_percentages": "UNMEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "REAL_D3D9_DRAW",
+      "D3D11_NATIVE_GPU_BEFORE_AFTER_RGB",
+      "AUTHENTIC_D3D9_FRAGMENTED_PRESENT",
+      "SOURCE_MATCHED_GPU_TILE_UPLOAD"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "OPT_IN_RAW_VISIBLE_OUTPUT"
+    ],
+    "batch_components": [
+      "CXX_32_MEMBER_CONNECTED_COMPONENT_BFS",
+      "STRICT_ORIGINAL_PIXEL_UNION_COVERAGE",
+      "REAL_D3D11_GPU_TILE_TO_D3D9_UPDATE_SURFACE",
+      "CXX17_POSITIVE_NEGATIVE_FRAGMENT_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Three 16px-wide joined rectangles and 20 thin joined source dirty strips plus an outlier admit only a genuinely repainted RAW D3D11 RGB tile",
+      "negative_regression": "One-pixel unpainted seam, forged rcBound, malformed outlier and unknown header fail closed; original source identity and fenced GPU capture unchanged",
+      "component_integration": "Real original-game native D3D11 Draw before/after RGB -> bounded authentic RGNDATA component placement -> exact 32-member region pixel coverage -> opt-in game D3D9 partial Present"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC:CONNECTED_DIRTY_COMPONENTS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Incomplete opt-in native RAW GPU pixel diagnostic only; menu/car/race entire native frame and stereo runtime NOT PROVEN",
+    "activation_guard_and_fallback": "Diagnostic default OFF; no gameplay or OpenXR promotion; game D3D9, DX9Ex fallback, input, FFB and frozen DXVK unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_present_coverage_test.cpp"
+  ],
+  "real_game_draw_blocker": "Latest exact-SHA game run absent; native_draws, native_gpu_pixel_output, publishedBackbufferFrames, menu/car/race source coverage and Quest3/VDXR validation UNTESTED",
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40764267375,
+        "head_sha": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40764267195,
+        "head_sha": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40764267230,
+        "head_sha": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40764267135,
+        "head_sha": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40764267491,
+        "head_sha": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+        "conclusion": "success"
+      }
+    ],
+    "source_implementation": "Bounded connected-component native diagnostic placement over authentic up to 32 D3D9 dirty rectangles, preserving exact per-pixel union proof; C++17 three- and 21-member edge/regression matrix",
+    "build_evidence": "Five required push workflows all completed SUCCESS on same material exact SHA; unchanged SHAs not rerun; C6 docs-only after gates",
+    "runtime_evidence": "UNTESTED (no source-matched GPU desktop game evidence or Quest 3/VDXR HMD proof)",
+    "desktop_native_game": "UNTESTED",
+    "quest3_vdxr": "UNTESTED",
+    "full_native_game_frame_complete": false,
+    "duplicate_task_score_change": 0,
+    "bookkeeping_only": true,
+    "prior_work_contract_reference": "docs/automation/runs/CONVERSION-DX11-01142.json"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Improve actual opt-in game-native GPU RGB visibility through fragmented authentic partial dirty Presents without fabricating repainted pixels or claiming complete scene",
+    "acceptance_items": [
+      {
+        "id": "connected_source_dirty_gpu_preview",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native GPU RGB into D3D9 multi-fragment partial Present",
+        "expected_behavior": "Connected three-or-more authentic RGNDATA rectangles permit a real bounded RAW tile while full original game Present crop is unchanged"
+      },
+      {
+        "id": "strict_authentic_region_rejection",
+        "category": "fallback_regression",
+        "behavior_area": "Exact source repaint, DX9Ex/input fallback",
+        "expected_behavior": "Invalid source members, pixel holes, fabricated rcBound, or absent header cannot authorize GPU publication"
+      },
+      {
+        "id": "five_exact_sha_gate_verification",
+        "category": "integrated_validation",
+        "behavior_area": "C++17 positive/negative regression plus mandatory five-gate exact-SHA CI",
+        "expected_behavior": "All five push workflows PASS on the same material source SHA; HMD and visible gameplay remain separate"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "connected_source_dirty_gpu_preview": "PASS_BUILD",
+    "strict_authentic_region_rejection": "PASS_BUILD",
+    "five_exact_sha_gate_verification": "PASS_EXACT_SHA"
+  },
+  "c6": {
+    "reason": "FIVE_GATES_SUCCESS_AT_VALIDATION_SHA",
+    "action": "CREATE_RESULT_RECORD_ONLY",
+    "bookkeeping_commit_separate_from_validation": true,
+    "validation_sha_immutable": "a0f4387b431082a1fcb550ec61f21d40b5fb7dc3",
+    "ci_rerun": false,
+    "source_changes": false
+  }
+}
