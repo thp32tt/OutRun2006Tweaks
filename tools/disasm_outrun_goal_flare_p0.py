@@ -26,7 +26,7 @@ WINDOWS = (
     # conditionally emits the live timer/split popup only while 8446E8 > 0.
     # Disassemble its body so we can hook the conditional display edge rather
     # than the unconditional outer display call.
-    ("navi-live-time-popup-dispatch", 0x000BD080, 0x000BD1A0),
+    ("navi-live-time-popup-dispatch", 0x000BD080, 0x000BD240),
     ("navi-race-display", 0x000BEA80, 0x000BEE20),
     ("goal-record-helpers", 0x000BE000, 0x000BEB20),
     ("lens-objects", 0x0000C900, 0x0000D950),
