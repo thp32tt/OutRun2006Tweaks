@@ -6,9 +6,10 @@ ROOT = Path(__file__).resolve().parents[1]
 R30 = ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
 GAME = ROOT / "src/vr/game/outrun_renderer.cpp"
 HOOK = ROOT / "src/hooks_graphics.cpp"
+SEM = ROOT / "src/vr/game/render_semantics.hpp"
 
 
-def check(r30: str, game: str, hook: str) -> None:
+def check(r30: str, game: str, hook: str, sem: str) -> None:
     body = r30.split("HRESULT R30TryScreenSpaceFovDraw(", 1)[1].split(
         "HRESULT R30GuardScreenSpace(", 1
     )[0]
@@ -25,7 +26,13 @@ def check(r30: str, game: str, hook: str) -> None:
     for phrase in (
         "VR LENS R30 PHYSICAL CLASS:",
         "VR LENS R30 PHYSICAL EYES:",
-        "opaqueObject=UNLINKED",
+        "opaqueObject=WINDOW_LINKED_ONLY",
+        "VR LENS R30 SOURCE JOIN:",
+        "DEFERRED_SOURCE_WINDOW",
+        "tex0=0x{:X} tex={}x{} fmt={}",
+        "vb0=0x{:X} offset={} stride={}",
+        "colorWrite=0x{:X} alphaBlend={}",
+        "rawWvpHash=0x{:016X}",
         "vsHr=0x{:08X} vsBound={} fvfHr=0x{:08X}",
         "fvf=0x{:08X}",
         "device->GetVertexShader(&liveVs)",
@@ -80,6 +87,19 @@ def check(r30: str, game: str, hook: str) -> None:
     assert "provenance=CALL_STACK_ONLY" in body
     assert "lensInline.sourceSerial != 0" in body
     assert "ScopedLensOriginalCall inlineSource(" in projected
+    assert "ArmLensDeferredPhysical(" in projected
+    assert "ClearLensDeferredPhysical();" in projected
+    assert "sourceOrdinal == 1" in projected
+    assert "VR LENS 570008 DEFERRED WINDOW ARM:" in projected
+    assert "VR LENS 570008 DEFERRED WINDOW CLOSE:" in projected
+    for phrase in (
+        "struct LensDeferredPhysicalReceipt",
+        "DeferredLensProjectedOwnsPhysicalDraw()",
+        "CurrentLensDeferredPhysical.objectId == 0x570008u",
+        "CurrentLensDeferredPhysical.ordinal == 1u",
+        "return RenderScope::ProjectedScreenEffect2D;",
+    ):
+        assert phrase in sem, "missing bounded deferred lens semantic: " + phrase
     assert centre.count("ScopedLensOriginalCall inlineSource(") == 2
     assert "sourceCallSerial" in centre and "sourceCallSerial" in projected
     assert "ordinalMaySpanSunCalls={}" in projected
@@ -95,11 +115,13 @@ def main() -> None:
     r30 = R30.read_text(encoding="utf-8-sig")
     game = GAME.read_text(encoding="utf-8-sig")
     hook = HOOK.read_text(encoding="utf-8-sig")
-    check(r30, game, hook)
+    sem = SEM.read_text(encoding="utf-8-sig")
+    check(r30, game, hook, sem)
     mutations = [
-        (0, "opaqueObject=UNLINKED", "object=570008"),
+        (0, "opaqueObject=WINDOW_LINKED_ONLY", "opaqueObject=PROVEN_DESCRIPTOR"),
+        (0, "DEFERRED_SOURCE_WINDOW", "OPAQUE_DESCRIPTOR_PROOF"),
         (0, "device->GetFVF(&liveFvf)", "D3D_OK"),
-        (0, "eyeRT=LEFT_RIGHT_TRANSACTION object=UNLINKED", "object=570002"),
+        (0, "eyeRT=LEFT_RIGHT_TRANSACTION", "eyeRT=FAKE_SINGLE_RT"),
         (0, "std::memcmp(eyeConstants[0], eyeConstants[1],", "true /* fake eye equality */("),
         (0, "const bool lensPhysicalCandidate = Settings::VRTelemetry &&",
             "const bool lensPhysicalCandidate = true &&"),
@@ -110,8 +132,12 @@ def main() -> None:
         (0, "provenance=CALL_STACK_ONLY", "provenance=OPAQUE_MATCH"),
         (0, "opaqueDescriptor=UNLINKED", "opaqueDescriptor=570008"),
         (2, "ordinalMaySpanSunCalls={}", "ordinalIsFrameProof=1"),
+        (2, "ArmLensDeferredPhysical(", "/* removed deferred bridge */"),
+        (0, "rawWvpHash=0x{:016X}", "rawWvpHash=OMITTED"),
+        (3, "CurrentLensDeferredPhysical.ordinal == 1u",
+            "CurrentLensDeferredPhysical.ordinal == 2u"),
     ]
-    values = [r30, game, hook]
+    values = [r30, game, hook, sem]
     for idx, old, new in mutations:
         assert old in values[idx], "missing negative mutation: " + old
         mutated = values.copy()
@@ -121,7 +147,7 @@ def main() -> None:
         except AssertionError:
             continue
         raise AssertionError("unsafe lens provenance mutation escaped: " + old)
-    print("PASS lens C993/CABE inline source candidate + R30 native receipts; "
+    print("PASS lens C993/CABE inline + bounded deferred source-to-R30 receipts; "
           f"{len(mutations)} destructive negative controls; "
           "no game optics changes; HMD UNTESTED")
 

@@ -5473,7 +5473,27 @@ namespace OutRunVRStereo
             // Scoped source identity is a bounded *inline call stack* hint.
             // A queued 405360 descriptor can flush after wrapper return, and
             // even a synchronous nested call does not prove PMT mesh lineage.
-            const auto lensInline = OutRunVR::GameSemantic::CurrentLensOriginalCall;
+            const auto lensInline =
+                OutRunVR::GameSemantic::CurrentLensOriginalCall;
+            const auto lensDeferred =
+                OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
+            const bool lensInlineLinked = lensInline.sourceSerial != 0;
+            const bool lensDeferredLinked =
+                !lensInlineLinked && lensDeferred.sourceSerial != 0;
+            const std::uint64_t lensSourceSerial = lensInlineLinked
+                ? lensInline.sourceSerial : lensDeferred.sourceSerial;
+            const std::uint64_t lensSourceSequence = lensInlineLinked
+                ? lensInline.lastC993Sequence : lensDeferred.sequence;
+            const std::uint32_t lensSourceObject = lensInlineLinked
+                ? lensInline.objectId : lensDeferred.objectId;
+            const unsigned lensSourceOrdinal = lensInlineLinked
+                ? static_cast<unsigned>(lensInline.ordinal)
+                : static_cast<unsigned>(lensDeferred.ordinal);
+            const unsigned lensSourceSite = lensInlineLinked
+                ? static_cast<unsigned>(lensInline.callsite) : 2u;
+            const char* lensSourceProvenance = lensInlineLinked
+                ? "CALL_STACK_INLINE"
+                : (lensDeferredLinked ? "DEFERRED_SOURCE_WINDOW" : "NONE");
             if (Settings::VRTelemetry && lensInline.sourceSerial != 0)
             {
                 static std::atomic<std::uint64_t> lensInlineSamples{0};
@@ -5490,6 +5510,26 @@ namespace OutRunVRStereo
                         lensInline.sourceSerial, lensInline.objectId,
                         static_cast<unsigned>(lensInline.callsite),
                         lensInline.lastC993Sequence,
+                        OutRunVR::GameSemantic::Name(
+                            OutRunVR::GameSemantic::EffectiveScope()),
+                        baseAdmitted ? 1 : 0, site ? site : "unknown");
+            }
+            if (Settings::VRTelemetry &&
+                (lensInlineLinked || lensDeferredLinked))
+            {
+                static std::atomic<std::uint64_t> lensJoinSamples{0};
+                const auto n = lensJoinSamples.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 64 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS R30 SOURCE JOIN: sample={} serial={} "
+                        "sourceCallSerial={} sequence={} sourceObj=0x{:X} "
+                        "sourceSite={} ordinal={} provenance={} "
+                        "scope={} baseAdmitted={} site={}",
+                        n, TopLevelDrawSerial(), lensSourceSerial,
+                        lensSourceSequence, lensSourceObject,
+                        lensSourceSite, lensSourceOrdinal,
+                        lensSourceProvenance,
                         OutRunVR::GameSemantic::Name(
                             OutRunVR::GameSemantic::EffectiveScope()),
                         baseAdmitted ? 1 : 0, site ? site : "unknown");
@@ -5520,8 +5560,85 @@ namespace OutRunVRStereo
             const bool lensPhysicalCandidate = Settings::VRTelemetry &&
                 (lensPhysicalScope == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
                  lensPhysicalScope == OutRunVR::GameSemantic::RenderScope::SceneEffect);
+
+            std::uintptr_t lensTexture0Ptr = 0;
+            std::uintptr_t lensVb0Ptr = 0;
+            std::uintptr_t lensIbPtr = 0;
+            std::uintptr_t lensRt0Ptr = 0;
+            UINT lensVb0Offset = 0;
+            UINT lensVb0Stride = 0;
+            DWORD lensColorWrite = 0;
+            DWORD lensAlphaBlend = 0;
+            DWORD lensSrcBlend = 0;
+            DWORD lensDstBlend = 0;
+            DWORD lensZEnable = 0;
+            DWORD lensZWrite = 0;
+            DWORD lensAlphaTest = 0;
+            UINT lensTexWidth = 0;
+            UINT lensTexHeight = 0;
+            D3DFORMAT lensTexFormat = D3DFMT_UNKNOWN;
+            UINT lensRtWidth = 0;
+            UINT lensRtHeight = 0;
+            D3DFORMAT lensRtFormat = D3DFMT_UNKNOWN;
+
             if (lensPhysicalCandidate)
             {
+                IDirect3DBaseTexture9* lensTexture0 = nullptr;
+                if (SUCCEEDED(device->GetTexture(0, &lensTexture0)) &&
+                    lensTexture0)
+                {
+                    lensTexture0Ptr =
+                        reinterpret_cast<std::uintptr_t>(lensTexture0);
+                    if (lensTexture0->GetType() == D3DRTYPE_TEXTURE)
+                    {
+                        D3DSURFACE_DESC desc{};
+                        if (SUCCEEDED(static_cast<IDirect3DTexture9*>(
+                                lensTexture0)->GetLevelDesc(0, &desc)))
+                        {
+                            lensTexWidth = desc.Width;
+                            lensTexHeight = desc.Height;
+                            lensTexFormat = desc.Format;
+                        }
+                    }
+                    lensTexture0->Release();
+                }
+                IDirect3DVertexBuffer9* lensVb0 = nullptr;
+                if (SUCCEEDED(device->GetStreamSource(
+                        0, &lensVb0, &lensVb0Offset, &lensVb0Stride)) &&
+                    lensVb0)
+                {
+                    lensVb0Ptr = reinterpret_cast<std::uintptr_t>(lensVb0);
+                    lensVb0->Release();
+                }
+                IDirect3DIndexBuffer9* lensIb = nullptr;
+                if (SUCCEEDED(device->GetIndices(&lensIb)) && lensIb)
+                {
+                    lensIbPtr = reinterpret_cast<std::uintptr_t>(lensIb);
+                    lensIb->Release();
+                }
+                IDirect3DSurface9* lensRt0 = nullptr;
+                if (SUCCEEDED(device->GetRenderTarget(0, &lensRt0)) &&
+                    lensRt0)
+                {
+                    lensRt0Ptr = reinterpret_cast<std::uintptr_t>(lensRt0);
+                    D3DSURFACE_DESC desc{};
+                    if (SUCCEEDED(lensRt0->GetDesc(&desc)))
+                    {
+                        lensRtWidth = desc.Width;
+                        lensRtHeight = desc.Height;
+                        lensRtFormat = desc.Format;
+                    }
+                    lensRt0->Release();
+                }
+                device->GetRenderState(
+                    D3DRS_COLORWRITEENABLE, &lensColorWrite);
+                device->GetRenderState(
+                    D3DRS_ALPHABLENDENABLE, &lensAlphaBlend);
+                device->GetRenderState(D3DRS_SRCBLEND, &lensSrcBlend);
+                device->GetRenderState(D3DRS_DESTBLEND, &lensDstBlend);
+                device->GetRenderState(D3DRS_ZENABLE, &lensZEnable);
+                device->GetRenderState(D3DRS_ZWRITEENABLE, &lensZWrite);
+                device->GetRenderState(D3DRS_ALPHATESTENABLE, &lensAlphaTest);
                 static std::atomic<std::uint64_t> lensClassSamples{0};
                 const auto n = lensClassSamples.fetch_add(1,
                     std::memory_order_relaxed) + 1;
@@ -5541,7 +5658,12 @@ namespace OutRunVRStereo
                         "VR LENS R30 PHYSICAL CLASS: sample={} serial={} site={} "
                         "kind={} scope={} producer={} spriteQueue={} "
                         "vsHr=0x{:08X} vsBound={} fvfHr=0x{:08X} "
-                        "fvf=0x{:08X} opaqueObject=UNLINKED",
+                        "fvf=0x{:08X} sourceCallSerial={} sequence={} "
+                        "sourceObj=0x{:X} sourceSite={} ordinal={} provenance={} "
+                        "tex0=0x{:X} tex={}x{} fmt={} vb0=0x{:X} offset={} stride={} "
+                        "ib=0x{:X} rt0=0x{:X} rt={}x{} rtfmt={} "
+                        "colorWrite=0x{:X} alphaBlend={} srcBlend={} dstBlend={} "
+                        "zEnable={} zWrite={} alphaTest={} opaqueObject=WINDOW_LINKED_ONLY",
                         n, TopLevelDrawSerial(), site ? site : "unknown",
                         static_cast<unsigned>(screenKind),
                         OutRunVR::GameSemantic::Name(lensPhysicalScope),
@@ -5550,7 +5672,21 @@ namespace OutRunVRStereo
                         OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
                         static_cast<unsigned>(vsHr), shaderBound ? 1 : 0,
                         static_cast<unsigned>(fvfHr),
-                        static_cast<unsigned>(liveFvf));
+                        static_cast<unsigned>(liveFvf),
+                        lensSourceSerial, lensSourceSequence,
+                        lensSourceObject, lensSourceSite,
+                        lensSourceOrdinal, lensSourceProvenance,
+                        lensTexture0Ptr, lensTexWidth, lensTexHeight,
+                        static_cast<unsigned>(lensTexFormat),
+                        lensVb0Ptr, lensVb0Offset, lensVb0Stride, lensIbPtr,
+                        lensRt0Ptr, lensRtWidth, lensRtHeight,
+                        static_cast<unsigned>(lensRtFormat),
+                        static_cast<unsigned>(lensColorWrite),
+                        lensAlphaBlend ? 1 : 0,
+                        static_cast<unsigned>(lensSrcBlend),
+                        static_cast<unsigned>(lensDstBlend),
+                        static_cast<unsigned>(lensZEnable),
+                        lensZWrite ? 1 : 0, lensAlphaTest ? 1 : 0);
                 }
             }
             if (screenKind == R30ScreenSpaceKind::None)
@@ -5745,6 +5881,24 @@ namespace OutRunVRStereo
             // sun; native eye targets alone do not establish flare origin.
             if (lensPhysicalCandidate)
             {
+                auto lensMatrixHash = [](const float* values) noexcept
+                {
+                    const auto* bytes =
+                        reinterpret_cast<const unsigned char*>(values);
+                    std::uint64_t hash = 1469598103934665603ull;
+                    for (unsigned i = 0; i < sizeof(float) * 16; ++i)
+                    {
+                        hash ^= bytes[i];
+                        hash *= 1099511628211ull;
+                    }
+                    return hash;
+                };
+                const std::uint64_t originalWvpHash =
+                    lensMatrixHash(original);
+                const std::uint64_t leftWvpHash =
+                    lensMatrixHash(eyeConstants[0]);
+                const std::uint64_t rightWvpHash =
+                    lensMatrixHash(eyeConstants[1]);
                 static std::atomic<std::uint64_t> lensEyeSamples{0};
                 const auto n = lensEyeSamples.fetch_add(1,
                     std::memory_order_relaxed) + 1;
@@ -5755,7 +5909,11 @@ namespace OutRunVRStereo
                         "leftHr=0x{:08X} rightHr=0x{:08X} restore={} "
                         "wvpEqual={} wvpT_L={:.5f},{:.5f},{:.5f} "
                         "wvpT_R={:.5f},{:.5f},{:.5f} "
-                        "eyeRT=LEFT_RIGHT_TRANSACTION object=UNLINKED",
+                        "rawWvpHash=0x{:016X} leftWvpHash=0x{:016X} "
+                        "rightWvpHash=0x{:016X} sourceCallSerial={} "
+                        "sequence={} sourceObj=0x{:X} sourceSite={} ordinal={} "
+                        "provenance={} tex0=0x{:X} vb0=0x{:X} ib=0x{:X} "
+                        "colorWrite=0x{:X} eyeRT=LEFT_RIGHT_TRANSACTION",
                         n, TopLevelDrawSerial(), site ? site : "unknown",
                         static_cast<unsigned>(screenKind),
                         OutRunVR::GameSemantic::Name(lensPhysicalScope),
@@ -5767,7 +5925,13 @@ namespace OutRunVRStereo
                             sizeof(eyeConstants[0])) == 0 ? 1 : 0,
                         eyeConstants[0][12], eyeConstants[0][13],
                         eyeConstants[0][14], eyeConstants[1][12],
-                        eyeConstants[1][13], eyeConstants[1][14]);
+                        eyeConstants[1][13], eyeConstants[1][14],
+                        originalWvpHash, leftWvpHash, rightWvpHash,
+                        lensSourceSerial, lensSourceSequence,
+                        lensSourceObject, lensSourceSite,
+                        lensSourceOrdinal, lensSourceProvenance,
+                        lensTexture0Ptr, lensVb0Ptr, lensIbPtr,
+                        static_cast<unsigned>(lensColorWrite));
             }
 
             // Only a submitted RIGHT Draw with the original state restored

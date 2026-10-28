@@ -876,7 +876,33 @@ namespace OutRunVR::GameSemantic
         std::uint64_t lastC993Sequence = 0;
         std::uint32_t objectId = 0;
         std::uint8_t callsite = 0; // 1=C993, 2=CABE
+        std::uint8_t ordinal = 0;  // CABE 570008 source ordinal when known
     };
+
+    // Bounded source-to-physical bridge for the first original CABE 570008.
+    // Original source reconstruction proves ordinal1 is queued and flushed
+    // after its wrapper returns but before ordinal2 enters. This receipt is
+    // valid only inside that narrow same-thread interval. It is not an opaque
+    // descriptor ID, PMT node ID or proof that any GPU draw occurs.
+    struct LensDeferredPhysicalReceipt
+    {
+        std::uint64_t sourceSerial = 0;
+        std::uint64_t sequence = 0;
+        std::uint32_t objectId = 0;
+        std::uint8_t ordinal = 0;
+    };
+    inline thread_local LensDeferredPhysicalReceipt CurrentLensDeferredPhysical{};
+
+    inline void ArmLensDeferredPhysical(
+        LensDeferredPhysicalReceipt receipt) noexcept
+    {
+        CurrentLensDeferredPhysical = receipt;
+    }
+
+    inline void ClearLensDeferredPhysical() noexcept
+    {
+        CurrentLensDeferredPhysical = {};
+    }
     inline thread_local LensOriginalCallReceipt CurrentLensOriginalCall{};
     class ScopedLensOriginalCall
     {
@@ -910,6 +936,16 @@ namespace OutRunVR::GameSemantic
     // its producer through the actual GPU draw, not merely the parent E8.
     // Queue execution and external F11 overlays retain higher precedence.
     inline thread_local unsigned ExactLensCentreGpuDrawDepth = 0;
+
+    inline bool DeferredLensProjectedOwnsPhysicalDraw() noexcept
+    {
+        return CurrentLensDeferredPhysical.sourceSerial != 0 &&
+            CurrentLensDeferredPhysical.objectId == 0x570008u &&
+            CurrentLensDeferredPhysical.ordinal == 1u &&
+            SpriteQueueDepth == 0 &&
+            CurrentQueueExactScope == RenderScope::None &&
+            ExternalOverlaySemanticDepth == 0;
+    }
 
     inline constexpr bool DirectLensCentreOwnsGpuDraw(
         bool exactCentreActive, bool queueActive, bool externalOverlay) noexcept
@@ -1009,6 +1045,8 @@ namespace OutRunVR::GameSemantic
         // F11 is an external overlay, never a game SpriteNode consumer.
         if (ExternalOverlaySemanticDepth != 0)
             return CurrentScope;
+        if (DeferredLensProjectedOwnsPhysicalDraw())
+            return RenderScope::ProjectedScreenEffect2D;
         if (ExactLensCentreDrawOwnsSemantic())
             return RenderScope::WorldBillboard;
         if (CurrentQueueExactScope == RenderScope::ScreenHud ||

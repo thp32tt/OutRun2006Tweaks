@@ -734,13 +734,13 @@ class VRLensFlareProjected2D : public Hook
         const bool trackedSource = Settings::VREnabled && IsOuterLensSource(objectId);
         const std::uint64_t sourceCallSerial =
             trackedSource ? NextLensSourceCallSerial() : 0;
+        unsigned sourceOrdinal = 0;
         // User Quest3 confirmed the "missing" tiny end-of-flare point
         // is NOT explained by hiding this child. Restore BOTH original
         // 0x570008 draws. Preserve their exact scene/projection semantics
         // and log source ordinals for diagnosing eye-space duplication.
         if (Settings::VREnabled && objectId == 0x570008)
         {
-            unsigned ordinal = 0;
             if (LensFlareSequence != 0)
             {
                 if (LensOuter570008Sequence != LensFlareSequence)
@@ -748,8 +748,25 @@ class VRLensFlareProjected2D : public Hook
                     LensOuter570008Sequence = LensFlareSequence;
                     LensOuter570008Ordinal = 0;
                 }
-                ordinal = ++LensOuter570008Ordinal;
+                sourceOrdinal = ++LensOuter570008Ordinal;
             }
+
+            // The first original CABE is deferred into the opaque queue.
+            // Close a previously armed ordinal1 window exactly when the
+            // second original CABE enters, before its synchronous Draw path.
+            if (sourceOrdinal >= 2)
+            {
+                const auto deferred =
+                    OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
+                if (Settings::VRTelemetry && deferred.sourceSerial != 0)
+                    spdlog::info(
+                        "VR LENS 570008 DEFERRED WINDOW CLOSE: sequence={} "
+                        "sourceCallSerial={} ordinal={} reason=SECOND_570008_ENTRY",
+                        deferred.sequence, deferred.sourceSerial,
+                        static_cast<unsigned>(deferred.ordinal));
+                OutRunVR::GameSemantic::ClearLensDeferredPhysical();
+            }
+
             if (Settings::VRTelemetry)
             {
                 static std::atomic<std::uint64_t> originalDraws{0};
@@ -757,13 +774,13 @@ class VRLensFlareProjected2D : public Hook
                 if (n <= 12 || (n & (n - 1)) == 0)
                     spdlog::info(
                         "VR LENS 570008 ORIGINAL BOTH DRAWN: id=0x{:X} ordinal={} sequence={} hits={} alpha={} flags=0x{:X} ambientScope={} spriteQueue={} physicalDraw=UNOBSERVED sourceCallSerial={} anchorKnown={} ordinalMaySpanSunCalls={}",
-                        static_cast<unsigned>(objectId), ordinal,
+                        static_cast<unsigned>(objectId), sourceOrdinal,
                         LensFlareSequence, n, alpha,
                         static_cast<unsigned>(flags),
                         static_cast<int>(OutRunVR::GameSemantic::EffectiveScope()),
                         OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
                         sourceCallSerial, LensFlareSequence != 0 ? 1 : 0,
-                        ordinal > 2 ? 1 : 0);
+                        sourceOrdinal > 2 ? 1 : 0);
             }
         }
 
@@ -788,8 +805,30 @@ class VRLensFlareProjected2D : public Hook
 			OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
         OutRunVR::GameSemantic::ScopedLensOriginalCall inlineSource(
             {sourceCallSerial, LensFlareSequence,
-             static_cast<std::uint32_t>(objectId), 2});
+             static_cast<std::uint32_t>(objectId), 2,
+             static_cast<std::uint8_t>(sourceOrdinal)});
 		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
+
+        // Preserve only ordinal1's projected ownership across the known
+        // source-wrapper-to-4052C0 deferred interval. The next 570008 entry
+        // clears this receipt before its immediate physical draw. This makes
+        // the two intentional CABE siblings use one projection policy without
+        // changing their source call count, alpha, matrix, PMT or queue order.
+        if (Settings::VREnabled && objectId == 0x570008 &&
+            sourceOrdinal == 1 && sourceCallSerial != 0)
+        {
+            OutRunVR::GameSemantic::ArmLensDeferredPhysical(
+                {sourceCallSerial, LensFlareSequence,
+                 static_cast<std::uint32_t>(objectId), 1});
+            if (Settings::VRTelemetry)
+                spdlog::info(
+                    "VR LENS 570008 DEFERRED WINDOW ARM: sequence={} "
+                    "sourceCallSerial={} ordinal=1 scope={} "
+                    "provenance=SOURCE_ORDER_BOUNDED",
+                    LensFlareSequence, sourceCallSerial,
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::EffectiveScope()));
+        }
 	}
 
     // Original sun pass decomp (r4dius/outrun2-decomp,
@@ -821,6 +860,9 @@ class VRLensFlareProjected2D : public Hook
         if (Settings::VREnabled &&
             static_cast<unsigned>(objectId) == 0x570002u)
         {
+            // Fail closed against a stale deferred receipt if the previous
+            // source sequence exited abnormally before ordinal2.
+            OutRunVR::GameSemantic::ClearLensDeferredPhysical();
             if (++LensFlareSequence == 0)
                 ++LensFlareSequence;
             LensOuter570008Sequence = LensFlareSequence;
