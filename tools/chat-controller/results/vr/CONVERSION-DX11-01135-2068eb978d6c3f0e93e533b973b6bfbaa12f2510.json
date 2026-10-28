@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01135",
+  "production_id": "CONVERSION-DX11-01135",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01135",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_SURFACE_WRITE_RGB_EPOCH",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_SAME_TASK_CI_CAUSAL_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "85530a4ca23206603542200a61156becb9be8a54",
+  "source_change_sha": "5f93b270f2342091d1dd37417ee36ae759e0f6b7",
+  "material_result_sha": "5f93b270f2342091d1dd37417ee36ae759e0f6b7",
+  "implementation_commits": [
+    "5f93b270f2342091d1dd37417ee36ae759e0f6b7"
+  ],
+  "causal_ci_repair_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+    "tests/native_raw_gpu_source_epoch_test.cpp"
+  ],
+  "implementation_summary": "Authentic original D3D9 ColorFill, StretchRect and UpdateSurface color writes into the EXACT canonical game backbuffer now supersede a queued RAW D3D11 BEFORE/AFTER native GPU tile, not just D3D9 TARGET Clears. Source device, COM RT identity, format/extent, successful API and nonempty region are authenticated before invalidation; GPU EVENT lifetime, source rendering/gamepad/FFB, DX9Ex fallback and frozen DXVK remain intact. No runtime pixels inferred.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_COLORFILL_STRETCHRECT_UPDATESURFACE",
+      "CANONICAL_BACKBUFFER_GAME_OWNER",
+      "REVOKE_STALE_D3D11_BEFORE_AFTER_GPU_TILE",
+      "FENCED_REAL_NATIVE_DRAW_RECAPTURE",
+      "OPT_IN_PARTIAL_GPU_VISUAL"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_TILE_NOT_FULL_GAME"
+    ],
+    "batch_components": [
+      "CPP_LIVE_COLORFILL_SOURCE_INTEGRATION",
+      "CPP_SURFACE_COPY_AND_FALLBACK_MUTATION_INTEGRATION",
+      "CPP_GPU_EVENT_SAFE_STALE_CAPTURE_RETIREMENT",
+      "CPP17_POSITIVE_NEGATIVE_SOURCE_WRITE_REGRESSIONS"
+    ],
+    "visible_frame_acceptance": "Not a completed native game frame or observed on-screen pixel output. C++ source implementation for opt-in RAW partial tile; all runtime desktop/HMD output UNTESTED.",
+    "activation_guard_and_fallback": "RAW_VISUAL_DIAGNOSTIC opt in only, source-owned canonical D3D9 game BackBuffer, no invalidation on failed/empty/offscreen/foreign writes, event-fenced stage reuse. Never alter original D3D9 game Draw/Present/input/FFB, full native routing or DXVK.",
+    "acceptance_proof": {
+      "positive_probe": "tests/native_raw_gpu_source_epoch_test.cpp verifies canonical successful nonempty ColorFill/Copy writes supersede the native GPU RGB capture and permit real post-event Draw rearm.",
+      "negative_regression": "Failed API/empty/no-op write, foreign owner, offscreen destination or mismatched dimensions do not retire captured pixels; pending GPU EVENT prevents staging reuse.",
+      "component_integration": "Three actual D3D9 source-write integration paths in live_game_frame_bridge.cpp call native RAW preview epoch invalidation, preserving original game while native GPU Draw capture and separate Present proof remain fenced."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "development_time_percentages": "UNMEASURED"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Retire outdated real native D3D11 GPU pixel preview after authentic ColorFill and surface-copy writes without corrupting game fallback, GPU fence lifetime, or full-frame safety.",
+    "acceptance_items": [
+      {
+        "id": "real_game_surface_write_to_native_pixel_epoch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native Draw preview versus actual D3D9 backbuffer color source writes",
+        "expected_behavior": "Canonical successful game ColorFill/StretchRect/UpdateSurface makes preceding native GPU RGB invalid; a genuine later Draw may recapture."
+      },
+      {
+        "id": "event_fence_and_original_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Source COM ownership, GPU fence, D3D9 input and Draw safety",
+        "expected_behavior": "Nonmatching, failed and empty game writes leave RAW capture intact; asynchronous staging cannot be reused prematurely; game/FFB output stays authoritative."
+      },
+      {
+        "id": "source_regressions_and_final_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Portable C++17 source tests and full mandatory GitHub Actions",
+        "expected_behavior": "One final non-CI-skipped commit with integrated source and targeted tests is verified by the exact-SHA five mandatory Gates; runtime separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "score_change": 0,
+  "work_time_ratio": "NOT_MEASURED",
+  "mandatory_gate_results": [],
+  "runtime_evidence": {
+    "real_game_draw_output": "UNTESTED",
+    "visible_native_rgb_pixels": "UNTESTED",
+    "full_native_game_frame": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "causal_ci_note": "First material SHA 5f93b270 failed DX11 Fast & Backend solely at inherited malformed 01134 C6 task policy acceptance (missing contract fields). Same-task CI repair restores 01134 historical five-Gate record semantics and 01135 current pending contract, without claiming a new independent feature or score.",
+  "validation_bearing_result_sha": "2068eb978d6c3f0e93e533b973b6bfbaa12f2510",
+  "controller_terminal": true,
+  "controller_finalize_reason": "LEGACY_EXACT_SHA_GATE_SUCCESS"
+}
