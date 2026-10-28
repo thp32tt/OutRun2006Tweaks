@@ -30,6 +30,7 @@ required = {
         "resetEpoch={}",
         "resetQpc={}",
         "resetFlags=0x{:X}",
+        "resetSnapshotStable={}",
     ]),
     "lens ownership/GPU": (renderer, [
         "VR TRACE LENS C64 PROOF FULL:",
@@ -40,7 +41,10 @@ required = {
         "VR TRACE LENS DRAW CALL FULL:",
         "VR LENS R30 PHYSICAL EYES:",
         "preViewport={},{},{}x{}",
-        "resetViewportMatchesPre={}",
+        "resetSnapshotStable={}",
+        "resetViewportExtentMatchesPre={}",
+        "resetViewportRectMatchesPre={}",
+        "resetScissorMatchesPre={}",
     ]),
     "full D3D9 pipeline": (renderer, [
         "VR TRACE STEREO POSE FULL:",
@@ -73,6 +77,7 @@ required = {
         "VR TRACE GOAL_TIME SOURCE:",
         "VR P0 GOAL B9200 ENTRY:",
         "resetEpoch={}",
+        "resetSnapshotStable={}",
     ]),
     "time/goal physical eyes": (renderer, [
         "VR TRACE RESULT R62 ENTRY FULL:",
@@ -136,6 +141,9 @@ required = {
         "resetEpoch={}",
         "resetQpc={}",
         "resetFlags=0x{:X}",
+        "resetSnapshotStable={}",
+        "Writer.test_and_set(std::memory_order_acquire)",
+        "PublishedResetSerial.store(",
     ]),
     "R19/R24 final receipt": (host_r19 + host_r24, [
         "LastEndFrameReceiptSerial",
@@ -167,6 +175,31 @@ required = {
 for label, (body, needles) in required.items():
     for needle in needles:
         assert needle in body, f"{label}: missing {needle!r}"
+
+# Reset trace must publish one stable epoch and full raster rectangle proof.
+# A same-size viewport is not evidence of the same X/Y origin, and a bounded
+# read failure must remain distinguishable from "no Reset has happened".
+assert "resetViewportMatchesPre" not in renderer
+for token in (
+    "lensResetTrace.readStable",
+    "resetViewportExtentMatchesPre",
+    "resetViewportRectMatchesPre",
+    "resetScissorMatchesPre",
+    "lensResetTrace.viewportX == savedViewport.X",
+    "lensResetTrace.viewportY == savedViewport.Y",
+    "OutRunVR::D3D9ResetTrace::ResetSucceeded",
+    "OutRunVR::D3D9ResetTrace::ViewportValid",
+    "OutRunVR::D3D9ResetTrace::ScissorValid",
+):
+    assert token in renderer, token
+for token in (
+    "Writer.test_and_set(std::memory_order_acquire)",
+    "Writer.clear(std::memory_order_release)",
+    "NextSerial.fetch_add(1",
+    "PublishedResetSerial.store(",
+    "snapshot.readStable = true;",
+):
+    assert token in reset_trace, token
 
 # Critical correctness regression: cached projection must report the actually
 # submitted cached XrCompositionLayerProjectionView, never unconditional pv[].
