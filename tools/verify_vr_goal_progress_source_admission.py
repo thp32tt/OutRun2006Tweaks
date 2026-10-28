@@ -15,6 +15,8 @@ def body(a,b):
 inner=body("static void ResultProgressEnter(safetyhook::Context&)", "static void ResultProgressLeave(safetyhook::Context&)")
 leave=body("static void ResultProgressLeave(safetyhook::Context&)", "using ResultProgressFullParentFn")
 parent=body("static bool __cdecl ResultProgressFullParent()", "inline static SafetyHookMid StageExtensionEnterHooks")
+goal_time=body("static void GoalTime_TagHelper(int helperRva)", "static void __cdecl GoalTime_Help020()")
+b9200=body("static void __cdecl ResultTextB9200_dest(", "// REA-proven original graph parents")
 def goal_snapshot_guard(code: str) -> bool:
     """Old D3DX producers must finish BEFORE GOAL takes its queue boundary."""
     needles = [
@@ -76,6 +78,32 @@ tests=[
         "projHashRaw=0x{:016X}" in renderer and
         "tex0=0x{:X} tex={}x{}" in renderer and
         "rightRt=0x{:X}" in renderer),
+    ("GOAL time helper post-drain admission",
+        "const OutRunVR::GoalProgress::SourceAdmission admission{" in goal_time and
+        goal_time.index("FlushD3DXBeforeDirectGoalSource();") <
+        goal_time.index("const bool admittedAfterDrain = admission.mayPublish(") <
+        goal_time.index("SpriteNodeSemanticNextSerial.load(") <
+        goal_time.index("ScopedExactProducerSemantic owner(") <
+        goal_time.index("original(); // exact original helper once") and
+        "if (!admission.mayBeginDirect())" in goal_time and
+        "action=NATIVE_ORIGINAL_ONCE" in goal_time and
+        "VR TRACE GOAL_TIME SOURCE:" in goal_time),
+    ("GOAL time helper exit admission",
+        "admittedAtExit = admission.mayPublish(" in goal_time and
+        goal_time.index("admittedAtExit = admission.mayPublish(") <
+        goal_time.index("TagAppendedNodes(before") <
+        goal_time.index("FlushD3DXAtDirectGoalSourceExit();")),
+    ("B9200 post-drain exact parent admission",
+        "const OutRunVR::GoalProgress::SourceAdmission admission{" in b9200 and
+        b9200.index("FlushD3DXBeforeDirectGoalSource();") <
+        b9200.index("const bool admittedAfterDrain = admission.mayPublish(") <
+        b9200.index("ScopedExactProducerSemantic owner(") and
+        "VR TRACE GOAL TEXT ADMISSION:" in b9200 and
+        "action=NATIVE_ORIGINAL_ONCE" in b9200),
+    ("B9200 exit admission before exact flush",
+        "admittedAtExit = admission.mayPublish(" in b9200 and
+        b9200.index("admittedAtExit = admission.mayPublish(") <
+        b9200.index("FlushD3DXAtDirectGoalSourceExit();")),
     ("original installed E8s preserved",
         "Module::exe_ptr(ResultProgressCallA), ResultProgressEnter" in src and
         "Module::exe_ptr(ResultProgressCallB), ResultProgressEnter" in src and
@@ -84,4 +112,9 @@ tests=[
 for name,good in tests:
     if not good:
         raise SystemExit("FAIL: "+name)
-print("PASS: real GOAL inner/full E8 entry, native drain, queue epoch and exit admission")
+# Destructive controls: removing either post-drain/exit admission from the
+# direct time/text helpers must fail the source contract above.
+assert goal_time.count("admission.mayPublish(") >= 2
+assert b9200.count("admission.mayPublish(") >= 2
+assert "if (Settings::VREnabled)\n            goalDirectDrawOwner.emplace" not in goal_time
+print("PASS: real GOAL inner/full/time/B9200 entry, native drain, queue epoch and exit admission")
