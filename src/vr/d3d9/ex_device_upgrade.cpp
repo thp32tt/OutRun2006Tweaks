@@ -560,7 +560,7 @@ namespace OutRunVRD3D9ExUpgrade
                 "requested={}x{} effective={}x{} actual={}x{} "
                 "viewport={},{},{}x{} scissor={},{},{},{} "
                 "preserveXrPhysical={} classicReplay={} flags=0x{:X} "
-                "contract=XR_RESET_EPOCH_V3",
+                "publishOrder=COMPLETION_MONOTONIC contract=XR_RESET_EPOCH_V3",
                 trace.resetSerial, trace.qpc, static_cast<unsigned>(hr),
                 trace.requestedWidth, trace.requestedHeight,
                 trace.effectiveWidth, trace.effectiveHeight,
