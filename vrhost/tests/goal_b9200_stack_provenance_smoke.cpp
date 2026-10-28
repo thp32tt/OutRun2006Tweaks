@@ -52,7 +52,7 @@ int main()
     using namespace OutRunVR::GoalResult;
     if (!VerifyOriginalGoalGlyphQueue())
         return 7;
-    if (OriginalB9200CallReturns.size() != 19u ||
+    if (OriginalB9200CallReturns.size() != 21u ||
         !CheckParentReturnProvenance())
         return 1;
     constexpr std::array<std::uintptr_t, 4> images{{
@@ -77,7 +77,7 @@ int main()
         }
         for (const auto unrelated : {
                  0x0002C80Du, // shared glyph E8 not a B9200 parent
-                 0x000989B2u, // +TIME numeric helper
+                 0x000989B2u, // GOAL result-time helper, not B9200
                  0x000BEA5Fu, // separate final GOAL helper
                  0x00097C5Fu, // prior crash EIP inside detached midhook
                  0x00097E75u  // second crash EIP inside detached midhook
