@@ -38,4 +38,31 @@ int main() {
         100, 100, true, 500, 500, 256, 144, nullptr, 0));
     assert(native_raw_dual_source_write_overlaps(
         0xffffffffu, 0, true, 500, 500, 256, 144, noHit, 1));
+    // Distinct game-visible RAW regions: large desktop supports side by
+    // side; narrow menus may use vertical placement; tiny crop fails closed.
+    NativeRawPresentTile primary{}, secondary{};
+    assert(native_raw_partial_present_tile(800, 450, 0, 0, 800, 450,
+                                          256, 144, primary));
+    assert(native_raw_secondary_present_tile(primary, 0, 0, 800, 450,
+                                             secondary));
+    assert(secondary.destinationX + secondary.copyWidth + 8 ==
+           primary.destinationX);
+    assert(secondary.destinationY == primary.destinationY);
+    assert(native_raw_partial_present_tile(300, 440, 0, 0, 300, 440,
+                                          256, 144, primary));
+    assert(native_raw_secondary_present_tile(primary, 0, 0, 300, 440,
+                                             secondary));
+    assert(secondary.destinationX == primary.destinationX);
+    assert(secondary.destinationY ==
+           primary.destinationY + primary.copyHeight + 8);
+    assert(native_raw_partial_present_tile(300, 185, 0, 0, 300, 185,
+                                          256, 144, primary));
+    assert(!native_raw_secondary_present_tile(primary, 0, 0, 300, 185,
+                                              secondary));
+    assert(!native_raw_secondary_present_tile(
+        NativeRawPresentTile{}, 0, 0, 800, 450, secondary));
+    assert(!native_raw_secondary_present_tile(
+        NativeRawPresentTile{0, 0, 256, 144, -2, 8},
+        0, 0, 800, 450, secondary));
+
 }

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include "native_game_raw_draw_tile.hpp"
 #include "native_game_raw_gpu_capture_epoch.hpp"
+#include "native_game_raw_partial_present_tile.hpp"
 #include <limits>
 namespace outrun::vr::dx11 {
 struct NativeRawDualTile {
@@ -28,6 +29,39 @@ struct NativeRawDualTile {
         }
     }
     return true;
+}
+// Place the second TRUE native GPU Draw crop beside the first, or below it
+// for a narrow source Present. Never overlap the two real diagnostic images,
+// escape the caller-verified source crop, or enlarge to a fictitious frame.
+[[nodiscard]] constexpr bool native_raw_secondary_present_tile(
+    const NativeRawPresentTile& primary,
+    std::int64_t cropLeft, std::int64_t cropTop,
+    std::int64_t cropRight, std::int64_t cropBottom,
+    NativeRawPresentTile& secondary) noexcept {
+    secondary = {};
+    constexpr std::int64_t margin = 8, gap = 8;
+    if (cropLeft < 0 || cropTop < 0 || cropLeft >= cropRight ||
+        cropTop >= cropBottom || !primary.copyWidth || !primary.copyHeight ||
+        primary.destinationX < cropLeft + margin ||
+        primary.destinationY < cropTop + margin ||
+        primary.destinationX > cropRight - margin ||
+        primary.destinationY > cropBottom - margin ||
+        primary.copyWidth > cropRight - margin - primary.destinationX ||
+        primary.copyHeight > cropBottom - margin - primary.destinationY)
+        return false;
+    secondary = primary;
+    const auto w = static_cast<std::int64_t>(primary.copyWidth);
+    const auto h = static_cast<std::int64_t>(primary.copyHeight);
+    if (primary.destinationX - cropLeft >= margin + gap + w) {
+        secondary.destinationX = primary.destinationX - gap - w;
+        return true;
+    }
+    if (cropBottom - margin - primary.destinationY >= h + gap + h) {
+        secondary.destinationY = primary.destinationY + h + gap;
+        return true;
+    }
+    secondary = {};
+    return false;
 }
 // Preserve authentic source color-write invalidation for BOTH native
 // BEFORE/AFTER regions. Unknown rectangles and arithmetic overflow always

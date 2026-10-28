@@ -32,6 +32,7 @@ public:
     void reset() noexcept {
         staging_.Reset(); baseline_.Reset();
         stagingAlternate_.Reset(); baselineAlternate_.Reset();
+        surfaceAlternate_.Reset();
         event_.Reset(); surface_.Reset();
         drawPair_.reset(); region_ = {}; regionAlternate_ = {};
         alternateActive_ = false;
@@ -203,107 +204,120 @@ public:
                     ctx->Unmap(staging_.Get(), 0);
                     ctx->Unmap(baseline_.Get(), 0);
                 };
-                const std::uint8_t* selectedBefore =
-                    static_cast<const std::uint8_t*>(before.pData);
-                const std::uint8_t* selectedAfter =
-                    static_cast<const std::uint8_t*>(mapped.pData);
-                std::size_t selectedBeforePitch = before.RowPitch;
-                std::size_t selectedAfterPitch = mapped.RowPitch;
-                // The centered crop can contain one changed GPU pixel while
-                // the actual vehicle/menu Draw produced hundreds elsewhere.
-                // Choose the densest source-authentic GPU RGB subset, without
-                // scaling, inventing pixels, moving the D3D9 destination, or
-                // treating this incomplete RAW tile as a whole native frame.
+                // These are TWO independent, authentic GPU Draw regions. A
+                // genuine RGB contribution in the second region must not be
+                // lost simply because the first one was denser. Present both
+                // as explicitly INCOMPLETE, disjoint RAW-only diagnostics
+                // when the source crop accommodates them; otherwise choose
+                // the strongest single genuine RGB region as before.
+                const NativeRawPresentTile originalTile = visibleTile;
+                NativeRawPresentTile firstTile{}, secondTile{};
+                UINT firstPixels = 0u, secondPixels = 0u;
                 changedWindow_.capture(before.pData, before.RowPitch,
                                        mapped.pData, mapped.RowPitch);
-                NativeRawPresentTile bestVisibleTile{};
-                if (!changedWindow_.select(visibleTile, bestVisibleTile,
-                                           nativePixels)) {
+                if (!changedWindow_.select(originalTile, firstTile,
+                                           firstPixels)) {
                     unmapPairs();
                     return NativeRawPreviewResult::UnsafePresent;
                 }
-                visibleTile = bestVisibleTile;
                 if (alternateActive_) {
-                    NativeRawPresentTile secondTile{};
-                    UINT secondPixels = 0u;
                     changedWindow_.capture(beforeAlternate.pData,
                         beforeAlternate.RowPitch, afterAlternate.pData,
                         afterAlternate.RowPitch);
-                    if (!changedWindow_.select(visibleTile, secondTile,
+                    if (!changedWindow_.select(originalTile, secondTile,
                                                secondPixels)) {
                         unmapPairs();
                         quarantined_ = true;
                         return NativeRawPreviewResult::GpuFailure;
                     }
-                    if (native_raw_choose_second_tile(
-                            nativePixels, secondPixels, true)) {
-                        nativePixels = secondPixels;
-                        visibleTile = secondTile;
-                        selectedBefore =
-                            static_cast<const std::uint8_t*>(beforeAlternate.pData);
-                        selectedAfter =
-                            static_cast<const std::uint8_t*>(afterAlternate.pData);
-                        selectedBeforePitch = beforeAlternate.RowPitch;
-                        selectedAfterPitch = afterAlternate.RowPitch;
-                    }
                 }
-                if (nativePixels) {
-                    if (!surface_ || format_ != back.Format) {
-                        surface_.Reset();
-                        format_ = D3DFMT_UNKNOWN;
-                        if (SUCCEEDED(game->CreateOffscreenPlainSurface(
-                                width, height, back.Format, D3DPOOL_SYSTEMMEM,
-                                surface_.GetAddressOf(), nullptr)))
-                            format_ = back.Format;
-                    }
+                NativeRawPresentTile secondaryPlacement{};
+                const bool canShowBoth = alternateActive_ && firstPixels &&
+                    secondPixels && native_raw_secondary_present_tile(
+                        originalTile, l, t, r, b, secondaryPlacement);
+                if (format_ != back.Format) {
+                    surface_.Reset();
+                    surfaceAlternate_.Reset();
+                    format_ = back.Format;
+                }
+                // Each region owns a distinct SYSTEMMEM staging surface. The
+                // game driver may queue UpdateSurface, so never reuse or
+                // overwrite the first surface while painting the second.
+                const auto paint = [&](Microsoft::WRL::ComPtr<IDirect3DSurface9>& target,
+                        const D3D11_MAPPED_SUBRESOURCE& prior,
+                        const D3D11_MAPPED_SUBRESOURCE& after,
+                        const NativeRawPresentTile& tile) noexcept -> bool {
+                    if (!target && FAILED(game->CreateOffscreenPlainSurface(
+                            width, height, back.Format, D3DPOOL_SYSTEMMEM,
+                            target.GetAddressOf(), nullptr)))
+                        return false;
                     D3DLOCKED_RECT locked{};
-                    if (!surface_ || FAILED(surface_->LockRect(&locked, nullptr, 0))) {
-                        unmapPairs();
-                        return NativeRawPreviewResult::UploadFailure;
+                    if (FAILED(target->LockRect(&locked, nullptr, 0)))
+                        return false;
+                    if (!locked.pBits || locked.Pitch < static_cast<INT>(width * 4u)) {
+                        target->UnlockRect();
+                        return false;
                     }
+                    const auto* prev = static_cast<const std::uint8_t*>(prior.pData);
+                    const auto* next = static_cast<const std::uint8_t*>(after.pData);
+                    auto* dstBase = static_cast<std::uint8_t*>(locked.pBits);
                     for (UINT y = 0; y < height; ++y) {
-                        const auto* src = selectedAfter +
-                            static_cast<std::size_t>(y) * selectedAfterPitch;
-                        auto* dst = static_cast<std::uint8_t*>(locked.pBits) +
-                            static_cast<std::size_t>(y) * locked.Pitch;
+                        const auto* p = prev + std::size_t{y} * prior.RowPitch;
+                        const auto* src = next + std::size_t{y} * after.RowPitch;
+                        auto* dst = dstBase + std::size_t{y} *
+                            static_cast<std::size_t>(locked.Pitch);
                         std::memcpy(dst, src, width * 4u);
-                        // Preserve source-authentic changed GPU RGB,
-                        // including a fragment on the marker border. Paint
-                        // INCOMPLETE magenta only over unchanged background.
-                        const auto* beforeRow =
-                            selectedBefore +
-                            static_cast<std::size_t>(y) * selectedBeforePitch;
+                        // A magenta RAW border may never hide a real RGB
+                        // pixel at that border in either GPU source region.
                         for (UINT x = 0; x < width; ++x) {
                             if (native_raw_present_border_pixel(
-                                    visibleTile, x, y,
-                                    native_raw_rgb_changed(beforeRow + 4u * x,
+                                    tile, x, y,
+                                    native_raw_rgb_changed(p + 4u * x,
                                                            src + 4u * x))) {
-                                dst[x*4u] = 255; dst[x*4u+1u] = 0;
-                                dst[x*4u+2u] = 255;
+                                dst[x * 4u] = 255u;
+                                dst[x * 4u + 1u] = 0u;
+                                dst[x * 4u + 2u] = 255u;
                             }
                             if (back.Format == D3DFMT_X8R8G8B8)
-                                dst[x*4u+3u] = 255;
+                                dst[x * 4u + 3u] = 255u;
                         }
                     }
-                    const HRESULT unlocked = surface_->UnlockRect();
-                    unmapPairs();
-                    const RECT sourceTile{
-                        static_cast<LONG>(visibleTile.sourceX),
-                        static_cast<LONG>(visibleTile.sourceY),
-                        static_cast<LONG>(visibleTile.sourceX + visibleTile.copyWidth),
-                        static_cast<LONG>(visibleTile.sourceY + visibleTile.copyHeight)};
-                    const POINT destination{
-                        static_cast<LONG>(visibleTile.destinationX),
-                        static_cast<LONG>(visibleTile.destinationY)};
-                    if (SUCCEEDED(unlocked) &&
-                        SUCCEEDED(game->UpdateSurface(
-                            surface_.Get(), &sourceTile, backbuffer, &destination)))
-                        output = NativeRawPreviewResult::VisibleGpuPixels;
-                    else output = NativeRawPreviewResult::UploadFailure;
-                } else {
-                    unmapPairs();
-                    output = NativeRawPreviewResult::NoChangedPixels;
+                    const HRESULT unlockHr = target->UnlockRect();
+                    if (FAILED(unlockHr)) return false;
+                    const RECT srcRect{
+                        static_cast<LONG>(tile.sourceX),
+                        static_cast<LONG>(tile.sourceY),
+                        static_cast<LONG>(tile.sourceX + tile.copyWidth),
+                        static_cast<LONG>(tile.sourceY + tile.copyHeight)};
+                    const POINT dstPoint{
+                        static_cast<LONG>(tile.destinationX),
+                        static_cast<LONG>(tile.destinationY)};
+                    return SUCCEEDED(game->UpdateSurface(
+                        target.Get(), &srcRect, backbuffer, &dstPoint));
+                };
+                if (canShowBoth) {
+                    secondTile.destinationX = secondaryPlacement.destinationX;
+                    secondTile.destinationY = secondaryPlacement.destinationY;
+                    if (paint(surface_, before, mapped, firstTile))
+                        nativePixels += firstPixels;
+                    if (paint(surfaceAlternate_, beforeAlternate,
+                              afterAlternate, secondTile))
+                        nativePixels += secondPixels;
+                } else if (alternateActive_ &&
+                           native_raw_choose_second_tile(
+                               firstPixels, secondPixels, true)) {
+                    if (paint(surface_, beforeAlternate, afterAlternate, secondTile))
+                        nativePixels = secondPixels;
+                } else if (firstPixels) {
+                    if (paint(surface_, before, mapped, firstTile))
+                        nativePixels = firstPixels;
                 }
+                unmapPairs();
+                output = nativePixels
+                    ? NativeRawPreviewResult::VisibleGpuPixels
+                    : (firstPixels || secondPixels)
+                        ? NativeRawPreviewResult::UploadFailure
+                        : NativeRawPreviewResult::NoChangedPixels;
             } else if (done == NativeRawGpuWaitResult::Pending) {
                 return NativeRawPreviewResult::GpuPending;
             } else {
@@ -611,7 +625,7 @@ private:
     bool alternateActive_ = false;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
-    Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_;
+    Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_;
     IDirect3DDevice9* gameOwner_ = nullptr;
     ID3D11Device* gpuOwner_ = nullptr;
     D3DFORMAT format_ = D3DFMT_UNKNOWN;

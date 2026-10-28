@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01139",
+  "production_id": "CONVERSION-DX11-01139",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01139",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:DUAL_GPU_REGION_VISIBLE_PRESENT",
+  "classification": "A_REAL_NATIVE_GAME_GPU_DUAL_REGION_VISUAL_PRESENT",
+  "status": "SOURCE_IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "source_base_sha": "d896b7a124ef8a9efc94547eb2e93fa35cb7fcee",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Complete the RAW-only source authentic D3D11 game Draw diagnostic output of both independently captured GPU RGB regions into two disjoint visible D3D9 debug tiles (single stronger tile fallback on tight crops), preserving full native frame rejection.",
+    "acceptance_items": [
+      {
+        "id": "dual_game_gpu_visible_tiles",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native game Draw GPU RGB to D3D9 RAW visual presentation",
+        "expected_behavior": "Two genuinely changed native Draw RGB regions from one source frame display as two separate, explicitly partial RAW GPU tiles in a fitting source crop."
+      },
+      {
+        "id": "narrow_crop_and_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "cropped menu Present and original D3D9 fallback",
+        "expected_behavior": "Second RAW tile appears below when the source crop is narrow, or the denser single region is selected when two do not fit; no overwrites outside the authenticated D3D9 source crop."
+      },
+      {
+        "id": "distinct_gpu_staging_and_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "D3D9 readback lifetime and automation",
+        "expected_behavior": "Separate system memory surfaces prevent copying/repainting one RAW GPU tile over another; targeted C++ positive/negative layouts and five unmodified exact-SHA CI checks."
+      }
+    ]
+  },
+  "validation_bearing_result_sha": null,
+  "material_result_sha": null,
+  "desktop_native_game": "UNTESTED",
+  "quest3_vdxr": "UNTESTED",
+  "development_time_percentages": "UNMEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "INTERCEPTED_D3D9_SOURCE_GAME_DRAW",
+      "D3D11_NATIVE_GPU_PRE_POST_DUAL_REGION_COPY",
+      "DISJOINT_D3D9_RAW_GPU_TILES_OR_SINGLE_FALLBACK",
+      "ORIGINAL_GAME_PRESENT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "DUAL_REAL_NATIVE_GPU_RGB_REGION_VISIBLE_PRESENT",
+      "CROP_FITTING_HORZ_VERTICAL_PLACEMENT",
+      "DISTINCT_D3D9_SYSTEMMEM_COPY_LIFETIMES",
+      "POSITIVE_NEGATIVE_CXX17_LAYOUT_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two different BEFORE/AFTER GPU RGB tiles from one actual source Draw paint individually labeled INCOMPLETE tiles when both contain RGB deltas and the source crop fits.",
+      "negative_regression": "Narrow source Present falls back to a single strongest genuine GPU tile; abort/reset/stale maps, nonmatching source, no RGB, device loss, original source clears and safety checks remain fail closed.",
+      "component_integration": "live_game_frame_bridge Draw -> native double GPU copies -> Present independent changed-window selection -> disjoint original D3D9 UpdateSurface or guarded single-tile mode."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Only two source authentic native GPU RGB diagnostic tiles are credited, never the full native game frame or Quest3 L/R.",
+    "activation_guard_and_fallback": "RAW explicit opt-in; original D3D9 Draw/FFB/input and DX9Ex fallback remain, DXVK frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01139.json"
+  ],
+  "real_game_draw_blocker": "New dual-tile RAW output needs matching game runtime counts; earlier zero Draw baseline and later 01138 exact-SHA CI are not proof of current binary display."
+}
