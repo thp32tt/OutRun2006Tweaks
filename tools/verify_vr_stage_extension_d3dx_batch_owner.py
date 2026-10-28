@@ -64,8 +64,9 @@ def check(code: str, header: str) -> list[str]:
          "Module::exe_ptr(LiveStageExtensionLeaveRva)" in source and
          "LiveStageExtensionEnter" in source and
          "LiveStageExtensionLeave" in source and
-         "VR TRACE PLUS_TIME LIVE NAVI ENTRY:" in source,
-         "canonical live Navi +TIME BD217/BD221 boundary missing")
+         "VR TRACE PLUS_TIME LIVE NAVI ENTRY:" in source and
+         '"LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY"' in source,
+         "canonical live Navi +TIME BD217/BD221 boundary or source-family telemetry missing")
     stage_enter = source[source.find("static void StageExtensionEnter("):
                          source.find("static void StageExtensionLeave(")]
     need("FlushD3DXBeforeDirectStageSource();" in stage_enter and

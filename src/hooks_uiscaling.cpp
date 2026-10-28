@@ -1876,6 +1876,7 @@ class UIScaling : public Hook
                     "vr={} queueActive={} mayBegin={} admittedAfterDrain={} "
                     "entrySerial={} entryEpoch={} liveEpoch={} "
                     "snapshotPriorities={} scope={} producer={}",
+                    StageExtensionLiveNaviSource ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY",
                     n,
                     Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                     Game::game_mode ? *Game::game_mode : -1,
@@ -2230,7 +2231,7 @@ class UIScaling : public Hook
                 1, std::memory_order_relaxed) + 1;
             if (n <= 64 || (n & (n - 1)) == 0)
                 spdlog::info(
-                    "VR TRACE PLUS_TIME SOURCE ENTRY: sample={} state={} mode={} "
+                    "VR TRACE PLUS_TIME SOURCE ENTRY: family={} sample={} state={} mode={} "
                     "vr={} queueActive={} mayBegin={} admittedAfterDrain={} "
                     "ticket={} entrySerial={} entryEpoch={} liveEpoch={} "
                     "snapshotPriorities={} scope={} producer={}",
@@ -2326,11 +2327,12 @@ class UIScaling : public Hook
         const auto resetTrace = OutRunVR::D3D9ResetTrace::Read();
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
             spdlog::info(
-                "VR TRACE PLUS_TIME SOURCE EXIT: calls={} gameState={} mode={} "
+                "VR TRACE PLUS_TIME SOURCE EXIT: family={} calls={} gameState={} mode={} "
                 "exactScope={} admitted={} reason={} ticket={} entrySerial={} "
                 "entryEpoch={} currentEpoch={} changedPriorities={} "
                 "queueActive={} scopeAtExit={} producerAtExit={} "
                 "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={}",
+                StageExtensionLiveNaviSource ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY",
                 hit,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1,
@@ -2382,7 +2384,9 @@ class UIScaling : public Hook
         StageExtensionLiveNaviSource = true;
         if (Settings::VRTelemetry)
             spdlog::info(
-                "VR TRACE PLUS_TIME LIVE NAVI ENTRY: callRva=0xBD217 target=0xB9320 leaveRva=0xBD221");
+                "VR TRACE PLUS_TIME LIVE NAVI ENTRY: callRva=0xBD217 target=0xB9320 leaveRva=0xBD221 gameState={} mode={}",
+                Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                Game::game_mode ? *Game::game_mode : -1);
         StageExtensionEnter(ctx);
     }
 
@@ -2396,7 +2400,7 @@ class UIScaling : public Hook
     }
 
     // The original GOAL animations print the large white record and
-    // intermediate stage text through *19* EXE 0x97xxx E8 calls into
+    // intermediate stage text through *21* exact EXE E8 calls into
     // sub_4B9200, not just the two 0x2D200 progress percentage calls.
     // No shared-function detour: bracket ONLY the exact original E8
     // parents, so a completed GOAL or another screen cannot inherit tags.
@@ -2427,7 +2431,7 @@ class UIScaling : public Hook
             ResultTextRootsBefore[p] = root;
             ResultTextBefore[p] = root ? root->tail_4 : nullptr;
         }
-        // Exact 19 B9200 parent calls also need source-time ownership for
+        // Exact 21 B9200 parent calls also need source-time ownership for
         // immediate graphics, independent of later queued-node provenance.
         ResultTextSavedScope = OutRunVR::GameSemantic::CurrentScope;
         if (Settings::VREnabled)
@@ -3270,10 +3274,25 @@ class UIScaling : public Hook
 		if constexpr (std::is_integral_v<T>)
 			spacing = std::round(spacing);
 
+		const float before = float(*value);
 		if(left)
-			*value = T(float(*value) - spacing);
+			*value = T(before - spacing);
 		else
-			*value = T(float(*value) + spacing);
+			*value = T(before + spacing);
+
+        if (Settings::VREnabled && Settings::VRHud1080pReference &&
+            Settings::VRTelemetry)
+        {
+            static std::uint64_t hud1080SpacingTrace = 0;
+            const auto hit = ++hud1080SpacingTrace;
+            if (hit <= 16 || (hit & (hit - 1u)) == 0)
+                spdlog::info(
+                    "VR TRACE HUD1080 SPACING: hit={} side={} before={:.9g} after={:.9g} logicalSpacing={:.9g} screenScale={:.9g},{:.9g} screenRes={:.9g},{:.9g} mode={}",
+                    hit, left ? "LEFT" : "RIGHT", before, float(*value),
+                    spacing, Game::screen_scale->x, Game::screen_scale->y,
+                    Game::screen_resolution->x, Game::screen_resolution->y,
+                    static_cast<int>(mode));
+        }
 	}
 
 	static void put_scroll_AdjustPositionRight(safetyhook::Context& ctx)
