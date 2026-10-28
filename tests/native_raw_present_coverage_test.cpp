@@ -293,3 +293,43 @@ constexpr bool kRawDisjointRepaintPairProof = []() constexpr {
 }();
 static_assert(kRawDisjointRepaintPairProof,
     "RAW paired GPU pixels need two genuine nonoverlapping dirty islands");
+
+// Three narrow pieces form a real 48x48 repaint, but an attached thin tail
+// makes the connected component's top-right candidate unpainted.
+constexpr bool kRawTailedRepaintProof = []() constexpr {
+    using namespace outrun::vr::dx11;
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true;
+    dirty.count = 4u;
+    dirty.boundLeft = 600; dirty.boundTop = 300;
+    dirty.boundRight = 900; dirty.boundBottom = 348;
+    dirty.rectangles[0] = {600, 300, 616, 348};
+    dirty.rectangles[1] = {616, 300, 632, 348};
+    dirty.rectangles[2] = {632, 300, 648, 348};
+    dirty.rectangles[3] = {648, 300, 900, 308};
+    NativeRawPresentTile tile{};
+    const auto place = [&]() constexpr {
+        return native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080, dirty, 256, 144, tile);
+    };
+    if (!place() || tile.copyWidth != 32u || tile.copyHeight != 32u ||
+        tile.destinationX != 608 || tile.destinationY != 308 ||
+        !native_raw_dirty_region_covers_tile(1920, 1080, dirty, tile))
+        return false;
+    // The source crop may clip the tail without changing the painted island.
+    if (!native_raw_dirty_region_place_tile(
+            1920, 1080, 590, 290, 850, 360, dirty, 256, 144, tile))
+        return false;
+    dirty.rectangles[1].left = 617; // authentic one-pixel hole
+    if (place()) return false;
+    dirty.rectangles[1].left = 616;
+    dirty.boundRight = 901; // no fabricated rcBound
+    if (place()) return false;
+    dirty.boundRight = 900;
+    dirty.rectangles[3].right = 2000; // invalid tail invalidates ALL output
+    if (place()) return false;
+    return true;
+}();
+static_assert(kRawTailedRepaintProof,
+    "connected thin tails must not hide authentic native GPU repaint islands");
+

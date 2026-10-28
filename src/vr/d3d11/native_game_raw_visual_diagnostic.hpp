@@ -284,6 +284,14 @@ public:
                 const bool firstVisible = firstPixels && covered(firstTile);
                 const bool secondVisible = alternateActive_ && secondPixels &&
                     covered(secondTile);
+                // An authenticated completed Draw may modify only depth or
+                // alpha. Retire the mapped pair without touching the original
+                // D3D9 surface; this is not an unsafe dirty Present or an
+                // upload failure, and must not hide the actual missing stage.
+                if (!firstPixels && !secondPixels) {
+                    unmapPairs();
+                    return NativeRawPreviewResult::NoChangedPixels;
+                }
                 if (!firstVisible && !secondVisible) {
                     unmapPairs();
                     return NativeRawPreviewResult::UnsafePresent;
@@ -692,3 +700,4 @@ private:
     NativeRawChangedPixelWindow changedWindow_{};
 };
 } // namespace outrun::vr::dx11
+

@@ -227,6 +227,65 @@ struct NativeRawPresentDirtyRegion {
                   (std::min)(cropRight, componentRight),
                   (std::min)(cropBottom, componentBottom));
      }
+     if (found) return true;
+     // A connected component can be nonrectangular: e.g. three thin menu
+     // strips make a real 48x48 island with an 8px-high attached tail.
+     // Its full bounds place the RAW tile in the tail's unpainted neighbor,
+     // and no single member is wide enough. Sweep source-authored Y edges
+     // instead. Only members covering the ENTIRE band contribute X spans;
+     // merging touching spans produces genuine rectangular repaint areas.
+     // This is a fallback only, bounded by the original 32-member RGNDATA.
+     for (std::uint32_t topIndex = 0u; topIndex < dirty.count; ++topIndex) {
+         const auto top = (std::max)(cropTop, dirty.rectangles[topIndex].top);
+         bool duplicateTop = false;
+         for (std::uint32_t i = 0u; i < topIndex; ++i)
+             if ((std::max)(cropTop, dirty.rectangles[i].top) == top)
+                 duplicateTop = true;
+         if (duplicateTop) continue;
+         for (std::uint32_t bottomIndex = 0u;
+              bottomIndex < dirty.count; ++bottomIndex) {
+             const auto bottom = (std::min)(
+                 cropBottom, dirty.rectangles[bottomIndex].bottom);
+             // Retain the existing 24px image + two 8px label margins.
+             if (bottom - top < 40) continue;
+             bool duplicateBottom = false;
+             for (std::uint32_t i = 0u; i < bottomIndex; ++i)
+                 if ((std::min)(cropBottom, dirty.rectangles[i].bottom) == bottom)
+                     duplicateBottom = true;
+             if (duplicateBottom) continue;
+             NativeRawPresentDirtyRect spans[NativeRawPresentDirtyRegion::kMaxRects]{};
+             std::uint32_t count = 0u;
+             for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+                 const auto& rect = dirty.rectangles[i];
+                 if (rect.top > top || rect.bottom < bottom) continue;
+                 const auto left = (std::max)(cropLeft, rect.left);
+                 const auto right = (std::min)(cropRight, rect.right);
+                 if (left >= right) continue;
+                 std::uint32_t slot = count++;
+                 while (slot && spans[slot - 1u].left > left) {
+                     spans[slot] = spans[slot - 1u];
+                     --slot;
+                 }
+                 spans[slot] = {left, top, right, bottom};
+             }
+             if (!count) continue;
+             auto left = spans[0].left, right = spans[0].right;
+             for (std::uint32_t i = 1u; i <= count; ++i) {
+                 if (i < count && spans[i].left <= right) {
+                     right = (std::max)(right, spans[i].right);
+                     continue;
+                 }
+                 // Still authenticate against the ORIGINAL region, including
+                 // all outliers and rcBound; sweep proposals grant no trust.
+                 consider(left, top, right, bottom);
+                 if (i < count) {
+                     left = spans[i].left;
+                     right = spans[i].right;
+                 }
+             }
+         }
+     }
      return found;
  }
 } // namespace outrun::vr::dx11
+

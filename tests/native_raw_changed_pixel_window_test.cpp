@@ -2,6 +2,7 @@
 // not just one center pixel while an entire vehicle/menu fragment is elsewhere.
 // This diagnostic remains source-crop bounded and cannot certify gameplay.
 #include "../src/vr/d3d11/native_game_raw_changed_pixel_window.hpp"
+#include "../src/vr/d3d11/native_game_raw_present_coverage.hpp"
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -53,4 +54,54 @@ int main() {
     bad.sourceX = W;
     assert(!chooser.select(bad, selected, changed));
     assert(changed == 0u && selected.copyWidth == 0u);
+    // End-to-end portable pixel behavior: a fragmented dirty union with a
+    // narrow attached tail must carry the REAL off-center GPU RGB window.
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true;
+    dirty.count = 4u;
+    dirty.boundLeft = 600; dirty.boundTop = 300;
+    dirty.boundRight = 900; dirty.boundBottom = 348;
+    dirty.rectangles[0] = {600, 300, 616, 348};
+    dirty.rectangles[1] = {616, 300, 632, 348};
+    dirty.rectangles[2] = {632, 300, 648, 348};
+    dirty.rectangles[3] = {648, 300, 900, 308};
+    assert(native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, dirty, W, H, original));
+    after.fill(0u);
+    for (std::uint32_t y = 100u; y < 108u; ++y)
+        for (std::uint32_t x = 200u; x < 208u; ++x)
+            after[(y * W + x) * 4u + 1u] = 210u;
+    chooser.capture(before.data(), W*4u, after.data(), W*4u);
+    assert(chooser.select(original, selected, changed));
+    assert(changed == 64u);
+    assert(selected.copyWidth == 32u && selected.copyHeight == 32u);
+    assert(native_raw_dirty_region_covers_tile(1920, 1080, dirty, selected));
+    // Simulate the exact unscaled source window and RAW border operation.
+    // All 64 genuine GPU pixels survive at real painted destinations.
+    std::uint32_t displayedRgb = 0u;
+    for (std::uint32_t y = 0; y < selected.copyHeight; ++y)
+        for (std::uint32_t x = 0; x < selected.copyWidth; ++x) {
+            const auto sx = selected.sourceX + x, sy = selected.sourceY + y;
+            const auto offset = (sy * W + sx) * 4u;
+            const bool genuine = native_raw_rgb_changed(
+                before.data() + offset, after.data() + offset);
+            if (genuine) {
+                assert(!native_raw_present_border_pixel(selected, sx, sy, true));
+                ++displayedRgb;
+            }
+            assert(selected.destinationX + x >= 600 &&
+                   selected.destinationX + x < 648);
+            assert(selected.destinationY + y >= 300 &&
+                   selected.destinationY + y < 348);
+        }
+    assert(displayedRgb == changed);
+    // Alpha-only output never becomes visible RGB evidence after placement.
+    after.fill(0u);
+    after[(100u * W + 200u) * 4u + 3u] = 255u;
+    chooser.capture(before.data(), W*4u, after.data(), W*4u);
+    assert(chooser.select(original, selected, changed) && changed == 0u);
+    dirty.rectangles[1].left = 617;
+    assert(!native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, dirty, W, H, original));
 }
+
