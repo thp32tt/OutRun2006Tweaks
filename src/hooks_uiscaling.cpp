@@ -481,11 +481,12 @@ class UIScaling : public Hook
                 spdlog::info(
                     "VR TRACE GOAL TEXT ADMISSION: callerRva=0x{:X} "
                     "admittedAfterDrain=0 entryEpoch={} liveEpoch={} queueActive={} "
-                    "resetEpoch={} resetFlags=0x{:X} action=NATIVE_ORIGINAL_ONCE",
+                    "resetEpoch={} resetFlags=0x{:X} resetSnapshotStable={} action=NATIVE_ORIGINAL_ONCE",
                     caller - base, admission.queueEpochAtEntry,
                     OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
                     OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
-                    resetTrace.resetSerial, resetTrace.flags);
+                    resetTrace.resetSerial, resetTrace.flags,
+                    resetTrace.readStable ? 1 : 0);
             ResultTextB9200InlineHook.call<void>(text, x, y, step);
             return;
         }
@@ -515,14 +516,15 @@ class UIScaling : public Hook
                     "VR P0 GOAL B9200 ENTRY: exactParent=1 calls={} "
                     "callerRva=0x{:X} scope={} admittedAfterDrain=1 "
                     "admittedAtExit={} entryEpoch={} exitEpoch={} "
-                    "resetEpoch={} resetQpc={} resetFlags=0x{:X} "
+                    "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={} "
                     "contract=GOAL_DRAIN_REVALIDATE_V1",
                     n, caller - base,
                     admittedAtExit ? "SCREEN_HUD" : "NATIVE_FALLBACK",
                     admittedAtExit ? 1 : 0,
                     admission.queueEpochAtEntry,
                     OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
-                    resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
+                    resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
+                    resetTrace.readStable ? 1 : 0);
         }
     }
 
@@ -2300,7 +2302,7 @@ class UIScaling : public Hook
                 "exactScope={} admitted={} reason={} ticket={} entrySerial={} "
                 "entryEpoch={} currentEpoch={} changedPriorities={} "
                 "queueActive={} scopeAtExit={} producerAtExit={} "
-                "resetEpoch={} resetQpc={} resetFlags=0x{:X}",
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={}",
                 hit,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1,
@@ -2318,7 +2320,8 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
                 OutRunVR::GameSemantic::Name(stageScopeAtExit),
                 OutRunVR::GameSemantic::Name(stageProducerAtExit),
-                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
+                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
+                resetTrace.readStable ? 1 : 0);
         if (Settings::VRTelemetry)
         {
             for (int p = 0; p < Game::SpritePriorityCount; ++p)
@@ -2453,13 +2456,14 @@ class UIScaling : public Hook
                 spdlog::info(
                     "VR TRACE GOAL_TIME SOURCE: helperRva=0x{:X} producer={} "
                     "admittedAfterDrain=0 entryEpoch={} liveEpoch={} queueActive={} "
-                    "resetEpoch={} resetFlags=0x{:X} action=NATIVE_ORIGINAL_ONCE",
+                    "resetEpoch={} resetFlags=0x{:X} resetSnapshotStable={} action=NATIVE_ORIGINAL_ONCE",
                     helperRva,
                     OutRunVR::GameSemantic::Name(producer),
                     admission.queueEpochAtEntry,
                     OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
                     OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
-                    resetTrace.resetSerial, resetTrace.flags);
+                    resetTrace.resetSerial, resetTrace.flags,
+                    resetTrace.readStable ? 1 : 0);
             original();
             return;
         }
@@ -2504,7 +2508,7 @@ class UIScaling : public Hook
                 "VR TRACE GOAL_TIME SOURCE: helperRva=0x{:X} producer={} "
                 "admittedAfterDrain=1 admittedAtExit={} entrySerial={} "
                 "entryEpoch={} exitEpoch={} queueActive={} "
-                "resetEpoch={} resetQpc={} resetFlags=0x{:X} "
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X} resetSnapshotStable={} "
                 "contract=GOAL_DRAIN_REVALIDATE_V1 verifier=FALLBACK_SPLIT",
                 helperRva,
                 OutRunVR::GameSemantic::Name(producer),
@@ -2512,7 +2516,8 @@ class UIScaling : public Hook
                 admission.queueEpochAtEntry,
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
                 OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
-                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
+                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
+                resetTrace.readStable ? 1 : 0);
 	}
 	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
 	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
