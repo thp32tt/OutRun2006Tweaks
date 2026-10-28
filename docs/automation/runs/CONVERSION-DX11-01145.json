@@ -8,15 +8,15 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:AUTHENTIC_NONRECTANGULAR_REPAINT",
   "classification": "A_SOURCE_VISIBLE_RAW_REPAINT_REPAIR",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "source_base_sha": "c258a194dfbae3e917501855ce2beb6050b9e99b",
-  "source_implementation_commit_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "source_implementation_commit_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+  "material_result_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+  "validation_bearing_result_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
   "development_time_percentages": "UNMEASURED",
   "development_strategy": {
     "work_class": "integration",
@@ -39,7 +39,7 @@
       "GENUINE_GPU_DELTA_CROP_TO_AUTHENTIC_DESTINATION_INTEGRATION_REGRESSION"
     ],
     "acceptance_proof": {
-      "positive_probe": "C++17 failing-before/passing-after 3x16x48 strips plus attached 252x8 tail; pixel integration preserves 64 actual off-center GPU RGB changes at authenticated 32x32 repaint destination.",
+      "positive_probe": "C++17 failing-before/passing-after 3x16x48 strips plus attached 252x8 tail; portable synthetic mapped-buffer fixture preserves 64 off-center RGB changes at an authenticated 32x32 repaint destination. Not GPU/runtime evidence.",
       "negative_regression": "One-pixel source gap, invalid tail, forged rcBound, unknown header, clip, no second island and alpha-only RGB absence remain rejected or zero evidence.",
       "component_integration": "Real source dirty union -> bounded rectangular-span proposal -> unchanged original union authentication -> GPU paired-delta crop -> source-bounded RAW Present; no full-frame publication."
     },
@@ -62,14 +62,80 @@
   "real_game_draw_blocker": "No source-matched runtime observation at new candidate; existing historical zero-native-Draw runtime remains pinned to b8dab362. This fixes source-reproducible RAW display loss only; native full-frame menu/car/race and stereo remain unfinished.",
   "evidence": {
     "local_tests": [
-      "C++17 coverage regression failed before at kRawTailedRepaintProof; passed after",
-      "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic coverage and changed-window tests PASS"
+      "C++17 coverage regression kRawTailedRepaintProof failed before implementation and passed after.",
+      "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic coverage and changed-window tests PASS.",
+      "64-pixel integration uses SYNTHETIC mapped-before/after buffers; no GPU, D3D9 upload or actual Present executed."
     ],
-    "required_push_workflows": [],
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40781185985,
+        "head_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40781185985"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40781185855,
+        "head_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40781185855"
+      },
+      {
+        "name": "Build",
+        "run_id": 40781186163,
+        "head_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40781186163"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40781185708,
+        "head_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40781185708"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40781186108,
+        "head_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40781186108"
+      }
+    ],
     "runtime_evidence": "UNTESTED: no matching game or Quest3/VDXR execution",
     "full_native_game_frame_complete": false,
     "claim_issue14_comment_id": 6482417657,
-    "duplicate_task_score_change": 0
+    "duplicate_task_score_change": 0,
+    "independent_review": {
+      "base_sha": "c258a194dfbae3e917501855ce2beb6050b9e99b",
+      "head_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+      "result": "NO_ACTIONABLE_FINDINGS_SOURCE_ONLY",
+      "limits": "Connector exact-diff review; no independent compilation or GPU/runtime execution; alpha-only portable test does not execute Windows NoChangedPixels branch."
+    },
+    "related_issue14_comment_id": 6482524089,
+    "build_artifacts": [
+      {
+        "id": 12857891369,
+        "name": "feature-dx11-first-game-frame-c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "digest": "sha256:96ad5b4defec765203264496a9b32d7e96b72c224700a73126986dfc47b2fbeb"
+      },
+      {
+        "id": 12856899296,
+        "name": "wheel-source-c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "digest": "sha256:9c6573095213290b820a6e6ff1707ea3d42a5d194b81cfe9dd0648954ee46b52"
+      },
+      {
+        "id": 12856758059,
+        "name": "outrun2006tweaks-c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "digest": "sha256:b3c4bc1c1129ca310fa617030c55f4ea7073c95d6de91bb87b6717f9d7c05306"
+      },
+      {
+        "id": 12857003345,
+        "name": "backend-autovalidated-c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+        "digest": "sha256:73d95aa86aab0583517ae5904984b43d97866d77575787ba131f162fb517d393"
+      }
+    ]
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -96,25 +162,38 @@
     ]
   },
   "acceptance_results": {
-    "tailed_source_repaint_pixels": "PASS_LOCAL_CPP17",
-    "source_safety_and_zero_rgb": "PASS_LOCAL_CPP17",
-    "five_exact_sha_gates": "PENDING"
+    "tailed_source_repaint_pixels": "PASS_BUILD",
+    "source_safety_and_zero_rgb": "PASS_BUILD",
+    "five_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "pipeline": {
     "C0_RECOVER": "PASS: GitHub latest HEAD c258a194, previous 01144 terminal gate record, owner paths, policy and historical runtime evidence inspected.",
     "C1_REVIEW": "PASS: reproduced source placement failure for true 48x48 strip-union island with thin connected tail.",
     "C2_IMPLEMENT": "PASS: production bounded rectangular union discovery and zero-RGB Present outcome; source and pixel integration regression.",
-    "C3_VALIDATE": "LOCAL_CPP17_PASS; final five exact-SHA CI pending.",
-    "C4_COMMIT": "Source+test integrated candidate prepared for nonforce GitHub CAS with exact AUTO marker and no CI skip.",
-    "C5_PACKAGE": "NOT_REQUIRED: no new promotion; existing CI build artifacts will retain source identity. Real game test package remains diagnostic-only.",
-    "C6_STATE": "PENDING final gate; immutable result SHA will be persisted separately."
+    "C3_VALIDATE": "PASS: local C++17 failing-before/passing-after coverage + synthetic pixel placement tests; all five required push Gates success at exact material SHA.",
+    "C4_COMMIT": "PASS: substantive source+tests+pending task record committed c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3 with exact AUTO marker, no CI skip, nonforce CAS.",
+    "C5_PACKAGE": "BUILD_ARTIFACT_CREATED: source-matched diagnostic feature bundle, Windows game and backend validation artifact recorded; no runtime or distribution promotion.",
+    "C6_STATE": "PASS: final task evidence persisted separately after all five Gates; result SHA immutable; whole native renderer unfinished, runtime UNTESTED, score 0."
   },
   "c6": {
-    "reason": "SOURCE_IMPLEMENTED_PENDING_FINAL_EXACT_SHA",
-    "next_action": "Inspect five push Gates on resulting material SHA; fix actual failures same task. Preserve same unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME with runtime UNTESTED."
+    "reason": "FIVE_GATES_SUCCESS_AT_VALIDATION_SHA",
+    "action": "RECORD_VERIFIED_SOURCE_STAGE_AND_RELEASE_SCOPE",
+    "bookkeeping_commit_separate_from_validation": true,
+    "validation_sha_immutable": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+    "ci_rerun": false,
+    "source_changes": false,
+    "score_change": 0,
+    "owner_scope_released": true,
+    "next_action": "Continue SAME unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME. Controller selects next actual live Draw/output blocker; source-matched native_draws, native_gpu_pixel_output, publishedBackbufferFrames and GPU desktop evidence remain UNTESTED. No whole-frame/menu-car-race or Quest3 promotion."
   },
   "event_id": "CONVERSION-DX11-01145-E001",
   "event_type": "dispatch",
   "attempt": "1/3",
-  "full_dx11_renderer_complete": false
+  "full_dx11_renderer_complete": false,
+  "CODE_CHANGED_SHA": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "updated_utc": "2026-10-28T22:51:02.708Z",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue SAME unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME. Controller selects next actual live Draw/output blocker; source-matched native_draws, native_gpu_pixel_output, publishedBackbufferFrames and GPU desktop evidence remain UNTESTED. No whole-frame/menu-car-race or Quest3 promotion."
 }
