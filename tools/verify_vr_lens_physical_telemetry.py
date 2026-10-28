@@ -33,6 +33,8 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
         "vb0=0x{:X} offset={} stride={}",
         "colorWrite=0x{:X} alphaBlend={}",
         "rawWvpHash=0x{:016X}",
+        "leftRT=0x{:X} leftRTDesc={}x{}:{}",
+        "rightRT=0x{:X} rightRTDesc={}x{}:{} sameRT={}",
         "vsHr=0x{:08X} vsBound={} fvfHr=0x{:08X}",
         "fvf=0x{:08X}",
         "device->GetVertexShader(&liveVs)",
@@ -145,6 +147,7 @@ def main() -> None:
         (2, "ordinalMaySpanSunCalls={}", "ordinalIsFrameProof=1"),
         (2, "ArmLensDeferredPhysical(", "/* removed deferred bridge */"),
         (0, "rawWvpHash=0x{:016X}", "rawWvpHash=OMITTED"),
+        (0, "sameRT={}", "sameRT=ASSUMED_ZERO"),
         (3, "CurrentLensDeferredPhysical.ordinal == 1u",
             "CurrentLensDeferredPhysical.ordinal == 2u"),
     ]
