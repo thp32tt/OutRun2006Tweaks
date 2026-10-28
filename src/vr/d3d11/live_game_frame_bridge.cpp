@@ -10285,7 +10285,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.surfaceReplayBudget.reset(); // a new verified full Clear starts a new source epoch
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
-        s.rawSourceProbe.reset();
+            s.rawSourceProbe.restart_epoch();
     s.sourceModeKnown = false;
             s.eligibleThisFrame = 0u;
             // After a successful full TARGET|ZBUFFER game Clear, initialize
@@ -11348,8 +11348,10 @@ void before_game_present(IDirect3DDevice9* game,
         s.probeSlot = GameNativeFrameBatch::next_probe_slot(
             s.probeSlot, s.eligibleThisFrame);
         s.eligibleThisFrame = 0;
+        // Present is the only source-observed frame boundary for the next
+        // rotating RAW probe. Do this BEFORE retiring the source ordinal.
+        s.rawSourceProbe.finish_present(s.sourceDrawsThisFrame);
         s.sourceDrawsThisFrame = 0u;
-        s.rawSourceProbe.reset();
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
         s.surfaceReplayBudget.reset();
@@ -11433,6 +11435,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.cpuSurfaceReplay.reset();
     s.eligibleThisFrame = 0;
     s.sourceDrawsThisFrame = 0u;
+    s.rawSourceProbe.reset();
     s.sourceModeKnown = false;
     s.sourceGameDevice = 0u;
     s.probeSlot = 0;
