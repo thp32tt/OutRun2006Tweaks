@@ -111,26 +111,44 @@ def check_extra_producers(ui, contracts):
             fail('result-progress partial hook rollback missing ' + token)
 
     goal = function_body(ui, 'static void GoalTime_TagHelper(')
-    # The current GOAL owner binds both the immutable priority-root lease
-    # and semantic entry serial before calling either original title/time
-    # producer. Check the live post-call tag explicitly instead of matching
-    # the retired three-argument TagAppendedNodes invocation.
-    ordered(goal, 'GOAL sprite parent call, stable root and all-node scope',
-            'Game::SpritePriorityCount', 'const auto entrySerial =',
-            'rootsBefore[prio] = root;', 'Module::exe_ptr(helperRva)',
-            'original();', 'TagAppendedNodes(before,',
+    # A native pre-source D3DX Flush may synchronously reenter the SpriteNode
+    # queue. Bind the root/serial lease only AFTER that drain and after an
+    # unchanged GOAL/queue-epoch admission, then publish only if the same
+    # admission also survives the original helper.
+    ordered(goal, 'GOAL post-drain parent call, stable root and all-node scope',
+            'Module::exe_ptr(helperRva)',
+            'const OutRunVR::GoalProgress::SourceAdmission admission{',
+            'FlushD3DXBeforeDirectGoalSource();',
+            'const bool admittedAfterDrain = admission.mayPublish(',
+            'const auto entrySerial =',
+            'rootsBefore[prio] = root;',
+            'ScopedExactProducerSemantic owner(',
+            'original(); // exact original helper once',
+            'admittedAtExit = admission.mayPublish(',
+            'TagAppendedNodes(before,',
             'RenderScope::ScreenHud, producer,',
-            'nullptr, &rootsBefore, entrySerial);')
-    # There are two intentionally different original components on the GOAL
-    # screen (likely course/stage label and recorded time). Do not interpret
-    # adjacent E8 calls as the same white timer emitted twice; either
-    # suppressing one or executing either one twice corrupts original UI.
-    if goal.count('original();') != 1 or 'return;' in goal:
-        fail('each GOAL helper must execute its original once, without skipping')
+            'nullptr, &rootsBefore, entrySerial);',
+            'FlushD3DXAtDirectGoalSourceExit();')
+    # Three mutually exclusive paths each execute the original exactly once:
+    # not-direct, post-drain rejected, or fully admitted exact owner.
+    if goal.count('original();') != 3:
+        fail('GOAL helper must execute one original on each exclusive path')
+    if goal.count('return;') != 2:
+        fail('GOAL helper fallback paths must terminate after native original')
     if goal.count('TagAppendedNodes(before,') != 1:
-        fail('GOAL helper must preserve one sibling ownership publication')
-    if 'ScopedProducerSemantic' in goal and 'Current R84 queue authority' not in goal:
-        fail('retired goal producer scope API reintroduced')
+        fail('GOAL helper must preserve one admitted sibling publication')
+    for token in (
+        'if (!admission.mayBeginDirect())',
+        'if (!admittedAfterDrain)',
+        'action=NATIVE_ORIGINAL_ONCE',
+        'contract=GOAL_DRAIN_REVALIDATE_V1',
+    ):
+        if token not in goal:
+            fail('GOAL helper post-drain fail-closed contract lost: ' + token)
+    if 'goalDirectDrawOwner.emplace(' in goal:
+        fail('retired pre-drain GOAL owner reintroduced')
+    if 'ScopedProducerSemantic' in goal:
+        fail('retired broad goal producer scope API reintroduced')
     for suffix, helper in (('A', '020'), ('B', '150')):
         if len(re.findall(r'GoalTime_Help%s\(\)\s*\{\s*GoalTime_TagHelper\(0xBE%s\);\s*\}' % (helper, helper), ui)) != 1:
             fail('wrong GOAL original helper ABI or target ' + helper)
@@ -731,25 +749,25 @@ def test_mutations(ui, manifest):
               ui[:goal_start] + goal_region.replace(
                   'nullptr, &rootsBefore, entrySerial);',
                   'nullptr, nullptr, 0);', 1) + ui[goal_end:])
-    # The original GOAL helper now drains its tracked D3DX batch before
-    # restoring source ownership. Mutate the one original call within that
-    # live boundary, not a retired adjacent original()/reset() sequence.
-    goal_original = ('        original();\n'
-                     '        if (directGoal)\n'
-                     '            FlushD3DXAtDirectGoalSourceExit();')
+    # Mutate the admitted original call specifically. The two native
+    # fallback originals remain necessary and must not mask duplication or
+    # skipping inside the exact ScreenHud transaction.
+    goal_original = '            original(); // exact original helper once'
     if ui.count(goal_original) != 1:
-        fail('GOAL original-call mutation anchor missing or duplicated')
+        fail('GOAL admitted original-call mutation anchor missing or duplicated')
     must_fail('original course/time helper called twice',
               ui.replace(goal_original,
-                         '        original();\n'
-                         '        original();\n'
-                         '        if (directGoal)\n'
-                         '            FlushD3DXAtDirectGoalSourceExit();', 1))
+                         '            original();\n'
+                         '            original(); // exact original helper twice', 1))
     must_fail('original course/time helper skipped',
               ui.replace(goal_original,
-                         '        return;\n'
-                         '        if (directGoal)\n'
-                         '            FlushD3DXAtDirectGoalSourceExit();', 1))
+                         '            return; // skipped exact original helper', 1))
+    must_fail('GOAL post-drain admission bypassed',
+              ui.replace('        if (!admittedAfterDrain)\n',
+                         '        if (false)\n', 1))
+    must_fail('GOAL exit admission bypassed',
+              ui.replace('            if (admittedAtExit)\n',
+                         '            if (true)\n', 1))
     corrupt = copy.deepcopy(manifest)
     next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0x97BE4)['expectedBytes'] = 'e800000000' + '00'*11
     must_fail('original result E8 destination corrupted', changed_manifest=corrupt)
@@ -786,7 +804,7 @@ def test_mutations(ui, manifest):
     next(x for x in corrupt['contracts']
          if int(x['rva'], 16) == 0x992AC)['expectedBytes'] = 'e800000000'
     must_fail('second full-progress E8 target corrupted', changed_manifest=corrupt)
-    print('P0 GOAL/RESULT original producer mutations: 10/10 failures detected')
+    print('P0 GOAL/RESULT original producer mutations: 12/12 failures detected')
     print("P0 HUD mutation suite: 10/10 failures detected")
 
 
