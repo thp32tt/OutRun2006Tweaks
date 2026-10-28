@@ -12,12 +12,18 @@ public:
     // Never promote a sampled partial Draw into full-frame coverage.
     void finish_present(std::uint64_t sourceDraws) noexcept {
         previousSourceDraws_ = sourceDraws;
+        attempts_ = 0u;
         restart_epoch();
     }
-    // A whole TARGET Clear starts a new source epoch, not a new game Present.
-    void restart_epoch() noexcept { attempts_ = 0u; nextOrdinal_ = 0u; }
-    // Reset/owner loss discards stale per-game population history.
-    void reset() noexcept { restart_epoch(); previousSourceDraws_ = 0u; }
+    // A whole Clear resets draw ordinals but NOT the four-attempt budget:
+    // one actual D3D9 Present may contain multiple canonical TARGET Clears.
+    void restart_epoch() noexcept { nextOrdinal_ = 0u; }
+    // Reset/owner loss discards the last game's real Present budget.
+    void reset() noexcept {
+        attempts_ = 0u;
+        restart_epoch();
+        previousSourceDraws_ = 0u;
+    }
     [[nodiscard]] bool should_attempt(std::uint64_t sourceOrdinal,
                                       std::uint64_t presentSerial) const noexcept {
         if (attempts_ >= kMaxAttemptsPerFrame) return false;

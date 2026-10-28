@@ -1375,6 +1375,7 @@ struct State {
     std::uint64_t rawPreviewRecoveredLogged = 0u;
     std::uint64_t rawZeroRgbRetiredLogged = 0u;
     std::uint64_t rawFogVisualBypasses = 0u;
+    std::uint64_t rawClearCaptureInvalidations = 0u;
     NativeRawSourceProbeSchedule rawSourceProbe;
     std::uint64_t rawProbeRestarts = 0u;
     // Persistent native D3D11 upload buffers for a whole real game frame.
@@ -10298,6 +10299,20 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.surfaceReplayBudget.reset(); // a new verified full Clear starts a new source epoch
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
+            // A successful canonical TARGET Clear erases any earlier
+            // game-authored color in this same Present. Old D3D11 GPU tiles
+            // are now invalid, even when their native Draw was successful.
+            if (env_raw_visual_opt_in() &&
+                s.rawPreview.invalidate_full_source_clear()) {
+                const auto discards = ++s.rawClearCaptureInvalidations;
+                if (discards <= 3u || discards % 128u == 0u)
+                    spdlog::info(
+                        "DX11 RAW_VISUAL full_source_clear_invalidated_capture={} "
+                        "present_serial={} pre_clear_gpu_pixels_discarded=1",
+                        discards, s.presents);
+            }
+            // Preserve four bounded native attempts ACROSS source Clears;
+            // only the next real D3D9 Present renews this budget.
             s.rawSourceProbe.restart_epoch();
     s.sourceModeKnown = false;
             s.eligibleThisFrame = 0u;

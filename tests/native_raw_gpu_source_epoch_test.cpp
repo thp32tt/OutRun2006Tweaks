@@ -78,6 +78,30 @@ int main() {
     e.queued(81u); // new native game Draw, same D3D9 Present
     assert(e.consume_for_present(81u));
     assert(!e.can_queue(81u, false)); // one positive pair preserved
+    // A canonical backbuffer Clear supersedes even positive native RGB.
+    // Same-Present GPU storage cannot be reused until its event completes.
+    e.reset(); e.queued(85u);
+    assert(e.invalidate_for_full_source_clear(true));
+    assert(e.invalidated_for_full_source_clear());
+    assert(!e.consume_for_present(85u));
+    assert(!e.can_queue(85u, false));
+    assert(e.retire_invalidated_source_clear(true, [&] {
+        ++polls; return GPU::Pending;
+    }) == GPU::Pending);
+    assert(!e.can_queue(85u, false));
+    assert(e.retire_invalidated_source_clear(true, [&] {
+        ++polls; return GPU::Complete;
+    }) == GPU::Complete);
+    assert(!e.invalidated_for_full_source_clear());
+    assert(e.can_queue(85u, false)); // genuine post-Clear native game Draw
+    e.queued(85u);
+    assert(e.consume_for_present(85u));
+    assert(!e.invalidate_for_full_source_clear(false));
+    assert(e.can_queue(85u, false)); // no GPU copy is in flight
+    e.queued(85u);
+    assert(e.invalidate_for_full_source_clear(false));
+    assert(!e.consume_for_present(85u));
+    assert(e.can_queue(85u, false));
     e.reset(); // genuine Reset/new D3D9 or D3D11 owner
     assert(e.can_queue(0u, false));
     assert(!e.consume());

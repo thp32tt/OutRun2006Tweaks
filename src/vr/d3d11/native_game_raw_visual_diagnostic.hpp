@@ -45,6 +45,13 @@ public:
     [[nodiscard]] std::uint64_t zero_rgb_retired_copies() const noexcept {
         return zeroRgbRetiredCopies_;
     }
+    // A whole game backbuffer Clear supersedes earlier native RGB pixels,
+    // without freeing any GPU staging texture while its fence is in flight.
+    [[nodiscard]] bool invalidate_full_source_clear() noexcept {
+        drawPair_.reset();
+        rgbEvidenceConfirmed_ = false;
+        return captureEpoch_.invalidate_for_full_source_clear(pending_);
+    }
     NativeRawPreviewResult present(
         IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,
         const D3DSURFACE_DESC& back, const RECT* crop,
@@ -261,10 +268,31 @@ public:
             }
         }
         if (quarantined_) return;
+        // Reclaim a superseded SAME-Present staging pair only after event
+        // completion. Unknown/busy GPU results remain fail-closed.
+        if (pending_ && captureEpoch_.invalidated_for_full_source_clear()) {
+            const auto retired = captureEpoch_.retire_invalidated_source_clear(
+                pending_, [&]() noexcept {
+                    if (!event_) return NativeRawGpuWaitResult::Failed;
+                    const HRESULT hr = ctx->GetData(event_.Get(), nullptr, 0,
+                        D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                    return hr == S_OK ? NativeRawGpuWaitResult::Complete :
+                           hr == S_FALSE ? NativeRawGpuWaitResult::Pending :
+                                           NativeRawGpuWaitResult::Failed;
+                });
+            if (retired == NativeRawGpuWaitResult::Complete)
+                pending_ = false;
+            else if (retired == NativeRawGpuWaitResult::Failed) {
+                pending_ = false;
+                quarantined_ = true;
+            }
+        }
+        if (quarantined_) return;
         // The first authentic native Draw may modify depth/alpha only.
         // Once its EVENT completes, abandon an RGB-inert copy and admit a
         // later real game Draw in THIS Present. Keep any RGB-positive pair.
-        if (pending_ && !captureEpoch_.previous_present_copy(presentingSerial))
+        if (pending_ && !captureEpoch_.previous_present_copy(presentingSerial) &&
+            !captureEpoch_.invalidated_for_full_source_clear())
             retire_same_present_zero_rgb_capture(ctx, presentingSerial);
         if (quarantined_) return;
         // One source-owned pair per frame; a GPU event still in flight blocks

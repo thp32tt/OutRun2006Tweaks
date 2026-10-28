@@ -45,7 +45,7 @@ int main() {
     probe.record_attempt(692u); // source-authentic backbuffer candidate
     assert(probe.attempts() == 1u && probe.next_ordinal() == 788u);
     probe.restart_epoch();
-    assert(probe.attempts() == 0u && probe.next_ordinal() == 0u);
+    assert(probe.attempts() == 1u && probe.next_ordinal() == 0u);
     probe.record_ineligible(max - 4u);
     assert(probe.next_ordinal() == max && probe.attempts() == 0u);
     probe.finish_present(2400u);
@@ -61,10 +61,22 @@ int main() {
     assert(!probe.should_attempt(595u, 5u));
     assert(probe.should_attempt(596u, 5u));
     probe.restart_epoch(); // genuine full Clear: retain previous Present
-    assert(probe.attempts() == 0u && probe.previous_source_draws() == 2400u);
+    assert(probe.attempts() == 1u && probe.previous_source_draws() == 2400u);
     assert(!probe.should_attempt(1199u, 12u));
     assert(probe.should_attempt(1200u, 12u));
+    // Multiple Clear epochs in one Present share one four-attempt ceiling.
+    probe.reset();
+    for (std::uint32_t clear = 0u;
+         clear < NativeRawSourceProbeSchedule::kMaxAttemptsPerFrame; ++clear) {
+        probe.restart_epoch();
+        assert(probe.should_attempt(0u, 0u));
+        probe.record_attempt(0u);
+        assert(probe.attempts() == clear + 1u);
+    }
+    probe.restart_epoch();
+    assert(!probe.should_attempt(10000u, 0u));
     probe.finish_present(3u);
+    assert(probe.attempts() == 0u);
     assert(!probe.should_attempt(1u, 23u));
     assert(probe.should_attempt(2u, 23u));
     probe.finish_present(max); // saturating epoch must never wrap
