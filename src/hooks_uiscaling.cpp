@@ -16,6 +16,7 @@
 #include "vr/ui/menu_matrix_provenance.hpp"
 #include "vr/ui/multi_sprite_contain_scale.hpp"
 #include "vr/ui/frontend_affine_contain.hpp"
+#include "vr/d3d9/reset_trace.hpp"
 
 #include <algorithm>
 #include <array>
@@ -434,6 +435,7 @@ class UIScaling : public Hook
             reinterpret_cast<std::uintptr_t>(Module::exe_ptr(0));
         const auto caller =
             reinterpret_cast<std::uintptr_t>(_ReturnAddress());
+        const auto resetTrace = OutRunVR::D3D9ResetTrace::Read();
         const bool exactGoalParent =
             Settings::VREnabled &&
             Game::current_mode &&
@@ -479,10 +481,11 @@ class UIScaling : public Hook
                 spdlog::info(
                     "VR TRACE GOAL TEXT ADMISSION: callerRva=0x{:X} "
                     "admittedAfterDrain=0 entryEpoch={} liveEpoch={} queueActive={} "
-                    "action=NATIVE_ORIGINAL_ONCE",
+                    "resetEpoch={} resetFlags=0x{:X} action=NATIVE_ORIGINAL_ONCE",
                     caller - base, admission.queueEpochAtEntry,
                     OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
-                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    resetTrace.resetSerial, resetTrace.flags);
             ResultTextB9200InlineHook.call<void>(text, x, y, step);
             return;
         }
@@ -512,12 +515,14 @@ class UIScaling : public Hook
                     "VR P0 GOAL B9200 ENTRY: exactParent=1 calls={} "
                     "callerRva=0x{:X} scope={} admittedAfterDrain=1 "
                     "admittedAtExit={} entryEpoch={} exitEpoch={} "
+                    "resetEpoch={} resetQpc={} resetFlags=0x{:X} "
                     "contract=GOAL_DRAIN_REVALIDATE_V1",
                     n, caller - base,
                     admittedAtExit ? "SCREEN_HUD" : "NATIVE_FALLBACK",
                     admittedAtExit ? 1 : 0,
                     admission.queueEpochAtEntry,
-                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                    resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
         }
     }
 
@@ -2288,12 +2293,14 @@ class UIScaling : public Hook
         StageExtensionSavedScope =
             OutRunVR::GameSemantic::RenderScope::None;
         const auto hit = ++StageExtensionCompleted;
+        const auto resetTrace = OutRunVR::D3D9ResetTrace::Read();
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
             spdlog::info(
                 "VR TRACE PLUS_TIME SOURCE EXIT: calls={} gameState={} mode={} "
                 "exactScope={} admitted={} reason={} ticket={} entrySerial={} "
                 "entryEpoch={} currentEpoch={} changedPriorities={} "
-                "queueActive={} scopeAtExit={} producerAtExit={}",
+                "queueActive={} scopeAtExit={} producerAtExit={} "
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X}",
                 hit,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1,
@@ -2310,7 +2317,8 @@ class UIScaling : public Hook
                 currentEpoch, changedPriorities,
                 OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
                 OutRunVR::GameSemantic::Name(stageScopeAtExit),
-                OutRunVR::GameSemantic::Name(stageProducerAtExit));
+                OutRunVR::GameSemantic::Name(stageProducerAtExit),
+                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
         if (Settings::VRTelemetry)
         {
             for (int p = 0; p < Game::SpritePriorityCount; ++p)
@@ -2415,6 +2423,8 @@ class UIScaling : public Hook
                 ? OutRunVR::GameSemantic::ProducerToken::GoalTime150
                 : OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper);
 
+        const auto resetTrace = OutRunVR::D3D9ResetTrace::Read();
+
         // The exact GOAL time/title helper is a direct source only when it
         // enters outside the native SpriteNode queue. A preceding D3DX Flush
         // can reenter the queue or advance its selection epoch, so admission
@@ -2443,12 +2453,13 @@ class UIScaling : public Hook
                 spdlog::info(
                     "VR TRACE GOAL_TIME SOURCE: helperRva=0x{:X} producer={} "
                     "admittedAfterDrain=0 entryEpoch={} liveEpoch={} queueActive={} "
-                    "action=NATIVE_ORIGINAL_ONCE",
+                    "resetEpoch={} resetFlags=0x{:X} action=NATIVE_ORIGINAL_ONCE",
                     helperRva,
                     OutRunVR::GameSemantic::Name(producer),
                     admission.queueEpochAtEntry,
                     OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
-                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    resetTrace.resetSerial, resetTrace.flags);
             original();
             return;
         }
@@ -2492,13 +2503,16 @@ class UIScaling : public Hook
             spdlog::info(
                 "VR TRACE GOAL_TIME SOURCE: helperRva=0x{:X} producer={} "
                 "admittedAfterDrain=1 admittedAtExit={} entrySerial={} "
-                "entryEpoch={} exitEpoch={} queueActive={} contract=GOAL_DRAIN_REVALIDATE_V1 verifier=FALLBACK_SPLIT",
+                "entryEpoch={} exitEpoch={} queueActive={} "
+                "resetEpoch={} resetQpc={} resetFlags=0x{:X} "
+                "contract=GOAL_DRAIN_REVALIDATE_V1 verifier=FALLBACK_SPLIT",
                 helperRva,
                 OutRunVR::GameSemantic::Name(producer),
                 admittedAtExit ? 1 : 0, entrySerial,
                 admission.queueEpochAtEntry,
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
-                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags);
 	}
 	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
 	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
