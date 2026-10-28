@@ -683,6 +683,23 @@ class VRLensFlareProjected2D : public Hook
         // A non-queued original producer must never overwrite a selected
         // SpriteNode's semantic during nested queue processing.
         ++LensCentreDepth;
+        if (Settings::VRTelemetry)
+            spdlog::info(
+                "VR TRACE LENS CENTRE ENTER FULL: depth={} ownerDepth={} vr={} "
+                "queueActive={} queueEpoch={} eligible={} preScope={} preProducer={} "
+                "preLensEpoch={}",
+                LensCentreDepth, LensCentreOwnerDepth,
+                Settings::VREnabled ? 1 : 0,
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                Settings::VREnabled &&
+                    !OutRunVR::GameSemantic::QueueRenderActive() &&
+                    LensCentreDepth == 1 ? 1 : 0,
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken()),
+                OutRunVR::GameSemantic::CurrentLensCentreCallEpoch);
         // Original 0xD3A5/0xD3AA are paired call edges, including nested
         // and disabled-VR paths. An ignored nested queue call must still
         // consume exactly one depth on its matching leave, not pop the
@@ -703,6 +720,20 @@ class VRLensFlareProjected2D : public Hook
             OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
         OutRunVR::GameSemantic::CurrentScope =
             OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+        if (Settings::VRTelemetry)
+            spdlog::info(
+                "VR TRACE LENS CENTRE ACQUIRED FULL: depth={} ownerDepth={} "
+                "scope={} producer={} lensEpoch={} savedScope={} savedProducer={} "
+                "savedEpoch={}",
+                LensCentreDepth, LensCentreOwnerDepth,
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken()),
+                OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
+                OutRunVR::GameSemantic::Name(LensCentreSavedScope),
+                OutRunVR::GameSemantic::Name(LensCentreSavedProducer),
+                LensCentreSavedEpoch);
     }
 
     static void LensCentreLeave(safetyhook::Context&)
@@ -712,6 +743,14 @@ class VRLensFlareProjected2D : public Hook
         // would leak the central WorldBillboard semantic into later effects.
         if (!LensCentreDepth)
             return;
+        const unsigned leaveDepthBefore = LensCentreDepth;
+        const bool restoringOwner = LensCentreOwnerDepth == LensCentreDepth;
+        const auto leaveScopeBefore =
+            OutRunVR::GameSemantic::EffectiveScope();
+        const auto leaveProducerBefore =
+            OutRunVR::GameSemantic::CurrentRenderProducerToken();
+        const auto leaveEpochBefore =
+            OutRunVR::GameSemantic::CurrentLensCentreCallEpoch;
         // Only the precise enter which acquired ownership may restore it.
         // Preserve that restore even if VREnabled toggles during the call.
         if (LensCentreOwnerDepth == LensCentreDepth)
@@ -726,6 +765,22 @@ class VRLensFlareProjected2D : public Hook
             LensCentreOwnerDepth = 0;
         }
         --LensCentreDepth;
+        if (Settings::VRTelemetry)
+            spdlog::info(
+                "VR TRACE LENS CENTRE LEAVE FULL: depthBefore={} depthAfter={} "
+                "restored={} preScope={} preProducer={} preLensEpoch={} "
+                "postScope={} postProducer={} postLensEpoch={} queueActive={} queueEpoch={}",
+                leaveDepthBefore, LensCentreDepth, restoringOwner ? 1 : 0,
+                OutRunVR::GameSemantic::Name(leaveScopeBefore),
+                OutRunVR::GameSemantic::Name(leaveProducerBefore),
+                leaveEpochBefore,
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken()),
+                OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
     }
 
 	static void __cdecl DrawObjectAlphaProjected(
@@ -783,6 +838,32 @@ class VRLensFlareProjected2D : public Hook
                         sourceCallSerial, LensFlareSequence != 0 ? 1 : 0,
                         sourceOrdinal > 2 ? 1 : 0);
             }
+        }
+
+        if (trackedSource && Settings::VRTelemetry)
+        {
+            const auto deferred =
+                OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
+            spdlog::info(
+                "VR TRACE LENS SOURCE FULL: site=CABE object=0x{:06X} alpha={:.9g} "
+                "flags=0x{:08X} work=0x{:X} sourceCallSerial={} sequence={} ordinal={} "
+                "scope={} producer={} queueActive={} queueEpoch={} lensCentreEpoch={} "
+                "centreDepth={} centreOwnerDepth={} deferredSerial={} "
+                "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={}",
+                static_cast<unsigned>(objectId), alpha,
+                static_cast<unsigned>(flags),
+                reinterpret_cast<std::uintptr_t>(work),
+                sourceCallSerial, LensFlareSequence, sourceOrdinal,
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken()),
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
+                LensCentreDepth, LensCentreOwnerDepth,
+                deferred.sourceSerial, deferred.sequence,
+                deferred.objectId, static_cast<unsigned>(deferred.ordinal));
         }
 
         // One original 0xCABE call occurs for each source effect object,
@@ -884,6 +965,31 @@ class VRLensFlareProjected2D : public Hook
             IsProjectedSunScreenObject(objectId);
         const std::uint64_t sourceCallSerial =
             trackedSource ? NextLensSourceCallSerial() : 0;
+        if (trackedSource && Settings::VRTelemetry)
+        {
+            const auto deferred =
+                OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
+            spdlog::info(
+                "VR TRACE LENS SOURCE FULL: site=C993 object=0x{:06X} alpha={:.9g} "
+                "flags=0x{:08X} work=0x{:X} sourceCallSerial={} sequence={} projected={} "
+                "scope={} producer={} queueActive={} queueEpoch={} lensCentreEpoch={} "
+                "centreDepth={} centreOwnerDepth={} deferredSerial={} "
+                "deferredSequence={} deferredObject=0x{:06X} deferredOrdinal={}",
+                static_cast<unsigned>(objectId), alpha,
+                static_cast<unsigned>(flags),
+                reinterpret_cast<std::uintptr_t>(work),
+                sourceCallSerial, LensFlareSequence, projectedSun ? 1 : 0,
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::EffectiveScope()),
+                OutRunVR::GameSemantic::Name(
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken()),
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
+                LensCentreDepth, LensCentreOwnerDepth,
+                deferred.sourceSerial, deferred.sequence,
+                deferred.objectId, static_cast<unsigned>(deferred.ordinal));
+        }
         // 4056D0 may only enqueue the original opaque object. Do NOT
         // interpret this hook's call counter as a native Draw or an eye RT.
         // The mod SpriteNode/D3DX queue flag is separate from that game's

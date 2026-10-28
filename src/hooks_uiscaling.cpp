@@ -1734,6 +1734,19 @@ class UIScaling : public Hook
                     OutRunVR::GameSemantic::Name(
                         OutRunVR::GameSemantic::CurrentRenderProducerToken()));
         }
+        if (Settings::VRTelemetry)
+        {
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+                spdlog::info(
+                    "VR TRACE GOAL_PERCENT QUEUE ENTRY FULL: priority={} root=0x{:X} "
+                    "tail=0x{:X} entrySerial={} entryEpoch={} admittedAfterDrain={}",
+                    p,
+                    reinterpret_cast<std::uintptr_t>(ResultProgressRootsBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(ResultProgressTailsBefore[p]),
+                    ResultProgressEntrySerial,
+                    ResultProgressAdmission.queueEpochAtEntry,
+                    ResultProgressAdmittedAfterDrain ? 1 : 0);
+        }
 	}
 	static void ResultProgressLeave(safetyhook::Context&)
 	{
@@ -1808,6 +1821,27 @@ class UIScaling : public Hook
                     !outsideQueueAtExit ? "queue-at-exit" :
                     exitQueueEpoch != ResultProgressAdmission.queueEpochAtEntry ?
                         "queue-epoch-changed" : "pre-drain-rejected");
+        }
+        if (Settings::VRTelemetry)
+        {
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* root = Game::sprite_prio_root[p];
+                SpriteNode* after = root ? root->tail_4 : nullptr;
+                spdlog::info(
+                    "VR TRACE GOAL_PERCENT QUEUE EXIT FULL: priority={} "
+                    "entryRoot=0x{:X} entryTail=0x{:X} exitRoot=0x{:X} exitTail=0x{:X} "
+                    "changed={} entrySerial={} entryEpoch={} exitEpoch={} admitted={}",
+                    p,
+                    reinterpret_cast<std::uintptr_t>(ResultProgressRootsBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(ResultProgressTailsBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(root),
+                    reinterpret_cast<std::uintptr_t>(after),
+                    after && after != ResultProgressTailsBefore[p] ? 1 : 0,
+                    ResultProgressEntrySerial,
+                    ResultProgressAdmission.queueEpochAtEntry,
+                    exitQueueEpoch, admitted ? 1 : 0);
+            }
         }
 		ResultProgressTailsBefore = {};
         ResultProgressRootsBefore = {};
@@ -1978,7 +2012,28 @@ class UIScaling : public Hook
         {
             StageExtensionEntrySerial = 0;
             StageExtensionRootsBefore = {};
-            StageExtensionBefore = {};
+            if (Settings::VRTelemetry)
+        {
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* root = Game::sprite_prio_root[p];
+                SpriteNode* after = root ? root->tail_4 : nullptr;
+                spdlog::info(
+                    "VR TRACE PLUS_TIME QUEUE EXIT FULL: priority={} "
+                    "entryRoot=0x{:X} entryTail=0x{:X} exitRoot=0x{:X} exitTail=0x{:X} "
+                    "changed={} entrySerial={} entryEpoch={} exitEpoch={} ticket={} admitted={}",
+                    p,
+                    reinterpret_cast<std::uintptr_t>(StageExtensionRootsBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(StageExtensionBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(root),
+                    reinterpret_cast<std::uintptr_t>(after),
+                    after && after != StageExtensionBefore[p] ? 1 : 0,
+                    StageExtensionEntrySerial,
+                    StageExtensionAdmission.queueEpochAtEntry,
+                    currentEpoch, sourceTicket, admitted ? 1 : 0);
+            }
+        }
+        StageExtensionBefore = {};
         }
         // These five exact +TIME source E8 CALLs can synchronously draw text as
         // well as enqueue sprites. Post-call node tags only cover the latter.
@@ -2054,6 +2109,19 @@ class UIScaling : public Hook
                         OutRunVR::GameSemantic::EffectiveScope()),
                     OutRunVR::GameSemantic::Name(
                         OutRunVR::GameSemantic::CurrentRenderProducerToken()));
+        }
+        if (Settings::VRTelemetry)
+        {
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+                spdlog::info(
+                    "VR TRACE PLUS_TIME QUEUE ENTRY FULL: priority={} root=0x{:X} "
+                    "tail=0x{:X} entrySerial={} entryEpoch={} ticket={} admittedAfterDrain={}",
+                    p,
+                    reinterpret_cast<std::uintptr_t>(StageExtensionRootsBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(StageExtensionBefore[p]),
+                    StageExtensionEntrySerial,
+                    StageExtensionAdmission.queueEpochAtEntry,
+                    StageTimeLiveTicket, stageAdmittedAfterFlush ? 1 : 0);
         }
     }
 

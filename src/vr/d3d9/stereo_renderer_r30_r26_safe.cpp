@@ -4257,6 +4257,26 @@ namespace OutRunVRStereo
                 trace->restoreOk = restoreOk;
             }
 
+            if (lensPhysicalCandidate)
+                spdlog::info(
+                    "VR TRACE LENS MATRIX FULL: serial={} pose={} "
+                    "raw=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                    "left=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                    "right=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}]",
+                    TopLevelDrawSerial(), stereo.poseSequence,
+                    original[0],original[1],original[2],original[3],
+                    original[4],original[5],original[6],original[7],
+                    original[8],original[9],original[10],original[11],
+                    original[12],original[13],original[14],original[15],
+                    eyeConstants[0][0],eyeConstants[0][1],eyeConstants[0][2],eyeConstants[0][3],
+                    eyeConstants[0][4],eyeConstants[0][5],eyeConstants[0][6],eyeConstants[0][7],
+                    eyeConstants[0][8],eyeConstants[0][9],eyeConstants[0][10],eyeConstants[0][11],
+                    eyeConstants[0][12],eyeConstants[0][13],eyeConstants[0][14],eyeConstants[0][15],
+                    eyeConstants[1][0],eyeConstants[1][1],eyeConstants[1][2],eyeConstants[1][3],
+                    eyeConstants[1][4],eyeConstants[1][5],eyeConstants[1][6],eyeConstants[1][7],
+                    eyeConstants[1][8],eyeConstants[1][9],eyeConstants[1][10],eyeConstants[1][11],
+                    eyeConstants[1][12],eyeConstants[1][13],eyeConstants[1][14],eyeConstants[1][15]);
+
             // Only a submitted RIGHT Draw with the original state restored
             // completes a physical stereo pair. The existing failure path
             // still poisons the frame and retains the LEFT HRESULT.
@@ -5709,6 +5729,51 @@ namespace OutRunVRStereo
                         lensZWrite ? 1 : 0, lensAlphaTest ? 1 : 0);
                 }
             }
+            if (lensPhysicalCandidate)
+            {
+                IDirect3DVertexShader9* traceVs = nullptr;
+                const HRESULT traceVsHr = device->GetVertexShader(&traceVs);
+                const std::uintptr_t traceVsPtr =
+                    reinterpret_cast<std::uintptr_t>(traceVs);
+                if (traceVs) traceVs->Release();
+                DWORD traceFvf = 0;
+                const HRESULT traceFvfHr = device->GetFVF(&traceFvf);
+                spdlog::info(
+                    "VR TRACE LENS GPU STATE FULL: serial={} site={} kind={} scope={} "
+                    "producer={} queueActive={} queueEpoch={} sourceCallSerial={} sequence={} "
+                    "sourceObj=0x{:06X} sourceSite={} ordinal={} exactSourceLinked={} "
+                    "windowAnchorSerial={} windowAnchorSequence={} windowAnchorObj=0x{:06X} "
+                    "windowAnchorOrdinal={} provenance={} vsHr=0x{:08X} vs=0x{:X} "
+                    "fvfHr=0x{:08X} fvf=0x{:08X} tex0=0x{:X} tex={}x{} texFmt={} "
+                    "vb0=0x{:X} vbOffset={} vbStride={} ib=0x{:X} rt0=0x{:X} "
+                    "rt={}x{} rtFmt={} colorWrite=0x{:X} alphaBlend={} srcBlend={} "
+                    "dstBlend={} zEnable={} zWrite={} alphaTest={} lensCentreEpoch={}",
+                    TopLevelDrawSerial(), site ? site : "unknown",
+                    static_cast<unsigned>(screenKind),
+                    OutRunVR::GameSemantic::Name(lensPhysicalScope),
+                    OutRunVR::GameSemantic::Name(
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken()),
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                    lensSourceSerial, lensSourceSequence, lensSourceObject,
+                    lensSourceSite, lensSourceOrdinal, lensInlineLinked ? 1 : 0,
+                    lensWindowAnchorSerial, lensWindowAnchorSequence,
+                    lensWindowAnchorObject, lensWindowAnchorOrdinal,
+                    lensSourceProvenance, static_cast<unsigned>(traceVsHr),
+                    traceVsPtr, static_cast<unsigned>(traceFvfHr),
+                    static_cast<unsigned>(traceFvf), lensTexture0Ptr,
+                    lensTexWidth, lensTexHeight,
+                    static_cast<unsigned>(lensTexFormat), lensVb0Ptr,
+                    lensVb0Offset, lensVb0Stride, lensIbPtr, lensRt0Ptr,
+                    lensRtWidth, lensRtHeight,
+                    static_cast<unsigned>(lensRtFormat),
+                    static_cast<unsigned>(lensColorWrite),
+                    lensAlphaBlend ? 1 : 0, static_cast<unsigned>(lensSrcBlend),
+                    static_cast<unsigned>(lensDstBlend),
+                    static_cast<unsigned>(lensZEnable),
+                    lensZWrite ? 1 : 0, lensAlphaTest ? 1 : 0,
+                    OutRunVR::GameSemantic::CurrentLensCentreCallEpoch);
+            }
             if (screenKind == R30ScreenSpaceKind::None)
                 return E_NOTIMPL;
 
@@ -6498,6 +6563,70 @@ namespace OutRunVRStereo
                         static_cast<unsigned long long>(resultProjectionHash[2]));
             }
 
+            if (detailedTimeGoalTrace)
+            {
+                spdlog::info(
+                    "VR TRACE RESULT GPU STATE FULL: serial={} family={} api={} producer={} "
+                    "queued={} node=0x{:X} epoch={} pose={} prim={} fvf=0x{:08X} "
+                    "viewport={},{},{},{} tex0=0x{:X} tex={}x{} texFmt={} vb0=0x{:X} "
+                    "vbOffset={} vbStride={} ib=0x{:X} rt0=0x{:X} rt={}x{} rtFmt={} "
+                    "rightRt=0x{:X} colorWrite=0x{:X} alphaBlend={} srcBlend={} dstBlend={} "
+                    "zEnable={} zWrite={} alphaTest={} projHashRaw=0x{:016X} "
+                    "projHashL=0x{:016X} projHashR=0x{:016X} eyeScale={:.9g},{:.9g} "
+                    "eyeOffset={:.9g},{:.9g} projectedBase={:.9g},{:.9g} hudWorldLockValid={}",
+                    TopLevelDrawSerial(), detailedTimeGoalFamily, drawApi,
+                    OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                    sourceCommand.queued ? 1 : 0,
+                    reinterpret_cast<std::uintptr_t>(sourceCommand.queueNode),
+                    sourceCommand.queueEpoch, state.stereo.poseSequence,
+                    primitiveCount, static_cast<unsigned>(fvf),
+                    state.viewport.X,state.viewport.Y,state.viewport.Width,state.viewport.Height,
+                    resultTex0Ptr,resultTexWidth,resultTexHeight,
+                    static_cast<unsigned>(resultTexFormat),resultVb0Ptr,
+                    resultVb0Offset,resultVb0Stride,resultIbPtr,resultRt0Ptr,
+                    resultRtWidth,resultRtHeight,static_cast<unsigned>(resultRtFormat),
+                    reinterpret_cast<std::uintptr_t>(RightEyeSurface),
+                    static_cast<unsigned>(resultColorWrite),
+                    resultAlphaBlend ? 1 : 0,static_cast<unsigned>(resultSrcBlend),
+                    static_cast<unsigned>(resultDstBlend),static_cast<unsigned>(resultZEnable),
+                    resultZWrite ? 1 : 0,resultAlphaTest ? 1 : 0,
+                    static_cast<unsigned long long>(resultProjectionHash[0]),
+                    static_cast<unsigned long long>(resultProjectionHash[1]),
+                    static_cast<unsigned long long>(resultProjectionHash[2]),
+                    state.eyeScale[0],state.eyeScale[1],state.eyeOffset[0],state.eyeOffset[1],
+                    state.projectedBaseX,state.projectedBaseY,state.hudWorldLockValid ? 1 : 0);
+                spdlog::info(
+                    "VR TRACE RESULT MATRIX FULL: serial={} family={} "
+                    "raw=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                    "left=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                    "right=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}]",
+                    TopLevelDrawSerial(),detailedTimeGoalFamily,
+                    originalProjection._11,originalProjection._12,originalProjection._13,originalProjection._14,
+                    originalProjection._21,originalProjection._22,originalProjection._23,originalProjection._24,
+                    originalProjection._31,originalProjection._32,originalProjection._33,originalProjection._34,
+                    originalProjection._41,originalProjection._42,originalProjection._43,originalProjection._44,
+                    eyeProjection[0]._11,eyeProjection[0]._12,eyeProjection[0]._13,eyeProjection[0]._14,
+                    eyeProjection[0]._21,eyeProjection[0]._22,eyeProjection[0]._23,eyeProjection[0]._24,
+                    eyeProjection[0]._31,eyeProjection[0]._32,eyeProjection[0]._33,eyeProjection[0]._34,
+                    eyeProjection[0]._41,eyeProjection[0]._42,eyeProjection[0]._43,eyeProjection[0]._44,
+                    eyeProjection[1]._11,eyeProjection[1]._12,eyeProjection[1]._13,eyeProjection[1]._14,
+                    eyeProjection[1]._21,eyeProjection[1]._22,eyeProjection[1]._23,eyeProjection[1]._24,
+                    eyeProjection[1]._31,eyeProjection[1]._32,eyeProjection[1]._33,eyeProjection[1]._34,
+                    eyeProjection[1]._41,eyeProjection[1]._42,eyeProjection[1]._43,eyeProjection[1]._44);
+                spdlog::info(
+                    "VR TRACE RESULT AFFINE FULL: serial={} family={} "
+                    "hudClipXL={:.9g},{:.9g},{:.9g} hudClipXR={:.9g},{:.9g},{:.9g} "
+                    "hudClipYL={:.9g},{:.9g},{:.9g} hudClipYR={:.9g},{:.9g},{:.9g} "
+                    "hudClipWL={:.9g},{:.9g},{:.9g} hudClipWR={:.9g},{:.9g},{:.9g}",
+                    TopLevelDrawSerial(),detailedTimeGoalFamily,
+                    state.hudClipX[0][0],state.hudClipX[0][1],state.hudClipX[0][2],
+                    state.hudClipX[1][0],state.hudClipX[1][1],state.hudClipX[1][2],
+                    state.hudClipY[0][0],state.hudClipY[0][1],state.hudClipY[0][2],
+                    state.hudClipY[1][0],state.hudClipY[1][1],state.hudClipY[1][2],
+                    state.hudClipW[0][0],state.hudClipW[0][1],state.hudClipW[0][2],
+                    state.hudClipW[1][0],state.hudClipW[1][1],state.hudClipW[1][2]);
+            }
+
             HRESULT eyeHr[2]{ E_PENDING, E_PENDING };
             HRESULT projectionSetHr[2]{ E_PENDING, E_PENDING };
             HRESULT drawHr[2]{ E_PENDING, E_PENDING };
@@ -6672,6 +6801,32 @@ namespace OutRunVRStereo
                         static_cast<unsigned long long>(resultProjectionHash[1]),
                         static_cast<unsigned long long>(resultProjectionHash[2]));
             }
+            if (detailedTimeGoalTrace)
+                spdlog::info(
+                    "VR TRACE RESULT PHYSICAL EYES FULL: serial={} family={} api={} "
+                    "producer={} queued={} node=0x{:X} epoch={} pose={} "
+                    "projectionL=0x{:08X} drawAttemptL={} drawL=0x{:08X} "
+                    "projectionR=0x{:08X} drawAttemptR={} drawR=0x{:08X} "
+                    "rightTarget=0x{:08X} rightDepth=0x{:08X} rightViewport=0x{:08X} "
+                    "restoreRight={} projectionRestore=0x{:08X} frameIncomplete={} "
+                    "sourceRt=0x{:X} rightRt=0x{:X} sameRt={}",
+                    TopLevelDrawSerial(),detailedTimeGoalFamily,drawApi,
+                    OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                    sourceCommand.queued ? 1 : 0,
+                    reinterpret_cast<std::uintptr_t>(sourceCommand.queueNode),
+                    sourceCommand.queueEpoch,state.stereo.poseSequence,
+                    static_cast<unsigned>(projectionSetHr[0]),drawAttempted[0] ? 1 : 0,
+                    static_cast<unsigned>(drawHr[0]),static_cast<unsigned>(projectionSetHr[1]),
+                    drawAttempted[1] ? 1 : 0,static_cast<unsigned>(drawHr[1]),
+                    static_cast<unsigned>(passTrace.rightTargetHr),
+                    static_cast<unsigned>(passTrace.rightDepthHr),
+                    static_cast<unsigned>(passTrace.rightViewportHr),
+                    passTrace.restoreOk ? 1 : 0,static_cast<unsigned>(projectionRestoreHr),
+                    FrameStereoIncomplete ? 1 : 0,resultRt0Ptr,
+                    reinterpret_cast<std::uintptr_t>(RightEyeSurface),
+                    resultRt0Ptr != 0 &&
+                        resultRt0Ptr == reinterpret_cast<std::uintptr_t>(RightEyeSurface) ? 1 : 0);
+
             // A failed LEFT projection setter submitted no GPU primitive.
             // Once the original projection is restored, return E_NOTIMPL so
             // the upper dispatcher can execute the untouched native command
