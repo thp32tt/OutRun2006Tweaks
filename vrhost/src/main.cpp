@@ -32,6 +32,20 @@
 #include "runtime/menu_capture_snapshot.hpp"
 #include "runtime/projection_pair_pipeline.hpp"
 
+static void OutRunVrEmitFullTrace(const std::string& line)
+{
+    std::cout << line;
+    static std::ofstream log(
+        "outrun-vr-host-full-trace.log",
+        std::ios::out | std::ios::app);
+    if (log.is_open())
+    {
+        log << line;
+        log.flush();
+    }
+}
+
+
 namespace
 {
     constexpr wchar_t GameExeName[] = L"OR2006C2C.EXE";
@@ -1469,7 +1483,8 @@ namespace
 
             std::uint32_t image = 0;
             Acquire(projection_, image);
-            std::cout
+            std::ostringstream fullTraceBlit;
+            fullTraceBlit
                 << "[VR TRACE HOST PROJECTION BLIT FULL]"
                 << " image=" << image
                 << " direct=" << (directFrameValid_ ? 1 : 0)
@@ -1485,6 +1500,7 @@ namespace
                 << " rightUv=" << eyes[1].x << "," << eyes[1].y << ","
                 << eyes[1].w << "," << eyes[1].h
                 << "\n";
+            OutRunVrEmitFullTrace(fullTraceBlit.str());
             const bool firstEyeOk = RenderTo(
                 projection_.rtvs[image][0], projection_.width, projection_.height,
                 eyes[0], eyeSrv[0], eyeFormat[0], 0);

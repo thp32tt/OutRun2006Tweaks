@@ -3760,7 +3760,8 @@ int main(int argc, char** argv)
             {
                 static std::uint64_t fullTraceXrTick = 0;
                 ++fullTraceXrTick;
-                std::cout
+                std::ostringstream fullTraceFrame;
+                fullTraceFrame
                     << "[VR TRACE XR FRAME FULL]"
                     << " tick=" << fullTraceXrTick
                     << " predictedDisplayTime=" << fs.predictedDisplayTime
@@ -3785,13 +3786,15 @@ int main(int argc, char** argv)
                     << " renderMs=" << frameRenderMs
                     << " xrWaitMs=" << xrWaitFrameMs
                     << "\n";
+                OutRunVrEmitFullTrace(fullTraceFrame.str());
                 if (vc >= 2)
                 {
                     for (int eye = 0; eye < 2; ++eye)
                     {
                         const auto& live = views[eye];
                         const auto& submitted = pv[eye];
-                        std::cout
+                        std::ostringstream fullTraceEye;
+                        fullTraceEye
                             << "[VR TRACE XR EYE FULL]"
                             << " tick=" << fullTraceXrTick
                             << " eye=" << eye
@@ -3821,6 +3824,7 @@ int main(int argc, char** argv)
                             << submitted.subImage.imageRect.extent.width << ","
                             << submitted.subImage.imageRect.extent.height
                             << "\n";
+                        OutRunVrEmitFullTrace(fullTraceEye.str());
                     }
                 }
             }
