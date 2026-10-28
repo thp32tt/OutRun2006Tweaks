@@ -4168,6 +4168,21 @@ int main(int argc, char** argv)
                     << " actualFrameId=" << actualSubmittedFrameId
                     << " actualSourceKind=" << actualSubmittedSourceKind
                     << " actualLayer=" << (actualSubmittedLayer ? 1 : 0)
+                    << " r19ReceiptSerial="
+                    << OutRunVrSbsCaptureOverride::LastEndFrameReceiptSerial
+                    << " r19Replaced="
+                    << (OutRunVrSbsCaptureOverride::LastEndFrameReceiptReplaced ? 1 : 0)
+                    << " r19Projection="
+                    << (OutRunVrSbsCaptureOverride::LastEndFrameReceiptProjection ? 1 : 0)
+                    << " r19FrameId="
+                    << OutRunVrSbsCaptureOverride::LastEndFrameReceiptFrameId
+                    << " r19PoseSequence="
+                    << OutRunVrSbsCaptureOverride::LastEndFrameReceiptPoseSequence
+                    << " r19LayerCount="
+                    << OutRunVrSbsCaptureOverride::LastEndFrameReceiptLayerCount
+                    << " r19Result="
+                    << static_cast<int>(
+                        OutRunVrSbsCaptureOverride::LastEndFrameReceiptResult)
                     << " submissionSerialBefore=" << submissionSerialBefore
                     << " submissionSerialAfter=" << submissionSerialAfter
                     << " receiptAdvanced="
