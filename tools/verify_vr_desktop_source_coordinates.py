@@ -5,6 +5,8 @@ R=Path(__file__).resolve().parents[1]
 settings=(R/"src/vr/settings.cpp").read_text()
 cfg=(R/"src/hooks_misc.cpp").read_text()
 ex=(R/"src/vr/d3d9/ex_device_upgrade.cpp").read_text()
+reset_trace=(R/"src/vr/d3d9/reset_trace.hpp").read_text()
+renderer=(R/"src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text()
 ini=(R/"OutRun2006Tweaks.ini").read_text()
 
 for token in (
@@ -68,6 +70,44 @@ assert "CompatVrPhysicalWidth.store(0" in ex
 assert "CompatVrPhysicalHeight.store(0" in ex
 assert "ResetEx will preserve this XR target" in ex
 
+# The Reset result must be a joinable epoch, not a free-form log line. Publish
+# requested/effective/actual raster state after ResetEx/classic replay and let
+# later lens/HUD logs read the same stable cross-TU snapshot.
+for token in (
+    "struct Snapshot",
+    "resetSerial",
+    "requestedWidth",
+    "effectiveWidth",
+    "actualWidth",
+    "viewportWidth",
+    "scissorRight",
+    "inline void Publish(",
+    "inline Snapshot Read()",
+    "Generation.fetch_add(1",
+):
+    assert token in reset_trace, token
+for token in (
+    "OutRunVR::D3D9ResetTrace::NextResetSerial()",
+    "OutRunVR::D3D9ResetTrace::Publish(trace);",
+    "device->GetBackBuffer(",
+    "device->GetViewport(&viewport)",
+    "device->GetScissorRect(&scissor)",
+    "VR D3D9Ex RESET TRACE: resetEpoch=",
+    "contract=XR_RESET_EPOCH_V2",
+):
+    assert token in reset, token
+assert reset.index("deviceEx->ResetEx(&effective, fullscreenPtr)") < reset.index(
+    "classicReplaySucceeded = RestoreClassicResetState(device);") < reset.index(
+    "OutRunVR::D3D9ResetTrace::Publish(trace);")
+for token in (
+    '#include "vr/d3d9/reset_trace.hpp"',
+    "lensResetTrace = OutRunVR::D3D9ResetTrace::Read();",
+    "preViewport={},{},{}x{}",
+    "resetEpoch={} resetQpc={} resetFlags=0x{:X}",
+    "resetViewportMatchesPre={}",
+):
+    assert token in renderer, token
+
 def choose(logical, eye, follow=False, auto=True, manual=None):
     physical=logical
     if follow: return logical, logical
@@ -93,4 +133,4 @@ assert reset_target((3440,1440),(2496,2688)) == (2496,2688)
 assert reset_target((1920,1080),(2496,2688),follow=True) == (1920,1080)
 assert reset_target((1920,1080),(2496,2688),windowed=False) == (1920,1080)
 assert reset_target((1920,1080),(0,0)) == (1920,1080)
-print("PASS logical UI resolution is monitor/game-owned while physical VR D3D9Ex target follows XR eye and survives ResetEx; HMD UNTESTED")
+print("PASS logical UI resolution is monitor/game-owned while physical VR D3D9Ex target follows XR eye, survives ResetEx, and publishes a joinable raster epoch; HMD UNTESTED")
