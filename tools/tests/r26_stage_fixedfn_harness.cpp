@@ -138,7 +138,7 @@ for(int api:{0,2,3}){
  call(api,d);assert(stereoTransactions==0&&receipts.size()==1&&d.sets==0);if(bad==4)assert(shader.released==1);
  }
  for(int eye:{0,1}){reset(d);failEye=eye;auto hr=call(api,d);assert(FrameStereoIncomplete);assert(receipts.size()==unsigned(eye+1));assert(stereoTransactions==1);assert(hr==(eye?D3D_OK:E_FAIL));assert(d.sets==eye+2);}
- for(int set:{1,2,3}){reset(d);d.failSet=set;auto hr=call(api,d);assert(FrameStereoIncomplete);assert(stereoTransactions==1);assert(receipts.size()==unsigned(set-1));if(set==3)assert(hr==E_FAIL&&restoreFailures==1);}
+ for(int set:{1,2,3}){reset(d);d.failSet=set;auto hr=call(api,d);assert(FrameStereoIncomplete);assert(stereoTransactions==1);const unsigned expectedReceipts=set==1?1u:unsigned(set-1);assert(receipts.size()==expectedReceipts);if(set==1)assert(receipts[0].api==api+10);if(set==3)assert(hr==E_FAIL&&restoreFailures==1);}
 }
 for(int api:{2,3}){reset(d);call(api,d,23);assert(stereoTransactions==0&&receipts.size()==1);}
 reset(d);call(3,d,24,999);assert(stereoTransactions==0&&receipts.size()==1);
