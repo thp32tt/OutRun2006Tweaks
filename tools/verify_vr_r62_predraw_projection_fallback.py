@@ -19,9 +19,13 @@ def body(source: str, signature: str) -> str:
 
 def check(source: str) -> bool:
     try:
-        helper=body(source,'HRESULT R30ExecuteXyzrhwStereo(')
+        helper_signature='HRESULT R30ExecuteXyzrhwStereo('
+        helper_at=source.index(helper_signature)
+        helper_open=source.index('{',helper_at)
+        helper_header=source[helper_at:helper_open]
+        helper=body(source,helper_signature)
         r62=body(source,'HRESULT R62TryFixedFunctionSpriteStereo(')
-        assert 'const bool* physicalLeftDrawAttempted = nullptr' in helper
+        assert 'const bool* physicalLeftDrawAttempted = nullptr' in helper_header
         assert 'const bool deferLeftAccounting =' in helper
         assert 'physicalLeftDrawAttempted != nullptr;' in helper
         assert 'const bool leftWasPhysicallyAttempted =' in helper
