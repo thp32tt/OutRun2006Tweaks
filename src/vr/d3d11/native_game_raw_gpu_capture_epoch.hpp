@@ -3,7 +3,7 @@
 // Successful GPU Draw is the producer; later Present is only a consumer.
 // Does not certify complete source coverage, stereo or gameplay activation.
 #include <cstdint>
-#include "native_raw_gpu_wait.hpp"
+#include "native_game_raw_gpu_wait.hpp"
 
 namespace outrun::vr::dx11 {
 class NativeRawGpuCaptureEpoch final {
