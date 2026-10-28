@@ -92,7 +92,8 @@ for token in (
 ):
     assert token in reset_trace, token
 for token in (
-    "trace.resetSerial = OutRunVR::D3D9ResetTrace::Publish(trace);",
+    "trace.resetSerial =",
+    "OutRunVR::D3D9ResetTrace::Publish(trace);",
     "device->GetBackBuffer(",
     "device->GetViewport(&viewport)",
     "device->GetScissorRect(&scissor)",
@@ -102,10 +103,11 @@ for token in (
     assert token in reset, token
 assert reset.index("deviceEx->ResetEx(&effective, fullscreenPtr)") < reset.index(
     "classicReplaySucceeded = RestoreClassicResetState(device);") < reset.index(
-    "trace.resetSerial = OutRunVR::D3D9ResetTrace::Publish(trace);")
+    "OutRunVR::D3D9ResetTrace::Publish(trace);")
 assert "resetViewportMatchesPre" not in renderer
 assert "NextResetSerial()" not in reset_trace
 assert "NextResetSerial()" not in reset
+assert reset.index("trace.resetSerial =") < reset.index("OutRunVR::D3D9ResetTrace::Publish(trace);")
 for token in (
     "lensResetTrace.readStable",
     "lensResetTrace.viewportX == savedViewport.X",
