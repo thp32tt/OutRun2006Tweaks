@@ -58,12 +58,12 @@ foreach($profile in @($control,$correctness,$performance)) {
     Assert-True (Has-Argument $profile '-PreferD3D9Ex=true') "$($profile.Name): D3D9Ex reference must be preferred"
     Assert-True (Has-Argument $profile '-DisableDesktopDuplication=false') "$($profile.Name): fallback must remain available by default"
     Assert-True (Has-Argument $profile '-TargetRefreshRateHz=0') "$($profile.Name): refresh must follow OpenXR/VDXR"
-    # The shipped game default is SkyGlowFactor=4. HMD traces from 2026-10-09
-    # proved test profiles silently replaced it with 1 (full-resolution
-    # postprocessing, roughly 16x source pixel area). Keep the actual visual
-    # effect, but do not force unnecessary full-resolution bloom in CORRECTNESS.
-    Assert-True (Has-Argument $profile '-SkyGlowFactor=4') "$($profile.Name): restored quarter-resolution SkyGlowFactor=4"
-    Assert-True (-not (Has-Argument $profile '-SkyGlowFactor=1')) "$($profile.Name): full-resolution SkyGlow must not silently override game defaults"
+    # 2026-10-29 user/HMD policy: VR SkyGlow is disabled. The scene remains
+    # visually acceptable without it and the postprocess is unnecessary at
+    # 2496x2688 eye resolution. Explicit GPU-lab A/B overrides are separate.
+    Assert-True (Has-Argument $profile '-SkyGlowFactor=0') "$($profile.Name): normal VR must disable SkyGlow"
+    Assert-True (-not (Has-Argument $profile '-SkyGlowFactor=1')) "$($profile.Name): full-resolution SkyGlow must stay disabled"
+    Assert-True (-not (Has-Argument $profile '-SkyGlowFactor=4')) "$($profile.Name): quarter-resolution SkyGlow must stay disabled in normal VR"
     Assert-True ($profile.Environment.OUTRUN_VR_TEST_PROFILE -eq $profile.Name) "$($profile.Name): environment identity mismatch"
 }
 
