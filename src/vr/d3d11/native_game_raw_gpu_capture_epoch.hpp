@@ -6,6 +6,20 @@
 #include "native_game_raw_gpu_wait.hpp"
 
 namespace outrun::vr::dx11 {
+// Only an authenticated live game device clearing its own canonical color
+// backbuffer may supersede RAW GPU pixels. RECT count/coverage is deliberately
+// not required: a clipped TARGET Clear after the native Draw can replace any
+// pixels in the sampled tile. An offscreen or foreign Clear cannot do so.
+[[nodiscard]] constexpr bool native_raw_source_color_clear_matches(
+    std::uintptr_t capturedDevice, std::uintptr_t clearingDevice,
+    std::uintptr_t target, std::uintptr_t backbuffer,
+    std::uint32_t targetWidth, std::uint32_t targetHeight,
+    std::uint32_t backWidth, std::uint32_t backHeight) noexcept {
+    return capturedDevice != 0u && capturedDevice == clearingDevice &&
+           target != 0u && target == backbuffer &&
+           targetWidth != 0u && targetHeight != 0u &&
+           targetWidth == backWidth && targetHeight == backHeight;
+}
 class NativeRawGpuCaptureEpoch final {
 public:
     [[nodiscard]] bool can_queue(std::uint64_t presentSerial,
@@ -31,8 +45,9 @@ public:
         unconsumed_ = false;
         return hadCopy;
     }
-    // A successful whole TARGET Clear supersedes earlier native Draw pixels
-    // inside the SAME D3D9 Present. Retain the in-flight GPU staging fence.
+    // A successful canonical TARGET Clear (whole or clipped) supersedes a
+    // native Draw's sampled pixels inside the SAME D3D9 Present.
+    // Retain the in-flight GPU staging fence.
     [[nodiscard]] bool invalidate_for_full_source_clear(
         bool gpuCopyPending) noexcept {
         const bool discarded = everQueued_ && unconsumed_;

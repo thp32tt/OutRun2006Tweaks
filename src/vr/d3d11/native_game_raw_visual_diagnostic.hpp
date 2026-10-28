@@ -45,9 +45,12 @@ public:
     [[nodiscard]] std::uint64_t zero_rgb_retired_copies() const noexcept {
         return zeroRgbRetiredCopies_;
     }
-    // A whole game backbuffer Clear supersedes earlier native RGB pixels,
-    // without freeing any GPU staging texture while its fence is in flight.
-    [[nodiscard]] bool invalidate_full_source_clear() noexcept {
+    // Whole AND clipped source-backbuffer TARGET Clears supersede a queued
+    // native RGB sample. A foreign D3D9 device cannot retire its GPU copy;
+    // in-flight staging remains owned by the original EVENT fence.
+    [[nodiscard]] bool invalidate_source_target_clear(
+        IDirect3DDevice9* game) noexcept {
+        if (!game || gameOwner_ != game) return false;
         drawPair_.reset();
         rgbEvidenceConfirmed_ = false;
         return captureEpoch_.invalidate_for_full_source_clear(pending_);

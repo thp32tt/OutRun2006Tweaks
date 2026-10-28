@@ -4,7 +4,26 @@
 #include <cstdint>
 #include <limits>
 using outrun::vr::dx11::NativeRawGpuCaptureEpoch;
+using outrun::vr::dx11::native_raw_source_color_clear_matches;
 int main() {
+    // A clipped color Clear on this exact game backbuffer is as capable of
+    // superseding a captured native pixel as a full color Clear. Only genuine
+    // source ownership and canonical RT identity authorize invalidation.
+    constexpr auto cleared = native_raw_source_color_clear_matches(
+        0x11u, 0x11u, 0x22u, 0x22u, 3440u, 1440u, 3440u, 1440u);
+    static_assert(cleared, "partial source TARGET Clear invalidates GPU evidence");
+    static_assert(!native_raw_source_color_clear_matches(
+        0x11u, 0x12u, 0x22u, 0x22u, 3440u, 1440u, 3440u, 1440u),
+        "foreign owner cannot invalidate source capture");
+    static_assert(!native_raw_source_color_clear_matches(
+        0x11u, 0x11u, 0x23u, 0x22u, 3440u, 1440u, 3440u, 1440u),
+        "offscreen TARGET Clear cannot invalidate backbuffer capture");
+    static_assert(!native_raw_source_color_clear_matches(
+        0x11u, 0x11u, 0x22u, 0x22u, 1280u, 720u, 3440u, 1440u),
+        "mismatched color extent cannot invalidate native capture");
+    static_assert(!native_raw_source_color_clear_matches(
+        0u, 0x11u, 0x22u, 0x22u, 3440u, 1440u, 3440u, 1440u),
+        "unowned diagnostic source cannot invalidate capture");
     NativeRawGpuCaptureEpoch e;
     // Cold-start menu real Draw can queue even at Present serial zero.
     assert(e.can_queue(0u, false));
@@ -81,7 +100,7 @@ int main() {
     // A canonical backbuffer Clear supersedes even positive native RGB.
     // Same-Present GPU storage cannot be reused until its event completes.
     e.reset(); e.queued(85u);
-    assert(e.invalidate_for_full_source_clear(true));
+    assert(cleared && e.invalidate_for_full_source_clear(true));
     assert(e.invalidated_for_full_source_clear());
     assert(!e.consume_for_present(85u));
     assert(!e.can_queue(85u, false));
@@ -102,6 +121,25 @@ int main() {
     assert(e.invalidate_for_full_source_clear(false));
     assert(!e.consume_for_present(85u));
     assert(e.can_queue(85u, false));
+    // Partial menu/HUD TARGET Clears must revoke a captured pixel even if
+    // the copy already finished; post-Clear Draws remain eligible without
+    // staging resource reuse while an EVENT is still outstanding.
+    e.reset(); e.queued(86u);
+    assert(cleared && e.invalidate_for_full_source_clear(true));
+    assert(!e.consume_for_present(86u));
+    assert(!e.can_queue(86u, true));
+    assert(e.retire_invalidated_source_clear(true, [&] {
+        ++polls; return GPU::Complete;
+    }) == GPU::Complete);
+    assert(e.can_queue(86u, false));
+    e.queued(86u);
+    assert(e.consume_for_present(86u));
+    // An offscreen or foreign Clear never runs the invalidation path.
+    e.reset(); e.queued(87u);
+    if (native_raw_source_color_clear_matches(
+            0x11u, 0x11u, 0x23u, 0x22u, 3440u, 1440u, 3440u, 1440u))
+        (void)e.invalidate_for_full_source_clear(true);
+    assert(e.consume_for_present(87u));
     e.reset(); // genuine Reset/new D3D9 or D3D11 owner
     assert(e.can_queue(0u, false));
     assert(!e.consume());

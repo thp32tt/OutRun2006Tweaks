@@ -10248,8 +10248,10 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         if (FAILED(target.As(&targetIdentity)) ||
             FAILED(backbuffer.As(&backbufferIdentity)) || !targetIdentity ||
             !backbufferIdentity) return;
-        const bool wholeBackbuffer = targetIdentity.Get() == backbufferIdentity.Get() &&
-            targetDesc.Width == bbDesc.Width && targetDesc.Height == bbDesc.Height &&
+        const bool canonicalBackbufferTarget =
+            targetIdentity.Get() == backbufferIdentity.Get() &&
+            targetDesc.Width == bbDesc.Width && targetDesc.Height == bbDesc.Height;
+        const bool wholeBackbuffer = canonicalBackbufferTarget &&
             viewport.X == 0u && viewport.Y == 0u &&
             viewport.Width == bbDesc.Width && viewport.Height == bbDesc.Height &&
             GameNativeClearCoverage::covers_whole(
@@ -10266,6 +10268,27 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.preDrawSurface.discard();
             s.preDrawFills.discard();
             s.preDrawDepth.discard();
+        }
+        // A genuine SOURCE TARGET Clear supersedes previously captured RAW
+        // pixels even when the D3D9 game clears only a clipped menu/HUD
+        // rectangle. Such a partial Clear does NOT restart full-frame source
+        // continuity, but old PRE/POST GPU pixels cannot be advertised as the
+        // current game image. Foreign/offscreen owners must not retire a pair.
+        const bool rawSourceTargetClear = env_raw_visual_opt_in() &&
+            native_raw_source_color_clear_matches(
+                s.sourceGameDevice, sourceDevice,
+                reinterpret_cast<std::uintptr_t>(targetIdentity.Get()),
+                reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
+                targetDesc.Width, targetDesc.Height, bbDesc.Width, bbDesc.Height);
+        if (rawSourceTargetClear &&
+            s.rawPreview.invalidate_source_target_clear(game)) {
+            const auto discards = ++s.rawClearCaptureInvalidations;
+            if (discards <= 3u || discards % 128u == 0u)
+                spdlog::info(
+                    "DX11 RAW_VISUAL source_target_clear_invalidated_capture={} "
+                    "present_serial={} whole_backbuffer={} "
+                    "pre_clear_gpu_pixels_discarded=1",
+                    discards, s.presents, wholeBackbuffer ? 1u : 0u);
         }
         std::uintptr_t mainDepthIdentity = 0u;
         if (wholeBackbuffer) {
@@ -10299,18 +10322,6 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.surfaceReplayBudget.reset(); // a new verified full Clear starts a new source epoch
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
-            // A successful canonical TARGET Clear erases any earlier
-            // game-authored color in this same Present. Old D3D11 GPU tiles
-            // are now invalid, even when their native Draw was successful.
-            if (env_raw_visual_opt_in() &&
-                s.rawPreview.invalidate_full_source_clear()) {
-                const auto discards = ++s.rawClearCaptureInvalidations;
-                if (discards <= 3u || discards % 128u == 0u)
-                    spdlog::info(
-                        "DX11 RAW_VISUAL full_source_clear_invalidated_capture={} "
-                        "present_serial={} pre_clear_gpu_pixels_discarded=1",
-                        discards, s.presents);
-            }
             // Preserve four bounded native attempts ACROSS source Clears;
             // only the next real D3D9 Present renews this budget.
             s.rawSourceProbe.restart_epoch();
