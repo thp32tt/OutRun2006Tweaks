@@ -460,7 +460,6 @@ namespace OutRunVRD3D9ExUpgrade
             if (FAILED(qi) || !deviceEx)
                 return ResetCompatHook.stdcall<HRESULT>(device, params);
 
-            const auto resetSerial = OutRunVR::D3D9ResetTrace::NextResetSerial();
             LARGE_INTEGER resetQpc{};
             QueryPerformanceCounter(&resetQpc);
 
@@ -502,7 +501,6 @@ namespace OutRunVRD3D9ExUpgrade
             }
 
             OutRunVR::D3D9ResetTrace::Snapshot trace{};
-            trace.resetSerial = resetSerial;
             trace.qpc = resetQpc.QuadPart;
             trace.requestedWidth = requested.BackBufferWidth;
             trace.requestedHeight = requested.BackBufferHeight;
@@ -553,7 +551,8 @@ namespace OutRunVRD3D9ExUpgrade
                     trace.flags |= OutRunVR::D3D9ResetTrace::ScissorValid;
                 }
             }
-            OutRunVR::D3D9ResetTrace::Publish(trace);
+            trace.resetSerial =
+                OutRunVR::D3D9ResetTrace::Publish(trace);
 
             ++ResetExRedirects;
             spdlog::info(
@@ -561,7 +560,7 @@ namespace OutRunVRD3D9ExUpgrade
                 "requested={}x{} effective={}x{} actual={}x{} "
                 "viewport={},{},{}x{} scissor={},{},{},{} "
                 "preserveXrPhysical={} classicReplay={} flags=0x{:X} "
-                "contract=XR_RESET_EPOCH_V2",
+                "contract=XR_RESET_EPOCH_V3",
                 trace.resetSerial, trace.qpc, static_cast<unsigned>(hr),
                 trace.requestedWidth, trace.requestedHeight,
                 trace.effectiveWidth, trace.effectiveHeight,
