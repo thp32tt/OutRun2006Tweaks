@@ -22,6 +22,7 @@
 #include "vr/ipc/host_state_v3_reader.hpp"
 #include "vr/ipc/xr_eye_extent.hpp"
 #include "vr/ipc/host_process_liveness.hpp"
+#include "vr/d3d9/reset_trace.hpp"
 
 namespace Settings
 {
@@ -459,6 +460,10 @@ namespace OutRunVRD3D9ExUpgrade
             if (FAILED(qi) || !deviceEx)
                 return ResetCompatHook.stdcall<HRESULT>(device, params);
 
+            const auto resetSerial = OutRunVR::D3D9ResetTrace::NextResetSerial();
+            LARGE_INTEGER resetQpc{};
+            QueryPerformanceCounter(&resetQpc);
+
             const D3DPRESENT_PARAMETERS requested = *params;
             D3DPRESENT_PARAMETERS effective = requested;
             const std::uint32_t vrWidth =
@@ -484,6 +489,8 @@ namespace OutRunVRD3D9ExUpgrade
             const HRESULT hr =
                 deviceEx->ResetEx(&effective, fullscreenPtr);
             deviceEx->Release();
+
+            bool classicReplaySucceeded = false;
             if (SUCCEEDED(hr))
             {
                 // Preserve D3D9's in/out presentation contract, but publish
@@ -491,15 +498,81 @@ namespace OutRunVRD3D9ExUpgrade
                 // logical reset request.
                 *params = effective;
                 UpdateCompatPresentationState(device, params);
-                RestoreClassicResetState(device);
+                classicReplaySucceeded = RestoreClassicResetState(device);
             }
+
+            OutRunVR::D3D9ResetTrace::Snapshot trace{};
+            trace.resetSerial = resetSerial;
+            trace.qpc = resetQpc.QuadPart;
+            trace.requestedWidth = requested.BackBufferWidth;
+            trace.requestedHeight = requested.BackBufferHeight;
+            trace.effectiveWidth = effective.BackBufferWidth;
+            trace.effectiveHeight = effective.BackBufferHeight;
+            if (SUCCEEDED(hr))
+                trace.flags |= OutRunVR::D3D9ResetTrace::ResetSucceeded;
+            if (preserveVrPhysical)
+                trace.flags |= OutRunVR::D3D9ResetTrace::PreserveXrPhysical;
+            if (classicReplaySucceeded)
+                trace.flags |= OutRunVR::D3D9ResetTrace::ClassicReplaySucceeded;
+
+            if (SUCCEEDED(hr))
+            {
+                IDirect3DSurface9* backBuffer = nullptr;
+                if (SUCCEEDED(device->GetBackBuffer(
+                        0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuffer)) &&
+                    backBuffer)
+                {
+                    D3DSURFACE_DESC desc{};
+                    if (SUCCEEDED(backBuffer->GetDesc(&desc)) &&
+                        desc.Width && desc.Height)
+                    {
+                        trace.actualWidth = desc.Width;
+                        trace.actualHeight = desc.Height;
+                        trace.flags |= OutRunVR::D3D9ResetTrace::BackBufferValid;
+                    }
+                    backBuffer->Release();
+                }
+
+                D3DVIEWPORT9 viewport{};
+                if (SUCCEEDED(device->GetViewport(&viewport)))
+                {
+                    trace.viewportX = viewport.X;
+                    trace.viewportY = viewport.Y;
+                    trace.viewportWidth = viewport.Width;
+                    trace.viewportHeight = viewport.Height;
+                    trace.flags |= OutRunVR::D3D9ResetTrace::ViewportValid;
+                }
+
+                RECT scissor{};
+                if (SUCCEEDED(device->GetScissorRect(&scissor)))
+                {
+                    trace.scissorLeft = scissor.left;
+                    trace.scissorTop = scissor.top;
+                    trace.scissorRight = scissor.right;
+                    trace.scissorBottom = scissor.bottom;
+                    trace.flags |= OutRunVR::D3D9ResetTrace::ScissorValid;
+                }
+            }
+            OutRunVR::D3D9ResetTrace::Publish(trace);
+
             ++ResetExRedirects;
             spdlog::info(
-                "VR D3D9Ex compat: Reset -> ResetEx hr=0x{:08X} requested={}x{} effective={}x{} preserveXrPhysical={} contract=XR_RESET_PERSIST_V1; emulated MANAGED resources remain persistent",
-                static_cast<unsigned>(hr),
-                requested.BackBufferWidth, requested.BackBufferHeight,
-                effective.BackBufferWidth, effective.BackBufferHeight,
-                preserveVrPhysical ? 1 : 0);
+                "VR D3D9Ex RESET TRACE: resetEpoch={} qpc={} hr=0x{:08X} "
+                "requested={}x{} effective={}x{} actual={}x{} "
+                "viewport={},{},{}x{} scissor={},{},{},{} "
+                "preserveXrPhysical={} classicReplay={} flags=0x{:X} "
+                "contract=XR_RESET_EPOCH_V2",
+                trace.resetSerial, trace.qpc, static_cast<unsigned>(hr),
+                trace.requestedWidth, trace.requestedHeight,
+                trace.effectiveWidth, trace.effectiveHeight,
+                trace.actualWidth, trace.actualHeight,
+                trace.viewportX, trace.viewportY,
+                trace.viewportWidth, trace.viewportHeight,
+                trace.scissorLeft, trace.scissorTop,
+                trace.scissorRight, trace.scissorBottom,
+                preserveVrPhysical ? 1 : 0,
+                classicReplaySucceeded ? 1 : 0,
+                trace.flags);
             return hr;
         }
 
