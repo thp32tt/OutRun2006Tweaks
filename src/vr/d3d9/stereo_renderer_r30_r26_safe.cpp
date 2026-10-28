@@ -5465,16 +5465,18 @@ namespace OutRunVRStereo
         {
             if (!Settings::VRTelemetry)
                 return;
+            LARGE_INTEGER traceQpc{};
+            QueryPerformanceCounter(&traceQpc);
             spdlog::info(
-                "VR TRACE STEREO POSE FULL: family={} serial={} pose={} framePose={} "
+                "VR TRACE STEREO POSE FULL: family={} serial={} qpc={} pose={} framePose={} "
                 "fovL={:.9g},{:.9g},{:.9g},{:.9g} fovR={:.9g},{:.9g},{:.9g},{:.9g} "
                 "eyeOffsetL={:.9g},{:.9g},{:.9g} eyeOffsetR={:.9g},{:.9g},{:.9g} "
                 "eyeOriL={:.9g},{:.9g},{:.9g},{:.9g} eyeOriR={:.9g},{:.9g},{:.9g},{:.9g} "
                 "effectiveOriL={:.9g},{:.9g},{:.9g},{:.9g} "
                 "effectiveOriR={:.9g},{:.9g},{:.9g},{:.9g} "
                 "effectivePosL={:.9g},{:.9g},{:.9g} effectivePosR={:.9g},{:.9g},{:.9g}",
-                family ? family : "UNKNOWN", serial, stereo.poseSequence,
-                FrameStereoPoseSequence,
+                family ? family : "UNKNOWN", serial, traceQpc.QuadPart,
+                stereo.poseSequence, FrameStereoPoseSequence,
                 stereo.eyeFov[0].angleLeft, stereo.eyeFov[0].angleRight,
                 stereo.eyeFov[0].angleUp, stereo.eyeFov[0].angleDown,
                 stereo.eyeFov[1].angleLeft, stereo.eyeFov[1].angleRight,
@@ -5509,6 +5511,9 @@ namespace OutRunVRStereo
             if (!Settings::VRTelemetry || !device)
                 return;
 
+            LARGE_INTEGER traceQpc{};
+            QueryPerformanceCounter(&traceQpc);
+
             D3DVIEWPORT9 viewport{};
             RECT scissor{};
             const HRESULT viewportHr = device->GetViewport(&viewport);
@@ -5533,6 +5538,8 @@ namespace OutRunVRStereo
             DWORD scissorEnable=0, srgbWrite=0, multisample=0;
             DWORD depthBias=0, slopeDepthBias=0, textureFactor=0;
             DWORD clipEnable=0, lighting=0, ambient=0;
+            DWORD colorVertex=0, diffuseSource=0, specularSource=0;
+            DWORD ambientSource=0, emissiveSource=0, clipping=0;
             device->GetRenderState(D3DRS_ALPHAREF,&alphaRef);
             device->GetRenderState(D3DRS_ALPHAFUNC,&alphaFunc);
             device->GetRenderState(D3DRS_BLENDOP,&blendOp);
@@ -5557,9 +5564,15 @@ namespace OutRunVRStereo
             device->GetRenderState(D3DRS_CLIPPLANEENABLE,&clipEnable);
             device->GetRenderState(D3DRS_LIGHTING,&lighting);
             device->GetRenderState(D3DRS_AMBIENT,&ambient);
+            device->GetRenderState(D3DRS_COLORVERTEX,&colorVertex);
+            device->GetRenderState(D3DRS_DIFFUSEMATERIALSOURCE,&diffuseSource);
+            device->GetRenderState(D3DRS_SPECULARMATERIALSOURCE,&specularSource);
+            device->GetRenderState(D3DRS_AMBIENTMATERIALSOURCE,&ambientSource);
+            device->GetRenderState(D3DRS_EMISSIVEMATERIALSOURCE,&emissiveSource);
+            device->GetRenderState(D3DRS_CLIPPING,&clipping);
 
             spdlog::info(
-                "VR TRACE PIPELINE FULL: family={} serial={} psHr=0x{:08X} ps=0x{:X} "
+                "VR TRACE PIPELINE FULL: family={} serial={} qpc={} psHr=0x{:08X} ps=0x{:X} "
                 "declHr=0x{:08X} decl=0x{:X} viewportHr=0x{:08X} "
                 "viewport={},{},{},{},{:.9g},{:.9g} scissorHr=0x{:08X} "
                 "scissor={},{},{},{} scissorEnable={} alphaRef={} alphaFunc={} "
@@ -5568,8 +5581,10 @@ namespace OutRunVRStereo
                 "stencilRef={} stencilMask=0x{:08X} stencilWriteMask=0x{:08X} "
                 "sRGBWrite={} multisample={} depthBiasBits=0x{:08X} "
                 "slopeDepthBiasBits=0x{:08X} textureFactor=0x{:08X} "
-                "clipEnable=0x{:08X} lighting={} ambient=0x{:08X}",
-                family ? family : "UNKNOWN", serial,
+                "clipEnable=0x{:08X} lighting={} ambient=0x{:08X} "
+                "colorVertex={} diffuseSource={} specularSource={} "
+                "ambientSource={} emissiveSource={} clipping={}",
+                family ? family : "UNKNOWN", serial, traceQpc.QuadPart,
                 static_cast<unsigned>(psHr), psPtr,
                 static_cast<unsigned>(declHr), declPtr,
                 static_cast<unsigned>(viewportHr),
@@ -5583,7 +5598,72 @@ namespace OutRunVRStereo
                 stencilEnable ? 1 : 0, stencilFunc, stencilRef,
                 stencilMask, stencilWriteMask, srgbWrite ? 1 : 0,
                 multisample ? 1 : 0, depthBias, slopeDepthBias,
-                textureFactor, clipEnable, lighting ? 1 : 0, ambient);
+                textureFactor, clipEnable, lighting ? 1 : 0, ambient,
+                colorVertex ? 1 : 0, diffuseSource, specularSource,
+                ambientSource, emissiveSource, clipping ? 1 : 0);
+
+
+            D3DMATRIX world{}, view{}, projection{}, texMtx0{}, texMtx1{};
+            const HRESULT worldHr=device->GetTransform(D3DTS_WORLD,&world);
+            const HRESULT viewHr=device->GetTransform(D3DTS_VIEW,&view);
+            const HRESULT projectionHr=device->GetTransform(D3DTS_PROJECTION,&projection);
+            const HRESULT texMtx0Hr=device->GetTransform(D3DTS_TEXTURE0,&texMtx0);
+            const HRESULT texMtx1Hr=device->GetTransform(D3DTS_TEXTURE1,&texMtx1);
+            spdlog::info(
+                "VR TRACE FIXEDFN MATRIX FULL: family={} serial={} qpc={} "
+                "worldHr=0x{:08X} world=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                "viewHr=0x{:08X} view=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                "projHr=0x{:08X} proj=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                "tex0Hr=0x{:08X} texMtx0=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                "tex1Hr=0x{:08X} texMtx1=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}]",
+                family ? family : "UNKNOWN", serial, traceQpc.QuadPart,
+                static_cast<unsigned>(worldHr),
+                world._11,world._12,world._13,world._14,world._21,world._22,world._23,world._24,
+                world._31,world._32,world._33,world._34,world._41,world._42,world._43,world._44,
+                static_cast<unsigned>(viewHr),
+                view._11,view._12,view._13,view._14,view._21,view._22,view._23,view._24,
+                view._31,view._32,view._33,view._34,view._41,view._42,view._43,view._44,
+                static_cast<unsigned>(projectionHr),
+                projection._11,projection._12,projection._13,projection._14,
+                projection._21,projection._22,projection._23,projection._24,
+                projection._31,projection._32,projection._33,projection._34,
+                projection._41,projection._42,projection._43,projection._44,
+                static_cast<unsigned>(texMtx0Hr),
+                texMtx0._11,texMtx0._12,texMtx0._13,texMtx0._14,
+                texMtx0._21,texMtx0._22,texMtx0._23,texMtx0._24,
+                texMtx0._31,texMtx0._32,texMtx0._33,texMtx0._34,
+                texMtx0._41,texMtx0._42,texMtx0._43,texMtx0._44,
+                static_cast<unsigned>(texMtx1Hr),
+                texMtx1._11,texMtx1._12,texMtx1._13,texMtx1._14,
+                texMtx1._21,texMtx1._22,texMtx1._23,texMtx1._24,
+                texMtx1._31,texMtx1._32,texMtx1._33,texMtx1._34,
+                texMtx1._41,texMtx1._42,texMtx1._43,texMtx1._44);
+
+            IDirect3DSurface9* traceRt=nullptr;
+            IDirect3DSurface9* traceDs=nullptr;
+            const HRESULT rtHr=device->GetRenderTarget(0,&traceRt);
+            const HRESULT dsHr=device->GetDepthStencilSurface(&traceDs);
+            D3DSURFACE_DESC rtDesc{}, dsDesc{};
+            const HRESULT rtDescHr=traceRt ? traceRt->GetDesc(&rtDesc) : E_FAIL;
+            const HRESULT dsDescHr=traceDs ? traceDs->GetDesc(&dsDesc) : E_FAIL;
+            const std::uintptr_t rtPtr=reinterpret_cast<std::uintptr_t>(traceRt);
+            const std::uintptr_t dsPtr=reinterpret_cast<std::uintptr_t>(traceDs);
+            if(traceRt) traceRt->Release();
+            if(traceDs) traceDs->Release();
+            spdlog::info(
+                "VR TRACE TARGET FULL: family={} serial={} qpc={} "
+                "rtHr=0x{:08X} rt=0x{:X} rtDescHr=0x{:08X} rt={}x{}:{} "
+                "dsHr=0x{:08X} ds=0x{:X} dsDescHr=0x{:08X} ds={}x{}:{} "
+                "rightRt=0x{:X} rightDepth=0x{:X} depthSynced={} stencilSynced={}",
+                family ? family : "UNKNOWN", serial, traceQpc.QuadPart,
+                static_cast<unsigned>(rtHr),rtPtr,static_cast<unsigned>(rtDescHr),
+                rtDesc.Width,rtDesc.Height,static_cast<unsigned>(rtDesc.Format),
+                static_cast<unsigned>(dsHr),dsPtr,static_cast<unsigned>(dsDescHr),
+                dsDesc.Width,dsDesc.Height,static_cast<unsigned>(dsDesc.Format),
+                reinterpret_cast<std::uintptr_t>(RightEyeSurface),
+                reinterpret_cast<std::uintptr_t>(RightEyeDepth),
+                RightDepthSynchronized ? 1 : 0,
+                RightStencilSynchronized ? 1 : 0);
 
             std::uintptr_t texPtr[4]{};
             UINT texW[4]{}, texH[4]{};

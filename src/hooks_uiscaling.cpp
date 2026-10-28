@@ -442,6 +442,17 @@ class UIScaling : public Hook
             OutRunVR::GoalResult::IsOriginalB9200ParentReturn(
                 base, caller);
 
+        if (exactGoalParent && Settings::VRTelemetry)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE GOAL TEXT FULL: qpc={} callerRva=0x{:X} x={} y={} "
+                "step={} text={}",
+                qpc.QuadPart, caller - base, x, y, step,
+                text ? text : "<null>");
+        }
+
         if (!exactGoalParent)
         {
             ResultTextB9200InlineHook.call<void>(text, x, y, step);
@@ -1384,6 +1395,87 @@ class UIScaling : public Hook
             }
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
+                const bool fullVisualNodeTrace =
+                    Settings::VRTelemetry &&
+                    (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
+                     producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
+                     producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
+                     producer == OutRunVR::GameSemantic::ProducerToken::Goal);
+                if (fullVisualNodeTrace)
+                {
+                    LARGE_INTEGER qpc{};
+                    QueryPerformanceCounter(&qpc);
+                    const auto* raw =
+                        reinterpret_cast<const unsigned char*>(node);
+                    std::uint64_t rawHash=1469598103934665603ull;
+                    for(std::size_t i=0;i<sizeof(SpriteNode);++i)
+                    {
+                        rawHash^=raw[i]; rawHash*=1099511628211ull;
+                    }
+                    spdlog::info(
+                        "VR TRACE HUD NODE FULL: qpc={} producer={} scope={} "
+                        "prio={} node=0x{:X} next=0x{:X} owner=0x{:X} kind={} "
+                        "queueEpoch={} preserveSince={} rawHash=0x{:016X}",
+                        qpc.QuadPart,
+                        OutRunVR::GameSemantic::Name(producer),
+                        OutRunVR::GameSemantic::Name(scope), prio,
+                        reinterpret_cast<std::uintptr_t>(node),
+                        reinterpret_cast<std::uintptr_t>(node->next_0),
+                        reinterpret_cast<std::uintptr_t>(node->owner_8),
+                        node->kind_C,
+                        OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                        preserveNewerExactSince,
+                        static_cast<unsigned long long>(rawHash));
+                    if(node->kind_C==0)
+                    {
+                        const auto& a=node->args_10;
+                        spdlog::info(
+                            "VR TRACE HUD NODE0 FULL: qpc={} producer={} prio={} "
+                            "xst={} top={} left={} bottom={} right={} "
+                            "scale={:.9g},{:.9g} f1C={:.9g} f20={:.9g} "
+                            "f24={:.9g} f28={:.9g} d2C=0x{:08X} f30={:.9g} "
+                            "d34=0x{:08X} p38=0x{:X}",
+                            qpc.QuadPart,
+                            OutRunVR::GameSemantic::Name(producer),prio,
+                            a.xstnum_0,a.top_4,a.left_8,a.bottom_C,a.right_10,
+                            a.scaleX,a.scaleY,a.float1C,a.float20,a.float24,
+                            a.float28,a.dword2C,a.float30,a.dword34,
+                            reinterpret_cast<std::uintptr_t>(a.pdword38));
+                    }
+                    else if(node->kind_C==1)
+                    {
+                        const auto& a=node->args2_58;
+                        std::uint32_t colorBits=0;
+                        std::memcpy(&colorBits,&a.color_4,sizeof(colorBits));
+                        spdlog::info(
+                            "VR TRACE HUD NODE1 FULL: qpc={} producer={} prio={} "
+                            "xst={} colorFloat={:.9g} colorBits=0x{:08X} tex=0x{:X} "
+                            "unk10=0x{:08X} "
+                            "mtx=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},"
+                            "{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
+                            "tl={:.9g},{:.9g},{:.9g} bl={:.9g},{:.9g},{:.9g} "
+                            "tr={:.9g},{:.9g},{:.9g} br={:.9g},{:.9g},{:.9g} "
+                            "uv={:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g} "
+                            "a4={:.9g} a8={:.9g} ac=0x{:08X} b0=0x{:08X} child=0x{:X}",
+                            qpc.QuadPart,
+                            OutRunVR::GameSemantic::Name(producer),prio,
+                            a.xstnum_0,a.color_4,colorBits,
+                            reinterpret_cast<std::uintptr_t>(a.d3dtexture_ptr_C),
+                            a.unk_10,
+                            a.mtx_14._11,a.mtx_14._12,a.mtx_14._13,a.mtx_14._14,
+                            a.mtx_14._21,a.mtx_14._22,a.mtx_14._23,a.mtx_14._24,
+                            a.mtx_14._31,a.mtx_14._32,a.mtx_14._33,a.mtx_14._34,
+                            a.mtx_14._41,a.mtx_14._42,a.mtx_14._43,a.mtx_14._44,
+                            a.TopLeft_54.x,a.TopLeft_54.y,a.TopLeft_54.z,
+                            a.BottomLeft_60.x,a.BottomLeft_60.y,a.BottomLeft_60.z,
+                            a.TopRight_6C.x,a.TopRight_6C.y,a.TopRight_6C.z,
+                            a.BottomRight_78.x,a.BottomRight_78.y,a.BottomRight_78.z,
+                            a.bottom_84,a.left_88,a.bottom_8C,a.right_90,
+                            a.top_94,a.right_98,a.top_9C,a.left_A0,
+                            a.unk_A4,a.unk_A8,a.unk_AC,a.unk_B0,
+                            reinterpret_cast<std::uintptr_t>(a.child_B4));
+                    }
+                }
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
 					node, scope, producer, projectedMarker,
                     preserveNewerExactSince);
@@ -4540,6 +4632,39 @@ private:
         const auto command = CapturePhysicalDrawCommand();
         const auto scope = command.scope;
         const auto source = command.producer;
+        const bool fullVisualD3dx =
+            Settings::VRTelemetry &&
+            (source == ProducerToken::StageExtensionTime ||
+             source == ProducerToken::ResultProgress ||
+             source == ProducerToken::ResultTextB9200 ||
+             source == ProducerToken::Goal);
+        static std::atomic<std::uint64_t> fullVisualD3dxSerial{0};
+        const std::uint64_t fullVisualDrawSerial =
+            fullVisualD3dx
+                ? fullVisualD3dxSerial.fetch_add(
+                    1,std::memory_order_relaxed)+1 : 0;
+        if(fullVisualD3dx)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE D3DX DRAW FULL: phase=PRE serial={} qpc={} producer={} "
+                "scope={} queued={} node=0x{:X} epoch={} self=0x{:X} tex=0x{:X} "
+                "rectValid={} rect={},{},{},{} centerValid={} center={:.9g},{:.9g},{:.9g} "
+                "posValid={} pos={:.9g},{:.9g},{:.9g} color=0x{:08X}",
+                fullVisualDrawSerial,qpc.QuadPart,Name(source),Name(scope),
+                command.queued ? 1 : 0,
+                reinterpret_cast<std::uintptr_t>(command.queueNode),
+                command.queueEpoch,reinterpret_cast<std::uintptr_t>(self),
+                reinterpret_cast<std::uintptr_t>(texture),rect ? 1 : 0,
+                rect ? rect->left : 0,rect ? rect->top : 0,
+                rect ? rect->right : 0,rect ? rect->bottom : 0,
+                center ? 1 : 0,center ? center->x : 0.0f,
+                center ? center->y : 0.0f,center ? center->z : 0.0f,
+                pos ? 1 : 0,pos ? pos->x : 0.0f,
+                pos ? pos->y : 0.0f,pos ? pos->z : 0.0f,
+                static_cast<unsigned>(color));
+        }
         // Stronger than the BB796 wrapper counter: this is an actual
         // native ID3DXSprite::Draw call. A valid original rival projector
         // without this row may enqueue ordinary SpriteNodes or use another
@@ -4573,6 +4698,27 @@ private:
         const auto submission = HudBatch.snapshot();
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
+        if(fullVisualD3dx)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            const auto afterTrace=CapturePhysicalDrawCommand();
+            spdlog::info(
+                "VR TRACE D3DX DRAW FULL: phase=POST serial={} qpc={} hr=0x{:08X} "
+                "preProducer={} postProducer={} preQueued={} postQueued={} "
+                "preNode=0x{:X} postNode=0x{:X} preEpoch={} postEpoch={} "
+                "batchActive={} batchDrawCount={} batchHomogeneous={} "
+                "batchScope={} batchProducer={}",
+                fullVisualDrawSerial,qpc.QuadPart,static_cast<unsigned>(hr),
+                Name(source),Name(afterTrace.producer),
+                command.queued ? 1 : 0,afterTrace.queued ? 1 : 0,
+                reinterpret_cast<std::uintptr_t>(command.queueNode),
+                reinterpret_cast<std::uintptr_t>(afterTrace.queueNode),
+                command.queueEpoch,afterTrace.queueEpoch,
+                HudBatch.active ? 1 : 0,HudBatch.drawCount,
+                HudBatch.homogeneous ? 1 : 0,
+                Name(HudBatch.scope),Name(HudBatch.producer));
+        }
         if (exactRivalNativeDraw)
         {
             static std::atomic<std::uint64_t> returns{0};

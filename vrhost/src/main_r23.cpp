@@ -3779,6 +3779,21 @@ int main(int argc, char** argv)
                     << " tick=" << fullTraceXrTick
                     << " qpc=" << fullTraceQpc.QuadPart
                     << " tickMs=" << fullTraceTickMs
+                    << " sessionState=" << static_cast<unsigned>(state)
+                    << " hostSequence=" << hostSequence
+                    << " endFrameResult=" << static_cast<int>(endResult)
+                    << " refSpacePending="
+                    << (pendingReferenceSpaceChange ? 1 : 0)
+                    << " refSpaceChangeTime=" << pendingReferenceSpaceChangeTime
+                    << " headFlags=0x" << std::hex
+                    << static_cast<unsigned long long>(head.locationFlags)
+                    << std::dec
+                    << " headPos=" << head.pose.position.x << ","
+                    << head.pose.position.y << "," << head.pose.position.z
+                    << " headOri=" << head.pose.orientation.x << ","
+                    << head.pose.orientation.y << ","
+                    << head.pose.orientation.z << ","
+                    << head.pose.orientation.w
                     << " viewStateFlags=0x" << std::hex
                     << static_cast<unsigned long long>(vs.viewStateFlags)
                     << std::dec
