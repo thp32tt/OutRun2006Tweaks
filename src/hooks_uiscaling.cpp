@@ -377,7 +377,7 @@ class UIScaling : public Hook
 		0x975EE, 0x97727, 0x977FB
 	};
 	// Canonical EXE original 0x97xxx source disassembly identified
-    // 19 distinct E8 direct calls to sub_4B9200. The 93% GOAL screenshot
+    // 21 distinct E8 direct calls to sub_4B9200. The 93% GOAL screenshot
     // displays oversized result digits while the separate progress-bar E8
     // calls remain 0x97BE4/0x97DEC -> 0x2D200. Restore the MISSING exact
     // sibling HUD owner at source, never by promoting all generic 2D draws.
@@ -415,7 +415,7 @@ class UIScaling : public Hook
     // 0x97C5F, so this is not a safe midhook placement. Keep the
     // original 0x97C57 E8 CALL completely unmodified until a verified
     // CALL-ABI wrapper can replace this parent without a post-CALL detour.
-    // All nineteen result text E8 parents must remain untouched until a
+    // All twenty-one result text E8 parents must remain untouched until a
     // verified ABI-safe wrapper exists: minidumps EIP 0x97C5F / 0x97E75.
     static constexpr int ResultTextUnsafeReturnRva = 0x97C57;
 
@@ -424,7 +424,7 @@ class UIScaling : public Hook
     // string one glyph at a time.  The old parent CALL+5 midhooks crashed
     // because legal branches can land inside those five-byte detours.
     // Hook the FUNCTION ENTRY instead.  SafetyHook's inline trampoline
-    // preserves the original E8 return address, so only the 19 canonical
+    // preserves the original E8 return address, so only the 21 canonical
     // GOAL callers are promoted to ScreenHud; +TIME's 4973C0/4974E0
     // callers and every unrelated text user pass through unchanged.
     static inline SafetyHookInline ResultTextB9200InlineHook{};
@@ -3692,7 +3692,7 @@ public:
         // are separate, still covered; safe B9200 caller wrappers require
         // confirmed original call ABI before another optical attempt.
         spdlog::warn(
-            "VR P0 RESULT CRASH GUARD 20261011: 19 B9200 original E8 "
+            "VR P0 RESULT CRASH GUARD 20261011: 21 B9200 original E8 "
             "calls unmodified, all rva+5 midhooks disabled "
             "(minidump EIPs 0x97C5F and 0x97E75); "
             "unsafe return-site hooks remain disabled; safe function-entry wrapper status follows; HMD validation pending");

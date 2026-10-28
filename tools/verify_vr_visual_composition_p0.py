@@ -971,7 +971,7 @@ for label, corrupted in (
 
 
 # Separate verified GOAL boundaries can submit pixels *during* their original
-# E8 call as well as queue SpriteNodes afterward. The 19 unsafe B9200 E8
+# E8 call as well as queue SpriteNodes afterward. The 21 unsafe B9200 E8
 # return midhooks remain disabled (real 0x97C5F/0x97E75 user minidumps).
 def verify_goal_transient_direct_hud_scope(ui_source, semantics_source):
     require('active_(SpriteQueueDepth == 0 && scope != RenderScope::None)',
