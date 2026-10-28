@@ -112,13 +112,13 @@
       },
       {
         "id": "exact_source_repaint_fallback",
-        "category": "safe_fallback",
+        "category": "fallback_regression",
         "behavior_area": "Original D3D9 crop/render and gamepad FFB preservation",
         "expected_behavior": "Invalid or insufficient RGNDATA dirty regions cannot publish native pixels and the original game render/input continue unchanged; all production/full-frame and DXVK paths remain protected."
       },
       {
         "id": "integrated_windows_cxx_and_gate_proof",
-        "category": "integration_verification",
+        "category": "integrated_validation",
         "behavior_area": "Source-integrated placement compile and exact-SHA regression",
         "expected_behavior": "C++17 positive and negative dirty-rectangle regression compiles and all five required GitHub Actions validate the identical material SHA; runtime/HMD remains untested."
       }
