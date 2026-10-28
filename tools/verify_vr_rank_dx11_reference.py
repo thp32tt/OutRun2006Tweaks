@@ -66,7 +66,10 @@ for name,expected in (("RankDx11ProducerReference", "true"),
                       ("RivalDx11NativeRoute","false"),
                       ("RankDesktopLift","false")):
     assert f"{name} = {expected}" in ini
-assert "if (!Settings::VRRivalDx11NativeRoute.get())" in hook
+assert "const bool rivalExactEdgeRequested =" in hook
+assert "!Settings::VRRivalDx11NativeRoute.get();" in hook
+assert "if (rivalExactEdgeRequested && Calc3D2D_hk)" in hook
+assert "RivalMarker_sprani, Memory::HookType::Call" in hook
 assert "const int anchorLiftY = Settings::VRRankDesktopLift.get()" in hook
 assert "R62TryFixedFunctionSpriteIndexed(" in dx9
 # The additional DX9-only positive-W gate must not reject an original
