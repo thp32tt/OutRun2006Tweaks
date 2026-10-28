@@ -110,7 +110,11 @@ require(
     "R24 top-level result-aware submission",
     "IntentionalMonoProjectionSubmits",
     "MixedValidatedSubmits",
-    "OutRunVrSbsCaptureOverride::EndFrame(session, endInfo)",
+    "OutRunVrFinalTest::EndFrame(session, endInfo)",
+    "SubmitNonProjectionOnly(",
+    "TrySubmitDirectSafeProjection(",
+    "SubmitOriginal(",
+    "SubmitVisibleFallback(",
     "RecordFinalSubmissionResult(",
 )
 if end_frame.count("RecordFinalSubmissionResult(") < 4:
