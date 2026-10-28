@@ -160,8 +160,19 @@ def mutate_exact_frontend_owner(source: str, good: str, bad: str) -> str:
     start = source.index("static int __stdcall D3DXMatrixTransformation2D_dest(")
     end = source.index("static inline SafetyHookMid draw_sprite_custom_matrix_hk", start)
     region = source[start:end]
-    assert good in region, "missing exact frontend mutation anchor: " + good
-    damaged = region.replace(good, bad, 1)
+    # STATE_SELECTOR exists in both the bounded legacy compatibility gate and
+    # the modern affine owner.  Mutate the modern owner specifically; otherwise
+    # an unchanged second list can make this destructive test a false negative.
+    if good == "*Game::current_mode == GameState::STATE_SELECTOR":
+        owner_start = region.index("const bool originalFrontEndProducer =")
+        owner_end = region.index("const bool centredPhysicalMenuFill =", owner_start)
+        owner = region[owner_start:owner_end]
+        assert good in owner, "missing modern frontend state mutation anchor"
+        damaged_owner = owner.replace(good, bad, 1)
+        damaged = region[:owner_start] + damaged_owner + region[owner_end:]
+    else:
+        assert good in region, "missing exact frontend mutation anchor: " + good
+        damaged = region.replace(good, bad, 1)
     return source[:start] + damaged + source[end:]
 
 for good, bad in (
