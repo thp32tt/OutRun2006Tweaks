@@ -36,9 +36,18 @@ def verify(src,setting,log):
 
     projected=src.split('static void __cdecl DrawObjectAlphaProjected(',1)[1].split('static void __cdecl DrawObjectAlphaCentre(',1)[0]
     assert 'objectId == 0x570008' in projected
-    assert 'const unsigned ordinal = ++LensOuter570008Ordinal;' in projected
+    # Current FULL trace scopes the 570008 source ordinal to one explicit
+    # LensFlareSequence. This preserves both original CABE calls while
+    # preventing an unanchored cross-sun counter from masquerading as a
+    # stable physical-child identity.
+    assert 'unsigned sourceOrdinal = 0;' in projected
+    assert 'if (LensFlareSequence != 0)' in projected
+    assert 'if (LensOuter570008Sequence != LensFlareSequence)' in projected
+    assert 'LensOuter570008Sequence = LensFlareSequence;' in projected
+    assert 'LensOuter570008Ordinal = 0;' in projected
+    assert 'sourceOrdinal = ++LensOuter570008Ordinal;' in projected
     assert 'VR LENS 570008 ORIGINAL BOTH DRAWN:' in projected
-    assert 'if (ordinal == 2)' not in projected
+    assert 'if (sourceOrdinal == 2)' not in projected
     assert 'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);' in projected
 
     assert 'Get-Content $active' in log
@@ -51,7 +60,7 @@ verify(source,settings,collector)
 mutations=[
     ('source','case 0x570010:','case 0x570011:'),
     ('source','case 0x57000F:','case 0x570011:'),
-    ('source','const unsigned ordinal = ++LensOuter570008Ordinal;','const unsigned ordinal = LensOuter570008Ordinal;'),
+    ('source','sourceOrdinal = ++LensOuter570008Ordinal;','sourceOrdinal = LensOuter570008Ordinal;'),
     ('source','static_cast<unsigned>(objectId) == 0x570002u','static_cast<unsigned>(objectId) == 0x570003u'),
     ('settings','"LensFlareCentreEnabled", true,','"LensFlareCentreEnabled", false,'),
     ('collector',"$kv.ContainsKey('gameDllSha256')","$kv.gameDllSha256"),
