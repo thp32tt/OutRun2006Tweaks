@@ -1,0 +1,209 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01129",
+  "production_id": "CONVERSION-DX11-01129",
+  "event_id": "CONVERSION-DX11-01129-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01129",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:ORPHAN_GPU_CAPTURE_COMPLETION_RECOVERY",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "d926114de7fe53e0ec856fbd8af146c81c7ff931",
+  "source_change_sha": "d984954e2cdc458e79cd7b33a84132f55a0a59d5",
+  "material_result_sha": "40492ccc267b469d4597db2cbbc71ab9bd772663",
+  "validation_bearing_result_sha": "40492ccc267b469d4597db2cbbc71ab9bd772663",
+  "result_sha": "40492ccc267b469d4597db2cbbc71ab9bd772663",
+  "implementation_commits": [
+    "d984954e2cdc458e79cd7b33a84132f55a0a59d5"
+  ],
+  "repair_commits": [
+    "40492ccc267b469d4597db2cbbc71ab9bd772663"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_gpu_source_epoch_test.cpp"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW",
+      "D3D11_GPU_PAIRED_BEFORE_AFTER_READBACK",
+      "SOURCE_GAME_PRESENT_EPOCH",
+      "ABANDONED_CAPTURE_EVENT_RETIRE",
+      "FRESH_SOURCE_NATIVE_DRAW",
+      "OPT_IN_RAW_VISIBLE_TILE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_TILE_NOT_FULL_NATIVE_GAME_FRAME"
+    ],
+    "batch_components": [
+      "CPP_SOURCE_EPOCH_ORPHAN_CAPTURE_SAFE_RETIREMENT",
+      "CPP_GPU_EVENT_QUERY_QUARANTINE",
+      "CPP_PRESENT_RECOVERY_TELEMETRY",
+      "CXX17_POSITIVE_NEGATIVE_SOURCE_EPOCH_REGRESSION",
+      "CAUSAL_WIN32_INCLUDE_NAME_COMPILATION_REPAIR"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_BUILD_VERIFIED ONLY; real menu/vehicle/race native GPU pixels and Quest3/VDXR stereo UNTESTED at exact SHA; partial RAW diagnostic not full native renderer.",
+    "activation_guard_and_fallback": "Opt-in RAW diagnostics only; failed/pending GPU copy does not overwrite original D3D9 backbuffer, original gamepad, input/FFB or DX9Ex fallback. No DXVK changes.",
+    "acceptance_proof": {
+      "positive_probe": "On later source Draw, a completed GPU EVENT retires prior Present's orphan copy and permits a NEW source-owned readback.",
+      "negative_regression": "S_FALSE retains in-flight GPU staging; same serial never retires current Present; no pending copy causes no probe; any failed GPU query/Map quarantines until Reset.",
+      "component_integration": "Native D3D11 real Draw before/after capture source epoch and D3D9 Present safety integrated; five exact SHA GitHub Actions PASS."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha_with_real_causal_repair"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Recover a completed native GPU staging capture when a genuine D3D9 Present was not eligible to consume it, without losing the next game Draw or publishing stale pixels.",
+    "acceptance_items": [
+      {
+        "id": "orphan_native_gpu_copy_recovery",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Genuine Draw GPU event readback and D3D9 Present epoch",
+        "expected_behavior": "Prior-epoch completed staging is retired only when next real source Draw occurs; a fresh capture can proceed."
+      },
+      {
+        "id": "pending_and_failure_original_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GPU fence and D3D9 original renderer/FFB/input",
+        "expected_behavior": "S_FALSE keeps staging busy; failed GPU query/map quarantines until Reset; old native pixels never uploaded."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA GitHub Actions source/build gates",
+        "expected_behavior": "DX11 Fast, Backend, Windows Build, OpenXR and HUD Inspector all completed success on same SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "orphan_native_gpu_copy_recovery": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_gpu_capture_epoch.hpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #40639228910 exact SHA PASS; original game/HMD UNTESTED"
+    },
+    "pending_and_failure_original_game_fallback": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_gpu_source_epoch_test.cpp"
+      ],
+      "validation_command": "Backend #40639228884 and Win32 Build #40639228900 exact SHA PASS"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40639228910",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40639228884"
+      ],
+      "validation_command": "Five required push workflows success at exact source SHA 40492ccc267b469d4597db2cbbc71ab9bd772663"
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40639228910,
+      "event": "push",
+      "head_sha": "40492ccc267b469d4597db2cbbc71ab9bd772663",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40639228884,
+      "event": "push",
+      "head_sha": "40492ccc267b469d4597db2cbbc71ab9bd772663",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40639228900,
+      "event": "push",
+      "head_sha": "40492ccc267b469d4597db2cbbc71ab9bd772663",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40639228912,
+      "event": "push",
+      "head_sha": "40492ccc267b469d4597db2cbbc71ab9bd772663",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40639228899,
+      "event": "push",
+      "head_sha": "40492ccc267b469d4597db2cbbc71ab9bd772663",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS current remote DX11 HEAD d926114de7fe53e0ec856fbd8af146c81c7ff931 and preserved prior completed owner 01128; identified orphan RAW pending GPU copy after unsafe or unobserved Present.",
+    "C1_REVIEW": "PASS bounded source-authentic native RAW frame flow, event ownership and protected original game path.",
+    "C2_IMPLEMENT": "PASS actual C++ source integration and regression at d984954e2cdc458e79cd7b33a84132f55a0a59d5",
+    "C3_VALIDATE": "PASS all five original required exact-SHA push workflows at 40492ccc267b469d4597db2cbbc71ab9bd772663; first Backend failed C1083 header, repaired under same TASK_ID.",
+    "C4_COMMIT": "PASS non-force implementation d984954e2cdc458e79cd7b33a84132f55a0a59d5 and same-task Win32 causal include repair 40492ccc267b469d4597db2cbbc71ab9bd772663 exact marker [AUTO:CONVERSION-DX11-01129]; no CI skip on Gate-bearing commit.",
+    "C5_PACKAGE": "PASS Windows Build artifact ID 12795380892 at exact 40492ccc267b469d4597db2cbbc71ab9bd772663; Quest3/VDXR game UNTESTED.",
+    "C6_STATE": "PASS docs-only record after five exact-SHA Gates; validation-bearing SHA preserved, previous scoreboard already counted task +1, C6 +0."
+  },
+  "source_matched_artifact": {
+    "name": "outrun2006tweaks-40492ccc267b469d4597db2cbbc71ab9bd772663",
+    "artifact_id": 12795380892,
+    "run_id": 40639228900
+  },
+  "runtime_evidence": {
+    "native_draws": "UNTESTED_AT_THIS_SHA",
+    "native_gpu_pixel_output": "UNTESTED_AT_THIS_SHA",
+    "publishedBackbufferFrames": "UNTESTED_AT_THIS_SHA",
+    "gpu_desktop_frames": "UNTESTED_AT_THIS_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "score_change": 1,
+  "c6_score_change": 0,
+  "cumulative_ai2_score": 2077,
+  "scoreboard_authority": {
+    "repository": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "path": "AI_SCOREBOARD.md",
+    "scoreboard_commit": "5cd45685fc31cdad65a3442a8ce90734e8252da7",
+    "previous_confirmed_ai2": 2076,
+    "score_increment_for_distinct_source_and_exact_sha_gate": 1,
+    "score_increment_for_retry_and_c6": 0,
+    "new_confirmed_ai2": 2077
+  },
+  "next_action": "Require user original-game source-matched desktop menu->car->race RAW visible GPU pixel evidence (native_draws and native_gpu_pixel_output), then continue full game native frame, LR OpenXR and Quest3/VDXR; no claim from CI only.",
+  "c6_note": "Separate docs bookkeeping commit does not change exact validation-bearing material SHA or add a new score. Actual task time proportions were not measured. External controller adoption NOT_VERIFIED."
+}
