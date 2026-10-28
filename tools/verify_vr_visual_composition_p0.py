@@ -2599,7 +2599,8 @@ def verify_centre_only_lens_owner(source, analyzer):
         require(needle, body, 'central sun balanced owner')
     for needle in (
         'LensCentreDepth', 'CurrentScope = LensCentreSavedScope',
-        'LensCentreOwnerDepth == LensCentreDepth',
+        'const bool restoringOwner = LensCentreOwnerDepth == LensCentreDepth;',
+        'if (LensCentreOwnerDepth == LensCentreDepth)',
         'LensCentreOwnerDepth = 0;', '--LensCentreDepth;',
     ):
         require(needle, leave, 'central sun balanced scope restore')
@@ -2723,8 +2724,8 @@ for label, mutant in (
         'skipped nested enter unbalanced')),
     ('nested scope popped early', mutate_lens_region(
         lens_leave_start, lens_leave_end, lens_leave_region,
-        'LensCentreOwnerDepth == LensCentreDepth',
-        'LensCentreDepth > 0', 'nested scope popped early')),
+        'if (LensCentreOwnerDepth == LensCentreDepth)',
+        'if (LensCentreDepth > 0)', 'nested scope popped early')),
     ('skipped nested leave unbalanced', mutate_lens_region(
         lens_leave_start, lens_leave_end, lens_leave_region,
         '--LensCentreDepth;', '/* unbalanced leave */',
