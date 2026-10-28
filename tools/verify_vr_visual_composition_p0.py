@@ -3298,9 +3298,11 @@ for label, corrupt in (
         raise SystemExit('P0 original HUD c64 mutation survived: ' + label)
 
 
-# Exact EXE+0xCABE is a centre-eye projected screen effect and gets the
-# HMD-proven R69 zero-disparity fusion path. Other Clr_SceneEffect variants
-# retain flat/spatial WVP classification. All paths require original raw c64.
+# Exact EXE+0xCABE is a centre-eye projected screen effect. R85 keeps one
+# original angular source ray but projects it independently through the left
+# and right OpenXR asymmetric FOVs with IPD translation suppressed. Other
+# Clr_SceneEffect variants retain flat/spatial WVP classification. All paths
+# require original raw c64.
 def check_exact_scene_effect_raw_wvp(source):
     scope = function_body(source, 'bool R30ExactSceneEffectScope(')
     require('RenderScope::SceneEffect', scope,
@@ -3334,13 +3336,25 @@ def check_exact_scene_effect_raw_wvp(source):
     projected = eye[eye.index(
         'R30ScreenSpaceKind::ProjectedScreenEffect2D)'):]
     require_order(
-        projected, 'CABE fusion uses bounded original game WVP before eye copy',
+        projected, 'CABE R85 uses bounded original WVP before asymmetric eye-ray projection',
         'if (!R44GetOwnedRawOverlayWvp(original) &&',
         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)',
-        'std::memcpy(eyeConstants[0], &stockT',
-        'std::memcpy(eyeConstants[1], &stockT'
+        'GetLatchedHeadInverse(',
+        'const D3DMATRIX identityEye = IdentityMatrix();',
+        'for (int eye = 0; eye < 2; ++eye)',
+        'ProjectionFromFov(',
+        'stereo.eyeFov[eye]',
+        'BuildProjectedSunRay(',
+        'std::memcpy(eyeConstants[eye], &projectedT'
     )
+    for forbidden in (
+        'std::memcpy(eyeConstants[0], &stockT',
+        'std::memcpy(eyeConstants[1], &stockT',
+        'VR R69 FLARE FUSION',
+    ):
+        if forbidden in projected:
+            raise SystemExit('P0 exact SceneEffect/CABE reverted to same-WVP fusion: ' + forbidden)
     fallback = eye[eye.index('if (!R44GetOwnedRawOverlayWvp(original))'):]
     require_order(
         fallback, 'flat/spatial SceneEffect retains original game WVP fallback',
