@@ -5,6 +5,7 @@
 #include "live_game_cull_state.hpp"
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_table_fog.hpp"
+#include "native_game_raw_fvf_fog_visual.hpp"
 #include "live_game_sm3_user_clip.hpp"
 #include "live_game_fixed_clip.hpp"
 #include "live_game_sm3_depth_output.hpp"
@@ -1242,6 +1243,7 @@ struct TextureCapture {
 struct OutputCapture {
     bool alphaBlend = false;
     bool nativeSrgbWrite = false; // Live FVF RT0 encoding; independent of sampler decode.
+    bool rawFogVisualMismatch = false; // Only for a fog-omitting opt-in RAW tile; NEVER a full game frame.
     bool additiveBlend = false; // D3D9 ONE/ONE
     bool sourceAlphaAddBlend = false; // D3D9 SRCALPHA/ONE
     bool premultipliedAlphaBlend = false; // D3D9 ONE/INVSRCALPHA
@@ -2634,19 +2636,44 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
         !clip || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame))
         return false;
-    // FVF fixed-function game draws use the same actual source NONE/NONE
-    // equation as SM3, not the inherited RANGEFOGENABLE flag. A genuine
-    // vertex or table fog equation is still unsupported for this shader
-    // family: do not substitute an un-fogged native output for colored fog.
-    bool sourceFogInactive = fog == FALSE;
+    // The original game's inert NONE/NONE fog equations remain fully safe.
+    // For ACTUAL active FVF fog, a deliberately incomplete GPU RAW tile may
+    // display approximate no-fog RGB only after bounded original source state
+    // and float payload have been read successfully. The D3D9 game Draw and
+    // normal full-frame DX11 path remain exact/fail-closed; this mismatch
+    // must invalidate complete-frame publication after native submission.
+    const bool sourceFogDisabled = fog == FALSE;
+    DWORD sourceTableFog = 0xffffffffu, sourceVertexFog = 0xffffffffu;
+    const bool fogModesKnown = sourceFogDisabled ||
+        (SUCCEEDED(game->GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)) &&
+         SUCCEEDED(game->GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)));
+    const bool sourceFogInactive = sourceFogDisabled ||
+        (fogModesKnown &&
+         native_game_inert_fog_modes(sourceTableFog, sourceVertexFog));
     if (!sourceFogInactive) {
-        DWORD sourceTableFog = 0xffffffffu, sourceVertexFog = 0xffffffffu;
-        sourceFogInactive =
-            SUCCEEDED(game->GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)) &&
-            SUCCEEDED(game->GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)) &&
-            native_game_inert_fog_modes(sourceTableFog, sourceVertexFog);
+        DWORD sourceRangeFog = 0xffffffffu, sourceFogColor = 0u;
+        DWORD startBits = 0u, endBits = 0u, densityBits = 0u;
+        D3DCAPS9 actualCaps{};
+        const bool sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&
+            fogModesKnown &&
+            SUCCEEDED(game->GetRenderState(D3DRS_RANGEFOGENABLE, &sourceRangeFog)) &&
+            SUCCEEDED(game->GetRenderState(D3DRS_FOGCOLOR, &sourceFogColor)) &&
+            SUCCEEDED(game->GetRenderState(D3DRS_FOGSTART, &startBits)) &&
+            SUCCEEDED(game->GetRenderState(D3DRS_FOGEND, &endBits)) &&
+            SUCCEEDED(game->GetRenderState(D3DRS_FOGDENSITY, &densityBits)) &&
+            SUCCEEDED(game->GetDeviceCaps(&actualCaps));
+        float start=0.0f, end=0.0f, density=0.0f;
+        if (sourceKnown) {
+            std::memcpy(&start, &startBits, sizeof(start));
+            std::memcpy(&end, &endBits, sizeof(end));
+            std::memcpy(&density, &densityBits, sizeof(density));
+        }
+        output.rawFogVisualMismatch = native_raw_fvf_fog_visual_admission(
+            env_raw_visual_opt_in(), sourceKnown,
+            sourceTableFog, sourceVertexFog, sourceRangeFog,
+            start, end, density);
+        if (!output.rawFogVisualMismatch) return false;
     }
-    if (!sourceFogInactive) return false; // DX9Ex source fallback is authoritative.
     // D3D9 polygon fill does not change the topology of a POINTLIST or
     // LINESTRIP inherited from an earlier triangle. The live SM3 GPU path
     // already uses these exact enum domains. Extend the full-game FVF path
@@ -5256,6 +5283,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         return false;
     }
     NativeSm3TableFog tableZFog{};
+    bool rawFogOmitted = false;
     if (fog != FALSE) {
         // Preserve the game's actual post-pixel-shader table fog where the
         // rasterizer guarantees Z fog. All other fog remains DX9Ex-owned.
@@ -5337,6 +5365,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                         fogStart, fogEnd, fogDensity);
                     return false;
                 }
+                rawFogOmitted = true;
                 ++s.rawFogVisualBypasses;
                 if (s.rawFogVisualBypasses <= 3u ||
                     s.rawFogVisualBypasses % 1024u == 0u)
@@ -7148,6 +7177,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         ++s.eligibleThisFrame;
     liveBatch.succeeded(liveDepth.enabled, reverseDepth);
     liveBatch.record_source_draw(sourceOrdinal);
+    // An otherwise successful RAW no-fog Draw cannot certify complete
+    // source-frame color parity or full-native game/VR publication.
+    if (rawFogOmitted) liveBatch.abort();
     submitted = true;
     return true;
     } catch (...) {
@@ -8670,6 +8702,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         const bool oversizedPointStrip = type == D3DPT_TRIANGLESTRIP &&
             output.nativePointFill &&
             std::uint64_t(primitives) * 3u > kMaxIndices;
+        const std::uint64_t issuedBeforeFvf = s.issued;
         if (oversizedFan || oversizedPointStrip) {
             const auto windowPlan = game_fvf_polygon_window_plan(
                 static_cast<std::uint32_t>(type), expectedElements,
@@ -8731,6 +8764,19 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                                        output.nativeDepthOrderingMode != 0u);
                 s.frameBatch.record_source_draw(sourceOrdinal);
             }
+        }
+        // An active fixed-function fog equation was omitted in the RAW-only
+        // preview shader. Preserve its genuine GPU before/after pixel sample,
+        // but never publish the partially converted D3D11 full game frame.
+        if (output.rawFogVisualMismatch && s.issued > issuedBeforeFvf) {
+            s.frameBatch.abort();
+            const auto bypasses = ++s.rawFogVisualBypasses;
+            if (bypasses <= 3u || bypasses % 1024u == 0u)
+                spdlog::warn(
+                    "DX11_VISUAL_MISMATCH_FOG path=FVF bypass_count={} "
+                    "source_ordinal={} RAW_TILE_ONLY full_frame=REJECTED "
+                    "original_D3D9_unchanged=1",
+                    bypasses, sourceOrdinal);
         }
     } catch (...) {
         // If allocation or translation throws after one native Draw, do not
