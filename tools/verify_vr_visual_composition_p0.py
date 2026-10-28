@@ -2541,6 +2541,7 @@ lens_draw = function_body(graphics, 'static void __cdecl DrawObjectAlphaProjecte
 if not re.search(
     r'OutRunVR::GameSemantic::ScopedRenderSemantic\s+semantic\(\s*'
     r'OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D\s*\);\s*'
+    r'OutRunVR::GameSemantic::ScopedLensOriginalCall\s+inlineSource\(.*?\);\s*'
     r'Game::DrawObjectAlpha_Internal\(objectId,\s*alpha,\s*work,\s*flags\);',
     lens_draw, re.S,
 ):
@@ -2556,13 +2557,15 @@ def verify_lens_child_producer_trace(graphics_source):
         'hit <= 24 || (hit & (hit - 1)) == 0',
         'VR P0 FLARE OBJECT:', 'objectId, alpha,',
         'ScopedRenderSemantic semantic(',
+        'ScopedLensOriginalCall inlineSource(',
         'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);',
     ):
         require(marker, lens_body, 'exact flare child source tracing')
     if lens_body.count('Game::DrawObjectAlpha_Internal(') != 1:
         raise SystemExit('P0 centre lens trace duplicated original draws')
-    require_order(lens_body, 'lens object source before unchanged original',
+    require_order(lens_body, 'lens object source/provenance before unchanged original',
                   'VR P0 FLARE OBJECT:', 'ScopedRenderSemantic semantic(',
+                  'ScopedLensOriginalCall inlineSource(',
                   'Game::DrawObjectAlpha_Internal(')
 verify_lens_child_producer_trace(graphics)
 for label, altered in (
