@@ -1014,15 +1014,29 @@ def verify_goal_transient_direct_hud_scope(ui_source, semantics_source):
         require_order(leave, name + ' tag before semantic release',
                       'TagAppendedNodes(', owner + '.reset();')
     helper = function_body(ui_source, 'static void GoalTime_TagHelper(')
-    for needle in ('goalDirectDrawOwner', 'if (Settings::VREnabled)',
-                   'goalDirectDrawOwner.emplace(',
-                   'RenderScope::ScreenHud',
-                   'goalDirectDrawOwner.reset();',
-                   'TagAppendedNodes(before,'):
+    for needle in (
+        'const OutRunVR::GoalProgress::SourceAdmission admission{',
+        'if (!admission.mayBeginDirect())',
+        'FlushD3DXBeforeDirectGoalSource();',
+        'const bool admittedAfterDrain = admission.mayPublish(',
+        'if (!admittedAfterDrain)',
+        'ScopedExactProducerSemantic owner(',
+        'RenderScope::ScreenHud',
+        'original(); // exact original helper once',
+        'admittedAtExit = admission.mayPublish(',
+        'if (admittedAtExit)',
+        'TagAppendedNodes(before,',
+        'FlushD3DXAtDirectGoalSourceExit();',
+    ):
         require(needle, helper, 'GOAL time/title helper direct-and-queued path')
-    require_order(helper, 'original once, release then queue sibling tag',
-                  'goalDirectDrawOwner.emplace(', 'original();',
-                  'goalDirectDrawOwner.reset();', 'TagAppendedNodes(before,')
+    require_order(helper, 'drain/revalidate, exact owner, original once, exit lease then queued tag',
+                  'FlushD3DXBeforeDirectGoalSource();',
+                  'const bool admittedAfterDrain = admission.mayPublish(',
+                  'ScopedExactProducerSemantic owner(',
+                  'original(); // exact original helper once',
+                  'admittedAtExit = admission.mayPublish(',
+                  'if (admittedAtExit)',
+                  'TagAppendedNodes(before,')
     for forbidden in ('ResultTextEnterHooks[i] = safetyhook::create_mid(',
                       'ResultTextLeaveHooks[i] = safetyhook::create_mid('):
         if forbidden in function_body(ui_source, 'bool apply() override'):
@@ -1037,7 +1051,9 @@ for label, original in (
     ('stage time text direct owner lost',
      'OutRunStagePrintfDirectDrawOwner.emplace('),
     ('GOAL time helper direct owner lost',
-     'goalDirectDrawOwner.emplace('),
+     'ScopedExactProducerSemantic owner('),
+    ('GOAL time helper exit admission lost',
+     'if (admittedAtExit)'),
     ('GOAL time helper queued sibling tagging lost',
      'TagAppendedNodes(before,\n\t\t\tOutRunVR::GameSemantic::RenderScope::ScreenHud, producer,\n            nullptr, &rootsBefore, entrySerial);'),
 ):
