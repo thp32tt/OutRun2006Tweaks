@@ -152,6 +152,18 @@ def require_frontend_owner(source: str) -> None:
         "if (!frontEndPivot && CanContainOriginalFullFrontEndVector(")
 
 require_frontend_owner(text)
+
+def mutate_exact_frontend_owner(source: str, good: str, bad: str) -> str:
+    if good == "hasScale && hasTranslation;":
+        assert good in source, "missing full-vector mutation anchor"
+        return source.replace(good, bad, 1)
+    start = source.index("static int __stdcall D3DXMatrixTransformation2D_dest(")
+    end = source.index("static inline SafetyHookMid draw_sprite_custom_matrix_hk", start)
+    region = source[start:end]
+    assert good in region, "missing exact frontend mutation anchor: " + good
+    damaged = region.replace(good, bad, 1)
+    return source[:start] + damaged + source[end:]
+
 for good, bad in (
     ("hasScale && hasTranslation;", "hasScale || hasTranslation;"),
     ("const bool originalFrontEndProducer = Game::current_mode &&",
@@ -163,9 +175,8 @@ for good, bad in (
     ("const bool partialFrontEndMenu = originalFrontEndProducer;",
      "const bool partialFrontEndMenu = true;"),
 ):
-    assert good in text, "missing owner mutation anchor: " + good
     try:
-        require_frontend_owner(text.replace(good, bad, 1))
+        require_frontend_owner(mutate_exact_frontend_owner(text, good, bad))
     except (AssertionError, ValueError):
         pass
     else:
