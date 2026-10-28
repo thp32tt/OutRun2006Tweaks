@@ -84,6 +84,11 @@ for token in (
     "inline void Publish(",
     "inline Snapshot Read()",
     "Generation.fetch_add(1",
+    "Writer.test_and_set(std::memory_order_acquire)",
+    "Writer.clear(std::memory_order_release)",
+    "NextSerial.fetch_add(1",
+    "PublishedResetSerial.store(",
+    "snapshot.readStable = true;",
 ):
     assert token in reset_trace, token
 for token in (
@@ -99,12 +104,28 @@ for token in (
 assert reset.index("deviceEx->ResetEx(&effective, fullscreenPtr)") < reset.index(
     "classicReplaySucceeded = RestoreClassicResetState(device);") < reset.index(
     "OutRunVR::D3D9ResetTrace::Publish(trace);")
+assert "resetViewportMatchesPre" not in renderer
+for token in (
+    "lensResetTrace.readStable",
+    "lensResetTrace.viewportX == savedViewport.X",
+    "lensResetTrace.viewportY == savedViewport.Y",
+    "lensResetTrace.viewportWidth == savedViewport.Width",
+    "lensResetTrace.viewportHeight == savedViewport.Height",
+    "lensResetTrace.has(",
+    "OutRunVR::D3D9ResetTrace::ResetSucceeded",
+    "OutRunVR::D3D9ResetTrace::ViewportValid",
+    "OutRunVR::D3D9ResetTrace::ScissorValid",
+):
+    assert token in renderer, token
 for token in (
     '#include "vr/d3d9/reset_trace.hpp"',
     "lensResetTrace = OutRunVR::D3D9ResetTrace::Read();",
     "preViewport={},{},{}x{}",
     "resetEpoch={} resetQpc={} resetFlags=0x{:X}",
-    "resetViewportMatchesPre={}",
+    "resetSnapshotStable={}",
+    "resetViewportExtentMatchesPre={}",
+    "resetViewportRectMatchesPre={}",
+    "resetScissorMatchesPre={}",
 ):
     assert token in renderer, token
 
@@ -133,4 +154,4 @@ assert reset_target((3440,1440),(2496,2688)) == (2496,2688)
 assert reset_target((1920,1080),(2496,2688),follow=True) == (1920,1080)
 assert reset_target((1920,1080),(2496,2688),windowed=False) == (1920,1080)
 assert reset_target((1920,1080),(0,0)) == (1920,1080)
-print("PASS logical UI resolution is monitor/game-owned while physical VR D3D9Ex target follows XR eye, survives ResetEx, and publishes a joinable raster epoch; HMD UNTESTED")
+print("PASS logical UI resolution is monitor/game-owned while physical VR D3D9Ex target follows XR eye; Reset epoch is writer-safe and full viewport/scissor joins are explicit; HMD UNTESTED")
