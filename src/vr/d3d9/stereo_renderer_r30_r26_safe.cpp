@@ -6412,7 +6412,7 @@ namespace OutRunVRStereo
                         "rightRT=0x{:X} rightRTDesc={}x{}:{} sameRT={} "
                         "preViewport={},{},{}x{} preScissorValid={} "
                         "preScissor={},{},{},{} "
-                        "resetEpoch={} resetQpc={} resetFlags=0x{:X} "
+                        "resetTraceSchema=3 resetEpoch={} resetQpc={} resetFlags=0x{:X} "
                         "resetSnapshotStable={} resetRequested={}x{} "
                         "resetEffective={}x{} resetActual={}x{} "
                         "resetViewport={},{},{}x{} "
