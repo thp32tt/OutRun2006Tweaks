@@ -45,7 +45,8 @@ struct ScopedRenderSemantic {explicit ScopedRenderSemantic(RenderScope){}};
 ProducerToken CurrentQueueProducerToken(){return command.producer;}
 ProducerToken CurrentRenderProducerToken(){return command.producer;}
 void*CurrentProjectedMarker(){return nullptr;}
-const char*Name(ProducerToken){return "test";}\nconst char*Name(RenderScope){return "test-scope";}
+const char*Name(ProducerToken){return "test";}
+const char*Name(RenderScope){return "test-scope";}
 }
 namespace Settings {bool VRTelemetry=true;}
 namespace spdlog {template<class...T>void info(T&&...){}}
