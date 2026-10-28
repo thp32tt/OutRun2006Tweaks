@@ -31,7 +31,7 @@ D3DMATRIX MultiplyMatrix(const D3DMATRIX&a,const D3DMATRIX&b){D3DMATRIX c{};for(
 bool MatrixFinite(const D3DMATRIX&m){for(auto&r:m.m)for(float v:r)if(!std::isfinite(v))return false;return true;}
 struct Viewport {DWORD X=0,Y=0,Width=1920,Height=1080;};
 namespace OutRunVR::GameSemantic {
-enum class RenderScope {None,ScreenHud,World,Projected,ProjectedWorldMarker2D,ScreenOverlay2D};
+enum class RenderScope {None,ScreenHud,World,Projected,ProjectedWorldMarker2D,ScreenOverlay2D,ProjectedScreenEffect2D,SceneEffect};
 enum class ProducerToken {None,StageExtensionTime,ResultProgress,Goal,Rank,Lens,RivalMarkerSprani};
 struct Command {RenderScope scope=RenderScope::ScreenHud;ProducerToken producer=ProducerToken::StageExtensionTime;bool queued=false;void*queueNode=nullptr;unsigned queueEpoch=0;
 bool IsExactFiniteResultHud()const{return scope==RenderScope::ScreenHud&&(producer==ProducerToken::StageExtensionTime||producer==ProducerToken::ResultProgress||producer==ProducerToken::Goal);}};
@@ -50,6 +50,7 @@ const char*Name(RenderScope){return "test-scope";}
 }
 namespace Settings {bool VRTelemetry=true;}
 namespace spdlog {template<class...T>void info(T&&...){}}
+struct IDirect3DDevice9;
 void R30TraceVisualPipelineFull(IDirect3DDevice9*, const char*, std::uint64_t){}
 namespace OutRunVRRenderer {struct LatchedStereoFrame{unsigned poseSequence=7;};bool poseValid=true;bool GetLatchedStereoFrame(LatchedStereoFrame&f){f.poseSequence=7;return poseValid;}}
 void R30TraceLatchedStereoFull(const char*, std::uint64_t, const OutRunVRRenderer::LatchedStereoFrame&){}
