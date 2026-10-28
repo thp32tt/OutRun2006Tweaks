@@ -12,6 +12,7 @@
 #include "native_game_raw_pixel_delta.hpp"
 #include "native_game_raw_draw_tile.hpp"
 #include "native_game_raw_draw_pair.hpp"
+#include "native_game_raw_partial_present_tile.hpp"
 
 namespace outrun::vr::dx11 {
 enum class NativeRawPreviewResult {
@@ -52,8 +53,12 @@ public:
              back.Format != D3DFMT_X8R8G8B8) ||
             l < 0 || t < 0 || r > static_cast<LONG>(back.Width) ||
             b > static_cast<LONG>(back.Height) ||
-            r - l < static_cast<LONG>(width + 16) ||
-            b - t < static_cast<LONG>(height + 16))
+            l >= r || t >= b)
+            return NativeRawPreviewResult::UnsafePresent;
+        NativeRawPresentTile visibleTile{};
+        if (!native_raw_partial_present_tile(
+                back.Width, back.Height, l, t, r, b,
+                width, height, visibleTile))
             return NativeRawPreviewResult::UnsafePresent;
         NativeRawPreviewResult output = NativeRawPreviewResult::NoDraw;
         if (pending_) {
@@ -91,7 +96,13 @@ public:
                     const auto* beforeRow = static_cast<const std::uint8_t*>(before.pData) +
                         static_cast<std::size_t>(y) * before.RowPitch;
                     for (UINT x = 0; x < width; ++x) {
-                        if (native_raw_rgb_changed(beforeRow + 4u * x,
+                        // Only changed GPU pixels inside the actually visible
+                        // D3D9 source crop can certify a RAW diagnostic.
+                        if (x >= visibleTile.sourceX &&
+                            x < visibleTile.sourceX + visibleTile.copyWidth &&
+                            y >= visibleTile.sourceY &&
+                            y < visibleTile.sourceY + visibleTile.copyHeight &&
+                            native_raw_rgb_changed(beforeRow + 4u * x,
                                                    afterRow + 4u * x))
                             ++nativePixels;
                     }
@@ -119,7 +130,16 @@ public:
                         std::memcpy(dst, src, width * 4u);
                         // Unmistakable magenta INCOMPLETE GPU tile border.
                         for (UINT x = 0; x < width; ++x) {
-                            if (x < 3 || x >= width-3 || y < 4 || y >= height-4) {
+                            // Magenta INCOMPLETE border on the visible
+                            // subsection, including small menu Present crops.
+                            if (x >= visibleTile.sourceX &&
+                                x < visibleTile.sourceX + visibleTile.copyWidth &&
+                                y >= visibleTile.sourceY &&
+                                y < visibleTile.sourceY + visibleTile.copyHeight &&
+                                (x - visibleTile.sourceX < 3u ||
+                                 visibleTile.sourceX + visibleTile.copyWidth - x <= 3u ||
+                                 y - visibleTile.sourceY < 4u ||
+                                 visibleTile.sourceY + visibleTile.copyHeight - y <= 4u)) {
                                 dst[x*4u] = 255; dst[x*4u+1u] = 0;
                                 dst[x*4u+2u] = 255;
                             }
@@ -130,10 +150,17 @@ public:
                     const HRESULT unlocked = surface_->UnlockRect();
                     ctx->Unmap(baseline_.Get(), 0);
                         ctx->Unmap(staging_.Get(), 0);
-                    const POINT destination{r-static_cast<LONG>(width)-8, t+8};
+                    const RECT sourceTile{
+                        static_cast<LONG>(visibleTile.sourceX),
+                        static_cast<LONG>(visibleTile.sourceY),
+                        static_cast<LONG>(visibleTile.sourceX + visibleTile.copyWidth),
+                        static_cast<LONG>(visibleTile.sourceY + visibleTile.copyHeight)};
+                    const POINT destination{
+                        static_cast<LONG>(visibleTile.destinationX),
+                        static_cast<LONG>(visibleTile.destinationY)};
                     if (SUCCEEDED(unlocked) &&
                         SUCCEEDED(game->UpdateSurface(
-                            surface_.Get(), nullptr, backbuffer, &destination)))
+                            surface_.Get(), &sourceTile, backbuffer, &destination)))
                         output = NativeRawPreviewResult::VisibleGpuPixels;
                     else output = NativeRawPreviewResult::UploadFailure;
                 } else {
