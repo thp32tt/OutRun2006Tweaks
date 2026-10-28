@@ -1399,8 +1399,7 @@ class UIScaling : public Hook
                     Settings::VRTelemetry &&
                     (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
                      producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
-                     producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
-                     producer == OutRunVR::GameSemantic::ProducerToken::Goal);
+                     producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
                 if (fullVisualNodeTrace)
                 {
                     LARGE_INTEGER qpc{};
@@ -4636,8 +4635,7 @@ private:
             Settings::VRTelemetry &&
             (source == ProducerToken::StageExtensionTime ||
              source == ProducerToken::ResultProgress ||
-             source == ProducerToken::ResultTextB9200 ||
-             source == ProducerToken::Goal);
+             source == ProducerToken::ResultTextB9200);
         static std::atomic<std::uint64_t> fullVisualD3dxSerial{0};
         const std::uint64_t fullVisualDrawSerial =
             fullVisualD3dx
