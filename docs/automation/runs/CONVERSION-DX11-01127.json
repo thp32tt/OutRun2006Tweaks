@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01127",
+  "production_id": "CONVERSION-DX11-01127",
+  "event_id": "CONVERSION-DX11-01127-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01127",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SAME_PRESENT_GPU_READBACK",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "b0f5189947250bfcc331b6e6f655f45ffd222461",
+  "source_change_sha": "6185393c488c6b2e6d5196b20f8248a42198ff6e",
+  "material_result_sha": "35a02c82bb62677326a0d67b849ce9459973eaf7",
+  "validation_bearing_result_sha": "35a02c82bb62677326a0d67b849ce9459973eaf7",
+  "result_sha": "35a02c82bb62677326a0d67b849ce9459973eaf7",
+  "implementation_commits": [
+    "6185393c488c6b2e6d5196b20f8248a42198ff6e"
+  ],
+  "repair_commits": [
+    "35a02c82bb62677326a0d67b849ce9459973eaf7"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_gpu_wait.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_gpu_wait_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_package_dx11_first_game_frame.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_D3D9_GAME_DRAW",
+      "NATIVE_D3D11_REAL_DRAW",
+      "ORDERED_GPU_PRE_AND_POST_COPY",
+      "BOUNDED_SAME_PRESENT_GPU_EVENT_COMPLETION",
+      "D3D9_RAW_PARTIAL_VISIBLE_PIXEL_TILE"
+    ],
+    "batch_components": [
+      "CXX_GPU_EVENT_TIMED_WAIT_AND_STAGING_MAP",
+      "CXX_SAME_PRESENT_RAW_NATIVE_PIXEL_DELIVERY",
+      "PORTABLE_POSITIVE_NEGATIVE_TIMING_REGRESSION",
+      "INHERITED_OPENXR_PACKAGE_NEGATIVE_CAUSAL_REPAIR"
+    ],
+    "positive_probe": "Deterministic ready-now and ready-within-timeout GPU event sequences return Complete and permit same-Present copy.",
+    "negative_regression": "Pending beyond 24ms, GPU failure, stopped clock and zero wait budget remain fail-closed; original renderer, input and FFB unaffected.",
+    "component_integration": "Actual D3D11 Draw paired GPU staging readback integrates bounded event-ready Map with existing authentic changed pixel crop; mandatory five exact-SHA push gates PASS.",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Make a genuine intercepted game native DX11 Draw's diagnostic GPU pixels eligible for same-epoch original D3D9 Present with bounded GPU event readiness, without claiming full native output.",
+    "acceptance_items": [
+      {
+        "id": "same_present_native_raw_pixels",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Bounded 24ms GPU event-complete readback and source-authentic RGB crop on matching original Present."
+      },
+      {
+        "id": "failed_gpu_original_game_fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Never block indefinitely, use event completion before staging Map and preserve original D3D9/FFB/gamepad."
+      },
+      {
+        "id": "five_exact_sha_actions",
+        "category": "integrated_validation",
+        "expected_behavior": "All five mandatory push workflows SUCCESS at the repaired material SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "same_present_native_raw_pixels": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_gpu_wait.hpp",
+        "tests/native_raw_gpu_wait_test.cpp"
+      ]
+    },
+    "failed_gpu_original_game_fallback": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tools/test_package_dx11_first_game_frame.py",
+        "tests/native_raw_gpu_wait_test.cpp"
+      ]
+    },
+    "five_exact_sha_actions": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS Github branch HEAD b0f5189947250bfcc331b6e6f655f45ffd222461 and source ownership checked; no concurrent 01127 material commit existed.",
+    "C1_REVIEW": "PASS native paired pre/post Draw copy's immediate GetData S_FALSE deferred visible RAW pixel to a later game Present; no real game-run proof asserted.",
+    "C2_IMPLEMENT": "PASS material C++ same-Present bounded native GPU readback integration and targeted portable regression at 6185393c488c6b2e6d5196b20f8248a42198ff6e.",
+    "C3_VALIDATE": "PASS mandatory five exact-SHA push Gates on 35a02c82bb62677326a0d67b849ce9459973eaf7",
+    "C4_COMMIT": "PASS non-force functional commit 6185393c..., same-TASK causal package test repair 35a02c82bb62677326a0d67b849ce9459973eaf7; both exact marker and neither CI skip.",
+    "C5_PACKAGE": "PASS Build artifact outrun2006tweaks-35a02c82bb62677326a0d67b849ce9459973eaf7 ID 12790387825; game/HMD runtime UNTESTED.",
+    "C6_STATE": "PASS separate bookkeeping after all five Gate successes; same task +0."
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40628277706,
+      "event": "push",
+      "head_sha": "35a02c82bb62677326a0d67b849ce9459973eaf7",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40628277545,
+      "event": "push",
+      "head_sha": "35a02c82bb62677326a0d67b849ce9459973eaf7",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40628277594,
+      "event": "push",
+      "head_sha": "35a02c82bb62677326a0d67b849ce9459973eaf7",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40628277530,
+      "event": "push",
+      "head_sha": "35a02c82bb62677326a0d67b849ce9459973eaf7",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40628277683,
+      "event": "push",
+      "head_sha": "35a02c82bb62677326a0d67b849ce9459973eaf7",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "code_changed": true,
+  "score_change": 1,
+  "c6_score_change": 0,
+  "ai2_scoreboard_commit": "63490d93d6202632cd3154f2c63b86d6088d94d8",
+  "cumulative_ai2_score": 2070,
+  "runtime_acceptance_pending": [
+    "same-SHA desktop native_draws>0, genuine native_gpu_pixel_output>0",
+    "publishedBackbufferFrames>0 for full native frame",
+    "separate native L/R OpenXR Quest3/VDXR HMD optical verification"
+  ]
+}
