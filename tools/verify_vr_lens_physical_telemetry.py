@@ -93,6 +93,11 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
         "const bool semanticOverlay =")
     # A wrapper can overlap a native entry; retain the explicit "candidate"
     # qualifier until the original opaque descriptor and flush generation join.
+    assert "VR TRACE LENS GPU STATE FULL:" in body
+    assert "VR TRACE LENS MATRIX FULL:" in body
+    assert "VR TRACE LENS SOURCE FULL:" in hook
+    assert "VR TRACE LENS CENTRE ENTER FULL:" in hook
+    assert "VR TRACE LENS CENTRE LEAVE FULL:" in hook
     assert "VR LENS R30 INLINE SOURCE ENTRY:" in body
     assert "opaqueDescriptor=UNLINKED" in body
     assert "provenance=CALL_STACK_ONLY" in body
@@ -168,7 +173,14 @@ def main() -> None:
     for idx, old, new in mutations:
         assert old in values[idx], "missing negative mutation: " + old
         mutated = values.copy()
-        mutated[idx] = mutated[idx].replace(old, new, 1)
+        # Full diagnostics intentionally repeat the exact-source receipt in
+        # multiple observational log lines. For this provenance mutation,
+        # mutate every receipt so an added log cannot absorb the single
+        # replacement while leaving the actual unsafe assertion untouched.
+        if old == "lensInlineLinked ? 1 : 0":
+            mutated[idx] = mutated[idx].replace(old, new)
+        else:
+            mutated[idx] = mutated[idx].replace(old, new, 1)
         try:
             check(*mutated)
         except AssertionError:
