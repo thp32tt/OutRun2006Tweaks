@@ -158,8 +158,8 @@ def main() -> None:
         (2, "ArmLensDeferredPhysical(", "/* removed deferred bridge */"),
         (0, "rawWvpHash=0x{:016X}", "rawWvpHash=OMITTED"),
         (0, "sameRT={}", "sameRT=ASSUMED_ZERO"),
-        (3, "diagnostics only and must never gain EffectiveScope/render authority.",
-            "diagnostics may override EffectiveScope."),
+        (3, "CurrentLensDeferredPhysical is diagnostic-only.",
+            "CurrentLensDeferredPhysical may override rendering."),
     ]
     values = [r30, game, hook, sem]
     for idx, old, new in mutations:
