@@ -4297,23 +4297,79 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         HudBatch.invalidate();
     }
 
+    static void LogDeviceLifecycle(
+        const char* phase,
+        const OutRunVR::HudCommandBatch::Ledger::NativeSnapshot& entry,
+        bool ownsBatch, bool invalidated,
+        bool entryActive, unsigned entryDrawCount, bool entryHomogeneous,
+        OutRunVR::GameSemantic::RenderScope entryScope,
+        OutRunVR::GameSemantic::ProducerToken entryProducer,
+        HRESULT hr) noexcept
+    {
+        if (!Settings::VRTelemetry)
+            return;
+        const auto resetTrace = OutRunVR::D3D9ResetTrace::Read();
+        spdlog::info(
+            "VR HUD D3DX LIFECYCLE: phase={} hr=0x{:08X} "
+            "ownsBatch={} invalidated={} entrySprite=0x{:X} "
+            "entryGeneration={} entryMutation={} entryActive={} "
+            "entryDrawCount={} entryHomogeneous={} entryScope={} "
+            "entryProducer={} postGeneration={} postMutation={} "
+            "postActive={} postDrawCount={} resetEpoch={} resetQpc={} "
+            "resetFlags=0x{:X} resetSnapshotStable={}",
+            phase, static_cast<unsigned>(hr),
+            ownsBatch ? 1 : 0, invalidated ? 1 : 0,
+            reinterpret_cast<std::uintptr_t>(entry.sprite),
+            entry.generation, entry.mutationSerial,
+            entryActive ? 1 : 0, entryDrawCount,
+            entryHomogeneous ? 1 : 0,
+            OutRunVR::GameSemantic::Name(entryScope),
+            OutRunVR::GameSemantic::Name(entryProducer),
+            HudBatch.generation, HudBatch.mutationSerial,
+            HudBatch.active ? 1 : 0, HudBatch.drawCount,
+            resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
+            resetTrace.readStable ? 1 : 0);
+    }
+
     static HRESULT __stdcall LostDeviceDest(void* self)
     {
         const auto entry = HudBatch.snapshot();
+        const bool entryActive = HudBatch.active;
+        const unsigned entryDrawCount = HudBatch.drawCount;
+        const bool entryHomogeneous = HudBatch.homogeneous;
+        const auto entryScope = HudBatch.scope;
+        const auto entryProducer = HudBatch.producer;
         const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
             self, entry.sprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);
+        const bool invalidated =
+            ownsBatch && HudBatch.sameGeneration(entry);
         InvalidateForDeviceLifecycle(ownsBatch, entry);
+        LogDeviceLifecycle(
+            "LOST_DEVICE", entry, ownsBatch, invalidated,
+            entryActive, entryDrawCount, entryHomogeneous,
+            entryScope, entryProducer, hr);
         return hr;
     }
 
     static HRESULT __stdcall ResetDeviceDest(void* self)
     {
         const auto entry = HudBatch.snapshot();
+        const bool entryActive = HudBatch.active;
+        const unsigned entryDrawCount = HudBatch.drawCount;
+        const bool entryHomogeneous = HudBatch.homogeneous;
+        const auto entryScope = HudBatch.scope;
+        const auto entryProducer = HudBatch.producer;
         const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
             self, entry.sprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);
+        const bool invalidated =
+            ownsBatch && HudBatch.sameGeneration(entry);
         InvalidateForDeviceLifecycle(ownsBatch, entry);
+        LogDeviceLifecycle(
+            "RESET_DEVICE", entry, ownsBatch, invalidated,
+            entryActive, entryDrawCount, entryHomogeneous,
+            entryScope, entryProducer, hr);
         return hr;
     }
 
