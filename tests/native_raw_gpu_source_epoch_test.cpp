@@ -37,6 +37,33 @@ int main() {
     assert(e.can_queue(9u, false)); // only after GPU fence retired
     e.queued(9u);
     assert(e.consume_for_present(9u));
+    // Cropped/dirty-menu Present 41 could not paint a RAW diagnostic tile.
+    // The following genuine source Draw safely retires only a completed copy.
+    e.reset(); e.queued(41u);
+    unsigned polls = 0u;
+    using GPU = outrun::vr::dx11::NativeRawGpuWaitResult;
+    assert(!e.previous_present_copy(41u));
+    assert(e.retire_previous_copy(41u, true, [&] {
+        ++polls; return GPU::Complete;
+    }) == GPU::Pending);
+    assert(polls == 0u && e.consume_for_present(41u));
+    e.reset(); e.queued(41u);
+    assert(e.previous_present_copy(42u));
+    assert(e.retire_previous_copy(42u, true, [&] {
+        ++polls; return GPU::Pending;
+    }) == GPU::Pending);
+    assert(polls == 1u && !e.can_queue(42u, true));
+    assert(e.retire_previous_copy(42u, true, [&] {
+        ++polls; return GPU::Complete;
+    }) == GPU::Complete);
+    assert(polls == 2u && !e.consume()); // no stale pixels on later Present
+    assert(e.can_queue(42u, false));
+    e.queued(42u); assert(e.consume_for_present(42u));
+    e.reset(); e.queued(52u);
+    assert(e.retire_previous_copy(53u, false, [&] {
+        ++polls; return GPU::Complete;
+    }) == GPU::Pending);
+    assert(polls == 2u); // no outstanding GPU copy, no event query
     e.reset(); // genuine Reset/new D3D9 or D3D11 owner
     assert(e.can_queue(0u, false));
     assert(!e.consume());

@@ -3,6 +3,7 @@
 // Successful GPU Draw is the producer; later Present is only a consumer.
 // Does not certify complete source coverage, stereo or gameplay activation.
 #include <cstdint>
+#include "native_raw_gpu_wait.hpp"
 
 namespace outrun::vr::dx11 {
 class NativeRawGpuCaptureEpoch final {
@@ -28,6 +29,21 @@ public:
         const bool hadCopy = unconsumed_;
         unconsumed_ = false;
         return hadCopy;
+    }
+    // The following game Present can reclaim an orphaned GPU copy only
+    // after its D3D11 EVENT completes; never reuse previous-frame pixels.
+    [[nodiscard]] bool previous_present_copy(std::uint64_t serial) const noexcept {
+        return everQueued_ && lastQueuedSerial_ != serial;
+    }
+    template <class Probe>
+    [[nodiscard]] NativeRawGpuWaitResult retire_previous_copy(
+        std::uint64_t serial, bool copyPending, Probe&& probe) noexcept {
+        if (!copyPending || !previous_present_copy(serial))
+            return NativeRawGpuWaitResult::Pending; // do not poll current frame
+        const auto state = probe();
+        if (state == NativeRawGpuWaitResult::Complete)
+            unconsumed_ = false; // orphaned copy cannot ever be published
+        return state;
     }
     void reset() noexcept {
         lastQueuedSerial_ = 0u;

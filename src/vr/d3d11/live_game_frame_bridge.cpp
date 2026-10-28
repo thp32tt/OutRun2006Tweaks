@@ -1372,6 +1372,7 @@ struct State {
     std::uint64_t rawPreviewFrames = 0u;
     std::uint64_t rawPreviewCopies = 0u;
     std::uint64_t rawPreviewLateCopies = 0u;
+    std::uint64_t rawPreviewRecoveredLogged = 0u;
     std::uint64_t rawFogVisualBypasses = 0u;
     NativeRawSourceProbeSchedule rawSourceProbe;
     std::uint64_t rawProbeRestarts = 0u;
@@ -11315,6 +11316,16 @@ void before_game_present(IDirect3DDevice9* game,
                     s.rawFogVisualBypasses);
             }
         }
+        // Event-complete orphan retirement is distinct from a displayed RAW
+        // pixel tile; the original game D3D9 Present/input remain authoritative.
+        const auto recoveredRaw = s.rawPreview.recovered_late_copies();
+        if (rawVisual && recoveredRaw != s.rawPreviewRecoveredLogged)
+            spdlog::info(
+                "DX11 RAW_VISUAL orphan_gpu_capture_retired={} "
+                "present_serial={} native_gpu_pixel_output=0 "
+                "full_native_frame=NO DX9Ex_preserved=1",
+                recoveredRaw, s.presents);
+        s.rawPreviewRecoveredLogged = recoveredRaw;
         s.pending = false;
         s.frameBatch.reset();
         s.preDrawSurface.discard();

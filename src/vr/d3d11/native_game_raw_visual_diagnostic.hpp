@@ -32,8 +32,12 @@ public:
         staging_.Reset(); baseline_.Reset(); event_.Reset(); surface_.Reset();
         drawPair_.reset();
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
-        pending_ = false; lastDraws_ = 0;
+        pending_ = false; quarantined_ = false; lastDraws_ = 0;
+        recoveredLateCopies_ = 0u;
         captureEpoch_.reset();
+    }
+    [[nodiscard]] std::uint64_t recovered_late_copies() const noexcept {
+        return recoveredLateCopies_;
     }
     NativeRawPreviewResult present(
         IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,
@@ -113,12 +117,14 @@ public:
                     before.RowPitch < width * 4u) {
                     if (beforeHr == S_OK) ctx->Unmap(baseline_.Get(), 0);
                     pending_ = false;
+                    quarantined_ = true; // invalid GPU Map needs Reset
                     return NativeRawPreviewResult::GpuFailure;
                 }
                 const HRESULT hr = ctx->Map(staging_.Get(), 0,
                     D3D11_MAP_READ, 0u, &mapped);
                 pending_ = false;
                 if (hr != S_OK || !mapped.pData || mapped.RowPitch < width * 4u) {
+                    quarantined_ = true;
                     if (hr == S_OK) ctx->Unmap(staging_.Get(), 0);
                     ctx->Unmap(baseline_.Get(), 0);
                     return NativeRawPreviewResult::GpuFailure;
@@ -202,6 +208,7 @@ public:
                 return NativeRawPreviewResult::GpuPending;
             } else {
                 pending_ = false;
+                quarantined_ = true; // GPU/query failure needs Reset
                 return NativeRawPreviewResult::GpuFailure;
             }
         }
@@ -220,6 +227,30 @@ public:
         if (gameOwner_ != game || gpuOwner_ != dev) {
             reset(); gameOwner_ = game; gpuOwner_ = dev;
         }
+        // A cropped/dirty/incompatible D3D9 Present may never enter present(),
+        // leaving an orphaned GPU staging pair across menus/car/race frames.
+        // Recover on a later genuine source Draw, with NO Map/UpdateSurface
+        // of stale pixels. Only S_OK releases both textures for reuse;
+        // S_FALSE holds the fence and any GPU failure quarantines until Reset.
+        if (pending_ && captureEpoch_.previous_present_copy(presentingSerial)) {
+            const auto retired = captureEpoch_.retire_previous_copy(
+                presentingSerial, pending_, [&]() noexcept {
+                    if (!event_) return NativeRawGpuWaitResult::Failed;
+                    const HRESULT hr = ctx->GetData(event_.Get(), nullptr, 0,
+                        D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                    return hr == S_OK ? NativeRawGpuWaitResult::Complete :
+                           hr == S_FALSE ? NativeRawGpuWaitResult::Pending :
+                                           NativeRawGpuWaitResult::Failed;
+                });
+            if (retired == NativeRawGpuWaitResult::Complete) {
+                pending_ = false;
+                ++recoveredLateCopies_;
+            } else if (retired == NativeRawGpuWaitResult::Failed) {
+                pending_ = false;
+                quarantined_ = true;
+            }
+        }
+        if (quarantined_) return;
         // One source-owned pair per frame; a GPU event still in flight blocks
         // allocation/reuse of BOTH before/after staging resources.
         // A previous source Draw can fail *after* its BEFORE copy. Discard
@@ -258,7 +289,7 @@ private:
     NativeRawPreviewResult queue_before_draw(
         ID3D11Device* dev, ID3D11DeviceContext* ctx,
         ID3D11Texture2D* color) noexcept {
-        if (!dev || !ctx || !color || pending_)
+        if (!dev || !ctx || !color || pending_ || quarantined_)
             return NativeRawPreviewResult::GpuFailure;
         D3D11_TEXTURE2D_DESC src{};
         color->GetDesc(&src);
@@ -347,6 +378,8 @@ private:
     D3DFORMAT format_ = D3DFMT_UNKNOWN;
     std::uint64_t lastDraws_ = 0, capture_ = 0;
     bool pending_ = false;
+    bool quarantined_ = false;
+    std::uint64_t recoveredLateCopies_ = 0u;
     NativeRawGpuCaptureEpoch captureEpoch_{};
     NativeRawChangedPixelWindow changedWindow_{};
 };
