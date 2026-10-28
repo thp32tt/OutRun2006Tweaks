@@ -125,6 +125,7 @@ def check_extra_producers(ui, contracts):
             'ScopedExactProducerSemantic owner(',
             'original(); // exact original helper once',
             'admittedAtExit = admission.mayPublish(',
+            'if (admittedAtExit)',
             'TagAppendedNodes(before,',
             'RenderScope::ScreenHud, producer,',
             'nullptr, &rootsBefore, entrySerial);',
