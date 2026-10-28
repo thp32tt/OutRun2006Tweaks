@@ -30,7 +30,7 @@ public:
     static constexpr UINT width = 256, height = 144;
     void reset() noexcept {
         staging_.Reset(); baseline_.Reset(); event_.Reset(); surface_.Reset();
-        drawPair_.reset();
+        drawPair_.reset(); region_ = {};
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; quarantined_ = false; lastDraws_ = 0;
         recoveredLateCopies_ = 0u;
@@ -49,18 +49,26 @@ public:
     // native RGB sample. A foreign D3D9 device cannot retire its GPU copy;
     // in-flight staging remains owned by the original EVENT fence.
     [[nodiscard]] bool invalidate_source_color_write(
-        IDirect3DDevice9* game) noexcept {
+        IDirect3DDevice9* game,
+        const NativeRawSourcePixelRect* changedRects = nullptr,
+        std::uint32_t changedCount = 0u) noexcept {
         if (!game || gameOwner_ != game) return false;
-        // A native BEFORE/AFTER pair must not survive a later real D3D9
-        // backbuffer write, even when its asynchronous GPU EVENT is pending.
-        // Keep both GPU readback resources owned until EVENT completion.
+        // The GPU capture is a 256x144 source-authentic tile, not the
+        // complete D3D9 scene. An explicitly bounded disjoint color write
+        // elsewhere cannot supersede these pixels. Unknown/full writes still
+        // invalidate conservatively. Never release an in-flight GPU EVENT.
+        if (!native_raw_source_write_overlaps_tile(
+                region_.left, region_.top, region_.right, region_.bottom,
+                changedRects, changedCount)) return false;
         drawPair_.reset();
         rgbEvidenceConfirmed_ = false;
         return captureEpoch_.invalidate_for_full_source_clear(pending_);
     }
     [[nodiscard]] bool invalidate_source_target_clear(
-        IDirect3DDevice9* game) noexcept {
-        return invalidate_source_color_write(game);
+        IDirect3DDevice9* game,
+        const NativeRawSourcePixelRect* changedRects = nullptr,
+        std::uint32_t changedCount = 0u) noexcept {
+        return invalidate_source_color_write(game, changedRects, changedCount);
     }
     NativeRawPreviewResult present(
         IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,

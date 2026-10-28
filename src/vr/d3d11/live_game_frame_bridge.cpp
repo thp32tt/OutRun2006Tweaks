@@ -8940,7 +8940,9 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
 // HRESULT, rendering, gamepad and FFB remain unchanged. Caller holds s.mutex.
 void invalidate_raw_preview_on_source_surface_write(
     State& s, IDirect3DDevice9* game, IDirect3DSurface9* destination,
-    bool hasWrittenPixels, const char* operation) noexcept {
+    bool hasWrittenPixels, const char* operation,
+    const NativeRawSourcePixelRect* changedRects = nullptr,
+    std::uint32_t changedCount = 0u) noexcept {
     if (!env_raw_visual_opt_in() || !hasWrittenPixels || !game ||
         !destination || !s.sourceGameDevice) return;
     ComPtr<IDirect3DSurface9> canonical;
@@ -8963,7 +8965,8 @@ void invalidate_raw_preview_on_source_surface_write(
             reinterpret_cast<std::uintptr_t>(canonicalId.Get()),
             sourceDesc.Width, sourceDesc.Height,
             canonicalDesc.Width, canonicalDesc.Height)) return;
-    if (s.rawPreview.invalidate_source_color_write(game)) {
+    if (s.rawPreview.invalidate_source_color_write(
+            game, changedRects, changedCount)) {
         const auto discarded = ++s.rawSurfaceWriteCaptureInvalidations;
         if (discarded <= 3u || discarded % 128u == 0u)
             spdlog::info(
@@ -9023,8 +9026,12 @@ bool preserve_game_surface_copy(
             : GameNativeSurfaceCopyRegion::destination(
                 0,0,desc.Width,desc.Height,desc.Width,desc.Height);
         if (!changedRegion.valid) return false;
+        const NativeRawSourcePixelRect copiedRegion{
+            changedRegion.left, changedRegion.top,
+            changedRegion.right, changedRegion.bottom};
         invalidate_raw_preview_on_source_surface_write(
-            s, game, destination, true, "surface_copy");
+            s, game, destination, true, "surface_copy",
+            &copiedRegion, 1u);
         // Menu/vehicle/race may begin with a whole authentic D3D9 GPU
         // StretchRect/UpdateSurface instead of TARGET Clear. Admit that
         // exact source only if it completely overwrites the bound main RT0
@@ -9798,10 +9805,18 @@ bool preserve_game_color_fill(
         std::lock_guard<std::mutex> lock(s.mutex);
         // Successful partial or whole ColorFill can replace a sampled RAW
         // native tile. An empty clipped source rectangle changes no pixels.
+        // A successful ColorFill with a clipped, bounded rectangle cannot
+        // overwrite RAW native pixels outside that exact source region.
+        // Null-rect full fills still conservatively revoke the current pair.
+        const NativeRawSourcePixelRect fillRegion{
+            clipped.left, clipped.top, clipped.right, clipped.bottom};
+        const bool boundedFill =
+            rect && coverage == GameNativeSourceMutation::ColorFillClip::Pixels;
         invalidate_raw_preview_on_source_surface_write(
             s, game, destination,
             !rect || coverage == GameNativeSourceMutation::ColorFillClip::Pixels,
-            "color_fill");
+            "color_fill", boundedFill ? &fillRegion : nullptr,
+            boundedFill ? 1u : 0u);
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
         // Original D3D9 can establish an entire frame with ColorFill instead
         // of a prior TARGET Clear. Only the CANONICAL bound game RT0/backbuffer
@@ -10333,8 +10348,20 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
                 reinterpret_cast<std::uintptr_t>(targetIdentity.Get()),
                 reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
                 targetDesc.Width, targetDesc.Height, bbDesc.Width, bbDesc.Height);
+        // Use the original successful D3D9 Clear rectangle array only when
+        // its complete bounded set is known. Null/excessive/invalid regions
+        // remain UNKNOWN: revoke the tile rather than risk stale native RGB.
+        NativeRawSourcePixelRect clearRegions[32]{};
+        const bool boundedClear = rects && count > 0u && count <= 32u;
+        if (boundedClear) {
+            for (DWORD i = 0u; i < count; ++i)
+                clearRegions[i] = {rects[i].x1, rects[i].y1,
+                                   rects[i].x2, rects[i].y2};
+        }
         if (rawSourceTargetClear &&
-            s.rawPreview.invalidate_source_target_clear(game)) {
+            s.rawPreview.invalidate_source_target_clear(
+                game, boundedClear ? clearRegions : nullptr,
+                boundedClear ? count : 0u)) {
             const auto discards = ++s.rawClearCaptureInvalidations;
             if (discards <= 3u || discards % 128u == 0u)
                 spdlog::info(

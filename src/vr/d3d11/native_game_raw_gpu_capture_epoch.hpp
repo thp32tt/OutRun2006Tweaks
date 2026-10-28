@@ -34,6 +34,32 @@ namespace outrun::vr::dx11 {
             capturedDevice, writingDevice, target, backbuffer,
             targetWidth, targetHeight, backWidth, backHeight);
 }
+// A native GPU BEFORE/AFTER pair samples only this bounded source tile.
+// Authentic D3D9 rectangular color writes elsewhere in the game's canonical
+// backbuffer do not erase pixels INSIDE the captured tile. Unknown, excessive
+// or malformed source regions remain conservatively overlapping.
+struct NativeRawSourcePixelRect {
+    std::int64_t left, top, right, bottom;
+};
+[[nodiscard]] constexpr bool native_raw_source_write_overlaps_tile(
+    std::uint32_t tileLeft, std::uint32_t tileTop,
+    std::uint32_t tileRight, std::uint32_t tileBottom,
+    const NativeRawSourcePixelRect* writes,
+    std::uint32_t count) noexcept {
+    if (tileRight <= tileLeft || tileBottom <= tileTop ||
+        !writes || count == 0u || count > 32u) return true;
+    for (std::uint32_t i = 0u; i < count; ++i) {
+        const auto& r = writes[i];
+        if (r.left < 0 || r.top < 0 ||
+            r.right <= r.left || r.bottom <= r.top) return true;
+        if (r.left < static_cast<std::int64_t>(tileRight) &&
+            r.right > static_cast<std::int64_t>(tileLeft) &&
+            r.top < static_cast<std::int64_t>(tileBottom) &&
+            r.bottom > static_cast<std::int64_t>(tileTop))
+            return true;
+    }
+    return false;
+}
 class NativeRawGpuCaptureEpoch final {
 public:
     [[nodiscard]] bool can_queue(std::uint64_t presentSerial,

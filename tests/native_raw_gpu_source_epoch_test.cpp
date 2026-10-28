@@ -6,6 +6,8 @@
 using outrun::vr::dx11::NativeRawGpuCaptureEpoch;
 using outrun::vr::dx11::native_raw_source_color_clear_matches;
 using outrun::vr::dx11::native_raw_source_color_write_matches;
+using outrun::vr::dx11::NativeRawSourcePixelRect;
+using outrun::vr::dx11::native_raw_source_write_overlaps_tile;
 int main() {
     // A clipped color Clear on this exact game backbuffer is as capable of
     // superseding a captured native pixel as a full color Clear. Only genuine
@@ -47,6 +49,30 @@ int main() {
     static_assert(!native_raw_source_color_write_matches(
         true, true, 0x11u, 0x11u, 0x22u, 0x22u,
         1280u, 720u, 3440u, 1440u), "wrong-sized destination cannot retire capture");
+    // Real native GPU source tile [100,200..356,344) is unchanged by an
+    // authentic disjoint source Clear/ColorFill/StretchRect destination.
+    // The touching edge is disjoint; a one-pixel intersect MUST retire it.
+    constexpr NativeRawSourcePixelRect disjointWrites[] = {
+        {0, 0, 100, 144}, {356, 200, 500, 400}};
+    constexpr NativeRawSourcePixelRect overlappingWrite[] = {
+        {355, 343, 400, 400}};
+    constexpr NativeRawSourcePixelRect malformedWrite[] = {
+        {-1, 0, 9, 9}};
+    static_assert(!native_raw_source_write_overlaps_tile(
+        100, 200, 356, 344, disjointWrites, 2),
+        "unrelated canonical source writes preserve real native tile pixels");
+    static_assert(native_raw_source_write_overlaps_tile(
+        100, 200, 356, 344, overlappingWrite, 1),
+        "one overlapping source pixel must retire the RAW sample");
+    static_assert(native_raw_source_write_overlaps_tile(
+        100, 200, 356, 344, malformedWrite, 1),
+        "unknown or malformed regions must fail closed");
+    static_assert(native_raw_source_write_overlaps_tile(
+        100, 200, 356, 344, nullptr, 0),
+        "full or unbounded source Clear must retire native tile");
+    static_assert(native_raw_source_write_overlaps_tile(
+        0, 0, 0, 0, disjointWrites, 2),
+        "missing source capture cannot prove a disjoint write");
     NativeRawGpuCaptureEpoch e;
     // Cold-start menu real Draw can queue even at Present serial zero.
     assert(e.can_queue(0u, false));
@@ -144,6 +170,24 @@ int main() {
     assert(e.invalidate_for_full_source_clear(false));
     assert(!e.consume_for_present(85u));
     assert(e.can_queue(85u, false));
+    // Replay the partial-source routing through the real capture epoch:
+    // disjoint screen-space color writes retain a usable same-Present GPU
+    // sample, whereas an overlapping write preserves the async fence.
+    e.reset(); e.queued(853u);
+    if (native_raw_source_write_overlaps_tile(
+            100, 200, 356, 344, disjointWrites, 2))
+        (void)e.invalidate_for_full_source_clear(true);
+    assert(e.consume_for_present(853u));
+    e.reset(); e.queued(853u);
+    if (native_raw_source_write_overlaps_tile(
+            100, 200, 356, 344, overlappingWrite, 1))
+        assert(e.invalidate_for_full_source_clear(true));
+    assert(!e.consume_for_present(853u));
+    assert(!e.can_queue(853u, true));
+    assert(e.retire_invalidated_source_clear(true, [] {
+        return GPU::Complete;
+    }) == GPU::Complete);
+    assert(e.can_queue(853u, false));
     // A genuine source Copy/ColorFill also invalidates the queued RGB pair,
     // without freeing its asynchronous GPU resources before the EVENT fence.
     e.reset(); e.queued(854u);
