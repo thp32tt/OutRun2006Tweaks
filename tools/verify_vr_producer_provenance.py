@@ -414,13 +414,35 @@ def verify_goal_owner(source: str) -> None:
             fail("GOAL progress deferred producer lost: " + marker)
     for marker in ("helperRva == 0xBE020", "ProducerToken::GoalTime020",
                    "helperRva == 0xBE150", "ProducerToken::GoalTime150",
-                   "goalDirectDrawOwner.emplace(", "nullptr, true, producer",
-                   "original();", "goalDirectDrawOwner.reset();",
-                   "TagAppendedNodes(before,", "RenderScope::ScreenHud, producer"):
+                   "const OutRunVR::GoalProgress::SourceAdmission admission{",
+                   "FlushD3DXBeforeDirectGoalSource();",
+                   "const bool admittedAfterDrain = admission.mayPublish(",
+                   "if (!admittedAfterDrain)", "action=NATIVE_ORIGINAL_ONCE",
+                   "ScopedExactProducerSemantic owner(",
+                   "nullptr, true, producer", "original(); // exact original helper once",
+                   "admittedAtExit = admission.mayPublish(",
+                   "TagAppendedNodes(before,", "RenderScope::ScreenHud, producer",
+                   "FlushD3DXAtDirectGoalSourceExit();"):
         if marker not in goal:
-            fail("GOAL title/time owner lost: " + marker)
-    if goal.index("const auto producer") > goal.index("original();"):
+            fail("GOAL title/time post-drain owner lost: " + marker)
+    order = (
+        "FlushD3DXBeforeDirectGoalSource();",
+        "const bool admittedAfterDrain = admission.mayPublish(",
+        "SpriteNodeSemanticNextSerial.load(",
+        "ScopedExactProducerSemantic owner(",
+        "original(); // exact original helper once",
+        "admittedAtExit = admission.mayPublish(",
+        "TagAppendedNodes(before,",
+        "FlushD3DXAtDirectGoalSourceExit();",
+    )
+    if [goal.index(marker) for marker in order] != sorted(
+            goal.index(marker) for marker in order):
+        fail("GOAL title/time drain/admission/owner order regressed")
+    if goal.index("const auto producer") > goal.index(
+            "original(); // exact original helper once"):
         fail("GOAL direct producer identity assigned after glyph Draw")
+    if "goalDirectDrawOwner.emplace(" in goal:
+        fail("GOAL time helper regressed to pre-drain unconditional owner")
     if "GameSemantic::CurrentScope =" in goal:
         fail("GOAL time helper overrides an active queue")
     for marker in ("ResultProgressCallA + 5", "ResultProgressCallB + 5",
@@ -437,7 +459,11 @@ for func, old, replacement in (
     ("static void ResultProgressEnter(", "ProducerToken::ResultProgress", "ProducerToken::None"),
     ("static void GoalTime_TagHelper(", "nullptr, true, producer", "nullptr, false, producer"),
     ("static void GoalTime_TagHelper(", "ProducerToken::GoalTime020", "ProducerToken::None"),
-    ("static void GoalTime_TagHelper(", "goalDirectDrawOwner.reset();", "/* missing reset */"),
+    ("static void GoalTime_TagHelper(", "const bool admittedAfterDrain = admission.mayPublish(",
+     "const bool admittedAfterDrain = admission.mayBeginDirect("),
+    ("static void GoalTime_TagHelper(", "admittedAtExit = admission.mayPublish(",
+     "admittedAtExit = admission.mayBeginDirect("),
+    ("static void GoalTime_TagHelper(", "if (!admittedAfterDrain)", "if (false)"),
 ):
     body = function_body(ui, func)
     if old not in body:
@@ -449,6 +475,59 @@ for func, old, replacement in (
         pass
     else:
         fail("GOAL negative mutation escaped: " + old)
+
+# The original B9200 final-result text wrapper must obey the same post-drain
+# admission fence. The call-stack parent is necessary but not sufficient after
+# a native Flush that can reenter the queue or change the selection epoch.
+def verify_b9200_owner(source: str) -> None:
+    body = function_body(source, "static void __cdecl ResultTextB9200_dest(")
+    required = (
+        "IsOriginalB9200ParentReturn(",
+        "const OutRunVR::GoalProgress::SourceAdmission admission{",
+        "FlushD3DXBeforeDirectGoalSource();",
+        "const bool admittedAfterDrain = admission.mayPublish(",
+        "if (!admittedAfterDrain)",
+        "action=NATIVE_ORIGINAL_ONCE",
+        "ScopedExactProducerSemantic owner(",
+        "ProducerToken::ResultTextB9200",
+        "admittedAtExit = admission.mayPublish(",
+        "FlushD3DXAtDirectGoalSourceExit();",
+    )
+    for marker in required:
+        if marker not in body:
+            fail("B9200 post-drain provenance lost: " + marker)
+    order = (
+        "FlushD3DXBeforeDirectGoalSource();",
+        "const bool admittedAfterDrain = admission.mayPublish(",
+        "ScopedExactProducerSemantic owner(",
+        "ResultTextB9200InlineHook.call<void>(text, x, y, step);",
+        "admittedAtExit = admission.mayPublish(",
+        "FlushD3DXAtDirectGoalSourceExit();",
+    )
+    if [body.index(marker) for marker in order] != sorted(
+            body.index(marker) for marker in order):
+        fail("B9200 drain/admission/owner order regressed")
+
+
+verify_b9200_owner(ui)
+for old, replacement in (
+    ("const bool admittedAfterDrain = admission.mayPublish(",
+     "const bool admittedAfterDrain = admission.mayBeginDirect("),
+    ("admittedAtExit = admission.mayPublish(",
+     "admittedAtExit = admission.mayBeginDirect("),
+    ("if (!admittedAfterDrain)", "if (false)"),
+):
+    body = function_body(ui, "static void __cdecl ResultTextB9200_dest(")
+    if old not in body:
+        fail("B9200 mutation has no source: " + old)
+    mutant = ui.replace(body, body.replace(old, replacement, 1), 1)
+    try:
+        verify_b9200_owner(mutant)
+    except SystemExit:
+        pass
+    else:
+        fail("unsafe B9200 ownership mutation escaped: " + old)
+
 
 # The three 0x97xxx original Sumo_Printf result parents render glyphs
 # synchronously, before their queued SpriteNode children acquire source tags.
