@@ -24,6 +24,7 @@
 #include "hud_1080p_reference.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/d3d9/reset_trace.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -6209,6 +6210,16 @@ namespace OutRunVRStereo
             if (FAILED(device->GetViewport(&savedViewport)))
                 return E_NOTIMPL;
 
+            OutRunVR::D3D9ResetTrace::Snapshot lensResetTrace{};
+            RECT lensPreDrawScissor{};
+            bool lensPreDrawScissorValid = false;
+            if (lensPhysicalCandidate)
+            {
+                lensResetTrace = OutRunVR::D3D9ResetTrace::Read();
+                lensPreDrawScissorValid =
+                    SUCCEEDED(device->GetScissorRect(&lensPreDrawScissor));
+            }
+
             // The screen's first exact HUD/overlay draw is the bloom cutoff.
             // The outer hook also guards delegated draws, but this owned-eye
             // path must NOT snapshot world billboards such as the central sun
@@ -6375,6 +6386,11 @@ namespace OutRunVRStereo
                         "colorWrite=0x{:X} "
                         "leftRT=0x{:X} leftRTDesc={}x{}:{} "
                         "rightRT=0x{:X} rightRTDesc={}x{}:{} sameRT={} "
+                        "preViewport={},{},{}x{} preScissorValid={} "
+                        "preScissor={},{},{},{} "
+                        "resetEpoch={} resetQpc={} resetFlags=0x{:X} "
+                        "resetRequested={}x{} resetEffective={}x{} resetActual={}x{} "
+                        "resetViewport={}x{} resetViewportMatchesPre={} "
                         "eyeRT=LEFT_RIGHT_TRANSACTION",
                         n, TopLevelDrawSerial(), site ? site : "unknown",
                         static_cast<unsigned>(screenKind),
@@ -6401,7 +6417,25 @@ namespace OutRunVRStereo
                         lensRightRtPtr, lensRightRtWidth, lensRightRtHeight,
                         static_cast<unsigned>(lensRightRtFormat),
                         lensLeftRtPtr != 0 &&
-                            lensLeftRtPtr == lensRightRtPtr ? 1 : 0);
+                            lensLeftRtPtr == lensRightRtPtr ? 1 : 0,
+                        savedViewport.X, savedViewport.Y,
+                        savedViewport.Width, savedViewport.Height,
+                        lensPreDrawScissorValid ? 1 : 0,
+                        lensPreDrawScissor.left, lensPreDrawScissor.top,
+                        lensPreDrawScissor.right, lensPreDrawScissor.bottom,
+                        lensResetTrace.resetSerial, lensResetTrace.qpc,
+                        lensResetTrace.flags,
+                        lensResetTrace.requestedWidth,
+                        lensResetTrace.requestedHeight,
+                        lensResetTrace.effectiveWidth,
+                        lensResetTrace.effectiveHeight,
+                        lensResetTrace.actualWidth,
+                        lensResetTrace.actualHeight,
+                        lensResetTrace.viewportWidth,
+                        lensResetTrace.viewportHeight,
+                        lensResetTrace.resetSerial != 0 &&
+                            lensResetTrace.viewportWidth == savedViewport.Width &&
+                            lensResetTrace.viewportHeight == savedViewport.Height ? 1 : 0);
             }
 
             if (lensPhysicalCandidate)
