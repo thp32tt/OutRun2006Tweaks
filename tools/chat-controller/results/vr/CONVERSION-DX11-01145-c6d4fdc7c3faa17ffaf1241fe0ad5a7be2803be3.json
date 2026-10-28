@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01145",
+  "production_id": "CONVERSION-DX11-01145",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT:CONVERSION-DX11-01145",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:AUTHENTIC_NONRECTANGULAR_REPAINT",
+  "classification": "A_SOURCE_VISIBLE_RAW_REPAINT_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "source_base_sha": "c258a194dfbae3e917501855ce2beb6050b9e99b",
+  "source_implementation_commit_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "c6d4fdc7c3faa17ffaf1241fe0ad5a7be2803be3",
+  "development_time_percentages": "UNMEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_DRAW",
+      "REAL_D3D11_GPU_BEFORE_AFTER_RGB",
+      "AUTHENTIC_RECTANGULAR_REPAINT_WITHIN_NONRECTANGULAR_DIRTY_UNION",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "CXX_BOUNDED_Y_EDGE_SWEEP_FOR_AUTHENTIC_REPAINT_RECTANGLES",
+      "RAW_PRESENT_ZERO_RGB_RETIREMENT_WITHOUT_GAME_SURFACE_WRITE",
+      "GENUINE_GPU_DELTA_CROP_TO_AUTHENTIC_DESTINATION_INTEGRATION_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 failing-before/passing-after 3x16x48 strips plus attached 252x8 tail; pixel integration preserves 64 actual off-center GPU RGB changes at authenticated 32x32 repaint destination.",
+      "negative_regression": "One-pixel source gap, invalid tail, forged rcBound, unknown header, clip, no second island and alpha-only RGB absence remain rejected or zero evidence.",
+      "component_integration": "Real source dirty union -> bounded rectangular-span proposal -> unchanged original union authentication -> GPU paired-delta crop -> source-bounded RAW Present; no full-frame publication."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_present_coverage_test.cpp",
+      "tests/native_raw_changed_pixel_window_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Only experimental opted-in PARTIAL D3D11 RAW GPU diagnostic source-to-D3D9 output has BUILD/CI proof; no matched actual game pixels, full frame, or stereo runtime proof.",
+    "activation_guard_and_fallback": "Diagnostic OFF by default; incomplete RAW pixels segregated; preserve original D3D9 Draw/Present/input/FFB, DX9Ex and frozen DXVK, original full-frame fail-closed; no Quest3 promotion."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_present_coverage_test.cpp",
+    "tests/native_raw_changed_pixel_window_test.cpp"
+  ],
+  "real_game_draw_blocker": "No source-matched runtime observation at new candidate; existing historical zero-native-Draw runtime remains pinned to b8dab362. This fixes source-reproducible RAW display loss only; native full-frame menu/car/race and stereo remain unfinished.",
+  "evidence": {
+    "local_tests": [
+      "C++17 coverage regression failed before at kRawTailedRepaintProof; passed after",
+      "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic coverage and changed-window tests PASS"
+    ],
+    "required_push_workflows": [],
+    "runtime_evidence": "UNTESTED: no matching game or Quest3/VDXR execution",
+    "full_native_game_frame_complete": false,
+    "claim_issue14_comment_id": 6482417657,
+    "duplicate_task_score_change": 0
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Continue unfinished native full-frame feature by repairing genuine partial RAW GPU display hidden by nonrectangular connected source repaints; retain original D3D9 and separate zero-RGB/no-upload result.",
+    "acceptance_items": [
+      {
+        "id": "tailed_source_repaint_pixels",
+        "category": "end_to_end_behavior",
+        "behavior_area": "source Present geometry to actual GPU RGB crop",
+        "expected_behavior": "A valid fragmented painted island remains displayable when an attached thin tail makes whole component bounds unsuitable."
+      },
+      {
+        "id": "source_safety_and_zero_rgb",
+        "category": "fallback_regression",
+        "behavior_area": "original source coverage and RGB provenance",
+        "expected_behavior": "Unpainted seams, forged bounds and invalid members reject; alpha-only native Draw never uploads or counts visible RGB."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable C++17 and Windows source integration",
+        "expected_behavior": "All five mandatory push workflows succeed at the exact final material commit; runtime remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "tailed_source_repaint_pixels": "PASS_LOCAL_CPP17",
+    "source_safety_and_zero_rgb": "PASS_LOCAL_CPP17",
+    "five_exact_sha_gates": "PENDING"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub latest HEAD c258a194, previous 01144 terminal gate record, owner paths, policy and historical runtime evidence inspected.",
+    "C1_REVIEW": "PASS: reproduced source placement failure for true 48x48 strip-union island with thin connected tail.",
+    "C2_IMPLEMENT": "PASS: production bounded rectangular union discovery and zero-RGB Present outcome; source and pixel integration regression.",
+    "C3_VALIDATE": "LOCAL_CPP17_PASS; final five exact-SHA CI pending.",
+    "C4_COMMIT": "Source+test integrated candidate prepared for nonforce GitHub CAS with exact AUTO marker and no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: no new promotion; existing CI build artifacts will retain source identity. Real game test package remains diagnostic-only.",
+    "C6_STATE": "PENDING final gate; immutable result SHA will be persisted separately."
+  },
+  "c6": {
+    "reason": "SOURCE_IMPLEMENTED_PENDING_FINAL_EXACT_SHA",
+    "next_action": "Inspect five push Gates on resulting material SHA; fix actual failures same task. Preserve same unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME with runtime UNTESTED."
+  },
+  "event_id": "CONVERSION-DX11-01145-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "full_dx11_renderer_complete": false,
+  "controller_terminal": true,
+  "controller_finalize_reason": "LEGACY_EXACT_SHA_GATE_SUCCESS"
+}
