@@ -1,0 +1,487 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-20261029T0845KST-A0075-B0088-NEW-SHA8",
+  "checked_at_kst": "2026-10-29T08:48:39+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "contract_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_inventory": {
+    "exported_entries": 914,
+    "unreviewed_sha_entries_before": 130,
+    "reviewed_sha_in_N100_history": 789,
+    "new_reviewed_sha": 8,
+    "postreview_unreviewed_count": 122
+  },
+  "summary": {
+    "PASS": 0,
+    "FAIL": 2,
+    "HOLD": 6,
+    "NEW_SHA_REVIEWED": 8
+  },
+  "records": [
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0075-E7998BD0",
+      "source_ordinal": 365,
+      "source_file": "Q092_ec969d44bfedebe0_source.png",
+      "candidate_file": "Q092_ec969d44bfedebe0_source_k.png",
+      "source_sha256": "7179d30e4ac513548550e037d571252a4de0081f70ae01b112feace717c05c1b",
+      "source_manifest_sha256": "7179d30e4ac513548550e037d571252a4de0081f70ae01b112feace717c05c1b",
+      "source_sha_match": true,
+      "candidate_sha256": "aefe9ef4176964fb1fbc8fbb15bd56cc35ec062ef28f7182088ee2b204d02371",
+      "candidate_export_sha256": "aefe9ef4176964fb1fbc8fbb15bd56cc35ec062ef28f7182088ee2b204d02371",
+      "candidate_export_sha_match": true,
+      "approved_mapping": {
+        "english": "OutRun Mode",
+        "korean": "아웃런 모드"
+      },
+      "source_bbox_xyxy": [
+        386,
+        12,
+        1068,
+        134
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          33,
+          2080,
+          692
+        ],
+        "alpha_edge_nz": 5,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 1,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean text is legible, the approved translation is visually matched, and PNG alpha is valid. Native UI-cell placement and adjacent protected art are not proven from the standalone lettering layer.",
+        "visual_text_match": "PASS",
+        "glyph_legibility": "PASS",
+        "image_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "alpha_edge_tiny_residue_not_clipping": true,
+        "unneeded_frame": "NOT_OBSERVED",
+        "native_UI_cell": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0075-E7998BD0",
+      "source_ordinal": 366,
+      "source_file": "Q107_b1b56091d26ffdf3_source.png",
+      "candidate_file": "Q107_b1b56091d26ffdf3_source_k.png",
+      "source_sha256": "5ab256d4caa61d5c3d8a60ee58966bd93b441b00d5262a0700dc146f44bfbcc9",
+      "source_manifest_sha256": "5ab256d4caa61d5c3d8a60ee58966bd93b441b00d5262a0700dc146f44bfbcc9",
+      "source_sha_match": true,
+      "candidate_sha256": "562f9df2c3a54bcdb4d9d011c044b6a438d4f54094573421d6c35f9b60038a6c",
+      "candidate_export_sha256": "562f9df2c3a54bcdb4d9d011c044b6a438d4f54094573421d6c35f9b60038a6c",
+      "candidate_export_sha_match": true,
+      "approved_mapping": {
+        "english": "No Handicap",
+        "korean": "무 핸디캡"
+      },
+      "source_bbox_xyxy": [
+        1500,
+        190,
+        1840,
+        410
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1559,
+          1009
+        ],
+        "alpha_bbox": [
+          17,
+          21,
+          1519,
+          952
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean text is legible, the approved translation is visually matched, and PNG alpha is valid. Native UI-cell placement and adjacent protected art are not proven from the standalone lettering layer.",
+        "visual_text_match": "PASS",
+        "glyph_legibility": "PASS",
+        "image_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "alpha_edge_tiny_residue_not_clipping": false,
+        "unneeded_frame": "NOT_OBSERVED",
+        "native_UI_cell": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0075-E7998BD0",
+      "source_ordinal": 367,
+      "source_file": "Q119_e9d31b675f66d275_source.png",
+      "candidate_file": "Q119_e9d31b675f66d275_source_k.png",
+      "source_sha256": "296d6b75bf496570ac80f807b9834095f9f5d7dc34c15a9a20a8de8b43a3fd68",
+      "source_manifest_sha256": "296d6b75bf496570ac80f807b9834095f9f5d7dc34c15a9a20a8de8b43a3fd68",
+      "source_sha_match": true,
+      "candidate_sha256": "24cc6910824e5589fe72669bf3f0a605fc6316bf8f482c0071c9a57ceb92008b",
+      "candidate_export_sha256": "24cc6910824e5589fe72669bf3f0a605fc6316bf8f482c0071c9a57ceb92008b",
+      "candidate_export_sha_match": true,
+      "approved_mapping": {
+        "english": "Time Attack Mode",
+        "korean": "타임 어택 모드"
+      },
+      "source_bbox_xyxy": [
+        388,
+        52,
+        1634,
+        202
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          23,
+          23,
+          2153,
+          724
+        ],
+        "alpha_edge_nz": 84,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 1,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean text is legible, the approved translation is visually matched, and PNG alpha is valid. Native UI-cell placement and adjacent protected art are not proven from the standalone lettering layer.",
+        "visual_text_match": "PASS",
+        "glyph_legibility": "PASS",
+        "image_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "alpha_edge_tiny_residue_not_clipping": true,
+        "unneeded_frame": "NOT_OBSERVED",
+        "native_UI_cell": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0075-E7998BD0",
+      "source_ordinal": 368,
+      "source_file": "Q241_7157da1bb0c3538d_source.png",
+      "candidate_file": "Q241_7157da1bb0c3538d_source_k.png",
+      "source_sha256": "f20b98523dd6bdd8641d9e9343b8383baba0cf9c52d6b510c99c59b4f72a3aeb",
+      "source_manifest_sha256": "f20b98523dd6bdd8641d9e9343b8383baba0cf9c52d6b510c99c59b4f72a3aeb",
+      "source_sha_match": true,
+      "candidate_sha256": "c0a5270591b61abd39e31539de0aae7cd15fd2d9e14af72c67ccbaa36ee85bcb",
+      "candidate_export_sha256": "c0a5270591b61abd39e31539de0aae7cd15fd2d9e14af72c67ccbaa36ee85bcb",
+      "candidate_export_sha_match": true,
+      "approved_mapping": {
+        "english": "Loading",
+        "korean": "로딩"
+      },
+      "source_bbox_xyxy": [
+        0,
+        98,
+        738,
+        256
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          466,
+          57,
+          1742,
+          702
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean text is legible, the approved translation is visually matched, and PNG alpha is valid. Native UI-cell placement and adjacent protected art are not proven from the standalone lettering layer.",
+        "visual_text_match": "PASS",
+        "glyph_legibility": "PASS",
+        "image_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "alpha_edge_tiny_residue_not_clipping": false,
+        "unneeded_frame": "NOT_OBSERVED",
+        "native_UI_cell": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0088-16DFF698",
+      "source_ordinal": 420,
+      "source_file": "Q032_54ebd6389169f84f_source.png",
+      "candidate_file": "Q032_54ebd6389169f84f_source_k.png",
+      "source_sha256": "2dda98452c5d8a002a800fccde243ae0437d74aa9fdbbf5b4657b5bb78cb7665",
+      "source_manifest_sha256": "2dda98452c5d8a002a800fccde243ae0437d74aa9fdbbf5b4657b5bb78cb7665",
+      "source_sha_match": true,
+      "candidate_sha256": "1c9e0c0ccecd0c8600efcb5f725087f751fe9f59cd046687d8bdf3445ffeea83",
+      "candidate_export_sha256": "1c9e0c0ccecd0c8600efcb5f725087f751fe9f59cd046687d8bdf3445ffeea83",
+      "candidate_export_sha_match": true,
+      "approved_mapping": {
+        "english": "Total Rank",
+        "korean": "종합 랭킹"
+      },
+      "source_bbox_xyxy": [
+        539,
+        156,
+        1073,
+        256
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          184,
+          28,
+          2152,
+          585
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean text is legible, the approved translation is visually matched, and PNG alpha is valid. Native UI-cell placement and adjacent protected art are not proven from the standalone lettering layer.",
+        "visual_text_match": "PASS",
+        "glyph_legibility": "PASS",
+        "image_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "alpha_edge_tiny_residue_not_clipping": false,
+        "unneeded_frame": "NOT_OBSERVED",
+        "native_UI_cell": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0088-16DFF698",
+      "source_ordinal": 421,
+      "source_file": "Q102_293bc908b7eb9ebe_source.png",
+      "candidate_file": "Q102_293bc908b7eb9ebe_source_k.png",
+      "source_sha256": "8f5019b11b00a8667165db19b6e4ac4b555adef701cafbcf462263642ea429fe",
+      "source_manifest_sha256": "8f5019b11b00a8667165db19b6e4ac4b555adef701cafbcf462263642ea429fe",
+      "source_sha_match": true,
+      "candidate_sha256": "31ce48b5197d4dba24231072038c060809d365218d5e22bb6fa95bf32fb15404",
+      "candidate_export_sha256": "31ce48b5197d4dba24231072038c060809d365218d5e22bb6fa95bf32fb15404",
+      "candidate_export_sha_match": true,
+      "approved_mapping": {
+        "english": "15 continuous course",
+        "korean": "15코스 연속"
+      },
+      "source_bbox_xyxy": [
+        517,
+        125,
+        1591,
+        247
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          49,
+          27,
+          2051,
+          673
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_PLACEMENT_UNVERIFIED",
+        "reason": "Korean text is legible, the approved translation is visually matched, and PNG alpha is valid. Native UI-cell placement and adjacent protected art are not proven from the standalone lettering layer.",
+        "visual_text_match": "PASS",
+        "glyph_legibility": "PASS",
+        "image_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "alpha_edge_tiny_residue_not_clipping": false,
+        "unneeded_frame": "NOT_OBSERVED",
+        "native_UI_cell": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0088-16DFF698",
+      "source_ordinal": 422,
+      "source_file": "Q195_4ff61f114eb4a1ec_source.png",
+      "candidate_file": "Q195_4ff61f114eb4a1ec_source_k.png",
+      "source_sha256": "1ed7896c6f83e5bc45f893d9f63f821a22decf188c518c516bc8bafa597ba1c1",
+      "source_manifest_sha256": "1ed7896c6f83e5bc45f893d9f63f821a22decf188c518c516bc8bafa597ba1c1",
+      "source_sha_match": true,
+      "candidate_sha256": "e85914da91a73dae07c1379d3f2f2cc03732ec9ff1f9f60ff6eeb11a028f4f16",
+      "candidate_export_sha256": "e85914da91a73dae07c1379d3f2f2cc03732ec9ff1f9f60ff6eeb11a028f4f16",
+      "candidate_export_sha_match": true,
+      "approved_mapping": {
+        "english": "NOT AVAILABLE",
+        "korean": "사용할 수 없음"
+      },
+      "source_bbox_xyxy": [
+        0,
+        60,
+        600,
+        128
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          243,
+          2135,
+          698
+        ],
+        "alpha_edge_nz": 9,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 1,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "qa": {
+        "judgement": "FAIL",
+        "reason_code": "NON_LETTERING_UI_BACKGROUND_REGENERATED",
+        "reason": "Generated layer includes a full red rounded UI banner/background in addition to Korean lettering; non-lettering art must be preserved only in native source, not emitted by ImageGen.",
+        "visual_text_match": "PASS",
+        "glyph_legibility": "PASS",
+        "image_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "alpha_edge_tiny_residue_not_clipping": true,
+        "unneeded_frame": "CONFIRMED",
+        "native_UI_cell": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0088-16DFF698",
+      "source_ordinal": 423,
+      "source_file": "Q100_84c26a1be776761c_source.png",
+      "candidate_file": "Q100_84c26a1be776761c_source_k.png",
+      "source_sha256": "045b2981f5363018a7c45d681a5747f6b71c06bd0cb259478f0ef327160f679c",
+      "source_manifest_sha256": "045b2981f5363018a7c45d681a5747f6b71c06bd0cb259478f0ef327160f679c",
+      "source_sha_match": true,
+      "candidate_sha256": "ea0136ae202f364456914c30075de823ea6ffeef5c8cf0e498f06b05cd23e900",
+      "candidate_export_sha256": "ea0136ae202f364456914c30075de823ea6ffeef5c8cf0e498f06b05cd23e900",
+      "candidate_export_sha_match": true,
+      "approved_mapping": {
+        "english": "TimeAttack Mode OutRun2",
+        "korean": "타임 어택 모드 아웃런2"
+      },
+      "source_bbox_xyxy": [
+        10,
+        1640,
+        360,
+        1840
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1659,
+          948
+        ],
+        "alpha_bbox": [
+          0,
+          21,
+          1613,
+          948
+        ],
+        "alpha_edge_nz": 144,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 2,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "qa": {
+        "judgement": "FAIL",
+        "reason_code": "NON_LETTERING_UI_BACKGROUND_REGENERATED",
+        "reason": "Generated layer includes the full blue beveled arrow/button frame in addition to translated lettering; protected non-text UI geometry was regenerated.",
+        "visual_text_match": "PASS",
+        "glyph_legibility": "PASS",
+        "image_transparency": "PASS",
+        "text_length_difference_ignored": true,
+        "alpha_edge_tiny_residue_not_clipping": true,
+        "unneeded_frame": "CONFIRMED",
+        "native_UI_cell": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    }
+  ],
+  "evidence_on_N100": [
+    "work/C1_QA_20261029_0845_preflight.py",
+    "work/C1_QA_20261029_0845_new_sha8/preflight.json",
+    "work/C1_QA_20261029_0845_new_sha8/pairs.jpg"
+  ],
+  "restrictions": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_auto_deployed": false,
+    "C2_C3_or_game_pass_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score_candidate": {
+    "AI": "AI 1",
+    "new_independent_sha8_qa_task": true,
+    "do_not_score_retry_or_status_report": true
+  }
+}
