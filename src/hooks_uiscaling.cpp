@@ -4334,6 +4334,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     {
         using namespace OutRunVR::GameSemantic;
         const auto submission = HudBatch.snapshot();
+        const auto submissionProducer = HudBatch.producer;
         // The game's normal Flush is allowed to occur after the original
         // +TIME/GOAL source leaves. Recover the proven producer for the
         // physical GPU draw, not merely the earlier CPU Draw registration.
@@ -4416,7 +4417,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 "VR TRACE D3DX PHYSICAL FULL: phase=FLUSH_POST qpc={} producer={} "
                 "hr=0x{:08X} submissionGeneration={} liveGeneration={} "
                 "liveActive={} liveDraws={} liveHomogeneous={}",
-                qpc.QuadPart, Name(submission.producer),
+                qpc.QuadPart, Name(submissionProducer),
                 static_cast<unsigned>(hr), submission.generation,
                 HudBatch.generation, HudBatch.active ? 1 : 0,
                 HudBatch.drawCount, HudBatch.homogeneous ? 1 : 0);
@@ -4433,6 +4434,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     {
         using namespace OutRunVR::GameSemantic;
         const auto submission = HudBatch.snapshot();
+        const auto submissionProducer = HudBatch.producer;
         // ID3DXSprite::End may be the first physical submission when neither
         // a source-exit nor a queue boundary was able to flush safely.
         // Preserve the exact homogeneous producer only until End returns;
@@ -4513,7 +4515,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 "VR TRACE D3DX PHYSICAL FULL: phase=END_POST qpc={} producer={} "
                 "hr=0x{:08X} submissionGeneration={} liveGeneration={} "
                 "liveActive={} liveDraws={} liveHomogeneous={}",
-                qpc.QuadPart, Name(submission.producer),
+                qpc.QuadPart, Name(submissionProducer),
                 static_cast<unsigned>(hr), submission.generation,
                 HudBatch.generation, HudBatch.active ? 1 : 0,
                 HudBatch.drawCount, HudBatch.homogeneous ? 1 : 0);
@@ -5051,70 +5053,6 @@ private:
         {
             LARGE_INTEGER qpc{};
             QueryPerformanceCounter(&qpc);
-            D3DXMATRIX spriteTransform{};
-            HRESULT spriteTransformHr = E_POINTER;
-            IDirect3DDevice9* spriteDevice = nullptr;
-            HRESULT spriteDeviceHr = E_POINTER;
-            D3DVIEWPORT9 spriteViewport{};
-            HRESULT spriteViewportHr = E_POINTER;
-            RECT spriteScissor{};
-            HRESULT spriteScissorHr = E_POINTER;
-            std::uintptr_t spriteRtPtr = 0;
-            UINT spriteRtWidth = 0, spriteRtHeight = 0;
-            D3DFORMAT spriteRtFormat = D3DFMT_UNKNOWN;
-            DWORD spriteAlphaBlend = 0, spriteSrcBlend = 0, spriteDstBlend = 0;
-            if (self)
-            {
-                auto* sprite = reinterpret_cast<ID3DXSprite*>(self);
-                spriteTransformHr = sprite->GetTransform(&spriteTransform);
-                spriteDeviceHr = sprite->GetDevice(&spriteDevice);
-                if (SUCCEEDED(spriteDeviceHr) && spriteDevice)
-                {
-                    spriteViewportHr = spriteDevice->GetViewport(&spriteViewport);
-                    spriteScissorHr = spriteDevice->GetScissorRect(&spriteScissor);
-                    IDirect3DSurface9* rt = nullptr;
-                    if (SUCCEEDED(spriteDevice->GetRenderTarget(0, &rt)) && rt)
-                    {
-                        spriteRtPtr = reinterpret_cast<std::uintptr_t>(rt);
-                        D3DSURFACE_DESC desc{};
-                        if (SUCCEEDED(rt->GetDesc(&desc)))
-                        {
-                            spriteRtWidth = desc.Width;
-                            spriteRtHeight = desc.Height;
-                            spriteRtFormat = desc.Format;
-                        }
-                        rt->Release();
-                    }
-                    spriteDevice->GetRenderState(D3DRS_ALPHABLENDENABLE, &spriteAlphaBlend);
-                    spriteDevice->GetRenderState(D3DRS_SRCBLEND, &spriteSrcBlend);
-                    spriteDevice->GetRenderState(D3DRS_DESTBLEND, &spriteDstBlend);
-                    spriteDevice->Release();
-                }
-            }
-            spdlog::info(
-                "VR TRACE D3DX STATE FULL: serial={} qpc={} producer={} scope={} "
-                "transformHr=0x{:08X} m11={:.9g} m12={:.9g} m21={:.9g} m22={:.9g} "
-                "tx={:.9g} ty={:.9g} deviceHr=0x{:08X} "
-                "viewportHr=0x{:08X} viewport={},{},{}x{} "
-                "scissorHr=0x{:08X} scissor={},{},{},{} "
-                "rt0=0x{:X} rt={}x{} rtFmt={} alphaBlend={} srcBlend={} dstBlend={}",
-                fullVisualDrawSerial, qpc.QuadPart, Name(source), Name(scope),
-                static_cast<unsigned>(spriteTransformHr),
-                spriteTransform._11, spriteTransform._12,
-                spriteTransform._21, spriteTransform._22,
-                spriteTransform._41, spriteTransform._42,
-                static_cast<unsigned>(spriteDeviceHr),
-                static_cast<unsigned>(spriteViewportHr),
-                spriteViewport.X, spriteViewport.Y,
-                spriteViewport.Width, spriteViewport.Height,
-                static_cast<unsigned>(spriteScissorHr),
-                spriteScissor.left, spriteScissor.top,
-                spriteScissor.right, spriteScissor.bottom,
-                spriteRtPtr, spriteRtWidth, spriteRtHeight,
-                static_cast<unsigned>(spriteRtFormat),
-                spriteAlphaBlend ? 1 : 0,
-                static_cast<unsigned>(spriteSrcBlend),
-                static_cast<unsigned>(spriteDstBlend));
             spdlog::info(
                 "VR TRACE D3DX DRAW FULL: phase=PRE serial={} qpc={} producer={} "
                 "scope={} stageTicket={} stageEntrySerial={} queued={} node=0x{:X} epoch={} self=0x{:X} tex=0x{:X} "
