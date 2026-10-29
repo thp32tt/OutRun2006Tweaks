@@ -1501,6 +1501,11 @@ class UIScaling : public Hook
                      producer == OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
                 if (fullVisualNodeTrace)
                 {
+                    const char* diagnosticSourceFamily =
+                        producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime
+                            ? (StageExtensionLiveNaviSource
+                                ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY")
+                            : "NOT_STAGE_EXTENSION";
                     LARGE_INTEGER qpc{};
                     QueryPerformanceCounter(&qpc);
                     const auto* raw =
@@ -1511,11 +1516,12 @@ class UIScaling : public Hook
                         rawHash^=raw[i]; rawHash*=1099511628211ull;
                     }
                     spdlog::info(
-                        "VR TRACE HUD NODE FULL: qpc={} producer={} scope={} "
-                        "prio={} node=0x{:X} next=0x{:X} owner=0x{:X} kind={} "
+                        "VR TRACE HUD NODE FULL: qpc={} producer={} sourceFamily={} "
+                        "scope={} prio={} node=0x{:X} next=0x{:X} owner=0x{:X} kind={} "
                         "queueEpoch={} preserveSince={} rawHash=0x{:016X}",
                         qpc.QuadPart,
                         OutRunVR::GameSemantic::Name(producer),
+                        diagnosticSourceFamily,
                         OutRunVR::GameSemantic::Name(scope), prio,
                         reinterpret_cast<std::uintptr_t>(node),
                         reinterpret_cast<std::uintptr_t>(node->next_0),
@@ -1528,13 +1534,14 @@ class UIScaling : public Hook
                     {
                         const auto& a=node->args_10;
                         spdlog::info(
-                            "VR TRACE HUD NODE0 FULL: qpc={} producer={} prio={} "
-                            "xst={} top={} left={} bottom={} right={} "
+                            "VR TRACE HUD NODE0 FULL: qpc={} producer={} sourceFamily={} "
+                            "prio={} xst={} top={} left={} bottom={} right={} "
                             "scale={:.9g},{:.9g} f1C={:.9g} f20={:.9g} "
                             "f24={:.9g} f28={:.9g} d2C=0x{:08X} f30={:.9g} "
                             "d34=0x{:08X} p38=0x{:X}",
                             qpc.QuadPart,
-                            OutRunVR::GameSemantic::Name(producer),prio,
+                            OutRunVR::GameSemantic::Name(producer),
+                            diagnosticSourceFamily,prio,
                             a.xstnum_0,a.top_4,a.left_8,a.bottom_C,a.right_10,
                             a.scaleX,a.scaleY,a.float1C,a.float20,a.float24,
                             a.float28,a.dword2C,a.float30,a.dword34,
@@ -1546,8 +1553,8 @@ class UIScaling : public Hook
                         std::uint32_t colorBits=0;
                         std::memcpy(&colorBits,&a.color_4,sizeof(colorBits));
                         spdlog::info(
-                            "VR TRACE HUD NODE1 FULL: qpc={} producer={} prio={} "
-                            "xst={} colorFloat={:.9g} colorBits=0x{:08X} tex=0x{:X} "
+                            "VR TRACE HUD NODE1 FULL: qpc={} producer={} sourceFamily={} "
+                            "prio={} xst={} colorFloat={:.9g} colorBits=0x{:08X} tex=0x{:X} "
                             "unk10=0x{:08X} "
                             "mtx=[{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},"
                             "{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g}] "
@@ -1556,7 +1563,8 @@ class UIScaling : public Hook
                             "uv={:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g},{:.9g} "
                             "a4={:.9g} a8={:.9g} ac=0x{:08X} b0=0x{:08X} child=0x{:X}",
                             qpc.QuadPart,
-                            OutRunVR::GameSemantic::Name(producer),prio,
+                            OutRunVR::GameSemantic::Name(producer),
+                            diagnosticSourceFamily,prio,
                             a.xstnum_0,a.color_4,colorBits,
                             reinterpret_cast<std::uintptr_t>(a.d3dtexture_ptr_C),
                             a.unk_10,
@@ -2260,8 +2268,7 @@ class UIScaling : public Hook
             static std::atomic<std::uint64_t> stageSourceEntries{0};
             const auto n = stageSourceEntries.fetch_add(
                 1, std::memory_order_relaxed) + 1;
-            if (n <= 64 || (n & (n - 1)) == 0)
-                spdlog::info(
+            spdlog::info(
                     "VR TRACE PLUS_TIME SOURCE ENTRY: family={} sample={} state={} mode={} "
                     "vr={} queueActive={} mayBegin={} admittedAfterDrain={} "
                     "ticket={} entrySerial={} entryEpoch={} liveEpoch={} "
@@ -2357,7 +2364,7 @@ class UIScaling : public Hook
             OutRunVR::GameSemantic::RenderScope::None;
         const auto hit = ++StageExtensionCompleted;
         const auto resetTrace = OutRunVR::D3D9ResetTrace::Read();
-        if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
+        if (Settings::VRTelemetry)
             spdlog::info(
                 "VR TRACE PLUS_TIME SOURCE EXIT: family={} calls={} gameState={} mode={} "
                 "exactScope={} admitted={} reason={} ticket={} entrySerial={} "
@@ -5055,11 +5062,16 @@ private:
             QueryPerformanceCounter(&qpc);
             spdlog::info(
                 "VR TRACE D3DX DRAW FULL: phase=PRE serial={} qpc={} producer={} "
-                "scope={} stageTicket={} stageEntrySerial={} queued={} node=0x{:X} epoch={} self=0x{:X} tex=0x{:X} "
+                "sourceFamily={} scope={} stageTicket={} stageEntrySerial={} "
+                "queued={} node=0x{:X} epoch={} self=0x{:X} tex=0x{:X} "
                 "rectValid={} rect={},{},{},{} centerValid={} center={:.9g},{:.9g},{:.9g} "
                 "posValid={} pos={:.9g},{:.9g},{:.9g} color=0x{:08X}",
-                fullVisualDrawSerial,qpc.QuadPart,Name(source),Name(scope),
-                StageTimeLiveTicket,StageExtensionEntrySerial,
+                fullVisualDrawSerial,qpc.QuadPart,Name(source),
+                source == ProducerToken::StageExtensionTime
+                    ? (StageExtensionLiveNaviSource
+                        ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY")
+                    : "NOT_STAGE_EXTENSION",
+                Name(scope),StageTimeLiveTicket,StageExtensionEntrySerial,
                 command.queued ? 1 : 0,
                 reinterpret_cast<std::uintptr_t>(command.queueNode),
                 command.queueEpoch,reinterpret_cast<std::uintptr_t>(self),
@@ -5112,11 +5124,15 @@ private:
             const auto afterTrace=CapturePhysicalDrawCommand();
             spdlog::info(
                 "VR TRACE D3DX DRAW FULL: phase=POST serial={} qpc={} hr=0x{:08X} "
-                "preProducer={} postProducer={} preQueued={} postQueued={} "
+                "sourceFamily={} preProducer={} postProducer={} preQueued={} postQueued={} "
                 "preNode=0x{:X} postNode=0x{:X} preEpoch={} postEpoch={} "
                 "batchActive={} batchDrawCount={} batchHomogeneous={} "
                 "batchScope={} batchProducer={}",
                 fullVisualDrawSerial,qpc.QuadPart,static_cast<unsigned>(hr),
+                source == ProducerToken::StageExtensionTime
+                    ? (StageExtensionLiveNaviSource
+                        ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY")
+                    : "NOT_STAGE_EXTENSION",
                 Name(source),Name(afterTrace.producer),
                 command.queued ? 1 : 0,afterTrace.queued ? 1 : 0,
                 reinterpret_cast<std::uintptr_t>(command.queueNode),
