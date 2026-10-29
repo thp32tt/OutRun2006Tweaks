@@ -140,6 +140,17 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
     assert "EXACT_RETAIL_405890_404700_PMT_ENTRY" in r30
     assert "pmtObjectId=0x{:06X}" in r30
     assert "pmtEntrySerial={}" in r30
+    r7 = (ROOT / "src/vr/d3d9/stereo_renderer_r7.inc").read_text(
+        encoding="utf-8-sig")
+    for phrase in (
+        "VR TRACE LENS PMT DIP FULL:",
+        "authority=EXACT_404700_NATIVE_DIP",
+        "pmt.objectId==0x570008u?1:0",
+        "baseVertexIndex,minVertexIndex",
+        "numVertices,startIndex,primitiveCount",
+        "CurrentLensOpaquePmtEntry",
+    ):
+        assert phrase in r7, "missing exact PMT->native DIP receipt: " + phrase
     effective_pmt = sem.split("inline RenderScope EffectiveScope()", 1)[1].split(
         "inline void ArmNextDraw", 1
     )[0]
