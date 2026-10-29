@@ -1,0 +1,60 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T2245KST-IDLE-NO-NEW-EXPORT-SHA",
+  "requested_at_kst": "2026-10-29T22:45:00+09:00",
+  "recorded_at_utc": "2026-10-29T13:49:44.653Z",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE",
+  "review_scope": "UNAPPROVED_AB_LOCAL_CANDIDATE_PNG_EXPORTS",
+  "selection_method": "Read-only SHA scan: all A/B export_evidence file hashes compared against earlier C1 report/metrics/byte-audit candidate hashes; local candidate and production manifest presence checked; no old SHA re-reviewed",
+  "evidence": {
+    "n100_scan_script": "work/C1_QA_20261029_2145_AI2_scan.py",
+    "n100_script_sha256": "52057112acf5d18ec038e22970535ee96125c294c4a5c9be6cc357018c659641",
+    "prior_git_idle_record": "localization/qa_reports/C1_20261029_2145_AI2_IDLE.json",
+    "reports_scanned": 208,
+    "known_reviewed_distinct_sha256": 921,
+    "export_evidence_file_entries": 916,
+    "unreviewed_export_file_entries": 0,
+    "unreviewed_distinct_sha256": 0,
+    "missing_candidate_or_manifest_entries": 0
+  },
+  "producer_snapshot": {
+    "A": {
+      "completed_files": 434,
+      "completed_batches": 140,
+      "next_ordinal": 435,
+      "active": false
+    },
+    "B": {
+      "completed_files": 481,
+      "completed_batches": 144,
+      "next_ordinal": 482,
+      "active": false
+    }
+  },
+  "summary": {
+    "candidates_selected": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "status": "IDLE_NO_ELIGIBLE_NEW_SHA"
+  },
+  "records": [],
+  "restrictions": {
+    "imagegen_called": false,
+    "producer_queue_consumed": false,
+    "dds_created": false,
+    "upgraded_C2_C3_or_user_pass": false,
+    "vr_ffb_dx11_dxvk_changed": false
+  },
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0
+}
