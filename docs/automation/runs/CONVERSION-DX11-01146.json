@@ -11,7 +11,7 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:STACKED_ROWS_SOURCE_REPAINT",
   "classification": "A_SOURCE_VISIBLE_REPAINT_REPAIR",
-  "status": "COMPLETE_BUILD_VERIFIED",
+  "status": "SOURCE_SLICE_BUILD_VERIFIED_FULL_FRAME_UNTESTED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -47,7 +47,13 @@
       "tests/native_raw_changed_pixel_window_test.cpp"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "activation_guard_and_fallback": "RAW opt-in only and default OFF; preserve original game D3D9 Draw/Present, input/FFB, DX9Ex rollback, DXVK freeze, protected original full-frame fail-closed."
+    "activation_guard_and_fallback": "RAW opt-in only and default OFF; preserve original game D3D9 Draw/Present, input/FFB, DX9Ex rollback, DXVK freeze, protected original full-frame fail-closed.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY: source-genuine RAW opt-in partial GPU RGB repaint; full menu/car/race native frame, matching game native_draws, publication and HMD remain UNTESTED. Never treat the exact-SHA five build Gate PASS as runtime proof."
   },
   "changed_files": [
     "src/vr/d3d11/native_game_raw_present_coverage.hpp",
@@ -157,6 +163,7 @@
   },
   "c6": {
     "reason": "EXACT_SHA_FIVE_GATES_PASS_RUNTIME_UNTESTED",
-    "next_action": "Continue same unfinished native full game frame feature: validate matched opt-in real game desktop evidence, then address native draw/complete frame blockers before native L/R Quest3 promotion. No new score for this incremental same-feature repair."
-  }
+    "next_action": "Resume unfinished full native game-frame feature using newest task. C6 denotes verified partial-source diagnostic, not a terminal full-renderer pass."
+  },
+  "full_dx11_renderer_complete": false
 }

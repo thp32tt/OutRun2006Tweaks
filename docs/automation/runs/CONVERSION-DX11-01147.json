@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01147",
+  "production_id": "CONVERSION-DX11-01147",
+  "event_id": "CONVERSION-DX11-01147-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "owner_id": "ChatGPT:CONVERSION-DX11-01147",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_GRID_REPAINT",
+  "classification": "A_SOURCE_INTEGRATION_WITH_CAUSAL_CI_RECORD_REPAIR",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_CI_IN_PROGRESS",
+  "full_dx11_renderer_complete": false,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "6a2ec9ef5ea801b38ba7a52f73aff529efff1378",
+  "source_implementation_commit_sha": "ece862e1e5c804dc771144a9e4e9c141bea28b0e",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_D3D9_DIRTY_GRID",
+      "LIVE_D3D11_BEFORE_AFTER_DRAW_RGB",
+      "NATIVE_RAW_TILE_2D_SOURCE_PLACEMENT",
+      "SOURCE_VERIFIED_DIAGNOSTIC_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: full scene remains UNTESTED; only an explicit opt-in source-bounded RAW partial D3D11 GPU diagnostic, real game native draw and visible output not tested",
+    "activation_guard_and_fallback": "RAW default OFF; original D3D9 game Draw/Present/input/FFB remains; preserve protected DX9Ex fallback, no DXVK changes; fail closed on invalid source/colour/target/epoch.",
+    "batch_components": [
+      "CXX_BOUNDED_2D_DIRTY_CORNER_PLACEMENT",
+      "CONSTEXPR_POSITIVE_NEGATIVE_SOURCE_UNION",
+      "PAIRED_REAL_BUFFER_GPU_RGB_INTEGRATION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact 3x3 grid of 16x16 source cells with attached 252x8 dirty tail places actual 32x32 source crop at (608,308), without fabricated pixels.",
+      "negative_regression": "One-pixel uncovered source gap, forged D3D9 rcBound, malformed member and unauthenticated header must fail closed.",
+      "component_integration": "Authentic RGNDATA -> 2D corner proposals -> full-pixel union authentication -> paired genuine RGB source window -> RAW-only D3D9 destination copy; protected game source unchanged."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "tests/native_raw_present_coverage_test.cpp",
+      "tests/native_raw_changed_pixel_window_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_present_coverage_test.cpp",
+    "tests/native_raw_changed_pixel_window_test.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Make authentic native DX11 GPU RGB diagnosable in 2D fragmented game Present regions, retaining source truth and fallbacks on the unfinished full native frame path.",
+    "acceptance_items": [
+      {
+        "id": "real_grid_source_placement",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 region to D3D11 RAW diagnostic",
+        "expected_behavior": "Authenticated 2D source grid carries genuine GPU RGB through partial diagnostic destination."
+      },
+      {
+        "id": "source_safety",
+        "category": "fallback_regression",
+        "behavior_area": "game source and original renderer",
+        "expected_behavior": "Unpainted pixel, forged bounds or invalid source reject rather than substitute fake native pixels; original game draws continue."
+      },
+      {
+        "id": "final_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "mandatory exact SHA workflows",
+        "expected_behavior": "Five complete push Gates on one validation-bearing material result SHA, but game/HMD remain separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real_grid_source_placement": "PENDING_EXACT_SHA",
+    "source_safety": "PENDING_EXACT_SHA",
+    "final_five_gates": "PENDING_EXACT_SHA"
+  },
+  "real_game_draw_blocker": "No real OutRun session for this SHA. Earlier b8dab362 desktop native_draws=0 and no publication do not imply success on new binary.",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "validation_history": {
+    "initial_material_commit": "ece862e1e5c804dc771144a9e4e9c141bea28b0e",
+    "first_gate_failure": "01146 stale terminal C6 claim omitted gameplay path and used unverified acceptance tokens; repair historical record without loosening validation policy."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "PASS",
+    "C2_IMPLEMENT": "COMMITTED",
+    "C3_VALIDATE": "REPAIRING_EXACT_SHA",
+    "C4_COMMIT": "INITIAL_MATERIAL_PRESENT",
+    "C5_PACKAGE": "WAIT_GATE",
+    "C6_STATE": "PENDING"
+  }
+}
