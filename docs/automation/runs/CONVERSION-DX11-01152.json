@@ -11,17 +11,17 @@
   "inherited_feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:LIVE_SM3:SOURCE_PROJECTED_W_Z_TABLE_FOG_COORDINATE",
   "classification": "A_SOURCE_IMPLEMENTATION_PLUS_B_CI_RECORD_CAUSAL_REPAIR",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMITTED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "full_dx11_renderer_complete": false,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_change": 0,
+  "score_change": 1,
   "development_time_percentages": "UNMEASURED",
   "source_base_sha": "dfe8d8c16848959f554719581cb80c4733b5b4df",
   "source_implementation_commit_sha": "1821758df335621ad2141b0b6e64015e9f64e609",
-  "material_result_sha": "1821758df335621ad2141b0b6e64015e9f64e609",
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+  "validation_bearing_result_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
   "development_strategy": {
     "work_class": "blocker_resolution",
     "milestone_id": "full_resolution_native_game_frame",
@@ -92,9 +92,9 @@
     ]
   },
   "acceptance_results": {
-    "native_z_w_table_fog": "PENDING_EXACT_SHA",
-    "safe_render_input_fallback": "PENDING_EXACT_SHA",
-    "five_exact_sha_gate": "PENDING_EXACT_SHA"
+    "native_z_w_table_fog": "PASS_EXACT_SHA_CPP_FAST",
+    "safe_render_input_fallback": "PASS_EXACT_SHA_BUILD_AND_FOG_NEGATIVE",
+    "five_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "real_game_draw_blocker": "No new exact-binary game/hmd session establishing native_draws>0 and publishedBackbufferFrames>0",
   "native_game_draw_count": "UNTESTED",
@@ -104,10 +104,10 @@
     "C0_RECOVER": "PASS_GITHUB_HEAD",
     "C1_REVIEW": "PASS_CAUSAL_GATE_DIAGNOSIS",
     "C2_IMPLEMENT": "PASS_MATERIAL_SOURCE_1821758d",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PASS_SOURCE_1821758d",
-    "C5_PACKAGE": "NOT_CREATED",
-    "C6_STATE": "PENDING"
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_EXACT_SHA_9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+    "C4_COMMIT": "PASS_1821758d_SOURCE_AND_9e7cc0c_CAUSAL_GATE_REPAIR",
+    "C5_PACKAGE": "NO_GAME_SCREEN_OR_QUEST3_SESSION_NO_RUNTIMETEST_PACKAGE",
+    "C6_STATE": "PASS_SEPARATE_CHECKPOINT_NO_ADDITIONAL_SCORE"
   },
   "evidence": {
     "source_implementation_sha": "1821758df335621ad2141b0b6e64015e9f64e609",
@@ -115,6 +115,59 @@
     "failed_backend_run": 40824173021,
     "failed_stage": "Existing 01151 COMPLETE_BUILD_VERIFIED record had changed_source_files but missing required changed_files; source files were genuinely modified on 95765463.",
     "runtime_evidence": "UNTESTED; no native Draw/HMD test on current game binary",
-    "requires_final_exact_sha_five_push_gates": true
+    "requires_final_exact_sha_five_push_gates": true,
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40824444626,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40824444229,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40824444287,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40824444217,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40824444243,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      }
+    ],
+    "original_material_source_commit": "1821758df335621ad2141b0b6e64015e9f64e609",
+    "validation_bearing_result_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+    "scoreboard_commit": "1ce9e9ac474934d376fc55a90815fcadecdf3375",
+    "scoreboard_ai2_prior": 2141,
+    "scoreboard_ai2_delta": 1,
+    "scoreboard_ai2_new": 2142,
+    "bookkeeping_only": true,
+    "checkpoint_has_ci_skip": true,
+    "ci_validated_source_commit_distinct": true
+  },
+  "c6": {
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+    "source_implementation_sha": "1821758df335621ad2141b0b6e64015e9f64e609",
+    "bookkeeping_only": true,
+    "score_change": 0,
+    "checkpoint_message_has_ci_skip": true,
+    "next_action": "No source-matched Quest3/native desktop game frame evidence. Same FEATURE_ID full-frame work continues elsewhere; do not re-run same exact Gate or claim native gameplay."
   }
 }
