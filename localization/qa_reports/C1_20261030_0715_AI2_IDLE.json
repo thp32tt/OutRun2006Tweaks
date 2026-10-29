@@ -1,0 +1,75 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T0715KST-IDLE",
+  "observed_at_kst": "2026-10-30T07:16:57+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "Direct N100 read-only inventory of work/image-src/text_roi_batches/candidate_outputs/{A,B} using existing C1_QA_20261030_0545_inventory.py; compared PNG mtimes to 2026-10-30T05:15:00+09:00 prior completed independent QA; rehashed the two latest QA candidates; no production queue consumed.",
+  "prior_qa": {
+    "report": "localization/qa_reports/C1_20261030_0515_AI2_NEW_SHA2.json",
+    "run_key": "OUTRUN-C1-AI2-20261030T0515KST-NEW-SHA2",
+    "result": "2 PASS",
+    "candidate_sha256": [
+      "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+      "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5"
+    ]
+  },
+  "live_inventory": {
+    "candidate_png_files": {
+      "A": 436,
+      "B": 482
+    },
+    "controller_state_completed_files": {
+      "A": 435,
+      "B": 482
+    },
+    "completed_batches": {
+      "A": 141,
+      "B": 145
+    },
+    "active": {
+      "A": null,
+      "B": null
+    },
+    "new_png_modified_since_prior_qa": 0,
+    "last_candidate_mtime_kst": {
+      "A": "2026-10-30T04:20:09+09:00",
+      "B": "2026-10-30T05:10:04+09:00"
+    },
+    "prior_qa_candidate_sha_match": {
+      "A": true,
+      "B": true
+    }
+  },
+  "results": {
+    "status": "IDLE",
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "notes": "No newly exported PNGs after previous QA cutoff; no repeated identical-SHA visual QA. No claim that all historical files have been freshly re-audited."
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "new_verified_qa_achievement": false,
+    "delta": 0,
+    "scoreboard_snapshot_ai2": 2194,
+    "scoreboard_repo": "thp32tt/ai-dev-lab",
+    "scoreboard_path": "AI_SCOREBOARD.md",
+    "scoreboard_updated": false
+  }
+}
