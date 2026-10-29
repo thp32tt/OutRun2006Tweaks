@@ -6,6 +6,7 @@
 #include <dxgi.h>
 #include <wrl/client.h>
 #include <cmath>
+#include <algorithm>
 #include <chrono>
 #include <thread>
 #include <cstdint>
@@ -39,6 +40,7 @@ public:
         drawPair_.reset(); region_ = {}; regionAlternate_ = {};
         alternateActive_ = false;
         captureFormat_ = DXGI_FORMAT_UNKNOWN;
+        captureWidth_ = width; captureHeight_ = height;
         sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; quarantined_ = false; lastDraws_ = 0;
@@ -62,6 +64,7 @@ public:
         const NativeRawSourcePixelRect* changedRects = nullptr,
         std::uint32_t changedCount = 0u) noexcept {
         if (!game || gameOwner_ != game) return false;
+        const UINT width = captureWidth_, height = captureHeight_;
         // The GPU capture is a 256x144 source-authentic tile, not the
         // complete D3D9 scene. An explicitly bounded disjoint color write
         // elsewhere cannot supersede these pixels. Unknown/full writes still
@@ -93,6 +96,7 @@ public:
         std::uint64_t draws, std::uint64_t presentingSerial,
         UINT& nativePixels) noexcept {
         nativePixels = 0;
+        const UINT width = captureWidth_, height = captureHeight_;
         if (!game || !backbuffer || !dev || !ctx || !color)
             return NativeRawPreviewResult::UnsafePresent;
         if (gameOwner_ != game || gpuOwner_ != dev) {
@@ -231,7 +235,8 @@ public:
                 NativeRawPresentTile firstTile{}, secondTile{};
                 UINT firstPixels = 0u, secondPixels = 0u;
                 changedWindow_.capture(before.pData, before.RowPitch,
-                                       mapped.pData, mapped.RowPitch);
+                                       mapped.pData, mapped.RowPitch,
+                                       width, height);
                 if (!changedWindow_.select(originalTile, firstTile,
                                            firstPixels)) {
                     unmapPairs();
@@ -240,7 +245,7 @@ public:
                 if (alternateActive_) {
                     changedWindow_.capture(beforeAlternate.pData,
                         beforeAlternate.RowPitch, afterAlternate.pData,
-                        afterAlternate.RowPitch);
+                        afterAlternate.RowPitch, width, height);
                     if (!changedWindow_.select(originalTile, secondTile,
                                                secondPixels)) {
                         unmapPairs();
@@ -503,6 +508,7 @@ public:
 private:
     void retire_same_present_zero_rgb_capture(
         ID3D11DeviceContext* ctx, std::uint64_t presentSerial) noexcept {
+        const UINT width = captureWidth_, height = captureHeight_;
         // Bound the extra readbacks: three different native GPU Draws at most
         // per original game Present. Never retry a positive RGB capture.
         if (!ctx || !pending_ || rgbEvidenceConfirmed_ ||
@@ -590,9 +596,13 @@ private:
             return NativeRawPreviewResult::GpuFailure;
         D3D11_TEXTURE2D_DESC src{};
         color->GetDesc(&src);
+        // Capture actual smaller menu/car surfaces without inventing or
+        // upscaling pixels. The GPU box and every CPU row share this extent.
+        const UINT width = (std::min)(src.Width, NativeRawVisualPreview::width);
+        const UINT height = (std::min)(src.Height, NativeRawVisualPreview::height);
         Microsoft::WRL::ComPtr<ID3D11Device> actual;
         color->GetDevice(actual.GetAddressOf());
-        if (actual.Get() != dev || src.Width < width || src.Height < height ||
+        if (actual.Get() != dev || width < 24u || height < 24u ||
             src.ArraySize != 1u || src.MipLevels != 1u ||
             src.SampleDesc.Count != 1u || src.Usage != D3D11_USAGE_DEFAULT ||
             src.CPUAccessFlags || !(src.BindFlags & D3D11_BIND_RENDER_TARGET))
@@ -617,10 +627,16 @@ private:
         // One preview can encounter different game-created color targets in
         // menu -> car -> race. Never reuse a BGRA8 staging texture for an
         // RGBA8 (or differently typed sRGB) GPU CopySubresourceRegion.
-        if (captureFormat_ != stagedFormat) {
+        if (captureFormat_ != stagedFormat ||
+            captureWidth_ != width || captureHeight_ != height) {
             staging_.Reset(); baseline_.Reset();
             stagingAlternate_.Reset(); baselineAlternate_.Reset();
+            // The source target's dimensions can change between menu and
+            // race. A previously created D3D9 SYSTEMMEM tile must not be
+            // reused with a newly sized native GPU capture.
+            surface_.Reset(); surfaceAlternate_.Reset();
             captureFormat_ = stagedFormat;
+            captureWidth_ = width; captureHeight_ = height;
         }
         sourceByteOrder_ = rgba ? NativeRawColorByteOrder::Rgba
                                 : NativeRawColorByteOrder::Bgra;
@@ -715,6 +731,7 @@ private:
     D3D11_BOX region_{}, regionAlternate_{};
     bool alternateActive_ = false;
     DXGI_FORMAT captureFormat_ = DXGI_FORMAT_UNKNOWN;
+    UINT captureWidth_ = width, captureHeight_ = height;
     NativeRawColorByteOrder sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;

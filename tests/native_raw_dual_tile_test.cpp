@@ -1,5 +1,7 @@
 #include "src/vr/d3d11/native_game_raw_dual_tile.hpp"
 #include "src/vr/d3d11/native_game_raw_color_transport.hpp"
+#include "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp"
+#include <array>
 #include <cassert>
 using namespace outrun::vr::dx11;
 int main() {
@@ -112,5 +114,38 @@ int main() {
     assert(!native_raw_secondary_present_tile(
         NativeRawPresentTile{0, 0, 256, 144, -2, 8},
         0, 0, 800, 450, secondary));
+
+    // End-to-end compact actual GPU staging + RGB-window crop path: a
+    // 96x64 menu target must not be rejected by the old 256x144 minimum.
+    constexpr std::uint32_t compactW = 96u, compactH = 64u;
+    assert(native_raw_dual_draw_tile(compactW, compactH, compactW, compactH,
+        NativeRawDrawExtent{0, 0, 96, 64}, 0u, t));
+    assert(!t.hasSecond && t.first.x == 0u && t.first.y == 0u);
+    NativeRawChangedPixelWindow changedWindow{};
+    std::array<std::uint8_t, compactW * compactH * 4u> before{};
+    auto after = before;
+    after[(60u * compactW + 94u) * 4u + 0u] = 213u;
+    // A restricted source crop can still select a real edge RGB pixel.
+    NativeRawPresentTile compactOriginal{};
+    NativeRawPresentTile compactSelected{};
+    std::uint32_t realPixels = 0u;
+    assert(native_raw_partial_present_tile(
+        88, 58, 0, 0, 88, 58, compactW, compactH, compactOriginal));
+    changedWindow.capture(before.data(), compactW * 4u,
+                          after.data(), compactW * 4u, compactW, compactH);
+    assert(changedWindow.select(compactOriginal, compactSelected, realPixels));
+    assert(realPixels == 1u);
+    assert(compactSelected.sourceX <= 94u &&
+           compactSelected.sourceX + compactSelected.copyWidth > 94u);
+    assert(compactSelected.sourceY <= 60u &&
+           compactSelected.sourceY + compactSelected.copyHeight > 60u);
+    // Invalid pitch, zero dimensions or unsupported larger GPU extents
+    // cannot turn stale prefix data into a visible native pixel.
+    changedWindow.capture(before.data(), 3u, after.data(), compactW * 4u,
+                          compactW, compactH);
+    assert(!changedWindow.select(compactOriginal, compactSelected, realPixels));
+    changedWindow.capture(before.data(), compactW * 4u,
+                          after.data(), compactW * 4u, 257u, compactH);
+    assert(!changedWindow.select(compactOriginal, compactSelected, realPixels));
 
 }
