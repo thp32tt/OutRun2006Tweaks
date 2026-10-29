@@ -63,10 +63,11 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
-      "LIVE_D3D9_DRAW",
+      "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
       "GPU_BEFORE_AFTER_RGB_DELTA",
-      "OPT_IN_SOURCE_ALIGNED_DIAGNOSTIC_PRESENT"
+      "OPT_IN_SOURCE_ALIGNED_DIAGNOSTIC_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "SOURCE_AND_BUILD_VERIFIED_PARTIAL_RAW_ONLY; game runtime optical proof still absent",
     "activation_guard_and_fallback": "RAW explicit opt-in only, canonical game target COM identity + matching source/backbuffer dimensions + original dirty union/crop proof; input/FFB original and DX9Ex fallback unchanged, DXVK frozen."
@@ -128,5 +129,68 @@
     "C5_PACKAGE": "NOT_REQUIRED_NO_RUNTIME_PROMOTION",
     "C6_STATE": "PASS_DOCUMENT_ONLY_AFTER_REQUIRED_FIVE_GATES"
   },
-  "next_unfinished": "Real game RAW source-aligned native GPU pixel visual observation at exact tested SHA and then complete mono menu/vehicle/race source coverage; L/R OpenXR game GPU output and Quest3/VDXR remain UNTESTED."
+  "next_unfinished": "Real game RAW source-aligned native GPU pixel visual observation at exact tested SHA and then complete mono menu/vehicle/race source coverage; L/R OpenXR game GPU output and Quest3/VDXR remain UNTESTED.",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "SOURCE_AND_BUILD_VERIFIED_PARTIAL_RAW_ONLY",
+    "goal": "Carry authentic source-aligned native GPU pixel output from live game D3D9 Draw through D3D11 PRE/Draw/POST into conditional visible D3D9 Present without losing original fallback.",
+    "acceptance_items": [
+      {
+        "id": "source_aligned_native_gpu_present",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 game Draw to source-coincident D3D9 Present",
+        "expected_behavior": "Admit authentic game GPU RGB pixels on original source coordinates only with game target ownership, dirty crop and nonoverlap."
+      },
+      {
+        "id": "dual_region_conflict_and_priority",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native GPU dual tile disjoint composition",
+        "expected_behavior": "Keep two source-aligned tiles when disjoint; reject overlapping destinations and prioritize authentic alignment over displaced legacy insets."
+      },
+      {
+        "id": "fail_closed_legacy_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original D3D9 game and DX9Ex fallback",
+        "expected_behavior": "Missing target COM, mismatched pixel extent or dirty crop falls back to bounded opt-in RAW diagnostic while preserving input and FFB."
+      },
+      {
+        "id": "five_gate_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "five mandatory GitHub Actions workflows",
+        "expected_behavior": "All five mandatory push CI jobs succeed against identical implementation SHA, without claiming full game or HMD runtime completion."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_aligned_native_gpu_present": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks run 40950615830 success at exact source SHA. Implementation SHA b8e71c2ca1c8466c10fc93dd749162cc4f68e10b. File src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+    },
+    "dual_region_conflict_and_priority": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Build run 40950615829 compiled dual source tile positive and negative regression at exact SHA. Implementation SHA b8e71c2ca1c8466c10fc93dd749162cc4f68e10b. File tests/native_raw_dual_tile_test.cpp"
+    },
+    "fail_closed_legacy_fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp"
+      ],
+      "validation_command": "Backend Conversion Gate run 40950615834 passed with original source and fallback policy; hardware not tested. Implementation SHA b8e71c2ca1c8466c10fc93dd749162cc4f68e10b. File src/vr/d3d11/native_game_raw_present_coverage.hpp"
+    },
+    "five_gate_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/backend-conversion-gate.yml"
+      ],
+      "validation_command": "Exact SHA five push runs successful: DX11 Fast 40950615830; Backend 40950615834; Build 40950615829; OpenXR 40950615875; HUD 40950615833. Implementation SHA b8e71c2ca1c8466c10fc93dd749162cc4f68e10b. File .github/workflows/backend-conversion-gate.yml"
+    }
+  },
+  "causal_ci_repair_task_id": "CONVERSION-DX11-01168",
+  "causal_ci_repair_note": "Metadata-only correction of missing 01167 C6 feature contract and canonical ordered live D3D9 Draw -> native D3D11 Draw -> opt-in visible D3D9 Present. Prior exact SHA five successful gates remain unchanged; no claim of runtime game/HMD validation."
 }

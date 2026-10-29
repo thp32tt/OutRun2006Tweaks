@@ -340,3 +340,29 @@ for label, mutate in (
     invalid_01158 = copy.deepcopy(historical_01158)
     mutate(invalid_01158)
     assert validate_task(invalid_01158, p), "01158 evidence regression admitted: " + label
+
+
+# 01168 causal repair: inherited 01167 C6 exact-SHA record was missing
+# required terminal feature contract and canonical live Draw ordering.
+historical_01167 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01167.json").read_text(encoding="utf-8"))
+assert historical_01167["validation_bearing_result_sha"] == "b8e71c2ca1c8466c10fc93dd749162cc4f68e10b"
+assert historical_01167["runtime_validation"] == "UNTESTED"
+assert historical_01167["gameplay_test_performed"] is False
+assert historical_01167["full_dx11_renderer_complete"] is False
+assert not validate_task(historical_01167, p), validate_task(historical_01167, p)
+for label, change in (
+    ("contract absent", lambda x: x.pop("feature_contract")),
+    ("contract mismatch", lambda x: x["feature_contract"].update(feature_id="WRONG")),
+    ("D3D9 live Draw absent", lambda x: x["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"])),
+    ("visible Present absent", lambda x: x["development_strategy"].update(
+        live_game_draw_path=["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW"])),
+    ("source acceptance unproven", lambda x: x["acceptance_results"]["dual_region_conflict_and_priority"].update(
+        evidence_paths=[])),
+    ("runtime proof forged", lambda x: x.update(runtime_validation="PASS")),
+    ("failed CI forged", lambda x: x.update(automation_validation="FAIL_EXACT_SHA")),
+):
+    broken = copy.deepcopy(historical_01167)
+    change(broken)
+    assert validate_task(broken, p), "01167 policy regression: " + label
