@@ -35,7 +35,7 @@ WINDOWS = (
     # queue descriptor, and that callee must be authenticated before a
     # CABE source ordinal can be equated with one PMT/texture/native Draw.
     ("lens-opaque-lower-render-core", 0x00004400, 0x000050C0),
-    ("lens-opaque-queue-core", 0x000050C0, 0x00005B20),
+    ("lens-opaque-queue-core", 0x000050C0, 0x00005D40),
     ("lens-objects", 0x0000C900, 0x0000D950),
     ("sprite-glyph-queue", 0x0002C800, 0x0002D300),
     ("calc3d2d", 0x00049940, 0x00049B20),
