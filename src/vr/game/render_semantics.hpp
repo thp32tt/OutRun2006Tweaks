@@ -918,6 +918,53 @@ namespace OutRunVR::GameSemantic
 
     inline thread_local LensOpaqueFlushReceipt CurrentLensOpaqueFlush{};
 
+    // Diagnostic-only identity for the exact retail 0x405890 -> 0x404700
+    // queue-entry call. Canonical EXE proves 0x405360 stores the original
+    // object id at +0x38, and 0x405890 writes pass at +0x20 before either
+    // 0x404700 call. This receipt never grants render ownership.
+    struct LensOpaquePmtEntryReceipt
+    {
+        std::uint64_t serial = 0;
+        std::uint64_t flushSerial = 0;
+        LensOpaqueFlushOrigin flushOrigin = LensOpaqueFlushOrigin::None;
+        std::uintptr_t entry = 0;
+        std::uint32_t depthBits = 0;
+        std::uint32_t matrix = 0;
+        std::uint32_t paletteCount = 0;
+        std::uint32_t idHigh = 0;
+        std::uint32_t resource = 0;
+        std::uintptr_t object = 0;
+        std::uintptr_t node = 0;
+        std::uintptr_t mesh = 0;
+        std::uint32_t pass = 0;
+        std::uint32_t colourList = 0;
+        std::uint32_t colour = 0;
+        std::uint32_t morphTarget = 0;
+        std::uint32_t morphWeightBits = 0;
+        std::uint32_t flags = 0;
+        std::uint32_t objectId = 0;
+    };
+    inline thread_local LensOpaquePmtEntryReceipt CurrentLensOpaquePmtEntry{};
+
+    class ScopedLensOpaquePmtEntry final
+    {
+        LensOpaquePmtEntryReceipt previous_{};
+    public:
+        explicit ScopedLensOpaquePmtEntry(
+            LensOpaquePmtEntryReceipt receipt) noexcept
+            : previous_(CurrentLensOpaquePmtEntry)
+        {
+            CurrentLensOpaquePmtEntry = receipt;
+        }
+        ~ScopedLensOpaquePmtEntry() noexcept
+        {
+            CurrentLensOpaquePmtEntry = previous_;
+        }
+        ScopedLensOpaquePmtEntry(const ScopedLensOpaquePmtEntry&) = delete;
+        ScopedLensOpaquePmtEntry& operator=(
+            const ScopedLensOpaquePmtEntry&) = delete;
+    };
+
     inline const char* Name(LensOpaqueFlushOrigin origin) noexcept
     {
         switch (origin)
