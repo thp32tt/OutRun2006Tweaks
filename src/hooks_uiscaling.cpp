@@ -1494,7 +1494,11 @@ class UIScaling : public Hook
                     Settings::VRTelemetry &&
                     (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
                      producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
-                     producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
+                     producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
+                     producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
+                     producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
+                     producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
+                     producer == OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
                 if (fullVisualNodeTrace)
                 {
                     LARGE_INTEGER qpc{};
@@ -2560,6 +2564,23 @@ class UIScaling : public Hook
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
 
+        if (Settings::VRTelemetry)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+                spdlog::info(
+                    "VR TRACE GOAL_TIME QUEUE ENTRY FULL: qpc={} helperRva=0x{:X} "
+                    "producer={} priority={} root=0x{:X} tail=0x{:X} "
+                    "entrySerial={} entryEpoch={} resetEpoch={}",
+                    qpc.QuadPart, helperRva,
+                    OutRunVR::GameSemantic::Name(producer), p,
+                    reinterpret_cast<std::uintptr_t>(rootsBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(before[p]),
+                    entrySerial, admission.queueEpochAtEntry,
+                    resetTrace.resetSerial);
+        }
+
         bool admittedAtExit = false;
         {
             OutRunVR::GameSemantic::ScopedExactProducerSemantic owner(
@@ -2596,6 +2617,32 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
                 resetTrace.resetSerial, resetTrace.qpc, resetTrace.flags,
                 resetTrace.readStable ? 1 : 0);
+        if (Settings::VRTelemetry)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            const auto exitEpoch =
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* root = Game::sprite_prio_root[p];
+                SpriteNode* tail = root ? root->tail_4 : nullptr;
+                spdlog::info(
+                    "VR TRACE GOAL_TIME QUEUE EXIT FULL: qpc={} helperRva=0x{:X} "
+                    "producer={} priority={} entryRoot=0x{:X} entryTail=0x{:X} "
+                    "exitRoot=0x{:X} exitTail=0x{:X} changed={} "
+                    "entrySerial={} entryEpoch={} exitEpoch={} admitted={}",
+                    qpc.QuadPart, helperRva,
+                    OutRunVR::GameSemantic::Name(producer), p,
+                    reinterpret_cast<std::uintptr_t>(rootsBefore[p]),
+                    reinterpret_cast<std::uintptr_t>(before[p]),
+                    reinterpret_cast<std::uintptr_t>(root),
+                    reinterpret_cast<std::uintptr_t>(tail),
+                    tail && tail != before[p] ? 1 : 0,
+                    entrySerial, admission.queueEpochAtEntry,
+                    exitEpoch, admittedAtExit ? 1 : 0);
+            }
+        }
 	}
 	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
 	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
@@ -4332,6 +4379,27 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             CanSuppressUnprovenDirectResultD3DXSubmission(
                 restore, QueueRenderActive(), EffectiveScope(),
                 CurrentRenderProducerToken());
+        const bool traceExactPhysicalFlush = Settings::VRTelemetry &&
+            HudBatch.active &&
+            OutRunVR::GameSemantic::CanReprojectFiniteResultHudPlane(
+                HudBatch.scope, HudBatch.producer);
+        if (traceExactPhysicalFlush)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE D3DX PHYSICAL FULL: phase=FLUSH_PRE qpc={} producer={} "
+                "scope={} restore={} unproven={} active={} draws={} homogeneous={} "
+                "queued={} node=0x{:X} epoch={} generation={} sprite=0x{:X} self=0x{:X}",
+                qpc.QuadPart, Name(HudBatch.producer), Name(HudBatch.scope),
+                restore ? 1 : 0, unprovenResult ? 1 : 0,
+                HudBatch.active ? 1 : 0, HudBatch.drawCount,
+                HudBatch.homogeneous ? 1 : 0, HudBatch.queued ? 1 : 0,
+                reinterpret_cast<std::uintptr_t>(HudBatch.queueNode),
+                HudBatch.queueEpoch, HudBatch.generation,
+                reinterpret_cast<std::uintptr_t>(HudBatch.sprite),
+                reinterpret_cast<std::uintptr_t>(self));
+        }
         HRESULT hr;
         {
             ScopedUnprovenDirectResultD3DXSubmission unproven(unprovenResult);
@@ -4339,6 +4407,19 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 restore ? HudBatch.scope : RenderScope::None, nullptr, restore,
                 restore ? HudBatch.producer : ProducerToken::None);
             hr = Flush_hk.stdcall<HRESULT>(self);
+        }
+        if (traceExactPhysicalFlush)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE D3DX PHYSICAL FULL: phase=FLUSH_POST qpc={} producer={} "
+                "hr=0x{:08X} submissionGeneration={} liveGeneration={} "
+                "liveActive={} liveDraws={} liveHomogeneous={}",
+                qpc.QuadPart, Name(submission.producer),
+                static_cast<unsigned>(hr), submission.generation,
+                HudBatch.generation, HudBatch.active ? 1 : 0,
+                HudBatch.drawCount, HudBatch.homogeneous ? 1 : 0);
         }
         // The inline vtable hook can receive a foreign ID3DXSprite sharing
         // this method address. Preserve its native Flush/HRESULT, but never
@@ -4395,6 +4476,27 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             CanSuppressUnprovenDirectResultD3DXSubmission(
                 restore, QueueRenderActive(), EffectiveScope(),
                 CurrentRenderProducerToken());
+        const bool traceExactPhysicalEnd = Settings::VRTelemetry &&
+            HudBatch.active &&
+            OutRunVR::GameSemantic::CanReprojectFiniteResultHudPlane(
+                HudBatch.scope, HudBatch.producer);
+        if (traceExactPhysicalEnd)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE D3DX PHYSICAL FULL: phase=END_PRE qpc={} producer={} "
+                "scope={} restore={} unproven={} active={} draws={} homogeneous={} "
+                "queued={} node=0x{:X} epoch={} generation={} sprite=0x{:X} self=0x{:X}",
+                qpc.QuadPart, Name(HudBatch.producer), Name(HudBatch.scope),
+                restore ? 1 : 0, unprovenResult ? 1 : 0,
+                HudBatch.active ? 1 : 0, HudBatch.drawCount,
+                HudBatch.homogeneous ? 1 : 0, HudBatch.queued ? 1 : 0,
+                reinterpret_cast<std::uintptr_t>(HudBatch.queueNode),
+                HudBatch.queueEpoch, HudBatch.generation,
+                reinterpret_cast<std::uintptr_t>(HudBatch.sprite),
+                reinterpret_cast<std::uintptr_t>(self));
+        }
         HRESULT hr;
         {
             ScopedUnprovenDirectResultD3DXSubmission unproven(unprovenResult);
@@ -4402,6 +4504,19 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 restore ? HudBatch.scope : RenderScope::None, nullptr, restore,
                 restore ? HudBatch.producer : ProducerToken::None);
             hr = End_hk.stdcall<HRESULT>(self);
+        }
+        if (traceExactPhysicalEnd)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE D3DX PHYSICAL FULL: phase=END_POST qpc={} producer={} "
+                "hr=0x{:08X} submissionGeneration={} liveGeneration={} "
+                "liveActive={} liveDraws={} liveHomogeneous={}",
+                qpc.QuadPart, Name(submission.producer),
+                static_cast<unsigned>(hr), submission.generation,
+                HudBatch.generation, HudBatch.active ? 1 : 0,
+                HudBatch.drawCount, HudBatch.homogeneous ? 1 : 0);
         }
         // A foreign ID3DXSprite End must not tear down the tracked game
         // sprite ledger. Exact-object generation/reentrancy handling remains
@@ -4922,7 +5037,11 @@ private:
             Settings::VRTelemetry &&
             (source == ProducerToken::StageExtensionTime ||
              source == ProducerToken::ResultProgress ||
-             source == ProducerToken::ResultTextB9200);
+             source == ProducerToken::ResultTextB9200 ||
+             source == ProducerToken::GoalTimeHelper ||
+             source == ProducerToken::GoalTime020 ||
+             source == ProducerToken::GoalTime150 ||
+             source == ProducerToken::OutRunStagePrintf);
         static std::atomic<std::uint64_t> fullVisualD3dxSerial{0};
         const std::uint64_t fullVisualDrawSerial =
             fullVisualD3dx
@@ -4932,8 +5051,72 @@ private:
         {
             LARGE_INTEGER qpc{};
             QueryPerformanceCounter(&qpc);
+            D3DXMATRIX spriteTransform{};
+            HRESULT spriteTransformHr = E_POINTER;
+            IDirect3DDevice9* spriteDevice = nullptr;
+            HRESULT spriteDeviceHr = E_POINTER;
+            D3DVIEWPORT9 spriteViewport{};
+            HRESULT spriteViewportHr = E_POINTER;
+            RECT spriteScissor{};
+            HRESULT spriteScissorHr = E_POINTER;
+            std::uintptr_t spriteRtPtr = 0;
+            UINT spriteRtWidth = 0, spriteRtHeight = 0;
+            D3DFORMAT spriteRtFormat = D3DFMT_UNKNOWN;
+            DWORD spriteAlphaBlend = 0, spriteSrcBlend = 0, spriteDstBlend = 0;
+            if (self)
+            {
+                auto* sprite = reinterpret_cast<ID3DXSprite*>(self);
+                spriteTransformHr = sprite->GetTransform(&spriteTransform);
+                spriteDeviceHr = sprite->GetDevice(&spriteDevice);
+                if (SUCCEEDED(spriteDeviceHr) && spriteDevice)
+                {
+                    spriteViewportHr = spriteDevice->GetViewport(&spriteViewport);
+                    spriteScissorHr = spriteDevice->GetScissorRect(&spriteScissor);
+                    IDirect3DSurface9* rt = nullptr;
+                    if (SUCCEEDED(spriteDevice->GetRenderTarget(0, &rt)) && rt)
+                    {
+                        spriteRtPtr = reinterpret_cast<std::uintptr_t>(rt);
+                        D3DSURFACE_DESC desc{};
+                        if (SUCCEEDED(rt->GetDesc(&desc)))
+                        {
+                            spriteRtWidth = desc.Width;
+                            spriteRtHeight = desc.Height;
+                            spriteRtFormat = desc.Format;
+                        }
+                        rt->Release();
+                    }
+                    spriteDevice->GetRenderState(D3DRS_ALPHABLENDENABLE, &spriteAlphaBlend);
+                    spriteDevice->GetRenderState(D3DRS_SRCBLEND, &spriteSrcBlend);
+                    spriteDevice->GetRenderState(D3DRS_DESTBLEND, &spriteDstBlend);
+                    spriteDevice->Release();
+                }
+            }
             spdlog::info(
-                "VR TRACE D3DX DRAW FULL: phase=PRE serial={} qpc={} producer={} "
+                "VR TRACE D3DX STATE FULL: serial={} qpc={} producer={} scope={} "
+                "transformHr=0x{:08X} m11={:.9g} m12={:.9g} m21={:.9g} m22={:.9g} "
+                "tx={:.9g} ty={:.9g} deviceHr=0x{:08X} "
+                "viewportHr=0x{:08X} viewport={},{},{}x{} "
+                "scissorHr=0x{:08X} scissor={},{},{},{} "
+                "rt0=0x{:X} rt={}x{} rtFmt={} alphaBlend={} srcBlend={} dstBlend={}",
+                fullVisualDrawSerial, qpc.QuadPart, Name(source), Name(scope),
+                static_cast<unsigned>(spriteTransformHr),
+                spriteTransform._11, spriteTransform._12,
+                spriteTransform._21, spriteTransform._22,
+                spriteTransform._41, spriteTransform._42,
+                static_cast<unsigned>(spriteDeviceHr),
+                static_cast<unsigned>(spriteViewportHr),
+                spriteViewport.X, spriteViewport.Y,
+                spriteViewport.Width, spriteViewport.Height,
+                static_cast<unsigned>(spriteScissorHr),
+                spriteScissor.left, spriteScissor.top,
+                spriteScissor.right, spriteScissor.bottom,
+                spriteRtPtr, spriteRtWidth, spriteRtHeight,
+                static_cast<unsigned>(spriteRtFormat),
+                spriteAlphaBlend ? 1 : 0,
+                static_cast<unsigned>(spriteSrcBlend),
+                static_cast<unsigned>(spriteDstBlend));
+            spdlog::info(
+                "VR TRACE D3DX DRAW FULL: phase=PRE serial={} qpc={} producer={} 
                 "scope={} stageTicket={} stageEntrySerial={} queued={} node=0x{:X} epoch={} self=0x{:X} tex=0x{:X} "
                 "rectValid={} rect={},{},{},{} centerValid={} center={:.9g},{:.9g},{:.9g} "
                 "posValid={} pos={:.9g},{:.9g},{:.9g} color=0x{:08X}",

@@ -6613,7 +6613,9 @@ namespace OutRunVRStereo
                     lensTransaction.restoreOk;
                 if (physicalSample <= 64 ||
                     (physicalSample & (physicalSample - 1)) == 0 ||
-                    !lensPairComplete)
+                    !lensPairComplete ||
+                    lensSourceSerial != 0 ||
+                    lensWindowAnchorSerial != 0)
                 {
                     LARGE_INTEGER physicalQpc{};
                     QueryPerformanceCounter(&physicalQpc);
@@ -7212,14 +7214,33 @@ namespace OutRunVRStereo
                 (sourceCommand.producer ==
                     OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
                  sourceCommand.producer ==
-                    OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+                    OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
+                 sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
+                 sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
+                 sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
+                 sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
             const char* detailedTimeGoalFamily =
                 sourceCommand.producer ==
                     OutRunVR::GameSemantic::ProducerToken::StageExtensionTime
                     ? "PLUS_TIME" :
                 sourceCommand.producer ==
                     OutRunVR::GameSemantic::ProducerToken::ResultProgress
-                    ? "GOAL_PERCENT" : "OTHER";
+                    ? "GOAL_PERCENT" :
+                sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::ResultTextB9200
+                    ? "GOAL_TEXT" :
+                (sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
+                 sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::GoalTime150)
+                    ? "GOAL_TIME" :
+                sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf
+                    ? "GOAL_STAGE_PRINTF" : "OTHER";
 
             if (detailedTimeGoalTrace)
             {

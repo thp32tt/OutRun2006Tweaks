@@ -1168,8 +1168,7 @@ float4 PSMain(VSOut input) : SV_Target
         };
         static std::uint64_t projectionUvReceipts = 0;
         const auto uvHit = ++projectionUvReceipts;
-        if (uvHit <= 64 || (uvHit & (uvHit - 1)) == 0)
-            std::cerr << "[R19 TRACE] projection-uv hit=" << uvHit
+        std::cerr << "[R19 TRACE] projection-uv hit=" << uvHit
                       << " frameId=" << LastStereoFrame.frameId
                       << " sourcePoseSequence=" << LastStereoFrame.sourcePoseSequence
                       << " incomingProjection=" << (incoming ? 1 : 0)
@@ -1202,9 +1201,7 @@ float4 PSMain(VSOut input) : SV_Target
         const bool released = Release(Projection, ok);
         static std::uint64_t projectionFrameResults = 0;
         const auto resultHit = ++projectionFrameResults;
-        if (resultHit <= 64 || (resultHit & (resultHit - 1)) == 0 ||
-            !leftBlitOk || !rightBlitOk || !released)
-            std::cerr << "[R19 TRACE] frame-result hit=" << resultHit
+        std::cerr << "[R19 TRACE] frame-result hit=" << resultHit
                       << " frameId=" << LastStereoFrame.frameId
                       << " sourcePoseSequence=" << LastStereoFrame.sourcePoseSequence
                       << " image=" << image
@@ -1258,7 +1255,6 @@ float4 PSMain(VSOut input) : SV_Target
 
         static std::uint64_t poseJoinReceipts = 0;
         const auto poseJoinHit = ++poseJoinReceipts;
-        if (poseJoinHit <= 64 || (poseJoinHit & (poseJoinHit - 1)) == 0)
         {
             for (int eye = 0; eye < 2; ++eye)
             {
