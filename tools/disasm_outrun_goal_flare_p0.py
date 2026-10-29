@@ -30,9 +30,11 @@ WINDOWS = (
     ("navi-race-display", 0x000BEA80, 0x000BEE20),
     ("goal-record-helpers", 0x000BE000, 0x000BEB20),
     # Original opaque object queue core. 0x4056D0 enqueues DrawObjectAlpha
-    # work; 0x4052C0 later consumes the shared queue. Keeping these bodies in
-    # the durable artifact is required before assigning a CABE ordinal to a
-    # physical PMT/Draw.
+    # work; 0x4052C0 later consumes the shared queue. Keep the lower renderer
+    # immediately upstream too: 0x405890 invokes 0x404700 once per admitted
+    # queue descriptor, and that callee must be authenticated before a
+    # CABE source ordinal can be equated with one PMT/texture/native Draw.
+    ("lens-opaque-lower-render-core", 0x00004400, 0x000050C0),
     ("lens-opaque-queue-core", 0x000050C0, 0x00005B20),
     ("lens-objects", 0x0000C900, 0x0000D950),
     ("sprite-glyph-queue", 0x0002C800, 0x0002D300),
