@@ -26,6 +26,11 @@ int main() {
     assert(t.hasSecond && t.first.x == 0u && t.second.x == 256u);
     assert(t.first.y == 0u && t.second.y == 0u);
     assert(native_raw_source_tiles_disjoint(t.first, t.second, 256, 144));
+    // Regression order: evaluate two authenticated source regions before
+    // the deliberate single-tile/no-overlap case changes hasSecond.
+    assert(native_raw_choose_second_tile(0, 21, t.hasSecond));
+    assert(!native_raw_choose_second_tile(21, 21, t.hasSecond));
+    assert(!native_raw_choose_second_tile(21, 0, t.hasSecond));
     // A narrow source raster can intersect multiple nominal tile origins,
     // but the same GPU RGB bytes must NEVER count as two native Draw tiles.
     assert(native_raw_dual_draw_tile(640, 480, 256, 144,
@@ -37,9 +42,6 @@ int main() {
         NativeRawTileOrigin{0, 0}, NativeRawTileOrigin{256, 20}, 256, 144));
     assert(!native_raw_source_tiles_disjoint(
         NativeRawTileOrigin{0, 0}, NativeRawTileOrigin{1, 1}, 0, 144));
-    assert(native_raw_choose_second_tile(0, 21, t.hasSecond));
-    assert(!native_raw_choose_second_tile(21, 21, t.hasSecond));
-    assert(!native_raw_choose_second_tile(21, 0, t.hasSecond));
     assert(native_raw_dual_draw_tile(256, 144, 256, 144,
         NativeRawDrawExtent{0,0,256,144}, 3, t));
     assert(!t.hasSecond && !native_raw_choose_second_tile(0, 1, t.hasSecond));
