@@ -105,7 +105,10 @@ for token in (
     'fvf != 0x00000142u',
     'VR RIVAL R62 FIXEDFN PREPARE:',
     'const bool tracePhysicalEyes =',
-    '(exactResult || exactProjectedRival)',
+    '(exactResult || exactProjectedRival ||',
+    'exactProjectedRank',
+    'ProducerToken::RankMarkerSprani',
+    'ProducerToken::RankMarkerClipSprite',
     'VR RIVAL R62 FIXEDFN EYE RECEIPT:',
 ):
     assert token in r62, token
