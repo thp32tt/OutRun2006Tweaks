@@ -5128,14 +5128,18 @@ private:
                 "posValid={} pos={:.9g},{:.9g},{:.9g} color=0x{:08X}",
                 fullVisualDrawSerial,qpc.QuadPart,Name(source),
                 source == ProducerToken::StageExtensionTime
-                    ? (StageExtensionLiveNaviSource
-                        ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY")
+                    ? (command.queued
+                        ? "QUEUED_JOIN_NODE_RECEIPT"
+                        : (StageExtensionLiveNaviSource
+                            ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY"))
                     : (source == ProducerToken::ResultProgress
-                        ? (ResultProgressFullParentCallRva == 0x98924u
-                            ? "GOAL_FULL_CALL_98924"
-                            : (ResultProgressFullParentCallRva == 0x992ACu
-                                ? "GOAL_FULL_CALL_992AC"
-                                : "GOAL_PROGRESS_INNER"))
+                        ? (command.queued
+                            ? "QUEUED_JOIN_NODE_RECEIPT"
+                            : (ResultProgressFullParentCallRva == 0x98924u
+                                ? "GOAL_FULL_CALL_98924"
+                                : (ResultProgressFullParentCallRva == 0x992ACu
+                                    ? "GOAL_FULL_CALL_992AC"
+                                    : "GOAL_PROGRESS_INNER")))
                         : "OTHER_VISUAL_SOURCE"),
                 Name(scope),StageTimeLiveTicket,StageExtensionEntrySerial,
                 command.queued ? 1 : 0,
@@ -5196,14 +5200,18 @@ private:
                 "batchScope={} batchProducer={}",
                 fullVisualDrawSerial,qpc.QuadPart,static_cast<unsigned>(hr),
                 source == ProducerToken::StageExtensionTime
-                    ? (StageExtensionLiveNaviSource
-                        ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY")
+                    ? (command.queued
+                        ? "QUEUED_JOIN_NODE_RECEIPT"
+                        : (StageExtensionLiveNaviSource
+                            ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY"))
                     : (source == ProducerToken::ResultProgress
-                        ? (ResultProgressFullParentCallRva == 0x98924u
-                            ? "GOAL_FULL_CALL_98924"
-                            : (ResultProgressFullParentCallRva == 0x992ACu
-                                ? "GOAL_FULL_CALL_992AC"
-                                : "GOAL_PROGRESS_INNER"))
+                        ? (command.queued
+                            ? "QUEUED_JOIN_NODE_RECEIPT"
+                            : (ResultProgressFullParentCallRva == 0x98924u
+                                ? "GOAL_FULL_CALL_98924"
+                                : (ResultProgressFullParentCallRva == 0x992ACu
+                                    ? "GOAL_FULL_CALL_992AC"
+                                    : "GOAL_PROGRESS_INNER")))
                         : "OTHER_VISUAL_SOURCE"),
                 Name(source),Name(afterTrace.producer),
                 command.queued ? 1 : 0,afterTrace.queued ? 1 : 0,
