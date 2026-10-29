@@ -4190,6 +4190,7 @@ namespace OutRunVRStereo
             OutRunVR::GameSemantic::LensOriginalCallReceipt lensInline{};
             OutRunVR::GameSemantic::LensDeferredPhysicalReceipt lensDeferred{};
             OutRunVR::GameSemantic::LensOpaqueFlushReceipt lensOpaque{};
+            OutRunVR::GameSemantic::LensOpaquePmtEntryReceipt lensPmt{};
             const char* family = "OTHER";
             bool enabled = false;
             bool lens = false;
@@ -4219,8 +4220,10 @@ namespace OutRunVRStereo
             trace.lensInline = CurrentLensOriginalCall;
             trace.lensDeferred = CurrentLensDeferredPhysical;
             trace.lensOpaque = CurrentLensOpaqueFlush;
+            trace.lensPmt = CurrentLensOpaquePmtEntry;
             trace.lens =
                 trace.command.producer == ProducerToken::LensFlareCentre ||
+                trace.lensPmt.serial != 0 ||
                 trace.lensOpaque.serial != 0 ||
                 trace.lensInline.sourceSerial != 0 ||
                 trace.lensDeferred.sourceSerial != 0 ||
@@ -4245,16 +4248,19 @@ namespace OutRunVRStereo
         {
             if (!visual.enabled)
                 return;
+            const bool exactPmtEntry = visual.lensPmt.serial != 0;
             const bool inlineLinked =
                 visual.lensInline.sourceSerial != 0;
             const bool deferredCandidate =
                 !inlineLinked && visual.lensDeferred.sourceSerial != 0;
             const char* sourceAuthority = visual.lens
-                ? (inlineLinked
-                    ? "INLINE_CALL_STACK_ONLY"
-                    : (deferredCandidate
-                        ? "DEFERRED_WINDOW_CANDIDATE"
-                        : "UNOWNED_PHYSICAL"))
+                ? (exactPmtEntry
+                    ? "EXACT_RETAIL_405890_404700_PMT_ENTRY"
+                    : (inlineLinked
+                        ? "INLINE_CALL_STACK_ONLY"
+                        : (deferredCandidate
+                            ? "DEFERRED_WINDOW_CANDIDATE"
+                            : "UNOWNED_PHYSICAL")))
                 : "EXACT_RESULT_PRODUCER";
             LARGE_INTEGER qpc{};
             QueryPerformanceCounter(&qpc);
@@ -4269,7 +4275,10 @@ namespace OutRunVRStereo
                 "ordinal={} windowAnchorSerial={} windowAnchorSequence={} "
                 "windowAnchorObj=0x{:06X} windowAnchorOrdinal={} "
                 "sourceAuthority={} opaqueFlushSerial={} opaqueFlushOrigin={} "
-                "opaquePatchCount={} opaquePatchHash=0x{:016X} opaquePmtIdentity={}",
+                "opaquePatchCount={} opaquePatchHash=0x{:016X} "
+                "pmtEntrySerial={} pmtObjectId=0x{:06X} pmtObject=0x{:X} "
+                "pmtNode=0x{:X} pmtMesh=0x{:X} pmtPass={} pmtFlags=0x{:08X} "
+                "opaquePmtIdentity={}",
                 qpc.QuadPart, TopLevelDrawSerial(), visual.family,
                 api ? api : "UNKNOWN",
                 OutRunVR::GameSemantic::Name(visual.command.producer),
@@ -4309,7 +4318,13 @@ namespace OutRunVRStereo
                 visual.lensOpaque.patchCount,
                 static_cast<unsigned long long>(
                     visual.lensOpaque.patchLedgerHash),
-                visual.lens ? "UNVERIFIED" : "NOT_APPLICABLE");
+                visual.lensPmt.serial, visual.lensPmt.objectId,
+                visual.lensPmt.object, visual.lensPmt.node,
+                visual.lensPmt.mesh, visual.lensPmt.pass,
+                visual.lensPmt.flags,
+                visual.lensPmt.serial != 0
+                    ? "EXACT_405890_404700_ENTRY"
+                    : (visual.lens ? "UNVERIFIED" : "NOT_APPLICABLE"));
         }
 
         template <typename LeftDraw, typename RightDraw>
@@ -6393,7 +6408,9 @@ namespace OutRunVRStereo
                     "windowAnchorSerial={} windowAnchorSequence={} "
                     "windowAnchorObj=0x{:06X} windowAnchorOrdinal={} provenance={} "
                     "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} rt0=0x{:X} "
-                    "correlationAuthority={} opaquePmtIdentity=UNVERIFIED",
+                    "pmtEntrySerial={} pmtObjectId=0x{:06X} pmtObject=0x{:X} "
+                    "pmtNode=0x{:X} pmtMesh=0x{:X} pmtPass={} "
+                    "correlationAuthority={} opaquePmtIdentity={}",
                     receipt, receiptQpc.QuadPart, TopLevelDrawSerial(),
                     site ? site : "unknown", static_cast<unsigned>(screenKind),
                     OutRunVR::GameSemantic::Name(lensPhysicalScope),
@@ -6403,10 +6420,21 @@ namespace OutRunVRStereo
                     lensWindowAnchorSequence, lensWindowAnchorObject,
                     lensWindowAnchorOrdinal, lensSourceProvenance,
                     lensTexture0Ptr, lensVb0Ptr, lensIbPtr, lensRt0Ptr,
-                    lensInlineLinked ? "INLINE_CALL_STACK_PMT_UNVERIFIED" :
-                        (lensDeferredCandidate ?
-                            "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" :
-                            "UNOWNED_PHYSICAL"));
+                    visualRoute.lensPmt.serial,
+                    visualRoute.lensPmt.objectId,
+                    visualRoute.lensPmt.object,
+                    visualRoute.lensPmt.node,
+                    visualRoute.lensPmt.mesh,
+                    visualRoute.lensPmt.pass,
+                    visualRoute.lensPmt.serial != 0
+                        ? "EXACT_RETAIL_405890_404700_PMT_ENTRY"
+                        : (lensInlineLinked
+                            ? "INLINE_CALL_STACK_PMT_UNVERIFIED"
+                            : (lensDeferredCandidate
+                                ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT"
+                                : "UNOWNED_PHYSICAL")),
+                    visualRoute.lensPmt.serial != 0
+                        ? "EXACT_405890_404700_ENTRY" : "UNVERIFIED");
                 IDirect3DVertexShader9* traceVs = nullptr;
                 const HRESULT traceVsHr = device->GetVertexShader(&traceVs);
                 const std::uintptr_t traceVsPtr =
@@ -6719,7 +6747,15 @@ namespace OutRunVRStereo
                             visualRoute.lensOpaque.origin),
                         visualRoute.lensOpaque.patchCount,
                         static_cast<unsigned long long>(
-                            visualRoute.lensOpaque.patchLedgerHash));
+                            visualRoute.lensOpaque.patchLedgerHash),
+                        visualRoute.lensPmt.serial,
+                        visualRoute.lensPmt.objectId,
+                        visualRoute.lensPmt.object,
+                        visualRoute.lensPmt.node,
+                        visualRoute.lensPmt.mesh,
+                        visualRoute.lensPmt.pass,
+                        visualRoute.lensPmt.serial != 0
+                            ? "EXACT_405890_404700_ENTRY" : "UNVERIFIED");
                 }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
@@ -6881,8 +6917,9 @@ namespace OutRunVRStereo
                         "rightRT=0x{:X} rightRt={}x{} rightRtFmt={} "
                         "qpc={} thread={} opaqueFlushSerial={} opaqueFlushOrigin={} "
                         "opaquePatchCount={} opaquePatchHash=0x{:016X} "
-                        "opaquePmtIdentity=UNVERIFIED "
-                        "evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
+                        "pmtEntrySerial={} pmtObjectId=0x{:06X} pmtObject=0x{:X} "
+                        "pmtNode=0x{:X} pmtMesh=0x{:X} pmtPass={} "
+                        "opaquePmtIdentity={} evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
                         physicalSample, TopLevelDrawSerial(), stereo.poseSequence,
                         site ? site : "unknown", lensSourceSerial,
                         lensSourceSequence, lensSourceObject, lensSourceSite,
@@ -7232,7 +7269,9 @@ namespace OutRunVRStereo
                     "windowAnchorSequence={} windowAnchorObj=0x{:06X} "
                     "windowAnchorOrdinal={} sourceAuthority={} "
                     "opaqueFlushSerial={} opaqueFlushOrigin={} opaquePatchCount={} "
-                    "opaquePatchHash=0x{:016X} opaquePmtIdentity={} "
+                    "opaquePatchHash=0x{:016X} pmtEntrySerial={} "
+                    "pmtObjectId=0x{:06X} pmtObject=0x{:X} pmtNode=0x{:X} "
+                    "pmtMesh=0x{:X} pmtPass={} opaquePmtIdentity={} "
                     "resultRoute=R29_FALLBACK",
                     lowerQpc.QuadPart, TopLevelDrawSerial(),
                     lowerVisual.family, site ? site : "unknown",
@@ -7284,7 +7323,15 @@ namespace OutRunVRStereo
                     lowerVisual.lensOpaque.patchCount,
                     static_cast<unsigned long long>(
                         lowerVisual.lensOpaque.patchLedgerHash),
-                    lowerVisual.lens ? "UNVERIFIED" : "NOT_APPLICABLE");
+                    lowerVisual.lensPmt.serial,
+                    lowerVisual.lensPmt.objectId,
+                    lowerVisual.lensPmt.object,
+                    lowerVisual.lensPmt.node,
+                    lowerVisual.lensPmt.mesh,
+                    lowerVisual.lensPmt.pass,
+                    lowerVisual.lensPmt.serial != 0
+                        ? "EXACT_405890_404700_ENTRY"
+                        : (lowerVisual.lens ? "UNVERIFIED" : "NOT_APPLICABLE"));
             }
             return lowerHr;
         }

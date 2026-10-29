@@ -1596,6 +1596,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			OutRunVR::GameSemantic::LensOriginalCallReceipt lensInline{};
 			OutRunVR::GameSemantic::LensDeferredPhysicalReceipt lensDeferred{};
 			OutRunVR::GameSemantic::LensOpaqueFlushReceipt lensOpaque{};
+			OutRunVR::GameSemantic::LensOpaquePmtEntryReceipt lensPmt{};
 			const char* family="OTHER";
 			bool enabled=false;
 			bool lens=false;
@@ -1625,8 +1626,10 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			trace.lensInline=CurrentLensOriginalCall;
 			trace.lensDeferred=CurrentLensDeferredPhysical;
 			trace.lensOpaque=CurrentLensOpaqueFlush;
+			trace.lensPmt=CurrentLensOpaquePmtEntry;
 			trace.lens=
 				trace.command.producer==ProducerToken::LensFlareCentre||
+				trace.lensPmt.serial!=0||
 				trace.lensOpaque.serial!=0||
 				trace.lensInline.sourceSerial!=0||
 				trace.lensDeferred.sourceSerial!=0||
@@ -1648,6 +1651,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			OutRunVR::StereoFailureReason failureAfter) noexcept
 		{
 			if(!trace.enabled)return;
+			const bool exactPmtEntry=trace.lensPmt.serial!=0;
 			const bool inlineLinked=trace.lensInline.sourceSerial!=0;
 			const bool deferredCandidate=!inlineLinked&&
 				trace.lensDeferred.sourceSerial!=0;
@@ -1665,6 +1669,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				"windowAnchorSequence={} windowAnchorObj=0x{:06X} "
 				"windowAnchorOrdinal={} sourceAuthority={} opaqueFlushSerial={} "
 				"opaqueFlushOrigin={} opaquePatchCount={} opaquePatchHash=0x{:016X} "
+				"pmtEntrySerial={} pmtObjectId=0x{:06X} pmtObject=0x{:X} "
+				"pmtNode=0x{:X} pmtMesh=0x{:X} pmtPass={} pmtFlags=0x{:08X} "
 				"opaquePmtIdentity={}",
 				qpc.QuadPart,receiptSerial,trace.family,
 				route?route:"UNKNOWN",
@@ -1693,16 +1699,21 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				deferredCandidate?
 					static_cast<unsigned>(trace.lensDeferred.ordinal):0,
 				trace.lens?
-					(inlineLinked?"INLINE_CALL_STACK_ONLY":
-						(deferredCandidate?"DEFERRED_WINDOW_CANDIDATE":
-							"UNOWNED_PHYSICAL")):
+					(exactPmtEntry?"EXACT_RETAIL_405890_404700_PMT_ENTRY":
+						(inlineLinked?"INLINE_CALL_STACK_ONLY":
+							(deferredCandidate?"DEFERRED_WINDOW_CANDIDATE":
+								"UNOWNED_PHYSICAL"))):
 					"EXACT_RESULT_PRODUCER",
 				trace.lensOpaque.serial,
 				OutRunVR::GameSemantic::Name(trace.lensOpaque.origin),
 				trace.lensOpaque.patchCount,
 				static_cast<unsigned long long>(
 					trace.lensOpaque.patchLedgerHash),
-				trace.lens?"UNVERIFIED":"NOT_APPLICABLE");
+				trace.lensPmt.serial,trace.lensPmt.objectId,
+				trace.lensPmt.object,trace.lensPmt.node,
+				trace.lensPmt.mesh,trace.lensPmt.pass,trace.lensPmt.flags,
+				trace.lensPmt.serial!=0?"EXACT_405890_404700_ENTRY":
+					(trace.lens?"UNVERIFIED":"NOT_APPLICABLE"));
 		}
 
 		template <typename DrawCall>
