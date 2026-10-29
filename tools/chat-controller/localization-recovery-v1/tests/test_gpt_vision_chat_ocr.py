@@ -168,6 +168,42 @@ class GPTChatOCRTests(unittest.TestCase):
         migrated=g._state()
         self.assertEqual(migrated["response_extractor_version"],g.RESPONSE_EXTRACTOR_VERSION)
 
+    def test_lane_partition_and_c2_independent_attempt_counter(self):
+        even_name="Q002_TEST_BASE_READABLE_FLIPY.png"
+        even_path=self.src/even_name
+        even_path.write_bytes(self.path.read_bytes())
+        even_sha=hashlib.sha256(even_path.read_bytes()).hexdigest()
+        even_row={"png_filename":even_name,"png_sha256":even_sha,"png_size_bytes":str(even_path.stat().st_size),
+                  "width":"100","height":"60","source_dds_path":"textures/even.dds",
+                  "dds_sha256":"1"*64,"queue_indexes":"002"}
+        g._manifest_rows=lambda:{self.name:self.row,even_name:even_row}
+        (self.report/"processed_v3"/(even_name+".json")).write_text(json.dumps({
+            "source_png":even_name,"source_sha256":even_sha,"attempts":21,
+            "unresolved_after":["EVEN"]
+        }),encoding="utf-8")
+
+        summary=g.summary()
+        self.assertEqual(summary["lanes"]["C1"]["retryable_sources"],1)
+        self.assertEqual(summary["lanes"]["C2"]["retryable_sources"],1)
+
+        binding,reason=g.next_binding("C2")
+        self.assertIsNone(reason)
+        self.assertEqual(binding["source_png"],even_name)
+        self.assertEqual(binding["role"],"C2OCR")
+        self.assertEqual(binding["ocr_lane"],"C2")
+        self.assertIn("-C2",binding["task_id"])
+        self.assertTrue(binding["attempt_key"].startswith("C2:"))
+        self.assertEqual(g.stage_submission(binding["task_id"]),"SUBMITTING")
+        self.assertEqual(g.record_chat_url(binding["task_id"],
+            "https://chatgpt.com/c/32345678-1234-1234-1234-123456789abc"),"URL_RECORDED")
+        st=g._state()
+        self.assertEqual(st["attempts"][binding["attempt_key"]],1)
+        self.assertNotIn(binding["fingerprint"],st["attempts"])
+
+    def test_lane_selector_rejects_invalid_lane(self):
+        with self.assertRaisesRegex(ValueError,"GPT_OCR_LANE_INVALID"):
+            g.next_binding("C3")
+
     def test_fenced_json_parser(self):
         ticks=chr(96)*3
         raw=ticks+"json\n"+json.dumps({"task_id":"X","source_png":"Y","detections":[]})+"\n"+ticks

@@ -28,7 +28,7 @@ services:
       OUTRUN_AB_BATCH_QUEUE: "false"
       OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Legacy ROI + GPT OCR full-HD direct-reference ImageGen queue
       OUTRUN_GPT_CHAT_OCR_ENABLED: "true" # Normal ChatGPT image-attachment OCR fallback; no API
-      OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "2400" # 10m stale wait -> retry/skip automatically
+      OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "600" # 10m stale wait -> retry/skip automatically
       OUTRUN_GPT_OCR_WATCHDOG_SECONDS: "60"
       # DDS compose/game PASS/deploy remain disabled; only PNG generation + C1 QA is automatic.
       OUTRUN_AB_BATCH_SIZE: "5"

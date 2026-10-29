@@ -17,10 +17,10 @@ AUDIT_PATH=QUEUE_DIR/"audit.jsonl"
 VERSION="gpt-chat-vision-ocr-v1-20261025"
 OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
-RESPONSE_STALL_SECONDS=max(2400,int(os.environ.get("OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS","2400")))
+RESPONSE_STALL_SECONDS=max(300,int(os.environ.get("OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS","600")))
 SUBMISSION_STALL_SECONDS=max(60,int(os.environ.get("OUTRUN_GPT_OCR_SUBMIT_STALL_SECONDS","300")))
 RESPONSE_EXTRACTOR_VERSION="search-unit-assistant-v3-slot-aligned-20261026"
-TASK_RE=re.compile(r"^OUTRUN-GPT-OCR-Q\d{3}-[A-F0-9]{8}(?:-R[12])?$")
+TASK_RE=re.compile(r"^OUTRUN-GPT-OCR-Q\d{3}-[A-F0-9]{8}(?:-C2)?(?:-R[12])?$")
 
 def _now():
     return dt.datetime.now(dt.timezone.utc).isoformat()
@@ -137,6 +137,24 @@ def _exhausted_candidates():
 def _fingerprint(row,phrases):
     return hashlib.sha256((row["png_filename"]+"|"+row["png_sha256"]+"|"+"\n".join(phrases)).encode()).hexdigest()
 
+def _normalize_lane(lane):
+    if lane is None:
+        return None
+    lane=str(lane).strip().upper()
+    if lane not in ("C1","C2"):
+        raise ValueError("GPT_OCR_LANE_INVALID")
+    return lane
+
+def _lane_for_source(source_png):
+    m=re.match(r"^Q(\d{3})_",str(source_png or ""))
+    if not m:
+        raise ValueError("GPT_OCR_SOURCE_QUEUE_INDEX_INVALID")
+    return "C1" if int(m.group(1)) % 2 else "C2"
+
+def _attempt_key(fp,lane):
+    # Preserve legacy C1 attempt counters; C2 is a new independent review lane.
+    return ("C2:"+fp) if lane=="C2" else fp
+
 def _prompt(task_id,row,phrases):
     phrase_lines="\n".join("- "+p for p in phrases)
     return f"""OutRun 2006 HD 원본 이미지의 영문 UI 위치 분석 작업입니다.
@@ -160,7 +178,8 @@ IMAGE_SIZE={row["width"]}x{row["height"]}
 
 {{"task_id":"{task_id}","source_png":"{row["png_filename"]}","detections":[{{"english":"승인 목록의 정확한 원문","bbox_xyxy":[0,0,1,1],"confidence":0.0}}],"uncertain":[{{"english":"승인 목록의 정확한 원문","reason":"이유"}}]}}"""
 
-def next_binding():
+def next_binding(lane=None):
+    lane=_normalize_lane(lane)
     if os.environ.get("OUTRUN_GPT_CHAT_OCR_ENABLED","true").lower()!="true":
         return None,"GPT_CHAT_OCR_DISABLED"
     st=_state()
@@ -196,7 +215,12 @@ def next_binding():
             return None,"ACTIVE_SUBMISSION_AMBIGUOUS:"+str(active.get("task_id"))
         raise ValueError("GPT_OCR_ACTIVE_STATE_INVALID")
     for row,phrases in _exhausted_candidates():
-        fp=_fingerprint(row,phrases);used=int(st["attempts"].get(fp,0) or 0)
+        source_lane=_lane_for_source(row["png_filename"])
+        if lane is not None and source_lane!=lane:
+            continue
+        effective_lane=lane or "C1"
+        fp=_fingerprint(row,phrases);attempt_key=_attempt_key(fp,effective_lane)
+        used=int(st["attempts"].get(attempt_key,0) or 0)
         bridged=any(
             isinstance(rec,dict) and rec.get("fingerprint")==fp and
             rec.get("status")=="APPLIED_MCP_BRIDGE" and
@@ -205,13 +229,15 @@ def next_binding():
         )
         if bridged:
             if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT:
-                st["attempts"][fp]=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT;_save_state(st)
+                st["attempts"][attempt_key]=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT;_save_state(st)
             continue
         if used>=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT: continue
         suffix="" if used==0 else f"-R{used}"
-        task=f"OUTRUN-GPT-OCR-{row['png_filename'][:4]}-{fp[:8].upper()}{suffix}"
+        lane_suffix="-C2" if effective_lane=="C2" else ""
+        task=f"OUTRUN-GPT-OCR-{row['png_filename'][:4]}-{fp[:8].upper()}{lane_suffix}{suffix}"
         if not TASK_RE.fullmatch(task): raise ValueError("GPT_OCR_TASK_ID_INVALID")
-        b={"task_id":task,"role":"C1OCR","source_png":row["png_filename"],"source_sha256":row["png_sha256"],
+        b={"task_id":task,"role":effective_lane+"OCR","ocr_lane":effective_lane,"attempt_key":attempt_key,
+           "source_png":row["png_filename"],"source_sha256":row["png_sha256"],
            "source_dds_path":row["source_dds_path"],"source_dds_sha256":row["dds_sha256"],
            "queue_indexes":row["queue_indexes"],"path":str(SRC/row["png_filename"]),"paths":[str(SRC/row["png_filename"])],
            "dimensions":[int(row["width"]),int(row["height"])],"target_phrases":phrases,"fingerprint":fp,
@@ -240,7 +266,8 @@ def record_chat_url(task_id,url):
     if not isinstance(a,dict) or a.get("task_id")!=task_id:return "STATE_TASK_MISMATCH"
     if a.get("status")!="SUBMITTING":return "STATE_NOT_SUBMITTING"
     a["status"]="SENT_AWAITING_RESPONSE";a["chat_url"]=url;a["sent_at"]=_now()
-    fp=a["fingerprint"];st["attempts"][fp]=int(st["attempts"].get(fp,0) or 0)+1;_save_state(st)
+    fp=a["fingerprint"];attempt_key=a.get("attempt_key") or _attempt_key(fp,a.get("ocr_lane") or "C1")
+    st["attempts"][attempt_key]=int(st["attempts"].get(attempt_key,0) or 0)+1;_save_state(st)
     _audit({"status":"SENT_AWAITING_RESPONSE","task_id":task_id,"source_png":a["source_png"],"chat_url":url,"external_api_used":False})
     return "URL_RECORDED"
 
@@ -285,7 +312,8 @@ def recover_stale_active(max_age_seconds=None):
         age=response_threshold+1
     if age<response_threshold:
         return {"status":"RESPONSE_WAIT_WITHIN_LIMIT","recovered":False,"age_seconds":int(max(0,age))}
-    fp=a.get("fingerprint");used=int(st.get("attempts",{}).get(fp,0) or 0)
+    fp=a.get("fingerprint");attempt_key=a.get("attempt_key") or _attempt_key(fp,a.get("ocr_lane") or "C1")
+    used=int(st.get("attempts",{}).get(attempt_key,0) or 0)
     status="RESPONSE_TIMEOUT_RETRY" if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT else "RESPONSE_TIMEOUT_MAX_ATTEMPTS"
     completed={"task_id":a.get("task_id"),"source_png":a.get("source_png"),"fingerprint":fp,
       "status":status,"applied":0,"completed_at":_now(),"chat_url":a.get("chat_url"),
@@ -411,6 +439,24 @@ def apply_response(task_id,assistant_text):
 
 def summary():
     st=_state();candidates=_exhausted_candidates()
+    lanes={}
+    retryable_sources=0;retryable_phrases=0
+    for lane in ("C1","C2"):
+        lane_rows=[]
+        for row,phrases in candidates:
+            if _lane_for_source(row["png_filename"])!=lane:
+                continue
+            fp=_fingerprint(row,phrases);used=int(st.get("attempts",{}).get(_attempt_key(fp,lane),0) or 0)
+            lane_rows.append((phrases,used))
+        rs=sum(1 for phrases,used in lane_rows if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT)
+        rp=sum(len(phrases) for phrases,used in lane_rows if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT)
+        retryable_sources+=rs;retryable_phrases+=rp
+        lanes[lane]={"candidate_sources":len(lane_rows),
+                     "candidate_phrases":sum(len(phrases) for phrases,_ in lane_rows),
+                     "retryable_sources":rs,"retryable_phrases":rp,
+                     "exhausted_sources":len(lane_rows)-rs}
     return {"version":VERSION,"active":st.get("active"),"candidate_sources":len(candidates),
-      "candidate_phrases":sum(len(p) for _,p in candidates),"completed_records":len(st.get("completed",[])),
-      "external_api_used":False}
+      "candidate_phrases":sum(len(p) for _,p in candidates),
+      "retryable_sources":retryable_sources,"retryable_phrases":retryable_phrases,
+      "exhausted_sources":len(candidates)-retryable_sources,"lanes":lanes,
+      "completed_records":len(st.get("completed",[])),"external_api_used":False}

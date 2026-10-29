@@ -58,6 +58,13 @@ RUN python /tmp/patch_controller_gpt_chat_ocr.py /opt/outrun/app/controller.py \
  && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/gpt_vision_chat_ocr.py /opt/outrun/app/controller_png_attach.py \
  && rm -f /tmp/patch_controller_gpt_chat_ocr.py
 
+# When B has no producer work, reuse its existing tab as the even-Q C2 OCR lane.
+# Producer B always wins; this fallback never steals a queued ImageGen job.
+COPY patch_controller_b_idle_gpt_ocr.py /tmp/patch_controller_b_idle_gpt_ocr.py
+RUN python /tmp/patch_controller_b_idle_gpt_ocr.py /opt/outrun/app/controller.py \
+ && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/gpt_vision_chat_ocr.py \
+ && rm -f /tmp/patch_controller_b_idle_gpt_ocr.py
+
 COPY v2_automation_policy.py /opt/outrun/app/v2_automation_policy.py
 COPY v2_docker_policy.json /opt/outrun/v2_docker_policy.json
 RUN python -m py_compile /opt/outrun/app/v2_automation_policy.py
