@@ -18,6 +18,28 @@ int main() {
     assert(native_sm3_fog_needs_parameters(true, 1u, 0u));
     assert(native_sm3_fog_needs_parameters(true, 0u, 2u));
     assert(native_sm3_fog_needs_parameters(true, 3u, 3u));
+    // Source-authentic EXP/EXP2 density=0 is pixel-inert even if the
+    // driver advertises W fog or reports no Z fog. Range/vertex fog are
+    // inherited but overridden by the active table equation; no synthetic
+    // color or full-frame claim is permitted.
+    for (unsigned mode : {1u, 2u}) {
+        assert(native_sm3_exponential_table_density_probe(mode, 3u));
+        assert(native_sm3_inert_exponential_table_fog(mode, 3u, -0.0f));
+        NativeSm3FogReject reason = NativeSm3FogReject::SourceQuery;
+        assert(native_sm3_table_zfog_admission(
+            true, mode, 3u, true, true, false, true,
+            0u, std::nanf(""), std::nanf(""), -0.0f, fog, &reason));
+        assert(!fog.enabled && reason == NativeSm3FogReject::None);
+        assert(!native_sm3_table_zfog_admission(
+            true, mode, 3u, true, true, false, true,
+            0u, 0.0f, 1.0f, 0.1f, fog, &reason));
+        assert(!fog.enabled && reason == NativeSm3FogReject::Srgb);
+        assert(!native_sm3_inert_exponential_table_fog(
+            mode, 3u, std::nanf("")));
+    }
+    assert(!native_sm3_exponential_table_density_probe(3u, 3u));
+    assert(!native_sm3_exponential_table_density_probe(1u, 4u));
+    assert(!native_sm3_inert_exponential_table_fog(0u, 0u, 0.0f));
     // Genuine exponential, squared-exponential and linear game fog inputs.
     for (unsigned mode : {1u, 2u, 3u}) {
         assert(native_sm3_table_zfog_admission(

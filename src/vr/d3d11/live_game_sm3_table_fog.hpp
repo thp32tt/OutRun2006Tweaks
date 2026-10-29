@@ -27,6 +27,20 @@ struct NativeSm3TableFog {
     bool fogEnabled, unsigned tableMode, unsigned vertexMode) noexcept {
     return fogEnabled && !native_game_inert_fog_modes(tableMode, vertexMode);
 }
+// An active D3D9 EXP/EXP2 table equation with zero density contributes
+// exactly 1.0 fog factor for finite raster depth, independently of Z/W
+// capability, sRGB, table color and unused start/end. Pixel/table fog
+// overrides inherited vertex/range fog. This is NOT a fog-off override:
+// demand the actual source table mode and the live density DWORD.
+[[nodiscard]] constexpr bool native_sm3_exponential_table_density_probe(
+    unsigned tableMode, unsigned vertexMode) noexcept {
+    return (tableMode == 1u || tableMode == 2u) && vertexMode <= 3u;
+}
+[[nodiscard]] inline bool native_sm3_inert_exponential_table_fog(
+    unsigned tableMode, unsigned vertexMode, float density) noexcept {
+    return native_sm3_exponential_table_density_probe(tableMode, vertexMode) &&
+           std::isfinite(density) && density == 0.0f;
+}
 // Stable bounded runtime rejection codes: never collapse source state failures
 // into an ambiguous "fog" aggregate. Code 12 is reserved for COM query failure.
 enum class NativeSm3FogReject : unsigned {
@@ -63,6 +77,11 @@ enum class NativeSm3FogReject : unsigned {
     // and never interpret a vertex-only equation as table Z-fog.
     if (vertexMode > 3u || tableMode == 0u)
         return fail(NativeSm3FogReject::VertexFog);
+    // A genuine zero-density exponential equation produces the original
+    // pixel shader RGB, including on a W-capable device. No fog shader or
+    // unused capability/float/color queries may suppress that source Draw.
+    if (native_sm3_inert_exponential_table_fog(
+            tableMode, vertexMode, density)) return true;
     if (srgbOutput) return fail(NativeSm3FogReject::Srgb);
     if (!zFogCapable) return fail(NativeSm3FogReject::MissingZCapability);
     if (wFogCapable) return fail(NativeSm3FogReject::WCapability);

@@ -5307,15 +5307,30 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         const bool modesKnown =
             readFog(D3DRS_FOGTABLEMODE, tableMode, 1u) &&
             readFog(D3DRS_FOGVERTEXMODE, vertexMode, 2u);
+        // EXP and EXP2 with an authentic live density of zero do not
+        // consume table color, start/end, range state or raster Z/W caps.
+        // Query the density first ONLY for a valid active table equation;
+        // positive density still follows the original full safety path.
+        const bool densityProbe = modesKnown &&
+            native_sm3_exponential_table_density_probe(tableMode, vertexMode);
+        const bool densityKnown = !densityProbe ||
+            readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u);
+        float actualDensity = 0.0f;
+        if (densityProbe && densityKnown)
+            std::memcpy(&actualDensity, &fogDensityBits, sizeof(actualDensity));
+        const bool inertExponential = densityProbe && densityKnown &&
+            native_sm3_inert_exponential_table_fog(
+                tableMode, vertexMode, actualDensity);
         const bool activeEquation = modesKnown &&
-            native_sm3_fog_needs_parameters(true, tableMode, vertexMode);
-        const bool parametersKnown = !activeEquation ||
+            native_sm3_fog_needs_parameters(true, tableMode, vertexMode) &&
+            !inertExponential;
+        const bool parametersKnown = densityKnown && (!activeEquation ||
             (readFog(D3DRS_RANGEFOGENABLE, rangeFog, 3u) &&
              readFog(D3DRS_FOGCOLOR, fogColor, 4u) &&
              readFog(D3DRS_FOGSTART, fogStartBits, 5u) &&
              readFog(D3DRS_FOGEND, fogEndBits, 6u) &&
-             readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u) &&
-             SUCCEEDED(game->GetDeviceCaps(&fogCaps)));
+             (densityProbe || readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u)) &&
+             SUCCEEDED(game->GetDeviceCaps(&fogCaps))));
         if (!modesKnown || !parametersKnown) {
             if (!failedFogGetter) failedFogGetter = 8u; // GetDeviceCaps
             ++s.liveSm3StateRejectReasons[1];
