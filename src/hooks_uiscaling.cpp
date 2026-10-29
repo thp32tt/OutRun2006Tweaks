@@ -1505,7 +1505,13 @@ class UIScaling : public Hook
                         producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime
                             ? (StageExtensionLiveNaviSource
                                 ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY")
-                            : "NOT_STAGE_EXTENSION";
+                            : producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress
+                                ? (ResultProgressFullParentCallRva == 0x98924u
+                                    ? "GOAL_FULL_CALL_98924"
+                                    : (ResultProgressFullParentCallRva == 0x992ACu
+                                        ? "GOAL_FULL_CALL_992AC"
+                                        : "GOAL_PROGRESS_INNER"))
+                                : "OTHER_VISUAL_SOURCE";
                     LARGE_INTEGER qpc{};
                     QueryPerformanceCounter(&qpc);
                     const auto* raw =
@@ -1830,6 +1836,9 @@ class UIScaling : public Hook
     inline static thread_local
         std::array<SpriteNode*, Game::SpritePriorityCount> ResultProgressRootsBefore{};
     inline static thread_local std::uint64_t ResultProgressEntrySerial = 0;
+    // Diagnostic-only exact parent E8. 0 means an inner 0x2D200 progress
+    // producer not currently bracketed by one of the two full 0x4979E0 calls.
+    inline static thread_local std::uintptr_t ResultProgressFullParentCallRva = 0;
     inline static thread_local OutRunVR::GoalProgress::SourceAdmission
         ResultProgressAdmission{};
     inline static thread_local bool ResultProgressAdmittedAfterDrain = false;
@@ -2075,6 +2084,15 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
             return original();
 
+        const auto moduleBase =
+            reinterpret_cast<std::uintptr_t>(Module::exe_ptr(0));
+        const auto callerReturn =
+            reinterpret_cast<std::uintptr_t>(_ReturnAddress());
+        const std::uintptr_t callerRva =
+            callerReturn >= moduleBase + 5 ? callerReturn - moduleBase - 5 : 0;
+        const auto savedFullParentCallRva = ResultProgressFullParentCallRva;
+        ResultProgressFullParentCallRva = callerRva;
+
         std::array<SpriteNode*, Game::SpritePriorityCount> before{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
         std::array<bool, Game::SpritePriorityCount> emptyBefore{};
@@ -2088,6 +2106,23 @@ class UIScaling : public Hook
             before[p] = root ? root->tail_4 : nullptr;
             emptyBefore[p] = root && before[p] == root &&
                 root->next_0 == nullptr;
+        }
+
+        if (Settings::VRTelemetry)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE GOAL FULL PARENT: phase=ENTRY qpc={} callerRva=0x{:X} "
+                "site={} entrySerial={} entryEpoch={} state={} mode={} "
+                "queueActive={} authority=EXACT_ORIGINAL_E8_TO_4979E0",
+                qpc.QuadPart, callerRva,
+                callerRva == 0x98924u ? "CALL_98924" :
+                    (callerRva == 0x992ACu ? "CALL_992AC" : "UNEXPECTED_CALLER"),
+                entrySerial, parentAdmission.queueEpochAtEntry,
+                Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                Game::game_mode ? *Game::game_mode : -1,
+                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
         }
 
         OutRunVR::GameSemantic::ScopedExactProducerSemantic parentOwner(
@@ -2145,6 +2180,22 @@ class UIScaling : public Hook
                     OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
             FlushD3DXAtDirectGoalSourceExit();
         }
+        if (Settings::VRTelemetry)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE GOAL FULL PARENT: phase=EXIT qpc={} callerRva=0x{:X} "
+                "site={} entrySerial={} entryEpoch={} exitEpoch={} admitted={} "
+                "result={} authority=EXACT_ORIGINAL_E8_TO_4979E0",
+                qpc.QuadPart, callerRva,
+                callerRva == 0x98924u ? "CALL_98924" :
+                    (callerRva == 0x992ACu ? "CALL_992AC" : "UNEXPECTED_CALLER"),
+                entrySerial, parentAdmission.queueEpochAtEntry,
+                OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                parentAdmittedAtExit ? 1 : 0, result ? 1 : 0);
+        }
+        ResultProgressFullParentCallRva = savedFullParentCallRva;
         return result;
     }
 
@@ -5070,7 +5121,13 @@ private:
                 source == ProducerToken::StageExtensionTime
                     ? (StageExtensionLiveNaviSource
                         ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY")
-                    : "NOT_STAGE_EXTENSION",
+                    : (source == ProducerToken::ResultProgress
+                        ? (ResultProgressFullParentCallRva == 0x98924u
+                            ? "GOAL_FULL_CALL_98924"
+                            : (ResultProgressFullParentCallRva == 0x992ACu
+                                ? "GOAL_FULL_CALL_992AC"
+                                : "GOAL_PROGRESS_INNER"))
+                        : "OTHER_VISUAL_SOURCE"),
                 Name(scope),StageTimeLiveTicket,StageExtensionEntrySerial,
                 command.queued ? 1 : 0,
                 reinterpret_cast<std::uintptr_t>(command.queueNode),
@@ -5132,7 +5189,13 @@ private:
                 source == ProducerToken::StageExtensionTime
                     ? (StageExtensionLiveNaviSource
                         ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY")
-                    : "NOT_STAGE_EXTENSION",
+                    : (source == ProducerToken::ResultProgress
+                        ? (ResultProgressFullParentCallRva == 0x98924u
+                            ? "GOAL_FULL_CALL_98924"
+                            : (ResultProgressFullParentCallRva == 0x992ACu
+                                ? "GOAL_FULL_CALL_992AC"
+                                : "GOAL_PROGRESS_INNER"))
+                        : "OTHER_VISUAL_SOURCE"),
                 Name(source),Name(afterTrace.producer),
                 command.queued ? 1 : 0,afterTrace.queued ? 1 : 0,
                 reinterpret_cast<std::uintptr_t>(command.queueNode),
