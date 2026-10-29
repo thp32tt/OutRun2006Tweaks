@@ -1595,6 +1595,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			OutRunVR::GameSemantic::PhysicalDrawCommand command{};
 			OutRunVR::GameSemantic::LensOriginalCallReceipt lensInline{};
 			OutRunVR::GameSemantic::LensDeferredPhysicalReceipt lensDeferred{};
+			OutRunVR::GameSemantic::LensOpaqueFlushReceipt lensOpaque{};
 			const char* family="OTHER";
 			bool enabled=false;
 			bool lens=false;
@@ -1623,8 +1624,10 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			trace.command=CapturePhysicalDrawCommand();
 			trace.lensInline=CurrentLensOriginalCall;
 			trace.lensDeferred=CurrentLensDeferredPhysical;
+			trace.lensOpaque=CurrentLensOpaqueFlush;
 			trace.lens=
 				trace.command.producer==ProducerToken::LensFlareCentre||
+				trace.lensOpaque.serial!=0||
 				trace.lensInline.sourceSerial!=0||
 				trace.lensDeferred.sourceSerial!=0||
 				trace.command.scope==RenderScope::ProjectedScreenEffect2D||
@@ -1660,7 +1663,9 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				"frameIncomplete={} rightFailed={} sourceCallSerial={} sequence={} "
 				"sourceObj=0x{:06X} sourceSite={} ordinal={} windowAnchorSerial={} "
 				"windowAnchorSequence={} windowAnchorObj=0x{:06X} "
-				"windowAnchorOrdinal={} sourceAuthority={} opaquePmtIdentity={}",
+				"windowAnchorOrdinal={} sourceAuthority={} opaqueFlushSerial={} "
+				"opaqueFlushOrigin={} opaquePatchCount={} opaquePatchHash=0x{:016X} "
+				"opaquePmtIdentity={}",
 				qpc.QuadPart,receiptSerial,trace.family,
 				route?route:"UNKNOWN",
 				OutRunVR::GameSemantic::Name(trace.command.producer),
@@ -1692,6 +1697,11 @@ if(WaitForEventQuery(slot.fence,1,0u))
 						(deferredCandidate?"DEFERRED_WINDOW_CANDIDATE":
 							"UNOWNED_PHYSICAL")):
 					"EXACT_RESULT_PRODUCER",
+				trace.lensOpaque.serial,
+				OutRunVR::GameSemantic::Name(trace.lensOpaque.origin),
+				trace.lensOpaque.patchCount,
+				static_cast<unsigned long long>(
+					trace.lensOpaque.patchLedgerHash),
 				trace.lens?"UNVERIFIED":"NOT_APPLICABLE");
 		}
 

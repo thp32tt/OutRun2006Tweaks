@@ -658,6 +658,7 @@ class VRLensFlareProjected2D : public Hook
     // A 0x570002 anchor can be absent when original 40CBC0 spread <= 0;
     // never use the last-C993 sequence as a Present or sun-invocation ID.
     inline static thread_local std::uint64_t LensSourceCallSerial = 0;
+    inline static std::atomic<std::uint64_t> LensOpaqueFlushSerial{0};
     static std::uint64_t NextLensSourceCallSerial() noexcept
     {
         if (++LensSourceCallSerial == 0)
@@ -676,6 +677,137 @@ class VRLensFlareProjected2D : public Hook
         default:
             return false;
         }
+    }
+
+    using LensOpaqueFlushFn = void(__cdecl*)();
+
+    static std::uint64_t HashOpaquePatchLedger(
+        std::uint32_t patchCount) noexcept
+    {
+        const auto count = std::min<std::uint32_t>(patchCount, 128u);
+        const auto* pairs =
+            Module::exe_ptr<const std::uint32_t>(0x4995A0);
+        std::uint64_t hash = 1469598103934665603ull;
+        for (std::uint32_t i = 0; i < count; ++i)
+        {
+            const std::uint32_t ptr = pairs[i * 2u + 0u];
+            const std::uint32_t oldValue = pairs[i * 2u + 1u];
+            hash ^= ptr;
+            hash *= 1099511628211ull;
+            hash ^= oldValue;
+            hash *= 1099511628211ull;
+        }
+        return hash;
+    }
+
+    static void TraceLensOpaqueFlush(
+        OutRunVR::GameSemantic::LensOpaqueFlushOrigin origin) noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        const auto inlineReceipt = CurrentLensOriginalCall;
+        const auto deferred = CurrentLensDeferredPhysical;
+        const bool exactSceneFlush =
+            origin == LensOpaqueFlushOrigin::SceneD44B ||
+            origin == LensOpaqueFlushOrigin::SceneD79B;
+        const bool trace = Settings::VREnabled && Settings::VRTelemetry &&
+            (exactSceneFlush || inlineReceipt.sourceSerial != 0 ||
+             deferred.sourceSerial != 0);
+
+        const auto readU32 = [](std::uintptr_t rva) noexcept {
+            return *Module::exe_ptr<const std::uint32_t>(rva);
+        };
+        const auto prePatchCount = readU32(0x464F14);
+        const auto prePatchHash = HashOpaquePatchLedger(prePatchCount);
+        const auto preQueue0 = readU32(0x464EF8);
+        const auto preQueue1 = readU32(0x464EFC);
+        const auto preQueue2 = readU32(0x464F00);
+        const auto preFlushFlag = readU32(0x4999B0);
+
+        LensOpaqueFlushReceipt receipt{};
+        if (trace)
+        {
+            receipt.serial = LensOpaqueFlushSerial.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (receipt.serial == 0)
+                receipt.serial = LensOpaqueFlushSerial.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+            receipt.origin = origin;
+            receipt.sourceSerial = inlineReceipt.sourceSerial != 0
+                ? inlineReceipt.sourceSerial : deferred.sourceSerial;
+            receipt.sequence = inlineReceipt.sourceSerial != 0
+                ? inlineReceipt.lastC993Sequence :
+                (deferred.sourceSerial != 0
+                    ? deferred.sequence : LensFlareSequence);
+            receipt.objectId = inlineReceipt.sourceSerial != 0
+                ? inlineReceipt.objectId : deferred.objectId;
+            receipt.ordinal = inlineReceipt.sourceSerial != 0
+                ? inlineReceipt.ordinal : deferred.ordinal;
+            receipt.patchCount = prePatchCount;
+            receipt.patchLedgerHash = prePatchHash;
+        }
+
+        ScopedLensOpaqueFlush flushScope(receipt);
+        if (trace)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE LENS OPAQUE FLUSH FULL: phase=PRE qpc={} thread={} "
+                "flushSerial={} origin={} sequence={} sourceCallSerial={} "
+                "sourceObj=0x{:06X} ordinal={} inlineLinked={} deferredCandidate={} "
+                "patchCount={} patchHash=0x{:016X} queueWords=0x{:08X},0x{:08X},0x{:08X} "
+                "flushFlag={} scope={} producer={} opaquePmtIdentity=UNVERIFIED",
+                qpc.QuadPart, GetCurrentThreadId(), receipt.serial,
+                Name(origin), receipt.sequence, receipt.sourceSerial,
+                receipt.objectId, static_cast<unsigned>(receipt.ordinal),
+                inlineReceipt.sourceSerial != 0 ? 1 : 0,
+                deferred.sourceSerial != 0 ? 1 : 0,
+                prePatchCount,
+                static_cast<unsigned long long>(prePatchHash),
+                preQueue0, preQueue1, preQueue2, preFlushFlag,
+                Name(EffectiveScope()), Name(CurrentRenderProducerToken()));
+        }
+
+        Module::fn_ptr<LensOpaqueFlushFn>(0x52C0)();
+
+        if (trace)
+        {
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            const auto postPatchCount = readU32(0x464F14);
+            const auto postPatchHash = HashOpaquePatchLedger(postPatchCount);
+            spdlog::info(
+                "VR TRACE LENS OPAQUE FLUSH FULL: phase=POST qpc={} thread={} "
+                "flushSerial={} origin={} sequence={} sourceCallSerial={} "
+                "sourceObj=0x{:06X} ordinal={} patchCountBefore={} patchCountAfter={} "
+                "patchHashBefore=0x{:016X} patchHashAfter=0x{:016X} "
+                "queueWordsAfter=0x{:08X},0x{:08X},0x{:08X} flushFlagAfter={} "
+                "opaquePmtIdentity=UNVERIFIED",
+                qpc.QuadPart, GetCurrentThreadId(), receipt.serial,
+                Name(origin), receipt.sequence, receipt.sourceSerial,
+                receipt.objectId, static_cast<unsigned>(receipt.ordinal),
+                prePatchCount, postPatchCount,
+                static_cast<unsigned long long>(prePatchHash),
+                static_cast<unsigned long long>(postPatchHash),
+                readU32(0x464EF8), readU32(0x464EFC), readU32(0x464F00),
+                readU32(0x4999B0));
+        }
+    }
+
+    static void __cdecl LensOpaqueFlushInline405360()
+    {
+        TraceLensOpaqueFlush(
+            OutRunVR::GameSemantic::LensOpaqueFlushOrigin::Inline405360);
+    }
+    static void __cdecl LensOpaqueFlushSceneD44B()
+    {
+        TraceLensOpaqueFlush(
+            OutRunVR::GameSemantic::LensOpaqueFlushOrigin::SceneD44B);
+    }
+    static void __cdecl LensOpaqueFlushSceneD79B()
+    {
+        TraceLensOpaqueFlush(
+            OutRunVR::GameSemantic::LensOpaqueFlushOrigin::SceneD79B);
     }
 
 
@@ -903,9 +1035,10 @@ class VRLensFlareProjected2D : public Hook
 		Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
 
         // Record only the source-order interval after ordinal1 returns and
-        // before ordinal2 enters. Original 4052C0 flushes a multi-object CABE
-        // queue here, so this receipt must remain diagnostic-only and cannot
-        // change EffectiveScope or claim a physical 570008 identity.
+        // before ordinal2 enters. Canonical EXE has both an optional inline
+        // 405360->4052C0 flush and later scene 4052C0 flushes, so this window
+        // remains diagnostic-only and cannot change EffectiveScope or claim
+        // one physical 570008/PMT identity.
         if (Settings::VREnabled && objectId == 0x570008 &&
             sourceOrdinal == 1 && sourceCallSerial != 0)
         {
@@ -1090,6 +1223,17 @@ public:
 		Memory::VP::InjectHook(
 			Module::exe_ptr(0xCABE), DrawObjectAlphaProjected,
 			Memory::HookType::Call);
+        // Diagnostic-only original opaque queue boundaries. Each site is a
+        // verified E8 -> 4052C0 and the wrapper calls 4052C0 exactly once.
+        Memory::VP::InjectHook(
+            Module::exe_ptr(0x542A), LensOpaqueFlushInline405360,
+            Memory::HookType::Call);
+        Memory::VP::InjectHook(
+            Module::exe_ptr(0xD44B), LensOpaqueFlushSceneD44B,
+            Memory::HookType::Call);
+        Memory::VP::InjectHook(
+            Module::exe_ptr(0xD79B), LensOpaqueFlushSceneD79B,
+            Memory::HookType::Call);
         // Separate verified E8 into the same DrawObjectAlpha_Internal ABI,
         // invoked only by the primary sun's sub_40C980 producer.
         Memory::VP::InjectHook(

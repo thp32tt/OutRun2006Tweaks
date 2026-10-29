@@ -25,6 +25,7 @@ official_runner = read("tools/Run-FocusOfficialTest.ps1")
 required = {
     "lens source provenance": (graphics, [
         "VR TRACE LENS SOURCE FULL:",
+        "VR TRACE LENS OPAQUE FLUSH FULL:",
         "sourceCallSerial={}",
         "sequence={}",
         "ordinal={}",
@@ -41,6 +42,8 @@ required = {
         "VR TRACE LENS LOWER FALLBACK FULL:",
         "VR TRACE VISUAL LOWER PHYSICAL RESULT FULL:",
         "VR TRACE XYZRHW VISUAL EYES FULL:",
+        "opaqueFlushSerial={}",
+        "opaqueFlushOrigin={}",
         "VR TRACE LENS GPU STATE FULL:",
         "VR TRACE LENS MATRIX FULL:",
         "VR TRACE LENS DRAW CALL FULL:",

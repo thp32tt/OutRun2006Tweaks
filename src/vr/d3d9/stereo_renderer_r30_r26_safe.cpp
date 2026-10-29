@@ -4189,6 +4189,7 @@ namespace OutRunVRStereo
             OutRunVR::GameSemantic::PhysicalDrawCommand command{};
             OutRunVR::GameSemantic::LensOriginalCallReceipt lensInline{};
             OutRunVR::GameSemantic::LensDeferredPhysicalReceipt lensDeferred{};
+            OutRunVR::GameSemantic::LensOpaqueFlushReceipt lensOpaque{};
             const char* family = "OTHER";
             bool enabled = false;
             bool lens = false;
@@ -4217,8 +4218,10 @@ namespace OutRunVRStereo
             trace.command = CapturePhysicalDrawCommand();
             trace.lensInline = CurrentLensOriginalCall;
             trace.lensDeferred = CurrentLensDeferredPhysical;
+            trace.lensOpaque = CurrentLensOpaqueFlush;
             trace.lens =
                 trace.command.producer == ProducerToken::LensFlareCentre ||
+                trace.lensOpaque.serial != 0 ||
                 trace.lensInline.sourceSerial != 0 ||
                 trace.lensDeferred.sourceSerial != 0 ||
                 trace.command.scope == RenderScope::ProjectedScreenEffect2D ||
@@ -4265,7 +4268,8 @@ namespace OutRunVRStereo
                 "sourceCallSerial={} sequence={} sourceObj=0x{:06X} sourceSite={} "
                 "ordinal={} windowAnchorSerial={} windowAnchorSequence={} "
                 "windowAnchorObj=0x{:06X} windowAnchorOrdinal={} "
-                "sourceAuthority={} opaquePmtIdentity={}",
+                "sourceAuthority={} opaqueFlushSerial={} opaqueFlushOrigin={} "
+                "opaquePatchCount={} opaquePatchHash=0x{:016X} opaquePmtIdentity={}",
                 qpc.QuadPart, TopLevelDrawSerial(), visual.family,
                 api ? api : "UNKNOWN",
                 OutRunVR::GameSemantic::Name(visual.command.producer),
@@ -4300,6 +4304,11 @@ namespace OutRunVRStereo
                 deferredCandidate
                     ? static_cast<unsigned>(visual.lensDeferred.ordinal) : 0,
                 sourceAuthority,
+                visual.lensOpaque.serial,
+                OutRunVR::GameSemantic::Name(visual.lensOpaque.origin),
+                visual.lensOpaque.patchCount,
+                static_cast<unsigned long long>(
+                    visual.lensOpaque.patchLedgerHash),
                 visual.lens ? "UNVERIFIED" : "NOT_APPLICABLE");
         }
 
@@ -6688,7 +6697,9 @@ namespace OutRunVRStereo
                         "windowAnchorOrdinal={} correlationAuthority={} "
                         "leftAttempted={} leftHr=0x{:08X} restore={} "
                         "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} entryRT=0x{:X} "
-                        "qpc={} thread={} opaquePmtIdentity=UNVERIFIED "
+                        "qpc={} thread={} opaqueFlushSerial={} opaqueFlushOrigin={} "
+                        "opaquePatchCount={} opaquePatchHash=0x{:016X} "
+                        "opaquePmtIdentity=UNVERIFIED "
                         "evidence=FAILED_LEFT_NATIVE_DRAW_NOT_PIXEL_PROOF",
                         TopLevelDrawSerial(), stereo.poseSequence,
                         site ? site : "unknown", lensSourceSerial,
@@ -6702,7 +6713,13 @@ namespace OutRunVRStereo
                         lensTransaction.leftDrawAttempted ? 1 : 0,
                         static_cast<unsigned>(leftHr), restored ? 1 : 0,
                         lensTexture0Ptr, lensVb0Ptr, lensIbPtr, lensRt0Ptr,
-                        physicalQpc.QuadPart, GetCurrentThreadId());
+                        physicalQpc.QuadPart, GetCurrentThreadId(),
+                        visualRoute.lensOpaque.serial,
+                        OutRunVR::GameSemantic::Name(
+                            visualRoute.lensOpaque.origin),
+                        visualRoute.lensOpaque.patchCount,
+                        static_cast<unsigned long long>(
+                            visualRoute.lensOpaque.patchLedgerHash));
                 }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
@@ -6862,7 +6879,9 @@ namespace OutRunVRStereo
                         "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} entryRT=0x{:X} "
                         "leftRT=0x{:X} leftRt={}x{} leftRtFmt={} "
                         "rightRT=0x{:X} rightRt={}x{} rightRtFmt={} "
-                        "qpc={} thread={} opaquePmtIdentity=UNVERIFIED "
+                        "qpc={} thread={} opaqueFlushSerial={} opaqueFlushOrigin={} "
+                        "opaquePatchCount={} opaquePatchHash=0x{:016X} "
+                        "opaquePmtIdentity=UNVERIFIED "
                         "evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
                         physicalSample, TopLevelDrawSerial(), stereo.poseSequence,
                         site ? site : "unknown", lensSourceSerial,
@@ -6886,7 +6905,13 @@ namespace OutRunVRStereo
                         static_cast<unsigned>(lensLeftRtFormat),
                         lensRightRtPtr, lensRightRtWidth, lensRightRtHeight,
                         static_cast<unsigned>(lensRightRtFormat),
-                        physicalQpc.QuadPart, GetCurrentThreadId());
+                        physicalQpc.QuadPart, GetCurrentThreadId(),
+                        visualRoute.lensOpaque.serial,
+                        OutRunVR::GameSemantic::Name(
+                            visualRoute.lensOpaque.origin),
+                        visualRoute.lensOpaque.patchCount,
+                        static_cast<unsigned long long>(
+                            visualRoute.lensOpaque.patchLedgerHash));
                 }
             }
 
@@ -7206,7 +7231,9 @@ namespace OutRunVRStereo
                     "sourceSite={} ordinal={} windowAnchorSerial={} "
                     "windowAnchorSequence={} windowAnchorObj=0x{:06X} "
                     "windowAnchorOrdinal={} sourceAuthority={} "
-                    "opaquePmtIdentity={} resultRoute=R29_FALLBACK",
+                    "opaqueFlushSerial={} opaqueFlushOrigin={} opaquePatchCount={} "
+                    "opaquePatchHash=0x{:016X} opaquePmtIdentity={} "
+                    "resultRoute=R29_FALLBACK",
                     lowerQpc.QuadPart, TopLevelDrawSerial(),
                     lowerVisual.family, site ? site : "unknown",
                     OutRunVR::GameSemantic::Name(
@@ -7251,6 +7278,12 @@ namespace OutRunVRStereo
                                 ? "DEFERRED_WINDOW_CANDIDATE"
                                 : "UNOWNED_PHYSICAL"))
                         : "EXACT_RESULT_PRODUCER",
+                    lowerVisual.lensOpaque.serial,
+                    OutRunVR::GameSemantic::Name(
+                        lowerVisual.lensOpaque.origin),
+                    lowerVisual.lensOpaque.patchCount,
+                    static_cast<unsigned long long>(
+                        lowerVisual.lensOpaque.patchLedgerHash),
                     lowerVisual.lens ? "UNVERIFIED" : "NOT_APPLICABLE");
             }
             return lowerHr;

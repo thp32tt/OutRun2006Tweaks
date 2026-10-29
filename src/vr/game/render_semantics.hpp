@@ -893,6 +893,59 @@ namespace OutRunVR::GameSemantic
     };
     inline thread_local LensDeferredPhysicalReceipt CurrentLensDeferredPhysical{};
 
+    // Diagnostic-only original opaque queue transaction. This is set only
+    // while one verified original 4052C0 CALL executes. It grants no render
+    // ownership and does not identify one PMT inside a multi-object flush.
+    enum class LensOpaqueFlushOrigin : std::uint8_t
+    {
+        None = 0,
+        Inline405360,
+        SceneD44B,
+        SceneD79B,
+    };
+
+    struct LensOpaqueFlushReceipt
+    {
+        std::uint64_t serial = 0;
+        LensOpaqueFlushOrigin origin = LensOpaqueFlushOrigin::None;
+        std::uint64_t sourceSerial = 0;
+        std::uint64_t sequence = 0;
+        std::uint32_t objectId = 0;
+        std::uint8_t ordinal = 0;
+        std::uint32_t patchCount = 0;
+        std::uint64_t patchLedgerHash = 0;
+    };
+
+    inline thread_local LensOpaqueFlushReceipt CurrentLensOpaqueFlush{};
+
+    inline const char* Name(LensOpaqueFlushOrigin origin) noexcept
+    {
+        switch (origin)
+        {
+        case LensOpaqueFlushOrigin::Inline405360: return "INLINE_405360_542A";
+        case LensOpaqueFlushOrigin::SceneD44B: return "SCENE_D44B";
+        case LensOpaqueFlushOrigin::SceneD79B: return "SCENE_D79B";
+        default: return "NONE";
+        }
+    }
+
+    class ScopedLensOpaqueFlush final
+    {
+        LensOpaqueFlushReceipt previous_{};
+    public:
+        explicit ScopedLensOpaqueFlush(LensOpaqueFlushReceipt receipt) noexcept
+            : previous_(CurrentLensOpaqueFlush)
+        {
+            CurrentLensOpaqueFlush = receipt;
+        }
+        ~ScopedLensOpaqueFlush() noexcept
+        {
+            CurrentLensOpaqueFlush = previous_;
+        }
+        ScopedLensOpaqueFlush(const ScopedLensOpaqueFlush&) = delete;
+        ScopedLensOpaqueFlush& operator=(const ScopedLensOpaqueFlush&) = delete;
+    };
+
     inline void ArmLensDeferredPhysical(
         LensDeferredPhysicalReceipt receipt) noexcept
     {
