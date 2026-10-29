@@ -226,7 +226,10 @@ def main() -> None:
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "return E_NOTIMPL;\n            }\n\n            // The first physical LEFT Draw", "return E_NOTIMPL;\n            }\n\n            R9NoteStereoDrawWithoutMonoBackup();\n            // The first physical LEFT Draw")
     rejects_in_function(verify_r30, r30, "HRESULT R30TryScreenSpaceFovDraw(", "R9Poison(OutRunVR::StereoFailureRestoreFailed,", "/* failure not poisoned */ (")
     rejects_in_function(verify_r7, r7, "HRESULT ExecuteStereoDraw(", "if(StereoWanted()&&TargetIsBackBuffer())", "if(StereoWanted()&&TargetIsBackBuffer()&&!occlusionActive)")
-    rejects_in_function(verify_r7, r7, "HRESULT ExecuteStereoDraw(", "InvalidateRightDepthStencilIfLeftMayWrite(device);\n\t\t\t\treturn drawCall();", "/* omitted invalidation */\n\t\t\t\treturn drawCall();")
+    rejects_in_function(
+        verify_r7, r7, "HRESULT ExecuteStereoDraw(",
+        "InvalidateRightDepthStencilIfLeftMayWrite(device);\n\t\t\t\tconst HRESULT hr=drawCall();",
+        "/* omitted invalidation */\n\t\t\t\tconst HRESULT hr=drawCall();")
     rejects_in_function(verify_r7, r7, "bool PrepareDuplicatedDraw(", "ActiveOcclusionQueries.load(std::memory_order_acquire)>0", "false")
     rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "if(stateBlock)stateBlock->Release();return false;", "return false;")
     rejects_in_function(verify_sbs, r7, "bool ComposeSbs(", "const bool stateOk=setupOk&&SUCCEEDED(device->SetViewport(&full))", "const bool stateOk=SUCCEEDED(device->SetViewport(&full))")
