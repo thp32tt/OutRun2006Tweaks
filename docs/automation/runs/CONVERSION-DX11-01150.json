@@ -106,7 +106,7 @@
     "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD",
     "C1_REVIEW": "PASS_SOURCE_NOOP_EXP_EXP2_ZERO_DENSITY",
     "C2_IMPLEMENT": "PASS_MATERIAL_COMMIT_7746cf5d38a4907e64044595bf47d0db541daac5",
-    "C3_VALIDATE": "CAUSAL_REGRESSION_SCRIPT_REPAIR_AFTER_40813263121; REVALIDATE_FINAL_SHA",
+    "C3_VALIDATE": "SECOND_CAUSAL_FAST_ASSERTION_REPAIR_PENDING_PUSH; GATES_REVALIDATE_EXACT_SHA",
     "C4_COMMIT": "PASS_SOURCE_COMMIT; REPAIR_RESULT_PENDING",
     "C5_PACKAGE": "NOT_CREATED",
     "C6_STATE": "PENDING_FIVE_GATE_PASS"
@@ -118,7 +118,9 @@
     "failed_stage": "inherited 01149 run record blocking_evidence missing",
     "runtime_evidence": "UNTESTED: no matching binary native menu/car/race or Quest 3/VDXR",
     "failed_fast_regression_run": 40813263121,
-    "failed_fast_regression_cause": "Existing source-static predicate required old const bool parametersKnown = !activeEquation ||; new real density-first state preserved fail closed but predicate rejected updated conditional. Strengthened static positive/destructive checks; original C++ positive/negative tests unchanged."
+    "failed_fast_regression_cause": "Existing source-static predicate required old const bool parametersKnown = !activeEquation ||; new real density-first state preserved fail closed but predicate rejected updated conditional. Strengthened static positive/destructive checks; original C++ positive/negative tests unchanged.",
+    "failed_fast_regression_2": 40814628413,
+    "failed_fast_regression_2_cause": "Static test required adjacent && !inertExponential; byte sequence, but actual safe C++ source has newline whitespace between && and !inertExponential. Preserve independent exact source mode/density ordering, active fog and destructive tests; require !inertExponential clause regardless of formatting."
   },
   "c6": {
     "checkpoint": "C3_VALIDATE",

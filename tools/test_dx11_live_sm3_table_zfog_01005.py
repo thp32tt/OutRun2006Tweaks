@@ -70,7 +70,7 @@ require("readFog(D3DRS_FOGTABLEMODE, tableMode, 1u)" in fog_gate and
 require("native_sm3_fog_needs_parameters(true, tableMode, vertexMode)" in fog_gate and
         "const bool densityKnown = !densityProbe ||" in fog_gate and
         "native_sm3_inert_exponential_table_fog(" in fog_gate and
-        "&& !inertExponential;" in fog_gate and
+        "!inertExponential;" in fog_gate and
         "const bool parametersKnown = densityKnown && (!activeEquation ||" in fog_gate and
         "if (!modesKnown || !parametersKnown)" in fog_gate and
         "if (activeEquation) {" in fog_gate,
