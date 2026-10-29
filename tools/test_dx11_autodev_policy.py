@@ -315,3 +315,28 @@ assert validate_task(failed_c6_01057, p), "01057 gate failure admitted"
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
 print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")
+
+
+# CONVERSION-DX11-01159 causal Backend Conversion Gate recovery: the
+# 01158 source/CI C6 record was written without mandatory policy evidence.
+# Preserve its previously proven SHA and never treat listed source stages
+# as source-matched live game/HMD execution proof.
+historical_01158 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01158.json").read_text(encoding="utf-8"))
+assert historical_01158["validation_bearing_result_sha"] == "9764a96693701186941ebeb515f31baaebb478d2"
+assert historical_01158["runtime_validation"] == "UNTESTED"
+assert not validate_task(historical_01158, p), validate_task(historical_01158, p)
+for label, mutate in (
+    ("missing positive source evidence", lambda t: t["development_strategy"]["acceptance_proof"].pop("positive_probe")),
+    ("missing negative fallback evidence", lambda t: t["development_strategy"]["acceptance_proof"].pop("negative_regression")),
+    ("missing component integration", lambda t: t["development_strategy"]["acceptance_proof"].pop("component_integration")),
+    ("missing owned files", lambda t: t["development_strategy"].update(conflict_keys=[])),
+    ("game draw bridge omitted", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"])),
+    ("visible handoff omitted", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW"])),
+    ("false HMD proof", lambda t: t.update(runtime_validation="PASS")),
+):
+    invalid_01158 = copy.deepcopy(historical_01158)
+    mutate(invalid_01158)
+    assert validate_task(invalid_01158, p), "01158 evidence regression admitted: " + label

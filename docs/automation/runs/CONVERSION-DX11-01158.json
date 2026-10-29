@@ -43,7 +43,22 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST",
-    "activation_guard_and_fallback": "Original D3D9/DX9Ex game draw/input/FFB unchanged; opt-in DX11 only; DXVK frozen."
+    "activation_guard_and_fallback": "Original D3D9/DX9Ex game draw/input/FFB unchanged; opt-in DX11 only; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Live source FVF COLOR1 Gouraud SPECULARENABLE RGB is composited after authenticated stage0/stage1 and before table fog; C++ positive and negative regressions plus five exact-source-SHA GitHub push Actions passed at 9764a96693701186941ebeb515f31baaebb478d2. No game/HMD runtime parity asserted.",
+      "negative_regression": "FLAT or unknown shade, unsupported vertex/range/RAW fog plus specular, failed COM/state, unknown shaders or source-device lifetime keep the original D3D9 fallback; source-matched native game frame and Quest3 remain UNTESTED.",
+      "component_integration": "Observed live D3D9 FVF Draw and DrawIndexed callsite -> source-identified D3D11 stage0/stage1 pixel shader -> Gouraud SPECULAR RGB -> authenticated table fog -> guarded native Draw -> existing game-visible presentation boundary; source/CI evidence only, not a tested gameplay image."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_fvf_fog_dispatch.hpp",
+      "tests/native_game_fvf_fog_dispatch_test.cpp"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
