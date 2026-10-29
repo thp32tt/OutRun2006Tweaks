@@ -68,25 +68,36 @@ require("readFog(D3DRS_FOGTABLEMODE, tableMode, 1u)" in fog_gate and
         "readFog(D3DRS_FOGVERTEXMODE, vertexMode, 2u)" in fog_gate,
         "both authentic D3D9 mode getters required")
 require("native_sm3_fog_needs_parameters(true, tableMode, vertexMode)" in fog_gate and
-        "const bool parametersKnown = !activeEquation ||" in fog_gate and
+        "const bool densityKnown = !densityProbe ||" in fog_gate and
+        "native_sm3_inert_exponential_table_fog(" in fog_gate and
+        "&& !inertExponential;" in fog_gate and
+        "const bool parametersKnown = densityKnown && (!activeEquation ||" in fog_gate and
         "if (!modesKnown || !parametersKnown)" in fog_gate and
         "if (activeEquation) {" in fog_gate,
-        "inactive query skip / active fog fail-closed linkage missing")
-require(fog_gate.index("native_sm3_fog_needs_parameters(") <
+        "density-first inert query skip / active fog fail-closed linkage missing")
+require(fog_gate.index("readFog(D3DRS_FOGVERTEXMODE, vertexMode, 2u)") <
+        fog_gate.index("const bool densityProbe") <
+        fog_gate.index("const bool densityKnown") <
+        fog_gate.index("native_sm3_fog_needs_parameters(") <
         fog_gate.index("readFog(D3DRS_RANGEFOGENABLE") <
         fog_gate.index("native_sm3_table_zfog_admission("),
-        "mode, conditional payload, native GPU shader order broken")
+        "source mode, authentic density, conditional payload, native shader order broken")
 for wrong, correct in (
     ("!modesKnown || !parametersKnown", "if (!modesKnown || !parametersKnown)"),
-    ("!activeEquation ||", "const bool parametersKnown = !activeEquation ||"),
+    ("!activeEquation ||", "const bool parametersKnown = densityKnown && (!activeEquation ||"),
     ("if (activeEquation) {", "if (activeEquation) {"),
 ):
     mutant = fog_gate.replace(wrong, "false /* destructive unsafe mutation */", 1)
     require(mutant != fog_gate and not all(t in mutant for t in (
         "if (!modesKnown || !parametersKnown)",
-        "const bool parametersKnown = !activeEquation ||",
+        "const bool parametersKnown = densityKnown && (!activeEquation ||",
         "if (activeEquation) {")),
         "destructive source mutation slipped through admission contract")
+require("native_sm3_inert_exponential_table_fog(" in header and
+        "std::isfinite(density) && density == 0.0f" in header and
+        "if (native_sm3_inert_exponential_table_fog(" in header and
+        "if (srgbOutput)" in header,
+        "exact zero-density no-op must precede active source fog safety")
 compiler = shutil.which("g++") or shutil.which("clang++")
 if compiler:
     with tempfile.TemporaryDirectory() as folder:

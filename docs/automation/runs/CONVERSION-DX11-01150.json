@@ -54,7 +54,8 @@
       "src/vr/d3d11/live_game_sm3_table_fog.hpp",
       "src/vr/d3d11/live_game_frame_bridge.cpp",
       "tools/dx11_live_sm3_table_zfog_01005.cpp",
-      "docs/automation/runs/CONVERSION-DX11-01149.json"
+      "docs/automation/runs/CONVERSION-DX11-01149.json",
+      "tools/test_dx11_live_sm3_table_zfog_01005.py"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "blocking_evidence": "Pinned 2026-10-28 real game b8dab362b9cc9072eafbd3307594a35ff5b8d413 native_draws=0 and Fog rejects 5,547; no new runtime proof. 2026-10-29 exact-SHA 7746cf5d38a4907e64044595bf47d0db541daac5 DX11 Fast run 40813007430 and Backend run 40813007429 BOTH failed policy on inherited CONVERSION-DX11-01149.json missing development_strategy.blocking_evidence; causal metadata repair only, no weakened Gate."
@@ -64,7 +65,8 @@
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/dx11_live_sm3_table_zfog_01005.cpp",
     "docs/automation/runs/CONVERSION-DX11-01149.json",
-    "docs/automation/runs/CONVERSION-DX11-01150.json"
+    "docs/automation/runs/CONVERSION-DX11-01150.json",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py"
   ],
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -104,7 +106,7 @@
     "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD",
     "C1_REVIEW": "PASS_SOURCE_NOOP_EXP_EXP2_ZERO_DENSITY",
     "C2_IMPLEMENT": "PASS_MATERIAL_COMMIT_7746cf5d38a4907e64044595bf47d0db541daac5",
-    "C3_VALIDATE": "PREVIOUS_SHA_FAILED_INHERITED_POLICY_EVIDENCE; CAUSAL_REPAIR_IN_PROGRESS",
+    "C3_VALIDATE": "CAUSAL_REGRESSION_SCRIPT_REPAIR_AFTER_40813263121; REVALIDATE_FINAL_SHA",
     "C4_COMMIT": "PASS_SOURCE_COMMIT; REPAIR_RESULT_PENDING",
     "C5_PACKAGE": "NOT_CREATED",
     "C6_STATE": "PENDING_FIVE_GATE_PASS"
@@ -114,7 +116,9 @@
     "failed_fast_run": 40813007430,
     "failed_backend_run": 40813007429,
     "failed_stage": "inherited 01149 run record blocking_evidence missing",
-    "runtime_evidence": "UNTESTED: no matching binary native menu/car/race or Quest 3/VDXR"
+    "runtime_evidence": "UNTESTED: no matching binary native menu/car/race or Quest 3/VDXR",
+    "failed_fast_regression_run": 40813263121,
+    "failed_fast_regression_cause": "Existing source-static predicate required old const bool parametersKnown = !activeEquation ||; new real density-first state preserved fail closed but predicate rejected updated conditional. Strengthened static positive/destructive checks; original C++ positive/negative tests unchanged."
   },
   "c6": {
     "checkpoint": "C3_VALIDATE",
