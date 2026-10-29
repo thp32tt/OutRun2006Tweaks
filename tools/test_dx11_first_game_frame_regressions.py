@@ -222,8 +222,10 @@ def main() -> None:
             "GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)",
             "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)",
             "native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
-            "sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&",
+            "sourceKnown = fog == TRUE && fogModesKnown &&",
             "native_raw_fvf_fog_visual_admission(",
+            "native_sm3_table_zfog_admission(",
+            "output.nativeTableFog.enabled;",
             "if (!output.rawFogVisualMismatch) return false;",
             "const auto polygonMode = game_sm3_effective_polygon_mode(",
             "if (!polygonMode.admitted ||",
@@ -257,7 +259,7 @@ def main() -> None:
          "true /* unchecked active fog */"),
         ("if (!output.rawFogVisualMismatch) return false;",
          "/* failed source fog fallback removed */"),
-        ("sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&",
+        ("sourceKnown = fog == TRUE && fogModesKnown &&",
          "sourceKnown = true &&"),
         ("native_raw_fvf_fog_visual_admission(",
          "native_raw_fvf_fog_visual_unchecked("),
@@ -2269,13 +2271,13 @@ def main() -> None:
     # Both the stage-1 branch and legacy stage-0 alpha blend dispatch must
     # remain connected to the native Draw/DrawIndexed submission.
     def stage0_dispatch_with_stage1(code: str) -> bool:
-        return ("ctx->PSSetShader(capture.stage1Enabled ?" in code and
+        return ("ID3D11PixelShader* fixedPixelShader = (capture.stage1Enabled ?" in code and
                 "capture.selectDiffuseTextureAlpha ? s.selectDiffuseTextureAlphaPs.Get() :" in code and
                 "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :" in code and
                 "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :" in code)
     assert stage0_dispatch_with_stage1(submit_section)
     for dispatch in (
-        "ctx->PSSetShader(capture.stage1Enabled ?",
+        "ID3D11PixelShader* fixedPixelShader = (capture.stage1Enabled ?",
         "capture.selectDiffuseTextureAlpha ? s.selectDiffuseTextureAlphaPs.Get() :",
         "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :",
         "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :",

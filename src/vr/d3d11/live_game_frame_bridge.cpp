@@ -2756,7 +2756,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             fogDepth != NativeSm3FogDepth::Unknown &&
             native_sm3_table_zfog_admission(
                 true, sourceTableFog, sourceVertexFog,
-                sourceRangeFog != FALSE, srgbWrite != FALSE,
+                sourceRangeFog != FALSE, srgbWrite == TRUE,
                 (actualCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
                 (actualCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
                 sourceFogColor, start, end, density,
