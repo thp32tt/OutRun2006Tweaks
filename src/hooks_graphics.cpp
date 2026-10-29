@@ -1011,11 +1011,14 @@ class VRLensFlareProjected2D : public Hook
                 resetTrace.readStable ? 1 : 0,
                 sourceEventQpc.QuadPart, GetCurrentThreadId());
         }
-        // 4056D0 may only enqueue the original opaque object. Do NOT
-        // interpret this hook's call counter as a native Draw or an eye RT.
-        // The mod SpriteNode/D3DX queue flag is separate from that game's
-        // opaque 405360/4052C0 transaction. Log its value as a control,
-        // not as a claim about deferred or immediate opaque submission.
+        // 4056D0 prepares the original opaque object and calls 405360.
+        // Canonical EXE disassembly proves 405360 can either leave the opaque
+        // work pending or, when the game's flush state is armed, call 4052C0
+        // before 4056D0 returns. Therefore this wrapper call counter proves
+        // source chronology only: it is NOT a native Draw/eye RT receipt and
+        // does not distinguish inline versus later opaque submission. The mod
+        // SpriteNode/D3DX queue flag is a separate mechanism and remains a
+        // control only.
         if (Settings::VREnabled && Settings::VRTelemetry &&
             IsProjectedSunScreenObject(objectId))
         {

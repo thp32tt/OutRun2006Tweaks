@@ -33,7 +33,7 @@ WINDOWS = (
     # work; 0x4052C0 later consumes the shared queue. Keeping these bodies in
     # the durable artifact is required before assigning a CABE ordinal to a
     # physical PMT/Draw.
-    ("lens-opaque-queue-core", 0x00005280, 0x00005880),
+    ("lens-opaque-queue-core", 0x000050C0, 0x00005B20),
     ("lens-objects", 0x0000C900, 0x0000D950),
     ("sprite-glyph-queue", 0x0002C800, 0x0002D300),
     ("calc3d2d", 0x00049940, 0x00049B20),
@@ -66,6 +66,8 @@ LIVE_STAGE_LEAVE_RVA = 0xBD221
 
 LENS_ENQUEUE_RVA = 0x56D0
 LENS_FLUSH_RVA = 0x52C0
+LENS_OBJECT_DISPATCH_RVA = 0x5360
+LENS_RENDER_FLUSH_RVA = 0x5890
 LENS_WRAPPER_EDGES = (
     (0xC993, LENS_ENQUEUE_RVA, "C993 centre wrapper -> opaque enqueue"),
     (0xCABE, LENS_ENQUEUE_RVA, "CABE projected wrapper -> opaque enqueue"),
@@ -169,6 +171,23 @@ def verify_lens_original_queue_edges(pe) -> list[str]:
         facts.append(
             f"- RVA `0x{call_rva:05X}` -> `0x{target_rva:05X}` ({label}).")
 
+    # 4056D0 itself calls 405360, and 405360 conditionally calls 4052C0.
+    # Therefore a source wrapper can cause an inline flush OR leave work for
+    # the later D44B/D79B shared flush depending on original game state.
+    assert call_target(0x5813) == LENS_OBJECT_DISPATCH_RVA, (
+        "4056D0 no longer dispatches through 405360")
+    assert call_target(0x542A) == LENS_FLUSH_RVA, (
+        "405360 inline flush edge to 4052C0 changed")
+    assert call_target(0x52C6) == LENS_RENDER_FLUSH_RVA, (
+        "4052C0 render flush edge to 405890 changed")
+    facts.extend((
+        "- RVA `0x05813` inside 4056D0 calls `0x05360`.",
+        "- RVA `0x0542A` inside 405360 conditionally calls `0x052C0`; "
+        "an opaque flush may therefore occur before the source wrapper returns.",
+        "- RVA `0x052C6` inside 4052C0 calls `0x05890`, the render/queue "
+        "consumer that must be inspected for descriptor-to-physical-Draw identity.",
+    ))
+
     # The same 0x570008 scene object is submitted once before and once after
     # the second shared queue flush. This proves CALL ordinal alone cannot be
     # treated as the identity of a later opaque PMT consumed by 0x4052C0.
@@ -187,8 +206,8 @@ def verify_lens_original_queue_edges(pe) -> list[str]:
         "0x570008 before/flush/after ordering changed")
     facts.append(
         "- Therefore CABE call-stack ordinal is source chronology only; "
-        "opaque PMT identity remains UNVERIFIED until the 0x4056D0 descriptor "
-        "and 0x4052C0 consumer are joined.")
+        "opaque PMT identity remains UNVERIFIED until the 0x4056D0/0x405360 "
+        "descriptor lifetime and 0x4052C0/0x405890 consumer are joined.")
     return facts
 
 
