@@ -16,6 +16,8 @@ struct NativeRawPresentTile {
     std::uint32_t tileWidth, std::uint32_t tileHeight,
     NativeRawPresentTile& out) noexcept {
     out = {};
+    // Tight original D3D9 menu/car dirty crops can be 24..39 pixels.
+    // Keep the unscaled GPU source and shrink only the label margin.
     constexpr std::int64_t kMargin = 8;
     constexpr std::uint32_t kMinPixels = 24;
     constexpr auto kMaxLong =
@@ -25,21 +27,26 @@ struct NativeRawPresentTile {
         tileHeight < kMinPixels || left < 0 || top < 0 ||
         left >= right || top >= bottom ||
         right > backWidth || bottom > backHeight ||
-        right - left < 2 * kMargin + kMinPixels ||
-        bottom - top < 2 * kMargin + kMinPixels)
+        right - left < kMinPixels || bottom - top < kMinPixels)
         return false;
+    // A 24px repaint permits zero destination margin; a >=40px repaint
+    // retains the original 8px experimental frame. No pixel is scaled.
+    const auto marginX = (std::min)(kMargin,
+        (right - left - kMinPixels) / 2);
+    const auto marginY = (std::min)(kMargin,
+        (bottom - top - kMinPixels) / 2);
     const auto width = static_cast<std::uint32_t>((std::min)(
-        std::int64_t{tileWidth}, right - left - 2 * kMargin));
+        std::int64_t{tileWidth}, right - left - 2 * marginX));
     const auto height = static_cast<std::uint32_t>((std::min)(
-        std::int64_t{tileHeight}, bottom - top - 2 * kMargin));
+        std::int64_t{tileHeight}, bottom - top - 2 * marginY));
     out.sourceX = (tileWidth - width) / 2u;
     out.sourceY = (tileHeight - height) / 2u;
     out.copyWidth = width;
     out.copyHeight = height;
-    out.destinationX = right - kMargin - width;
-    out.destinationY = top + kMargin;
-    return out.destinationX >= left + kMargin &&
-           out.destinationY + height <= bottom - kMargin;
+    out.destinationX = right - marginX - width;
+    out.destinationY = top + marginY;
+    return out.destinationX >= left + marginX &&
+           out.destinationY + height <= bottom - marginY;
 }
 // When a real GPU Draw changed pixels away from the initially centered
 // source subsection, move the RAW diagnostic crop to those authentic pixels.

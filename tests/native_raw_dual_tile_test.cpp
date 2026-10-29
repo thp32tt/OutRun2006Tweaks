@@ -1,6 +1,7 @@
 #include "src/vr/d3d11/native_game_raw_dual_tile.hpp"
 #include "src/vr/d3d11/native_game_raw_color_transport.hpp"
 #include "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp"
+#include "src/vr/d3d11/native_game_raw_present_coverage.hpp"
 #include <array>
 #include <cassert>
 using namespace outrun::vr::dx11;
@@ -135,6 +136,29 @@ int main() {
                           after.data(), compactW * 4u, compactW, compactH);
     assert(changedWindow.select(compactOriginal, compactSelected, realPixels));
     assert(realPixels == 1u);
+    // Real split 30x30 menu dirty repaint: 96x64 native GPU capture
+    // now reaches the D3D9 source crop without guessed/upscaled pixels.
+    NativeRawPresentDirtyRegion narrow{};
+    narrow.headerVerified = true;
+    narrow.count = 2u;
+    narrow.rectangles[0] = {100, 120, 130, 135};
+    narrow.rectangles[1] = {100, 135, 130, 150};
+    narrow.boundLeft = 100; narrow.boundTop = 120;
+    narrow.boundRight = 130; narrow.boundBottom = 150;
+    NativeRawPresentTile tight{}, gpuCrop{};
+    assert(native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, narrow,
+        compactW, compactH, tight));
+    assert(tight.copyWidth == 24u && tight.copyHeight == 24u);
+    assert(native_raw_dirty_region_covers_tile(1920, 1080, narrow, tight));
+    assert(changedWindow.select(tight, gpuCrop, realPixels));
+    assert(realPixels == 1u && gpuCrop.sourceX <= 94u &&
+           gpuCrop.sourceX + gpuCrop.copyWidth > 94u);
+    // One missing original-game dirty row never grants publication.
+    narrow.rectangles[1].top = 136;
+    assert(!native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, narrow,
+        compactW, compactH, tight));
     assert(compactSelected.sourceX <= 94u &&
            compactSelected.sourceX + compactSelected.copyWidth > 94u);
     assert(compactSelected.sourceY <= 60u &&

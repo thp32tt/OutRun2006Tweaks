@@ -16,8 +16,15 @@ constexpr bool valid_raw_partial_present() {
         p.sourceX!=112u || p.sourceY!=56u || p.copyWidth!=32u ||
         p.copyHeight!=32u || p.destinationX!=708 || p.destinationY!=308)
         return false;
-    if (native_raw_partial_present_tile(1920,1080,0,0,39,100,256,144,p) ||
-        native_raw_partial_present_tile(1920,1080,0,0,100,39,256,144,p) ||
+    // The 30x30 source repaint carries an authentic unscaled 24x24 tile.
+    if (!native_raw_partial_present_tile(
+            1920,1080,700,300,730,330,96,64,p) ||
+        p.copyWidth!=24u || p.copyHeight!=24u ||
+        p.sourceX!=36u || p.sourceY!=20u ||
+        p.destinationX!=703 || p.destinationY!=303)
+        return false;
+    if (native_raw_partial_present_tile(1920,1080,0,0,23,100,256,144,p) ||
+        native_raw_partial_present_tile(1920,1080,0,0,100,23,256,144,p) ||
         native_raw_partial_present_tile(1920,1080,-1,0,100,100,256,144,p) ||
         native_raw_partial_present_tile(1920,1080,1800,0,1980,100,256,144,p) ||
         native_raw_partial_present_tile(1920,1080,0,0,0,100,256,144,p) ||
