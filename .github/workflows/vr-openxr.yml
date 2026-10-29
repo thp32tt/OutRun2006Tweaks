@@ -5,6 +5,9 @@ on:
     branches: [ vr-openxr, vr-dx11-native-r71, feature/dx11-01013-visible-game-frame, feature/dx11-00952-live-sm3-device-bool, feature/dx11-00966-live-game-frame, feature/dx11-00970-live-game-rt-frame, feature/dx11-00973-live-cube-rt-game-frame, feature/dx11-00974-live-cube-color-frame ]
     paths:
       - 'src/vr/**'
+      # Keep genuine RAW native pixel source-pair regressions on this SHA.
+      - 'tests/native_raw_dual_tile_test.cpp'
+      - '.github/workflows/vr-openxr.yml'
       - 'tools/test_dx11_live_sm3_draw_00925.py'
       - 'tools/test_dx11_live_sm3_blend_factor_00966.py'
       - 'src/vr_shared.hpp'

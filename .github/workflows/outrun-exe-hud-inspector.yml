@@ -45,6 +45,9 @@ on:
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
       - 'src/vr/d3d11/**'
+      # Keep RAW source pair C++ fixture corrections in exact-SHA HUD CI.
+      - 'tests/native_raw_dual_tile_test.cpp'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
       - 'tools/test_dx11_live_sm3_draw_00925.py'
       - 'tools/test_dx11_live_sm3_blend_factor_00966.py'
       # Exact pushed DX11 result SHA must retain the HUD inspector gate when

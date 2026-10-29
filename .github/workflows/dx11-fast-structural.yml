@@ -16,6 +16,9 @@ on:
       - feature/dx11-00975-live-sm3-volume-frame
     paths:
       - 'src/vr/d3d11/**'
+      # RAW native source tile C++ assertion fixes must reach exact-SHA CI.
+      - 'tests/native_raw_dual_tile_test.cpp'
+      - '.github/workflows/dx11-fast-structural.yml'
       - 'src/vr/d3d9/stereo_renderer_r30.cpp'
       # Both host compositor entry paths use the same native L/R -> XR copy.
       - 'vrhost/src/main.cpp'
