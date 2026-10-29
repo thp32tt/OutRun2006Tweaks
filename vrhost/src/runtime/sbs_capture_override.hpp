@@ -1218,6 +1218,66 @@ float4 PSMain(VSOut input) : SV_Target
             views[eye].subImage.imageArrayIndex = eye;
         }
 
+        static std::uint64_t poseJoinReceipts = 0;
+        const auto poseJoinHit = ++poseJoinReceipts;
+        if (poseJoinHit <= 64 || (poseJoinHit & (poseJoinHit - 1)) == 0)
+        {
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const bool usedIncoming =
+                    incoming && incoming->viewCount >= 2 && incoming->views;
+                const auto& sourceEye = LastStereoFrame.eye[eye];
+                const auto& outView = views[eye];
+                const XrPosef* incomingPose = usedIncoming
+                    ? &incoming->views[eye].pose : nullptr;
+                const XrFovf* incomingFov = usedIncoming
+                    ? &incoming->views[eye].fov : nullptr;
+                std::cerr
+                    << "[R19 TRACE] pose-fov-join hit=" << poseJoinHit
+                    << " eye=" << eye
+                    << " frameId=" << LastStereoFrame.frameId
+                    << " sourcePoseSequence=" << LastStereoFrame.sourcePoseSequence
+                    << " poseAuthority=" << (usedIncoming ? "INCOMING_A" : "SOURCE_B")
+                    << " sourcePos="
+                    << sourceEye.position[0] << "," << sourceEye.position[1] << ","
+                    << sourceEye.position[2]
+                    << " sourceOri="
+                    << sourceEye.orientation[0] << "," << sourceEye.orientation[1] << ","
+                    << sourceEye.orientation[2] << "," << sourceEye.orientation[3]
+                    << " sourceFov="
+                    << sourceEye.fov.angleLeft << "," << sourceEye.fov.angleRight << ","
+                    << sourceEye.fov.angleUp << "," << sourceEye.fov.angleDown;
+                if (incomingPose && incomingFov)
+                    std::cerr
+                        << " incomingPos="
+                        << incomingPose->position.x << "," << incomingPose->position.y << ","
+                        << incomingPose->position.z
+                        << " incomingOri="
+                        << incomingPose->orientation.x << "," << incomingPose->orientation.y << ","
+                        << incomingPose->orientation.z << "," << incomingPose->orientation.w
+                        << " incomingFov="
+                        << incomingFov->angleLeft << "," << incomingFov->angleRight << ","
+                        << incomingFov->angleUp << "," << incomingFov->angleDown;
+                else
+                    std::cerr << " incoming=NONE";
+                std::cerr
+                    << " outgoingPos="
+                    << outView.pose.position.x << "," << outView.pose.position.y << ","
+                    << outView.pose.position.z
+                    << " outgoingOri="
+                    << outView.pose.orientation.x << "," << outView.pose.orientation.y << ","
+                    << outView.pose.orientation.z << "," << outView.pose.orientation.w
+                    << " outgoingFov="
+                    << outView.fov.angleLeft << "," << outView.fov.angleRight << ","
+                    << outView.fov.angleUp << "," << outView.fov.angleDown
+                    << " swapchain=0x" << std::hex
+                    << reinterpret_cast<std::uintptr_t>(outView.subImage.swapchain)
+                    << std::dec
+                    << " slice=" << outView.subImage.imageArrayIndex
+                    << " evidence=R19_OUTGOING_VIEW_PRE_XREND_FRAME\n";
+            }
+        }
+
         projectionLayer = { XR_TYPE_COMPOSITION_LAYER_PROJECTION };
         projectionLayer.space = incoming && incoming->space != XR_NULL_HANDLE
             ? incoming->space : OutRunVrFinalTest::LocalSpace;

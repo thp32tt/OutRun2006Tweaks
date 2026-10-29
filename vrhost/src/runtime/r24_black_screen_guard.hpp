@@ -595,6 +595,30 @@ namespace OutRunVrR24BlackScreenGuard
         const bool hasLayer =
             receiptCurrent &&
             OutRunVrSbsCaptureOverride::LastEndFrameReceiptLayerCount > 0;
+        static std::uint64_t classicReceiptJoins = 0;
+        const auto joinHit = ++classicReceiptJoins;
+        if (joinHit <= 64 || (joinHit & (joinHit - 1)) == 0 ||
+            XR_FAILED(result) || !receiptCurrent)
+        {
+            std::cerr
+                << "[R24 TRACE] classic-final-receipt hit=" << joinHit
+                << " xrResult=" << result
+                << " receiptCurrent=" << (receiptCurrent ? 1 : 0)
+                << " projection=" << (projection ? 1 : 0)
+                << " frameId=" << frameId
+                << " sourcePoseSequence="
+                << (receiptCurrent
+                    ? OutRunVrSbsCaptureOverride::LastEndFrameReceiptPoseSequence
+                    : 0)
+                << " layerCount="
+                << (receiptCurrent
+                    ? OutRunVrSbsCaptureOverride::LastEndFrameReceiptLayerCount
+                    : 0)
+                << " hasLayer=" << (hasLayer ? 1 : 0)
+                << " sourceKind=" << (projection ? "ClassicSbs" : "None")
+                << " accepted=" << (XR_SUCCEEDED(result) ? 1 : 0)
+                << " evidence=POST_R19_XREND_FRAME_PRE_R23_RECORD\n";
+        }
         return OutRunVrR23RuntimeHardening::RecordFinalSubmissionResult(
             result, frameId, kind, hasLayer);
     }
