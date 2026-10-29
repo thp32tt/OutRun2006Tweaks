@@ -4184,6 +4184,122 @@ namespace OutRunVRStereo
             bool restoreOk = false;
         };
 
+        struct R30VisualRouteTrace
+        {
+            OutRunVR::GameSemantic::PhysicalDrawCommand command{};
+            OutRunVR::GameSemantic::LensOriginalCallReceipt lensInline{};
+            OutRunVR::GameSemantic::LensDeferredPhysicalReceipt lensDeferred{};
+            const char* family = "OTHER";
+            bool enabled = false;
+            bool lens = false;
+        };
+
+        const char* R30VisualTraceFamily(
+            OutRunVR::GameSemantic::ProducerToken producer) noexcept
+        {
+            using OutRunVR::GameSemantic::ProducerToken;
+            switch (producer)
+            {
+            case ProducerToken::StageExtensionTime: return "PLUS_TIME";
+            case ProducerToken::ResultProgress: return "GOAL_PERCENT";
+            case ProducerToken::ResultTextB9200: return "GOAL_TEXT";
+            case ProducerToken::GoalTime020:
+            case ProducerToken::GoalTime150: return "GOAL_TIME";
+            case ProducerToken::OutRunStagePrintf: return "GOAL_STAGE_PRINTF";
+            default: return "RESULT_OTHER";
+            }
+        }
+
+        R30VisualRouteTrace R30CaptureVisualRouteTrace() noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            R30VisualRouteTrace trace{};
+            trace.command = CapturePhysicalDrawCommand();
+            trace.lensInline = CurrentLensOriginalCall;
+            trace.lensDeferred = CurrentLensDeferredPhysical;
+            trace.lens =
+                trace.command.scope == RenderScope::ProjectedScreenEffect2D ||
+                trace.command.scope == RenderScope::SceneEffect;
+            trace.family = trace.lens
+                ? "LENS" : R30VisualTraceFamily(trace.command.producer);
+            trace.enabled = Settings::VRTelemetry &&
+                (trace.lens || trace.command.IsExactFiniteResultHud());
+            return trace;
+        }
+
+        void R30TraceXyzrhwVisualReceipt(
+            const R30VisualRouteTrace& visual,
+            const R30XyzrhwState& state,
+            const R30StereoPassTrace& pass,
+            HRESULT result,
+            const char* api,
+            UINT primitiveCount,
+            UINT vertexCount,
+            UINT stride) noexcept
+        {
+            if (!visual.enabled)
+                return;
+            const bool inlineLinked =
+                visual.lensInline.sourceSerial != 0;
+            const bool deferredCandidate =
+                !inlineLinked && visual.lensDeferred.sourceSerial != 0;
+            const char* sourceAuthority = visual.lens
+                ? (inlineLinked
+                    ? "INLINE_CALL_STACK_ONLY"
+                    : (deferredCandidate
+                        ? "DEFERRED_WINDOW_CANDIDATE"
+                        : "UNOWNED_PHYSICAL"))
+                : "EXACT_RESULT_PRODUCER";
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            spdlog::info(
+                "VR TRACE XYZRHW VISUAL EYES FULL: qpc={} serial={} family={} api={} "
+                "producer={} scope={} queued={} node=0x{:X} epoch={} "
+                "primitiveCount={} vertexCount={} stride={} worldEffect={} "
+                "rhwDepthEvidence={} hudWorldLock={} screenOverlay={} "
+                "left=0x{:08X} rightTarget=0x{:08X} rightDepth=0x{:08X} "
+                "rightViewport=0x{:08X} right=0x{:08X} restore={} result=0x{:08X} "
+                "sourceCallSerial={} sequence={} sourceObj=0x{:06X} sourceSite={} "
+                "ordinal={} windowAnchorSerial={} windowAnchorSequence={} "
+                "windowAnchorObj=0x{:06X} windowAnchorOrdinal={} "
+                "sourceAuthority={} opaquePmtIdentity={}",
+                qpc.QuadPart, TopLevelDrawSerial(), visual.family,
+                api ? api : "UNKNOWN",
+                OutRunVR::GameSemantic::Name(visual.command.producer),
+                OutRunVR::GameSemantic::Name(visual.command.scope),
+                visual.command.queued ? 1 : 0,
+                reinterpret_cast<std::uintptr_t>(visual.command.queueNode),
+                visual.command.queueEpoch,
+                primitiveCount, vertexCount, stride,
+                state.worldEffect ? 1 : 0,
+                state.rhwDepthEvidence ? 1 : 0,
+                state.hudWorldLockValid ? 1 : 0,
+                state.screenOverlay2D ? 1 : 0,
+                static_cast<unsigned>(pass.leftHr),
+                static_cast<unsigned>(pass.rightTargetHr),
+                static_cast<unsigned>(pass.rightDepthHr),
+                static_cast<unsigned>(pass.rightViewportHr),
+                static_cast<unsigned>(pass.rightHr),
+                pass.restoreOk ? 1 : 0,
+                static_cast<unsigned>(result),
+                inlineLinked ? visual.lensInline.sourceSerial : 0,
+                inlineLinked ? visual.lensInline.lastC993Sequence :
+                    (deferredCandidate ? visual.lensDeferred.sequence : 0),
+                inlineLinked ? visual.lensInline.objectId :
+                    (deferredCandidate ? visual.lensDeferred.objectId : 0),
+                inlineLinked
+                    ? static_cast<unsigned>(visual.lensInline.callsite) : 0,
+                inlineLinked
+                    ? static_cast<unsigned>(visual.lensInline.ordinal) : 0,
+                deferredCandidate ? visual.lensDeferred.sourceSerial : 0,
+                deferredCandidate ? visual.lensDeferred.sequence : 0,
+                deferredCandidate ? visual.lensDeferred.objectId : 0,
+                deferredCandidate
+                    ? static_cast<unsigned>(visual.lensDeferred.ordinal) : 0,
+                sourceAuthority,
+                visual.lens ? "UNVERIFIED" : "NOT_APPLICABLE");
+        }
+
         template <typename LeftDraw, typename RightDraw>
         HRESULT R30ExecuteXyzrhwStereo(
             IDirect3DDevice9* device, const R30XyzrhwState& state,
@@ -4457,11 +4573,16 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
                 sourceCommand.scope ==
                     OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
-            R30StereoPassTrace rivalTrace{};
+            const auto visualRoute = R30CaptureVisualRouteTrace();
+            R30StereoPassTrace physicalTrace{};
             const HRESULT stereoHr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
                 "R30.6/DrawPrimitiveUP-XYZRHW",
-                exactRivalReceipt ? &rivalTrace : nullptr);
+                (exactRivalReceipt || visualRoute.enabled)
+                    ? &physicalTrace : nullptr);
+            R30TraceXyzrhwVisualReceipt(
+                visualRoute, state, physicalTrace, stereoHr,
+                "DPUP", primitiveCount, vertexCount, stride);
             if (exactRivalReceipt)
             {
                 static std::atomic<std::uint64_t> rivalXyzReceipts{0};
@@ -4471,12 +4592,12 @@ namespace OutRunVRStereo
                     spdlog::info(
                         "VR RIVAL XYZRHW EYE RECEIPT: hits={} stride={} primitives={} left=0x{:08X} rightTarget=0x{:08X} rightDepth=0x{:08X} rightViewport=0x{:08X} right=0x{:08X} restore={} projected={} worldAuth={} node={} epoch={}",
                         hit, stride, primitiveCount,
-                        static_cast<unsigned>(rivalTrace.leftHr),
-                        static_cast<unsigned>(rivalTrace.rightTargetHr),
-                        static_cast<unsigned>(rivalTrace.rightDepthHr),
-                        static_cast<unsigned>(rivalTrace.rightViewportHr),
-                        static_cast<unsigned>(rivalTrace.rightHr),
-                        rivalTrace.restoreOk ? 1 : 0,
+                        static_cast<unsigned>(physicalTrace.leftHr),
+                        static_cast<unsigned>(physicalTrace.rightTargetHr),
+                        static_cast<unsigned>(physicalTrace.rightDepthHr),
+                        static_cast<unsigned>(physicalTrace.rightViewportHr),
+                        static_cast<unsigned>(physicalTrace.rightHr),
+                        physicalTrace.restoreOk ? 1 : 0,
                         state.projectedWorldMarker ? 1 : 0,
                         state.worldEvidenceAuthoritative ? 1 : 0,
                         sourceCommand.queueNode, sourceCommand.queueEpoch);
@@ -4615,9 +4736,16 @@ namespace OutRunVRStereo
                     primitiveCount, drawIndices, indexFormat,
                     scratch.right.data(), stride);
             };
-            return R30ExecuteXyzrhwStereo(
+            const auto visualRoute = R30CaptureVisualRouteTrace();
+            R30StereoPassTrace physicalTrace{};
+            const HRESULT stereoHr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.6/DrawIndexedPrimitiveUP-XYZRHW");
+                "R30.6/DrawIndexedPrimitiveUP-XYZRHW",
+                visualRoute.enabled ? &physicalTrace : nullptr);
+            R30TraceXyzrhwVisualReceipt(
+                visualRoute, state, physicalTrace, stereoHr,
+                "DIPUP", primitiveCount, vertexCount, stride);
+            return stereoHr;
         }
 
 
@@ -4708,9 +4836,15 @@ namespace OutRunVRStereo
                     device, type, primitiveCount,
                     scratch.right.data(), stride);
             };
+            const auto visualRoute = R30CaptureVisualRouteTrace();
+            R30StereoPassTrace physicalTrace{};
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.6/DrawPrimitiveVB-ShadowXYZRHW");
+                "R30.6/DrawPrimitiveVB-ShadowXYZRHW",
+                visualRoute.enabled ? &physicalTrace : nullptr);
+            R30TraceXyzrhwVisualReceipt(
+                visualRoute, state, physicalTrace, hr,
+                "DP", primitiveCount, vertexCount, stride);
 
             {
                 InternalPassScope guard;
@@ -4971,9 +5105,15 @@ namespace OutRunVRStereo
                     device, type, 0u, vertexCount, primitiveCount,
                     rebased, ibDesc.Format, scratch.right.data(), stride);
             };
+            const auto visualRoute = R30CaptureVisualRouteTrace();
+            R30StereoPassTrace physicalTrace{};
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
-                "R30.6/DrawIndexedPrimitiveVB-ShadowXYZRHW");
+                "R30.6/DrawIndexedPrimitiveVB-ShadowXYZRHW",
+                visualRoute.enabled ? &physicalTrace : nullptr);
+            R30TraceXyzrhwVisualReceipt(
+                visualRoute, state, physicalTrace, hr,
+                "DIP", primitiveCount, vertexCount, stride);
 
             {
                 InternalPassScope guard;
@@ -5951,6 +6091,7 @@ namespace OutRunVRStereo
             const bool rivalGpuProbe = Settings::VRTelemetry &&
                 OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
                     OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani;
+            const auto visualRoute = R30CaptureVisualRouteTrace();
             const bool baseAdmitted = R30SafeStereoBase(device);
             if (rivalGpuProbe)
             {
@@ -6240,7 +6381,7 @@ namespace OutRunVRStereo
                     "windowAnchorSerial={} windowAnchorSequence={} "
                     "windowAnchorObj=0x{:06X} windowAnchorOrdinal={} provenance={} "
                     "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} rt0=0x{:X} "
-                    "correlationAuthority={}",
+                    "correlationAuthority={} opaquePmtIdentity=UNVERIFIED",
                     receipt, receiptQpc.QuadPart, TopLevelDrawSerial(),
                     site ? site : "unknown", static_cast<unsigned>(screenKind),
                     OutRunVR::GameSemantic::Name(lensPhysicalScope),
@@ -6250,7 +6391,7 @@ namespace OutRunVRStereo
                     lensWindowAnchorSequence, lensWindowAnchorObject,
                     lensWindowAnchorOrdinal, lensSourceProvenance,
                     lensTexture0Ptr, lensVb0Ptr, lensIbPtr, lensRt0Ptr,
-                    lensInlineLinked ? "EXACT_INLINE_SOURCE" :
+                    lensInlineLinked ? "INLINE_CALL_STACK_PMT_UNVERIFIED" :
                         (lensDeferredCandidate ?
                             "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" :
                             "UNOWNED_PHYSICAL"));
@@ -6364,6 +6505,13 @@ namespace OutRunVRStereo
             if (lensPhysicalCandidate)
                 R30TraceLatchedStereoFull(
                     "LENS", TopLevelDrawSerial(), stereo);
+            if (visualRoute.enabled && !visualRoute.lens)
+            {
+                R30TraceLatchedStereoFull(
+                    visualRoute.family, TopLevelDrawSerial(), stereo);
+                R30TraceVisualPipelineFull(
+                    device, visualRoute.family, TopLevelDrawSerial());
+            }
 
             // If perspective world geometry already established this Present's
             // pose sequence, screen-space correction must use that exact packet.
@@ -6451,6 +6599,20 @@ namespace OutRunVRStereo
                     return E_FAIL;
                 }
                 lensTransaction.Emit("LEFT_WVP", E_NOTIMPL);
+                if (visualRoute.enabled && !visualRoute.lens)
+                    spdlog::info(
+                        "VR TRACE RESULT SCREENSPACE REJECT FULL: serial={} family={} "
+                        "site={} producer={} queued={} node=0x{:X} epoch={} "
+                        "reason=LEFT_WVP_REJECT restore={}",
+                        TopLevelDrawSerial(), visualRoute.family,
+                        site ? site : "unknown",
+                        OutRunVR::GameSemantic::Name(
+                            visualRoute.command.producer),
+                        visualRoute.command.queued ? 1 : 0,
+                        reinterpret_cast<std::uintptr_t>(
+                            visualRoute.command.queueNode),
+                        visualRoute.command.queueEpoch,
+                        restored ? 1 : 0);
                 return E_NOTIMPL;
             }
 
@@ -6488,14 +6650,15 @@ namespace OutRunVRStereo
                         "windowAnchorOrdinal={} correlationAuthority={} "
                         "leftAttempted={} leftHr=0x{:08X} restore={} "
                         "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} entryRT=0x{:X} "
-                        "qpc={} thread={} evidence=FAILED_LEFT_NATIVE_DRAW_NOT_PIXEL_PROOF",
+                        "qpc={} thread={} opaquePmtIdentity=UNVERIFIED "
+                        "evidence=FAILED_LEFT_NATIVE_DRAW_NOT_PIXEL_PROOF",
                         TopLevelDrawSerial(), stereo.poseSequence,
                         site ? site : "unknown", lensSourceSerial,
                         lensSourceSequence, lensSourceObject, lensSourceSite,
                         lensSourceOrdinal, lensInlineLinked ? 1 : 0,
                         lensWindowAnchorSerial, lensWindowAnchorSequence,
                         lensWindowAnchorObject, lensWindowAnchorOrdinal,
-                        lensInlineLinked ? "EXACT_INLINE_SOURCE" :
+                        lensInlineLinked ? "INLINE_CALL_STACK_PMT_UNVERIFIED" :
                             (lensWindowAnchorSerial != 0
                                 ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE"),
                         lensTransaction.leftDrawAttempted ? 1 : 0,
@@ -6598,6 +6761,36 @@ namespace OutRunVRStereo
             }
             lensTransaction.Emit(lensTransaction.rightStage, leftHr);
 
+            if (visualRoute.enabled && !visualRoute.lens)
+            {
+                LARGE_INTEGER resultQpc{};
+                QueryPerformanceCounter(&resultQpc);
+                spdlog::info(
+                    "VR TRACE RESULT SCREENSPACE EYES FULL: qpc={} serial={} family={} "
+                    "site={} kind={} producer={} queued={} node=0x{:X} epoch={} pose={} "
+                    "leftAttempted={} left=0x{:08X} rightAttempted={} "
+                    "right=0x{:08X} rightStage={} rightWvpAttempted={} "
+                    "rightWvpOk={} restore={} resultRoute=SHADER_C64_SCREENSPACE",
+                    resultQpc.QuadPart, TopLevelDrawSerial(),
+                    visualRoute.family, site ? site : "unknown",
+                    static_cast<unsigned>(screenKind),
+                    OutRunVR::GameSemantic::Name(
+                        visualRoute.command.producer),
+                    visualRoute.command.queued ? 1 : 0,
+                    reinterpret_cast<std::uintptr_t>(
+                        visualRoute.command.queueNode),
+                    visualRoute.command.queueEpoch, stereo.poseSequence,
+                    lensTransaction.leftDrawAttempted ? 1 : 0,
+                    static_cast<unsigned>(leftHr),
+                    lensTransaction.rightDrawAttempted ? 1 : 0,
+                    static_cast<unsigned>(rightHr),
+                    lensTransaction.rightStage
+                        ? lensTransaction.rightStage : "NONE",
+                    lensTransaction.rightWvpAttempted ? 1 : 0,
+                    lensTransaction.rightWvpOk ? 1 : 0,
+                    restoreOk ? 1 : 0);
+            }
+
             // Post-native-draw lens receipt belongs here, inside the exact
             // R30 screen-space transaction where source provenance, both eye
             // attempts and restore state are all simultaneously in scope.
@@ -6631,14 +6824,15 @@ namespace OutRunVRStereo
                         "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} entryRT=0x{:X} "
                         "leftRT=0x{:X} leftRt={}x{} leftRtFmt={} "
                         "rightRT=0x{:X} rightRt={}x{} rightRtFmt={} "
-                        "qpc={} thread={} evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
+                        "qpc={} thread={} opaquePmtIdentity=UNVERIFIED "
+                        "evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
                         physicalSample, TopLevelDrawSerial(), stereo.poseSequence,
                         site ? site : "unknown", lensSourceSerial,
                         lensSourceSequence, lensSourceObject, lensSourceSite,
                         lensSourceOrdinal, lensInlineLinked ? 1 : 0,
                         lensWindowAnchorSerial, lensWindowAnchorSequence,
                         lensWindowAnchorObject, lensWindowAnchorOrdinal,
-                        lensInlineLinked ? "EXACT_INLINE_SOURCE" :
+                        lensInlineLinked ? "INLINE_CALL_STACK_PMT_UNVERIFIED" :
                             (lensWindowAnchorSerial != 0
                                 ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE"),
                         lensTransaction.leftDrawAttempted ? 1 : 0,
@@ -6935,8 +7129,93 @@ namespace OutRunVRStereo
                         n, TopLevelDrawSerial(), site ? site : "unknown",
                         OutRunVR::GameSemantic::Name(lensFallbackScope));
             }
+            const auto lowerVisual = R30CaptureVisualRouteTrace();
+            std::uintptr_t lowerTex0Ptr = 0;
+            std::uintptr_t lowerRt0Ptr = 0;
+            if (lowerVisual.enabled && device)
+            {
+                IDirect3DBaseTexture9* texture0 = nullptr;
+                if (SUCCEEDED(device->GetTexture(0, &texture0)) && texture0)
+                {
+                    lowerTex0Ptr =
+                        reinterpret_cast<std::uintptr_t>(texture0);
+                    texture0->Release();
+                }
+                IDirect3DSurface9* rt0 = nullptr;
+                if (SUCCEEDED(device->GetRenderTarget(0, &rt0)) && rt0)
+                {
+                    lowerRt0Ptr =
+                        reinterpret_cast<std::uintptr_t>(rt0);
+                    rt0->Release();
+                }
+            }
             ++R30ScreenSpaceFallbacks;
-            return r29Draw();
+            const HRESULT lowerHr = r29Draw();
+            if (lowerVisual.enabled)
+            {
+                const bool inlineLinked =
+                    lowerVisual.lensInline.sourceSerial != 0;
+                const bool deferredCandidate =
+                    !inlineLinked &&
+                    lowerVisual.lensDeferred.sourceSerial != 0;
+                LARGE_INTEGER lowerQpc{};
+                QueryPerformanceCounter(&lowerQpc);
+                spdlog::info(
+                    "VR TRACE VISUAL LOWER PHYSICAL RESULT FULL: qpc={} serial={} "
+                    "family={} site={} producer={} scope={} queued={} node=0x{:X} "
+                    "epoch={} hr=0x{:08X} tex0=0x{:X} rt0=0x{:X} "
+                    "sourceCallSerial={} sequence={} sourceObj=0x{:06X} "
+                    "sourceSite={} ordinal={} windowAnchorSerial={} "
+                    "windowAnchorSequence={} windowAnchorObj=0x{:06X} "
+                    "windowAnchorOrdinal={} sourceAuthority={} "
+                    "opaquePmtIdentity={} resultRoute=R29_FALLBACK",
+                    lowerQpc.QuadPart, TopLevelDrawSerial(),
+                    lowerVisual.family, site ? site : "unknown",
+                    OutRunVR::GameSemantic::Name(
+                        lowerVisual.command.producer),
+                    OutRunVR::GameSemantic::Name(
+                        lowerVisual.command.scope),
+                    lowerVisual.command.queued ? 1 : 0,
+                    reinterpret_cast<std::uintptr_t>(
+                        lowerVisual.command.queueNode),
+                    lowerVisual.command.queueEpoch,
+                    static_cast<unsigned>(lowerHr),
+                    lowerTex0Ptr, lowerRt0Ptr,
+                    inlineLinked
+                        ? lowerVisual.lensInline.sourceSerial : 0,
+                    inlineLinked
+                        ? lowerVisual.lensInline.lastC993Sequence
+                        : (deferredCandidate
+                            ? lowerVisual.lensDeferred.sequence : 0),
+                    inlineLinked
+                        ? lowerVisual.lensInline.objectId
+                        : (deferredCandidate
+                            ? lowerVisual.lensDeferred.objectId : 0),
+                    inlineLinked
+                        ? static_cast<unsigned>(
+                            lowerVisual.lensInline.callsite) : 0,
+                    inlineLinked
+                        ? static_cast<unsigned>(
+                            lowerVisual.lensInline.ordinal) : 0,
+                    deferredCandidate
+                        ? lowerVisual.lensDeferred.sourceSerial : 0,
+                    deferredCandidate
+                        ? lowerVisual.lensDeferred.sequence : 0,
+                    deferredCandidate
+                        ? lowerVisual.lensDeferred.objectId : 0,
+                    deferredCandidate
+                        ? static_cast<unsigned>(
+                            lowerVisual.lensDeferred.ordinal) : 0,
+                    lowerVisual.lens
+                        ? (inlineLinked
+                            ? "INLINE_CALL_STACK_ONLY"
+                            : (deferredCandidate
+                                ? "DEFERRED_WINDOW_CANDIDATE"
+                                : "UNOWNED_PHYSICAL"))
+                        : "EXACT_RESULT_PRODUCER",
+                    lowerVisual.lens ? "UNVERIFIED" : "NOT_APPLICABLE");
+            }
+            return lowerHr;
         }
 
         // Share the existing R62 projection/restore transaction across native
