@@ -119,15 +119,23 @@ struct NativeRawPresentDirtyRegion {
      const NativeRawPresentDirtyRegion& dirty,
      std::uint32_t sourceWidth, std::uint32_t sourceHeight,
      NativeRawPresentTile& placed,
-     const NativeRawPresentTile* exclude = nullptr) noexcept {
+     const NativeRawPresentTile* exclude = nullptr,
+     bool allowCompactRaw = false) noexcept {
      placed = {};
+     // Preserve legacy 40px minimum for every historical source proof.
+     // Compact opt-in is connected solely from the matching native GPU
+     // source-size path; dirty union coverage remains a strict requirement.
+     const bool compact = allowCompactRaw &&
+         (sourceWidth < 256u || sourceHeight < 144u);
+     const std::int64_t minSpan = compact ? 24 : 40;
      // Only an authenticated first image may reserve painted D3D9 pixels.
      if (exclude && !native_raw_dirty_region_covers_tile(
              backWidth, backHeight, dirty, *exclude)) return false;
      NativeRawPresentTile ordinary{};
      if (!native_raw_partial_present_tile(
              backWidth, backHeight, cropLeft, cropTop,
-             cropRight, cropBottom, sourceWidth, sourceHeight, ordinary))
+             cropRight, cropBottom, sourceWidth, sourceHeight, ordinary,
+             compact))
          return false;
      if ((!exclude || native_raw_disjoint_equal_tiles(ordinary, *exclude)) &&
          native_raw_dirty_region_covers_tile(
@@ -152,7 +160,7 @@ struct NativeRawPresentDirtyRegion {
          NativeRawPresentTile candidate{};
          if (!native_raw_partial_present_tile(
                  backWidth, backHeight, left, top, right, bottom,
-                 sourceWidth, sourceHeight, candidate))
+                 sourceWidth, sourceHeight, candidate, compact))
              return;
          const auto area = std::uint64_t{candidate.copyWidth} *
                            candidate.copyHeight;
@@ -251,7 +259,7 @@ struct NativeRawPresentDirtyRegion {
              const auto bottom = (std::min)(
                  cropBottom, dirty.rectangles[bottomIndex].bottom);
              // Even a tight source-painted crop needs 24 true unscaled pixels.
-             if (bottom - top < 24) continue;
+             if (bottom - top < minSpan) continue;
              bool duplicateBottom = false;
              for (std::uint32_t i = 0u; i < bottomIndex; ++i)
                  if ((std::min)(cropBottom, dirty.rectangles[i].bottom) == bottom)
@@ -307,7 +315,7 @@ struct NativeRawPresentDirtyRegion {
              const auto right = (std::min)(
                  cropRight, dirty.rectangles[rightIndex].right);
              // The native source crop still needs 24 true unscaled pixels.
-             if (right - left < 24) continue;
+             if (right - left < minSpan) continue;
              bool duplicateRight = false;
              for (std::uint32_t i = 0u; i < rightIndex; ++i)
                  if ((std::min)(cropRight, dirty.rectangles[i].right) == right)
@@ -363,7 +371,7 @@ struct NativeRawPresentDirtyRegion {
                  cropRight, dirty.rectangles[end].right);
              const auto bottom = (std::min)(
                  cropBottom, dirty.rectangles[end].bottom);
-             if (right - left < 24 || bottom - top < 24) continue;
+             if (right - left < minSpan || bottom - top < minSpan) continue;
              consider(left, top, right, bottom);
          }
      }

@@ -18,7 +18,7 @@ constexpr bool valid_raw_partial_present() {
         return false;
     // The 30x30 source repaint carries an authentic unscaled 24x24 tile.
     if (!native_raw_partial_present_tile(
-            1920,1080,700,300,730,330,96,64,p) ||
+            1920,1080,700,300,730,330,96,64,p,true) ||
         p.copyWidth!=24u || p.copyHeight!=24u ||
         p.sourceX!=36u || p.sourceY!=20u ||
         p.destinationX!=703 || p.destinationY!=303)

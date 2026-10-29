@@ -148,7 +148,7 @@ int main() {
     NativeRawPresentTile tight{}, gpuCrop{};
     assert(native_raw_dirty_region_place_tile(
         1920, 1080, 0, 0, 1920, 1080, narrow,
-        compactW, compactH, tight));
+        compactW, compactH, tight, nullptr, true));
     assert(tight.copyWidth == 24u && tight.copyHeight == 24u);
     assert(native_raw_dirty_region_covers_tile(1920, 1080, narrow, tight));
     assert(changedWindow.select(tight, gpuCrop, realPixels));
@@ -158,7 +158,7 @@ int main() {
     narrow.rectangles[1].top = 136;
     assert(!native_raw_dirty_region_place_tile(
         1920, 1080, 0, 0, 1920, 1080, narrow,
-        compactW, compactH, tight));
+        compactW, compactH, tight, nullptr, true));
     assert(compactSelected.sourceX <= 94u &&
            compactSelected.sourceX + compactSelected.copyWidth > 94u);
     assert(compactSelected.sourceY <= 60u &&

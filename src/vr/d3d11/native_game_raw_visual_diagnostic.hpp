@@ -119,10 +119,14 @@ public:
             b > static_cast<LONG>(back.Height) ||
             l >= r || t >= b)
             return NativeRawPreviewResult::UnsafePresent;
+        // Only the actual smaller game-created D3D11 GPU color target
+        // opts into tight 24px original D3D9 dirty-rectangle admission.
+        // Normal 256x144 RAW retains the proven 8px margin and regressions.
+        const bool compactRaw = width < 256u || height < 144u;
         NativeRawPresentTile visibleTile{};
         if (!native_raw_partial_present_tile(
                 back.Width, back.Height, l, t, r, b,
-                width, height, visibleTile))
+                width, height, visibleTile, compactRaw))
             return NativeRawPreviewResult::UnsafePresent;
         // Partial D3D9 dirty Presents frequently omit the normal top-right
         // diagnostic destination. Retarget the visible RAW GPU tile INSIDE
@@ -132,7 +136,8 @@ public:
             NativeRawPresentTile dirtyPlaced{};
             if (!native_raw_dirty_region_place_tile(
                     back.Width, back.Height, l, t, r, b,
-                    *sourceDirty, width, height, dirtyPlaced))
+                    *sourceDirty, width, height, dirtyPlaced,
+                    nullptr, compactRaw))
                 return NativeRawPreviewResult::UnsafePresent;
             visibleTile = dirtyPlaced;
         }
@@ -274,7 +279,7 @@ public:
                         canShowBoth = native_raw_dirty_region_place_tile(
                             back.Width, back.Height, l, t, r, b, *sourceDirty,
                             originalTile.copyWidth, originalTile.copyHeight,
-                            secondaryPlacement, &originalTile);
+                            secondaryPlacement, &originalTile, compactRaw);
                     }
                 }
                 if (canShowBoth) {

@@ -14,12 +14,20 @@ struct NativeRawPresentTile {
     std::int64_t left, std::int64_t top,
     std::int64_t right, std::int64_t bottom,
     std::uint32_t tileWidth, std::uint32_t tileHeight,
-    NativeRawPresentTile& out) noexcept {
+    NativeRawPresentTile& out,
+    bool allowCompactRaw = false) noexcept {
     out = {};
     // Tight original D3D9 menu/car dirty crops can be 24..39 pixels.
     // Keep the unscaled GPU source and shrink only the label margin.
     constexpr std::int64_t kMargin = 8;
     constexpr std::uint32_t kMinPixels = 24;
+    // Existing regular RAW 256x144 diagnostic windows retain the original
+    // 40px minimum. Only explicit genuine SMALL GPU target paths may relax
+    // the margin, without weakening legacy dirty Present admission.
+    const bool compact = allowCompactRaw &&
+        (tileWidth < 256u || tileHeight < 144u);
+    const auto minSpan = static_cast<std::int64_t>(
+        kMinPixels + (compact ? 0u : 2u * static_cast<std::uint32_t>(kMargin)));
     constexpr auto kMaxLong =
         static_cast<std::uint32_t>((std::numeric_limits<std::int32_t>::max)());
     if (!backWidth || !backHeight || backWidth > kMaxLong ||
@@ -27,14 +35,14 @@ struct NativeRawPresentTile {
         tileHeight < kMinPixels || left < 0 || top < 0 ||
         left >= right || top >= bottom ||
         right > backWidth || bottom > backHeight ||
-        right - left < kMinPixels || bottom - top < kMinPixels)
+        right - left < minSpan || bottom - top < minSpan)
         return false;
     // A 24px repaint permits zero destination margin; a >=40px repaint
     // retains the original 8px experimental frame. No pixel is scaled.
-    const auto marginX = (std::min)(kMargin,
-        (right - left - kMinPixels) / 2);
-    const auto marginY = (std::min)(kMargin,
-        (bottom - top - kMinPixels) / 2);
+    const auto marginX = compact ? (std::min)(kMargin,
+        (right - left - kMinPixels) / 2) : kMargin;
+    const auto marginY = compact ? (std::min)(kMargin,
+        (bottom - top - kMinPixels) / 2) : kMargin;
     const auto width = static_cast<std::uint32_t>((std::min)(
         std::int64_t{tileWidth}, right - left - 2 * marginX));
     const auto height = static_cast<std::uint32_t>((std::min)(
