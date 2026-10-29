@@ -25,8 +25,13 @@ int main() {
     assert(!admitted(true, true, 1u, 0u, 0u, 0.f, 1.f, -0.1f));
     const float nan=(std::numeric_limits<float>::quiet_NaN)();
     const float inf=(std::numeric_limits<float>::infinity)();
-    assert(!admitted(true, true, 1u, 0u, 0u, nan, 1.f, 0.5f));
-    assert(!admitted(true, true, 1u, 0u, 0u, 0.f, inf, 0.5f));
+    // EXP reads density only; stale unused START/END are immaterial.
+    // This is the source-authentic 01154 equation consumed by new FVF PS.
+    assert(admitted(true, true, 1u, 0u, 0u, nan, 1.f, 0.5f));
+    assert(admitted(true, true, 1u, 0u, 0u, 0.f, inf, 0.5f));
+    // LINEAR still consumes both endpoints: no unsafe native admission.
+    assert(!admitted(true, true, 3u, 0u, 0u, nan, 1.f, 0.5f));
+    assert(!admitted(true, true, 3u, 0u, 0u, 0.f, inf, 0.5f));
     assert(!admitted(true, true, 1u, 0u, 0u, 0.f, 1.f, inf));
     return 0;
 }
