@@ -9,6 +9,7 @@ root = Path(__file__).resolve().parents[1]
 bridge = (root / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 backend = (root / "src/vr/d3d11/native_backend.cpp").read_text()
 header = (root / "src/vr/d3d11/live_game_sm3_table_fog.hpp").read_text()
+fvf_header = (root / "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp").read_text()
 source = bridge.partition("bool submit_live_sm3_game_draw(")[2].partition(
     "// Reuse geometric growth buffers")[0]
 
@@ -59,6 +60,24 @@ require("sourceInertExponential = native_sm3_inert_exponential_table_fog(" in br
         "source FVF inert EXP and raw vertex fog parameter transport missing")
 require("native_game_inert_fog_modes(tableMode, vertexMode)" in header,
         "shared programmable and FVF source equation classification absent")
+# FVF and SM3 RAW must use exactly the same source equation precedence.
+# The FVF bridge reads only consumed original D3D9 DWORDs; a failed required
+# getter still prevents native submission and preserves game/DX9Ex fallback.
+fvf_gate = bridge.partition("const DWORD sourceFogEquation =")[2].partition(
+    "output.rawFogVisualMismatch =")[0]
+require(bool(fvf_gate) and
+        "sourceTableFog != D3DFOG_NONE" in fvf_gate and
+        "native_sm3_table_fog_requires_linear_bounds(sourceFogEquation)" in fvf_gate and
+        "native_sm3_table_fog_requires_density(sourceFogEquation)" in fvf_gate and
+        "GetRenderState(D3DRS_FOGSTART, &startBits)" in fvf_gate and
+        "GetRenderState(D3DRS_FOGEND, &endBits)" in fvf_gate and
+        "GetRenderState(D3DRS_FOGDENSITY, &densityBits)" in fvf_gate and
+        "SUCCEEDED(game->GetDeviceCaps(&actualCaps))" in fvf_gate,
+        "FVF RAW real-source equation-specific COM reads not wired")
+require("native_sm3_raw_visual_fog_omission(" in fvf_header and
+        '#include "live_game_sm3_table_fog.hpp"' in fvf_header and
+        "rangeFog != 1u" in fvf_header,
+        "FVF/SM3 shared active table fog semantics or range safety missing")
 for token in ("LIVE_SM3_FOG_REJECT", "liveSm3FogRejectReasons",
               "NativeSm3FogReject::SourceQuery",
               "D3DRS_RANGEFOGENABLE", "sourceOrdinal"):

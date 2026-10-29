@@ -2672,13 +2672,22 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         DWORD sourceRangeFog = 0xffffffffu, sourceFogColor = 0u;
         DWORD startBits = 0u, endBits = 0u, densityBits = 0u;
         D3DCAPS9 actualCaps{};
+        // D3D9 table fog overrides inherited vertex fog. An isolated RAW
+        // preview intentionally omits fog, but must still read every real
+        // register consumed by the active source equation. Do not reject a
+        // valid game FVF Draw because an UNCONSUMED legacy float getter fails
+        // (or returns NaN); never substitute a guessed consumed value.
+        const DWORD sourceFogEquation = sourceTableFog != D3DFOG_NONE
+            ? sourceTableFog : sourceVertexFog;
         const bool sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&
             fogModesKnown &&
             SUCCEEDED(game->GetRenderState(D3DRS_RANGEFOGENABLE, &sourceRangeFog)) &&
             SUCCEEDED(game->GetRenderState(D3DRS_FOGCOLOR, &sourceFogColor)) &&
-            SUCCEEDED(game->GetRenderState(D3DRS_FOGSTART, &startBits)) &&
-            SUCCEEDED(game->GetRenderState(D3DRS_FOGEND, &endBits)) &&
-            SUCCEEDED(game->GetRenderState(D3DRS_FOGDENSITY, &densityBits)) &&
+            (!native_sm3_table_fog_requires_linear_bounds(sourceFogEquation) ||
+             (SUCCEEDED(game->GetRenderState(D3DRS_FOGSTART, &startBits)) &&
+              SUCCEEDED(game->GetRenderState(D3DRS_FOGEND, &endBits)))) &&
+            (!native_sm3_table_fog_requires_density(sourceFogEquation) ||
+             SUCCEEDED(game->GetRenderState(D3DRS_FOGDENSITY, &densityBits))) &&
             SUCCEEDED(game->GetDeviceCaps(&actualCaps));
         float start=0.0f, end=0.0f, density=0.0f;
         if (sourceKnown) {

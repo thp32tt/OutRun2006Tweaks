@@ -1,4 +1,5 @@
 #include "live_game_sm3_table_fog.hpp"
+#include "native_game_raw_fvf_fog_visual.hpp"
 #include <cassert>
 #include <cmath>
 #include <string>
@@ -178,6 +179,36 @@ int main() {
         true, true, 0u, 1u, 0.f, 1.f, std::nanf("")));
     assert(!native_sm3_raw_visual_fog_omission(
         true, true, 4u, 0u, 0.f, 1.f, 0.25f));
+    // Source-matched FVF RAW GPU preview: the table equation overrides
+    // inherited vertex mode. An unused live register can be NaN or its COM
+    // getter can be intentionally skipped, without inventing source pixels.
+    // The RAW tile remains incomplete and never marks full-frame parity.
+    assert(native_raw_fvf_fog_visual_admission(
+        true, true, 1u, 3u, 1u, std::nanf(""), std::nanf(""), 0.25f));
+    assert(native_raw_fvf_fog_visual_admission(
+        true, true, 2u, 3u, 0u, std::nanf(""), std::nanf(""), 0.25f));
+    assert(native_raw_fvf_fog_visual_admission(
+        true, true, 3u, 2u, 0u, 0.2f, 0.8f, std::nanf("")));
+    assert(native_raw_fvf_fog_visual_admission(
+        true, true, 0u, 3u, 1u, 0.2f, 0.8f, std::nanf("")));
+    assert(native_raw_fvf_fog_visual_admission(
+        true, true, 0u, 2u, 0u, std::nanf(""), std::nanf(""), 0.5f));
+    assert(!native_raw_fvf_fog_visual_admission(
+        false, true, 1u, 0u, 0u, 0.f, 1.f, 0.1f));
+    assert(!native_raw_fvf_fog_visual_admission(
+        true, false, 1u, 0u, 0u, 0.f, 1.f, 0.1f));
+    assert(!native_raw_fvf_fog_visual_admission(
+        true, true, 1u, 0u, 3u, 0.f, 1.f, 0.1f));
+    assert(!native_raw_fvf_fog_visual_admission(
+        true, true, 0u, 0u, 0u, 0.f, 1.f, 0.1f));
+    assert(!native_raw_fvf_fog_visual_admission(
+        true, true, 4u, 0u, 0u, 0.f, 1.f, 0.1f));
+    assert(!native_raw_fvf_fog_visual_admission(
+        true, true, 3u, 1u, 0u, 0.9f, 0.2f, std::nanf("")));
+    assert(!native_raw_fvf_fog_visual_admission(
+        true, true, 2u, 0u, 0u, std::nanf(""), std::nanf(""), std::nanf("")));
+    assert(!native_raw_fvf_fog_visual_admission(
+        true, true, 1u, 0u, 0u, 0.f, 1.f, -0.25f));
     // Source FOGENABLE=TRUE with no active TABLE or VERTEX equation is
     // pixel-equivalent to no fog, even if RANGEFOG/sRGB/caps are inherited.
     // This is NOT permission to ignore an active vertex or W table fog.
