@@ -35,12 +35,12 @@ require(source.index("native_sm3_table_zfog_admission(") <
 for token in ("append_native_sm3_table_zfog(pixelHlsl, tableZFog)",
               "append_native_sm3_alpha_test(pixelHlsl, alphaCompare)"):
     require(token in backend, "native HLSL compile stage disconnected: " + token)
-# FVF active fog remains rejected in production. The only alternative
-# requires real D3D9 source getters + explicit RAW opt-in + bounded floats,
-# then poisons complete-frame publication after the authentic native Draw.
+# Authenticated table Z/W fog may reach exact native FVF RGB; other active
+# vertex/range/sRGB fog admits only source-read RAW opt-in, which poisons
+# full-frame publication after the authentic native Draw.
 for token in ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
               "D3DRS_FOGTABLEMODE", "D3DRS_FOGVERTEXMODE",
-              "sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&",
+              "sourceKnown = fog == TRUE && fogModesKnown &&",
               "native_raw_fvf_fog_visual_admission(",
               "if (!output.rawFogVisualMismatch) return false;",
               "if (output.rawFogVisualMismatch && s.issued > issuedBeforeFvf)",
