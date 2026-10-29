@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01161",
+  "production_id": "CONVERSION-DX11-01161",
+  "event_id": "CONVERSION-DX11-01161-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_work_key": "DX11:RAW_DRAW_GPU_SOURCE_DISJOINT_PAIR",
+  "classification": "A_SOURCE_IMPLEMENTATION_IN_UNFINISHED_FEATURE_WITH_B_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "3c9b24d7052a0a486165dd2c42555199a333cbe3",
+  "implementation_source_sha": "f5b30faade843a9743eff3dea74309f2bd073f98",
+  "first_causal_test_repair_sha": "0439ba03c83ffdac70715198eba8436cd3d9691c",
+  "validation_bearing_result_sha": "d90348a00f41877c51da2db79dfbe7024c59f16e",
+  "material_result_sha": "d90348a00f41877c51da2db79dfbe7024c59f16e",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/vr-openxr.yml",
+    ".github/workflows/outrun-exe-hud-inspector.yml"
+  ],
+  "implementation": "Native RAW D3D11 GPU paired BEFORE/AFTER source-copy region selection now requires physically disjoint source tile rectangles. Search up to five original game viewport/scissor source-authentic anchors; recover valid two-tile 512x144 source raster and disallow falsely independent overlapping menu/HUD samples. D3D11 CopySubresourceRegion integration re-checks non-overlap. C++ regression positive/negative tests preserve native pixel provenance. No complete frame or OpenXR visible runtime claim.",
+  "ci_repair": "First source commit f5b30fa Fast failed due new single-tile negative fixture changing hasSecond ahead of existing positive assertion; same-task order repair 0439ba03. The test-only SHA omitted three mandatory Gate path filters, so final d90348a0 adds the exact C++ regression and workflow self-path to Fast/OpenXR/HUD trigger filters without weakening gates.",
+  "evidence": {
+    "required_push_workflows_result": "5/5 completed success on same exact validation-bearing result SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40893433076,
+        "head_sha": "d90348a00f41877c51da2db79dfbe7024c59f16e",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40893433135,
+        "head_sha": "d90348a00f41877c51da2db79dfbe7024c59f16e",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40893433116,
+        "head_sha": "d90348a00f41877c51da2db79dfbe7024c59f16e",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40893432997,
+        "head_sha": "d90348a00f41877c51da2db79dfbe7024c59f16e",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40893433164,
+        "head_sha": "d90348a00f41877c51da2db79dfbe7024c59f16e",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "additional_native_transport_warp": {
+      "run_id": 40893433030,
+      "head_sha": "d90348a00f41877c51da2db79dfbe7024c59f16e",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "conditional_vr_pc_fast_build": "skipped; not part of five mandatory Gates",
+    "runtime_evidence": "No exact-source real OutRun 2006 GPU desktop native_draws, publishedBackbufferFrames or menu/vehicle/race screenshot observed; no Quest3/VDXR session. Historical old-SHA zero Draw not projected forward.",
+    "validation_layer": "BUILD_VERIFIED_NOT_GAMEPLAY_OR_HMD",
+    "score": "AI2 prior confirmed GitHub SSOT 2173 + same-unfinished-feature diagnostic capture repair 0 = 2173; no independent feature credit. AI1 separate."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_LATEST_REMOTE_HEAD_AND_AGENTS",
+    "C1_REVIEW": "PASS_ACTUAL_RAW_GPU_PAIR_OVERLAP_AND_NARROW_RASTER_MISS",
+    "C2_IMPLEMENT": "PASS_REAL_CPLUSPLUS_SOURCE_AND_POSITIVE_NEGATIVE_REGRESSION",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_EXACT_SHA_PUSH_GATES",
+    "C4_COMMIT": "PASS_IMPLEMENTATION_AND_SAME_TASK_CAUSAL_CI_FIXES",
+    "C5_PACKAGE": "BUILD_VERIFIED_NEED_GAMEPLAY_HMD_TEST",
+    "C6_STATE": "PASS_DOCS_ONLY_POST_GATE_RECORDED_SEPARATELY"
+  },
+  "next_unfinished": "Run separately labeled opt-in RAW source-matched real D3D11 game pixel desktop trial: native_draws >0 and native_gpu_pixel_output >0 in same launch, then full menu->vehicle->race source draw coverage and OpenXR L/R HMD validation. Original D3D9 input/FFB and DXVK freeze unaffected."
+}
