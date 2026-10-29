@@ -24,6 +24,79 @@
 #include "native_game_raw_gpu_wait.hpp"
 
 namespace outrun::vr::dx11 {
+// Keep genuine GPU RAW pixel locations SOURCE-COINCIDENT with a game
+// backbuffer when both targets share the identical physical pixel grid.
+// This guarded opt-in diagnostic never certifies a complete game frame.
+[[nodiscard]] constexpr bool native_raw_source_aligned_present_tile(
+    const NativeRawPresentTile& sampled, std::uint32_t sourceOriginX,
+    std::uint32_t sourceOriginY, std::uint32_t sourceTargetWidth,
+    std::uint32_t sourceTargetHeight, std::uint32_t backWidth,
+    std::uint32_t backHeight, std::int64_t cropLeft, std::int64_t cropTop,
+    std::int64_t cropRight, std::int64_t cropBottom,
+    const NativeRawPresentDirtyRegion* dirty, bool fullCropRepaint,
+    NativeRawPresentTile& aligned) noexcept {
+    aligned = {};
+    if (!sourceTargetWidth || !sourceTargetHeight ||
+        sourceTargetWidth != backWidth || sourceTargetHeight != backHeight ||
+        !sampled.copyWidth || !sampled.copyHeight ||
+        sampled.sourceX > sourceTargetWidth ||
+        sampled.sourceY > sourceTargetHeight ||
+        sourceOriginX > sourceTargetWidth - sampled.sourceX ||
+        sourceOriginY > sourceTargetHeight - sampled.sourceY)
+        return false;
+    const auto x = std::uint64_t{sourceOriginX} + sampled.sourceX;
+    const auto y = std::uint64_t{sourceOriginY} + sampled.sourceY;
+    const auto r = x + sampled.copyWidth, b = y + sampled.copyHeight;
+    if (cropLeft < 0 || cropTop < 0 || cropLeft >= cropRight ||
+        cropTop >= cropBottom || cropRight > backWidth ||
+        cropBottom > backHeight ||
+        x < static_cast<std::uint64_t>(cropLeft) ||
+        y < static_cast<std::uint64_t>(cropTop) ||
+        r > static_cast<std::uint64_t>(cropRight) ||
+        b > static_cast<std::uint64_t>(cropBottom))
+        return false;
+    aligned = sampled;
+    aligned.destinationX = static_cast<std::int64_t>(x);
+    aligned.destinationY = static_cast<std::int64_t>(y);
+    if (!fullCropRepaint &&
+        (!dirty || !native_raw_dirty_region_covers_tile(
+             backWidth, backHeight, *dirty, aligned))) {
+        aligned = {};
+        return false;
+    }
+    return true;
+}
+// Source-coordinate, split-dirty and unsafe-target compile-time regressions.
+static_assert([]() constexpr {
+    NativeRawPresentTile tile{5u, 6u, 64u, 48u, 0, 0}, out{};
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true;
+    dirty.count = 2u;
+    dirty.rectangles[0] = {325, 206, 389, 230};
+    dirty.rectangles[1] = {325, 230, 389, 254};
+    dirty.boundLeft = 325; dirty.boundTop = 206;
+    dirty.boundRight = 389; dirty.boundBottom = 254;
+    const bool sourceMapped = native_raw_source_aligned_present_tile(
+        tile, 320u, 200u, 1920u, 1080u, 1920u, 1080u,
+        0, 0, 1920, 1080, &dirty, false, out);
+    if (!sourceMapped || out.destinationX != 325 ||
+        out.destinationY != 206 || out.sourceX != 5u) return false;
+    if (native_raw_source_aligned_present_tile(
+            tile, 320u, 200u, 1280u, 720u, 1920u, 1080u,
+            0, 0, 1920, 1080, &dirty, false, out)) return false;
+    if (native_raw_source_aligned_present_tile(
+            tile, 320u, 200u, 1920u, 1080u, 1920u, 1080u,
+            330, 0, 1920, 1080, &dirty, false, out)) return false;
+    dirty.rectangles[1].top = 231;
+    if (native_raw_source_aligned_present_tile(
+            tile, 320u, 200u, 1920u, 1080u, 1920u, 1080u,
+            0, 0, 1920, 1080, &dirty, false, out)) return false;
+    if (native_raw_source_aligned_present_tile(
+            tile, 1919u, 200u, 1920u, 1080u, 1920u, 1080u,
+            0, 0, 1920, 1080, nullptr, true, out)) return false;
+    return true;
+}(), "RAW source-aligned game Present requires exact pixel provenance");
+
 enum class NativeRawPreviewResult {
     NoDraw, CopyQueued, GpuPending, VisibleGpuPixels, NoChangedPixels,
     UnsafePresent, InvalidNativeColor, GpuFailure, UploadFailure,
@@ -41,6 +114,7 @@ public:
         alternateActive_ = false;
         captureFormat_ = DXGI_FORMAT_UNKNOWN;
         captureWidth_ = width; captureHeight_ = height;
+        captureTargetWidth_ = captureTargetHeight_ = 0u;
         sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; quarantined_ = false; lastDraws_ = 0;
@@ -285,6 +359,43 @@ public:
                 if (canShowBoth) {
                     secondTile.destinationX = secondaryPlacement.destinationX;
                     secondTile.destinationY = secondaryPlacement.destinationY;
+                }
+                // Preserve the real source screen position when a canonical
+                // D3D9 game backbuffer has an identically sized DX11 target.
+                // Both source regions and ALL original dirty pixels must be
+                // authenticated independently; otherwise use legacy insets.
+                if (captureTargetWidth_ == back.Width &&
+                    captureTargetHeight_ == back.Height) {
+                    Microsoft::WRL::ComPtr<IDirect3DSurface9> gameTarget;
+                    if (SUCCEEDED(game->GetRenderTarget(
+                            0u, gameTarget.GetAddressOf())) &&
+                        gameTarget.Get() == backbuffer) {
+                        NativeRawPresentTile alignedFirst{}, alignedSecond{};
+                        const bool haveFirst = firstPixels &&
+                            native_raw_source_aligned_present_tile(
+                                firstTile, region_.left, region_.top,
+                                captureTargetWidth_, captureTargetHeight_,
+                                back.Width, back.Height, l, t, r, b,
+                                sourceDirty, sourceCropRepaintVerified,
+                                alignedFirst);
+                        const bool haveSecond = alternateActive_ && secondPixels &&
+                            native_raw_source_aligned_present_tile(
+                                secondTile, regionAlternate_.left,
+                                regionAlternate_.top, captureTargetWidth_,
+                                captureTargetHeight_, back.Width, back.Height,
+                                l, t, r, b, sourceDirty,
+                                sourceCropRepaintVerified, alignedSecond);
+                        if (haveFirst && haveSecond &&
+                            native_raw_disjoint_equal_tiles(
+                                alignedFirst, alignedSecond)) {
+                            firstTile = alignedFirst;
+                            secondTile = alignedSecond;
+                            canShowBoth = true;
+                        } else if (!canShowBoth) {
+                            if (haveFirst) firstTile = alignedFirst;
+                            if (haveSecond) secondTile = alignedSecond;
+                        }
+                    }
                 }
                 // Use original D3D9 dirty geometry rather than a broad rcBound
                 // as visibility evidence. Menu and vehicle Presents can dirty
@@ -643,6 +754,8 @@ private:
             captureFormat_ = stagedFormat;
             captureWidth_ = width; captureHeight_ = height;
         }
+        captureTargetWidth_ = src.Width;
+        captureTargetHeight_ = src.Height;
         sourceByteOrder_ = rgba ? NativeRawColorByteOrder::Rgba
                                 : NativeRawColorByteOrder::Bgra;
         if (!staging_ || !baseline_) {
@@ -737,6 +850,7 @@ private:
     bool alternateActive_ = false;
     DXGI_FORMAT captureFormat_ = DXGI_FORMAT_UNKNOWN;
     UINT captureWidth_ = width, captureHeight_ = height;
+    UINT captureTargetWidth_ = 0u, captureTargetHeight_ = 0u;
     NativeRawColorByteOrder sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
