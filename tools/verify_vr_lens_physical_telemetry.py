@@ -71,7 +71,12 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
     assert "VR TRACE VISUAL LOWER PHYSICAL RESULT FULL:" in lower
     assert "opaquePmtIdentity={}" in lower
     assert "INLINE_CALL_STACK_PMT_UNVERIFIED" in body
-    assert "opaquePmtIdentity=UNVERIFIED" in body
+    # Generic SceneEffect/source-window traffic remains candidate-only. The
+    # exact-retail PMT claim is legal only when the 405890->404700 TLS entry
+    # receipt is live; a broad lens scope alone must never create that claim.
+    assert "EXACT_RETAIL_405890_404700_PMT_ENTRY" in body
+    assert body.count("visualRoute.lensPmt.serial != 0") >= 3
+    assert '"UNVERIFIED"' in body
 
     for phrase in (
         "VR LENS CAMERA SYNC:",
@@ -214,6 +219,8 @@ def main() -> None:
         (2, "ArmLensDeferredPhysical(", "/* removed deferred bridge */"),
         (0, "rawWvpHash=0x{:016X}", "rawWvpHash=OMITTED"),
         (0, "sameRT={}", "sameRT=ASSUMED_ZERO"),
+        (0, "visualRoute.lensPmt.serial != 0",
+            "true /* unsafe generic lens promoted to exact PMT */"),
         (3, "if (ExactLensCentreDrawOwnsSemantic())",
             "if (CurrentLensDeferredPhysical.sourceSerial != 0) return RenderScope::ProjectedScreenEffect2D;\n        if (ExactLensCentreDrawOwnsSemantic())"),
     ]
@@ -229,6 +236,7 @@ def main() -> None:
             "lensInlineLinked ? 1 : 0",
             "INLINE_CALL_STACK_PMT_UNVERIFIED",
             "DEFERRED_WINDOW_CANDIDATE",
+            "visualRoute.lensPmt.serial != 0",
         ):
             mutated[idx] = mutated[idx].replace(old, new)
         else:
