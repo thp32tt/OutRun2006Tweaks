@@ -22,6 +22,7 @@
 #include "native_game_raw_present_coverage.hpp"
 #include "native_game_raw_changed_pixel_window.hpp"
 #include "native_game_raw_gpu_wait.hpp"
+#include "native_game_raw_source_target_identity.hpp"
 
 namespace outrun::vr::dx11 {
 // Keep genuine GPU RAW pixel locations SOURCE-COINCIDENT with a game
@@ -109,6 +110,8 @@ public:
         staging_.Reset(); baseline_.Reset();
         stagingAlternate_.Reset(); baselineAlternate_.Reset();
         surfaceAlternate_.Reset();
+        sourceGameTarget_.Reset();
+        sourceAlignedPixelsThisPresent_ = 0u;
         event_.Reset(); surface_.Reset();
         drawPair_.reset(); region_ = {}; regionAlternate_ = {};
         alternateActive_ = false;
@@ -129,6 +132,9 @@ public:
     }
     [[nodiscard]] std::uint64_t zero_rgb_retired_copies() const noexcept {
         return zeroRgbRetiredCopies_;
+    }
+    [[nodiscard]] UINT source_aligned_pixels_last_present() const noexcept {
+        return sourceAlignedPixelsThisPresent_;
     }
     // Whole AND clipped source-backbuffer TARGET Clears supersede a queued
     // native RGB sample. A foreign D3D9 device cannot retire its GPU copy;
@@ -170,6 +176,7 @@ public:
         std::uint64_t draws, std::uint64_t presentingSerial,
         UINT& nativePixels) noexcept {
         nativePixels = 0;
+        sourceAlignedPixelsThisPresent_ = 0u;
         const UINT width = captureWidth_, height = captureHeight_;
         if (!game || !backbuffer || !dev || !ctx || !color)
             return NativeRawPreviewResult::UnsafePresent;
@@ -364,12 +371,11 @@ public:
                 // D3D9 game backbuffer has an identically sized DX11 target.
                 // Both source regions and ALL original dirty pixels must be
                 // authenticated independently; otherwise use legacy insets.
+                bool firstAligned = false, secondAligned = false;
                 if (captureTargetWidth_ == back.Width &&
-                    captureTargetHeight_ == back.Height) {
-                    Microsoft::WRL::ComPtr<IDirect3DSurface9> gameTarget;
-                    if (SUCCEEDED(game->GetRenderTarget(
-                            0u, gameTarget.GetAddressOf())) &&
-                        gameTarget.Get() == backbuffer) {
+                    captureTargetHeight_ == back.Height &&
+                    native_raw_source_target_is_presented(
+                        sourceGameTarget_.Get(), backbuffer)) {
                         NativeRawPresentTile alignedFirst{}, alignedSecond{};
                         const bool haveFirst = firstPixels &&
                             native_raw_source_aligned_present_tile(
@@ -390,12 +396,12 @@ public:
                                 alignedFirst, alignedSecond)) {
                             firstTile = alignedFirst;
                             secondTile = alignedSecond;
+                            firstAligned = secondAligned = true;
                             canShowBoth = true;
                         } else if (!canShowBoth) {
-                            if (haveFirst) firstTile = alignedFirst;
-                            if (haveSecond) secondTile = alignedSecond;
+                            if (haveFirst) { firstTile = alignedFirst; firstAligned = true; }
+                            if (haveSecond) { secondTile = alignedSecond; secondAligned = true; }
                         }
-                    }
                 }
                 // Use original D3D9 dirty geometry rather than a broad rcBound
                 // as visibility evidence. Menu and vehicle Presents can dirty
@@ -484,19 +490,27 @@ public:
                         target.Get(), &srcRect, backbuffer, &dstPoint));
                 };
                 if (canShowBoth && firstVisible && secondVisible) {
-                    if (paint(surface_, before, mapped, firstTile))
+                    if (paint(surface_, before, mapped, firstTile)) {
                         nativePixels += firstPixels;
+                        if (firstAligned) sourceAlignedPixelsThisPresent_ += firstPixels;
+                    }
                     if (paint(surfaceAlternate_, beforeAlternate,
-                              afterAlternate, secondTile))
+                              afterAlternate, secondTile)) {
                         nativePixels += secondPixels;
+                        if (secondAligned) sourceAlignedPixelsThisPresent_ += secondPixels;
+                    }
                 } else if (secondVisible &&
                            (!firstVisible || native_raw_choose_second_tile(
                                firstPixels, secondPixels, true))) {
-                    if (paint(surface_, beforeAlternate, afterAlternate, secondTile))
+                    if (paint(surface_, beforeAlternate, afterAlternate, secondTile)) {
                         nativePixels = secondPixels;
+                        if (secondAligned) sourceAlignedPixelsThisPresent_ = secondPixels;
+                    }
                 } else if (firstVisible) {
-                    if (paint(surface_, before, mapped, firstTile))
+                    if (paint(surface_, before, mapped, firstTile)) {
                         nativePixels = firstPixels;
+                        if (firstAligned) sourceAlignedPixelsThisPresent_ = firstPixels;
+                    }
                 }
                 unmapPairs();
                 output = nativePixels
@@ -591,6 +605,13 @@ public:
         if (!captureEpoch_.can_queue(presentingSerial, pending_))
             return;
         if (queue_before_draw(dev, ctx, color) == NativeRawPreviewResult::CopyQueued) {
+            // Save the original game RT at the actual source Draw. D3D9 can
+            // change its bound RT between Draw and Present; no Present-time
+            // RT query can reconstruct that identity. Unknown => inset only.
+            sourceGameTarget_.Reset();
+            if (FAILED(game->GetRenderTarget(
+                    0u, sourceGameTarget_.GetAddressOf())))
+                sourceGameTarget_.Reset();
             rgbEvidenceConfirmed_ = false;
             drawPair_.arm(presentingSerial, color);
         }
@@ -855,6 +876,8 @@ private:
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_;
+    Microsoft::WRL::ComPtr<IDirect3DSurface9> sourceGameTarget_;
+    UINT sourceAlignedPixelsThisPresent_ = 0u;
     IDirect3DDevice9* gameOwner_ = nullptr;
     ID3D11Device* gpuOwner_ = nullptr;
     D3DFORMAT format_ = D3DFMT_UNKNOWN;

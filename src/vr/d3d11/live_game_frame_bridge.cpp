@@ -11901,11 +11901,13 @@ void before_game_present(IDirect3DDevice9* game,
                 ++s.rawPreviewFrames;
                 spdlog::info(
                     "DX11 RAW_VISUAL native_gpu_pixel_output={} "
+                    "source_aligned_gpu_pixel_output={} "
                     "magenta_preview_frames={} gpu_tile_copies={} "
                     "native_draws={} original_D3D9=preserved "
                     "full_native_frame=NO OpenXR_native_stereo=NO",
-                    rawChangedPixels, s.rawPreviewFrames,
-                    s.rawPreviewCopies, s.issued);
+                    rawChangedPixels,
+                    s.rawPreview.source_aligned_pixels_last_present(),
+                    s.rawPreviewFrames, s.rawPreviewCopies, s.issued);
             } else if (status == NativeRawPreviewResult::StaleGpuCopy) {
                 ++s.rawPreviewLateCopies;
                 if (s.rawPreviewLateCopies == 1u ||
