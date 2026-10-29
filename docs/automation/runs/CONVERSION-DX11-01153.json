@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01153",
+  "production_id": "CONVERSION-DX11-01153",
+  "event_id": "CONVERSION-DX11-01153-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_SM3_FVF:SOURCE_AUTHENTIC_FOG_NATIVE_VISUAL",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "SOURCE_INTEGRATED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "4e54b63269348ab13207027a27c8f3a7aaae4228",
+  "material_result_sha": "PENDING_ACTUAL_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_ACTUAL_COMMIT_SHA",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    "docs/automation/runs/CONVERSION-DX11-01153.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_FVF_FOGENABLE_GETTERS_AND_EXACT_ZERO_DENSITY_PRODUCTION_DRAW",
+      "LIVE_SM3_SOURCE_FOG_MODES_AND_VERTEX_ONLY_EQUATION_FLOAT_GETTERS",
+      "RAW_PARTIAL_NATIVE_GPU_NOFOG_DRAW_ON_FAILED_W_PROJECTION_WITH_STRICT_FALLBACK"
+    ],
+    "batch_components": [
+      "FIXED_FUNCTION_GAME_FVF_LIVE_EXACT_INERT_TABLE_FOG_NATIVE_DRAW",
+      "PROGRAMMABLE_GAME_SM3_RAW_SOURCE_VERIFIED_PROJECTION_FAILURE_FALLBACK",
+      "POSITIVE_NEGATIVE_CPLUSPLUS_AND_SOURCE_INTEGRATION_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source EXP/EXP2 density=0 produces exact unmodified FVF RGB; RAW gets genuine native SM3 GPU Draw without a usable W projection and only where source modes/consumed floats are known.",
+      "negative_regression": "Nonzero/NaN density, invalid LINEAR interval, invalid mode, missing source getters and normal production W projection failure still reject; RAW cannot publish full native frame.",
+      "component_integration": "Real D3D9 GetRenderState/GetTransform -> native FVF or SM3 Draw -> opt-in RAW tile under original D3D9 and input/FFB fallback"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+      "tools/dx11_live_sm3_table_zfog_01005.cpp",
+      "tools/test_dx11_live_sm3_table_zfog_01005.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "real_game_draw_blocker": "No new actual game source-matched Draw or published frame evidence; old b8dab362 was zero-native-draw",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED"
+}

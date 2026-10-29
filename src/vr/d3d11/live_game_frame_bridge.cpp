@@ -2647,9 +2647,27 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     const bool fogModesKnown = sourceFogDisabled ||
         (SUCCEEDED(game->GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)) &&
          SUCCEEDED(game->GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)));
+    // An authentic EXP/EXP2 table equation at zero density produces exactly
+    // the unfogged FVF RGB even when inherited vertex/range fog remains on.
+    // Unlike the RAW preview omission, this is source-equivalent production
+    // admission: an unavailable or nonfinite live density never becomes zero.
+    bool sourceInertExponential = false;
+    if (!sourceFogDisabled && fogModesKnown &&
+        native_sm3_exponential_table_density_probe(
+            sourceTableFog, sourceVertexFog)) {
+        DWORD liveDensityBits = 0u;
+        if (SUCCEEDED(game->GetRenderState(D3DRS_FOGDENSITY,
+                                            &liveDensityBits))) {
+            float liveDensity = 0.0f;
+            std::memcpy(&liveDensity, &liveDensityBits, sizeof(liveDensity));
+            sourceInertExponential = native_sm3_inert_exponential_table_fog(
+                sourceTableFog, sourceVertexFog, liveDensity);
+        }
+    }
     const bool sourceFogInactive = sourceFogDisabled ||
         (fogModesKnown &&
-         native_game_inert_fog_modes(sourceTableFog, sourceVertexFog));
+         native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)) ||
+        sourceInertExponential;
     if (!sourceFogInactive) {
         DWORD sourceRangeFog = 0xffffffffu, sourceFogColor = 0u;
         DWORD startBits = 0u, endBits = 0u, densityBits = 0u;
@@ -5333,10 +5351,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             ((tableMode != 0u ||
               readFog(D3DRS_RANGEFOGENABLE, rangeFog, 3u)) &&
              readFog(D3DRS_FOGCOLOR, fogColor, 4u) &&
-             (!native_sm3_table_fog_requires_linear_bounds(tableMode) ||
+             (!(native_sm3_table_fog_requires_linear_bounds(tableMode) ||
+                 (tableMode == 0u && vertexMode == D3DFOG_LINEAR)) ||
                  (readFog(D3DRS_FOGSTART, fogStartBits, 5u) &&
                   readFog(D3DRS_FOGEND, fogEndBits, 6u))) &&
-             (!native_sm3_table_fog_requires_density(tableMode) ||
+             (!(native_sm3_table_fog_requires_density(tableMode) ||
+                 (tableMode == 0u &&
+                  (vertexMode == D3DFOG_EXP ||
+                   vertexMode == D3DFOG_EXP2))) ||
                  densityProbe ||
                  readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u)) &&
              SUCCEEDED(game->GetDeviceCaps(&fogCaps))));
@@ -5356,53 +5378,56 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             // Admit only the canonical affine-Z or camera-W fourth column;
             // any unknown/failed COM transform remains original D3D9.
             NativeSm3FogDepth fogDepth = NativeSm3FogDepth::Z;
+            bool fogProjectionQueryFailed = false;
             if ((fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u) {
                 D3DMATRIX projection{};
                 if (FAILED(game->GetTransform(D3DTS_PROJECTION, &projection))) {
-                    ++s.liveSm3StateRejectReasons[1];
-                    trace_live_sm3_fog_rejection(
-                        s, game, sourceOrdinal, NativeSm3FogReject::SourceQuery,
-                        9u, fog, tableMode, vertexMode, rangeFog,
-                        srgbWrite, fogCaps, 0.0f, 0.0f, 0.0f);
-                    return false;
+                    // Full parity still rejects this unverifiable W/Z choice.
+                    // Only the explicitly opted-in, incomplete RAW tile may
+                    // omit fog after the other authentic source reads succeed.
+                    fogProjectionQueryFailed = true;
+                    fogDepth = NativeSm3FogDepth::Unknown;
+                } else {
+                    fogDepth = native_sm3_projection_fog_depth(
+                        projection._14, projection._24,
+                        projection._34, projection._44, true);
                 }
-                fogDepth = native_sm3_projection_fog_depth(
-                    projection._14, projection._24,
-                    projection._34, projection._44, true);
             }
             float fogStart = 0.0f, fogEnd = 0.0f, fogDensity = 0.0f;
             std::memcpy(&fogStart, &fogStartBits, sizeof(float));
             std::memcpy(&fogEnd, &fogEndBits, sizeof(float));
             std::memcpy(&fogDensity, &fogDensityBits, sizeof(float));
             NativeSm3FogReject fogCause = NativeSm3FogReject::None;
-            if (!native_sm3_table_zfog_admission(
+            const bool exactFogAdmitted = !fogProjectionQueryFailed &&
+                native_sm3_table_zfog_admission(
                     true, tableMode, vertexMode, rangeFog != FALSE,
                     srgbWrite != FALSE,
                     (fogCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
                     (fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
                     fogColor, fogStart, fogEnd, fogDensity, tableZFog,
-                    &fogCause, fogDepth)) {
+                    &fogCause, fogDepth);
+            if (!exactFogAdmitted) {
+                if (fogProjectionQueryFailed)
+                    fogCause = NativeSm3FogReject::SourceQuery;
                 // Only explicitly marked RAW visual tiles may omit an
                 // otherwise valid but unsupported source fog *appearance*.
                 // Do not admit unknown enums, invalid floats, missing COM
                 // source identity or resource/RT safety failures.
-                const bool supportedSourceModes =
-                    tableMode <= D3DFOG_LINEAR &&
-                    vertexMode <= D3DFOG_LINEAR;
-                const bool boundedPayload =
-                    std::isfinite(fogStart) && std::isfinite(fogEnd) &&
-                    std::isfinite(fogDensity) && fogDensity >= 0.0f;
                 const bool visualMismatch =
                     fogCause == NativeSm3FogReject::VertexFog ||
                     fogCause == NativeSm3FogReject::RangeFog ||
                     fogCause == NativeSm3FogReject::Srgb ||
                     fogCause == NativeSm3FogReject::MissingZCapability ||
-                    fogCause == NativeSm3FogReject::WCapability;
-                if (!(env_raw_visual_opt_in() && supportedSourceModes &&
-                      boundedPayload && visualMismatch)) {
+                    fogCause == NativeSm3FogReject::WCapability ||
+                    fogProjectionQueryFailed;
+                const bool rawSafe = native_sm3_raw_visual_fog_omission(
+                    env_raw_visual_opt_in(), modesKnown && parametersKnown,
+                    tableMode, vertexMode, fogStart, fogEnd, fogDensity);
+                if (!(rawSafe && visualMismatch)) {
                     ++s.liveSm3StateRejectReasons[1];
                     trace_live_sm3_fog_rejection(
-                        s, game, sourceOrdinal, fogCause, 0u, fog,
+                        s, game, sourceOrdinal, fogCause,
+                        fogProjectionQueryFailed ? 9u : 0u, fog,
                         tableMode, vertexMode, rangeFog, srgbWrite, fogCaps,
                         fogStart, fogEnd, fogDensity);
                     return false;
@@ -5414,10 +5439,11 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                     spdlog::warn(
                         "DX11_VISUAL_MISMATCH_FOG reason={} bypass_count={} "
                         "source_ordinal={} table={} vertex={} range={} srgb={} "
-                        "raster_caps={:#x}; RAW TILE ONLY; original D3D9 unchanged",
+                        "raster_caps={:#x} projection_query_failed={}; "
+                        "RAW TILE ONLY; original D3D9 unchanged",
                         static_cast<unsigned>(fogCause), s.rawFogVisualBypasses,
                         sourceOrdinal, tableMode, vertexMode, rangeFog,
-                        srgbWrite, fogCaps.RasterCaps);
+                        srgbWrite, fogCaps.RasterCaps, fogProjectionQueryFailed);
                 // No native fog controls are issued for a raw partial tile.
 
             }

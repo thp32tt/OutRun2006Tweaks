@@ -70,6 +70,23 @@ struct NativeSm3TableFog {
     return native_sm3_exponential_table_density_probe(tableMode, vertexMode) &&
            std::isfinite(density) && density == 0.0f;
 }
+// RAW mode may omit ONLY source-known, visually mismatched active fog.
+ // It cannot assert full-frame color equivalence. For vertex-only fog the
+ // source must supply the consumed vertex equation's float registers too.
+[[nodiscard]] inline bool native_sm3_raw_visual_fog_omission(
+    bool rawOptIn, bool sourceQueriesKnown,
+    unsigned tableMode, unsigned vertexMode,
+    float start, float end, float density) noexcept {
+    if (!rawOptIn || !sourceQueriesKnown || tableMode > 3u ||
+        vertexMode > 3u || native_game_inert_fog_modes(tableMode, vertexMode))
+        return false;
+    const unsigned sourceEquation = tableMode != 0u ? tableMode : vertexMode;
+    if (native_sm3_table_fog_requires_linear_bounds(sourceEquation))
+        return std::isfinite(start) && std::isfinite(end) && end > start;
+    if (native_sm3_table_fog_requires_density(sourceEquation))
+        return std::isfinite(density) && density >= 0.0f;
+    return false;
+}
 // Stable bounded runtime rejection codes: never collapse source state failures
 // into an ambiguous "fog" aggregate. Code 12 is reserved for COM query failure.
 enum class NativeSm3FogReject : unsigned {

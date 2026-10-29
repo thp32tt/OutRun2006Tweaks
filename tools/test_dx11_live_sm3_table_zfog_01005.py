@@ -45,8 +45,18 @@ for token in ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
               "if (output.rawFogVisualMismatch && s.issued > issuedBeforeFvf)",
               "s.frameBatch.abort();"):
     require(token in bridge, "fixed-function live D3D9 fog fallback missing: " + token)
-require("if (rawFogOmitted) liveBatch.abort();" in source,
+require("native_sm3_raw_visual_fog_omission(" in source and
+        "fogProjectionQueryFailed" in source and
+        "fogProjectionQueryFailed ? 9u : 0u" in source and
+        "if (rawFogOmitted) liveBatch.abort();" in source,
         "SM3 incomplete RAW Fog Draw cannot certify a full native game frame")
+require("sourceInertExponential = native_sm3_inert_exponential_table_fog(" in bridge and
+        "const bool sourceFogInactive" in bridge and
+        "sourceInertExponential;" in bridge and
+        "native_sm3_raw_visual_fog_omission(" in header and
+        "(tableMode == 0u && vertexMode == D3DFOG_LINEAR)" in source and
+        "(vertexMode == D3DFOG_EXP ||" in source,
+        "source FVF inert EXP and raw vertex fog parameter transport missing")
 require("native_game_inert_fog_modes(tableMode, vertexMode)" in header,
         "shared programmable and FVF source equation classification absent")
 for token in ("LIVE_SM3_FOG_REJECT", "liveSm3FogRejectReasons",

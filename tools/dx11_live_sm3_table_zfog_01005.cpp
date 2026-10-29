@@ -147,6 +147,37 @@ int main() {
     assert(native_sm3_table_zfog_admission(
         false, 3u, 1u, true, true, false, true,
         0u, 0.0f, 1.0f, -1.0f, fog) && !fog.enabled);
+    // Live FVF production Draws must admit EXP/EXP2 table fog only with
+    // an authentic zero-density DWORD; vertex/range inherit no contribution.
+    assert(native_sm3_exponential_table_density_probe(1u, 3u));
+    assert(native_sm3_inert_exponential_table_fog(1u, 3u, -0.0f));
+    assert(native_sm3_inert_exponential_table_fog(2u, 0u, 0.0f));
+    assert(!native_sm3_inert_exponential_table_fog(1u, 3u, 0.1f));
+    assert(!native_sm3_inert_exponential_table_fog(1u, 3u, std::nanf("")));
+    // An unavailable W projection cannot certify production fog, but RAW
+    // deliberately omits its appearance after verified SOURCE float reads.
+    // LINEAR and EXP consume different source registers, including vertex-
+    // only fallback. A failed getter/invalid consumed equation never enters.
+    assert(native_sm3_raw_visual_fog_omission(
+        true, true, 3u, 1u, 0.2f, 0.8f, std::nanf("")));
+    assert(native_sm3_raw_visual_fog_omission(
+        true, true, 1u, 3u, std::nanf(""), std::nanf(""), 0.25f));
+    assert(native_sm3_raw_visual_fog_omission(
+        true, true, 0u, 3u, 0.2f, 0.8f, std::nanf("")));
+    assert(native_sm3_raw_visual_fog_omission(
+        true, true, 0u, 2u, std::nanf(""), std::nanf(""), 0.25f));
+    assert(!native_sm3_raw_visual_fog_omission(
+        false, true, 1u, 0u, 0.f, 1.f, 0.25f));
+    assert(!native_sm3_raw_visual_fog_omission(
+        true, false, 1u, 0u, 0.f, 1.f, 0.25f));
+    assert(!native_sm3_raw_visual_fog_omission(
+        true, true, 0u, 0u, 0.f, 1.f, 0.25f));
+    assert(!native_sm3_raw_visual_fog_omission(
+        true, true, 0u, 3u, 1.f, 0.f, 0.25f));
+    assert(!native_sm3_raw_visual_fog_omission(
+        true, true, 0u, 1u, 0.f, 1.f, std::nanf("")));
+    assert(!native_sm3_raw_visual_fog_omission(
+        true, true, 4u, 0u, 0.f, 1.f, 0.25f));
     // Source FOGENABLE=TRUE with no active TABLE or VERTEX equation is
     // pixel-equivalent to no fog, even if RANGEFOG/sRGB/caps are inherited.
     // This is NOT permission to ignore an active vertex or W table fog.
