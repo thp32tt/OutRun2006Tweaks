@@ -1,0 +1,52 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1945KST-IDLE-NO-NEW-SHA",
+  "timestamp_kst": "2026-10-29T19:45:00+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_branch_head_at_preflight": "1d4759dfd4bf4581945c78ae37d44129ae53d369",
+  "policy_files": {
+    "contract": {
+      "path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+      "blob_sha": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1"
+    },
+    "glyph_scale": {
+      "path": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+      "blob_sha": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6"
+    },
+    "roles": {
+      "path": "localization/controller_roles.json",
+      "blob_sha": "8638b458e60740ed93ddd7f74eb45e8204413812"
+    }
+  },
+  "eligibility": "Only source-identified current production_manifest item with English/Korean mapping, exported A/B candidate and SHA matching stored bytes; exclude reviewed SHA",
+  "evidence": {
+    "n100_script": "work/c1_20261029_1945_check_pending.py",
+    "n100_script_sha256": "be25c778a5f1d0ecac4a4345e3648e45d46dc177de8be5d9fd810392a3fe385e",
+    "previous_review_reports_with_records": 41,
+    "previously_reviewed_distinct_sha256": 307,
+    "current_production_manifest_items": 963,
+    "current_manifest_eligible_export_files": 114,
+    "verified_export_candidate_sha_mismatches": 0,
+    "missing_candidate_files": 0,
+    "new_unreviewed_unique_sha256": 0
+  },
+  "review_summary": {
+    "reviewed_candidates": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": true
+  },
+  "imagegen_called": false,
+  "AB_queue_consumed": false,
+  "DDS_created": false,
+  "C2_C3_game_approval": "NOT_ASSESSED",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk": "UNCHANGED",
+  "ai_score_change": 0,
+  "note": "All eligible exported candidate hashes were already reviewed. No duplicate review or PASS; no unverified additional candidates were evaluated."
+}
