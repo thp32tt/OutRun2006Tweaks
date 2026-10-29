@@ -1211,6 +1211,27 @@ namespace OutRunVR::GameSemantic
         return scope == RenderScope::ScreenOverlay2D;
     }
 
+    // The physical D3D9Ex target follows the XR eye extent while all original
+    // game 2D producers still author in the game's logical 1920x1080 canvas.
+    // Keep this ownership rule centralized so HUD, pause/menu glyphs, generic
+    // SpriteNode overlays and vehicle-projected rank/rival markers cannot
+    // accidentally normalize against the portrait XR viewport. Projected
+    // lens/screen effects are intentionally excluded: they originate from a
+    // camera/world projection and have a separate optical owner.
+    inline constexpr bool UsesLogicalUiCanvas(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ScreenHud ||
+            scope == RenderScope::ScreenOverlay2D ||
+            scope == RenderScope::ProjectedWorldMarker2D;
+    }
+    static_assert(UsesLogicalUiCanvas(RenderScope::ScreenHud));
+    static_assert(UsesLogicalUiCanvas(RenderScope::ScreenOverlay2D));
+    static_assert(UsesLogicalUiCanvas(RenderScope::ProjectedWorldMarker2D));
+    static_assert(!UsesLogicalUiCanvas(RenderScope::ProjectedScreenEffect2D));
+    static_assert(!UsesLogicalUiCanvas(RenderScope::SceneEffect));
+    static_assert(!UsesLogicalUiCanvas(RenderScope::WorldParticle));
+    static_assert(!UsesLogicalUiCanvas(RenderScope::WorldBillboard));
+
     // R26 HMD-proven queue-owned generic HUD uses the recentered finite
     // screen plane, not head-following per-eye FOV-only affine. Neither an
     // unqueued world overlay nor F11's external UI may acquire this owner.
