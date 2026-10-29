@@ -105,6 +105,8 @@ enum class NativeSm3FogReject : unsigned {
     NativeSm3FogDepth sourceDepth = NativeSm3FogDepth::Unknown) noexcept {
     result = {};
     if (rejected) *rejected = NativeSm3FogReject::None;
+    // Range fog affects vertex distance only; active table fog takes priority.
+    (void)rangeFog;
     const auto fail = [&](NativeSm3FogReject cause) noexcept {
         if (rejected) *rejected = cause;
         return false;

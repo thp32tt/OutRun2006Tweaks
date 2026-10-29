@@ -18,7 +18,9 @@ def valid(source):
     admit = fixed.index("GameNativeSrgbDraw::admit(srgbWrite, fullFrame)")
     select = fixed.index("output.nativeSrgbWrite = GameNativeSrgbDraw::uses_srgb(srgbWrite)")
     sampler = fixed.index("if (capture.enabled) {", select)
-    if not state < admit < select < sampler or "srgbWrite != FALSE" in fixed:
+    if (not state < admit < select < sampler or
+            "srgbWrite != FALSE" in fixed[:admit] or
+            "sourceRangeFog != FALSE, srgbWrite != FALSE," not in fixed):
         return False
     if fixed.count("GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)") != 1:
         return False
@@ -43,4 +45,7 @@ assert bad != code and not valid(bad), "inset fallback negative control"
 bad = code.replace("ID3D11RenderTargetView* gameRtv = output.nativeSrgbWrite",
     "ID3D11RenderTargetView* gameRtv = false", 1)
 assert bad != code and not valid(bad), "RTV source-state negative control"
+bad = code.replace("sourceRangeFog != FALSE, srgbWrite != FALSE,",
+    "sourceRangeFog != FALSE, false,", 1)
+assert bad != code and not valid(bad), "active table-fog sRGB negative control"
 print("DX11 live FVF/SM3 sRGB RT0 and D3D9 fallback integration PASS")

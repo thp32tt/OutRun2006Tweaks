@@ -7,6 +7,7 @@ on:
       - feature/dx11-01045-first-full-colorfill-game-frame
       - feature/dx11-01037-offscreen-postpass-overflow
       - feature/dx11-01013-visible-game-frame
+      - feature/dx11-01155-fvf-ci-repair
       - feature/dx11-01034-live-predraw-fill-overdraw
       - feature/dx11-00952-live-sm3-device-bool
       - feature/dx11-00966-live-game-frame

@@ -4,21 +4,21 @@
   "production_id": "CONVERSION-DX11-01155",
   "event_id": "CONVERSION-DX11-01155-E001",
   "event_type": "dispatch",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:LIVE_FVF:EXACT_TABLE_FOG_NATIVE_RGB_GAME_DRAW",
   "classification": "A_SOURCE_IMPLEMENTATION",
-  "status": "SOURCE_INTEGRATED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
+  "status": "FEATURE_CI_REPAIR_PENDING_EXACT_SHA",
+  "checkpoint": "C4_FEATURE_REPAIR",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "development_time_percentages": "UNMEASURED",
   "source_base_sha": "1aa24b7cbe29923ff9a1ef329e991d5c2dde56d6",
-  "material_result_sha": "PENDING_ACTUAL_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_ACTUAL_COMMIT_SHA",
+  "material_result_sha": "d5a042c82779c24b997f7c1fdd751d745b676f91",
+  "validation_bearing_result_sha": "PENDING_FEATURE_COMMIT_SHA",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/dx11_live_sm3_table_zfog_01005.cpp",
@@ -107,5 +107,25 @@
     "runtime_evidence": "UNTESTED: no source-matched desktop, Quest3 or VDXR actual game session"
   },
   "visible_frame_acceptance": "New game and HMD real visual proof UNTESTED; target remains full contiguous source coverage.",
-  "activation_guard_and_fallback": "Source exact Fog only; no DXVK/DX9Ex branch writes, original game D3D9 Draw/input/FFB untouched."
+  "activation_guard_and_fallback": "Source exact Fog only; no DXVK/DX9Ex branch writes, original game D3D9 Draw/input/FFB untouched.",
+  "feature_branch": "feature/dx11-01155-fvf-ci-repair",
+  "feature_stage": "FEATURE_CI_PENDING",
+  "rollover_count": 2,
+  "ci_failure_repair": {
+    "source_implementation_sha": "d5a042c82779c24b997f7c1fdd751d745b676f91",
+    "prior_failed_runs": [
+      40843613265,
+      40843613398,
+      40843613288
+    ],
+    "scope": [
+      "00673 stage1 shader concatenation assertion",
+      "first-game-frame sourceKnown/RAW-destructive admission",
+      "00969 sRGB old false rejection and active fog destructive test",
+      "rangeFog table-only -Werror unused parameter",
+      "feature branch five push CI triggers"
+    ],
+    "next_action": "Five mandatory feature push Actions exact-SHA; after success compare behind=0 and expected_sha nonforce target promotion; then C6 exact-SHA readback",
+    "runtime_validation": "UNTESTED"
+  }
 }
