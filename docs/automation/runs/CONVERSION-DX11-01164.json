@@ -1,0 +1,208 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01164",
+  "production_id": "CONVERSION-DX11-01164",
+  "event_id": "CONVERSION-DX11-01164-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_work_key": "DX11:RAW_COMPACT_NATIVE_GPU_TIGHT_DIRTY_PRESENT",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_CI_REPAIRS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "scoreboard_previous": 2185,
+  "scoreboard_new": 2186,
+  "development_time_percentages": "UNMEASURED",
+  "controller_runtime_adoption": "UNVERIFIED",
+  "source_base_sha": "74264c0b6038649f5235ec4142f3d68aafe2ca9e",
+  "implementation_source_sha": "b37e739a204c3bb009cfc13a4a67f3c1b48e1603",
+  "validation_bearing_result_sha": "3de7fe51685b61e6702212f6b8fa8177a0077a77",
+  "material_result_sha": "3de7fe51685b61e6702212f6b8fa8177a0077a77",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_partial_present_tile.hpp",
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_partial_present_tile_test.cpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01163.json"
+  ],
+  "implementation": "Connect authenticated compact native D3D11 GPU BEFORE/DRAW/AFTER pixel capture to user-opt-in RAW partial display in real 24..39px D3D9 menu/vehicle dirty Presents. Source-owned width/height and explicit compact-only admission preserve unscaled 24px GPU pixels, strict dirty union, zero-gap safety, normal 256x144 legacy 40px/8px margin, D3D9/FFB and DXVK frozen. Source logic and positive/negative C++ regressions implemented; visible gameplay/HMD proof not claimed.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW_TO_NATIVE_D3D11_COLOR_TARGET",
+      "COMPACT_NATIVE_BEFORE_AFTER_GPU_RGB_READBACK",
+      "EXPLICIT_24_TO_39_PIXEL_ORIGINAL_DIRTY_UNION_PRESENT",
+      "D3D9_ORIGINAL_FALLBACK"
+    ],
+    "batch_components": [
+      "CPP_RAW_PARTIAL_CROP_COMPACT_MARGIN",
+      "CPP_DIRTY_REGION_COMPACT_STRICT_UNION_AND_GPU_PRESENT",
+      "CPP_POSITIVE_NEGATIVE_RAW_PIXEL_AND_LEGACY_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "A 96x64 source-owned native GPU RGB capture can select an authentic changed edge pixel into a 24x24 D3D9 source crop inside a split real 30x30 game dirty region.",
+      "negative_regression": "Missing dirty row, invalid crop and source pitch remain rejected. Legacy 256x144 diagnostic retains former 40px minimum, 8px border and existing 5 negative regression groups.",
+      "component_integration": "Native live GPU authentic RGB readback -> compact-only source crop and D3D9 verified Present dirty union -> unscaled opt-in screen pixel; normal full-frame remains fail closed."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_partial_present_tile.hpp",
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_partial_present_tile_test.cpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "OPT_IN_VISIBLE_PARTIAL_DIAGNOSTIC",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and all 5 GitHub Actions verify authentic RAW partial visible output integration; does NOT establish a real menu/vehicle/race GPU desktop frame, full-frame coverage, OpenXR native eye or Quest3 HMD.",
+    "activation_guard_and_fallback": "Explicit env RAW diagnostic only, original D3D9/FFB remains authoritative; 256x144 legacy dirty safety intact, production full frame fail closed, DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Render authentic native GPU RGB diagnostic pixels into small original D3D9 repaint rectangles without sacrificing existing 40px RAW safety or claiming full game frame.",
+    "acceptance_items": [
+      {
+        "id": "compact_dirty_native_gpu_pixel_present",
+        "category": "end_to_end_behavior",
+        "behavior_area": "DX11 GPU Draw to original game D3D9 Present",
+        "expected_behavior": "New compact-only opt-in permits a genuine 24x24 GPU RGB crop inside an original 30x30 menu/vehicle dirty Present without scaling."
+      },
+      {
+        "id": "connected_native_gpu_byte_provenance",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native RGB source staging and repaint union",
+        "expected_behavior": "Exact mapped GPU bytes and their selected RGB delta are presented only within authenticated source-backed destination pixels."
+      },
+      {
+        "id": "legacy_dirty_fallback_unchanged",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 source protection, input, and prior RAW constraints",
+        "expected_behavior": "Regular 256x144 preview retains 40px dirty crop and 8px border, gaps and invalid pitches reject, original input/FFB unchanged."
+      },
+      {
+        "id": "exact_sha_five_gate",
+        "category": "integrated_validation",
+        "behavior_area": "mandatory GitHub Actions",
+        "expected_behavior": "Fast/Backend/Build/OpenXR/HUD all PASS on same validation-bearing SHA; real game/HMD remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "compact_dirty_native_gpu_pixel_present": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_partial_present_tile.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Fast 40923721969 PASS exact SHA"
+    },
+    "connected_native_gpu_byte_provenance": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "Fast source-only C++ and Backend PASS"
+    },
+    "legacy_dirty_fallback_unchanged": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_partial_present_tile.hpp",
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_partial_present_tile_test.cpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Earlier Fast 40923165093 failed causal regressions, repaired SHA 3de7... Fast 40923721969 PASS"
+    },
+    "exact_sha_five_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [],
+      "validation_command": "Fast 40923721969; Backend 40923721956; Build 40923738868; OpenXR 40923721959; HUD 40923722149; all same 3de7... SHA"
+    }
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40923721969,
+        "head_sha": "3de7fe51685b61e6702212f6b8fa8177a0077a77",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40923721956,
+        "head_sha": "3de7fe51685b61e6702212f6b8fa8177a0077a77",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40923738868,
+        "head_sha": "3de7fe51685b61e6702212f6b8fa8177a0077a77",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40923721959,
+        "head_sha": "3de7fe51685b61e6702212f6b8fa8177a0077a77",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40923722149,
+        "head_sha": "3de7fe51685b61e6702212f6b8fa8177a0077a77",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_evidence": "No authenticated source-matched real menu/car/race GPU desktop or Quest3/VDXR runtime experiment completed for this SHA. RUNTIME_VALIDATION=UNTESTED.",
+    "validation_layer": "SOURCE_AND_BUILD_VERIFIED_NOT_GAMEPLAY_OR_HMD",
+    "scoreboard": "GitHub AI2 SSOT readback main commit 4b0eaa3f126bd21fed7df4ced7666c0fd243b12e: 2185 + new compact RAW integration +1 = 2186. Same TASK_ID retry, CI repair and C6 score +0."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_LATEST_GITHUB_HEAD_AND_CLAIM_NO_CONFLICT",
+    "C1_REVIEW": "PASS_AUTHENTIC_COMPACT_GPU_DIRTY_PRESENT_BLOCKER",
+    "C2_IMPLEMENT": "PASS_COHESIVE_NATIVE_CPP_SOURCE_AND_POSITIVE_NEGATIVE_REGRESSIONS",
+    "C3_VALIDATE": "PASS_5_MANDATORY_PUSH_EXACT_SHA_GATES",
+    "C4_COMMIT": "PASS_MATERIAL_RESULT_SHA_3de7fe51",
+    "C5_PACKAGE": "SOURCE_BUILD_VERIFIED_REAL_GAME_HMD_UNTESTED",
+    "C6_STATE": "PASS_SEPARATE_DOCS_ONLY_CHECKPOINT_NO_CI_RERUN"
+  },
+  "next_unfinished": "Continue DX11 full menu/car/race native frame coverage and direct L/R OpenXR GPU handoff; Quest3/VDXR native source-matched observation remains NEED_HMD_TEST. Existing DX9Ex fallback/FFB protected, DXVK frozen.",
+  "causal_record_correction": {
+    "inherited_01163_policy_repair": "c821c6cce8deaa99f43d7ce087687c7ca67af519",
+    "causal_source_regression_repair": "3de7fe51685b61e6702212f6b8fa8177a0077a77",
+    "score_for_repairs_separately": 0
+  },
+  "causal_ci_repair_shas": [
+    "c821c6cce8deaa99f43d7ce087687c7ca67af519",
+    "3de7fe51685b61e6702212f6b8fa8177a0077a77"
+  ]
+}
