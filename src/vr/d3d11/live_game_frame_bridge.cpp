@@ -1412,6 +1412,7 @@ struct State {
         ID3D11PixelShader* source{}; // non-owning, same State/native device
         bool fogEnabled{}; // authentic live source table fog b2
         bool specularAdd{}; // post-cascade source COLOR1 RGB
+        bool rawFogOmitted{}; // separately owned incomplete RAW shader
         ComPtr<ID3D11PixelShader> fogged;
     };
     std::vector<FvfFogVariant> fvfFogVariants;
@@ -2007,17 +2008,21 @@ const char* game_fvf_original_pixel_entry(
 // compile at startup. State::mutex serializes this bounded per-device cache.
 ID3D11PixelShader* game_fvf_final_rgb_variant(
     State& s, ID3D11Device* device, ID3D11PixelShader* source,
-    bool fogEnabled, bool specularAdd) {
-    if (!device || !source || (!fogEnabled && !specularAdd)) return nullptr;
+    bool fogEnabled, bool specularAdd, bool rawFogOmitted) {
+    if (!device || !source || (!fogEnabled && !specularAdd) ||
+        (rawFogOmitted && (fogEnabled || !specularAdd))) return nullptr;
     for (const auto& entry : s.fvfFogVariants)
         if (entry.source == source && entry.specularAdd == specularAdd &&
-            entry.fogEnabled == fogEnabled)
+            entry.fogEnabled == fogEnabled &&
+            entry.rawFogOmitted == rawFogOmitted)
             return entry.fogged.Get();
     constexpr std::size_t kMaxSourceVariants = 128u;
     if (s.fvfFogVariants.size() >= kMaxSourceVariants) return nullptr;
     const char* originalEntry = game_fvf_original_pixel_entry(s, source);
     if (!originalEntry) return nullptr;
-    const auto wrapper = fogEnabled && specularAdd
+    const auto wrapper = rawFogOmitted
+        ? native_fvf_raw_specular_fog_omission_wrapper(originalEntry)
+        : fogEnabled && specularAdd
         ? native_fvf_specular_fog_wrapper(originalEntry)
         : specularAdd ? native_fvf_specular_wrapper(originalEntry)
                       : native_fvf_fog_wrapper(originalEntry);
@@ -2029,6 +2034,7 @@ ID3D11PixelShader* game_fvf_final_rgb_variant(
     ComPtr<ID3DBlob> compiled, errors;
     if (FAILED(D3DCompile(shaderSource.data(), shaderSource.size(),
             "live_game_frame_fvf_fog_variant", nullptr, nullptr,
+            rawFogOmitted ? "PSFvfRawSpecularFogOmittedVariant" :
             fogEnabled && specularAdd ? "PSFvfSpecularFogVariant" :
             specularAdd ? "PSFvfSpecularVariant" : "PSFvfTableFogVariant",
             "ps_4_0", D3DCOMPILE_ENABLE_STRICTNESS,
@@ -2040,20 +2046,26 @@ ID3D11PixelShader* game_fvf_final_rgb_variant(
             compiled->GetBufferPointer(), compiled->GetBufferSize(),
             nullptr, fogged.GetAddressOf())) || !fogged)
         return nullptr;
-    s.fvfFogVariants.push_back({source, fogEnabled, specularAdd, std::move(fogged)});
+    s.fvfFogVariants.push_back({source, fogEnabled, specularAdd,
+                                rawFogOmitted, std::move(fogged)});
     return s.fvfFogVariants.back().fogged.Get();
 }
 ID3D11PixelShader* game_fvf_exact_table_fog_variant(
     State& s, ID3D11Device* device, ID3D11PixelShader* source) {
-    return game_fvf_final_rgb_variant(s, device, source, true, false);
+    return game_fvf_final_rgb_variant(s, device, source, true, false, false);
 }
 ID3D11PixelShader* game_fvf_specular_final_variant(
     State& s, ID3D11Device* device, ID3D11PixelShader* source) {
-    return game_fvf_final_rgb_variant(s, device, source, false, true);
+    return game_fvf_final_rgb_variant(s, device, source, false, true, false);
 }
 ID3D11PixelShader* game_fvf_specular_table_fog_variant(
     State& s, ID3D11Device* device, ID3D11PixelShader* source) {
-    return game_fvf_final_rgb_variant(s, device, source, true, true);
+    return game_fvf_final_rgb_variant(s, device, source, true, true, false);
+}
+
+ID3D11PixelShader* game_fvf_raw_visual_specular_variant(
+    State& s, ID3D11Device* device, ID3D11PixelShader* source) {
+    return game_fvf_final_rgb_variant(s, device, source, false, true, true);
 }
 
 bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
@@ -2828,6 +2840,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     // register and the existing native VS forwards COLOR1. Preserve the
     // source's vertex alpha/AlphaGate; an active unproven vertex/table fog +
     // specular ordering still stays on the original D3D9 renderer below.
+    DWORD shadeMode = 0xffffffffu; // original source shade state if needed
     if (layout.hasSpecular) {
         DWORD specularEnabled = TRUE;
         if (FAILED(game->GetRenderState(D3DRS_SPECULARENABLE, &specularEnabled)) ||
@@ -2838,7 +2851,6 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             // D3D9 FLAT shading broadcasts the first vertex's SPECULAR RGB.
             // Native COLOR1 is Gouraud-interpolated by the D3D11 VS/PS;
             // do not publish a visually different flat-shaded source Draw.
-            DWORD shadeMode = 0xffffffffu;
             if (FAILED(game->GetRenderState(D3DRS_SHADEMODE, &shadeMode)) ||
                 !native_fvf_vertex_specular_shade_admitted(shadeMode))
                 return false;
@@ -2971,7 +2983,14 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             if (!output.rawFogVisualMismatch) return false;
             // Approximate RAW/no-fog visual output cannot establish the
             // correct source specular + fog ordering or full-frame parity.
-            if (output.nativeSpecularAdd) return false;
+            // Dedicated opt-in RAW GPU tile: preserve source SPECULAR and
+            // omit unsupported active fog without promoting source parity.
+            if (output.nativeSpecularAdd &&
+                !native_raw_fvf_specular_fog_visual_admission(
+                    env_raw_visual_opt_in(), sourceKnown, layout.hasSpecular,
+                    output.nativeSpecularAdd, shadeMode, sourceTableFog,
+                    sourceVertexFog, sourceRangeFog, start, end, density))
+                return false;
         }
     }
     // D3D9 polygon fill does not change the topology of a POINTLIST or
@@ -8426,8 +8445,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     } else if (output.nativeSpecularAdd) {
         // Source-owned stage0 or stage1 PS -> exact post-combiner RGB specular
         // -> alpha-preserving native OM, for authentic no-fog FVF Draws only.
-        fixedPixelShader = game_fvf_specular_final_variant(
-            s, dev, fixedPixelShader);
+        fixedPixelShader = output.rawFogVisualMismatch
+            ? game_fvf_raw_visual_specular_variant(s, dev, fixedPixelShader)
+            : game_fvf_specular_final_variant(s, dev, fixedPixelShader);
         if (!fixedPixelShader) return false;
     }
     ctx->PSSetShader(fixedPixelShader, nullptr, 0u);
@@ -9166,9 +9186,10 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             if (bypasses <= 3u || bypasses % 1024u == 0u)
                 spdlog::warn(
                     "DX11_VISUAL_MISMATCH_FOG path=FVF bypass_count={} "
-                    "source_ordinal={} RAW_TILE_ONLY full_frame=REJECTED "
-                    "original_D3D9_unchanged=1",
-                    bypasses, sourceOrdinal);
+                    "source_ordinal={} source_specular={} RAW_TILE_ONLY "
+                    "full_frame=REJECTED original_D3D9_unchanged=1",
+                    bypasses, sourceOrdinal,
+                    output.nativeSpecularAdd ? 1u : 0u);
         }
     } catch (...) {
         // If allocation or translation throws after one native Draw, do not

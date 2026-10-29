@@ -53,4 +53,16 @@ namespace outrun::vr::dx11 {
            "    return FvfApplyTableFog(v, color);\n"
            "}\n";
 }
+// Deliberately incomplete RAW visual output: the authenticated source
+// stage0/stage1 result and Gouraud SPECULAR RGB survive; active fog is
+// visibly omitted only in the dedicated RAW tile, never full-frame output.
+[[nodiscard]] inline std::string native_fvf_raw_specular_fog_omission_wrapper(
+    std::string_view original) {
+    if (native_fvf_fog_wrapper(original).empty()) return {};
+    return "float4 PSFvfRawSpecularFogOmittedVariant(VOut v) : SV_Target {\n"
+           "    float4 color = " + std::string(original) + "(v);\n"
+           "    color.rgb = saturate(color.rgb + v.specular.rgb);\n"
+           "    return color; // ACTIVE_SOURCE_FOG_OMITTED_RAW_TILE_ONLY\n"
+           "}\n";
+}
 } // namespace outrun::vr::dx11

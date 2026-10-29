@@ -4,6 +4,7 @@
 using outrun::vr::dx11::native_fvf_fog_wrapper;
 using outrun::vr::dx11::native_fvf_specular_wrapper;
 using outrun::vr::dx11::native_fvf_specular_fog_wrapper;
+using outrun::vr::dx11::native_fvf_raw_specular_fog_omission_wrapper;
 using outrun::vr::dx11::native_fvf_vertex_specular_shade_admitted;
 int main() {
     static_assert(native_fvf_vertex_specular_shade_admitted(2u),
@@ -36,6 +37,13 @@ int main() {
         assert(addPos < fogPos);
         assert(combined.find("PSFvfSpecularFogVariant(VOut v)") != std::string::npos);
         assert(combined.find("return FvfApplyTableFog(v, color);") != std::string::npos);
+        const std::string raw = native_fvf_raw_specular_fog_omission_wrapper(name);
+        assert(raw.find(std::string("float4 color = ") + name + "(v)") !=
+               std::string::npos);
+        assert(raw.find("PSFvfRawSpecularFogOmittedVariant") != std::string::npos);
+        assert(raw.find("ACTIVE_SOURCE_FOG_OMITTED_RAW_TILE_ONLY") != std::string::npos);
+        assert(raw.find("saturate(color.rgb + v.specular.rgb)") != std::string::npos);
+        assert(raw.find("FvfApplyTableFog(v, color)") == std::string::npos);
     }
     // A failed lookup, malicious or unknown string cannot enter HLSL JIT.
     for (const char* bad : {"", "P", "not_a_PS", "PSFvfTableFogDiffuse",
@@ -43,6 +51,7 @@ int main() {
         assert(native_fvf_fog_wrapper(bad).empty());
         assert(native_fvf_specular_wrapper(bad).empty());
         assert(native_fvf_specular_fog_wrapper(bad).empty());
+        assert(native_fvf_raw_specular_fog_omission_wrapper(bad).empty());
     }
     assert(native_fvf_fog_wrapper(std::string(97u, 'P')).empty());
     assert(native_fvf_specular_wrapper(std::string(97u, 'P')).empty());

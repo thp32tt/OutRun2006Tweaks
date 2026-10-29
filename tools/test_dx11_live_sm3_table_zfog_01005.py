@@ -190,6 +190,13 @@ if compiler:
                         str(root / "tools/dx11_live_sm3_table_zfog_01005.cpp"),
                         "-o", str(result)], check=True)
         subprocess.run([str(result)], check=True)
+require("native_raw_fvf_specular_fog_visual_admission(" in bridge and
+        "game_fvf_raw_visual_specular_variant(" in bridge and
+        "native_fvf_raw_specular_fog_omission_wrapper(originalEntry)" in bridge and
+        "entry.rawFogOmitted == rawFogOmitted" in bridge and
+        "if (output.rawFogVisualMismatch && s.issued > issuedBeforeFvf)" in bridge and
+        "s.frameBatch.abort();" in bridge,
+        "RAW authentic FVF specular tile / full frame safety disconnected")
 # Portable native C++ unit regression for dynamic HLSL entry composition.
 # This is not a real D3D11 GPU or HMD observation.
 if compiler:
@@ -199,4 +206,11 @@ if compiler:
                         str(root / "tests/native_game_fvf_fog_dispatch_test.cpp"),
                         "-o", str(result)], check=True)
         subprocess.run([str(result)], check=True)
-print("DX11 SM3 + complete FVF table-fog source dispatch PASS (runtime UNTESTED)")
+if compiler:
+    with tempfile.TemporaryDirectory() as folder:
+        result = Path(folder) / "raw_fvf_fog"
+        subprocess.run([compiler, "-std=c++17", "-I", str(root),
+                        str(root / "tests/native_raw_fvf_fog_visual_test.cpp"),
+                        "-o", str(result)], check=True)
+        subprocess.run([str(result)], check=True)
+print("DX11 SM3 + FVF table fog / RAW specular visual source dispatch PASS (runtime UNTESTED)")
