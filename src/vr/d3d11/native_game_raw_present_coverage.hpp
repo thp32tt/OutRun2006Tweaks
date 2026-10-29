@@ -342,6 +342,27 @@ struct NativeRawPresentDirtyRegion {
              }
          }
      }
+     // Authentic menus may partition one repaint in BOTH axes (for
+     // example, a 3x3 grid of 16px cells), while an attached thin update
+     // extends the connected component's bounding box. Neither one-axis
+     // strip sweep can reconstruct this completely painted 2D island.
+     // Seed a bounded 2D rectangle from two ORIGINAL member corners.
+     // Both coordinates come from observed D3D9 source rectangles; the
+     // resulting proposal is still checked pixel-for-pixel against the
+     // entire validated RGNDATA union by consider(). No holes are filled,
+     // no source crop is widened, and this is RAW opt-in only.
+     for (std::uint32_t start = 0u; start < dirty.count; ++start) {
+         const auto left = (std::max)(cropLeft, dirty.rectangles[start].left);
+         const auto top = (std::max)(cropTop, dirty.rectangles[start].top);
+         for (std::uint32_t end = 0u; end < dirty.count; ++end) {
+             const auto right = (std::min)(
+                 cropRight, dirty.rectangles[end].right);
+             const auto bottom = (std::min)(
+                 cropBottom, dirty.rectangles[end].bottom);
+             if (right - left < 40 || bottom - top < 40) continue;
+             consider(left, top, right, bottom);
+         }
+     }
      return found;
  }
 } // namespace outrun::vr::dx11

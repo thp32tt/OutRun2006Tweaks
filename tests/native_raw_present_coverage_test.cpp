@@ -382,3 +382,53 @@ constexpr bool kRawStackedRowsAndTailProof = []() constexpr {
 }();
 static_assert(kRawStackedRowsAndTailProof,
     "stacked source repaint must show only authentic native RGB pixels");
+
+// A 3x3 repaint grid cannot be reconstructed from any one-axis strip:
+// each genuine member is only 16x16. An attached skinny source tail
+// poisons whole-component placement, but NOT the real 48x48 painted island.
+constexpr bool kRawTwoAxisGridRepaintProof = []() constexpr {
+    using namespace outrun::vr::dx11;
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true;
+    dirty.count = 10u;
+    dirty.boundLeft = 600; dirty.boundTop = 300;
+    dirty.boundRight = 900; dirty.boundBottom = 348;
+    for (std::uint32_t row = 0u; row < 3u; ++row)
+        for (std::uint32_t col = 0u; col < 3u; ++col) {
+            const auto x = std::int64_t{600} + std::int64_t{16} * col;
+            const auto y = std::int64_t{300} + std::int64_t{16} * row;
+            dirty.rectangles[row * 3u + col] = {x, y, x + 16, y + 16};
+        }
+    dirty.rectangles[9] = {648, 300, 900, 308};
+    NativeRawPresentTile tile{};
+    const auto place = [&]() constexpr {
+        return native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080, dirty, 256, 144, tile);
+    };
+    if (!place() || tile.copyWidth != 32u ||
+        tile.copyHeight != 32u || tile.destinationX != 608 ||
+        tile.destinationY != 308 ||
+        !native_raw_dirty_region_covers_tile(1920, 1080, dirty, tile))
+        return false;
+    // The right-bound source crop is authoritative even when the island
+    // and thin tail belong to one D3D9 connected component.
+    if (!native_raw_dirty_region_place_tile(
+            1920, 1080, 590, 290, 850, 360, dirty, 256, 144, tile) ||
+        !native_raw_dirty_region_covers_tile(1920, 1080, dirty, tile))
+        return false;
+    // A real 1px missing vertical line in the center row forbids output.
+    dirty.rectangles[4].left = 617;
+    if (place()) return false;
+    dirty.rectangles[4].left = 616;
+    dirty.boundRight = 901; // forged D3D9 rcBound
+    if (place()) return false;
+    dirty.boundRight = 900;
+    dirty.rectangles[9].right = 2000; // invalid tail member
+    if (place()) return false;
+    dirty.rectangles[9].right = 900;
+    dirty.headerVerified = false;
+    if (place()) return false;
+    return true;
+}();
+static_assert(kRawTwoAxisGridRepaintProof,
+              "two-axis fragmented RAW repaint must preserve real source RGB");

@@ -137,5 +137,48 @@ int main() {
     dirty.rectangles[1].top = 317;
     assert(!native_raw_dirty_region_covers_tile(
         1920, 1080, dirty, selected));
+    // Complete source-to-visible native GPU crop for a 2D-fragmented
+    // repaint. This was previously rejected when neither one-axis strip
+    // sweep could place the tile around an attached skinny update.
+    dirty = {};
+    dirty.headerVerified = true;
+    dirty.count = 10u;
+    dirty.boundLeft = 600; dirty.boundTop = 300;
+    dirty.boundRight = 900; dirty.boundBottom = 348;
+    for (std::uint32_t row = 0u; row < 3u; ++row)
+        for (std::uint32_t col = 0u; col < 3u; ++col) {
+            const auto x = std::int64_t{600} + std::int64_t{16} * col;
+            const auto y = std::int64_t{300} + std::int64_t{16} * row;
+            dirty.rectangles[row * 3u + col] = {x, y, x + 16, y + 16};
+        }
+    dirty.rectangles[9] = {648, 300, 900, 308};
+    assert(native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, dirty, W, H, original));
+    assert(original.copyWidth == 32u && original.copyHeight == 32u);
+    assert(original.destinationX == 608 && original.destinationY == 308);
+    after.fill(0u);
+    for (std::uint32_t y = 100u; y < 108u; ++y)
+        for (std::uint32_t x = 200u; x < 208u; ++x)
+            after[(y * W + x) * 4u + 1u] = 190u;
+    chooser.capture(before.data(), W * 4u, after.data(), W * 4u);
+    assert(chooser.select(original, selected, changed) && changed == 64u);
+    assert(native_raw_dirty_region_covers_tile(1920, 1080, dirty, selected));
+    std::uint32_t actualGpuRgb = 0u;
+    for (std::uint32_t y = 0u; y < selected.copyHeight; ++y)
+        for (std::uint32_t x = 0u; x < selected.copyWidth; ++x) {
+            const auto sx = selected.sourceX + x, sy = selected.sourceY + y;
+            const auto off = (sy * W + sx) * 4u;
+            if (native_raw_rgb_changed(before.data() + off,
+                                       after.data() + off)) {
+                assert(!native_raw_present_border_pixel(
+                    selected, sx, sy, true));
+                ++actualGpuRgb;
+            }
+        }
+    assert(actualGpuRgb == 64u);
+    dirty.rectangles[4].left = 617;
+    assert(!native_raw_dirty_region_covers_tile(
+        1920, 1080, dirty, selected));
+
 }
 
