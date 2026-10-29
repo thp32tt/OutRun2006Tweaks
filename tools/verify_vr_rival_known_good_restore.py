@@ -111,18 +111,23 @@ for token in (
     assert token in r62, token
 
 # Do not restore the old per-Draw rival Flush. Modern D3DX may defer an exact
-# rival command, so submit only while its current queue node/epoch/anchor are
-# still authoritative at NEXT_NODE or QUEUE_END.
+# vehicle marker command, so submit only while its current queue node/epoch/
+# anchor are still authoritative at NEXT_NODE or QUEUE_END. Rank 1/2/3
+# sprani and rank 4/5 clip digits intentionally share the exact rival boundary
+# without weakening the rival proof.
 for token in (
-    'static bool FlushExactRivalAtQueueBoundary(',
-    'RivalProjectedOwner(HudBatch.scope, HudBatch.producer)',
+    'static bool FlushExactVehicleMarkerAtQueueBoundary(',
+    'ProjectedVehicleMarkerOwner(',
+    'ProducerToken::RivalMarkerSprani',
+    'ProducerToken::RankMarkerSprani',
+    'ProducerToken::RankMarkerClipSprite',
     'HudBatch.matchesGpuOwner(',
     'CurrentProjectedMarker()',
-    'FlushExactRivalAtQueueBoundary("NEXT_NODE")',
-    'FlushExactRivalAtQueueBoundary("QUEUE_END")',
-    'VR RIVAL D3DX QUEUE BOUNDARY FLUSH:',
+    'FlushExactVehicleMarkerAtQueueBoundary("NEXT_NODE")',
+    'FlushExactVehicleMarkerAtQueueBoundary("QUEUE_END")',
+    'VR VEHICLE MARKER D3DX QUEUE BOUNDARY FLUSH:',
 ):
     assert token in ui, token
 assert 'VR RIVAL R84 RAW C64 PROOF:' in r84
 
-print('PASS rival known-good BB796 ownership + native-first + null-root + live DPUP/R62 probes + exact-node R33 c64 fence telemetry + exact D3DX queue-boundary ownership; HMD UNTESTED')
+print('PASS rival known-good BB796 ownership preserved + rank 1-5 share exact projected vehicle queue boundary + native-first/null-root/live DPUP/R62/R33 proofs retained; HMD UNTESTED')
