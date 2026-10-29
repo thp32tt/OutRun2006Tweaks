@@ -1,0 +1,66 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T0645KST-IDLE",
+  "role": "C1",
+  "observed_at_kst": "2026-10-30T06:47:26+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE",
+  "reason": "NO_NEW_A_B_CANDIDATE_SINCE_LAST_C1_REVIEW",
+  "reference_qa_report": "localization/qa_reports/C1_20261030_0515_AI2_NEW_SHA2.json",
+  "reference_last_qa_cutoff_kst": "2026-10-30T05:15:00+09:00",
+  "inventory": {
+    "source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs",
+    "collection_method": "read-only execution of pre-existing work/C1_QA_20261030_0545_inventory.py",
+    "total_png": 918,
+    "by_role": {
+      "A": 436,
+      "B": 482
+    },
+    "files_modified_after_cutoff": 0,
+    "A_state": {
+      "completed_files": 435,
+      "completed_batches": 141,
+      "active": null,
+      "next_ordinal": 436
+    },
+    "B_state": {
+      "completed_files": 482,
+      "completed_batches": 145,
+      "active": null,
+      "next_ordinal": 483
+    },
+    "latest_candidate_mtime_kst": {
+      "A": "2026-10-30T04:20:09+09:00",
+      "B": "2026-10-30T05:10:04+09:00"
+    },
+    "recent_last_pass_reverified_sha256": {
+      "A": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+      "B": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5"
+    },
+    "verified_last_pass_shas_match": true
+  },
+  "newly_reviewed": 0,
+  "pass": 0,
+  "fail": 0,
+  "hold": 0,
+  "new_candidate_sha_count": 0,
+  "limitations": [
+    "New candidate check uses stable file count, last reviewed candidate hashes and post-cutoff modification times; does not independently rehash all historical candidate files.",
+    "This is an idle evidence record, not a new C1 PASS or any C2/C3/ingame approval.",
+    "DDS/runtime untested."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "A_B_queue_consumed": false,
+    "DDS_written": false,
+    "C2_C3_game_pass_created": false,
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "ai2_score_change": 0
+}
