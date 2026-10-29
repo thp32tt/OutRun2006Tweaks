@@ -134,7 +134,13 @@
     },
     "exact_sha_five_gate": {
       "status": "PASS_EXACT_SHA",
-      "evidence_paths": [],
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
       "validation_command": "Fast 40923721969; Backend 40923721956; Build 40923738868; OpenXR 40923721959; HUD 40923722149; all same 3de7... SHA"
     }
   },
