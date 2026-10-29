@@ -4,15 +4,25 @@
   "base_sha": "cffec078b50debec5b8a95e5b0fb4a6653cec272",
   "lane": "DX9Ex C",
   "attempt": 1,
-  "checkpoint": "C3_LOCAL_VALIDATED",
+  "checkpoint": "C5_PACKAGE_VERIFIED_RUNTIME_PENDING",
   "source_mode": "CHAT_DIRECT",
   "validation": {
     "cpu_differential": "PASS",
     "profile": "PASS",
     "stage_four_api": "PASS",
-    "windows": "PENDING",
-    "runtime": "UNTESTED"
+    "windows": "PASS",
+    "runtime": "UNTESTED",
+    "domain_isolation": "PASS",
+    "full_source": "PASS",
+    "package_digest": "RECOMPUTED_MATCH",
+    "generic_build": "FAILED_PRECOMPILE_MISSING_docs/reverse/LINDBERGH_FFB_MAP.md"
   },
-  "next_action": "Push isolated candidate; inspect exact-SHA performance build and full-source results; deliver ZIP with digest; no focus merge",
-  "score_delta": 0
+  "next_action": "User Quest A/B test: particles, dense buildings, translucent water; collect frame times and visuals; no focus merge",
+  "score_delta": 0,
+  "result_sha": "0b39f432a1dbb7d4b6018aaf086206b457f223c0",
+  "build_run": 40780288085,
+  "full_source_run": 40780287986,
+  "artifact_id": 12856782703,
+  "package": "OutRun2_VR_R26_PERF_COPY_MATH_AA2_TEST_0b39f432a1db.zip",
+  "package_sha256": "e5eae8b83ec95982d53c3bcd31af5b73ddf08f880f4dbb6bc41b0f0cd0609720"
 }

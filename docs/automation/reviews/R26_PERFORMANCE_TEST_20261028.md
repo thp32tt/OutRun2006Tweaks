@@ -23,3 +23,9 @@ RUNTIME_VALIDATION=UNTESTED. No FPS or visual acceptance claim.
 ## User test
 Extract all files beside OR2006C2C.EXE, run RUN_DX9EX_TEST.cmd. Restart is required for reflection/AA. The runner explicitly disables both transparency supersampling settings and selects reflection512, so an existing user INI cannot silently restore them. Driver-forced AA outside game settings is not changed.
 Compare identical car/course/camera and headset refresh against the source baseline, with the same reflection512/transparencyOff settings to isolate code benefit. Measure crowded buildings, dusty beach/drift, and water for at least 60 seconds each; repeat. Check both-eye particles, fences, distant buildings, HUD, recenter and scene transitions. Collect DX9EX_LOGS after normal exit. This is a test package, not a runtime-proven replacement baseline.
+
+## Exact-SHA build evidence
+
+Source: `0b39f432a1dbb7d4b6018aaf086206b457f223c0`. Windows performance build and package: https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40780288085 (PASS Win32 R26+HUD, x64 host, domain isolation, production differential). Full Source: https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40780287986 (PASS).
+
+Artifact 12856782703 downloaded and inner ZIP SHA256 recomputed: `e5eae8b83ec95982d53c3bcd31af5b73ddf08f880f4dbb6bc41b0f0cd0609720`. SOURCE_SHA.txt matches source. General Build 40780287849 failed before compilation because docs/reverse/LINDBERGH_FFB_MAP.md is missing; this gate was not bypassed or reported as PASS. HMD/FPS UNTESTED. Documentation seal is not the built source SHA.
