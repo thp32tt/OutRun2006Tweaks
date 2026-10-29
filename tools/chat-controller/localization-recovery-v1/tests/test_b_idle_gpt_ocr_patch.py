@@ -32,6 +32,13 @@ class BIdleOCRPatchTests(unittest.TestCase):
         self.assertIn('[data-testid^="conversation-turn-"]',src)
         self.assertIn('[data-message-author-role="assistant"]',src)
         self.assertIn('mono - last_gpt_ocr_poll >= GPT_OCR_RESPONSE_POLL_SECONDS',src)
+        # The actual reply must be polled in the lane that sent it.
+        self.assertIn('poll_slot = "B" if active.get("ocr_lane") == "C2" else "C1"',src)
+        self.assertIn('page = pages.get(poll_slot)',src)
+        self.assertIn('protected_slots.add(poll_slot)',src)
+        self.assertIn('protected_slots.discard(poll_slot)',src)
+        self.assertIn('C1_OCR_C2_LEASE_ACTIVE',src)
+        self.assertIn('B_C2_OCR_C1_LEASE_ACTIVE',src)
         producer=src.index('png_binding, png_reason = load_binding(slot.name)')
         fallback=src.index('slot.name == "B" and send_result == "SOURCE_REFERENCE_NOT_BOUND:ROI_ROLE_QUEUE_EMPTY_OR_FINISHED"')
         self.assertLess(producer,fallback)
