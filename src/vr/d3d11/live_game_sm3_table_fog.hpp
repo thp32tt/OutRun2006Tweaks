@@ -27,6 +27,18 @@ struct NativeSm3TableFog {
     bool fogEnabled, unsigned tableMode, unsigned vertexMode) noexcept {
     return fogEnabled && !native_game_inert_fog_modes(tableMode, vertexMode);
 }
+// D3D9 table fog equations consume disjoint source registers. EXP/EXP2
+// use density (not START/END); LINEAR uses START/END (not DENSITY).
+// Preserve exact per-Draw COM reads only for the source equation in use.
+// Unknown/vertex-only modes never become admitted through this classification.
+[[nodiscard]] constexpr bool native_sm3_table_fog_requires_density(
+    unsigned tableMode) noexcept {
+    return tableMode == 1u || tableMode == 2u; // D3DFOG_EXP/EXP2
+}
+[[nodiscard]] constexpr bool native_sm3_table_fog_requires_linear_bounds(
+    unsigned tableMode) noexcept {
+    return tableMode == 3u; // D3DFOG_LINEAR
+}
 // An active D3D9 EXP/EXP2 table equation with zero density contributes
 // exactly 1.0 fog factor for finite raster depth, independently of Z/W
 // capability, sRGB, table color and unused start/end. Pixel/table fog
@@ -87,12 +99,17 @@ enum class NativeSm3FogReject : unsigned {
     if (wFogCapable) return fail(NativeSm3FogReject::WCapability);
     if (tableMode != 1u && tableMode != 2u && tableMode != 3u)
         return fail(NativeSm3FogReject::TableMode);
-    if (!std::isfinite(start)) return fail(NativeSm3FogReject::StartNotFinite);
-    if (!std::isfinite(end)) return fail(NativeSm3FogReject::EndNotFinite);
-    if (!std::isfinite(density)) return fail(NativeSm3FogReject::DensityNotFinite);
-    if (density < 0.0f) return fail(NativeSm3FogReject::NegativeDensity);
-    if (tableMode == 3u && !(end > start))
-        return fail(NativeSm3FogReject::LinearRange);
+    // Do not reject a real game Draw because an unused D3D9 fog register
+    // is stale, non-finite, or unavailable. Still validate every operand
+    // the chosen active equation actually consumes.
+    if (native_sm3_table_fog_requires_linear_bounds(tableMode)) {
+        if (!std::isfinite(start)) return fail(NativeSm3FogReject::StartNotFinite);
+        if (!std::isfinite(end)) return fail(NativeSm3FogReject::EndNotFinite);
+        if (!(end > start)) return fail(NativeSm3FogReject::LinearRange);
+    } else {
+        if (!std::isfinite(density)) return fail(NativeSm3FogReject::DensityNotFinite);
+        if (density < 0.0f) return fail(NativeSm3FogReject::NegativeDensity);
+    }
     constexpr float kScale = 1.0f / 255.0f;
     result.rgba = {{
         float((color >> 16u) & 255u) * kScale,
@@ -105,9 +122,15 @@ enum class NativeSm3FogReject : unsigned {
 [[nodiscard]] inline float native_sm3_table_zfog_factor(
     unsigned mode, float depth, float start, float end,
     float density) noexcept {
-    if (!std::isfinite(depth) || !std::isfinite(start) ||
-        !std::isfinite(end) || !std::isfinite(density) ||
-        density < 0.0f) return -1.0f;
+    // Match the GPU equation: ignored float operands do not affect the
+    // fog factor. This reference is used to compare native RGB semantics.
+    if (!std::isfinite(depth)) return -1.0f;
+    if (native_sm3_table_fog_requires_linear_bounds(mode)) {
+        if (!std::isfinite(start) || !std::isfinite(end) ||
+            !(end > start)) return -1.0f;
+    } else if (native_sm3_table_fog_requires_density(mode)) {
+        if (!std::isfinite(density) || density < 0.0f) return -1.0f;
+    } else return -1.0f;
     const float z = (std::max)(0.0f, depth);
     float factor = -1.0f;
     if (mode == 1u) factor = std::exp(-density * z);

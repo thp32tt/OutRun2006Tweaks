@@ -5324,12 +5324,21 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         const bool activeEquation = modesKnown &&
             native_sm3_fog_needs_parameters(true, tableMode, vertexMode) &&
             !inertExponential;
+        // A source-active table equation always overrides inherited
+        // vertex/range fog. Read only the equation's actual live COM inputs:
+        // EXP/EXP2 consume DENSITY; LINEAR consumes START and END.
+        // The unused float DWORDs remain finite zero in the native cbuffer;
+        // no synthetic fallback is substituted for a *required* getter.
         const bool parametersKnown = densityKnown && (!activeEquation ||
-            (readFog(D3DRS_RANGEFOGENABLE, rangeFog, 3u) &&
+            ((tableMode != 0u ||
+              readFog(D3DRS_RANGEFOGENABLE, rangeFog, 3u)) &&
              readFog(D3DRS_FOGCOLOR, fogColor, 4u) &&
-             readFog(D3DRS_FOGSTART, fogStartBits, 5u) &&
-             readFog(D3DRS_FOGEND, fogEndBits, 6u) &&
-             (densityProbe || readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u)) &&
+             (!native_sm3_table_fog_requires_linear_bounds(tableMode) ||
+                 (readFog(D3DRS_FOGSTART, fogStartBits, 5u) &&
+                  readFog(D3DRS_FOGEND, fogEndBits, 6u))) &&
+             (!native_sm3_table_fog_requires_density(tableMode) ||
+                 densityProbe ||
+                 readFog(D3DRS_FOGDENSITY, fogDensityBits, 7u)) &&
              SUCCEEDED(game->GetDeviceCaps(&fogCaps))));
         if (!modesKnown || !parametersKnown) {
             if (!failedFogGetter) failedFogGetter = 8u; // GetDeviceCaps

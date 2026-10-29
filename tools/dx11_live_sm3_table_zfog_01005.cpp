@@ -120,6 +120,41 @@ int main() {
         true, 3u, 0u, false, false, true, false,
         0u, 0.9f, 0.3f, 1.0f, fog, &cause));
     assert(!fog.enabled && cause == NativeSm3FogReject::LinearRange);
+    // Live shader-bound table fog must not depend on unused COM float
+    // registers. Non-finite *consumed* operands still reject the native Draw.
+    assert(native_sm3_table_fog_requires_density(1u));
+    assert(native_sm3_table_fog_requires_density(2u));
+    assert(!native_sm3_table_fog_requires_density(3u));
+    assert(native_sm3_table_fog_requires_linear_bounds(3u));
+    assert(!native_sm3_table_fog_requires_linear_bounds(1u));
+    for (unsigned mode : {1u, 2u}) {
+        NativeSm3FogReject why = NativeSm3FogReject::SourceQuery;
+        assert(native_sm3_table_zfog_admission(
+            true, mode, 0u, true, false, true, false,
+            0xff123456u, std::nanf(""), std::nanf(""), 0.25f,
+            fog, &why));
+        assert(fog.enabled && why == NativeSm3FogReject::None);
+        assert(std::fabs(native_sm3_table_zfog_factor(
+            mode, 0.5f, std::nanf(""), std::nanf(""), 0.25f) -
+            (mode == 1u ? std::exp(-0.125f) : std::exp(-0.015625f))) < 0.0001f);
+        assert(!native_sm3_table_zfog_admission(
+            true, mode, 0u, false, false, true, false,
+            0u, 0.0f, 1.0f, std::nanf(""), fog, &why));
+        assert(why == NativeSm3FogReject::DensityNotFinite && !fog.enabled);
+    }
+    NativeSm3FogReject linearWhy = NativeSm3FogReject::SourceQuery;
+    assert(native_sm3_table_zfog_admission(
+        true, 3u, 2u, true, false, true, false,
+        0xff567890u, 0.1f, 0.9f, std::nanf(""), fog, &linearWhy));
+    assert(fog.enabled && linearWhy == NativeSm3FogReject::None);
+    assert(std::fabs(native_sm3_table_zfog_factor(
+        3u, 0.5f, 0.1f, 0.9f, std::nanf("")) - 0.5f) < 0.0001f);
+    assert(!native_sm3_table_zfog_admission(
+        true, 3u, 0u, false, false, true, false,
+        0u, std::nanf(""), 1.0f, 0.0f, fog, &linearWhy));
+    assert(linearWhy == NativeSm3FogReject::StartNotFinite && !fog.enabled);
+    // Native GPU shader and output stays protected: no bypass of Z/W,
+    // source shader identity, render target, poison or publication guards.
     std::string ps = "float4 main(R283Input input) : SV_Target0 {\n"
                      "    float4 r283_color = float4(0,0,0,0);\n"
                      "    return r283_color;\n}\n";
