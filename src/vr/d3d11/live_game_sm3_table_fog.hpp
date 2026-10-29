@@ -9,8 +9,25 @@
 #include <string>
 
 namespace outrun::vr::dx11 {
+// D3D9 selects per-pixel Z or W fog from its *live projection matrix*.
+// The fourth column (0,0,0,1) selects device Z. A canonical
+// perspective (0,0,1,0) selects eye-relative W when WFOG is supported.
+// Arbitrary/noncanonical transforms cannot be guessed by native D3D11.
+enum class NativeSm3FogDepth : unsigned { Unknown, Z, W };
+[[nodiscard]] inline NativeSm3FogDepth native_sm3_projection_fog_depth(
+    float m14, float m24, float m34, float m44,
+    bool wFogCapable) noexcept {
+    if (!wFogCapable) return NativeSm3FogDepth::Z;
+    if (!std::isfinite(m14) || !std::isfinite(m24) ||
+        !std::isfinite(m34) || !std::isfinite(m44) ||
+        m14 != 0.0f || m24 != 0.0f)
+        return NativeSm3FogDepth::Unknown;
+    if (m34 == 0.0f && m44 == 1.0f) return NativeSm3FogDepth::Z;
+    if (m34 == 1.0f && m44 == 0.0f) return NativeSm3FogDepth::W;
+    return NativeSm3FogDepth::Unknown;
+}
 struct NativeSm3TableFog {
-    std::array<float, 4> rgba{};
+    std::array<float, 4> rgba{}; // RGB fog color, A = exact W-depth selector
     std::array<float, 4> controls{}; // start, end, density, D3DFOGMODE
     bool enabled{};
 };
@@ -67,7 +84,8 @@ enum class NativeSm3FogReject : unsigned {
     bool rangeFog, bool srgbOutput, bool zFogCapable, bool wFogCapable,
     std::uint32_t color, float start, float end, float density,
     NativeSm3TableFog& result,
-    NativeSm3FogReject* rejected = nullptr) noexcept {
+    NativeSm3FogReject* rejected = nullptr,
+    NativeSm3FogDepth sourceDepth = NativeSm3FogDepth::Unknown) noexcept {
     result = {};
     if (rejected) *rejected = NativeSm3FogReject::None;
     const auto fail = [&](NativeSm3FogReject cause) noexcept {
@@ -95,8 +113,16 @@ enum class NativeSm3FogReject : unsigned {
     if (native_sm3_inert_exponential_table_fog(
             tableMode, vertexMode, density)) return true;
     if (srgbOutput) return fail(NativeSm3FogReject::Srgb);
-    if (!zFogCapable) return fail(NativeSm3FogReject::MissingZCapability);
-    if (wFogCapable) return fail(NativeSm3FogReject::WCapability);
+    // WFOG capability alone does not mean the current source Draw uses W.
+    // On a WFOG rasterizer consult the authentic projection matrix before
+    // selecting the fog distance. A canonical W projection uses camera Z;
+    // an affine projection still uses device Z. Unknown matrices fail closed.
+    if (wFogCapable && sourceDepth == NativeSm3FogDepth::Unknown)
+        return fail(NativeSm3FogReject::WCapability);
+    if (sourceDepth == NativeSm3FogDepth::W && !wFogCapable)
+        return fail(NativeSm3FogReject::WCapability);
+    if (sourceDepth != NativeSm3FogDepth::W && !zFogCapable)
+        return fail(NativeSm3FogReject::MissingZCapability);
     if (tableMode != 1u && tableMode != 2u && tableMode != 3u)
         return fail(NativeSm3FogReject::TableMode);
     // Do not reject a real game Draw because an unused D3D9 fog register
@@ -114,7 +140,8 @@ enum class NativeSm3FogReject : unsigned {
     result.rgba = {{
         float((color >> 16u) & 255u) * kScale,
         float((color >> 8u) & 255u) * kScale,
-        float(color & 255u) * kScale, 0.0f}};
+        float(color & 255u) * kScale,
+        sourceDepth == NativeSm3FogDepth::W ? 1.0f : 0.0f}};
     result.controls = {{start, end, density, static_cast<float>(tableMode)}};
     result.enabled = true;
     return true;
@@ -152,7 +179,12 @@ enum class NativeSm3FogReject : unsigned {
         point + marker.size() != shader.size() ||
         shader.find(signature) == std::string::npos) return false;
     shader.replace(point, marker.size(),
-        "    float r283_z = max(0.0f, r283_fogPosition.z);\n"
+        // In PS SV_Position.w is reciprocal homogeneous W, so rcp()\n
+        // reconstructs the original eye-relative fog distance only for\n
+        // the proven canonical (0,0,1,0) D3D9 projection. Device-space Z\n
+        // remains the original path for affine and Z-only rasterizers.\n
+        "    float r283_z = max(0.0f, (r283_fogColor.a == 1.0f)\n"
+        "        ? rcp(r283_fogPosition.w) : r283_fogPosition.z);\n"
         "    float r283_fog = (r283_fogControls.w == 1.0f)\n"
         "        ? exp(-r283_fogControls.z * r283_z)\n"
         "        : ((r283_fogControls.w == 2.0f)\n"

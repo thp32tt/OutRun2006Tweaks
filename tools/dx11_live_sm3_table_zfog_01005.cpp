@@ -54,6 +54,53 @@ int main() {
                      - std::exp(-1.0f)) < 0.0001f);
     assert(std::fabs(native_sm3_table_zfog_factor(2u, 1.0f, 0.0f, 1.0f, 1.0f)
                      - std::exp(-1.0f)) < 0.0001f);
+    // The D3D9 rasterizer chooses real Z/W fog by the actual projection
+    // fourth column, not by the mere presence of a WFOG device capability.
+    assert(native_sm3_projection_fog_depth(0.f,0.f,0.f,1.f,true)
+           == NativeSm3FogDepth::Z);
+    assert(native_sm3_projection_fog_depth(0.f,0.f,1.f,0.f,true)
+           == NativeSm3FogDepth::W);
+    assert(native_sm3_projection_fog_depth(0.f,0.f,0.2f,0.f,true)
+           == NativeSm3FogDepth::Unknown);
+    assert(native_sm3_projection_fog_depth(0.f,1.f,1.f,0.f,true)
+           == NativeSm3FogDepth::Unknown);
+    assert(native_sm3_projection_fog_depth(
+               std::nanf(""),0.f,1.f,0.f,true)
+           == NativeSm3FogDepth::Unknown);
+    assert(native_sm3_projection_fog_depth(0.f,0.f,1.f,0.f,false)
+           == NativeSm3FogDepth::Z);
+    // Source-authentic active EXP/EXP2/LINEAR table fog now travels through
+    // the same native PS and live cbuffer with either certified coordinate.
+    // A W-only device must not require the unrelated ZFOG capability.
+    for (unsigned mode : {1u, 2u, 3u}) {
+        NativeSm3FogReject why = NativeSm3FogReject::SourceQuery;
+        assert(native_sm3_table_zfog_admission(
+            true, mode, 2u, true, false, false, true,
+            0xffaabbccu, 0.1f, 0.9f, 0.5f, fog, &why,
+            NativeSm3FogDepth::W));
+        assert(fog.enabled && fog.rgba[3] == 1.0f &&
+               fog.controls[3] == float(mode) && why == NativeSm3FogReject::None);
+        assert(native_sm3_table_zfog_admission(
+            true, mode, 2u, false, false, true, true,
+            0xffaabbccu, 0.1f, 0.9f, 0.5f, fog, &why,
+            NativeSm3FogDepth::Z));
+        assert(fog.enabled && fog.rgba[3] == 0.0f);
+        assert(!native_sm3_table_zfog_admission(
+            true, mode, 2u, false, false, true, true,
+            0u, 0.1f, 0.9f, 0.5f, fog, &why,
+            NativeSm3FogDepth::Unknown));
+        assert(why == NativeSm3FogReject::WCapability && !fog.enabled);
+        assert(!native_sm3_table_zfog_admission(
+            true, mode, 2u, false, false, false, false,
+            0u, 0.1f, 0.9f, 0.5f, fog, &why,
+            NativeSm3FogDepth::W));
+        assert(why == NativeSm3FogReject::WCapability && !fog.enabled);
+        assert(!native_sm3_table_zfog_admission(
+            true, mode, 2u, false, false, false, true,
+            0u, 0.1f, 0.9f, 0.5f, fog, &why,
+            NativeSm3FogDepth::Z));
+        assert(why == NativeSm3FogReject::MissingZCapability);
+    }
     // A live D3D9 TABLE mode wins over inherited VERTEX and RANGE modes.
     // These are real game-state combinations, not relaxed safety checks.
     for (unsigned mode : {1u, 2u, 3u}) {
@@ -161,6 +208,8 @@ int main() {
     assert(append_native_sm3_table_zfog(ps, true));
     assert(ps.find("register(b4)") != std::string::npos);
     assert(ps.find("r283_fogPosition : SV_Position") != std::string::npos);
+    assert(ps.find("rcp(r283_fogPosition.w)") != std::string::npos);
+    assert(ps.find("r283_fogColor.a == 1.0f") != std::string::npos);
     assert(ps.find("r283_color.rgb = lerp(") != std::string::npos);
     assert(ps.find("return r283_color;") != std::string::npos);
     assert(!append_native_sm3_table_zfog(ps, true)); // no duplicate injection

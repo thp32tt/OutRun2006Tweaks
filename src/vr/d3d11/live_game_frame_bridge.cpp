@@ -5350,8 +5350,26 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         }
         if (activeEquation) {
-            // Active equations still require every genuine source getter,
-            // safe Z capabilities and the unchanged native HLSL fog shader.
+            // WFOG capability is not the source fog coordinate. D3D9 picks
+            // Z or eye-relative W from the current projection matrix even
+            // when the application uses a programmable vertex shader.
+            // Admit only the canonical affine-Z or camera-W fourth column;
+            // any unknown/failed COM transform remains original D3D9.
+            NativeSm3FogDepth fogDepth = NativeSm3FogDepth::Z;
+            if ((fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u) {
+                D3DMATRIX projection{};
+                if (FAILED(game->GetTransform(D3DTS_PROJECTION, &projection))) {
+                    ++s.liveSm3StateRejectReasons[1];
+                    trace_live_sm3_fog_rejection(
+                        s, game, sourceOrdinal, NativeSm3FogReject::SourceQuery,
+                        9u, fog, tableMode, vertexMode, rangeFog,
+                        srgbWrite, fogCaps, 0.0f, 0.0f, 0.0f);
+                    return false;
+                }
+                fogDepth = native_sm3_projection_fog_depth(
+                    projection._14, projection._24,
+                    projection._34, projection._44, true);
+            }
             float fogStart = 0.0f, fogEnd = 0.0f, fogDensity = 0.0f;
             std::memcpy(&fogStart, &fogStartBits, sizeof(float));
             std::memcpy(&fogEnd, &fogEndBits, sizeof(float));
@@ -5363,7 +5381,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                     (fogCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
                     (fogCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
                     fogColor, fogStart, fogEnd, fogDensity, tableZFog,
-                    &fogCause)) {
+                    &fogCause, fogDepth)) {
                 // Only explicitly marked RAW visual tiles may omit an
                 // otherwise valid but unsupported source fog *appearance*.
                 // Do not admit unknown enums, invalid floats, missing COM
