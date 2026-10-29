@@ -1154,11 +1154,30 @@ float4 PSMain(VSOut input) : SV_Target
             Release(Projection, false);
             return false;
         }
-        bool ok = RenderTo(Projection.rtvs[image][0], Projection.width,
+        const bool leftBlitOk = RenderTo(
+            Projection.rtvs[image][0], Projection.width,
             Projection.height, eyeUv[0], &Projection);
-        ok = RenderTo(Projection.rtvs[image][1], Projection.width,
-            Projection.height, eyeUv[1], &Projection) && ok;
+        const bool rightBlitOk = RenderTo(
+            Projection.rtvs[image][1], Projection.width,
+            Projection.height, eyeUv[1], &Projection);
+        const bool ok = leftBlitOk && rightBlitOk;
         const bool released = Release(Projection, ok);
+        static std::uint64_t projectionFrameResults = 0;
+        const auto resultHit = ++projectionFrameResults;
+        if (resultHit <= 64 || (resultHit & (resultHit - 1)) == 0 ||
+            !leftBlitOk || !rightBlitOk || !released)
+            std::cerr << "[R19 TRACE] frame-result hit=" << resultHit
+                      << " frameId=" << LastStereoFrame.frameId
+                      << " sourcePoseSequence=" << LastStereoFrame.sourcePoseSequence
+                      << " image=" << image
+                      << " leftBlit=" << (leftBlitOk ? 1 : 0)
+                      << " rightBlit=" << (rightBlitOk ? 1 : 0)
+                      << " released=" << (released ? 1 : 0)
+                      << " captureQpc=" << LastProductionPresentQpc
+                      << " framePresentQpc=" << LastStereoFrame.presentQpc
+                      << " target=" << Projection.width << "x" << Projection.height
+                      << " evidence=POST_BOTH_RENDERTO_PRE_XREND_FRAME"
+                      << "\n";
         if (!ok || !released)
             return false;
 
@@ -1378,6 +1397,23 @@ float4 PSMain(VSOut input) : SV_Target
             replaced, replacementProjection,
             replacementFrameId, replacementPoseSequence,
             submittedInfo ? submittedInfo->layerCount : 0, result);
+        static std::uint64_t endFrameResults = 0;
+        const auto endHit = ++endFrameResults;
+        if (endHit <= 64 || (endHit & (endHit - 1)) == 0 || XR_FAILED(result))
+            std::cerr << "[R19 TRACE] endframe-result hit=" << endHit
+                      << " replaced=" << (replaced ? 1 : 0)
+                      << " projection=" << (replacementProjection ? 1 : 0)
+                      << " frameId=" << replacementFrameId
+                      << " sourcePoseSequence=" << replacementPoseSequence
+                      << " layerCount="
+                      << (submittedInfo ? submittedInfo->layerCount : 0)
+                      << " xrResult=" << static_cast<long long>(result)
+                      << " captureQpc=" << LastProductionPresentQpc
+                      << " framePresentQpc="
+                      << (LastStereoFrameValid ? LastStereoFrame.presentQpc : 0)
+                      << " receiptSerial=" << LastEndFrameReceiptSerial
+                      << " evidence=POST_XREND_FRAME"
+                      << "\n";
         return result;
     }
 
