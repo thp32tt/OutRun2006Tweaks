@@ -661,7 +661,13 @@ private:
         ++capture_;
         region_ = D3D11_BOX{tiles.first.x, tiles.first.y, 0u,
                             tiles.first.x + width, tiles.first.y + height, 1u};
-        alternateActive_ = tiles.hasSecond;
+        // Defense in depth: two staging copies sharing GPU source RGB
+        // cannot be advertised as two independent Draw pixel populations.
+        // The selector normally enforces this; retain the check at the
+        // actual D3D11 CopySubresourceRegion integration boundary.
+        alternateActive_ = tiles.hasSecond &&
+            native_raw_source_tiles_disjoint(
+                tiles.first, tiles.second, width, height);
         regionAlternate_ = alternateActive_
             ? D3D11_BOX{tiles.second.x, tiles.second.y, 0u,
                         tiles.second.x + width, tiles.second.y + height, 1u}

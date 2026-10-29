@@ -11,6 +11,17 @@ struct NativeRawDualTile {
     NativeRawTileOrigin first{}, second{};
     bool hasSecond = false;
 };
+// Source readback regions must be non-overlapping in either physical axis.
+// Compare unsigned differences without converting D3D11 coordinates to
+// signed types or overflowing x + width at the caller's pixel limits.
+[[nodiscard]] constexpr bool native_raw_source_tiles_disjoint(
+    NativeRawTileOrigin a, NativeRawTileOrigin b,
+    std::uint32_t width, std::uint32_t height) noexcept {
+    if (!width || !height) return false;
+    const auto deltaX = a.x >= b.x ? a.x - b.x : b.x - a.x;
+    const auto deltaY = a.y >= b.y ? a.y - b.y : b.y - a.y;
+    return deltaX >= width || deltaY >= height;
+}
 [[nodiscard]] constexpr bool native_raw_dual_draw_tile(
     std::uint32_t sw, std::uint32_t sh, std::uint32_t tw,
     std::uint32_t th, NativeRawDrawExtent raster,
@@ -18,14 +29,28 @@ struct NativeRawDualTile {
     out = {};
     if (!native_raw_draw_tile(sw, sh, tw, th, raster, ordinal, out.first))
         return false;
-    for (std::uint32_t step = 2u; step < 7u; ++step) {
-        NativeRawTileOrigin next{};
-        if (native_raw_draw_tile(sw, sh, tw, th, raster,
-                                 ordinal + step, next) &&
-            (next.x != out.first.x || next.y != out.first.y)) {
-            out.second = next;
+    // Different origins do NOT imply independent pixels: small HUD/menu
+    // viewports can cause two largely overlapping GPU copies. Distinct
+    // RAW proof requires disjoint physical source rectangles.
+    NativeRawTileOrigin samples[5]{out.first};
+    bool valid[5]{true, false, false, false, false};
+    for (std::uint32_t step = 1u; step < 5u; ++step)
+        valid[step] = native_raw_draw_tile(sw, sh, tw, th, raster,
+                                           ordinal + step, samples[step]);
+    // Try the rotating center/corner anchor first; if it straddles both
+    // halves of a narrow menu strip, another TWO real source tiles may
+    // still fit. Search all five authenticated anchors before falling
+    // back to one tile. No pixels are duplicated or extrapolated.
+    for (std::uint32_t first = 0u; first < 5u; ++first) {
+        if (!valid[first]) continue;
+        for (std::uint32_t second = first + 1u; second < 5u; ++second) {
+            if (!valid[second] || !native_raw_source_tiles_disjoint(
+                    samples[first], samples[second], tw, th))
+                continue;
+            out.first = samples[first];
+            out.second = samples[second];
             out.hasSecond = true;
-            break;
+            return true;
         }
     }
     return true;
