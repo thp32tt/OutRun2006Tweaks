@@ -1,0 +1,574 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1145KST-A0095-B0110-NEW-SHA8",
+  "question_at_kst": "2026-10-29T11:45:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "baseline_remote_head": "86c6475888dfbb3a274cb4ea8b1c31769cbd884c",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence": {
+    "preflight": "work/C1_QA_20261029_1145_AI2_new_sha8/preflight.json",
+    "candidate_pair_sheets": [
+      "work/C1_QA_20261029_1145_AI2_new_sha8/pairs_A.jpg",
+      "work/C1_QA_20261029_1145_AI2_new_sha8/pairs_B.jpg"
+    ],
+    "aspect_preserving_fit_simulations": [
+      "work/C1_QA_20261029_1145_AI2_new_sha8/native_fit_A.jpg",
+      "work/C1_QA_20261029_1145_AI2_new_sha8/native_fit_B.jpg"
+    ],
+    "expanded_original_context": [
+      "work/C1_QA_20261029_1145_AI2_new_sha8/Q062_left_right_context.png",
+      "work/C1_QA_20261029_1145_AI2_new_sha8/Q062_easy_context.png",
+      "work/C1_QA_20261029_1145_AI2_new_sha8/Q086_continuous_context.png",
+      "work/C1_QA_20261029_1145_AI2_new_sha8/Q086_goal_context.png"
+    ]
+  },
+  "inventory": {
+    "checked_prior_reports": 32,
+    "unique_candidate_SHA_in_prior_reports": 223,
+    "all_eight_new_sha": true
+  },
+  "summary": {
+    "new_SHA_reviewed": 8,
+    "candidate_sha_match": 8,
+    "source_HD_SHA_match": 8,
+    "PNG_RGBA": 8,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8,
+    "confirmed_glyph_failure": 0,
+    "alpha_edge_suspicion": "A0095/B0108/B0109 only alpha=1 edge; no alpha>=32 edge",
+    "actual_native_UI_composite": "NOT_TESTED",
+    "dds": "NOT_CREATED",
+    "runtime_validation": "UNTESTED"
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0095-6B62FFA1",
+      "source_ordinal": 389,
+      "english": "Right",
+      "approved_korean": "우측",
+      "source_file": "Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "45545843d55e1e33a059b1832e6c75206056468b86a29478838391636eae8772",
+      "manifest_source_sha256": "45545843d55e1e33a059b1832e6c75206056468b86a29478838391636eae8772",
+      "source_sha_match": true,
+      "source_dimensions": [
+        2048,
+        1024
+      ],
+      "bbox_xyxy": [
+        676,
+        162,
+        879,
+        249
+      ],
+      "target_dimensions": [
+        203,
+        87
+      ],
+      "candidate_file": "Q062_3d91f8d09b7fabe4_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q062_3d91f8d09b7fabe4_k.png",
+      "candidate_sha256": "9779723db3bd89c0d8edee85a711566752dcaab9a42550eba39ba568bc1af549",
+      "export_sha256": "9779723db3bd89c0d8edee85a711566752dcaab9a42550eba39ba568bc1af549",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1916,
+        821
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        43,
+        36,
+        1789,
+        821
+      ],
+      "edge_nz": 19,
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        203,
+        87
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_ROI_INCLUDES_PROTECTED_TRACK_ART",
+        "observation": "Original Q062 wider context shows Right label overlaps adjacent green track illustration and white/background pixels inside the source bbox. Korean '우측' is legible and a transparent glyph-only image; actual cell/protected-art isolation is not composite-tested.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0096-F51AF5C4",
+      "source_ordinal": 390,
+      "english": "GOAL A",
+      "approved_korean": "골 A",
+      "source_file": "Q086_C598919A_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q086_C598919A_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "41ffc83d2106617cf0f0d92e04ae4f0fc7ecce1b7c6d3fdf096f9e4aaa6db4f8",
+      "manifest_source_sha256": "41ffc83d2106617cf0f0d92e04ae4f0fc7ecce1b7c6d3fdf096f9e4aaa6db4f8",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        2612,
+        1490,
+        2972,
+        1640
+      ],
+      "target_dimensions": [
+        360,
+        150
+      ],
+      "candidate_file": "Q086_63903035a9ba4fea_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q086_63903035a9ba4fea_k.png",
+      "candidate_sha256": "35626572479529726ee1824d5fdcbf99b5e868accef8509942b5185667983620",
+      "export_sha256": "35626572479529726ee1824d5fdcbf99b5e868accef8509942b5185667983620",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1942,
+        809
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        248,
+        36,
+        1685,
+        785
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        360,
+        150
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "Korean '골 A' is clean and readable; expanded Q086 context has neighboring course/icon assets, so precise on-atlas registration and protection need a native composite check.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0097-BD757009",
+      "source_ordinal": 391,
+      "english": "OutRun2 15 Continuous Course",
+      "approved_korean": "OutRun2 15코스 연속",
+      "source_file": "Q086_C598919A_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q086_C598919A_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "41ffc83d2106617cf0f0d92e04ae4f0fc7ecce1b7c6d3fdf096f9e4aaa6db4f8",
+      "manifest_source_sha256": "41ffc83d2106617cf0f0d92e04ae4f0fc7ecce1b7c6d3fdf096f9e4aaa6db4f8",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        2752,
+        1890,
+        3962,
+        2036
+      ],
+      "target_dimensions": [
+        1210,
+        146
+      ],
+      "candidate_file": "Q086_efe5f21b303c5b48_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q086_efe5f21b303c5b48_k.png",
+      "candidate_sha256": "d65fb1d50b260b41bc10db17e297580b47b2839208e53cda38514383ef329572",
+      "export_sha256": "d65fb1d50b260b41bc10db17e297580b47b2839208e53cda38514383ef329572",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        21,
+        87,
+        2156,
+        696
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        438,
+        146
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "'OutRun2 15코스 연속' visibly preserves OutRun2 and the approved Korean mapping; smaller overall width alone is allowed. Wider Q086 source includes a dark bar and nearby graphics; exact target cell fitting/50%-scale legibility not independently proven by simulation.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0098-AE0046AE",
+      "source_ordinal": 392,
+      "english": "GOAL C",
+      "approved_korean": "골 C",
+      "source_file": "Q086_C598919A_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q086_C598919A_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "41ffc83d2106617cf0f0d92e04ae4f0fc7ecce1b7c6d3fdf096f9e4aaa6db4f8",
+      "manifest_source_sha256": "41ffc83d2106617cf0f0d92e04ae4f0fc7ecce1b7c6d3fdf096f9e4aaa6db4f8",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        1412,
+        1490,
+        1762,
+        1640
+      ],
+      "target_dimensions": [
+        350,
+        150
+      ],
+      "candidate_file": "Q086_9eeb087d3de40205_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q086_9eeb087d3de40205_k.png",
+      "candidate_sha256": "2268016dce3f164ca1fc8f8553892d8b2176d0a7fd44df989e6025c14f146330",
+      "export_sha256": "2268016dce3f164ca1fc8f8553892d8b2176d0a7fd44df989e6025c14f146330",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1916,
+        821
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        355,
+        25,
+        1760,
+        790
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        350,
+        150
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "'골 C' visible with no apparent fake jamo or alpha edge cutoff; actual Q086 atlas compositing and protected graphics unchanged requirement remain unproven.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0107-CACFCA45",
+      "source_ordinal": 444,
+      "english": "Go through the gate!",
+      "approved_korean": "게이트를 통과하세요!",
+      "source_file": "Q061_C4A2937B_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q061_C4A2937B_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e6eacff3ddc62628fe4bc2cfc92868936fa755476c73407f74bbd2f4d48ad7f7",
+      "manifest_source_sha256": "e6eacff3ddc62628fe4bc2cfc92868936fa755476c73407f74bbd2f4d48ad7f7",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        2066,
+        1022,
+        2548,
+        1112
+      ],
+      "target_dimensions": [
+        482,
+        90
+      ],
+      "candidate_file": "Q061_d09b126a2b69bc9e_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q061_d09b126a2b69bc9e_k.png",
+      "candidate_sha256": "c39d37bdd268d3f948903d605823de64f79ccee297bdde8a781d319f03bbb96a",
+      "export_sha256": "c39d37bdd268d3f948903d605823de64f79ccee297bdde8a781d319f03bbb96a",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2065,
+        762
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        31,
+        29,
+        2051,
+        713
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        244,
+        90
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "'게이트를 통과하세요!' legible with no detected substantive edge alpha clip or foreign objects; no native cell/protected-art compositing test.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0108-11631FFC",
+      "source_ordinal": 445,
+      "english": "EASY",
+      "approved_korean": "쉬움",
+      "source_file": "Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "45545843d55e1e33a059b1832e6c75206056468b86a29478838391636eae8772",
+      "manifest_source_sha256": "45545843d55e1e33a059b1832e6c75206056468b86a29478838391636eae8772",
+      "source_sha_match": true,
+      "source_dimensions": [
+        2048,
+        1024
+      ],
+      "bbox_xyxy": [
+        145,
+        289,
+        380,
+        377
+      ],
+      "target_dimensions": [
+        235,
+        88
+      ],
+      "candidate_file": "Q062_bdd51608c09e7e5f_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q062_bdd51608c09e7e5f_k.png",
+      "candidate_sha256": "5b7853a6acb06b3097954622d1d7da058d3078315978e10f7ab6669a415799cf",
+      "export_sha256": "5b7853a6acb06b3097954622d1d7da058d3078315978e10f7ab6669a415799cf",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2049,
+        767
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        336,
+        32,
+        1901,
+        767
+      ],
+      "edge_nz": 1,
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        235,
+        88
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_ROI_INCLUDES_PROTECTED_TRACK_ART",
+        "observation": "Original Q062 EASY crop/wider view includes white and green track art near the text. Korean '쉬움' itself is isolated and readable. No true source-safe-cell registration/composite proof.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0109-C7956C41",
+      "source_ordinal": 446,
+      "english": "Left",
+      "approved_korean": "좌측",
+      "source_file": "Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "45545843d55e1e33a059b1832e6c75206056468b86a29478838391636eae8772",
+      "manifest_source_sha256": "45545843d55e1e33a059b1832e6c75206056468b86a29478838391636eae8772",
+      "source_sha_match": true,
+      "source_dimensions": [
+        2048,
+        1024
+      ],
+      "bbox_xyxy": [
+        315,
+        162,
+        471,
+        246
+      ],
+      "target_dimensions": [
+        156,
+        84
+      ],
+      "candidate_file": "Q062_9d92bca9ea5295b0_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q062_9d92bca9ea5295b0_k.png",
+      "candidate_sha256": "88441c279a70c3363da5b18e72129a39924a3551558e03ae24b7366d98b44e67",
+      "export_sha256": "88441c279a70c3363da5b18e72129a39924a3551558e03ae24b7366d98b44e67",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1709,
+        920
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        18,
+        1614,
+        888
+      ],
+      "edge_nz": 8,
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        156,
+        84
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_ROI_INCLUDES_PROTECTED_TRACK_ART",
+        "observation": "Original Q062 Left crop/wider view contains green/grey track art. Korean '좌측' is legible and isolated; alpha=1 pixels at an edge are not clipped glyph evidence. Exact atlas-cell art isolation remains unverified.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0110-D18D5A59",
+      "source_ordinal": 447,
+      "english": "GOAL E",
+      "approved_korean": "골 E",
+      "source_file": "Q086_C598919A_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q086_C598919A_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "41ffc83d2106617cf0f0d92e04ae4f0fc7ecce1b7c6d3fdf096f9e4aaa6db4f8",
+      "manifest_source_sha256": "41ffc83d2106617cf0f0d92e04ae4f0fc7ecce1b7c6d3fdf096f9e4aaa6db4f8",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        212,
+        1488,
+        554,
+        1638
+      ],
+      "target_dimensions": [
+        342,
+        150
+      ],
+      "candidate_file": "Q086_b666fbc45549afc4_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q086_b666fbc45549afc4_k.png",
+      "candidate_sha256": "0d81b7488baa484f8719ad0f3673b7b4af84b40c857d15986c692cb554b220a9",
+      "export_sha256": "0d81b7488baa484f8719ad0f3673b7b4af84b40c857d15986c692cb554b220a9",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1893,
+        831
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        137,
+        60,
+        1616,
+        693
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        342,
+        150
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "'골 E' clear and mapping exact. Expanded Q086 goal context contains adjacent icons/labels, so native atlas placement/protected art remains UNTESTED.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    }
+  ],
+  "role_scope": "NO_IMAGEGEN_NO_A_B_QUEUE_CONSUMPTION_NO_DDS_NO_C2_C3_OR_INGAME_APPROVAL_NO_VR_FFB_DX11_DXVK_CHANGES"
+}
