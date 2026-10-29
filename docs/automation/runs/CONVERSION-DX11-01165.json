@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01165",
+  "production_id": "CONVERSION-DX11-01165",
+  "event_id": "CONVERSION-DX11-01165-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_work_key": "DX11:RAW_SOURCE_ALIGNED_GAME_BACKBUFFER_PRESENT",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_INHERITED_EXACT_SHA_GATE_CAUSAL_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "scoreboard_previous": 2187,
+  "scoreboard_new": 2188,
+  "development_time_percentages": "UNMEASURED",
+  "controller_runtime_adoption": "UNVERIFIED",
+  "source_base_sha": "c0986e075671f8768c51e340c37014a1df6da38d",
+  "implementation_source_sha": "035891715b575e96fc46cbab524d28bb80df432d",
+  "validation_bearing_result_sha": "dc0acb87687ba1bcf503dee748f6f801940d8ee9",
+  "material_result_sha": "035891715b575e96fc46cbab524d28bb80df432d",
+  "causal_ci_repair_shas": [
+    "dc0acb87687ba1bcf503dee748f6f801940d8ee9"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "docs/automation/runs/CONVERSION-DX11-01164.json"
+  ],
+  "implementation": "E001 original source commit adds full-size SOURCE-COINCIDENT RAW native GPU diagnostic placement with authentic source-target dimension and D3D9 render-target identity, crop/dirty coverage, optional second tile disjointness and compile-time positive/negative regression. E003 fixes inherited 01164 structured acceptance evidence (empty exact-SHA workflow paths) without changing 01165 game C++ code. This only demonstrates source/build validity for opt-in partial native pixels; menu/car/race gameplay and full-frame/HMD output are not runtime proven.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "AUTHENTIC_D3D9_GAME_DRAW_AND_SOURCE_RTV",
+      "NATIVE_D3D11_GPU_RGB_CAPTURE",
+      "ORIGINAL_BACKBUFFER_SOURCE_ALIGNED_DIRTY_PRESENT",
+      "FAIL_CLOSED_D3D9_ORIGINAL_FALLBACK"
+    ],
+    "batch_components": [
+      "CPP_CANONICAL_GAME_RENDER_TARGET_AND_PIXEL_GRID_IDENTITY",
+      "CPP_SOURCE_ALIGNED_GPU_TILE_AND_SPLIT_DIRTY_UNION",
+      "CPP_CONSTEXPR_POSITIVE_NEGATIVE_SOURCE_PRESENT_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compile-time true for source-origin (320,200)+sample (5,6) -> original screen pixel (325,206) with both dirty halves authentic on equal 1920x1080 surfaces.",
+      "negative_regression": "Compile-time rejection for mismatched source dimensions, crop excluding native pixel, split dirty gap and target-overflow source origin.",
+      "component_integration": "Live GPU RAW capture and D3D9 original backbuffer identity feed source-aligned opt-in dirty Present, with old inset path left available and DXVK unchanged."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "docs/automation/runs/CONVERSION-DX11-01164.json"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "OPT_IN_VISIBLE_PARTIAL_DIAGNOSTIC",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_BUILD_VERIFIED_DIAGNOSTIC_ONLY; real game full-screen Draw pixel count, menu/car/race video, desktop screen output and Quest3 eye display NOT_YET_OBSERVED.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC remains user opt-in; source/size/RT/dirty/crop fail closed, original D3D9 rendering/gamepad/FFB and DX9Ex fallback unchanged, DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Integrate source-position-preserving authentic native GPU RAW diagnostic pixels into original game-backbuffer dirty Presents while protecting canonical D3D9 input and fallback.",
+    "acceptance_items": [
+      {
+        "id": "source_coincident_native_gpu_present",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native GPU diagnostic pixels to canonical D3D9 game backbuffer",
+        "expected_behavior": "Source-owned native GPU pixel tile lands at the original coincident game-backbuffer coordinates when both surfaces share dimensions and the original render target."
+      },
+      {
+        "id": "source_identity_dirty_rect_admission",
+        "category": "end_to_end_behavior",
+        "behavior_area": "guarded exact-region D3D9 Present",
+        "expected_behavior": "Nonmatching source dimensions, out-of-crop offsets, missing split dirty rows and out-of-target sample extents reject source-aligned presentation."
+      },
+      {
+        "id": "production_fallback_unchanged",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9Ex and input safety",
+        "expected_behavior": "Unproved source identity or dirty coverage preserves legacy RAW inset/fail-closed presentation, default diagnostic OFF, and unchanged game input, FFB and DXVK."
+      },
+      {
+        "id": "five_gate_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Actions exact source SHA",
+        "expected_behavior": "All five required GitHub Actions workflows succeed against one candidate SHA without CI skip; game desktop and Quest 3 remain UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_coincident_native_gpu_present": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "Exact SHA DX11 Fast 40932661091 + Build 40932661186 success (compile-time regression)"
+    },
+    "source_identity_dirty_rect_admission": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "Header static_assert positive/negative source-coincident 1920x1080 dirty/crop/overflow compiled at exact SHA"
+    },
+    "production_fallback_unchanged": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "DX11 Fast 40932661091 + Backend validate/smoke 40932661087 PASS; runtime verification not asserted"
+    },
+    "five_gate_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Five required exact-SHA GitHub workflow results success: 40932661091, 40932661087, 40932661186, 40932661519, 40932661182"
+    }
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40932661091,
+        "head_sha": "dc0acb87687ba1bcf503dee748f6f801940d8ee9",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40932661087,
+        "head_sha": "dc0acb87687ba1bcf503dee748f6f801940d8ee9",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40932661186,
+        "head_sha": "dc0acb87687ba1bcf503dee748f6f801940d8ee9",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40932661519,
+        "head_sha": "dc0acb87687ba1bcf503dee748f6f801940d8ee9",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40932661182,
+        "head_sha": "dc0acb87687ba1bcf503dee748f6f801940d8ee9",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "original_failed_backend_gate": 40932243369,
+    "failed_inherited_cause": "01164 structured five_gate evidence_paths=[] rejected by tools/dx11_autodev_policy.py verified_build_acceptance(); all five 01164 source SHA 3de7fe51 historical workflows were actually successful.",
+    "causal_repair": "Populate exact existing five workflow paths in 01164 record; no fake test PASS, no policy bypass.",
+    "validation_layer": "SOURCE_AND_BUILD_VERIFIED_NOT_GAMEPLAY_OR_HMD",
+    "runtime_evidence": "No source-matched native game desktop, menu-to-race or Quest3/VDXR HMD test. RUNTIME_VALIDATION=UNTESTED.",
+    "scoreboard": "AI2 prior confirmed 2187 + 01165 independently integrated C++ source/build exact-SHA proof +1 = 2188; retries/metadata/C6 additional +0."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_HEAD_03589171_AND_FAILED_BACKEND_40932243369",
+    "C1_REVIEW": "PASS_IDENTIFIED_INHERITED_01164_STRUCTURED_ACCEPTANCE_PATHS_MISSING",
+    "C2_IMPLEMENT": "PASS_E001_ORIGINAL_NATIVE_CXX_114_LINES_SOURCE_AND_CONSTEXPR_REGRESSIONS",
+    "C3_VALIDATE": "PASS_5_MANDATORY_PUSH_EXACT_SHA_GATES_AFTER_E003_CAUSAL_REPAIR",
+    "C4_COMMIT": "PASS_MATERIAL_CPP_03589171_WITH_CAUSAL_REPAIR_DC0ACB87",
+    "C5_PACKAGE": "BUILD_VERIFIED_NO_USER_RUNTIME_CANDIDATE_PROMOTION",
+    "C6_STATE": "PASS_DOCS_ONLY_NO_SCORE_DUPLICATION"
+  },
+  "next_unfinished": "Need user real-game native GPU pixel provenance and menu/vehicle/race full-frame coverage and native L/R OpenXR GPU handoff; DXVK remains frozen; Quest3 HMD untested."
+}
