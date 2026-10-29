@@ -1,0 +1,67 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T0745KST-IDLE",
+  "observed_at_kst": "2026-10-30T07:47:47+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "Read-only N100 filesystem/state inventory via existing work/C1_QA_20261030_0545_inventory.py; compare PNG modification times against completed 05:15 C1 QA; recheck two latest SHA256; do not duplicate visual review for identical SHA.",
+  "prior_qa": "localization/qa_reports/C1_20261030_0515_AI2_NEW_SHA2.json",
+  "previous_idle": "localization/qa_reports/C1_20261030_0715_AI2_IDLE.json",
+  "inventory": {
+    "candidate_png_files": {
+      "A": 436,
+      "B": 482
+    },
+    "completed_files": {
+      "A": 435,
+      "B": 482
+    },
+    "completed_batches": {
+      "A": 141,
+      "B": 145
+    },
+    "active": {
+      "A": null,
+      "B": null
+    },
+    "new_png_modified_since_20261030_0515_kst": 0,
+    "latest_candidate_mtime_kst": {
+      "A": "2026-10-30T04:20:09+09:00",
+      "B": "2026-10-30T05:10:04+09:00"
+    },
+    "last_qa_sha256_match": {
+      "A": true,
+      "B": true
+    }
+  },
+  "results": {
+    "status": "IDLE",
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "notes": "No new A/B exported candidate since prior QA; no repeated same-SHA review."
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "new_verified_qa_achievement": false,
+    "delta": 0,
+    "previous_confirmed_ai2": 2195,
+    "new_ai2": 2195,
+    "scoreboard_updated": false
+  }
+}
