@@ -1,0 +1,74 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T0545KST-IDLE",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "observed_at_kst": "2026-10-30T05:48:24+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "No newly exported or modified A/B Korean PNG candidate since previous 05:15 C1 SHA-reviewed batch. No newly reviewable candidate is established; do not re-review prior SHA.",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "candidate_outputs_png": {
+      "A": 436,
+      "B": 482,
+      "total": 918
+    },
+    "state": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "active": null,
+        "next_ordinal": 436
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "active": null,
+        "next_ordinal": 483
+      }
+    },
+    "modified_since_previous_qa_20261030T0515KST": 0,
+    "latest_file_mtime_kst": {
+      "A": "2026-10-30T04:20:09+09:00",
+      "B": "2026-10-30T05:10:04+09:00"
+    },
+    "previous_qa_report": "localization/qa_reports/C1_20261030_0515_AI2_NEW_SHA2.json",
+    "prior_two_candidate_sha256_reverified": {
+      "A/Q043_8845a649913b5ecf_k.png": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+      "B/Q046_d10debc727463563_k.png": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5"
+    }
+  },
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "evidence": {
+    "n100_inventory_script": "work/C1_QA_20261030_0545_inventory.py",
+    "file_count_unchanged_from_previous_QA": true
+  },
+  "scope": {
+    "A_B_queue_consumed": false,
+    "imagegen_called": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score": {
+    "previous_confirmed_ai2": 2190,
+    "delta": 0,
+    "new_cumulative_ai2": 2190,
+    "reason": "IDLE/status verification is not a new scored QA achievement."
+  },
+  "limitations": [
+    "File modification times and exact latest candidate SHA recheck were used for no-new-output determination; an intentionally backdated in-place replacement is not ruled out.",
+    "Full 918-candidate per-SHA historical comparison not repeated for this IDLE run; previous 05:15 QA had de-duplicated earlier QA reports."
+  ]
+}
