@@ -127,6 +127,33 @@ require("native_sm3_inert_exponential_table_fog(" in header and
         "if (native_sm3_inert_exponential_table_fog(" in header and
         "if (srgbOutput)" in header,
         "exact zero-density no-op must precede active source fog safety")
+# FVF table fog must reach native GPU RGB and an authentic per-Draw b2,
+# not merely an admission helper or repeated prior SM3 PASS.
+for token in ("PSFvfTableFogDiffuse", "PSFvfTableFogModulate",
+              "PSFvfTableFogTextureOnly", "FvfApplyTableFog",
+              "rcp(v.clip.w)", "color.rgb = lerp(",
+              "ctx->PSSetConstantBuffers(2u, 1u, &fvfFogBuffer)",
+              "ctx->PSSetShader(fixedPixelShader",
+              "native_sm3_projection_fog_depth(",
+              "native_sm3_table_zfog_admission(",
+              "output.nativeTableFog.enabled",
+              "sourceTableFog != D3DFOG_NONE",
+              "if (!output.rawFogVisualMismatch) return false;",
+              "s.fvfFogConstants.Reset()"):
+    require(token in bridge,
+            "FVF native table fog game-state, GPU PS, or fallback missing: " + token)
+require(bridge.index("ctx->PSSetConstantBuffers(2u, 1u, &fvfFogBuffer)") <
+        bridge.index("ctx->PSSetShader(fixedPixelShader, nullptr, 0u)") <
+        bridge.index("if (ib) ctx->DrawIndexed(indexCount, 0, 0);"),
+        "FVF native table fog was bound after GPU submission")
+# Unsupported stage-1/complex combiner must NEVER return a false exact fog.
+selected_fog = bridge.partition("if (output.nativeTableFog.enabled) {")[2].partition(
+    "ctx->PSSetShader(fixedPixelShader, nullptr, 0u);")[0]
+require("else return false;" in selected_fog and
+        "s.fvfFogDiffusePs.Get()" in selected_fog and
+        "s.fvfFogModulatePs.Get()" in selected_fog and
+        "s.fvfFogTextureOnlyPs.Get()" in selected_fog,
+        "exact FVF fog incorrectly promotes unsupported combiner")
 compiler = shutil.which("g++") or shutil.which("clang++")
 if compiler:
     with tempfile.TemporaryDirectory() as folder:

@@ -1244,6 +1244,7 @@ struct OutputCapture {
     bool alphaBlend = false;
     bool nativeSrgbWrite = false; // Live FVF RT0 encoding; independent of sampler decode.
     bool rawFogVisualMismatch = false; // Only for a fog-omitting opt-in RAW tile; NEVER a full game frame.
+    NativeSm3TableFog nativeTableFog{}; // Authenticated live FVF Z/W fog RGB output.
     bool additiveBlend = false; // D3D9 ONE/ONE
     bool sourceAlphaAddBlend = false; // D3D9 SRCALPHA/ONE
     bool premultipliedAlphaBlend = false; // D3D9 ONE/INVSRCALPHA
@@ -1401,6 +1402,8 @@ struct State {
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
     ComPtr<ID3D11PixelShader> sampledPs;
+    ComPtr<ID3D11PixelShader> fvfFogDiffusePs, fvfFogModulatePs, fvfFogTextureOnlyPs;
+    ComPtr<ID3D11Buffer> fvfFogConstants;
     ComPtr<ID3D11PixelShader> stage1DiffusePs;
     ComPtr<ID3D11PixelShader> stage1ModulatePs;
     ComPtr<ID3D11PixelShader> stage1TextureOnlyPs;
@@ -1831,11 +1834,41 @@ float4 PSStage1Add(VOut v) : SV_Target {
 }
 )";
 
+constexpr char kFvfTableFogShader[] = R"(
+// Real fixed-function table fog: apply to native FVF RGB before blending.
+// SV_Position.w in the pixel shader is inverse homogeneous W.
+cbuffer FvfTableFog : register(b2) {
+    float4 fvfFogRGBW;
+    float4 fvfFogControls;
+};
+float4 FvfApplyTableFog(VOut v, float4 color) {
+    float depth = max(0.0f, fvfFogRGBW.a > 0.5f ? rcp(v.clip.w) : v.clip.z);
+    float factor = 1.0f;
+    if (fvfFogControls.w == 1.0f)
+        factor = exp(-fvfFogControls.z * depth);
+    else if (fvfFogControls.w == 2.0f)
+        factor = exp(-fvfFogControls.z * fvfFogControls.z * depth * depth);
+    else
+        factor = (fvfFogControls.y - depth) / (fvfFogControls.y - fvfFogControls.x);
+    color.rgb = lerp(fvfFogRGBW.rgb, color.rgb, saturate(factor));
+    return color;
+}
+float4 PSFvfTableFogDiffuse(VOut v) : SV_Target {
+    return FvfApplyTableFog(v, PS(v));
+}
+float4 PSFvfTableFogModulate(VOut v) : SV_Target {
+    return FvfApplyTableFog(v, PSTextured(v));
+}
+float4 PSFvfTableFogTextureOnly(VOut v) : SV_Target {
+    return FvfApplyTableFog(v, PSTextureOnly(v));
+}
+)";
+
 bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noexcept {
     ComPtr<ID3DBlob> errors;
     static const std::string shaderSource = std::string(kShader) + kScaledAlphaShader;
     // Preserve the original stage-0 shader source while linking stage 1.
-    static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader;
+    static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader + kFvfTableFogShader;
     return SUCCEEDED(D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size(), "live_game_frame",
         nullptr, nullptr, entry, profile, D3DCOMPILE_ENABLE_STRICTNESS,
         0, blob.GetAddressOf(), errors.GetAddressOf())) && blob;
@@ -1847,7 +1880,9 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     const bool readbackReady = std::all_of(s.readbacks.begin(), s.readbacks.end(),
         [](const ReadbackSlot& item) { return item.staging && item.fence; });
     if (s.backend.ready() && s.nativeWidth == width &&
-        s.nativeHeight == height && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.selectDiffuseTextureAlphaPs && s.selectDiffuseModulateAlphaPs && s.selectDiffuseAddAlphaPs && s.selectDiffuseSubtractAlphaPs && s.selectDiffuseModulate2XAlphaPs && s.selectDiffuseModulate4XAlphaPs && s.additivePs && s.subtractPs &&
+        s.nativeHeight == height && s.fvfFogDiffusePs && s.fvfFogModulatePs &&
+        s.fvfFogTextureOnlyPs && s.fvfFogConstants &&
+        s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.selectDiffuseTextureAlphaPs && s.selectDiffuseModulateAlphaPs && s.selectDiffuseAddAlphaPs && s.selectDiffuseSubtractAlphaPs && s.selectDiffuseModulate2XAlphaPs && s.selectDiffuseModulate4XAlphaPs && s.additivePs && s.subtractPs &&
         s.stage1DiffusePs && s.stage1ModulatePs &&
         s.stage1TextureOnlyPs && s.stage1AddPs && s.selectTextureAddSmoothAlphaPs && s.selectDiffuseAddSmoothAlphaPs && s.selectTextureFactorAlphaPs && s.selectTextureTfactorAlphaPs && s.selectDiffuseFactorAlphaPs && s.selectDiffuseTfactorAlphaPs && s.selectTextureBlendTextureAlphaPs && s.selectDiffuseBlendTextureAlphaPs && s.selectTextureBlendDiffuseAlphaPs && s.selectDiffuseBlendDiffuseAlphaPs && s.selectTextureModulate2XAlphaPs && s.selectTextureModulate4XAlphaPs && s.selectTextureDiffuseAlphaPs && s.selectTextureModulateAlphaPs && s.selectTextureAddAlphaPs && s.selectTextureSubtractAlphaPs &&
         s.subtractTextureAlphaPs && s.subtractDiffuseAlphaPs && s.subtractModulateAlphaPs && s.addSmoothPs && s.modulate2xPs && s.modulate4xPs &&
@@ -1895,6 +1930,8 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
+    s.fvfFogDiffusePs.Reset(); s.fvfFogModulatePs.Reset();
+    s.fvfFogTextureOnlyPs.Reset(); s.fvfFogConstants.Reset();
     s.stage1DiffusePs.Reset(); s.stage1ModulatePs.Reset();
     s.stage1TextureOnlyPs.Reset(); s.stage1AddPs.Reset(); s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
     s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset();
@@ -1944,6 +1981,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.nativeWidth = width; s.nativeHeight = height;
     auto* dev = s.backend.device();
     ComPtr<ID3DBlob> vcode, pcode, sampledCode, textureOnlyCode, additiveCode, subtractCode, addSmoothCode, modulate2xCode, modulate4xCode, modulate2xTextureCode, modulate2xDiffuseCode, modulate4xTextureCode, modulate4xDiffuseCode, subtractTextureCode, subtractDiffuseCode, subtractModulateCode, mixedTextureCode, mixedDiffuseCode, mixedAddTextureCode, mixedAddDiffuseCode, blendTextureCode, blendTexturePmCode, blendTexturePmTextureAlphaCode, blendTexturePmInverseTextureAlphaCode, blendTexturePmInverseDiffuseAlphaCode, blendTexturePmDiffuseAlphaCode, blendTexturePmModulateAlphaCode, blendTexturePmFactorAlphaCode, blendDiffuseCode, blendTexturePmAddAlphaCode, blendTexturePmSubtractAlphaCode, blendTexturePmModulate2XAlphaCode, blendTexturePmModulate4XAlphaCode, blendTexturePmAddSignedAlphaCode, blendTexturePmAddSigned2XAlphaCode, blendTexturePmBlendTextureAlphaCode, blendTexturePmBlendDiffuseAlphaCode, blendTexturePmBlendCurrentFactorAlphaCode, blendTexturePmBlendFactorAlphaCode, blendTexturePmAddSmoothAlphaCode, blendTextureSelectedTextureAlphaCode, blendTextureSelectedDiffuseAlphaCode, blendDiffuseSelectedTextureAlphaCode, blendDiffuseSelectedDiffuseAlphaCode, blendTextureModulate2XCode, blendTextureModulate4XCode, blendDiffuseModulate2XCode, blendDiffuseModulate4XCode, blendTextureModulateCode, blendDiffuseModulateCode, blendTextureAddCode, blendDiffuseAddCode, blendTextureSubtractCode, blendDiffuseSubtractCode, blendTextureAddSmoothCode, blendDiffuseAddSmoothCode, blendFactorCode, blendFactorTextureCode, blendFactorModulateCode, blendFactorDiffuseCode, blendFactorAddCode, blendFactorSubtractCode, blendFactorAddSmoothCode, blendFactorModulate2XCode, blendFactorModulate4XCode, smoothTextureCode, smoothDiffuseCode, selectDiffuseTextureCode, selectDiffuseModulateCode, selectTextureDiffuseCode, selectTextureModulateCode, selectTextureModulate2XCode, selectTextureModulate4XCode, selectTextureAddCode, selectTextureSubtractCode, selectDiffuseAddCode, selectDiffuseSubtractCode, selectDiffuseModulate2XCode, selectDiffuseModulate4XCode, selectTextureAddSmoothCode, selectDiffuseAddSmoothCode, selectTextureFactorCode, selectDiffuseFactorCode, selectTextureBlendTextureCode, selectDiffuseBlendTextureCode; ComPtr<ID3DBlob> selectTextureBlendDiffuseCode, selectDiffuseBlendDiffuseCode, selectTextureTfactorCode, selectDiffuseTfactorCode;
+    ComPtr<ID3DBlob> fvfFogDiffuseCode, fvfFogModulateCode, fvfFogTextureOnlyCode;
     ComPtr<ID3DBlob> stage1DiffuseCode, stage1ModulateCode;
     ComPtr<ID3DBlob> stage1TextureOnlyCode, stage1AddCode;
     ComPtr<ID3DBlob> blendTexturePmModulateFactorAlphaCode;
@@ -1951,6 +1989,9 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     ComPtr<ID3DBlob> blendTexturePmSignedFactorCode, blendTexturePmSigned2XFactorCode;
     if (!compile("VS", "vs_4_0", vcode) ||
         !compile("PS", "ps_4_0", pcode) ||
+        !compile("PSFvfTableFogDiffuse", "ps_4_0", fvfFogDiffuseCode) ||
+        !compile("PSFvfTableFogModulate", "ps_4_0", fvfFogModulateCode) ||
+        !compile("PSFvfTableFogTextureOnly", "ps_4_0", fvfFogTextureOnlyCode) ||
         !compile("PSStage1Diffuse", "ps_4_0", stage1DiffuseCode) ||
         !compile("PSStage1Modulate", "ps_4_0", stage1ModulateCode) ||
         !compile("PSStage1TextureOnly", "ps_4_0", stage1TextureOnlyCode) ||
@@ -2051,6 +2092,12 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
                                       nullptr, s.vs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(pcode->GetBufferPointer(), pcode->GetBufferSize(),
                                      nullptr, s.ps.GetAddressOf())) ||
+        FAILED(dev->CreatePixelShader(fvfFogDiffuseCode->GetBufferPointer(), fvfFogDiffuseCode->GetBufferSize(),
+                                     nullptr, s.fvfFogDiffusePs.GetAddressOf())) ||
+        FAILED(dev->CreatePixelShader(fvfFogModulateCode->GetBufferPointer(), fvfFogModulateCode->GetBufferSize(),
+                                     nullptr, s.fvfFogModulatePs.GetAddressOf())) ||
+        FAILED(dev->CreatePixelShader(fvfFogTextureOnlyCode->GetBufferPointer(), fvfFogTextureOnlyCode->GetBufferSize(),
+                                     nullptr, s.fvfFogTextureOnlyPs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(stage1DiffuseCode->GetBufferPointer(), stage1DiffuseCode->GetBufferSize(),
                                      nullptr, s.stage1DiffusePs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(stage1ModulateCode->GetBufferPointer(), stage1ModulateCode->GetBufferSize(),
@@ -2425,6 +2472,9 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     constants.ByteWidth = sizeof(Stage1Upload);
     if (FAILED(dev->CreateBuffer(&constants, nullptr, s.stage1Constants.GetAddressOf())))
         return false;
+    constants.ByteWidth = sizeof(float) * 8u;
+    if (FAILED(dev->CreateBuffer(&constants, nullptr, s.fvfFogConstants.GetAddressOf())))
+        return false;
     D3D11_TEXTURE2D_DESC desc{};
     s.backend.color_texture()->GetDesc(&desc);
     desc.Usage = D3D11_USAGE_STAGING;
@@ -2672,15 +2722,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         DWORD sourceRangeFog = 0xffffffffu, sourceFogColor = 0u;
         DWORD startBits = 0u, endBits = 0u, densityBits = 0u;
         D3DCAPS9 actualCaps{};
-        // D3D9 table fog overrides inherited vertex fog. An isolated RAW
-        // preview intentionally omits fog, but must still read every real
-        // register consumed by the active source equation. Do not reject a
-        // valid game FVF Draw because an UNCONSUMED legacy float getter fails
-        // (or returns NaN); never substitute a guessed consumed value.
+        // Table overrides vertex fog: read ONLY the floats consumed by the
+        // active game equation, never guess missing COM state.
         const DWORD sourceFogEquation = sourceTableFog != D3DFOG_NONE
             ? sourceTableFog : sourceVertexFog;
-        const bool sourceKnown = env_raw_visual_opt_in() && fog == TRUE &&
-            fogModesKnown &&
+        const bool sourceKnown = fog == TRUE && fogModesKnown &&
             SUCCEEDED(game->GetRenderState(D3DRS_RANGEFOGENABLE, &sourceRangeFog)) &&
             SUCCEEDED(game->GetRenderState(D3DRS_FOGCOLOR, &sourceFogColor)) &&
             (!native_sm3_table_fog_requires_linear_bounds(sourceFogEquation) ||
@@ -2689,17 +2735,43 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             (!native_sm3_table_fog_requires_density(sourceFogEquation) ||
              SUCCEEDED(game->GetRenderState(D3DRS_FOGDENSITY, &densityBits))) &&
             SUCCEEDED(game->GetDeviceCaps(&actualCaps));
+        if (!sourceKnown || (sourceRangeFog != FALSE && sourceRangeFog != TRUE))
+            return false;
         float start=0.0f, end=0.0f, density=0.0f;
-        if (sourceKnown) {
-            std::memcpy(&start, &startBits, sizeof(start));
-            std::memcpy(&end, &endBits, sizeof(end));
-            std::memcpy(&density, &densityBits, sizeof(density));
+        std::memcpy(&start, &startBits, sizeof(start));
+        std::memcpy(&end, &endBits, sizeof(end));
+        std::memcpy(&density, &densityBits, sizeof(density));
+        NativeSm3FogDepth fogDepth = NativeSm3FogDepth::Z;
+        if ((actualCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u) {
+            D3DMATRIX projection{};
+            if (FAILED(game->GetTransform(D3DTS_PROJECTION, &projection)))
+                fogDepth = NativeSm3FogDepth::Unknown;
+            else
+                fogDepth = native_sm3_projection_fog_depth(
+                    projection._14, projection._24,
+                    projection._34, projection._44, true);
         }
-        output.rawFogVisualMismatch = native_raw_fvf_fog_visual_admission(
-            env_raw_visual_opt_in(), sourceKnown,
-            sourceTableFog, sourceVertexFog, sourceRangeFog,
-            start, end, density);
-        if (!output.rawFogVisualMismatch) return false;
+        const bool exactTableFog =
+            sourceTableFog != D3DFOG_NONE &&
+            fogDepth != NativeSm3FogDepth::Unknown &&
+            native_sm3_table_zfog_admission(
+                true, sourceTableFog, sourceVertexFog,
+                sourceRangeFog != FALSE, srgbWrite != FALSE,
+                (actualCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
+                (actualCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
+                sourceFogColor, start, end, density,
+                output.nativeTableFog, nullptr, fogDepth) &&
+            output.nativeTableFog.enabled;
+        if (!exactTableFog) {
+            // An unmirrored equation remains original D3D9, except for
+            // explicitly opted-in approximate RAW tiles. RAW never upgrades
+            // a partial game frame or asserts Quest/OpenXR correctness.
+            output.rawFogVisualMismatch = native_raw_fvf_fog_visual_admission(
+                env_raw_visual_opt_in(), sourceKnown,
+                sourceTableFog, sourceVertexFog, sourceRangeFog,
+                start, end, density);
+            if (!output.rawFogVisualMismatch) return false;
+        }
     }
     // D3D9 polygon fill does not change the topology of a POINTLIST or
     // LINESTRIP inherited from an earlier triangle. The live SM3 GPU path
@@ -7962,6 +8034,19 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // Never let a previous stage-1 combiner leak into a new game draw.
     ID3D11Buffer* combiner = capture.stage1Enabled ? s.stage1Constants.Get() : nullptr;
     ctx->PSSetConstantBuffers(1, 1, &combiner);
+    // Exact native FVF fog uses an isolated per-Draw b2, not stale SM3 b4.
+    ID3D11Buffer* fvfFogBuffer = nullptr;
+    if (output.nativeTableFog.enabled) {
+        const std::array<float, 8> fogPayload{{
+            output.nativeTableFog.rgba[0], output.nativeTableFog.rgba[1],
+            output.nativeTableFog.rgba[2], output.nativeTableFog.rgba[3],
+            output.nativeTableFog.controls[0], output.nativeTableFog.controls[1],
+            output.nativeTableFog.controls[2], output.nativeTableFog.controls[3]}};
+        ctx->UpdateSubresource(s.fvfFogConstants.Get(), 0u, nullptr,
+                               fogPayload.data(), 0u, 0u);
+        fvfFogBuffer = s.fvfFogConstants.Get();
+    }
+    ctx->PSSetConstantBuffers(2u, 1u, &fvfFogBuffer);
     // Both source modes must bind the exact buffers populated above. In
     // particular, the bounded D3D9 diagnostic fallback must not shadow these
     // owners with short-lived local ComPtrs and submit with a null IA vertex
@@ -8016,7 +8101,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     }
     ctx->RSSetState(nativeRaster);
     ctx->VSSetShader(s.vs.Get(), nullptr, 0);
-    ctx->PSSetShader(capture.stage1Enabled ?
+    ID3D11PixelShader* fixedPixelShader = (capture.stage1Enabled ?
                        (!capture.enabled ? s.stage1DiffusePs.Get() :
                         capture.selectTexture ? s.stage1TextureOnlyPs.Get() :
                         capture.additive ? s.stage1AddPs.Get() :
@@ -8115,7 +8200,19 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                      (capture.mixedAddTextureAlpha ? s.mixedAddTextureAlphaPs.Get() :
                      (capture.mixedAddDiffuseAlpha ? s.mixedAddDiffuseAlphaPs.Get() :
                      (capture.selectTexture ? s.textureOnlyPs.Get() :
-                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get()))))))))))), nullptr, 0);
+                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get()))))))))))); 
+    // Source fog is exact only for these three decoded game combiners.
+    // Preserve original game Draw for all unmapped stage-0/1 operations.
+    if (output.nativeTableFog.enabled) {
+        if (fixedPixelShader == s.ps.Get())
+            fixedPixelShader = s.fvfFogDiffusePs.Get();
+        else if (fixedPixelShader == s.sampledPs.Get())
+            fixedPixelShader = s.fvfFogModulatePs.Get();
+        else if (fixedPixelShader == s.textureOnlyPs.Get())
+            fixedPixelShader = s.fvfFogTextureOnlyPs.Get();
+        else return false;
+    }
+    ctx->PSSetShader(fixedPixelShader, nullptr, 0u);
     ID3D11ShaderResourceView* boundView = sampledView.Get();
     ID3D11SamplerState* boundSampler = sampledSampler.Get();
     ctx->PSSetShaderResources(0, 1, &boundView);

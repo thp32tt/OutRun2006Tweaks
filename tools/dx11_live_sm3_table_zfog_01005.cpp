@@ -262,6 +262,29 @@ int main() {
         true, 3u, 0u, false, false, true, false,
         0u, std::nanf(""), 1.0f, 0.0f, fog, &linearWhy));
     assert(linearWhy == NativeSm3FogReject::StartNotFinite && !fog.enabled);
+    // Live game FVF diffuse, modulate and texture-only now use the shared
+    // actual D3D9 table fog equation. Native shader must keep alpha unchanged.
+    NativeSm3FogReject fixedWhy = NativeSm3FogReject::SourceQuery;
+    assert(native_sm3_table_zfog_admission(
+        true, 3u, 2u, true, false, true, false,
+        0xff204060u, 0.25f, 0.75f, std::nanf(""), fog, &fixedWhy));
+    assert(fog.enabled && fog.rgba[3] == 0.0f &&
+           std::fabs(native_sm3_table_zfog_factor(
+               3u, 0.5f, 0.25f, 0.75f, std::nanf("")) - 0.5f) < 0.0001f);
+    assert(native_sm3_table_zfog_admission(
+        true, 1u, 3u, false, false, true, true,
+        0xff204060u, std::nanf(""), std::nanf(""), 0.5f,
+        fog, &fixedWhy, NativeSm3FogDepth::W));
+    assert(fog.enabled && fog.rgba[3] == 1.0f);
+    // Vertex-only fog or SRGB output cannot borrow the exact table shader.
+    assert(!native_sm3_table_zfog_admission(
+        true, 0u, 3u, false, false, true, false,
+        0xff204060u, 0.2f, 0.8f, 0.0f, fog, &fixedWhy));
+    assert(!fog.enabled && fixedWhy == NativeSm3FogReject::VertexFog);
+    assert(!native_sm3_table_zfog_admission(
+        true, 3u, 0u, false, true, true, false,
+        0xff204060u, 0.2f, 0.8f, 0.0f, fog, &fixedWhy));
+    assert(!fog.enabled && fixedWhy == NativeSm3FogReject::Srgb);
     // Native GPU shader and output stays protected: no bypass of Z/W,
     // source shader identity, render target, poison or publication guards.
     std::string ps = "float4 main(R283Input input) : SV_Target0 {\n"
