@@ -1,0 +1,168 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01149",
+  "production_id": "CONVERSION-DX11-01149",
+  "event_id": "CONVERSION-DX11-01149-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "inherited_feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_SM3:TABLE_FOG_PRIORITY",
+  "classification": "B_EXACT_GATE_FAILURE_REPAIR_AFTER_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "full_dx11_renderer_complete": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "5b8597ed5259babd0275b0c3b858a2cabfea8722",
+  "source_implementation_commit_sha": "0f004edd6778db23d05779e12627c27be68ce00f",
+  "material_result_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+  "validation_bearing_result_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+  "c6_bookkeeping_reason": "FINAL_FIVE_GATES_PASS_AFTER_01148_FEATURE_ID_CAUSAL_REPAIR",
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_D3D9_LIVE_FOG_TABLE_VERTEX_RANGE_RENDER_STATES",
+      "NATIVE_SM3_TABLE_ZFOG_PS_RGB_SHADER",
+      "REAL_GAME_PROGRAMMABLE_NATIVE_DRAW_PROTECTED_BY_SOURCE_GATES",
+      "FULL_FRAME_DIAGNOSTIC_FAIL_CLOSED_UNTIL_RUNTIME_EVIDENCE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY: source translation and required exact-SHA 5 Gates PASS; real game Draw, published frame and Quest 3/VDXR NOT OBSERVED",
+    "activation_guard_and_fallback": "Original D3D9 DX9Ex Draw/input/FFB unchanged; active Z/W/sRGB and unknown states fail closed; no full-game or HMD promotion; DXVK frozen",
+    "batch_components": [
+      "CXX_REAL_SM3_TABLE_FOG_VERTEX_RANGE_PRIORITY_REPAIR",
+      "POSITIVE_AND_NEGATIVE_CPP_FOG_GPU_SHADER_ADMISSION_REGRESSION",
+      "EXACT_SHA_POLICY_RECORD_CAUSAL_REPAIR_FROM_01148"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 active TABLE EXP/EXP2/LINEAR admits inherited VERTEX and RANGE states, loads unchanged source parameters into native PS Z-fog path",
+      "negative_regression": "Vertex-only fog, invalid fog modes, unproven Z/W capabilities, sRGB conflicts, invalid source float/range fail closed with original D3D9 fallback",
+      "component_integration": "Live game render states -> native SM3 Z table-fog admission -> PS b4 HLSL -> shader-bound Draw/DrawIndexed; first real-game native pixels still UNTESTED"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+      "tools/dx11_live_sm3_table_zfog_01005.cpp",
+      "docs/automation/runs/CONVERSION-DX11-01148.json"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01148.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Repair native live programmable D3D9 table fog precedence across inherited vertex and range render states, preserving strict hardware/PS safety and complete-frame runtime gating",
+    "acceptance_items": [
+      {
+        "id": "native_sm3_table_fog_priority",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native SM3 game Draw admission and post-PS Z-fog",
+        "expected_behavior": "Valid active pixel/table fog overrides inherited vertex/range fog and binds genuine table equation into existing native Draw path"
+      },
+      {
+        "id": "unsupported_fog_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source D3D9 fog hardware and original renderer",
+        "expected_behavior": "Unimplemented vertex-only, unsafe Z/W, sRGB, malformed states and float parameters never publish guessed native game pixels"
+      },
+      {
+        "id": "final_five_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Actions exact-SHA build and game-to-host integration",
+        "expected_behavior": "Five required push Gates complete successfully at same result SHA; gameplay/HMD remains separately untested"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_sm3_table_fog_priority": "PASS_EXACT_SHA",
+    "unsupported_fog_fallback": "PASS_EXACT_SHA",
+    "final_five_exact_sha": "PASS_EXACT_SHA"
+  },
+  "real_game_draw_blocker": "No source-matched game run proving native_draws>0 and publishedBackbufferFrames>0, so full game native frame and VR stereo remain unverified",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_HEAD_AND_01148_INHERITED_C6_ERROR",
+    "C1_REVIEW": "PASS_ACTUAL_FOG_STATE_PRIORITY_SUPPORTED_BY_DIRECT3D9",
+    "C2_IMPLEMENT": "PASS_CXX_SOURCE_SHA_0f004edd6778db23d05779e12627c27be68ce00f",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_FINAL_SHA_a3ecc6192fc069a5ece2fdae84d3812708b09746",
+    "C4_COMMIT": "PASS_MATERIAL_SOURCE_AND_CAUSAL_REPAIR_SHA_a3ecc6192fc069a5ece2fdae84d3812708b09746",
+    "C5_PACKAGE": "NOT_CREATED_NO_REAL_GAME_OR_HMD_PROMOTION",
+    "C6_STATE": "PASS_SEPARATE_CHECKPOINT_NO_ADDITIONAL_DEVELOPMENT_SCORE"
+  },
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40808403717,
+        "head_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40808403717"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40808403751,
+        "head_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40808403751"
+      },
+      {
+        "name": "Build",
+        "run_id": 40808403713,
+        "head_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40808403713"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40808403702,
+        "head_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40808403702"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40808403680,
+        "head_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40808403680"
+      }
+    ],
+    "source_implementation": "0f004edd6778db23d05779e12627c27be68ce00f",
+    "validation_bearing_result": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+    "causal_gate_failures": [
+      "DX11 Fast Structural Checks run 40807300127 prior 01148 feature_id=null",
+      "Backend Conversion Gate run 40807300107 same null feature identity"
+    ],
+    "runtime_evidence": "UNTESTED: no exact-binary real OutRun menu/car/race game or Quest3/VDXR HMD proof",
+    "c6_only": true,
+    "c6_is_material_result": false
+  },
+  "c6": {
+    "reason": "FIVE_EXACT_SHA_GATES_SUCCEEDED_AFTER_CAUSAL_CI_REPAIR",
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "original_source_implementation_sha": "0f004edd6778db23d05779e12627c27be68ce00f",
+    "unchanged_validation_bearing_result_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746",
+    "next_action": "Continue unfinished full-resolution native game-frame implementation; require new binary real-game Draw>0 and published frame before visual/HMD claims",
+    "score_change": 0
+  },
+  "causal_repair_commit_sha": "a3ecc6192fc069a5ece2fdae84d3812708b09746"
+}
