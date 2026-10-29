@@ -2586,6 +2586,12 @@ namespace OutRunVRStereo
             float hudClipY[2][3]{};
             float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
+            // Game/UI vertices are authored on the forced 1920x1080 logical
+            // canvas even though the physical D3D9Ex backbuffer is the live
+            // OpenXR eye extent (for example 2496x2688 on Quest 3). Keep those
+            // two coordinate spaces separate; StageExtensionTime is excluded
+            // because the 2026-10-30 HMD run confirmed its existing placement.
+            bool logicalUiSourceCanvas = false;
             bool screenOverlay2D = false;
             bool projectedWorldMarker = false;
             float projectedDeltaX[2]{};
@@ -3393,6 +3399,13 @@ namespace OutRunVRStereo
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
+            const auto uiCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            state.logicalUiSourceCanvas =
+                Settings::VRHud1080pReference.get() &&
+                (semanticHud || semanticOverlay2D) &&
+                uiCommand.producer !=
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
             // Exact executable lens draw at 0xCABE and original Clr_SceneEffect
             // both enter the fixed-function XYZRHW path on some effects.
             // Shader-only R44 semantic recognition must not be a prerequisite.
@@ -4051,9 +4064,42 @@ namespace OutRunVRStereo
                     !std::isfinite(z) || !std::isfinite(rhw))
                     return false;
 
-                const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
+                const float sourceX0 =
+                    state.logicalUiSourceCanvas ? 0.0f : x0;
+                const float sourceY0 =
+                    state.logicalUiSourceCanvas ? 0.0f : y0;
+                const float sourceWidth = state.logicalUiSourceCanvas
+                    ? static_cast<float>(OutRunVRHud1080p::ReferenceWidth)
+                    : width;
+                const float sourceHeight = state.logicalUiSourceCanvas
+                    ? static_cast<float>(OutRunVRHud1080p::ReferenceHeight)
+                    : height;
+                const float ndcX =
+                    ((x - sourceX0) / sourceWidth) * 2.0f - 1.0f;
                 const float ndcY =
-                    1.0f - ((y - y0) / height) * 2.0f;
+                    1.0f - ((y - sourceY0) / sourceHeight) * 2.0f;
+
+                if (Settings::VRTelemetry &&
+                    state.logicalUiSourceCanvas && eye == 0)
+                {
+                    static std::atomic<std::uint64_t> logicalCanvasHits{0};
+                    const auto hit = logicalCanvasHits.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (hit <= 64 || (hit & (hit - 1)) == 0)
+                    {
+                        const auto command =
+                            OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                        spdlog::info(
+                            "VR TRACE UI LOGICAL CANVAS: route=XYZRHW hit={} producer={} "
+                            "source={}x{} physicalViewport={},{},{},{} firstXY={:.9g},{:.9g}",
+                            hit, OutRunVR::GameSemantic::Name(command.producer),
+                            OutRunVRHud1080p::ReferenceWidth,
+                            OutRunVRHud1080p::ReferenceHeight,
+                            state.viewport.X, state.viewport.Y,
+                            state.viewport.Width, state.viewport.Height,
+                            x, y);
+                    }
+                }
 
                 float correctedX = 0.0f;
                 float correctedY = 0.0f;
@@ -5347,6 +5393,75 @@ namespace OutRunVRStereo
             if (!MatrixFinite(stockWvp))
                 return false;
 
+            // The split-render build keeps game/UI authoring at 1920x1080
+            // while the device viewport/backbuffer follows the XR eye extent.
+            // Some stock orthographic c64 uploads are therefore still built
+            // against the physical target (2/Wp,-2/Hp), which maps logical UI
+            // into the upper-left. Normalize only explicit screen UI, never
+            // world/lens/rival geometry, and preserve the HMD-confirmed +TIME
+            // route until separate evidence says otherwise.
+            D3DMATRIX logicalUiWvp = stockWvp;
+            const auto uiCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool logicalUiRoute =
+                Settings::VRHud1080pReference.get() &&
+                uiCommand.producer !=
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime &&
+                (screenKind == R30ScreenSpaceKind::Hud2D ||
+                 screenKind == R30ScreenSpaceKind::PerspectiveHud ||
+                 screenKind == R30ScreenSpaceKind::ScreenOverlay2D);
+            bool logicalUiRemapped = false;
+            if (logicalUiRoute && BackBufferDesc.Width &&
+                BackBufferDesc.Height)
+            {
+                const float expectedX =
+                    2.0f / static_cast<float>(BackBufferDesc.Width);
+                const float expectedY =
+                    2.0f / static_cast<float>(BackBufferDesc.Height);
+                const bool physicalPixelOrtho =
+                    std::fabs(std::fabs(stockWvp._11) - expectedX) <=
+                        std::max(1.0e-7f, expectedX * 0.12f) &&
+                    std::fabs(std::fabs(stockWvp._22) - expectedY) <=
+                        std::max(1.0e-7f, expectedY * 0.12f) &&
+                    std::fabs(stockWvp._34) <= 1.0e-4f &&
+                    std::fabs(stockWvp._44 - 1.0f) <= 1.0e-3f;
+                if (physicalPixelOrtho)
+                {
+                    const float sx =
+                        static_cast<float>(BackBufferDesc.Width) /
+                        static_cast<float>(OutRunVRHud1080p::ReferenceWidth);
+                    const float sy =
+                        static_cast<float>(BackBufferDesc.Height) /
+                        static_cast<float>(OutRunVRHud1080p::ReferenceHeight);
+                    D3DMATRIX logicalRemap = IdentityMatrix();
+                    logicalRemap._11 = sx;
+                    logicalRemap._22 = sy;
+                    logicalRemap._41 = sx - 1.0f;
+                    logicalRemap._42 = 1.0f - sy;
+                    logicalUiWvp =
+                        MultiplyMatrix(stockWvp, logicalRemap);
+                    logicalUiRemapped = MatrixFinite(logicalUiWvp);
+                    if (!logicalUiRemapped)
+                        logicalUiWvp = stockWvp;
+                    if (logicalUiRemapped && Settings::VRTelemetry)
+                    {
+                        static std::atomic<std::uint64_t> shaderCanvasHits{0};
+                        const auto hit = shaderCanvasHits.fetch_add(
+                            1, std::memory_order_relaxed) + 1;
+                        if (hit <= 64 || (hit & (hit - 1)) == 0)
+                            spdlog::info(
+                                "VR TRACE UI LOGICAL CANVAS: route=SHADER hit={} "
+                                "producer={} source={}x{} physical={}x{} remap={:.9g},{:.9g}",
+                                hit,
+                                OutRunVR::GameSemantic::Name(uiCommand.producer),
+                                OutRunVRHud1080p::ReferenceWidth,
+                                OutRunVRHud1080p::ReferenceHeight,
+                                BackBufferDesc.Width, BackBufferDesc.Height,
+                                sx, sy);
+                    }
+                }
+            }
+
             float baseRaw[16]{};
             D3DMATRIX baseProjection{};
             D3DMATRIX inverseBaseProjection{};
@@ -5596,7 +5711,7 @@ namespace OutRunVRStereo
             hudScale._11 = hudScaleX;
             hudScale._22 = hudScaleY;
             const D3DMATRIX scaledClip =
-                MultiplyMatrix(stockWvp, hudScale);
+                MultiplyMatrix(logicalUiWvp, hudScale);
 
             const float HudPlaneViewZ =
                 R30HudPlaneViewZ(
