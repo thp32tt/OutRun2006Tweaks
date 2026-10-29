@@ -6251,7 +6251,7 @@ namespace OutRunVRStereo
                     lensTexture0Ptr, lensVb0Ptr, lensIbPtr, lensRt0Ptr,
                     lensInlineLinked ? "EXACT_INLINE_SOURCE" :
                         (lensDeferredCandidate ?
-                            "DEFERRED_WINDOW_CANDIDATE_NOT_EXACT_OBJECT" :
+                            "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" :
                             "UNOWNED_PHYSICAL"));
                 IDirect3DVertexShader9* traceVs = nullptr;
                 const HRESULT traceVsHr = device->GetVertexShader(&traceVs);
