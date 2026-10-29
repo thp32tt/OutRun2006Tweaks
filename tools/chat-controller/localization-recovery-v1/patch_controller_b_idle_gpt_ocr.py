@@ -128,9 +128,10 @@ async def _outrun_poll_active_gpt_ocr(pages: dict[str, Page]):
     active = gpt_ocr_active_task()
     if not active or active.get("status") != "SENT_AWAITING_RESPONSE":
         return {"status": "NO_ACTIVE_OCR"}
-    page = pages.get("C1")
+    poll_slot = "B" if active.get("ocr_lane") == "C2" else "C1"
+    page = pages.get(poll_slot)
     if page is None or page.is_closed():
-        return {"status": "C1_POLL_TAB_UNAVAILABLE"}
+        return {"status": "OCR_POLL_TAB_UNAVAILABLE", "slot": poll_slot}
     expected_url = str(active.get("chat_url") or "")
     if not expected_url:
         return {"status": "OCR_CHAT_URL_MISSING"}
@@ -178,6 +179,11 @@ async def _outrun_poll_active_gpt_ocr(pages: dict[str, Page]):
 async def _outrun_b_idle_gpt_ocr(page: Page, slot: Slot, reg: Registry):
     """Run one C2 OCR collect/send cycle on B only while B producer queue is idle."""
     gpt_active = gpt_ocr_active_task()
+    # A C1 lease must never redirect the B OCR tab or consume C1 replies.
+    if gpt_active and gpt_active.get("ocr_lane", "C1") != "C2":
+        slot.last_result = "B_C2_OCR_C1_LEASE_ACTIVE"
+        save_registry(reg)
+        return "handled"
     if gpt_active and gpt_active.get("status") == "SENT_AWAITING_RESPONSE":
         expected_url = gpt_active.get("chat_url")
         if expected_url and page.url.rstrip("/") != expected_url.rstrip("/"):
@@ -387,14 +393,16 @@ async def _outrun_b_idle_gpt_ocr(page: Page, slot: Slot, reg: Registry):
         if (AUTO_SEND and CONTROLLER_MODE == "localization" and
                 mono - last_gpt_ocr_poll >= GPT_OCR_RESPONSE_POLL_SECONDS):
             last_gpt_ocr_poll = mono
-            protected_slots.add("C1")
+            ocr_active = gpt_ocr_active_task()
+            poll_slot = "B" if ocr_active and ocr_active.get("ocr_lane") == "C2" else "C1"
+            protected_slots.add(poll_slot)
             try:
                 await _outrun_poll_active_gpt_ocr(pages)
             except Exception as e:
                 log.exception("periodic GPT OCR response poll failed")
                 write_runtime(status="gpt_ocr_poll_error", last_error=repr(e))
             finally:
-                protected_slots.discard("C1")
+                protected_slots.discard(poll_slot)
         if AUTO_SEND and WATCHDOG_ENABLED and not did_scheduled and mono - last_watchdog_check >= WATCHDOG_CHECK_SECONDS:
 """,
         "ocr-poll-loop",
