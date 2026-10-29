@@ -3,6 +3,15 @@
 using namespace outrun::vr::dx11;
 int main() {
     NativeRawDualTile t{};
+    NativeRawDrawExtent fractional{};
+    assert(native_raw_viewport_pixel_extent(3440, 1440,
+        166.125f, 80.125f, 1.125f, 0.5f, fractional));
+    assert(native_raw_dual_draw_tile(3440, 1440, 256, 144,
+        fractional, 2u, t));
+    assert(t.first.x <= 167u && t.first.x + 256u >= 167u);
+    assert(t.first.y <= 80u && t.first.y + 144u >= 80u);
+    assert(!native_raw_viewport_pixel_extent(3440, 1440,
+        3440.125f, 80.f, 1.f, 50.f, fractional));
     assert(native_raw_dual_draw_tile(3440, 1440, 256, 144,
         NativeRawDrawExtent{0,0,3440,1440}, 0, t));
     assert(t.hasSecond);

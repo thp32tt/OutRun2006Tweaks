@@ -628,20 +628,15 @@ private:
         UINT viewCount=1u;
         D3D11_VIEWPORT view{};
         ctx->RSGetViewports(&viewCount,&view);
-        const float right=view.TopLeftX+view.Width;
-        const float bottom=view.TopLeftY+view.Height;
-        if(viewCount!=1u||!std::isfinite(view.TopLeftX)||
-           !std::isfinite(view.TopLeftY)||!std::isfinite(view.Width)||
-           !std::isfinite(view.Height)||!std::isfinite(right)||
-           !std::isfinite(bottom)||view.Width<=0.f||view.Height<=0.f)
+        NativeRawDrawExtent draw{};
+        // GPU rasterization may cover an edge pixel even when viewport
+        // coordinates are fractional or thinner than one physical pixel.
+        // Authenticated scissor and target clipping below still apply.
+        if (viewCount != 1u ||
+            !native_raw_viewport_pixel_extent(
+                src.Width, src.Height, view.TopLeftX, view.TopLeftY,
+                view.Width, view.Height, draw))
             return NativeRawPreviewResult::NoDraw;
-        const auto clip=[](float value,UINT limit) noexcept {
-            return static_cast<std::int64_t>((std::max)(0.f,
-                (std::min)(value,static_cast<float>(limit))));
-        };
-        NativeRawDrawExtent draw{clip(view.TopLeftX,src.Width),
-            clip(view.TopLeftY,src.Height),clip(right,src.Width),
-            clip(bottom,src.Height)};
         Microsoft::WRL::ComPtr<ID3D11RasterizerState> raster;
         ctx->RSGetState(raster.GetAddressOf());
         if(raster){
