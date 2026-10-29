@@ -5116,7 +5116,7 @@ private:
                 static_cast<unsigned>(spriteSrcBlend),
                 static_cast<unsigned>(spriteDstBlend));
             spdlog::info(
-                "VR TRACE D3DX DRAW FULL: phase=PRE serial={} qpc={} producer={} 
+                "VR TRACE D3DX DRAW FULL: phase=PRE serial={} qpc={} producer={} "
                 "scope={} stageTicket={} stageEntrySerial={} queued={} node=0x{:X} epoch={} self=0x{:X} tex=0x{:X} "
                 "rectValid={} rect={},{},{},{} centerValid={} center={:.9g},{:.9g},{:.9g} "
                 "posValid={} pos={:.9g},{:.9g},{:.9g} color=0x{:08X}",
