@@ -3815,10 +3815,39 @@ namespace OutRunVRStereo
                     (!command.queued ||
                      (command.queueNode && command.queueEpoch != 0)))
                 {
-                    static std::atomic<std::uint64_t> resultPixelProbes{ 0 };
-                    const auto n = resultPixelProbes.fetch_add(
+                    // Keep independent budgets: the gameplay +TIME event
+                    // normally happens before GOAL and previously consumed the
+                    // shared first-16/power-of-two samples, hiding the exact
+                    // GOAL raw XY which this diagnostic is meant to prove.
+                    static std::atomic<std::uint64_t> plusTimePixelProbes{0};
+                    static std::atomic<std::uint64_t> goalProgressPixelProbes{0};
+                    static std::atomic<std::uint64_t> goalTimePixelProbes{0};
+                    static std::atomic<std::uint64_t> goalTextPixelProbes{0};
+                    static std::atomic<std::uint64_t> otherResultPixelProbes{0};
+                    std::atomic<std::uint64_t>* familyCounter =
+                        &otherResultPixelProbes;
+                    switch (command.producer)
+                    {
+                    case OutRunVR::GameSemantic::ProducerToken::StageExtensionTime:
+                        familyCounter = &plusTimePixelProbes;
+                        break;
+                    case OutRunVR::GameSemantic::ProducerToken::ResultProgress:
+                        familyCounter = &goalProgressPixelProbes;
+                        break;
+                    case OutRunVR::GameSemantic::ProducerToken::GoalTime020:
+                    case OutRunVR::GameSemantic::ProducerToken::GoalTime150:
+                        familyCounter = &goalTimePixelProbes;
+                        break;
+                    case OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf:
+                    case OutRunVR::GameSemantic::ProducerToken::ResultTextB9200:
+                        familyCounter = &goalTextPixelProbes;
+                        break;
+                    default:
+                        break;
+                    }
+                    const auto n = familyCounter->fetch_add(
                         1, std::memory_order_relaxed) + 1;
-                    if (n <= 16 || (n & (n - 1)) == 0)
+                    if (n <= 32 || (n & (n - 1)) == 0)
                     {
                         UINT firstUsed = 0;
                         while (usedMask && firstUsed < vertexCount &&
@@ -3828,14 +3857,18 @@ namespace OutRunVRStereo
                         {
                             const float* v = sourceVertex(firstUsed);
                             spdlog::info(
-                                "VR R26 RESULT_XYZRHW_PIXEL_PROBE: stage=TRANSFORM_CANDIDATE producer={} queued={} node={} epoch={} eye={} firstUsed={} xy={},{} vertices={} backbuffer={}x{} viewport={},{},{},{} sourceExtent=UNPROVEN hits={}",
+                                "VR R26 RESULT_XYZRHW_PIXEL_PROBE: stage=TRANSFORM_CANDIDATE producer={} queued={} node={} epoch={} eye={} firstUsed={} xy={},{} vertices={} backbuffer={}x{} viewport={},{},{},{} sourceExtent={} hits={}",
                                 OutRunVR::GameSemantic::Name(command.producer),
                                 command.queued, command.queueNode,
                                 command.queueEpoch, eye, firstUsed,
                                 v[0], v[1], vertexCount,
                                 BackBufferDesc.Width, BackBufferDesc.Height,
                                 state.viewport.X, state.viewport.Y,
-                                state.viewport.Width, state.viewport.Height, n);
+                                state.viewport.Width, state.viewport.Height,
+                                state.logicalUiSourceCanvas
+                                    ? "LOGICAL_1920X1080"
+                                    : "PHYSICAL_VIEWPORT",
+                                n);
                         }
                     }
                 }
