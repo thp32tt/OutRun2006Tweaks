@@ -62,9 +62,10 @@
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "OPT_IN_VISIBLE_PARTIAL_DIAGNOSTIC"
+      "OPT_IN_VISIBLE_PARTIAL_DIAGNOSTIC",
+      "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "Only source+CI verified partial RAW native GPU pixel diagnostic support for compact source textures; actual menu/car/race GPU pixel output, native full-frame and Quest3 stereo UNTESTED.",
+    "visible_frame_acceptance": "Partial opt-in RAW GPU RGB diagnostic D3D9 original-game display is a visible-frame-output integration stage only, NOT an entire native D3D11 frame, gameplay/HMD pixel PASS, or OpenXR eye. Earlier implementation remains source+CI verified at 021d4638ebe7704995bddad5241cc66e6d3439b0; actual live game output untested.",
     "activation_guard_and_fallback": "Explicit RAW diagnostic opt-in, original D3D9 and DX9Ex gameplay input/FFB fallback authoritative, full frame remains fail closed, DXVK frozen."
   },
   "feature_contract": {
@@ -191,5 +192,11 @@
     "C5_PACKAGE": "SOURCE_BUILD_VERIFIED_RUNTIME_AND_FULL_FRAME_UNTESTED",
     "C6_STATE": "PASS_SEPARATE_BOOKKEEPING_COMMIT"
   },
-  "next_unfinished": "Observe real source-matched RAW GPU desktop native Draw and GPU pixel output; continue same full-frame feature to complete source geometry/coverage and L/R direct OpenXR, preserve DX9Ex fallback."
+  "next_unfinished": "Observe real source-matched RAW GPU desktop native Draw and GPU pixel output; continue same full-frame feature to complete source geometry/coverage and L/R direct OpenXR, preserve DX9Ex fallback.",
+  "causal_record_correction": {
+    "cause": "01164 exact-SHA Fast 40922837220 and Backend 40922837285 fail policy acceptance: previous 01163 strategy omitted generic VISIBLE_FRAME_OUTPUT after opt-in partial diagnostic stage",
+    "scope": "Record existing partial RAW source-authentic diagnostic output without claiming production full-frame/HMD",
+    "credited_as_new_feature": false,
+    "belongs_to_task": "CONVERSION-DX11-01164"
+  }
 }
