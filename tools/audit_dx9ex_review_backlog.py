@@ -42,8 +42,9 @@ SOURCE_PATCH_RECEIPTS = {
               "initViewport.Width=desc.Width;initViewport.Height=desc.Height;",
               "Full-size right-eye color allocation initialization"),
     "01516": ("src/vr/d3d9/stereo_renderer_r7.inc",
-              "LEFT depth/stencil write still invalidates the RIGHT content.",
-              "Occlusion-query single LEFT depth sync invalidation"),
+              "if(StereoWanted()&&TargetIsBackBuffer())",
+              "Prepare-reject single LEFT draw invalidates writable RIGHT depth/stencil; "
+              "this includes active occlusion-query stereo rejection"),
     "01519": ("src/vr/d3d9/stereo_renderer.cpp",
               "Present/mono-shadow-restore",
               "Failed mono-shadow restore metadata propagation only"),
