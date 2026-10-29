@@ -391,17 +391,21 @@ public:
                                 captureTargetHeight_, back.Width, back.Height,
                                 l, t, r, b, sourceDirty,
                                 sourceCropRepaintVerified, alignedSecond);
-                        if (haveFirst && haveSecond &&
-                            native_raw_disjoint_equal_tiles(
-                                alignedFirst, alignedSecond)) {
+                        // Preserve true source coordinates even when a
+                        // displaced two-inset layout happens to fit. Verify
+                        // non-overlap AFTER moving either native GPU crop.
+                        if (haveFirst) {
                             firstTile = alignedFirst;
-                            secondTile = alignedSecond;
-                            firstAligned = secondAligned = true;
-                            canShowBoth = true;
-                        } else if (!canShowBoth) {
-                            if (haveFirst) { firstTile = alignedFirst; firstAligned = true; }
-                            if (haveSecond) { secondTile = alignedSecond; secondAligned = true; }
+                            firstAligned = true;
                         }
+                        if (haveSecond) {
+                            secondTile = alignedSecond;
+                            secondAligned = true;
+                        }
+                        if (haveFirst || haveSecond)
+                            canShowBoth = native_raw_can_show_source_aligned_pair(
+                                canShowBoth, firstAligned, secondAligned,
+                                firstTile, secondTile);
                 }
                 // Use original D3D9 dirty geometry rather than a broad rcBound
                 // as visibility evidence. Menu and vehicle Presents can dirty
@@ -500,8 +504,9 @@ public:
                         if (secondAligned) sourceAlignedPixelsThisPresent_ += secondPixels;
                     }
                 } else if (secondVisible &&
-                           (!firstVisible || native_raw_choose_second_tile(
-                               firstPixels, secondPixels, true))) {
+                           (!firstVisible || native_raw_choose_source_aligned_second_tile(
+                               firstPixels, secondPixels,
+                               firstAligned, secondAligned, true))) {
                     if (paint(surface_, beforeAlternate, afterAlternate, secondTile)) {
                         nativePixels = secondPixels;
                         if (secondAligned) sourceAlignedPixelsThisPresent_ = secondPixels;

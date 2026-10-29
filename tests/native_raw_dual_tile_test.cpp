@@ -52,6 +52,32 @@ int main() {
     assert(native_raw_choose_second_tile(0, 21, t.hasSecond));
     assert(!native_raw_choose_second_tile(21, 21, t.hasSecond));
     assert(!native_raw_choose_second_tile(21, 0, t.hasSecond));
+    // Source-aligned Draw pixels outrank a displaced, denser legacy tile.
+    // Retain the dual output only when final destinations are disjoint.
+    {
+        constexpr NativeRawPresentTile legacyFirst{0, 0, 64, 48, 100, 100};
+        constexpr NativeRawPresentTile legacySecond{0, 0, 64, 48, 172, 100};
+        constexpr NativeRawPresentTile alignedFirst{0, 0, 64, 48, 170, 100};
+        constexpr NativeRawPresentTile alignedSecond{0, 0, 64, 48, 300, 100};
+        static_assert(native_raw_can_show_source_aligned_pair(
+            true, false, false, legacyFirst, legacySecond));
+        static_assert(!native_raw_can_show_source_aligned_pair(
+            true, true, false, alignedFirst, legacySecond));
+        static_assert(native_raw_can_show_source_aligned_pair(
+            false, true, true, alignedFirst, alignedSecond));
+        static_assert(!native_raw_can_show_source_aligned_pair(
+            false, true, false, alignedFirst, legacySecond));
+        static_assert(native_raw_choose_source_aligned_second_tile(
+            800u, 1u, false, true, true));
+        static_assert(!native_raw_choose_source_aligned_second_tile(
+            1u, 800u, true, false, true));
+        static_assert(native_raw_choose_source_aligned_second_tile(
+            1u, 800u, true, true, true));
+        static_assert(!native_raw_choose_source_aligned_second_tile(
+            800u, 1u, false, false, true));
+        static_assert(!native_raw_choose_source_aligned_second_tile(
+            1u, 800u, false, true, false));
+    }
     // A narrow source raster can intersect multiple nominal tile origins,
     // but the same GPU RGB bytes must NEVER count as two native Draw tiles.
     assert(native_raw_dual_draw_tile(640, 480, 256, 144,

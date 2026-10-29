@@ -108,6 +108,24 @@ struct NativeRawPresentDirtyRegion {
            a.destinationY + std::int64_t{a.copyHeight} <= b.destinationY ||
            b.destinationY + std::int64_t{b.copyHeight} <= a.destinationY;
 }
+// Source-coincident native GPU pixels take priority over displaced RAW
+// insets. A pair is safe only if both final original-game destinations are
+// disjoint after replacing either or both tiles with source coordinates.
+[[nodiscard]] constexpr bool native_raw_can_show_source_aligned_pair(
+    bool legacyPairVisible, bool firstAligned, bool secondAligned,
+    const NativeRawPresentTile& first,
+    const NativeRawPresentTile& second) noexcept {
+    return (legacyPairVisible || (firstAligned && secondAligned)) &&
+           native_raw_disjoint_equal_tiles(first, second);
+}
+[[nodiscard]] constexpr bool native_raw_choose_source_aligned_second_tile(
+    std::uint32_t firstChanged, std::uint32_t secondChanged,
+    bool firstAligned, bool secondAligned, bool secondVisible) noexcept {
+    return secondVisible &&
+        (firstAligned != secondAligned
+            ? secondAligned
+            : secondChanged > firstChanged);
+}
  // When a D3D9 menu/car Present updates only a subset, the default
  // top-right RAW diagnostic tile may be outside ALL genuine dirty pixels.
  // Keep it when fully covered; otherwise find the largest tile inside a
