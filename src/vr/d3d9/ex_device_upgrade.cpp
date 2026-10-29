@@ -1155,6 +1155,15 @@ namespace OutRunVRD3D9ExUpgrade
         }
     }
 
+    bool GetPhysicalTargetExtent(
+        std::uint32_t& width, std::uint32_t& height) noexcept
+    {
+        width = CompatVrPhysicalWidth.load(std::memory_order_acquire);
+        height = CompatVrPhysicalHeight.load(std::memory_order_acquire);
+        return width >= 640u && height >= 480u &&
+            static_cast<std::uint64_t>(width) * height <= 16777216ULL;
+    }
+
     void SetFinalCompatOverlayReady(bool ready) noexcept
     {
         FinalCompatOverlayReady.store(ready, std::memory_order_release);
