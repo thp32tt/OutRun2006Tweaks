@@ -1,0 +1,345 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1845KST-A0135-A0140-NEW-SHA6",
+  "started_at_kst": "2026-10-29T18:45:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "review_scope": "PNG_KOREAN_LETTERING_LAYER_ONLY",
+  "review_method": "Distinct-SHA de-duplication vs previous reports; SHA256 equality from original HD, manifest and export; original English ROI and saved Korean PNG visually compared; native aspect-preserving and offline 50% previews; dark-background alpha overlays; RGBA and borders.",
+  "prior_review_report_count": 42,
+  "prior_distinct_reviewed_candidate_sha": 301,
+  "summary": {
+    "new_unique_sha": 6,
+    "A": 6,
+    "B": 0,
+    "pass": 4,
+    "fail": 2,
+    "hold": 0,
+    "source_sha_verified": 6,
+    "candidate_sha_verified": 6,
+    "rgba": 6,
+    "alpha_ge32_border_contact": 0,
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "dds_created": false,
+    "actual_UI_composite": "NOT_TESTED",
+    "C2_C3": "NOT_ASSESSED",
+    "runtime": "UNTESTED",
+    "vr_ffb_dx11_dxvk": "UNCHANGED"
+  },
+  "evidence": {
+    "n100_root": "work/C1_QA_20261029_1845_AI2_new_sha8",
+    "files": [
+      "preflight.json",
+      "pairs_A.jpg",
+      "native_fit_A.jpg",
+      "dark_alpha_A.jpg",
+      "alpha_stats.json",
+      "native_zoom_problem_cases.jpg"
+    ],
+    "n100_report": "work/C1_QA_20261029_1845_AI2_report.json"
+  },
+  "records": [
+    {
+      "task_id": "OUTRUN-ROI-A-0135-F2410BD5",
+      "role": "A",
+      "source_ordinal": 429,
+      "english": "START",
+      "approved_korean": "출발",
+      "source_file": "Q217_D1039D6F_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "56b3834649568383293786e862025351d0f2379ec632592cf40d78c532a50b15",
+      "manifest_source_sha256": "56b3834649568383293786e862025351d0f2379ec632592cf40d78c532a50b15",
+      "bbox_xyxy": [
+        797,
+        503,
+        892,
+        540
+      ],
+      "candidate_file": "Q217_dccffac670aa640c_k.png",
+      "candidate_sha256": "c670eb9468c2c3a0674a0f782a0d583dcfb2254e92e69112e82f3ac524491356",
+      "export_sha256": "c670eb9468c2c3a0674a0f782a0d583dcfb2254e92e69112e82f3ac524491356",
+      "output_dimensions": [
+        2010,
+        782
+      ],
+      "mode": "RGBA",
+      "source_sha_match": true,
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "alpha_bbox": [
+        0,
+        118,
+        1934,
+        758
+      ],
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "native_fit_dimensions": [
+        95,
+        37
+      ],
+      "judgement": "FAIL",
+      "reason_code": "UNNECESSARY_OPAQUE_RED_BANNER",
+      "observation": "원문 START → 출발 일치, RGBA이나 문자 아래와 가장자리까지 넓은 채도가 높은 불투명 붉은 사다리꼴 판이 반복 생성됨. 글자/효과만 허용되는 레이어 정책 위반. 생성물 alpha>=235 약 48.9%; 시각증빙 native_zoom_problem_cases.jpg.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_TEXT_BUT_FAIL_BANNER",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0136-F4574BB3",
+      "role": "A",
+      "source_ordinal": 430,
+      "english": "COURSE SELECT",
+      "approved_korean": "코스 선택",
+      "source_file": "Q219_D263B3F1_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "30167702b1577a3aa02da54181c8e78d98b208e1bfb3911139b442e30e02610d",
+      "manifest_source_sha256": "30167702b1577a3aa02da54181c8e78d98b208e1bfb3911139b442e30e02610d",
+      "bbox_xyxy": [
+        6,
+        1011,
+        1473,
+        1129
+      ],
+      "candidate_file": "Q219_c8ba2f8f315ffdac_k.png",
+      "candidate_sha256": "0a2ddfb52f7382d338e48152eb911aa65c20c2ecf3a1d9978087d1964bf02125",
+      "export_sha256": "0a2ddfb52f7382d338e48152eb911aa65c20c2ecf3a1d9978087d1964bf02125",
+      "output_dimensions": [
+        2135,
+        737
+      ],
+      "mode": "RGBA",
+      "source_sha_match": true,
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "alpha_bbox": [
+        142,
+        81,
+        2089,
+        721
+      ],
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        342,
+        118
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'코스 선택' 한글 자소·받침 모두 판독, 금속 음영 효과와 줄의 배치 적절. 문장 폭 축소 자체는 반려하지 않음. 불필요한 판/영문 잔상 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0137-E099CABB",
+      "role": "A",
+      "source_ordinal": 431,
+      "english": "mode select",
+      "approved_korean": "모드 선택",
+      "source_file": "Q228_E7F6E9B7_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "manifest_source_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "bbox_xyxy": [
+        2,
+        1742,
+        1252,
+        1861
+      ],
+      "candidate_file": "Q228_c59d679311eed391_k.png",
+      "candidate_sha256": "63201d39d0dfe0197e32abc0aefb09bcd76613172bc6cd29c72078efe6239695",
+      "export_sha256": "63201d39d0dfe0197e32abc0aefb09bcd76613172bc6cd29c72078efe6239695",
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "source_sha_match": true,
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "alpha_bbox": [
+        41,
+        51,
+        2146,
+        689
+      ],
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        357,
+        119
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'모드 선택' 각 자소·받침 판독, 외곽선 정돈, 투명 글자/효과만 보임. 원문 대비 짧은 폭 정상 허용.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0138-91FED037",
+      "role": "A",
+      "source_ordinal": 432,
+      "english": "car select",
+      "approved_korean": "차량 선택",
+      "source_file": "Q228_E7F6E9B7_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "manifest_source_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "bbox_xyxy": [
+        5,
+        182,
+        1124,
+        301
+      ],
+      "candidate_file": "Q228_0a1c695fc1f912a8_k.png",
+      "candidate_sha256": "0e76a0753a35f199872bc8747296b664f4c0f1a4cbe5ac5af372e8cfbd028203",
+      "export_sha256": "0e76a0753a35f199872bc8747296b664f4c0f1a4cbe5ac5af372e8cfbd028203",
+      "output_dimensions": [
+        2135,
+        737
+      ],
+      "mode": "RGBA",
+      "source_sha_match": true,
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "alpha_bbox": [
+        25,
+        21,
+        2121,
+        640
+      ],
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        345,
+        119
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'차량 선택' 모든 글자 명료, 하단 금속 그림자 자연스러움, 불필요한 배경판이나 영문 잔상 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0139-9301B9FD",
+      "role": "A",
+      "source_ordinal": 433,
+      "english": "Play OutRun Online with Friends or other players!",
+      "approved_korean": "아웃런 온라인에서 친구나 다른 플레이어와 함께 플레이하세요!",
+      "source_file": "Q231_EBE401C8_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "f305721db135a1e30b8a36140c21a29ca802338b0b2d96fe32f365fb09fc4b5e",
+      "manifest_source_sha256": "f305721db135a1e30b8a36140c21a29ca802338b0b2d96fe32f365fb09fc4b5e",
+      "bbox_xyxy": [
+        7,
+        371,
+        1446,
+        437
+      ],
+      "candidate_file": "Q231_1912e616e31bc76d_k.png",
+      "candidate_sha256": "418ed171a02360d18fea705eefb5649cfec59d30ed744be02d5c8a3b32dc2ce8",
+      "export_sha256": "418ed171a02360d18fea705eefb5649cfec59d30ed744be02d5c8a3b32dc2ce8",
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "source_sha_match": true,
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "alpha_bbox": [
+        20,
+        184,
+        2171,
+        523
+      ],
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        198,
+        66
+      ],
+      "judgement": "FAIL",
+      "reason_code": "NATIVE_HALF_SCALE_GLYPH_LEGIBILITY",
+      "observation": "원문 1439×66의 긴 안내 문구를 원본 bbox에 왜곡 없이 맞추면 출력 전체가 198×66px로 축소됨. 이때 개별 자소들이 수평으로 뭉치고, 오프라인 50%(99×33px)에서 연속 문구의 자소/받침을 실제로 판독하기 어려움. 원문-번역 길이 차이만이 아니라 실측/시각적 가독성 결함. native_zoom_problem_cases.jpg 증빙. 실제 게임 렌더는 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "FAIL_NATIVE_HALF_SCALE",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0140-9FD7C4DA",
+      "role": "A",
+      "source_ordinal": 434,
+      "english": "Loading",
+      "approved_korean": "로딩",
+      "source_file": "Q241_E1639D2E_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "51949265b00166feb0fa2745669733d45e62137644d25f995135ae0744e52016",
+      "manifest_source_sha256": "51949265b00166feb0fa2745669733d45e62137644d25f995135ae0744e52016",
+      "bbox_xyxy": [
+        1,
+        109,
+        731,
+        255
+      ],
+      "candidate_file": "Q241_d600fb2889175d94_k.png",
+      "candidate_sha256": "99fc27f97ab34a0b3c4408e9781b6fba6a520237fe1606f81d928a0e1fb32efa",
+      "export_sha256": "99fc27f97ab34a0b3c4408e9781b6fba6a520237fe1606f81d928a0e1fb32efa",
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "source_sha_match": true,
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "alpha_bbox": [
+        87,
+        9,
+        2015,
+        692
+      ],
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        438,
+        146
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'로딩' 글자와 받침 명료, 금속 음영/두께가 읽히고 투명 배경 유지. 기울임/잘림 문제 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    }
+  ]
+}
