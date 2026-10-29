@@ -10,9 +10,9 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:LIVE_FVF:EXACT_TABLE_FOG_NATIVE_RGB_GAME_DRAW",
   "classification": "A_SOURCE_IMPLEMENTATION",
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
-  "checkpoint": "C6_DONE",
-  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 1,
   "development_time_percentages": "UNMEASURED",
@@ -106,7 +106,7 @@
     "C3_VALIDATE": "PASS_FINAL_FIVE_EXACT_SHA",
     "C4_COMMIT": "PASS_VALIDATION_BEARING_RESULT_SHA",
     "C5_PACKAGE": "SOURCE_ONLY",
-    "C6_STATE": "PASS_DOCS_ONLY_CHECKPOINT_AFTER_CI"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "evidence": {
     "requires_final_exact_sha_five_push_gates": true,
