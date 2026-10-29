@@ -32,7 +32,7 @@ bool MatrixFinite(const D3DMATRIX&m){for(auto&r:m.m)for(float v:r)if(!std::isfin
 struct Viewport {DWORD X=0,Y=0,Width=1920,Height=1080;};
 namespace OutRunVR::GameSemantic {
 enum class RenderScope {None,ScreenHud,World,Projected,ProjectedWorldMarker2D,ScreenOverlay2D,ProjectedScreenEffect2D,SceneEffect};
-enum class ProducerToken {None,StageExtensionTime,ResultProgress,ResultTextB9200,GoalTimeHelper,GoalTime020,GoalTime150,OutRunStagePrintf,Goal,Rank,Lens,RivalMarkerSprani};
+enum class ProducerToken {None,StageExtensionTime,ResultProgress,ResultTextB9200,GoalTimeHelper,GoalTime020,GoalTime150,OutRunStagePrintf,Goal,Rank,Lens,RivalMarkerSprani,RankMarkerSprani,RankMarkerClipSprite};
 struct Command {RenderScope scope=RenderScope::ScreenHud;ProducerToken producer=ProducerToken::StageExtensionTime;bool queued=false;void*queueNode=nullptr;unsigned queueEpoch=0;
 bool IsExactFiniteResultHud()const{return scope==RenderScope::ScreenHud&&(producer==ProducerToken::StageExtensionTime||producer==ProducerToken::ResultProgress||producer==ProducerToken::ResultTextB9200||producer==ProducerToken::GoalTime020||producer==ProducerToken::GoalTime150||producer==ProducerToken::OutRunStagePrintf||producer==ProducerToken::Goal);}};
 Command command; unsigned ExternalOverlaySemanticDepth=0;
@@ -49,6 +49,10 @@ const char*Name(ProducerToken){return "test";}
 const char*Name(RenderScope){return "test-scope";}
 }
 namespace Settings {bool VRTelemetry=true;}
+namespace OutRunVRHud1080p {
+constexpr std::uint32_t ReferenceWidth=1920u;
+constexpr std::uint32_t ReferenceHeight=1080u;
+}
 namespace spdlog {template<class...T>void info(T&&...){}}
 struct IDirect3DDevice9;
 void R30TraceVisualPipelineFull(IDirect3DDevice9*, const char*, std::uint64_t){}
@@ -85,7 +89,7 @@ bool TargetIsBackBuffer(){return backbuffer;}
 bool R30SafeStereoBase(IDirect3DDevice9*d){return d==gameDevice&&!InternalStereoPass&&safeBase&&!FrameStereoIncomplete;}
 bool EnsureStereoResources(IDirect3DDevice9*){return true;}
 struct InternalPassScope {bool old=InternalStereoPass;InternalPassScope(){InternalStereoPass=true;}~InternalPassScope(){InternalStereoPass=old;}};
-struct R30XyzrhwState {Viewport viewport;OutRunVRRenderer::LatchedStereoFrame stereo;float eyeScale[2]{},eyeOffset[2]{},projectedDeltaX[2]{},projectedDeltaY[2]{},projectedBaseX=0,projectedBaseY=0;bool depthTestEnabled=false,hudWorldLockValid=true;D3DMATRIX baseProjection=IdentityMatrix();float hudClipX[2][3]{},hudClipY[2][3]{},hudClipW[2][3]{};};
+struct R30XyzrhwState {Viewport viewport;OutRunVRRenderer::LatchedStereoFrame stereo;float eyeScale[2]{},eyeOffset[2]{},projectedDeltaX[2]{},projectedDeltaY[2]{},projectedBaseX=0,projectedBaseY=0;bool depthTestEnabled=false,hudWorldLockValid=true,logicalUiSourceCanvas=false;D3DMATRIX baseProjection=IdentityMatrix();float hudClipX[2][3]{},hudClipY[2][3]{},hudClipW[2][3]{};};
 bool configureValid=true;
 bool R30BuildEyeAffine(const OutRunVRRenderer::LatchedStereoFrame&,float*,float*){return true;}
 bool ReadTrackedRenderState(IDirect3DDevice9*,int,DWORD&v){v=0;return true;}
