@@ -854,6 +854,30 @@ class UIScaling : public Hook
                 Game::screen_scale->x, Game::screen_scale->y,
                 Game::screen_resolution->x, Game::screen_resolution->y);
         }
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            vrFrontEndProducer && result && pOut)
+        {
+            static std::atomic<std::uint64_t> frontEndMatrixReceipts{0};
+            const auto hit = frontEndMatrixReceipts.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (hit <= 64 || (hit & (hit - 1)) == 0)
+                spdlog::info(
+                    "VR TRACE MENU MATRIX FINAL: hit={} state={} mode={} "
+                    "partial={} pivot={} precontained={} fill={} "
+                    "screenScale={:.9g},{:.9g} screenRes={:.9g},{:.9g} "
+                    "m11={:.9g} m12={:.9g} m21={:.9g} m22={:.9g} tx={:.9g} ty={:.9g}",
+                    hit, Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                    static_cast<int>(mode), vrFrontEndPartial ? 1 : 0,
+                    vrFrontEndPivot ? 1 : 0,
+                    publishedPrecontainedMenuMatrix ? 1 : 0,
+                    centredPhysicalMenuFill ? 1 : 0,
+                    Game::screen_scale ? Game::screen_scale->x : 0.0f,
+                    Game::screen_scale ? Game::screen_scale->y : 0.0f,
+                    Game::screen_resolution ? Game::screen_resolution->x : 0.0f,
+                    Game::screen_resolution ? Game::screen_resolution->y : 0.0f,
+                    pOut->_11, pOut->_12, pOut->_21, pOut->_22,
+                    pOut->_41, pOut->_42);
+        }
         return result;
 	}
 
@@ -2843,6 +2867,26 @@ class UIScaling : public Hook
 			*Game::current_mode == GameState::STATE_SMPAUSEMENU;
 		const int result = Game::put_clip_sprite(
 			xstnum, x, y, flags, priority, color);
+        if (Settings::VREnabled && Settings::VRHud1080pReference &&
+            Settings::VRTelemetry)
+        {
+            static std::atomic<std::uint64_t> hudFinalSourceReceipts{0};
+            const auto hit = hudFinalSourceReceipts.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (hit <= 64 || (hit & (hit - 1)) == 0)
+                spdlog::info(
+                    "VR TRACE HUD1080 FINAL SOURCE: hit={} producer={} xstnum={} "
+                    "x={} y={} flags=0x{:08X} priority={:.9g} color=0x{:08X} "
+                    "nativeResult={} screenScale={:.9g},{:.9g} "
+                    "screenRes={:.9g},{:.9g} logicalReference=1920x1080",
+                    hit, OutRunVR::GameSemantic::Name(producer), xstnum,
+                    x, y, static_cast<unsigned>(flags), priority,
+                    static_cast<unsigned>(color), result,
+                    Game::screen_scale ? Game::screen_scale->x : 0.0f,
+                    Game::screen_scale ? Game::screen_scale->y : 0.0f,
+                    Game::screen_resolution ? Game::screen_resolution->x : 0.0f,
+                    Game::screen_resolution ? Game::screen_resolution->y : 0.0f);
+        }
 		if (pauseArrow && !OutRunVrPauseEye::CanTagNativePauseArrow(
 			vrAtEntry, Settings::VREnabled, pauseAtEntry,
 			Game::current_mode &&
@@ -4888,10 +4932,11 @@ private:
             QueryPerformanceCounter(&qpc);
             spdlog::info(
                 "VR TRACE D3DX DRAW FULL: phase=PRE serial={} qpc={} producer={} "
-                "scope={} queued={} node=0x{:X} epoch={} self=0x{:X} tex=0x{:X} "
+                "scope={} stageTicket={} stageEntrySerial={} queued={} node=0x{:X} epoch={} self=0x{:X} tex=0x{:X} "
                 "rectValid={} rect={},{},{},{} centerValid={} center={:.9g},{:.9g},{:.9g} "
                 "posValid={} pos={:.9g},{:.9g},{:.9g} color=0x{:08X}",
                 fullVisualDrawSerial,qpc.QuadPart,Name(source),Name(scope),
+                StageTimeLiveTicket,StageExtensionEntrySerial,
                 command.queued ? 1 : 0,
                 reinterpret_cast<std::uintptr_t>(command.queueNode),
                 command.queueEpoch,reinterpret_cast<std::uintptr_t>(self),

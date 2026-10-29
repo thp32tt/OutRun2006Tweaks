@@ -712,11 +712,27 @@ float4 PSMain(VSOut input) : SV_Target
         const long outputH = OutputDesktop.bottom - OutputDesktop.top;
         const long clientW = br.x - tl.x;
         const long clientH = br.y - tl.y;
-        if (outputW > 0 && outputH > 0 &&
+        const bool nearFullDesktop =
+            outputW > 0 && outputH > 0 &&
             clientW >= static_cast<long>(outputW * 0.90) &&
-            clientH >= static_cast<long>(outputH * 0.90))
+            clientH >= static_cast<long>(outputH * 0.90);
+        if (nearFullDesktop)
         {
             uv = { 0.f, 0.f, 1.f, 1.f };
+            static std::uint64_t geometryReceipts = 0;
+            const auto hit = ++geometryReceipts;
+            if (hit <= 64 || (hit & (hit - 1)) == 0)
+                std::cerr << "[R19 TRACE] game-uv hit=" << hit
+                          << " branch=WHOLE_DESKTOP"
+                          << " output=" << OutputDesktop.left << "," << OutputDesktop.top
+                          << "-" << OutputDesktop.right << "," << OutputDesktop.bottom
+                          << " client=" << tl.x << "," << tl.y
+                          << "-" << br.x << "," << br.y
+                          << " source=" << SourceWidth << "x" << SourceHeight
+                          << " clientMidX=" << (0.5 * (double(tl.x) + double(br.x)))
+                          << " selectedSplitX="
+                          << (double(OutputDesktop.left) + 0.5 * double(SourceWidth))
+                          << " uv=0,0,1,1\n";
             return true;
         }
 
@@ -730,7 +746,22 @@ float4 PSMain(VSOut input) : SV_Target
         const float bb = std::clamp(b, 0.f, 1.f);
         uv.w = rr - uv.x;
         uv.h = bb - uv.y;
-        return uv.w > 0.01f && uv.h > 0.01f;
+        const bool valid = uv.w > 0.01f && uv.h > 0.01f;
+        static std::uint64_t clientGeometryReceipts = 0;
+        const auto hit = ++clientGeometryReceipts;
+        if (hit <= 64 || (hit & (hit - 1)) == 0)
+            std::cerr << "[R19 TRACE] game-uv hit=" << hit
+                      << " branch=CLIENT_RECT valid=" << (valid ? 1 : 0)
+                      << " output=" << OutputDesktop.left << "," << OutputDesktop.top
+                      << "-" << OutputDesktop.right << "," << OutputDesktop.bottom
+                      << " client=" << tl.x << "," << tl.y
+                      << "-" << br.x << "," << br.y
+                      << " source=" << SourceWidth << "x" << SourceHeight
+                      << " clientMidX=" << (0.5 * (double(tl.x) + double(br.x)))
+                      << " selectedSplitUv=" << (uv.x + uv.w * 0.5f)
+                      << " uv=" << uv.x << "," << uv.y << "," << uv.w << "," << uv.h
+                      << "\n";
+        return valid;
     }
 
     inline DXGI_FORMAT ChooseSwapchainFormat(XrSession session)
@@ -1009,6 +1040,32 @@ float4 PSMain(VSOut input) : SV_Target
             LastProductionPresentQpc >= frame.presentQpc;
         const bool ageOk = LastProductionPublishMs != 0 &&
             GetTickCount64() - LastProductionPublishMs <= PublishedSourceMaxAgeMs;
+        static std::uint64_t sourceMatchReceipts = 0;
+        const auto sourceMatchHit = ++sourceMatchReceipts;
+        const auto nowMs = GetTickCount64();
+        const ULONGLONG sourceAgeMs = LastProductionPublishMs
+            ? nowMs - LastProductionPublishMs : 0;
+        const ULONGLONG frameObservedAgeMs = LastStereoFrameMs
+            ? nowMs - LastStereoFrameMs : 0;
+        if (sourceMatchHit <= 64 ||
+            (sourceMatchHit & (sourceMatchHit - 1)) == 0 ||
+            !qpcOk || !ageOk)
+        {
+            LARGE_INTEGER qpcFreq{};
+            QueryPerformanceFrequency(&qpcFreq);
+            std::cerr << "[R19 TRACE] source-match hit=" << sourceMatchHit
+                      << " accepted=" << ((qpcOk && ageOk) ? 1 : 0)
+                      << " frameId=" << frame.frameId
+                      << " sourcePoseSequence=" << frame.sourcePoseSequence
+                      << " captureQpc=" << LastProductionPresentQpc
+                      << " framePresentQpc=" << frame.presentQpc
+                      << " qpcDelta=" << (LastProductionPresentQpc - frame.presentQpc)
+                      << " qpcFreq=" << qpcFreq.QuadPart
+                      << " sourceAgeMs=" << sourceAgeMs
+                      << " frameObservedAgeMs=" << frameObservedAgeMs
+                      << " qpcOk=" << (qpcOk ? 1 : 0)
+                      << " ageOk=" << (ageOk ? 1 : 0) << "\n";
+        }
         if (qpcOk && ageOk)
             return true;
         ++SourceQpcRejects;
@@ -1071,6 +1128,23 @@ float4 PSMain(VSOut input) : SV_Target
             { whole.x, whole.y, whole.w * 0.5f, whole.h },
             { whole.x + whole.w * 0.5f, whole.y, whole.w * 0.5f, whole.h }
         };
+        static std::uint64_t projectionUvReceipts = 0;
+        const auto uvHit = ++projectionUvReceipts;
+        if (uvHit <= 64 || (uvHit & (uvHit - 1)) == 0)
+            std::cerr << "[R19 TRACE] projection-uv hit=" << uvHit
+                      << " frameId=" << LastStereoFrame.frameId
+                      << " sourcePoseSequence=" << LastStereoFrame.sourcePoseSequence
+                      << " incomingProjection=" << (incoming ? 1 : 0)
+                      << " captureQpc=" << LastProductionPresentQpc
+                      << " framePresentQpc=" << LastStereoFrame.presentQpc
+                      << " whole=" << whole.x << "," << whole.y << ","
+                      << whole.w << "," << whole.h
+                      << " leftUv=" << eyeUv[0].x << "," << eyeUv[0].y << ","
+                      << eyeUv[0].w << "," << eyeUv[0].h
+                      << " rightUv=" << eyeUv[1].x << "," << eyeUv[1].y << ","
+                      << eyeUv[1].w << "," << eyeUv[1].h
+                      << " target=" << Projection.width << "x" << Projection.height
+                      << "\n";
 
         std::uint32_t image = 0;
         if (!Acquire(Projection, image))

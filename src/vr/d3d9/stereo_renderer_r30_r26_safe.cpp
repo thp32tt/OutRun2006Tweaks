@@ -5224,6 +5224,42 @@ namespace OutRunVRStereo
                     std::memcpy(eyeConstants[eye], &projectedT,
                         sizeof(projectedT));
                 }
+                if (Settings::VRTelemetry)
+                {
+                    const auto sourceReceipt =
+                        OutRunVR::GameSemantic::CurrentLensOriginalCall;
+                    const auto deferredReceipt =
+                        OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
+                    static std::atomic<std::uint64_t> r85BuildReceipts{0};
+                    const auto hit = r85BuildReceipts.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (hit <= 64 || (hit & (hit - 1)) == 0)
+                        spdlog::info(
+                            "VR TRACE LENS R85 BUILD: hit={} pose={} headSeq={} "
+                            "cameraSynced={} sourceCallSerial={} sourceObj=0x{:06X} "
+                            "sourceSite={} ordinal={} deferredSerial={} deferredObj=0x{:06X} "
+                            "deferredOrdinal={} stockT={:.9g},{:.9g},{:.9g} "
+                            "headR=[{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g}] "
+                            "headT={:.9g},{:.9g},{:.9g} "
+                            "fovL={:.9g},{:.9g},{:.9g},{:.9g} "
+                            "fovR={:.9g},{:.9g},{:.9g},{:.9g}",
+                            hit, stereo.poseSequence, headSequence,
+                            sourceCameraSynced ? 1 : 0,
+                            sourceReceipt.sourceSerial, sourceReceipt.objectId,
+                            static_cast<unsigned>(sourceReceipt.callsite),
+                            static_cast<unsigned>(sourceReceipt.ordinal),
+                            deferredReceipt.sourceSerial, deferredReceipt.objectId,
+                            static_cast<unsigned>(deferredReceipt.ordinal),
+                            stockWvp._41, stockWvp._42, stockWvp._43,
+                            headInverse._11, headInverse._12, headInverse._13,
+                            headInverse._21, headInverse._22, headInverse._23,
+                            headInverse._31, headInverse._32, headInverse._33,
+                            headInverse._41, headInverse._42, headInverse._43,
+                            stereo.eyeFov[0].angleLeft, stereo.eyeFov[0].angleRight,
+                            stereo.eyeFov[0].angleUp, stereo.eyeFov[0].angleDown,
+                            stereo.eyeFov[1].angleLeft, stereo.eyeFov[1].angleRight,
+                            stereo.eyeFov[1].angleUp, stereo.eyeFov[1].angleDown);
+                }
                 static bool firstAsymmetricFlareRayLogged = false;
                 if (!firstAsymmetricFlareRayLogged)
                 {
@@ -6191,6 +6227,32 @@ namespace OutRunVRStereo
             }
             if (lensPhysicalCandidate)
             {
+                static std::atomic<std::uint64_t> lensPhysicalReceipts{0};
+                const auto receipt = lensPhysicalReceipts.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                LARGE_INTEGER receiptQpc{};
+                QueryPerformanceCounter(&receiptQpc);
+                spdlog::info(
+                    "VR TRACE LENS PHYSICAL CORRELATION: receipt={} qpc={} serial={} "
+                    "site={} kind={} scope={} sourceCallSerial={} sequence={} "
+                    "sourceObj=0x{:06X} sourceSite={} ordinal={} exactSourceLinked={} "
+                    "windowAnchorSerial={} windowAnchorSequence={} "
+                    "windowAnchorObj=0x{:06X} windowAnchorOrdinal={} provenance={} "
+                    "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} rt0=0x{:X} "
+                    "correlationAuthority={}",
+                    receipt, receiptQpc.QuadPart, TopLevelDrawSerial(),
+                    site ? site : "unknown", static_cast<unsigned>(screenKind),
+                    OutRunVR::GameSemantic::Name(lensPhysicalScope),
+                    lensSourceSerial, lensSourceSequence, lensSourceObject,
+                    lensSourceSite, lensSourceOrdinal,
+                    lensInlineLinked ? 1 : 0, lensWindowAnchorSerial,
+                    lensWindowAnchorSequence, lensWindowAnchorObject,
+                    lensWindowAnchorOrdinal, lensSourceProvenance,
+                    lensTexture0Ptr, lensVb0Ptr, lensIbPtr, lensRt0Ptr,
+                    lensInlineLinked ? "EXACT_INLINE_SOURCE" :
+                        (lensDeferredCandidate ?
+                            "DEFERRED_WINDOW_CANDIDATE_NOT_EXACT_OBJECT" :
+                            "UNOWNED_PHYSICAL"));
                 IDirect3DVertexShader9* traceVs = nullptr;
                 const HRESULT traceVsHr = device->GetVertexShader(&traceVs);
                 const std::uintptr_t traceVsPtr =
