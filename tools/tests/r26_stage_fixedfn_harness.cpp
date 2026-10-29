@@ -32,9 +32,9 @@ bool MatrixFinite(const D3DMATRIX&m){for(auto&r:m.m)for(float v:r)if(!std::isfin
 struct Viewport {DWORD X=0,Y=0,Width=1920,Height=1080;};
 namespace OutRunVR::GameSemantic {
 enum class RenderScope {None,ScreenHud,World,Projected,ProjectedWorldMarker2D,ScreenOverlay2D,ProjectedScreenEffect2D,SceneEffect};
-enum class ProducerToken {None,StageExtensionTime,ResultProgress,Goal,Rank,Lens,RivalMarkerSprani};
+enum class ProducerToken {None,StageExtensionTime,ResultProgress,ResultTextB9200,GoalTimeHelper,GoalTime020,GoalTime150,OutRunStagePrintf,Goal,Rank,Lens,RivalMarkerSprani};
 struct Command {RenderScope scope=RenderScope::ScreenHud;ProducerToken producer=ProducerToken::StageExtensionTime;bool queued=false;void*queueNode=nullptr;unsigned queueEpoch=0;
-bool IsExactFiniteResultHud()const{return scope==RenderScope::ScreenHud&&(producer==ProducerToken::StageExtensionTime||producer==ProducerToken::ResultProgress||producer==ProducerToken::Goal);}};
+bool IsExactFiniteResultHud()const{return scope==RenderScope::ScreenHud&&(producer==ProducerToken::StageExtensionTime||producer==ProducerToken::ResultProgress||producer==ProducerToken::ResultTextB9200||producer==ProducerToken::GoalTime020||producer==ProducerToken::GoalTime150||producer==ProducerToken::OutRunStagePrintf||producer==ProducerToken::Goal);}};
 Command command; unsigned ExternalOverlaySemanticDepth=0;
 Command CapturePhysicalDrawCommand(){return command;}
 RenderScope EffectiveScope(){return command.scope;}
