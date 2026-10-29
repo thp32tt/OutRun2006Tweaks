@@ -47,7 +47,13 @@ def verify_r7(source: str) -> None:
     single = fn[start:fn.index("D3DVIEWPORT9 savedViewport{}", start)]
     assert "if(StereoWanted()&&TargetIsBackBuffer())" in single
     assert "InvalidateRightDepthStencilIfLeftMayWrite(device);" in single
-    assert single.index("InvalidateRightDepthStencilIfLeftMayWrite(device);") < single.index("return drawCall();")
+    assert single.count("const HRESULT hr=drawCall();") == 1
+    assert single.count("return hr;") == 1
+    assert "R7TraceVisualEyes(visualTrace,\"PREPARE_REJECT_SINGLE\"" in single
+    assert single.index("InvalidateRightDepthStencilIfLeftMayWrite(device);") < single.index(
+        "const HRESULT hr=drawCall();") < single.index(
+        "R7TraceVisualEyes(visualTrace,\"PREPARE_REJECT_SINGLE\"") < single.index(
+        "return hr;")
     assert "!occlusionActive" not in single
     assert "const bool occlusionActive=" not in fn
     # Query handling remains single native execution, never binocular.

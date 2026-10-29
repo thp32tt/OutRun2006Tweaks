@@ -29,6 +29,11 @@ WINDOWS = (
     ("navi-live-time-popup-dispatch", 0x000BD080, 0x000BD240),
     ("navi-race-display", 0x000BEA80, 0x000BEE20),
     ("goal-record-helpers", 0x000BE000, 0x000BEB20),
+    # Original opaque object queue core. 0x4056D0 enqueues DrawObjectAlpha
+    # work; 0x4052C0 later consumes the shared queue. Keeping these bodies in
+    # the durable artifact is required before assigning a CABE ordinal to a
+    # physical PMT/Draw.
+    ("lens-opaque-queue-core", 0x00005280, 0x00005880),
     ("lens-objects", 0x0000C900, 0x0000D950),
     ("sprite-glyph-queue", 0x0002C800, 0x0002D300),
     ("calc3d2d", 0x00049940, 0x00049B20),
@@ -58,6 +63,21 @@ STAGE_MODE2_JUMP_CASES = (0x98ABC, 0x98C42, 0x98C97, 0x98CD9)
 LIVE_STAGE_CALL_RVA = 0xBD217
 LIVE_STAGE_TARGET_RVA = 0xB9320
 LIVE_STAGE_LEAVE_RVA = 0xBD221
+
+LENS_ENQUEUE_RVA = 0x56D0
+LENS_FLUSH_RVA = 0x52C0
+LENS_WRAPPER_EDGES = (
+    (0xC993, LENS_ENQUEUE_RVA, "C993 centre wrapper -> opaque enqueue"),
+    (0xCABE, LENS_ENQUEUE_RVA, "CABE projected wrapper -> opaque enqueue"),
+)
+LENS_FLUSH_EDGES = (
+    (0xD44B, LENS_FLUSH_RVA, "first scene-effect queue flush"),
+    (0xD79B, LENS_FLUSH_RVA, "outer lens-child queue flush"),
+)
+LENS_570008_CALLS = (
+    (0xD6B5, 0xD6BA, "570008 before 0xD79B flush"),
+    (0xD7AF, 0xD7B4, "570008 after 0xD79B flush"),
+)
 
 
 def verify_stage_source_hook_boundary(source: str) -> None:
@@ -129,6 +149,49 @@ def verify_stage_original_binary(pe, source: str) -> list[str]:
     return facts
 
 
+def verify_lens_original_queue_edges(pe) -> list[str]:
+    """Pin enqueue/flush boundaries without claiming descriptor identity."""
+    from struct import unpack
+
+    read = pe.bytes_at_rva
+    facts: list[str] = []
+
+    def call_target(call_rva: int) -> int:
+        insn = read(call_rva, 5)
+        assert len(insn) == 5 and insn[0] == 0xE8, (
+            f"expected original CALL rel32 at RVA {call_rva:#x}")
+        return (call_rva + 5 + unpack("<i", insn[1:])[0]) & 0xFFFFFFFF
+
+    for call_rva, target_rva, label in (*LENS_WRAPPER_EDGES, *LENS_FLUSH_EDGES):
+        actual = call_target(call_rva)
+        assert actual == target_rva, (
+            f"{label}: expected {target_rva:#x}, found {actual:#x}")
+        facts.append(
+            f"- RVA `0x{call_rva:05X}` -> `0x{target_rva:05X}` ({label}).")
+
+    # The same 0x570008 scene object is submitted once before and once after
+    # the second shared queue flush. This proves CALL ordinal alone cannot be
+    # treated as the identity of a later opaque PMT consumed by 0x4052C0.
+    for push_rva, call_rva, label in LENS_570008_CALLS:
+        push = read(push_rva, 5)
+        assert push == bytes((0x68, 0x08, 0x00, 0x57, 0x00)), (
+            f"{label}: 0x570008 PUSH changed at {push_rva:#x}")
+        target = call_target(call_rva)
+        assert target == 0xC9A0, (
+            f"{label}: expected projected wrapper 0xC9A0, found {target:#x}")
+        facts.append(
+            f"- RVA `0x{push_rva:05X}` pushes `0x570008` and "
+            f"`0x{call_rva:05X}` calls `0x0C9A0` ({label}).")
+
+    assert LENS_570008_CALLS[0][1] < LENS_FLUSH_EDGES[1][0] < LENS_570008_CALLS[1][0], (
+        "0x570008 before/flush/after ordering changed")
+    facts.append(
+        "- Therefore CABE call-stack ordinal is source chronology only; "
+        "opaque PMT identity remains UNVERIFIED until the 0x4056D0 descriptor "
+        "and 0x4052C0 consumer are joined.")
+    return facts
+
+
 def test_stage_source_guard_negative(source: str) -> None:
     """Prove the source verifier rejects a replay of the original crash."""
     safe = "callRva == 0x98A10 ? 0x98A18 : callRva + 5"
@@ -153,6 +216,7 @@ def main():
     pe = parse_pe(binary)
     source = Path(__file__).resolve().parents[1].joinpath("src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
     stage_facts = verify_stage_original_binary(pe, source)
+    lens_queue_facts = verify_lens_original_queue_edges(pe)
     test_stage_source_guard_negative(source)
     dis = Cs(CS_ARCH_X86, CS_MODE_32)
     dis.detail = False
@@ -161,6 +225,7 @@ def main():
            "and disassembled command flow are used for actionable code changes.",
            ""]
     out.extend(["## Exact GOAL result-time panel / mode-2 branch guard", *stage_facts, "",
+                "## Original lens opaque queue boundary", *lens_queue_facts, "",
                 "## Live +TIME investigation contract",
                 "- Race-manager 0x450CC0 is the actual time-extension state transition.",
                 "- Navi 0x4B93E0 observes manager flag3 and arms HUD timer 0x8446E8.",
