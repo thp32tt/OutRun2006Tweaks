@@ -1,0 +1,53 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T0045KST-IDLE",
+  "observed_at_kst": "2026-10-30T00:47:24+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "disposition": "IDLE",
+  "reason_code": "NO_NEW_UNREVIEWED_EXPORTED_CANDIDATE_SHA",
+  "method": "N100 read-only execution of pre-existing work/C1_QA_20261029_2145_AI2_scan.py: parse A/B export evidence, join production manifest and local PNG files, deduplicate candidate SHA256 against prior QA JSON; read A/B state.",
+  "counts": {
+    "review_json_artifacts_scanned": 208,
+    "prior_distinct_candidate_sha256": 921,
+    "exported_files": 916,
+    "new_unreviewed_export_sha256": 0,
+    "new_unreviewed_export_files": 0,
+    "missing_or_incomplete_export_files": 0,
+    "A_completed_files": 434,
+    "A_completed_batches": 140,
+    "B_completed_files": 481,
+    "B_completed_batches": 144,
+    "A_active": false,
+    "B_active": false
+  },
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "scope": "EXPORTED_A_B_CANDIDATES_ONLY; production output without valid export evidence is not promoted to QA",
+  "limitations": [
+    "No fresh candidate to inspect visually in this run",
+    "Prior QA report count covers collected JSON artifacts, not unique sessions",
+    "No native DDS or actual in-game UI retest"
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "ai2_score_delta": 0,
+  "note": "IDLE status report is not a QA review achievement; repeat/status checks score +0."
+}
