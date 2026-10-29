@@ -2,10 +2,24 @@
 #include "src/vr/d3d11/native_game_raw_color_transport.hpp"
 #include "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp"
 #include "src/vr/d3d11/native_game_raw_present_coverage.hpp"
+#include "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
 #include <array>
 #include <cassert>
 using namespace outrun::vr::dx11;
 int main() {
+    // Different D3D9 interface pointers may identify the same canonical
+    // game backbuffer. Never accept an unrelated or unavailable IUnknown.
+    int drawSurface = 0, presentedSurface = 0, canonical = 0, foreign = 0;
+    assert(native_raw_canonical_source_target_is_presented(
+        &drawSurface, &presentedSurface, &canonical, &canonical));
+    assert(!native_raw_canonical_source_target_is_presented(
+        &drawSurface, &presentedSurface, &canonical, &foreign));
+    assert(!native_raw_canonical_source_target_is_presented(
+        &drawSurface, &presentedSurface, &canonical,
+        static_cast<int*>(nullptr)));
+    assert(!native_raw_canonical_source_target_is_presented(
+        static_cast<int*>(nullptr), &presentedSurface,
+        &canonical, &canonical));
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};

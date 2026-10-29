@@ -111,6 +111,7 @@ public:
         stagingAlternate_.Reset(); baselineAlternate_.Reset();
         surfaceAlternate_.Reset();
         sourceGameTarget_.Reset();
+        sourceGameTargetIdentity_.Reset();
         sourceAlignedPixelsThisPresent_ = 0u;
         event_.Reset(); surface_.Reset();
         drawPair_.reset(); region_ = {}; regionAlternate_ = {};
@@ -372,10 +373,22 @@ public:
                 // Both source regions and ALL original dirty pixels must be
                 // authenticated independently; otherwise use legacy insets.
                 bool firstAligned = false, secondAligned = false;
+                // D3D9 GetRenderTarget/GetBackBuffer may expose distinct
+                // COM interface pointers for the same underlying surface.
+                // Compare canonical IID_IUnknown identity from the real
+                // Draw and Present, not their IDirect3DSurface9 addresses.
+                Microsoft::WRL::ComPtr<IUnknown> presentedIdentity;
+                const bool canonicalBackbuffer =
+                    sourceGameTargetIdentity_ && backbuffer &&
+                    SUCCEEDED(backbuffer->QueryInterface(
+                        IID_IUnknown, reinterpret_cast<void**>(
+                            presentedIdentity.GetAddressOf())));
                 if (captureTargetWidth_ == back.Width &&
                     captureTargetHeight_ == back.Height &&
-                    native_raw_source_target_is_presented(
-                        sourceGameTarget_.Get(), backbuffer)) {
+                    canonicalBackbuffer &&
+                    native_raw_canonical_source_target_is_presented(
+                        sourceGameTarget_.Get(), backbuffer,
+                        sourceGameTargetIdentity_.Get(), presentedIdentity.Get())) {
                         NativeRawPresentTile alignedFirst{}, alignedSecond{};
                         const bool haveFirst = firstPixels &&
                             native_raw_source_aligned_present_tile(
@@ -614,9 +627,17 @@ public:
             // change its bound RT between Draw and Present; no Present-time
             // RT query can reconstruct that identity. Unknown => inset only.
             sourceGameTarget_.Reset();
+            sourceGameTargetIdentity_.Reset();
             if (FAILED(game->GetRenderTarget(
-                    0u, sourceGameTarget_.GetAddressOf())))
+                    0u, sourceGameTarget_.GetAddressOf())) || !sourceGameTarget_) {
                 sourceGameTarget_.Reset();
+            } else if (FAILED(sourceGameTarget_->QueryInterface(
+                    IID_IUnknown, reinterpret_cast<void**>(
+                        sourceGameTargetIdentity_.GetAddressOf())))) {
+                // Preserve the opt-in displaced RAW diagnostic but never
+                // infer source-aligned game pixels without COM identity.
+                sourceGameTargetIdentity_.Reset();
+            }
             rgbEvidenceConfirmed_ = false;
             drawPair_.arm(presentingSerial, color);
         }
@@ -882,6 +903,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> sourceGameTarget_;
+    Microsoft::WRL::ComPtr<IUnknown> sourceGameTargetIdentity_;
     UINT sourceAlignedPixelsThisPresent_ = 0u;
     IDirect3DDevice9* gameOwner_ = nullptr;
     ID3D11Device* gpuOwner_ = nullptr;
