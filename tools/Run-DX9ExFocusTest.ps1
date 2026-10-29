@@ -94,11 +94,21 @@ foreach ($pattern in $logPatterns) {
 }
 $hostFullTrace = Join-Path $root 'outrun-vr-host-full-trace.log'
 $gameTrace = Join-Path $root 'OutRun2006Tweaks.log'
+$hostFullTraceBytes = if (Test-Path -LiteralPath $hostFullTrace) {
+    (Get-Item -LiteralPath $hostFullTrace).Length
+} else {
+    0
+}
+$gameTraceBytes = if (Test-Path -LiteralPath $gameTrace) {
+    (Get-Item -LiteralPath $gameTrace).Length
+} else {
+    0
+}
 @(
     "hostFullTracePresent=$([int](Test-Path -LiteralPath $hostFullTrace))"
-    "hostFullTraceBytes=$((if (Test-Path -LiteralPath $hostFullTrace) { (Get-Item -LiteralPath $hostFullTrace).Length } else { 0 }))"
+    "hostFullTraceBytes=$hostFullTraceBytes"
     "gameTracePresent=$([int](Test-Path -LiteralPath $gameTrace))"
-    "gameTraceBytes=$((if (Test-Path -LiteralPath $gameTrace) { (Get-Item -LiteralPath $gameTrace).Length } else { 0 }))"
+    "gameTraceBytes=$gameTraceBytes"
 ) | Set-Content (Join-Path $session 'FULL_TRACE_STATUS.txt') -Encoding UTF8
 
 $result = @(
