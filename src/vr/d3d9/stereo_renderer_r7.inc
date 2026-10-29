@@ -1589,10 +1589,122 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			if(InternalStereoPass||!StereoWanted()||!TargetIsBackBuffer())return false;if(OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire)){PoisonFrame(OutRunVR::StereoFailureOcclusionQueryActive);++OcclusionStereoRejects;if(!FirstOcclusionTrackingUnavailableLogged){FirstOcclusionTrackingUnavailableLogged=true;spdlog::error("VR stereo: occlusion-query Issue tracking unavailable; stereo duplication fails closed to single-execution mono until tracking recovers");}return false;}if(AnyAuxRenderTargetActive()){PoisonFrame(OutRunVR::StereoFailureMrtActive);++MrtRejectedDraws;if(!FirstMrtRejectLogged){FirstMrtRejectLogged=true;spdlog::info("VR stereo: auxiliary MRT active; current Present is marked incomplete");}return false;}if(ActiveOcclusionQueries.load(std::memory_order_acquire)>0){++OcclusionStereoRejects;if(!FirstOcclusionRejectLogged){FirstOcclusionRejectLogged=true;spdlog::info("VR stereo: active D3D9 occlusion query kept single-eye; query result is shared without invalidating the stereo Present");}return false;}if(!EnsureStereoResources(device)){PoisonFrame(OutRunVR::StereoFailureResourceUnavailable);return false;}if(TrackedDepthStencil&&(!RightDepthSynchronized||!RightStencilSynchronized))TryBootstrapRightDepthFromRecentClear(device);if(TrackedDepthStencil&&!RightDepthSynchronized&&DepthTestActive(device)){PoisonFrame(OutRunVR::StereoFailureDepthUnsynchronized);return false;}if(TrackedDepthStencil&&!RightStencilSynchronized&&StencilTestActive(device)){PoisonFrame(OutRunVR::StereoFailureStencilUnsynchronized);return false;}OutRunVRRenderer::LatchedStereoFrame stereo{};if(!OutRunVRRenderer::GetLatchedStereoFrame(stereo)){PoisonFrame(OutRunVR::StereoFailureMissingLatchedPose);return false;}draw.stereoFrame=stereo;const EyeBuildResult classification=BuildEyeConstants(device,stereo,draw);if(classification==EyeBuildResult::FatalError){++WorldClassificationFailures;PoisonFrame(OutRunVR::StereoFailureWorldClassificationFailed);if(!FirstClassificationFailureLogged){FirstClassificationFailureLogged=true;spdlog::warn("VR stereo: verified world draw could not be classified/transformed safely; frame forced to mono fallback");}return false;}return true;
 		}
 
+		struct R7VisualTraceContext
+		{
+			OutRunVR::GameSemantic::PhysicalDrawCommand command{};
+			OutRunVR::GameSemantic::LensOriginalCallReceipt lensInline{};
+			OutRunVR::GameSemantic::LensDeferredPhysicalReceipt lensDeferred{};
+			const char* family="OTHER";
+			bool enabled=false;
+			bool lens=false;
+		};
+
+		const char* R7VisualTraceFamily(
+			OutRunVR::GameSemantic::ProducerToken producer) noexcept
+		{
+			using OutRunVR::GameSemantic::ProducerToken;
+			switch(producer)
+			{
+			case ProducerToken::StageExtensionTime:return "PLUS_TIME";
+			case ProducerToken::ResultProgress:return "GOAL_PERCENT";
+			case ProducerToken::ResultTextB9200:return "GOAL_TEXT";
+			case ProducerToken::GoalTime020:
+			case ProducerToken::GoalTime150:return "GOAL_TIME";
+			case ProducerToken::OutRunStagePrintf:return "GOAL_STAGE_PRINTF";
+			default:return "RESULT_OTHER";
+			}
+		}
+
+		R7VisualTraceContext R7CaptureVisualTrace() noexcept
+		{
+			using namespace OutRunVR::GameSemantic;
+			R7VisualTraceContext trace{};
+			trace.command=CapturePhysicalDrawCommand();
+			trace.lensInline=CurrentLensOriginalCall;
+			trace.lensDeferred=CurrentLensDeferredPhysical;
+			trace.lens=
+				trace.command.producer==ProducerToken::LensFlareCentre||
+				trace.lensInline.sourceSerial!=0||
+				trace.lensDeferred.sourceSerial!=0||
+				trace.command.scope==RenderScope::ProjectedScreenEffect2D||
+				trace.command.scope==RenderScope::SceneEffect;
+			trace.family=trace.lens?"LENS":R7VisualTraceFamily(trace.command.producer);
+			trace.enabled=Settings::VRTelemetry&&
+				(trace.lens||trace.command.IsExactFiniteResultHud());
+			return trace;
+		}
+
+		void R7TraceVisualEyes(
+			const R7VisualTraceContext& trace,const char* route,
+			bool prepared,bool worldStereo,bool fixedFunctionWorld,
+			std::uint32_t poseSequence,bool leftAttempted,HRESULT leftHr,
+			bool rightAttempted,HRESULT rightHr,
+			OutRunVR::StereoFailureReason rightFailure,bool restoreOk,
+			OutRunVR::StereoFailureReason failureBefore,
+			OutRunVR::StereoFailureReason failureAfter) noexcept
+		{
+			if(!trace.enabled)return;
+			const bool inlineLinked=trace.lensInline.sourceSerial!=0;
+			const bool deferredCandidate=!inlineLinked&&
+				trace.lensDeferred.sourceSerial!=0;
+			LARGE_INTEGER qpc{};QueryPerformanceCounter(&qpc);
+			spdlog::info(
+				"VR TRACE R7 VISUAL EYES FULL: qpc={} serial={} family={} route={} "
+				"producer={} scope={} queued={} node=0x{:X} epoch={} prepared={} "
+				"worldStereo={} fixedFunctionWorld={} pose={} "
+				"leftAttempted={} left=0x{:08X} rightAttempted={} right=0x{:08X} "
+				"rightFailure={} restore={} failureBefore={} failureAfter={} "
+				"frameIncomplete={} rightFailed={} sourceCallSerial={} sequence={} "
+				"sourceObj=0x{:06X} sourceSite={} ordinal={} windowAnchorSerial={} "
+				"windowAnchorSequence={} windowAnchorObj=0x{:06X} "
+				"windowAnchorOrdinal={} sourceAuthority={} opaquePmtIdentity={}",
+				qpc.QuadPart,TopLevelDrawSerial(),trace.family,
+				route?route:"UNKNOWN",
+				OutRunVR::GameSemantic::Name(trace.command.producer),
+				OutRunVR::GameSemantic::Name(trace.command.scope),
+				trace.command.queued?1:0,
+				reinterpret_cast<std::uintptr_t>(trace.command.queueNode),
+				trace.command.queueEpoch,prepared?1:0,worldStereo?1:0,
+				fixedFunctionWorld?1:0,poseSequence,
+				leftAttempted?1:0,static_cast<unsigned>(leftHr),
+				rightAttempted?1:0,static_cast<unsigned>(rightHr),
+				static_cast<unsigned>(rightFailure),restoreOk?1:0,
+				static_cast<unsigned>(failureBefore),
+				static_cast<unsigned>(failureAfter),
+				FrameStereoIncomplete?1:0,FrameRightDrawFailed?1:0,
+				inlineLinked?trace.lensInline.sourceSerial:0,
+				inlineLinked?trace.lensInline.lastC993Sequence:
+					(deferredCandidate?trace.lensDeferred.sequence:0),
+				inlineLinked?trace.lensInline.objectId:
+					(deferredCandidate?trace.lensDeferred.objectId:0),
+				inlineLinked?static_cast<unsigned>(trace.lensInline.callsite):0,
+				inlineLinked?static_cast<unsigned>(trace.lensInline.ordinal):0,
+				deferredCandidate?trace.lensDeferred.sourceSerial:0,
+				deferredCandidate?trace.lensDeferred.sequence:0,
+				deferredCandidate?trace.lensDeferred.objectId:0,
+				deferredCandidate?
+					static_cast<unsigned>(trace.lensDeferred.ordinal):0,
+				trace.lens?
+					(inlineLinked?"INLINE_CALL_STACK_ONLY":
+						(deferredCandidate?"DEFERRED_WINDOW_CANDIDATE":
+							"UNOWNED_PHYSICAL")):
+					"EXACT_RESULT_PRODUCER",
+				trace.lens?"UNVERIFIED":"NOT_APPLICABLE");
+		}
+
 		template <typename DrawCall>
 		HRESULT ExecuteStereoDraw(IDirect3DDevice9* device,DrawCall&& drawCall)
 		{
-			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))return drawCall();
+			const auto visualTrace=R7CaptureVisualTrace();
+			const auto failureAtEntry=FrameFailureReason;
+			if(!StereoBaseCallbacksArmed.load(std::memory_order_acquire)||!IsGameDevice(device))
+			{
+				const HRESULT hr=drawCall();
+				R7TraceVisualEyes(visualTrace,"BASE_BYPASS_SINGLE",false,false,false,0,
+					true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,true,
+					failureAtEntry,FrameFailureReason);
+				return hr;
+			}
 			if(StereoWanted()&&!TargetIsBackBuffer())
 			{
 				if(CurrentDrawMatchesVerifiedWorld(device))
@@ -1600,29 +1712,180 @@ if(WaitForEventQuery(slot.fence,1,0u))
 					++OffscreenVerifiedWorldDraws;
 					if(!FirstOffscreenWorldLogged)
 					{
-						FirstOffscreenWorldLogged=true;D3DSURFACE_DESC rtDesc{},depthDesc{};const bool rtOk=TrackedRenderTarget&&SUCCEEDED(TrackedRenderTarget->GetDesc(&rtDesc));const bool depthOk=TrackedDepthStencil&&SUCCEEDED(TrackedDepthStencil->GetDesc(&depthDesc));
+						FirstOffscreenWorldLogged=true;
+						D3DSURFACE_DESC rtDesc{},depthDesc{};
+						const bool rtOk=TrackedRenderTarget&&SUCCEEDED(TrackedRenderTarget->GetDesc(&rtDesc));
+						const bool depthOk=TrackedDepthStencil&&SUCCEEDED(TrackedDepthStencil->GetDesc(&depthDesc));
 						spdlog::info("VR stereo: verified auxiliary/offscreen world pass kept mono; stereo backbuffer remains eligible. rt={}x{} fmt={} msaa={} depthFmt={} depthMsaa={}",rtOk?rtDesc.Width:0u,rtOk?rtDesc.Height:0u,rtOk?static_cast<int>(rtDesc.Format):-1,rtOk?static_cast<int>(rtDesc.MultiSampleType):-1,depthOk?static_cast<int>(depthDesc.Format):-1,depthOk?static_cast<int>(depthDesc.MultiSampleType):-1);
 					}
 				}
-				return drawCall();
+				const HRESULT hr=drawCall();
+				R7TraceVisualEyes(visualTrace,"OFFSCREEN_SINGLE",false,false,false,0,
+					true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,true,
+					failureAtEntry,FrameFailureReason);
+				return hr;
 			}
 
 			DrawStereoState draw{};
 			if(!PrepareDuplicatedDraw(device,draw))
 			{
-				// Keep occlusion-query Draw single-execution, but an original
-				// LEFT depth/stencil write still invalidates the RIGHT content.
-				// Otherwise a later eligible Draw may trust stale RIGHT sync
-				// after query END (review 01516). No extra query Draw is issued.
 				if(StereoWanted()&&TargetIsBackBuffer())
 					InvalidateRightDepthStencilIfLeftMayWrite(device);
-				return drawCall();
+				const HRESULT hr=drawCall();
+				R7TraceVisualEyes(visualTrace,"PREPARE_REJECT_SINGLE",false,false,false,0,
+					true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,true,
+					failureAtEntry,FrameFailureReason);
+				return hr;
 			}
-			D3DVIEWPORT9 savedViewport{};if(FAILED(device->GetViewport(&savedViewport))){InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);return drawCall();}
-			if(draw.worldStereo){bool leftEyeOk=false;{InternalPassScope guard;leftEyeOk=draw.fixedFunctionWorld?SetFixedFunctionEyeTransforms(device,draw,0):SetWvpOneRegisterAtATime(device,draw.eyeConstants[0]);}if(!leftEyeOk){bool rolledBack=false;{InternalPassScope guard;rolledBack=draw.fixedFunctionWorld?RestoreFixedFunctionTransforms(device,draw):SetWvpOneRegisterAtATime(device,draw.originalConstants);}InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(OutRunVR::StereoFailureLeftWvpUploadFailed);if(!rolledBack)NoteRestoreFailure(draw.fixedFunctionWorld?"left-eye fixed-function rollback":"left-eye c64 rollback");return drawCall();}}
-			const HRESULT leftHr=drawCall();if(FAILED(leftHr)){InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(OutRunVR::StereoFailureLeftDrawFailed);if(draw.worldStereo){bool restored=false;{InternalPassScope guard;restored=draw.fixedFunctionWorld?RestoreFixedFunctionTransforms(device,draw):SetWvpOneRegisterAtATime(device,draw.originalConstants);}if(!restored)NoteRestoreFailure(draw.fixedFunctionWorld?"left draw fixed-function transforms":"left draw c64");}return leftHr;}
-			IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;HRESULT rightHr=D3D_OK;OutRunVR::StereoFailureReason rightFailure=OutRunVR::StereoFailureRightStateFailed;bool restoreOk=true;{InternalPassScope guard;rightHr=SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface);if(SUCCEEDED(rightHr))rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);if(SUCCEEDED(rightHr))rightHr=device->SetViewport(&savedViewport);if(SUCCEEDED(rightHr)&&draw.worldStereo){const bool eyeOk=draw.fixedFunctionWorld?SetFixedFunctionEyeTransforms(device,draw,1):SetWvpOneRegisterAtATime(device,draw.eyeConstants[1]);if(!eyeOk){rightFailure=OutRunVR::StereoFailureRightWvpUploadFailed;rightHr=E_FAIL;}}if(SUCCEEDED(rightHr)){rightFailure=OutRunVR::StereoFailureRightDrawFailed;rightHr=drawCall();}restoreOk=RestoreRightPassState(device,savedRt,savedDepth,savedViewport,draw.originalConstants,draw.worldStereo&&!draw.fixedFunctionWorld);if(draw.fixedFunctionWorld&&!RestoreFixedFunctionTransforms(device,draw))restoreOk=false;}
-			FrameHadDuplicatedDraw=true;++DuplicatedDraws;if(draw.worldStereo){if(FrameStereoPoseSequence==0){FrameStereoPoseSequence=draw.poseSequence;FrameStereoMetadata=draw.stereoFrame;}else if(FrameStereoPoseSequence!=draw.poseSequence){FrameRightDrawFailed=true;PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);if(!FramePoseMismatchLogged){FramePoseMismatchLogged=true;++PoseSequenceMismatchFrames;spdlog::warn("VR stereo: multiple host pose sequences reached one Present; frame forced to mono fallback");}}FrameHadWorldStereo=true;++WorldStereoDraws;if(!FirstWorldStereoLogged){FirstWorldStereoLogged=true;spdlog::info("VR stereo: TRUE GEOMETRY STEREO active; per-eye c64 + OpenXR asymmetric FOV confirmed");}}else ++NonWorldDuplicatedDraws;if(FAILED(rightHr)){FrameRightDrawFailed=true;InvalidateRightDepthStencilIfLeftMayWrite(device);PoisonFrame(rightFailure);}if(!restoreOk){InvalidateRightDepthStencilIfLeftMayWrite(device);NoteRestoreFailure("right-eye draw");}return leftHr;
+			D3DVIEWPORT9 savedViewport{};
+			if(FAILED(device->GetViewport(&savedViewport)))
+			{
+				InvalidateRightDepthStencilIfLeftMayWrite(device);
+				PoisonFrame(OutRunVR::StereoFailureViewportUnavailable);
+				const HRESULT hr=drawCall();
+				R7TraceVisualEyes(visualTrace,"VIEWPORT_REJECT_SINGLE",true,
+					draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
+					true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,true,
+					failureAtEntry,FrameFailureReason);
+				return hr;
+			}
+			if(draw.worldStereo)
+			{
+				bool leftEyeOk=false;
+				{
+					InternalPassScope guard;
+					leftEyeOk=draw.fixedFunctionWorld?
+						SetFixedFunctionEyeTransforms(device,draw,0):
+						SetWvpOneRegisterAtATime(device,draw.eyeConstants[0]);
+				}
+				if(!leftEyeOk)
+				{
+					bool rolledBack=false;
+					{
+						InternalPassScope guard;
+						rolledBack=draw.fixedFunctionWorld?
+							RestoreFixedFunctionTransforms(device,draw):
+							SetWvpOneRegisterAtATime(device,draw.originalConstants);
+					}
+					InvalidateRightDepthStencilIfLeftMayWrite(device);
+					PoisonFrame(OutRunVR::StereoFailureLeftWvpUploadFailed);
+					if(!rolledBack)
+						NoteRestoreFailure(draw.fixedFunctionWorld?
+							"left-eye fixed-function rollback":"left-eye c64 rollback");
+					const HRESULT hr=drawCall();
+					R7TraceVisualEyes(visualTrace,"LEFT_WVP_REJECT_SINGLE",true,
+						draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
+						true,hr,false,E_PENDING,OutRunVR::StereoFailureNone,rolledBack,
+						failureAtEntry,FrameFailureReason);
+					return hr;
+				}
+			}
+			const HRESULT leftHr=drawCall();
+			if(FAILED(leftHr))
+			{
+				InvalidateRightDepthStencilIfLeftMayWrite(device);
+				PoisonFrame(OutRunVR::StereoFailureLeftDrawFailed);
+				bool restored=true;
+				if(draw.worldStereo)
+				{
+					restored=false;
+					{
+						InternalPassScope guard;
+						restored=draw.fixedFunctionWorld?
+							RestoreFixedFunctionTransforms(device,draw):
+							SetWvpOneRegisterAtATime(device,draw.originalConstants);
+					}
+					if(!restored)
+						NoteRestoreFailure(draw.fixedFunctionWorld?
+							"left draw fixed-function transforms":"left draw c64");
+				}
+				R7TraceVisualEyes(visualTrace,"LEFT_DRAW_FAILURE",true,
+					draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
+					true,leftHr,false,E_PENDING,OutRunVR::StereoFailureNone,restored,
+					failureAtEntry,FrameFailureReason);
+				return leftHr;
+			}
+			IDirect3DSurface9*savedRt=TrackedRenderTarget,*savedDepth=TrackedDepthStencil;
+			HRESULT rightHr=D3D_OK;
+			OutRunVR::StereoFailureReason rightFailure=OutRunVR::StereoFailureRightStateFailed;
+			bool restoreOk=true;
+			bool rightDrawAttempted=false;
+			{
+				InternalPassScope guard;
+				rightHr=SetRenderTargetHook.stdcall<HRESULT>(device,0u,RightEyeSurface);
+				if(SUCCEEDED(rightHr))
+					rightHr=SetDepthStencilSurfaceHook.stdcall<HRESULT>(device,RightEyeDepth);
+				if(SUCCEEDED(rightHr))
+					rightHr=device->SetViewport(&savedViewport);
+				if(SUCCEEDED(rightHr)&&draw.worldStereo)
+				{
+					const bool eyeOk=draw.fixedFunctionWorld?
+						SetFixedFunctionEyeTransforms(device,draw,1):
+						SetWvpOneRegisterAtATime(device,draw.eyeConstants[1]);
+					if(!eyeOk)
+					{
+						rightFailure=OutRunVR::StereoFailureRightWvpUploadFailed;
+						rightHr=E_FAIL;
+					}
+				}
+				if(SUCCEEDED(rightHr))
+				{
+					rightFailure=OutRunVR::StereoFailureRightDrawFailed;
+					rightDrawAttempted=true;
+					rightHr=drawCall();
+				}
+				restoreOk=RestoreRightPassState(device,savedRt,savedDepth,
+					savedViewport,draw.originalConstants,
+					draw.worldStereo&&!draw.fixedFunctionWorld);
+				if(draw.fixedFunctionWorld&&!RestoreFixedFunctionTransforms(device,draw))
+					restoreOk=false;
+			}
+			FrameHadDuplicatedDraw=true;
+			++DuplicatedDraws;
+			if(draw.worldStereo)
+			{
+				if(FrameStereoPoseSequence==0)
+				{
+					FrameStereoPoseSequence=draw.poseSequence;
+					FrameStereoMetadata=draw.stereoFrame;
+				}
+				else if(FrameStereoPoseSequence!=draw.poseSequence)
+				{
+					FrameRightDrawFailed=true;
+					PoisonFrame(OutRunVR::StereoFailurePoseSequenceMismatch);
+					if(!FramePoseMismatchLogged)
+					{
+						FramePoseMismatchLogged=true;
+						++PoseSequenceMismatchFrames;
+						spdlog::warn("VR stereo: multiple host pose sequences reached one Present; frame forced to mono fallback");
+					}
+				}
+				FrameHadWorldStereo=true;
+				++WorldStereoDraws;
+				if(!FirstWorldStereoLogged)
+				{
+					FirstWorldStereoLogged=true;
+					spdlog::info("VR stereo: TRUE GEOMETRY STEREO active; per-eye c64 + OpenXR asymmetric FOV confirmed");
+				}
+			}
+			else
+				++NonWorldDuplicatedDraws;
+			if(FAILED(rightHr))
+			{
+				FrameRightDrawFailed=true;
+				InvalidateRightDepthStencilIfLeftMayWrite(device);
+				PoisonFrame(rightFailure);
+			}
+			if(!restoreOk)
+			{
+				InvalidateRightDepthStencilIfLeftMayWrite(device);
+				NoteRestoreFailure("right-eye draw");
+			}
+			R7TraceVisualEyes(visualTrace,"STEREO_PAIR",true,
+				draw.worldStereo,draw.fixedFunctionWorld,draw.poseSequence,
+				true,leftHr,rightDrawAttempted,rightHr,rightFailure,restoreOk,
+				failureAtEntry,FrameFailureReason);
+			return leftHr;
 		}
 
 		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT startVertex,UINT primitiveCount){auto call=[&](){return DrawPrimitiveHook.stdcall<HRESULT>(device,type,startVertex,primitiveCount);};return ExecuteStereoDraw(device,call);}

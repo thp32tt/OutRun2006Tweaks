@@ -4218,6 +4218,9 @@ namespace OutRunVRStereo
             trace.lensInline = CurrentLensOriginalCall;
             trace.lensDeferred = CurrentLensDeferredPhysical;
             trace.lens =
+                trace.command.producer == ProducerToken::LensFlareCentre ||
+                trace.lensInline.sourceSerial != 0 ||
+                trace.lensDeferred.sourceSerial != 0 ||
                 trace.command.scope == RenderScope::ProjectedScreenEffect2D ||
                 trace.command.scope == RenderScope::SceneEffect;
             trace.family = trace.lens

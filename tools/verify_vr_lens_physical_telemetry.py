@@ -66,8 +66,12 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
     assert "reason=R30_NOT_ADMITTED" in lower
     assert "lowerActualDraw=NOT_YET_OBSERVED object=UNLINKED" in lower
     assert lower.index("VR LENS R30 LOWER FALLBACK:") < lower.index(
-        "return r29Draw();")
-    assert "return r29Draw();" in lower
+        "const HRESULT lowerHr = r29Draw();")
+    assert "const HRESULT lowerHr = r29Draw();" in lower
+    assert "VR TRACE VISUAL LOWER PHYSICAL RESULT FULL:" in lower
+    assert "opaquePmtIdentity={}" in lower
+    assert "INLINE_CALL_STACK_PMT_UNVERIFIED" in body
+    assert "opaquePmtIdentity=UNVERIFIED" in body
 
     for phrase in (
         "VR LENS CAMERA SYNC:",
@@ -152,6 +156,7 @@ def main() -> None:
         (0, "opaqueObject=WINDOW_LINKED_ONLY", "opaqueObject=PROVEN_DESCRIPTOR"),
         (0, "DEFERRED_WINDOW_CANDIDATE", "OPAQUE_DESCRIPTOR_PROOF"),
         (0, "lensInlineLinked ? 1 : 0", "1 /* unsafe exact source claim */"),
+        (0, "INLINE_CALL_STACK_PMT_UNVERIFIED", "OPAQUE_PMT_PROVEN"),
         (0, "device->GetFVF(&liveFvf)", "D3D_OK"),
         (0, "eyeRT=LEFT_RIGHT_TRANSACTION", "eyeRT=FAKE_SINGLE_RT"),
         (0, "std::memcmp(eyeConstants[0], eyeConstants[1],", "true /* fake eye equality */("),
