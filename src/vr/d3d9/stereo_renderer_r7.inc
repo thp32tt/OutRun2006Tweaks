@@ -1913,7 +1913,35 @@ if(WaitForEventQuery(slot.fence,1,0u))
 		}
 
 		HRESULT __stdcall DrawPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT startVertex,UINT primitiveCount){auto call=[&](){return DrawPrimitiveHook.stdcall<HRESULT>(device,type,startVertex,primitiveCount);};return ExecuteStereoDraw(device,call);}
-		HRESULT __stdcall DrawIndexedPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,INT baseVertexIndex,UINT minVertexIndex,UINT numVertices,UINT startIndex,UINT primitiveCount){auto call=[&](){return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device,type,baseVertexIndex,minVertexIndex,numVertices,startIndex,primitiveCount);};return ExecuteStereoDraw(device,call);}
+		HRESULT __stdcall DrawIndexedPrimitiveDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,INT baseVertexIndex,UINT minVertexIndex,UINT numVertices,UINT startIndex,UINT primitiveCount)
+		{
+			const auto pmt=OutRunVR::GameSemantic::CurrentLensOpaquePmtEntry;
+			if(Settings::VRTelemetry&&pmt.serial!=0)
+			{
+				static std::atomic<std::uint64_t> pmtDipSerial{0};
+				const auto dipSerial=pmtDipSerial.fetch_add(
+					1,std::memory_order_relaxed)+1;
+				LARGE_INTEGER qpc{};QueryPerformanceCounter(&qpc);
+				spdlog::info(
+					"VR TRACE LENS PMT DIP FULL: qpc={} dipSerial={} "
+					"pmtEntrySerial={} flushSerial={} flushOrigin={} "
+					"objectId=0x{:06X} target570008={} object=0x{:X} "
+					"node=0x{:X} mesh=0x{:X} pass={} flags=0x{:08X} "
+					"type={} baseVertex={} minVertex={} numVertices={} "
+					"startIndex={} primitiveCount={} "
+					"authority=EXACT_404700_NATIVE_DIP",
+					qpc.QuadPart,dipSerial,pmt.serial,pmt.flushSerial,
+					OutRunVR::GameSemantic::Name(pmt.flushOrigin),
+					pmt.objectId,pmt.objectId==0x570008u?1:0,
+					pmt.object,pmt.node,pmt.mesh,pmt.pass,pmt.flags,
+					static_cast<unsigned>(type),baseVertexIndex,minVertexIndex,
+					numVertices,startIndex,primitiveCount);
+			}
+			auto call=[&](){return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+				device,type,baseVertexIndex,minVertexIndex,numVertices,startIndex,
+				primitiveCount);};
+			return ExecuteStereoDraw(device,call);
+		}
 		HRESULT __stdcall DrawPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT primitiveCount,const void*data,UINT stride){if(InternalStereoPass)return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);auto call=[&](){return DrawPrimitiveUPHook.stdcall<HRESULT>(device,type,primitiveCount,data,stride);};return ExecuteStereoDraw(device,call);}
 		HRESULT __stdcall DrawIndexedPrimitiveUPDest(IDirect3DDevice9*device,D3DPRIMITIVETYPE type,UINT minVertexIndex,UINT numVertices,UINT primitiveCount,const void*indexData,D3DFORMAT indexFormat,const void*vertexData,UINT stride){auto call=[&](){return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device,type,minVertexIndex,numVertices,primitiveCount,indexData,indexFormat,vertexData,stride);};return ExecuteStereoDraw(device,call);}
 
