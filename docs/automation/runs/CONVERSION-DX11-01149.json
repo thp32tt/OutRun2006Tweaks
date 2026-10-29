@@ -55,7 +55,8 @@
       "tools/dx11_live_sm3_table_zfog_01005.cpp",
       "docs/automation/runs/CONVERSION-DX11-01148.json"
     ],
-    "full_gate_plan": "one_validation_bearing_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "blocking_evidence": "Prior exact real desktop negative at OutRun source b8dab362b9cc9072eafbd3307594a35ff5b8d413: D3D9 source Draws 10,341,768, native_draws=0, sm3_state_reject.fog=5,547, gpu_desktop_frames=0. Actual 01149 source 0f004edd6778db23d05779e12627c27be68ce00f corrected active TABLE fog priority over inherited VERTEX/RANGE states; resulting a3ecc6192fc069a5ece2fdae84d3812708b09746 was verified with five same-SHA GitHub Actions PASS. This is source-static blocker context, not newer-sha real game/HMD proof."
   },
   "changed_files": [
     "src/vr/d3d11/live_game_sm3_table_fog.hpp",
