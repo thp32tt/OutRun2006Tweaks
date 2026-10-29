@@ -185,7 +185,10 @@ def main() -> None:
         # multiple observational log lines. For this provenance mutation,
         # mutate every receipt so an added log cannot absorb the single
         # replacement while leaving the actual unsafe assertion untouched.
-        if old == "lensInlineLinked ? 1 : 0":
+        if old in (
+            "lensInlineLinked ? 1 : 0",
+            "INLINE_CALL_STACK_PMT_UNVERIFIED",
+        ):
             mutated[idx] = mutated[idx].replace(old, new)
         else:
             mutated[idx] = mutated[idx].replace(old, new, 1)

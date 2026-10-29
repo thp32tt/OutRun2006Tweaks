@@ -8,6 +8,7 @@ def read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
 renderer = read("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
+r7 = read("src/vr/d3d9/stereo_renderer_r7.inc")
 present = read("src/vr/d3d9/stereo_renderer.cpp")
 graphics = read("src/hooks_graphics.cpp")
 ui = read("src/hooks_uiscaling.cpp")
@@ -40,7 +41,6 @@ required = {
         "VR TRACE LENS LOWER FALLBACK FULL:",
         "VR TRACE VISUAL LOWER PHYSICAL RESULT FULL:",
         "VR TRACE XYZRHW VISUAL EYES FULL:",
-        "VR TRACE R7 VISUAL EYES FULL:",
         "VR TRACE LENS GPU STATE FULL:",
         "VR TRACE LENS MATRIX FULL:",
         "VR TRACE LENS DRAW CALL FULL:",
@@ -99,7 +99,14 @@ required = {
         "VR TRACE RESULT SCREENSPACE EYES FULL:",
         "VR TRACE XYZRHW VISUAL EYES FULL:",
         "VR TRACE VISUAL LOWER PHYSICAL RESULT FULL:",
+    ]),
+    "lower R7 visual eyes": (r7, [
         "VR TRACE R7 VISUAL EYES FULL:",
+        "PREPARE_REJECT_SINGLE",
+        "LEFT_WVP_REJECT_SINGLE",
+        "LEFT_DRAW_FAILURE",
+        "STEREO_PAIR",
+        "opaquePmtIdentity={}",
     ]),
     "game frame join": (present, [
         "VR TRACE FRAME PUBLISH FULL:",
