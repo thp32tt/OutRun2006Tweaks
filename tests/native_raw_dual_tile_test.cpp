@@ -48,6 +48,31 @@ int main() {
                cropped.copyHeight == 16u && cropped.destinationX == 160 &&
                cropped.destinationY == 220);
         assert(delta.changed_pixels(cropped) == realRgb);
+        // A second independent native Draw on the SAME original
+        // backbuffer can repaint a DIFFERENT-size dirty island. Keep the
+        // actual source-pixel coordinates and both GPU RGB contributions.
+        NativeRawPresentDirtyRegion twoIslands = island;
+        twoIslands.count = 2u;
+        twoIslands.rectangles[1] = {356, 220, 374, 246};
+        twoIslands.boundRight = 374;
+        twoIslands.boundBottom = 246;
+        const NativeRawPresentTile secondDraw{5u, 5u, 64u, 40u, 310, 210};
+        NativeRawPresentTile secondCrop{};
+        std::uint32_t secondRgb = 0u;
+        assert(native_raw_dirty_source_rgb_crop(
+            1920, 1080, twoIslands, secondDraw, delta,
+            secondCrop, secondRgb));
+        assert(secondRgb == 1u && secondCrop.sourceX == 51u &&
+               secondCrop.sourceY == 15u && secondCrop.copyWidth == 18u &&
+               secondCrop.copyHeight == 26u &&
+               secondCrop.destinationX == 356 &&
+               secondCrop.destinationY == 220);
+        assert(native_raw_dirty_region_covers_tile(
+            1920, 1080, twoIslands, cropped));
+        assert(native_raw_dirty_region_covers_tile(
+            1920, 1080, twoIslands, secondCrop));
+        assert(native_raw_can_show_source_aligned_pair(
+            false, true, true, cropped, secondCrop));
         // Alpha-only mutations must not create native RGB evidence.
         after[(22u * w + 65u) * 4u + 2u] = 0u;
         after[(22u * w + 65u) * 4u + 3u] = 255u;
@@ -126,6 +151,28 @@ int main() {
             true, true, false, alignedFirst, legacySecond));
         static_assert(native_raw_can_show_source_aligned_pair(
             false, true, true, alignedFirst, alignedSecond));
+        // Source-coincident menu/vehicle repaint islands may clip two
+        // independently completed GPU Draws to DIFFERENT sizes. The
+        // previous equal-size pair predicate silently lost one draw.
+        constexpr NativeRawPresentTile smallDirty{60, 20, 13, 16, 160, 220};
+        constexpr NativeRawPresentTile largeDirty{51, 15, 18, 26, 356, 220};
+        static_assert(native_raw_can_show_source_aligned_pair(
+            false, true, true, smallDirty, largeDirty));
+        static_assert(!native_raw_disjoint_equal_tiles(
+            smallDirty, largeDirty));
+        static_assert(!native_raw_can_show_source_aligned_pair(
+            true, true, false, smallDirty, largeDirty));
+        static_assert(!native_raw_can_show_source_aligned_pair(
+            true, false, true, smallDirty, largeDirty));
+        constexpr NativeRawPresentTile overlapDirty{51, 15, 18, 26, 165, 222};
+        static_assert(!native_raw_can_show_source_aligned_pair(
+            false, true, true, smallDirty, overlapDirty));
+        constexpr NativeRawPresentTile emptyDirty{51, 15, 0, 26, 356, 220};
+        static_assert(!native_raw_can_show_source_aligned_pair(
+            false, true, true, smallDirty, emptyDirty));
+        constexpr NativeRawPresentTile negativeDirty{51, 15, 18, 26, -1, 220};
+        static_assert(!native_raw_can_show_source_aligned_pair(
+            false, true, true, smallDirty, negativeDirty));
         static_assert(!native_raw_can_show_source_aligned_pair(
             false, true, false, alignedFirst, legacySecond));
         static_assert(native_raw_choose_source_aligned_second_tile(

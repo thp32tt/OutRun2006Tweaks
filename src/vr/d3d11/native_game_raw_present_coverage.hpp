@@ -155,18 +155,29 @@ struct NativeRawPresentDirtyRegion {
     }
     return changedRgb > 0u;
 }
-// Allow two independently captured native Draw images in separate ORIGINAL
-// game repaint islands, without overlapping either image or claiming a
-// complete scene. Their pixel counts require identical tile dimensions.
+// Two individually source-authenticated native Draw crops can have
+// DIFFERENT widths/heights after exact D3D9 dirty-island clipping. Their
+// pixels are still independent and safe to show together when nonoverlapping.
+// Callers verify each source, pixel delta, dirty union and backbuffer bounds.
+[[nodiscard]] constexpr bool native_raw_disjoint_present_tiles(
+    const NativeRawPresentTile& a, const NativeRawPresentTile& b) noexcept {
+    if (!a.copyWidth || !a.copyHeight || !b.copyWidth || !b.copyHeight ||
+        a.destinationX < 0 || a.destinationY < 0 ||
+        b.destinationX < 0 || b.destinationY < 0)
+        return false;
+    const auto ax = static_cast<std::uint64_t>(a.destinationX);
+    const auto ay = static_cast<std::uint64_t>(a.destinationY);
+    const auto bx = static_cast<std::uint64_t>(b.destinationX);
+    const auto by = static_cast<std::uint64_t>(b.destinationY);
+    return ax + a.copyWidth <= bx || bx + b.copyWidth <= ax ||
+           ay + a.copyHeight <= by || by + b.copyHeight <= ay;
+}
+// Legacy displaced inset pairs still require equal dimensions: the two
+// native captures share one fixed GPU staging shape in that path.
 [[nodiscard]] constexpr bool native_raw_disjoint_equal_tiles(
     const NativeRawPresentTile& a, const NativeRawPresentTile& b) noexcept {
-    if (!a.copyWidth || !a.copyHeight ||
-        a.copyWidth != b.copyWidth || a.copyHeight != b.copyHeight)
-        return false;
-    return a.destinationX + std::int64_t{a.copyWidth} <= b.destinationX ||
-           b.destinationX + std::int64_t{b.copyWidth} <= a.destinationX ||
-           a.destinationY + std::int64_t{a.copyHeight} <= b.destinationY ||
-           b.destinationY + std::int64_t{b.copyHeight} <= a.destinationY;
+    return a.copyWidth == b.copyWidth && a.copyHeight == b.copyHeight &&
+           native_raw_disjoint_present_tiles(a, b);
 }
 // Source-coincident native GPU pixels take priority over displaced RAW
 // insets. A pair is safe only if both final original-game destinations are
@@ -175,7 +186,12 @@ struct NativeRawPresentDirtyRegion {
     bool legacyPairVisible, bool firstAligned, bool secondAligned,
     const NativeRawPresentTile& first,
     const NativeRawPresentTile& second) noexcept {
-    return (legacyPairVisible || (firstAligned && secondAligned)) &&
+    // The real source-aligned path carries independently clipped GPU
+    // regions. Do not drop one real repaint solely because they differ
+    // in size; displaced/mixed pairs retain the legacy equal-size rule.
+    if (firstAligned && secondAligned)
+        return native_raw_disjoint_present_tiles(first, second);
+    return legacyPairVisible &&
            native_raw_disjoint_equal_tiles(first, second);
 }
 [[nodiscard]] constexpr bool native_raw_choose_source_aligned_second_tile(
