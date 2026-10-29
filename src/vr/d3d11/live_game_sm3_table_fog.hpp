@@ -57,8 +57,12 @@ enum class NativeSm3FogReject : unsigned {
     if (native_game_inert_fog_modes(tableMode, vertexMode)) return true;
     // An active equation still needs an exactly mirrored GPU fog pipeline.
     // Preserve conservative Z/W and sRGB restrictions for real fog.
-    if (vertexMode != 0u) return fail(NativeSm3FogReject::VertexFog);
-    if (rangeFog) return fail(NativeSm3FogReject::RangeFog);
+    // D3D9 pixel/table fog takes priority over any inherited vertex fog.
+    // RANGEFOGENABLE changes only vertex-fog distance and has no effect on
+    // an active table equation. Still reject invalid vertex mode identities,
+    // and never interpret a vertex-only equation as table Z-fog.
+    if (vertexMode > 3u || tableMode == 0u)
+        return fail(NativeSm3FogReject::VertexFog);
     if (srgbOutput) return fail(NativeSm3FogReject::Srgb);
     if (!zFogCapable) return fail(NativeSm3FogReject::MissingZCapability);
     if (wFogCapable) return fail(NativeSm3FogReject::WCapability);
