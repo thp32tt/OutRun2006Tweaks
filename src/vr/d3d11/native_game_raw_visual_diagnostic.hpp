@@ -15,6 +15,7 @@
 #include "native_game_raw_pixel_delta.hpp"
 #include "native_game_raw_draw_tile.hpp"
 #include "native_game_raw_dual_tile.hpp"
+#include "native_game_raw_color_transport.hpp"
 #include "native_game_raw_draw_pair.hpp"
 #include "native_game_raw_partial_present_tile.hpp"
 #include "native_game_raw_present_coverage.hpp"
@@ -37,6 +38,8 @@ public:
         event_.Reset(); surface_.Reset();
         drawPair_.reset(); region_ = {}; regionAlternate_ = {};
         alternateActive_ = false;
+        captureFormat_ = DXGI_FORMAT_UNKNOWN;
+        sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; quarantined_ = false; lastDraws_ = 0;
         recoveredLateCopies_ = 0u;
@@ -327,7 +330,12 @@ public:
                         const auto* src = next + std::size_t{y} * after.RowPitch;
                         auto* dst = dstBase + std::size_t{y} *
                             static_cast<std::size_t>(locked.Pitch);
-                        std::memcpy(dst, src, width * 4u);
+                        // Readback is still the exact source GPU Draw bytes.
+                        // Convert only channel ordering for the D3D9 BGRA
+                        // presentation surface; preserve sRGB-encoded values.
+                        native_raw_copy_to_d3d9_bgra(
+                            dst, src, width, sourceByteOrder_,
+                            back.Format == D3DFMT_X8R8G8B8);
                         // A magenta RAW border may never hide a real RGB
                         // pixel at that border in either GPU source region.
                         for (UINT x = 0; x < width; ++x) {
@@ -339,8 +347,6 @@ public:
                                 dst[x * 4u + 1u] = 0u;
                                 dst[x * 4u + 2u] = 255u;
                             }
-                            if (back.Format == D3DFMT_X8R8G8B8)
-                                dst[x * 4u + 3u] = 255u;
                         }
                     }
                     const HRESULT unlockHr = target->UnlockRect();
@@ -589,15 +595,40 @@ private:
         if (actual.Get() != dev || src.Width < width || src.Height < height ||
             src.ArraySize != 1u || src.MipLevels != 1u ||
             src.SampleDesc.Count != 1u || src.Usage != D3D11_USAGE_DEFAULT ||
-            src.CPUAccessFlags || !(src.BindFlags & D3D11_BIND_RENDER_TARGET) ||
-            (src.Format != DXGI_FORMAT_B8G8R8A8_UNORM &&
-             src.Format != DXGI_FORMAT_B8G8R8A8_TYPELESS))
+            src.CPUAccessFlags || !(src.BindFlags & D3D11_BIND_RENDER_TARGET))
             return NativeRawPreviewResult::InvalidNativeColor;
+        // GPU copies require a format-compatible staging resource. Do not
+        // reinterpret RGBA8 as BGRA8: the different DXGI typeless families
+        // are not copy-compatible. A same-family TYPELESS source uses its
+        // corresponding typed UNORM CPU-readback destination.
+        const bool rgba = src.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
+            src.Format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB ||
+            src.Format == DXGI_FORMAT_R8G8B8A8_TYPELESS;
+        const bool bgra = src.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
+            src.Format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB ||
+            src.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS;
+        if (!rgba && !bgra)
+            return NativeRawPreviewResult::InvalidNativeColor;
+        const DXGI_FORMAT stagedFormat =
+            src.Format == DXGI_FORMAT_R8G8B8A8_TYPELESS
+                ? DXGI_FORMAT_R8G8B8A8_UNORM
+                : src.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS
+                    ? DXGI_FORMAT_B8G8R8A8_UNORM : src.Format;
+        // One preview can encounter different game-created color targets in
+        // menu -> car -> race. Never reuse a BGRA8 staging texture for an
+        // RGBA8 (or differently typed sRGB) GPU CopySubresourceRegion.
+        if (captureFormat_ != stagedFormat) {
+            staging_.Reset(); baseline_.Reset();
+            stagingAlternate_.Reset(); baselineAlternate_.Reset();
+            captureFormat_ = stagedFormat;
+        }
+        sourceByteOrder_ = rgba ? NativeRawColorByteOrder::Rgba
+                                : NativeRawColorByteOrder::Bgra;
         if (!staging_ || !baseline_) {
             D3D11_TEXTURE2D_DESC dst{};
             dst.Width = width; dst.Height = height;
             dst.MipLevels = 1; dst.ArraySize = 1;
-            dst.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+            dst.Format = captureFormat_;
             dst.SampleDesc.Count = 1;
             dst.Usage = D3D11_USAGE_STAGING;
             dst.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
@@ -683,6 +714,8 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Texture2D> stagingAlternate_, baselineAlternate_;
     D3D11_BOX region_{}, regionAlternate_{};
     bool alternateActive_ = false;
+    DXGI_FORMAT captureFormat_ = DXGI_FORMAT_UNKNOWN;
+    NativeRawColorByteOrder sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_;

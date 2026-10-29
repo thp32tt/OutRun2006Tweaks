@@ -1,7 +1,25 @@
 #include "src/vr/d3d11/native_game_raw_dual_tile.hpp"
+#include "src/vr/d3d11/native_game_raw_color_transport.hpp"
 #include <cassert>
 using namespace outrun::vr::dx11;
 int main() {
+    // Two authenticated GPU source byte orders yield identical displayed
+    // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
+    const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};
+    const std::uint8_t nativeBgra[8]{241, 31, 17, 77, 255, 128, 9, 2};
+    std::uint8_t dst[8]{};
+    native_raw_copy_to_d3d9_bgra(dst, nativeRgba, 2u,
+                                 NativeRawColorByteOrder::Rgba, false);
+    for (std::uint32_t i = 0u; i < 8u; ++i)
+        assert(dst[i] == nativeBgra[i]);
+    native_raw_copy_to_d3d9_bgra(dst, nativeBgra, 2u,
+                                 NativeRawColorByteOrder::Bgra, true);
+    for (std::uint32_t i = 0u; i < 8u; ++i)
+        assert(dst[i] == (i % 4u == 3u ? 255u : nativeBgra[i]));
+    native_raw_copy_to_d3d9_bgra(dst, nativeRgba, 2u,
+                                 NativeRawColorByteOrder::Rgba, true);
+    for (std::uint32_t i = 0u; i < 8u; ++i)
+        assert(dst[i] == (i % 4u == 3u ? 255u : nativeBgra[i]));
     NativeRawDualTile t{};
     NativeRawDrawExtent fractional{};
     assert(native_raw_viewport_pixel_extent(3440, 1440,
