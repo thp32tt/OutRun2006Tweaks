@@ -168,6 +168,24 @@ class GPTChatOCRTests(unittest.TestCase):
         migrated=g._state()
         self.assertEqual(migrated["response_extractor_version"],g.RESPONSE_EXTRACTOR_VERSION)
 
+    def test_response_upgrade_recovers_c2_timeout_without_resetting_success(self):
+        st=g._state()
+        timed_out="a"*64
+        succeeded="b"*64
+        st["attempts"]={"C2:"+timed_out:2,"C2:"+succeeded:2}
+        st["completed"]=[
+            {"task_id":"OUTRUN-GPT-OCR-Q002-AAAAAAAA-C2-R1",
+             "fingerprint":timed_out,"status":"RESPONSE_TIMEOUT_MAX_ATTEMPTS","applied":0},
+            {"task_id":"OUTRUN-GPT-OCR-Q004-BBBBBBBB-C2",
+             "fingerprint":succeeded,"status":"APPLIED","applied":1},
+        ]
+        st["response_extractor_version"]="search-unit-assistant-v3-slot-aligned-20261026"
+        reset=g._migrate_response_extractor_state(st)
+        self.assertEqual(reset,["C2:"+timed_out])
+        self.assertEqual(st["attempts"]["C2:"+timed_out],0)
+        self.assertEqual(st["attempts"]["C2:"+succeeded],2)
+        self.assertEqual(g._migrate_response_extractor_state(st),[])
+
     def test_lane_partition_and_c2_independent_attempt_counter(self):
         even_name="Q002_TEST_BASE_READABLE_FLIPY.png"
         even_path=self.src/even_name
