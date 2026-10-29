@@ -10,19 +10,25 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:LIVE_FVF:EXACT_TABLE_FOG_NATIVE_RGB_GAME_DRAW",
   "classification": "A_SOURCE_IMPLEMENTATION",
-  "status": "SOURCE_INTEGRATED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_DONE",
+  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
   "runtime_validation": "UNTESTED",
-  "score_change": 0,
+  "score_change": 1,
   "development_time_percentages": "UNMEASURED",
   "source_base_sha": "1aa24b7cbe29923ff9a1ef329e991d5c2dde56d6",
-  "material_result_sha": "PENDING_ACTUAL_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_ACTUAL_COMMIT_SHA",
+  "material_result_sha": "4de2114a31887bc9bd2d9fb535723da0507c22e0",
+  "validation_bearing_result_sha": "4de2114a31887bc9bd2d9fb535723da0507c22e0",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
     "tools/dx11_live_sm3_table_zfog_01005.cpp",
     "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    "tools/test_dx11_stage1_factor_00673.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tests/native_raw_fvf_fog_visual_test.cpp",
+    "tools/test_dx11_inactive_texture_game_frame_00771.py",
+    "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
     "docs/automation/runs/CONVERSION-DX11-01155.json"
   ],
   "development_strategy": {
@@ -55,7 +61,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "SOURCE_INTEGRATED_CI_PENDING; exact source-matched game native Draw/published frame and Quest3 runtime UNTESTED, no full-scene claim.",
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; Quest3 game visible frame and actual native Draw count remain UNTESTED",
     "activation_guard_and_fallback": "Native path opt-in; exact table fog only for authenticated live FVF modes and 3 original combiners, otherwise normal D3D9/FFB fallback or isolated RAW visual preview; DXVK frozen."
   },
   "feature_contract": {
@@ -97,15 +103,44 @@
     "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD",
     "C1_REVIEW": "PASS_SOURCE_FVF_MISSING_TABLE_FOG_GPU",
     "C2_IMPLEMENT": "CPP_HLSL_NATIVE_GAME_DRAW_AND_REGRESSION_PATCH",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_ACTUAL_COMMIT_SHA",
+    "C3_VALIDATE": "PASS_FINAL_FIVE_EXACT_SHA",
+    "C4_COMMIT": "PASS_VALIDATION_BEARING_RESULT_SHA",
     "C5_PACKAGE": "SOURCE_ONLY",
-    "C6_STATE": "PENDING_CI_RESULT"
+    "C6_STATE": "PASS_DOCS_ONLY_CHECKPOINT_AFTER_CI"
   },
   "evidence": {
     "requires_final_exact_sha_five_push_gates": true,
-    "runtime_evidence": "UNTESTED: no source-matched desktop, Quest3 or VDXR actual game session"
+    "runtime_evidence": "UNTESTED: no actual OutRun 2006/Quest3/VDXR session or per-frame game-source-matched native Draw/frame count; CI does not prove HMD pixels.",
+    "validated_exact_sha": "4de2114a31887bc9bd2d9fb535723da0507c22e0",
+    "required_push_workflow_runs": {
+      "DX11 Fast Structural Checks": 40846863272,
+      "Backend Conversion Gate": 40846863380,
+      "Build": 40846863370,
+      "OpenXR VR architecture": 40846863493,
+      "OutRun EXE HUD Inspector CI": 40846863381
+    },
+    "required_push_workflows_result": "5/5 completed/success on same head_sha (remote GitHub API checked 2026-10-29 KST)",
+    "smoke_job": "Backend Conversion Gate validate PASS, DX11 readiness smoke probes PASS (104 steps)",
+    "scoreboard_commit": "c6c1a6dab199055b5955094cfd8a5687d5fe7a8a",
+    "scoreboard_new": 2162
   },
   "visible_frame_acceptance": "New game and HMD real visual proof UNTESTED; target remains full contiguous source coverage.",
-  "activation_guard_and_fallback": "Source exact Fog only; no DXVK/DX9Ex branch writes, original game D3D9 Draw/input/FFB untouched."
+  "activation_guard_and_fallback": "Source exact Fog only; no DXVK/DX9Ex branch writes, original game D3D9 Draw/input/FFB untouched.",
+  "scoreboard_previous": 2161,
+  "scoreboard_new": 2162,
+  "scoreboard_commit": "c6c1a6dab199055b5955094cfd8a5687d5fe7a8a",
+  "scoreboard_blob": "cf02c10c8624f74d720e9d2ce4ae6c2eb51a376d",
+  "implementation_commits": [
+    "d5a042c82779c24b997f7c1fdd751d745b676f91",
+    "549ab110cf1b060e052f31206ea795b94b130b28",
+    "d7e190cc6a7f6e3d02994113e945480cfca60626",
+    "c306e40aaeadc164007fb5e419737f10642c327e"
+  ],
+  "causal_ci_repair_commits": [
+    "549ab110cf1b060e052f31206ea795b94b130b28",
+    "d7e190cc6a7f6e3d02994113e945480cfca60626",
+    "c306e40aaeadc164007fb5e419737f10642c327e",
+    "e6bd9ee2e206e19cd6346685af2a858177bf64e9",
+    "4de2114a31887bc9bd2d9fb535723da0507c22e0"
+  ]
 }
