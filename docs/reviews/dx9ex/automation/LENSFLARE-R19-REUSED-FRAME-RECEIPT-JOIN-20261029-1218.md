@@ -1,0 +1,47 @@
+# LENSFLARE-R19-REUSED-FRAME-RECEIPT-JOIN-20261029-1218 — R19 post-blit to accepted-XR receipt identity is not injective (LENS_FLARE_ONLY / REVIEW_ONLY)
+
+- DATE=2026-10-29 KST; RUN_KEY=LENSFLARE-R19-REUSED-FRAME-RECEIPT-JOIN-20261029-1218; REPOSITORY=thp32tt/OutRun2006Tweaks; BRANCH=vr-d3d9ex-focus; SOURCE_HEAD=1460e4ae101efe8235ba6cf89b17f83e4f3201c6; SOURCE_SSOT=CONNECTED_GITHUB.
+- PROTECTED_BASELINE=R26+HUD@0cff83cf509c2acd6f3391b3a46c4dec1403a0d9 IMMUTABLE; R84=COMPARISON_ONLY; B9200_POST_CALL_PLUS5_HOOK=FORBIDDEN.
+- REVIEW_SCOPE=LENS_FLARE_ONLY; DX9EX_REVIEW_ONLY=ON; CODE_CHANGE=NO; RUNTIME_VALIDATION=UNTESTED; SOURCE_BUILD_GATE=NOT_REQUIRED_DOCS_ONLY; CI_SKIP=NONE.
+- INHERITED_NOT_RESCORED=CONVERSION-DX9EX-01567 R19 source B/incoming pose A, 01569 SBS crop, 01570 R30 pre-native candidate, 01571 current R30 lexical-scope compile blocker, LENSFLARE-R19-ONE-SIDED-PRESENTQPC-20261029-1018 capture QPC age gap, LENSFLARE-R19-PREACQUIRE-UV-RECEIPT-20261029-1104 pre-Acquire UV log.
+- DISTINCT_AXIS=The NEW post-both-blit `[R19 TRACE] frame-result` and post-xrEndFrame `endframe-result` receipts introduced in source commit 7196265081a4: can their frameId/sourcePoseSequence and independent hit counters certify a unique one-to-one physical R19 capture/blit -> accepted XR frame? This checks repeated cached source identity and log join, not the old pre-Acquire stage or original opaque draw.
+
+## NEW_FINDING
+
+NEW_FINDING=STATIC_R19_NEW_POSTBLIT_AND_POST_XREND_FRAME_RECEIPTS_LACK_SHARED_PER_INVOCATION_JOIN_ID_UNDER_REUSED_STEREO_FRAME;_SOURCE_STATIC_CONDITIONAL_NOT_HMD_OPTICAL_CAUSE.
+
+1. `vrhost/src/runtime/sbs_capture_override.hpp:1029-1034` refreshes `LastStereoFrameMs` only when the published `frameId` or `presentQpc` changes. `:1351-1353` permits gameplay for up to 500ms after that refresh. `:1359-1380` calls `RenderProjectionOverride` on each eligible `EndFrame`, not just once per new game frame. Consequently multiple XR EndFrame invocations may legitimately use the SAME cached `LastStereoFrame.frameId`, `sourcePoseSequence`, and `presentQpc`; no actual repetition is asserted without HMD logs.
+2. New `frame-result` at `:1157-1182` is emitted after BOTH `RenderTo` calls and `Release`, recording `image`, `frameId`, `sourcePoseSequence`, capture/present QPC, leftBlit/rightBlit/released. Its counter `projectionFrameResults` increments ONLY after successful Acquire and valid image; it does not contain the subsequent `LastEndFrameReceiptSerial` or an XR EndFrame invocation ID. It is explicitly PRE-xrEndFrame.
+3. New `endframe-result` at `:1394-1417` follows `OutRunVrFinalTest::EndFrame` and `RecordEndFrameReceipt` and records `receiptSerial`, `replacementFrameId`, `replacementPoseSequence`, `xrResult` and capture/present QPC. It does NOT record the R19 `image` or `frame-result.hit`. Its separate `endFrameResults` counter counts active EndFrame invocations, including ones where no projection was replaced. `RecordEndFrameReceipt:433-445` increments serial even when `replaced=false`; that serial is not carried backward to the post-blit event.
+4. Both success logs are sampled for hits 1..64 and powers of two thereafter, independently. On a tick without successful Acquire, `endframe-result` may advance while `frame-result` does not. Thus equal or nearby `hit` values are NOT a reliable cross-stage key; missing logs are not a negative proof. FrameId+poseSequence alone is non-unique when the cached source is reused; captureQpc may help a particular trace but is not specified as a unique invocation ID, especially when a published source is reused.
+5. STATIC FALSIFICATION WITNESS (logical path, not measured runtime): keep complete producer frame F=(frameId=42,poseSequence=7,presentQpc=100) unchanged over two eligible host EndFrames within 500ms. Assume both CaptureDesktop/Acquire/blits/Release and xrEndFrame succeed. Both frame-result and endframe-result events can legitimately name F. Their distinct end receiptSerial values cannot be joined to the two individual frame-result image/capture events by a guaranteed shared serial. If an intervening active EndFrame fails before Acquire, the two `hit` counters diverge further. This proves a missing guaranteed bijective diagnostic join, NOT that any real image was duplicated or head-locked.
+6. GitHub commit `7196265081a4` added BOTH new receipts after the earlier `5f587da09042` pre-Acquire UV log. `CONVERSION-DX9EX-01571` instead establishes the independently introduced R30 cross-function lexical-scope error, which remains a separate blocker to relying on a current game build. The present finding concerns the R19 host's NEW paired receipt join and is not a repeat of 01571.
+7. A successful endframe-result with `replaced=1,projection=1,xrResult=XR_SUCCESS` does attest an accepted R19 projection *for that host invocation*; it does NOT attest the exact earlier sampled `frame-result` image/capture, original CABE 0x570008 ordinal, source PMT/texture/alpha, native same-eye RGB, or that the incoming projection pose equals the captured source pose (01567). Do not weaken this positive success evidence or overstate the diagnostic limitation.
+
+## HYPOTHESIS_LEDGER
+
+| Axis | Status / independent discriminator |
+| --- | --- |
+| A original C993/D3A5 extra emitter | OPEN; original 0x570002/006/00F/010 source calls and CABE two 0x570008 ordinals still require actual 405360 descriptor identity and same-eye RGB. |
+| B 4052C0/405890 queue, D3DX/native same-eye replay | OPEN; R19 receipt counters cannot count original opaque physical Draws. Require material/RT/colour deltas. |
+| C wrong c64/WVP and L/R depth | OPEN; R85 per-eye FOV/eye-orientation findings inherited; no native ray-to-pixel proof. |
+| D intended centre/halo alpha | OPEN; distinct original source offsets/alpha are not actual texture/PMT or pixel identities. |
+| E R19 fresh/cached source-to-XR acceptance | NEW_DIAGNOSTIC_JOIN_GAP: post-blit and post-EndFrame events have no guaranteed common invocation key when game frame is reused. A successful endframe-result remains a valid per-invocation XR result. |
+| F head-lock from wrong source/pose | OPEN; 01567 conditional incoming A pose / source B pixels remains unobserved in HMD. |
+| G frameId+sourcePoseSequence or equal hit numbers uniquely pair R19 frame-result with endframe-result | REFUTED_AS_UNCONDITIONAL by cache reuse, separate counters and independent sampling. |
+
+## SOURCE_TRACE
+
+- CURRENT_GITHUB `vrhost/src/runtime/sbs_capture_override.hpp` blob `f2ec57f461492666ff9017ebe77e0b53e3ee2142`: `RecordEndFrameReceipt:423-445`; `UpdateStereoFrameCache:1015-1034`; `RenderProjectionOverride:1084-1217`, especially `Acquire:1149-1156`, `RenderTo/Release:1157-1164`, `frame-result:1165-1182`; `EndFrame:1339-1417`, `endframe-result:1394-1417`.
+- INTRODUCTION=GitHub commit `7196265081a4` host diff, independent of later R30 migration `d2b9b8451b6c`. Prior review `LENSFLARE-R19-PREACQUIRE-UV-RECEIPT-20261029-1104` pinned pre-introduction host blob `ed2b6aa371ec6bc3bba5e70063d46953de42f155`.
+- UPSTREAM_BOUNDARY=`src/hooks_graphics.cpp::DrawObjectAlphaProjected:787-836` CABE 0x570008 two ordinal window, `DrawObjectAlphaCentre:947-1005` C993 0x570002/006/00F/010, `src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp::R30BuildScreenSpaceEyeConstants:5191-5234`, `R30TryScreenSpaceFovDraw:6403-6771`; neither R19 log identifies an original 405360/4052C0 PMT or a source-eye pixel.
+
+## EVIDENCE_GAPS / FALSIFICATION
+
+- EVIDENCE_GAPS=No live repeated-frame R19 traces, no Quest3 two-yaw matched ROI, no actual PMT/texture/alpha-to-native L/R RT RGB join, no per-invocation shared R19 blit/endframe serial, no exact source-frame/incoming-view pose comparison, no exact-SHA compiler result for 01571, no HMD optical validation.
+- FALSIFICATION_POSITIVE=In an authorized unchanged-visual HMD run, capture at least two R19 EndFrame invocations with same producer frameId/sourcePoseSequence and successful R19 projection, plus one negative Acquire or no-replacement tick. Verify independent hit counts and compare exact frame-result image/RT data with final XR receiptSerial; if a unique shared invocation identifier exists in other compiled telemetry, this join gap is narrowed.
+- FALSIFICATION_NEGATIVE=If the actual session always has a fresh unique producer frame and unique captureQpc per XR EndFrame, existing tuple may permit a practical join for that session; this does not create a general invariant. If native same-eye ROI is doubled before R19, prioritize A/B/D regardless of host receipt gaps.
+- PATCH_CANDIDATE_ONLY=NOT_APPLIED. Separately authorized diagnostic-only future change: assign one R19 EndFrame invocation serial BEFORE RenderProjectionOverride, carry it through source-match/UV/Acquire/image/LR RenderTo/Release, selected outgoing eye poses and final RecordEndFrameReceipt, with bounded logs and explicit no-replacement/failure events. Include sourceFrameId/poseSeq/captureQpc and R24 accepted actual layer. Do not alter matrices, alpha, game emitters, original 4052C0 queue, or B9200 +5 hook.
+- REGRESSION=DOCS_ONLY_NONE; any future instrumentation must avoid frame-pacing overhead and never infer same-eye duplicate from two-eye success, source alias from frameId alone, or R19 pose correctness from XR success alone.
+- CODE_CHANGE=NO; RUNTIME_VALIDATION=UNTESTED; NEW_HMD_LOG=NONE; NEW_BUILD_LOG=NONE; CI_SKIP=NONE.
+- NEXT_REVIEW=LENS_FLARE:R19_SHARED_END_FRAME_INVOCATION_SERIAL_FRAME_RESULT_TO_ACCEPTED_R24_XR_WITH_CABE_570008_PMT_ALPHA_NATIVE_LR_RGB_TWO_YAW.
