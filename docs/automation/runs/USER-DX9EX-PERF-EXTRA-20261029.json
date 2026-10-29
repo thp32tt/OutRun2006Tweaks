@@ -1,0 +1,21 @@
+{
+  "task_id": "USER-DX9EX-PERF-EXTRA-20261029",
+  "base_sha": "0e00dabec17a50f6051e6af03a474d0dd2b8ac8e",
+  "status": "LOCAL_VALIDATED_CI_PENDING",
+  "changes": [
+    "particle inverse projection cache",
+    "particle eye math cache with relative eye identity convention",
+    "fixed function eye math cache and common view multiply",
+    "in place uint32 index rebasing",
+    "VB/IB immutable shadow metadata reuse"
+  ],
+  "preserved": [
+    "diagnostics",
+    "MSAA2",
+    "culling8",
+    "reflection512",
+    "transparency supersampling off"
+  ],
+  "runtime": "UNTESTED",
+  "score_delta": 0
+}

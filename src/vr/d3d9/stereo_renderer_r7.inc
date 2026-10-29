@@ -911,33 +911,20 @@ namespace OutRunVRStereo
 					appliedHeadInverse._43 = 0.0f;
 				}
 
-				for (int eye = 0; eye < 2; ++eye)
-				{
-					float eyeOffset[3]{
-						stereo.eyeOffset[eye][0],
-						stereo.eyeOffset[eye][1],
-						stereo.eyeOffset[eye][2]
-					};
-					if (rotationOnly)
-						eyeOffset[0] = eyeOffset[1] = eyeOffset[2] = 0.0f;
-					const D3DMATRIX eyePose =
-						MatrixFromQuaternionTranslation(
-							stereo.eyeOrientation[eye], eyeOffset,
-							Settings::VRWorldScale * Settings::VRStereoDepth);
-					const D3DMATRIX eyeInverse = InverseRigid(eyePose);
-					state.fixedEyeView[eye] =
-						MultiplyMatrix(
-							MultiplyMatrix(
-								state.fixedOriginalView, appliedHeadInverse),
-							eyeInverse);
-					state.fixedEyeProjection[eye] =
-						ProjectionFromFov(
-							state.fixedOriginalProjection,
-							stereo.eyeFov[eye]);
-					if (!MatrixFinite(state.fixedEyeView[eye]) ||
-						!MatrixFinite(state.fixedEyeProjection[eye]))
-						return EyeBuildResult::FatalError;
-				}
+                auto mathFrame = stereo;
+                if (rotationOnly)
+                    for (auto& offset : mathFrame.eyeOffset)
+                        for (float& value : offset) value = 0.0f;
+                const auto* eyeMath = R26CachedEyeMath(state.fixedOriginalProjection, mathFrame);
+                if (!eyeMath) return EyeBuildResult::FatalError;
+                const D3DMATRIX commonView = MultiplyMatrix(state.fixedOriginalView, appliedHeadInverse);
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    state.fixedEyeView[eye] = MultiplyMatrix(commonView, eyeMath->inverse[eye]);
+                    state.fixedEyeProjection[eye] = eyeMath->projection[eye];
+                    if (!MatrixFinite(state.fixedEyeView[eye]) || !MatrixFinite(state.fixedEyeProjection[eye]))
+                        return EyeBuildResult::FatalError;
+                }
 
 				state.fixedFunctionWorld = true;
 				state.fixedFunctionRotationOnly = rotationOnly;

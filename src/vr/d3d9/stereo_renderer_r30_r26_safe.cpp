@@ -632,6 +632,25 @@ namespace OutRunVRStereo
             return true;
         }
 
+        bool R30ReadIndexDesc(IDirect3DIndexBuffer9* buffer, D3DINDEXBUFFER_DESC& desc)
+        {
+            auto entry = R30FindIndexShadow(buffer);
+            if (!entry) return SUCCEEDED(buffer->GetDesc(&desc));
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            desc.Size = entry->size;
+            desc.Format = entry->indexFormat;
+            return true;
+        }
+
+        bool R30ReadVertexDesc(IDirect3DVertexBuffer9* buffer, D3DVERTEXBUFFER_DESC& desc)
+        {
+            auto entry = R30FindVertexShadow(buffer);
+            if (!entry) return SUCCEEDED(buffer->GetDesc(&desc));
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            desc.Size = entry->size;
+            return true;
+        }
+
         bool R30CopySparseVertexShadow(IDirect3DVertexBuffer9* buffer,
             UINT streamOffset, UINT stride, const std::vector<std::uint32_t>& physical,
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out)
@@ -3641,7 +3660,7 @@ namespace OutRunVRStereo
                 std::fabs(baseProjection._11) < 0.01f ||
                 std::fabs(baseProjection._22) < 0.01f ||
                 std::fabs(baseProjection._34) < 0.25f ||
-                !InvertMatrix(baseProjection, state.inverseBaseProjection) ||
+                !GetInverseProjection(baseProjection, state.inverseBaseProjection) ||
                 !MatrixFinite(state.inverseBaseProjection))
                 return false;
             state.fullWorldReprojection = true;
@@ -3654,37 +3673,22 @@ namespace OutRunVRStereo
                 0.5f * (state.stereo.eyeOffset[0][2] +
                         state.stereo.eyeOffset[1][2])
             };
-            const float zero[3]{};
-
+            auto mathFrame = state.stereo;
             for (int eye = 0; eye < 2; ++eye)
             {
-                // Use the exact same per-eye rigid transform convention as the
-                // normal fixed-function/world path: view * eyeInverse *
-                // eyeProjection. The reconstructed CPU-projected point is
-                // already in game view space, so only eyeInverse is applied
-                // here; common head/camera motion must not be applied twice.
-                // CPU-projected XYZRHW effects were generated from OutRun's
-                // already head-synchronised camera. Reapplying the absolute HMD
-                // eye orientation here rotates them twice and shifts smoke/skid
-                // away from the road. Apply only the eye pose relative to the
-                // common head centre; the asymmetric eye projection still owns
-                // the final FOV.
-                const float relativeEye[3]{
-                    state.stereo.eyeOffset[eye][0] - center[0],
-                    state.stereo.eyeOffset[eye][1] - center[1],
-                    state.stereo.eyeOffset[eye][2] - center[2]
-                };
-                const float identityOrientation[4]{
-                    0.0f, 0.0f, 0.0f, 1.0f
-                };
-                const D3DMATRIX eyePose =
-                    MatrixFromQuaternionTranslation(
-                        identityOrientation, relativeEye,
-                        Settings::VRWorldScale * Settings::VRStereoDepth);
-                state.eyeInverse[eye] = InverseRigid(eyePose);
-                state.eyeProjection[eye] =
-                    ProjectionFromFov(baseProjection,
-                        state.stereo.eyeFov[eye]);
+                mathFrame.eyeOrientation[eye][0] = 0.0f;
+                mathFrame.eyeOrientation[eye][1] = 0.0f;
+                mathFrame.eyeOrientation[eye][2] = 0.0f;
+                mathFrame.eyeOrientation[eye][3] = 1.0f;
+                for (int axis = 0; axis < 3; ++axis)
+                    mathFrame.eyeOffset[eye][axis] -= center[axis];
+            }
+            const auto* eyeMath = R26CachedEyeMath(baseProjection, mathFrame);
+            if (!eyeMath) return false;
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                state.eyeInverse[eye] = eyeMath->inverse[eye];
+                state.eyeProjection[eye] = eyeMath->projection[eye];
 
                 // Preserve a conservative affine fallback for vertices whose
                 // clip reconstruction is unsafe. Its parallax uses the old
@@ -4716,7 +4720,7 @@ namespace OutRunVRStereo
                 static_cast<std::uint64_t>(startVertex) * stride;
             const std::uint64_t byteCount =
                 static_cast<std::uint64_t>(vertexCount) * stride;
-            if (FAILED(vb->GetDesc(&desc)) || firstByte > desc.Size ||
+            if (!R30ReadVertexDesc(vb, desc) || firstByte > desc.Size ||
                 byteCount > desc.Size - firstByte ||
                 firstByte > UINT_MAX || byteCount > UINT_MAX)
             {
@@ -4821,7 +4825,7 @@ namespace OutRunVRStereo
             }
 
             D3DINDEXBUFFER_DESC ibDesc{};
-            if (FAILED(ib->GetDesc(&ibDesc)) ||
+            if (!R30ReadIndexDesc(ib, ibDesc) ||
                 (ibDesc.Format != D3DFMT_INDEX16 &&
                  ibDesc.Format != D3DFMT_INDEX32))
             {
@@ -4919,7 +4923,7 @@ namespace OutRunVRStereo
                 static_cast<std::uint64_t>(minPhysical) * stride;
             const std::uint64_t vertexBytes =
                 static_cast<std::uint64_t>(vertexCount) * stride;
-            if (FAILED(vb->GetDesc(&vbDesc)) ||
+            if (!R30ReadVertexDesc(vb, vbDesc) ||
                 firstVertexByte > vbDesc.Size ||
                 vertexBytes > vbDesc.Size - firstVertexByte ||
                 firstVertexByte > UINT_MAX || vertexBytes > UINT_MAX)
@@ -5030,17 +5034,10 @@ namespace OutRunVRStereo
             }
             else
             {
-                try { scratch.indices32.resize(indexCount); }
-                catch (...) {
-                    ib->Release();
-                    vb->Release();
-                    return E_NOTIMPL;
-                }
-                for (UINT i = 0; i < indexCount; ++i)
-                    scratch.indices32[i] =
-                        scratch.physical[i] -
-                        static_cast<std::uint32_t>(minPhysical);
-                rebased = scratch.indices32.data();
+                // physical is dead after this conversion; submit its storage directly.
+                for (auto& index : scratch.physical)
+                    index -= static_cast<std::uint32_t>(minPhysical);
+                rebased = scratch.physical.data();
             }
 
             auto leftDraw = [&]() {
