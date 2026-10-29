@@ -6727,7 +6727,9 @@ namespace OutRunVRStereo
                         "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} entryRT=0x{:X} "
                         "qpc={} thread={} opaqueFlushSerial={} opaqueFlushOrigin={} "
                         "opaquePatchCount={} opaquePatchHash=0x{:016X} "
-                        "opaquePmtIdentity=UNVERIFIED "
+                        "pmtEntrySerial={} pmtObjectId=0x{:06X} pmtObject=0x{:X} "
+                        "pmtNode=0x{:X} pmtMesh=0x{:X} pmtPass={} "
+                        "opaquePmtIdentity={} "
                         "evidence=FAILED_LEFT_NATIVE_DRAW_NOT_PIXEL_PROOF",
                         TopLevelDrawSerial(), stereo.poseSequence,
                         site ? site : "unknown", lensSourceSerial,
@@ -6735,9 +6737,12 @@ namespace OutRunVRStereo
                         lensSourceOrdinal, lensInlineLinked ? 1 : 0,
                         lensWindowAnchorSerial, lensWindowAnchorSequence,
                         lensWindowAnchorObject, lensWindowAnchorOrdinal,
-                        lensInlineLinked ? "INLINE_CALL_STACK_PMT_UNVERIFIED" :
-                            (lensWindowAnchorSerial != 0
-                                ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE"),
+                        visualRoute.lensPmt.serial != 0
+                            ? "EXACT_RETAIL_405890_404700_PMT_ENTRY"
+                            : (lensInlineLinked
+                                ? "INLINE_CALL_STACK_PMT_UNVERIFIED"
+                                : (lensWindowAnchorSerial != 0
+                                    ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE")),
                         lensTransaction.leftDrawAttempted ? 1 : 0,
                         static_cast<unsigned>(leftHr), restored ? 1 : 0,
                         lensTexture0Ptr, lensVb0Ptr, lensIbPtr, lensRt0Ptr,
@@ -6926,9 +6931,12 @@ namespace OutRunVRStereo
                         lensSourceOrdinal, lensInlineLinked ? 1 : 0,
                         lensWindowAnchorSerial, lensWindowAnchorSequence,
                         lensWindowAnchorObject, lensWindowAnchorOrdinal,
-                        lensInlineLinked ? "INLINE_CALL_STACK_PMT_UNVERIFIED" :
-                            (lensWindowAnchorSerial != 0
-                                ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE"),
+                        visualRoute.lensPmt.serial != 0
+                            ? "EXACT_RETAIL_405890_404700_PMT_ENTRY"
+                            : (lensInlineLinked
+                                ? "INLINE_CALL_STACK_PMT_UNVERIFIED"
+                                : (lensWindowAnchorSerial != 0
+                                    ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE")),
                         lensTransaction.leftDrawAttempted ? 1 : 0,
                         static_cast<unsigned>(leftHr),
                         lensTransaction.rightDrawAttempted ? 1 : 0,
@@ -6948,7 +6956,15 @@ namespace OutRunVRStereo
                             visualRoute.lensOpaque.origin),
                         visualRoute.lensOpaque.patchCount,
                         static_cast<unsigned long long>(
-                            visualRoute.lensOpaque.patchLedgerHash));
+                            visualRoute.lensOpaque.patchLedgerHash),
+                        visualRoute.lensPmt.serial,
+                        visualRoute.lensPmt.objectId,
+                        visualRoute.lensPmt.object,
+                        visualRoute.lensPmt.node,
+                        visualRoute.lensPmt.mesh,
+                        visualRoute.lensPmt.pass,
+                        visualRoute.lensPmt.serial != 0
+                            ? "EXACT_405890_404700_ENTRY" : "UNVERIFIED");
                 }
             }
 
