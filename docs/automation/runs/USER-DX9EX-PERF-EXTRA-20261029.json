@@ -1,21 +1,16 @@
 {
   "task_id": "USER-DX9EX-PERF-EXTRA-20261029",
-  "base_sha": "0e00dabec17a50f6051e6af03a474d0dd2b8ac8e",
-  "status": "LOCAL_VALIDATED_CI_PENDING",
-  "changes": [
-    "particle inverse projection cache",
-    "particle eye math cache with relative eye identity convention",
-    "fixed function eye math cache and common view multiply",
-    "in place uint32 index rebasing",
-    "VB/IB immutable shadow metadata reuse"
-  ],
-  "preserved": [
-    "diagnostics",
-    "MSAA2",
-    "culling8",
-    "reflection512",
-    "transparency supersampling off"
-  ],
+  "result_sha": "36d5882d0482cf36ed2a5d69eab8641c36cfef42",
+  "status": "PACKAGE_VERIFIED_RUNTIME_PENDING",
+  "build_run": 40867338399,
+  "full_source_run": 40867338380,
+  "artifact": 12894657084,
+  "sha256": "a7c8e41bb8002418809a97f928be1b4586ddf356e6e89e9d7322395445b22da3",
+  "windows": "PASS",
+  "domain": "PASS",
+  "full_source": "PASS",
+  "generic_build": "FAIL missing FFB map document before compile",
   "runtime": "UNTESTED",
+  "diagnostics": "UNCHANGED",
   "score_delta": 0
 }
