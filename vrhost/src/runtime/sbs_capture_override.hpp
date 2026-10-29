@@ -712,10 +712,48 @@ float4 PSMain(VSOut input) : SV_Target
         const long outputH = OutputDesktop.bottom - OutputDesktop.top;
         const long clientW = br.x - tl.x;
         const long clientH = br.y - tl.y;
-        const bool nearFullDesktop =
+        const bool nearFullDesktopSize =
             outputW > 0 && outputH > 0 &&
             clientW >= static_cast<long>(outputW * 0.90) &&
             clientH >= static_cast<long>(outputH * 0.90);
+        const double outputMidX =
+            0.5 * (double(OutputDesktop.left) + double(OutputDesktop.right));
+        const double outputMidY =
+            0.5 * (double(OutputDesktop.top) + double(OutputDesktop.bottom));
+        const double clientMidX = 0.5 * (double(tl.x) + double(br.x));
+        const double clientMidY = 0.5 * (double(tl.y) + double(br.y));
+        const double centreDeltaX = std::fabs(clientMidX - outputMidX);
+        const double centreDeltaY = std::fabs(clientMidY - outputMidY);
+        const double centreToleranceX =
+            std::max(2.0, std::fabs(double(outputW)) * 0.01);
+        const double centreToleranceY =
+            std::max(2.0, std::fabs(double(outputH)) * 0.01);
+        const bool nearFullDesktopCentered =
+            centreDeltaX <= centreToleranceX &&
+            centreDeltaY <= centreToleranceY;
+        // A near-full client that is materially offset must not silently
+        // inherit the desktop midpoint as the SBS seam. Fall through to the
+        // client-rect UV path so left/right slicing follows the actual game.
+        const bool nearFullDesktop =
+            nearFullDesktopSize && nearFullDesktopCentered;
+        if (nearFullDesktopSize)
+        {
+            static std::uint64_t nearFullGeometryReceipts = 0;
+            const auto hit = ++nearFullGeometryReceipts;
+            if (hit <= 64 || (hit & (hit - 1)) == 0 ||
+                !nearFullDesktopCentered)
+                std::cerr << "[R19 TRACE] near-full-geometry hit=" << hit
+                          << " acceptedWholeDesktop=" << (nearFullDesktop ? 1 : 0)
+                          << " centered=" << (nearFullDesktopCentered ? 1 : 0)
+                          << " centreDelta=" << centreDeltaX << "," << centreDeltaY
+                          << " centreTolerance=" << centreToleranceX << ","
+                          << centreToleranceY
+                          << " outputMid=" << outputMidX << "," << outputMidY
+                          << " clientMid=" << clientMidX << "," << clientMidY
+                          << " clientSize=" << clientW << "x" << clientH
+                          << " outputSize=" << outputW << "x" << outputH
+                          << " evidence=SBS_SEAM_AUTHORITY_CHECK\n";
+        }
         if (nearFullDesktop)
         {
             uv = { 0.f, 0.f, 1.f, 1.f };
@@ -729,7 +767,7 @@ float4 PSMain(VSOut input) : SV_Target
                           << " client=" << tl.x << "," << tl.y
                           << "-" << br.x << "," << br.y
                           << " source=" << SourceWidth << "x" << SourceHeight
-                          << " clientMidX=" << (0.5 * (double(tl.x) + double(br.x)))
+                          << " clientMidX=" << clientMidX
                           << " selectedSplitX="
                           << (double(OutputDesktop.left) + 0.5 * double(SourceWidth))
                           << " uv=0,0,1,1\n";
@@ -1232,12 +1270,43 @@ float4 PSMain(VSOut input) : SV_Target
                     ? &incoming->views[eye].pose : nullptr;
                 const XrFovf* incomingFov = usedIncoming
                     ? &incoming->views[eye].fov : nullptr;
+                float positionDeltaMax = 0.f;
+                float orientationDelta = 0.f;
+                float fovDeltaMax = 0.f;
+                if (incomingPose && incomingFov)
+                {
+                    positionDeltaMax = std::max({
+                        std::fabs(incomingPose->position.x - sourceEye.position[0]),
+                        std::fabs(incomingPose->position.y - sourceEye.position[1]),
+                        std::fabs(incomingPose->position.z - sourceEye.position[2]) });
+                    const float orientationDotAbs = std::fabs(
+                        incomingPose->orientation.x * sourceEye.orientation[0] +
+                        incomingPose->orientation.y * sourceEye.orientation[1] +
+                        incomingPose->orientation.z * sourceEye.orientation[2] +
+                        incomingPose->orientation.w * sourceEye.orientation[3]);
+                    orientationDelta =
+                        1.f - std::min(1.f, orientationDotAbs);
+                    fovDeltaMax = std::max({
+                        std::fabs(incomingFov->angleLeft - sourceEye.fov.angleLeft),
+                        std::fabs(incomingFov->angleRight - sourceEye.fov.angleRight),
+                        std::fabs(incomingFov->angleUp - sourceEye.fov.angleUp),
+                        std::fabs(incomingFov->angleDown - sourceEye.fov.angleDown) });
+                }
+                const bool sourceIncomingMismatch =
+                    usedIncoming &&
+                    (positionDeltaMax > 0.0005f ||
+                     orientationDelta > 0.00001f ||
+                     fovDeltaMax > 0.0005f);
                 std::cerr
                     << "[R19 TRACE] pose-fov-join hit=" << poseJoinHit
                     << " eye=" << eye
                     << " frameId=" << LastStereoFrame.frameId
                     << " sourcePoseSequence=" << LastStereoFrame.sourcePoseSequence
                     << " poseAuthority=" << (usedIncoming ? "INCOMING_A" : "SOURCE_B")
+                    << " sourceIncomingMismatch=" << (sourceIncomingMismatch ? 1 : 0)
+                    << " positionDeltaMax=" << positionDeltaMax
+                    << " orientationOneMinusAbsDot=" << orientationDelta
+                    << " fovDeltaMax=" << fovDeltaMax
                     << " sourcePos="
                     << sourceEye.position[0] << "," << sourceEye.position[1] << ","
                     << sourceEye.position[2]

@@ -6476,6 +6476,33 @@ namespace OutRunVRStereo
                 lensTransaction.restoreOk = restored;
                 if (lensTransaction.sample) lensTransaction.post.Capture(device);
                 lensTransaction.Emit("LEFT_DRAW", leftHr);
+                if (lensPhysicalCandidate)
+                {
+                    LARGE_INTEGER physicalQpc{};
+                    QueryPerformanceCounter(&physicalQpc);
+                    spdlog::info(
+                        "VR TRACE LENS PHYSICAL LEFT FAILURE: serial={} pose={} "
+                        "site={} sourceCallSerial={} sequence={} sourceObj=0x{:X} "
+                        "sourceSite={} ordinal={} exactInline={} windowAnchorSerial={} "
+                        "windowAnchorSequence={} windowAnchorObj=0x{:X} "
+                        "windowAnchorOrdinal={} correlationAuthority={} "
+                        "leftAttempted={} leftHr=0x{:08X} restore={} "
+                        "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} entryRT=0x{:X} "
+                        "qpc={} thread={} evidence=FAILED_LEFT_NATIVE_DRAW_NOT_PIXEL_PROOF",
+                        TopLevelDrawSerial(), stereo.poseSequence,
+                        site ? site : "unknown", lensSourceSerial,
+                        lensSourceSequence, lensSourceObject, lensSourceSite,
+                        lensSourceOrdinal, lensInlineLinked ? 1 : 0,
+                        lensWindowAnchorSerial, lensWindowAnchorSequence,
+                        lensWindowAnchorObject, lensWindowAnchorOrdinal,
+                        lensInlineLinked ? "EXACT_INLINE_SOURCE" :
+                            (lensWindowAnchorSerial != 0
+                                ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE"),
+                        lensTransaction.leftDrawAttempted ? 1 : 0,
+                        static_cast<unsigned>(leftHr), restored ? 1 : 0,
+                        lensTexture0Ptr, lensVb0Ptr, lensIbPtr, lensRt0Ptr,
+                        physicalQpc.QuadPart, GetCurrentThreadId());
+                }
                 R9Poison(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
                 if (!restored)
@@ -6598,8 +6625,11 @@ namespace OutRunVRStereo
                         "windowAnchorOrdinal={} correlationAuthority={} "
                         "leftAttempted={} leftHr=0x{:08X} rightAttempted={} "
                         "rightHr=0x{:08X} restore={} pairComplete={} "
-                        "leftRT=0x{:X} rightRT=0x{:X} qpc={} thread={} "
-                        "evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
+                        "rightStage={} rightWvpAttempted={} rightWvpOk={} "
+                        "tex0=0x{:X} vb0=0x{:X} ib=0x{:X} entryRT=0x{:X} "
+                        "leftRT=0x{:X} leftRt={}x{} leftRtFmt={} "
+                        "rightRT=0x{:X} rightRt={}x{} rightRtFmt={} "
+                        "qpc={} thread={} evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
                         physicalSample, TopLevelDrawSerial(), stereo.poseSequence,
                         site ? site : "unknown", lensSourceSerial,
                         lensSourceSequence, lensSourceObject, lensSourceSite,
@@ -6614,7 +6644,14 @@ namespace OutRunVRStereo
                         lensTransaction.rightDrawAttempted ? 1 : 0,
                         static_cast<unsigned>(rightHr), restoreOk ? 1 : 0,
                         lensPairComplete ? 1 : 0,
-                        lensLeftRtPtr, lensRightRtPtr,
+                        lensTransaction.rightStage ? lensTransaction.rightStage : "NONE",
+                        lensTransaction.rightWvpAttempted ? 1 : 0,
+                        lensTransaction.rightWvpOk ? 1 : 0,
+                        lensTexture0Ptr, lensVb0Ptr, lensIbPtr, lensRt0Ptr,
+                        lensLeftRtPtr, lensLeftRtWidth, lensLeftRtHeight,
+                        static_cast<unsigned>(lensLeftRtFormat),
+                        lensRightRtPtr, lensRightRtWidth, lensRightRtHeight,
+                        static_cast<unsigned>(lensRightRtFormat),
                         physicalQpc.QuadPart, GetCurrentThreadId());
                 }
             }
