@@ -144,5 +144,10 @@
     "checkpoint_only": true,
     "checkpoint_has_ci_skip": true,
     "ci_validated_source_commit_is_distinct": true
-  }
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp"
+  ]
 }
