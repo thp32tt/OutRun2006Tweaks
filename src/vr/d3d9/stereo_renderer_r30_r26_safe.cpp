@@ -4278,6 +4278,51 @@ namespace OutRunVRStereo
             // completes a physical stereo pair. The existing failure path
             // still poisons the frame and retains the LEFT HRESULT.
             const bool pairComplete = SUCCEEDED(rightHr) && restoreOk;
+
+            // Post-native-draw receipt. Reuse the canonical pairComplete
+            // verdict above so diagnostics cannot create a second completion
+            // predicate that diverges from the renderer/accounting contract.
+            if (lensPhysicalCandidate)
+            {
+                static std::atomic<std::uint64_t> lensPhysicalResultSamples{0};
+                const auto physicalSample = lensPhysicalResultSamples.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (physicalSample <= 64 ||
+                    (physicalSample & (physicalSample - 1)) == 0 ||
+                    !pairComplete)
+                {
+                    LARGE_INTEGER physicalQpc{};
+                    QueryPerformanceCounter(&physicalQpc);
+                    spdlog::info(
+                        "VR TRACE LENS PHYSICAL RESULT FULL: sample={} serial={} pose={} "
+                        "site={} sourceCallSerial={} sequence={} sourceObj=0x{:X} "
+                        "sourceSite={} ordinal={} exactInline={} windowAnchorSerial={} "
+                        "windowAnchorSequence={} windowAnchorObj=0x{:X} "
+                        "windowAnchorOrdinal={} correlationAuthority={} "
+                        "leftAttempted={} leftHr=0x{:08X} rightAttempted={} "
+                        "rightHr=0x{:08X} restore={} pairComplete={} "
+                        "leftRT=0x{:X} rightRT=0x{:X} qpc={} thread={} "
+                        "evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
+                        physicalSample, TopLevelDrawSerial(), stereo.poseSequence,
+                        site ? site : "unknown", lensSourceSerial,
+                        lensSourceSequence, lensSourceObject, lensSourceSite,
+                        lensSourceOrdinal, lensInlineLinked ? 1 : 0,
+                        lensWindowAnchorSerial, lensWindowAnchorSequence,
+                        lensWindowAnchorObject, lensWindowAnchorOrdinal,
+                        lensInlineLinked ? "EXACT_INLINE_SOURCE" :
+                            (lensWindowAnchorSerial != 0
+                                ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE"),
+                        lensTransaction.leftDrawAttempted ? 1 : 0,
+                        static_cast<unsigned>(leftHr),
+                        lensTransaction.rightDrawAttempted ? 1 : 0,
+                        static_cast<unsigned>(rightHr), restoreOk ? 1 : 0,
+                        pairComplete ? 1 : 0,
+                        reinterpret_cast<std::uintptr_t>(TrackedRenderTarget),
+                        reinterpret_cast<std::uintptr_t>(RightEyeSurface),
+                        physicalQpc.QuadPart, GetCurrentThreadId());
+                }
+            }
+
             if (pairComplete)
             {
                 FrameHadDuplicatedDraw = true;
@@ -6569,53 +6614,6 @@ namespace OutRunVRStereo
                 if (lensTransaction.sample) lensTransaction.post.Capture(device);
             }
             lensTransaction.Emit(lensTransaction.rightStage, leftHr);
-
-            // Post-native-draw receipt: unlike the earlier correlation candidate,
-            // this line is emitted only after LEFT actualDraw and the RIGHT
-            // transaction have completed or failed. Deferred-window ancestry is
-            // still explicitly non-authoritative for opaque-object identity.
-            if (lensPhysicalCandidate)
-            {
-                static std::atomic<std::uint64_t> lensPhysicalResultSamples{0};
-                const auto physicalSample = lensPhysicalResultSamples.fetch_add(
-                    1, std::memory_order_relaxed) + 1;
-                const bool physicalPairComplete =
-                    SUCCEEDED(leftHr) && SUCCEEDED(rightHr) && restoreOk;
-                if (physicalSample <= 64 ||
-                    (physicalSample & (physicalSample - 1)) == 0 ||
-                    !physicalPairComplete)
-                {
-                    LARGE_INTEGER physicalQpc{};
-                    QueryPerformanceCounter(&physicalQpc);
-                    spdlog::info(
-                        "VR TRACE LENS PHYSICAL RESULT FULL: sample={} serial={} pose={} "
-                        "site={} sourceCallSerial={} sequence={} sourceObj=0x{:X} "
-                        "sourceSite={} ordinal={} exactInline={} windowAnchorSerial={} "
-                        "windowAnchorSequence={} windowAnchorObj=0x{:X} "
-                        "windowAnchorOrdinal={} correlationAuthority={} "
-                        "leftAttempted={} leftHr=0x{:08X} rightAttempted={} "
-                        "rightHr=0x{:08X} restore={} pairComplete={} "
-                        "leftRT=0x{:X} rightRT=0x{:X} qpc={} thread={} "
-                        "evidence=POST_NATIVE_DRAW_NOT_PIXEL_PROOF",
-                        physicalSample, TopLevelDrawSerial(), stereo.poseSequence,
-                        site ? site : "unknown", lensSourceSerial,
-                        lensSourceSequence, lensSourceObject, lensSourceSite,
-                        lensSourceOrdinal, lensInlineLinked ? 1 : 0,
-                        lensWindowAnchorSerial, lensWindowAnchorSequence,
-                        lensWindowAnchorObject, lensWindowAnchorOrdinal,
-                        lensInlineLinked ? "EXACT_INLINE_SOURCE" :
-                            (lensWindowAnchorSerial != 0
-                                ? "WINDOW_CANDIDATE_NOT_EXACT_OBJECT" : "NONE"),
-                        lensTransaction.leftDrawAttempted ? 1 : 0,
-                        static_cast<unsigned>(leftHr),
-                        lensTransaction.rightDrawAttempted ? 1 : 0,
-                        static_cast<unsigned>(rightHr), restoreOk ? 1 : 0,
-                        physicalPairComplete ? 1 : 0,
-                        reinterpret_cast<std::uintptr_t>(TrackedRenderTarget),
-                        reinterpret_cast<std::uintptr_t>(RightEyeSurface),
-                        physicalQpc.QuadPart, GetCurrentThreadId());
-                }
-            }
 
             // Observational L/R receipt for this specific R30 transaction.
             // Equal c64 matrices may be correct for a directional infinity
