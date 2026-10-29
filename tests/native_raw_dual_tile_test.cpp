@@ -20,6 +20,53 @@ int main() {
     assert(!native_raw_canonical_source_target_is_presented(
         static_cast<int*>(nullptr), &presentedSurface,
         &canonical, &canonical));
+    // Source-coincident RAW publishing previously rejected the ENTIRE
+    // 64x40 tile if the game repainted only a smaller legitimate dirty island.
+    // This must preserve exactly the GPU source coordinates and RGB evidence.
+    {
+        constexpr std::uint32_t w = 96u, h = 64u;
+        std::array<std::uint8_t, w * h * 4u> prior{};
+        auto after = prior;
+        after[(22u * w + 65u) * 4u + 2u] = 201u;
+        NativeRawChangedPixelWindow delta;
+        delta.capture(prior.data(), w * 4u, after.data(), w * 4u, w, h);
+        NativeRawPresentDirtyRegion island{};
+        island.headerVerified = true;
+        island.count = 1u;
+        island.rectangles[0] = {160, 220, 173, 236};
+        island.boundLeft = 160; island.boundTop = 220;
+        island.boundRight = 173; island.boundBottom = 236;
+        const NativeRawPresentTile fullGpuTile{10u, 10u, 64u, 40u, 110, 210};
+        NativeRawPresentTile cropped{};
+        std::uint32_t realRgb = 0u;
+        assert(!native_raw_dirty_region_covers_tile(
+            1920, 1080, island, fullGpuTile));
+        assert(native_raw_dirty_source_rgb_crop(
+            1920, 1080, island, fullGpuTile, delta, cropped, realRgb));
+        assert(realRgb == 1u && cropped.sourceX == 60u &&
+               cropped.sourceY == 20u && cropped.copyWidth == 13u &&
+               cropped.copyHeight == 16u && cropped.destinationX == 160 &&
+               cropped.destinationY == 220);
+        assert(delta.changed_pixels(cropped) == realRgb);
+        // Alpha-only mutations must not create native RGB evidence.
+        after[(22u * w + 65u) * 4u + 2u] = 0u;
+        after[(22u * w + 65u) * 4u + 3u] = 255u;
+        delta.capture(prior.data(), w * 4u, after.data(), w * 4u, w, h);
+        assert(!native_raw_dirty_source_rgb_crop(
+            1920, 1080, island, fullGpuTile, delta, cropped, realRgb));
+        // Malformed dirty bounds or a disjoint repaint must fail closed.
+        after[(22u * w + 65u) * 4u + 2u] = 201u;
+        delta.capture(prior.data(), w * 4u, after.data(), w * 4u, w, h);
+        island.boundRight = 174;
+        assert(!native_raw_dirty_source_rgb_crop(
+            1920, 1080, island, fullGpuTile, delta, cropped, realRgb));
+        island.boundRight = 173;
+        island.rectangles[0] = {400, 400, 413, 416};
+        island.boundLeft = 400; island.boundTop = 400;
+        island.boundRight = 413; island.boundBottom = 416;
+        assert(!native_raw_dirty_source_rgb_crop(
+            1920, 1080, island, fullGpuTile, delta, cropped, realRgb));
+    }
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};

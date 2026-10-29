@@ -390,20 +390,48 @@ public:
                         sourceGameTarget_.Get(), backbuffer,
                         sourceGameTargetIdentity_.Get(), presentedIdentity.Get())) {
                         NativeRawPresentTile alignedFirst{}, alignedSecond{};
-                        const bool haveFirst = firstPixels &&
-                            native_raw_source_aligned_present_tile(
-                                firstTile, region_.left, region_.top,
-                                captureTargetWidth_, captureTargetHeight_,
-                                back.Width, back.Height, l, t, r, b,
-                                sourceDirty, sourceCropRepaintVerified,
-                                alignedFirst);
-                        const bool haveSecond = alternateActive_ && secondPixels &&
-                            native_raw_source_aligned_present_tile(
-                                secondTile, regionAlternate_.left,
-                                regionAlternate_.top, captureTargetWidth_,
-                                captureTargetHeight_, back.Width, back.Height,
-                                l, t, r, b, sourceDirty,
-                                sourceCropRepaintVerified, alignedSecond);
+                        // Small genuine menu/car dirty islands need not
+                        // repaint the entire 256x144 native GPU capture.
+                        // Keep the actual source position and upload only a
+                        // proven dirty subrectangle containing changed RGB.
+                        const auto alignChanged = [&](
+                                const NativeRawPresentTile& sample,
+                                const D3D11_BOX& source,
+                                const D3D11_MAPPED_SUBRESOURCE& pre,
+                                const D3D11_MAPPED_SUBRESOURCE& post,
+                                NativeRawPresentTile& aligned,
+                                UINT& changed) noexcept {
+                            if (!changed) return false;
+                            if (native_raw_source_aligned_present_tile(
+                                    sample, source.left, source.top,
+                                    captureTargetWidth_, captureTargetHeight_,
+                                    back.Width, back.Height, l, t, r, b,
+                                    sourceDirty, sourceCropRepaintVerified,
+                                    aligned)) return true;
+                            if (!sourceDirty || sourceCropRepaintVerified)
+                                return false;
+                            NativeRawPresentTile trueSource{};
+                            if (!native_raw_source_aligned_present_tile(
+                                    sample, source.left, source.top,
+                                    captureTargetWidth_, captureTargetHeight_,
+                                    back.Width, back.Height, l, t, r, b,
+                                    nullptr, true, trueSource))
+                                return false;
+                            changedWindow_.capture(pre.pData, pre.RowPitch,
+                                post.pData, post.RowPitch, width, height);
+                            UINT actualDirtyRgb = 0u;
+                            if (!native_raw_dirty_source_rgb_crop(
+                                    back.Width, back.Height, *sourceDirty,
+                                    trueSource, changedWindow_, aligned,
+                                    actualDirtyRgb)) return false;
+                            changed = actualDirtyRgb;
+                            return true;
+                        };
+                        const bool haveFirst = alignChanged(firstTile, region_,
+                            before, mapped, alignedFirst, firstPixels);
+                        const bool haveSecond = alternateActive_ && alignChanged(
+                            secondTile, regionAlternate_, beforeAlternate,
+                            afterAlternate, alignedSecond, secondPixels);
                         // Preserve true source coordinates even when a
                         // displaced two-inset layout happens to fit. Verify
                         // non-overlap AFTER moving either native GPU crop.

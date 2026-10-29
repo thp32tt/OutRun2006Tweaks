@@ -21,6 +21,7 @@ namespace outrun::vr::dx11 {
 #include <cstdint>
 #include <limits>
 #include "native_game_raw_partial_present_tile.hpp"
+#include "native_game_raw_changed_pixel_window.hpp"
 namespace outrun::vr::dx11 {
 struct NativeRawPresentDirtyRect {
     std::int64_t left{}, top{}, right{}, bottom{};
@@ -94,6 +95,65 @@ struct NativeRawPresentDirtyRegion {
         x = nextX;
     }
     return true;
+}
+// Keep real D3D11 changed RGB on its ORIGINAL D3D9 screen coordinate
+// when a small game dirty island intersects only part of a larger capture.
+// Candidate source bytes are an unscaled subset of the SAME GPU capture;
+// never move pixels into a different game coordinate or claim a full frame.
+[[nodiscard]] inline bool native_raw_dirty_source_rgb_crop(
+    std::uint32_t backWidth, std::uint32_t backHeight,
+    const NativeRawPresentDirtyRegion& dirty,
+    const NativeRawPresentTile& sourceAligned,
+    const NativeRawChangedPixelWindow& gpuDelta,
+    NativeRawPresentTile& cropped,
+    std::uint32_t& changedRgb) noexcept {
+    cropped = {};
+    changedRgb = 0u;
+    if (!sourceAligned.copyWidth || !sourceAligned.copyHeight ||
+        sourceAligned.destinationX < 0 || sourceAligned.destinationY < 0 ||
+        sourceAligned.copyWidth > backWidth ||
+        sourceAligned.copyHeight > backHeight ||
+        sourceAligned.destinationX >
+            std::int64_t{backWidth - sourceAligned.copyWidth} ||
+        sourceAligned.destinationY >
+            std::int64_t{backHeight - sourceAligned.copyHeight} ||
+        !dirty.headerVerified || !dirty.count ||
+        dirty.count > NativeRawPresentDirtyRegion::kMaxRects)
+        return false;
+    const auto right = sourceAligned.destinationX + sourceAligned.copyWidth;
+    const auto bottom = sourceAligned.destinationY + sourceAligned.copyHeight;
+    std::uint64_t bestArea = 0u;
+    for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+        const auto& rect = dirty.rectangles[i];
+        const auto l = (std::max)(sourceAligned.destinationX, rect.left);
+        const auto t = (std::max)(sourceAligned.destinationY, rect.top);
+        const auto r = (std::min)(right, rect.right);
+        const auto b = (std::min)(bottom, rect.bottom);
+        if (r <= l || b <= t) continue;
+        NativeRawPresentTile candidate = sourceAligned;
+        candidate.sourceX += static_cast<std::uint32_t>(
+            l - sourceAligned.destinationX);
+        candidate.sourceY += static_cast<std::uint32_t>(
+            t - sourceAligned.destinationY);
+        candidate.copyWidth = static_cast<std::uint32_t>(r - l);
+        candidate.copyHeight = static_cast<std::uint32_t>(b - t);
+        candidate.destinationX = l;
+        candidate.destinationY = t;
+        // This independently checks every rect, the true D3D9 rcBound and
+        // exact dirty UNION, not only the candidate's intersecting member.
+        if (!native_raw_dirty_region_covers_tile(
+                backWidth, backHeight, dirty, candidate)) continue;
+        const auto rgb = gpuDelta.changed_pixels(candidate);
+        const auto area = std::uint64_t{candidate.copyWidth} *
+                          candidate.copyHeight;
+        if (rgb && (rgb > changedRgb ||
+                    (rgb == changedRgb && area > bestArea))) {
+            cropped = candidate;
+            changedRgb = rgb;
+            bestArea = area;
+        }
+    }
+    return changedRgb > 0u;
 }
 // Allow two independently captured native Draw images in separate ORIGINAL
 // game repaint islands, without overlapping either image or claiming a

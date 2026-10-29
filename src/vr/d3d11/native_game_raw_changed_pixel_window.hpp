@@ -84,6 +84,20 @@ public:
         return true;
     }
 
+    // Count only RGB pixels produced by the captured native GPU Draw in
+    // this exact, unscaled source subrectangle (not its bounding box).
+    [[nodiscard]] std::uint32_t changed_pixels(
+        const NativeRawPresentTile& tile) const noexcept {
+        if (!windowWidth_ || !windowHeight_ ||
+            !tile.copyWidth || !tile.copyHeight ||
+            tile.copyWidth > windowWidth_ || tile.copyHeight > windowHeight_ ||
+            tile.sourceX > windowWidth_ - tile.copyWidth ||
+            tile.sourceY > windowHeight_ - tile.copyHeight)
+            return 0u;
+        return count(tile.sourceX, tile.sourceY,
+                     tile.copyWidth, tile.copyHeight);
+    }
+
 private:
     [[nodiscard]] std::uint32_t count(std::uint32_t x, std::uint32_t y,
                                       std::uint32_t w, std::uint32_t h) const noexcept {
