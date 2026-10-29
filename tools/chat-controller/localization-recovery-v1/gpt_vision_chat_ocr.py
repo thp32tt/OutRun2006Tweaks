@@ -19,7 +19,7 @@ OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
 RESPONSE_STALL_SECONDS=max(300,int(os.environ.get("OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS","600")))
 SUBMISSION_STALL_SECONDS=max(60,int(os.environ.get("OUTRUN_GPT_OCR_SUBMIT_STALL_SECONDS","300")))
-RESPONSE_EXTRACTOR_VERSION="search-unit-assistant-v3-slot-aligned-20261026"
+RESPONSE_EXTRACTOR_VERSION="search-unit-assistant-v4-dual-lane-poll-20261030"
 TASK_RE=re.compile(r"^OUTRUN-GPT-OCR-Q\d{3}-[A-F0-9]{8}(?:-C2)?(?:-R[12])?$")
 
 def _now():
@@ -73,14 +73,19 @@ def _migrate_response_extractor_state(st):
         fp=rec.get("fingerprint")
         if not isinstance(fp,str):
             continue
+        lane=rec.get("ocr_lane") or (
+            "C2" if re.search(r"-C2(?:-R[12])?$",str(rec.get("task_id") or "")) else "C1")
+        if lane not in ("C1","C2"):
+            continue
+        key=_attempt_key(fp,lane)
         status=rec.get("status")
         if status in ("APPLIED","APPLIED_MCP_BRIDGE") and int(rec.get("applied",0) or 0)>0:
-            success.add(fp)
+            success.add(key)
         elif status in ("RESPONSE_TIMEOUT_RETRY","RESPONSE_TIMEOUT_MAX_ATTEMPTS"):
-            timed_out.add(fp)
+            timed_out.add(key)
     reset=sorted(timed_out-success)
-    for fp in reset:
-        st["attempts"][fp]=0
+    for key in reset:
+        st["attempts"][key]=0
     st["response_extractor_version"]=RESPONSE_EXTRACTOR_VERSION
     st["response_extractor_migrated_at"]=_now()
     st["response_extractor_retry_reset_count"]=len(reset)
