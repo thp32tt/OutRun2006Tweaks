@@ -2403,6 +2403,46 @@ namespace OutRunVRStereo
                 if (matrixKind == R44OverlayMatrixKind::FlatHud)
                 {
                     ++R44FlatOverlayClassifications;
+
+                    // Quest3 2026-10-30 capture: the first original 0x570008
+                    // CABE call defers a short multi-material lens batch. Those
+                    // physical children lost ProjectedScreenEffect2D after the
+                    // wrapper returned and were consequently classified as a
+                    // finite PerspectiveHud plane, while the exact C993/second
+                    // 0x570008 path used the zero-IPD projected sun ray. That
+                    // split is a direct binocular-depth mismatch inside one
+                    // flare chain. The deferred receipt is still NOT object
+                    // identity: use it only to recover the screen-projection
+                    // class for flat matrices inside this tightly bounded
+                    // ordinal-1 interval. Spatial matrices remain unchanged.
+                    const auto deferredLens =
+                        OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
+                    const bool deferredOuterLensFlat =
+                        deferredLens.sourceSerial != 0 &&
+                        deferredLens.objectId == 0x570008u &&
+                        deferredLens.ordinal == 1;
+                    if (deferredOuterLensFlat)
+                    {
+                        if (Settings::VRTelemetry)
+                        {
+                            static std::atomic<std::uint64_t>
+                                deferredProjectedRayHits{0};
+                            const auto hit = deferredProjectedRayHits.fetch_add(
+                                1, std::memory_order_relaxed) + 1;
+                            if (hit <= 64 || (hit & (hit - 1)) == 0)
+                                spdlog::info(
+                                    "VR TRACE LENS DEFERRED RAY RECOVERY: hit={} "
+                                    "sourceSerial={} sequence={} object=0x{:06X} "
+                                    "ordinal={} oldKind=PERSPECTIVE_HUD "
+                                    "newKind=PROJECTED_SCREEN_EFFECT_2D",
+                                    hit, deferredLens.sourceSerial,
+                                    deferredLens.sequence,
+                                    deferredLens.objectId,
+                                    static_cast<unsigned>(
+                                        deferredLens.ordinal));
+                        }
+                        return R30ScreenSpaceKind::ProjectedScreenEffect2D;
+                    }
                     return R30ScreenSpaceKind::PerspectiveHud;
                 }
                 return R30ScreenSpaceKind::None;
