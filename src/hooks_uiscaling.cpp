@@ -263,6 +263,10 @@ static void FlushD3DXAtDirectStageSourceExit() noexcept;
 static void RevokeD3DXDirectStageTicket(std::uint64_t ticket) noexcept;
 static thread_local std::uint64_t StageTimeTicketSerial = 0;
 static thread_local std::uint64_t StageTimeLiveTicket = 0;
+// Shared source-entry cursor used by both UIScaling producer bracketing and
+// the later native D3DX Draw receipt. It must live at translation-unit scope:
+// the D3DX isolation hook is a separate class from UIScaling.
+static thread_local std::uint64_t StageExtensionEntrySerial = 0;
 static thread_local OutRunVR::StageExtension::SourceAdmission StageTimeLiveAdmission{};
 static void FlushD3DXBeforeDirectGoalSource() noexcept;
 static void FlushD3DXAtDirectGoalSourceExit() noexcept;
@@ -2151,7 +2155,6 @@ class UIScaling : public Hook
     inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
         StageExtensionRootsBefore{};
     inline static thread_local std::uint64_t StageExtensionCompleted = 0;
-    inline static thread_local std::uint64_t StageExtensionEntrySerial = 0;
     // Keep the original +TIME source's entry admission across all five E8
     // parents. A desktop-to-VR toggle or a queued reentrant call must never
     // publish that earlier source as an OpenXR HUD owner on return.
