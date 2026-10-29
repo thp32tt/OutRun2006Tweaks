@@ -1,0 +1,410 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1415KST-A0115-B0130-NEW-SHA8",
+  "timestamp_kst": "2026-10-29T14:15:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "review_scope": "PNG_KOREAN_LETTERING_LAYER_ONLY",
+  "review_method": "Direct visual comparison of English source ROI, generated Korean RGBA candidate, and simulated native fit; verified N100 export and manifest SHA256; inspected alpha border",
+  "prior_distinct_reviewed_candidate_sha": 263,
+  "summary": {
+    "new_unique_sha": 8,
+    "A": 4,
+    "B": 4,
+    "pass": 7,
+    "hold": 0,
+    "fail": 1,
+    "source_sha_verified": 8,
+    "candidate_sha_verified": 8,
+    "rgba": 8,
+    "alpha_ge32_border_contact": 0,
+    "fail_reason": "B-0129_UNNECESSARY_OPAQUE_YELLOW_BANNER",
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "dds_created": false,
+    "actual_UI_composite": "NOT_TESTED",
+    "C2_C3": "NOT_ASSESSED",
+    "runtime": "UNTESTED",
+    "vr_ffb_dx11_dxvk": "UNCHANGED"
+  },
+  "evidence": {
+    "n100_root": "work/C1_QA_20261029_1415_AI2_new_sha8",
+    "files": [
+      "preflight.json",
+      "pairs_A.jpg",
+      "pairs_B.jpg",
+      "native_fit_A.jpg",
+      "native_fit_B.jpg"
+    ],
+    "n100_report": "work/C1_QA_20261029_1415_AI2_report.json"
+  },
+  "records": [
+    {
+      "task_id": "OUTRUN-ROI-A-0115-2A767742",
+      "role": "A",
+      "source_ordinal": 409,
+      "english": "Long distance",
+      "approved_korean": "장거리",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "candidate_filename": "Q111_a33a0b15d91aa61b_k.png",
+      "candidate_sha256": "911567c2e86ab5b9f205f50a6b49aa1188533be7a0ae18cab2c7a650a3f0f6e5",
+      "source_bbox_xyxy": [
+        575,
+        30,
+        1097,
+        128
+      ],
+      "source_bbox_size": [
+        522,
+        98
+      ],
+      "output_png_size": [
+        2172,
+        724
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        294,
+        98
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "significant_alpha_border_contact": false,
+      "alpha_border_max": 1,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'Long distance'→'장거리'. 붉은 글자와 흰 외곽선이 읽히며 원문 전체 폭을 강제 채우지 않아도 됨. alpha=1 경계 잡음만 있고 실질 잘림 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0116-6EAF2739",
+      "role": "A",
+      "source_ordinal": 410,
+      "english": "Tuned Setting",
+      "approved_korean": "튜닝 설정",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "candidate_filename": "Q111_71cf8062553a9961_k.png",
+      "candidate_sha256": "72120ce570a010539ba1393d9183c0e539983e24a8467ff15cd68c3d21b2ef6b",
+      "source_bbox_xyxy": [
+        44,
+        1208,
+        221,
+        1311
+      ],
+      "source_bbox_size": [
+        177,
+        103
+      ],
+      "output_png_size": [
+        1644,
+        957
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        177,
+        103
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "significant_alpha_border_contact": false,
+      "alpha_border_max": 1,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'Tuned Setting'→'튜닝 설정'. 두 줄 모두 읽히며 후보는 한글 글자/효과만 포함. 원본 ROI의 빨간 패널은 보호 아트이므로 실제 클린/합성 경로는 별도 검증 필요.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0117-C5817D42",
+      "role": "A",
+      "source_ordinal": 411,
+      "english": "RANDOM",
+      "approved_korean": "무작위",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "candidate_filename": "Q111_5cdc8808f3d14492_k.png",
+      "candidate_sha256": "af634068150871849755a7242a48bbe14bcacb0be74fd263ce49283c58f5b675",
+      "source_bbox_xyxy": [
+        1734,
+        1450,
+        1945,
+        1498
+      ],
+      "source_bbox_size": [
+        211,
+        48
+      ],
+      "output_png_size": [
+        2080,
+        756
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        132,
+        48
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "significant_alpha_border_contact": false,
+      "alpha_border_max": 0,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'RANDOM'→'무작위' 글자와 외곽선 가독, 가짜 자소 없음. 원본 파란 배경 패널은 후보에 재생성되지 않음; 실제 UV 배치 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0118-27FC8F40",
+      "role": "A",
+      "source_ordinal": 412,
+      "english": "For Experts:",
+      "approved_korean": "상급자용:",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "candidate_filename": "Q111_9ee1437b986d35cc_k.png",
+      "candidate_sha256": "dc7cb45c5a76f0344c774196b6c2c859ad86f4bdfb6a0f229c48ef07275dcf8c",
+      "source_bbox_xyxy": [
+        1577,
+        277,
+        1980,
+        366
+      ],
+      "source_bbox_size": [
+        403,
+        89
+      ],
+      "output_png_size": [
+        2172,
+        724
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        267,
+        89
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "significant_alpha_border_contact": false,
+      "alpha_border_max": 0,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'For Experts:'→'상급자용:' 글자와 콜론 식별 가능. 흰 윤곽 및 원문 기울기 방향 유지; 실질 alpha 경계 잘림 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0127-C70CB0E0",
+      "role": "B",
+      "source_ordinal": 464,
+      "english": "Go through the gate!",
+      "approved_korean": "게이트를 통과하세요!",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "candidate_filename": "Q111_b40aa043dc4c3737_k.png",
+      "candidate_sha256": "b5506ca8fd5d76915747187ea042aeee5fb389d2bcc1ed55f145f2ac41dc6530",
+      "source_bbox_xyxy": [
+        1076,
+        262,
+        1566,
+        357
+      ],
+      "source_bbox_size": [
+        490,
+        95
+      ],
+      "output_png_size": [
+        2106,
+        747
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        268,
+        95
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "significant_alpha_border_contact": false,
+      "alpha_border_max": 1,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'Go through the gate!'→'게이트를 통과하세요!' 문구 정확. 노란 글자·흰 외곽선 읽힘, alpha=1 외곽 잡음만 있고 글자 잘림 증거 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0128-7880EA9A",
+      "role": "B",
+      "source_ordinal": 465,
+      "english": "Don't crash!",
+      "approved_korean": "충돌하지 마세요!",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "candidate_filename": "Q111_9684be626751292c_k.png",
+      "candidate_sha256": "27dbf9b8c2d48d1b18a5d63f295b45f52f7619ba10a9a980e7e0023119dbaed7",
+      "source_bbox_xyxy": [
+        608,
+        265,
+        1029,
+        348
+      ],
+      "source_bbox_size": [
+        421,
+        83
+      ],
+      "output_png_size": [
+        2006,
+        784
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        212,
+        83
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "significant_alpha_border_contact": false,
+      "alpha_border_max": 0,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'Don't crash!'→'충돌하지 마세요!' 음절 및 느낌표 명확. 원문 유사 색상과 기울임, 실질 경계 잘림 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0129-3554FA88",
+      "role": "B",
+      "source_ordinal": 466,
+      "english": "More BGM",
+      "approved_korean": "BGM 더 많이",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "candidate_filename": "Q111_d0b8641741d39217_k.png",
+      "candidate_sha256": "48b00ee0825d6d1f343eea2036a9b9b132595631839285571cab5d416e4e5c81",
+      "source_bbox_xyxy": [
+        1348,
+        1727,
+        1652,
+        1781
+      ],
+      "source_bbox_size": [
+        304,
+        54
+      ],
+      "output_png_size": [
+        2172,
+        724
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        162,
+        54
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "significant_alpha_border_contact": false,
+      "alpha_border_max": 1,
+      "judgement": "FAIL",
+      "reason_code": "UNNECESSARY_OPAQUE_YELLOW_BANNER",
+      "observation": "'More BGM'→'BGM 더 많이' 문구는 읽히지만, 후보 PNG에 글자/외곽선 외 노란색 불투명 사다리꼴 배너 전체가 생성됨. 투명 한글 글자 레이어 전용 조건 위반; 원래 영문 배경은 보존된 원본에서 유지해야 함. A/B 재생성 요청 대상, C1에서 재생성하지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_TEXT_ONLY_FAIL_BACKGROUND",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0130-EB09E627",
+      "role": "B",
+      "source_ordinal": 467,
+      "english": "The course from the original OutRun2.",
+      "approved_korean": "오리지널 아웃런2의 코스입니다.",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "candidate_filename": "Q111_c933a3b7ed546d09_k.png",
+      "candidate_sha256": "7605f860bc3187498d42f492f52b1ec6f4cbc472b36a74be62da36847e84a621",
+      "source_bbox_xyxy": [
+        788,
+        1395,
+        1305,
+        1609
+      ],
+      "source_bbox_size": [
+        517,
+        214
+      ],
+      "output_png_size": [
+        1950,
+        807
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        517,
+        214
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "significant_alpha_border_contact": false,
+      "alpha_border_max": 1,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'The course from the original OutRun2.'→'오리지널 아웃런2의 코스입니다.' 한글 두 줄 판독 가능. 외곽/그림자와 기울기 방향 양호, 실질 출력 경계 잘림 없음. 원본 문구 셀/보호아트 합성은 미확인.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    }
+  ]
+}
