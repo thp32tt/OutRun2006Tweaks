@@ -36,7 +36,7 @@
     "vr_ffb_dx11_dxvk": "UNCHANGED"
   },
   "evidence": {
-    "n100_root": "work/C1_QA_20261029_1745_AI2_new_sha8",
+    "n100_root": "work/C1_QA_20261029_1745_AI2_new_sha6",
     "files": [
       "preflight.json",
       "pairs_A.jpg",
