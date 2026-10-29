@@ -1,0 +1,386 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1515KST-A0123-B0138-NEW-SHA8",
+  "timestamp_kst": "2026-10-29T15:15:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "review_scope": "PNG_KOREAN_LETTERING_LAYER_ONLY",
+  "review_method": "SHA verified originals and generated PNG; independently viewed English source crop, Korean lettering, and aspect-preserving native fit; border alpha checked",
+  "prior_review_report_count": 39,
+  "prior_distinct_reviewed_candidate_sha": 279,
+  "summary": {
+    "new_unique_sha": 8,
+    "A": 4,
+    "B": 4,
+    "pass": 7,
+    "fail": 1,
+    "hold": 0,
+    "source_sha_verified": 8,
+    "candidate_sha_verified": 8,
+    "rgba": 8,
+    "alpha_ge32_border_contact": 0,
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "dds_created": false,
+    "actual_UI_composite": "NOT_TESTED",
+    "C2_C3": "NOT_ASSESSED",
+    "runtime": "UNTESTED",
+    "vr_ffb_dx11_dxvk": "UNCHANGED"
+  },
+  "evidence": {
+    "n100_root": "work/C1_QA_20261029_1515_AI2_new_sha8",
+    "files": [
+      "preflight.json",
+      "pairs_A.jpg",
+      "pairs_B.jpg",
+      "native_fit_A.jpg",
+      "native_fit_B.jpg"
+    ],
+    "n100_report": "work/C1_QA_20261029_1515_AI2_report.json"
+  },
+  "records": [
+    {
+      "task_id": "OUTRUN-ROI-A-0123-70C827F4",
+      "role": "A",
+      "source_ordinal": 417,
+      "english": "More Engine sound",
+      "approved_korean": "엔진음 크게",
+      "source_file": "Q121_FD90AA9_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "29f5411f9109f5217ca7a308cddcf541820cdf13d8e238d2063193f0bc5c1456",
+      "bbox_xyxy": [
+        2792,
+        388,
+        3184,
+        436
+      ],
+      "candidate_file": "Q121_ee45cd46f3b02118_k.png",
+      "candidate_sha256": "3ce0954a2238f814df8e3b7fad544ee57579c4ecaf53f926a925a079a9c01c7f",
+      "output_dimensions": [
+        2098,
+        750
+      ],
+      "mode": "RGBA",
+      "candidate_sha_match": true,
+      "source_sha_match": true,
+      "previously_reviewed_sha": false,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        134,
+        48
+      ],
+      "judgement": "FAIL",
+      "reason_code": "UNNECESSARY_OPAQUE_YELLOW_BANNER",
+      "observation": "승인 번역 '엔진음 크게'는 읽히지만 노란색 사다리꼴 면 전체와 검은 외곽 테두리가 글자 외 배경 패널로 생성됨. 문자/효과만 남겨야 하므로 반려.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "FAIL_LAYER_NONLETTERING",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0124-8C97968B",
+      "role": "A",
+      "source_ordinal": 418,
+      "english": "A brand new course designed for OutRun2: SP.",
+      "approved_korean": "아웃런2 SP용으로 새롭게 설계된 코스입니다.",
+      "source_file": "Q121_FD90AA9_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "29f5411f9109f5217ca7a308cddcf541820cdf13d8e238d2063193f0bc5c1456",
+      "bbox_xyxy": [
+        3008,
+        1708,
+        3662,
+        1828
+      ],
+      "candidate_file": "Q121_87a498b96e5f222b_k.png",
+      "candidate_sha256": "102c72dee79b343a195db483c83ccc392e5cee854bfd09ce0686debf449d5678",
+      "output_dimensions": [
+        2075,
+        758
+      ],
+      "mode": "RGBA",
+      "candidate_sha_match": true,
+      "source_sha_match": true,
+      "previously_reviewed_sha": false,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        328,
+        120
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "두 줄 '아웃런2 SP용으로 / 새롭게 설계된 코스입니다.' 음절, 받침, 문장부호 판독 가능. 영문 잔상 및 뚜렷한 외곽 잘림 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0125-47D5DD8A",
+      "role": "A",
+      "source_ordinal": 419,
+      "english": "START",
+      "approved_korean": "출발",
+      "source_file": "Q172_6C9B3611_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "802cc4dac34586b02da92c65da8d84f5145167d8c8ef416e5ceec0621632b804",
+      "bbox_xyxy": [
+        49,
+        366,
+        147,
+        404
+      ],
+      "candidate_file": "Q172_de7da2dbb5499484_k.png",
+      "candidate_sha256": "362d31dcbfbf6e94539a30cd0f792c1c322732cf70da5d46dc2cbcc30d6aa640",
+      "output_dimensions": [
+        2014,
+        781
+      ],
+      "mode": "RGBA",
+      "candidate_sha_match": true,
+      "source_sha_match": true,
+      "previously_reviewed_sha": false,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        98,
+        38
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "START에 대응하는 '출발' 읽힘. 붉은 글자·윤곽·광택이 유지되고 배경 패널 복제는 보이지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0126-7D257748",
+      "role": "A",
+      "source_ordinal": 420,
+      "english": "showroom",
+      "approved_korean": "쇼룸",
+      "source_file": "Q175_754F0599_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "4afc4932bbdebe3b42c16a50bd5012f52cea97a73aa592bd33e9f4f6c8053eff",
+      "bbox_xyxy": [
+        6,
+        410,
+        956,
+        530
+      ],
+      "candidate_file": "Q175_a46d37b435d4e249_k.png",
+      "candidate_sha256": "a514b7b1bceb4505a2b88d1a2f46274f4f2299fd38dabea6df38d5a526b1b1e9",
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "candidate_sha_match": true,
+      "source_sha_match": true,
+      "previously_reviewed_sha": false,
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "native_fit_dimensions": [
+        360,
+        120
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "회색 금속 질감의 '쇼룸' 각 음절 및 받침 판독 가능. 원문보다 문장이 짧은 것은 반려 사유 아님.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0135-F62377EB",
+      "role": "B",
+      "source_ordinal": 472,
+      "english": "Music will be Randomly Selected.",
+      "approved_korean": "음악이 무작위로 선택됩니다.",
+      "source_file": "Q121_FD90AA9_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "29f5411f9109f5217ca7a308cddcf541820cdf13d8e238d2063193f0bc5c1456",
+      "bbox_xyxy": [
+        1764,
+        2360,
+        2720,
+        2574
+      ],
+      "candidate_file": "Q121_1899c0152ffdcde2_k.png",
+      "candidate_sha256": "2c4577e9e025287ce41b4655e35a435068599cb3ed3268e1ea0c7a3655de0134",
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "candidate_sha_match": true,
+      "source_sha_match": true,
+      "previously_reviewed_sha": false,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        642,
+        214
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'음악이 무작위로 선택됩니다.' 한 줄 가독성과 문장부호 확인. 원문과 줄 수·전체 폭이 달라도 단독 반려하지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0136-5E6A8C6A",
+      "role": "B",
+      "source_ordinal": 473,
+      "english": "GOAL",
+      "approved_korean": "골",
+      "source_file": "Q172_6C9B3611_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "802cc4dac34586b02da92c65da8d84f5145167d8c8ef416e5ceec0621632b804",
+      "bbox_xyxy": [
+        587,
+        628,
+        686,
+        666
+      ],
+      "candidate_file": "Q172_7040528564141cff_k.png",
+      "candidate_sha256": "cfc1432339a17d828d5ff54229bc17e163612f971d7d056891456fdc76d7da3c",
+      "output_dimensions": [
+        2022,
+        778
+      ],
+      "mode": "RGBA",
+      "candidate_sha_match": true,
+      "source_sha_match": true,
+      "previously_reviewed_sha": false,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        99,
+        38
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "GOAL 대응 '골' 붉은 글자와 노란 윤곽 식별 가능. 원문의 색상 배경은 출력에 복제되지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0137-31D6268E",
+      "role": "B",
+      "source_ordinal": 474,
+      "english": "single player",
+      "approved_korean": "싱글 플레이",
+      "source_file": "Q175_754F0599_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "4afc4932bbdebe3b42c16a50bd5012f52cea97a73aa592bd33e9f4f6c8053eff",
+      "bbox_xyxy": [
+        2,
+        566,
+        1386,
+        718
+      ],
+      "candidate_file": "Q175_624765c18605ae83_k.png",
+      "candidate_sha256": "e7133ce8afa33f79bb837bb233cd8c45596ae0984ba905bd2a6676b049919e54",
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "candidate_sha_match": true,
+      "source_sha_match": true,
+      "previously_reviewed_sha": false,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        456,
+        152
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'싱글 플레이' 음절, 받침 판독 가능. 회색 음영/금속 질감 유지, 가시적인 문자 잘림 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0138-27187080",
+      "role": "B",
+      "source_ordinal": 475,
+      "english": "View the online multiplayer rankings!",
+      "approved_korean": "온라인 멀티플레이 랭킹 보기",
+      "source_file": "Q193_97E863AD_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "f0989973f095b73c5293c12ce6daa5922b274b3a9d7d6916605ede7d634d7489",
+      "bbox_xyxy": [
+        7,
+        384,
+        1137,
+        450
+      ],
+      "candidate_file": "Q193_e519d8702c5dc77d_k.png",
+      "candidate_sha256": "4063532ced769b82d900a804dbf4bc5d046e068af844ec2e3a11ba14c9ab05ca",
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "candidate_sha_match": true,
+      "source_sha_match": true,
+      "previously_reviewed_sha": false,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "native_fit_dimensions": [
+        198,
+        66
+      ],
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'온라인 멀티플레이 랭킹 보기' 글자가 줄 끊김 없이 읽히고 영문 잔상·불투명 프레임이 보이지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    }
+  ]
+}
