@@ -100,5 +100,104 @@
     "C5_PACKAGE": "BUILD_VERIFIED_NEED_GAMEPLAY_HMD_TEST",
     "C6_STATE": "PASS_DOCS_ONLY_POST_GATE_RECORDED_SEPARATELY"
   },
-  "next_unfinished": "Run separately labeled opt-in RAW source-matched real D3D11 game pixel desktop trial: native_draws >0 and native_gpu_pixel_output >0 in same launch, then full menu->vehicle->race source draw coverage and OpenXR L/R HMD validation. Original D3D9 input/FFB and DXVK freeze unaffected."
+  "next_unfinished": "Run separately labeled opt-in RAW source-matched real D3D11 game pixel desktop trial: native_draws >0 and native_gpu_pixel_output >0 in same launch, then full menu->vehicle->race source draw coverage and OpenXR L/R HMD validation. Original D3D9 input/FFB and DXVK freeze unaffected.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_MENU_AND_RACE_DRAWS",
+      "NATIVE_D3D11_GPU_PAIR_BEFORE_AFTER_SOURCE_COLOR",
+      "DISJOINT_AUTHENTIC_GPU_RGB_TILES_IN_EXPLICIT_RAW_PRESENT"
+    ],
+    "batch_components": [
+      "CPLUSPLUS_GPU_PAIR_DISJOINT_SOURCE_RECT_SELECTION",
+      "CPLUSPLUS_D3D11_GPU_COLOR_COPY_INTEGRATION",
+      "POSITIVE_NEGATIVE_CPLUSPLUS_SOURCE_PIXEL_PROVENANCE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "The archived exact-SHA d90348a0 five required push Gates passed after the source disjoint-pair C++ implementation and corrected C++ source-raster fixtures.",
+      "negative_regression": "Overlapping source readback rectangles and unsupported/unsafe Presents are not promoted to two independent native RGB tiles; original D3D9 fallback, input and FFB unchanged.",
+      "component_integration": "Actual game Draw -> native D3D11 GPU BEFORE/AFTER copies from distinct source regions -> incomplete opt-in RAW D3D9 present; runtime pixel output and full frame NOT observed."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY; incomplete RAW native GPU source tiles, real game screenshot and HMD output UNTESTED.",
+    "activation_guard_and_fallback": "Explicit RAW visual opt-in only; no implicit production native Draw routing; preserve original D3D9 Draw/input/FFB, DXVK freeze."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Capture two genuinely disjoint D3D11 native game Draw source regions and present both authenticated RGB tile populations in explicit incomplete RAW diagnostics while preserving original fallback and source ownership.",
+    "acceptance_items": [
+      {
+        "id": "native_dual_region_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native D3D11 GPU source Draw geometry",
+        "expected_behavior": "Select two non-overlapping viewport/scissor source copy regions in a bounded active Draw, recovering narrow 512x144 scene strips."
+      },
+      {
+        "id": "real_gpu_copy_preview",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GPU copy into original D3D9 diagnostic Present",
+        "expected_behavior": "Keep both BEFORE/AFTER authentic source RGB tile pairs independently visible without promoting a full game frame."
+      },
+      {
+        "id": "source_fallback_safety",
+        "category": "fallback_regression",
+        "behavior_area": "original D3D9 source ownership and fallback",
+        "expected_behavior": "Reject identical/overlapping source regions and unsafe pixel or dirty-Present evidence; preserve original Draw and input."
+      },
+      {
+        "id": "required_exact_sha_validation",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Actions exact source SHA",
+        "expected_behavior": "All five required GitHub push Gates pass at the recorded d90348a0 validation-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_dual_region_source": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 40893433076, Backend 40893433135, Build 40893433116, OpenXR 40893432997, HUD 40893433164 on d90348a0"
+    },
+    "real_gpu_copy_preview": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 40893433076, Backend 40893433135, Build 40893433116, OpenXR 40893432997, HUD 40893433164 on d90348a0"
+    },
+    "source_fallback_safety": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "DX11 Fast 40893433076, Backend 40893433135, Build 40893433116, OpenXR 40893432997, HUD 40893433164 on d90348a0"
+    },
+    "required_exact_sha_validation": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_dual_tile.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 40893433076, Backend 40893433135, Build 40893433116, OpenXR 40893432997, HUD 40893433164 on d90348a0"
+    }
+  },
+  "causal_record_repair_01162": "The 01162 exact-SHA Fast Gate detected missing mandatory development_strategy/feature_contract/acceptance_results on earlier 01161 C6. This documentation-only CI acceptance repair restores the original source+regression evidence and prior 01161 exact-SHA five-Gate PASS; does not create a new feature, runtime proof or score."
 }
