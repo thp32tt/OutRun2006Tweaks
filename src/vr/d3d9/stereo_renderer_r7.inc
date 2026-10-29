@@ -96,6 +96,7 @@ namespace OutRunVRStereo
 		SafetyHookInline SetVertexShaderHook{};
 		SafetyHookInline CreateQueryHook{};
 		SafetyHookInline QueryIssueHook{};
+		std::atomic<std::uint64_t> R7VisualReceiptSerial{0};
 
 		HANDLE SharedMapping = nullptr;
 		OutRunVR::SharedPoseState* SharedState = nullptr;
@@ -1648,8 +1649,10 @@ if(WaitForEventQuery(slot.fence,1,0u))
 			const bool deferredCandidate=!inlineLinked&&
 				trace.lensDeferred.sourceSerial!=0;
 			LARGE_INTEGER qpc{};QueryPerformanceCounter(&qpc);
+			const auto receiptSerial=R7VisualReceiptSerial.fetch_add(
+				1,std::memory_order_relaxed)+1;
 			spdlog::info(
-				"VR TRACE R7 VISUAL EYES FULL: qpc={} serial={} family={} route={} "
+				"VR TRACE R7 VISUAL EYES FULL: qpc={} r7Serial={} family={} route={} "
 				"producer={} scope={} queued={} node=0x{:X} epoch={} prepared={} "
 				"worldStereo={} fixedFunctionWorld={} pose={} "
 				"leftAttempted={} left=0x{:08X} rightAttempted={} right=0x{:08X} "
@@ -1658,7 +1661,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 				"sourceObj=0x{:06X} sourceSite={} ordinal={} windowAnchorSerial={} "
 				"windowAnchorSequence={} windowAnchorObj=0x{:06X} "
 				"windowAnchorOrdinal={} sourceAuthority={} opaquePmtIdentity={}",
-				qpc.QuadPart,TopLevelDrawSerial(),trace.family,
+				qpc.QuadPart,receiptSerial,trace.family,
 				route?route:"UNKNOWN",
 				OutRunVR::GameSemantic::Name(trace.command.producer),
 				OutRunVR::GameSemantic::Name(trace.command.scope),
