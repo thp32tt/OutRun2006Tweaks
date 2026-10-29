@@ -1,0 +1,53 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T2345KST-IDLE",
+  "requested_at_kst": "2026-10-29T23:45:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policies_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source": "N100 /home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "method": "Compared SHA256 in A/B export evidence against prior C1 reports; cross-checked production manifest, existing candidate files and producer states. No new candidate QA performed.",
+  "state": "IDLE",
+  "preflight": {
+    "prior_qa_report_files": 208,
+    "prior_candidate_sha_unique": 921,
+    "export_evidence_file_count": 916,
+    "unreviewed_export_sha_count": 0,
+    "unreviewed_export_file_count": 0,
+    "missing_or_incomplete_evidence_count": 0,
+    "A": {
+      "completed_files": 434,
+      "completed_batches": 140,
+      "next_ordinal": 435,
+      "active": false
+    },
+    "B": {
+      "completed_files": 481,
+      "completed_batches": 144,
+      "next_ordinal": 482,
+      "active": false
+    }
+  },
+  "judgements": {
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "new_sha_reviewed": 0
+  },
+  "preserved_boundaries": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_created": false,
+    "c2_c3_pass": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk": "UNCHANGED"
+  },
+  "ai2_score_change": 0,
+  "notes": "This is an idle status record, not a new QA achievement, DDS approval or user in-game verification."
+}
