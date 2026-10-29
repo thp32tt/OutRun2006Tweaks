@@ -42,4 +42,15 @@ namespace outrun::vr::dx11 {
            "    return color;\n"
            "}\n";
 }
+// Authentic D3D9 FVF: stage0/stage1 + AlphaGate, post-cascade SPECULAR RGB,
+// then source-authenticated table fog. Preserve the shader's discard and alpha.
+[[nodiscard]] inline std::string native_fvf_specular_fog_wrapper(
+    std::string_view original) {
+    if (native_fvf_fog_wrapper(original).empty()) return {};
+    return "float4 PSFvfSpecularFogVariant(VOut v) : SV_Target {\n"
+           "    float4 color = " + std::string(original) + "(v);\n"
+           "    color.rgb = saturate(color.rgb + v.specular.rgb);\n"
+           "    return FvfApplyTableFog(v, color);\n"
+           "}\n";
+}
 } // namespace outrun::vr::dx11

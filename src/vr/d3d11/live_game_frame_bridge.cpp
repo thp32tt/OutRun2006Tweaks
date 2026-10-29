@@ -1410,7 +1410,8 @@ struct State {
     // pixel shader pointers can select one matching RGB-fog variant.
     struct FvfFogVariant {
         ID3D11PixelShader* source{}; // non-owning, same State/native device
-        bool specularAdd{}; // distinguish exact fog from distinct post-combiner specular
+        bool fogEnabled{}; // authentic live source table fog b2
+        bool specularAdd{}; // post-cascade source COLOR1 RGB
         ComPtr<ID3D11PixelShader> fogged;
     };
     std::vector<FvfFogVariant> fvfFogVariants;
@@ -2006,18 +2007,20 @@ const char* game_fvf_original_pixel_entry(
 // compile at startup. State::mutex serializes this bounded per-device cache.
 ID3D11PixelShader* game_fvf_final_rgb_variant(
     State& s, ID3D11Device* device, ID3D11PixelShader* source,
-    bool specularAdd) {
-    if (!device || !source) return nullptr;
+    bool fogEnabled, bool specularAdd) {
+    if (!device || !source || (!fogEnabled && !specularAdd)) return nullptr;
     for (const auto& entry : s.fvfFogVariants)
-        if (entry.source == source && entry.specularAdd == specularAdd)
+        if (entry.source == source && entry.specularAdd == specularAdd &&
+            entry.fogEnabled == fogEnabled)
             return entry.fogged.Get();
     constexpr std::size_t kMaxSourceVariants = 128u;
     if (s.fvfFogVariants.size() >= kMaxSourceVariants) return nullptr;
     const char* originalEntry = game_fvf_original_pixel_entry(s, source);
     if (!originalEntry) return nullptr;
-    const auto wrapper = specularAdd
-        ? native_fvf_specular_wrapper(originalEntry)
-        : native_fvf_fog_wrapper(originalEntry);
+    const auto wrapper = fogEnabled && specularAdd
+        ? native_fvf_specular_fog_wrapper(originalEntry)
+        : specularAdd ? native_fvf_specular_wrapper(originalEntry)
+                      : native_fvf_fog_wrapper(originalEntry);
     if (wrapper.empty()) return nullptr;
     static const std::string sourcePrefix =
         std::string(kShader) + kScaledAlphaShader +
@@ -2026,6 +2029,7 @@ ID3D11PixelShader* game_fvf_final_rgb_variant(
     ComPtr<ID3DBlob> compiled, errors;
     if (FAILED(D3DCompile(shaderSource.data(), shaderSource.size(),
             "live_game_frame_fvf_fog_variant", nullptr, nullptr,
+            fogEnabled && specularAdd ? "PSFvfSpecularFogVariant" :
             specularAdd ? "PSFvfSpecularVariant" : "PSFvfTableFogVariant",
             "ps_4_0", D3DCOMPILE_ENABLE_STRICTNESS,
             0, compiled.GetAddressOf(), errors.GetAddressOf())) ||
@@ -2036,16 +2040,20 @@ ID3D11PixelShader* game_fvf_final_rgb_variant(
             compiled->GetBufferPointer(), compiled->GetBufferSize(),
             nullptr, fogged.GetAddressOf())) || !fogged)
         return nullptr;
-    s.fvfFogVariants.push_back({source, specularAdd, std::move(fogged)});
+    s.fvfFogVariants.push_back({source, fogEnabled, specularAdd, std::move(fogged)});
     return s.fvfFogVariants.back().fogged.Get();
 }
 ID3D11PixelShader* game_fvf_exact_table_fog_variant(
     State& s, ID3D11Device* device, ID3D11PixelShader* source) {
-    return game_fvf_final_rgb_variant(s, device, source, false);
+    return game_fvf_final_rgb_variant(s, device, source, true, false);
 }
 ID3D11PixelShader* game_fvf_specular_final_variant(
     State& s, ID3D11Device* device, ID3D11PixelShader* source) {
-    return game_fvf_final_rgb_variant(s, device, source, true);
+    return game_fvf_final_rgb_variant(s, device, source, false, true);
+}
+ID3D11PixelShader* game_fvf_specular_table_fog_variant(
+    State& s, ID3D11Device* device, ID3D11PixelShader* source) {
+    return game_fvf_final_rgb_variant(s, device, source, true, true);
 }
 
 bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
@@ -2906,10 +2914,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         (fogModesKnown &&
          native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)) ||
         sourceInertExponential;
-    // D3D9 may consume SPECULAR.a as vertex fog. Only add authenticated
-    // vertex SPECULAR.rgb when live fog has no pixel contribution; active
-    // fog/specular ordering is intentionally not promoted by this batch.
-    if (output.nativeSpecularAdd && !sourceFogInactive) return false;
+    // Table fog is authenticated below. Never assume that vertex/range fog
+    // consuming COLOR1 alpha can be composed with a native specular RGB add.
     if (!sourceFogInactive) {
         DWORD sourceRangeFog = 0xffffffffu, sourceFogColor = 0u;
         DWORD startBits = 0u, endBits = 0u, densityBits = 0u;
@@ -2963,6 +2969,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                 sourceTableFog, sourceVertexFog, sourceRangeFog,
                 start, end, density);
             if (!output.rawFogVisualMismatch) return false;
+            // Approximate RAW/no-fog visual output cannot establish the
+            // correct source specular + fog ordering or full-frame parity.
+            if (output.nativeSpecularAdd) return false;
         }
     }
     // D3D9 polygon fill does not change the topology of a POINTLIST or
@@ -8399,7 +8408,12 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // fogging only final native RGB. Unknown source shader/compile/device
     // still fails closed before any native Draw; original D3D9 survives.
     if (output.nativeTableFog.enabled) {
-        if (fixedPixelShader == s.ps.Get())
+        // Source stage0/stage1 AlphaGate -> Gouraud SPECULAR -> exact table
+        // Fog -> native OM. Unknown or failed shader variants fail closed.
+        if (output.nativeSpecularAdd) {
+            fixedPixelShader = game_fvf_specular_table_fog_variant(
+                s, dev, fixedPixelShader);
+        } else if (fixedPixelShader == s.ps.Get())
             fixedPixelShader = s.fvfFogDiffusePs.Get();
         else if (fixedPixelShader == s.sampledPs.Get())
             fixedPixelShader = s.fvfFogModulatePs.Get();
