@@ -267,6 +267,10 @@ static thread_local std::uint64_t StageTimeLiveTicket = 0;
 // the later native D3DX Draw receipt. It must live at translation-unit scope:
 // the D3DX isolation hook is a separate class from UIScaling.
 static thread_local std::uint64_t StageExtensionEntrySerial = 0;
+// Diagnostic source-family cursors are shared with the separate D3DX isolation
+// hook class. They never grant render ownership.
+static thread_local bool StageExtensionLiveNaviSource = false;
+static thread_local std::uintptr_t ResultProgressFullParentCallRva = 0;
 static thread_local OutRunVR::StageExtension::SourceAdmission StageTimeLiveAdmission{};
 static void FlushD3DXBeforeDirectGoalSource() noexcept;
 static void FlushD3DXAtDirectGoalSourceExit() noexcept;
@@ -1836,9 +1840,6 @@ class UIScaling : public Hook
     inline static thread_local
         std::array<SpriteNode*, Game::SpritePriorityCount> ResultProgressRootsBefore{};
     inline static thread_local std::uint64_t ResultProgressEntrySerial = 0;
-    // Diagnostic-only exact parent E8. 0 means an inner 0x2D200 progress
-    // producer not currently bracketed by one of the two full 0x4979E0 calls.
-    inline static thread_local std::uintptr_t ResultProgressFullParentCallRva = 0;
     inline static thread_local OutRunVR::GoalProgress::SourceAdmission
         ResultProgressAdmission{};
     inline static thread_local bool ResultProgressAdmittedAfterDrain = false;
@@ -1921,11 +1922,15 @@ class UIScaling : public Hook
                 1, std::memory_order_relaxed) + 1;
             if (n <= 64 || (n & (n - 1)) == 0)
                 spdlog::info(
-                    "VR TRACE GOAL_PERCENT SOURCE ENTRY: sample={} state={} mode={} "
-                    "vr={} queueActive={} mayBegin={} admittedAfterDrain={} "
-                    "entrySerial={} entryEpoch={} liveEpoch={} "
+                    "VR TRACE GOAL_PERCENT SOURCE ENTRY: sourceFamily={} sample={} "
+                    "state={} mode={} vr={} queueActive={} mayBegin={} "
+                    "admittedAfterDrain={} entrySerial={} entryEpoch={} liveEpoch={} "
                     "snapshotPriorities={} scope={} producer={}",
-                    StageExtensionLiveNaviSource ? "LIVE_NAVI" : "GOAL_RESULT_PANEL_LEGACY",
+                    ResultProgressFullParentCallRva == 0x98924u
+                        ? "GOAL_FULL_CALL_98924"
+                        : (ResultProgressFullParentCallRva == 0x992ACu
+                            ? "GOAL_FULL_CALL_992AC"
+                            : "GOAL_PROGRESS_INNER"),
                     n,
                     Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                     Game::game_mode ? *Game::game_mode : -1,
@@ -2007,10 +2012,15 @@ class UIScaling : public Hook
         if (Settings::VRTelemetry && (hits & (hits - 1u)) == 0)
         {
             spdlog::info(
-                "VR TRACE GOAL_PERCENT SOURCE EXIT: completedCalls={} changedPriorities={} "
-                "state={} mode={} exactScope={} admitted={} entrySerial={} "
+                "VR TRACE GOAL_PERCENT SOURCE EXIT: sourceFamily={} completedCalls={} "
+                "changedPriorities={} state={} mode={} exactScope={} admitted={} entrySerial={} "
                 "entryEpoch={} exitEpoch={} queueActive={} scopeAtExit={} "
                 "producerAtExit={} reason={}",
+                ResultProgressFullParentCallRva == 0x98924u
+                    ? "GOAL_FULL_CALL_98924"
+                    : (ResultProgressFullParentCallRva == 0x992ACu
+                        ? "GOAL_FULL_CALL_992AC"
+                        : "GOAL_PROGRESS_INNER"),
                 hits, changedPriorities,
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1,
@@ -2209,7 +2219,6 @@ class UIScaling : public Hook
         std::size(StageExtensionPrintCalls)]{};
     inline static SafetyHookMid LiveStageExtensionEnterHook{};
     inline static SafetyHookMid LiveStageExtensionLeaveHook{};
-    inline static thread_local bool StageExtensionLiveNaviSource = false;
     inline static thread_local unsigned StageExtensionDepth = 0;
     inline static thread_local OutRunVR::GameSemantic::RenderScope
         StageExtensionSavedScope = OutRunVR::GameSemantic::RenderScope::None;
