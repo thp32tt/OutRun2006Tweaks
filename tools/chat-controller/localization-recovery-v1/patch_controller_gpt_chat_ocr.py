@@ -49,6 +49,11 @@ def patch(source):
         # GPT vision OCR fallback uses the EXISTING ChatGPT browser session only.
         # No API is called and the Create-image tool is deliberately not selected.
         gpt_active = gpt_ocr_active_task()
+        # B/C2 OCR is owned by the B tab; C1 must not hijack that chat.
+        if gpt_active and gpt_active.get("ocr_lane") == "C2":
+            slot.last_result = "C1_OCR_C2_LEASE_ACTIVE"
+            save_registry(reg)
+            return
         if gpt_active and gpt_active.get("status") == "SENT_AWAITING_RESPONSE":
             expected_url = gpt_active.get("chat_url")
             if expected_url and page.url.rstrip("/") != expected_url.rstrip("/"):
