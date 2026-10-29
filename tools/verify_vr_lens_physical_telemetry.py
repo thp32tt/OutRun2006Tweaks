@@ -117,6 +117,35 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
     assert "VR LENS 570008 DEFERRED WINDOW CLOSE:" in projected
     assert "struct LensDeferredPhysicalReceipt" in sem
     assert "CurrentLensDeferredPhysical" in sem
+    # Retail-byte PMT identity is now available only while the exact
+    # 405890 -> 404700 entry wrapper is active. Generic SceneEffect and
+    # source-window receipts remain candidate-only.
+    for phrase in (
+        "VR TRACE LENS PMT ENTRY FULL:",
+        "authority=EXACT_RETAIL_405890_CALL_404700",
+        "Module::exe_ptr(0x5A41)",
+        "Module::exe_ptr(0x5C44)",
+        "TraceLensOpaquePmtEntry",
+        "receipt.objectId = entry[14];",
+        "receipt.pass = entry[8];",
+        "queueLayout=EXE_PROVEN_405160_4052C0",
+    ):
+        assert phrase in hook, "missing exact opaque PMT entry trace: " + phrase
+    for phrase in (
+        "struct LensOpaquePmtEntryReceipt",
+        "CurrentLensOpaquePmtEntry",
+        "ScopedLensOpaquePmtEntry",
+    ):
+        assert phrase in sem, "missing PMT entry TLS receipt: " + phrase
+    assert "EXACT_RETAIL_405890_404700_PMT_ENTRY" in r30
+    assert "pmtObjectId=0x{:06X}" in r30
+    assert "pmtEntrySerial={}" in r30
+    effective_pmt = sem.split("inline RenderScope EffectiveScope()", 1)[1].split(
+        "inline void ArmNextDraw", 1
+    )[0]
+    assert "CurrentLensOpaquePmtEntry" not in effective_pmt, (
+        "PMT diagnostic receipt must not grant EffectiveScope"
+    )
     # The original 4052C0 queue is multi-object: the interval receipt is
     # diagnostics only and must never gain EffectiveScope/render authority.
     assert "DeferredLensProjectedOwnsPhysicalDraw" not in sem
