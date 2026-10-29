@@ -8124,6 +8124,35 @@ namespace OutRunVRStereo
                         static_cast<unsigned>(projectionRestoreHr),
                         sourceCommand.queueNode, sourceCommand.queueEpoch);
             }
+            if (exactProjectedRank && Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> rankEyeReceipts{0};
+                const auto n = rankEyeReceipts.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 16 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR RANK R62 FIXEDFN EYE RECEIPT: hits={} producer={} api={} "
+                        "fvf=0x{:08X} leftProjection=0x{:08X} leftDrawAttempt={} "
+                        "leftDraw=0x{:08X} rightTarget=0x{:08X} rightDepth=0x{:08X} "
+                        "rightViewport=0x{:08X} rightProjection=0x{:08X} "
+                        "rightDrawAttempt={} rightDraw=0x{:08X} restoreRight={} "
+                        "projectionRestore=0x{:08X} node={} epoch={}",
+                        n, OutRunVR::GameSemantic::Name(
+                            sourceCommand.producer),
+                        drawApi, static_cast<unsigned>(fvf),
+                        static_cast<unsigned>(projectionSetHr[0]),
+                        drawAttempted[0] ? 1 : 0,
+                        static_cast<unsigned>(drawHr[0]),
+                        static_cast<unsigned>(passTrace.rightTargetHr),
+                        static_cast<unsigned>(passTrace.rightDepthHr),
+                        static_cast<unsigned>(passTrace.rightViewportHr),
+                        static_cast<unsigned>(projectionSetHr[1]),
+                        drawAttempted[1] ? 1 : 0,
+                        static_cast<unsigned>(drawHr[1]),
+                        passTrace.restoreOk ? 1 : 0,
+                        static_cast<unsigned>(projectionRestoreHr),
+                        sourceCommand.queueNode, sourceCommand.queueEpoch);
+            }
             if (exactResult && Settings::VRTelemetry)
             {
                 // Ordinary HUD/rank traffic must not consume result samples.
