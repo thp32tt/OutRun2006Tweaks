@@ -7724,12 +7724,72 @@ namespace OutRunVRStereo
                 !MatrixFinite(originalProjection))
                 return E_NOTIMPL;
 
+            // D3DXSprite's fixed-function XYZ path can install an
+            // orthographic matrix built for the physical XR backbuffer while
+            // its vertices are still authored in the logical 1920x1080 game
+            // canvas. Normalize that source projection before either the HUD
+            // finite-plane map or the vehicle-anchor clip shift. The physical
+            // render target remains full XR resolution.
+            D3DMATRIX logicalSourceProjection = originalProjection;
+            bool logicalSourceProjectionRemapped = false;
+            if (state.logicalUiSourceCanvas &&
+                BackBufferDesc.Width && BackBufferDesc.Height)
+            {
+                const float expectedX =
+                    2.0f / static_cast<float>(BackBufferDesc.Width);
+                const float expectedY =
+                    2.0f / static_cast<float>(BackBufferDesc.Height);
+                const bool physicalPixelOrtho =
+                    std::fabs(std::fabs(originalProjection._11) - expectedX) <=
+                        std::max(1.0e-7f, expectedX * 0.12f) &&
+                    std::fabs(std::fabs(originalProjection._22) - expectedY) <=
+                        std::max(1.0e-7f, expectedY * 0.12f) &&
+                    std::fabs(originalProjection._34) <= 1.0e-4f &&
+                    std::fabs(originalProjection._44 - 1.0f) <= 1.0e-3f;
+                if (physicalPixelOrtho)
+                {
+                    const float sx =
+                        static_cast<float>(BackBufferDesc.Width) /
+                        static_cast<float>(OutRunVRHud1080p::ReferenceWidth);
+                    const float sy =
+                        static_cast<float>(BackBufferDesc.Height) /
+                        static_cast<float>(OutRunVRHud1080p::ReferenceHeight);
+                    D3DMATRIX logicalRemap = IdentityMatrix();
+                    logicalRemap._11 = sx;
+                    logicalRemap._22 = sy;
+                    logicalRemap._41 = sx - 1.0f;
+                    logicalRemap._42 = 1.0f - sy;
+                    const D3DMATRIX candidate =
+                        MultiplyMatrix(originalProjection, logicalRemap);
+                    if (MatrixFinite(candidate))
+                    {
+                        logicalSourceProjection = candidate;
+                        logicalSourceProjectionRemapped = true;
+                    }
+                }
+            }
+            if (logicalSourceProjectionRemapped && Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> fixedUiCanvasHits{0};
+                const auto n = fixedUiCanvasHits.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 64 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR TRACE UI LOGICAL CANVAS: route=FIXEDFN142 hit={} "
+                        "producer={} source={}x{} physical={}x{} node={} epoch={}",
+                        n, OutRunVR::GameSemantic::Name(sourceCommand.producer),
+                        OutRunVRHud1080p::ReferenceWidth,
+                        OutRunVRHud1080p::ReferenceHeight,
+                        BackBufferDesc.Width, BackBufferDesc.Height,
+                        sourceCommand.queueNode, sourceCommand.queueEpoch);
+            }
+
             D3DMATRIX eyeProjection[2]{};
             if (projected)
             {
                 // Apply the exact same clip-space delta/anchor scale already
                 // proven by mode 6 for kind-1 rank markers. D3DXSprite supplies
-                // XYZ vertices, so post-multiply its fixed-function projection
+                // XYZ vertices, so post-multiply its logical-canvas projection
                 // rather than trying to rewrite a nonexistent XYZRHW/RHW field.
                 const float markerScale = R30HudScaleValue();
                 for (int eye = 0; eye < 2; ++eye)
@@ -7744,7 +7804,7 @@ namespace OutRunVRStereo
                         state.projectedDeltaY[eye] +
                         (1.0f - markerScale) * state.projectedBaseY;
                     eyeProjection[eye] =
-                        MultiplyMatrix(originalProjection, clipShift);
+                        MultiplyMatrix(logicalSourceProjection, clipShift);
                     if (!MatrixFinite(eyeProjection[eye]))
                         return E_NOTIMPL;
                 }
@@ -7793,7 +7853,7 @@ namespace OutRunVRStereo
                     clipMap._43 = planeNdcZ * clipMap._44;
 
                     eyeProjection[eye] =
-                        MultiplyMatrix(originalProjection, clipMap);
+                        MultiplyMatrix(logicalSourceProjection, clipMap);
                     if (!MatrixFinite(eyeProjection[eye]))
                         return E_NOTIMPL;
                 }
