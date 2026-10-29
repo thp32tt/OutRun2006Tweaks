@@ -1,0 +1,531 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1015KST-A0083-B0098-NEW-SHA8",
+  "question_at_kst": "2026-10-29T10:15:00+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "baseline_remote_head": "a31da6da5416f8d0ef67a1eb8a1d1b670dbee5e7",
+  "contract_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_inventory": {
+    "unreviewed_SHA_before": 108,
+    "reviewed_SHA_before": 813,
+    "new_reviewed_SHA": 8,
+    "unreviewed_remaining_at_snapshot": 100,
+    "concurrent_exports_possible": true
+  },
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8,
+    "NEW_SHA_REVIEWED": 8
+  },
+  "records": [
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0083-7CCDF748",
+      "source_ordinal": 377,
+      "english": "Snow Mountain",
+      "approved_korean": "스노 마운틴",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256_verified": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q046_34bab43a7a71606f_k.png",
+      "candidate_sha256": "ef66c98cd2e25bd1decd59397a4fa9c9c0fa8819a70f2c6acfd509a983992c19",
+      "candidate_export_sha256": "ef66c98cd2e25bd1decd59397a4fa9c9c0fa8819a70f2c6acfd509a983992c19",
+      "candidate_sha_match": true,
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1864,
+          843
+        ],
+        "alpha_bbox": [
+          23,
+          72,
+          1806,
+          760
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "native_box": {
+        "ordinal": 377,
+        "target_dimensions": [
+          283,
+          128
+        ],
+        "candidate_fitted_dimensions": [
+          283,
+          128
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "readable_korean_phrase": "PASS",
+        "mapping": "PASS",
+        "no_fake_glyph_observed": true,
+        "no_visible_background_regeneration": true,
+        "lettering_only_alpha": "PASS",
+        "border_clipping": "NO_SUBSTANTIVE_CLIPPING_OBSERVED",
+        "visual_observation": "Original English ROI and candidate compared at generated size and simulated native-size fit; Korean text is legible, mapping exact, no obvious extra background/frame or gross glyph clipping. Native UI-cell/protected-art composited pixel proof absent; no full candidate approval.",
+        "text_length_difference_ignored": true,
+        "rendered_dds": "NOT_CREATED",
+        "C2_C3_INGAME": "NOT_ASSESSED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0084-939EF401",
+      "source_ordinal": 378,
+      "english": "Sunny Beach",
+      "approved_korean": "서니 비치",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256_verified": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q046_b577bb70f171fb40_k.png",
+      "candidate_sha256": "d5a9c89eb4a6641889863dea0c6d69506b3126af7651b2aad5507b6b7f3cc395",
+      "candidate_export_sha256": "d5a9c89eb4a6641889863dea0c6d69506b3126af7651b2aad5507b6b7f3cc395",
+      "candidate_sha_match": true,
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1659,
+          948
+        ],
+        "alpha_bbox": [
+          108,
+          37,
+          1581,
+          948
+        ],
+        "alpha_edge_nz": 32,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 1,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "native_box": {
+        "ordinal": 378,
+        "target_dimensions": [
+          224,
+          128
+        ],
+        "candidate_fitted_dimensions": [
+          224,
+          128
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "readable_korean_phrase": "PASS",
+        "mapping": "PASS",
+        "no_fake_glyph_observed": true,
+        "no_visible_background_regeneration": true,
+        "lettering_only_alpha": "PASS",
+        "border_clipping": "NO_SUBSTANTIVE_CLIPPING_OBSERVED",
+        "visual_observation": "Original English ROI and candidate compared at generated size and simulated native-size fit; Korean text is legible, mapping exact, no obvious extra background/frame or gross glyph clipping. Native UI-cell/protected-art composited pixel proof absent; no full candidate approval.",
+        "text_length_difference_ignored": true,
+        "rendered_dds": "NOT_CREATED",
+        "C2_C3_INGAME": "NOT_ASSESSED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0085-BCF00800",
+      "source_ordinal": 379,
+      "english": "Palm Beach",
+      "approved_korean": "팜 비치",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256_verified": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q046_10ba6632e1f31585_k.png",
+      "candidate_sha256": "841c8794bfdcab6a8b6d65a8d4e8e9a34193374f519f47944689b861a2eb87f0",
+      "candidate_export_sha256": "841c8794bfdcab6a8b6d65a8d4e8e9a34193374f519f47944689b861a2eb87f0",
+      "candidate_sha_match": true,
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1632,
+          964
+        ],
+        "alpha_bbox": [
+          159,
+          53,
+          1490,
+          948
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "native_box": {
+        "ordinal": 379,
+        "target_dimensions": [
+          215,
+          127
+        ],
+        "candidate_fitted_dimensions": [
+          215,
+          127
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "readable_korean_phrase": "PASS",
+        "mapping": "PASS",
+        "no_fake_glyph_observed": true,
+        "no_visible_background_regeneration": true,
+        "lettering_only_alpha": "PASS",
+        "border_clipping": "NO_SUBSTANTIVE_CLIPPING_OBSERVED",
+        "visual_observation": "Original English ROI and candidate compared at generated size and simulated native-size fit; Korean text is legible, mapping exact, no obvious extra background/frame or gross glyph clipping. Native UI-cell/protected-art composited pixel proof absent; no full candidate approval.",
+        "text_length_difference_ignored": true,
+        "rendered_dds": "NOT_CREATED",
+        "C2_C3_INGAME": "NOT_ASSESSED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0086-5987DB6B",
+      "source_ordinal": 380,
+      "english": "Big Forest",
+      "approved_korean": "빅 포레스트",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256_verified": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q046_c28a311899c25247_k.png",
+      "candidate_sha256": "8c9436e74f58cf05161a913666c66f05084ce6190877724b0cf58d9a2fb85a60",
+      "candidate_export_sha256": "8c9436e74f58cf05161a913666c66f05084ce6190877724b0cf58d9a2fb85a60",
+      "candidate_sha_match": true,
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          33,
+          70,
+          2075,
+          714
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "native_box": {
+        "ordinal": 380,
+        "target_dimensions": [
+          318,
+          82
+        ],
+        "candidate_fitted_dimensions": [
+          246,
+          82
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "readable_korean_phrase": "PASS",
+        "mapping": "PASS",
+        "no_fake_glyph_observed": true,
+        "no_visible_background_regeneration": true,
+        "lettering_only_alpha": "PASS",
+        "border_clipping": "NO_SUBSTANTIVE_CLIPPING_OBSERVED",
+        "visual_observation": "Original English ROI and candidate compared at generated size and simulated native-size fit; Korean text is legible, mapping exact, no obvious extra background/frame or gross glyph clipping. Native UI-cell/protected-art composited pixel proof absent; no full candidate approval.",
+        "text_length_difference_ignored": true,
+        "rendered_dds": "NOT_CREATED",
+        "C2_C3_INGAME": "NOT_ASSESSED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0095-C3BAEBF8",
+      "source_ordinal": 432,
+      "english": "Deep Lake",
+      "approved_korean": "딥 레이크",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256_verified": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q046_4cb6257a5abe3410_k.png",
+      "candidate_sha256": "bb5baae80f20611dacada5639f517e24d70d5e597121157fd6bf16621f03ff0c",
+      "candidate_export_sha256": "bb5baae80f20611dacada5639f517e24d70d5e597121157fd6bf16621f03ff0c",
+      "candidate_sha_match": true,
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          0,
+          12,
+          2100,
+          680
+        ],
+        "alpha_edge_nz": 2,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 1,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "native_box": {
+        "ordinal": 432,
+        "target_dimensions": [
+          328,
+          81
+        ],
+        "candidate_fitted_dimensions": [
+          243,
+          81
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "readable_korean_phrase": "PASS",
+        "mapping": "PASS",
+        "no_fake_glyph_observed": true,
+        "no_visible_background_regeneration": true,
+        "lettering_only_alpha": "PASS",
+        "border_clipping": "NO_SUBSTANTIVE_CLIPPING_OBSERVED",
+        "visual_observation": "Original English ROI and candidate compared at generated size and simulated native-size fit; Korean text is legible, mapping exact, no obvious extra background/frame or gross glyph clipping. Native UI-cell/protected-art composited pixel proof absent; no full candidate approval.",
+        "text_length_difference_ignored": true,
+        "rendered_dds": "NOT_CREATED",
+        "C2_C3_INGAME": "NOT_ASSESSED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0096-394DF702",
+      "source_ordinal": 433,
+      "english": "Desert",
+      "approved_korean": "데저트",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256_verified": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q046_4e41d0e870b4e6e3_k.png",
+      "candidate_sha256": "c85cf01492ae4a1304c0557ea811dfe636b2167430270be29ac0e9745f48b002",
+      "candidate_export_sha256": "c85cf01492ae4a1304c0557ea811dfe636b2167430270be29ac0e9745f48b002",
+      "candidate_sha_match": true,
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          130,
+          9,
+          2140,
+          702
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "native_box": {
+        "ordinal": 433,
+        "target_dimensions": [
+          235,
+          73
+        ],
+        "candidate_fitted_dimensions": [
+          219,
+          73
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "readable_korean_phrase": "PASS",
+        "mapping": "PASS",
+        "no_fake_glyph_observed": true,
+        "no_visible_background_regeneration": true,
+        "lettering_only_alpha": "PASS",
+        "border_clipping": "NO_SUBSTANTIVE_CLIPPING_OBSERVED",
+        "visual_observation": "Original English ROI and candidate compared at generated size and simulated native-size fit; Korean text is legible, mapping exact, no obvious extra background/frame or gross glyph clipping. Native UI-cell/protected-art composited pixel proof absent; no full candidate approval.",
+        "text_length_difference_ignored": true,
+        "rendered_dds": "NOT_CREATED",
+        "C2_C3_INGAME": "NOT_ASSESSED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0097-DD59E261",
+      "source_ordinal": 434,
+      "english": "Bay Area",
+      "approved_korean": "베이 에어리어",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256_verified": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q046_c11dd55c0f69ea32_k.png",
+      "candidate_sha256": "323583fe40bde645ecbe573add5a70aa920351b5554768ffb2cdb88195e77060",
+      "candidate_export_sha256": "323583fe40bde645ecbe573add5a70aa920351b5554768ffb2cdb88195e77060",
+      "candidate_sha_match": true,
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          76,
+          21,
+          2124,
+          701
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "native_box": {
+        "ordinal": 434,
+        "target_dimensions": [
+          283,
+          82
+        ],
+        "candidate_fitted_dimensions": [
+          246,
+          82
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "readable_korean_phrase": "PASS",
+        "mapping": "PASS",
+        "no_fake_glyph_observed": true,
+        "no_visible_background_regeneration": true,
+        "lettering_only_alpha": "PASS",
+        "border_clipping": "NO_SUBSTANTIVE_CLIPPING_OBSERVED",
+        "visual_observation": "Original English ROI and candidate compared at generated size and simulated native-size fit; Korean text is legible, mapping exact, no obvious extra background/frame or gross glyph clipping. Native UI-cell/protected-art composited pixel proof absent; no full candidate approval.",
+        "text_length_difference_ignored": true,
+        "rendered_dds": "NOT_CREATED",
+        "C2_C3_INGAME": "NOT_ASSESSED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0098-16619D3E",
+      "source_ordinal": 435,
+      "english": "Coniferous Forest",
+      "approved_korean": "코니퍼러스 포레스트",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256_verified": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q046_bafb49b53be97b5b_k.png",
+      "candidate_sha256": "b0887df34da37aba0ac3e804bd58ae7ff06bd23112e36cd8c155f86b34027d93",
+      "candidate_export_sha256": "b0887df34da37aba0ac3e804bd58ae7ff06bd23112e36cd8c155f86b34027d93",
+      "candidate_sha_match": true,
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1448,
+          1086
+        ],
+        "alpha_bbox": [
+          0,
+          50,
+          1434,
+          1086
+        ],
+        "alpha_edge_nz": 65,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 1,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "native_box": {
+        "ordinal": 435,
+        "target_dimensions": [
+          324,
+          128
+        ],
+        "candidate_fitted_dimensions": [
+          171,
+          128
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "readable_korean_phrase": "PASS",
+        "mapping": "PASS",
+        "no_fake_glyph_observed": true,
+        "no_visible_background_regeneration": true,
+        "lettering_only_alpha": "PASS",
+        "border_clipping": "NO_SUBSTANTIVE_CLIPPING_OBSERVED",
+        "visual_observation": "Original English ROI and candidate compared at generated size and simulated native-size fit; Korean text is legible, mapping exact, no obvious extra background/frame or gross glyph clipping. Native UI-cell/protected-art composited pixel proof absent; no full candidate approval.",
+        "text_length_difference_ignored": true,
+        "rendered_dds": "NOT_CREATED",
+        "C2_C3_INGAME": "NOT_ASSESSED"
+      }
+    }
+  ],
+  "evidence": {
+    "n100_source_audit": "work/C1_QA_20261029_1015_AI2_new_sha8/source_path_audit.json",
+    "n100_preflight": "work/C1_QA_20261029_1015_AI2_new_sha8/preflight.json",
+    "n100_originals": "work/C1_QA_20261029_1015_AI2_new_sha8/originals.jpg",
+    "n100_pairs": "work/C1_QA_20261029_1015_AI2_new_sha8/pairs.jpg",
+    "n100_native_fit": "work/C1_QA_20261029_1015_AI2_new_sha8/native_fit.jpg",
+    "n100_native_metrics": "work/C1_QA_20261029_1015_AI2_new_sha8/native_fit_metrics.json"
+  },
+  "limitations": [
+    "No actual full-HD composed UI-cell/protected-asset pixel validation",
+    "No DDS writes, C2/C3 sign-off, in-game runtime validation, or queue mutation",
+    "HOLD is not a cosmetic underfill failure, and simulated fit is not actual insertion proof"
+  ]
+}
