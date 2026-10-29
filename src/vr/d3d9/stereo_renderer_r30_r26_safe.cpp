@@ -6593,6 +6593,19 @@ namespace OutRunVRStereo
                 if (!restored)
                 {
                     lensTransaction.Emit("LEFT_WVP", E_FAIL);
+                    if (visualRoute.enabled && !visualRoute.lens)
+                        spdlog::info(
+                            "VR TRACE RESULT SCREENSPACE REJECT FULL: serial={} family={} "
+                            "site={} producer={} queued={} node=0x{:X} epoch={} "
+                            "reason=LEFT_WVP_RESTORE_FAILED restore=0",
+                            TopLevelDrawSerial(), visualRoute.family,
+                            site ? site : "unknown",
+                            OutRunVR::GameSemantic::Name(
+                                visualRoute.command.producer),
+                            visualRoute.command.queued ? 1 : 0,
+                            reinterpret_cast<std::uintptr_t>(
+                                visualRoute.command.queueNode),
+                            visualRoute.command.queueEpoch);
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R30/HUD-left-WVP-rollback");
                     R30ArmSafeFallback();
@@ -6638,6 +6651,28 @@ namespace OutRunVRStereo
                 lensTransaction.restoreOk = restored;
                 if (lensTransaction.sample) lensTransaction.post.Capture(device);
                 lensTransaction.Emit("LEFT_DRAW", leftHr);
+                if (visualRoute.enabled && !visualRoute.lens)
+                {
+                    LARGE_INTEGER resultQpc{};
+                    QueryPerformanceCounter(&resultQpc);
+                    spdlog::info(
+                        "VR TRACE RESULT SCREENSPACE LEFT FAILURE FULL: qpc={} "
+                        "serial={} family={} site={} kind={} producer={} queued={} "
+                        "node=0x{:X} epoch={} pose={} leftAttempted={} "
+                        "left=0x{:08X} restore={} resultRoute=SHADER_C64_SCREENSPACE",
+                        resultQpc.QuadPart, TopLevelDrawSerial(),
+                        visualRoute.family, site ? site : "unknown",
+                        static_cast<unsigned>(screenKind),
+                        OutRunVR::GameSemantic::Name(
+                            visualRoute.command.producer),
+                        visualRoute.command.queued ? 1 : 0,
+                        reinterpret_cast<std::uintptr_t>(
+                            visualRoute.command.queueNode),
+                        visualRoute.command.queueEpoch, stereo.poseSequence,
+                        lensTransaction.leftDrawAttempted ? 1 : 0,
+                        static_cast<unsigned>(leftHr),
+                        restored ? 1 : 0);
+                }
                 if (lensPhysicalCandidate)
                 {
                     LARGE_INTEGER physicalQpc{};
