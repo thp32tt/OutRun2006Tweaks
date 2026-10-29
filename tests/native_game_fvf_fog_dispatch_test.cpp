@@ -3,7 +3,12 @@
 #include <string>
 using outrun::vr::dx11::native_fvf_fog_wrapper;
 using outrun::vr::dx11::native_fvf_specular_wrapper;
+using outrun::vr::dx11::native_fvf_vertex_specular_shade_admitted;
 int main() {
+    static_assert(native_fvf_vertex_specular_shade_admitted(2u),
+                  "D3D9 Gouraud FVF SPECULAR must remain source-equivalent");
+    for (const unsigned unsupported : {0u, 1u, 3u, 0xffffffffu})
+        assert(!native_fvf_vertex_specular_shade_admitted(unsupported));
     // Real native stage-0, stage-1 and complex blend shader compositions
     // receive pixel fog AFTER source RGB/alpha/clip, not before blending.
     for (const char* name : {"PS", "PSTextured", "PSStage1Add",

@@ -177,7 +177,9 @@ for token in ("game_fvf_original_pixel_entry(", "s.fvfFogVariants.clear();",
               "return nullptr;", "kStage1FactorShader + kFvfTableFogShader",
               "native_fvf_specular_wrapper(originalEntry)",
               "entry.specularAdd == specularAdd",
-              "game_fvf_specular_final_variant(", "output.nativeSpecularAdd"):
+              "game_fvf_specular_final_variant(", "output.nativeSpecularAdd",
+              "native_fvf_vertex_specular_shade_admitted(shadeMode)",
+              "D3DRS_SHADEMODE"):
     require(token in bridge, "bounded native FVF fog compilation/fallback missing: " + token)
 
 compiler = shutil.which("g++") or shutil.which("clang++")

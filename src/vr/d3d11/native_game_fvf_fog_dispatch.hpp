@@ -23,6 +23,12 @@ namespace outrun::vr::dx11 {
            "    return FvfApplyTableFog(v, " + std::string(original) + "(v));\n"
            "}\n";
 }
+// Source D3DSHADE_GOURAUD = 2. FLAT/PHONG/invalid FVF source shading cannot
+// use the D3D11 COLOR1 perspective interpolator: preserve D3D9 fallback.
+[[nodiscard]] constexpr bool native_fvf_vertex_specular_shade_admitted(
+    unsigned shadeMode) noexcept {
+    return shadeMode == 2u;
+}
 // The D3D9 FVF SPECULAR RGB contribution is applied after the texture cascade
 // and before output alpha blending, without altering source alpha or discard.
 // Caller must have authenticated a live D3DRS_SPECULARENABLE TRUE, FVF COLOR1,

@@ -2826,6 +2826,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             (specularEnabled != FALSE && specularEnabled != TRUE))
             return false;
         output.nativeSpecularAdd = specularEnabled == TRUE;
+        if (output.nativeSpecularAdd) {
+            // D3D9 FLAT shading broadcasts the first vertex's SPECULAR RGB.
+            // Native COLOR1 is Gouraud-interpolated by the D3D11 VS/PS;
+            // do not publish a visually different flat-shaded source Draw.
+            DWORD shadeMode = 0xffffffffu;
+            if (FAILED(game->GetRenderState(D3DRS_SHADEMODE, &shadeMode)) ||
+                !native_fvf_vertex_specular_shade_admitted(shadeMode))
+                return false;
+        }
     }
     ComPtr<IDirect3DVertexShader9> vs;
     ComPtr<IDirect3DPixelShader9> ps;
