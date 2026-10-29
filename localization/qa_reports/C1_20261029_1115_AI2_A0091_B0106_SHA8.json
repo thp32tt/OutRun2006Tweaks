@@ -1,0 +1,580 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1115KST-A0091-B0106-NEW-SHA8",
+  "question_at_kst": "2026-10-29T11:15:00+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "baseline_remote_head": "e5db818393939f1aa2187d7cc1e848287c0503f2",
+  "contract_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "existing_sha_checked_in_N100_reports": 215,
+    "report_files": 31,
+    "all_eight_not_in_reviewed_sha": true,
+    "prior_1045_run_different_ids_and_SHA": true,
+    "selection_by": "export evidence unique SHA / source ordinal A385-388 and B440-443",
+    "global_unreviewed_total": "NOT_CALCULATED_THIS_RUN"
+  },
+  "evidence": {
+    "preflight": "work/C1_QA_20261029_1115_AI2_new_sha8/preflight.json",
+    "candidate_pair_sheets": [
+      "work/C1_QA_20261029_1115_AI2_new_sha8/pairs_A.jpg",
+      "work/C1_QA_20261029_1115_AI2_new_sha8/pairs_B.jpg"
+    ],
+    "native_fit_simulations": [
+      "work/C1_QA_20261029_1115_AI2_new_sha8/native_fit_A.jpg",
+      "work/C1_QA_20261029_1115_AI2_new_sha8/native_fit_B.jpg"
+    ],
+    "expanded_original_context": [
+      "work/C1_QA_20261029_1115_AI2_new_sha8/A0091_wider.png",
+      "work/C1_QA_20261029_1115_AI2_new_sha8/A0092_wider.png"
+    ],
+    "note": "N100 native visual source/candidate QA. Simulated size/layout not proof of true UI cell or protected art containment."
+  },
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8,
+    "NEW_SHA_REVIEWED": 8,
+    "candidate_SHA_match": 8,
+    "source_HD_SHA_match": 8,
+    "PNG_RGBA": 8,
+    "actual_UI_composite": "NOT_TESTED",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0091-F408B9AD",
+      "source_ordinal": 385,
+      "english": "Dribble the beach ball!",
+      "approved_korean": "비치볼을 드리블하세요!",
+      "source_file": "Q053_568D3696_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q053_568D3696_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "58fdb632ae7c704872340710633affbcf3c9625d976a9a32a984ff6838dfe60a",
+      "manifest_source_sha256": "58fdb632ae7c704872340710633affbcf3c9625d976a9a32a984ff6838dfe60a",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        2304,
+        2240,
+        3036,
+        2352
+      ],
+      "target_dimensions": [
+        732,
+        112
+      ],
+      "candidate_file": "Q053_6587c10019e717d5_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q053_6587c10019e717d5_k.png",
+      "candidate_sha256": "f48e25a118724cc457d2d9de1ef315eb3922d7c7d8c8bd7772e1fedd74422458",
+      "export_sha256": "f48e25a118724cc457d2d9de1ef315eb3922d7c7d8c8bd7772e1fedd74422458",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        67,
+        39,
+        2141,
+        626
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        336,
+        112
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_ROI_MIXES_PROTECTED_ICONS_AND_CROPS_ENGLISH_BOTTOM",
+        "observation": "Wider original HD crop shows source bbox includes preceding icon strip and cuts English lettering vertically. Korean candidate itself legible with no extra panel; original ROI needs correction before safe-cell validation.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0092-BBD70F70",
+      "source_ordinal": 386,
+      "english": "Feed the girl!",
+      "approved_korean": "여자친구에게 먹이세요!",
+      "source_file": "Q053_568D3696_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q053_568D3696_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "58fdb632ae7c704872340710633affbcf3c9625d976a9a32a984ff6838dfe60a",
+      "manifest_source_sha256": "58fdb632ae7c704872340710633affbcf3c9625d976a9a32a984ff6838dfe60a",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        1976,
+        2004,
+        2360,
+        2136
+      ],
+      "target_dimensions": [
+        384,
+        132
+      ],
+      "candidate_file": "Q053_a59ce2eb9b2d51f5_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q053_a59ce2eb9b2d51f5_k.png",
+      "candidate_sha256": "301debed82171a81e6ba9e28f13f90248145b70422791f22ea98a0393f5df34a",
+      "export_sha256": "301debed82171a81e6ba9e28f13f90248145b70422791f22ea98a0393f5df34a",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2139,
+        735
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        45,
+        23,
+        2104,
+        713
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        384,
+        132
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_ROI_TRUNCATES_ENGLISH_RIGHT",
+        "observation": "Wider original HD crop visibly reads full 'Feed the girl!', whereas pinned source bbox cuts the right part. Candidate '여자친구에게 먹이세요!' is readable; correction/review needed before final placement.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0093-86D31A89",
+      "source_ordinal": 387,
+      "english": "Slipstream To Score!",
+      "approved_korean": "슬립스트림 점수 도전!",
+      "source_file": "Q059_7CE1CFC5_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q059_7CE1CFC5_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a513dca87d2eaae45117c2f7afcde06bb635b4ca08bf1949e3868c8b68b0d771",
+      "manifest_source_sha256": "a513dca87d2eaae45117c2f7afcde06bb635b4ca08bf1949e3868c8b68b0d771",
+      "source_sha_match": true,
+      "source_dimensions": [
+        2048,
+        512
+      ],
+      "bbox_xyxy": [
+        717,
+        225,
+        1409,
+        320
+      ],
+      "target_dimensions": [
+        692,
+        95
+      ],
+      "candidate_file": "Q059_58da97467534c071_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q059_58da97467534c071_k.png",
+      "candidate_sha256": "98b0ce042a22fdce55278b59e3fea6ba173a346d987404021d12852f7817a71c",
+      "export_sha256": "98b0ce042a22fdce55278b59e3fea6ba173a346d987404021d12852f7817a71c",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        43,
+        7,
+        2160,
+        706
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        285,
+        95
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "Approved Korean phrase visually legible on isolated transparent layer; no definite extra art, severe skew, broken glyph or meaningful edge clipping. Native-fit is a simulation only.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0094-B8524A5E",
+      "source_ordinal": 388,
+      "english": "Keep passing the cars!",
+      "approved_korean": "계속 차량을 추월하세요!",
+      "source_file": "Q061_C4A2937B_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q061_C4A2937B_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e6eacff3ddc62628fe4bc2cfc92868936fa755476c73407f74bbd2f4d48ad7f7",
+      "manifest_source_sha256": "e6eacff3ddc62628fe4bc2cfc92868936fa755476c73407f74bbd2f4d48ad7f7",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        3068,
+        1024,
+        3566,
+        1116
+      ],
+      "target_dimensions": [
+        498,
+        92
+      ],
+      "candidate_file": "Q061_c1c73f966f0ec18f_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q061_c1c73f966f0ec18f_k.png",
+      "candidate_sha256": "fe20a2ab13677697691cc296f45f252a1e1a262b886784035c0d9119c2f4be3f",
+      "export_sha256": "fe20a2ab13677697691cc296f45f252a1e1a262b886784035c0d9119c2f4be3f",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2135,
+        737
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        30,
+        63,
+        2120,
+        681
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        267,
+        92
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "Approved Korean phrase visually legible on isolated transparent layer; no definite extra art, severe skew, broken glyph or meaningful edge clipping. Native-fit is a simulation only.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0103-E76425E0",
+      "source_ordinal": 440,
+      "english": "Slipstream the cars!",
+      "approved_korean": "슬립스트림하세요!",
+      "source_file": "Q054_FA7BBB13_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q054_FA7BBB13_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "70d581cf5d0a70b2dd0036d61a51110ba1e3fc39b9088c3bc5cdd3847ea7943b",
+      "manifest_source_sha256": "70d581cf5d0a70b2dd0036d61a51110ba1e3fc39b9088c3bc5cdd3847ea7943b",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        2048
+      ],
+      "bbox_xyxy": [
+        2288,
+        470,
+        2938,
+        558
+      ],
+      "target_dimensions": [
+        650,
+        88
+      ],
+      "candidate_file": "Q054_85a8ad3334363978_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q054_85a8ad3334363978_k.png",
+      "candidate_sha256": "a42cd6847ca288712a8a9d47d7c27b6420f7f213587f0d84dad5a5a1454780d8",
+      "export_sha256": "a42cd6847ca288712a8a9d47d7c27b6420f7f213587f0d84dad5a5a1454780d8",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2206,
+        713
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        41,
+        29,
+        2146,
+        666
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        272,
+        88
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "Approved Korean phrase visually legible on isolated transparent layer; no definite extra art, severe skew, broken glyph or meaningful edge clipping. Native-fit is a simulation only.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0104-62738DE0",
+      "source_ordinal": 441,
+      "english": "Slipstream the cars!",
+      "approved_korean": "슬립스트림하세요!",
+      "source_file": "Q054_FA7BBB13_PLAYSTATION_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q054_FA7BBB13_PLAYSTATION_READABLE_FLIPY.png",
+      "source_png_sha256": "427cb79065223e1dae93a72447760f24af9b994d54ecbf4f8f8c08e4cb741289",
+      "manifest_source_sha256": "427cb79065223e1dae93a72447760f24af9b994d54ecbf4f8f8c08e4cb741289",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        2048
+      ],
+      "bbox_xyxy": [
+        2288,
+        470,
+        2938,
+        558
+      ],
+      "target_dimensions": [
+        650,
+        88
+      ],
+      "candidate_file": "Q054_2356624ce9bada2b_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q054_2356624ce9bada2b_k.png",
+      "candidate_sha256": "bb630b8702d90a574ad8126407819c1a73121fa9df2e976af756defc37a6a2cb",
+      "export_sha256": "bb630b8702d90a574ad8126407819c1a73121fa9df2e976af756defc37a6a2cb",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        81,
+        7,
+        2078,
+        668
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        264,
+        88
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "Approved Korean phrase visually legible on isolated transparent layer; no definite extra art, severe skew, broken glyph or meaningful edge clipping. Native-fit is a simulation only.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0105-B8CDC124",
+      "source_ordinal": 442,
+      "english": "Slipstream the cars!",
+      "approved_korean": "슬립스트림하세요!",
+      "source_file": "Q054_FA7BBB13_SWITCH_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q054_FA7BBB13_SWITCH_READABLE_FLIPY.png",
+      "source_png_sha256": "1528ccaf25ff29aacb4c9c27de8ed7cae6e1880b403b6f73048e3ed283d38ed5",
+      "manifest_source_sha256": "1528ccaf25ff29aacb4c9c27de8ed7cae6e1880b403b6f73048e3ed283d38ed5",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        2048
+      ],
+      "bbox_xyxy": [
+        2288,
+        470,
+        2938,
+        558
+      ],
+      "target_dimensions": [
+        650,
+        88
+      ],
+      "candidate_file": "Q054_38b70f155d1a8be0_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q054_38b70f155d1a8be0_k.png",
+      "candidate_sha256": "1668edd52748fcd251082a2b6f9383d8948ac0dc26afbd92c8c80eb11e38d7d2",
+      "export_sha256": "1668edd52748fcd251082a2b6f9383d8948ac0dc26afbd92c8c80eb11e38d7d2",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        50,
+        31,
+        2156,
+        700
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        264,
+        88
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "Approved Korean phrase visually legible on isolated transparent layer; no definite extra art, severe skew, broken glyph or meaningful edge clipping. Native-fit is a simulation only.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0106-86F86076",
+      "source_ordinal": 443,
+      "english": "Match the total!",
+      "approved_korean": "합계를 맞히세요!",
+      "source_file": "Q054_FA7BBB13_XBOX_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q054_FA7BBB13_XBOX_READABLE_FLIPY.png",
+      "source_png_sha256": "adf2af25cceb60bb5afd30243023d320191729615dbb9b2dc344ce5ea7182e91",
+      "manifest_source_sha256": "adf2af25cceb60bb5afd30243023d320191729615dbb9b2dc344ce5ea7182e91",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        2048
+      ],
+      "bbox_xyxy": [
+        118,
+        42,
+        638,
+        116
+      ],
+      "target_dimensions": [
+        520,
+        74
+      ],
+      "candidate_file": "Q054_5122f504ed13121f_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q054_5122f504ed13121f_k.png",
+      "candidate_sha256": "bb2b80ed85100c0ecab2496445c291c3b5beaf05e6227f8d21903631d171cbb3",
+      "export_sha256": "bb2b80ed85100c0ecab2496445c291c3b5beaf05e6227f8d21903631d171cbb3",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        0,
+        2162,
+        724
+      ],
+      "edge_nz": 56,
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        222,
+        74
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "Approved Korean phrase visually legible on isolated transparent layer; no definite extra art, severe skew, broken glyph or meaningful edge clipping. Native-fit is a simulation only.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE",
+        "transparent_lettering_layer": "YES",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UV_CELL",
+        "actual_UI_composite": "NOT_TESTED",
+        "dds": "NOT_CREATED",
+        "runtime_validation": "UNTESTED",
+        "C2_C3": "NOT_ASSESSED"
+      }
+    }
+  ],
+  "exclusions": {
+    "ImageGen": false,
+    "consume_A_B_queue": false,
+    "create_DDS": false,
+    "issue_C2_C3_approval": false,
+    "change_VR_FFB_DX11_DXVK": false
+  },
+  "limits": "A-0091 and A-0092 ROI evidence defects keep HOLD; any new production method and DDS/game pass outside C1 scope."
+}
