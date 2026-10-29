@@ -10,18 +10,18 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "inherited_feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:LIVE_SM3:SOURCE_ZERO_DENSITY_EXPONENTIAL_FOG",
-  "classification": "B_EXACT_GATE_FAILURE_REPAIR_AFTER_MATERIAL_SOURCE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_VALIDATE",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_GATE_REPAIRS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "full_dx11_renderer_complete": false,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_change": 0,
+  "score_change": 1,
   "development_time_percentages": "UNMEASURED",
   "source_base_sha": "4b352f2a9a22cb27fec3312ffd70ad8fffd05895",
   "source_implementation_commit_sha": "7746cf5d38a4907e64044595bf47d0db541daac5",
-  "material_result_sha": "7746cf5d38a4907e64044595bf47d0db541daac5",
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+  "validation_bearing_result_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
   "development_strategy": {
     "work_class": "blocker_resolution",
     "milestone_id": "full_resolution_native_game_frame",
@@ -94,9 +94,9 @@
     ]
   },
   "acceptance_results": {
-    "source_inert_exponential": "PENDING_EXACT_SHA",
-    "active_fog_and_original_fallback": "PENDING_EXACT_SHA",
-    "exact_sha_five_gates": "PENDING_EXACT_SHA"
+    "source_inert_exponential": "PASS_EXACT_SHA",
+    "active_fog_and_original_fallback": "PASS_EXACT_SHA",
+    "exact_sha_five_gates": "PASS_EXACT_SHA"
   },
   "real_game_draw_blocker": "Latest code has no source-matched real game session showing native_draws>0 and publishedBackbufferFrames>0",
   "native_game_draw_count": "UNTESTED",
@@ -106,25 +106,82 @@
     "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD",
     "C1_REVIEW": "PASS_SOURCE_NOOP_EXP_EXP2_ZERO_DENSITY",
     "C2_IMPLEMENT": "PASS_MATERIAL_COMMIT_7746cf5d38a4907e64044595bf47d0db541daac5",
-    "C3_VALIDATE": "SECOND_CAUSAL_FAST_ASSERTION_REPAIR_PENDING_PUSH; GATES_REVALIDATE_EXACT_SHA",
-    "C4_COMMIT": "PASS_SOURCE_COMMIT; REPAIR_RESULT_PENDING",
-    "C5_PACKAGE": "NOT_CREATED",
-    "C6_STATE": "PENDING_FIVE_GATE_PASS"
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_EXACT_SHA_50221dcc1e238e383897a65992d34ac663d7152d",
+    "C4_COMMIT": "PASS_SOURCE_7746cf5d_AND_CAUSAL_TEST_REPAIR_50221dcc",
+    "C5_PACKAGE": "NOT_CREATED_NO_MATCHING_REAL_GAME_OR_HMD_PROOF",
+    "C6_STATE": "PASS_SEPARATE_BOOKKEEPING_NO_ADDITIONAL_SCORE"
   },
   "evidence": {
     "original_material_commit": "7746cf5d38a4907e64044595bf47d0db541daac5",
     "failed_fast_run": 40813007430,
     "failed_backend_run": 40813007429,
     "failed_stage": "inherited 01149 run record blocking_evidence missing",
-    "runtime_evidence": "UNTESTED: no matching binary native menu/car/race or Quest 3/VDXR",
+    "runtime_evidence": "UNTESTED: no matching real game native_draws/publishedBackbufferFrames/gpu_desktop_frames or Quest3/VDXR",
     "failed_fast_regression_run": 40813263121,
     "failed_fast_regression_cause": "Existing source-static predicate required old const bool parametersKnown = !activeEquation ||; new real density-first state preserved fail closed but predicate rejected updated conditional. Strengthened static positive/destructive checks; original C++ positive/negative tests unchanged.",
     "failed_fast_regression_2": 40814628413,
-    "failed_fast_regression_2_cause": "Static test required adjacent && !inertExponential; byte sequence, but actual safe C++ source has newline whitespace between && and !inertExponential. Preserve independent exact source mode/density ordering, active fog and destructive tests; require !inertExponential clause regardless of formatting."
+    "failed_fast_regression_2_cause": "Static test required adjacent && !inertExponential; byte sequence, but actual safe C++ source has newline whitespace between && and !inertExponential. Preserve independent exact source mode/density ordering, active fog and destructive tests; require !inertExponential clause regardless of formatting.",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40815567628,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567628"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40815567595,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567595"
+      },
+      {
+        "name": "Build",
+        "run_id": 40815567603,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567603"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40815567537,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567537"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40815567613,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567613"
+      }
+    ],
+    "final_validation_bearing_result": "50221dcc1e238e383897a65992d34ac663d7152d",
+    "source_implementation": "7746cf5d38a4907e64044595bf47d0db541daac5",
+    "causal_gate_repair_shas": [
+      "163818ffd2ee04fa2f7b6b9dacc2a00d755d2997",
+      "d0a547dcb7a72afaeed57c08522b6ba6cbec860f",
+      "50221dcc1e238e383897a65992d34ac663d7152d"
+    ],
+    "scoreboard_commit": "913830a17389e1ad7a83dc3cf9e5235973c1bd8c",
+    "scoreboard_ai2_prior": 2133,
+    "scoreboard_ai2_delta": 1,
+    "scoreboard_ai2_cumulative": 2134,
+    "c6_only": true,
+    "c6_is_material_result": false
   },
   "c6": {
-    "checkpoint": "C3_VALIDATE",
-    "reason": "CAUSAL_REQUIRED_GATE_POLICY_FAILURE_REPAIR_IN_PROGRESS",
-    "score_change": 0
+    "reason": "FIVE_EXACT_SHA_GATES_PASS_AFTER_SOURCE_AND_CAUSAL_POLICY_REGRESSION_REPAIRS",
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "original_source_implementation_sha": "7746cf5d38a4907e64044595bf47d0db541daac5",
+    "unchanged_validation_bearing_result_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+    "bookkeeping_only": true,
+    "score_change": 0,
+    "next_action": "Next independent DX11 actual game source integration; real native Draw/published frame exact binary needed to establish runtime proof"
   }
 }
