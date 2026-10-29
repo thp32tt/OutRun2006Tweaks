@@ -1,0 +1,172 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T0515KST-NEW-SHA2",
+  "observed_at_kst": "2026-10-30T05:15:00+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "N100 direct source PNG, manifest source hash, A/B actual exported candidate SHA256 compared. Distinct-SHA exclusion against earlier 208 QA reports / 921 SHA. Direct visual review of original English full-HD ROI crop vs native aspect-preserved Korean transparent layer and 50% preview on checkerboard; RGBA alpha-border and glyph inspection.",
+  "counts": {
+    "prior_review_json_artifacts": 208,
+    "prior_reviewed_sha": 921,
+    "exported_files": 918,
+    "new_unreviewed_export_sha": 2,
+    "missing_or_incomplete": 0,
+    "A_completed_files": 435,
+    "A_completed_batches": 141,
+    "B_completed_files": 482,
+    "B_completed_batches": 145
+  },
+  "results": {
+    "newly_reviewed": 2,
+    "pass": 2,
+    "fail": 0,
+    "hold": 0
+  },
+  "records": [
+    {
+      "role": "A",
+      "id": "Q043_8845a649913b5ecf",
+      "english": "PERFECT!",
+      "korean": "완벽!",
+      "candidate_file": "Q043_8845a649913b5ecf_k.png",
+      "candidate_sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+      "source_sha256": "67a3c20552a843ac19ba45dcf2d79a3e037040d6788cc443e52ae8457672bb22",
+      "manifest_source_sha256": "67a3c20552a843ac19ba45dcf2d79a3e037040d6788cc443e52ae8457672bb22",
+      "source_sha_match": true,
+      "bbox_xyxy": [
+        113,
+        352,
+        1302,
+        561
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        1965,
+        800
+      ],
+      "candidate_mode": "RGBA",
+      "native_fit_dimensions": [
+        513,
+        209
+      ],
+      "half_dimensions": [
+        256,
+        104
+      ],
+      "alpha_bbox_ge32": [
+        180,
+        123,
+        1859,
+        694
+      ],
+      "alpha_border_ge32_pixels": 0,
+      "alpha_border_max": 0,
+      "alpha_ge240_fraction": 0.4246940203562341,
+      "alpha_nonzero_fraction": 0.4721558524173028,
+      "preview": "C1_QA_20261030_0515_AI2_new_sha2/pairs_A.jpg",
+      "task_id": "OUTRUN-ROI-A-0141-10E79723",
+      "judgement": "PASS",
+      "reason_code": "C1_TRANSLATION_READABLE_RGBA_LAYER",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_NATIVE_FIT_WITHIN_TARGET_ROI",
+      "visual_observation": "Green beveled '완벽!' matches approved PERFECT! translation, whole Hangul and exclamation visible at native 513x209 and 50% 256x104, no false glyph or extra graphic plate, original source style green slope retained.",
+      "actual_UI_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "id": "Q046_d10debc727463563",
+      "english": "Imperial Avenue",
+      "korean": "임페리얼 애비뉴",
+      "candidate_file": "Q046_d10debc727463563_k.png",
+      "candidate_sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+      "source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "bbox_xyxy": [
+        1652,
+        1027,
+        1939,
+        1158
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        1856,
+        847
+      ],
+      "candidate_mode": "RGBA",
+      "native_fit_dimensions": [
+        287,
+        131
+      ],
+      "half_dimensions": [
+        143,
+        65
+      ],
+      "alpha_bbox_ge32": [
+        166,
+        43,
+        1742,
+        825
+      ],
+      "alpha_border_ge32_pixels": 0,
+      "alpha_border_max": 1,
+      "alpha_ge240_fraction": 0.6539714204291007,
+      "alpha_nonzero_fraction": 0.6757203415706551,
+      "preview": "C1_QA_20261030_0515_AI2_new_sha2/pairs_B.jpg",
+      "task_id": "OUTRUN-ROI-B-0145-84201DC6",
+      "judgement": "PASS",
+      "reason_code": "C1_TRANSLATION_READABLE_RGBA_LAYER",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_NATIVE_FIT_WITHIN_TARGET_ROI",
+      "visual_observation": "Two-line '임페리얼 애비뉴' matches original Imperial Avenue and approved mapping; Hangul remains legible at native 287x131 and 50% 143x65, dark-blue/white outline aligned with original treatment; white bridges between lines are stylistically comparable to source, no materially separate background plate or stray English.",
+      "actual_UI_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime": "UNTESTED"
+    }
+  ],
+  "evidence": {
+    "n100": "work/C1_QA_20261030_0515_AI2_new_sha2",
+    "preflight": "preflight.json",
+    "source_originals": "Verified full source PNG paths/SHA in manifest",
+    "original_to_native_previews": [
+      "pairs_A.jpg",
+      "pairs_B.jpg"
+    ],
+    "export_manifests": [
+      "OUTRUN-ROI-A-0141-10E79723.json",
+      "OUTRUN-ROI-B-0145-84201DC6.json"
+    ]
+  },
+  "limitations": [
+    "C1 PASS is generated Korean lettering PNG layer only, not installed full original UI or DDS",
+    "Native fit is illustrative centered containment inside specified ROI, not an actual in-game UV compositing result",
+    "C2/C3, actual DDS mip, protected art collision within in-game UI, and runtime remain untested"
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
