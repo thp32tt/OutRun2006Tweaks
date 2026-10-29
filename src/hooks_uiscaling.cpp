@@ -3355,46 +3355,14 @@ class UIScaling : public Hook
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
 	}
 
-    static void TraceHud1080FinalProducerCoord(
-        const char* family, int xstnum, int x, int y, uint32_t flags,
-        float priority, uint32_t color) noexcept
-    {
-        if (!Settings::VREnabled || !Settings::VRHud1080pReference ||
-            !Settings::VRTelemetry)
-            return;
-        static std::atomic<std::uint64_t> samples{0};
-        const auto n = samples.fetch_add(1, std::memory_order_relaxed) + 1;
-        if (n <= 64 || (n & (n - 1)) == 0)
-            spdlog::info(
-                "VR TRACE HUD1080 FINAL COORD: sample={} family={} xstnum={} "
-                "x={} y={} priority={:.9g} flags=0x{:X} color=0x{:08X} "
-                "screenScale={:.9g},{:.9g} screenRes={:.9g},{:.9g} "
-                "scope={} producer={} queueActive={} queueEpoch={}",
-                n, family ? family : "unknown", xstnum, x, y, priority,
-                static_cast<unsigned>(flags), static_cast<unsigned>(color),
-                Game::screen_scale ? Game::screen_scale->x : 0.0f,
-                Game::screen_scale ? Game::screen_scale->y : 0.0f,
-                Game::screen_resolution ? Game::screen_resolution->x : 0.0f,
-                Game::screen_resolution ? Game::screen_resolution->y : 0.0f,
-                OutRunVR::GameSemantic::Name(
-                    OutRunVR::GameSemantic::EffectiveScope()),
-                OutRunVR::GameSemantic::Name(
-                    OutRunVR::GameSemantic::CurrentRenderProducerToken()),
-                OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
-                OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
-    }
-
 	static int __cdecl ExactScreenHudRight_putClipSprite(
 		int xstnum, int x, int y, uint32_t flags,
 		float priority, uint32_t color)
 	{
 		AddSpriteSpacing(&x, false);
-        TraceHud1080FinalProducerCoord(
-            "EXACT_RIGHT_CLIP", xstnum, x, y, flags, priority, color);
 		return ExactScreenHud_putClipSprite(
 			xstnum, x, y, flags, priority, color);
 	}
-
 	// R64 exact 6th/6 kind-0 source. Unlike generic C2C/time/right
 	// clips, these eight canonical DispRank E8 edges are the only source
 	// eligible for the HMD-proven post-ID3DXSprite::Draw Flush isolate.
@@ -3419,8 +3387,6 @@ class UIScaling : public Hook
 		// and exact all-sibling queued HUD tagging as the retired generic
 		// right wrapper; only its source identity differs.
 		AddSpriteSpacing(&x, false);
-        TraceHud1080FinalProducerCoord(
-            "DISP_RANK_RIGHT_CLIP", xstnum, x, y, flags, priority, color);
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
 		std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int p = 0; p < Game::SpritePriorityCount; ++p)
@@ -3443,8 +3409,6 @@ class UIScaling : public Hook
 		float priority, uint32_t color)
 	{
 		AddSpriteSpacing(&x, true);
-        TraceHud1080FinalProducerCoord(
-            "EXACT_LEFT_CLIP", xstnum, x, y, flags, priority, color);
 		return ExactScreenHud_putClipSprite(
 			xstnum, x, y, flags, priority, color);
 	}
