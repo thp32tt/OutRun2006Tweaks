@@ -174,7 +174,10 @@ for token in ("game_fvf_original_pixel_entry(", "s.fvfFogVariants.clear();",
               "if (!originalEntry) return nullptr;",
               "if (s.fvfFogVariants.size() >= kMaxSourceVariants)",
               "if (FAILED(device->CreatePixelShader(",
-              "return nullptr;", "kStage1FactorShader + kFvfTableFogShader"):
+              "return nullptr;", "kStage1FactorShader + kFvfTableFogShader",
+              "native_fvf_specular_wrapper(originalEntry)",
+              "entry.specularAdd == specularAdd",
+              "game_fvf_specular_final_variant(", "output.nativeSpecularAdd"):
     require(token in bridge, "bounded native FVF fog compilation/fallback missing: " + token)
 
 compiler = shutil.which("g++") or shutil.which("clang++")

@@ -23,4 +23,17 @@ namespace outrun::vr::dx11 {
            "    return FvfApplyTableFog(v, " + std::string(original) + "(v));\n"
            "}\n";
 }
+// The D3D9 FVF SPECULAR RGB contribution is applied after the texture cascade
+// and before output alpha blending, without altering source alpha or discard.
+// Caller must have authenticated a live D3DRS_SPECULARENABLE TRUE, FVF COLOR1,
+// and absence of active fog. Never generate shader code from an unknown name.
+[[nodiscard]] inline std::string native_fvf_specular_wrapper(
+    std::string_view original) {
+    if (native_fvf_fog_wrapper(original).empty()) return {};
+    return "float4 PSFvfSpecularVariant(VOut v) : SV_Target {\n"
+           "    float4 color = " + std::string(original) + "(v);\n"
+           "    color.rgb = saturate(color.rgb + v.specular.rgb);\n"
+           "    return color;\n"
+           "}\n";
+}
 } // namespace outrun::vr::dx11
