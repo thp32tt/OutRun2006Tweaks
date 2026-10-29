@@ -17,6 +17,11 @@ EXPECTED_SHA = "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3
 WINDOWS = (
     ("goal-result-stage", 0x00097000, 0x00098000),
     ("goal-result-time-panel", 0x00098000, 0x00099000),
+    # Second exact FUN_004979E0 full-result graph parent lives beyond the
+    # earlier time-panel window. Keep both E8 parents in the same artifact so
+    # runtime caller receipts can be interpreted without guessing which visual
+    # phase produced the graph.
+    ("goal-result-final-panel", 0x00099000, 0x00099580),
     # Live race time-extension path: 450CC0 sets manager flag3/time, the
     # Navi control/display pair turns that into the 8446E8 HUD lifetime,
     # and 4B9320/4B9250 emit the split/time sprites and glyphs.
@@ -42,7 +47,7 @@ WINDOWS = (
 )
 ANCHORS = (
     0x000975EE, 0x00097727, 0x000977FB, 0x00097BB7,
-    0x00097BE4, 0x00097DA7, 0x00097DEC,
+    0x00097BE4, 0x00097DA7, 0x00097DEC, 0x00098924, 0x000992AC,
     0x000BEA5A, 0x000BEA5F, 0x0000CABE,
     0x0000CF4E, 0x0002C808, 0x0002C9DB,
 )
