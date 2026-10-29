@@ -151,7 +151,7 @@ require(bridge.index("ctx->PSSetConstantBuffers(2u, 1u, &fvfFogBuffer)") <
 # even when standalone Linux fog tests passed. Protect the complete expression.
 from re import sub as _fog_re_sub
 fixed_ps_start = bridge.index("ID3D11PixelShader* fixedPixelShader = (")
-fixed_ps_end = bridge.index("// Source fog is exact only for these three", fixed_ps_start)
+fixed_ps_end = bridge.index("// Three established common FVF shaders", fixed_ps_start)
 fixed_ps_expression = bridge[fixed_ps_start:fixed_ps_end]
 require(fixed_ps_expression.count("(") == fixed_ps_expression.count(")") and
         "capture.stage1Enabled ?" in fixed_ps_expression and
@@ -161,14 +161,22 @@ mutated_ps = fixed_ps_expression.replace("s.sampledPs.Get()))", "s.sampledPs.Get
 require(mutated_ps != fixed_ps_expression and
         mutated_ps.count("(") != mutated_ps.count(")"),
         "destructive fixed-game PS source syntax mutation escaped C2059 guard")
-# Unsupported stage-1/complex combiner must NEVER return a false exact fog.
+# Every *already supported* stage-0/1 shader must preserve its source
+# alpha/discard and apply exact native Fog on final RGB. No unknown shader
+# pointers or JIT failures may become an admitted native GPU Draw.
 selected_fog = bridge.partition("if (output.nativeTableFog.enabled) {")[2].partition(
     "ctx->PSSetShader(fixedPixelShader, nullptr, 0u);")[0]
-require("else return false;" in selected_fog and
-        "s.fvfFogDiffusePs.Get()" in selected_fog and
-        "s.fvfFogModulatePs.Get()" in selected_fog and
-        "s.fvfFogTextureOnlyPs.Get()" in selected_fog,
-        "exact FVF fog incorrectly promotes unsupported combiner")
+for token in ("s.fvfFogDiffusePs.Get()", "s.fvfFogModulatePs.Get()",
+              "s.fvfFogTextureOnlyPs.Get()",
+              "game_fvf_exact_table_fog_variant(", "if (!fixedPixelShader) return false;"):
+    require(token in selected_fog, "FVF exact source pixel dispatch missing: " + token)
+for token in ("game_fvf_original_pixel_entry(", "s.fvfFogVariants.clear();",
+              "if (!originalEntry) return nullptr;",
+              "if (s.fvfFogVariants.size() >= kMaxSourceVariants)",
+              "if (FAILED(device->CreatePixelShader(",
+              "return nullptr;", "kStage1FactorShader + kFvfTableFogShader"):
+    require(token in bridge, "bounded native FVF fog compilation/fallback missing: " + token)
+
 compiler = shutil.which("g++") or shutil.which("clang++")
 if compiler:
     with tempfile.TemporaryDirectory() as folder:
@@ -177,4 +185,13 @@ if compiler:
                         str(root / "tools/dx11_live_sm3_table_zfog_01005.cpp"),
                         "-o", str(result)], check=True)
         subprocess.run([str(result)], check=True)
-print("DX11 SM3 real GPU Z-fog admission/binding/fallback PASS (runtime UNTESTED)")
+# Portable native C++ unit regression for dynamic HLSL entry composition.
+# This is not a real D3D11 GPU or HMD observation.
+if compiler:
+    with tempfile.TemporaryDirectory() as folder:
+        result = Path(folder) / "fvf_fog"
+        subprocess.run([compiler, "-std=c++17", "-I", str(root),
+                        str(root / "tests/native_game_fvf_fog_dispatch_test.cpp"),
+                        "-o", str(result)], check=True)
+        subprocess.run([str(result)], check=True)
+print("DX11 SM3 + complete FVF table-fog source dispatch PASS (runtime UNTESTED)")

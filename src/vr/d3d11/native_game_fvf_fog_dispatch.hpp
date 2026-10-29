@@ -1,0 +1,26 @@
+#pragma once
+// Native FVF shader source composition. Only game-owned, compiled and
+// registered pixel shader entrypoints may request this wrapper. The wrapper
+// preserves the original alpha-test/discard and alpha channel; authentic
+// table fog operates solely on final RGB before D3D11 OM blending.
+#include <string>
+#include <string_view>
+
+namespace outrun::vr::dx11 {
+[[nodiscard]] inline std::string native_fvf_fog_wrapper(
+    std::string_view original) {
+    if (original.size() < 2u || original.size() > 96u ||
+        original.substr(0u, 2u) != "PS" ||
+        original.substr(0u, 13u) == "PSFvfTableFog")
+        return {};
+    for (const char c : original) {
+        if (!((c >= 'A' && c <= 'Z') ||
+              (c >= 'a' && c <= 'z') ||
+              (c >= '0' && c <= '9') || c == '_'))
+            return {};
+    }
+    return "float4 PSFvfTableFogVariant(VOut v) : SV_Target {\n"
+           "    return FvfApplyTableFog(v, " + std::string(original) + "(v));\n"
+           "}\n";
+}
+} // namespace outrun::vr::dx11

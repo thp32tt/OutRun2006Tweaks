@@ -6,6 +6,7 @@
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_table_fog.hpp"
 #include "native_game_raw_fvf_fog_visual.hpp"
+#include "native_game_fvf_fog_dispatch.hpp"
 #include "live_game_sm3_user_clip.hpp"
 #include "live_game_fixed_clip.hpp"
 #include "live_game_sm3_depth_output.hpp"
@@ -1404,6 +1405,13 @@ struct State {
     ComPtr<ID3D11PixelShader> sampledPs;
     ComPtr<ID3D11PixelShader> fvfFogDiffusePs, fvfFogModulatePs, fvfFogTextureOnlyPs;
     ComPtr<ID3D11Buffer> fvfFogConstants;
+    // Cached per native-device lifetime. Only authenticated game-owned FVF
+    // pixel shader pointers can select one matching RGB-fog variant.
+    struct FvfFogVariant {
+        ID3D11PixelShader* source{}; // non-owning, same State/native device
+        ComPtr<ID3D11PixelShader> fogged;
+    };
+    std::vector<FvfFogVariant> fvfFogVariants;
     ComPtr<ID3D11PixelShader> stage1DiffusePs;
     ComPtr<ID3D11PixelShader> stage1ModulatePs;
     ComPtr<ID3D11PixelShader> stage1TextureOnlyPs;
@@ -1885,6 +1893,146 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
         0, blob.GetAddressOf(), errors.GetAddressOf())) && blob;
 }
 
+// This mapping is derived from the same actual CreatePixelShader owners
+// in ensure_pipeline(), not guessed from FVF texture-stage state. An unknown
+// or cross-device shader pointer never enters a new native GPU Draw.
+const char* game_fvf_original_pixel_entry(
+    const State& s, ID3D11PixelShader* source) noexcept {
+    if (!source) return nullptr;
+    if (source == s.ps.Get()) return "PS";
+    if (source == s.stage1DiffusePs.Get()) return "PSStage1Diffuse";
+    if (source == s.stage1ModulatePs.Get()) return "PSStage1Modulate";
+    if (source == s.stage1TextureOnlyPs.Get()) return "PSStage1TextureOnly";
+    if (source == s.stage1AddPs.Get()) return "PSStage1Add";
+    if (source == s.sampledPs.Get()) return "PSTextured";
+    if (source == s.textureOnlyPs.Get()) return "PSTextureOnly";
+    if (source == s.selectTextureDiffuseAlphaPs.Get()) return "PSTextureSelectTextureDiffuseAlpha";
+    if (source == s.selectTextureModulateAlphaPs.Get()) return "PSTextureSelectTextureModulateAlpha";
+    if (source == s.selectTextureModulate2XAlphaPs.Get()) return "PSTextureSelectTextureModulate2XAlpha";
+    if (source == s.selectTextureModulate4XAlphaPs.Get()) return "PSTextureSelectTextureModulate4XAlpha";
+    if (source == s.selectTextureAddAlphaPs.Get()) return "PSTextureSelectTextureAddAlpha";
+    if (source == s.selectTextureSubtractAlphaPs.Get()) return "PSTextureSelectTextureSubtractAlpha";
+    if (source == s.selectDiffuseTextureAlphaPs.Get()) return "PSTextureSelectDiffuseTextureAlpha";
+    if (source == s.selectDiffuseModulateAlphaPs.Get()) return "PSTextureSelectDiffuseModulateAlpha";
+    if (source == s.selectDiffuseAddAlphaPs.Get()) return "PSTextureSelectDiffuseAddAlpha";
+    if (source == s.selectDiffuseSubtractAlphaPs.Get()) return "PSTextureSelectDiffuseSubtractAlpha";
+    if (source == s.selectDiffuseModulate2XAlphaPs.Get()) return "PSTextureSelectDiffuseModulate2XAlpha";
+    if (source == s.selectDiffuseModulate4XAlphaPs.Get()) return "PSTextureSelectDiffuseModulate4XAlpha";
+    if (source == s.selectTextureAddSmoothAlphaPs.Get()) return "PSTextureSelectTextureAddSmoothAlpha";
+    if (source == s.selectDiffuseAddSmoothAlphaPs.Get()) return "PSTextureSelectDiffuseAddSmoothAlpha";
+    if (source == s.selectTextureFactorAlphaPs.Get()) return "PSTextureSelectTextureFactorAlpha";
+    if (source == s.selectTextureTfactorAlphaPs.Get()) return "PSTextureSelectTextureTfactorAlpha";
+    if (source == s.selectDiffuseFactorAlphaPs.Get()) return "PSTextureSelectDiffuseFactorAlpha";
+    if (source == s.selectDiffuseTfactorAlphaPs.Get()) return "PSTextureSelectDiffuseTfactorAlpha";
+    if (source == s.selectTextureBlendTextureAlphaPs.Get()) return "PSTextureSelectTextureBlendTextureAlpha";
+    if (source == s.selectDiffuseBlendTextureAlphaPs.Get()) return "PSTextureSelectDiffuseBlendTextureAlpha";
+    if (source == s.selectTextureBlendDiffuseAlphaPs.Get()) return "PSTextureSelectTextureBlendDiffuseAlpha";
+    if (source == s.selectDiffuseBlendDiffuseAlphaPs.Get()) return "PSTextureSelectDiffuseBlendDiffuseAlpha";
+    if (source == s.additivePs.Get()) return "PSTextureAdd";
+    if (source == s.subtractPs.Get()) return "PSTextureSubtract";
+    if (source == s.subtractTextureAlphaPs.Get()) return "PSTextureSubtractTextureAlpha";
+    if (source == s.subtractDiffuseAlphaPs.Get()) return "PSTextureSubtractDiffuseAlpha";
+    if (source == s.subtractModulateAlphaPs.Get()) return "PSTextureSubtractModulateAlpha";
+    if (source == s.addSmoothPs.Get()) return "PSTextureAddSmooth";
+    if (source == s.addSmoothTextureAlphaPs.Get()) return "PSTextureAddSmoothTextureAlpha";
+    if (source == s.addSmoothDiffuseAlphaPs.Get()) return "PSTextureAddSmoothDiffuseAlpha";
+    if (source == s.modulate2xPs.Get()) return "PSTextureModulate2X";
+    if (source == s.modulate4xPs.Get()) return "PSTextureModulate4X";
+    if (source == s.modulate2xTextureAlphaPs.Get()) return "PSTextureModulate2XTextureAlpha";
+    if (source == s.modulate2xDiffuseAlphaPs.Get()) return "PSTextureModulate2XDiffuseAlpha";
+    if (source == s.modulate4xTextureAlphaPs.Get()) return "PSTextureModulate4XTextureAlpha";
+    if (source == s.modulate4xDiffuseAlphaPs.Get()) return "PSTextureModulate4XDiffuseAlpha";
+    if (source == s.mixedTextureAlphaPs.Get()) return "PSTextureModulateTextureAlpha";
+    if (source == s.mixedDiffuseAlphaPs.Get()) return "PSTextureModulateDiffuseAlpha";
+    if (source == s.mixedAddTextureAlphaPs.Get()) return "PSTextureAddTextureAlpha";
+    if (source == s.mixedAddDiffuseAlphaPs.Get()) return "PSTextureAddDiffuseAlpha";
+    if (source == s.blendTextureAlphaPs.Get()) return "PSTextureBlendTextureAlpha";
+    if (source == s.blendTextureAlphaPmPs.Get()) return "PSTextureBlendTextureAlphaPM";
+    if (source == s.blendTextureAlphaPmTextureAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMSelectTextureAlpha";
+    if (source == s.blendTextureAlphaPmInverseTextureAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMSelectInverseTextureAlpha";
+    if (source == s.blendTextureAlphaPmInverseDiffuseAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMSelectInverseDiffuseAlpha";
+    if (source == s.blendTextureAlphaPmDiffuseAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMSelectDiffuseAlpha";
+    if (source == s.blendTextureAlphaPmFactorAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMSelectFactorAlpha";
+    if (source == s.blendTextureAlphaPmModulateFactorAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMModulateFactorAlpha";
+    if (source == s.blendTextureAlphaPmAddFactorAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMAddFactorAlpha";
+    if (source == s.blendTextureAlphaPmAddSmoothFactorAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMAddSmoothFactorAlpha";
+    if (source == s.blendTextureAlphaPmSignedFactorAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMSignedFactorAlpha";
+    if (source == s.blendTextureAlphaPmSigned2XFactorAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMSigned2XFactorAlpha";
+    if (source == s.blendTextureAlphaPmModulateAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMModulateAlpha";
+    if (source == s.blendTextureAlphaPmAddAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMAddAlpha";
+    if (source == s.blendTextureAlphaPmSubtractAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMSubtractAlpha";
+    if (source == s.blendTextureAlphaPmModulate2XAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMModulate2XAlpha";
+    if (source == s.blendTextureAlphaPmModulate4XAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMModulate4XAlpha";
+    if (source == s.blendTextureAlphaPmAddSignedAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMAddSignedAlpha";
+    if (source == s.blendTextureAlphaPmAddSigned2XAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMAddSigned2XAlpha";
+    if (source == s.blendTextureAlphaPmBlendTextureAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMBlendTextureAlpha";
+    if (source == s.blendTextureAlphaPmBlendDiffuseAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMBlendDiffuseAlpha";
+    if (source == s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMBlendCurrentFactorAlpha";
+    if (source == s.blendTextureAlphaPmBlendFactorAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMBlendFactorAlpha";
+    if (source == s.blendTextureAlphaPmAddSmoothAlphaPs.Get()) return "PSTextureBlendTextureAlphaPMAddSmoothAlpha";
+    if (source == s.blendDiffuseAlphaPs.Get()) return "PSTextureBlendDiffuseAlpha";
+    if (source == s.blendTextureSelectedTextureAlphaPs.Get()) return "PSTextureBlendTextureSelectedTextureAlpha";
+    if (source == s.blendTextureSelectedDiffuseAlphaPs.Get()) return "PSTextureBlendTextureSelectedDiffuseAlpha";
+    if (source == s.blendDiffuseSelectedTextureAlphaPs.Get()) return "PSTextureBlendDiffuseSelectedTextureAlpha";
+    if (source == s.blendDiffuseSelectedDiffuseAlphaPs.Get()) return "PSTextureBlendDiffuseSelectedDiffuseAlpha";
+    if (source == s.blendTextureModulateAlphaPs.Get()) return "PSTextureBlendTextureModulateAlpha";
+    if (source == s.blendDiffuseModulateAlphaPs.Get()) return "PSTextureBlendDiffuseModulateAlpha";
+    if (source == s.blendTextureModulate2XAlphaPs.Get()) return "PSTextureBlendTextureModulate2XAlpha";
+    if (source == s.blendTextureModulate4XAlphaPs.Get()) return "PSTextureBlendTextureModulate4XAlpha";
+    if (source == s.blendDiffuseModulate2XAlphaPs.Get()) return "PSTextureBlendDiffuseModulate2XAlpha";
+    if (source == s.blendDiffuseModulate4XAlphaPs.Get()) return "PSTextureBlendDiffuseModulate4XAlpha";
+    if (source == s.blendTextureAddAlphaPs.Get()) return "PSTextureBlendTextureAddAlpha";
+    if (source == s.blendDiffuseAddAlphaPs.Get()) return "PSTextureBlendDiffuseAddAlpha";
+    if (source == s.blendTextureSubtractAlphaPs.Get()) return "PSTextureBlendTextureSubtractAlpha";
+    if (source == s.blendDiffuseSubtractAlphaPs.Get()) return "PSTextureBlendDiffuseSubtractAlpha";
+    if (source == s.blendTextureAddSmoothAlphaPs.Get()) return "PSTextureBlendTextureAddSmoothAlpha";
+    if (source == s.blendDiffuseAddSmoothAlphaPs.Get()) return "PSTextureBlendDiffuseAddSmoothAlpha";
+    if (source == s.blendFactorAlphaPs.Get()) return "PSTextureBlendFactorAlpha";
+    if (source == s.blendFactorTextureAlphaPs.Get()) return "PSTextureBlendFactorTextureAlpha";
+    if (source == s.blendFactorModulateAlphaPs.Get()) return "PSTextureBlendFactorModulateAlpha";
+    if (source == s.blendFactorDiffuseAlphaPs.Get()) return "PSTextureBlendFactorDiffuseAlpha";
+    if (source == s.blendFactorAddAlphaPs.Get()) return "PSTextureBlendFactorAddAlpha";
+    if (source == s.blendFactorSubtractAlphaPs.Get()) return "PSTextureBlendFactorSubtractAlpha";
+    if (source == s.blendFactorAddSmoothAlphaPs.Get()) return "PSTextureBlendFactorAddSmoothAlpha";
+    if (source == s.blendFactorModulate2XAlphaPs.Get()) return "PSTextureBlendFactorModulate2XAlpha";
+    if (source == s.blendFactorModulate4XAlphaPs.Get()) return "PSTextureBlendFactorModulate4XAlpha";
+    return nullptr;
+}
+
+// Compile only variants that an authenticated source Draw actually selects;
+// no cost or shader changes in ordinary D3D9 fallback, and no 100-PS eager
+// compile at startup. State::mutex serializes this bounded per-device cache.
+ID3D11PixelShader* game_fvf_exact_table_fog_variant(
+    State& s, ID3D11Device* device, ID3D11PixelShader* source) {
+    if (!device || !source) return nullptr;
+    for (const auto& entry : s.fvfFogVariants)
+        if (entry.source == source) return entry.fogged.Get();
+    constexpr std::size_t kMaxSourceVariants = 128u;
+    if (s.fvfFogVariants.size() >= kMaxSourceVariants) return nullptr;
+    const char* originalEntry = game_fvf_original_pixel_entry(s, source);
+    if (!originalEntry) return nullptr;
+    const auto wrapper = native_fvf_fog_wrapper(originalEntry);
+    if (wrapper.empty()) return nullptr;
+    static const std::string sourcePrefix =
+        std::string(kShader) + kScaledAlphaShader +
+        kStage1FactorShader + kFvfTableFogShader;
+    const std::string shaderSource = sourcePrefix + wrapper;
+    ComPtr<ID3DBlob> compiled, errors;
+    if (FAILED(D3DCompile(shaderSource.data(), shaderSource.size(),
+            "live_game_frame_fvf_fog_variant", nullptr, nullptr,
+            "PSFvfTableFogVariant", "ps_4_0", D3DCOMPILE_ENABLE_STRICTNESS,
+            0, compiled.GetAddressOf(), errors.GetAddressOf())) ||
+        !compiled)
+        return nullptr;
+    ComPtr<ID3D11PixelShader> fogged;
+    if (FAILED(device->CreatePixelShader(
+            compiled->GetBufferPointer(), compiled->GetBufferSize(),
+            nullptr, fogged.GetAddressOf())) || !fogged)
+        return nullptr;
+    s.fvfFogVariants.push_back({source, std::move(fogged)});
+    return s.fvfFogVariants.back().fogged.Get();
+}
+
 bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     if (!width || !height || width > 4096u || height > 4096u ||
         static_cast<std::uint64_t>(width) * height > 8388608u) return false;
@@ -1943,6 +2091,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
     s.fvfFogDiffusePs.Reset(); s.fvfFogModulatePs.Reset();
     s.fvfFogTextureOnlyPs.Reset(); s.fvfFogConstants.Reset();
+    s.fvfFogVariants.clear();
     s.stage1DiffusePs.Reset(); s.stage1ModulatePs.Reset();
     s.stage1TextureOnlyPs.Reset(); s.stage1AddPs.Reset(); s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
     s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset();
@@ -8212,8 +8361,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                      (capture.mixedAddDiffuseAlpha ? s.mixedAddDiffuseAlphaPs.Get() :
                      (capture.selectTexture ? s.textureOnlyPs.Get() :
                       capture.additive ? s.additivePs.Get() : s.sampledPs.Get())))))))))))); 
-    // Source fog is exact only for these three decoded game combiners.
-    // Preserve original game Draw for all unmapped stage-0/1 operations.
+    // Three established common FVF shaders keep their eagerly compiled
+    // exact table-fog variants. Every other already-supported stage-0/1
+    // combiner can now retain its original AlphaGate/clip/discard while
+    // fogging only final native RGB. Unknown source shader/compile/device
+    // still fails closed before any native Draw; original D3D9 survives.
     if (output.nativeTableFog.enabled) {
         if (fixedPixelShader == s.ps.Get())
             fixedPixelShader = s.fvfFogDiffusePs.Get();
@@ -8221,7 +8373,10 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             fixedPixelShader = s.fvfFogModulatePs.Get();
         else if (fixedPixelShader == s.textureOnlyPs.Get())
             fixedPixelShader = s.fvfFogTextureOnlyPs.Get();
-        else return false;
+        else
+            fixedPixelShader = game_fvf_exact_table_fog_variant(
+                s, dev, fixedPixelShader);
+        if (!fixedPixelShader) return false;
     }
     ctx->PSSetShader(fixedPixelShader, nullptr, 0u);
     ID3D11ShaderResourceView* boundView = sampledView.Get();
