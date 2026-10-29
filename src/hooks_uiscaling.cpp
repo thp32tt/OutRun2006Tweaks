@@ -24,6 +24,12 @@
 #include <cstring>
 #include <optional>
 
+namespace OutRunVRD3D9ExUpgrade
+{
+    bool GetPhysicalTargetExtent(
+        std::uint32_t& width, std::uint32_t& height) noexcept;
+}
+
 namespace Settings
 {
 	extern Setting<bool> VREnabled;
@@ -56,6 +62,92 @@ enum class ScalingMode
 
 namespace
 {
+    bool ResolveVrFrontEndVirtualCanvasScale(
+        bool exactFrontEnd, bool containedMode,
+        float& scaleX, float& scaleY,
+        std::uint32_t* physicalWidth = nullptr,
+        std::uint32_t* physicalHeight = nullptr) noexcept
+    {
+        scaleX = 1.0f;
+        scaleY = 1.0f;
+        if (!exactFrontEnd || !containedMode ||
+            !Settings::VREnabled || !Settings::VRHud1080pReference ||
+            !Game::screen_resolution)
+            return false;
+
+        const float logicalWidth = Game::screen_resolution->x;
+        const float logicalHeight = Game::screen_resolution->y;
+        if (!std::isfinite(logicalWidth) ||
+            !std::isfinite(logicalHeight) ||
+            logicalWidth < 640.0f || logicalHeight < 480.0f)
+            return false;
+
+        std::uint32_t width = 0, height = 0;
+        if (!OutRunVRD3D9ExUpgrade::GetPhysicalTargetExtent(
+                width, height))
+            return false;
+
+        scaleX = static_cast<float>(width) / logicalWidth;
+        scaleY = static_cast<float>(height) / logicalHeight;
+        if (!std::isfinite(scaleX) || !std::isfinite(scaleY) ||
+            scaleX <= 0.0f || scaleY <= 0.0f ||
+            scaleX > 8.0f || scaleY > 8.0f)
+        {
+            scaleX = scaleY = 1.0f;
+            return false;
+        }
+        if (physicalWidth) *physicalWidth = width;
+        if (physicalHeight) *physicalHeight = height;
+        return true;
+    }
+
+    bool MapVrFrontEndMatrixToPhysical(
+        D3DMATRIX* matrix, bool exactFrontEnd,
+        bool containedMode) noexcept
+    {
+        if (!matrix)
+            return false;
+        float scaleX = 1.0f, scaleY = 1.0f;
+        std::uint32_t physicalWidth = 0, physicalHeight = 0;
+        if (!ResolveVrFrontEndVirtualCanvasScale(
+                exactFrontEnd, containedMode, scaleX, scaleY,
+                &physicalWidth, &physicalHeight))
+            return false;
+
+        D3DMATRIX mapped = *matrix;
+        // D3DXVec4Transform is row-vector style: output X is column 1 and
+        // output Y is column 2. Scale those two output columns only; Z/W and
+        // the 3D render target remain untouched.
+        mapped._11 *= scaleX; mapped._21 *= scaleX;
+        mapped._31 *= scaleX; mapped._41 *= scaleX;
+        mapped._12 *= scaleY; mapped._22 *= scaleY;
+        mapped._32 *= scaleY; mapped._42 *= scaleY;
+
+        const float* values =
+            reinterpret_cast<const float*>(&mapped);
+        for (std::size_t i = 0; i < 16; ++i)
+            if (!std::isfinite(values[i]))
+                return false;
+        *matrix = mapped;
+
+        if (Settings::VRTelemetry)
+        {
+            static std::atomic<std::uint64_t> hits{0};
+            const auto hit = hits.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (hit <= 64 || (hit & (hit - 1)) == 0)
+                spdlog::info(
+                    "VR TRACE FRONTEND VIRTUAL CANVAS: hit={} "
+                    "logical={:.9g}x{:.9g} physical={}x{} scale={:.9g},{:.9g} "
+                    "matrixTx={:.9g} matrixTy={:.9g}",
+                    hit, Game::screen_resolution->x,
+                    Game::screen_resolution->y,
+                    physicalWidth, physicalHeight,
+                    scaleX, scaleY, matrix->_41, matrix->_42);
+        }
+        return true;
+    }
+
     // REA original EXE: 0x498958 JNZ -> 0x498A18. An E9 midhook at
     // 0x498A15 (immediate post-CALL) overwrites 0x498A18, reproducing
     // the same branch-into-detour failure as the retired GOAL text hooks.
@@ -661,9 +753,27 @@ class UIScaling : public Hook
             }
             // The old owned D3DX path never promoted nullable/rotation-only
             // matrices and never applied a second 4:3 optical affine.
-            return D3DXMatrixTransformation2D.stdcall<int>(
-                pOut, pScalingCenter, pScalingRotation,
-                inputScale, pRotationCenter, Rotation, inputTranslation);
+            const int legacyResult =
+                D3DXMatrixTransformation2D.stdcall<int>(
+                    pOut, pScalingCenter, pScalingRotation,
+                    inputScale, pRotationCenter, Rotation, inputTranslation);
+            const bool physicalized =
+                legacyResult && pOut &&
+                MapVrFrontEndMatrixToPhysical(
+                    pOut, vrFrontEndProducer, vrContainedMode);
+            if (physicalized && Game::screen_scale &&
+                Game::screen_resolution)
+            {
+                std::array<float, 16> fingerprint{};
+                static_assert(sizeof(fingerprint) == sizeof(D3DMATRIX));
+                std::memcpy(fingerprint.data(), pOut, sizeof(D3DMATRIX));
+                OutRunVrMenuQuad::ContainedMatrices.Remember(
+                    fingerprint, static_cast<int>(mode),
+                    Game::screen_scale->x, Game::screen_scale->y,
+                    Game::screen_resolution->x,
+                    Game::screen_resolution->y);
+            }
+            return legacyResult;
         }
 		// D3DX treats these input vectors as read-only. The game may reuse
 		// the same source sprite matrix across menu/car-selection draws;
@@ -847,6 +957,17 @@ class UIScaling : public Hook
                 }
             }
         }
+        // The menu is authored in the logical game/UI canvas. Only after all
+        // original 4:3/front-end containment is complete, map that finished
+        // 2D matrix to the XR-sized physical D3D9Ex target. This does not
+        // change world/selector-car geometry or the XR render resolution.
+        if (result && pOut &&
+            MapVrFrontEndMatrixToPhysical(
+                pOut, originalFrontEndProducer,
+                mode == ScalingMode::KeepCentered ||
+                    mode == ScalingMode::OnlineArcade))
+            publishedPrecontainedMenuMatrix = true;
+
         // D3DX may have already contained this ORIGINAL front-end matrix.
         // Mark only a successful game producer result, never a generic HUD
         // quad, device-reset fallback or unproven/partial transform.
@@ -1052,6 +1173,26 @@ class UIScaling : public Hook
         quad[7] = OutRunVrMenuQuad::ProjectX(quadMap, bottomLeft.x);
         quad[0xE] = OutRunVrMenuQuad::ProjectX(quadMap, topRight.x);
         quad[0x15] = OutRunVrMenuQuad::ProjectX(quadMap, bottomRight.x);
+
+        // If this custom quad did not inherit a matrix already physicalized
+        // by D3DXMatrixTransformation2D, its PixelMap result is still in the
+        // logical 1920x1080 canvas. Apply the same final virtual->XR mapping
+        // here so background/text/custom sprites share one coordinate space.
+        if (!precontained && frontEnd && contained)
+        {
+            float physicalScaleX = 1.0f, physicalScaleY = 1.0f;
+            if (ResolveVrFrontEndVirtualCanvasScale(
+                    true, true, physicalScaleX, physicalScaleY))
+            {
+                constexpr std::size_t xIndex[4]{0, 7, 0xE, 0x15};
+                constexpr std::size_t yIndex[4]{1, 8, 0xF, 0x16};
+                for (std::size_t i = 0; i < 4; ++i)
+                {
+                    quad[xIndex[i]] *= physicalScaleX;
+                    quad[yIndex[i]] *= physicalScaleY;
+                }
+            }
+        }
 
 		// Validate every transformed vertex/UV before publishing anything.
 		// Keep packed diffuse color bits as-is: its float representation may
