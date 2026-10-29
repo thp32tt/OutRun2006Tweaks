@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01148",
+  "production_id": "CONVERSION-DX11-01148",
+  "event_id": "CONVERSION-DX11-01148-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": null,
+  "inherited_feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:FRAGMENTED_LARGER_SOURCE_REPAINT",
+  "classification": "C6_RESULT_ONLY_AFTER_MATERIAL_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "full_dx11_renderer_complete": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "3f3e0d08c67cfdf9bddb1620c62e07a8cf41a8cb",
+  "source_implementation_commit_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+  "material_result_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+  "validation_bearing_result_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+  "c6_bookkeeping_reason": "RUN_RECORD_NOT_FOUND",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "ORIGINAL_D3D9_PARTIAL_PRESENT_RGNDATA",
+      "DX11_NATIVE_DRAW_GPU_BEFORE_AFTER_RGB",
+      "SOURCE_AUTHENTIC_LARGEST_DIRTY_TILE_PLACEMENT",
+      "OPT_IN_RAW_DIAGNOSTIC_DISPLAY"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY: opt-in RAW pixel tile selection and source RGB regression; a real game full frame and HMD have not been observed",
+    "activation_guard_and_fallback": "RAW opt-in/default OFF; unchanged original D3D9 Draw/Present/input/FFB and DX9Ex fallback; do not claim production scene publication or alter DXVK",
+    "batch_components": [
+      "CXX_FRAGMENTED_DIRTY_REGION_LARGEST_REAL_TILE_REPAIR",
+      "ORIGINAL_SOURCE_REPAINT_POSITIVE_NEGATIVE_REGRESSION",
+      "PAIRED_RGB_PIXEL_WINDOW_INTEGRATION_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "A genuine 3x3 source grid plus thin tail and separate small rectangle selects the larger 32x32 source-authentic GPU tile rather than prematurely selecting 24x24",
+      "negative_regression": "Missing source-painted line falls back only to a real 24x24 island; forged rcBound or unauthenticated RGNDATA is rejected",
+      "component_integration": "D3D9 Present dirty source -> source-verified tile picker -> genuine DX11 before/after RGB delta -> bounded opt-in diagnostic copy"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "tests/native_raw_present_coverage_test.cpp",
+      "tests/native_raw_changed_pixel_window_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_changed_pixel_window_test.cpp",
+    "tests/native_raw_present_coverage_test.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Keep richer genuine DX11 GPU RGB visible in an explicitly opted-in RAW partial diagnostic when D3D9 Presents include an isolated smaller rectangle and a larger fragmented painted island; do not promote a complete native game frame",
+    "acceptance_items": [
+      {
+        "id": "authentic_largest_source_tile",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 dirty-region to DX11 RAW output",
+        "expected_behavior": "Choose the largest authenticated source-painted native GPU tile instead of the first smaller component"
+      },
+      {
+        "id": "source_safety",
+        "category": "fallback_regression",
+        "behavior_area": "original renderer/source safety",
+        "expected_behavior": "A missing source-painted line safely downgrades to an authentic smaller tile; invalid bounds/header fail closed; original D3D9 input/FFB unaffected"
+      },
+      {
+        "id": "final_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact-SHA GitHub Actions",
+        "expected_behavior": "All five mandatory push workflows succeed on the original validation-bearing implementation commit; runtime remains separately untested"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "authentic_largest_source_tile": "PASS_EXACT_SHA",
+    "source_safety": "PASS_EXACT_SHA",
+    "final_five_gates": "PASS_EXACT_SHA"
+  },
+  "real_game_draw_blocker": "No matching real-game Draw/published full-frame or Quest 3 evidence for the result SHA; no runtime performance or correctness conclusion",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "PASS",
+    "C2_IMPLEMENT": "PASS MATERIAL_SOURCE_SHA e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+    "C3_VALIDATE": "PASS FIVE MANDATORY PUSH GATES AT SAME EXACT SHA",
+    "C4_COMMIT": "PASS SOURCE_COMMIT e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+    "C5_PACKAGE": "NOT_EVIDENCE_OF_RUNTIME_HMD_PASS",
+    "C6_STATE": "PASS bookkeeping-only [skip ci] record; no change to validation-bearing result"
+  },
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40801404785,
+        "head_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40801404785"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40801404789,
+        "head_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40801404789"
+      },
+      {
+        "name": "Build",
+        "run_id": 40801404957,
+        "head_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40801404957"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40801404792,
+        "head_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40801404792"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40801404887,
+        "head_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40801404887"
+      }
+    ],
+    "runtime_evidence": "UNTESTED: no matching actual OutRun game/Quest3/VDXR test; native Draw counts and full-frame output unobserved",
+    "source_implementation": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+    "c6_only": true,
+    "c6_is_material_result": false
+  },
+  "c6": {
+    "reason": "RUN_RECORD_NOT_FOUND",
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "original_material_result_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+    "unchanged_validation_bearing_result_sha": "e3fb97a465334cf9f1a95a1b2da097a91395de1a",
+    "next_action": "Continue the unfinished native full-frame renderer separately; no repeated CI, no C6 source modifications, and HMD validation remains separate",
+    "score_change": 0
+  }
+}
