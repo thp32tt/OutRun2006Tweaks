@@ -21,7 +21,7 @@ WINDOWS = (
     # earlier time-panel window. Keep both E8 parents in the same artifact so
     # runtime caller receipts can be interpreted without guessing which visual
     # phase produced the graph.
-    ("goal-result-final-panel", 0x00099000, 0x00099580),
+    ("goal-result-second-parent", 0x00099280, 0x00099480),
     # Live race time-extension path: 450CC0 sets manager flag3/time, the
     # Navi control/display pair turns that into the 8446E8 HUD lifetime,
     # and 4B9320/4B9250 emit the split/time sprites and glyphs.
