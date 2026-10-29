@@ -10,15 +10,15 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:LIVE_FVF:SOURCE_EQUATION_RAW_GAME_DRAW",
   "classification": "A_SOURCE_IMPLEMENTATION",
-  "status": "SOURCE_INTEGRATED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_change": 0,
+  "score_change": 1,
   "development_time_percentages": "UNMEASURED",
   "source_base_sha": "31f9fca464644a94432a9c3a38e379d686009712",
-  "material_result_sha": "PENDING_ACTUAL_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_ACTUAL_COMMIT_SHA",
+  "material_result_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+  "validation_bearing_result_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp",
@@ -98,16 +98,67 @@
   "pipeline": {
     "C0_RECOVER": "PASS_GITHUB_PINNED_BASE",
     "C1_REVIEW": "PASS_SOURCE_FVF_SM3_FOG_CONSUMPTION_SCOPE",
-    "C2_IMPLEMENT": "SOURCE_CHANGED_CPLUSPLUS_AND_REGRESSIONS",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_ACTUAL_COMMIT_SHA",
-    "C5_PACKAGE": "NOT_REQUESTED_FOR_SOURCE_ONLY",
-    "C6_STATE": "PENDING_CI_RESULT"
+    "C2_IMPLEMENT": "PASS_CPP_SOURCE_AND_TARGETED_INTEGRATION_REGRESSIONS",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_EXACT_SHA_0eb3fb66",
+    "C4_COMMIT": "PASS_SOURCE_MATERIAL_0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+    "C5_PACKAGE": "NO_SOURCE_MATCHED_GAME_OR_HMD_RUNTIME",
+    "C6_STATE": "PASS_SEPARATE_DOCS_CHECKPOINT_NO_ADDITIONAL_SCORE"
   },
   "evidence": {
     "requires_final_exact_sha_five_push_gates": true,
-    "runtime_evidence": "UNTESTED; no source-matched original game desktop-native Draw or Quest3/VDXR observed"
+    "runtime_evidence": "UNTESTED: no new source-matched real desktop game native Draw/published frame or Quest3/VDXR.",
+    "source_implementation_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40836219899,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40836220067,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40836219961,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40836219915,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40836219996,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      }
+    ],
+    "scoreboard_commit": "46392c4c0e8e41c44d2b13d9f012d174be851a74",
+    "scoreboard_ai2_prior": 2152,
+    "scoreboard_ai2_delta": 1,
+    "scoreboard_ai2_new": 2153
   },
   "visible_frame_acceptance": "SOURCE_INTEGRATED_CI_PENDING; actual game native Draw and published frame remain UNTESTED at this SHA; RAW tile is visual-only and cannot establish a complete native game frame.",
-  "activation_guard_and_fallback": "No production fog bypass: production exact disabled/NONE/NONE/verified zero-density path unchanged. All active FVF fog remains RAW opt-in visual mismatch only, with consumed real COM floats known, native resource/poison/frame gates untouched; game Draw/FFB unchanged."
+  "activation_guard_and_fallback": "No production fog bypass: production exact disabled/NONE/NONE/verified zero-density path unchanged. All active FVF fog remains RAW opt-in visual mismatch only, with consumed real COM floats known, native resource/poison/frame gates untouched; game Draw/FFB unchanged.",
+  "source_implementation_commit_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+  "c6": {
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+    "source_implementation_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+    "bookkeeping_only": true,
+    "score_change": 0,
+    "checkpoint_message_has_ci_skip": true,
+    "ci_validated_source_commit_distinct": true,
+    "next_action": "Feature still unfinished for native menu->vehicle->race full-frame source-matched game/HMD proof; preserve original D3D9 game/input/FFB and frozen DXVK."
+  }
 }
