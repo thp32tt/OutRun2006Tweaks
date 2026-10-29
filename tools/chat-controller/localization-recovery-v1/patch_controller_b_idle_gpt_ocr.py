@@ -35,6 +35,146 @@ def patch(source):
     )
 
     helper=r'''
+GPT_OCR_RESPONSE_POLL_SECONDS = max(
+    10, int(_outrun_smoke_os.environ.get("OUTRUN_GPT_OCR_RESPONSE_POLL_SECONDS", "30")))
+
+async def _outrun_extract_task_assistant(page: Page, task_token: str):
+    """Return only an assistant turn that follows this OCR task's user turn."""
+    try:
+        result = await page.evaluate(
+            r"""({task}) => {
+              const marker = 'UPLOAD_TASK_ID=' + task;
+              const textOf = el => ((el && (el.innerText || el.textContent)) || '').trim();
+              const roleOf = el => {
+                if (!el) return '';
+                const direct = (el.getAttribute('data-message-author-role') || '').toLowerCase();
+                if (direct === 'user' || direct === 'assistant') return direct;
+                const key = el.getAttribute('data-chatgpt-search-unit-key') ||
+                            el.getAttribute('data-content-search-unit-key') || '';
+                const m = key.match(/:(user|assistant)$/);
+                if (m) return m[1];
+                if (el.matches?.('[data-markdown-text-tone="user-message"]') ||
+                    el.querySelector?.('[data-markdown-text-tone="user-message"],[data-message-author-role="user"]'))
+                  return 'user';
+                if (el.matches?.('[data-markdown-text-style="assistant-message"]') ||
+                    el.querySelector?.('[data-markdown-text-style="assistant-message"],[data-message-author-role="assistant"]'))
+                  return 'assistant';
+                return '';
+              };
+              const uniq = xs => xs.filter((el, i) => el && xs.indexOf(el) === i);
+              const turnSelector = [
+                '[data-turn-key]',
+                '[data-testid^="conversation-turn-"]',
+                '[data-chatgpt-search-unit-key]',
+                '[data-content-search-unit-key]',
+                '[data-message-author-role]'
+              ].join(',');
+              const turns = uniq([...document.querySelectorAll(turnSelector)]);
+              let user = null;
+              for (let i = turns.length - 1; i >= 0; i--) {
+                if (roleOf(turns[i]) === 'user' && textOf(turns[i]).includes(marker)) {
+                  user = turns[i];
+                  break;
+                }
+              }
+              if (!user) {
+                const userBodies = uniq([...document.querySelectorAll(
+                  '[data-markdown-text-tone="user-message"],[data-message-author-role="user"]')]);
+                for (let i = userBodies.length - 1; i >= 0; i--) {
+                  if (!textOf(userBodies[i]).includes(marker)) continue;
+                  user = userBodies[i].closest(
+                    '[data-turn-key],[data-testid^="conversation-turn-"],' +
+                    '[data-chatgpt-search-unit-key],[data-content-search-unit-key]') || userBodies[i];
+                  break;
+                }
+              }
+              if (!user) {
+                return {text:'', reason:'TASK_USER_TURN_NOT_FOUND',
+                        turns:turns.length, assistants:0};
+              }
+              const assistantBodies = uniq([...document.querySelectorAll([
+                '[data-message-author-role="assistant"]',
+                '[data-markdown-text-style="assistant-message"]',
+                '[data-chatgpt-search-unit-key$=":assistant"]',
+                '[data-content-search-unit-key$=":assistant"]',
+                '[data-chatgpt-selection-message-id]'
+              ].join(','))]);
+              const after = assistantBodies.filter(el =>
+                !!(user.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING));
+              for (const body of after) {
+                const turn = body.closest(
+                  '[data-turn-key],[data-testid^="conversation-turn-"],' +
+                  '[data-chatgpt-search-unit-key],[data-content-search-unit-key]') || body;
+                const inProgress =
+                  turn.matches?.('[data-talvt-turn-state="in_progress"]') ||
+                  !!turn.querySelector?.('[data-talvt-turn-state="in_progress"]');
+                const txt = textOf(body);
+                if (!inProgress && txt) {
+                  return {text:txt, reason:'ASSISTANT_AFTER_TASK',
+                          turns:turns.length, assistants:assistantBodies.length};
+                }
+              }
+              return {text:'', reason:'ASSISTANT_AFTER_TASK_NOT_READY',
+                      turns:turns.length, assistants:assistantBodies.length};
+            }""",
+            {"task": task_token})
+        return result if isinstance(result, dict) else {
+            "text": "", "reason": "DOM_RESULT_INVALID"}
+    except Exception as exc:
+        return {"text": "", "reason": "DOM_EVALUATE_FAILED:" + type(exc).__name__}
+
+async def _outrun_poll_active_gpt_ocr(pages: dict[str, Page]):
+    """Poll OCR independently of producer/QA schedule and consume completed reply."""
+    active = gpt_ocr_active_task()
+    if not active or active.get("status") != "SENT_AWAITING_RESPONSE":
+        return {"status": "NO_ACTIVE_OCR"}
+    page = pages.get("C1")
+    if page is None or page.is_closed():
+        return {"status": "C1_POLL_TAB_UNAVAILABLE"}
+    expected_url = str(active.get("chat_url") or "")
+    if not expected_url:
+        return {"status": "OCR_CHAT_URL_MISSING"}
+    if page.url.rstrip("/") != expected_url.rstrip("/"):
+        try:
+            await page.goto(expected_url, wait_until="domcontentloaded", timeout=60000)
+            await page.wait_for_timeout(700)
+        except Exception as exc:
+            return {"status": "OCR_CHAT_REOPEN_FAILED", "error": type(exc).__name__}
+    if await detect_busy(page):
+        return {"status": "OCR_RESPONSE_BUSY", "task_id": active.get("task_id")}
+
+    dom = await _outrun_extract_task_assistant(page, str(active.get("task_id") or ""))
+    answer = str(dom.get("text") or "")
+    if answer:
+        applied = gpt_ocr_apply_response(active["task_id"], answer)
+        write_runtime(
+            status="gpt_ocr_response_applied",
+            last_action="Periodic OCR response poll consumed " + active["task_id"],
+            gpt_ocr_result=applied,
+            gpt_ocr_dom_probe={k:v for k,v in dom.items() if k != "text"},
+            gpt_ocr_summary=gpt_ocr_summary(),
+        )
+        return {"status": "OCR_RESPONSE_CONSUMED", "result": applied.get("status")}
+
+    stale = gpt_ocr_recover_stale_active()
+    if stale.get("recovered"):
+        write_runtime(
+            status="gpt_ocr_auto_recovered",
+            last_action="Periodic OCR poll recovered stale " + str(stale.get("status")),
+            gpt_ocr_recovery=stale,
+            gpt_ocr_dom_probe=dom,
+            gpt_ocr_summary=gpt_ocr_summary(),
+        )
+        return {"status": "OCR_STALE_RECOVERED", "recovery": stale.get("status")}
+
+    write_runtime(
+        status="gpt_ocr_waiting",
+        last_action="Periodic OCR response poll waiting for " + str(active.get("task_id")),
+        gpt_ocr_dom_probe=dom,
+        gpt_ocr_summary=gpt_ocr_summary(),
+    )
+    return {"status": "OCR_RESPONSE_NOT_READY", "dom": dom}
+
 async def _outrun_b_idle_gpt_ocr(page: Page, slot: Slot, reg: Registry):
     """Run one C2 OCR collect/send cycle on B only while B producer queue is idle."""
     gpt_active = gpt_ocr_active_task()
@@ -225,6 +365,40 @@ async def _outrun_b_idle_gpt_ocr(page: Page, slot: Slot, reg: Registry):
             send_result = b_ocr
     elif CONTROLLER_MODE == "localization" and slot.name == "C1":'''
     s=replace_once(s,old,new,"b-idle-fallback")
+    s=replace_once(
+        s,
+        """    last_tick = None
+    last_watchdog_check = 0.0
+    recycle_started = time.monotonic()
+""",
+        """    last_tick = None
+    last_watchdog_check = 0.0
+    last_gpt_ocr_poll = 0.0
+    recycle_started = time.monotonic()
+""",
+        "ocr-poll-state",
+    )
+    s=replace_once(
+        s,
+        """        mono = time.monotonic()
+        if AUTO_SEND and WATCHDOG_ENABLED and not did_scheduled and mono - last_watchdog_check >= WATCHDOG_CHECK_SECONDS:
+""",
+        """        mono = time.monotonic()
+        if (AUTO_SEND and CONTROLLER_MODE == "localization" and
+                mono - last_gpt_ocr_poll >= GPT_OCR_RESPONSE_POLL_SECONDS):
+            last_gpt_ocr_poll = mono
+            protected_slots.add("C1")
+            try:
+                await _outrun_poll_active_gpt_ocr(pages)
+            except Exception as e:
+                log.exception("periodic GPT OCR response poll failed")
+                write_runtime(status="gpt_ocr_poll_error", last_error=repr(e))
+            finally:
+                protected_slots.discard("C1")
+        if AUTO_SEND and WATCHDOG_ENABLED and not did_scheduled and mono - last_watchdog_check >= WATCHDOG_CHECK_SECONDS:
+""",
+        "ocr-poll-loop",
+    )
     s=MARKER+"\n"+s
     ast.parse(s)
     return s

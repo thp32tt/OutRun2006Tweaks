@@ -19,6 +19,11 @@ def test(root):
     assert "UPLOAD_TASK_ID=" in out
     assert "role(units[i]) !== 'assistant'" in out
     assert "Never consume an unrelated prior assistant turn." in out
+    out=module(root/"patch_controller_b_idle_gpt_ocr.py","bocr").patch(out)
+    assert '[data-testid^="conversation-turn-"]' in out
+    assert '[data-message-author-role="assistant"]' in out
+    assert "Periodic OCR response poll consumed" in out
+    assert "TASK_USER_TURN_NOT_FOUND" in out
     print("CHATGPT_RESPONSE_DOM_PASS")
 
 if __name__=="__main__":

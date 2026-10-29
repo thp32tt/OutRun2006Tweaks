@@ -98,6 +98,7 @@ class PolicyTests(unittest.TestCase):
         self.assertIn('OUTRUN_KR_V2_AUTO_DEPLOY: "false"', s)
         self.assertIn('OUTRUN_CROP_ENABLED: "false"', s)
         self.assertIn('OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "600"', s)
+        self.assertIn('OUTRUN_GPT_OCR_RESPONSE_POLL_SECONDS: "30"', s)
 
 
 if __name__ == "__main__":
