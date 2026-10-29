@@ -1,0 +1,588 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1245KST-A0103-B0118-NEW-SHA8",
+  "question_at_kst": "2026-10-29T12:45:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "baseline_remote_head": "1a057c3a91d05061aba547d24c30105a3201fa02",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "prior_review_files": 34,
+    "prior_distinct_reviewed_candidate_sha": 239,
+    "selected_new_sha": 8,
+    "all_first_time_sha": true,
+    "remaining_manifest_backed_exports_before_selection": {
+      "A": 38,
+      "B": 30
+    }
+  },
+  "evidence": {
+    "preflight": "work/C1_QA_20261029_1245_AI2_new_sha8/preflight.json",
+    "source_candidate_sheets": [
+      "work/C1_QA_20261029_1245_AI2_new_sha8/pairs_A.jpg",
+      "work/C1_QA_20261029_1245_AI2_new_sha8/pairs_B.jpg"
+    ],
+    "native_fit_simulation": [
+      "work/C1_QA_20261029_1245_AI2_new_sha8/native_fit_A.jpg",
+      "work/C1_QA_20261029_1245_AI2_new_sha8/native_fit_B.jpg"
+    ]
+  },
+  "summary": {
+    "new_sha_reviewed": 8,
+    "candidate_sha_match": 8,
+    "source_hd_sha_match": 8,
+    "PNG_RGBA": 8,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8,
+    "alpha_ge32_border_contact": 0,
+    "actual_UI_composite": "NOT_TESTED",
+    "DDS": "NOT_CREATED",
+    "runtime_validation": "UNTESTED",
+    "imagegen": "NOT_CALLED",
+    "AB_queues": "NOT_CONSUMED",
+    "C2_C3": "NOT_ASSESSED",
+    "scope_exclusions": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0103-28A2F8C2",
+      "source_ordinal": 397,
+      "english": "Real Player Only",
+      "approved_korean": "실제 플레이어 전용",
+      "source_file": "Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "manifest_source_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        2322,
+        544,
+        2584,
+        693
+      ],
+      "target_dimensions": [
+        262,
+        149
+      ],
+      "candidate_file": "Q095_33ecaebcda7a82c7_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q095_33ecaebcda7a82c7_k.png",
+      "candidate_sha256": "b3b50e35c7c488b38b180c470f95b48df05e114e54d74eb64488d9f6262b2e8b",
+      "export_sha256": "b3b50e35c7c488b38b180c470f95b48df05e114e54d74eb64488d9f6262b2e8b",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        29,
+        39,
+        1510,
+        1008
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        224,
+        149
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_PROTECTED_YELLOW_PANEL_AND_TRUE_CELL_UNVERIFIED",
+        "observation": "실제 플레이어 전용: 글자와 받침을 식별할 수 있음. 원본 ROI에 노란 패널 아트가 포함되어 실제 원문 제거/보호영역 합성이 필요함.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE_IN_SOURCE_COMPARISON",
+        "transparent_lettering_layer": "YES_VISUAL",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UI_UV_CELL",
+        "native_fit": "SIMULATION_ONLY",
+        "actual_UI_composite": "NOT_TESTED",
+        "DDS": "NOT_CREATED",
+        "C2_C3": "NOT_ASSESSED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0104-978C5096",
+      "source_ordinal": 398,
+      "english": "For Expert Drivers : The car is difficult to control.",
+      "approved_korean": "상급자용: 조작이 어려운 차량입니다.",
+      "source_file": "Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "manifest_source_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        10,
+        40,
+        1614,
+        154
+      ],
+      "target_dimensions": [
+        1604,
+        114
+      ],
+      "candidate_file": "Q095_b1097bc6629c510e_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q095_b1097bc6629c510e_k.png",
+      "candidate_sha256": "96ed63383973e48d74a6638e3b6d57cf5a00f0f9aea81a7600496c0a119ec040",
+      "export_sha256": "96ed63383973e48d74a6638e3b6d57cf5a00f0f9aea81a7600496c0a119ec040",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        33,
+        73,
+        2143,
+        675
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        342,
+        114
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "TRUE_CELL_AND_NATIVE_READABILITY_UNVERIFIED",
+        "observation": "상급자용: 조작이 어려운 차량입니다. 승인 문구 일치. 긴 문장이 시뮬레이션에서 작게 축소되어 실제 UI 셀·50% 크기 가독성 확인 필요.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE_IN_SOURCE_COMPARISON",
+        "transparent_lettering_layer": "YES_VISUAL",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UI_UV_CELL",
+        "native_fit": "SIMULATION_ONLY",
+        "actual_UI_composite": "NOT_TESTED",
+        "DDS": "NOT_CREATED",
+        "C2_C3": "NOT_ASSESSED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0105-DFBAC802",
+      "source_ordinal": 399,
+      "english": "OutRun Mode 15 continuous course",
+      "approved_korean": "아웃런 모드 15코스 연속",
+      "source_file": "Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "manifest_source_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        3685,
+        2120,
+        3970,
+        2330
+      ],
+      "target_dimensions": [
+        285,
+        210
+      ],
+      "candidate_file": "Q095_3f83420414b71418_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q095_3f83420414b71418_k.png",
+      "candidate_sha256": "9bb23918860147807f5e1f86ac9b8c36f42273f789896ec32877b93f1e94223c",
+      "export_sha256": "9bb23918860147807f5e1f86ac9b8c36f42273f789896ec32877b93f1e94223c",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1461,
+        1076
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        109,
+        1433,
+        1042
+      ],
+      "edge_nz": 17,
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        285,
+        210
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_ROI_TOP_CUT_AND_PROTECTED_ART_UNVERIFIED",
+        "observation": "아웃런 모드 15코스 연속: 결과 한글은 식별 가능. 영문 원본 ROI 상단의 OutRun 글자 일부가 잘려 보이고 검은 패널/차량 아이콘이 포함되어 원본 문구 완전 범위 및 보존 검증 필요.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE_IN_SOURCE_COMPARISON",
+        "transparent_lettering_layer": "YES_VISUAL",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UI_UV_CELL",
+        "native_fit": "SIMULATION_ONLY",
+        "actual_UI_composite": "NOT_TESTED",
+        "DDS": "NOT_CREATED",
+        "C2_C3": "NOT_ASSESSED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0106-F3FA663F",
+      "source_ordinal": 400,
+      "english": "Automatic Transmission",
+      "approved_korean": "자동 변속",
+      "source_file": "Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "manifest_source_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        1948,
+        548,
+        2212,
+        657
+      ],
+      "target_dimensions": [
+        264,
+        109
+      ],
+      "candidate_file": "Q095_588b6568a8de7c8f_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q095_588b6568a8de7c8f_k.png",
+      "candidate_sha256": "4af7cc5e65d90424cd445f3d32b381a4461e692ee5162088739ff5cd02265253",
+      "export_sha256": "4af7cc5e65d90424cd445f3d32b381a4461e692ee5162088739ff5cd02265253",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1952,
+        806
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        29,
+        1878,
+        717
+      ],
+      "edge_nz": 7,
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        264,
+        109
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_PROTECTED_GREEN_PANEL_AND_TRUE_CELL_UNVERIFIED",
+        "observation": "자동 변속: 글자 식별 가능. 영문 원본 영역에는 초록색 패널 아트가 포함됨. 생성물의 alpha=1 경계 픽셀만 있고 실제 글자 잘림은 확인되지 않음.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE_IN_SOURCE_COMPARISON",
+        "transparent_lettering_layer": "YES_VISUAL",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UI_UV_CELL",
+        "native_fit": "SIMULATION_ONLY",
+        "actual_UI_composite": "NOT_TESTED",
+        "DDS": "NOT_CREATED",
+        "C2_C3": "NOT_ASSESSED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0115-3787C3F0",
+      "source_ordinal": 452,
+      "english": "OutRun2: SP · 15 Continuous Course has been selected.",
+      "approved_korean": "OutRun2: SP · 15코스 연속이 선택되었습니다.",
+      "source_file": "Q094_2DA43E41_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q094_2DA43E41_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "7faa7b28d8230bdfafd4888c7579e68033f893aa4a9273dd30fa3f3f7e2b1862",
+      "manifest_source_sha256": "7faa7b28d8230bdfafd4888c7579e68033f893aa4a9273dd30fa3f3f7e2b1862",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        130,
+        488,
+        2080,
+        718
+      ],
+      "target_dimensions": [
+        1950,
+        230
+      ],
+      "candidate_file": "Q094_990d1c9df0e9928d_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q094_990d1c9df0e9928d_k.png",
+      "candidate_sha256": "e362f31d54a9dfee299b20145fa9b0b15d853af78ed02d7187fa0ff2aab4140a",
+      "export_sha256": "e362f31d54a9dfee299b20145fa9b0b15d853af78ed02d7187fa0ff2aab4140a",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        25,
+        19,
+        2154,
+        708
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        690,
+        230
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "TRUE_CELL_AND_NATIVE_READABILITY_UNVERIFIED",
+        "observation": "OutRun2: SP · 15코스 연속이 선택되었습니다. 승인 문구와 육안 일치. 네이티브 크기 시뮬레이션에서 작게 보이므로 실제 UI 보호 픽셀과 가독성 확인 필요.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE_IN_SOURCE_COMPARISON",
+        "transparent_lettering_layer": "YES_VISUAL",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UI_UV_CELL",
+        "native_fit": "SIMULATION_ONLY",
+        "actual_UI_composite": "NOT_TESTED",
+        "DDS": "NOT_CREATED",
+        "C2_C3": "NOT_ASSESSED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0116-8F448492",
+      "source_ordinal": 453,
+      "english": "OutRun Mode",
+      "approved_korean": "아웃런 모드",
+      "source_file": "Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "manifest_source_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        464,
+        1244,
+        688,
+        1354
+      ],
+      "target_dimensions": [
+        224,
+        110
+      ],
+      "candidate_file": "Q095_9f589bc61b1ec38c_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q095_9f589bc61b1ec38c_k.png",
+      "candidate_sha256": "79ed0efc13ff262680f7d011a39ec249051c398b9a537e9ded9af53e95565124",
+      "export_sha256": "79ed0efc13ff262680f7d011a39ec249051c398b9a537e9ded9af53e95565124",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1790,
+        879
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        154,
+        1768,
+        814
+      ],
+      "edge_nz": 8,
+      "edge_ge32": 0,
+      "edge_max": 1,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        224,
+        110
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_PROTECTED_BLUE_PANEL_AND_TRUE_CELL_UNVERIFIED",
+        "observation": "아웃런 모드: 문구 가독성 확인. 원본 ROI에 파란 패널이 포함되어 원문 제거 및 보호 아트 복원은 별도 검증 필요. alpha=1 경계 픽셀만 확인됨.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE_IN_SOURCE_COMPARISON",
+        "transparent_lettering_layer": "YES_VISUAL",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UI_UV_CELL",
+        "native_fit": "SIMULATION_ONLY",
+        "actual_UI_composite": "NOT_TESTED",
+        "DDS": "NOT_CREATED",
+        "C2_C3": "NOT_ASSESSED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0117-5492DCC5",
+      "source_ordinal": 454,
+      "english": "YES",
+      "approved_korean": "예",
+      "source_file": "Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "manifest_source_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        2742,
+        1726,
+        2988,
+        1838
+      ],
+      "target_dimensions": [
+        246,
+        112
+      ],
+      "candidate_file": "Q095_ba20bdfa91f818d6_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q095_ba20bdfa91f818d6_k.png",
+      "candidate_sha256": "1246c980348ec0f353d72208c7dcb39b9901086706fbdea9114ae0f20d80a43b",
+      "export_sha256": "1246c980348ec0f353d72208c7dcb39b9901086706fbdea9114ae0f20d80a43b",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1859,
+        846
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        456,
+        23,
+        1377,
+        763
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        246,
+        112
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_PROTECTED_BLUE_BUTTON_AND_TRUE_CELL_UNVERIFIED",
+        "observation": "예: 글자 형태와 매핑 확인. 원본 YES의 청색 버튼/패턴은 생성물과 별도이며 보존 합성 확인 필요.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE_IN_SOURCE_COMPARISON",
+        "transparent_lettering_layer": "YES_VISUAL",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UI_UV_CELL",
+        "native_fit": "SIMULATION_ONLY",
+        "actual_UI_composite": "NOT_TESTED",
+        "DDS": "NOT_CREATED",
+        "C2_C3": "NOT_ASSESSED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0118-8E6744B4",
+      "source_ordinal": 455,
+      "english": "Manual Transmission",
+      "approved_korean": "수동 변속",
+      "source_file": "Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q095_37759842_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "manifest_source_sha256": "e16974bb026f18dc0d18f03b270c27b1ea4cdeb530d23ed9d6eded99e65fa436",
+      "source_sha_match": true,
+      "source_dimensions": [
+        4096,
+        4096
+      ],
+      "bbox_xyxy": [
+        1590,
+        548,
+        1854,
+        655
+      ],
+      "target_dimensions": [
+        264,
+        107
+      ],
+      "candidate_file": "Q095_50e8901240df8ca5_k.png",
+      "candidate_png": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/B/Q095_50e8901240df8ca5_k.png",
+      "candidate_sha256": "c185502e2865e6858b81e20116e3e535de1d134dc651f599cbff542567e88089",
+      "export_sha256": "c185502e2865e6858b81e20116e3e535de1d134dc651f599cbff542567e88089",
+      "candidate_sha_match": true,
+      "previously_reviewed_sha": false,
+      "output_dimensions": [
+        1970,
+        798
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        129,
+        17,
+        1894,
+        788
+      ],
+      "edge_nz": 0,
+      "edge_ge32": 0,
+      "edge_max": 0,
+      "right_edge_ge32": 0,
+      "fit_dimensions": [
+        264,
+        107
+      ],
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "SOURCE_PROTECTED_RED_PANEL_AND_TRUE_CELL_UNVERIFIED",
+        "observation": "수동 변속: 글자 형태와 매핑 확인. 원본에 빨간 패널 아트가 있어 실제 원문 제거/보호영역 합성 미검증.",
+        "english_to_approved_korean_match": true,
+        "per_glyph_legibility": "VISIBLE_READABLE_IN_SOURCE_COMPARISON",
+        "transparent_lettering_layer": "YES_VISUAL",
+        "text_length_difference_ignored": true,
+        "source_bbox_containment": "NOT_VERIFIED_TRUE_UI_UV_CELL",
+        "native_fit": "SIMULATION_ONLY",
+        "actual_UI_composite": "NOT_TESTED",
+        "DDS": "NOT_CREATED",
+        "C2_C3": "NOT_ASSESSED",
+        "runtime_validation": "UNTESTED"
+      }
+    }
+  ]
+}
