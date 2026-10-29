@@ -146,6 +146,21 @@ require(bridge.index("ctx->PSSetConstantBuffers(2u, 1u, &fvfFogBuffer)") <
         bridge.index("ctx->PSSetShader(fixedPixelShader, nullptr, 0u)") <
         bridge.index("if (ib) ctx->DrawIndexed(indexCount, 0, 0);"),
         "FVF native table fog was bound after GPU submission")
+# The actual real-game PS dispatch expression is a deeply nested conditional.
+# A single lost parenthesis here produced a C2059 on the Windows source lane,
+# even when standalone Linux fog tests passed. Protect the complete expression.
+from re import sub as _fog_re_sub
+fixed_ps_start = bridge.index("ID3D11PixelShader* fixedPixelShader = (")
+fixed_ps_end = bridge.index("// Source fog is exact only for these three", fixed_ps_start)
+fixed_ps_expression = bridge[fixed_ps_start:fixed_ps_end]
+require(fixed_ps_expression.count("(") == fixed_ps_expression.count(")") and
+        "capture.stage1Enabled ?" in fixed_ps_expression and
+        "s.sampledPs.Get()" in fixed_ps_expression,
+        "native game FVF PS selection unbalanced or stage-1 fallback missing")
+mutated_ps = fixed_ps_expression.replace("s.sampledPs.Get()))", "s.sampledPs.Get())", 1)
+require(mutated_ps != fixed_ps_expression and
+        mutated_ps.count("(") != mutated_ps.count(")"),
+        "destructive fixed-game PS source syntax mutation escaped C2059 guard")
 # Unsupported stage-1/complex combiner must NEVER return a false exact fog.
 selected_fog = bridge.partition("if (output.nativeTableFog.enabled) {")[2].partition(
     "ctx->PSSetShader(fixedPixelShader, nullptr, 0u);")[0]

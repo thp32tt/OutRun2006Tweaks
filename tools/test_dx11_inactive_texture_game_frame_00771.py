@@ -24,7 +24,8 @@ def joined(b):
         "if (!supported_game_state(game, type, vp, layout, transforms,\n                                  fixedClip, capture, output))" in draw,
         "translate_vertices(bytes, vertexCount, stride, vp," in draw,
         "if (!submit(s, vertices, indices, indexCount, type, capture, output))" in draw,
-        "ctx->PSSetShader(capture.stage1Enabled ?" in submit,
+        "ID3D11PixelShader* fixedPixelShader = (capture.stage1Enabled ?" in submit,
+        "ctx->PSSetShader(fixedPixelShader, nullptr, 0u);" in submit,
         "!capture.enabled ? s.ps.Get()" in submit,
         "s.frameBatch.record_source_draw(sourceOrdinal);" in draw,
     ))

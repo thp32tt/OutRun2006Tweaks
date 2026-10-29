@@ -8211,7 +8211,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                      (capture.mixedAddTextureAlpha ? s.mixedAddTextureAlphaPs.Get() :
                      (capture.mixedAddDiffuseAlpha ? s.mixedAddDiffuseAlphaPs.Get() :
                      (capture.selectTexture ? s.textureOnlyPs.Get() :
-                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get()))))))))))); 
+                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get())))))))))))); 
     // Source fog is exact only for these three decoded game combiners.
     // Preserve original game Draw for all unmapped stage-0/1 operations.
     if (output.nativeTableFog.enabled) {
