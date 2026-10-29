@@ -2686,19 +2686,31 @@ namespace OutRunVRStereo
             // device getter below is still authoritative and a real shader
             // always rejects the XYZRHW fixed-function route.
             const bool exactResult = R30IsExactResultHudDraw();
+            const auto projectedProducer =
+                OutRunVR::GameSemantic::CurrentRenderProducerToken();
             const bool exactProjectedRival =
                 OutRunVR::GameSemantic::QueueRenderActive() &&
                 OutRunVR::GameSemantic::EffectiveScope() ==
                     OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                projectedProducer ==
                     OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
                 OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
-            // Known-good a22be86a always reached the live VS/FVF XYZRHW probe
-            // for DPUP. The newer R33 cached-state fast gate can be stale after
-            // D3DX StateBlock traffic. Exact rival ownership has source+node+
-            // Calc3D2D anchor proof, so ignore only the cached VS hint here and
-            // retain the authoritative live GetVertexShader/GetFVF rejection.
+            const bool exactProjectedRank =
+                OutRunVR::GameSemantic::QueueRenderActive() &&
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                (projectedProducer ==
+                    OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
+                 projectedProducer ==
+                    OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite) &&
+                OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
+            // Rank 1/2/3 sprani and rank 4/5 clip digits now use the same
+            // authoritative live VS/FVF admission as the HMD-known-good rival.
+            // Only exact queue-owned vehicle markers with a live Calc3D2D
+            // anchor bypass the stale cached VS hint; a real bound VS still
+            // rejects below before any stereo GPU draw.
             if (!exactResult && !exactProjectedRival &&
+                !exactProjectedRank &&
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire) != 0)
                 return reject(R30XyzrhwPrepareReject::CachedVsIdentity);
 
@@ -7569,11 +7581,23 @@ namespace OutRunVRStereo
                 sourceCommand.queued && sourceCommand.queueNode &&
                 sourceCommand.queueEpoch != 0 &&
                 OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
+            const bool exactProjectedRank =
+                OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
+                sourceCommand.scope ==
+                    OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                (sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
+                 sourceCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite) &&
+                sourceCommand.queued && sourceCommand.queueNode &&
+                sourceCommand.queueEpoch != 0 &&
+                OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
             // D3DX StateBlocks may leave a stale shader tracking hint.
-            // A proven result batch and an exact queue-owned rival marker use
+            // A proven result batch and an exact queue-owned vehicle marker use
             // the authoritative live getter below; a real VS still rejects
             // this fixed-function path before any stereo GPU submission.
             if (!exactResult && !exactProjectedRival &&
+                !exactProjectedRank &&
                 CurrentVertexShaderIdentity.load(
                     std::memory_order_acquire) != 0)
                 return E_NOTIMPL;
@@ -8039,7 +8063,8 @@ namespace OutRunVRStereo
             R30StereoPassTrace passTrace{};
             const bool tracePhysicalEyes =
                 Settings::VRTelemetry &&
-                (exactResult || exactProjectedRival);
+                (exactResult || exactProjectedRival ||
+                 exactProjectedRank);
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
                 projected
