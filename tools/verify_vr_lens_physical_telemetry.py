@@ -188,6 +188,7 @@ def main() -> None:
         if old in (
             "lensInlineLinked ? 1 : 0",
             "INLINE_CALL_STACK_PMT_UNVERIFIED",
+            "DEFERRED_WINDOW_CANDIDATE",
         ):
             mutated[idx] = mutated[idx].replace(old, new)
         else:
