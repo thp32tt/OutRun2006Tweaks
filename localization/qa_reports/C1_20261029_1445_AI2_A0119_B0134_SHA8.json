@@ -1,0 +1,409 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T1445KST-A0119-B0134-NEW-SHA8",
+  "timestamp_kst": "2026-10-29T14:45:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "review_scope": "PNG_KOREAN_LETTERING_LAYER_ONLY",
+  "review_method": "Direct visual comparison of English source ROI, generated Korean transparent PNG, and simulated native fit; verified N100 export/manifest SHA256 and alpha canvas boundary.",
+  "prior_distinct_reviewed_candidate_sha": 271,
+  "summary": {
+    "new_unique_sha": 8,
+    "A": 4,
+    "B": 4,
+    "pass": 8,
+    "hold": 0,
+    "fail": 0,
+    "source_sha_verified": 8,
+    "candidate_sha_verified": 8,
+    "rgba": 8,
+    "alpha_ge32_border_contact": 0,
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "dds_created": false,
+    "actual_UI_composite": "NOT_TESTED",
+    "C2_C3": "NOT_ASSESSED",
+    "runtime": "UNTESTED",
+    "vr_ffb_dx11_dxvk": "UNCHANGED"
+  },
+  "evidence": {
+    "n100_root": "work/C1_QA_20261029_1445_AI2_new_sha8",
+    "files": [
+      "preflight.json",
+      "pairs_A.jpg",
+      "pairs_B.jpg",
+      "native_fit_A.jpg",
+      "native_fit_B.jpg"
+    ],
+    "n100_report": "work/C1_QA_20261029_1445_AI2_report.json"
+  },
+  "records": [
+    {
+      "task_id": "OUTRUN-ROI-A-0119-7A5CE8C4",
+      "role": "A",
+      "source_ordinal": 413,
+      "english": "Try to reach the goal with your girlfriend.",
+      "approved_korean": "여자친구와 함께 골에 도착하세요.",
+      "source_file": "Q112_D41D0B1_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "c12daea521b675a6454026575a2a6516382161e5f3ed6fe93796a71f0029a201",
+      "source_bbox_xyxy": [
+        435,
+        19,
+        1357,
+        238
+      ],
+      "source_bbox_size": [
+        922,
+        219
+      ],
+      "candidate_filename": "Q112_34d7b55a5e6b3ec8_k.png",
+      "candidate_sha256": "a270f0d48836cf04cee26adf6ca3814a9cc6a1e69ad08fed0c305aa2a8ed13d4",
+      "output_png_size": [
+        2167,
+        726
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        654,
+        219
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "alpha_border_max": 0,
+      "significant_alpha_border_contact": false,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'여자친구와 함께 골에 도착하세요.' 두 줄의 글자·받침·마침표 판독 가능. 영문 원문 없이 글자/효과만 표시. 기울기 일치, 경계 잘림 미관찰.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0120-34DBE799",
+      "role": "A",
+      "source_ordinal": 414,
+      "english": "Time Attack Mode",
+      "approved_korean": "타임 어택 모드",
+      "source_file": "Q119_F6811E94_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "e77fd214e84ee5369432c8838110ec72b7d954e50c499f9c6c75d5cee4070507",
+      "source_bbox_xyxy": [
+        400,
+        65,
+        1621,
+        189
+      ],
+      "source_bbox_size": [
+        1221,
+        124
+      ],
+      "candidate_filename": "Q119_470c1b806cd9eecb_k.png",
+      "candidate_sha256": "1482817fe4770dce64b13febd57a5412f18eb9953e74e5a7718f5ca6d7d98622",
+      "output_png_size": [
+        2172,
+        724
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        372,
+        124
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "alpha_border_max": 0,
+      "significant_alpha_border_contact": false,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'타임 어택 모드' 음절 식별 가능. 원본 주황/검정 기울기와 외곽선 방향 유지. 폭 축소 단독 반려 금지.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0121-979D5750",
+      "role": "A",
+      "source_ordinal": 415,
+      "english": "A course designed for player battle.",
+      "approved_korean": "플레이어 대전을 위해 설계된 코스입니다.",
+      "source_file": "Q121_FD90AA9_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "29f5411f9109f5217ca7a308cddcf541820cdf13d8e238d2063193f0bc5c1456",
+      "source_bbox_xyxy": [
+        3180,
+        1534,
+        3828,
+        1668
+      ],
+      "source_bbox_size": [
+        648,
+        134
+      ],
+      "candidate_filename": "Q121_c8c40943e3657cc4_k.png",
+      "candidate_sha256": "f0e88662b76bf0d1c3f0addc62eb326b59d6cffb45cacf0e2300c38ef1a31e03",
+      "output_png_size": [
+        2180,
+        721
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        405,
+        134
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "alpha_border_max": 1,
+      "significant_alpha_border_contact": false,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'플레이어 대전을 위해 설계된 코스입니다.' 두 줄 읽힘. 색상·기울기 유사, alpha=1 경계 잡음은 실질 잘림 증거가 아님.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0122-475DF070",
+      "role": "A",
+      "source_ordinal": 416,
+      "english": "The course from the original OutRun2.",
+      "approved_korean": "오리지널 아웃런2의 코스입니다.",
+      "source_file": "Q121_FD90AA9_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "29f5411f9109f5217ca7a308cddcf541820cdf13d8e238d2063193f0bc5c1456",
+      "source_bbox_xyxy": [
+        3034,
+        1880,
+        3566,
+        1996
+      ],
+      "source_bbox_size": [
+        532,
+        116
+      ],
+      "candidate_filename": "Q121_7d604aea11ee8cd5_k.png",
+      "candidate_sha256": "9cb3872e9fa9c790b51d85526c49d62b31e8806162897e8812ba14e4501880ad",
+      "output_png_size": [
+        1902,
+        827
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        267,
+        116
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "alpha_border_max": 1,
+      "significant_alpha_border_contact": false,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'오리지널 아웃런2의 코스입니다.' 두 줄 선명. 출력 하단 alpha=1 경계 잡음만 확인; 실제 글자 잘림 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0131-7DFF86B7",
+      "role": "B",
+      "source_ordinal": 468,
+      "english": "Normal Setting",
+      "approved_korean": "일반 설정",
+      "source_file": "Q111_C075FB49_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "source_bbox_xyxy": [
+        405,
+        1208,
+        602,
+        1311
+      ],
+      "source_bbox_size": [
+        197,
+        103
+      ],
+      "candidate_filename": "Q111_391c45c30f031821_k.png",
+      "candidate_sha256": "1b116bcf8cc92f7a0b06ee95e9ed6f863df8a7d0625bdb5a1bc3060d75236b0c",
+      "output_png_size": [
+        1735,
+        906
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        197,
+        103
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "alpha_border_max": 1,
+      "significant_alpha_border_contact": false,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'일반 설정' 글자와 받침 읽힘. 원문 녹색 패널/흰 막대는 출력에 복제되지 않음. 본 후보는 투명 글자/효과만.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0132-6BF4258D",
+      "role": "B",
+      "source_ordinal": 469,
+      "english": "Outrun2: SP Course has been selected.",
+      "approved_korean": "아웃런2 SP 코스가 선택되었습니다.",
+      "source_file": "Q121_FD90AA9_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "29f5411f9109f5217ca7a308cddcf541820cdf13d8e238d2063193f0bc5c1456",
+      "source_bbox_xyxy": [
+        62,
+        1244,
+        2146,
+        1348
+      ],
+      "source_bbox_size": [
+        2084,
+        104
+      ],
+      "candidate_filename": "Q121_acfc678988a06403_k.png",
+      "candidate_sha256": "180af486dae49fa76005bfa17850ea3dd28f494aded20210e9e075139df0ac66",
+      "output_png_size": [
+        2172,
+        724
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        312,
+        104
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "alpha_border_max": 0,
+      "significant_alpha_border_contact": false,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'아웃런2 SP 코스가 선택되었습니다.' 읽힘. 네이티브 bbox 모의 영상에서 원문보다 좁으나 폭 차이 자체는 FAIL 근거 아님; 50% 실제 게임 가독성 별도 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0133-C057FC83",
+      "role": "B",
+      "source_ordinal": 470,
+      "english": "Normal difficult",
+      "approved_korean": "보통 난이도",
+      "source_file": "Q121_FD90AA9_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "29f5411f9109f5217ca7a308cddcf541820cdf13d8e238d2063193f0bc5c1456",
+      "source_bbox_xyxy": [
+        2614,
+        756,
+        3310,
+        868
+      ],
+      "source_bbox_size": [
+        696,
+        112
+      ],
+      "candidate_filename": "Q121_9a62ccb58daa23ae_k.png",
+      "candidate_sha256": "8a8d99b5ba30a4e8abe94518841b9977a8cc780432ff414fc141572b27ca9bd1",
+      "output_png_size": [
+        2106,
+        747
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        316,
+        112
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "alpha_border_max": 1,
+      "significant_alpha_border_contact": false,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'보통 난이도' 두 색상 구분 및 음절 읽힘. 원본 기울기와 어두운 윤곽선 유지, 실질 출력 경계 잘림 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0134-9DF35040",
+      "role": "B",
+      "source_ordinal": 471,
+      "english": "Outrun2 Course has been selected.",
+      "approved_korean": "아웃런2 코스가 선택되었습니다.",
+      "source_file": "Q121_FD90AA9_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "29f5411f9109f5217ca7a308cddcf541820cdf13d8e238d2063193f0bc5c1456",
+      "source_bbox_xyxy": [
+        162,
+        1380,
+        2048,
+        1484
+      ],
+      "source_bbox_size": [
+        1886,
+        104
+      ],
+      "candidate_filename": "Q121_ceb2a8173087102c_k.png",
+      "candidate_sha256": "ba9adb7023c5cbf41183385279828e098d2068878b9d87ae1659f89c4af47366",
+      "output_png_size": [
+        1991,
+        789
+      ],
+      "output_png_mode": "RGBA",
+      "native_simulation_size": [
+        262,
+        104
+      ],
+      "sha_matches_manifest": true,
+      "previously_reviewed_sha": false,
+      "alpha_border_max": 0,
+      "significant_alpha_border_contact": false,
+      "judgement": "PASS",
+      "reason_code": "C1_LETTERING_LAYER_READABLE",
+      "observation": "'아웃런2 코스가 선택되었습니다.' 읽힘. 원본보다 좁지만 가독/문구 매핑 정상, 실게임/50% 가독성 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "actual_ui_cell_containment": "NOT_VERIFIED",
+      "actual_ui_composite": "NOT_TESTED",
+      "native_50pct": "NOT_FORMALLY_TESTED",
+      "C2_C3": "NOT_ASSESSED",
+      "dds": "NOT_CREATED",
+      "runtime": "UNTESTED"
+    }
+  ]
+}
