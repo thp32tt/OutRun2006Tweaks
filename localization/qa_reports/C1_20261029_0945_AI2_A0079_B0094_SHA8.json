@@ -1,0 +1,623 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261029T0945KST-A0079-B0094-NEW-SHA8",
+  "review_requested_at_kst": "2026-10-29T09:45:00+09:00",
+  "verified_at_utc": "2026-10-29T00:49:28.577Z",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "baseline_remote_head": "ad3c4f23dbf3a5ebcd889c75fd74346ba7589453",
+  "contract_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "candidate_inventory": {
+    "unreviewed_SHA_before": 116,
+    "seen_reviewed_SHA_before": 805,
+    "new_reviewed_SHA": 8,
+    "unreviewed_after_at_snapshot": 108,
+    "concurrent_new_exports_possible": true
+  },
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 8,
+    "NEW_SHA_REVIEWED": 8
+  },
+  "records": [
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0079-6181549C",
+      "source_ordinal": 373,
+      "source_file": "Q043_6d75016bd272e246_source.png",
+      "candidate_file": "Q043_6d75016bd272e246_source_k.png",
+      "source_path": "/home/chatgpt-runner2/work/image-src/text_roi_batches/inputs/Q043_6d75016bd272e246_source.png",
+      "source_sha256": "cf9dd39384d49f5ddbd73dd51c5e354b0ace42444a4b560a2560c343840526de",
+      "source_manifest_sha256": "cf9dd39384d49f5ddbd73dd51c5e354b0ace42444a4b560a2560c343840526de",
+      "source_sha_match": true,
+      "candidate_sha256": "6ad10ca9975efe72c3c9346d8ec6b584c7f7617d88fb3c3923a374d8db7f4f44",
+      "candidate_export_sha256": "6ad10ca9975efe72c3c9346d8ec6b584c7f7617d88fb3c3923a374d8db7f4f44",
+      "candidate_sha_match": true,
+      "approved_mapping": {
+        "english": "PERFECT!",
+        "korean": "완벽!"
+      },
+      "source_bbox_xyxy": [
+        113,
+        352,
+        1302,
+        561
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          43,
+          23,
+          1925,
+          630
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "simulated_preserve_aspect_fit": {
+        "ordinal": 373,
+        "target_dimensions": [
+          1189,
+          209
+        ],
+        "candidate_fitted_dimensions": [
+          627,
+          209
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_REGISTRATION_AND_PROTECTED_ART_UNVERIFIED",
+        "reason": "Source ROI and candidate visually compared; approved Korean lettering is readable with no visible spelling/sub-glyph defects, background regeneration or substantial clipping. All image/source SHA match and transparent RGBA validates. Preserve-aspect fit within designated bbox was simulated, but no real UI-cell placement/composited DDS/protected-art pixel comparison was executed; therefore C1 full candidate approval remains HOLD.",
+        "visual_text_match": "PASS",
+        "glyph_legibility_native_sample": "PASS",
+        "image_transparency": "PASS",
+        "source_sha_integrity": "PASS",
+        "candidate_sha_integrity": "PASS",
+        "text_length_difference_ignored": true,
+        "background_frame": "NOT_OBSERVED",
+        "alpha_border_clipping": "NOT_OBSERVED",
+        "candidate_box_fit_simulated": "PASS",
+        "native_UI_cell_registration": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0080-9737F29B",
+      "source_ordinal": 374,
+      "source_file": "Q043_455717B2_SWITCH_READABLE_FLIPY.png",
+      "candidate_file": "Q043_6692c78faa4ef14e_k.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q043_455717B2_SWITCH_READABLE_FLIPY.png",
+      "source_sha256": "76b58caa8d7dcb25ae3705c3aec28099f7ba005b7a8c1c8818a6081103b6fb76",
+      "source_manifest_sha256": "76b58caa8d7dcb25ae3705c3aec28099f7ba005b7a8c1c8818a6081103b6fb76",
+      "source_sha_match": true,
+      "candidate_sha256": "5a2759431b463f838672d870c9896f58d686a79ce3ce8bb439393459b5c7a784",
+      "candidate_export_sha256": "5a2759431b463f838672d870c9896f58d686a79ce3ce8bb439393459b5c7a784",
+      "candidate_sha_match": true,
+      "approved_mapping": {
+        "english": "PERFECT!",
+        "korean": "완벽!"
+      },
+      "source_bbox_xyxy": [
+        113,
+        355,
+        1302,
+        561
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          138,
+          101,
+          2096,
+          710
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "simulated_preserve_aspect_fit": {
+        "ordinal": 374,
+        "target_dimensions": [
+          1189,
+          206
+        ],
+        "candidate_fitted_dimensions": [
+          618,
+          206
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_REGISTRATION_AND_PROTECTED_ART_UNVERIFIED",
+        "reason": "Source ROI and candidate visually compared; approved Korean lettering is readable with no visible spelling/sub-glyph defects, background regeneration or substantial clipping. All image/source SHA match and transparent RGBA validates. Preserve-aspect fit within designated bbox was simulated, but no real UI-cell placement/composited DDS/protected-art pixel comparison was executed; therefore C1 full candidate approval remains HOLD.",
+        "visual_text_match": "PASS",
+        "glyph_legibility_native_sample": "PASS",
+        "image_transparency": "PASS",
+        "source_sha_integrity": "PASS",
+        "candidate_sha_integrity": "PASS",
+        "text_length_difference_ignored": true,
+        "background_frame": "NOT_OBSERVED",
+        "alpha_border_clipping": "NOT_OBSERVED",
+        "candidate_box_fit_simulated": "PASS",
+        "native_UI_cell_registration": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0081-FC28A2B5",
+      "source_ordinal": 375,
+      "source_file": "Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "candidate_file": "Q046_04f09090b3bc4003_k.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_sha256": "125db43164fef1b46794e3ec56a6c8b4c393058bf10d601f33f1aeea6bb23d93",
+      "candidate_export_sha256": "125db43164fef1b46794e3ec56a6c8b4c393058bf10d601f33f1aeea6bb23d93",
+      "candidate_sha_match": true,
+      "approved_mapping": {
+        "english": "Castle Wall",
+        "korean": "캐슬 월"
+      },
+      "source_bbox_xyxy": [
+        646,
+        573,
+        872,
+        701
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1666,
+          944
+        ],
+        "alpha_bbox": [
+          43,
+          55,
+          1622,
+          880
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "simulated_preserve_aspect_fit": {
+        "ordinal": 375,
+        "target_dimensions": [
+          226,
+          128
+        ],
+        "candidate_fitted_dimensions": [
+          226,
+          128
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_REGISTRATION_AND_PROTECTED_ART_UNVERIFIED",
+        "reason": "Source ROI and candidate visually compared; approved Korean lettering is readable with no visible spelling/sub-glyph defects, background regeneration or substantial clipping. All image/source SHA match and transparent RGBA validates. Preserve-aspect fit within designated bbox was simulated, but no real UI-cell placement/composited DDS/protected-art pixel comparison was executed; therefore C1 full candidate approval remains HOLD.",
+        "visual_text_match": "PASS",
+        "glyph_legibility_native_sample": "PASS",
+        "image_transparency": "PASS",
+        "source_sha_integrity": "PASS",
+        "candidate_sha_integrity": "PASS",
+        "text_length_difference_ignored": true,
+        "background_frame": "NOT_OBSERVED",
+        "alpha_border_clipping": "NOT_OBSERVED",
+        "candidate_box_fit_simulated": "PASS",
+        "native_UI_cell_registration": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "A",
+      "task_id": "OUTRUN-ROI-A-0082-8239C1FC",
+      "source_ordinal": 376,
+      "source_file": "Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "candidate_file": "Q046_41f1bf6830e0be2d_k.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_sha256": "89b505fc2e2d73eddb97b23a5074b754ce8cf3a82f7b045c6a0799e523006729",
+      "candidate_export_sha256": "89b505fc2e2d73eddb97b23a5074b754ce8cf3a82f7b045c6a0799e523006729",
+      "candidate_sha_match": true,
+      "approved_mapping": {
+        "english": "Industrial Complex",
+        "korean": "인더스트리얼 컴플렉스"
+      },
+      "source_bbox_xyxy": [
+        647,
+        726,
+        925,
+        863
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1786,
+          880
+        ],
+        "alpha_bbox": [
+          45,
+          31,
+          1754,
+          822
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "simulated_preserve_aspect_fit": {
+        "ordinal": 376,
+        "target_dimensions": [
+          278,
+          137
+        ],
+        "candidate_fitted_dimensions": [
+          278,
+          137
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_REGISTRATION_AND_PROTECTED_ART_UNVERIFIED",
+        "reason": "Source ROI and candidate visually compared; approved Korean lettering is readable with no visible spelling/sub-glyph defects, background regeneration or substantial clipping. All image/source SHA match and transparent RGBA validates. Preserve-aspect fit within designated bbox was simulated, but no real UI-cell placement/composited DDS/protected-art pixel comparison was executed; therefore C1 full candidate approval remains HOLD.",
+        "visual_text_match": "PASS",
+        "glyph_legibility_native_sample": "PASS",
+        "image_transparency": "PASS",
+        "source_sha_integrity": "PASS",
+        "candidate_sha_integrity": "PASS",
+        "text_length_difference_ignored": true,
+        "background_frame": "NOT_OBSERVED",
+        "alpha_border_clipping": "NOT_OBSERVED",
+        "candidate_box_fit_simulated": "PASS",
+        "native_UI_cell_registration": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0091-13159BD2",
+      "source_ordinal": 428,
+      "source_file": "Q043_f4bbdc9b75dad5ed_source.png",
+      "candidate_file": "Q043_f4bbdc9b75dad5ed_source_k.png",
+      "source_path": "/home/chatgpt-runner2/work/image-src/text_roi_batches/inputs/Q043_f4bbdc9b75dad5ed_source.png",
+      "source_sha256": "55358b0ae6f5d381f40bb403d7b8067d7611f481d1084f92f0a347696c11bb9b",
+      "source_manifest_sha256": "55358b0ae6f5d381f40bb403d7b8067d7611f481d1084f92f0a347696c11bb9b",
+      "source_sha_match": true,
+      "candidate_sha256": "c1ec95919114460670798548e039361bee788c86396384c3cced76c4976b84f3",
+      "candidate_export_sha256": "c1ec95919114460670798548e039361bee788c86396384c3cced76c4976b84f3",
+      "candidate_sha_match": true,
+      "approved_mapping": {
+        "english": "CONGRATULATIONS!",
+        "korean": "축하합니다!"
+      },
+      "source_bbox_xyxy": [
+        6,
+        583,
+        2024,
+        794
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2157,
+          729
+        ],
+        "alpha_bbox": [
+          73,
+          180,
+          2140,
+          579
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "simulated_preserve_aspect_fit": {
+        "ordinal": 428,
+        "target_dimensions": [
+          2018,
+          211
+        ],
+        "candidate_fitted_dimensions": [
+          624,
+          211
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_REGISTRATION_AND_PROTECTED_ART_UNVERIFIED",
+        "reason": "Source ROI and candidate visually compared; approved Korean lettering is readable with no visible spelling/sub-glyph defects, background regeneration or substantial clipping. All image/source SHA match and transparent RGBA validates. Preserve-aspect fit within designated bbox was simulated, but no real UI-cell placement/composited DDS/protected-art pixel comparison was executed; therefore C1 full candidate approval remains HOLD.",
+        "visual_text_match": "PASS",
+        "glyph_legibility_native_sample": "PASS",
+        "image_transparency": "PASS",
+        "source_sha_integrity": "PASS",
+        "candidate_sha_integrity": "PASS",
+        "text_length_difference_ignored": true,
+        "background_frame": "NOT_OBSERVED",
+        "alpha_border_clipping": "NOT_OBSERVED",
+        "candidate_box_fit_simulated": "PASS",
+        "native_UI_cell_registration": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0092-526D93D5",
+      "source_ordinal": 429,
+      "source_file": "Q032_DCC7B488_BASE_READABLE_FLIPY.png",
+      "candidate_file": "Q032_87d9ccf1a3e3fc79_k.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q032_DCC7B488_BASE_READABLE_FLIPY.png",
+      "source_sha256": "42971c0fabbb10d7ca4969574c9529e02e1111586578607c066640c95d86fab7",
+      "source_manifest_sha256": "42971c0fabbb10d7ca4969574c9529e02e1111586578607c066640c95d86fab7",
+      "source_sha_match": true,
+      "candidate_sha256": "4bb2809e6143ff46a7324599f76508df2aae482916572fbcf2a2ec689510d977",
+      "candidate_export_sha256": "4bb2809e6143ff46a7324599f76508df2aae482916572fbcf2a2ec689510d977",
+      "candidate_sha_match": true,
+      "approved_mapping": {
+        "english": "Total Rank",
+        "korean": "종합 랭킹"
+      },
+      "source_bbox_xyxy": [
+        545,
+        162,
+        1066,
+        249
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          187,
+          23,
+          2028,
+          686
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "simulated_preserve_aspect_fit": {
+        "ordinal": 429,
+        "target_dimensions": [
+          521,
+          87
+        ],
+        "candidate_fitted_dimensions": [
+          261,
+          87
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_REGISTRATION_AND_PROTECTED_ART_UNVERIFIED",
+        "reason": "Source ROI and candidate visually compared; approved Korean lettering is readable with no visible spelling/sub-glyph defects, background regeneration or substantial clipping. All image/source SHA match and transparent RGBA validates. Preserve-aspect fit within designated bbox was simulated, but no real UI-cell placement/composited DDS/protected-art pixel comparison was executed; therefore C1 full candidate approval remains HOLD.",
+        "visual_text_match": "PASS",
+        "glyph_legibility_native_sample": "PASS",
+        "image_transparency": "PASS",
+        "source_sha_integrity": "PASS",
+        "candidate_sha_integrity": "PASS",
+        "text_length_difference_ignored": true,
+        "background_frame": "NOT_OBSERVED",
+        "alpha_border_clipping": "NOT_OBSERVED",
+        "candidate_box_fit_simulated": "PASS",
+        "native_UI_cell_registration": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0093-F88F2B49",
+      "source_ordinal": 430,
+      "source_file": "Q044_19CEDB9_BASE_READABLE_FLIPY.png",
+      "candidate_file": "Q044_a036a116ad16dcc5_k.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q044_19CEDB9_BASE_READABLE_FLIPY.png",
+      "source_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "source_manifest_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "source_sha_match": true,
+      "candidate_sha256": "c6f7dd76500c1222d8c54dfbdbffb1f9d3297229fec0e97edd8b8e35cf1b86eb",
+      "candidate_export_sha256": "c6f7dd76500c1222d8c54dfbdbffb1f9d3297229fec0e97edd8b8e35cf1b86eb",
+      "candidate_sha_match": true,
+      "approved_mapping": {
+        "english": "Diff",
+        "korean": "차이"
+      },
+      "source_bbox_xyxy": [
+        1853,
+        312,
+        1975,
+        381
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1668,
+          943
+        ],
+        "alpha_bbox": [
+          25,
+          19,
+          1654,
+          898
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "simulated_preserve_aspect_fit": {
+        "ordinal": 430,
+        "target_dimensions": [
+          122,
+          69
+        ],
+        "candidate_fitted_dimensions": [
+          122,
+          69
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_REGISTRATION_AND_PROTECTED_ART_UNVERIFIED",
+        "reason": "Source ROI and candidate visually compared; approved Korean lettering is readable with no visible spelling/sub-glyph defects, background regeneration or substantial clipping. All image/source SHA match and transparent RGBA validates. Preserve-aspect fit within designated bbox was simulated, but no real UI-cell placement/composited DDS/protected-art pixel comparison was executed; therefore C1 full candidate approval remains HOLD.",
+        "visual_text_match": "PASS",
+        "glyph_legibility_native_sample": "PASS",
+        "image_transparency": "PASS",
+        "source_sha_integrity": "PASS",
+        "candidate_sha_integrity": "PASS",
+        "text_length_difference_ignored": true,
+        "background_frame": "NOT_OBSERVED",
+        "alpha_border_clipping": "NOT_OBSERVED",
+        "candidate_box_fit_simulated": "PASS",
+        "native_UI_cell_registration": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    {
+      "lane": "B",
+      "task_id": "OUTRUN-ROI-B-0094-E76FC116",
+      "source_ordinal": 431,
+      "source_file": "Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "candidate_file": "Q046_1aed03d1cf8b7210_k.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified/Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_manifest_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_match": true,
+      "candidate_sha256": "1e94c9cfffa47fa0f8e73daabb3d5dc65b583402ceb0ab73239cade1fcaeed90",
+      "candidate_export_sha256": "1e94c9cfffa47fa0f8e73daabb3d5dc65b583402ceb0ab73239cade1fcaeed90",
+      "candidate_sha_match": true,
+      "approved_mapping": {
+        "english": "Ancient Ruins",
+        "korean": "에인션트 루인스"
+      },
+      "source_bbox_xyxy": [
+        140,
+        878,
+        412,
+        1004
+      ],
+      "image": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1842,
+          853
+        ],
+        "alpha_bbox": [
+          25,
+          68,
+          1767,
+          781
+        ],
+        "alpha_edge_nz": 0,
+        "alpha_edge_ge32": 0,
+        "alpha_edge_max": 0,
+        "alpha_min": 0,
+        "alpha_max": 255
+      },
+      "simulated_preserve_aspect_fit": {
+        "ordinal": 431,
+        "target_dimensions": [
+          272,
+          126
+        ],
+        "candidate_fitted_dimensions": [
+          272,
+          126
+        ],
+        "aspect_ratio_preserved": true,
+        "target_containment": true
+      },
+      "qa": {
+        "judgement": "HOLD",
+        "reason_code": "NATIVE_UI_CELL_REGISTRATION_AND_PROTECTED_ART_UNVERIFIED",
+        "reason": "Source ROI and candidate visually compared; approved Korean lettering is readable with no visible spelling/sub-glyph defects, background regeneration or substantial clipping. All image/source SHA match and transparent RGBA validates. Preserve-aspect fit within designated bbox was simulated, but no real UI-cell placement/composited DDS/protected-art pixel comparison was executed; therefore C1 full candidate approval remains HOLD.",
+        "visual_text_match": "PASS",
+        "glyph_legibility_native_sample": "PASS",
+        "image_transparency": "PASS",
+        "source_sha_integrity": "PASS",
+        "candidate_sha_integrity": "PASS",
+        "text_length_difference_ignored": true,
+        "background_frame": "NOT_OBSERVED",
+        "alpha_border_clipping": "NOT_OBSERVED",
+        "candidate_box_fit_simulated": "PASS",
+        "native_UI_cell_registration": "UNVERIFIED",
+        "runtime_validation": "UNTESTED"
+      }
+    }
+  ],
+  "evidence": {
+    "source_candidate_contact_sheet": "work/C1_QA_20261029_0945_AI2_new_sha8/pairs.jpg",
+    "source_original_contact_sheet": "work/C1_QA_20261029_0945_AI2_new_sha8/originals.jpg",
+    "native_fit_contact_sheet": "work/C1_QA_20261029_0945_AI2_new_sha8/native_fit.jpg",
+    "preflight": "work/C1_QA_20261029_0945_AI2_new_sha8/preflight.json",
+    "source_path_audit": "work/C1_QA_20261029_0945_AI2_new_sha8/source_path_audit.json",
+    "native_fit_metrics": "work/C1_QA_20261029_0945_AI2_new_sha8/native_fit_metrics.json"
+  },
+  "limitations": [
+    "NO_IMAGEGEN",
+    "NO_AB_QUEUE_CONSUMPTION",
+    "NO_NEW_DDS",
+    "NO_C2_C3_OR_INGAME_PASS",
+    "NO_VR_FFB_DX11_DXVK_CHANGES",
+    "RUNTIME_VALIDATION=UNTESTED"
+  ]
+}
