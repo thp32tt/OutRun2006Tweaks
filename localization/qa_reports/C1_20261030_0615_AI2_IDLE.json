@@ -1,0 +1,78 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T0615KST-IDLE",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "observed_at_kst": "2026-10-30T06:17:57+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "No new or modified exported A/B PNG candidate since 2026-10-30 05:15 KST. Prior 05:15 C1-approved file hashes unchanged. Do not re-QA the same SHA.",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "source_root": "/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "candidate_outputs_png": {
+      "A": 436,
+      "B": 482,
+      "total": 918
+    },
+    "files_modified_since_20261030_0515_KST": 0,
+    "latest_file_mtime_kst": {
+      "A": "2026-10-30T04:20:09+09:00",
+      "B": "2026-10-30T05:10:04+09:00"
+    },
+    "states": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "active": null,
+        "next_ordinal": 436
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "active": null,
+        "next_ordinal": 483
+      }
+    },
+    "previous_qa_report": "localization/qa_reports/C1_20261030_0515_AI2_NEW_SHA2.json",
+    "previous_idle_report": "localization/qa_reports/C1_20261030_0545_AI2_IDLE.json",
+    "recent_pass_sha256_reverified": {
+      "A/Q043_8845a649913b5ecf_k.png": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+      "B/Q046_d10debc727463563_k.png": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5"
+    }
+  },
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "evidence": {
+    "n100_readonly_inventory_script": "work/C1_QA_20261030_0545_inventory.py",
+    "cutoff_qa_kst": "2026-10-30T05:15:00+09:00",
+    "file_count_unchanged_from_previous_qa": true
+  },
+  "scope": {
+    "A_B_queue_consumed": false,
+    "imagegen_called": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score": {
+    "previous_confirmed_ai2": 2192,
+    "delta": 0,
+    "new_cumulative_ai2": 2192,
+    "reason": "IDLE state check and re-verification do not establish a new QA achievement."
+  },
+  "limitations": [
+    "Decision uses candidate filename counts, modification-time cutoff and two latest reviewed SHA readbacks; an intentionally backdated in-place overwrite cannot be entirely ruled out.",
+    "A completed_files counter is 435 while A candidate_outputs contains 436 PNGs; count difference is not a new QA candidate.",
+    "No full historical SHA cross-comparison of all 918 existing PNGs was performed. No new C1 PASS asserted."
+  ]
+}
