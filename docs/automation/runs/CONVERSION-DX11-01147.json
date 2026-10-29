@@ -11,17 +11,17 @@
   "owner_id": "ChatGPT:CONVERSION-DX11-01147",
   "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_GRID_REPAINT",
   "classification": "A_SOURCE_INTEGRATION_WITH_CAUSAL_CI_RECORD_REPAIR",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_CI_IN_PROGRESS",
+  "status": "SOURCE_SLICE_BUILD_VERIFIED_FULL_FRAME_UNTESTED",
+  "checkpoint": "C6_STATE",
   "full_dx11_renderer_complete": false,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "development_time_percentages": "UNMEASURED",
   "source_base_sha": "6a2ec9ef5ea801b38ba7a52f73aff529efff1378",
   "source_implementation_commit_sha": "ece862e1e5c804dc771144a9e4e9c141bea28b0e",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "671a3542d6edf1c11cbed033b783b8579bd96991",
+  "validation_bearing_result_sha": "671a3542d6edf1c11cbed033b783b8579bd96991",
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
@@ -86,9 +86,9 @@
     ]
   },
   "acceptance_results": {
-    "real_grid_source_placement": "PENDING_EXACT_SHA",
-    "source_safety": "PENDING_EXACT_SHA",
-    "final_five_gates": "PENDING_EXACT_SHA"
+    "real_grid_source_placement": "PASS_EXACT_SHA",
+    "source_safety": "PASS_EXACT_SHA",
+    "final_five_gates": "PASS_EXACT_SHA"
   },
   "real_game_draw_blocker": "No real OutRun session for this SHA. Earlier b8dab362 desktop native_draws=0 and no publication do not imply success on new binary.",
   "native_game_draw_count": "UNTESTED",
@@ -99,12 +99,72 @@
     "first_gate_failure": "01146 stale terminal C6 claim omitted gameplay path and used unverified acceptance tokens; repair historical record without loosening validation policy."
   },
   "pipeline": {
-    "C0_RECOVER": "PASS",
-    "C1_REVIEW": "PASS",
-    "C2_IMPLEMENT": "COMMITTED",
-    "C3_VALIDATE": "REPAIRING_EXACT_SHA",
-    "C4_COMMIT": "INITIAL_MATERIAL_PRESENT",
-    "C5_PACKAGE": "WAIT_GATE",
-    "C6_STATE": "PENDING"
+    "C0_RECOVER": "PASS pinned GitHub HEAD, branch and completed previous 01146",
+    "C1_REVIEW": "PASS precise missing two-axis fragmented RAW D3D9 source dirty placement",
+    "C2_IMPLEMENT": "PASS native_game_raw_present_coverage.hpp 2D source-corner scan and two focused regressions",
+    "C3_VALIDATE": "PASS five mandatory push GitHub Actions same exact material SHA; runtime separately UNTESTED",
+    "C4_COMMIT": "PASS original source commit ece862e1 plus causal previous-record repair candidate 671a3542d6edf1c11cbed033b783b8579bd96991",
+    "C5_PACKAGE": "SOURCE_MATCHED_WINDOWS_BUILD_AND_BACKEND_ARTIFACTS_PRESENT; NOT_HMD_OR_GAMEPLAY_PASS",
+    "C6_STATE": "PASS docs-only checkpoint after five full exact-SHA Gates; no extra score"
+  },
+  "evidence": {
+    "required_push_workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40794964088,
+        "head_sha": "671a3542d6edf1c11cbed033b783b8579bd96991",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40794964088"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40794964102,
+        "head_sha": "671a3542d6edf1c11cbed033b783b8579bd96991",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40794964102"
+      },
+      {
+        "name": "Build",
+        "run_id": 40794964211,
+        "head_sha": "671a3542d6edf1c11cbed033b783b8579bd96991",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40794964211"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40794964135,
+        "head_sha": "671a3542d6edf1c11cbed033b783b8579bd96991",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40794964135"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40794964131,
+        "head_sha": "671a3542d6edf1c11cbed033b783b8579bd96991",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40794964131"
+      }
+    ],
+    "build_artifacts": [
+      {
+        "id": 12862649565,
+        "name": "outrun2006tweaks-671a3542d6edf1c11cbed033b783b8579bd96991",
+        "digest": "sha256:825aa1a0dbd37e9ea3f547903fa55d045d2c2d4e0040339aef304dde7a20de5f"
+      },
+      {
+        "id": 12863896628,
+        "name": "backend-autovalidated-671a3542d6edf1c11cbed033b783b8579bd96991",
+        "digest": "sha256:d25b71b77334d7893940274440f050d76a19304c0b05628ace672a19a7c1b683"
+      }
+    ],
+    "runtime_evidence": "UNTESTED. No exact-SHA OutRun desktop native Draw, actual visual, or Quest3/VDXR test performed.",
+    "source_implementation": "ece862e1e5c804dc771144a9e4e9c141bea28b0e",
+    "causal_gate_record_repair": "671a3542d6edf1c11cbed033b783b8579bd96991",
+    "full_native_game_frame_complete": false
+  },
+  "c6": {
+    "reason": "FIVE_EXACT_SHA_GATES_PASS_FULL_NATIVE_GAME_FRAME_UNTESTED",
+    "next_action": "Obtain matched opt-in actual desktop OutRun native_draws and publishedBackbufferFrames evidence on same build, diagnose still-unobserved live-game draw/placement blockers; only then menu/car/race and Quest3 stereo. Do not infer native GPU Draw from this RAW static coverage test.",
+    "score_change": 0
   }
 }
