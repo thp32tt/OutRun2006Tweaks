@@ -10,17 +10,17 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:LIVE_FVF:ALL_EXISTING_COMBINER_EXACT_TABLE_FOG_GPU_DRAW",
   "classification": "A_SOURCE_IMPLEMENTATION",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMITTED_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_change": 0,
+  "score_change": 1,
   "development_time_percentages": "UNMEASURED",
   "full_dx11_renderer_complete": false,
   "source_base_sha": "1b674b78a1634f07386b24fdb604960d34162a69",
   "implementation_source_sha": "4abbad3845182dbc63f43880118213575e3040e8",
-  "material_result_sha": "4abbad3845182dbc63f43880118213575e3040e8",
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
+  "validation_bearing_result_sha": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_fvf_fog_dispatch.hpp",
@@ -58,7 +58,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "SOURCE_ONLY_CANDIDATE_CI_PENDING; native game Draw, GPU desktop frame and Quest3 optical evidence at this binary not tested; 5 exact SHA Gates required before BUILD_VERIFIED.",
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; actual source-matched game native draws/published game frames and Quest3/VDXR optical evidence remain UNTESTED",
     "activation_guard_and_fallback": "DX11 opt-in retains authentic source state/RT/depth and RAW only isolated diagnostic; preserve original D3D9 game Draw, gamepad, FFB and DX9Ex fallback. DXVK frozen."
   },
   "feature_contract": {
@@ -92,15 +92,48 @@
       }
     ]
   },
-  "acceptance_results": null,
+  "acceptance_results": {
+    "game_fvf_native_fog_combiner_matrix": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_fvf_fog_dispatch.hpp"
+      ],
+      "validation_command": "Backend Conversion Gate #40851232972 validate and DX11 readiness smoke; Build #40851233047 on validation-bearing SHA"
+    },
+    "fog_shader_device_lifecycle": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_fvf_fog_dispatch.hpp"
+      ],
+      "validation_command": "Build #40851233047 and Backend Conversion Gate #40851232972 exact SHA"
+    },
+    "failclosed_original_game_and_unsafe_hlsl": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tests/native_game_fvf_fog_dispatch_test.cpp",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks #40851233072, Backend Conversion Gate #40851232972 exact SHA"
+    },
+    "five_exact_sha_actions_and_cpp_regressions": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_live_sm3_table_zfog_01005.py"
+      ],
+      "validation_command": "Five GitHub mandatory push checks exact SHA #40851233072 #40851232972 #40851233047 #40851232977 #40851233174"
+    }
+  },
   "pipeline": {
     "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD_NO_OWNER_CONFLICT",
-    "C1_REVIEW": "PASS_IDENTIFIED_3_OF_100_PIXEL_FOG_MAPPING_LIMIT",
-    "C2_IMPLEMENT": "SOURCE_CPP_HLSL_AND_POSITIVE_NEGATIVE_REGRESSION",
-    "C3_VALIDATE": "PENDING_EXACT_SHA_GATES",
-    "C4_COMMIT": "PASS_GITHUB_MATERIAL_CPP_SHA",
-    "C5_PACKAGE": "NEED_NEW_BINARY_AFTER_GATE",
-    "C6_STATE": "PENDING"
+    "C1_REVIEW": "PASS_ORIGINAL_3_OF_100_PIXEL_FOG_MAPPING_LIMIT",
+    "C2_IMPLEMENT": "PASS_CPP_HLSL_GPU_DISPATCH_AND_CPLUSPLUS_REGRESSION",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_EXACT_SHA",
+    "C4_COMMIT": "PASS_SOURCE_MATERIAL_AND_VALIDATION_BEARING_SHA",
+    "C5_PACKAGE": "SOURCE_AND_WINDOWS_BUILD_VERIFIED_NEED_HMD_TEST",
+    "C6_STATE": "PASS_SEPARATE_DOCS_ONLY_AFTER_ALL_GATES"
   },
   "evidence": {
     "old_runtime_evidence": "2026-10-28 previous different SHA native_draws=0, not evidence at current binary",
@@ -115,7 +148,64 @@
       "OpenXR VR architecture",
       "OutRun EXE HUD Inspector CI"
     ],
-    "no_runtime_session": "No exact-source OutRun/Quest3/VDXR session yet; RUNTIME_VALIDATION=UNTESTED",
-    "external_controller_adoption": "UNVERIFIED"
-  }
+    "no_runtime_session": "No source-matched OutRun/Quest3/VDXR; RUNTIME_VALIDATION=UNTESTED",
+    "external_controller_adoption": "UNVERIFIED",
+    "validated_exact_sha": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
+    "required_push_workflows_result": "5/5 completed/success, same exact head_sha, event push",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40851233072,
+        "head_sha": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40851232972,
+        "head_sha": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40851233047,
+        "head_sha": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40851232977,
+        "head_sha": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40851233174,
+        "head_sha": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "exact_shader_source_count": 97,
+    "implementation_source_sha": "4abbad3845182dbc63f43880118213575e3040e8",
+    "source_and_regression_commit": "4abbad3845182dbc63f43880118213575e3040e8",
+    "validation_bearing_result_commit": "9ff2f5806aede6f0309717c0cf819de3863ea53b",
+    "scoreboard_commit": "25e70c4c9a8a32755bdc4e31488c5e425a6614ad",
+    "scoreboard_new": 2165,
+    "runtime_evidence": "UNTESTED: no user real-game source-matched Draw>0, publishedBackbufferFrames>0, GPU desktop frames or Quest3 VDXR test on 9ff2f580",
+    "development_ratio_evidence": "NOT_MEASURED"
+  },
+  "scoreboard_previous": 2164,
+  "scoreboard_new": 2165,
+  "scoreboard_commit": "25e70c4c9a8a32755bdc4e31488c5e425a6614ad",
+  "scoreboard_blob": "43362b9bbc7b76cc812674d6f156bda6d58468f7",
+  "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; actual source-matched game native draws/published game frames and Quest3/VDXR optical evidence remain UNTESTED"
 }
