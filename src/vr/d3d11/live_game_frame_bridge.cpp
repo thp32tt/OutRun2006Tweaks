@@ -1868,7 +1868,18 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
     ComPtr<ID3DBlob> errors;
     static const std::string shaderSource = std::string(kShader) + kScaledAlphaShader;
     // Preserve the original stage-0 shader source while linking stage 1.
-    static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader + kFvfTableFogShader;
+    static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader;
+    // Preserve the established game stage-0/1 shader ABI and shader-source
+    // regression contract. Compile the additional authenticated FVF table
+    // fog entrypoints only from the extended source, never alter legacy PS.
+    if (entry && std::strncmp(entry, "PSFvfTableFog", 13u) == 0) {
+        static const std::string fvfFogShaderSource =
+            stage1ShaderSource + kFvfTableFogShader;
+        return SUCCEEDED(D3DCompile(
+            fvfFogShaderSource.data(), fvfFogShaderSource.size(), "live_game_frame_fvf_fog",
+            nullptr, nullptr, entry, profile, D3DCOMPILE_ENABLE_STRICTNESS,
+            0, blob.GetAddressOf(), errors.GetAddressOf())) && blob;
+    }
     return SUCCEEDED(D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size(), "live_game_frame",
         nullptr, nullptr, entry, profile, D3DCOMPILE_ENABLE_STRICTNESS,
         0, blob.GetAddressOf(), errors.GetAddressOf())) && blob;
@@ -2756,7 +2767,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             fogDepth != NativeSm3FogDepth::Unknown &&
             native_sm3_table_zfog_admission(
                 true, sourceTableFog, sourceVertexFog,
-                sourceRangeFog != FALSE, srgbWrite != FALSE,
+                sourceRangeFog != FALSE, srgbWrite == TRUE,
                 (actualCaps.RasterCaps & D3DPRASTERCAPS_ZFOG) != 0u,
                 (actualCaps.RasterCaps & D3DPRASTERCAPS_WFOG) != 0u,
                 sourceFogColor, start, end, density,

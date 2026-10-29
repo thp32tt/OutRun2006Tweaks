@@ -10,8 +10,8 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:LIVE_FVF:EXACT_TABLE_FOG_NATIVE_RGB_GAME_DRAW",
   "classification": "A_SOURCE_IMPLEMENTATION",
-  "status": "FEATURE_CI_REPAIR_PENDING_EXACT_SHA",
-  "checkpoint": "C4_FEATURE_REPAIR",
+  "status": "FEATURE_MERGED_CURRENT_TARGET_PENDING_FIVE_GATES",
+  "checkpoint": "C4_RECONCILED_FEATURE",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
@@ -126,6 +126,19 @@
       "feature branch five push CI triggers"
     ],
     "next_action": "Five mandatory feature push Actions exact-SHA; after success compare behind=0 and expected_sha nonforce target promotion; then C6 exact-SHA readback",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "concurrent_target_head_reconciled": "d7e190cc6a7f6e3d02994113e945480cfca60626",
+    "adopted_target_repairs": [
+      "preserved original stage1 HLSL ABI",
+      "00581 SELECTARG2 alpha check",
+      "RAW fog unused operand probe",
+      "source sRGB TRUE query",
+      "complete first-frame destructive guards"
+    ],
+    "pending": [
+      "five feature-branch exact-SHA gate PASS",
+      "target behind=0 compare and fast-forward expected_sha, force=false",
+      "C6 actions/artifacts readback"
+    ]
   }
 }

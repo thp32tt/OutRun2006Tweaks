@@ -104,9 +104,10 @@ enum class NativeSm3FogReject : unsigned {
     NativeSm3FogReject* rejected = nullptr,
     NativeSm3FogDepth sourceDepth = NativeSm3FogDepth::Unknown) noexcept {
     result = {};
+    // RANGEFOGENABLE affects vertex-distance fog only; a table equation
+    // overrides it. Preserve the input in the API without a false GPU gate.
+    static_cast<void>(rangeFog);
     if (rejected) *rejected = NativeSm3FogReject::None;
-    // Range fog affects vertex distance only; active table fog takes priority.
-    (void)rangeFog;
     const auto fail = [&](NativeSm3FogReject cause) noexcept {
         if (rejected) *rejected = cause;
         return false;
