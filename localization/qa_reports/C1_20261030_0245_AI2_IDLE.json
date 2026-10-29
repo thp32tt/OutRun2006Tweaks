@@ -1,0 +1,54 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T0245KST-IDLE",
+  "observed_at_kst": "2026-10-30T02:47:01+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "disposition": "IDLE",
+  "reason_code": "NO_NEW_UNREVIEWED_EXPORTED_CANDIDATE_SHA",
+  "method": "N100 read-only execution of work/C1_QA_20261029_2145_AI2_scan.py; deduplicated A/B exported candidate SHA256 against prior C1 QA artifacts and verified export file existence/manifest mapping; inspected A/B state.",
+  "counts": {
+    "review_json_artifacts_scanned": 208,
+    "prior_distinct_candidate_sha256": 921,
+    "exported_files": 916,
+    "new_unreviewed_export_sha256": 0,
+    "new_unreviewed_export_files": 0,
+    "missing_or_incomplete_export_files": 0,
+    "A_completed_files": 434,
+    "A_completed_batches": 140,
+    "B_completed_files": 481,
+    "B_completed_batches": 144,
+    "A_active": false,
+    "B_active": false
+  },
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "scope": "EXPORTED_A_B_CANDIDATES_ONLY; a production output without valid export evidence is not promoted to QA",
+  "limitations": [
+    "No new candidate SHA for visual inspection; no new PASS/FAIL minted",
+    "Historical reviewed SHA count includes earlier revisions and may exceed currently exported files",
+    "Scanner checks export SHA declaration, candidate file existence and manifest match but does not re-hash every local PNG byte in an IDLE scan",
+    "No composite/native DDS/actual game retest"
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "ai2_score_delta": 0,
+  "note": "This IDLE status is a repeated no-candidate check, not a new QA achievement; no AI_SCOREBOARD.md update."
+}
