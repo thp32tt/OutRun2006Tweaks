@@ -6579,13 +6579,14 @@ namespace OutRunVRStereo
                 static std::atomic<std::uint64_t> lensPhysicalResultSamples{0};
                 const auto physicalSample = lensPhysicalResultSamples.fetch_add(
                     1, std::memory_order_relaxed) + 1;
-                const bool pairComplete =
+                const bool lensPairComplete =
                     lensTransaction.leftDrawAttempted &&
                     lensTransaction.rightDrawAttempted &&
-                    SUCCEEDED(leftHr) && SUCCEEDED(rightHr) && restoreOk;
+                    SUCCEEDED(leftHr) && SUCCEEDED(rightHr) &&
+                    lensTransaction.restoreOk;
                 if (physicalSample <= 64 ||
                     (physicalSample & (physicalSample - 1)) == 0 ||
-                    !pairComplete)
+                    !lensPairComplete)
                 {
                     LARGE_INTEGER physicalQpc{};
                     QueryPerformanceCounter(&physicalQpc);
@@ -6612,7 +6613,7 @@ namespace OutRunVRStereo
                         static_cast<unsigned>(leftHr),
                         lensTransaction.rightDrawAttempted ? 1 : 0,
                         static_cast<unsigned>(rightHr), restoreOk ? 1 : 0,
-                        pairComplete ? 1 : 0,
+                        lensPairComplete ? 1 : 0,
                         lensLeftRtPtr, lensRightRtPtr,
                         physicalQpc.QuadPart, GetCurrentThreadId());
                 }
