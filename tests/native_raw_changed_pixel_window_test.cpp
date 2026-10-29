@@ -180,5 +180,44 @@ int main() {
     assert(!native_raw_dirty_region_covers_tile(
         1920, 1080, dirty, selected));
 
+    // Regression: an earlier isolated 40x40 repaint is genuinely visible,
+    // but must not conceal more real native GPU RGB inside a 3x3 D3D9 grid.
+    dirty.rectangles[4].left = 616;
+    dirty.count = 11u;
+    dirty.rectangles[10] = {100, 100, 140, 140};
+    dirty.boundLeft = 100; dirty.boundTop = 100;
+    assert(native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, dirty, W, H, original));
+    assert(original.copyWidth == 32u && original.copyHeight == 32u);
+    assert(original.destinationX == 608 && original.destinationY == 308);
+    after.fill(0u);
+    for (std::uint32_t y = 100u; y < 108u; ++y)
+        for (std::uint32_t x = 200u; x < 208u; ++x)
+            after[(y * W + x) * 4u + 2u] = 211u;
+    chooser.capture(before.data(), W * 4u, after.data(), W * 4u);
+    assert(chooser.select(original, selected, changed) && changed == 64u);
+    assert(native_raw_dirty_region_covers_tile(1920, 1080, dirty, selected));
+    std::uint32_t genuineShown = 0u;
+    for (std::uint32_t y = 0u; y < selected.copyHeight; ++y)
+        for (std::uint32_t x = 0u; x < selected.copyWidth; ++x) {
+            const auto sx = selected.sourceX + x, sy = selected.sourceY + y;
+            const auto i = (sy * W + sx) * 4u;
+            if (native_raw_rgb_changed(before.data() + i, after.data() + i)) {
+                assert(!native_raw_present_border_pixel(selected, sx, sy, true));
+                ++genuineShown;
+            }
+        }
+    assert(genuineShown == 64u);
+    // Missing painted source column must demote to the smaller real island.
+    dirty.rectangles[4].left = 617;
+    assert(native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, dirty, W, H, original));
+    assert(original.copyWidth == 24u && original.copyHeight == 24u);
+    assert(original.destinationX == 108 && original.destinationY == 108);
+    dirty.rectangles[4].left = 616;
+    dirty.boundRight = 901;
+    assert(!native_raw_dirty_region_place_tile(
+        1920, 1080, 0, 0, 1920, 1080, dirty, W, H, original));
+
 }
 

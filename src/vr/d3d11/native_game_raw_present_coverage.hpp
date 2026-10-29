@@ -227,7 +227,11 @@ struct NativeRawPresentDirtyRegion {
                   (std::min)(cropRight, componentRight),
                   (std::min)(cropBottom, componentBottom));
      }
-     if (found) return true;
+     // Do not stop after finding an isolated SMALL repaint: a fragmented
+     // two-axis region may still contain more original GPU RGB pixels.
+     // Only a staging-sized result is provably optimal before the sweeps.
+     if (found && largestArea ==
+             std::uint64_t{sourceWidth} * sourceHeight) return true;
      // A connected component can be nonrectangular: e.g. three thin menu
      // strips make a real 48x48 island with an 8px-high attached tail.
      // Its full bounds place the RAW tile in the tail's unpainted neighbor,

@@ -12,7 +12,11 @@ constexpr bool kSafeRawPresentCoverage =
     !native_raw_preview_present_coverage(true, false, false, false);
 static_assert(kSafeRawPresentCoverage,
               "unproven D3D9 dirty source crops must not publish RAW tiles");
-int main() { assert(kSafeRawPresentCoverage); }
+void test_largest_native_raw_repaint();
+int main() {
+    assert(kSafeRawPresentCoverage);
+    test_largest_native_raw_repaint();
+}
 
 // Partial source-dirty Presents may still visibly display an authenticated
 // opt-in RAW GPU region; neither rcBound alone nor a partial intersecting
@@ -432,3 +436,45 @@ constexpr bool kRawTwoAxisGridRepaintProof = []() constexpr {
 }();
 static_assert(kRawTwoAxisGridRepaintProof,
               "two-axis fragmented RAW repaint must preserve real source RGB");
+
+void test_largest_native_raw_repaint() {
+    using namespace outrun::vr::dx11;
+    // A 3x3 source-painted grid plus thin repaint tail cannot be recovered
+    // by either single-axis sweep. The isolated 40x40 source repaint is a
+    // real but smaller (24x24) GPU diagnostic destination.
+    NativeRawPresentDirtyRegion region{};
+    region.headerVerified = true;
+    region.count = 11u;
+    region.boundLeft = 100; region.boundTop = 100;
+    region.boundRight = 900; region.boundBottom = 348;
+    for (std::uint32_t row = 0u; row < 3u; ++row)
+        for (std::uint32_t col = 0u; col < 3u; ++col) {
+            const auto x = std::int64_t{600} + std::int64_t{16} * col;
+            const auto y = std::int64_t{300} + std::int64_t{16} * row;
+            region.rectangles[row * 3u + col] = {x, y, x + 16, y + 16};
+        }
+    region.rectangles[9] = {648, 300, 900, 308};
+    region.rectangles[10] = {100, 100, 140, 140};
+    NativeRawPresentTile selected{};
+    const auto place = [&]() {
+        return native_raw_dirty_region_place_tile(
+            1920, 1080, 0, 0, 1920, 1080, region, 256, 144, selected);
+    };
+    assert(place());
+    assert(selected.copyWidth == 32u && selected.copyHeight == 32u);
+    assert(selected.destinationX == 608 && selected.destinationY == 308);
+    assert(native_raw_dirty_region_covers_tile(1920, 1080, region, selected));
+    // A genuine missing line in the grid must fall back to the ONLY valid
+    // 24x24 crop, rather than copying any unpainted game-backbuffer pixel.
+    region.rectangles[4].left = 617;
+    assert(place());
+    assert(selected.copyWidth == 24u && selected.copyHeight == 24u);
+    assert(selected.destinationX == 108 && selected.destinationY == 108);
+    assert(native_raw_dirty_region_covers_tile(1920, 1080, region, selected));
+    region.rectangles[4].left = 616;
+    region.boundRight = 901; // forged rcBound poisons every candidate
+    assert(!place());
+    region.boundRight = 900;
+    region.headerVerified = false;
+    assert(!place());
+}
