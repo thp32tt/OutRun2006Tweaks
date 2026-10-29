@@ -2090,15 +2090,26 @@ namespace OutRunVRStereo
                 // Reliable setter/StateBlock tracking proves a bound VS is
                 // not an XYZRHW fixed-function draw. Unreliable tracking must
                 // retain R30's live shader fallback, never assume VS identity.
+                const auto projectedProducer =
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken();
                 const bool exactProjectedRival =
                     OutRunVR::GameSemantic::QueueRenderActive() &&
                     OutRunVR::GameSemantic::EffectiveScope() ==
                         OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
-                    OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    projectedProducer ==
                         OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&
                     OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
+                const bool exactProjectedRank =
+                    OutRunVR::GameSemantic::QueueRenderActive() &&
+                    OutRunVR::GameSemantic::EffectiveScope() ==
+                        OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
+                    (projectedProducer ==
+                        OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
+                     projectedProducer ==
+                        OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite) &&
+                    OutRunVR::GameSemantic::CurrentProjectedMarker() != nullptr;
                 const bool tryXyzrhw = resyncAlreadyFlushed &&
-                    (exactProjectedRival ||
+                    (exactProjectedRival || exactProjectedRank ||
                      !OutRunVR::State::StateBlockTracker::Reliable() ||
                      R32ReviewCurrentVertexShaderIdentity() == 0);
                 // Known-good a22be86a always live-probed PrimitiveUP before
