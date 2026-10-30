@@ -1,0 +1,64 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T2245KST-IDLE",
+  "requested_slot_kst": "2026-10-30T22:45:00+09:00",
+  "checked_at_kst": "2026-10-30T22:47:25+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "branch_head_before": "0808117370d383dda63943c131c7ebb89e2dc888",
+  "policy_blob_shas": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "status": "IDLE",
+  "reason": "No unreviewed candidate SHA with matching existing export-evidence record; do not invent work or repeat SHA QA.",
+  "n100_source": "work/image-src/text_roi_batches",
+  "candidate_outputs": {
+    "A_png_count": 437,
+    "B_png_count": 483,
+    "total_png_count": 920
+  },
+  "dedup_scan": {
+    "prior_qa_report_files": 197,
+    "prior_reviewed_sha256_count": 925,
+    "export_named_count": 920,
+    "pending_unreviewed_export_sha256_count": 0,
+    "missing_export_record_count": 0,
+    "new_A_png_since_last_completed_QA": 0,
+    "new_B_png_since_last_completed_QA": 0,
+    "cutoff_kst": "2026-10-30T18:21:49+09:00"
+  },
+  "last_completed_new_sha_qa": {
+    "run_key": "OUTRUN-C1-AI2-20261030T1815KST-Q228-NEW-SHA2",
+    "record": "localization/qa_reports/C1_20261030_1815_Q228_new_sha2.json",
+    "new_sha_count": 2,
+    "repeat_review_excluded": true
+  },
+  "this_run": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "limits": {
+    "ImageGen": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_approval": false,
+    "ingame_pass": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score": {
+    "change": 0,
+    "reason": "IDLE, status check, and duplicate verification do not count as newly completed independent QA"
+  },
+  "evidence": {
+    "inventory_script": "work/C1_QA_20261030_1945_inventory_readonly.py",
+    "dedup_script": "work/C1_QA_20261030_1945_dedup_readonly.py",
+    "source_local_report": "work/C1_QA_20261030_1815_AI2_report.json"
+  }
+}
