@@ -1,0 +1,88 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1145KST-IDLE",
+  "scheduled_slot_kst": "2026-10-30T11:45:00+09:00",
+  "checked_at_kst": "2026-10-30T11:47:08+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_EXPORTED_LOCAL_KOREAN_PNG_SHA_DETECTED",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "baseline_report": "localization/c1_qa_reports/OUTRUN-C1-AI2-20261030T1045KST-IDLE.json",
+  "n100_inventory": {
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "candidate_counts": {
+      "A": 436,
+      "B": 482,
+      "total": 918
+    },
+    "export_evidence_root": "work/image-src/text_roi_batches/export_evidence",
+    "export_manifest_count": 287,
+    "latest_A_manifest": "OUTRUN-ROI-A-0141-10E79723.json",
+    "latest_A_exported_at_utc": "2026-10-29T19:20:09.213752+00:00",
+    "latest_B_manifest": "OUTRUN-ROI-B-0145-84201DC6.json",
+    "latest_B_exported_at_utc": "2026-10-29T20:10:04.130605+00:00",
+    "producer_state": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "next_ordinal": 436,
+        "active": null
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "next_ordinal": 483,
+        "active": null
+      }
+    },
+    "spot_verified_sha256": [
+      {
+        "role": "A",
+        "file": "Q043_8845a649913b5ecf_k.png",
+        "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+        "export_manifest_sha_match": true,
+        "prior_c1_report_match": true
+      },
+      {
+        "role": "B",
+        "file": "Q046_d10debc727463563_k.png",
+        "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+        "export_manifest_sha_match": true,
+        "prior_c1_report_match": true
+      }
+    ],
+    "baseline_prior_reviewed_unique_sha256": 923,
+    "new_unreviewed_export_unique_sha256_detected": 0,
+    "verification_scope": "A/B candidate counts, exporter manifest count and last exporter names/timestamps unchanged since prior C1 checkpoint; two existing PNG SHA256 spot hashes matched. A full 918-file rehash and every historical SHA comparison were not repeated, so IDLE means no new verified exported candidate, not exhaustive proof of no out-of-band file alteration."
+  },
+  "summary": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": 1
+  },
+  "restrictions": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_DDS": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "final_deployment": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_ssot": "thp32tt/ai-dev-lab/main/AI_SCOREBOARD.md",
+    "previous_confirmed_AI2_cumulative": 2206,
+    "this_run_change": 0,
+    "new_AI2_cumulative": 2206,
+    "reason": "IDLE/status-only checkpoint is not a new scored QA achievement."
+  }
+}
