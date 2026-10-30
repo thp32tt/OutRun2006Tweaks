@@ -2518,6 +2518,108 @@ def reconcile_legacy_conversion_blocked(q: dict) -> bool:
     return bool(recovered)
 
 
+async def uw2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime) -> bool:
+    """A single project chat and one short message per :00/:30 scheduling window.
+
+    This lane has NO production/task/event IDs, GitHub commit polling, C6, or
+    forced 30-minute conversation rotation. A busy worker is never interrupted.
+    One pending window survives its minute until the worker becomes idle; a newer
+    window replaces the older one instead of piling up requests.
+    """
+    if not UW2_WEB_PORT_ENABLED or (CONVERSION_ONLY_SLOT and CONVERSION_ONLY_SLOT != "C"):
+        return False
+    state = q.setdefault("uw2_simple", {})
+    if now.minute in UW2_SCHEDULE_MINUTES:
+        window = now.replace(second=0, microsecond=0).isoformat()
+        if state.get("last_sent_window") != window:
+            state["pending_window"] = window
+    pending = str(state.get("pending_window") or "")
+    if not pending or pending == state.get("last_sent_window"):
+        return False
+    try:
+        scheduled_at = datetime.fromisoformat(pending)
+    except ValueError:
+        state.pop("pending_window", None)
+        save_queue_state(q)
+        return False
+    if (now - scheduled_at).total_seconds() >= 1800:
+        state.pop("pending_window", None)
+        save_queue_state(q)
+        return False
+
+    reg = load_registry(now)
+    slot = next((item for item in reg.slots if item.name == "C"), None)
+    if slot is None:
+        write_runtime(status="uw2_simple_slot_missing", last_action="C tab not configured")
+        return False
+    guard = send_guard_reason(reg, slot, now)
+    if guard:
+        write_runtime(status="uw2_simple_guard", last_action=f"C send delayed: {guard}")
+        return False
+
+    if state.get("fresh_chat_required"):
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        state["fresh_chat_required"] = False
+        save_queue_state(q)
+        save_registry(reg)
+    else:
+        page = await slot_page(context, pages, slot)
+        if slot.url and (await detect_conversation_limit(page)
+                         or await first_visible(page, RETRY_SELECTORS, total_wait_ms=300) is not None):
+            # Start another chat only when the old one is unusable.
+            page = await replace_with_fresh_slot_page(context, pages, slot)
+            save_registry(reg)
+
+    # Sending while ChatGPT is still generating would truncate the development
+    # session. Leave the scheduled follow-up pending and retry when idle.
+    if await detect_busy(page):
+        write_runtime(status="uw2_simple_busy",
+                      last_action="C still working; follow-up queued, no stop or new chat")
+        return False
+    if not await ensure_logged_in(page):
+        write_runtime(status="uw2_simple_login_required",
+                      last_action="C login required; pending message retained")
+        return False
+    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1300) is None:
+        page = await recover_slot_composer(context, pages, slot, page)
+        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=2500) is None:
+            write_runtime(status="uw2_simple_composer_missing",
+                          last_action="C composer unavailable; pending retained")
+            return False
+    if await detect_rate_limit(page) or await detect_limit(page):
+        mark_rate_limit(reg, datetime.now(TZ), "uw2-simple-c")
+        return False
+
+    # This is the entire user-visible message: no ID, metadata or long prompt.
+    sent_result = await send_message(page, "웹포팅 개발 계속진행해")
+    if sent_result != "sent":
+        write_runtime(status="uw2_simple_send_retry",
+                      last_action=f"C send did not succeed: {sent_result}")
+        return False
+
+    sent_at = datetime.now(TZ)
+    if not slot.url:
+        fresh_url = await wait_for_chat_url(page, timeout_sec=8)
+        if fresh_url:
+            slot.url = fresh_url
+    note_successful_request(reg, sent_at, slot.name)
+    slot.runs += 1
+    slot.last_sent_at = sent_at.isoformat()
+    slot.last_result = "uw2_simple_continue_sent"
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = sent_at.isoformat()
+    slot.watchdog_resumes_since_schedule = 0
+    save_registry(reg)
+    state["last_sent_window"] = pending
+    state.pop("pending_window", None)
+    state["last_sent_at"] = sent_at.isoformat()
+    save_queue_state(q)
+    write_runtime(status="uw2_simple_running",
+                  last_action="C: short continuation sent; same chat retained",
+                  uw2_simple=state, queue=q)
+    return True
+
+
 async def conversion_send_lane_task(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -2526,8 +2628,10 @@ async def conversion_send_lane_task(
     *,
     force_fresh_chat: bool = False,
 ) -> bool:
-    """Dispatch one conversion lane without blocking the other conversion lanes."""
+    """Dispatch a normal conversion lane; UW2 uses the minimal chat loop."""
     now = datetime.now(TZ)
+    if UW2_WEB_PORT_ENABLED and slot_name == "C":
+        return await uw2_simple_cycle(context, pages, q, now)
     if not vr_scheduled_dispatch_due(q, slot_name, now):
         return False
     reg = load_registry(now)
@@ -3622,7 +3726,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     Actions and missing C6 results are never silently archived at 30 minutes.
     """
     active_by_lane = q.setdefault("active_by_lane", {})
-    enabled = (("A", CONVERSION_DX11_ENABLED), ("C", UW2_WEB_PORT_ENABLED or CONVERSION_DX9EX_ENABLED))
+    enabled = (("A", CONVERSION_DX11_ENABLED), ("C", CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED))
     for lane_key, allowed in enabled:
         if not allowed or (CONVERSION_ONLY_SLOT and lane_key != CONVERSION_ONLY_SLOT):
             continue
