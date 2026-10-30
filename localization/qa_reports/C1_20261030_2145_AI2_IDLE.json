@@ -1,0 +1,59 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T2145KST-IDLE-READONLY",
+  "scheduled_slot_kst": "2026-10-30T21:45:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policies_verified": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "Verified N100 source inventory and SHA dedup via read-only scripts; existing exported PNGs and C1 report SHA history checked before any visual inspection; no duplicate SHA inspected",
+  "candidate_inventory": {
+    "A": 437,
+    "B": 483,
+    "total": 920,
+    "exported_candidate_count": 920,
+    "missing_export_count": 0,
+    "files_newer_than_last_actual_C1_review_at_2026_10_30_18_21_49_KST": 0
+  },
+  "dedup": {
+    "reviewed_qa_record_files": 197,
+    "previously_reviewed_candidate_sha_count": 925,
+    "unreviewed_export_sha_count": 0
+  },
+  "results": {
+    "new_candidate_sha": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": true
+  },
+  "last_actual_C1_review": "localization/qa_reports/C1_20261030_1815_Q228_new_sha2.json",
+  "prior_idle": "localization/qa_reports/C1_20261030_2115_AI2_IDLE.json",
+  "evidence": {
+    "n100_readonly_inventory": "work/C1_QA_20261030_1945_inventory_readonly.py",
+    "n100_readonly_dedup": "work/C1_QA_20261030_1945_dedup_readonly.py",
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "export_evidence_root": "work/image-src/text_roi_batches/export_evidence"
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "AI": "AI 2",
+    "previous_confirmed_GitHub_SSOT": 2229,
+    "delta": 0,
+    "new_cumulative": 2229,
+    "reason": "IDLE and duplicate check only; no distinct new output review"
+  }
+}
