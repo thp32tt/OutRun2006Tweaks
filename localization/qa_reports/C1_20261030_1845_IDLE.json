@@ -1,0 +1,56 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "task_id": "OUTRUN-C1-20261030T1845KST",
+  "slot_kst": "2026-10-30T18:45:00+09:00",
+  "role": "C1",
+  "status": "IDLE_NO_UNREVIEWED_EXPORTED_SHA",
+  "evidence_source": "N100 /home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "checked": {
+    "prior_reports_scanned": 210,
+    "distinct_previously_reviewed_candidate_sha256": 925,
+    "export_evidence_png_records": 920,
+    "physically_present_output_files_A": 437,
+    "physically_present_output_files_B": 483,
+    "missing_or_incomplete_export_files": 0,
+    "unreviewed_export_candidate_sha256": 0,
+    "unreviewed_export_candidate_files": 0,
+    "producer_states": {
+      "A": {
+        "completed_files": 436,
+        "completed_batches": 142,
+        "active": false
+      },
+      "B": {
+        "completed_files": 483,
+        "completed_batches": 146,
+        "active": false
+      }
+    }
+  },
+  "inspection_method": "N100 read-only C1_QA_20261029_2145_AI2_scan.py: compare evidence SHA with nested prior C1 report SHA keys; inspect A/B candidate directories and export evidence. No eligible image for visual QA.",
+  "results": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "safeguards": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_created": false,
+    "c2_c3_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_modified": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "previous_independent_qa": "localization/qa_reports/C1_20261030_1815_Q228_new_sha2.json",
+  "score_change": 0,
+  "notes": [
+    "No new candidate SHA: this is an IDLE scan and not a duplicate QA judgement.",
+    "No change to candidate approval status, A/B queue or final game delivery."
+  ]
+}
