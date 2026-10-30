@@ -860,7 +860,7 @@ def require_multi_frontend_physicalization(source: str) -> None:
                   "GAMERESET","SUMOGAMERESET","TRYAGAIN"):
         assert "GameState::STATE_"+state in helper, state
     for excluded in ("GAME","GOAL","TIMEUP","RESULT"):
-        assert "GameState::STATE_"+excluded not in helper, excluded
+        assert "case GameState::STATE_"+excluded+":" not in helper, excluded
     multi = source.split("static void CenterMultiSpriteQuad(",1)[1].split(
         "static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite_hk",1)[0]
     for token in (
