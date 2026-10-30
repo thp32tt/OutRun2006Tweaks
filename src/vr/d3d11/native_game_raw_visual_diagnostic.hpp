@@ -446,19 +446,25 @@ public:
                         // exhausting the bounded upload budget on one side.
                         if (sourceDirty && !sourceCropRepaintVerified) {
                             NativeRawPresentTile wholeFirst{}, wholeSecond{};
+                            // The selected preview tiles are only a VIEW into
+                            // two authentic GPU captures. Passing those small
+                            // windows to a multi-island batch loses real RGB
+                            // elsewhere in the same menu/car source Draw.
+                            // Reinspect the entire mapped PRE/POST captures,
+                            // clipped to actual D3D9 game Present coordinates.
                             const bool firstSource = firstPixels &&
-                                native_raw_source_aligned_present_tile(
-                                    firstTile, region_.left, region_.top,
+                                native_raw_source_capture_clip_tile(
+                                    region_.left, region_.top, width, height,
                                     captureTargetWidth_, captureTargetHeight_,
                                     back.Width, back.Height, l, t, r, b,
-                                    nullptr, true, wholeFirst);
+                                    wholeFirst);
                             const bool secondSource = alternateActive_ && secondPixels &&
-                                native_raw_source_aligned_present_tile(
-                                    secondTile, regionAlternate_.left,
-                                    regionAlternate_.top,
+                                native_raw_source_capture_clip_tile(
+                                    regionAlternate_.left, regionAlternate_.top,
+                                    width, height,
                                     captureTargetWidth_, captureTargetHeight_,
                                     back.Width, back.Height, l, t, r, b,
-                                    nullptr, true, wholeSecond);
+                                    wholeSecond);
                             const auto appendFirst = [&]() noexcept -> bool {
                                 if (!firstSource) return false;
                                 changedWindow_.capture(before.pData, before.RowPitch,

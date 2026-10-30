@@ -360,6 +360,51 @@ struct NativeRawPresentDirtyRegion {
     }
     return changedRgb > 0u;
 }
+// Use the WHOLE authenticated D3D11 PRE/POST capture when selecting RAW
+// source-coincident game pixels. An earlier small diagnostic display window
+// may contain only one of several disjoint menu/car RGB updates. Clip the
+// captured physical game coordinates to the real D3D9 Present source crop,
+// retaining source offsets for the mapped GPU staging bytes. Dirty RGNDATA
+// and per-pixel delta are checked independently before ANY UpdateSurface.
+[[nodiscard]] constexpr bool native_raw_source_capture_clip_tile(
+    std::uint32_t captureOriginX, std::uint32_t captureOriginY,
+    std::uint32_t captureWidth, std::uint32_t captureHeight,
+    std::uint32_t sourceTargetWidth, std::uint32_t sourceTargetHeight,
+    std::uint32_t backWidth, std::uint32_t backHeight,
+    std::int64_t cropLeft, std::int64_t cropTop,
+    std::int64_t cropRight, std::int64_t cropBottom,
+    NativeRawPresentTile& clipped) noexcept {
+    clipped = {};
+    if (!captureWidth || !captureHeight ||
+        captureWidth > NativeRawChangedPixelWindow::kWidth ||
+        captureHeight > NativeRawChangedPixelWindow::kHeight ||
+        !backWidth || !backHeight ||
+        sourceTargetWidth != backWidth || sourceTargetHeight != backHeight ||
+        captureOriginX > sourceTargetWidth ||
+        captureOriginY > sourceTargetHeight ||
+        captureWidth > sourceTargetWidth - captureOriginX ||
+        captureHeight > sourceTargetHeight - captureOriginY ||
+        cropLeft < 0 || cropTop < 0 || cropRight <= cropLeft ||
+        cropBottom <= cropTop || cropRight > backWidth ||
+        cropBottom > backHeight)
+        return false;
+    const auto l = (std::max)(std::int64_t{captureOriginX}, cropLeft);
+    const auto t = (std::max)(std::int64_t{captureOriginY}, cropTop);
+    const auto r = (std::min)(
+        std::int64_t{captureOriginX} + captureWidth, cropRight);
+    const auto b = (std::min)(
+        std::int64_t{captureOriginY} + captureHeight, cropBottom);
+    if (r <= l || b <= t) return false;
+    clipped.sourceX = static_cast<std::uint32_t>(
+        l - static_cast<std::int64_t>(captureOriginX));
+    clipped.sourceY = static_cast<std::uint32_t>(
+        t - static_cast<std::int64_t>(captureOriginY));
+    clipped.copyWidth = static_cast<std::uint32_t>(r - l);
+    clipped.copyHeight = static_cast<std::uint32_t>(b - t);
+    clipped.destinationX = l;
+    clipped.destinationY = t;
+    return true;
+}
 // Preserve independently sampled genuine GPU Draw RGB islands in one bounded
 // D3D9 Present transaction. Both source captures must already be authenticated
 // to the same canonical game backbuffer, crop and Present epoch by the caller.

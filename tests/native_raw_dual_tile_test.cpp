@@ -742,6 +742,95 @@ int main() {
         assert(!forged.append(1920, 1080, dirty, source, gpu,
                               false, true));
     }
+    // A single real GPU capture can contain TWO separate native RGB repaint
+    // panels farther apart than the legacy 24x24 preview window. Use the
+    // entire physical capture (clipped to the actual D3D9 Present crop) to
+    // recover both unscaled game-source islands. No invented RGB or holes.
+    {
+        constexpr std::uint32_t w = 96u, h = 64u;
+        std::array<std::uint8_t, w * h * 4u> before{};
+        auto after = before;
+        for (std::uint32_t y = 25u; y < 29u; ++y)
+            for (std::uint32_t x = 20u; x < 24u; ++x)
+                after[(y * w + x) * 4u] = 31u;
+        for (std::uint32_t y = 35u; y < 39u; ++y)
+            for (std::uint32_t x = 70u; x < 74u; ++x)
+                after[(y * w + x) * 4u + 2u] = 197u;
+        NativeRawChangedPixelWindow gpu{};
+        gpu.capture(before.data(), w * 4u, after.data(), w * 4u, w, h);
+        NativeRawPresentTile preview{0u, 0u, 24u, 24u, 0, 0};
+        NativeRawPresentTile selected{};
+        std::uint32_t previewPixels = 0u;
+        assert(gpu.select(preview, selected, previewPixels));
+        assert(previewPixels == 16u); // one window cannot reach both panels
+
+        NativeRawPresentTile source{};
+        assert(native_raw_source_capture_clip_tile(
+            100u, 200u, w, h, 1920u, 1080u, 1920u, 1080u,
+            115, 215, 180, 256, source));
+        assert(source.sourceX == 15u && source.sourceY == 15u &&
+               source.copyWidth == 65u && source.copyHeight == 41u &&
+               source.destinationX == 115 && source.destinationY == 215);
+        NativeRawPresentDirtyRegion dirty{};
+        dirty.headerVerified = true;
+        dirty.count = 2u;
+        dirty.rectangles[0] = {118, 221, 137, 240};
+        dirty.rectangles[1] = {163, 230, 179, 253};
+        dirty.boundLeft = 118; dirty.boundTop = 221;
+        dirty.boundRight = 179; dirty.boundBottom = 253;
+        assert(!native_raw_dirty_region_covers_tile(
+            1920u, 1080u, dirty, source));
+        NativeRawSourceIslandBatch batch{};
+        assert(batch.append(1920u, 1080u, dirty, source,
+                            gpu, false, true));
+        assert(batch.append(1920u, 1080u, dirty, source,
+                            gpu, false, true));
+        assert(batch.count == 2u && batch.rgbPixels[0] == 16u &&
+               batch.rgbPixels[1] == 16u);
+        assert(batch.tiles[0].destinationX == 120 &&
+               batch.tiles[0].destinationY == 225 &&
+               batch.tiles[1].destinationX == 170 &&
+               batch.tiles[1].destinationY == 235 &&
+               batch.tiles[0].sourceX == 20u &&
+               batch.tiles[1].sourceX == 70u &&
+               native_raw_disjoint_present_tiles(
+                   batch.tiles[0], batch.tiles[1]));
+        assert(!batch.append(1920u, 1080u, dirty, source,
+                             gpu, false, true));
+        // A crop without intersection, mismatched canonical game target,
+        // capture outside source bounds, or forged D3D9 rcBound fails closed.
+        assert(!native_raw_source_capture_clip_tile(
+            100u, 200u, w, h, 1280u, 720u, 1920u, 1080u,
+            115, 215, 180, 256, source));
+        assert(source.copyWidth == 0u);
+        assert(!native_raw_source_capture_clip_tile(
+            1900u, 200u, w, h, 1920u, 1080u, 1920u, 1080u,
+            115, 215, 180, 256, source));
+        assert(!native_raw_source_capture_clip_tile(
+            100u, 200u, w, h, 1920u, 1080u, 1920u, 1080u,
+            200, 215, 210, 256, source));
+        assert(native_raw_source_capture_clip_tile(
+            100u, 200u, w, h, 1920u, 1080u, 1920u, 1080u,
+            115, 215, 180, 256, source));
+        dirty.boundRight = 180;
+        NativeRawSourceIslandBatch forged{};
+        assert(!forged.append(1920u, 1080u, dirty, source,
+                              gpu, false, true));
+        // An alpha-only second panel does not count as real GPU RGB.
+        dirty.boundRight = 179;
+        for (std::uint32_t y = 35u; y < 39u; ++y)
+            for (std::uint32_t x = 70u; x < 74u; ++x) {
+                after[(y * w + x) * 4u + 2u] = 0u;
+                after[(y * w + x) * 4u + 3u] = 255u;
+            }
+        gpu.capture(before.data(), w * 4u, after.data(), w * 4u, w, h);
+        NativeRawSourceIslandBatch alpha{};
+        assert(alpha.append(1920u, 1080u, dirty, source,
+                            gpu, false, true));
+        assert(!alpha.append(1920u, 1080u, dirty, source,
+                             gpu, false, true));
+        assert(alpha.count == 1u && alpha.rgbPixels[0] == 16u);
+    }
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};
