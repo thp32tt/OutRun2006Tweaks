@@ -289,7 +289,7 @@ class Registry:
     last_global_send_slot: Optional[str] = None
 
 runtime = {
-    "controller_build": "2026-10-11-continuous-v4",
+    "controller_build": "2026-10-31-uw2-c-slot-v1",
     "vr_continuous_30m_enabled": VR_CONTINUOUS_30M_ENABLED,
     "vr_continuous_interval_seconds": VR_CONTINUOUS_INTERVAL_SECONDS,
     "vr_scheduled_dispatch_enabled": VR_SCHEDULED_DISPATCH_ENABLED,
@@ -318,6 +318,9 @@ runtime = {
     "dxvk_frozen": DXVK_FROZEN,
     "conversion_dx9ex_enabled": CONVERSION_DX9EX_ENABLED,
     "dx9ex_review_only": DX9EX_REVIEW_ONLY,
+    "uw2_web_port_enabled": UW2_WEB_PORT_ENABLED,
+    "uw2_github_repo": UW2_GITHUB_REPO if UW2_WEB_PORT_ENABLED else None,
+    "uw2_target_branch": UW2_TARGET_BRANCH if UW2_WEB_PORT_ENABLED else None,
     "conversion_only_slot": CONVERSION_ONLY_SLOT,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
@@ -346,6 +349,7 @@ runtime = {
     "novnc_public_url": NOVNC_PUBLIC_URL or None,
     "schedule_minutes": SCHEDULE_MINUTES,
     "dx9ex_schedule_minutes": DX9EX_SCHEDULE_MINUTES,
+    "uw2_schedule_minutes": UW2_SCHEDULE_MINUTES if UW2_WEB_PORT_ENABLED else [],
     "dx9ex_schedule_every_hours": DX9EX_SCHEDULE_EVERY_HOURS,
     "status": "starting",
     "last_tick": None,
