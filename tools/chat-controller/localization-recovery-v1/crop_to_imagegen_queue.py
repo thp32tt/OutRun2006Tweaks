@@ -69,11 +69,13 @@ def qid(source_png: str):
     m = re.match(r"Q(\d{3})_", source_png or "")
     return ("Q" + m.group(1)) if m else None
 
-def source_manifests(croot: Path):
-    # Native/local OCR results remain under hd108_outputs. GPT chat vision OCR
-    # writes to a separate host-writable tree because older native output can
-    # be root-owned on the bind mount.
-    for root in (croot / "hd108_outputs", croot / "gpt_vision_chat_ocr_outputs"):
+def source_manifests(croot: Path, imagegen_root: Path | None = None):
+    # Keep root-owned legacy OCR output read-only. Independent vision reviews
+    # can stage SHA-bound manifests in the imagegen bind-mount writable queue.
+    roots = [croot / "hd108_outputs", croot / "gpt_vision_chat_ocr_outputs"]
+    if imagegen_root is not None:
+        roots.append(imagegen_root / "text_roi_batches" / "manual_vision_outputs")
+    for root in roots:
         if root.is_dir():
             yield from sorted(root.glob("*/*/manifest.json"))
 
@@ -260,9 +262,21 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
     existing = {x.get("source_key") for x in data["items"] if isinstance(x, dict)}
     added = 0
     held = 0
-    for mp in source_manifests(croot):
+    manual_root = imagegen_root / "text_roi_batches" / "manual_vision_outputs"
+    for mp in source_manifests(croot, imagegen_root):
         try:
             j = json.loads(mp.read_text(encoding="utf-8"))
+            if mp.is_relative_to(manual_root):
+                # Explicit manual ChatGPT visual-review evidence is required:
+                # never treat an arbitrary JSON file in the queue as approved.
+                if (j.get("manual_visual_ocr_record") is None or
+                        j.get("gpt_chat_bbox_source") !=
+                            "MANUAL_CHAT_VISUAL_N100_ORIGINAL_HD_IMAGE" or
+                        j.get("human_review_required") is not True or
+                        j.get("external_api_used") is not False or
+                        j.get("image_generation_used") is not False):
+                    held += 1
+                    continue
             if j.get("status") not in ACCEPT_STATUS:
                 continue
             if j.get("source_type") != "SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG":
