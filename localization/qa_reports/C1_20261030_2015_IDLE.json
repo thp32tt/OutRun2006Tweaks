@@ -1,0 +1,71 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T2015KST-IDLE-READONLY",
+  "checked_at_kst": "2026-10-30T20:15:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "N100 read-only candidate inventory plus full 197 local C1 QA JSON/metrics dedup by candidate sha256, matched against SHA-pinned 289 export evidence records. No new ImageGen or QA PASS.",
+  "candidate_inventory": {
+    "A": 437,
+    "B": 483,
+    "total": 920,
+    "exported_candidate_count": 920,
+    "missing_export_count": 0
+  },
+  "dedup": {
+    "reviewed_QA_record_files": 197,
+    "previously_reviewed_candidate_sha_count": 925,
+    "unreviewed_export_sha_count": 0
+  },
+  "results": {
+    "new_candidate_sha": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": true
+  },
+  "last_source_candidates": [
+    {
+      "role": "A",
+      "name": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "already_reviewed": "C1_20261030_1815_Q228_new_sha2.json"
+    },
+    {
+      "role": "B",
+      "name": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "already_reviewed": "C1_20261030_1815_Q228_new_sha2.json"
+    }
+  ],
+  "evidence": {
+    "N100_scripts": [
+      "work/C1_QA_20261030_1945_dedup_readonly.py",
+      "work/C1_QA_20261030_1945_inventory_readonly.py"
+    ],
+    "last_actual_C1_report": "work/C1_QA_20261030_1815_AI2_report.json"
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_DDS": false,
+    "new_C2_C3_or_game_pass": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "ai": "AI 2",
+    "previous_confirmed_ssot": 2228,
+    "delta": 0,
+    "new_cumulative": 2228,
+    "reason": "IDLE status verification; no new independently reviewed SHA or qualifying new result"
+  }
+}
