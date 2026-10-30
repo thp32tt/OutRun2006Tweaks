@@ -1,0 +1,92 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1016KST-IDLE",
+  "checked_at_kst": "2026-10-30T10:16:30+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_EXPORTED_LOCAL_KOREAN_PNG_SHA",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "n100_inventory": {
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "producer_export_evidence_glob": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-*.json",
+    "prior_review_report_globs": [
+      "work/c1_batch_*/report.json",
+      "work/c1_batch_*/metrics.json",
+      "work/C1_QA_*/metrics.json",
+      "work/C1_QA_*_metrics.json",
+      "work/C1_QA_*_report.json",
+      "work/C1_QA_*_byte_audit.json"
+    ],
+    "exported_records": 918,
+    "candidate_files": {
+      "A": 436,
+      "B": 482,
+      "total": 918
+    },
+    "producer_state": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "next_ordinal": 436,
+        "active": false
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "next_ordinal": 483,
+        "active": false
+      }
+    },
+    "prior_qa_report_artifacts": 209,
+    "prior_reviewed_unique_sha256": 923,
+    "new_unreviewed_export_unique_sha256": 0,
+    "missing_or_incomplete_export_files": 0,
+    "candidate_files_modified_after": "2026-10-30T05:15:00+09:00",
+    "modified_file_count": 0,
+    "latest_pass_rechecked": [
+      {
+        "role": "A",
+        "file": "Q043_8845a649913b5ecf_k.png",
+        "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+        "matches_prior": true
+      },
+      {
+        "role": "B",
+        "file": "Q046_d10debc727463563_k.png",
+        "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+        "matches_prior": true
+      }
+    ],
+    "notes": "SHA dedup uses prior QA reports and exporter evidence. Entire 918 files were not newly rehashed; last two PASS hashes were rechecked. No newly exported unreviewed SHA was found."
+  },
+  "summary": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": 1
+  },
+  "restrictions": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_DDS": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "final_deployment": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_ssot": "thp32tt/ai-dev-lab/main/AI_SCOREBOARD.md",
+    "previous_confirmed_AI2_cumulative": 2200,
+    "this_run_change": 0,
+    "new_AI2_cumulative": 2200,
+    "reason": "IDLE is a status-only check, not a distinct QA achievement."
+  }
+}
