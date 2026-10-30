@@ -15,7 +15,8 @@ for token in (
     "float gameProjectedWorldCenterX = 0.0f;",
     "float gameProjectedWorldCenterY = 0.0f;",
     "state.worldEffect && state.rhwDepthEvidence &&",
-    "!state.projectedWorldMarker && Game::screen_resolution",
+    "!state.projectedWorldMarker && !exactSceneEffect &&",
+    "Game::screen_resolution",
     "state.gameProjectedWorldCenterX = gameCenterX;",
     "state.gameProjectedWorldCenterY = gameCenterY;",
     "VR TRACE WORLD PROJECTED SOURCE:",
@@ -38,7 +39,10 @@ for token in (
 
 configure = SRC[SRC.index("bool R30ConfigureXyzrhwWorldEffect("):
                 SRC.index("UINT R30PrimitiveElementCount(")]
+assert configure.index("const bool exactSceneEffect =") < configure.index(
+    "state.worldEffect && state.rhwDepthEvidence")
 assert configure.index("state.worldEffect && state.rhwDepthEvidence") < configure.index(
+    "!state.projectedWorldMarker && !exactSceneEffect &&") < configure.index(
     "state.gameProjectedWorldSourceCanvas = true;")
 assert "state.logicalUiSourceCanvas = true" not in configure
 
@@ -90,8 +94,10 @@ for good, bad in (
      "sourceScaleX = 2.0f / width;"),
     ("sourceScaleY = -1.0f / state.gameProjectedWorldCenterY;",
      "sourceScaleY = -2.0f / height;"),
-    ("!state.projectedWorldMarker && Game::screen_resolution",
-     "Game::screen_resolution"),
+    ("!state.projectedWorldMarker && !exactSceneEffect &&",
+     "!state.projectedWorldMarker &&"),
+    ("Game::screen_resolution",
+     "true"),
     ("std::fabs(rhw - 1.0f) <= 0.02f;",
      "false;"),
     ("actualNdcZ * bp._34 - bp._33;",
@@ -103,4 +109,4 @@ for good, bad in (
     damaged = SRC.replace(good, bad, 1)
     assert damaged != SRC and damaged.count(good) < SRC.count(good)
 
-print("PASS R26 retail 418CF0 game-screen + RHW=1 screen-Z depth -> world stereo -> physical XR output contract; HMD UNTESTED")
+print("PASS R26 retail 418CF0 game-screen + RHW=1 screen-Z depth -> world stereo -> physical XR output, exact lens scene scopes excluded; HMD UNTESTED")

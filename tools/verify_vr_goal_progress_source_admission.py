@@ -93,6 +93,9 @@ tests=[
         goal_time.index("admittedAtExit = admission.mayPublish(") <
         goal_time.index("TagAppendedNodes(before") <
         goal_time.index("FlushD3DXAtDirectGoalSourceExit();")),
+    ("B9200 GOAL/TIMEUP/RESULT presentation symmetry",
+        "ResultPresentationState()" in b9200 and
+        "*Game::current_mode == GameState::STATE_GOAL" not in b9200),
     ("B9200 post-drain exact parent admission",
         "const OutRunVR::GoalProgress::SourceAdmission admission{" in b9200 and
         b9200.index("FlushD3DXBeforeDirectGoalSource();") <
@@ -117,4 +120,13 @@ for name,good in tests:
 assert goal_time.count("admission.mayPublish(") >= 2
 assert b9200.count("admission.mayPublish(") >= 2
 assert "if (Settings::VREnabled)\n            goalDirectDrawOwner.emplace" not in goal_time
-print("PASS: real GOAL inner/full/time/B9200 entry, native drain, queue epoch and exit admission")
+# Destructive state regression: a GOAL-only B9200 gate would recreate the
+# observed TIMEUP/result-animation ownership hole while the other result
+# producers still accept the complete presentation lifetime.
+goal_only = b9200.replace(
+    "ResultPresentationState()",
+    "Game::current_mode && *Game::current_mode == GameState::STATE_GOAL", 1)
+assert "ResultPresentationState()" not in goal_only.split(
+    "const bool exactGoalParent =", 1)[1].split(";", 1)[0]
+assert "*Game::current_mode == GameState::STATE_GOAL" in goal_only
+print("PASS: real GOAL inner/full/time/B9200 entry, GOAL-TIMEUP-RESULT state symmetry, native drain, queue epoch and exit admission")

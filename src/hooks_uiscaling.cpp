@@ -546,8 +546,7 @@ class UIScaling : public Hook
         const auto resetTrace = OutRunVR::D3D9ResetTrace::Read();
         const bool exactGoalParent =
             Settings::VREnabled &&
-            Game::current_mode &&
-            *Game::current_mode == GameState::STATE_GOAL &&
+            ResultPresentationState() &&
             !OutRunVR::GameSemantic::QueueRenderActive() &&
             OutRunVR::GoalResult::IsOriginalB9200ParentReturn(
                 base, caller);
@@ -575,8 +574,9 @@ class UIScaling : public Hook
         };
 
         // The previous D3DX batch belongs to the previous producer. Flush it,
-        // then prove this exact parent is still outside a queue and in GOAL
-        // before assigning ScreenHud ownership to the final result text.
+        // then prove this exact parent is still outside a queue and remains in
+        // the GOAL/TIMEUP/RESULT presentation lifetime before assigning
+        // ScreenHud ownership to the race-end result text.
         FlushD3DXBeforeDirectGoalSource();
         const bool admittedAfterDrain = admission.mayPublish(
             Settings::VREnabled,

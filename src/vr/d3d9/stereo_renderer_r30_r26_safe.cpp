@@ -3549,8 +3549,11 @@ namespace OutRunVRStereo
             // the same Gx/Gy centres, not the portrait XR viewport extent.
             // This does NOT grant HUD ownership: eye reconstruction and final
             // output still use the world path and physical XR viewport.
+            // Exact CABE/C993 SceneEffect/ProjectedScreenEffect2D uses its own
+            // optical source and must never borrow the retail particle canvas.
             if (state.worldEffect && state.rhwDepthEvidence &&
-                !state.projectedWorldMarker && Game::screen_resolution)
+                !state.projectedWorldMarker && !exactSceneEffect &&
+                Game::screen_resolution)
             {
                 const float gameCenterX = Game::screen_resolution->x;
                 const float gameCenterY = Game::screen_resolution->y;
