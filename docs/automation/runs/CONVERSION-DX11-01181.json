@@ -151,7 +151,8 @@
         "behavior_area": "DX11 Windows OpenXR HUD and backend build validation",
         "expected_behavior": "All five mandatory push workflows completed successfully at validation-bearing exact SHA."
       }
-    ]
+    ],
+    "goal": "Recover both distant authentic native D3D11 game Draw RGB panels across the original D3D9 Present source crop, while rejecting forged dirty geometry and preserving safe source-coincident fallback."
   },
   "acceptance_results": {
     "source_capture_span": {
