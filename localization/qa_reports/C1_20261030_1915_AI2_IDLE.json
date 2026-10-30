@@ -1,0 +1,58 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "task_id": "OUTRUN-C1-20261030T1915KST-AI2",
+  "slot_kst": "2026-10-30T19:15:00+09:00",
+  "role": "C1",
+  "status": "IDLE_NO_UNREVIEWED_EXPORTED_SHA",
+  "source": "N100 /home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "inspected_policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "Read-only rerun of N100 work/C1_QA_20261029_2145_AI2_scan.py; compares exported A/B candidate SHA256 with prior C1 report SHA keys and verifies export files present; no new image visual QA when eligible count is zero.",
+  "checked": {
+    "prior_qa_report_files": 210,
+    "distinct_previously_reviewed_candidate_sha256": 925,
+    "exported_candidate_files": 920,
+    "physically_present_output_files_A": 437,
+    "physically_present_output_files_B": 483,
+    "missing_or_incomplete_export_files": 0,
+    "unreviewed_export_candidate_sha256": 0,
+    "unreviewed_export_candidate_files": 0,
+    "producer_states": {
+      "A": {
+        "completed_files": 436,
+        "completed_batches": 142,
+        "active": false
+      },
+      "B": {
+        "completed_files": 483,
+        "completed_batches": 146,
+        "active": false
+      }
+    }
+  },
+  "results": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "safeguards": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_created": false,
+    "c2_c3_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_modified": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "previous_independent_qa": "localization/qa_reports/C1_20261030_1815_Q228_new_sha2.json",
+  "last_idle": "localization/qa_reports/C1_20261030_1845_IDLE.json",
+  "score_change": 0,
+  "notes": [
+    "No new exported candidate SHA since previous IDLE; no duplicate QA or score.",
+    "Physical candidate presence and export evidence SHA metadata compared; this IDLE scan does not imply rescanning all PNG pixel bytes or new C1 visual PASS.",
+    "Preserve prior QA, A/B queue and DDS/game approval states."
+  ]
+}
