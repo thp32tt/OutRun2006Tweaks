@@ -1645,6 +1645,62 @@ class UIScaling : public Hook
                 node = before[prio]
                     ? before[prio]->next_0 : root->next_0;
             }
+
+            // Accepted nodes already emit full per-node receipts below. The
+            // missing evidence was the opposite case: an exact GOAL/+TIME
+            // producer ran, but queue-root/tail proof failed and therefore no
+            // node entered ScreenHud ownership. Record that fail-closed edge
+            // without adopting any node or changing native rendering.
+            const bool exactResultRejectTrace =
+                Settings::VREnabled && Settings::VRTelemetry && sourceRoots &&
+                !node &&
+                (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+            if (exactResultRejectTrace)
+            {
+                SpriteNode* const entryRoot = (*sourceRoots)[prio];
+                const bool rootChanged = entryRoot != root;
+                const bool emptyAtEntry =
+                    entryRoot != nullptr && before[prio] == entryRoot;
+                const unsigned verifiedRebuiltChildren =
+                    rootChanged && emptyAtEntry
+                        ? OutRunVR::SpriteQueue::
+                            CountVerifiedRebuiltEmptyChildren(
+                                entryRoot, before[prio], true, root, tailAfter,
+                                Game::SpriteNodeMax)
+                        : 0;
+                const char* reason = rootChanged
+                    ? (verifiedRebuiltChildren > 1
+                        ? "ROOT_REBUILT_MULTI_CHILD"
+                        : "ROOT_REBUILT_UNPROVEN")
+                    : "TAIL_UNREACHABLE_OR_NONTERMINAL";
+                static std::atomic<std::uint64_t> exactRejects{0};
+                const auto hit = exactRejects.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (hit <= 64 || (hit & (hit - 1)) == 0)
+                    spdlog::info(
+                        "VR TRACE GOAL TAG REJECT: hits={} producer={} "
+                        "priority={} reason={} entryEmpty={} "
+                        "entryRoot=0x{:X} currentRoot=0x{:X} "
+                        "entryTail=0x{:X} currentTail=0x{:X} "
+                        "verifiedRebuiltChildren={} preserveSince={} "
+                        "allowCurrentRootRebuild={} queueEpoch={} "
+                        "action=KEEP_NATIVE_UNOWNED",
+                        hit, OutRunVR::GameSemantic::Name(producer), prio,
+                        reason, emptyAtEntry ? 1 : 0,
+                        reinterpret_cast<std::uintptr_t>(entryRoot),
+                        reinterpret_cast<std::uintptr_t>(root),
+                        reinterpret_cast<std::uintptr_t>(before[prio]),
+                        reinterpret_cast<std::uintptr_t>(tailAfter),
+                        verifiedRebuiltChildren, preserveNewerExactSince,
+                        allowCurrentRootRebuild ? 1 : 0,
+                        OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+            }
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
                 const bool fullVisualNodeTrace =

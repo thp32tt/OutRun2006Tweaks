@@ -20,6 +20,7 @@ b9200=body("static void __cdecl ResultTextB9200_dest(", "// REA-proven original 
 glyph_proof=body("static bool IsOriginalB9200GoalGlyph() noexcept", "using TextGlyphPutSpriteFn")
 stack_guard=body("static bool GoalResultPresentationState() noexcept", "class UIScaling")
 d3dx_bridge=body("using namespace OutRunVR::GameSemantic;", "// Stronger than the BB796 wrapper counter:")
+tagger=body("static void TagAppendedNodes(", "// Exact FUN_004BA9D0 caller identity")
 def goal_snapshot_guard(code: str) -> bool:
     """Old D3DX producers must finish BEFORE GOAL takes its queue boundary."""
     needles = [
@@ -74,6 +75,13 @@ tests=[
         "VR TRACE GOAL_PERCENT SOURCE ENTRY:" in inner and
         "VR TRACE GOAL_PERCENT SOURCE EXIT:" in leave and
         "entrySerial={}" in leave and "changedPriorities={}" in leave),
+    ("fail-closed GOAL/+TIME tag rejection telemetry",
+        "VR TRACE GOAL TAG REJECT:" in tagger and
+        "CountVerifiedRebuiltEmptyChildren(" in tagger and
+        "ROOT_REBUILT_MULTI_CHILD" in tagger and
+        "TAIL_UNREACHABLE_OR_NONTERMINAL" in tagger and
+        "action=KEEP_NATIVE_UNOWNED" in tagger and
+        tagger.count("RegisterSpriteNodeScope(") == 1),
     ("detailed +TIME/GOAL physical telemetry",
         "VR TRACE RESULT PHYSICAL PRE:" in renderer and
         "VR TRACE RESULT PHYSICAL EYES:" in renderer and
