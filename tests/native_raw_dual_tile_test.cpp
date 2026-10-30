@@ -84,6 +84,9 @@ int main() {
             NativeRawChangedPixelWindow rgbUnion;
             rgbUnion.capture(fragmentedBefore.data(), w * 4u,
                              fragmentedAfter.data(), w * 4u, w, h);
+            // Unlike the prior 64px sample, the fragmented full crop must
+            // cover the second authentic RGB pixel at source x=75.
+            const NativeRawPresentTile fragmentedGpu{10u, 10u, 76u, 40u, 110, 210};
             NativeRawPresentDirtyRegion fragments{};
             fragments.headerVerified = true;
             fragments.count = 3u;
@@ -95,7 +98,7 @@ int main() {
             NativeRawPresentTile multi{};
             std::uint32_t rgbCount = 0u;
             assert(native_raw_dirty_source_rgb_crop(
-                1920, 1080, fragments, fullGpuTile, rgbUnion,
+                1920, 1080, fragments, fragmentedGpu, rgbUnion,
                 multi, rgbCount));
             assert(rgbCount == 2u && multi.sourceX == 60u &&
                    multi.sourceY == 20u && multi.copyWidth == 20u &&
@@ -107,14 +110,14 @@ int main() {
             // never stretch a native GPU fragment across a D3D9 dirty gap.
             fragments.rectangles[2].left = 173;
             assert(native_raw_dirty_source_rgb_crop(
-                1920, 1080, fragments, fullGpuTile, rgbUnion,
+                1920, 1080, fragments, fragmentedGpu, rgbUnion,
                 multi, rgbCount));
             assert(rgbCount == 1u && multi.copyWidth < 20u);
             // Repaint geometry is untrusted until rcBound agrees with
             // every member. Even a real RGB source pixel cannot override it.
             fragments.boundRight = 181;
             assert(!native_raw_dirty_source_rgb_crop(
-                1920, 1080, fragments, fullGpuTile, rgbUnion,
+                1920, 1080, fragments, fragmentedGpu, rgbUnion,
                 multi, rgbCount));
             // Vertical fragmented game repaint is equally source-coincident.
             fragmentedAfter[(33u * w + 65u) * 4u + 2u] = 93u;
@@ -128,7 +131,7 @@ int main() {
             fragments.boundLeft = 160; fragments.boundTop = 220;
             fragments.boundRight = 180; fragments.boundBottom = 236;
             assert(native_raw_dirty_source_rgb_crop(
-                1920, 1080, fragments, fullGpuTile, rgbUnion,
+                1920, 1080, fragments, fragmentedGpu, rgbUnion,
                 multi, rgbCount));
             assert(rgbCount == 3u && multi.copyWidth == 20u &&
                    multi.copyHeight == 16u && multi.destinationX == 160 &&
