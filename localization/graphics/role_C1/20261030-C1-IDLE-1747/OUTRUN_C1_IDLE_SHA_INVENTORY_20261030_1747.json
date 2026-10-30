@@ -1,0 +1,84 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-IDLE-20261030T1747KST",
+  "observed_at_kst": "2026-10-30T17:47:32+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "status": "IDLE",
+  "execution_backend": "GitHub policy source + N100 read-only inventory",
+  "policy_blobs": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "candidate_inventory": {
+    "A": 436,
+    "B": 482,
+    "total": 918,
+    "modified_after_last_review": 0,
+    "cutoff_kst": "2026-10-30T05:15:00+09:00",
+    "last_modified_by_role_kst": {
+      "A": "2026-10-30T04:20:09+09:00",
+      "B": "2026-10-30T05:10:04+09:00"
+    },
+    "prior_sha_reverification": {
+      "A": {
+        "file": "Q043_8845a649913b5ecf_k.png",
+        "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+        "matches_last_review": true
+      },
+      "B": {
+        "file": "Q046_d10debc727463563_k.png",
+        "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+        "matches_last_review": true
+      }
+    }
+  },
+  "production_state": {
+    "A": {
+      "completed_files": 435,
+      "completed_batches": 141,
+      "active_task_id": "OUTRUN-ROI-A-0142-F13160DD",
+      "active_expected_output": "Q228_3df4ed65ab58f44f_k.png",
+      "active_english": "multiplayer",
+      "active_korean": "멀티플레이",
+      "status": "SENT_AWAITING_GENERATED_IMAGES"
+    },
+    "B": {
+      "completed_files": 482,
+      "completed_batches": 145,
+      "active_task_id": "OUTRUN-ROI-B-0146-6F7C670F",
+      "active_expected_output": "Q228_6a1d77db05265918_k.png",
+      "active_english": "game lobby",
+      "active_korean": "게임 로비",
+      "status": "SENT_AWAITING_GENERATED_IMAGES"
+    }
+  },
+  "qa": {
+    "new_unreviewed_candidate_sha": 0,
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "previous_evidence": {
+    "last_review": "work/C1_QA_20261030_0515_AI2_report.json",
+    "last_idle_commit": "8a549b73e0a151aa2e8fea7d7d6659c2138e71dd",
+    "inventory_script": "work/C1_QA_20261030_0545_inventory.py"
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds_production": false,
+    "c2_c3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": [
+    "N100 candidate PNG filenames count differs by one from aggregate A+B completed_files=917; this historical count discrepancy is not a new unreviewed SHA.",
+    "No candidate was modified after the 05:15 QA cutoff; output SHA verification matched last review.",
+    "Active A and B batches are sent but N100 generated candidate PNGs have not been confirmed as saved. Do not prematurely review.",
+    "Repeated IDLE status is an observation only, not a new QA accomplishment; AI competition score delta=0."
+  ]
+}
