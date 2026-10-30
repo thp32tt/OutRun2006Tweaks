@@ -14,6 +14,10 @@ GPT_OUT=C_ROOT/"gpt_vision_chat_ocr_outputs"
 QUEUE_DIR=C_ROOT/"gpt_vision_chat_ocr"
 STATE_PATH=QUEUE_DIR/"state.json"
 AUDIT_PATH=QUEUE_DIR/"audit.jsonl"
+# Host-side OCR triage is exported to the existing read/write imagegen bind
+# mount. This read-only rescue input is strictly SHA-bound and cannot approve
+# an OCR result; it only allows a verified chat-vision retry.
+HOST_RETRY_PATH=Path("/data/imagegen/text_roi_batches/ocr_host_verified_retries.json")
 VERSION="gpt-chat-vision-ocr-v1-20261025"
 OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
@@ -138,6 +142,85 @@ def _exhausted_candidates():
         if not src.is_file() or src.is_symlink() or src.stat().st_size!=int(row["png_size_bytes"]) or _digest(src)!=row["png_sha256"]: continue
         out.append((row,remaining))
     return out
+
+def _host_verified_candidates():
+    """Read a bounded host-verified retry snapshot when container OCR sources diverge.
+
+    The host and container may have different OCR processed-v3 views even while
+    sharing state.json. Never trust raw phrases alone: pin source PNG bytes and
+    exact processed-record bytes, require those phrases to be in the original
+    unresolved_after record, and re-check current existing coverage.
+    """
+    p=HOST_RETRY_PATH
+    if not p.is_file() or p.is_symlink() or p.stat().st_size>262144:
+        return []
+    try:
+        doc=json.loads(p.read_text(encoding="utf-8"))
+        if doc.get("schema")!="outrun.gpt_ocr.host_verified_retries.v1":
+            return []
+        rows=doc.get("items")
+        if not isinstance(rows,list) or len(rows)>108:
+            return []
+        source_rows=_manifest_rows()
+        result=[]
+        seen=set()
+        for entry in rows:
+            if not isinstance(entry,dict):
+                continue
+            name=entry.get("source_png")
+            if not isinstance(name,str) or name not in source_rows or name in seen:
+                continue
+            seen.add(name)
+            row=source_rows[name]
+            if entry.get("source_sha256")!=row.get("png_sha256"):
+                continue
+            src=SRC/name
+            if (not src.is_file() or src.is_symlink()
+                    or src.stat().st_size!=int(row["png_size_bytes"])
+                    or _digest(src)!=row["png_sha256"]):
+                continue
+            proc=REPORT/"processed_v3"/(name+".json")
+            if not proc.is_file() or proc.is_symlink() or proc.stat().st_size>131072:
+                continue
+            raw=proc.read_bytes()
+            if hashlib.sha256(raw).hexdigest()!=entry.get("processed_sha256"):
+                continue
+            record=json.loads(raw.decode("utf-8"))
+            if (record.get("source_png")!=name
+                    or record.get("source_sha256")!=row["png_sha256"]
+                    or int(record.get("attempts",0) or 0)<OCR_EXHAUSTED_ATTEMPTS):
+                continue
+            unresolved=record.get("unresolved_after")
+            targets=entry.get("target_phrases")
+            if (not isinstance(unresolved,list) or not isinstance(targets,list)
+                    or not targets or len(targets)>40
+                    or not all(isinstance(x,str) and 0<len(x)<=220 for x in targets)
+                    or len({_norm(x) for x in targets})!=len(targets)):
+                continue
+            allowed={_norm(x) for x in unresolved if isinstance(x,str)}
+            if any(_norm(x) not in allowed for x in targets):
+                continue
+            covered=_covered_phrases(name,row["png_sha256"])
+            remaining=[x for x in targets if _norm(x) not in covered]
+            if not remaining or _fingerprint(row,remaining)!=entry.get("fingerprint"):
+                continue
+            result.append((row,remaining))
+        return result
+    except (OSError,ValueError,TypeError,KeyError,json.JSONDecodeError):
+        return []
+
+
+def _dispatch_candidates():
+    """Normal OCR queue first; SHA-pinned host sidecar only supplies gaps."""
+    regular=_exhausted_candidates()
+    known={(row["png_filename"],_fingerprint(row,phrases)) for row,phrases in regular}
+    for row,phrases in _host_verified_candidates():
+        key=(row["png_filename"],_fingerprint(row,phrases))
+        if key not in known:
+            regular.append((row,phrases))
+            known.add(key)
+    return regular
+
 
 def _fingerprint(row,phrases):
     return hashlib.sha256((row["png_filename"]+"|"+row["png_sha256"]+"|"+"\n".join(phrases)).encode()).hexdigest()
@@ -278,7 +361,7 @@ def next_binding(lane=None):
                 return dict(active),None
             return None,"ACTIVE_SUBMISSION_AMBIGUOUS:"+str(active.get("task_id"))
         raise ValueError("GPT_OCR_ACTIVE_STATE_INVALID")
-    for row,phrases in _exhausted_candidates():
+    for row,phrases in _dispatch_candidates():
         source_lane=_lane_for_source(row["png_filename"])
         if lane is not None and source_lane!=lane:
             continue
@@ -512,7 +595,7 @@ def apply_response(task_id,assistant_text):
         return failed
 
 def summary():
-    st=_state();candidates=_exhausted_candidates()
+    st=_state();candidates=_dispatch_candidates()
     lanes={}
     retryable_sources=0;retryable_phrases=0;manual_sources=0;manual_phrases=0;exhausted_sources=0
     for lane in ("C1","C2"):
