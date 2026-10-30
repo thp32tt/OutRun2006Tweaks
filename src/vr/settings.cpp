@@ -82,7 +82,7 @@ namespace Settings
     Setting<bool> VRRankDx11ReferenceEyePose{ "VR", "RankDx11ReferenceEyePose", true,
         "Use the DX11 HMD-proven R57 mode-6 eye pose for car-attached rank markers. True keeps identity eye orientation and relative IPD with head inverse. False restores the R26 ordinal-only canted-eye experiment for A/B. World and rival producers are unchanged." };
 	Setting<bool> VRHud1080pReference{ "VR", "Hud1080pReference", true,
-        "R26 VR gameplay HUD only: uniform 1920x1080 viewing reference for ultrawide game sources. Never rewrite native OutRun 640x480 sprite coordinates, rank/rival anchors, front-end, or F11." };
+        "VR logical-UI split: gameplay HUD/overlays and projected rank/rival markers use the 1920x1080 reference before XR mapping; front-end keeps its game logical canvas and is mapped to the XR target separately. Native 640x480 source coordinates and F11 remain independently owned." };
     Setting<float> VRHudPlaneDistance{ "VR", "HudPlaneDistance", 4.0f,
         "R26 VR gameplay HUD plane distance. Old reference 2.50, default 4.00 for less face-close HUD. External ImGui F11 and front-end are unchanged.", Range<float>{ 2.50f, 8.00f } };
 	Setting<float> VRPauseMenuScale{ "VR", "PauseMenuScale", 1.0f,

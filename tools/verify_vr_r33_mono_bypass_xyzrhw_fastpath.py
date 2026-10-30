@@ -59,16 +59,19 @@ def check(r33, r29):
             if path == "PrimitiveUP":
                 for required in (
                     "const bool exactProjectedRival =",
+                    "const bool exactProjectedRank =",
                     "QueueRenderActive() &&",
                     "RenderScope::ProjectedWorldMarker2D",
                     "ProducerToken::RivalMarkerSprani",
-                    "CurrentProjectedMarker() != nullptr",
-                    "(exactProjectedRival ||",
+                    "ProducerToken::RankMarkerSprani",
+                    "ProducerToken::RankMarkerClipSprite",
+                    "(exactProjectedRival || exactProjectedRank ||",
                     "!OutRunVR::State::StateBlockTracker::Reliable() ||",
                     "R32ReviewCurrentVertexShaderIdentity() == 0);",
                     "R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(",
                 ):
                     assert required in draw
+                assert draw.count("CurrentProjectedMarker() != nullptr") == 2
             else:
                 assert "exactProjectedRival" not in draw
                 assert "(!OutRunVR::State::StateBlockTracker::Reliable() ||" in draw
@@ -115,10 +118,14 @@ def main():
             "OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani &&",
             "OutRunVR::GameSemantic::ProducerToken::None &&"),
          r29, "rival producer"),
+        (mutate_dpup(
+            "OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||",
+            "OutRunVR::GameSemantic::ProducerToken::None ||"),
+         r29, "rank producer"),
         (mutate_dpup("CurrentProjectedMarker() != nullptr",
-                     "true"), r29, "rival anchor"),
-        (mutate_dpup("(exactProjectedRival ||",
-                     "(true ||"), r29, "rival cache bypass"),
+                     "true"), r29, "vehicle marker anchor"),
+        (mutate_dpup("(exactProjectedRival || exactProjectedRank ||",
+                     "(true ||"), r29, "vehicle marker cache bypass"),
     ]
     for candidate, candidate29, label in cases:
         assert candidate != r33, ("unchanged mutation", label)
@@ -126,7 +133,7 @@ def main():
     mutated29 = r29.replace("!TargetIsBackBuffer()", "false", 1)
     assert mutated29 != r29
     assert not check(r33, mutated29), "R29 backbuffer mutation passed"
-    print(f"PASS R33 guarded XYZRHW mono/aux bypass + exact rival PrimitiveUP cache exception; {len(cases)+1} destructive checks")
+    print(f"PASS R33 guarded XYZRHW mono/aux bypass + exact rival/rank PrimitiveUP cache exception; {len(cases)+1} destructive checks")
 
 
 if __name__ == "__main__":

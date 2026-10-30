@@ -3547,6 +3547,44 @@ namespace OutRunVRStereo
                 !exactSceneEffect)
             {
                 ++R47SemanticUnknownRejected;
+                if (Settings::VRTelemetry)
+                {
+                    static std::atomic<std::uint64_t> unownedFlat2D{0};
+                    const auto hit = unownedFlat2D.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (hit <= 64 || (hit & (hit - 1)) == 0)
+                    {
+                        float firstX = 0.0f;
+                        float firstY = 0.0f;
+                        if (source && vertexCount != 0 &&
+                            stride >= sizeof(float) * 2)
+                        {
+                            const auto* bytes =
+                                static_cast<const std::uint8_t*>(source);
+                            std::memcpy(&firstX, bytes, sizeof(firstX));
+                            std::memcpy(&firstY, bytes + sizeof(firstX),
+                                sizeof(firstY));
+                        }
+                        spdlog::info(
+                            "VR TRACE UI UNOWNED XYZRHW: hit={} draw={} "
+                            "scope={} producer={} queued={} node=0x{:X} epoch={} "
+                            "firstXY={:.9g},{:.9g} viewport={},{},{}x{} "
+                            "rhwDepthEvidence={} logicalCanvas={} gameState={}",
+                            hit, TopLevelDrawSerial(),
+                            OutRunVR::GameSemantic::Name(semanticScope),
+                            OutRunVR::GameSemantic::Name(uiCommand.producer),
+                            uiCommand.queued ? 1 : 0,
+                            reinterpret_cast<std::uintptr_t>(
+                                uiCommand.queueNode),
+                            uiCommand.queueEpoch, firstX, firstY,
+                            state.viewport.X, state.viewport.Y,
+                            state.viewport.Width, state.viewport.Height,
+                            state.rhwDepthEvidence ? 1 : 0,
+                            state.logicalUiSourceCanvas ? 1 : 0,
+                            Game::current_mode
+                                ? static_cast<int>(*Game::current_mode) : -1);
+                    }
+                }
                 return false;
             }
             if (!state.worldEffect)
@@ -5568,15 +5606,16 @@ namespace OutRunVRStereo
                         1, std::memory_order_relaxed) + 1;
                     if (hit <= 64 || (hit & (hit - 1)) == 0)
                         spdlog::info(
-                            "VR TRACE LENS R85 BUILD: hit={} pose={} headSeq={} "
-                            "cameraSynced={} sourceCallSerial={} sourceObj=0x{:06X} "
+                            "VR TRACE LENS R85 BUILD: hit={} draw={} pose={} headSeq={} "
+                            "cameraSyncedApplied={} sourceCallSerial={} sourceObj=0x{:06X} "
                             "sourceSite={} ordinal={} deferredSerial={} deferredObj=0x{:06X} "
                             "deferredOrdinal={} stockT={:.9g},{:.9g},{:.9g} "
                             "headR=[{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g}] "
                             "headT={:.9g},{:.9g},{:.9g} "
                             "fovL={:.9g},{:.9g},{:.9g},{:.9g} "
                             "fovR={:.9g},{:.9g},{:.9g},{:.9g}",
-                            hit, stereo.poseSequence, headSequence,
+                            hit, TopLevelDrawSerial(),
+                            stereo.poseSequence, headSequence,
                             sourceCameraSynced ? 1 : 0,
                             sourceReceipt.sourceSerial, sourceReceipt.objectId,
                             static_cast<unsigned>(sourceReceipt.callsite),
@@ -7186,7 +7225,7 @@ namespace OutRunVRStereo
                 if (n <= 32 || (n & (n - 1)) == 0)
                     spdlog::info(
                         "VR LENS R30 PHYSICAL EYES: sample={} serial={} site={} "
-                        "kind={} scope={} pose={} cameraSynced={} "
+                        "kind={} scope={} pose={} cameraSyncedLate={} "
                         "leftHr=0x{:08X} rightHr=0x{:08X} restore={} "
                         "wvpEqual={} wvpT_L={:.5f},{:.5f},{:.5f} "
                         "wvpT_R={:.5f},{:.5f},{:.5f} "
@@ -7307,20 +7346,32 @@ namespace OutRunVRStereo
             }
             if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)
             {
+                const bool exactC993ProjectedSource =
+                    lensInlineLinked && lensSourceSerial != 0 &&
+                    (lensSourceObject == 0x570002u ||
+                     lensSourceObject == 0x570006u ||
+                     lensSourceObject == 0x57000Fu ||
+                     lensSourceObject == 0x570010u);
                 if (Settings::VRTelemetry &&
                     !OutRunVR::GameSemantic::QueueRenderActive() &&
-                    OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                        OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
+                    exactC993ProjectedSource)
                 {
                     static std::uint64_t centreDraws = 0;
                     const auto n = ++centreDraws;
                     if (n <= 8 || (n & (n - 1)) == 0)
                         spdlog::info(
-                            "VR LENS C993 RAY EYES: pose={} draw={} left=0x{:08X} right=0x{:08X} restore={} cameraSynced={} hits={} mode=CENTRE_EYE_MONO_WORLD_LOCK",
+                            "VR LENS C993 RAY EYES: pose={} draw={} "
+                            "sourceCallSerial={} sourceObj=0x{:06X} sourceSite={} ordinal={} "
+                            "left=0x{:08X} right=0x{:08X} restore={} "
+                            "cameraSyncedLate={} hits={} "
+                            "mode=ASYMMETRIC_FOV_PROJECTED_RAY_ZERO_IPD",
                             stereo.poseSequence, TopLevelDrawSerial(),
+                            lensSourceSerial, lensSourceObject,
+                            lensSourceSite, lensSourceOrdinal,
                             static_cast<unsigned>(leftHr),
                             static_cast<unsigned>(rightHr), restoreOk ? 1 : 0,
-                            OutRunVRRenderer::GetLastRawGameWvpCameraSynced() ? 1 : 0, n);
+                            OutRunVRRenderer::GetLastRawGameWvpCameraSynced()
+                                ? 1 : 0, n);
                 }
                 static bool firstProjectedScreenEffectLogged = false;
                 if (pairComplete && !firstProjectedScreenEffectLogged)
