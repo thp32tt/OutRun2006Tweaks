@@ -15,6 +15,15 @@ def check(c,h,s):
     assert 'x += fit.left;' in owner and 'y += fit.top;' in owner
     assert 'width = fit.width;' in owner and 'height = fit.height;' in owner
     assert 'SetWindowPos(window, 0, x, y, width, height, 0x40);' in owner
+    assert 'mirror_backdrop_window' in owner
+    assert 'update_mirror_backdrop(' in owner
+    assert 'WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE' in owner
+    assert 'GetStockObject(BLACK_BRUSH)' in owner
+    assert 'mirrorBackdropNeeded =' in owner
+    assert 'fit.width < monitorWidth ||' in owner
+    assert 'fit.height < monitorHeight;' in owner
+    assert 'SetWindowPos(mirror_backdrop_window, HWND_TOP,' in owner
+    assert 'backdrop={}' in owner
     assert 'Game::screen_resolution->x =' not in owner
     assert 'Game::screen_resolution->y =' not in owner
     assert 'GetMonitorInfoW(monitor, &monitorInfo)' in owner
@@ -50,4 +59,4 @@ for monitor in [(3440,1440),(1920,1080),(2560,1440)]:
         assert x>=0 and y>=0 and w<=monitor[0] and h<=monitor[1]
         assert abs(w/h-source[0]/source[1])<=max(1/h,1/w)*2
 assert fit(3440,1440,2496,2688)==(1051,0,1337,1440)
-print('PASS portrait XRender -> desktop source-preserving mirror fit; source/eye unchanged; five destructive controls')
+print('PASS portrait XRender -> aspect-preserved mirror + black desktop-strip backdrop; source/eye unchanged; five destructive controls')
