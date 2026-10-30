@@ -233,6 +233,24 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertEqual(fresh["target_phrases"],["HELLO","NEXT"])
         self.assertNotEqual(fresh["fingerprint"],binding["fingerprint"])
 
+    def test_prompt_excludes_existing_regions_only_for_verified_source_sha(self):
+        old=self.out/Path(self.name).stem/"older"
+        old.mkdir(parents=True)
+        (old/"manifest.json").write_text(json.dumps({
+            "source_sha256":self.row["png_sha256"],"english":"OTHER",
+            "bbox_xyxy":[10,10,50,30]}),encoding="utf-8")
+        binding,_=g.next_binding()
+        self.assertIn('기존 좌표와 90% 이상 겹치는 영역',binding["prompt"])
+        self.assertIn('"english": "OTHER"',binding["prompt"])
+        self.assertIn('"bbox_xyxy": [10, 10, 50, 30]',binding["prompt"])
+        self.assertIn("uncertain",binding["prompt"])
+        # Different source bytes never authorize old bounding-box exclusions.
+        (old/"manifest.json").write_text(json.dumps({
+            "source_sha256":"0"*64,"english":"POISON",
+            "bbox_xyxy":[10,10,50,30]}),encoding="utf-8")
+        self.assertNotIn("POISON",g._prompt(binding["task_id"],self.row,["HELLO"]))
+        self.assertIn("- 없음",g._prompt(binding["task_id"],self.row,["HELLO"]))
+
     def test_low_confidence_invalid_bbox_remains_retryable(self):
         binding,_=g.next_binding();g.stage_submission(binding["task_id"])
         g.record_chat_url(binding["task_id"],
