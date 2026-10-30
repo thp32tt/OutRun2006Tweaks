@@ -48,7 +48,30 @@
     ],
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "visible_frame_acceptance": "ONLY_SOURCE_BUILD_PARTIAL_NATIVE_RAW; NO_REAL_DESKTOP_GAME_OR_HMD_SCREEN_PROOF",
-    "activation_guard_and_fallback": "RAW_EXPLICIT_OPT_IN; original D3D9 source identity, original dirty union and RGB evidence fail-closed; native full coverage and OpenXR stereo not claimed."
+    "activation_guard_and_fallback": "RAW_EXPLICIT_OPT_IN; original D3D9 source identity, original dirty union and RGB evidence fail-closed; native full coverage and OpenXR stereo not claimed.",
+    "batch_components": [
+      "CPP_NATIVE_RAW_TWO_DIFFERENT_SIZE_GPU_DIRTY_CROP_ADMISSION",
+      "CPP_SOURCE_ALIGNED_DIRTY_PRESENT_PAIR_INTEGRATION",
+      "CPP_COMPILED_DUAL_RGB_DIRTY_AND_LEGACY_NEGATIVE_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two independent original-game source-coordinate D3D11 GPU RGB Draw crops of different sizes are retained at disjoint D3D9 dirty Present islands.",
+      "negative_regression": "Overlapping, empty, negative-coordinate and mixed/displaced unequal-size crops remain rejected; native full-frame or HMD success is not claimed.",
+      "component_integration": "src/vr/d3d11/native_game_raw_present_coverage.hpp joins authenticated source-aligned native Draw RGB crops to true D3D9 Present dirty union; src/vr/d3d11/native_game_raw_visual_diagnostic.hpp consumes the pair predicate; tests/native_raw_dual_tile_test.cpp compiles and exercises positive/negative paths."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_PRE_POST_RGB",
+      "CANONICAL_D3D9_DIRTY_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -57,24 +80,29 @@
       {
         "id": "dual_distinct_size_source_output",
         "category": "end_to_end_behavior",
-        "expected_behavior": "Two different-size independently authentic native GPU dirty RGB Draw source crops remain visible together at disjoint original D3D9 game coordinates."
+        "expected_behavior": "Two different-size independently authentic native GPU dirty RGB Draw source crops remain visible together at disjoint original D3D9 game coordinates.",
+        "behavior_area": "native D3D11 game Draw RGB to source-coincident D3D9 dirty Present"
       },
       {
         "id": "legacy_nonoverlap_fallback",
         "category": "fallback_regression",
-        "expected_behavior": "Mixed/displaced tiles retain equal dimensions; overlap, negative/zero coordinates reject."
+        "expected_behavior": "Mixed/displaced tiles retain equal dimensions; overlap, negative/zero coordinates reject.",
+        "behavior_area": "protected displaced RAW pair fallback and pixel bounds"
       },
       {
         "id": "compiled_rgb_dirty_islands",
         "category": "end_to_end_behavior",
-        "expected_behavior": "Compiled regressions verify two differently shaped D3D9 dirty union islands, original RGB source coordinates, and negative guards."
+        "expected_behavior": "Compiled regressions verify two differently shaped D3D9 dirty union islands, original RGB source coordinates, and negative guards.",
+        "behavior_area": "compiled authentic RGB dirty-island source coordinate regression"
       },
       {
         "id": "exact_sha_five_gates",
         "category": "integrated_validation",
-        "expected_behavior": "Five mandatory push CI workflows succeed at identical source SHA."
+        "expected_behavior": "Five mandatory push CI workflows succeed at identical source SHA.",
+        "behavior_area": "mandatory exact-source five push GitHub Actions"
       }
-    ]
+    ],
+    "goal": "Preserve two independently authenticated different-size source-coincident native D3D11 GPU RGB Draw crops through real disjoint D3D9 dirty Present islands, with original game pixels, legacy fail-closed placement, and exact-SHA compile/gate evidence; partial RAW only, not full game/HMD."
   },
   "acceptance_results": {
     "dual_distinct_size_source_output": {
