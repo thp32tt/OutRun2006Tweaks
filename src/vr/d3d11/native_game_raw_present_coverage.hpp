@@ -357,7 +357,7 @@ struct NativeRawSourceIslandBatch {
         const NativeRawPresentDirtyRegion& dirty,
         const NativeRawPresentTile& sourceAligned,
         const NativeRawChangedPixelWindow& sourceRgb,
-        bool fromAlternate) noexcept {
+        bool fromAlternate, bool tightRgbExtent = false) noexcept {
         if (count == kMaxIslands) return false;
         NativeRawPresentTile next{};
         std::uint32_t changed = 0u;
@@ -366,6 +366,21 @@ struct NativeRawSourceIslandBatch {
                 next, changed, count ? tiles.data() : nullptr,
                 count ? count : 1u))
             return false;
+        // Shrink GPU-authentic pixels before claiming original game dirty
+        // destinations. Keep inherited callers unchanged until they opt in.
+        if (tightRgbExtent) {
+            NativeRawPresentTile tight{};
+            std::uint32_t trueRgb = 0u;
+            if (!sourceRgb.tighten_to_rgb_bounds(next, tight, trueRgb) ||
+                trueRgb != changed ||
+                !native_raw_dirty_region_covers_tile(
+                    backWidth, backHeight, dirty, tight))
+                return false;
+            for (std::uint32_t i = 0u; i < count; ++i)
+                if (!native_raw_disjoint_present_tiles(tight, tiles[i]))
+                    return false;
+            next = tight;
+        }
         tiles[count] = next;
         rgbPixels[count] = changed;
         alternate[count] = fromAlternate;

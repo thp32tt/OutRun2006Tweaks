@@ -5,6 +5,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include "native_game_raw_partial_present_tile.hpp"
 #include "native_game_raw_pixel_delta.hpp"
 
@@ -96,6 +97,41 @@ public:
             return 0u;
         return count(tile.sourceX, tile.sourceY,
                      tile.copyWidth, tile.copyHeight);
+    }
+
+    // Retain only GPU-changed RGB on an authenticated original-screen tile.
+    // Reserving a huge source box for one changed pixel can hide the next
+    // overlapping native Draw even when that Draw changes a different pixel.
+    [[nodiscard]] bool tighten_to_rgb_bounds(
+        const NativeRawPresentTile& tile, NativeRawPresentTile& tight,
+        std::uint32_t& rgb) const noexcept {
+        tight = {};
+        rgb = changed_pixels(tile);
+        if (!rgb || tile.destinationX < 0 || tile.destinationY < 0)
+            return false;
+        std::uint32_t left = 0u, top = 0u;
+        std::uint32_t right = tile.copyWidth - 1u;
+        std::uint32_t bottom = tile.copyHeight - 1u;
+        while (left < right && !count(tile.sourceX + left,
+                                      tile.sourceY, 1u, tile.copyHeight)) ++left;
+        while (right > left && !count(tile.sourceX + right,
+                                      tile.sourceY, 1u, tile.copyHeight)) --right;
+        const auto keptWidth = right - left + 1u;
+        while (top < bottom && !count(tile.sourceX + left,
+                                      tile.sourceY + top, keptWidth, 1u)) ++top;
+        while (bottom > top && !count(tile.sourceX + left,
+                                      tile.sourceY + bottom, keptWidth, 1u)) --bottom;
+        if (tile.destinationX > (std::numeric_limits<std::int64_t>::max)() - left ||
+            tile.destinationY > (std::numeric_limits<std::int64_t>::max)() - top)
+            return false;
+        tight = tile;
+        tight.sourceX += left;
+        tight.sourceY += top;
+        tight.destinationX += static_cast<std::int64_t>(left);
+        tight.destinationY += static_cast<std::int64_t>(top);
+        tight.copyWidth = keptWidth;
+        tight.copyHeight = bottom - top + 1u;
+        return changed_pixels(tight) == rgb;
     }
 
 private:

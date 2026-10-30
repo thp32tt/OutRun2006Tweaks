@@ -464,7 +464,7 @@ public:
                                 changedWindow_.capture(before.pData, before.RowPitch,
                                     mapped.pData, mapped.RowPitch, width, height);
                                 return sourceBatch.append(back.Width, back.Height,
-                                    *sourceDirty, wholeFirst, changedWindow_, false);
+                                    *sourceDirty, wholeFirst, changedWindow_, false, true);
                             };
                             const auto appendSecond = [&]() noexcept -> bool {
                                 if (!secondSource) return false;
@@ -472,7 +472,7 @@ public:
                                     beforeAlternate.RowPitch, afterAlternate.pData,
                                     afterAlternate.RowPitch, width, height);
                                 return sourceBatch.append(back.Width, back.Height,
-                                    *sourceDirty, wholeSecond, changedWindow_, true);
+                                    *sourceDirty, wholeSecond, changedWindow_, true, true);
                             };
                             const bool firstFound = appendFirst();
                             const bool secondFound = appendSecond();

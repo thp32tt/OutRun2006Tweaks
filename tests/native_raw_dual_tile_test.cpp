@@ -475,6 +475,70 @@ int main() {
             1920, 1080, dirty, overlap, b, remainder, rgb,
             batch.tiles.data()));
     }
+    // Overlapping live GPU Draw sample boxes need not overlap their actual
+    // changed RGB. Preserve both authentic game source pixels, not just one.
+    {
+        constexpr std::uint32_t w = 64u, h = 32u;
+        std::array<std::uint8_t, w * h * 4u> before{};
+        auto afterA = before, afterB = before;
+        afterA[(10u * w + 8u) * 4u] = 71u;
+        afterB[(10u * w + 55u) * 4u + 2u] = 91u;
+        NativeRawChangedPixelWindow rgbA{}, rgbB{};
+        rgbA.capture(before.data(), w * 4u, afterA.data(), w * 4u, w, h);
+        rgbB.capture(before.data(), w * 4u, afterB.data(), w * 4u, w, h);
+        NativeRawPresentDirtyRegion dirty{};
+        dirty.headerVerified = true; dirty.count = 1u;
+        dirty.rectangles[0] = {300, 400, 364, 432};
+        dirty.boundLeft = 300; dirty.boundTop = 400;
+        dirty.boundRight = 364; dirty.boundBottom = 432;
+        const NativeRawPresentTile source{0u, 0u, w, h, 300, 400};
+        NativeRawSourceIslandBatch legacy{};
+        assert(legacy.append(1920, 1080, dirty, source, rgbA, false));
+        assert(!legacy.append(1920, 1080, dirty, source, rgbB, true));
+        NativeRawSourceIslandBatch tight{};
+        assert(tight.append(1920, 1080, dirty, source, rgbA, false, true));
+        assert(tight.append(1920, 1080, dirty, source, rgbB, true, true));
+        assert(tight.count == 2u && tight.rgbPixels[0] == 1u &&
+               tight.rgbPixels[1] == 1u &&
+               tight.tiles[0].sourceX == 8u &&
+               tight.tiles[0].sourceY == 10u &&
+               tight.tiles[0].destinationX == 308 &&
+               tight.tiles[0].destinationY == 410 &&
+               tight.tiles[0].copyWidth == 1u &&
+               tight.tiles[0].copyHeight == 1u &&
+               tight.tiles[1].sourceX == 55u &&
+               tight.tiles[1].destinationX == 355 &&
+               native_raw_disjoint_present_tiles(tight.tiles[0], tight.tiles[1]));
+        // A 2x2 changed block retains all its authentic pixels and mapping.
+        auto afterWide = before;
+        for (std::uint32_t y = 18u; y < 20u; ++y)
+            for (std::uint32_t x = 26u; x < 28u; ++x)
+                afterWide[(y * w + x) * 4u + 1u] = 123u;
+        NativeRawChangedPixelWindow rgbWide{};
+        rgbWide.capture(before.data(), w * 4u,
+                        afterWide.data(), w * 4u, w, h);
+        NativeRawPresentTile bounded{};
+        std::uint32_t realRgb = 0u;
+        assert(rgbWide.tighten_to_rgb_bounds(source, bounded, realRgb));
+        assert(realRgb == 4u && bounded.sourceX == 26u &&
+               bounded.sourceY == 18u && bounded.destinationX == 326 &&
+               bounded.destinationY == 418 && bounded.copyWidth == 2u &&
+               bounded.copyHeight == 2u &&
+               rgbWide.changed_pixels(bounded) == realRgb);
+        assert(tight.append(1920, 1080, dirty, source, rgbWide, false, true));
+        assert(!tight.append(1920, 1080, dirty, source, rgbWide, false, true));
+        // Alpha-only content, forged source dirty geometry: fail closed.
+        afterB[(10u * w + 55u) * 4u + 2u] = 0u;
+        afterB[(10u * w + 55u) * 4u + 3u] = 255u;
+        rgbB.capture(before.data(), w * 4u, afterB.data(), w * 4u, w, h);
+        NativeRawPresentTile alphaTile{};
+        assert(!rgbB.tighten_to_rgb_bounds(source, alphaTile, realRgb));
+        assert(realRgb == 0u);
+        dirty.boundRight = 365;
+        NativeRawSourceIslandBatch invalid{};
+        assert(!invalid.append(1920, 1080, dirty, source,
+                               rgbA, false, true));
+    }
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};
