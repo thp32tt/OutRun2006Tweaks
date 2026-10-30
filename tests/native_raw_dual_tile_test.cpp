@@ -617,6 +617,57 @@ int main() {
         assert(!forged.append(1920, 1080, dirty, source,
                               first, false, true));
     }
+    // A wide changed top row plus many narrower RGB rows must publish the
+    // largest genuine GPU rectangle, not the first maximal horizontal run.
+    // The latter misses one native row and wastes the four-island budget.
+    {
+        constexpr std::uint32_t w = 64u, h = 32u;
+        std::array<std::uint8_t, w * h * 4u> before{};
+        auto afterA = before, afterB = before;
+        for (std::uint32_t x = 10u; x <= 20u; ++x)
+            afterA[(10u * w + x) * 4u] = 111u;
+        for (std::uint32_t y = 11u; y <= 17u; ++y)
+            for (std::uint32_t x = 13u; x <= 17u; ++x)
+                afterA[(y * w + x) * 4u + 1u] = 77u;
+        afterB[(12u * w + 11u) * 4u + 2u] = 199u;
+        NativeRawChangedPixelWindow a{}, b{};
+        a.capture(before.data(), w * 4u, afterA.data(), w * 4u, w, h);
+        b.capture(before.data(), w * 4u, afterB.data(), w * 4u, w, h);
+        const NativeRawPresentTile original{0u, 0u, w, h, 300, 400};
+        NativeRawPresentTile solid{};
+        std::uint32_t pixels = 0u;
+        assert(a.select_solid_rgb_tile(original, solid, pixels));
+        assert(pixels == 40u && solid.copyWidth == 5u &&
+               solid.copyHeight == 8u && solid.sourceX == 13u &&
+               solid.sourceY == 10u && solid.destinationX == 313 &&
+               solid.destinationY == 410);
+        NativeRawPresentDirtyRegion dirty{};
+        dirty.headerVerified = true;
+        dirty.count = 1u;
+        dirty.rectangles[0] = {300, 400, 364, 432};
+        dirty.boundLeft = 300; dirty.boundTop = 400;
+        dirty.boundRight = 364; dirty.boundBottom = 432;
+        NativeRawSourceIslandBatch batch{};
+        assert(batch.append(1920, 1080, dirty, original, a, false, true));
+        assert(batch.append(1920, 1080, dirty, original, b, true, true));
+        assert(batch.count == 2u && batch.rgbPixels[0] == 40u &&
+               batch.rgbPixels[1] == 1u &&
+               batch.tiles[0].destinationX == 313 &&
+               batch.tiles[1].destinationX == 311 &&
+               batch.tiles[1].destinationY == 412 &&
+               native_raw_disjoint_present_tiles(batch.tiles[0],
+                                                 batch.tiles[1]));
+        // Alpha alone is not a D3D11 RGB pixel; malformed game RGNDATA
+        // must never become permission to overwrite the D3D9 Present.
+        afterB = before;
+        afterB[(12u * w + 11u) * 4u + 3u] = 255u;
+        b.capture(before.data(), w * 4u, afterB.data(), w * 4u, w, h);
+        assert(!b.select_solid_rgb_tile(original, solid, pixels));
+        dirty.boundRight = 365;
+        NativeRawSourceIslandBatch forged{};
+        assert(!forged.append(1920, 1080, dirty, original,
+                              a, false, true));
+    }
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};

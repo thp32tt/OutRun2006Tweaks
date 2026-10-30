@@ -134,11 +134,12 @@ public:
         return changed_pixels(tight) == rgb;
     }
 
-    // Find a real, fully RGB-changed rectangle inside one source-aligned
-    // capture. Sparse PRE/POST deltas must not claim the unchanged pixels
-    // BETWEEN two islands: a subsequent genuine Draw may own those pixels.
-    // Only exact dense runs are admitted; no interpolation/relocation.
-    // A bounded batch may publish additional disjoint runs separately.
+    // Find the largest fully native-RGB rectangle in the same original
+    // game source coordinates. A wide top row above several narrower rows
+    // defeats a horizontal-run-only search: it misses the taller rectangle
+    // beginning *inside* the wider row and consumes extra Present slots.
+    // A bounded monotonic histogram scans each authentic GPU delta pixel
+    // once per row, O(width * height), without heap or invented pixels.
     [[nodiscard]] bool select_solid_rgb_tile(
         const NativeRawPresentTile& tile, NativeRawPresentTile& solid,
         std::uint32_t& rgb) const noexcept {
@@ -154,36 +155,43 @@ public:
             rgb = total;
             return true;
         }
-        const auto endX = tile.sourceX + tile.copyWidth;
-        const auto endY = tile.sourceY + tile.copyHeight;
-        for (std::uint32_t y = tile.sourceY; y < endY; ++y) {
-            for (std::uint32_t x = tile.sourceX; x < endX;) {
-                if (!count(x, y, 1u, 1u)) { ++x; continue; }
-                const auto left = x;
-                while (x < endX && count(x, y, 1u, 1u)) ++x;
-                const auto width = x - left;
-                std::uint32_t height = 1u;
-                while (y + height < endY &&
-                       count(left, y + height, width, 1u) == width)
-                    ++height;
-                const auto pixels = width * height;
-                if (pixels <= rgb) continue; // deterministic first run
-                const auto dx = left - tile.sourceX;
-                const auto dy = y - tile.sourceY;
-                constexpr auto max =
-                    (std::numeric_limits<std::int64_t>::max)();
-                if (tile.destinationX > max - dx ||
-                    tile.destinationY > max - dy) continue;
-                solid = tile;
-                solid.sourceX = left;
-                solid.sourceY = y;
-                solid.copyWidth = width;
-                solid.copyHeight = height;
-                solid.destinationX += dx;
-                solid.destinationY += dy;
-                rgb = pixels;
+        // changed_pixels proved the bounded source footprint (<=256x144).
+        std::array<std::uint32_t, kWidth> heights{};
+        std::array<std::uint32_t, kWidth> stack{};
+        constexpr auto max = (std::numeric_limits<std::int64_t>::max)();
+        for (std::uint32_t y = 0u; y < tile.copyHeight; ++y) {
+            for (std::uint32_t x = 0u; x < tile.copyWidth; ++x)
+                heights[x] = count(tile.sourceX + x, tile.sourceY + y,
+                                   1u, 1u) ? heights[x] + 1u : 0u;
+            std::uint32_t depth = 0u;
+            // The sentinel flushes the final rising histogram. Equal-size
+            // candidates keep the first deterministic source position.
+            for (std::uint32_t x = 0u; x <= tile.copyWidth; ++x) {
+                const auto nextHeight = x < tile.copyWidth ? heights[x] : 0u;
+                while (depth && heights[stack[depth - 1u]] > nextHeight) {
+                    const auto h = heights[stack[--depth]];
+                    const auto left = depth ? stack[depth - 1u] + 1u : 0u;
+                    const auto w = x - left;
+                    const auto pixels = w * h;
+                    if (pixels <= rgb) continue;
+                    const auto top = y + 1u - h;
+                    if (tile.destinationX > max - left ||
+                        tile.destinationY > max - top) continue;
+                    NativeRawPresentTile candidate = tile;
+                    candidate.sourceX += left;
+                    candidate.sourceY += top;
+                    candidate.destinationX += static_cast<std::int64_t>(left);
+                    candidate.destinationY += static_cast<std::int64_t>(top);
+                    candidate.copyWidth = w;
+                    candidate.copyHeight = h;
+                    solid = candidate;
+                    rgb = pixels;
+                }
+                if (x < tile.copyWidth) stack[depth++] = x;
             }
         }
+        // No density guess: authenticate every pixel in the selected GPU
+        // rectangle before D3D9 original-screen UpdateSurface can use it.
         return rgb != 0u && changed_pixels(solid) == rgb &&
             std::uint64_t{solid.copyWidth} * solid.copyHeight == rgb;
     }
