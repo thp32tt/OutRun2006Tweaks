@@ -141,6 +141,70 @@ class BridgeTests(unittest.TestCase):
         self.assertFalse(item["alpha_crop_margin_checked"])
         self.assertFalse((self.ig/"text_roi_batches/inputs"/item["imagegen_input_png"]).exists())
 
+    def test_writable_manual_vision_review_queue_admits_verified_source_only(self):
+        self.trans.write_text(self.trans.read_text(encoding="utf-8") +
+            json.dumps({"index":228,"status":"transcribed_reviewed",
+                "segments":[{"source":"game lobby","korean":"게임 로비"}]},ensure_ascii=False)+"\\n",
+            encoding="utf-8")
+        source_dir=self.croot/"hd_original_108_verified"
+        source_dir.mkdir()
+        src=source_dir/"Q228_SAMPLE.png"
+        Image.new("RGBA",(256,128),(10,20,30,100)).save(src)
+        src_sha=bridge.digest(src)
+        out=self.ig/"text_roi_batches/manual_vision_outputs/Q228_SAMPLE/visual001"
+        out.mkdir(parents=True)
+        payload={"status":"DIRECT_IMAGEGEN_READY",
+          "source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+          "source_png":src.name,"source_sha256":src_sha,
+          "reference_dds_path":"textures/Q228.dds",
+          "reference_dds_sha256":"a"*64,
+          "english":"game lobby","bbox_xyxy":[10,20,130,60],
+          "source_dimensions":[256,128],
+          "direct_full_hd_reference":True,"crop_created":False,
+          "old_split_tiles_used":False,
+          "manual_visual_ocr_record":"MANUAL-Q228-VERIFY-001",
+          "gpt_chat_bbox_source":"MANUAL_CHAT_VISUAL_N100_ORIGINAL_HD_IMAGE",
+          "human_review_required":True,"external_api_used":False,
+          "image_generation_used":False}
+        mp=out/"manifest.json"
+        mp.write_text(json.dumps(payload),encoding="utf-8")
+        self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],1)
+        self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],0)
+        data=json.loads((self.ig/"text_roi_batches/production_manifest.json").read_text())
+        item=next(x for x in data["items"] if x["english"]=="game lobby")
+        self.assertEqual(item["korean"],"게임 로비")
+        self.assertEqual(item["source_png_sha256"],src_sha)
+        self.assertTrue(item["direct_bbox_validated"])
+        self.assertEqual(item["runtime_validation"],"UNTESTED")
+
+    def test_manual_vision_queue_fails_closed_on_missing_review_and_wrong_source_sha(self):
+        self.trans.write_text(self.trans.read_text(encoding="utf-8") +
+            json.dumps({"index":228,"status":"transcribed_reviewed",
+                "segments":[{"source":"game lobby","korean":"게임 로비"}]},ensure_ascii=False)+"\\n",
+            encoding="utf-8")
+        source_dir=self.croot/"hd_original_108_verified"
+        source_dir.mkdir()
+        src=source_dir/"Q228_SAMPLE.png"
+        Image.new("RGBA",(256,128),(10,20,30,100)).save(src)
+        out=self.ig/"text_roi_batches/manual_vision_outputs/Q228_SAMPLE/visual001"
+        out.mkdir(parents=True)
+        data={"status":"DIRECT_IMAGEGEN_READY",
+          "source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+          "source_png":src.name,"source_sha256":bridge.digest(src),
+          "reference_dds_sha256":"a"*64,
+          "english":"game lobby","bbox_xyxy":[10,20,130,60],
+          "source_dimensions":[256,128],
+          "direct_full_hd_reference":True,"crop_created":False,"old_split_tiles_used":False}
+        mp=out/"manifest.json"
+        mp.write_text(json.dumps(data),encoding="utf-8")
+        self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],0)
+        data.update(manual_visual_ocr_record="MANUAL-Q228-VERIFY-001",
+            gpt_chat_bbox_source="MANUAL_CHAT_VISUAL_N100_ORIGINAL_HD_IMAGE",
+            human_review_required=True,external_api_used=False,image_generation_used=False,
+            source_sha256="0"*64)
+        mp.write_text(json.dumps(data),encoding="utf-8")
+        self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],0)
+
     def test_duplicate_scan_does_not_requeue(self):
         self.make_crop("Q051","Total Time")
         self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],1)
