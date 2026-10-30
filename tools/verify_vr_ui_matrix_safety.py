@@ -91,12 +91,22 @@ def require_vr_legacy_owner(source: str) -> None:
         "if (pScaling && pTranslation &&",
         "OutRunVR::LogicalUI::Contain(",
         "legacyTranslation.y += logicalViewport.y;",
-        "return D3DXMatrixTransformation2D.stdcall<int>(",
+        "const int legacyResult =",
+        "D3DXMatrixTransformation2D.stdcall<int>(",
+        "const bool physicalized =",
+        "legacyResult && pOut &&",
+        "MapVrFrontEndMatrixToPhysical(",
+        "pOut, vrFrontEndProducer, vrContainedMode);",
+        "if (physicalized && Game::screen_scale &&",
+        "OutRunVrMenuQuad::ContainedMatrices.Remember(",
+        "return legacyResult;",
     ):
         assert key in block, "legacy/fallthrough VR compatibility missing: " + key
     assert block.index("const bool vrFrontEndNeedsModernAffine") < block.index(
         "if (Settings::VREnabled && vrContainedMode &&") < block.index(
-        "return D3DXMatrixTransformation2D.stdcall<int>(")
+        "const int legacyResult =") < block.index(
+        "MapVrFrontEndMatrixToPhysical(") < block.index(
+        "return legacyResult;")
     assert "pScaling->x =" not in block and "pTranslation->x =" not in block
 
 require_vr_legacy_owner(text)
@@ -104,6 +114,9 @@ for old, broken in (
     ("!vrFrontEndNeedsModernAffine)", "true)"),
     ("vrFrontEndPartial || vrFrontEndPivot;", "false;"),
     ("legacyTranslation.y += logicalViewport.y;", "legacyTranslation.y += 0.0f;"),
+    ("pOut, vrFrontEndProducer, vrContainedMode);",
+     "pOut, false, vrContainedMode);"),
+    ("return legacyResult;", "return 0;"),
 ):
     assert old in text
     try:
@@ -112,7 +125,7 @@ for old, broken in (
         pass
     else:
         raise AssertionError("VR bounded front-end fallthrough mutation escaped: " + old)
-print("VR full-vector rollback + exact partial/pivot affine fallthrough PASS (3 destructive controls)")
+print("VR full-vector rollback + XR physical mapping + exact partial/pivot affine fallthrough PASS (5 destructive controls)")
 
 
 # 01071: Enforce the new full-vector guard and its shared game-state snapshot.
