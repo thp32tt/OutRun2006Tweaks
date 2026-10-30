@@ -17,10 +17,11 @@ class GPTChatOCRTests(unittest.TestCase):
         self.gpt_out=root/"gpt_out";self.gpt_out.mkdir()
         self.report=root/"report";(self.report/"processed_v3").mkdir(parents=True)
         self.queue=root/"queue";self.queue.mkdir()
-        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH","HOST_RETRY_PATH")}
+        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH","HOST_RETRY_PATH","PRODUCTION_MANIFEST")}
         g.SRC=self.src;g.OUT=self.out;g.GPT_OUT=self.gpt_out;g.REPORT=self.report;g.QUEUE_DIR=self.queue
         g.STATE_PATH=self.queue/"state.json";g.AUDIT_PATH=self.queue/"audit.jsonl"
         g.HOST_RETRY_PATH=self.queue/"host_verified_retries.json"
+        g.PRODUCTION_MANIFEST=self.queue/"production_manifest.json"
         self.addCleanup(self.restore)
         self.name="Q001_TEST_BASE_READABLE_FLIPY.png"
         im=Image.new("RGBA",(100,60),(0,0,0,0))
@@ -186,6 +187,40 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertEqual(st["attempts"]["C2:"+timed_out],0)
         self.assertEqual(st["attempts"]["C2:"+succeeded],2)
         self.assertEqual(g._migrate_response_extractor_state(st),[])
+
+    def test_registered_production_roi_is_not_requeued_for_chat_ocr(self):
+        source_sha=self.row["png_sha256"]
+        manifest={"schema":"outrun-text-roi-production-v1","item_count":1,
+            "items":[{"id":"Q001_APPROVED","status":"ROI_APPROVED_FOR_IMAGEGEN",
+                      "source_png_sha256":source_sha,"english":"HELLO",
+                      "bbox_xyxy":[10,10,50,30]}]}
+        g.PRODUCTION_MANIFEST.write_text(json.dumps(manifest),encoding="utf-8")
+        g._production_regions_cached.cache_clear()
+        self.assertIn("hello",g._covered_phrases(self.name,source_sha))
+        self.assertIn(("HELLO",(10,10,50,30)),g._known_ocr_regions(self.name,source_sha))
+        self.assertEqual(g.summary()["candidate_sources"],0)
+        self.assertIsNone(g.next_binding("C1")[0])
+        # A registered ROI needs independent image QA and DDS testing; the
+        # lookup must not imply those stages have passed.
+
+    def test_production_roi_coverage_rejects_wrong_source_sha_and_bad_manifest(self):
+        entry={"id":"BAD","status":"ROI_APPROVED_FOR_IMAGEGEN",
+               "source_png_sha256":"0"*64,"english":"HELLO",
+               "bbox_xyxy":[10,10,50,30]}
+        doc={"schema":"outrun-text-roi-production-v1","item_count":1,"items":[entry]}
+        g.PRODUCTION_MANIFEST.write_text(json.dumps(doc),encoding="utf-8")
+        g._production_regions_cached.cache_clear()
+        self.assertEqual(g.summary()["retryable_sources"],1)
+        doc["items"][0]["source_png_sha256"]=self.row["png_sha256"]
+        doc["item_count"]=2
+        g.PRODUCTION_MANIFEST.write_text(json.dumps(doc),encoding="utf-8")
+        g._production_regions_cached.cache_clear()
+        self.assertEqual(g.summary()["retryable_sources"],1)
+        doc["item_count"]=1
+        doc["items"][0]["status"]="ROI_REBALANCED_TO_B"
+        g.PRODUCTION_MANIFEST.write_text(json.dumps(doc),encoding="utf-8")
+        g._production_regions_cached.cache_clear()
+        self.assertEqual(g.summary()["candidate_sources"],0)
 
     def _host_rescue_doc(self,phrases=None):
         phrases=phrases or ["HELLO"]
