@@ -1,0 +1,89 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1345KST-IDLE",
+  "scheduled_slot_kst": "2026-10-30T13:45:00+09:00",
+  "checked_at_kst": "2026-10-30T13:46:43+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_EXPORTED_LOCAL_KOREAN_PNG_SHA_DETECTED_BY_CURRENT_CHECK",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "initial_remote_head": "611278178447f2042d1cac31632c412d7f22c391",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "prior_report": "localization/c1_qa_reports/OUTRUN-C1-AI2-20261030T1215KST-IDLE.json",
+  "baseline_new_sha_pass": "localization/qa_reports/C1_20261030_0515_AI2_NEW_SHA2.json",
+  "n100_inventory": {
+    "observed_at_kst": "2026-10-30T13:46:43+09:00",
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "candidate_files_by_role": {
+      "A": 436,
+      "B": 482,
+      "total": 918
+    },
+    "files_modified_since_20261030T0515KST": 0,
+    "producer_state": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "next_ordinal": 436,
+        "active": null
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "next_ordinal": 483,
+        "active": null
+      }
+    },
+    "spot_verified_actual_sha256": [
+      {
+        "role": "A",
+        "file": "Q043_8845a649913b5ecf_k.png",
+        "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+        "previous_C1_PASS_SHA_match": true
+      },
+      {
+        "role": "B",
+        "file": "Q046_d10debc727463563_k.png",
+        "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+        "previous_C1_PASS_SHA_match": true
+      }
+    ],
+    "manifest_subset_check": {
+      "current_manifest_items": 965,
+      "qualifying_exported_entries_in_existing_script": 116,
+      "new_unique_sha_in_subset": 0,
+      "invalid_in_subset": 0
+    },
+    "last_confirmed_prior_recorded_reviewed_sha_count": 923,
+    "verification_scope": "N100 918 PNG directory inventory and mtime cutoff, two last exported PNG direct SHA256 checks and producer states. Existing read-only eligible-manifest subset script reports zero new unique SHA. This check does not rehash every archived PNG or prove absence of out-of-band replacements."
+  },
+  "summary": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": 1
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_DDS": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "final_deployment": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_ssot": "thp32tt/ai-dev-lab/main/AI_SCOREBOARD.md",
+    "previous_confirmed_AI2_cumulative": 2210,
+    "this_run_change": 0,
+    "new_AI2_cumulative": 2210,
+    "reason": "IDLE/status-only and duplicate SHA recheck give +0"
+  }
+}
