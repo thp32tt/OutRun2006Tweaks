@@ -183,8 +183,40 @@ def _duplicate_bbox_review_hold(st,fp,lane):
     return None
 
 
+def _known_ocr_regions(source_png,source_sha):
+    """Historical boxes for this *exact* source SHA; never use another variant."""
+    found=set()
+    for root in _output_roots():
+        sourceout=root/Path(source_png).stem
+        if not sourceout.is_dir():
+            continue
+        for mp in sourceout.glob("*/manifest.json"):
+            try:
+                j=json.loads(mp.read_text(encoding="utf-8"))
+                box=j.get("bbox_xyxy");phrase=j.get("english")
+                if (j.get("source_sha256")!=source_sha or
+                        not (isinstance(box,list) and len(box)==4
+                             and all(type(v) is int for v in box))):
+                    continue
+                if not isinstance(phrase,str) or not phrase.strip():
+                    continue
+                found.add((phrase.strip()[:100],tuple(box)))
+            except Exception:
+                continue
+    return sorted(found,key=lambda x:(x[1],x[0]))
+
+
 def _prompt(task_id,row,phrases):
     phrase_lines="\n".join("- "+p for p in phrases)
+    regions=_known_ocr_regions(row["png_filename"],row["png_sha256"])
+    limit=40
+    old_box_lines="\n".join(
+        "- "+json.dumps({"english":english,"bbox_xyxy":list(box)},ensure_ascii=False)
+        for english,box in regions[:limit])
+    if len(regions)>limit:
+        old_box_lines+="\n- ... 이미 등록된 좌표 "+str(len(regions)-limit)+"건 추가 생략"
+    if not old_box_lines:
+        old_box_lines="- 없음"
     return f"""OutRun 2006 HD 원본 이미지의 영문 UI 위치 분석 작업입니다.
 이미지를 수정하거나 새 이미지를 만들지 마세요. 첨부된 원본 PNG를 직접 보고 아래 승인 영문 문구만 찾으세요.
 
@@ -195,8 +227,12 @@ IMAGE_SIZE={row["width"]}x{row["height"]}
 찾을 문구:
 {phrase_lines}
 
+이미 등록된 원문 ROI 좌표(동일 이미지 SHA 확인, 신규 검출 대상으로 재사용하지 마세요):
+{old_box_lines}
+
 규칙:
 1. 첨부 이미지를 직접 시각적으로 읽으세요.
+1-1. 위 기존 좌표와 90% 이상 겹치는 영역은 다른 문구로 다시 제출하지 마세요. 승인 문구의 위치가 다른 부분에서 확인되지 않거나 모호하면 detections에 추측 좌표를 만들지 말고 uncertain에 넣으세요.
 2. 위 목록에 있는 문구만 반환하고 보이지 않으면 만들지 마세요.
 3. bbox는 원본 이미지 픽셀 좌표 [x0,y0,x1,y1]이고 글자/외곽선/그림자를 포함하세요.
 4. 좌상단은 (0,0), x는 오른쪽, y는 아래쪽입니다.
