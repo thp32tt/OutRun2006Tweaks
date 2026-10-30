@@ -2809,6 +2809,84 @@ class WindowedBorderless : public Hook
 	const static int Win32_Init_SetWindowPos_Addr = 0xEAA7;
 
 	inline static SafetyHookMid dest_hook = {};
+    inline static HWND mirror_backdrop_window = nullptr;
+
+    static LRESULT CALLBACK mirror_backdrop_wndproc(
+        HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+    {
+        if (message == WM_ERASEBKGND)
+        {
+            RECT client{};
+            if (GetClientRect(hwnd, &client))
+            {
+                FillRect(reinterpret_cast<HDC>(wparam), &client,
+                    static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
+                return 1;
+            }
+        }
+        return DefWindowProcW(hwnd, message, wparam, lparam);
+    }
+
+    static void update_mirror_backdrop(
+        const MONITORINFO& monitorInfo, bool needed)
+    {
+        if (!needed)
+        {
+            if (mirror_backdrop_window && IsWindow(mirror_backdrop_window))
+                ShowWindow(mirror_backdrop_window, SW_HIDE);
+            return;
+        }
+
+        constexpr wchar_t className[] = L"OutRunVRMirrorBackdrop";
+        const HINSTANCE instance = GetModuleHandleW(nullptr);
+        WNDCLASSW existing{};
+        if (!GetClassInfoW(instance, className, &existing))
+        {
+            WNDCLASSW wc{};
+            wc.lpfnWndProc = mirror_backdrop_wndproc;
+            wc.hInstance = instance;
+            wc.hbrBackground =
+                static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
+            wc.lpszClassName = className;
+            if (!RegisterClassW(&wc) &&
+                GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
+            {
+                spdlog::warn(
+                    "VR PC MIRROR: black backdrop class registration failed err={}",
+                    GetLastError());
+                return;
+            }
+        }
+
+        if (!mirror_backdrop_window || !IsWindow(mirror_backdrop_window))
+        {
+            mirror_backdrop_window = CreateWindowExW(
+                WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
+                className, L"", WS_POPUP,
+                monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top,
+                monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
+                monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+                nullptr, nullptr, instance, nullptr);
+            if (!mirror_backdrop_window)
+            {
+                spdlog::warn(
+                    "VR PC MIRROR: black backdrop creation failed err={}",
+                    GetLastError());
+                return;
+            }
+        }
+
+        const int width =
+            monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+        const int height =
+            monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+        SetWindowPos(mirror_backdrop_window, HWND_TOP,
+            monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top,
+            width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+        InvalidateRect(mirror_backdrop_window, nullptr, TRUE);
+        UpdateWindow(mirror_backdrop_window);
+    }
+
 	static void destination(safetyhook::Context& ctx)
 	{
 		HWND window = HWND(ctx.ebp);
@@ -2850,6 +2928,7 @@ class WindowedBorderless : public Hook
                 // anisotropically and flattens car/menu sprites vertically.
                 // Fit the WINDOW, never the actual game/eye render buffers.
                 // Users can opt out for old full-width mirror A/B captures.
+                bool mirrorBackdropNeeded = false;
                 if (Settings::VRMirrorPreserveAspect) {
                     const auto fit = OutRunVRMirrorAspect::Fit(
                         monitorWidth, monitorHeight,
@@ -2860,14 +2939,19 @@ class WindowedBorderless : public Hook
                         y += fit.top;
                         width = fit.width;
                         height = fit.height;
+                        mirrorBackdropNeeded =
+                            fit.width < monitorWidth ||
+                            fit.height < monitorHeight;
                     }
                 }
+                update_mirror_backdrop(monitorInfo, mirrorBackdropNeeded);
                 spdlog::info(
-                    "VR PC MIRROR: monitor={}x{} source={}x{} fittedWindow={}x{} origin={},{} preserveAspect={} (OpenXR eyes unchanged)",
+                    "VR PC MIRROR: monitor={}x{} source={}x{} fittedWindow={}x{} origin={},{} preserveAspect={} backdrop={} (OpenXR eyes unchanged)",
                     monitorWidth, monitorHeight,
                     Game::screen_resolution->x, Game::screen_resolution->y,
                     width, height, x, y,
-                    Settings::VRMirrorPreserveAspect.get());
+                    Settings::VRMirrorPreserveAspect.get(),
+                    mirrorBackdropNeeded ? 1 : 0);
 			}
 		}
 
