@@ -150,6 +150,35 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         self.assertEqual(env["prompt_for_slot"](SimpleNamespace(name="C"), "parallel"), PROMPT)
         self.assertEqual(env["prompt_for_slot"](SimpleNamespace(name="C"), "watchdog"), PROMPT)
 
+    def test_one_time_migration_clears_old_uw2_ids_not_dx11(self):
+        previous_c = {"lane": "UW2", "task_id": "CONVERSION-UW2-01609"}
+        old_a = {"lane": "DX11", "task_id": "CONVERSION-DX11-01184"}
+        completed = [previous_c, old_a]
+        q = {"active_by_lane": {"A": old_a, "C": previous_c},
+             "completed": completed, "blocked": [previous_c],
+             "vr_scheduled_dispatch_windows": {"A": "old_a", "C": "old_c"},
+             "vr_continuous_last_dispatch_at": {"A": "old_a", "C": "old_c"}}
+        cycle = FUNCS["conversion_parallel_cycle"]
+        section = next(node for node in ast.walk(cycle)
+                       if isinstance(node, ast.If)
+                       and "uw2_simple_initialized" in ast.unparse(node.test))
+        reg = SimpleNamespace(slots=[self.slot])
+        env = {"UW2_WEB_PORT_ENABLED": True,
+               "q": q, "active_by_lane": q["active_by_lane"],
+               "now": datetime.datetime(2026, 10, 31, 9, 0, tzinfo=KST),
+               "load_registry": lambda now: reg,
+               "save_registry": lambda reg: None,
+               "save_queue_state": lambda q: None}
+        exec(compile(ast.fix_missing_locations(
+            ast.Module(body=[section], type_ignores=[])), "<uw2-migrate>", "exec"), env)
+        self.assertNotIn("C", q["active_by_lane"])
+        self.assertEqual(q["active_by_lane"]["A"], old_a)
+        self.assertEqual(q["completed"], [old_a])
+        self.assertEqual(q["blocked"], [])
+        self.assertEqual(q["vr_scheduled_dispatch_windows"], {"A": "old_a"})
+        self.assertTrue(q["uw2_simple"]["fresh_chat_required"])
+        self.assertTrue(q["uw2_simple_initialized"])
+
     def test_old_id_dispatch_excluded_when_uw2_is_on(self):
         src = ast.get_source_segment(SRC, FUNCS["vr_continuous_conversion_cycle"])
         self.assertIn('("C", CONVERSION_DX9EX_ENABLED and not UW2_WEB_PORT_ENABLED)', src)
