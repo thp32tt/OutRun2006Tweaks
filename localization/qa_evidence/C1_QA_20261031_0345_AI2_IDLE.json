@@ -1,0 +1,58 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T0345KST-IDLE",
+  "started_at_kst": "2026-10-31T03:45:00+09:00",
+  "checked_at_kst": "2026-10-31T03:49:53+09:00",
+  "role": "C1",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source": "N100 work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+  "method": "Read-only SHA de-duplication against historical C1 QA reports and export-evidence SHA; output-file inventory by latest mtime; last A and B actual PNG SHA256 readback.",
+  "inventory": {
+    "A_png": 437,
+    "B_png": 483,
+    "total_png": 920,
+    "export_entries": 920,
+    "previous_qa_files": 197,
+    "previous_reviewed_sha": 925,
+    "new_unreviewed_sha": 0,
+    "missing_export_entries": 0
+  },
+  "latest_png_sha_verified": [
+    {
+      "role": "A",
+      "filename": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "result": "MATCH_PREVIOUS_C1"
+    },
+    {
+      "role": "B",
+      "filename": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "result": "MATCH_PREVIOUS_C1"
+    }
+  ],
+  "results": {
+    "new_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "safety": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_pass_created": false,
+    "ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score_delta": 0,
+  "note": "No new SHA-backed unapproved A/B Korean PNG candidates. IDLE; no invented QA and no duplicate score."
+}
