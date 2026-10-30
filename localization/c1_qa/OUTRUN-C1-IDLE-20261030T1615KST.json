@@ -1,0 +1,59 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261030T1615KST-IDLE",
+  "observed_at_kst": "2026-10-30T16:16:39+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE_NO_NEW_CANDIDATE",
+  "scan": {
+    "source": "N100 work/image-src/text_roi_batches",
+    "procedure": "Existing manifest/export-evidence JSON cross-checked against prior QA report candidate SHA references; source, candidate files and SHA dedup; latest candidate mtimes verified",
+    "previous_reports": 209,
+    "previous_unique_sha256": 923,
+    "exported_files": 918,
+    "new_unreviewed_export_sha": 0,
+    "missing_or_incomplete_export": 0,
+    "candidate_files_by_role": {
+      "A": 436,
+      "B": 482
+    },
+    "state": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "active": false
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "active": false
+      }
+    },
+    "new_file_modified_after_last_qa": "NONE",
+    "last_qa_reference": "work/C1_QA_20261030_0515_AI2_report.json"
+  },
+  "this_run": {
+    "reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "reason": "NO_NEW_DISTINCT_SHA",
+    "repeated_sha_reviewed": false
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "dds_created": false,
+    "C2_C3_approval": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "note": "No change to previously reviewed candidate result; C1 idle evidence is not a new QA accomplishment and scores +0."
+}
