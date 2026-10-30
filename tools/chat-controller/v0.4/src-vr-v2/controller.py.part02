@@ -242,7 +242,7 @@ def prompt_for_slot(slot: Slot, phase: str) -> str:
         role_prompts = {
             "A": "conversion_dx11.md",
             "B": "conversion_dxvk.md",
-            "C": "conversion_dx9ex.md",
+            "C": "uw2_web_port.md" if UW2_WEB_PORT_ENABLED else "conversion_dx9ex.md",
         }
         default_prompt = "conversion_dx11.md"
     else:
@@ -254,12 +254,12 @@ def prompt_for_slot(slot: Slot, phase: str) -> str:
             "C": "localization_C.md",
         }
         default_prompt = "localization_A.md"
-    context_prefix = (GAME_MOD_CONTEXT + "\n\n") if CONTROLLER_MODE == "conversion" else ""
+    context_prefix = (GAME_MOD_CONTEXT + "\n\n") if (CONTROLLER_MODE == "conversion" and not (UW2_WEB_PORT_ENABLED and slot.name == "C")) else ""
     if CONTROLLER_MODE == "conversion" and VR_CONTINUOUS_30M_ENABLED:
         if slot.name in {"A", "C"}:
             return context_prefix + queue_dynamic_prefix() + read_prompt(
                 "conversion_continuous_dx11.md" if slot.name == "A"
-                else "conversion_continuous_dx9ex.md"
+                else ("uw2_web_port.md" if UW2_WEB_PORT_ENABLED else "conversion_continuous_dx9ex.md")
             )
     return context_prefix + queue_dynamic_prefix() + read_prompt(role_prompts.get(slot.name, default_prompt))
 
