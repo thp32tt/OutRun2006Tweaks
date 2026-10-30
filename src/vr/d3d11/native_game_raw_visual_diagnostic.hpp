@@ -107,7 +107,7 @@ enum class NativeRawPreviewResult {
 class NativeRawVisualPreview final {
 public:
     static constexpr UINT width = 256, height = 144;
-    static constexpr UINT kMaxSourceIslands = 4u;
+    static constexpr UINT kMaxSourceIslands = NativeRawSourceIslandBatch::kMaxIslands;
     void reset() noexcept {
         staging_.Reset(); baseline_.Reset();
         stagingAlternate_.Reset(); baselineAlternate_.Reset();
@@ -325,9 +325,7 @@ public:
                 NativeRawPresentTile firstTile{}, secondTile{};
                 // Exact GPU source island chosen inside the canonical-target
                 // block is also consumed by the later UpdateSurface branch.
-                std::array<NativeRawPresentTile, kMaxSourceIslands> sourceIslands{};
-                std::array<UINT, kMaxSourceIslands> sourceIslandPixels{};
-                UINT sourceIslandCount = 0u;
+                NativeRawSourceIslandBatch sourceBatch{};
                 UINT firstPixels = 0u, secondPixels = 0u;
                 changedWindow_.capture(before.pData, before.RowPitch,
                                        mapped.pData, mapped.RowPitch,
@@ -440,39 +438,55 @@ public:
                         const bool haveSecond = alternateActive_ && alignChanged(
                             secondTile, regionAlternate_, beforeAlternate,
                             afterAlternate, alignedSecond, secondPixels);
-                        // One real GPU Draw may hit several independently repainted
-                        // source islands. Consume only original source pixels
-                        // whose exact RGB deltas and full RGNDATA coverage are
-                        // verified; retain disjoint rectangles for each upload.
-                        if (haveFirst && !alternateActive_ && sourceDirty &&
-                            !sourceCropRepaintVerified) {
-                            NativeRawPresentTile entireSource{};
-                            if (native_raw_source_aligned_present_tile(
+                        // A single native Draw may touch multiple disconnected
+                        // original D3D9 repaint regions in EACH captured GPU
+                        // source tile. Retain up to four source-coincident RGB
+                        // islands across both independent PRE/POST samples.
+                        // Reserve one genuine region from each source before
+                        // exhausting the bounded upload budget on one side.
+                        if (sourceDirty && !sourceCropRepaintVerified) {
+                            NativeRawPresentTile wholeFirst{}, wholeSecond{};
+                            const bool firstSource = firstPixels &&
+                                native_raw_source_aligned_present_tile(
                                     firstTile, region_.left, region_.top,
                                     captureTargetWidth_, captureTargetHeight_,
                                     back.Width, back.Height, l, t, r, b,
-                                    nullptr, true, entireSource)) {
-                                changedWindow_.capture(
-                                    before.pData, before.RowPitch,
+                                    nullptr, true, wholeFirst);
+                            const bool secondSource = alternateActive_ && secondPixels &&
+                                native_raw_source_aligned_present_tile(
+                                    secondTile, regionAlternate_.left,
+                                    regionAlternate_.top,
+                                    captureTargetWidth_, captureTargetHeight_,
+                                    back.Width, back.Height, l, t, r, b,
+                                    nullptr, true, wholeSecond);
+                            const auto appendFirst = [&]() noexcept -> bool {
+                                if (!firstSource) return false;
+                                changedWindow_.capture(before.pData, before.RowPitch,
                                     mapped.pData, mapped.RowPitch, width, height);
-                                sourceIslands[0] = alignedFirst;
-                                sourceIslandPixels[0] = firstPixels;
-                                sourceIslandCount = 1u;
-                                // Fixed budget keeps per-Present candidate
-                                // searching and queued D3D9 staging bounded.
-                                for (UINT i = 1u; i < kMaxSourceIslands; ++i) {
-                                    NativeRawPresentTile next{};
-                                    UINT rgb = 0u;
-                                    if (!native_raw_dirty_source_rgb_crop(
-                                            back.Width, back.Height, *sourceDirty,
-                                            entireSource, changedWindow_, next,
-                                            rgb, sourceIslands.data(),
-                                            sourceIslandCount))
-                                        break;
-                                    sourceIslands[sourceIslandCount] = next;
-                                    sourceIslandPixels[sourceIslandCount] = rgb;
-                                    ++sourceIslandCount;
-                                }
+                                return sourceBatch.append(back.Width, back.Height,
+                                    *sourceDirty, wholeFirst, changedWindow_, false);
+                            };
+                            const auto appendSecond = [&]() noexcept -> bool {
+                                if (!secondSource) return false;
+                                changedWindow_.capture(beforeAlternate.pData,
+                                    beforeAlternate.RowPitch, afterAlternate.pData,
+                                    afterAlternate.RowPitch, width, height);
+                                return sourceBatch.append(back.Width, back.Height,
+                                    *sourceDirty, wholeSecond, changedWindow_, true);
+                            };
+                            const bool firstFound = appendFirst();
+                            const bool secondFound = appendSecond();
+                            // No extra allocation, resampling, non-dirty
+                            // destination or shared staging surface is allowed.
+                            bool nextFirst = firstFound, nextSecond = secondFound;
+                            while (sourceBatch.count < kMaxSourceIslands &&
+                                   (nextFirst || nextSecond)) {
+                                const bool a = nextFirst && appendFirst();
+                                const bool b = nextSecond &&
+                                    sourceBatch.count < kMaxSourceIslands &&
+                                    appendSecond();
+                                nextFirst = a;
+                                nextSecond = b;
                             }
                         }
                         // Preserve true source coordinates even when a
@@ -510,7 +524,7 @@ public:
                     unmapPairs();
                     return NativeRawPreviewResult::NoChangedPixels;
                 }
-                if (!firstVisible && !secondVisible) {
+                if (!firstVisible && !secondVisible && !sourceBatch.count) {
                     unmapPairs();
                     return NativeRawPreviewResult::UnsafePresent;
                 }
@@ -578,7 +592,27 @@ public:
                     return SUCCEEDED(game->UpdateSurface(
                         target.Get(), &srcRect, backbuffer, &dstPoint));
                 };
-                if (canShowBoth && firstVisible && secondVisible) {
+                if (sourceBatch.count) {
+                    // A distinct D3D9 SYSTEMMEM surface per UpdateSurface:
+                    // queued driver copies cannot observe a later island's
+                    // bytes or overwrite an earlier source-aligned island.
+                    std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>*,
+                               kMaxSourceIslands> surfaces{
+                        &surface_, &surfaceAlternate_,
+                        &surfaceRemainders_[0], &surfaceRemainders_[1]};
+                    for (UINT i = 0u; i < sourceBatch.count; ++i) {
+                        if (!covered(sourceBatch.tiles[i])) continue;
+                        const bool secondary = sourceBatch.alternate[i];
+                        if (paint(*surfaces[i],
+                                  secondary ? beforeAlternate : before,
+                                  secondary ? afterAlternate : mapped,
+                                  sourceBatch.tiles[i])) {
+                            nativePixels += sourceBatch.rgbPixels[i];
+                            sourceAlignedPixelsThisPresent_ +=
+                                sourceBatch.rgbPixels[i];
+                        }
+                    }
+                } else if (canShowBoth && firstVisible && secondVisible) {
                     if (paint(surface_, before, mapped, firstTile)) {
                         nativePixels += firstPixels;
                         if (firstAligned) sourceAlignedPixelsThisPresent_ += firstPixels;
@@ -600,18 +634,6 @@ public:
                     if (paint(surface_, before, mapped, firstTile)) {
                         nativePixels = firstPixels;
                         if (firstAligned) sourceAlignedPixelsThisPresent_ = firstPixels;
-                        // Each same-Draw RGB island owns unique SYSTEMMEM
-                        // bytes until the driver's queued UpdateSurface is
-                        // consumed. Never repaint the primary upload surface.
-                        for (UINT i = 1u; i < sourceIslandCount; ++i) {
-                            if (covered(sourceIslands[i]) &&
-                                paint(surfaceRemainders_[i - 1u], before,
-                                      mapped, sourceIslands[i])) {
-                                nativePixels += sourceIslandPixels[i];
-                                sourceAlignedPixelsThisPresent_ +=
-                                    sourceIslandPixels[i];
-                            }
-                        }
                     }
                 }
                 unmapPairs();

@@ -336,6 +336,66 @@ int main() {
                 1920, 1080, four, full, multiRgb, extra, extraRgb,
                 picks.data(), 3u) && extraRgb == 0u);
         }
+        // Two disjoint authentic GPU PRE/POST sources may each contain TWO
+        // separately repainted menu/car pixels. Retain both sources in one
+        // exact-Present upload batch, not just one island per source.
+        {
+            constexpr std::uint32_t tw = 96u, th = 64u;
+            std::array<std::uint8_t, tw * th * 4u> beforeA{}, beforeB{};
+            auto afterA = beforeA, afterB = beforeB;
+            afterA[(14u * tw + 12u) * 4u] = 21u;
+            afterA[(14u * tw + 52u) * 4u + 1u] = 41u;
+            afterB[(41u * tw + 12u) * 4u + 2u] = 61u;
+            afterB[(41u * tw + 75u) * 4u] = 81u;
+            NativeRawChangedPixelWindow rgbA{}, rgbB{};
+            rgbA.capture(beforeA.data(), tw * 4u, afterA.data(), tw * 4u, tw, th);
+            rgbB.capture(beforeB.data(), tw * 4u, afterB.data(), tw * 4u, tw, th);
+            NativeRawPresentDirtyRegion repaint{};
+            repaint.headerVerified = true;
+            repaint.count = 4u;
+            repaint.rectangles[0] = {208, 310, 216, 318};
+            repaint.rectangles[1] = {248, 310, 256, 318};
+            repaint.rectangles[2] = {408, 337, 416, 345};
+            repaint.rectangles[3] = {471, 337, 479, 345};
+            repaint.boundLeft = 208; repaint.boundTop = 310;
+            repaint.boundRight = 479; repaint.boundBottom = 345;
+            const NativeRawPresentTile sourceA{0u, 0u, tw, th, 200, 300};
+            const NativeRawPresentTile sourceB{0u, 0u, tw, th, 400, 300};
+            NativeRawSourceIslandBatch batch{};
+            assert(batch.append(1920, 1080, repaint, sourceA, rgbA, false));
+            assert(batch.append(1920, 1080, repaint, sourceB, rgbB, true));
+            assert(batch.append(1920, 1080, repaint, sourceA, rgbA, false));
+            assert(batch.append(1920, 1080, repaint, sourceB, rgbB, true));
+            assert(batch.count == 4u && !batch.alternate[0] &&
+                   batch.alternate[1] && !batch.alternate[2] &&
+                   batch.alternate[3]);
+            std::uint32_t total = 0u;
+            for (std::uint32_t i = 0u; i < batch.count; ++i) {
+                total += batch.rgbPixels[i];
+                assert(batch.rgbPixels[i] == 1u);
+                assert(native_raw_dirty_region_covers_tile(
+                    1920, 1080, repaint, batch.tiles[i]));
+                for (std::uint32_t j = 0u; j < i; ++j)
+                    assert(native_raw_disjoint_present_tiles(
+                        batch.tiles[i], batch.tiles[j]));
+            }
+            assert(total == 4u);
+            assert(!batch.append(1920, 1080, repaint, sourceA, rgbA, false));
+            repaint.boundRight = 480; // forged union is never eligible
+            NativeRawSourceIslandBatch invalid{};
+            assert(!invalid.append(1920, 1080, repaint, sourceA, rgbA, false));
+            repaint.boundRight = 479;
+            // Alpha-only writes cannot create the second source RGB island.
+            afterB[(41u * tw + 75u) * 4u] = 0u;
+            afterB[(41u * tw + 75u) * 4u + 3u] = 255u;
+            rgbB.capture(beforeB.data(), tw * 4u, afterB.data(), tw * 4u, tw, th);
+            NativeRawSourceIslandBatch three{};
+            assert(three.append(1920, 1080, repaint, sourceA, rgbA, false));
+            assert(three.append(1920, 1080, repaint, sourceB, rgbB, true));
+            assert(three.append(1920, 1080, repaint, sourceA, rgbA, false));
+            assert(!three.append(1920, 1080, repaint, sourceB, rgbB, true));
+            assert(three.count == 3u);
+        }
         // Alpha-only mutations must not create native RGB evidence.
         after[(22u * w + 65u) * 4u + 2u] = 0u;
         after[(22u * w + 65u) * 4u + 3u] = 255u;

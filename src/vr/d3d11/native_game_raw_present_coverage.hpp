@@ -18,6 +18,7 @@ namespace outrun::vr::dx11 {
 // than requiring the full game crop to be dirty. This grants no full-frame
 // or OpenXR publication and cannot accept a bounding RECT with holes.
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <limits>
 #include "native_game_raw_partial_present_tile.hpp"
@@ -257,6 +258,38 @@ struct NativeRawPresentDirtyRegion {
     }
     return changedRgb > 0u;
 }
+// Preserve independently sampled genuine GPU Draw RGB islands in one bounded
+// D3D9 Present transaction. Both source captures must already be authenticated
+// to the same canonical game backbuffer, crop and Present epoch by the caller.
+// A batch never fabricates full-frame or stereo coverage.
+struct NativeRawSourceIslandBatch {
+    static constexpr std::uint32_t kMaxIslands = 4u;
+    std::array<NativeRawPresentTile, kMaxIslands> tiles{};
+    std::array<std::uint32_t, kMaxIslands> rgbPixels{};
+    std::array<bool, kMaxIslands> alternate{};
+    std::uint32_t count = 0u;
+
+    [[nodiscard]] bool append(
+        std::uint32_t backWidth, std::uint32_t backHeight,
+        const NativeRawPresentDirtyRegion& dirty,
+        const NativeRawPresentTile& sourceAligned,
+        const NativeRawChangedPixelWindow& sourceRgb,
+        bool fromAlternate) noexcept {
+        if (count == kMaxIslands) return false;
+        NativeRawPresentTile next{};
+        std::uint32_t changed = 0u;
+        if (!native_raw_dirty_source_rgb_crop(
+                backWidth, backHeight, dirty, sourceAligned, sourceRgb,
+                next, changed, count ? tiles.data() : nullptr,
+                count ? count : 1u))
+            return false;
+        tiles[count] = next;
+        rgbPixels[count] = changed;
+        alternate[count] = fromAlternate;
+        ++count;
+        return true;
+    }
+};
 // Two individually source-authenticated native Draw crops can have
 // DIFFERENT widths/heights after exact D3D9 dirty-island clipping. Their
 // pixels are still independent and safe to show together when nonoverlapping.
