@@ -25,14 +25,21 @@ def extract(source, signature):
 def verify(source):
     occ = extract(source, "bool R26TrackedOcclusionDrawIsWriteFree(")
     present = extract(source, "HRESULT __stdcall PresentDestR27(")
+    guard = extract(source, "HRESULT R26GuardTrackedOcclusion(")
+    assert "R26OcclusionUnreliableStateRejects" in source
+    assert "StateBlock tracking is unreliable" in guard
+    assert guard.index("StateBlockTracker::Reliable()") < guard.index(
+        "R26TrackedOcclusionDrawIsWriteFree(device)")
     states = ("D3DRS_COLORWRITEENABLE", "D3DRS_ZWRITEENABLE",
               "D3DRS_STENCILENABLE", "D3DRS_STENCILWRITEMASK")
     positions = [occ.index(state) for state in states]
     assert positions == sorted(positions)
     for token in ("colorWrite != 0", "zWrite != FALSE",
                   "if (stencilEnable == FALSE)\n                return true;",
-                  "stencilWriteMask == 0", "if (!device)"):
+                  "stencilWriteMask == 0", "if (!device)",
+                  "StateBlockTracker::Reliable()"):
         assert token in occ, token
+    assert occ.index("StateBlockTracker::Reliable()") < positions[0]
     assert occ.index("colorWrite != 0") < positions[1]
     assert occ.index("zWrite != FALSE") < positions[2]
     assert occ.index("if (stencilEnable == FALSE)") < positions[3]
@@ -55,8 +62,11 @@ def verify(source):
     assert "R27TelemetryActiveOnThread = true;" in present
 
 
-def sample(color, depth, stencil, mask, failed_at=None):
+def sample(color, depth, stencil, mask, failed_at=None, reliable=True):
     states = (color, depth, stencil, mask)
+    # Unreliable StateBlock coverage must reject before any cached state read.
+    if not reliable:
+        return False, 0
     # Fail closed on every state actually read, skip provably irrelevant reads.
     reads = 0
     for i, value in enumerate(states):
@@ -85,7 +95,12 @@ def main():
         for failure_at in range(reads):
             failed, got_reads = sample(color, depth, stencil, mask, failure_at)
             assert not failed and got_reads == failure_at + 1
+        unreliable, unreliable_reads = sample(
+            color, depth, stencil, mask, reliable=False)
+        assert not unreliable and unreliable_reads == 0
     for good, bad in (
+        ("!OutRunVR::State::StateBlockTracker::Reliable()",
+         "false /* unsafe: trust stale StateBlock cache */"),
         ("colorWrite != 0", "colorWrite == 0"),
         ("zWrite != FALSE", "zWrite == FALSE"),
         ("if (stencilEnable == FALSE)", "if (stencilEnable != FALSE)"),
@@ -106,8 +121,8 @@ def main():
         except (AssertionError, ValueError, IndexError):
             continue
         raise AssertionError("unsafe R26 mutation escaped: " + good)
-    print("PASS R26 write-free occlusion: 16 predicates, all observed getter failures, "
-          "10 destructive mutations; disabled Present diagnostics bypass")
+    print("PASS R26 write-free occlusion: 16 predicates, unreliable StateBlock zero-read rejection, "
+          "all observed getter failures, 11 destructive mutations; disabled Present diagnostics bypass")
 
 
 if __name__ == "__main__":

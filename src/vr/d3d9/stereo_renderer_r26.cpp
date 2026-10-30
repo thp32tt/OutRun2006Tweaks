@@ -47,6 +47,7 @@ namespace OutRunVRStereo
 
         std::uint64_t R26TrackedOcclusionSingleExec = 0;
         std::uint64_t R26OcclusionWriteRejects = 0;
+        std::uint64_t R26OcclusionUnreliableStateRejects = 0;
         std::uint64_t R27WorldEffectDraws = 0;
         std::uint64_t R27EffectStateResyncs = 0;
         std::uint64_t R27LastEffectStateSyncDrawSerial = 0;
@@ -59,6 +60,7 @@ namespace OutRunVRStereo
         std::uint64_t R28RebindPoseReject = 0;
         bool R26FirstTrackedOcclusionLogged = false;
         bool R26FirstOcclusionWriteRejectLogged = false;
+        bool R26FirstOcclusionUnreliableStateLogged = false;
         bool R27FirstWorldEffectLogged = false;
         bool R28FirstShaderEpochWorldLogged = false;
 
@@ -354,9 +356,15 @@ namespace OutRunVRStereo
         bool R26TrackedOcclusionDrawIsWriteFree(
             IDirect3DDevice9* device) noexcept
         {
-            if (!device)
+            if (!device ||
+                !OutRunVR::State::StateBlockTracker::Reliable())
                 return false;
 
+            // Query-only occlusion draws are rare. Cached render-state values
+            // are authoritative only while StateBlock coverage is reliable.
+            // If Apply coverage is lost, the caller must fall back to the
+            // existing R23/R22/R13/R9 fail-closed path instead of trusting a
+            // stale COLORWRITEENABLE=0 cache.
             // Query-only occlusion draws are rare. Reject known writers at
             // the first authoritative state instead of consulting all four
             // R22/D3D9 getters on every active-query geometry draw. This is
@@ -391,6 +399,22 @@ namespace OutRunVRStereo
         {
             if (!R26TrackedOcclusionNeedsSingleExecution(device))
                 return normalR23Draw();
+
+            // A valid cached COLORWRITEENABLE=0 is not authoritative after
+            // StateBlock Apply coverage is lost. Never use the single-exec
+            // shortcut in that state; preserve the established lower
+            // fail-closed replay/mono policy instead.
+            if (!OutRunVR::State::StateBlockTracker::Reliable())
+            {
+                ++R26OcclusionUnreliableStateRejects;
+                if (!R26FirstOcclusionUnreliableStateLogged)
+                {
+                    R26FirstOcclusionUnreliableStateLogged = true;
+                    spdlog::warn(
+                        "VR R28 occlusion: StateBlock tracking is unreliable; rejecting cached write-free shortcut and delegating to fail-closed lower path");
+                }
+                return normalR23Draw();
+            }
 
             // Only a proven query-only proxy may bypass replay. A regular scene
             // draw bracketed by an occlusion query can still write visible color
