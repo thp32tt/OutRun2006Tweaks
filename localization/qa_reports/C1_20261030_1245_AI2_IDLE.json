@@ -1,0 +1,84 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1245KST-IDLE",
+  "observed_at_kst": "2026-10-30T12:46:45+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence": {
+    "candidate_root_n100": "work/image-src/text_roi_batches/candidate_outputs",
+    "production_manifest_n100": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence_n100": "work/image-src/text_roi_batches/export_evidence",
+    "existing_qa_evidence_n100": "work/C1_QA_*report.json",
+    "read_only_inventory_script": "work/C1_QA_20261030_0545_inventory.py",
+    "read_only_export_dedup_scan": "work/c1_20261029_1945_check_pending.py",
+    "cutoff_for_new_file_mtime_kst": "2026-10-30T05:15:00+09:00",
+    "candidate_count_by_role": {
+      "A": 436,
+      "B": 482
+    },
+    "completed_files_by_role": {
+      "A": 435,
+      "B": 482
+    },
+    "completed_batches_by_role": {
+      "A": 141,
+      "B": 145
+    },
+    "active": {
+      "A": null,
+      "B": null
+    },
+    "files_modified_since_cutoff": 0,
+    "last_candidate_modification_kst": {
+      "A": "2026-10-30T04:20:09+09:00",
+      "B": "2026-10-30T05:10:04+09:00"
+    },
+    "last_pass_sha_recheck": {
+      "A": {
+        "file": "Q043_8845a649913b5ecf_k.png",
+        "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+        "matches": true
+      },
+      "B": {
+        "file": "Q046_d10debc727463563_k.png",
+        "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+        "matches": true
+      }
+    },
+    "export_manifest_scan": {
+      "qualifying_exported_files": 116,
+      "unreviewed_distinct_sha": 0,
+      "invalid_export_matches": 0,
+      "scan_scope": "Existing read-only N100 script's export-ID/manifest intersection; independently corroborated by zero candidate modification after latest QA"
+    }
+  },
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "status": "IDLE_NO_NEW_UNREVIEWED_SHA"
+  },
+  "limitations": [
+    "No new candidate means no additional visual review took place",
+    "Scan scope is existing export manifest intersection, not a new comprehensive audit of all historical assets",
+    "Not an integrated UI, DDS, C2/C3, or in-game approval"
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score_change": 0
+}
