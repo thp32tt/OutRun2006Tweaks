@@ -100,7 +100,7 @@ jobs:
             'Gameplay HUD reference: 1920x1080 widescreen, HudScale=0.55'
             'Title/main menu: independent 4:3 composition; F11: independent VR shell'
             'Baseline AA: VR AntiAliasing=2 (4x MSAA with 2x fallback)'
-            'ReflectionResolution=512; VR and Graphics transparency supersampling OFF; culling margin 8 degrees unchanged'
+            'ReflectionResolution=256; VR and Graphics transparency supersampling OFF; culling margin 8 degrees unchanged'
             'Runner: GitHub-hosted windows-2022'
             'RUNTIME_VALIDATION=UNTESTED'
             ''
