@@ -878,7 +878,7 @@ def queue_rollover_prompt(active: dict) -> str:
             "롤오버는 새 생산작업이 아니므로 원래 TASK_ID를 유지해. 이전 개발 기능의 미완료 소스 구현을 바로 이어가.",
             "GitHub uw2-web-port 최신 HEAD, 이전 포팅 계획과 원본 역어셈블리 근거, web/ 및 테스트 이력을 조사해.",
             "한국어판 원작 OPEN.EXE→MAIN.EXE, OPGRAPH, 항구/항해/교역/전투/세이브의 원본 실행·화면·음악을 임의 변경하지 마.",
-            "실제 web/ 구현 변경을 포함하는 커밋 메시지에 정확히 [AUTO:" + active['task_id'] + "]를 남겨. 문서만 작성하면 미완료다.",
+            "실제 uw2-web/ 또는 web/ 도구·구현 소스 변경을 포함하는 커밋 메시지에 정확히 [AUTO:" + active['task_id'] + "]를 남겨. 문서만 작성하면 미완료다.",
             "이전 테스트 결과와 새 테스트를 구분하고 수행하지 않은 브라우저·실기 동작은 UNTESTED로 남겨.",
             "NEXT_ACTION=" + str(active.get('resume_cursor') or active.get('failure_context') or "continue original web source implementation"),
         ]
@@ -2982,8 +2982,10 @@ async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
         result = github_api_json(f"/repos/{repo}/commits/{sha}")
         paths = [str(row.get("filename") or "") for row in result.get("files", [])
                  if isinstance(row, dict)]
-        source_paths = [p for p in paths if p.startswith("web/")
-                        and p.endswith((".js", ".mjs", ".ts", ".html", ".css"))]
+        source_paths = [p for p in paths
+                        if (p.startswith("uw2-web/") or p.startswith("web/"))
+                        and not p.startswith(("uw2-web/tests/", "uw2-web/docs/"))
+                        and p.endswith((".js", ".mjs", ".ts", ".html", ".css", ".py", ".c", ".cpp"))]
         if not source_paths:
             active["uw2_verification_error"] = "TASK_COMMIT_HAS_NO_WEB_SOURCE"
             save_queue_state(q)
