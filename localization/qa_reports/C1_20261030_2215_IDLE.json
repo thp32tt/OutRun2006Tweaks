@@ -1,0 +1,78 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T2215KST-IDLE",
+  "requested_slot_kst": "2026-10-30T22:15:00+09:00",
+  "checked_at_kst": "2026-10-30T22:18:05+09:00",
+  "role": "C1",
+  "status": "IDLE_NO_NEW_UNREVIEWED_SHA",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source": "N100 work/image-src/text_roi_batches/candidate_outputs/A,B plus export_evidence and historical C1 QA reports",
+  "inventory": {
+    "candidate_files_A": 437,
+    "candidate_files_B": 483,
+    "total_candidate_files": 920,
+    "export_evidence_records_by_filename": 920,
+    "missing_export_count": 0,
+    "local_qa_report_files": 197,
+    "previously_reviewed_sha_count": 925,
+    "pending_unreviewed_export_sha": 0,
+    "newer_candidate_files_than_last_qa": 0,
+    "last_qa_kst": "2026-10-30T18:21:49+09:00"
+  },
+  "latest_file_byte_hash_spotchecks": [
+    {
+      "role": "A",
+      "file": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530"
+    },
+    {
+      "role": "B",
+      "file": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b"
+    },
+    {
+      "role": "A",
+      "file": "Q043_8845a649913b5ecf_k.png",
+      "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2"
+    },
+    {
+      "role": "B",
+      "file": "Q046_d10debc727463563_k.png",
+      "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5"
+    }
+  ],
+  "previously_completed_new_sha_qa": {
+    "run_key": "OUTRUN-C1-AI2-20261030T1815KST-Q228-NEW-SHA2",
+    "report": "localization/qa_reports/C1_20261030_1815_Q228_new_sha2.json",
+    "new_sha": 2,
+    "pass": 2,
+    "fail": 0,
+    "not_repeated": true
+  },
+  "result": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": true
+  },
+  "limitations": [
+    "Inventory dedup is based on exported file SHA and existing C1 report SHA; exact bytes were rehashed for four newest candidates, not every historical file",
+    "C1 cannot assert actual UI composition, protected art, final DDS, C2/C3 or in-game PASS"
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "ai2_competition_score_delta": 0
+}
