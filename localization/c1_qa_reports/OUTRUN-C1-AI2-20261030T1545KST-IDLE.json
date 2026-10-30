@@ -82,9 +82,11 @@
   },
   "scoring": {
     "scoreboard_ssot": "thp32tt/ai-dev-lab/main/AI_SCOREBOARD.md",
-    "previous_confirmed_ai2_cumulative": 2214,
+    "scoreboard_blob_sha_at_postwrite_verification": "e8e9ece9d56b66904b292fc87ed36c6fc3a77cf6",
+    "scoreboard_initial_snapshot_at_run": 2214,
+    "previous_confirmed_ai2_cumulative": 2215,
     "this_run_change": 0,
-    "new_ai2_cumulative": 2214,
-    "reason": "IDLE and SHA re-verification are not a new QA achievement; no double count"
+    "new_ai2_cumulative": 2215,
+    "reason": "A separate task independently moved the SSOT from 2214 to 2215 between initial inventory and remote verification. This C1 IDLE has +0; no duplicate QA work scored."
   }
 }
