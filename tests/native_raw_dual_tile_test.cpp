@@ -831,6 +831,81 @@ int main() {
                              gpu, false, true));
         assert(alpha.count == 1u && alpha.rgbPixels[0] == 16u);
     }
+    // A verified FULL original game Present has no dirty RGNDATA. It must
+    // still show separate real GPU RGB geometry/color islands across the
+    // physical source capture, without reserving gaps as native pixels.
+    {
+        constexpr std::uint32_t w = 96u, h = 64u;
+        std::array<std::uint8_t, w * h * 4u> before{};
+        auto after = before;
+        for (std::uint32_t y = 10u; y < 14u; ++y)
+            for (std::uint32_t x = 10u; x < 14u; ++x)
+                after[(y * w + x) * 4u] = 21u;
+        for (std::uint32_t y = 20u; y < 24u; ++y)
+            for (std::uint32_t x = 40u; x < 44u; ++x)
+                after[(y * w + x) * 4u + 1u] = 91u;
+        for (std::uint32_t y = 35u; y < 39u; ++y)
+            for (std::uint32_t x = 75u; x < 79u; ++x)
+                after[(y * w + x) * 4u + 2u] = 174u;
+        NativeRawChangedPixelWindow rgb{};
+        rgb.capture(before.data(), w * 4u, after.data(), w * 4u, w, h);
+        NativeRawPresentDirtyRegion full{};
+        assert(!native_raw_verified_full_source_crop_region(
+            false, 1920u, 1080u, 100, 200, 300, 280, full));
+        assert(!full.headerVerified && full.count == 0u);
+        assert(!native_raw_verified_full_source_crop_region(
+            true, 1920u, 1080u, 100, 200, 1921, 280, full));
+        assert(!native_raw_verified_full_source_crop_region(
+            true, 1920u, 1080u, 300, 200, 100, 280, full));
+        assert(native_raw_verified_full_source_crop_region(
+            true, 1920u, 1080u, 100, 200, 300, 280, full));
+        NativeRawPresentTile source{};
+        assert(native_raw_source_capture_clip_tile(
+            105u, 205u, w, h, 1920u, 1080u, 1920u, 1080u,
+            100, 200, 300, 280, source));
+        NativeRawSourceIslandBatch batch{};
+        for (std::uint32_t i = 0u; i < 3u; ++i)
+            assert(batch.append(1920u, 1080u, full, source,
+                                rgb, false, true));
+        assert(!batch.append(1920u, 1080u, full, source,
+                             rgb, false, true));
+        assert(batch.count == 3u);
+        assert(batch.tiles[0].destinationX == 115 &&
+               batch.tiles[0].destinationY == 215 &&
+               batch.tiles[1].destinationX == 145 &&
+               batch.tiles[1].destinationY == 225 &&
+               batch.tiles[2].destinationX == 180 &&
+               batch.tiles[2].destinationY == 240);
+        for (std::uint32_t i = 0u; i < 3u; ++i) {
+            assert(batch.rgbPixels[i] == 16u);
+            assert(batch.tiles[i].copyWidth == 4u &&
+                   batch.tiles[i].copyHeight == 4u);
+            assert(rgb.changed_pixels(batch.tiles[i]) == 16u);
+        }
+        // A verified partial crop is still clipped to original coordinates.
+        NativeRawPresentDirtyRegion narrow{};
+        assert(native_raw_verified_full_source_crop_region(
+            true, 1920u, 1080u, 100, 200, 135, 225, narrow));
+        NativeRawPresentTile narrowSource{};
+        assert(native_raw_source_capture_clip_tile(
+            105u, 205u, w, h, 1920u, 1080u, 1920u, 1080u,
+            100, 200, 135, 225, narrowSource));
+        NativeRawSourceIslandBatch onlyInside{};
+        assert(onlyInside.append(1920u, 1080u, narrow,
+                                 narrowSource, rgb, false, true));
+        assert(!onlyInside.append(1920u, 1080u, narrow,
+                                  narrowSource, rgb, false, true));
+        assert(onlyInside.count == 1u && onlyInside.rgbPixels[0] == 16u);
+        // An alpha-only Draw has no GPU RGB to present, full repaint or not.
+        auto alpha = before;
+        for (std::uint32_t y = 10u; y < 14u; ++y)
+            for (std::uint32_t x = 10u; x < 14u; ++x)
+                alpha[(y * w + x) * 4u + 3u] = 255u;
+        rgb.capture(before.data(), w * 4u, alpha.data(), w * 4u, w, h);
+        NativeRawSourceIslandBatch zero{};
+        assert(!zero.append(1920u, 1080u, full, source,
+                            rgb, false, true));
+    }
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};

@@ -444,7 +444,21 @@ public:
                         // islands across both independent PRE/POST samples.
                         // Reserve one genuine region from each source before
                         // exhausting the bounded upload budget on one side.
-                        if (sourceDirty && !sourceCropRepaintVerified) {
+                        NativeRawPresentDirtyRegion verifiedFullCrop{};
+                        // Full verified game repaint has no RGNDATA, yet can
+                        // contain multiple distant, genuine native RGB panels.
+                        // Convert ONLY that verified Present crop into a
+                        // bounded repaint region; partial Presents still use
+                        // their original unmodified D3D9 dirty members.
+                        const bool fullSourceRegion =
+                            native_raw_verified_full_source_crop_region(
+                                sourceCropRepaintVerified,
+                                back.Width, back.Height, l, t, r, b,
+                                verifiedFullCrop);
+                        const NativeRawPresentDirtyRegion* batchDirty =
+                            fullSourceRegion ? &verifiedFullCrop :
+                            (!sourceCropRepaintVerified ? sourceDirty : nullptr);
+                        if (batchDirty) {
                             NativeRawPresentTile wholeFirst{}, wholeSecond{};
                             // The selected preview tiles are only a VIEW into
                             // two authentic GPU captures. Passing those small
@@ -470,7 +484,7 @@ public:
                                 changedWindow_.capture(before.pData, before.RowPitch,
                                     mapped.pData, mapped.RowPitch, width, height);
                                 return sourceBatch.append(back.Width, back.Height,
-                                    *sourceDirty, wholeFirst, changedWindow_, false, true);
+                                    *batchDirty, wholeFirst, changedWindow_, false, true);
                             };
                             const auto appendSecond = [&]() noexcept -> bool {
                                 if (!secondSource) return false;
@@ -478,7 +492,7 @@ public:
                                     beforeAlternate.RowPitch, afterAlternate.pData,
                                     afterAlternate.RowPitch, width, height);
                                 return sourceBatch.append(back.Width, back.Height,
-                                    *sourceDirty, wholeSecond, changedWindow_, true, true);
+                                    *batchDirty, wholeSecond, changedWindow_, true, true);
                             };
                             const bool firstFound = appendFirst();
                             const bool secondFound = appendSecond();

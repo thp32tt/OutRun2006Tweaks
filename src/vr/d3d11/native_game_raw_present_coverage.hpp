@@ -405,6 +405,36 @@ struct NativeRawPresentDirtyRegion {
     clipped.destinationY = t;
     return true;
 }
+// A full-source repaint can legitimately carry several independent native
+// Draw RGB islands even when D3D9 passes no RGNDATA. Admit its source crop
+// as ONE painted region only after the original Present caller has verified
+// complete repaint; otherwise never synthesize dirty game pixels. The same
+// exact RGB-delta and source-coincident batch admission applies afterward.
+[[nodiscard]] constexpr bool native_raw_verified_full_source_crop_region(
+    bool fullRepaintVerified, std::uint32_t backWidth,
+    std::uint32_t backHeight, std::int64_t cropLeft,
+    std::int64_t cropTop, std::int64_t cropRight,
+    std::int64_t cropBottom,
+    NativeRawPresentDirtyRegion& repaint) noexcept {
+    repaint = {};
+    const auto maxDim = static_cast<std::uint32_t>(
+        (std::numeric_limits<std::int32_t>::max)());
+    if (!fullRepaintVerified || !backWidth || !backHeight ||
+        backWidth > maxDim || backHeight > maxDim ||
+        cropLeft < 0 || cropTop < 0 ||
+        cropRight <= cropLeft || cropBottom <= cropTop ||
+        cropRight > backWidth || cropBottom > backHeight)
+        return false;
+    repaint.headerVerified = true;
+    repaint.count = 1u;
+    repaint.boundLeft = cropLeft;
+    repaint.boundTop = cropTop;
+    repaint.boundRight = cropRight;
+    repaint.boundBottom = cropBottom;
+    repaint.rectangles[0] = {
+        cropLeft, cropTop, cropRight, cropBottom};
+    return true;
+}
 // Preserve independently sampled genuine GPU Draw RGB islands in one bounded
 // D3D9 Present transaction. Both source captures must already be authenticated
 // to the same canonical game backbuffer, crop and Present epoch by the caller.
