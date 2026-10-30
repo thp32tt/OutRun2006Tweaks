@@ -28,8 +28,13 @@ services:
       CONVERSION_DX11_ENABLED: "true"
       DXVK_FROZEN: "true"
       CONVERSION_DXVK_ENABLED: "false"
-      CONVERSION_DX9EX_ENABLED: "true"
+      # C slot repurposed from lens-flare review to authentic UW2 browser porting.
+      CONVERSION_DX9EX_ENABLED: "false"
       DX9EX_REVIEW_ONLY: "true"
+      UW2_WEB_PORT_ENABLED: "true"
+      UW2_GITHUB_REPO: "thp32tt/ai-dev-lab"
+      UW2_TARGET_BRANCH: "uw2-web-port"
+      UW2_SCHEDULE_MINUTES: "0,30"
       CONVERSION_ONLY_SLOT: ""
       QUEUE_CHECK_SECONDS: "15"
       # GUI Chrome/noVNC stays enabled; only failed tabs are replaced.
@@ -63,8 +68,8 @@ services:
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       # New DX11 production: :30 KST, at most once per hour.
       SCHEDULE_MINUTES: "30"
-      # New DX9Ex review production: every hour at :00 KST (24/day max).
-      # Active TASK_ID retries/rollovers are not throttled by this cadence.
+      # Legacy DX9Ex C schedule disabled. UW2 C executes at :00/:30 KST.
+      # An unfinished TASK_ID is resumed, never replaced on a clock tick.
       DX9EX_SCHEDULE_MINUTES: "0"
       DX9EX_SCHEDULE_EVERY_HOURS: "1"
       CHAT_SLOTS: "3"
