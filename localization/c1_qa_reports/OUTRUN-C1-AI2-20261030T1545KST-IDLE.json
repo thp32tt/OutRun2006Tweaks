@@ -1,0 +1,90 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1545KST-IDLE",
+  "scheduled_slot_kst": "2026-10-30T15:45:00+09:00",
+  "observed_inventory_at_kst": "2026-10-30T15:47:15+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_EXPORTED_LOCAL_KOREAN_PNG_SHA",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "initial_remote_head": "7b28d438a9d15ea3ae783503df26fd91ee0f8850",
+  "policy_blobs": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "prior_report": "localization/c1_qa_reports/OUTRUN-C1-AI2-20261030T1445KST-IDLE.json",
+  "baseline_last_new_sha_qa": "localization/qa_reports/C1_20261030_0515_AI2_NEW_SHA2.json",
+  "n100_inventory": {
+    "root": "work/image-src/text_roi_batches/candidate_outputs",
+    "existing_qa_reports_scanned": 209,
+    "previously_reviewed_sha_unique": 923,
+    "exported_candidate_file_count": 918,
+    "candidate_files_by_role": {
+      "A": 436,
+      "B": 482
+    },
+    "unreviewed_export_sha_count": 0,
+    "unreviewed_export_file_count": 0,
+    "missing_or_incomplete_export_count": 0,
+    "files_modified_after_last_new_sha_qa": 0,
+    "producer_state": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "next_ordinal": 436,
+        "active": null
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "next_ordinal": 483,
+        "active": null
+      }
+    },
+    "last_qa_sha_reverified": [
+      {
+        "role": "A",
+        "file": "Q043_8845a649913b5ecf_k.png",
+        "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+        "matches_previous_qa": true
+      },
+      {
+        "role": "B",
+        "file": "Q046_d10debc727463563_k.png",
+        "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+        "matches_previous_qa": true
+      }
+    ],
+    "read_only_validation": [
+      "work/C1_QA_20261029_2145_AI2_scan.py",
+      "work/C1_QA_20261030_0545_inventory.py"
+    ],
+    "limitations": "Exclusion against archived QA candidate SHA records and export manifest SHA plus candidate file mtime and two sample byte hashes, not all 918 full candidate-byte hashes in this pass."
+  },
+  "summary": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": 1
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_dds_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "final_deployment": false,
+    "vr_ffb_dx11_dxvk_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_ssot": "thp32tt/ai-dev-lab/main/AI_SCOREBOARD.md",
+    "previous_confirmed_ai2_cumulative": 2214,
+    "this_run_change": 0,
+    "new_ai2_cumulative": 2214,
+    "reason": "IDLE and SHA re-verification are not a new QA achievement; no double count"
+  }
+}
