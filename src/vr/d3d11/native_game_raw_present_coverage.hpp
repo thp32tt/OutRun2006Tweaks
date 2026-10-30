@@ -123,13 +123,19 @@ struct NativeRawPresentDirtyRegion {
     const auto right = sourceAligned.destinationX + sourceAligned.copyWidth;
     const auto bottom = sourceAligned.destinationY + sourceAligned.copyHeight;
     std::uint64_t bestArea = 0u;
-    for (std::uint32_t i = 0u; i < dirty.count; ++i) {
-        const auto& rect = dirty.rectangles[i];
-        const auto l = (std::max)(sourceAligned.destinationX, rect.left);
-        const auto t = (std::max)(sourceAligned.destinationY, rect.top);
-        const auto r = (std::min)(right, rect.right);
-        const auto b = (std::min)(bottom, rect.bottom);
-        if (r <= l || b <= t) continue;
+    // A single authentic game repaint can be split into several RGNDATA
+    // rectangles. The old per-member selection discarded RGB from adjoining
+    // fragments, even though their whole union reached the D3D9 Present.
+    // Proposals below never confer visibility: validate the ORIGINAL entire
+    // dirty region, the exact candidate pixels, and the native GPU RGB delta.
+    const auto consider = [&](std::int64_t left, std::int64_t top,
+                              std::int64_t rectRight,
+                              std::int64_t rectBottom) noexcept {
+        const auto l = (std::max)(sourceAligned.destinationX, left);
+        const auto t = (std::max)(sourceAligned.destinationY, top);
+        const auto r = (std::min)(right, rectRight);
+        const auto b = (std::min)(bottom, rectBottom);
+        if (r <= l || b <= t) return;
         NativeRawPresentTile candidate = sourceAligned;
         candidate.sourceX += static_cast<std::uint32_t>(
             l - sourceAligned.destinationX);
@@ -139,10 +145,8 @@ struct NativeRawPresentDirtyRegion {
         candidate.copyHeight = static_cast<std::uint32_t>(b - t);
         candidate.destinationX = l;
         candidate.destinationY = t;
-        // This independently checks every rect, the true D3D9 rcBound and
-        // exact dirty UNION, not only the candidate's intersecting member.
         if (!native_raw_dirty_region_covers_tile(
-                backWidth, backHeight, dirty, candidate)) continue;
+                backWidth, backHeight, dirty, candidate)) return;
         const auto rgb = gpuDelta.changed_pixels(candidate);
         const auto area = std::uint64_t{candidate.copyWidth} *
                           candidate.copyHeight;
@@ -152,6 +156,62 @@ struct NativeRawPresentDirtyRegion {
             changedRgb = rgb;
             bestArea = area;
         }
+    };
+    // Keep the original single-rectangle fast path and its stable tie-break.
+    for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+        const auto& r = dirty.rectangles[i];
+        consider(r.left, r.top, r.right, r.bottom);
+    }
+    // Two overlapping/touching dirty members may represent one original
+    // game pixel island, or a useful rectangular portion of an L-shape.
+    // At most 496 pair candidates; no guessed destination, resampling or
+    // full-frame publication. A hole between them always fails union proof.
+    for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+        const auto& a = dirty.rectangles[i];
+        for (std::uint32_t j = i + 1u; j < dirty.count; ++j) {
+            const auto& b = dirty.rectangles[j];
+            if (a.left > b.right || b.left > a.right ||
+                a.top > b.bottom || b.top > a.bottom)
+                continue;
+            consider((std::min)(a.left, b.left),
+                     (std::min)(a.top, b.top),
+                     (std::max)(a.right, b.right),
+                     (std::max)(a.bottom, b.bottom));
+        }
+    }
+    // Menus can split one STRIP into three or more adjacent dirty members.
+    // A bounded connected-component traversal proposes their common bounds;
+    // strict per-pixel union verification rejects L-shaped holes and
+    // out-of-bounds / forged rcBound even for a connected component.
+    bool visited[NativeRawPresentDirtyRegion::kMaxRects]{};
+    for (std::uint32_t seed = 0u; seed < dirty.count; ++seed) {
+        if (visited[seed]) continue;
+        std::uint32_t queue[NativeRawPresentDirtyRegion::kMaxRects]{seed};
+        std::uint32_t read = 0u, size = 1u;
+        visited[seed] = true;
+        auto left = dirty.rectangles[seed].left;
+        auto top = dirty.rectangles[seed].top;
+        auto rectRight = dirty.rectangles[seed].right;
+        auto rectBottom = dirty.rectangles[seed].bottom;
+        while (read < size) {
+            const auto& current = dirty.rectangles[queue[read++]];
+            for (std::uint32_t j = 0u; j < dirty.count; ++j) {
+                if (visited[j]) continue;
+                const auto& next = dirty.rectangles[j];
+                if (next.left > current.right ||
+                    next.right < current.left ||
+                    next.top > current.bottom ||
+                    next.bottom < current.top)
+                    continue;
+                visited[j] = true;
+                queue[size++] = j;
+                left = (std::min)(left, next.left);
+                top = (std::min)(top, next.top);
+                rectRight = (std::max)(rectRight, next.right);
+                rectBottom = (std::max)(rectBottom, next.bottom);
+            }
+        }
+        if (size > 1u) consider(left, top, rectRight, rectBottom);
     }
     return changedRgb > 0u;
 }

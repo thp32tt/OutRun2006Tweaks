@@ -73,6 +73,67 @@ int main() {
             1920, 1080, twoIslands, secondCrop));
         assert(native_raw_can_show_source_aligned_pair(
             false, true, true, cropped, secondCrop));
+        // More than two contiguous real game dirty rectangles may cover a
+        // single native GPU Draw RGB island. Select their true rectangular
+        // union instead of discarding all but one source fragment.
+        {
+            std::array<std::uint8_t, w * h * 4u> fragmentedBefore{};
+            auto fragmentedAfter = fragmentedBefore;
+            fragmentedAfter[(22u * w + 65u) * 4u] = 71u;
+            fragmentedAfter[(22u * w + 75u) * 4u + 1u] = 83u;
+            NativeRawChangedPixelWindow rgbUnion;
+            rgbUnion.capture(fragmentedBefore.data(), w * 4u,
+                             fragmentedAfter.data(), w * 4u, w, h);
+            NativeRawPresentDirtyRegion fragments{};
+            fragments.headerVerified = true;
+            fragments.count = 3u;
+            fragments.rectangles[0] = {160, 220, 166, 236};
+            fragments.rectangles[1] = {166, 220, 172, 236};
+            fragments.rectangles[2] = {172, 220, 180, 236};
+            fragments.boundLeft = 160; fragments.boundTop = 220;
+            fragments.boundRight = 180; fragments.boundBottom = 236;
+            NativeRawPresentTile multi{};
+            std::uint32_t rgbCount = 0u;
+            assert(native_raw_dirty_source_rgb_crop(
+                1920, 1080, fragments, fullGpuTile, rgbUnion,
+                multi, rgbCount));
+            assert(rgbCount == 2u && multi.sourceX == 60u &&
+                   multi.sourceY == 20u && multi.copyWidth == 20u &&
+                   multi.copyHeight == 16u && multi.destinationX == 160 &&
+                   multi.destinationY == 220);
+            assert(native_raw_dirty_region_covers_tile(
+                1920, 1080, fragments, multi));
+            // Missing ONE real destination pixel breaks the union:
+            // never stretch a native GPU fragment across a D3D9 dirty gap.
+            fragments.rectangles[2].left = 173;
+            assert(native_raw_dirty_source_rgb_crop(
+                1920, 1080, fragments, fullGpuTile, rgbUnion,
+                multi, rgbCount));
+            assert(rgbCount == 1u && multi.copyWidth < 20u);
+            // Repaint geometry is untrusted until rcBound agrees with
+            // every member. Even a real RGB source pixel cannot override it.
+            fragments.boundRight = 181;
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, fragments, fullGpuTile, rgbUnion,
+                multi, rgbCount));
+            // Vertical fragmented game repaint is equally source-coincident.
+            fragmentedAfter[(33u * w + 65u) * 4u + 2u] = 93u;
+            rgbUnion.capture(fragmentedBefore.data(), w * 4u,
+                             fragmentedAfter.data(), w * 4u, w, h);
+            fragments = {};
+            fragments.headerVerified = true;
+            fragments.count = 2u;
+            fragments.rectangles[0] = {160, 220, 180, 228};
+            fragments.rectangles[1] = {160, 228, 180, 236};
+            fragments.boundLeft = 160; fragments.boundTop = 220;
+            fragments.boundRight = 180; fragments.boundBottom = 236;
+            assert(native_raw_dirty_source_rgb_crop(
+                1920, 1080, fragments, fullGpuTile, rgbUnion,
+                multi, rgbCount));
+            assert(rgbCount == 3u && multi.copyWidth == 20u &&
+                   multi.copyHeight == 16u && multi.destinationX == 160 &&
+                   multi.destinationY == 220);
+        }
         // Alpha-only mutations must not create native RGB evidence.
         after[(22u * w + 65u) * 4u + 2u] = 0u;
         after[(22u * w + 65u) * 4u + 3u] = 255u;
