@@ -1,0 +1,91 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1415KST-IDLE",
+  "scheduled_slot_kst": "2026-10-30T14:15:00+09:00",
+  "checked_at_kst": "2026-10-30T14:17:16+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_EXPORTED_LOCAL_KOREAN_PNG_SHA",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "initial_remote_head": "2a32e4c6d4a8e92a4792250ae529c113dd6ad892",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "prior_report": "localization/c1_qa_reports/OUTRUN-C1-AI2-20261030T1345KST-IDLE.json",
+  "baseline_last_new_sha_qa": "localization/qa_reports/C1_20261030_0515_AI2_NEW_SHA2.json",
+  "n100_inventory": {
+    "observed_at_kst": "2026-10-30T14:17:16+09:00",
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "existing_qa_reports_scanned": 209,
+    "prior_distinct_reviewed_sha": 923,
+    "exported_candidate_file_count": 918,
+    "candidate_files_by_role": {
+      "A": 436,
+      "B": 482,
+      "total": 918
+    },
+    "verified_new_unique_sha": 0,
+    "missing_or_incomplete_exports": 0,
+    "files_modified_after_0515_qa": 0,
+    "producer_state": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "next_ordinal": 436,
+        "active": null
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "next_ordinal": 483,
+        "active": null
+      }
+    },
+    "last_pass_sha_reverified": [
+      {
+        "role": "A",
+        "filename": "Q043_8845a649913b5ecf_k.png",
+        "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+        "matches_prior_qa": true
+      },
+      {
+        "role": "B",
+        "filename": "Q046_d10debc727463563_k.png",
+        "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+        "matches_prior_qa": true
+      }
+    ],
+    "checks": [
+      "read-only N100 SHA exclusion scan: work/C1_QA_20261029_2145_AI2_scan.py",
+      "read-only N100 mtime and last-two-SHA spot check: work/C1_QA_20261030_0545_inventory.py"
+    ],
+    "limitation": "Manifest/export SHA de-dup and cutoff mtime inventory, not a fresh byte-by-byte rehash of every archived candidate."
+  },
+  "summary": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": 1
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds": false,
+    "c2_c3_or_ingame_pass_created": false,
+    "final_deployment": false,
+    "vr_ffb_dx11_dxvk_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_ssot": "thp32tt/ai-dev-lab/main/AI_SCOREBOARD.md",
+    "previous_confirmed_ai2_cumulative": 2212,
+    "this_run_change": 0,
+    "new_ai2_cumulative": 2212,
+    "reason": "IDLE and repeated SHA verification are +0, with no scoreboard modification"
+  }
+}
