@@ -1,0 +1,71 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "task_id": "OUTRUN-C1-AI2-20261030T0915KST-IDLE",
+  "observed_at_kst": "2026-10-30T09:17:09+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "branch_head_before": "daca82461509496bcc22b4b94c66b1a27b984213",
+  "policy_source_blob_sha": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "source": "N100 /home/chatgpt-runner2/work/image-src/text_roi_batches (read-only)",
+  "scan_script": "work/C1_QA_20261029_2145_AI2_scan.py",
+  "latest_prior_report": "localization/qa_reports/C1_QA_20261030_0845_AI2_IDLE.json",
+  "inventory": {
+    "prior_qa_json_artifacts": 209,
+    "prior_reviewed_sha256_unique": 923,
+    "export_png_files": 918,
+    "candidate_png_files": {
+      "A": 436,
+      "B": 482
+    },
+    "new_unique_unreviewed_export_sha256": 0,
+    "new_unreviewed_export_files": 0,
+    "missing_or_incomplete_export_files": 0,
+    "A_state": {
+      "completed_files": 435,
+      "completed_batches": 141,
+      "next_ordinal": 436,
+      "active": false
+    },
+    "B_state": {
+      "completed_files": 482,
+      "completed_batches": 145,
+      "next_ordinal": 483,
+      "active": false
+    }
+  },
+  "result": "IDLE",
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "limitations": [
+    "No new unseen candidate SHA256; no repeat PASS/FAIL assigned.",
+    "A state completed_files=435 vs A candidate disk=436 is a preexisting producer accounting discrepancy; not a new QA candidate.",
+    "No DDS/C2/C3/user in-game PASS generated."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_produced": false,
+    "C2_C3_or_runtime_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "file": "AI_SCOREBOARD.md",
+    "AI2_previous_confirmed": 2199,
+    "change": 0,
+    "AI2_result": 2199,
+    "reason": "IDLE/inventory refresh only, no new QA achievement"
+  }
+}
