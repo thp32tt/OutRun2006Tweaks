@@ -17,7 +17,7 @@ services:
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
       VR_FEATURE_DEVELOPMENT_ENABLED: "true"
-      # Retain live TASK_ID but never chain new production immediately.
+      # Native DX11 A keeps its existing production/CI queue; UW2 C does not use it.
       VR_CONTINUOUS_30M_ENABLED: "true"
       VR_SCHEDULED_DISPATCH_ENABLED: "true"
       VR_CONTINUOUS_INTERVAL_SECONDS: "3600"
@@ -35,9 +35,6 @@ services:
       UW2_GITHUB_REPO: "thp32tt/ai-dev-lab"
       UW2_TARGET_BRANCH: "uw2-web-port"
       UW2_SCHEDULE_MINUTES: "0,30"
-      # Do not mark a feature-sized source commit terminal; only final P0-P9 acceptance.
-      UW2_ALLOW_FINAL_TERMINAL: "false"
-      UW2_PROGRESS_POLL_SECONDS: "60"
       CONVERSION_ONLY_SLOT: ""
       QUEUE_CHECK_SECONDS: "15"
       # GUI Chrome/noVNC stays enabled; only failed tabs are replaced.
@@ -71,8 +68,8 @@ services:
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       # New DX11 production: :30 KST, at most once per hour.
       SCHEDULE_MINUTES: "30"
-      # Legacy DX9Ex C schedule disabled. UW2 C executes at :00/:30 KST.
-      # Both C windows resume the SAME TASK_ID until the complete original game is verified.
+      # C uses one existing project chat and sends only the short continuation at :00/:30 KST.
+      # Busy workers are not interrupted; due messages remain pending until idle.
       DX9EX_SCHEDULE_MINUTES: "0"
       DX9EX_SCHEDULE_EVERY_HOURS: "1"
       CHAT_SLOTS: "3"
