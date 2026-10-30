@@ -26,6 +26,11 @@ require = [
      "static_assert(ChildCountDiagnosticProof()" in head and
      "VR ABC C GOAL REBUILT EMPTY ROOT REJECTED:" in p and
      "action=KEEP_NATIVE_UNOWNED" in p),
+ ("rejected-tail kind dereference guarded by live-chain proof",
+     "const bool liveChainProven = verifiedChildren != 0;" in p and
+     "liveChainProven ? currentTail->kind_C : -1" in p and
+     "kindsVerified={}" in p and
+     "const SpriteNode* first = liveChainProven" in p),
  ("diagnostic never broadens ownership",
      p.count("RegisterSpriteNodeScope(") == 1 and
      p.count("FirstVerifiedRebuiltEmptySingleChild(") == 1),

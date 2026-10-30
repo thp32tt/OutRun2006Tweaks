@@ -1558,8 +1558,60 @@ class UIScaling : public Hook
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
-			if (!root || !tailAfter || tailAfter == before[prio])
+            const bool exactResultTraceProducer =
+                sourceRoots &&
+                (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+            if (!root || !tailAfter || tailAfter == before[prio])
+            {
+                // The old fast continue hid one important fail-closed case:
+                // a native producer can replace the priority root while
+                // reusing the exact old tail pointer. Record addresses/reason
+                // only; never dereference a detached old tail or grant scope.
+                if (Settings::VREnabled && Settings::VRTelemetry &&
+                    exactResultTraceProducer)
+                {
+                    SpriteNode* const entryRoot = (*sourceRoots)[prio];
+                    const bool rootChanged = entryRoot != root;
+                    const char* reason = !root
+                        ? "NO_LIVE_ROOT"
+                        : (!tailAfter
+                            ? "NO_LIVE_TAIL"
+                            : (rootChanged
+                                ? "ROOT_CHANGED_TAIL_REUSED"
+                                : nullptr));
+                    if (reason)
+                    {
+                        static std::atomic<std::uint64_t>
+                            exactEarlyRejects{0};
+                        const auto hit = exactEarlyRejects.fetch_add(
+                            1, std::memory_order_relaxed) + 1;
+                        if (hit <= 64 || (hit & (hit - 1)) == 0)
+                            spdlog::info(
+                                "VR TRACE GOAL TAG REJECT EARLY: hits={} "
+                                "producer={} priority={} reason={} "
+                                "entryRoot=0x{:X} currentRoot=0x{:X} "
+                                "entryTail=0x{:X} currentTail=0x{:X} "
+                                "preserveSince={} queueEpoch={} "
+                                "action=KEEP_NATIVE_UNOWNED",
+                                hit,
+                                OutRunVR::GameSemantic::Name(producer),
+                                prio, reason,
+                                reinterpret_cast<std::uintptr_t>(entryRoot),
+                                reinterpret_cast<std::uintptr_t>(root),
+                                reinterpret_cast<std::uintptr_t>(before[prio]),
+                                reinterpret_cast<std::uintptr_t>(tailAfter),
+                                preserveNewerExactSince,
+                                OutRunVR::GameSemantic::CurrentQueueNodeEpoch());
+                    }
+                }
 				continue;
+            }
 
 			// Preserve ordinary HUD fast tagging; exact rank/GOAL/+TIME
             // producers can rebuild the queue, so prove old/new tail
@@ -1652,15 +1704,8 @@ class UIScaling : public Hook
             // node entered ScreenHud ownership. Record that fail-closed edge
             // without adopting any node or changing native rendering.
             const bool exactResultRejectTrace =
-                Settings::VREnabled && Settings::VRTelemetry && sourceRoots &&
-                !node &&
-                (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
-                 producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
-                 producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
-                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
-                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
-                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
-                 producer == OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+                Settings::VREnabled && Settings::VRTelemetry &&
+                exactResultTraceProducer && !node;
             if (exactResultRejectTrace)
             {
                 SpriteNode* const entryRoot = (*sourceRoots)[prio];
@@ -2407,18 +2452,28 @@ class UIScaling : public Hook
                         1, std::memory_order_relaxed) + 1;
                     if (hit <= 32 || (hit & (hit - 1)) == 0)
                     {
-                        const SpriteNode* first = currentRoot->next_0;
+                        // CountVerifiedRebuiltEmptyChildren() is the only
+                        // reachability proof here. On zero, both child/tail
+                        // kind fields stay UNVERIFIED and no detached native
+                        // pointer is dereferenced by telemetry.
+                        const bool liveChainProven = verifiedChildren != 0;
+                        const SpriteNode* first = liveChainProven
+                            ? currentRoot->next_0 : nullptr;
+                        const int firstKind =
+                            liveChainProven && first ? first->kind_C : -1;
+                        const int tailKind =
+                            liveChainProven ? currentTail->kind_C : -1;
                         spdlog::info(
                             "VR ABC C GOAL REBUILT EMPTY ROOT REJECTED: "
                             "hits={} priority={} verifiedChildren={} "
                             "first=0x{:X} firstKind={} tail=0x{:X} tailKind={} "
-                            "entryEpoch={} liveEpoch={} entrySerial={} "
-                            "action=KEEP_NATIVE_UNOWNED",
+                            "kindsVerified={} entryEpoch={} liveEpoch={} "
+                            "entrySerial={} action=KEEP_NATIVE_UNOWNED",
                             hit, p, verifiedChildren,
                             reinterpret_cast<std::uintptr_t>(first),
-                            first ? first->kind_C : -1,
+                            firstKind,
                             reinterpret_cast<std::uintptr_t>(currentTail),
-                            currentTail->kind_C,
+                            tailKind, liveChainProven ? 1 : 0,
                             parentAdmission.queueEpochAtEntry,
                             OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
                             entrySerial);

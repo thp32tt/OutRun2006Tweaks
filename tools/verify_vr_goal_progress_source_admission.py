@@ -77,6 +77,11 @@ tests=[
         "entrySerial={}" in leave and "changedPriorities={}" in leave),
     ("fail-closed GOAL/+TIME tag rejection telemetry",
         "VR TRACE GOAL TAG REJECT:" in tagger and
+        "VR TRACE GOAL TAG REJECT EARLY:" in tagger and
+        "ROOT_CHANGED_TAIL_REUSED" in tagger and
+        "NO_LIVE_ROOT" in tagger and "NO_LIVE_TAIL" in tagger and
+        tagger.index("VR TRACE GOAL TAG REJECT EARLY:") <
+            tagger.index("continue;") and
         "CountVerifiedRebuiltEmptyChildren(" in tagger and
         "ROOT_REBUILT_MULTI_CHILD" in tagger and
         "TAIL_UNREACHABLE_OR_NONTERMINAL" in tagger and
