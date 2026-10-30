@@ -70,9 +70,6 @@ CONVERSION_DXVK_ENABLED = (not DXVK_FROZEN) and os.getenv("CONVERSION_DXVK_ENABL
 UW2_WEB_PORT_ENABLED = os.getenv("UW2_WEB_PORT_ENABLED", "false").lower() == "true"
 UW2_GITHUB_REPO = os.getenv("UW2_GITHUB_REPO", "thp32tt/ai-dev-lab").strip()
 UW2_TARGET_BRANCH = os.getenv("UW2_TARGET_BRANCH", "uw2-web-port").strip()
-# Fail closed on completion: no small commit can terminate the C slot.
-UW2_ALLOW_FINAL_TERMINAL = os.getenv("UW2_ALLOW_FINAL_TERMINAL", "false").lower() == "true"
-UW2_PROGRESS_POLL_SECONDS = max(30, int(os.getenv("UW2_PROGRESS_POLL_SECONDS", "60")))
 # DXVK remains frozen independently of the C lane.
 CONVERSION_DX9EX_ENABLED = os.getenv("CONVERSION_DX9EX_ENABLED", "true").lower() == "true"
 DX9EX_REVIEW_ONLY = os.getenv("DX9EX_REVIEW_ONLY", "true").lower() == "true"
@@ -292,7 +289,7 @@ class Registry:
     last_global_send_slot: Optional[str] = None
 
 runtime = {
-    "controller_build": "2026-10-31-uw2-full-fidelity-continuous-v2",
+    "controller_build": "2026-10-31-uw2-simple-one-line-v3",
     "vr_continuous_30m_enabled": VR_CONTINUOUS_30M_ENABLED,
     "vr_continuous_interval_seconds": VR_CONTINUOUS_INTERVAL_SECONDS,
     "vr_scheduled_dispatch_enabled": VR_SCHEDULED_DISPATCH_ENABLED,
@@ -324,8 +321,6 @@ runtime = {
     "uw2_web_port_enabled": UW2_WEB_PORT_ENABLED,
     "uw2_github_repo": UW2_GITHUB_REPO if UW2_WEB_PORT_ENABLED else None,
     "uw2_target_branch": UW2_TARGET_BRANCH if UW2_WEB_PORT_ENABLED else None,
-    "uw2_allow_final_terminal": UW2_ALLOW_FINAL_TERMINAL if UW2_WEB_PORT_ENABLED else False,
-    "uw2_progress_poll_seconds": UW2_PROGRESS_POLL_SECONDS if UW2_WEB_PORT_ENABLED else None,
     "conversion_only_slot": CONVERSION_ONLY_SLOT,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
@@ -1137,6 +1132,8 @@ LOCALIZATION_EXECUTION_POLICY = (
 
 
 def queue_dynamic_prefix() -> str:
+    if CONTROLLER_MODE == "conversion" and UW2_WEB_PORT_ENABLED and runtime.get("queue_lane") == "UW2":
+        return ""  # Never inject TASK_ID or workflow controls into the C chat.
     task_id = str(runtime.get("queue_task_id") or "").strip()
     if not task_id:
         return ""
@@ -1151,11 +1148,8 @@ def queue_dynamic_prefix() -> str:
             "DX9Ex는 REVIEW_ONLY이므로 최종 결과는 대상 브랜치의 docs/reviews/dx9ex/automation/<TASK_ID>.md 기록으로 남기고 게임 소스는 수정하지 마."
             if lane == "DX9EX"
             else
-            ("대항해시대 2 원작 웹포팅 전용. thp32tt/ai-dev-lab@uw2-web-port 최신 HEAD를 SSOT로 사용해. 원작 로직/화면/순서/음악을 임의로 바꾸지 말고 실제 웹 소스와 회귀 테스트를 구현해. 작은 기능·분석 도구·테스트 커밋은 중간 진척이며 종료 조건이 아니다. P0~P9 원작 동등성 전체 검증과 최종 인수 전까지 동일 TASK_ID를 유지하고 개발을 계속해."
-             if lane == "UW2" else
-             "GitHub 최신 HEAD를 최종 상태·결과 SSOT로 유지하되 N100 로컬 저장소/clone/worktree와 Google Drive는 "
+            "GitHub 최신 HEAD를 최종 상태·결과 SSOT로 유지하되 N100 로컬 저장소/clone/worktree와 Google Drive는 "
             "보조 입력, 분석, 빌드, 검증, 전송 수단으로 필요할 때 사용해도 된다. 최종 결과와 완료 판정은 대상 Git 브랜치의 실제 material commit으로 남겨."
-            )
         )
     )
     branch = str(runtime.get("queue_branch") or "")
@@ -1194,14 +1188,6 @@ def queue_dynamic_prefix() -> str:
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         ("각 실행 응답에는 TASK_ID, LATEST_MATERIAL_SHA, FULL_GAME_STATUS=IN_PROGRESS, P0_P9_GATE, NEXT_ACTION을 남기고 전체 게임이 완성되지 않았다면 바로 다음 구현을 계속해. 소스 커밋 하나로 답변·작업을 종료하지 마." if lane == "UW2" else "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해."),
     ]
-    if lane == "UW2":
-        lines += [
-            "MODE=ORIGINAL_UW2_WEB_PORT. 오직 thp32tt/ai-dev-lab@uw2-web-port를 개발해. OutRun DX9Ex/DX11/DXVK 코드는 수정하지 마.",
-            "원작 OPEN.EXE→MAIN.EXE 실행 순서, 한국어판 그래픽/음악/게임 규칙/세이브/항해/도시를 역어셈블리 증거와 대조하고 추정 구현은 추정이라 표시해. 원작 게임을 새로 디자인하지 마.",
-            "계획을 GitHub에 기록하고 최신 진행 위치를 이어받아 실제 미완료 웹 소스 1개 이상과 필요한 회귀를 구현해. REVIEW_ONLY나 상태 보고만으로 종료하지 마.",
-            "작은 소스 커밋 및 [AUTO:TASK_ID] 커밋은 진척 기록일 뿐이다. 원작 전체 동등성 P0~P9, 시작→6인 엔딩, 저장/불러오기, 그래픽/음악/전투/경제의 원본 대조 및 최종 인수 전에는 DONE/PASS/TERMINAL을 선언하지 마.",
-            "실행하지 않은 브라우저/원작 바이너리 테스트는 PASS라 주장하지 마. TASK_ID/RESULT_SHA/검증 상태를 정확히 보고해.",
-        ]
     if lane == "DX9EX":
         lines += [
             "DX9EX_REVIEW_ONLY=ON. REVIEW_SUBJECT=LENS_FLARE_ONLY. 2026-10-27 사용자 단일 주제 고정 지시가 과거 모든 DX9Ex 종합 검토·자동개발·자동수정 지시보다 우선한다. 매 신규 작업·retry·rollover에서도 렌즈플레어만 조사해.",
