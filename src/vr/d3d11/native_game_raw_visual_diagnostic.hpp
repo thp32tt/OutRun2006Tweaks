@@ -572,32 +572,19 @@ public:
                         target->UnlockRect();
                         return false;
                     }
-                    const auto* prev = static_cast<const std::uint8_t*>(prior.pData);
-                    const auto* next = static_cast<const std::uint8_t*>(after.pData);
-                    auto* dstBase = static_cast<std::uint8_t*>(locked.pBits);
-                    for (UINT y = 0; y < height; ++y) {
-                        const auto* p = prev + std::size_t{y} * prior.RowPitch;
-                        const auto* src = next + std::size_t{y} * after.RowPitch;
-                        auto* dst = dstBase + std::size_t{y} *
-                            static_cast<std::size_t>(locked.Pitch);
-                        // Readback is still the exact source GPU Draw bytes.
-                        // Convert only channel ordering for the D3D9 BGRA
-                        // presentation surface; preserve sRGB-encoded values.
-                        native_raw_copy_to_d3d9_bgra(
-                            dst, src, width, sourceByteOrder_,
-                            back.Format == D3DFMT_X8R8G8B8);
-                        // A magenta RAW border may never hide a real RGB
-                        // pixel at that border in either GPU source region.
-                        for (UINT x = 0; x < width; ++x) {
-                            if (native_raw_present_border_pixel(
-                                    tile, x, y,
-                                    native_raw_rgb_changed(p + 4u * x,
-                                                           src + 4u * x))) {
-                                dst[x * 4u] = 255u;
-                                dst[x * 4u + 1u] = 0u;
-                                dst[x * 4u + 2u] = 255u;
-                            }
-                        }
+                    // Copy only the independently authenticated RAW island.
+                    // GPU PRE/POST maps retain their original row pitches and
+                    // complete source coordinates; UpdateSurface copies just
+                    // tile.sourceX/Y + tile.copyWidth/Height from this buffer.
+                    const bool copied = native_raw_copy_present_island(
+                        locked.pBits, static_cast<std::size_t>(locked.Pitch),
+                        prior.pData, prior.RowPitch,
+                        after.pData, after.RowPitch,
+                        width, height, tile, sourceByteOrder_,
+                        back.Format == D3DFMT_X8R8G8B8);
+                    if (!copied) {
+                        target->UnlockRect();
+                        return false;
                     }
                     const HRESULT unlockHr = target->UnlockRect();
                     if (FAILED(unlockHr)) return false;

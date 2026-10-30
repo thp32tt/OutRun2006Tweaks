@@ -1120,4 +1120,85 @@ int main() {
                           after.data(), compactW * 4u, 257u, compactH);
     assert(!changedWindow.select(compactOriginal, compactSelected, realPixels));
 
+
+    // Real source RGB panels can be much smaller than the 256x144 mapped
+    // GPU copy. A D3D9 UpdateSurface only consumes this island source RECT;
+    // modifying other staging bytes is wasted work and must not be required.
+    // Probe both RGBA/BGRA, padded pitches, magenta incomplete borders,
+    // alpha-only pixels, a second disjoint panel, and fail-closed bounds.
+    {
+        constexpr std::uint32_t w = 14u, h = 12u;
+        constexpr std::size_t sourcePitch = w * 4u + 4u;
+        constexpr std::size_t dstPitch = w * 4u + 8u;
+        std::array<std::uint8_t, sourcePitch * h> before{}, after{};
+        std::array<std::uint8_t, dstPitch * h> output{};
+        const auto rgba = [&](std::uint32_t x, std::uint32_t y,
+                              std::uint8_t r, std::uint8_t g,
+                              std::uint8_t b, std::uint8_t a) {
+            auto* pixel = after.data() + y * sourcePitch + x * 4u;
+            pixel[0] = r; pixel[1] = g; pixel[2] = b; pixel[3] = a;
+        };
+        const NativeRawPresentTile panel{2u, 1u, 10u, 10u, 100, 200};
+        rgba(2u, 1u, 90u, 60u, 40u, 80u); // changed REAL border pixel
+        rgba(6u, 6u, 10u, 20u, 30u, 40u); // changed inner pixel
+        rgba(7u, 6u, 0u, 0u, 0u, 40u); // alpha-only is NOT RGB evidence
+        output.fill(0x5au);
+        assert(native_raw_copy_present_island(
+            output.data(), dstPitch, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, panel,
+            NativeRawColorByteOrder::Rgba, false));
+        const auto pixel = [&](std::uint32_t x, std::uint32_t y) {
+            return output.data() + y * dstPitch + x * 4u;
+        };
+        assert(pixel(2u, 1u)[0] == 40u &&
+               pixel(2u, 1u)[1] == 60u &&
+               pixel(2u, 1u)[2] == 90u &&
+               pixel(2u, 1u)[3] == 80u);
+        assert(pixel(6u, 6u)[0] == 30u &&
+               pixel(6u, 6u)[1] == 20u &&
+               pixel(6u, 6u)[2] == 10u &&
+               pixel(6u, 6u)[3] == 40u);
+        assert(pixel(3u, 2u)[0] == 255u &&
+               pixel(3u, 2u)[1] == 0u &&
+               pixel(3u, 2u)[2] == 255u); // incomplete border
+        assert(pixel(7u, 6u)[0] == 0u &&
+               pixel(7u, 6u)[1] == 0u &&
+               pixel(7u, 6u)[2] == 0u &&
+               pixel(7u, 6u)[3] == 40u);
+        assert(pixel(0u, 0u)[0] == 0x5au &&
+               pixel(13u, 11u)[0] == 0x5au);
+        // Another independent source-aligned panel on the same D3D9
+        // staging buffer must not change the first/other-pixel receipts.
+        rgba(12u, 10u, 51u, 52u, 53u, 54u);
+        const NativeRawPresentTile other{12u, 10u, 2u, 2u, 400, 200};
+        assert(native_raw_copy_present_island(
+            output.data(), dstPitch, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, other,
+            NativeRawColorByteOrder::Bgra, true));
+        assert(pixel(12u, 10u)[0] == 51u &&
+               pixel(12u, 10u)[1] == 52u &&
+               pixel(12u, 10u)[2] == 53u &&
+               pixel(12u, 10u)[3] == 255u);
+        assert(pixel(6u, 6u)[0] == 30u &&
+               pixel(6u, 6u)[2] == 10u);
+        // Incomplete or invalid native source extents cannot stage even
+        // one pixel, and no destination byte is touched on failure.
+        const auto priorOutput = output;
+        NativeRawPresentTile invalid = other;
+        invalid.copyWidth = 3u; // extends beyond GPU readback
+        assert(!native_raw_copy_present_island(
+            output.data(), dstPitch, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, invalid,
+            NativeRawColorByteOrder::Bgra, false));
+        assert(!native_raw_copy_present_island(
+            output.data(), dstPitch, before.data(), 8u,
+            after.data(), sourcePitch, w, h, other,
+            NativeRawColorByteOrder::Bgra, false));
+        assert(!native_raw_copy_present_island(
+            output.data(), dstPitch, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, NativeRawPresentTile{},
+            NativeRawColorByteOrder::Bgra, false));
+        assert(output == priorOutput);
+    }
+
 }
