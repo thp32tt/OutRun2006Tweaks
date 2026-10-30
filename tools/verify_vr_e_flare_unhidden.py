@@ -22,7 +22,7 @@ checks = {
   'known-good rival native-first owner': 'VR RIVAL KNOWN-GOOD ORDER RESTORED' in rv and 'Game::sprani_play_ae_auth_alpha' in rv and 'TagAppendedNodes(' in rv and 'FlushD3DXAtDirectGoalSourceExit();' not in rv and 'FlushD3DXBeforeDirectGoalSource();' not in rv,
   'rival no generic hook': 'RivalDx11NativeRoute = false' in ini and "'-RivalDx11NativeRoute=false'" in runner,
   'late actual XR eye startup': 'GetTickCount64() + 8000ULL' in ex and 'ResolveStartupForLiveHost(' in ex and 'Sleep(50);' in ex,
-  'menu aspect restored': 'MirrorPreserveAspect = true' in ini and "'-MirrorPreserveAspect=true'" in runner,
+  'full-monitor menu capture avoids desktop strips': 'MirrorFitDesktop = true' in ini and 'MirrorPreserveAspect = false' in ini and "'-MirrorPreserveAspect=false'" in runner,
   'legacy C993 hide option ineffective': 'False is deliberately ignored' in s,
   'runnable TEST DEBUG': "foreach ($mode in @('TEST','DEBUG'))" in workflow and 'START_HERE.cmd' in workflow and 'DX9EX_VARIANT.txt' in workflow,
   'official focus metadata': 'FOCUS_BUILD.txt' in workflow,
