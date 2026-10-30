@@ -113,7 +113,8 @@ struct NativeRawPresentDirtyRegion {
     NativeRawPresentTile& cropped,
     std::uint32_t& changedRgb,
     const NativeRawPresentTile* exclude = nullptr,
-    std::uint32_t excludeCount = 1u) noexcept {
+    std::uint32_t excludeCount = 1u,
+    bool preferSolidRgb = false) noexcept {
     cropped = {};
     changedRgb = 0u;
     if (!sourceAligned.copyWidth || !sourceAligned.copyHeight ||
@@ -174,18 +175,36 @@ struct NativeRawPresentDirtyRegion {
         for (std::uint32_t i = 0u; exclude && i < excludeCount; ++i)
             if (!native_raw_disjoint_present_tiles(candidate, exclude[i]))
                 return;
-        const auto rgb = gpuDelta.changed_pixels(candidate);
-        const auto area = std::uint64_t{candidate.copyWidth} *
-                          candidate.copyHeight;
+        auto rgb = gpuDelta.changed_pixels(candidate);
         if (!rgb || rgb < changedRgb ||
-            (rgb == changedRgb && area <= bestArea)) return;
+            (preferSolidRgb && rgb == changedRgb)) return;
         if (!native_raw_dirty_region_covers_tile(
                 backWidth, backHeight, dirty, candidate)) return;
-        {
-            cropped = candidate;
-            changedRgb = rgb;
-            bestArea = area;
+        // RAW multi-Draw presentation is bounded by four independent
+        // source-aligned uploads. Ranking a sparse repaint by total RGB
+        // BEFORE extracting its largest solid GPU island can spend a slot
+        // on one pixel while missing a smaller, genuinely dense menu/car
+        // repaint in another disjoint D3D9 dirty rectangle.
+        // Rank the actual uploadable rectangle, never its sparse envelope.
+        if (preferSolidRgb &&
+            std::uint64_t{candidate.copyWidth} * candidate.copyHeight != rgb) {
+            NativeRawPresentTile solid{};
+            std::uint32_t solidRgb = 0u;
+            if (!gpuDelta.select_solid_rgb_tile(
+                    candidate, solid, solidRgb) || !solidRgb ||
+                !native_raw_dirty_region_covers_tile(
+                    backWidth, backHeight, dirty, solid))
+                return;
+            candidate = solid;
+            rgb = solidRgb;
         }
+        const auto area = std::uint64_t{candidate.copyWidth} *
+                          candidate.copyHeight;
+        if (rgb < changedRgb ||
+            (rgb == changedRgb && area <= bestArea)) return;
+        cropped = candidate;
+        changedRgb = rgb;
+        bestArea = area;
     };
     // Two real Draw source rectangles can overlap but affect different RGB
     // pixels. Subtract earlier source-aligned uploads, preserving later GPU
@@ -364,7 +383,7 @@ struct NativeRawSourceIslandBatch {
         if (!native_raw_dirty_source_rgb_crop(
                 backWidth, backHeight, dirty, sourceAligned, sourceRgb,
                 next, changed, count ? tiles.data() : nullptr,
-                count ? count : 1u))
+                count ? count : 1u, tightRgbExtent))
             return false;
         // Shrink GPU-authentic pixels before claiming original game dirty
         // destinations. Keep inherited callers unchanged until they opt in.
@@ -379,6 +398,8 @@ struct NativeRawSourceIslandBatch {
             for (std::uint32_t i = 0u; i < count; ++i)
                 if (!native_raw_disjoint_present_tiles(tight, tiles[i]))
                     return false;
+            // The dense-selection path returns an exact native RGB rectangle;
+            // this remains a fail-closed check for legacy and future callers.
             // A tight bounding box can still contain an unchanged gap.
             // If another Draw changes RGB inside that gap, reserving the
             // whole box drops authentic source pixels from the later Draw.

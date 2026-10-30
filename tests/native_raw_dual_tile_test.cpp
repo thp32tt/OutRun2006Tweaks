@@ -668,6 +668,80 @@ int main() {
         assert(!forged.append(1920, 1080, dirty, original,
                               a, false, true));
     }
+    // Two separated ORIGINAL D3D9 dirty menu panels: 20 scattered real
+    // native RGB pixels on the first panel compete with a dense 4x4 real
+    // GPU rectangle on the second. Sparse RGB-count selection (legacy)
+    // chooses the first panel and later shrinks it to just one pixel.
+    // The opt-in multi-Draw path must rank the final solid GPU upload and
+    // retain all 16 authentic pixels in the second original screen panel.
+    {
+        constexpr std::uint32_t w = 80u, h = 32u;
+        std::array<std::uint8_t, w * h * 4u> before{}, after{};
+        for (std::uint32_t y = 0u; y < 2u; ++y)
+            for (std::uint32_t x = 0u; x < 10u; ++x)
+                after[((1u + y * 3u) * w + x * 3u) * 4u] = 81u;
+        for (std::uint32_t y = 10u; y < 14u; ++y)
+            for (std::uint32_t x = 53u; x < 57u; ++x)
+                after[(y * w + x) * 4u + 1u] = 193u;
+        NativeRawChangedPixelWindow gpu{};
+        gpu.capture(before.data(), w * 4u, after.data(), w * 4u, w, h);
+        NativeRawPresentDirtyRegion dirty{};
+        dirty.headerVerified = true;
+        dirty.count = 2u;
+        dirty.rectangles[0] = {300, 400, 332, 432};
+        dirty.rectangles[1] = {348, 400, 380, 432};
+        dirty.boundLeft = 300; dirty.boundTop = 400;
+        dirty.boundRight = 380; dirty.boundBottom = 432;
+        const NativeRawPresentTile source{0u, 0u, w, h, 300, 400};
+        NativeRawPresentTile legacy{}, dense{};
+        std::uint32_t legacyRgb = 0u, denseRgb = 0u;
+        assert(native_raw_dirty_source_rgb_crop(
+            1920, 1080, dirty, source, gpu, legacy, legacyRgb));
+        assert(legacyRgb == 20u && legacy.destinationX == 300);
+        assert(native_raw_dirty_source_rgb_crop(
+            1920, 1080, dirty, source, gpu, dense, denseRgb,
+            nullptr, 1u, true));
+        assert(denseRgb == 16u && dense.sourceX == 53u &&
+               dense.sourceY == 10u && dense.destinationX == 353 &&
+               dense.destinationY == 410 && dense.copyWidth == 4u &&
+               dense.copyHeight == 4u &&
+               native_raw_dirty_region_covers_tile(
+                   1920, 1080, dirty, dense));
+        NativeRawSourceIslandBatch batch{};
+        assert(batch.append(1920, 1080, dirty, source, gpu,
+                            false, true));
+        assert(batch.count == 1u && batch.rgbPixels[0] == 16u &&
+               batch.tiles[0].destinationX == 353);
+        // The remaining sparse panel can still contribute one unscaled
+        // authentic RGB pixel; it never inherits the first panel's count.
+        assert(batch.append(1920, 1080, dirty, source, gpu,
+                            false, true));
+        assert(batch.count == 2u && batch.rgbPixels[1] == 1u &&
+               batch.tiles[1].destinationX >= 300 &&
+               batch.tiles[1].destinationX < 332 &&
+               native_raw_disjoint_present_tiles(
+                   batch.tiles[0], batch.tiles[1]));
+        // Alpha-only GPU output cannot displace the dense RGB evidence.
+        auto alpha = after;
+        for (std::uint32_t y = 10u; y < 14u; ++y)
+            for (std::uint32_t x = 53u; x < 57u; ++x) {
+                alpha[(y * w + x) * 4u + 1u] = 0u;
+                alpha[(y * w + x) * 4u + 3u] = 255u;
+            }
+        gpu.capture(before.data(), w * 4u,
+                    alpha.data(), w * 4u, w, h);
+        NativeRawSourceIslandBatch alphaBatch{};
+        assert(alphaBatch.append(1920, 1080, dirty, source, gpu,
+                                 false, true));
+        assert(alphaBatch.rgbPixels[0] == 1u &&
+               alphaBatch.tiles[0].destinationX < 332);
+        // Neither malformed rcBound nor a repaint-gap bridging rectangle
+        // is allowed to publish even a genuine native GPU pixel.
+        dirty.boundRight = 381;
+        NativeRawSourceIslandBatch forged{};
+        assert(!forged.append(1920, 1080, dirty, source, gpu,
+                              false, true));
+    }
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};
