@@ -24,6 +24,15 @@ for token in (
     "x * sourceScaleX + sourceBiasX",
     "y * sourceScaleY + sourceBiasY",
     "GAME_PROJECTED_WORLD_740C8C_90",
+    "const bool unitRhwSource =",
+    "std::fabs(rhw - 1.0f) <= 0.02f;",
+    "const float zDenominator =",
+    "actualNdcZ * bp._34 - bp._33;",
+    "screenZViewZ =",
+    "(bp._43 - actualNdcZ * bp._44) /",
+    "screenZViewZ * bp._34 + bp._44;",
+    "usedScreenZOnlyDepth = true;",
+    "VR TRACE WORLD SCREENZ REPROJECT:",
 ):
     assert token in SRC, token
 
@@ -57,6 +66,17 @@ for gx, gy in ((640.0, 480.0), (1920.0, 1080.0), (3440.0, 1440.0)):
         assert math.isclose(a[0], b[0], abs_tol=1e-12)
         assert math.isclose(a[1], b[1], abs_tol=1e-12)
 
+def view_z_from_screen_z(ndc_z, m33, m34, m43, m44):
+    denom = ndc_z * m34 - m33
+    return (m43 - ndc_z * m44) / denom
+
+m33, m34, m43, m44 = 1.00002, 1.0, -0.100002, 0.0
+z_nearish = view_z_from_screen_z(0.90, m33, m34, m43, m44)
+z_farther = view_z_from_screen_z(0.99, m33, m34, m43, m44)
+assert math.isfinite(z_nearish) and math.isfinite(z_farther)
+assert abs(z_farther) > abs(z_nearish)
+assert not math.isclose(z_nearish, z_farther)
+
 gx, gy = 1920.0, 1080.0
 xr_w, xr_h = 2496.0, 2688.0
 assert game_ndc(gx, gy, gx, gy) == (0.0, 0.0)
@@ -72,9 +92,15 @@ for good, bad in (
      "sourceScaleY = -2.0f / height;"),
     ("!state.projectedWorldMarker && Game::screen_resolution",
      "Game::screen_resolution"),
+    ("std::fabs(rhw - 1.0f) <= 0.02f;",
+     "false;"),
+    ("actualNdcZ * bp._34 - bp._33;",
+     "bp._34 - bp._33;"),
+    ("screenZViewZ * bp._34 + bp._44;",
+     "1.0f / rhw;"),
 ):
     assert good in SRC
     damaged = SRC.replace(good, bad, 1)
     assert damaged != SRC and damaged.count(good) < SRC.count(good)
 
-print("PASS R26 retail 418CF0 game-screen particle source -> world stereo -> physical XR output contract; HMD UNTESTED")
+print("PASS R26 retail 418CF0 game-screen + RHW=1 screen-Z depth -> world stereo -> physical XR output contract; HMD UNTESTED")

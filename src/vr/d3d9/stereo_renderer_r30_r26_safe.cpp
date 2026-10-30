@@ -4020,6 +4020,7 @@ namespace OutRunVRStereo
                 allowFullReprojection)
             {
                 bool fullDrawOk = true;
+                bool usedScreenZOnlyDepth = false;
                 UINT selectedVertices = 0;
                 for (UINT i = 0; i < vertexCount; ++i)
                 {
@@ -4045,26 +4046,70 @@ namespace OutRunVRStereo
                         x * sourceScaleX + sourceBiasX;
                     const float ndcY =
                         y * sourceScaleY + sourceBiasY;
-                    const float clipW = 1.0f / rhw;
-                    const float clipX = ndcX * clipW;
-                    const float clipY = ndcY * clipW;
+                    float clipW = 1.0f / rhw;
+                    float screenZViewZ = 0.0f;
+                    bool screenZViewZValid = false;
 
                     float restoredView[4]{};
                     bool restored = false;
 
-                    // Pre-transformed D3D9 particles carry RHW = 1/clipW.
-                    // For the normal OutRun perspective matrix, clipW gives
-                    // view-Z directly and X/Y can then be solved from clip X/Y.
-                    // This avoids depending on the particle's biased/clamped
-                    // screen Z, which is exactly what caused smoke/decal draws
-                    // to fall back to the approximate affine path.
+                    // Retail 418CF0 grass/screen-quad particles explicitly
+                    // write RHW=1.0 even though screen-Z carries perspective
+                    // depth. R30XyzrhwHasProjectedDepthSignature already
+                    // recognizes that source; full reprojection must use the
+                    // SAME evidence instead of turning RHW=1 into one fixed
+                    // view-Z. Non-unit-RHW smoke/skid keeps the clip-W path.
                     const D3DMATRIX& bp = state.baseProjection;
-                    if (std::fabs(bp._14) <= 1.0e-5f &&
+                    const bool standardPerspective =
+                        std::fabs(bp._14) <= 1.0e-5f &&
                         std::fabs(bp._24) <= 1.0e-5f &&
-                        std::fabs(bp._34) > 1.0e-5f)
+                        std::fabs(bp._34) > 1.0e-5f;
+                    const bool unitRhwSource =
+                        std::fabs(rhw - 1.0f) <= 0.02f;
+                    if (unitRhwSource && standardPerspective)
                     {
-                        const float viewZ =
-                            (clipW - bp._44) / bp._34;
+                        const float actualNdcZ =
+                            (screenZ - minZ) / depthSpan;
+                        const float zDenominator =
+                            actualNdcZ * bp._34 - bp._33;
+                        if (!std::isfinite(actualNdcZ) ||
+                            actualNdcZ <= 1.0e-5f ||
+                            actualNdcZ >= 0.99999f ||
+                            !std::isfinite(zDenominator) ||
+                            std::fabs(zDenominator) <= 1.0e-6f)
+                        {
+                            fullDrawOk = false;
+                            break;
+                        }
+                        screenZViewZ =
+                            (bp._43 - actualNdcZ * bp._44) /
+                            zDenominator;
+                        clipW =
+                            screenZViewZ * bp._34 + bp._44;
+                        if (!std::isfinite(screenZViewZ) ||
+                            std::fabs(screenZViewZ) < 0.75f ||
+                            std::fabs(screenZViewZ) >= 1000000.0f ||
+                            !std::isfinite(clipW) ||
+                            clipW <= 1.0e-6f)
+                        {
+                            fullDrawOk = false;
+                            break;
+                        }
+                        screenZViewZValid = true;
+                        usedScreenZOnlyDepth = true;
+                    }
+
+                    const float clipX = ndcX * clipW;
+                    const float clipY = ndcY * clipW;
+
+                    // For the normal OutRun perspective matrix, recover
+                    // view-Z from either the retail screen-Z-only particle
+                    // source above or non-unit RHW/clip-W, then solve X/Y.
+                    if (standardPerspective)
+                    {
+                        const float viewZ = screenZViewZValid
+                            ? screenZViewZ
+                            : (clipW - bp._44) / bp._34;
                         const float rhsX =
                             clipX - viewZ * bp._31 - bp._41;
                         const float rhsY =
@@ -4212,6 +4257,23 @@ namespace OutRunVRStereo
 
                 if (fullDrawOk && selectedVertices != 0)
                 {
+                    if (usedScreenZOnlyDepth && Settings::VRTelemetry)
+                    {
+                        static std::atomic<std::uint64_t>
+                            screenZWorldReprojections{0};
+                        const auto hit = screenZWorldReprojections.fetch_add(
+                            1, std::memory_order_relaxed) + 1;
+                        if (hit <= 32 || (hit & (hit - 1)) == 0)
+                            spdlog::info(
+                                "VR TRACE WORLD SCREENZ REPROJECT: hit={} draw={} "
+                                "vertices={} sourceCenter={:.9g},{:.9g} "
+                                "physicalViewport={},{},{}x{}",
+                                hit, TopLevelDrawSerial(), selectedVertices,
+                                state.gameProjectedWorldCenterX,
+                                state.gameProjectedWorldCenterY,
+                                state.viewport.X, state.viewport.Y,
+                                state.viewport.Width, state.viewport.Height);
+                    }
                     usedFullReprojection = true;
                     return true;
                 }
