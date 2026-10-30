@@ -209,10 +209,33 @@ public:
         // Normal 256x144 RAW retains the proven 8px margin and regressions.
         const bool compactRaw = width < 256u || height < 144u;
         NativeRawPresentTile visibleTile{};
+        bool sourceSmallCropOnly = false;
         if (!native_raw_partial_present_tile(
                 back.Width, back.Height, l, t, r, b,
-                width, height, visibleTile, compactRaw))
-            return NativeRawPreviewResult::UnsafePresent;
+                width, height, visibleTile, compactRaw)) {
+            // A 24..39px original game Present can carry real GPU RGB, but
+            // the historic 40px minimum protects displaced/unknown insets.
+            // Admit ONLY a complete source repaint on the SAME canonical
+            // backbuffer and matching pixel grid; an inset is never an
+            // acceptable fallback for this exceptional small crop.
+            Microsoft::WRL::ComPtr<IUnknown> smallPresentIdentity;
+            if (!sourceCropRepaintVerified ||
+                captureTargetWidth_ != back.Width ||
+                captureTargetHeight_ != back.Height ||
+                !sourceGameTargetIdentity_ ||
+                FAILED(backbuffer->QueryInterface(IID_IUnknown,
+                    reinterpret_cast<void**>(
+                        smallPresentIdentity.GetAddressOf()))) ||
+                !native_raw_canonical_source_target_is_presented(
+                    sourceGameTarget_.Get(), backbuffer,
+                    sourceGameTargetIdentity_.Get(),
+                    smallPresentIdentity.Get()) ||
+                !native_raw_verified_small_source_present_tile(
+                    sourceCropRepaintVerified, back.Width, back.Height,
+                    l, t, r, b, width, height, visibleTile))
+                return NativeRawPreviewResult::UnsafePresent;
+            sourceSmallCropOnly = true;
+        }
         // Partial D3D9 dirty Presents frequently omit the normal top-right
         // diagnostic destination. Retarget the visible RAW GPU tile INSIDE
         // authenticated game-painted pixels, never outside source crop.
@@ -545,6 +568,14 @@ public:
                     return NativeRawPreviewResult::NoChangedPixels;
                 }
                 if (!firstVisible && !secondVisible && !sourceBatch.count) {
+                    unmapPairs();
+                    return NativeRawPreviewResult::UnsafePresent;
+                }
+                // Small verified source crops may publish ONLY genuine,
+                // source-coincident GPU RGB selected by the bounded batch.
+                // An unaligned/missing batch cannot use the displaced RAW
+                // preview or borrow a pixel from a different D3D9 surface.
+                if (sourceSmallCropOnly && !sourceBatch.count) {
                     unmapPairs();
                     return NativeRawPreviewResult::UnsafePresent;
                 }

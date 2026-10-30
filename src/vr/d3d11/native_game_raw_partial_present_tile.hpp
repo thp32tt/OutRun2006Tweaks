@@ -56,6 +56,45 @@ struct NativeRawPresentTile {
     return out.destinationX >= left + marginX &&
            out.destinationY + height <= bottom - marginY;
 }
+
+ // A verified 24..39px source repaint can contain REAL menu/HUD RGB even
+ // when the native GPU capture is the ordinary 256x144 size. This is NOT a
+ // displaced diagnostic inset: the caller must separately prove canonical
+ // D3D9 Draw/Present surface identity and forbid the legacy upload fallback.
+ // The bounded preview only provides a legal starting window for the full
+ // source-aligned PRE/POST RGB island scan.
+ [[nodiscard]] constexpr bool native_raw_verified_small_source_present_tile(
+     bool fullCropRepaintVerified,
+     std::uint32_t backWidth, std::uint32_t backHeight,
+     std::int64_t left, std::int64_t top,
+     std::int64_t right, std::int64_t bottom,
+     std::uint32_t captureWidth, std::uint32_t captureHeight,
+     NativeRawPresentTile& out) noexcept {
+     out = {};
+     constexpr auto kMaxDim = static_cast<std::uint32_t>(
+         (std::numeric_limits<std::int32_t>::max)());
+     if (!fullCropRepaintVerified || !backWidth || !backHeight ||
+         backWidth > kMaxDim || backHeight > kMaxDim ||
+         captureWidth < 24u || captureHeight < 24u ||
+         left < 0 || top < 0 || right <= left || bottom <= top ||
+         right > backWidth || bottom > backHeight)
+         return false;
+     const auto cropW = right - left, cropH = bottom - top;
+     if (cropW < 24 || cropH < 24 ||
+         (cropW >= 40 && cropH >= 40))
+         return false;
+     const auto width = static_cast<std::uint32_t>((std::min)(
+         std::int64_t{captureWidth}, cropW));
+     const auto height = static_cast<std::uint32_t>((std::min)(
+         std::int64_t{captureHeight}, cropH));
+     out.sourceX = (captureWidth - width) / 2u;
+     out.sourceY = (captureHeight - height) / 2u;
+     out.copyWidth = width;
+     out.copyHeight = height;
+     out.destinationX = left;
+     out.destinationY = top;
+     return true;
+ }
 // When a real GPU Draw changed pixels away from the initially centered
 // source subsection, move the RAW diagnostic crop to those authentic pixels.
 // A source pixel never becomes a guessed/extrapolated destination pixel.
