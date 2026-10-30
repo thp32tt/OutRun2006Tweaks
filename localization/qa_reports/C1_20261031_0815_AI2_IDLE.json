@@ -1,0 +1,76 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T0815KST-IDLE",
+  "requested_slot_kst": "2026-10-31T08:15:00+09:00",
+  "checked_at_kst": "2026-10-31T08:19:07+09:00",
+  "role": "C1",
+  "status": "IDLE_NO_NEW_CANDIDATE_IDENTIFIED",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "input_inventory": {
+    "candidate_files_A": 437,
+    "candidate_files_B": 483,
+    "total_candidate_files": 920,
+    "export_evidence_files": 289,
+    "AB_state_completed_A": 436,
+    "AB_state_completed_B": 483,
+    "AB_active_A": null,
+    "AB_active_B": null
+  },
+  "dedup_basis": {
+    "last_full_report": "localization/qa_reports/C1_20261030_2215_IDLE.json",
+    "last_full_report_github_commit": "0808117370d383dda63943c131c7ebb89e2dc888",
+    "previously_reviewed_sha_count": 925,
+    "previously_pending_unreviewed_export_sha": 0,
+    "latest_known_C1_status": "IDLE",
+    "candidate_file_count_unchanged": true,
+    "scope_limitation": "Full 920-file byte rehash and 925 historical SHA re-enumeration were not repeated in this 08:15 round. Four exact candidate bytes were spot-rehashed. Count equality alone does not rule out unspotted replacement."
+  },
+  "byte_sha256_spotchecks": [
+    {
+      "role": "A",
+      "filename": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "historical_sha_match": true
+    },
+    {
+      "role": "B",
+      "filename": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "historical_sha_match": true
+    },
+    {
+      "role": "A",
+      "filename": "Q043_8845a649913b5ecf_k.png",
+      "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+      "historical_sha_match": true
+    },
+    {
+      "role": "B",
+      "filename": "Q046_d10debc727463563_k.png",
+      "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+      "historical_sha_match": true
+    }
+  ],
+  "qa": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": true
+  },
+  "guards": {
+    "ImageGen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_PASS_created": false,
+    "VR_FFB_DX11_DXVK_modified": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "ai2_score_delta": 0
+}
