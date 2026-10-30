@@ -1,0 +1,94 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1645KST-IDLE",
+  "scheduled_slot_kst": "2026-10-30T16:45:00+09:00",
+  "observed_inventory_at_kst": "2026-10-30T16:49:10+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "reason": "NO_NEW_UNREVIEWED_EXPORTED_LOCAL_KOREAN_PNG_SHA",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "n100_inventory": {
+    "root": "work/image-src/text_roi_batches",
+    "dedup_script": "work/C1_QA_20261029_2145_AI2_scan.py",
+    "byte_audit_script": "work/c1_20261029_1945_check_pending.py",
+    "latest_mtime_script": "work/C1_QA_20261030_0545_inventory.py",
+    "previous_qa_reports": 209,
+    "previous_reviewed_sha_unique": 923,
+    "exported_candidate_file_count": 918,
+    "candidate_files_by_role": {
+      "A": 436,
+      "B": 482
+    },
+    "unreviewed_export_sha_count": 0,
+    "unreviewed_export_file_count": 0,
+    "missing_or_incomplete_export_count": 0,
+    "files_modified_since_last_new_sha_qa": 0,
+    "most_recent_producer_mtime_kst": {
+      "A": "2026-10-30T04:20:09+09:00",
+      "B": "2026-10-30T05:10:04+09:00"
+    },
+    "producer_state": {
+      "A": {
+        "completed_files": 435,
+        "completed_batches": 141,
+        "next_ordinal": 436,
+        "active": null
+      },
+      "B": {
+        "completed_files": 482,
+        "completed_batches": 145,
+        "next_ordinal": 483,
+        "active": null
+      }
+    },
+    "byte_audit_qualifying_exports": 116,
+    "byte_audit_invalid_exports": 0,
+    "byte_audit_new_sha": 0,
+    "recent_c1_qa_reference": "work/C1_QA_20261030_0515_AI2_report.json",
+    "last_qa_candidate_sha_reverified": {
+      "A": {
+        "filename": "Q043_8845a649913b5ecf_k.png",
+        "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+        "match": true
+      },
+      "B": {
+        "filename": "Q046_d10debc727463563_k.png",
+        "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+        "match": true
+      }
+    }
+  },
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": 1,
+    "repeated_sha_reviewed": false
+  },
+  "limitations": [
+    "IDLE is an inventory/dedup status, not visual QA of any new file.",
+    "SHA inventory compares existing export reports and samples; 116 qualifying exports were byte-audited; this is not a full independent hash of all 918 candidate files.",
+    "C1 layer-only pass history does not establish real UI composition, DDS, C2/C3 or runtime pass."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "final_deployment": false,
+    "vr_ffb_dx11_dxvk_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "task_score_change": 0,
+    "reason": "IDLE/no independent new QA accomplishment; do not recredit previous work"
+  }
+}
