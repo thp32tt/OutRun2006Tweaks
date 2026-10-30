@@ -137,6 +137,72 @@ int main() {
                    multi.copyHeight == 16u && multi.destinationX == 160 &&
                    multi.destinationY == 220);
         }
+        // The real DX11 PRE/POST RGB can land at OPPOSITE corners of
+        // nine 16x16 D3D9 menu/vehicle repaint cells. A thin attached tail
+        // makes the whole connected component bounding box non-rectangular.
+        // Neither the per-member nor connected-bounds crop can preserve both.
+        {
+            std::array<std::uint8_t, w * h * 4u> gridBefore{};
+            auto gridAfter = gridBefore;
+            // Original backbuffer (130,230) and (170,260), not relocated.
+            gridAfter[(20u * w + 20u) * 4u + 0u] = 51u;
+            gridAfter[(50u * w + 60u) * 4u + 2u] = 92u;
+            NativeRawChangedPixelWindow gridRgb{};
+            gridRgb.capture(gridBefore.data(), w * 4u,
+                            gridAfter.data(), w * 4u, w, h);
+            NativeRawPresentDirtyRegion grid{};
+            grid.headerVerified = true;
+            grid.count = 10u;
+            for (std::uint32_t gy = 0u; gy < 3u; ++gy)
+                for (std::uint32_t gx = 0u; gx < 3u; ++gx)
+                    grid.rectangles[gy * 3u + gx] = {
+                        125 + std::int64_t{gx} * 16,
+                        220 + std::int64_t{gy} * 16,
+                        141 + std::int64_t{gx} * 16,
+                        236 + std::int64_t{gy} * 16};
+            grid.rectangles[9] = {173, 220, 185, 232};
+            grid.boundLeft = 125; grid.boundTop = 220;
+            grid.boundRight = 185; grid.boundBottom = 268;
+            const NativeRawPresentTile entireGpu{0u, 0u, w, h, 110, 210};
+            NativeRawPresentTile chosen{};
+            std::uint32_t rgb = 0u;
+            assert(!native_raw_dirty_region_covers_tile(
+                1920, 1080, grid, entireGpu));
+            assert(native_raw_dirty_source_rgb_crop(
+                1920, 1080, grid, entireGpu, gridRgb, chosen, rgb));
+            assert(rgb == 2u && chosen.sourceX == 15u &&
+                   chosen.sourceY == 10u && chosen.copyWidth == 48u &&
+                   chosen.copyHeight == 48u && chosen.destinationX == 125 &&
+                   chosen.destinationY == 220);
+            assert(native_raw_dirty_region_covers_tile(
+                1920, 1080, grid, chosen));
+            assert(gridRgb.changed_pixels(chosen) == 2u);
+            // Remove the painted centre: bounding-box and component proofs
+            // must not stretch GPU pixels across the missing D3D9 rectangle.
+            grid.rectangles[4] = {185, 220, 189, 232};
+            grid.boundRight = 189;
+            assert(native_raw_dirty_source_rgb_crop(
+                1920, 1080, grid, entireGpu, gridRgb, chosen, rgb));
+            assert(rgb == 1u);
+            // A forged rcBound invalidates the ENTIRE region, not just the
+            // candidate whose box happens to match it.
+            grid.boundRight = 190;
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, grid, entireGpu, gridRgb, chosen, rgb));
+            assert(rgb == 0u);
+            // Source alpha cannot masquerade as real GPU-generated RGB.
+            grid = {};
+            grid.headerVerified = true; grid.count = 1u;
+            grid.rectangles[0] = {125, 220, 173, 268};
+            grid.boundLeft = 125; grid.boundTop = 220;
+            grid.boundRight = 173; grid.boundBottom = 268;
+            gridAfter = gridBefore;
+            gridAfter[(20u * w + 20u) * 4u + 3u] = 255u;
+            gridRgb.capture(gridBefore.data(), w * 4u,
+                            gridAfter.data(), w * 4u, w, h);
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, grid, entireGpu, gridRgb, chosen, rgb));
+        }
         // Alpha-only mutations must not create native RGB evidence.
         after[(22u * w + 65u) * 4u + 2u] = 0u;
         after[(22u * w + 65u) * 4u + 3u] = 255u;

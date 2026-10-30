@@ -213,6 +213,32 @@ struct NativeRawPresentDirtyRegion {
         }
         if (size > 1u) consider(left, top, rectRight, rectBottom);
     }
+
+    // A genuine repaint can be partitioned in BOTH axes (menu tiles or
+    // vehicle-selection panels) with an attached narrow update. Its connected
+    // bounds have unpainted holes, and neither individual member nor pair
+    // can retain RGB on opposite corners of the authenticated 2-D island.
+    // Propose a rectangle between two ORIGINAL D3D9 member corners, then
+    // require exact pixel coverage of the FULL original RGNDATA and real
+    // D3D11 PRE/POST RGB before source-coincident D3D9 UpdateSurface.
+    //
+    // Bound the extra search to 32*32 proposals, and avoid the sweep when
+    // the existing path has already retained all observed source RGB.
+    // No guessed pixels, extent scaling or full-frame/eye publication.
+    const auto allSourceRgb = gpuDelta.changed_pixels(sourceAligned);
+    if (changedRgb < allSourceRgb) {
+        for (std::uint32_t start = 0u; start < dirty.count; ++start) {
+            const auto& first = dirty.rectangles[start];
+            for (std::uint32_t end = 0u; end < dirty.count; ++end) {
+                const auto& last = dirty.rectangles[end];
+                if (first.left >= last.right || first.top >= last.bottom)
+                    continue;
+                consider(first.left, first.top, last.right, last.bottom);
+                if (changedRgb == allSourceRgb) break;
+            }
+            if (changedRgb == allSourceRgb) break;
+        }
+    }
     return changedRgb > 0u;
 }
 // Two individually source-authenticated native Draw crops can have
