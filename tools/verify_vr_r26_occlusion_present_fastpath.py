@@ -27,8 +27,8 @@ def verify(source):
     present = extract(source, "HRESULT __stdcall PresentDestR27(")
     guard = extract(source, "HRESULT R26GuardTrackedOcclusion(")
     assert "R26OcclusionUnreliableStateRejects" in source
-    assert "StateBlock tracking is unreliable" in guard
-    assert guard.index("StateBlockTracker::Reliable()") < guard.index(
+    assert "R22 StateBlock tracking/coverage is unreliable" in guard
+    assert guard.index("StateBlockTracker::R22Reliable()") < guard.index(
         "R26TrackedOcclusionDrawIsWriteFree(device)")
     states = ("D3DRS_COLORWRITEENABLE", "D3DRS_ZWRITEENABLE",
               "D3DRS_STENCILENABLE", "D3DRS_STENCILWRITEMASK")
@@ -37,9 +37,10 @@ def verify(source):
     for token in ("colorWrite != 0", "zWrite != FALSE",
                   "if (stencilEnable == FALSE)\n                return true;",
                   "stencilWriteMask == 0", "if (!device ||",
-                  "StateBlockTracker::Reliable()"):
+                  "StateBlockTracker::R22Reliable()"):
         assert token in occ, token
-    assert occ.index("StateBlockTracker::Reliable()") < positions[0]
+    assert occ.index("StateBlockTracker::R22Reliable()") < positions[0]
+    assert "StateBlockTracker::CoverageLost()" in occ
     assert occ.index("colorWrite != 0") < positions[1]
     assert occ.index("zWrite != FALSE") < positions[2]
     assert occ.index("if (stencilEnable == FALSE)") < positions[3]
@@ -99,8 +100,10 @@ def main():
             color, depth, stencil, mask, reliable=False)
         assert not unreliable and unreliable_reads == 0
     for good, bad in (
-        ("!OutRunVR::State::StateBlockTracker::Reliable()",
-         "false /* unsafe: trust stale StateBlock cache */"),
+        ("!OutRunVR::State::StateBlockTracker::R22Reliable()",
+         "false /* unsafe: ignore R22 reliability */"),
+        ("OutRunVR::State::StateBlockTracker::CoverageLost()",
+         "false /* unsafe: ignore coverage loss */"),
         ("colorWrite != 0", "colorWrite == 0"),
         ("zWrite != FALSE", "zWrite == FALSE"),
         ("if (stencilEnable == FALSE)", "if (stencilEnable != FALSE)"),
@@ -122,7 +125,7 @@ def main():
             continue
         raise AssertionError("unsafe R26 mutation escaped: " + good)
     print("PASS R26 write-free occlusion: 16 predicates, unreliable StateBlock zero-read rejection, "
-          "all observed getter failures, 11 destructive mutations; disabled Present diagnostics bypass")
+          "all observed getter failures, 12 destructive mutations; disabled Present diagnostics bypass")
 
 
 if __name__ == "__main__":

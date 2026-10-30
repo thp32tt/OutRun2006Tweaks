@@ -357,11 +357,13 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device) noexcept
         {
             if (!device ||
-                !OutRunVR::State::StateBlockTracker::Reliable())
+                (!OutRunVR::State::StateBlockTracker::R22Reliable() ||
+                 OutRunVR::State::StateBlockTracker::CoverageLost()))
                 return false;
 
             // Query-only occlusion draws are rare. Cached render-state values
-            // are authoritative only while StateBlock coverage is reliable.
+            // are authoritative only while R22 Apply interception is reliable
+            // and no StateBlock coverage loss has been observed.
             // If Apply coverage is lost, the caller must fall back to the
             // existing R23/R22/R13/R9 fail-closed path instead of trusting a
             // stale COLORWRITEENABLE=0 cache.
@@ -404,14 +406,15 @@ namespace OutRunVRStereo
             // StateBlock Apply coverage is lost. Never use the single-exec
             // shortcut in that state; preserve the established lower
             // fail-closed replay/mono policy instead.
-            if (!OutRunVR::State::StateBlockTracker::Reliable())
+            if ((!OutRunVR::State::StateBlockTracker::R22Reliable() ||
+                 OutRunVR::State::StateBlockTracker::CoverageLost()))
             {
                 ++R26OcclusionUnreliableStateRejects;
                 if (!R26FirstOcclusionUnreliableStateLogged)
                 {
                     R26FirstOcclusionUnreliableStateLogged = true;
                     spdlog::warn(
-                        "VR R28 occlusion: StateBlock tracking is unreliable; rejecting cached write-free shortcut and delegating to fail-closed lower path");
+                        "VR R28 occlusion: R22 StateBlock tracking/coverage is unreliable; rejecting cached write-free shortcut and delegating to fail-closed lower path");
                 }
                 return normalR23Draw();
             }
