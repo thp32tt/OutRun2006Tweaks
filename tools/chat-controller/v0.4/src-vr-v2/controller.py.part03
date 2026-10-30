@@ -3689,7 +3689,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     q = load_queue_state()
     active_by_lane = q.setdefault("active_by_lane", {})
 
-    if DX9EX_REVIEW_ONLY and int(q.get("dx9ex_review_only_policy_version", 0)) < 1:
+    if DX9EX_REVIEW_ONLY and not UW2_WEB_PORT_ENABLED and int(q.get("dx9ex_review_only_policy_version", 0)) < 1:
         retired = q.setdefault("retired_lane_tasks", [])
         old_c = active_by_lane.pop("C", None)
         if isinstance(old_c, dict):
