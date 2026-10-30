@@ -17,9 +17,10 @@ class GPTChatOCRTests(unittest.TestCase):
         self.gpt_out=root/"gpt_out";self.gpt_out.mkdir()
         self.report=root/"report";(self.report/"processed_v3").mkdir(parents=True)
         self.queue=root/"queue";self.queue.mkdir()
-        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH")}
+        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH","HOST_RETRY_PATH")}
         g.SRC=self.src;g.OUT=self.out;g.GPT_OUT=self.gpt_out;g.REPORT=self.report;g.QUEUE_DIR=self.queue
         g.STATE_PATH=self.queue/"state.json";g.AUDIT_PATH=self.queue/"audit.jsonl"
+        g.HOST_RETRY_PATH=self.queue/"host_verified_retries.json"
         self.addCleanup(self.restore)
         self.name="Q001_TEST_BASE_READABLE_FLIPY.png"
         im=Image.new("RGBA",(100,60),(0,0,0,0))
@@ -185,6 +186,61 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertEqual(st["attempts"]["C2:"+timed_out],0)
         self.assertEqual(st["attempts"]["C2:"+succeeded],2)
         self.assertEqual(g._migrate_response_extractor_state(st),[])
+
+    def _host_rescue_doc(self,phrases=None):
+        phrases=phrases or ["HELLO"]
+        record=self.report/"processed_v3"/(self.name+".json")
+        return {"schema":"outrun.gpt_ocr.host_verified_retries.v1",
+            "items":[{"source_png":self.name,
+              "source_sha256":self.row["png_sha256"],
+              "processed_sha256":hashlib.sha256(record.read_bytes()).hexdigest(),
+              "target_phrases":phrases,
+              "fingerprint":g._fingerprint(self.row,phrases)}]}
+
+    def test_host_verified_snapshot_recovers_missing_container_source(self):
+        # Simulate the real incident: the controller's local candidate
+        # discovery has no records, but the verified host queue has one.
+        old=g._exhausted_candidates
+        g._exhausted_candidates=lambda:[]
+        self.addCleanup(lambda:setattr(g,"_exhausted_candidates",old))
+        g.HOST_RETRY_PATH.write_text(json.dumps(self._host_rescue_doc()),encoding="utf-8")
+        summary=g.summary()
+        self.assertEqual(summary["retryable_sources"],1)
+        self.assertEqual(summary["retryable_phrases"],1)
+        binding,reason=g.next_binding("C1")
+        self.assertIsNone(reason)
+        self.assertEqual(binding["source_png"],self.name)
+        self.assertEqual(binding["target_phrases"],["HELLO"])
+        self.assertEqual(binding["source_sha256"],self.row["png_sha256"])
+        st=g._state()
+        st["active"]=None
+        st["attempts"][g._attempt_key(binding["fingerprint"],"C1")]=2
+        g._save_state(st)
+        retry,reason=g.next_binding("C1")
+        self.assertIsNone(retry)
+        self.assertEqual(reason,"GPT_CHAT_OCR_QUEUE_EMPTY_OR_EXHAUSTED")
+
+    def test_host_verified_snapshot_rejects_tampering_and_covered_text(self):
+        old=g._exhausted_candidates
+        g._exhausted_candidates=lambda:[]
+        self.addCleanup(lambda:setattr(g,"_exhausted_candidates",old))
+        good=self._host_rescue_doc()
+        for key,value in (("source_sha256","f"*64),
+                           ("processed_sha256","f"*64),
+                           ("target_phrases",["UNAPPROVED"])):
+            bad=json.loads(json.dumps(good))
+            bad["items"][0][key]=value
+            g.HOST_RETRY_PATH.write_text(json.dumps(bad),encoding="utf-8")
+            self.assertIsNone(g.next_binding("C1")[0],key)
+        g.HOST_RETRY_PATH.write_text(json.dumps(good),encoding="utf-8")
+        self.assertEqual(g.summary()["retryable_sources"],1)
+        directory=self.out/Path(self.name).stem/"covered"
+        directory.mkdir(parents=True)
+        (directory/"manifest.json").write_text(json.dumps({
+            "source_sha256":self.row["png_sha256"],"english":"HELLO",
+            "bbox_xyxy":[10,10,50,30]}),encoding="utf-8")
+        self.assertEqual(g.summary()["retryable_sources"],0)
+        self.assertIsNone(g.next_binding("C1")[0])
 
     def test_duplicate_only_bbox_requires_manual_review_without_retry(self):
         # Same source area was already assigned to another English label.
