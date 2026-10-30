@@ -213,8 +213,8 @@ def main() -> None:
     sem = SEM.read_text(encoding="utf-8-sig")
     check(r30, game, hook, sem)
     mutations = [
-        (0, "drawCommand.IsDirectWorldLensCentre()",
-            "false /* unsafe exact centre generic XYZRHW */"),
+        (0, "if (drawCommand.IsDirectWorldLensCentre())",
+            "if (false /* unsafe exact centre generic XYZRHW */)"),
         (0, "opaqueObject=WINDOW_LINKED_ONLY", "opaqueObject=PROVEN_DESCRIPTOR"),
         (0, "DEFERRED_WINDOW_CANDIDATE", "OPAQUE_DESCRIPTOR_PROOF"),
         (0, "lensInlineLinked ? 1 : 0", "1 /* unsafe exact source claim */"),
