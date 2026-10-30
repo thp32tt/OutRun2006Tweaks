@@ -578,26 +578,34 @@ def check_result_parent_provenance(ui_source, semantics_source):
         raise SystemExit("Sumo no-tick replay loses exact result producer")
 
 check_result_parent_provenance(ui, sem)
-# Original-game 93% GOAL source x86 disassembly proves 19 E8 calls to
-# sub_4B9200 that print record and stage text, separately from 0x2D200
-# progress/percentage. Only these exact 0x97... game result parents may
-# force finite ScreenHud ownership, and all queued siblings must be tagged.
+# Original-game 93% GOAL source x86 disassembly proves the 19 historical
+# 0x97xxx E8 calls to sub_4B9200. Current exact parent provenance additionally
+# carries two separately recovered canonical callers (0x98D37/0xBE009).
+# Keep the binary-fingerprinted 19 and portable 21-return contract distinct.
 def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
-    expected = (
+    historical_x97 = (
         0x973AF, 0x97422, 0x974D0, 0x97544,
         0x97664, 0x97675, 0x9769E, 0x976B2, 0x976F4,
         0x9784F, 0x9787D, 0x9788E, 0x978B4, 0x978C8, 0x978EC,
         0x97C31, 0x97C57, 0x97E47, 0x97E6D,
     )
-    if len(expected) != 19:
-        raise SystemExit('wrong original B9200 source CALL count')
+    canonical_extra = (0x98D37, 0xBE009)
+    if len(historical_x97) != 19 or len(historical_x97 + canonical_extra) != 21:
+        raise SystemExit('wrong canonical B9200 source CALL count')
     allow_start = ui_source.index('static constexpr int ResultTextB9200Calls[]')
     allow_end = ui_source.index('};', allow_start)
     allow = ui_source[allow_start:allow_end]
-    for callsite in expected:
-        require(f'0x{callsite:X}', allow, 'missing original B9200 CALL allowlist')
+    for callsite in historical_x97 + canonical_extra:
+        require(f'0x{callsite:X}', allow, 'missing canonical B9200 CALL allowlist')
+    for callsite in historical_x97:
         require(f'0x{callsite:08X}: 0x000B9200', disasm_source,
-                'missing original EXE 4B9200 direct E8 target fingerprint')
+                'missing historical EXE 4B9200 direct E8 target fingerprint')
+    provenance = read('src/vr/game/goal_result_parent_provenance.hpp')
+    require('std::array<std::uintptr_t, 21>', provenance,
+            'portable B9200 provenance must retain 21 exact returns')
+    for callsite in canonical_extra:
+        require(f'0x{callsite:X}u + 5u', provenance,
+                'recovered canonical B9200 caller missing from provenance')
     for marker in (
         'ResultTextB9200,', 'OUTRUN_RESULT_TEXT_B9200',
     ):
@@ -607,16 +615,25 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
     # B9200 formerly crashed when a +5 midhook overwrote a legal branch
     # target. Its exact E8-parent source is now recovered INSIDE the existing
     # 2C808/2C9DB glyph call wrapper, without patching the nineteen CALLs.
-    # One exact original-call stack discriminator now serves both glyph
-    # emission and native D3DX direct Draw. Verify source proof in the shared
-    # helper and verify that BOTH GPU paths actually call that helper.
+    # One exact original-call stack discriminator serves both glyph emission
+    # and native D3DX Draw. All layers share GOAL/TIMEUP/RESULT lifetime.
+    state_guard = function_body(ui_source, 'static bool GoalResultPresentationState() noexcept')
     trace = function_body(ui_source, 'static bool OriginalB9200GoalStackActive(')
     glyph_trace = function_body(ui_source, 'static bool IsOriginalB9200GoalGlyph(')
     draw = function_body(ui_source, 'static HRESULT __stdcall DrawDest(')
     glyph = function_body(ui_source, 'static int __cdecl TextGlyph_putSprite(')
-    for part in ('STATE_GOAL', 'RtlCaptureStackBackTrace(',
+    for part in ('STATE_GOAL', 'STATE_TIMEUP', 'STATE_RESULT'):
+        require(part, state_guard, 'complete GOAL result presentation-state proof')
+    require('GoalResultPresentationState()', trace,
+            'B9200 stack proof must use complete result presentation lifetime')
+    for part in ('RtlCaptureStackBackTrace(',
                  'GoalResult::IsOriginalB9200ParentReturn('):
         require(part, trace, 'safe original GOAL result text stack proof')
+    require('GoalResultPresentationState()', draw,
+            'direct B9200 D3DX path must use complete result presentation lifetime')
+    if '*Game::current_mode == GameState::STATE_GOAL' in trace or (
+            '*Game::current_mode == GameState::STATE_GOAL' in draw):
+        raise SystemExit('B9200 GPU ownership regressed to GOAL-only state')
     require('return OriginalB9200GoalStackActive();', glyph_trace,
             'B9200 glyph must retain exact GOAL original caller proof')
     for part in ('CurrentRenderProducerToken() == ProducerToken::None',
@@ -643,9 +660,9 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
     # inserted at EXE+0x97E72, exactly as earlier 0x97C5F did
     # in E9 rel32 inserted at EXE+0x97C5C. Excluding one callsite
     # left 18 equivalent control-flow-corrupting midhooks active.
-    # Preserve 19 original E8 identities and reject ALL rva+5 detours.
+    # Preserve canonical original E8 identities and reject ALL rva+5 detours.
     require('VR P0 RESULT CRASH GUARD 20261011:', apply,
-            'all nineteen B9200 calls must remain original')
+            'all canonical B9200 calls must remain original')
     require('0x97C5F and 0x97E75', apply,
             'both real result minidump fault locations')
     for unsafe in ('ResultTextEnterHooks[i] = safetyhook::create_mid(',
@@ -664,6 +681,17 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
         raise SystemExit('result text HUD parent may not change game draw/state')
 
 verify_goal_b9200_source(ui, sem, read('tools/analyze_outrun_exe.py'))
+goal_only_state = ui.replace(
+    'if (!Settings::VREnabled || !GoalResultPresentationState())',
+    'if (!Settings::VREnabled || !Game::current_mode || '
+    '*Game::current_mode != GameState::STATE_GOAL)', 1)
+try:
+    verify_goal_b9200_source(
+        goal_only_state, sem, read('tools/analyze_outrun_exe.py'))
+except SystemExit:
+    pass
+else:
+    raise SystemExit('GOAL-only B9200 stack state escaped verifier')
 # Deliberately reintroducing *either* dangerous midhook must FAIL.
 # The new 0x97E75 dump proves that a single-address exception is not safe.
 for mutation in (
@@ -681,7 +709,7 @@ for mutation in (
     except SystemExit:
         pass
     else:
-        raise SystemExit('unsafe 19-parent result detour escaped verifier')
+        raise SystemExit('unsafe canonical-parent result detour escaped verifier')
 
 # The in-game course-extension transient lives in the distinct 0x989xx
 # original sprani animation, not the GOAL 0x97xxx record/percentage.
