@@ -141,7 +141,7 @@ class Uw2LongRunningTest(unittest.TestCase):
                          if isinstance(node, ast.If)
                          and "uw2_full_game_continuation_version" in ast.unparse(node.test))
         previous = dict(self.active)
-        previous.update(phase="DONE", terminal="PASS", status="DONE",
+        previous.update(lane="UW2", phase="DONE", terminal="PASS", status="DONE",
                         result_sha=SHA_B,
                         terminal_verification="UW2_TAGGED_WEB_SOURCE_ON_TARGET")
         q = {"completed": [previous], "active_by_lane": {}}
