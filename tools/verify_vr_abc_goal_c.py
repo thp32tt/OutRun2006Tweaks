@@ -21,6 +21,14 @@ require = [
  ("nested exact serial", "nullptr, entrySerial);" in p),
  ("no general fallback",src.count("FirstVerifiedRebuiltEmptySingleChild(")==1),
  ("const-expr guard","static_assert(SingleChildOwnerProof()" in head),
+ ("bounded rebuilt-root diagnostic",
+     "CountVerifiedRebuiltEmptyChildren(" in head and
+     "static_assert(ChildCountDiagnosticProof()" in head and
+     "VR ABC C GOAL REBUILT EMPTY ROOT REJECTED:" in p and
+     "action=KEEP_NATIVE_UNOWNED" in p),
+ ("diagnostic never broadens ownership",
+     p.count("RegisterSpriteNodeScope(") == 1 and
+     p.count("FirstVerifiedRebuiltEmptySingleChild(") == 1),
  ("only single terminal child","currentRoot->next_0 == newTail &&" in head and
                                 "newTail->next_0 == nullptr" in head),
  ("not old reused root","currentRoot == oldRoot" in head and "oldTail != oldRoot" in head),

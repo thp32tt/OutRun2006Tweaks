@@ -2328,6 +2328,46 @@ class UIScaling : public Hook
                         nullptr, entrySerial);
                     ++recoveredSingleChildren;
                 }
+                else if (Settings::VRTelemetry && emptyBefore[p] &&
+                         rootsBefore[p] && currentRoot &&
+                         currentRoot != rootsBefore[p] && currentTail &&
+                         currentTail != currentRoot)
+                {
+                    // Do not broaden ABC-C ownership here. A rebuilt empty
+                    // priority with multiple children can contain nested or
+                    // foreign producers. Count only a bounded CURRENT chain
+                    // and record the ambiguity so the next Quest run can prove
+                    // whether the bad GOAL frame is exactly this fail-closed
+                    // path. Pixels and native queue ownership stay unchanged.
+                    const unsigned verifiedChildren =
+                        OutRunVR::SpriteQueue::
+                            CountVerifiedRebuiltEmptyChildren(
+                                rootsBefore[p], before[p], emptyBefore[p],
+                                currentRoot, currentTail,
+                                Game::SpriteNodeMax);
+                    static std::atomic<std::uint64_t>
+                        rejectedRebuiltEmptyRoots{0};
+                    const auto hit = rejectedRebuiltEmptyRoots.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (hit <= 32 || (hit & (hit - 1)) == 0)
+                    {
+                        const SpriteNode* first = currentRoot->next_0;
+                        spdlog::info(
+                            "VR ABC C GOAL REBUILT EMPTY ROOT REJECTED: "
+                            "hits={} priority={} verifiedChildren={} "
+                            "first=0x{:X} firstKind={} tail=0x{:X} tailKind={} "
+                            "entryEpoch={} liveEpoch={} entrySerial={} "
+                            "action=KEEP_NATIVE_UNOWNED",
+                            hit, p, verifiedChildren,
+                            reinterpret_cast<std::uintptr_t>(first),
+                            first ? first->kind_C : -1,
+                            reinterpret_cast<std::uintptr_t>(currentTail),
+                            currentTail->kind_C,
+                            parentAdmission.queueEpochAtEntry,
+                            OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                            entrySerial);
+                    }
+                }
             }
             if (Settings::VRTelemetry && recoveredSingleChildren)
                 spdlog::info(

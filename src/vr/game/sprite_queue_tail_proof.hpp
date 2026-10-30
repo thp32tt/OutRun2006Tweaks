@@ -113,6 +113,31 @@ namespace OutRunVR::SpriteQueue
                newTail->next_0 == nullptr ? newTail : nullptr;
     }
 
+    // Diagnostic-only proof for the same replaced-empty-root shape. This
+    // counts a CURRENT live chain only when its advertised tail is terminal.
+    // It never grants semantic ownership: childCount > 1 is precisely the
+    // ambiguous case that ABC-C must leave on the native/unowned path until
+    // runtime evidence and original producer structure prove otherwise.
+    template<class Node>
+    constexpr unsigned CountVerifiedRebuiltEmptyChildren(
+        Node* oldRoot, Node* oldTail, bool wasEmptyAtEntry,
+        Node* currentRoot, Node* newTail, unsigned bound) noexcept
+    {
+        if (!wasEmptyAtEntry || !oldRoot || oldTail != oldRoot ||
+            !currentRoot || currentRoot == oldRoot || !newTail ||
+            newTail == currentRoot || newTail == oldRoot || bound == 0)
+            return 0;
+        unsigned count = 0;
+        for (Node* node = currentRoot->next_0;
+             node && bound != 0; node = node->next_0, --bound)
+        {
+            ++count;
+            if (node == newTail)
+                return node->next_0 == nullptr ? count : 0;
+        }
+        return 0;
+    }
+
     namespace AbcGoalExperiment
     {
         struct Node { Node* next_0 = nullptr; };
@@ -154,6 +179,37 @@ namespace OutRunVR::SpriteQueue
         }
         static_assert(SingleChildOwnerProof(),
             "ABC C GOAL root-rebuild needs proven single terminal child");
+
+        constexpr bool ChildCountDiagnosticProof() noexcept
+        {
+            Node oldRoot{}, newRoot{}, one{}, two{}, three{}, cycle{};
+            newRoot.next_0 = &one;
+            one.next_0 = &two;
+            if (CountVerifiedRebuiltEmptyChildren(
+                    &oldRoot, &oldRoot, true, &newRoot, &two, 3) != 2)
+                return false;
+            if (CountVerifiedRebuiltEmptyChildren(
+                    &oldRoot, &oldRoot, true, &newRoot, &two, 1) != 0)
+                return false; // bound exhaustion is never a proof
+            two.next_0 = &three;
+            if (CountVerifiedRebuiltEmptyChildren(
+                    &oldRoot, &oldRoot, true, &newRoot, &two, 3) != 0)
+                return false; // advertised tail is not terminal
+            two.next_0 = &cycle;
+            cycle.next_0 = &one;
+            if (CountVerifiedRebuiltEmptyChildren(
+                    &oldRoot, &oldRoot, true, &newRoot, &three, 4) != 0)
+                return false; // cycle cannot invent a terminal chain
+            two.next_0 = nullptr;
+            if (CountVerifiedRebuiltEmptyChildren(
+                    &oldRoot, &oldRoot, false, &newRoot, &two, 3) != 0 ||
+                CountVerifiedRebuiltEmptyChildren(
+                    &oldRoot, &oldRoot, true, &oldRoot, &two, 3) != 0)
+                return false;
+            return true;
+        }
+        static_assert(ChildCountDiagnosticProof(),
+            "ABC C rebuilt-root diagnostics must remain bounded and terminal");
     }
 
     // Native SpriteNode tails may be recycled or moved when an original
