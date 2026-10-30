@@ -34,6 +34,8 @@ for token in (
     "screenZViewZ * bp._34 + bp._44;",
     "usedScreenZOnlyDepth = true;",
     "VR TRACE WORLD SCREENZ REPROJECT:",
+    "VR TRACE WORLD PARTICLE XY FULL:",
+    "RETAIL_418CF0_SCREEN_QUAD_CANDIDATE",
 ):
     assert token in SRC, token
 
@@ -110,3 +112,13 @@ for good, bad in (
     assert damaged != SRC and damaged.count(good) < SRC.count(good)
 
 print("PASS R26 retail 418CF0 game-screen + RHW=1 screen-Z depth -> world stereo -> physical XR output, exact lens scene scopes excluded; HMD UNTESTED")
+
+# Runtime diagnostic must remain observational: both eye buffers are already
+# built before the receipt samples one bounded vertex.
+stereo_fn = SRC[SRC.index("bool R30TransformXyzrhwStereo("):
+                SRC.index("// Optional per-stage result-HUD evidence.")]
+assert stereo_fn.index("R30TransformXyzrhwVertices(source, vertexCount, stride,\n                    state, 1, right") < stereo_fn.index("VR TRACE WORLD PARTICLE XY FULL:")
+assert "state.gameProjectedWorldSourceCanvas" in stereo_fn
+assert "read4(source, src);" in stereo_fn
+assert "read4(left.data(), l);" in stereo_fn
+assert "read4(right.data(), r);" in stereo_fn

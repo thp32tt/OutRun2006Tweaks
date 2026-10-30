@@ -62,6 +62,30 @@ enum class ScalingMode
 
 namespace
 {
+    bool VrFrontEndPhysicalCanvasState() noexcept
+    {
+        if (!Game::current_mode)
+            return false;
+        switch (*Game::current_mode)
+        {
+        case GameState::STATE_TITLE:
+        case GameState::STATE_MENU:
+        case GameState::STATE_SELECTOR:
+        case GameState::STATE_SELEXIT:
+        case GameState::STATE_SELRESET:
+        case GameState::STATE_RESTART:
+        case GameState::STATE_CONTINUE:
+        case GameState::STATE_GAMEOVER:
+        case GameState::STATE_GAMEEXIT:
+        case GameState::STATE_GAMERESET:
+        case GameState::STATE_SUMOGAMERESET:
+        case GameState::STATE_TRYAGAIN:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     bool ResolveVrFrontEndVirtualCanvasScale(
         bool exactFrontEnd, bool containedMode,
         float& scaleX, float& scaleY,
@@ -683,12 +707,7 @@ class UIScaling : public Hook
 		D3DXVECTOR2* pScaling, D3DXVECTOR2* pRotationCenter, float Rotation, D3DXVECTOR2* pTranslation)
 	{
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
-        const bool vrFrontEndProducer = Game::current_mode &&
-            (*Game::current_mode == GameState::STATE_TITLE ||
-             *Game::current_mode == GameState::STATE_MENU ||
-             *Game::current_mode == GameState::STATE_SELECTOR ||
-             *Game::current_mode == GameState::STATE_SELEXIT ||
-             *Game::current_mode == GameState::STATE_SELRESET);
+        const bool vrFrontEndProducer = VrFrontEndPhysicalCanvasState();
         const bool vrContainedMode =
             mode == ScalingMode::KeepCentered ||
             mode == ScalingMode::OnlineArcade;
@@ -799,12 +818,7 @@ class UIScaling : public Hook
         // D3DX scale+translation branch used to apply menu 4:3 containment
         // even to race HUD/GOAL/+TIME matrices; unlike its pivot/partial
         // siblings it had no title/menu/selector ownership check.
-        const bool originalFrontEndProducer = Game::current_mode &&
-            (*Game::current_mode == GameState::STATE_TITLE ||
-             *Game::current_mode == GameState::STATE_MENU ||
-             *Game::current_mode == GameState::STATE_SELECTOR ||
-             *Game::current_mode == GameState::STATE_SELEXIT ||
-             *Game::current_mode == GameState::STATE_SELRESET);
+        const bool originalFrontEndProducer = VrFrontEndPhysicalCanvasState();
         const bool centredPhysicalMenuFill =
             mode == ScalingMode::KeepCentered && originalFrontEndProducer;
 
@@ -1085,12 +1099,7 @@ class UIScaling : public Hook
             mode == ScalingMode::KeepCentered ||
             mode == ScalingMode::OnlineArcade;
         const bool vanillaFrontEnd =
-            mode == ScalingMode::Vanilla && Game::current_mode &&
-            (*Game::current_mode == GameState::STATE_TITLE ||
-             *Game::current_mode == GameState::STATE_MENU ||
-             *Game::current_mode == GameState::STATE_SELECTOR ||
-             *Game::current_mode == GameState::STATE_SELEXIT ||
-             *Game::current_mode == GameState::STATE_SELRESET);
+            mode == ScalingMode::Vanilla && VrFrontEndPhysicalCanvasState();
         // A copied matrix with exact positive D3DX producer provenance is
         // ALREADY in physical menu pixels. Applying the quad contain again
         // creates a smaller inset title/selector image in the VR theatre.
@@ -1098,12 +1107,7 @@ class UIScaling : public Hook
         std::array<float, 16> sourceMatrix{};
         static_assert(sizeof(sourceMatrix) == sizeof(pM));
         std::memcpy(sourceMatrix.data(), &pM, sizeof(pM));
-        const bool frontEnd = Game::current_mode &&
-            (*Game::current_mode == GameState::STATE_TITLE ||
-             *Game::current_mode == GameState::STATE_MENU ||
-             *Game::current_mode == GameState::STATE_SELECTOR ||
-             *Game::current_mode == GameState::STATE_SELEXIT ||
-             *Game::current_mode == GameState::STATE_SELRESET);
+        const bool frontEnd = VrFrontEndPhysicalCanvasState();
         const bool precontained = contained && frontEnd &&
             OutRunVrMenuQuad::ContainedMatrices.Contains(
                 sourceMatrix, static_cast<int>(mode),
@@ -3626,11 +3630,44 @@ class UIScaling : public Hook
 				!std::isfinite(transformedY[i]))
 				return;
 		}
+        bool physicalized = false;
+        float physicalScaleX = 1.0f, physicalScaleY = 1.0f;
+        std::uint32_t physicalWidth = 0, physicalHeight = 0;
+        if (Settings::VREnabled && VrFrontEndPhysicalCanvasState() &&
+            ResolveVrFrontEndVirtualCanvasScale(
+                true, true, physicalScaleX, physicalScaleY,
+                &physicalWidth, &physicalHeight))
+        {
+            for (int i = 0; i < 4; ++i)
+            {
+                transformedX[i] *= physicalScaleX;
+                transformedY[i] *= physicalScaleY;
+            }
+            physicalized = true;
+        }
+
 		for (int i = 0; i < 4; ++i)
 		{
 			vertices[i * stride] = transformedX[i];
 			vertices[i * stride + 1] = transformedY[i];
 		}
+        if (physicalized && Settings::VRTelemetry)
+        {
+            static std::atomic<std::uint64_t> multiPhysicalHits{0};
+            const auto hit = multiPhysicalHits.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (hit <= 32 || (hit & (hit - 1)) == 0)
+                spdlog::info(
+                    "VR TRACE FRONTEND MULTI VIRTUAL CANVAS: hit={} state={} "
+                    "stride={} logical={:.9g}x{:.9g} physical={}x{} "
+                    "scale={:.9g},{:.9g} firstXY={:.9g},{:.9g}",
+                    hit,
+                    Game::current_mode
+                        ? static_cast<int>(*Game::current_mode) : -1,
+                    stride, width, height, physicalWidth, physicalHeight,
+                    physicalScaleX, physicalScaleY,
+                    transformedX[0], transformedY[0]);
+        }
 	}
 
 	static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite_hk{};

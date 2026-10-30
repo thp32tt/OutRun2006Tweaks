@@ -147,11 +147,13 @@ def require_frontend_owner(source: str) -> None:
         "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)[0]
     owner = hook.split("const bool originalFrontEndProducer =", 1)[1].split(
         "const bool centredPhysicalMenuFill =", 1)[0]
-    assert "Game::current_mode &&" in owner
+    assert "VrFrontEndPhysicalCanvasState()" in owner
+    helper = source.split("bool VrFrontEndPhysicalCanvasState() noexcept", 1)[1].split(
+        "bool ResolveVrFrontEndVirtualCanvasScale(", 1)[0]
     for state in ("TITLE", "MENU", "SELECTOR", "SELEXIT", "SELRESET"):
-        assert "GameState::STATE_" + state in owner, "frontend missing: " + state
-    for excluded in ("GOAL", "RACE"):
-        assert "GameState::STATE_" + excluded not in owner, "foreign HUD owner: " + excluded
+        assert "GameState::STATE_" + state in helper, "frontend missing: " + state
+    for excluded in ("GOAL", "GAME"):
+        assert "GameState::STATE_" + excluded not in helper, "foreign HUD owner: " + excluded
     for required in (
         "mode == ScalingMode::KeepCentered && originalFrontEndProducer;",
         "const bool frontEndPivot = NeedsFrontEndAffineContain(\n            originalFrontEndProducer,",
@@ -177,12 +179,11 @@ def mutate_exact_frontend_owner(source: str, good: str, bad: str) -> str:
     # the modern affine owner.  Mutate the modern owner specifically; otherwise
     # an unchanged second list can make this destructive test a false negative.
     if good == "*Game::current_mode == GameState::STATE_SELECTOR":
-        owner_start = region.index("const bool originalFrontEndProducer =")
-        owner_end = region.index("const bool centredPhysicalMenuFill =", owner_start)
-        owner = region[owner_start:owner_end]
-        assert good in owner, "missing modern frontend state mutation anchor"
-        damaged_owner = owner.replace(good, bad, 1)
-        damaged = region[:owner_start] + damaged_owner + region[owner_end:]
+        helper_start = source.index("bool VrFrontEndPhysicalCanvasState() noexcept")
+        helper_end = source.index("bool ResolveVrFrontEndVirtualCanvasScale(", helper_start)
+        helper = source[helper_start:helper_end]
+        assert good in helper, "missing frontend state mutation anchor"
+        return source[:helper_start] + helper.replace(good, bad, 1) + source[helper_end:]
     else:
         assert good in region, "missing exact frontend mutation anchor: " + good
         damaged = region.replace(good, bad, 1)
@@ -190,8 +191,8 @@ def mutate_exact_frontend_owner(source: str, good: str, bad: str) -> str:
 
 for good, bad in (
     ("hasScale && hasTranslation;", "hasScale || hasTranslation;"),
-    ("const bool originalFrontEndProducer = Game::current_mode &&",
-     "const bool originalFrontEndProducer = true &&"),
+    ("const bool originalFrontEndProducer = VrFrontEndPhysicalCanvasState();",
+     "const bool originalFrontEndProducer = true;"),
     ("*Game::current_mode == GameState::STATE_SELECTOR",
      "*Game::current_mode == GameState::STATE_GOAL"),
     ("if (!frontEndPivot && CanContainOriginalFullFrontEndVector(\n                originalFrontEndProducer,",
@@ -847,3 +848,32 @@ for viewport in ((640,480),(1920,1080),(3440,1440),(2496,2688)):
         assert scale[0] == scale[1] or scale[0] < scale[1]
         assert offset[0] >= 0.0
 print("PASS optional front-end D3DX scale/translation containment and five destructive controls")
+
+# 2026-10-31 Quest trace: custom-matrix-multi front-end draws can bypass the
+# D3DX matrix receipt. They must receive the same final logical->physical map,
+# including GameOver/restart 2D transition states, without touching GOAL/GAME.
+def require_multi_frontend_physicalization(source: str) -> None:
+    helper = source.split("bool VrFrontEndPhysicalCanvasState() noexcept",1)[1].split(
+        "bool ResolveVrFrontEndVirtualCanvasScale(",1)[0]
+    for state in ("TITLE","MENU","SELECTOR","SELEXIT","SELRESET",
+                  "RESTART","CONTINUE","GAMEOVER","GAMEEXIT",
+                  "GAMERESET","SUMOGAMERESET","TRYAGAIN"):
+        assert "GameState::STATE_"+state in helper, state
+    for excluded in ("GAME","GOAL","TIMEUP","RESULT"):
+        assert "GameState::STATE_"+excluded not in helper, excluded
+    multi = source.split("static void CenterMultiSpriteQuad(",1)[1].split(
+        "static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite_hk",1)[0]
+    for token in (
+        "Settings::VREnabled && VrFrontEndPhysicalCanvasState()",
+        "ResolveVrFrontEndVirtualCanvasScale(",
+        "transformedX[i] *= physicalScaleX;",
+        "transformedY[i] *= physicalScaleY;",
+        "VR TRACE FRONTEND MULTI VIRTUAL CANVAS:",
+    ):
+        assert token in multi, token
+    assert multi.index("CenterMultiSpriteAxis(") < multi.index(
+        "ResolveVrFrontEndVirtualCanvasScale(") < multi.index(
+        "vertices[i * stride] = transformedX[i];")
+
+require_multi_frontend_physicalization(text)
+print("DX9Ex front-end multi-sprite logical->physical mapping PASS; gameplay/GOAL excluded")

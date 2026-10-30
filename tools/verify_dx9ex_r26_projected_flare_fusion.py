@@ -18,6 +18,22 @@ for t in ("GetLatchedHeadInverse(","const D3DMATRIX identityEye = IdentityMatrix
 assert "std::memcpy(eyeConstants[0], &stockT" not in tail
 assert "std::memcpy(eyeConstants[1], &stockT" not in tail
 assert "VR R69 FLARE FUSION" not in tail
+assert "R30GetExactC993SunDiscLiveWvp(" in text
+lenslive=body("bool R30GetExactC993SunDiscLiveWvp(")
+for t in (
+ "SunDiscObject = 0x570002u",
+ "call.callsite != 1",
+ "flush.origin != LensOpaqueFlushOrigin::Inline405360",
+ "flush.sourceSerial != call.sourceSerial",
+ "flush.sequence != call.lastC993Sequence",
+ "pmt.flushSerial != flush.serial",
+ "pmt.objectId != SunDiscObject",
+ "pmt.pass != 1",
+ "liveShaderIdentity != cachedShader",
+ "GetVertexShaderConstantF(",
+ "EXACT_CURRENT_C993_PMT_LIVE_REGISTER",
+): assert t in lenslive,t
+assert "!R30GetExactC993SunDiscLiveWvp(device, original)" in builder
 assert dispatch.count("const HRESULT leftHr = actualDraw();")==1
 assert dispatch.count("rightHr = actualDraw();")==1
 print("PASS R26 flare angular ray uses separate asymmetric L/R FOV; physical draw count unchanged")

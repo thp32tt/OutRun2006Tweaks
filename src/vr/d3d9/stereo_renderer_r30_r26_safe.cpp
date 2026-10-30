@@ -4475,6 +4475,54 @@ namespace OutRunVRStereo
                         state, 1, right, usedMask, false, ignored))
                     return false;
             }
+
+            if (Settings::VRTelemetry && state.worldEffect &&
+                state.gameProjectedWorldSourceCanvas && source &&
+                stride >= sizeof(float) * 4u && vertexCount != 0)
+            {
+                UINT sampleIndex = 0;
+                while (sampleIndex < vertexCount && usedMask &&
+                    (sampleIndex >= usedMask->size() ||
+                     (*usedMask)[sampleIndex] == 0))
+                    ++sampleIndex;
+                if (sampleIndex < vertexCount)
+                {
+                    const auto read4 = [stride, sampleIndex](
+                        const void* base, float out[4]) noexcept {
+                        const auto* bytes =
+                            static_cast<const std::uint8_t*>(base) +
+                            static_cast<std::size_t>(sampleIndex) * stride;
+                        std::memcpy(out, bytes, sizeof(float) * 4u);
+                    };
+                    float src[4]{}, l[4]{}, r[4]{};
+                    read4(source, src);
+                    read4(left.data(), l);
+                    read4(right.data(), r);
+                    static std::atomic<std::uint64_t> samples{0};
+                    const auto hit = samples.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (hit <= 32 || (hit & (hit - 1)) == 0)
+                        spdlog::info(
+                            "VR TRACE WORLD PARTICLE XY FULL: hit={} serial={} "
+                            "vertex={} count={} stride={} sourceCenter={:.9g},{:.9g} "
+                            "viewport={},{},{}x{} "
+                            "src={:.9g},{:.9g},{:.9g},{:.9g} "
+                            "left={:.9g},{:.9g},{:.9g},{:.9g} "
+                            "right={:.9g},{:.9g},{:.9g},{:.9g} "
+                            "leftFull={} rightFull={} "
+                            "authority=RETAIL_418CF0_SCREEN_QUAD_CANDIDATE",
+                            hit, TopLevelDrawSerial() + 1u,
+                            sampleIndex, vertexCount, stride,
+                            state.gameProjectedWorldCenterX,
+                            state.gameProjectedWorldCenterY,
+                            state.viewport.X, state.viewport.Y,
+                            state.viewport.Width, state.viewport.Height,
+                            src[0], src[1], src[2], src[3],
+                            l[0], l[1], l[2], l[3],
+                            r[0], r[1], r[2], r[3],
+                            leftFull ? 1 : 0, rightFull ? 1 : 0);
+                }
+            }
             return true;
         }
 
@@ -5467,6 +5515,75 @@ namespace OutRunVRStereo
             return hr;
         }
 
+        bool R30GetExactC993SunDiscLiveWvp(
+            IDirect3DDevice9* device, float out[16]) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            constexpr std::uint32_t SunDiscObject = 0x570002u;
+            if (!device || !out || QueueRenderActive() ||
+                EffectiveScope() != RenderScope::ProjectedScreenEffect2D)
+                return false;
+
+            const auto& call = CurrentLensOriginalCall;
+            const auto& flush = CurrentLensOpaqueFlush;
+            const auto& pmt = CurrentLensOpaquePmtEntry;
+            if (call.sourceSerial == 0 || call.callsite != 1 ||
+                call.objectId != SunDiscObject ||
+                call.lastC993Sequence == 0 ||
+                flush.serial == 0 ||
+                flush.origin != LensOpaqueFlushOrigin::Inline405360 ||
+                flush.sourceSerial != call.sourceSerial ||
+                flush.sequence != call.lastC993Sequence ||
+                flush.objectId != SunDiscObject ||
+                pmt.serial == 0 ||
+                pmt.flushSerial != flush.serial ||
+                pmt.flushOrigin != flush.origin ||
+                pmt.objectId != SunDiscObject ||
+                pmt.pass != 1 || !pmt.object || !pmt.node || !pmt.mesh)
+                return false;
+
+            const auto cachedShader =
+                CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+            if (!cachedShader)
+                return false;
+            IDirect3DVertexShader9* liveShader = nullptr;
+            const HRESULT shaderHr = device->GetVertexShader(&liveShader);
+            const auto liveShaderIdentity =
+                reinterpret_cast<std::uintptr_t>(liveShader);
+            if (liveShader)
+                liveShader->Release();
+            if (FAILED(shaderHr) || !liveShaderIdentity ||
+                liveShaderIdentity != cachedShader)
+                return false;
+
+            if (FAILED(device->GetVertexShaderConstantF(
+                    OutRunWvpRegister, out, OutRunWvpRegisterCount)))
+                return false;
+            D3DMATRIX uploadedT{};
+            std::memcpy(&uploadedT, out, sizeof(uploadedT));
+            const D3DMATRIX stockWvp = TransposeMatrix(uploadedT);
+            if (!MatrixFinite(stockWvp))
+                return false;
+
+            if (Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> recoveries{0};
+                const auto hit = recoveries.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (hit <= 32 || (hit & (hit - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS 570002 LIVE C64 RECOVERY: hit={} drawSerial={} "
+                        "sourceSerial={} sequence={} flushSerial={} pmtEntrySerial={} "
+                        "shader=0x{:X} object=0x{:06X} pass={} "
+                        "authority=EXACT_CURRENT_C993_PMT_LIVE_REGISTER",
+                        hit, TopLevelDrawSerial() + 1u,
+                        call.sourceSerial, call.lastC993Sequence,
+                        flush.serial, pmt.serial, liveShaderIdentity,
+                        pmt.objectId, pmt.pass);
+            }
+            return true;
+        }
+
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
@@ -5563,7 +5680,8 @@ namespace OutRunVRStereo
                     // exact SceneEffect/CABE provenance; never borrow the live
                     // c64 after a previous eye has injected head correction.
                     if (!R44GetOwnedRawOverlayWvp(original) &&
-                        !R30GetExtendedRawWvpForExactSceneEffect(original))
+                        !R30GetExtendedRawWvpForExactSceneEffect(original) &&
+                        !R30GetExactC993SunDiscLiveWvp(device, original))
                         return false;
                 }
                 else if (!R44GetOwnedRawOverlayWvp(original))
