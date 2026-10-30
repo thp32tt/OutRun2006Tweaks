@@ -17,6 +17,8 @@ leave=body("static void ResultProgressLeave(safetyhook::Context&)", "using Resul
 parent=body("static bool __cdecl ResultProgressFullParent()", "inline static SafetyHookMid StageExtensionEnterHooks")
 goal_time=body("static void GoalTime_TagHelper(int helperRva)", "static void __cdecl GoalTime_Help020()")
 b9200=body("static void __cdecl ResultTextB9200_dest(", "// REA-proven original graph parents")
+stack_guard=body("static bool GoalResultPresentationState() noexcept", "class UIScaling")
+d3dx_bridge=body("using namespace OutRunVR::GameSemantic;", "// Stronger than the BB796 wrapper counter:")
 def goal_snapshot_guard(code: str) -> bool:
     """Old D3DX producers must finish BEFORE GOAL takes its queue boundary."""
     needles = [
@@ -95,7 +97,14 @@ tests=[
         goal_time.index("FlushD3DXAtDirectGoalSourceExit();")),
     ("B9200 GOAL/TIMEUP/RESULT presentation symmetry",
         "ResultPresentationState()" in b9200 and
-        "*Game::current_mode == GameState::STATE_GOAL" not in b9200),
+        "*Game::current_mode == GameState::STATE_GOAL" not in b9200 and
+        "GoalResultPresentationState()" in stack_guard and
+        "state == GameState::STATE_GOAL" in stack_guard and
+        "state == GameState::STATE_TIMEUP" in stack_guard and
+        "state == GameState::STATE_RESULT" in stack_guard and
+        "if (!Settings::VREnabled || !GoalResultPresentationState())" in stack_guard and
+        "GoalResultPresentationState()" in d3dx_bridge and
+        "*Game::current_mode == GameState::STATE_GOAL" not in d3dx_bridge),
     ("B9200 post-drain exact parent admission",
         "const OutRunVR::GoalProgress::SourceAdmission admission{" in b9200 and
         b9200.index("FlushD3DXBeforeDirectGoalSource();") <
@@ -120,13 +129,20 @@ for name,good in tests:
 assert goal_time.count("admission.mayPublish(") >= 2
 assert b9200.count("admission.mayPublish(") >= 2
 assert "if (Settings::VREnabled)\n            goalDirectDrawOwner.emplace" not in goal_time
-# Destructive state regression: a GOAL-only B9200 gate would recreate the
-# observed TIMEUP/result-animation ownership hole while the other result
-# producers still accept the complete presentation lifetime.
+# Destructive state regressions: narrowing any one of the three B9200
+# ownership layers back to GOAL-only recreates the TIMEUP/result-animation
+# hole while sibling result producers remain correctly admitted.
 goal_only = b9200.replace(
     "ResultPresentationState()",
     "Game::current_mode && *Game::current_mode == GameState::STATE_GOAL", 1)
 assert "ResultPresentationState()" not in goal_only.split(
     "const bool exactGoalParent =", 1)[1].split(";", 1)[0]
 assert "*Game::current_mode == GameState::STATE_GOAL" in goal_only
-print("PASS: real GOAL inner/full/time/B9200 entry, GOAL-TIMEUP-RESULT state symmetry, native drain, queue epoch and exit admission")
+assert stack_guard.replace(
+    "if (!Settings::VREnabled || !GoalResultPresentationState())",
+    "if (!Settings::VREnabled || !Game::current_mode || "
+    "*Game::current_mode != GameState::STATE_GOAL)", 1) != stack_guard
+assert d3dx_bridge.replace(
+    "GoalResultPresentationState()",
+    "Game::current_mode && *Game::current_mode == GameState::STATE_GOAL", 1) != d3dx_bridge
+print("PASS: real GOAL inner/full/time/B9200 entry, unified GOAL-TIMEUP-RESULT stack/glyph/D3DX state symmetry, native drain, queue epoch and exit admission")

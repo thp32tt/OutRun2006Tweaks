@@ -367,13 +367,25 @@ static thread_local OutRunVR::StageExtension::SourceAdmission StageTimeLiveAdmis
 static void FlushD3DXBeforeDirectGoalSource() noexcept;
 static void FlushD3DXAtDirectGoalSourceExit() noexcept;
 
+static bool GoalResultPresentationState() noexcept
+{
+    if (!Game::current_mode)
+        return false;
+    const auto state = *Game::current_mode;
+    // Real Quest traces proved the result animation can still draw through
+    // STATE_TIMEUP before the final RESULT state. Every B9200 ownership layer
+    // must use the same lifetime as the 0-99/full-result and GOAL-time owners.
+    return state == GameState::STATE_GOAL ||
+        state == GameState::STATE_TIMEUP ||
+        state == GameState::STATE_RESULT;
+}
+
 // Preserve the original nineteen B9200 E8 CALLs: prior +5 return-site
 // trampolines corrupted legal branch targets. The glyph producer and direct
 // D3DX GPU sink share stack-only exact parent proof instead.
 static bool OriginalB9200GoalStackActive() noexcept
 {
-    if (!Settings::VREnabled || !Game::current_mode ||
-        *Game::current_mode != GameState::STATE_GOAL)
+    if (!Settings::VREnabled || !GoalResultPresentationState())
         return false;
     void* frames[24]{};
     const USHORT count = RtlCaptureStackBackTrace(
@@ -1986,13 +1998,7 @@ class UIScaling : public Hook
     inline static thread_local bool ResultProgressAdmittedAfterDrain = false;
 	static bool ResultPresentationState() noexcept
     {
-        if (!Game::current_mode) return false;
-        const auto state = *Game::current_mode;
-        // 2026-10-26 real Quest log proved 0x2D200 runs in state=20
-        // (STATE_TIMEUP), rejected by the earlier STATE_GOAL-only gate.
-        return state == GameState::STATE_GOAL ||
-            state == GameState::STATE_TIMEUP ||
-            state == GameState::STATE_RESULT;
+        return GoalResultPresentationState();
     }
     static void ResultProgressEnter(safetyhook::Context&)
 	{
@@ -5231,7 +5237,7 @@ private:
         // directly, bypassing the already source-tagged put_sprite_ex glyph
         // path. Bind ONLY a stack-proven GOAL result with no queue or owner.
         const bool unownedDirectGoal = Settings::VREnabled &&
-            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL &&
+            GoalResultPresentationState() &&
             !QueueRenderActive() &&
             CurrentRenderProducerToken() == ProducerToken::None;
         const bool exactB9200Direct = unownedDirectGoal &&
