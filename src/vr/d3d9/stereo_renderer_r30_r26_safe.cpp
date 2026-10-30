@@ -2592,12 +2592,16 @@ namespace OutRunVRStereo
             float hudClipY[2][3]{};
             float hudClipW[2][3]{};
             bool hudWorldLockValid = false;
-            // Game/UI vertices are authored on the forced 1920x1080 logical
-            // canvas even though the physical D3D9Ex backbuffer is the live
-            // OpenXR eye extent (for example 2496x2688 on Quest 3). Keep those
-            // two coordinate spaces separate; StageExtensionTime is excluded
-            // because the 2026-10-30 HMD run confirmed its existing placement.
+            // Game/UI vertices can be authored on the forced 1920x1080
+            // logical canvas while the physical D3D9Ex backbuffer is the live
+            // OpenXR eye extent. CPU-projected world particles are a DIFFERENT
+            // source space: retail 418CF0 derives XY from the original
+            // 0x740C8C/90 screen coefficients before submitting FVF 0x144
+            // XYZRHW. Keep that world source separate from HUD ownership.
             bool logicalUiSourceCanvas = false;
+            bool gameProjectedWorldSourceCanvas = false;
+            float gameProjectedWorldCenterX = 0.0f;
+            float gameProjectedWorldCenterY = 0.0f;
             bool screenOverlay2D = false;
             bool projectedWorldMarker = false;
             float projectedDeltaX[2]{};
@@ -3534,6 +3538,55 @@ namespace OutRunVRStereo
             else
                 state.worldEffect = state.rhwDepthEvidence;
 
+            // Canonical retail particle path (r4dius/outrun2-decomp
+            // e1e1c592, race_particles_draw.cpp::draw_418cf0) computes:
+            //   sx = Gx * (viewX / W) + Gx
+            //   sy = -Gy * (viewY / W) + Gy
+            // where Gx/Gy are EXE 0x740C8C/90. In this fork those exact
+            // addresses are Game::screen_resolution and remain the LOGICAL
+            // game source while the D3D9Ex viewport follows XR. Therefore a
+            // depth-proven CPU-projected world draw must invert its XY using
+            // the same Gx/Gy centres, not the portrait XR viewport extent.
+            // This does NOT grant HUD ownership: eye reconstruction and final
+            // output still use the world path and physical XR viewport.
+            if (state.worldEffect && state.rhwDepthEvidence &&
+                !state.projectedWorldMarker && Game::screen_resolution)
+            {
+                const float gameCenterX = Game::screen_resolution->x;
+                const float gameCenterY = Game::screen_resolution->y;
+                if (std::isfinite(gameCenterX) &&
+                    std::isfinite(gameCenterY) &&
+                    gameCenterX >= 320.0f && gameCenterY >= 240.0f &&
+                    gameCenterX <= 8192.0f && gameCenterY <= 8192.0f)
+                {
+                    state.gameProjectedWorldSourceCanvas = true;
+                    state.gameProjectedWorldCenterX = gameCenterX;
+                    state.gameProjectedWorldCenterY = gameCenterY;
+                    if (Settings::VRTelemetry)
+                    {
+                        static std::atomic<std::uint64_t>
+                            projectedWorldSourceHits{0};
+                        const auto hit = projectedWorldSourceHits.fetch_add(
+                            1, std::memory_order_relaxed) + 1;
+                        if (hit <= 32 || (hit & (hit - 1)) == 0)
+                        {
+                            const auto command =
+                                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                            spdlog::info(
+                                "VR TRACE WORLD PROJECTED SOURCE: hit={} draw={} "
+                                "scope={} producer={} gameCenter={:.9g},{:.9g} "
+                                "physicalViewport={},{},{}x{} rhwDepthEvidence=1",
+                                hit, TopLevelDrawSerial(),
+                                OutRunVR::GameSemantic::Name(semanticScope),
+                                OutRunVR::GameSemantic::Name(command.producer),
+                                gameCenterX, gameCenterY,
+                                state.viewport.X, state.viewport.Y,
+                                state.viewport.Width, state.viewport.Height);
+                        }
+                    }
+                }
+            }
+
             // R30 perspective screen-Z can look like real world depth even
             // for an untagged flat RHW=1 overlay. Keep rendering that effect
             // without granting it authority to declare a valid world stereo
@@ -3826,6 +3879,39 @@ namespace OutRunVRStereo
                 !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
                 return false;
 
+            // Build the source-pixel -> NDC transform once. UI uses the
+            // explicit 1920x1080 canvas. Depth-proven CPU-projected world
+            // particles use retail 418CF0's Gx/Gy centre convention:
+            // ndcX=(x-Gx)/Gx, ndcY=(Gy-y)/Gy. Only native physical-pixel
+            // sources normalize against the XR viewport itself.
+            float sourceScaleX = 2.0f / width;
+            float sourceBiasX = -1.0f - x0 * sourceScaleX;
+            float sourceScaleY = -2.0f / height;
+            float sourceBiasY = 1.0f - y0 * sourceScaleY;
+            if (state.logicalUiSourceCanvas)
+            {
+                sourceScaleX =
+                    2.0f / static_cast<float>(
+                        OutRunVRHud1080p::ReferenceWidth);
+                sourceBiasX = -1.0f;
+                sourceScaleY =
+                    -2.0f / static_cast<float>(
+                        OutRunVRHud1080p::ReferenceHeight);
+                sourceBiasY = 1.0f;
+            }
+            else if (state.gameProjectedWorldSourceCanvas)
+            {
+                sourceScaleX = 1.0f / state.gameProjectedWorldCenterX;
+                sourceBiasX = -1.0f;
+                sourceScaleY = -1.0f / state.gameProjectedWorldCenterY;
+                sourceBiasY = 1.0f;
+            }
+            if (!std::isfinite(sourceScaleX) ||
+                !std::isfinite(sourceScaleY) ||
+                !std::isfinite(sourceBiasX) ||
+                !std::isfinite(sourceBiasY))
+                return false;
+
             // Fail before the expensive clone for invalid viewport state.
             // Fully overwrite the logical payload (including attributes and
             // unused indexed vertices) before changing either eye's XYZRHW.
@@ -3921,7 +4007,9 @@ namespace OutRunVRStereo
                                 state.viewport.Width, state.viewport.Height,
                                 state.logicalUiSourceCanvas
                                     ? "LOGICAL_1920X1080"
-                                    : "PHYSICAL_VIEWPORT",
+                                    : (state.gameProjectedWorldSourceCanvas
+                                        ? "GAME_PROJECTED_WORLD_740C8C_90"
+                                        : "PHYSICAL_VIEWPORT"),
                                 n);
                         }
                     }
@@ -3953,9 +4041,10 @@ namespace OutRunVRStereo
                         break;
                     }
 
-                    const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
+                    const float ndcX =
+                        x * sourceScaleX + sourceBiasX;
                     const float ndcY =
-                        1.0f - ((y - y0) / height) * 2.0f;
+                        y * sourceScaleY + sourceBiasY;
                     const float clipW = 1.0f / rhw;
                     const float clipX = ndcX * clipW;
                     const float clipY = ndcY * clipW;
@@ -4151,20 +4240,10 @@ namespace OutRunVRStereo
                     !std::isfinite(z) || !std::isfinite(rhw))
                     return false;
 
-                const float sourceX0 =
-                    state.logicalUiSourceCanvas ? 0.0f : x0;
-                const float sourceY0 =
-                    state.logicalUiSourceCanvas ? 0.0f : y0;
-                const float sourceWidth = state.logicalUiSourceCanvas
-                    ? static_cast<float>(OutRunVRHud1080p::ReferenceWidth)
-                    : width;
-                const float sourceHeight = state.logicalUiSourceCanvas
-                    ? static_cast<float>(OutRunVRHud1080p::ReferenceHeight)
-                    : height;
                 const float ndcX =
-                    ((x - sourceX0) / sourceWidth) * 2.0f - 1.0f;
+                    x * sourceScaleX + sourceBiasX;
                 const float ndcY =
-                    1.0f - ((y - sourceY0) / sourceHeight) * 2.0f;
+                    y * sourceScaleY + sourceBiasY;
 
                 if (Settings::VRTelemetry &&
                     state.logicalUiSourceCanvas && eye == 0)

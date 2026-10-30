@@ -217,6 +217,7 @@ on:
       - 'tools/verify_vr_rival_known_good_restore.py'
       - 'tools/verify_vr_r30_disprank_postrt_source_fence.py'
       - 'tools/verify_vr_r30_particle_predraw_accounting.py'
+      - 'tools/verify_vr_r26_projected_particle_canvas.py'
       - 'tools/verify_vr_r62_predraw_projection_fallback.py'
       - 'tools/verify_vr_r30_postleft_viewport_fence.py'
       - 'tools/verify_vr_driver_seat_basis_stability.py'
@@ -459,6 +460,7 @@ jobs:
             'tools/verify_vr_rival_known_good_restore.py',
             'tools/verify_vr_r30_disprank_postrt_source_fence.py',
             'tools/verify_vr_r30_particle_predraw_accounting.py',
+            'tools/verify_vr_r26_projected_particle_canvas.py',
             'tools/verify_vr_r62_predraw_projection_fallback.py',
             'tools/verify_vr_r30_postleft_viewport_fence.py',
             'tools/verify_vr_driver_seat_basis_stability.py',
