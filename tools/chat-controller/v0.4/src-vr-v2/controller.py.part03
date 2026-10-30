@@ -3663,6 +3663,16 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     if UW2_WEB_PORT_ENABLED and not q.get("uw2_simple_initialized"):
         active_by_lane.pop("C", None)
         q.setdefault("vr_scheduled_dispatch_windows", {}).pop("C", None)
+        q.setdefault("vr_continuous_last_dispatch_at", {}).pop("C", None)
+        # Drop obsolete UW2 task records from the controller queue only.
+        # Git history and actual web-port source/evidence remain untouched.
+        for history_key in ("completed", "blocked", "retired_lane_tasks", "frozen_lane_tasks"):
+            items = q.get(history_key)
+            if isinstance(items, list):
+                q[history_key] = [
+                    item for item in items
+                    if not (isinstance(item, dict) and item.get("lane") == "UW2")
+                ]
         state = q.setdefault("uw2_simple", {})
         state.clear()
         state["fresh_chat_required"] = True
