@@ -3772,6 +3772,43 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             save_registry(reg)
         save_queue_state(q)
 
+    # One-time upgrade from the earlier "one tagged commit = DONE" UW2 policy.
+    # Resume the LAST prematurely completed UW2 task, never overwrite a live
+    # C task or resurrect a genuinely accepted P0-P9 original-game release.
+    if UW2_WEB_PORT_ENABLED and int(q.get("uw2_full_game_continuation_version", 0)) < 1:
+        existing_c = active_by_lane.get("C")
+        if existing_c is None:
+            previous_uw2 = next((
+                x for x in reversed(q.get("completed", []))
+                if isinstance(x, dict) and x.get("lane") == "UW2"
+                and x.get("branch") == UW2_TARGET_BRANCH
+                and (x.get("repo") or UW2_GITHUB_REPO) == UW2_GITHUB_REPO
+                and x.get("terminal_verification") != "UW2_P0_P9_FINAL_ACCEPTANCE"
+                and re.fullmatch(r"CONVERSION-UW2-[0-9]{5,}", str(x.get("task_id") or ""))
+                and re.fullmatch(r"[0-9a-fA-F]{40}", str(x.get("base_sha") or ""))
+            ), None)
+            if previous_uw2:
+                existing_c = dict(previous_uw2)
+                active_by_lane["C"] = existing_c
+        if isinstance(existing_c, dict) and existing_c.get("lane") == "UW2" and (
+                existing_c.get("phase") == "DONE" or existing_c.get("terminal") == "PASS"):
+            prior_sha = str(existing_c.get("result_sha") or "")
+            existing_c.update(phase="WAIT_CHAT", status="WAIT_CHAT", terminal=None,
+                              repo=UW2_GITHUB_REPO, uw2_full_game_status="IN_PROGRESS",
+                              uw2_completion_gate="FINAL_ACCEPTANCE_HOLD",
+                              uw2_restored_from_partial_terminal=True)
+            existing_c.pop("completed_at", None)
+            existing_c.pop("terminal_verification", None)
+            if re.fullmatch(r"[0-9a-fA-F]{40}", prior_sha):
+                existing_c["uw2_last_material_sha"] = prior_sha
+                existing_c["uw2_material_commits_seen"] = max(
+                    1, int(existing_c.get("uw2_material_commits_seen") or 0))
+            write_runtime(status="uw2_partial_task_restored",
+                          last_action=f"{existing_c.get('task_id')}: original-game completion pending; continuing same ID")
+        q["uw2_full_game_continuation_version"] = 1
+        q["uw2_full_game_continuation_at"] = now.isoformat()
+        save_queue_state(q)
+
     # Reconcile across the previous DX11-only deployment without losing C
     # task identity. Park B before per-lane processing, even if B was active.
     if reconcile_conversion_lane_freeze(
