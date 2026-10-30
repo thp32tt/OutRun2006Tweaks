@@ -134,6 +134,60 @@ public:
         return changed_pixels(tight) == rgb;
     }
 
+    // Find a real, fully RGB-changed rectangle inside one source-aligned
+    // capture. Sparse PRE/POST deltas must not claim the unchanged pixels
+    // BETWEEN two islands: a subsequent genuine Draw may own those pixels.
+    // Only exact dense runs are admitted; no interpolation/relocation.
+    // A bounded batch may publish additional disjoint runs separately.
+    [[nodiscard]] bool select_solid_rgb_tile(
+        const NativeRawPresentTile& tile, NativeRawPresentTile& solid,
+        std::uint32_t& rgb) const noexcept {
+        solid = {};
+        rgb = 0u;
+        const auto total = changed_pixels(tile);
+        if (!total || tile.destinationX < 0 || tile.destinationY < 0)
+            return false;
+        const std::uint64_t area =
+            std::uint64_t{tile.copyWidth} * tile.copyHeight;
+        if (total == area) {
+            solid = tile;
+            rgb = total;
+            return true;
+        }
+        const auto endX = tile.sourceX + tile.copyWidth;
+        const auto endY = tile.sourceY + tile.copyHeight;
+        for (std::uint32_t y = tile.sourceY; y < endY; ++y) {
+            for (std::uint32_t x = tile.sourceX; x < endX;) {
+                if (!count(x, y, 1u, 1u)) { ++x; continue; }
+                const auto left = x;
+                while (x < endX && count(x, y, 1u, 1u)) ++x;
+                const auto width = x - left;
+                std::uint32_t height = 1u;
+                while (y + height < endY &&
+                       count(left, y + height, width, 1u) == width)
+                    ++height;
+                const auto pixels = width * height;
+                if (pixels <= rgb) continue; // deterministic first run
+                const auto dx = left - tile.sourceX;
+                const auto dy = y - tile.sourceY;
+                constexpr auto max =
+                    (std::numeric_limits<std::int64_t>::max)();
+                if (tile.destinationX > max - dx ||
+                    tile.destinationY > max - dy) continue;
+                solid = tile;
+                solid.sourceX = left;
+                solid.sourceY = y;
+                solid.copyWidth = width;
+                solid.copyHeight = height;
+                solid.destinationX += dx;
+                solid.destinationY += dy;
+                rgb = pixels;
+            }
+        }
+        return rgb != 0u && changed_pixels(solid) == rgb &&
+            std::uint64_t{solid.copyWidth} * solid.copyHeight == rgb;
+    }
+
 private:
     [[nodiscard]] std::uint32_t count(std::uint32_t x, std::uint32_t y,
                                       std::uint32_t w, std::uint32_t h) const noexcept {

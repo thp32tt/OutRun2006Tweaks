@@ -379,6 +379,22 @@ struct NativeRawSourceIslandBatch {
             for (std::uint32_t i = 0u; i < count; ++i)
                 if (!native_raw_disjoint_present_tiles(tight, tiles[i]))
                     return false;
+            // A tight bounding box can still contain an unchanged gap.
+            // If another Draw changes RGB inside that gap, reserving the
+            // whole box drops authentic source pixels from the later Draw.
+            // Commit only a fully native-RGB rectangle and let the remaining
+            // bounded slots recover other real islands on later append calls.
+            if (std::uint64_t{tight.copyWidth} * tight.copyHeight != trueRgb) {
+                NativeRawPresentTile solid{};
+                std::uint32_t solidRgb = 0u;
+                if (!sourceRgb.select_solid_rgb_tile(
+                        tight, solid, solidRgb) || !solidRgb ||
+                    !native_raw_dirty_region_covers_tile(
+                        backWidth, backHeight, dirty, solid))
+                    return false;
+                tight = solid;
+                changed = solidRgb;
+            }
             next = tight;
         }
         tiles[count] = next;

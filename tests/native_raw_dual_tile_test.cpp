@@ -539,6 +539,84 @@ int main() {
         assert(!invalid.append(1920, 1080, dirty, source,
                                rgbA, false, true));
     }
+    // One genuine source Draw changes two separated RGB runs, while a
+    // second native Draw changes a pixel INSIDE their sparse bounding box.
+    // Preserve three genuine source contributions, in original coordinates,
+    // without treating unchanged pixels as owned by the first Draw.
+    {
+        constexpr std::uint32_t w = 64u, h = 32u;
+        std::array<std::uint8_t, w * h * 4u> before{};
+        auto afterFirst = before, afterSecond = before;
+        afterFirst[(9u * w + 7u) * 4u] = 71u;
+        afterFirst[(9u * w + 51u) * 4u + 1u] = 61u;
+        afterSecond[(9u * w + 29u) * 4u + 2u] = 91u;
+        NativeRawChangedPixelWindow first{}, second{};
+        first.capture(before.data(), w * 4u,
+                      afterFirst.data(), w * 4u, w, h);
+        second.capture(before.data(), w * 4u,
+                       afterSecond.data(), w * 4u, w, h);
+        NativeRawPresentDirtyRegion dirty{};
+        dirty.headerVerified = true;
+        dirty.count = 1u;
+        dirty.rectangles[0] = {300, 400, 364, 432};
+        dirty.boundLeft = 300; dirty.boundTop = 400;
+        dirty.boundRight = 364; dirty.boundBottom = 432;
+        const NativeRawPresentTile source{0u, 0u, w, h, 300, 400};
+        NativeRawPresentTile enclosing{}, solid{};
+        std::uint32_t pixels = 0u, denseRgb = 0u;
+        assert(first.tighten_to_rgb_bounds(source, enclosing, pixels));
+        assert(pixels == 2u && enclosing.copyWidth == 45u &&
+               enclosing.copyHeight == 1u);
+        assert(first.select_solid_rgb_tile(enclosing, solid, denseRgb));
+        assert(denseRgb == 1u && solid.sourceX == 7u &&
+               solid.destinationX == 307 && solid.destinationY == 409 &&
+               solid.copyWidth == 1u);
+        NativeRawSourceIslandBatch batch{};
+        assert(batch.append(1920, 1080, dirty, source, first, false, true));
+        assert(batch.append(1920, 1080, dirty, source, second, true, true));
+        assert(batch.append(1920, 1080, dirty, source, first, false, true));
+        assert(batch.count == 3u && batch.rgbPixels[0] == 1u &&
+               batch.rgbPixels[1] == 1u && batch.rgbPixels[2] == 1u &&
+               batch.tiles[0].destinationX == 307 &&
+               batch.tiles[1].destinationX == 329 &&
+               batch.tiles[2].destinationX == 351);
+        for (std::uint32_t i = 0u; i < batch.count; ++i) {
+            assert(batch.tiles[i].destinationY == 409 &&
+                   batch.tiles[i].copyWidth == 1u &&
+                   batch.tiles[i].copyHeight == 1u);
+            for (std::uint32_t j = 0u; j < i; ++j)
+                assert(native_raw_disjoint_present_tiles(
+                    batch.tiles[i], batch.tiles[j]));
+        }
+        assert(!batch.append(1920, 1080, dirty, source, first,
+                             false, true));
+        // Dense 2x2 source pixels remain one original-coordinate upload.
+        auto wide = before;
+        for (std::uint32_t y = 15u; y < 17u; ++y)
+            for (std::uint32_t x = 33u; x < 35u; ++x)
+                wide[(y * w + x) * 4u] = 142u;
+        first.capture(before.data(), w * 4u, wide.data(), w * 4u, w, h);
+        NativeRawSourceIslandBatch wideBatch{};
+        assert(wideBatch.append(1920, 1080, dirty, source, first,
+                                false, true));
+        assert(wideBatch.count == 1u && wideBatch.rgbPixels[0] == 4u &&
+               wideBatch.tiles[0].copyWidth == 2u &&
+               wideBatch.tiles[0].copyHeight == 2u &&
+               wideBatch.tiles[0].destinationX == 333 &&
+               wideBatch.tiles[0].destinationY == 415);
+        // Alpha-only Draw and forged D3D9 rcBound cannot borrow RGB proof.
+        afterSecond = before;
+        afterSecond[(9u * w + 29u) * 4u + 3u] = 255u;
+        second.capture(before.data(), w * 4u,
+                       afterSecond.data(), w * 4u, w, h);
+        NativeRawPresentTile absent{};
+        assert(!second.select_solid_rgb_tile(source, absent, denseRgb));
+        assert(denseRgb == 0u);
+        dirty.boundRight = 365;
+        NativeRawSourceIslandBatch forged{};
+        assert(!forged.append(1920, 1080, dirty, source,
+                              first, false, true));
+    }
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};
