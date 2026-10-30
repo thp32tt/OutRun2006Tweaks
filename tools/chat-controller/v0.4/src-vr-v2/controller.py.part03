@@ -3017,6 +3017,26 @@ def uw2_full_game_acceptance_verdict(repo: str, branch: str, head: str, material
         return False, "ACCEPTANCE_PROOF_UNAVAILABLE:" + type(exc).__name__
 
 
+
+def uw2_finalize_full_game(q: dict, active: dict, now: datetime, sha: str) -> None:
+    """Only called after explicit full P0-P9 original-game acceptance."""
+    active.update(result_sha=sha, phase="DONE", status="DONE", terminal="PASS",
+                  automation_validation="FULL_GAME_ACCEPTANCE_VERIFIED",
+                  completed_at=now.isoformat(),
+                  terminal_verification="UW2_P0_P9_FINAL_ACCEPTANCE")
+    q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
+    reg = load_registry(now)
+    slot = next((x for x in reg.slots if x.name == active.get("slot")), None)
+    if slot is not None:
+        slot.completed_tasks_in_chat += 1
+        slot.last_result = f"uw2_full_game_accepted:{active['task_id']}"
+        save_registry(reg)
+    save_queue_state(q)
+    write_runtime(status="uw2_full_game_accepted",
+                  last_action=f"{active['task_id']}: FULL-GAME acceptance verified; source {sha}",
+                  last_completed=dict(active), queue=q)
+
+
 async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
     """Observe incremental UW2 source changes, preserving one active TASK_ID.
 
@@ -3041,6 +3061,16 @@ async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
                       last_action=f"{task_id}: UW2 branch HEAD unavailable; owner retained")
         return
     active["uw2_latest_head"] = head
+    # A separate final manifest may be committed after the last actual source
+    # commit; reevaluate it against the last known material SHA, not the
+    # markdown/JSON-only acceptance commit itself.
+    last_material = str(active.get("uw2_last_material_sha") or "")
+    if UW2_ALLOW_FINAL_TERMINAL and last_material:
+        complete, verdict = uw2_full_game_acceptance_verdict(repo, branch, head, last_material)
+        active["uw2_completion_gate"] = verdict
+        if complete:
+            uw2_finalize_full_game(q, active, now, last_material)
+            return
     commit = github_find_task_commit(branch, task_id, repo=repo)
     if not commit or not commit.get("sha"):
         active["uw2_full_game_status"] = "IN_PROGRESS"
@@ -3091,22 +3121,7 @@ async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
     complete, verdict = uw2_full_game_acceptance_verdict(repo, branch, head, sha)
     active["uw2_completion_gate"] = verdict
     if complete:
-        active.update(result_sha=sha, result_message=commit.get("message"),
-                      phase="DONE", status="DONE", terminal="PASS",
-                      automation_validation="FULL_GAME_ACCEPTANCE_VERIFIED",
-                      completed_at=now.isoformat(),
-                      terminal_verification="UW2_P0_P9_FINAL_ACCEPTANCE")
-        q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
-        reg = load_registry(now)
-        slot = next((x for x in reg.slots if x.name == active.get("slot")), None)
-        if slot is not None:
-            slot.completed_tasks_in_chat += 1
-            slot.last_result = f"uw2_full_game_accepted:{task_id}"
-            save_registry(reg)
-        save_queue_state(q)
-        write_runtime(status="uw2_full_game_accepted",
-                      last_action=f"{task_id}: FULL-GAME acceptance verified; source {sha}",
-                      last_completed=dict(active), queue=q)
+        uw2_finalize_full_game(q, active, now, sha)
         return
     # Progress is durable but NOT terminal. Rollover continues the same ID.
     save_queue_state(q)
