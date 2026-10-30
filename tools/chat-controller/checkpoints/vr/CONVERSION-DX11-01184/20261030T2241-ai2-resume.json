@@ -23,19 +23,23 @@
     "fast": 41064653744,
     "backend": 41064653779,
     "build": 41064653943,
-    "openxr": 41064664344,
-    "hud_inspector": 41064664409
+    "openxr": 41064654107,
+    "hud_inspector": 41064654059
   },
   "verified_at_checkpoint": {
-    "fast": "completed/success",
-    "backend": "in_progress",
-    "build": "in_progress",
-    "openxr": "in_progress",
-    "hud_inspector": "in_progress"
+    "fast": "push/completed/success",
+    "backend": "push/completed/success",
+    "build": "push/completed/success",
+    "openxr": "push/completed/success",
+    "hud_inspector": "push/in_progress"
   },
-  "next_action": "Read each of the five mandatory Actions for exact b6dbd1c15f398d3203e58f5e1104cad9cd0b4a9f; repair only real failure within SAME task; when all success, verify artifacts, write C6 JSON to target and score only once. If any failure, DO NOT mark complete or score.",
+  "next_action": "Wait for push HUD 41064654059 to conclude; if success verify all 5 EXACT b6dbd1c15f398d3203e58f5e1104cad9cd0b4a9f, write 01184 C6 metadata, update AI2 SSOT once; do not score while pending or if failed.",
   "runtime_validation": "UNTESTED",
   "full_game_frame_or_hmd_proven": false,
   "score_note": "AI2 confirmed SSOT 2230 before this task; no score granted for rollover/repair/checkpoint",
-  "protected": "No DX9Ex/DXVK/input/FFB modification. RAW explicitly opt-in, default OFF; preserve fallback."
+  "protected": "No DX9Ex/DXVK/input/FFB modification. RAW explicitly opt-in, default OFF; preserve fallback.",
+  "alternate_pr_runs_not_required": {
+    "openxr": 41064664344,
+    "hud_inspector": 41064664409
+  }
 }
