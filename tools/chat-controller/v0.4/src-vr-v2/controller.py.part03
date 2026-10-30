@@ -717,6 +717,9 @@ def github_stale_event_guard(active: dict, trigger: str) -> bool:
     """Drop stale retry/rollover work before it can reopen an older production task."""
     if CONTROLLER_MODE != "conversion":
         return False
+    if active.get("lane") == "UW2":
+        # A tagged partial source commit must never suppress rollover/resume.
+        return False
     branch = str(active.get("branch") or "").strip()
     production_id = str(active.get("production_id") or active.get("task_id") or "").strip()
     if not branch or not production_id:
@@ -1103,7 +1106,7 @@ def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head
     """No chat URLs, tokens, cookies, or private response text in public GitHub."""
     allowed = (
         "task_id", "production_id", "event_id", "event_type", "lane", "slot",
-        "branch", "base_sha", "result_sha", "result_message", "phase",
+        "repo", "branch", "base_sha", "result_sha", "result_message", "phase",
         "status", "terminal", "attempt", "retry_count", "rollover_count",
         "chat_rollovers", "sent_at", "last_rollover_at", "last_hash",
         "last_hash_changed_at", "last_gate_poll_at", "wait_actions_started_at",
@@ -1116,6 +1119,9 @@ def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head
         "feature_base_sha", "feature_last_head", "feature_last_real_activity_at",
         "feature_work_key", "feature_blocker", "feature_promoted_at",
         "retry_failed_sha", "last_c6_finalize_at", "c6_finalize_count",
+        "uw2_latest_head", "uw2_last_material_sha", "uw2_last_material_paths",
+        "uw2_last_material_at", "uw2_material_commits_seen",
+        "uw2_full_game_status", "uw2_completion_gate",
     )
     details = {k: active.get(k) for k in allowed if k in active}
     # Failure/commit text can contain user data. Preserve only short, typed identifiers.
@@ -1124,13 +1130,13 @@ def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head
             details[key] = None
     return {
         "schema": 1, "kind": "vr_queue_checkpoint",
-        "controller_build": "2026-10-11-resume-v3",
+        "controller_build": "2026-10-31-uw2-full-fidelity-continuous-v2",
         "purpose": purpose, "captured_at_kst": now.isoformat(),
         "controller_branch": VR_CHECKPOINT_BRANCH,
         "game_branch_head": branch_head,
         "record": details,
         "recovery": {
-            "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+            "first_action": "Read task target repository HEAD, current P0-P9 fidelity master plan and existing material; incremental UW2 commits are NOT task completion",
             "do_not_duplicate": True,
             "runtime_validation": "UNTESTED unless real HMD tested",
             "note": "A periodic controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved",
@@ -1216,7 +1222,7 @@ async def vr_persist_checkpoint(q: dict, active: dict, now: datetime, purpose: s
     active["vr_checkpoint_last_attempt_at"] = now.isoformat()
     save_queue_state(q)
     try:
-        branch_head = await asyncio.to_thread(github_branch_head, active["branch"])
+        branch_head = await asyncio.to_thread(github_branch_head, active["branch"], active.get("repo"))
         if not branch_head:
             raise RuntimeError("Game branch HEAD unavailable; snapshot not trustworthy")
         payload = vr_checkpoint_payload(active, now, purpose, branch_head)
@@ -2953,24 +2959,98 @@ def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, 
     return True
 
 
-async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
-    """Verify an immutable web source change on UW2 repository, never OutRun.
+UW2_FULL_GAME_ACCEPTANCE_PATH = "uw2-web/docs/ORIGINAL_FULL_GAME_ACCEPTANCE.json"
+UW2_REQUIRED_STAGES = tuple("P" + str(n) for n in range(10))
 
-    Documents, status-only commits, unrelated repositories and unfounded CI
-    claims never mark UW2 production complete.
+
+def uw2_full_game_acceptance_verdict(repo: str, branch: str, head: str, material_sha: str) -> tuple[bool, str]:
+    """Fail closed until original DOS comparison and all P0..P9 are accepted.
+
+    A source commit, synthetically green CI, a final-looking markdown, and
+    even a self-declared PASS are not sufficient for original-game parity.
+    The explicit operator flag is deliberately OFF in normal deployments.
+    """
+    if not UW2_ALLOW_FINAL_TERMINAL:
+        return False, "FINAL_ACCEPTANCE_HOLD"
+    try:
+        endpoint = (f"/repos/{repo}/contents/"
+                    + urllib.parse.quote(UW2_FULL_GAME_ACCEPTANCE_PATH, safe="/")
+                    + "?ref=" + urllib.parse.quote(head, safe=""))
+        content = github_api_json(endpoint)
+        if not isinstance(content, dict):
+            return False, "ACCEPTANCE_MANIFEST_MISSING"
+        manifest = json.loads(base64.b64decode(content["content"]).decode("utf-8"))
+        if not isinstance(manifest, dict) or manifest.get("schema_version") != 1:
+            return False, "ACCEPTANCE_SCHEMA_INVALID"
+        if (manifest.get("target_repo") != repo or manifest.get("target_branch") != branch
+                or manifest.get("status") != "FULL_GAME_ACCEPTED"):
+            return False, "ACCEPTANCE_TARGET_OR_STATUS_INVALID"
+        if manifest.get("validated_source_sha") != material_sha:
+            return False, "ACCEPTANCE_SHA_MISMATCH"
+        if (manifest.get("reviewer_acceptance") != "APPROVED"
+                or manifest.get("original_dos_differential") != "PASS"
+                or manifest.get("six_playable_campaigns") != "PASS"
+                or manifest.get("all_scenarios_endings") != "PASS"
+                or manifest.get("save_load_bit_exact") != "PASS"
+                or manifest.get("graphics_audio_input_parity") != "PASS"
+                or manifest.get("browser_e2e") != "PASS"):
+            return False, "ACCEPTANCE_PARITY_OR_REVIEW_MISSING"
+        stages = manifest.get("stages")
+        if not isinstance(stages, dict) or set(stages) != set(UW2_REQUIRED_STAGES):
+            return False, "ACCEPTANCE_P0_P9_INCOMPLETE"
+        for stage in UW2_REQUIRED_STAGES:
+            item = stages[stage]
+            if (not isinstance(item, dict) or item.get("status") != "PASS"
+                    or not isinstance(item.get("evidence_path"), str)
+                    or not item["evidence_path"].startswith("uw2-web/docs/")
+                    or not item["evidence_path"].endswith(".json")):
+                return False, "ACCEPTANCE_STAGE_INCOMPLETE:" + stage
+        reach = github_api_json(f"/repos/{repo}/compare/{material_sha}...{head}")
+        if (reach.get("status") not in {"ahead", "identical"}
+                or int(reach.get("behind_by") or 0) != 0):
+            return False, "ACCEPTANCE_SOURCE_NOT_ANCESTOR"
+        # A final manual acceptance cannot be generated solely by a source
+        # change and never asserts an absent browser/DOS proof was executed.
+        return True, "P0_P9_AND_FINAL_ACCEPTANCE"
+    except Exception as exc:
+        log.warning("UW2 final acceptance check deferred: %s", type(exc).__name__)
+        return False, "ACCEPTANCE_PROOF_UNAVAILABLE:" + type(exc).__name__
+
+
+async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
+    """Observe incremental UW2 source changes, preserving one active TASK_ID.
+
+    Only the strict optional original-game P0-P9 acceptance can end the lane.
+    Progress commits never release C; checkpoint/rollover drives continued work.
     """
     repo = str(active.get("repo") or UW2_GITHUB_REPO)
     branch = str(active.get("branch") or UW2_TARGET_BRANCH)
     task_id = str(active.get("task_id") or "")
+    if repo != UW2_GITHUB_REPO or branch != UW2_TARGET_BRANCH:
+        write_runtime(status="uw2_target_mismatch",
+                      last_action=f"{task_id}: target mismatch; retain owner")
+        return
+    last_poll = _parse_iso(active.get("uw2_last_poll_at"))
+    if last_poll and (now - last_poll).total_seconds() < UW2_PROGRESS_POLL_SECONDS:
+        return
+    active["uw2_last_poll_at"] = now.isoformat()
     head = github_branch_head(branch, repo=repo)
     if not head:
+        save_queue_state(q)
         write_runtime(status="uw2_github_read_deferred",
-                      last_action=f"{task_id}: UW2 branch HEAD unavailable")
+                      last_action=f"{task_id}: UW2 branch HEAD unavailable; owner retained")
         return
+    active["uw2_latest_head"] = head
     commit = github_find_task_commit(branch, task_id, repo=repo)
     if not commit or not commit.get("sha"):
+        active["uw2_full_game_status"] = "IN_PROGRESS"
+        save_queue_state(q)
         return
     sha = str(commit["sha"])
+    # Track a commit only once. Multi-commit work and rollovers keep the task.
+    if active.get("uw2_last_material_sha") == sha:
+        save_queue_state(q)
+        return
     base = str(active.get("base_sha") or "")
     try:
         if not re.fullmatch(r"[0-9a-fA-F]{40}", base):
@@ -2978,7 +3058,7 @@ async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
         ancestry = github_api_json(f"/repos/{repo}/compare/{base}...{sha}")
         if (ancestry.get("status") != "ahead"
                 or int(ancestry.get("behind_by") or 0) != 0):
-            raise ValueError("UW2 result is not a descendant of task base")
+            raise ValueError("UW2 task source commit not after base SHA")
         result = github_api_json(f"/repos/{repo}/commits/{sha}")
         paths = [str(row.get("filename") or "") for row in result.get("files", [])
                  if isinstance(row, dict)]
@@ -2987,10 +3067,8 @@ async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
                         and not p.startswith(("uw2-web/tests/", "uw2-web/docs/"))
                         and p.endswith((".js", ".mjs", ".ts", ".html", ".css", ".py", ".c", ".cpp"))]
         if not source_paths:
-            active["uw2_verification_error"] = "TASK_COMMIT_HAS_NO_WEB_SOURCE"
+            active["uw2_verification_error"] = "TAGGED_COMMIT_NO_PORT_SOURCE"
             save_queue_state(q)
-            write_runtime(status="uw2_source_pending",
-                          last_action=f"{task_id}: tagged docs/tests-only commit is not completion")
             return
         reach = github_api_json(f"/repos/{repo}/compare/{sha}...{head}")
         if (reach.get("status") not in {"ahead", "identical"}
@@ -2999,26 +3077,42 @@ async def uw2_process_lane(q: dict, active: dict, now: datetime) -> None:
     except Exception as exc:
         active["uw2_verification_error"] = type(exc).__name__
         save_queue_state(q)
-        write_runtime(status="uw2_commit_verification_deferred",
+        write_runtime(status="uw2_progress_verification_deferred",
                       last_action=f"{task_id}: source verification deferred: {type(exc).__name__}")
         return
-    active.update(result_sha=sha, result_message=commit.get("message"),
-                  material_paths=source_paths, phase="DONE", status="DONE",
-                  terminal="PASS", automation_validation="GITHUB_MATERIAL_VERIFIED_CI_UNTESTED",
-                  runtime_validation="UNTESTED", validation_mode="UW2_GITHUB_SOURCE",
-                  completed_at=now.isoformat(),
-                  terminal_verification="UW2_TAGGED_WEB_SOURCE_ON_TARGET")
-    q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
-    reg = load_registry(now)
-    slot = next((x for x in reg.slots if x.name == active.get("slot")), None)
-    if slot is not None:
-        slot.completed_tasks_in_chat += 1
-        slot.last_result = f"uw2_material_commit_complete:{task_id}"
-        save_registry(reg)
+
+    active.update(uw2_last_material_sha=sha, uw2_last_material_paths=source_paths,
+                  uw2_latest_head=head, uw2_full_game_status="IN_PROGRESS",
+                  uw2_last_material_at=now.isoformat(),
+                  uw2_material_commits_seen=int(active.get("uw2_material_commits_seen") or 0) + 1,
+                  phase="WAIT_CHAT", terminal=None, runtime_validation="UNTESTED",
+                  automation_validation="PARTIAL_SOURCE_COMMIT_VERIFIED_NOT_FULL_GAME")
+    active.pop("uw2_verification_error", None)
+    complete, verdict = uw2_full_game_acceptance_verdict(repo, branch, head, sha)
+    active["uw2_completion_gate"] = verdict
+    if complete:
+        active.update(result_sha=sha, result_message=commit.get("message"),
+                      phase="DONE", status="DONE", terminal="PASS",
+                      automation_validation="FULL_GAME_ACCEPTANCE_VERIFIED",
+                      completed_at=now.isoformat(),
+                      terminal_verification="UW2_P0_P9_FINAL_ACCEPTANCE")
+        q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
+        reg = load_registry(now)
+        slot = next((x for x in reg.slots if x.name == active.get("slot")), None)
+        if slot is not None:
+            slot.completed_tasks_in_chat += 1
+            slot.last_result = f"uw2_full_game_accepted:{task_id}"
+            save_registry(reg)
+        save_queue_state(q)
+        write_runtime(status="uw2_full_game_accepted",
+                      last_action=f"{task_id}: FULL-GAME acceptance verified; source {sha}",
+                      last_completed=dict(active), queue=q)
+        return
+    # Progress is durable but NOT terminal. Rollover continues the same ID.
     save_queue_state(q)
-    write_runtime(status="uw2_material_commit_verified",
-                  last_action=f"{task_id}: verified {repo}@{branch} web source commit {sha}; CI/runtime untested",
-                  last_completed=dict(active), queue=q)
+    write_runtime(status="uw2_full_game_in_progress",
+                  last_action=f"{task_id}: source {sha[:12]} verified; P0-P9 full acceptance pending; continue",
+                  queue=q)
 
 
 async def conversion_process_lane(
