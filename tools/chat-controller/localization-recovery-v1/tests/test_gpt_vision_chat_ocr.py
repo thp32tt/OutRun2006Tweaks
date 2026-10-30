@@ -186,6 +186,66 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertEqual(st["attempts"]["C2:"+succeeded],2)
         self.assertEqual(g._migrate_response_extractor_state(st),[])
 
+    def test_duplicate_only_bbox_requires_manual_review_without_retry(self):
+        # Same source area was already assigned to another English label.
+        old=self.out/Path(self.name).stem/"older"
+        old.mkdir(parents=True)
+        (old/"manifest.json").write_text(json.dumps({
+            "source_sha256":self.row["png_sha256"],"english":"OTHER",
+            "bbox_xyxy":[10,10,50,30]}),encoding="utf-8")
+        binding,_=g.next_binding()
+        self.assertEqual(g.stage_submission(binding["task_id"]),"SUBMITTING")
+        self.assertEqual(g.record_chat_url(binding["task_id"],
+            "https://chatgpt.com/c/12345678-1234-1234-1234-123456789abc"),"URL_RECORDED")
+        response=json.dumps({"task_id":binding["task_id"],"source_png":self.name,
+          "detections":[{"english":"HELLO","bbox_xyxy":[10,10,50,30],"confidence":0.96}],
+          "uncertain":[]})
+        result=g.apply_response(binding["task_id"],response)
+        self.assertEqual(result["status"],"REVIEW_REQUIRED_DUPLICATE_BBOX")
+        self.assertTrue(result["manual_review_required"])
+        self.assertEqual(result["applied"],0)
+        self.assertEqual(list(self.gpt_out.glob("*/*/manifest.json")),[])
+        retry,reason=g.next_binding()
+        self.assertIsNone(retry)
+        self.assertEqual(reason,"GPT_CHAT_OCR_QUEUE_EMPTY_OR_EXHAUSTED")
+        summary=g.summary()
+        self.assertEqual(summary["manual_review_sources"],1)
+        self.assertEqual(summary["manual_review_phrases"],1)
+        self.assertEqual(summary["retryable_sources"],0)
+        self.assertEqual(summary["exhausted_sources"],0)
+
+        # Existing historical NO_VALID_DETECTIONS records must be honored too.
+        st=g._state()
+        st["completed"][-1]["status"]="NO_VALID_DETECTIONS"
+        st["completed"][-1].pop("manual_review_required",None)
+        g._save_state(st)
+        self.assertEqual(g.summary()["manual_review_sources"],1)
+        self.assertIsNone(g.next_binding()[0])
+
+        # A changed unresolved phrase set has a distinct fingerprint and can
+        # be reviewed without unblocking the original conflicting response.
+        rec=self.report/"processed_v3"/(self.name+".json")
+        processed=json.loads(rec.read_text())
+        processed["unresolved_after"]=["HELLO","NEXT"]
+        rec.write_text(json.dumps(processed),encoding="utf-8")
+        fresh,reason=g.next_binding()
+        self.assertIsNone(reason)
+        self.assertEqual(fresh["target_phrases"],["HELLO","NEXT"])
+        self.assertNotEqual(fresh["fingerprint"],binding["fingerprint"])
+
+    def test_low_confidence_invalid_bbox_remains_retryable(self):
+        binding,_=g.next_binding();g.stage_submission(binding["task_id"])
+        g.record_chat_url(binding["task_id"],
+            "https://chatgpt.com/c/12345678-1234-1234-1234-123456789abc")
+        response=json.dumps({"task_id":binding["task_id"],"source_png":self.name,
+          "detections":[{"english":"HELLO","bbox_xyxy":[10,10,50,30],"confidence":0.3}],
+          "uncertain":[]})
+        self.assertEqual(g.apply_response(binding["task_id"],response)["status"],"NO_VALID_DETECTIONS")
+        self.assertEqual(g.summary()["manual_review_sources"],0)
+        retry,reason=g.next_binding()
+        self.assertIsNone(reason)
+        self.assertTrue(retry["task_id"].endswith("-R1"))
+
     def test_lane_partition_and_c2_independent_attempt_counter(self):
         even_name="Q002_TEST_BASE_READABLE_FLIPY.png"
         even_path=self.src/even_name
