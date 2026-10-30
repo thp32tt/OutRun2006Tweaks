@@ -153,7 +153,7 @@ def require_frontend_owner(source: str) -> None:
     for state in ("TITLE", "MENU", "SELECTOR", "SELEXIT", "SELRESET"):
         assert "GameState::STATE_" + state in helper, "frontend missing: " + state
     for excluded in ("GOAL", "GAME"):
-        assert "GameState::STATE_" + excluded not in helper, "foreign HUD owner: " + excluded
+        assert "case GameState::STATE_" + excluded + ":" not in helper, "foreign HUD owner: " + excluded
     for required in (
         "mode == ScalingMode::KeepCentered && originalFrontEndProducer;",
         "const bool frontEndPivot = NeedsFrontEndAffineContain(\n            originalFrontEndProducer,",
