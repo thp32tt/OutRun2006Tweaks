@@ -269,17 +269,33 @@ def test_raw_visual_native_source_contract():
     # RAW border pixels must remain magenta ONLY where they do not cover
     # genuine source-native RGB changes. Check the actual guard and all BGR
     # writes together, not a historical whitespace-specific assignment.
+    # The source-aligned multi-island presentation now delegates the actual
+    # channel conversion and incomplete-frame border to a bounded helper.
+    # Preserve the same guard strength at the new runtime callsite; merely
+    # finding an unused historical border string cannot satisfy this test.
+    transport = (root / "src" / "vr" / "d3d11" /
+                 "native_game_raw_color_transport.hpp").read_text(encoding="utf-8")
+    if "native_raw_copy_present_island(" not in header:
+        raise AssertionError("RAW Present must call the bounded island writer")
+    for required in (
+        "native_raw_copy_to_d3d9_bgra(",
+        "tile.copyWidth > captureWidth - tile.sourceX",
+        "tile.copyHeight > captureHeight - tile.sourceY",
+        "destinationPitch < std::size_t{captureWidth} * 4u",
+    ):
+        if required not in transport:
+            raise AssertionError("RAW bounded source-island writer missing: " + required)
     border_guard = "if (native_raw_present_border_pixel("
-    guard_start = header.find(border_guard)
+    guard_start = transport.find(border_guard)
     if guard_start < 0:
         raise AssertionError("RAW border must protect genuine RGB pixels")
-    guard_end = header.find("}", guard_start)
-    guarded_writes = header[guard_start:guard_end]
+    guard_end = transport.find("}", guard_start)
+    guarded_writes = transport[guard_start:guard_end]
     for required in (
-        "native_raw_rgb_changed(",
-        "dst[x * 4u] = 255u;",
-        "dst[x * 4u + 1u] = 0u;",
-        "dst[x * 4u + 2u] = 255u;",
+        "native_raw_rgb_changed(p + offset, a + offset)",
+        "d[offset] = 255u;",
+        "d[offset + 1u] = 0u;",
+        "d[offset + 2u] = 255u;",
     ):
         if required not in guarded_writes:
             raise AssertionError("RAW protected magenta pixel missing: " + required)
