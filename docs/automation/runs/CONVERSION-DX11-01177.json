@@ -36,20 +36,24 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "integration_path": [
-      "LIVE_D3D9_DRAW",
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
       "D3D11_NATIVE_PRE_POST_RGB",
       "ORIGINAL_D3D9_PRESENT_DIRTY",
       "RGB_TIGHT_SOURCE_ISLANDS",
       "INDEPENDENT_D3D9_SYSTEMMEM_UPLOAD",
-      "OPT_IN_VISIBLE_RAW_PARTIAL_OUTPUT"
+      "OPT_IN_VISIBLE_RAW_PARTIAL_OUTPUT",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "live_game_draw_path": [
-      "LIVE_D3D9_DRAW",
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
       "D3D11_NATIVE_PRE_POST_RGB",
       "ORIGINAL_D3D9_PRESENT_DIRTY",
       "RGB_TIGHT_SOURCE_ISLANDS",
       "INDEPENDENT_D3D9_SYSTEMMEM_UPLOAD",
-      "OPT_IN_VISIBLE_RAW_PARTIAL_OUTPUT"
+      "OPT_IN_VISIBLE_RAW_PARTIAL_OUTPUT",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "batch_components": [
       "CPP_RGB_DELTA_TIGHT_WINDOW",
@@ -118,7 +122,8 @@
     "runtime_evidence": "No matching OutRun game/Quest3/VDXR source capture or FPS evidence; runtime untested.",
     "scoreboard_previous": 2214,
     "score_change": 1,
-    "scoreboard_new": 2215
+    "scoreboard_new": 2215,
+    "inherited_acceptance_path_record_correction": "CONVERSION-DX11-01178 restores strict original LIVE_D3D9_CALLSITE -> D3D11_NATIVE_DRAW -> VISIBLE_FRAME_OUTPUT validation vocabulary for the already source/CI-proven opt-in partial RAW output; no new implementation or score"
   },
   "pipeline": {
     "C0_RECOVER": "PASS_GITHUB_HEAD_48cd0b2b",
@@ -204,5 +209,5 @@
   "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
   "feature_ready": "PASS_SOURCE_CI_NEED_HMD_TEST",
   "next_unfinished": "Full contiguous native menu/vehicle/race frame and real desktop/Quest3 GPU-pixel evidence remain incomplete; OpenXR distinct L/R and actual input/fps/HMD require real game runtime.",
-  "notes": "C6 is a standalone [skip ci] documentation checkpoint after 5/5 successful validation-bearing source commit. No HMD test, production promotion, runtime score double count or DXVK development."
+  "notes": "C6 is a standalone [skip ci] documentation checkpoint after 5/5 successful validation-bearing source commit. No HMD test, production promotion, runtime score double count or DXVK development. Inherited C6 acceptance-path vocabulary corrected under following 01178 CI causal repair: original real D3D9 callsite enters D3D11 native Draw, GPU PRE/POST crop and opt-in partial visible output; no new gameplay/HMD claim, no additional score. Original 01177 exact-SHA five Gate evidence remains at de720614."
 }
