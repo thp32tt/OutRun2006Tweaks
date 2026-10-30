@@ -196,6 +196,14 @@
         "evidence": "docs/automation/reviews/R26_PERFORMANCE_TEST_20261028.md",
         "runtimeValidation": "UNTESTED",
         "status": "SOURCE_REGRESSION_PASS_WINDOWS_PENDING"
+      },
+      "performanceRound3": {
+        "taskId": "USER-DX9EX-PERF-ROUND3-20261030",
+        "branch": "perf/r26-copy-math-aa-20261028",
+        "sourceSha": "6b75e5cbd70f3e3640d0410b6a99675bdb0a94b9",
+        "evidence": "docs/automation/runs/USER-DX9EX-PERF-ROUND3-20261030.json",
+        "status": "BUILD_VERIFIED_RUNTIME_UNTESTED",
+        "runtimeValidation": "UNTESTED"
       }
     },
     {

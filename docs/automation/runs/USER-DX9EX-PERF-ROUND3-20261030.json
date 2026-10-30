@@ -8,8 +8,45 @@
     "high-water initialized view scratch",
     "compact all-used mask elimination"
   ],
-  "validation": "4000 transform cases PASS, alternating cache 100 warm requests zero builds, retained shadow after registry removal PASS; CI pending",
+  "validation": "4000 production transform cases PASS; alternating cache 100 warm requests zero builds; retained shadow after registry removal PASS; exact-SHA performance game/host/package, Domain, Full Source and HUD Inspector PASS",
   "runtime": "UNTESTED",
   "preserved": "diagnostics MSAA2 culling8 reflection512 transparencyOff",
-  "score_delta": 0
+  "score_delta": 0,
+  "schema_version": 1,
+  "branch": "perf/r26-copy-math-aa-20261028",
+  "lane": "VR/DX9Ex R26+HUD",
+  "attempt": 1,
+  "result_sha": "6b75e5cbd70f3e3640d0410b6a99675bdb0a94b9",
+  "latest_verified_source_head": "6b75e5cbd70f3e3640d0410b6a99675bdb0a94b9",
+  "checkpoint": "C6",
+  "status": "BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "ci": {
+    "performance": {
+      "run_id": 40989121434,
+      "result": "success"
+    },
+    "full_source": {
+      "run_id": 40989121406,
+      "result": "success"
+    },
+    "hud_inspector": {
+      "run_id": 40989121404,
+      "result": "success"
+    },
+    "general_build": {
+      "run_id": 40989121467,
+      "result": "failure",
+      "reason": "CURRENT VERIFY FAILED [missing file]: docs/reverse/LINDBERGH_FFB_MAP.md"
+    }
+  },
+  "artifact": {
+    "id": 12947938952,
+    "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40989121434/artifacts/12947938952",
+    "file": "OutRun2_VR_R26_PERF_COPY_MATH_AA2_TEST_6b75e5cbd70f.zip",
+    "sha256": "51804baff6cec1a48a5a0fc8bb0c4a377594a17f125b76150ca563143d3ef8f6",
+    "source_sha_verified": true,
+    "outer_sha256": "177a94f75938791438b6f34bdd0652382594a5d3b1128f0c3028309c62c41a15"
+  },
+  "next_action": "User Quest3/VDXR test exact ZIP in same dense particle/building/water scenes; compare frame pacing and visual correctness. No mainline merge or runtime baseline promotion.",
+  "completed_utc": "2026-10-30T14:50:38.666Z"
 }

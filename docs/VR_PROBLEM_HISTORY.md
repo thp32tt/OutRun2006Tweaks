@@ -306,3 +306,8 @@ screen-family change, so do not claim full-suite PASS. RUNTIME_VALIDATION=UNTEST
 ## 2026-10-29 — isolated R26 performance experiment
 
 USER-DX9EX-PERF-TEST-20261028 preserves VR-R50-FRAME-STABILITY-PRESERVE-001, MSAA/culling and exact stereo semantics. See docs/automation/reviews/R26_PERFORMANCE_TEST_20261028.md for five CPU/copy optimizations and transparent-AA OFF/reflection512 test profile. Differential CPU output passes; performance and HMD are UNTESTED. No runtime baseline promotion.
+
+
+## 2026-10-30 — R26 performance round 3 build evidence
+
+USER-DX9EX-PERF-ROUND3-20261030 continues VR-R50-FRAME-STABILITY-PRESERVE-001 on the isolated performance branch. Source 6b75e5cbd70f3e3640d0410b6a99675bdb0a94b9 adds four-entry exact eye-math reuse, retained per-draw shadows, acquire/release hook-ready fast path with rollback invalidation, high-water initialized scratch, and compact all-used mask elimination. 4000 differential cases pass; 100 alternating warm cache requests rebuild zero times. Dedicated game/host/package + Domain, Full Source, and HUD Inspector pass. General Build fails on missing docs/reverse/LINDBERGH_FFB_MAP.md. Package hash and all run IDs: docs/automation/runs/USER-DX9EX-PERF-ROUND3-20261030.json. Diagnostics/MSAA2/culling8/reflection512/transparencyOff remain. RUNTIME_VALIDATION=UNTESTED; no FPS or mainline promotion claim.
