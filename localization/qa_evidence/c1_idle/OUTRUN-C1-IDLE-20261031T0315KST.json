@@ -1,0 +1,59 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "task_id": "OUTRUN-C1-IDLE-20261031T0315KST",
+  "slot_time_kst": "2026-10-31T03:15:00+09:00",
+  "verified_at_kst": "2026-10-31T03:18:07+09:00",
+  "reviewer": "ChatGPT AI2",
+  "lane": "C1",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inspection": {
+    "server": "N100",
+    "evidence_root": "work/image-src/text_roi_batches",
+    "candidate_dirs": [
+      "candidate_outputs/A",
+      "candidate_outputs/B"
+    ],
+    "evidence_dir": "export_evidence",
+    "reports_roots": [
+      "work/C1_QA_*_report.json",
+      "work/C1_QA_*_metrics.json",
+      "work/c1_batch_*/report.json",
+      "work/c1_batch_*/metrics.json",
+      "work/C1_QA_*/metrics.json"
+    ],
+    "method": "Run existing N100 read-only 20261030_1945_dedup_readonly.py; collect candidate SHA from export evidence, harvest previously QA-reviewed SHA from 197 reports, and check all candidate PNG filenames match export metadata; no visually eligible new candidate.",
+    "qa_report_files": 197,
+    "reviewed_distinct_sha_count": 925,
+    "export_entries_named": 920,
+    "pending_export_unreviewed_sha_count": 0,
+    "candidates_without_export_count": 0,
+    "duplicate_qa_skipped": true
+  },
+  "results": {
+    "new_candidate_count": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "conditions": {
+    "png_visual_qa_performed": false,
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_created": false,
+    "c2_c3_or_ingame_pass_created": false,
+    "game_runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changed": false
+  },
+  "score": {
+    "delta": 0,
+    "reason": "IDLE/no new independent QA achievement"
+  },
+  "evidence_note": "Counts describe the read-only inventory at verification time, not proof that previously reviewed candidates passed DDS or in-game validation."
+}
