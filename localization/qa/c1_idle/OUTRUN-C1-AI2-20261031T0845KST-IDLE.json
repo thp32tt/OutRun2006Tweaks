@@ -2,7 +2,6 @@
   "schema": "outrun.c1.independent_lightweight_qa.v1",
   "run_key": "OUTRUN-C1-AI2-20261031T0845KST-IDLE",
   "started_at_kst": "2026-10-31T08:45:00+09:00",
-  "recorded_at_kst": "2026-10-30T23:47:16.115Z",
   "role": "C1",
   "status": "IDLE",
   "reviewer": "ChatGPT AI2",
@@ -61,5 +60,6 @@
     "cumulative_ai2": 2246,
     "scoreboard_written": false
   },
-  "evidence_type": "IDLE_RECORD_ONLY_NO_NEW_PASS_NO_SCORING"
+  "evidence_type": "IDLE_RECORD_ONLY_NO_NEW_PASS_NO_SCORING",
+  "recorded_at_utc": "2026-10-30T23:47:16.115Z"
 }
