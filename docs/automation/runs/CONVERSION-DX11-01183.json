@@ -46,10 +46,10 @@
       "EXPLICIT_RAW_PARTIAL_VISIBLE_OUTPUT"
     ],
     "live_game_draw_path": [
-      "REAL_D3D9_DRAW",
-      "NATIVE_D3D11_DRAW",
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
       "NATIVE_GPU_READBACK",
-      "SAFE_OPT_IN_PARTIAL_PRESENT"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "batch_components": [
       "CPP_BOUNDED_SOURCE_ISLAND_RGB_TRANSPORT",
@@ -68,7 +68,7 @@
       "tests/native_raw_dual_tile_test.cpp",
       "tools/test_package_dx11_first_game_frame.py"
     ],
-    "full_gate_plan": "one_validation_bearing_sha_plus_exact_causal_repair",
+    "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "SOURCE_CI_OPT_IN_PARTIAL_GPU_RGB_ONLY_RUNTIME_UNTESTED",
     "activation_guard_and_fallback": "RAW opt in OFF by default, original D3D9 input/FFB/SkyGlow and DX9Ex fallback untouched, DXVK frozen."
   },
@@ -165,14 +165,16 @@
         "src/vr/d3d11/native_game_raw_color_transport.hpp",
         "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
         "tests/native_raw_dual_tile_test.cpp"
-      ]
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41057504113 and Backend Conversion Gate 41057504134; original exact-SHA 8b741d4c85456ff3bd09244af39190a446e256ef"
     },
     "reject_invalid_and_preserve_unselected": {
       "status": "PASS_SOURCE_CI",
       "evidence_paths": [
         "tests/native_raw_dual_tile_test.cpp",
         "tools/test_package_dx11_first_game_frame.py"
-      ]
+      ],
+      "validation_command": "Backend Conversion Gate 41057504134 and OpenXR VR architecture 41057504298; original exact-SHA 8b741d4c85456ff3bd09244af39190a446e256ef"
     },
     "exact_sha_required_gates": {
       "status": "PASS_EXACT_SHA",
