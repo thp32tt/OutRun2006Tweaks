@@ -397,6 +397,7 @@ namespace OutRunVRStereo
         using R30ShadowPtr = std::shared_ptr<R30BufferShadow>;
         std::mutex R30ShadowRegistryMutex;
         std::mutex R30ShadowHookMutex;
+        std::atomic<std::uintptr_t> R30VertexHooksReady{0}, R30IndexHooksReady{0};
         std::unordered_map<IDirect3DVertexBuffer9*, R30ShadowPtr>
             R30VertexShadows;
         std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
@@ -597,9 +598,9 @@ namespace OutRunVRStereo
         }
 
         bool R30CopyVertexShadow(IDirect3DVertexBuffer9* buffer,
-            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out)
+            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out, const R30ShadowPtr& known = R30ShadowPtr())
         {
-            const auto entry = R30FindVertexShadow(buffer);
+            const auto entry = known ? known : R30FindVertexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
@@ -632,9 +633,9 @@ namespace OutRunVRStereo
             return true;
         }
 
-        bool R30ReadIndexDesc(IDirect3DIndexBuffer9* buffer, D3DINDEXBUFFER_DESC& desc)
+        bool R30ReadIndexDesc(IDirect3DIndexBuffer9* buffer, D3DINDEXBUFFER_DESC& desc, const R30ShadowPtr& known = R30ShadowPtr())
         {
-            auto entry = R30FindIndexShadow(buffer);
+            auto entry = known ? known : R30FindIndexShadow(buffer);
             if (!entry) return SUCCEEDED(buffer->GetDesc(&desc));
             std::lock_guard<std::mutex> lock(entry->mutex);
             desc.Size = entry->size;
@@ -642,9 +643,9 @@ namespace OutRunVRStereo
             return true;
         }
 
-        bool R30ReadVertexDesc(IDirect3DVertexBuffer9* buffer, D3DVERTEXBUFFER_DESC& desc)
+        bool R30ReadVertexDesc(IDirect3DVertexBuffer9* buffer, D3DVERTEXBUFFER_DESC& desc, const R30ShadowPtr& known = R30ShadowPtr())
         {
-            auto entry = R30FindVertexShadow(buffer);
+            auto entry = known ? known : R30FindVertexShadow(buffer);
             if (!entry) return SUCCEEDED(buffer->GetDesc(&desc));
             std::lock_guard<std::mutex> lock(entry->mutex);
             desc.Size = entry->size;
@@ -653,9 +654,9 @@ namespace OutRunVRStereo
 
         bool R30CopySparseVertexShadow(IDirect3DVertexBuffer9* buffer,
             UINT streamOffset, UINT stride, const std::vector<std::uint32_t>& physical,
-            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out)
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out, const R30ShadowPtr& known = R30ShadowPtr())
         {
-            const auto entry = R30FindVertexShadow(buffer);
+            const auto entry = known ? known : R30FindVertexShadow(buffer);
             if (!entry || physical.empty()) return false;
             std::lock_guard<std::mutex> lock(entry->mutex);
             if (entry->bytes.size() != entry->size) return false;
@@ -677,9 +678,9 @@ namespace OutRunVRStereo
         }
 
         bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
-            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out)
+            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out, const R30ShadowPtr& known = R30ShadowPtr())
         {
-            const auto entry = R30FindIndexShadow(buffer);
+            const auto entry = known ? known : R30FindIndexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
@@ -822,8 +823,10 @@ namespace OutRunVRStereo
         {
             if (!buffer)
                 return false;
-            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             auto** vtable = *reinterpret_cast<void***>(buffer);
+            const auto tableKey = reinterpret_cast<std::uintptr_t>(vtable);
+            if (R30VertexHooksReady.load(std::memory_order_acquire) == tableKey) return true;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             if (!R30VertexBufferLockHook)
                 R30VertexBufferLockHook = safetyhook::create_inline(
                     vtable[R30BufferLockVtableIndex],
@@ -836,16 +839,20 @@ namespace OutRunVRStereo
                 R30VertexBufferReleaseHook = safetyhook::create_inline(
                     vtable[R30BufferReleaseVtableIndex],
                     R30VertexBufferReleaseDest);
-            return R30VertexBufferLockHook &&
+            const bool ready = R30VertexBufferLockHook &&
                 R30VertexBufferUnlockHook && R30VertexBufferReleaseHook;
+            if (ready) R30VertexHooksReady.store(tableKey, std::memory_order_release);
+            return ready;
         }
 
         bool R30EnsureIndexBufferHooks(IDirect3DIndexBuffer9* buffer)
         {
             if (!buffer)
                 return false;
-            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             auto** vtable = *reinterpret_cast<void***>(buffer);
+            const auto tableKey = reinterpret_cast<std::uintptr_t>(vtable);
+            if (R30IndexHooksReady.load(std::memory_order_acquire) == tableKey) return true;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             if (!R30IndexBufferLockHook)
                 R30IndexBufferLockHook = safetyhook::create_inline(
                     vtable[R30BufferLockVtableIndex],
@@ -858,8 +865,10 @@ namespace OutRunVRStereo
                 R30IndexBufferReleaseHook = safetyhook::create_inline(
                     vtable[R30BufferReleaseVtableIndex],
                     R30IndexBufferReleaseDest);
-            return R30IndexBufferLockHook &&
+            const bool ready = R30IndexBufferLockHook &&
                 R30IndexBufferUnlockHook && R30IndexBufferReleaseHook;
+            if (ready) R30IndexHooksReady.store(tableKey, std::memory_order_release);
+            return ready;
         }
 
         HRESULT __stdcall R30CreateVertexBufferDest(
@@ -937,6 +946,9 @@ namespace OutRunVRStereo
 
         void R30RollbackBufferShadowHooks() noexcept
         {
+            std::lock_guard<std::mutex> hookLock(R30ShadowHookMutex);
+            R30VertexHooksReady.store(0, std::memory_order_release);
+            R30IndexHooksReady.store(0, std::memory_order_release);
             // Unhook entry points before dropping registry ownership. Any draw
             // holding a COM reference also holds a shared_ptr acquired from the
             // registry, so clearing the maps cannot invalidate an in-flight
@@ -4199,7 +4211,7 @@ namespace OutRunVRStereo
             if (state.worldEffect && state.fullWorldReprojection)
             {
                 if (!vertexCount || vertexCount > 262144u) return false;
-                try { sharedView.resize(vertexCount); } catch (...) { return false; }
+                try { if (sharedView.size() < vertexCount) sharedView.resize(vertexCount); } catch (...) { return false; }
             }
             bool leftFull = false;
             bool rightFull = false;
@@ -4706,7 +4718,7 @@ namespace OutRunVRStereo
             R30EnsureVertexBufferHooks(vb);
             const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
                 true, std::memory_order_acq_rel);
-            R30EnsureVertexShadow(vb);
+            const auto vertexShadow = R30EnsureVertexShadow(vb);
             if (!wasArmed && !R30FirstShadowArmLogged)
             {
                 R30FirstShadowArmLogged = true;
@@ -4720,7 +4732,7 @@ namespace OutRunVRStereo
                 static_cast<std::uint64_t>(startVertex) * stride;
             const std::uint64_t byteCount =
                 static_cast<std::uint64_t>(vertexCount) * stride;
-            if (!R30ReadVertexDesc(vb, desc) || firstByte > desc.Size ||
+            if (!R30ReadVertexDesc(vb, desc, vertexShadow) || firstByte > desc.Size ||
                 byteCount > desc.Size - firstByte ||
                 firstByte > UINT_MAX || byteCount > UINT_MAX)
             {
@@ -4737,7 +4749,7 @@ namespace OutRunVRStereo
             auto& scratch = *lease.buffers;
             if (!R30CopyVertexShadow(vb,
                     static_cast<UINT>(firstByte),
-                    static_cast<UINT>(byteCount), scratch.source))
+                    static_cast<UINT>(byteCount), scratch.source, vertexShadow))
             {
                 vb->Release();
                 ++R30XyzrhwFallbacks;
@@ -4815,8 +4827,8 @@ namespace OutRunVRStereo
             R30EnsureIndexBufferHooks(ib);
             const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
                 true, std::memory_order_acq_rel);
-            R30EnsureVertexShadow(vb);
-            R30EnsureIndexShadow(ib);
+            const auto vertexShadow = R30EnsureVertexShadow(vb);
+            const auto indexShadow = R30EnsureIndexShadow(ib);
             if (!wasArmed && !R30FirstShadowArmLogged)
             {
                 R30FirstShadowArmLogged = true;
@@ -4825,7 +4837,7 @@ namespace OutRunVRStereo
             }
 
             D3DINDEXBUFFER_DESC ibDesc{};
-            if (!R30ReadIndexDesc(ib, ibDesc) ||
+            if (!R30ReadIndexDesc(ib, ibDesc, indexShadow) ||
                 (ibDesc.Format != D3DFMT_INDEX16 &&
                  ibDesc.Format != D3DFMT_INDEX32))
             {
@@ -4858,7 +4870,7 @@ namespace OutRunVRStereo
             auto& scratch = *lease.buffers;
             if (!R30CopyIndexShadow(ib,
                     static_cast<UINT>(firstIndexByte),
-                    static_cast<UINT>(indexBytes), scratch.indexSource))
+                    static_cast<UINT>(indexBytes), scratch.indexSource, indexShadow))
             {
                 ib->Release();
                 vb->Release();
@@ -4923,7 +4935,7 @@ namespace OutRunVRStereo
                 static_cast<std::uint64_t>(minPhysical) * stride;
             const std::uint64_t vertexBytes =
                 static_cast<std::uint64_t>(vertexCount) * stride;
-            if (!R30ReadVertexDesc(vb, vbDesc) ||
+            if (!R30ReadVertexDesc(vb, vbDesc, vertexShadow) ||
                 firstVertexByte > vbDesc.Size ||
                 vertexBytes > vbDesc.Size - firstVertexByte ||
                 firstVertexByte > UINT_MAX || vertexBytes > UINT_MAX)
@@ -4945,7 +4957,7 @@ namespace OutRunVRStereo
                 }
                 catch (...) { ib->Release(); vb->Release(); return E_NOTIMPL; }
                 if (!R30CopySparseVertexShadow(vb, streamOffset, stride,
-                        scratch.compactPhysical, scratch.source))
+                        scratch.compactPhysical, scratch.source, vertexShadow))
                 { ib->Release(); vb->Release(); ++R30XyzrhwFallbacks; return E_NOTIMPL; }
                 // Remap indices without changing primitive order or attributes.
                 for (auto& index : scratch.physical)
@@ -4954,14 +4966,13 @@ namespace OutRunVRStereo
                         - scratch.compactPhysical.begin());
                 minPhysical = 0;
                 vertexCount = static_cast<UINT>(scratch.compactPhysical.size());
-                try { scratch.used.assign(vertexCount, 1); }
-                catch (...) { ib->Release(); vb->Release(); return E_NOTIMPL; }
+                // Every compacted vertex occurs in the original index stream.
             }
             else
             {
             if (!R30CopyVertexShadow(vb,
                     static_cast<UINT>(firstVertexByte),
-                    static_cast<UINT>(vertexBytes), scratch.source))
+                    static_cast<UINT>(vertexBytes), scratch.source, vertexShadow))
             {
                 ib->Release();
                 vb->Release();
@@ -4997,10 +5008,10 @@ namespace OutRunVRStereo
 
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, scratch.source.data(), vertexCount,
-                    stride, state, &scratch.used) ||
+                    stride, state, compact ? nullptr : &scratch.used) ||
                 !R30TransformXyzrhwStereo(
                     scratch.source.data(), vertexCount, stride, state,
-                    scratch.left, scratch.right, scratch.restoredView, &scratch.used))
+                    scratch.left, scratch.right, scratch.restoredView, compact ? nullptr : &scratch.used))
             {
                 ib->Release();
                 vb->Release();

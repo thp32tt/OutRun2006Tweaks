@@ -47,6 +47,7 @@ struct IDirect3DDevice9{
 // @COPY@
 struct IDirect3DVertexBuffer9{};
 struct Shadow{std::mutex mutex;UINT size=0;std::vector<std::uint8_t> bytes;std::vector<std::pair<UINT,UINT>> valid;};
+using R30ShadowPtr = std::shared_ptr<Shadow>;
 std::shared_ptr<Shadow> shadow;
 auto R30FindVertexShadow(IDirect3DVertexBuffer9*){return shadow;}
 unsigned R30ShadowReadHits=0;
@@ -78,8 +79,11 @@ int main(){
    case 10:std::fill(used.begin(),used.end(),0);break;
   }
   const auto* mask=test%2?&used:nullptr;
+  const auto priorScratchSize=shared.size();
   bool a=R30TransformXyzrhwStereo(v.data(),n,sizeof(Vertex),st,al,ar,shared,mask);
-  bool b=ReferenceTransformXyzrhwStereo(v.data(),n,sizeof(Vertex),st,bl,br,mask);
+  CHECK(shared.size()>=priorScratchSize);
+  std::vector<std::uint8_t> allUsed(n,1);
+  bool b=ReferenceTransformXyzrhwStereo(v.data(),n,sizeof(Vertex),st,bl,br,mask?mask:&allUsed);
   CHECK(a==b);
   if(a){++success;CHECK(al.size()==bl.size()&&ar.size()==br.size());if(std::memcmp(al.data(),bl.data(),al.size())||std::memcmp(ar.data(),br.data(),ar.size()))++mismatches;}
  }
@@ -94,6 +98,13 @@ int main(){
  CHECK(cacheBuilds==1);
  for(int field=0;field<5;++field){switch(field){case 0:projection._11+=.1f;break;case 1:stereo.eyeOrientation[1][1]=.1f;break;case 2:stereo.eyeOffset[0][2]=.1f;break;case 3:stereo.eyeFov[1].angleRight+=.1f;break;case 4:Settings::VRWorldScale+=.1f;break;}CHECK(R26CachedEyeMath(projection,stereo));CHECK(cacheBuilds==unsigned(field+2));}
  std::puts("PASS actual eye cache: identical results, repeat hit, projection/quaternion/offset/FOV/scale invalidation");
+
+ auto alternate=stereo;alternate.eyeOffset[0][0]+=.125f;
+ CHECK(R26CachedEyeMath(projection,stereo));CHECK(R26CachedEyeMath(projection,alternate));
+ const auto warmBuilds=cacheBuilds;
+ for(unsigned i=0;i<100;++i)CHECK(R26CachedEyeMath(projection,(i%2)?stereo:alternate));
+ CHECK(cacheBuilds==warmBuilds);
+ std::puts("PASS alternating eye inputs: 100 warm requests, zero recomputations");
  IDirect3DDevice9 dev;IDirect3DSurface9 source,target;
  CHECK(StretchDirectEye(&dev,&source,&target)==0&&dev.linear==0&&dev.none==1);
  DirectTransportWidth=1500;++DirectTransportGeneration;dev.linearResult=D3DERR_INVALIDCALL;
@@ -112,5 +123,9 @@ int main(){
  for(unsigned i=0;i<physical.size();++i)CHECK(!std::memcmp(sparse.data()+physical[i]*28,shadow->bytes.data()+16+original[i]*28,28));
  shadow->valid={{0,200}};CHECK(!R30CopySparseVertexShadow(&vb,16,28,unique,sparse));
  shadow->valid={{0,10000}};CHECK(!R30CopySparseVertexShadow(&vb,0,28,{UINT(-1)},sparse));
+ auto retained=shadow;shadow.reset();
+ CHECK(R30CopySparseVertexShadow(&vb,16,28,unique,sparse,retained));
+ CHECK(!R30CopySparseVertexShadow(&vb,16,28,unique,sparse));
+ std::puts("PASS retained per-draw shadow remains valid after registry removal");
  std::puts("PASS actual sparse shadow copy: primitive order/attributes, missing provenance, overflow bounds");
 }

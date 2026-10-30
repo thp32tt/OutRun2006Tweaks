@@ -762,10 +762,11 @@ namespace OutRunVRStereo
             append(stereo.eyeOffset, sizeof(stereo.eyeOffset));
             append(stereo.eyeFov, sizeof(stereo.eyeFov));
             append(&scale, sizeof(scale));
-            static thread_local std::array<unsigned char, KeyBytes> previous{};
-            static thread_local R26EyeMathPair cached{};
-            static thread_local bool valid = false;
-            if (valid && key == previous) return &cached;
+            struct Entry { std::array<unsigned char, KeyBytes> key{}; R26EyeMathPair value{}; bool valid=false; };
+            static thread_local std::array<Entry, 4> entries{};
+            static thread_local unsigned next = 0;
+            for (auto& entry : entries)
+                if (entry.valid && entry.key == key) return &entry.value;
             R26EyeMathPair candidate{};
             for (int eye = 0; eye < 2; ++eye)
             {
@@ -778,8 +779,10 @@ namespace OutRunVRStereo
             }
             // Recenter, Reset and pose/FOV changes need no resource lifetime
             // assumption: every mathematical input is included in the key.
-            previous = key; cached = candidate; valid = true;
-            return &cached;
+            auto& entry = entries[next];
+            next = (next + 1) % entries.size();
+            entry.key = key; entry.value = candidate; entry.valid = true;
+            return &entry.value;
         }
 
 		EyeBuildResult BuildEyeConstants(IDirect3DDevice9* device, const OutRunVRRenderer::LatchedStereoFrame& stereo, DrawStereoState& state)
