@@ -2,6 +2,7 @@
 """ChatGPT browser-attachment vision OCR fallback. No external API."""
 from __future__ import annotations
 import csv, datetime as dt, hashlib, io, json, os, re, tempfile, zipfile
+from functools import lru_cache
 from pathlib import Path
 from PIL import Image
 
@@ -18,6 +19,7 @@ AUDIT_PATH=QUEUE_DIR/"audit.jsonl"
 # mount. This read-only rescue input is strictly SHA-bound and cannot approve
 # an OCR result; it only allows a verified chat-vision retry.
 HOST_RETRY_PATH=Path("/data/imagegen/text_roi_batches/ocr_host_verified_retries.json")
+PRODUCTION_MANIFEST=Path("/data/imagegen/text_roi_batches/production_manifest.json")
 VERSION="gpt-chat-vision-ocr-v1-20261025"
 OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
@@ -105,6 +107,50 @@ def _manifest_rows():
 def _output_roots():
     return (OUT,GPT_OUT)
 
+@lru_cache(maxsize=3)
+def _production_regions_cached(path,mtime_ns,size):
+    """Only SHA-bound, registered English UI regions; read once per manifest version."""
+    try:
+        if size<=0 or size>20000000:
+            return {}
+        j=json.loads(Path(path).read_text(encoding="utf-8"))
+        if not isinstance(j,dict) or j.get("schema")!="outrun-text-roi-production-v1":
+            return {}
+        items=j.get("items")
+        if not isinstance(items,list) or j.get("item_count")!=len(items):
+            return {}
+        by_sha={}
+        for item in items:
+            if not isinstance(item,dict) or item.get("status") not in (
+                    "ROI_APPROVED_FOR_IMAGEGEN","ROI_REBALANCED_TO_B"):
+                continue
+            source_sha=item.get("source_png_sha256")
+            english=item.get("english")
+            box=item.get("bbox_xyxy")
+            if (not isinstance(source_sha,str) or not re.fullmatch(r"[0-9a-f]{64}",source_sha)
+                    or not isinstance(english,str) or not english.strip()
+                    or not isinstance(box,list) or len(box)!=4
+                    or not all(type(x) is int for x in box)
+                    or box[0]<0 or box[1]<0 or box[2]<=box[0] or box[3]<=box[1]):
+                continue
+            by_sha.setdefault(source_sha,[]).append((english.strip(),tuple(box)))
+        return by_sha
+    except (OSError,ValueError,TypeError,json.JSONDecodeError):
+        return {}
+
+
+def _production_regions(source_sha):
+    """Production records are ROI coverage, not evidence of image/game QA."""
+    p=PRODUCTION_MANIFEST
+    try:
+        if not p.is_file() or p.is_symlink():
+            return []
+        st=p.stat()
+        return _production_regions_cached(str(p),st.st_mtime_ns,st.st_size).get(source_sha,[])
+    except OSError:
+        return []
+
+
 def _covered_phrases(source_png,source_sha):
     covered=set()
     for root in _output_roots():
@@ -118,6 +164,7 @@ def _covered_phrases(source_png,source_sha):
                     covered.add(_norm(j["english"]))
             except Exception:
                 pass
+    covered.update(_norm(english) for english,_ in _production_regions(source_sha))
     return covered
 
 def _exhausted_candidates():
@@ -286,6 +333,7 @@ def _known_ocr_regions(source_png,source_sha):
                 found.add((phrase.strip()[:100],tuple(box)))
             except Exception:
                 continue
+    found.update(_production_regions(source_sha))
     return sorted(found,key=lambda x:(x[1],x[0]))
 
 
