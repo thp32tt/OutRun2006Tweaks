@@ -1192,7 +1192,7 @@ def queue_dynamic_prefix() -> str:
             "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해."
         ),
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
-        "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
+        ("각 실행 응답에는 TASK_ID, LATEST_MATERIAL_SHA, FULL_GAME_STATUS=IN_PROGRESS, P0_P9_GATE, NEXT_ACTION을 남기고 전체 게임이 완성되지 않았다면 바로 다음 구현을 계속해. 소스 커밋 하나로 답변·작업을 종료하지 마." if lane == "UW2" else "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해."),
     ]
     if lane == "UW2":
         lines += [
