@@ -4545,7 +4545,8 @@ namespace OutRunVRStereo
                 "VR TRACE XYZRHW VISUAL EYES FULL: qpc={} serial={} family={} api={} "
                 "producer={} scope={} queued={} node=0x{:X} epoch={} "
                 "primitiveCount={} vertexCount={} stride={} worldEffect={} "
-                "rhwDepthEvidence={} hudWorldLock={} screenOverlay={} "
+                "rhwDepthEvidence={} gameProjectedWorldCanvas={} "
+                "hudWorldLock={} screenOverlay={} "
                 "left=0x{:08X} rightTarget=0x{:08X} rightDepth=0x{:08X} "
                 "rightViewport=0x{:08X} right=0x{:08X} restore={} result=0x{:08X} "
                 "sourceCallSerial={} sequence={} sourceObj=0x{:06X} sourceSite={} "
@@ -4566,6 +4567,7 @@ namespace OutRunVRStereo
                 primitiveCount, vertexCount, stride,
                 state.worldEffect ? 1 : 0,
                 state.rhwDepthEvidence ? 1 : 0,
+                state.gameProjectedWorldSourceCanvas ? 1 : 0,
                 state.hudWorldLockValid ? 1 : 0,
                 state.screenOverlay2D ? 1 : 0,
                 static_cast<unsigned>(pass.leftHr),

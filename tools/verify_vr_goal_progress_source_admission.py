@@ -105,6 +105,10 @@ tests=[
         "if (!Settings::VREnabled || !GoalResultPresentationState())" in stack_guard and
         "GoalResultPresentationState()" in d3dx_bridge and
         "*Game::current_mode == GameState::STATE_GOAL" not in d3dx_bridge),
+    ("TIMEUP/RESULT unowned queue diagnostics use shared presentation state",
+        '(*Game::current_mode == GameState::STATE_GAME ||' in src and
+        "GoalResultPresentationState())" in src and
+        "VR TRACE UNOWNED QUEUE SIGNATURE:" in src),
     ("B9200 post-drain exact parent admission",
         "const OutRunVR::GoalProgress::SourceAdmission admission{" in b9200 and
         b9200.index("FlushD3DXBeforeDirectGoalSource();") <

@@ -42,6 +42,7 @@ required = {
         "VR TRACE LENS LOWER FALLBACK FULL:",
         "VR TRACE VISUAL LOWER PHYSICAL RESULT FULL:",
         "VR TRACE XYZRHW VISUAL EYES FULL:",
+        "gameProjectedWorldCanvas={}",
         "opaqueFlushSerial={}",
         "opaqueFlushOrigin={}",
         "VR TRACE LENS GPU STATE FULL:",

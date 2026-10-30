@@ -380,7 +380,7 @@ static bool GoalResultPresentationState() noexcept
         state == GameState::STATE_RESULT;
 }
 
-// Preserve the original nineteen B9200 E8 CALLs: prior +5 return-site
+// Preserve the 21 canonical B9200 E8 CALLs: prior +5 return-site
 // trampolines corrupted legal branch targets. The glyph producer and direct
 // D3DX GPU sink share stack-only exact parent proof instead.
 static bool OriginalB9200GoalStackActive() noexcept
@@ -3252,7 +3252,7 @@ class UIScaling : public Hook
         }
 		return result;
 	}
-    // 2026-10-11 Quest3 dumps proved that hooking any of the nineteen
+    // 2026-10-11 Quest3 dumps proved that hooking any canonical
     // original GOAL B9200 E8 return sites can corrupt a legal branch target.
     // Recover the source from its exact return address on the call stack of
     // the ALREADY installed 0x2C808/0x2C9DB glyph wrapper instead.
@@ -5659,11 +5659,12 @@ class VRHudQueueSemanticBridge : public Hook
 		OutRunVR::GameSemantic::SelectSpriteQueueNode(node);
         // 2026-10-29: the historical 0x989xx StageExtension group is a
         // GOAL result panel, not proof of the live checkpoint +TIME popup.
-        // Record unique unowned GAME/GOAL nodes without changing ownership.
+        // Record unique unowned GAME and GOAL/TIMEUP/RESULT nodes without
+        // changing ownership; this is telemetry only.
         if (Settings::VREnabled && Settings::VRTelemetry && node &&
             Game::current_mode &&
             (*Game::current_mode == GameState::STATE_GAME ||
-             *Game::current_mode == GameState::STATE_GOAL) &&
+             GoalResultPresentationState()) &&
             OutRunVR::GameSemantic::CurrentQueueProducerToken() ==
                 OutRunVR::GameSemantic::ProducerToken::None)
         {
