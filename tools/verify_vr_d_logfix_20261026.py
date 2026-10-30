@@ -16,8 +16,8 @@ assert "GetTickCount64() + 8000ULL" in ex and "Sleep(50);" in ex
 assert "state == GameState::STATE_TIMEUP" in ui and "ResultPresentationState()" in ui
 assert "ResultProgressAdmission.mayPublish(" in ui and "parentAdmission.mayPublish(" in ui
 assert "RivalDx11NativeRoute = false" in ini and "'-RivalDx11NativeRoute=false'" in run
-assert "MirrorPreserveAspect = true" in ini and "'-MirrorPreserveAspect=true'" in run
+assert "MirrorPreserveAspect = false" in ini and "'-MirrorPreserveAspect=false'" in run
 assert 'getboolean("VR","RivalDx11NativeRoute") is False' in flow
-assert 'getboolean("VR","MirrorPreserveAspect") is True' in flow
+assert 'getboolean("VR","MirrorPreserveAspect") is False' in flow
 assert "foreach ($mode in @(\'TEST\',\'DEBUG\'))" in flow
 print("Quest D log/source/packaging static PASS; HMD untested")

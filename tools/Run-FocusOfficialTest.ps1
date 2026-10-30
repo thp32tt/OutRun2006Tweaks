@@ -70,7 +70,7 @@ try {
         '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
         '-RivalDx11NativeRoute=false','-UIScalingMode=1',
         '-AutoRenderResolution=true','-FollowGameResolution=false',
-        '-MirrorPreserveAspect=true',
+        '-MirrorPreserveAspect=false',
         '-UnifiedEyeMenuSource=false','-AntiAliasing=2',
         '-Hud1080pReference=true','-HudScale=0.55',
         '-MenuScale=1.00','-CullingUnionMarginDegrees=8.0'
