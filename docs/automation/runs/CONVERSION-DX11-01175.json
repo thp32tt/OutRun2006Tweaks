@@ -174,5 +174,41 @@
   "score_change_proposed": 1,
   "scoreboard_previous_before_this_task": 2210,
   "scoreboard_new_if_recorded": 2211,
-  "notes": "Same task retry E002, inherited metadata repair, C6, readback and extra checks +0; proposed source reward at most once after exact SHA verification."
+  "notes": "Same task retry E002, inherited metadata repair, C6, readback and extra checks +0; proposed source reward at most once after exact SHA verification.",
+  "acceptance_results": {
+    "dual_capture_four_islands": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate push run 41004595065 completed SUCCESS at affb662fbf6bf39ee0f874541c3f1a2d5fa834fb"
+    },
+    "dirty_union_and_input_fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast push 41004595165 and Backend 41004595065 completed SUCCESS at affb662fbf6bf39ee0f874541c3f1a2d5fa834fb"
+    },
+    "immutable_queued_staging": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "Windows Build push 41004595096 completed SUCCESS at affb662fbf6bf39ee0f874541c3f1a2d5fa834fb"
+    },
+    "five_exact_sha_push_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Exact affb662fbf6bf39ee0f874541c3f1a2d5fa834fb five push Gates all SUCCESS: 41004595165, 41004595065, 41004595096, 41004595067, 41004595115"
+    }
+  }
 }
