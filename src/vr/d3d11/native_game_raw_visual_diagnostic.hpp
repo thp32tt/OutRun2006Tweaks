@@ -109,7 +109,7 @@ public:
     void reset() noexcept {
         staging_.Reset(); baseline_.Reset();
         stagingAlternate_.Reset(); baselineAlternate_.Reset();
-        surfaceAlternate_.Reset();
+        surfaceAlternate_.Reset(); surfaceRemainder_.Reset();
         sourceGameTarget_.Reset();
         sourceGameTargetIdentity_.Reset();
         sourceAlignedPixelsThisPresent_ = 0u;
@@ -508,6 +508,7 @@ public:
                 if (format_ != back.Format) {
                     surface_.Reset();
                     surfaceAlternate_.Reset();
+                    surfaceRemainder_.Reset();
                     format_ = back.Format;
                 }
                 // Each region owns a distinct SYSTEMMEM staging surface. The
@@ -590,12 +591,14 @@ public:
                     if (paint(surface_, before, mapped, firstTile)) {
                         nativePixels = firstPixels;
                         if (firstAligned) sourceAlignedPixelsThisPresent_ = firstPixels;
-                        // A second UpdateSurface references identical,
-                        // immutable staging bytes after the first upload.
-                        // Both destination rectangles are independently
-                        // authenticated and disjoint in the original game.
+                        // The D3D9 driver can enqueue UpdateSurface instead
+                        // of consuming SYSTEMMEM bytes synchronously. Keep
+                        // a separate owned upload surface for this second
+                        // authentic GPU island: repainting surface_ here
+                        // could mutate the first upload's queued source.
+                        // Both destinations are independently authenticated.
                         if (sameDrawRemainderVisible &&
-                            paint(surface_, before, mapped, sameDrawRemainder)) {
+                            paint(surfaceRemainder_, before, mapped, sameDrawRemainder)) {
                             nativePixels += sameDrawRemainderPixels;
                             sourceAlignedPixelsThisPresent_ +=
                                 sameDrawRemainderPixels;
@@ -870,6 +873,7 @@ private:
             // race. A previously created D3D9 SYSTEMMEM tile must not be
             // reused with a newly sized native GPU capture.
             surface_.Reset(); surfaceAlternate_.Reset();
+            surfaceRemainder_.Reset();
             captureFormat_ = stagedFormat;
             captureWidth_ = width; captureHeight_ = height;
         }
@@ -973,7 +977,7 @@ private:
     NativeRawColorByteOrder sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
-    Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_;
+    Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_, surfaceRemainder_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> sourceGameTarget_;
     Microsoft::WRL::ComPtr<IUnknown> sourceGameTargetIdentity_;
     UINT sourceAlignedPixelsThisPresent_ = 0u;
