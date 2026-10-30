@@ -1,0 +1,70 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1945KST-IDLE",
+  "observed_slot_kst": "2026-10-30T19:45:00+09:00",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "result": "IDLE",
+  "reason": "No unreviewed A/B candidate SHA was found in the N100 local exported PNG inventory. No candidate PNG was created or modified after prior C1 review cutoff.",
+  "inventory": {
+    "source": "N100 work/image-src/text_roi_batches",
+    "candidate_pngs": {
+      "A": 437,
+      "B": 483,
+      "total": 920
+    },
+    "export_evidence_matched_filename_count": 920,
+    "export_evidence_missing_count": 0,
+    "reviewed_unique_candidate_sha_count": 925,
+    "qa_report_files_scanned": 197,
+    "new_or_modified_candidate_png_after_cutoff": 0,
+    "export_sha_unreviewed_count": 0,
+    "sha_matching_method": "Export evidence SHA mapped to filename, recursively compared against prior C1 report candidate SHA fields; only two newest physical PNG bytes were separately re-hashed for this check."
+  },
+  "last_review_cutoff_kst": "2026-10-30T18:21:49+09:00",
+  "latest_candidate_checks": [
+    {
+      "role": "A",
+      "file": "Q228_3df4ed65ab58f44f_k.png",
+      "mtime_kst": "2026-10-30T18:00:02+09:00",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "previously_reviewed": true
+    },
+    {
+      "role": "B",
+      "file": "Q228_6a1d77db05265918_k.png",
+      "mtime_kst": "2026-10-30T17:50:07+09:00",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "previously_reviewed": true
+    }
+  ],
+  "outcome": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": {
+    "local_inventory": "work/C1_QA_20261030_1945_inventory_readonly.py",
+    "local_dedup": "work/C1_QA_20261030_1945_dedup_readonly.py",
+    "previous_qa": "localization/qa_reports/C1_20261030_1815_Q228_new_sha2.json"
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_created": false,
+    "c2_c3_or_game_pass_created": false,
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "scoring": {
+    "reason": "IDLE/status-only, no new candidate QA achievement",
+    "change": 0
+  }
+}
