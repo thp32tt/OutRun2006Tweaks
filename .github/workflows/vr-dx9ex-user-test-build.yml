@@ -11,6 +11,7 @@ on:
       - '.github/workflows/vr-dx9ex-user-test-build.yml'
       - 'tools/Run-DX9ExFocusTest.ps1'
       - 'tools/verify_vr_r26_stage_fixedfn.py'
+      - 'tools/verify_vr_r26_occlusion_present_fastpath.py'
       - 'tools/verify_vr_desktop_source_coordinates.py'
       - 'tools/verify_vr_unified_menu_source.py'
       - 'tools/verify_vr_menu_resolution_split.py'
@@ -21,6 +22,7 @@ on:
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'tools/verify_vr_lens_transaction_trace.py'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r26.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
       - 'src/hooks_uiscaling.cpp'
       - 'src/overlay/hooks_overlay.cpp'
@@ -56,6 +58,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'R26 visual recovery bundle contract failed' }
           python tools/verify_vr_r26_stage_fixedfn.py
           if ($LASTEXITCODE -ne 0) { throw '+TIME four-API source regression failed' }
+          python tools/verify_vr_r26_occlusion_present_fastpath.py
+          if ($LASTEXITCODE -ne 0) { throw 'R26 occlusion/StateBlock fail-closed contract failed' }
           python tools/verify_dx9ex_full_visual_trace_contract.py
           if ($LASTEXITCODE -ne 0) { throw 'One-pass FULL visual trace contract failed' }
 
