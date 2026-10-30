@@ -132,5 +132,38 @@ class Uw2LongRunningTest(unittest.TestCase):
         self.assertEqual(len(self.q["completed"]), 1)
 
 
+    def test_upgrade_reopens_latest_partial_terminal_without_new_id(self):
+        # The old UW2 controller incorrectly marked a single source commit DONE.
+        # A deployment upgrade must restore that last job rather than allocate
+        # another production number and abandon unfinished original-game work.
+        cycle = NODES["conversion_parallel_cycle"]
+        migration = next(node for node in ast.walk(cycle)
+                         if isinstance(node, ast.If)
+                         and "uw2_full_game_continuation_version" in ast.unparse(node.test))
+        previous = dict(self.active)
+        previous.update(phase="DONE", terminal="PASS", status="DONE",
+                        result_sha=SHA_B,
+                        terminal_verification="UW2_TAGGED_WEB_SOURCE_ON_TARGET")
+        q = {"completed": [previous], "active_by_lane": {}}
+        state = {
+            "UW2_WEB_PORT_ENABLED": True,
+            "UW2_GITHUB_REPO": REPO,
+            "UW2_TARGET_BRANCH": BRANCH,
+            "q": q, "active_by_lane": q["active_by_lane"],
+            "now": self.now, "re": re,
+            "write_runtime": lambda **kw: None,
+            "save_queue_state": lambda q: None,
+        }
+        exec(compile(ast.fix_missing_locations(
+            ast.Module(body=[migration], type_ignores=[])), "<migration>", "exec"),
+             state)
+        restored = q["active_by_lane"]["C"]
+        self.assertEqual(restored["task_id"], previous["task_id"])
+        self.assertEqual(restored["phase"], "WAIT_CHAT")
+        self.assertIsNone(restored["terminal"])
+        self.assertEqual(restored["uw2_last_material_sha"], SHA_B)
+        self.assertEqual(q["uw2_full_game_continuation_version"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()
