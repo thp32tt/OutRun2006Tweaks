@@ -1,0 +1,61 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-IDLE-20261030T1717KST",
+  "observed_at_kst": "2026-10-30T17:17:02+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "status": "IDLE",
+  "policy_blobs": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "inventory_method": "N100 read-only execution of work/C1_QA_20261030_0545_inventory.py; counts, modification cutoff, A/B states, and last two candidate SHA256 verified against the prior C1 05:15 report.",
+  "last_c1_review": "OUTRUN-C1-AI2-20261030T0515KST-NEW-SHA2",
+  "last_review_evidence": "N100 work/C1_QA_20261030_0515_AI2_report.json",
+  "candidate_exports": {
+    "A": 436,
+    "B": 482,
+    "total": 918
+  },
+  "files_modified_after_last_review": 0,
+  "last_two_reviewed_shas_verified": {
+    "A": {
+      "file": "Q043_8845a649913b5ecf_k.png",
+      "sha256": "04b523d531fb8681b93d573e0f80984fcf9c4a50e66158971ec37ba54715d9b2",
+      "unchanged": true
+    },
+    "B": {
+      "file": "Q046_d10debc727463563_k.png",
+      "sha256": "378c7dd32b50143cd2602e7a1fd02c3352f31dc5e9ec3d8939f071e09c6458c5",
+      "unchanged": true
+    }
+  },
+  "state": {
+    "A": {
+      "completed_files": 435,
+      "completed_batches": 141,
+      "active": null
+    },
+    "B": {
+      "completed_files": 482,
+      "completed_batches": 145,
+      "active": null
+    }
+  },
+  "qa": {
+    "new_candidate_sha_after_last_review": 0,
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "notes": [
+    "918 on-disk exported filenames vs 917 aggregate completed_files is a metadata count difference, not evidence of a new unreviewed SHA. No candidate file changed after 05:15; do not infer unknown candidate approval.",
+    "No new QA PASS or FAIL is issued; prior SHA reviews remain unchanged.",
+    "Transparency, glyph integrity, glyph-scale and in-game protection cannot be re-adjudicated without a new candidate.",
+    "C2/C3/DDS/game approval not attempted. RUNTIME_VALIDATION=UNTESTED.",
+    "No ImageGen call, no A/B queue consumption, no Docker/Portainer deployment, and no VR/FFB/DX11/DXVK changes."
+  ]
+}
