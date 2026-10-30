@@ -36,7 +36,7 @@ def verify(source):
     assert positions == sorted(positions)
     for token in ("colorWrite != 0", "zWrite != FALSE",
                   "if (stencilEnable == FALSE)\n                return true;",
-                  "stencilWriteMask == 0", "if (!device)",
+                  "stencilWriteMask == 0", "if (!device ||",
                   "StateBlockTracker::Reliable()"):
         assert token in occ, token
     assert occ.index("StateBlockTracker::Reliable()") < positions[0]
