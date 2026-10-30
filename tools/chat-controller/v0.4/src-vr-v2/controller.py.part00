@@ -1194,7 +1194,7 @@ def queue_dynamic_prefix() -> str:
             "MODE=ORIGINAL_UW2_WEB_PORT. 오직 thp32tt/ai-dev-lab@uw2-web-port를 개발해. OutRun DX9Ex/DX11/DXVK 코드는 수정하지 마.",
             "원작 OPEN.EXE→MAIN.EXE 실행 순서, 한국어판 그래픽/음악/게임 규칙/세이브/항해/도시를 역어셈블리 증거와 대조하고 추정 구현은 추정이라 표시해. 원작 게임을 새로 디자인하지 마.",
             "계획을 GitHub에 기록하고 최신 진행 위치를 이어받아 실제 미완료 웹 소스 1개 이상과 필요한 회귀를 구현해. REVIEW_ONLY나 상태 보고만으로 종료하지 마.",
-            "완료 판정은 이 TASK_ID의 [AUTO:TASK_ID] 태그가 있는 실제 web/ 소스 변경 커밋을 기준으로 하며 단순 문서·테스트 전용 커밋은 완료가 아니다.",
+            "완료 판정은 이 TASK_ID의 [AUTO:TASK_ID] 태그가 있는 실제 uw2-web/ 또는 web/ 소스 변경 커밋을 기준으로 하며 단순 문서·테스트 전용 커밋은 완료가 아니다.",
             "실행하지 않은 브라우저/원작 바이너리 테스트는 PASS라 주장하지 마. TASK_ID/RESULT_SHA/검증 상태를 정확히 보고해.",
         ]
     if lane == "DX9EX":
