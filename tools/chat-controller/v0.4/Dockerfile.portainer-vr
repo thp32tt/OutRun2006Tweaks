@@ -34,7 +34,6 @@ COPY vr_C.md /opt/outrun/prompts/vr_C.md
 COPY conversion_dx11.md /opt/outrun/prompts/conversion_dx11.md
 COPY conversion_dxvk.md /opt/outrun/prompts/conversion_dxvk.md
 COPY conversion_dx9ex.md /opt/outrun/prompts/conversion_dx9ex.md
-COPY uw2_web_port.md /opt/outrun/prompts/uw2_web_port.md
 COPY conversion_continuous_dx11.md /opt/outrun/prompts/conversion_continuous_dx11.md
 COPY conversion_continuous_dx9ex.md /opt/outrun/prompts/conversion_continuous_dx9ex.md
 
