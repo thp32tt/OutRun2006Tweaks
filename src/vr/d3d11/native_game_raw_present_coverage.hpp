@@ -128,6 +128,13 @@ struct NativeRawPresentDirtyRegion {
         dirty.count > NativeRawPresentDirtyRegion::kMaxRects ||
         (exclude && (!excludeCount || excludeCount > 4u)))
         return false;
+    // Exclusion is a claim of a previous original-game upload. Reject
+    // foreign/forged destination claims before considering any fragments.
+    if (exclude)
+        for (std::uint32_t i = 0u; i < excludeCount; ++i)
+            if (!native_raw_dirty_region_covers_tile(
+                    backWidth, backHeight, dirty, exclude[i]))
+                return false;
     const auto right = sourceAligned.destinationX + sourceAligned.copyWidth;
     const auto bottom = sourceAligned.destinationY + sourceAligned.copyHeight;
     std::uint64_t bestArea = 0u;
@@ -136,7 +143,7 @@ struct NativeRawPresentDirtyRegion {
     // fragments, even though their whole union reached the D3D9 Present.
     // Proposals below never confer visibility: validate the ORIGINAL entire
     // dirty region, the exact candidate pixels, and the native GPU RGB delta.
-    const auto consider = [&](std::int64_t left, std::int64_t top,
+    const auto evaluateCandidate = [&](std::int64_t left, std::int64_t top,
                               std::int64_t rectRight,
                               std::int64_t rectBottom) noexcept {
         const auto l = (std::max)(sourceAligned.destinationX, left);
@@ -145,10 +152,16 @@ struct NativeRawPresentDirtyRegion {
         const auto b = (std::min)(bottom, rectBottom);
         if (r <= l || b <= t) return;
         NativeRawPresentTile candidate = sourceAligned;
-        candidate.sourceX += static_cast<std::uint32_t>(
+        const auto offsetX = static_cast<std::uint64_t>(
             l - sourceAligned.destinationX);
-        candidate.sourceY += static_cast<std::uint32_t>(
+        const auto offsetY = static_cast<std::uint64_t>(
             t - sourceAligned.destinationY);
+        if (offsetX > (std::numeric_limits<std::uint32_t>::max)() -
+                          sourceAligned.sourceX ||
+            offsetY > (std::numeric_limits<std::uint32_t>::max)() -
+                          sourceAligned.sourceY) return;
+        candidate.sourceX += static_cast<std::uint32_t>(offsetX);
+        candidate.sourceY += static_cast<std::uint32_t>(offsetY);
         candidate.copyWidth = static_cast<std::uint32_t>(r - l);
         candidate.copyHeight = static_cast<std::uint32_t>(b - t);
         candidate.destinationX = l;
@@ -172,6 +185,76 @@ struct NativeRawPresentDirtyRegion {
             cropped = candidate;
             changedRgb = rgb;
             bestArea = area;
+        }
+    };
+    // Two real Draw source rectangles can overlap but affect different RGB
+    // pixels. Subtract earlier source-aligned uploads, preserving later GPU
+    // source coordinates and original game Present dirty-region coverage.
+    const auto consider = [&](std::int64_t left, std::int64_t top,
+                              std::int64_t rectRight,
+                              std::int64_t rectBottom) noexcept {
+        const auto l = (std::max)(sourceAligned.destinationX, left);
+        const auto t = (std::max)(sourceAligned.destinationY, top);
+        const auto r = (std::min)(right, rectRight);
+        const auto b = (std::min)(bottom, rectBottom);
+        if (r <= l || b <= t) return;
+        if (!exclude) {
+            evaluateCandidate(l, t, r, b);
+            return;
+        }
+        bool intersects = false;
+        for (std::uint32_t i = 0u; i < excludeCount; ++i) {
+            const auto& q = exclude[i];
+            if (l < q.destinationX + q.copyWidth && r > q.destinationX &&
+                t < q.destinationY + q.copyHeight && b > q.destinationY) {
+                intersects = true;
+                break;
+            }
+        }
+        if (!intersects) {
+            evaluateCandidate(l, t, r, b);
+            return;
+        }
+        // Four exclusions create at most 1+3*4 disjoint pieces. No heap
+        // allocation, uncertain coverage or partial overflow acceptance.
+        constexpr std::size_t kMaxPieces = 13u;
+        std::array<NativeRawPresentDirtyRect, kMaxPieces> pieces{}, next{};
+        pieces[0] = {l, t, r, b};
+        std::size_t count = 1u;
+        for (std::uint32_t i = 0u; i < excludeCount; ++i) {
+            const auto& q = exclude[i];
+            const auto ql = q.destinationX, qt = q.destinationY;
+            const auto qr = ql + q.copyWidth, qb = qt + q.copyHeight;
+            std::size_t n = 0u;
+            bool overflow = false;
+            const auto push = [&](std::int64_t x0, std::int64_t y0,
+                                  std::int64_t x1, std::int64_t y1) noexcept {
+                if (x0 >= x1 || y0 >= y1) return;
+                if (n >= kMaxPieces) { overflow = true; return; }
+                next[n++] = {x0, y0, x1, y1};
+            };
+            for (std::size_t j = 0u; j < count; ++j) {
+                const auto& p = pieces[j];
+                const auto il = (std::max)(p.left, ql);
+                const auto it = (std::max)(p.top, qt);
+                const auto ir = (std::min)(p.right, qr);
+                const auto ib = (std::min)(p.bottom, qb);
+                if (il >= ir || it >= ib) {
+                    push(p.left, p.top, p.right, p.bottom);
+                    continue;
+                }
+                push(p.left, p.top, p.right, it);
+                push(p.left, ib, p.right, p.bottom);
+                push(p.left, it, il, ib);
+                push(ir, it, p.right, ib);
+            }
+            if (overflow || !n) return;
+            pieces = next;
+            count = n;
+        }
+        for (std::size_t j = 0u; j < count; ++j) {
+            const auto& p = pieces[j];
+            evaluateCandidate(p.left, p.top, p.right, p.bottom);
         }
     };
     // Keep the original single-rectangle fast path and its stable tie-break.

@@ -415,6 +415,66 @@ int main() {
         assert(!native_raw_dirty_source_rgb_crop(
             1920, 1080, island, fullGpuTile, delta, cropped, realRgb));
     }
+    // Overlapping real Draw extents must not erase non-overlapping GPU RGB
+    // contributions at their authentic original-game Present coordinates.
+    {
+        constexpr std::uint32_t w = 64u, h = 32u;
+        std::array<std::uint8_t, w * h * 4u> before{};
+        auto afterA = before, afterB = before;
+        afterA[(10u * w + 8u) * 4u] = 71u;
+        afterB[(10u * w + 55u) * 4u + 2u] = 91u;
+        NativeRawChangedPixelWindow a{}, b{};
+        a.capture(before.data(), w * 4u, afterA.data(), w * 4u, w, h);
+        b.capture(before.data(), w * 4u, afterB.data(), w * 4u, w, h);
+        NativeRawPresentDirtyRegion dirty{};
+        dirty.headerVerified = true; dirty.count = 1u;
+        dirty.rectangles[0] = {300, 400, 364, 432};
+        dirty.boundLeft = 300; dirty.boundTop = 400;
+        dirty.boundRight = 364; dirty.boundBottom = 432;
+        const NativeRawPresentTile first{0u, 0u, 32u, 32u, 300, 400};
+        const NativeRawPresentTile overlap{20u, 0u, 44u, 32u, 320, 400};
+        NativeRawSourceIslandBatch batch{};
+        assert(batch.append(1920, 1080, dirty, first, a, false));
+        assert(batch.append(1920, 1080, dirty, overlap, b, true));
+        assert(batch.count == 2u && !batch.alternate[0] &&
+               batch.alternate[1] && batch.tiles[1].destinationX == 332 &&
+               batch.tiles[1].sourceX == 32u &&
+               batch.tiles[1].copyWidth == 32u &&
+               batch.rgbPixels[0] == 1u && batch.rgbPixels[1] == 1u &&
+               native_raw_disjoint_present_tiles(batch.tiles[0], batch.tiles[1]));
+        // Two previously uploaded islands divide a third authentic Draw
+        // into three possible disjoint bands. The changed pixel survives.
+        const NativeRawPresentTile used[2]{
+            {0u, 0u, 20u, 32u, 320, 400},
+            {0u, 0u, 8u, 32u, 356, 400}
+        };
+        NativeRawPresentTile remainder{};
+        std::uint32_t rgb = 0u;
+        assert(native_raw_dirty_source_rgb_crop(
+            1920, 1080, dirty,
+            NativeRawPresentTile{0u, 0u, 64u, 32u, 300, 400},
+            b, remainder, rgb, used, 2u));
+        assert(rgb == 1u && remainder.destinationX == 340 &&
+               remainder.sourceX == 40u && remainder.copyWidth == 16u &&
+               native_raw_disjoint_present_tiles(remainder, used[0]) &&
+               native_raw_disjoint_present_tiles(remainder, used[1]));
+        // Invalid old upload, forged dirty union and alpha-only changes
+        // cannot make the later GPU region appear as valid game RGB.
+        const NativeRawPresentTile foreign{0u, 0u, 12u, 8u, 1200, 400};
+        assert(!native_raw_dirty_source_rgb_crop(
+            1920, 1080, dirty, overlap, b, remainder, rgb, &foreign));
+        dirty.boundRight = 365;
+        assert(!native_raw_dirty_source_rgb_crop(
+            1920, 1080, dirty, overlap, b, remainder, rgb,
+            batch.tiles.data()));
+        dirty.boundRight = 364;
+        afterB[(10u * w + 55u) * 4u + 2u] = 0u;
+        afterB[(10u * w + 55u) * 4u + 3u] = 255u;
+        b.capture(before.data(), w * 4u, afterB.data(), w * 4u, w, h);
+        assert(!native_raw_dirty_source_rgb_crop(
+            1920, 1080, dirty, overlap, b, remainder, rgb,
+            batch.tiles.data()));
+    }
     // Two authenticated GPU source byte orders yield identical displayed
     // D3D9 BGRA pixels, with XRGB opaque and ARGB alpha retained.
     const std::uint8_t nativeRgba[8]{17, 31, 241, 77, 9, 128, 255, 2};
