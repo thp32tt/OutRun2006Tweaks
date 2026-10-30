@@ -80,7 +80,7 @@ def require_vr_legacy_owner(source: str) -> None:
     block = source.split("static int __stdcall D3DXMatrixTransformation2D_dest(", 1)[1].split(
         "// D3DX treats these input vectors as read-only.", 1)[0]
     for key in (
-        "const bool vrFrontEndProducer = Game::current_mode &&",
+        "const bool vrFrontEndProducer = VrFrontEndPhysicalCanvasState();",
         "const bool vrContainedMode =",
         "const bool vrFrontEndPartial = vrFrontEndProducer &&",
         "const bool vrFrontEndPivot = NeedsFrontEndAffineContain(",
