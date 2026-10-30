@@ -160,6 +160,29 @@ def _attempt_key(fp,lane):
     # Preserve legacy C1 attempt counters; C2 is a new independent review lane.
     return ("C2:"+fp) if lane=="C2" else fp
 
+def _duplicate_bbox_review_hold(st,fp,lane):
+    """Treat an exact prior duplicate-only OCR response as a manual-review hold.
+
+    The phrase fingerprint includes source identity and still-unresolved phrases,
+    so a changed candidate set remains eligible for fresh OCR. Do not mark text
+    as localized, and never infer a box from an overlapping, differently named
+    historical ROI. Supports existing NO_VALID_DETECTIONS records.
+    """
+    for rec in reversed(st.get("completed",[])):
+        if not isinstance(rec,dict) or rec.get("fingerprint")!=fp:
+            continue
+        rec_lane=rec.get("ocr_lane") or (
+            "C2" if re.search(r"-C2(?:-R[12])?$",str(rec.get("task_id") or "")) else "C1")
+        if rec_lane!=lane or int(rec.get("applied",0) or 0)!=0:
+            continue
+        rejected=rec.get("rejected")
+        if (rec.get("status") in ("NO_VALID_DETECTIONS","REVIEW_REQUIRED_DUPLICATE_BBOX")
+                and isinstance(rejected,list) and rejected
+                and all(reason=="BBOX_DUPLICATES_EXISTING_REGION" for reason in rejected)):
+            return rec
+    return None
+
+
 def _prompt(task_id,row,phrases):
     phrase_lines="\n".join("- "+p for p in phrases)
     return f"""OutRun 2006 HD 원본 이미지의 영문 UI 위치 분석 작업입니다.
@@ -235,6 +258,10 @@ def next_binding(lane=None):
         if bridged:
             if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT:
                 st["attempts"][attempt_key]=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT;_save_state(st)
+            continue
+        if _duplicate_bbox_review_hold(st,fp,effective_lane):
+            # Prevent repeated, identical cross-label region collisions. A
+            # qualified reviewer must inspect these missing English phrases.
             continue
         if used>=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT: continue
         suffix="" if used==0 else f"-R{used}"
@@ -430,8 +457,14 @@ def apply_response(task_id,assistant_text):
               "gpt_chat_bbox_source":"CHATGPT_ATTACHED_ORIGINAL_HD_IMAGE","external_api_used":False,
               "image_generation_used":False}
             _atomic_json(mp,manifest);existing.append(box);seen.add(code);applied+=1
+        duplicate_only=(applied==0 and bool(rejected)
+                        and all(reason=="BBOX_DUPLICATES_EXISTING_REGION" for reason in rejected))
         completed={"task_id":task_id,"source_png":a["source_png"],"fingerprint":a["fingerprint"],
-          "status":"APPLIED" if applied else "NO_VALID_DETECTIONS","applied":applied,"rejected":rejected[:50],
+          "ocr_lane":a.get("ocr_lane") or "C1",
+          "status":"APPLIED" if applied else (
+              "REVIEW_REQUIRED_DUPLICATE_BBOX" if duplicate_only else "NO_VALID_DETECTIONS"),
+          "applied":applied,"rejected":rejected[:50],
+          "manual_review_required":duplicate_only,
           "response_sha256":response_sha,"completed_at":_now(),"chat_url":a.get("chat_url")}
         st["completed"].append(completed);st["completed"]=st["completed"][-500:];st["active"]=None;_save_state(st);_audit(completed)
         return completed
@@ -445,23 +478,32 @@ def apply_response(task_id,assistant_text):
 def summary():
     st=_state();candidates=_exhausted_candidates()
     lanes={}
-    retryable_sources=0;retryable_phrases=0
+    retryable_sources=0;retryable_phrases=0;manual_sources=0;manual_phrases=0;exhausted_sources=0
     for lane in ("C1","C2"):
-        lane_rows=[]
+        retryable=[];held=[];exhausted=[];lane_rows=[]
         for row,phrases in candidates:
             if _lane_for_source(row["png_filename"])!=lane:
                 continue
             fp=_fingerprint(row,phrases);used=int(st.get("attempts",{}).get(_attempt_key(fp,lane),0) or 0)
             lane_rows.append((phrases,used))
-        rs=sum(1 for phrases,used in lane_rows if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT)
-        rp=sum(len(phrases) for phrases,used in lane_rows if used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT)
-        retryable_sources+=rs;retryable_phrases+=rp
+            if _duplicate_bbox_review_hold(st,fp,lane):
+                held.append((row,phrases))
+            elif used<MAX_CHAT_ATTEMPTS_PER_FINGERPRINT:
+                retryable.append((row,phrases))
+            else:
+                exhausted.append((row,phrases))
+        rs=len(retryable);rp=sum(len(phrases) for _,phrases in retryable)
+        ms=len(held);mp=sum(len(phrases) for _,phrases in held)
+        retryable_sources+=rs;retryable_phrases+=rp;manual_sources+=ms;manual_phrases+=mp
+        exhausted_sources+=len(exhausted)
         lanes[lane]={"candidate_sources":len(lane_rows),
                      "candidate_phrases":sum(len(phrases) for phrases,_ in lane_rows),
                      "retryable_sources":rs,"retryable_phrases":rp,
-                     "exhausted_sources":len(lane_rows)-rs}
+                     "manual_review_sources":ms,"manual_review_phrases":mp,
+                     "exhausted_sources":len(exhausted)}
     return {"version":VERSION,"active":st.get("active"),"candidate_sources":len(candidates),
       "candidate_phrases":sum(len(p) for _,p in candidates),
       "retryable_sources":retryable_sources,"retryable_phrases":retryable_phrases,
-      "exhausted_sources":len(candidates)-retryable_sources,"lanes":lanes,
+      "manual_review_sources":manual_sources,"manual_review_phrases":manual_phrases,
+      "exhausted_sources":exhausted_sources,"lanes":lanes,
       "completed_records":len(st.get("completed",[])),"external_api_used":False}
