@@ -1,0 +1,183 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261030T1815KST-Q228-NEW-SHA2",
+  "reviewed_at_kst": "2026-10-30T18:21:49+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "Independent direct visual inspection of actual N100 A/B generated PNG versus SHA-pinned original full HD ROI, with unchanged source bytes, candidate/output SHA256, RGBA alpha edges, aspect-preserving ROI scale and 50% preview. Same candidate SHA previously reviewed excluded.",
+  "prior_report_files": 196,
+  "prior_sha_count": 923,
+  "results": {
+    "new_sha": 2,
+    "pass": 2,
+    "fail": 0,
+    "hold": 0,
+    "A": 1,
+    "B": 1
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0142-F13160DD",
+      "id": "Q228_3df4ed65ab58f44f",
+      "english": "multiplayer",
+      "korean": "멀티플레이",
+      "bbox_xyxy": [
+        4,
+        803,
+        1195,
+        957
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "source_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "manifest_source_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "input_source_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "manifest_imagegen_input_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "candidate_file": "Q228_3df4ed65ab58f44f_k.png",
+      "candidate_sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "export_sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "candidate_mode": "RGBA",
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_type": "RGBA",
+      "alpha_bbox": [
+        95,
+        13,
+        2152,
+        699
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        462,
+        154
+      ],
+      "half_fit": [
+        231,
+        77
+      ],
+      "candidate_sha_matches_export": true,
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_input": true,
+      "already_reviewed": false,
+      "export_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "reason_code": "C1_TRANSLATION_READABLE_RGBA_LAYER",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_ONLY",
+      "original_full_hd_source_sha_verified": true,
+      "observations": "원문 multiplayer의 금속 음영/기울기 특성을 유지한 '멀티플레이'가 오탈자·가짜 자소 없이 판독됩니다. 글자 효과만 있고 별도 불투명 배경판·영문 잔상·획 잘림은 보이지 않습니다. ROI 1191×154 내 비율 유지 462×154 및 50% 231×77에서 읽힘.",
+      "actual_ui_composite": "NOT_TESTED",
+      "actual_protected_art_coverage": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "c2_c3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0146-6F7C670F",
+      "id": "Q228_6a1d77db05265918",
+      "english": "game lobby",
+      "korean": "게임 로비",
+      "bbox_xyxy": [
+        4,
+        491,
+        1132,
+        647
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "source_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "manifest_source_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "input_source_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "manifest_imagegen_input_sha256": "861fb53409f132ebbf7f14babe28037421e29fde89bf8603e49d73cfdba13f9e",
+      "candidate_file": "Q228_6a1d77db05265918_k.png",
+      "candidate_sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "export_sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "candidate_mode": "RGBA",
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_type": "RGBA",
+      "alpha_bbox": [
+        83,
+        19,
+        2078,
+        622
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        468,
+        156
+      ],
+      "half_fit": [
+        234,
+        78
+      ],
+      "candidate_sha_matches_export": true,
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_input": true,
+      "already_reviewed": false,
+      "export_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "reason_code": "C1_TRANSLATION_READABLE_RGBA_LAYER",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_ONLY",
+      "original_full_hd_source_sha_verified": true,
+      "observations": "원문 game lobby → 승인 '게임 로비' 정확합니다. 두 단어 모두 금속 스타일의 단일 투명 레이어로 보이며 글자/받침 선명하고 영문 잔상·보호 아트·불필요한 프레임 생성은 보이지 않습니다. ROI 1128×156 내 비율 유지 468×156 및 50% 234×78에서 읽힘.",
+      "actual_ui_composite": "NOT_TESTED",
+      "actual_protected_art_coverage": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "c2_c3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "evidence": {
+    "n100_report": "work/C1_QA_20261030_1815_AI2_report.json",
+    "n100_preflight": "work/C1_QA_20261030_1815_AI2_new_sha2/preflight.json",
+    "n100_preview": "work/C1_QA_20261030_1815_AI2_new_sha2/pairs_source_native_half.jpg"
+  },
+  "limitations": [
+    "C1 PASS is only the Korean lettering PNG layer, not actual in-game composite or safe UI cell UV compositing proof",
+    "DDS final assembly, C2/C3, mip texture validation and in-game user PASS remain UNTESTED",
+    "REWORK_DIMENSIONS is the producer's canvas-size rework flag, not alone a C1 rejection criterion"
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
