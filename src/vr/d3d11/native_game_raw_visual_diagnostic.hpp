@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 #include <cstdint>
+#include <array>
 #include <cstring>
 #include <limits>
 #include "native_game_raw_gpu_capture_epoch.hpp"
@@ -106,10 +107,12 @@ enum class NativeRawPreviewResult {
 class NativeRawVisualPreview final {
 public:
     static constexpr UINT width = 256, height = 144;
+    static constexpr UINT kMaxSourceIslands = 4u;
     void reset() noexcept {
         staging_.Reset(); baseline_.Reset();
         stagingAlternate_.Reset(); baselineAlternate_.Reset();
-        surfaceAlternate_.Reset(); surfaceRemainder_.Reset();
+        surfaceAlternate_.Reset();
+        for (auto& surface : surfaceRemainders_) surface.Reset();
         sourceGameTarget_.Reset();
         sourceGameTargetIdentity_.Reset();
         sourceAlignedPixelsThisPresent_ = 0u;
@@ -322,8 +325,9 @@ public:
                 NativeRawPresentTile firstTile{}, secondTile{};
                 // Exact GPU source island chosen inside the canonical-target
                 // block is also consumed by the later UpdateSurface branch.
-                NativeRawPresentTile sameDrawRemainder{};
-                UINT sameDrawRemainderPixels = 0u;
+                std::array<NativeRawPresentTile, kMaxSourceIslands> sourceIslands{};
+                std::array<UINT, kMaxSourceIslands> sourceIslandPixels{};
+                UINT sourceIslandCount = 0u;
                 UINT firstPixels = 0u, secondPixels = 0u;
                 changedWindow_.capture(before.pData, before.RowPitch,
                                        mapped.pData, mapped.RowPitch,
@@ -436,12 +440,10 @@ public:
                         const bool haveSecond = alternateActive_ && alignChanged(
                             secondTile, regionAlternate_, beforeAlternate,
                             afterAlternate, alignedSecond, secondPixels);
-                        // A SINGLE genuine native Draw can cover two distant
-                        // real D3D9 dirty islands. The first crop cannot
-                        // contain both without painting unupdated screen
-                        // pixels. Use the SAME pre/post GPU capture to admit
-                        // one disjoint exact-source remainder, never a moved
-                        // inset or a guessed full-frame RGB image.
+                        // One real GPU Draw may hit several independently repainted
+                        // source islands. Consume only original source pixels
+                        // whose exact RGB deltas and full RGNDATA coverage are
+                        // verified; retain disjoint rectangles for each upload.
                         if (haveFirst && !alternateActive_ && sourceDirty &&
                             !sourceCropRepaintVerified) {
                             NativeRawPresentTile entireSource{};
@@ -453,11 +455,24 @@ public:
                                 changedWindow_.capture(
                                     before.pData, before.RowPitch,
                                     mapped.pData, mapped.RowPitch, width, height);
-                                (void)native_raw_dirty_source_rgb_crop(
-                                    back.Width, back.Height, *sourceDirty,
-                                    entireSource, changedWindow_,
-                                    sameDrawRemainder, sameDrawRemainderPixels,
-                                    &alignedFirst);
+                                sourceIslands[0] = alignedFirst;
+                                sourceIslandPixels[0] = firstPixels;
+                                sourceIslandCount = 1u;
+                                // Fixed budget keeps per-Present candidate
+                                // searching and queued D3D9 staging bounded.
+                                for (UINT i = 1u; i < kMaxSourceIslands; ++i) {
+                                    NativeRawPresentTile next{};
+                                    UINT rgb = 0u;
+                                    if (!native_raw_dirty_source_rgb_crop(
+                                            back.Width, back.Height, *sourceDirty,
+                                            entireSource, changedWindow_, next,
+                                            rgb, sourceIslands.data(),
+                                            sourceIslandCount))
+                                        break;
+                                    sourceIslands[sourceIslandCount] = next;
+                                    sourceIslandPixels[sourceIslandCount] = rgb;
+                                    ++sourceIslandCount;
+                                }
                             }
                         }
                         // Preserve true source coordinates even when a
@@ -487,12 +502,6 @@ public:
                 const bool firstVisible = firstPixels && covered(firstTile);
                 const bool secondVisible = alternateActive_ && secondPixels &&
                     covered(secondTile);
-                const bool sameDrawRemainderVisible =
-                    !alternateActive_ && firstAligned &&
-                    sameDrawRemainderPixels &&
-                    native_raw_disjoint_present_tiles(
-                        firstTile, sameDrawRemainder) &&
-                    covered(sameDrawRemainder);
                 // An authenticated completed Draw may modify only depth or
                 // alpha. Retire the mapped pair without touching the original
                 // D3D9 surface; this is not an unsafe dirty Present or an
@@ -508,7 +517,7 @@ public:
                 if (format_ != back.Format) {
                     surface_.Reset();
                     surfaceAlternate_.Reset();
-                    surfaceRemainder_.Reset();
+                    for (auto& surface : surfaceRemainders_) surface.Reset();
                     format_ = back.Format;
                 }
                 // Each region owns a distinct SYSTEMMEM staging surface. The
@@ -591,17 +600,17 @@ public:
                     if (paint(surface_, before, mapped, firstTile)) {
                         nativePixels = firstPixels;
                         if (firstAligned) sourceAlignedPixelsThisPresent_ = firstPixels;
-                        // The D3D9 driver can enqueue UpdateSurface instead
-                        // of consuming SYSTEMMEM bytes synchronously. Keep
-                        // a separate owned upload surface for this second
-                        // authentic GPU island: repainting surface_ here
-                        // could mutate the first upload's queued source.
-                        // Both destinations are independently authenticated.
-                        if (sameDrawRemainderVisible &&
-                            paint(surfaceRemainder_, before, mapped, sameDrawRemainder)) {
-                            nativePixels += sameDrawRemainderPixels;
-                            sourceAlignedPixelsThisPresent_ +=
-                                sameDrawRemainderPixels;
+                        // Each same-Draw RGB island owns unique SYSTEMMEM
+                        // bytes until the driver's queued UpdateSurface is
+                        // consumed. Never repaint the primary upload surface.
+                        for (UINT i = 1u; i < sourceIslandCount; ++i) {
+                            if (covered(sourceIslands[i]) &&
+                                paint(surfaceRemainders_[i - 1u], before,
+                                      mapped, sourceIslands[i])) {
+                                nativePixels += sourceIslandPixels[i];
+                                sourceAlignedPixelsThisPresent_ +=
+                                    sourceIslandPixels[i];
+                            }
                         }
                     }
                 }
@@ -873,7 +882,7 @@ private:
             // race. A previously created D3D9 SYSTEMMEM tile must not be
             // reused with a newly sized native GPU capture.
             surface_.Reset(); surfaceAlternate_.Reset();
-            surfaceRemainder_.Reset();
+            for (auto& surface : surfaceRemainders_) surface.Reset();
             captureFormat_ = stagedFormat;
             captureWidth_ = width; captureHeight_ = height;
         }
@@ -977,7 +986,9 @@ private:
     NativeRawColorByteOrder sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
-    Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_, surfaceRemainder_;
+    Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_;
+    std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>,
+               kMaxSourceIslands - 1u> surfaceRemainders_{};
     Microsoft::WRL::ComPtr<IDirect3DSurface9> sourceGameTarget_;
     Microsoft::WRL::ComPtr<IUnknown> sourceGameTargetIdentity_;
     UINT sourceAlignedPixelsThisPresent_ = 0u;

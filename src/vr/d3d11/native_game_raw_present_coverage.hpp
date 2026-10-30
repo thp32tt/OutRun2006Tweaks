@@ -111,7 +111,8 @@ struct NativeRawPresentDirtyRegion {
     const NativeRawChangedPixelWindow& gpuDelta,
     NativeRawPresentTile& cropped,
     std::uint32_t& changedRgb,
-    const NativeRawPresentTile* exclude = nullptr) noexcept {
+    const NativeRawPresentTile* exclude = nullptr,
+    std::uint32_t excludeCount = 1u) noexcept {
     cropped = {};
     changedRgb = 0u;
     if (!sourceAligned.copyWidth || !sourceAligned.copyHeight ||
@@ -123,7 +124,8 @@ struct NativeRawPresentDirtyRegion {
         sourceAligned.destinationY >
             std::int64_t{backHeight - sourceAligned.copyHeight} ||
         !dirty.headerVerified || !dirty.count ||
-        dirty.count > NativeRawPresentDirtyRegion::kMaxRects)
+        dirty.count > NativeRawPresentDirtyRegion::kMaxRects ||
+        (exclude && (!excludeCount || excludeCount > 4u)))
         return false;
     const auto right = sourceAligned.destinationX + sourceAligned.copyWidth;
     const auto bottom = sourceAligned.destinationY + sourceAligned.copyHeight;
@@ -153,8 +155,11 @@ struct NativeRawPresentDirtyRegion {
         // A single real GPU Draw can modify two different original menu
         // repaint islands. The second upload must not overwrite a pixel of
         // the first exact-source upload, nor claim an inert RGB region.
-        if (exclude &&
-            !native_raw_disjoint_present_tiles(candidate, *exclude)) return;
+        // Every earlier source-aligned GPU upload reserves its destination.
+        // Multi-island batches never widen across an original D3D9 dirty gap.
+        for (std::uint32_t i = 0u; exclude && i < excludeCount; ++i)
+            if (!native_raw_disjoint_present_tiles(candidate, exclude[i]))
+                return;
         const auto rgb = gpuDelta.changed_pixels(candidate);
         const auto area = std::uint64_t{candidate.copyWidth} *
                           candidate.copyHeight;

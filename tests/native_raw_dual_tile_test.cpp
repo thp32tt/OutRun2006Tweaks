@@ -264,6 +264,78 @@ int main() {
                 remainder, remainderRgb, &primary));
             assert(remainderRgb == 0u);
         }
+        // A live GPU Draw can change FOUR disjoint menu/vehicle repaint
+        // regions. Each source-aligned UpdateSurface needs an independent
+        // immutable staging surface and a non-overlapping exact-source crop.
+        {
+            constexpr std::uint32_t mw = 128u, mh = 96u;
+            std::array<std::uint8_t, mw * mh * 4u> beforeMulti{};
+            auto afterMulti = beforeMulti;
+            const std::uint32_t xs[4]{16u, 56u, 16u, 106u};
+            const std::uint32_t ys[4]{16u, 16u, 61u, 61u};
+            NativeRawPresentDirtyRegion four{};
+            four.headerVerified = true;
+            four.count = 4u;
+            for (std::uint32_t i = 0u; i < four.count; ++i) {
+                afterMulti[(ys[i] * mw + xs[i]) * 4u + (i % 3u)] =
+                    static_cast<std::uint8_t>(50u + i);
+                four.rectangles[i] = {200 + std::int64_t{xs[i]} - 6,
+                    300 + std::int64_t{ys[i]} - 6,
+                    200 + std::int64_t{xs[i]} + 6,
+                    300 + std::int64_t{ys[i]} + 6};
+            }
+            four.boundLeft = 210; four.boundTop = 310;
+            four.boundRight = 312; four.boundBottom = 367;
+            NativeRawChangedPixelWindow multiRgb{};
+            multiRgb.capture(beforeMulti.data(), mw * 4u,
+                             afterMulti.data(), mw * 4u, mw, mh);
+            const NativeRawPresentTile full{0u, 0u, mw, mh, 200, 300};
+            std::array<NativeRawPresentTile, 4> picks{};
+            std::uint32_t count = 0u, totalRgb = 0u;
+            for (; count < picks.size(); ++count) {
+                std::uint32_t rgb = 0u;
+                assert(native_raw_dirty_source_rgb_crop(
+                    1920, 1080, four, full, multiRgb, picks[count],
+                    rgb, count ? picks.data() : nullptr, count ? count : 1u));
+                assert(rgb == 1u && native_raw_dirty_region_covers_tile(
+                    1920, 1080, four, picks[count]));
+                for (std::uint32_t j = 0u; j < count; ++j)
+                    assert(native_raw_disjoint_present_tiles(picks[count], picks[j]));
+                totalRgb += rgb;
+            }
+            assert(totalRgb == 4u);
+            NativeRawPresentTile extra{};
+            std::uint32_t extraRgb = 99u;
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, four, full, multiRgb, extra, extraRgb,
+                picks.data(), 4u) && extraRgb == 0u);
+            // Reject an invalid exclusion budget and forged dirty bounds.
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, four, full, multiRgb, extra, extraRgb,
+                picks.data(), 5u) && extraRgb == 0u);
+            four.boundRight = 313;
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, four, full, multiRgb, extra, extraRgb,
+                picks.data(), 1u) && extraRgb == 0u);
+            // A last island with only an alpha mutation is not RGB evidence.
+            four.boundRight = 312;
+            afterMulti[(ys[3] * mw + xs[3]) * 4u] = 0u;
+            afterMulti[(ys[3] * mw + xs[3]) * 4u + 3u] = 255u;
+            multiRgb.capture(beforeMulti.data(), mw * 4u,
+                             afterMulti.data(), mw * 4u, mw, mh);
+            // The other three still produce RGB, the fourth must not.
+            count = 0u;
+            for (; count < 3u; ++count) {
+                std::uint32_t rgb = 0u;
+                assert(native_raw_dirty_source_rgb_crop(
+                    1920, 1080, four, full, multiRgb, picks[count],
+                    rgb, count ? picks.data() : nullptr, count ? count : 1u));
+                assert(rgb == 1u);
+            }
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, four, full, multiRgb, extra, extraRgb,
+                picks.data(), 3u) && extraRgb == 0u);
+        }
         // Alpha-only mutations must not create native RGB evidence.
         after[(22u * w + 65u) * 4u + 2u] = 0u;
         after[(22u * w + 65u) * 4u + 3u] = 255u;
