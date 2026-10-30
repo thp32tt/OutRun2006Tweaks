@@ -96,6 +96,10 @@ struct NativeRawPresentDirtyRegion {
     }
     return true;
 }
+// A declaration permits bounded disjoint-crop selection before the shared
+// destination-overlap helper definition below.
+[[nodiscard]] constexpr bool native_raw_disjoint_present_tiles(
+    const NativeRawPresentTile&, const NativeRawPresentTile&) noexcept;
 // Keep real D3D11 changed RGB on its ORIGINAL D3D9 screen coordinate
 // when a small game dirty island intersects only part of a larger capture.
 // Candidate source bytes are an unscaled subset of the SAME GPU capture;
@@ -106,7 +110,8 @@ struct NativeRawPresentDirtyRegion {
     const NativeRawPresentTile& sourceAligned,
     const NativeRawChangedPixelWindow& gpuDelta,
     NativeRawPresentTile& cropped,
-    std::uint32_t& changedRgb) noexcept {
+    std::uint32_t& changedRgb,
+    const NativeRawPresentTile* exclude = nullptr) noexcept {
     cropped = {};
     changedRgb = 0u;
     if (!sourceAligned.copyWidth || !sourceAligned.copyHeight ||
@@ -145,13 +150,19 @@ struct NativeRawPresentDirtyRegion {
         candidate.copyHeight = static_cast<std::uint32_t>(b - t);
         candidate.destinationX = l;
         candidate.destinationY = t;
-        if (!native_raw_dirty_region_covers_tile(
-                backWidth, backHeight, dirty, candidate)) return;
+        // A single real GPU Draw can modify two different original menu
+        // repaint islands. The second upload must not overwrite a pixel of
+        // the first exact-source upload, nor claim an inert RGB region.
+        if (exclude &&
+            !native_raw_disjoint_present_tiles(candidate, *exclude)) return;
         const auto rgb = gpuDelta.changed_pixels(candidate);
         const auto area = std::uint64_t{candidate.copyWidth} *
                           candidate.copyHeight;
-        if (rgb && (rgb > changedRgb ||
-                    (rgb == changedRgb && area > bestArea))) {
+        if (!rgb || rgb < changedRgb ||
+            (rgb == changedRgb && area <= bestArea)) return;
+        if (!native_raw_dirty_region_covers_tile(
+                backWidth, backHeight, dirty, candidate)) return;
+        {
             cropped = candidate;
             changedRgb = rgb;
             bestArea = area;

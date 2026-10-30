@@ -203,6 +203,67 @@ int main() {
             assert(!native_raw_dirty_source_rgb_crop(
                 1920, 1080, grid, entireGpu, gridRgb, chosen, rgb));
         }
+        // One authentic native GPU Draw can change two DISJOINT
+        // original D3D9 menu/car dirty islands. The second needs its own
+        // UpdateSurface rect, not a widened hole-filling bounding box.
+        {
+            constexpr std::uint32_t pw = 96u, ph = 64u;
+            std::array<std::uint8_t, pw * ph * 4u> beforePair{};
+            auto afterPair = beforePair;
+            afterPair[(20u * pw + 20u) * 4u] = 31u;
+            afterPair[(35u * pw + 70u) * 4u + 2u] = 91u;
+            NativeRawChangedPixelWindow pairRgb{};
+            pairRgb.capture(beforePair.data(), pw * 4u,
+                            afterPair.data(), pw * 4u, pw, ph);
+            NativeRawPresentDirtyRegion islands{};
+            islands.headerVerified = true;
+            islands.count = 2u;
+            islands.rectangles[0] = {110, 210, 140, 235};
+            islands.rectangles[1] = {160, 225, 180, 255};
+            islands.boundLeft = 110; islands.boundTop = 210;
+            islands.boundRight = 180; islands.boundBottom = 255;
+            const NativeRawPresentTile fullCapture{0u, 0u, pw, ph, 100, 200};
+            NativeRawPresentTile primary{}, remainder{};
+            std::uint32_t primaryRgb = 0u, remainderRgb = 0u;
+            assert(!native_raw_dirty_region_covers_tile(
+                1920, 1080, islands, fullCapture));
+            assert(native_raw_dirty_source_rgb_crop(
+                1920, 1080, islands, fullCapture, pairRgb,
+                primary, primaryRgb));
+            assert(primaryRgb == 1u && primary.destinationX == 110 &&
+                   primary.destinationY == 210);
+            assert(native_raw_dirty_source_rgb_crop(
+                1920, 1080, islands, fullCapture, pairRgb,
+                remainder, remainderRgb, &primary));
+            assert(remainderRgb == 1u && remainder.destinationX == 160 &&
+                   remainder.destinationY == 225 &&
+                   native_raw_disjoint_present_tiles(primary, remainder));
+            assert(pairRgb.changed_pixels(primary) == 1u &&
+                   pairRgb.changed_pixels(remainder) == 1u);
+            // Repeated passes may not redisplay the same real source pixel.
+            NativeRawPresentTile third{};
+            std::uint32_t thirdRgb = 99u;
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, islands, fullCapture, pairRgb,
+                third, thirdRgb, &fullCapture));
+            assert(thirdRgb == 0u);
+            // A forged rcBound never permits either GPU upload.
+            islands.boundRight = 181;
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, islands, fullCapture, pairRgb,
+                third, thirdRgb, &primary));
+            assert(thirdRgb == 0u);
+            islands.boundRight = 180;
+            // Alpha-only output in the second island is not native RGB.
+            afterPair[(35u * pw + 70u) * 4u + 2u] = 0u;
+            afterPair[(35u * pw + 70u) * 4u + 3u] = 255u;
+            pairRgb.capture(beforePair.data(), pw * 4u,
+                            afterPair.data(), pw * 4u, pw, ph);
+            assert(!native_raw_dirty_source_rgb_crop(
+                1920, 1080, islands, fullCapture, pairRgb,
+                remainder, remainderRgb, &primary));
+            assert(remainderRgb == 0u);
+        }
         // Alpha-only mutations must not create native RGB evidence.
         after[(22u * w + 65u) * 4u + 2u] = 0u;
         after[(22u * w + 65u) * 4u + 3u] = 255u;

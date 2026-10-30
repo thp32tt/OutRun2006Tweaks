@@ -390,6 +390,8 @@ public:
                         sourceGameTarget_.Get(), backbuffer,
                         sourceGameTargetIdentity_.Get(), presentedIdentity.Get())) {
                         NativeRawPresentTile alignedFirst{}, alignedSecond{};
+                        NativeRawPresentTile sameDrawRemainder{};
+                        UINT sameDrawRemainderPixels = 0u;
                         // Small genuine menu/car dirty islands need not
                         // repaint the entire 256x144 native GPU capture.
                         // Keep the actual source position and upload only a
@@ -432,6 +434,30 @@ public:
                         const bool haveSecond = alternateActive_ && alignChanged(
                             secondTile, regionAlternate_, beforeAlternate,
                             afterAlternate, alignedSecond, secondPixels);
+                        // A SINGLE genuine native Draw can cover two distant
+                        // real D3D9 dirty islands. The first crop cannot
+                        // contain both without painting unupdated screen
+                        // pixels. Use the SAME pre/post GPU capture to admit
+                        // one disjoint exact-source remainder, never a moved
+                        // inset or a guessed full-frame RGB image.
+                        if (haveFirst && !alternateActive_ && sourceDirty &&
+                            !sourceCropRepaintVerified) {
+                            NativeRawPresentTile entireSource{};
+                            if (native_raw_source_aligned_present_tile(
+                                    firstTile, region_.left, region_.top,
+                                    captureTargetWidth_, captureTargetHeight_,
+                                    back.Width, back.Height, l, t, r, b,
+                                    nullptr, true, entireSource)) {
+                                changedWindow_.capture(
+                                    before.pData, before.RowPitch,
+                                    mapped.pData, mapped.RowPitch, width, height);
+                                (void)native_raw_dirty_source_rgb_crop(
+                                    back.Width, back.Height, *sourceDirty,
+                                    entireSource, changedWindow_,
+                                    sameDrawRemainder, sameDrawRemainderPixels,
+                                    &alignedFirst);
+                            }
+                        }
                         // Preserve true source coordinates even when a
                         // displaced two-inset layout happens to fit. Verify
                         // non-overlap AFTER moving either native GPU crop.
@@ -459,6 +485,12 @@ public:
                 const bool firstVisible = firstPixels && covered(firstTile);
                 const bool secondVisible = alternateActive_ && secondPixels &&
                     covered(secondTile);
+                const bool sameDrawRemainderVisible =
+                    !alternateActive_ && firstAligned &&
+                    sameDrawRemainderPixels &&
+                    native_raw_disjoint_present_tiles(
+                        firstTile, sameDrawRemainder) &&
+                    covered(sameDrawRemainder);
                 // An authenticated completed Draw may modify only depth or
                 // alpha. Retire the mapped pair without touching the original
                 // D3D9 surface; this is not an unsafe dirty Present or an
@@ -556,6 +588,16 @@ public:
                     if (paint(surface_, before, mapped, firstTile)) {
                         nativePixels = firstPixels;
                         if (firstAligned) sourceAlignedPixelsThisPresent_ = firstPixels;
+                        // A second UpdateSurface references identical,
+                        // immutable staging bytes after the first upload.
+                        // Both destination rectangles are independently
+                        // authenticated and disjoint in the original game.
+                        if (sameDrawRemainderVisible &&
+                            paint(surface_, before, mapped, sameDrawRemainder)) {
+                            nativePixels += sameDrawRemainderPixels;
+                            sourceAlignedPixelsThisPresent_ +=
+                                sameDrawRemainderPixels;
+                        }
                     }
                 }
                 unmapPairs();
