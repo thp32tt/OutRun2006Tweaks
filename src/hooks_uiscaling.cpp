@@ -3259,6 +3259,23 @@ class UIScaling : public Hook
     // Unknown/FPO-unwind-failed frames use the original glyph path.
     static bool IsOriginalB9200GoalGlyph() noexcept
     {
+        // The function-entry wrapper has already authenticated one of the
+        // 21 canonical B9200 callers and published an exact direct owner.
+        // Prefer that in-process proof so a single unwind failure cannot
+        // downgrade queued result glyphs to generic TextGlyphPutSprite.
+        const bool exactDirectOwner =
+            Settings::VREnabled &&
+            GoalResultPresentationState() &&
+            !OutRunVR::GameSemantic::QueueRenderActive() &&
+            OutRunVR::GameSemantic::EffectiveScope() ==
+                OutRunVR::GameSemantic::RenderScope::ScreenHud &&
+            OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                OutRunVR::GameSemantic::ProducerToken::ResultTextB9200;
+        if (exactDirectOwner)
+            return true;
+
+        // Legacy/source-only fallback: retain canonical return-address stack
+        // proof for paths that reach the glyph wrapper without the entry owner.
         return OriginalB9200GoalStackActive();
     }
 

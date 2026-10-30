@@ -2628,6 +2628,7 @@ namespace OutRunVRStereo
         {
             None = 0,
             SafeStereoBase,
+            ExactDirectLensCentre,
             CachedVsIdentity,
             LiveVsReadFailed,
             LiveVsBound,
@@ -2650,6 +2651,7 @@ namespace OutRunVRStereo
             {
             case R30XyzrhwPrepareReject::None: return "ADMITTED";
             case R30XyzrhwPrepareReject::SafeStereoBase: return "SAFE_STEREO_BASE";
+            case R30XyzrhwPrepareReject::ExactDirectLensCentre: return "EXACT_DIRECT_LENS_CENTRE";
             case R30XyzrhwPrepareReject::CachedVsIdentity: return "CACHED_VS_IDENTITY";
             case R30XyzrhwPrepareReject::LiveVsReadFailed: return "LIVE_VS_READ_FAILED";
             case R30XyzrhwPrepareReject::LiveVsBound: return "LIVE_VS_BOUND";
@@ -2681,6 +2683,34 @@ namespace OutRunVRStereo
                     *rejectReason = reason;
                 return false;
             };
+
+            // Exact D3A5/C993 centre is source-proven WorldBillboard and its
+            // semantic contract explicitly forbids generic XYZRHW stereo.
+            // Enforce that policy before any POSITIONT/game-canvas path can
+            // run, so the later exact original-WVP/c64 route (or one unchanged
+            // native fallback) remains authoritative.
+            const auto drawCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            if (drawCommand.IsDirectWorldLensCentre())
+            {
+                if (Settings::VRTelemetry)
+                {
+                    static std::atomic<std::uint64_t> exactLensXyzVetoes{0};
+                    const auto n = exactLensXyzVetoes.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 16 || (n & (n - 1)) == 0)
+                        spdlog::info(
+                            "VR TRACE LENS C993 XYZRHW VETO: hits={} "
+                            "scope={} producer={} lensEpoch={} "
+                            "policy=EXACT_WORLD_WVP_ONLY",
+                            n,
+                            OutRunVR::GameSemantic::Name(drawCommand.scope),
+                            OutRunVR::GameSemantic::Name(drawCommand.producer),
+                            drawCommand.lensCentreCallEpoch);
+                }
+                return reject(
+                    R30XyzrhwPrepareReject::ExactDirectLensCentre);
+            }
 
             if (!R30SafeStereoBase(device, safeBaseRejectReason))
                 return reject(R30XyzrhwPrepareReject::SafeStereoBase);

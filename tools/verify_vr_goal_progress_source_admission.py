@@ -17,6 +17,7 @@ leave=body("static void ResultProgressLeave(safetyhook::Context&)", "using Resul
 parent=body("static bool __cdecl ResultProgressFullParent()", "inline static SafetyHookMid StageExtensionEnterHooks")
 goal_time=body("static void GoalTime_TagHelper(int helperRva)", "static void __cdecl GoalTime_Help020()")
 b9200=body("static void __cdecl ResultTextB9200_dest(", "// REA-proven original graph parents")
+glyph_proof=body("static bool IsOriginalB9200GoalGlyph() noexcept", "using TextGlyphPutSpriteFn")
 stack_guard=body("static bool GoalResultPresentationState() noexcept", "class UIScaling")
 d3dx_bridge=body("using namespace OutRunVR::GameSemantic;", "// Stronger than the BB796 wrapper counter:")
 def goal_snapshot_guard(code: str) -> bool:
@@ -109,6 +110,13 @@ tests=[
         '(*Game::current_mode == GameState::STATE_GAME ||' in src and
         "GoalResultPresentationState())" in src and
         "VR TRACE UNOWNED QUEUE SIGNATURE:" in src),
+    ("B9200 glyph prefers exact direct owner before stack fallback",
+        "GoalResultPresentationState()" in glyph_proof and
+        "!OutRunVR::GameSemantic::QueueRenderActive()" in glyph_proof and
+        "RenderScope::ScreenHud" in glyph_proof and
+        "ProducerToken::ResultTextB9200" in glyph_proof and
+        glyph_proof.index("if (exactDirectOwner)") <
+        glyph_proof.index("return OriginalB9200GoalStackActive();")),
     ("B9200 post-drain exact parent admission",
         "const OutRunVR::GoalProgress::SourceAdmission admission{" in b9200 and
         b9200.index("FlushD3DXBeforeDirectGoalSource();") <

@@ -634,8 +634,21 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
     if '*Game::current_mode == GameState::STATE_GOAL' in trace or (
             '*Game::current_mode == GameState::STATE_GOAL' in draw):
         raise SystemExit('B9200 GPU ownership regressed to GOAL-only state')
+    for part in ('GoalResultPresentationState()',
+                 '!OutRunVR::GameSemantic::QueueRenderActive()',
+                 'RenderScope::ScreenHud',
+                 'ProducerToken::ResultTextB9200',
+                 'if (exactDirectOwner)'):
+        require(part, glyph_trace,
+                'B9200 glyph must prefer authenticated direct owner')
     require('return OriginalB9200GoalStackActive();', glyph_trace,
-            'B9200 glyph must retain exact GOAL original caller proof')
+            'B9200 glyph must retain stack fallback proof')
+    require_order(glyph_trace,
+                  'B9200 direct owner must precede stack fallback',
+                  'const bool exactDirectOwner =',
+                  'if (exactDirectOwner)',
+                  'return true;',
+                  'return OriginalB9200GoalStackActive();')
     for part in ('CurrentRenderProducerToken() == ProducerToken::None',
                  '!QueueRenderActive()', 'OriginalB9200GoalStackActive()',
                  'FlushD3DXBeforeDirectGoalSource();',

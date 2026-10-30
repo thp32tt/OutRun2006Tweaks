@@ -21,6 +21,21 @@ def check(r30: str, game: str, hook: str, sem: str) -> None:
         "public:", 1
     )[0]
 
+    prepare = r30.split("bool R30PrepareXyzrhwState(", 1)[1].split(
+        "bool R30XyzrhwHasProjectedDepthSignature(", 1
+    )[0]
+    for phrase in (
+        "CapturePhysicalDrawCommand()",
+        "drawCommand.IsDirectWorldLensCentre()",
+        "R30XyzrhwPrepareReject::ExactDirectLensCentre",
+        "VR TRACE LENS C993 XYZRHW VETO:",
+        "policy=EXACT_WORLD_WVP_ONLY",
+    ):
+        assert phrase in prepare, "missing exact C993 early XYZRHW veto: " + phrase
+    assert prepare.index("drawCommand.IsDirectWorldLensCentre()") < prepare.index(
+        "R30SafeStereoBase(device, safeBaseRejectReason)")
+    assert "EXACT_DIRECT_LENS_CENTRE" in r30
+
     # Native draw logging cannot identify an original descriptor without an
     # opaque 4056D0/4052C0 transaction join. Never label these as proven IDs.
     for phrase in (
@@ -198,6 +213,8 @@ def main() -> None:
     sem = SEM.read_text(encoding="utf-8-sig")
     check(r30, game, hook, sem)
     mutations = [
+        (0, "drawCommand.IsDirectWorldLensCentre()",
+            "false /* unsafe exact centre generic XYZRHW */"),
         (0, "opaqueObject=WINDOW_LINKED_ONLY", "opaqueObject=PROVEN_DESCRIPTOR"),
         (0, "DEFERRED_WINDOW_CANDIDATE", "OPAQUE_DESCRIPTOR_PROOF"),
         (0, "lensInlineLinked ? 1 : 0", "1 /* unsafe exact source claim */"),
