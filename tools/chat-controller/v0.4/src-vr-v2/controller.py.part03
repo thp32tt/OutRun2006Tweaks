@@ -901,7 +901,7 @@ def queue_rollover_prompt(active: dict) -> str:
             "NEXT_ACTION=GitHub에서 기존 review commit 및 조상 관계를 확인하고 "
             "미완료일 때만 문서 리뷰 수행. source-only CI 재시도 금지.",
         ]
-    if CONTROLLER_MODE == "conversion":
+    if CONTROLLER_MODE == "conversion" and lane != "UW2":
         lines = [GAME_MOD_CONTEXT, ""] + lines
     if str(active.get("lane", "")).upper() == "DX11":
         task_match = re.fullmatch(r"CONVERSION-DX11-([0-9]{5,})", str(active.get("task_id") or ""))
@@ -2519,7 +2519,7 @@ async def conversion_send_lane_task(
         return False
 
     target = queue_target_for_slot(slot_name)
-    base_sha = github_branch_head(target["branch"])
+    base_sha = github_branch_head(target["branch"], repo=target.get("repo"))
     if not base_sha:
         write_runtime(
             status="queue_github_unavailable",
@@ -2694,6 +2694,7 @@ async def conversion_send_lane_task(
         "event_type": event.event_type,
         "slot": slot_name,
         "lane": target["lane"],
+        "repo": target.get("repo") or GITHUB_REPO,
         "branch": target["branch"],
         "workflow": target["workflow"],
         "base_sha": base_sha,
@@ -3388,7 +3389,9 @@ def conversion_dispatch_plan(
 
 
 def vr_lane_schedule_window_due(slot_name: str, now: datetime) -> bool:
-    """DX9Ex C uses its configured hour/minute slots; other lanes use the global schedule."""
+    """C uses UW2 timing when enabled; A keeps the DX11 cadence."""
+    if CONTROLLER_MODE == "conversion" and slot_name == "C" and UW2_WEB_PORT_ENABLED:
+        return now.minute in UW2_SCHEDULE_MINUTES
     if CONTROLLER_MODE == "conversion" and slot_name == "C":
         return now.hour % DX9EX_SCHEDULE_EVERY_HOURS == 0 and now.minute in DX9EX_SCHEDULE_MINUTES
     return not VR_SCHEDULED_DISPATCH_ENABLED or now.minute in SCHEDULE_MINUTES
@@ -3419,7 +3422,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     Actions and missing C6 results are never silently archived at 30 minutes.
     """
     active_by_lane = q.setdefault("active_by_lane", {})
-    enabled = (("A", CONVERSION_DX11_ENABLED), ("C", CONVERSION_DX9EX_ENABLED))
+    enabled = (("A", CONVERSION_DX11_ENABLED), ("C", UW2_WEB_PORT_ENABLED or CONVERSION_DX9EX_ENABLED))
     for lane_key, allowed in enabled:
         if not allowed or (CONVERSION_ONLY_SLOT and lane_key != CONVERSION_ONLY_SLOT):
             continue
@@ -3470,7 +3473,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     save_queue_state(q)
     write_runtime(
         status="vr_continuous_running",
-        last_action="A(DX11 implementation)+C(DX9Ex REVIEW_ONLY), B(DXVK) frozen; active: " +
+        last_action="A(DX11 implementation)+C("+("UW2 web port" if UW2_WEB_PORT_ENABLED else "DX9Ex REVIEW_ONLY")+"), B(DXVK) frozen; active: " +
             ", ".join(f"{key}={x.get('task_id')}:{x.get('phase')}"
                       for key, x in sorted(active_by_lane.items())),
         vr_continuous_last_dispatch=q.get("vr_continuous_last_dispatch_at", {}),
@@ -3479,7 +3482,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
 
 
 async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """Develop native DX11 while DX9Ex performs review-only analysis; freeze DXVK."""
+    """Develop native DX11 with independent C (UW2 or DX9Ex); freeze DXVK."""
     now = datetime.now(TZ)
     q = load_queue_state()
     reconcile_legacy_conversion_blocked(q)
@@ -3548,12 +3551,33 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         q.pop("next_task_not_before", None)
         save_queue_state(q)
 
+    # One-time C reassignment. Retire old lens-flare task and its chat URL,
+    # preserving history and independently running A/DX11.
+    if UW2_WEB_PORT_ENABLED and int(q.get("uw2_c_slot_migration_version", 0)) < 1:
+        old = active_by_lane.pop("C", None)
+        if isinstance(old, dict):
+            q["retired_lane_tasks"] = (q.get("retired_lane_tasks", []) + [{
+                **old, "retired_lane": "C", "retired_at": now.isoformat(),
+                "retired_reason": "DX9Ex lens-flare C reassigned to UW2 web port",
+            }])[-100:]
+        q.setdefault("vr_scheduled_dispatch_windows", {}).pop("C", None)
+        q["uw2_c_slot_migration_version"] = 1
+        q["uw2_c_slot_migrated_at"] = now.isoformat()
+        reg = load_registry(now)
+        c_slot = next((x for x in reg.slots if x.name == "C"), None)
+        if c_slot is not None:
+            c_slot.url = None
+            c_slot.completed_tasks_in_chat = 0
+            c_slot.last_result = "reassigned_to_uw2_web_port"
+            save_registry(reg)
+        save_queue_state(q)
+
     # Reconcile across the previous DX11-only deployment without losing C
     # task identity. Park B before per-lane processing, even if B was active.
     if reconcile_conversion_lane_freeze(
         q, active_by_lane, now,
         dxvk_frozen=DXVK_FROZEN,
-        dx9ex_enabled=CONVERSION_DX9EX_ENABLED,
+        dx9ex_enabled=CONVERSION_DX9EX_ENABLED or UW2_WEB_PORT_ENABLED,
         only_slot=CONVERSION_ONLY_SLOT,
     ):
         save_queue_state(q)
@@ -3586,7 +3610,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             CONVERSION_ACTIVE_LIMIT,
             CONVERSION_DX11_ENABLED,
             CONVERSION_DXVK_ENABLED,
-            CONVERSION_DX9EX_ENABLED,
+            CONVERSION_DX9EX_ENABLED or UW2_WEB_PORT_ENABLED,
         ):
             await conversion_send_lane_task(context, pages, q, lane_key)
 
@@ -3630,14 +3654,14 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         CONVERSION_ACTIVE_LIMIT,
         CONVERSION_DX11_ENABLED,
         CONVERSION_DXVK_ENABLED,
-        CONVERSION_DX9EX_ENABLED,
+        CONVERSION_DX9EX_ENABLED or UW2_WEB_PORT_ENABLED,
     ):
         await conversion_send_lane_task(context, pages, q, lane_key)
 
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            "A(DX11 native) + C(DX9Ex REVIEW_ONLY); B(DXVK frozen); active: "
+            ("A(DX11 native) + C(" + ("UW2 web port" if UW2_WEB_PORT_ENABLED else "DX9Ex REVIEW_ONLY") + "); B(DXVK frozen); active: ")
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())
