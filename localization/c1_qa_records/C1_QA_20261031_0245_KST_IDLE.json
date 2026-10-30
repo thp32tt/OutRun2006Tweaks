@@ -1,0 +1,69 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa_idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T0245KST-IDLE",
+  "scheduled_slot_kst": "2026-10-31T02:45:00+09:00",
+  "observed_at_kst": "2026-10-31T02:51:46+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE_NO_NEW_UNREVIEWED_SHA",
+  "source": "N100 /home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "dedup_method": "Read-only N100 scripts: match each A/B candidate filename to export_evidence per-file SHA256, collect prior C1 report SHA across reports/metrics, then exclude reviewed candidates; check filesystem mtime newer than 2026-10-30T18:21:49+09:00.",
+  "inventory": {
+    "candidate_png_A": 437,
+    "candidate_png_B": 483,
+    "candidate_png_total": 920,
+    "export_file_sha_mappings": 920,
+    "prior_qa_reports_scanned": 197,
+    "already_reviewed_distinct_sha": 925,
+    "pending_unreviewed_sha_with_export": 0,
+    "candidates_missing_export_mapping": 0,
+    "new_candidate_png_since_last_qa": {
+      "A": 0,
+      "B": 0
+    },
+    "producer_state": {
+      "A": {
+        "completed_files": 436,
+        "completed_batches": 142,
+        "active": null
+      },
+      "B": {
+        "completed_files": 483,
+        "completed_batches": 146,
+        "active": null
+      }
+    }
+  },
+  "latest_new_sha_qa": "work/C1_QA_20261030_1815_AI2_report.json",
+  "qa_this_slot": {
+    "new_candidates_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "evidence": {
+    "dedup_script": "work/C1_QA_20261030_1945_dedup_readonly.py",
+    "inventory_script": "work/C1_QA_20261030_1945_inventory_readonly.py"
+  },
+  "limitations": [
+    "No new visual QA or approval is claimed; this is an IDLE observation only.",
+    "Export SHA mappings and prior QA reports were compared; all 920 physical candidate PNG bytes were not rehashed this slot.",
+    "Previous C1 PASS covers lettering layer only. DDS/C2/C3/protected UI composite/in-game validation remain UNTESTED."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score_change": 0
+}
