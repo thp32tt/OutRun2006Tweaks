@@ -237,7 +237,9 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
 
 
 def prompt_for_slot(slot: Slot, phase: str) -> str:
-    """Select a queue-isolated prompt and prepend the current task contract."""
+    """UW2 uses exactly one human-readable sentence; other lanes unchanged."""
+    if CONTROLLER_MODE == "conversion" and UW2_WEB_PORT_ENABLED and slot.name == "C":
+        return "웹포팅 개발 계속진행해"
     if CONTROLLER_MODE == "conversion":
         role_prompts = {
             "A": "conversion_dx11.md",
@@ -294,6 +296,9 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         return slot.last_watchdog_at or slot.last_sent_at or ""
 
     for idx, slot in sorted(candidates, key=watch_key):
+        if CONTROLLER_MODE == "conversion" and UW2_WEB_PORT_ENABLED and slot.name == "C":
+            # Dedicated simple loop owns UW2; legacy watchdog must never inject prompts.
+            continue
         if slot.watchdog_resumes_since_schedule >= WATCHDOG_MAX_RESUMES_PER_RUN:
             continue
 
