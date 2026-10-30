@@ -320,6 +320,10 @@ public:
                 // the strongest single genuine RGB region as before.
                 const NativeRawPresentTile originalTile = visibleTile;
                 NativeRawPresentTile firstTile{}, secondTile{};
+                // Exact GPU source island chosen inside the canonical-target
+                // block is also consumed by the later UpdateSurface branch.
+                NativeRawPresentTile sameDrawRemainder{};
+                UINT sameDrawRemainderPixels = 0u;
                 UINT firstPixels = 0u, secondPixels = 0u;
                 changedWindow_.capture(before.pData, before.RowPitch,
                                        mapped.pData, mapped.RowPitch,
@@ -390,8 +394,6 @@ public:
                         sourceGameTarget_.Get(), backbuffer,
                         sourceGameTargetIdentity_.Get(), presentedIdentity.Get())) {
                         NativeRawPresentTile alignedFirst{}, alignedSecond{};
-                        NativeRawPresentTile sameDrawRemainder{};
-                        UINT sameDrawRemainderPixels = 0u;
                         // Small genuine menu/car dirty islands need not
                         // repaint the entire 256x144 native GPU capture.
                         // Keep the actual source position and upload only a
