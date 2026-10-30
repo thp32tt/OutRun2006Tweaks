@@ -1,0 +1,51 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T0115KST-IDLE",
+  "slot_at_kst": "2026-10-31T01:15:00+09:00",
+  "observed_at_kst": "2026-10-31T01:18:02+09:00",
+  "reviewer": "ChatGPT AI2",
+  "role": "C1",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "dedup_provenance": "N100:work/C1_QA_20261030_1945_dedup_readonly.py",
+  "mtime_provenance": "N100:work/C1_QA_20261030_1945_inventory_readonly.py",
+  "counts": {
+    "stored_candidate_png_A": 437,
+    "stored_candidate_png_B": 483,
+    "total_stored_png": 920,
+    "production_export_named": 920,
+    "prior_qa_reports_parsed": 197,
+    "prior_reviewed_sha256_unique": 925,
+    "unreviewed_export_sha256": 0,
+    "missing_export_for_candidate_filename": 0,
+    "files_newer_than_last_unique_sha_review_A": 0,
+    "files_newer_than_last_unique_sha_review_B": 0
+  },
+  "last_unique_review_cutoff_kst": "2026-10-30T18:21:49+09:00",
+  "verdicts": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "notes": [
+    "Read-only dedup: all current saved candidate filenames match production export manifests, no unseen SHA among exported candidates.",
+    "No new QA PASS/FAIL is asserted; prior C1 records preserved.",
+    "No newly generated files after last unique-sha C1 report cutoff."
+  ],
+  "guardrails": {
+    "ImageGen_called": false,
+    "A_B_queue_consumed": false,
+    "dds_created": false,
+    "C2_C3_or_game_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
