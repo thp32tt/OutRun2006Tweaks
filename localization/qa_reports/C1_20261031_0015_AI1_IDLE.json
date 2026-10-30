@@ -1,0 +1,78 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI1-20261031T0015KST-IDLE",
+  "requested_slot_kst": "2026-10-31T00:15:00+09:00",
+  "checked_at_kst": "2026-10-31T00:19:27+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "branch_head_before": "66c5e32f0edee0b7aade626bba3f1451fd9d4eea",
+  "policy_blob_shas": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "status": "IDLE",
+  "reason": "N100 has no new export-evidence-backed candidate SHA not already covered by C1 reports. No repeat SHA reviews.",
+  "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+  "inventory": {
+    "A_png": 437,
+    "B_png": 483,
+    "total_png": 920,
+    "export_named": 920,
+    "missing_export": 0,
+    "reviewed_sha256": 925,
+    "qa_report_files": 197,
+    "pending_unreviewed_export_sha": 0,
+    "newer_than_last_qa": {
+      "A": 0,
+      "B": 0
+    },
+    "newest_A_mtime_kst": "2026-10-30T18:00:02+09:00",
+    "newest_B_mtime_kst": "2026-10-30T17:50:07+09:00"
+  },
+  "last_new_sha_qa": {
+    "record": "localization/qa_reports/C1_20261030_1815_Q228_new_sha2.json",
+    "new_sha_count": 2,
+    "source": "existing C1 reports",
+    "not_repeated": true
+  },
+  "sha256_spotchecks": [
+    {
+      "role": "A",
+      "filename": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530"
+    },
+    {
+      "role": "B",
+      "filename": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b"
+    }
+  ],
+  "scan_method": "Ran N100 read-only C1_QA_20261030_1945_dedup_readonly.py and inventory_readonly.py at this execution, and independently hashed newest A/B candidate bytes; checked GitHub asset branch policy and C1 prior QA report.",
+  "result": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": true
+  },
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "dds_created": false,
+    "C2_C3_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "scoreboard": {
+    "AI": "AI1",
+    "previous_confirmed": 1779,
+    "delta": 0,
+    "new_cumulative": 1779,
+    "SSOT": "thp32tt/ai-dev-lab@main:AI_SCOREBOARD.md",
+    "mutation": false,
+    "reason": "IDLE and duplicate SHA inventory are not new qualifying work"
+  }
+}
