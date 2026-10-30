@@ -357,6 +357,16 @@ def require_portrait_center(code):
     ):
         if required not in producer:
             raise AssertionError("menu matrix source provenance: " + required)
+    # Both the bounded legacy full-vector path and the modern partial/pivot
+    # path now physicalize a successful original D3DX result and publish the
+    # exact resulting matrix fingerprint. Losing either receipt can make the
+    # later custom-quad path double-contain only one front-end family.
+    if producer.count(
+            "std::memcpy(fingerprint.data(), pOut, sizeof(D3DMATRIX));") != 2:
+        raise AssertionError("both front-end D3DX provenance fingerprints required")
+    if producer.count(
+            "OutRunVrMenuQuad::ContainedMatrices.Remember(") != 2:
+        raise AssertionError("both front-end D3DX provenance remembers required")
     if sprite.index("precontained = contained && frontEnd &&") > sprite.index(
         "const auto quadMap = precontained"):
         raise AssertionError("original matrix proof must precede custom quad map")
@@ -420,7 +430,7 @@ for before, after in (
         pass
     else:
         raise AssertionError("double containment provenance mutant escaped: " + before)
-print("DX9Ex exact native D3DX/custom quad menu containment PASS (6 negative controls)")
+print("DX9Ex exact native D3DX/custom quad menu containment PASS (6 negative controls, dual legacy/modern provenance)")
 
 
 for w, h, margin in ((2496, 2688, 408), (3440, 1440, 0),
