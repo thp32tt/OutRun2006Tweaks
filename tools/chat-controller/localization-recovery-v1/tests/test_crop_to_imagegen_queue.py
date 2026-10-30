@@ -144,7 +144,7 @@ class BridgeTests(unittest.TestCase):
     def test_writable_manual_vision_review_queue_admits_verified_source_only(self):
         self.trans.write_text(self.trans.read_text(encoding="utf-8") +
             json.dumps({"index":228,"status":"transcribed_reviewed",
-                "segments":[{"source":"game lobby","korean":"게임 로비"}]},ensure_ascii=False)+"\\n",
+                "segments":[{"source":"game lobby","korean":"게임 로비"}]},ensure_ascii=False)+"\n",
             encoding="utf-8")
         source_dir=self.croot/"hd_original_108_verified"
         source_dir.mkdir()
@@ -180,7 +180,7 @@ class BridgeTests(unittest.TestCase):
     def test_manual_vision_queue_fails_closed_on_missing_review_and_wrong_source_sha(self):
         self.trans.write_text(self.trans.read_text(encoding="utf-8") +
             json.dumps({"index":228,"status":"transcribed_reviewed",
-                "segments":[{"source":"game lobby","korean":"게임 로비"}]},ensure_ascii=False)+"\\n",
+                "segments":[{"source":"game lobby","korean":"게임 로비"}]},ensure_ascii=False)+"\n",
             encoding="utf-8")
         source_dir=self.croot/"hd_original_108_verified"
         source_dir.mkdir()
