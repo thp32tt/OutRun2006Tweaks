@@ -118,9 +118,10 @@ DX9EX_SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("DX9EX_SCHEDU
 if not DX9EX_SCHEDULE_MINUTES or any(minute < 0 or minute > 59 for minute in DX9EX_SCHEDULE_MINUTES):
     raise ValueError("DX9EX_SCHEDULE_MINUTES must contain minutes in 0..59")
 UW2_SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("UW2_SCHEDULE_MINUTES", "0,30").split(",") if x.strip()})
-# Resume as soon as an assistant response is finished; :00/:30 remain fallbacks.
-# A conservative gap prevents uncontrolled send loops and excessive Chrome load.
-UW2_CONTINUE_MIN_SECONDS = max(60, int(os.getenv("UW2_CONTINUE_MIN_SECONDS", "120")))
+# Long single-command development, not rapid conversation ping-pong.
+# Never send the next UW2 input until 30 minutes after the previous one;
+# this spaces input calls but does not falsely claim the model worked 30 min.
+UW2_CONTINUE_MIN_SECONDS = max(1800, int(os.getenv("UW2_CONTINUE_MIN_SECONDS", "1800")))
 UW2_RESPONSE_STABLE_SECONDS = max(10, int(os.getenv("UW2_RESPONSE_STABLE_SECONDS", "20")))
 if not UW2_SCHEDULE_MINUTES or any(x < 0 or x > 59 for x in UW2_SCHEDULE_MINUTES):
     raise ValueError("UW2_SCHEDULE_MINUTES must contain minutes in 0..59")
@@ -293,7 +294,7 @@ class Registry:
     last_global_send_slot: Optional[str] = None
 
 runtime = {
-    "controller_build": "2026-10-31-uw2-response-driven-continuous-v4",
+    "controller_build": "2026-10-31-uw2-long-batch-low-input-v5",
     "vr_continuous_30m_enabled": VR_CONTINUOUS_30M_ENABLED,
     "vr_continuous_interval_seconds": VR_CONTINUOUS_INTERVAL_SECONDS,
     "vr_scheduled_dispatch_enabled": VR_SCHEDULED_DISPATCH_ENABLED,
