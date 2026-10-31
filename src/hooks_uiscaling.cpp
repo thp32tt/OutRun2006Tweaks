@@ -92,6 +92,11 @@ namespace
         }
     }
 
+    static_assert(static_cast<int>(GameState::STATE_SUMO_FE) == 0x20,
+        "Quest runtime front-end owner must remain the Sumo FE state");
+    static_assert(static_cast<int>(GameState::STATE_GAME) == 0x10,
+        "Gameplay state must remain distinct from the front-end physical canvas");
+
     bool ResolveVrFrontEndVirtualCanvasScale(
         bool exactFrontEnd, bool containedMode,
         float& scaleX, float& scaleY,
