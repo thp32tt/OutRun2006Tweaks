@@ -1,0 +1,83 @@
+name: VR Native D3D9Ex Full Quality Launcher CI
+on:
+  push:
+    branches: ['test/r26-native-d3d9ex-quality-20261101']
+    paths:
+      - 'tools/vr_native_quality/**'
+      - '.github/workflows/vr-native-quality-launcher.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify PowerShell syntax and fail-closed high-quality settings
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $path='tools/vr_native_quality/Run-VRNativeD3D9Ex.ps1'
+          $tokens=$null; $errors=$null
+          $null=[System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $path).Path,[ref]$tokens,[ref]$errors)
+          if ($errors.Count) { throw "PowerShell parse errors: $errors" }
+          $code=Get-Content $path -Raw
+          foreach($required in @('-PreferD3D9Ex=true','-DirectGpuOnly=true','-AutoRenderResolution=true',
+                                  '-FollowGameResolution=false','-DisableDesktopDuplication=false',
+                                  '-VR.Telemetry=false','OUTRUN_VR_R23_PIXEL_PROBE',
+                                  'Get-FileHash','Move-Item','finally')) {
+            if (!$code.Contains($required)) { throw "Missing native quality invariant: $required" }
+          }
+          if ($code.Contains('Remove-Item -LiteralPath $wrapperPath')) { throw 'Wrapper must not be deleted' }
+          if (!(Test-Path 'tools/vr_native_quality/RUN_NATIVE_VR_QUALITY.cmd')) { throw 'CMD missing' }
+
+      - name: Windows simulated wrapper isolation and exact restore
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $mock=Join-Path $env:RUNNER_TEMP 'OutRun 2006 Mock Game'
+          New-Item -ItemType Directory -Path $mock -Force | Out-Null
+          $wrapper=Join-Path $mock 'd3d9.dll'
+          $bytes = [byte[]](0,1,2,255,126,123,77,66,55,44,33,22)
+          [IO.File]::WriteAllBytes($wrapper,$bytes)
+          $initial=(Get-FileHash $wrapper -Algorithm SHA256).Hash
+          & 'tools/vr_native_quality/Run-VRNativeD3D9Ex.ps1' -GameDirectory $mock -ProbeOnly -ApproveTemporaryWrapperIsolation
+          if (!(Test-Path $wrapper)) { throw 'Wrapper not restored after test' }
+          $after=(Get-FileHash $wrapper -Algorithm SHA256).Hash
+          if ($initial -ne $after) { throw 'Wrapper bytes changed' }
+          $left = Get-ChildItem $mock -Filter d3d9.dll -Recurse -File
+          if ($left.Count -ne 1) { throw "Unexpected duplicate DLL count: $($left.Count)" }
+          Write-Host 'WRAPPER MOVE + SHA256 EXACT RESTORE: PASS'
+
+          Remove-Item $wrapper -Force
+          & 'tools/vr_native_quality/Run-VRNativeD3D9Ex.ps1' -GameDirectory $mock -ProbeOnly -ApproveTemporaryWrapperIsolation
+          if (Test-Path $wrapper) { throw 'No-wrapper test created a file unexpectedly' }
+          Write-Host 'NO WRAPPER / NO OP MODE: PASS'
+
+      - name: Create native-quality launcher archive
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $out='dist/OutRun_VR_NATIVE_D3D9EX_QUALITY_TEST'
+          New-Item -ItemType Directory -Path $out -Force | Out-Null
+          Copy-Item tools/vr_native_quality/*.ps1 $out
+          Copy-Item tools/vr_native_quality/*.cmd $out
+          Copy-Item tools/vr_native_quality/README_FIRST.txt $out
+          @(
+            'SOURCE_BRANCH=test/r26-native-d3d9ex-quality-20261101'
+            "SOURCE_COMMIT=$env:GITHUB_SHA"
+            'TEST=WINDOWS_SIMULATED_WRAPPER_MOVE_AND_SHA256_RESTORE_PASS'
+            'BINARY=USER_INSTALLED_SAFE_R26_UNMODIFIED'
+            'QUEST_HMD_RUNTIME=NOT_VERIFIED'
+          ) | Set-Content "$out/PROVENANCE.txt" -Encoding utf8
+          Get-ChildItem $out | Select-Object Name,Length
+
+      - name: Upload verified native-quality launcher
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun_VR_NATIVE_D3D9EX_QUALITY_TEST
+          path: dist/OutRun_VR_NATIVE_D3D9EX_QUALITY_TEST/
+          retention-days: 30
+          if-no-files-found: error
