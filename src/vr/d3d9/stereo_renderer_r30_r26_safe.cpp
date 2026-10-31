@@ -2356,7 +2356,9 @@ namespace OutRunVRStereo
             // Treat it as its own screen-effect class so it can be fused at the
             // same centre-eye placement in both HMD eyes. Do not route it
             // through WorldBillboard/PerspectiveHud and apply head/IPD twice.
-            if (semanticProjectedScreen || exactOpaqueAxisLensPmt)
+            if (semanticProjectedScreen)
+                return R30ScreenSpaceKind::ProjectedScreenEffect2D;
+            if (exactOpaqueAxisLensPmt)
                 return R30ScreenSpaceKind::ProjectedScreenEffect2D;
 
             // Generic queue membership is not an exact named HUD or

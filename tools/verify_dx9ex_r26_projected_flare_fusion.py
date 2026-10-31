@@ -17,7 +17,9 @@ builder=body(r30,"bool R30BuildScreenSpaceEyeConstants(")
 dispatch=body(r30,"HRESULT R30TryScreenSpaceFovDraw(")
 exact=body(r30,"bool R30GetExactInlineProjectedLensRawWvp(")
 axis=body(r30,"bool R30GetExactOpaqueAxisLensLiveWvp(")
-assert "if (semanticProjectedScreen || exactOpaqueAxisLensPmt)" in classifier
+assert "if (semanticProjectedScreen)" in classifier
+assert "if (exactOpaqueAxisLensPmt)" in classifier
+assert classifier.index("if (semanticProjectedScreen)") < classifier.index("if (exactOpaqueAxisLensPmt)")
 assert "ExactProjectedLensAxisPmtActive()" in classifier
 assert "if (semanticProjectedScreen || semanticSceneEffect)" not in classifier
 tail=builder[builder.index("if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)"):]
