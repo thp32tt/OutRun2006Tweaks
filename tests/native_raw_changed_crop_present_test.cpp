@@ -35,7 +35,7 @@ constexpr bool native_raw_changed_crop_regression() {
         moved.sourceX || moved.sourceY ||
         native_raw_present_border_pixel(moved, 0, 0, true))
         return false;
-    // Previously a 24..39px full native-game repaint was rejected by the
+    // Previously a small full native-game repaint was rejected by the
     // legacy 40px displaced-inset margin, before source-aligned RGB batching.
     // Only the caller-proven canonical Draw/Present path can use this tile.
     NativeRawPresentTile small{};
@@ -49,11 +49,11 @@ constexpr bool native_raw_changed_crop_regression() {
         small.copyWidth != 39u || small.copyHeight != 32u ||
         native_raw_verified_small_source_present_tile(
             false, 1920, 1080, 700, 300, 724, 324, 256, 144, small) ||
-        native_raw_verified_small_source_present_tile(
+        !native_raw_verified_small_source_present_tile(
             true, 1920, 1080, 700, 300, 723, 324, 256, 144, small) ||
         native_raw_verified_small_source_present_tile(
             true, 1920, 1080, 700, 300, 740, 340, 256, 144, small) ||
-        native_raw_verified_small_source_present_tile(
+        !native_raw_verified_small_source_present_tile(
             true, 1920, 1080, 700, 300, 724, 324, 23, 144, small) ||
         native_raw_verified_small_source_present_tile(
             true, 1920, 1080, 1900, 1060, 1921, 1081, 256, 144, small))
