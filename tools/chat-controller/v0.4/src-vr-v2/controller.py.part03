@@ -2553,6 +2553,7 @@ async def uw2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: d
         state.pop("last_observed_response_hash", None)
         state.pop("last_observed_response_at", None)
         state.pop("response_before_send_hash", None)
+        state.pop("last_followed_response_hash", None)
         save_queue_state(q)
         save_registry(reg)
     else:
@@ -2604,6 +2605,9 @@ async def uw2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: d
         and response_sha != state.get("last_followed_response_hash")
         and (now - observed_at).total_seconds() >= UW2_RESPONSE_STABLE_SECONDS
     )
+    if pending and response_sha and (now - observed_at).total_seconds() < UW2_RESPONSE_STABLE_SECONDS:
+        # Even scheduled fallback must not type into a reply that just changed.
+        return False
     if not pending and not response_ready:
         return False
 
