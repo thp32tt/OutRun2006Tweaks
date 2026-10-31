@@ -21,6 +21,9 @@ on:
       - 'tools/verify_dx9ex_full_visual_trace_contract.py'
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'tools/verify_vr_lens_transaction_trace.py'
+      - 'tools/verify_dx9ex_r26_projected_flare_fusion.py'
+      - 'src/vr/game/projected_lens_inline_source.hpp'
+      - 'src/vr/game/outrun_renderer.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/d3d9/stereo_renderer_r26.cpp'
       - 'src/vr/d3d9/ex_device_upgrade.cpp'
@@ -60,6 +63,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw '+TIME four-API source regression failed' }
           python tools/verify_vr_r26_occlusion_present_fastpath.py
           if ($LASTEXITCODE -ne 0) { throw 'R26 occlusion/StateBlock fail-closed contract failed' }
+          python tools/verify_dx9ex_r26_projected_flare_fusion.py
+          if ($LASTEXITCODE -ne 0) { throw 'Exact C993 projected flare ownership contract failed' }
           python tools/verify_dx9ex_full_visual_trace_contract.py
           if ($LASTEXITCODE -ne 0) { throw 'One-pass FULL visual trace contract failed' }
 
