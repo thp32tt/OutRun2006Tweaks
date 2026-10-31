@@ -14,8 +14,11 @@ foreach ($name in $names) {
         Write-Host "Restored $name"
     } elseif (Test-Path -LiteralPath $absent) {
         if (Test-Path -LiteralPath $target) {
-            $moved = Join-Path $backup ("safe-installed-" + $name)
-            if (Test-Path -LiteralPath $moved) { throw "Existing disabled copy: $moved. Manual review required." }
+            # Keep every displaced test file in a unique, reversible backup name.
+            # Repeated install -> rollback cycles must never overwrite an older copy.
+            $suffix = (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' +
+                ([Guid]::NewGuid().ToString('N').Substring(0, 8))
+            $moved = Join-Path $backup ("safe-installed-" + $suffix + "-" + $name)
             Move-Item -LiteralPath $target -Destination $moved -ErrorAction Stop
         }
         Write-Host "Disabled newly introduced $name"
