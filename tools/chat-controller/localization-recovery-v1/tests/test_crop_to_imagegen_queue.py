@@ -80,6 +80,75 @@ class BridgeTests(unittest.TestCase):
         (folder/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
         return source,source_sha
 
+    def test_cross_variant_rgba_exact_proof_and_tamper_fail_closed(self):
+        # Two console PNGs are different outside the copied English glyph box.
+        source_dir=self.croot/"hd_original_108_verified"
+        source_dir.mkdir(exist_ok=True)
+        donor=source_dir/"Q051_KEYBOARD.png"
+        target=source_dir/"Q051_SWITCH.png"
+        a=Image.new("RGBA",(256,128),(0,0,0,0))
+        for y in range(20,60):
+            for x in range(10,130):
+                a.putpixel((x,y),(250,250,250,255))
+        a.save(donor)
+        b=a.copy()
+        b.putpixel((240,110),(17,39,53,255))
+        b.save(target)
+        donor_sha=bridge.digest(donor)
+        target_sha=bridge.digest(target)
+        box=[10,20,130,60]
+        rgba_digest=hashlib.sha256(a.crop(tuple(box)).tobytes()).hexdigest()
+        # Register a SHA-verified donor in the ordinary production manifest.
+        donor_dir=self.croot/"gpt_vision_chat_ocr_outputs/Q051_KEYBOARD/verified"
+        donor_dir.mkdir(parents=True)
+        donor_dir.joinpath("manifest.json").write_text(json.dumps({
+            "status":"DIRECT_IMAGEGEN_READY",
+            "source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+            "source_png":donor.name,"source_sha256":donor_sha,
+            "reference_dds_sha256":"a"*64,
+            "reference_dds_path":"textures/51.dds",
+            "english":"Total Time","bbox_xyxy":box,
+            "source_dimensions":[256,128],
+            "direct_full_hd_reference":True,"crop_created":False,
+            "old_split_tiles_used":False}),encoding="utf-8")
+        self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],1)
+        p=self.ig/"text_roi_batches/production_manifest.json"
+        doc=json.loads(p.read_text())
+        donor_id=doc["items"][0]["id"]
+        proof={"status":"DIRECT_IMAGEGEN_READY",
+            "source_type":"SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG",
+            "source_png":target.name,"source_sha256":target_sha,
+            "reference_dds_sha256":"a"*64,
+            "reference_dds_path":"textures/51.dds",
+            "english":"Total Time","bbox_xyxy":box,
+            "source_dimensions":[256,128],
+            "direct_full_hd_reference":True,"crop_created":False,
+            "old_split_tiles_used":False,
+            "external_api_used":False,"image_generation_used":False,
+            "human_review_required":True,
+            "cross_variant_exact_rgba_verified":True,
+            "cross_variant_donor_png":donor.name,
+            "cross_variant_donor_sha256":donor_sha,
+            "cross_variant_donor_id":donor_id,
+            "cross_variant_exact_pixel_sha256":rgba_digest}
+        tr=bridge.translations(self.trans)
+        self.assertTrue(bridge.verify_cross_variant_manifest(proof,doc,self.croot,tr))
+        tampered=dict(proof,cross_variant_exact_pixel_sha256="0"*64)
+        self.assertFalse(bridge.verify_cross_variant_manifest(tampered,doc,self.croot,tr))
+        tampered=dict(proof,cross_variant_donor_sha256="0"*64)
+        self.assertFalse(bridge.verify_cross_variant_manifest(tampered,doc,self.croot,tr))
+        proof_dir=self.ig/"text_roi_batches/cross_variant_verified/Q051_SWITCH/verified"
+        proof_dir.mkdir(parents=True)
+        mp=proof_dir/"manifest.json"
+        mp.write_text(json.dumps(tampered),encoding="utf-8")
+        self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],0)
+        mp.write_text(json.dumps(proof),encoding="utf-8")
+        self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],1)
+        self.assertEqual(bridge.scan_once(self.croot,self.trans,self.ig)["added"],0)
+        verified=json.loads(p.read_text())
+        self.assertEqual(verified["item_count"],2)
+        self.assertTrue(all(z["runtime_validation"]=="UNTESTED" for z in verified["items"]))
+
     def test_verified_odd_even_crops_become_ab_queue(self):
         self.make_crop("Q051","Total Time")
         self.make_crop("Q052","Extra Time",dds_sha="c"*64,source_sha="d"*64)
