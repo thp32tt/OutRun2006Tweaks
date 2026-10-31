@@ -51,7 +51,15 @@ foreach ($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')) {
     }
 }
 foreach ($name in @('RUN_INSTALLED_SAFE.cmd','RESTORE_PREVIOUS.cmd','RESTORE_PREVIOUS.ps1')) {
-    Copy-Item -LiteralPath (Join-Path $source $name) -Destination (Join-Path $gameRoot $name) -Force -ErrorAction Stop
+    $srcPath = [System.IO.Path]::GetFullPath((Join-Path $source $name))
+    $dstPath = [System.IO.Path]::GetFullPath((Join-Path $gameRoot $name))
+    # The extracted ZIP is valid either in the game folder or in a separate folder.
+    # Windows Copy-Item throws when the source and destination are the same file.
+    if ([string]::Equals($srcPath, $dstPath, [System.StringComparison]::OrdinalIgnoreCase)) {
+        Write-Host "Launcher already installed in game directory: $name"
+        continue
+    }
+    Copy-Item -LiteralPath $srcPath -Destination $dstPath -Force -ErrorAction Stop
 }
 Write-Host "SAFE R26 VR binaries installed. Backups: $backup"
 Write-Host 'Existing game EXE and INI were not overwritten.'
