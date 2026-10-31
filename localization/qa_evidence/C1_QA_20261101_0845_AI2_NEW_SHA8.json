@@ -1,0 +1,546 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261101T0845KST-NEW-SHA8",
+  "reviewed_at_kst": "2026-11-01T08:47:16+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "N100 실제 저장 SHA256 검증된 A/B 원본 이미지 ROI 및 한국어 PNG를 4+4 독립 시각검수. 출력투명도, 알파 경계, 원문/승인번역 일치, native bbox 비율 fit 및 50% 읽기 확인. 기존 SHA QA 기록과 추가 검수 기록을 포함하여 중복 제외.",
+  "prior_reviewed_sha_count": 928,
+  "total_pending_before_selection": 11,
+  "results": {
+    "new_sha": 8,
+    "pass": 8,
+    "fail": 0,
+    "hold": 0,
+    "A": 4,
+    "B": 4,
+    "remaining_at_inventory": 3
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0146-165F520B",
+      "id": "Q135_f59ca0432f4b2283",
+      "english": "CLASS",
+      "korean": "클래스",
+      "candidate_file": "Q135_f59ca0432f4b2283_k.png",
+      "candidate_sha256": "988f5f7472026002c6c46b2b21b4184610a2838a2e7f942ddf3d6b64c8120fe3",
+      "export_sha256": "988f5f7472026002c6c46b2b21b4184610a2838a2e7f942ddf3d6b64c8120fe3",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "990f1141554c278e6556bc2ffc9283a9beaeb179eef2b9248eddad21778ff535",
+      "manifest_source_sha256": "990f1141554c278e6556bc2ffc9283a9beaeb179eef2b9248eddad21778ff535",
+      "source_sha_matches_manifest": true,
+      "manifest_imagegen_input_sha256": "990f1141554c278e6556bc2ffc9283a9beaeb179eef2b9248eddad21778ff535",
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1272,
+        34,
+        1460,
+        105
+      ],
+      "candidate_size": [
+        2041,
+        771
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        118,
+        113,
+        1961,
+        723
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        188,
+        71
+      ],
+      "half_fit": [
+        94,
+        35
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "CLASS → 클래스: 세 음절과 받침 판독 가능. 글자만 있는 분리 레이어로 보이며 원본 붉은 캡슐은 생성하지 않음. 심각한 기울기 역전 또는 가짜 한글 미발견."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0145-585F3494",
+      "id": "Q054_8cd3e8916dca5dea",
+      "english": "Match the total!",
+      "korean": "합계를 맞히세요!",
+      "candidate_file": "Q054_8cd3e8916dca5dea_k.png",
+      "candidate_sha256": "c0df49b90f2292747bf29b7dbb4dff5ad3660c91cbeef25fa9d4b438c9e80f41",
+      "export_sha256": "c0df49b90f2292747bf29b7dbb4dff5ad3660c91cbeef25fa9d4b438c9e80f41",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "1528ccaf25ff29aacb4c9c27de8ed7cae6e1880b403b6f73048e3ed283d38ed5",
+      "manifest_source_sha256": "1528ccaf25ff29aacb4c9c27de8ed7cae6e1880b403b6f73048e3ed283d38ed5",
+      "source_sha_matches_manifest": true,
+      "manifest_imagegen_input_sha256": "1528ccaf25ff29aacb4c9c27de8ed7cae6e1880b403b6f73048e3ed283d38ed5",
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        118,
+        42,
+        638,
+        116
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        49,
+        9,
+        2113,
+        724
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        222,
+        74
+      ],
+      "half_fit": [
+        111,
+        37
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Match the total! → 합계를 맞히세요!: 승인 한글 전체 문구 판독 가능. 원본의 황색 채움·백색/진청 외곽 효과와 유사. 후보 알파 bbox는 최하단 행까지 저강도 투명픽셀이 있으나 alpha>=32 경계 픽셀은 0, 확대·축소 비교에서 가시적 잘림 미발견."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0149-81AEEAEA",
+      "id": "Q049_d376b4138af8349a",
+      "english": "Turkey!",
+      "korean": "터키!",
+      "candidate_file": "Q049_d376b4138af8349a_k.png",
+      "candidate_sha256": "f61ba8e52e7bf3fb614f31335e655f8bd5b5795083d840f365dcd0e4ce74c602",
+      "export_sha256": "f61ba8e52e7bf3fb614f31335e655f8bd5b5795083d840f365dcd0e4ce74c602",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "ea838bd2f514d2b07faab761cd7f19ceb11fb5662b23e0cb9473efc12ce520c9",
+      "manifest_source_sha256": "ea838bd2f514d2b07faab761cd7f19ceb11fb5662b23e0cb9473efc12ce520c9",
+      "source_sha_matches_manifest": true,
+      "manifest_imagegen_input_sha256": "ea838bd2f514d2b07faab761cd7f19ceb11fb5662b23e0cb9473efc12ce520c9",
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1540,
+        974,
+        2010,
+        1145
+      ],
+      "candidate_size": [
+        2079,
+        756
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        49,
+        9,
+        2025,
+        736
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        470,
+        171
+      ],
+      "half_fit": [
+        235,
+        85
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Turkey! → 터키!: 글자/효과 모두 읽히고 잘림·원문 잔상 미발견. 원본 대비 광택 색채/각도 차이는 경미한 스타일 차이로 판단."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0147-78A8C54D",
+      "id": "Q137_61bbbac3283b424a",
+      "english": "SELECT TRANSMISSION",
+      "korean": "변속기 선택",
+      "candidate_file": "Q137_61bbbac3283b424a_k.png",
+      "candidate_sha256": "e5dd3769088e3cf8bcbd56da76c31067df5724c7c9da26199dafd247a71359d9",
+      "export_sha256": "e5dd3769088e3cf8bcbd56da76c31067df5724c7c9da26199dafd247a71359d9",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "6468f7cc6b5fb125275060b08c003fb086717ae4bd13e1178a033cf1e8b58b7c",
+      "manifest_source_sha256": "6468f7cc6b5fb125275060b08c003fb086717ae4bd13e1178a033cf1e8b58b7c",
+      "source_sha_matches_manifest": true,
+      "manifest_imagegen_input_sha256": "6468f7cc6b5fb125275060b08c003fb086717ae4bd13e1178a033cf1e8b58b7c",
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        0,
+        57,
+        889,
+        139
+      ],
+      "candidate_size": [
+        2206,
+        713
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        41,
+        38,
+        2150,
+        640
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        254,
+        82
+      ],
+      "half_fit": [
+        127,
+        41
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "SELECT TRANSMISSION → 변속기 선택: 전 음절·받침 가독성과 정렬 무결성 확인. 원문보다 한글 폭이 짧으나 현행 정책상 단독 FAIL 아님. 효과 경계 내 판독 가능."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0150-74EA8012",
+      "id": "Q106_4addcfe292975026",
+      "english": "Music Change",
+      "korean": "음악 변경",
+      "candidate_file": "Q106_4addcfe292975026_k.png",
+      "candidate_sha256": "c091c9384ab9ba1caffafb13db9e6fa330c2043ebbda03fa4d451c04fff490dc",
+      "export_sha256": "c091c9384ab9ba1caffafb13db9e6fa330c2043ebbda03fa4d451c04fff490dc",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "442e722818f950629c7f36f4554cb2a999bbc3f2d436ccc37a573b0aa89dec81",
+      "manifest_source_sha256": "442e722818f950629c7f36f4554cb2a999bbc3f2d436ccc37a573b0aa89dec81",
+      "source_sha_matches_manifest": true,
+      "manifest_imagegen_input_sha256": "442e722818f950629c7f36f4554cb2a999bbc3f2d436ccc37a573b0aa89dec81",
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        944,
+        116,
+        1308,
+        193
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        356,
+        25,
+        1941,
+        660
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        231,
+        77
+      ],
+      "half_fit": [
+        115,
+        38
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Music Change → 음악 변경: 한글 두 단어 선명함. 원문의 우측 기울임 및 백색 문자/흑색 음영 계열 대응, 영어 잔상 미발견."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0153-A6FF557F",
+      "id": "Q111_d6c400ede94057ea",
+      "english": "Drift!",
+      "korean": "드리프트!",
+      "candidate_file": "Q111_d6c400ede94057ea_k.png",
+      "candidate_sha256": "f36736e59078a7d879ce5b1379b8f674125fe85a4be495f7f21cecb6d4fb6a4c",
+      "export_sha256": "f36736e59078a7d879ce5b1379b8f674125fe85a4be495f7f21cecb6d4fb6a4c",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "manifest_source_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "source_sha_matches_manifest": true,
+      "manifest_imagegen_input_sha256": "a2ca9718429b025f4290235d8a229e4f3da4c555f07932e8da520c700a3d9dfb",
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        510,
+        140,
+        708,
+        238
+      ],
+      "candidate_size": [
+        1774,
+        887
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        23,
+        100,
+        1754,
+        861
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        196,
+        98
+      ],
+      "half_fit": [
+        98,
+        49
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Drift! → 드리프트!: 모든 음절이 명확하며 노랑·짙은 외곽 스타일 확인. 196×98 native fit 및 반축소에서 읽힘. 합성 시 배경과의 관계는 미검증."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0151-D2A68C81",
+      "id": "Q048_0bcd4916a1b49d05",
+      "english": "NEW Record!!",
+      "korean": "신기록!!",
+      "candidate_file": "Q048_0bcd4916a1b49d05_k.png",
+      "candidate_sha256": "cd55642c549b3b7ba38ede49892217df5a4af94e14fc8d681bc04d5b9e50ace6",
+      "export_sha256": "cd55642c549b3b7ba38ede49892217df5a4af94e14fc8d681bc04d5b9e50ace6",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "f2d969801361f1ceba5e9861bb1c3fb6d7d061cb01f0586d2c5d055844019c0b",
+      "manifest_source_sha256": "f2d969801361f1ceba5e9861bb1c3fb6d7d061cb01f0586d2c5d055844019c0b",
+      "source_sha_matches_manifest": true,
+      "manifest_imagegen_input_sha256": "f2d969801361f1ceba5e9861bb1c3fb6d7d061cb01f0586d2c5d055844019c0b",
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1605,
+        1711,
+        1904,
+        1850
+      ],
+      "candidate_size": [
+        1840,
+        855
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        89,
+        47,
+        1810,
+        831
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        299,
+        139
+      ],
+      "half_fit": [
+        149,
+        69
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "NEW Record!! → 신기록!!: 원문의 두 줄 레이아웃에 대응해 '신'과 '기록!!'을 두 줄로 출력, 승인 문자열 자체는 판독 가능. 금색 효과·외곽선 보존, 잘림/가짜 자소/영문 잔상 미발견."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0149-B3DBEE23",
+      "id": "Q054_36654298c628bfa0",
+      "english": "Match the total!",
+      "korean": "합계를 맞히세요!",
+      "candidate_file": "Q054_36654298c628bfa0_k.png",
+      "candidate_sha256": "c8bc944716508a46e0274da021d601ff53d7cab2bd585c7f9328adaab7e82eee",
+      "export_sha256": "c8bc944716508a46e0274da021d601ff53d7cab2bd585c7f9328adaab7e82eee",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "427cb79065223e1dae93a72447760f24af9b994d54ecbf4f8f8c08e4cb741289",
+      "manifest_source_sha256": "427cb79065223e1dae93a72447760f24af9b994d54ecbf4f8f8c08e4cb741289",
+      "source_sha_matches_manifest": true,
+      "manifest_imagegen_input_sha256": "427cb79065223e1dae93a72447760f24af9b994d54ecbf4f8f8c08e4cb741289",
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        118,
+        42,
+        638,
+        116
+      ],
+      "candidate_size": [
+        2079,
+        756
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        53,
+        9,
+        2049,
+        696
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        204,
+        74
+      ],
+      "half_fit": [
+        102,
+        37
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Match the total! → 합계를 맞히세요!: 한글/받침/구두점 정확히 읽힘. 황색 채움과 진청 외곽 효과, 투명 글자 레이어 확인. 전체 폭은 원문보다 작으나 별도 반려 근거 아님."
+    }
+  ],
+  "evidence": {
+    "n100_preflight": "work/C1_QA_20261101_0845_AI2_new_sha8/preflight.json",
+    "n100_A_preview": "work/C1_QA_20261101_0845_AI2_new_sha8/A_source_native_half.jpg",
+    "n100_B_preview": "work/C1_QA_20261101_0845_AI2_new_sha8/B_source_native_half.jpg",
+    "n100_candidates": "work/image-src/text_roi_batches/candidate_outputs/{A,B}/",
+    "n100_exports": "work/image-src/text_roi_batches/export_evidence/"
+  },
+  "limitations": [
+    "C1 PASS only for isolated Korean lettering RGBA PNG; NO C2, C3, game, or DDS approval.",
+    "All eight producer exports remain REWORK_DIMENSIONS. C1 cannot change or clear producer status; native-fit is preview-only, not actual DDS/UI composition.",
+    "All eight export pairing statuses remain OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED; independent visual comparison supports lettering only, not production provenance promotion.",
+    "Full protected UI art, source DDS, actual UV/composition orientation and runtime not tested.",
+    "Original English line/word widths differ legitimately; not used for rejection."
+  ],
+  "guards": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
