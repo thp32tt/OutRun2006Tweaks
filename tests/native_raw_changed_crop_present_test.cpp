@@ -379,4 +379,79 @@ bool native_raw_packed_island_transfer_regression() {
     return output == saved;
 }
 
-int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); }
+
+ // One authentic source Present may contain more than four separated menu,
+ // car or HUD RGB islands. Prove that all eight have distinct original-screen
+ // destinations and independent staged publication, not merely a larger enum.
+ bool native_raw_eight_island_present_regression() {
+     constexpr std::uint32_t w = 16u, h = 8u;
+     constexpr std::size_t pitch = w * 4u;
+     std::array<std::uint8_t, pitch * h> before{}, first{}, second{};
+     for (std::uint32_t n = 0u; n < 4u; ++n) {
+         first[(1u * w + 1u + 2u * n) * 4u] =
+             static_cast<std::uint8_t>(20u + n);
+         second[(3u * w + 9u + 2u * n) * 4u + 1u] =
+             static_cast<std::uint8_t>(40u + n);
+     }
+     NativeRawChangedPixelWindow firstRgb{}, secondRgb{};
+     firstRgb.capture(before.data(), pitch, first.data(), pitch, w, h);
+     secondRgb.capture(before.data(), pitch, second.data(), pitch, w, h);
+     NativeRawPresentDirtyRegion dirty{};
+     dirty.headerVerified = true;
+     dirty.count = 1u;
+     dirty.boundLeft = 100; dirty.boundTop = 300;
+     dirty.boundRight = 116; dirty.boundBottom = 308;
+     dirty.rectangles[0] = {100, 300, 116, 308};
+     const NativeRawPresentTile original{0u, 0u, w, h, 100, 300};
+     NativeRawSourceIslandBatch batch{};
+     for (std::uint32_t n = 0u; n < 4u; ++n) {
+         if (!batch.append(200u, 400u, dirty, original, firstRgb, false, true) ||
+             !batch.append(200u, 400u, dirty, original, secondRgb, true, true))
+             return false;
+         const auto& a = batch.tiles[n * 2u];
+         const auto& b = batch.tiles[n * 2u + 1u];
+         if (a.destinationX != 101 + 2 * n || a.destinationY != 301 ||
+             b.destinationX != 109 + 2 * n || b.destinationY != 303 ||
+             a.copyWidth != 1u || a.copyHeight != 1u ||
+             b.copyWidth != 1u || b.copyHeight != 1u ||
+             batch.rgbPixels[n * 2u] != 1u ||
+             batch.rgbPixels[n * 2u + 1u] != 1u ||
+             batch.alternate[n * 2u] || !batch.alternate[n * 2u + 1u])
+             return false;
+     }
+     if (batch.count != NativeRawSourceIslandBatch::kMaxIslands ||
+         batch.append(200u, 400u, dirty, original, firstRgb, false, true))
+         return false;
+     std::uint32_t staged = 0u, published = 0u, committed = 99u;
+     if (!native_raw_preflight_publish_islands(
+             batch.count,
+             [&](std::uint32_t i) {
+                 ++staged;
+                 return i < batch.count &&
+                     batch.tiles[i].copyWidth == 1u;
+             },
+             [&](std::uint32_t i) {
+                 ++published;
+                 return i < batch.count;
+             }, committed) ||
+         staged != 8u || published != 8u || committed != 8u)
+         return false;
+     staged = published = 0u; committed = 99u;
+     // Even the eighth LockRect failure must keep ALL seven valid earlier
+     // staged islands off the original game's D3D9 backbuffer.
+     if (native_raw_preflight_publish_islands(
+             batch.count,
+             [&](std::uint32_t i) {
+                 ++staged;
+                 return i != 7u;
+             },
+             [&](std::uint32_t) {
+                 ++published;
+                 return true;
+             }, committed) ||
+         staged != 8u || published != 0u || committed != 0u)
+         return false;
+     return true;
+ }
+
+int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); }

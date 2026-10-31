@@ -688,9 +688,15 @@ public:
                     // Each preflight slot has a private SYSTEMMEM surface;
                     // no prior committed island can observe overwritten bytes.
                     std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>*,
-                               kMaxSourceIslands> surfaces{
-                        &surface_, &surfaceAlternate_,
-                        &surfaceRemainders_[0], &surfaceRemainders_[1]};
+                               kMaxSourceIslands> surfaces{};
+                    // Eight authenticated RGB islands share two mapped GPU
+                    // captures, but NEVER a D3D9 upload staging surface.
+                    // Bind all slots before preflight; a later preparation
+                    // failure cannot publish the earlier menu/race islands.
+                    surfaces[0] = &surface_;
+                    surfaces[1] = &surfaceAlternate_;
+                    for (std::size_t i = 2u; i < surfaces.size(); ++i)
+                        surfaces[i] = &surfaceRemainders_[i - 2u];
                     std::uint32_t committed = 0u;
                     const bool complete = native_raw_preflight_publish_islands(
                         sourceBatch.count,
@@ -1130,7 +1136,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_;
     std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>,
-               kMaxSourceIslands - 1u> surfaceRemainders_{};
+               kMaxSourceIslands - 2u> surfaceRemainders_{};
     Microsoft::WRL::ComPtr<IDirect3DSurface9> sourceGameTarget_;
     Microsoft::WRL::ComPtr<IUnknown> sourceGameTargetIdentity_;
     UINT sourceAlignedPixelsThisPresent_ = 0u;

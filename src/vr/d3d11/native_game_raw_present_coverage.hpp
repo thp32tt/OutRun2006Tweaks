@@ -197,7 +197,7 @@ struct NativeRawPresentDirtyRegion {
             std::int64_t{backHeight - sourceAligned.copyHeight} ||
         !dirty.headerVerified || !dirty.count ||
         dirty.count > NativeRawPresentDirtyRegion::kMaxRects ||
-        (exclude && (!excludeCount || excludeCount > 4u)))
+        (exclude && (!excludeCount || excludeCount > 8u)))
         return false;
     // Exclusion is a claim of a previous original-game upload. Reject
     // foreign/forged destination claims before considering any fragments.
@@ -304,9 +304,10 @@ struct NativeRawPresentDirtyRegion {
             evaluateCandidate(l, t, r, b);
             return;
         }
-        // Four exclusions create at most 1+3*4 disjoint pieces. No heap
-        // allocation, uncertain coverage or partial overflow acceptance.
-        constexpr std::size_t kMaxPieces = 13u;
+        // Eight previously uploaded native GPU regions can each divide a
+        // candidate into three additional disjoint pieces. Preserve all
+        // remaining authentic D3D9 pixels without heap or partial overflow.
+        constexpr std::size_t kMaxPieces = 25u;
         std::array<NativeRawPresentDirtyRect, kMaxPieces> pieces{}, next{};
         pieces[0] = {l, t, r, b};
         std::size_t count = 1u;
@@ -510,7 +511,7 @@ struct NativeRawPresentDirtyRegion {
 // to the same canonical game backbuffer, crop and Present epoch by the caller.
 // A batch never fabricates full-frame or stereo coverage.
 struct NativeRawSourceIslandBatch {
-    static constexpr std::uint32_t kMaxIslands = 4u;
+    static constexpr std::uint32_t kMaxIslands = 8u;
     std::array<NativeRawPresentTile, kMaxIslands> tiles{};
     std::array<std::uint32_t, kMaxIslands> rgbPixels{};
     std::array<bool, kMaxIslands> alternate{};
