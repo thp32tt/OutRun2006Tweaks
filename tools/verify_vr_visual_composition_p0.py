@@ -56,6 +56,7 @@ verify_scene_texture_contract(textures)
 verify_texture_cache_lifetime(textures)
 hud = read('src/vr/hud_semantics.hpp')
 sem = read('src/vr/game/render_semantics.hpp')
+projected_lens = read('src/vr/game/projected_lens_inline_source.hpp')
 r30 = read('src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp')
 r7 = read('src/vr/d3d9/stereo_renderer_r7.inc')
 r26 = read('src/vr/d3d9/stereo_renderer_r26.cpp')
@@ -85,6 +86,7 @@ for path in (
     'src/hooks_bugfixes.cpp',
     'src/vr/hud_semantics.hpp',
     'src/vr/game/render_semantics.hpp',
+    'src/vr/game/projected_lens_inline_source.hpp',
     'src/vr/d3d9/stereo_renderer_r26.cpp',
     'src/vr/d3d9/stereo_renderer_r29.cpp',
     'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp',
@@ -3377,8 +3379,10 @@ def check_exact_scene_effect_raw_wvp(source):
     projected = eye[eye.index(
         'R30ScreenSpaceKind::ProjectedScreenEffect2D)'):]
     require_order(
-        projected, 'CABE R85 uses bounded original WVP before asymmetric eye-ray projection',
-        'if (!R44GetOwnedRawOverlayWvp(original) &&',
+        projected, 'exact C993 first, then CABE bounded raw WVP, before asymmetric eye-ray projection',
+        'R30GetExactInlineProjectedLensRawWvp(',
+        'if (!exactProjectedLensRaw &&',
+        '!R44GetOwnedRawOverlayWvp(original) &&',
         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)',
         'GetLatchedHeadInverse(',
@@ -3389,6 +3393,33 @@ def check_exact_scene_effect_raw_wvp(source):
         'BuildProjectedSunRay(',
         'std::memcpy(eyeConstants[eye], &projectedT'
     )
+    exact_projected = function_body(
+        source, 'bool R30GetExactInlineProjectedLensRawWvp(')
+    for token in (
+        'CurrentInlinePmt',
+        'GetLastProjectedLensRawWvp(out, raw)',
+        'OutRunVR::ProjectedLens::OwnsRawWvp(',
+        'sourceCameraSynced = raw.cameraSynced;',
+        'SAME_SOURCE_INLINE_PMT_NATIVE_C64',
+    ):
+        require(token, exact_projected,
+                'exact inline C993 must use source-owned raw WVP receipt')
+    if 'GetVertexShaderConstantF(' in exact_projected:
+        raise SystemExit(
+            'P0 exact inline C993 must not recover live possibly eye-mutated c64')
+    for token in (
+        '0x570002u',
+        '0x570006u',
+        '!IsExactInlineC993Object(0x57000Fu)',
+        '!IsExactInlineC993Object(0x570010u)',
+        'currentSourceSerial == raw.sourceSerial',
+        'currentObject == pmt.objectId',
+        'currentPoseEpoch == raw.poseEpoch',
+        'currentShader == raw.shader',
+        'currentShaderEpoch == raw.shaderEpoch',
+    ):
+        require(token, projected_lens,
+                'exact projected C993 source contract')
     for forbidden in (
         'std::memcpy(eyeConstants[0], &stockT',
         'std::memcpy(eyeConstants[1], &stockT',
