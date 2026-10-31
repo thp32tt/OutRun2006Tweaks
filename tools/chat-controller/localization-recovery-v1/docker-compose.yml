@@ -28,6 +28,7 @@ services:
       OUTRUN_AB_BATCH_QUEUE: "false"
       OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Legacy ROI + GPT OCR full-HD direct-reference ImageGen queue
       OUTRUN_GPT_CHAT_OCR_ENABLED: "true" # Normal ChatGPT image-attachment OCR fallback; no API
+      OUTRUN_PIXEL_OCR_REVIEW_ENABLED: "true" # SHA-verified small PNG review only; never auto-admit returned OCR bbox
       OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "600" # 10m stale wait -> retry/skip automatically
       OUTRUN_GPT_OCR_RESPONSE_POLL_SECONDS: "30" # Browser DOM response collector; independent of A/B/C1 schedule
       OUTRUN_GPT_OCR_WATCHDOG_SECONDS: "60"
