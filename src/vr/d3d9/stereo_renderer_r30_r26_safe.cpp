@@ -5673,7 +5673,10 @@ namespace OutRunVRStereo
         {
             using namespace OutRunVR::GameSemantic;
             sourceCameraSynced = false;
-            if (!device || !out || QueueRenderActive() ||
+            // This exact 405890 -> 404700 PMT executes *inside* the original
+            // opaque queue. QueueRenderActive is therefore expected here and
+            // must not veto the exact object/node/mesh owner.
+            if (!device || !out ||
                 EffectiveScope() != RenderScope::SceneEffect ||
                 !ExactProjectedLensAxisPmtActive())
                 return false;
@@ -6039,10 +6042,20 @@ namespace OutRunVRStereo
                     return false;
 
                 const D3DMATRIX identityEye = IdentityMatrix();
-                const bool sourceCameraSynced =
+                const auto activeLensSource =
+                    OutRunVR::GameSemantic::CurrentLensOriginalCall;
+                bool sourceCameraSynced =
                     exactProjectedLensRaw
                         ? exactProjectedLensCameraSynced
                         : OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
+                // Quest 23:09 runtime: CABE's second immediate 0x570008
+                // (callsite 2, ordinal 2) was the sole flare element moving
+                // WITH the head. Its screen WVP is not camera-synchronised;
+                // applying cameraSynced=1 suppresses the required head inverse.
+                if (activeLensSource.objectId == 0x570008u &&
+                    activeLensSource.callsite == 2u &&
+                    activeLensSource.ordinal == 2u)
+                    sourceCameraSynced = false;
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyeProjection =

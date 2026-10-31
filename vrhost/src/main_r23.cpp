@@ -2343,7 +2343,9 @@ namespace
                 static_cast<float>(capturedTheaterClient.right),
                 static_cast<float>(capturedTheaterClient.bottom),
                 static_cast<float>(c.sourceWidth_),
-                static_cast<float>(c.sourceHeight_))
+                static_cast<float>(c.sourceHeight_),
+                static_cast<float>(c.projection_.width),
+                static_cast<float>(c.projection_.height))
             : OutRunVrMenuAspect::LogicalCanvasCapturePlan{};
         const bool logicalCanvasCropApplied =
             !sourceIsSbs && logicalCanvasCrop.crop;

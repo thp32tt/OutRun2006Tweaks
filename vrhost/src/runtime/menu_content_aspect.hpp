@@ -134,6 +134,7 @@ namespace OutRunVrMenuAspect
         float clientLeft, float clientTop,
         float clientRight, float clientBottom,
         float sourceWidth, float sourceHeight,
+        float physicalWidth, float physicalHeight,
         float logicalWidth = 1920.0f,
         float logicalHeight = 1080.0f) noexcept
     {
@@ -141,8 +142,10 @@ namespace OutRunVrMenuAspect
             !std::isfinite(clientLeft) || !std::isfinite(clientTop) ||
             !std::isfinite(clientRight) || !std::isfinite(clientBottom) ||
             !std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
+            !std::isfinite(physicalWidth) || !std::isfinite(physicalHeight) ||
             !std::isfinite(logicalWidth) || !std::isfinite(logicalHeight) ||
             sourceWidth <= 0.0f || sourceHeight <= 0.0f ||
+            physicalWidth <= 0.0f || physicalHeight <= 0.0f ||
             logicalWidth <= 0.0f || logicalHeight <= 0.0f ||
             clientRight <= clientLeft || clientBottom <= clientTop)
             return {};
@@ -152,10 +155,13 @@ namespace OutRunVrMenuAspect
         if (clientWidth < logicalWidth || clientHeight < logicalHeight)
             return {};
 
-        const float clientAspect = clientWidth / clientHeight;
+        // The captured client rectangle is already clipped to the desktop
+        // output (e.g. 2496x1440), so its aspect cannot identify the original
+        // XR target. Use the actual OpenXR/D3D9Ex physical target instead.
+        const float physicalAspect = physicalWidth / physicalHeight;
         const float logicalAspect = logicalWidth / logicalHeight;
-        if (!std::isfinite(clientAspect) || !std::isfinite(logicalAspect) ||
-            clientAspect >= logicalAspect - 0.10f)
+        if (!std::isfinite(physicalAspect) || !std::isfinite(logicalAspect) ||
+            physicalAspect >= logicalAspect - 0.10f)
             return {};
 
         const float logicalRight = clientLeft + logicalWidth;

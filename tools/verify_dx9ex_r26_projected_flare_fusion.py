@@ -41,6 +41,12 @@ for obj in ("0x57000Eu","0x570003u","0x570004u","0x570005u",
             "0x57000Bu","0x57000Cu","0x57000Du"):
  assert obj in semantics,obj
 assert "CurrentLensDeferredPhysical" not in axis
+assert "QueueRenderActive()" not in axis
+assert "exact 405890 -> 404700 PMT executes *inside* the original" in axis
+assert "activeLensSource.objectId == 0x570008u" in tail
+assert "activeLensSource.callsite == 2u" in tail
+assert "activeLensSource.ordinal == 2u" in tail
+assert "sourceCameraSynced = false;" in tail
 axis_pmt_scope=body(hooks,"static void __cdecl TraceLensOpaquePmtEntry(")
 axis_flush_scope=body(hooks,"static void TraceLensOpaqueFlush(")
 assert axis_pmt_scope.index("ScopedLensAxisOpaquePmtOwner") < axis_pmt_scope.index("!Settings::VREnabled || !Settings::VRTelemetry")
