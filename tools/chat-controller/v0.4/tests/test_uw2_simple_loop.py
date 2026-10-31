@@ -217,7 +217,8 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         self.assertFalse(self.tick(9, 20))
         self.assertFalse(self.tick(9, 29, 59))
         self.assertEqual(self.sent, [PROMPT])
-        self.assertTrue(self.tick(9, 30))
+        self.assertFalse(self.tick(9, 30))  # newly seen reply: 20s stability first
+        self.assertTrue(self.tick(9, 30, 25))
         self.assertEqual(self.sent, [PROMPT, PROMPT])
         self.assertEqual(self.q["uw2_simple"]["last_send_reason"], "schedule_fallback")
 
