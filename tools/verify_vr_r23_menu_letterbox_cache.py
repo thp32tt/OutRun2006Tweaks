@@ -27,6 +27,7 @@ def verify(text: str) -> None:
         "PlanTopLeftLogicalCaptureUv(",
         "R23PublishedMirrorUv(",
         "GAME_PUBLISHED_D3D9_HWND_CLIENT_RECT",
+        "ORIGINAL_TITLE_MENU_4_3_WITHIN_GAME_HWND",
         "logicalRectVisible=1",
         "CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD",
         "c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)",
@@ -75,6 +76,9 @@ def verify(text: str) -> None:
     assert "fitPixels=" in theater
     assert "publishedMirrorApplied" in theater
     assert "!publishedMirrorApplied" in theater
+    assert "authoredFourThreeApplied" in theater
+    assert "(clientGameState == 0x04u || clientGameState == 0x09u)" in theater
+    assert "PlanCenteredContent(" in theater
 
 
 verify(source)

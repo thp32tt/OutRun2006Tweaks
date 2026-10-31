@@ -40,6 +40,9 @@ for t in ("CurrentLensAxisOpaquePmt",
  assert t in axis,t
 assert "GetCurrentShaderEpoch(" not in axis
 assert "IsProjectedLensPmtObject" in axis
+assert "R85LensVisualScale = 0.50f" in tail
+assert "R85LensStereoTranslationScale = 0.025f" in tail
+assert "lensEyeInverse._41" in tail
 for obj in ("0x570002u","0x570006u","0x57000Fu","0x570010u",
             "0x57000Eu","0x570003u","0x570004u","0x570005u",
             "0x570007u","0x570008u","0x57000Au","0x570009u",

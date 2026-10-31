@@ -64,6 +64,36 @@ int main() {
        !ray(result,0.12f,0.07f,0.25f,-0.125f)) {
         std::puts("FAIL: synchronized camera receives a second head rotation"); return 6;
     }
+    // HMD visual tuning: 0.5 scale halves local flare geometry around
+    // its authored origin without moving the centre ray.
+    {
+        Matrix half{};
+        const Matrix id = identity();
+        if (!OutRunVR::LensCentre::BuildProjectedSunRay(
+                projection(0,0), inverseProjection(), id, id,
+                projection(0,0), half, false, 0.5f, 0.0f) ||
+            !ray(half,0,0,0.125f,-0.0625f)) {
+            std::puts("FAIL: 0.5 flare scale did not preserve centre and halve local size");
+            return 7;
+        }
+    }
+    // A tiny eye translation fraction is allowed for finite depth; it must
+    // remain bounded and finite rather than reproducing full fake-plane IPD.
+    {
+        Matrix depthEye=identity(), shallow{};
+        depthEye.m[3][0]=-0.032f;
+        if (!OutRunVR::LensCentre::BuildProjectedSunRay(
+                stock,inverse,identity(),depthEye,projection(0,0),
+                shallow,false,1.0f,0.025f)) {
+            std::puts("FAIL: shallow finite flare depth rejected");
+            return 8;
+        }
+        for(int i=0;i<4;++i) for(int j=0;j<4;++j)
+            if(!std::isfinite(shallow.m[i][j])) {
+                std::puts("FAIL: shallow flare depth produced non-finite matrix");
+                return 9;
+            }
+    }
     Matrix saved=result;
     head.m[0][0]=std::numeric_limits<float>::quiet_NaN();
     if(OutRunVR::LensCentre::BuildProjectedSunRay(stock,inverse,head,eye,
@@ -72,5 +102,5 @@ int main() {
     }
     for(int i=0;i<4;++i) for(int j=0;j<4;++j)
         if(result.m[i][j]!=saved.m[i][j]) { std::puts("FAIL: partial result published"); return 5; }
-    std::puts("PASS projected sun: asymmetric XY FOV, head rotation, eye cant, translation exclusion, atomic rejection");
+    std::puts("PASS projected sun: asymmetric FOV, head rotation, 0.5 local scale, shallow finite eye depth, atomic rejection");
 }

@@ -2436,6 +2436,48 @@ namespace
                 }
             }
         }
+        bool authoredFourThreeApplied = false;
+        if (!sourceIsSbs && publishedMirrorApplied &&
+            (clientGameState == 0x04u || clientGameState == 0x09u))
+        {
+            constexpr float authoredAspect = 4.0f / 3.0f;
+            const auto menuCrop =
+                OutRunVrMenuAspect::PlanCenteredContent(
+                    publishedMirrorAspect, authoredAspect);
+            if (menuCrop.crop)
+            {
+                const float baseWidth = theaterUv.w;
+                const float baseHeight = theaterUv.h;
+                theaterUv.x += baseWidth * menuCrop.offsetX;
+                theaterUv.y += baseHeight * menuCrop.offsetY;
+                theaterUv.w = baseWidth * menuCrop.width;
+                theaterUv.h = baseHeight * menuCrop.height;
+                publishedMirrorAspect = authoredAspect;
+                authoredFourThreeApplied = true;
+
+                static std::uint64_t menu43Hits = 0;
+                const auto hit = ++menu43Hits;
+                if (hit <= 32 || (hit & (hit - 1)) == 0)
+                {
+                    std::ostringstream trace;
+                    trace
+                        << "[VR TRACE MENU AUTHORED 4_3 FULL]"
+                        << " hit=" << hit
+                        << " state=" << clientGameState
+                        << " uv=" << theaterUv.x << ',' << theaterUv.y
+                        << ',' << theaterUv.w << ',' << theaterUv.h
+                        << " aspect=" << publishedMirrorAspect
+                        << " authority=ORIGINAL_TITLE_MENU_4_3_WITHIN_GAME_HWND\n";
+                    OutRunVrEmitFullTrace(trace.str());
+                }
+            }
+            else if (std::fabs(publishedMirrorAspect - authoredAspect) <= 0.001f)
+            {
+                publishedMirrorAspect = authoredAspect;
+                authoredFourThreeApplied = true;
+            }
+        }
+
         const auto logicalCanvasCrop =
             !sourceIsSbs && !publishedMirrorApplied
             ? OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
@@ -2537,7 +2579,9 @@ namespace
         // Game SBS uses a different split seam; its established safe
         // fallback is unchanged.
         if (!sourceIsSbs &&
-            !publishedMirrorApplied && !logicalCanvasCropApplied)
+            !publishedMirrorApplied &&
+            !authoredFourThreeApplied &&
+            !logicalCanvasCropApplied)
         {
             const RECT& clientOnOutput = capturedTheaterClient;
             const auto fragment =

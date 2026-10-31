@@ -6035,7 +6035,8 @@ namespace OutRunVRStereo
                 if (!MatrixFinite(headInverse))
                     return false;
 
-                const D3DMATRIX identityEye = IdentityMatrix();
+                constexpr float R85LensVisualScale = 0.50f;
+                constexpr float R85LensStereoTranslationScale = 0.025f;
                 const bool sourceCameraSynced =
                     exactProjectedLensRaw
                         ? exactProjectedLensCameraSynced
@@ -6045,11 +6046,27 @@ namespace OutRunVRStereo
                     const D3DMATRIX eyeProjection =
                         ProjectionFromFov(
                             baseProjection, stereo.eyeFov[eye]);
+                    // Keep the successful single-image angular-ray repair,
+                    // but restore a tiny finite stereo depth. The eye inverse
+                    // contains translation only: no per-eye cant/rotation is
+                    // introduced here, avoiding a return of the old split flare.
+                    D3DMATRIX lensEyeInverse = IdentityMatrix();
+                    const float eyeDepth =
+                        Settings::VRWorldScale.get() *
+                        Settings::VRStereoDepth.get();
+                    lensEyeInverse._41 =
+                        -stereo.eyeOffset[eye][0] * eyeDepth;
+                    lensEyeInverse._42 =
+                        -stereo.eyeOffset[eye][1] * eyeDepth;
+                    lensEyeInverse._43 =
+                        -stereo.eyeOffset[eye][2] * eyeDepth;
                     D3DMATRIX projected{};
                     if (!OutRunVR::LensCentre::BuildProjectedSunRay(
                             stockWvp, inverseBaseProjection, headInverse,
-                            identityEye, eyeProjection, projected,
-                            sourceCameraSynced))
+                            lensEyeInverse, eyeProjection, projected,
+                            sourceCameraSynced,
+                            R85LensVisualScale,
+                            R85LensStereoTranslationScale))
                         return false;
                     const D3DMATRIX projectedT = TransposeMatrix(projected);
                     std::memcpy(eyeConstants[eye], &projectedT,
@@ -6073,7 +6090,8 @@ namespace OutRunVRStereo
                             "headR=[{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g}] "
                             "headT={:.9g},{:.9g},{:.9g} "
                             "fovL={:.9g},{:.9g},{:.9g},{:.9g} "
-                            "fovR={:.9g},{:.9g},{:.9g},{:.9g}",
+                            "fovR={:.9g},{:.9g},{:.9g},{:.9g} "
+                            "visualScale={:.3f} stereoTranslationScale={:.4f}",
                             hit, TopLevelDrawSerial(),
                             stereo.poseSequence, headSequence,
                             sourceCameraSynced ? 1 : 0,
@@ -6090,7 +6108,9 @@ namespace OutRunVRStereo
                             stereo.eyeFov[0].angleLeft, stereo.eyeFov[0].angleRight,
                             stereo.eyeFov[0].angleUp, stereo.eyeFov[0].angleDown,
                             stereo.eyeFov[1].angleLeft, stereo.eyeFov[1].angleRight,
-                            stereo.eyeFov[1].angleUp, stereo.eyeFov[1].angleDown);
+                            stereo.eyeFov[1].angleUp, stereo.eyeFov[1].angleDown,
+                            R85LensVisualScale,
+                            R85LensStereoTranslationScale);
                 }
                 static bool firstAsymmetricFlareRayLogged = false;
                 if (!firstAsymmetricFlareRayLogged)
