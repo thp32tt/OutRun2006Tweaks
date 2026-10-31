@@ -392,8 +392,10 @@ namespace OutRunVrMenuAspect
         float menuScale = 1.0f) noexcept
     {
         const bool ownsFrontEndOpticalScale =
+            gameState == 0x00u || // SYSTEM / boot-title theater
             gameState == 0x04u || gameState == 0x09u ||
-            gameState == 0x20u; // STATE_SUMO_FE runtime owner
+            gameState == 0x0Du || // START / loading theater
+            gameState == 0x20u;   // STATE_SUMO_FE runtime owner
         // Scale is a fraction of the binocular-safe source-aspect canvas,
         // independent of desktop pixels, render extent and XR resolution.
         const float defaultCoverage =

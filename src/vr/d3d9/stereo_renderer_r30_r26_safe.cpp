@@ -6043,16 +6043,49 @@ namespace OutRunVRStereo
                     exactProjectedLensRaw
                         ? exactProjectedLensCameraSynced
                         : OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
-                // Quest 2026-11-01 01:23 HMD proof: the flare family now
-                // converges, but the sun/light source moves opposite head yaw.
-                // Exact 405890 PMT c64 is recorded cameraSynced=1 because the
-                // game camera has ALREADY consumed the common HMD rotation.
-                // Feeding that source through headInverse again removes the
-                // rotation a second time and creates the observed counter-lock.
-                // Preserve the recorded ownership bit: BuildProjectedSunRay
-                // suppresses common head rotation only for an already-synced
-                // source, while unsynced fallbacks still receive headInverse.
-                const bool sourceCameraSynced = recordedCameraSynced;
+
+                // Quest 2026-11-01 01:51 HMD proof separates two owners:
+                // the sun/light source is now directionally correct when its
+                // camera-synchronized PMT keeps the game camera rotation,
+                // while the optical flare discs move with the headset when
+                // that same rule is applied to them. Keep the source families
+                // distinct instead of toggling one global PMT rule.
+                const auto sourceReceipt =
+                    OutRunVR::GameSemantic::CurrentLensOriginalCall;
+                const auto deferredReceipt =
+                    OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
+                const std::uint32_t pmtObjectId =
+                    exactProjectedLensPmtRaw
+                        ? OutRunVR::GameSemantic::CurrentLensAxisOpaquePmt.objectId
+                        : 0u;
+                const std::uint32_t projectedObjectId =
+                    pmtObjectId != 0u
+                        ? pmtObjectId
+                        : (sourceReceipt.objectId != 0u
+                            ? sourceReceipt.objectId
+                            : deferredReceipt.objectId);
+                const auto isOuterFlareObject =
+                    [](std::uint32_t objectId) noexcept
+                    {
+                        switch (objectId)
+                        {
+                        case 0x570003u: case 0x570004u: case 0x570005u:
+                        case 0x570007u: case 0x570008u: case 0x570009u:
+                        case 0x57000Au: case 0x57000Bu: case 0x57000Cu:
+                        case 0x57000Du: case 0x57000Eu:
+                            return true;
+                        default:
+                            return false;
+                        }
+                    };
+                const bool outerFlareObject =
+                    isOuterFlareObject(projectedObjectId);
+                // Sun/light family 570002/570006/57000F/570010 keeps the
+                // synchronized game-camera rotation that fixed counter-lock.
+                // Only lens artifacts re-enter the head-inverse world-bearing
+                // path so they stay attached to the sun rather than the HMD.
+                const bool sourceCameraSynced =
+                    outerFlareObject ? false : recordedCameraSynced;
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyeProjection =
@@ -6086,10 +6119,6 @@ namespace OutRunVRStereo
                 }
                 if (Settings::VRTelemetry)
                 {
-                    const auto sourceReceipt =
-                        OutRunVR::GameSemantic::CurrentLensOriginalCall;
-                    const auto deferredReceipt =
-                        OutRunVR::GameSemantic::CurrentLensDeferredPhysical;
                     static std::atomic<std::uint64_t> r85BuildReceipts{0};
                     const auto hit = r85BuildReceipts.fetch_add(
                         1, std::memory_order_relaxed) + 1;
@@ -6097,7 +6126,8 @@ namespace OutRunVRStereo
                         spdlog::info(
                             "VR TRACE LENS R85 BUILD: hit={} draw={} pose={} headSeq={} "
                             "cameraSyncedRecorded={} cameraSyncedApplied={} "
-                            "pmtSourceOwnsCameraRotation={} sourceCallSerial={} sourceObj=0x{:06X} "
+                            "outerFlareObject={} projectedObj=0x{:06X} pmtObj=0x{:06X} "
+                            "sourceCallSerial={} sourceObj=0x{:06X} "
                             "sourceSite={} ordinal={} deferredSerial={} deferredObj=0x{:06X} "
                             "deferredOrdinal={} stockT={:.9g},{:.9g},{:.9g} "
                             "headR=[{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g}] "
@@ -6109,7 +6139,8 @@ namespace OutRunVRStereo
                             stereo.poseSequence, headSequence,
                             recordedCameraSynced ? 1 : 0,
                             sourceCameraSynced ? 1 : 0,
-                            exactProjectedLensPmtRaw ? 1 : 0,
+                            outerFlareObject ? 1 : 0,
+                            projectedObjectId, pmtObjectId,
                             sourceReceipt.sourceSerial, sourceReceipt.objectId,
                             static_cast<unsigned>(sourceReceipt.callsite),
                             static_cast<unsigned>(sourceReceipt.ordinal),
@@ -6132,7 +6163,7 @@ namespace OutRunVRStereo
                 {
                     firstAsymmetricFlareRayLogged = true;
                     spdlog::info(
-                        "VR R85 FLARE RAY: camera-synchronized PMT source preserves its existing common head rotation; unsynced sources alone receive head inverse, then both project through L/R asymmetric FOV; shallow 2.5% eye translation retained");
+                        "VR R85 FLARE RAY: sun/light PMTs preserve synchronized game-camera rotation; outer lens artifacts receive common head inverse, then both use L/R asymmetric FOV with shallow 2.5% eye translation");
                 }
                 return true;
             }

@@ -27,15 +27,15 @@ assert 'FollowGameResolution = false' in ini
 front_end = ui.split('bool VrFrontEndPhysicalCanvasState() noexcept', 1)[1].split(
     'bool ResolveVrFrontEndVirtualCanvasScale(', 1)[0]
 assert 'STATE_SUMO_FE = 0x20' in game
-assert 'case GameState::STATE_SYSTEM:' in front_end
-assert 'case GameState::STATE_START:' in front_end
+assert 'case GameState::STATE_SYSTEM:' not in front_end
+assert 'case GameState::STATE_START:' not in front_end
 assert 'case GameState::STATE_SUMO_FE:' in front_end
 assert 'case GameState::STATE_GAME:' not in front_end
-assert 'const float containScale =' in ui
-assert '(std::min)(physicalScaleX, physicalScaleY)' in ui
-assert 'scaleX = scaleY = containScale;' in ui
-assert 'mapped._41 += offsetX;' in ui
-assert 'mapped._42 += offsetY;' in ui
+assert 'const float containScale =' not in ui
+assert 'mapped._41 += offsetX;' not in ui
+assert 'mapped._42 += offsetY;' not in ui
+assert 'scaleX = static_cast<float>(width) / logicalWidth;' in ui
+assert 'scaleY = static_cast<float>(height) / logicalHeight;' in ui
 assert 'MapVrFrontEndMatrixToPhysical(' in ui
 assert 'VR TRACE FRONTEND VIRTUAL CANVAS:' in ui
 
@@ -57,7 +57,9 @@ assert 'ReadMenuScaleOverride(path, candidateMenuScale)' in host
 assert host.count('ReadMenuScaleOverride(path, candidateMenuScale)') == 2
 assert 'clientGameState, R23ConfiguredMenuScale);' in host
 aspect = (root / 'vrhost/src/runtime/menu_content_aspect.hpp').read_text(encoding='utf-8')
-assert 'gameState == 0x20u; // STATE_SUMO_FE runtime owner' in aspect
+assert 'gameState == 0x00u || // SYSTEM / boot-title theater' in aspect
+assert 'gameState == 0x0Du || // START / loading theater' in aspect
+assert 'gameState == 0x20u;   // STATE_SUMO_FE runtime owner' in aspect
 assert 'ownsFrontEndOpticalScale ? menuScale : 1.0f' in aspect
 assert 'cachedMenuScale != R23ConfiguredMenuScale' in host
 assert 'HudScale = 0.55' in ini

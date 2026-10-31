@@ -93,8 +93,9 @@ assert 'if (ordinal == 2)' not in gfx
 # translation; full/canted eye transforms remain forbidden here.
 assert 'R85LensVisualScale = 0.50f' in r30
 assert 'R85LensStereoTranslationScale = 0.025f' in r30
-assert 'const bool sourceCameraSynced = recordedCameraSynced;' in r30
-assert 'pmtSourceOwnsCameraRotation={}' in r30
+assert 'outerFlareObject ? false : recordedCameraSynced' in r30
+assert 'outerFlareObject={}' in r30
+assert 'projectedObj=0x{:06X}' in r30
 assert 'lensEyeInverse = IdentityMatrix()' in r30
 assert 'lensEyeInverse._41' in r30
 assert 'stereo.eyeFov[eye]' in r30

@@ -3387,7 +3387,7 @@ def check_exact_scene_effect_raw_wvp(source):
         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)',
         'GetLatchedHeadInverse(',
-        'const bool sourceCameraSynced = recordedCameraSynced;',
+        'outerFlareObject ? false : recordedCameraSynced',
         'for (int eye = 0; eye < 2; ++eye)',
         'ProjectionFromFov(',
         'stereo.eyeFov[eye]',
@@ -3397,13 +3397,14 @@ def check_exact_scene_effect_raw_wvp(source):
     for token in (
         'exactProjectedLensPmtRaw',
         'recordedCameraSynced',
-        'const bool sourceCameraSynced = recordedCameraSynced;',
+        'outerFlareObject ? false : recordedCameraSynced',
         'lensEyeInverse = IdentityMatrix()',
         'R85LensStereoTranslationScale = 0.025f',
-        'pmtSourceOwnsCameraRotation={}',
+        'outerFlareObject={}',
+        'projectedObj=0x{:06X}',
     ):
         require(token, projected,
-                'exact PMT flare must preserve synchronized camera ownership before eye projection')
+                'sun PMTs keep synchronized rotation while outer flare PMTs receive head inverse')
     exact_projected = function_body(
         source, 'bool R30GetExactInlineProjectedLensRawWvp(')
     for token in (

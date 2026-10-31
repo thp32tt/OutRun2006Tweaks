@@ -68,10 +68,6 @@ namespace
             return false;
         switch (*Game::current_mode)
         {
-        // Quest runtime 2026-11-01 01:23: boot/license/title captures can
-        // remain STATE_SYSTEM while the original 2D front-end is already
-        // drawing. Treat that observed owner exactly like the later menu.
-        case GameState::STATE_SYSTEM:
         case GameState::STATE_TITLE:
         case GameState::STATE_MENU:
         case GameState::STATE_SELECTOR:
@@ -83,10 +79,6 @@ namespace
         case GameState::STATE_GAMEEXIT:
         case GameState::STATE_GAMERESET:
         case GameState::STATE_SUMOGAMERESET:
-        // Quest runtime 2026-11-01 01:23: STATE_START is the loading panel
-        // between selector and gameplay. Without physical-canvas mapping the
-        // 1920x1080 loading image remains in the upper-left of the XR target.
-        case GameState::STATE_START:
         // Quest runtime 2026-11-01: the real Sumo front-end keeps
         // current_mode at 0x20 while drawing the title/main menu/selector.
         // Without this owner the finished 1920x1080 UI matrix remains in the
@@ -130,22 +122,11 @@ namespace
                 width, height))
             return false;
 
-        const float physicalScaleX =
-            static_cast<float>(width) / logicalWidth;
-        const float physicalScaleY =
-            static_cast<float>(height) / logicalHeight;
-        // The XR eye surface is portrait on Quest/VDXR (2496x2688 in the
-        // current trace) while the front-end canvas is 1920x1080. Stretching
-        // each axis independently made Y=2.4889 versus X=1.30, producing a
-        // face-close menu, overlong bottom bar and detached black rectangles.
-        // Map one logical pixel scale uniformly and centre the contained
-        // canvas inside the physical target. OpenXR/MenuScale controls the
-        // final optical size; this path only maps game pixels to D3D9 pixels.
-        const float containScale =
-            (std::min)(physicalScaleX, physicalScaleY);
-        scaleX = scaleY = containScale;
-        if (!std::isfinite(scaleX) || scaleX <= 0.0f ||
-            scaleX > 8.0f)
+        scaleX = static_cast<float>(width) / logicalWidth;
+        scaleY = static_cast<float>(height) / logicalHeight;
+        if (!std::isfinite(scaleX) || !std::isfinite(scaleY) ||
+            scaleX <= 0.0f || scaleY <= 0.0f ||
+            scaleX > 8.0f || scaleY > 8.0f)
         {
             scaleX = scaleY = 1.0f;
             return false;
@@ -168,26 +149,14 @@ namespace
                 &physicalWidth, &physicalHeight))
             return false;
 
-        const float logicalWidth = Game::screen_resolution->x;
-        const float logicalHeight = Game::screen_resolution->y;
-        const float offsetX =
-            (static_cast<float>(physicalWidth) - logicalWidth * scaleX) * 0.5f;
-        const float offsetY =
-            (static_cast<float>(physicalHeight) - logicalHeight * scaleY) * 0.5f;
-        if (!std::isfinite(offsetX) || !std::isfinite(offsetY))
-            return false;
-
         D3DMATRIX mapped = *matrix;
         // D3DXVec4Transform is row-vector style: output X is column 1 and
-        // output Y is column 2. Use ONE contain scale for both output columns,
-        // then centre the completed logical canvas in the physical XR target.
-        // Z/W and the 3D render target remain untouched.
+        // output Y is column 2. Scale those two output columns only; Z/W and
+        // the 3D render target remain untouched.
         mapped._11 *= scaleX; mapped._21 *= scaleX;
         mapped._31 *= scaleX; mapped._41 *= scaleX;
         mapped._12 *= scaleY; mapped._22 *= scaleY;
         mapped._32 *= scaleY; mapped._42 *= scaleY;
-        mapped._41 += offsetX;
-        mapped._42 += offsetY;
 
         const float* values =
             reinterpret_cast<const float*>(&mapped);
@@ -205,12 +174,11 @@ namespace
                 spdlog::info(
                     "VR TRACE FRONTEND VIRTUAL CANVAS: hit={} "
                     "logical={:.9g}x{:.9g} physical={}x{} scale={:.9g},{:.9g} "
-                    "offset={:.9g},{:.9g} matrixTx={:.9g} matrixTy={:.9g}",
+                    "matrixTx={:.9g} matrixTy={:.9g}",
                     hit, Game::screen_resolution->x,
                     Game::screen_resolution->y,
                     physicalWidth, physicalHeight,
-                    scaleX, scaleY, offsetX, offsetY,
-                    matrix->_41, matrix->_42);
+                    scaleX, scaleY, matrix->_41, matrix->_42);
         }
         return true;
     }
