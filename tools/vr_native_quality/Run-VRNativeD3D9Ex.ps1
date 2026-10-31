@@ -66,6 +66,19 @@ try {
         $session = Join-Path $logRoot ("NATIVE_D3D9EX_" + $stamp)
         New-Item -ItemType Directory -Path $session -Force | Out-Null
         $report = Join-Path $session 'TRANSPORT_RESULT.txt'
+        # Never classify stale logs from a previous test run as this run's
+        # D3D9Ex/DirectGPU result. Preserve them instead of deleting them.
+        $priorLogDir = Join-Path $session 'PREVIOUS_RUN_LOGS'
+        foreach ($pattern in @('OutRun2006Tweaks*.log',
+                               'outrun-vr-host*.log',
+                               'outrun-vr-watchdog*.log')) {
+            foreach ($oldLog in @(Get-ChildItem -Path $gameDir -Filter $pattern -File -ErrorAction SilentlyContinue)) {
+                if (!(Test-Path -LiteralPath $priorLogDir)) {
+                    New-Item -ItemType Directory -Path $priorLogDir -Force | Out-Null
+                }
+                Move-Item -LiteralPath $oldLog.FullName -Destination (Join-Path $priorLogDir $oldLog.Name) -ErrorAction Stop
+            }
+        }
         $gameArgs = @(
             '-FramerateLimit=0',
             '-FramerateFastLoad=0',
