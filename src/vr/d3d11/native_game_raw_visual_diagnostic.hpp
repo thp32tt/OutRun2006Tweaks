@@ -245,11 +245,14 @@ public:
                 return NativeRawPreviewResult::UnsafePresent;
             sourceSmallCropOnly = true;
         }
-        // Partial D3D9 dirty Presents frequently omit the normal top-right
-        // diagnostic destination. Retarget the visible RAW GPU tile INSIDE
-        // authenticated game-painted pixels, never outside source crop.
+        // Partial D3D9 dirty Presents frequently omit the top-right
+        // diagnostic destination. Only a displaced RAW tile must be moved:
+        // authenticated source-only RGB uses the exact D3D9 source pixel
+        // grid and the independently verified dirty-source island batch.
         // Full source-repaint proof still uses the original fixed location.
-        if (sourceDirty && !sourceCropRepaintVerified) {
+        if (native_raw_requires_legacy_dirty_placement(
+                sourceDirty != nullptr, sourceCropRepaintVerified,
+                sourceSmallCropOnly)) {
             NativeRawPresentTile dirtyPlaced{};
             if (!native_raw_dirty_region_place_tile(
                     back.Width, back.Height, l, t, r, b,

@@ -82,6 +82,13 @@ constexpr bool native_raw_changed_crop_regression() {
             573u, 229u, 256u, 144u, 1919u, 1080u,
             1920u, 1080u, 700, 300, 701, 301, clipped))
         return false;
+    // A source-aligned 1px dirty Present must bypass legacy 24px displaced
+    // inset placement; unverified/ordinary dirty diagnostic retains it.
+    if (native_raw_requires_legacy_dirty_placement(true, false, true) ||
+        !native_raw_requires_legacy_dirty_placement(true, false, false) ||
+        native_raw_requires_legacy_dirty_placement(false, false, false) ||
+        native_raw_requires_legacy_dirty_placement(true, true, false))
+        return false;
     // Genuine dirty Present members may also completely cover a tiny crop.
     // A bounding rectangle containing a hole must never authorize painting.
     NativeRawPresentDirtyRegion tinyDirty{};

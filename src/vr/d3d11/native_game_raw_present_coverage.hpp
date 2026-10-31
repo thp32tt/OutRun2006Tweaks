@@ -97,6 +97,15 @@ struct NativeRawPresentDirtyRegion {
     }
     return true;
 }
+// An exact, original-screen source-only batch paints directly from the
+// canonical backbuffer and never needs a displaced RAW diagnostic tile.
+// Requiring legacy 24px placement here rejects genuine 1..23px D3D9 dirty
+// menu/HUD Presents before their authenticated GPU RGB can be uploaded.
+[[nodiscard]] constexpr bool native_raw_requires_legacy_dirty_placement(
+    bool dirtyPresent, bool fullRepaintVerified,
+    bool authenticatedSourceOnly) noexcept {
+    return dirtyPresent && !fullRepaintVerified && !authenticatedSourceOnly;
+}
 // A small game source crop may be repainted by an authentic D3D9 dirty
 // RGNDATA union even when the Present caller did not certify a full repaint.
 // Prove every pixel of the VISIBLE crop, not rcBound or an intersecting
