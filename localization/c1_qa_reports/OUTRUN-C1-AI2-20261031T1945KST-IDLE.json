@@ -1,0 +1,89 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T1945KST-IDLE",
+  "scheduled_slot_kst": "2026-10-31T19:45:00+09:00",
+  "verified_at_kst": "2026-10-31T19:50:07+09:00",
+  "role": "C1",
+  "status": "IDLE",
+  "reason": "NO_NEW_VERIFIED_UNREVIEWED_A_B_KOREAN_CANDIDATE_PNG_SHA",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "observed_asset_head_before_report": "f1822ec67f211965e130b06a8dd9b126083614c1",
+  "policy_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence": {
+    "n100_candidate_root": "work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+    "A_png_count": 437,
+    "B_png_count": 483,
+    "total_png": 920,
+    "export_evidence_file_count": 289,
+    "previous_full_sha_dedup_at_kst": "2026-10-31T17:45:00+09:00",
+    "previous_reviewed_sha_records": 925,
+    "previous_unreviewed_candidate_sha_count": 0,
+    "previous_github_report": "localization/c1_qa_reports/OUTRUN-C1-AI2-20261031T1915KST-IDLE.json",
+    "current_directory_mtimes_utc": {
+      "A": "2026-10-30T09:00:02.155Z",
+      "B": "2026-10-30T08:50:07.171Z",
+      "export_evidence": "2026-10-30T09:00:02.157Z",
+      "local_completion": "2026-10-30T09:00:02.159Z"
+    },
+    "directory_mtimes_match_prior_report": true,
+    "latest_verified_producer_state": {
+      "A": {
+        "completed_files": 436,
+        "completed_batches": 142,
+        "active": null
+      },
+      "B": {
+        "completed_files": 483,
+        "completed_batches": 146,
+        "active": null
+      }
+    },
+    "candidate_sha256_spotchecks": [
+      {
+        "role": "A",
+        "file": "Q228_3df4ed65ab58f44f_k.png",
+        "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+        "matches_prior": true
+      },
+      {
+        "role": "B",
+        "file": "Q228_6a1d77db05265918_k.png",
+        "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+        "matches_prior": true
+      }
+    ]
+  },
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": 1,
+    "duplicate_sha_re_reviewed": false
+  },
+  "caveats": [
+    "The legacy N100 c1_inventory_20261031_0245.py indexes only 45 local QA reports/311 SHAs, omitting prior GitHub QA reports; its 551 unknown SHAs are NOT established pending candidates.",
+    "Full 920-file candidate rehash was not repeated. Existing 17:45 full dedup, unchanged live source directory mtimes and two current SHA spot checks support IDLE.",
+    "No new PNG visual QA or in-game/rendered DDS acceptance performed."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score": {
+    "source": "thp32tt/ai-dev-lab@main/AI_SCOREBOARD.md",
+    "previous_ai2": 2267,
+    "delta": 0,
+    "cumulative_ai2": 2267,
+    "reason": "IDLE and repeated status verification are not independent accomplishments"
+  }
+}
