@@ -85,6 +85,12 @@ assert 'StageExtensionEntrySerial);' in stage_leave
 # families now retain one angular source while using each eye's asymmetric FOV.
 assert 'VR LENS 570008 ORIGINAL BOTH DRAWN:' in gfx
 assert 'if (ordinal == 2)' not in gfx
-assert 'identityEye = IdentityMatrix()' in r30
+# Quest 2026-11-01: zero-IPD repaired the double image but looked optically
+# flat. Keep the same angular-ray route while allowing only a tiny bounded eye
+# translation; full/canted eye transforms remain forbidden here.
+assert 'R85LensVisualScale = 0.50f' in r30
+assert 'R85LensStereoTranslationScale = 0.025f' in r30
+assert 'lensEyeInverse = IdentityMatrix()' in r30
+assert 'lensEyeInverse._41' in r30
 assert 'stereo.eyeFov[eye]' in r30
 assert 'ProjectionFromFov(' in r30
