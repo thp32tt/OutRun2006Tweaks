@@ -1,0 +1,86 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T1215KST-IDLE",
+  "scheduled_slot_kst": "2026-10-31T12:15:00+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "verified_remote_head_before": "1c044b40e9e299750e17fe13178fa1731e35dc95",
+  "policies_verified": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_root": "N100 /home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "inventory": {
+    "A_png": 437,
+    "B_png": 483,
+    "total_png": 920,
+    "export_sha_mappings": 920,
+    "prior_qa_reports": 197,
+    "reviewed_distinct_sha": 925,
+    "pending_unreviewed_export_sha": 0,
+    "missing_export_mappings": 0,
+    "new_candidate_png_since_20261030_182149_kst": 0,
+    "producer_state": {
+      "A": {
+        "completed_files": 436,
+        "completed_batches": 142,
+        "active": null
+      },
+      "B": {
+        "completed_files": 483,
+        "completed_batches": 146,
+        "active": null
+      }
+    }
+  },
+  "last_png_mtime_kst": {
+    "A": "2026-10-30T18:00:02+09:00",
+    "B": "2026-10-30T17:50:07+09:00"
+  },
+  "live_sha256_spot_checks": [
+    {
+      "role": "A",
+      "filename": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "matches_prior_sha": true
+    },
+    {
+      "role": "B",
+      "filename": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "matches_prior_sha": true
+    }
+  ],
+  "method": "N100 candidate_outputs A/B listing; read-only work/C1_QA_20261030_1945_dedup_readonly.py + work/C1_QA_20261030_1945_inventory_readonly.py; SHA256 spot checks; GitHub contract/glyph/roles/latest remote branch",
+  "verdict": {
+    "new_candidates_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "reason": "No unique unreviewed SHA candidates; do not re-review same SHA or fabricate QA PASS."
+  },
+  "limitations": [
+    "Historical SHA comparisons use exporter records; this slot did not freshly hash all 920 physical PNGs.",
+    "No new candidate visual QA was conducted because no unreviewed candidate was found.",
+    "No DDS/C2/C3/ingame approval is implied."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "ai_score": {
+    "SSOT": "thp32tt/ai-dev-lab main AI_SCOREBOARD.md",
+    "previous_confirmed_AI2": 2257,
+    "delta": 0,
+    "cumulative_AI2": 2257,
+    "scoreboard_updated": false
+  }
+}
