@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01191",
+  "production_id": "CONVERSION-DX11-01191",
+  "event_id": "CONVERSION-DX11-01191-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SOURCE_RGB_CORE_ACROSS_COMPLEX_GAME_PRESENT_DIRTY_UNION",
+  "classification": "A_SOURCE_IMPLEMENTATION_AND_B_CAUSAL_CI_POLICY_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "83f211680c7729c317fe806cd0d258dce64ee8be",
+  "implementation_source_sha": "aa7e68cbca8c225b67196873f98e6120a459611d",
+  "material_result_sha": "aa7e68cbca8c225b67196873f98e6120a459611d",
+  "validation_bearing_result_sha": "097b69d150a09a66689dac5d16ddfd8823def64f",
+  "c6_checkpoint_is_validation_bearing": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01190.json",
+    "tools/test_dx11_autodev_policy.py"
+  ],
+  "implementation": "In the native source-Present pixel pipeline, derive the strongest actual GPU-solid PRE/POST RGB rectangle before D3D9 dirty-member proposals. Use the same original game source/destination coordinates, disjoint batching, original pixel-exact dirty union coverage and bounded 8-private-surface staging. Regressions for a 10x2 authentic GPU core over 3 D3D9 repaint strips with dangling arm, duplicate pixels, forged rcBound and dirty hole. A separate 01191 metadata-only causal repair restores 01190's historical exact-SHA policy validation. This remains opt-in partial RAW diagnostic; no full-game native DX11 or HMD proof.",
+  "validation": {
+    "exact_sha": "097b69d150a09a66689dac5d16ddfd8823def64f",
+    "required_push_workflows_result": "5/5 completed SUCCESS on identical exact SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41235061074,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "097b69d150a09a66689dac5d16ddfd8823def64f",
+        "event": "push"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41235061068,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "097b69d150a09a66689dac5d16ddfd8823def64f",
+        "event": "push"
+      },
+      {
+        "name": "Build",
+        "run_id": 41235061076,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "097b69d150a09a66689dac5d16ddfd8823def64f",
+        "event": "push"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41235061067,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "097b69d150a09a66689dac5d16ddfd8823def64f",
+        "event": "push"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41235061080,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "097b69d150a09a66689dac5d16ddfd8823def64f",
+        "event": "push"
+      }
+    ],
+    "initial_source_sha": "aa7e68cbca8c225b67196873f98e6120a459611d",
+    "initial_fast_run": 41234809176,
+    "initial_backend_run": 41234809302,
+    "initial_failure": "Previous record 01190 missing live-game path and two distinct behavior areas; same-task 097b69d repair restored historical C6 policy and negative policy regression; no separate score.",
+    "targeted_test": "Fast Structural Checks compiled and ran C++ changed-source regressions, including native_raw_gpu_core_across_dirty_strips_regression; same exact SHA.",
+    "runtime_game_and_quest3": "UNTESTED"
+  },
+  "safety": {
+    "raw_opt_in_default_off": true,
+    "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
+    "dxvk": "FROZEN_UNMODIFIED",
+    "native_game_full_frame": "NOT_CLAIMED",
+    "external_controller_adoption": "UNVERIFIED"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_BEFORE_AFTER_RGB_DELTA",
+      "OPT_IN_SOURCE_ALIGNED_DIAGNOSTIC_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "REAL_GAME_D3D9_DRAW",
+      "REAL_D3D11_PRE_POST_RGB_CAPTURE",
+      "SOLID_GPU_CORE_SELECTION",
+      "ORIGINAL_D3D9_DIRTY_UNION_PIXEL_AUTHENTICATION",
+      "ORIGINAL_SOURCE_POSITIONED_D3D9_UPDATE_SURFACE"
+    ],
+    "batch_components": [
+      "NATIVE_RGB_SOURCE_CORE_SELECTION",
+      "ORIGINAL_D3D9_DIRTY_UNION_AND_DISJOINT_STAGING",
+      "POSITIVE_NEGATIVE_CPP_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original 10x2 native RGB remains at identical game pixels across three adjacent D3D9 dirty strips, exact SHA Fast CI PASS.",
+      "negative_regression": "Previously published GPU RGB and forged rcBound grant no extra paint; a hole in original dirty union cannot become visible native RGB.",
+      "component_integration": "Real live D3D9 Draw -> native D3D11 GPU PRE/POST RGB -> authenticated source-only solid region -> D3D9 Present staging; default-off diagnostic, protected legacy renderer and game input."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "tests/native_raw_changed_crop_present_test.cpp",
+      "docs/automation/runs/CONVERSION-DX11-01191.json"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "PARTIAL_SOURCE_MATCHED_REAL_NATIVE_GPU_RGB_ONLY; FULL_MENU_CAR_RACE_NOT_VERIFIED; GAME_HMD_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "RAW opt-in OFF by default, original D3D9/FFB/input retained, DX9Ex fallback protected, DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Carry genuine source-owned native GPU RGB across complex original D3D9 multi-member Present regions without fabricating pixels or claiming full-scene/gameplay output.",
+    "acceptance_items": [
+      {
+        "id": "source_gpu_core",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_LIVE_GPU_DRAW_SOURCE_RGB",
+        "expected_behavior": "Native GPU changed-RGB solid core is selected in the true original D3D9 game source coordinates."
+      },
+      {
+        "id": "game_present_union_safety",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_PRESENT_SOURCE_IDENTITY_AND_FALLBACK",
+        "expected_behavior": "Only verified original D3D9 dirty-union covered, source-authenticated, disjoint RGB tiles may be staged."
+      },
+      {
+        "id": "exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "WIN32_BACKEND_OPENXR_HUD_CI",
+        "expected_behavior": "All five mandatory GitHub Actions pass on the same final source-bearing validation SHA; HMD remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_gpu_core": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "GitHub DX11 Fast 41235061074"
+    },
+    "game_present_union_safety": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "GitHub DX11 Fast 41235061074"
+    },
+    "exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41235061074",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41235061068",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41235061076",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41235061067",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41235061080"
+      ],
+      "validation_command": "41235061074,41235061068,41235061076,41235061067,41235061080"
+    }
+  },
+  "scoring": "Same unfinished full-native-frame feature continuation. Metadata repair/C6, test and existing feature extension receive no duplicate points; AI 2 GitHub SSOT most recently observed 2310 + this task 0 = 2310."
+}
