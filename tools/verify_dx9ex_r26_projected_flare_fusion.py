@@ -1,39 +1,53 @@
 #!/usr/bin/env python3
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-text=(ROOT/"src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(encoding="utf-8")
-def body(sig):
+r30=(ROOT/"src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(encoding="utf-8")
+hooks=(ROOT/"src/hooks_graphics.cpp").read_text(encoding="utf-8")
+renderer=(ROOT/"src/vr/game/outrun_renderer.cpp").read_text(encoding="utf-8")
+contract=(ROOT/"src/vr/game/projected_lens_inline_source.hpp").read_text(encoding="utf-8")
+def body(text,sig):
  s=text.index(sig); b=text.index("{",s); d=0
  for i in range(b,len(text)):
   d += 1 if text[i]=="{" else -1 if text[i]=="}" else 0
   if d==0:return text[s:i+1]
  raise AssertionError(sig)
-classifier=body("R30ScreenSpaceKind R30ClassifyScreenSpacePass(")
-builder=body("bool R30BuildScreenSpaceEyeConstants(")
-dispatch=body("HRESULT R30TryScreenSpaceFovDraw(")
+classifier=body(r30,"R30ScreenSpaceKind R30ClassifyScreenSpacePass(")
+builder=body(r30,"bool R30BuildScreenSpaceEyeConstants(")
+dispatch=body(r30,"HRESULT R30TryScreenSpaceFovDraw(")
+exact=body(r30,"bool R30GetExactInlineProjectedLensRawWvp(")
 assert "if (semanticProjectedScreen)" in classifier
 assert "if (semanticProjectedScreen || semanticSceneEffect)" not in classifier
 tail=builder[builder.index("if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)"):]
-for t in ("GetLatchedHeadInverse(","const D3DMATRIX identityEye = IdentityMatrix();","for (int eye = 0; eye < 2; ++eye)","ProjectionFromFov(","stereo.eyeFov[eye]","BuildProjectedSunRay(","identityEye, eyeProjection, projected,","std::memcpy(eyeConstants[eye], &projectedT,","VR R85 FLARE RAY:"): assert t in tail,t
-assert "std::memcpy(eyeConstants[0], &stockT" not in tail
-assert "std::memcpy(eyeConstants[1], &stockT" not in tail
-assert "VR R69 FLARE FUSION" not in tail
-assert "R30GetExactC993SunDiscLiveWvp(" in text
-lenslive=body("bool R30GetExactC993SunDiscLiveWvp(")
-for t in (
- "SunDiscObject = 0x570002u",
- "call.callsite != 1",
- "flush.origin != LensOpaqueFlushOrigin::Inline405360",
- "flush.sourceSerial != call.sourceSerial",
- "flush.sequence != call.lastC993Sequence",
- "pmt.flushSerial != flush.serial",
- "pmt.objectId != SunDiscObject",
- "pmt.pass != 1",
- "liveShaderIdentity != cachedShader",
- "GetVertexShaderConstantF(",
- "EXACT_CURRENT_C993_PMT_LIVE_REGISTER",
-): assert t in lenslive,t
-assert "!R30GetExactC993SunDiscLiveWvp(device, original)" in builder
+for t in ("GetLatchedHeadInverse(","const D3DMATRIX identityEye = IdentityMatrix();",
+          "for (int eye = 0; eye < 2; ++eye)","ProjectionFromFov(",
+          "stereo.eyeFov[eye]","BuildProjectedSunRay(",
+          "identityEye, eyeProjection, projected,",
+          "std::memcpy(eyeConstants[eye], &projectedT,","VR R85 FLARE RAY:"):
+ assert t in tail,t
+assert "R30GetExactInlineProjectedLensRawWvp(" in builder
+assert builder.index("R30GetExactInlineProjectedLensRawWvp(") < builder.index("R44GetOwnedRawOverlayWvp(original)")
+assert "exactProjectedLensCameraSynced" in tail
+assert "GetLastProjectedLensRawWvp(out, raw)" in exact
+for t in ("CurrentInlinePmt","OwnsRawWvp(","GetCurrentLatchedPoseEpoch()",
+          "SAME_SOURCE_INLINE_PMT_NATIVE_C64"):
+ assert t in exact,t
+assert "R30GetExactC993SunDiscLiveWvp(" not in r30
+assert "GetVertexShaderConstantF(" not in exact
+for t in ("0x570002u","0x570006u","!IsExactInlineC993Object(0x57000Fu)",
+          "!IsExactInlineC993Object(0x570010u)","currentSourceSerial == raw.sourceSerial",
+          "currentObject == pmt.objectId","currentPoseEpoch == raw.poseEpoch",
+          "currentShader == raw.shader","currentShaderEpoch == raw.shaderEpoch"):
+ assert t in contract,t
+# Exact PMT ownership must exist before the telemetry-only diagnostic early return.
+pmt=body(hooks,"static void __cdecl TraceLensOpaquePmtEntry(")
+assert pmt.index("ScopedInlinePmt") < pmt.index("!Settings::VREnabled || !Settings::VRTelemetry")
+flush=body(hooks,"static void TraceLensOpaqueFlush(")
+assert "ScopedInlineFlush" in flush
+assert flush.index("ScopedInlineFlush") < flush.index("const bool trace =")
+for t in ("ProjectedLensRawWvp.Reset();","VR LENS PROJECTED RAW WVP CAPTURE",
+          "GetLastProjectedLensRawWvp(","CurrentInlinePmt",
+          "CanPublishCompleteOriginalCentreWvp(\n\t\t\t\t\t\t\ttrue, nativeGameWvp)"):
+ assert t in renderer,t
 assert dispatch.count("const HRESULT leftHr = actualDraw();")==1
 assert dispatch.count("rightHr = actualDraw();")==1
-print("PASS R26 flare angular ray uses separate asymmetric L/R FOV; physical draw count unchanged")
+print("PASS R26 exact inline C993 570002/570006 raw-WVP ownership is telemetry-independent; live-c64 fallback removed")

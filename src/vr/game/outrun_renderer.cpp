@@ -22,6 +22,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/lens_centre_partial_wvp.hpp"
 #include "vr/game/lens_centre_upload_transaction.hpp"
+#include "vr/game/projected_lens_inline_source.hpp"
 #include "vr/game/game_wvp_native_upload.hpp"
 #include "vr/game/queued_hud_partial_wvp.hpp"
 #include "vr/game/hud_native_source_transaction.hpp"
@@ -186,6 +187,7 @@ namespace OutRunVRRenderer
 		// Increment BEFORE each original game c64 write. A reentrant D3D9
 		// hook may publish a newer source while the outer native call returns.
 		thread_local std::uint64_t LensCentreUploadGeneration = 0;
+		thread_local OutRunVR::ProjectedLens::RawWvpSnapshot ProjectedLensRawWvp{};
 		// The exact queued ScreenHud may publish the game WVP as several native
 		// c64..c67 writes. Keep its source rows independent of the C993 flare.
 		thread_local OutRunVR::HudQueuedWvp::Upload HudQueuedPartialWvp{};
@@ -1859,6 +1861,7 @@ namespace OutRunVRRenderer
 			const HRESULT result = EndSceneHook.stdcall<HRESULT>(device);
 			LensCentrePartialWvp.Reset(); // never span a scene boundary
 			HudQueuedPartialWvp.Reset(); // a queued HUD owner cannot cross scenes
+			ProjectedLensRawWvp.Reset(); // exact inline PMT source cannot cross scenes
 
 			std::uint32_t publishedFlags = FrameTelemetryFlags;
 			if (SUCCEEDED(result))
@@ -1891,6 +1894,31 @@ namespace OutRunVRRenderer
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
 			}
+
+			const auto projectedLensCallAtUpload =
+				OutRunVR::GameSemantic::CurrentLensOriginalCall;
+			const auto projectedLensPmtAtUpload =
+				OutRunVR::ProjectedLens::CurrentInlinePmt;
+			const bool exactProjectedLensUpload =
+				projectedLensPmtAtUpload.valid &&
+				projectedLensCallAtUpload.sourceSerial != 0 &&
+				projectedLensCallAtUpload.callsite == 1u &&
+				projectedLensCallAtUpload.sourceSerial ==
+					projectedLensPmtAtUpload.sourceSerial &&
+				projectedLensCallAtUpload.lastC993Sequence ==
+					projectedLensPmtAtUpload.sequence &&
+				projectedLensCallAtUpload.objectId ==
+					projectedLensPmtAtUpload.objectId &&
+				OutRunVR::ProjectedLens::IsExactInlineC993Object(
+					projectedLensCallAtUpload.objectId) &&
+				!OutRunVR::GameSemantic::QueueRenderActive() &&
+				OutRunVR::GameSemantic::EffectiveScope() ==
+					OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D;
+			// Any new c64 touch by this exact PMT supersedes its earlier raw
+			// snapshot. A failed/partial native upload therefore cannot reuse a
+			// previous matrix from the same source call.
+			if (exactProjectedLensUpload)
+				ProjectedLensRawWvp.Reset();
 
 			// This is a physical GAME c64 write, even if its native call fails.
 			// Give every overlapping callback an identity BEFORE invoking its
@@ -2141,6 +2169,60 @@ namespace OutRunVRRenderer
 							lensBefore.exactDirectCentre, nativeGameWvp);
 					if (publishNativeCentreWvp)
 						RecordGameWvpWrite(nativeGameWvp, nativeGameWvp);
+
+					const auto projectedLensCallAfter =
+						OutRunVR::GameSemantic::CurrentLensOriginalCall;
+					const auto projectedLensPmtAfter =
+						OutRunVR::ProjectedLens::CurrentInlinePmt;
+					const bool projectedLensSourceUnchanged =
+						exactProjectedLensUpload && callbackCurrent &&
+						projectedLensCallAfter.sourceSerial ==
+							projectedLensCallAtUpload.sourceSerial &&
+						projectedLensCallAfter.lastC993Sequence ==
+							projectedLensCallAtUpload.lastC993Sequence &&
+						projectedLensCallAfter.objectId ==
+							projectedLensCallAtUpload.objectId &&
+						projectedLensCallAfter.callsite == 1u &&
+						OutRunVR::ProjectedLens::SameInlinePmt(
+							projectedLensPmtAtUpload, projectedLensPmtAfter) &&
+						!OutRunVR::GameSemantic::QueueRenderActive() &&
+						OutRunVR::GameSemantic::EffectiveScope() ==
+							OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D;
+					if (projectedLensSourceUnchanged &&
+						OutRunVR::LensCentre::CanPublishCompleteOriginalCentreWvp(
+							true, nativeGameWvp))
+					{
+						std::uintptr_t projectedShader = 0;
+						std::uint64_t projectedShaderEpoch = 0;
+						if (OutRunVRStereo::GetCurrentShaderEpoch(
+								projectedShader, projectedShaderEpoch) &&
+							projectedShader != 0 && projectedShaderEpoch != 0)
+						{
+							std::memcpy(ProjectedLensRawWvp.raw, nativeGameWvp,
+								sizeof(ProjectedLensRawWvp.raw));
+							ProjectedLensRawWvp.stamp = {
+								projectedLensCallAtUpload.sourceSerial,
+								projectedLensCallAtUpload.lastC993Sequence,
+								projectedLensCallAtUpload.objectId,
+								projectedLensCallAtUpload.callsite,
+								OutRunVRStereo::GetTopLevelDrawSerial(),
+								LatchedPoseEpoch,
+								projectedShader, projectedShaderEpoch,
+								CullingCameraOverridden, true
+							};
+							if (Settings::VRTelemetry)
+								spdlog::info(
+									"VR LENS PROJECTED RAW WVP CAPTURE: sourceSerial={} sequence={} object=0x{:06X} draw={} poseEpoch={} shader=0x{:X} shaderEpoch={} cameraSynced={} authority=EXACT_INLINE_PMT_NATIVE_C64",
+									ProjectedLensRawWvp.stamp.sourceSerial,
+									ProjectedLensRawWvp.stamp.sequence,
+									ProjectedLensRawWvp.stamp.objectId,
+									ProjectedLensRawWvp.stamp.writtenDraw,
+									ProjectedLensRawWvp.stamp.poseEpoch,
+									ProjectedLensRawWvp.stamp.shader,
+									ProjectedLensRawWvp.stamp.shaderEpoch,
+									ProjectedLensRawWvp.stamp.cameraSynced ? 1 : 0);
+						}
+					}
 					// A full c64..c67 game upload is not discarded by a
 					// subsequent single-row D3D9 update in this very same
 					// C993 physical submission. R84 must reconstruct the
@@ -2352,6 +2434,7 @@ namespace OutRunVRRenderer
 		InvalidateVerifiedWvp();
 		LensCentrePartialWvp.Reset();
 		HudQueuedPartialWvp.Reset();
+		ProjectedLensRawWvp.Reset();
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
 		WaitForNextCadenceRequest();
@@ -2368,6 +2451,7 @@ namespace OutRunVRRenderer
 		PresentPoseLocked = false;
 		LensCentrePartialWvp.Reset();
 		HudQueuedPartialWvp.Reset();
+		ProjectedLensRawWvp.Reset();
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
 		ResetFrameState();
@@ -2499,6 +2583,18 @@ namespace OutRunVRRenderer
 		shaderIdentity = LastGameWvpShaderIdentity;
 		shaderSerial = LastGameWvpShaderSerial;
 		return true;
+	}
+
+	bool GetLastProjectedLensRawWvp(
+		float outConstants[16],
+		OutRunVR::ProjectedLens::RawWvpStamp& stamp) noexcept
+	{
+		if (!outConstants || !ProjectedLensRawWvp.Valid())
+			return false;
+		std::memcpy(outConstants, ProjectedLensRawWvp.raw,
+			sizeof(ProjectedLensRawWvp.raw));
+		stamp = ProjectedLensRawWvp.stamp;
+		return stamp.valid;
 	}
 
 	class VRRendererHook : public Hook

@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/projected_lens_inline_source.hpp"
 #include "vr/game/stage_edge_cull_projection.hpp"
 #include "vr/ui/vr_mirror_aspect_fit.hpp"
 #include "vr/game/pmt_node_culling_contract.hpp"
@@ -687,6 +688,23 @@ class VRLensFlareProjected2D : public Hook
         const std::uint32_t* entry)
     {
         using namespace OutRunVR::GameSemantic;
+        const auto projectedFlush =
+            OutRunVR::ProjectedLens::CurrentInlineFlush;
+        OutRunVR::ProjectedLens::InlinePmtReceipt projectedPmt{};
+        if (entry && projectedFlush.valid &&
+            entry[14] == projectedFlush.objectId &&
+            entry[8] == 1u && entry[5] && entry[6] && entry[7])
+        {
+            projectedPmt = {
+                projectedFlush.sourceSerial,
+                projectedFlush.sequence,
+                projectedFlush.objectId,
+                entry[8], entry[5], entry[6], entry[7], true
+            };
+        }
+        OutRunVR::ProjectedLens::ScopedInlinePmt projectedLensPmt(
+            projectedPmt);
+
         const auto flush = CurrentLensOpaqueFlush;
         if (!entry || flush.serial == 0 ||
             !Settings::VREnabled || !Settings::VRTelemetry)
@@ -782,6 +800,20 @@ class VRLensFlareProjected2D : public Hook
         using namespace OutRunVR::GameSemantic;
         const auto inlineReceipt = CurrentLensOriginalCall;
         const auto deferred = CurrentLensDeferredPhysical;
+        const bool exactInlineProjectedLens =
+            Settings::VREnabled &&
+            origin == LensOpaqueFlushOrigin::Inline405360 &&
+            inlineReceipt.sourceSerial != 0 &&
+            inlineReceipt.callsite == 1u &&
+            OutRunVR::ProjectedLens::IsExactInlineC993Object(
+                inlineReceipt.objectId) &&
+            !QueueRenderActive() &&
+            EffectiveScope() == RenderScope::ProjectedScreenEffect2D;
+        OutRunVR::ProjectedLens::ScopedInlineFlush projectedLensFlush(
+            { inlineReceipt.sourceSerial,
+              inlineReceipt.lastC993Sequence,
+              inlineReceipt.objectId,
+              exactInlineProjectedLens });
         const bool exactSceneFlush =
             origin == LensOpaqueFlushOrigin::SceneD44B ||
             origin == LensOpaqueFlushOrigin::SceneD79B;

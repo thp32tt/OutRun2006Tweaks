@@ -24,6 +24,7 @@
 #include "hud_1080p_reference.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/projected_lens_inline_source.hpp"
 #include "vr/d3d9/reset_trace.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
@@ -47,6 +48,8 @@ namespace Settings
 namespace OutRunVRRenderer
 {
     bool GetLastRawGameWvpCameraSynced() noexcept;
+    bool GetLastProjectedLensRawWvp(float outConstants[16],
+        OutRunVR::ProjectedLens::RawWvpStamp& stamp) noexcept;
     std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept;
     std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
     std::uint64_t GetLastGameWvpPoseEpoch() noexcept;
@@ -5515,56 +5518,36 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        bool R30GetExactC993SunDiscLiveWvp(
-            IDirect3DDevice9* device, float out[16]) noexcept
+        bool R30GetExactInlineProjectedLensRawWvp(
+            float out[16], bool& sourceCameraSynced) noexcept
         {
             using namespace OutRunVR::GameSemantic;
-            constexpr std::uint32_t SunDiscObject = 0x570002u;
-            if (!device || !out || QueueRenderActive() ||
+            sourceCameraSynced = false;
+            if (!out || QueueRenderActive() ||
                 EffectiveScope() != RenderScope::ProjectedScreenEffect2D)
                 return false;
 
             const auto& call = CurrentLensOriginalCall;
-            const auto& flush = CurrentLensOpaqueFlush;
-            const auto& pmt = CurrentLensOpaquePmtEntry;
-            if (call.sourceSerial == 0 || call.callsite != 1 ||
-                call.objectId != SunDiscObject ||
-                call.lastC993Sequence == 0 ||
-                flush.serial == 0 ||
-                flush.origin != LensOpaqueFlushOrigin::Inline405360 ||
-                flush.sourceSerial != call.sourceSerial ||
-                flush.sequence != call.lastC993Sequence ||
-                flush.objectId != SunDiscObject ||
-                pmt.serial == 0 ||
-                pmt.flushSerial != flush.serial ||
-                pmt.flushOrigin != flush.origin ||
-                pmt.objectId != SunDiscObject ||
-                pmt.pass != 1 || !pmt.object || !pmt.node || !pmt.mesh)
+            const auto& pmt = OutRunVR::ProjectedLens::CurrentInlinePmt;
+            OutRunVR::ProjectedLens::RawWvpStamp raw{};
+            if (!OutRunVRRenderer::GetLastProjectedLensRawWvp(out, raw))
                 return false;
 
-            const auto cachedShader =
-                CurrentVertexShaderIdentity.load(std::memory_order_acquire);
-            if (!cachedShader)
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentShaderEpoch = 0;
+            if (!GetCurrentShaderEpoch(currentShader, currentShaderEpoch))
                 return false;
-            IDirect3DVertexShader9* liveShader = nullptr;
-            const HRESULT shaderHr = device->GetVertexShader(&liveShader);
-            const auto liveShaderIdentity =
-                reinterpret_cast<std::uintptr_t>(liveShader);
-            if (liveShader)
-                liveShader->Release();
-            if (FAILED(shaderHr) || !liveShaderIdentity ||
-                liveShaderIdentity != cachedShader)
-                return false;
-
-            if (FAILED(device->GetVertexShaderConstantF(
-                    OutRunWvpRegister, out, OutRunWvpRegisterCount)))
-                return false;
-            D3DMATRIX uploadedT{};
-            std::memcpy(&uploadedT, out, sizeof(uploadedT));
-            const D3DMATRIX stockWvp = TransposeMatrix(uploadedT);
-            if (!MatrixFinite(stockWvp))
+            const std::uint64_t currentDraw = TopLevelDrawSerial() + 1u;
+            const bool owned = OutRunVR::ProjectedLens::OwnsRawWvp(
+                raw, pmt,
+                call.sourceSerial, call.lastC993Sequence,
+                call.objectId, call.callsite,
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                currentDraw, currentShader, currentShaderEpoch);
+            if (!owned)
                 return false;
 
+            sourceCameraSynced = raw.cameraSynced;
             if (Settings::VRTelemetry)
             {
                 static std::atomic<std::uint64_t> recoveries{0};
@@ -5572,14 +5555,15 @@ namespace OutRunVRStereo
                     1, std::memory_order_relaxed) + 1;
                 if (hit <= 32 || (hit & (hit - 1)) == 0)
                     spdlog::info(
-                        "VR LENS 570002 LIVE C64 RECOVERY: hit={} drawSerial={} "
-                        "sourceSerial={} sequence={} flushSerial={} pmtEntrySerial={} "
-                        "shader=0x{:X} object=0x{:06X} pass={} "
-                        "authority=EXACT_CURRENT_C993_PMT_LIVE_REGISTER",
-                        hit, TopLevelDrawSerial() + 1u,
-                        call.sourceSerial, call.lastC993Sequence,
-                        flush.serial, pmt.serial, liveShaderIdentity,
-                        pmt.objectId, pmt.pass);
+                        "VR LENS EXACT PROJECTED RAW WVP: hit={} draw={} "
+                        "sourceSerial={} sequence={} object=0x{:06X} "
+                        "writtenDraw={} poseEpoch={} shader=0x{:X} "
+                        "shaderEpoch={} cameraSynced={} "
+                        "authority=SAME_SOURCE_INLINE_PMT_NATIVE_C64",
+                        hit, currentDraw, call.sourceSerial,
+                        call.lastC993Sequence, call.objectId,
+                        raw.writtenDraw, raw.poseEpoch, raw.shader,
+                        raw.shaderEpoch, sourceCameraSynced ? 1 : 0);
             }
             return true;
         }
@@ -5593,6 +5577,8 @@ namespace OutRunVRStereo
         {
             if (!device)
                 return false;
+            bool exactProjectedLensRaw = false;
+            bool exactProjectedLensCameraSynced = false;
             if (CurrentVertexShaderIdentity.load(
                     std::memory_order_acquire) == 0)
             {
@@ -5679,9 +5665,12 @@ namespace OutRunVRStereo
                     // draw. Preserve only an original game WVP with bounded
                     // exact SceneEffect/CABE provenance; never borrow the live
                     // c64 after a previous eye has injected head correction.
-                    if (!R44GetOwnedRawOverlayWvp(original) &&
-                        !R30GetExtendedRawWvpForExactSceneEffect(original) &&
-                        !R30GetExactC993SunDiscLiveWvp(device, original))
+                    exactProjectedLensRaw =
+                        R30GetExactInlineProjectedLensRawWvp(
+                            original, exactProjectedLensCameraSynced);
+                    if (!exactProjectedLensRaw &&
+                        !R44GetOwnedRawOverlayWvp(original) &&
+                        !R30GetExtendedRawWvpForExactSceneEffect(original))
                         return false;
                 }
                 else if (!R44GetOwnedRawOverlayWvp(original))
@@ -5873,7 +5862,9 @@ namespace OutRunVRStereo
 
                 const D3DMATRIX identityEye = IdentityMatrix();
                 const bool sourceCameraSynced =
-                    OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
+                    exactProjectedLensRaw
+                        ? exactProjectedLensCameraSynced
+                        : OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyeProjection =
