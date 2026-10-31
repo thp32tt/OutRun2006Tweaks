@@ -6,7 +6,66 @@
 #include <array>
 #include <cassert>
 using namespace outrun::vr::dx11;
+// Sweep authentic 512x288 paired GPU tiles across a 3440x1440 race
+// source, including interior fragments missed by center/corner anchors.
+constexpr bool native_raw_swept_source_coverage_regression() {
+    constexpr std::uint32_t w = 3440u, h = 1440u;
+    constexpr std::uint32_t tw = 512u, th = 288u;
+    NativeRawDualTile pair{};
+    if (!native_raw_swept_dual_draw_tile(
+            w, h, tw, th, {0, 0, w, h}, 0u, pair) ||
+        !pair.hasSecond || pair.first.x != 0u || pair.first.y != 0u ||
+        !native_raw_source_tiles_disjoint(
+            pair.first, pair.second, tw, th))
+        return false;
+    for (std::uint32_t gy = 0u; gy < 5u; ++gy) {
+        for (std::uint32_t gx = 0u; gx < 7u; ++gx) {
+            const auto px = (std::min)(gx * tw, w - tw) + tw / 2u;
+            const auto py = (std::min)(gy * th, h - th) + th / 2u;
+            bool witnessed = false;
+            for (std::uint32_t ordinal = 0u; ordinal < 35u; ++ordinal) {
+                if (!native_raw_swept_dual_draw_tile(
+                        w, h, tw, th, {0, 0, w, h}, ordinal, pair))
+                    return false;
+                if (pair.first.x > w - tw || pair.first.y > h - th ||
+                    (pair.hasSecond &&
+                     (pair.second.x > w - tw || pair.second.y > h - th ||
+                      !native_raw_source_tiles_disjoint(
+                          pair.first, pair.second, tw, th))))
+                    return false;
+                const auto in = [=](NativeRawTileOrigin o) constexpr {
+                    return px >= o.x && px - o.x < tw &&
+                           py >= o.y && py - o.y < th;
+                };
+                witnessed = witnessed || in(pair.first) ||
+                    (pair.hasSecond && in(pair.second));
+            }
+            if (!witnessed) return false;
+        }
+    }
+    if (!native_raw_swept_dual_draw_tile(
+            w, h, tw, th, {1300, 200, 3000, 1000}, 6u, pair) ||
+        pair.first.x + tw <= 1300u || pair.first.x >= 3000u ||
+        pair.first.y + th <= 200u || pair.first.y >= 1000u)
+        return false;
+    if (!native_raw_swept_dual_draw_tile(
+            512, 288, tw, th, {0, 0, 512, 288}, 0u, pair) ||
+        pair.hasSecond)
+        return false;
+    if (native_raw_swept_dual_draw_tile(
+            511, 288, tw, th, {0, 0, 511, 288}, 0u, pair))
+        return false;
+    if (!native_raw_swept_dual_draw_tile(
+            1024, 288, tw, th, {0, 0, 1024, 288}, 0u, pair) ||
+        !pair.hasSecond || pair.first.x != 0u ||
+        pair.second.x != 512u)
+        return false;
+    return true;
+}
+static_assert(native_raw_swept_source_coverage_regression(),
+              "authentic large-raster native GPU source sweep");
 int main() {
+    assert(native_raw_swept_source_coverage_regression());
     // Different D3D9 interface pointers may identify the same canonical
     // game backbuffer. Never accept an unrelated or unavailable IUnknown.
     int drawSurface = 0, presentedSurface = 0, canonical = 0, foreign = 0;

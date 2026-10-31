@@ -1072,6 +1072,7 @@ private:
             if (FAILED(dev->CreateQuery(&desc, event_.GetAddressOf())))
                 return NativeRawPreviewResult::GpuFailure;
         }
+        // Sweep the authentic raster over successive native game Draws.
         // Capture the actual bound native Draw viewport/scissor, not a
         // whole-backbuffer anchor that can miss game menu/HUD raster output.
         UINT viewCount=1u;
@@ -1103,7 +1104,7 @@ private:
             }
         }
         NativeRawDualTile tiles{};
-        if (!native_raw_dual_draw_tile(
+        if (!native_raw_swept_dual_draw_tile(
                 src.Width, src.Height, width, height, draw,
                 static_cast<std::uint32_t>(capture_), tiles))
             return NativeRawPreviewResult::NoDraw;
