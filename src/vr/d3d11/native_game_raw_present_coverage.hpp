@@ -97,6 +97,27 @@ struct NativeRawPresentDirtyRegion {
     }
     return true;
 }
+// A small game source crop may be repainted by an authentic D3D9 dirty
+// RGNDATA union even when the Present caller did not certify a full repaint.
+// Prove every pixel of the VISIBLE crop, not rcBound or an intersecting
+// rectangle. The GPU/source backbuffer identity check remains at the caller;
+// this grants no displaced inset or full-game-frame authorization.
+[[nodiscard]] constexpr bool native_raw_dirty_covers_small_source_crop(
+    std::uint32_t backWidth, std::uint32_t backHeight,
+    std::int64_t left, std::int64_t top,
+    std::int64_t right, std::int64_t bottom,
+    const NativeRawPresentDirtyRegion& dirty) noexcept {
+    if (left < 0 || top < 0 || right <= left || bottom <= top ||
+        right > static_cast<std::int64_t>(backWidth) ||
+        bottom > static_cast<std::int64_t>(backHeight) ||
+        (right - left >= 40 && bottom - top >= 40))
+        return false;
+    const NativeRawPresentTile crop{
+        0u, 0u, static_cast<std::uint32_t>(right - left),
+        static_cast<std::uint32_t>(bottom - top), left, top};
+    return native_raw_dirty_region_covers_tile(
+        backWidth, backHeight, dirty, crop);
+}
 // A declaration permits bounded disjoint-crop selection before the shared
 // destination-overlap helper definition below.
 [[nodiscard]] constexpr bool native_raw_disjoint_present_tiles(

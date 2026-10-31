@@ -82,6 +82,32 @@ constexpr bool native_raw_changed_crop_regression() {
             573u, 229u, 256u, 144u, 1919u, 1080u,
             1920u, 1080u, 700, 300, 701, 301, clipped))
         return false;
+    // Genuine dirty Present members may also completely cover a tiny crop.
+    // A bounding rectangle containing a hole must never authorize painting.
+    NativeRawPresentDirtyRegion tinyDirty{};
+    tinyDirty.headerVerified = true;
+    tinyDirty.count = 2u;
+    tinyDirty.boundLeft = 700;
+    tinyDirty.boundTop = 300;
+    tinyDirty.boundRight = 702;
+    tinyDirty.boundBottom = 301;
+    tinyDirty.rectangles[0] = {700, 300, 701, 301};
+    tinyDirty.rectangles[1] = {701, 300, 702, 301};
+    if (!native_raw_dirty_covers_small_source_crop(
+            1920, 1080, 700, 300, 702, 301, tinyDirty) ||
+        native_raw_dirty_covers_small_source_crop(
+            1920, 1080, 700, 300, 703, 301, tinyDirty))
+        return false;
+    tinyDirty.rectangles[1] = {702, 300, 703, 301};
+    tinyDirty.boundRight = 703;
+    if (native_raw_dirty_covers_small_source_crop(
+            1920, 1080, 700, 300, 703, 301, tinyDirty))
+        return false;
+    tinyDirty.rectangles[1] = {701, 300, 702, 301};
+    tinyDirty.boundRight = 703; // forged rcBound must fail
+    if (native_raw_dirty_covers_small_source_crop(
+            1920, 1080, 700, 300, 702, 301, tinyDirty))
+        return false;
     // Genuine smaller game-created GPU targets share their own exact pixels.
     if (!native_raw_verified_small_source_present_tile(
             true, 2, 2, 0, 0, 1, 1, 2, 2, tiny) ||

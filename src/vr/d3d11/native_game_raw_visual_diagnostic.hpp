@@ -217,11 +217,18 @@ public:
             // A 1..39px original game Present can carry genuine GPU RGB,
             // including one-pixel HUD/menu updates. The historic 40px
             // minimum protects displaced/unknown diagnostic insets.
-            // Admit ONLY a complete source repaint on the SAME canonical
+            // Admit ONLY a verified full visible source crop repaint
+            // (explicit or exact dirty union) on the SAME canonical
             // backbuffer and matching pixel grid; an inset is never an
             // acceptable fallback for this exceptional small crop.
             Microsoft::WRL::ComPtr<IUnknown> smallPresentIdentity;
-            if (!sourceCropRepaintVerified ||
+            // Dirty RGNDATA can prove a tiny menu/HUD Present crop even
+            // without the full-repaint flag. Reject holes, malformed bounds
+            // and mere rcBound overlap before any native pixel upload.
+            const bool visibleCropRepaintProven = sourceCropRepaintVerified ||
+                (sourceDirty && native_raw_dirty_covers_small_source_crop(
+                    back.Width, back.Height, l, t, r, b, *sourceDirty));
+            if (!visibleCropRepaintProven ||
                 captureTargetWidth_ != back.Width ||
                 captureTargetHeight_ != back.Height ||
                 !sourceGameTargetIdentity_ ||
@@ -233,7 +240,7 @@ public:
                     sourceGameTargetIdentity_.Get(),
                     smallPresentIdentity.Get()) ||
                 !native_raw_verified_small_source_present_tile(
-                    sourceCropRepaintVerified, back.Width, back.Height,
+                    visibleCropRepaintProven, back.Width, back.Height,
                     l, t, r, b, width, height, visibleTile))
                 return NativeRawPreviewResult::UnsafePresent;
             sourceSmallCropOnly = true;
