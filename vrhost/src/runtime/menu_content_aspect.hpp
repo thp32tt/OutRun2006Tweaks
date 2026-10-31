@@ -40,6 +40,70 @@ namespace OutRunVrMenuAspect
         return state == 0x0Au || state == 0x0Bu || state == 0x0Cu;
     }
 
+    // The D3D9Ex backbuffer follows the OpenXR eye extent in VR, but these
+    // front-end/exit states still rasterize their 2D scene into the game's
+    // top-left 1920x1080 logical canvas. Desktop Present then scales the whole
+    // portrait backbuffer, so the host must sample the logical sub-rectangle
+    // before placing the LOCAL-fixed theater plane. Ferrari selector states
+    // remain full-width and are deliberately excluded.
+    constexpr bool IsTopLeftLogicalTheaterState(
+        std::uint32_t state) noexcept
+    {
+        return state == 0x04u || state == 0x09u || // TITLE / MENU
+            state == 0x17u ||                     // CONTINUE
+            state == 0x1Bu || state == 0x1Cu ||   // GAMEOVER / GAMEEXIT
+            state == 0x1Du || state == 0x1Eu ||   // GAMERESET variants
+            state == 0x23u;                       // TRYAGAIN
+    }
+
+    struct LogicalCanvasCropPlan
+    {
+        bool crop = false;
+        float offsetX = 0.0f;
+        float offsetY = 0.0f;
+        float width = 1.0f;
+        float height = 1.0f;
+        float aspect = 16.0f / 9.0f;
+    };
+
+    inline LogicalCanvasCropPlan PlanTopLeftLogicalCanvasCrop(
+        std::uint32_t state, float physicalWidth, float physicalHeight,
+        float logicalWidth = 1920.0f, float logicalHeight = 1080.0f) noexcept
+    {
+        if (!IsTopLeftLogicalTheaterState(state) ||
+            !std::isfinite(physicalWidth) || !std::isfinite(physicalHeight) ||
+            !std::isfinite(logicalWidth) || !std::isfinite(logicalHeight) ||
+            physicalWidth <= 0.0f || physicalHeight <= 0.0f ||
+            logicalWidth <= 0.0f || logicalHeight <= 0.0f ||
+            physicalWidth < logicalWidth || physicalHeight < logicalHeight)
+            return {};
+
+        const float physicalAspect = physicalWidth / physicalHeight;
+        const float logicalAspect = logicalWidth / logicalHeight;
+        // A normal 1920x1080/ultrawide desktop source already owns its 2D
+        // extent. Only the narrow/portrait XR physical source can contain the
+        // observed unused right/bottom region around the top-left game canvas.
+        if (!std::isfinite(physicalAspect) || !std::isfinite(logicalAspect) ||
+            physicalAspect >= logicalAspect - 0.10f)
+            return {};
+
+        const float width = logicalWidth / physicalWidth;
+        const float height = logicalHeight / physicalHeight;
+        if (!std::isfinite(width) || !std::isfinite(height) ||
+            width <= 0.0f || width > 1.0f ||
+            height <= 0.0f || height > 1.0f)
+            return {};
+        return { true, 0.0f, 0.0f, width, height, logicalAspect };
+    }
+
+    static_assert(IsTopLeftLogicalTheaterState(0x04u));
+    static_assert(IsTopLeftLogicalTheaterState(0x09u));
+    static_assert(IsTopLeftLogicalTheaterState(0x17u));
+    static_assert(IsTopLeftLogicalTheaterState(0x1Cu));
+    static_assert(IsTopLeftLogicalTheaterState(0x23u));
+    static_assert(!IsTopLeftLogicalTheaterState(0x0Au));
+    static_assert(!IsTopLeftLogicalTheaterState(0x10u));
+
     constexpr bool PlanStateSafeMenuCrop(
         std::uint32_t state, bool configuredLetterbox,
         bool imageMatteVerified, bool requestedCrop,

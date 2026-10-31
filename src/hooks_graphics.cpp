@@ -2926,6 +2926,21 @@ class WindowedBorderless : public Hook
 		int y = Settings::WindowPositionY;
 		int width = Game::screen_resolution->x;
 		int height = Game::screen_resolution->y;
+        int mirrorSourceWidth = width;
+        int mirrorSourceHeight = height;
+        if (Settings::VREnabled && Game::D3DPresentParams)
+        {
+            const auto backbufferWidth =
+                static_cast<int>(Game::D3DPresentParams->BackBufferWidth);
+            const auto backbufferHeight =
+                static_cast<int>(Game::D3DPresentParams->BackBufferHeight);
+            if (backbufferWidth >= 640 && backbufferWidth <= 8192 &&
+                backbufferHeight >= 480 && backbufferHeight <= 8192)
+            {
+                mirrorSourceWidth = backbufferWidth;
+                mirrorSourceHeight = backbufferHeight;
+            }
+        }
 
 		// VR may intentionally render a larger internal backbuffer than the PC
 		// desktop. Keep that render resolution for the HMD/SBS source, but fit the
@@ -2964,8 +2979,7 @@ class WindowedBorderless : public Hook
                 if (Settings::VRMirrorPreserveAspect) {
                     const auto fit = OutRunVRMirrorAspect::Fit(
                         monitorWidth, monitorHeight,
-                        Game::screen_resolution->x,
-                        Game::screen_resolution->y);
+                        mirrorSourceWidth, mirrorSourceHeight);
                     if (fit.valid) {
                         x += fit.left;
                         y += fit.top;
@@ -2980,7 +2994,7 @@ class WindowedBorderless : public Hook
                 spdlog::info(
                     "VR PC MIRROR: monitor={}x{} source={}x{} fittedWindow={}x{} origin={},{} preserveAspect={} backdrop={} (OpenXR eyes unchanged)",
                     monitorWidth, monitorHeight,
-                    Game::screen_resolution->x, Game::screen_resolution->y,
+                    mirrorSourceWidth, mirrorSourceHeight,
                     width, height, x, y,
                     Settings::VRMirrorPreserveAspect.get(),
                     mirrorBackdropNeeded ? 1 : 0);

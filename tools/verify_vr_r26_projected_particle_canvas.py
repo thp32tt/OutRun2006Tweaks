@@ -17,6 +17,10 @@ for token in (
     "state.worldEffect && state.rhwDepthEvidence &&",
     "!state.projectedWorldMarker && !exactSceneEffect &&",
     "Game::screen_resolution",
+    "const float rawGameScreenX = Game::screen_resolution->x;",
+    "const float rawGameScreenY = Game::screen_resolution->y;",
+    "const float gameCenterX = rawGameScreenX * 0.5f;",
+    "const float gameCenterY = rawGameScreenY * 0.5f;",
     "state.gameProjectedWorldCenterX = gameCenterX;",
     "state.gameProjectedWorldCenterY = gameCenterY;",
     "VR TRACE WORLD PROJECTED SOURCE:",
@@ -83,9 +87,15 @@ assert math.isfinite(z_nearish) and math.isfinite(z_farther)
 assert abs(z_farther) > abs(z_nearish)
 assert not math.isclose(z_nearish, z_farther)
 
-gx, gy = 1920.0, 1080.0
+# The PC variables hold the full logical extent while FixParticleRendering
+# halves the generated screen-space particle output. The actual source centre
+# consumed by the VR reprojection is therefore half of 1920x1080.
+raw_w, raw_h = 1920.0, 1080.0
+gx, gy = raw_w * 0.5, raw_h * 0.5
 xr_w, xr_h = 2496.0, 2688.0
 assert game_ndc(gx, gy, gx, gy) == (0.0, 0.0)
+assert game_ndc(0.0, 0.0, gx, gy) == (-1.0, 1.0)
+assert game_ndc(raw_w, raw_h, gx, gy) == (1.0, -1.0)
 old = physical_ndc(gx, gy, 0.0, 0.0, xr_w, xr_h)
 assert abs(old[0]) > 0.1 or abs(old[1]) > 0.1
 

@@ -65,7 +65,9 @@ static_assert(!ShouldCropConfiguredMenu(1, 3));
 // historical 4:3 A/B override active. Title and menu alone may use its
 // explicitly requested source crop; unknown/gameplay fail closed.
 using OutRunVrMenuAspect::IsWideVehicleSelector;
+using OutRunVrMenuAspect::IsTopLeftLogicalTheaterState;
 using OutRunVrMenuAspect::PlanStateSafeMenuCrop;
+using OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop;
 static_assert(IsWideVehicleSelector(0x0Au));
 static_assert(IsWideVehicleSelector(0x0Bu));
 static_assert(IsWideVehicleSelector(0x0Cu));
@@ -92,6 +94,16 @@ static_assert(!PlanStateSafeMenuCrop(0xFFFFFFFFu, true, true, true, false));
 static_assert(!PlanStateSafeMenuCrop(0x12u, true, true, true, false));
 static_assert(!PlanStateSafeMenuCrop(0x04u, false, false, false, false));
 static_assert(!PlanStateSafeMenuCrop(0x0Au, false, false, true, false));
+static_assert(IsTopLeftLogicalTheaterState(0x04u));
+static_assert(IsTopLeftLogicalTheaterState(0x09u));
+static_assert(IsTopLeftLogicalTheaterState(0x17u));
+static_assert(IsTopLeftLogicalTheaterState(0x1Bu));
+static_assert(IsTopLeftLogicalTheaterState(0x1Cu));
+static_assert(IsTopLeftLogicalTheaterState(0x1Du));
+static_assert(IsTopLeftLogicalTheaterState(0x1Eu));
+static_assert(IsTopLeftLogicalTheaterState(0x23u));
+static_assert(!IsTopLeftLogicalTheaterState(0x0Au));
+static_assert(!IsTopLeftLogicalTheaterState(0x10u));
 
 constexpr auto native43 = PlanCenteredContent(4.0f / 3.0f, 4.0f / 3.0f);
 static_assert(!native43.crop && native43.width == 1.0f &&
@@ -134,6 +146,31 @@ static_assert(!ShouldRefreshMenuLetterboxConfig(
 
 int main()
 {
+    // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
+    // in its upper-left. Sample exactly that logical rectangle before the
+    // LOCAL-fixed menu projection; never crop Ferrari selector/gameplay or
+    // an already-normal landscape 1920x1080 source.
+    {
+        const auto q3 = PlanTopLeftLogicalCanvasCrop(
+            0x09u, 2496.f, 2688.f);
+        const auto title = PlanTopLeftLogicalCanvasCrop(
+            0x04u, 2496.f, 2688.f);
+        const auto retry = PlanTopLeftLogicalCanvasCrop(
+            0x23u, 2496.f, 2688.f);
+        const auto selector = PlanTopLeftLogicalCanvasCrop(
+            0x0Au, 2496.f, 2688.f);
+        const auto gameplay = PlanTopLeftLogicalCanvasCrop(
+            0x10u, 2496.f, 2688.f);
+        const auto native = PlanTopLeftLogicalCanvasCrop(
+            0x09u, 1920.f, 1080.f);
+        if (!q3.crop || !title.crop || !retry.crop ||
+            selector.crop || gameplay.crop || native.crop ||
+            std::fabs(q3.width - 1920.f / 2496.f) > 1.e-6f ||
+            std::fabs(q3.height - 1080.f / 2688.f) > 1.e-6f ||
+            std::fabs(q3.aspect - 16.f / 9.f) > 1.e-6f)
+            return 123;
+    }
+
     // MenuScale is optical size, never a game/source/XR pixel count.
     // Title/main consume it; selectors, unknown states and gameplay do not.
     using OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState;

@@ -3588,8 +3588,16 @@ namespace OutRunVRStereo
                 !state.projectedWorldMarker && !exactSceneEffect &&
                 Game::screen_resolution)
             {
-                const float gameCenterX = Game::screen_resolution->x;
-                const float gameCenterY = Game::screen_resolution->y;
+                // FixParticleRendering halves the PC 0x740C8C/90-derived
+                // screen-space output. The live variables still contain the
+                // full logical 1920x1080 values (runtime log evidence), so the
+                // post-fix retail projection centre is 960x540. Treating the
+                // raw values themselves as the centre maps every grass/gravel
+                // quad into the upper-left quarter of the XR backbuffer.
+                const float rawGameScreenX = Game::screen_resolution->x;
+                const float rawGameScreenY = Game::screen_resolution->y;
+                const float gameCenterX = rawGameScreenX * 0.5f;
+                const float gameCenterY = rawGameScreenY * 0.5f;
                 if (std::isfinite(gameCenterX) &&
                     std::isfinite(gameCenterY) &&
                     gameCenterX >= 320.0f && gameCenterY >= 240.0f &&

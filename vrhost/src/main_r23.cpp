@@ -1935,6 +1935,23 @@ namespace
                 whole, false, &capturedClient, &capturedClientFullyVisible))
             return false;
 
+        const auto logicalCanvasCrop =
+            OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
+                clientGameState,
+                static_cast<float>(c.projection_.width),
+                static_cast<float>(c.projection_.height));
+        const bool logicalCanvasCropApplied =
+            capturedClientFullyVisible && logicalCanvasCrop.crop;
+        if (logicalCanvasCropApplied)
+        {
+            const float baseWidth = whole.w;
+            const float baseHeight = whole.h;
+            whole.x += baseWidth * logicalCanvasCrop.offsetX;
+            whole.y += baseHeight * logicalCanvasCrop.offsetY;
+            whole.w = baseWidth * logicalCanvasCrop.width;
+            whole.h = baseHeight * logicalCanvasCrop.height;
+        }
+
         // Issue #119: intersect the two eyes' tangent-plane FOV extents.
         // Mean eye edges can extend outside one real eye frustum and clip
         // car-selection/menu content. A shared valid overlap is projected
@@ -1958,15 +1975,20 @@ namespace
             static_cast<float>(capturedClient.right - capturedClient.left);
         const float clientHeight =
             static_cast<float>(capturedClient.bottom - capturedClient.top);
-        const float clientAspect = clientWidth > 0.0f && clientHeight > 0.0f
-            ? clientWidth / clientHeight : 16.0f / 9.0f;
+        const float clientAspect = logicalCanvasCropApplied
+            ? logicalCanvasCrop.aspect
+            : (clientWidth > 0.0f && clientHeight > 0.0f
+                ? clientWidth / clientHeight : 16.0f / 9.0f);
         // GetGameUv() can clip an off-desktop window to the real capture
         // image. Use the sampled texture region's physical aspect for the
         // LOCAL-fixed menu, not the now-larger unclipped GetClientRect().
         // On a fully visible window this equals the original client aspect.
         // It is independent of the eye FOV and does not alter world/HUD.
-        float sourceAspect = OutRunVrMenuAspect::PlanCapturedAspect(
-            c.sourceWidth_, c.sourceHeight_, whole.w, whole.h, clientAspect);
+        float sourceAspect = logicalCanvasCropApplied
+            ? logicalCanvasCrop.aspect
+            : OutRunVrMenuAspect::PlanCapturedAspect(
+                c.sourceWidth_, c.sourceHeight_, whole.w, whole.h,
+                clientAspect);
         float visibleOffsetX = 0.0f, visibleOffsetY = 0.0f;
         float visibleWidthScale = 1.0f, visibleHeightScale = 1.0f;
 
@@ -2021,14 +2043,19 @@ namespace
         const RECT& fullClient = capturedClient;
         const float authoredAspect =
             cropCentered43 ? 4.0f / 3.0f : clientAspect;
-        const auto plan = OutRunVrMenuAspect::PlanVisibleCenteredContent(
-            static_cast<float>(fullClient.left),
-            static_cast<float>(fullClient.top),
-            static_cast<float>(fullClient.right),
-            static_cast<float>(fullClient.bottom),
-            static_cast<float>(c.sourceWidth_),
-            static_cast<float>(c.sourceHeight_),
-            whole.x, whole.y, whole.w, whole.h, authoredAspect);
+        const auto plan = logicalCanvasCropApplied
+            ? (cropCentered43
+                ? OutRunVrMenuAspect::PlanCenteredContent(
+                    logicalCanvasCrop.aspect, authoredAspect)
+                : OutRunVrMenuAspect::CropPlan{})
+            : OutRunVrMenuAspect::PlanVisibleCenteredContent(
+                static_cast<float>(fullClient.left),
+                static_cast<float>(fullClient.top),
+                static_cast<float>(fullClient.right),
+                static_cast<float>(fullClient.bottom),
+                static_cast<float>(c.sourceWidth_),
+                static_cast<float>(c.sourceHeight_),
+                whole.x, whole.y, whole.w, whole.h, authoredAspect);
         bool uncroppedTitleOrMainMenu = false;
         if (plan.crop)
         {
@@ -2117,7 +2144,8 @@ namespace
         // the corrected 4:3 menu again. The uncropped selector retains
         // reference-height stabilization during eye/backbuffer resizing.
         // The measured source aspect, UV and FOV containment are preserved.
-        const auto placement = (cropCentered43 || uncroppedTitleOrMainMenu)
+        const auto placement = (cropCentered43 || logicalCanvasCropApplied ||
+            uncroppedTitleOrMainMenu)
             ? requestedPlacement
             : OutRunVrMenuAspect::StabilizeMenuToReference3440x1440(
                 common, requestedPlacement);
@@ -2140,6 +2168,9 @@ namespace
                       << " crop43=" << (cropCentered43 ? 1 : 0)
                       << " wideSelector=" << (wideVehicleSelector ? 1 : 0)
                       << " nativeAspect=" << (useNativeMenuAspect ? 1 : 0)
+                      << " logicalCanvas=" << (logicalCanvasCropApplied ? 1 : 0)
+                      << " logicalCrop=" << logicalCanvasCrop.width << ','
+                      << logicalCanvasCrop.height
                       << " menuScale=" << R23ConfiguredMenuScale
                       << " sourceAspect=" << sourceAspect
                       << " uv=" << whole.x << ',' << whole.y
