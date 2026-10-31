@@ -20,6 +20,7 @@ AUDIT_PATH=QUEUE_DIR/"audit.jsonl"
 # an OCR result; it only allows a verified chat-vision retry.
 HOST_RETRY_PATH=Path("/data/imagegen/text_roi_batches/ocr_host_verified_retries.json")
 PRODUCTION_MANIFEST=Path("/data/imagegen/text_roi_batches/production_manifest.json")
+PIXEL_REVIEW_ROOT=Path("/data/imagegen/text_roi_batches/pixel_ocr_review")
 VERSION="gpt-chat-vision-ocr-v1-20261025"
 OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
@@ -373,6 +374,200 @@ IMAGE_SIZE={row["width"]}x{row["height"]}
 
 {{"task_id":"{task_id}","source_png":"{row["png_filename"]}","detections":[{{"english":"승인 목록의 정확한 원문","bbox_xyxy":[0,0,1,1],"confidence":0.0}}],"uncertain":[{{"english":"승인 목록의 정확한 원문","reason":"이유"}}]}}"""
 
+def _pixel_review_next_binding(st, lane):
+    """Fallback to cropped visual reviews without approving any ROI.
+
+    Each crop is validated against the exact original PNG bytes; labels are
+    restricted to the current unresolved English list.
+    """
+    if os.environ.get("OUTRUN_PIXEL_OCR_REVIEW_ENABLED","false").lower() != "true":
+        return None
+    queue=PIXEL_REVIEW_ROOT/"latest.json"
+    if (not queue.is_file() or queue.is_symlink()
+            or queue.stat().st_size>900000):
+        return None
+    try:
+        doc=json.loads(queue.read_text(encoding="utf-8"))
+    except (OSError,ValueError,json.JSONDecodeError):
+        return None
+    if doc.get("schema")!="outrun.pixel_ocr_review.v1":
+        return None
+    sources=doc.get("sources")
+    if not isinstance(sources,list) or len(sources)>108:
+        return None
+    available={row["png_filename"]:(row,phrases)
+               for row,phrases in _exhausted_candidates()}
+    rows=_manifest_rows()
+    crop_root=(PIXEL_REVIEW_ROOT/"crops").resolve()
+    for entry in sources:
+        if not isinstance(entry,dict):
+            continue
+        name=entry.get("source_png")
+        if name not in available or name not in rows:
+            continue
+        row,phrases=available[name]
+        if row["png_sha256"]!=entry.get("source_png_sha256"):
+            continue
+        source_lane=_lane_for_source(name)
+        if lane is not None and source_lane!=lane:
+            continue
+        effective_lane=lane or "C1"
+        source=SRC/name
+        if (not source.is_file() or source.is_symlink()
+                or source.stat().st_size!=int(row["png_size_bytes"])
+                or _digest(source)!=row["png_sha256"]):
+            continue
+        proposals=entry.get("proposals")
+        if not isinstance(proposals,list) or len(proposals)>40:
+            continue
+        for proposal in proposals[:4]:
+            if not isinstance(proposal,dict) or proposal.get("art_or_merged_risk") is not False:
+                continue
+            box=proposal.get("bbox_xyxy")
+            if (not isinstance(box,list) or len(box)!=4
+                    or not all(type(x) is int for x in box)
+                    or box[0]<0 or box[1]<0 or box[2]>int(row["width"])
+                    or box[3]>int(row["height"])
+                    or box[2]-box[0]<70 or box[3]-box[1]<16
+                    or box[2]-box[0]>int(row["width"])*0.7
+                    or box[3]-box[1]>int(row["height"])*0.35):
+                continue
+            if any(_overlap_ratio(box,list(old))>.90 for _,old in _known_ocr_regions(name,row["png_sha256"])):
+                continue
+            basename=proposal.get("display_name")
+            checksum=proposal.get("crop_sha256")
+            if (not isinstance(basename,str) or Path(basename).name!=basename
+                    or not basename.endswith(".png")
+                    or not isinstance(checksum,str)
+                    or not re.fullmatch(r"[0-9a-f]{64}",checksum)):
+                continue
+            path=PIXEL_REVIEW_ROOT/"crops"/basename
+            if (not path.is_file() or path.is_symlink()
+                    or not path.resolve().is_relative_to(crop_root)
+                    or path.stat().st_size>5000000
+                    or _digest(path)!=checksum):
+                continue
+            try:
+                with Image.open(source) as original,Image.open(path) as crop:
+                    if (original.format!="PNG" or original.mode!="RGBA"
+                            or crop.format!="PNG" or crop.mode!="RGBA"
+                            or crop.size!=(box[2]-box[0],box[3]-box[1])
+                            or original.crop(tuple(box)).tobytes()!=crop.tobytes()):
+                        continue
+            except (OSError,ValueError):
+                continue
+            fp=hashlib.sha256(("PIXEL_REVIEW|" + row["png_sha256"] + "|" + checksum
+                + "|" + "\n".join(phrases)).encode()).hexdigest()
+            attempt_key=_attempt_key(fp,effective_lane)
+            used=int(st.get("attempts",{}).get(attempt_key,0) or 0)
+            if used>=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT:
+                continue
+            suffix="" if used==0 else f"-R{used}"
+            lane_suffix="-C2" if effective_lane=="C2" else ""
+            task=f"OUTRUN-GPT-OCR-{name[:4]}-{fp[:8].upper()}{lane_suffix}{suffix}"
+            prompt=(
+              "OutRun 2006 영문 UI 픽셀 크롭 검수 전용 작업입니다. 이미지는"
+              " 원본 PNG의 일부이며 원본 전체 좌표를 추측하지 마세요.\n"
+              f"TASK_ID={task}\nSOURCE_PNG={name}\n"
+              f"CROP_SIZE={box[2]-box[0]}x{box[3]-box[1]}\n"
+              "이 작은 이미지에서 다음 승인 영문 중 실제 보이는 문구만 찾아주세요:\n"
+              + "\n".join("- "+v for v in phrases)
+              + "\n범위 밖 문구와 숫자, 아이콘, 기호를 승인 영문으로 바꾸지 마세요.\n"
+              "bbox_xyxy는 첨부된 크롭 이미지 기준 상대 좌표입니다.\n"
+              "확실하지 않으면 detections=[]와 uncertain에 이유를 적으세요.\n"
+              "코드펜스 없이 JSON 객체 하나만 반환하세요.\n"
+              + json.dumps({"task_id":task,"source_png":name,
+                  "detections":[],"uncertain":[]},ensure_ascii=False)
+            )
+            binding={
+                "task_id":task,"role":effective_lane+"OCR","ocr_lane":effective_lane,
+                "pixel_review_only":True,"attempt_key":attempt_key,
+                "source_png":name,"source_sha256":row["png_sha256"],
+                "source_dds_path":row["source_dds_path"],
+                "source_dds_sha256":row["dds_sha256"],
+                "queue_indexes":row["queue_indexes"],
+                "path":str(path),"paths":[str(path)],
+                "crop_sha256":checksum,"crop_bbox_global":box,
+                "dimensions":list((box[2]-box[0],box[3]-box[1])),
+                "target_phrases":phrases,"fingerprint":fp,
+                "attempt_index":used,"status":"STAGED",
+                "created_at":_now(),"chat_url":None,"prompt":prompt}
+            st["active"]=binding
+            _save_state(st)
+            _audit({"status":"PIXEL_REVIEW_STAGED","task_id":task,
+                    "source_png":name,"crop_sha256":checksum,
+                    "external_api_used":False,"promotion":False})
+            return dict(binding)
+    return None
+
+
+def _apply_pixel_review(st,a,task_id,assistant_text):
+    """Record OCR suggestions for independent QA. Never write a source ROI."""
+    raw=_extract_json(assistant_text)
+    if (not isinstance(raw,dict) or raw.get("task_id")!=task_id
+            or raw.get("source_png")!=a["source_png"]
+            or not isinstance(raw.get("detections"),list)):
+        raise ValueError("PIXEL_REVIEW_RESPONSE_BINDING_INVALID")
+    verified=[]
+    rejected=[]
+    allowed={_norm(v):v for v in a["target_phrases"]}
+    xorig,yorig,xend,yend=a["crop_bbox_global"]
+    for det in raw["detections"][:25]:
+        if not isinstance(det,dict):
+            rejected.append("DETECTION_NOT_OBJECT")
+            continue
+        code=_norm(det.get("english")) if isinstance(det.get("english"),str) else ""
+        box=det.get("bbox_xyxy")
+        conf=det.get("confidence")
+        if code not in allowed:
+            rejected.append("UNAPPROVED_PHRASE")
+            continue
+        if (not isinstance(box,list) or len(box)!=4
+                or not all(type(v) is int for v in box)
+                or not 0<=box[0]<box[2]<=xend-xorig
+                or not 0<=box[1]<box[3]<=yend-yorig):
+            rejected.append("CROP_BBOX_INVALID")
+            continue
+        if not isinstance(conf,(int,float)) or isinstance(conf,bool) or not 0.6<=conf<=1:
+            rejected.append("CONFIDENCE_LOW_OR_INVALID")
+            continue
+        global_box=[box[0]+xorig,box[1]+yorig,box[2]+xorig,box[3]+yorig]
+        if any(_overlap_ratio(global_box,list(old))>.90 for _,old in
+               _known_ocr_regions(a["source_png"],a["source_sha256"])):
+            rejected.append("EXISTING_REGION_OVERLAP")
+            continue
+        verified.append({"english":allowed[code],"crop_bbox_xyxy":box,
+                         "proposed_global_bbox_xyxy":global_box,
+                         "confidence":conf})
+    review={
+        "schema":"outrun.pixel_ocr_chat_review.v1",
+        "task_id":task_id,"source_png":a["source_png"],
+        "source_sha256":a["source_sha256"],
+        "crop_sha256":a["crop_sha256"],"crop_bbox_global":a["crop_bbox_global"],
+        "proposals_not_approved":verified,"rejected":rejected,
+        "uncertain":raw.get("uncertain",[]),
+        "response_sha256":hashlib.sha256(assistant_text.encode()).hexdigest(),
+        "manual_review_required":True,"production_queue_modified":False,
+        "runtime_validation":"UNTESTED","external_api_used":False,
+        "completed_at":_now()}
+    out=PIXEL_REVIEW_ROOT/"responses"/(task_id+".json")
+    if out.exists():
+        prev=json.loads(out.read_text(encoding="utf-8"))
+        if prev.get("response_sha256")!=review["response_sha256"]:
+            raise ValueError("PIXEL_REVIEW_RESPONSE_COLLISION")
+    else:
+        _atomic_json(out,review)
+    done={"task_id":task_id,"source_png":a["source_png"],
+          "fingerprint":a["fingerprint"],"ocr_lane":a.get("ocr_lane"),
+          "status":"REVIEW_REQUIRED_PIXEL_ROI","applied":0,
+          "reviewed_candidates":len(verified),"rejected":rejected,
+          "completed_at":_now(),"chat_url":a.get("chat_url"),
+          "manual_review_required":True}
+    st["completed"].append(done);st["completed"]=st["completed"][-500:]
+    st["active"]=None;_save_state(st);_audit(done)
+    return done
+
+
 def next_binding(lane=None):
     lane=_normalize_lane(lane)
     if os.environ.get("OUTRUN_GPT_CHAT_OCR_ENABLED","true").lower()!="true":
@@ -444,6 +639,9 @@ def next_binding(lane=None):
         b["prompt"]=_prompt(task,row,phrases);st["active"]=b;_save_state(st)
         _audit({"status":"STAGED","task_id":task,"source_png":row["png_filename"],"target_count":len(phrases),"external_api_used":False})
         return dict(b),None
+    pixel=_pixel_review_next_binding(st,lane)
+    if pixel is not None:
+        return pixel,None
     return None,"GPT_CHAT_OCR_QUEUE_EMPTY_OR_EXHAUSTED"
 
 def stage_submission(task_id):
@@ -553,6 +751,8 @@ def apply_response(task_id,assistant_text):
     if not isinstance(a,dict) or a.get("task_id")!=task_id:return {"status":"STATE_TASK_MISMATCH","applied":0}
     if a.get("status")!="SENT_AWAITING_RESPONSE":return {"status":"STATE_NOT_AWAITING_RESPONSE","applied":0}
     try:
+        if a.get("pixel_review_only"):
+            return _apply_pixel_review(st,a,task_id,assistant_text)
         data=_extract_json(assistant_text)
         if not isinstance(data,dict):raise ValueError("GPT_OCR_RESPONSE_NOT_OBJECT")
         if data.get("task_id")!=task_id or data.get("source_png")!=a["source_png"]:raise ValueError("GPT_OCR_RESPONSE_BINDING_MISMATCH")
