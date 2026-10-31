@@ -76,7 +76,8 @@ mutations = (
     ("fs.predictedDisplayTime, quad, false",
      "fs.predictedDisplayTime, projection, false"),
     ('menu-local-fixed-quad-fresh', 'menu-local-fixed-projection-fresh'),
-    ("compositor.ReferenceSpaceChanged();", "/* no anchor reset */"),
+    ("if (presentation != lastPresentation)\n            {\n                compositor.ReferenceSpaceChanged();",
+     "if (presentation != lastPresentation)\n            {\n                /* no anchor reset */"),
 )
 for old, bad in mutations:
     assert old in source, "mutation fixture missing: " + old
