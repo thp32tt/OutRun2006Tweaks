@@ -3341,11 +3341,12 @@ for label, corrupt in (
         raise SystemExit('P0 original HUD c64 mutation survived: ' + label)
 
 
-# Exact EXE+0xCABE is a centre-eye projected screen effect. R85 keeps one
-# original angular source ray but projects it independently through the left
-# and right OpenXR asymmetric FOVs with IPD translation suppressed. Other
-# Clr_SceneEffect variants retain flat/spatial WVP classification. All paths
-# require original raw c64.
+# Exact lens PMTs are centre-eye projected screen effects. R85 keeps one
+# original source ray, but Quest 2026-11-01 HMD proof shows that an exact
+# 405890 PMT c64 recorded while the game camera is synchronized must be
+# unprojected through the common head inverse before L/R asymmetric-FOV
+# reprojection. A tiny bounded eye translation may remain for shallow depth.
+# Other Clr_SceneEffect variants retain flat/spatial WVP classification.
 def check_exact_scene_effect_raw_wvp(source):
     scope = function_body(source, 'bool R30ExactSceneEffectScope(')
     require('RenderScope::SceneEffect', scope,
@@ -3386,13 +3387,23 @@ def check_exact_scene_effect_raw_wvp(source):
         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)',
         'GetLatchedHeadInverse(',
-        'const D3DMATRIX identityEye = IdentityMatrix();',
+        'exactProjectedLensPmtRaw ? false : recordedCameraSynced',
         'for (int eye = 0; eye < 2; ++eye)',
         'ProjectionFromFov(',
         'stereo.eyeFov[eye]',
         'BuildProjectedSunRay(',
         'std::memcpy(eyeConstants[eye], &projectedT'
     )
+    for token in (
+        'exactProjectedLensPmtRaw',
+        'recordedCameraSynced',
+        'exactProjectedLensPmtRaw ? false : recordedCameraSynced',
+        'lensEyeInverse = IdentityMatrix()',
+        'R85LensStereoTranslationScale = 0.025f',
+        'pmtHeadUnproject={}',
+    ):
+        require(token, projected,
+                'exact PMT flare must unproject synchronized camera before eye projection')
     exact_projected = function_body(
         source, 'bool R30GetExactInlineProjectedLensRawWvp(')
     for token in (
