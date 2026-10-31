@@ -1,0 +1,215 @@
+name: VR Mono Full Test ZIP With Batches
+
+on:
+  push:
+    branches: ['test/r26-no-mono-shadow-20261101']
+    paths: ['.github/workflows/vr-mono-batch-package.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  package:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve exact tested x86 DLL and x64 host
+        uses: actions/download-artifact@v4
+        with:
+          repository: thp32tt/OutRun2006Tweaks
+          run-id: 41214679954
+          name: VR_MONO_ELISION_TEST_c38a8e1c17ad79aaa40ff4453de23153e67ed333
+          github-token: ${{ github.token }}
+          path: staged
+      - name: Assemble complete launcher kit
+        shell: pwsh
+        run: |
+          $out = 'dist/VR_MONO_BATCH_TEST'
+          New-Item -ItemType Directory -Force "$out/payload","$out/settings_reference" | Out-Null
+          foreach ($name in @('dinput8.dll','outrun-vr-host.exe')) {
+            if (!(Test-Path "staged/$name")) { throw "Missing compiled $name" }
+            Copy-Item "staged/$name" "$out/payload/$name"
+          }
+          if (Test-Path 'staged/openxr_loader.dll') { Copy-Item staged/openxr_loader.dll "$out/payload/" }
+          foreach ($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')) {
+            if (Test-Path "staged/$name") { Copy-Item "staged/$name" "$out/settings_reference/$name" }
+          }
+
+          @'
+          @echo off
+          setlocal EnableExtensions DisableDelayedExpansion
+          title OutRun VR Mono Test - Install and Run
+          set "PKG=%~dp0"
+          set "GAME=%~1"
+          if not defined GAME if exist "%PKG%OR2006C2C.exe" set "GAME=%PKG%"
+          if not defined GAME if exist "%PKG%..\OR2006C2C.exe" set "GAME=%PKG%.."
+          if not defined GAME set /p "GAME=Path to existing OutRun 2006 game folder: "
+          set "GAME=%GAME:"=%"
+          if not defined GAME goto BAD_GAME
+          for %%D in ("%GAME%") do set "GAME=%%~fD"
+          if not exist "%GAME%\OR2006C2C.exe" goto BAD_GAME
+          if not exist "%PKG%payload\dinput8.dll" goto BAD_ZIP
+          if not exist "%PKG%payload\outrun-vr-host.exe" goto BAD_ZIP
+          set "BAK=%GAME%\VR_MONO_TEST_BACKUP"
+          if not exist "%BAK%" mkdir "%BAK%"
+          if not exist "%BAK%" goto FAILED
+          echo Backing up prior binaries...
+          call :SAVE dinput8.dll
+          call :SAVE outrun-vr-host.exe
+          if exist "%PKG%payload\openxr_loader.dll" call :SAVE openxr_loader.dll
+          echo Installing matching VR test binaries...
+          copy /Y "%PKG%payload\dinput8.dll" "%GAME%\dinput8.dll" >nul || goto FAILED
+          copy /Y "%PKG%payload\outrun-vr-host.exe" "%GAME%\outrun-vr-host.exe" >nul || goto FAILED
+          if exist "%PKG%payload\openxr_loader.dll" copy /Y "%PKG%payload\openxr_loader.dll" "%GAME%\openxr_loader.dll" >nul || goto FAILED
+          if not exist "%GAME%\OutRun2006Tweaks.ini" if exist "%PKG%settings_reference\OutRun2006Tweaks.ini" copy /Y "%PKG%settings_reference\OutRun2006Tweaks.ini" "%GAME%\OutRun2006Tweaks.ini" >nul
+          if not exist "%GAME%\OutRun2006Tweaks.lods.ini" if exist "%PKG%settings_reference\OutRun2006Tweaks.lods.ini" copy /Y "%PKG%settings_reference\OutRun2006Tweaks.lods.ini" "%GAME%\OutRun2006Tweaks.lods.ini" >nul
+          copy /Y "%PKG%02_RUN_GAME.bat" "%GAME%\VRTEST_RUN_GAME.bat" >nul || goto FAILED
+          copy /Y "%PKG%03_RESTORE_PREVIOUS.bat" "%GAME%\VRTEST_RESTORE_PREVIOUS.bat" >nul || goto FAILED
+          copy /Y "%PKG%04_COLLECT_LOGS.bat" "%GAME%\VRTEST_COLLECT_LOGS.bat" >nul || goto FAILED
+          echo Installed. Existing settings were preserved.
+          echo Start Quest / VDXR first. Press a key to launch OutRun 2006.
+          pause >nul
+          call "%GAME%\VRTEST_RUN_GAME.bat"
+          exit /b %ERRORLEVEL%
+          :SAVE
+          if exist "%BAK%\%~1" exit /b 0
+          if exist "%BAK%\%~1.absent" exit /b 0
+          if exist "%GAME%\%~1" (
+            copy /Y "%GAME%\%~1" "%BAK%\%~1" >nul
+          ) else (
+            type nul > "%BAK%\%~1.absent"
+          )
+          exit /b 0
+          :BAD_GAME
+          echo ERROR: OR2006C2C.exe not found. Specify the real game folder.
+          pause
+          exit /b 2
+          :BAD_ZIP
+          echo ERROR: Extract the entire ZIP before using this installer.
+          pause
+          exit /b 3
+          :FAILED
+          echo ERROR: Close the game and VR host, then check file permissions.
+          pause
+          exit /b 4
+          '@ | Set-Content "$out/01_INSTALL_AND_RUN.bat" -Encoding ascii
+
+          @'
+          @echo off
+          setlocal EnableExtensions
+          title OutRun VR Mono Test - Run Installed Game
+          cd /d "%~dp0"
+          if not exist OR2006C2C.exe goto MISSING
+          if not exist dinput8.dll goto MISSING
+          if not exist outrun-vr-host.exe goto MISSING
+          echo Launching game; AutoLaunchHost=true in your existing INI starts VR host.
+          echo Keep Quest + VDXR active. This script avoids a second VR host.
+          start "" /wait /D "%CD%" "%CD%\OR2006C2C.exe"
+          if exist "%~dp0VRTEST_COLLECT_LOGS.bat" call "%~dp0VRTEST_COLLECT_LOGS.bat"
+          echo Game exited. Press a key to close.
+          pause >nul
+          exit /b 0
+          :MISSING
+          echo ERROR: First run 01_INSTALL_AND_RUN.bat from the ZIP folder.
+          pause
+          exit /b 2
+          '@ | Set-Content "$out/02_RUN_GAME.bat" -Encoding ascii
+
+          @'
+          @echo off
+          setlocal
+          title OutRun VR Mono Test - Restore Previous Version
+          cd /d "%~dp0"
+          set "BAK=%~dp0VR_MONO_TEST_BACKUP"
+          if not exist "%BAK%" goto NO_BACKUP
+          tasklist /FI "IMAGENAME eq OR2006C2C.exe" 2>nul | find /I "OR2006C2C.exe" >nul
+          if not errorlevel 1 goto CLOSE_GAME
+          tasklist /FI "IMAGENAME eq outrun-vr-host.exe" 2>nul | find /I "outrun-vr-host.exe" >nul
+          if not errorlevel 1 goto CLOSE_GAME
+          call :RESTORE dinput8.dll
+          call :RESTORE outrun-vr-host.exe
+          call :RESTORE openxr_loader.dll
+          echo Previous version restored where a backup existed. INI unchanged.
+          pause
+          exit /b 0
+          :RESTORE
+          if exist "%BAK%\%~1" (
+            copy /Y "%BAK%\%~1" "%~dp0%~1" >nul
+          ) else if exist "%BAK%\%~1.absent" (
+            if exist "%~dp0%~1" (
+              if not exist "%BAK%\test-disabled-%~1" move /Y "%~dp0%~1" "%BAK%\test-disabled-%~1" >nul
+            )
+          ) else (
+            echo No saved prior state for %~1; unchanged.
+          )
+          exit /b 0
+          :NO_BACKUP
+          echo ERROR: Pre-test backup folder missing. Nothing changed.
+          pause
+          exit /b 3
+          :CLOSE_GAME
+          echo ERROR: Close the game and host before restoring.
+          pause
+          exit /b 4
+          '@ | Set-Content "$out/03_RESTORE_PREVIOUS.bat" -Encoding ascii
+
+          @'
+          @echo off
+          setlocal
+          cd /d "%~dp0"
+          set "DEST=%~dp0VR_MONO_TEST_LOGS\run-%RANDOM%-%RANDOM%"
+          mkdir "%DEST%"
+          for %%F in (OutRun2006Tweaks.log outrun-vr-host.log outrun-vr-host-pipeline.log outrun-vr-frame-pacing.csv vrhost.log) do (
+            if exist "%~dp0%%F" copy /Y "%~dp0%%F" "%DEST%\" >nul
+          )
+          echo Logs copied, if present, to "%DEST%"
+          powershell -NoProfile -Command "Compress-Archive -Path $env:DEST -DestinationPath ($env:DEST+'.zip') -Force" >nul 2>&1
+          if exist "%DEST%.zip" echo ZIP: "%DEST%.zip"
+          exit /b 0
+          '@ | Set-Content "$out/04_COLLECT_LOGS.bat" -Encoding ascii
+
+          @'
+          OutRun 2006 VR mono-shadow elimination TEST (Quest/VDXR).
+          Compiled game DLL and x64 OpenXR host are taken from successful CI
+          run https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41214679954
+          exact binary source SHA c38a8e1c17ad79aaa40ff4453de23153e67ed333
+
+          FIRST RUN:
+          1. Extract this complete ZIP to a new folder.
+          2. Close the game / old VR host, start Quest + VDXR/OpenXR.
+          3. Double-click 01_INSTALL_AND_RUN.bat.
+          4. Enter your game folder path if asked. It must contain OR2006C2C.exe.
+          5. Your current DLL and host are backed up to VR_MONO_TEST_BACKUP.
+             Existing INI settings and your original game EXE are NOT overwritten.
+          6. Press any key to start. The game normally auto-launches the VR host.
+
+          LATER RUNS: Double-click VRTEST_RUN_GAME.bat in your game folder.
+          ROLLBACK: Close game + host, run VRTEST_RESTORE_PREVIOUS.bat.
+          LOGS: Run VRTEST_COLLECT_LOGS.bat in your game folder.
+
+          Normal stereo draws LEFT+RIGHT only; center mono backup draw/clear is
+          omitted. No resolution, AA, reflection or texture quality reduction.
+          Incomplete-frame fallback is experimental. Quest visuals and GPU frame
+          timing improvement have NOT been validated. Roll back if defects occur.
+          No copyrighted original game data or game EXE is included in this ZIP.
+          '@ | Set-Content "$out/README_FIRST.txt" -Encoding utf8
+
+          $dll=[IO.File]::ReadAllBytes("$out/payload/dinput8.dll")
+          $off=[BitConverter]::ToInt32($dll,0x3c)
+          if ($dll.Length -lt 1000000 -or [BitConverter]::ToUInt16($dll,$off+4) -ne 0x14c) { throw 'Invalid x86 game DLL' }
+          if (![Text.Encoding]::ASCII.GetString($dll).Contains('elidedDraws=')) { throw 'Elided draw telemetry missing' }
+          $host=[IO.File]::ReadAllBytes("$out/payload/outrun-vr-host.exe")
+          $off=[BitConverter]::ToInt32($host,0x3c)
+          if ([BitConverter]::ToUInt16($host,$off+4) -ne 0x8664) { throw 'Invalid x64 host' }
+          Write-Host 'Verified x86 DLL + x64 host + one-click scripts'
+          Get-ChildItem $out -Recurse | Select-Object FullName,Length
+
+      - name: Upload all-in-one test ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: VR_MONO_BATCH_COMPLETE_0461
+          path: dist/VR_MONO_BATCH_TEST/
+          retention-days: 14
+          if-no-files-found: error
