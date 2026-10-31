@@ -35,9 +35,10 @@ services:
       UW2_GITHUB_REPO: "thp32tt/ai-dev-lab"
       UW2_TARGET_BRANCH: "uw2-web-port"
       UW2_SCHEDULE_MINUTES: "0,30"
-      # Reply-driven UW2 continuation: next input as soon as answer stabilizes.
-      # Throttle keeps Chrome and ChatGPT from becoming saturated.
-      UW2_CONTINUE_MIN_SECONDS: "120"
+      # Low-input UW2: target long implementation batches per instruction.
+      # Do not send another message until >=30 minutes after previous send;
+      # elapsed cooldown is NOT claimed as actual development time.
+      UW2_CONTINUE_MIN_SECONDS: "1800"
       UW2_RESPONSE_STABLE_SECONDS: "20"
       CONVERSION_ONLY_SLOT: ""
       QUEUE_CHECK_SECONDS: "15"
@@ -72,9 +73,9 @@ services:
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       # New DX11 production: :30 KST, at most once per hour.
       SCHEDULE_MINUTES: "30"
-      # C keeps a single UW2 chat; continues on every stable finished response.
-      # :00/:30 KST are backup wakeups if a response cannot be observed.
-      # Busy generation is never interrupted; pending fallback waits until idle.
+      # C sends only the same short sentence, at most once in 30 minutes.
+      # :00/:30 KST fallback plus idle/response observations; never stop busy work.
+      # Actual 20-minute development goal is in the single UW2 master plan.
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
