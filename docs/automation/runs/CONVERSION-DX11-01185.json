@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01185",
+  "production_id": "CONVERSION-DX11-01185",
+  "event_id": "CONVERSION-DX11-01185-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_ONE_TO_23PX_GPU_RGB_SOURCE_CROP",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_SAME_TASK_CAUSAL_CI_REGRESSION_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "6cf6404ee71140f3181e36089e62a3518f4a2c0f",
+  "implementation_source_sha": "f170f28fdd482de3de37430966110176fc651508",
+  "validation_bearing_result_sha": "77a86c867994fc404384697ed9c015ea3df04b17",
+  "material_result_sha": "77a86c867994fc404384697ed9c015ea3df04b17",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_partial_present_tile.hpp",
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp"
+  ],
+  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "development_time_percentages": "UNMEASURED",
+  "controller_runtime_adoption": "UNVERIFIED",
+  "implementation": "An existing explicitly opt-in partial native D3D11 Draw GPU PRE/POST RGB-to-original-D3D9 Present source-aligned diagnostic now retains authentic 1..23px menu/HUD source crop pixels. Identical canonical D3D9 source Draw/Present IUnknown identity and physical target grid are required; small source update is authenticated by explicit full source-crop repaint or full exact original dirty RGNDATA union and changed GPU RGB. Tiny original native color targets can be staged at their actual physical size; authenticated source-only partial dirty Presents bypass only the unrelated legacy 24px displaced RAW inset placement gate. Unknown/holey dirty or mismatched source, unchanged RGB and old displaced insets stay fail-closed. No complete native game frame or VR eye parity claim.",
+  "validation": {
+    "required_push_workflows_result": "5/5 completed success on identical validation-bearing material SHA",
+    "exact_sha": "77a86c867994fc404384697ed9c015ea3df04b17",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41206854042,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41206854085,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 41206854017,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41206854012,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41206853999,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "nonmandatory_fast_test_build": {
+      "run_id": 41206854076,
+      "conclusion": "skipped"
+    },
+    "runtime_d3d11_draw_and_hmd": "UNTESTED"
+  },
+  "safety": {
+    "raw_opt_in_default_off": true,
+    "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
+    "dxvk": "FROZEN_UNMODIFIED",
+    "score_duplicate_prevention": "Only one material feature result, same-TASK CI/test/C6 no extra achievement"
+  }
+}
