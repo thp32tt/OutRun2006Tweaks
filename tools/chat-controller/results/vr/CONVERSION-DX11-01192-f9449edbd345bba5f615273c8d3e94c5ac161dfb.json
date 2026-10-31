@@ -1,0 +1,123 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01192",
+  "production_id": "CONVERSION-DX11-01192",
+  "event_id": "CONVERSION-DX11-01192-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SOURCE_RGB_MASKED_DIRTY_UNION_TWO_DRAW_PRESENT",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "dd0c3c06a008e823ee989196d57ea3d7b9a30bf7",
+  "implementation_source_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01192.json"
+  ],
+  "implementation": "Integrated per-pixel genuine native GPU RGB and original D3D9 RGNDATA intersection with bounded preexisting tile exclusion, recovering largest source-coincident rectangle even when GPU-only dense core crosses an unpainted dirty-region hole. Connect to two-source ranked eight-island game Present batch with no forged pixels or full-frame promotion; test actual RGB two-capture 8-cell ring, 4x4 unpainted center, reused pixels and forged rcBound.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_BEFORE_AFTER_RGB_DELTA",
+      "ORIGINAL_D3D9_DIRTY_UNION_PIXEL_MASK",
+      "SOURCE_COINCIDENT_GAME_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_GAME_D3D9_DRAW",
+      "D3D11_GPU_PRE_POST_RGB_CAPTURE",
+      "ORIGINAL_GAME_DIRTY_UNION_MASKED_SOLID_ISLAND",
+      "DUAL_SOURCE_RANKED_DISJOINT_STAGING",
+      "OPT_IN_GAME_PIXEL_UPDATE_SURFACE"
+    ],
+    "batch_components": [
+      "GPU_RGB_VISIBLE_MASKED_RECTANGLE_HISTOGRAM",
+      "SOURCE_GAME_DIRTY_AND_EXCLUSION_INTEGRATION",
+      "DUAL_CAPTURE_POSITIVE_NEGATIVE_CPP_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "A pair of independent GPU captures yields the 128 actual RGB game pixels from eight painted D3D9 menu cells in four disjoint source-aligned tiles.",
+      "negative_regression": "Central 4x4 game dirty hole, previously uploaded pixels and forged rcBound cannot authorize a native RGB upload.",
+      "component_integration": "Authentic live Draw->D3D11 PRE/POST GPU RGB->original D3D9 RGNDATA masked solid source-crop->two-capture ranked nonoverlapping original-coordinate Present."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "tests/native_raw_changed_crop_present_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "OPT_IN_PARTIAL_NATIVE_RGB_ONLY; NOT_FULL_MENU_CAR_RACE_RUNTIME; HMD_UNTESTED",
+    "activation_guard_and_fallback": "RAW opt-in default off; DX9Ex renderer, gamepad, FFB, SkyGlow retained; DXVK untouched."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Recover real native GPU RGB in fragmented source-authentic menu/car dirty regions through two Draw captures without presenting unpainted pixels.",
+    "acceptance_items": [
+      {
+        "id": "masked_gpu_rgb",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_REAL_GPU_DRAW_AND_RGB",
+        "expected_behavior": "Select a true GPU PRE/POST RGB rectangle respecting the actual D3D9 dirty union."
+      },
+      {
+        "id": "game_present_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_REAL_PRESENT_AND_ORIGINAL_INPUT",
+        "expected_behavior": "Never publish unpainted, double-owned, outside-source or forged dirty pixels."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "WIN32_BACKEND_OPENXR_HUD_CI",
+        "expected_behavior": "All five mandatory exact-SHA workflows pass on material candidate; hardware untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "masked_gpu_rgb": {
+      "status": "PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ]
+    },
+    "game_present_fallback": {
+      "status": "PENDING",
+      "evidence_paths": [
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ]
+    },
+    "exact_sha_gate": {
+      "status": "PENDING",
+      "evidence_paths": []
+    }
+  },
+  "safety": {
+    "raw_opt_in_default_off": true,
+    "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
+    "dxvk": "FROZEN_UNMODIFIED",
+    "native_game_full_frame": "NOT_CLAIMED",
+    "external_controller_adoption": "UNVERIFIED"
+  },
+  "controller_terminal": true,
+  "controller_finalize_reason": "LEGACY_EXACT_SHA_GATE_SUCCESS"
+}
