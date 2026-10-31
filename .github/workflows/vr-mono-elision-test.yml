@@ -38,16 +38,33 @@ jobs:
       - name: Compile game VR and host
         run: cmake --build build --config Release --parallel 4
 
+      - name: Configure and compile x64 OpenXR host
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host --parallel 4
+          $hostExe = Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe -File | Select-Object -First 1
+          if (!$hostExe) { throw 'Missing x64 OpenXR host executable' }
+          Copy-Item $hostExe.FullName build/bin/outrun-vr-host.exe
+          $loader = Get-ChildItem build-host -Recurse -Filter openxr_loader.dll -File | Select-Object -First 1
+          if ($loader) { Copy-Item $loader.FullName build/bin/openxr_loader.dll }
+          Write-Host ("Host x64 packaged: {0}" -f $hostExe.FullName)
+
       - name: Validate and package test binary
         shell: pwsh
         run: |
           if (!(Test-Path build/bin/dinput8.dll)) { throw 'Missing Win32 dinput8.dll' }
+          if (!(Test-Path build/bin/outrun-vr-host.exe)) { throw 'Missing x64 OpenXR host' }
           $bytes = [System.IO.File]::ReadAllBytes('build/bin/dinput8.dll')
           if ($bytes.Length -lt 1000000 -or $bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw 'Invalid PE32 test DLL' }
           $peOffset = [BitConverter]::ToInt32($bytes,0x3C)
           if ([BitConverter]::ToUInt16($bytes,$peOffset+4) -ne 0x014C) { throw 'Not x86' }
           $ascii = [System.Text.Encoding]::ASCII.GetString($bytes)
           if (!$ascii.Contains('elidedDraws=')) { throw 'Missing new no-shadow telemetry' }
+          $hostBytes = [System.IO.File]::ReadAllBytes('build/bin/outrun-vr-host.exe')
+          $hostPeOffset = [BitConverter]::ToInt32($hostBytes,0x3C)
+          if ([BitConverter]::ToUInt16($hostBytes,$hostPeOffset+4) -ne 0x8664) { throw 'Host must be x64' }
           Copy-Item OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
           Copy-Item OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
           New-Item -ItemType Directory -Force build/bin/VR_NO_MONO_TEST | Out-Null
