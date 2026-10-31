@@ -2319,10 +2319,61 @@ namespace
         return true;
     }
 
+    bool R23PublishedMirrorUv(
+        const StereoCompositor& c,
+        const OutRunVR::SharedRenderFrameState& frame,
+        UvRect& uv, RECT& outputRelativeRect) noexcept
+    {
+        uv = {};
+        outputRelativeRect = {};
+        if (!c.sourceWidth_ || !c.sourceHeight_ ||
+            frame.clientPid == 0 ||
+            (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0)
+            return false;
+
+        std::int32_t desktopLeft = 0, desktopTop = 0;
+        const std::uint32_t leftBits =
+            frame.reserved[OutRunVR::RenderFrameMirrorLeftIndex];
+        const std::uint32_t topBits =
+            frame.reserved[OutRunVR::RenderFrameMirrorTopIndex];
+        std::memcpy(&desktopLeft, &leftBits, sizeof(desktopLeft));
+        std::memcpy(&desktopTop, &topBits, sizeof(desktopTop));
+        const std::uint32_t width =
+            frame.reserved[OutRunVR::RenderFrameMirrorWidthIndex];
+        const std::uint32_t height =
+            frame.reserved[OutRunVR::RenderFrameMirrorHeightIndex];
+        if (!width || !height || width > 16384u || height > 16384u)
+            return false;
+
+        const std::int64_t left =
+            static_cast<std::int64_t>(desktopLeft) - c.outputDesktop_.left;
+        const std::int64_t top =
+            static_cast<std::int64_t>(desktopTop) - c.outputDesktop_.top;
+        const std::int64_t right = left + width;
+        const std::int64_t bottom = top + height;
+        if (left < 0 || top < 0 ||
+            right > static_cast<std::int64_t>(c.sourceWidth_) ||
+            bottom > static_cast<std::int64_t>(c.sourceHeight_) ||
+            right <= left || bottom <= top)
+            return false;
+
+        uv.x = static_cast<float>(left) / c.sourceWidth_;
+        uv.y = static_cast<float>(top) / c.sourceHeight_;
+        uv.w = static_cast<float>(width) / c.sourceWidth_;
+        uv.h = static_cast<float>(height) / c.sourceHeight_;
+        outputRelativeRect = {
+            static_cast<LONG>(left), static_cast<LONG>(top),
+            static_cast<LONG>(right), static_cast<LONG>(bottom)};
+        return uv.w > 0.0f && uv.h > 0.0f &&
+            uv.x >= 0.0f && uv.y >= 0.0f &&
+            uv.x + uv.w <= 1.00001f && uv.y + uv.h <= 1.00001f;
+    }
+
     bool R23RenderTheater(StereoCompositor& c, XrSpace viewSpace,
         XrSpace localSpace, XrTime displayTime, XrCompositionLayerQuad& quad,
         bool sourceIsSbs,
-        std::uint32_t clientGameState = 0xFFFFFFFFu)
+        std::uint32_t clientGameState = 0xFFFFFFFFu,
+        const OutRunVR::SharedRenderFrameState* mirrorFrame = nullptr)
     {
         R23Pixels.TryConsume(c.context_);
         if (!c.haveFrame_ || !c.sourceSrv_) return false;
@@ -2334,8 +2385,59 @@ namespace
                 &capturedTheaterFullyVisible))
             return false;
         UvRect theaterUv = whole;
+        bool publishedMirrorApplied = false;
+        float publishedMirrorAspect = 0.0f;
+        if (!sourceIsSbs && mirrorFrame)
+        {
+            UvRect publishedUv{};
+            RECT publishedRect{};
+            if (R23PublishedMirrorUv(
+                    c, *mirrorFrame, publishedUv, publishedRect))
+            {
+                theaterUv = publishedUv;
+                capturedTheaterClient = publishedRect;
+                capturedTheaterFullyVisible = true;
+                publishedMirrorApplied = true;
+                publishedMirrorAspect =
+                    static_cast<float>(publishedRect.right - publishedRect.left) /
+                    static_cast<float>(publishedRect.bottom - publishedRect.top);
+
+                static std::uint64_t mirrorRectHits = 0;
+                const auto hit = ++mirrorRectHits;
+                if (hit <= 32 || (hit & (hit - 1)) == 0)
+                {
+                    std::ostringstream trace;
+                    trace
+                        << "[VR TRACE MENU FRAME MIRROR RECT FULL]"
+                        << " hit=" << hit
+                        << " state=" << clientGameState
+                        << " desktopRect="
+                        << static_cast<std::int32_t>(
+                            mirrorFrame->reserved[
+                                OutRunVR::RenderFrameMirrorLeftIndex])
+                        << ','
+                        << static_cast<std::int32_t>(
+                            mirrorFrame->reserved[
+                                OutRunVR::RenderFrameMirrorTopIndex])
+                        << ','
+                        << mirrorFrame->reserved[
+                            OutRunVR::RenderFrameMirrorWidthIndex]
+                        << ','
+                        << mirrorFrame->reserved[
+                            OutRunVR::RenderFrameMirrorHeightIndex]
+                        << " outputRect="
+                        << publishedRect.left << ',' << publishedRect.top
+                        << ',' << publishedRect.right << ','
+                        << publishedRect.bottom
+                        << " uv=" << theaterUv.x << ',' << theaterUv.y
+                        << ',' << theaterUv.w << ',' << theaterUv.h
+                        << " authority=GAME_PUBLISHED_D3D9_HWND_CLIENT_RECT\n";
+                    OutRunVrEmitFullTrace(trace.str());
+                }
+            }
+        }
         const auto logicalCanvasCrop =
-            !sourceIsSbs
+            !sourceIsSbs && !publishedMirrorApplied
             ? OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
                 clientGameState,
                 static_cast<float>(capturedTheaterClient.left),
@@ -2348,7 +2450,7 @@ namespace
                 static_cast<float>(c.projection_.height))
             : OutRunVrMenuAspect::LogicalCanvasCapturePlan{};
         const bool logicalCanvasCropApplied =
-            !sourceIsSbs && logicalCanvasCrop.crop;
+            !sourceIsSbs && !publishedMirrorApplied && logicalCanvasCrop.crop;
         if (logicalCanvasCropApplied)
         {
             theaterUv.x = logicalCanvasCrop.x;
@@ -2415,12 +2517,14 @@ namespace
             capturedTheaterClient.right - capturedTheaterClient.left);
         const float theaterHeight = static_cast<float>(
             capturedTheaterClient.bottom - capturedTheaterClient.top);
-        const float aspect = logicalCanvasCropApplied
-            ? logicalCanvasCrop.aspect
-            : (theaterWidth > 0.0f && theaterHeight > 0.0f
+        const float aspect = publishedMirrorApplied
+            ? publishedMirrorAspect
+            : (logicalCanvasCropApplied
+                ? logicalCanvasCrop.aspect
+                : (theaterWidth > 0.0f && theaterHeight > 0.0f
                 ? theaterWidth / theaterHeight *
                     (sourceIsSbs ? 0.5f : 1.0f)
-                : 16.f / 9.f);
+                : 16.f / 9.f));
         quad.size.width = 2.f;
         quad.size.height = 2.f / aspect;
 
@@ -2432,7 +2536,8 @@ namespace
         // the offset together with the recovered picture.
         // Game SBS uses a different split seam; its established safe
         // fallback is unchanged.
-        if (!sourceIsSbs && !logicalCanvasCropApplied)
+        if (!sourceIsSbs &&
+            !publishedMirrorApplied && !logicalCanvasCropApplied)
         {
             const RECT& clientOnOutput = capturedTheaterClient;
             const auto fragment =
@@ -4188,11 +4293,19 @@ int main(int argc, char** argv)
                     // one LOCAL-space quad instead; OpenXR owns binocular
                     // placement and both eyes see the same centred 2D plane.
                     // This same path also covers post-race restart/title/menu.
+                    OutRunVR::SharedRenderFrameState menuMirrorFrame{};
+                    const bool haveMenuMirrorFrame =
+                        renderFrames.Read(menuMirrorFrame) &&
+                        menuMirrorFrame.presentationMode ==
+                            OutRunVR::PresentationTheater &&
+                        (menuMirrorFrame.flags &
+                            OutRunVR::RenderFramePresentInFlight) == 0;
                     if (capture.available &&
                         R23RenderTheater(
                             compositor, viewSpace, localSpace,
                             fs.predictedDisplayTime, quad, false,
-                            clientGameState))
+                            clientGameState,
+                            haveMenuMirrorFrame ? &menuMirrorFrame : nullptr))
                     {
                         cachedMenuProjectionValid = false;
                         cachedMenuSourceFovValid = false;

@@ -115,6 +115,13 @@ namespace OutRunVR
     // keeps the Frame.v2 ABI unchanged while letting every reader reject stale
     // slots left behind when the host mapping survives a fast game restart.
     inline constexpr std::uint32_t RenderFrameRunGenerationIndex = 11;
+    // Exact game-side PC mirror client rectangle, sampled from the real D3D9
+    // HWND at frame publication. Coordinates are signed desktop pixels; width
+    // and height are positive client pixels. Slots 12..15 remain pacing-only.
+    inline constexpr std::uint32_t RenderFrameMirrorLeftIndex = 16;
+    inline constexpr std::uint32_t RenderFrameMirrorTopIndex = 17;
+    inline constexpr std::uint32_t RenderFrameMirrorWidthIndex = 18;
+    inline constexpr std::uint32_t RenderFrameMirrorHeightIndex = 19;
 
     enum StereoFailureReason : std::uint32_t
     {

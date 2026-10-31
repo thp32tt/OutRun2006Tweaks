@@ -25,6 +25,8 @@ def verify(text: str) -> None:
         "quad.pose = c.theaterAnchor_;",
         "c.GetCapturedGameUv(",
         "PlanTopLeftLogicalCaptureUv(",
+        "R23PublishedMirrorUv(",
+        "GAME_PUBLISHED_D3D9_HWND_CLIENT_RECT",
         "logicalRectVisible=1",
         "CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD",
         "c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)",
@@ -71,6 +73,8 @@ def verify(text: str) -> None:
     assert "capturedTheaterFullyVisible &&" not in theater
     assert "CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD" in theater
     assert "fitPixels=" in theater
+    assert "publishedMirrorApplied" in theater
+    assert "!publishedMirrorApplied" in theater
 
 
 verify(source)

@@ -6,6 +6,9 @@ r=Path(__file__).resolve().parents[1]
 cpp=(r/'src/hooks_graphics.cpp').read_text(encoding='utf-8')
 header=(r/'src/vr/ui/vr_mirror_aspect_fit.hpp').read_text(encoding='utf-8')
 settings=(r/'src/vr/settings.cpp').read_text(encoding='utf-8')
+protocol=(r/'src/vr/ipc/protocol.hpp').read_text(encoding='utf-8')
+r7=(r/'src/vr/d3d9/stereo_renderer_r7.inc').read_text(encoding='utf-8')
+host=(r/'vrhost/src/main_r23.cpp').read_text(encoding='utf-8')
 def check(c,h,s):
     assert 'VRMirrorPreserveAspect{ "VR", "MirrorPreserveAspect", true,' in s
     assert '#include "vr/ui/vr_mirror_aspect_fit.hpp"' in c
@@ -35,6 +38,19 @@ def check(c,h,s):
         '(monitorH - height) / 2',
     ): assert needle in h, needle
 check(cpp,header,settings)
+for token in (
+    'RenderFrameMirrorLeftIndex = 16',
+    'RenderFrameMirrorTopIndex = 17',
+    'RenderFrameMirrorWidthIndex = 18',
+    'RenderFrameMirrorHeightIndex = 19',
+): assert token in protocol, token
+assert 'WriteGameMirrorClientRect(frame);' in r7
+assert 'Game::D3DPresentParams->hDeviceWindow' in r7
+assert 'GetClientRect(window, &client)' in r7
+assert 'ClientToScreen(window, &tl)' in r7
+assert 'RenderFrameMirrorLeftIndex' in host
+assert 'GAME_PUBLISHED_D3D9_HWND_CLIENT_RECT' in host
+assert 'R23PublishedMirrorUv(' in host
 for src,old,bad in (
     ('cpp','if (Settings::VRMirrorPreserveAspect)','if (false)'),
     ('cpp','width = fit.width;','width = monitorWidth;'),
