@@ -15,7 +15,7 @@ assert 'VRFollowGameResolution{ "VR", "FollowGameResolution", false,' in setting
 assert 'VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,' in settings
 for x in ('AntiAliasing = 2','AutoRenderResolution = true',
           'FollowGameResolution = false','UnifiedEyeMenuSource = false',
-          'Hud1080pReference = true','HudScale = 0.55','MenuScale = 1.00'):
+          'Hud1080pReference = true','HudScale = 0.55','MenuScale = 0.75'):
     assert x in ini, x
 assert 'physical D3D9Ex target will use live OpenXR eye extent at CreateDevice' in misc
 assert 'Game::screen_resolution->x = static_cast<int>(xrSize.width)' not in ex
@@ -24,7 +24,7 @@ assert 'physical D3D9Ex target=' in ex
 for x in ("'-AutoRenderResolution=true'","'-FollowGameResolution=false'",
           "'-UnifiedEyeMenuSource=false'","'-AntiAliasing=2'",
           "'-Hud1080pReference=true'","'-HudScale=0.55'",
-          "'-MenuScale=1.00'","'-CullingUnionMarginDegrees=8.0'"):
+          "'-MenuScale=0.75'","'-CullingUnionMarginDegrees=8.0'"):
     assert x in run, x
 assert 'VRHud1080pReference' in ui
 front_end_owner=ui[ui.index('bool VrFrontEndPhysicalCanvasState() noexcept'):ui.index('bool ResolveVrFrontEndVirtualCanvasScale(')]
@@ -93,8 +93,8 @@ assert 'if (ordinal == 2)' not in gfx
 # translation; full/canted eye transforms remain forbidden here.
 assert 'R85LensVisualScale = 0.50f' in r30
 assert 'R85LensStereoTranslationScale = 0.025f' in r30
-assert 'exactProjectedLensPmtRaw ? false : recordedCameraSynced' in r30
-assert 'pmtHeadUnproject={}' in r30
+assert 'const bool sourceCameraSynced = recordedCameraSynced;' in r30
+assert 'pmtSourceOwnsCameraRotation={}' in r30
 assert 'lensEyeInverse = IdentityMatrix()' in r30
 assert 'lensEyeInverse._41' in r30
 assert 'stereo.eyeFov[eye]' in r30
