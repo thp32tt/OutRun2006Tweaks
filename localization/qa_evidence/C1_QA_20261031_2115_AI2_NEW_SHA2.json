@@ -1,0 +1,190 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T2115KST-Q043-NEW-SHA2",
+  "reviewed_at_kst": "2026-10-31T21:19:35+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "N100 실제 RGBA PNG 2장 원본 2048×2048 SHA-pinned HD ROI/미리보기 직접 시각검사, native-fit 및 50% 가독성, alpha border, 생산 증빙 SHA 비교; 동일 SHA 기존 C1 기록 197개 파일 중 재검수 금지.",
+  "prior_report_files": 197,
+  "prior_reviewed_sha_count": 925,
+  "results": {
+    "new_sha": 2,
+    "pass": 2,
+    "fail": 0,
+    "hold": 0,
+    "A": 1,
+    "B": 1
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0143-7560ABB0",
+      "id": "Q043_8c2673128986a6c8",
+      "english": "CONGRATULATIONS!",
+      "korean": "축하합니다!",
+      "bbox_xyxy": [
+        12,
+        589,
+        2012,
+        778
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "source_sha256": "67a3c20552a843ac19ba45dcf2d79a3e037040d6788cc443e52ae8457672bb22",
+      "manifest_source_sha256": "67a3c20552a843ac19ba45dcf2d79a3e037040d6788cc443e52ae8457672bb22",
+      "input_source_sha256": "67a3c20552a843ac19ba45dcf2d79a3e037040d6788cc443e52ae8457672bb22",
+      "manifest_imagegen_input_sha256": "67a3c20552a843ac19ba45dcf2d79a3e037040d6788cc443e52ae8457672bb22",
+      "candidate_file": "Q043_8c2673128986a6c8_k.png",
+      "candidate_sha256": "a188160c74496eb7f2027b1aaa087f59171e813bab19a3d32498538472addd62",
+      "export_sha256": "a188160c74496eb7f2027b1aaa087f59171e813bab19a3d32498538472addd62",
+      "candidate_mode": "RGBA",
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_type": "RGBA",
+      "alpha_bbox": [
+        65,
+        9,
+        2130,
+        706
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        567,
+        189
+      ],
+      "half_fit": [
+        283,
+        94
+      ],
+      "candidate_sha_matches_export": true,
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_input": true,
+      "already_reviewed": false,
+      "export_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "reason_code": "C1_TRANSLATION_READABLE_RGBA_LAYER",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_ONLY",
+      "original_full_hd_source_sha_verified": true,
+      "observations": "PlayStation source: 글자 '축하합니다!' 전 음절/받침이 읽히고 원문의 우상향 이탤릭 기울기 및 주황색 그라데이션·검은 외곽선 스타일이 보존된 독립 투명 글자 레이어. 원문 문자 수보다 폭이 짧은 것은 FAIL 근거가 아님. 567×189 원본 ROI 높이 비율 유지 및 283×94 축소 시 가독성 확인. 심각한 잘림/영문 잔상/불필요한 배경판/프레임 육안 미발견.",
+      "actual_ui_composite": "NOT_TESTED",
+      "actual_protected_art_coverage": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0147-6BDC818C",
+      "id": "Q043_ff4cb68946ab376b",
+      "english": "CONGRATULATIONS!",
+      "korean": "축하합니다!",
+      "bbox_xyxy": [
+        12,
+        589,
+        2012,
+        778
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "source_sha256": "76b58caa8d7dcb25ae3705c3aec28099f7ba005b7a8c1c8818a6081103b6fb76",
+      "manifest_source_sha256": "76b58caa8d7dcb25ae3705c3aec28099f7ba005b7a8c1c8818a6081103b6fb76",
+      "input_source_sha256": "76b58caa8d7dcb25ae3705c3aec28099f7ba005b7a8c1c8818a6081103b6fb76",
+      "manifest_imagegen_input_sha256": "76b58caa8d7dcb25ae3705c3aec28099f7ba005b7a8c1c8818a6081103b6fb76",
+      "candidate_file": "Q043_ff4cb68946ab376b_k.png",
+      "candidate_sha256": "45063e76377c10e58739da302f629282f5ca1bd54fcf0976b3e9adff864b6637",
+      "export_sha256": "45063e76377c10e58739da302f629282f5ca1bd54fcf0976b3e9adff864b6637",
+      "candidate_mode": "RGBA",
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "source_type": "RGBA",
+      "alpha_bbox": [
+        60,
+        0,
+        2141,
+        698
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        567,
+        189
+      ],
+      "half_fit": [
+        283,
+        94
+      ],
+      "candidate_sha_matches_export": true,
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_input": true,
+      "already_reviewed": false,
+      "export_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "reason_code": "C1_TRANSLATION_READABLE_RGBA_LAYER",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_ONLY",
+      "original_full_hd_source_sha_verified": true,
+      "observations": "Switch source: 글자 '축하합니다!' 오탈자·가짜 자소 없이 읽힘. 금색-주황 그라데이션 및 검은 외곽선·우측 기울기 원본 계열과 일치. 567×189 ROI 비율 유지/283×94 축소에도 판독됨. 불필요한 불투명 배경·영문 잔상·글자/효과 잘림 육안 미발견.",
+      "actual_ui_composite": "NOT_TESTED",
+      "actual_protected_art_coverage": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "evidence": {
+    "n100_preflight": "work/C1_QA_20261031_2115_AI2_new_sha2/preflight.json",
+    "n100_preview": "work/C1_QA_20261031_2115_AI2_new_sha2/pairs_source_native_half.jpg",
+    "n100_candidates": "work/image-src/text_roi_batches/candidate_outputs/{A,B}/",
+    "n100_exports": [
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0143-7560ABB0.json",
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0147-6BDC818C.json"
+    ]
+  },
+  "limitations": [
+    "QA PASS is Korean lettering PNG layer only, not DDS/composited UV and not game PASS",
+    "Producer flags REWORK_DIMENSIONS (2172x724 vs 2000x189 original ROI) remain and are not silently cleared; intended native-fit 567x189 is inspection-only, not actual final compositing",
+    "Output pairing is OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED in producer metadata; independent C1 original/source visual pairing supports wording/style but does not modify producer status",
+    "Latest A-0144 / B-0148 currently active not evaluated unless actual N100 PNG exists and new SHA is verified"
+  ],
+  "guards": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
