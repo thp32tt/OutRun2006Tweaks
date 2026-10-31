@@ -180,4 +180,70 @@ bool native_raw_tiny_rgb_source_upload_regression() {
         2u, 2u, sourceRepaint, clipped, gpu, false, true);
 }
 
-int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); }
+// A source-authenticated DX11 Draw can change a 1px menu island within
+// a FULL-SIZE D3D9 Present whose dirty RGNDATA paints only that single pixel.
+// The displaced RAW diagnostic cannot fit here. Preserve exact coordinates,
+// real GPU byte transport, and never allow foreign/forged/holey regions.
+bool native_raw_large_crop_sparse_dirty_source_regression() {
+    NativeRawPresentDirtyRegion repaint{};
+    repaint.headerVerified = true;
+    repaint.count = 1u;
+    repaint.boundLeft = 700; repaint.boundTop = 300;
+    repaint.boundRight = 701; repaint.boundBottom = 301;
+    repaint.rectangles[0] = {700, 300, 701, 301};
+    if (!native_raw_source_only_dirty_crop_can_defer_placement(
+            true, 1920u, 1080u, 1920u, 1080u,
+            0, 0, 1920, 1080, repaint) ||
+        native_raw_source_only_dirty_crop_can_defer_placement(
+            false, 1920u, 1080u, 1920u, 1080u,
+            0, 0, 1920, 1080, repaint) ||
+        native_raw_source_only_dirty_crop_can_defer_placement(
+            true, 1280u, 720u, 1920u, 1080u,
+            0, 0, 1920, 1080, repaint) ||
+        native_raw_source_only_dirty_crop_can_defer_placement(
+            true, 1920u, 1080u, 1920u, 1080u,
+            800, 300, 900, 400, repaint))
+        return false;
+    const std::array<std::uint8_t, 16> before{};
+    std::array<std::uint8_t, 16> after{};
+    after[0] = 4u; after[1] = 5u; after[2] = 6u; after[3] = 7u;
+    NativeRawChangedPixelWindow delta{};
+    delta.capture(before.data(), 8u, after.data(), 8u, 2u, 2u);
+    NativeRawPresentTile source{};
+    if (!native_raw_source_capture_clip_tile(
+            700u, 300u, 2u, 2u, 1920u, 1080u,
+            1920u, 1080u, 0, 0, 1920, 1080, source))
+        return false;
+    NativeRawSourceIslandBatch batch{};
+    if (!batch.append(1920u, 1080u, repaint, source, delta,
+                      false, true) ||
+        batch.count != 1u || batch.rgbPixels[0] != 1u ||
+        batch.tiles[0].sourceX != 0u || batch.tiles[0].sourceY != 0u ||
+        batch.tiles[0].copyWidth != 1u || batch.tiles[0].copyHeight != 1u ||
+        batch.tiles[0].destinationX != 700 ||
+        batch.tiles[0].destinationY != 300)
+        return false;
+    std::array<std::uint8_t, 16> destination{};
+    if (!native_raw_copy_present_island(
+            destination.data(), 8u, before.data(), 8u, after.data(), 8u,
+            2u, 2u, batch.tiles[0], NativeRawColorByteOrder::Rgba, false) ||
+        destination[0] != 6u || destination[1] != 5u ||
+        destination[2] != 4u || destination[3] != 7u ||
+        destination[4] != 0u || destination[8] != 0u)
+        return false;
+    // A forged region bound invalidates every member, not just the
+    // upload candidate, and unchanged native RGB never starts a batch.
+    repaint.boundRight = 702;
+    if (native_raw_source_only_dirty_crop_can_defer_placement(
+            true, 1920u, 1080u, 1920u, 1080u,
+            0, 0, 1920, 1080, repaint))
+        return false;
+    repaint.boundRight = 701;
+    after = before;
+    delta.capture(before.data(), 8u, after.data(), 8u, 2u, 2u);
+    NativeRawSourceIslandBatch unchanged{};
+    return !unchanged.append(
+        1920u, 1080u, repaint, source, delta, false, true);
+}
+
+int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); }

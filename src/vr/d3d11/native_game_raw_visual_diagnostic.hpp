@@ -211,6 +211,7 @@ public:
         const bool compactRaw = width < 256u || height < 144u;
         NativeRawPresentTile visibleTile{};
         bool sourceSmallCropOnly = false;
+        bool strictSourceOnlyDirtyPresent = false;
         if (!native_raw_partial_present_tile(
                 back.Width, back.Height, l, t, r, b,
                 width, height, visibleTile, compactRaw)) {
@@ -257,9 +258,30 @@ public:
             if (!native_raw_dirty_region_place_tile(
                     back.Width, back.Height, l, t, r, b,
                     *sourceDirty, width, height, dirtyPlaced,
-                    nullptr, compactRaw))
-                return NativeRawPreviewResult::UnsafePresent;
-            visibleTile = dirtyPlaced;
+                    nullptr, compactRaw)) {
+                // A large source crop with a genuine 1px dirty member does
+                // not have room for a 24px displaced RAW inset. Permit only
+                // an actual source-coincident native GPU RGB batch instead.
+                // A missing batch below is unsafe, never an inset fallback.
+                Microsoft::WRL::ComPtr<IUnknown> presentIdentity;
+                const bool canonicalSource =
+                    sourceGameTargetIdentity_ && backbuffer &&
+                    SUCCEEDED(backbuffer->QueryInterface(IID_IUnknown,
+                        reinterpret_cast<void**>(
+                            presentIdentity.GetAddressOf()))) &&
+                    native_raw_canonical_source_target_is_presented(
+                        sourceGameTarget_.Get(), backbuffer,
+                        sourceGameTargetIdentity_.Get(),
+                        presentIdentity.Get());
+                if (!native_raw_source_only_dirty_crop_can_defer_placement(
+                        canonicalSource, captureTargetWidth_,
+                        captureTargetHeight_, back.Width, back.Height,
+                        l, t, r, b, *sourceDirty))
+                    return NativeRawPreviewResult::UnsafePresent;
+                strictSourceOnlyDirtyPresent = true;
+            } else {
+                visibleTile = dirtyPlaced;
+            }
         }
         NativeRawPreviewResult output = NativeRawPreviewResult::NoDraw;
         if (pending_) {
@@ -587,7 +609,8 @@ public:
                 // source-coincident GPU RGB selected by the bounded batch.
                 // An unaligned/missing batch cannot use the displaced RAW
                 // preview or borrow a pixel from a different D3D9 surface.
-                if (sourceSmallCropOnly && !sourceBatch.count) {
+                if ((sourceSmallCropOnly || strictSourceOnlyDirtyPresent) &&
+                    !sourceBatch.count) {
                     unmapPairs();
                     return NativeRawPreviewResult::UnsafePresent;
                 }

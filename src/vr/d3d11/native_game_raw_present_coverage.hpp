@@ -127,6 +127,46 @@ struct NativeRawPresentDirtyRegion {
     return native_raw_dirty_region_covers_tile(
         backWidth, backHeight, dirty, crop);
 }
+// A large original D3D9 Present may contain a single 1px/short menu dirty
+// member. Legacy displaced RAW placement cannot fit there, but a source-owned
+// D3D11 Draw can still put its real RGB at that SAME original game pixel.
+// Admit only a deferred SOURCE-ALIGNED batch after the caller has checked the
+// Draw/Present canonical surface identity. This does not itself authorize a
+// pixel upload: the batch must still prove per-pixel GPU RGB and complete
+// original RGNDATA coverage, or Present fails closed without an inset.
+[[nodiscard]] constexpr bool native_raw_source_only_dirty_crop_can_defer_placement(
+    bool canonicalDrawPresentIdentity,
+    std::uint32_t sourceTargetWidth, std::uint32_t sourceTargetHeight,
+    std::uint32_t backWidth, std::uint32_t backHeight,
+    std::int64_t cropLeft, std::int64_t cropTop,
+    std::int64_t cropRight, std::int64_t cropBottom,
+    const NativeRawPresentDirtyRegion& dirty) noexcept {
+    if (!canonicalDrawPresentIdentity || !backWidth || !backHeight ||
+        sourceTargetWidth != backWidth || sourceTargetHeight != backHeight ||
+        cropLeft < 0 || cropTop < 0 ||
+        cropRight <= cropLeft || cropBottom <= cropTop ||
+        cropRight > backWidth || cropBottom > backHeight ||
+        !dirty.headerVerified || !dirty.count ||
+        dirty.count > NativeRawPresentDirtyRegion::kMaxRects)
+        return false;
+    // Validate ALL members and rcBound using the existing exact-coverage
+    // contract. Only a real member overlapping the Present source crop can
+    // serve as the seed. A broad rcBound, malformed member or hole cannot.
+    for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+        const auto& r = dirty.rectangles[i];
+        const auto l = (std::max)(cropLeft, r.left);
+        const auto t = (std::max)(cropTop, r.top);
+        const auto right = (std::min)(cropRight, r.right);
+        const auto bottom = (std::min)(cropBottom, r.bottom);
+        if (right <= l || bottom <= t) continue;
+        const NativeRawPresentTile seed{
+            0u, 0u, static_cast<std::uint32_t>(right - l),
+            static_cast<std::uint32_t>(bottom - t), l, t};
+        if (native_raw_dirty_region_covers_tile(
+                backWidth, backHeight, dirty, seed)) return true;
+    }
+    return false;
+}
 // A declaration permits bounded disjoint-crop selection before the shared
 // destination-overlap helper definition below.
 [[nodiscard]] constexpr bool native_raw_disjoint_present_tiles(
