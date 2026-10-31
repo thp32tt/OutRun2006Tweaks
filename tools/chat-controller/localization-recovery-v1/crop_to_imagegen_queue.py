@@ -75,6 +75,7 @@ def source_manifests(croot: Path, imagegen_root: Path | None = None):
     roots = [croot / "hd108_outputs", croot / "gpt_vision_chat_ocr_outputs"]
     if imagegen_root is not None:
         roots.append(imagegen_root / "text_roi_batches" / "manual_vision_outputs")
+        roots.append(imagegen_root / "text_roi_batches" / "cross_variant_verified")
     for root in roots:
         if root.is_dir():
             yield from sorted(root.glob("*/*/manifest.json"))
@@ -249,6 +250,61 @@ def choose_role(data, imagegen_root: Path, q: str):
         return "A" if int(q[1:]) % 2 else "B"
     return min(pending, key=pending.get)
 
+def verify_cross_variant_manifest(j, data, croot, tr):
+    """Proof of EXACT same RGBA glyph bytes on a verified sibling console source.
+
+    Never trust 'matching-looking' text or old labels alone. An accepted donor
+    must exist in the current production index and have approved translation.
+    """
+    try:
+        src_png = j["source_png"]
+        source_sha = j["source_sha256"]
+        donor_png = j["cross_variant_donor_png"]
+        donor_sha = j["cross_variant_donor_sha256"]
+        donor_id = j["cross_variant_donor_id"]
+        box = j["bbox_xyxy"]
+        crop_sha = j["cross_variant_exact_pixel_sha256"]
+        if (not all(isinstance(x, str) for x in (
+                src_png, source_sha, donor_png, donor_sha, donor_id, crop_sha))
+                or not all(HEX64.fullmatch(x) for x in (source_sha,donor_sha,crop_sha))
+                or src_png == donor_png or qid(src_png) != qid(donor_png)
+                or not isinstance(box,list) or len(box)!=4
+                or not all(type(v) is int for v in box)):
+            return False
+        approved = [
+            x for x in data["items"]
+            if isinstance(x,dict) and x.get("id") == donor_id
+            and x.get("source_png_sha256") == donor_sha
+            and normalized(x.get("english","")) == normalized(j.get("english",""))
+            and x.get("bbox_xyxy") == box
+            and x.get("status") in ("ROI_APPROVED_FOR_IMAGEGEN","ROI_REBALANCED_TO_B")]
+        if len(approved) != 1:
+            return False
+        kos = tr.get((qid(src_png),normalized(j["english"])),set())
+        if len(kos)!=1 or approved[0].get("korean") not in kos:
+            return False
+        root = (croot/"hd_original_108_verified").resolve()
+        src = root/src_png
+        donor = root/donor_png
+        if (not src.is_file() or src.is_symlink() or not donor.is_file()
+                or donor.is_symlink()
+                or not src.resolve().is_relative_to(root)
+                or not donor.resolve().is_relative_to(root)
+                or digest(src) != source_sha or digest(donor) != donor_sha):
+            return False
+        with Image.open(src) as a, Image.open(donor) as b:
+            if (a.format!="PNG" or b.format!="PNG" or a.mode!="RGBA"
+                    or b.mode!="RGBA" or a.size!=b.size
+                    or box[0]<0 or box[1]<0 or not(box[0]<box[2]<=a.width)
+                    or not(box[1]<box[3]<=a.height)):
+                return False
+            a_bytes=a.crop(tuple(box)).tobytes()
+            b_bytes=b.crop(tuple(box)).tobytes()
+            return a_bytes == b_bytes and hashlib.sha256(a_bytes).hexdigest() == crop_sha
+    except (OSError,ValueError,TypeError,KeyError):
+        return False
+
+
 def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
     if not croot.is_dir() or not transcript.is_file():
         raise ValueError("SOURCE_ROOT_OR_TRANSCRIPT_MISSING")
@@ -263,6 +319,7 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
     added = 0
     held = 0
     manual_root = imagegen_root / "text_roi_batches" / "manual_vision_outputs"
+    cross_variant_root = imagegen_root / "text_roi_batches" / "cross_variant_verified"
     for mp in source_manifests(croot, imagegen_root):
         try:
             j = json.loads(mp.read_text(encoding="utf-8"))
@@ -275,6 +332,14 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
                         j.get("human_review_required") is not True or
                         j.get("external_api_used") is not False or
                         j.get("image_generation_used") is not False):
+                    held += 1
+                    continue
+            if mp.is_relative_to(cross_variant_root):
+                if (j.get("cross_variant_exact_rgba_verified") is not True
+                        or j.get("external_api_used") is not False
+                        or j.get("image_generation_used") is not False
+                        or j.get("human_review_required") is not True
+                        or not verify_cross_variant_manifest(j, data, croot, tr)):
                     held += 1
                     continue
             if j.get("status") not in ACCEPT_STATUS:
