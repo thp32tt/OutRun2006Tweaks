@@ -347,6 +347,60 @@ struct NativeRawPresentDirtyRegion {
             evaluateCandidate(p.left, p.top, p.right, p.bottom);
         }
     };
+
+    // A native Draw can span the original game's painted menu/vehicle
+    // cells and an unpainted center hole. The largest GPU-only RGB core
+    // then fails original dirty coverage; checking individual RGNDATA
+    // member bounds can miss the best rectangle inside the true union.
+    // Validate the WHOLE RGNDATA once with its authentic first member,
+    // then intersect GPU delta, source-painted pixels and prior uploads
+    // at the ORIGINAL D3D9 coordinates before selecting a dense tile.
+    if (preferSolidRgb) {
+        const auto& seed = dirty.rectangles[0];
+        if (seed.left >= 0 && seed.top >= 0 &&
+            seed.right > seed.left && seed.bottom > seed.top &&
+            seed.right <= backWidth && seed.bottom <= backHeight) {
+            const NativeRawPresentTile proof{
+                0u, 0u,
+                static_cast<std::uint32_t>(seed.right - seed.left),
+                static_cast<std::uint32_t>(seed.bottom - seed.top),
+                seed.left, seed.top};
+            if (native_raw_dirty_region_covers_tile(
+                    backWidth, backHeight, dirty, proof)) {
+                const auto visible = [&](std::int64_t x,
+                                         std::int64_t y) noexcept {
+                    bool painted = false;
+                    for (std::uint32_t i = 0u; i < dirty.count; ++i) {
+                        const auto& r = dirty.rectangles[i];
+                        if (x >= r.left && x < r.right &&
+                            y >= r.top && y < r.bottom) {
+                            painted = true;
+                            break;
+                        }
+                    }
+                    if (!painted) return false;
+                    for (std::uint32_t i = 0u; exclude && i < excludeCount; ++i) {
+                        const auto& q = exclude[i];
+                        if (x >= q.destinationX &&
+                            x < q.destinationX + q.copyWidth &&
+                            y >= q.destinationY &&
+                            y < q.destinationY + q.copyHeight)
+                            return false;
+                    }
+                    return true;
+                };
+                NativeRawPresentTile visibleCore{};
+                std::uint32_t visibleRgb = 0u;
+                if (gpuDelta.select_solid_visible_rgb_tile(
+                        sourceAligned, visibleCore, visibleRgb, visible) &&
+                    visibleRgb)
+                    evaluateCandidate(
+                        visibleCore.destinationX, visibleCore.destinationY,
+                        visibleCore.destinationX + visibleCore.copyWidth,
+                        visibleCore.destinationY + visibleCore.copyHeight);
+            }
+        }
+    }
     // The genuine GPU delta itself can identify a solid rectangular game
     // pixel island whose boundary falls INSIDE several D3D9 RGNDATA members.
     // In an L/T-shaped union, considering only member/connected bounds can

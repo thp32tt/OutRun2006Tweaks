@@ -610,4 +610,81 @@ bool native_raw_ranked_two_capture_present_regression() {
      return true;
  }
 
-int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); assert(native_raw_ranked_two_capture_present_regression()); assert(native_raw_gpu_core_across_dirty_strips_regression()); }
+
+ // Two authentic D3D11 Draws change different parts of a fragmented
+ // vehicle/menu repaint. Original D3D9 RGNDATA contains a true 4x4 central
+ // HOLE: its rcBound would falsely authorize 144 pixels. The source-owned
+ // GPU images contain exactly 128 painted pixels outside that hole.
+ bool native_raw_masked_repaint_two_draws_regression() {
+     constexpr std::uint32_t w = 12u, h = 12u;
+     constexpr std::size_t pitch = w * 4u;
+     std::array<std::uint8_t, pitch * h> before{}, first{}, second{};
+     NativeRawPresentDirtyRegion dirty{};
+     dirty.headerVerified = true;
+     dirty.boundLeft = 100; dirty.boundTop = 200;
+     dirty.boundRight = 112; dirty.boundBottom = 212;
+     for (std::uint32_t cy = 0; cy < 3u; ++cy)
+         for (std::uint32_t cx = 0; cx < 3u; ++cx) {
+             if (cx == 1u && cy == 1u) continue;
+             dirty.rectangles[dirty.count++] = {
+                 100 + 4 * cx, 200 + 4 * cy,
+                 104 + 4 * cx, 204 + 4 * cy};
+         }
+     for (std::uint32_t y = 0; y < h; ++y)
+         for (std::uint32_t x = 0; x < w; ++x) {
+             if (x >= 4u && x < 8u && y >= 4u && y < 8u)
+                 continue;
+             if (y < 4u || y >= 8u)
+                 first[(y * w + x) * 4u + 1u] = 0x5au;
+             else
+                 second[(y * w + x) * 4u + 2u] = 0x73u;
+         }
+     NativeRawChangedPixelWindow a{}, b{};
+     a.capture(before.data(), pitch, first.data(), pitch, w, h);
+     b.capture(before.data(), pitch, second.data(), pitch, w, h);
+     const NativeRawPresentTile source{0u, 0u, w, h, 100, 200};
+     NativeRawSourceIslandBatch batch{};
+     std::uint32_t total = 0u, fromSecond = 0u;
+     for (std::uint32_t n = 0; n < 4u; ++n) {
+         if (!batch.append_best_of_two(
+                 320u, 240u, dirty, &source, &a, &source, &b))
+             return false;
+         const auto& tile = batch.tiles[n];
+         const auto rgb = batch.rgbPixels[n];
+         if (!native_raw_dirty_region_covers_tile(
+                 320u, 240u, dirty, tile) ||
+             rgb != std::uint64_t{tile.copyWidth} * tile.copyHeight ||
+             (batch.alternate[n] ? b.changed_pixels(tile) : a.changed_pixels(tile))
+                 != rgb) return false;
+         for (std::uint32_t i = 0u; i < n; ++i)
+             if (!native_raw_disjoint_present_tiles(tile, batch.tiles[i]))
+                 return false;
+         fromSecond += batch.alternate[n] ? rgb : 0u;
+         total += rgb;
+     }
+     if (total != 128u || fromSecond != 32u || batch.count != 4u ||
+         batch.append_best_of_two(
+             320u, 240u, dirty, &source, &a, &source, &b))
+         return false;
+     // A real-game unpainted hole stays unpainted even when the GPU changed
+     // source RGB there; original RGNDATA remains the publication authority.
+     first[((5u * w) + 5u) * 4u + 1u] = 0xfdu;
+     a.capture(before.data(), pitch, first.data(), pitch, w, h);
+     NativeRawSourceIslandBatch hole{};
+     for (std::uint32_t n = 0u; n < 4u; ++n)
+         if (!hole.append_best_of_two(
+                 320u, 240u, dirty, &source, &a, &source, &b))
+             return false;
+     if (hole.append_best_of_two(
+             320u, 240u, dirty, &source, &a, &source, &b))
+         return false;
+     dirty.boundRight = 113; // rcBound forged to include a nonpainted pixel
+     NativeRawSourceIslandBatch forged{};
+     if (forged.append_best_of_two(
+             320u, 240u, dirty, &source, &a, &source, &b))
+         return false;
+     return true;
+ }
+
+
+int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); assert(native_raw_ranked_two_capture_present_regression()); assert(native_raw_gpu_core_across_dirty_strips_regression()); assert(native_raw_masked_repaint_two_draws_regression()); }

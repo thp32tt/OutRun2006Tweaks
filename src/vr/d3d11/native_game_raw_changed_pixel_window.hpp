@@ -196,6 +196,60 @@ public:
             std::uint64_t{solid.copyWidth} * solid.copyHeight == rgb;
     }
 
+    // Find the largest GPU-RGB rectangle that is ALSO visible through the
+    // original D3D9 source repaint and not already owned by an earlier tile.
+    // The caller's predicate is a per-pixel visibility test, never a guessed
+    // dirty bounding box. This is opt-in RAW-only, not full-frame evidence.
+    template <typename VisiblePixel>
+    [[nodiscard]] bool select_solid_visible_rgb_tile(
+        const NativeRawPresentTile& tile, NativeRawPresentTile& solid,
+        std::uint32_t& rgb, VisiblePixel visible) const noexcept {
+        solid = {};
+        rgb = 0u;
+        if (!changed_pixels(tile) || tile.destinationX < 0 ||
+            tile.destinationY < 0) return false;
+        constexpr auto max = (std::numeric_limits<std::int64_t>::max)();
+        if (tile.destinationX > max - tile.copyWidth ||
+            tile.destinationY > max - tile.copyHeight) return false;
+        std::array<std::uint32_t, kWidth> heights{};
+        std::array<std::uint32_t, kWidth> stack{};
+        for (std::uint32_t y = 0u; y < tile.copyHeight; ++y) {
+            for (std::uint32_t x = 0u; x < tile.copyWidth; ++x) {
+                const auto px = tile.destinationX + x;
+                const auto py = tile.destinationY + y;
+                heights[x] = visible(px, py) &&
+                    count(tile.sourceX + x, tile.sourceY + y, 1u, 1u)
+                    ? heights[x] + 1u : 0u;
+            }
+            std::uint32_t depth = 0u;
+            for (std::uint32_t x = 0u; x <= tile.copyWidth; ++x) {
+                const auto next = x < tile.copyWidth ? heights[x] : 0u;
+                while (depth && heights[stack[depth - 1u]] > next) {
+                    const auto height = heights[stack[--depth]];
+                    const auto left = depth ? stack[depth - 1u] + 1u : 0u;
+                    const auto width = x - left;
+                    const auto pixels = width * height;
+                    if (pixels <= rgb) continue;
+                    const auto top = y + 1u - height;
+                    NativeRawPresentTile candidate = tile;
+                    candidate.sourceX += left;
+                    candidate.sourceY += top;
+                    candidate.destinationX += left;
+                    candidate.destinationY += top;
+                    candidate.copyWidth = width;
+                    candidate.copyHeight = height;
+                    solid = candidate;
+                    rgb = pixels;
+                }
+                if (x < tile.copyWidth) stack[depth++] = x;
+            }
+        }
+        // Both independent proofs remain mandatory at the caller: original
+        // RGNDATA whole-union coverage and the exact native GPU RGB count.
+        return rgb != 0u && changed_pixels(solid) == rgb &&
+            std::uint64_t{solid.copyWidth} * solid.copyHeight == rgb;
+    }
+
 private:
     [[nodiscard]] std::uint32_t count(std::uint32_t x, std::uint32_t y,
                                       std::uint32_t w, std::uint32_t h) const noexcept {
