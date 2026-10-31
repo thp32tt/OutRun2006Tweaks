@@ -1,0 +1,66 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T0915KST-IDLE",
+  "started_at_kst": "2026-10-31T09:15:00+09:00",
+  "checked_at_kst": "2026-10-31T09:17:16.332+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "observed_precommit_remote_head": "850e72538a1d31fb38610fad767e70788d9e06a0",
+  "policies_verified": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "A_png": 437,
+    "B_png": 483,
+    "total_png": 920,
+    "export_entries": 920,
+    "historical_qa_report_files": 197,
+    "historical_reviewed_sha": 925,
+    "pending_unreviewed_export_sha": 0,
+    "missing_export_entries": 0
+  },
+  "live_sha256_checks": [
+    {
+      "role": "A",
+      "filename": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "prior_reviewed_sha": true
+    },
+    {
+      "role": "B",
+      "filename": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "prior_reviewed_sha": true
+    }
+  ],
+  "method": "Live N100 candidate_outputs A/B inventory; read-only SHA dedup via work/C1_QA_20261030_1945_dedup_readonly.py (197 historical QA files); direct two PNG SHA256; GitHub policy and branch HEAD; AI scoreboard SSOT on main.",
+  "verdict": {
+    "reviewed_new": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "reason": "No SHA-unique unreviewed A/B PNG; avoid duplicate QA."
+  },
+  "limits": {
+    "imagegen": false,
+    "ab_queue_consumed": false,
+    "c2_c3_approval": false,
+    "dds_compose": false,
+    "user_ingame_pass": false,
+    "vr_ffb_dx11_dxvk_unchanged": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "ai_score": {
+    "previous_confirmed_ai2": 2248,
+    "delta": 0,
+    "cumulative_ai2": 2248,
+    "scoreboard_written": false
+  },
+  "evidence_type": "IDLE_RECORD_ONLY_NO_NEW_PASS_NO_SCORING",
+  "recorded_at_utc": "2026-10-31T00:17:16.335Z"
+}
