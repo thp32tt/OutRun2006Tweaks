@@ -17,11 +17,12 @@ class GPTChatOCRTests(unittest.TestCase):
         self.gpt_out=root/"gpt_out";self.gpt_out.mkdir()
         self.report=root/"report";(self.report/"processed_v3").mkdir(parents=True)
         self.queue=root/"queue";self.queue.mkdir()
-        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH","HOST_RETRY_PATH","PRODUCTION_MANIFEST")}
+        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH","HOST_RETRY_PATH","PRODUCTION_MANIFEST","PIXEL_REVIEW_ROOT")}
         g.SRC=self.src;g.OUT=self.out;g.GPT_OUT=self.gpt_out;g.REPORT=self.report;g.QUEUE_DIR=self.queue
         g.STATE_PATH=self.queue/"state.json";g.AUDIT_PATH=self.queue/"audit.jsonl"
         g.HOST_RETRY_PATH=self.queue/"host_verified_retries.json"
         g.PRODUCTION_MANIFEST=self.queue/"production_manifest.json"
+        g.PIXEL_REVIEW_ROOT=self.queue/"pixel_review"
         self.addCleanup(self.restore)
         self.name="Q001_TEST_BASE_READABLE_FLIPY.png"
         im=Image.new("RGBA",(100,60),(0,0,0,0))
@@ -187,6 +188,70 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertEqual(st["attempts"]["C2:"+timed_out],0)
         self.assertEqual(st["attempts"]["C2:"+succeeded],2)
         self.assertEqual(g._migrate_response_extractor_state(st),[])
+
+    def test_pixel_crop_review_only_never_promotes_ocr_region(self):
+        import os
+        from unittest.mock import patch
+        rect=[10,10,50,30]
+        p=g.PIXEL_REVIEW_ROOT/"crops"/"genuine.png"
+        p.parent.mkdir(parents=True)
+        with Image.open(self.path) as original:
+            original.crop(tuple(rect)).save(p)
+        sha=hashlib.sha256(p.read_bytes()).hexdigest()
+        review={"schema":"outrun.pixel_ocr_review.v1","sources":[{
+          "source_png":self.name,"source_png_sha256":self.row["png_sha256"],
+          "proposals":[{"bbox_xyxy":rect,"display_name":p.name,
+                         "crop_sha256":sha,"art_or_merged_risk":False}]}]}
+        # The crop eligibility gate requires width >=70px, so create a
+        # larger, verified 80px-wide thumbnail from the original source.
+        rect=[5,5,90,40]
+        with Image.open(self.path) as original:
+            original.crop(tuple(rect)).save(p)
+        sha=hashlib.sha256(p.read_bytes()).hexdigest()
+        review["sources"][0]["proposals"][0].update(bbox_xyxy=rect,crop_sha256=sha)
+        (g.PIXEL_REVIEW_ROOT/"latest.json").write_text(json.dumps(review))
+        st=g._state()
+        fp=g._fingerprint(self.row,["HELLO"])
+        st["attempts"][fp]=2
+        g._save_state(st)
+        with patch.dict(os.environ,{"OUTRUN_PIXEL_OCR_REVIEW_ENABLED":"true"}):
+            b,reason=g.next_binding("C1")
+            self.assertIsNone(reason)
+            self.assertTrue(b["pixel_review_only"])
+            self.assertEqual(b["path"],str(p))
+            self.assertEqual(g.stage_submission(b["task_id"]),"SUBMITTING")
+            g.record_chat_url(b["task_id"],"https://chatgpt.com/c/12345678-1234-1234-1234-123456789abc")
+            response=json.dumps({"task_id":b["task_id"],"source_png":self.name,
+              "detections":[{"english":"HELLO","bbox_xyxy":[5,5,45,25],"confidence":0.96}],
+              "uncertain":[]})
+            applied=g.apply_response(b["task_id"],response)
+            self.assertEqual(applied["status"],"REVIEW_REQUIRED_PIXEL_ROI")
+            self.assertEqual(applied["applied"],0)
+            self.assertEqual(list(self.gpt_out.glob("*/*/manifest.json")),[])
+            records=list((g.PIXEL_REVIEW_ROOT/"responses").glob("*.json"))
+            self.assertEqual(len(records),1)
+            item=json.loads(records[0].read_text())
+            self.assertFalse(item["production_queue_modified"])
+            self.assertEqual(item["proposals_not_approved"][0]["proposed_global_bbox_xyxy"],[10,10,50,30])
+
+    def test_pixel_crop_rejects_tampered_image_sha(self):
+        import os
+        from unittest.mock import patch
+        p=g.PIXEL_REVIEW_ROOT/"crops"/"genuine.png"
+        p.parent.mkdir(parents=True)
+        with Image.open(self.path) as original:
+            original.crop((5,5,90,40)).save(p)
+        item={"schema":"outrun.pixel_ocr_review.v1","sources":[{
+           "source_png":self.name,"source_png_sha256":self.row["png_sha256"],
+           "proposals":[{"bbox_xyxy":[5,5,90,40],"display_name":p.name,
+                         "crop_sha256":"0"*64,"art_or_merged_risk":False}]}]}
+        (g.PIXEL_REVIEW_ROOT/"latest.json").write_text(json.dumps(item))
+        st=g._state();st["attempts"][g._fingerprint(self.row,["HELLO"])]=2
+        g._save_state(st)
+        with patch.dict(os.environ,{"OUTRUN_PIXEL_OCR_REVIEW_ENABLED":"true"}):
+            b,reason=g.next_binding("C1")
+            self.assertIsNone(b)
+            self.assertEqual(reason,"GPT_CHAT_OCR_QUEUE_EMPTY_OR_EXHAUSTED")
 
     def test_registered_production_roi_is_not_requeued_for_chat_ocr(self):
         source_sha=self.row["png_sha256"]
