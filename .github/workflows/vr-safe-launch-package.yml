@@ -1,0 +1,102 @@
+name: R26 Safe VR Original DX9Ex Launcher Package
+on:
+  push:
+    branches: ['test/r26-safe-dx9ex-launcher-20261101']
+    paths: ['.github/workflows/vr-safe-launch-package.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  safe-launcher:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout verified R26 VR launcher source
+        uses: actions/checkout@v4
+      - name: Download exact successful safe mono R26 bundle
+        uses: actions/download-artifact@v4
+        with:
+          repository: thp32tt/OutRun2006Tweaks
+          run-id: 41207495346
+          name: OutRun2-VR-R26-PERF-COPY-MATH-AA2-TEST-8ee0bc110425f6bd3f18e2d9d286931c32141f08
+          github-token: ${{ github.token }}
+          path: original_bundle
+      - name: Validate safe build and assemble corrected launcher
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $zip = Get-ChildItem original_bundle -Recurse -File -Filter 'OutRun2_VR_R26_PERF_COPY_MATH_AA2_TEST_*.zip' | Select-Object -First 1
+          if (!$zip) { throw 'Original successful safe build ZIP not found' }
+          Expand-Archive -LiteralPath $zip.FullName -DestinationPath unpacked -Force
+          $need = @('dinput8.dll','outrun-vr-host.exe','RUN_DX9EX_TEST.cmd','Run-DX9ExFocusTest.ps1','DX9EX_VARIANT.txt')
+          foreach ($name in $need) {
+            if (!(Test-Path "unpacked/$name")) { throw "Safe original package incomplete: $name" }
+          }
+          $runner = Get-Content unpacked/Run-DX9ExFocusTest.ps1 -Raw
+          foreach ($arg in @('-PreferD3D9Ex=true','-DirectGpuOnly=false','-DisableDesktopDuplication=false','-AutoRenderResolution=true','-AntiAliasing=2')) {
+            if (!$runner.Contains($arg)) { throw "R26 validated launcher missing $arg" }
+          }
+          $source = Get-Content src/vr/d3d9/stereo_renderer.cpp -Raw
+          if (!$source.Contains('R9ReplayMonoDraw') -or !$source.Contains('R9RestoreMonoBeforePresent') -or $source.Contains('R9SuppressedMonoDraws')) {
+            throw 'Safe mono fallback source verification failed'
+          }
+          $out = 'dist/R26_SAFE_VR_LAUNCH_WHITE_SCREEN_REPAIR'
+          New-Item -ItemType Directory -Force "$out/payload", "$out/reference_ini" | Out-Null
+          foreach ($name in $need) { Copy-Item "unpacked/$name" "$out/payload/$name" }
+          foreach ($name in @('OutRun2006Tweaks.ini','OutRun2006Tweaks.lods.ini')) {
+            if (Test-Path "unpacked/$name") { Copy-Item "unpacked/$name" "$out/reference_ini/$name" }
+          }
+          Copy-Item tools/vr_safe_launch/*.cmd $out
+          Copy-Item tools/vr_safe_launch/*.ps1 $out
+          Copy-Item tools/vr_safe_launch/README_FIRST.txt $out
+          $dll = [IO.File]::ReadAllBytes("$out/payload/dinput8.dll")
+          $off = [BitConverter]::ToInt32($dll,0x3c)
+          if ($dll.Length -lt 1000000 -or [BitConverter]::ToUInt16($dll,$off+4) -ne 0x014c) { throw 'Safe game DLL PE32 invalid' }
+          $hostBytes = [IO.File]::ReadAllBytes("$out/payload/outrun-vr-host.exe")
+          $off = [BitConverter]::ToInt32($hostBytes,0x3c)
+          if ([BitConverter]::ToUInt16($hostBytes,$off+4) -ne 0x8664) { throw 'Safe OpenXR host x64 invalid' }
+          $scriptPaths = @("$out/INSTALL_AND_RUN.ps1","$out/RESTORE_PREVIOUS.ps1")
+          foreach ($scriptPath in $scriptPaths) {
+            $tokens = $null
+            $errors = $null
+            $null = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $scriptPath).Path,[ref]$tokens,[ref]$errors)
+            if ($errors.Count) { throw "PowerShell launcher syntax error in $scriptPath : $errors" }
+          }
+          @(
+            'SAFE_SOURCE_SHA=8ee0bc110425f6bd3f18e2d9d286931c32141f08'
+            'SAFE_BUILD_RUN=41207495346'
+            "DLL_SHA256=$((Get-FileHash "$out/payload/dinput8.dll" -Algorithm SHA256).Hash)"
+            "HOST_SHA256=$((Get-FileHash "$out/payload/outrun-vr-host.exe" -Algorithm SHA256).Hash)"
+            'DEFAULT=ORIGINAL_MONO_FALLBACK'
+            'GAME_LAUNCHER=RUN_DX9EX_TEST.cmd'
+          ) | Set-Content "$out/BUILD_PROVENANCE.txt" -Encoding utf8
+          Write-Host 'Safe x86 DLL, x64 host, and original DX9Ex launcher were verified.'
+      - name: Smoke-test install/backup/rollback without starting a game
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $out = (Resolve-Path 'dist/R26_SAFE_VR_LAUNCH_WHITE_SCREEN_REPAIR').Path
+          $mock = Join-Path $env:RUNNER_TEMP 'OutRun Mock Game'
+          New-Item -ItemType Directory -Force $mock | Out-Null
+          'GAME' | Set-Content (Join-Path $mock 'OR2006C2C.EXE')
+          'PREVIOUS_DLL' | Set-Content (Join-Path $mock 'dinput8.dll')
+          'PREVIOUS_HOST' | Set-Content (Join-Path $mock 'outrun-vr-host.exe')
+          & "$out/INSTALL_AND_RUN.ps1" -GameDirectory $mock -InstallOnly
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'Safe installation script failed' }
+          if ((Get-Item (Join-Path $mock 'dinput8.dll')).Length -lt 1000000) { throw 'Test install did not copy game DLL' }
+          & "$mock/RESTORE_PREVIOUS.ps1"
+          $restoredDll = (Get-Content (Join-Path $mock 'dinput8.dll') -Raw).Trim()
+          $restoredHost = (Get-Content (Join-Path $mock 'outrun-vr-host.exe') -Raw).Trim()
+          if ($restoredDll -ne 'PREVIOUS_DLL' -or $restoredHost -ne 'PREVIOUS_HOST') {
+            throw 'Original mock binaries not restored correctly'
+          }
+          Write-Host 'Mock install, version backup and rollback: PASS'
+      - name: Upload complete safe DX9Ex recovery package
+        uses: actions/upload-artifact@v4
+        with:
+          name: R26_SAFE_VR_WHITE_SCREEN_RECOVERY
+          path: dist/R26_SAFE_VR_LAUNCH_WHITE_SCREEN_REPAIR/
+          retention-days: 21
+          if-no-files-found: error
