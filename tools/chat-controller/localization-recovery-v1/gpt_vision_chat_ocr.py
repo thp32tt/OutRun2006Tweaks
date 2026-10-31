@@ -21,6 +21,7 @@ AUDIT_PATH=QUEUE_DIR/"audit.jsonl"
 HOST_RETRY_PATH=Path("/data/imagegen/text_roi_batches/ocr_host_verified_retries.json")
 PRODUCTION_MANIFEST=Path("/data/imagegen/text_roi_batches/production_manifest.json")
 PIXEL_REVIEW_ROOT=Path("/data/imagegen/text_roi_batches/pixel_ocr_review")
+VISUAL_ABSENCE_PATH=Path("/data/imagegen/text_roi_batches/ocr_source_absent_visual_review_20261031.json")
 VERSION="gpt-chat-vision-ocr-v1-20261025"
 OCR_EXHAUSTED_ATTEMPTS=21
 MAX_CHAT_ATTEMPTS_PER_FINGERPRINT=2
@@ -168,6 +169,52 @@ def _covered_phrases(source_png,source_sha):
     covered.update(_norm(english) for english,_ in _production_regions(source_sha))
     return covered
 
+@lru_cache(maxsize=3)
+def _visual_absence_cached(path,mtime_ns,size):
+    """Negative visual evidence applies only to one exact original PNG SHA.
+
+    It is not an image localization PASS and does not remove source artwork.
+    """
+    try:
+        if not 0 < size <= 100000:
+            return {}
+        doc=json.loads(Path(path).read_text(encoding="utf-8"))
+        if doc.get("schema")!="outrun.ocr.visual_absence_review.v1":
+            return {}
+        items=doc.get("items")
+        if not isinstance(items,list) or len(items)>108:
+            return {}
+        mapping={}
+        for item in items:
+            if not isinstance(item,dict):
+                continue
+            source=item.get("source_png")
+            sha=item.get("source_sha256")
+            english=item.get("english")
+            if (item.get("status")!="NOT_VISIBLE_IN_THIS_VERIFIED_SPRITE_VARIANT"
+                    or item.get("visual_review")!="ORIGINAL_HD_IMAGE_DIRECTLY_INSPECTED_BY_CHATGPT_AI2"
+                    or not isinstance(source,str) or not re.fullmatch(r"Q[0-9]{3}_[A-Za-z0-9_]+[.]png",source)
+                    or not isinstance(sha,str) or not re.fullmatch(r"[0-9a-f]{64}",sha)
+                    or not isinstance(english,str) or not english.strip()):
+                continue
+            mapping.setdefault((source,sha),set()).add(_norm(english))
+        return mapping
+    except (OSError,ValueError,TypeError,json.JSONDecodeError):
+        return {}
+
+
+def _visually_absent_codes(source_png,source_sha):
+    p=VISUAL_ABSENCE_PATH
+    try:
+        if not p.is_file() or p.is_symlink():
+            return set()
+        st=p.stat()
+        return _visual_absence_cached(str(p),st.st_mtime_ns,st.st_size).get(
+            (source_png,source_sha),set())
+    except OSError:
+        return set()
+
+
 def _exhausted_candidates():
     rows=_manifest_rows();done=REPORT/"processed_v3";out=[]
     for name,row in sorted(rows.items()):
@@ -179,11 +226,12 @@ def _exhausted_candidates():
         if int(r.get("attempts",0) or 0)<OCR_EXHAUSTED_ATTEMPTS: continue
         unresolved=r.get("unresolved_after")
         if not isinstance(unresolved,list): continue
-        covered=_covered_phrases(name,row["png_sha256"]);seen=set();remaining=[]
+        covered=_covered_phrases(name,row["png_sha256"])
+        absent=_visually_absent_codes(name,row["png_sha256"]);seen=set();remaining=[]
         for phrase in unresolved:
             if not isinstance(phrase,str) or not phrase.strip(): continue
             code=_norm(phrase)
-            if code in covered or code in seen: continue
+            if code in covered or code in seen or code in absent: continue
             seen.add(code);remaining.append(phrase.strip())
         if not remaining: continue
         src=SRC/name
@@ -249,7 +297,8 @@ def _host_verified_candidates():
             if any(_norm(x) not in allowed for x in targets):
                 continue
             covered=_covered_phrases(name,row["png_sha256"])
-            remaining=[x for x in targets if _norm(x) not in covered]
+            absent=_visually_absent_codes(name,row["png_sha256"])
+            remaining=[x for x in targets if _norm(x) not in covered and _norm(x) not in absent]
             if not remaining or _fingerprint(row,remaining)!=entry.get("fingerprint"):
                 continue
             result.append((row,remaining))
