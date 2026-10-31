@@ -3618,11 +3618,14 @@ namespace OutRunVRStereo
                                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
                             spdlog::info(
                                 "VR TRACE WORLD PROJECTED SOURCE: hit={} draw={} "
-                                "scope={} producer={} gameCenter={:.9g},{:.9g} "
-                                "physicalViewport={},{},{}x{} rhwDepthEvidence=1",
+                                "scope={} producer={} rawGameScreen={:.9g},{:.9g} "
+                                "gameCenter={:.9g},{:.9g} "
+                                "physicalViewport={},{},{}x{} rhwDepthEvidence=1 "
+                                "authority=FIX_PARTICLE_RENDERING_POST_HALF_CANVAS",
                                 hit, TopLevelDrawSerial(),
                                 OutRunVR::GameSemantic::Name(semanticScope),
                                 OutRunVR::GameSemantic::Name(command.producer),
+                                rawGameScreenX, rawGameScreenY,
                                 gameCenterX, gameCenterY,
                                 state.viewport.X, state.viewport.Y,
                                 state.viewport.Width, state.viewport.Height);

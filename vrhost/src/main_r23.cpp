@@ -1935,6 +1935,7 @@ namespace
                 whole, false, &capturedClient, &capturedClientFullyVisible))
             return false;
 
+        const UvRect capturedWholeBeforeLogicalCrop = whole;
         const auto logicalCanvasCrop =
             OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
                 clientGameState,
@@ -1950,6 +1951,46 @@ namespace
             whole.y += baseHeight * logicalCanvasCrop.offsetY;
             whole.w = baseWidth * logicalCanvasCrop.width;
             whole.h = baseHeight * logicalCanvasCrop.height;
+        }
+
+        // Runtime proof for the final Quest pass. Keep this in the packaged
+        // full-trace file rather than stdout only, and rate-limit it so menu
+        // residency at 90/120 Hz cannot create another multi-GB trace.
+        if (OutRunVrMenuAspect::IsTopLeftLogicalTheaterState(clientGameState))
+        {
+            static std::uint64_t logicalCanvasTraceHits = 0;
+            const std::uint64_t hit = ++logicalCanvasTraceHits;
+            if (hit <= 32 || (hit & (hit - 1)) == 0)
+            {
+                std::ostringstream trace;
+                trace
+                    << "[VR TRACE MENU LOGICAL CANVAS FULL]"
+                    << " hit=" << hit
+                    << " state=" << clientGameState
+                    << " eligible=1"
+                    << " applied=" << (logicalCanvasCropApplied ? 1 : 0)
+                    << " fullVisible=" << (capturedClientFullyVisible ? 1 : 0)
+                    << " xrPhysical=" << c.projection_.width << 'x'
+                    << c.projection_.height
+                    << " desktopCapture=" << c.sourceWidth_ << 'x'
+                    << c.sourceHeight_
+                    << " logical=1920x1080"
+                    << " client=" << capturedClient.left << ','
+                    << capturedClient.top << ','
+                    << capturedClient.right << ','
+                    << capturedClient.bottom
+                    << " inputUv=" << capturedWholeBeforeLogicalCrop.x << ','
+                    << capturedWholeBeforeLogicalCrop.y << ','
+                    << capturedWholeBeforeLogicalCrop.w << ','
+                    << capturedWholeBeforeLogicalCrop.h
+                    << " outputUv=" << whole.x << ',' << whole.y << ','
+                    << whole.w << ',' << whole.h
+                    << " cropRatio=" << logicalCanvasCrop.width << ','
+                    << logicalCanvasCrop.height
+                    << " authority=GAMESTATE_PLUS_XR_PHYSICAL_LOGICAL_CANVAS"
+                    << "\n";
+                OutRunVrEmitFullTrace(trace.str());
+            }
         }
 
         // Issue #119: intersect the two eyes' tangent-plane FOV extents.

@@ -2992,8 +2992,9 @@ class WindowedBorderless : public Hook
                 }
                 update_mirror_backdrop(monitorInfo, mirrorBackdropNeeded);
                 spdlog::info(
-                    "VR PC MIRROR: monitor={}x{} source={}x{} fittedWindow={}x{} origin={},{} preserveAspect={} backdrop={} (OpenXR eyes unchanged)",
+                    "VR PC MIRROR: monitor={}x{} logical={}x{} backbufferSource={}x{} fittedWindow={}x{} origin={},{} preserveAspect={} backdrop={} (OpenXR eyes unchanged)",
                     monitorWidth, monitorHeight,
+                    Game::screen_resolution->x, Game::screen_resolution->y,
                     mirrorSourceWidth, mirrorSourceHeight,
                     width, height, x, y,
                     Settings::VRMirrorPreserveAspect.get(),
