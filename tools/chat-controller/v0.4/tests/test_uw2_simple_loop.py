@@ -190,6 +190,15 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         self.assertTrue(self.tick(9, 30))
         self.assertEqual(self.q["uw2_simple"]["last_send_reason"], "schedule_fallback")
 
+    def test_scheduled_fallback_never_interrupts_changing_reply(self):
+        self.assertTrue(self.tick(9, 0))
+        self.answer = "working on web port"
+        self.assertFalse(self.tick(9, 29, 40))
+        self.answer = "new changed output still being finalized"
+        self.assertFalse(self.tick(9, 30))
+        self.assertTrue(self.tick(9, 30, 25))
+        self.assertEqual(self.sent, [PROMPT, PROMPT])
+
     def test_cooldown_delays_half_hour_boundary_after_fast_reply(self):
         self.assertTrue(self.tick(9, 0))
         self.answer = "passed"
