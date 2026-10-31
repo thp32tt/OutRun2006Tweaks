@@ -469,7 +469,8 @@ def _pixel_review_next_binding(st, lane):
         proposals=entry.get("proposals")
         if not isinstance(proposals,list) or len(proposals)>40:
             continue
-        for proposal in proposals[:4]:
+        # Inspect every bounded proposal (<=40), not just the first four.
+        for proposal in proposals:
             if not isinstance(proposal,dict) or proposal.get("art_or_merged_risk") is not False:
                 continue
             box=proposal.get("bbox_xyxy")
@@ -510,6 +511,18 @@ def _pixel_review_next_binding(st, lane):
             attempt_key=_attempt_key(fp,effective_lane)
             used=int(st.get("attempts",{}).get(attempt_key,0) or 0)
             if used>=MAX_CHAT_ATTEMPTS_PER_FINGERPRINT:
+                continue
+            # A prior exact-SHA crop that returned no readable candidate and no
+            # validation rejection is not helped by an identical second query.
+            # Skip only this crop/fingerprint, never the source or other crops.
+            if any(
+                rec.get("fingerprint")==fp
+                and rec.get("ocr_lane")==effective_lane
+                and rec.get("status")=="REVIEW_REQUIRED_PIXEL_ROI"
+                and int(rec.get("reviewed_candidates",0) or 0)==0
+                and not rec.get("rejected")
+                for rec in st.get("completed",[]) if isinstance(rec,dict)
+            ):
                 continue
             suffix="" if used==0 else f"-R{used}"
             lane_suffix="-C2" if effective_lane=="C2" else ""
