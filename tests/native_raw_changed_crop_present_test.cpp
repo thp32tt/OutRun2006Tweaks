@@ -408,16 +408,31 @@ bool native_raw_packed_island_transfer_regression() {
          if (!batch.append(200u, 400u, dirty, original, firstRgb, false, true) ||
              !batch.append(200u, 400u, dirty, original, secondRgb, true, true))
              return false;
+         // RGB proof determines which island is selected; candidate
+         // subtraction can rank equally sized islands in any safe order.
+         // Enforce every original pixel exactly once, not traversal order.
          const auto& a = batch.tiles[n * 2u];
          const auto& b = batch.tiles[n * 2u + 1u];
-         if (a.destinationX != 101 + 2 * n || a.destinationY != 301 ||
-             b.destinationX != 109 + 2 * n || b.destinationY != 303 ||
+         if (a.destinationY != 301 || b.destinationY != 303 ||
              a.copyWidth != 1u || a.copyHeight != 1u ||
              b.copyWidth != 1u || b.copyHeight != 1u ||
              batch.rgbPixels[n * 2u] != 1u ||
              batch.rgbPixels[n * 2u + 1u] != 1u ||
              batch.alternate[n * 2u] || !batch.alternate[n * 2u + 1u])
              return false;
+         for (std::uint32_t j = 0u; j <= n; ++j) {
+             const auto& priorA = batch.tiles[2u * j];
+             const auto& priorB = batch.tiles[2u * j + 1u];
+             if (priorA.destinationX < 101 || priorA.destinationX > 107 ||
+                 ((priorA.destinationX - 101) % 2) != 0 ||
+                 priorB.destinationX < 109 || priorB.destinationX > 115 ||
+                 ((priorB.destinationX - 109) % 2) != 0)
+                 return false;
+             if (j != n &&
+                 (a.destinationX == priorA.destinationX ||
+                  b.destinationX == priorB.destinationX))
+                 return false;
+         }
      }
      if (batch.count != NativeRawSourceIslandBatch::kMaxIslands ||
          batch.append(200u, 400u, dirty, original, firstRgb, false, true))
