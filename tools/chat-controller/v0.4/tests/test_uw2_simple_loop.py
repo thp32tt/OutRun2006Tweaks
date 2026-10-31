@@ -108,9 +108,12 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         return page
 
     def tick(self, hour, minute, second=0):
+        # The isolated function calls datetime.now(TZ) after sending; keep it
+        # aligned with synthetic scheduler time rather than wall-clock time.
+        at = datetime.datetime(2026, 10, 31, hour, minute, second, tzinfo=KST)
+        self.ns["datetime"] = SimpleNamespace(now=lambda tz: at)
         return asyncio.run(self.ns["uw2_simple_cycle"](
-            self.ctx, self.pages, self.q,
-            datetime.datetime(2026, 10, 31, hour, minute, second, tzinfo=KST)))
+            self.ctx, self.pages, self.q, at))
 
     def test_one_sentence_and_dedup_same_chat(self):
         self.assertTrue(self.tick(9, 0))
