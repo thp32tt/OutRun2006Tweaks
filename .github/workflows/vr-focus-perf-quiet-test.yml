@@ -1,8 +1,5 @@
 name: R26 Focus Visual + All Safe Performance Quiet Test Build
 
-permissions:
-  contents: read
-
 on:
   push:
     branches:
