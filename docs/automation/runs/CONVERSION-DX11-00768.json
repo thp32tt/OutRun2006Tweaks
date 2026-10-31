@@ -1,0 +1,107 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00768",
+  "production_id": "CONVERSION-DX11-00768",
+  "event_id": "CONVERSION-DX11-00768-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:GAME_NO_WRITE_DRAW_CONTINUITY",
+  "feature_id": "DX11-GAME-NO-WRITE-DRAW-CONTINUITY",
+  "status": "BUILD_VALIDATION_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "b6da8b46ebe36091115a8e45f7fb552418d9a029",
+  "material_result_sha": "0f1a7126b399b96179c09251442df426fe007b7c",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_game_masked_draw.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_no_target_write_draw_probe_00768.cpp",
+    "tools/test_dx11_no_target_write_draw_00768.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-GAME-NO-WRITE-DRAW-CONTINUITY",
+    "goal": "Retain full-resolution real game menu/vehicle/race native Draw/DrawIndexed source continuity across D3D9 zero-output color/depth/stencil-masked draws, with original D3D9/input fallback.",
+    "acceptance_items": [
+      {
+        "id": "no-write-source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_Draw_DrawIndexed_native_scene",
+        "expected_behavior": "Proven D3D9 no-output source calls consume ordinals without native GPU submissions; following native Draw and DrawIndexed remain full-frame presentable."
+      },
+      {
+        "id": "no-skip-regression",
+        "category": "fallback_regression",
+        "behavior_area": "source_target_depth_stencil_MRT_and_D3D9_input",
+        "expected_behavior": "Color/depth/stencil/MRT writers, unknown queries and missing clear cannot skip native source admission; original D3D9 render/gamepad remains authoritative."
+      },
+      {
+        "id": "exact-gate",
+        "category": "integrated_validation",
+        "behavior_area": "portable_CXX17_Windows_DX11Fast_Backend_OpenXR_HUD",
+        "expected_behavior": "Destructive C++/source graph tests plus full exact material-SHA mandatory five GitHub Actions Gates, HMD separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "no-write-source": "PENDING",
+    "no-skip-regression": "PENDING",
+    "exact-gate": "PENDING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Real game D3D9 Draw and DrawIndexed source state capture identifies verified pixel-neutral passes",
+      "Consume exact source ordinal in same cleared game scene while continuing native D3D11 full-resolution Draw/DrawIndexed",
+      "Publish eligible full-size scene to D3D9 Present and preserve original Draw/input fallback on unverified states"
+    ],
+    "batch_components": [
+      "D3D9 pixel-neutral state/MRT proof in actual live Draw/Indexed source admission",
+      "Both supported geometry and unavailable VB/IB Draw/Indexed paths consume exact source ordinals",
+      "GameNativeMaskedDraw C++ eligibility, GameNativeFrameBatch continuation, destructive DX11 Fast positive/negative regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ seeded frame with masked game Draw, live Draw, masked game DrawIndexed, live DrawIndexed passes full-frame publication with exact source ordinals.",
+      "negative_regression": "Color mask, Z-write, stencil, MRT, unseeded and graph-destructively removed state queries reject admission; D3D9 rendering/input unaffected.",
+      "component_integration": "D3D9 real game Draw/Indexed -> actual render-state proof -> no-op source ordinal -> native D3D11 subsequent Draw/Indexed -> native full-frame D3D9 Present with opt-in/fallback."
+    },
+    "conflict_keys": [
+      "DX11:GAME_NO_WRITE_DRAW_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Only explicit DX11 full-frame diagnostic opt-in; unknown state falls back to original D3D9 draw/input and suppresses native publication.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Compile-level same-source ordinal continuity and real game draw bridge; hardware menu/car/race and Quest3 visible output separately NEED_HMD_TEST."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Branch HEAD/policy/00767 material inspected, selected disjoint source path",
+    "C1_REVIEW": "Pixel-neutral nonzero primitive source Draw could abort a valid full native game frame",
+    "C2_IMPLEMENT": "Live native-eligible and VB/IB-unavailable Draw/Indexed both preserve verified no-write source ordinals without native output.",
+    "C3_VALIDATE": "Repair exact-SHA validation: original record path lacked VISIBLE_FRAME_OUTPUT; full GitHub Gates must rerun for corrected source SHA.",
+    "C4_COMMIT": "Material source plus compiled/destructive DX11 Fast tests in one commit",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "evidence": {
+    "runtime": "No OutRun gamepad/Quest3/VDXR test performed; no runtime promotion.",
+    "material_first_source_sha": "0f1a7126b399b96179c09251442df426fe007b7c",
+    "test_repair_sha": "e147cc14de93d9146019c39af205336efb01fede"
+  }
+}

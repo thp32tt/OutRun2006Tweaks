@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01114",
+  "production_id": "CONVERSION-DX11-01114",
+  "event_id": "CONVERSION-DX11-01114-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01114",
+  "classification": "A_ACTUAL_NO_CLEAR_BOOTSTRAP_SOURCE_DEFECT",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_NO_CLEAR_GAME_BACKBUFFER_BOOTSTRAP",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "fb16be338a8e9ce592e179e9494ae2a68192c1ff",
+  "source_change_sha": "78354ec6d2adb1e439b357f6242f35f2064dee4b",
+  "material_result_sha": "b8dab362b9cc9072eafbd3307594a35ff5b8d413",
+  "validation_bearing_result_sha": "b8dab362b9cc9072eafbd3307594a35ff5b8d413",
+  "result_sha": "b8dab362b9cc9072eafbd3307594a35ff5b8d413",
+  "implementation_commits": [
+    "78354ec6d2adb1e439b357f6242f35f2064dee4b"
+  ],
+  "repair_commits": [
+    "b8dab362b9cc9072eafbd3307594a35ff5b8d413"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_full_copy_seed.hpp",
+    "tools/dx11_full_copy_seed_01113.cpp",
+    "tools/test_dx11_full_copy_seed_01113.py",
+    "tools/test_dx11_game_surface_copy_00886.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Unblock real D3D9 whole-backbuffer StretchRect/UpdateSurface menu/car/race first-frame capture without a preceding D3D9 TARGET Clear; require exact source identity, successful full readback, native SM3/FVF first Draw seed and DX9Ex original fallback.",
+    "acceptance_items": [
+      {
+        "id": "no_clear_whole_copy_bootstrap",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_COPY_TO_D3D11_FIRST_DRAW",
+        "expected_behavior": "The canonical no-Clear GPU copy reaches independently authenticated full-image capture and first Draw replay instead of being rejected before bootstrap eligibility is assessed."
+      },
+      {
+        "id": "wrong_owner_and_unproven_pixels_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "SOURCE_OWNER_PIXEL_PROVENANCE_INPUT_FFB",
+        "expected_behavior": "Foreign owner with only an old seed, partial copy, unproven pixels, failed readback or failed GPU replay never promotes native output; original D3D9 and inputs/FFB remain authoritative."
+      },
+      {
+        "id": "exact_sha_five_gate_source_build",
+        "category": "integrated_validation",
+        "behavior_area": "SOURCE_CXX_BUILD_BACKEND_OPENXR_HUD",
+        "expected_behavior": "All five mandatory push GitHub Actions complete success on exactly one final material SHA; no inferred HMD or game visual success."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "SUCCESSFUL_ORIGINAL_D3D9_WHOLE_BACKBUFFER_COPY",
+      "EXACT_CANONICAL_OWNER_AND_NO_CLEAR_BOOTSTRAP_GATE",
+      "SYNCHRONIZED_AUTHENTIC_BGRA_SNAPSHOT",
+      "NATIVE_SM3_OR_FVF_FIRST_GPU_DRAW_AND_SAFE_ORIGINAL_FALLBACK"
+    ],
+    "batch_components": [
+      "CXX_PREMATURE_CLEAR_SEED_GATE_ROOT_CAUSE_REPAIR",
+      "CXX_TWO_PATH_AUTHENTIC_SOURCE_ADMISSION",
+      "COMPILED_CXX_AND_SOURCE_NEGATIVE_MUTATION_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast run 40522771101 compiled no-Clear bootstrap admission and verified both SM3/FVF source first-Draw replay callsites; five Gates on final material SHA.",
+      "negative_regression": "C++ owner/seed/bootstrap truth matrix and linked 00886 destructive tests reject lost owner, provenance, GPU copy and fallback. Native copySnapshotRequired remains mandatory.",
+      "component_integration": "preserve_game_surface_copy now authenticates raw COM backbuffer/extent, THEN admits either an existing-owner seeded copy or a separately proven whole-source bootstrap. Only recorded real GPU readback pixels seed the native first Draw; no replacement to original D3D9 callsite."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:AUTHENTIC_NO_CLEAR_GAME_BACKBUFFER_BOOTSTRAP"
+    ],
+    "blocking_evidence": "Observed C++ source defect: an authentic no-Clear whole game-backbuffer copy was rejected before the same-owner/whole-source bootstrap test; 01114 code changes plus exact-SHA Gates already verify this repair. This backfilled field records existing evidence only; native gameplay remains UNTESTED.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source path requirement: admitted original D3D9 backbuffer pixels seed a guarded native Draw/DrawIndexed and eligible full-size output, but no matching native game-frame runtime verification exists. RUNTIME_VALIDATION=UNTESTED; no fabricated publication claim.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME and OUTRUN_DX11_FULL_GAME_FRAME are opt-in; validate same D3D9 owner/extent, authentic pixels, supported shader/targets. On any failure retain original D3D9Ex drawing, gamepad and FFB with no native promotion."
+  },
+  "acceptance_results": {
+    "no_clear_whole_copy_bootstrap": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_full_copy_seed.hpp",
+        "tools/dx11_full_copy_seed_01113.cpp"
+      ],
+      "validation_command": "DX11 Fast 40522771101 completed success at exact SHA; physical gameplay UNTESTED."
+    },
+    "wrong_owner_and_unproven_pixels_fail_closed": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/test_dx11_game_surface_copy_00886.py",
+        "tools/test_dx11_full_copy_seed_01113.py",
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp"
+      ],
+      "validation_command": "DX11 Fast 40522771101 completed success with original fail-closed source fallback and C++ tests."
+    },
+    "exact_sha_five_gate_source_build": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522771101",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522770991",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522771053",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522771089",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522771263"
+      ],
+      "validation_command": "Five mandatory push workflows completed success at exact SHA b8dab362b9cc9072eafbd3307594a35ff5b8d413."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40522771101,
+      "head_sha": "b8dab362b9cc9072eafbd3307594a35ff5b8d413",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522771101"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40522770991,
+      "head_sha": "b8dab362b9cc9072eafbd3307594a35ff5b8d413",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522770991"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40522771053,
+      "head_sha": "b8dab362b9cc9072eafbd3307594a35ff5b8d413",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522771053"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40522771089,
+      "head_sha": "b8dab362b9cc9072eafbd3307594a35ff5b8d413",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522771089"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40522771263,
+      "head_sha": "b8dab362b9cc9072eafbd3307594a35ff5b8d413",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40522771263"
+    }
+  ],
+  "runtime_evidence": {
+    "native_game_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_ffb": "UNTESTED"
+  },
+  "c6_note": "This docs-only C6 descendant is separate from source implementation and validation-bearing material SHA; prior failed 78354ec Fast 00886 obsolete-string regression was causally repaired on same TASK_ID b8dab362; no duplicate score for CI/test repair/checkpoint/retry. Native gameplay activation remains opt-in; DX9Ex original fallback, input, FFB, SkyGlow and DXVK freeze unchanged. No HMD or game screen test claimed."
+}

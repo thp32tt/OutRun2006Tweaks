@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01030",
+  "production_id": "CONVERSION-DX11-01030",
+  "event_id": "CONVERSION-DX11-01030-E001",
+  "event_type": "dispatch",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01030",
+  "lane": "DX11",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_SM3_INSTANCE_LIST_GPU_DRAW",
+  "work_key": "DX11:LIVE_SM3_INSTANCE_LIST_GPU_DRAW",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "source_head": "eeebb8cb1f3bace239d0f745105c27a857e0fb7d",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "score_award_event": false,
+  "full_dx11_renderer_complete": false,
+  "quest3_playable": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "Batch real game SM3 source-instanced point/line/triangle-list native GPU draw and indexed VB rebasing; fail closed without changing DX9Ex/input/FFB.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_INSTANCE_LIST_GPU_DRAW",
+    "goal": "Real game 16-stream instance geometry reaches a single native indexed/nonindexed list GPU Draw, without merging strip/fan boundaries.",
+    "acceptance_items": [
+      {
+        "id": "nonindexed",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Live_Game_GPU_Draw",
+        "expected_behavior": "Three independent D3D9 list families submit one D3D11 Draw for source instanced packed geometry"
+      },
+      {
+        "id": "indexed",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Source_Indexed_GPU_Draw",
+        "expected_behavior": "D3D9 source IB maps correctly into each native per-instance VB slice and uses one DrawIndexed"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_Input_FFB",
+        "expected_behavior": "Reject invalid/oversized index sources without modifying old GPU data; preserve strip/fan draws and original DX9Ex gameplay"
+      },
+      {
+        "id": "gate",
+        "category": "integrated_validation",
+        "behavior_area": "C6_Exact_SHA",
+        "expected_behavior": "Portable C++ positive and negative instance regression and all five mandatory exact-SHA GitHub gates"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "R30 intercepted live game 16-stream Draw/DrawIndexed",
+      "SM3 packed instance VB + rebased index list",
+      "native D3D11 GPU Draw with original D3D9 fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_instance_batches.hpp",
+      "tools/dx11_sm3_instance_list_batch_probe_01030.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "independent lists plus D3D9 stream15 instance data and IB exact positions",
+      "negative_regression": "invalid index, absent source, overflow, disjoint strip/fan not compacted",
+      "component_integration": "D3D9 source snapshot -> GPU-ready instance stream/IB -> D3D11 Draw"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_INSTANCE_LIST_GPU_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "Native opt-in unchanged, original D3D9 Draw/Present/gamepad/FFB DX9Ex fallback and DXVK frozen",
+    "visible_frame_acceptance": "SOURCE_ONLY RUNTIME_UNTESTED",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_instance_batches.hpp",
+    "tools/dx11_sm3_instance_list_batch_probe_01030.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01030.json"
+  ],
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Real game/HMD runtime observation UNTESTED",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_IMPLEMENTATION_ACTION": "C6 build verification complete; leave physical Quest3/VDXR gameplay and stereo parity for separate runtime validation.",
+  "acceptance_results": {
+    "nonindexed": {
+      "status": "PASS_SOURCE_CI",
+      "evidence": "Native nonindexed instance-list source and 01030 compiled probe within DX11 Fast at exact SHA."
+    },
+    "indexed": {
+      "status": "PASS_SOURCE_CI",
+      "evidence": "Rebased indexed instance-list source and 01030 compiled probe within DX11 Fast at exact SHA."
+    },
+    "fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence": "Negative index/overflow/unsupported topology regression and original D3D9 fallback retained; no game or HMD runtime test."
+    },
+    "gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "All five required GitHub Actions successful at 94c544b28d54ed44eac9918659c16e1790d6f9be."
+    },
+    "runtime": {
+      "status": "UNTESTED"
+    }
+  },
+  "material_result_sha": "fae2c8103574572702e82f479685e598aff04402",
+  "validation_bearing_result_sha": "94c544b28d54ed44eac9918659c16e1790d6f9be",
+  "c6_recovery_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "gate_evidence": {
+    "validation_sha": "94c544b28d54ed44eac9918659c16e1790d6f9be",
+    "exact_sha_verified": true,
+    "required_gates": {
+      "dx11_fast": {
+        "run_id": 39995040087,
+        "conclusion": "success"
+      },
+      "backend_conversion": {
+        "run_id": 39995040376,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39995040057,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39995040245,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39995040393,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED"
+  },
+  "c6_bookkeeping_note": "C6 bookkeeping-only [skip ci]; exact validation-bearing SHA unchanged; no source edits, CI rerun, or duplicate score."
+}

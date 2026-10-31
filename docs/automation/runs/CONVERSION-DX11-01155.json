@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01155",
+  "production_id": "CONVERSION-DX11-01155",
+  "event_id": "CONVERSION-DX11-01155-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_FVF:EXACT_TABLE_FOG_NATIVE_RGB_GAME_DRAW",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "1aa24b7cbe29923ff9a1ef329e991d5c2dde56d6",
+  "material_result_sha": "4de2114a31887bc9bd2d9fb535723da0507c22e0",
+  "validation_bearing_result_sha": "4de2114a31887bc9bd2d9fb535723da0507c22e0",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    "tools/test_dx11_stage1_factor_00673.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tests/native_raw_fvf_fog_visual_test.cpp",
+    "tools/test_dx11_inactive_texture_game_frame_00771.py",
+    "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
+    "docs/automation/runs/CONVERSION-DX11-01155.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "AUTHENTIC_LIVE_D3D9_TABLE_FOG_FLOAT_COLOR_CAPS_AND_PROJECTION",
+      "NATIVE_D3D11_FVF_DIFFUSE_MODULATE_TEXTUREONLY_FOG_SHADER_AND_CONSTANTS",
+      "GUARDED_REAL_GAME_DRAW_OR_ORIGINAL_D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "SOURCE_FVF_COM_STATE_TO_EXACT_Z_W_FOG_ADMISSION",
+      "THREE_NATIVE_GAME_PIXEL_SHADER_ENTRYPOINTS_AND_GPU_B2_BINDING",
+      "POSITIVE_NEGATIVE_CPLUSPLUS_AND_BRIDGE_SOURCE_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual live D3D9 FVF diffuse, texture-modulate, texture-only game Draw receives authenticated EXP/EXP2/LINEAR table fog PS RGB, W/Z depth and live source constants before D3D11 GPU submission; alpha preserved.",
+      "negative_regression": "Invalid consumed floats, source COM/projection failures, active vertex-only fog, unmirrored sRGB, unsupported combiner, unsafe source buffers/RT/depth and poison retain D3D9 draw or separately labeled RAW-only tile; no false full-frame promotion.",
+      "component_integration": "D3D9 FVF Draw -> live fog/query projection -> shared SM3 table fog admission -> new FVF native HLSL PS -> b2 GPU constants -> guarded Draw/DrawIndexed/OM while original game Draw/input/FFB persists."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_live_sm3_table_zfog_01005.cpp",
+      "tools/test_dx11_live_sm3_table_zfog_01005.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; Quest3 game visible frame and actual native Draw count remain UNTESTED",
+    "activation_guard_and_fallback": "Native path opt-in; exact table fog only for authenticated live FVF modes and 3 original combiners, otherwise normal D3D9/FFB fallback or isolated RAW visual preview; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Source-match D3D9 table Fog GPU RGB for actual menu, car selection and race FVF Draw rather than fog-omitted RAW tiles; retain fail-closed game renderer.",
+    "acceptance_items": [
+      {
+        "id": "real_fvf_native_table_fog_rgb",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native FVF diffuse/texture pixel shaders",
+        "expected_behavior": "Three native shader branches fog RGB before OM blending, preserve alpha, and bind to source game Draw/DrawIndexed."
+      },
+      {
+        "id": "authenticated_live_fog_source_gpu_b2",
+        "category": "end_to_end_behavior",
+        "behavior_area": "actual D3D9 fog/pixel state transport",
+        "expected_behavior": "Consumed table fog floats, color, capabilities and canonical Z/W projection provide b2 constants per Draw and Reset owns GPU lifetime."
+      },
+      {
+        "id": "fallback_and_raw_visual_regression",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 gamepad/FFB/render and source safety",
+        "expected_behavior": "Unknown source/COM/W/Z/sRGB/combiner never enters exact FVF native route; RAW-only preview never publishes full frame."
+      },
+      {
+        "id": "five_final_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "source-native Windows CI",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector all pass on validation-bearing SHA; runtime UNTESTED."
+      }
+    ]
+  },
+  "real_game_draw_blocker": "Old real-game 2026-10-28 native_draws=0 at earlier b8dab362; no matching new runtime evidence.",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "pipeline": {
+    "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD",
+    "C1_REVIEW": "PASS_SOURCE_FVF_MISSING_TABLE_FOG_GPU",
+    "C2_IMPLEMENT": "CPP_HLSL_NATIVE_GAME_DRAW_AND_REGRESSION_PATCH",
+    "C3_VALIDATE": "PASS_FINAL_FIVE_EXACT_SHA",
+    "C4_COMMIT": "PASS_VALIDATION_BEARING_RESULT_SHA",
+    "C5_PACKAGE": "SOURCE_ONLY",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "evidence": {
+    "requires_final_exact_sha_five_push_gates": true,
+    "runtime_evidence": "UNTESTED: no actual OutRun 2006/Quest3/VDXR session or per-frame game-source-matched native Draw/frame count; CI does not prove HMD pixels.",
+    "validated_exact_sha": "4de2114a31887bc9bd2d9fb535723da0507c22e0",
+    "required_push_workflow_runs": {
+      "DX11 Fast Structural Checks": 40846863272,
+      "Backend Conversion Gate": 40846863380,
+      "Build": 40846863370,
+      "OpenXR VR architecture": 40846863493,
+      "OutRun EXE HUD Inspector CI": 40846863381
+    },
+    "required_push_workflows_result": "5/5 completed/success on same head_sha (remote GitHub API checked 2026-10-29 KST)",
+    "smoke_job": "Backend Conversion Gate validate PASS, DX11 readiness smoke probes PASS (104 steps)",
+    "scoreboard_commit": "c6c1a6dab199055b5955094cfd8a5687d5fe7a8a",
+    "scoreboard_new": 2162
+  },
+  "visible_frame_acceptance": "New game and HMD real visual proof UNTESTED; target remains full contiguous source coverage.",
+  "activation_guard_and_fallback": "Source exact Fog only; no DXVK/DX9Ex branch writes, original game D3D9 Draw/input/FFB untouched.",
+  "scoreboard_previous": 2161,
+  "scoreboard_new": 2162,
+  "scoreboard_commit": "c6c1a6dab199055b5955094cfd8a5687d5fe7a8a",
+  "scoreboard_blob": "cf02c10c8624f74d720e9d2ce4ae6c2eb51a376d",
+  "implementation_commits": [
+    "d5a042c82779c24b997f7c1fdd751d745b676f91",
+    "549ab110cf1b060e052f31206ea795b94b130b28",
+    "d7e190cc6a7f6e3d02994113e945480cfca60626",
+    "c306e40aaeadc164007fb5e419737f10642c327e"
+  ],
+  "causal_ci_repair_commits": [
+    "549ab110cf1b060e052f31206ea795b94b130b28",
+    "d7e190cc6a7f6e3d02994113e945480cfca60626",
+    "c306e40aaeadc164007fb5e419737f10642c327e",
+    "e6bd9ee2e206e19cd6346685af2a858177bf64e9",
+    "4de2114a31887bc9bd2d9fb535723da0507c22e0"
+  ]
+}

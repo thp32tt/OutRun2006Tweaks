@@ -1,0 +1,170 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01049",
+  "production_id": "CONVERSION-DX11-01049",
+  "event_id": "CONVERSION-DX11-01049-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01049",
+  "classification": "A",
+  "feature_id": "DX11:LIVE_PREDRAW_COPY_NATIVE_GAME_FRAME",
+  "work_key": "DX11:MENU_CAR_RACE_PRE_DRAW_BACKBUFFER_COPY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "e39dd60981dc5b09b5c269fd99a0d22b7621bc7e",
+  "validation_bearing_result_sha": "91bf170e4b232f967363ffd8ac8e04a8c570b349",
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Original game full Clear -> successful pre-Draw UpdateSurface/StretchRect into owned canonical D3D9 backbuffer -> current CPU-staged full color snapshot -> real native SM3/FVF game Draw and guarded same-Present. Subsequent fills replay after snapshot in source order; all unsupported writes remain D3D9 fallback. Runtime/HMD untested.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_native_pre_draw_copy_01049.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01049.json",
+    "tools/test_dx11_source_owner_handoff_00740.py",
+    "tools/test_dx11_game_surface_copy_00886.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_PREDRAW_COPY_NATIVE_GAME_FRAME",
+    "goal": "Preserve authentic pre-Draw game backbuffer UpdateSurface/StretchRect color for menu -> vehicle -> race native SM3/FVF Draw/DrawIndexed while retaining original D3D9 input/FFB/Present fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_predraw_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_SOURCE_BACKBUFFER",
+        "expected_behavior": "Capture original successful canonical backbuffer copy after an authored Clear and before the first native game Draw, with authentic dimensions and color."
+      },
+      {
+        "id": "sm3_fvf_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_D3D11_GAME_DRAW",
+        "expected_behavior": "Seed actual first real game SM3 and fixed-function native frame with copied D3D9 pixels and preserve subsequent ordered game fills."
+      },
+      {
+        "id": "fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_INPUT_FFB_PRESENT",
+        "expected_behavior": "Reject wrong owner, stale copies, unsupported format/size, failed readback and invalid epochs without modifying D3D9 Draw, Present or input."
+      },
+      {
+        "id": "integrated_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "All mandatory DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector checks succeed on the same validation-bearing SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_D3D9_SOURCE_CLEAR",
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_BACKBUFFER_COPY_SNAPSHOT",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_native_pre_draw_copy_01049.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game-authored full backbuffer clear, successful preDraw UpdateSurface/StretchRect, ordered partial fill, real native SM3/FVF Draw and Present.",
+      "negative_regression": "Foreign device/RT, open CPU write, invalid size, unsupported D3D9 readback, stale prior frame and unproven source Draw reject native replay.",
+      "component_integration": "Real D3D9 copy hook and CPU staging + native SM3 and FVF first-Draw RTV UpdateSubresource + original game Present fallback."
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_PRE_DRAW_BACKBUFFER_COPY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "NativeDrawPathActive=false/default opt-in; DX11 full game frame only with exact D3D9 canonical owner, otherwise unchanged original D3D9 Draw/Present/input/FFB; DXVK frozen."
+  },
+  "acceptance_results": {
+    "native_predraw_source": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_pre_draw_copy_01049.cpp -o /tmp/dx11_pre_draw_copy_01049 && /tmp/dx11_pre_draw_copy_01049"
+    },
+    "sm3_fvf_draw": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Windows Build run 40079715441 SUCCESS + DX11 Fast Structural Checks run 40079714792 SUCCESS at exact validation SHA"
+    },
+    "fail_closed": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+        "tools/dx11_native_pre_draw_copy_01049.cpp",
+        "tools/test_dx11_source_owner_handoff_00740.py",
+        "tools/test_dx11_game_surface_copy_00886.py"
+      ],
+      "validation_command": "python tools/test_dx11_source_owner_handoff_00740.py && python tools/test_dx11_game_surface_copy_00886.py"
+    },
+    "integrated_exact_sha": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "GitHub Actions exact SHA: Fast 40079714792; Backend 40079714873; Build 40079715441; OpenXR 40079714829; HUD 40079714871"
+    }
+  },
+  "ci_failure_repair": "Previous exact-SHA e39dd60981dc5b09b5c269fd99a0d22b7621bc7e Fast 40079080747 and Backend 40079080734 failed tools/dx11_autodev_policy.py --check-latest on stale 01048 terminal record (acceptance SOURCE_IMPLEMENTED and PENDING_EXACT_SHA, as originally authored). Adding this actual current 01049 feature record makes policy target current source stage; prior 01048 validation SHA and acceptance remain unchanged. No required Gate relaxed. Second candidate 24abc5e4695f7a64367c755c5060c2e543daa2c4 failed inherited 00740 because new pre-Draw copied-color retirement changed owner-clear chain; repaired negative mutation with 00740. Following Fast 40079522646/40079637408 failed inherited 00886 because post-Draw GPU copy mutation matched earlier new pre-Draw copy counter; retained the original post-Draw negative mutation and required final count after actual CopySubresourceRegion. Final exact-SHA five mandatory workflows PASS at 91bf170e4b232f967363ffd8ac8e04a8c570b349.",
+  "runtime_note": "No actual OutRun desktop or Quest3/VDXR matching run. D3D11 native draw/published frames UNTESTED.",
+  "c6_reconciliation_reason": "FIVE_MANDATORY_GATES_EXACT_SHA_AFTER_CAUSAL_REPAIR",
+  "c6_gate_results": {
+    "validation_sha": "91bf170e4b232f967363ffd8ac8e04a8c570b349",
+    "DX11 Fast Structural Checks": {
+      "status": "SUCCESS",
+      "run_id": 40079714792,
+      "event": "push"
+    },
+    "Backend Conversion Gate": {
+      "status": "SUCCESS",
+      "run_id": 40079714873,
+      "event": "push"
+    },
+    "Windows Build": {
+      "status": "SUCCESS",
+      "run_id": 40079715441,
+      "event": "push"
+    },
+    "OpenXR VR architecture": {
+      "status": "SUCCESS",
+      "run_id": 40079714829,
+      "event": "push"
+    },
+    "HUD Inspector CI": {
+      "status": "SUCCESS",
+      "run_id": 40079714871,
+      "event": "push"
+    },
+    "note": "Five mandatory exact-SHA GitHub Actions SUCCESS. HMD/game runtime UNTESTED, native frames counts UNTESTED. Prior source material SHA preserved. C6 bookkeeping [skip ci], no duplicate CI or scoring."
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01163",
+  "production_id": "CONVERSION-DX11-01163",
+  "event_id": "CONVERSION-DX11-01163-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_work_key": "DX11:RAW_COMPACT_MENU_CAR_NATIVE_GPU_CAPTURE",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "scoreboard_previous": 2179,
+  "scoreboard_new": 2179,
+  "development_time_percentages": "UNMEASURED",
+  "controller_runtime_adoption": "UNVERIFIED",
+  "source_base_sha": "cda0916e04e47265afba791471a5bed5d2e82234",
+  "implementation_source_sha": "021d4638ebe7704995bddad5241cc66e6d3439b0",
+  "validation_bearing_result_sha": "021d4638ebe7704995bddad5241cc66e6d3439b0",
+  "material_result_sha": "021d4638ebe7704995bddad5241cc66e6d3439b0",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Coherent C++ opt-in RAW native game GPU preview source slice: actual 24..256 by 24..144 target dimensions now feed D3D11 source-authentic BEFORE/AFTER staging, dynamic RGB delta prefix window and original D3D9 safe partial diagnostic Present. Source target transitions retire differently sized GPU staging and D3D9 SYSTEMMEM tile surfaces, retaining source epoch/fences, main D3D9 game Draw/input/FFB and fail-closed complete native frame policy. Not validated as real gameplay pixels or Quest3 output.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW_TO_NATIVE_D3D11_COLOR_TARGET",
+      "COMPACT_NATIVE_SOURCE_TEXTURE_BEFORE_AFTER_GPU_COPY",
+      "ACTUAL_TARGET_BOUNDED_RGB_DELTA_WINDOW",
+      "OPT_IN_ORIGINAL_D3D9_PARTIAL_GAME_PREVIEW"
+    ],
+    "batch_components": [
+      "CPP_SOURCE_TARGET_DIMENSION_AND_GPU_STAGING_LIFETIME",
+      "CPP_DYNAMIC_RGB_CHANGE_WINDOW_AND_D3D9_PRESENT",
+      "CPP_COMPACT_TRUE_PIXEL_POSITIVE_NEGATIVE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast C++ compact 96x64 source target and GPU before/after RGB window positive pixel regression; Win32 Build and OpenXR compile verified at exact source SHA.",
+      "negative_regression": "Wrong row pitch, oversize/unbounded source dimensions reject; no fake GPU RGB; existing DX9Ex game Draw, input/FFB and separate RAW opt-in preserved.",
+      "component_integration": "Real source-owned D3D11 color texture -> sized GPU before/after staging and event fence -> GPU-pixel RGB delta selection -> opt-in D3D9 clipped partial RAW tile."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "OPT_IN_VISIBLE_PARTIAL_DIAGNOSTIC",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Partial opt-in RAW GPU RGB diagnostic D3D9 original-game display is a visible-frame-output integration stage only, NOT an entire native D3D11 frame, gameplay/HMD pixel PASS, or OpenXR eye. Earlier implementation remains source+CI verified at 021d4638ebe7704995bddad5241cc66e6d3439b0; actual live game output untested.",
+    "activation_guard_and_fallback": "Explicit RAW diagnostic opt-in, original D3D9 and DX9Ex gameplay input/FFB fallback authoritative, full frame remains fail closed, DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Admit real smaller menu/car source-owned native GPU Draw color targets into bounded genuine-pixel RAW preview without resizing stale GPU/D3D9 staging or inventing whole-frame output.",
+    "acceptance_items": [
+      {
+        "id": "compact_real_gpu_source_copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native D3D11 GPU render target and capture ownership",
+        "expected_behavior": "A valid 24..256 by 24..144 source texture creates same-size true GPU before/after staging and avoids mismatched resources when switching from menus to race."
+      },
+      {
+        "id": "native_pixel_clip_present",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 original game clipped diagnostic Present",
+        "expected_behavior": "Native GPU RGB delta prefix selection, row mapping and SystemMem UpdateSurface use the identical authenticated compact source dimensions; no invented upscale."
+      },
+      {
+        "id": "incompatible_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native invalid-source rejection and protected original input/renderer",
+        "expected_behavior": "Zero/too-small/unknown GPU resource and invalid mapped source pitch fail closed; original game source input/FFB, DX9Ex and DXVK remain protected."
+      },
+      {
+        "id": "five_same_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "exact-SHA mandatory push GitHub Actions",
+        "expected_behavior": "Fast, Backend, Windows Build, OpenXR and HUD all PASS at same material commit SHA without runtime/HMD promotion."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "compact_real_gpu_source_copy": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 40912757305 + Build 40912757332 PASS exact SHA; runtime source GPU evidence UNTESTED."
+    },
+    "native_pixel_clip_present": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 40912757305 positive compact RGB pixel crop and negative malformed-size/pitch test PASS."
+    },
+    "incompatible_source_fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp"
+      ],
+      "validation_command": "Backend 40912757296, OpenXR 40912757349, HUD 40912757301 PASS; HMD UNTESTED."
+    },
+    "five_same_sha_ci": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "All five required push workflows at exact 021d4638: 40912757305, 40912757296, 40912757332, 40912757349, 40912757301."
+    }
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40912757305,
+        "head_sha": "021d4638ebe7704995bddad5241cc66e6d3439b0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40912757296,
+        "head_sha": "021d4638ebe7704995bddad5241cc66e6d3439b0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40912757332,
+        "head_sha": "021d4638ebe7704995bddad5241cc66e6d3439b0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40912757349,
+        "head_sha": "021d4638ebe7704995bddad5241cc66e6d3439b0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40912757301,
+        "head_sha": "021d4638ebe7704995bddad5241cc66e6d3439b0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_evidence": "No new matching real OutRun 2006 GPU desktop native Draw, actual menu/car/race pixel output or Quest3 VDXR HMD test. RUNTIME_VALIDATION=UNTESTED.",
+    "validation_layer": "SOURCE_AND_BUILD_VERIFIED_NOT_GAMEPLAY_OR_HMD",
+    "scoreboard": "GitHub latest confirmed AI2 SSOT=2179 + same unfinished feature source-slice score 0 = 2179. AI1 tracked separately."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_LATEST_BRANCH_SOURCE_AND_PREVIOUS_C6",
+    "C1_REVIEW": "PASS_COMPACT_NATIVE_TARGET_CAPTURE_GAP",
+    "C2_IMPLEMENT": "PASS_COHESIVE_CPP_DYNAMIC_GPU_PIXEL_SOURCE_STAGING_AND_REGRESSION",
+    "C3_VALIDATE": "PASS_5_MANDATORY_PUSH_EXACT_SHA_GATES",
+    "C4_COMMIT": "PASS_MATERIAL_SOURCE_SHA_021d4638",
+    "C5_PACKAGE": "SOURCE_BUILD_VERIFIED_RUNTIME_AND_FULL_FRAME_UNTESTED",
+    "C6_STATE": "PASS_SEPARATE_BOOKKEEPING_COMMIT"
+  },
+  "next_unfinished": "Observe real source-matched RAW GPU desktop native Draw and GPU pixel output; continue same full-frame feature to complete source geometry/coverage and L/R direct OpenXR, preserve DX9Ex fallback.",
+  "causal_record_correction": {
+    "cause": "01164 exact-SHA Fast 40922837220 and Backend 40922837285 fail policy acceptance: previous 01163 strategy omitted generic VISIBLE_FRAME_OUTPUT after opt-in partial diagnostic stage",
+    "scope": "Record existing partial RAW source-authentic diagnostic output without claiming production full-frame/HMD",
+    "credited_as_new_feature": false,
+    "belongs_to_task": "CONVERSION-DX11-01164"
+  }
+}

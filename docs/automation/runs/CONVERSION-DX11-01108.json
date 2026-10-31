@@ -1,0 +1,207 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01108",
+  "production_id": "CONVERSION-DX11-01108",
+  "event_id": "CONVERSION-DX11-01108-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01108",
+  "classification": "A_REAL_GAME_NATIVE_TILED_FULL_CLEAR_AND_STALE_MAIN_Z",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "work_key": "DX11:GAME_NATIVE_FULL_TARGET_RECT_UNION_AND_DEPTH_PROVENANCE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "2d919b7cc26fc2913efab76fb2387759bbaee7d3",
+  "source_change_sha": "5c4b640b9de7ccd34b2a8ee267e38a2c8ca0b0ef",
+  "material_result_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+  "validation_bearing_result_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+  "result_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+  "implementation_commits": [
+    "5c4b640b9de7ccd34b2a8ee267e38a2c8ca0b0ef"
+  ],
+  "repair_commits": [
+    "b120616baa742bd5a4c7faf60a962ba2d6be308d"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/native_game_clear_coverage.hpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_pre_draw_tiled_full_clear_probe_01108.cpp",
+    "tools/test_dx11_pre_draw_tiled_full_clear_01108.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_full_clear_clipped_00762.cpp",
+    "tools/test_dx11_full_clear_resume_00728.py"
+  ],
+  "feature_contract": {
+    "goal": "Full-size native D3D11 main RTV/D32 accepts authenticated 17..128 original D3D9 tiled full TARGET/TARGET|Z Clears, but retains real depth provenance after a later TARGET-only whole Clear instead of fabricating a new DSV state.",
+    "categories": [
+      "end_to_end_behavior",
+      "fallback_regression",
+      "integrated_validation"
+    ],
+    "acceptance": [
+      "17..128 signed D3DRECT clipped viewport union -> game-authored whole RTV/depth scene seed, includes source DrawIndexed ordinals and game color/Z/stencil paths",
+      "129 count, one-pixel gap, malformed source rect, cropped viewport, foreign depth and retained-Z-uncleared source Draw -> no native publication, original D3D9 input/FFB still authoritative",
+      "All unchanged 5 mandatory GitHub Actions push gates on exact material repair SHA"
+    ],
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "acceptance_items": [
+      {
+        "id": "source_clear_integration",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_GAME_CLEAR_TO_NATIVE_RTV_D32",
+        "expected_behavior": "Real 17..128 D3D9 tiled TARGET/Z Clears preserve viewport union and original source Draw ordinal into full-resolution native RTV/D32 replay."
+      },
+      {
+        "id": "depth_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "MAIN_DEPTH_SOURCE_PROVENANCE_AND_DX9EX_FALLBACK",
+        "expected_behavior": "After target-only full Clears retain existing main D3D9 depth identity, reject malformed or foreign source and preserve original DX9Ex game input and FFB."
+      },
+      {
+        "id": "same_sha_five_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_BUILD_AND_SOURCE_REGRESSION",
+        "expected_behavior": "Five required push workflows completed successfully on immutable validation-bearing source and causal Fast repair SHA; game and HMD runtime remain UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_GAME_CLEAR",
+      "BOUNDED_AUTHENTIC_CLEAR_COVERAGE",
+      "NATIVE_RTV_D32_SOURCE_PROVENANCE",
+      "GAME_DRAW_DRAWINDEXED_CONTINUITY",
+      "DX9EX_FAIL_CLOSED"
+    ],
+    "batch_components": [
+      "CXX_ORIGINAL_CLEAR_COLOR_DEPTH_BRIDGE",
+      "CXX_BOUNDED_RECT_UNION_PRODUCTION_PATH",
+      "COMPILED_NEGATIVE_ORACLE_AND_CAUSAL_LEGACY_FAST_REPAIR"
+    ],
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:GAME_NATIVE_FULL_TARGET_RECT_UNION_AND_DEPTH_PROVENANCE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Build-level source bridge validated by exact-SHA five required Gates only. Full visible OutRun menu, car, race, hardware game GPU pixels, input and Quest3/VDXR remain UNTESTED; this is not native gameplay promotion.",
+    "activation_guard_and_fallback": "Original D3D9Ex remains authoritative on source gap, foreign RT/depth, invalid tile union, unavailable native frame or unsupported native shader; leave gamepad and FFB unchanged, DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "01108 source commit 5c4b640 adds real viewport tiled 17..128 TARGET/Z scene seed and depth persistence; compiled native C++ union regression in tools/dx11_pre_draw_tiled_full_clear_probe_01108.cpp, verified DX11 Fast 40475190617 on b120616b.",
+      "negative_regression": "01108 compiled probe rejects 129 rectangles, invalid or non-full viewport union, foreign Z and main-depth loss; old 00762 and 00728 test fixture failures repaired in b120616b while negatives remain enforced.",
+      "component_integration": "live_game_frame_bridge.cpp original game D3D9 Clear interception -> native_game_clear_coverage.hpp viewport union -> native_game_frame_batch.hpp native RTV/D32 seed with retained-depth provenance -> ordered game DrawIndexed with DX9Ex fail-closed fallback."
+    }
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 40475190617,
+      "head_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190617"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 40475190639,
+      "head_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190639"
+    },
+    {
+      "name": "Build",
+      "event": "push",
+      "run_id": 40475190628,
+      "head_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190628"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "push",
+      "run_id": 40475190606,
+      "head_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190606"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "push",
+      "run_id": 40475190765,
+      "head_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190765"
+    }
+  ],
+  "acceptance_results": {
+    "source_clear_integration": {
+      "status": "PASS_BUILD",
+      "evidence": [
+        "src/vr/d3d11/native_game_clear_coverage.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/dx11_pre_draw_tiled_full_clear_probe_01108.cpp"
+      ],
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_clear_coverage.hpp",
+        "tools/dx11_pre_draw_tiled_full_clear_probe_01108.cpp"
+      ],
+      "validation_command": "DX11 Fast push 40475190617 completed/success on exact b120616baa742bd5a4c7faf60a962ba2d6be308d, compiled 01108 native source probe."
+    },
+    "depth_fallback": {
+      "status": "PASS_BUILD",
+      "evidence": [
+        "src/vr/d3d11/native_game_frame_batch.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_pre_draw_tiled_full_clear_01108.py"
+      ],
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_frame_batch.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_pre_draw_tiled_full_clear_01108.py"
+      ],
+      "validation_command": "DX11 Fast push 40475190617 completed/success with negative union and depth fallback tests, after causal original Fast failure 40474911126 repair b120616b."
+    },
+    "same_sha_five_required_gates": {
+      "status": "PASS_EXACT_SHA",
+      "sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190617",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190639",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190628",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190606",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40475190765"
+      ],
+      "validation_command": "All five existing required push workflows on exact b120616baa742bd5a4c7faf60a962ba2d6be308d completed/success: 40475190617,40475190639,40475190628,40475190606,40475190765; no runtime/HMD testing."
+    }
+  },
+  "inherited_gate_failure": "First 5c4b640 DX11 Fast 40474911126 failed legacy 00762 16-rect constexpr out-of-bounds and 00728 hardcoded 16 source threshold. Same-task b120616 repaired real 129 valid-rect negative limit and preserved destructive regression checks, without suppressing any Gate.",
+  "code_change": true,
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "terminal_gameplay_verified": false,
+  "runtime_note": "No original OutRun 2006 x86 menu/vehicle/race pixels, Quest 3, VDXR, gamepad/FFB or live FPS measured. Automated source/CI PASS only, no claimed gameplay or HMD PASS.",
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "b120616baa742bd5a4c7faf60a962ba2d6be308d",
+  "c6_does_not_revalidate_source": true,
+  "score_note": "Single independent source implementation achievement at same TASK_ID. Fast repair, CI retry, C6 and rollover score +0; GitHub ai-dev-lab scoreboard is point SSOT."
+}

@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00637",
+  "production_id": "CONVERSION-DX11-00637",
+  "event_id": "CONVERSION-DX11-00637-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_MODULATE_TEXTURE_COMPLEMENT_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "07a91acc10ee477cd4c90a02612cb5c4545c3b93",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game-authored D3D9 stage0 PM RGB and ALPHAOP=MODULATE with complemented TFACTOR alpha admission",
+      "Read D3DRS_TEXTUREFACTOR high-byte and invert before native D3D11 PS constant upload",
+      "Reuse exact native PM RGB / independently modulated alpha PS in guarded Draw/DrawIndexed diagnostic inset, preserving original D3D9 Draw/input"
+    ],
+    "batch_components": [
+      "Real D3D9 modified alpha-operand admission plus live TFACTOR read and DX9Ex reject fallback",
+      "D3D11 PS constant inversion and native shader bind/Draw pipeline integration",
+      "Destructive source graph and 32,768-case numeric regression in fast/full GitHub Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact PM RGB and modulated TEXTURE * (1-TFACTOR) alpha from game state to native PS for both Draw variants",
+      "negative_regression": "Reject reverse operands, wrong op, spurious modifier, non-PM RGB, missing TFACTOR read, invalid RGB diffuse operand",
+      "component_integration": "Game GetTextureStageState -> GetRenderState(TEXTUREFACTOR) -> inverted b0 alphaParams.w -> PM HLSL -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_MODULATE_TEXTURE_COMPLEMENT_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/numeric regression only, no actual menu/vehicle/race/HMD visual or input runtime capture",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit opt-in only, original game D3D9 renderer and gamepad input unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_inverse_modulate_factor_00637.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00637.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: initial HEAD and 00636 exact Gate reviewed; 00636 complete, new disjoint modifier path selected",
+    "C1_REVIEW": "PASS: unhandled D3D9 MODULATE(TEXTURE,COMPLEMENT(TFACTOR)) alpha; reuse existing correct shader via inverted constant",
+    "C2_IMPLEMENT": "PASS: D3D9 source admission, owned factor read, native pixel shader constant integration, exact fallback",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast #38316110073, Backend validate+readiness #38316109999, Windows Build #38316114461, OpenXR push #38316110031 and PR #38316114445, HUD #38316114439 all SUCCESS on 41aa91898428061383d47066d6e2748131b50060",
+    "C4_COMMIT": "PASS: material and validation-bearing 41aa91898428061383d47066d6e2748131b50060 committed non-force without CI-skip",
+    "C5_PACKAGE": "NOT_REQUIRED: no runtime, HMD or gamepad validated; diagnostic only",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: static/CI exact SHA SUCCESS, gameplay and HMD NEED_HMD_TEST (RUNTIME_VALIDATION=UNTESTED)"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No runtime/HMD visual proof; production native gameplay remains dormant"
+  },
+  "next_action": "C0-C6 completed, validated exact material SHA; do not repeat task 00637. Continue independent non-conflicting native menu/vehicle/race state and gamepad-safe draw coverage. Quest3/VDXR and gameplay remain NEED_HMD_TEST; DXVK frozen.",
+  "material_implementation_sha": "41aa91898428061383d47066d6e2748131b50060",
+  "material_result_sha": "41aa91898428061383d47066d6e2748131b50060",
+  "validation_bearing_result_sha": "41aa91898428061383d47066d6e2748131b50060",
+  "result_sha": "41aa91898428061383d47066d6e2748131b50060",
+  "completed_at": "2026-10-13T07:32:02+09:00",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38316109999,
+      "conclusion": "SUCCESS",
+      "head_sha": "41aa91898428061383d47066d6e2748131b50060"
+    },
+    "dx11_fast": {
+      "run_id": 38316110073,
+      "conclusion": "SUCCESS",
+      "head_sha": "41aa91898428061383d47066d6e2748131b50060"
+    },
+    "windows_build": {
+      "run_id": 38316114461,
+      "conclusion": "SUCCESS",
+      "head_sha": "41aa91898428061383d47066d6e2748131b50060"
+    },
+    "openxr_push": {
+      "run_id": 38316110031,
+      "conclusion": "SUCCESS",
+      "head_sha": "41aa91898428061383d47066d6e2748131b50060"
+    },
+    "openxr_pr": {
+      "run_id": 38316114445,
+      "conclusion": "SUCCESS",
+      "head_sha": "41aa91898428061383d47066d6e2748131b50060"
+    },
+    "hud_inspector": {
+      "run_id": 38316114439,
+      "conclusion": "SUCCESS",
+      "head_sha": "41aa91898428061383d47066d6e2748131b50060"
+    }
+  },
+  "evidence": {
+    "backend_gate_run_id": 38316109999,
+    "backend_gate_conclusion": "success",
+    "dx11_fast_run_id": 38316110073,
+    "dx11_fast_conclusion": "success",
+    "windows_build_run_id": 38316114461,
+    "windows_build_conclusion": "success",
+    "openxr_push_run_id": 38316110031,
+    "openxr_push_conclusion": "success",
+    "openxr_pr_run_id": 38316114445,
+    "openxr_pr_conclusion": "success",
+    "hud_run_id": 38316114439,
+    "hud_conclusion": "success",
+    "validation_bearing_result_sha": "41aa91898428061383d47066d6e2748131b50060",
+    "runtime_validation": "UNTESTED"
+  }
+}

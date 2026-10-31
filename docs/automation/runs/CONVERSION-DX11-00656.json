@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00656",
+  "production_id": "CONVERSION-DX11-00656",
+  "event_id": "CONVERSION-DX11-00656-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:MAG_ANISO_GAME_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "d61b4d65df9dc31da1b58be038d2ea0eef21366a",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "real D3D9 game MAG/MIN/MIP/MAXANISOTROPY sampler state -> validated capture",
+      "game texture all readable mip levels -> D3D11 sampler object -> native Draw/DrawIndexed"
+    ],
+    "batch_components": [
+      "C++ live game D3D9 MAG_ANISOTROPIC sampler admission and DX9Ex fallback",
+      "C++ D3D11 anisotropic sampler mirror binding into native game Draw and indexed Draw",
+      "216-case/14-mutation negative tests, prior contract adjustment, mandatory GitHub Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "MIN/MAG ANISO and MIP LINEAR, max 2..16 -> D3D11 ANISOTROPIC sampler -> game native Draw",
+      "negative_regression": "unsupported other MIN/MIP/MAG and invalid maxAniso retain D3D9-only render",
+      "component_integration": "real D3D9 sampler capture -> readable mip snapshot -> D3D11 PSSetSamplers and Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:MAG_ANISO_GAME_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY: no in-game pixels or Quest3 evidence",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in; original game D3D9 Draw/Present/gamepad retained; invalid sampler D3D9-only"
+  },
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "scope": "game MAXANISOTROPY and MAG_ANISOTROPIC into real native Draw sampler"
+  },
+  "acceptance_results": {
+    "static_regression": "PASS",
+    "compile_build": "PASS_EXACT_SHA",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_anisotropic_sampler_00655.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_native_anisotropic_mag_00656.py",
+    "docs/automation/runs/CONVERSION-DX11-00656.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS latest GitHub HEAD and unique work key",
+    "C1_REVIEW": "PASS live MAG_ANISOTROPIC native Draw gap",
+    "C2_IMPLEMENT": "PASS real game C++ sampler capture+mirror+14 mutation regression",
+    "C3_VALIDATE": "PASS exact SHA 5 required GitHub Gates",
+    "C4_COMMIT": "PASS C++ material result",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS separate bookkeeping"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Quest3/VDXR and gamepad menu->vehicle selection->race screen/pixel parity UNTESTED; DXVK frozen. Next independent DX11 feature only; do not re-run 00656.",
+  "material_result_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+  "validation_bearing_result_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+  "result_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38348259453,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348259453"
+    },
+    "dx11_fast_structural": {
+      "id": 38348259448,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348259448"
+    },
+    "windows_build": {
+      "id": 38348263359,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348263359"
+    },
+    "openxr_architecture": {
+      "id": 38348263062,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348263062"
+    },
+    "hud_inspector": {
+      "id": 38348263064,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348263064"
+    }
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01062",
+  "production_id": "CONVERSION-DX11-01062",
+  "event_id": "CONVERSION-DX11-01062-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01062",
+  "classification": "A",
+  "feature_id": "DX11:NATIVE_INDEPENDENT_RESOLUTION_GAME_GPU_FRAME",
+  "work_key": "DX11:INDEPENDENT_RESOLUTION_NATIVE_GPU_SINK",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_stage": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Native full game Draw/DrawIndexed GPU-frame sink eligibility now independently validates its own D3D11 BGRA render-target resource size and owner instead of requiring equality with the game desktop backbuffer. The strict D3D9Ex GPU/CPU desktop overwrite, dirty region rollback, original input/gamepad/FFB and stereo mono-safety gates remain unchanged. No observed game, theater visual, Quest3 or OpenXR HMD result.",
+  "material_result_sha": "44494c8f0ffad0138ae3c7dd3ffe8701942d78bf",
+  "validation_bearing_result_sha": "fb339c7a7740c19ecec2777e5310d9cd2657366d",
+  "changed_files": [
+    "src/vr/d3d11/native_game_gpu_handoff.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/vr/dx11_native_independent_game_output_01062.cpp",
+    "tools/test_dx11_native_independent_game_output_01062.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_INDEPENDENT_RESOLUTION_GAME_GPU_FRAME",
+    "goal": "Deliver authentic full native game GPU-frame sink input independently of desktop resolution for menu, car-selection and race while preserving D3D9Ex strict desktop fallback, original input/FFB, and separate XR stereo provenance until real hardware testing.",
+    "acceptance_items": [
+      {
+        "id": "independent_native_gpu_resolution",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_NATIVE_DRAW_TO_GPU_FRAME_SINK",
+        "expected_behavior": "Native real menu/car/race full-frame producer can offer a source texture at its own proven dimensions to an independent-sized XR/theater GPU sink, without using D3D9 desktop backbuffer extent as the sink's geometry proof"
+      },
+      {
+        "id": "native_resource_ownership_and_extent",
+        "category": "fallback_regression",
+        "behavior_area": "NATIVE_D3D11_GPU_RESOURCE_VALIDATION",
+        "expected_behavior": "Same-device BGRA GPU color render target is validated for real width/height, binding, mip/array/sample count and producer ownership, rejecting missing, stale or mismatched GPU resource"
+      },
+      {
+        "id": "original_dx9ex_desktop_and_input",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9EX_STEREO_PRESENT_INPUT_FFB_FALLBACK",
+        "expected_behavior": "D3D9Ex desktop write still requires exact native-to-desktop size and backbuffer crop/dirty rollback, mono publication permission and complete-source proof; original Draw/Present, gamepad and FFB remain intact"
+      },
+      {
+        "id": "exact_sha_five_mandatory_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS_EXACT_SHA",
+        "expected_behavior": "New native GPU admission C++ probe and source mutation regression pass with DX11 Fast, Backend, Windows Build, OpenXR and HUD at the identical validation-bearing SHA"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_D3D9_GAME_DRAW_NATIVE_D3D11_RENDER",
+      "PROVEN_NATIVE_GPU_COLOR_TEXTURE",
+      "INDEPENDENT_RESOLUTION_GPU_SINK_CALLBACK",
+      "GPU_SINK_ACCEPTANCE_WITHOUT_D3D9_DESKTOP_SCALE_DEPENDENCY",
+      "ORIGINAL_D3D9EX_PRESENT_INPUT_FFB_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_gpu_handoff.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tests/vr/dx11_native_independent_game_output_01062.cpp",
+      "tools/test_dx11_native_independent_game_output_01062.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Fast run 40173587197 compiled/executed 01062 portable C++ admission probe and ran 01062 Python source-link negative mutation regression; all five required GitHub Actions succeeded on fb339c7a7740c19ecec2777e5310d9cd2657366d",
+      "negative_regression": "Source-link mutations break resource owner, BGRA texture format, mip sample count, geometry dimensions and mono permission; D3D9Ex original same-size fallback remains unchanged",
+      "component_integration": "NativeBackend producer color texture, game frame completion and real D3D11 resource ownership -> full-res native GPU callback; D3D9Ex desktop sharing remains a separate strict and rollback-protected output"
+    },
+    "conflict_keys": [
+      "DX11:INDEPENDENT_RESOLUTION_NATIVE_GPU_SINK"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "No automatic native promotion, stereo duplication or DXVK modification. Original D3D9Ex Draw/Present, gamepad and FFB still authoritative until actual native/HMD results; native sink is separate opt-in",
+    "blocking_evidence": "Before 01062 the native GPU-only sink reused nativeExtentMatches and fullPlacement, incorrectly coupling a logically independent GPU consumer to D3D9 desktop resolution even when its own native GPU texture was complete."
+  },
+  "acceptance_results": {
+    "independent_native_gpu_resolution": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01062 native GPU-independent geometry portable C++ positive/negative cases pass Fast 40173587197; physical display result UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_gpu_handoff.hpp",
+        "tests/vr/dx11_native_independent_game_output_01062.cpp"
+      ],
+      "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_native_independent_game_output_01062.cpp -o /tmp/dx11_native_independent_01062 && /tmp/dx11_native_independent_01062"
+    },
+    "native_resource_ownership_and_extent": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "01062 structural source-link negative tests at Fast run 40173587197; real device source untested",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_native_independent_game_output_01062.py"
+      ],
+      "validation_command": "python tools/test_dx11_native_independent_game_output_01062.py"
+    },
+    "original_dx9ex_desktop_and_input": {
+      "status": "PASS_FEATURE_CI",
+      "evidence": "Original D3D9Ex writable/present and mono guards explicitly retained and checked by new Fast source-link regression; hardware gamepad/FFB UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_native_independent_game_output_01062.py"
+      ],
+      "validation_command": "python tools/test_dx11_native_independent_game_output_01062.py"
+    },
+    "exact_sha_five_mandatory_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Five push-triggered GitHub Actions completed SUCCESS for identical fb339c7a7740c19ecec2777e5310d9cd2657366d: Fast 40173587197, Backend 40173587220, Build 40173587171, OpenXR 40173587163, HUD 40173587208",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "docs/automation/runs/CONVERSION-DX11-01062.json"
+      ],
+      "validation_command": "GitHub REST /actions/runs?head_sha=fb339c7a7740c19ecec2777e5310d9cd2657366d"
+    }
+  },
+  "validation_history": [
+    {
+      "exact_sha": "44494c8f0ffad0138ae3c7dd3ffe8701942d78bf",
+      "result": "FAIL",
+      "cause": "01062 new Python source-link test mutated an earlier identical argument sequence outside GPU-only callback; implementation/C++ portable probe were retained"
+    },
+    {
+      "exact_sha": "fb339c7a7740c19ecec2777e5310d9cd2657366d",
+      "result": "PASS_EXACT_SHA",
+      "cause": "Scoped negative mutation to the GPU-only callback, keeping all safety assertions and running all five mandatory exact-SHA gates"
+    }
+  ],
+  "c6_validation_evidence": {
+    "exact_sha": "fb339c7a7740c19ecec2777e5310d9cd2657366d",
+    "dx11_fast_run_id": 40173587197,
+    "backend_gate_run_id": 40173587220,
+    "windows_build_run_id": 40173587171,
+    "openxr_architecture_run_id": 40173587163,
+    "hud_inspector_run_id": 40173587208,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_conclusion": "success",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "No physical OutRun menu/car/race source Draw count, visible native frame count or XR theater size observation for exact fb339c7a7740c19ecec2777e5310d9cd2657366d.",
+  "next_implementation_action": "Implement and verify the remaining actual menu/car/race native programmable draw coverage and independent GPU eye-surface/OpenXR integration. Obtain separate desktop game and Quest3 stereo visual evidence before promotion.",
+  "runtime_note": "CI only. Real game/Quest3/VDXR, physical gamepad/FFB and screen/theater aspect behavior all UNTESTED.",
+  "resolved_hold_reason": "C6_EXACT_SHA_FIVE_MANDATORY_GATES_SUCCESS",
+  "ci_repair_note": "01062 regression mutation selection was scoped to the actual GPU sink block under the SAME TASK_ID. No source or safety Gate bypass. One source material commit and one causal repair commit, no duplicate score."
+}

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00266",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "e839d2f45c79bdff39365cf7579e9465a84e7704",
+  "result_sha": "6fff554c96d7c6e58a2879173f8505455551ca7f",
+  "validation_bearing_result_sha": "6fff554c96d7c6e58a2879173f8505455551ca7f",
+  "source_commits": [
+    "6fff554c96d7c6e58a2879173f8505455551ca7f"
+  ],
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_DORMANT_ACTIVATION_BOUNDARY_REVIEW",
+  "selection_reason": "CONVERSION-DX11-00266 resumed from GitHub HEAD e839d2f45c79bdff39365cf7579e9465a84e7704. The native path is not complete: census evidence remains diagnostic-only/non-exhaustive and native D3D11 draw routing is intentionally dormant. Review of the activation verifier found that ID3D11DeviceContext::DrawAuto was not matched by the Draw* fail-closed boundary.",
+  "summary": "Reviewed the dormant native DX11 activation boundary and fixed a concrete guard gap. DRAW_DISPATCH now includes DrawAuto, and the verifier self-checks all seven ID3D11DeviceContext Draw* entry-point families so future matcher regressions fail closed. No native game draw routing was activated. RUNTIME_VALIDATION remains UNTESTED.",
+  "changed_paths": [
+    "tools/verify_dx11_activation_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-00266.json"
+  ],
+  "conversion_changed_paths": [
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "evidence": [
+    "GitHub plugin resolved vr-dx11-native-r71 HEAD e839d2f45c79bdff39365cf7579e9465a84e7704 before work.",
+    "CONVERSION-DX11-00266 had no existing run record at resume time; the 404 was a missing path, not a GitHub connection failure.",
+    "Existing activation verifier matched Draw, DrawIndexed, DrawInstanced, DrawIndexedInstanced and indirect variants but omitted DrawAuto.",
+    "Commit 6fff554c96d7c6e58a2879173f8505455551ca7f adds DrawAuto to the dormant activation matcher and adds explicit matcher samples for every ID3D11DeviceContext Draw* family.",
+    "Exact-SHA GitHub Actions were registered for 6fff554c96d7c6e58a2879173f8505455551ca7f: Build 36933017428, OpenXR VR architecture 36933017420, OutRun EXE HUD Inspector CI 36933017514 and Backend Conversion Gate 36933012749."
+  ],
+  "related_finding_or_regression_keys": [
+    "CONVERSION-DX11-00262",
+    "DX11-DRAWAUTO-ACTIVATION-GUARD-001"
+  ],
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 36933012749,
+      "head_sha": "6fff554c96d7c6e58a2879173f8505455551ca7f",
+      "conclusion": "in_progress"
+    },
+    "build": {
+      "run_id": 36933017428,
+      "head_sha": "6fff554c96d7c6e58a2879173f8505455551ca7f",
+      "conclusion": "in_progress"
+    },
+    "openxr_architecture": {
+      "run_id": 36933017420,
+      "head_sha": "6fff554c96d7c6e58a2879173f8505455551ca7f",
+      "conclusion": "queued"
+    },
+    "hud_inspector": {
+      "run_id": 36933017514,
+      "head_sha": "6fff554c96d7c6e58a2879173f8505455551ca7f",
+      "conclusion": "queued"
+    }
+  },
+  "blocker": "Native DX11 conversion is not complete. Exact-SHA automation validation for 6fff554c96d7c6e58a2879173f8505455551ca7f is still running, native draw activation remains deliberately disabled, exhaustive draw coverage is not proven, and no runtime/HMD validation has been performed.",
+  "next_action": "Continue review from 6fff554c96d7c6e58a2879173f8505455551ca7f without repeating completed work. Consume exact-SHA CI results, then review the remaining activation-proof and exhaustive-coverage gaps before any native Draw* routing is permitted.",
+  "checkpoint": "C1_REVIEW_FIX_VALIDATION_PENDING",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE"
+}

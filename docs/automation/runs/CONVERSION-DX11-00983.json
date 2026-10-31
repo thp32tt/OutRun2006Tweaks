@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00983",
+  "production_id": "CONVERSION-DX11-00983",
+  "event_id": "CONVERSION-DX11-00983-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00983",
+  "feature_id": "DX11_MENU_RACE_CAMERA_CLEAR_TO_GPU_STEREO_POSTPASS",
+  "work_key": "DX11:MENU_RACE_CAMERA_CLEAR_POSTPASS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "f18926d1f44877ef00cf67b24e3155ada8ab7b53",
+  "material_result_sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f",
+  "validation_bearing_result_sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f",
+  "result_sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "code_change": "YES",
+  "feature_stage": "NATIVE_CAMERA_COLOR_CLEAR_TO_COPY_STRETCH_SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "summary": "A genuine game-authored full or viewport/scissor-cropped offscreen camera TARGET Clear now contributes its exact GPU-written pixels, texture identity, array slice and mip to later native D3D11 L/R Copy/Stretch source provenance. Old Draw pixels are invalidated first; partial/failed Clears cannot manufacture full-frame proof. Native game Draw counters are not incremented and D3D9Ex render/input/FFB remains authoritative on unsupported or unproven states.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Authentic game GPU camera D3D11 RTV Draw/Clear; successful full or partial TARGET Clear replaces stale source footprints with real GPU-written background color",
+      "Keyed physical camera mip/slice coverage to game-authored Copy/Stretch and native stereo eye targets, allowing clear+geometry camera compositing with fail-closed DX9Ex input/render fallback"
+    ],
+    "batch_components": [
+      "native_game_stereo_submission.cpp full/ClearView/D3D11.0 shader-raster success paths and keyed source color ledger",
+      "native_game_offscreen_color_provenance.hpp source-coverage region translation",
+      "source-linked C++ and negative Python regressions wired to DX11 Fast"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast source-linked C++ coverage demonstrates full GPU Clear and partial Clear+Draw fully covering source camera, visible copied source point sampling",
+      "negative_regression": "Incomplete or missing pixel coverage rejected, foreign mip/array key rejected, invalid cropped Clear rejected, unsuccessful shader raster Clear does not mint source evidence; original D3D9Ex source/input/FFB unmodified",
+      "component_integration": "NativeGameEyeDrawEncoder::clear_offscreen_game_color emits offscreen GPU Clear; rememberClearedPixels follows real successful GPU writes only, and offscreen_color_source_proven feeds Copy/Stretch -> native eye ring. Actual gameplay/Quest3 output UNTESTED."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp:CAMERA_CLEAR",
+      "src/vr/d3d11/native_game_offscreen_color_provenance.hpp:CAMERA_CLEAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "runtime_validation_boundary": "NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_offscreen_clear_postpass_00983.cpp",
+    "tools/test_dx11_game_offscreen_clear_postpass_00983.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: confirmed branch/head, AGENTS.md, task ownership and prior 00982 exact-SHA five-gate success, no 00983 existing marker",
+    "C1_REVIEW": "PASS: confirmed successful GPU camera TARGET Clear erased previous source Draw evidence but did not represent newly GPU-written color used by native Copy/Stretch",
+    "C2_IMPLEMENT": "PASS: C++ full/cropped game camera GPU Clear source-color record and conservative keyed pixel-region helper; regression source and CI wiring",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 5 required actions success on material SHA; native transport isolated WARP success; no HMD",
+    "C4_COMMIT": "PASS: material code commit with exact marker and no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED: user controls runtime deployment; no game/HMD test",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: code feature and CI exact SHA recorded; actual menu/car/race/OpenXR runtime remains UNTESTED"
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f",
+    "mandatory_gate_results": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39656114675,
+        "status": "success",
+        "sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39656114602,
+        "status": "success",
+        "sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f"
+      },
+      {
+        "name": "Build",
+        "run_id": 39656114774,
+        "status": "success",
+        "sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39656114651,
+        "status": "success",
+        "sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39656114597,
+        "status": "success",
+        "sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f"
+      }
+    ],
+    "extra_gate": {
+      "name": "DX11 Native Transport Isolated WARP",
+      "run_id": 39656114653,
+      "status": "success",
+      "sha": "54f1b0c5e3ce79d0932ed1a10a310a0411ca934f"
+    },
+    "not_required": {
+      "name": "VR PC Fast Test Build",
+      "run_id": 39656114705,
+      "status": "skipped"
+    }
+  },
+  "next_action": "Use genuine matching-game launch with Quest3/VDXR or desktop to measure actual native Draw and published frame counts, and continue unresolved menu->car->race shader-bound full frame under its owning new safe task. Do not claim playable native renderer or reactivate DXVK.",
+  "score": {
+    "run_key": "CONVERSION-DX11-00983",
+    "score_change_when_scoreboard_recorded": 1,
+    "scoreboard_recorded": false
+  }
+}

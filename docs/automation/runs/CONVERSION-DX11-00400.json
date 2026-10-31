@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00400",
+  "production_id": "CONVERSION-DX11-00400",
+  "event_id": "CONVERSION-DX11-00400-E004",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "status": "COMPLETE",
+  "selected_work_item": "DX11_R262_PROGRAMMABLE_OUTPUT_RESOURCE_BEHAVIOR_PROOF",
+  "base_sha": "b5edab688693695510004233a405b0698c229dfe",
+  "result_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+  "material_result_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+  "source_implementation_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+  "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+  "result_marker": "[AUTO:CONVERSION-DX11-00400]",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "summary": "R262 closes the remaining F18 output-resource behavior scope by requiring current R261 geometry+texture evidence plus an exact current R119 color/depth surface pair and live R145 RTV/DSV/UAV-clear binding identity. R259 now observes complete F18 evidence, but F21 shader semantic translation remains absent and NativeDrawPath/Draw/DrawIndexed remain fail-closed.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "68e5659c9c3389ab6a7cc01144b5940d9af95244",
+    "5528c745271811eedb0517bd96af1ce2b411e5dd",
+    "9bfbb627ed5a33760abdd633715df46272404dcf",
+    "27d9771a71071497972c69856413ed1340e60c82",
+    "c5eb1152c0588fd6057cbb5aaf23ca8f0b37632a",
+    "d2e6895feefca9325e59080d37bbcd30ce11d129",
+    "4333cad4f6288fd4ae5f15a38e53f2b9301e7146"
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "draw_dispatch_changed": false,
+    "dx9ex_branch_modified": false
+  },
+  "validation": {
+    "local_exact_sha_static": {
+      "sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+      "conclusion": "PASS",
+      "checks": [
+        "verify_queue_controller_contract.py",
+        "verify_vr_proven_baseline.py",
+        "test_dx11_xr_source_resolution_policy.py",
+        "verify_vr_backend_disasm_contract.py",
+        "verify_dx11_native_transport_contract.py",
+        "verify_dx11_dual_source_contract.py",
+        "test_dx11_static_surface_contract.py",
+        "dx11_native_static_surface_contract_check.py",
+        "verify_dx11_source_graph.py",
+        "verify_dx11_activation_boundary.py",
+        "test_analyze_dx11_census.py",
+        "git diff --check"
+      ]
+    },
+    "backend_conversion_gate": {
+      "conclusion": "PASS",
+      "run_id": 37268485884,
+      "run_attempt": 1,
+      "validation_job_id": 111630276099,
+      "readiness_smoke_job_id": 111631104379,
+      "head_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9"
+    },
+    "r262_contract": {
+      "geometry_resource_behavior_exact": true,
+      "texture_resource_behavior_exact": true,
+      "output_resource_behavior_exact": true,
+      "full_f18_proof_present": true,
+      "shader_translation_proof": "MISSING_F21",
+      "missing_prerequisite_mask": "0x4",
+      "native_draw_path_activation_allowed": false,
+      "draw_dispatch_authorized": false
+    },
+    "artifact": {
+      "id": 11327203741,
+      "name": "backend-autovalidated-vr-dx11-native-r71-ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+      "digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21"
+    },
+    "superseded_intermediate": {
+      "initial_material_sha": "68e5659c9c3389ab6a7cc01144b5940d9af95244",
+      "finding": "Initial R262 probe lineage produced compile errors in OpenXR game-x86 jobs; repaired within the same ATTEMPT and superseded by descendant material 4333cad4.",
+      "retry_incremented": false
+    }
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT and direct commit ancestry. 00399 was complete; 00400 exact validation-bearing SHA ed34771a directly descends from final material 4333cad4. Current user E004/CHAT_ROLLOVER=4 is a chat rollover, not a retry, so ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R262 requires current R119 surface-pair identity plus live R145 RTV/DSV binding readiness/UAV-clear observation, preventing stale or non-live output evidence from completing F18."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "R262 output resource-behavior readiness/validator are implemented and R259 consumes complete F18 while F21 remains fail-closed. Indexed/non-indexed positive cases and stale live-binding lineage are covered."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Final material 4333cad4 passed N100 clean static verification. Exact descendant SHA ed34771a passed Backend Conversion Gate 37268485884: validate job 111630276099 and DX11 readiness smoke job 111631104379, including Build/Run DX11 constant buffer probe."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+      "material_result_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+      "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+      "result_marker": "[AUTO:CONVERSION-DX11-00400]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R262 is dormant review/readiness evidence only and does not activate or package a runtime native draw path."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "evidence": "Durable run record and lane state are reconciled to current user dispatch E004/CHAT_ROLLOVER=4 without changing validated material or ATTEMPT."
+    }
+  },
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00400",
+    "production_id": "CONVERSION-DX11-00400",
+    "event_id": "CONVERSION-DX11-00400-E004",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 4,
+    "rollover_is_retry": false,
+    "lane": "DX11",
+    "target_branch": "vr-dx11-native-r71",
+    "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+    "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9",
+    "validation_run_id": 37268485884,
+    "validation_job_id": 111630276099,
+    "readiness_smoke_job_id": 111631104379,
+    "artifact_id": 11327203741,
+    "artifact_digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21",
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started."
+  },
+  "exact_next_action": "Preserve validated R239-R262. Under the next independent DX11 task, implement one exact F21 programmable-shader semantic-translation proof for the dormant candidate and feed it into the R259 prerequisite chain while keeping NativeDrawPath, Draw and DrawIndexed fail-closed until the full activation gate and separate matching Quest 3/VDXR runtime evidence are satisfied.",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R262_PROGRAMMABLE_OUTPUT_RESOURCE_BEHAVIOR_PROOF_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+  "validation_run_id": 37268485884,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111630276099,
+  "readiness_smoke_job_id": 111631104379,
+  "artifact_id": 11327203741,
+  "artifact_digest": "sha256:b54c0fb5701d868852c39b83ec8eb7a1aa3dda2c134403b148cdb645c082fc21",
+  "artifact_size_bytes": 2366688,
+  "implementation_comment_id": 5988637928,
+  "validation_comment_id": 5988818305,
+  "current_metadata_reconciliation": {
+    "task_id": "CONVERSION-DX11-00400",
+    "corrected_from": {
+      "event_id": "CONVERSION-DX11-00400-E003",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "material_result_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+      "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9"
+    },
+    "corrected_to": {
+      "event_id": "CONVERSION-DX11-00400-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 4,
+      "rollover_is_retry": false,
+      "material_result_sha": "4333cad4f6288fd4ae5f15a38e53f2b9301e7146",
+      "validation_bearing_result_sha": "ed34771a6fe3bc0bb07846768ffcd52d68abaaa9"
+    },
+    "reason": "E004 is the latest explicit chat-rollover metadata. It does not create a retry or new material result.",
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

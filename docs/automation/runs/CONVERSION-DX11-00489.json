@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00489",
+  "production_id": "CONVERSION-DX11-00489",
+  "event_id": "CONVERSION-DX11-00489-E004",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00489",
+  "lease_epoch": 1,
+  "work_key": "DX11:R187:DORMANT_NATIVE_INDEXED_RTV_VIEWPORT_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp:R187",
+    "tools/dx11_viewport_draw_probe_r187.cpp:R187",
+    "tools/test_dx11_viewport_draw_r187.py:R187",
+    "cmake.toml:R187",
+    ".github/workflows/backend-conversion-gate.yml:R187"
+  ],
+  "base_sha": "9fd3c09a6bb1548792d226b00f7515002ce8f1b0",
+  "result_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
+  "material_result_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
+  "validation_bearing_result_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R187 exact owned RTV COM identity guard now rejects same-dimension/same-format wrong-eye binding; 4-mutant source contract, Win32 compile and isolated WARP real DrawIndexed pixels PASS. Exact-SHA Backend Conversion Gate 37966364768 FAIL only unchanged R175 TEXCOORD6 PS varying mismatch owned by 00477; no runtime/HMD promotion.",
+  "pipeline": {
+    "C0_RECOVER": "PASS E004: recovered previous 00489 material SHA 3da8133f and C6 bookkeeping HEAD 2f35de1e; Gate 37964422215 failure isolated to 00477-owned R175. Preserved work_key/ownership; R187 was source-reviewed for new evidence.",
+    "C1_REVIEW": "PASS: inspected R187 target/viewport and discovered wrong same-sized matching-format RTV passed without expected object identity. R175 outside ownership; no source collisions.",
+    "C2_IMPLEMENT": "PASS: native indexed RTV object identity argument and null check added to R187 dormant C++ guard; isolated WARP test rejects same-sized wrong RTV and null expected RTV, restores exact RTV; Python contract adds 4th negative source mutant. No gameplay Draw activation.",
+    "C3_VALIDATE": "PASS scoped: 4 negative mutants; MSVC Win32 compile; live WARP DrawIndexed actual GPU pixel readback plus same-sized wrong-eye RTV guard. Exact 576048f02b Gate 37966364768 validate 113941598028 SUCCESS; readiness smoke 113943933063 FAILURE only inherited R175 TEXCOORD6 BGRA actual [128,0,16,255] vs expected [224,128,32,255].",
+    "C4_COMMIT": "PASS: material [AUTO:CONVERSION-DX11-00489] commit 576048f02b0bf708d7b495253409e93a2ba59e3f no CI-skip, exact SHA GitHub Gate concluded. This separate C6 [skip ci] status commit leaves material identity unchanged; previous SHA stored explicitly.",
+    "C5_PACKAGE": "NOT_REQUIRED; no live native game Draw route or Quest3/VDXR package/test authority.",
+    "C6_STATE": "SEALED E004 attempt 3/3: material fix and R187 isolated real WARP PASS; full mandatory exact-SHA Gate FAIL from inherited 00477-owned R175; RUNTIME_VALIDATION=UNTESTED; no replay or task score."
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp",
+    "tools/dx11_viewport_draw_probe_r187.cpp",
+    "tools/test_dx11_viewport_draw_r187.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00489.json"
+  ],
+  "blockers": [
+    "R175_GENERIC_VARYING_MISMATCH in tools/dx11_constant_buffer_probe.cpp is 00477-owned; BGRA actual [128,0,16,255] expected [224,128,32,255]; avoid duplicate edits.",
+    "Quest3/VDXR actual game/HMD testing absent, no native Draw activation or release acceptance."
+  ],
+  "next_action": "00489 E004 is sealed BLOCKED_UPSTREAM after retry 3/3; do not replay R187 or run unchanged CI. Preserve exact SHA 576048f02b results. R175 work belongs to owner 00477; separate controller assigns independent new DX11 native work_key when safe, with no DXVK or protected DX9Ex edits.",
+  "last_real_activity_at": "2026-10-09T17:48:26.067Z",
+  "score_change": 0,
+  "static_precommit_checks": {
+    "headerGuards": true,
+    "noProductionDraw": true,
+    "gpuProbe": true,
+    "cmkrManifest": true,
+    "gateOrder": true,
+    "rtvIdentityGuard": true,
+    "nullExpectedRtvGuard": true,
+    "fourNegativeSourceMutants": true,
+    "wrongSameSizedRtvWarpCase": true
+  },
+  "scoped_automation_validation": "PASS_R187_RTV_OBJECT_IDENTITY_4_MUTANTS_WIN32_WARP_DRAWINDEXED_PIXELS",
+  "resume_cursor": "C6_BLOCKED_UPSTREAM_R175_RETRY_LIMIT_NO_REPLAY",
+  "score_reason": "Additional R187 exact RTV identity C++ work and compiled WARP proof are real, but required whole exact-SHA Gate failed inherited R175; no completed mandatory Gate acceptance, no retry bonus.",
+  "validation_evidence": {
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37966364768,
+    "gate_head_sha": "576048f02b0bf708d7b495253409e93a2ba59e3f",
+    "gate_event": "push",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113941598028,
+    "validate_conclusion": "success",
+    "readiness_smoke_job_id": 113943933063,
+    "readiness_smoke_conclusion": "failure",
+    "r187_static_contract": "PASS",
+    "r187_negative_mutants": 4,
+    "r187_cmkr_build": "PASS",
+    "r187_warp_gpu_drawindexed_pixels": "PASS",
+    "r187_wrong_same_size_rtv_rejected": "PASS",
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "artifact_id": 11633762448,
+    "artifact_digest": "sha256:fa4ac4662bd6a8e80fee597d16188813d6af28eab660916cd15a640a1a79bdd4",
+    "other_exact_material_workflows": {
+      "build": "SUCCESS 37966371200",
+      "openxr_architecture": "SUCCESS 37966371268",
+      "hud_inspector": "SUCCESS 37966371236"
+    }
+  },
+  "previous_material_result_sha": "3da8133f81bead43b3700c444062228f5d6861ed",
+  "previous_validation_evidence": {
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37964422215,
+    "gate_head_sha": "3da8133f81bead43b3700c444062228f5d6861ed",
+    "gate_event": "push",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113935069208,
+    "validate_conclusion": "success",
+    "readiness_smoke_job_id": 113937424223,
+    "readiness_smoke_conclusion": "failure",
+    "r187_static_contract": "PASS",
+    "r187_negative_mutants": 3,
+    "r187_cmkr_build": "PASS",
+    "r187_warp_gpu_drawindexed_pixels": "PASS",
+    "r187_rejects": [
+      "wrong target width",
+      "wrong view format",
+      "missing viewport",
+      "extra viewport",
+      "half viewport",
+      "scissor enabled",
+      "missing bound RTV",
+      "retired IB"
+    ],
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "artifact_id": 11633190719,
+    "artifact_digest": "sha256:1de7cd1aa808b1709a32622322bc8f51cc19009f81cd5bbb4c9b7f41c3bdb973",
+    "ledger_issue_14_preseal_comment_id": 6085649170
+  }
+}

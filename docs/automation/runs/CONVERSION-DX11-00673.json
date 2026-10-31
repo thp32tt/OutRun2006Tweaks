@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00673",
+  "production_id": "CONVERSION-DX11-00673",
+  "event_id": "CONVERSION-DX11-00673-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_NATIVE_STAGE1_CURRENT_TFACTOR_COMBINER",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME_STAGE1_CURRENT_FACTOR_COMBINER",
+  "base_head_sha": "cb93dc3270014944a66670c9e8ec92935dbf5452",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real OutRun D3D9 stage0 and stage1 CURRENT/TFACTOR color/alpha combiner state captured from live game Draw and rejected on unsupported operands/stage2",
+      "End-to-end native D3D11 stage1 HLSL pixel shaders and b1 CB bind to guarded game-authored Draw/DrawIndexed with diagnostic visible frame readback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_factor_probe.cpp",
+      "tools/test_dx11_stage1_factor_00673.py",
+      ".github/workflows/dx11-fast-structural.yml",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "32 operand/operator combinations and four connected stage0 native shader variants feed D3D11 Draw/DrawIndexed",
+      "negative_regression": "Invalid modifiers, unsupported stage0 shaders, TEMP output, stage2 effects and missing constant buffer reject native submission without altering original D3D9 gamepad/Draw",
+      "component_integration": "D3D9 GetTextureStageState and TextureFactor, portable CPU admission, HLSL b1 constant binding, OM/native Draw and standard inset Present all linked, exact-SHA GitHub fast and backend/build gate required"
+    },
+    "conflict_keys": [
+      "DX11:GAME_NATIVE_STAGE1_CURRENT_TFACTOR_COMBINER",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST; diagnostic native inset code only; real menu/vehicle/race pixels and controller input unverified",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic only; all original game D3D9 Draw/Present and gamepad unchanged, non-supported ops fail closed"
+  },
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME_STAGE1_CURRENT_FACTOR_COMBINER",
+    "goal": "Integrate real game-authored D3D9 stage-1 CURRENT/TFACTOR color and alpha fixed-function combine across native D3D11 pixel shaders for menu, car select and race draws, while retaining exact DX9Ex fallback",
+    "acceptance_items": [
+      {
+        "id": "stage1-end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_color_pipeline",
+        "expected_behavior": "Live stage0 diffuse/modulate/texture-only/additive color is combined with stage1 factor for RGB and alpha before native alpha-test/OM in Draw and DrawIndexed"
+      },
+      {
+        "id": "stage1-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "safe_original_game_draw",
+        "expected_behavior": "Stage2, unsupported stage0, TEMP, complemented or alpha-replicated operands and unsupported combiners never issue the diagnostic native draw or change the gamepad/DX9Ex path"
+      },
+      {
+        "id": "stage1-gate",
+        "category": "integrated_validation",
+        "behavior_area": "native_shader_and_source_gate",
+        "expected_behavior": "Portable executable positive/negative combiner probe, source destructive tests and exact-SHA DX11 fast, Backend Conversion, Build, OpenXR and HUD checks pass"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_stage1_factor_probe.cpp",
+    "tools/test_dx11_stage1_factor_00673.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00673.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "Stage1 CURRENT/TFACTOR fixed-function game draws blocked by disabled-only stage1 filter; parallel 00672 sparse mesh conflict avoided",
+    "C2_IMPLEMENT": "LIVE_STAGE1_CAPTURE_HLSL_B1_NATIVE_DRAW_AND_NEGATIVE_TESTS",
+    "C3_VALIDATE": "PENDING_EXACT_SHA_GITHUB_ACTIONS",
+    "C4_COMMIT": "MATERIAL_COMMIT_PREPARED",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "stage1-end2end": "PENDING_GITHUB_FAST",
+    "stage1-fallback": "PENDING_GITHUB_FAST",
+    "stage1-gate": "PENDING_EXACT_SHA",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null
+}

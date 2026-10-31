@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01150",
+  "production_id": "CONVERSION-DX11-01150",
+  "event_id": "CONVERSION-DX11-01150-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "inherited_feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_SM3:SOURCE_ZERO_DENSITY_EXPONENTIAL_FOG",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_GATE_REPAIRS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "full_dx11_renderer_complete": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "4b352f2a9a22cb27fec3312ffd70ad8fffd05895",
+  "source_implementation_commit_sha": "7746cf5d38a4907e64044595bf47d0db541daac5",
+  "material_result_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+  "validation_bearing_result_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "AUTHENTIC_D3D9_SM3_EXP_EXP2_TABLE_DENSITY_STATE",
+      "PROVEN_INERT_ZERO_DENSITY_NATIVE_SHADER_FOG_ADMISSION",
+      "D3D11_NATIVE_GAME_DRAW_PROTECTED_BY_ALL_OTHER_SOURCE_GATES",
+      "OPTIONAL_GPU_RAW_VISUAL_CAPTURE_AND_ORIGINAL_D3D9_FALLBACK"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY; native zero-density exponential Fog source translation and regression integrated, original D3D9 game preserved; actual same-SHA native game Draw, desktop GPU output and HMD UNTESTED",
+    "activation_guard_and_fallback": "All D3D9 game rendering, input, FFB and SkyGlow remain authoritative; native experimental route opt-in; unknown source Fog identity, invalid COM query, active fog, RT, Z, poison and publication fail closed; DXVK frozen",
+    "batch_components": [
+      "CXX_SOURCE_FOG_ZERO_DENSITY_EXPONENTIAL_PIXEL_EQUIVALENT_ADMISSION",
+      "CXX_LIVE_D3D9_DENSITY_FIRST_STATE_READ_AND_NATIVE_DRAW_INTEGRATION",
+      "CPP_POSITIVE_NEGATIVE_SM3_TABLE_FOG_REGRESSION",
+      "PREEXISTING_01149_POLICY_EVIDENCE_CI_CAUSAL_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual D3D9 EXP/EXP2 table-fog mode with authentic density bits 0 or negative zero admits unchanged native shader RGB despite inherited VERTEX/RANGE and unused Z/W/sRGB/color/limits",
+      "negative_regression": "Nonzero EXP/EXP2 density requires original caps/sRGB/start/end/range safety, malformed modes, failed GetRenderState and NaN density never treated as inert",
+      "component_integration": "D3D9 live GetRenderState FOGTABLEMODE/FOGVERTEXMODE/FOGDENSITY -> native_sm3_table_zfog_admission -> SM3 Draw/DrawIndexed -> optional source-authentic GPU RAW tile; unsupported original game state falls back to D3D9"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_live_sm3_table_zfog_01005.cpp",
+      "docs/automation/runs/CONVERSION-DX11-01149.json",
+      "tools/test_dx11_live_sm3_table_zfog_01005.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "blocking_evidence": "Pinned 2026-10-28 real game b8dab362b9cc9072eafbd3307594a35ff5b8d413 native_draws=0 and Fog rejects 5,547; no new runtime proof. 2026-10-29 exact-SHA 7746cf5d38a4907e64044595bf47d0db541daac5 DX11 Fast run 40813007430 and Backend run 40813007429 BOTH failed policy on inherited CONVERSION-DX11-01149.json missing development_strategy.blocking_evidence; causal metadata repair only, no weakened Gate."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01149.json",
+    "docs/automation/runs/CONVERSION-DX11-01150.json",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Do not discard real game programmable D3D9 SM3 Draws when authentic EXP or EXP2 table fog has source-zero density, while keeping active fog source identities, GPU state and DX9Ex input/render fallback exact until real full-frame output",
+    "acceptance_items": [
+      {
+        "id": "source_inert_exponential",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real D3D9 programmable source -> native SM3 admission",
+        "expected_behavior": "Live zero-density EXP/EXP2 Fog excludes only its mathematically inert RGB operation without rejecting an otherwise valid native Draw"
+      },
+      {
+        "id": "active_fog_and_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 source Fog, render state, original input and FFB",
+        "expected_behavior": "Nonzero, invalid, unknown and active Fog retain all preexisting source and GPU protection and never spoof native gameplay"
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Actions final source compile, policy, OpenXR and inspector",
+        "expected_behavior": "Final single exact-SHA five mandatory push workflows success while game and HMD test remains separately unverified"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_inert_exponential": "PASS_EXACT_SHA",
+    "active_fog_and_original_fallback": "PASS_EXACT_SHA",
+    "exact_sha_five_gates": "PASS_EXACT_SHA"
+  },
+  "real_game_draw_blocker": "Latest code has no source-matched real game session showing native_draws>0 and publishedBackbufferFrames>0",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "pipeline": {
+    "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD",
+    "C1_REVIEW": "PASS_SOURCE_NOOP_EXP_EXP2_ZERO_DENSITY",
+    "C2_IMPLEMENT": "PASS_MATERIAL_COMMIT_7746cf5d38a4907e64044595bf47d0db541daac5",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_EXACT_SHA_50221dcc1e238e383897a65992d34ac663d7152d",
+    "C4_COMMIT": "PASS_SOURCE_7746cf5d_AND_CAUSAL_TEST_REPAIR_50221dcc",
+    "C5_PACKAGE": "NOT_CREATED_NO_MATCHING_REAL_GAME_OR_HMD_PROOF",
+    "C6_STATE": "PASS_SEPARATE_BOOKKEEPING_NO_ADDITIONAL_SCORE"
+  },
+  "evidence": {
+    "original_material_commit": "7746cf5d38a4907e64044595bf47d0db541daac5",
+    "failed_fast_run": 40813007430,
+    "failed_backend_run": 40813007429,
+    "failed_stage": "inherited 01149 run record blocking_evidence missing",
+    "runtime_evidence": "UNTESTED: no matching real game native_draws/publishedBackbufferFrames/gpu_desktop_frames or Quest3/VDXR",
+    "failed_fast_regression_run": 40813263121,
+    "failed_fast_regression_cause": "Existing source-static predicate required old const bool parametersKnown = !activeEquation ||; new real density-first state preserved fail closed but predicate rejected updated conditional. Strengthened static positive/destructive checks; original C++ positive/negative tests unchanged.",
+    "failed_fast_regression_2": 40814628413,
+    "failed_fast_regression_2_cause": "Static test required adjacent && !inertExponential; byte sequence, but actual safe C++ source has newline whitespace between && and !inertExponential. Preserve independent exact source mode/density ordering, active fog and destructive tests; require !inertExponential clause regardless of formatting.",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40815567628,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567628"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40815567595,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567595"
+      },
+      {
+        "name": "Build",
+        "run_id": 40815567603,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567603"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40815567537,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567537"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40815567613,
+        "head_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40815567613"
+      }
+    ],
+    "final_validation_bearing_result": "50221dcc1e238e383897a65992d34ac663d7152d",
+    "source_implementation": "7746cf5d38a4907e64044595bf47d0db541daac5",
+    "causal_gate_repair_shas": [
+      "163818ffd2ee04fa2f7b6b9dacc2a00d755d2997",
+      "d0a547dcb7a72afaeed57c08522b6ba6cbec860f",
+      "50221dcc1e238e383897a65992d34ac663d7152d"
+    ],
+    "scoreboard_commit": "913830a17389e1ad7a83dc3cf9e5235973c1bd8c",
+    "scoreboard_ai2_prior": 2133,
+    "scoreboard_ai2_delta": 1,
+    "scoreboard_ai2_cumulative": 2134,
+    "c6_only": true,
+    "c6_is_material_result": false
+  },
+  "c6": {
+    "reason": "FIVE_EXACT_SHA_GATES_PASS_AFTER_SOURCE_AND_CAUSAL_POLICY_REGRESSION_REPAIRS",
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "original_source_implementation_sha": "7746cf5d38a4907e64044595bf47d0db541daac5",
+    "unchanged_validation_bearing_result_sha": "50221dcc1e238e383897a65992d34ac663d7152d",
+    "bookkeeping_only": true,
+    "score_change": 0,
+    "next_action": "Next independent DX11 actual game source integration; real native Draw/published frame exact binary needed to establish runtime proof"
+  }
+}

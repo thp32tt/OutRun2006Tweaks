@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00602",
+  "production_id": "CONVERSION-DX11-00602",
+  "event_id": "CONVERSION-DX11-00602-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00602",
+  "work_key": "DX11:MENU_RACE_SRCALPHA_ZERO",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "127ef4dfa1a108d75f2c77f5832bcbffd3ecde8c",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game GetRenderState D3D9 SRCALPHA/ZERO with ADD-only admission",
+      "D3D11 dedicated source attenuation RGB/alpha output-merger state plus 16 per-channel masked caches",
+      "Real indexed and linear native diagnostic Draw with original game D3D9 Draw/Present/controller input preserved"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_srcalpha_zero_00602.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "65536 exhaustive sampled D3D9 SRCALPHA/ZERO numeric cases plus Windows source build",
+      "negative_regression": "20 destructive source/OM/draw mutants; subtract and separate-alpha remain fail closed",
+      "component_integration": "Game Draw GetRenderState -> captured blend choice -> native blend cache -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SRCALPHA_ZERO",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SRCALPHA_ZERO"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST: actual menu/vehicle/race parity, gamepad and Quest3/VDXR not tested",
+    "activation_guard_and_fallback": "Diagnostic opt-in OUTRUN_DX11_FIRST_GAME_FRAME=1 only, DX9Ex original Draw/Present/input retained"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_srcalpha_zero_00602.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00602.json",
+    "tools/test_dx11_native_multiply_00598.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Diagnostic opt-in only; no real Quest3/VDXR game/input validation or release"
+  },
+  "next_action": "Independent later DX11 work may continue; current 00602 exact-SHA CI verified. Quest3/VDXR visual/gamepad outcome remains NEED_HMD_TEST.",
+  "validation_bearing_result_sha": "1900c2f7fe247446f47380e8cd3e867d3d02d7eb",
+  "result_sha": "1900c2f7fe247446f47380e8cd3e867d3d02d7eb",
+  "material_commit_sha": "fca94958e1d652d0bbd787d3486ad5b31701d26a",
+  "repair_commits": [
+    "33ed79b5cd204b4a28174ca16ac2c9ea24cf2081",
+    "1900c2f7fe247446f47380e8cd3e867d3d02d7eb"
+  ],
+  "automation_gates": {
+    "backend_conversion_gate": {
+      "id": 38227963330,
+      "status": "SUCCESS",
+      "validate": "SUCCESS",
+      "readiness_smoke": "SUCCESS"
+    },
+    "build": {
+      "id": 38227970912,
+      "status": "SUCCESS"
+    },
+    "dx11_fast_structural_checks": {
+      "id": 38227963430,
+      "status": "SUCCESS"
+    },
+    "openxr_vr_architecture": {
+      "id": 38227970879,
+      "status": "SUCCESS"
+    },
+    "outrun_exe_hud_inspector": {
+      "id": 38227970869,
+      "status": "SUCCESS"
+    }
+  },
+  "failure_repair_summary": "38227415941 00598 global ZERO-factor mutation accidentally targeted newly added SRCALPHA/ZERO; 38227793655 00602 Python loop shadowed C++ source string with float. Scoped multiply OM proof and renamed numeric channel variables without relaxing guards."
+}

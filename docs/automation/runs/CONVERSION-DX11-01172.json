@@ -1,0 +1,189 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01172",
+  "production_id": "CONVERSION-DX11-01172",
+  "event_id": "CONVERSION-DX11-01172-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_2D_DIRTY_GRID_NATIVE_RGB",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "81e562d32cefdf6ac26d73fdab12d73f4d03cc27",
+  "implementation_source_sha": "7c1a5b2c5f50d0654a48672fa739af8209763f80",
+  "validation_bearing_result_sha": "7c1a5b2c5f50d0654a48672fa739af8209763f80",
+  "material_result_sha": "7c1a5b2c5f50d0654a48672fa739af8209763f80",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "controller_runtime_adoption": "UNVERIFIED",
+  "development_time_percentages": "UNMEASURED",
+  "implementation": "2-D original D3D9 dirty member-corner grid rectangle candidate search in existing RAW native D3D11 GPU RGB PRE/POST source-aligned live Present, with full authentic RGNDATA pixel-union/identity and RGB evidence gates; 3x3 grid plus attached-tail positive and missing-center/forged-rcBound/alpha-only compiled C++ negatives. Partial diagnostic only, no native full frame or Quest3 visual claim.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_DRAW",
+      "D3D11_PRE_POST_GPU_RGB",
+      "ORIGINAL_D3D9_2D_DIRTY_UNION",
+      "SOURCE_ALIGNED_RAW_DIAGNOSTIC_PRESENT"
+    ],
+    "batch_components": [
+      "CPP_NATIVE_2D_RGB_SOURCE_CROP",
+      "CPP_SOURCE_ALIGNED_PRESENT_INTEGRATION_EXISTING_CALLER",
+      "COMPILED_CPP_2D_DIRTY_NEGATIVE_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two authentic RGB pixels at diagonally opposite corners of nine original D3D9 16x16 repaint cells retained in one 48x48 exact source-aligned GPU crop despite attached repaint tail.",
+      "negative_regression": "Missing painted centre rejects spanning whole candidate; forged dirty rcBound and RGB-inert alpha-only changes fail closed.",
+      "component_integration": "Existing native_game_raw_visual_diagnostic.hpp alignChanged() consumes revised native_raw_dirty_source_rgb_crop and actual PRE/POST GPU staging RGB; no synthetic full-game output."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "visible_frame_acceptance": "SOURCE_CI_ONLY: opt-in, source-aligned partial native GPU RGB present code and compiled regressions; actual complete game menu/vehicle/race, stereo and Quest3/VDXR runtime UNTESTED",
+    "activation_guard_and_fallback": "Explicit DX11_RAW_VISUAL_DIAGNOSTIC only; original D3D9 backbuffer/source identity, genuine GPU RGB and full dirty union required; DX9Ex/input/FFB/SkyGlow unmodified; DXVK frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_PRE_POST_RGB",
+      "D3D9_AUTHENTIC_DIRTY_UNION",
+      "OPT_IN_SOURCE_ALIGNED_DIAGNOSTIC",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40986554378,
+        "head_sha": "7c1a5b2c5f50d0654a48672fa739af8209763f80",
+        "event": "push",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40986554454,
+        "head_sha": "7c1a5b2c5f50d0654a48672fa739af8209763f80",
+        "event": "push",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40986554358,
+        "head_sha": "7c1a5b2c5f50d0654a48672fa739af8209763f80",
+        "event": "push",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40986554470,
+        "head_sha": "7c1a5b2c5f50d0654a48672fa739af8209763f80",
+        "event": "push",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40986554376,
+        "head_sha": "7c1a5b2c5f50d0654a48672fa739af8209763f80",
+        "event": "push",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_evidence": "Not run on actual OutRun game screen or Quest3/VDXR; no native full-frame or stereo guarantee.",
+    "scoreboard_previous": 2200,
+    "score_change": 1,
+    "scoreboard_new": 2201,
+    "scoreboard_commit": "c1aa837321b77e55aa71ff9c61183bed49d7f29d",
+    "score_formula": "2200 + 1 = 2201; docs-only C6, readback, retry and rollover +0."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_HEAD_81e562d3",
+    "C1_REVIEW": "PASS_2D_GRID_RGB_GAP",
+    "C2_IMPLEMENT": "PASS_CPP_SOURCE_PLUS_REGRESSIONS",
+    "C3_VALIDATE": "PASS_5_PUSH_EXACT_SHA",
+    "C4_COMMIT": "PASS_7c1a5b2c5f50d0654a48672fa739af8209763f80",
+    "C5_PACKAGE": "WINDOWS_BUILD_VERIFIED_NO_HMD_PROOF",
+    "C6_STATE": "PASS_DOC_ONLY"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "SOURCE_BUILD_VERIFIED_PARTIAL_OPT_IN_NATIVE_RGB_DIAGNOSTIC_NOT_FULL_GAME_OR_HMD",
+    "goal": "Retain authentic native D3D11 RGB changes spanning the original game D3D9 dirty grid with exact source pixel coordinates, while refusing inferred dirty coverage and preserving the protected original draw fallback.",
+    "acceptance_items": [
+      {
+        "id": "original_d3d9_grid_gpu_rgb",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live game D3D9 draw native GPU RGB source aligned present",
+        "expected_behavior": "Authentic GPU RGB changes at separate corners of a real D3D9 3x3 repaint grid survive in an exact-source crop with fully verified dirty coverage."
+      },
+      {
+        "id": "grid_holes_forged_bound_alpha_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 dirty-region authentication and fail-closed original Present",
+        "expected_behavior": "Missing painted centre, forged rcBound, and RGB-inert alpha-only changes cannot authorize a falsely covered GPU RGB upload."
+      },
+      {
+        "id": "compiled_grid_crop_regressions",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native source crop C++ and bound-check regression",
+        "expected_behavior": "Compiled native_raw_dual_tile_test.cpp covers authentic grid pixels, attached tail and uncovered-gap negative cases."
+      },
+      {
+        "id": "five_exact_sha_push_gates",
+        "category": "integrated_validation",
+        "behavior_area": "mandatory GitHub Actions exact-SHA integration",
+        "expected_behavior": "Five mandatory push workflows are successful at the original source result SHA; live game desktop and Quest3 validation remain separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "original_d3d9_grid_gpu_rgb": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Build 40986554358 and Backend Conversion Gate 40986554454 success on 7c1a5b2c5f50d0654a48672fa739af8209763f80"
+    },
+    "grid_holes_forged_bound_alpha_fallback": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate 40986554454 successful original source-sha negative regression"
+    },
+    "compiled_grid_crop_regressions": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Build 40986554358 and Backend Conversion Gate 40986554454 successful original source-sha regression"
+    },
+    "five_exact_sha_push_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/backend-conversion-gate.yml",
+        "docs/automation/runs/CONVERSION-DX11-01172.json"
+      ],
+      "validation_command": "Runs 40986554378, 40986554454, 40986554358, 40986554470, 40986554376 verified completed success, all at exact source SHA 7c1a5b2c5f50d0654a48672fa739af8209763f80"
+    }
+  },
+  "score_change": 1,
+  "causal_ci_repair_context": "CONVERSION-DX11-01173 Backend Conversion Gate 40992538469 failed because prior 01172 C6 JSON omitted required live_game_draw_path and feature_contract; 01172 original exact SHA 7c1a5b2c5f50d0654a48672fa739af8209763f80 had five independently re-read successful runs. This metadata repair changes no source, grants no new score, claims no runtime outcome."
+}

@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00933",
+  "production_id": "CONVERSION-DX11-00933",
+  "event_id": "CONVERSION-DX11-00933-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00933",
+  "feature_id": "LIVE_GAME_SM3_RECTANGULAR_MATRIX_FAMILY_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "d0e0e87d8f9cfea44dbda68b6db273b6988b12c7",
+  "validation_bearing_result_sha": "8e2a8f6806cf0c8ebef272b2f5a3e443ce12b402",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "LIVE_GAME_SM3_RECTANGULAR_MATRIX_FAMILY_NATIVE_DRAW",
+    "goal": "Translate game-authored D3D9 SM3 VS/PS M4x4/M4x3/M3x4/M3x3/M3x2 matrix operations with actual D3D9 constant-register rows, physical TEMP liveness and exact GPU HLSL row dots in live D3D11 Draw/DrawIndexed while preserving original game input, FFB and D3D9 rendering fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_matrix_family",
+        "category": "end_to_end_behavior",
+        "behavior_area": "actual_sm3_shader_to_native_d3d11_gpu_draw",
+        "expected_behavior": "All five SM3 matrix forms decode from actual game VS/PS bytecode and reach native D3D11 vertex/pixel shader HLSL with matching row count and vector width, bounded constants and GPU draw bindings."
+      },
+      {
+        "id": "matrix_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "source_register_and_gameplay_fallback",
+        "expected_behavior": "Unwritten TEMP components, nonexistent destination lanes, missing/misdeclared matrix constant rows and unsupported dimensions reject without altering original D3D9/DX9Ex Draw, gamepad or FFB."
+      },
+      {
+        "id": "exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_draw_shader_and_game_fallback_compilation",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Win32 Build, OpenXR and HUD Inspector all complete SUCCESS on the same validation-bearing code SHA; runtime requires a separate Quest3/VDXR real game session."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "Decode D3D9 game-created SM3 VS/PS M4x4/M4x3/M3x4/M3x3/M3x2 and actual physical source vector widths",
+      "Bind real D3D9 constant rows, enforce TEMP read masks, emit native DX11 matrix dot HLSL and shader objects",
+      "Use existing live D3D11 Draw/DrawIndexed and original D3D9/FFB fallback; whole game frame/hardware acceptance separate"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+      "tools/dx11_sm3_constant_codegen_probe.cpp",
+      "tools/test_dx11_live_sm3_draw_00925.py",
+      "tools/verify_dx11_source_graph.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source-generated five matrix ops with live D3D9 c rows, native HLSL rows, native VS/PS binding; Win32 Build and all five Actions succeed on one exact SHA.",
+      "negative_regression": "Matrix dimensions, missing constant rows, unwritten TEMP components and out-of-range destination masks reject; CI static graph exact V7 provenance check preserved.",
+      "component_integration": "D3D9 SM3 game Draw/DrawIndexed interception -> shader bytecode operand decoder -> native GPU HLSL materialization -> native shader/object and live game draw, original D3D9 fall-back retained."
+    },
+    "conflict_keys": [
+      "DX11:SM3_NATIVE_SHADER_TRANSLATION:MATRIX_FAMILY:00933"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native game Draw count and full menu/car/race output UNTESTED; exact-SHA source/build success is not real game evidence.",
+    "activation_guard_and_fallback": "Native full-frame opt-in; D3D9Ex game render/input/FFB authoritative fallback; DXVK frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+    "tools/dx11_sm3_constant_codegen_probe.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub SSOT branch HEAD 4f4c13e0, 00932 complete, no 00933 run record; DX11 ownership scoped to independent SM3 matrix family.",
+    "C1_REVIEW": "Live SM3 translator and c-register HLSL emitter covered M4x4/M3x3 only; original D3D9 instruction decoder already recognized M4x3/M3x4/M3x2.",
+    "C2_IMPLEMENT": "Implemented 5-op rectangular matrix family, row/vector-width c-register/HLSL dot and TEMP-liveness admission in native game GPU shader source plus positive/negative tests.",
+    "C3_VALIDATE": "Initial material d0e0e87d failed exact-V6 R283 source graph check; repaired same TASK verifier to validate V7 matrix/provenance source markers. Validation-bearing 8e2a8f68 mandatory Actions 5/5 SUCCESS, real gameplay/HMD UNTESTED.",
+    "C4_COMMIT": "material d0e0e87d8f9cfea44dbda68b6db273b6988b12c7; same TASK source-policy repair/validation 8e2a8f6806cf0c8ebef272b2f5a3e443ce12b402",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "SOURCE_BUILD_VERIFIED, EXACT_SHA_5_OF_5, RUNTIME_VALIDATION=UNTESTED"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Native matrix family compiles; actual native menu/car/race draw and published full-frame evidence still not observed in this task.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "8e2a8f6806cf0c8ebef272b2f5a3e443ce12b402",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue remaining coherent game programmable shader/source integration blockers, obtain actual game-created Draw/DrawIndexed and visible menu/vehicle/race frame counters and Quest3/VDXR parity without DX9Ex/FFB or DXVK changes.",
+  "acceptance_results": {
+    "native_matrix_family": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "matrix_fail_closed": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "exact_sha_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED",
+    "exact_sha": "8e2a8f6806cf0c8ebef272b2f5a3e443ce12b402",
+    "ci_status": "PASS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "exact_sha_workflow_runs": {
+      "fast": {
+        "run_id": 39163214411,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39163214406,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39163214417,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39163220502,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39163220532,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  },
+  "score_policy": "00933 one independent source integration feature; V7 verifier repair, CI and C6 are part of same performance, not independently scored."
+}

@@ -34,6 +34,7 @@
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
+#include "runtime/native_direct_stereo_pair.hpp"
 #include "vr/ipc/cadence_v1.hpp"
 
 #ifndef OUTRUN_VR_BUILD_SHA
@@ -113,6 +114,7 @@ namespace
         return slot < OutRunVR::RenderFrameRingSize &&
             generation != 0 &&
             leftHandle != 0 && rightHandle != 0 &&
+            leftHandle != rightHandle &&
             width != 0 && height != 0 &&
             width == frame.backbufferWidth &&
             height == frame.backbufferHeight;
@@ -374,17 +376,31 @@ namespace
         D3D11_TEXTURE2D_DESC right{};
         c.directLeft_[slot]->GetDesc(&left);
         c.directRight_[slot]->GetDesc(&right);
-        if (!left.Width || !left.Height || left.Width != right.Width ||
-            left.Height != right.Height || left.MipLevels != right.MipLevels ||
-            left.ArraySize != right.ArraySize || left.Format != right.Format ||
-            left.SampleDesc.Count != 1 || right.SampleDesc.Count != 1 ||
-            left.Width != frame.backbufferWidth ||
-            left.Height != frame.backbufferHeight)
+        // Re-check before the actual GPU CopyResource + OpenXR eye projection:
+        // a changed transport generation or an aliased eye cannot reach HMD.
+        if (!OutRunVrNativeEyePair::TextureOwnedByDevice(
+                c.directLeft_[slot], c.device_) ||
+            !OutRunVrNativeEyePair::TextureOwnedByDevice(
+                c.directRight_[slot], c.device_) ||
+            !OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+                c.directLeft_[slot], c.directRight_[slot], IID_IUnknown) ||
+            !OutRunVrNativeEyePair::Compatible(
+                frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex],
+                frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex],
+                generation, frame.backbufferWidth, frame.backbufferHeight,
+                left, right))
             return false;
 
         const bool recreate =
             !R23DirectHold.eye[0] || !R23DirectHold.eye[1] ||
             !R23DirectHold.srv[0] || !R23DirectHold.srv[1] ||
+            // Global R23 hold textures survive compositor replacement. Copying
+            // old device resources on a newly constructed OpenXR context is
+            // invalid even if the new game backbuffer has identical geometry.
+            !OutRunVrNativeEyePair::TextureOwnedByDevice(
+                R23DirectHold.eye[0], c.device_) ||
+            !OutRunVrNativeEyePair::TextureOwnedByDevice(
+                R23DirectHold.eye[1], c.device_) ||
             R23DirectHold.width != left.Width ||
             R23DirectHold.height != left.Height ||
             R23DirectHold.mipLevels != left.MipLevels ||
@@ -422,8 +438,14 @@ namespace
         // Immediate-context ordering guarantees that both copies execute before
         // the following projection draw samples this host-owned pair. The R32
         // EVENT fence then covers the copy + projection work before producer ACK.
-        c.context_->CopyResource(R23DirectHold.eye[0], c.directLeft_[slot]);
-        c.context_->CopyResource(R23DirectHold.eye[1], c.directRight_[slot]);
+        if (!OutRunVrNativeEyePair::CopyDirectEyesToHold<IUnknown>(
+                c.context_, c.device_, R23DirectHold.eye[0],
+                R23DirectHold.eye[1], c.directLeft_[slot],
+                c.directRight_[slot], IID_IUnknown))
+        {
+            R23InvalidateDirectHold();
+            return false;
+        }
         R23DirectHold.frameId = frame.frameId;
         R23DirectHold.generation = generation;
         R23DirectHold.valid = true;
@@ -504,6 +526,8 @@ namespace
             rgb[0] = p[0] / 255.0f; rgb[1] = p[1] / 255.0f; rgb[2] = p[2] / 255.0f;
             return true;
         }
+        if (format == DXGI_FORMAT_R10G10B10A2_UNORM)
+            return OutRunVrNativeEyePair::DecodeR10G10B10A2Rgb(p, rgb);
         if (format == DXGI_FORMAT_R16G16B16A16_FLOAT)
         {
             const auto* h = reinterpret_cast<const std::uint16_t*>(p);
@@ -1036,7 +1060,11 @@ namespace
         const OutRunVR::SharedRenderFrameState& before)
     {
         OutRunVR::SharedRenderFrameState after{};
-        return reader.ReadFrame(before.frameId, after) &&
+        return reader.ReadFrame(
+            before.frameId, after,
+            (before.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0
+                ? before.reserved[OutRunVR::RenderFrameDirectGenerationIndex]
+                : 0u) &&
             (after.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
             after.sequence == before.sequence &&
             after.clientPid == before.clientPid &&
@@ -1163,17 +1191,36 @@ namespace
         return true;
     }
 
+    // The built R23 host uses its own GPU hold eye pair. The legacy
+    // StereoCompositor::HasStereoSource() checks directSnapshot SRVs, which
+    // the R23 commit path deliberately never fills. That drops complete
+    // native game eyes before XR projection. Route by real R23 ownership.
+    [[nodiscard]] OutRunVrNativeEyePair::StereoSourceRoute
+    R23ProductionStereoSource(const StereoCompositor& c) noexcept
+    {
+        return OutRunVrNativeEyePair::ChooseStereoSource(
+            c.directFrameValid_ && R23DirectHold.valid,
+            R23DirectHold.srv[0] != nullptr &&
+                OutRunVrNativeEyePair::TextureOwnedByDevice(
+                    R23DirectHold.eye[0], c.device_),
+            R23DirectHold.srv[1] != nullptr &&
+                OutRunVrNativeEyePair::TextureOwnedByDevice(
+                    R23DirectHold.eye[1], c.device_),
+            c.stereoSourceValid_, c.stereoSourceSrv_ != nullptr);
+    }
+
     bool R23RenderProjection(StereoCompositor& c,
         const std::array<XrView, 2>& views,
         std::array<XrCompositionLayerProjectionView, 2>& pv)
     {
         R23Pixels.TryConsume(c.context_);
-        if (!c.HasStereoSource()) return false;
+        const auto sourceRoute = R23ProductionStereoSource(c);
+        if (sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::None)
+            return false;
         UvRect eyes[2]{};
         ID3D11ShaderResourceView* srv[2]{};
         DXGI_FORMAT fmt[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
-        if (c.directFrameValid_ && R23DirectHold.valid &&
-            R23DirectHold.srv[0] && R23DirectHold.srv[1])
+        if (sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu)
         {
             eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
             srv[0] = R23DirectHold.srv[0];
@@ -1191,11 +1238,48 @@ namespace
         }
 
         std::uint32_t image = 0;
-        c.Acquire(c.projection_, image);
-        bool ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
-            c.projection_.height, eyes[0], srv[0], fmt[0]);
-        ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
-            c.projection_.height, eyes[1], srv[1], fmt[1]) && ok;
+        if (!c.Acquire(c.projection_, image, 2u)) return false;
+        // Explicit opt-in: transport-proven native L/R game frames can bypass
+        // a second full-screen shader blit when the XR array has the EXACT
+        // extent/UNORM color space. DirectGPU identities were validated at
+        // import and the hold pair is owned by this same D3D11 device.
+        // Never reinterpret HDR/sRGB, resample an unmatched size, or turn
+        // the classic SBS texture into duplicated mono VR eyes.
+        static const bool nativeEyeCopyOptIn = [] {
+            const char* value = std::getenv("OUTRUN_VR_NATIVE_XR_EYE_COPY");
+            return value && std::strcmp(value, "1") == 0;
+        }();
+        bool directEyeCopied = false;
+        if (image < c.projection_.images.size() &&
+            c.projection_.images[image].texture) {
+            ID3D11Texture2D* xrTarget = c.projection_.images[image].texture;
+            // Execute the exact GPU two-eye transfer only for the currently
+            // selected native game source. During a device recreation the
+            // fallback may be ClassicSbs even though old direct hold data
+            // still exists; never copy that stale pair into an XR projection.
+            directEyeCopied =
+                OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                    c.context_, c.device_, R23DirectHold.eye[0],
+                    R23DirectHold.eye[1], xrTarget, nativeEyeCopyOptIn,
+                    sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu,
+                    c.directFrameValid_ && R23DirectHold.valid, IID_IUnknown);
+            if (directEyeCopied) {
+                static bool logged = false;
+                if (!logged) {
+                    std::cout << "Native DirectGPU L/R -> OpenXR array-slice GPU copy active; Quest3 parity UNTESTED.\\n";
+                    logged = true;
+                }
+            }
+        }
+        // Default path and every unsupported native frame keep the original
+        // shader color-space conversion, stereo SBS and original game inputs.
+        bool ok = directEyeCopied;
+        if (!directEyeCopied) {
+            ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
+                c.projection_.height, eyes[0], srv[0], fmt[0]);
+            ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
+                c.projection_.height, eyes[1], srv[1], fmt[1]) && ok;
+        }
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
         if (!ok) return false;
@@ -1221,9 +1305,16 @@ namespace
         std::array<XrCompositionLayerProjectionView, 2>& pv)
     {
         R23Pixels.TryConsume(c.context_);
-        if (!c.haveFrame_ || !c.sourceSrv_) return false;
-        UvRect whole{};
-        if (!c.GetGameUv(whole)) return false;
+        // Native menu/race DirectGPU source does not require D3D9 readback.
+        // Selection checks both committed eye holds against the live device.
+        const auto flatRoute = OutRunVrNativeEyePair::ChooseFlatPresentationSource(
+            R23ProductionStereoSource(c), c.haveFrame_ && c.sourceSrv_);
+        if (flatRoute == OutRunVrNativeEyePair::StereoSourceRoute::None)
+            return false;
+        const bool nativePair =
+            flatRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu;
+        UvRect whole{0.f, 0.f, 1.f, 1.f};
+        if (!nativePair && !c.GetGameUv(whole)) return false;
 
         XrFovf commonFov{};
         commonFov.angleLeft = 0.5f *
@@ -1247,10 +1338,13 @@ namespace
 
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
-        const float sourceAspect = (cr.bottom > cr.top)
-            ? static_cast<float>(cr.right - cr.left) /
-                static_cast<float>(cr.bottom - cr.top)
-            : 16.0f / 9.0f;
+        const float sourceAspect = nativePair
+            ? static_cast<float>(R23DirectHold.width) /
+                static_cast<float>(R23DirectHold.height)
+            : (cr.bottom > cr.top)
+                ? static_cast<float>(cr.right - cr.left) /
+                    static_cast<float>(cr.bottom - cr.top)
+                : 16.0f / 9.0f;
         const float fovAspect = spanX / spanY;
         if (!std::isfinite(sourceAspect) || !std::isfinite(fovAspect) ||
             sourceAspect <= 0.1f || fovAspect <= 0.1f)
@@ -1277,14 +1371,16 @@ namespace
         }
 
         std::uint32_t image = 0;
-        c.Acquire(c.projection_, image);
-        bool ok = image < c.projection_.rtvs.size();
+        if (!c.Acquire(c.projection_, image, 2u)) return false;
+        bool ok = true;
         for (int eye = 0; eye < 2 && ok; ++eye)
         {
             ok = c.RenderMenuPlaneTo(
                 c.projection_.rtvs[image][eye],
                 c.projection_.width, c.projection_.height,
-                whole, c.sourceSrv_, c.sourceFormat_, clip);
+                whole,
+                nativePair ? R23DirectHold.srv[eye] : c.sourceSrv_,
+                nativePair ? R23DirectHold.format : c.sourceFormat_, clip);
         }
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
@@ -1314,18 +1410,27 @@ namespace
         bool sourceIsSbs)
     {
         R23Pixels.TryConsume(c.context_);
-        if (!c.haveFrame_ || !c.sourceSrv_) return false;
-        UvRect whole{};
-        if (!c.GetGameUv(whole)) return false;
+        const auto flatRoute = OutRunVrNativeEyePair::ChooseFlatPresentationSource(
+            R23ProductionStereoSource(c), c.haveFrame_ && c.sourceSrv_);
+        if (flatRoute == OutRunVrNativeEyePair::StereoSourceRoute::None)
+            return false;
+        const bool nativePair =
+            flatRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu;
+        UvRect whole{0.f, 0.f, 1.f, 1.f};
+        if (!nativePair && !c.GetGameUv(whole)) return false;
         UvRect theaterUv = whole;
-        if (sourceIsSbs)
+        const bool cropSbs = OutRunVrNativeEyePair::FlatPresentationNeedsSbsCrop(
+            flatRoute, sourceIsSbs);
+        if (cropSbs)
             theaterUv.w *= 0.5f;
         if (theaterUv.w <= 0.0f)
             return false;
         std::uint32_t image = 0;
-        c.Acquire(c.theater_, image);
+        if (!c.Acquire(c.theater_, image, 1u)) return false;
         const bool ok = c.RenderTo(c.theater_.rtvs[image][0], c.theater_.width,
-            c.theater_.height, theaterUv, c.sourceSrv_, c.sourceFormat_);
+            c.theater_.height, theaterUv,
+            nativePair ? R23DirectHold.srv[0] : c.sourceSrv_,
+            nativePair ? R23DirectHold.format : c.sourceFormat_);
         if (ok) R23Pixels.ScheduleTheater(c, image);
         c.Release(c.theater_);
         if (!ok || !c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)) return false;
@@ -1340,11 +1445,14 @@ namespace
             static_cast<int32_t>(c.theater_.width), static_cast<int32_t>(c.theater_.height) };
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
-        const float aspect = (cr.bottom > cr.top)
-            ? (static_cast<float>(cr.right - cr.left) /
-                static_cast<float>(cr.bottom - cr.top)) *
-                (sourceIsSbs ? 0.5f : 1.0f)
-            : 16.f / 9.f;
+        const float aspect = nativePair
+            ? static_cast<float>(R23DirectHold.width) /
+                static_cast<float>(R23DirectHold.height)
+            : (cr.bottom > cr.top)
+                ? (static_cast<float>(cr.right - cr.left) /
+                    static_cast<float>(cr.bottom - cr.top)) *
+                    (cropSbs ? 0.5f : 1.0f)
+                : 16.f / 9.f;
         quad.size.width = 2.f;
         quad.size.height = 2.f / aspect;
         return true;
@@ -2043,6 +2151,7 @@ int main(int argc, char** argv)
         std::array<XrView, 2> matchedViews{};
         bool matchedStereoValid = false;
         std::uint32_t lastProcessedStereoFrame = 0;
+        std::uint32_t lastProcessedDirectGeneration = 0;
         ULONGLONG lastStereoMatchMs = 0;
         std::array<XrCompositionLayerProjectionView, 2>
             cachedProjectionViews{};
@@ -2118,6 +2227,7 @@ int main(int argc, char** argv)
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
                         if (renderFrames.Read(rf)) lastProcessedStereoFrame = rf.frameId;
+                         lastProcessedDirectGeneration = 0;
                     }
                     else if (state == XR_SESSION_STATE_EXITING || state == XR_SESSION_STATE_LOSS_PENDING)
                         quit = true;
@@ -2163,6 +2273,7 @@ int main(int argc, char** argv)
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
+                lastProcessedDirectGeneration = 0;
                 pendingReferenceSpaceChange = false; pendingReferenceSpaceChangeTime = 0;
             }
 
@@ -2251,6 +2362,7 @@ int main(int argc, char** argv)
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
+                lastProcessedDirectGeneration = 0;
                 if (presentation != OutRunVR::PresentationGameplay)
                 {
                     cachedProjectionValid = false;
@@ -2320,6 +2432,22 @@ int main(int argc, char** argv)
                     // being sampled by D3D11 are immediately per-slot ACKed so
                     // the producer can recycle them; the selected frame keeps
                     // R32's GPU EVENT completion ACK.
+                    constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
+                        OutRunVR::RenderFrameWorldStereo | OutRunVR::RenderFrameDrawDuplicated |
+                        OutRunVR::RenderFrameEffectivePoseValid;
+                    const auto completeDirectFrame =
+                        [&](const OutRunVR::SharedRenderFrameState& frame) noexcept {
+                            return OutRunVrNativeEyePair::NativeDirectFrameSelectable(
+                                frame.frameId,
+                                frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex],
+                                frame.reserved[OutRunVR::RenderFrameDirectSlotIndex],
+                                OutRunVR::RenderFrameRingSize,
+                                frame.sourcePoseSequence, frame.flags, need,
+                                frame.state == OutRunVR::StereoSbsActive,
+                                (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0u,
+                                (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0u);
+                        };
+
                     if (directTransportOnly)
                     {
                         std::array<OutRunVR::SharedRenderFrameState,
@@ -2331,22 +2459,25 @@ int main(int argc, char** argv)
                         {
                             std::uint32_t currentGeneration = 0;
                             std::uint32_t newestDirectFrame = 0;
+                            std::int64_t newestDirectQpc = 0;
                             bool haveCurrentGeneration = false;
                             for (std::size_t i = 0; i < historyCount; ++i)
                             {
                                 const auto& frame = history[i];
                                 const std::uint32_t generation =
                                     frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                if (!frame.frameId || !generation ||
-                                    frame.state != OutRunVR::StereoSbsActive ||
-                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                                // Do not elect a newer frame whose game eye
+                                // pair or latched pose is incomplete.
+                                if (!completeDirectFrame(frame))
                                     continue;
                                 if (!haveCurrentGeneration ||
-                                    R37FrameIdBefore(
-                                        newestDirectFrame, frame.frameId))
+                                    OutRunVrNativeEyePair::PreferNativeDirectFrame(
+                                        generation, frame.frameId, frame.presentQpc,
+                                        currentGeneration, newestDirectFrame,
+                                        newestDirectQpc))
                                 {
                                     newestDirectFrame = frame.frameId;
+                                    newestDirectQpc = frame.presentQpc;
                                     currentGeneration = generation;
                                     haveCurrentGeneration = true;
                                 }
@@ -2355,27 +2486,22 @@ int main(int argc, char** argv)
                             for (std::size_t i = 0; i < historyCount; ++i)
                             {
                                 const auto& frame = history[i];
-                                const std::uint32_t slot =
-                                    frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
                                 const std::uint32_t generation =
                                     frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                if (!frame.frameId ||
-                                    (lastProcessedStereoFrame != 0 &&
-                                     !R37FrameIdBefore(
-                                         lastProcessedStereoFrame,
-                                         frame.frameId)) ||
-                                    frame.state != OutRunVR::StereoSbsActive ||
-                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
-                                    slot >= OutRunVR::RenderFrameRingSize ||
-                                    generation == 0 ||
+                                if (!completeDirectFrame(frame) ||
+                                    OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(
+                                        generation, frame.frameId,
+                                        lastProcessedDirectGeneration,
+                                        lastProcessedStereoFrame) ||
                                     !haveCurrentGeneration ||
                                     generation != currentGeneration)
                                     continue;
 
                                 if (!foundDirect ||
-                                    R37FrameIdBefore(
-                                        selectedDirect.frameId, frame.frameId))
+                                    OutRunVrNativeEyePair::PreferNativeDirectFrame(
+                                        generation, frame.frameId, frame.presentQpc,
+                                        currentGeneration, selectedDirect.frameId,
+                                        selectedDirect.presentQpc))
                                 {
                                     selectedDirect = frame;
                                     foundDirect = true;
@@ -2391,16 +2517,15 @@ int main(int argc, char** argv)
                                         frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
                                     const std::uint32_t generation =
                                         frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                    if (!frame.frameId ||
+                                    // Only older fully published stereo frames
+                                    // may be skipped/ACKed without a host copy.
+                                    // Unfinished newer frames remain un-ACKed.
+                                    if (!completeDirectFrame(frame) ||
                                         frame.frameId == selectedDirect.frameId ||
-                                        (lastProcessedStereoFrame != 0 &&
-                                         !R37FrameIdBefore(
-                                             lastProcessedStereoFrame,
-                                             frame.frameId)) ||
-                                        frame.state != OutRunVR::StereoSbsActive ||
-                                        (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                        (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
-                                        slot >= OutRunVR::RenderFrameRingSize ||
+                                        OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(
+                                            generation, frame.frameId,
+                                            lastProcessedDirectGeneration,
+                                            lastProcessedStereoFrame) ||
                                         generation != currentGeneration)
                                         continue;
 
@@ -2445,9 +2570,13 @@ int main(int argc, char** argv)
                         }
                     }
 
-                    constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
-                        OutRunVR::RenderFrameWorldStereo | OutRunVR::RenderFrameDrawDuplicated |
-                        OutRunVR::RenderFrameEffectivePoseValid;
+                    const bool beforeAlreadyProcessed = have &&
+                        ((before.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0
+                            ? OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(
+                                before.reserved[OutRunVR::RenderFrameDirectGenerationIndex],
+                                before.frameId, lastProcessedDirectGeneration,
+                                lastProcessedStereoFrame)
+                            : before.frameId == lastProcessedStereoFrame);
                     if (have)
                     {
                         candidateGameFrameId = before.frameId;
@@ -2464,7 +2593,7 @@ int main(int argc, char** argv)
                         candidateRejectReason = "not-sbs-active";
                     else if (!before.frameId)
                         candidateRejectReason = "zero-frame-id";
-                    else if (before.frameId == lastProcessedStereoFrame)
+                    else if (beforeAlreadyProcessed)
                         candidateRejectReason = "already-processed";
                     else if (!before.sourcePoseSequence)
                         candidateRejectReason = "zero-pose-sequence";
@@ -2477,7 +2606,7 @@ int main(int argc, char** argv)
                         (before.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
                         before.state == OutRunVR::StereoSbsActive &&
                         before.frameId &&
-                        before.frameId != lastProcessedStereoFrame &&
+                        !beforeAlreadyProcessed &&
                         before.sourcePoseSequence &&
                         (before.flags & need) == need)
                     {
@@ -2653,7 +2782,8 @@ int main(int argc, char** argv)
                     const bool grace =
                         newStereoCommitted ||
                         (matchedStereoValid &&
-                         compositor.HasStereoSource() &&
+                         R23ProductionStereoSource(compositor) !=
+                             OutRunVrNativeEyePair::StereoSourceRoute::None &&
                          projectionNow >= lastStereoMatchMs &&
                          projectionNow - lastStereoMatchMs <= StereoGraceMs);
                     // T0/R47: while Gameplay remains active, never age
@@ -2721,6 +2851,12 @@ int main(int argc, char** argv)
                             }
                             lastProcessedStereoFrame =
                                 pendingBundleFrame.frameId;
+                            lastProcessedDirectGeneration =
+                                pendingBundleSource ==
+                                    OutRunVrR23VerifiedBundle::SourceKind::DirectGpu
+                                    ? pendingBundleFrame.reserved[
+                                        OutRunVR::RenderFrameDirectGenerationIndex]
+                                    : 0u;
                             lastStereoMatchMs = projectionNow;
                             candidateRejectReason = "displayed-fresh";
                             pendingBundlePublish = false;

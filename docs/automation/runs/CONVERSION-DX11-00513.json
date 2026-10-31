@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00513",
+  "production_id": "CONVERSION-DX11-00513",
+  "event_id": "CONVERSION-DX11-00513-E005",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "0953c54c2cebb22869956548e9f76c3f1fc0e28b",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00513",
+  "work_key": "DX11:R216:D32_FLOAT_DEPTH_EYE_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp:R216",
+    "tools/dx11_linear_buffer_mirror_probe.cpp:R216",
+    "tools/test_dx11_float_depth_eye_r216.py",
+    ".github/workflows/backend-conversion-gate.yml:R216",
+    "tools/test_dx11_sealed_opaque_eye_r215.py:scope"
+  ],
+  "status": "BLOCKED_INDEPENDENT_R175_GATE",
+  "checkpoint": "C6_STATE",
+  "summary": "R216 typed writable dedicated D32_FLOAT native linear depth-eye C++ preflight, static mutation coverage, D16 negative WARP and restored D32 red-pixel controls. R215 scope bug from R216 additive helper fixed. R216 scoped Gate steps PASS on exact SHA; total Backend Conversion Gate FAIL due separately owned pre-existing R175 TEXCOORD6 shader varying WARP mismatch.",
+  "pipeline": {
+    "C0_RECOVER": "PASS exact branch HEAD/checkpoint E005/old failed Gate recovered, no duplicate source implementation",
+    "C1_REVIEW": "PASS failure Gate 38019672062 R215 mutation scope vs R216 additive helper; R175 separate recurring blocker identified",
+    "C2_IMPLEMENT": "PASS R216 source 0953c54c (C++ + focused static + WARP) and test-scope fix 3647e5d8 (do not repeat)",
+    "C3_VALIDATE": "R216_SCOPED_PASS (R215/R216 static checks, R183 linear VB/IB mirror WARP), entire exact-SHA Gate FAILURE due R175 independently owned TEXCOORD6 shader varying mismatch",
+    "C4_COMMIT": "PASS validation-bearing material 3647e5d82dc7103d32570f64818aec0eecef455b with exact [AUTO:CONVERSION-DX11-00513] marker; C6 bookkeeping separate",
+    "C5_PACKAGE": "NOT_REQUIRED dormant native readiness; no HMD or runtime promotion",
+    "C6_STATE": "PASS durable blocked-state run record with exact material+validation SHA and CI evidence"
+  },
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "implementation_sha": "0953c54c2cebb22869956548e9f76c3f1fc0e28b",
+  "material_result_sha": "3647e5d82dc7103d32570f64818aec0eecef455b",
+  "validation_bearing_result_sha": "3647e5d82dc7103d32570f64818aec0eecef455b",
+  "result_sha": "3647e5d82dc7103d32570f64818aec0eecef455b",
+  "validation_run_id": 38020216016,
+  "validation_job_id": 114119343904,
+  "readiness_smoke_job_id": 114120381816,
+  "blockers": [
+    "Backend Conversion Gate R175_GENERIC_VARYING_MISMATCH; independently owned by prior CONVERSION-DX11-00477 work_key; do not overwrite foreign owner",
+    "Quest3/VDXR real game/HMD runtime UNTESTED; no promotion"
+  ],
+  "evidence": {
+    "initial_failed_run_id": 38019672062,
+    "initial_failed_sha": "0953c54c2cebb22869956548e9f76c3f1fc0e28b",
+    "initial_failure": "R215 static mutation escaped due scanner scope including additive R216",
+    "repair_material_sha": "3647e5d82dc7103d32570f64818aec0eecef455b",
+    "canonical_exact_sha_gate_run": 38020216016,
+    "validate": "SUCCESS",
+    "r215_static": "SUCCESS smoke step 34",
+    "r216_static": "SUCCESS smoke step 35",
+    "r216_real_warp": "SUCCESS smoke step 37 DX11 linear VB/IB mirror R183 WARP includes R216 D16/D32 pixel probes",
+    "smoke": "FAILURE at Run DX11 constant buffer probe (step 82)",
+    "r175_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_classification": "R175_GENERIC_VARYING_MISMATCH",
+    "hmd_runtime": "UNTESTED"
+  },
+  "next_action": "Preserve R216 scoped-PASS material and failed canonical Gate; reconcile independently owned R175 under its own controller work_key/lease; next independent DX11 native implementation requires newly allocated nonconflicting task, not retrying completed R216 source. DXVK frozen; DX9Ex unchanged.",
+  "score_change": 0,
+  "score_policy": "No new score while full required Gate failed; retry/rollover and bookkeeping have no independent score.",
+  "completed_at_utc": "2026-10-10T03:30:38Z"
+}

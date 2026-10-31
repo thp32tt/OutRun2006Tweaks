@@ -1,0 +1,108 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00763",
+  "production_id": "CONVERSION-DX11-00763",
+  "event_id": "CONVERSION-DX11-00763-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_FRAME_ALPHA_DEPTH_MASKED_DRAW",
+  "feature_id": "DX11-FULL_FRAME_ALPHA_DEPTH_MASKED_DRAW",
+  "status": "BUILD_VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "1c4c73341015841061bdcfade163204a35f41e16",
+  "source_implementation_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_masked_draw.hpp",
+    "tools/dx11_full_game_masked_draw_00763.cpp",
+    "tools/test_dx11_full_game_masked_draw_00763.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "change_summary": "Admit actual game alpha-only A8 and verified depth-only prepass D3D9 Draw/DrawIndexed in guarded full-resolution native D3D11 batch, retaining channel masks, X8 alpha exclusion, original D3D9 Present/gamepad and all unsupported-state fallback.",
+  "feature_contract": {
+    "feature_id": "DX11-FULL_FRAME_ALPHA_DEPTH_MASKED_DRAW",
+    "goal": "Mirror game-authored RGB-invisible alpha-only menu/vehicle passes and depth-only race prepasses through the contiguous full-size native D3D11 Draw/DrawIndexed and same-Present pipeline, preserving exact D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "game-alpha-depth-real-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_game_masked_draw_to_native_om_dsv",
+        "expected_behavior": "Full native A8 alpha-only and depth-write-only game draws retain source ordinals and OM/DSV writes through Draw and DrawIndexed."
+      },
+      {
+        "id": "unsafe-mask-original-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_gamepad_present_and_original_draw_fallback",
+        "expected_behavior": "Diagnostic inset, unsupported mask bits, X8 alpha-only without depth writes and zero-effect passes remain original D3D9-only; gamepad unchanged."
+      },
+      {
+        "id": "five-gates-exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_windows_openxr_hud_ci",
+        "expected_behavior": "Source-bearing result SHA is validated by DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD inspector, with real Quest3 separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game-alpha-depth-real-draw": "PENDING",
+    "unsafe-mask-original-input-fallback": "PENDING",
+    "five-gates-exact-sha": "PENDING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_ALPHA_DEPTH_MASKED_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "DX9EX_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Game-authored alpha/depth source admission plus preserved real native Draw/DrawIndexed output and same-Present guarded full frame, exact SHA source/CI; HMD/menu/race game observations not yet performed.",
+    "activation_guard_and_fallback": "Only explicit OUTRUN_DX11_FIRST_GAME_FRAME and OUTRUN_DX11_FULL_GAME_FRAME opt-in; unsupported source states never alter D3D9 Draw HRESULT, Present or controller input.",
+    "integration_path": [
+      "Read actual D3D9 COLORWRITEENABLE and validated depth/target format per live game Draw",
+      "Admit A8 alpha-only and actual native DSV-writing passes through existing masked D3D11 OM and Draw/DrawIndexed",
+      "Preserve same-Present full frame publishing with original D3D9 and gamepad fallback"
+    ],
+    "batch_components": [
+      "Live D3D9 render-state/alpha/depth source eligibility and D3D11 effective mask binding",
+      "Source batch Draw+DrawIndexed and OM/DSV zero-channel handling",
+      "Portable C++ positive/negative integration probe, destructive Python source test and required CI wiring"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable compiled alpha-only A8 and no-color depth-write admission plus continuous game source Draw/DrawIndexed batch.",
+      "negative_regression": "Inset, X8 unobservable alpha, zero-effect/depth-read-only, high unknown bits and unsupported D3D9 states continue fallback.",
+      "component_integration": "D3D9 color-write/depth state to A8 native OM masked blend and depth DSV to real native Draw/DrawIndexed to same-Present D3D9 upload."
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_ALPHA_DEPTH_MASKED_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read authenticated GitHub branch HEAD and earlier 00762 completed nonoverlapping color-Clear implementation.",
+    "C1_REVIEW": "Real game RGB-invisible A8 alpha and depth-writing prepasses were rejected before native Draw/DrawIndexed, aborting full-size scene continuity.",
+    "C2_IMPLEMENT": "Portable admitted alpha/depth write selector wired into real state capture and post-X8 Draw mask with negative fail-closed.",
+    "C3_VALIDATE": "Portable C++ local compile PASS; exact-SHA Actions pending.",
+    "C4_COMMIT": "Material code/test commit (SHA pending publication).",
+    "C5_PACKAGE": "NOT_REQUIRED until real Quest3/VDXR candidate.",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "evidence": {
+    "runtime_validation": "UNTESTED",
+    "source_only_limit": "No game/HMD visual or gamepad device execution; no production promotion."
+  }
+}

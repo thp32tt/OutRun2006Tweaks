@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00018",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T03:30:21+09:00",
+  "base_sha": "6dfdc93c19f155a0369f38d0fa4ccb573d7a87d1",
+  "code_result_sha": "192cfb9b534e2954c2ce5090e85da70fad75e542",
+  "result_sha": "192cfb9b534e2954c2ce5090e85da70fad75e542",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R80 fail-closed F21 shader readiness and VS/PS bytecode fingerprint evidence gate.",
+  "summary": "Added passive VS/PS query and bytecode fingerprint evidence to the DX11 census. Shader query failures, mixed shader pairs, fixed-function pending samples and programmable pending samples are explicit. ExactSamples now additionally requires shaderTranslationExact; R80 intentionally keeps this false until complete F20 fixed-function emulation or F21 programmable shader translation exists. No native D3D11 draw routing or renderer ownership was enabled.",
+  "evidence": [
+    "VR_BACKEND_100_REVIEW_SET_05 F21 is HIGH_ACTIVATION because shader readiness previously did not participate in ExactSamples.",
+    "R79 already covered explicit declarations and a conservative non-blended FVF subset; forcing FVF blend semantics before shader readiness would couple layout semantics to an unimplemented F21 path.",
+    "Backend Conversion Gate 36464347487 PASS on exact production SHA.",
+    "Build 36464353852 PASS on exact production SHA.",
+    "OpenXR VR architecture 36464353898 PASS across host-x64 and all Win32 comparison jobs.",
+    "HUD Inspector 36464353924 PASS.",
+    "No Quest 3/VDXR or in-game runtime validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Added shader query/introspection classification, GetFunction bytecode version/hash fingerprints, R80 counters/logging and shaderTranslationExact ExactSamples gate."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Added R80 summary/signature compatibility and shader readiness blocker fields to unsupported accounting."
+    },
+    {
+      "path": "tools/test_analyze_dx11_census.py",
+      "result": "Added R80 analyzer regression proving shader pending blocks translation-exact status even when resource/input-layout counters are otherwise clean."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added structural guards for shader observation, counters, deliberate fail-closed shaderTranslationExact state and ExactSamples shader gate."
+    }
+  ],
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "MANAGED_LIFETIME_STATE_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "DECLARATION_AND_CONSERVATIVE_FVF_LAYOUT_READY_BLEND_ENCODINGS_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "OPEN_FIXED_FUNCTION_EMULATION_READINESS",
+    "F21_shader_translation_readiness": "FAIL_CLOSED_FINGERPRINTED_TRANSLATION_NOT_IMPLEMENTED",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_R80_SHADER_GATE_AND_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "reason": "R80 makes shader readiness an explicit fail-closed ExactSamples prerequisite. shaderTranslationExact remains false because complete F20 fixed-function emulation and F21 programmable shader translation are not implemented; Quest 3/OpenXR exact-build parity is also still required."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36464347487,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "192cfb9b534e2954c2ce5090e85da70fad75e542",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10989122164,
+      "artifact_digest": "sha256:6c9411ff2641981353c617726e098956610e0705654b8ed434f2305dd24a8460"
+    },
+    "build": {
+      "run_id": 36464353852,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "192cfb9b534e2954c2ce5090e85da70fad75e542",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 10989087400,
+      "binary_artifact_digest": "sha256:29e456f9929bab7e2cdd49424d806f3e3f523e50958fe993220f0f07e9582427"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36464353898,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "192cfb9b534e2954c2ce5090e85da70fad75e542",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 10989865890,
+      "host_artifact_digest": "sha256:8924f814ad0ca5f14a3faa4a3b10f47c1e4ebe50c413d7f45be6540cb85e345f"
+    },
+    "hud_inspector": {
+      "run_id": 36464353924,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "192cfb9b534e2954c2ce5090e85da70fad75e542",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10988857575,
+      "artifact_digest": "sha256:3d5229ce8343ecd0e32eac67d4e5f5cad125e08c0529c4ef393bfa402d1672fc"
+    },
+    "pc_fast": {
+      "run_id": 36464347592,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5875938079,
+    "validation_comment_id": 5876102675
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. In the next bounded DX11 task, tighten F20 fixed-function texture-stage/sampler coverage and readiness. FVF blend encodings remain fail-closed until their shader semantics are paired with F20/F21. Exact-build Quest 3/VDXR runtime parity remains mandatory before native draw promotion.",
+  "finalized_kst": "2026-09-29T03:30:21+09:00"
+}

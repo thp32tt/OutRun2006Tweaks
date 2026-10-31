@@ -1,0 +1,181 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01132",
+  "production_id": "CONVERSION-DX11-01132",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01132",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:AUTHENTIC_BACKBUFFER_ATTEMPT_BUDGET",
+  "classification": "A_CAUSAL_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "8b76000b46b19c285398310745799807c58f458f",
+  "source_change_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+  "material_result_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+  "validation_bearing_result_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+  "result_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+  "implementation_commits": [
+    "379dd599e1c517a28f0397f1442965c658a31167"
+  ],
+  "gate_registration_commits": [],
+  "bookkeeping_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_source_probe.hpp",
+    "tests/native_raw_source_probe_schedule_test.cpp"
+  ],
+  "implementation_summary": "Preserve up to four authentic native RAW backbuffer candidate Draw attempts after a poisoned real-game D3D9 full source frame: no-op, unshadowed, malformed and foreign RT source Draws advance a saturated sparse probe cursor without spending the native conversion budget. Consume budget only after live RT0/actual D3D9 backbuffer COM identity and original Clear owner validation. Native GPU pixel capture/independent partial tile/fail-closed full frame, DX9Ex input/FFB/fallback unchanged.",
+  "negative_regression": "2400-Draw frame: offscreen source #500 and unshadowed #596 consume zero native attempt budget; authentic backbuffer #692 consumes one; checked 96-Draw COM query cadence, Clear epoch reset, uint64 saturation and Present population reset.",
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40657648170,
+      "event": "push",
+      "head_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40657648138,
+      "event": "push",
+      "head_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 40657648160,
+      "event": "push",
+      "head_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40657658675,
+      "event": "pull_request",
+      "head_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40657648148,
+      "event": "push",
+      "head_sha": "379dd599e1c517a28f0397f1442965c658a31167",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "runtime_evidence": {
+    "real_game_draw_output": "UNTESTED",
+    "visible_native_rgb_pixels": "UNTESTED",
+    "gpu_desktop_frames": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "score_change": 0,
+  "c6_score_change": 0,
+  "score_note": "C6 bookkeeping and same-feature validation carry no independent score. Any new independent source achievement is recorded separately only against GitHub scoreboard SSOT.",
+  "pipeline": {
+    "C0_RECOVER": "PASS pinned base HEAD and 01131 completed",
+    "C1_REVIEW": "PASS observed RAW attempt budget consumed by foreign RT before eligibility",
+    "C2_IMPLEMENT": "PASS C++ source and C++17 regression integrated",
+    "C3_VALIDATE": "PASS five required GitHub Actions exact source SHA",
+    "C4_COMMIT": "PASS non-CI-skipped material commit",
+    "C5_PACKAGE": "Windows Build workflow success; artifact packaging not independently inspected",
+    "C6_STATE": "PASS docs-only run record after final CI, no workflow retrigger"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW",
+      "CANONICAL_BACKBUFFER_SOURCE_IDENTITY",
+      "BOUNDED_NATIVE_D3D11_RAW_DRAW_ATTEMPT",
+      "RAW_GPU_PIXEL_DIAGNOSTIC"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "RAW_PARTIAL_TILE_NOT_FULL_NATIVE_GAME_FRAME"
+    ],
+    "batch_components": [
+      "CPP_BACKBUFFER_IDENTITY_BEFORE_BUDGET",
+      "CPP_SKIP_UNSHADOWED_AND_FOREIGN_RT_GEOMETRY",
+      "CXX17_AUTHENTIC_SOURCE_PROBE_REGRESSION"
+    ],
+    "visible_frame_acceptance": "Verified build of protected opt-in RAW conversion attempt preflight. Real native GPU pixel, complete menu/car/race game frame and Quest3/HMD visibility remain UNTESTED.",
+    "activation_guard_and_fallback": "Source authentic backbuffer RT0 and previous full Clear required, original D3D9 Draw/input/FFB, DX9Ex fallback and protected full native frame path unchanged.",
+    "acceptance_proof": {
+      "positive_probe": "C++17 test authentic backbuffer sample ordinal 692 after invalid candidates at 500 and 596 consumes one of four real native attempts.",
+      "negative_regression": "Offscreen RT, missing source geometry, zero-primitive and malformed topology do not exhaust expensive GPU attempts; saturated ordinal math rejects unsafe overflow.",
+      "component_integration": "Real D3D9 observer performs geometry and COM backbuffer identity preflight before native conversion accounting, source matched with exact-SHA five GitHub Actions Gate PASS on 379dd599e1c517a28f0397f1442965c658a31167."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve authentic backbuffer native RAW GPU conversion opportunities across heavy foreign-target and unavailable-shadow game Draw traffic without changing original renderer or input.",
+    "acceptance_items": [
+      {
+        "id": "authentic_backbuffer_attempt",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 source RT0 and native RAW Draw conversion",
+        "expected_behavior": "Only a real source-owned canonical backbuffer Draw with bounded original mesh geometry consumes the finite native conversion budget."
+      },
+      {
+        "id": "rejected_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign render targets and unavailable source shadows",
+        "expected_behavior": "Offscreen, zero-primitive, malformed and unshadowed game source Draws retain original fallback and cannot exhaust four native backbuffer attempts."
+      },
+      {
+        "id": "source_regression_gates",
+        "category": "integrated_validation",
+        "behavior_area": "C++17 source admission regression and mandatory GitHub Actions",
+        "expected_behavior": "Bounded native scheduling regression and unchanged five exact-SHA build, backend, OpenXR, HUD and structural gates PASS on the original 01132 material SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "authentic_backbuffer_attempt": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_source_probe.hpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 40657648170 at 379dd599e1c517a28f0397f1442965c658a31167: success; real game untested"
+    },
+    "rejected_source_fallback": {
+      "status": "PASS_BUILD",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tests/native_raw_source_probe_schedule_test.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate 40657648138 at 379dd599e1c517a28f0397f1442965c658a31167: success; original DX9Ex path retained"
+    },
+    "source_regression_gates": {
+      "status": "PASS_EXACT_SHA",
+      "runtime_validation": "UNTESTED",
+      "evidence_paths": [
+        "tests/native_raw_source_probe_schedule_test.cpp",
+        "src/vr/d3d11/native_game_raw_source_probe.hpp"
+      ],
+      "validation_command": "Five exact source-SHA GitHub Actions gates at 379dd599e1c517a28f0397f1442965c658a31167 successfully verified for 01132"
+    }
+  },
+  "c6_note": "C6 contract metadata repair only: original 01132 actual material SHA and five gates remain unchanged. This record's missing strategy and acceptance sections blocked later 01133 CI policy; repair does not award new score or claim runtime pixels."
+}

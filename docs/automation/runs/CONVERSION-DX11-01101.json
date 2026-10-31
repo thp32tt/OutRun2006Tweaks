@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01101",
+  "production_id": "CONVERSION-DX11-01101",
+  "event_id": "CONVERSION-DX11-01101-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01101",
+  "classification": "A_LIVE_GAME_PREDRAW_CROPPED_TARGET_STENCIL_COLOR_DEPTH_REPLAY",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:NATIVE_GAME_PREDRAW_CROPPED_TARGET_Z_STENCIL_CLEAR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "source_base_sha": "1d54f633d007aa9294ecd873e574a7c36eade7e0",
+  "source_change_sha": "78f9dbfffdcf27f94cd29e24ad76dabd508fd4d2",
+  "material_result_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+  "validation_bearing_result_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+  "result_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+  "implementation_commits": [
+    "78f9dbfffdcf27f94cd29e24ad76dabd508fd4d2"
+  ],
+  "repair_commits": [
+    "f918875bb1cfa1c82b1343f6877ff6387fd2e94c",
+    "eb2a320126b72332d388a2d6b136af3751adbfe8"
+  ],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_main_stencil_clear.hpp",
+    "tools/dx11_pre_draw_stencil_clear_probe_01101.cpp",
+    "tools/test_dx11_pre_draw_stencil_clear_01101.py",
+    "tools/test_dx11_pre_draw_combined_clear_01100.py",
+    "tools/test_dx11_pre_draw_target_clear_01035.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-01100.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate authentic first-Draw pre-Draw clipped TARGET|STENCIL and TARGET|Z|STENCIL game Clear color/depth paths with canonical main D3D9 Z/S COM proof and source-faithful fallback.",
+    "acceptance_items": [
+      {
+        "id": "game_cropped_stencil_gpu_replay",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_MAIN_COLOR_Z_CLEAR_TO_NATIVE_RTV_DSV",
+        "expected_behavior": "Original game cropped TARGET|STENCIL color and TARGET|Z|STENCIL paired color and Z mutations reproduce native ordered color/depth pixels before first SM3/FVF Draw."
+      },
+      {
+        "id": "main_depth_owner_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "CANONICAL_ZS_COM_OWNER_AND_ORIGINAL_D3D9_FALLBACK",
+        "expected_behavior": "Foreign or mismatched depth identity, non-pristine source ordinal, unsupported rectangles, absent pending Z seed and recording capacity failure retain original D3D9 input/render/FFB without half committing native color/Z."
+      },
+      {
+        "id": "five_mandatory_push_gates",
+        "category": "integrated_validation",
+        "behavior_area": "EXACT_SHA_GITHUB_ACTIONS_BUILD",
+        "expected_behavior": "DX11 Fast, Backend, Build, OpenXR and HUD Inspector push workflows each finish success on one identical integration SHA, without claiming HMD runtime."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "LIVE_D3D9_AUTHENTIC_CROPPED_TARGET_STENCIL_CLEAR",
+      "CANONICAL_MAIN_RT_AND_ZS_COM_PROOF",
+      "STENCIL_DISABLED_NATIVE_DRAW_ADMISSION",
+      "ATOMIC_COLOR_AND_Z_FIRST_NATIVE_GPU_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "D3D9_SUCCESSFUL_CLEAR_HOOK",
+      "CANONICAL_ZS_STENCIL_NEUTRAL_PRE_DRAW_ADMISSION",
+      "NATIVE_PRE_DRAW_RTV_DSV_REPLAY",
+      "COMPILED_PIXELS_AND_OWNER_NEGATIVE_TESTS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01101 C++ pixel probe exercised clipped TARGET|STENCIL-only color and paired TARGET|Z|STENCIL ordered D3D11 replay recorders; DX11 Fast PASS.",
+      "negative_regression": "01101 C++ and static tests prove wrong Z owner, invalid rects, missing epoch/identity fail closed; legacy 01035 and 01100 regression oracles PASS.",
+      "component_integration": "Genuine successful D3D9 Clear -> canonical backbuffer and Z/S COM validation -> stencil-free native admission -> native color-only or atomic color/Z stage -> existing first SM3/FVF Draw replay."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:NATIVE_GAME_PREDRAW_CROPPED_TARGET_Z_STENCIL_CLEAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Real game menu/car/race pixels, exact native draw and publish counters, Quest3 stereo, FPS and gamepad performance remain UNTESTED; exact-SHA build PASS is not gameplay proof.",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains opt-in/fail-closed; original D3D9Ex rendering, input, FFB, SkyGlow and unsupported stencil-dependent Draws authoritative. DXVK frozen."
+  },
+  "acceptance_results": {
+    "game_cropped_stencil_gpu_replay": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_main_stencil_clear.hpp",
+        "tools/dx11_pre_draw_stencil_clear_probe_01101.cpp"
+      ],
+      "validation_command": "DX11 Fast source/static/compiled probe, exact SHA eb2a320126b72332d388a2d6b136af3751adbfe8"
+    },
+    "main_depth_owner_and_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tools/dx11_pre_draw_stencil_clear_probe_01101.cpp",
+        "tools/test_dx11_pre_draw_stencil_clear_01101.py",
+        "tools/test_dx11_pre_draw_combined_clear_01100.py"
+      ],
+      "validation_command": "DX11 Fast original Clear/negative/probe compile PASS, exact SHA eb2a320126b72332d388a2d6b136af3751adbfe8"
+    },
+    "five_mandatory_push_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434376032",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434376005",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434376055",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434375896",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434375857"
+      ],
+      "validation_command": "GitHub five push workflow run ID exact head_sha eb2a320126b72332d388a2d6b136af3751adbfe8"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD 1d54f633.. prior 01100 C6 and no 01101 owner commit",
+    "C1_SCOPE": "PASS canonical main RT and Z/S stencil-neutral source pre-Draw cropped Clear integration",
+    "C2_IMPLEMENT": "PASS source C++ helper/hook/test batch SHA 78f9dbf..",
+    "C3_VALIDATE": "PASS_EXACT_SHA required five push Gates at eb2a320126b72332d388a2d6b136af3751adbfe8",
+    "C4_COMMIT": "PASS implementation 78f9dbf; causal inherited-policy repair f918875; obsolete structural oracle repair eb2a320126b72332d388a2d6b136af3751adbfe8",
+    "C5_PACKAGE": "NOT_REQUIRED no user runtime ZIP requested by auto dispatch",
+    "C6_STATE": "PASS bookkeeping-only after exact SHA five success; no extra CI"
+  },
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40434376032,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434376032"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40434376005,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434376005"
+    },
+    {
+      "name": "Build",
+      "run_id": 40434376055,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434376055"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40434375896,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434375896"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40434375857,
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push",
+      "head_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/40434375857"
+    }
+  ],
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "terminal_gameplay_verified": false,
+  "score_change": 0,
+  "score_note": "C6, retry and CI repair are not independent development scores; scoreboard is separately maintained and counted once only for newly verified source feature.",
+  "c6_bookkeeping_only": true,
+  "c6_source_validation_sha": "eb2a320126b72332d388a2d6b136af3751adbfe8",
+  "c6_does_not_revalidate_source": true,
+  "runtime_note": "Actual game/HMD Quest 3 VDXR menu-to-race output, stereo and FPS UNTESTED; CI BUILD PASS only."
+}

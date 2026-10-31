@@ -1,0 +1,213 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01173",
+  "production_id": "CONVERSION-DX11-01173",
+  "event_id": "CONVERSION-DX11-01173-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:TWO_DISJOINT_AUTHENTIC_NATIVE_RGB_ISLANDS",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_GATE_AND_SOURCE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "3eb4b7582d8a5897db158f4c1607c6fd5b23b23b",
+  "implementation_source_sha": "b4e75f63207d7387d7cbf5d3fb7891f4fb2cebf4",
+  "validation_bearing_result_sha": "9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+  "material_result_sha": "9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "controller_runtime_adoption": "UNVERIFIED",
+  "development_time_percentages": "UNMEASURED",
+  "implementation": "Two genuine, disjoint GPU RGB source-coincident changed islands from a single live game Draw can both be cropped against the original D3D9 dirty union and independently uploaded to their native source screen coordinates. Distinct D3D9 SYSTEMMEM second-upload surface protects queued driver consumption, fixed MSVC variable lifetime, compiled positive/negative crop regressions; opt-in partial RAW diagnostic only. No complete game frame or Quest3 visual proof.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_PRE_POST_RGB",
+      "D3D9_AUTHENTIC_DIRTY_UNION",
+      "TWO_SOURCE_ALIGNED_UPDATE_SURFACES",
+      "OPT_IN_PARTIAL_VISIBLE_OUTPUT"
+    ],
+    "batch_components": [
+      "CPP_GPU_RGB_TWO_ISLAND_PRESENT",
+      "CPP_D3D9_QUEUED_STAGING_LIFETIME",
+      "COMPILED_CPP_POSITIVE_NEGATIVE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two disjoint changed RGB islands from one native GPU source map to two original screen dirty rectangles.",
+      "negative_regression": "No forged dirty coverage, alpha-only upload, overlap or queued mutable source.",
+      "component_integration": "Real-game D3D11 GPU PRE/POST RGB crops feed independent native-source-bound D3D9 SYSTEMMEM UpdateSurface calls under canonical backbuffer and guard."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "visible_frame_acceptance": "BUILD_VERIFIED_OPT_IN_PARTIAL_RAW_ONLY; game desktop menu/vehicle/race full frame and Quest3/VDXR HMD RUNTIME_VALIDATION=UNTESTED",
+    "activation_guard_and_fallback": "Explicit DX11_RAW_VISUAL_DIAGNOSTIC opt-in, canonical D3D9 source/backbuffer and entire RGNDATA plus true GPU RGB gates. D3D9 original Draw/input/FFB/DX9Ex fallback preserved; DXVK frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_PRE_POST_RGB",
+      "D3D9_AUTHENTIC_DIRTY_UNION",
+      "OPT_IN_SOURCE_ALIGNED_DIAGNOSTIC",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40993887309,
+        "head_sha": "9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40993887288,
+        "head_sha": "9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40993887203,
+        "head_sha": "9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40993887326,
+        "head_sha": "9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40993887342,
+        "head_sha": "9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_evidence": "Not tested on OutRun game desktop screen, Quest3 or VDXR; no proof of correct full-frame or live stereo.",
+    "inherited_gate_repair": "01172 legacy task acceptance metadata, cause of 40992538469, repaired at 642cd921; later scope C2065 compiler failure 40992961717 repaired at e11b47ff; queued SYSTEMMEM source lifetime fixed at 9947d3c2.",
+    "scoreboard_previous": 2206,
+    "score_change": 1,
+    "scoreboard_new": 2207,
+    "scoreboard_commit": "5761c0425b58270ac3553a13b82507787eb22785"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_HEAD_SOURCE_B4E75F6",
+    "C1_REVIEW": "PASS_INHERITED_CI_AND_MSVC_SOURCE_SCOPE_CAUSE",
+    "C2_IMPLEMENT": "PASS_CPP_DUAL_RGB_SOURCE_PLUS_STAGING_REPAIR",
+    "C3_VALIDATE": "PASS_5_PUSH_EXACT_SHA_9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+    "C4_COMMIT": "PASS_MATERIAL_9947d3c23e8d722d0f397e9a02796f4bbefdd0e0",
+    "C5_PACKAGE": "WINDOWS_BUILD_VERIFIED_NO_HMD_PROOF",
+    "C6_STATE": "PASS_DOC_ONLY_AFTER_GATE"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "SOURCE_BUILD_VERIFIED_PARTIAL_OPT_IN_NATIVE_GPU_RGB_NOT_FULL_GAME_OR_HMD",
+    "goal": "Present two disjoint authentic RGB islands from one live native game Draw at original D3D9 screen coordinates with independent safe queued SYSTEMMEM uploads, fail-closed dirty-union proof and the original input/render fallback.",
+    "acceptance_items": [
+      {
+        "id": "two_islands_source_rgb",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native game Draw GPU PRE/POST to original D3D9 source pixels",
+        "expected_behavior": "Two genuine non-overlapping source-coincident RGB islands from one immutable native GPU Draw can reach two original dirty Present regions."
+      },
+      {
+        "id": "dirty_union_and_alpha_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "original dirty union identity and RGB validity",
+        "expected_behavior": "Forged dirty bound, missing source overlap, alpha-only changes and overlapping duplicate source crops reject incorrect GPU publication."
+      },
+      {
+        "id": "queued_d3d9_systemmem_lifetime",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 system-memory staging source ownership",
+        "expected_behavior": "Second UpdateSurface uses independent owned staging surface so queued GPU driver consumption cannot read a rewritten first upload source."
+      },
+      {
+        "id": "five_exact_sha_push_gates",
+        "category": "integrated_validation",
+        "behavior_area": "all mandatory DX11 Windows, OpenXR and inspection workflows",
+        "expected_behavior": "Five mandatory push workflows finish successfully at the one exact material source SHA while runtime HMD remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "two_islands_source_rgb": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate 40993887288 success and Build 40993887203 success on 9947d3c23e8d722d0f397e9a02796f4bbefdd0e0"
+    },
+    "dirty_union_and_alpha_fail_closed": {
+      "status": "PASS_SOURCE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate 40993887288 completed success with compiled positive/negative C++ regression"
+    },
+    "queued_d3d9_systemmem_lifetime": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+      ],
+      "validation_command": "Windows Build 40993887203 and Backend Conversion Gate 40993887288 both success at source SHA"
+    },
+    "five_exact_sha_push_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/backend-conversion-gate.yml"
+      ],
+      "validation_command": "Five successful exact-SHA push workflow runs: 40993887309, 40993887288, 40993887203, 40993887326, 40993887342"
+    }
+  },
+  "score_change": 1,
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_ready": "PASS_FEATURE_CI_SOURCE_ONLY",
+  "causal_ci_repair_shas": [
+    "642cd92102b64947dc2a6c8c60eff76f0c326558",
+    "e11b47ffc63695fcd7e4c50478a92c9a9cb2cb60",
+    "9947d3c23e8d722d0f397e9a02796f4bbefdd0e0"
+  ],
+  "causal_ci_repair_files": [
+    "docs/automation/runs/CONVERSION-DX11-01172.json",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp"
+  ],
+  "scoreboard_previous": 2206,
+  "scoreboard_new": 2207,
+  "scoreboard_commit": "5761c0425b58270ac3553a13b82507787eb22785",
+  "score_formula": "Previous confirmed AI2 2206 + distinct source-integrated DX11 feature exact 5/5 Gate +1 = 2207. Retry, inherited 01172 acceptance CI repair, scope fix, same-feature lifetime fix and C6 +0.",
+  "next_unfinished": "Live real game desktop native GPU Draw/pixel evidence; full menu->vehicle->race frame coverage and native L/R Quest3/VDXR remain untested."
+}

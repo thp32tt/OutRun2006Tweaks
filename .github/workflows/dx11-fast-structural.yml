@@ -1,0 +1,708 @@
+name: DX11 Fast Structural Checks
+
+on:
+  push:
+    branches:
+      - vr-dx11-native-r71
+      - feature/dx11-01045-first-full-colorfill-game-frame
+      - feature/dx11-01037-offscreen-postpass-overflow
+      - feature/dx11-01013-visible-game-frame
+      - feature/dx11-01034-live-predraw-fill-overdraw
+      - feature/dx11-00952-live-sm3-device-bool
+      - feature/dx11-00966-live-game-frame
+      - feature/dx11-00970-live-game-rt-frame
+      - feature/dx11-00973-live-cube-rt-game-frame
+      - feature/dx11-00974-live-cube-color-frame
+      - feature/dx11-00975-live-sm3-volume-frame
+    paths:
+      - 'src/vr/d3d11/**'
+      # RAW native source tile C++ assertion fixes must reach exact-SHA CI.
+      - 'tests/native_raw_dual_tile_test.cpp'
+      - '.github/workflows/dx11-fast-structural.yml'
+      - 'src/vr/d3d9/stereo_renderer_r30.cpp'
+      # Both host compositor entry paths use the same native L/R -> XR copy.
+      - 'vrhost/src/main.cpp'
+      - 'vrhost/src/main_r23.cpp'
+      - 'vrhost/src/runtime/native_direct_stereo_pair.hpp'
+      - 'vrhost/tests/native_direct_eye_pair_smoke.cpp'
+      - 'tools/dx11_autodev_policy.py'
+      # The isolated native stereo game producer is linked from the cmkr
+      # manifest, not the generated CMakeLists.txt checked into the tree.
+      - 'cmake.toml'
+      # Native stereo producer contract repairs must trigger a fresh exact-SHA Fast Gate.
+      - 'tools/verify_dx11_native_transport_contract.py'
+      - 'tools/test_dx11_*.py'
+      # Genuine SM3 shader-control C++ regressions must run Fast at their own exact SHA.
+      - 'tools/dx11_sm3_*_probe.cpp'
+      - 'tools/dx11_sm3_*_probe_*.cpp'
+      # Numbered SM3 live-game C++ source fixtures (e.g. indexed fan 01087)
+      # must trigger every exact-SHA Gate after a causal compiler/test repair.
+      - 'tools/dx11_sm3_*_010*.cpp'
+      - 'tools/dx11_pre_draw_*_probe_*.cpp'
+      # Authentic 17..128 source Clear regression must re-run this Gate at the exact repair SHA.
+      - 'tools/dx11_full_clear_resume_probe_00728.cpp'
+      # The real source-span GPU-window regression must retrigger Fast when
+      # either its production boundary probe or checked-in C++ fixture changes.
+      - 'tools/dx11_game_primitive_span_probe.cpp'
+      - 'tests/vr/dx11_live_sm3_native_point_strip_windows.cpp'
+      # RAW same-Present TARGET Clear ownership and per-Present attempt budget
+      # regressions must trigger all required checks at their exact repaired SHA.
+      - 'tests/native_raw_source_probe_schedule_test.cpp'
+      - 'tests/native_raw_gpu_source_epoch_test.cpp'
+      - 'tools/dx11_native_frame_batch_probe.cpp'
+      # The real desktop GPU output restoration probe must trigger exact-SHA Fast.
+      - 'tools/dx11_native_desktop_gpu_output_probe.cpp'
+      - '.github/workflows/dx11-native-transport-isolated.yml'
+      # Source-graph activation verifier revisions also need fresh same-SHA Fast checks.
+      - 'tools/verify_dx11_first_game_frame_boundary.py'
+      # Native eye Draw activation checker and its source-graph entrypoint
+      # must be verified at the exact source+contract repair commit as well.
+      - 'tools/verify_dx11_activation_boundary.py'
+      - 'tools/verify_dx11_source_graph.py'
+      # Stage-1 portable C++ probe changes must re-run the fast exact-SHA gate,
+      # not leave the preceding shader result as the last tested revision.
+      - 'tools/dx11_game_stage1_*probe*.cpp'
+      - 'tools/dx11_live_sm3_packed_model_probe.cpp'
+      - 'tools/dx11_live_sm3_multistream_probe.cpp'
+      - 'src/vr/d3d11/live_game_sm3_stream_assembly.hpp'
+      - 'docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json'
+      # Native desktop launch+packaging changes must re-enter exact-SHA Fast gate.
+      - 'tools/package_dx11_first_game_frame.py'
+      - 'tools/test_package_dx11_first_game_frame.py'
+      - 'docs/automation/runs/CONVERSION-DX11-*.json'
+      # Backend workflow edits must trigger all exact-SHA validation gates.
+      - '.github/workflows/backend-conversion-gate.yml'
+      - '.github/workflows/build.yml'
+      - '.github/workflows/vr-openxr.yml'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
+      - '.github/workflows/dx11-fast-structural.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: dx11-fast-structural-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  fast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Validate DX11 development work allocation
+        run: |
+          python tools/test_dx11_autodev_policy.py
+          python tools/dx11_autodev_policy.py --check-latest
+      - name: Run focused DX11 source-only regression checks
+        run: |
+          # 01138 dual authentic source-native GPU tile capture.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tests/native_raw_dual_tile_test.cpp -o /tmp/dx11_raw_dual_tile && /tmp/dx11_raw_dual_tile
+          # 01137 real FVF fog RAW-only RGB admission; malformed/missing-state fallback.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tests/native_raw_fvf_fog_visual_test.cpp -o /tmp/dx11_raw_fvf_fog && /tmp/dx11_raw_fvf_fog
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_postpass_coverage_00987.cpp -o /tmp/dx11_eye_coverage_00987 && /tmp/dx11_eye_coverage_00987
+          # Source-authored ColorFill -> native stereo GPU fill regression.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_color_fill_01043.cpp -o /tmp/dx11_eye_color_fill_01043 && /tmp/dx11_eye_color_fill_01043
+          python tools/test_dx11_live_full_colorfill_seed_01045.py
+          # 01046 post-Draw full game ColorFill -> new contiguous native color epoch.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_resume_01046.cpp -o /tmp/dx11_full_colorfill_resume_01046 && /tmp/dx11_full_colorfill_resume_01046
+          python tools/test_dx11_full_colorfill_resume_01046.py
+          # 01049 real game pre-Draw source copy feeds SM3/FVF native pixels.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_pre_draw_copy_01049.cpp -o /tmp/dx11_pre_draw_copy_01049 && /tmp/dx11_pre_draw_copy_01049
+          # 01050 original LockRect/GetDC before first native Draw and safe completion.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_predraw_cpu_surface_01050.cpp -o /tmp/dx11_predraw_cpu_01050 && /tmp/dx11_predraw_cpu_01050
+          # 01051 canonical color continuity through foreign game camera fills.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_predraw_colorfill_01051.cpp -o /tmp/dx11_predraw_colorfill_01051 && /tmp/dx11_predraw_colorfill_01051
+          python tools/test_dx11_predraw_colorfill_01051.py
+          # 01052 canonical D3D9 pre-Draw CPU/GDI surface on cold start / Reset.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_cold_predraw_01052.cpp -o /tmp/dx11_cold_predraw_01052 && /tmp/dx11_cold_predraw_01052
+          python tools/test_dx11_cold_predraw_01052.py
+          # 01053 bounded REAL full-backbuffer transfer budget for multiple menu/car/race CPU/GDI copies.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_burst_surface_copy_01053.cpp -o /tmp/dx11_burst_surface_01053 && /tmp/dx11_burst_surface_01053
+          python tools/test_dx11_burst_surface_copy_01053.py
+          # 01056 actual D3D9 GPU tile-source budget + full fallback safety.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_tile_budget_01056.cpp -o /tmp/dx11_tile_budget_01056 && /tmp/dx11_tile_budget_01056
+          python tools/test_dx11_tile_budget_01056.py
+          # 01057 partial original LockRect -> cropped GPU tile, GetDC full fallback.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_cpu_tile_admission_01057.cpp -o /tmp/dx11_cpu_tile_01057 && /tmp/dx11_cpu_tile_01057
+          python tools/test_dx11_cpu_tile_admission_01057.py
+          # 01055: actual source partial post-Draw D3D9 GPU tile readback and whole-frame fallback.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_surface_tile_readback_01055.cpp -o /tmp/dx11_tile_01055 && /tmp/dx11_tile_01055
+          python tools/test_dx11_surface_tile_readback_01055.py
+          # 01048 authentic color overwrite -> full main Z Clear -> native race Draw.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_depth_epoch_recovery_01048.cpp -o /tmp/dx11_depth_epoch_01048 && /tmp/dx11_depth_epoch_01048
+          # 01047 repeated REAL full ColorFill cycles with game Draw/no-op chronology.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_chained_colorfill_epochs_01047.cpp -o /tmp/dx11_chained_colorfill_01047 && /tmp/dx11_chained_colorfill_01047
+          # 01045 original full D3D9 ColorFill -> real game native Draw seed.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_seed_01045.cpp -o /tmp/dx11_seed_01045 && /tmp/dx11_seed_01045
+          # 01044 complete-source ColorFill overwrites & per-eye X8/A8 seeds.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_full_colorfill_epoch_01044.cpp -o /tmp/dx11_full_colorfill_01044 && /tmp/dx11_full_colorfill_01044
+          python tools/test_dx11_native_eye_postpass_coverage_00987.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_postpass_overwrite_00988.cpp -o /tmp/dx11_eye_overwrite_00988 && /tmp/dx11_eye_overwrite_00988
+          python tools/test_dx11_native_eye_postpass_overwrite_00988.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_color_chronology_00989.cpp -o /tmp/dx11_eye_chronology_00989 && /tmp/dx11_eye_chronology_00989
+          python tools/test_dx11_native_eye_color_chronology_00989.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_clear_recovery_00990.cpp -o /tmp/dx11_eye_clear_recovery_00990 && /tmp/dx11_eye_clear_recovery_00990
+          python tools/test_dx11_native_eye_clear_recovery_00990.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_partial_clear_frame_00991.cpp -o /tmp/dx11_eye_mosaic_00991 && /tmp/dx11_eye_mosaic_00991
+          python tools/test_dx11_native_eye_partial_clear_frame_00991.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_camera_safe_composite_00986.cpp -o /tmp/dx11_camera_safe_composite_00986 && /tmp/dx11_camera_safe_composite_00986
+          python tools/test_dx11_game_camera_safe_composite_00986.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_camera_mosaic_postpass_00985.cpp -o /tmp/dx11_camera_mosaic_00985 && /tmp/dx11_camera_mosaic_00985
+          python tools/test_dx11_game_camera_mosaic_postpass_00985.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_camera_compact_postpass_00984.cpp -o /tmp/dx11_camera_compact_00984 && /tmp/dx11_camera_compact_00984
+          python tools/test_dx11_game_camera_compact_postpass_00984.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_offscreen_clear_postpass_00983.cpp -o /tmp/dx11_camera_clear_00983 && /tmp/dx11_camera_clear_00983
+          python tools/test_dx11_game_offscreen_clear_postpass_00983.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_visible_postpass_source_00982.cpp -o /tmp/dx11_visible_postpass_00982 && /tmp/dx11_visible_postpass_00982
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_offscreen_color_coverage_00981.cpp -o /tmp/dx11_camera_coverage_00981 && /tmp/dx11_camera_coverage_00981
+          python tools/test_dx11_game_offscreen_color_coverage_00981.py
+          # 01037: camera GPU writes not recorded due to ledger overflow
+          # must never be accepted as untouched native L/R eye postpass.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_color_overflow_01037.cpp -o /tmp/dx11_camera_overflow_01037 && /tmp/dx11_camera_overflow_01037
+          python tools/test_dx11_game_offscreen_color_overflow_01037.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_arithmetic_codegen_probe.cpp -o /tmp/dx11_sm3_arithmetic && /tmp/dx11_sm3_arithmetic
+          python tools/test_dx11_live_sm3_sampler_swizzle_01014.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_conditional_flow_probe_00946.cpp -o /tmp/dx11_sm3_ifc_00946 && /tmp/dx11_sm3_ifc_00946
+          python tools/test_dx11_sm3_conditional_flow_00946.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_boolean_flow_probe_00947.cpp -o /tmp/dx11_sm3_bool_00947 && /tmp/dx11_sm3_bool_00947
+          python tools/test_dx11_sm3_boolean_flow_00947.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_live_boolean_probe_00952.cpp -o /tmp/dx11_sm3_live_bool_00952 && /tmp/dx11_sm3_live_bool_00952
+          python tools/test_dx11_sm3_live_boolean_00952.py
+          python tools/test_dx11_live_sm3_srgb_output_00967.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_stencil_game_probe_00968.cpp -o /tmp/dx11_live_stencil_00968 && /tmp/dx11_live_stencil_00968
+          python tools/test_dx11_live_stencil_draw_00968.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_fvf_srgb_game_probe_00969.cpp -o /tmp/dx11_live_fvf_srgb_00969 && /tmp/dx11_live_fvf_srgb_00969
+          python tools/test_dx11_live_fvf_srgb_draw_00969.py
+          python tools/test_dx11_backend_artifact_identity_00952.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_repeat_flow_probe_00948.cpp -o /tmp/dx11_sm3_repeat_00948 && /tmp/dx11_sm3_repeat_00948
+          python tools/test_dx11_sm3_repeat_flow_00948.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_break_flow_probe_00949.cpp -o /tmp/dx11_sm3_break_00949 && /tmp/dx11_sm3_break_00949
+          python tools/test_dx11_sm3_break_flow_00949.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_predicate_flow_probe_00950.cpp -o /tmp/dx11_sm3_predicate_00950 && /tmp/dx11_sm3_predicate_00950
+          python tools/test_dx11_sm3_predicate_flow_00950.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_predicated_draw_probe_00951.cpp -o /tmp/dx11_sm3_predicated_00951 && /tmp/dx11_sm3_predicated_00951
+          python tools/test_dx11_sm3_predicated_draw_00951.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_destination_output_probe_00952.cpp -o /tmp/dx11_sm3_output_00952 && /tmp/dx11_sm3_output_00952
+          python tools/test_dx11_sm3_destination_output_00952.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_projective_source_probe_00953.cpp -o /tmp/dx11_sm3_projective_00953 && /tmp/dx11_sm3_projective_00953
+          python tools/test_dx11_sm3_projective_source_00953.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_texture_modifiers_probe_00954.cpp -o /tmp/dx11_sm3_texture_mod_00954 && /tmp/dx11_sm3_texture_mod_00954
+          python tools/test_dx11_sm3_texture_modifiers_00954.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_live_integer_repeat_probe_00955.cpp -o /tmp/dx11_live_int_rep_00955 && /tmp/dx11_live_int_rep_00955
+          python tools/test_dx11_sm3_live_integer_repeat_00955.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_scalar_branch_modifiers_probe_00956.cpp -o /tmp/dx11_branch_mod_00956 && /tmp/dx11_branch_mod_00956
+          python tools/test_dx11_sm3_scalar_branch_modifiers_00956.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_interface_channels_probe_00957.cpp -o /tmp/dx11_sm3_channels_00957 && /tmp/dx11_sm3_channels_00957
+          python tools/test_dx11_sm3_interface_channels_00957.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_loop_index_probe_00958.cpp -o /tmp/dx11_sm3_loop_00958 && /tmp/dx11_sm3_loop_00958
+          python tools/test_dx11_sm3_loop_index_00958.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_dynamic_loop_index_probe_00959.cpp -o /tmp/dx11_sm3_index_00959 && /tmp/dx11_sm3_index_00959
+          python tools/test_dx11_sm3_dynamic_loop_index_00959.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_static_address_probe_00960.cpp -o /tmp/dx11_sm3_addr_00960 && /tmp/dx11_sm3_addr_00960
+          python tools/test_dx11_sm3_static_address_00960.py
+          python tools/test_dx11_sm3_signed_mova_01012.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_relative_matrix_probe_00961.cpp -o /tmp/dx11_sm3_matrix_00961 && /tmp/dx11_sm3_matrix_00961
+          python tools/test_dx11_sm3_relative_matrix_00961.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_dynamic_texture_flow_probe_00962.cpp -o /tmp/dx11_sm3_texflow_00962 && /tmp/dx11_sm3_texflow_00962
+          python tools/test_dx11_sm3_dynamic_texture_flow_00962.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_interface_draw_probe_00964.cpp -o /tmp/dx11_sm3_interface_00964 && /tmp/dx11_sm3_interface_00964
+          python tools/test_dx11_sm3_interface_draw_00964.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_cube_draw_probe_00965.cpp -o /tmp/dx11_sm3_cube_00965 && /tmp/dx11_sm3_cube_00965
+          python tools/test_dx11_sm3_cube_draw_00965.py
+          python tools/test_dx11_live_sm3_blend_factor_00966.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_source_stride_probe_00966.cpp -o /tmp/dx11_game_source_stride_00966 && /tmp/dx11_game_source_stride_00966
+          python tools/test_dx11_live_source_stride_00966.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_alpha_test_probe.cpp -o /tmp/dx11_sm3_alpha && /tmp/dx11_sm3_alpha
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_constant_codegen_probe.cpp -o /tmp/dx11_sm3_constant && /tmp/dx11_sm3_constant
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_packed_model_probe.cpp -o /tmp/dx11_sm3_packed_model && /tmp/dx11_sm3_packed_model
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_multistream_probe.cpp -o /tmp/dx11_sm3_multistream && /tmp/dx11_sm3_multistream
+          python tools/test_dx11_live_sm3_vertex_decl_00929.py
+          python tools/test_dx11_live_sm3_draw_00925.py
+          python tools/test_dx11_linear_predication_r230.py
+          python tools/test_dx11_linear_stream_output_r232.py
+          python tools/test_dx11_linear_buffer_owner_r183.py
+          python tools/test_dx11_stage0_pm_factor_00619.py
+          python tools/test_dx11_stage0_pm_modulate_00620.py
+          python tools/test_dx11_stage0_pm_add_00621.py
+          python tools/test_dx11_stage0_pm_subtract_00622.py
+          python tools/test_dx11_stage0_pm_dual_00623.py
+          python tools/test_dx11_stage0_pm_modulate4x_00624.py
+          python tools/test_dx11_stage0_pm_addsigned_00625.py
+          python tools/test_dx11_stage0_pm_addsigned2x_00626.py
+          python tools/test_dx11_stage0_pm_blendtexturealpha_00627.py
+          python tools/test_dx11_stage0_pm_blenddiffusealpha_00628.py
+          python tools/test_dx11_stage0_pm_blendfactoralpha_00629.py
+          python tools/test_dx11_stage0_pm_factor_arg2_00630.py
+          python tools/test_dx11_stage0_pm_diffuse_arg1_00631.py
+          python tools/test_dx11_stage0_pm_inverse_texture_alpha_00632.py
+          python tools/test_dx11_stage0_pm_inverse_arg2_00633.py
+          python tools/test_dx11_stage0_pm_inverse_diffuse_00634.py
+          python tools/test_dx11_stage0_pm_inverse_factor_00635.py
+          python tools/test_dx11_stage0_pm_modulate_factor_00636.py
+          python tools/test_dx11_stage0_pm_inverse_modulate_factor_00637.py
+          python tools/test_dx11_stage0_pm_scaled_factor_00638.py
+          python tools/test_dx11_stage0_pm_signed_factor_00639.py
+          python tools/test_dx11_stage0_pm_add_factor_00640.py
+          python tools/test_dx11_stage0_pm_current_factor_00641.py
+          python tools/test_dx11_stage0_pm_current_diffuse_00642.py
+          python tools/test_dx11_stage0_pm_current_dispatch_00643.py
+          python tools/test_dx11_live_line_draw_00644.py
+          python tools/test_dx11_live_point_draw_00645.py
+          python tools/test_dx11_sparse_index_draw_00646.py
+          python tools/test_dx11_fragmented_vb_shadow_00647.py
+          python tools/test_dx11_race_depth_draw_00648.py
+          python tools/test_dx11_game_cull_draw_00649.py
+          python tools/test_dx11_readonly_depth_draw_00650.py
+          python tools/test_dx11_depth_state_binding_00651.py
+          python tools/test_dx11_depth_always_draw_00652.py
+          python tools/test_dx11_depth_equality_draw_00653.py
+          python tools/test_dx11_depth_ordering_draw_00654.py
+          python tools/test_dx11_native_anisotropic_sampler_00655.py
+          python tools/test_dx11_native_anisotropic_mag_00656.py
+          python tools/test_dx11_native_srgb_texture_00657.py
+          python tools/test_dx11_native_luminance_texture_00658.py
+          python tools/test_dx11_native_rgb24_texture_00659.py
+          python tools/test_dx11_native_rgba_texture_00660.py
+          python tools/test_dx11_native_xrgb16_texture_00661.py
+          python tools/test_dx11_native_10bit_texture_00662.py
+          python tools/test_dx11_native_extended_luminance_00663.py
+          python tools/test_dx11_native_rg16_00664.py
+          python tools/test_dx11_native_a8p8_00665.py
+          python tools/test_dx11_native_rgb332_00667.py
+          python tools/test_dx11_native_p8_00668.py
+          python tools/test_dx11_native_rgba16_00669.py
+          python tools/test_dx11_native_float_rgba_00670.py
+          python tools/test_dx11_native_frame_batch_00671.py
+          python tools/test_dx11_game_scene_readback_00680.py
+          python tools/test_dx11_game_device_handoff_00681.py
+          python tools/test_dx11_game_output_transition_00682.py
+          python tools/test_dx11_output_mode_transition_00739.py
+          python tools/test_dx11_source_owner_handoff_00740.py
+          python tools/test_dx11_source_reset_00741.py
+          # Real game UpdateSurface/StretchRect -> native full-frame GPU region
+          # replay, including strict source-ownership and fallback checks.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_surface_copy_region_probe_00886.cpp -o /tmp/dx11_surface_copy_00886 && /tmp/dx11_surface_copy_00886
+          python tools/test_dx11_game_surface_copy_00886.py
+          # D3D9Ex read of shared native GPU pixels must complete before reuse.
+          python tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py
+          # Full-size native game allocation swap must retire BOTH GPU queues.
+          python tools/test_dx11_shared_desktop_generation_transition_01000.py
+          # Guard real-game D3D11 shared GPU shader-state and lost-device handoff.
+          python tools/test_dx11_shared_desktop_gpu_transfer_01001.py
+          # Native menu/car/race mip0 GPU handoff, typed BGRA source and
+          # cropped/dirty region copy; distinct from real D3D9Ex/HMD execution.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_shared_desktop_source_layout_01061.cpp -o /tmp/dx11_shared_layout_01061 && /tmp/dx11_shared_layout_01061
+          python tools/test_dx11_shared_desktop_source_layout_01061.py
+          # An actual native game frame may have independent XR/theater
+          # resolution; only same-sized desktop overlay paths remain gated.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_native_independent_game_output_01062.cpp -o /tmp/dx11_native_independent_01062 && /tmp/dx11_native_independent_01062
+          python tools/test_dx11_native_independent_game_output_01062.py
+          # Actual menu/car/race native camera -> matching typed RTV pair ->
+          # OpenXR L/R shared GPU copy, with scoped game output-state restore.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_native_stereo_source_transfer_01063.cpp -o /tmp/dx11_stereo_transfer_01063 && /tmp/dx11_stereo_transfer_01063
+          python tools/test_dx11_native_stereo_source_transfer_01063.py
+          # Sequential authentic left/right game camera RTV capture across OM switch.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_native_stereo_captured_views_01064.cpp -o /tmp/dx11_stereo_views_01064 && /tmp/dx11_stereo_views_01064
+          python tools/test_dx11_native_stereo_captured_views_01064.py
+          python tools/test_dx11_native_float_camera_postpass_01065.py
+          python tools/test_dx11_native_float_camera_pair_01066.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/vr/dx11_live_fixed_clip_01067.cpp -o /tmp/dx11_live_fixed_clip_01067 && /tmp/dx11_live_fixed_clip_01067
+          python tools/test_dx11_live_fixed_clip_01067.py
+          # 01068 signed D3D9 U/V/W/Q bump/normal-map textures through native VS/PS SRVs.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_signed_normal_game_probe_01068.cpp -o /tmp/dx11_signed_normal_01068 && /tmp/dx11_signed_normal_01068
+          python tools/test_dx11_signed_normal_texture_01068.py
+          # 01069 original D3D9 BC legacy alpha/normal material -> D3D11 native shader sampler.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_block_compressed_game_probe_01069.cpp -o /tmp/dx11_bc_01069 && /tmp/dx11_bc_01069
+          python tools/test_dx11_block_compressed_game_01069.py
+          # 01070 original mixed bump game material to native shader Draw/Indexed.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_mixed_bump_game_probe_01070.cpp -o /tmp/dx11_mixed_01070 && /tmp/dx11_mixed_01070
+          python tools/test_dx11_mixed_bump_game_01070.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_reset_probe_00741.cpp -o /tmp/dx11_source_reset_00741 && /tmp/dx11_source_reset_00741
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_owner_handoff_probe_00740.cpp -o /tmp/dx11_source_owner_00740 && /tmp/dx11_source_owner_00740
+          python tools/test_dx11_game_backbuffer_admission_00683.py
+          python tools/test_dx11_same_mode_swapchain_transition_00684.py
+          python tools/test_dx11_object_clip_draw_00685.py
+          python tools/test_dx11_untextured_draw_00686.py
+          python tools/test_dx11_live_viewport_depth_00687.py
+          python tools/test_dx11_eye_pair_sources_00690.py
+          python tools/test_dx11_eye_copy_lifetime_00721.py
+          python tools/test_dx11_eye_ack_replay_00766.py
+          python tools/test_dx11_game_rt_16bit_00692.py
+          python tools/test_dx11_game_rt_mips_00742.py
+          python tools/test_dx11_game_float_vector_00693.py
+          python tools/test_dx11_game_dynamic_texture_00694.py
+          python tools/test_dx11_eye_msaa_resolve_00695.py
+          python tools/test_dx11_game_scene_boundary_00696.py
+          python tools/test_dx11_failed_clear_boundary_00729.py
+          python tools/test_dx11_failed_game_draw_00730.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_failed_game_draw_probe_00730.cpp -o /tmp/dx11_failed_draw_00730 && /tmp/dx11_failed_draw_00730
+          python tools/test_dx11_game_present_crop_00698.py
+          python tools/test_dx11_full_dirty_present_00748.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_dirty_present_probe_00748.cpp -o /tmp/dx11_dirty_present_00748 && /tmp/dx11_dirty_present_00748
+          python tools/test_dx11_full_dirty_partition_00749.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_dirty_partition_probe_00749.cpp -o /tmp/dx11_dirty_partition_00749 && /tmp/dx11_dirty_partition_00749
+          python tools/test_dx11_full_dirty_crop_00750.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_dirty_crop_probe_00750.cpp -o /tmp/dx11_dirty_crop_00750 && /tmp/dx11_dirty_crop_00750
+          python tools/test_dx11_cropped_cpu_upload_00751.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_cropped_cpu_upload_probe_00751.cpp -o /tmp/dx11_cropped_upload_00751 && /tmp/dx11_cropped_upload_00751
+          python tools/test_dx11_visible_source_crop_00752.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_visible_source_crop_probe_00752.cpp -o /tmp/dx11_visible_crop_00752 && /tmp/dx11_visible_crop_00752
+          python tools/test_dx11_partial_dirty_upload_00753.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_partial_dirty_upload_probe_00753.cpp -o /tmp/dx11_partial_dirty_00753 && /tmp/dx11_partial_dirty_00753
+          python tools/test_dx11_overlap_dirty_game_present_00769.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_overlap_dirty_game_present_00769.cpp -o /tmp/dx11_overlap_dirty_00769 && /tmp/dx11_overlap_dirty_00769
+          python tools/test_dx11_multi_dirty_upload_00754.py
+          python tools/test_dx11_extended_dirty_batch_00767.py
+          python tools/test_dx11_readonly_masked_main_game_00784.py
+          python tools/test_dx11_inert_stencil_mrt_main_game_00785.py
+          python tools/test_dx11_no_target_write_draw_00768.py
+          python tools/test_dx11_x8_alpha_only_game_draw_00770.py
+          python tools/test_dx11_inactive_texture_game_frame_00771.py
+          python tools/test_dx11_pixel_center_game_draw_00773.py
+          python tools/test_dx11_dynamic_stream_game_frame_00774.py
+          python tools/test_dx11_rejected_fragments_game_frame_00775.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_dynamic_stream_probe_00774.cpp -o /tmp/dx11_dynamic_stream_00774 && /tmp/dx11_dynamic_stream_00774
+          # 01072 real VB/IB/UP source-shadow miss: pixel-neutral Draws keep
+          # exact ordinals across all four hooks; pixel writers fail closed.
+          python tools/test_dx11_unmirrored_neutral_01072.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_unmirrored_neutral_probe_01072.cpp -o /tmp/dx11_unmirrored_01072 && /tmp/dx11_unmirrored_01072
+          # 01073 real game indexed instancing uses the instance record domain.
+          python tools/test_dx11_instance_capture_01073.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_instance_capture_probe_01073.cpp -o /tmp/dx11_instance_01073 && /tmp/dx11_instance_01073
+          python tools/test_dx11_full_frame_empty_draw_00755.py
+          python tools/test_dx11_zero_source_hook_00756.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_zero_source_hook_probe_00756.cpp -o /tmp/dx11_zero_hook_00756 && /tmp/dx11_zero_hook_00756
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_empty_draw_probe_00755.cpp -o /tmp/dx11_empty_draw_00755 && /tmp/dx11_empty_draw_00755
+          python tools/test_dx11_full_game_geometry_upload.py
+          python tools/test_dx11_game_source_buffer_binding_00757.py
+          python tools/test_dx11_stage1_game_constant_owner_00758.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_multi_dirty_upload_probe_00754.cpp -o /tmp/dx11_multi_dirty_00754 && /tmp/dx11_multi_dirty_00754
+          python tools/test_dx11_full_frame_fallback_00724.py
+          python tools/test_dx11_full_frame_same_present_00726.py
+          python tools/test_dx11_same_present_fence_00731.py
+          python tools/test_dx11_depth_only_clear_00732.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_depth_only_clear_00732.cpp -o /tmp/dx11_depth_only_clear_00732 && /tmp/dx11_depth_only_clear_00732
+          python tools/test_dx11_full_color_depth_clear_00733.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_color_depth_clear_00733.cpp -o /tmp/dx11_full_color_depth_00733 && /tmp/dx11_full_color_depth_00733
+          python tools/test_dx11_pre_draw_depth_clear_00734.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_pre_draw_depth_clear_00734.cpp -o /tmp/dx11_pre_draw_depth_00734 && /tmp/dx11_pre_draw_depth_00734
+          python tools/test_dx11_full_frame_color_seed_00735.py
+          python tools/test_dx11_clipped_color_fill_00799.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_clipped_color_fill_00799.cpp -o /tmp/dx11_clipped_fill_00799 && /tmp/dx11_clipped_fill_00799
+          python tools/test_dx11_game_target_linkage_00766.py
+          python tools/test_dx11_auxiliary_clear_game_frame_00777.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_auxiliary_clear_game_frame_00777.cpp -o /tmp/dx11_auxiliary_clear_00777 && /tmp/dx11_auxiliary_clear_00777
+          python tools/test_dx11_game_offscreen_pass_00765.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_offscreen_pass_00765.cpp -o /tmp/dx11_offscreen_00765 && /tmp/dx11_offscreen_00765
+          python tools/test_dx11_auxiliary_depth_draw_00778.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_auxiliary_depth_draw_00778.cpp -o /tmp/dx11_aux_depth_00778 && /tmp/dx11_aux_depth_00778
+          python tools/test_dx11_offscreen_masked_mrt_stencil_00779.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_offscreen_masked_mrt_stencil_00779.cpp -o /tmp/dx11_offscreen_00779 && /tmp/dx11_offscreen_00779
+          python tools/test_dx11_auxiliary_mrt_stencil_game_frame_00780.py
+          python tools/test_dx11_main_stencil_clear_game_frame_00781.py
+          python tools/test_dx11_main_clear_depth_identity_00782.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_main_clear_depth_identity_00782.cpp -o /tmp/dx11_main_clear_00782 && /tmp/dx11_main_clear_00782
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_main_stencil_clear_game_frame_00781.cpp -o /tmp/dx11_main_stencil_00781 && /tmp/dx11_main_stencil_00781
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_auxiliary_mrt_stencil_game_frame_00780.cpp -o /tmp/dx11_aux_mrt_stencil_00780 && /tmp/dx11_aux_mrt_stencil_00780
+          python tools/test_dx11_game_clipped_draw_00764.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_clipped_draw_00764.cpp -o /tmp/dx11_clipped_game_00764 && /tmp/dx11_clipped_game_00764
+          python tools/test_dx11_full_game_masked_draw_00763.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_game_masked_draw_00763.cpp -o /tmp/dx11_masked_game_00763 && /tmp/dx11_masked_game_00763
+          python tools/test_dx11_full_clear_clipped_00762.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_clear_clipped_00762.cpp -o /tmp/dx11_clear_clip_00762 && /tmp/dx11_clear_clip_00762
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_color_seed_00735.cpp -o /tmp/dx11_color_seed_00735 && /tmp/dx11_color_seed_00735
+          python tools/test_dx11_x8_dest_alpha_00736.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_x8_dest_alpha_00736.cpp -o /tmp/dx11_x8_dest_alpha_00736 && /tmp/dx11_x8_dest_alpha_00736
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_same_present_fence_probe_00731.cpp -o /tmp/dx11_fence_00731 && /tmp/dx11_fence_00731
+          python tools/test_dx11_full_frame_slot_reuse_00743.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_slot_reuse_probe_00743.cpp -o /tmp/dx11_full_frame_slot_00743 && /tmp/dx11_full_frame_slot_00743
+          python tools/test_dx11_readback_quarantine_00744.py
+          python tools/test_dx11_readback_map_00745.py
+          python tools/test_dx11_stale_pending_map_00746.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_readback_map_probe_00745.cpp -o /tmp/dx11_readback_map_00745 && /tmp/dx11_readback_map_00745
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_readback_quarantine_probe_00744.cpp -o /tmp/dx11_readback_quarantine_00744 && /tmp/dx11_readback_quarantine_00744
+          python tools/test_dx11_game_frame_publication_00727.py
+          python tools/test_dx11_frame_upload_00747.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_frame_upload_probe_00747.cpp -o /tmp/dx11_upload_00747 && /tmp/dx11_upload_00747
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_frame_publication_probe_00727.cpp -o /tmp/dx11_publication_00727 && /tmp/dx11_publication_00727
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_same_present_probe_00726.cpp -o /tmp/dx11_same_present_00726 && /tmp/dx11_same_present_00726
+          python tools/test_dx11_game_clear_color_00725.py
+          python tools/test_dx11_full_clear_resume_00728.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_clear_resume_probe_00728.cpp -o /tmp/dx11_full_clear_00728 && /tmp/dx11_full_clear_00728 || exit 1
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_clear_color_probe_00725.cpp -o /tmp/dx11_clear_00725 && /tmp/dx11_clear_00725
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_fallback_probe_00724.cpp -o /tmp/dx11_fallback_00724 && /tmp/dx11_fallback_00724
+          python tools/test_dx11_game_texture_atlas_00699.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_rt_frame_probe_00970.cpp -o /tmp/dx11_live_game_rt_frame_00970 && /tmp/dx11_live_game_rt_frame_00970
+          python tools/test_dx11_live_game_rt_frame_00970.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_draw_mirror_probe_00971.cpp -o /tmp/dx11_live_draw_mirror_00971 && /tmp/dx11_live_draw_mirror_00971
+          python tools/test_dx11_live_game_draw_mirror_00971.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_draw_mirror_probe_00972.cpp -o /tmp/dx11_live_draw_mirror_00972 && /tmp/dx11_live_draw_mirror_00972
+          python tools/test_dx11_live_game_draw_mirror_00972.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_cube_rt_00973.cpp -o /tmp/dx11_cube_rt_00973 && /tmp/dx11_cube_rt_00973
+          python tools/test_dx11_live_game_cube_rt_00973.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_cube_color_00974.cpp -o /tmp/dx11_cube_color_00974 && /tmp/dx11_cube_color_00974
+          python tools/test_dx11_live_game_cube_color_00974.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_volume_00975.cpp -o /tmp/dx11_live_volume_00975 && /tmp/dx11_live_volume_00975
+          python tools/test_dx11_live_sm3_volume_00975.py
+          python tools/test_dx11_live_sm3_mirror_lod_00979.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_trig_sign_00980.cpp -o /tmp/dx11_sm3_trig_sign_00980 && /tmp/dx11_sm3_trig_sign_00980
+          python tools/test_dx11_sm3_trig_sign_00980.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_viewport_depth_probe_00687.cpp -o /tmp/dx11_00687 && /tmp/dx11_00687
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_untextured_game_probe_00686.cpp -o /tmp/dx11_00686 && /tmp/dx11_00686
+          python tools/test_dx11_stage1_factor_00673.py
+          python tools/test_dx11_stage1_operands_00700.py
+          python tools/test_dx11_stage1_diffuse_00701.py
+          python tools/test_dx11_stage1_blends_00702.py
+          python tools/test_dx11_stage1_signed_00703.py
+          python tools/test_dx11_stage1_cross_channel_00704.py
+          python tools/test_dx11_stage1_triop_00705.py
+          python tools/test_dx11_stage1_specular_00706.py
+          python tools/test_dx11_stage1_constant_00707.py
+          python tools/test_dx11_stage1_temp_00708.py
+          python tools/test_dx11_stage1_dotproduct_00709.py
+          python tools/test_dx11_stage1_texture_alpha_00710.py
+          python tools/test_dx11_stage1_premultiplied_00711.py
+          python tools/test_dx11_stage1_texture_operand_00712.py
+           python tools/test_dx11_stage1_dual_game_texture_00713.py
+          python tools/test_dx11_stage1_independent_sampler_00714.py
+          python tools/test_dx11_stage1_uv_00715.py
+          python tools/test_dx11_stage1_mirror_reuse_00716.py
+          python tools/test_dx11_game_blend_extrema_00717.py
+          python tools/test_dx11_host_source_switch_00718.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_blend_probe_00702.cpp -o /tmp/dx11_stage1_blend_00702 && /tmp/dx11_stage1_blend_00702
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_signed_probe_00703.cpp -o /tmp/dx11_stage1_signed_00703 && /tmp/dx11_stage1_signed_00703
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_cross_channel_probe_00704.cpp -o /tmp/dx11_stage1_cross_00704 && /tmp/dx11_stage1_cross_00704
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_triop_probe_00705.cpp -o /tmp/dx11_stage1_triop_00705 && /tmp/dx11_stage1_triop_00705
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_specular_probe_00706.cpp -o /tmp/dx11_stage1_specular_00706 && /tmp/dx11_stage1_specular_00706
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_constant_probe_00707.cpp -o /tmp/dx11_stage1_constant_00707 && /tmp/dx11_stage1_constant_00707
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_temp_probe_00708.cpp -o /tmp/dx11_stage1_temp_00708 && /tmp/dx11_stage1_temp_00708
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_dotproduct_probe_00709.cpp -o /tmp/dx11_dp3_00709 && /tmp/dx11_dp3_00709
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_texture_alpha_probe_00710.cpp -o /tmp/dx11_ta_00710 && /tmp/dx11_ta_00710
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_premultiplied_probe_00711.cpp -o /tmp/dx11_pm_00711 && /tmp/dx11_pm_00711
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_texture_operand_probe_00712.cpp -o /tmp/dx11_to_00712 && /tmp/dx11_to_00712
+           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_dual_texture_probe_00713.cpp -o /tmp/dx11_dual_00713 && /tmp/dx11_dual_00713
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_sampler_probe_00714.cpp -o /tmp/dx11_sampler_00714 && /tmp/dx11_sampler_00714
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_uv_probe_00715.cpp -o /tmp/dx11_uv_00715 && /tmp/dx11_uv_00715
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_mirror_reuse_probe_00716.cpp -o /tmp/dx11_mirror_reuse_00716 && /tmp/dx11_mirror_reuse_00716
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_blend_extrema_probe_00717.cpp -o /tmp/dx11_extrema_00717 && /tmp/dx11_extrema_00717
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_host_source_switch_probe_00718.cpp -o /tmp/dx11_host_switch_00718 && /tmp/dx11_host_switch_00718
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_factor_probe.cpp -o /tmp/dx11_stage1_00673 && /tmp/dx11_stage1_00673
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgb332_probe.cpp -o /tmp/dx11_rgb332_00667 && /tmp/dx11_rgb332_00667
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_p8_probe.cpp -o /tmp/dx11_p8_00668 && /tmp/dx11_p8_00668
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgba16_probe.cpp -o /tmp/dx11_rgba16_00669 && /tmp/dx11_rgba16_00669
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_float_rgba_probe.cpp -o /tmp/dx11_float_rgba_00670 && /tmp/dx11_float_rgba_00670
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_a8p8_probe.cpp -o /tmp/dx11_a8p8_00665 && /tmp/dx11_a8p8_00665
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rg16_probe.cpp -o /tmp/dx11_rg16_00664 && /tmp/dx11_rg16_00664
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_extended_luminance_probe.cpp -o /tmp/dx11_luma_00663 && /tmp/dx11_luma_00663
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_10bit_probe.cpp -o /tmp/dx11_10bit_00662 && /tmp/dx11_10bit_00662
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_xrgb16_probe.cpp -o /tmp/dx11_xrgb16_00661 && /tmp/dx11_xrgb16_00661
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgba_probe.cpp -o /tmp/dx11_rgba_00660 && /tmp/dx11_rgba_00660
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgb24_probe.cpp -o /tmp/dx11_rgb24_00659 && /tmp/dx11_rgb24_00659
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_luminance_probe.cpp -o /tmp/dx11_luminance_00658 && /tmp/dx11_luminance_00658
+          g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_cull_probe.cpp -o /tmp/dx11_cull_00649 && /tmp/dx11_cull_00649
+          g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_depth_probe.cpp -o /tmp/dx11_depth_00648 && /tmp/dx11_depth_00648
+          g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_primitive_span_probe.cpp -o /tmp/dx11_primitive_00644 && /tmp/dx11_primitive_00644
+      - name: Verify source graph and dormant runtime activation
+        run: |
+          # 01002 preserve real menu/car/race shader inputs during GPU eye transfers.
+          # 01004 real menu/car/race shader and blend cache eviction after creation.
+          python tools/test_dx11_live_shader_cache_01004.py
+          python tools/test_dx11_live_sm3_table_zfog_01005.py
+          python tools/test_dx11_live_sm3_user_clip_01006.py
+          python tools/test_dx11_live_sm3_depth_01007.py
+          python tools/test_dx11_live_sm3_depth_only_01008.py
+          python tools/test_dx11_live_sm3_partial_color_01009.py
+          python tools/test_dx11_live_sm3_aux_mrt_01010.py
+          python tools/test_dx11_live_sm3_masked_channels_01011.py
+          python tools/test_dx11_live_sm3_texkill_01013.py
+          python tools/test_dx11_live_sm3_pixel_position_01015.py
+          python tools/test_dx11_live_sm3_face_01016.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_subroutine_probe_01025.cpp -o /tmp/dx11_sm3_subroutine_01025 && /tmp/dx11_sm3_subroutine_01025
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_conditional_call_probe_01026.cpp -o /tmp/dx11_sm3_conditional_call_01026 && /tmp/dx11_sm3_conditional_call_01026
+          python tools/test_dx11_sm3_uniform_texture_01017.py
+          python tools/test_dx11_sm3_uniform_ifc_01018.py
+          python tools/test_dx11_sm3_temp_uniform_01019.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_static_address_matrix_probe_01027.cpp -o /tmp/dx11_sm3_static_address_01027 && /tmp/dx11_sm3_static_address_01027
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_signed_loop_index_probe_01028.cpp -o /tmp/dx11_sm3_signed_loop_01028 && /tmp/dx11_sm3_signed_loop_01028
+          python tools/test_dx11_sm3_signed_loop_index_01028.py
+          python tools/test_dx11_sm3_matrix_draw_uniform_01020.py
+          python tools/test_dx11_sm3_uniform_predicate_texture_01021.py
+          python tools/test_dx11_sm3_branch_temp_01022.py
+          python tools/test_dx11_sm3_branch_predicate_01023.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_shader_cache_01004.cpp -o /tmp/dx11_live_shader_cache_01004 && /tmp/dx11_live_shader_cache_01004
+          # 01003 source-stamped GPU staging through native menu/car/race Present.
+          python tools/test_dx11_readback_copy_01003.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_readback_copy_01003.cpp -o /tmp/dx11_readback_01003 && /tmp/dx11_readback_01003
+          python tools/test_dx11_stereo_eye_gpu_transfer_01002.py
+          # 00996 main TARGET|Z|STENCIL clipped D3D9 Clear -> native D3D11 GPU.
+          python tools/test_dx11_game_clipped_stencil_gpu_00996.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_clipped_stencil_gpu_00996.cpp -o /tmp/dx11_stencil_00996 && /tmp/dx11_stencil_00996
+          # 00995 real game clipped Z-only Clear on native D3D11.0 GPU.
+          python tools/test_dx11_partial_depth_gpu_00995.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_partial_depth_gpu_00995.cpp -o /tmp/dx11_partial_z_00995 && /tmp/dx11_partial_z_00995
+          # 00994 real game partial TARGET|Z paired GPU raster on D3D11.0.
+          python tools/test_dx11_partial_target_depth_gpu_00994.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_partial_target_depth_gpu_00994.cpp -o /tmp/dx11_partial_z_00994 && /tmp/dx11_partial_z_00994
+          # 00993 native game ColorFill/partial TARGET GPU fallback on D3D11.0.
+          python tools/test_dx11_partial_color_fallback_00993.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_partial_color_fallback_00993.cpp -o /tmp/dx11_partial_color_00993 && /tmp/dx11_partial_color_00993
+          # 00992 game-origin D3D9 indexed instancing reaches native SM3
+          # IA/Draw without merging line/strip/fan boundaries across instances.
+          python tools/test_dx11_live_sm3_instancing_00992.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_instancing_00992.cpp -o /tmp/dx11_live_sm3_instancing_00992 && /tmp/dx11_live_sm3_instancing_00992
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_multistream_game_draw_probe_01029.cpp -o /tmp/dx11_sm3_multistream_01029 && /tmp/dx11_sm3_multistream_01029
+          python tools/test_dx11_sm3_multistream_game_draw_01029.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_instance_list_batch_probe_01030.cpp -o /tmp/dx11_list_batch_01030 && /tmp/dx11_list_batch_01030
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_connected_instance_probe_01031.cpp -o /tmp/dx11_connected_instance_01031 && /tmp/dx11_connected_instance_01031
+          # 01074: source-valid large connected instances segment GPU submits, no draw loss.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_connected_submission_01074.cpp -o /tmp/dx11_connected_submission_01074 && /tmp/dx11_connected_submission_01074
+          python tools/test_dx11_sm3_connected_submission_01074.py
+          # 01075: real source indexed independent lists preserve valid high-instance draws.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_list_submission_01075.cpp -o /tmp/dx11_list_submission_01075 && /tmp/dx11_list_submission_01075
+          python tools/test_dx11_sm3_list_submission_01075.py
+          # 01076: real live D3D9 indexed/linear multi-stream instances
+          # survive one native VB budget with global frequency semantics.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_segmented_instances_01076.cpp -o /tmp/dx11_segmented_instances_01076 && /tmp/dx11_segmented_instances_01076
+          python tools/test_dx11_sm3_segmented_instances_01076.py
+          # 01077: real shader-bound D3D9 game instances that exceed GPU
+          # upload bytes (not only vertex count) use bounded native segments.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_gpu_upload_budget_01077.cpp -o /tmp/dx11_sm3_gpu_budget_01077 && /tmp/dx11_sm3_gpu_budget_01077
+          python tools/test_dx11_sm3_gpu_upload_budget_01077.py
+          # 01078: contiguous original D3D9 instances share bounded GPU
+          # uploads while independent native strip/fan Draws remain exact.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_chunk_upload_01078.cpp -o /tmp/dx11_sm3_chunk_01078 && /tmp/dx11_sm3_chunk_01078
+          python tools/test_dx11_sm3_chunk_upload_01078.py
+          # 01079: native game SM3 >128 source instances preserve authentic
+          # per-instance records across bounded GPU chunk uploads.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_extended_instance_01079.cpp -o /tmp/dx11_sm3_extended_01079 && /tmp/dx11_sm3_extended_01079
+          python tools/test_dx11_sm3_extended_instance_01079.py
+          # 01080: native shader-bound game list primitives submit once per GPU
+          # instance upload, preserving indexed locals and connected fallback.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_segmented_list_batch_01080.cpp -o /tmp/dx11_sm3_segmented_list_01080 && /tmp/dx11_sm3_segmented_list_01080
+          python tools/test_dx11_sm3_segmented_list_batch_01080.py
+          # Genuine connected LINESTRIP/TRIANGLESTRIP/TRIANGLEFAN instanced
+          # game draws must keep their source primitive boundaries per GPU chunk.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_segmented_connected_batch_01081.cpp -o /tmp/dx11_sm3_segmented_connected_01081 && /tmp/dx11_sm3_segmented_connected_01081
+          python tools/test_dx11_sm3_segmented_connected_01081.py
+          # Full-frame game SM3 point/line/triangle lists survive bounded
+          # FLOAT4 multi-stream upload with whole primitive GPU chunks.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_linear_chunk_01082.cpp -o /tmp/dx11_sm3_linear_chunk_01082 && /tmp/dx11_sm3_linear_chunk_01082
+          python tools/test_dx11_sm3_linear_chunk_01082.py
+          # Preserve connected real-game LINESTRIP/TRIANGLESTRIP seams and
+          # triangle parity across bounded native D3D11 GPU uploads.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_connected_chunk_01083.cpp -o /tmp/dx11_sm3_connected_chunk_01083 && /tmp/dx11_sm3_connected_chunk_01083
+          python tools/test_dx11_sm3_connected_chunk_01083.py
+          # Preserve native real-game SM3 fan center/rim and chunked indexed triangle order.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_fan_chunk_01084.cpp -o /tmp/dx11_sm3_fan_chunk_01084 && /tmp/dx11_sm3_fan_chunk_01084
+          python tools/test_dx11_sm3_fan_chunk_01084.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_indexed_chunk_01085.cpp -o /tmp/dx11_sm3_indexed_chunk_01085 && /tmp/dx11_sm3_indexed_chunk_01085
+          python tools/test_dx11_sm3_indexed_chunk_01085.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_indexed_connected_01086.cpp -o /tmp/dx11_sm3_indexed_connected_01086 && /tmp/dx11_sm3_indexed_connected_01086
+          python tools/test_dx11_sm3_indexed_connected_01086.py
+          # Full-size programmable game TRIANGLEFAN source center/rim:
+          # bounded indexed GPU windows and oversized fan-IB preservation.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_indexed_fan_01087.cpp -o /tmp/dx11_sm3_indexed_fan_01087 && /tmp/dx11_sm3_indexed_fan_01087
+          python tools/test_dx11_sm3_indexed_fan_01087.py
+          # 01092: real point/line GPU paths survive inherited polygon fill.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_game_inherited_polygon_state.cpp -o /tmp/dx11_fill_01092 && /tmp/dx11_fill_01092
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_fvf_polygon_modes.cpp -o /tmp/dx11_fvf_01093 && /tmp/dx11_fvf_01093
+          # 01094: large real-game FVF fan and point-strip native indexed GPU windows.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_fvf_polygon_windows.cpp -o /tmp/dx11_fvf_windows_01094 && /tmp/dx11_fvf_windows_01094
+          # 01095: shader-bound indexed POINT-strip GPU window continuity with unrepacked original VB.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_sm3_native_point_strip_windows.cpp -o /tmp/dx11_sm3_point_strip_01095 && /tmp/dx11_sm3_point_strip_01095
+          python tools/test_dx11_live_fvf_polygon_windows_01094.py
+          # 01091 authentic game SM3 instanced POINT/WIREFRAME GPU batch
+          # with source corner order, negative late-index, and budget proofs.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tests/vr/dx11_live_game_segmented_polygon_fill.cpp -o /tmp/dx11_poly_fill_01091 && /tmp/dx11_poly_fill_01091
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_polygon_raster_probe_01032.cpp -o /tmp/dx11_polygon_raster_01032 && /tmp/dx11_polygon_raster_01032
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_colorfill_gpu_probe_01033.cpp -o /tmp/dx11_pre_draw_01033 && /tmp/dx11_pre_draw_01033
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_overdraw_probe_01034.cpp -o /tmp/dx11_pre_draw_01034 && /tmp/dx11_pre_draw_01034
+          # 01039 genuine game camera typed RTV -> GPU SRV/Resolve eye postpass.
+          python tools/test_dx11_typed_camera_postpass_01039.py
+          # 01040: typed camera preflight -> exact live RTV GPU postpass path.
+          python tools/test_dx11_typed_camera_preflight_01040.py
+          # 01041 full-frame typed game camera Copy/Resolve without shader.
+          python tools/test_dx11_typed_camera_raw_copy_01041.py
+          # 01042: live typed RTV selects raw GPU Copy or shader conversion.
+          python tools/test_dx11_typed_camera_copy_fallback_01042.py
+          # 01038 independently authored offscreen MRT game Draw -> GPU color source.
+          python tools/test_dx11_game_offscreen_mrt_01038.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tools/dx11_game_offscreen_mrt_probe_01038.cpp -o /tmp/dx11_offscreen_mrt_01038 && /tmp/dx11_offscreen_mrt_01038
+          # 01036 whole D3D9 Z seed then pre-Draw clipped Z -> actual native SM3/FVF GPU depth.
+          python tools/test_dx11_pre_draw_depth_01036.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_depth_probe_01036.cpp -o /tmp/dx11_predraw_depth_01036 && /tmp/dx11_predraw_depth_01036
+          python tools/test_dx11_pre_draw_target_clear_01035.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_target_clear_probe_01035.cpp -o /tmp/dx11_pre_draw_01035 && /tmp/dx11_pre_draw_01035
+          # 01100 paired actual D3D9 TARGET|Z partial pre-Draw native replay.
+          python tools/test_dx11_pre_draw_combined_clear_01100.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_combined_clear_probe_01100.cpp -o /tmp/dx11_pre_draw_combined_01100 && /tmp/dx11_pre_draw_combined_01100
+          # 01101 authentic clipped TARGET|STENCIL / TARGET|Z|STENCIL.
+          python tools/test_dx11_pre_draw_stencil_clear_01101.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_stencil_clear_probe_01101.cpp -o /tmp/dx11_pre_draw_stencil_01101 && /tmp/dx11_pre_draw_stencil_01101
+          # 01102 clipped Z|STENCIL successful D3D9 game Clear -> first-Draw D32.
+          python tools/test_dx11_pre_draw_z_stencil_01102.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_z_stencil_probe_01102.cpp -o /tmp/dx11_z_stencil_01102 && /tmp/dx11_z_stencil_01102
+          # 01103 genuine many-rect depth Clear compacted into exact ordered GPU tiles.
+          python tools/test_dx11_pre_draw_depth_compaction_01103.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_depth_compaction_probe_01103.cpp -o /tmp/dx11_pre_draw_depth_01103 && /tmp/dx11_pre_draw_depth_01103
+          # 01104 exact ordered source RTV/DSV rectangular fusion, real first-Draw GPU replay.
+          python tools/test_dx11_pre_draw_tile_fusion_01104.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_tile_fusion_probe_01104.cpp -o /tmp/dx11_pre_draw_tile_fusion_01104 && /tmp/dx11_pre_draw_tile_fusion_01104
+          # 01105: interleaved original-game color/Z native GPU bands and
+          # strict overlap/overflow negative regression on first real Draw.
+          python tools/test_dx11_pre_draw_disjoint_bands_01105.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_disjoint_bands_probe_01105.cpp -o /tmp/dx11_disjoint_bands_01105 && /tmp/dx11_disjoint_bands_01105
+          # 01106 real game partial-edge source overwrites, color and depth
+          # bounded first-Draw D3D11 GPU tile replay and unchanged fallback.
+          # 01107 leading pixel-neutral game Draws must preserve authentic
+          # TARGET|Z|STENCIL pre-first-native color/depth source pixels.
+          # 01108 authentic 17..128 tiled full Clear seeds native RTV/D32,
+          # with original main-Z preservation after post-Draw TARGET-only Clear.
+          # 01110: authentic sparse 33..128 post-Draw game TARGET/Z
+          # regions, bounded 32-rect GPU ClearView batches and 11.0 fallback.
+          python tools/test_dx11_post_draw_sparse_clear_01110.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_post_draw_sparse_clear_01110.cpp -o /tmp/dx11_sparse_clear_01110 && /tmp/dx11_sparse_clear_01110
+          # 01111 authentic 128 sparse pre-first-Draw TARGET|Z GPU replay:
+          # atomic C++ color/depth ledger and D3D11.1 32-rect Z ClearView batches.
+          # 01113: full real D3D9 backbuffer copy starts a native menu frame.
+          python tools/test_dx11_full_copy_seed_01113.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_full_copy_seed_01113.cpp -o /tmp/dx11_full_copy_01113 && /tmp/dx11_full_copy_01113
+          python tools/test_dx11_pre_draw_long_sparse_replay_01111.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_long_sparse_replay_01111.cpp -o /tmp/dx11_predraw_sparse_01111 && /tmp/dx11_predraw_sparse_01111
+          # 01109: full-game post-Draw 128-rect TARGET/Z exact GPU union,
+          # with fail-closed fragmented/invalid source and original DX9Ex input.
+          python tools/test_dx11_post_draw_clear_union_01109.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_post_draw_clear_union_probe_01109.cpp -o /tmp/dx11_post_clear_union_01109 && /tmp/dx11_post_clear_union_01109
+          python tools/test_dx11_pre_draw_tiled_full_clear_01108.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_tiled_full_clear_probe_01108.cpp -o /tmp/dx11_tiled_full_clear_01108 && /tmp/dx11_tiled_full_clear_01108
+          python tools/test_dx11_pre_draw_leading_empty_01107.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_pre_draw_leading_empty_probe_01107.cpp -o /tmp/dx11_predraw_empty_01107 && /tmp/dx11_predraw_empty_01107
+          python tools/test_dx11_pre_draw_edge_overwrite_01106.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_pre_draw_edge_overwrite_probe_01106.cpp -o /tmp/dx11_edge_overwrite_01106 && /tmp/dx11_edge_overwrite_01106
+          # Draw-time GPU source copy survives later rejected/poisoned D3D9 Draws.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_gpu_source_epoch_test.cpp -o /tmp/dx11_raw_gpu_epoch_01119 && /tmp/dx11_raw_gpu_epoch_01119
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_source_probe_schedule_test.cpp -o /tmp/dx11_raw_source_schedule_01131 && /tmp/dx11_raw_source_schedule_01131
+          # Real D3D11 RGB evidence compares the same region on either side of the Draw.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_pixel_provenance_test.cpp -o /tmp/dx11_raw_pixel_01120 && /tmp/dx11_raw_pixel_01120
+          # Native RAW GPU tile follows the genuine rasterized viewport/scissor.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_draw_tile_test.cpp -o /tmp/dx11_raw_draw_tile_01121 && /tmp/dx11_raw_draw_tile_01121
+          # 01122: failed SM3 Draw cannot lend its pre-copy to a later Draw;
+          # count only genuine paired GPU post-copies and preserve D3D9 fallback.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_draw_pair_test.cpp -o /tmp/dx11_raw_draw_pair_01122 && /tmp/dx11_raw_draw_pair_01122
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_present_coverage_test.cpp -o /tmp/dx11_raw_present_01123 && /tmp/dx11_raw_present_01123
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_partial_present_tile_test.cpp -o /tmp/dx11_raw_partial_01124 && /tmp/dx11_raw_partial_01124
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_changed_crop_present_test.cpp -o /tmp/dx11_raw_changed_crop_01125 && /tmp/dx11_raw_changed_crop_01125
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_changed_pixel_window_test.cpp -o /tmp/dx11_raw_changed_window_01126 && /tmp/dx11_raw_changed_window_01126
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tests/native_raw_gpu_wait_test.cpp -o /tmp/dx11_raw_gpu_wait_01127 && /tmp/dx11_raw_gpu_wait_01127
+          python tools/verify_dx11_source_graph.py
+          python tools/verify_dx11_activation_boundary.py
+          # Native L/R partial-depth GPU Draw is a separate non-evidence
+          # submission; keep negative tamper and source-RECT regressions live.
+          python tools/test_dx11_eye_partial_depth_activation.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_cpu_surface_replay_probe_00887.cpp -o /tmp/dx11_cpu_surface_replay_00887 && /tmp/dx11_cpu_surface_replay_00887
+          # Native eye GPU Copy restores legally non-overlapping RTV/PS-UAV slots.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_eye_om_slots_probe_00888.cpp -o /tmp/dx11_game_eye_om_slots_00888 && /tmp/dx11_game_eye_om_slots_00888

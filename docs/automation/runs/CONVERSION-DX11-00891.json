@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00891",
+  "production_id": "CONVERSION-DX11-00891",
+  "event_id": "CONVERSION-DX11-00891-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00891",
+  "feature_id": "DX11:GAME_EYE_SPARSE_MRT7_NATIVE_RING_TRANSFER",
+  "work_key": "DX11:GAME_EYE:SPARSE_MRT7_NATIVE_RING_TRANSFER",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "score_note": "The independent confirmed renderer repair may earn one scoreboard point; this C6 checkpoint, CI repair and retry earn +0. See ai-dev-lab/AI_SCOREBOARD.md SSOT.",
+  "full_dx11_renderer_complete": false,
+  "base_sha": "10b0b1ef92173ab90cf633229aa81d8ae3f49e99",
+  "material_result_sha": "1976e29c00c1b28a1d7591ea48b25f15b321c226",
+  "ci_repair_commit_sha": "8c738484ad505d9bf9d4a494393c187a6dbdb8e8",
+  "validation_bearing_result_sha": "8c738484ad505d9bf9d4a494393c187a6dbdb8e8",
+  "feature_contract": {
+    "feature_id": "DX11:GAME_EYE_SPARSE_MRT7_NATIVE_RING_TRANSFER",
+    "goal": "Restore the exact game camera sparse MRT0/RT1/RT7 output set after native two-eye GPU copy and source alias detachment, keeping shared-eye fence/publication and DX9Ex gamepad/FFB fallback intact.",
+    "acceptance_items": [
+      {
+        "id": "native_sparse_mrt7_eye_transfer",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_native_eye_om_state_and_two_eye_gpu_copy",
+        "expected_behavior": "Win32 WARP real GPU left/right eye Copy with RTV0/RTV1/RTV7 bound, exact sparse OM slots and depth restored with a legal RTV-only restore when the UAV tail is empty."
+      },
+      {
+        "id": "native_eye_host_pixels",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_ring_gpu_fence_and_xr_host_source",
+        "expected_behavior": "Independent native red/blue eye textures survive producer fence, ring publication and separate-device host shared-handle readback."
+      },
+      {
+        "id": "original_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_dx9ex_game_inputs_and_no_invalid_uav_binding",
+        "expected_behavior": "No illegal pixel UAV slot 8 restoration, no altered original D3D9/DX9Ex fallback or input/FFB, and negative regression mutations reject lost RTV/UAV/counters."
+      },
+      {
+        "id": "same_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_final_exact_sha",
+        "expected_behavior": "All five mandatory GitHub Actions workflows succeed against one validation-bearing exact SHA without CI bypass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_sparse_mrt7_eye_transfer": "PASS_WARP_SPARSE_RTV0_RTV1_RTV7_GPU_COPY",
+    "native_eye_host_pixels": "PASS_WARP_DISTINCT_LR_HOST_GPU_READBACK",
+    "original_game_fallback": "PASS_STATIC_NEGATIVE_MRT_UAV_COUNTER_MUTANTS",
+    "same_sha_gates": "PASS_EXACT_SHA_5_OF_5",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/test_dx11_eye_copy_lifetime_00721.py"
+  ],
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Actual D3D11 game camera L/R GPU source with RTV0/RTV1/RTV7 remains bound across immediate-context producer copy",
+      "Native shared-eye ring detaches PS/CS outputs, writes two independent eye resources, restores sparse RTV7 with no invalid UAV slot 8 and signals GPU EVENT",
+      "Native host opens both GPU handles and consumes separate camera pixels without changing D3D9Ex game rendering or inputs"
+    ],
+    "batch_components": [
+      "Win32 native shared-eye ring C++ sparse RT7 OM output recovery",
+      "Authentic WARP GPU two-eye producer/foreign-host pixel and sparse MRT regression",
+      "Exact legal zero-UAV and nonzero PS UAV destructive static regression repair"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Native Transport Isolated WARP #39060354384 SUCCESS at source SHA 1976e29c00c1b28a1d7591ea48b25f15b321c226; RT0/RT1/RT7 preserved and independent native L/R GPU pixels verified.",
+      "negative_regression": "Original DX11 Fast #39060354590 failed stale test-only exact-string shape; repaired under same TASK by 8c738484ad505d9bf9d4a494393c187a6dbdb8e8; negative mutants check invalid zero-tail branch, lost RT7, missing OM/CS UAV, counter reset.",
+      "component_integration": "Real producer GPU Copy/Resolve -> sparse OM state recovery -> native two-eye ring EVENT and host GPU shared-handle test, with DX9Ex/input/FFB untouched."
+    },
+    "conflict_keys": [
+      "DX11:GAME_EYE:SPARSE_MRT7_NATIVE_RING_TRANSFER"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Isolated real WARP game-eye producer and foreign D3D11 GPU pixels proved; actual OutRun menu/vehicle/race and Quest3/VDXR screen not run.",
+    "activation_guard_and_fallback": "Native source remains opt-in/fail closed; original DX9Ex desktop Draw/Present and gamepad/FFB retained, DXVK frozen."
+  },
+  "validation_evidence": {
+    "validation_sha": "8c738484ad505d9bf9d4a494393c187a6dbdb8e8",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39060492005,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39060492004,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 39060496506,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39060496502,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39060496523,
+        "conclusion": "success"
+      }
+    ],
+    "isolated_native_warp_run_id": 39060354384,
+    "isolated_native_warp_sha": "1976e29c00c1b28a1d7591ea48b25f15b321c226",
+    "isolated_native_warp_conclusion": "success",
+    "fast_failure_run_id": 39060354590,
+    "fast_failure_cause": "Stale pre-RTV7 static exact-string assertion, repaired without reducing native DX11 runtime safety checks",
+    "runtime_validation": "UNTESTED",
+    "hmd_test": "UNTESTED",
+    "source_material_sha": "1976e29c00c1b28a1d7591ea48b25f15b321c226",
+    "score_change": 0
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub branch HEAD 10b0b1ef and 00890 exact-SHA C6 PASS; 00891 did not yet have a run record or overlapping owner.",
+    "C1_REVIEW": "Class A native stereo GPU Copy real game camera sparse RT7 restore attempted illegal pixel UAV StartSlot=8 with UAVCount=0.",
+    "C2_IMPLEMENT": "Actual C++ RTV-only zero-tail OM recovery plus native Win32 WARP GPU source/host pixel regression; no DXVK or D3D9Ex modifications.",
+    "C3_VALIDATE": "Native isolated WARP #39060354384 SUCCESS; after same-ID stale fast regression repair exact 8c738484 all mandatory 5 GitHub Actions SUCCESS. Quest3/gamepad UNTESTED.",
+    "C4_COMMIT": "Material C++/WARP SHA 1976e29c00c1b28a1d7591ea48b25f15b321c226; same-TASK CI regression repair SHA 8c738484ad505d9bf9d4a494393c187a6dbdb8e8 bears final exact-SHA five gates.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA, COMPLETE_BUILD_VERIFIED, NEED_HMD_TEST for matching live OutRun full frame/gamepad/Quest3; scoreboard single-point feature credit only, C6 bookkeeping +0."
+  }
+}

@@ -3,6 +3,7 @@ name: OutRun EXE HUD Inspector CI
 on:
   workflow_dispatch:
   push:
+    branches-ignore: [ vr-dxvk-r71-disasm, 'vr-d3d9ex-review-feature-*' ]
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
       - 'OutRun2006Tweaks.ini'
@@ -23,10 +24,43 @@ on:
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
+      - 'tools/test_dx11_first_game_frame_regressions.py'
+      # Causal full-game activation repairs must trigger exact-SHA HUD Gate.
+      - 'tools/verify_dx11_first_game_frame_boundary.py'
+      - 'tools/test_dx11_*.py'
+      # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
+      - 'tools/dx11_sm3_*_probe.cpp'
+      # Ensure real pre-Draw native GPU replay probe repairs also run the
+      # OpenXR/HUD Gate on the exact validation-bearing pushed source SHA.
+      - 'tools/dx11_pre_draw_*_probe_*.cpp'
+      - 'tools/dx11_full_clear_resume_probe_00728.cpp'
+      # Authentic 17..128 source Clear regression must re-run this Gate at the exact repair SHA.
+      - 'tools/dx11_full_clear_resume_probe_00728.cpp'
+      # Numbered SM3 live-game C++ source fixtures (e.g. indexed fan 01087)
+      # must trigger every exact-SHA Gate after a causal compiler/test repair.
+      - 'tools/dx11_sm3_*_010*.cpp'
+      - 'tools/dx11_live_sm3_texkill_01013.cpp'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
+      - 'src/vr/d3d11/**'
+      # Keep RAW source pair C++ fixture corrections in exact-SHA HUD CI.
+      - 'tests/native_raw_dual_tile_test.cpp'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
+      - 'tools/test_dx11_live_sm3_draw_00925.py'
+      - 'tools/test_dx11_live_sm3_blend_factor_00966.py'
+      # Exact pushed DX11 result SHA must retain the HUD inspector gate when
+      # a causal source-activation or packaging negative repair is committed.
+      - 'tools/verify_dx11_activation_boundary.py'
+      - 'tools/test_package_dx11_first_game_frame.py'
+      - 'tools/dx11_autodev_policy.py'
+      - 'tools/test_dx11_autodev_policy.py'
+      - 'docs/automation/runs/CONVERSION-DX11-*.json'
+      # Revalidate native artifacts on exact SHA when backend CI changes.
+      - '.github/workflows/backend-conversion-gate.yml'
+      - '.github/workflows/build.yml'
+      - '.github/workflows/vr-openxr.yml'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
   pull_request:
     paths:
@@ -49,11 +83,28 @@ on:
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'tools/analyze_outrun_exe.py'
+      - 'tools/test_dx11_first_game_frame_regressions.py'
+      # Causal full-game activation repairs must trigger exact-SHA HUD Gate.
+      - 'tools/verify_dx11_first_game_frame_boundary.py'
+      - 'tools/test_dx11_*.py'
+      # Same-feature C++ compiler regression repairs must retrigger exact-SHA CI.
+      - 'tools/dx11_sm3_*_probe.cpp'
+      # Ensure real pre-Draw native GPU replay probe repairs also run the
+      # OpenXR/HUD Gate on the exact validation-bearing pushed source SHA.
+      - 'tools/dx11_pre_draw_*_probe_*.cpp'
+      # Numbered SM3 live-game C++ source fixtures (e.g. indexed fan 01087)
+      # must trigger every exact-SHA Gate after a causal compiler/test repair.
+      - 'tools/dx11_sm3_*_010*.cpp'
+      - 'tools/dx11_live_sm3_texkill_01013.cpp'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
+
+concurrency:
+  group: exe-hud-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -63,6 +114,14 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify exact pushed DX11 source checkout
+        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-01013-visible-game-frame' || github.ref_name == 'feature/dx11-00966-live-game-frame')
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $expected = '${{ github.sha }}'
+          if ($actual -ne $expected) { throw "DX11 exact-SHA checkout mismatch: $actual != $expected" }
 
       - name: Validate PowerShell helper syntax
         shell: pwsh
@@ -119,6 +178,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Verify exact pushed DX11 source checkout
+        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-01013-visible-game-frame' || github.ref_name == 'feature/dx11-00966-live-game-frame')
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $expected = '${{ github.sha }}'
+          if ($actual -ne $expected) { throw "DX11 exact-SHA checkout mismatch: $actual != $expected" }
 
       - name: Configure Win32 game DLL
         shell: pwsh

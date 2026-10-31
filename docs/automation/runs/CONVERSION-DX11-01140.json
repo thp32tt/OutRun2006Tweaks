@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01140",
+  "production_id": "CONVERSION-DX11-01140",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01140",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_DIRTY_TILE_VISIBLE",
+  "classification": "A_REAL_NATIVE_GAME_GPU_SOURCE_DIRTY_VISIBLE_PATH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "source_base_sha": "6fddac94aedb0366fd3aa75582e59b5a4a048115",
+  "material_result_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+  "validation_bearing_result_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+  "development_time_percentages": "UNMEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "INTERCEPTED_D3D9_GAME_DRAW",
+      "D3D11_NATIVE_GPU_BEFORE_AFTER_PIXEL_CAPTURE",
+      "AUTHENTIC_D3D9_SOURCE_DIRTY_RECT_UNION",
+      "RAW_TILE_PARTIAL_VISIBLE_PRESENT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "REGION_UNION_TILE_VISIBILITY",
+      "REAL_D3D9_DIRTY_REGION_TO_PREVIEW_INTEGRATION",
+      "DUAL_TILE_VISIBLE_FALLBACK",
+      "CXX17_POSITIVE_NEGATIVE_DIRTY_RECT_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "One/two real GPU RGB tiles visibly painted only when exactly covered by actual D3D9 Present dirty rectangles, including multipart coverage",
+      "negative_regression": "Holes, forged rcBound, unverified/oversize regions, and any unmapped native RGB remain original D3D9-only without claiming a native frame",
+      "component_integration": "Live D3D9 dirty region -> bounded source copy -> real D3D11 GPU Draw pair -> independent tile destination coverage -> D3D9 partial diagnostic UpdateSurface"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC:SOURCE_DIRTY_TILE_VISIBLE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "A genuine opt-in partial GPU diagnostic tile, NOT a full native game or stereo frame",
+    "activation_guard_and_fallback": "RAW mode opt-in only; original D3D9 Draw/gamepad/FFB and DX9Ex fallback remain; DXVK unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/native_raw_present_coverage_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01140.json"
+  ],
+  "real_game_draw_blocker": "Source-matched native GPU Draw and visual dirty-Present counts UNTESTED; no gameplay/HMD claims",
+  "checkpoint": "C6_STATE",
+  "evidence": {
+    "desktop_native_game": "UNTESTED",
+    "quest3_vdxr": "UNTESTED",
+    "full_native_game_frame_complete": false,
+    "causal_policy_repair": "Add required feature-sized acceptance contract and ordered canonical actual D3D9 -> D3D11 Draw -> visible output path; preserve incomplete frame and unchanged Gate policy.",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40737459372,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40737459663,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40737459761,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40737459883,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40737459716,
+        "head_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_evidence": "UNTESTED: no source-matched real menu/car/race visual, native_draws, native_gpu_pixel_output or Quest3/VDXR optical evidence; incomplete RAW GPU tiles are build-validated only",
+    "source_implementation": "C++ real D3D9 Present dirty rectangles integrated with per-native-GPU RGB tile visibility; functional source commit 334d6fff; include repair 827e6e8f; exact-SHA test-policy contract repair 747c938e",
+    "duplicate_task_score_change": 0
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate real game-authored D3D11 RAW Draw GPU RGB into original D3D9 partially dirty menu/car/race Presents with exact authentic rectangle-union visibility and fail-closed unchanged full native gameplay fallback.",
+    "acceptance_items": [
+      {
+        "id": "partial_dirty_gpu_output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native game GPU Draw RGB to original D3D9 Present",
+        "expected_behavior": "The opt-in RAW game diagnostic paints genuine native GPU Draw pixels where the game's partial dirty RECT union covers the actual diagnostic tile, including adjacent rectangles."
+      },
+      {
+        "id": "independent_tile_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Source dirty region and original input-safe D3D9 output",
+        "expected_behavior": "If only one of two real GPU regions is covered, show that region exclusively; unknown, malformed or incomplete dirty regions do not paint, preserving original D3D9 rendering and input."
+      },
+      {
+        "id": "exact_sha_integrated_regression",
+        "category": "integrated_validation",
+        "behavior_area": "Bounded D3D9 region-to-GPU-staging source chronology and compile",
+        "expected_behavior": "The C++17 positive and negative union regression and the five unmodified exact-SHA CI gates validate the renderer code candidate separately from untested game and HMD output."
+      }
+    ]
+  },
+  "source_implementation_commit_sha": "334d6fff56b010e0f362f790af18a32f6b4b78a3",
+  "causal_source_compile_repair_sha": "827e6e8f2c315a94e677ab56ac747660fa198ce6",
+  "causal_policy_contract_repair_sha": "747c938e9b95d616c8c08563b9ad44189235af68",
+  "acceptance_results": {
+    "partial_dirty_gpu_output": "PASS_BUILD",
+    "independent_tile_source_fallback": "PASS_BUILD",
+    "exact_sha_integrated_regression": "PASS_EXACT_SHA"
+  },
+  "desktop_native_game": "UNTESTED",
+  "quest3_vdxr": "UNTESTED"
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00645",
+  "production_id": "CONVERSION-DX11-00645",
+  "event_id": "CONVERSION-DX11-00645-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_POINT_TOPOLOGY",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "ab46b9b6fa96343eb7429523993ab21c700eb2e4",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "game-authored D3D9 R30 point VB/IB/UP bounded capture",
+      "D3D9 point raster gate -> D3D11 IA POINTLIST Draw/DrawIndexed diagnostic inset"
+    ],
+    "batch_components": [
+      "R30 and R26-safe real game point-source observer and element bound",
+      "D3D11 one-pixel point raster admission + native Draw/DrawIndexed and numeric regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "P POINTLIST spans and 1-pixel no-sprite/no-scale fixed FVF -> real point Draw/DrawIndexed",
+      "negative_regression": "reject zero/513 points, point sprite, scaling, FVF PSIZE, non-1-size, invalid min/max or render-state failure",
+      "component_integration": "R30 VB/IB/UP -> native bridge -> D3D11 POINTLIST -> diagnostic visible inset with original D3D9 and gamepad unaffected"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_POINT_TOPOLOGY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source+CI only; actual menu/race/HMD pixels untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME exact opt-in, original D3D9 draw and input unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_live_point_draw_00645.py",
+    "docs/automation/runs/CONVERSION-DX11-00645.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "PASS: D3DPT_POINTLIST ignored by live bridge, point size/sprite not guarded",
+    "C2_IMPLEMENT": "PASS: R30 point source and guarded D3D11 POINTLIST",
+    "C3_VALIDATE": "PASS_EXACT_SHA",
+    "C4_COMMIT": "PASS_MATERIAL_COMMIT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Separate runtime Quest3/VDXR game+gamepad tests remain UNTESTED; next independent DX11 native gameplay code item may start immediately. DXVK remains frozen.",
+  "validation_bearing_result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8",
+  "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38331015386,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "dx11_fast_structural": {
+      "id": 38331015339,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "windows_build": {
+      "id": 38331018370,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "openxr_architecture_push": {
+      "id": 38331015312,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "openxr_architecture_other": {
+      "id": 38331018562,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "optional_hud_inspector": {
+      "id": 38331018323,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    }
+  }
+}

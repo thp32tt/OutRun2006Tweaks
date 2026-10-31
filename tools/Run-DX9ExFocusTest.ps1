@@ -9,6 +9,21 @@ if (-not (Test-Path $variantFile)) { throw 'DX9EX_VARIANT.txt is missing.' }
 $variantLine = Get-Content $variantFile | Where-Object { $_ -match '^variant=' } | Select-Object -First 1
 if (-not $variantLine) { throw 'variant= entry is missing from DX9EX_VARIANT.txt.' }
 $variant = ($variantLine -split '=',2)[1].Trim()
+# Explicit source-matched opt-in for native pixel evidence, never default.
+$testMode = 'DX9EX_COMPAT'
+$requested = $env:OUTRUN_DX11_TEST_MODE
+if ($requested -eq 'RAW_VISUAL' -or $requested -eq 'DX9EX_CONTROL') {
+    $testMode = if ($requested -eq 'RAW_VISUAL') { 'DX11_RAW_VISUAL' } else { 'DX9EX_CONTROL' }
+    $requiredValue = if ($requested -eq 'RAW_VISUAL') { '1' } else { '0' }
+    foreach ($flag in @('OUTRUN_DX11_FIRST_GAME_FRAME',
+                        'OUTRUN_DX11_FULL_GAME_FRAME',
+                        'OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC')) {
+        if ([Environment]::GetEnvironmentVariable($flag, 'Process') -ne $requiredValue) {
+            throw "$testMode requires $flag=$requiredValue"
+        }
+    }
+    $variant = "$variant-$testMode"
+}
 
 $game = Join-Path $root 'OR2006C2C.EXE'
 if (-not (Test-Path $game)) { throw 'OR2006C2C.EXE not found. Extract this ZIP into the OutRun 2006 game folder.' }
@@ -58,7 +73,10 @@ Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding 
 Copy-Item $variantFile (Join-Path $session 'DX9EX_VARIANT.txt')
 Copy-Item (Join-Path $root 'OutRun2006Tweaks.ini') (Join-Path $session 'OutRun2006Tweaks.ini')
 
-Write-Host "Starting DX9Ex variant $variant"
+Write-Host "Original D3D9Ex game + $testMode session $variant"
+if ($testMode -eq 'DX11_RAW_VISUAL') {
+    Write-Host 'EXPERIMENTAL native D3D11 pixel tile, not full frame or Quest3 native stereo.'
+}
 Write-Host "Test the same short gameplay section, then exit normally."
 
 $p = Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
@@ -76,7 +94,9 @@ $result = @(
     "variant=$variant",
     "finished=$(Get-Date -Format o)",
     "gameExitCode=$($p.ExitCode)",
-    "policy=DX9Ex-only; dynamic XR cadence; DirectGPU preferred with desktop fallback allowed"
+    "testMode=$testMode",
+    "runtimeValidation=UNTESTED",
+    "policy=Original D3D9Ex game authoritative; DX11_RAW_VISUAL is isolated incomplete native RGB-delta tile only"
 )
 Set-Content (Join-Path $session 'TEST_RESULT.txt') $result -Encoding UTF8
 

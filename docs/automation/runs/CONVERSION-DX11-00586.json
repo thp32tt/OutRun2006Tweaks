@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00586",
+  "production_id": "CONVERSION-DX11-00586",
+  "event_id": "CONVERSION-DX11-00586-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00586",
+  "base_sha": "c53485248b45838561b85f8bbf7b1b9a95bade11",
+  "work_key": "DX11:MENU_RACE_SELECTARG_BLENDDIFFUSEALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real game stage0 D3D9 SELECTARG1/2 RGB and independent BLENDDIFFUSEALPHA capture/admission",
+      "D3D11 HLSL diffuse-alpha-weighted PS create/bind, guarded Draw/DrawIndexed diagnostic inset"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp game-state capture and native pixel pipeline",
+      "tools/test_dx11_selectarg_blend_diffuse_alpha_00586.py and GitHub exact-SHA Gate integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "20 destructive mutations and 28 diffuse-weighted RGBA alpha cases, exact Gate + Windows build SUCCESS",
+      "negative_regression": "Older SELECTARG 00584/00585 and DX11 fail-closed gate passed; D3D9 original Draw/gamepad unchanged",
+      "component_integration": "D3D9 game state -> HLSL -> CreatePixelShader -> PSSetShader -> Draw/DrawIndexed -> opt-in 256x144 inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SELECTARG_BLENDDIFFUSEALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SELECTARG_BLENDDIFFUSEALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native diagnostic inset implementation build verified; actual Quest3/VDXR/menu/race visible frame NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact opt-in, DX9Ex original Draw and gamepad unaffected"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_selectarg_blend_diffuse_alpha_00586.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "material_result_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f",
+  "validation_bearing_result_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f",
+  "result_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f",
+  "c6_basis_head_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f",
+  "local_validation": [
+    "00586 20 destructive mutation/28 math PASS",
+    "00585 20 destructive mutation/28 alpha PASS",
+    "00584 22 destructive mutation/24 alpha PASS",
+    "git diff --check PASS"
+  ],
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38199387735,
+      "conclusion": "success",
+      "validation_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f",
+      "jobs": "validate (33/33) + DX11 readiness smoke"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38199392271,
+      "conclusion": "success",
+      "validation_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38199387739,
+      "conclusion": "success",
+      "validation_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38199387725,
+      "conclusion": "success",
+      "validation_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38199392255,
+      "conclusion": "success",
+      "validation_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38199392270,
+      "conclusion": "success",
+      "validation_sha": "bd09b645224c6514a231d7b134f8df02d3e9045f"
+    }
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Only source/CI-native integration; real Quest3/VDXR user test required for package/runtime advancement"
+  },
+  "next_action": "NEED_HMD_TEST: native opt-in real menu→vehicle select→race and Quest 3/VDXR/gamepad comparison. Controller can select next independent DX11 feature; do not reactivate DXVK."
+}

@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01154",
+  "production_id": "CONVERSION-DX11-01154",
+  "event_id": "CONVERSION-DX11-01154-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_FVF:SOURCE_EQUATION_RAW_GAME_DRAW",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "31f9fca464644a94432a9c3a38e379d686009712",
+  "material_result_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+  "validation_bearing_result_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "tools/test_dx11_live_sm3_table_zfog_01005.py",
+    "docs/automation/runs/CONVERSION-DX11-01154.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_GAME_FVF_FOG_MODES_AND_TABLE_PRIORITY",
+      "CONSUMED_D3D9_FOG_FLOAT_GETTERS_TO_NATIVE_RAW_FVF_GPU_DRAW",
+      "SOURCE_EQUIVALENT_SHARED_SM3_FVF_FOG_REJECTION_AND_FULL_FRAME_FALLBACK"
+    ],
+    "batch_components": [
+      "NATIVE_FVF_COM_GETTER_AND_ACTIVE_SOURCE_FOG_EQUATION_INTEGRATION",
+      "RAW_FVF_SM3_SHARED_VISUAL_FOG_ADMISSION",
+      "POSITIVE_NEGATIVE_CPLUSPLUS_AND_SOURCE_INTEGRATION_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual EXP/EXP2 table over inherited LINEAR vertex reads only DENSITY; actual LINEAR table reads START/END; active source FVF native opt-in RAW GPU Draw no longer rejected by unused COM floats.",
+      "negative_regression": "No RAW opt-in, unknown mode/query, invalid live range enum, nonfinite/negative CONSUMED density and bad LINEAR interval still fail-closed; no full-frame parity credit.",
+      "component_integration": "Real game D3D9 FVF GetRenderState per active table/vertex fog equation -> native D3D11 opt-in RAW tile -> original D3D9 game render/input/FFB preserved."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_raw_fvf_fog_visual.hpp",
+      "tools/dx11_live_sm3_table_zfog_01005.cpp",
+      "tools/test_dx11_live_sm3_table_zfog_01005.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_INTEGRATED_CI_PENDING; native Draw/output visibility NOT verified on the exact user game binary. Runtime requires native_draws>0 and publishedBackbufferFrames>0 from one authentic game launch; RAW partial tile is visibly labeled and never counted as full-frame proof.",
+    "activation_guard_and_fallback": "Original D3D9Ex game pixels, controller input and FFB remain authoritative; full-frame source/target/poison/caps/stencil/resource/viewport admission fail closed. Only exact source-zero EXP/EXP2 is production-equivalent; unknown W projection may omit visual fog solely for separately enabled RAW tile."
+  },
+  "real_game_draw_blocker": "No new actual game source-matched Draw or published frame evidence; old b8dab362 was zero-native-draw",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Unblock real game-authored native D3D11 FVF visual RAW Draws previously blocked by unused D3D9 Fog float getters, while coupling FVF and SM3 to one source-authentic table-over-vertex fog equation and preserving DX9Ex input and full-frame fail-closed.",
+    "acceptance_items": [
+      {
+        "id": "fvf_raw_live_source_equation_native_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Actual D3D9 game FVF source Fog -> DX11 GPU RAW tile",
+        "expected_behavior": "EXP/EXP2 table fog reads only DENSITY; LINEAR table reads START/END; inherited vertex-only equation is selected solely when table is NONE; actual consumed COM reads guard opt-in GPU draw."
+      },
+      {
+        "id": "fvf_sm3_one_live_equation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Shared programmable and fixed-function source-to-native fog pipeline",
+        "expected_behavior": "FVF and SM3 RAW admissions use one source table-over-vertex precedence; NaN or failed unused legacy COM floats cannot reject an otherwise valid authentic source draw."
+      },
+      {
+        "id": "original_input_fallback_and_native_frame_safety",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9Ex game Draw, input/FFB and native frame safety",
+        "expected_behavior": "Source query failure for required consumed state, malformed modes/float/range, RAW off and unknown GPU resources still reject; no incomplete RAW tile certified as full game frame."
+      },
+      {
+        "id": "exact_sha_five_actions",
+        "category": "integrated_validation",
+        "behavior_area": "DX11 C++ Windows build and source regression",
+        "expected_behavior": "Unmodified DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector workflows succeed on validation-bearing SHA; game and HMD remain UNTESTED."
+      }
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_PINNED_BASE",
+    "C1_REVIEW": "PASS_SOURCE_FVF_SM3_FOG_CONSUMPTION_SCOPE",
+    "C2_IMPLEMENT": "PASS_CPP_SOURCE_AND_TARGETED_INTEGRATION_REGRESSIONS",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_EXACT_SHA_0eb3fb66",
+    "C4_COMMIT": "PASS_SOURCE_MATERIAL_0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+    "C5_PACKAGE": "NO_SOURCE_MATCHED_GAME_OR_HMD_RUNTIME",
+    "C6_STATE": "PASS_SEPARATE_DOCS_CHECKPOINT_NO_ADDITIONAL_SCORE"
+  },
+  "evidence": {
+    "requires_final_exact_sha_five_push_gates": true,
+    "runtime_evidence": "UNTESTED: no new source-matched real desktop game native Draw/published frame or Quest3/VDXR.",
+    "source_implementation_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40836219899,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40836220067,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40836219961,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40836219915,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40836219996,
+        "head_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+        "conclusion": "success"
+      }
+    ],
+    "scoreboard_commit": "46392c4c0e8e41c44d2b13d9f012d174be851a74",
+    "scoreboard_ai2_prior": 2152,
+    "scoreboard_ai2_delta": 1,
+    "scoreboard_ai2_new": 2153
+  },
+  "visible_frame_acceptance": "SOURCE_INTEGRATED_CI_PENDING; actual game native Draw and published frame remain UNTESTED at this SHA; RAW tile is visual-only and cannot establish a complete native game frame.",
+  "activation_guard_and_fallback": "No production fog bypass: production exact disabled/NONE/NONE/verified zero-density path unchanged. All active FVF fog remains RAW opt-in visual mismatch only, with consumed real COM floats known, native resource/poison/frame gates untouched; game Draw/FFB unchanged.",
+  "source_implementation_commit_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+  "c6": {
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+    "source_implementation_sha": "0eb3fb663aa1aebef14cb1574249d7ec78ab3fa6",
+    "bookkeeping_only": true,
+    "score_change": 0,
+    "checkpoint_message_has_ci_skip": true,
+    "ci_validated_source_commit_distinct": true,
+    "next_action": "Feature still unfinished for native menu->vehicle->race full-frame source-matched game/HMD proof; preserve original D3D9 game/input/FFB and frozen DXVK."
+  }
+}

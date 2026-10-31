@@ -1,0 +1,161 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00572",
+  "production_id": "CONVERSION-DX11-00572",
+  "event_id": "CONVERSION-DX11-00572-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00572",
+  "base_sha": "73be29dc2d2571fe31b76786c09bacc7dfd31a88",
+  "work_key": "DX11:MENU_RACE_BLEND_RGB_ADDSMOOTH_ALPHA_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Actual game D3D9 texture/diffuse RGB BLEND plus ADDSMOOTH alpha state producer",
+      "Two compiled HLSL PS and D3D11 Draw/DrawIndexed consumer, device reset lifecycle",
+      "Opt-in native GPU frame readback to D3D9 inset, original DX9Ex input/Draw/Present fallback"
+    ],
+    "batch_components": [
+      "D3D9 stage0 color/alpha operation intake + capture",
+      "HLSL shaders and D3D11 resource creation, reset, Draw binding",
+      "14 destructive source mutations + nine invalid operand cases"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two real game blend RGB / ADDSMOOTH alpha native Draw modes",
+      "negative_regression": "14 negative link mutants, nine alpha operation/operand denials, four CPU alpha examples",
+      "component_integration": "Game D3D9 Draw -> D3D11 native PS -> Draw/Indexed -> opt-in visible inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BLEND_RGB_ADDSMOOTH_ALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BLEND_ADDSMOOTH_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "BLEND_RGB_ADDSMOOTH_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Diagnostic opt-in only. HMD/Quest3/VDXR/menu/vehicle/race/gamepad outcome requires live test.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 optional; default off. Original DX9Ex game Draw/input/Present unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00572.json"
+  ],
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 73be29dc2d2571fe31b76786c09bacc7dfd31a88 and completed 00571 C6; R175 ownership preserved",
+    "C1_REVIEW": "Missing stage0 BLEND RGB/ADDSMOOTH alpha native integration",
+    "C2_IMPLEMENT": "Two source PS, game capture and D3D11 Draw/DrawIndexed/lifecycle with negative tests",
+    "C3_VALIDATE": "PASS_EXACT_SHA: first C++ material f64af4b7ddaf3c0395ee2508c4a194757e584dc9, test repair 6129c1177c910f7c0c43e7a2ee6ca8000017bd90; exact GitHub Backend Gate validate+readiness, Build, OpenXR, HUD and DX11 Fast SUCCESS. Runtime Quest3/VDXR/gamepad untested.",
+    "C4_COMMIT": "Game C++ material commit f64af4b7ddaf3c0395ee2508c4a194757e584dc9 and source-linked regression repair/validation-bearing commit 6129c1177c910f7c0c43e7a2ee6ca8000017bd90; both with [AUTO:CONVERSION-DX11-00572], no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic only",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED PASS_EXACT_SHA at 6129c1177c910f7c0c43e7a2ee6ca8000017bd90; separate documentation-only [skip ci] C6 commit; HMD/gamepad UNTESTED, NEED_HMD_TEST. No duplicate score."
+  },
+  "next_action": "BUILD_VERIFIED, no same TASK retry. Quest3/VDXR menu→vehicle→race, input and frame parity runtime remains NEED_HMD_TEST; next source feature selection belongs to controller; DXVK frozen.",
+  "state_persisted": true,
+  "validation_evidence": {
+    "initial_material_sha": "f64af4b7ddaf3c0395ee2508c4a194757e584dc9",
+    "failed_workflow_run_id": 38180437561,
+    "failed_step": "Feature acceptance DX11-SAFE-RETURN",
+    "failed_assertion": "Unscoped mutation token duplicated by pre-existing RGB blend shader; function-local negative test required",
+    "runtime_status": "UNTESTED",
+    "exact_sha": "6129c1177c910f7c0c43e7a2ee6ca8000017bd90",
+    "github_workflow_runs_observed": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38180543989,
+        "conclusion": "SUCCESS",
+        "head_sha": "6129c1177c910f7c0c43e7a2ee6ca8000017bd90"
+      },
+      {
+        "name": "Build",
+        "run_id": 38180546658,
+        "conclusion": "SUCCESS",
+        "head_sha": "6129c1177c910f7c0c43e7a2ee6ca8000017bd90"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38180546722,
+        "conclusion": "SUCCESS",
+        "head_sha": "6129c1177c910f7c0c43e7a2ee6ca8000017bd90"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38180546655,
+        "conclusion": "SUCCESS",
+        "head_sha": "6129c1177c910f7c0c43e7a2ee6ca8000017bd90"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38180543988,
+        "conclusion": "SUCCESS",
+        "head_sha": "6129c1177c910f7c0c43e7a2ee6ca8000017bd90"
+      }
+    ],
+    "backend_jobs": [
+      {
+        "name": "validate",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "DX11 readiness smoke probes",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "openxr_jobs": [
+      {
+        "name": "host-x64",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "game-x86",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "game-x86-c2-r30-hud",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "game-x86-c1-r29-r28-classify",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "game-x86-r26-hud-safe",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "game-x86-safe-draw-compare",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "DX11 FIRST_GAME_DRAW_FRAME diagnostic bundle",
+        "conclusion": "SKIPPED"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  },
+  "material_result_sha": "f64af4b7ddaf3c0395ee2508c4a194757e584dc9",
+  "validation_bearing_result_sha": "6129c1177c910f7c0c43e7a2ee6ca8000017bd90",
+  "result_sha": "6129c1177c910f7c0c43e7a2ee6ca8000017bd90",
+  "c6_recovery_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+}

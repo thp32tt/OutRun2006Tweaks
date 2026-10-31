@@ -1,0 +1,85 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00738",
+  "production_id": "CONVERSION-DX11-00738",
+  "event_id": "CONVERSION-DX11-00738-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:R26_SAFE_HRESULT_NATIVE_FRAME_REVOCATION",
+  "feature_id": "DX11-FULL-FRAME-SOURCE-HRESULT-OWNERSHIP",
+  "status": "C3_VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "base_head_sha": "6ae897f5f485807471496a20e9282527bbded63d",
+  "material_result_sha": "d6bbd9a89a34b284da60dba0907d383350cd9a9a",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "change_summary": "Restore native full-frame source draw HRESULT revocation for R26-safe menu, car-select and race draw hook variants, including fixed-function sprite, direct XYZRHW, delegated R29/R26, VB/IB and UP. Speculative D3D11 frame is revoked on D3D9 HRESULT failure without altering original return, input or DX9Ex fallback.",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/test_dx11_failed_game_draw_00730.py"
+  ],
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "live game VB/IB/UP R26-safe source Draw capture",
+      "post-call original HRESULT reconciliation across R26/R29/XYZRHW/sprite",
+      "native full-frame publication revocation before same-device Present"
+    ],
+    "batch_components": [
+      "D3D9 R26-safe four Draw hook HRESULT ownership",
+      "native live_game_frame_bridge failed source draw rollback",
+      "destructive source regression for all return branches"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "All source variants record successful Draw and preserve original HRESULT and gamepad route, existing C++ frame batch probe.",
+      "negative_regression": "Four R26-safe hooks and indexed fixed-function sprite early-return must revoke speculative native scene on FAILED HRESULT; destructive source mutations caught.",
+      "component_integration": "D3D9 hook callsite -> observe_failed_game_draw -> full-frame batch abort -> no same-Present native publication in existing bridge."
+    },
+    "conflict_keys": [
+      "DX11:R26_SAFE_HRESULT_NATIVE_FRAME_REVOCATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "blocking_evidence": "R30 normal variant calls observe_failed_game_draw on failed game HRESULT; R30 R26-safe variant had four missing hook result calls plus a sprite early return, allowing failed speculative native full-frame pixels.",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "No native full-size menu/car-select/race frame may publish pixels after its original D3D9 Draw fails. Source/build verification separate from Quest3 display parity.",
+    "activation_guard_and_fallback": "NativeDrawPathActive opt-in remains false by default; original D3D9 HRESULT/input, fallback rendering and game Present remain authoritative."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-FRAME-SOURCE-HRESULT-OWNERSHIP",
+    "goal": "Ensure all original D3D9 R26-safe menu, vehicle selection and racing Draw return paths revoke a speculative full-frame native D3D11 scene on failure, preserving game input and DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "real_source_paths",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_rendering",
+        "expected_behavior": "Four R26-safe game Draw hooks reconcile original results before native full-frame output."
+      },
+      {
+        "id": "failure_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_draw_fallback",
+        "expected_behavior": "Early sprite and XYZRHW as well as delegated failure paths revoke speculative frames without replacing HRESULT/input."
+      },
+      {
+        "id": "exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "source_build_ci",
+        "expected_behavior": "One final validation-bearing SHA passes mandatory DX11 Fast, Backend, Build, OpenXR and HUD workflows."
+      }
+    ]
+  },
+  "runtime_gate": "NEED_HMD_TEST"
+}

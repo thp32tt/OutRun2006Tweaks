@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00076",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T03:07:45+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "f66a132321e11870c5322487a1c7fc90941acaa7",
+  "result_sha": "527c1f16f9f641702e3824ad552db8582da44cee",
+  "validation_bearing_result_sha": "527c1f16f9f641702e3824ad552db8582da44cee",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F18 R110 MANAGED Texture2D stale readiness snapshot rejection.",
+  "summary": "R110 adds a non-routing readiness snapshot token bound to registry instance/membership generation, required-stage mask, expected D3D11 device, texture identities, managed device/shadow/mirror generations and per-mirror instance generation. Tokens fail closed after same-shadow mirror recreation, registry membership change, external mutation, Reset or later recapture/recreation.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "runtime_census_calls_r108_r109_r110_observation_api": false,
+    "raw_registry_srv_getter": false,
+    "production_ps_set_shader_resources": false,
+    "native_game_draw_routing": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36606779633,
+      "conclusion": "success",
+      "validated_sha": "527c1f16f9f641702e3824ad552db8582da44cee",
+      "evidence": "Source graph/census/build/probe chain PASS; hosted log emitted DX11 managed Texture2D readiness snapshot token R110: PASS."
+    },
+    "build": {
+      "run_id": 36606784293,
+      "conclusion": "success",
+      "validated_sha": "527c1f16f9f641702e3824ad552db8582da44cee"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36606784339,
+      "conclusion": "success",
+      "validated_sha": "527c1f16f9f641702e3824ad552db8582da44cee"
+    },
+    "hud_inspector": {
+      "run_id": 36606784350,
+      "conclusion": "success",
+      "validated_sha": "527c1f16f9f641702e3824ad552db8582da44cee"
+    },
+    "pc_fast": {
+      "run_id": 36606779355,
+      "conclusion": "skipped",
+      "validated_sha": "527c1f16f9f641702e3824ad552db8582da44cee"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5895442319,
+    "repair_comment_id": 5895486425,
+    "validation_comment_id": 5895878760,
+    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_WRITTEN"
+  },
+  "blocker": null,
+  "resume_cursor": "R110 is automation-validated but runtime-untested. Stale readiness evidence can now be rejected without exposing or binding registry SRVs.",
+  "next_action": "Continue F18 with one bounded non-routing activation prerequisite after R110. Do not promote native draw or claim Quest3/VDXR visual correctness without exact-build runtime evidence."
+}

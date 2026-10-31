@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01162",
+  "production_id": "CONVERSION-DX11-01162",
+  "event_id": "CONVERSION-DX11-01162-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "SOURCE_SLICE_BUILD_VERIFIED",
+  "feature_work_key": "DX11:RAW_GAME_GPU_RGBA_BGRA_PRESENT_CHANNEL_ORDER",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_B_CAUSAL_INHERITED_POLICY_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "scoreboard_previous": 2175,
+  "scoreboard_new": 2175,
+  "development_time_percentages": "UNMEASURED",
+  "controller_runtime_adoption": "UNVERIFIED",
+  "source_base_sha": "ba93fa6fd9566fd10f968531f9fc98a6951da6a6",
+  "implementation_source_sha": "86a1c5580b827261bd74d9d5b5a34320cd64ec48",
+  "first_failed_validation_sha": "86a1c5580b827261bd74d9d5b5a34320cd64ec48",
+  "causal_ci_repair_sha": "94991be30de56307fca999c5f4860e4cb59370cd",
+  "validation_bearing_result_sha": "94991be30de56307fca999c5f4860e4cb59370cd",
+  "material_result_sha": "94991be30de56307fca999c5f4860e4cb59370cd",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_color_transport.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01161.json"
+  ],
+  "implementation": "Explicit opt-in RAW preview now accepts actual native D3D11 BGRA8/RGBA8 UINT8 source render targets in UNORM/sRGB/TYPELESS layout with correctly matched GPU staging format. A source target format switch retires all FOUR GPU before/after staging textures before allocation. Completed source-owned per-Draw GPU copy bytes are accurately converted from RGBA->D3D9 BGRA during UpdateSurface on the existing original game's partial RAW Present. Both independent true native GPU tile regions, original D3D9 fallback/input/FFB, full-frame fail-closed routing, source epoch fences and mandatory safety gates remain intact.",
+  "ci_repair": "Source SHA 86a1c558 passed source-only C++ regression but Fast/Backend policy checks failed due PREEXISTING 01161 C6 run record lacking development_strategy and feature_contract/acceptance_results. Same 01162 causal repair 94991be3 restores the 01161 exact-SHA recorded prior source evidence; does NOT change game source or award another point. All five mandatory push Gates complete success on 94991be3.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_GAME_DRAW_TO_NATIVE_D3D11_COLOR_TARGET",
+      "SOURCE_FORMAT_MATCHED_D3D11_GPU_BEFORE_AFTER_STAGING",
+      "REAL_RGBA_OR_BGRA_GPU_SOURCE_BYTES_TO_D3D9_BGR_RAW_TILE_PRESENT"
+    ],
+    "batch_components": [
+      "CPLUSPLUS_RGBA_BGRA_GPU_STAGING_FORMAT_TRANSLATION_AND_LIFETIME",
+      "CPLUSPLUS_D3D9_PRESENT_REAL_GPU_PIXEL_CHANNEL_ORDER_MAPPING",
+      "CPLUSPLUS_RGBA_BGRA_ALPHA_FALLBACK_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast C++ native_raw_dual_tile_test RGB alpha/source ordering test and Win32 Build/OpenXR confirm compile at exact 94991be3; RAW native game GPU pixels not observed at runtime.",
+      "negative_regression": "Unsupported DXGI formats and MSAA/deferred or foreign native GPU color targets still reject; old BGRA byte identity and source-owned D3D9 rendering/FFB fallback preserved.",
+      "component_integration": "Game-origin native D3D11 Draw -> original GPU RGBA/BGRA source BEFORE/AFTER copies -> compatible same-family typed staging -> source-authentic RGB channel conversion -> opt-in incomplete D3D9 RAW tile."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "src/vr/d3d11/native_game_raw_color_transport.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "ONLY SOURCE+CI VERIFIED partial RAW native GPU RGB preview staging; actual source-matched game native_draws>0, publishedBackbufferFrames, complete menu/car/race or Quest3 stereo NOT OBSERVED.",
+    "activation_guard_and_fallback": "Explicit OUTRUN_DX11_RAW_VISUAL_DIAGNOSTIC remains opt-in, ordinary/native full-frame path remains fail closed. Original D3D9/DX9Ex Draw, input, FFB, SkyGlow and DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Extend source-authentic native D3D11 game GPU color capture and user-visible opt-in RAW presentation to both RGBA8 and BGRA8 render target families without corrupting GPU copies or altering the original D3D9 game fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_source_format_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live native Draw color target GPU capture",
+        "expected_behavior": "D3D11 REAL RGBA8 or BGRA8 source textures get correct format-matched staging copies; no incompatible RGBA-to-BGRA CopySubresourceRegion."
+      },
+      {
+        "id": "real_pixel_present_mapping",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 original-game opt-in RAW tile output",
+        "expected_behavior": "Readback native source RGB bytes are reordered only as needed to D3D9 BGRA; XRGB forced alpha opaque and ARGB alpha preserved."
+      },
+      {
+        "id": "unsafe_source_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native resource ownership and original game fallback",
+        "expected_behavior": "Foreign/unsupported/multisampled targets remain rejected; source format switches safely recreate staging; source epoch fences, original D3D9 input and FFB continue unchanged."
+      },
+      {
+        "id": "five_gate_integrated_validation",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Actions same-SHA production source verification",
+        "expected_behavior": "All five mandatory GitHub push Actions succeed on the final 94991be3 validation-bearing source-plus-causal-repair SHA with NO HMD runtime promotion."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_source_format_capture": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_color_transport.hpp"
+      ],
+      "validation_command": "Five required GitHub Actions push PASS at 94991be3, including Win32 Build 40903344854"
+    },
+    "real_pixel_present_mapping": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_color_transport.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural 40903344901 source-only g++ regression PASS"
+    },
+    "unsafe_source_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 40903344901 + Backend 40903344747 + OpenXR 40903344907"
+    },
+    "five_gate_integrated_validation": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_color_transport.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 40903344901, Backend 40903344747, Build 40903344854, OpenXR 40903344907, HUD 40903344908 all push completed success at 94991be3"
+    }
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 COMPLETED SUCCESS SAME EXACT SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40903344901,
+        "head_sha": "94991be30de56307fca999c5f4860e4cb59370cd",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40903344747,
+        "head_sha": "94991be30de56307fca999c5f4860e4cb59370cd",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40903344854,
+        "head_sha": "94991be30de56307fca999c5f4860e4cb59370cd",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40903344907,
+        "head_sha": "94991be30de56307fca999c5f4860e4cb59370cd",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40903344908,
+        "head_sha": "94991be30de56307fca999c5f4860e4cb59370cd",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "conditional_vr_pc_fast_build": "skipped; not among five mandatory Gates",
+    "runtime_evidence": "No real source-matched OutRun 2006 GPU desktop native Draw, native_gpu_pixel_output or actual menu/car/race frame observation. No Quest 3 / VDXR HMD execution. RUNTIME_VALIDATION UNTESTED.",
+    "validation_layer": "SOURCE_AND_BUILD_VERIFIED_NOT_GAMEPLAY_OR_HMD",
+    "scoreboard": "AI2 prior confirmed GitHub SSOT 2175 + same unfinished full-frame feature source-slice work 0 = AI2 2175; AI1 score separate."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_BRANCH_AND_01161_C6_CHECK",
+    "C1_REVIEW": "PASS_RGBA_BGRA_NATIVE_SOURCE_COPY_AND_D3D9_PRESENT_GAP",
+    "C2_IMPLEMENT": "PASS_ACTUAL_CPLUSPLUS_GPU_COPY_STAGING_PIXEL_MAPPING_AND_REGRESSION",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_EXACT_SHA_PUSH_GATES_AFTER_CAUSAL_REPAIR",
+    "C4_COMMIT": "PASS_REAL_SOURCE_SHA_86a1c558_AND_CAUSAL_CI_REPAIR_SHA_94991be3",
+    "C5_PACKAGE": "BUILD_VERIFIED_NEED_REAL_GAME_GPU_DESKTOP_AND_QUEST3_HMD",
+    "C6_STATE": "PASS_DOCS_ONLY_AFTER_EXACT_SHA_GATES"
+  },
+  "next_unfinished": "Use separately labeled RAW GPU desktop runner to observe real game native_draws>0 and actual GPU RGB pixels on same source/runner SHA; then implement and validate complete menu->vehicle->race native frame and separate native L/R Quest3/VXR. No runtime claim or DXVK development."
+}

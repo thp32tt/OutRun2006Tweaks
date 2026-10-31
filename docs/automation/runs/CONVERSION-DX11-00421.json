@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00421",
+  "production_id": "CONVERSION-DX11-00421",
+  "event_id": "CONVERSION-DX11-00421-E004",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R283_PROGRAMMABLE_TARGET_BYTECODE_MATERIALIZATION",
+  "base_sha": "b954a0e34fce4619266e55c19107836bfe3252eb",
+  "result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+  "material_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+  "validation_bearing_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+  "validation_bearing_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS_RECONCILED_E004_STALE_TIMEOUT",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "validation_run_id": 37575812828,
+  "validation_run_attempt": 1,
+  "validation_job_id": 112644341530,
+  "readiness_smoke_job_id": 112645775002,
+  "artifact_id": 11463037311,
+  "artifact_digest": "sha256:fc2bcfe8357f9b1ca8d00e0315e849f50b10bd0dfc0497c9e0cda64a6577a889",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00421.json",
+  "implementation_commits": [
+    "eb9532f4c0bd59c23164683ba880870aa9a474c7",
+    "0570e53588c9ae92770825f663e36c8b70f98733"
+  ],
+  "issue14_comment_id": 6031629494,
+  "native_draw_path_activation_changed": false,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE",
+  "summary": "E004 retry reconciles a stale controller missing-run timeout. The existing R283 material/validation-bearing SHA remains 0570e53588c9ae92770825f663e36c8b70f98733 because exact-SHA GitHub fallback confirms Backend Conversion Gate 37575812828 SUCCESS with validate 112644341530 and DX11 readiness smoke 112645775002. No material R283 work is repeated; runtime remains UNTESTED.",
+  "evidence": [
+    "native_backend.hpp/.cpp define NativeProgrammableShaderTargetBytecodeMaterializationEvidence and a fail-closed SM3 DCL+MOV materializer using the existing strictness+O3 D3DCompile path for vs_4_0/ps_4_0.",
+    "R283 validates generated DXBC payloads, hashes translated source and target bytecode, and seals per-stage materialized artifact identities to R281 receipt identities plus R282 compile-contract identities.",
+    "runtime_census.cpp derives, hashes and logs signature-attributable R283 evidence while keeping sig.shaderTranslationExact=false and object creation unauthorized.",
+    "analyze_dx11_census.py correlates exact R283 evidence and advances the next missing prerequisite to R242_TRANSLATED_OBJECT_OWNERSHIP; source-graph and analyzer regressions passed.",
+    "tools/dx11_constant_buffer_probe.cpp compiles the bounded synthetic SM3 DCL+MOV pair, verifies non-empty DXBC/hash/artifact identities, and rejects stale detached source provenance.",
+    "Initial material SHA eb9532f4c0bd59c23164683ba880870aa9a474c7 failed Backend Conversion Gate 37575640067 at one-click Python syntax validation due an unterminated R275 analyzer regex; repair SHA 0570e53588c9ae92770825f663e36c8b70f98733 fixes only that parser syntax.",
+    "Exact-SHA Backend Conversion Gate 37575812828 completed success for 0570e53588c9ae92770825f663e36c8b70f98733; validate 112644341530 and DX11 readiness smoke 112645775002 both succeeded, including the R283 constant-buffer hosted probe.",
+    "Artifact 11463037311 digest sha256:fc2bcfe8357f9b1ca8d00e0315e849f50b10bd0dfc0497c9e0cda64a6577a889.",
+    "Issue #14 production change ledger event 6031629494 records the material change.",
+    "E004 retry exact-SHA fallback rechecked GitHub Actions and found authoritative Backend Conversion Gate 37575812828 SUCCESS for 0570e53588c9ae92770825f663e36c8b70f98733; the 623s missing-run FAILURE_CONTEXT is a stale controller false negative.",
+    "Current branch HEAD before E004 reconciliation was e2409759be27f00c6b2a46af4ffe5c7846ca8ad4, whose durable record already preserved the same successful Gate/jobs/artifact and RUNTIME_VALIDATION=UNTESTED."
+  ],
+  "validation_history": [
+    {
+      "sha": "eb9532f4c0bd59c23164683ba880870aa9a474c7",
+      "run_id": 37575640067,
+      "validate_job_id": 112643800537,
+      "conclusion": "failure",
+      "failure_step": "Verify one-click structure contract",
+      "failure_detail": "Python SyntaxError in tools/analyze_dx11_census.py line 224: unterminated R275 regex string.",
+      "queue_attempt_incremented": false,
+      "reason": "In-turn validation repair; rollover metadata itself did not increment ATTEMPT."
+    },
+    {
+      "sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+      "run_id": 37575812828,
+      "validate_job_id": 112644341530,
+      "readiness_smoke_job_id": 112645775002,
+      "conclusion": "success"
+    }
+  ],
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "bounded_sm3_dcl_mov_materializer_present": true,
+    "target_bytecode_materialized": true,
+    "diagnostic_d3dcompile_performed": true,
+    "native_programmable_object_created": false,
+    "native_programmable_object_bound": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "shader_translation_exact_enabled": false,
+    "object_creation_authorized": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "E004 retry recovered current GitHub HEAD e2409759be27f00c6b2a46af4ffe5c7846ca8ad4, reread AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, VR_AUTODEV_STATE.json, CONVERSION_LANE_STATE.json and the 00421 run record, then performed the required exact-SHA Actions fallback."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed R281/R282/R276 provenance and selected a fail-closed SM3 DCL+MOV subset that can be translated to deterministic HLSL/DXBC without shader-object creation or draw activation."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R283 translated-source/DXBC materialization, provenance receipts, runtime census/analyzer correlation, static guards and hosted positive/stale-source regressions."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "No new validation run was needed. Exact-SHA fallback confirmed existing canonical Backend Conversion Gate 37575812828 SUCCESS for validation-bearing SHA 0570e53588c9ae92770825f663e36c8b70f98733; validate 112644341530 and DX11 readiness smoke 112645775002 are SUCCESS and artifact 11463037311 remains valid. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Final material/validation-bearing SHA 0570e53588c9ae92770825f663e36c8b70f98733 descends from the R283 implementation commit and both material commits contain [AUTO:CONVERSION-DX11-00421]."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R283 is a diagnostic target-bytecode materialization slice; no user runtime package/HMD deployment is claimed. CI validation artifact was produced separately."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "E004 retry metadata and stale-timeout reconciliation are persisted while preserving the validated material/result SHA, canonical Gate/jobs/artifact, and RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "exact_next_action": "Implement a bounded R284 programmable shader-object materialization/ownership receipt that consumes exact R283 DXBC and same-device/cache provenance, while keeping shader binding, shaderTranslationExact, NativeDrawPath, Draw and DrawIndexed disabled until separate activation evidence exists.",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+    "backend_conversion_gate": {
+      "run_id": 37575812828,
+      "conclusion": "success",
+      "validate_job_id": 112644341530,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112645775002,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11463037311,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-0570e53588c9ae92770825f663e36c8b70f98733",
+      "artifact_digest": "sha256:fc2bcfe8357f9b1ca8d00e0315e849f50b10bd0dfc0497c9e0cda64a6577a889"
+    }
+  },
+  "retry_of_event_id": "CONVERSION-DX11-00421-E003",
+  "failure_context": "No authoritative Backend Conversion Gate run was created for result SHA 0570e53588c9ae92770825f663e36c8b70f98733 after 623s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+  "failure_context_resolution": "STALE_TIMEOUT_FALSE_NEGATIVE_EXACT_SHA_FALLBACK_FOUND_AUTHORITATIVE_SUCCESS",
+  "retry_reconciliation": {
+    "authoritative_result_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+    "result_sha_changed": false,
+    "material_work_repeated": false,
+    "validation_rerun_required": false,
+    "validation_bearing_result_sha_preserved": true,
+    "exact_sha_fallback_performed": true,
+    "authoritative_backend_conversion_gate": {
+      "run_id": 37575812828,
+      "name": "Backend Conversion Gate",
+      "head_sha": "0570e53588c9ae92770825f663e36c8b70f98733",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "validate_job_id": 112644341530,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112645775002,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11463037311,
+      "artifact_digest": "sha256:fc2bcfe8357f9b1ca8d00e0315e849f50b10bd0dfc0497c9e0cda64a6577a889"
+    },
+    "controller_contract_basis": [
+      "QUEUE_CONTROLLER_CONTRACT exact-SHA missing-run fallback is authoritative.",
+      "A completed successful Backend Conversion Gate with head_sha equal to validation_bearing_result_sha must be recorded as PASS instead of consuming another repair attempt.",
+      "Bookkeeping commits must preserve validation_bearing_result_sha and may use CI-skip only after the required Gate completed."
+    ],
+    "resolution": "The reported 623s missing-run timeout is stale relative to GitHub Actions SSOT. Canonical Gate 37575812828 completed SUCCESS for the exact validation-bearing SHA; no new R283 source work or Gate rerun is warranted."
+  }
+}

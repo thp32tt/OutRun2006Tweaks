@@ -1,0 +1,194 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01158",
+  "production_id": "CONVERSION-DX11-01158",
+  "event_id": "CONVERSION-DX11-01158-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_FVF:SOURCE_SPECULAR_TABLE_FOG_GPU_DRAW",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "development_time_percentages": "UNMEASURED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "bbee31fcc5fd19dec7a1da89bf5857c97db01903",
+  "implementation_source_sha": "9764a96693701186941ebeb515f31baaebb478d2",
+  "material_result_sha": "9764a96693701186941ebeb515f31baaebb478d2",
+  "validation_bearing_result_sha": "9764a96693701186941ebeb515f31baaebb478d2",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_fvf_fog_dispatch.hpp",
+    "tests/native_game_fvf_fog_dispatch_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01158.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "REAL_D3D9_FVF_GOURAUD_SPECULAR_AND_SOURCE_FOG_CAPTURE",
+      "D3D11_STAGE0_STAGE1_SPECULAR_THEN_TABLE_FOG_PIXEL_COMPOSITION",
+      "AUTHENTIC_NATIVE_DRAW_OR_FAILCLOSED_ORIGINAL_D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "AUTHENTIC_LIVE_FVF_SOURCE_COMBINED_FOG_ADMISSION",
+      "BOUNDED_SOURCE_IDENTIFIED_D3D11_PS_VARIANT_COMPOSITION_CACHE",
+      "CPLUSPLUS_COMPOSITE_SHADER_ORDER_AND_NEGATIVE_SOURCE_REGRESSION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Original D3D9/DX9Ex game draw/input/FFB unchanged; opt-in DX11 only; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Live source FVF COLOR1 Gouraud SPECULARENABLE RGB is composited after authenticated stage0/stage1 and before table fog; C++ positive and negative regressions plus five exact-source-SHA GitHub push Actions passed at 9764a96693701186941ebeb515f31baaebb478d2. No game/HMD runtime parity asserted.",
+      "negative_regression": "FLAT or unknown shade, unsupported vertex/range/RAW fog plus specular, failed COM/state, unknown shaders or source-device lifetime keep the original D3D9 fallback; source-matched native game frame and Quest3 remain UNTESTED.",
+      "component_integration": "Observed live D3D9 FVF Draw and DrawIndexed callsite -> source-identified D3D11 stage0/stage1 pixel shader -> Gouraud SPECULAR RGB -> authenticated table fog -> guarded native Draw -> existing game-visible presentation boundary; source/CI evidence only, not a tested gameplay image."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_fvf_fog_dispatch.hpp",
+      "tests/native_game_fvf_fog_dispatch_test.cpp"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Authentic FVF Gouraud source SPECULAR RGB followed by admitted table fog on native DX11 game Draw; no claim of whole-frame or HMD runtime parity.",
+    "acceptance_items": [
+      {
+        "id": "source_composite_fog_specular",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game-authored FVF Draw and shader/texture pipeline",
+        "expected_behavior": "Original stage0/1 and AlphaGate produce source RGB/alpha, authentic source COLOR1 Gouraud specular is saturated before native table fog."
+      },
+      {
+        "id": "native_gpu_variant_cache",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11 GPU shader ownership/device lifetime",
+        "expected_behavior": "Source PS pointer, fog flag and specular flag key a lazy native PS with same-device cache; no invalid shader admitted."
+      },
+      {
+        "id": "source_fog_negative_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original D3D9 renderer/input/FFB",
+        "expected_behavior": "Unknown source shader, FLAT/PHONG shading, unsupported vertex/range fog, approximate RAW combined fog/spec, failed shader/device remain original game Draw."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Windows build/Backend/OpenXR/HUD/source C++",
+        "expected_behavior": "All five required push workflows completed/success at one material source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_composite_fog_specular": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_fvf_fog_dispatch.hpp"
+      ],
+      "validation_command": "DX11 Fast #40866504857, Build #40866504850"
+    },
+    "native_gpu_variant_cache": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "Backend #40866504853 and Build #40866504850"
+    },
+    "source_fog_negative_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "tests/native_game_fvf_fog_dispatch_test.cpp"
+      ],
+      "validation_command": "DX11 Fast #40866504857 source regressions"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_fvf_fog_dispatch.hpp",
+        "tests/native_game_fvf_fog_dispatch_test.cpp"
+      ],
+      "validation_command": "all five push workflows completed/success at 9764a96693701186941ebeb515f31baaebb478d2"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS_PINNED_GITHUB_HEAD_NO_TASK_COLLISION",
+    "C1_REVIEW": "PASS_AUTHENTIC_SOURCE_SPECULAR_TABLE_FOG_ORDER",
+    "C2_IMPLEMENT": "PASS_CPLUSPLUS_HLSL_NATIVE_SHADER_COMPOSITION",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_REQUIRED_ACTIONS",
+    "C4_COMMIT": "PASS_MATERIAL_CPLUSPLUS_REGRESSION_COMMIT",
+    "C5_PACKAGE": "NEED_GAME_AND_HMD_SOURCE_MATCHED_RUNTIME",
+    "C6_STATE": "PASS_DOCS_ONLY_SEPARATE_AFTER_ALL_GATES"
+  },
+  "evidence": {
+    "required_push_workflows_result": "5/5 completed/success same exact SHA event push",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40866504857,
+        "head_sha": "9764a96693701186941ebeb515f31baaebb478d2",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40866504853,
+        "head_sha": "9764a96693701186941ebeb515f31baaebb478d2",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40866504850,
+        "head_sha": "9764a96693701186941ebeb515f31baaebb478d2",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40866504852,
+        "head_sha": "9764a96693701186941ebeb515f31baaebb478d2",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40866504932,
+        "head_sha": "9764a96693701186941ebeb515f31baaebb478d2",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_evidence": "UNTESTED native_draws/publishedBackbufferFrames/gpu_desktop_frames and Quest3/VDXR on source SHA; previous 2026-10-28 zero-draw was a different binary.",
+    "source_equivalence": "Source table fog must be admitted with genuine caps/equation/float; original shader alpha/discard unchanged.",
+    "extra_conditional_workflow": "VR PC Fast Test Build skipped (not mandatory)",
+    "development_ratio_evidence": "NOT_MEASURED",
+    "external_controller_adoption": "NOT_VERIFIED",
+    "source_commit_url": "https://github.com/thp32tt/OutRun2006Tweaks/commit/9764a96693701186941ebeb515f31baaebb478d2",
+    "scoreboard_commit": "1a0e8880abf61f3b553291ac08ccafbfb3b62925",
+    "scoreboard_blob": "aca6cb713ca2033c9a5d7f5cd163f2ed26ce9bc4"
+  },
+  "scoreboard_previous": 2167,
+  "scoreboard_new": 2168,
+  "scoreboard_commit": "1a0e8880abf61f3b553291ac08ccafbfb3b62925",
+  "scoreboard_blob": "aca6cb713ca2033c9a5d7f5cd163f2ed26ce9bc4",
+  "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; source-matched native game Draw/published frame/Quest3 evidence not captured"
+}

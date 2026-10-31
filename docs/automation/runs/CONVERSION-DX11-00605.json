@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00605",
+  "production_id": "CONVERSION-DX11-00605",
+  "event_id": "CONVERSION-DX11-00605-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00605",
+  "work_key": "DX11:INDEXED_UP_NONZERO_VERTEX_WINDOW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "c479c503fb4fac5093402708c3d03a0ef525cc96",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real game R30 IndexedPrimitiveUP D3D9 hook in normal/R26-safe paths",
+      "Attested nonzero MinVertexIndex window and INDEX16/INDEX32 rebased IA vertex/index ownership",
+      "Native DX11 DrawIndexed opt-in diagnostic inset and preserved original DX9Ex/gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "src/vr/d3d11/native_d3d9_indexed_up_batch.hpp",
+      "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real R30 game IndexedUP source capture plus WARP INDEX16 shifted window GPU pixel / existing INDEX32 list/strip pixels",
+      "negative_regression": "Invalid below/above indexed windows rejected, overflow guarded, 6 live hook destructive mutations per renderer",
+      "component_integration": "D3D9 game IndexedUP -> rebased transient vertices/indices -> DX11 diagnostic DrawIndexed; DX9Ex call retained"
+    },
+    "conflict_keys": [
+      "DX11:INDEXED_UP_NONZERO_VERTEX_WINDOW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST: no Quest3/VDXR game/menu/car selection/race evidence",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in; D3D9 original Draw/Present/gamepad remains authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d11/native_d3d9_indexed_up_batch.hpp",
+    "src/vr/d3d11/native_d3d9_indexed_up_strip_batch.hpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_indexed_up_r238.py",
+    "tools/test_dx11_indexed_up_strip_r239.py",
+    "tools/dx11_indexed_up_probe_r238.cpp",
+    "tools/dx11_indexed_up_strip_probe_r239.cpp"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Opt-in diagnostic source change only; hardware parity untested and user performs packaging/deployment"
+  },
+  "next_action": "New independent DX11 feature development may continue. Quest3/VDXR/gamepad and menu->vehicle->race native parity remain NEED_HMD_TEST, not a blocker for new C++ work.",
+  "result_sha": "f907eb8c514215fa20751b67bf828e9c04c186e0",
+  "validation_bearing_sha": "f907eb8c514215fa20751b67bf828e9c04c186e0",
+  "material_commit": "f907eb8c514215fa20751b67bf828e9c04c186e0",
+  "ci_summary": "Exact-SHA Backend Conversion Gate (validate + WARP smoke), DX11 Fast Structural Checks, and OpenXR VR architecture all SUCCESS. Build and HUD workflows exclude direct vr-dx11-native-r71 pushes; NOT_TRIGGERED, not claimed PASS. Quest3/VDXR game and gamepad UNTESTED.",
+  "validation_runs": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38234234813,
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38234234803,
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38234234804,
+      "conclusion": "success"
+    }
+  ],
+  "not_triggered_workflows": [
+    "Build (direct-push branch excluded)",
+    "OutRun EXE HUD Inspector CI (direct-push branch excluded)"
+  ],
+  "validation_bearing_result_sha": "f907eb8c514215fa20751b67bf828e9c04c186e0"
+}

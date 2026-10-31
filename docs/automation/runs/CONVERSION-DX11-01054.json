@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01054",
+  "production_id": "CONVERSION-DX11-01054",
+  "event_id": "CONVERSION-DX11-01054-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01054",
+  "classification": "A",
+  "feature_id": "DX11:AUTHENTIC_PREDRAW_FRAME_RECYCLING",
+  "work_key": "DX11:MENU_CAR_RACE_PREDRAW_SOURCE_REUSE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_award_event": false,
+  "summary": "Causal failure repair for the new real-game source reuse: original record(const vector&) keeps deep-copy semantics for existing mutable and const callers; only preserve_game_surface_copy() explicitly consumes its disposable authenticated D3D9 readback via record_consuming(). One real native renderer integration source change, C++ and Python regression updates; five-gate exact-SHA and game/HMD pending. Predecessor 01053 C6 evidence removed from this unverified 01054 run to prevent false PASS attribution.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+    "tools/dx11_native_burst_surface_copy_01053.cpp",
+    "tools/test_dx11_burst_surface_copy_01053.py",
+    "docs/automation/runs/CONVERSION-DX11-01054.json",
+    "tools/test_dx11_cold_predraw_01052.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:AUTHENTIC_PREDRAW_FRAME_RECYCLING",
+    "goal": "Carry the latest actual game menu/vehicle/race CPU/GDI and StretchRect backbuffer colors to the first D3D11 SM3/FVF Draw across repeated 1080p/1440p source updates without an extra whole-frame copy.",
+    "acceptance_items": [
+      {
+        "id": "authentic_burst_seed",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_BACKBUFFER_TO_FIRST_NATIVE_DRAW",
+        "expected_behavior": "Twenty genuine 1080p-sized source buffers can replace the first native Draw seed in chronological order using two stable allocations and retain the last image."
+      },
+      {
+        "id": "reset_and_immutable_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "SOURCE_ALLOCATOR_TO_NATIVE_RESET",
+        "expected_behavior": "Canonical 3440x1440 source snapshot on cold/Reset reuses the correct identity and extent; const-source callers still receive deep copies."
+      },
+      {
+        "id": "fallback_rejection",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_PRESENT_INPUT_FFB",
+        "expected_behavior": "Invalid source size, self-alias, foreign identity or source format mismatch never exports invented native pixels; D3D9/DX9Ex original frame and input/FFB remain untouched."
+      },
+      {
+        "id": "exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_ACTIONS",
+        "expected_behavior": "The five required DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector workflows pass on the same material source SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "REAL_D3D9_CPU_GDI_STRETCHRECT_RT0",
+      "FULL_BACKBUFFER_READBACK_AND_X8_ALPHA",
+      "ZERO_EXTRA_COPY_SOURCE_TO_NATIVE_PREDRAW_SEED",
+      "FIRST_NATIVE_DRAW_AND_D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+      "tools/dx11_native_burst_surface_copy_01053.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ exercises 20 real full-resolution 1920x1080 staged buffers, their exact no-copy allocation identities, latest values, resolution Reset 3440x1440, and const-source old behavior.",
+      "negative_regression": "C++ rejects undersized buffer and overlapping alias without invalidating the previous seed; Python verifies live source bridge record order, actual budget charge, and CPU ticket closure.",
+      "component_integration": "D3D9 canonical GetRenderTargetData -> LockRect -> native source buffer -> explicit preDrawSurface.record_consuming() -> authentic first native SM3/FVF Draw->full-frame GPU seed."
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_RACE_PREDRAW_SOURCE_REUSE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "activation_guard_and_fallback": "Retain strict opt-in and original game Draw/Present/input/FFB, DX9Ex fallback and DXVK freeze.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "blocking_evidence": "Exact-SHA DX11 Fast d991c0e5 segfault (exit 139) in unchanged tools/dx11_native_pre_draw_copy_01049.cpp: a newly introduced non-const record() overload consumes existing mutable source even where original 01049 API contract requires independent deep copy. Restore copy contract; require explicitly named record_consuming() in actual D3D9 observer."
+  },
+  "acceptance_results": {
+    "authentic_burst_seed": {
+      "status": "PENDING",
+      "evidence": "Pending exact-SHA integrated Gates"
+    },
+    "reset_and_immutable_source": {
+      "status": "PENDING",
+      "evidence": "Pending integrated Gate"
+    },
+    "fallback_rejection": {
+      "status": "PENDING",
+      "evidence": "Pending integrated Gate"
+    },
+    "exact_sha_integration": {
+      "status": "PENDING",
+      "evidence": "Pending all five exact-SHA GitHub Gates"
+    }
+  },
+  "next_source_file": "src/vr/d3d11/native_game_pre_draw_surface.hpp",
+  "real_game_draw_blocker": "Actual native game/HMD draw evidence UNTESTED since 2026-10-18",
+  "next_implementation_action": "Revalidate exact SHA with all required Actions; no changes to D3D9 fallback or CI safety checks.",
+  "runtime_note": "No real game/HMD test performed; source and simulated copy semantics only; counts UNTESTED.",
+  "validation_bearing_result_sha": "69f12986effdbc4e742005b8b8c12f5d3ccb1e23",
+  "c6_validation_evidence": {
+    "exact_sha": "69f12986effdbc4e742005b8b8c12f5d3ccb1e23",
+    "dx11_fast_run_id": 40140033243,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 40140033242,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 40140033217,
+    "windows_build_conclusion": "success",
+    "openxr_architecture_run_id": 40140033239,
+    "openxr_architecture_conclusion": "success",
+    "hud_inspector_run_id": 40140033203,
+    "hud_inspector_conclusion": "success",
+    "validation_scope": "Five GitHub Actions Gates on unchanged exact material SHA; no gameplay/HMD execution"
+  }
+}

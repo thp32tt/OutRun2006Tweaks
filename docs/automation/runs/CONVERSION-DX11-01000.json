@@ -1,0 +1,183 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01000",
+  "production_id": "CONVERSION-DX11-01000",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01000",
+  "work_key": "DX11:FULL_FRAME_NATIVE_D3D11_D3D9EX_CROSS_GENERATION_GPU_RETIREMENT",
+  "feature_id": "DX11_NATIVE_SHARED_DESKTOP_CROSS_GENERATION_GPU_RETIREMENT",
+  "work_class": "integration",
+  "milestone_id": "full_resolution_native_game_frame",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "source_head": "f9a331f9a11dc250247a4869f5f57a69bde3c775",
+  "material_result_sha": "61ffa9d54f907a0c9a6ae6d5480dec2f134f1d46",
+  "causal_ci_repair_shas": [
+    "5ce72272abff6b5e8e9e9c9069dda1a1431f36df",
+    "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa"
+  ],
+  "validation_bearing_result_sha": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa",
+  "result_sha": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "score_change_on_bookkeeping": 0,
+  "score_change": 0,
+  "summary": "Restored missing 01000 run record at C6 only. Material 61ffa9d5 fences old-generation D3D9Ex shared GPU reader and D3D11 producer before menu/vehicle/race shared desktop allocation replacement; read producer EVENT on its previous owning immediate context and preserve original D3D9/gamepad/FFB/SkyGlow fallback when incomplete or faulted. Causal regression repairs 5ce72272 and ba6f8258 retain 00999 same-generation FLUSH negative mutation while covering new generation-transition fences. All five mandatory GitHub Actions completed successfully on exact ba6f8258; no source edits or CI reruns for C6 record, no score change. Actual Quest3/VDXR/gameplay/HMD UNTESTED; full renderer not marked complete.",
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "tools/test_dx11_shared_desktop_generation_transition_01000.py",
+    "tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py"
+  ],
+  "causal_ci_repair_files": [
+    "tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_NATIVE_SHARED_DESKTOP_CROSS_GENERATION_GPU_RETIREMENT",
+    "goal": "Retire the old native D3D11 full-resolution producer and D3D9Ex shared desktop GPU reader before menu/car/race allocation generation, owner, resolution, or device handoff; preserve the original game fallback and enforce exact-SHA source regression gates.",
+    "acceptance_items": [
+      {
+        "id": "retire_old_d3d9ex_reader",
+        "category": "end_to_end_behavior",
+        "behavior_area": "old_shared_D3D9Ex_GPU_reader_lifetime",
+        "expected_behavior": "On full-frame allocation replacement, wait nonblockingly for the pending old D3D9Ex EVENT read fence before freeing or replacing shared GPU resources."
+      },
+      {
+        "id": "retire_previous_d3d11_producer_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "prior_D3D11_device_context_and_original_D3D9_input",
+        "expected_behavior": "Poll the pending D3D11 producer EVENT using the old owning immediate context, return to original D3D9 Present/input/FFB on busy or failed fences, and reset only after both GPU queues retire."
+      },
+      {
+        "id": "mutation_regressions_and_five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_fast_structural_mutations_and_Windows_build",
+        "expected_behavior": "The new generation-transition destructive mutation regression and inherited steady-frame D3D9Ex fence mutation both pass, alongside DX11 Fast, Backend, Build, OpenXR and HUD GitHub Actions on one exact SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "retire_old_d3d9ex_reader": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_shared_desktop.hpp",
+        "tools/test_dx11_shared_desktop_generation_transition_01000.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks run 39721043885 at exact ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa executes source-negative mutation regression; live D3D9 GPU behavior/HMD UNTESTED."
+    },
+    "retire_previous_d3d11_producer_and_fallback": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_shared_desktop.hpp",
+        "tools/test_dx11_shared_desktop_generation_transition_01000.py",
+        "tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks run 39721043885 and Windows Build run 39721043904 succeed on ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa; source guards require previous owning D3D11 context and original D3D9 fallback; runtime UNTESTED."
+    },
+    "mutation_regressions_and_five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_shared_desktop_generation_transition_01000.py",
+        "tools/test_dx11_shared_desktop_d3d9_read_fence_00999.py"
+      ],
+      "validation_commit": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa",
+      "validation_command": "Five required GitHub Actions at exact ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa: DX11 Fast 39721043885, Backend 39721043903, Build 39721043904, OpenXR 39721043917, HUD 39721043902, all success."
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "game-owned D3D9Ex Draw/Present invokes native D3D11 full-resolution shared game desktop bridge",
+      "previous allocation D3D9Ex StretchRect read EVENT and old D3D11 producer EVENT retire on their original devices before allocation handoff",
+      "new generation D3D11 shared GPU output returns to D3D9Ex desktop when ready; original D3D9 Present/input/FFB remains guarded fallback"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "old-generation D3D9Ex consumer fence and D3D11 producer retirement on previous owning context",
+      "fail-closed allocation switch and original D3D9 input/FFB/SkyGlow fallback",
+      "generation transition negative mutation regression plus causal 00999 same-generation FLUSH test repair"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast source regression and Windows Build success on exact ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa; no actual hardware/HMD claim.",
+      "negative_regression": "Generation-transition regression destructively removes each reader/producer retirement token; inherited 00999 negative FLUSH and read-consumer mutation keep checking same-generation path.",
+      "component_integration": "Real native shared desktop bridge coordinates old D3D9Ex GPU reader and previous-device D3D11 producer fences before allocation generation reset; original D3D9 Present, gamepad, FFB and SkyGlow are fallback."
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_NATIVE_D3D11_D3D9EX_CROSS_GENERATION_GPU_RETIREMENT",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_PASS_EXACT_SHA_NEED_REAL_GAME; no Quest3/VDXR runtime or visible-frame outcome observed.",
+    "activation_guard_and_fallback": "Nonblocking S_FALSE and fault paths retain old shared allocation and original D3D9 game Present/input/FFB/SkyGlow; never poll old producer fence on incoming D3D11 device."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "material_source_commit": "61ffa9d54f907a0c9a6ae6d5480dec2f134f1d46",
+    "causal_policy_repair_shas": [
+      "5ce72272abff6b5e8e9e9c9069dda1a1431f36df",
+      "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa"
+    ],
+    "validation_bearing_exact_sha": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39721043885,
+        "conclusion": "success",
+        "sha": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39721043903,
+        "conclusion": "success",
+        "sha": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa"
+      },
+      {
+        "name": "Build",
+        "run_id": 39721043904,
+        "conclusion": "success",
+        "sha": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39721043917,
+        "conclusion": "success",
+        "sha": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39721043902,
+        "conclusion": "success",
+        "sha": "ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa"
+      }
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS missing docs/automation/runs/CONVERSION-DX11-01000.json confirmed, reason RUN_RECORD_NOT_FOUND.",
+    "C1_REVIEW": "PASS material implementation and two subsequent causal source-regression repairs identified from GitHub commit history.",
+    "C2_IMPLEMENT": "ALREADY_DONE at material 61ffa9d5; no source changes during C6 bookkeeping.",
+    "C3_VALIDATE": "PASS five required GitHub Actions all success on exact ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa; no new CI run. HMD UNTESTED.",
+    "C4_COMMIT": "ALREADY_DONE material 61ffa9d54f907a0c9a6ae6d5480dec2f134f1d46, causal repairs 5ce72272abff6b5e8e9e9c9069dda1a1431f36df and ba6f82583ed83c8d1d4f3f9901546c4c1a1838fa without CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED; user controls deployment and real Quest3 tests.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA result recorded by separate docs-only [skip ci] bookkeeping commit."
+  },
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_implementation_action": "Separately test actual menu/car/race full-resolution frame, native eye output and original gamepad/FFB on Quest3/VDXR; do not claim runtime PASS without recorded evidence."
+}

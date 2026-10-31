@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00695",
+  "production_id": "CONVERSION-DX11-00695",
+  "event_id": "CONVERSION-DX11-00695-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_STEREO_MSAA_EYE_TRANSPORT",
+  "work_key": "DX11:NATIVE_GAME_STEREO_MSAA_RESOLVE",
+  "status": "AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Local game-authored stereo D3D11 MSAA render targets and sample/format ownership",
+      "Two native ResolveSubresource GPU operations into the shared 1x DX11 stereo eye ring",
+      "Existing single-sample CopyResource path and exact frame/slot GPU EVENT, later host OpenXR ACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+      "tools/dx11_eye_msaa_resolve_probe_00695.cpp",
+      "tools/test_dx11_eye_msaa_resolve_00695.py",
+      "tools/dx11_native_transport_probe.cpp",
+      "tools/verify_dx11_native_transport_contract.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 sample/quality matrix plus real Windows WARP 4x per-eye MSAA GPU Resolve, producer EVENT and cross-device host shared-handle color readback",
+      "negative_regression": "Mixed samples/quality, unsupported format or source alias reject before either GPU command; WARP mixed 1x/4x rejection and existing single-sample GPU copy/ACK checks",
+      "component_integration": "Game local stereo MSAA RT -> D3D11 ResolveSubresource into shared ring -> existing producer EVENT/host ACK publication path; non-MSAA Copy preserved"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STEREO_MSAA_RESOLVE",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "LOCAL_STEREO_GAME_RENDER_TARGET",
+      "DX11_MULTISAMPLE_RESOLVE",
+      "SHARED_EYE_RING",
+      "HOST_OPENXR_FENCE_ACK"
+    ],
+    "visible_frame_acceptance": "Existing live D3D9 Draw -> guarded D3D11 Draw -> visible-frame routing is an upstream dependency; this feature adds stereo MSAA Resolve to the native ring. Integrated build/CI required; no physical Quest3/VDXR or gamepad runtime observation.",
+    "activation_guard_and_fallback": "No change to production native draw enablement; only explicit live ring submission accepts validated source eyes; D3D9 source Draw/input unaffected"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STEREO_MSAA_EYE_TRANSPORT",
+    "goal": "Accept local game-produced stereoscopic MSAA color targets and resolve both eyes into the existing DX11/OpenXR shareable ring without weakening single-sample copy, failure handling or ACK ownership.",
+    "acceptance_items": [
+      {
+        "id": "eye-msaa-native-output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "dx11_stereo_resolve_ring_event",
+        "expected_behavior": "Game-created 2/4/8x local render eye pair resolves to the 1x shared native ring before the existing single GPU fence"
+      },
+      {
+        "id": "eye-msaa-source-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "sample_quality_ownership_d3d9_fallback",
+        "expected_behavior": "Mixed sample counts/quality, lack of format support, stale shared sources and device mismatch issue no native GPU commands and preserve game D3D9 drawing"
+      },
+      {
+        "id": "eye-msaa-exact-gate",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_mutation_windows_ci",
+        "expected_behavior": "Compiled C++ pair matrix, destructive source/producer tests and exact-SHA Actions including native Win32 build"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "eye-msaa-native-output": "PENDING_GATE",
+    "eye-msaa-source-fallback": "PENDING_GATE",
+    "eye-msaa-exact-gate": "PENDING_GATE"
+  },
+  "base_head_sha": "08447dfbdc066dec6dc636255862854f9877c9e4",
+  "material_result_sha": "c5b39d53e552c40eb4e63ae9fbd15c16aa66191c",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_eye_msaa_resolve_probe_00695.cpp",
+    "tools/test_dx11_eye_msaa_resolve_00695.py",
+    "docs/automation/runs/CONVERSION-DX11-00695.json",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: exact c5b39d53 Gate #38464123294 failed stale R306 signature + incomplete live_game_draw_path metadata; Fast and WARP inherited related fails",
+    "C1_REVIEW": "PASS: preserve existing C++ MSAA Resolve native game producer; check static contract for both 1x and 2x+ ownership path",
+    "C2_IMPLEMENT": "PASS: MSAA-aware R306 producer source/resolve/copy/fence static verifier with destructive test; gameplay path identity corrected without asserting HMD success",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Actions and portable 00695 probe",
+    "C4_COMMIT": "PENDING follow-up validation-bearing repair commit",
+    "C5_PACKAGE": "NOT_REQUIRED; native eye output Quest3/VDXR UNTESTED",
+    "C6_STATE": "PENDING exact-SHA GitHub Actions; bookkeeping separate after verification"
+  },
+  "next_action": "Validate the new material repair SHA with Backend Conversion Gate, DX11 Fast, Native Transport WARP, Build, OpenXR and HUD. Only after success make separate C6 bookkeeping; HMD/gamepad UNTESTED."
+}

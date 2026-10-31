@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00953",
+  "production_id": "CONVERSION-DX11-00953",
+  "event_id": "CONVERSION-DX11-00953-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00953",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "feature_contract": {
+    "feature_id": null,
+    "recovery_note": "RUN_RECORD_NOT_FOUND at C6; this is a GitHub material-history reconstruction, not a claim to have preserved an earlier unavailable JSON contract.",
+    "goal": "Carry genuine D3D9 SM3 DZ/DW projective source modifiers through the live native D3D11 VS/PS HLSL game Draw/DrawIndexed path with exact swizzled TEMP denominator read provenance and fail-closed fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_projective_sm3_operands",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Live native shader VS/PS translates SM3 DZ/DW projective operands into HLSL divide expressions used by game Draw/DrawIndexed."
+      },
+      {
+        "id": "projective_temp_denominator_safety",
+        "category": "fallback_regression",
+        "expected_behavior": "Unwritten swizzled z/w TEMP denominator lanes and invalid/reserved modifiers reject native draw translation; original D3D9Ex render/input/FFB fallback remains guarded."
+      },
+      {
+        "id": "same_sha_integrated_gates",
+        "category": "integrated_validation",
+        "expected_behavior": "Fast, Backend, Build (Win32), OpenXR and HUD GitHub workflow checks all succeed on the same validation SHA; runtime is separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_projective_sm3_operands": "PASS_BUILD",
+    "projective_temp_denominator_safety": "PASS_BUILD",
+    "same_sha_integrated_gates": "PASS_EXACT_SHA"
+  },
+  "material_result_sha": "aac7f060152c6a0076d258d362e4e32d6a4b0f32",
+  "validation_bearing_result_sha": "263f43d370e8f5f5bece43c89186a3db32240986",
+  "validation_evidence": {
+    "exact_sha": "263f43d370e8f5f5bece43c89186a3db32240986",
+    "required_workflow_runs": {
+      "fast": 39461474532,
+      "backend": 39461474203,
+      "windows_build": 39461474115,
+      "openxr": 39461483364,
+      "hud": 39461483232
+    },
+    "ci_gate_count": "5/5",
+    "all_required_gates": "SUCCESS",
+    "github_exact_sha_workflow_runs_verified": true,
+    "gameplay": "UNTESTED",
+    "runtime": "UNTESTED",
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED"
+  },
+  "material_history": {
+    "initial_material_commit": "aac7f060152c6a0076d258d362e4e32d6a4b0f32",
+    "material_repair_commits": [
+      "4c41e040a11144ab7bbb5edd12c1e3a480e842da",
+      "ba0d6a5f56e6dd59570fbe41cafdd61ab8d541c6"
+    ],
+    "final_validation_ci_trigger_repair": "263f43d370e8f5f5bece43c89186a3db32240986",
+    "source": "Authenticated GitHub commit history; material_result_sha reconstructed because run record did not exist"
+  },
+  "pipeline": {
+    "C6_RESULT": "PASS_EXACT_SHA; exactly matching GitHub SHA for five required workflows, separately recorded with [skip ci], no new source changes/CI rerun; HMD/real gameplay UNTESTED."
+  },
+  "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "run_record_recovery": "CREATED_FROM_GITHUB_MATERIAL_AND_EXACT_SHA_CI; original feature_contract/acceptance_results were unavailable to preserve verbatim",
+  "score_change": 0
+}

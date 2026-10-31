@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00856",
+  "production_id": "CONVERSION-DX11-00856",
+  "event_id": "CONVERSION-DX11-00856-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:REAL_GAME_GPU_ONLY_HANDOFF_D3D9_CPU_INDEPENDENCE",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "validation_bearing_result_sha": "0c16308e1f554ca075a87b550b9dae96d55e7cf9",
+  "material_result_sha": "7c80593b05c0b0ce54e5d6be8b22461822e12172",
+  "result_sha": "0c16308e1f554ca075a87b550b9dae96d55e7cf9",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Admit complete live-game native D3D11 GPU frame copies at same Present independently of D3D9 CPU UpdateSurface/backbuffer write eligibility, while retaining source ownership, mono-stereo publication, output geometry and completeness guards, plus original D3D9Ex Draw/Present/input/FFB and shared-desktop CPU fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_live_game_gpu_frame_sink",
+        "expected_behavior": "A full real-game Draw/DrawIndexed native GPU frame with complete source and matching output geometry may be synchronously handed off even if MSAA/format/dirty D3D9 CPU upload is unwritable; C++ behavioral and actual callsite regressions must pass."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "mono_stereo_output_and_d3d9_fallback",
+        "expected_behavior": "Reject partial/foreign/inset/stereo-suppressed or mismatched output, null GPU source/sink and invalid source generation; keep shared desktop outputWritable guard and original D3D9Ex rendering, input, FFB fallback."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_mandatory_ci",
+        "expected_behavior": "Exact final validation SHA must pass DX11 Fast, Backend Conversion Gate, Windows Build, OpenXR architecture and HUD Inspector with no rerun/skip of required validation."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp native sink gpu_frame_output_ready admission independent of D3D9 CPU outputWritable",
+      "src/vr/d3d11/native_game_gpu_handoff.hpp guarded complete native frame source readiness",
+      "tests/vr/dx11_native_game_gpu_handoff.cpp compiled C++ positive/negative behavior",
+      "tools/test_dx11_gpu_only_handoff_00856.py executable callsite and retained desktop guard regression"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real game-authored D3D9 Draw/DrawIndexed -> complete independent native D3D11 source frame",
+      "Same-Present source/geometry/mono-stereo guarded synchronous native GPU sink independent of CPU UpdateSurface",
+      "Native GPU transport and preserved original D3D9Ex Draw/Present/input/FFB; original shared desktop CPU fallback still gated on outputWritable"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Material implementation 7c80593b05c0b0ce54e5d6be8b22461822e12172 adds C++ admitted native GPU frame with cpuD3D9UploadWritable=false, plus source-callsite regression repaired at exact SHA 0c16308e1f554ca075a87b550b9dae96d55e7cf9.",
+      "negative_regression": "Native sink rejects incomplete/unowned/invalid extent/mono publication or missing GPU source; original D3D9 shared desktop fallback retains outputWritable check.",
+      "component_integration": "Same-Present live-game D3D11 GPU copy source route validated by source-level plus C++ behavioral tests and exact-sha CI; actual Quest3/VDXR HMD gameplay not executed."
+    },
+    "conflict_keys": [
+      "DX11:REAL_GAME_GPU_ONLY_HANDOFF_D3D9_CPU_INDEPENDENCE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "5/5 required exact-SHA CI SUCCESS; executable C++ and source-callsite tests verified. Full headset/gameplay visual parity remains UNTESTED; full DX11 renderer not declared complete.",
+    "activation_guard_and_fallback": "Opt-in independent native GPU sink cannot bypass source completeness or ownership; original D3D9Ex Draw/Present/gamepad/FFB and shared CPU path preserved."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_gpu_handoff.hpp",
+    "tests/vr/dx11_native_game_gpu_handoff.cpp",
+    "tools/test_dx11_gpu_only_handoff_00856.py"
+  ],
+  "acceptance_results": {
+    "end2end": "PASS_CPP_BEHAVIOR_AND_ACTUAL_CALLSITE_CI",
+    "fallback": "PASS_NEGATIVE_GUARDS_AND_DESKTOP_FALLBACK_CI",
+    "gates": "PASS_EXACT_SHA_5_OF_5",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub target branch exact SHA identified; original run record path does not exist (RUN_RECORD_NOT_FOUND).",
+    "C1_REVIEW": "PASS: inspected original material commit and causal source regression correction; no additional source changes allowed in C6.",
+    "C2_IMPLEMENT": "PASS: existing material source commit 7c80593b05c0b0ce54e5d6be8b22461822e12172",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 0c16308e1f554ca075a87b550b9dae96d55e7cf9; DX11 Fast 38992794518, Backend 38992794497, Windows Build 38992797775, OpenXR 38992797747, HUD 38992797752 all SUCCESS.",
+    "C4_COMMIT": "PASS: material 7c80593b05c0b0ce54e5d6be8b22461822e12172 and validation-bearing 0c16308e1f554ca075a87b550b9dae96d55e7cf9 exist on GitHub target branch; both carry [AUTO:CONVERSION-DX11-00856].",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: 00856 original five Gates successful at 0c16308e; subsequent 00857 Fast checker required prior end2end build PASS token separate from HMD UNTESTED. Metadata-only correction, no new 00856 material or point."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "7c80593b05c0b0ce54e5d6be8b22461822e12172",
+    "validation_bearing_sha": "0c16308e1f554ca075a87b550b9dae96d55e7cf9",
+    "dx11_fast_run_id": 38992794518,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 38992794497,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 38992797775,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 38992797747,
+    "openxr_conclusion": "success",
+    "hud_inspector_run_id": 38992797752,
+    "hud_inspector_conclusion": "success",
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "original_record_status": "RUN_RECORD_NOT_FOUND",
+    "original_record_history": "No commits found for docs/automation/runs/CONVERSION-DX11-00856.json",
+    "contract_source": "Reconstructed from exact task material and validation commits; no original feature_contract/acceptance_results file existed to preserve.",
+    "score_policy": "C6 bookkeeping only; no additional points; no duplicate TASK_ID scoring.",
+    "acceptance_record_repair": "00857 exact-SHA DX11 Fast 38994202627 found invalid mixed build/runtime string in prior 00856 C6 record. Keep build-verifiable acceptance PASS and Quest3/gamepad UNTESTED separately. This is a causal 00856 bookkeeping correction with score_change=0, not a new renderer feature."
+  },
+  "next_action": "C6 bookkeeping complete; no source modification, full CI rerun, HMD PASS claim or duplicate scoring. Future real Quest3/VDXR gameplay requires a separate runtime test."
+}

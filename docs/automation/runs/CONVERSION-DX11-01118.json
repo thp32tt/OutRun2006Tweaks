@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01118",
+  "production_id": "CONVERSION-DX11-01118",
+  "event_id": "CONVERSION-DX11-01118-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01118",
+  "classification": "A_COHESIVE_RAW_DX11_NATIVE_DRAW_SOURCE_CONTINUATION_AND_B_CAUSAL_CI_REPAIR",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:RAW_VISUAL_DIAGNOSTIC",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "source_base_sha": "b9bcee1e6e7abaf4d50fcaffb2ab16f1af4b1e9f",
+  "source_change_sha": "bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0",
+  "material_result_sha": "bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0",
+  "validation_bearing_result_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+  "implementation_commits": [
+    "bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0"
+  ],
+  "repair_commits": [],
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_source_probe.hpp",
+    "tests/native_raw_source_probe_schedule_test.cpp"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "SOURCE_D3D9_DRAW_AND_BACKBUFFER_OWNERSHIP",
+      "FAIL_CLOSED_NATIVE_D3D11_DRAW_OR_REJECTION",
+      "BOUNDED_DIAGNOSTIC_RETRY_AND_NONBLOCKING_GPU_PRESENT"
+    ],
+    "batch_components": [
+      "REAL_SOURCE_CXX_BRIDGE_SAMPLING",
+      "NEW_CXX_BOUNDED_SCHEDULER",
+      "CPP17_DETERMINISTIC_POSITIVE_AND_NEGATIVE_REGRESSIONS"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Same-SHA real game/HMD RUN UNTESTED; source-only code schedules up to four real game Draw attempts separated by 96 ordinals after aborted full-scene frame. No native GPU screen observed; production full-scene output remains guarded.",
+    "activation_guard_and_fallback": "Opt-in RAW only and source device/RT/Clear ownership rechecked; original D3D9 Draw, gamepad, FFB, SkyGlow, DX9Ex fallback and DXVK freeze maintained, no guessed shader/resource admission.",
+    "acceptance_proof": {
+      "positive_probe": "Bounded source draw retry scheduler gives authentic differently positioned later source Draw a chance at native pixel contribution; portable C++ positives assert rotation and spacing.",
+      "negative_regression": "Maximum four probes, minimum ordinal gap, overflow saturation, reset per Present, no full-frame certification; existing COM/RT/DS and device checks unchanged.",
+      "component_integration": "live_game_frame_bridge.cpp owns raw-source fallback/retry -> native_game_raw_source_probe.hpp schedules budget -> deterministic C++ regression validates bounded input; original Present and D3D9 fallback remain authoritative."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+      "DX11:RAW_VISUAL_DIAGNOSTIC"
+    ]
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Continue the real D3D9 source Draw to D3D11 native partial GPU sampling integration without rejecting an entire RAW diagnostic frame solely because the first safely selected source Draw is unsupported; preserve protected fallbacks and evidence boundaries.",
+    "acceptance_items": [
+      {
+        "id": "bounded_actual_source_draw_sampling",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_SOURCE_DRAW_AND_DX11_NATIVE_BINDINGS",
+        "expected_behavior": "Opt-in source bridge may retry different real shader-bound Draw ordinals with bounded budget and spacing after authentic rejection without changing D3D9 Draw."
+      },
+      {
+        "id": "native_production_and_input_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "FRAME_PUBLICATION_AND_D3D9_INPUT",
+        "expected_behavior": "Normal full-scene compositor remains fail-closed, with no D3D9 RT/clear/device/shader/depth bypass and intact input/FFB."
+      },
+      {
+        "id": "integrated_exact_sha_five_gate_validation",
+        "category": "integrated_validation",
+        "behavior_area": "CPP_SAMPLER_FAST_BACKEND_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "Compile bounded C++ regression and execute five required exact-SHA Actions after source and inherited record-policy repair."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "runtime_evidence": {
+    "native_draws": "UNTESTED",
+    "native_gpu_pixel_output": "UNTESTED",
+    "complete_native_frame": "UNTESTED",
+    "quest3_stereo": "UNTESTED"
+  },
+  "c6_note": "2026-10-28 KST E002 C6-only bookkeeping: validation-bearing source/record repair SHA 30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8 confirmed five original push GitHub Actions completed/success (DX11 Fast 40562027136, Backend 40562027074, Build 40562026974, OpenXR 40562027079, HUD 40562027764). Do not rerun unchanged SHA. Source implementation remains bc6d24f83ec3cd7b3f7f522c08399f1bf3b00aa0; this later [skip ci] record-only commit is not a new validation-bearing SHA or development score. Game/Quest3/VDXR runtime remains UNTESTED; RAW partial tile is not a proven full native frame.",
+  "mandatory_gate_results": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 40562027136,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 40562027074,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    },
+    {
+      "name": "Build",
+      "run_id": 40562026974,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 40562027079,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 40562027764,
+      "head_sha": "30e4d24ec34a3b4e5e0db170bc55b87c0fb7d1f8",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "push"
+    }
+  ]
+}

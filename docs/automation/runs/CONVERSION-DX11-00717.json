@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00717",
+  "production_id": "CONVERSION-DX11-00717",
+  "event_id": "CONVERSION-DX11-00717-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_GAME_MENU_RACE_MINMAX_RGBA_BLEND",
+  "work_key": "DX11:LIVE_GAME_NATIVE_BLEND_EXTREMA",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "capture actual game D3D9 RGB MIN/MAX blend and existing per-draw alpha/write mask",
+      "translate to isolated D3D11 OM rgba extrema state for native Draw/DrawIndexed",
+      "keep unsupported blend pair, independent alpha, GPU creation failure and gamepad on original D3D9 fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_blend_extrema.hpp",
+      "tools/dx11_game_blend_extrema_probe_00717.cpp",
+      "tools/test_dx11_game_blend_extrema_00717.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 menu/vehicle/race MIN/MAX blends submit native Draw/Indexed with independent RGBA extrema OM",
+      "negative_regression": "Unproven factor pairs, alpha-only writes, separate alpha and unsupported operations fail closed; original D3D9/gamepad always runs",
+      "component_integration": "Live D3D9 render state capture -> D3D11 cached BlendDesc + masked Draw/Indexed -> diagnostic inset, exact-SHA gates"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_NATIVE_BLEND_EXTREMA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "activation_guard_and_fallback": "Explicit opt-in diagnostic only; original D3D9 Draw and gamepad always run; no gameplay promotion",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Live D3D9 menu/vehicle/race Draw/DrawIndexed -> native diagnostic 256x144 desktop inset; GPU/Quest3/VDXR pixels need actual runtime, RUNTIME_VALIDATION=UNTESTED"
+  },
+  "feature_contract": {
+    "goal": "Native MIN/MAX RGBA blended menu, vehicle-selection and race overlay Draw/Indexed diagnostic with bounded cache and robust original game fallback",
+    "acceptance_items": [
+      {
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_capture_d3d11_om",
+        "expected_behavior": "real MIN/MAX RGBA native OM masked Draw/Indexed",
+        "id": "native-menu-race-rgba-extrema"
+      },
+      {
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_gamepad_original",
+        "expected_behavior": "unsupported operations, alpha modes and allocation failures return safely to D3D9",
+        "id": "fallback-unsupported-alpha-and-input"
+      },
+      {
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_and_exact_sha_actions",
+        "expected_behavior": "portable probe, destructive integration regressions, exact SHA 5 mandatory Gates",
+        "id": "portable-build-and-exact-sha-gates"
+      }
+    ],
+    "feature_id": "LIVE_GAME_MENU_RACE_MINMAX_RGBA_BLEND"
+  },
+  "base_head_sha": "badb047e2af58574c9e2dda2ac40de86bf0b1fd4",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null
+}

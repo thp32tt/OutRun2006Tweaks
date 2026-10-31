@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00402",
+  "production_id": "CONVERSION-DX11-00402",
+  "event_id": "CONVERSION-DX11-00402-E009",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "status": "COMPLETE",
+  "selected_work_item": "DX11_R264_PROGRAMMABLE_SHADER_SOURCE_EVIDENCE_PRODUCER",
+  "base_sha": "fcbca61db7c226acbac135b837fa21b7f6d9ecb7",
+  "result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+  "material_result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+  "source_implementation_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+  "validation_bearing_result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+  "result_marker": "[AUTO:CONVERSION-DX11-00402]",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "summary": "R264 adds a production-path D3D9 programmable-shader source-evidence producer. Exact GetFunction bytes are bounded, DWORD-aligned, stage/version checked, retained as DWORD tokens, hashed, and bound back to the R239 size/version/hash identity. runtime_census now derives programmable shader identity through this producer instead of a parallel ad-hoc hash path. This is raw source evidence only: no D3D9 instruction semantic translator, R263 production semantic receipt, NativeDrawPath activation, Draw or DrawIndexed dispatch is enabled.",
+  "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "e72f26a95e06f3e64c9d23917ad9f4bdf87dde58",
+    "9e8cceeb296d4b63de4018db8dd2165c01b1715e",
+    "0aff982ebbcf7dd7ce5d22be46786b73ae31c78d",
+    "193cec9e0a8478ab563d32a097a6cef81cdf2e5d",
+    "1f7505984c0a0106802f4a7f2a45febfdecc211f",
+    "179a2f6db481df5435e012cfbf01a48179c3b4ab"
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "draw_dispatch_changed": false,
+    "dx9ex_branch_modified": false,
+    "production_programmable_source_evidence_enabled": true,
+    "production_programmable_semantic_translator_enabled": false
+  },
+  "validation": {
+    "backend_conversion_gate": {
+      "conclusion": "PASS",
+      "run_id": 37274615551,
+      "run_attempt": 1,
+      "validation_job_id": 111648808044,
+      "readiness_smoke_job_id": 111650766235,
+      "head_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab"
+    },
+    "r264_contract": {
+      "source_bytecode_evidence_producer_present": true,
+      "production_runtime_census_wired": true,
+      "exact_getfunction_bytes_retained_as_tokens": true,
+      "bounded_max_bytes": 1048576,
+      "dword_alignment_required": true,
+      "vertex_stage_versions_fail_closed": true,
+      "pixel_stage_versions_fail_closed": true,
+      "r239_size_version_hash_identity_binding": true,
+      "identity_drift_rejected": true,
+      "wrong_stage_rejected": true,
+      "misaligned_payload_rejected": true,
+      "production_programmable_semantic_translator_implemented": false,
+      "production_r263_semantic_translation_evidence_present": false,
+      "native_draw_path_activation_allowed": false,
+      "draw_dispatch_authorized": false,
+      "evidence_scope": "PRODUCTION_RAW_SHADER_SOURCE_EVIDENCE_ONLY"
+    },
+    "artifact": {
+      "id": 11329673195,
+      "name": "backend-autovalidated-vr-dx11-native-r71-179a2f6db481df5435e012cfbf01a48179c3b4ab",
+      "digest": "sha256:8aa35ed8e647b5049bf25d98de61ce659fea40924aa7dca9a1dce2ffe17dcbb6",
+      "size_bytes": 2367844
+    },
+    "superseded_intermediate_runs": {
+      "reason": "The first R264 verifier-bearing SHA exposed a source-graph verifier token-direction mismatch. The implementation contract was unchanged; the verifier was corrected under the same task and the final exact SHA passed. This is not a controller retry and ATTEMPT remains 1/3.",
+      "run_ids": [
+        37274512672
+      ],
+      "retry_incremented": false
+    }
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered current GitHub SSOT after the chat rollover and preserved already-complete R264 material/validation. E009/CHAT_ROLLOVER=5 supersedes E007 bookkeeping only; this rollover is not a retry, so ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R263 can authenticate exact semantic receipts but production code lacked a source-bytecode evidence producer feeding the programmable path. The first independent step is to preserve and authenticate the actual D3D9 GetFunction byte stream before implementing instruction/register/sampler/linkage translation."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R264 source-evidence API and implementation, routed runtime census shader inspection through it, added positive plus identity-drift/wrong-stage/misaligned fail-closed regressions, and added source-graph enforcement. No native draw authority was changed."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+      "validation_run_id": 37274615551,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111648808044,
+      "readiness_smoke_job_id": 111650766235,
+      "artifact_id": 11329673195,
+      "artifact_digest": "sha256:8aa35ed8e647b5049bf25d98de61ce659fea40924aa7dca9a1dce2ffe17dcbb6",
+      "evidence": "Exact-SHA Backend Conversion Gate passed queue/HMD/structure/disassembly/native-transport/dual-source/static-surface/source-graph/dormant-activation/census checks, Win32 build/binary verification, and the dependent DX11 readiness smoke suite including the constant-buffer R264 regressions. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+      "material_result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+      "source_implementation_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+      "validation_bearing_result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+      "result_marker": "[AUTO:CONVERSION-DX11-00402]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R264 is a dormant source-evidence producer and deliberately does not activate/package a NativeDrawPath runtime conversion."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "evidence": "Durable run record and DX11 lane state are reconciled to authoritative E009/CHAT_ROLLOVER=5 while preserving material/validation SHA 179a2f6, exact-SHA PASS evidence, and RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00402",
+    "production_id": "CONVERSION-DX11-00402",
+    "event_id": "CONVERSION-DX11-00402-E009",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "lane": "DX11",
+    "target_branch": "vr-dx11-native-r71",
+    "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+    "source_implementation_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+    "validation_bearing_result_sha": "179a2f6db481df5435e012cfbf01a48179c3b4ab",
+    "validation_run_id": 37274615551,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111648808044,
+    "readiness_smoke_job_id": 111650766235,
+    "artifact_id": 11329673195,
+    "artifact_digest": "sha256:8aa35ed8e647b5049bf25d98de61ce659fea40924aa7dca9a1dce2ffe17dcbb6",
+    "chat_rollover": 5,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "exact_next_action": "Preserve validated R239-R264. Under the next DX11 task, implement the first fail-closed D3D9 programmable instruction/operand decoder over the captured R264 DWORD token stream and generate non-synthetic translator/semantic provenance consumable by R263. Keep NativeDrawPath, Draw and DrawIndexed unauthorized until complete semantic coverage plus separate matching Quest 3/VDXR runtime evidence exist.",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R264_PROGRAMMABLE_SOURCE_EVIDENCE_SOURCE_GRAPH_DORMANT_BOUNDARY_WIN32_BUILD_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
+  "validation_run_id": 37274615551,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111648808044,
+  "readiness_smoke_job_id": 111650766235,
+  "artifact_id": 11329673195,
+  "artifact_digest": "sha256:8aa35ed8e647b5049bf25d98de61ce659fea40924aa7dca9a1dce2ffe17dcbb6",
+  "artifact_size_bytes": 2367844,
+  "current_metadata_reconciliation": {
+    "authoritative": {
+      "event_id": "CONVERSION-DX11-00402-E009",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 5,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "superseded_record_metadata": [
+      {
+        "event_id": "CONVERSION-DX11-00402-E007",
+        "event_type": "rollover",
+        "chat_rollover": 4
+      }
+    ],
+    "reason": "E009/CHAT_ROLLOVER=5 is the latest explicit user dispatch. It changes bookkeeping only; completed R264 material and exact-SHA validation remain unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

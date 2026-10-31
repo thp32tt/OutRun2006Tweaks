@@ -1,0 +1,152 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00830",
+  "production_id": "CONVERSION-DX11-00830",
+  "event_id": "CONVERSION-DX11-00830-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_COLOR_DRAW_PROVENANCE",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "source_gate": "R30_GAME_SCENE_TO_NATIVE_EYE_CALLBACK_PENDING",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "material_result_sha": "d7692caa06480b952f82b910eee63b88a0d57cdb",
+  "validation_bearing_result_sha": "d7692caa06480b952f82b910eee63b88a0d57cdb",
+  "packaging_status": "NOT_REQUIRED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Preserve actual native game depth Draw/DrawIndexed but prevent masked, zero-sample or unshaded geometry alone from certifying OpenXR game-eye color output. Continue unfinished real R30 menu/vehicle/race scene submission without changing D3D9 gamepad, FFB or DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-eye-color-provenance",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_stereo_submission",
+        "expected_behavior": "Per-eye recorder executes source GPU depth-only Draws without claiming color; nonzero color-capable Draw evidence is required to publish both independent game eyes."
+      },
+      {
+        "id": "source-fallback-isolation",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_original_game_input_ffb",
+        "expected_behavior": "Colorless candidate cannot promote XR; original D3D9 Draw, input/FFB and DX9Ex fallback remain unchanged."
+      },
+      {
+        "id": "exact-sha-native-gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_eye_warp_and_build",
+        "expected_behavior": "Actual VS/PS WARP positive and zero sample mask, masked RT0, absent PS negative cases plus five mandatory GitHub exact-SHA workflows pass; no claim of HMD parity."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-eye-color-provenance": "PASS_BUILD",
+    "source-fallback-isolation": "PASS_BUILD",
+    "exact-sha-native-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "NativeGameEyeDrawEncoder issues actual per-eye D3D11 Draw/DrawIndexed into ring RTV/DSV while separately tracking color-capable shader/OM writes.",
+      "NativeGameStereoSubmission rejects XR publication for either eye lacking a color-capable native Draw; source draw ordinals and real depth history are preserved.",
+      "Native Transport WARP regression uses actual compiled VS/PS and tests sample mask, RT0 write mask, missing pixel shader, two distinct camera signatures and producer GPU fence.",
+      "R30 real game menu/vehicle/race scene callback, constant/texture replay and Quest3 native image parity remain incomplete."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native eye WARP real VS/PS Draw/DrawIndexed and independent L/R texture readback; exact-sha build, OpenXR, Backend, Fast, HUD 5/5 SUCCESS.",
+      "negative_regression": "Zero sample mask, zero RTV write mask and missing pixel shader preserve Draw/depth evidence but cannot certify eye color; unattached OM/offscreen viewport/scissor remain rejected.",
+      "component_integration": "Actual D3D11 eye Draw encoder and shared-eye submission publication gate coupled with per-eye WARP regression; R30 callsite still unconnected."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_COLOR_DRAW_PROVENANCE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "remaining_implementation": [
+      "Bind real R30 game menu/vehicle/race scene journals to distinct native eye callbacks with actual constants and textures.",
+      "Verify DX11-native gamepad/menu-to-race frame output on Quest3/VDXR; HMD runtime remains UNTESTED."
+    ],
+    "visible_frame_acceptance": "WARP confirms distinct native L/R color-capable D3D11 Draw/DrawIndexed eye output with negative coverage/PS/RT masking; actual R30 menu, vehicle-selection and race source callback is still pending, and no live gameplay/HMD frame is claimed.",
+    "activation_guard_and_fallback": "Native OpenXR eye publication remains fail-closed without color evidence; opt-in and original D3D9/DX9Ex renderer, input and FFB paths are preserved; runtime/Quest3 not tested."
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 28c887822aa3; 00829 bound-eye OM/viewport/scissor source was already committed and CI SUCCESS; no R30 callback to OpenXR source yet.",
+    "C1_REVIEW": "Identified real false-positive native eye publication: an OM-bound D3D11 Draw with no pixel shader, zero sample coverage, or masked color output could count as a rendered game eye.",
+    "C2_IMPLEMENT": "Implemented separate actual color-capable Draw accounting in C++ eye encoder and final stereo publication; extended WARP executable with genuine VS/PS and negative colorless depth Draw regressions.",
+    "C3_VALIDATE": "PASS_EXACT_SHA at d7692caa: five mandatory GitHub workflows SUCCESS and separate Native Transport Isolated WARP SUCCESS; Quest3 gameplay not executed.",
+    "C4_COMMIT": "Material source+WARP regression commit d7692caa06480b952f82b910eee63b88a0d57cdb; no force and no CI skip on result.",
+    "C5_PACKAGE": "NOT_REQUIRED; not a gameplay/HMD-certified release.",
+    "C6_STATE": "Recorded verified exact-SHA source checkpoint separately from implementation; R30/OpenXR end-to-end feature remains incomplete and HMD/VDXR remains UNTESTED."
+  },
+  "ci_exact_sha_gates": {
+    "sha": "d7692caa06480b952f82b910eee63b88a0d57cdb",
+    "status": "PASS_EXACT_SHA",
+    "mandatory_5_of_5": [
+      {
+        "workflow": "DX11 Fast Structural Checks",
+        "run_id": 38916173760,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "Backend Conversion Gate",
+        "run_id": 38916173667,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "Build",
+        "run_id": 38916179858,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "OpenXR VR architecture",
+        "run_id": 38916179860,
+        "conclusion": "success"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 38916180577,
+        "conclusion": "success"
+      }
+    ],
+    "additional_native_warp": {
+      "workflow": "DX11 Native Transport Isolated WARP",
+      "run_id": 38916173682,
+      "conclusion": "success"
+    }
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00830",
+    "score_change": 0,
+    "score_status": "PARTIAL_SOURCE_INTEGRATION_NO_NEW_FEATURE_AWARD",
+    "note": "Unfinished parent DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR feature, no duplicate award for partial shader/eye admission implementation or C6 bookkeeping."
+  },
+  "acceptance_evidence": {
+    "native-eye-color-provenance": "PASS_WARP_GAME_EYE_REPLAY_NATIVE_DRAW_COLOR_EVIDENCE_R30_CALLBACK_PENDING",
+    "source-fallback-isolation": "PASS_BUILD_AND_STATIC_NO_D3D9_INPUT_FFB_OR_DXVK_SOURCE_WRITES_RUNTIME_UNTESTED",
+    "exact-sha-native-gates": "PASS_EXACT_SHA_5_OF_5_PLUS_NATIVE_TRANSPORT_WARP"
+  }
+}

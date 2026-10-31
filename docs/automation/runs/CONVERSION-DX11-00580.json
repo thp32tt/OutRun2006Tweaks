@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00580",
+  "production_id": "CONVERSION-DX11-00580",
+  "event_id": "CONVERSION-DX11-00580-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00580",
+  "base_sha": "2bbbaf6a4dbe984e29252fb4819857134044390c",
+  "work_key": "DX11:MENU_RACE_SELECTARG2_ARITH_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real D3D9 stage0 SELECTARG2 diffuse RGB with independent ADD/SUBTRACT alpha capture",
+      "New HLSL shader compilation and D3D11 Draw/DrawIndexed into visible diagnostic inset"
+    ],
+    "batch_components": [
+      "C++ D3D9 live game state admission with exact argument guards",
+      "D3D11 pixel shader pipeline and native Draw dispatch with 17 negative source mutation tests"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Independent SELECTARG2 diffuse RGB and saturated ADD/SUBTRACT alpha linked to shader dispatch",
+      "negative_regression": "17 destructive source mutations and four clamped alpha arithmetic cases",
+      "component_integration": "D3D9 game draw -> admitted texture state -> D3D11 shader and Draw -> original Present native inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SELECTARG2_ARITH_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SELECTARG2_ARITH_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 explicit opt-in; native replacement off; original D3D9 gameplay Draw, Present and gamepad preserved",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "256x144 opt-in native pixel inset; no actual game menu/vehicle/race, Quest3/VDXR or gamepad PASS without hardware tests; RESULTARG TEMP or unsupported operands fail closed"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_selectarg2_arithmetic_alpha_00580.py",
+    "docs/automation/runs/CONVERSION-DX11-00580.json"
+  ],
+  "next_action": "Controller: do not retry 00580. Next independent DX11 native gameplay feature may proceed. Quest3/VDXR/menu/race/gamepad parity remains NEED_HMD_TEST; no backend promotion.",
+  "material_result_sha": "42915747e667543960806cde51ef1cf9fa560b8f",
+  "validation_bearing_result_sha": "e04b591b6ff56f5c9d45a14d1874a0b3846ab789",
+  "evidence": {
+    "backend_gate_run_id": 38190299060,
+    "backend_gate_conclusion": "success",
+    "backend_gate_jobs": "validate and DX11 readiness smoke succeeded",
+    "dx11_fast_run_id": 38190299066,
+    "dx11_fast_conclusion": "success",
+    "build_run_id": 38190301546,
+    "build_conclusion": "success",
+    "build_feature_acceptance": "DX11 LIVE-CALLSITE/NATIVE-DRAW/VISIBLE-FRAME/SAFE-RETURN success; new 17 destructive mutation controls invoked",
+    "openxr_run_ids": [
+      38190301543
+    ],
+    "openxr_conclusions": [
+      "success"
+    ],
+    "hud_inspector_run_id": 38190301531,
+    "hud_inspector_conclusion": "success",
+    "vr_pc_fast_test_build_run_id": 38190299086,
+    "vr_pc_fast_test_build_conclusion": "skipped (not mandatory)",
+    "original_material_sha": "42915747e667543960806cde51ef1cf9fa560b8f",
+    "repair_validation_sha": "e04b591b6ff56f5c9d45a14d1874a0b3846ab789",
+    "hmd_game_quest3_vdxr_test": "not performed",
+    "gamepad_test": "not performed",
+    "runtime_validation": "UNTESTED",
+    "notes": "CI/source-build success is not live gameplay visual, FPS, Quest3/VDXR, or gamepad evidence."
+  }
+}

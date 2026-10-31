@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01152",
+  "production_id": "CONVERSION-DX11-01152",
+  "event_id": "CONVERSION-DX11-01152-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "inherited_feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:LIVE_SM3:SOURCE_PROJECTED_W_Z_TABLE_FOG_COORDINATE",
+  "classification": "A_SOURCE_IMPLEMENTATION_PLUS_B_CI_RECORD_CAUSAL_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "full_dx11_renderer_complete": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_change": 1,
+  "development_time_percentages": "UNMEASURED",
+  "source_base_sha": "dfe8d8c16848959f554719581cb80c4733b5b4df",
+  "source_implementation_commit_sha": "1821758df335621ad2141b0b6e64015e9f64e609",
+  "material_result_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+  "validation_bearing_result_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_GAME_SM3_FOG_CAPS_PROJECTION_AND_STATE_GETTERS",
+      "CANONICAL_AFFINE_Z_OR_CAMERA_W_DEPTH_SELECTION",
+      "D3D11_HLSL_NATIVE_SM3_POST_PS_TABLE_FOG_AND_DRAWINDEXED",
+      "OPT_IN_FULL_RESOLUTION_GAME_OUTPUT_WITH_ORIGINAL_D3D9_FALLBACK"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source integration only. Real native_draws/published frame/gpu-desktop/Quest3 evidence pending matching game session.",
+    "activation_guard_and_fallback": "Source D3D9 Draw, controls/FFB/SkyGlow and DX9Ex remain authoritative. Canonical Z/W projection required; invalid state, caps, resources, RT/DS, poisoned Draw and native publication remain fail-closed; DXVK frozen.",
+    "batch_components": [
+      "REAL_GAME_D3D9_LIVE_PROJECTION_COM_READ_AND_Z_W_FOG_COORDINATE_SELECTION",
+      "D3D11_SM3_POST_PIXEL_SHADER_W_DEPTH_RECONSTRUCTION_AND_CONSTANT_BINDING",
+      "POSITIVE_AND_NEGATIVE_PORTABLE_CPP_SHADER_SOURCE_REGRESSIONS",
+      "CAUSAL_INHERITED_01151_COMPLETED_TASK_CHANGED_FILES_RECORD_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "True D3D9 active table Fog canonical perspective/WFOG feeds native camera-W fog distance while affine D3D9 projection uses Z and retains original RGB fog mixing.",
+      "negative_regression": "Noncanonical projection, failed required GetTransform, missing fog caps, invalid consumed equation payload still fail closed; no unconditional fog bypass or game input/FFB change.",
+      "component_integration": "Real D3D9 programmable game draw -> GetDeviceCaps/GetTransform/FOG state -> live native SM3 table fog cbuffer b4 -> D3D11 HLSL PS interpolation -> opt-in native Draw/DrawIndexed with D3D9 fallback."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+      "tools/dx11_live_sm3_table_zfog_01005.cpp",
+      "docs/automation/runs/CONVERSION-DX11-01151.json"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "blocking_evidence": "2026-10-28 real game desktop negative b8dab362: native_draws=0, sm3_state_reject.fog=5547. New exact 1821758d DX11 Fast 40824173042 and Backend 40824173021 fail only inherited 01151 completed record absent changed_files despite changed_source_files enumerating three actual src/test files; causal metadata repair bundled into final result."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_table_fog.hpp",
+    "tools/dx11_live_sm3_table_zfog_01005.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01151.json",
+    "docs/automation/runs/CONVERSION-DX11-01152.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "scope": "UNFINISHED_SOURCE_SLICE_ONLY",
+    "goal": "Real source-owned programmable D3D9 game menu/vehicle/race table fog must use the actual rasterizer-selected Z or W coordinate in native D3D11, with safe fallback and exact-SHA game-frame Gates.",
+    "acceptance_items": [
+      {
+        "id": "native_z_w_table_fog",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 native programmable shader pixel path",
+        "expected_behavior": "Canonical Z/W-projected table fog transmits verified live fog coordinate and color into native PS rather than rejecting every W-capable device."
+      },
+      {
+        "id": "safe_render_input_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 input FFB RT DS shader provenance",
+        "expected_behavior": "Unknown or failed source projection, invalid floats, unsupported resources, publication remains original game authoritative."
+      },
+      {
+        "id": "five_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Actions source build backend OpenXR HUD",
+        "expected_behavior": "Same source candidate SHA passes full five push Gates, separately tracked from runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_z_w_table_fog": "PASS_EXACT_SHA_CPP_FAST",
+    "safe_render_input_fallback": "PASS_EXACT_SHA_BUILD_AND_FOG_NEGATIVE",
+    "five_exact_sha_gate": "PASS_EXACT_SHA"
+  },
+  "real_game_draw_blocker": "No new exact-binary game/hmd session establishing native_draws>0 and publishedBackbufferFrames>0",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "external_controller_adoption": "UNVERIFIED",
+  "pipeline": {
+    "C0_RECOVER": "PASS_GITHUB_HEAD",
+    "C1_REVIEW": "PASS_CAUSAL_GATE_DIAGNOSIS",
+    "C2_IMPLEMENT": "PASS_MATERIAL_SOURCE_1821758d",
+    "C3_VALIDATE": "PASS_FIVE_MANDATORY_PUSH_GATES_EXACT_SHA_9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+    "C4_COMMIT": "PASS_1821758d_SOURCE_AND_9e7cc0c_CAUSAL_GATE_REPAIR",
+    "C5_PACKAGE": "NO_GAME_SCREEN_OR_QUEST3_SESSION_NO_RUNTIMETEST_PACKAGE",
+    "C6_STATE": "PASS_SEPARATE_CHECKPOINT_NO_ADDITIONAL_SCORE"
+  },
+  "evidence": {
+    "source_implementation_sha": "1821758df335621ad2141b0b6e64015e9f64e609",
+    "failed_fast_run": 40824173042,
+    "failed_backend_run": 40824173021,
+    "failed_stage": "Existing 01151 COMPLETE_BUILD_VERIFIED record had changed_source_files but missing required changed_files; source files were genuinely modified on 95765463.",
+    "runtime_evidence": "UNTESTED; no native Draw/HMD test on current game binary",
+    "requires_final_exact_sha_five_push_gates": true,
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 40824444626,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 40824444229,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 40824444287,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 40824444217,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 40824444243,
+        "head_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+        "conclusion": "success"
+      }
+    ],
+    "original_material_source_commit": "1821758df335621ad2141b0b6e64015e9f64e609",
+    "validation_bearing_result_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+    "scoreboard_commit": "1ce9e9ac474934d376fc55a90815fcadecdf3375",
+    "scoreboard_ai2_prior": 2141,
+    "scoreboard_ai2_delta": 1,
+    "scoreboard_ai2_new": 2142,
+    "bookkeeping_only": true,
+    "checkpoint_has_ci_skip": true,
+    "ci_validated_source_commit_distinct": true
+  },
+  "c6": {
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "automation_validation": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "9e7cc0c090f4a14bb605795e4e35a274ed577e71",
+    "source_implementation_sha": "1821758df335621ad2141b0b6e64015e9f64e609",
+    "bookkeeping_only": true,
+    "score_change": 0,
+    "checkpoint_message_has_ci_skip": true,
+    "next_action": "No source-matched Quest3/native desktop game frame evidence. Same FEATURE_ID full-frame work continues elsewhere; do not re-run same exact Gate or claim native gameplay."
+  }
+}

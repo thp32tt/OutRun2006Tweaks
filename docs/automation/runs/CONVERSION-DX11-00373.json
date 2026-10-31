@@ -1,0 +1,204 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00373",
+  "production_id": "CONVERSION-DX11-00373",
+  "event_id": "CONVERSION-DX11-00373-E008",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "status": "VALIDATING_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "b81c2281fc9b25e2c3d437baa1131714bf3c39ac",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX11-00373]",
+  "selected_work_item": "DX11_R250_QUEUE_GATE_DISCOVERY_RECOVERY",
+  "summary": "Retry E008 repairs the queue-controller false missing-Backend-Gate timeout without repeating validated R250 rendering work. The contract now requires exact-SHA repository workflow-run fallback discovery, preserves prior validation-bearing identity across bookkeeping commits, and is enforced by the Backend Conversion Gate.",
+  "changed_paths": [
+    "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "tools/verify_queue_controller_contract.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00373.json",
+    "docs/CONVERSION_LANE_STATE.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered current GitHub branch HEAD b81c2281fc9b25e2c3d437baa1131714bf3c39ac, 00373 durable record, lane state, AGENTS.md, review index and queue contract. Failure SHA 1e12ad88f58eb8260d246654c00ea47062aa929b was inspected because FAILURE_CONTEXT explicitly reported a missing Gate."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "The reported missing Gate was false: Backend Conversion Gate #37203955314 exists for exact head_sha 1e12ad88f58eb8260d246654c00ea47062aa929b and completed success. Existing contract handled cancelled runs but did not require fallback recovery when normal run discovery returned empty.",
+      "review_lenses": {
+        "architecture": "Repair controller contract and its CI verifier only; do not repeat R250 or modify vr-d3d9ex-focus.",
+        "ownership_lifetime": "Preserve original R250 implementation/Gate evidence separately from later bookkeeping commit identity.",
+        "stereo_correctness": "No rendering/stereo semantics change; runtime remains UNTESTED.",
+        "performance": "No game hot-path change.",
+        "adversarial": "Reject false timeout when a push-triggered exact-SHA Gate exists but a wrapper omits it; do not silently promote bookkeeping commits to validation-bearing results."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added mandatory exact-SHA missing-run fallback rules to QUEUE_CONTROLLER_CONTRACT.md, added tools/verify_queue_controller_contract.py, and wired the verifier into Backend Conversion Gate. R250 rendering source remains unchanged."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_CI",
+      "automation_validation": "LOCAL_CONTRACT_AND_SOURCE_GRAPH_PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_MATERIAL_COMMIT",
+      "result_marker": "[AUTO:CONVERSION-DX11-00373]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Automation contract/verifier repair only; no deployable game/HMD package changed."
+    },
+    "C6_STATE": {
+      "status": "PENDING_VALIDATION",
+      "state_persisted": false,
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "After the E008 repair result commit passes its exact-SHA Backend Conversion Gate, finalize the retry record/lane state while retaining the original R250 implementation evidence and RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant DX11 programmable cache and hosted probes only; no production draw/renderer/transport/OpenXR path is activated or changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00373",
+    "production_id": "CONVERSION-DX11-00373",
+    "event_id": "CONVERSION-DX11-00373-E008",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "rollover_is_retry": true,
+    "resume_reason": "No authoritative Backend Conversion Gate run was created for result SHA 1e12ad88f58eb8260d246654c00ea47062aa929b after 15296s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+    "dispatch_source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "After the E008 repair result commit passes its exact-SHA Backend Conversion Gate, finalize the retry record/lane state while retaining the original R250 implementation evidence and RUNTIME_VALIDATION=UNTESTED.",
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37203246583,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "03b8dc06f483b985bfe2df74103093c6c3977330",
+      "validate_job_id": 111439049164,
+      "readiness_smoke_job_id": 111439978545,
+      "artifact_id": 11303667230,
+      "artifact_digest": "sha256:563bc666618183197fd75ea15010868dae2eea03e7fc8691a278f4e39e6e8b5f"
+    }
+  },
+  "issue14": {
+    "implementation_and_validation_comment_id": 5980153335
+  },
+  "chat_rollover": 4,
+  "rollover_is_retry": true,
+  "resume_reason": "No authoritative Backend Conversion Gate run was created for result SHA 1e12ad88f58eb8260d246654c00ea47062aa929b after 15296s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00373",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00373",
+      "production_id": "CONVERSION-DX11-00373",
+      "event_id": "CONVERSION-DX11-00373-E006",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 4,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00373",
+        "production_id": "CONVERSION-DX11-00373",
+        "event_id": "CONVERSION-DX11-00373-E002",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2
+      },
+      {
+        "task_id": "CONVERSION-DX11-00373",
+        "production_id": "CONVERSION-DX11-00373",
+        "event_id": "CONVERSION-DX11-00373-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 3,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE"
+      }
+    ],
+    "reason": "E006 / CHAT_ROLLOVER=4 is the newest explicit user dispatch. This rollover is not a retry, so ATTEMPT remains 1/3. The completed R250 material/result SHA and exact-SHA Gate evidence remain unchanged.",
+    "dispatch_correction_comment_id": 5980154828,
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "rollover_metadata_correction": {
+    "task_id": "CONVERSION-DX11-00373",
+    "corrected_from": [
+      {
+        "task_id": "CONVERSION-DX11-00373",
+        "production_id": "CONVERSION-DX11-00373",
+        "event_id": "CONVERSION-DX11-00373-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 3,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE"
+      }
+    ],
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00373",
+      "production_id": "CONVERSION-DX11-00373",
+      "event_id": "CONVERSION-DX11-00373-E006",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 4,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "reason": "E006 / CHAT_ROLLOVER=4 is the newest explicit user dispatch. This rollover is not a retry, so ATTEMPT remains 1/3. The completed R250 material/result SHA and exact-SHA Gate evidence remain unchanged.",
+    "dispatch_correction_comment_id": 5980154828,
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "preserved_r250_conversion_result": {
+    "selected_work_item": "DX11_R250_PROGRAMMABLE_NONINDEXED_IA_GEOMETRY_BINDING_RECEIPT",
+    "material_result_sha": "03b8dc06f483b985bfe2df74103093c6c3977330",
+    "validation_bearing_result_sha": "03b8dc06f483b985bfe2df74103093c6c3977330",
+    "validation_run_id": 37203246583,
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R250_PROGRAMMABLE_NONINDEXED_IA_GEOMETRY_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "runtime_validation": "UNTESTED"
+  },
+  "failure_recovery": {
+    "reported_result_sha": "1e12ad88f58eb8260d246654c00ea47062aa929b",
+    "reported_failure": "No authoritative Backend Conversion Gate run was created before controller timeout.",
+    "recovered_gate_run_id": 37203955314,
+    "recovered_gate_head_sha": "1e12ad88f58eb8260d246654c00ea47062aa929b",
+    "recovered_gate_event": "push",
+    "recovered_gate_status": "completed",
+    "recovered_gate_conclusion": "success",
+    "recovered_validate_job_id": 111441158987,
+    "recovered_readiness_smoke_job_id": 111441969689,
+    "recovered_artifact_id": 11303942027,
+    "recovered_artifact_digest": "sha256:7d5970b088066fd4ca1f33ec5f626aedf4ced0cf44f529d8d44f2fb8257cc5f7",
+    "root_cause": "Controller run discovery falsely treated the exact-SHA Gate as absent even though the push-triggered Backend Conversion Gate existed and succeeded. Contract covered cancelled-run reconciliation but not an empty/missed discovery path.",
+    "repair": "Require exact-SHA repository workflow-run fallback discovery and preserve validation-bearing identity across bookkeeping commits."
+  }
+}

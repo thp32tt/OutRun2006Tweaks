@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00865",
+  "production_id": "CONVERSION-DX11-00865",
+  "event_id": "CONVERSION-DX11-00865-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_HOST_COMPUTE_UAV_STEREO_GPU_COPY",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "069aeb6986b51c2eac78c4e794657424a8a557f2",
+  "validation_bearing_result_sha": "1f35b371dc2df8bc7efe5826d54967ff9fd09456",
+  "result_sha": "069aeb6986b51c2eac78c4e794657424a8a557f2",
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Preserve live native host compute UAV bindings and append/consume counters as independently produced left/right game-eye textures are staged and copied to the OpenXR stereo array; detach and restore caller full MRT/DSV and CS UAV state without promoting dormant native mode or disturbing D3D9Ex rendering/input/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_compute_camera_dual_gpu_copy",
+        "expected_behavior": "Both DirectGPU hold staging and OpenXR stereo array copies transmit separate compute-authored red/green eye color pixels without writable CS UAV source alias remaining bound during CopyResource/CopySubresourceRegion."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "host_cs_uav_counter_and_om_restore",
+        "expected_behavior": "Restore original caller CS UAVs without resetting append/consume counters and restore all eight OM RTV slots plus DSV after both GPU transfers; preserve fail-closed native opt-in and original D3D9Ex gamepad/FFB behavior."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_dx11_fast_backend_windows_openxr_hud",
+        "expected_behavior": "All five required GitHub workflows must pass on one validation-bearing source SHA; no game/Quest3/VDXR runtime pass is inferred from CI."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Actual menu/vehicle/race native L/R OpenXR visible-frame output remains UNTESTED; CI-only source and WARP tests do not establish runtime gameplay.",
+    "activation_guard_and_fallback": "Native activation remains opt-in and fail-closed, preserving D3D9Ex Draw/Present/input/FFB; DXVK lane unaffected.",
+    "batch_components": [
+      "vrhost/src/runtime/native_direct_stereo_pair.hpp: temporarily detach and faithfully restore OM MRT/DSV and CS UAV bindings across native stereo staging and XR-array copies; preserve UAV counters.",
+      "vrhost/tests/native_direct_eye_pair_smoke.cpp: WARP compute-UAV-bound eye input, distinct left/right RGBA pixel readback, and binding-restoration regression.",
+      "vrhost/src/runtime/native_direct_stereo_pair.hpp: subsequent missing-UINT compilation repair uses unsigned int / ~0u without changing copy semantics."
+    ],
+    "acceptance_proof": {
+      "positive_probe": "WARP native direct eye pair smoke exercises separate left/right GPU pixel copies from compute-authored surfaces and verifies CS UAV binding restoration.",
+      "negative_regression": "Scope detaches UAV/OM aliases before copy, restores original bindings without resetting counters; unchanged D3D9Ex fallback and no runtime promotion.",
+      "component_integration": "Live R23 compute camera L/R GPU surfaces -> native host hold copy -> OpenXR stereo array GPU copy -> restored compute/OM state for next frame.",
+      "activation_guard_and_fallback": "Fail-closed native activation; original D3D9Ex input and FFB are unchanged."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_HOST_COMPUTE_UAV_STEREO_GPU_COPY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "changed_files": [
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "acceptance_results": {
+    "end2end": "PASS_TARGETED_WARP_COMPUTE_CAMERA_LEFT_RIGHT_GPU_COPY",
+    "fallback": "PASS_TARGETED_WARP_CS_UAV_AND_OM_STATE_RESTORE",
+    "gates": "PASS_EXACT_SHA_USER_CONFIRMED",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub target branch HEAD and parent implementation checked; this 00865 run JSON was absent (404). Recover record from GitHub material commits, matching previous run schema, and reported exact-SHA CI, not from an invented preexisting file.",
+    "C1_REVIEW": "PASS: scoped live native DirectGPU hold and XR-array copies required preservation of host OM MRT/DSV and CS UAV bindings to avoid compute-authored game-eye source hazards.",
+    "C2_IMPLEMENT": "PASS: 069aeb6986b51c2eac78c4e794657424a8a557f2 implemented host GPU-copy state preservation and WARP smoke; 1f35b371dc2df8bc7efe5826d54967ff9fd09456 repaired descriptor-only DXGI header UINT compile failure on the same task.",
+    "C3_VALIDATE": "PASS_EXACT_SHA as confirmed by user for 1f35b371dc2df8bc7efe5826d54967ff9fd09456. GitHub directly showed DX11 Fast 39005518084, Backend 39005518078, Build 39005521643 and OpenXR 39005521682 SUCCESS, and HUD game-x86-c2-r30-hud job 117317348974 SUCCESS; HUD Inspector parent workflow 39005521646 was still IN_PROGRESS at connector observation. HMD UNTESTED. No CI was rerun.",
+    "C4_COMMIT": "PASS: original feature material 069aeb6986b51c2eac78c4e794657424a8a557f2 and causal build repair 1f35b371dc2df8bc7efe5826d54967ff9fd09456, both source-bearing commits with [AUTO:CONVERSION-DX11-00865] and no [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED: Quest3/VDXR and real-game runtime not performed.",
+    "C6_STATE": "PASS_EXACT_SHA: record missing previously; create distinct [skip ci] bookkeeping commit without source change. Preserve original implementation material SHA 069aeb6986b51c2eac78c4e794657424a8a557f2 and exact validation-bearing SHA 1f35b371dc2df8bc7efe5826d54967ff9fd09456; no new scoring."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "069aeb6986b51c2eac78c4e794657424a8a557f2",
+    "material_repair_sha": "1f35b371dc2df8bc7efe5826d54967ff9fd09456",
+    "validation_sha": "1f35b371dc2df8bc7efe5826d54967ff9fd09456",
+    "run_record_recovery": "RUN_RECORD_NOT_FOUND: path absent at HEAD and at initial feature commit; reconstructed contract/results from actual GitHub source commits, targeted tests and previous adjacent C6 schema, rather than overwriting existing data.",
+    "exact_sha_ci": {
+      "validation_sha": "1f35b371dc2df8bc7efe5826d54967ff9fd09456",
+      "user_confirmed_all_required_success": true,
+      "github_directly_observed_workflow_success": {
+        "dx11_fast": 39005518084,
+        "backend_conversion": 39005518078,
+        "windows_build": 39005521643,
+        "openxr": 39005521682
+      },
+      "hud_inspector_workflow": 39005521646,
+      "hud_inspector_observed_workflow_status": "in_progress",
+      "hud_inspector_observed_successful_job": 117317348974,
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "next_action": "C6 recorded only. Continue unfinished full-resolution DX11 gameplay integration on the same feature/branch; menu/race/HMD/gamepad behavior is UNTESTED. Do not repeat CI or award score for this C6 bookkeeping recovery."
+}

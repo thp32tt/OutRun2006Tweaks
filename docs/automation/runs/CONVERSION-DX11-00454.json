@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00454",
+  "production_id": "CONVERSION-DX11-00454",
+  "event_id": "CONVERSION-DX11-00454-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "attempt": "1/3",
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "selected_work_item": "DX11_R316_R275_RECEIPT_PROVENANCE_FAIL_CLOSED_AUDIT",
+  "base_sha": "502bd94c4379972106a4d921bc85b9256bc5f6c6",
+  "result_sha": "a057daefb59e1f807be2f74c52fe467b47c1073f",
+  "material_result_sha": "a057daefb59e1f807be2f74c52fe467b47c1073f",
+  "validation_bearing_sha": "0fa9b8c36de1ff7d28395312ba0d54690f3145b6",
+  "validation_bearing_result_sha": "0fa9b8c36de1ff7d28395312ba0d54690f3145b6",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "validation_run_id": 37725927711,
+  "validation_job_id": 113144030314,
+  "readiness_smoke_job_id": 113145406464,
+  "artifact_id": 11528215907,
+  "artifact_digest": "sha256:0a105cd3e7a3de813019461e2973c96a0f22829f92ee0b5638dde009e40b6a23",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00454.json",
+  "implementation_commits": [
+    "a057daefb59e1f807be2f74c52fe467b47c1073f"
+  ],
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "state_persisted": true,
+  "summary": "R316 adds source-evidenced fail-closed R275 receipt telemetry provenance classification, catches contradictory exact/objectReady/snapshot claims, and marks R275 object/source/plan hash input tuple unlogged; R315 exact R276 remains separate. Source and regression tests committed; exact-SHA static census test passed, Windows CI still in progress.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub branch HEAD 502bd94c; 00453 complete, 00454 absent; E003 rollover=2 is not a retry, ATTEMPT=1/3.",
+    "C1_REVIEW": "PASS: native_backend.cpp R275 receipt hash mixes source identity, R273/R276 snapshots, translation-object snapshot and four exactness bits; runtime_census.cpp logs only exact/objectReady/snapshot; scalar log alone is insufficient for independent receipt provenance.",
+    "C2_IMPLEMENT": "PASS: R316 analyzer surfaces shape contradictions and explicit unlogged provenance; added direct C++ emitter/composer schema assertions and seven exact/forged/inexact/zero-token regression cases. No Draw or DrawIndexed activation.",
+    "C3_VALIDATE": "PASS: validation-bearing SHA 0fa9b8c36de1ff7d28395312ba0d54690f3145b6 Backend Conversion Gate #37725927711 concluded SUCCESS: validate #113144030314 and DX11 readiness smoke #113145406464 SUCCESS. Census regressions, static graphs, Win32 binary and native DX11 probes passed; artifact #11528215907 sha256:0a105cd3e7a3de813019461e2973c96a0f22829f92ee0b5638dde009e40b6a23. Earlier material-SHA gate 37725741310 was cancelled by subsequent C6 checkpoint commit, superseded by full success on exact final source+checkpoint SHA; not counted as PASS.",
+    "C4_COMMIT": "PASS: source/test material SHA a057daefb59e1f807be2f74c52fe467b47c1073f with [AUTO:CONVERSION-DX11-00454].",
+    "C5_PACKAGE": "NOT_REQUIRED: diagnostic-only analyzer change, no HMD candidate.",
+    "C6_STATE": "PASS: persisted R316 validated material/evidence SHAs, exact-SHA Gate jobs/artifact, E003 rollover ATTEMPT=1/3 and fail-closed next action. Quest3/VDXR runtime UNTESTED."
+  },
+  "next_action": "R317: investigate exposing object-owned R275 receipt source/plan/object binding scalars at production logging boundary for independently reconstructible R275 hash; current 3-scalar log is not enough. Keep Draw/DrawIndexed fail-closed, no promotion without source/census proof and Quest3/VDXR hardware runtime evidence.",
+  "recorded_at_kst": "2026-10-08T13:17:12.213+09:00",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "artifact_name": "backend-autovalidated-vr-dx11-native-r71-0fa9b8c36de1ff7d28395312ba0d54690f3145b6",
+  "evidence": {
+    "backend_conversion_gate_run_id": 37725927711,
+    "validation_job_id": 113144030314,
+    "readiness_smoke_job_id": 113145406464,
+    "artifact_id": 11528215907,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-0fa9b8c36de1ff7d28395312ba0d54690f3145b6",
+    "artifact_digest": "sha256:0a105cd3e7a3de813019461e2973c96a0f22829f92ee0b5638dde009e40b6a23",
+    "superseded_cancelled_gate_id": 37725741310
+  },
+  "issue14_comment_id": null
+}

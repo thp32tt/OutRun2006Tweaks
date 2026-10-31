@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""00781 native whole-main STENCIL Clear, linked rendering and fail-closed D3D9."""
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+b=(r/"src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
+h=(r/"src/vr/d3d9/stereo_renderer.cpp").read_text()
+g=(r/"src/vr/d3d11/native_game_main_stencil_clear.hpp").read_text()
+wf=(r/".github/workflows/dx11-fast-structural.yml").read_text()
+def valid(bridge,hook,guard):
+    main=bridge.split("bool observe_game_depth_clear(",1)[1].split("void observe_game_clear(",1)[0]
+    color=bridge.split("void observe_game_clear(",1)[1].split("void observe_unavailable_game_draw(",1)[0]
+    raster=bridge.split("bool supported_game_state(",1)[1].split("GameNativeCullAdmission admittedCull{}",1)[0]
+    return all((
+      "const bool clearZ = (flags & D3DCLEAR_ZBUFFER) != 0u;" in main,
+      "(flags & ~kDepthStencilFlags) != 0u" in main,
+      "(clearZ && !(z >= 0.0f && z <= 1.0f))" in main,
+      "GameNativeClearCoverage::covers_whole(" in main,
+      "s.clearColor.main_depth_still_bound(" in main,
+      "GameNativeMainStencilClear::may_ignore(" in main,
+      "if (clearZ) {\n            s.preDrawDepth.discard();\n            s.frameBatch.note_full_depth_clear(z);\n        }" in main,
+      "GameNativeMainStencilClear::may_ignore(" in color,
+      "mainDepthIdentity != 0u" in color,
+      "if ((clearStencil && !ignoreStencil) ||" in color,
+      "s.frameBatch.abort(); // failed proof: original D3D9 lives" in color,
+      "GetRenderState(D3DRS_STENCILFUNC, &stencilFunc)" in raster,
+      "GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)" in raster,
+      "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)" in raster,
+      "stencil_equivalent_to_disabled(" in raster,
+      "!clip || !GameNativeSrgbDraw::admit(srgbWrite, fullFrame)" in raster,
+      "GetRenderState(D3DRS_FOGTABLEMODE, &sourceTableFog)" in raster,
+      "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)" in raster,
+      "native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)" in raster,
+      "sourceKnown = fog == TRUE && fogModesKnown &&" in raster,
+      "native_raw_fvf_fog_visual_admission(" in raster,
+      "if (!output.rawFogVisualMismatch) return false;" in raster,
+      "const auto polygonMode = game_sm3_effective_polygon_mode(" in raster,
+      "if (!polygonMode.admitted ||" in raster,
+      "(!fullFrame && fillMode != D3DFILL_SOLID))" in raster,
+      "!GameNativeSrgbDraw::admit(srgbWrite, fullFrame)" in raster,
+      "output.nativeSrgbWrite = GameNativeSrgbDraw::uses_srgb(srgbWrite);" in raster,
+      "live_game_frame::observe_game_depth_clear(" in hook,
+      "live_game_frame::observe_game_clear(" in hook,
+      "nativeFullFrame && originalMainColorSeed &&" in guard,
+      "sameMainDepthStencil && fullClearCoverage && nativeBatchOpen;" in guard,
+      "python tools/test_dx11_main_stencil_clear_game_frame_00781.py" in wf,
+      "tools/dx11_main_stencil_clear_game_frame_00781.cpp" in wf,
+    ))
+assert valid(b,h,g)
+def mutant(which,old,new):
+    start="bool observe_game_depth_clear(" if which=="main" else "void observe_game_clear("
+    end="void observe_game_clear(" if which=="main" else "void observe_unavailable_game_draw("
+    pre,rest=b.split(start,1)
+    sec,suf=rest.split(end,1)
+    assert old in sec,old
+    return pre+start+sec.replace(old,new,1)+end+suf
+for scope,old,new in (
+ ("main","GameNativeClearCoverage::covers_whole(","GameNativeClearCoverage::skip("),
+ ("main","s.clearColor.main_depth_still_bound(","true /* unproven */("),
+ ("main","if (clearZ) {\n            s.preDrawDepth.discard();\n            s.frameBatch.note_full_depth_clear(z);\n        }","/* omitted Z */"),
+ ("main","s.preDrawDepth.discard();","/* retain stale pre-draw Z */"),
+ ("color","mainDepthIdentity != 0u","true /* foreign Z */"),
+ ("color","if ((clearStencil && !ignoreStencil) ||","if ((clearStencil && ignoreStencil) ||"),
+ ("color","s.frameBatch.abort(); // failed proof: original D3D9 lives","s.frameBatch.reset(); // fail open"),
+):
+    assert not valid(mutant(scope,old,new),h,g),old
+# Losing the new live source-side stencil proof must also fail this Clear
+# regression: original D3D9 Draw, not a native scene, wins on conditional Z/S.
+# Mutate the actual fixed-function Draw owner only. The live programmable
+# SM3 path has its own stencil proof; replacing its earlier occurrence must
+# not produce a false positive for this main-scene Clear regression.
+rasterStart = "bool supported_game_state("
+rasterEnd = "bool submit("
+prefix, tail = b.split(rasterStart, 1)
+raster, suffix = tail.split(rasterEnd, 1)
+assert "stencil_equivalent_to_disabled(" in raster
+unsafeRaster = prefix + rasterStart + raster.replace(
+    "stencil_equivalent_to_disabled(",
+    "stencil_unconditionally_ignored(", 1) + rasterEnd + suffix
+assert not valid(unsafeRaster, h, g)
+# Exact FVF table fog requires authentic source Z/W/caps and consumed payload.
+# RAW-only approximation of unmirrored equations still requires real getters;
+# removing either fallback or its opt-in makes this regression fail.
+for token, disabled in (
+    ("native_game_inert_fog_modes(sourceTableFog, sourceVertexFog)",
+     "true /* unchecked active fog */"),
+    ("if (!output.rawFogVisualMismatch) return false;",
+     "/* lost live source fog fallback */"),
+    ("sourceKnown = fog == TRUE && fogModesKnown &&",
+     "sourceKnown = true && /* unverified raw source */"),
+    ("native_raw_fvf_fog_visual_admission(",
+     "native_raw_fvf_fog_visual_unchecked("),
+    ("GetRenderState(D3DRS_FOGVERTEXMODE, &sourceVertexFog)",
+     "GetRenderState(D3DRS_FOGVERTEXMODE, &sourceTableFog)"),
+):
+    assert token in raster
+    unsafe = prefix + rasterStart + raster.replace(token, disabled, 1) + rasterEnd + suffix
+    assert not valid(unsafe, h, g), token
+assert not valid(b,h,g.replace("sameMainDepthStencil && fullClearCoverage && nativeBatchOpen;","true; /* unproved */"))
+assert not valid(b,h.replace("live_game_frame::observe_game_depth_clear(","live_game_frame::skip_clear(",1),g)
+print("00781 real game main STENCIL, Z|STENCIL, menu-race Draw+Present fallback PASS")

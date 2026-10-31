@@ -1,0 +1,145 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00809",
+  "production_id": "CONVERSION-DX11-00809",
+  "event_id": "CONVERSION-DX11-00809-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_OPENXR_STEREO_FRAME_COMPLETENESS",
+  "feature_id": "DX11-NATIVE-OPENXR-STEREO-FRAME-COMPLETENESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "f54ab6bc6e17d24c3e9d6559830506358192331e",
+  "material_result_sha": "6c97049809f90edd6da9ed837d4f4ea81fd9617b",
+  "validation_bearing_result_sha": "02e3fb38d85693b5c3f952ee9ef5b3fcefc3fec6",
+  "changed_files": [
+    "vrhost/src/runtime/native_stereo_source_route.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-NATIVE-OPENXR-STEREO-FRAME-COMPLETENESS",
+    "full_dx11_renderer_complete": false,
+    "goal": "Prevent incomplete newer DirectGPU game frames from displacing fully published native OpenXR stereo menu/race eyes or prematurely ACKing valid prior ring frames.",
+    "acceptance_items": [
+      {
+        "id": "latest-complete-native-frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "x64_openxr_native_game_frame",
+        "expected_behavior": "R41 host latest-first frame routing selects a fully published native left/right frame with valid pose even when a newer game history entry is incomplete."
+      },
+      {
+        "id": "unproven-eye-ack-denied",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9ex_source_and_ack_lifetime",
+        "expected_behavior": "Never skip/ACK incomplete, in-flight or invalid-slot native eyes; preserve original D3D9Ex rendering and gamepad/FFB fallback."
+      },
+      {
+        "id": "same-sha-native-five-gate",
+        "category": "integrated_validation",
+        "behavior_area": "native_d3d11_host_integrated_build",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector all succeed at one validation-bearing exact SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "latest-complete-native-frame": "PASS_BUILD",
+    "unproven-eye-ack-denied": "PASS_BUILD",
+    "same-sha-native-five-gate": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_GPU_HANDOFF",
+      "OPENXR_PROJECTION"
+    ],
+    "integration_path": [
+      "Real game Draw -> guarded native D3D11 full-size frame/stereo transport source",
+      "R41 host frame-history prefilters fully published native stereo pose/frame/slot before latest-first candidate selection",
+      "R41 skip ACK applies only to older eligible frames; original D3D9/SBS/gamepad fallback remains authoritative on rejects"
+    ],
+    "batch_components": [
+      "vrhost/src/main_r23.cpp live newest DirectGPU game-frame election and skip ACK",
+      "native_stereo_source_route.hpp shared source selection predicate",
+      "native_direct_eye_pair_smoke.cpp positive and negative host WARP/source routing regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Windows host-x64 source build and native direct-eye regression for complete frame 40 preferred over incomplete newer frame 41, with all five same-SHA Gates SUCCESS.",
+      "negative_regression": "Reject absent native pose, incomplete stereo flags, wrong slot, Present-in-flight and zero transport generation before eye publication selection; original D3D9Ex input path unchanged.",
+      "component_integration": "Live main_r23.cpp DirectGPU ring history, source routing helper and native eye importer smoke are compiled by mandatory OpenXR/Windows pipelines at exact validated SHA."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_OPENXR_STEREO_FRAME_COMPLETENESS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED for host source routing only, not Quest3/VDXR observed or full native menu/car/race renderer completion.",
+    "activation_guard_and_fallback": "Native stereo routing remains guarded by actual game frame/pose; original DX9Ex and gamepad/FFB unchanged; DXVK frozen."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Remote head f54ab6bc6e17d24c3e9d6559830506358192331e; 00808 source 5/5 passed and its C6 live path later repaired separately.",
+    "C1_REVIEW": "R41 native host selected newest DirectGPU history before proving stereo frame/pose and could skip-ACK older complete eye sources.",
+    "C2_IMPLEMENT": "Material C++/host regression source 6c97049809f90edd6da9ed837d4f4ea81fd9617b with marker [AUTO:CONVERSION-DX11-00809].",
+    "C3_VALIDATE": "Initial Backend #38851489513 failed inherited 00808 record enum contract; correction 02e3fb38 preserved source, five exact-SHA required workflows all SUCCESS.",
+    "C4_COMMIT": "Source material 6c97049809f90edd6da9ed837d4f4ea81fd9617b, separate inherited 00808 validation-input fix 02e3fb38d85693b5c3f952ee9ef5b3fcefc3fec6, neither CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA; runtime Quest3/VDXR, gamepad and output UNTESTED."
+  },
+  "evidence": {
+    "exact_sha_gate_results": {
+      "DX11 Fast": {
+        "run_id": 38851716211,
+        "conclusion": "success",
+        "head_sha": "02e3fb38d85693b5c3f952ee9ef5b3fcefc3fec6"
+      },
+      "Backend Conversion": {
+        "run_id": 38851716219,
+        "conclusion": "success",
+        "head_sha": "02e3fb38d85693b5c3f952ee9ef5b3fcefc3fec6"
+      },
+      "Windows Build": {
+        "run_id": 38851720616,
+        "conclusion": "success",
+        "head_sha": "02e3fb38d85693b5c3f952ee9ef5b3fcefc3fec6"
+      },
+      "OpenXR": {
+        "run_id": 38851720617,
+        "conclusion": "success",
+        "head_sha": "02e3fb38d85693b5c3f952ee9ef5b3fcefc3fec6"
+      },
+      "HUD Inspector": {
+        "run_id": 38851720630,
+        "conclusion": "success",
+        "head_sha": "02e3fb38d85693b5c3f952ee9ef5b3fcefc3fec6"
+      }
+    },
+    "inherited_record_repair": {
+      "sha": "02e3fb38d85693b5c3f952ee9ef5b3fcefc3fec6",
+      "original_run": "CONVERSION-DX11-00808",
+      "reason": "restored canonical live D3D9 callsite -> native D3D11 Draw -> visible source stages without rescore"
+    },
+    "runtime_evidence": "NONE - Quest3/VDXR game view or gamepad not executed"
+  },
+  "material_source_commits": [
+    "6c97049809f90edd6da9ed837d4f4ea81fd9617b"
+  ],
+  "score": {
+    "run_key": "CONVERSION-DX11-00809",
+    "score_change": 0,
+    "score_status": "NO_FULL_NATIVE_RENDERER_COMPLETION_SCORE",
+    "note": "Scoped native host completeness/ACK repair; no independent full native renderer release, C6 and prior 00808 repair not scored."
+  }
+}

@@ -1,0 +1,145 @@
+#pragma once
+#include "native_game_source_mutation.hpp"
+#include <array>
+#include <cstdint>
+namespace outrun::vr::dx11::live_game_frame {
+// Original D3D9 whole-Z Clear -> partial Z region(s) -> first native Z Draw.
+// Native GPU depth is only allocated on the first real game Draw.
+struct GameNativePreDrawDepth {
+    struct Tile { std::int64_t left{}, top{}, right{}, bottom{}; float z{}; };
+    static constexpr std::uint32_t kCapacity=128u;
+    static constexpr std::uint32_t kGpuChunkCapacity =
+        GameNativeSourceMutation::kMaxPartialTargetClearRects;
+    // One original D3D9 Clear may contain more source rectangles than the
+    // bounded GPU replay ledger. Fully hidden older depth writes are retired
+    // while preserving the final per-pixel Z value and source order.
+    static constexpr std::uint32_t kMaxSourceRects=
+        GameNativePreDrawFills::kMaxPreDrawTargetClearSourceRects;
+    std::array<Tile,kCapacity> tiles{};
+    std::uintptr_t device{},backbuffer{},depth{};
+    std::uint32_t count{},sourceWidth{},sourceHeight{};
+    constexpr void discard() noexcept {
+        device=backbuffer=depth=0u;count=sourceWidth=sourceHeight=0u;
+    }
+    [[nodiscard]] constexpr bool replay_ready(
+        std::uintptr_t owner,std::uintptr_t rt,std::uintptr_t ds,
+        std::uint32_t w,std::uint32_t h) const noexcept {
+        if(!count)return true;
+        if(count>kCapacity||!owner||!rt||!ds||owner!=device||
+           rt!=backbuffer||ds!=depth||!w||!h||
+           w!=sourceWidth||h!=sourceHeight||
+           w>0x7fffffffu||h>0x7fffffffu)
+            return false;
+        for(std::uint32_t i=0;i<count;++i){
+            const auto& p=tiles[i];
+            if(p.left<0||p.top<0||p.right<=p.left||p.bottom<=p.top||
+               p.right>w||p.bottom>h||!(p.z>=0.f&&p.z<=1.f))return false;
+        }
+        return true;
+    }
+    // Replay 33..128 authentic sparse game Z regions in source order. D3D11.1
+    // groups consecutive equal-Z rectangles into at most 32 ClearView regions;
+    // D3D11.0 uses the same ordered batches with per-tile depth-only raster.
+    // Validate the entire ledger and COM owners BEFORE the first GPU write.
+    template<class Submit>
+    [[nodiscard]] bool replay_batched(
+        std::uintptr_t owner, std::uintptr_t rt, std::uintptr_t ds,
+        std::uint32_t w, std::uint32_t h, Submit&& submit) const noexcept {
+        if (!replay_ready(owner,rt,ds,w,h)) return false;
+        std::uint32_t start=0u;
+        while (start<count) {
+            const float z=tiles[start].z;
+            std::uint32_t used=1u;
+            while (start+used<count && used<kGpuChunkCapacity &&
+                   tiles[start+used].z==z) ++used;
+            if (!submit(tiles.data()+start,used,z)) return false;
+            start+=used;
+        }
+        return true;
+    }
+    template<class Rect>
+    [[nodiscard]] constexpr bool record(
+        std::uintptr_t owner,std::uintptr_t rt,std::uintptr_t ds,
+        std::uint32_t w,std::uint32_t h,
+        std::uint32_t vx,std::uint32_t vy,std::uint32_t vw,std::uint32_t vh,
+        std::uint32_t n,const Rect* rects,float z) noexcept {
+        if(!owner||!rt||!ds||!(z>=0.f&&z<=1.f)||
+           n>kMaxSourceRects||(n&&!rects)||
+           (count&&!replay_ready(owner,rt,ds,w,h)))return false;
+        auto staged=*this; // Entire original D3D9 call commits or none.
+        for(std::uint32_t i=0;i<(n?n:1u);++i){
+            // D3DRECT source LONG may be negative: never cast to UINT.
+            const std::int64_t l=n?std::int64_t(rects[i].x1):vx;
+            const std::int64_t t=n?std::int64_t(rects[i].y1):vy;
+            const std::int64_t r=n?std::int64_t(rects[i].x2):std::int64_t(vx)+vw;
+            const std::int64_t b=n?std::int64_t(rects[i].y2):std::int64_t(vy)+vh;
+            GameNativeSourceMutation::TargetClearRect out{};
+            const auto kind=GameNativeSourceMutation::classify_target_clear_rect(
+                l,t,r,b,vx,vy,vw,vh,w,h,out);
+            if(kind==GameNativeSourceMutation::TargetClearClip::Invalid)return false;
+            if(kind==GameNativeSourceMutation::TargetClearClip::Empty)continue;
+            const Tile next{out.left,out.top,out.right,out.bottom,z};
+            const auto covers=[](const Tile& outer,const Tile& inner) constexpr {
+                return outer.left<=inner.left && outer.top<=inner.top &&
+                    outer.right>=inner.right && outer.bottom>=inner.bottom;
+            };
+            // An immediate prior write of the identical Z already owns all
+            // these pixels. Never elide an earlier same-Z tile across an
+            // intervening different-Z writer.
+            if(staged.count && staged.tiles[staged.count-1u].z==z &&
+               covers(staged.tiles[staged.count-1u],next))continue;
+            // A later opaque D3D9 Z Clear replaces *every* entirely covered
+            // previous tile, including differently-valued Z and intervening
+            // source writes. Reject capacity BEFORE mutating the transaction.
+            std::uint32_t retained=0u;
+            for(std::uint32_t j=0u;j<staged.count;++j)
+                if(!covers(next,staged.tiles[j]))++retained;
+            std::uint32_t output=0u;
+            for(std::uint32_t j=0u;j<staged.count;++j) {
+                Tile prior=staged.tiles[j];
+                if(!covers(next,prior)) {
+                    // Same opaque edge subtraction as authentic RTV color:
+                    // the native first-Draw D32 replay never needs pixels
+                    // covered by this newer D3D9 source Clear.
+                    (void)game_native_trim_partially_overwritten(prior,next);
+                    staged.tiles[output++]=prior;
+                }
+            }
+            staged.count=output;
+            // Adjacent/overlapping equal-Z strips form one exact rectangle.
+            // Unlike bounding-box packing, the merge never paints unowned
+            // pixels or elides an intervening different-Z source write.
+            const bool merged=staged.count &&
+                staged.tiles[staged.count-1u].z==z &&
+                game_native_merge_ordered_overwrite(
+                    staged.tiles[staged.count-1u],next);
+            const bool recovered = !merged &&
+                game_native_merge_noninterfering_overwrite(
+                    staged.tiles, staged.count, next,
+                    [](const Tile& a, const Tile& b) constexpr {
+                        return a.z == b.z;
+                    });
+            if(!merged && !recovered) {
+                if(retained>=kCapacity)return false;
+                if(staged.count==kCapacity)return false;
+                staged.tiles[staged.count++]=next;
+            }
+            // Compact consecutive rows once both have become identical
+            // rectangular strips. No cross-value/source-order merging.
+            while(staged.count>=2u &&
+                  staged.tiles[staged.count-2u].z==
+                      staged.tiles[staged.count-1u].z &&
+                  game_native_merge_ordered_overwrite(
+                      staged.tiles[staged.count-2u],
+                      staged.tiles[staged.count-1u]))
+                --staged.count;
+            if(!count){
+                staged.device=owner;staged.backbuffer=rt;staged.depth=ds;
+                staged.sourceWidth=w;staged.sourceHeight=h;
+            }
+        }
+        *this=staged;
+        return true;
+    }
+};
+} // namespace outrun::vr::dx11::live_game_frame

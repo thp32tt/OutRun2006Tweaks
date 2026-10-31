@@ -1,0 +1,162 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01187",
+  "production_id": "CONVERSION-DX11-01187",
+  "event_id": "CONVERSION-DX11-01187-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SOURCE_GPU_RGB_MULTI_ISLAND_PRESENT_PREFLIGHT",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "36ec7e5eae7a6ebda6f5c94b58b1dacdc556f3b6",
+  "implementation_source_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+  "material_result_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+  "validation_bearing_result_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_upload_transaction.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "implementation": "For opt-in RAW DX11 native GPU Draw/Present source-coincident and dual-source preview, stage every authentic sampled RGB tile into distinct D3D9 SYSTEMMEM surfaces before any UpdateSurface. Reject a later preparation failure without a stranded earlier update; report an UpdateSurface mid-commit failure even if previous regions were copied. Preserve original source coordinates, verified D3D9 dirty regions, source-epoch fence, and fail-closed D3D9/DX9Ex game input and FFB. This is incomplete visual diagnostic source integration, not a native full frame or Quest3 stereo runtime observation.",
+  "validation": {
+    "exact_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+    "required_push_workflows_result": "5/5 completed success on identical validation-bearing SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41215588318,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+        "event": "push"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41215588325,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+        "event": "push"
+      },
+      {
+        "name": "Build",
+        "run_id": 41215588252,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+        "event": "push"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41215588361,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+        "event": "push"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41215588265,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f3aa216d30ff40438ab0a27d8d3720fecd864b2e",
+        "event": "push"
+      }
+    ],
+    "runtime_game_and_quest3": "UNTESTED",
+    "targeted_test": "GCC C++17 -Wall -Wextra -Werror -pedantic tests/native_raw_changed_crop_present_test.cpp compiled/executed successfully in DX11 Fast"
+  },
+  "safety": {
+    "raw_opt_in_default_off": true,
+    "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
+    "dxvk": "FROZEN_UNMODIFIED",
+    "native_game_full_frame": "NOT_CLAIMED",
+    "scoring": "Existing unfinished full native game-frame feature; two-phase source safety refinement and C6 cause no separately awarded score"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_DRAW",
+      "FENCE_VERIFIED_NATIVE_D3D11_GPU_RGB",
+      "SOURCE_ALIGNED_PREPARE_ALL_SYS_MEM_TILES",
+      "ORIGINAL_GAME_D3D9_PRESENT_UPDATESURFACE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_READBACK",
+      "INCOMPLETE_VISIBLE_DIAGNOSTIC"
+    ],
+    "batch_components": [
+      "MULTI_SOURCE_GPU_RGB_ISLAND_PREPARE",
+      "ALL_SURFACE_LOCK_COPY_UNLOCK_BEFORE_UPDATE",
+      "MID_COMMIT_FAILURE_SURFACE_REPORT",
+      "PREPARE_FAILURE_AND_POSITIVE_NEGATIVE_CPP_TEST"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "All 3 changed RGB source sample slots stage prior to any paint callback; existing source-only GPU copy tested on original dirty union.",
+      "negative_regression": "Third SYSTEMMEM preparation failure performs zero original game UpdateSurface; mid-commit failure reports partial published count and false outcome; invalid count never calls source callbacks.",
+      "component_integration": "Both native sourceBatch (up to four independent authenticated GPU samples) and paired RAW insets are wired through preflight+publication against original game backbuffer."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "src/vr/d3d11/native_game_raw_upload_transaction.hpp",
+      "tests/native_raw_changed_crop_present_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_ONLY_PARTIAL_GPU_RGB_CI_VERIFIED_FULL_GAMEPLAY_UNTESTED",
+    "activation_guard_and_fallback": "Explicit RAW opt-in default OFF, native pixel provenance, canonical backbuffer and D3D9 dirty coverage, preserved original game renderer/input/FFB; DXVK frozen"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Commit source-coincident paired native GPU RGB regions as one staged Present group and fail closed on preparation failures without claiming fully playable frames.",
+    "scope": "PARTIAL_SOURCE_AUTHENTIC_OPT_IN_DIAGNOSTIC_ONLY",
+    "acceptance_items": [
+      {
+        "id": "real_source_preflight",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native Draw source to D3D9 original Present",
+        "expected_behavior": "Prepare every distinct SYSTEMMEM surface from genuine GPU PRE/POST RGB before any UpdateSurface."
+      },
+      {
+        "id": "safe_fallback_on_failed_prepare",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9/game runtime preservation",
+        "expected_behavior": "Any preflight failure prevents all uploads, and a partial device-commit failure is not reported as complete visible success."
+      },
+      {
+        "id": "exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "C++ focused regression and five GitHub Actions",
+        "expected_behavior": "GCC C++17 targeted tests and unchanged five exact-SHA push gates pass; HMD remains UNTESTED."
+      }
+    ],
+    "acceptance_results": [
+      {
+        "id": "real_source_preflight",
+        "status": "PASS_STATIC_SOURCE_AND_TARGETED_CPP"
+      },
+      {
+        "id": "safe_fallback_on_failed_prepare",
+        "status": "PASS_TARGETED_CPP"
+      },
+      {
+        "id": "exact_sha_required_gates",
+        "status": "PASS_EXACT_SHA_5_OF_5"
+      }
+    ]
+  }
+}
