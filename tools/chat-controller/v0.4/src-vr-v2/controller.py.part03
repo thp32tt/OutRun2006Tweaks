@@ -3580,7 +3580,10 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     save_queue_state(q)
     write_runtime(
         status="vr_continuous_running",
-        last_action="A(DX11 implementation)+C("+("UW2 web port" if UW2_WEB_PORT_ENABLED else "DX9Ex REVIEW_ONLY")+"), B(DXVK) frozen; active: " +
+        last_action="A(DX11 implementation)+C("+(
+            "UW2 last sent " + str((q.get("uw2_simple") or {}).get("last_sent_at") or "not sent yet")
+            if UW2_WEB_PORT_ENABLED else "DX9Ex REVIEW_ONLY"
+        )+"), B(DXVK) frozen; active: " +
             ", ".join(f"{key}={x.get('task_id')}:{x.get('phase')}"
                       for key, x in sorted(active_by_lane.items())),
         vr_continuous_last_dispatch=q.get("vr_continuous_last_dispatch_at", {}),
