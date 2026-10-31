@@ -8,6 +8,7 @@ from __future__ import annotations
 import ast
 import asyncio
 import datetime
+import hashlib
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
@@ -27,6 +28,7 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         self.sent = []
         self.new_pages = 0
         self.busy = False
+        self.answer = ""
         self.slot = SimpleNamespace(
             name="C", url="https://chatgpt.com/g/g-p-example/c/existing",
             runs=0, last_sent_at=None, last_result=None,
@@ -40,6 +42,10 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         self.ns = {
             "datetime": datetime.datetime, "TZ": KST,
             "UW2_WEB_PORT_ENABLED": True, "UW2_SCHEDULE_MINUTES": [0, 30],
+            "UW2_CONTINUE_MIN_SECONDS": 120, "UW2_RESPONSE_STABLE_SECONDS": 20,
+            "_parse_iso": lambda x: datetime.datetime.fromisoformat(x) if x else None,
+            "last_assistant_text": self.last_answer,
+            "stable_hash": lambda x: hashlib.sha256(x.encode()).hexdigest(),
             "CONVERSION_ONLY_SLOT": "",
             "load_registry": lambda now: self.reg,
             "save_registry": lambda reg: None,
@@ -87,6 +93,9 @@ class Uw2SimpleLoopTest(unittest.TestCase):
 
     async def detect_busy(self, page):
         return self.busy
+
+    async def last_answer(self, page):
+        return self.answer
 
     async def send_message(self, page, message):
         self.sent.append(message)
@@ -141,6 +150,51 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         self.assertTrue(self.tick(9, 30))
         self.assertEqual(self.new_pages, 1)
         self.assertEqual(self.sent, [PROMPT, PROMPT])
+
+    def test_auto_resumes_after_completed_stable_response(self):
+        self.assertTrue(self.tick(9, 0))
+        self.answer = "One new source feature committed and tests passed."
+        self.assertFalse(self.tick(9, 2, 10))  # first observed, still stabilizing
+        self.assertTrue(self.tick(9, 2, 35))   # response finished, next work starts
+        self.assertEqual(self.sent, [PROMPT, PROMPT])
+        self.assertEqual(self.q["uw2_simple"]["last_send_reason"], "response_complete")
+        self.assertFalse(self.tick(9, 4, 50))  # identical old answer is not new work
+        self.assertEqual(self.new_pages, 0)
+
+    def test_does_not_follow_up_while_busy_even_if_reply_text_exists(self):
+        self.assertTrue(self.tick(9, 0))
+        self.answer = "Finished part of game logic"
+        self.busy = True
+        self.assertFalse(self.tick(9, 3))
+        self.busy = False
+        self.assertFalse(self.tick(9, 4))
+        self.assertTrue(self.tick(9, 4, 25))
+        self.assertEqual(self.sent, [PROMPT, PROMPT])
+
+    def test_response_must_stabilize_and_message_stays_exact(self):
+        self.assertTrue(self.tick(9, 0))
+        self.answer = "partially generated"
+        self.assertFalse(self.tick(9, 2, 10))
+        self.answer = "full response with actual GitHub result"
+        self.assertFalse(self.tick(9, 2, 25))   # different fingerprint resets
+        self.assertTrue(self.tick(9, 2, 50))
+        self.assertEqual(self.sent, [PROMPT, PROMPT])
+
+    def test_without_any_assistant_reply_only_scheduled_fallback(self):
+        self.assertTrue(self.tick(9, 0))
+        self.assertFalse(self.tick(9, 4))
+        self.assertFalse(self.tick(9, 20))
+        self.assertTrue(self.tick(9, 30))
+        self.assertEqual(self.q["uw2_simple"]["last_send_reason"], "schedule_fallback")
+
+    def test_cooldown_delays_half_hour_boundary_after_fast_reply(self):
+        self.assertTrue(self.tick(9, 0))
+        self.answer = "passed"
+        self.assertFalse(self.tick(9, 28, 45))
+        self.assertTrue(self.tick(9, 29, 10))
+        self.assertFalse(self.tick(9, 30))  # 50s since send, do not spam
+        self.assertTrue(self.tick(9, 31, 30))
+        self.assertEqual(self.sent, [PROMPT, PROMPT, PROMPT])
 
     def test_prompt_router_early_return_has_no_extra_text(self):
         node = FUNCS["prompt_for_slot"]
