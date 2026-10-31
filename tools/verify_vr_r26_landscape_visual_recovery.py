@@ -27,6 +27,9 @@ for x in ("'-AutoRenderResolution=true'","'-FollowGameResolution=false'",
           "'-MenuScale=1.00'","'-CullingUnionMarginDegrees=8.0'"):
     assert x in run, x
 assert 'VRHud1080pReference' in ui
+front_end_owner=ui[ui.index('bool VrFrontEndPhysicalCanvasState() noexcept'):ui.index('bool ResolveVrFrontEndVirtualCanvasScale(')]
+assert 'case GameState::STATE_SUMO_FE:' in front_end_owner
+assert 'case GameState::STATE_GAME:' not in front_end_owner
 assert 'spacing = 80.0f * Game::screen_scale->x;' in ui
 assert '? 80.0f' in ui
 assert 'exactCurrentChainOwner' in ui
@@ -90,6 +93,8 @@ assert 'if (ordinal == 2)' not in gfx
 # translation; full/canted eye transforms remain forbidden here.
 assert 'R85LensVisualScale = 0.50f' in r30
 assert 'R85LensStereoTranslationScale = 0.025f' in r30
+assert 'exactProjectedLensPmtRaw ? false : recordedCameraSynced' in r30
+assert 'pmtHeadUnproject={}' in r30
 assert 'lensEyeInverse = IdentityMatrix()' in r30
 assert 'lensEyeInverse._41' in r30
 assert 'stereo.eyeFov[eye]' in r30

@@ -6,6 +6,8 @@ root = Path(__file__).resolve().parents[1]
 cfg = (root / 'src/hooks_misc.cpp').read_text(encoding='utf-8')
 ex = (root / 'src/vr/d3d9/ex_device_upgrade.cpp').read_text(encoding='utf-8')
 host = (root / 'vrhost/src/main_r23.cpp').read_text(encoding='utf-8')
+ui = (root / 'src/hooks_uiscaling.cpp').read_text(encoding='utf-8')
+game = (root / 'src/game.hpp').read_text(encoding='utf-8')
 settings = (root / 'src/vr/settings.cpp').read_text(encoding='utf-8')
 ini = (root / 'OutRun2006Tweaks.ini').read_text(encoding='utf-8')
 source = cfg.split('void ApplyVrEyeResolutionAfterConfig(', 1)[1].split('class CommandLineArguments', 1)[0]
@@ -22,6 +24,13 @@ assert 'VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,' in settings
 assert 'VRFollowGameResolution{ "VR", "FollowGameResolution", false,' in settings
 assert 'AutoRenderResolution = true' in ini
 assert 'FollowGameResolution = false' in ini
+front_end = ui.split('bool VrFrontEndPhysicalCanvasState() noexcept', 1)[1].split(
+    'bool ResolveVrFrontEndVirtualCanvasScale(', 1)[0]
+assert 'STATE_SUMO_FE = 0x20' in game
+assert 'case GameState::STATE_SUMO_FE:' in front_end
+assert 'case GameState::STATE_GAME:' not in front_end
+assert 'MapVrFrontEndMatrixToPhysical(' in ui
+assert 'VR TRACE FRONTEND VIRTUAL CANVAS:' in ui
 
 # CreateDevice owns the physical XR render target and must not publish it back
 # into the original game's logical UI resolution global.

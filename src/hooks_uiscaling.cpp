@@ -79,6 +79,11 @@ namespace
         case GameState::STATE_GAMEEXIT:
         case GameState::STATE_GAMERESET:
         case GameState::STATE_SUMOGAMERESET:
+        // Quest runtime 2026-11-01: the real Sumo front-end keeps
+        // current_mode at 0x20 while drawing the title/main menu/selector.
+        // Without this owner the finished 1920x1080 UI matrix remains in the
+        // upper-left of the 2496x2688 XR target.
+        case GameState::STATE_SUMO_FE:
         case GameState::STATE_OUTRUNMILES:
         case GameState::STATE_TRYAGAIN:
             return true;

@@ -66,6 +66,10 @@ assert axis_flush_scope.index("ScopedLensAxisOpaqueFlushOwner") < axis_flush_sco
 assert "deferred.objectId == 0x570008u" in axis_flush_scope
 assert "deferred.ordinal == 1u" in axis_flush_scope
 assert "exactProjectedLensCameraSynced" in tail
+assert "exactProjectedLensPmtRaw" in tail
+assert "recordedCameraSynced" in tail
+assert "exactProjectedLensPmtRaw ? false : recordedCameraSynced" in tail
+assert "pmtHeadUnproject={}" in tail
 assert "GetLastProjectedLensRawWvp(out, raw)" in exact
 for t in ("CurrentInlinePmt","OwnsRawWvp(","GetCurrentLatchedPoseEpoch()",
           "SAME_SOURCE_INLINE_PMT_NATIVE_C64"):

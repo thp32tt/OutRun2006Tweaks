@@ -5738,6 +5738,7 @@ namespace OutRunVRStereo
             if (!device)
                 return false;
             bool exactProjectedLensRaw = false;
+            bool exactProjectedLensPmtRaw = false;
             bool exactProjectedLensCameraSynced = false;
             if (CurrentVertexShaderIdentity.load(
                     std::memory_order_acquire) == 0)
@@ -5825,10 +5826,11 @@ namespace OutRunVRStereo
                     // draw. Preserve only an original game WVP with bounded
                     // exact SceneEffect/CABE provenance; never borrow the live
                     // c64 after a previous eye has injected head correction.
-                    exactProjectedLensRaw =
+                    exactProjectedLensPmtRaw =
                         R30GetExactOpaqueAxisLensLiveWvp(
                             device, original,
                             exactProjectedLensCameraSynced);
+                    exactProjectedLensRaw = exactProjectedLensPmtRaw;
                     if (!exactProjectedLensRaw)
                         exactProjectedLensRaw =
                             R30GetExactInlineProjectedLensRawWvp(
@@ -6037,10 +6039,23 @@ namespace OutRunVRStereo
 
                 constexpr float R85LensVisualScale = 0.50f;
                 constexpr float R85LensStereoTranslationScale = 0.025f;
-                const bool sourceCameraSynced =
+                const bool recordedCameraSynced =
                     exactProjectedLensRaw
                         ? exactProjectedLensCameraSynced
                         : OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
+                // Quest 2026-11-01 00:49 HMD proof: all 15 exact 405890 PMT
+                // flare objects were mostly recorded cameraSynced=1 while the
+                // repaired family was visibly head-locked. For this exact PMT
+                // path the native c64 is a screen-projected sun ray produced
+                // while the game camera is synchronized. Recovering a WORLD
+                // bearing therefore must REMOVE that camera rotation with the
+                // common head inverse before each eye FOV projection.
+                //
+                // Keep the older camera-sync suppression for non-PMT raw
+                // fallbacks; do not broaden this HMD-derived rule to HUD,
+                // world billboards, inline-only projected effects or markers.
+                const bool sourceCameraSynced =
+                    exactProjectedLensPmtRaw ? false : recordedCameraSynced;
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyeProjection =
@@ -6084,7 +6099,8 @@ namespace OutRunVRStereo
                     if (hit <= 64 || (hit & (hit - 1)) == 0)
                         spdlog::info(
                             "VR TRACE LENS R85 BUILD: hit={} draw={} pose={} headSeq={} "
-                            "cameraSyncedApplied={} sourceCallSerial={} sourceObj=0x{:06X} "
+                            "cameraSyncedRecorded={} cameraSyncedApplied={} "
+                            "pmtHeadUnproject={} sourceCallSerial={} sourceObj=0x{:06X} "
                             "sourceSite={} ordinal={} deferredSerial={} deferredObj=0x{:06X} "
                             "deferredOrdinal={} stockT={:.9g},{:.9g},{:.9g} "
                             "headR=[{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g}] "
@@ -6094,7 +6110,9 @@ namespace OutRunVRStereo
                             "visualScale={:.3f} stereoTranslationScale={:.4f}",
                             hit, TopLevelDrawSerial(),
                             stereo.poseSequence, headSequence,
+                            recordedCameraSynced ? 1 : 0,
                             sourceCameraSynced ? 1 : 0,
+                            exactProjectedLensPmtRaw ? 1 : 0,
                             sourceReceipt.sourceSerial, sourceReceipt.objectId,
                             static_cast<unsigned>(sourceReceipt.callsite),
                             static_cast<unsigned>(sourceReceipt.ordinal),
@@ -6117,7 +6135,7 @@ namespace OutRunVRStereo
                 {
                     firstAsymmetricFlareRayLogged = true;
                     spdlog::info(
-                        "VR R85 FLARE RAY: one source angular ray projected separately through L/R asymmetric FOV; IPD translation suppressed");
+                        "VR R85 FLARE RAY: exact PMT screen ray unprojects synchronized game-camera rotation through common head inverse, then projects through L/R asymmetric FOV; shallow 2.5% eye translation retained");
                 }
                 return true;
             }
