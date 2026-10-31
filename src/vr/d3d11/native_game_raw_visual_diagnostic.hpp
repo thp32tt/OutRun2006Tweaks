@@ -107,7 +107,12 @@ enum class NativeRawPreviewResult {
 };
 class NativeRawVisualPreview final {
 public:
-    static constexpr UINT width = 256, height = 144;
+    // Expand real D3D11 game-Draw PRE/POST color capture without relaxing
+    // source identity, GPU fence, original D3D9 Present, or RAW opt-in.
+    static constexpr UINT width = 384, height = 216;
+    static_assert(width == NativeRawChangedPixelWindow::kWidth &&
+                  height == NativeRawChangedPixelWindow::kHeight,
+                  "D3D11 GPU source capture must match RGB delta bounds");
     static constexpr UINT kMaxSourceIslands = NativeRawSourceIslandBatch::kMaxIslands;
     void reset() noexcept {
         staging_.Reset(); baseline_.Reset();
@@ -150,7 +155,7 @@ public:
         std::uint32_t changedCount = 0u) noexcept {
         if (!game || gameOwner_ != game) return false;
         const UINT width = captureWidth_, height = captureHeight_;
-        // The GPU capture is a 256x144 source-authentic tile, not the
+        // The GPU capture is a 384x216 source-authentic tile, not the
         // complete D3D9 scene. An explicitly bounded disjoint color write
         // elsewhere cannot supersede these pixels. Unknown/full writes still
         // invalidate conservatively. Never release an in-flight GPU EVENT.

@@ -39,7 +39,7 @@ int main() {
     assert(changed == 0u && selected.sourceX == initialX &&
            selected.sourceY == initialY);
     // One source-authentic pixel in the original crop does not jitter a tie.
-    after[(70u * W + 120u) * 4u] = 255u;
+    after[((initialY + 5u) * W + (initialX + 5u)) * 4u] = 255u;
     chooser.capture(before.data(), W*4u, after.data(), W*4u);
     assert(chooser.select(original, selected, changed));
     assert(changed == 1u && selected.sourceX == initialX &&

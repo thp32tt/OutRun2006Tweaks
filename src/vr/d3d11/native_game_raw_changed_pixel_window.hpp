@@ -12,8 +12,8 @@
 namespace outrun::vr::dx11 {
 class NativeRawChangedPixelWindow final {
 public:
-    static constexpr std::uint32_t kWidth = 256u;
-    static constexpr std::uint32_t kHeight = 144u;
+    static constexpr std::uint32_t kWidth = 384u;
+    static constexpr std::uint32_t kHeight = 216u;
     static constexpr std::size_t kStride = kWidth + 1u;
 
     // Caller owns the mapped, format-validated before/after staging images.
@@ -24,7 +24,7 @@ public:
                  std::uint32_t captureHeight = kHeight) noexcept {
         prefix_.fill(0u);
         // A game-created menu/vehicle surface can be smaller than the
-        // 256x144 diagnostic maximum. Keep the same fixed-size scratch
+        // 384x216 diagnostic maximum. Keep the same fixed-size scratch
         // buffer but admit only bytes copied from that authentic target.
         windowWidth_ = captureWidth <= kWidth ? captureWidth : 0u;
         windowHeight_ = captureHeight <= kHeight ? captureHeight : 0u;
@@ -155,7 +155,7 @@ public:
             rgb = total;
             return true;
         }
-        // changed_pixels proved the bounded source footprint (<=256x144).
+        // changed_pixels proved the bounded source footprint (<=384x216).
         std::array<std::uint32_t, kWidth> heights{};
         std::array<std::uint32_t, kWidth> stack{};
         constexpr auto max = (std::numeric_limits<std::int64_t>::max)();

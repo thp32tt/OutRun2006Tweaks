@@ -687,4 +687,74 @@ bool native_raw_ranked_two_capture_present_regression() {
  }
 
 
-int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); assert(native_raw_ranked_two_capture_present_regression()); assert(native_raw_gpu_core_across_dirty_strips_regression()); assert(native_raw_masked_repaint_two_draws_regression()); }
+
+ // Larger original-game native capture covers a real menu/car RGB panel
+ // beyond the old 256x144 D3D11 staging extent. Screen coordinates, D3D9
+ // repaint members, and final GPU byte transport must still be exact.
+ bool native_raw_expanded_source_window_regression() {
+     constexpr auto w = NativeRawChangedPixelWindow::kWidth;
+     constexpr auto h = NativeRawChangedPixelWindow::kHeight;
+     static_assert(w == 384u && h == 216u);
+     constexpr auto pitch = std::size_t{w} * 4u;
+     std::array<std::uint8_t, pitch * h> pre{}, post{};
+     for (std::uint32_t y = 196u; y < 204u; ++y)
+         for (std::uint32_t x = 344u; x < 360u; ++x)
+             post[(std::size_t{y} * w + x) * 4u + 1u] = 171u;
+     NativeRawChangedPixelWindow gpu{};
+     gpu.capture(pre.data(), pitch, post.data(), pitch, w, h);
+     NativeRawPresentTile source{};
+     if (!native_raw_source_capture_clip_tile(
+             1000u, 500u, w, h, 1920u, 1080u,
+             1920u, 1080u, 0, 0, 1920, 1080, source) ||
+         source.copyWidth != w || source.copyHeight != h)
+         return false;
+     NativeRawPresentDirtyRegion dirty{};
+     dirty.headerVerified = true; dirty.count = 2u;
+     dirty.boundLeft = 1344; dirty.boundTop = 696;
+     dirty.boundRight = 1360; dirty.boundBottom = 704;
+     dirty.rectangles[0] = {1344, 696, 1352, 704};
+     dirty.rectangles[1] = {1352, 696, 1360, 704};
+     NativeRawSourceIslandBatch batch{};
+     if (!batch.append(1920u, 1080u, dirty, source, gpu,
+                       false, true) ||
+         batch.count != 1u || batch.rgbPixels[0] != 128u ||
+         batch.tiles[0].sourceX != 344u ||
+         batch.tiles[0].sourceY != 196u ||
+         batch.tiles[0].destinationX != 1344 ||
+         batch.tiles[0].destinationY != 696 ||
+         batch.tiles[0].copyWidth != 16u ||
+         batch.tiles[0].copyHeight != 8u ||
+         !native_raw_dirty_region_covers_tile(
+             1920u, 1080u, dirty, batch.tiles[0]))
+         return false;
+     std::array<std::uint8_t, 16u * 8u * 4u> packed{};
+     if (!native_raw_copy_packed_present_island(
+             packed.data(), 16u * 4u,
+             pre.data(), pitch, post.data(), pitch, w, h,
+             batch.tiles[0], NativeRawColorByteOrder::Bgra, false))
+         return false;
+     for (std::uint32_t y = 0u; y < 8u; ++y)
+         for (std::uint32_t x = 0u; x < 16u; ++x)
+             if (packed[(y * 16u + x) * 4u + 1u] != 171u)
+                 return false;
+     // A duplicate GPU Draw cannot claim an already uploaded D3D9 pixel.
+     if (batch.append(1920u, 1080u, dirty, source, gpu, true, true))
+         return false;
+     // Malformed original dirty bounds never grant RAW publication.
+     dirty.boundRight = 1361;
+     NativeRawSourceIslandBatch forged{};
+     if (forged.append(1920u, 1080u, dirty, source, gpu, false, true))
+         return false;
+     // A real dirty-region hole can select a smaller authentic island,
+     // but cannot publish through the hole.
+     dirty.boundRight = 1360;
+     dirty.rectangles[1].left = 1353;
+     NativeRawSourceIslandBatch hole{};
+     if (hole.append(1920u, 1080u, dirty, source, gpu, false, true) &&
+         !native_raw_dirty_region_covers_tile(
+             1920u, 1080u, dirty, hole.tiles[0]))
+         return false;
+     return true;
+ }
+
+int main() { assert(native_raw_expanded_source_window_regression()); assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); assert(native_raw_ranked_two_capture_present_regression()); assert(native_raw_gpu_core_across_dirty_strips_regression()); assert(native_raw_masked_repaint_two_draws_regression()); }
