@@ -827,7 +827,14 @@ def parse_task_record_counter(value, *, field: str) -> int:
     if isinstance(value, int):
         result = value
     elif isinstance(value, str):
-        match = re.fullmatch(r"\s*(\d+)(?:\s*/\s*(\d+))?\s*", value)
+        # Legacy DX11 C6 records append this exact explanatory rollover
+        # suffix to the numeric attempt. It is descriptive text, not a new
+        # attempt and never evidence of acceptance or a retry.
+        annotation = " (rollover; no retry increment)"
+        normalized = value.strip()
+        if normalized.endswith(annotation):
+            normalized = normalized[:-len(annotation)].rstrip()
+        match = re.fullmatch(r"(\d+)(?:\s*/\s*(\d+))?", normalized)
         if not match:
             raise ValueError(f"INVALID_TASK_COUNTER:{field}")
         result = int(match.group(1))
