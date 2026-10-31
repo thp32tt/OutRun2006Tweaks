@@ -291,7 +291,7 @@ bool native_raw_two_phase_present_regression() {
         return false; // Report partial commit as a failure, never full PASS.
     count = 0u; committed = 99u;
     const bool badCount = native_raw_preflight_publish_islands(
-        5u,
+        9u,
         [&](std::uint32_t) noexcept { ++count; return true; },
         [&](std::uint32_t) noexcept { ++count; return true; },
         committed);

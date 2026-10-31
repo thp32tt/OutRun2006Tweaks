@@ -11,7 +11,9 @@ template <class Prepare, class Publish>
     std::uint32_t count, Prepare&& prepare, Publish&& publish,
     std::uint32_t& committed) noexcept {
     committed = 0u;
-    if (!count || count > 4u) return false;
+    // The authenticated source batch owns at most eight PRIVATE staging surfaces.
+    // The ninth request must fail before any publish/prepare side effect.
+    if (!count || count > 8u) return false;
     for (std::uint32_t i = 0u; i < count; ++i)
         if (!prepare(i)) return false;
     for (std::uint32_t i = 0u; i < count; ++i) {
