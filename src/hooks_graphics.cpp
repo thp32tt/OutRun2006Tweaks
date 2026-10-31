@@ -705,6 +705,20 @@ class VRLensFlareProjected2D : public Hook
         OutRunVR::ProjectedLens::ScopedInlinePmt projectedLensPmt(
             projectedPmt);
 
+        const auto axisFlush = CurrentLensAxisOpaqueFlush;
+        LensAxisOpaquePmtOwner axisPmt{};
+        if (Settings::VREnabled && entry && axisFlush.valid &&
+            IsProjectedLensAxisObject(entry[14]) &&
+            entry[5] != 0 && entry[6] != 0 && entry[7] != 0)
+        {
+            axisPmt = {
+                axisFlush.sourceSerial, axisFlush.sequence,
+                reinterpret_cast<std::uintptr_t>(entry),
+                entry[14], entry[5], entry[6], entry[7], entry[8], true
+            };
+        }
+        ScopedLensAxisOpaquePmtOwner axisPmtScope(axisPmt);
+
         const auto flush = CurrentLensOpaqueFlush;
         if (!entry || flush.serial == 0 ||
             !Settings::VREnabled || !Settings::VRTelemetry)
@@ -817,6 +831,14 @@ class VRLensFlareProjected2D : public Hook
         const bool exactSceneFlush =
             origin == LensOpaqueFlushOrigin::SceneD44B ||
             origin == LensOpaqueFlushOrigin::SceneD79B;
+        const bool exactAxisFlush =
+            Settings::VREnabled &&
+            deferred.sourceSerial != 0 &&
+            deferred.sequence != 0 &&
+            deferred.objectId == 0x570008u &&
+            deferred.ordinal == 1u;
+        ScopedLensAxisOpaqueFlushOwner axisFlushScope(
+            { deferred.sourceSerial, deferred.sequence, exactAxisFlush });
         const bool trace = Settings::VREnabled && Settings::VRTelemetry &&
             (exactSceneFlush || inlineReceipt.sourceSerial != 0 ||
              deferred.sourceSerial != 0);

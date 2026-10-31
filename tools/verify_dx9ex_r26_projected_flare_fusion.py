@@ -32,15 +32,21 @@ for t in ("GetLatchedHeadInverse(","const D3DMATRIX identityEye = IdentityMatrix
 assert "R30GetExactInlineProjectedLensRawWvp(" in builder
 assert "R30GetExactOpaqueAxisLensLiveWvp(" in builder
 assert builder.index("R30GetExactInlineProjectedLensRawWvp(") < builder.index("R30GetExactOpaqueAxisLensLiveWvp(") < builder.index("R44GetOwnedRawOverlayWvp(original)")
-for t in ("CurrentLensOpaquePmtEntry","CurrentLensOpaqueFlush",
+for t in ("CurrentLensAxisOpaquePmt",
           "ExactProjectedLensAxisPmtActive()","GetVertexShaderConstantF(",
-          "EXACT_405890_404700_PMT_ENTRY_PRE_EYE"):
+          "DEFERRED_INTERVAL_AND_EXACT_405890_PMT_PRE_EYE"):
  assert t in axis,t
 for obj in ("0x57000Eu","0x570003u","0x570004u","0x570005u",
             "0x570007u","0x570008u","0x57000Au","0x570009u",
             "0x57000Bu","0x57000Cu","0x57000Du"):
  assert obj in semantics,obj
 assert "CurrentLensDeferredPhysical" not in axis
+axis_pmt_scope=body(hooks,"static void __cdecl TraceLensOpaquePmtEntry(")
+axis_flush_scope=body(hooks,"static void TraceLensOpaqueFlush(")
+assert axis_pmt_scope.index("ScopedLensAxisOpaquePmtOwner") < axis_pmt_scope.index("!Settings::VREnabled || !Settings::VRTelemetry")
+assert axis_flush_scope.index("ScopedLensAxisOpaqueFlushOwner") < axis_flush_scope.index("const bool trace = Settings::VREnabled && Settings::VRTelemetry")
+assert "deferred.objectId == 0x570008u" in axis_flush_scope
+assert "deferred.ordinal == 1u" in axis_flush_scope
 assert "exactProjectedLensCameraSynced" in tail
 assert "GetLastProjectedLensRawWvp(out, raw)" in exact
 for t in ("CurrentInlinePmt","OwnsRawWvp(","GetCurrentLatchedPoseEpoch()",

@@ -977,15 +977,79 @@ namespace OutRunVR::GameSemantic
     static_assert(!IsProjectedLensAxisObject(0x57000Fu));
     static_assert(!IsProjectedLensAxisObject(0x570010u));
 
+    // Render-policy ownership is separate from the diagnostic receipts above.
+    // The first 0x570008 source call brackets the one original axis-flare
+    // 4052C0 flush; that interval alone grants NO object identity. The exact
+    // 405890 entry below must additionally identify one whitelisted child.
+    struct LensAxisOpaqueFlushOwner
+    {
+        std::uint64_t sourceSerial = 0;
+        std::uint64_t sequence = 0;
+        bool valid = false;
+    };
+    inline thread_local LensAxisOpaqueFlushOwner CurrentLensAxisOpaqueFlush{};
+
+    class ScopedLensAxisOpaqueFlushOwner final
+    {
+        LensAxisOpaqueFlushOwner previous_{};
+    public:
+        explicit ScopedLensAxisOpaqueFlushOwner(
+            LensAxisOpaqueFlushOwner owner) noexcept
+            : previous_(CurrentLensAxisOpaqueFlush)
+        {
+            CurrentLensAxisOpaqueFlush = owner;
+        }
+        ~ScopedLensAxisOpaqueFlushOwner() noexcept
+        {
+            CurrentLensAxisOpaqueFlush = previous_;
+        }
+        ScopedLensAxisOpaqueFlushOwner(
+            const ScopedLensAxisOpaqueFlushOwner&) = delete;
+        ScopedLensAxisOpaqueFlushOwner& operator=(
+            const ScopedLensAxisOpaqueFlushOwner&) = delete;
+    };
+
+    struct LensAxisOpaquePmtOwner
+    {
+        std::uint64_t sourceSerial = 0;
+        std::uint64_t sequence = 0;
+        std::uintptr_t entry = 0;
+        std::uint32_t objectId = 0;
+        std::uintptr_t object = 0;
+        std::uintptr_t node = 0;
+        std::uintptr_t mesh = 0;
+        std::uint32_t pass = 0;
+        bool valid = false;
+    };
+    inline thread_local LensAxisOpaquePmtOwner CurrentLensAxisOpaquePmt{};
+
+    class ScopedLensAxisOpaquePmtOwner final
+    {
+        LensAxisOpaquePmtOwner previous_{};
+    public:
+        explicit ScopedLensAxisOpaquePmtOwner(
+            LensAxisOpaquePmtOwner owner) noexcept
+            : previous_(CurrentLensAxisOpaquePmt)
+        {
+            CurrentLensAxisOpaquePmt = owner;
+        }
+        ~ScopedLensAxisOpaquePmtOwner() noexcept
+        {
+            CurrentLensAxisOpaquePmt = previous_;
+        }
+        ScopedLensAxisOpaquePmtOwner(
+            const ScopedLensAxisOpaquePmtOwner&) = delete;
+        ScopedLensAxisOpaquePmtOwner& operator=(
+            const ScopedLensAxisOpaquePmtOwner&) = delete;
+    };
+
     inline bool ExactProjectedLensAxisPmtActive() noexcept
     {
-        const auto& pmt = CurrentLensOpaquePmtEntry;
-        const auto& flush = CurrentLensOpaqueFlush;
-        return pmt.serial != 0 && pmt.flushSerial != 0 &&
-            flush.serial != 0 && pmt.flushSerial == flush.serial &&
+        const auto& pmt = CurrentLensAxisOpaquePmt;
+        return pmt.valid && pmt.sourceSerial != 0 &&
+            pmt.sequence != 0 && pmt.entry != 0 &&
             IsProjectedLensAxisObject(pmt.objectId) &&
-            pmt.entry != 0 && pmt.object != 0 &&
-            pmt.node != 0 && pmt.mesh != 0;
+            pmt.object != 0 && pmt.node != 0 && pmt.mesh != 0;
     }
 
     class ScopedLensOpaquePmtEntry final

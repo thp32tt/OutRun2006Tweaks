@@ -5678,9 +5678,9 @@ namespace OutRunVRStereo
                 !ExactProjectedLensAxisPmtActive())
                 return false;
 
-            const auto& pmt = CurrentLensOpaquePmtEntry;
-            const auto& flush = CurrentLensOpaqueFlush;
-            if (pmt.flushSerial != flush.serial ||
+            const auto& pmt = CurrentLensAxisOpaquePmt;
+            if (!pmt.valid || pmt.sourceSerial == 0 ||
+                pmt.sequence == 0 ||
                 !IsProjectedLensAxisObject(pmt.objectId))
                 return false;
 
@@ -5717,13 +5717,14 @@ namespace OutRunVRStereo
                 if (hit <= 64 || (hit & (hit - 1)) == 0)
                     spdlog::info(
                         "VR LENS EXACT AXIS PMT LIVE C64: hit={} draw={} "
-                        "flushSerial={} pmtEntrySerial={} objectId=0x{:06X} "
-                        "pass={} object=0x{:X} node=0x{:X} mesh=0x{:X} "
-                        "shader=0x{:X} shaderEpoch={} cameraSynced={} "
-                        "authority=EXACT_405890_404700_PMT_ENTRY_PRE_EYE",
+                        "sourceSerial={} sequence={} objectId=0x{:06X} "
+                        "pass={} entry=0x{:X} object=0x{:X} node=0x{:X} "
+                        "mesh=0x{:X} shader=0x{:X} shaderEpoch={} "
+                        "cameraSynced={} "
+                        "authority=DEFERRED_INTERVAL_AND_EXACT_405890_PMT_PRE_EYE",
                         hit, TopLevelDrawSerial() + 1u,
-                        flush.serial, pmt.serial, pmt.objectId, pmt.pass,
-                        pmt.object, pmt.node, pmt.mesh,
+                        pmt.sourceSerial, pmt.sequence, pmt.objectId, pmt.pass,
+                        pmt.entry, pmt.object, pmt.node, pmt.mesh,
                         currentShader, currentShaderEpoch,
                         sourceCameraSynced ? 1 : 0);
             }
