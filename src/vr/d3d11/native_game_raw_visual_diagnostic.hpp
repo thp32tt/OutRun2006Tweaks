@@ -634,18 +634,33 @@ public:
                         const D3D11_MAPPED_SUBRESOURCE& prior,
                         const D3D11_MAPPED_SUBRESOURCE& after,
                         const NativeRawPresentTile& tile) noexcept -> bool {
+                    // Game menu/car/race repaint islands have different
+                    // widths/heights even when the native capture is unchanged.
+                    // A cached SYSTEMMEM surface must match THIS exact island,
+                    // not merely its DXGI capture format or original pitch.
+                    if (target) {
+                        D3DSURFACE_DESC cached{};
+                        if (FAILED(target->GetDesc(&cached))) return false;
+                        if (!native_raw_packed_surface_dimensions_match(
+                                cached.Width, cached.Height, tile) ||
+                            cached.Format != back.Format ||
+                            cached.Pool != D3DPOOL_SYSTEMMEM)
+                            target.Reset();
+                    }
                     if (!target && FAILED(game->CreateOffscreenPlainSurface(
-                            width, height, back.Format, D3DPOOL_SYSTEMMEM,
-                            target.GetAddressOf(), nullptr)))
+                            tile.copyWidth, tile.copyHeight, back.Format,
+                            D3DPOOL_SYSTEMMEM, target.GetAddressOf(), nullptr)))
                         return false;
                     D3DLOCKED_RECT locked{};
                     if (FAILED(target->LockRect(&locked, nullptr, 0)))
                         return false;
-                    if (!locked.pBits || locked.Pitch < static_cast<INT>(width * 4u)) {
+                    if (!locked.pBits || locked.Pitch <= 0 ||
+                        static_cast<std::size_t>(locked.Pitch) <
+                            std::size_t{tile.copyWidth} * 4u) {
                         target->UnlockRect();
                         return false;
                     }
-                    const bool copied = native_raw_copy_present_island(
+                    const bool copied = native_raw_copy_packed_present_island(
                         locked.pBits, static_cast<std::size_t>(locked.Pitch),
                         prior.pData, prior.RowPitch,
                         after.pData, after.RowPitch,
@@ -656,11 +671,12 @@ public:
                 };
                 const auto publish = [&](IDirect3DSurface9* target,
                         const NativeRawPresentTile& tile) noexcept -> bool {
+                    // Packed SYSTEMMEM input is tile-local. Only the D3D9
+                    // destination POINT is in authentic game coordinates.
                     const RECT srcRect{
-                        static_cast<LONG>(tile.sourceX),
-                        static_cast<LONG>(tile.sourceY),
-                        static_cast<LONG>(tile.sourceX + tile.copyWidth),
-                        static_cast<LONG>(tile.sourceY + tile.copyHeight)};
+                        0, 0,
+                        static_cast<LONG>(tile.copyWidth),
+                        static_cast<LONG>(tile.copyHeight)};
                     const POINT dstPoint{
                         static_cast<LONG>(tile.destinationX),
                         static_cast<LONG>(tile.destinationY)};

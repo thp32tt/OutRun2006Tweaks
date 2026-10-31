@@ -86,4 +86,74 @@ inline void native_raw_copy_to_d3d9_bgra(
      }
      return true;
  }
+
+ // A source-authenticated D3D11 RGB island can occupy only 1..N pixels of
+ // its 256x144 capture. Pack only that exact unscaled rectangle into a small
+ // D3D9 SYSTEMMEM surface: UpdateSurface reads [0,w)x[0,h), while its
+ // destination POINT retains the ORIGINAL game source coordinates. No
+ // whole-frame pixels, extra draw ownership or synthetic colors are claimed.
+ [[nodiscard]] inline bool native_raw_copy_packed_present_island(
+     void* destination, std::size_t destinationPitch,
+     const void* before, std::size_t beforePitch,
+     const void* after, std::size_t afterPitch,
+     std::uint32_t captureWidth, std::uint32_t captureHeight,
+     const NativeRawPresentTile& tile,
+     NativeRawColorByteOrder order, bool opaqueXrgb) noexcept {
+     if (!destination || !before || !after ||
+         !captureWidth || !captureHeight ||
+         captureWidth > (std::numeric_limits<std::size_t>::max)() / 4u ||
+         !tile.copyWidth || !tile.copyHeight ||
+         tile.sourceX >= captureWidth || tile.sourceY >= captureHeight ||
+         tile.copyWidth > captureWidth - tile.sourceX ||
+         tile.copyHeight > captureHeight - tile.sourceY)
+         return false;
+     const auto sourceRowBytes = std::size_t{captureWidth} * 4u;
+     const auto outputRowBytes = std::size_t{tile.copyWidth} * 4u;
+     // Reject every malformed extent BEFORE changing any destination byte.
+     // Pitch bounds also protect the last row from size_t wraparound.
+     const auto validRows = [](std::size_t pitch, std::uint32_t rows,
+                               std::size_t rowBytes) noexcept {
+         return pitch >= rowBytes && rows &&
+             rows - 1u <= ((std::numeric_limits<std::size_t>::max)() -
+                           rowBytes) / pitch;
+     };
+     if (!validRows(beforePitch, captureHeight, sourceRowBytes) ||
+         !validRows(afterPitch, captureHeight, sourceRowBytes) ||
+         !validRows(destinationPitch, tile.copyHeight, outputRowBytes))
+         return false;
+     auto* dst = static_cast<std::uint8_t*>(destination);
+     const auto* pre = static_cast<const std::uint8_t*>(before);
+     const auto* post = static_cast<const std::uint8_t*>(after);
+     for (std::uint32_t y = 0u; y < tile.copyHeight; ++y) {
+         const auto sourceY = tile.sourceY + y;
+         const auto* preRow = pre + std::size_t{sourceY} * beforePitch +
+             std::size_t{tile.sourceX} * 4u;
+         const auto* postRow = post + std::size_t{sourceY} * afterPitch +
+             std::size_t{tile.sourceX} * 4u;
+         auto* outputRow = dst + std::size_t{y} * destinationPitch;
+         native_raw_copy_to_d3d9_bgra(
+             outputRow, postRow, tile.copyWidth, order, opaqueXrgb);
+         // Preserve authentic changed RGB even on the INCOMPLETE edge.
+         // In a source-aligned solid island all pixels are changed, so the
+         // original D3D9 game surface outside this island is untouched.
+         for (std::uint32_t x = 0u; x < tile.copyWidth; ++x) {
+             const auto offset = std::size_t{x} * 4u;
+             if (native_raw_present_border_pixel(
+                     tile, tile.sourceX + x, sourceY,
+                     native_raw_rgb_changed(
+                         preRow + offset, postRow + offset))) {
+                 outputRow[offset] = 255u;
+                 outputRow[offset + 1u] = 0u;
+                 outputRow[offset + 2u] = 255u;
+             }
+         }
+     }
+     return true;
+ }
+ [[nodiscard]] constexpr bool native_raw_packed_surface_dimensions_match(
+     std::uint32_t width, std::uint32_t height,
+     const NativeRawPresentTile& tile) noexcept {
+     return width != 0u && height != 0u &&
+         width == tile.copyWidth && height == tile.copyHeight;
+ }
 } // namespace outrun::vr::dx11

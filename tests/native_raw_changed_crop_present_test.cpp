@@ -298,4 +298,85 @@ bool native_raw_two_phase_present_regression() {
     return !badCount && !committed && !count;
 }
 
-int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); }
+
+bool native_raw_packed_island_transfer_regression() {
+    constexpr std::uint32_t w = 12u, h = 9u;
+    constexpr std::size_t sourcePitch = w * 4u + 8u;
+    constexpr std::size_t outputPitch = 3u * 4u + 4u;
+    std::array<std::uint8_t, sourcePitch * h> before{}, after{};
+    const auto put = [&](std::uint32_t x, std::uint32_t y,
+                         std::uint8_t r, std::uint8_t g,
+                         std::uint8_t b, std::uint8_t a) {
+        auto* p = after.data() + y * sourcePitch + x * 4u;
+        p[0] = r; p[1] = g; p[2] = b; p[3] = a;
+    };
+    put(8u, 5u, 10u, 20u, 30u, 40u);
+    put(9u, 6u, 0u, 0u, 0u, 71u); // Alpha-only: no RGB proof.
+    const NativeRawPresentTile island{7u, 5u, 3u, 2u, 900, 700};
+    if (!native_raw_packed_surface_dimensions_match(3u, 2u, island) ||
+        native_raw_packed_surface_dimensions_match(w, h, island) ||
+        native_raw_packed_surface_dimensions_match(3u, 1u, island))
+        return false; // Recreate a cached surface on menu/car size changes.
+    std::array<std::uint8_t, outputPitch * 2u> output{};
+    output.fill(0x5au);
+    if (!native_raw_copy_packed_present_island(
+            output.data(), outputPitch, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, island,
+            NativeRawColorByteOrder::Rgba, false))
+        return false;
+    const auto pixel = [&](std::uint32_t x, std::uint32_t y) {
+        return output.data() + y * outputPitch + x * 4u;
+    };
+    // Source (8,5) maps to packed (1,0), NOT (8,5); the original D3D9
+    // destination remains (901,700) via UpdateSurface destination POINT.
+    if (pixel(1u, 0u)[0] != 30u ||
+        pixel(1u, 0u)[1] != 20u ||
+        pixel(1u, 0u)[2] != 10u ||
+        pixel(1u, 0u)[3] != 40u ||
+        pixel(0u, 0u)[0] != 255u ||
+        pixel(0u, 0u)[1] != 0u ||
+        pixel(0u, 0u)[2] != 255u ||
+        pixel(2u, 1u)[3] != 71u ||
+        output[outputPitch - 1u] != 0x5au ||
+        output[outputPitch * 2u - 1u] != 0x5au)
+        return false;
+    // One-pixel native RGB on a real dirty game Present: no resampling,
+    // no extraneous rows, and the XRGB alpha is always opaque.
+    put(2u, 1u, 51u, 52u, 53u, 54u);
+    const NativeRawPresentTile one{2u, 1u, 1u, 1u, 400, 300};
+    std::array<std::uint8_t, 8u> tiny{};
+    tiny.fill(0x5au);
+    if (!native_raw_copy_packed_present_island(
+            tiny.data(), 8u, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, one,
+            NativeRawColorByteOrder::Bgra, true) ||
+        tiny[0] != 51u || tiny[1] != 52u ||
+        tiny[2] != 53u || tiny[3] != 255u ||
+        tiny[4] != 0x5au)
+        return false;
+    // Preflight rejects every malformed source/destination extent before
+    // writing a single byte, including narrow packed D3D9 lock pitches.
+    const auto saved = output;
+    NativeRawPresentTile outside = island;
+    outside.copyWidth = 6u;
+    if (native_raw_copy_packed_present_island(
+            output.data(), outputPitch, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, outside,
+            NativeRawColorByteOrder::Rgba, false) ||
+        native_raw_copy_packed_present_island(
+            output.data(), 8u, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, island,
+            NativeRawColorByteOrder::Rgba, false) ||
+        native_raw_copy_packed_present_island(
+            output.data(), outputPitch, before.data(), 12u,
+            after.data(), sourcePitch, w, h, island,
+            NativeRawColorByteOrder::Rgba, false) ||
+        native_raw_copy_packed_present_island(
+            output.data(), outputPitch, before.data(), sourcePitch,
+            after.data(), sourcePitch, w, h, NativeRawPresentTile{},
+            NativeRawColorByteOrder::Rgba, false))
+        return false;
+    return output == saved;
+}
+
+int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); }
