@@ -204,8 +204,9 @@ public:
             b > static_cast<LONG>(back.Height) ||
             l >= r || t >= b)
             return NativeRawPreviewResult::UnsafePresent;
-        // Only the actual smaller game-created D3D11 GPU color target
-        // opts into tight 24px original D3D9 dirty-rectangle admission.
+        // Only genuine native GPU RGB with matching D3D9 Draw/Present
+        // backbuffer identity can opt into a 1..39px source crop. Displaced
+        // diagnostic tiles keep their 24px/40px legacy minimum.
         // Normal 256x144 RAW retains the proven 8px margin and regressions.
         const bool compactRaw = width < 256u || height < 144u;
         NativeRawPresentTile visibleTile{};
@@ -213,8 +214,9 @@ public:
         if (!native_raw_partial_present_tile(
                 back.Width, back.Height, l, t, r, b,
                 width, height, visibleTile, compactRaw)) {
-            // A 24..39px original game Present can carry real GPU RGB, but
-            // the historic 40px minimum protects displaced/unknown insets.
+            // A 1..39px original game Present can carry genuine GPU RGB,
+            // including one-pixel HUD/menu updates. The historic 40px
+            // minimum protects displaced/unknown diagnostic insets.
             // Admit ONLY a complete source repaint on the SAME canonical
             // backbuffer and matching pixel grid; an inset is never an
             // acceptable fallback for this exceptional small crop.
@@ -903,13 +905,15 @@ private:
             return NativeRawPreviewResult::GpuFailure;
         D3D11_TEXTURE2D_DESC src{};
         color->GetDesc(&src);
-        // Capture actual smaller menu/car surfaces without inventing or
-        // upscaling pixels. The GPU box and every CPU row share this extent.
+        // Capture even a genuine one-pixel game-created target without
+        // inventing or upscaling pixels. All PRE/POST GPU boxes and CPU rows
+        // retain the same exact physical extent; tiny targets can only reach
+        // the source-coincident Present path, never a displaced RAW inset.
         const UINT width = (std::min)(src.Width, NativeRawVisualPreview::width);
         const UINT height = (std::min)(src.Height, NativeRawVisualPreview::height);
         Microsoft::WRL::ComPtr<ID3D11Device> actual;
         color->GetDevice(actual.GetAddressOf());
-        if (actual.Get() != dev || width < 24u || height < 24u ||
+        if (actual.Get() != dev || !width || !height ||
             src.ArraySize != 1u || src.MipLevels != 1u ||
             src.SampleDesc.Count != 1u || src.Usage != D3D11_USAGE_DEFAULT ||
             src.CPUAccessFlags || !(src.BindFlags & D3D11_BIND_RENDER_TARGET))

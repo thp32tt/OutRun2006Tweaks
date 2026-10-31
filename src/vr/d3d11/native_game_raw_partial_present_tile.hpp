@@ -57,12 +57,15 @@ struct NativeRawPresentTile {
            out.destinationY + height <= bottom - marginY;
 }
 
- // A verified 24..39px source repaint can contain REAL menu/HUD RGB even
- // when the native GPU capture is the ordinary 256x144 size. This is NOT a
+ // A verified 1..39px original game repaint can contain REAL menu/HUD RGB
+ // even when the native GPU capture is the ordinary 256x144 size. This is NOT a
  // displaced diagnostic inset: the caller must separately prove canonical
  // D3D9 Draw/Present surface identity and forbid the legacy upload fallback.
- // The bounded preview only provides a legal starting window for the full
- // source-aligned PRE/POST RGB island scan.
+ // A one-pixel game source crop must not inherit the displaced-inset
+ // diagnostic's 24px/8px-margin restriction. Exact source identity, matching
+ // physical target dimensions, a verified full crop repaint and actual GPU
+ // PRE/POST RGB are mandatory at the caller before this tile is published.
+ // The bounded preview only seeds the full source-aligned RGB island scan.
  [[nodiscard]] constexpr bool native_raw_verified_small_source_present_tile(
      bool fullCropRepaintVerified,
      std::uint32_t backWidth, std::uint32_t backHeight,
@@ -75,12 +78,12 @@ struct NativeRawPresentTile {
          (std::numeric_limits<std::int32_t>::max)());
      if (!fullCropRepaintVerified || !backWidth || !backHeight ||
          backWidth > kMaxDim || backHeight > kMaxDim ||
-         captureWidth < 24u || captureHeight < 24u ||
+         !captureWidth || !captureHeight ||
          left < 0 || top < 0 || right <= left || bottom <= top ||
          right > backWidth || bottom > backHeight)
          return false;
      const auto cropW = right - left, cropH = bottom - top;
-     if (cropW < 24 || cropH < 24 ||
+     if (cropW < 1 || cropH < 1 ||
          (cropW >= 40 && cropH >= 40))
          return false;
      const auto width = static_cast<std::uint32_t>((std::min)(
