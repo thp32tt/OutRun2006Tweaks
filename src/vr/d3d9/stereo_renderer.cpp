@@ -808,14 +808,17 @@ namespace OutRunVRStereo
 			// TEST 20261101: no mono shadow exists. A failed stereo frame must
 			// not overwrite host's previously verified projection; R42 holds it.
 			// Never copy an uninitialized mono surface into the PC backbuffer.
-			if (stereoRequested && (!composedStereo || FrameStereoIncomplete))
+			const bool holdLastGoodStereo = stereoRequested && !composedStereo &&
+				(FrameStereoIncomplete || FrameRightDrawFailed ||
+				 FrameFailureReason != OutRunVR::StereoFailureNone || directOnly);
+			if (holdLastGoodStereo)
 				++R9WithheldStereoFrames;
 
 			R9MaybeLogSummary();
 			MaybeLogSummary();
 			LARGE_INTEGER presentStart{};
 			QueryPerformanceCounter(&presentStart);
-			if (stereoRequested && composedStereo && (!directOnly || directTransport))
+			if (stereoRequested && !holdLastGoodStereo && (!directOnly || directTransport))
 				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono, pendingFrameId, pendingPoseSequence,
 					presentStart.QuadPart, FrameFailureReason, nullptr, true, directTransport);
 
@@ -865,12 +868,12 @@ namespace OutRunVRStereo
 				if (FrameFailureReason != OutRunVR::StereoFailureNone)
 					R9LogFirstFailure("Present/fallback", hr);
 				const std::uint32_t fallback = stereoRequested ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled;
-				if (!stereoRequested)
+				if (!holdLastGoodStereo)
 					PublishStereoState(fallback, false, 0, 0);
 				// In DirectGPU-only mode, do not overwrite the bounded frame ring
 				// with classic fallback descriptors while the host still needs to
 				// consume/ACK one of the initial shared-eye frames.
-				if (!stereoRequested)
+				if (!holdLastGoodStereo && (!directOnly || !stereoRequested || directTransport))
 					PublishRenderFrame(fallback, 0, 0, presentStart.QuadPart, FrameFailureReason, nullptr);
 			}
 
