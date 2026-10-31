@@ -2558,6 +2558,11 @@ namespace OutRunVRRenderer
 		return LastGameWvpWriteValid && LastRawGameWvpCameraSynced;
 	}
 
+	bool IsCullingCameraSyncedNow() noexcept
+	{
+		return CullingCameraOverridden;
+	}
+
 	std::uint64_t GetCurrentLatchedPoseEpoch() noexcept
 	{
 		return LatchedPoseEpoch;

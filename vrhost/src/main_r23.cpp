@@ -2321,19 +2321,67 @@ namespace
 
     bool R23RenderTheater(StereoCompositor& c, XrSpace viewSpace,
         XrSpace localSpace, XrTime displayTime, XrCompositionLayerQuad& quad,
-        bool sourceIsSbs)
+        bool sourceIsSbs,
+        std::uint32_t clientGameState = 0xFFFFFFFFu)
     {
         R23Pixels.TryConsume(c.context_);
         if (!c.haveFrame_ || !c.sourceSrv_) return false;
         UvRect whole{};
         RECT capturedTheaterClient{};
+        bool capturedTheaterFullyVisible = false;
         if (!c.GetCapturedGameUv(
-                whole, false, &capturedTheaterClient))
+                whole, false, &capturedTheaterClient,
+                &capturedTheaterFullyVisible))
             return false;
         UvRect theaterUv = whole;
+        const auto logicalCanvasCrop =
+            !sourceIsSbs
+            ? OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
+                clientGameState,
+                static_cast<float>(c.projection_.width),
+                static_cast<float>(c.projection_.height))
+            : OutRunVrMenuAspect::LogicalCanvasCropPlan{};
+        const bool logicalCanvasCropApplied =
+            !sourceIsSbs && capturedTheaterFullyVisible &&
+            logicalCanvasCrop.crop;
+        if (logicalCanvasCropApplied)
+        {
+            const float baseWidth = theaterUv.w;
+            const float baseHeight = theaterUv.h;
+            theaterUv.x += baseWidth * logicalCanvasCrop.offsetX;
+            theaterUv.y += baseHeight * logicalCanvasCrop.offsetY;
+            theaterUv.w = baseWidth * logicalCanvasCrop.width;
+            theaterUv.h = baseHeight * logicalCanvasCrop.height;
+
+            static std::uint64_t menuQuadLogicalHits = 0;
+            const auto hit = ++menuQuadLogicalHits;
+            if (hit <= 32 || (hit & (hit - 1)) == 0)
+            {
+                std::ostringstream trace;
+                trace
+                    << "[VR TRACE MENU QUAD LOGICAL CANVAS FULL]"
+                    << " hit=" << hit
+                    << " state=" << clientGameState
+                    << " applied=1 fullVisible=1"
+                    << " xrPhysical=" << c.projection_.width << 'x'
+                    << c.projection_.height
+                    << " desktopCapture=" << c.sourceWidth_ << 'x'
+                    << c.sourceHeight_
+                    << " logical=1920x1080"
+                    << " inputUv=" << whole.x << ',' << whole.y << ','
+                    << whole.w << ',' << whole.h
+                    << " outputUv=" << theaterUv.x << ',' << theaterUv.y
+                    << ',' << theaterUv.w << ',' << theaterUv.h
+                    << " cropRatio=" << logicalCanvasCrop.width << ','
+                    << logicalCanvasCrop.height
+                    << " authority=ACTIVE_LOCAL_FIXED_QUAD_TITLE_MENU"
+                    << "\n";
+                OutRunVrEmitFullTrace(trace.str());
+            }
+        }
         if (sourceIsSbs)
             theaterUv.w *= 0.5f;
-        if (theaterUv.w <= 0.0f)
+        if (theaterUv.w <= 0.0f || theaterUv.h <= 0.0f)
             return false;
         std::uint32_t image = 0;
         c.Acquire(c.theater_, image);
@@ -2355,10 +2403,12 @@ namespace
             capturedTheaterClient.right - capturedTheaterClient.left);
         const float theaterHeight = static_cast<float>(
             capturedTheaterClient.bottom - capturedTheaterClient.top);
-        const float aspect = theaterWidth > 0.0f && theaterHeight > 0.0f
-            ? theaterWidth / theaterHeight *
-                (sourceIsSbs ? 0.5f : 1.0f)
-            : 16.f / 9.f;
+        const float aspect = logicalCanvasCropApplied
+            ? logicalCanvasCrop.aspect
+            : (theaterWidth > 0.0f && theaterHeight > 0.0f
+                ? theaterWidth / theaterHeight *
+                    (sourceIsSbs ? 0.5f : 1.0f)
+                : 16.f / 9.f);
         quad.size.width = 2.f;
         quad.size.height = 2.f / aspect;
 
@@ -2370,7 +2420,7 @@ namespace
         // the offset together with the recovered picture.
         // Game SBS uses a different split seam; its established safe
         // fallback is unchanged.
-        if (!sourceIsSbs)
+        if (!sourceIsSbs && !logicalCanvasCropApplied)
         {
             const RECT& clientOnOutput = capturedTheaterClient;
             const auto fragment =
@@ -4129,7 +4179,8 @@ int main(int argc, char** argv)
                     if (capture.available &&
                         R23RenderTheater(
                             compositor, viewSpace, localSpace,
-                            fs.predictedDisplayTime, quad, false))
+                            fs.predictedDisplayTime, quad, false,
+                            clientGameState))
                     {
                         cachedMenuProjectionValid = false;
                         cachedMenuSourceFovValid = false;

@@ -79,6 +79,7 @@ namespace
         case GameState::STATE_GAMEEXIT:
         case GameState::STATE_GAMERESET:
         case GameState::STATE_SUMOGAMERESET:
+        case GameState::STATE_OUTRUNMILES:
         case GameState::STATE_TRYAGAIN:
             return true;
         default:

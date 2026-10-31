@@ -48,6 +48,7 @@ namespace Settings
 namespace OutRunVRRenderer
 {
     bool GetLastRawGameWvpCameraSynced() noexcept;
+    bool IsCullingCameraSyncedNow() noexcept;
     bool GetLastProjectedLensRawWvp(float outConstants[16],
         OutRunVR::ProjectedLens::RawWvpStamp& stamp) noexcept;
     std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept;
@@ -5579,6 +5580,84 @@ namespace OutRunVRStereo
             return true;
         }
 
+        bool R30GetExact570002LiveWvp(
+            IDirect3DDevice9* device, float out[16],
+            bool& sourceCameraSynced) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            sourceCameraSynced = false;
+            if (!device || !out || QueueRenderActive() ||
+                EffectiveScope() != RenderScope::ProjectedScreenEffect2D)
+                return false;
+
+            const auto& call = CurrentLensOriginalCall;
+            const auto& flush = OutRunVR::ProjectedLens::CurrentInlineFlush;
+            const auto& pmt = OutRunVR::ProjectedLens::CurrentInlinePmt;
+            // HMD log 20261031-215308: 0x570002 reaches this exact C993
+            // inline PMT without ANY game c64 callback, whereas 0x570006
+            // publishes c64 normally. The D3D9 state machine therefore keeps
+            // the source matrix already bound by the original game. Admit
+            // this read only while all exact synchronous owners agree.
+            if (call.objectId != 0x570002u || call.callsite != 1u ||
+                call.sourceSerial == 0 || call.lastC993Sequence == 0 ||
+                !flush.valid || flush.objectId != 0x570002u ||
+                flush.sourceSerial != call.sourceSerial ||
+                flush.sequence != call.lastC993Sequence ||
+                !pmt.valid || pmt.objectId != 0x570002u ||
+                pmt.sourceSerial != call.sourceSerial ||
+                pmt.sequence != call.lastC993Sequence ||
+                pmt.pass != 1u || pmt.object == 0 ||
+                pmt.node == 0 || pmt.mesh == 0)
+                return false;
+
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentShaderEpoch = 0;
+            if (!GetCurrentShaderEpoch(currentShader, currentShaderEpoch) ||
+                currentShader == 0 || currentShaderEpoch == 0)
+                return false;
+
+            IDirect3DVertexShader9* liveVs = nullptr;
+            const HRESULT vsHr = device->GetVertexShader(&liveVs);
+            const auto liveShader =
+                reinterpret_cast<std::uintptr_t>(liveVs);
+            if (liveVs)
+                liveVs->Release();
+            if (FAILED(vsHr) || liveShader == 0 ||
+                liveShader != currentShader)
+                return false;
+
+            if (FAILED(device->GetVertexShaderConstantF(
+                    OutRunWvpRegister, out, OutRunWvpRegisterCount)))
+                return false;
+            for (float* value = out; value != out + 16; ++value)
+                if (!std::isfinite(*value))
+                    return false;
+
+            sourceCameraSynced =
+                OutRunVRRenderer::IsCullingCameraSyncedNow();
+            if (Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> liveHits{0};
+                const auto hit = liveHits.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (hit <= 32 || (hit & (hit - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS EXACT 570002 LIVE C64: hit={} draw={} "
+                        "sourceSerial={} sequence={} object=0x{:06X} "
+                        "flushSerial={} pmtObject=0x{:X} pmtNode=0x{:X} "
+                        "pmtMesh=0x{:X} shader=0x{:X} shaderEpoch={} "
+                        "cameraSynced={} "
+                        "authority=EXACT_C993_INLINE_FLUSH_PMT_PRE_EYE",
+                        hit, TopLevelDrawSerial() + 1u,
+                        call.sourceSerial, call.lastC993Sequence,
+                        call.objectId, flush.sourceSerial,
+                        pmt.object, pmt.node, pmt.mesh,
+                        currentShader, currentShaderEpoch,
+                        sourceCameraSynced ? 1 : 0);
+            }
+            return true;
+        }
+
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
@@ -5679,6 +5758,16 @@ namespace OutRunVRStereo
                     exactProjectedLensRaw =
                         R30GetExactInlineProjectedLensRawWvp(
                             original, exactProjectedLensCameraSynced);
+                    // 0x570002 has no game c64 callback in the failing Quest
+                    // trace. Its exact C993 inline flush + exact PMT are still
+                    // live here, before R30 writes either eye. Read the D3D9
+                    // source c64 only under that exact owner; 0x570006 keeps
+                    // the normal cached native-upload path above.
+                    if (!exactProjectedLensRaw)
+                        exactProjectedLensRaw =
+                            R30GetExact570002LiveWvp(
+                                device, original,
+                                exactProjectedLensCameraSynced);
                     if (!exactProjectedLensRaw &&
                         !R44GetOwnedRawOverlayWvp(original) &&
                         !R30GetExtendedRawWvpForExactSceneEffect(original))

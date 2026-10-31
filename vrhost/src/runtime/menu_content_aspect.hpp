@@ -40,20 +40,16 @@ namespace OutRunVrMenuAspect
         return state == 0x0Au || state == 0x0Bu || state == 0x0Cu;
     }
 
-    // The D3D9Ex backbuffer follows the OpenXR eye extent in VR, but these
-    // front-end/exit states still rasterize their 2D scene into the game's
-    // top-left 1920x1080 logical canvas. Desktop Present then scales the whole
-    // portrait backbuffer, so the host must sample the logical sub-rectangle
-    // before placing the LOCAL-fixed theater plane. Ferrari selector states
-    // remain full-width and are deliberately excluded.
+    // 2026-10-31 Quest proof: TITLE/MAIN still show the game's logical
+    // 1920x1080 raster in the upper-left of the portrait XR source, while
+    // Ferrari selection and TRYAGAIN are already correct. Keep this host-side
+    // crop deliberately limited to the two observed broken menu states.
+    // OUTRUNMILES is fixed at its game-side sprite canvas instead so its
+    // already-correct world/background is never cropped or zoomed.
     constexpr bool IsTopLeftLogicalTheaterState(
         std::uint32_t state) noexcept
     {
-        return state == 0x04u || state == 0x09u || // TITLE / MENU
-            state == 0x17u ||                     // CONTINUE
-            state == 0x1Bu || state == 0x1Cu ||   // GAMEOVER / GAMEEXIT
-            state == 0x1Du || state == 0x1Eu ||   // GAMERESET variants
-            state == 0x23u;                       // TRYAGAIN
+        return state == 0x04u || state == 0x09u; // TITLE / MENU only
     }
 
     struct LogicalCanvasCropPlan
@@ -98,11 +94,12 @@ namespace OutRunVrMenuAspect
 
     static_assert(IsTopLeftLogicalTheaterState(0x04u));
     static_assert(IsTopLeftLogicalTheaterState(0x09u));
-    static_assert(IsTopLeftLogicalTheaterState(0x17u));
-    static_assert(IsTopLeftLogicalTheaterState(0x1Cu));
-    static_assert(IsTopLeftLogicalTheaterState(0x23u));
     static_assert(!IsTopLeftLogicalTheaterState(0x0Au));
     static_assert(!IsTopLeftLogicalTheaterState(0x10u));
+    static_assert(!IsTopLeftLogicalTheaterState(0x17u));
+    static_assert(!IsTopLeftLogicalTheaterState(0x1Cu));
+    static_assert(!IsTopLeftLogicalTheaterState(0x22u));
+    static_assert(!IsTopLeftLogicalTheaterState(0x23u));
 
     constexpr bool PlanStateSafeMenuCrop(
         std::uint32_t state, bool configuredLetterbox,
