@@ -429,7 +429,7 @@ def _pixel_review_next_binding(st, lane):
                     or box[0]<0 or box[1]<0 or box[2]>int(row["width"])
                     or box[3]>int(row["height"])
                     or box[2]-box[0]<70 or box[3]-box[1]<16
-                    or box[2]-box[0]>int(row["width"])*0.7
+                    or box[2]-box[0]>max(90,int(row["width"])*0.7)
                     or box[3]-box[1]>int(row["height"])*0.35):
                 continue
             if any(_overlap_ratio(box,list(old))>.90 for _,old in _known_ocr_regions(name,row["png_sha256"])):
