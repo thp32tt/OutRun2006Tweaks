@@ -1,0 +1,82 @@
+name: Focus R26 Perf Quiet Final Launcher Exact Binary Repackage
+
+on:
+  push:
+    branches:
+      - test/r26-focus-all-perf-no-trace-20261101
+    paths:
+      - .github/workflows/vr-focus-perf-quiet-final-package.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  final-package:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout final quiet launcher
+        uses: actions/checkout@v4
+      - name: Retrieve exact successful Win32/x64 compiled pair
+        uses: actions/download-artifact@v4
+        with:
+          repository: thp32tt/OutRun2006Tweaks
+          run-id: 41221914246
+          name: OutRun-VR-FOCUS-PERF-QUIET-9e53199adb49ed939797136e969c2b83723f6802
+          github-token: ${{ github.token }}
+          path: previous_compiled
+      - name: Merge final launch flags into original compiled package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $old=Get-ChildItem previous_compiled -Recurse -Filter OutRun2_VR_FOCUS_PERF_QUIET_*.zip -File | Select-Object -First 1
+          if (!$old) { throw 'The previous exact-SHA compiled ZIP was not downloaded' }
+          $output='dist/OutRun2_VR_FOCUS_PERF_QUIET_FINAL'
+          New-Item -ItemType Directory -Path $output -Force | Out-Null
+          Expand-Archive -LiteralPath $old.FullName -DestinationPath $output -Force
+          Copy-Item tools/vr_perf_quiet/Run-VRPerfQuiet.ps1 "$output/Run-VRPerfQuiet.ps1" -Force
+          Copy-Item tools/vr_perf_quiet/RUN_VR_PERF_QUIET.cmd "$output/RUN_VR_PERF_QUIET.cmd" -Force
+          $launcher=Get-Content "$output/Run-VRPerfQuiet.ps1" -Raw
+          foreach ($arg in @('-PreferD3D9Ex=true','-DirectGpuOnly=true','-AutoRenderResolution=true',
+                              '-VR.Telemetry=false','-Graphics.ReflectionResolution=256',
+                              '-Graphics.ReflectionUpdateRate=0.25',
+                              '-Graphics.DisableVehicleLODs=false')) {
+            if (!$launcher.Contains($arg)) { throw "Missing CLI perf/quality setting $arg" }
+          }
+          if (!$launcher.Contains("OUTRUN_VR_FULL_TRACE = '0'")) { throw 'Host full trace must be disabled' }
+          if (!$launcher.Contains("OUTRUN_VR_R23_PIXEL_PROBE = '0'")) { throw 'XR pixel probe must be disabled' }
+          $tokens=$null; $errors=$null
+          $null=[System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path "$output/Run-VRPerfQuiet.ps1").Path,[ref]$tokens,[ref]$errors)
+          if ($errors.Count) { throw "Launcher PowerShell syntax failed: $errors" }
+          $gameBytes=[IO.File]::ReadAllBytes("$output/dinput8.dll")
+          $offset=[BitConverter]::ToInt32($gameBytes,0x3c)
+          if ($gameBytes.Length -lt 1000000 -or [BitConverter]::ToUInt16($gameBytes,$offset+4) -ne 0x014c) { throw 'Invalid original game DLL' }
+          $hostBytes=[IO.File]::ReadAllBytes("$output/outrun-vr-host.exe")
+          $offset=[BitConverter]::ToInt32($hostBytes,0x3c)
+          if ([BitConverter]::ToUInt16($hostBytes,$offset+4) -ne 0x8664) { throw 'Invalid original host EXE' }
+          @(
+            'SOURCE_BINARIES_SHA=9e53199adb49ed939797136e969c2b83723f6802'
+            'SOURCE_COMPILE_RUN=41221914246'
+            "QUIET_LAUNCHER_SHA=$env:GITHUB_SHA"
+            'FOCUS_BASE=9e26abe49fc414ae8eeaa9f3bbebe16ab618d385'
+            'PERF=R26 merged copy/math/shadows/reflection256/rate0.25/LODs'
+            'MONO_FALLBACK=SAFE RETAINED'
+            'GAME_LOG_FULL_TRACE=OFF'
+            'HOST_LOG_FULL_TRACE=OFF'
+            'PIXEL_PROBE=OFF'
+            "DLL_SHA256=$((Get-FileHash "$output/dinput8.dll" -Algorithm SHA256).Hash)"
+            "HOST_SHA256=$((Get-FileHash "$output/outrun-vr-host.exe" -Algorithm SHA256).Hash)"
+          ) | Set-Content "$output/FINAL_BUILD_PROVENANCE.txt" -Encoding utf8
+          New-Item -ItemType Directory -Path final_zip -Force | Out-Null
+          Compress-Archive -Path "$output/*" -DestinationPath 'final_zip/OutRun2_VR_FOCUS_PERF_QUIET_FINAL.zip' -Force
+          Write-Host 'Exact successful compiled binaries preserved, final launcher verified.'
+          Get-FileHash 'final_zip/OutRun2_VR_FOCUS_PERF_QUIET_FINAL.zip' -Algorithm SHA256
+      - name: Upload fully playable quiet combined final zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun-VR-FOCUS-PERF-QUIET-FINAL
+          path: final_zip/OutRun2_VR_FOCUS_PERF_QUIET_FINAL.zip
+          retention-days: 21
+          if-no-files-found: error
