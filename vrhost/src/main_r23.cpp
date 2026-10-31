@@ -2336,22 +2336,23 @@ namespace
         UvRect theaterUv = whole;
         const auto logicalCanvasCrop =
             !sourceIsSbs
-            ? OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
+            ? OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
                 clientGameState,
-                static_cast<float>(c.projection_.width),
-                static_cast<float>(c.projection_.height))
-            : OutRunVrMenuAspect::LogicalCanvasCropPlan{};
+                static_cast<float>(capturedTheaterClient.left),
+                static_cast<float>(capturedTheaterClient.top),
+                static_cast<float>(capturedTheaterClient.right),
+                static_cast<float>(capturedTheaterClient.bottom),
+                static_cast<float>(c.sourceWidth_),
+                static_cast<float>(c.sourceHeight_))
+            : OutRunVrMenuAspect::LogicalCanvasCapturePlan{};
         const bool logicalCanvasCropApplied =
-            !sourceIsSbs && capturedTheaterFullyVisible &&
-            logicalCanvasCrop.crop;
+            !sourceIsSbs && logicalCanvasCrop.crop;
         if (logicalCanvasCropApplied)
         {
-            const float baseWidth = theaterUv.w;
-            const float baseHeight = theaterUv.h;
-            theaterUv.x += baseWidth * logicalCanvasCrop.offsetX;
-            theaterUv.y += baseHeight * logicalCanvasCrop.offsetY;
-            theaterUv.w = baseWidth * logicalCanvasCrop.width;
-            theaterUv.h = baseHeight * logicalCanvasCrop.height;
+            theaterUv.x = logicalCanvasCrop.x;
+            theaterUv.y = logicalCanvasCrop.y;
+            theaterUv.w = logicalCanvasCrop.width;
+            theaterUv.h = logicalCanvasCrop.height;
 
             static std::uint64_t menuQuadLogicalHits = 0;
             const auto hit = ++menuQuadLogicalHits;
@@ -2362,19 +2363,23 @@ namespace
                     << "[VR TRACE MENU QUAD LOGICAL CANVAS FULL]"
                     << " hit=" << hit
                     << " state=" << clientGameState
-                    << " applied=1 fullVisible=1"
+                    << " applied=1 fullClientVisible="
+                    << (capturedTheaterFullyVisible ? 1 : 0)
+                    << " logicalRectVisible=1"
                     << " xrPhysical=" << c.projection_.width << 'x'
                     << c.projection_.height
                     << " desktopCapture=" << c.sourceWidth_ << 'x'
                     << c.sourceHeight_
+                    << " client=" << capturedTheaterClient.left << ','
+                    << capturedTheaterClient.top << ','
+                    << capturedTheaterClient.right << ','
+                    << capturedTheaterClient.bottom
                     << " logical=1920x1080"
                     << " inputUv=" << whole.x << ',' << whole.y << ','
                     << whole.w << ',' << whole.h
                     << " outputUv=" << theaterUv.x << ',' << theaterUv.y
                     << ',' << theaterUv.w << ',' << theaterUv.h
-                    << " cropRatio=" << logicalCanvasCrop.width << ','
-                    << logicalCanvasCrop.height
-                    << " authority=ACTIVE_LOCAL_FIXED_QUAD_TITLE_MENU"
+                    << " authority=VISIBLE_LOGICAL_RECT_LOCAL_FIXED_QUAD"
                     << "\n";
                 OutRunVrEmitFullTrace(trace.str());
             }

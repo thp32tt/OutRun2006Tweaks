@@ -5,6 +5,7 @@ r30=(ROOT/"src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(encoding="ut
 hooks=(ROOT/"src/hooks_graphics.cpp").read_text(encoding="utf-8")
 renderer=(ROOT/"src/vr/game/outrun_renderer.cpp").read_text(encoding="utf-8")
 contract=(ROOT/"src/vr/game/projected_lens_inline_source.hpp").read_text(encoding="utf-8")
+semantics=(ROOT/"src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
 def body(text,sig):
  s=text.index(sig); b=text.index("{",s); d=0
  for i in range(b,len(text)):
@@ -15,7 +16,9 @@ classifier=body(r30,"R30ScreenSpaceKind R30ClassifyScreenSpacePass(")
 builder=body(r30,"bool R30BuildScreenSpaceEyeConstants(")
 dispatch=body(r30,"HRESULT R30TryScreenSpaceFovDraw(")
 exact=body(r30,"bool R30GetExactInlineProjectedLensRawWvp(")
-assert "if (semanticProjectedScreen)" in classifier
+axis=body(r30,"bool R30GetExactOpaqueAxisLensLiveWvp(")
+assert "if (semanticProjectedScreen || exactOpaqueAxisLensPmt)" in classifier
+assert "ExactProjectedLensAxisPmtActive()" in classifier
 assert "if (semanticProjectedScreen || semanticSceneEffect)" not in classifier
 tail=builder[builder.index("if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)"):]
 for t in ("GetLatchedHeadInverse(","const D3DMATRIX identityEye = IdentityMatrix();",
@@ -25,7 +28,17 @@ for t in ("GetLatchedHeadInverse(","const D3DMATRIX identityEye = IdentityMatrix
           "std::memcpy(eyeConstants[eye], &projectedT,","VR R85 FLARE RAY:"):
  assert t in tail,t
 assert "R30GetExactInlineProjectedLensRawWvp(" in builder
-assert builder.index("R30GetExactInlineProjectedLensRawWvp(") < builder.index("R44GetOwnedRawOverlayWvp(original)")
+assert "R30GetExactOpaqueAxisLensLiveWvp(" in builder
+assert builder.index("R30GetExactInlineProjectedLensRawWvp(") < builder.index("R30GetExactOpaqueAxisLensLiveWvp(") < builder.index("R44GetOwnedRawOverlayWvp(original)")
+for t in ("CurrentLensOpaquePmtEntry","CurrentLensOpaqueFlush",
+          "ExactProjectedLensAxisPmtActive()","GetVertexShaderConstantF(",
+          "EXACT_405890_404700_PMT_ENTRY_PRE_EYE"):
+ assert t in axis,t
+for obj in ("0x57000Eu","0x570003u","0x570004u","0x570005u",
+            "0x570007u","0x570008u","0x57000Au","0x570009u",
+            "0x57000Bu","0x57000Cu","0x57000Du"):
+ assert obj in semantics,obj
+assert "CurrentLensDeferredPhysical" not in axis
 assert "exactProjectedLensCameraSynced" in tail
 assert "GetLastProjectedLensRawWvp(out, raw)" in exact
 for t in ("CurrentInlinePmt","OwnsRawWvp(","GetCurrentLatchedPoseEpoch()",
@@ -50,4 +63,4 @@ for t in ("ProjectedLensRawWvp.Reset();","VR LENS PROJECTED RAW WVP CAPTURE",
  assert t in renderer,t
 assert dispatch.count("const HRESULT leftHr = actualDraw();")==1
 assert dispatch.count("rightHr = actualDraw();")==1
-print("PASS R26 exact inline C993 570002/570006 raw-WVP ownership is telemetry-independent; live-c64 fallback removed")
+print("PASS R26 exact C993 plus exact 405890 PMT flare-axis ownership; each CABE child keeps its own pre-eye native c64")

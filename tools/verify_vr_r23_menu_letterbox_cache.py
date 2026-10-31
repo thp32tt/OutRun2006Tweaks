@@ -24,6 +24,8 @@ def verify(text: str) -> None:
         "quad.eyeVisibility = XR_EYE_VISIBILITY_BOTH;",
         "quad.pose = c.theaterAnchor_;",
         "c.GetCapturedGameUv(",
+        "PlanTopLeftLogicalCaptureUv(",
+        "logicalRectVisible=1",
         "c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)",
     )
     for token in required_theater:
@@ -62,9 +64,11 @@ def verify(text: str) -> None:
     assert "intentionalMonoProjection = true;" not in menu
 
     # Capture remains game-client cropped, so the quad must not contain
-    # unrelated desktop pixels. Black mirror backdrop is a separate PC-only
-    # presentation fix and does not authorize full-monitor capture.
+    # unrelated desktop pixels. A taller XR client may extend off the monitor;
+    # only the exact 1920x1080 logical rectangle itself must be fully visible.
     assert "GetCapturedGameUv(" in theater
+    assert "capturedTheaterFullyVisible &&" not in theater
+    assert "VISIBLE_LOGICAL_RECT_LOCAL_FIXED_QUAD" in theater
 
 
 verify(source)

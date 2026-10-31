@@ -40,16 +40,27 @@ namespace OutRunVrMenuAspect
         return state == 0x0Au || state == 0x0Bu || state == 0x0Cu;
     }
 
-    // 2026-10-31 Quest proof: TITLE/MAIN still show the game's logical
-    // 1920x1080 raster in the upper-left of the portrait XR source, while
-    // Ferrari selection and TRYAGAIN are already correct. Keep this host-side
-    // crop deliberately limited to the two observed broken menu states.
-    // OUTRUNMILES is fixed at its game-side sprite canvas instead so its
-    // already-correct world/background is never cropped or zoomed.
+    // Quest runtime proof: early front-end/title/menu rasters can remain on
+    // the game's logical 1920x1080 top-left canvas while the physical D3D9Ex
+    // target follows the taller OpenXR eye extent. Keep selector/advertise/
+    // gameplay/post-race owners out: those have independent verified routes.
     constexpr bool IsTopLeftLogicalTheaterState(
         std::uint32_t state) noexcept
     {
-        return state == 0x04u || state == 0x09u; // TITLE / MENU only
+        switch (state)
+        {
+        case 0x00u: // SYSTEM / SEGA boot card
+        case 0x01u: // WARNING
+        case 0x02u: // INFO
+        case 0x04u: // TITLE
+        case 0x05u: // RATING
+        case 0x06u: // ENTRY
+        case 0x08u: // ERROR
+        case 0x09u: // MENU
+            return true;
+        default:
+            return false;
+        }
     }
 
     struct LogicalCanvasCropPlan
@@ -100,6 +111,78 @@ namespace OutRunVrMenuAspect
     static_assert(!IsTopLeftLogicalTheaterState(0x1Cu));
     static_assert(!IsTopLeftLogicalTheaterState(0x22u));
     static_assert(!IsTopLeftLogicalTheaterState(0x23u));
+
+    // Desktop Duplication can see only a fragment of the physical XR-sized
+    // game window when that window is taller than the monitor. Requiring the
+    // entire client to be visible therefore rejects the exact Quest failure:
+    // the desired 1920x1080 logical menu is fully on-screen at the client's
+    // top-left even though the unused lower XR target extends off-screen.
+    // Return absolute desktop-source UVs only when that logical rectangle is
+    // itself fully visible; clipped logical content fails closed.
+    struct LogicalCanvasCapturePlan
+    {
+        bool crop = false;
+        float x = 0.0f;
+        float y = 0.0f;
+        float width = 1.0f;
+        float height = 1.0f;
+        float aspect = 16.0f / 9.0f;
+    };
+
+    inline LogicalCanvasCapturePlan PlanTopLeftLogicalCaptureUv(
+        std::uint32_t state,
+        float clientLeft, float clientTop,
+        float clientRight, float clientBottom,
+        float sourceWidth, float sourceHeight,
+        float logicalWidth = 1920.0f,
+        float logicalHeight = 1080.0f) noexcept
+    {
+        if (!IsTopLeftLogicalTheaterState(state) ||
+            !std::isfinite(clientLeft) || !std::isfinite(clientTop) ||
+            !std::isfinite(clientRight) || !std::isfinite(clientBottom) ||
+            !std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
+            !std::isfinite(logicalWidth) || !std::isfinite(logicalHeight) ||
+            sourceWidth <= 0.0f || sourceHeight <= 0.0f ||
+            logicalWidth <= 0.0f || logicalHeight <= 0.0f ||
+            clientRight <= clientLeft || clientBottom <= clientTop)
+            return {};
+
+        const float clientWidth = clientRight - clientLeft;
+        const float clientHeight = clientBottom - clientTop;
+        if (clientWidth < logicalWidth || clientHeight < logicalHeight)
+            return {};
+
+        const float clientAspect = clientWidth / clientHeight;
+        const float logicalAspect = logicalWidth / logicalHeight;
+        if (!std::isfinite(clientAspect) || !std::isfinite(logicalAspect) ||
+            clientAspect >= logicalAspect - 0.10f)
+            return {};
+
+        const float logicalRight = clientLeft + logicalWidth;
+        const float logicalBottom = clientTop + logicalHeight;
+        if (clientLeft < 0.0f || clientTop < 0.0f ||
+            logicalRight > sourceWidth || logicalBottom > sourceHeight)
+            return {};
+
+        const float x = clientLeft / sourceWidth;
+        const float y = clientTop / sourceHeight;
+        const float width = logicalWidth / sourceWidth;
+        const float height = logicalHeight / sourceHeight;
+        if (!std::isfinite(x) || !std::isfinite(y) ||
+            !std::isfinite(width) || !std::isfinite(height) ||
+            x < 0.0f || y < 0.0f || width <= 0.0f || height <= 0.0f ||
+            x + width > 1.00001f || y + height > 1.00001f)
+            return {};
+        return { true, x, y, width, height, logicalAspect };
+    }
+
+    static_assert(IsTopLeftLogicalTheaterState(0x00u));
+    static_assert(IsTopLeftLogicalTheaterState(0x02u));
+    static_assert(IsTopLeftLogicalTheaterState(0x05u));
+    static_assert(IsTopLeftLogicalTheaterState(0x06u));
+    static_assert(IsTopLeftLogicalTheaterState(0x08u));
+    static_assert(!IsTopLeftLogicalTheaterState(0x03u));
+    static_assert(!IsTopLeftLogicalTheaterState(0x07u));
 
     constexpr bool PlanStateSafeMenuCrop(
         std::uint32_t state, bool configuredLetterbox,

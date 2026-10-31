@@ -2265,6 +2265,13 @@ namespace OutRunVRStereo
             const bool semanticOverlay2D =
                 OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
                     semanticScope);
+            // Source-call time windows cannot identify one child in the
+            // multi-object flare flush. The current retail 405890 PMT receipt
+            // can, and preserves that child's own native WVP.
+            const bool exactOpaqueAxisLensPmt =
+                semanticSceneEffect &&
+                OutRunVR::GameSemantic::ExactProjectedLensAxisPmtActive();
+
 
             // Diagnostic-only exact-producer fingerprint. This deliberately
             // does not participate in any return/classification decision:
@@ -2349,7 +2356,7 @@ namespace OutRunVRStereo
             // Treat it as its own screen-effect class so it can be fused at the
             // same centre-eye placement in both HMD eyes. Do not route it
             // through WorldBillboard/PerspectiveHud and apply head/IPD twice.
-            if (semanticProjectedScreen)
+            if (semanticProjectedScreen || exactOpaqueAxisLensPmt)
                 return R30ScreenSpaceKind::ProjectedScreenEffect2D;
 
             // Generic queue membership is not an exact named HUD or
@@ -5658,6 +5665,69 @@ namespace OutRunVRStereo
             return true;
         }
 
+        bool R30GetExactOpaqueAxisLensLiveWvp(
+            IDirect3DDevice9* device, float out[16],
+            bool& sourceCameraSynced) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            sourceCameraSynced = false;
+            if (!device || !out || QueueRenderActive() ||
+                EffectiveScope() != RenderScope::SceneEffect ||
+                !ExactProjectedLensAxisPmtActive())
+                return false;
+
+            const auto& pmt = CurrentLensOpaquePmtEntry;
+            const auto& flush = CurrentLensOpaqueFlush;
+            if (pmt.flushSerial != flush.serial ||
+                !IsProjectedLensAxisObject(pmt.objectId))
+                return false;
+
+            std::uintptr_t currentShader = 0;
+            std::uint64_t currentShaderEpoch = 0;
+            if (!GetCurrentShaderEpoch(currentShader, currentShaderEpoch) ||
+                currentShader == 0 || currentShaderEpoch == 0)
+                return false;
+
+            IDirect3DVertexShader9* liveVs = nullptr;
+            const HRESULT vsHr = device->GetVertexShader(&liveVs);
+            const auto liveShader =
+                reinterpret_cast<std::uintptr_t>(liveVs);
+            if (liveVs)
+                liveVs->Release();
+            if (FAILED(vsHr) || liveShader == 0 ||
+                liveShader != currentShader)
+                return false;
+
+            if (FAILED(device->GetVertexShaderConstantF(
+                    OutRunWvpRegister, out, OutRunWvpRegisterCount)))
+                return false;
+            for (float* value = out; value != out + 16; ++value)
+                if (!std::isfinite(*value))
+                    return false;
+
+            sourceCameraSynced =
+                OutRunVRRenderer::IsCullingCameraSyncedNow();
+            if (Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> liveHits{0};
+                const auto hit = liveHits.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (hit <= 64 || (hit & (hit - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS EXACT AXIS PMT LIVE C64: hit={} draw={} "
+                        "flushSerial={} pmtEntrySerial={} objectId=0x{:06X} "
+                        "pass={} object=0x{:X} node=0x{:X} mesh=0x{:X} "
+                        "shader=0x{:X} shaderEpoch={} cameraSynced={} "
+                        "authority=EXACT_405890_404700_PMT_ENTRY_PRE_EYE",
+                        hit, TopLevelDrawSerial() + 1u,
+                        flush.serial, pmt.serial, pmt.objectId, pmt.pass,
+                        pmt.object, pmt.node, pmt.mesh,
+                        currentShader, currentShaderEpoch,
+                        sourceCameraSynced ? 1 : 0);
+            }
+            return true;
+        }
+
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
@@ -5766,6 +5836,11 @@ namespace OutRunVRStereo
                     if (!exactProjectedLensRaw)
                         exactProjectedLensRaw =
                             R30GetExact570002LiveWvp(
+                                device, original,
+                                exactProjectedLensCameraSynced);
+                    if (!exactProjectedLensRaw)
+                        exactProjectedLensRaw =
+                            R30GetExactOpaqueAxisLensLiveWvp(
                                 device, original,
                                 exactProjectedLensCameraSynced);
                     if (!exactProjectedLensRaw &&

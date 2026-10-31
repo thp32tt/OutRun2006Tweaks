@@ -946,6 +946,48 @@ namespace OutRunVR::GameSemantic
     };
     inline thread_local LensOpaquePmtEntryReceipt CurrentLensOpaquePmtEntry{};
 
+    // Original CABE flare-axis children emitted inside the opaque 4052C0
+    // flush. The second immediate 0x570008 glow is outside this PMT receipt.
+    constexpr bool IsProjectedLensAxisObject(
+        std::uint32_t objectId) noexcept
+    {
+        switch (objectId)
+        {
+        case 0x57000Eu:
+        case 0x570003u:
+        case 0x570004u:
+        case 0x570005u:
+        case 0x570007u:
+        case 0x570008u:
+        case 0x57000Au:
+        case 0x570009u:
+        case 0x57000Bu:
+        case 0x57000Cu:
+        case 0x57000Du:
+            return true;
+        default:
+            return false;
+        }
+    }
+    static_assert(IsProjectedLensAxisObject(0x57000Eu));
+    static_assert(IsProjectedLensAxisObject(0x570008u));
+    static_assert(IsProjectedLensAxisObject(0x57000Du));
+    static_assert(!IsProjectedLensAxisObject(0x570002u));
+    static_assert(!IsProjectedLensAxisObject(0x570006u));
+    static_assert(!IsProjectedLensAxisObject(0x57000Fu));
+    static_assert(!IsProjectedLensAxisObject(0x570010u));
+
+    inline bool ExactProjectedLensAxisPmtActive() noexcept
+    {
+        const auto& pmt = CurrentLensOpaquePmtEntry;
+        const auto& flush = CurrentLensOpaqueFlush;
+        return pmt.serial != 0 && pmt.flushSerial != 0 &&
+            flush.serial != 0 && pmt.flushSerial == flush.serial &&
+            IsProjectedLensAxisObject(pmt.objectId) &&
+            pmt.entry != 0 && pmt.object != 0 &&
+            pmt.node != 0 && pmt.mesh != 0;
+    }
+
     class ScopedLensOpaquePmtEntry final
     {
         LensOpaquePmtEntryReceipt previous_{};
