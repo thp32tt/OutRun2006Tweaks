@@ -10,13 +10,13 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:EXPANDED_GAME_GPU_RGB_CAPTURE",
   "classification": "A_SOURCE_IMPLEMENTATION",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_CANDIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_base_sha": "3f91cb7e6052319e5516f83180e71ca87a0605c0",
-  "implementation_source_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "implementation_source_sha": "c75d915ea2752a6aa47164736a4bd3f3b0c9019f",
+  "material_result_sha": "c75d915ea2752a6aa47164736a4bd3f3b0c9019f",
+  "validation_bearing_result_sha": "c75d915ea2752a6aa47164736a4bd3f3b0c9019f",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
@@ -95,33 +95,39 @@
   },
   "acceptance_results": {
     "native_rgb_extent": {
-      "status": "PENDING_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
         "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
         "tests/native_raw_changed_crop_present_test.cpp"
       ],
-      "validation_command": "DX11 Fast and five mandatory exact-SHA GitHub Actions"
+      "validation_command": "Required 5 GitHub Actions SUCCESS at exact source commit c75d915ea2752a6aa47164736a4bd3f3b0c9019f"
     },
     "game_source_fallback": {
-      "status": "PENDING_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "tests/native_raw_changed_crop_present_test.cpp",
         "tests/native_raw_changed_pixel_window_test.cpp"
       ],
-      "validation_command": "DX11 Fast and five mandatory exact-SHA GitHub Actions"
+      "validation_command": "Required 5 GitHub Actions SUCCESS at exact source commit c75d915ea2752a6aa47164736a4bd3f3b0c9019f"
     },
     "five_exact_sha_gates": {
-      "status": "PENDING_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
         "tests/native_raw_changed_crop_present_test.cpp"
       ],
-      "validation_command": "DX11 Fast and five mandatory exact-SHA GitHub Actions"
+      "validation_command": "Required 5 GitHub Actions SUCCESS at exact source commit c75d915ea2752a6aa47164736a4bd3f3b0c9019f"
     }
   },
-  "validation_note": "CI pending at material candidate; no HMD or original game screen run.",
-  "exact_sha_gate_runs": {},
+  "validation_note": "Five mandatory exact-SHA Gate workflow SUCCESS, no causal test repair or follow-up C++ change. This is bounded opt-in partial native RGB 512x288; does not prove whole menu/car/race frame or Quest3/HMD. C6 docs-only +0.",
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41248740677,
+    "Backend Conversion Gate": 41248740745,
+    "Build": 41248740676,
+    "OpenXR VR architecture": 41248740748,
+    "OutRun EXE HUD Inspector CI": 41248740701
+  },
   "actual_runtime_evidence": "NOT_RUN_NO_GAME_DESKTOP_NO_QUEST3_VDXR",
   "native_gpu_pixels_observed": "UNTESTED",
   "full_menu_vehicle_race": "INCOMPLETE"
