@@ -1,0 +1,79 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa_idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T1445KST-IDLE",
+  "scheduled_slot_kst": "2026-10-31T14:45:00+09:00",
+  "checked_at_kst": "2026-10-31T14:46:51+09:00",
+  "role": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "observed_remote_head": "4189243815a87f84df4a2d477bb20cebb8a68564",
+  "policies": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "status": "IDLE_NO_NEW_UNREVIEWED_EXPORTED_SHA",
+  "source": "N100 /home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "inventory": {
+    "A_png": 437,
+    "B_png": 483,
+    "total_png": 920,
+    "export_file_sha_mappings": 920,
+    "prior_qa_report_files": 197,
+    "already_reviewed_distinct_sha": 925,
+    "pending_unreviewed_export_sha": 0,
+    "missing_export_entries": 0,
+    "new_files_after_20261030_182149_kst": {
+      "A": 0,
+      "B": 0
+    },
+    "most_recent_mtime_kst": {
+      "A": "2026-10-30T18:00:02+09:00",
+      "B": "2026-10-30T17:50:07+09:00"
+    }
+  },
+  "sha256_spot_checks": [
+    {
+      "role": "A",
+      "file": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "matches_previous_C1": true
+    },
+    {
+      "role": "B",
+      "file": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "matches_previous_C1": true
+    }
+  ],
+  "evidence": {
+    "dedup_script": "work/C1_QA_20261030_1945_dedup_readonly.py",
+    "inventory_script": "work/C1_QA_20261030_1945_inventory_readonly.py",
+    "method": "Executed existing read-only N100 scripts; checked export SHA against historical QA report SHA and checked candidate mtimes; independently rehashed latest two candidate files."
+  },
+  "qa_this_slot": {
+    "new_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "limitations": [
+    "IDLE is based on candidate/export SHA index and two file SHA spot-checks; the other 918 PNG bytes were not individually rehashed.",
+    "No fresh visual QA was possible because there are no new unreviewed candidates.",
+    "No C2/C3/game PASS or DDS deployment is implied."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_created": false,
+    "c2_c3_or_ingame_pass_created": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score": {
+    "source": "thp32tt/ai-dev-lab@main/AI_SCOREBOARD.md",
+    "previous_ai2": 2266,
+    "delta": 0,
+    "cumulative_ai2": 2266
+  }
+}
