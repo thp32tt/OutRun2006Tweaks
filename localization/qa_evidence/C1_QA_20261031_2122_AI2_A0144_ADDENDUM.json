@@ -1,0 +1,113 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T2115KST-Q043-NEW-SHA2-ADDENDUM-A0144",
+  "parent_run_key": "OUTRUN-C1-AI2-20261031T2115KST-Q043-NEW-SHA2",
+  "reviewed_at_kst": "2026-10-31T21:22:33+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "reason": "Candidate A-0144 persisted to N100 after initial C1 two-SHA report commit; same QA session, no repeated SHA or extra competition point.",
+  "prior_report_files": 198,
+  "prior_reviewed_sha_count": 927,
+  "results": {
+    "new_sha": 1,
+    "pass": 1,
+    "fail": 0,
+    "hold": 0,
+    "A": 1,
+    "B": 0
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0144-73D63CBB",
+      "id": "Q043_611d77bb8595b600",
+      "english": "CONGRATULATIONS!",
+      "korean": "축하합니다!",
+      "bbox_xyxy": [
+        12,
+        589,
+        2012,
+        778
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "source_sha256": "d68ae81e50fd9194abd35d6c2a65f72ffe95c3b8ed865160fd8cd4961a1b1b7f",
+      "manifest_source_sha256": "d68ae81e50fd9194abd35d6c2a65f72ffe95c3b8ed865160fd8cd4961a1b1b7f",
+      "input_source_sha256": "d68ae81e50fd9194abd35d6c2a65f72ffe95c3b8ed865160fd8cd4961a1b1b7f",
+      "manifest_imagegen_input_sha256": "d68ae81e50fd9194abd35d6c2a65f72ffe95c3b8ed865160fd8cd4961a1b1b7f",
+      "candidate_file": "Q043_611d77bb8595b600_k.png",
+      "candidate_sha256": "4875ce336377ba83074c99cfa6269e7647e0cf21dbcec4d99d8de170337904f5",
+      "export_sha256": "4875ce336377ba83074c99cfa6269e7647e0cf21dbcec4d99d8de170337904f5",
+      "candidate_mode": "RGBA",
+      "candidate_size": [
+        1752,
+        897
+      ],
+      "source_type": "RGBA",
+      "alpha_bbox": [
+        74,
+        99,
+        1725,
+        755
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        369,
+        189
+      ],
+      "half_fit": [
+        184,
+        94
+      ],
+      "candidate_sha_matches_export": true,
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_input": true,
+      "already_reviewed": false,
+      "export_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "reason_code": "C1_TRANSLATION_READABLE_RGBA_LAYER",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "diagnostic_only",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_ONLY",
+      "original_full_hd_source_sha_verified": true,
+      "observations": "Xbox 원본 CONGRATULATIONS! 대비 한글 축하합니다! 정확히 판독되며 가짜 자소/영문 잔상/불투명 배경/보호 아트 침범 없이 독립 글자 효과 PNG. 원문 오른쪽으로 기울어진 주황색 금속 스타일 재현. 369×189 네이티브-fit 및 184×94 50% 축소 시 읽힘. 비례 조정 미리보기로만 확인하였고 아직 실제 DDS/UI 합성 검증은 아님.",
+      "actual_ui_composite": "NOT_TESTED",
+      "actual_protected_art_coverage": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "c2_c3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "evidence": {
+    "n100_preflight": "work/C1_QA_20261031_2122_AI2_new_sha1/preflight.json",
+    "n100_preview": "work/C1_QA_20261031_2122_AI2_new_sha1/pairs_source_native_half.jpg",
+    "n100_candidate": "work/image-src/text_roi_batches/candidate_outputs/A/Q043_611d77bb8595b600_k.png",
+    "n100_export": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0144-73D63CBB.json"
+  },
+  "limitations": [
+    "Producer REWORK_DIMENSIONS unchanged; C1 PASS does not clear producer dimensions flag",
+    "No DDS, C2/C3, protected-art composite or in-game verification",
+    "Competition scoreboard same QA session already +1 for 2 initial SHAs; addendum +0"
+  ],
+  "guards": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "runtime_validation": "UNTESTED",
+    "competition_score_delta": 0
+  }
+}
