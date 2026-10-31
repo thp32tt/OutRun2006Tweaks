@@ -79,12 +79,10 @@ class FixParticleRendering : public Hook
 	inline static SafetyHookMid midhook{};
 	static void destination(SafetyHookContext& ctx)
 	{
-		// This hook sits inside the original particle renderer immediately before
-		// the particle geometry path. Mark the next top-level D3D draw as a world
-		// particle; stereo code still requires the verified world-WVP gate.
-		OutRunVR::GameSemantic::ArmNextDraw(
-			OutRunVR::GameSemantic::RenderScope::WorldParticle);
-
+		// Geometry ownership is now held by the exact 0x418CF0 wrapper below.
+		// Do not arm a speculative "next draw" token here: 0x418CF0 can be
+		// interrupted by other effect draws before its final DrawPrimitiveUP,
+		// which previously let lens/other effects consume WORLD_PARTICLE.
 		float ptcl_size;
 		__asm
 		{
@@ -104,6 +102,21 @@ class FixParticleRendering : public Hook
 		{
 			fld [ptcl_size]
 		}
+	}
+
+	// Canonical PC particle path: 0x418CF0 is source type 2 and emits the
+	// final FVF 0x144 DrawPrimitiveUP screen quads used by sparks/gravel/grass.
+	// Own the whole original call instead of guessing which later GPU draw is
+	// "next". isolatePendingDraw also protects an unrelated HUD/lens one-shot
+	// while the particle function executes.
+	inline static SafetyHookInline particle_draw_418cf0{};
+	static std::uint32_t __cdecl particle_draw_418cf0_dest(
+		std::uint32_t buffer, std::uint32_t source)
+	{
+		OutRunVR::GameSemantic::ScopedExactProducerSemantic exactParticle(
+			OutRunVR::GameSemantic::RenderScope::WorldParticle,
+			nullptr, true, OutRunVR::GameSemantic::ProducerToken::None);
+		return particle_draw_418cf0.call<std::uint32_t>(buffer, source);
 	}
 
 	// Fix metropolis firework texture issue (https://github.com/emoose/OutRun2006Tweaks/issues/52)
@@ -141,12 +154,21 @@ public:
 	bool apply() override
 	{
 		constexpr int particle_draw_rect2_HookAddr = 0x19009;
-		midhook = safetyhook::create_mid(Module::exe_ptr(particle_draw_rect2_HookAddr), destination);
+		midhook = safetyhook::create_mid(
+			Module::exe_ptr(particle_draw_rect2_HookAddr), destination);
+
+		// OR2006C2C.EXE 0x00418CF0 -> module RVA 0x18CF0.
+		// r4dius/outrun2-decomp independently identifies this exact function
+		// as source type 2 screen quads for sparks/gravel/grass.
+		constexpr int particle_draw_418cf0_Addr = 0x18CF0;
+		particle_draw_418cf0 = safetyhook::create_inline(
+			Module::exe_ptr(particle_draw_418cf0_Addr),
+			particle_draw_418cf0_dest);
 
 		constexpr int DispStage_HookAddr = 0x4E179;
 		midhook_fireworks = safetyhook::create_mid(Module::exe_ptr(DispStage_HookAddr), destination_fireworks);
 
-		return !!midhook;
+		return !!midhook && !!particle_draw_418cf0;
 	}
 
 	static FixParticleRendering instance;

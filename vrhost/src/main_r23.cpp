@@ -4045,40 +4045,30 @@ int main(int argc, char** argv)
                     const bool letterboxPolicyChanged =
                         cachedMenuProjectionValid &&
                         cachedMenuLetterbox != currentMenuLetterbox;
+                    // A flat front-end is an object/layer, not an XR camera.
+                    // The old path wrote menuProjectionAnchor into
+                    // XrCompositionLayerProjectionView::pose for both eyes.
+                    // ProjectionView::pose describes the VIEW pose, so this
+                    // could place the already-rasterized 2D image in an
+                    // eye-dependent corner. Submit the captured game client as
+                    // one LOCAL-space quad instead; OpenXR owns binocular
+                    // placement and both eyes see the same centred 2D plane.
+                    // This same path also covers post-race restart/title/menu.
                     if (capture.available &&
-                        menuProjectionAnchorValid &&
-                        currentMenuViewsValid &&
-                        (!cachedMenuProjectionValid || capture.fresh ||
-                         letterboxPolicyChanged || menuFovChanged))
+                        R23RenderTheater(
+                            compositor, viewSpace, localSpace,
+                            fs.predictedDisplayTime, quad, false))
                     {
-                        std::array<XrCompositionLayerProjectionView, 2>
-                            refreshed{};
-                        if (R23RenderWorldLockedMenuProjection(
-                                compositor, views, menuProjectionAnchor,
-                                clientGameState, refreshed))
-                        {
-                            cachedMenuProjectionViews = refreshed;
-                            cachedMenuLetterbox = currentMenuLetterbox;
-                            cachedMenuSourceFov[0] = views[0].fov;
-                            cachedMenuSourceFov[1] = views[1].fov;
-                            cachedMenuSourceFovValid = true;
-                            cachedMenuProjectionValid = true;
-                        }
-                    }
-                    if (cachedMenuProjectionValid)
-                    {
-                        pv = cachedMenuProjectionViews;
-                        projection.space = localSpace;
-                        projection.viewCount = 2;
-                        projection.views = pv.data();
+                        cachedMenuProjectionValid = false;
+                        cachedMenuSourceFovValid = false;
+                        cachedMenuLetterbox = currentMenuLetterbox;
                         layers[0] =
                             reinterpret_cast<const XrCompositionLayerBaseHeader*>(
-                                &projection);
+                                &quad);
                         layerReady = true;
-                        intentionalMonoProjection = true;
                         finalLayerKind = capture.fresh
-                            ? "menu-local-fixed-projection-fresh"
-                            : "menu-local-fixed-projection-cached";
+                            ? "menu-local-fixed-quad-fresh"
+                            : "menu-local-fixed-quad-cached";
                     }
                     QueryPerformanceCounter(&re);
                     frameRenderMs += timings.Ms(rs, re);

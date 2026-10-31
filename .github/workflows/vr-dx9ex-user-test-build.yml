@@ -12,6 +12,7 @@ on:
       - 'tools/Run-DX9ExFocusTest.ps1'
       - 'tools/verify_vr_r26_stage_fixedfn.py'
       - 'tools/verify_vr_r26_occlusion_present_fastpath.py'
+      - 'tools/verify_vr_r26_projected_particle_canvas.py'
       - 'tools/verify_vr_desktop_source_coordinates.py'
       - 'tools/verify_vr_unified_menu_source.py'
       - 'tools/verify_vr_menu_resolution_split.py'
@@ -32,6 +33,7 @@ on:
       - 'src/overlay/overlay.cpp'
       - 'src/hooks_misc.cpp'
       - 'src/hooks_graphics.cpp'
+      - 'src/hooks_bugfixes.cpp'
       - 'src/vr/settings.cpp'
       - 'vrhost/src/main.cpp'
       - 'vrhost/src/main_r23.cpp'
@@ -63,6 +65,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw '+TIME four-API source regression failed' }
           python tools/verify_vr_r26_occlusion_present_fastpath.py
           if ($LASTEXITCODE -ne 0) { throw 'R26 occlusion/StateBlock fail-closed contract failed' }
+          python tools/verify_vr_r26_projected_particle_canvas.py
+          if ($LASTEXITCODE -ne 0) { throw 'Exact 418CF0 grass/gravel particle ownership/canvas contract failed' }
           python tools/verify_dx9ex_r26_projected_flare_fusion.py
           if ($LASTEXITCODE -ne 0) { throw 'Exact C993 projected flare ownership contract failed' }
           python tools/verify_dx9ex_full_visual_trace_contract.py
@@ -119,11 +123,11 @@ jobs:
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
           @(
             'DX9Ex R26 + HUD user test build'
-            'Targets: AA2 + OpenXR render/UI split + rival current-chain / +TIME exact-owner / GOAL exact-parent / lens centre-eye fusion'
+            'Targets: AA2 + XR/UI split + rival/+TIME/GOAL + C993 lens + exact 418CF0 grass particles + centered menu quad'
             'Renderer: R26+HUD default'
             'VR physical target: OpenXR/VDXR recommended eye extent (desktop-independent)'
             'Gameplay HUD reference: 1920x1080 widescreen, HudScale=0.55'
-            'Title/main menu: independent 4:3 composition; F11: independent VR shell'
+            'Title/main/restart menu: centered LOCAL-space OpenXR quad; F11: independent VR shell'
             'PC mirror: preserves aspect; a black backdrop covers unused monitor strips so the desktop is not exposed; OpenXR eyes remain independent'
             'Baseline AA: VR AntiAliasing=2 (4x MSAA with 2x fallback)'
             'Runner: GitHub-hosted windows-2022'

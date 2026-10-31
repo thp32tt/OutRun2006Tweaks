@@ -111,6 +111,20 @@ for good, bad in (
     damaged = SRC.replace(good, bad, 1)
     assert damaged != SRC and damaged.count(good) < SRC.count(good)
 
+# The bugfix hook must own the WHOLE canonical 0x418CF0 particle call.
+# A speculative ArmNextDraw inside the 0x419009 scaling midhook can be stolen
+# by an intervening lens/effect Draw and must not return.
+BUG=(ROOT / "src/hooks_bugfixes.cpp").read_text(encoding="utf-8")
+particle=BUG[BUG.index("class FixParticleRendering"):BUG.index("class FixIncorrectShading")]
+assert "particle_draw_418cf0_Addr = 0x18CF0" in particle
+assert "particle_draw_418cf0_dest" in particle
+assert "ScopedExactProducerSemantic exactParticle" in particle
+assert "RenderScope::WorldParticle" in particle
+assert "nullptr, true, OutRunVR::GameSemantic::ProducerToken::None" in particle
+inner=particle[particle.index("static void destination("):particle.index("// Canonical PC particle path")]
+assert "ArmNextDraw" not in inner
+
+print("PASS exact 0x418CF0 particle function owns WORLD_PARTICLE through final DrawPrimitiveUP; no stealable next-draw token")
 print("PASS R26 retail 418CF0 game-screen + RHW=1 screen-Z depth -> world stereo -> physical XR output, exact lens scene scopes excluded; HMD UNTESTED")
 
 # Runtime diagnostic must remain observational: both eye buffers are already
