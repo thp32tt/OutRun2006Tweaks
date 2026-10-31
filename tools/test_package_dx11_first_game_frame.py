@@ -275,30 +275,54 @@ def test_raw_visual_native_source_contract():
     # finding an unused historical border string cannot satisfy this test.
     transport = (root / "src" / "vr" / "d3d11" /
                  "native_game_raw_color_transport.hpp").read_text(encoding="utf-8")
-    if "native_raw_copy_present_island(" not in header:
-        raise AssertionError("RAW Present must call the bounded island writer")
+    if "native_raw_copy_packed_present_island(" not in header:
+        raise AssertionError("RAW Present must call the bounded packed RGB writer")
+    if "native_raw_packed_surface_dimensions_match(" not in header or (
+        "tile.copyWidth, tile.copyHeight, back.Format" not in header):
+        raise AssertionError("RAW Present must create tile-sized SYSTEMMEM surfaces")
+    # The captured native source coordinates remain absolute, but the D3D9
+    # SYSTEMMEM upload RECT is packed and tile-local (0,0,w,h). A stale
+    # 256x144 source RECT must not read outside the new packed allocation.
+    if not all(marker in header for marker in (
+        "const RECT srcRect{",
+        "0, 0,",
+        "static_cast<LONG>(tile.copyWidth)",
+        "static_cast<LONG>(tile.copyHeight)",
+    )):
+        raise AssertionError("RAW packed UpdateSurface must use a local source RECT")
+    packed_start = transport.find("native_raw_copy_packed_present_island(")
+    packed_end = transport.find("native_raw_packed_surface_dimensions_match(",
+                                packed_start)
+    if packed_start < 0 or packed_end < packed_start:
+        raise AssertionError("RAW packed RGB transport implementation missing")
+    packed = transport[packed_start:packed_end]
     for required in (
         "native_raw_copy_to_d3d9_bgra(",
         "tile.copyWidth > captureWidth - tile.sourceX",
         "tile.copyHeight > captureHeight - tile.sourceY",
-        "destinationPitch < std::size_t{captureWidth} * 4u",
+        "validRows(beforePitch, captureHeight, sourceRowBytes)",
+        "validRows(afterPitch, captureHeight, sourceRowBytes)",
+        "validRows(destinationPitch, tile.copyHeight, outputRowBytes)",
+        "std::size_t{tile.sourceX} * 4u",
+        "native_raw_rgb_changed(",
     ):
-        if required not in transport:
-            raise AssertionError("RAW bounded source-island writer missing: " + required)
+        if required not in packed:
+            raise AssertionError("RAW packed RGB writer lost bounded source proof: " + required)
     border_guard = "if (native_raw_present_border_pixel("
-    guard_start = transport.find(border_guard)
+    guard_start = packed.find(border_guard)
     if guard_start < 0:
-        raise AssertionError("RAW border must protect genuine RGB pixels")
-    guard_end = transport.find("}", guard_start)
-    guarded_writes = transport[guard_start:guard_end]
+        raise AssertionError("RAW packed border must protect genuine RGB pixels")
+    guard_end = packed.find("}", guard_start)
+    guarded_writes = packed[guard_start:guard_end]
     for required in (
-        "native_raw_rgb_changed(p + offset, a + offset)",
-        "d[offset] = 255u;",
-        "d[offset + 1u] = 0u;",
-        "d[offset + 2u] = 255u;",
+        "preRow + offset, postRow + offset",
+        "outputRow[offset] = 255u;",
+        "outputRow[offset + 1u] = 0u;",
+        "outputRow[offset + 2u] = 255u;",
     ):
         if required not in guarded_writes:
-            raise AssertionError("RAW protected magenta pixel missing: " + required)
+            raise AssertionError("RAW packed protected magenta pixel missing: " + required)
+
 
 
 def main():
