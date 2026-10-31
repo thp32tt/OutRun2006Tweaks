@@ -17,12 +17,13 @@ class GPTChatOCRTests(unittest.TestCase):
         self.gpt_out=root/"gpt_out";self.gpt_out.mkdir()
         self.report=root/"report";(self.report/"processed_v3").mkdir(parents=True)
         self.queue=root/"queue";self.queue.mkdir()
-        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH","HOST_RETRY_PATH","PRODUCTION_MANIFEST","PIXEL_REVIEW_ROOT")}
+        self.old={k:getattr(g,k) for k in ("SRC","OUT","GPT_OUT","REPORT","QUEUE_DIR","STATE_PATH","AUDIT_PATH","HOST_RETRY_PATH","PRODUCTION_MANIFEST","PIXEL_REVIEW_ROOT","VISUAL_ABSENCE_PATH")}
         g.SRC=self.src;g.OUT=self.out;g.GPT_OUT=self.gpt_out;g.REPORT=self.report;g.QUEUE_DIR=self.queue
         g.STATE_PATH=self.queue/"state.json";g.AUDIT_PATH=self.queue/"audit.jsonl"
         g.HOST_RETRY_PATH=self.queue/"host_verified_retries.json"
         g.PRODUCTION_MANIFEST=self.queue/"production_manifest.json"
         g.PIXEL_REVIEW_ROOT=self.queue/"pixel_review"
+        g.VISUAL_ABSENCE_PATH=self.queue/"visual_absence.json"
         self.addCleanup(self.restore)
         self.name="Q001_TEST_BASE_READABLE_FLIPY.png"
         im=Image.new("RGBA",(100,60),(0,0,0,0))
@@ -188,6 +189,46 @@ class GPTChatOCRTests(unittest.TestCase):
         self.assertEqual(st["attempts"]["C2:"+timed_out],0)
         self.assertEqual(st["attempts"]["C2:"+succeeded],2)
         self.assertEqual(g._migrate_response_extractor_state(st),[])
+
+    def test_manual_visual_absence_is_sha_scoped_and_never_localization_pass(self):
+        absent={"schema":"outrun.ocr.visual_absence_review.v1","items":[
+          {"status":"NOT_VISIBLE_IN_THIS_VERIFIED_SPRITE_VARIANT",
+            "visual_review":"ORIGINAL_HD_IMAGE_DIRECTLY_INSPECTED_BY_CHATGPT_AI2",
+            "source_png":self.name,"source_sha256":self.row["png_sha256"],
+            "english":"HELLO"}]}
+        g.VISUAL_ABSENCE_PATH.write_text(json.dumps(absent),encoding="utf-8")
+        g._visual_absence_cached.cache_clear()
+        self.assertEqual(g.summary()["candidate_sources"],0)
+        self.assertEqual(g.summary()["retryable_sources"],0)
+        self.assertIsNone(g.next_binding("C1")[0])
+        self.assertEqual(list(self.gpt_out.glob("*/*/manifest.json")),[])
+        # A different source SHA or a changed positive judgement cannot hide
+        # a new or edited original image from the review queue.
+        absent["items"][0]["source_sha256"]="0"*64
+        g.VISUAL_ABSENCE_PATH.write_text(json.dumps(absent),encoding="utf-8")
+        g._visual_absence_cached.cache_clear()
+        self.assertEqual(g.summary()["retryable_sources"],1)
+        absent["items"][0]["source_sha256"]=self.row["png_sha256"]
+        absent["items"][0]["status"]="PENDING_VISUAL_REVIEW"
+        g.VISUAL_ABSENCE_PATH.write_text(json.dumps(absent),encoding="utf-8")
+        g._visual_absence_cached.cache_clear()
+        self.assertEqual(g.summary()["retryable_sources"],1)
+
+    def test_visual_absent_restriction_does_not_hide_another_phrase(self):
+        rec=self.report/"processed_v3"/(self.name+".json")
+        j=json.loads(rec.read_text(encoding="utf-8"))
+        j["unresolved_after"]=["HELLO","NEXT"]
+        rec.write_text(json.dumps(j),encoding="utf-8")
+        absent={"schema":"outrun.ocr.visual_absence_review.v1","items":[
+          {"status":"NOT_VISIBLE_IN_THIS_VERIFIED_SPRITE_VARIANT",
+           "visual_review":"ORIGINAL_HD_IMAGE_DIRECTLY_INSPECTED_BY_CHATGPT_AI2",
+           "source_png":self.name,"source_sha256":self.row["png_sha256"],
+           "english":"HELLO"}]}
+        g.VISUAL_ABSENCE_PATH.write_text(json.dumps(absent),encoding="utf-8")
+        g._visual_absence_cached.cache_clear()
+        bind,reason=g.next_binding("C1")
+        self.assertIsNone(reason)
+        self.assertEqual(bind["target_phrases"],["NEXT"])
 
     def test_pixel_crop_review_only_never_promotes_ocr_region(self):
         import os
