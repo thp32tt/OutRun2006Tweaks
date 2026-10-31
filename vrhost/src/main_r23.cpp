@@ -2381,7 +2381,12 @@ namespace
                     << whole.w << ',' << whole.h
                     << " outputUv=" << theaterUv.x << ',' << theaterUv.y
                     << ',' << theaterUv.w << ',' << theaterUv.h
-                    << " authority=VISIBLE_LOGICAL_RECT_LOCAL_FIXED_QUAD"
+                    << " fitPixels="
+                    << theaterUv.x * c.sourceWidth_ << ','
+                    << theaterUv.y * c.sourceHeight_ << ','
+                    << theaterUv.w * c.sourceWidth_ << ','
+                    << theaterUv.h * c.sourceHeight_
+                    << " authority=CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD"
                     << "\n";
                 OutRunVrEmitFullTrace(trace.str());
             }

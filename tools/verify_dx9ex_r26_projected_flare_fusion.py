@@ -34,22 +34,29 @@ assert "R30GetExactOpaqueAxisLensLiveWvp(" in builder
 assert builder.index("R30GetExactInlineProjectedLensRawWvp(") < builder.index("R30GetExactOpaqueAxisLensLiveWvp(") < builder.index("R44GetOwnedRawOverlayWvp(original)")
 for t in ("CurrentLensAxisOpaquePmt",
           "ExactProjectedLensAxisPmtActive()","GetVertexShaderConstantF(",
-          "DEFERRED_INTERVAL_AND_EXACT_405890_PMT_PRE_EYE"):
+          "EXACT_405890_PMT_NATIVE_C64_PRE_EYE"):
  assert t in axis,t
-for obj in ("0x57000Eu","0x570003u","0x570004u","0x570005u",
+assert "GetCurrentShaderEpoch(" not in axis
+assert "IsProjectedLensPmtObject" in axis
+for obj in ("0x570002u","0x570006u","0x57000Fu","0x570010u",
+            "0x57000Eu","0x570003u","0x570004u","0x570005u",
             "0x570007u","0x570008u","0x57000Au","0x570009u",
             "0x57000Bu","0x57000Cu","0x57000Du"):
  assert obj in semantics,obj
+assert "IsProjectedLensPmtObject" in semantics
 assert "CurrentLensDeferredPhysical" not in axis
 assert "QueueRenderActive()" not in axis
-assert "exact 405890 -> 404700 PMT executes *inside* the original" in axis
-assert "activeLensSource.objectId == 0x570008u" in tail
-assert "activeLensSource.callsite == 2u" in tail
-assert "activeLensSource.ordinal == 2u" in tail
-assert "sourceCameraSynced = false;" in tail
+assert "405890 has already loaded this exact entry's matrix" in axis
+assert "activeLensSource.objectId == 0x570008u" not in tail
+assert "activeLensSource.callsite == 2u" not in tail
+assert "activeLensSource.ordinal == 2u" not in tail
 axis_pmt_scope=body(hooks,"static void __cdecl TraceLensOpaquePmtEntry(")
 axis_flush_scope=body(hooks,"static void TraceLensOpaqueFlush(")
 assert axis_pmt_scope.index("ScopedLensAxisOpaquePmtOwner") < axis_pmt_scope.index("!Settings::VREnabled || !Settings::VRTelemetry")
+assert "IsProjectedLensPmtObject(entry[14])" in axis_pmt_scope
+assert "ScopedRenderSemantic exactSceneProjectedScope" in axis_flush_scope
+assert "RenderScope::ProjectedScreenEffect2D" in axis_flush_scope
+assert axis_flush_scope.index("ScopedRenderSemantic exactSceneProjectedScope") < axis_flush_scope.index("Module::fn_ptr<LensOpaqueFlushFn>(0x52C0)();")
 assert axis_flush_scope.index("ScopedLensAxisOpaqueFlushOwner") < axis_flush_scope.index("const bool trace = Settings::VREnabled && Settings::VRTelemetry")
 assert "deferred.objectId == 0x570008u" in axis_flush_scope
 assert "deferred.ordinal == 1u" in axis_flush_scope
@@ -77,4 +84,4 @@ for t in ("ProjectedLensRawWvp.Reset();","VR LENS PROJECTED RAW WVP CAPTURE",
  assert t in renderer,t
 assert dispatch.count("const HRESULT leftHr = actualDraw();")==1
 assert dispatch.count("rightHr = actualDraw();")==1
-print("PASS R26 exact C993 plus exact 405890 PMT flare-axis ownership; each CABE child keeps its own pre-eye native c64")
+print("PASS R26 complete sun-family exact 405890 PMT ownership; D44B/D79B c64 stays raw until one R85 angular-ray eye transform")

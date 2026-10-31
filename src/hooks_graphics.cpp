@@ -707,12 +707,17 @@ class VRLensFlareProjected2D : public Hook
 
         const auto axisFlush = CurrentLensAxisOpaqueFlush;
         LensAxisOpaquePmtOwner axisPmt{};
-        if (Settings::VREnabled && entry && axisFlush.valid &&
-            IsProjectedLensAxisObject(entry[14]) &&
+        if (Settings::VREnabled && entry &&
+            IsProjectedLensPmtObject(entry[14]) &&
             entry[5] != 0 && entry[6] != 0 && entry[7] != 0)
         {
+            // D79B carries the first-570008 source interval. D44B and the
+            // inline 405360 flushes are independently exact original call
+            // sites, so zero sourceSerial is valid there; PMT identity itself
+            // is the physical proof.
             axisPmt = {
-                axisFlush.sourceSerial, axisFlush.sequence,
+                axisFlush.valid ? axisFlush.sourceSerial : 0,
+                axisFlush.valid ? axisFlush.sequence : LensFlareSequence,
                 reinterpret_cast<std::uintptr_t>(entry),
                 entry[14], entry[5], entry[6], entry[7], entry[8], true
             };
@@ -831,6 +836,15 @@ class VRLensFlareProjected2D : public Hook
         const bool exactSceneFlush =
             origin == LensOpaqueFlushOrigin::SceneD44B ||
             origin == LensOpaqueFlushOrigin::SceneD79B;
+        // Runtime 23:57 + retail decomp prove these two original E8 sites
+        // submit only the same screen-space sun family (D44B: 570010/57000F,
+        // D79B: the eleven 40C9A0 axis sprites). Own the semantic BEFORE
+        // 405890 reloads the entry matrix/c64, otherwise the generic renderer
+        // head transform is injected before R30 can build the angular ray.
+        ScopedRenderSemantic exactSceneProjectedScope(
+            exactSceneFlush
+                ? RenderScope::ProjectedScreenEffect2D
+                : EffectiveScope());
         const bool exactAxisFlush =
             Settings::VREnabled &&
             deferred.sourceSerial != 0 &&

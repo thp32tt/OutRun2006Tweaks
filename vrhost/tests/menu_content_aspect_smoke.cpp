@@ -147,6 +147,28 @@ static_assert(!ShouldRefreshMenuLetterboxConfig(
 
 int main()
 {
+    // Quest 23:57 proof: Desktop Duplication sees 3440x1440 while the game
+    // mirror contains its logical 16:9 image at 440,0 with size 2560x1440.
+    // Reconstruct that fit; never sample literal [0,0..1920,1080].
+    {
+        using OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv;
+        const auto fit = PlanTopLeftLogicalCaptureUv(
+            0x00u, 0.f, 0.f, 3440.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f);
+        const auto gameplay = PlanTopLeftLogicalCaptureUv(
+            0xFFFFFFFFu, 0.f, 0.f, 3440.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f);
+        const auto native = PlanTopLeftLogicalCaptureUv(
+            0x09u, 0.f, 0.f, 1920.f, 1080.f,
+            1920.f, 1080.f, 2496.f, 2688.f);
+        if (!fit.crop || gameplay.crop || native.crop ||
+            std::fabs(fit.x - 440.f/3440.f) > 1.e-6f ||
+            std::fabs(fit.y) > 1.e-6f ||
+            std::fabs(fit.width - 2560.f/3440.f) > 1.e-6f ||
+            std::fabs(fit.height - 1.f) > 1.e-6f ||
+            std::fabs(fit.aspect - 16.f/9.f) > 1.e-6f)
+            return 124;
+    }
     // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
     // in its upper-left. Sample exactly that logical rectangle before the
     // LOCAL-fixed menu projection; never crop Ferrari selector/gameplay or

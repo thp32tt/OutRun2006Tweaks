@@ -5673,34 +5673,30 @@ namespace OutRunVRStereo
         {
             using namespace OutRunVR::GameSemantic;
             sourceCameraSynced = false;
-            // This exact 405890 -> 404700 PMT executes *inside* the original
-            // opaque queue. QueueRenderActive is therefore expected here and
-            // must not veto the exact object/node/mesh owner.
-            if (!device || !out ||
-                EffectiveScope() != RenderScope::SceneEffect ||
-                !ExactProjectedLensAxisPmtActive())
+            if (!device || !out || !ExactProjectedLensAxisPmtActive())
+                return false;
+
+            const auto scope = EffectiveScope();
+            if (scope != RenderScope::SceneEffect &&
+                scope != RenderScope::ProjectedScreenEffect2D)
                 return false;
 
             const auto& pmt = CurrentLensAxisOpaquePmt;
-            if (!pmt.valid || pmt.sourceSerial == 0 ||
-                pmt.sequence == 0 ||
-                !IsProjectedLensAxisObject(pmt.objectId))
+            if (!pmt.valid || !IsProjectedLensPmtObject(pmt.objectId))
                 return false;
 
-            std::uintptr_t currentShader = 0;
-            std::uint64_t currentShaderEpoch = 0;
-            if (!GetCurrentShaderEpoch(currentShader, currentShaderEpoch) ||
-                currentShader == 0 || currentShaderEpoch == 0)
-                return false;
-
+            // 405890 has already loaded this exact entry's matrix through
+            // world_411060 before calling 404700. This wrapper is still on the
+            // stack at the physical D3D9 Draw, so c64 is the current entry's
+            // native matrix. Do not require the renderer's cached shader epoch:
+            // the original 404700 material path is allowed to rebind its VS.
             IDirect3DVertexShader9* liveVs = nullptr;
             const HRESULT vsHr = device->GetVertexShader(&liveVs);
             const auto liveShader =
                 reinterpret_cast<std::uintptr_t>(liveVs);
             if (liveVs)
                 liveVs->Release();
-            if (FAILED(vsHr) || liveShader == 0 ||
-                liveShader != currentShader)
+            if (FAILED(vsHr) || liveShader == 0)
                 return false;
 
             if (FAILED(device->GetVertexShaderConstantF(
@@ -5717,19 +5713,17 @@ namespace OutRunVRStereo
                 static std::atomic<std::uint64_t> liveHits{0};
                 const auto hit = liveHits.fetch_add(
                     1, std::memory_order_relaxed) + 1;
-                if (hit <= 64 || (hit & (hit - 1)) == 0)
+                if (hit <= 96 || (hit & (hit - 1)) == 0)
                     spdlog::info(
-                        "VR LENS EXACT AXIS PMT LIVE C64: hit={} draw={} "
+                        "VR LENS EXACT PMT NATIVE C64: hit={} draw={} "
                         "sourceSerial={} sequence={} objectId=0x{:06X} "
                         "pass={} entry=0x{:X} object=0x{:X} node=0x{:X} "
-                        "mesh=0x{:X} shader=0x{:X} shaderEpoch={} "
-                        "cameraSynced={} "
-                        "authority=DEFERRED_INTERVAL_AND_EXACT_405890_PMT_PRE_EYE",
+                        "mesh=0x{:X} shader=0x{:X} cameraSynced={} "
+                        "authority=EXACT_405890_PMT_NATIVE_C64_PRE_EYE",
                         hit, TopLevelDrawSerial() + 1u,
                         pmt.sourceSerial, pmt.sequence, pmt.objectId, pmt.pass,
                         pmt.entry, pmt.object, pmt.node, pmt.mesh,
-                        currentShader, currentShaderEpoch,
-                        sourceCameraSynced ? 1 : 0);
+                        liveShader, sourceCameraSynced ? 1 : 0);
             }
             return true;
         }
@@ -5832,8 +5826,13 @@ namespace OutRunVRStereo
                     // exact SceneEffect/CABE provenance; never borrow the live
                     // c64 after a previous eye has injected head correction.
                     exactProjectedLensRaw =
-                        R30GetExactInlineProjectedLensRawWvp(
-                            original, exactProjectedLensCameraSynced);
+                        R30GetExactOpaqueAxisLensLiveWvp(
+                            device, original,
+                            exactProjectedLensCameraSynced);
+                    if (!exactProjectedLensRaw)
+                        exactProjectedLensRaw =
+                            R30GetExactInlineProjectedLensRawWvp(
+                                original, exactProjectedLensCameraSynced);
                     // 0x570002 has no game c64 callback in the failing Quest
                     // trace. Its exact C993 inline flush + exact PMT are still
                     // live here, before R30 writes either eye. Read the D3D9
@@ -5842,11 +5841,6 @@ namespace OutRunVRStereo
                     if (!exactProjectedLensRaw)
                         exactProjectedLensRaw =
                             R30GetExact570002LiveWvp(
-                                device, original,
-                                exactProjectedLensCameraSynced);
-                    if (!exactProjectedLensRaw)
-                        exactProjectedLensRaw =
-                            R30GetExactOpaqueAxisLensLiveWvp(
                                 device, original,
                                 exactProjectedLensCameraSynced);
                     if (!exactProjectedLensRaw &&
@@ -6042,20 +6036,10 @@ namespace OutRunVRStereo
                     return false;
 
                 const D3DMATRIX identityEye = IdentityMatrix();
-                const auto activeLensSource =
-                    OutRunVR::GameSemantic::CurrentLensOriginalCall;
-                bool sourceCameraSynced =
+                const bool sourceCameraSynced =
                     exactProjectedLensRaw
                         ? exactProjectedLensCameraSynced
                         : OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
-                // Quest 23:09 runtime: CABE's second immediate 0x570008
-                // (callsite 2, ordinal 2) was the sole flare element moving
-                // WITH the head. Its screen WVP is not camera-synchronised;
-                // applying cameraSynced=1 suppresses the required head inverse.
-                if (activeLensSource.objectId == 0x570008u &&
-                    activeLensSource.callsite == 2u &&
-                    activeLensSource.ordinal == 2u)
-                    sourceCameraSynced = false;
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyeProjection =

@@ -977,6 +977,24 @@ namespace OutRunVR::GameSemantic
     static_assert(!IsProjectedLensAxisObject(0x57000Fu));
     static_assert(!IsProjectedLensAxisObject(0x570010u));
 
+    constexpr bool IsProjectedLensPmtObject(
+        std::uint32_t objectId) noexcept
+    {
+        return IsProjectedLensAxisObject(objectId) ||
+            objectId == 0x570002u ||
+            objectId == 0x570006u ||
+            objectId == 0x57000Fu ||
+            objectId == 0x570010u;
+    }
+    static_assert(IsProjectedLensPmtObject(0x570002u));
+    static_assert(IsProjectedLensPmtObject(0x570006u));
+    static_assert(IsProjectedLensPmtObject(0x57000Fu));
+    static_assert(IsProjectedLensPmtObject(0x570010u));
+    static_assert(IsProjectedLensPmtObject(0x57000Eu));
+    static_assert(IsProjectedLensPmtObject(0x570008u));
+    static_assert(!IsProjectedLensPmtObject(0x570001u));
+    static_assert(!IsProjectedLensPmtObject(0x570011u));
+
     // Render-policy ownership is separate from the diagnostic receipts above.
     // The first 0x570008 source call brackets the one original axis-flare
     // 4052C0 flush; that interval alone grants NO object identity. The exact
@@ -1046,9 +1064,12 @@ namespace OutRunVR::GameSemantic
     inline bool ExactProjectedLensAxisPmtActive() noexcept
     {
         const auto& pmt = CurrentLensAxisOpaquePmt;
-        return pmt.valid && pmt.sourceSerial != 0 &&
-            pmt.sequence != 0 && pmt.entry != 0 &&
-            IsProjectedLensAxisObject(pmt.objectId) &&
+        // Exact 405890 -> 404700 receipt + retail lens-family object/node/mesh
+        // is the physical ownership proof. Source-window serials are useful
+        // diagnostics for D79B but are not required for the independently
+        // proven D44B or inline 405360 flush sites.
+        return pmt.valid && pmt.entry != 0 &&
+            IsProjectedLensPmtObject(pmt.objectId) &&
             pmt.object != 0 && pmt.node != 0 && pmt.mesh != 0;
     }
 

@@ -26,6 +26,7 @@ def verify(text: str) -> None:
         "c.GetCapturedGameUv(",
         "PlanTopLeftLogicalCaptureUv(",
         "logicalRectVisible=1",
+        "CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD",
         "c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)",
     )
     for token in required_theater:
@@ -68,7 +69,8 @@ def verify(text: str) -> None:
     # only the exact 1920x1080 logical rectangle itself must be fully visible.
     assert "GetCapturedGameUv(" in theater
     assert "capturedTheaterFullyVisible &&" not in theater
-    assert "VISIBLE_LOGICAL_RECT_LOCAL_FIXED_QUAD" in theater
+    assert "CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD" in theater
+    assert "fitPixels=" in theater
 
 
 verify(source)

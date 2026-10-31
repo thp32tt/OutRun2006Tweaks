@@ -138,7 +138,10 @@ namespace OutRunVrMenuAspect
         float logicalWidth = 1920.0f,
         float logicalHeight = 1080.0f) noexcept
     {
-        if (!IsTopLeftLogicalTheaterState(state) ||
+        // This helper is called by the explicit theater/menu branch with a
+        // concrete game-state value. The gameplay recovery call uses the
+        // sentinel and must retain its existing full/fragment path.
+        if (state == 0xFFFFFFFFu ||
             !std::isfinite(clientLeft) || !std::isfinite(clientTop) ||
             !std::isfinite(clientRight) || !std::isfinite(clientBottom) ||
             !std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
@@ -152,28 +155,66 @@ namespace OutRunVrMenuAspect
 
         const float clientWidth = clientRight - clientLeft;
         const float clientHeight = clientBottom - clientTop;
-        if (clientWidth < logicalWidth || clientHeight < logicalHeight)
-            return {};
-
-        // The captured client rectangle is already clipped to the desktop
-        // output (e.g. 2496x1440), so its aspect cannot identify the original
-        // XR target. Use the actual OpenXR/D3D9Ex physical target instead.
-        const float physicalAspect = physicalWidth / physicalHeight;
         const float logicalAspect = logicalWidth / logicalHeight;
-        if (!std::isfinite(physicalAspect) || !std::isfinite(logicalAspect) ||
-            physicalAspect >= logicalAspect - 0.10f)
+        if (!std::isfinite(logicalAspect) || logicalAspect <= 0.0f)
             return {};
 
-        const float logicalRight = clientLeft + logicalWidth;
-        const float logicalBottom = clientTop + logicalHeight;
-        if (clientLeft < 0.0f || clientTop < 0.0f ||
-            logicalRight > sourceWidth || logicalBottom > sourceHeight)
+        // Quest 2026-10-31 23:57 runtime proof:
+        //   desktopCapture=3440x1440, captured client=0,0,3440,1440
+        //   game mirror: logical=1920x1080 -> fittedWindow=2560x1440
+        //                origin=440,0 preserveAspect=true.
+        //
+        // Sampling literal source pixels [0,0..1920,1080] therefore selects
+        // the LEFT black bar plus only part of the game image. Reconstruct the
+        // exact same aspect-preserving centered fit that the game mirror owns.
+        float fitLeft = clientLeft;
+        float fitTop = clientTop;
+        float fitWidth = clientWidth;
+        float fitHeight = clientHeight;
+        const float clientAspect = clientWidth / clientHeight;
+        if (!std::isfinite(clientAspect) || clientAspect <= 0.0f)
+            return {};
+        if (clientAspect > logicalAspect)
+        {
+            fitHeight = clientHeight;
+            fitWidth = fitHeight * logicalAspect;
+            fitLeft += 0.5f * (clientWidth - fitWidth);
+        }
+        else if (clientAspect < logicalAspect)
+        {
+            fitWidth = clientWidth;
+            fitHeight = fitWidth / logicalAspect;
+            fitTop += 0.5f * (clientHeight - fitHeight);
+        }
+
+        const float fitRight = fitLeft + fitWidth;
+        const float fitBottom = fitTop + fitHeight;
+        if (!std::isfinite(fitLeft) || !std::isfinite(fitTop) ||
+            !std::isfinite(fitWidth) || !std::isfinite(fitHeight) ||
+            fitWidth <= 0.0f || fitHeight <= 0.0f ||
+            fitLeft < 0.0f || fitTop < 0.0f ||
+            fitRight > sourceWidth + 0.01f ||
+            fitBottom > sourceHeight + 0.01f)
             return {};
 
-        const float x = clientLeft / sourceWidth;
-        const float y = clientTop / sourceHeight;
-        const float width = logicalWidth / sourceWidth;
-        const float height = logicalHeight / sourceHeight;
+        // When the captured source already is exactly the logical aspect and
+        // occupies the full output, no crop is needed. This keeps ordinary
+        // 1920x1080 theater sources bit-for-bit on the established path.
+        constexpr float eps = 0.01f;
+        if (std::fabs(fitLeft - clientLeft) <= eps &&
+            std::fabs(fitTop - clientTop) <= eps &&
+            std::fabs(fitWidth - clientWidth) <= eps &&
+            std::fabs(fitHeight - clientHeight) <= eps &&
+            std::fabs(clientLeft) <= eps &&
+            std::fabs(clientTop) <= eps &&
+            std::fabs(clientRight - sourceWidth) <= eps &&
+            std::fabs(clientBottom - sourceHeight) <= eps)
+            return {};
+
+        const float x = fitLeft / sourceWidth;
+        const float y = fitTop / sourceHeight;
+        const float width = fitWidth / sourceWidth;
+        const float height = fitHeight / sourceHeight;
         if (!std::isfinite(x) || !std::isfinite(y) ||
             !std::isfinite(width) || !std::isfinite(height) ||
             x < 0.0f || y < 0.0f || width <= 0.0f || height <= 0.0f ||
