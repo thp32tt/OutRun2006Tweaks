@@ -1,0 +1,62 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa_idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T1345KST-IDLE",
+  "scheduled_slot_kst": "2026-10-31T13:45:00+09:00",
+  "checked_at_kst": "2026-10-31T13:46:55+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "inspected_remote_head": "24240e8ce5b541691086f8ec2a456461a8d633b1",
+  "policy_refs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "status": "IDLE_NO_NEW_UNREVIEWED_EXPORTED_SHA",
+  "source": "N100 /home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "inventory": {
+    "candidate_png_A": 437,
+    "candidate_png_B": 483,
+    "candidate_png_total": 920,
+    "export_file_sha_mappings": 920,
+    "prior_qa_reports_scanned": 197,
+    "already_reviewed_distinct_sha": 925,
+    "pending_unreviewed_sha_with_export": 0,
+    "candidates_missing_export_mapping": 0,
+    "cutoff_kst": "2026-10-30T18:21:49+09:00",
+    "files_modified_after_cutoff": {
+      "A": 0,
+      "B": 0
+    },
+    "latest_candidate_mtime_kst": {
+      "A": "2026-10-30T18:00:02+09:00",
+      "B": "2026-10-30T17:50:07+09:00"
+    }
+  },
+  "qa_this_slot": {
+    "new_candidates_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "evidence": {
+    "dedup_script": "work/C1_QA_20261030_1945_dedup_readonly.py",
+    "inventory_script": "work/C1_QA_20261030_1945_inventory_readonly.py",
+    "method": "Ran both existing N100 read-only scripts for current candidate filename/export SHA mapping vs prior C1 SHA decisions and for modified-time inventory. No candidates selected."
+  },
+  "limitations": [
+    "IDLE is an inventory/dedup observation, not a new visual QA.",
+    "Physical PNG bytes of all 920 candidates not independently rehashed in this run; verified export filename/SHA mappings and candidate mtimes.",
+    "C1 never grants C2/C3, DDS, runtime or user in-game PASS."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "DDS_created": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_changed": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score_change": 0
+}
