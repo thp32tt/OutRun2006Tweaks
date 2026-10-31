@@ -208,6 +208,37 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         self.assertTrue(self.tick(9, 31, 30))
         self.assertEqual(self.sent, [PROMPT, PROMPT, PROMPT])
 
+    def test_production_cooldown_is_30_minutes_not_2_minutes(self):
+        self.ns["UW2_CONTINUE_MIN_SECONDS"] = 1800
+        self.assertTrue(self.tick(9, 0))
+        self.answer = "Implemented a complete integration batch."
+        self.assertFalse(self.tick(9, 4))
+        self.assertFalse(self.tick(9, 10))
+        self.assertFalse(self.tick(9, 20))
+        self.assertFalse(self.tick(9, 29, 59))
+        self.assertEqual(self.sent, [PROMPT])
+        self.assertTrue(self.tick(9, 30))
+        self.assertEqual(self.sent, [PROMPT, PROMPT])
+        self.assertEqual(self.q["uw2_simple"]["last_send_reason"], "schedule_fallback")
+
+    def test_30_minute_boundary_cannot_interrupt_busy_development(self):
+        self.ns["UW2_CONTINUE_MIN_SECONDS"] = 1800
+        self.assertTrue(self.tick(9, 0))
+        self.busy = True
+        self.assertFalse(self.tick(9, 30))
+        self.assertEqual(self.sent, [PROMPT])
+        self.busy = False
+        self.answer = "Long-running work completed"
+        self.assertFalse(self.tick(9, 32))
+        self.assertTrue(self.tick(9, 32, 30))
+        self.assertEqual(self.sent, [PROMPT, PROMPT])
+        self.assertEqual(self.new_pages, 0)
+
+    def test_live_configuration_enforces_low_input_floor(self):
+        source = (ROOT / "src-vr-v2" / "controller.py.part00").read_text()
+        self.assertIn('UW2_CONTINUE_MIN_SECONDS = max(1800,', source)
+        self.assertIn('os.getenv("UW2_CONTINUE_MIN_SECONDS", "1800")', source)
+
     def test_prompt_router_early_return_has_no_extra_text(self):
         node = FUNCS["prompt_for_slot"]
         module = ast.fix_missing_locations(ast.Module(body=[node], type_ignores=[]))
