@@ -73,7 +73,8 @@ mutations = (
     ("quad.space = localSpace;", "quad.space = viewSpace;"),
     ("quad.pose = c.theaterAnchor_;", "quad.pose = {};"),
     ("R23RenderTheater(", "R23RenderWorldLockedMenuProjection("),
-    ("&quad);", "&projection);"),
+    ("fs.predictedDisplayTime, quad, false",
+     "fs.predictedDisplayTime, projection, false"),
     ('menu-local-fixed-quad-fresh', 'menu-local-fixed-projection-fresh'),
     ("compositor.ReferenceSpaceChanged();", "/* no anchor reset */"),
 )
