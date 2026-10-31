@@ -97,6 +97,8 @@ try {
             '-UnifiedEyeMenuSource=false',
             '-AntiAliasing=2',
             '-Graphics.ReflectionResolution=256',
+            '-Graphics.ReflectionUpdateRate=0.25',
+            '-Graphics.DisableVehicleLODs=false',
             '-Graphics.TransparencySupersampling=false',
             '-VR.TransparencySupersampling=false',
             '-VR.Telemetry=false',
