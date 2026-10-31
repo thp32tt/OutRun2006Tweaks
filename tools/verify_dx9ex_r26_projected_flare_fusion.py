@@ -31,7 +31,9 @@ for t in ("GetLatchedHeadInverse(","const D3DMATRIX identityEye = IdentityMatrix
  assert t in tail,t
 assert "R30GetExactInlineProjectedLensRawWvp(" in builder
 assert "R30GetExactOpaqueAxisLensLiveWvp(" in builder
-assert builder.index("R30GetExactInlineProjectedLensRawWvp(") < builder.index("R30GetExactOpaqueAxisLensLiveWvp(") < builder.index("R44GetOwnedRawOverlayWvp(original)")
+# Exact physical 405890 PMT ownership is stronger than historical inline
+# wrapper provenance, so it must be attempted first.
+assert builder.index("R30GetExactOpaqueAxisLensLiveWvp(") < builder.index("R30GetExactInlineProjectedLensRawWvp(") < builder.index("R44GetOwnedRawOverlayWvp(original)")
 for t in ("CurrentLensAxisOpaquePmt",
           "ExactProjectedLensAxisPmtActive()","GetVertexShaderConstantF(",
           "EXACT_405890_PMT_NATIVE_C64_PRE_EYE"):
