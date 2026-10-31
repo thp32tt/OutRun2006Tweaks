@@ -10,8 +10,17 @@ using namespace outrun::vr::dx11;
 int main() {
     constexpr std::uint32_t W = NativeRawChangedPixelWindow::kWidth;
     constexpr std::uint32_t H = NativeRawChangedPixelWindow::kHeight;
-    std::array<std::uint8_t, W*H*4u> before{}, after{};
-    NativeRawChangedPixelWindow chooser;
+    static std::array<std::uint8_t, W*H*4u> before{}, after{};
+    static NativeRawChangedPixelWindow chooser;
+    static_assert(W == 512u && H == 288u);
+    // Authenticate a far-edge game fragment absent from the former 384x216 source box.
+    for (std::uint32_t y = 264u; y < 272u; ++y)
+        for (std::uint32_t x = 456u; x < 472u; ++x)
+            after[(std::size_t{y} * W + x) * 4u + 2u] = 201u;
+    chooser.capture(before.data(), W * 4u, after.data(), W * 4u);
+    assert(chooser.changed_pixels(NativeRawPresentTile{456u, 264u, 16u, 8u, 1456, 764}) == 128u);
+    assert(chooser.changed_pixels(NativeRawPresentTile{456u, 264u, 17u, 8u, 1456, 764}) == 128u);
+    after.fill(0u);
     NativeRawPresentTile original{}, selected{};
     std::uint32_t changed = 0u;
     assert(native_raw_partial_present_tile(1920u, 1080u, 700, 300,

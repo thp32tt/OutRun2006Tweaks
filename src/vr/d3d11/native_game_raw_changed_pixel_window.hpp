@@ -12,8 +12,8 @@
 namespace outrun::vr::dx11 {
 class NativeRawChangedPixelWindow final {
 public:
-    static constexpr std::uint32_t kWidth = 384u;
-    static constexpr std::uint32_t kHeight = 216u;
+    static constexpr std::uint32_t kWidth = 512u;
+    static constexpr std::uint32_t kHeight = 288u;
     static constexpr std::size_t kStride = kWidth + 1u;
 
     // Caller owns the mapped, format-validated before/after staging images.
@@ -24,7 +24,7 @@ public:
                  std::uint32_t captureHeight = kHeight) noexcept {
         prefix_.fill(0u);
         // A game-created menu/vehicle surface can be smaller than the
-        // 384x216 diagnostic maximum. Keep the same fixed-size scratch
+        // 512x288 diagnostic maximum. Keep the same fixed-size scratch
         // buffer but admit only bytes copied from that authentic target.
         windowWidth_ = captureWidth <= kWidth ? captureWidth : 0u;
         windowHeight_ = captureHeight <= kHeight ? captureHeight : 0u;
@@ -155,7 +155,7 @@ public:
             rgb = total;
             return true;
         }
-        // changed_pixels proved the bounded source footprint (<=384x216).
+        // changed_pixels proved the bounded source footprint (<=512x288).
         std::array<std::uint32_t, kWidth> heights{};
         std::array<std::uint32_t, kWidth> stack{};
         constexpr auto max = (std::numeric_limits<std::int64_t>::max)();
@@ -259,7 +259,7 @@ private:
         const auto br = bl + w;
         return prefix_[br] - prefix_[tr] - prefix_[bl] + prefix_[tl];
     }
-    // Inclusive prefix of genuine GPU RGB deltas; max sum is 256*144.
+    // Inclusive prefix of genuine GPU RGB deltas; max sum is 512*288.
     // Keep scratch storage on the preview owner, not a large hook-call stack.
     std::array<std::uint32_t, (kWidth + 1u) * (kHeight + 1u)> prefix_{};
     std::uint32_t windowWidth_ = 0u, windowHeight_ = 0u;

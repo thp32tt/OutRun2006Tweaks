@@ -147,7 +147,7 @@ bool native_raw_tiny_rgb_source_upload_regression() {
     const std::array<std::uint8_t, 16> before{};
     std::array<std::uint8_t, 16> after{};
     after[0] = 21u; after[1] = 43u; after[2] = 65u; after[3] = 87u;
-    NativeRawChangedPixelWindow gpu{};
+    static NativeRawChangedPixelWindow gpu{};
     gpu.capture(before.data(), 8u, after.data(), 8u, 2u, 2u);
     NativeRawPresentDirtyRegion sourceRepaint{};
     NativeRawPresentTile clipped{};
@@ -208,7 +208,7 @@ bool native_raw_large_crop_sparse_dirty_source_regression() {
     const std::array<std::uint8_t, 16> before{};
     std::array<std::uint8_t, 16> after{};
     after[0] = 4u; after[1] = 5u; after[2] = 6u; after[3] = 7u;
-    NativeRawChangedPixelWindow delta{};
+    static NativeRawChangedPixelWindow delta{};
     delta.capture(before.data(), 8u, after.data(), 8u, 2u, 2u);
     NativeRawPresentTile source{};
     if (!native_raw_source_capture_clip_tile(
@@ -569,7 +569,7 @@ bool native_raw_ranked_two_capture_present_regression() {
      for (std::uint32_t y = 1u; y < 3u; ++y)
          for (std::uint32_t x = 1u; x < 11u; ++x)
              post[(y * w + x) * 4u + 1u] = 0x78u;
-     NativeRawChangedPixelWindow rgb{};
+     static NativeRawChangedPixelWindow rgb{};
      rgb.capture(pre.data(), pitch, post.data(), pitch, w, h);
      NativeRawPresentDirtyRegion dirty{};
      dirty.headerVerified = true; dirty.count = 4u;
@@ -694,13 +694,13 @@ bool native_raw_ranked_two_capture_present_regression() {
  bool native_raw_expanded_source_window_regression() {
      constexpr auto w = NativeRawChangedPixelWindow::kWidth;
      constexpr auto h = NativeRawChangedPixelWindow::kHeight;
-     static_assert(w == 384u && h == 216u);
+     static_assert(w == 512u && h == 288u);
      constexpr auto pitch = std::size_t{w} * 4u;
-     std::array<std::uint8_t, pitch * h> pre{}, post{};
-     for (std::uint32_t y = 196u; y < 204u; ++y)
-         for (std::uint32_t x = 344u; x < 360u; ++x)
+     static std::array<std::uint8_t, pitch * h> pre{}, post{};
+     for (std::uint32_t y = 264u; y < 272u; ++y)
+         for (std::uint32_t x = 456u; x < 472u; ++x)
              post[(std::size_t{y} * w + x) * 4u + 1u] = 171u;
-     NativeRawChangedPixelWindow gpu{};
+     static NativeRawChangedPixelWindow gpu{};
      gpu.capture(pre.data(), pitch, post.data(), pitch, w, h);
      NativeRawPresentTile source{};
      if (!native_raw_source_capture_clip_tile(
@@ -710,18 +710,18 @@ bool native_raw_ranked_two_capture_present_regression() {
          return false;
      NativeRawPresentDirtyRegion dirty{};
      dirty.headerVerified = true; dirty.count = 2u;
-     dirty.boundLeft = 1344; dirty.boundTop = 696;
-     dirty.boundRight = 1360; dirty.boundBottom = 704;
-     dirty.rectangles[0] = {1344, 696, 1352, 704};
-     dirty.rectangles[1] = {1352, 696, 1360, 704};
+     dirty.boundLeft = 1456; dirty.boundTop = 764;
+     dirty.boundRight = 1472; dirty.boundBottom = 772;
+     dirty.rectangles[0] = {1456, 764, 1464, 772};
+     dirty.rectangles[1] = {1464, 764, 1472, 772};
      NativeRawSourceIslandBatch batch{};
      if (!batch.append(1920u, 1080u, dirty, source, gpu,
                        false, true) ||
          batch.count != 1u || batch.rgbPixels[0] != 128u ||
-         batch.tiles[0].sourceX != 344u ||
-         batch.tiles[0].sourceY != 196u ||
-         batch.tiles[0].destinationX != 1344 ||
-         batch.tiles[0].destinationY != 696 ||
+         batch.tiles[0].sourceX != 456u ||
+         batch.tiles[0].sourceY != 264u ||
+         batch.tiles[0].destinationX != 1456 ||
+         batch.tiles[0].destinationY != 764 ||
          batch.tiles[0].copyWidth != 16u ||
          batch.tiles[0].copyHeight != 8u ||
          !native_raw_dirty_region_covers_tile(
@@ -741,14 +741,14 @@ bool native_raw_ranked_two_capture_present_regression() {
      if (batch.append(1920u, 1080u, dirty, source, gpu, true, true))
          return false;
      // Malformed original dirty bounds never grant RAW publication.
-     dirty.boundRight = 1361;
+     dirty.boundRight = 1473;
      NativeRawSourceIslandBatch forged{};
      if (forged.append(1920u, 1080u, dirty, source, gpu, false, true))
          return false;
      // A real dirty-region hole can select a smaller authentic island,
      // but cannot publish through the hole.
-     dirty.boundRight = 1360;
-     dirty.rectangles[1].left = 1353;
+     dirty.boundRight = 1472;
+     dirty.rectangles[1].left = 1465;
      NativeRawSourceIslandBatch hole{};
      if (hole.append(1920u, 1080u, dirty, source, gpu, false, true) &&
          !native_raw_dirty_region_covers_tile(
