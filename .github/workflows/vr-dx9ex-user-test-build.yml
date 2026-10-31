@@ -17,6 +17,7 @@ on:
       - 'tools/verify_vr_unified_menu_source.py'
       - 'tools/verify_vr_menu_resolution_split.py'
       - 'tools/verify_vr_r23_menu_letterbox_cache.py'
+      - 'tools/verify_vr_r23_menu_fov_cache_provenance.py'
       - 'tools/verify_vr_f11_font_density.py'
       - 'tools/verify_vr_r26_landscape_visual_recovery.py'
       - 'tools/verify_focus_official_diagnostics.py'
@@ -60,6 +61,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Menu/XR render-target split failed' }
           python tools/verify_vr_r23_menu_letterbox_cache.py
           if ($LASTEXITCODE -ne 0) { throw 'Centered LOCAL menu/restart quad contract failed' }
+          python tools/verify_vr_r23_menu_fov_cache_provenance.py
+          if ($LASTEXITCODE -ne 0) { throw 'Menu quad must not depend on cached projection FOV' }
           python tools/verify_vr_f11_font_density.py
           if ($LASTEXITCODE -ne 0) { throw 'F11 VR density/layout contract failed' }
           python tools/verify_vr_r26_landscape_visual_recovery.py
