@@ -1,0 +1,169 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01190",
+  "production_id": "CONVERSION-DX11-01190",
+  "event_id": "CONVERSION-DX11-01190-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_GPU_RGB_RANKED_DUAL_CAPTURE_GAME_PRESENT",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "73216a57e6fc0fa568c9795f0d8d13fe80236d22",
+  "implementation_source_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+  "material_result_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+  "validation_bearing_result_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "implementation": "Bounded authentic GPU RGB source-aligned Present now selects the highest newly publishable RGB island across both before/after native captures, rather than alternating equal-slot priority. Both captures receive independent fixed-size RGB delta workspaces, candidate appends are tentative until the winner is selected, and existing eight private D3D9 SYSTEMMEM surfaces retain complete staging preflight, original-screen coordinates, D3D9 repaint coverage and fail-closed fallback. Integrated C++ positive regression proves 32 true primary RGB pixels in 8 slots instead of 20 from fixed alternation and mixed-capture 2 dense plus 6 sparse original screen pixels, rejecting overlap and forged dirty rcBound. RAW opt-in diagnostic only, not native full-frame or HMD proof.",
+  "validation": {
+    "exact_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+    "required_push_workflows_result": "5/5 completed success on identical exact SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41229933428,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+        "event": "push"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41229933536,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+        "event": "push"
+      },
+      {
+        "name": "Build",
+        "run_id": 41229933554,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+        "event": "push"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41229933493,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+        "event": "push"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41229933490,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "09c3975e8032dd368fc7d15a60eb602e1d3a3868",
+        "event": "push"
+      }
+    ],
+    "targeted_test": "tests/native_raw_changed_crop_present_test.cpp compiled and executed by DX11 Fast Structural Checks; ranked two-capture eight-slot positive, mixed source, disjoint-pixel and forged-dirty negative regressions PASS",
+    "runtime_game_and_quest3": "UNTESTED"
+  },
+  "safety": {
+    "raw_opt_in_default_off": true,
+    "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
+    "dxvk": "FROZEN_UNMODIFIED",
+    "native_game_full_frame": "NOT_CLAIMED",
+    "external_controller_adoption": "UNVERIFIED"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_DRAW",
+      "TWO_AUTHENTIC_NATIVE_GPU_RGB_PRE_POST_CAPTURES",
+      "PIXEL_COUNT_PRIORITIZED_SOURCE_ALIGNED_ISLANDS",
+      "EIGHT_PRIVATE_D3D9_STAGING_SURFACES",
+      "ORIGINAL_GAME_PRESENT"
+    ],
+    "batch_components": [
+      "SOURCE_PRESENT_TWO_CAPTURE_RANKED_ISLAND_SELECTOR",
+      "INDEPENDENT_CAPTURE_RGB_PREFIX_SCRATCH_AND_REAL_GAME_UPLOAD",
+      "SOURCE_COORDINATE_AND_FORGED_DIRTY_CPP_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "GitHub Fast C++17 exact source SHA success for prioritizing eight dense primary source islands (32 RGB) and mixed two-capture 2+6 islands.",
+      "negative_regression": "Source tiles remain strictly nonoverlapping, batch cannot exceed eight, and forged D3D9 dirty rcBound grants no additional publication.",
+      "component_integration": "Canonical game D3D9 Draw -> real native D3D11 GPU PRE/POST pixels -> priority-based disjoint original-screen batch -> preflighted private SYSTEMMEM staging -> original game D3D9 Present. Explicit RAW opt-in; HMD untested."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_changed_crop_present_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "PARTIAL_AUTHENTIC_NATIVE_GPU_RGB_SOURCE_ISLANDS_ONLY; COMPLETE_MENU_CAR_RACE_AND_QUEST3_HMD_UNTESTED",
+    "activation_guard_and_fallback": "RAW opt-in default OFF; original source backbuffer/dirty/epoch checks, protected D3D9 input/FFB, DX9Ex fallback and DXVK freeze preserved"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Prioritize verified genuine DX11 RGB pixels of independently captured original game source panels within fixed eight D3D9 Present staging slots.",
+    "scope": "PARTIAL_AUTHENTIC_SOURCE_ALIGNED_OPT_IN_DIAGNOSTIC",
+    "acceptance_items": [
+      {
+        "id": "ranked_two_capture_rgb",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Choose greater native GPU RGB count per source-aligned slot, not fixed alternate slot order."
+      },
+      {
+        "id": "mixed_capture_source_safety",
+        "category": "fallback_regression",
+        "expected_behavior": "Preserve original-source game coordinates, disjoint RGB islands, forged-dirty rejection and eight-stage preflight."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "expected_behavior": "All five mandatory GitHub push workflows pass at identical material SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "ranked_two_capture_rgb": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "GitHub Actions fast 41229933428"
+    },
+    "mixed_capture_source_safety": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "GitHub Actions fast 41229933428"
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41229933428",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41229933536",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41229933554",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41229933493",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41229933490"
+      ],
+      "validation_command": "41229933428, 41229933536, 41229933554, 41229933493, 41229933490"
+    }
+  },
+  "scoring": "Same unfinished DX11 full-native-frame feature continuation; C6, the Gate result, repeated checks and this source prioritization refinement are not separately scored. GitHub AI2 scoreboard remains at latest confirmed baseline unless new independent score criteria are established."
+}
