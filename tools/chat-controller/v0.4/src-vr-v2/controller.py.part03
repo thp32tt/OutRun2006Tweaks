@@ -2496,12 +2496,12 @@ def reconcile_legacy_conversion_blocked(q: dict) -> bool:
 
 
 async def uw2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: dict, now: datetime) -> bool:
-    """A single project chat and one short message per :00/:30 scheduling window.
+    """Continue the same UW2 chat on completed replies, with :00/:30 recovery.
 
-    This lane has NO production/task/event IDs, GitHub commit polling, C6, or
-    forced 30-minute conversation rotation. A busy worker is never interrupted.
-    One pending window survives its minute until the worker becomes idle; a newer
-    window replaces the older one instead of piling up requests.
+    C has no task IDs, no commit-as-terminal logic and no forced rollover.
+    One unchanged Korean sentence is sent only after the prior response settles,
+    or on a scheduled fallback when the composer is idle. Busy generation,
+    rate limits and short send gaps never trigger a Stop button or chat replacement.
     """
     if not UW2_WEB_PORT_ENABLED or (CONVERSION_ONLY_SLOT and CONVERSION_ONLY_SLOT != "C"):
         return False
@@ -2511,17 +2511,30 @@ async def uw2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: d
         if state.get("last_sent_window") != window:
             state["pending_window"] = window
     pending = str(state.get("pending_window") or "")
-    if not pending or pending == state.get("last_sent_window"):
-        return False
-    try:
-        scheduled_at = datetime.fromisoformat(pending)
-    except ValueError:
+    if pending and pending == state.get("last_sent_window"):
         state.pop("pending_window", None)
-        save_queue_state(q)
+        pending = ""
+    if pending:
+        try:
+            scheduled_at = datetime.fromisoformat(pending)
+        except ValueError:
+            state.pop("pending_window", None)
+            save_queue_state(q)
+            pending = ""
+        else:
+            if (now - scheduled_at).total_seconds() >= 1800:
+                state.pop("pending_window", None)
+                save_queue_state(q)
+                pending = ""
+
+    last_sent = _parse_iso(state.get("last_sent_at"))
+    age = (now - last_sent).total_seconds() if last_sent else None
+    reply_probe_due = age is not None and age >= UW2_CONTINUE_MIN_SECONDS
+    if not pending and not reply_probe_due:
         return False
-    if (now - scheduled_at).total_seconds() >= 1800:
-        state.pop("pending_window", None)
-        save_queue_state(q)
+    # Even the scheduled fallback waits for a minimum gap if a reply follow-up
+    # occurred just before the half-hour boundary.
+    if age is not None and age < UW2_CONTINUE_MIN_SECONDS:
         return False
 
     reg = load_registry(now)
@@ -2537,41 +2550,69 @@ async def uw2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: d
     if state.get("fresh_chat_required"):
         page = await replace_with_fresh_slot_page(context, pages, slot)
         state["fresh_chat_required"] = False
+        state.pop("last_observed_response_hash", None)
+        state.pop("last_observed_response_at", None)
+        state.pop("response_before_send_hash", None)
         save_queue_state(q)
         save_registry(reg)
     else:
         page = await slot_page(context, pages, slot)
         if slot.url and (await detect_conversation_limit(page)
                          or await first_visible(page, RETRY_SELECTORS, total_wait_ms=300) is not None):
-            # Start another chat only when the old one is unusable.
             page = await replace_with_fresh_slot_page(context, pages, slot)
+            state.pop("last_observed_response_hash", None)
+            state.pop("last_observed_response_at", None)
+            state.pop("response_before_send_hash", None)
+            save_queue_state(q)
             save_registry(reg)
 
-    # Sending while ChatGPT is still generating would truncate the development
-    # session. Leave the scheduled follow-up pending and retry when idle.
     if await detect_busy(page):
         write_runtime(status="uw2_simple_busy",
-                      last_action="C still working; follow-up queued, no stop or new chat")
+                      last_action="C still generating; do not interrupt, follow-up retained")
         return False
     if not await ensure_logged_in(page):
         write_runtime(status="uw2_simple_login_required",
-                      last_action="C login required; pending message retained")
+                      last_action="C login required; follow-up retained")
         return False
     if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1300) is None:
         page = await recover_slot_composer(context, pages, slot, page)
         if await first_visible(page, INPUT_SELECTORS, total_wait_ms=2500) is None:
             write_runtime(status="uw2_simple_composer_missing",
-                          last_action="C composer unavailable; pending retained")
+                          last_action="C composer unavailable; follow-up retained")
             return False
     if await detect_rate_limit(page) or await detect_limit(page):
         mark_rate_limit(reg, datetime.now(TZ), "uw2-simple-c")
         return False
 
-    # This is the entire user-visible message: no ID, metadata or long prompt.
+    # Persist the response fingerprint so a long reply must finish and remain
+    # unchanged for a short period before a new message is inserted.
+    response = await last_assistant_text(page)
+    response_sha = stable_hash(response) if response else ""
+    observed_sha = str(state.get("last_observed_response_hash") or "")
+    if response_sha and response_sha != observed_sha:
+        state["last_observed_response_hash"] = response_sha
+        state["last_observed_response_at"] = now.isoformat()
+        save_queue_state(q)
+        observed_at = now
+    else:
+        observed_at = _parse_iso(state.get("last_observed_response_at")) or now
+
+    response_ready = bool(
+        reply_probe_due
+        and response_sha
+        and response_sha != state.get("response_before_send_hash")
+        and response_sha != state.get("last_followed_response_hash")
+        and (now - observed_at).total_seconds() >= UW2_RESPONSE_STABLE_SECONDS
+    )
+    if not pending and not response_ready:
+        return False
+
+    # A half-hour recovery pulse and response-complete wake-up both carry the
+    # same exact one-sentence prompt. No task ID or plan is pasted in chat.
     sent_result = await send_message(page, "웹포팅 개발 계속진행해")
     if sent_result != "sent":
         write_runtime(status="uw2_simple_send_retry",
-                      last_action=f"C send did not succeed: {sent_result}")
+                      last_action=f"C send deferred: {sent_result}")
         return False
 
     sent_at = datetime.now(TZ)
@@ -2582,20 +2623,25 @@ async def uw2_simple_cycle(context: BrowserContext, pages: dict[str, Page], q: d
     note_successful_request(reg, sent_at, slot.name)
     slot.runs += 1
     slot.last_sent_at = sent_at.isoformat()
-    slot.last_result = "uw2_simple_continue_sent"
+    slot.last_result = "uw2_reply_continuation_sent" if response_ready else "uw2_scheduled_continuation_sent"
     slot.last_assistant_hash = None
     slot.last_assistant_change_at = sent_at.isoformat()
     slot.watchdog_resumes_since_schedule = 0
     save_registry(reg)
-    state["last_sent_window"] = pending
-    state.pop("pending_window", None)
     state["last_sent_at"] = sent_at.isoformat()
+    state["response_before_send_hash"] = response_sha or None
+    if response_ready:
+        state["last_followed_response_hash"] = response_sha
+    if pending:
+        state["last_sent_window"] = pending
+        state.pop("pending_window", None)
+    state["last_send_reason"] = "response_complete" if response_ready else "schedule_fallback"
+    state["continuations_sent"] = int(state.get("continuations_sent") or 0) + 1
     save_queue_state(q)
-    write_runtime(status="uw2_simple_running",
-                  last_action="C: short continuation sent; same chat retained",
+    write_runtime(status="uw2_reply_continuation_running",
+                  last_action=f"C: {state['last_send_reason']} follow-up sent in same chat",
                   uw2_simple=state, queue=q)
     return True
-
 
 async def conversion_send_lane_task(
     context: BrowserContext,
