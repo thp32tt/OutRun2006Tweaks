@@ -347,6 +347,23 @@ struct NativeRawPresentDirtyRegion {
             evaluateCandidate(p.left, p.top, p.right, p.bottom);
         }
     };
+    // The genuine GPU delta itself can identify a solid rectangular game
+    // pixel island whose boundary falls INSIDE several D3D9 RGNDATA members.
+    // In an L/T-shaped union, considering only member/connected bounds can
+    // reject the large valid RGB core because the union has an unrelated
+    // unpainted arm. Derive one exact GPU-solid candidate before inspecting
+    // original dirty member geometry; it grants NO paint authority. 'consider'
+    // subtracts previous source-owned uploads and evaluateCandidate checks
+    // the whole original dirty union, source coordinates, and GPU RGB again.
+    if (preferSolidRgb && gpuDelta.changed_pixels(sourceAligned)) {
+        NativeRawPresentTile gpuCore{};
+        std::uint32_t coreRgb = 0u;
+        if (gpuDelta.select_solid_rgb_tile(
+                sourceAligned, gpuCore, coreRgb) && coreRgb)
+            consider(gpuCore.destinationX, gpuCore.destinationY,
+                     gpuCore.destinationX + gpuCore.copyWidth,
+                     gpuCore.destinationY + gpuCore.copyHeight);
+    }
     // Keep the original single-rectangle fast path and its stable tie-break.
     for (std::uint32_t i = 0u; i < dirty.count; ++i) {
         const auto& r = dirty.rectangles[i];

@@ -557,4 +557,57 @@ bool native_raw_ranked_two_capture_present_regression() {
     return true;
 }
 
-int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); assert(native_raw_ranked_two_capture_present_regression()); }
+
+ // Authentic GPU RGB spans three D3D9 menu repaint strips while a fourth
+ // dirty member extends into a lower decorative arm. The full dirty bound
+ // is NOT solid, but the GPU-created core is and stays at true game coords.
+ // A detached/forged dirty rectangle must never grant native publication.
+ bool native_raw_gpu_core_across_dirty_strips_regression() {
+     constexpr std::uint32_t w = 12u, h = 8u;
+     constexpr std::size_t pitch = w * 4u;
+     std::array<std::uint8_t, pitch * h> pre{}, post{};
+     for (std::uint32_t y = 1u; y < 3u; ++y)
+         for (std::uint32_t x = 1u; x < 11u; ++x)
+             post[(y * w + x) * 4u + 1u] = 0x78u;
+     NativeRawChangedPixelWindow rgb{};
+     rgb.capture(pre.data(), pitch, post.data(), pitch, w, h);
+     NativeRawPresentDirtyRegion dirty{};
+     dirty.headerVerified = true; dirty.count = 4u;
+     dirty.rectangles[0] = {100, 200, 104, 203};
+     dirty.rectangles[1] = {104, 200, 108, 203};
+     dirty.rectangles[2] = {108, 200, 112, 203};
+     dirty.rectangles[3] = {104, 203, 108, 208};
+     dirty.boundLeft = 100; dirty.boundTop = 200;
+     dirty.boundRight = 112; dirty.boundBottom = 208;
+     const NativeRawPresentTile origin{0u, 0u, w, h, 100, 200};
+     NativeRawSourceIslandBatch batch{};
+     if (!batch.append(320u, 240u, dirty, origin, rgb, false, true) ||
+         batch.count != 1u || batch.rgbPixels[0] != 20u ||
+         batch.tiles[0].sourceX != 1u || batch.tiles[0].sourceY != 1u ||
+         batch.tiles[0].destinationX != 101 ||
+         batch.tiles[0].destinationY != 201 ||
+         batch.tiles[0].copyWidth != 10u ||
+         batch.tiles[0].copyHeight != 2u ||
+         !native_raw_dirty_region_covers_tile(
+             320u, 240u, dirty, batch.tiles[0]))
+         return false;
+     if (batch.append(320u, 240u, dirty, origin, rgb, true, true))
+         return false; // same GPU RGB cannot be published a second time
+     dirty.boundRight = 113; // forged D3D9 rcBound must not help
+     NativeRawSourceIslandBatch forged{};
+     if (forged.append(320u, 240u, dirty, origin, rgb, false, true))
+         return false;
+     // A 1px gap in the middle strip excludes the entire 10x2 rectangle.
+     dirty.boundRight = 112;
+     dirty.rectangles[1] = {105, 200, 108, 203};
+     NativeRawSourceIslandBatch hole{};
+     if (hole.append(320u, 240u, dirty, origin, rgb, false, true) &&
+         (!native_raw_dirty_region_covers_tile(
+              320u, 240u, dirty, hole.tiles[0]) ||
+          hole.rgbPixels[0] != std::uint64_t{hole.tiles[0].copyWidth} *
+                                 hole.tiles[0].copyHeight))
+         return false;
+     return true;
+ }
+
+int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); assert(native_raw_ranked_two_capture_present_regression()); assert(native_raw_gpu_core_across_dirty_strips_regression()); }
