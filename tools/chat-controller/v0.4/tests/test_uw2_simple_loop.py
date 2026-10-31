@@ -111,7 +111,7 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         # The isolated function calls datetime.now(TZ) after sending; keep it
         # aligned with synthetic scheduler time rather than wall-clock time.
         at = datetime.datetime(2026, 10, 31, hour, minute, second, tzinfo=KST)
-        self.ns["datetime"] = SimpleNamespace(now=lambda tz: at)
+        self.ns["datetime"] = SimpleNamespace(now=lambda tz: at, fromisoformat=datetime.datetime.fromisoformat)
         return asyncio.run(self.ns["uw2_simple_cycle"](
             self.ctx, self.pages, self.q, at))
 
