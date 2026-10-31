@@ -75,7 +75,8 @@
       }
     ],
     "runtime_game_and_quest3": "UNTESTED",
-    "targeted_test": "GCC C++17 -Wall -Wextra -Werror -pedantic tests/native_raw_changed_crop_present_test.cpp compiled/executed successfully in DX11 Fast"
+    "targeted_test": "GCC C++17 -Wall -Wextra -Werror -pedantic tests/native_raw_changed_crop_present_test.cpp compiled/executed successfully in DX11 Fast",
+    "note_01188_causal_ci_repair": "01187 original exact-SHA 5/5 source/build success is preserved; later 01188 push policy rejected absent top-level acceptance_results and the noncanonical descriptive preview stage. This rectifies only the existing verified record using its original per-item status and explicit partial-visibility semantics; it neither revalidates 01187 nor adds a new score."
   },
   "safety": {
     "raw_opt_in_default_off": true,
@@ -98,7 +99,7 @@
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
       "NATIVE_GPU_READBACK",
-      "INCOMPLETE_VISIBLE_DIAGNOSTIC"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "batch_components": [
       "MULTI_SOURCE_GPU_RGB_ISLAND_PREPARE",
@@ -117,7 +118,7 @@
       "tests/native_raw_changed_crop_present_test.cpp"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_ONLY_PARTIAL_GPU_RGB_CI_VERIFIED_FULL_GAMEPLAY_UNTESTED",
+    "visible_frame_acceptance": "CODE_AND_EXACT_SHA_ONLY_PARTIAL_D3D9_UPDATE_SURFACE_VISIBLE_FRAME_OUTPUT_PATH; REAL_GAME_NATIVE_GPU_PIXEL_VISIBILITY_AND_HMD_UNTESTED",
     "activation_guard_and_fallback": "Explicit RAW opt-in default OFF, native pixel provenance, canonical backbuffer and D3D9 dirty coverage, preserved original game renderer/input/FFB; DXVK frozen"
   },
   "feature_contract": {
@@ -158,5 +159,10 @@
         "status": "PASS_EXACT_SHA_5_OF_5"
       }
     ]
+  },
+  "acceptance_results": {
+    "real_source_preflight": "PASS_STATIC_SOURCE_AND_TARGETED_CPP",
+    "safe_fallback_on_failed_prepare": "PASS_TARGETED_CPP",
+    "exact_sha_required_gates": "PASS_EXACT_SHA_5_OF_5"
   }
 }
