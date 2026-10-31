@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01186",
+  "production_id": "CONVERSION-DX11-01186",
+  "event_id": "CONVERSION-DX11-01186-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_LARGE_PRESENT_SPARSE_DIRTY_GPU_RGB_ISLANDS",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_SAME_TASK_CAUSAL_CI_CONTRACT_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "aaf14556df6ca32050ddba68cd85945768d930a7",
+  "implementation_source_sha": "552bec0e8aa58f9cf7e1e3a34354717522e92977",
+  "material_result_sha": "552bec0e8aa58f9cf7e1e3a34354717522e92977",
+  "validation_bearing_result_sha": "eddf453b9e98a97139480c195f0e9371406347ee",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01185.json"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "implementation": "Original game canonical D3D9 Draw/Present backbuffer and target-grid verified sparse dirty 1px/short source crop now admits deferred source-coincident native D3D11 RGB batches when displaced 24px RAW insets cannot fit. The source path requires actual GPU RGB delta, exact D3D9 RGNDATA coverage, original Present coordinates and safe UpdateSurface. Reject forged/holey dirty union, mismatched IUnknown identity or dimensions, inert RGB, and unsafe fallback; explicitly opt-in RAW diagnostic remains default OFF. This is bounded CI-proven partial source output, NOT a playable full native game frame.",
+  "validation": {
+    "exact_sha": "eddf453b9e98a97139480c195f0e9371406347ee",
+    "required_push_workflows_result": "5/5 completed success on identical validation-bearing SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41210935550,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41210935544,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 41210935606,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41210935546,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41210935618,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_game_and_quest3": "UNTESTED",
+    "prior_failure_run": 41210790578,
+    "prior_failure": "Inherited 01185 development_strategy missing; same task CI repair restored legacy feature acceptance metadata without modifying 01185 verified source SHA.",
+    "ci_repair_commit": "eddf453b9e98a97139480c195f0e9371406347ee"
+  },
+  "safety": {
+    "raw_opt_in_default_off": true,
+    "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
+    "dxvk": "FROZEN_UNMODIFIED",
+    "r175_texcoord6": "NOT_CLAIMED_FIXED_OWNER_00477_UNCHANGED",
+    "scoring": "Single 01186 source outcome; causal CI/C6 same task +0 separately"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_DRAW",
+      "CANONICAL_GAME_BACKBUFFER_PRESENT",
+      "SOURCE_COINCIDENT_NATIVE_D3D11_GPU_RGB",
+      "VERIFIED_SPARSE_D3D9_DIRTY_UNION",
+      "ORIGINAL_GAME_PRESENT_UPDATE_SURFACE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "SOURCE_ONLY_SPARSE_DIRTY_ADMISSION",
+      "CANONICAL_SOURCE_TARGET_IDENTITY",
+      "BOUNDED_NATIVE_GPU_RGB_CAPTURE_AND_COPY",
+      "NEGATIVE_REGRESSION_FOREIGN_HOLEY_INERT",
+      "CAUSAL_HISTORICAL_01185_ACCEPTANCE_CONTRACT_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source-coincident native D3D11 GPU RGB of an authentic one-pixel game repaint is carried across the original full-size D3D9 dirty Present instead of fabricated displaced inset.",
+      "negative_regression": "Foreign IUnknown surface, wrong target dimensions, forged or holey dirty union, inert GPU RGB and invalid source crop fail closed.",
+      "component_integration": "NativeRawVisualPreview present calls sparse source-only admission then batches the same original pixel coordinates through bounded UpdateSurface; legacy fallback and opt-in remain protected."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_changed_crop_present_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_COINCIDENT_PARTIAL_GPU_RGB_TESTED_IN_CI_ONLY_FULL_PLAYABLE_NATIVE_GAME_AND_HMD_UNTESTED",
+    "activation_guard_and_fallback": "RAW opt-in default OFF, source identity RGB and exact dirty proof required, D3D9/DX9Ex fallback and input/FFB unchanged; DXVK frozen"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Carry genuine sparse one-pixel native D3D11 game-draw GPU RGB through original full-size D3D9 Present source coordinates, without asserting full-scene playback.",
+    "scope": "PARTIAL_SOURCE_AUTHENTIC_OPT_IN_DIAGNOSTIC_ONLY",
+    "acceptance_items": [
+      {
+        "id": "sparse_game_rgb_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native D3D11 game Draw to source original Present",
+        "expected_behavior": "GPU RGB changed original game pixel survives source-aligned D3D9 dirty full-size Present."
+      },
+      {
+        "id": "source_identity_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 ownership and safe fallback",
+        "expected_behavior": "Foreign surface and grid, malformed or holey dirty and inert RGB never authorize native upload."
+      },
+      {
+        "id": "exact_five_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Win32 OpenXR HUD integration",
+        "expected_behavior": "Five required push GitHub Actions all succeed at the same causal CI repair SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "sparse_game_rgb_source": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "Exact eddf453b9e98a97139480c195f0e9371406347ee DX11 Fast/Backend/Build/OpenXR/HUD push 41210935550, 41210935544, 41210935606, 41210935546, 41210935618"
+    },
+    "source_identity_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "Native RAW positive/negative sparse dirty source crop C++ regression included in 5/5 exact-SHA CI eddf453b9e98a97139480c195f0e9371406347ee"
+    },
+    "exact_five_required_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp",
+        "docs/automation/runs/CONVERSION-DX11-01185.json"
+      ],
+      "validation_command": "5/5 SUCCESS exact eddf453b9e98a97139480c195f0e9371406347ee: Fast 41210935550, Backend 41210935544, Build 41210935606, OpenXR 41210935546, HUD 41210935618"
+    }
+  }
+}
