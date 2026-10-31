@@ -2,7 +2,9 @@ name: R26 Safe VR Original DX9Ex Launcher Package
 on:
   push:
     branches: ['test/r26-safe-dx9ex-launcher-20261101']
-    paths: ['.github/workflows/vr-safe-launch-package.yml']
+    paths:
+      - '.github/workflows/vr-safe-launch-package.yml'
+      - 'tools/vr_safe_launch/**'
   workflow_dispatch:
 
 permissions:
@@ -93,6 +95,20 @@ jobs:
             throw 'Original mock binaries not restored correctly'
           }
           Write-Host 'Mock install, version backup and rollback: PASS'
+          # Regression: the user extracts the ZIP DIRECTLY into the game directory.
+          # Installing should never attempt to Copy-Item an installer CMD onto itself.
+          Copy-Item -Path "$out/*" -Destination $mock -Recurse -Force
+          & "$mock/INSTALL_AND_RUN.ps1" -GameDirectory $mock -InstallOnly
+          if ((Get-Item (Join-Path $mock 'dinput8.dll')).Length -lt 1000000) {
+            throw 'Same-folder installation did not install the test DLL'
+          }
+          & "$mock/RESTORE_PREVIOUS.ps1"
+          $restoredDllAgain = (Get-Content (Join-Path $mock 'dinput8.dll') -Raw).Trim()
+          $restoredHostAgain = (Get-Content (Join-Path $mock 'outrun-vr-host.exe') -Raw).Trim()
+          if ($restoredDllAgain -ne 'PREVIOUS_DLL' -or $restoredHostAgain -ne 'PREVIOUS_HOST') {
+            throw 'Same-folder rollback did not preserve original versions'
+          }
+          Write-Host 'Mock direct-in-game-folder extraction/install/rollback: PASS'
       - name: Upload complete safe DX9Ex recovery package
         uses: actions/upload-artifact@v4
         with:
