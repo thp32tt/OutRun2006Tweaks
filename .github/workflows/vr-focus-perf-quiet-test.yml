@@ -52,8 +52,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Merged R26 performance profile not active' }
           $ini = Get-Content OutRun2006Tweaks.ini -Raw
           if (!$ini.Contains('Telemetry = false')) { throw 'VR telemetry must be off' }
-          $host = Get-Content vrhost/src/main.cpp -Raw
-          if (!$host.Contains('OutRunVrFullTraceEnabled()')) { throw 'Host full trace gating absent' }
+          $hostSource = Get-Content vrhost/src/main.cpp -Raw
+          if (!$hostSource.Contains('OutRunVrFullTraceEnabled()')) { throw 'Host full trace gating absent' }
           $launcher = Get-Content tools/vr_perf_quiet/Run-VRPerfQuiet.ps1 -Raw
           foreach ($flag in @('-DirectGpuOnly=true','-AutoRenderResolution=true','-VR.Telemetry=false')) {
             if (!$launcher.Contains($flag)) { throw "Missing quiet full-quality flag: $flag" }
