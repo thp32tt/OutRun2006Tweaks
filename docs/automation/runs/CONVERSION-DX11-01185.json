@@ -10,7 +10,7 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:AUTHENTIC_ONE_TO_23PX_GPU_RGB_SOURCE_CROP",
   "classification": "A_SOURCE_IMPLEMENTATION_WITH_SAME_TASK_CAUSAL_CI_REGRESSION_REPAIR",
-  "status": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "source_base_sha": "6cf6404ee71140f3181e36089e62a3518f4a2c0f",
   "implementation_source_sha": "f170f28fdd482de3de37430966110176fc651508",
@@ -23,7 +23,7 @@
     "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
     "tests/native_raw_changed_crop_present_test.cpp"
   ],
-  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
@@ -77,5 +77,6 @@
     "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
     "dxvk": "FROZEN_UNMODIFIED",
     "score_duplicate_prevention": "Only one material feature result, same-TASK CI/test/C6 no extra achievement"
-  }
+  },
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
