@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "dx11_work_recovery_checkpoint",
+  "task_id": "CONVERSION-DX11-01191",
+  "production_id": "CONVERSION-DX11-01191",
+  "event_id": "CONVERSION-DX11-01191-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "LEGACY",
+  "target_branch": "vr-dx11-native-r71",
+  "source_base_sha": "83f211680c7729c317fe806cd0d258dce64ee8be",
+  "implementation_source_sha": "aa7e68cbca8c225b67196873f98e6120a459611d",
+  "repair_commit_sha": "097b69d150a09a66689dac5d16ddfd8823def64f",
+  "checkpoint_kst": "2026-11-01T04:39:00+09:00",
+  "previous_failed_gate": {
+    "id": 41234809302,
+    "reason": "Earlier 01190 acceptance record missing live_game_draw_path and behavior_area metadata; compilation never ran"
+  },
+  "repair_files": [
+    "docs/automation/runs/CONVERSION-DX11-01190.json",
+    "tools/test_dx11_autodev_policy.py"
+  ],
+  "implementation_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp"
+  ],
+  "validated_so_far": {
+    "source_targeted_gate": {
+      "id": 41235061074,
+      "conclusion": "success"
+    },
+    "backend_policy_step": "success",
+    "full_exact_sha": "PENDING"
+  },
+  "required_exact_sha_runs": [
+    {
+      "name": "DX11 Fast Structural Checks",
+      "id": 41235061074
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "id": 41235061068
+    },
+    {
+      "name": "Build",
+      "id": 41235061076
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "id": 41235061067
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "id": 41235061080
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "completed": false,
+  "score_change": 0,
+  "next_action": "Check listed five exact repair SHA 097b69d runs; if all success create C6 docs/automation/runs/CONVERSION-DX11-01191.json; if any failure patch only causal source/test/workflow under original TASK_ID; do not repeat successful SHA checks."
+}
