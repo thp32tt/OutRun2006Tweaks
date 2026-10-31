@@ -200,9 +200,9 @@ jobs:
           $off=[BitConverter]::ToInt32($dll,0x3c)
           if ($dll.Length -lt 1000000 -or [BitConverter]::ToUInt16($dll,$off+4) -ne 0x14c) { throw 'Invalid x86 game DLL' }
           if (![Text.Encoding]::ASCII.GetString($dll).Contains('elidedDraws=')) { throw 'Elided draw telemetry missing' }
-          $host=[IO.File]::ReadAllBytes("$out/payload/outrun-vr-host.exe")
-          $off=[BitConverter]::ToInt32($host,0x3c)
-          if ([BitConverter]::ToUInt16($host,$off+4) -ne 0x8664) { throw 'Invalid x64 host' }
+          $hostExeBytes=[IO.File]::ReadAllBytes("$out/payload/outrun-vr-host.exe")
+          $off=[BitConverter]::ToInt32($hostExeBytes,0x3c)
+          if ([BitConverter]::ToUInt16($hostExeBytes,$off+4) -ne 0x8664) { throw 'Invalid x64 host' }
           Write-Host 'Verified x86 DLL + x64 host + one-click scripts'
           Get-ChildItem $out -Recurse | Select-Object FullName,Length
 
