@@ -23,10 +23,10 @@ assert classifier.index("if (semanticProjectedScreen)") < classifier.index("if (
 assert "ExactProjectedLensAxisPmtActive()" in classifier
 assert "if (semanticProjectedScreen || semanticSceneEffect)" not in classifier
 tail=builder[builder.index("if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)"):]
-for t in ("GetLatchedHeadInverse(","const D3DMATRIX identityEye = IdentityMatrix();",
+for t in ("GetLatchedHeadInverse(","lensEyeInverse = IdentityMatrix();",
           "for (int eye = 0; eye < 2; ++eye)","ProjectionFromFov(",
           "stereo.eyeFov[eye]","BuildProjectedSunRay(",
-          "identityEye, eyeProjection, projected,",
+          "lensEyeInverse, eyeProjection, projected,",
           "std::memcpy(eyeConstants[eye], &projectedT,","VR R85 FLARE RAY:"):
  assert t in tail,t
 assert "R30GetExactInlineProjectedLensRawWvp(" in builder
