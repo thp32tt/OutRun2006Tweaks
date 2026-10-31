@@ -112,7 +112,14 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "PARTIAL_AUTHENTIC_NATIVE_GPU_RGB_SOURCE_ISLANDS_ONLY; COMPLETE_MENU_CAR_RACE_AND_QUEST3_HMD_UNTESTED",
-    "activation_guard_and_fallback": "RAW opt-in default OFF; original source backbuffer/dirty/epoch checks, protected D3D9 input/FFB, DX9Ex fallback and DXVK freeze preserved"
+    "activation_guard_and_fallback": "RAW opt-in default OFF; original source backbuffer/dirty/epoch checks, protected D3D9 input/FFB, DX9Ex fallback and DXVK freeze preserved",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_BEFORE_AFTER_RGB_DELTA",
+      "OPT_IN_SOURCE_ALIGNED_DIAGNOSTIC_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -122,17 +129,20 @@
       {
         "id": "ranked_two_capture_rgb",
         "category": "end_to_end_behavior",
-        "expected_behavior": "Choose greater native GPU RGB count per source-aligned slot, not fixed alternate slot order."
+        "expected_behavior": "Choose greater native GPU RGB count per source-aligned slot, not fixed alternate slot order.",
+        "behavior_area": "Live D3D9 Draw to authentic native GPU source RGB"
       },
       {
         "id": "mixed_capture_source_safety",
         "category": "fallback_regression",
-        "expected_behavior": "Preserve original-source game coordinates, disjoint RGB islands, forged-dirty rejection and eight-stage preflight."
+        "expected_behavior": "Preserve original-source game coordinates, disjoint RGB islands, forged-dirty rejection and eight-stage preflight.",
+        "behavior_area": "Guarded D3D9 Present staging and safe fallback"
       },
       {
         "id": "exact_sha_five_gates",
         "category": "integrated_validation",
-        "expected_behavior": "All five mandatory GitHub push workflows pass at identical material SHA."
+        "expected_behavior": "All five mandatory GitHub push workflows pass at identical material SHA.",
+        "behavior_area": "Exact SHA GitHub Actions verification"
       }
     ]
   },

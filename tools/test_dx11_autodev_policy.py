@@ -366,3 +366,28 @@ for label, change in (
     broken = copy.deepcopy(historical_01167)
     change(broken)
     assert validate_task(broken, p), "01167 policy regression: " + label
+
+# 01191 Backend Conversion Gate recovery for a confirmed earlier task:
+# validate the immutable 01190 material/CI evidence as a PARTIAL source path.
+# Both ordered live-game-to-visible stages and multiple distinct behavior
+# areas must be explicit; this metadata is not a playable/HMD result.
+historical_01190 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01190.json").read_text(encoding="utf-8"))
+assert historical_01190["validation_bearing_result_sha"] == "09c3975e8032dd368fc7d15a60eb602e1d3a3868"
+assert historical_01190["runtime_validation"] == "UNTESTED"
+assert historical_01190["full_dx11_renderer_complete"] is False
+assert not validate_task(historical_01190, p), validate_task(historical_01190, p)
+for label, mutate in (
+    ("missing live Draw path", lambda t: t["development_strategy"].pop("live_game_draw_path")),
+    ("missing native Draw", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["LIVE_D3D9_CALLSITE", "VISIBLE_FRAME_OUTPUT"])),
+    ("missing actual visible output", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW"])),
+    ("single feature behavior area", lambda t: [
+        x.update(behavior_area="same") for x in t["feature_contract"]["acceptance_items"]]),
+    ("not actually verified", lambda t: t.update(automation_validation="FAIL_EXACT_SHA")),
+    ("fabricated HMD runtime", lambda t: t.update(runtime_validation="PASS")),
+):
+    rejected = copy.deepcopy(historical_01190)
+    mutate(rejected)
+    assert validate_task(rejected, p), "01190 source-stage policy regression: " + label
