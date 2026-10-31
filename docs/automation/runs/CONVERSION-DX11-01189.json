@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01189",
+  "production_id": "CONVERSION-DX11-01189",
+  "event_id": "CONVERSION-DX11-01189-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_GPU_RGB_EIGHT_ISLAND_GAME_PRESENT",
+  "classification": "A_SOURCE_IMPLEMENTATION_WITH_SAME_TASK_CI_AND_REGRESSION_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "5c2e1c67bbba6343a14ccdcc73b2449b5323c788",
+  "implementation_source_sha": "c97f671aa49bfa86c8436df81d561fbff56ccf57",
+  "material_result_sha": "db7c0c0ab4a10451cd73d646379c2bc6294188ad",
+  "validation_bearing_result_sha": "db7c0c0ab4a10451cd73d646379c2bc6294188ad",
+  "c6_checkpoint_is_validation_bearing": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "src/vr/d3d11/native_game_raw_upload_transaction.hpp",
+    "tests/native_raw_changed_crop_present_test.cpp"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "implementation": "Extend the actual opt-in source-authenticated native Draw PRE/POST RGB island selection from four to eight independently packed, canonical game D3D9 Present updates. Increase subtraction capacity and preflight transaction cap from four to eight with separately owned SYSTEMMEM staging per source island, retaining exact original destination coordinates, incomplete RAW marker protection, full D3D9 input/FFB and DX9Ex fallback. Eight authentic multi-source pixels and ninth-request/eighth-staging failure regressions are checked on source code. This is partial native RGB diagnostic integration and NOT a complete menu/car/race native frame or actual HMD/game runtime proof.",
+  "validation": {
+    "exact_sha": "db7c0c0ab4a10451cd73d646379c2bc6294188ad",
+    "required_push_workflows_result": "5/5 completed success on identical exact validation-bearing push SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41225484794,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db7c0c0ab4a10451cd73d646379c2bc6294188ad",
+        "event": "push"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41225484692,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db7c0c0ab4a10451cd73d646379c2bc6294188ad",
+        "event": "push"
+      },
+      {
+        "name": "Build",
+        "run_id": 41225484706,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db7c0c0ab4a10451cd73d646379c2bc6294188ad",
+        "event": "push"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41225484791,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db7c0c0ab4a10451cd73d646379c2bc6294188ad",
+        "event": "push"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41225484763,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db7c0c0ab4a10451cd73d646379c2bc6294188ad",
+        "event": "push"
+      }
+    ],
+    "runtime_game_and_quest3": "UNTESTED",
+    "implementation_commit": "c97f671aa49bfa86c8436df81d561fbff56ccf57",
+    "causal_repair_commits": [
+      "692c89ff6c1970b2f7d036a8a07d728bb77c9d4c",
+      "86c0ed23bce90be4ad2bf458e8a7b77ed0da2aa2",
+      "db7c0c0ab4a10451cd73d646379c2bc6294188ad"
+    ],
+    "targeted_test": "Fast Structural Checks exact-SHA native_raw_changed_crop_present_test.cpp with eight-island positive, distinct-coordinates and eighth-stage failure regression PASS"
+  },
+  "safety": {
+    "raw_opt_in_default_off": true,
+    "original_d3d9_input_ffb_and_dx9ex_fallback": "UNMODIFIED",
+    "dxvk": "FROZEN_UNMODIFIED",
+    "native_game_full_frame": "NOT_CLAIMED",
+    "external_controller_adoption": "UNVERIFIED",
+    "scoring": "Ongoing DX11 full native frame feature extension; no score for same-feature follow-up, CI repair, C6 or re-report."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_GAME_D3D9_DRAW",
+      "SOURCE_AUTHENTIC_D3D11_GPU_RGB_PRE_POST",
+      "EIGHT_DISJOINT_ORIGINAL_SCREEN_RGB_ISLANDS",
+      "EIGHT_PRIVATE_PACKED_SYSTEMMEM_STAGING_SURFACES",
+      "ORIGINAL_D3D9_GAME_PRESENT_UPDATESURFACE"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_RGB_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "REAL_GAME_SOURCE_RGB_BATCH_EXCLUSION_AND_SELECTION",
+      "EIGHT_PRIVATE_SYSTEMMEM_PACKED_STAGING_AND_GAME_PRESENT",
+      "EIGHT_ISLAND_CPP_POSITIVE_AND_NINTH_REQUEST_AND_EIGHTH_PREPARE_NEGATIVE_REGRESSIONS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "GitHub Fast C++17 exact-SHA success confirms eight authentic PRE/POST source RGB islands with independent original game pixel positions and eight staged publications.",
+      "negative_regression": "GitHub Fast exact-SHA C++ regression rejects ninth stage request and does zero D3D9 Publish when eighth staging preparation fails; legacy corrupt pitch/extent and absent RGB paths continue to reject.",
+      "component_integration": "Canonical live D3D9 intercepted Draw -> native D3D11 GPU PRE/POST source RGB -> bounded multi-island dense selection -> packed private D3D9 SYSTEMMEM -> original game Present; opt-in only and no real Quest3 gameplay observation."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "src/vr/d3d11/native_game_raw_upload_transaction.hpp",
+      "tests/native_raw_changed_crop_present_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "PARTIAL_AUTHENTIC_SOURCE_RGB_PRESENT_SOURCE_AND_EXACT_SHA_CI_VERIFIED_ONLY; REAL_NATIVE_FULL_MENU_CAR_RACE_FRAME_AND_HMD_UNTESTED",
+    "activation_guard_and_fallback": "RAW opt-in default OFF, source canonical Draw/Present target and fence epoch/dirty coverage proof; preserve D3D9/DX9Ex game input and FFB fallback, frozen DXVK"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Extend source-owned native GPU RGB to eight independently staged disjoint original game Present islands while preserving fail-closed input/FFB/fallback and explicit incomplete native frame semantics.",
+    "scope": "PARTIAL_SOURCE_AUTHENTIC_OPT_IN_DIAGNOSTIC_ONLY",
+    "acceptance_items": [
+      {
+        "id": "eight_authentic_source_islands",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Authentic native GPU RGB to original D3D9 game Present",
+        "expected_behavior": "Publish up to eight distinct original source-coincident RGB islands using exact original game coordinates, not displaced or synthetic pixels."
+      },
+      {
+        "id": "eight_private_staging_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "Packed D3D9 surface staging and partial-update safety",
+        "expected_behavior": "Preflight all eight private system-memory staging surfaces; reject ninth request and eighth LockRect failure before any update; preserve original D3D9/DX9Ex fallback."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub five mandatory push workflows",
+        "expected_behavior": "All five mandatory push Actions succeed on the same final integrated source SHA, with game and Quest3 HMD untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "eight_authentic_source_islands": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "8-island exact original-screen regression in Fast Structural Checks run 41225484794"
+    },
+    "eight_private_staging_fail_closed": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_upload_transaction.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "8th preparer fault, ninth over-cap rejection and private staging C++ regression in run 41225484794"
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_present_coverage.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/native_game_raw_upload_transaction.hpp",
+        "tests/native_raw_changed_crop_present_test.cpp"
+      ],
+      "validation_command": "Exact SHA five success: 41225484794, 41225484692, 41225484706, 41225484791, 41225484763"
+    }
+  }
+}
