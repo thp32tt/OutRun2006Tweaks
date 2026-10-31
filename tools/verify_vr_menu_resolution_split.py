@@ -27,8 +27,15 @@ assert 'FollowGameResolution = false' in ini
 front_end = ui.split('bool VrFrontEndPhysicalCanvasState() noexcept', 1)[1].split(
     'bool ResolveVrFrontEndVirtualCanvasScale(', 1)[0]
 assert 'STATE_SUMO_FE = 0x20' in game
+assert 'case GameState::STATE_SYSTEM:' in front_end
+assert 'case GameState::STATE_START:' in front_end
 assert 'case GameState::STATE_SUMO_FE:' in front_end
 assert 'case GameState::STATE_GAME:' not in front_end
+assert 'const float containScale =' in ui
+assert '(std::min)(physicalScaleX, physicalScaleY)' in ui
+assert 'scaleX = scaleY = containScale;' in ui
+assert 'mapped._41 += offsetX;' in ui
+assert 'mapped._42 += offsetY;' in ui
 assert 'MapVrFrontEndMatrixToPhysical(' in ui
 assert 'VR TRACE FRONTEND VIRTUAL CANVAS:' in ui
 
@@ -44,8 +51,8 @@ assert 'Game::screen_resolution->y = static_cast<int>(xrSize.height)' not in ex
 
 # Menu optical placement remains a host-side 4:3/scale policy, independent
 # from physical XR render-target dimensions.
-assert 'VRMenuScale{ "VR", "MenuScale", 1.0f,' in settings
-assert 'MenuScale = 1.00' in ini
+assert 'VRMenuScale{ "VR", "MenuScale", 0.75f,' in settings
+assert 'MenuScale = 0.75' in ini
 assert 'ReadMenuScaleOverride(path, candidateMenuScale)' in host
 assert host.count('ReadMenuScaleOverride(path, candidateMenuScale)') == 2
 assert 'clientGameState, R23ConfiguredMenuScale);' in host

@@ -66,7 +66,7 @@ namespace Settings
         "Keep the original 2D menu/game pixel aspect when displaying a portrait VDXR 3D/2D source on an ultrawide desktop. The PC mirror is centered with unused desktop space instead of vertically squashing the image. VR eye buffers and all source UI pixels stay unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
-    Setting<float> VRMenuScale{ "VR", "MenuScale", 1.0f,
+    Setting<float> VRMenuScale{ "VR", "MenuScale", 0.75f,
         "Title/main menu size as a fraction of the binocular-safe 4:3 canvas (1 = maximum). Independent of game RenderWidth/Height, desktop resolution and HudScale. Saved changes are read by the host within 2.5 seconds; vehicle selection is unchanged.", Range<float>{ 0.50f, 1.0f } };
 	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };

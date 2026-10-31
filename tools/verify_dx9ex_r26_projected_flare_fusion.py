@@ -68,8 +68,9 @@ assert "deferred.ordinal == 1u" in axis_flush_scope
 assert "exactProjectedLensCameraSynced" in tail
 assert "exactProjectedLensPmtRaw" in tail
 assert "recordedCameraSynced" in tail
-assert "exactProjectedLensPmtRaw ? false : recordedCameraSynced" in tail
-assert "pmtHeadUnproject={}" in tail
+assert "const bool sourceCameraSynced = recordedCameraSynced;" in tail
+assert "exactProjectedLensPmtRaw ? false : recordedCameraSynced" not in tail
+assert "pmtSourceOwnsCameraRotation={}" in tail
 assert "GetLastProjectedLensRawWvp(out, raw)" in exact
 for t in ("CurrentInlinePmt","OwnsRawWvp(","GetCurrentLatchedPoseEpoch()",
           "SAME_SOURCE_INLINE_PMT_NATIVE_C64"):

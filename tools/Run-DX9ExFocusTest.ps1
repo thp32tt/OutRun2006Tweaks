@@ -63,7 +63,7 @@ $gameArgs = @(
     '-Hud1080pReference=true',
     '-HudResponsiveLayout=true',
     '-HudScale=0.55',
-    '-MenuScale=1.00',
+    '-MenuScale=0.75',
     '-CullingUnionFov=true',
     '-CullingUnionMarginDegrees=8.0'
 )

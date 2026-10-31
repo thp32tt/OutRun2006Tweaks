@@ -6043,19 +6043,16 @@ namespace OutRunVRStereo
                     exactProjectedLensRaw
                         ? exactProjectedLensCameraSynced
                         : OutRunVRRenderer::GetLastRawGameWvpCameraSynced();
-                // Quest 2026-11-01 00:49 HMD proof: all 15 exact 405890 PMT
-                // flare objects were mostly recorded cameraSynced=1 while the
-                // repaired family was visibly head-locked. For this exact PMT
-                // path the native c64 is a screen-projected sun ray produced
-                // while the game camera is synchronized. Recovering a WORLD
-                // bearing therefore must REMOVE that camera rotation with the
-                // common head inverse before each eye FOV projection.
-                //
-                // Keep the older camera-sync suppression for non-PMT raw
-                // fallbacks; do not broaden this HMD-derived rule to HUD,
-                // world billboards, inline-only projected effects or markers.
-                const bool sourceCameraSynced =
-                    exactProjectedLensPmtRaw ? false : recordedCameraSynced;
+                // Quest 2026-11-01 01:23 HMD proof: the flare family now
+                // converges, but the sun/light source moves opposite head yaw.
+                // Exact 405890 PMT c64 is recorded cameraSynced=1 because the
+                // game camera has ALREADY consumed the common HMD rotation.
+                // Feeding that source through headInverse again removes the
+                // rotation a second time and creates the observed counter-lock.
+                // Preserve the recorded ownership bit: BuildProjectedSunRay
+                // suppresses common head rotation only for an already-synced
+                // source, while unsynced fallbacks still receive headInverse.
+                const bool sourceCameraSynced = recordedCameraSynced;
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyeProjection =
@@ -6100,7 +6097,7 @@ namespace OutRunVRStereo
                         spdlog::info(
                             "VR TRACE LENS R85 BUILD: hit={} draw={} pose={} headSeq={} "
                             "cameraSyncedRecorded={} cameraSyncedApplied={} "
-                            "pmtHeadUnproject={} sourceCallSerial={} sourceObj=0x{:06X} "
+                            "pmtSourceOwnsCameraRotation={} sourceCallSerial={} sourceObj=0x{:06X} "
                             "sourceSite={} ordinal={} deferredSerial={} deferredObj=0x{:06X} "
                             "deferredOrdinal={} stockT={:.9g},{:.9g},{:.9g} "
                             "headR=[{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g};{:.9g},{:.9g},{:.9g}] "
@@ -6135,7 +6132,7 @@ namespace OutRunVRStereo
                 {
                     firstAsymmetricFlareRayLogged = true;
                     spdlog::info(
-                        "VR R85 FLARE RAY: exact PMT screen ray unprojects synchronized game-camera rotation through common head inverse, then projects through L/R asymmetric FOV; shallow 2.5% eye translation retained");
+                        "VR R85 FLARE RAY: camera-synchronized PMT source preserves its existing common head rotation; unsynced sources alone receive head inverse, then both project through L/R asymmetric FOV; shallow 2.5% eye translation retained");
                 }
                 return true;
             }
