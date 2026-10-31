@@ -286,7 +286,10 @@ assert "preservedHasLayer" in host_r24
 # Full tracing is intentionally performance-heavy and must remain opt-in under
 # the already-enabled VR telemetry switch, not silently promoted to all users.
 assert "if (!Settings::VRTelemetry || !device)" in renderer
-assert "Telemetry = true" in read("OutRun2006Tweaks.ini")
+# This isolated performance branch must keep expensive telemetry OFF by default.
+# The optional full-trace implementation may be enabled by explicit env only.
+assert "Telemetry = false" in read("OutRun2006Tweaks.ini")
+assert "OutRunVrFullTraceEnabled()" in read("vrhost/src/main.cpp")
 
 runpy.run_path(str(ROOT / "tools/verify_vr_lens_transaction_trace.py"), run_name="__main__")
 print("PASS DX9Ex one-pass FULL visual trace contract: source -> queue -> D3DX -> D3D9 -> frame -> OpenXR -> collected ZIP")

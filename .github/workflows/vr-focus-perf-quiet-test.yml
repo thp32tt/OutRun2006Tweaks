@@ -1,0 +1,140 @@
+name: R26 Focus Visual + All Safe Performance Quiet Test Build
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - 'test/r26-focus-all-perf-no-trace-20261101'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify XR render target and independent UI contracts
+        shell: pwsh
+        run: |
+          python tools/verify_vr_desktop_source_coordinates.py
+          if ($LASTEXITCODE -ne 0) { throw 'XR physical target/logical UI split failed' }
+          python tools/verify_vr_unified_menu_source.py
+          if ($LASTEXITCODE -ne 0) { throw 'VR UI reference split failed' }
+          python tools/verify_vr_menu_resolution_split.py
+          if ($LASTEXITCODE -ne 0) { throw 'Menu/XR render-target split failed' }
+          python tools/verify_vr_r23_menu_letterbox_cache.py
+          if ($LASTEXITCODE -ne 0) { throw 'Centered LOCAL menu/restart quad contract failed' }
+          python tools/verify_vr_r23_menu_fov_cache_provenance.py
+          if ($LASTEXITCODE -ne 0) { throw 'Menu quad must not depend on cached projection FOV' }
+          python tools/verify_vr_f11_font_density.py
+          if ($LASTEXITCODE -ne 0) { throw 'F11 VR density/layout contract failed' }
+          python tools/verify_vr_r26_landscape_visual_recovery.py
+          if ($LASTEXITCODE -ne 0) { throw 'R26 visual recovery bundle contract failed' }
+          python tools/verify_vr_r26_stage_fixedfn.py
+          if ($LASTEXITCODE -ne 0) { throw '+TIME four-API source regression failed' }
+          python tools/verify_vr_r26_occlusion_present_fastpath.py
+          if ($LASTEXITCODE -ne 0) { throw 'R26 occlusion/StateBlock fail-closed contract failed' }
+          python tools/verify_vr_r26_projected_particle_canvas.py
+          if ($LASTEXITCODE -ne 0) { throw 'Exact 418CF0 grass/gravel particle ownership/canvas contract failed' }
+          python tools/verify_dx9ex_r26_projected_flare_fusion.py
+          if ($LASTEXITCODE -ne 0) { throw 'Exact C993 projected flare ownership contract failed' }
+          python tools/verify_dx9ex_full_visual_trace_contract.py
+          if ($LASTEXITCODE -ne 0) { throw 'One-pass FULL visual trace contract failed' }
+
+      - name: Verify merged performance/quiet profile
+        shell: pwsh
+        run: |
+          python tools/verify_vr_r26_perf_profile.py
+          if ($LASTEXITCODE -ne 0) { throw 'Merged R26 performance profile not active' }
+          $ini = Get-Content OutRun2006Tweaks.ini -Raw
+          if (!$ini.Contains('Telemetry = false')) { throw 'VR telemetry must be off' }
+          $host = Get-Content vrhost/src/main.cpp -Raw
+          if (!$host.Contains('OutRunVrFullTraceEnabled()')) { throw 'Host full trace gating absent' }
+          $launcher = Get-Content tools/vr_perf_quiet/Run-VRPerfQuiet.ps1 -Raw
+          foreach ($flag in @('-DirectGpuOnly=true','-AutoRenderResolution=true','-VR.Telemetry=false')) {
+            if (!$launcher.Contains($flag)) { throw "Missing quiet full-quality flag: $flag" }
+          }
+
+      - name: Configure Win32 R26+HUD
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32
+          $cache = Get-Content build-game/CMakeCache.txt
+          if ($cache -notcontains 'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON') {
+            throw 'R26+HUD default renderer is not active'
+          }
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+
+      - name: Build x64 OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+
+      - name: Assemble no-full-trace all-optimizations VR test build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $dir = "OutRun2_VR_FOCUS_PERF_QUIET_$short"
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (!$dll) { throw 'No Win32 game DLL' }
+          $hostExe = Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
+          if (!$hostExe) { throw 'No x64 OpenXR host' }
+          Copy-Item $dll.FullName "$dir/dinput8.dll"
+          Copy-Item $hostExe.FullName "$dir/outrun-vr-host.exe"
+          Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
+          Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
+          Copy-Item tools/vr_perf_quiet/Run-VRPerfQuiet.ps1 "$dir/Run-VRPerfQuiet.ps1"
+          Copy-Item tools/vr_perf_quiet/RUN_VR_PERF_QUIET.cmd "$dir/RUN_VR_PERF_QUIET.cmd"
+          Copy-Item tools/vr_perf_quiet/README_FIRST.txt "$dir/README_FIRST.txt"
+          Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
+          # Verify PE CPU architectures and mandatory runtime log gate.
+          $pe = [IO.File]::ReadAllBytes("$dir/dinput8.dll")
+          $offset = [BitConverter]::ToInt32($pe,0x3c)
+          if ($pe.Length -lt 1000000 -or [BitConverter]::ToUInt16($pe,$offset+4) -ne 0x014c) { throw 'Invalid Win32 DLL' }
+          $hpe = [IO.File]::ReadAllBytes("$dir/outrun-vr-host.exe")
+          $offset = [BitConverter]::ToInt32($hpe,0x3c)
+          if ([BitConverter]::ToUInt16($hpe,$offset+4) -ne 0x8664) { throw 'Invalid x64 host' }
+          $scriptText = Get-Content "$dir/Run-VRPerfQuiet.ps1" -Raw
+          $tokens=$null; $parseErrors=$null
+          $null = [Management.Automation.Language.Parser]::ParseFile((Resolve-Path "$dir/Run-VRPerfQuiet.ps1").Path,[ref]$tokens,[ref]$parseErrors)
+          if ($parseErrors.Count) { throw "Invalid launcher syntax: $parseErrors" }
+          @(
+            'BASE_VISUAL_FOCUS_SHA=9e26abe49fc414ae8eeaa9f3bbebe16ab618d385'
+            "TEST_SHA=$env:GITHUB_SHA"
+            'INTEGRATED=0b39f432,36d5882d,6b75e5cb,73e1bfc5,8ee0bc11'
+            'LOGGING=OFF: game telemetry, host full trace, XR pixel probe'
+            'EYE_RESOLUTION=OpenXR recommended per-eye allocation'
+            'TRANSPORT=DirectGPU-only for gameplay; menu Desktop Duplication kept'
+            'MONO_SHADOW=SAFE fallback retained; unsafe white-screen no-mono patch excluded'
+            'RUNTIME_QUEST_VALIDATION=UNTESTED'
+          ) | Set-Content "$dir/BUILD_PROVENANCE.txt" -Encoding UTF8
+          Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
+          Get-FileHash "$dir.zip" -Algorithm SHA256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun-VR-FOCUS-PERF-QUIET-${{ github.sha }}
+          path: OutRun2_VR_FOCUS_PERF_QUIET_*.zip
+          retention-days: 21
+          if-no-files-found: error

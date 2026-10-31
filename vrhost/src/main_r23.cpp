@@ -4403,6 +4403,7 @@ int main(int argc, char** argv)
             R23Pixels.NoteFinalSubmission(
                 submissionSerialBefore, submissionSerialAfter);
             CheckXr(endResult, "xrEndFrame");
+            if (OutRunVrFullTraceEnabled())
             {
                 static std::uint64_t fullTraceXrTick = 0;
                 ++fullTraceXrTick;

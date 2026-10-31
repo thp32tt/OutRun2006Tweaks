@@ -401,6 +401,7 @@ namespace OutRunVRStereo
         using R30ShadowPtr = std::shared_ptr<R30BufferShadow>;
         std::mutex R30ShadowRegistryMutex;
         std::mutex R30ShadowHookMutex;
+        std::atomic<std::uintptr_t> R30VertexHooksReady{0}, R30IndexHooksReady{0};
         std::unordered_map<IDirect3DVertexBuffer9*, R30ShadowPtr>
             R30VertexShadows;
         std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
@@ -427,6 +428,8 @@ namespace OutRunVRStereo
             // before reprojection; no value-initialization is needed on growth.
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch left;
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch right;
+            std::vector<std::array<float, 4>> restoredView;
+            std::vector<std::uint32_t> compactPhysical;
             std::vector<std::uint8_t> used;
             std::vector<std::uint32_t> physical;
             std::vector<std::uint16_t> indices16;
@@ -599,9 +602,9 @@ namespace OutRunVRStereo
         }
 
         bool R30CopyVertexShadow(IDirect3DVertexBuffer9* buffer,
-            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out)
+            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out, const R30ShadowPtr& known = R30ShadowPtr())
         {
-            const auto entry = R30FindVertexShadow(buffer);
+            const auto entry = known ? known : R30FindVertexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
@@ -634,10 +637,54 @@ namespace OutRunVRStereo
             return true;
         }
 
-        bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
-            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out)
+        bool R30ReadIndexDesc(IDirect3DIndexBuffer9* buffer, D3DINDEXBUFFER_DESC& desc, const R30ShadowPtr& known = R30ShadowPtr())
         {
-            const auto entry = R30FindIndexShadow(buffer);
+            auto entry = known ? known : R30FindIndexShadow(buffer);
+            if (!entry) return SUCCEEDED(buffer->GetDesc(&desc));
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            desc.Size = entry->size;
+            desc.Format = entry->indexFormat;
+            return true;
+        }
+
+        bool R30ReadVertexDesc(IDirect3DVertexBuffer9* buffer, D3DVERTEXBUFFER_DESC& desc, const R30ShadowPtr& known = R30ShadowPtr())
+        {
+            auto entry = known ? known : R30FindVertexShadow(buffer);
+            if (!entry) return SUCCEEDED(buffer->GetDesc(&desc));
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            desc.Size = entry->size;
+            return true;
+        }
+
+        bool R30CopySparseVertexShadow(IDirect3DVertexBuffer9* buffer,
+            UINT streamOffset, UINT stride, const std::vector<std::uint32_t>& physical,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out, const R30ShadowPtr& known = R30ShadowPtr())
+        {
+            const auto entry = known ? known : R30FindVertexShadow(buffer);
+            if (!entry || physical.empty()) return false;
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            if (entry->bytes.size() != entry->size) return false;
+            const std::uint64_t bytes = std::uint64_t(physical.size()) * stride;
+            if (!bytes || bytes > 4u * 1024u * 1024u) return false;
+            for (const auto index : physical)
+            {
+                const std::uint64_t offset = std::uint64_t(streamOffset) + std::uint64_t(index) * stride;
+                if (offset > entry->size || stride > entry->size - offset ||
+                    !R30RangeValid(entry->valid, static_cast<UINT>(offset),
+                        static_cast<UINT>(offset + stride))) return false;
+            }
+            try { out.resize(static_cast<std::size_t>(bytes)); } catch (...) { return false; }
+            for (std::size_t i = 0; i < physical.size(); ++i)
+                std::memcpy(out.data() + i * stride,
+                    entry->bytes.data() + streamOffset + std::size_t(physical[i]) * stride, stride);
+            ++R30ShadowReadHits;
+            return true;
+        }
+
+        bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
+            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out, const R30ShadowPtr& known = R30ShadowPtr())
+        {
+            const auto entry = known ? known : R30FindIndexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
@@ -780,8 +827,10 @@ namespace OutRunVRStereo
         {
             if (!buffer)
                 return false;
-            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             auto** vtable = *reinterpret_cast<void***>(buffer);
+            const auto tableKey = reinterpret_cast<std::uintptr_t>(vtable);
+            if (R30VertexHooksReady.load(std::memory_order_acquire) == tableKey) return true;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             if (!R30VertexBufferLockHook)
                 R30VertexBufferLockHook = safetyhook::create_inline(
                     vtable[R30BufferLockVtableIndex],
@@ -794,16 +843,20 @@ namespace OutRunVRStereo
                 R30VertexBufferReleaseHook = safetyhook::create_inline(
                     vtable[R30BufferReleaseVtableIndex],
                     R30VertexBufferReleaseDest);
-            return R30VertexBufferLockHook &&
+            const bool ready = R30VertexBufferLockHook &&
                 R30VertexBufferUnlockHook && R30VertexBufferReleaseHook;
+            if (ready) R30VertexHooksReady.store(tableKey, std::memory_order_release);
+            return ready;
         }
 
         bool R30EnsureIndexBufferHooks(IDirect3DIndexBuffer9* buffer)
         {
             if (!buffer)
                 return false;
-            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             auto** vtable = *reinterpret_cast<void***>(buffer);
+            const auto tableKey = reinterpret_cast<std::uintptr_t>(vtable);
+            if (R30IndexHooksReady.load(std::memory_order_acquire) == tableKey) return true;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
             if (!R30IndexBufferLockHook)
                 R30IndexBufferLockHook = safetyhook::create_inline(
                     vtable[R30BufferLockVtableIndex],
@@ -816,8 +869,10 @@ namespace OutRunVRStereo
                 R30IndexBufferReleaseHook = safetyhook::create_inline(
                     vtable[R30BufferReleaseVtableIndex],
                     R30IndexBufferReleaseDest);
-            return R30IndexBufferLockHook &&
+            const bool ready = R30IndexBufferLockHook &&
                 R30IndexBufferUnlockHook && R30IndexBufferReleaseHook;
+            if (ready) R30IndexHooksReady.store(tableKey, std::memory_order_release);
+            return ready;
         }
 
         HRESULT __stdcall R30CreateVertexBufferDest(
@@ -895,6 +950,9 @@ namespace OutRunVRStereo
 
         void R30RollbackBufferShadowHooks() noexcept
         {
+            std::lock_guard<std::mutex> hookLock(R30ShadowHookMutex);
+            R30VertexHooksReady.store(0, std::memory_order_release);
+            R30IndexHooksReady.store(0, std::memory_order_release);
             // Unhook entry points before dropping registry ownership. Any draw
             // holding a COM reference also holds a shared_ptr acquired from the
             // registry, so clearing the maps cannot invalidate an in-flight
@@ -3791,7 +3849,7 @@ namespace OutRunVRStereo
                 std::fabs(baseProjection._11) < 0.01f ||
                 std::fabs(baseProjection._22) < 0.01f ||
                 std::fabs(baseProjection._34) < 0.25f ||
-                !InvertMatrix(baseProjection, state.inverseBaseProjection) ||
+                !GetInverseProjection(baseProjection, state.inverseBaseProjection) ||
                 !MatrixFinite(state.inverseBaseProjection))
                 return false;
             state.fullWorldReprojection = true;
@@ -3804,37 +3862,22 @@ namespace OutRunVRStereo
                 0.5f * (state.stereo.eyeOffset[0][2] +
                         state.stereo.eyeOffset[1][2])
             };
-            const float zero[3]{};
-
+            auto mathFrame = state.stereo;
             for (int eye = 0; eye < 2; ++eye)
             {
-                // Use the exact same per-eye rigid transform convention as the
-                // normal fixed-function/world path: view * eyeInverse *
-                // eyeProjection. The reconstructed CPU-projected point is
-                // already in game view space, so only eyeInverse is applied
-                // here; common head/camera motion must not be applied twice.
-                // CPU-projected XYZRHW effects were generated from OutRun's
-                // already head-synchronised camera. Reapplying the absolute HMD
-                // eye orientation here rotates them twice and shifts smoke/skid
-                // away from the road. Apply only the eye pose relative to the
-                // common head centre; the asymmetric eye projection still owns
-                // the final FOV.
-                const float relativeEye[3]{
-                    state.stereo.eyeOffset[eye][0] - center[0],
-                    state.stereo.eyeOffset[eye][1] - center[1],
-                    state.stereo.eyeOffset[eye][2] - center[2]
-                };
-                const float identityOrientation[4]{
-                    0.0f, 0.0f, 0.0f, 1.0f
-                };
-                const D3DMATRIX eyePose =
-                    MatrixFromQuaternionTranslation(
-                        identityOrientation, relativeEye,
-                        Settings::VRWorldScale * Settings::VRStereoDepth);
-                state.eyeInverse[eye] = InverseRigid(eyePose);
-                state.eyeProjection[eye] =
-                    ProjectionFromFov(baseProjection,
-                        state.stereo.eyeFov[eye]);
+                mathFrame.eyeOrientation[eye][0] = 0.0f;
+                mathFrame.eyeOrientation[eye][1] = 0.0f;
+                mathFrame.eyeOrientation[eye][2] = 0.0f;
+                mathFrame.eyeOrientation[eye][3] = 1.0f;
+                for (int axis = 0; axis < 3; ++axis)
+                    mathFrame.eyeOffset[eye][axis] -= center[axis];
+            }
+            const auto* eyeMath = R26CachedEyeMath(baseProjection, mathFrame);
+            if (!eyeMath) return false;
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                state.eyeInverse[eye] = eyeMath->inverse[eye];
+                state.eyeProjection[eye] = eyeMath->projection[eye];
 
                 // Preserve a conservative affine fallback for vertices whose
                 // clip reconstruction is unsafe. Its parallax uses the old
@@ -3912,7 +3955,9 @@ namespace OutRunVRStereo
             const R30XyzrhwState& state, int eye,
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out,
             const std::vector<std::uint8_t>* usedMask,
-            bool allowFullReprojection, bool& usedFullReprojection) noexcept
+            bool allowFullReprojection, bool& usedFullReprojection,
+            std::vector<std::array<float, 4>>* sharedView = nullptr,
+            UINT* restoredThrough = nullptr) noexcept
         {
             usedFullReprojection = false;
             if (!source || vertexCount == 0 || stride < sizeof(float) * 4 ||
@@ -4108,6 +4153,14 @@ namespace OutRunVRStereo
                     bool screenZViewZValid = false;
 
                     float restoredView[4]{};
+                    // A single draw/mask owns the reconstructed game-view values.
+                    // Reuse only in the other eye, not across producer draws.
+                    if (sharedView && restoredThrough && i < *restoredThrough)
+                    {
+                        std::memcpy(restoredView, (*sharedView)[i].data(), sizeof(restoredView));
+                    }
+                    else
+                    {
                     bool restored = false;
 
                     // Retail 418CF0 grass/screen-quad particles explicitly
@@ -4237,6 +4290,13 @@ namespace OutRunVRStereo
                         restoredView[2] =
                             restoredViewH[2] * invRestoredW;
                         restoredView[3] = 1.0f;
+                    }
+
+                        if (sharedView && restoredThrough)
+                        {
+                            std::memcpy((*sharedView)[i].data(), restoredView, sizeof(restoredView));
+                            *restoredThrough = i + 1;
+                        }
                     }
 
                     // Match the normal world path exactly: the reconstructed
@@ -4473,14 +4533,23 @@ namespace OutRunVRStereo
             const R30XyzrhwState& state,
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& right,
+            std::vector<std::array<float, 4>>& sharedView,
             const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
         {
+            UINT restoredThrough = 0;
+            // Bound allocation before any output or native draw. Failure retains
+            // the original no-stereo fallback, not a partially submitted eye.
+            if (state.worldEffect && state.fullWorldReprojection)
+            {
+                if (!vertexCount || vertexCount > 262144u) return false;
+                try { if (sharedView.size() < vertexCount) sharedView.resize(vertexCount); } catch (...) { return false; }
+            }
             bool leftFull = false;
             bool rightFull = false;
             if (!R30TransformXyzrhwVertices(source, vertexCount, stride,
-                    state, 0, left, usedMask, true, leftFull) ||
+                    state, 0, left, usedMask, true, leftFull, &sharedView, &restoredThrough) ||
                 !R30TransformXyzrhwVertices(source, vertexCount, stride,
-                    state, 1, right, usedMask, true, rightFull))
+                    state, 1, right, usedMask, true, rightFull, &sharedView, &restoredThrough))
                 return false;
 
             if (leftFull != rightFull)
@@ -4493,10 +4562,12 @@ namespace OutRunVRStereo
                         "VR R30.6 XYZRHW WORLD: one eye rejected full reprojection; both eyes are forced onto the same affine fallback policy");
                 }
                 bool ignored = false;
-                if (!R30TransformXyzrhwVertices(source, vertexCount, stride,
-                        state, 0, left, usedMask, false, ignored) ||
-                    !R30TransformXyzrhwVertices(source, vertexCount, stride,
-                        state, 1, right, usedMask, false, ignored))
+                // The failed-full eye already contains the exact affine output.
+                // Recompute only the eye that still contains full projection.
+                if ((leftFull && !R30TransformXyzrhwVertices(source, vertexCount, stride,
+                        state, 0, left, usedMask, false, ignored)) ||
+                    (rightFull && !R30TransformXyzrhwVertices(source, vertexCount, stride,
+                        state, 1, right, usedMask, false, ignored)))
                     return false;
             }
 
@@ -4957,7 +5028,7 @@ namespace OutRunVRStereo
             auto& scratch = *lease.buffers;
             if (!R30TransformXyzrhwStereo(
                     data, vertexCount, stride, state,
-                    scratch.left, scratch.right))
+                    scratch.left, scratch.right, scratch.restoredView))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
@@ -5085,7 +5156,7 @@ namespace OutRunVRStereo
 
             if (!R30TransformXyzrhwStereo(
                     windowVertexData, vertexCount, stride, state,
-                    scratch.left, scratch.right, &scratch.used))
+                    scratch.left, scratch.right, scratch.restoredView, &scratch.used))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
@@ -5184,7 +5255,7 @@ namespace OutRunVRStereo
             R30EnsureVertexBufferHooks(vb);
             const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
                 true, std::memory_order_acq_rel);
-            R30EnsureVertexShadow(vb);
+            const auto vertexShadow = R30EnsureVertexShadow(vb);
             if (!wasArmed && !R30FirstShadowArmLogged)
             {
                 R30FirstShadowArmLogged = true;
@@ -5198,7 +5269,7 @@ namespace OutRunVRStereo
                 static_cast<std::uint64_t>(startVertex) * stride;
             const std::uint64_t byteCount =
                 static_cast<std::uint64_t>(vertexCount) * stride;
-            if (FAILED(vb->GetDesc(&desc)) || firstByte > desc.Size ||
+            if (!R30ReadVertexDesc(vb, desc, vertexShadow) || firstByte > desc.Size ||
                 byteCount > desc.Size - firstByte ||
                 firstByte > UINT_MAX || byteCount > UINT_MAX)
             {
@@ -5215,7 +5286,7 @@ namespace OutRunVRStereo
             auto& scratch = *lease.buffers;
             if (!R30CopyVertexShadow(vb,
                     static_cast<UINT>(firstByte),
-                    static_cast<UINT>(byteCount), scratch.source))
+                    static_cast<UINT>(byteCount), scratch.source, vertexShadow))
             {
                 vb->Release();
                 ++R30XyzrhwFallbacks;
@@ -5227,7 +5298,7 @@ namespace OutRunVRStereo
                     stride, state) ||
                 !R30TransformXyzrhwStereo(
                     scratch.source.data(), vertexCount, stride, state,
-                    scratch.left, scratch.right))
+                    scratch.left, scratch.right, scratch.restoredView))
             {
                 vb->Release();
                 ++R30XyzrhwFallbacks;
@@ -5299,8 +5370,8 @@ namespace OutRunVRStereo
             R30EnsureIndexBufferHooks(ib);
             const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
                 true, std::memory_order_acq_rel);
-            R30EnsureVertexShadow(vb);
-            R30EnsureIndexShadow(ib);
+            const auto vertexShadow = R30EnsureVertexShadow(vb);
+            const auto indexShadow = R30EnsureIndexShadow(ib);
             if (!wasArmed && !R30FirstShadowArmLogged)
             {
                 R30FirstShadowArmLogged = true;
@@ -5309,7 +5380,7 @@ namespace OutRunVRStereo
             }
 
             D3DINDEXBUFFER_DESC ibDesc{};
-            if (FAILED(ib->GetDesc(&ibDesc)) ||
+            if (!R30ReadIndexDesc(ib, ibDesc, indexShadow) ||
                 (ibDesc.Format != D3DFMT_INDEX16 &&
                  ibDesc.Format != D3DFMT_INDEX32))
             {
@@ -5342,7 +5413,7 @@ namespace OutRunVRStereo
             auto& scratch = *lease.buffers;
             if (!R30CopyIndexShadow(ib,
                     static_cast<UINT>(firstIndexByte),
-                    static_cast<UINT>(indexBytes), scratch.indexSource))
+                    static_cast<UINT>(indexBytes), scratch.indexSource, indexShadow))
             {
                 ib->Release();
                 vb->Release();
@@ -5399,7 +5470,7 @@ namespace OutRunVRStereo
                 vb->Release();
                 return E_NOTIMPL;
             }
-            const UINT vertexCount = static_cast<UINT>(vertexCount64);
+            UINT vertexCount = static_cast<UINT>(vertexCount64);
 
             D3DVERTEXBUFFER_DESC vbDesc{};
             const std::uint64_t firstVertexByte =
@@ -5407,7 +5478,7 @@ namespace OutRunVRStereo
                 static_cast<std::uint64_t>(minPhysical) * stride;
             const std::uint64_t vertexBytes =
                 static_cast<std::uint64_t>(vertexCount) * stride;
-            if (FAILED(vb->GetDesc(&vbDesc)) ||
+            if (!R30ReadVertexDesc(vb, vbDesc, vertexShadow) ||
                 firstVertexByte > vbDesc.Size ||
                 vertexBytes > vbDesc.Size - firstVertexByte ||
                 firstVertexByte > UINT_MAX || vertexBytes > UINT_MAX)
@@ -5417,9 +5488,34 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
+            bool compact = vertexCount >= 1024u && indexCount < vertexCount / 2u;
+            if (compact)
+            {
+                try
+                {
+                    scratch.compactPhysical.assign(scratch.physical.begin(), scratch.physical.end());
+                    std::sort(scratch.compactPhysical.begin(), scratch.compactPhysical.end());
+                    scratch.compactPhysical.erase(std::unique(scratch.compactPhysical.begin(),
+                        scratch.compactPhysical.end()), scratch.compactPhysical.end());
+                }
+                catch (...) { ib->Release(); vb->Release(); return E_NOTIMPL; }
+                if (!R30CopySparseVertexShadow(vb, streamOffset, stride,
+                        scratch.compactPhysical, scratch.source, vertexShadow))
+                { ib->Release(); vb->Release(); ++R30XyzrhwFallbacks; return E_NOTIMPL; }
+                // Remap indices without changing primitive order or attributes.
+                for (auto& index : scratch.physical)
+                    index = static_cast<std::uint32_t>(std::lower_bound(
+                        scratch.compactPhysical.begin(), scratch.compactPhysical.end(), index)
+                        - scratch.compactPhysical.begin());
+                minPhysical = 0;
+                vertexCount = static_cast<UINT>(scratch.compactPhysical.size());
+                // Every compacted vertex occurs in the original index stream.
+            }
+            else
+            {
             if (!R30CopyVertexShadow(vb,
                     static_cast<UINT>(firstVertexByte),
-                    static_cast<UINT>(vertexBytes), scratch.source))
+                    static_cast<UINT>(vertexBytes), scratch.source, vertexShadow))
             {
                 ib->Release();
                 vb->Release();
@@ -5451,12 +5547,14 @@ namespace OutRunVRStereo
                 scratch.used[static_cast<std::size_t>(local)] = 1;
             }
 
+            }
+
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, scratch.source.data(), vertexCount,
-                    stride, state, &scratch.used) ||
+                    stride, state, compact ? nullptr : &scratch.used) ||
                 !R30TransformXyzrhwStereo(
                     scratch.source.data(), vertexCount, stride, state,
-                    scratch.left, scratch.right, &scratch.used))
+                    scratch.left, scratch.right, scratch.restoredView, compact ? nullptr : &scratch.used))
             {
                 ib->Release();
                 vb->Release();
@@ -5490,17 +5588,10 @@ namespace OutRunVRStereo
             }
             else
             {
-                try { scratch.indices32.resize(indexCount); }
-                catch (...) {
-                    ib->Release();
-                    vb->Release();
-                    return E_NOTIMPL;
-                }
-                for (UINT i = 0; i < indexCount; ++i)
-                    scratch.indices32[i] =
-                        scratch.physical[i] -
-                        static_cast<std::uint32_t>(minPhysical);
-                rebased = scratch.indices32.data();
+                // physical is dead after this conversion; submit its storage directly.
+                for (auto& index : scratch.physical)
+                    index -= static_cast<std::uint32_t>(minPhysical);
+                rebased = scratch.physical.data();
             }
 
             auto leftDraw = [&]() {

@@ -1,0 +1,15 @@
+{
+  "task_id": "USER-DX9EX-PERF-ROUND3-20261030",
+  "base_sha": "9515877c76479461d1ad990bb31291e117403ecf",
+  "changes": [
+    "4-entry exact input math cache",
+    "per-draw retained shadow references",
+    "atomic vtable-ready hook fast path with rollback invalidation",
+    "high-water initialized view scratch",
+    "compact all-used mask elimination"
+  ],
+  "validation": "4000 transform cases PASS, alternating cache 100 warm requests zero builds, retained shadow after registry removal PASS; CI pending",
+  "runtime": "UNTESTED",
+  "preserved": "diagnostics MSAA2 culling8 reflection512 transparencyOff",
+  "score_delta": 0
+}

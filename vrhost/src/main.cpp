@@ -32,8 +32,20 @@
 #include "runtime/menu_capture_snapshot.hpp"
 #include "runtime/projection_pair_pipeline.hpp"
 
+static bool OutRunVrFullTraceEnabled() noexcept
+{
+    // Expensive full-frame trace is opt-in: no frame string formatting/file flush
+    // on the normal performance test path.
+    static const bool enabled = []() noexcept {
+        const char* value = std::getenv("OUTRUN_VR_FULL_TRACE");
+        return value && std::strcmp(value, "1") == 0;
+    }();
+    return enabled;
+}
+
 static void OutRunVrEmitFullTrace(const std::string& line)
 {
+    if (!OutRunVrFullTraceEnabled()) return;
     std::cout << line;
     static std::ofstream log(
         "outrun-vr-host-full-trace.log",
@@ -1483,6 +1495,8 @@ namespace
 
             std::uint32_t image = 0;
             Acquire(projection_, image);
+            if (OutRunVrFullTraceEnabled())
+            {
             std::ostringstream fullTraceBlit;
             fullTraceBlit
                 << "[VR TRACE HOST PROJECTION BLIT FULL]"
@@ -1501,6 +1515,7 @@ namespace
                 << eyes[1].w << "," << eyes[1].h
                 << "\n";
             OutRunVrEmitFullTrace(fullTraceBlit.str());
+            }
             const bool firstEyeOk = RenderTo(
                 projection_.rtvs[image][0], projection_.width, projection_.height,
                 eyes[0], eyeSrv[0], eyeFormat[0], 0);

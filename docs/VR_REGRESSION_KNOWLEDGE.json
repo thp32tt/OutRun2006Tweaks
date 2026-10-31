@@ -188,6 +188,14 @@
           "Quest3/VDXR CORRECTNESS or PERFORMANCE comparison on the same scene/profile must not visibly regress pacing from the protected baseline",
           "capture standardized timing telemetry when a pacing regression is suspected"
         ]
+      },
+      "performanceExperiment20261029": {
+        "taskId": "USER-DX9EX-PERF-TEST-20261028",
+        "branch": "perf/r26-copy-math-aa-20261028",
+        "baseSha": "cffec078b50debec5b8a95e5b0fb4a6653cec272",
+        "evidence": "docs/automation/reviews/R26_PERFORMANCE_TEST_20261028.md",
+        "runtimeValidation": "UNTESTED",
+        "status": "SOURCE_REGRESSION_PASS_WINDOWS_PENDING"
       }
     },
     {
