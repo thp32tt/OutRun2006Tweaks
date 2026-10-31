@@ -1,0 +1,71 @@
+name: VR Mono Shadow Elision Test Build
+
+on:
+  push:
+    branches:
+      - 'test/r26-no-mono-shadow-*'
+  workflow_dispatch:
+
+jobs:
+  vr_test_build:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact test branch
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure Win32 Release
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build -G "Visual Studio 17 2022" -A Win32
+
+      - name: Older VS2022 safetyhook compatibility
+        shell: pwsh
+        run: |
+          (Get-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build/_deps/zydis-build/zycore/Zycore.vcxproj
+
+      - name: Disable obsolete SDL GameInput source
+        shell: pwsh
+        run: |
+          Set-Content -Path build/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Compile game VR and host
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Validate and package test binary
+        shell: pwsh
+        run: |
+          if (!(Test-Path build/bin/dinput8.dll)) { throw 'Missing Win32 dinput8.dll' }
+          $bytes = [System.IO.File]::ReadAllBytes('build/bin/dinput8.dll')
+          if ($bytes.Length -lt 1000000 -or $bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw 'Invalid PE32 test DLL' }
+          $peOffset = [BitConverter]::ToInt32($bytes,0x3C)
+          if ([BitConverter]::ToUInt16($bytes,$peOffset+4) -ne 0x014C) { throw 'Not x86' }
+          $ascii = [System.Text.Encoding]::ASCII.GetString($bytes)
+          if (!$ascii.Contains('elidedDraws=')) { throw 'Missing new no-shadow telemetry' }
+          Copy-Item OutRun2006Tweaks.ini build/bin/OutRun2006Tweaks.ini
+          Copy-Item OutRun2006Tweaks.lods.ini build/bin/OutRun2006Tweaks.lods.ini
+          New-Item -ItemType Directory -Force build/bin/VR_NO_MONO_TEST | Out-Null
+          @(
+            'VR TEST ONLY / NOT A RELEASE',
+            'Branch: test/r26-no-mono-shadow-20261101',
+            "Commit: $env:GITHUB_SHA",
+            'NORMAL: stereo LEFT+RIGHT, no center mono shadow draw/clear',
+            'FAILURE: no invalid mono restore, hold last valid host projection',
+            'Check VR R9 mono[draws=0, elidedDraws=..., elidedClears=..., heldFrames=...]',
+            'Restore original DLL for rollback; game runtime is not yet validated.'
+          ) | Set-Content build/bin/VR_NO_MONO_TEST/README.txt
+          Get-FileHash build/bin/dinput8.dll -Algorithm SHA256
+
+      - name: Upload playable test payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: VR_MONO_ELISION_TEST_${{ github.sha }}
+          path: build/bin/
+          retention-days: 14
+          if-no-files-found: error
