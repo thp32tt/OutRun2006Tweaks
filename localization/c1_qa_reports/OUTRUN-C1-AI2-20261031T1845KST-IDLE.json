@@ -1,0 +1,83 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261031T1845KST-IDLE",
+  "requested_at_kst": "2026-10-31T18:45:00+09:00",
+  "checked_at_kst": "2026-10-31T18:47:20+09:00",
+  "role": "C1",
+  "status": "IDLE",
+  "reason": "NO_NEW_VERIFIED_UNREVIEWED_A_B_KOREAN_CANDIDATE_PNG_SINCE_PRIOR_SHA_INVENTORY",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "asset_head_before_report": "cc0e5a86c98e876acead17777b90b95fd01355c2",
+  "sources_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json",
+    "localization/c1_qa_reports/OUTRUN-C1-AI2-20261031T1815KST-IDLE.json"
+  ],
+  "n100_inventory": {
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+    "A_candidate_png_count": 437,
+    "B_candidate_png_count": 483,
+    "total_candidate_png_count": 920,
+    "export_evidence_files": 289,
+    "prior_reviewed_sha_records": 925,
+    "prior_unreviewed_sha": 0,
+    "prior_full_dedup_report_time_kst": "2026-10-31T17:45:00+09:00",
+    "A_candidate_directory_mtime_utc": "2026-10-30T09:00:02.155Z",
+    "B_candidate_directory_mtime_utc": "2026-10-30T08:50:07.171Z",
+    "export_evidence_directory_mtime_utc": "2026-10-30T09:00:02.157Z",
+    "prior_inventory_and_directory_mtimes_unchanged": true,
+    "A_producer_state": {
+      "completed_files": 436,
+      "completed_batches": 142,
+      "active": null
+    },
+    "B_producer_state": {
+      "completed_files": 483,
+      "completed_batches": 146,
+      "active": null
+    }
+  },
+  "candidate_sha256_spotchecks": [
+    {
+      "role": "A",
+      "file": "Q228_3df4ed65ab58f44f_k.png",
+      "sha256": "d8824b00014bc7a1233ca156310d75a2deb0508ffd14039113f91df04afa2530",
+      "matches_prior": true
+    },
+    {
+      "role": "B",
+      "file": "Q228_6a1d77db05265918_k.png",
+      "sha256": "312a2f13b9f52578afbf2453bf796eb368510cdf986340b2c0653b7788b4080b",
+      "matches_prior": true
+    }
+  ],
+  "results": {
+    "newly_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "idle": 1,
+    "repeat_sha_reviewed": false
+  },
+  "limitations": [
+    "No complete 920-file rehash was performed in this run. Existing 17:45 SHA dedup inventory was reused; current file counts, folder modification timestamps, producer states and two actual candidate SHA-256 spotchecks are unchanged.",
+    "No candidate visual QA, C2/C3, DDS deployment or gameplay acceptance claimed."
+  ],
+  "guardrails": {
+    "imagegen_called": false,
+    "AB_queue_consumed": false,
+    "new_dds_production": false,
+    "C2_C3_or_ingame_pass_created": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "score": {
+    "source": "thp32tt/ai-dev-lab@main/AI_SCOREBOARD.md",
+    "previous_ai2": 2267,
+    "delta": 0,
+    "cumulative_ai2": 2267,
+    "reason": "IDLE-only repeat inventory; no new distinct QA achievement."
+  }
+}
