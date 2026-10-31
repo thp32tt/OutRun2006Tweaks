@@ -10,13 +10,13 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:SOURCE_RGB_MASKED_DIRTY_UNION_TWO_DRAW_PRESENT",
   "classification": "A_SOURCE_IMPLEMENTATION",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_CANDIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_base_sha": "dd0c3c06a008e823ee989196d57ea3d7b9a30bf7",
-  "implementation_source_sha": null,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "implementation_source_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+  "material_result_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+  "validation_bearing_result_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
@@ -93,22 +93,31 @@
   },
   "acceptance_results": {
     "masked_gpu_rgb": {
-      "status": "PENDING",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp",
         "src/vr/d3d11/native_game_raw_present_coverage.hpp",
         "tests/native_raw_changed_crop_present_test.cpp"
-      ]
+      ],
+      "validation_command": "GitHub DX11 Fast 41239525745"
     },
     "game_present_fallback": {
-      "status": "PENDING",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "tests/native_raw_changed_crop_present_test.cpp"
-      ]
+      ],
+      "validation_command": "GitHub DX11 Fast 41239525745"
     },
     "exact_sha_gate": {
-      "status": "PENDING",
-      "evidence_paths": []
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41239525745",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41239525663",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41239525741",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41239525807",
+        "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41239525683"
+      ],
+      "validation_command": "41239525745,41239525663,41239525741,41239525807,41239525683"
     }
   },
   "safety": {
@@ -117,5 +126,58 @@
     "dxvk": "FROZEN_UNMODIFIED",
     "native_game_full_frame": "NOT_CLAIMED",
     "external_controller_adoption": "UNVERIFIED"
-  }
+  },
+  "c6_checkpoint_is_validation_bearing": false,
+  "real_game_native_draw_count": "UNTESTED",
+  "real_game_published_backbuffer_frames": "UNTESTED",
+  "validation": {
+    "exact_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+    "required_push_workflows_result": "5/5 completed SUCCESS on identical exact SHA",
+    "required_push_workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 41239525745,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+        "event": "push"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 41239525663,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+        "event": "push"
+      },
+      {
+        "name": "Build",
+        "run_id": 41239525741,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+        "event": "push"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 41239525807,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+        "event": "push"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 41239525683,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f9449edbd345bba5f615273c8d3e94c5ac161dfb",
+        "event": "push"
+      }
+    ],
+    "targeted_test": "DX11 Fast 41239525745 compiled and ran tests/native_raw_changed_crop_present_test.cpp including dual-capture dirty hole/exclusion/forged rcBound regression",
+    "runtime_game_and_quest3": "UNTESTED"
+  },
+  "scoring": "No new independent full-frame native renderer feature completed. Same unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME continuation; score change +0. GitHub AI2 SSOT confirmed 2312 on 2026-11-01 KST; scoreboard not rewritten.",
+  "next_source_action": "Continue genuine original D3D9 menu/car/race Draw and fully native GPU backbuffer presentation; this bounded opt-in RAW RGB path is not real-game full-scene or stereo completion. Require matching Quest3/VDXR runtime evidence before claiming visual parity."
 }
