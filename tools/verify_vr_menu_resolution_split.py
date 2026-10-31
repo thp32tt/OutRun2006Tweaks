@@ -56,6 +56,9 @@ assert 'MenuScale = 0.75' in ini
 assert 'ReadMenuScaleOverride(path, candidateMenuScale)' in host
 assert host.count('ReadMenuScaleOverride(path, candidateMenuScale)') == 2
 assert 'clientGameState, R23ConfiguredMenuScale);' in host
+aspect = (root / 'vrhost/src/runtime/menu_content_aspect.hpp').read_text(encoding='utf-8')
+assert 'gameState == 0x20u; // STATE_SUMO_FE runtime owner' in aspect
+assert 'ownsFrontEndOpticalScale ? menuScale : 1.0f' in aspect
 assert 'cachedMenuScale != R23ConfiguredMenuScale' in host
 assert 'HudScale = 0.55' in ini
 print('PASS menu logical coordinates / host 4:3 placement / physical XR target are independent; HMD UNTESTED')

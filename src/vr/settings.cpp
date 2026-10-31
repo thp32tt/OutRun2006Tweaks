@@ -67,7 +67,7 @@ namespace Settings
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
     Setting<float> VRMenuScale{ "VR", "MenuScale", 0.75f,
-        "Title/main menu size as a fraction of the binocular-safe 4:3 canvas (1 = maximum). Independent of game RenderWidth/Height, desktop resolution and HudScale. Saved changes are read by the host within 2.5 seconds; vehicle selection is unchanged.", Range<float>{ 0.50f, 1.0f } };
+        "Front-end optical size as a fraction of the binocular-safe source-aspect canvas (1 = maximum). Current Sumo FE title/main/Coast2Coast/car-select share this scale without forcing a 4:3 crop. Independent of game RenderWidth/Height, desktop resolution and HudScale.", Range<float>{ 0.50f, 1.0f } };
 	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
 	// HMD-proven DX11 R57 mode 6 projects car ordinal and rival markers

@@ -381,19 +381,23 @@ namespace OutRunVrMenuAspect
         return parsed;
     }
 
-    // Every menu state uses full safe optical coverage by default.
-    // Retain the state argument for the original game ABI/callers, but
-    // do not quietly reinstate the old 0.78 car-selector fallback.
+    // Keep non-front-end states at full safe optical coverage. The current
+    // Sumo front-end build keeps title/main/Coast2Coast/car-select under
+    // STATE_SUMO_FE (0x20), so a title-only 0x04/0x09 filter makes MenuScale
+    // inert on the exact Quest runtime that needs it. Applying the same
+    // optical size to 0x20 does NOT enable a 4:3 source crop: selector UV and
+    // source aspect remain governed separately by PlanStateSafeMenuCrop.
     inline float ResolveMenuOpticalCoverageForState(
         const char* requested, std::uint32_t gameState,
         float menuScale = 1.0f) noexcept
     {
-        // Only title/main-menu own this setting. Vehicle selection, pause,
-        // gameplay, results and unknown transitions keep their old policy.
-        // Scale is a fraction of the binocular-safe 4:3 canvas, independent
-        // of desktop pixels, game render extent and XR swapchain resolution.
-        const float defaultCoverage = gameState == 0x04u || gameState == 0x09u
-            ? menuScale : 1.0f;
+        const bool ownsFrontEndOpticalScale =
+            gameState == 0x04u || gameState == 0x09u ||
+            gameState == 0x20u; // STATE_SUMO_FE runtime owner
+        // Scale is a fraction of the binocular-safe source-aspect canvas,
+        // independent of desktop pixels, render extent and XR resolution.
+        const float defaultCoverage =
+            ownsFrontEndOpticalScale ? menuScale : 1.0f;
         return ResolveMenuOpticalCoverage(requested, defaultCoverage);
     }
 
