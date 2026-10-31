@@ -97,7 +97,28 @@
     ],
     "visible_frame_acceptance": "PARTIAL_NATIVE_SOURCE_RGB_PRESENT_PATH_VERIFIED_BY_CODE_AND_EXACT_SHA_CI_ONLY; REAL_GAME_FULL_FRAME_AND_HMD_UNTESTED",
     "full_gate_plan": "one_validation_bearing_sha",
-    "activation_guard_and_fallback": "RAW opt-in default OFF, native RGB origin and bounds proof, safe original game D3D9/DX9Ex fallback; DXVK unchanged"
+    "activation_guard_and_fallback": "RAW opt-in default OFF, native RGB origin and bounds proof, safe original game D3D9/DX9Ex fallback; DXVK unchanged",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_GPU_RGB_CAPTURE",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "REAL_GPU_RGB_SOURCE_ISLAND_PACKING",
+      "TILE_LOCAL_D3D9_SYSTEMMEM_STAGING_AND_PRESENT",
+      "MULTI_ISLAND_POSITIVE_AND_BOUNDS_NEGATIVE_TESTS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "01188 original native RGB packed transfer regression proves local 3x2 and 1x1 source islands reach the original D3D9 destination coordinates without scaling, under the prior five-gate exact SHA bda328fcfde7075ff16c3843f5b0e29340457312.",
+      "negative_regression": "01188 regression rejects invalid source dimensions and lock pitches before publishing; two-phase preflight rejects a later failed surface without committing earlier islands.",
+      "component_integration": "Previously implemented canonical original-game D3D9 Draw -> D3D11 native PRE/POST RGB -> packed SYSTEMMEM island -> original D3D9 Present UpdateSurface path. Not a complete native frame or live Quest3 evidence."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_color_transport.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_changed_crop_present_test.cpp"
+    ]
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
