@@ -220,7 +220,7 @@ class Uw2SimpleLoopTest(unittest.TestCase):
         self.assertFalse(self.tick(9, 30))  # newly seen reply: 20s stability first
         self.assertTrue(self.tick(9, 30, 25))
         self.assertEqual(self.sent, [PROMPT, PROMPT])
-        self.assertEqual(self.q["uw2_simple"]["last_send_reason"], "schedule_fallback")
+        self.assertEqual(self.q["uw2_simple"]["last_send_reason"], "response_complete")
 
     def test_30_minute_boundary_cannot_interrupt_busy_development(self):
         self.ns["UW2_CONTINUE_MIN_SECONDS"] = 1800
