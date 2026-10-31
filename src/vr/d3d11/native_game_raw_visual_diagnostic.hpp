@@ -537,34 +537,31 @@ public:
                                     captureTargetWidth_, captureTargetHeight_,
                                     back.Width, back.Height, l, t, r, b,
                                     wholeSecond);
-                            const auto appendFirst = [&]() noexcept -> bool {
-                                if (!firstSource) return false;
-                                changedWindow_.capture(before.pData, before.RowPitch,
-                                    mapped.pData, mapped.RowPitch, width, height);
-                                return sourceBatch.append(back.Width, back.Height,
-                                    *batchDirty, wholeFirst, changedWindow_, false, true);
-                            };
-                            const auto appendSecond = [&]() noexcept -> bool {
-                                if (!secondSource) return false;
-                                changedWindow_.capture(beforeAlternate.pData,
-                                    beforeAlternate.RowPitch, afterAlternate.pData,
-                                    afterAlternate.RowPitch, width, height);
-                                return sourceBatch.append(back.Width, back.Height,
-                                    *batchDirty, wholeSecond, changedWindow_, true, true);
-                            };
-                            const bool firstFound = appendFirst();
-                            const bool secondFound = appendSecond();
-                            // No extra allocation, resampling, non-dirty
-                            // destination or shared staging surface is allowed.
-                            bool nextFirst = firstFound, nextSecond = secondFound;
+                            // Capture each real GPU PRE/POST image once.
+                            // Separate bounded prefix workspaces let the
+                            // selector compare true next-island RGB counts,
+                            // rather than alternately burning eight slots
+                            // on whichever capture happened to be first.
+                            if (firstSource)
+                                changedWindow_.capture(
+                                    before.pData, before.RowPitch,
+                                    mapped.pData, mapped.RowPitch,
+                                    width, height);
+                            if (secondSource)
+                                changedWindowAlternate_.capture(
+                                    beforeAlternate.pData, beforeAlternate.RowPitch,
+                                    afterAlternate.pData, afterAlternate.RowPitch,
+                                    width, height);
                             while (sourceBatch.count < kMaxSourceIslands &&
-                                   (nextFirst || nextSecond)) {
-                                const bool a = nextFirst && appendFirst();
-                                const bool b = nextSecond &&
-                                    sourceBatch.count < kMaxSourceIslands &&
-                                    appendSecond();
-                                nextFirst = a;
-                                nextSecond = b;
+                                   sourceBatch.append_best_of_two(
+                                       back.Width, back.Height, *batchDirty,
+                                       firstSource ? &wholeFirst : nullptr,
+                                       firstSource ? &changedWindow_ : nullptr,
+                                       secondSource ? &wholeSecond : nullptr,
+                                       secondSource ? &changedWindowAlternate_ : nullptr)) {
+                                // Each winner has distinct original game
+                                // coordinates and a strictly positive real
+                                // GPU RGB delta. The append rejects gaps.
                             }
                         }
                         // Preserve true source coordinates even when a
@@ -1153,6 +1150,7 @@ private:
     bool rgbEvidenceConfirmed_ = false;
     NativeRawGpuCaptureEpoch captureEpoch_{};
     NativeRawChangedPixelWindow changedWindow_{};
+    NativeRawChangedPixelWindow changedWindowAlternate_{};
 };
 } // namespace outrun::vr::dx11
 

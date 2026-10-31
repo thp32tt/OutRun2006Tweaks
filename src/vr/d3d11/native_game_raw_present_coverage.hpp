@@ -570,6 +570,43 @@ struct NativeRawSourceIslandBatch {
         ++count;
         return true;
     }
+    // Choose the greatest number of newly paintable, source-authenticated
+    // native GPU RGB pixels for the next private D3D9 staging surface.
+    // The older first/second round-robin filled scarce slots with single
+    // changed pixels while skipping whole native menu/car/race rectangles.
+    // Probe both captures against the SAME previously committed exclusions;
+    // only the winner mutates the batch. Equal evidence prefers the first
+    // capture, preserving deterministic source order.
+    [[nodiscard]] bool append_best_of_two(
+        std::uint32_t backWidth, std::uint32_t backHeight,
+        const NativeRawPresentDirtyRegion& dirty,
+        const NativeRawPresentTile* firstTile,
+        const NativeRawChangedPixelWindow* firstRgb,
+        const NativeRawPresentTile* secondTile,
+        const NativeRawChangedPixelWindow* secondRgb) noexcept {
+        if (count >= kMaxIslands) return false;
+        NativeRawSourceIslandBatch winner{};
+        bool found = false;
+        const auto try_source = [&](const NativeRawPresentTile* tile,
+                                    const NativeRawChangedPixelWindow* rgb,
+                                    bool alternate) noexcept {
+            if (!tile || !rgb) return;
+            NativeRawSourceIslandBatch candidate = *this;
+            if (!candidate.append(backWidth, backHeight, dirty,
+                                  *tile, *rgb, alternate, true))
+                return;
+            if (!found ||
+                candidate.rgbPixels[count] > winner.rgbPixels[count]) {
+                winner = candidate;
+                found = true;
+            }
+        };
+        try_source(firstTile, firstRgb, false);
+        try_source(secondTile, secondRgb, true);
+        if (!found) return false;
+        *this = winner;
+        return true;
+    }
 };
 // Two individually source-authenticated native Draw crops can have
 // DIFFERENT widths/heights after exact D3D9 dirty-island clipping. Their

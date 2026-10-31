@@ -469,4 +469,92 @@ bool native_raw_packed_island_transfer_regression() {
      return true;
  }
 
-int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); }
+// Reserve a scarce source-authenticated Present budget for the most real
+// D3D11 RGB. Round-robin once published four 1px fragments from the alternate
+// capture ahead of four 2x2 menu panels from the primary capture. The full
+// eight-slot integrated path must paint all 32 authentic primary pixels.
+// When only two primary panels remain, it must also admit six distinct
+// alternate pixels; none may overlap or leave its game source coordinates.
+bool native_raw_ranked_two_capture_present_regression() {
+    constexpr std::uint32_t width = 32u, height = 12u;
+    constexpr std::size_t pitch = width * 4u;
+    std::array<std::uint8_t, pitch * height> baseline{}, primary{}, secondary{};
+    for (std::uint32_t n = 0u; n < 8u; ++n) {
+        const std::uint32_t x = 1u + 4u * n;
+        for (std::uint32_t y = 1u; y < 3u; ++y)
+            for (std::uint32_t xx = x; xx < x + 2u; ++xx)
+                primary[(y * width + xx) * 4u] =
+                    static_cast<std::uint8_t>(40u + n);
+        secondary[(8u * width + x) * 4u + 1u] =
+            static_cast<std::uint8_t>(100u + n);
+    }
+    NativeRawChangedPixelWindow first{}, second{};
+    first.capture(baseline.data(), pitch, primary.data(), pitch, width, height);
+    second.capture(baseline.data(), pitch, secondary.data(), pitch, width, height);
+    NativeRawPresentDirtyRegion dirty{};
+    dirty.headerVerified = true; dirty.count = 1u;
+    dirty.boundLeft = 100; dirty.boundTop = 300;
+    dirty.boundRight = 132; dirty.boundBottom = 312;
+    dirty.rectangles[0] = {100, 300, 132, 312};
+    const NativeRawPresentTile source{0u, 0u, width, height, 100, 300};
+    NativeRawSourceIslandBatch batch{};
+    for (std::uint32_t i = 0u; i < 8u; ++i)
+        if (!batch.append_best_of_two(
+                320u, 480u, dirty, &source, &first, &source, &second))
+            return false;
+    if (batch.count != 8u) return false;
+    std::uint32_t totalRgb = 0u;
+    for (std::uint32_t i = 0u; i < batch.count; ++i) {
+        const auto& tile = batch.tiles[i];
+        if (batch.alternate[i] || batch.rgbPixels[i] != 4u ||
+            tile.copyWidth != 2u || tile.copyHeight != 2u ||
+            tile.destinationY != 301 ||
+            tile.destinationX < 101 || tile.destinationX > 129 ||
+            ((tile.destinationX - 101) % 4) != 0)
+            return false;
+        totalRgb += batch.rgbPixels[i];
+        for (std::uint32_t j = 0u; j < i; ++j)
+            if (!native_raw_disjoint_present_tiles(tile, batch.tiles[j]))
+                return false;
+    }
+    if (totalRgb != 32u || batch.append_best_of_two(
+            320u, 480u, dirty, &source, &first, &source, &second))
+        return false;
+    // Two high-evidence panels and six genuinely separate alternate pixels
+    // must survive an actual two-source priority switch in the same batch.
+    for (std::uint32_t n = 2u; n < 8u; ++n)
+        for (std::uint32_t y = 1u; y < 3u; ++y)
+            for (std::uint32_t x = 1u + 4u * n; x < 3u + 4u * n; ++x)
+                primary[(y * width + x) * 4u] = 0u;
+    first.capture(baseline.data(), pitch, primary.data(), pitch, width, height);
+    NativeRawSourceIslandBatch mixed{};
+    for (std::uint32_t i = 0u; i < 8u; ++i)
+        if (!mixed.append_best_of_two(
+                320u, 480u, dirty, &source, &first, &source, &second))
+            return false;
+    std::uint32_t firstCount = 0u, secondCount = 0u;
+    for (std::uint32_t i = 0u; i < mixed.count; ++i) {
+        if (mixed.alternate[i]) {
+            if (mixed.rgbPixels[i] != 1u ||
+                mixed.tiles[i].destinationY != 308) return false;
+            ++secondCount;
+        } else {
+            if (mixed.rgbPixels[i] != 4u ||
+                mixed.tiles[i].destinationY != 301) return false;
+            ++firstCount;
+        }
+        for (std::uint32_t j = 0u; j < i; ++j)
+            if (!native_raw_disjoint_present_tiles(
+                    mixed.tiles[i], mixed.tiles[j])) return false;
+    }
+    if (firstCount != 2u || secondCount != 6u) return false;
+    const auto saved = mixed;
+    dirty.boundRight = 133; // forged original D3D9 rcBound
+    if (mixed.append_best_of_two(
+            320u, 480u, dirty, &source, &first, &source, &second) ||
+        mixed.count != saved.count)
+        return false;
+    return true;
+}
+
+int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); assert(native_raw_packed_island_transfer_regression()); assert(native_raw_eight_island_present_regression()); assert(native_raw_ranked_two_capture_present_regression()); }
