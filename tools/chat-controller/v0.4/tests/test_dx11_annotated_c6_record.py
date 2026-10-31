@@ -7,6 +7,7 @@ import ast
 import base64
 import json
 from pathlib import Path
+from typing import Optional
 import re
 import unittest
 import urllib.parse
@@ -37,7 +38,7 @@ class AnnotatedC6Test(unittest.TestCase):
             "runtime_validation": "UNTESTED",
         }
         self.env = {
-            "re": re, "json": json, "base64": base64,
+            "re": re, "json": json, "base64": base64, "Optional": Optional,
             "urllib": SimpleNamespace(parse=urllib.parse),
             "GITHUB_REPO": "thp32tt/OutRun2006Tweaks",
             "production_id_from_identifier": lambda x: x,
