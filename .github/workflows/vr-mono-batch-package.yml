@@ -56,9 +56,9 @@ jobs:
           if not exist "%BAK%" mkdir "%BAK%"
           if not exist "%BAK%" goto FAILED
           echo Backing up prior binaries...
-          call :SAVE dinput8.dll
-          call :SAVE outrun-vr-host.exe
-          if exist "%PKG%payload\openxr_loader.dll" call :SAVE openxr_loader.dll
+          call :SAVE dinput8.dll || goto FAILED
+          call :SAVE outrun-vr-host.exe || goto FAILED
+          if exist "%PKG%payload\openxr_loader.dll" call :SAVE openxr_loader.dll || goto FAILED
           echo Installing matching VR test binaries...
           copy /Y "%PKG%payload\dinput8.dll" "%GAME%\dinput8.dll" >nul || goto FAILED
           copy /Y "%PKG%payload\outrun-vr-host.exe" "%GAME%\outrun-vr-host.exe" >nul || goto FAILED
@@ -77,9 +77,9 @@ jobs:
           if exist "%BAK%\%~1" exit /b 0
           if exist "%BAK%\%~1.absent" exit /b 0
           if exist "%GAME%\%~1" (
-            copy /Y "%GAME%\%~1" "%BAK%\%~1" >nul
+            copy /Y "%GAME%\%~1" "%BAK%\%~1" >nul || exit /b 1
           ) else (
-            type nul > "%BAK%\%~1.absent"
+            type nul > "%BAK%\%~1.absent" || exit /b 1
           )
           exit /b 0
           :BAD_GAME
