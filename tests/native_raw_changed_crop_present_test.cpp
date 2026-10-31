@@ -3,6 +3,7 @@
 #include "../src/vr/d3d11/native_game_raw_partial_present_tile.hpp"
 #include "../src/vr/d3d11/native_game_raw_color_transport.hpp"
 #include "../src/vr/d3d11/native_game_raw_present_coverage.hpp"
+#include "../src/vr/d3d11/native_game_raw_upload_transaction.hpp"
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -246,4 +247,55 @@ bool native_raw_large_crop_sparse_dirty_source_regression() {
         1920u, 1080u, repaint, source, delta, false, true);
 }
 
-int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); }
+
+// The real multi-island Present caller uses the same staged-then-commit
+// transaction. A later surface create/lock/copy failure must not publish an
+// earlier source RGB island into the original game before fallback.
+bool native_raw_two_phase_present_regression() {
+    std::array<unsigned, 8> operations{};
+    unsigned count = 0u;
+    std::uint32_t committed = 99u;
+    const bool good = native_raw_preflight_publish_islands(
+        3u,
+        [&](std::uint32_t i) noexcept { operations[count++] = 10u + i; return true; },
+        [&](std::uint32_t i) noexcept { operations[count++] = 20u + i; return true; },
+        committed);
+    if (!good || committed != 3u || count != 6u ||
+        operations[0] != 10u || operations[1] != 11u ||
+        operations[2] != 12u || operations[3] != 20u ||
+        operations[4] != 21u || operations[5] != 22u)
+        return false;
+    count = 0u; committed = 99u;
+    const bool rejected = native_raw_preflight_publish_islands(
+        3u,
+        [&](std::uint32_t i) noexcept {
+            operations[count++] = 10u + i;
+            return i != 2u; // Third D3D9 SYSTEMMEM LockRect failed.
+        },
+        [&](std::uint32_t i) noexcept {
+            operations[count++] = 20u + i; return true;
+        },
+        committed);
+    if (rejected || committed || count != 3u) return false;
+    count = 0u; committed = 99u;
+    const bool deviceLostDuringCommit = native_raw_preflight_publish_islands(
+        3u,
+        [&](std::uint32_t i) noexcept {
+            operations[count++] = 10u + i; return true;
+        },
+        [&](std::uint32_t i) noexcept {
+            operations[count++] = 20u + i; return i != 1u;
+        },
+        committed);
+    if (deviceLostDuringCommit || committed != 1u || count != 5u)
+        return false; // Report partial commit as a failure, never full PASS.
+    count = 0u; committed = 99u;
+    const bool badCount = native_raw_preflight_publish_islands(
+        5u,
+        [&](std::uint32_t) noexcept { ++count; return true; },
+        [&](std::uint32_t) noexcept { ++count; return true; },
+        committed);
+    return !badCount && !committed && !count;
+}
+
+int main() { assert(native_raw_changed_crop_regression()); assert(native_raw_tiny_rgb_source_upload_regression()); assert(native_raw_large_crop_sparse_dirty_source_regression()); assert(native_raw_two_phase_present_regression()); }

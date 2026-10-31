@@ -18,6 +18,7 @@
 #include "native_game_raw_draw_tile.hpp"
 #include "native_game_raw_dual_tile.hpp"
 #include "native_game_raw_color_transport.hpp"
+#include "native_game_raw_upload_transaction.hpp"
 #include "native_game_raw_draw_pair.hpp"
 #include "native_game_raw_partial_present_tile.hpp"
 #include "native_game_raw_present_coverage.hpp"
@@ -623,7 +624,13 @@ public:
                 // Each region owns a distinct SYSTEMMEM staging surface. The
                 // game driver may queue UpdateSurface, so never reuse or
                 // overwrite the first surface while painting the second.
-                const auto paint = [&](Microsoft::WRL::ComPtr<IDirect3DSurface9>& target,
+                // Two-phase original-game Present: prepare every authentic GPU
+                // island in its own D3D9 SYSTEMMEM surface before issuing ANY
+                // UpdateSurface. A later LockRect/format/copy failure must not
+                // leave only the first panel painted in this partial frame.
+                // D3D9 has no rollback after UpdateSurface itself fails; a
+                // mid-commit device error is surfaced as UploadFailure.
+                const auto prepare = [&](Microsoft::WRL::ComPtr<IDirect3DSurface9>& target,
                         const D3D11_MAPPED_SUBRESOURCE& prior,
                         const D3D11_MAPPED_SUBRESOURCE& after,
                         const NativeRawPresentTile& tile) noexcept -> bool {
@@ -638,22 +645,17 @@ public:
                         target->UnlockRect();
                         return false;
                     }
-                    // Copy only the independently authenticated RAW island.
-                    // GPU PRE/POST maps retain their original row pitches and
-                    // complete source coordinates; UpdateSurface copies just
-                    // tile.sourceX/Y + tile.copyWidth/Height from this buffer.
                     const bool copied = native_raw_copy_present_island(
                         locked.pBits, static_cast<std::size_t>(locked.Pitch),
                         prior.pData, prior.RowPitch,
                         after.pData, after.RowPitch,
                         width, height, tile, sourceByteOrder_,
                         back.Format == D3DFMT_X8R8G8B8);
-                    if (!copied) {
-                        target->UnlockRect();
-                        return false;
-                    }
                     const HRESULT unlockHr = target->UnlockRect();
-                    if (FAILED(unlockHr)) return false;
+                    return copied && SUCCEEDED(unlockHr);
+                };
+                const auto publish = [&](IDirect3DSurface9* target,
+                        const NativeRawPresentTile& tile) noexcept -> bool {
                     const RECT srcRect{
                         static_cast<LONG>(tile.sourceX),
                         static_cast<LONG>(tile.sourceY),
@@ -662,55 +664,82 @@ public:
                     const POINT dstPoint{
                         static_cast<LONG>(tile.destinationX),
                         static_cast<LONG>(tile.destinationY)};
-                    return SUCCEEDED(game->UpdateSurface(
-                        target.Get(), &srcRect, backbuffer, &dstPoint));
+                    return target && SUCCEEDED(game->UpdateSurface(
+                        target, &srcRect, backbuffer, &dstPoint));
                 };
+                bool uploadFailed = false;
                 if (sourceBatch.count) {
-                    // A distinct D3D9 SYSTEMMEM surface per UpdateSurface:
-                    // queued driver copies cannot observe a later island's
-                    // bytes or overwrite an earlier source-aligned island.
+                    // Each preflight slot has a private SYSTEMMEM surface;
+                    // no prior committed island can observe overwritten bytes.
                     std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>*,
                                kMaxSourceIslands> surfaces{
                         &surface_, &surfaceAlternate_,
                         &surfaceRemainders_[0], &surfaceRemainders_[1]};
-                    for (UINT i = 0u; i < sourceBatch.count; ++i) {
-                        if (!covered(sourceBatch.tiles[i])) continue;
-                        const bool secondary = sourceBatch.alternate[i];
-                        if (paint(*surfaces[i],
-                                  secondary ? beforeAlternate : before,
-                                  secondary ? afterAlternate : mapped,
-                                  sourceBatch.tiles[i])) {
+                    std::uint32_t committed = 0u;
+                    const bool complete = native_raw_preflight_publish_islands(
+                        sourceBatch.count,
+                        [&](std::uint32_t i) noexcept -> bool {
+                            if (!covered(sourceBatch.tiles[i])) return false;
+                            const bool second = sourceBatch.alternate[i];
+                            return prepare(*surfaces[i],
+                                second ? beforeAlternate : before,
+                                second ? afterAlternate : mapped,
+                                sourceBatch.tiles[i]);
+                        },
+                        [&](std::uint32_t i) noexcept -> bool {
+                            if (!publish(surfaces[i]->Get(), sourceBatch.tiles[i]))
+                                return false;
                             nativePixels += sourceBatch.rgbPixels[i];
-                            sourceAlignedPixelsThisPresent_ +=
-                                sourceBatch.rgbPixels[i];
-                        }
-                    }
+                            sourceAlignedPixelsThisPresent_ += sourceBatch.rgbPixels[i];
+                            return true;
+                        }, committed);
+                    uploadFailed = !complete;
                 } else if (canShowBoth && firstVisible && secondVisible) {
-                    if (paint(surface_, before, mapped, firstTile)) {
-                        nativePixels += firstPixels;
-                        if (firstAligned) sourceAlignedPixelsThisPresent_ += firstPixels;
-                    }
-                    if (paint(surfaceAlternate_, beforeAlternate,
-                              afterAlternate, secondTile)) {
-                        nativePixels += secondPixels;
-                        if (secondAligned) sourceAlignedPixelsThisPresent_ += secondPixels;
-                    }
+                    // Paired native game Draw tiles share the same original
+                    // Present. A second preflight failure must not publish a
+                    // stranded first tile as an apparently valid GPU pair.
+                    std::uint32_t committed = 0u;
+                    const bool complete = native_raw_preflight_publish_islands(
+                        2u,
+                        [&](std::uint32_t i) noexcept -> bool {
+                            return i == 0u
+                                ? prepare(surface_, before, mapped, firstTile)
+                                : prepare(surfaceAlternate_, beforeAlternate,
+                                          afterAlternate, secondTile);
+                        },
+                        [&](std::uint32_t i) noexcept -> bool {
+                            const bool success = i == 0u
+                                ? publish(surface_.Get(), firstTile)
+                                : publish(surfaceAlternate_.Get(), secondTile);
+                            if (!success) return false;
+                            nativePixels += i == 0u ? firstPixels : secondPixels;
+                            if (i == 0u && firstAligned)
+                                sourceAlignedPixelsThisPresent_ += firstPixels;
+                            if (i == 1u && secondAligned)
+                                sourceAlignedPixelsThisPresent_ += secondPixels;
+                            return true;
+                        }, committed);
+                    uploadFailed = !complete;
                 } else if (secondVisible &&
                            (!firstVisible || native_raw_choose_source_aligned_second_tile(
                                firstPixels, secondPixels,
                                firstAligned, secondAligned, true))) {
-                    if (paint(surface_, beforeAlternate, afterAlternate, secondTile)) {
+                    if (prepare(surface_, beforeAlternate, afterAlternate, secondTile) &&
+                        publish(surface_.Get(), secondTile)) {
                         nativePixels = secondPixels;
                         if (secondAligned) sourceAlignedPixelsThisPresent_ = secondPixels;
-                    }
+                    } else uploadFailed = true;
                 } else if (firstVisible) {
-                    if (paint(surface_, before, mapped, firstTile)) {
+                    if (prepare(surface_, before, mapped, firstTile) &&
+                        publish(surface_.Get(), firstTile)) {
                         nativePixels = firstPixels;
                         if (firstAligned) sourceAlignedPixelsThisPresent_ = firstPixels;
-                    }
+                    } else uploadFailed = true;
                 }
                 unmapPairs();
-                output = nativePixels
+                output = uploadFailed
+                    ? NativeRawPreviewResult::UploadFailure
+                    : nativePixels
                     ? NativeRawPreviewResult::VisibleGpuPixels
                     : (firstPixels || secondPixels)
                         ? NativeRawPreviewResult::UploadFailure
