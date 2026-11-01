@@ -176,9 +176,31 @@ namespace OutRunVrMenuAspect
         float fitWidth = clientWidth;
         float fitHeight = clientHeight;
         const float clientAspect = clientWidth / clientHeight;
-        if (!std::isfinite(clientAspect) || clientAspect <= 0.0f)
+        const float physicalAspect = physicalWidth / physicalHeight;
+        if (!std::isfinite(clientAspect) || clientAspect <= 0.0f ||
+            !std::isfinite(physicalAspect) || physicalAspect <= 0.0f)
             return {};
-        if (clientAspect > logicalAspect)
+
+        // SUMO_FE keeps the original 1920x1080 pixels at the top-left of
+        // the portrait XR backbuffer, not in the centre of that backbuffer.
+        // Only interpret a desktop client as that PHYSICAL portrait source
+        // when its own aspect independently matches the physical extent.
+        // A landscape HWND (e.g. the 2560x1440 mirror from Quest logs)
+        // is a centered 16:9 FIT, and must retain the existing branch below.
+        // Title/menu 0x04/0x09 use game-side physicalization and must never
+        // inherit SUMO's top-left physical-pixel interpretation.
+        const bool sumoPhysicalPortrait =
+            state == 0x20u &&
+            physicalWidth >= logicalWidth &&
+            physicalHeight >= logicalHeight &&
+            physicalAspect < logicalAspect - 0.10f &&
+            std::fabs(clientAspect - physicalAspect) <= 0.025f;
+        if (sumoPhysicalPortrait)
+        {
+            fitWidth = clientWidth * (logicalWidth / physicalWidth);
+            fitHeight = clientHeight * (logicalHeight / physicalHeight);
+        }
+        else if (clientAspect > logicalAspect)
         {
             fitHeight = clientHeight;
             fitWidth = fitHeight * logicalAspect;
