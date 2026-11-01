@@ -140,6 +140,8 @@ namespace Settings
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
+	Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
+		"Read-only bounded QuestCockpitV2 Phase-0 diagnostics. Does not enable cockpit rendering; only logging-enabled diagnostic builds show samples." };
 	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,
 		"Experimental test view: reuses the native bumper camera timing/smoothing, shows the full player car, hides the driver robot and offsets the VR camera into the cockpit." };
     Setting<float> VRDriverSeatVehicleScale{ "VR", "DriverSeatVehicleScale", 1.0f,

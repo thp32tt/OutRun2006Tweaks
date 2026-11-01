@@ -20,6 +20,7 @@
 #include "vr/ipc/cadence_v1.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/lens_centre_partial_wvp.hpp"
 #include "vr/game/lens_centre_upload_transaction.hpp"
 #include "vr/game/projected_lens_inline_source.hpp"
@@ -66,6 +67,7 @@ namespace Settings
 	extern Setting<float> VRRotationScale;
 	extern Setting<int> VRMatrixOrder;
 	extern Setting<bool> VRTelemetry;
+	extern Setting<bool> VRCockpitFrameProbe;
 	extern Setting<bool> UseNewInput;
 	extern Setting<int> VRFrameCadenceMode;
 	extern Setting<float> VRFrameCadenceTimeoutMs;
@@ -1841,6 +1843,9 @@ namespace OutRunVRRenderer
 				}
 				else
 					ReusePresentPoseForScene();
+				if (Settings::VREnabled && Settings::VRCockpitFrameProbe)
+					OutRunVR::QuestCockpitV2::ThreadProbe().OnBegin(
+						LatchedPoseSequence, LatchedPoseEpoch);
 			}
 			else
 			{
@@ -1859,6 +1864,8 @@ namespace OutRunVRRenderer
 			// it before returning control to post-scene game code.
 			RestoreCullingCamera();
 			const HRESULT result = EndSceneHook.stdcall<HRESULT>(device);
+			if (Settings::VREnabled && Settings::VRCockpitFrameProbe)
+				OutRunVR::QuestCockpitV2::ThreadProbe().OnEnd(SUCCEEDED(result));
 			LensCentrePartialWvp.Reset(); // never span a scene boundary
 			HudQueuedPartialWvp.Reset(); // a queued HUD owner cannot cross scenes
 			ProjectedLensRawWvp.Reset(); // exact inline PMT source cannot cross scenes
@@ -2429,6 +2436,21 @@ namespace OutRunVRRenderer
 
 	void NotifyGamePresent()
 	{
+		// Present-window evidence only; NEVER a native game-frame owner.
+		if (Settings::VREnabled && Settings::VRCockpitFrameProbe)
+		{
+			const auto s = OutRunVR::QuestCockpitV2::ThreadProbe().OnPresent();
+			const auto n = s.ordinal;
+			if (n <= 64 || (n & (n - 1)) == 0)
+				spdlog::info(
+					"VR COCKPIT P0 present={} tid={} begin={} end={} failed={} worldCam={} effectCam={} borrowCam={} playerCar={} modeFirst={} modeLast={} modeChange={} poseFirst={} poseLast={} poseChange={} poseEpochFirst={} poseEpochLast={} overflow={} nativeFrame=UNOBSERVED",
+					n,GetCurrentThreadId(),s.begins,s.ends,s.failedEnds,
+					s.worldCameras,s.effectCameras,s.borrowedCameras,s.playerCars,
+					s.firstMode,s.lastMode,s.modeChanged,s.firstPose,s.lastPose,
+					s.poseChanged,s.firstPoseEpoch,s.lastPoseEpoch,s.overflow);
+		}
+		else
+			OutRunVR::QuestCockpitV2::ThreadProbe().Clear();
 		MarkCadencePresented();
 		PresentPoseLocked = false;
 		InvalidateVerifiedWvp();
@@ -2442,6 +2464,7 @@ namespace OutRunVRRenderer
 
 	void NotifyGameReset()
 	{
+		OutRunVR::QuestCockpitV2::ThreadProbe().Clear();
 		ActiveCadenceRequestId.store(0, std::memory_order_release);
 		CadencePacingActive.store(false, std::memory_order_release);
 		CadenceAcceptedRequestId = 0;

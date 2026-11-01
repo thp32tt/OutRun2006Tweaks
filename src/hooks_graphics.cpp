@@ -7,6 +7,7 @@
 #include "vr/ui/vr_mirror_aspect_fit.hpp"
 #include "vr/game/pmt_node_culling_contract.hpp"
 #include "vr_shared.hpp"
+#include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
 #include "vr/game/driver_seat_car_space.hpp"
 #include "vr/game/driver_seat_render_pass.hpp"
@@ -49,6 +50,7 @@ namespace Settings
 	extern Setting<int> VRRenderWidth;
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
+	extern Setting<bool> VRCockpitFrameProbe;
 	extern Setting<bool> VRDriverSeatView;
     extern Setting<bool> VRDriverSeatGlassMaterialTrace;
     extern Setting<float> VRDriverSeatVehicleScale;
@@ -329,6 +331,17 @@ class VRDriverSeatRenderTest : public Hook
 
 	static void PlayerCarRenderState_dest(SafetyHookContext& ctx)
 	{
+		// P0 is observational, including when the legacy cockpit is OFF.
+		if (Settings::VREnabled && Settings::VRCockpitFrameProbe)
+		{
+			auto* player = Game::pl_car();
+			if (player && reinterpret_cast<EVWORK_CAR*>(ctx.ebx) == player)
+			{
+				const auto* camera = Game::camera();
+				OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(
+					camera ? static_cast<std::uint8_t>(camera->cam_mode_34A) : 0xFF);
+			}
+		}
 		if (!Active() || !Settings::VRDriverSeatFullCar)
 			return;
 		EVWORK_CAR* player = Game::pl_car();
@@ -2618,6 +2631,11 @@ class FixZBufferPrecision : public Hook
 
 	static void CalcCameraMatrix_dest(EvWorkCamera* camera)
 	{
+		if (Settings::VREnabled && Settings::VRCockpitFrameProbe && camera)
+			OutRunVR::QuestCockpitV2::ThreadProbe().OnCamera(
+				static_cast<std::uint8_t>(camera->cam_mode_34A),
+				OutRunVRRenderer::IsCullingCameraSyncedNow(),
+				!OutRunVR::DriverSeatRenderPass::IsWorldOrCockpitPass());
 		// improve z-buffer precision by increasing znear
 		// game default is 0.1 which reduces precision of far objects massively, causing z-fighting and objects not drawing properly
 

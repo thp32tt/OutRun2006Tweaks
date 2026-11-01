@@ -333,6 +333,7 @@ namespace OutRunVRRenderer
     bool GetLastGameWvpWrite(float outConstants[16], std::uint64_t& writeSerial,
         std::uint64_t& topLevelDrawSerial, std::uintptr_t& shaderIdentity,
         std::uint64_t& shaderSerial) noexcept;
+    bool IsCullingCameraSyncedNow() noexcept; // P0 observational hook
     std::uint64_t GetBeginSceneCallCount();
     void NotifyGamePresent();
     std::uint32_t GetActiveCadenceRequestId() noexcept;
