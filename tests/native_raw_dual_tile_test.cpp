@@ -119,7 +119,51 @@ constexpr bool native_raw_even_grid_source_coverage_regression() {
 static_assert(native_raw_even_grid_source_coverage_regression(),
               "even-grid game Draw GPU source tiles must not starve pixels");
 
+// XRGB source game RGB must not propagate an undefined source X as A8.
+static_assert(native_raw_requires_opaque_alpha(true, false));
+static_assert(native_raw_requires_opaque_alpha(true, true));
+static_assert(native_raw_requires_opaque_alpha(false, true));
+static_assert(!native_raw_requires_opaque_alpha(false, false));
 int main() {
+    {
+        constexpr std::uint32_t w=2u,h=2u;
+        const std::array<std::uint8_t,16u> pre{};
+        const std::array<std::uint8_t,16u> post{{
+            11u,21u,31u,0u,12u,22u,32u,7u,
+            13u,23u,33u,91u,14u,24u,34u,203u}};
+        const NativeRawPresentTile tile{0u,0u,w,h,130,240};
+        std::array<std::uint8_t,16u> dst{};
+        // Source B8G8R8X8 -> original game A8: opaque, authentic RGB.
+        assert(native_raw_copy_packed_present_island(
+            dst.data(),w*4u,pre.data(),w*4u,post.data(),w*4u,
+            w,h,tile,NativeRawColorByteOrder::Bgra,
+            native_raw_requires_opaque_alpha(true,false)));
+        for(std::uint32_t p=0u;p<w*h;++p) {
+            assert(dst[p*4u]==post[p*4u] &&
+                   dst[p*4u+1u]==post[p*4u+1u] &&
+                   dst[p*4u+2u]==post[p*4u+2u] &&
+                   dst[p*4u+3u]==255u);
+        }
+        // Source A8 alpha remains real, not forced opaque.
+        assert(native_raw_copy_packed_present_island(
+            dst.data(),w*4u,pre.data(),w*4u,post.data(),w*4u,
+            w,h,tile,NativeRawColorByteOrder::Bgra,
+            native_raw_requires_opaque_alpha(false,false)));
+        for(std::uint32_t p=0u;p<w*h;++p)
+            assert(dst[p*4u+3u]==post[p*4u+3u]);
+        // R8G8B8A8 native source retains its correct channel swizzle.
+        assert(native_raw_copy_packed_present_island(
+            dst.data(),w*4u,pre.data(),w*4u,post.data(),w*4u,
+            w,h,tile,NativeRawColorByteOrder::Rgba,false));
+        assert(dst[0]==31u && dst[1]==21u &&
+               dst[2]==11u && dst[3]==0u);
+        const auto prior=dst;
+        auto invalid=tile;invalid.sourceX=w;
+        assert(!native_raw_copy_packed_present_island(
+            dst.data(),w*4u,pre.data(),w*4u,post.data(),w*4u,
+            w,h,invalid,NativeRawColorByteOrder::Bgra,true));
+        assert(dst==prior);
+    }
     // The same real source-native RT must resolve both PRE and POST tiles.
     for (unsigned samples : {1u, 2u, 4u, 8u, 16u, 32u}) {
         assert(native_raw_msaa_capture_samples_supported(samples));

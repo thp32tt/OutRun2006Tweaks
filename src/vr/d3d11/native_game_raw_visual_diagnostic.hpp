@@ -134,6 +134,7 @@ public:
         captureTargetWidth_ = captureTargetHeight_ = 0u;
         captureSampleCount_ = 0u;
         sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
+        sourceHasAlpha_ = true;
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; quarantined_ = false; lastDraws_ = 0;
         recoveredLateCopies_ = 0u;
@@ -672,7 +673,8 @@ public:
                         prior.pData, prior.RowPitch,
                         after.pData, after.RowPitch,
                         width, height, tile, sourceByteOrder_,
-                        back.Format == D3DFMT_X8R8G8B8);
+                        native_raw_requires_opaque_alpha(
+                            !sourceHasAlpha_, back.Format == D3DFMT_X8R8G8B8));
                     const HRESULT unlockHr = target->UnlockRect();
                     return copied && SUCCEEDED(unlockHr);
                 };
@@ -1038,13 +1040,20 @@ private:
         const bool bgra = src.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
             src.Format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB ||
             src.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS;
-        if (!rgba && !bgra)
+        // D3D9 X8R8G8B8 becomes B8G8R8X8 on the real D3D11 GPU.
+        // Read the authentic RGB without trusting the undefined X byte.
+        const bool bgrx = src.Format == DXGI_FORMAT_B8G8R8X8_UNORM ||
+            src.Format == DXGI_FORMAT_B8G8R8X8_UNORM_SRGB ||
+            src.Format == DXGI_FORMAT_B8G8R8X8_TYPELESS;
+        if (!rgba && !bgra && !bgrx)
             return NativeRawPreviewResult::InvalidNativeColor;
         const DXGI_FORMAT stagedFormat =
             src.Format == DXGI_FORMAT_R8G8B8A8_TYPELESS
                 ? DXGI_FORMAT_R8G8B8A8_UNORM
                 : src.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS
-                    ? DXGI_FORMAT_B8G8R8A8_UNORM : src.Format;
+                    ? DXGI_FORMAT_B8G8R8A8_UNORM
+                 : src.Format == DXGI_FORMAT_B8G8R8X8_TYPELESS
+                     ? DXGI_FORMAT_B8G8R8X8_UNORM : src.Format;
         // Native menu/car/race render targets may switch sample count
         // without changing their dimensions. Do not reuse a stale resolve
         // texture across different source formats/raster/sample layouts.
@@ -1090,6 +1099,7 @@ private:
         }
         sourceByteOrder_ = rgba ? NativeRawColorByteOrder::Rgba
                                 : NativeRawColorByteOrder::Bgra;
+        sourceHasAlpha_ = !bgrx;
         if (!staging_ || !baseline_) {
             D3D11_TEXTURE2D_DESC dst{};
             dst.Width = width; dst.Height = height;
@@ -1189,6 +1199,7 @@ private:
     UINT captureTargetWidth_ = 0u, captureTargetHeight_ = 0u;
     UINT captureSampleCount_ = 0u;
     NativeRawColorByteOrder sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
+    bool sourceHasAlpha_ = true;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;
     Microsoft::WRL::ComPtr<IDirect3DSurface9> surface_, surfaceAlternate_;

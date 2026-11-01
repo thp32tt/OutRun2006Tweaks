@@ -11,6 +11,14 @@
 #include "native_game_raw_pixel_delta.hpp"
 namespace outrun::vr::dx11 {
 enum class NativeRawColorByteOrder : std::uint8_t { Bgra, Rgba };
+// An XRGB native GPU source contains RGB, but its high byte is undefined.
+[[nodiscard]] constexpr bool native_raw_requires_opaque_alpha(
+    bool nativeSourceXrgb, bool destinationXrgb) noexcept {
+    return nativeSourceXrgb || destinationXrgb;
+}
+static_assert(native_raw_requires_opaque_alpha(true, false));
+static_assert(native_raw_requires_opaque_alpha(false, true));
+static_assert(!native_raw_requires_opaque_alpha(false, false));
 inline void native_raw_copy_to_d3d9_bgra(
     std::uint8_t* dst, const std::uint8_t* source,
     std::uint32_t pixels, NativeRawColorByteOrder order,
