@@ -2,6 +2,17 @@
 
 v0.01 Beta 공개 베타입니다. 2026-11-02 Quest 3 + Virtual Desktop/VDXR에서 기존 DX9Ex Focus 렌더링 경로는 정상 동작이 확인됐고, 사용자 요청에 따라 2D/VR 선택 실행 구조를 포함해 게시합니다. 새 **직접 EXE 2D / CMD VR 진입점은 CI/정적 검증을 통과했으며 사용자 PC 실기 확인은 후속 검증 항목**입니다.
 
+## English Summary
+
+OutRun 2006 VR v0.01 Beta for Quest 3 / OpenXR (VDXR). This build includes the stabilized DX9Ex Focus VR path, fixed front-end/menu alignment, lens-flare and HUD-related fixes, and a quiet release profile with telemetry/file logging disabled by default.
+
+- One shared `dinput8.dll` includes Tweaks, wheel FFB, and VR.
+- Run `OR2006C2C.exe` directly for **2D + FFB**.
+- Run `Start-OutRun-VR.cmd` for **VR + FFB**.
+- `Start-OutRun.cmd` lets you choose 2D or VR.
+- No PowerShell script is required in the release package.
+- Extract the ZIP into the game folder containing `OR2006C2C.exe`.
+
 ## 주요 수정
 
 - 메인 메뉴/로딩/차량 선택 화면의 VR 좌표계 안정화
