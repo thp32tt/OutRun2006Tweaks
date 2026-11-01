@@ -1,0 +1,39 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261101T2345KST-IDLE",
+  "checked_at_kst": "2026-11-01T23:47:26+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "branch_head_before": "694e1d1e0df3d3bacdd647e1645878b2bb09b33a",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_source": "N100: work/image-src/text_roi_batches/candidate_outputs/{A,B}; export_evidence; prior C1 report/metrics JSON",
+  "inventory_script": "work/C1_QA_20261101_2145_AI2_inventory.py",
+  "sha_preflight_script": "work/C1_QA_20261101_2315_AI2_probe.py",
+  "results": {
+    "state": "IDLE",
+    "A_png": 454,
+    "B_png": 501,
+    "total_candidate_png": 955,
+    "export_receipts_mapped": 955,
+    "prior_reviewed_unique_sha256": 960,
+    "new_unreviewed_sha256": 0,
+    "missing_export_receipts": 0,
+    "selected": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "note": "No new producer PNG SHA after previous C1 23:15 batch. No phantom QA or repeat same SHA.",
+  "C1_scope": "Unapproved A/B candidate lettering QA only. No generation, queue consumption, DDS/C2/C3/game approvals.",
+  "actual_ui_composite": "NOT_TESTED",
+  "dds": "NOT_CREATED",
+  "C2_C3": "NOT_ASSESSED",
+  "runtime_validation": "UNTESTED",
+  "ai2_score_delta": 0
+}
