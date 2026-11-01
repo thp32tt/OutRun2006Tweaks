@@ -1,0 +1,200 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261101T2315KST-NEW-SHA2",
+  "reviewed_at_utc": "2026-11-01T14:19:18.003Z",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "base_branch_head": "19735d4abb31e983507af78d6f2e9b8670ea9620",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "A/B N100 실제 PNG 바이트 SHA256과 export receipt 및 원본 SHA-pinned HD 소스/승인 번역 대조; 4수준 알파 경계 계측; 원문 HD 영어 ROI와 native-fit, 50% 이미지 육안 독립 검사. 원본 최종 UI 합성, DDS 및 실게임은 제외.",
+  "prior_reviewed_sha_count": 958,
+  "total_pending_before_selection": 2,
+  "results": {
+    "new_sha": 2,
+    "pass": 2,
+    "fail": 0,
+    "hold": 0,
+    "A": 1,
+    "B": 1,
+    "remaining_at_inventory": 0
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0159-D53927FE",
+      "id": "Q054_09c99df535a2a0b6",
+      "english": "Count the gifts!",
+      "korean": "선물을 세세요!",
+      "candidate_file": "Q054_09c99df535a2a0b6_k.png",
+      "candidate_sha256": "092e9a272be9853dc2c5cf55c600657ccdb56d951a0d61d6c218dd1b4fd8aaf3",
+      "export_sha256": "092e9a272be9853dc2c5cf55c600657ccdb56d951a0d61d6c218dd1b4fd8aaf3",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "adf2af25cceb60bb5afd30243023d320191729615dbb9b2dc344ce5ea7182e91",
+      "manifest_source_sha256": "adf2af25cceb60bb5afd30243023d320191729615dbb9b2dc344ce5ea7182e91",
+      "manifest_imagegen_input_sha256": "adf2af25cceb60bb5afd30243023d320191729615dbb9b2dc344ce5ea7182e91",
+      "source_sha_matches_manifest": true,
+      "source_size": [
+        4096,
+        2048
+      ],
+      "bbox_xyxy": [
+        118,
+        120,
+        658,
+        210
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        94,
+        8,
+        2142,
+        700
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low_alpha": {
+        "top": {
+          "max_alpha": 0,
+          "positive": 0
+        },
+        "bottom": {
+          "max_alpha": 0,
+          "positive": 0
+        },
+        "left": {
+          "max_alpha": 0,
+          "positive": 0
+        },
+        "right": {
+          "max_alpha": 0,
+          "positive": 0
+        }
+      },
+      "native_fit": [
+        270,
+        90
+      ],
+      "half_fit": [
+        135,
+        45
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "fail_code": null,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "원문 Count the gifts!의 승인 매핑 선물을 세세요! 판독. 노란색/검정/흰 외곽과 우측 기울기 대체로 유지, 모호한 자소·원문 잔상·프레임/불투명 배경 없음. 원본 실물 SHA 일치. native-fit 270x90 및 50% 135x45 가독. alpha>=8 실제 문자/효과 bbox [97,182,2139,596]으로 PNG 사방 여백 존재."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0164-C037763A",
+      "id": "Q054_eb40f33a1d54b74b",
+      "english": "Count the gifts!",
+      "korean": "선물을 세세요!",
+      "candidate_file": "Q054_eb40f33a1d54b74b_k.png",
+      "candidate_sha256": "99999fef586ceb5cbb4f56730b0182d103bc0ea1e95327ec9a4d2ae0a87d9b13",
+      "export_sha256": "99999fef586ceb5cbb4f56730b0182d103bc0ea1e95327ec9a4d2ae0a87d9b13",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "1528ccaf25ff29aacb4c9c27de8ed7cae6e1880b403b6f73048e3ed283d38ed5",
+      "manifest_source_sha256": "1528ccaf25ff29aacb4c9c27de8ed7cae6e1880b403b6f73048e3ed283d38ed5",
+      "manifest_imagegen_input_sha256": "1528ccaf25ff29aacb4c9c27de8ed7cae6e1880b403b6f73048e3ed283d38ed5",
+      "source_sha_matches_manifest": true,
+      "source_size": [
+        4096,
+        2048
+      ],
+      "bbox_xyxy": [
+        118,
+        120,
+        658,
+        210
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        9,
+        2132,
+        724
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low_alpha": {
+        "top": {
+          "max_alpha": 0,
+          "positive": 0
+        },
+        "bottom": {
+          "max_alpha": 1,
+          "positive": 58
+        },
+        "left": {
+          "max_alpha": 1,
+          "positive": 25
+        },
+        "right": {
+          "max_alpha": 0,
+          "positive": 0
+        }
+      },
+      "native_fit": [
+        270,
+        90
+      ],
+      "half_fit": [
+        135,
+        45
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "fail_code": null,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "원문 Count the gifts!의 승인 매핑 선물을 세세요! 판독. 노란 본문/검정·흰 외곽/우측 기울기 유지, 원문 잔상·프레임/불투명 배경 없음. native-fit 270x90 및 50% 135x45 가독. alpha>=8 실제 문자/효과 bbox [184,179,2018,553]으로 모든 방향 여백. alpha=1 잔여 픽셀이 왼쪽 25px/하단 58px 경계에 있지만 시각 내용 아님, alpha>=8 또는 >=32 경계 접촉 0; 이를 실제 글자 잘림으로 잘못 분류하지 않음."
+    }
+  ],
+  "limit_scope": "C1 Korean lettering-layer only; no new ImageGen, A/B queue mutation, DDS write, C2/C3 or runtime pass.",
+  "producer_export_note": "Both export status REWORK_DIMENSIONS and pairing OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED retained; C1 layer PASS is not a producer export approval nor release eligibility.",
+  "qa_not_a_release_gate": true
+}
