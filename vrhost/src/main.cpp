@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <cwchar>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -32,9 +33,52 @@
 #include "runtime/menu_capture_snapshot.hpp"
 #include "runtime/projection_pair_pipeline.hpp"
 
+static bool OutRunVrParseBool(const wchar_t* text, bool fallback) noexcept
+{
+    if (!text || !*text) return fallback;
+    if (!_wcsicmp(text, L"true") || !_wcsicmp(text, L"yes") ||
+        !wcscmp(text, L"1")) return true;
+    if (!_wcsicmp(text, L"false") || !_wcsicmp(text, L"no") ||
+        !wcscmp(text, L"0")) return false;
+    return fallback;
+}
+
+static bool OutRunVrFileLoggingEnabled() noexcept
+{
+    static const bool enabled = []() noexcept {
+        bool value = true;
+
+        wchar_t modulePath[MAX_PATH]{};
+        if (GetModuleFileNameW(nullptr, modulePath, MAX_PATH))
+        {
+            wchar_t* filename = wcsrchr(modulePath, L'\\');
+            if (filename)
+            {
+                wcscpy_s(filename + 1,
+                    MAX_PATH - static_cast<std::size_t>(filename + 1 - modulePath),
+                    L"OutRun2006Tweaks.ini");
+                wchar_t text[16]{};
+                GetPrivateProfileStringW(L"VR", L"FileLogging", L"true",
+                    text, static_cast<DWORD>(std::size(text)), modulePath);
+                value = OutRunVrParseBool(text, value);
+            }
+        }
+
+        wchar_t env[16]{};
+        const DWORD envLen = GetEnvironmentVariableW(
+            L"OUTRUN_VR_FILE_LOG", env, static_cast<DWORD>(std::size(env)));
+        if (envLen > 0 && envLen < std::size(env))
+            value = OutRunVrParseBool(env, value);
+        return value;
+    }();
+    return enabled;
+}
+
 static void OutRunVrEmitFullTrace(const std::string& line)
 {
     std::cout << line;
+    if (!OutRunVrFileLoggingEnabled())
+        return;
     static std::ofstream log(
         "outrun-vr-host-full-trace.log",
         std::ios::out | std::ios::app);
@@ -1139,6 +1183,7 @@ namespace
             CreateProjectionSwapchain();
             CreateTheaterSwapchain();
             // Actual XR array-slice extent, not guessed desktop coordinates.
+            if (OutRunVrFileLoggingEnabled())
             {
                 std::ofstream eyeLog("outrun-vr-eye-extent.log",
                     std::ios::out | std::ios::trunc);
