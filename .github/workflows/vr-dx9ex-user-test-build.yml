@@ -13,6 +13,8 @@ on:
       - 'tools/verify_vr_r26_stage_fixedfn.py'
       - 'tools/verify_vr_r26_occlusion_present_fastpath.py'
       - 'tools/verify_vr_r26_projected_particle_canvas.py'
+      - 'tools/verify_vr_r26_mono_elision.py'
+      - 'src/vr/d3d9/stereo_renderer.cpp'
       - 'tools/verify_vr_desktop_source_coordinates.py'
       - 'tools/verify_vr_unified_menu_source.py'
       - 'tools/verify_vr_menu_resolution_split.py'
@@ -83,6 +85,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'R26 occlusion/StateBlock fail-closed contract failed' }
           python tools/verify_vr_r26_projected_particle_canvas.py
           if ($LASTEXITCODE -ne 0) { throw 'Exact 418CF0 grass/gravel particle ownership/canvas contract failed' }
+          python tools/verify_vr_r26_mono_elision.py
+          if ($LASTEXITCODE -ne 0) { throw 'Verified DirectGPU mono-elision contract failed' }
           python tools/verify_dx9ex_r26_projected_flare_fusion.py
           if ($LASTEXITCODE -ne 0) { throw 'Exact C993 projected flare ownership contract failed' }
           python tools/verify_dx9ex_full_visual_trace_contract.py

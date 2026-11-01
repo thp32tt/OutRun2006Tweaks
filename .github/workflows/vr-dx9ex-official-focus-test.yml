@@ -24,7 +24,8 @@ on:
       - 'tools/verify_vr_lens_transaction_trace.py'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/d3d9/stereo_renderer_r7.inc' # Shared compositor/query-depth guards must revalidate packaged R26.
-      - 'src/vr/d3d9/stereo_renderer.cpp' # R9 mono restore failure provenance.
+      - 'src/vr/d3d9/stereo_renderer.cpp' # R9 mono restore / verified DirectGPU elision policy.
+      - 'tools/verify_vr_r26_mono_elision.py'
       - 'src/vr/game/render_semantics.hpp'
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
@@ -102,6 +103,12 @@ jobs:
         run: |
           python tools/verify_vr_stage_extension_d3dx_batch_owner.py
           if ($LASTEXITCODE -ne 0) { throw 'Native +TIME ticket/epoch regression failed' }
+
+      - name: Verify runtime-proven DirectGPU mono elision safety policy
+        shell: pwsh
+        run: |
+          python tools/verify_vr_r26_mono_elision.py
+          if ($LASTEXITCODE -ne 0) { throw 'Verified DirectGPU mono-elision contract failed' }
 
       - name: Validate R9 physical pre-Draw and R7 occlusion depth guards
         shell: pwsh
