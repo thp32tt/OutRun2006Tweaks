@@ -2,6 +2,13 @@
 
 v0.01 Beta 공개 베타입니다. 2026-11-02 Quest 3 + Virtual Desktop/VDXR에서 기존 DX9Ex Focus 렌더링 경로는 정상 동작이 확인됐고, 사용자 요청에 따라 2D/VR 선택 실행 구조를 포함해 게시합니다. 새 **직접 EXE 2D / CMD VR 진입점은 CI/정적 검증을 통과했으며 사용자 PC 실기 확인은 후속 검증 항목**입니다.
 
+## 중요 조작: F12 리센터
+
+- **VR 화면의 정면이 어긋나거나 메뉴/게임 화면 방향이 현재 착석 방향과 맞지 않으면, 원하는 정면을 바라본 상태에서 `F12`를 누르세요.**
+- `F12`는 현재 HMD의 위치와 방향을 새 VR 기준 원점으로 다시 설정하여 메뉴/시어터와 게임플레이 공간을 다시 정렬합니다.
+- 게임 시작 직후, HMD를 다시 착용했을 때, 또는 플레이 중 정면 기준이 어긋났을 때 언제든 사용할 수 있습니다.
+- 기본 키: **F12 = VR Recenter** (`F10`은 HUD Toggle)
+
 ## English Summary
 
 OutRun 2006 VR v0.01 Beta for Quest 3 / OpenXR (VDXR). This build includes the stabilized DX9Ex Focus VR path, fixed front-end/menu alignment, lens-flare and HUD-related fixes, and a quiet release profile with telemetry/file logging disabled by default.
@@ -12,6 +19,13 @@ OutRun 2006 VR v0.01 Beta for Quest 3 / OpenXR (VDXR). This build includes the s
 - `Start-OutRun.cmd` lets you choose 2D or VR.
 - No PowerShell script is required in the release package.
 - Extract the ZIP into the game folder containing `OR2006C2C.exe`.
+
+## Important Control: F12 Recenter
+
+- **If the VR view is not centered, or the menu/game is facing the wrong direction, look straight ahead in your desired forward direction and press `F12`.**
+- `F12` resets the current HMD position and orientation as the new VR application origin, re-anchoring the menu/theater and gameplay space.
+- Use it after launching the game, after putting the headset back on, or anytime the forward direction feels misaligned.
+- Default key: **F12 = VR Recenter** (`F10` is HUD Toggle)
 
 ## 주요 수정
 
