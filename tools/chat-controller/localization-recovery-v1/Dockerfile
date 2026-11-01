@@ -29,7 +29,8 @@ COPY crop_to_imagegen_queue.py /opt/outrun/app/crop_to_imagegen_queue.py
 # OCR-free deterministic Korean DDS TEST_ONLY bulk fallback; independent of A/B/C1.
 COPY offline_korean_sprite_fallback.py /opt/outrun/app/offline_korean_sprite_fallback.py
 COPY offline_korean_batch.py /opt/outrun/app/offline_korean_batch.py
-RUN python -m py_compile /opt/outrun/c_english_crop/*.py /opt/outrun/app/crop_to_imagegen_queue.py /opt/outrun/app/offline_korean_sprite_fallback.py /opt/outrun/app/offline_korean_batch.py && tesseract --list-langs 2>&1 | grep -q eng
+COPY offline_korean_packager.py /opt/outrun/app/offline_korean_packager.py
+RUN python -m py_compile /opt/outrun/c_english_crop/*.py /opt/outrun/app/crop_to_imagegen_queue.py /opt/outrun/app/offline_korean_sprite_fallback.py /opt/outrun/app/offline_korean_batch.py /opt/outrun/app/offline_korean_packager.py && tesseract --list-langs 2>&1 | grep -q eng
 COPY chrome-cache-clean.sh /opt/outrun/chrome-cache-clean.sh
 RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
 
