@@ -65,3 +65,11 @@ No automatic fallback to partial/unsynchronized mono headset frames.
 This is a TEST build only. Quest3 HMD visual/boot behavior is unverified.
 If blank/white/one-eye display appears, restore the previous safe
 R26 gap-repair build and provide logs. Keep DirectGpuOnly=true.
+
+OPENXR LAST-GOOD HOST CHANGE: a verified DirectGPU stereo pair is copied to
+host-private D3D11 snapshot textures; while the same gameplay presentation
+and XR session remain valid, host keeps presenting that pair until another
+verified pair is ready. Reset/session/reference-space/presentation changes
+invalidate matching. SBS/DesktopDuplication still uses its old 250ms grace.
+This can temporarily freeze head-motion parallax during prolonged game stalls;
+for experimental use only, not yet validated for comfort on Quest.

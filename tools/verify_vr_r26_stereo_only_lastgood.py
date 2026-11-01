@@ -63,10 +63,16 @@ assert "if (holdLastGood)" in present
 assert "PublishStereoState(fallback, false" in present
 assert "R9LastCompletedDirectVrFrame = false;" in r9
 assert "R9LastCompletedDirectVrFrame = false;" in r13
+host=(root/"vrhost/src/main.cpp").read_text(encoding="utf-8")
+assert "directTransportEnabled || GetTickCount64()-lastStereoMatchMs<=StereoGraceMs" in host
+assert "CopyResource(directSnapshotLeft_,directLeft_[slot])" in host
+assert "CopyResource(directSnapshotRight_,directRight_[slot])" in host
+assert "matchedStereoValid=false" in host
 assert "DirectTransportFrameReadyAfterPresent" in r7
 assert "R9MonoElisionArmed" not in r9
 print("PASS R9: DirectGPU VR is two-eye only; original 2D/offscreen paths preserved")
 print("PASS R20: right-eye color/depth baseline replaces mono bootstrap dependency")
 print("PASS R13: side-effecting unsafe draw executes once, incomplete stereo dropped")
-print("PASS Present: verified last-good VR packet held; host/device reset disarms")
+print("PASS Present: last-good VR frame held, host-private left/right snapshots retained")
+print("PASS OpenXR: DirectGPU uses last-good projection until next valid pair, unlike 250ms SBS")
 print("HMD_RUNTIME=UNTESTED; visual safety and GPU improvement require Quest validation")
