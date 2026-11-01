@@ -33,12 +33,15 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "D3D9_GAME_FVF_DRAW",
       "WHOLE_SOURCE_IA_VALIDATION",
+      "D3D11_NATIVE_DRAW",
       "NATIVE_D3D11_DRAW",
       "VISIBLE_CLIPPED_GPU_CROP_SELECTION",
       "D3D11_PRE_POST_GPU_RGB",
-      "ORIGINAL_D3D9_PRESENT"
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "integration_path": [
       "AUTHENTIC_GAME_FVF_IA",
@@ -62,7 +65,7 @@
       "tests/native_raw_dual_tile_test.cpp"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_ONLY_BUILD_VERIFIED, not complete native game frame or tested HMD stereo.",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY: VISIBLE_FRAME_OUTPUT denotes original D3D9 Present with opt-in partial native GPU diagnostic RGB, never a complete DX11 game frame or verified Quest3 runtime.",
     "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in default OFF; original D3D9 render/input/FFB, DX9Ex fallback and frozen DXVK unchanged."
   },
   "feature_contract": {
@@ -129,5 +132,6 @@
   ],
   "runtime_note": "Original Windows game and Quest 3/VDXR HMD tests not run. RUNTIME_VALIDATION=UNTESTED; no native full-frame/playability claim.",
   "score_note": "One new source integration +1 only if scored in GitHub SSOT; C6/docs/retest +0.",
-  "recorded_at": "2026-11-02 03:46 KST"
+  "recorded_at": "2026-11-02 03:46 KST",
+  "regression_repair": "No new 01205 source, score or CI claim. Subsequent 01206 exact-SHA Fast CI discovered this older C6 record used the synonymous D3D9_GAME_FVF_DRAW/NATIVE_D3D11_DRAW/ORIGINAL_D3D9_PRESENT stage labels rather than the required LIVE_D3D9_CALLSITE/D3D11_NATIVE_DRAW/VISIBLE_FRAME_OUTPUT policy anchors. Add aliases in source order; original five 01205 PASS run IDs and material/result SHA unchanged. This is metadata-only causal CI repair on 01206, +0."
 }
