@@ -1,0 +1,163 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261101T2245KST-NEW-SHA2",
+  "reviewed_at_kst": "2026-11-01T22:46:46+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "A/B 실제 PNG SHA·export SHA·원본 전체 HD SHA 및 승인 매핑 대조; RGBA/alpha>=32 경계 계측; 원본 영어 ROI와 native-fit/50% 생성물 시각 비교. 최종 아틀라스 합성·DDS·실게임은 제외.",
+  "prior_reviewed_sha_count": 956,
+  "total_pending_before_selection": 2,
+  "results": {
+    "new_sha": 2,
+    "pass": 2,
+    "fail": 0,
+    "hold": 0,
+    "A": 1,
+    "B": 1,
+    "remaining_at_inventory": 0
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0158-71351238",
+      "id": "Q054_a471884404c55bc3",
+      "english": "Count the gifts!",
+      "korean": "선물을 세세요!",
+      "candidate_file": "Q054_a471884404c55bc3_k.png",
+      "candidate_sha256": "fed6ba6006d309a7d81c21f4265f413c4cd50bf26ac91553acc421116cb42f0a",
+      "export_sha256": "fed6ba6006d309a7d81c21f4265f413c4cd50bf26ac91553acc421116cb42f0a",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "427cb79065223e1dae93a72447760f24af9b994d54ecbf4f8f8c08e4cb741289",
+      "manifest_source_sha256": "427cb79065223e1dae93a72447760f24af9b994d54ecbf4f8f8c08e4cb741289",
+      "manifest_imagegen_input_sha256": "427cb79065223e1dae93a72447760f24af9b994d54ecbf4f8f8c08e4cb741289",
+      "source_sha_matches_manifest": true,
+      "source_size": [
+        4096,
+        2048
+      ],
+      "bbox_xyxy": [
+        118,
+        120,
+        658,
+        210
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        25,
+        35,
+        2144,
+        724
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        270,
+        90
+      ],
+      "half_fit": [
+        135,
+        45
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "fail_code": null,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Count the gifts!→선물을 세세요! 승인 번역과 육안 일치. 노란 본문/청색 외곽/흰색 하이라이트 및 원문 스타일의 우측 기울임. native 270×90 / 50% 135×45에서 글자별 가독성 유지. 다른 문구나 영문 잔상 없음. 알파>=32 경계 접촉 0. 레이어의 가로폭이 영문보다 짧다는 이유만으로 반려하지 않음."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0163-4F9E7016",
+      "id": "Q054_9f830c717b379c82",
+      "english": "Count the gifts!",
+      "korean": "선물을 세세요!",
+      "candidate_file": "Q054_9f830c717b379c82_k.png",
+      "candidate_sha256": "2a65e40ba3cbfd4296d9145e066b3550675047daf6673021e6bf2a6ddcc5364e",
+      "export_sha256": "2a65e40ba3cbfd4296d9145e066b3550675047daf6673021e6bf2a6ddcc5364e",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "70d581cf5d0a70b2dd0036d61a51110ba1e3fc39b9088c3bc5cdd3847ea7943b",
+      "manifest_source_sha256": "70d581cf5d0a70b2dd0036d61a51110ba1e3fc39b9088c3bc5cdd3847ea7943b",
+      "manifest_imagegen_input_sha256": "70d581cf5d0a70b2dd0036d61a51110ba1e3fc39b9088c3bc5cdd3847ea7943b",
+      "source_sha_matches_manifest": true,
+      "source_size": [
+        4096,
+        2048
+      ],
+      "bbox_xyxy": [
+        118,
+        120,
+        658,
+        210
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        41,
+        37,
+        2141,
+        724
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        270,
+        90
+      ],
+      "half_fit": [
+        135,
+        45
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "fail_code": null,
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Count the gifts!→선물을 세세요! 승인 번역과 육안 일치. 원본의 밝은 본문/청색 외곽/광택 및 전진 기울기 대체로 유지. native 270×90 / 50% 135×45에서 전체와 각 음절 판독, 영어 잔상·불필요한 프레임/배경 없음. 알파>=32 경계 접촉 0. 전체 폭만으로 반려하지 않음."
+    }
+  ],
+  "limit_scope": "Only independent Korean lettering-layer C1 QA, no ImageGen, A/B queue mutation, DDS, C2/C3 or game signoff.",
+  "producer_export_note": "REWORK_DIMENSIONS and OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED remain unchanged; C1 layer PASS does not override them.",
+  "qa_not_a_release_gate": true
+}
