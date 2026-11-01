@@ -1,0 +1,33 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261102T0045KST-IDLE",
+  "checked_at_kst": "2026-11-02T00:46:45+09:00",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "base_branch_head": "0b8e141a1b1d0b9c91b9159a4a2b3b3788c4c940",
+  "required_policy_files_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory_source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/{A,B}; export_evidence/*.json; prior QA reports/metrics",
+  "inventory_script": "/home/chatgpt-runner2/work/C1_QA_20261101_2145_AI2_inventory.py",
+  "inventory": {
+    "previously_reviewed_unique_sha256": 960,
+    "candidate_png_files": 955,
+    "export_file_entries": 955,
+    "pending_unreviewed_sha256_count": 0,
+    "candidate_without_export_count": 0,
+    "missing_export_samples": []
+  },
+  "status": "IDLE",
+  "newly_inspected_count": 0,
+  "newly_passed_count": 0,
+  "newly_failed_count": 0,
+  "newly_held_count": 0,
+  "note": "No new SHA-unreviewed exported Korean PNG candidates in N100 inventory; no repeats or speculative PASS/FAIL. Prior reviewed SHA count includes past/removed entries and is not an inventory file count.",
+  "limitations": "No ImageGen invocation, A/B queue mutation, DDS build, C2/C3 judgement, UI composite test, protected-art pixel overlay or game runtime signoff; runtime_validation=UNTESTED.",
+  "ai2_score_change": 0
+}
