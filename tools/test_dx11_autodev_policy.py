@@ -412,7 +412,7 @@ for label, mutate in (
     ("full renderer not proven", lambda t: t.update(full_dx11_renderer_complete=True)),
     ("source stages missing", lambda t: t["development_strategy"]["live_game_draw_path"].pop(0)),
     ("GPU stage removed", lambda t: t["development_strategy"]["live_game_draw_path"].pop(2)),
-    ("wrong endpoint", lambda t: t["development_strategy"]["live_game_draw_path"][-1:].__setitem__(0, "NATIVE_OPENXR_VISIBLE_OUTPUT")),
+    ("wrong endpoint", lambda t: t["development_strategy"]["live_game_draw_path"].__setitem__(-1, "NATIVE_OPENXR_VISIBLE_OUTPUT")),
     ("source file missing", lambda t: t["changed_files"].remove("src/vr/d3d11/live_game_frame_bridge.cpp")),
     ("missing partial-stage disclaimer", lambda t: t["development_strategy"].update(visible_frame_acceptance="claim full frame")),
 ):
