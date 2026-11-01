@@ -23,6 +23,7 @@ for token in (
     "bool FileLoggingEnabled() noexcept",
     'L"OUTRUN_VR_FILE_LOG"',
     "if (Module::FileLoggingEnabled())",
+    "spdlog::level::off",
 ):
     assert token in dll, token
 
@@ -36,14 +37,18 @@ for token in (
 
 assert 'if (OutRunVrFileLoggingEnabled())\n            pipelineLog.open(' in r23
 assert 'OutRunVR::Pacing::Enabled() && OutRunVrFileLoggingEnabled()' in r23
+assert 'CheckXr(endResult, "xrEndFrame");\n            if (OutRunVrFileLoggingEnabled())' in r23
+assert 'if (OutRunVrFileLoggingEnabled() &&\n                (lastPipelineTelemetryMs == 0 ||' in r23
+assert 'if (OutRunVrFileLoggingEnabled())\n                timings.MaybeLog();' in r23
+assert 'Acquire(projection_, image);\n            if (OutRunVrFileLoggingEnabled())' in host
 
 for script in (focus, official):
     assert "-VR.Telemetry=true" in script
     assert "OUTRUN_VR_FILE_LOG = '1'" in script
 
-probe = host.split("bool R23PixelDiagnosticsEnabled() noexcept", 1)[1].split(
+probe = r23.split("bool R23PixelDiagnosticsEnabled() noexcept", 1)[1].split(
     "constexpr UINT R23SourceSamples", 1)[0]
 assert 'std::strcmp(value, "1") == 0' in probe
 assert "return value != nullptr" in probe
 
-print("PASS VR v0.01-beta quiet release defaults; diagnostics explicitly opt in")
+print("PASS VR v0.01-beta: file writes, hot-path trace construction, telemetry and pixel probe are quiet by default; diagnostics explicitly opt in")
