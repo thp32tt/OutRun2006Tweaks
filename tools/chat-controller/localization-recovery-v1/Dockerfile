@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_DEFAULT_TIMEOUT=120
 
-RUN apt-get update && apt-get install -y --no-install-recommends xvfb x11vnc openbox novnc websockify tini curl ca-certificates gnupg wget tesseract-ocr tesseract-ocr-eng python3-numpy python3-pil && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends xvfb x11vnc openbox novnc websockify tini curl ca-certificates gnupg wget tesseract-ocr tesseract-ocr-eng python3-numpy python3-pil fonts-nanum && rm -rf /var/lib/apt/lists/*
 RUN wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && apt-get update && apt-get install -y --no-install-recommends google-chrome-stable && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/outrun
@@ -26,7 +26,10 @@ COPY chrome_maintenance.py /opt/outrun/app/chrome_maintenance.py
 RUN mkdir -p /opt/outrun/c_english_crop
 COPY c_english_crop/*.py /opt/outrun/c_english_crop/
 COPY crop_to_imagegen_queue.py /opt/outrun/app/crop_to_imagegen_queue.py
-RUN python -m py_compile /opt/outrun/c_english_crop/*.py /opt/outrun/app/crop_to_imagegen_queue.py && tesseract --list-langs 2>&1 | grep -q eng
+# OCR-free deterministic Korean DDS TEST_ONLY bulk fallback; independent of A/B/C1.
+COPY offline_korean_sprite_fallback.py /opt/outrun/app/offline_korean_sprite_fallback.py
+COPY offline_korean_batch.py /opt/outrun/app/offline_korean_batch.py
+RUN python -m py_compile /opt/outrun/c_english_crop/*.py /opt/outrun/app/crop_to_imagegen_queue.py /opt/outrun/app/offline_korean_sprite_fallback.py /opt/outrun/app/offline_korean_batch.py && tesseract --list-langs 2>&1 | grep -q eng
 COPY chrome-cache-clean.sh /opt/outrun/chrome-cache-clean.sh
 RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
 
