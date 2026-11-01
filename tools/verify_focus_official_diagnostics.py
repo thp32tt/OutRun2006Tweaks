@@ -12,4 +12,9 @@ assert actual=={'R26_FOCUS_OFFICIAL_TEST':False,'R26_FOCUS_OFFICIAL_DEBUG':True}
 for x in ('SOURCE_SHA.txt','BINARY_IDENTITY.json',"'-AutoRenderResolution=true'","'-FollowGameResolution=false'","'-UnifiedEyeMenuSource=false'","'-AntiAliasing=2'","'-Hud1080pReference=true'","'-HudScale=0.55'"):
  assert x in s,x
 assert "Get-FileHash" in s
+# User's actual DEBUG run succeeded but post-exit packaging failed: PowerShell
+# cannot evaluate a statement 'if' inside the old $((if ...)) expansion.
+assert '$((if ' not in s
+assert '$hostFullTraceBytes = if (Test-Path -LiteralPath $hostFullTrace)' in s
+assert '"hostFullTraceBytes=$hostFullTraceBytes"' in s
 print('PASS official TEST/DEBUG reachability, XR/HUD arguments and captured binary identity')
