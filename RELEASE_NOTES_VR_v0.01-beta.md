@@ -1,6 +1,6 @@
 # OutRun 2006 VR v0.01 Beta
 
-첫 공개 베타 패키지입니다. 2026-11-02 Quest 3 + Virtual Desktop/VDXR 실기에서 현재 테스트 경로가 정상 동작하는 것을 확인한 DX9Ex Focus 빌드를 기준으로 합니다.
+v0.01 Beta 릴리즈 후보입니다. 2026-11-02 Quest 3 + Virtual Desktop/VDXR에서 기존 DX9Ex Focus 렌더링 경로는 정상 동작이 확인됐지만, 이번 후보에서 새로 분리한 **직접 EXE 2D / CMD VR 진입점은 사용자 실기 재검증 전까지 릴리즈하지 않습니다.**
 
 ## 주요 수정
 
@@ -38,5 +38,7 @@ ZIP 내용을 `OR2006C2C.EXE`가 있는 게임 폴더에 덮어씁니다.
 
 ## 검증
 
-- Quest 3 / Virtual Desktop / VDXR 사용자 실기: 현재 메뉴/로딩/차량선택/게임플레이 화면 정상 확인
-- 릴리즈 패키지는 테스트 로그 수집 스크립트를 포함하지 않습니다.
+- 기존 Quest 3 / Virtual Desktop / VDXR Focus 렌더링 상태: 메뉴/로딩/차량선택/게임플레이 정상 확인
+- **신규 진입점 검증 필요:** `OR2006C2C.EXE` 직접 실행 = 2D + FFB, `Start-OutRun-VR.cmd` = VR + FFB
+- 위 두 실행 경로를 사용자 PC에서 확인하기 전에는 GitHub prerelease를 게시하지 않습니다.
+- 릴리즈 후보 패키지는 테스트 로그 수집 PS1을 포함하지 않습니다.

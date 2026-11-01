@@ -39,6 +39,21 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Withdraw stale prerelease from pre-entrypoint-fix build
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, 'withdraw stale v0.01-beta') }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view vr-v0.01-beta --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release delete vr-v0.01-beta --repo $env:GITHUB_REPOSITORY --cleanup-tag --yes
+            Write-Host 'Removed stale vr-v0.01-beta prerelease; no replacement is published by this push.'
+          } else {
+            Write-Host 'No stale vr-v0.01-beta prerelease found.'
+          }
+
+
       - name: Verify quiet release profile
         shell: pwsh
         run: |
@@ -133,7 +148,7 @@ jobs:
             'OUTRUN_VR_R23_PIXEL_PROBE=OFF (default)'
             'VR.Telemetry=false'
             'VR.FileLogging=false'
-            'RUNTIME_VALIDATION=USER_CONFIRMED_2026-11-02'
+            'RUNTIME_VALIDATION=PENDING_USER_2D_VR_ENTRYPOINT_TEST'
           ) | Set-Content "$dir/VR_RELEASE_PROFILE.txt" -Encoding ascii
 
           $env:VR_RELEASE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
