@@ -113,11 +113,18 @@ namespace OutRunVRStereo
 		// Test-only no-third-pass mode: verified DirectGPU headset gameplay.
 		// Original 2D and offscreen draws are not altered.
 		bool R9LastCompletedDirectVrFrame = false;
+		bool R9FrameMonoPolicyLatched = false;
+		bool R9FrameStereoOnly = false;
 		std::uint64_t R9StereoOnlySavedDraws = 0;
 		std::uint64_t R9StereoOnlySavedClears = 0;
 		std::uint64_t R9HeldLastGoodVrFrames = 0;
 		bool R9NoMonoForActiveVr() noexcept
 		{
+			// The first main Clear latches transport policy for this Present.
+			// Later host readiness flaps must not mix mono and two-eye state
+			// within one depth/color-history generation.
+			if (R9FrameMonoPolicyLatched)
+				return R9FrameStereoOnly;
 			return Settings::VRDirectGpuOnly &&
 				Settings::VRHmdlessDebugMode == 0 &&
 				HostDirectTransportReady() && StereoWanted();
@@ -673,6 +680,15 @@ namespace OutRunVRStereo
 				return originalHr;
 			}
 
+			if (!R9FrameMonoPolicyLatched)
+			{
+				// Freeze policy at the first main-target Clear. Use the already
+				// evaluated 'wanted' to avoid a second StereoWanted side effect.
+				R9FrameStereoOnly = wanted && Settings::VRDirectGpuOnly &&
+					Settings::VRHmdlessDebugMode == 0 &&
+					HostDirectTransportReady();
+				R9FrameMonoPolicyLatched = true;
+			}
 			if (R9DeferredDepth || !R9CurrentDepthCanMirror())
 			{
 				const HRESULT hr = ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
@@ -1085,6 +1101,8 @@ namespace OutRunVRStereo
 			R9StereoSeeded = false;
 			R9MonoSeeded = false;
 			R9MonoBackupGap = false;
+			R9FrameMonoPolicyLatched = false;
+			R9FrameStereoOnly = false;
 			if (++PresentEpoch == 0) PresentEpoch = 1;
 			return hr;
 		}
@@ -1093,6 +1111,8 @@ namespace OutRunVRStereo
 		{
 			R9ReleaseMonoResources();
 			R9LastCompletedDirectVrFrame = false;
+			R9FrameMonoPolicyLatched = false;
+			R9FrameStereoOnly = false;
 			R9ReleaseDepthIdentity();
 			R9StereoSeeded = false;
 			R9MonoSeeded = false;

@@ -64,10 +64,23 @@ assert "PublishStereoState(fallback, false" in present
 assert "R9LastCompletedDirectVrFrame = false;" in r9
 assert "R9LastCompletedDirectVrFrame = false;" in r13
 host=(root/"vrhost/src/main.cpp").read_text(encoding="utf-8")
-assert "directTransportEnabled || GetTickCount64()-lastStereoMatchMs<=StereoGraceMs" in host
-assert "CopyResource(directSnapshotLeft_,directLeft_[slot])" in host
-assert "CopyResource(directSnapshotRight_,directRight_[slot])" in host
+assert "matchedStereoDirect || GetTickCount64()-lastStereoMatchMs<=StereoGraceMs" in host
+assert "context_->CopyResource(directPendingLeft_, directLeft_[slot]);" in host
+assert "context_->CopyResource(directPendingRight_, directRight_[slot]);" in host
 assert "matchedStereoValid=false" in host
+assert "matchedStereoDirect=false" in host
+assert "bool PreparePendingDirectStereoSource(" in host
+assert "bool AcceptPendingDirectStereoSource()" in host
+assert "void DiscardPendingDirectStereoSource()" in host
+assert "sourceReady=compositor.PreparePendingDirectStereoSource(before);" in host
+assert "compositor.AcceptPendingDirectStereoSource()" in host
+assert "compositor.DiscardPendingDirectStereoSource();" in host
+assert "directFrameValid_=false;" not in host.split("bool PrepareDirectStereoSource(",1)[1].split("bool PreparePendingDirectStereoSource(",1)[0]
+assert "if (R9FrameMonoPolicyLatched)" in guard
+assert "R9FrameMonoPolicyLatched = true;" in clear
+assert "R9FrameMonoPolicyLatched = false;" in present
+assert "R9FrameMonoPolicyLatched = false;" in r13
+assert "before.state==OutRunVR::StereoDisabled && before.frameId==0" in host
 assert "DirectTransportFrameReadyAfterPresent" in r7
 assert "stereoOnlySavedDraw={}" in r9
 assert "stereoOnlySavedClear={}" in r9
@@ -78,5 +91,5 @@ print("PASS R9: DirectGPU VR is two-eye only; original 2D/offscreen paths preser
 print("PASS R20: right-eye color/depth baseline replaces mono bootstrap dependency")
 print("PASS R13: side-effecting unsafe draw executes once, incomplete stereo dropped")
 print("PASS Present: last-good VR frame held, host-private left/right snapshots retained")
-print("PASS OpenXR: DirectGPU uses last-good projection until next valid pair, unlike 250ms SBS")
+print("PASS OpenXR: staged stereo pair accepted only after GPU+metadata proofs; SBS 250ms preserved")
 print("HMD_RUNTIME=UNTESTED; visual safety and GPU improvement require Quest validation")

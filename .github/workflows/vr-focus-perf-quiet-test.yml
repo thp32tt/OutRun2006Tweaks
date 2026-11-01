@@ -1,9 +1,9 @@
-name: R26 Focus DirectGPU Stereo-Only Last Good VR Test
+name: R26 Focus Stereo-Only Transactional Safety Repair
 
 on:
   push:
     branches:
-      - 'test/r26-focus-stereo-only-lastgood-20261101'
+      - 'test/r26-focus-stereo-only-safety-repair-20261101'
   workflow_dispatch:
 
 permissions:
@@ -104,7 +104,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $short = $env:GITHUB_SHA.Substring(0,12)
-          $dir = "OutRun2_VR_FOCUS_STEREO_ONLY_$short"
+          $dir = "OutRun2_VR_FOCUS_STEREO_SAFETY_$short"
           New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (!$dll) { throw 'No Win32 game DLL' }
@@ -136,14 +136,14 @@ jobs:
             'LOGGING=OFF: game telemetry, host full trace, XR pixel probe'
             'EYE_RESOLUTION=OpenXR recommended per-eye allocation'
             'TRANSPORT=DirectGPU-only for gameplay; menu Desktop Duplication kept'
-            'MONO_SHADOW=DISABLED for verified DirectGPU VR only; R20 right-eye seed + last-good frame hold'
+            'MONO_SHADOW=DirectGPU two-eye only; per-Present latch; staged host snap / metadata commit / Reset invalidation'
             'RUNTIME_QUEST_VALIDATION=UNTESTED'
           ) | Set-Content "$dir/BUILD_PROVENANCE.txt" -Encoding UTF8
           Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
           Get-FileHash "$dir.zip" -Algorithm SHA256
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun-VR-FOCUS-STEREO-ONLY-${{ github.sha }}
-          path: OutRun2_VR_FOCUS_STEREO_ONLY_*.zip
+          name: OutRun-VR-FOCUS-STEREO-SAFETY-${{ github.sha }}
+          path: OutRun2_VR_FOCUS_STEREO_SAFETY_*.zip
           retention-days: 21
           if-no-files-found: error

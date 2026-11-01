@@ -73,3 +73,21 @@ verified pair is ready. Reset/session/reference-space/presentation changes
 invalidate matching. SBS/DesktopDuplication still uses its old 250ms grace.
 This can temporarily freeze head-motion parallax during prolonged game stalls;
 for experimental use only, not yet validated for comfort on Quest.
+
+R26+HUD STEREO-ONLY TRANSACTIONAL SAFETY REPAIR (2026-11-01)
+- R9 latches the DirectGPU no-mono decision on the first main Clear of
+  each Present; fast host-ready toggles cannot mix 2-eye and 3-eye
+  histories inside one frame. Both Reset paths explicitly disarm latch.
+- OpenXR never copies directly into the displayed last-good snapshots:
+  candidate left/right textures are GPU-copied and fenced separately;
+  the EXACT frame metadata must be rechecked before pointer swap.
+  Copy timeout, allocation failure or metadata mismatch keep the
+  previously committed stereo frame unchanged.
+- Host uses the 250ms stereo grace for SBS; only actually accepted
+  DirectGPU stereo pairs use the longer last-good hold.
+- Explicit game ResetEx-disabled/zero publication invalidates old
+  host matched source, preventing stale old-generation VR projection.
+- Candidate snapshot textures are reused through two-buffer swapping
+  when dimensions/format stay stable, avoiding repeated allocations.
+- Source/Windows CI tests do NOT prove Quest HMD visual comfort.
+  First test cautiously, keep prior R26 safety build for rollback.
