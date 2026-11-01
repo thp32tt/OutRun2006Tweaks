@@ -48,3 +48,20 @@ candidateSkipSharePct is NOT a GPU frame-time or FPS estimate.
 No full per-draw trace, no GPU readback, no new RT, no fidelity changes.
 After a same-course gameplay test, compare GPU frame time and send the small
 OutRun2006Tweaks.log. Do not change the VR Telemetry setting for this probe.
+
+STEREO-ONLY / LAST GOOD DirectGPU TEST — 2026-11-01
+This experimental R26+HUD branch removes the third independent mono
+backup in VERIFIED DirectGPU headset gameplay only. It DOES NOT remove
+the original game's normal 2D/offscreen Draws or theater/menu rendering.
+R20 initial color/depth seed no longer requires a dedicated mono RT or
+mono depth: right-eye baseline is built and validated using the original
+main-depth generation and current Present's full depth/stencil clear.
+R13 side-effecting unsafe Draws continue exactly once on the real target;
+incomplete frames are never advertised as active stereo.
+After a verified DirectGPU frame was published, failed/incomplete frames
+preserve the last-good VR publication until the next valid pair; Reset,
+host disconnection and leaving VR invalidate this proof.
+No automatic fallback to partial/unsynchronized mono headset frames.
+This is a TEST build only. Quest3 HMD visual/boot behavior is unverified.
+If blank/white/one-eye display appears, restore the previous safe
+R26 gap-repair build and provide logs. Keep DirectGpuOnly=true.

@@ -110,6 +110,18 @@ namespace OutRunVRStereo
 		std::uint64_t R9NullDepthBinds = 0;
 		std::uint64_t R9MainDepthReacquires = 0;
 		std::uint64_t R9FullClearSeeds = 0;
+		// Test-only no-third-pass mode: verified DirectGPU headset gameplay.
+		// Original 2D and offscreen draws are not altered.
+		bool R9LastCompletedDirectVrFrame = false;
+		std::uint64_t R9StereoOnlySavedDraws = 0;
+		std::uint64_t R9StereoOnlySavedClears = 0;
+		std::uint64_t R9HeldLastGoodVrFrames = 0;
+		bool R9NoMonoForActiveVr() noexcept
+		{
+			return Settings::VRDirectGpuOnly &&
+				Settings::VRHmdlessDebugMode == 0 &&
+				HostDirectTransportReady() && StereoWanted();
+		}
 		std::uint64_t R9MonoBackupDraws = 0;
 		// Skips are valid ONLY after an earlier two-eye draw made the independent
 		// mono restoration history incomplete for this Present.
@@ -656,6 +668,30 @@ namespace OutRunVRStereo
 				return hr;
 			}
 
+			if (R9NoMonoForActiveVr())
+			{
+				// R7 still clears LEFT and RIGHT. R20 validates actual depth;
+				// no third VR color/depth RT is needed in this experiment.
+				const auto before = FrameFailureReason;
+				const HRESULT hr = FrameStereoIncomplete
+					? ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil)
+					: R9ClearCallbackHook.stdcall<HRESULT>(
+						device, count, rects, flags, color, z, stencil);
+				R9ObserveLegacyFailure(before, "Clear/stereo-only", hr);
+				if (SUCCEEDED(hr) &&
+					ClearCoversStereoBackbuffer(device, count, rects) &&
+					(flags & D3DCLEAR_TARGET) != 0 && !FrameStereoIncomplete)
+				{
+					R9StereoSeeded = true;
+					R9MonoSeeded = false;
+					R9MonoBackupGap = true;
+					++R9FullClearSeeds;
+					if ((flags & (D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL)) != 0)
+						++R9MainDepthContentSerial;
+				}
+				++R9StereoOnlySavedClears;
+				return hr;
+			}
 			// A later R30/R29 direct two-eye draw can invalidate the mono history
 			// without an error. A partial Clear cannot repair that missing history,
 			// so never spend a third GPU pass clearing the unusable shadow.
@@ -753,7 +789,14 @@ namespace OutRunVRStereo
 				return actualDraw();
 			}
 
-			if (R9MonoBackupGap)
+			if (R9NoMonoForActiveVr())
+			{
+				// Preserve R7 left/right Draw below, omit the third VR scene.
+				R9MonoBackupGap = true;
+				R9MonoSeeded = false;
+				++R9StereoOnlySavedDraws;
+			}
+			else if (R9MonoBackupGap)
 			{
 				// R30 has already rendered one object without the mono copy.
 				// Present is forbidden to restore this now-incomplete backup.
@@ -861,6 +904,8 @@ namespace OutRunVRStereo
 
 			const bool stereoRequested = StereoWanted() && R9StereoSeeded;
 			const bool directOnly = R9DirectOnlyTransport();
+			if (!HostDirectTransportReady() || !StereoWanted())
+				R9LastCompletedDirectVrFrame = false;
 			const std::uint32_t pendingFrameId = stereoRequested ? NextStereoFrameId() : 0;
 			bool composedStereo = false;
 			bool directTransport = false;
@@ -944,6 +989,10 @@ namespace OutRunVRStereo
 			}
 
 			R9MaybeLogQuietGapEfficiency(stereoRequested);
+			if (R9StereoOnlySavedDraws != 0 &&
+				(R9StereoOnlySavedDraws & (R9StereoOnlySavedDraws - 1)) == 0)
+				spdlog::info("VR R26 STEREO-ONLY TEST: savedMonoDraw={} savedMonoClear={} heldLastGood={} (no third VR RT; real HMD visual unverified)",
+					R9StereoOnlySavedDraws, R9StereoOnlySavedClears, R9HeldLastGoodVrFrames);
 			R9MaybeLogSummary();
 			MaybeLogSummary();
 			LARGE_INTEGER presentStart{};
@@ -978,6 +1027,8 @@ namespace OutRunVRStereo
 
 			if (composedStereo && SUCCEEDED(hr) && !FrameStereoIncomplete)
 			{
+				if (directTransport && HostDirectTransportReady())
+					R9LastCompletedDirectVrFrame = true;
 				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence, pendingFrameId);
 				PublishRenderFrame(OutRunVR::StereoSbsActive, pendingFrameId, pendingPoseSequence,
 					presentStart.QuadPart, OutRunVR::StereoFailureNone, &FrameStereoMetadata, false, directTransport);
@@ -998,11 +1049,16 @@ namespace OutRunVRStereo
 				if (FrameFailureReason != OutRunVR::StereoFailureNone)
 					R9LogFirstFailure("Present/fallback", hr);
 				const std::uint32_t fallback = stereoRequested ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled;
-				PublishStereoState(fallback, false, 0, 0);
+				const bool holdLastGood = R9LastCompletedDirectVrFrame &&
+					R9NoMonoForActiveVr() && directOnly;
+				if (holdLastGood)
+					++R9HeldLastGoodVrFrames;
+				else
+					PublishStereoState(fallback, false, 0, 0);
 				// In DirectGPU-only mode, do not overwrite the bounded frame ring
 				// with classic fallback descriptors while the host still needs to
 				// consume/ACK one of the initial shared-eye frames.
-				if (!directOnly || !stereoRequested || directTransport)
+				if (!holdLastGood && (!directOnly || !stereoRequested || directTransport))
 					PublishRenderFrame(fallback, 0, 0, presentStart.QuadPart, FrameFailureReason, nullptr);
 			}
 
@@ -1026,6 +1082,7 @@ namespace OutRunVRStereo
 		HRESULT __stdcall ResetDestR9(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 		{
 			R9ReleaseMonoResources();
+			R9LastCompletedDirectVrFrame = false;
 			R9ReleaseDepthIdentity();
 			R9StereoSeeded = false;
 			R9MonoSeeded = false;

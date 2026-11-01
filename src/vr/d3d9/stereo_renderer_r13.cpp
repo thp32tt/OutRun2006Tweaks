@@ -383,6 +383,7 @@ namespace OutRunVRStereo
             R13DirectCopyPathRejected = false;
             R13DirectCopyRejectHr = D3D_OK;
             R9ReleaseMonoResources();
+            R9LastCompletedDirectVrFrame = false;
             R9ReleaseDepthIdentity();
             R9StereoSeeded = false;
             R9MonoSeeded = false;
@@ -467,6 +468,17 @@ namespace OutRunVRStereo
         HRESULT R13DrawMonoShadowOnce(IDirect3DDevice9* device,
             DrawCall&& actualDraw, const char* site)
         {
+            if (R9NoMonoForActiveVr())
+            {
+                // No third RT exists in headset gameplay. Side-effecting
+                // MRT/query Draws still execute exactly ONCE on the game's
+                // real target, but this Present must not publish stereo.
+                R9MonoBackupGap = true;
+                R9MonoSeeded = false;
+                FrameStereoIncomplete = true;
+                ++R9MonoOnlyDraws;
+                return actualDraw();
+            }
             IDirect3DSurface9* savedRt = nullptr;
             IDirect3DSurface9* savedDepth = nullptr;
             D3DVIEWPORT9 savedViewport{};

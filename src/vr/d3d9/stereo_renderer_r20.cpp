@@ -50,7 +50,7 @@ namespace OutRunVRStereo
         {
             if (FAILED(hr) || !device || !IsGameDevice(device) || InternalStereoPass ||
                 !TargetIsBackBuffer() || R9DeferredDepth || !R9CurrentDepthCanMirror() ||
-                !R9MonoDepth || R9MonoBackupGap)
+                (!R9NoMonoForActiveVr() && (!R9MonoDepth || R9MonoBackupGap)))
                 return;
 
             const DWORD depthFlags = flags & (D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL);
@@ -80,7 +80,7 @@ namespace OutRunVRStereo
                 R20DepthClearEpoch == PresentEpoch &&
                 R20DepthClearDrawSerial == R9DrawCallCount() &&
                 R20DepthClearGeneration == R9MainDepthGenerationValue() &&
-                R9MonoDepth != nullptr;
+                (R9NoMonoForActiveVr() ? RightEyeDepth != nullptr : R9MonoDepth != nullptr);
 
             bool stencilSafe = true;
             if (StencilTestActive(device))
@@ -121,16 +121,18 @@ namespace OutRunVRStereo
 
         bool R20BuildCompleteColorBaseline(IDirect3DDevice9* device) noexcept
         {
-            if (!device || !BackBuffer || !RightEyeSurface || !R9MonoSurface)
+            if (!device || !BackBuffer || !RightEyeSurface ||
+                (!R9NoMonoForActiveVr() && !R9MonoSurface))
                 return false;
 
             InternalPassScope guard;
             const HRESULT rightHr = device->StretchRect(
                 BackBuffer, nullptr, RightEyeSurface, nullptr, D3DTEXF_NONE);
-            const HRESULT monoHr = SUCCEEDED(rightHr)
-                ? device->StretchRect(
-                    BackBuffer, nullptr, R9MonoSurface, nullptr, D3DTEXF_NONE)
-                : rightHr;
+            const HRESULT monoHr = R9NoMonoForActiveVr()
+                ? rightHr : (SUCCEEDED(rightHr)
+                    ? device->StretchRect(
+                        BackBuffer, nullptr, R9MonoSurface, nullptr, D3DTEXF_NONE)
+                    : rightHr);
             if (FAILED(rightHr) || FAILED(monoHr))
             {
                 ++R20BaselineCopyFailures;
@@ -189,8 +191,9 @@ namespace OutRunVRStereo
                 return hr;
 
             if (!StereoWanted() || !TargetIsBackBuffer() || R9DeferredDepth ||
-                !R9CurrentDepthCanMirror() || !R9MonoSurface ||
-                R9MonoBackupGap || FrameStereoIncomplete ||
+                !R9CurrentDepthCanMirror() ||
+                (!R9NoMonoForActiveVr() && (!R9MonoSurface || R9MonoBackupGap)) ||
+                FrameStereoIncomplete ||
                 FrameFailureReason != OutRunVR::StereoFailureNone)
                 return hr;
 
@@ -210,8 +213,8 @@ namespace OutRunVRStereo
                 return hr;
 
             R9StereoSeeded = true;
-            R9MonoSeeded = true;
-            R9MonoBackupGap = false;
+            R9MonoSeeded = !R9NoMonoForActiveVr();
+            R9MonoBackupGap = R9NoMonoForActiveVr();
             ++R20RelaxedSeeds;
 
             if (TrackedDepthStencil)
@@ -226,8 +229,8 @@ namespace OutRunVRStereo
             {
                 R20FirstRelaxedSeedLogged = true;
                 spdlog::info(
-                    "VR R20/R23: relaxed bootstrap accepted after complete right+mono color baseline and common depth/stencil generation/draw-serial validation (rectCount={}, flags=0x{:08x})",
-                    count, static_cast<unsigned>(flags));
+                    "VR R20/R23: relaxed bootstrap accepted after complete right-eye baseline (optional mono safety) and current depth/stencil generation+draw-serial validation (rectCount={}, flags=0x{:08x}, stereoOnly={})",
+                    count, static_cast<unsigned>(flags), R9NoMonoForActiveVr() ? 1 : 0);
             }
             return hr;
         }
