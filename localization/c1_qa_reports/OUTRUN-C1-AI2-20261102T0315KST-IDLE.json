@@ -1,0 +1,54 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261102T0315KST-IDLE",
+  "requested_at_kst": "2026-11-02T03:15:00+09:00",
+  "checked_at_kst": "2026-11-02T03:17:38+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "base_branch_head": "33219d5864ae41f6eed3a56d48cce5efa507e9ff",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policy_sources": [
+    {
+      "path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+      "blob_sha": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1"
+    },
+    {
+      "path": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+      "blob_sha": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6"
+    },
+    {
+      "path": "localization/controller_roles.json",
+      "blob_sha": "8638b458e60740ed93ddd7f74eb45e8204413812"
+    }
+  ],
+  "evidence_source": "N100 live filesystem /home/chatgpt-runner2/work, read-only script work/C1_QA_20261101_2145_AI2_inventory.py",
+  "inventory": {
+    "candidate_directory": "work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+    "export_directory": "work/image-src/text_roi_batches/export_evidence",
+    "candidate_png_files": 955,
+    "export_file_entries": 955,
+    "prior_reviewed_distinct_sha_count": 960,
+    "new_unreviewed_sha_count": 0,
+    "candidate_without_export_count": 0,
+    "pending": [],
+    "deduplication": "Each PNG bytes SHA256 compared against existing independent C1 QA JSON record SHAs"
+  },
+  "status": "IDLE_NO_NEW_UNREVIEWED_AB_CANDIDATES",
+  "run_results": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "score_change": 0
+  },
+  "boundaries": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds_created": false,
+    "c2_c3_pass_created": false,
+    "ingame_pass_claimed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "No new SHA-unique exported A/B candidate. Same-SHA retries prohibited. C1 only, no DDS/C2/C3/user runtime gate changed."
+}
