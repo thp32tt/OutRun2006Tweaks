@@ -105,14 +105,22 @@ def verify_r7_bootstrap_coverage(source: str) -> None:
 
 def verify_r9(source: str) -> None:
     fn = function_block(source, "HRESULT __stdcall PresentDestR9(")
-    recovery = fn.split("if (!composedStereo || FrameStereoIncomplete)", 1)[1].split(
-        "R9MaybeLogSummary();", 1)[0]
+    armed_gate = "if ((!composedStereo || FrameStereoIncomplete) && !R9MonoElisionArmed)"
+    legacy_gate = "if (!composedStereo || FrameStereoIncomplete)"
+    gate = armed_gate if armed_gate in fn else legacy_gate
+    assert gate in fn
+    recovery = fn.split(gate, 1)[1].split("R9MaybeLogSummary();", 1)[0]
     assert "if (R9MonoSeeded && !R9MonoBackupGap &&" in recovery
     assert "!R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason))" in recovery
     assert recovery.index("!R9RestoreMonoBeforePresent(") < recovery.index(
         "R9MonoBackupGap = true;") < recovery.index(
         "R9Poison(OutRunVR::StereoFailureRestoreFailed,")
     assert "Present/mono-shadow-restore" in recovery
+    if armed_gate in fn:
+        assert "const bool holdVerifiedStereo =" in fn
+        assert "directTransport && HostDirectTransportReady() && !R9MonoElisionArmed" in fn
+        assert "++R9MonoElisionFailureStreak >= 3u" in fn
+        assert "if (stereoRequested && !holdVerifiedStereo &&" in fn
     # The game still physically Presents once; no retry/copy or fabricated
     # mono frame is allowed after an unsuccessful GPU StretchRect.
     assert fn.count("const HRESULT rawPresentHr = PresentHook.stdcall<HRESULT>(") == 1
