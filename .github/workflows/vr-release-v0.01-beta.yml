@@ -1,0 +1,140 @@
+name: VR Release v0.01 Beta
+
+on:
+  push:
+    branches:
+      - vr-d3d9ex-focus
+    paths:
+      - '.github/workflows/vr-release-v0.01-beta.yml'
+      - 'src/dllmain.cpp'
+      - 'src/vr/settings.cpp'
+      - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
+      - 'src/overlay/hooks_overlay.cpp'
+      - 'vrhost/src/main.cpp'
+      - 'vrhost/src/main_r23.cpp'
+      - 'OutRun2006Tweaks.ini'
+      - 'OutRun2006Tweaks.lods.ini'
+      - 'tools/verify_vr_release_quiet_profile.py'
+      - 'RELEASE_NOTES_VR_v0.01-beta.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: "${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'release(vr): v0.01-beta') }}"
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Verify quiet release profile
+        shell: pwsh
+        run: |
+          python tools/verify_vr_release_quiet_profile.py
+          if ($LASTEXITCODE -ne 0) { throw 'v0.01-beta quiet release profile failed' }
+          python tools/verify_vr_r26_projected_particle_canvas.py
+          if ($LASTEXITCODE -ne 0) { throw 'particle fastpath regression failed' }
+          python tools/verify_vr_r26_mono_elision.py
+          if ($LASTEXITCODE -ne 0) { throw 'mono-elision regression failed' }
+          python tools/verify_vr_menu_resolution_split.py
+          if ($LASTEXITCODE -ne 0) { throw 'menu coordinate regression failed' }
+          python tools/verify_vr_menu_letterbox_aspect.py
+          if ($LASTEXITCODE -ne 0) { throw 'letterbox physical-map regression failed' }
+
+      - name: Configure Win32 R26+HUD
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32
+          $cache = Get-Content build-game/CMakeCache.txt
+          if ($cache -notcontains 'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON') {
+            throw 'R26+HUD default renderer is not active'
+          }
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
+      - name: Build Win32 game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+
+      - name: Build x64 OpenXR host
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-host
+
+      - name: Assemble v0.01 Beta
+        shell: pwsh
+        run: |
+          $dir = 'OutRun2_VR_v0.01_Beta'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw 'dinput8.dll missing' }
+          $host = Get-ChildItem build-host -Recurse -Filter outrun-vr-host.exe | Select-Object -First 1
+          if (-not $host) { throw 'outrun-vr-host.exe missing' }
+
+          Copy-Item $dll.FullName "$dir/dinput8.dll"
+          Copy-Item $host.FullName "$dir/outrun-vr-host.exe"
+          Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
+          Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
+          if (Test-Path LICENSES.txt) { Copy-Item LICENSES.txt "$dir/LICENSES.txt" }
+          Copy-Item RELEASE_NOTES_VR_v0.01-beta.md "$dir/README_VR_v0.01_Beta.md"
+          Set-Content "$dir/VR_RELEASE_VERSION.txt" 'OutRun 2006 VR v0.01 Beta' -Encoding ascii
+          Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
+          @(
+            'DirectGpuOnly=true'
+            'Graphics.ReflectionUpdateRate=0.25'
+            'Graphics.TransparencySupersampling=false'
+            'VR.TransparencySupersampling=false'
+            'OUTRUN_VR_R23_PIXEL_PROBE=OFF (default)'
+            'VR.Telemetry=false'
+            'VR.FileLogging=false'
+            'RUNTIME_VALIDATION=USER_CONFIRMED_2026-11-02'
+          ) | Set-Content "$dir/VR_RELEASE_PROFILE.txt" -Encoding ascii
+
+          $env:VR_RELEASE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
+          python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["VR_RELEASE_INI"],encoding="utf-8"); assert p.getboolean("VR","DirectGpuOnly") is True; assert abs(p.getfloat("Graphics","ReflectionUpdateRate")-0.25)<1e-9; assert p.getboolean("Graphics","TransparencySupersampling") is False; assert p.getboolean("VR","TransparencySupersampling") is False; assert p.getboolean("VR","Telemetry") is False; assert p.getboolean("VR","FileLogging") is False'
+          if ($LASTEXITCODE -ne 0) { throw 'release INI profile mismatch' }
+
+          foreach ($forbidden in @(
+            'RUN_DX9EX_TEST.cmd','Run-DX9ExFocusTest.ps1',
+            'Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd')) {
+            if (Test-Path (Join-Path $dir $forbidden)) {
+              throw "diagnostic file leaked into release: $forbidden"
+            }
+          }
+
+          New-Item -ItemType Directory -Force release | Out-Null
+          Compress-Archive -Path "$dir/*" -DestinationPath 'release/OutRun2_VR_v0.01_Beta.zip' -Force
+          Get-FileHash 'release/OutRun2_VR_v0.01_Beta.zip' -Algorithm SHA256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-v0.01-Beta-${{ github.sha }}
+          path: release/OutRun2_VR_v0.01_Beta.zip
+          if-no-files-found: error
+
+      - name: Publish GitHub prerelease
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view vr-v0.01-beta --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release delete vr-v0.01-beta --repo $env:GITHUB_REPOSITORY --cleanup-tag --yes
+          }
+          gh release create vr-v0.01-beta release/OutRun2_VR_v0.01_Beta.zip `
+            --repo $env:GITHUB_REPOSITORY `
+            --target $env:GITHUB_SHA `
+            --title 'OutRun 2006 VR v0.01 Beta' `
+            --notes-file RELEASE_NOTES_VR_v0.01-beta.md `
+            --prerelease
