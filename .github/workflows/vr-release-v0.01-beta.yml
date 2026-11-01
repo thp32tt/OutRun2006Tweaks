@@ -39,21 +39,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Withdraw stale prerelease from pre-entrypoint-fix build
-        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, 'withdraw stale v0.01-beta') }}
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release view vr-v0.01-beta --repo $env:GITHUB_REPOSITORY *> $null
-          if ($LASTEXITCODE -eq 0) {
-            gh release delete vr-v0.01-beta --repo $env:GITHUB_REPOSITORY --cleanup-tag --yes
-            Write-Host 'Removed stale vr-v0.01-beta prerelease; no replacement is published by this push.'
-          } else {
-            Write-Host 'No stale vr-v0.01-beta prerelease found.'
-          }
-
-
       - name: Verify quiet release profile
         shell: pwsh
         run: |
@@ -193,7 +178,7 @@ jobs:
           if-no-files-found: error
 
       - name: Publish GitHub prerelease
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, 'release(vr): v0.01-beta publish')) }}
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
