@@ -295,6 +295,7 @@ def main():
     p.add_argument("--max-sources",type=int,default=1)
     p.add_argument("--only-source",default="",help="Only the literal basename Q...png for an isolated test")
     p.add_argument("--retry-holds",action="store_true",help="Retry failed sources after changing the code or source")
+    p.add_argument("--inventory-only",action="store_true",help="Summarize readiness without rendering or modifying any file")
     p.add_argument("--mips",type=int,default=1)
     p.add_argument("--max-opaque-fraction",type=float,default=1.0)
     p.add_argument("--manifest",default=str(IMAGE_ROOT/"text_roi_batches/production_manifest.json"))
@@ -319,6 +320,20 @@ def main():
         if not SAFE_SOURCE.fullmatch(args.only_source):p.error("unsafe --only-source")
         entries=[e for e in entries if e["source"].name==args.only_source]
         if not entries:raise ValueError("SOURCE_NAME_NOT_FOUND")
+    if args.inventory_only:
+        stats=collections.Counter()
+        source_rows=0
+        for e in entries:
+            key=e["source"].stem+"_"+e["sha"][:12]
+            source_rows+=len(e["rows"])
+            status=("NO_APPROVED_ROI" if not e["rows"] else
+                    "ALREADY_GENERATED" if (output_root/"sources"/key/"report.json").is_file() else
+                    "HELD" if (output_root/"holds"/(key+".json")).is_file() else "PENDING")
+            stats[status]+=1
+        print(json.dumps({"status":"INVENTORY_ONLY","total_source_png":len(entries),
+           "approved_source_rows_including_rebalances":source_rows,
+           "counts":dict(stats),"RUNTIME_VALIDATION":"UNTESTED"},ensure_ascii=False))
+        return
     if args.execute:atomic_json(cache_path,cache)
     results=[];attempted=0
     # Bound actual new builds. Previously verified sources do not consume slots.
