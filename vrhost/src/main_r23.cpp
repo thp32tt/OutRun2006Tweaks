@@ -2591,6 +2591,43 @@ namespace
                 mirrorFrame->backbufferWidth, mirrorFrame->backbufferHeight,
                 mirrorFrame->presentQpc, sumoReceiptNow.QuadPart,
                 sumoReceiptFrequency.QuadPart);
+        // Persist the negative path as well: a missing Frame.v2 QPC/extent
+        // receipt is otherwise indistinguishable from a fixed menu when
+        // only accepted logical-canvas crop traces are present.
+        // Bound at powers of two so long 120-Hz menu sessions stay small.
+        if (clientGameState == 0x20u && !sourceIsSbs)
+        {
+            static std::uint64_t sumoSourceDecisionHits = 0;
+            const auto hit = ++sumoSourceDecisionHits;
+            if (hit <= 16 || (hit & (hit - 1)) == 0)
+            {
+                std::ostringstream trace;
+                trace << "[VR TRACE SUMO THEATER SOURCE DECISION FULL]"
+                    << " hit=" << hit
+                    << " publishedMirror=" << (publishedMirrorApplied ? 1 : 0)
+                    << " recentPhysical=" << (recentSumoPhysicalSource ? 1 : 0)
+                    << " gamePid=" << c.gamePid_
+                    << " framePid=" << (mirrorFrame ? mirrorFrame->clientPid : 0u)
+                    << " frameExtent="
+                    << (mirrorFrame ? mirrorFrame->backbufferWidth : 0u)
+                    << 'x'
+                    << (mirrorFrame ? mirrorFrame->backbufferHeight : 0u)
+                    << " frameQpc="
+                    << (mirrorFrame ? mirrorFrame->presentQpc : 0)
+                    << " captureQpc=" << c.lastCapturePresentQpc_
+                    << " client="
+                    << capturedTheaterClient.left << ','
+                    << capturedTheaterClient.top << ','
+                    << capturedTheaterClient.right << ','
+                    << capturedTheaterClient.bottom
+                    << " source=" << c.sourceWidth_ << 'x'
+                    << c.sourceHeight_
+                    << " xr=" << c.projection_.width << 'x'
+                    << c.projection_.height
+                    << "\n";
+                OutRunVrEmitFullTrace(trace.str());
+            }
+        }
         const float fallbackPhysicalWidth = recentSumoPhysicalSource
             ? static_cast<float>(mirrorFrame->backbufferWidth)
             : static_cast<float>(c.projection_.width);
