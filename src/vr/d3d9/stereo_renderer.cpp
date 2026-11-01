@@ -442,6 +442,9 @@ namespace OutRunVRStereo
 		std::uint64_t R9GapProbeStereoFrames = 0;
 		std::uint64_t R9GapProbePrevFrameSkipped = 0;
 		std::uint64_t R9GapProbeLastActual = 0;
+		std::uint64_t R9GapProbeLastStereoOnlySavedDraw = 0;
+		std::uint64_t R9GapProbeLastStereoOnlySavedClear = 0;
+		std::uint64_t R9GapProbeLastHeldLastGood = 0;
 		std::uint64_t R9GapProbeLastSkipped = 0;
 		std::uint64_t R9GapProbeLastClearSkipped = 0;
 		std::uint64_t R9GapProbeLastGapFrames = 0;
@@ -470,6 +473,9 @@ namespace OutRunVRStereo
 			{
 				R9GapProbeLastMs = now;
 				R9GapProbeLastActual = R9MonoBackupDraws;
+				R9GapProbeLastStereoOnlySavedDraw = R9StereoOnlySavedDraws;
+				R9GapProbeLastStereoOnlySavedClear = R9StereoOnlySavedClears;
+				R9GapProbeLastHeldLastGood = R9HeldLastGoodVrFrames;
 				R9GapProbeLastSkipped = R9MonoGapSkippedDraws;
 				R9GapProbeLastClearSkipped = R9MonoGapSkippedClears;
 				R9GapProbeLastGapFrames = R9GapProbeGapFrames;
@@ -480,6 +486,9 @@ namespace OutRunVRStereo
 			if (now - R9GapProbeLastMs < 10000)
 				return;
 			const auto actual = R9MonoBackupDraws - R9GapProbeLastActual;
+			const auto stereoOnlySaved = R9StereoOnlySavedDraws - R9GapProbeLastStereoOnlySavedDraw;
+			const auto stereoOnlyClears = R9StereoOnlySavedClears - R9GapProbeLastStereoOnlySavedClear;
+			const auto lastGoodHeld = R9HeldLastGoodVrFrames - R9GapProbeLastHeldLastGood;
 			const auto skipped = R9MonoGapSkippedDraws - R9GapProbeLastSkipped;
 			const auto clearSkipped =
 				R9MonoGapSkippedClears - R9GapProbeLastClearSkipped;
@@ -494,14 +503,18 @@ namespace OutRunVRStereo
 						static_cast<double>(actual + skipped) : 0.0;
 			spdlog::info(
 				"VR R26 MONO-GAP SAMPLE: intervalMs={} stereoFrames={} "
-				"monoActual={} gapSkipDraw={} gapSkipClear={} "
+				"monoActual={} stereoOnlySavedDraw={} stereoOnlySavedClear={} lastGoodHeld={} gapSkipDraw={} gapSkipClear={} "
 				"gapFrames={} gapFramesWithoutLaterSkip={} "
 				"candidateSkipSharePct={:.2f} "
 				"(Draw share only; NOT GPU-time or FPS gain)",
-				now - R9GapProbeLastMs, stereoFrames, actual, skipped,
+				now - R9GapProbeLastMs, stereoFrames, actual,
+				stereoOnlySaved, stereoOnlyClears, lastGoodHeld, skipped,
 				clearSkipped, gapFrames, noSkipFrames, candidateSkipShare);
 			R9GapProbeLastMs = now;
 			R9GapProbeLastActual = R9MonoBackupDraws;
+			R9GapProbeLastStereoOnlySavedDraw = R9StereoOnlySavedDraws;
+			R9GapProbeLastStereoOnlySavedClear = R9StereoOnlySavedClears;
+			R9GapProbeLastHeldLastGood = R9HeldLastGoodVrFrames;
 			R9GapProbeLastSkipped = R9MonoGapSkippedDraws;
 			R9GapProbeLastClearSkipped = R9MonoGapSkippedClears;
 			R9GapProbeLastGapFrames = R9GapProbeGapFrames;
@@ -989,10 +1002,7 @@ namespace OutRunVRStereo
 			}
 
 			R9MaybeLogQuietGapEfficiency(stereoRequested);
-			if (R9StereoOnlySavedDraws != 0 &&
-				(R9StereoOnlySavedDraws & (R9StereoOnlySavedDraws - 1)) == 0)
-				spdlog::info("VR R26 STEREO-ONLY TEST: savedMonoDraw={} savedMonoClear={} heldLastGood={} (no third VR RT; real HMD visual unverified)",
-					R9StereoOnlySavedDraws, R9StereoOnlySavedClears, R9HeldLastGoodVrFrames);
+			// 10-second summary above records stereo-only saved Draw/Clear.
 			R9MaybeLogSummary();
 			MaybeLogSummary();
 			LARGE_INTEGER presentStart{};

@@ -69,6 +69,10 @@ assert "CopyResource(directSnapshotLeft_,directLeft_[slot])" in host
 assert "CopyResource(directSnapshotRight_,directRight_[slot])" in host
 assert "matchedStereoValid=false" in host
 assert "DirectTransportFrameReadyAfterPresent" in r7
+assert "stereoOnlySavedDraw={}" in r9
+assert "stereoOnlySavedClear={}" in r9
+assert "lastGoodHeld={}" in r9
+assert "now - R9GapProbeLastMs < 10000" in r9
 assert "R9MonoElisionArmed" not in r9
 print("PASS R9: DirectGPU VR is two-eye only; original 2D/offscreen paths preserved")
 print("PASS R20: right-eye color/depth baseline replaces mono bootstrap dependency")
