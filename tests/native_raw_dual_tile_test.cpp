@@ -7,6 +7,7 @@
 #include "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
 #include <array>
 #include <cassert>
+#include <cstdio>
 #include <limits>
 #include "src/vr/d3d11/native_game_raw_msaa_capture.hpp"
 using namespace outrun::vr::dx11;
@@ -172,6 +173,10 @@ static_assert([]() constexpr {
 // receives these exact clip-space coordinates, so source sampling may focus
 // on the real triangle without altering source Draw, RGB or Present proof.
 bool native_raw_fvf_clip_capture_regression() {
+    const auto reject = [](int line) noexcept {
+        std::fprintf(stderr, "FVF source raster regression failed at line %d\n", line);
+        return false;
+    };
     constexpr std::array<std::array<float, 4>, 3> verts{{
         {{0.78f, 0.25f, 0.5f, 1.0f}},
         {{0.95f, 0.25f, 0.5f, 1.0f}},
@@ -182,26 +187,26 @@ bool native_raw_fvf_clip_capture_regression() {
     if (!native_raw_fvf_projected_raster(span, 0, 0, 3440, 1440, rect) ||
         rect.left < 3000 || rect.right > 3440 ||
         rect.top < 300 || rect.bottom > 550)
-        return false;
+        return reject(__LINE__);
     NativeRawDualTile source{};
     if (!native_raw_swept_dual_draw_tile(3440, 1440, 512, 288,
             rect, 0u, source) || source.first.x < 2500u)
-        return false;
+        return reject(__LINE__);
     auto invalidW = verts;
     invalidW[1][3] = 0.0f;
     if (native_raw_fvf_projected_raster(
             {invalidW.data(), sizeof(invalidW[0]), invalidW.size()},
             0, 0, 3440, 1440, rect))
-        return false;
+        return reject(__LINE__);
     auto invalidNaN = verts;
     invalidNaN[2][0] = (std::numeric_limits<float>::quiet_NaN)();
     if (native_raw_fvf_projected_raster(
             {invalidNaN.data(), sizeof(invalidNaN[0]), invalidNaN.size()},
             0, 0, 3440, 1440, rect))
-        return false;
+        return reject(__LINE__);
     if (native_raw_fvf_projected_raster(span, 0, 0, 0, 1440, rect) ||
         native_raw_fvf_projected_raster({}, 0, 0, 3440, 1440, rect))
-        return false;
+        return reject(__LINE__);
 
     // The actual indexed native menu/vehicle/HUD GPU Draw references only
     // the three far-right vertices; the other positions in its VB are not
@@ -225,12 +230,12 @@ bool native_raw_fvf_clip_capture_regression() {
             {indexedVerts.data(), sizeof(indexedVerts[0]),
              indexedVerts.size()}, 0, 0, 3440, 1440, broad) ||
         broad.left > 300 || indexedRect.left <= broad.left)
-        return false;
+        return reject(__LINE__);
     NativeRawDualTile indexedGpu{};
     if (!native_raw_swept_dual_draw_tile(
             3440, 1440, 512, 288, indexedRect, 0u, indexedGpu) ||
         indexedGpu.first.x < 2500u)
-        return false;
+        return reject(__LINE__);
 
     // Real menu and vehicle geometry may include fully offscreen and
     // depth-clipped D3D11 triangles in the SAME IA draw. Their vertices
@@ -251,7 +256,7 @@ bool native_raw_fvf_clip_capture_regression() {
         clippedRect.right != indexedRect.right ||
         clippedRect.top != indexedRect.top ||
         clippedRect.bottom != indexedRect.bottom)
-        return false;
+        return reject(__LINE__);
     // Cross the right clip plane: a genuine partly visible triangle
     // survives while its offscreen corner cannot widen capture beyond RT.
     auto crossing = verts;
@@ -260,7 +265,7 @@ bool native_raw_fvf_clip_capture_regression() {
             {crossing.data(), sizeof(crossing[0]), crossing.size()},
             0,0,3440,1440,clippedRect) ||
         clippedRect.left < 3000 || clippedRect.right > 3442)
-        return false;
+        return reject(__LINE__);
     // Triangle strip and triangle fan must follow actual GPU IA assembly.
     // A far out-of-frustum tail must not inflate the visible first tri.
     constexpr std::array<std::array<float,4>,4> stripVerts{{
@@ -273,7 +278,7 @@ bool native_raw_fvf_clip_capture_regression() {
                 {stripVerts.data(),sizeof(stripVerts[0]),stripVerts.size(),
                  nullptr,0u,assembly},0,0,3440,1440,clippedRect) ||
             clippedRect.left < 3000 || clippedRect.right > 3442)
-            return false;
+            return reject(__LINE__);
     }
     // Active malformed IA still fails closed, never dereferencing VB OOB.
     const std::array<std::uint32_t,4> badStrip{{0u,1u,2u,99u}};
@@ -281,7 +286,7 @@ bool native_raw_fvf_clip_capture_regression() {
             {stripVerts.data(),sizeof(stripVerts[0]),stripVerts.size(),
              badStrip.data(),badStrip.size(),NativeRawFvfAssembly::TriangleStrip},
             0,0,3440,1440,clippedRect))
-        return false;
+        return reject(__LINE__);
     // Malformed/unknown IA always falls back to the original broad GPU
     // source viewport capture. No index may read outside the live VB.
     auto malformed = used;
@@ -291,24 +296,24 @@ bool native_raw_fvf_clip_capture_regression() {
     if (native_raw_fvf_projected_raster(
             badSpan, 0, 0, 3440, 1440, rect) ||
         rect.left != 0 || rect.right != 0)
-        return false;
+        return reject(__LINE__);
     badSpan = indexed;
     badSpan.indexCount = 0u;
     if (native_raw_fvf_projected_raster(
             badSpan, 0, 0, 3440, 1440, rect))
-        return false;
+        return reject(__LINE__);
     badSpan = indexed;
     badSpan.indices = nullptr;
     if (native_raw_fvf_projected_raster(
             badSpan, 0, 0, 3440, 1440, rect))
-        return false;
+        return reject(__LINE__);
     auto invalidActive = indexedVerts;
     invalidActive[5][3] = 0.0f;
     if (native_raw_fvf_projected_raster(
             {invalidActive.data(), sizeof(invalidActive[0]),
              invalidActive.size(), used.data(), used.size()},
             0, 0, 3440, 1440, rect))
-        return false;
+        return reject(__LINE__);
     // Invalid UNREFERENCED VB clip data cannot silence the real indexed GPU
     // triangle: these positions never reach the native DrawIndexed raster.
     invalidActive = indexedVerts;
@@ -318,7 +323,7 @@ bool native_raw_fvf_clip_capture_regression() {
              invalidActive.size(), used.data(), used.size()},
             0, 0, 3440, 1440, rect) ||
         rect.left != indexedRect.left || rect.right != indexedRect.right)
-        return false;
+        return reject(__LINE__);
     return true;
 }
 
