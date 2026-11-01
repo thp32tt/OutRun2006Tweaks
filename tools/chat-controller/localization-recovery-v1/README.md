@@ -1,3 +1,11 @@
+## 2026-11-01 direct visual ROI non-OCR GitOps profile
+
+Portainer branch: `localization-controller-recovery-20260928`. Existing Compose: `tools/chat-controller/localization-recovery-v1/docker-compose.yml` (same stack; rebuild + redeploy manually). A/B remain enabled for SHA-verified full-HD direct-reference ImageGen; C1 remains independent QA. OCR ChatGPT dispatch, pixel OCR review and OCR response polling are disabled, and the in-container OCR watchdog is not started. Old OCR `state.json` is retained but no longer locks QA. The ROI bridge scans only `manual_vision_outputs` and exact RGBA `cross_variant_verified` in `OUTRUN_ROI_SOURCE_MODE=direct_visual`; legacy `hd108_outputs` and `gpt_vision_chat_ocr_outputs` are **not** used as *new* inputs. Previously admitted manifest entries and A/B progress remain unchanged. New human-verified visual ROI cases must have exact original SHA, approved English/Korean translation and visual crop evidence; a blind alpha split does not count as semantic proof. 1- and 2-line source layouts must remain intact. No automatic DDS edits, C3/game PASS or VR changes.
+
+Startup policy fails closed unless `OUTRUN_GPT_CHAT_OCR_ENABLED=false`, `OUTRUN_PIXEL_OCR_REVIEW_ENABLED=false`, `OUTRUN_ROI_SOURCE_MODE=direct_visual`, A/B queue, bridge and controlled sending are enabled. Normal Portainer **Pull latest + Rebuild + Redeploy** applies this profile; never delete browser/session named volumes or start a separate container. After deployment verify `/status`: C1 QA no longer posts OCR tasks, A/B can consume only newly verified ROI records, and existing pending tasks remain; do not infer ImageGen completion from queue registration.
+
+---
+
 ## 2026-10-18 C 슬롯 OCR 중복 작업 제거 — GitOps v2
 
 측정: 2026-10-18 UTC 기준 기존 N100 C OCR 로그에서 원본 PNG 716회 중복 검사, 매치 1,670, 중복 1,153, 보류 517, 신규 크롭 0. 하루 전 원본 108개에서 최초 166개 TEST_ONLY 결과를 얻은 뒤에 전수 재검사를 무한 반복하는 구조를 개선했습니다.

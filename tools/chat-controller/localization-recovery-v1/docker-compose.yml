@@ -20,15 +20,15 @@ services:
       OUTRUN_KR_V2_AUTO_GENERATE: "true"
       OUTRUN_KR_V2_AUTO_COMPOSE: "false"
       OUTRUN_KR_V2_AUTO_DEPLOY: "false"
-      # A/B generate from verified native ROI; C1 handles GPT chat OCR fallback first, then QA.
+      # A/B generate from SHA-verified direct visual ROI; C1 remains independent QA, no OCR dispatch.
       SCHEDULE_MINUTES: "0,10,15,20,30,40,45,50"
       CHAT_SLOTS: "3" # One Chrome/profile, three persistent tabs: A/B/C1
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "false"
-      OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Legacy ROI + GPT OCR full-HD direct-reference ImageGen queue
-      OUTRUN_GPT_CHAT_OCR_ENABLED: "true" # Normal ChatGPT image-attachment OCR fallback; no API
-      OUTRUN_PIXEL_OCR_REVIEW_ENABLED: "true" # SHA-verified small PNG review only; never auto-admit returned OCR bbox
+      OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Preserve verified unsplit full-HD A/B ImageGen pipeline
+      OUTRUN_GPT_CHAT_OCR_ENABLED: "false" # Disable both C1 and B/C2 chat OCR submission/collection
+      OUTRUN_PIXEL_OCR_REVIEW_ENABLED: "false" # No repeated OCR pixel-crop reviews
       OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "600" # 10m stale wait -> retry/skip automatically
       OUTRUN_GPT_OCR_RESPONSE_POLL_SECONDS: "30" # Browser DOM response collector; independent of A/B/C1 schedule
       OUTRUN_GPT_OCR_WATCHDOG_SECONDS: "60"
@@ -77,6 +77,7 @@ services:
       OUTRUN_CROP_INTERVAL_SECONDS: "60"
       OUTRUN_CROP_MAX_PER_CYCLE: "10"
       OUTRUN_ROI_BRIDGE_ENABLED: "true"
+      OUTRUN_ROI_SOURCE_MODE: "direct_visual" # Only SHA-pinned manual visual and exact cross-variant evidence; no OCR-produced inputs
       OUTRUN_ROI_BRIDGE_INTERVAL_SECONDS: "60"
     ports:
       - "6083:6080"

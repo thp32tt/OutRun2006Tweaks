@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Fail-closed activation policy for controlled OutRun Korean ImageGen automation.
+"""Fail-closed activation policy for controlled non-OCR OutRun Korean ImageGen automation.
 
 Authorized automatic scope:
-  verified unsplit/native HD full-image reference + GPT OCR target metadata -> exact reviewed translation ->
-  A/B ChatGPT ImageGen attachment/generation -> project Library SHA proof ->
-  C1 browser-attached GPT vision OCR fallback, then lightweight independent QA.
+  verified unsplit/native HD full-image reference + human-verified visual ROI ->
+  exact reviewed translation -> A/B ChatGPT ImageGen attachment/generation ->
+  project Library SHA proof; C1 remains independent lightweight QA.
 
 Explicitly NOT authorized here:
   legacy 986 split tiles, automatic DDS promotion/write, game PASS, game deploy,
@@ -50,7 +50,7 @@ def gate(env=None, policy_path=None, evidence_root=None):
             policy.get("schema") != SCHEMA
             or policy.get("native_source_only") is not True
             or policy.get("legacy_986_tiles_forbidden") is not True
-            or policy.get("c_role") != "GPT_OCR_METADATA_ONLY_NO_CROP"
+            or policy.get("c_role") != "DIRECT_VISUAL_ROI_NO_OCR"
             or policy.get("auto_dds_write") is not False
             or policy.get("auto_game_pass") is not False
             or policy.get("auto_deploy") is not False
@@ -62,6 +62,9 @@ def gate(env=None, policy_path=None, evidence_root=None):
     roi_bridge = _enabled(env.get("OUTRUN_ROI_BRIDGE_ENABLED", "false"))
     auto_generate = _enabled(env.get("OUTRUN_KR_V2_AUTO_GENERATE", "false"))
     gpt_chat_ocr = _enabled(env.get("OUTRUN_GPT_CHAT_OCR_ENABLED", "false"))
+    pixel_ocr = _enabled(env.get("OUTRUN_PIXEL_OCR_REVIEW_ENABLED", "false"))
+    legacy_crop = _enabled(env.get("OUTRUN_CROP_ENABLED", "false"))
+    roi_source_mode = str(env.get("OUTRUN_ROI_SOURCE_MODE", "")).strip().lower()
     no_send = _enabled(env.get("OUTRUN_KR_V2_NO_SEND", "true"))
 
     # Retired/unqualified paths are never allowed during controlled activation.
@@ -87,8 +90,10 @@ def gate(env=None, policy_path=None, evidence_root=None):
         return False, "NO_SEND_INTERLOCK_CONFLICTS_WITH_AUTOSEND", phase
     if phase not in ("F2", "F3", "F4"):
         return False, "AUTOSEND_REQUIRES_CONTROLLED_PRODUCTION_PHASE", phase
-    if not (roi_queue and roi_bridge and auto_generate and gpt_chat_ocr):
+    if not (roi_queue and roi_bridge and auto_generate):
         return False, "CONTROLLED_ROI_PIPELINE_NOT_FULLY_ENABLED", phase
+    if gpt_chat_ocr or pixel_ocr or legacy_crop or roi_source_mode != "direct_visual":
+        return False, "NON_OCR_DIRECT_VISUAL_MODE_REQUIRED", phase
 
     if policy:
         if (
@@ -97,9 +102,10 @@ def gate(env=None, policy_path=None, evidence_root=None):
             or policy.get("controller_auto_send") is not True
             or policy.get("native_roi_dispatch_implemented") is not True
             or policy.get("browser_slots") != ["A", "B", "C1"]
-            or policy.get("requirements", {}).get("c1_gpt_chat_vision_ocr_fallback") is not True
+            or policy.get("requirements", {}).get("c1_gpt_chat_vision_ocr_fallback") is not False
             or policy.get("requirements", {}).get("external_ocr_api_used") is not False
-            or policy.get("requirements", {}).get("gpt_ocr_direct_full_hd_imagegen") is not True
+            or policy.get("requirements", {}).get("direct_visual_roi_imagegen") is not True
+            or policy.get("requirements", {}).get("manual_vision_sha_verified") is not True
             or policy.get("requirements", {}).get("crop_file_required") is not False
         ):
             return False, "ACTIVE_POLICY_NOT_APPROVED", phase
@@ -125,8 +131,8 @@ def main(argv=None):
         "phase": phase,
         "AUTO_SEND": _enabled(env.get("AUTO_SEND", "false")),
         "A_B": "FULL_HD_DIRECT_REFERENCE_IMAGEGEN" if ok and _enabled(env.get("AUTO_SEND", "false")) else "NO_SEND",
-        "C1": "GPT_CHAT_VISION_OCR_FALLBACK_THEN_LIGHT_QA",
-        "C": "DISABLED_NO_CROP_FILE_PIPELINE",
+        "C1": "INDEPENDENT_LIGHT_QA_NO_OCR",
+        "C": "DIRECT_VISUAL_ROI_SOURCE_NO_OCR",
         "AUTO_DDS_WRITE": False,
         "AUTO_GAME_PASS": False,
         "RUNTIME_VALIDATION": "UNTESTED",

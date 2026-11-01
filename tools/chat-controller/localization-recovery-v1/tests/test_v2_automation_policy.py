@@ -27,7 +27,9 @@ class PolicyTests(unittest.TestCase):
             "OUTRUN_AB_TEXT_ROI_QUEUE":"true",
             "OUTRUN_ROI_BRIDGE_ENABLED":"true",
             "OUTRUN_KR_V2_AUTO_GENERATE":"true",
-            "OUTRUN_GPT_CHAT_OCR_ENABLED":"true",
+            "OUTRUN_GPT_CHAT_OCR_ENABLED":"false",
+            "OUTRUN_PIXEL_OCR_REVIEW_ENABLED":"false",
+            "OUTRUN_ROI_SOURCE_MODE":"direct_visual",
             "OUTRUN_KR_V2_AUTO_COMPOSE":"false",
             "OUTRUN_KR_V2_AUTO_DEPLOY":"false",
             "OUTRUN_A_SINGLE_SMOKE_TASK_ID":"",
@@ -62,7 +64,10 @@ class PolicyTests(unittest.TestCase):
         self.assertIn("PIPELINE_NOT_FULLY_ENABLED", self.gate(OUTRUN_ROI_BRIDGE_ENABLED="false")[1])
         self.assertIn("PIPELINE_NOT_FULLY_ENABLED", self.gate(OUTRUN_AB_TEXT_ROI_QUEUE="false")[1])
         self.assertIn("PIPELINE_NOT_FULLY_ENABLED", self.gate(OUTRUN_KR_V2_AUTO_GENERATE="false")[1])
-        self.assertIn("PIPELINE_NOT_FULLY_ENABLED", self.gate(OUTRUN_GPT_CHAT_OCR_ENABLED="false")[1])
+        self.assertEqual(self.gate(OUTRUN_GPT_CHAT_OCR_ENABLED="true")[1], "NON_OCR_DIRECT_VISUAL_MODE_REQUIRED")
+        self.assertEqual(self.gate(OUTRUN_PIXEL_OCR_REVIEW_ENABLED="true")[1], "NON_OCR_DIRECT_VISUAL_MODE_REQUIRED")
+        self.assertEqual(self.gate(OUTRUN_CROP_ENABLED="true")[1], "NON_OCR_DIRECT_VISUAL_MODE_REQUIRED")
+        self.assertEqual(self.gate(OUTRUN_ROI_SOURCE_MODE="legacy")[1], "NON_OCR_DIRECT_VISUAL_MODE_REQUIRED")
         self.assertIn("NO_SEND_INTERLOCK", self.gate(OUTRUN_KR_V2_NO_SEND="true")[1])
 
     def test_invalid_phase_and_bad_policy_rejected(self):
@@ -83,15 +88,19 @@ class PolicyTests(unittest.TestCase):
         self.assertFalse(p["auto_game_pass"])
         self.assertFalse(p["auto_deploy"])
         self.assertEqual(p["browser_slots"], ["A","B","C1"])
-        self.assertEqual(p["c_role"], "GPT_OCR_METADATA_ONLY_NO_CROP")
-        self.assertTrue(p["requirements"]["gpt_ocr_direct_full_hd_imagegen"])
+        self.assertEqual(p["c_role"], "DIRECT_VISUAL_ROI_NO_OCR")
+        self.assertTrue(p["requirements"]["direct_visual_roi_imagegen"])
+        self.assertTrue(p["requirements"]["manual_vision_sha_verified"])
+        self.assertFalse(p["requirements"]["c1_gpt_chat_vision_ocr_fallback"])
         self.assertFalse(p["requirements"]["crop_file_required"])
 
         s = (HERE / "docker-compose.yml").read_text(encoding="utf-8")
         self.assertIn('AUTO_SEND: "true"', s)
         self.assertIn('SCHEDULE_MINUTES: "0,10,15,20,30,40,45,50"', s)
         self.assertIn('OUTRUN_AB_TEXT_ROI_QUEUE: "true"', s)
-        self.assertIn('OUTRUN_GPT_CHAT_OCR_ENABLED: "true"', s)
+        self.assertIn('OUTRUN_GPT_CHAT_OCR_ENABLED: "false"', s)
+        self.assertIn('OUTRUN_PIXEL_OCR_REVIEW_ENABLED: "false"', s)
+        self.assertIn('OUTRUN_ROI_SOURCE_MODE: "direct_visual"', s)
         self.assertIn('OUTRUN_A_TILE_BATCH_QUEUE: "false"', s)
         self.assertIn('OUTRUN_AB_BATCH_QUEUE: "false"', s)
         self.assertIn('OUTRUN_KR_V2_AUTO_COMPOSE: "false"', s)

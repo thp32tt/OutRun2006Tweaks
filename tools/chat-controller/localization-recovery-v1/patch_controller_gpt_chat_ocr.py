@@ -48,7 +48,11 @@ def patch(source):
     new='''    elif CONTROLLER_MODE == "localization" and slot.name == "C1":
         # GPT vision OCR fallback uses the EXISTING ChatGPT browser session only.
         # No API is called and the Create-image tool is deliberately not selected.
-        gpt_active = gpt_ocr_active_task()
+        # Non-OCR production ignores historical OCR active leases; C1 QA must
+        # not be held by a stale legacy OCR task after GitOps redeploy.
+        gpt_active = (gpt_ocr_active_task() if
+            _outrun_smoke_os.environ.get("OUTRUN_GPT_CHAT_OCR_ENABLED", "false").lower() == "true"
+            else None)
         # B/C2 OCR is owned by the B tab; C1 must not hijack that chat.
         if gpt_active and gpt_active.get("ocr_lane") == "C2":
             slot.last_result = "C1_OCR_C2_LEASE_ACTIVE"

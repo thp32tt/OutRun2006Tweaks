@@ -364,7 +364,8 @@ async def _outrun_b_idle_gpt_ocr(page: Page, slot: Slot, reg: Registry):
                 slot.name, png_binding["task_id"], send_result)
             if rollback_status != "ROLLED_BACK_TO_STAGED":
                 send_result += ":ROLLBACK_FAILED:" + rollback_status
-        if slot.name == "B" and send_result == "SOURCE_REFERENCE_NOT_BOUND:ROI_ROLE_QUEUE_EMPTY_OR_FINISHED":
+        if (slot.name == "B" and send_result == "SOURCE_REFERENCE_NOT_BOUND:ROI_ROLE_QUEUE_EMPTY_OR_FINISHED"
+                and _outrun_smoke_os.environ.get("OUTRUN_GPT_CHAT_OCR_ENABLED", "false").lower() == "true"):
             b_ocr = await _outrun_b_idle_gpt_ocr(page, slot, reg)
             if b_ocr == "handled":
                 return
@@ -391,6 +392,7 @@ async def _outrun_b_idle_gpt_ocr(page: Page, slot: Slot, reg: Registry):
 """,
         """        mono = time.monotonic()
         if (AUTO_SEND and CONTROLLER_MODE == "localization" and
+                _outrun_smoke_os.environ.get("OUTRUN_GPT_CHAT_OCR_ENABLED", "false").lower() == "true" and
                 mono - last_gpt_ocr_poll >= GPT_OCR_RESPONSE_POLL_SECONDS):
             last_gpt_ocr_poll = mono
             ocr_active = gpt_ocr_active_task()

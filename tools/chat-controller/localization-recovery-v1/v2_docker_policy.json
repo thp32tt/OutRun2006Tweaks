@@ -4,7 +4,7 @@
   "deployment_mode": "ACTIVE_CONTROLLED_ROI_IMAGEGEN",
   "native_source_only": true,
   "legacy_986_tiles_forbidden": true,
-  "c_role": "GPT_OCR_METADATA_ONLY_NO_CROP",
+  "c_role": "DIRECT_VISUAL_ROI_NO_OCR",
   "browser_slots": [
     "A",
     "B",
@@ -14,7 +14,7 @@
   "v2_batch_sheet_dispatch_implemented": false,
   "runtime_activation_approved": true,
   "controller_auto_send": true,
-  "auto_scope": "GPT_OCR_METADATA_TO_FULL_HD_DIRECT_A_B_IMAGEGEN_THEN_LIGHT_QA",
+  "auto_scope": "SHA_PINNED_DIRECT_VISUAL_ROI_TO_FULL_HD_A_B_IMAGEGEN_THEN_LIGHT_QA",
   "auto_dds_write": false,
   "auto_game_pass": false,
   "auto_deploy": false,
@@ -40,11 +40,14 @@
     "runtime_and_game_approval_separate": true,
     "local_generated_png_sha_verified": true,
     "project_library_status": "SUPPLEMENTAL_NONBLOCKING",
-    "c1_gpt_chat_vision_ocr_fallback": true,
+    "c1_gpt_chat_vision_ocr_fallback": false,
     "external_ocr_api_used": false,
-    "gpt_ocr_direct_full_hd_imagegen": true,
-    "crop_file_required": false
+    "crop_file_required": false,
+    "direct_visual_roi_imagegen": true,
+    "manual_vision_sha_verified": true,
+    "ocr_auto_dispatch_enabled": false
   },
   "release_owner": "USER_MANUAL_PORTAINER_REDEPLOY_ONLY",
-  "no_live_or_other_projects_modified": true
+  "no_live_or_other_projects_modified": true,
+  "roi_source_mode": "direct_visual"
 }

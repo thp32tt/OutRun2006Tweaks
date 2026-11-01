@@ -72,7 +72,15 @@ def qid(source_png: str):
 def source_manifests(croot: Path, imagegen_root: Path | None = None):
     # Keep root-owned legacy OCR output read-only. Independent vision reviews
     # can stage SHA-bound manifests in the imagegen bind-mount writable queue.
-    roots = [croot / "hd108_outputs", croot / "gpt_vision_chat_ocr_outputs"]
+    # An explicit GitOps-only non-OCR mode excludes legacy machine/GPT OCR
+    # discoveries. Existing production manifest records stay append-only.
+    mode = os.environ.get("OUTRUN_ROI_SOURCE_MODE", "legacy").strip().lower()
+    if mode not in ("legacy", "direct_visual"):
+        raise ValueError("ROI_SOURCE_MODE_INVALID")
+    roots = ([croot / "hd108_outputs", croot / "gpt_vision_chat_ocr_outputs"]
+             if mode == "legacy" else [])
+    if mode == "direct_visual" and imagegen_root is None:
+        raise ValueError("DIRECT_VISUAL_REQUIRES_IMAGEGEN_ROOT")
     if imagegen_root is not None:
         roots.append(imagegen_root / "text_roi_batches" / "manual_vision_outputs")
         roots.append(imagegen_root / "text_roi_batches" / "cross_variant_verified")
@@ -392,6 +400,35 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
                         digest(source) != source_sha):
                     held += 1
                     continue
+                if (os.environ.get("OUTRUN_ROI_SOURCE_MODE", "legacy").strip().lower()
+                        == "direct_visual" and mp.is_relative_to(manual_root)):
+                    # A label and bbox alone are insufficient: a direct visual
+                    # review must retain exact original pixels as inspectable
+                    # evidence. Legacy production records remain untouched.
+                    evidence_path = j.get("manual_visual_evidence_crop_path")
+                    evidence_sha = j.get("manual_visual_evidence_crop_sha256")
+                    if (j.get("manual_source_region_pixel_verified") is not True or
+                            not isinstance(evidence_path, str) or not evidence_path or
+                            not isinstance(evidence_sha, str) or
+                            not HEX64.fullmatch(evidence_sha)):
+                        held += 1
+                        continue
+                    evidence = Path(evidence_path)
+                    if (not evidence.is_file() or evidence.is_symlink() or
+                            evidence.stat().st_size > 16_000_000 or
+                            digest(evidence) != evidence_sha):
+                        held += 1
+                        continue
+                    with Image.open(source) as full, Image.open(evidence) as crop:
+                        if (full.format != "PNG" or full.mode != "RGBA" or
+                                crop.format != "PNG" or crop.mode != "RGBA" or
+                                bbox[0] < 0 or bbox[1] < 0 or
+                                bbox[0] >= bbox[2] or bbox[1] >= bbox[3] or
+                                bbox[2] > full.width or bbox[3] > full.height or
+                                crop.size != (bbox[2] - bbox[0], bbox[3] - bbox[1]) or
+                                full.crop(tuple(bbox)).tobytes() != crop.tobytes()):
+                            held += 1
+                            continue
             else:
                 crop = mp.parent / "english_original_native_crop.png"
                 if not crop.is_file() or crop.is_symlink() or digest(crop) != crop_sha:
