@@ -35,3 +35,16 @@ With VR Telemetry=true, R9's 5-second summary reports gapSkipDraw and
 gapSkipClear counters. Default Telemetry=false keeps logs quiet.
 This source contract and Windows binary compile are CI checked, but real
 Quest HMD visual correctness and GPU frame-time gains require user testing.
+
+QUIET MONO-GAP PERFORMANCE PROBE:
+This experimental binary keeps EXACTLY the previous focused mono-gap repair.
+With VR.Telemetry=false, it writes one short aggregate line every 10 seconds
+while stereo is active: VR R26 MONO-GAP SAMPLE. Values are per interval:
+monoActual: real third-pass backups; gapSkipDraw: eliminated third passes;
+gapSkipClear: eliminated invalid-shadow partial clears; gapFrames:
+frames where mono history became invalid; gapFramesWithoutLaterSkip:
+gap frames where no subsequent R9 draw could be eliminated. The
+candidateSkipSharePct is NOT a GPU frame-time or FPS estimate.
+No full per-draw trace, no GPU readback, no new RT, no fidelity changes.
+After a same-course gameplay test, compare GPU frame time and send the small
+OutRun2006Tweaks.log. Do not change the VR Telemetry setting for this probe.

@@ -421,6 +421,82 @@ namespace OutRunVRStereo
 			return true;
 		}
 
+
+		// Quiet A/B measurement for the R26+HUD mono gap repair. Unlike the
+		// full VR telemetry this emits a single aggregate line per 10 seconds;
+		// there are no per-draw logs, GPU queries, or expensive state reads.
+		std::uint64_t R9GapProbeGapFrames = 0;
+		std::uint64_t R9GapProbeNoSkipFrames = 0;
+		std::uint64_t R9GapProbeStereoFrames = 0;
+		std::uint64_t R9GapProbePrevFrameSkipped = 0;
+		std::uint64_t R9GapProbeLastActual = 0;
+		std::uint64_t R9GapProbeLastSkipped = 0;
+		std::uint64_t R9GapProbeLastClearSkipped = 0;
+		std::uint64_t R9GapProbeLastGapFrames = 0;
+		std::uint64_t R9GapProbeLastNoSkipFrames = 0;
+		std::uint64_t R9GapProbeLastStereoFrames = 0;
+		ULONGLONG R9GapProbeLastMs = 0;
+
+		void R9MaybeLogQuietGapEfficiency(bool stereoRequested)
+		{
+			if (stereoRequested)
+			{
+				++R9GapProbeStereoFrames;
+				if (R9MonoBackupGap)
+				{
+					++R9GapProbeGapFrames;
+					if (R9MonoGapSkippedDraws == R9GapProbePrevFrameSkipped)
+						++R9GapProbeNoSkipFrames;
+				}
+			}
+			R9GapProbePrevFrameSkipped = R9MonoGapSkippedDraws;
+			if (!stereoRequested)
+				return;
+
+			const ULONGLONG now = GetTickCount64();
+			if (R9GapProbeLastMs == 0)
+			{
+				R9GapProbeLastMs = now;
+				R9GapProbeLastActual = R9MonoBackupDraws;
+				R9GapProbeLastSkipped = R9MonoGapSkippedDraws;
+				R9GapProbeLastClearSkipped = R9MonoGapSkippedClears;
+				R9GapProbeLastGapFrames = R9GapProbeGapFrames;
+				R9GapProbeLastNoSkipFrames = R9GapProbeNoSkipFrames;
+				R9GapProbeLastStereoFrames = R9GapProbeStereoFrames;
+				return;
+			}
+			if (now - R9GapProbeLastMs < 10000)
+				return;
+			const auto actual = R9MonoBackupDraws - R9GapProbeLastActual;
+			const auto skipped = R9MonoGapSkippedDraws - R9GapProbeLastSkipped;
+			const auto clearSkipped =
+				R9MonoGapSkippedClears - R9GapProbeLastClearSkipped;
+			const auto gapFrames = R9GapProbeGapFrames - R9GapProbeLastGapFrames;
+			const auto noSkipFrames =
+				R9GapProbeNoSkipFrames - R9GapProbeLastNoSkipFrames;
+			const auto stereoFrames =
+				R9GapProbeStereoFrames - R9GapProbeLastStereoFrames;
+			const double candidateSkipShare =
+				(actual + skipped) != 0
+					? 100.0 * static_cast<double>(skipped) /
+						static_cast<double>(actual + skipped) : 0.0;
+			spdlog::info(
+				"VR R26 MONO-GAP SAMPLE: intervalMs={} stereoFrames={} "
+				"monoActual={} gapSkipDraw={} gapSkipClear={} "
+				"gapFrames={} gapFramesWithoutLaterSkip={} "
+				"candidateSkipSharePct={:.2f} "
+				"(Draw share only; NOT GPU-time or FPS gain)",
+				now - R9GapProbeLastMs, stereoFrames, actual, skipped,
+				clearSkipped, gapFrames, noSkipFrames, candidateSkipShare);
+			R9GapProbeLastMs = now;
+			R9GapProbeLastActual = R9MonoBackupDraws;
+			R9GapProbeLastSkipped = R9MonoGapSkippedDraws;
+			R9GapProbeLastClearSkipped = R9MonoGapSkippedClears;
+			R9GapProbeLastGapFrames = R9GapProbeGapFrames;
+			R9GapProbeLastNoSkipFrames = R9GapProbeNoSkipFrames;
+			R9GapProbeLastStereoFrames = R9GapProbeStereoFrames;
+		}
+
 		void R9MaybeLogSummary()
 		{
 			if (!Settings::VRTelemetry)
@@ -867,6 +943,7 @@ namespace OutRunVRStereo
 				}
 			}
 
+			R9MaybeLogQuietGapEfficiency(stereoRequested);
 			R9MaybeLogSummary();
 			MaybeLogSummary();
 			LARGE_INTEGER presentStart{};

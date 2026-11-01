@@ -1,9 +1,9 @@
-name: R26 Focus Quiet + Safe Mono Gap Repair Test
+name: R26 Focus Mono-Gap Quiet A-B Measurement Test
 
 on:
   push:
     branches:
-      - 'test/r26-focus-perf-mono-gap-repair-20261101'
+      - 'test/r26-focus-perf-mono-gap-probe-20261101'
   workflow_dispatch:
 
 permissions:
@@ -98,7 +98,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $short = $env:GITHUB_SHA.Substring(0,12)
-          $dir = "OutRun2_VR_FOCUS_GAP_REPAIR_$short"
+          $dir = "OutRun2_VR_FOCUS_GAP_PROBE_$short"
           New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (!$dll) { throw 'No Win32 game DLL' }
@@ -137,7 +137,7 @@ jobs:
           Get-FileHash "$dir.zip" -Algorithm SHA256
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun-VR-FOCUS-GAP-REPAIR-${{ github.sha }}
-          path: OutRun2_VR_FOCUS_GAP_REPAIR_*.zip
+          name: OutRun-VR-FOCUS-GAP-PROBE-${{ github.sha }}
+          path: OutRun2_VR_FOCUS_GAP_PROBE_*.zip
           retention-days: 21
           if-no-files-found: error

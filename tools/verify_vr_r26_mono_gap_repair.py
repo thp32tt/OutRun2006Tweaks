@@ -29,3 +29,13 @@ assert "R9MonoElisionArmed" not in s
 print("PASS R26 gap-only third mono Draw and partial Clear removal")
 print("PASS full Clear reseed, original stereo and guarded mono restore retained")
 print("Quest HMD rendering and FPS UNTESTED")
+
+# Quiet A/B probe reports once per 10 seconds, even with VR.Telemetry=false.
+assert "void R9MaybeLogQuietGapEfficiency(bool stereoRequested)" in s
+assert "R9MaybeLogQuietGapEfficiency(stereoRequested);" in p
+assert "gapFramesWithoutLaterSkip=" in s
+assert "candidateSkipSharePct={:.2f}" in s
+assert "now - R9GapProbeLastMs < 10000" in s
+assert "if (!stereoRequested)" in s
+assert "++R9GapProbeNoSkipFrames;" in s
+print("PASS quiet 10s gap efficiency probe is independent of heavy per-draw telemetry")
