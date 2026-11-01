@@ -55,6 +55,7 @@ start "" "%~dp0OR2006C2C.exe" ^
  -VR.RivalDx11NativeRoute=false ^
  -VR.AutoRenderResolution=true ^
  -VR.FollowGameResolution=false ^
+ -VR.MirrorFitDesktop=true ^
  -VR.MirrorPreserveAspect=true ^
  -VR.UnifiedEyeMenuSource=false ^
  -VR.AntiAliasing=2 ^

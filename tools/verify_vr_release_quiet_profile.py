@@ -72,6 +72,7 @@ for token in (
     '-VR.DirectGpuOnly=true',
     '-VR.AutoRenderResolution=true',
     '-VR.FollowGameResolution=false',
+    '-VR.MirrorFitDesktop=true',
     '-VR.Hud1080pReference=true',
     '-VR.HudResponsiveLayout=true',
     '-VR.HudScale=0.55',
