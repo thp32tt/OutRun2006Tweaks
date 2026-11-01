@@ -65,7 +65,22 @@ def variant_path(row, name):
         return False
     return True
 
-def read_sources(manifest, source_root, hash_cache=None):
+def unchanged_translation_qids(transcript):
+    qids=set()
+    if not transcript.is_file():
+        return qids
+    for line in transcript.read_text(encoding="utf-8").splitlines():
+        if not line.strip():continue
+        row=json.loads(line)
+        segments=row.get("segments",[])
+        if row.get("status")!="transcribed_reviewed" or not segments:
+            continue
+        if all(isinstance(e.get("source"),str) and isinstance(e.get("korean"),str)
+               and e["source"].strip()==e["korean"].strip() for e in segments):
+            qids.add("Q"+str(row.get("index","")).zfill(3))
+    return qids
+
+def read_sources(manifest, source_root, hash_cache=None, preserve_qids=None):
     cache = hash_cache if hash_cache is not None else {}
     by_hash = collections.defaultdict(list)
     for row in manifest["items"]:
@@ -102,7 +117,9 @@ def read_sources(manifest, source_root, hash_cache=None):
                 base_rows=[r for r in by_hash.get(actual_sha, []) if variant_path(r,base_name)]
                 alias = bool(base_rows)
         seen[src.name] = actual_sha
-        results.append({"source": src, "sha": actual_sha, "rows": matching, "alias": alias})
+        preserved=(not matching and not alias and src.name[:4] in (preserve_qids or set()))
+        results.append({"source": src, "sha": actual_sha, "rows": matching,
+                        "alias": alias, "preserved": preserved})
     return results
 
 def canonical_dds(source_name, wanted_sha, root):
@@ -223,6 +240,8 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
     rows=entry["rows"]
     if entry.get("alias"):
         return {"source":source_path.name,"status":"ALIAS_EXACT_BASE_SOURCE","ready_count":0}
+    if entry.get("preserved"):
+        return {"source":source_path.name,"status":"PRESERVED_REVIEWED_ORIGINAL_LABELS","ready_count":0}
     if not rows:
         return {"source":source_path.name,"status":"NO_APPROVED_ROI","ready_count":0}
     dds_paths=sorted(set(r["source_dds_path"] for r in rows))
@@ -312,6 +331,7 @@ def main():
     p.add_argument("--mips",type=int,default=1)
     p.add_argument("--max-opaque-fraction",type=float,default=1.0)
     p.add_argument("--manifest",default=str(IMAGE_ROOT/"text_roi_batches/production_manifest.json"))
+    p.add_argument("--transcript",default=str(DDS_ROOT/"transcriptions.jsonl"))
     p.add_argument("--source-root",default=str(SOURCE_ROOT))
     p.add_argument("--dds-root",default=str(DDS_ROOT))
     p.add_argument("--output-root",default=str(DEFAULT_OUTPUT))
@@ -328,7 +348,8 @@ def main():
     except (ValueError,OSError):
         cache={}
     if not isinstance(cache,dict):cache={}
-    entries=read_sources(manifest,Path(args.source_root),cache)
+    preserved=unchanged_translation_qids(Path(args.transcript))
+    entries=read_sources(manifest,Path(args.source_root),cache,preserved)
     if args.only_source:
         if not SAFE_SOURCE.fullmatch(args.only_source):p.error("unsafe --only-source")
         entries=[e for e in entries if e["source"].name==args.only_source]
@@ -340,6 +361,7 @@ def main():
             key=e["source"].stem+"_"+e["sha"][:12]
             source_rows+=len(e["rows"])
             status=("ALIAS_EXACT_BASE_SOURCE" if e.get("alias") else
+                    "PRESERVED_REVIEWED_ORIGINAL_LABELS" if e.get("preserved") else
                     "NO_APPROVED_ROI" if not e["rows"] else
                     "ALREADY_GENERATED" if (output_root/"sources"/key/"report.json").is_file() else
                     "HELD" if (output_root/"holds"/(key+".json")).is_file() else "PENDING")
@@ -382,7 +404,8 @@ def main():
              "runtime_validation":"UNTESTED"}
     if args.execute:
         atomic_json(output_root/"last_run.json",summary)
-        finished={"ALREADY_VERIFIED","TEST_ONLY_SAVED","NO_APPROVED_ROI","ALIAS_EXACT_BASE_SOURCE"}
+        finished={"ALREADY_VERIFIED","TEST_ONLY_SAVED","NO_APPROVED_ROI",
+                  "ALIAS_EXACT_BASE_SOURCE","PRESERVED_REVIEWED_ORIGINAL_LABELS"}
         complete=(len(results)==len(entries) and all(x["status"] in finished for x in results))
         published=list(output_root.glob("OUTRUN_OFFLINE_KOREAN_TEST_ONLY_*.zip"))
         if complete and not published:
