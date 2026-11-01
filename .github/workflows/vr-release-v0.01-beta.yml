@@ -178,7 +178,7 @@ jobs:
           if-no-files-found: error
 
       - name: Publish GitHub prerelease
-        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, 'release(vr): v0.01-beta publish')) }}
+        if: "${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, 'release(vr): v0.01-beta publish')) }}"
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
