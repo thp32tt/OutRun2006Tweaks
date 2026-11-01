@@ -4,7 +4,7 @@
 The user authorized a low-fidelity fallback for remaining OutRun 2006 graphics and explicitly reserved **manual Portainer deployment**. The fallback does not invoke OCR, ImageGen, any paid API, or overwrite existing source, installed DDS, game, browser session, A/B/C1 queue or VR code. All outputs remain `TEST_ONLY_NOT_RUNTIME_APPROVED`. Source/translation information is the SHA-pinned production manifest, not a blind OCR guess.
 
 ## Snapshot before user's next redeploy
-N100 source inventory (2026-11-02 KST): 108 verified source PNGs, 954 active production rows (1,002 manifest entries including 48 retired A→B rebalance rows). Strict per-console DDS-path matching yields **104 eligible source PNGs**, **2 exact-byte variant aliases** (reuse BASE texture), **2 sources with no approved ROI** (Q143, Q152). At the end of this work **3 bulk outputs** exist (Q012, Q047, Q053), leaving **101 eligible source PNGs to process**. This is source-level tracking, **not 954/954 Korean phrases completed or game-ready**.
+N100 source inventory (2026-11-02 KST): 108 verified source PNGs, 954 active production rows (1,002 manifest entries including 48 retired A→B rebalance rows). Strict per-console DDS-path matching yields **104 eligible source PNGs**, **2 exact-byte variant aliases** (reuse BASE texture), **2 intentionally untranslated/preserved sources** (Q143 music titles and Q152 year/mix badges: `transcribed_reviewed` Korean exactly matches English). At the end of this work **3 bulk outputs** exist (Q012, Q047, Q053), leaving **101 eligible source PNGs to process**; 2 byte-identical aliases and 2 explicitly preserved sources require no replacement. This is source-level tracking, **not 954/954 Korean phrases completed or game-ready**.
 
 Successful actual N100 executions:
 - Q012: 1 label, original canonical DDS not available in pinned N100 folder; derived an uncompressed DDS from exact source PNG. DDS top-level re-decode PASS, outside-ROI changes 0.
@@ -51,9 +51,9 @@ python tools/chat-controller/localization-recovery-v1/offline_korean_packager.py
 ## Boundaries still OPEN
 - Outputs preserve confirmed source ROI **outside** pixels exactly, but **inside** the ROI may lose protected artwork or original effects. Simpler typefaces and approximate outlines are explicitly intentional.
 - DXT5 inputs are *not* recompressed to DXT5. The new DDS is RGB32/RGBA32, single mip by default; higher VRAM consumption and in-game compatibility/performance are unverified.
-- Q143/Q152 do not have approved geometric ROIs and cannot be silently "completed." Several other sources have overlapping/uncertain boxes; each held region is reported rather than invented.
+- Q143/Q152 are `transcribed_reviewed` with source=Korean for intentionally protected song-title and mix-badge art; preserved unchanged. They are not unlocalized text. Several other sources have overlapping/uncertain boxes; each held region is reported rather than invented.
 - Console-specific source variants without a matching DDS path are never blindly written over an unrelated texture.
 - C1/C3, installed HD-mod compatibility, final DDS validation, actual game/Quest VR and screenshot signoff remain `UNTESTED`. No automatic game deployment.
 
 ## Tests
-Executed 5/5 `tests/test_offline_korean_batch.py` on N100: native DDS orientation, up to three mip levels, ROI outside-pixel protection, overlap HOLD, and target-path safety. N100 live source Q012/Q047/Q053 operations succeeded. GitHub CI workflow now includes the same tests and entrypoint `bash -n`; a GitHub build/redeploy or CI success must not be assumed until verified.
+Executed 6/6 `tests/test_offline_korean_batch.py` on N100: native DDS orientation, up to three mip levels, ROI outside-pixel protection, overlap HOLD, and target-path safety. N100 live source Q012/Q047/Q053 operations succeeded. GitHub CI workflow now includes the same tests and entrypoint `bash -n`; a GitHub build/redeploy or CI success must not be assumed until verified.
