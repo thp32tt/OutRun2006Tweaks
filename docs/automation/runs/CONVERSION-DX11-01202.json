@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01202",
+  "production_id": "CONVERSION-DX11-01202",
+  "event_id": "CONVERSION-DX11-01202-E003",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_branch": "feature/dx11-01202-real-fvf-clip-ci-repair",
+  "feature_work_key": "DX11:REAL_FVF_TRIANGLE_ASSEMBLY_CLIPPED_GPU_RGB_CAPTURE",
+  "classification": "A_LIVE_GAME_NATIVE_FVF_GPU_RGB_SOURCE_IMPLEMENTATION_B_CAUSAL_GATE_AND_CXX_REPAIR",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "source_base_sha": "298e48d8fb1b5997294be1286c2e9b522b0e4fac",
+  "implementation_source_sha": "4d6bea4078304886fc4964dd2656fbebb40604a1",
+  "causal_policy_repair_sha": "b2702d541896947a4d5b367258b2d15aba95bd64",
+  "causal_cpp_regression_trace_sha": "1468bd93132139ad361ba2a54cf0578a7b85d473",
+  "material_result_sha": "c750e91658f5d675aca9e80d683a9bffb75d8b8a",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "implementation": "Source-authentic D3D9 FVF native D3D11 triangle list/strip/fan clip-volume raster bounds steer genuine GPU PRE/POST RGB sampling. Reject offscreen/near-clipped/degenerate polygons, preserve malformed IA and W fail-closed viewport capture. GPU runner showed float ULP crossing right clip plane widened conservative 2px bounds to a 3rd pixel; fixed NDC [-1,+1] accumulation. Historic 01201 exact-SHA indexed source record policy compatibility repaired without rewriting old evidence. Original D3D9 Draw/Present, GPU event fences, DX9Ex input/FFB and DXVK freeze preserved. Full game output and HMD remain UNTESTED.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    "tools/dx11_autodev_policy.py",
+    "tools/test_dx11_autodev_policy.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_FVF_CLIPPED_GPU_PRE_POST_RGB",
+      "ORIGINAL_D3D9_SOURCE_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "REAL_D3D9_FVF_IA_DRAW",
+      "NATIVE_D3D11_DRAW_AND_INDEXED",
+      "SOURCE_TRIANGLE_CLIPPED_GPU_PRE_POST_TILES",
+      "ORIGINAL_D3D9_PRESENT"
+    ],
+    "batch_components": [
+      "REAL_TRIANGLE_ASSEMBLY_CLIP",
+      "GPU_SOURCE_RGB_RASTER_SELECTION",
+      "NUMERIC_CLIP_BOUNDARY_FIX",
+      "CAUSAL_LEGACY_POLICY_CI_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real menu/vehicle/HUD off-center solid source FVF triangles with indexed IA and strip/fan assembly select GPU RGB tiles. N100 GCC 13.3 C++17 native_raw_dual_tile_test PASS.",
+      "negative_regression": "Malformed active index/W, offscreen/depth-clipped/degenerate triangles fail-closed to whole-viewport sampling; source NDC clipping never exceeds 2px conservative margin on runner.",
+      "component_integration": "Actual D3D9 FVF native Draw/DrawIndexed forwards IA triangle assembly and active clip-space vertices through D3D11 native Draw into RAW GPU PRE/POST and original game Present path."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_CI_PENDING_ONLY; partial live-game GPU RGB capture, original D3D9 Present is diagnostic endpoint, no full DX11 frame/no Quest3 runtime proof",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in default OFF; preserve DX9Ex fallback, D3D9 Present/input/FFB, RT identity, source GPU fence and DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Clip actual assembled indexed and nonindexed D3D9 FVF game triangles to native D3D11 clip planes to focus source-authentic GPU RGB PRE/POST diagnostics while preserving original game rendering and fail-closed fallback.",
+    "acceptance_items": [
+      {
+        "id": "clip_native_source_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_D3D9_FVF_TO_D3D11_GPU",
+        "expected_behavior": "Native raster bounds follow actual assembled visible FVF triangles and source real GPU PRE/POST readback; clip crossing stays bounded with conservative 2px margin."
+      },
+      {
+        "id": "unknown_geometry_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_RENDER_PRESENT_INPUT",
+        "expected_behavior": "Unsupported geometry, malformed indices, invalid W, depth-fully-clipped triangles preserve original raster sampling and D3D9 game path without unsafe access."
+      },
+      {
+        "id": "source_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_CI_OPENXR_WIN32",
+        "expected_behavior": "All five mandatory push Actions on one exact validation-bearing source SHA complete SUCCESS before FEATURE_READY; HMD UNTESTED separately."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "clip_native_source_draw": {
+      "status": "PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "N100 g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -I. tests/native_raw_dual_tile_test.cpp; CI pending"
+    },
+    "unknown_geometry_fallback": {
+      "status": "PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "N100 native_raw_dual_tile_test PASS and GitHub DX11 Fast focused source regression at c750e916 pending completion"
+    },
+    "source_sha_five_gates": {
+      "status": "PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "GitHub exact SHA c750e91658f5d675aca9e80d683a9bffb75d8b8a: Fast 41323288943 Backend 41323288956 Build 41323289011 OpenXR 41323289133 HUD 41323289029; results pending"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41323288943,
+    "Backend Conversion Gate": 41323288956,
+    "Build": 41323289011,
+    "OpenXR VR architecture": 41323289133,
+    "OutRun EXE HUD Inspector CI": 41323289029
+  },
+  "actual_runtime_evidence": "NOT_RUN_NO_GAME_DESKTOP_NO_QUEST3_VDXR",
+  "native_gpu_pixels_observed": "UNTESTED",
+  "full_menu_vehicle_race": "INCOMPLETE",
+  "next_feature_action": "Await exact-SHA mandatory Actions. Repair same-task CI failures if observed. Once 5/5 SUCCESS, mark acceptance PASS_FEATURE_CI, write C6, then adjust scoreboard once for independently verified original 01202 source; avoid duplicate retry/rollover scoring.",
+  "separate_documentation_commit": true,
+  "recorded_at": "2026-11-02 00:52 KST"
+}
