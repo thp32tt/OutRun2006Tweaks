@@ -96,7 +96,9 @@ def require_vr_legacy_owner(source: str) -> None:
         "const bool physicalized =",
         "legacyResult && pOut &&",
         "MapVrFrontEndMatrixToPhysical(",
-        "pOut, vrFrontEndProducer, vrContainedMode);",
+        "pOut, vrFrontEndProducer &&",
+        "VrFrontEndNeedsPhysicalTargetMap(),",
+        "vrContainedMode);",
         "if (physicalized && Game::screen_scale &&",
         "OutRunVrMenuQuad::ContainedMatrices.Remember(",
         "return legacyResult;",
@@ -114,8 +116,8 @@ for old, broken in (
     ("!vrFrontEndNeedsModernAffine)", "true)"),
     ("vrFrontEndPartial || vrFrontEndPivot;", "false;"),
     ("legacyTranslation.y += logicalViewport.y;", "legacyTranslation.y += 0.0f;"),
-    ("pOut, vrFrontEndProducer, vrContainedMode);",
-     "pOut, false, vrContainedMode);"),
+    ("VrFrontEndNeedsPhysicalTargetMap(),",
+     "false,"),
     ("return legacyResult;", "return 0;"),
 ):
     assert old in text
@@ -150,6 +152,10 @@ def require_frontend_owner(source: str) -> None:
     assert "VrFrontEndPhysicalCanvasState()" in owner
     helper = source.split("bool VrFrontEndPhysicalCanvasState() noexcept", 1)[1].split(
         "bool ResolveVrFrontEndVirtualCanvasScale(", 1)[0]
+    assert "bool VrFrontEndNeedsPhysicalTargetMap() noexcept" in helper
+    physical_owner = helper.split(
+        "bool VrFrontEndNeedsPhysicalTargetMap() noexcept", 1)[1]
+    assert "*Game::current_mode != GameState::STATE_SUMO_FE" in physical_owner
     for state in ("TITLE", "MENU", "SELECTOR", "SELEXIT", "SELRESET"):
         assert "GameState::STATE_" + state in helper, "frontend missing: " + state
     for excluded in ("GOAL", "GAME"):
