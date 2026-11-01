@@ -172,11 +172,11 @@ static_assert([]() constexpr {
 // receives these exact clip-space coordinates, so source sampling may focus
 // on the real triangle without altering source Draw, RGB or Present proof.
 bool native_raw_fvf_clip_capture_regression() {
-    constexpr std::array<std::array<float, 4>, 3> verts{{{
-        {0.78f, 0.25f, 0.5f, 1.0f},
-        {0.95f, 0.25f, 0.5f, 1.0f},
-        {0.90f, 0.52f, 0.5f, 1.0f}
-    }}};
+    constexpr std::array<std::array<float, 4>, 3> verts{{
+        {{0.78f, 0.25f, 0.5f, 1.0f}},
+        {{0.95f, 0.25f, 0.5f, 1.0f}},
+        {{0.90f, 0.52f, 0.5f, 1.0f}}
+    }};
     NativeRawDrawExtent rect{};
     const NativeRawFvfClipSpan span{verts.data(), sizeof(verts[0]), verts.size()};
     if (!native_raw_fvf_projected_raster(span, 0, 0, 3440, 1440, rect) ||
