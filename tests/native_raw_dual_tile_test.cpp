@@ -526,6 +526,7 @@ bool native_raw_fvf_large_island_phase_regression() {
     const NativeRawFvfClipSpan hit{
         cornerHit.data(),sizeof(cornerHit[0]),cornerHit.size()};
     NativeRawDrawExtent aabb{}, clippedPolygon{};
+    NativeRawDualTile tile{}; // malformed/off-scissor source must not queue RGB
     if (!native_raw_fvf_projected_raster(
             miss,0,0,1000,1000,aabb) ||
         aabb.left >= cornerScissor.right ||
