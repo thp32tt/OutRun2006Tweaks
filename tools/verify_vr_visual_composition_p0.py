@@ -3387,7 +3387,7 @@ def check_exact_scene_effect_raw_wvp(source):
         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)',
         'GetLatchedHeadInverse(',
-        'outerFlareObject ? false : recordedCameraSynced',
+        'R85UseRecordedCameraSync(',
         'for (int eye = 0; eye < 2; ++eye)',
         'ProjectionFromFov(',
         'stereo.eyeFov[eye]',
@@ -3397,10 +3397,12 @@ def check_exact_scene_effect_raw_wvp(source):
     for token in (
         'exactProjectedLensPmtRaw',
         'recordedCameraSynced',
-        'outerFlareObject ? false : recordedCameraSynced',
+        'R85UseRecordedCameraSync(',
         'lensEyeInverse = IdentityMatrix()',
         'R85LensStereoTranslationScale = 0.025f',
         'outerFlareObject={}',
+        'innerHeadInverse={}',
+        'projectedObjectId, outerFlareObject,',
         'projectedObj=0x{:06X}',
     ):
         require(token, projected,
