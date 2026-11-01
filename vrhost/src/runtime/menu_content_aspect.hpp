@@ -145,7 +145,7 @@ namespace OutRunVrMenuAspect
         // This helper is called by the explicit theater/menu branch with a
         // concrete game-state value. The gameplay recovery call uses the
         // sentinel and must retain its existing full/fragment path.
-        if (state == 0xFFFFFFFFu ||
+        if (!IsTopLeftLogicalTheaterState(state) ||
             !std::isfinite(clientLeft) || !std::isfinite(clientTop) ||
             !std::isfinite(clientRight) || !std::isfinite(clientBottom) ||
             !std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
