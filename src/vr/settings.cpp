@@ -175,8 +175,8 @@ namespace Settings
 	Setting<int> VRMatrixOrder{ "VR", "MatrixOrder", 0,
 		"Renderer-side camera-matrix composition order. Leave at 0 unless runtime validation shows the alternate path is required.",
 		{ "WorldView * HeadInverse * Projection", "World * HeadInverse * View * Projection" } };
-	Setting<bool> VRTelemetry{ "VR", "Telemetry", true,
-		"Logs renderer-boundary verification, stereo draw duplication, pose source/fallback and head-tracking diagnostics." };
+	Setting<bool> VRTelemetry{ "VR", "Telemetry", false,
+		"Logs renderer-boundary verification, stereo draw duplication, pose source/fallback and head-tracking diagnostics. Off by default in VR beta releases; diagnostic launchers opt in." };
 }
 
 namespace OutRunVR
