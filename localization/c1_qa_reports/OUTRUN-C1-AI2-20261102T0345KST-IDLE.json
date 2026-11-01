@@ -7,7 +7,7 @@
   "branch": "korean-localization-recovery-20260928",
   "base_branch_head": "9357d396f81076a3ab2b4f3cf0328fbb839500d2",
   "role": "C1",
-  "reviewer": "ChatGPT AI2",
+  "reviewer": "ChatGPT AI 1 (C1)",
   "policy_sources": [
     {
       "path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
@@ -50,5 +50,5 @@
     "ingame_pass_claimed": false,
     "runtime_validation": "UNTESTED"
   },
-  "notes": "No SHA-unique unreviewed exported A/B candidate as of 03:46:52 KST. C1 did not inspect already-reviewed SHA nor fabricate a PASS. No production or deployment changes."
+  "notes": "No SHA-unique unreviewed exported A/B candidate as of 03:46:52 KST. C1 did not inspect already-reviewed SHA nor fabricate a PASS. No production or deployment changes. AI 1 is ChatGPT per the current user score identity rule. This idle readback is not a new scored QA achievement."
 }
