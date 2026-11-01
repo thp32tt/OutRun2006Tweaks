@@ -1,4 +1,5 @@
 #include "vr/d3d9/projected_sun_ray.hpp"
+#include "vr/d3d9/projected_lens_r85_source_policy.hpp"
 #include <cmath>
 #include <cstdio>
 #include <limits>
@@ -63,6 +64,28 @@ int main() {
             projection(0.12f,0.07f),result,true) ||
        !ray(result,0.12f,0.07f,0.25f,-0.125f)) {
         std::puts("FAIL: synchronized camera receives a second head rotation"); return 6;
+    }
+    // Observed Quest C993 second disc: exact 0x570006 is not the sun.
+    // Recorded camera synchronization must NOT bypass the head inverse,
+    // while the central sun 0x570002 still must retain its original ray.
+    {
+        Matrix inner{}, sun{};
+        const bool innerSynced = OutRunVR::LensCentre::R85UseRecordedCameraSync(
+            0x570006u, false, true);
+        const bool sunSynced = OutRunVR::LensCentre::R85UseRecordedCameraSync(
+            0x570002u, false, true);
+        if (innerSynced || !sunSynced ||
+            !OutRunVR::LensCentre::BuildProjectedSunRay(
+                stock, inverse, head, eye, projection(0.12f,0.07f),
+                inner, innerSynced) ||
+            !OutRunVR::LensCentre::BuildProjectedSunRay(
+                stock, inverse, head, eye, projection(0.12f,0.07f),
+                sun, sunSynced) ||
+            !ray(inner,0.12f,0.07f,0.125f,0.25f) ||
+            !ray(sun,0.12f,0.07f,0.25f,-0.125f)) {
+            std::puts("FAIL: exact C993 inner flare/sun source ownership mixed");
+            return 10;
+        }
     }
     // HMD visual tuning: 0.5 scale halves local flare geometry around
     // its authored origin without moving the centre ray.
