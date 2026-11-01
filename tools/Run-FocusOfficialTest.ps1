@@ -124,9 +124,15 @@ try {
         }
     }
     $hostFullTrace = Join-Path $root 'outrun-vr-host-full-trace.log'
+    # PowerShell does not accept an if statement directly inside $(...).
+    # Determine the optional size before constructing the report, so a
+    # successful game session cannot turn into a post-exit exit-code 5.
+    $hostFullTraceBytes = if (Test-Path -LiteralPath $hostFullTrace) {
+        (Get-Item -LiteralPath $hostFullTrace).Length
+    } else { 0 }
     @(
       "hostFullTracePresent=$([int](Test-Path -LiteralPath $hostFullTrace))",
-      "hostFullTraceBytes=$((if (Test-Path -LiteralPath $hostFullTrace) { (Get-Item -LiteralPath $hostFullTrace).Length } else { 0 }))",
+      "hostFullTraceBytes=$hostFullTraceBytes",
       'expectedHostMarkers=HOST PROJECTION BLIT FULL; XR FRAME FULL; XR EYE FULL actual FRESH/CACHED submitted view with source frame/pose/QPC/head/reference-space',
       'expectedGameMarkers=LENS SOURCE/C64/R30/GPU/MATRIX/DRAW_CALL + PIPELINE/FIXEDFN/TARGET/TEXTURE/SHADER_CONSTANTS/STEREO_POSE; PLUS_TIME/GOAL_PERCENT SOURCE/QUEUE/HUD_NODE/D3DX/R62/GPU/MATRIX/EYES; GOAL_TEXT; FRAME_PUBLISH_FULL',
       'performancePolicy=VISUAL_FIX_FIRST_UNTHROTTLED_TRACE'
