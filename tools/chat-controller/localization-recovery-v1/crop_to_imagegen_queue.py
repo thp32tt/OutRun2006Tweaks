@@ -413,7 +413,18 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
                             not HEX64.fullmatch(evidence_sha)):
                         held += 1
                         continue
-                    evidence = Path(evidence_path)
+                    # Shared bind-mount portable proof: the same relative file
+                    # resolves on N100 (/home/.../image-src) and in Docker
+                    # (/data/imagegen) without any extra host-path bind.
+                    relative = j.get("manual_visual_evidence_relative_path")
+                    if relative is not None:
+                        if (not isinstance(relative, str) or
+                                relative != evidence_sha + ".png"):
+                            held += 1
+                            continue
+                        evidence = imagegen_root / "text_roi_batches" / "manual_visual_evidence" / relative
+                    else:
+                        evidence = Path(evidence_path)
                     if (not evidence.is_file() or evidence.is_symlink() or
                             evidence.stat().st_size > 16_000_000 or
                             digest(evidence) != evidence_sha):
