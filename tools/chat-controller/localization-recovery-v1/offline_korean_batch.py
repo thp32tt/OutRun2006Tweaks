@@ -6,7 +6,7 @@ metadata. It emits isolated DDS candidates; original DDS may be absent or DXT.
 In that case emits a valid UNCOMPRESSED DDS, explicitly not a source-format clone.
 """
 from __future__ import annotations
-import argparse, collections, datetime as dt, hashlib, importlib.util, json, os, re, struct, tempfile, time
+import argparse, collections, datetime as dt, hashlib, importlib.util, json, os, re, struct, subprocess, sys, tempfile, time
 from pathlib import Path, PurePosixPath
 import numpy as np
 from PIL import Image
@@ -78,6 +78,7 @@ def read_sources(manifest, source_root, hash_cache=None):
         by_hash[row["source_png_sha256"]].append(row)
     # File names are pinned against their actual bytes, not from a guessed Q index.
     results = []
+    seen = {}
     for src in sorted(source_root.glob("*.png")):
         if src.is_symlink() or not SAFE_SOURCE.fullmatch(src.name):
             continue
@@ -91,7 +92,17 @@ def read_sources(manifest, source_root, hash_cache=None):
             cache[src.name] = {"stat":sig,"sha":actual_sha}
         matching = by_hash.get(actual_sha, [])
         matching = [r for r in matching if variant_path(r, src.name)]
-        results.append({"source": src, "sha": actual_sha, "rows": matching})
+        alias = False
+        if not matching and source_variation(src.name):
+            # Console files whose RGBA bytes are *identical* to the BASE file
+            # share a single DDS target, so do not render a duplicate.
+            base_name = re.sub(r"_(?:KEYBOARD|PLAYSTATION|SWITCH|XBOX)_READABLE",
+                               "_BASE_READABLE", src.name)
+            if seen.get(base_name) == actual_sha:
+                base_rows=[r for r in by_hash.get(actual_sha, []) if variant_path(r,base_name)]
+                alias = bool(base_rows)
+        seen[src.name] = actual_sha
+        results.append({"source": src, "sha": actual_sha, "rows": matching, "alias": alias})
     return results
 
 def canonical_dds(source_name, wanted_sha, root):
@@ -210,6 +221,8 @@ def encode_rgba_dds(readable, orientation, mip_count):
 def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mips):
     source_path=entry["source"]
     rows=entry["rows"]
+    if entry.get("alias"):
+        return {"source":source_path.name,"status":"ALIAS_EXACT_BASE_SOURCE","ready_count":0}
     if not rows:
         return {"source":source_path.name,"status":"NO_APPROVED_ROI","ready_count":0}
     dds_paths=sorted(set(r["source_dds_path"] for r in rows))
@@ -326,7 +339,8 @@ def main():
         for e in entries:
             key=e["source"].stem+"_"+e["sha"][:12]
             source_rows+=len(e["rows"])
-            status=("NO_APPROVED_ROI" if not e["rows"] else
+            status=("ALIAS_EXACT_BASE_SOURCE" if e.get("alias") else
+                    "NO_APPROVED_ROI" if not e["rows"] else
                     "ALREADY_GENERATED" if (output_root/"sources"/key/"report.json").is_file() else
                     "HELD" if (output_root/"holds"/(key+".json")).is_file() else "PENDING")
             stats[status]+=1
@@ -366,6 +380,22 @@ def main():
              "results":results,
              "next_step":"Repeat --execute --max-sources 1; already saved files are hash-checked and skipped",
              "runtime_validation":"UNTESTED"}
-    if args.execute: atomic_json(output_root/"last_run.json",summary)
+    if args.execute:
+        atomic_json(output_root/"last_run.json",summary)
+        finished={"ALREADY_VERIFIED","TEST_ONLY_SAVED","NO_APPROVED_ROI","ALIAS_EXACT_BASE_SOURCE"}
+        complete=(len(results)==len(entries) and all(x["status"] in finished for x in results))
+        published=list(output_root.glob("OUTRUN_OFFLINE_KOREAN_TEST_ONLY_*.zip"))
+        if complete and not published:
+            try:
+                result=subprocess.run([sys.executable,str(HERE/"offline_korean_packager.py"),
+                    "--when-complete","--output-root",str(output_root),
+                    "--source-root",str(args.source_root)],
+                    check=False,capture_output=True,text=True,timeout=1800)
+                summary["packaging"]={"returncode":result.returncode,
+                    "stdout":result.stdout[-2000:],"stderr":result.stderr[-500:]}
+                atomic_json(output_root/"last_run.json",summary)
+            except (OSError,subprocess.TimeoutExpired) as exc:
+                summary["packaging"]={"status":"HOLD_ERROR","error":str(exc)[:300]}
+                atomic_json(output_root/"last_run.json",summary)
     print(json.dumps(summary,ensure_ascii=False))
 if __name__=="__main__":main()
