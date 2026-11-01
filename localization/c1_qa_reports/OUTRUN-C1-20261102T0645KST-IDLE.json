@@ -1,0 +1,43 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261102T0645KST-IDLE",
+  "scheduled_slot_kst": "2026-11-02T06:45:00+09:00",
+  "inventory_checked_at_kst": "2026-11-02T06:46:30+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_branch_head_before": "f8f5c8ef7f586e29377a21843879da084ea747d0",
+  "role": "C1",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "method": "read-only work/C1_QA_20261101_2145_AI2_inventory.py executed on N100",
+    "candidate_png_files": 955,
+    "export_evidence_entries": 955,
+    "prior_reviewed_distinct_sha256": 960,
+    "new_unreviewed_sha256": 0,
+    "candidates_without_export": 0,
+    "checked_at_kst": "2026-11-02T06:46:30+09:00"
+  },
+  "status": "IDLE_NO_NEW_UNREVIEWED_AB_CANDIDATES",
+  "result": {
+    "reviewed_new": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "qa_scope": "Candidate layer only. No visual QA on any new SHA because none was available.",
+  "guards": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds_generated": false,
+    "c2_c3_or_ingame_pass": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "score_change": 0,
+  "note": "Only the 06:45 read-only SHA-deduplicated inventory was run. Historical duplicate hashes are excluded; no approval is implied by this IDLE record."
+}
