@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01205",
+  "production_id": "CONVERSION-DX11-01205",
+  "event_id": "CONVERSION-DX11-01205-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:VISIBLE_CLIPPED_FVF_GPU_CAPTURE_PHASE",
+  "classification": "A_SOURCE_VISIBLE_FVF_GPU_CAPTURE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "cd3d94fb454f7d2d3bcc4e85780164fffd09103c",
+  "implementation_source_sha": "1f8e1c3e013d84f572e2b687695b6db468815ff8",
+  "material_result_sha": "1f8e1c3e013d84f572e2b687695b6db468815ff8",
+  "validation_bearing_result_sha": "1f8e1c3e013d84f572e2b687695b6db468815ff8",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "desktop_game_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Native D3D11 opt-in real game FVF GPU PRE/POST RGB crop scheduling phases by viewport/scissor-visible triangle count, rather than offscreen-inclusive original IA count; sparse menu/car/race source rasters no longer strand real GPU capture at one corner. Original whole-IA validation, GPU RGB pixels, device/fence, D3D9 Present/input/FFB and DX9Ex fallback preserved.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "D3D9_GAME_FVF_DRAW",
+      "WHOLE_SOURCE_IA_VALIDATION",
+      "NATIVE_D3D11_DRAW",
+      "VISIBLE_CLIPPED_GPU_CROP_SELECTION",
+      "D3D11_PRE_POST_GPU_RGB",
+      "ORIGINAL_D3D9_PRESENT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_GAME_FVF_IA",
+      "VIEWPORT_SCISSOR_VISIBLE_TRIANGLE_COUNT",
+      "ADVANCING_GPU_SOURCE_CROPS",
+      "ORIGINAL_GAME_PRESENT_IDENTITY"
+    ],
+    "batch_components": [
+      "ACTUAL_FVF_CLIP_TRIANGLE_SCHEDULING",
+      "SPARSE_MESH_GPU_RASTER_ADVANCE",
+      "SOURCE_SCISSOR_FALLBACK_REGRESSION",
+      "EXACT_SHA_CXX_VALIDATION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "native_raw_dual_tile_test 32 original IA triangles of which two are visible; GPU crop advances after two captures; DX11 Fast 41337303379 SUCCESS.",
+      "negative_regression": "No-visible IA fails closed; source scissor limits right island; malformed original IA and GPU tile overlap regressions remain passing.",
+      "component_integration": "NativeRawVisualPreview::queue_before_draw -> clipped source FVF scan -> bounded GPU PRE/POST copy -> EVENT fence/actual RGB change -> protected original D3D9 source Present; 5/5 exact SHA Gate SUCCESS."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_ONLY_BUILD_VERIFIED, not complete native game frame or tested HMD stereo.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in default OFF; original D3D9 render/input/FFB, DX9Ex fallback and frozen DXVK unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Advance real native menu/car/race FVF GPU source RGB sampling across viewport-visible original primitives without inventing pixels.",
+    "acceptance_items": [
+      {
+        "id": "visible_source_gpu_sampling",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_NATIVE_D3D11_RGB",
+        "expected_behavior": "Original clipped visible FVF triangles drive successive native GPU crop advances."
+      },
+      {
+        "id": "original_source_safety",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_FALLBACK",
+        "expected_behavior": "Offscreen or excluded-scissor triangles cannot create visible RGB evidence; original D3D9 path preserved."
+      },
+      {
+        "id": "mandatory_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_SOURCE_BUILD_OPENXR",
+        "expected_behavior": "Five mandatory GitHub push workflow runs for material exact SHA pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "visible_source_gpu_sampling": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural 41337303379 SUCCESS"
+    },
+    "original_source_safety": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural 41337303379 SUCCESS"
+    },
+    "mandatory_exact_sha_gate": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/backend-conversion-gate.yml"
+      ],
+      "validation_command": "GitHub push Actions 41337303379,41337303634,41337303376,41337303349,41337303321 SUCCESS"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41337303379,
+    "Backend Conversion Gate": 41337303634,
+    "Build": 41337303376,
+    "OpenXR VR architecture": 41337303349,
+    "OutRun EXE HUD Inspector CI": 41337303321
+  },
+  "exact_sha_gate_conclusions": [
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS"
+  ],
+  "runtime_note": "Original Windows game and Quest 3/VDXR HMD tests not run. RUNTIME_VALIDATION=UNTESTED; no native full-frame/playability claim.",
+  "score_note": "One new source integration +1 only if scored in GitHub SSOT; C6/docs/retest +0.",
+  "recorded_at": "2026-11-02 03:46 KST"
+}
