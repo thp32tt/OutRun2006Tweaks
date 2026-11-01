@@ -1,0 +1,36 @@
+{
+  "schema": "outrun.c1.idle_evidence.v1",
+  "task_id": "OUTRUN-C1-AI2-20261101T2115KST-IDLE",
+  "checked_at_kst": "2026-11-01T21:16:29+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "n100_path": "work/image-src/text_roi_batches",
+    "producer_roles": [
+      "A",
+      "B"
+    ],
+    "candidate_filter": "PNG present under candidate_outputs with matching export evidence and SHA not in previous C1 reports",
+    "previously_reviewed_sha_count": 956,
+    "new_sha_pending": 0,
+    "selected": 0
+  },
+  "judgement": "IDLE_NO_UNREVIEWED_CANDIDATES",
+  "records": [],
+  "constraints": {
+    "imagegen_called": false,
+    "producer_queue_mutated": false,
+    "dds_created": false,
+    "c2_c3_pass_claimed": false,
+    "ingame_pass_claimed": false
+  },
+  "point_delta": 0,
+  "notes": "No unseen candidate matched SHA-deduplicated N100 inventory; no invented QA. Previous C1 PASS/FAIL and producer statuses unchanged."
+}
