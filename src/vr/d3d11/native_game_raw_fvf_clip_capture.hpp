@@ -82,6 +82,7 @@ struct NativeRawFvfClipSpan {
             scissorBottom >= scissorTop) return false;
     }
     struct Point { double x, y, z; };
+    struct HomogeneousPoint { double x, y, z, w; };
     const auto* bytes = static_cast<const std::uint8_t*>(source.firstClip);
     const auto plane_distance = [&](Point p, int plane) noexcept {
         switch (plane) {
@@ -104,6 +105,8 @@ struct NativeRawFvfClipSpan {
     bool anyVisible = false;
     for (std::size_t triangle = 0u; triangle < triangles; ++triangle) {
         std::array<Point, 20u> polygon{}, clipped{};
+        std::array<HomogeneousPoint,20u> homogeneous{}, clippedH{};
+        bool crossesEyePlane = false;
         for (std::size_t corner = 0u; corner < 3u; ++corner) {
             const auto element =
                 source.assembly == NativeRawFvfAssembly::TriangleList
@@ -118,16 +121,80 @@ struct NativeRawFvfClipSpan {
             std::memcpy(clip, bytes + vertex * source.vertexStride, sizeof(clip));
             if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
                 !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
-                clip[3] <= 0.00001f) return false;
-            const double invW = 1.0 / static_cast<double>(clip[3]);
-            polygon[corner] = {static_cast<double>(clip[0]) * invW,
-                               static_cast<double>(clip[1]) * invW,
-                               static_cast<double>(clip[2]) * invW};
-            if (!std::isfinite(polygon[corner].x) ||
-                !std::isfinite(polygon[corner].y) ||
-                !std::isfinite(polygon[corner].z)) return false;
+                clip[3] == 0.0f ||
+                (clip[3] > 0.0f && clip[3] <= 0.00001f)) return false;
+            homogeneous[corner] = {static_cast<double>(clip[0]),
+                                   static_cast<double>(clip[1]),
+                                   static_cast<double>(clip[2]),
+                                   static_cast<double>(clip[3])};
+            crossesEyePlane = crossesEyePlane || clip[3] < 0.0f;
+            if (clip[3] > 0.0f) {
+                const double invW = 1.0 / static_cast<double>(clip[3]);
+                polygon[corner] = {static_cast<double>(clip[0]) * invW,
+                                   static_cast<double>(clip[1]) * invW,
+                                   static_cast<double>(clip[2]) * invW};
+                if (!std::isfinite(polygon[corner].x) ||
+                    !std::isfinite(polygon[corner].y) ||
+                    !std::isfinite(polygon[corner].z)) return false;
+            }
         }
         std::size_t polygonCount = 3u;
+        // Real menu, vehicle and race triangles can straddle the eye plane:
+        // clip their finite source homogeneous vertices BEFORE dividing W.
+        // Keep the original positive-W NDC path unchanged for ordinary game
+        // Draws. W=0, nonfinite source data and malformed IA still fail closed.
+        if (crossesEyePlane) {
+            const auto distance = [](const HomogeneousPoint& q,
+                                     unsigned plane) noexcept {
+                switch (plane) {
+                case 0u: return q.x + q.w;
+                case 1u: return q.w - q.x;
+                case 2u: return q.y + q.w;
+                case 3u: return q.w - q.y;
+                case 4u: return q.z;
+                case 5u: return q.w - q.z;
+                default: return q.w - 0.00001;
+                }
+            };
+            for (unsigned plane = 0u; plane < 7u && polygonCount; ++plane) {
+                std::size_t nextCount = 0u;
+                auto previous = homogeneous[polygonCount - 1u];
+                auto prevDistance = distance(previous, plane);
+                for (std::size_t i = 0u; i < polygonCount; ++i) {
+                    const auto current = homogeneous[i];
+                    const auto currentDistance = distance(current, plane);
+                    const bool wasInside = prevDistance >= 0.0;
+                    const bool isInside = currentDistance >= 0.0;
+                    if (wasInside != isInside) {
+                        const double divisor = prevDistance - currentDistance;
+                        if (!std::isfinite(divisor) || divisor == 0.0 ||
+                            nextCount >= clippedH.size()) return false;
+                        const double t = prevDistance / divisor;
+                        clippedH[nextCount++] = {
+                            previous.x + t * (current.x - previous.x),
+                            previous.y + t * (current.y - previous.y),
+                            previous.z + t * (current.z - previous.z),
+                            previous.w + t * (current.w - previous.w)};
+                    }
+                    if (isInside) {
+                        if (nextCount >= clippedH.size()) return false;
+                        clippedH[nextCount++] = current;
+                    }
+                    previous = current;
+                    prevDistance = currentDistance;
+                }
+                polygonCount = nextCount;
+                homogeneous = clippedH;
+            }
+            for (std::size_t i = 0u; i < polygonCount; ++i) {
+                const auto& q = homogeneous[i];
+                if (!std::isfinite(q.w) || !(q.w > 0.0)) return false;
+                polygon[i] = {q.x / q.w, q.y / q.w, q.z / q.w};
+                if (!std::isfinite(polygon[i].x) ||
+                    !std::isfinite(polygon[i].y) ||
+                    !std::isfinite(polygon[i].z)) return false;
+            }
+        }
         // Homogeneous triangle edges remain straight after perspective
         // division for positive W. NDC half-plane clipping preserves their
         // precise screen footprint without interpolating shader attributes.

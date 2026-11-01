@@ -199,6 +199,42 @@ bool native_raw_fvf_clip_capture_regression() {
             {invalidW.data(), sizeof(invalidW[0]), invalidW.size()},
             0, 0, 3440, 1440, rect))
         return reject(__LINE__);
+    // Mixed-sign homogeneous W is a valid D3D11 clipped game Draw.
+    // Validate both original source rectangle and the integrated native
+    // PRE/POST dual-GPU capture origin, without relaxing invalid W=0.
+    constexpr std::array<std::array<float,4>,3> crossingEye{{
+        {{-0.7f,-0.1f,0.5f,1.f}}, {{0.7f,-0.1f,0.5f,1.f}},
+        {{0.0f,0.2f,-0.5f,-0.5f}}
+    }};
+    const NativeRawFvfClipSpan crossingEyeIa{
+        crossingEye.data(),sizeof(crossingEye[0]),crossingEye.size()};
+    NativeRawDrawExtent nearRaster{};
+    if (!native_raw_fvf_projected_raster(
+            crossingEyeIa,0,0,3440,1440,nearRaster) ||
+        nearRaster.left < -2 || nearRaster.top < -2 ||
+        nearRaster.right > 3442 || nearRaster.bottom > 1442 ||
+        nearRaster.right <= nearRaster.left ||
+        nearRaster.bottom <= nearRaster.top)
+        return reject(__LINE__);
+    NativeRawDualTile nearGpu{};
+    if (!native_raw_fvf_island_dual_draw_tile(
+            crossingEyeIa,0,0,3440,1440,3440,1440,512,288,
+            {0,0,3440,1440},0u,nearGpu) ||
+        nearGpu.first.x > 3440u - 512u ||
+        nearGpu.first.y > 1440u - 288u)
+        return reject(__LINE__);
+    auto fullyBehind = crossingEye;
+    for (auto& v : fullyBehind) v[3] = -1.f;
+    if (native_raw_fvf_projected_raster(
+            {fullyBehind.data(),sizeof(fullyBehind[0]),fullyBehind.size()},
+            0,0,3440,1440,nearRaster))
+        return reject(__LINE__);
+    auto badEye = crossingEye;
+    badEye[1][3] = (std::numeric_limits<float>::quiet_NaN)();
+    if (native_raw_fvf_projected_raster(
+            {badEye.data(),sizeof(badEye[0]),badEye.size()},
+            0,0,3440,1440,nearRaster))
+        return reject(__LINE__);
     auto invalidNaN = verts;
     invalidNaN[2][0] = (std::numeric_limits<float>::quiet_NaN)();
     if (native_raw_fvf_projected_raster(
