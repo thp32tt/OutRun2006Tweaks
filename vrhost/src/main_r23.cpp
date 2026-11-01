@@ -3618,14 +3618,16 @@ int main(int argc, char** argv)
         shared.SetAllocatedEyeExtent(allocatedEyeExtent);
         ViewHistory viewHistory;
         HostTimings timings;
-        std::ofstream pipelineLog("outrun-vr-host-pipeline.log",
-            std::ios::out | std::ios::trunc);
+        std::ofstream pipelineLog;
+        if (OutRunVrFileLoggingEnabled())
+            pipelineLog.open("outrun-vr-host-pipeline.log",
+                std::ios::out | std::ios::trunc);
         LARGE_INTEGER qpcFrequency{};
         QueryPerformanceFrequency(&qpcFrequency);
         // Opt-in only: no frame-selection, render ownership, or GPU ACK changes.
         OutRunVR::Pacing::Buffer pacingBuffer;
         std::ofstream pacingLog;
-        if (OutRunVR::Pacing::Enabled())
+        if (OutRunVR::Pacing::Enabled() && OutRunVrFileLoggingEnabled())
         {
             pacingLog.open("outrun-vr-frame-pacing.csv",
                 std::ios::out | std::ios::trunc);
