@@ -1,0 +1,44 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa_idle.v1",
+  "task_id": "OUTRUN-C1-AI2-20261102T0115KST-IDLE",
+  "role": "C1",
+  "time_window_kst": "2026-11-02 01:15",
+  "inventory_checked_at_kst": "2026-11-02T01:17:57+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "inventory_base_head": "0e44b44b8769cd6d7938ad549215a09ff0e02527",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inspection": {
+    "type": "read_only",
+    "candidate_root": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs",
+    "receipt_root": "/home/chatgpt-runner2/work/image-src/text_roi_batches/export_evidence",
+    "reviewed_sha_source": "/home/chatgpt-runner2/work/C1_QA_*_report.json / metrics.json and prior c1 batch reports",
+    "existing_inventory_script": "work/C1_QA_20261101_2145_AI2_inventory.py",
+    "reviewed_sha_count": 960,
+    "candidate_file_count": 955,
+    "candidates_by_role": {
+      "A": 454,
+      "B": 501
+    },
+    "matched_export_receipt_count": 955,
+    "candidates_missing_export": 0,
+    "unseen_candidate_sha_count": 0
+  },
+  "results": {
+    "state": "IDLE",
+    "new_sha": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "scope": "No production, no queue consume, no C2/C3/ingame pass, no DDS deployment. Existing verified hashes not re-reviewed. Candidate inventory snapshot only.",
+  "score": {
+    "scoreboard_ai": "AI 2",
+    "score_change": 0,
+    "reason": "IDLE and no independent newly verified QA outcome; no duplicate award"
+  }
+}
