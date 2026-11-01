@@ -1960,7 +1960,7 @@ namespace
         {
             static std::uint64_t logicalCanvasTraceHits = 0;
             const std::uint64_t hit = ++logicalCanvasTraceHits;
-            if (hit <= 32 || (hit & (hit - 1)) == 0)
+            if (OutRunVrFileLoggingEnabled() && (hit <= 32 || (hit & (hit - 1)) == 0))
             {
                 std::ostringstream trace;
                 trace
@@ -2486,7 +2486,7 @@ namespace
 
                 static std::uint64_t mirrorRectHits = 0;
                 const auto hit = ++mirrorRectHits;
-                if (hit <= 32 || (hit & (hit - 1)) == 0)
+                if (OutRunVrFileLoggingEnabled() && (hit <= 32 || (hit & (hit - 1)) == 0))
                 {
                     std::ostringstream trace;
                     trace
@@ -2601,7 +2601,7 @@ namespace
                 publishedMirrorAspect = liveAspect;
                 static std::uint64_t liveWindowHits = 0;
                 const auto hit = ++liveWindowHits;
-                if (hit <= 32 || (hit & (hit - 1)) == 0)
+                if (OutRunVrFileLoggingEnabled() && (hit <= 32 || (hit & (hit - 1)) == 0))
                 {
                     std::ostringstream trace;
                     trace << "[VR TRACE MENU LIVE HWND RECT FULL]"
@@ -2656,7 +2656,7 @@ namespace
 
                 static std::uint64_t menu43Hits = 0;
                 const auto hit = ++menu43Hits;
-                if (hit <= 32 || (hit & (hit - 1)) == 0)
+                if (OutRunVrFileLoggingEnabled() && (hit <= 32 || (hit & (hit - 1)) == 0))
                 {
                     std::ostringstream trace;
                     trace
@@ -2690,7 +2690,7 @@ namespace
         {
             static std::uint64_t sumoCompositeHits = 0;
             const auto hit = ++sumoCompositeHits;
-            if (hit <= 32 || (hit & (hit - 1)) == 0)
+            if (OutRunVrFileLoggingEnabled() && (hit <= 32 || (hit & (hit - 1)) == 0))
             {
                 std::ostringstream trace;
                 trace
@@ -2743,7 +2743,7 @@ namespace
 
             static std::uint64_t menuQuadLogicalHits = 0;
             const auto hit = ++menuQuadLogicalHits;
-            if (hit <= 32 || (hit & (hit - 1)) == 0)
+            if (OutRunVrFileLoggingEnabled() && (hit <= 32 || (hit & (hit - 1)) == 0))
             {
                 std::ostringstream trace;
                 trace
@@ -4691,6 +4691,7 @@ int main(int argc, char** argv)
             R23Pixels.NoteFinalSubmission(
                 submissionSerialBefore, submissionSerialAfter);
             CheckXr(endResult, "xrEndFrame");
+            if (OutRunVrFileLoggingEnabled())
             {
                 static std::uint64_t fullTraceXrTick = 0;
                 ++fullTraceXrTick;
@@ -4847,9 +4848,12 @@ int main(int argc, char** argv)
             cadence.NoteFrame(frameFreshProjection,
                 frameCachedProjection, layerReady,
                 candidateCadenceRequestId);
-            pipelineWindow.Note(candidateRejectReason,
-                actualFinalLayerKind, candidateCaptureMs,
-                candidateCommitCopyMs, frameRenderMs, endFrameMs);
+            if (OutRunVrFileLoggingEnabled())
+            {
+                pipelineWindow.Note(candidateRejectReason,
+                    actualFinalLayerKind, candidateCaptureMs,
+                    candidateCommitCopyMs, frameRenderMs, endFrameMs);
+            }
             // Only the frame confirmed by the xrEndFrame interception is joined.
             // A stale newest candidate is never described as XR-submitted.
             if (pacingLog.is_open())
@@ -4900,8 +4904,9 @@ int main(int argc, char** argv)
             }
 
             const ULONGLONG pipelineNowMs = GetTickCount64();
-            if (lastPipelineTelemetryMs == 0 ||
-                pipelineNowMs - lastPipelineTelemetryMs >= 5000)
+            if (OutRunVrFileLoggingEnabled() &&
+                (lastPipelineTelemetryMs == 0 ||
+                 pipelineNowMs - lastPipelineTelemetryMs >= 5000))
             {
                 lastPipelineTelemetryMs = pipelineNowMs;
                 OutRunVrR23VerifiedBundle::Snapshot bundle{};
@@ -4963,7 +4968,8 @@ int main(int argc, char** argv)
                     pipelineLog << line;
                 }
             }
-            timings.MaybeLog();
+            if (OutRunVrFileLoggingEnabled())
+                timings.MaybeLog();
         }
 
         if (pacingLog.is_open())
