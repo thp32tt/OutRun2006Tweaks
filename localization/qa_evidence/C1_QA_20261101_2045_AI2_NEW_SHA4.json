@@ -1,0 +1,298 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261101T2045KST-NEW-SHA4",
+  "reviewed_at_kst": "2026-11-01T20:46:59+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "N100 신규 SHA 후보 원본·증빙 해시 일치 대조, 투명 RGBA/alpha>=32 경계, 원본 영어 ROI와 승인 한글 매핑 및 native-fit/50% 육안 판독의 독립 C1 글자 레이어 검사. 전신 UI 합성/DDS 게임 검증은 제외.",
+  "prior_reviewed_sha_count": 952,
+  "total_pending_before_selection": 4,
+  "results": {
+    "new_sha": 4,
+    "pass": 4,
+    "fail": 0,
+    "hold": 0,
+    "A": 1,
+    "B": 3,
+    "remaining_at_inventory": 0
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0157-08FE4E79",
+      "id": "Q044_8f2fb4bb6e3a34b0",
+      "english": "Sector2",
+      "korean": "섹터 2",
+      "candidate_file": "Q044_8f2fb4bb6e3a34b0_k.png",
+      "candidate_sha256": "abb634090f013a845ee8db77c09068455bc420ae9f36c4903cda5ff5654e623e",
+      "export_sha256": "abb634090f013a845ee8db77c09068455bc420ae9f36c4903cda5ff5654e623e",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_source_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_imagegen_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        6,
+        97,
+        198,
+        166
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        24,
+        41,
+        2072,
+        698
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        192,
+        64
+      ],
+      "half_fit": [
+        96,
+        32
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Sector2→섹터 2. 노란 글자·짙은 파랑 효과·전방 기울기 유지, native/50% 글자와 숫자 판독, 주요 알파 경계 접촉 없음."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0160-C0A95C01",
+      "id": "Q044_4384f7339ae91043",
+      "english": "Stage",
+      "korean": "스테이지",
+      "candidate_file": "Q044_4384f7339ae91043_k.png",
+      "candidate_sha256": "37d2bf9edae2abfe9c5b4de7b58ac673828ea535d03342bf8b8584e9808c1406",
+      "export_sha256": "37d2bf9edae2abfe9c5b4de7b58ac673828ea535d03342bf8b8584e9808c1406",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_source_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_imagegen_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        565,
+        177,
+        780,
+        250
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2152,
+        731
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        139,
+        66,
+        2076,
+        731
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        215,
+        73
+      ],
+      "half_fit": [
+        107,
+        36
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Stage→스테이지. 노란 본문·백색/남색 외곽 효과 유지, native/50% 네 음절 판독, 주요 알파 경계 접촉 없음."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0161-96EEB693",
+      "id": "Q044_7a31403046d4e992",
+      "english": "WIN",
+      "korean": "승리",
+      "candidate_file": "Q044_7a31403046d4e992_k.png",
+      "candidate_sha256": "69250d187081ac6aac6abdfc1005adb8d88be41000f000ebb0c1a9bcffafbf8c",
+      "export_sha256": "69250d187081ac6aac6abdfc1005adb8d88be41000f000ebb0c1a9bcffafbf8c",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_source_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_imagegen_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        420,
+        108,
+        507,
+        166
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        1536,
+        1024
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        31,
+        1478,
+        986
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        87,
+        58
+      ],
+      "half_fit": [
+        43,
+        29
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "WIN→승리. 원본의 흰색 본문·남색 그림자/외곽 계열 유지, native/50% 두 음절 판독, 주요 알파 경계 접촉 없음."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0162-8D85757D",
+      "id": "Q044_b2708f0084b065f8",
+      "english": "Result",
+      "korean": "결과",
+      "candidate_file": "Q044_b2708f0084b065f8_k.png",
+      "candidate_sha256": "19ef2a808206e67de620193113fca579f5bebea3ad8c05bb30d694911974e054",
+      "export_sha256": "19ef2a808206e67de620193113fca579f5bebea3ad8c05bb30d694911974e054",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_source_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_imagegen_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        28,
+        177,
+        249,
+        250
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        0,
+        1975,
+        691
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        219,
+        73
+      ],
+      "half_fit": [
+        109,
+        36
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Result→결과. 노란 글자·백색/남색 외곽과 이탤릭 계열 유지, native/50% 판독, alpha>=32 경계 접촉 없음."
+    }
+  ],
+  "limit_scope": "C1 lettering layer only; ImageGen/C2/C3/DDS/game excluded; A/B queue and status not mutated.",
+  "producer_export_note": "REWORK_DIMENSIONS and OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED remain unchanged; only C1 independent layer PASS. No automatic DDS/game approvals."
+}
