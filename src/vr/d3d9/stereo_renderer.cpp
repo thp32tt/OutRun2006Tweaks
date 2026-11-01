@@ -112,7 +112,6 @@ namespace OutRunVRStereo
 		std::uint64_t R9FullClearSeeds = 0;
 		// Test-only no-third-pass mode: verified DirectGPU headset gameplay.
 		// Original 2D and offscreen draws are not altered.
-		bool R9LastCompletedDirectVrFrame = false;
 		bool R9FrameMonoPolicyLatched = false;
 		bool R9FrameStereoOnly = false;
 		std::uint64_t R9StereoOnlySavedDraws = 0;
@@ -933,8 +932,6 @@ namespace OutRunVRStereo
 
 			const bool stereoRequested = StereoWanted() && R9StereoSeeded;
 			const bool directOnly = R9DirectOnlyTransport();
-			if (!HostDirectTransportReady() || !StereoWanted())
-				R9LastCompletedDirectVrFrame = false;
 			const std::uint32_t pendingFrameId = stereoRequested ? NextStereoFrameId() : 0;
 			bool composedStereo = false;
 			bool directTransport = false;
@@ -1053,8 +1050,9 @@ namespace OutRunVRStereo
 
 			if (composedStereo && SUCCEEDED(hr) && !FrameStereoIncomplete)
 			{
-				if (directTransport && HostDirectTransportReady())
-					R9LastCompletedDirectVrFrame = true;
+				// A producer publication is NOT proof of host acceptance.
+				// The host owns the last-good snapshot after its GPU fence
+				// and exact shared frame reread both succeed.
 				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence, pendingFrameId);
 				PublishRenderFrame(OutRunVR::StereoSbsActive, pendingFrameId, pendingPoseSequence,
 					presentStart.QuadPart, OutRunVR::StereoFailureNone, &FrameStereoMetadata, false, directTransport);
@@ -1075,8 +1073,11 @@ namespace OutRunVRStereo
 				if (FrameFailureReason != OutRunVR::StereoFailureNone)
 					R9LogFirstFailure("Present/fallback", hr);
 				const std::uint32_t fallback = stereoRequested ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled;
-				const bool holdLastGood = R9LastCompletedDirectVrFrame &&
-					R9NoMonoForActiveVr() && directOnly;
+				// Never publish an incomplete mono/fallback packet to headset
+				// transport. The host independently decides whether a verified
+				// older stereo pair exists and can still be displayed.
+				const bool holdLastGood =
+					stereoRequested && directOnly && R9NoMonoForActiveVr();
 				if (holdLastGood)
 					++R9HeldLastGoodVrFrames;
 				else
@@ -1110,7 +1111,6 @@ namespace OutRunVRStereo
 		HRESULT __stdcall ResetDestR9(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 		{
 			R9ReleaseMonoResources();
-			R9LastCompletedDirectVrFrame = false;
 			R9FrameMonoPolicyLatched = false;
 			R9FrameStereoOnly = false;
 			R9ReleaseDepthIdentity();

@@ -91,3 +91,12 @@ R26+HUD STEREO-ONLY TRANSACTIONAL SAFETY REPAIR (2026-11-01)
   when dimensions/format stay stable, avoiding repeated allocations.
 - Source/Windows CI tests do NOT prove Quest HMD visual comfort.
   First test cautiously, keep prior R26 safety build for rollback.
+
+FINAL SAFETY CONTRACT ADDENDUM:
+The game cannot prove that the host has accepted a DirectGPU frame merely
+because producer Present and publication succeeded. No game-side boolean
+is treated as authoritative 'last-good'; the game suppresses bad mono packet
+publication only while a stereo-only DirectGPU Present is active. The host
+commits its own fence-verified and metadata-verified stereo candidate and
+holds the only authoritative last-good pair. A lastGoodHeld counter in the
+game log means suppressed fallback publication, NOT confirmed host display.

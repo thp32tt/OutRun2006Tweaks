@@ -383,7 +383,6 @@ namespace OutRunVRStereo
             R13DirectCopyPathRejected = false;
             R13DirectCopyRejectHr = D3D_OK;
             R9ReleaseMonoResources();
-            R9LastCompletedDirectVrFrame = false;
             R9FrameMonoPolicyLatched = false;
             R9FrameStereoOnly = false;
             R9ReleaseDepthIdentity();

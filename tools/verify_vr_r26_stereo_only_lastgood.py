@@ -55,14 +55,13 @@ assert safety.index("if (R9NoMonoForActiveVr())") < safety.index("R9BindMonoTarg
 # completed verified direct frame, keep its previous transport state.
 assert "const bool frameEligible = stereoRequested && FrameHadWorldStereo" in present
 assert "!FrameRightDrawFailed && !FrameStereoIncomplete" in present
-assert "if (directTransport && HostDirectTransportReady())" in present
-assert "R9LastCompletedDirectVrFrame = true;" in present
-assert "const bool holdLastGood = R9LastCompletedDirectVrFrame" in present
+assert "A producer publication is NOT proof of host acceptance." in present
+assert "const bool holdLastGood =" in present
+assert "stereoRequested && directOnly && R9NoMonoForActiveVr();" in present
+assert "R9LastCompletedDirectVrFrame" not in r9
 assert "if (!holdLastGood && (!directOnly || !stereoRequested || directTransport))" in present
 assert "if (holdLastGood)" in present
 assert "PublishStereoState(fallback, false" in present
-assert "R9LastCompletedDirectVrFrame = false;" in r9
-assert "R9LastCompletedDirectVrFrame = false;" in r13
 host=(root/"vrhost/src/main.cpp").read_text(encoding="utf-8")
 assert "matchedStereoDirect || GetTickCount64()-lastStereoMatchMs<=StereoGraceMs" in host
 assert "context_->CopyResource(directPendingLeft_, directLeft_[slot]);" in host
