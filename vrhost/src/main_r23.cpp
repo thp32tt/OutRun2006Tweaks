@@ -2629,6 +2629,36 @@ namespace
                 OutRunVrEmitFullTrace(trace.str());
             }
         }
+        // The published-Frame.v2 path above crops exact TITLE/MENU 4:3.
+        // Its fully visible desktop fallback must use the same authored
+        // content aspect, even when the QPC match missed this Present.
+        // Do not turn the SUMO_FE (0x20) car selector into a 4:3 crop.
+        if (OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
+                clientGameState, sourceIsSbs, publishedMirrorApplied,
+                capturedTheaterFullyVisible))
+        {
+            const float fallbackSourceAspect = fallbackLogicalCanvasApplied
+                ? logicalCanvasCrop.aspect
+                : OutRunVrMenuAspect::PlanCapturedAspect(
+                    c.sourceWidth_, c.sourceHeight_,
+                    theaterUv.w, theaterUv.h, 16.f / 9.f);
+            constexpr float titleAspect = 4.f / 3.f;
+            const auto fallbackAuthor43 =
+                OutRunVrMenuAspect::PlanCenteredContent(
+                    fallbackSourceAspect, titleAspect);
+            if (fallbackAuthor43.crop)
+            {
+                const float baseWidth = theaterUv.w;
+                const float baseHeight = theaterUv.h;
+                theaterUv.x += baseWidth * fallbackAuthor43.offsetX;
+                theaterUv.y += baseHeight * fallbackAuthor43.offsetY;
+                theaterUv.w = baseWidth * fallbackAuthor43.width;
+                theaterUv.h = baseHeight * fallbackAuthor43.height;
+            }
+            authoredFourThreeApplied =
+                fallbackAuthor43.crop ||
+                std::fabs(fallbackSourceAspect - titleAspect) <= 0.001f;
+        }
         if (sourceIsSbs)
             theaterUv.w *= 0.5f;
         if (theaterUv.w <= 0.0f || theaterUv.h <= 0.0f)
@@ -2653,14 +2683,16 @@ namespace
             capturedTheaterClient.right - capturedTheaterClient.left);
         const float theaterHeight = static_cast<float>(
             capturedTheaterClient.bottom - capturedTheaterClient.top);
-        const float aspect = publishedMirrorApplied
+        const float aspect = authoredFourThreeApplied
+            ? 4.f / 3.f
+            : (publishedMirrorApplied
             ? publishedMirrorAspect
             : (logicalCanvasCropApplied
                 ? logicalCanvasCrop.aspect
                 : (theaterWidth > 0.0f && theaterHeight > 0.0f
                 ? theaterWidth / theaterHeight *
                     (sourceIsSbs ? 0.5f : 1.0f)
-                : 16.f / 9.f));
+                : 16.f / 9.f)));
 
         // This is the LIVE menu submission path. The old world-locked menu
         // projection helper is no longer called by the front-end loop, so
