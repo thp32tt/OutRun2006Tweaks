@@ -29,8 +29,11 @@
 
 ZIP 내용을 `OR2006C2C.EXE`가 있는 게임 폴더에 덮어씁니다.
 
-- **일반 2D 실행:** `OR2006C2C.EXE`를 직접 실행합니다. 릴리즈 패키지에서는 VR 훅과 OpenXR host가 활성화되지 않습니다.
-- **VR 실행:** `Start-OutRun-VR.cmd`를 실행합니다. 이 런처만 명시적으로 VR을 활성화하고 OpenXR host를 시작합니다.
+- **선택 실행:** `Start-OutRun.cmd`에서 **1 = 2D + FFB**, **2 = VR + FFB**를 선택할 수 있습니다.
+- **일반 2D 실행:** `OR2006C2C.EXE`를 직접 실행해도 됩니다. 동일한 `dinput8.dll`의 Tweaks/휠 FFB는 유지되고 VR 훅/OpenXR host만 비활성화됩니다.
+- **VR 바로 실행:** `Start-OutRun-VR.cmd`를 실행합니다. 내부적으로 선택 런처의 VR 모드를 호출합니다.
+- 릴리즈에는 별도 VR DLL을 두지 않습니다. **하나의 `dinput8.dll`에 FFB와 VR 코드가 함께 포함**되고 실행 모드만 분리합니다.
+- 테스트 ZIP에서 사용하던 PS1은 릴리즈에 필요하지 않습니다. 정상 테스트 PS1이 넣던 DX9Ex/OpenXR/DirectGPU/cadence/HUD/menu 실행 프로파일을 `Start-OutRun.cmd`의 VR 경로에 직접 고정했습니다.
 - 기존 `OutRun2006Tweaks.user.ini`에 `VR.Enabled=true`가 남아 있어도 릴리즈판의 EXE 직접 실행은 2D로 강제됩니다.
 
 ## 검증

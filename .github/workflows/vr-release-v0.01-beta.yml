@@ -17,6 +17,7 @@ on:
       - 'tools/verify_vr_release_quiet_profile.py'
       - 'RELEASE_NOTES_VR_v0.01-beta.md'
       - 'Start-OutRun-VR.cmd'
+      - 'Start-OutRun.cmd'
   workflow_dispatch:
     inputs:
       publish:
@@ -94,6 +95,7 @@ jobs:
           Copy-Item $hostExe.FullName "$dir/outrun-vr-host.exe"
           Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
           Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
+          Copy-Item Start-OutRun.cmd "$dir/Start-OutRun.cmd"
           Copy-Item Start-OutRun-VR.cmd "$dir/Start-OutRun-VR.cmd"
 
           # Release-only entrypoint policy: direct OR2006C2C.exe is 2D.
@@ -120,7 +122,10 @@ jobs:
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
           @(
             'DirectExeMode=2D'
+            'SelectorEntrypoint=Start-OutRun.cmd'
             'VrEntrypoint=Start-OutRun-VR.cmd'
+            'SharedDllIncludesFFB=true'
+            'PowerShellRequired=false'
             'DirectGpuOnly=true'
             'Graphics.ReflectionUpdateRate=0.25'
             'Graphics.TransparencySupersampling=false'
@@ -137,9 +142,27 @@ jobs:
 
           foreach ($forbidden in @(
             'RUN_DX9EX_TEST.cmd','Run-DX9ExFocusTest.ps1',
+            'Run-FocusOfficialTest.ps1','Run-OutRunVRTest.ps1',
             'Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd')) {
             if (Test-Path (Join-Path $dir $forbidden)) {
               throw "diagnostic file leaked into release: $forbidden"
+            }
+          }
+
+          if (-not (Test-Path "$dir/Start-OutRun.cmd")) { throw '2D/VR selector missing' }
+          if (-not (Test-Path "$dir/Start-OutRun-VR.cmd")) { throw 'VR shortcut missing' }
+          $selectorText = Get-Content "$dir/Start-OutRun.cmd" -Raw
+          foreach ($requiredToken in @(
+            'OUTRUN_VR_FORCE_DISABLED=1',
+            'OUTRUN_VR_LAUNCH=1',
+            '-VR.Enabled=true',
+            '-VR.PreferD3D9Ex=true',
+            '-VR.DirectGpuOnly=true',
+            '-VR.AutoRenderResolution=true',
+            '-VR.Hud1080pReference=true',
+            '-VR.MenuScale=0.75')) {
+            if ($selectorText -notmatch [regex]::Escape($requiredToken)) {
+              throw "release selector missing validated launch token: $requiredToken"
             }
           }
 

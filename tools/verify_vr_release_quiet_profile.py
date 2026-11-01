@@ -18,7 +18,10 @@ host = (root / "vrhost/src/main.cpp").read_text(encoding="utf-8")
 r23 = (root / "vrhost/src/main_r23.cpp").read_text(encoding="utf-8")
 focus = (root / "tools/Run-DX9ExFocusTest.ps1").read_text(encoding="utf-8")
 official = (root / "tools/Run-FocusOfficialTest.ps1").read_text(encoding="utf-8")
+selector = (root / "Start-OutRun.cmd").read_text(encoding="utf-8")
 launcher = (root / "Start-OutRun-VR.cmd").read_text(encoding="utf-8")
+cmake = (root / "CMakeLists.txt").read_text(encoding="utf-8")
+wheel_build = (root / "src/hooks_wheel_ffb_build.cpp").read_text(encoding="utf-8")
 
 for token in (
     "bool FileLoggingEnabled() noexcept",
@@ -55,14 +58,38 @@ for script in (focus, official):
     assert "-VR.Telemetry=true" in script
     assert "OUTRUN_VR_FILE_LOG = '1'" in script
 
-assert 'set "OUTRUN_VR_LAUNCH=1"' in launcher
-assert "-VR.Enabled=true" in launcher
-assert "-VR.AutoLaunchHost=true" in launcher
-assert "-VR.PreferD3D9Ex=true" in launcher
+assert 'call "%~dp0Start-OutRun.cmd" vr' in launcher
+
+for token in (
+    'OUTRUN_VR_FORCE_DISABLED=1',
+    'OUTRUN_VR_LAUNCH=1',
+    'OUTRUN_VR_R23_PIXEL_PROBE=0',
+    '-VR.Enabled=true',
+    '-VR.AutoLaunchHost=true',
+    '-FramerateUnlockExperimental=true',
+    '-VR.FrameCadenceMode=1',
+    '-VR.PreferD3D9Ex=true',
+    '-VR.DirectGpuOnly=true',
+    '-VR.AutoRenderResolution=true',
+    '-VR.FollowGameResolution=false',
+    '-VR.Hud1080pReference=true',
+    '-VR.HudResponsiveLayout=true',
+    '-VR.HudScale=0.55',
+    '-VR.MenuScale=0.75',
+    '-VR.CullingUnionMarginDegrees=8.0',
+    '-VR.Telemetry=false',
+    '-VR.FileLogging=false',
+):
+    assert token in selector, token
+
+# The one shipped dinput8.dll is intentionally shared by 2D and VR and retains
+# the current wheel FFB implementation rather than packaging a second DLL.
+assert '"src/hooks_wheel_ffb_build.cpp"' in cmake
+assert '#include "hooks_wheel_ffb.cpp"' in wheel_build
 
 probe = r23.split("bool R23PixelDiagnosticsEnabled() noexcept", 1)[1].split(
     "constexpr UINT R23SourceSamples", 1)[0]
 assert 'std::strcmp(value, "1") == 0' in probe
 assert "return value != nullptr" in probe
 
-print("PASS VR v0.01-beta: direct release EXE is forced to 2D, Start-OutRun-VR.cmd explicitly opts into VR, publishing is manual, and diagnostics stay quiet by default")
+print("PASS VR v0.01-beta: one shared FFB+VR dinput8.dll, direct EXE/selector 2D path disables only VR, CMD-only validated VR profile replaces PS1 dependency, publishing remains manual")
