@@ -1612,8 +1612,9 @@ namespace
             ++R23TheaterRefreshFresh;
 
         const ULONGLONG now = GetTickCount64();
-        if (R23LastTheaterRefreshLogMs == 0 ||
-            now - R23LastTheaterRefreshLogMs >= R23TheaterRefreshLogIntervalMs)
+        if (OutRunVrFileLoggingEnabled() &&
+            (R23LastTheaterRefreshLogMs == 0 ||
+             now - R23LastTheaterRefreshLogMs >= R23TheaterRefreshLogIntervalMs))
         {
             R23LastTheaterRefreshLogMs = now;
             const ULONGLONG publishedAt =
@@ -2195,8 +2196,9 @@ namespace
 
         static std::uint32_t lastMenuDecisionState = 0xFFFFFFFFu;
         static float lastMenuDecisionScale = -1.0f;
-        if (lastMenuDecisionState != clientGameState ||
-            lastMenuDecisionScale != R23ConfiguredMenuScale)
+        if (OutRunVrFileLoggingEnabled() &&
+            (lastMenuDecisionState != clientGameState ||
+             lastMenuDecisionScale != R23ConfiguredMenuScale))
         {
             lastMenuDecisionState = clientGameState;
             lastMenuDecisionScale = R23ConfiguredMenuScale;
@@ -3076,7 +3078,8 @@ namespace
                 sessionEpoch_.pendingRenderHz = 0.0f;
                 sessionEpoch_.pendingRenderHzSamples = 0;
                 sessionEpoch_.nextRequestDisplayTime = 0;
-                std::cout
+                if (OutRunVrFileLoggingEnabled())
+                    std::cout
                     << "[R36 cadence] activeRenderHz=" << sessionEpoch_.activeRenderHz
                     << " actualXrHz=" << sessionEpoch_.actualXrHz
                     << " maxRenderHz=" << maxRenderHz_
@@ -3300,8 +3303,9 @@ namespace
                 ? sessionEpoch_.actualXrHz * 0.90 + hz * 0.10
                 : hz;
 
-            if (sessionEpoch_.lastLoggedXrHz <= 0.0 ||
-                std::fabs(sessionEpoch_.actualXrHz - sessionEpoch_.lastLoggedXrHz) >= 0.75)
+            if (OutRunVrFileLoggingEnabled() &&
+                (sessionEpoch_.lastLoggedXrHz <= 0.0 ||
+                 std::fabs(sessionEpoch_.actualXrHz - sessionEpoch_.lastLoggedXrHz) >= 0.75))
             {
                 sessionEpoch_.lastLoggedXrHz = sessionEpoch_.actualXrHz;
                 const double ratio = sessionEpoch_.activeRenderHz > 0.0f
@@ -4403,9 +4407,10 @@ int main(int argc, char** argv)
                             }
                         }
 
-                        if (R23LastCachedProjectionLogMs == 0 ||
-                            projectionNow - R23LastCachedProjectionLogMs >=
-                                R23CachedProjectionLogIntervalMs)
+                        if (OutRunVrFileLoggingEnabled() &&
+                            (R23LastCachedProjectionLogMs == 0 ||
+                             projectionNow - R23LastCachedProjectionLogMs >=
+                                R23CachedProjectionLogIntervalMs))
                         {
                             R23LastCachedProjectionLogMs = projectionNow;
                             std::cout
@@ -4528,8 +4533,9 @@ int main(int argc, char** argv)
                                 : "recovery-full-mono-theater";
                             ++R23GameplayTheaterFallbacks;
                             const ULONGLONG now = GetTickCount64();
-                            if (R23LastGameplayFallbackLogMs == 0 ||
-                                now - R23LastGameplayFallbackLogMs >= 5000)
+                            if (OutRunVrFileLoggingEnabled() &&
+                                (R23LastGameplayFallbackLogMs == 0 ||
+                                 now - R23LastGameplayFallbackLogMs >= 5000))
                             {
                                 R23LastGameplayFallbackLogMs = now;
                                 std::cout
