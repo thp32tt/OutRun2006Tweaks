@@ -331,6 +331,10 @@ bool native_raw_fvf_clip_capture_regression() {
 // One real FVF Draw can span disjoint left-menu and right-HUD islands.
 // Its merged rectangle can direct BOTH legacy GPU captures to empty space.
 bool native_raw_fvf_island_regression() {
+    const auto fail = [](int line) noexcept {
+        std::fprintf(stderr, "FVF island regression failed at line %d\\n", line);
+        return false;
+    };
     constexpr std::array<std::array<float,4>,6> vertices{{
         {{-0.96f,-0.3f,0.5f,1.f}}, {{-0.84f,-0.3f,0.5f,1.f}},
         {{-0.9f,0.1f,0.5f,1.f}},
@@ -349,29 +353,30 @@ bool native_raw_fvf_island_regression() {
     if (!capture(original,canvas,0u) || !tile.hasSecond ||
         tile.first.x > 512u || tile.second.x < 2400u ||
         !native_raw_source_tiles_disjoint(tile.first,tile.second,512,288))
-        return false;
+        return fail(__LINE__);
     if (!capture(original,canvas,1u) || !tile.hasSecond ||
         tile.first.x < 2400u || tile.second.x > 512u)
-        return false;
+        return fail(__LINE__);
     constexpr std::array<std::uint32_t,6> reversed{{3,4,5,0,1,2}};
     const NativeRawFvfClipSpan indexed{
         vertices.data(),sizeof(vertices[0]),vertices.size(),
         reversed.data(),reversed.size()};
     if (!capture(indexed,canvas,0u) || !tile.hasSecond ||
         tile.first.x < 2400u || tile.second.x > 512u)
-        return false;
+        return fail(__LINE__);
     // A scissor that excludes the right polygon cannot sample it.
-    if (!capture(original,{0,0,800,1440},1u) || tile.hasSecond ||
-        tile.first.x > 512u) return false;
+    if (!capture(original,{0,0,800,1440},1u) ||
+        tile.first.x > 512u ||
+        (tile.hasSecond && tile.second.x > 512u)) return fail(__LINE__);
     auto malformed = reversed;
     malformed[4] = 99u;
     if (capture({vertices.data(),sizeof(vertices[0]),vertices.size(),
                  malformed.data(),malformed.size()},canvas,0u))
-        return false;
+        return fail(__LINE__);
     auto invalid = vertices;
     invalid[4][3] = 0.f;
     if (capture({invalid.data(),sizeof(invalid[0]),invalid.size()},
-                canvas,0u)) return false;
+                canvas,0u)) return fail(__LINE__);
     // A large single primitive must still produce two independent GPU
     // source regions under the original swept sampling algorithm.
     constexpr std::array<std::array<float,4>,3> broad{{
