@@ -8485,7 +8485,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
               topology == D3DPT_TRIANGLEFAN))
                 ? NativeRawFvfClipSpan{
                       vertices.front().clip, sizeof(NativeVertex),
-                      vertices.size()}
+                      vertices.size(),
+                      (indices && indexCount) ? indices : nullptr,
+                      (indices && indexCount) ? indexCount : 0u}
                 : NativeRawFvfClipSpan{});
     }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);

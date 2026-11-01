@@ -15,6 +15,11 @@ struct NativeRawFvfClipSpan {
     const void* firstClip = nullptr;
     std::size_t vertexStride = 0u;
     std::size_t count = 0u;
+    // Optional original native IA DrawIndexed stream. Ignore unreferenced
+    // VB vertices (they never rasterize); malformed indices demote to
+    // conservative whole-viewport GPU capture rather than reading past VB.
+    const std::uint32_t* indices = nullptr;
+    std::size_t indexCount = 0u;
 };
 // All vertices must have a finite positive W. A crossing/unknown clip W,
 // an unsupported primitive, or a suspicious viewport retains the original
@@ -31,15 +36,25 @@ struct NativeRawFvfClipSpan {
         !std::isfinite(viewportW) || !std::isfinite(viewportH) ||
         viewportW <= 0.0f || viewportH <= 0.0f ||
         source.count > (std::numeric_limits<std::size_t>::max)() /
-            source.vertexStride) return false;
+            source.vertexStride ||
+        (source.indices == nullptr) != (source.indexCount == 0u) ||
+        (source.indices && (source.indexCount < 3u ||
+                            source.indexCount > 1048576u)))
+        return false;
     const auto* bytes = static_cast<const std::uint8_t*>(source.firstClip);
     double minX = (std::numeric_limits<double>::max)();
     double minY = minX;
     double maxX = -(std::numeric_limits<double>::max)();
     double maxY = maxX;
-    for (std::size_t i = 0u; i < source.count; ++i) {
+    const auto activeCount = source.indices ? source.indexCount : source.count;
+    for (std::size_t i = 0u; i < activeCount; ++i) {
+        const auto vertex = source.indices
+            ? static_cast<std::size_t>(source.indices[i]) : i;
+        // Do not read malformed IA indices. The GPU original Draw remains
+        // authoritative and the caller keeps its full-viewport sampling.
+        if (vertex >= source.count) return false;
         float clip[4]{};
-        std::memcpy(clip, bytes + i * source.vertexStride, sizeof(clip));
+        std::memcpy(clip, bytes + vertex * source.vertexStride, sizeof(clip));
         if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
             !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
             clip[3] <= 0.00001f) return false;

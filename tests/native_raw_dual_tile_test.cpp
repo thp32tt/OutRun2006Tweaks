@@ -202,6 +202,72 @@ bool native_raw_fvf_clip_capture_regression() {
     if (native_raw_fvf_projected_raster(span, 0, 0, 0, 1440, rect) ||
         native_raw_fvf_projected_raster({}, 0, 0, 3440, 1440, rect))
         return false;
+
+    // The actual indexed native menu/vehicle/HUD GPU Draw references only
+    // the three far-right vertices; the other positions in its VB are not
+    // submitted. Bounding all VB vertices used to steer both 512x288 RGB
+    // source captures away from the real shaded pixels on a 3440x1440 game.
+    constexpr std::array<std::array<float, 4>, 6> indexedVerts{{
+        {{-0.95f,-0.80f,0.5f,1.f}}, {{-0.85f,-0.70f,0.5f,1.f}},
+        {{-0.80f,-0.75f,0.5f,1.f}},
+        {{0.78f,0.25f,0.5f,1.f}}, {{0.95f,0.25f,0.5f,1.f}},
+        {{0.90f,0.52f,0.5f,1.f}}
+    }};
+    constexpr std::array<std::uint32_t, 3> used{{3u,4u,5u}};
+    const NativeRawFvfClipSpan indexed{
+        indexedVerts.data(), sizeof(indexedVerts[0]), indexedVerts.size(),
+        used.data(), used.size()};
+    NativeRawDrawExtent indexedRect{}, broad{};
+    if (!native_raw_fvf_projected_raster(
+            indexed, 0, 0, 3440, 1440, indexedRect) ||
+        indexedRect.left < 3000 || indexedRect.right > 3440 ||
+        !native_raw_fvf_projected_raster(
+            {indexedVerts.data(), sizeof(indexedVerts[0]),
+             indexedVerts.size()}, 0, 0, 3440, 1440, broad) ||
+        broad.left > 300 || indexedRect.left <= broad.left)
+        return false;
+    NativeRawDualTile indexedGpu{};
+    if (!native_raw_swept_dual_draw_tile(
+            3440, 1440, 512, 288, indexedRect, 0u, indexedGpu) ||
+        indexedGpu.first.x < 2500u)
+        return false;
+    // Malformed/unknown IA always falls back to the original broad GPU
+    // source viewport capture. No index may read outside the live VB.
+    auto malformed = used;
+    malformed[2] = 6u;
+    auto badSpan = indexed;
+    badSpan.indices = malformed.data();
+    if (native_raw_fvf_projected_raster(
+            badSpan, 0, 0, 3440, 1440, rect) ||
+        rect.left != 0 || rect.right != 0)
+        return false;
+    badSpan = indexed;
+    badSpan.indexCount = 0u;
+    if (native_raw_fvf_projected_raster(
+            badSpan, 0, 0, 3440, 1440, rect))
+        return false;
+    badSpan = indexed;
+    badSpan.indices = nullptr;
+    if (native_raw_fvf_projected_raster(
+            badSpan, 0, 0, 3440, 1440, rect))
+        return false;
+    auto invalidActive = indexedVerts;
+    invalidActive[5][3] = 0.0f;
+    if (native_raw_fvf_projected_raster(
+            {invalidActive.data(), sizeof(invalidActive[0]),
+             invalidActive.size(), used.data(), used.size()},
+            0, 0, 3440, 1440, rect))
+        return false;
+    // Invalid UNREFERENCED VB clip data cannot silence the real indexed GPU
+    // triangle: these positions never reach the native DrawIndexed raster.
+    invalidActive = indexedVerts;
+    invalidActive[0][3] = 0.0f;
+    if (!native_raw_fvf_projected_raster(
+            {invalidActive.data(), sizeof(invalidActive[0]),
+             invalidActive.size(), used.data(), used.size()},
+            0, 0, 3440, 1440, rect) ||
+        rect.left != indexedRect.left || rect.right != indexedRect.right)
+        return false;
     return true;
 }
 
