@@ -2534,14 +2534,71 @@ namespace
             RECT liveRect{};
             if (R23LiveGameWindowUv(c, liveUv, liveRect))
             {
+                const UvRect rawLiveUv = liveUv;
+                const RECT rawLiveRect = liveRect;
+                const float rawWidth =
+                    static_cast<float>(rawLiveRect.right - rawLiveRect.left);
+                const float rawHeight =
+                    static_cast<float>(rawLiveRect.bottom - rawLiveRect.top);
+                float liveAspect =
+                    rawHeight > 0.0f ? rawWidth / rawHeight : 0.0f;
+                bool normalizedFrontEndMirror = false;
+
+                // Before the first completed Frame.v2 publication, the Win32
+                // HWND may already cover the entire 3440x1440 monitor even
+                // though the game-side mirror contract is the centered
+                // 2560x1440 16:9 window at x=440. Quest 2026-11-02 logs showed
+                // SYSTEM and START alternating between those two geometries.
+                // Reconstruct the same 16:9 fit immediately for every explicit
+                // front-end state so live-HWND fallback and later published
+                // Frame.v2 geometry are identical. This changes only sampled
+                // desktop pixels; OpenXR eye buffers and game rendering stay
+                // untouched.
+                if (clientGameState != 0xFFFFFFFFu &&
+                    rawWidth > 0.0f && rawHeight > 0.0f)
+                {
+                    constexpr float frontEndMirrorAspect = 16.0f / 9.0f;
+                    const auto fit =
+                        OutRunVrMenuAspect::PlanCenteredContent(
+                            liveAspect, frontEndMirrorAspect);
+                    if (fit.crop)
+                    {
+                        const float baseWidth = liveUv.w;
+                        const float baseHeight = liveUv.h;
+                        liveUv.x += baseWidth * fit.offsetX;
+                        liveUv.y += baseHeight * fit.offsetY;
+                        liveUv.w = baseWidth * fit.width;
+                        liveUv.h = baseHeight * fit.height;
+
+                        RECT fittedRect{};
+                        fittedRect.left = rawLiveRect.left +
+                            static_cast<LONG>(std::lround(
+                                rawWidth * fit.offsetX));
+                        fittedRect.top = rawLiveRect.top +
+                            static_cast<LONG>(std::lround(
+                                rawHeight * fit.offsetY));
+                        fittedRect.right = rawLiveRect.left +
+                            static_cast<LONG>(std::lround(
+                                rawWidth * (fit.offsetX + fit.width)));
+                        fittedRect.bottom = rawLiveRect.top +
+                            static_cast<LONG>(std::lround(
+                                rawHeight * (fit.offsetY + fit.height)));
+                        if (fittedRect.right > fittedRect.left &&
+                            fittedRect.bottom > fittedRect.top)
+                        {
+                            liveRect = fittedRect;
+                            liveAspect = fit.aspect;
+                            normalizedFrontEndMirror = true;
+                        }
+                    }
+                }
+
                 theaterUv = liveUv;
                 capturedTheaterClient = liveRect;
                 capturedTheaterFullyVisible = true;
                 publishedMirrorApplied = true;
                 liveMirrorApplied = true;
-                publishedMirrorAspect =
-                    static_cast<float>(liveRect.right - liveRect.left) /
-                    static_cast<float>(liveRect.bottom - liveRect.top);
+                publishedMirrorAspect = liveAspect;
                 static std::uint64_t liveWindowHits = 0;
                 const auto hit = ++liveWindowHits;
                 if (hit <= 32 || (hit & (hit - 1)) == 0)
@@ -2551,11 +2608,22 @@ namespace
                         << " hit=" << hit
                         << " state=" << clientGameState
                         << " pid=" << c.gamePid_
+                        << " rawClient=" << rawLiveRect.left << ','
+                        << rawLiveRect.top << ',' << rawLiveRect.right << ','
+                        << rawLiveRect.bottom
                         << " client=" << liveRect.left << ',' << liveRect.top
                         << ',' << liveRect.right << ',' << liveRect.bottom
+                        << " rawUv=" << rawLiveUv.x << ',' << rawLiveUv.y
+                        << ',' << rawLiveUv.w << ',' << rawLiveUv.h
                         << " uv=" << liveUv.x << ',' << liveUv.y
                         << ',' << liveUv.w << ',' << liveUv.h
-                        << " authority=CURRENT_SAME_PID_WIN32_CLIENT_RECT\n";
+                        << " normalized16x9="
+                        << (normalizedFrontEndMirror ? 1 : 0)
+                        << " authority="
+                        << (normalizedFrontEndMirror
+                            ? "CURRENT_SAME_PID_WIN32_CLIENT_RECT_CENTERED_16_9_FRONTEND_MIRROR"
+                            : "CURRENT_SAME_PID_WIN32_CLIENT_RECT")
+                        << "\n";
                     OutRunVrEmitFullTrace(trace.str());
                 }
             }

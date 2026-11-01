@@ -34,12 +34,15 @@ assert 'case GameState::STATE_GAME:' not in front_end
 assert 'bool VrFrontEndNeedsPhysicalTargetMap() noexcept' in ui
 physical_owner = ui.split('bool VrFrontEndNeedsPhysicalTargetMap() noexcept', 1)[1].split(
     'bool ResolveVrFrontEndVirtualCanvasScale(', 1)[0]
-assert '*Game::current_mode != GameState::STATE_SUMO_FE' in physical_owner
+assert 'return VrFrontEndPhysicalCanvasState();' in physical_owner
+assert '*Game::current_mode != GameState::STATE_SUMO_FE' not in physical_owner
 assert 'pOut, vrFrontEndProducer &&\n                        VrFrontEndNeedsPhysicalTargetMap(),' in ui
 assert 'pOut, originalFrontEndProducer &&\n                    VrFrontEndNeedsPhysicalTargetMap(),' in ui
 assert 'if (!precontained && frontEnd && contained &&\n            VrFrontEndNeedsPhysicalTargetMap())' in ui
 assert 'if (Settings::VREnabled && VrFrontEndNeedsPhysicalTargetMap() &&\n            ResolveVrFrontEndVirtualCanvasScale(' in ui
-# No Sumo-FE custom/multi route may bypass the same physical-map veto.
+# SUMO now uses the same exactly-once physical map as every other proven
+# front-end owner. Custom quads still require matrix provenance before they
+# skip the final map; multi-sprite paths map their raw vertices once.
 assert 'if (!precontained && frontEnd && contained)\n        {' not in ui
 assert 'Settings::VREnabled && VrFrontEndPhysicalCanvasState() &&\n            ResolveVrFrontEndVirtualCanvasScale(' not in ui
 assert 'const float containScale =' not in ui
@@ -100,6 +103,10 @@ assert 'quad.size.width = 2.f * theaterScale;' in theater
 assert 'quad.size.height = quad.size.width / aspect;' in theater
 assert 'const float theaterScale = !sourceIsSbs &&' in theater
 assert 'clientGameState != 0xFFFFFFFFu' in theater
+assert 'CURRENT_SAME_PID_WIN32_CLIENT_RECT_CENTERED_16_9_FRONTEND_MIRROR' in theater
+assert 'normalized16x9=' in theater
+assert 'rawClient=' in theater
+assert 'PlanCenteredContent(' in theater
 
 # Quest 23:17 regression: SUMO_FE is a mixed 2D+3D vehicle composition.
 # The complete published mirror must survive; the old 1920/2496 x
@@ -139,7 +146,7 @@ assert '(clientGameState == 0x04u || clientGameState == 0x09u)' in authored43
 assert host.count('R23RenderWorldLockedMenuProjection(') == 1
 assert host.count('R23RenderTheater(') >= 3
 assert 'HudScale = 0.55' in ini
-print('PASS live R23RenderTheater preserves SUMO whole-composite ownership; START physical-map owner enabled; HMD UNTESTED')
+print('PASS SUMO whole-composite + exactly-once physical UI map + stable 16:9 live HWND fallback; HMD UNTESTED')
 
 # Same-owner failed refresh must not publish defaults or a partial config.
 owner = host.split('bool R23GameMenuIsLetterboxed(HWND gameWindow) noexcept', 1)[1].split(

@@ -155,7 +155,8 @@ def require_frontend_owner(source: str) -> None:
     assert "bool VrFrontEndNeedsPhysicalTargetMap() noexcept" in helper
     physical_owner = helper.split(
         "bool VrFrontEndNeedsPhysicalTargetMap() noexcept", 1)[1]
-    assert "*Game::current_mode != GameState::STATE_SUMO_FE" in physical_owner
+    assert "return VrFrontEndPhysicalCanvasState();" in physical_owner
+    assert "*Game::current_mode != GameState::STATE_SUMO_FE" not in physical_owner
     for state in ("TITLE", "MENU", "SELECTOR", "SELEXIT", "SELRESET", "START"):
         assert "GameState::STATE_" + state in helper, "frontend missing: " + state
     for excluded in ("GOAL", "GAME"):
@@ -857,8 +858,9 @@ print("PASS optional front-end D3DX scale/translation containment and five destr
 
 # 2026-10-31 Quest trace: custom-matrix-multi front-end draws can bypass the
 # D3DX matrix receipt. Physical mapping remains valid for proven transition
-# owners, but STATE_SUMO_FE is now host-theater-owned and must stop before the
-# portrait XR map. Gameplay/GOAL remain excluded as before.
+# owners. STATE_SUMO_FE remains a whole-composite host source, but its 2D
+# producers must still map once into the physical XR target so they share the
+# same raster coordinates as the 3D Ferrari. Gameplay/GOAL remain excluded.
 def require_multi_frontend_physicalization(source: str) -> None:
     helper = source.split("bool VrFrontEndPhysicalCanvasState() noexcept",1)[1].split(
         "bool ResolveVrFrontEndVirtualCanvasScale(",1)[0]
@@ -873,7 +875,8 @@ def require_multi_frontend_physicalization(source: str) -> None:
     assert "bool VrFrontEndNeedsPhysicalTargetMap() noexcept" in helper
     physical_owner = helper.split(
         "bool VrFrontEndNeedsPhysicalTargetMap() noexcept",1)[1]
-    assert "*Game::current_mode != GameState::STATE_SUMO_FE" in physical_owner
+    assert "return VrFrontEndPhysicalCanvasState();" in physical_owner
+    assert "*Game::current_mode != GameState::STATE_SUMO_FE" not in physical_owner
     for token in (
         "Settings::VREnabled && VrFrontEndNeedsPhysicalTargetMap()",
         "ResolveVrFrontEndVirtualCanvasScale(",
@@ -887,4 +890,4 @@ def require_multi_frontend_physicalization(source: str) -> None:
         "vertices[i * stride] = transformedX[i];")
 
 require_multi_frontend_physicalization(text)
-print("DX9Ex front-end multi-sprite physical mapping PASS; SUMO_FE theater-owned, gameplay/GOAL excluded")
+print("DX9Ex front-end multi-sprite physical mapping PASS; SUMO_FE exactly-once physical map, gameplay/GOAL excluded")

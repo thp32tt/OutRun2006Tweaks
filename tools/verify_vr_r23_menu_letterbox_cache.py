@@ -84,6 +84,10 @@ def verify(text: str) -> None:
     assert 'publishedMirrorApplied = true;' in theater
     assert 'else if (clientGameState != 0xFFFFFFFFu)' in theater
     assert 'authority=CURRENT_SAME_PID_WIN32_CLIENT_RECT' in theater
+    assert 'CURRENT_SAME_PID_WIN32_CLIENT_RECT_CENTERED_16_9_FRONTEND_MIRROR' in theater
+    assert 'normalized16x9=' in theater
+    assert 'rawClient=' in theater
+    assert 'PlanCenteredContent(' in theater
     assert 'const bool publishedMirrorGeometryEligible =' in theater
     assert 'mirrorFrame->clientPid == c.gamePid_' in theater
     assert 'CanUsePublishedMirrorGeometry(' in theater

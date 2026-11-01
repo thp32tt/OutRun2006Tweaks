@@ -105,17 +105,20 @@ namespace
     static_assert(static_cast<int>(GameState::STATE_GAME) == 0x10,
         "Gameplay state must remain distinct from the front-end physical canvas");
 
-    // The Sumo wrapper (0x20) is an ownership label for original logical
-    // menu/car-selector composition, not permission to rewrite that finished
-    // 1920x1080 UI into the portrait XR eye target. The x64 host consumes the
-    // game HWND/mirror as a LOCAL theater quad and owns its optical size.
-    // Keeping 0x20 out here prevents the previous 1.30x/2.489y double-map
-    // while retaining front-end containment/provenance above.
+    // The game owns 2D source coordinates while the OpenXR D3D9Ex target owns
+    // the physical raster.  Quest 2026-11-02 runtime proved that keeping
+    // STATE_SUMO_FE out of this map leaves its 1920x1080 selector UI in the
+    // upper-left of the 2496x2688 target while the 3D Ferrari is already
+    // physical.  The host no longer crops SUMO to the logical corner; it keeps
+    // the complete mixed 2D+3D mirror.  Therefore every proven front-end owner,
+    // including SUMO, must receive this final logical->physical map exactly
+    // once. D3DX/custom-quad duplicate application remains blocked by the
+    // exact ContainedMatrices provenance ledger.
     bool VrFrontEndNeedsPhysicalTargetMap() noexcept
     {
-        if (!VrFrontEndPhysicalCanvasState() || !Game::current_mode)
+        if (!Game::current_mode)
             return false;
-        return *Game::current_mode != GameState::STATE_SUMO_FE;
+        return VrFrontEndPhysicalCanvasState();
     }
 
     bool ResolveVrFrontEndVirtualCanvasScale(

@@ -329,6 +329,26 @@ int main()
         if (unavailableLogicalMenu.crop)
             return 136;
     }
+    // 2026-11-02 Quest SYSTEM/START live-HWND fallback: the raw same-PID
+    // client can momentarily be the full 3440x1440 desktop before Frame.v2
+    // publishes the stable mirror rectangle. The fallback must derive the
+    // exact same centered 2560x1440 region (440..3000) so source geometry
+    // cannot jump when publication becomes available.
+    {
+        const auto liveFit = OutRunVrMenuAspect::PlanCenteredContent(
+            3440.f / 1440.f, 16.f / 9.f);
+        const auto close = [](float a, float b) {
+            return std::fabs(a - b) <= 1.e-6f;
+        };
+        if (!liveFit.crop ||
+            !close(liveFit.offsetX, 440.f / 3440.f) ||
+            !close(liveFit.offsetY, 0.f) ||
+            !close(liveFit.width, 2560.f / 3440.f) ||
+            !close(liveFit.height, 1.f) ||
+            !close(liveFit.aspect, 16.f / 9.f))
+            return 138;
+    }
+
     // 2026-11-01 23:17 Quest proof: the authoritative mirror rectangle is
     // 440,0..3000,1440. SUMO must preserve that complete 2560x1440 source;
     // neither a same-PID QPC miss nor a physical-extent receipt may turn it
