@@ -22,3 +22,16 @@ Avoid copying this package over an unrelated build without backing up
  dinput8.dll, outrun-vr-host.exe, and INI first. Existing user INI can
  override the package reference INI; the launcher forces key VR settings.
 This is an experimental Windows-compiled test, not Quest runtime validated.
+
+MONO GAP REPAIR TEST (2026-11-01):
+This R26+HUD branch is NOT the prior unconditional third-mono elimination.
+Before a gap, complete independent R9 mono safety render is preserved.
+After R30 draws a stereo pair without a mono copy, R9MonoBackupGap=true;
+the existing backup is now unrestorable for that Present. Later R9
+Draw and partial Clear skip ONLY the unusable third shadow replay, while
+real left/right stereo and R13/R9 failure flow remain in place.
+A verified full main-target color Clear can re-seed the independent backup.
+With VR Telemetry=true, R9's 5-second summary reports gapSkipDraw and
+gapSkipClear counters. Default Telemetry=false keeps logs quiet.
+This source contract and Windows binary compile are CI checked, but real
+Quest HMD visual correctness and GPU frame-time gains require user testing.

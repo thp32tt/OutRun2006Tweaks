@@ -1,9 +1,9 @@
-name: R26 Focus Visual + All Safe Performance Quiet Test Build
+name: R26 Focus Quiet + Safe Mono Gap Repair Test
 
 on:
   push:
     branches:
-      - 'test/r26-focus-all-perf-no-trace-20261101'
+      - 'test/r26-focus-perf-mono-gap-repair-20261101'
   workflow_dispatch:
 
 permissions:
@@ -44,6 +44,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact C993 projected flare ownership contract failed' }
           python tools/verify_dx9ex_full_visual_trace_contract.py
           if ($LASTEXITCODE -ne 0) { throw 'One-pass FULL visual trace contract failed' }
+
+      - name: Verify unusable mono gap elision and full-clear reseed
+        shell: pwsh
+        run: |
+          python tools/verify_vr_r26_mono_gap_repair.py
+          if ($LASTEXITCODE -ne 0) { throw 'R26 mono gap safety contract failed' }
 
       - name: Verify merged performance/quiet profile
         shell: pwsh
@@ -92,7 +98,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $short = $env:GITHUB_SHA.Substring(0,12)
-          $dir = "OutRun2_VR_FOCUS_PERF_QUIET_$short"
+          $dir = "OutRun2_VR_FOCUS_GAP_REPAIR_$short"
           New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (!$dll) { throw 'No Win32 game DLL' }
@@ -124,14 +130,14 @@ jobs:
             'LOGGING=OFF: game telemetry, host full trace, XR pixel probe'
             'EYE_RESOLUTION=OpenXR recommended per-eye allocation'
             'TRANSPORT=DirectGPU-only for gameplay; menu Desktop Duplication kept'
-            'MONO_SHADOW=SAFE fallback retained; unsafe white-screen no-mono patch excluded'
+            'MONO_SHADOW=SAFE until R30 gap; invalid replay skipped, verified full color Clear reseeds'
             'RUNTIME_QUEST_VALIDATION=UNTESTED'
           ) | Set-Content "$dir/BUILD_PROVENANCE.txt" -Encoding UTF8
           Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
           Get-FileHash "$dir.zip" -Algorithm SHA256
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun-VR-FOCUS-PERF-QUIET-${{ github.sha }}
-          path: OutRun2_VR_FOCUS_PERF_QUIET_*.zip
+          name: OutRun-VR-FOCUS-GAP-REPAIR-${{ github.sha }}
+          path: OutRun2_VR_FOCUS_GAP_REPAIR_*.zip
           retention-days: 21
           if-no-files-found: error
