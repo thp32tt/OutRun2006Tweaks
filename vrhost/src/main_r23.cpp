@@ -2369,6 +2369,30 @@ namespace
             uv.x + uv.w <= 1.00001f && uv.y + uv.h <= 1.00001f;
     }
 
+    bool R23TheaterFrameMatchesCapture(
+        const StereoCompositor& c,
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        if (frame.presentationMode != OutRunVR::PresentationTheater ||
+            (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+            frame.presentQpc <= 0 || c.lastCapturePresentQpc_ <= 0 ||
+            frame.presentQpc > c.lastCapturePresentQpc_)
+            return false;
+
+        static const std::int64_t maxSkewTicks = []() noexcept {
+            LARGE_INTEGER frequency{};
+            if (!QueryPerformanceFrequency(&frequency) ||
+                frequency.QuadPart <= 0)
+                return std::int64_t{0};
+            // Same 100 ms correlation envelope used by the classic capture
+            // selector. Menu frames have frameId=0, so QPC is their stable
+            // cross-stream identity instead of the gameplay stereo frame ID.
+            return frequency.QuadPart / 10;
+        }();
+        return maxSkewTicks > 0 &&
+            c.lastCapturePresentQpc_ - frame.presentQpc <= maxSkewTicks;
+    }
+
     bool R23RenderTheater(StereoCompositor& c, XrSpace viewSpace,
         XrSpace localSpace, XrTime displayTime, XrCompositionLayerQuad& quad,
         bool sourceIsSbs,
@@ -2387,7 +2411,8 @@ namespace
         UvRect theaterUv = whole;
         bool publishedMirrorApplied = false;
         float publishedMirrorAspect = 0.0f;
-        if (!sourceIsSbs && mirrorFrame)
+        if (!sourceIsSbs && mirrorFrame &&
+            R23TheaterFrameMatchesCapture(c, *mirrorFrame))
         {
             UvRect publishedUv{};
             RECT publishedRect{};

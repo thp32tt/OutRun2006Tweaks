@@ -80,6 +80,18 @@ assert 'cachedMenuScale != R23ConfiguredMenuScale' in host
 # R23RenderWorldLockedMenuProjection helper. The live front-end loop submits
 # R23RenderTheater(... clientGameState ...), so MenuScale and aspect must be
 # consumed inside that function itself.
+correlation = host.split('bool R23TheaterFrameMatchesCapture(', 1)[1].split(
+    'bool R23RenderTheater(', 1)[0]
+for token in (
+    'frame.presentationMode != OutRunVR::PresentationTheater',
+    'RenderFramePresentInFlight',
+    'frame.presentQpc <= 0',
+    'c.lastCapturePresentQpc_ <= 0',
+    'frame.presentQpc > c.lastCapturePresentQpc_',
+    'frequency.QuadPart / 10',
+    'c.lastCapturePresentQpc_ - frame.presentQpc <= maxSkewTicks',
+):
+    assert token in correlation, token
 theater = host.split('bool R23RenderTheater(', 1)[1].split(
     'void R23CopyMatchedViews(', 1)[0]
 assert 'ResolveMenuOpticalCoverageForState(' in theater
@@ -90,6 +102,7 @@ assert 'const float theaterScale = !sourceIsSbs &&' in theater
 assert 'clientGameState != 0xFFFFFFFFu' in theater
 assert 'clientGameState == 0x20u' in theater
 assert 'PlanTopLeftLogicalCanvasCrop(' in theater
+assert 'R23TheaterFrameMatchesCapture(c, *mirrorFrame)' in theater
 assert 'mirrorFrame->backbufferWidth >= 640u' in theater
 assert 'mirrorFrame->backbufferHeight >= 480u' in theater
 assert 'const float menuPhysicalWidth = mirrorBackbufferExtentValid' in theater
