@@ -140,11 +140,30 @@ if [[ "${OUTRUN_ROI_BRIDGE_ENABLED:-true}" == "true" ]]; then
   echo "$(date -Is) verifying SHA-pinned direct visual ROI -> ImageGen queue sync" >>/logs/roi-bridge.log
   # Complete one fail-closed sync before AUTO_SEND controller startup. This
   # prevents a deployment exactly on a schedule minute from consuming stale Q104 state.
-  python -u /opt/outrun/app/crop_to_imagegen_queue.py --once >>/logs/roi-bridge.log 2>&1
-  echo "$(date -Is) starting SHA-pinned direct visual ROI -> ImageGen queue bridge loop" >>/logs/roi-bridge.log
-  python -u /opt/outrun/app/crop_to_imagegen_queue.py \
-    --interval-seconds "${OUTRUN_ROI_BRIDGE_INTERVAL_SECONDS:-60}" \
-    >>/logs/roi-bridge.log 2>&1 &
+  # A bounded initial sync fails closed if the source/translation gate fails.
+  timeout --signal=TERM --kill-after=10s 180s \
+    python -u /opt/outrun/app/crop_to_imagegen_queue.py --once >>/logs/roi-bridge.log 2>&1
+  echo "$(date -Is) starting supervised non-OCR bridge reconciliation" >>/logs/roi-bridge.log
+  # A one-shot reconciliation restarts at every interval even if the prior
+  # process exited; it cannot silently die and starve A/B of newly verified ROIs.
+  # The last structured result is also visible in the existing shared N100 mount.
+  (
+    while true; do
+      status_file=/data/imagegen/text_roi_batches/roi_bridge_last_result.json
+      tmp_file=/data/imagegen/text_roi_batches/.roi_bridge_last_result.$.tmp
+      if result="$(timeout --signal=TERM --kill-after=10s 180s \
+          python -u /opt/outrun/app/crop_to_imagegen_queue.py --once 2>&1)"; then
+        printf '%s %s\n' "$(date -Is)" "$result" >>/logs/roi-bridge.log
+        printf '%s\n' "$result" > "$tmp_file"
+      else
+        code=$?
+        echo "$(date -Is) ROI bridge failed/timeout (exit=$code), retrying" >>/logs/roi-bridge.log
+        printf '{"status":"ROI_BRIDGE_RETRY","exit_code":%s}\n' "$code" > "$tmp_file"
+      fi
+      mv -f "$tmp_file" "$status_file"
+      sleep "${OUTRUN_ROI_BRIDGE_INTERVAL_SECONDS:-60}"
+    done
+  ) &
 fi
 
 exec python -m app.controller
