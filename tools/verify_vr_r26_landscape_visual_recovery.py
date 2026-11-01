@@ -93,7 +93,16 @@ assert 'if (ordinal == 2)' not in gfx
 # translation; full/canted eye transforms remain forbidden here.
 assert 'R85LensVisualScale = 0.50f' in r30
 assert 'R85LensStereoTranslationScale = 0.025f' in r30
-assert 'outerFlareObject ? false : recordedCameraSynced' in r30
+# 2026-11-01 Quest: exact inner optical 0x570006 is HMD-locked when
+# erroneously classified with sun-camera-synchronized C993 objects.
+# Preserve the known-good sun (0x570002) and outer flare route separately.
+source_policy=(R/'src/vr/d3d9/projected_lens_r85_source_policy.hpp').read_text()
+assert 'R85UseRecordedCameraSync(' in r30
+assert 'projectedObjectId, outerFlareObject,' in r30
+assert 'objectId == 0x570006u' in source_policy
+assert 'static_assert(R85UseRecordedCameraSync(0x570002u, false, true));' in source_policy
+assert 'static_assert(!R85UseRecordedCameraSync(0x570006u, false, true));' in source_policy
+assert 'innerHeadInverse={}' in r30
 assert 'outerFlareObject={}' in r30
 assert 'projectedObj=0x{:06X}' in r30
 assert 'lensEyeInverse = IdentityMatrix()' in r30
