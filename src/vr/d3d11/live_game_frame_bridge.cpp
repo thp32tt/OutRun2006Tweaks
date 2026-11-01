@@ -8487,7 +8487,12 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                       vertices.front().clip, sizeof(NativeVertex),
                       vertices.size(),
                       (indices && indexCount) ? indices : nullptr,
-                      (indices && indexCount) ? indexCount : 0u}
+                      (indices && indexCount) ? indexCount : 0u,
+                      topology == D3DPT_TRIANGLESTRIP
+                          ? NativeRawFvfAssembly::TriangleStrip
+                          : topology == D3DPT_TRIANGLEFAN
+                              ? NativeRawFvfAssembly::TriangleFan
+                              : NativeRawFvfAssembly::TriangleList}
                 : NativeRawFvfClipSpan{});
     }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);

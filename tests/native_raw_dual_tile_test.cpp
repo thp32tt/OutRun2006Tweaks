@@ -231,6 +231,57 @@ bool native_raw_fvf_clip_capture_regression() {
             3440, 1440, 512, 288, indexedRect, 0u, indexedGpu) ||
         indexedGpu.first.x < 2500u)
         return false;
+
+    // Real menu and vehicle geometry may include fully offscreen and
+    // depth-clipped D3D11 triangles in the SAME IA draw. Their vertices
+    // must not drag a 512x288 source GPU tile away from visible right HUD.
+    constexpr std::array<std::array<float,4>, 9> clippedMenu{{
+        {{-20.f, 0.0f, 0.5f,1.f}}, {{-19.f,0.5f,0.5f,1.f}},
+        {{-19.f,-0.5f,0.5f,1.f}}, // fully left-clipped
+        {{-0.9f,-0.7f,-2.f,1.f}}, {{-0.8f,-0.7f,-2.f,1.f}},
+        {{-0.8f,-0.6f,-2.f,1.f}}, // fully near-plane clipped
+        {{0.78f,0.25f,0.5f,1.f}}, {{0.95f,0.25f,0.5f,1.f}},
+        {{0.90f,0.52f,0.5f,1.f}}
+    }};
+    NativeRawDrawExtent clippedRect{};
+    if (!native_raw_fvf_projected_raster(
+            {clippedMenu.data(),sizeof(clippedMenu[0]),clippedMenu.size()},
+            0,0,3440,1440,clippedRect) ||
+        clippedRect.left != indexedRect.left ||
+        clippedRect.right != indexedRect.right ||
+        clippedRect.top != indexedRect.top ||
+        clippedRect.bottom != indexedRect.bottom)
+        return false;
+    // Cross the right clip plane: a genuine partly visible triangle
+    // survives while its offscreen corner cannot widen capture beyond RT.
+    auto crossing = verts;
+    crossing[1][0] = 20.0f;
+    if (!native_raw_fvf_projected_raster(
+            {crossing.data(), sizeof(crossing[0]), crossing.size()},
+            0,0,3440,1440,clippedRect) ||
+        clippedRect.left < 3000 || clippedRect.right > 3442)
+        return false;
+    // Triangle strip and triangle fan must follow actual GPU IA assembly.
+    // A far out-of-frustum tail must not inflate the visible first tri.
+    constexpr std::array<std::array<float,4>,4> stripVerts{{
+        {{0.78f,0.25f,0.5f,1.f}}, {{0.95f,0.25f,0.5f,1.f}},
+        {{0.90f,0.52f,0.5f,1.f}}, {{20.f,0.5f,0.5f,1.f}}
+    }};
+    for (auto assembly : {NativeRawFvfAssembly::TriangleStrip,
+                          NativeRawFvfAssembly::TriangleFan}) {
+        if (!native_raw_fvf_projected_raster(
+                {stripVerts.data(),sizeof(stripVerts[0]),stripVerts.size(),
+                 nullptr,0u,assembly},0,0,3440,1440,clippedRect) ||
+            clippedRect.left < 3000 || clippedRect.right > 3442)
+            return false;
+    }
+    // Active malformed IA still fails closed, never dereferencing VB OOB.
+    const std::array<std::uint32_t,4> badStrip{{0u,1u,2u,99u}};
+    if (native_raw_fvf_projected_raster(
+            {stripVerts.data(),sizeof(stripVerts[0]),stripVerts.size(),
+             badStrip.data(),badStrip.size(),NativeRawFvfAssembly::TriangleStrip},
+            0,0,3440,1440,clippedRect))
+        return false;
     // Malformed/unknown IA always falls back to the original broad GPU
     // source viewport capture. No index may read outside the live VB.
     auto malformed = used;

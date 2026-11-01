@@ -1,9 +1,9 @@
 #pragma once
-// Select a real native fixed-function triangle's source GPU capture region
-// from the exact clip-space vertices sent to the D3D11 pass-through VS.
-// Sampling guidance ONLY: never substitutes for the live GPU RGB delta,
-// original game RT identity, Present visibility, fences or fallback.
+// Source-authentic FVF native GPU PRE/POST capture geometry.
+// This only guides bounded pixel sampling; source RT/Present identity,
+// D3D11 GPU RGB delta, fences and original D3D9 fallback remain authoritative.
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -11,19 +11,26 @@
 #include <limits>
 #include "native_game_raw_draw_tile.hpp"
 namespace outrun::vr::dx11 {
+enum class NativeRawFvfAssembly : std::uint8_t {
+    TriangleList, TriangleStrip, TriangleFan
+};
 struct NativeRawFvfClipSpan {
     const void* firstClip = nullptr;
     std::size_t vertexStride = 0u;
     std::size_t count = 0u;
-    // Optional original native IA DrawIndexed stream. Ignore unreferenced
-    // VB vertices (they never rasterize); malformed indices demote to
-    // conservative whole-viewport GPU capture rather than reading past VB.
+    // Original D3D11 IA index stream. Unused VB vertices must never
+    // influence genuine source-raster capture placement.
     const std::uint32_t* indices = nullptr;
     std::size_t indexCount = 0u;
+    NativeRawFvfAssembly assembly = NativeRawFvfAssembly::TriangleList;
 };
-// All vertices must have a finite positive W. A crossing/unknown clip W,
-// an unsupported primitive, or a suspicious viewport retains the original
-// full-viewport sampling schedule rather than risking a missing native pixel.
+// Clip each real assembled triangle against the SAME D3D11 clip volume
+// (x,y in [-w,w], z in [0,w]) instead of bounding all raw IA vertices,
+// including wholly offscreen/depth-clipped and degenerate geometry.
+// Partial diagnostic output is still sampled from the actual GPU texture;
+// no CPU polygon can substitute for the native pixel/RT/Present proof.
+// Unknown W, malformed IA, excessive geometry or unknown raster conditions
+// revert to the existing full-viewport GPU source-sampling path.
 [[nodiscard]] inline bool native_raw_fvf_projected_raster(
     NativeRawFvfClipSpan source,
     float viewportX, float viewportY, float viewportW, float viewportH,
@@ -41,32 +48,110 @@ struct NativeRawFvfClipSpan {
         (source.indices && (source.indexCount < 3u ||
                             source.indexCount > 1048576u)))
         return false;
+    const auto activeCount = source.indices ? source.indexCount : source.count;
+    const auto triangles = source.assembly == NativeRawFvfAssembly::TriangleList
+        ? activeCount / 3u : activeCount - 2u;
+    // Bounded diagnostic CPU geometry work; a very large genuine draw
+    // always keeps the original viewport GPU-capture schedule.
+    if (triangles == 0u || triangles > 8192u) return false;
+    struct Point { double x, y, z; };
     const auto* bytes = static_cast<const std::uint8_t*>(source.firstClip);
+    const auto plane_distance = [](Point p, int plane) noexcept {
+        switch (plane) {
+        case 0: return p.x + 1.0;
+        case 1: return 1.0 - p.x;
+        case 2: return p.y + 1.0;
+        case 3: return 1.0 - p.y;
+        case 4: return p.z;
+        default: return 1.0 - p.z;
+        }
+    };
     double minX = (std::numeric_limits<double>::max)();
     double minY = minX;
     double maxX = -(std::numeric_limits<double>::max)();
     double maxY = maxX;
-    const auto activeCount = source.indices ? source.indexCount : source.count;
-    for (std::size_t i = 0u; i < activeCount; ++i) {
-        const auto vertex = source.indices
-            ? static_cast<std::size_t>(source.indices[i]) : i;
-        // Do not read malformed IA indices. The GPU original Draw remains
-        // authoritative and the caller keeps its full-viewport sampling.
-        if (vertex >= source.count) return false;
-        float clip[4]{};
-        std::memcpy(clip, bytes + vertex * source.vertexStride, sizeof(clip));
-        if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
-            !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
-            clip[3] <= 0.00001f) return false;
-        const double x = double{clip[0]} / clip[3];
-        const double y = double{clip[1]} / clip[3];
-        if (!std::isfinite(x) || !std::isfinite(y)) return false;
-        minX = (std::min)(minX, x); maxX = (std::max)(maxX, x);
-        minY = (std::min)(minY, y); maxY = (std::max)(maxY, y);
+    bool anyVisible = false;
+    for (std::size_t triangle = 0u; triangle < triangles; ++triangle) {
+        std::array<Point, 12u> polygon{}, clipped{};
+        for (std::size_t corner = 0u; corner < 3u; ++corner) {
+            const auto element =
+                source.assembly == NativeRawFvfAssembly::TriangleList
+                    ? triangle * 3u + corner
+                    : source.assembly == NativeRawFvfAssembly::TriangleStrip
+                        ? triangle + corner
+                        : corner == 0u ? 0u : triangle + corner;
+            const auto vertex = source.indices
+                ? static_cast<std::size_t>(source.indices[element]) : element;
+            if (vertex >= source.count) return false;
+            float clip[4]{};
+            std::memcpy(clip, bytes + vertex * source.vertexStride, sizeof(clip));
+            if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
+                !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
+                clip[3] <= 0.00001f) return false;
+            const double invW = 1.0 / static_cast<double>(clip[3]);
+            polygon[corner] = {static_cast<double>(clip[0]) * invW,
+                               static_cast<double>(clip[1]) * invW,
+                               static_cast<double>(clip[2]) * invW};
+            if (!std::isfinite(polygon[corner].x) ||
+                !std::isfinite(polygon[corner].y) ||
+                !std::isfinite(polygon[corner].z)) return false;
+        }
+        std::size_t polygonCount = 3u;
+        // Homogeneous triangle edges remain straight after perspective
+        // division for positive W. NDC half-plane clipping preserves their
+        // precise screen footprint without interpolating shader attributes.
+        for (int plane = 0; plane < 6 && polygonCount; ++plane) {
+            std::size_t nextCount = 0u;
+            auto previous = polygon[polygonCount - 1u];
+            auto previousDistance = plane_distance(previous, plane);
+            for (std::size_t i = 0u; i < polygonCount; ++i) {
+                const auto current = polygon[i];
+                const auto distance = plane_distance(current, plane);
+                const bool wasInside = previousDistance >= 0.0;
+                const bool isInside = distance >= 0.0;
+                if (wasInside != isInside) {
+                    const double divisor = previousDistance - distance;
+                    if (!std::isfinite(divisor) || divisor == 0.0 ||
+                        nextCount >= clipped.size()) return false;
+                    const double t = previousDistance / divisor;
+                    clipped[nextCount++] = {
+                        previous.x + t * (current.x - previous.x),
+                        previous.y + t * (current.y - previous.y),
+                        previous.z + t * (current.z - previous.z)};
+                }
+                if (isInside) {
+                    if (nextCount >= clipped.size()) return false;
+                    clipped[nextCount++] = current;
+                }
+                previous = current;
+                previousDistance = distance;
+            }
+            polygonCount = nextCount;
+            polygon = clipped;
+        }
+        if (polygonCount < 3u) continue;
+        // A point or zero-area edge cannot color an RGB sample as a solid
+        // triangle. It must not inflate a distant legitimate menu raster.
+        double area = 0.0;
+        for (std::size_t i = 0u; i < polygonCount; ++i) {
+            const auto& a = polygon[i];
+            const auto& b = polygon[(i + 1u) % polygonCount];
+            area += a.x * b.y - b.x * a.y;
+        }
+        if (!std::isfinite(area)) return false;
+        if (std::abs(area) <= 1.0e-12) continue;
+        anyVisible = true;
+        for (std::size_t i = 0u; i < polygonCount; ++i) {
+            const auto& p = polygon[i];
+            minX = (std::min)(minX, p.x);
+            minY = (std::min)(minY, p.y);
+            maxX = (std::max)(maxX, p.x);
+            maxY = (std::max)(maxY, p.y);
+        }
     }
-    // 2px outward safety margin covers D3D9/D3D11 pixel-center rounding
-    // and conservative triangle-edge rasterization. Source scissor/viewport
-    // intersections and GPU RGB-delta proof are independently required.
+    if (!anyVisible) return false; // retain viewport sampling for unknown pixels
+    // Outward two-pixel rounding keeps both D3D9 and D3D11 edge pixels
+    // eligible; caller independently intersects native viewport/scissor.
     constexpr double margin = 2.0;
     const double l = double{viewportX} + (minX + 1.0) * double{viewportW} * 0.5 - margin;
     const double r = double{viewportX} + (maxX + 1.0) * double{viewportW} * 0.5 + margin;

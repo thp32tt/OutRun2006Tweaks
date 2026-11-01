@@ -1214,7 +1214,8 @@ private:
         D3D11_RASTERIZER_DESC rasterDesc{};
         if (raster) raster->GetDesc(&rasterDesc);
         if (fvfClip.firstClip &&
-            (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID)) {
+            (!raster || (rasterDesc.FillMode == D3D11_FILL_SOLID &&
+                         rasterDesc.DepthClipEnable))) {
             NativeRawDrawExtent clipped{};
             if (native_raw_fvf_projected_raster(
                     fvfClip, view.TopLeftX, view.TopLeftY,
