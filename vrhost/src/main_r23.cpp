@@ -2369,6 +2369,54 @@ namespace
             uv.x + uv.w <= 1.00001f && uv.y + uv.h <= 1.00001f;
     }
 
+    // At MENU Present time, the copied desktop frame often precedes the
+    // newest Frame.v2 Present QPC. Its metadata must not be correlated with
+    // that older image, but the CURRENT game HWND is still authoritative for
+    // pixel geometry. Re-sample the live Win32 client rectangle on the same
+    // capture output instead of incorrectly treating the full 3440x1440
+    // desktop as the game window. This does not borrow a stale frame HWND.
+    bool R23LiveGameWindowUv(const StereoCompositor& c,
+        UvRect& uv, RECT& outputRelativeRect) noexcept
+    {
+        uv = {};
+        outputRelativeRect = {};
+        if (!c.gamePid_ || !c.sourceWidth_ || !c.sourceHeight_)
+            return false;
+        const HWND hwnd = c.hwnd_;
+        DWORD ownerPid = 0;
+        if (!hwnd || !IsWindow(hwnd) ||
+            !GetWindowThreadProcessId(hwnd, &ownerPid) ||
+            ownerPid != c.gamePid_)
+            return false;
+        RECT client{};
+        if (!GetClientRect(hwnd, &client) ||
+            client.right <= client.left || client.bottom <= client.top)
+            return false;
+        POINT tl{client.left, client.top};
+        POINT br{client.right, client.bottom};
+        if (!ClientToScreen(hwnd, &tl) || !ClientToScreen(hwnd, &br))
+            return false;
+        const std::int64_t left =
+            static_cast<std::int64_t>(tl.x) - c.outputDesktop_.left;
+        const std::int64_t top =
+            static_cast<std::int64_t>(tl.y) - c.outputDesktop_.top;
+        const std::int64_t right =
+            static_cast<std::int64_t>(br.x) - c.outputDesktop_.left;
+        const std::int64_t bottom =
+            static_cast<std::int64_t>(br.y) - c.outputDesktop_.top;
+        const auto clipped = OutRunVrMenuCapture::ClipClient(
+            left, top, right, bottom, c.sourceWidth_, c.sourceHeight_);
+        // Partial and cross-monitor HWNDs must not convert an arbitrary
+        // desktop slice into a full stretched LOCAL menu quad.
+        if (!clipped.fullyVisible)
+            return false;
+        uv = {clipped.x, clipped.y, clipped.width, clipped.height};
+        outputRelativeRect = {
+            static_cast<LONG>(left), static_cast<LONG>(top),
+            static_cast<LONG>(right), static_cast<LONG>(bottom)};
+        return uv.w > 0.f && uv.h > 0.f;
+    }
+
     bool R23TheaterFrameMatchesCapture(
         const StereoCompositor& c,
         const OutRunVR::SharedRenderFrameState& frame) noexcept
@@ -2461,6 +2509,51 @@ namespace
                 }
             }
         }
+        // The game publishes 440,0..3000,1440, but a QPC-missed
+        // capture reported 0,0..3440,1440 in the 2026-11-01 Quest trace.
+        // Re-read the actual HWND of the same game PID for these frames.
+        // Do not use a future Present receipt to authorize pixel identity.
+        bool liveMirrorApplied = false;
+        if (!sourceIsSbs && !publishedMirrorApplied)
+        {
+            UvRect liveUv{};
+            RECT liveRect{};
+            if (R23LiveGameWindowUv(c, liveUv, liveRect))
+            {
+                theaterUv = liveUv;
+                capturedTheaterClient = liveRect;
+                capturedTheaterFullyVisible = true;
+                publishedMirrorApplied = true;
+                liveMirrorApplied = true;
+                publishedMirrorAspect =
+                    static_cast<float>(liveRect.right - liveRect.left) /
+                    static_cast<float>(liveRect.bottom - liveRect.top);
+                static std::uint64_t liveWindowHits = 0;
+                const auto hit = ++liveWindowHits;
+                if (hit <= 32 || (hit & (hit - 1)) == 0)
+                {
+                    std::ostringstream trace;
+                    trace << "[VR TRACE MENU LIVE HWND RECT FULL]"
+                        << " hit=" << hit
+                        << " state=" << clientGameState
+                        << " pid=" << c.gamePid_
+                        << " client=" << liveRect.left << ',' << liveRect.top
+                        << ',' << liveRect.right << ',' << liveRect.bottom
+                        << " uv=" << liveUv.x << ',' << liveUv.y
+                        << ',' << liveUv.w << ',' << liveUv.h
+                        << " authority=CURRENT_SAME_PID_WIN32_CLIENT_RECT"
+                        << "\\n";
+                    OutRunVrEmitFullTrace(trace.str());
+                }
+            }
+            else if (clientGameState != 0xFFFFFFFFu)
+            {
+                // An unknown MENU HWND is not authority to render the
+                // whole desktop. Skip this frame rather than alternate
+                // between 4:3 menu and a stretched desktop capture.
+                return false;
+            }
+        }
         bool authoredFourThreeApplied = false;
         if (!sourceIsSbs && publishedMirrorApplied &&
             (clientGameState == 0x04u || clientGameState == 0x09u))
@@ -2511,7 +2604,7 @@ namespace
         // This is not a 4:3 crop: the entire 16:9 logical selector/menu canvas
         // remains present.
         const bool mirrorBackbufferExtentValid =
-            mirrorFrame &&
+            mirrorFrame && mirrorFrame->clientPid == c.gamePid_ &&
             mirrorFrame->backbufferWidth >= 640u &&
             mirrorFrame->backbufferHeight >= 480u &&
             mirrorFrame->backbufferWidth <= 8192u &&
@@ -2605,6 +2698,7 @@ namespace
                 trace << "[VR TRACE SUMO THEATER SOURCE DECISION FULL]"
                     << " hit=" << hit
                     << " publishedMirror=" << (publishedMirrorApplied ? 1 : 0)
+                    << " liveHwnd=" << (liveMirrorApplied ? 1 : 0)
                     << " recentPhysical=" << (recentSumoPhysicalSource ? 1 : 0)
                     << " gamePid=" << c.gamePid_
                     << " framePid=" << (mirrorFrame ? mirrorFrame->clientPid : 0u)
