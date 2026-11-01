@@ -2681,6 +2681,14 @@ namespace OutRunVRStereo
             float projectedBaseY = 0.0f;
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
+            // Exact 418CF0 fast-state proof. SetRenderTarget(0) resets the
+            // viewport to the full new target automatically; when the source
+            // viewport is already that full target, explicit right/restore
+            // SetViewport calls are redundant. If both Z and stencil tests are
+            // disabled, the matching LEFT depth surface may remain bound while
+            // drawing the RIGHT color target, avoiding two more state binds.
+            bool fullTargetViewport = false;
+            bool depthStencilUnused = false;
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
             bool worldEvidenceAuthoritative = false;
@@ -2843,11 +2851,24 @@ namespace OutRunVRStereo
                 !std::isfinite(state.viewport.MaxZ) ||
                 state.viewport.MaxZ <= state.viewport.MinZ)
                 return reject(R30XyzrhwPrepareReject::ViewportInvalid);
+            state.fullTargetViewport =
+                state.viewport.X == 0u && state.viewport.Y == 0u &&
+                state.viewport.Width == BackBufferDesc.Width &&
+                state.viewport.Height == BackBufferDesc.Height &&
+                std::fabs(state.viewport.MinZ) <= 1.0e-6f &&
+                std::fabs(state.viewport.MaxZ - 1.0f) <= 1.0e-6f;
 
             DWORD zEnable = D3DZB_FALSE;
             if (!ReadTrackedRenderState(device, D3DRS_ZENABLE, zEnable))
                 return reject(R30XyzrhwPrepareReject::ZStateReadFailed);
             state.depthTestEnabled = zEnable != D3DZB_FALSE;
+            DWORD stencilEnable = FALSE;
+            const bool stencilKnown =
+                ReadTrackedRenderState(
+                    device, D3DRS_STENCILENABLE, stencilEnable);
+            state.depthStencilUnused =
+                !state.depthTestEnabled && stencilKnown &&
+                stencilEnable == FALSE;
 
             if (!OutRunVRRenderer::GetLatchedStereoFrame(state.stereo))
                 return reject(R30XyzrhwPrepareReject::StereoFrameUnavailable);
@@ -4831,6 +4852,27 @@ namespace OutRunVRStereo
 
             IDirect3DSurface9* savedRt = TrackedRenderTarget;
             IDirect3DSurface9* savedDepth = TrackedDepthStencil;
+            // Exact retail 418CF0 particles can issue thousands of tiny
+            // transparent DPUPs. Avoid redundant D3D9 state traffic only when
+            // source ownership and state make the omitted binds provably inert.
+            const bool particleFastRoute =
+                state.worldEffect && state.gameProjectedWorldSourceCanvas;
+            const bool particleViewportFast =
+                particleFastRoute && state.fullTargetViewport;
+            const bool particleDepthFast =
+                particleFastRoute && state.depthStencilUnused;
+            if ((particleViewportFast || particleDepthFast) &&
+                Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> particleFastHits{0};
+                const auto hit = particleFastHits.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (hit == 1)
+                    spdlog::info(
+                        "VR R30 PARTICLE STATE FASTPATH: exact 418CF0 viewportSkip={} depthBindSkip={} quality=UNCHANGED",
+                        particleViewportFast ? 1 : 0,
+                        particleDepthFast ? 1 : 0);
+            }
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -4843,14 +4885,19 @@ namespace OutRunVRStereo
                     trace->rightTargetHr = rightHr;
                 if (SUCCEEDED(rightHr))
                 {
-                    rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
-                        device, TrackedDepthStencil ? RightEyeDepth : nullptr);
+                    if (!particleDepthFast)
+                        rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+                            device, TrackedDepthStencil ? RightEyeDepth : nullptr);
                     if (trace)
                         trace->rightDepthHr = rightHr;
                 }
                 if (SUCCEEDED(rightHr))
                 {
-                    rightHr = device->SetViewport(&state.viewport);
+                    // SetRenderTarget(0) already resets to the full target
+                    // viewport. Exact 418CF0 uses that full viewport, so the
+                    // explicit setter is unnecessary in the particle storm.
+                    if (!particleViewportFast)
+                        rightHr = device->SetViewport(&state.viewport);
                     if (trace)
                         trace->rightViewportHr = rightHr;
                 }
@@ -4860,8 +4907,35 @@ namespace OutRunVRStereo
                         OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = rightDraw();
                 }
-                restoreOk = RestoreRightPassState(device,
-                    savedRt, savedDepth, state.viewport, nullptr, false);
+                if (particleViewportFast || particleDepthFast)
+                {
+                    // Mirror RestoreRightPassState, but omit only the state
+                    // which is already correct by the exact fast-route proof.
+                    restoreOk = true;
+                    if (savedRt && FAILED(SetRenderTargetHook.stdcall<HRESULT>(
+                            device, 0u, savedRt)))
+                        restoreOk = false;
+                    if (!particleDepthFast)
+                    {
+                        const HRESULT depthHr =
+                            SetDepthStencilSurfaceHook
+                            ? SetDepthStencilSurfaceHook.stdcall<HRESULT>(
+                                device, savedDepth)
+                            : device->SetDepthStencilSurface(savedDepth);
+                        if (FAILED(depthHr))
+                            restoreOk = false;
+                    }
+                    // Restoring RT0 resets to the full saved target viewport,
+                    // which is exactly state.viewport under particleViewportFast.
+                    if (!particleViewportFast &&
+                        FAILED(device->SetViewport(&state.viewport)))
+                        restoreOk = false;
+                }
+                else
+                {
+                    restoreOk = RestoreRightPassState(device,
+                        savedRt, savedDepth, state.viewport, nullptr, false);
+                }
             }
             if (trace)
             {

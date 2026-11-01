@@ -146,3 +146,36 @@ assert "state.gameProjectedWorldSourceCanvas" in stereo_fn
 assert "read4(source, src);" in stereo_fn
 assert "read4(left.data(), l);" in stereo_fn
 assert "read4(right.data(), r);" in stereo_fn
+
+# Exact 418CF0 state-switch fastpath: quality is unchanged; it only removes
+# state setters that D3D9 RT0 switching or disabled depth/stencil already make
+# redundant. Generic HUD/world routes must remain on the normal restore path.
+for token in (
+    "bool fullTargetViewport = false;",
+    "bool depthStencilUnused = false;",
+    "state.viewport.Width == BackBufferDesc.Width",
+    "ReadTrackedRenderState(\n                    device, D3DRS_STENCILENABLE, stencilEnable);",
+    "const bool particleFastRoute =",
+    "state.worldEffect && state.gameProjectedWorldSourceCanvas;",
+    "const bool particleViewportFast =",
+    "particleFastRoute && state.fullTargetViewport;",
+    "const bool particleDepthFast =",
+    "particleFastRoute && state.depthStencilUnused;",
+    "if (!particleDepthFast)",
+    "if (!particleViewportFast)",
+    "VR R30 PARTICLE STATE FASTPATH:",
+    "quality=UNCHANGED",
+):
+    assert token in SRC, token
+
+execute = SRC[SRC.index("HRESULT R30ExecuteXyzrhwStereo("):
+              SRC.index("HRESULT R30TryXyzrhwPrimitiveUP(")]
+assert execute.index("const bool particleFastRoute =") < execute.index(
+    "SetRenderTargetHook.stdcall<HRESULT>(")
+assert execute.index("if (!particleDepthFast)") < execute.index(
+    "SetDepthStencilSurfaceHook.stdcall<HRESULT>(")
+assert execute.index("if (!particleViewportFast)") < execute.index(
+    "device->SetViewport(&state.viewport)")
+assert "RestoreRightPassState(device,\n                        savedRt, savedDepth, state.viewport, nullptr, false);" in execute
+assert "if (particleViewportFast || particleDepthFast)" in execute
+print("PASS exact 418CF0 fast-state route skips only redundant viewport/depth binds; visual particle count/blend/geometry unchanged")
