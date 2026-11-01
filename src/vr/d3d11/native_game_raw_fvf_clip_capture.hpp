@@ -143,10 +143,16 @@ struct NativeRawFvfClipSpan {
         anyVisible = true;
         for (std::size_t i = 0u; i < polygonCount; ++i) {
             const auto& p = polygon[i];
-            minX = (std::min)(minX, p.x);
-            minY = (std::min)(minY, p.y);
-            maxX = (std::max)(maxX, p.x);
-            maxY = (std::max)(maxY, p.y);
+            // A clipped plane intersection can land a few ULP beyond
+            // +/-1 in floating point. Keep the 2px safety margin but
+            // never let ceil/floor grow a source tile by a third pixel
+            // outside the actual D3D11 clip volume on different CPUs.
+            const double x = (std::min)(1.0, (std::max)(-1.0, p.x));
+            const double y = (std::min)(1.0, (std::max)(-1.0, p.y));
+            minX = (std::min)(minX, x);
+            minY = (std::min)(minY, y);
+            maxX = (std::max)(maxX, x);
+            maxY = (std::max)(maxY, y);
         }
     }
     if (!anyVisible) return false; // retain viewport sampling for unknown pixels
