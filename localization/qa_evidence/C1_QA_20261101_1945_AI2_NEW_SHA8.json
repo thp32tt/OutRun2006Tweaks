@@ -1,0 +1,558 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261101T1945KST-NEW-SHA8",
+  "reviewed_at_kst": "2026-11-01T19:48:04+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "N100 저장 후보 PNG 8개를 독립 검수. source/input/output/export SHA256 대조, 네이티브 ROI 비율 축소 및 50% 시각 판독, RGBA 투명도와 경계 알파·승인 한글·잔상·기울기·효과를 확인. 같은 후보 SHA 재검수 배제.",
+  "prior_reviewed_sha_count": 936,
+  "total_pending_before_selection": 20,
+  "results": {
+    "new_sha": 8,
+    "pass": 8,
+    "fail": 0,
+    "hold": 0,
+    "A": 4,
+    "B": 4,
+    "remaining_at_inventory": 12
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0148-361E31C9",
+      "id": "Q049_8aea01d250190d2b",
+      "english": "Strike!",
+      "korean": "스트라이크!",
+      "candidate_file": "Q049_8aea01d250190d2b_k.png",
+      "candidate_sha256": "39edfdada24ad169eb56b5433c687be75e3f292fdf719177b9105dce39b4928b",
+      "export_sha256": "39edfdada24ad169eb56b5433c687be75e3f292fdf719177b9105dce39b4928b",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "ea838bd2f514d2b07faab761cd7f19ceb11fb5662b23e0cb9473efc12ce520c9",
+      "manifest_source_sha256": "ea838bd2f514d2b07faab761cd7f19ceb11fb5662b23e0cb9473efc12ce520c9",
+      "manifest_imagegen_input_sha256": "ea838bd2f514d2b07faab761cd7f19ceb11fb5662b23e0cb9473efc12ce520c9",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        542,
+        396,
+        966,
+        520
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        117,
+        27,
+        2108,
+        700
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        372,
+        124
+      ],
+      "half_fit": [
+        186,
+        62
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "원본 Strike! 계열의 황색·남색 외곽효과와 유사. '스트라이크!' 전체 음절, 받침, 느낌표 가독성 확인. native/50%에서 실질 잘림 없음."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0150-95397B5B",
+      "id": "Q173_096f6d8630fb5096",
+      "english": "ICE SCAPE",
+      "korean": "아이스스케이프",
+      "candidate_file": "Q173_096f6d8630fb5096_k.png",
+      "candidate_sha256": "868c0d23779c368fe6f6542fb7e633a28bdfe5f6bc6064c0ee38ac91200c0a18",
+      "export_sha256": "868c0d23779c368fe6f6542fb7e633a28bdfe5f6bc6064c0ee38ac91200c0a18",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "manifest_source_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "manifest_imagegen_input_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        0,
+        1184,
+        475,
+        1276
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        83,
+        2149,
+        628
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        276,
+        92
+      ],
+      "half_fit": [
+        138,
+        46
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "ICE SCAPE → 아이스스케이프: 짙은 회색 단색 레이어, 글자별 획·받침 판독. 어두운 원본 계열과 유사하며 영문 잔상·불필요 배경 없음. 초저강도 좌측 알파는 있으나 alpha>=32 경계 0."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0151-09A8CEC5",
+      "id": "Q173_da8ec03645ac649f",
+      "english": "SKYSCRAPERS",
+      "korean": "스카이스크레이퍼스",
+      "candidate_file": "Q173_da8ec03645ac649f_k.png",
+      "candidate_sha256": "e1ba782bde0b2fa9d491770e7349ff75808d2587f72ab58f904f2399c4c6c3c5",
+      "export_sha256": "e1ba782bde0b2fa9d491770e7349ff75808d2587f72ab58f904f2399c4c6c3c5",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "manifest_source_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "manifest_imagegen_input_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        0,
+        1760,
+        648,
+        1850
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        17,
+        65,
+        2159,
+        637
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        270,
+        90
+      ],
+      "half_fit": [
+        135,
+        45
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "SKYSCRAPERS → 스카이스크레이퍼스: 긴 승인 한글 50% 판독 가능. 문장 전체 폭 차이만으로 반려하지 않음. 외곽선/음영 약간 차이는 치명 결함 아님."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0152-3D2E453E",
+      "id": "Q201_70b80e4307a54926",
+      "english": "CANYON",
+      "korean": "캐니언",
+      "candidate_file": "Q201_70b80e4307a54926_k.png",
+      "candidate_sha256": "23f3418f4097057f8a8fa16ef86c21791c6cd378889b546c43662a07621d41b9",
+      "export_sha256": "23f3418f4097057f8a8fa16ef86c21791c6cd378889b546c43662a07621d41b9",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "manifest_source_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "manifest_imagegen_input_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        600,
+        675,
+        1055,
+        782
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        8,
+        2124,
+        700
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        321,
+        107
+      ],
+      "half_fit": [
+        160,
+        53
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "CANYON → 캐니언: 음절 모두 판독, 밝은 문자와 파란 계열 하단 음영. alpha bbox 좌측 0의 미세 투명 픽셀은 강한 경계 알파 0 및 가시적 잘림 없음."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0148-DA5F9E0A",
+      "id": "Q054_776a0e04038be7f0",
+      "english": "Match the total!",
+      "korean": "합계를 맞히세요!",
+      "candidate_file": "Q054_776a0e04038be7f0_k.png",
+      "candidate_sha256": "618d10ebe789e85fe212484cdcb68bb98e1eed1becb07b2c75b32b253abb3a2e",
+      "export_sha256": "618d10ebe789e85fe212484cdcb68bb98e1eed1becb07b2c75b32b253abb3a2e",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "70d581cf5d0a70b2dd0036d61a51110ba1e3fc39b9088c3bc5cdd3847ea7943b",
+      "manifest_source_sha256": "70d581cf5d0a70b2dd0036d61a51110ba1e3fc39b9088c3bc5cdd3847ea7943b",
+      "manifest_imagegen_input_sha256": "70d581cf5d0a70b2dd0036d61a51110ba1e3fc39b9088c3bc5cdd3847ea7943b",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        118,
+        42,
+        638,
+        116
+      ],
+      "source_size": [
+        4096,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        99,
+        21,
+        2156,
+        724
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        222,
+        74
+      ],
+      "half_fit": [
+        111,
+        37
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Match the total! → 합계를 맞히세요!: 정확한 한글과 종결 !, 노란 글자+어두운 외곽. 원문보다 폭은 짧지만 개별 글자 충분히 선명. 바닥 저알파 터치 있으나 alpha>=32 경계 0."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0152-D8A8CECA",
+      "id": "Q048_0ce66f077a5751c5",
+      "english": "Slipstream",
+      "korean": "슬립스트림",
+      "candidate_file": "Q048_0ce66f077a5751c5_k.png",
+      "candidate_sha256": "953d5837ebec81f69c833890ac7d3fd1db8403bc5f686383e973cccd5bacdeb7",
+      "export_sha256": "953d5837ebec81f69c833890ac7d3fd1db8403bc5f686383e973cccd5bacdeb7",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "f2d969801361f1ceba5e9861bb1c3fb6d7d061cb01f0586d2c5d055844019c0b",
+      "manifest_source_sha256": "f2d969801361f1ceba5e9861bb1c3fb6d7d061cb01f0586d2c5d055844019c0b",
+      "manifest_imagegen_input_sha256": "f2d969801361f1ceba5e9861bb1c3fb6d7d061cb01f0586d2c5d055844019c0b",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        948,
+        1715,
+        1318,
+        1850
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2020,
+        779
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        113,
+        20,
+        1874,
+        763
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        350,
+        135
+      ],
+      "half_fit": [
+        175,
+        67
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Slipstream → 슬립스트림: 철자 정확, 흰색/청색 발광 윤곽 계열 보존, native 및 50% 가독. 다른 레이블/보호 아트 포함 없음."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0154-93AC2813",
+      "id": "Q173_861eef7d0bd821b2",
+      "english": "GIANT STATUES",
+      "korean": "자이언트 스태추스",
+      "candidate_file": "Q173_861eef7d0bd821b2_k.png",
+      "candidate_sha256": "1ceadc56f23ce9c4df9b835a7c4caf72a2b56cafa6da4ae46fa31e84407d8f20",
+      "export_sha256": "1ceadc56f23ce9c4df9b835a7c4caf72a2b56cafa6da4ae46fa31e84407d8f20",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "manifest_source_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "manifest_imagegen_input_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        0,
+        1088,
+        698,
+        1179
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        33,
+        68,
+        2141,
+        678
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        273,
+        91
+      ],
+      "half_fit": [
+        136,
+        45
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "GIANT STATUES → 자이언트 스태추스: 띄어쓰기 및 모든 음절 확인. 어두운 회색 원본 계열, 다소 진한 외곽효과는 간이 QA에서 치명적 오염 아님."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0155-40C05C92",
+      "id": "Q173_e1919089d76eeeac",
+      "english": "CASINO TOWN",
+      "korean": "카지노 타운",
+      "candidate_file": "Q173_e1919089d76eeeac_k.png",
+      "candidate_sha256": "6363899003e2c431b130d89627ec55123fe184fe50528fab2cc273b2563c2bd7",
+      "export_sha256": "6363899003e2c431b130d89627ec55123fe184fe50528fab2cc273b2563c2bd7",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "manifest_source_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "manifest_imagegen_input_sha256": "47b083769716219762a70f83e4c1a19ad7e8ce7a05a4f4d4a17f4b5384e6ae7e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        0,
+        900,
+        620,
+        990
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        35,
+        35,
+        2090,
+        708
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        270,
+        90
+      ],
+      "half_fit": [
+        135,
+        45
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "PASS_ASPECT_FIT_WITHIN_ROI_PREVIEW_ONLY",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "CASINO TOWN → 카지노 타운: 승인 매핑과 띄어쓰기 정확, 실제 획·받침 판독. 원문 단색·기울기 계열 대체, 다른 아트 포함 없음."
+    }
+  ],
+  "limit_scope": "C1 layer-only. No producer queue consumption, ImageGen call, C2/C3 authority, DDS/game deployment, or live composite check.",
+  "producer_export_note": "REWORK_DIMENSIONS 및 OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED 원천 상태는 변경하지 않음; C1의 독립 레이어 판정은 생산자 정식 완료·실게임 배포 승인이 아님."
+}
