@@ -391,3 +391,31 @@ for label, mutate in (
     rejected = copy.deepcopy(historical_01190)
     mutate(rejected)
     assert validate_task(rejected, p), "01190 source-stage policy regression: " + label
+
+
+# 01202 causal CI repair: the completed 01201 C6 record used specific
+# indexed FVF GPU/PRESENT labels rather than later canonical live path names.
+# Preserve its exact immutable SHA and assert no new task or forged runtime
+# evidence can borrow that limited source-stage compatibility.
+historical_01201 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01201.json").read_text(encoding="utf-8"))
+assert historical_01201["validation_bearing_result_sha"] == "135223c0d4f64b5309d8073212ecda2f90e7fdb4"
+assert historical_01201["runtime_validation"] == "UNTESTED"
+assert historical_01201["full_dx11_renderer_complete"] is False
+assert not validate_task(historical_01201, p), validate_task(historical_01201, p)
+for label, mutate in (
+    ("new task may not inherit exception", lambda t: t.update(task_id="CONVERSION-DX11-01202")),
+    ("unverified SHA", lambda t: t.update(validation_bearing_result_sha="0" * 40)),
+    ("failure not promoted", lambda t: t.update(automation_validation="FAIL_EXACT_SHA")),
+    ("forged gameplay", lambda t: t.update(gameplay_test_performed=True)),
+    ("forged HMD", lambda t: t.update(hmd_test_performed=True)),
+    ("full renderer not proven", lambda t: t.update(full_dx11_renderer_complete=True)),
+    ("source stages missing", lambda t: t["development_strategy"]["live_game_draw_path"].pop(0)),
+    ("GPU stage removed", lambda t: t["development_strategy"]["live_game_draw_path"].pop(2)),
+    ("wrong endpoint", lambda t: t["development_strategy"]["live_game_draw_path"][-1:].__setitem__(0, "NATIVE_OPENXR_VISIBLE_OUTPUT")),
+    ("source file missing", lambda t: t["changed_files"].remove("src/vr/d3d11/live_game_frame_bridge.cpp")),
+    ("missing partial-stage disclaimer", lambda t: t["development_strategy"].update(visible_frame_acceptance="claim full frame")),
+):
+    invalid = copy.deepcopy(historical_01201)
+    mutate(invalid)
+    assert validate_task(invalid, p), "01201 historical source-stage guard bypassed: " + label

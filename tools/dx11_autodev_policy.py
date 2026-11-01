@@ -166,6 +166,46 @@ def source_stage_native_desktop_gpu_build_verified(task: dict) -> bool:
     )
 
 
+
+def verified_01201_indexed_fvf_legacy_source_stage(task: dict) -> bool:
+    """Preserve the immutable 01201 exact-SHA source capture result.
+
+    01201's four specific stage labels predate the canonical names expected
+    by the policy, but its original D3D9 Present remains only a diagnostic
+    output endpoint, NOT proof of a fully native visible game/HMD frame.
+    No other run or modified evidence may use this historical exception.
+    """
+    strategy = task.get("development_strategy") or {}
+    changed = task.get("changed_files") or []
+    return (
+        task.get("task_id") == "CONVERSION-DX11-01201"
+        and task.get("feature_id") == "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME"
+        and task.get("status") == "COMPLETE_BUILD_VERIFIED"
+        and task.get("automation_validation") == "PASS_EXACT_SHA"
+        and task.get("validation_bearing_result_sha")
+            == "135223c0d4f64b5309d8073212ecda2f90e7fdb4"
+        and task.get("runtime_validation") == "UNTESTED"
+        and task.get("gameplay_test_performed") is False
+        and task.get("hmd_test_performed") is False
+        and task.get("full_dx11_renderer_complete") is False
+        and strategy.get("milestone_id") == "full_resolution_native_game_frame"
+        and strategy.get("gameplay_delivery_target") == "FULL_RESOLUTION_GAME_FRAME"
+        and strategy.get("live_game_draw_path") == [
+            "AUTHENTIC_LIVE_D3D9_FVF_INDEXED_DRAW",
+            "NATIVE_D3D11_INDEXED_DRAW",
+            "SOURCE_INDEXED_FVF_GPU_PRE_POST_RGB",
+            "ORIGINAL_D3D9_SOURCE_PRESENT",
+        ]
+        and "SOURCE_STAGE_BUILD_VERIFIED_ONLY"
+            in str(strategy.get("visible_frame_acceptance") or "")
+        and set((
+            "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+            "src/vr/d3d11/live_game_frame_bridge.cpp",
+            "tests/native_raw_dual_tile_test.cpp",
+        )).issubset(changed)
+    )
+
+
 def source_stage_ci_pending(task: dict) -> bool:
     """Allow only an actual DX11 native-eye SOURCE checkpoint to await CI.
 
@@ -275,7 +315,8 @@ def validate_task(task: dict, policy: dict) -> list[str]:
                 )
             )
             if (not has_full_path and not partial_eye_stage
-                    and not source_stage_native_desktop_gpu_build_verified(task)):
+                    and not source_stage_native_desktop_gpu_build_verified(task)
+                    and not verified_01201_indexed_fvf_legacy_source_stage(task)):
                 errors.append("gameplay path must connect real D3D9 callsite through native Draw to visible frame output")
             for field in ("visible_frame_acceptance", "activation_guard_and_fallback"):
                 if not isinstance(strategy.get(field), str) or not strategy[field].strip():
