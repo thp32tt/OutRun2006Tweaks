@@ -1,0 +1,48 @@
+name: QuestCockpitV2 Isolated Core Smoke
+
+on:
+  push:
+    branches: [ vr-quest-cockpit-v2 ]
+    paths:
+      - '.github/workflows/quest-cockpit-v2-core.yml'
+      - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
+      - 'tools/tests/quest_cockpit_v2_runtime_smoke.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/vr/settings.cpp'
+      - 'OutRun2006Tweaks.ini'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cpp17-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Build QuestCockpitV2 frame and matrix regression tests
+        run: |
+          c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            tools/tests/quest_cockpit_v2_runtime_smoke.cpp \
+            -o /tmp/quest-cockpit-v2-runtime
+          /tmp/quest-cockpit-v2-runtime
+      - name: Reject removed legacy hooks and unsafe defaults
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          hook=Path('src/hooks_graphics.cpp').read_text(encoding='utf-8')
+          settings=Path('src/vr/settings.cpp').read_text(encoding='utf-8')
+          ini=Path('OutRun2006Tweaks.ini').read_text(encoding='utf-8')
+          for forbidden in ['VRDriverSeatRenderTest','VRDriverSeatVehicleScaleRenderHook',
+                            'VRDriverSeatGlassMaterialProbe','VRDriverSeatCameraPose',
+                            'ApplyDriverSeatCameraOffset','DriverSeatCameraActive']:
+              assert forbidden not in hook, forbidden
+          assert 'QuestCockpitV2PlayerCandidateProbe' in hook
+          assert 'ComputeBodyCorrection(b0,f0,corrected)' in hook
+          assert 'DriverSeatView =' not in ini
+          assert 'VRDriverSeatView' not in settings
+          assert 'CockpitFrameProbe = false' in ini
+          print('QuestCockpitV2 isolated-core contract PASS')
+          PY

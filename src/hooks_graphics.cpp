@@ -8,12 +8,7 @@
 #include "vr/game/pmt_node_culling_contract.hpp"
 #include "vr_shared.hpp"
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
-#include "vr/game/driver_seat_camera_math.hpp"
-#include "vr/game/driver_seat_car_space.hpp"
-#include "vr/game/driver_seat_render_pass.hpp"
-#include "vr/game/driver_seat_vehicle_scale.hpp"
-#include "vr/game/driver_seat_occupant.hpp"
-#include "vr/game/cockpit_glass_material_probe.hpp"
+#include "vr/game/quest_cockpit_v2_runtime.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -51,19 +46,6 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-	extern Setting<bool> VRDriverSeatView;
-    extern Setting<bool> VRDriverSeatGlassMaterialTrace;
-    extern Setting<float> VRDriverSeatVehicleScale;
-    extern Setting<float> VRDriverSeatGlassOpacity;
-	extern Setting<bool> VRDriverSeatCarSpaceBasis;
-	extern Setting<int> VRDriverSeatNativeMode;
-	extern Setting<float> VRDriverSeatForward;
-	extern Setting<float> VRDriverSeatRight;
-	extern Setting<float> VRDriverSeatUp;
-	extern Setting<bool> VRDriverSeatFullCar;
-	extern Setting<bool> VRDriverSeatHideDriver;
-	extern Setting<int> VRDriverSeatDriverWorkId;
-	extern Setting<int> VRDriverSeatDriverChrset;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -165,395 +147,73 @@ public:
 };
 UseHiDefCharacters UseHiDefCharacters::instance;
 
-// Keep camera placement and the native car/occupant render pass eligible
-// under the same validated basis, following the standalone Quest's separation
-// of cockpit-active, vehicle and occupant rendering responsibilities.
-static bool VRDriverSeatGameplayActive() noexcept;
-
-// The last-valid camera pose belongs to one continuous DriverSeat session.
-// Track only the true enabled+gameplay boundary; never use native camera
-// mode/timer pulses, which previously caused cockpit/bumper oscillation.
-static thread_local bool VRDriverSeatPoseSessionActive = false;
-static thread_local std::uint64_t VRDriverSeatPoseSessionEpoch = 1;
-
-static void VRDriverSeatObservePoseSession(bool active) noexcept
+// Isolated V2 branch: retire every active legacy driver-seat detour.
+// Only the original player-car state call is observed, never modified.
+// The original Quest cockpit only permits mode 1 and a proven game-frame
+// owner; the latter is still UNOBSERVED on PC and must never be guessed.
+static bool IsPlayableCarGameplay() noexcept
 {
-    if (active == VRDriverSeatPoseSessionActive)
-        return;
-    VRDriverSeatPoseSessionActive = active;
-    if (!active)
-    {
-        if (++VRDriverSeatPoseSessionEpoch == 0)
-            ++VRDriverSeatPoseSessionEpoch;
-    }
-}
-
-static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
-    D3DVECTOR& translatedPosition, D3DVECTOR& translatedLook) noexcept
-{
-    if (!camera)
-        return false;
-    const auto* player = Game::pl_car();
-    if (!player)
-        return false;
-
-    const auto& m = player->matrix_B0;
-    const OutRunVR::DriverSeatCamera::CarAxes axes{
-        {m._31, m._32, m._33},
-        {m._21, m._22, m._23}
-    };
-    const auto& nativePos = camera->cam_pos_F8;
-    const auto& nativeLook = camera->look_pos_104;
-
-    // Runtime Quest3 evidence on 2026-10-22 proved the absolute car-origin
-    // anchor placed the eye deep inside the player model:
-    //   car origin=(3.5,0,-16) + offsets(-1.35,-0.32,+0.65)
-    //   -> seat=(2.15,0.65,-16.32)
-    // and the full vehicle then filled the HMD. The published settings have
-    // always described these offsets relative to the native bumper/in-car
-    // camera, not relative to matrix_B0 translation. Restore that contract.
-    //
-    // VRDriverSeatCarSpaceBasis still optionally uses the player-car axes for
-    // offset orientation, but the absolute anchor remains the native camera.
-    // If one interpolated pose is invalid, retain the last valid pair so the
-    // previous zoom-oscillation fix remains intact.
-    static thread_local bool hasLastValidPose = false;
-    static thread_local OutRunVR::DriverSeatCamera::Vec3 lastPosition{};
-    static thread_local OutRunVR::DriverSeatCamera::Vec3 lastLook{};
-    static thread_local const EVWORK_CAR* lastPlayer = nullptr;
-    static thread_local std::uint64_t lastPoseSessionEpoch = 0;
-
-    if (!VRDriverSeatGameplayActive() || player != lastPlayer ||
-        lastPoseSessionEpoch != VRDriverSeatPoseSessionEpoch)
-    {
-        hasLastValidPose = false;
-        lastPlayer = player;
-        lastPoseSessionEpoch = VRDriverSeatPoseSessionEpoch;
-    }
-
-    OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
-    bool usedCarSpace = false;
-    if (OutRunVR::DriverSeatCamera::ComputeStableSeatPose(
-            {nativePos.x, nativePos.y, nativePos.z},
-            {nativeLook.x, nativeLook.y, nativeLook.z},
-            Settings::VRDriverSeatCarSpaceBasis,
-            axes,
-            Settings::VRDriverSeatForward.get(),
-            Settings::VRDriverSeatRight.get(),
-            Settings::VRDriverSeatUp.get(),
-            newPos, newLook, &usedCarSpace))
-    {
-        lastPosition = newPos;
-        lastLook = newLook;
-        hasLastValidPose = true;
-    }
-    else if (hasLastValidPose)
-    {
-        newPos = lastPosition;
-        newLook = lastLook;
-    }
-    else
-    {
-        return false;
-    }
-
-    translatedPosition = {newPos.x, newPos.y, newPos.z};
-    translatedLook = {newLook.x, newLook.y, newLook.z};
-    return true;
-}
-
-// START includes cinematics; only progress 65 is the playable countdown.
-static bool VRDriverSeatGameplayActive() noexcept
-{
-    if (!Game::current_mode)
-        return false;
-    if (*Game::current_mode == STATE_GAME ||
-        *Game::current_mode == STATE_GOAL)
+    if (!Game::current_mode) return false;
+    if (*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL)
         return true;
     return *Game::current_mode == STATE_START &&
-        Game::game_start_progress_code &&
-        *Game::game_start_progress_code == 65;
+        Game::game_start_progress_code && *Game::game_start_progress_code == 65;
 }
 
-
-static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
+class QuestCockpitV2PlayerCandidateProbe final : public Hook
 {
-    const bool gameplayActive = VRDriverSeatGameplayActive();
-    const bool driverSeatEnabled =
-        Settings::VREnabled && Settings::VRDriverSeatView;
-    // Observe the session even when the later render-pass/camera gates reject.
-    // This closes the old stale-pose lifetime where the normal caller returned
-    // before VRDriverSeatCameraPose could clear its same-player cache.
-    VRDriverSeatObservePoseSession(driverSeatEnabled && gameplayActive);
-    if (!driverSeatEnabled || !gameplayActive)
-        return false;
-    if (!OutRunVR::DriverSeatRenderPass::IsWorldOrCockpitPass())
-        return false;
-    // A missing player vehicle has no seat geometry to render. Do not
-    // displace the camera, force a near plane, or hide any occupant.
-    if (!camera || !Game::pl_car())
-        return false;
-    // DriverSeatView owns the cockpit for the whole playable session.
-    // Do NOT use the game's native camera mode/timer/switch counters as an
-    // OFF switch: those values can change while the stock camera controller
-    // updates, which previously prevented entry or repeatedly bounced the
-    // view back to the native bumper camera.
-    if (!OutRunVR::DriverSeatCamera::PersistentDriverSeatSessionEligible(
-            driverSeatEnabled, gameplayActive))
-        return false;
+    static constexpr int PlayerCarRenderStateRva = 0x69764;
+    inline static SafetyHookMid PlayerCarHook{};
+    inline static std::uint64_t Count=0;
 
-    // Validate the seat pose itself, but camera-mode transitions no longer
-    // deactivate the cockpit. Use the same result for camera/body/driver/near.
-    D3DVECTOR correctedPosition{}, correctedLook{};
-    return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
-}
-
-class VRDriverSeatRenderTest : public Hook
-{
-	constexpr static int PlayerCarRenderState_HookAddr = 0x69764;
-	constexpr static int RobotDisplay_Addr = 0x114C10;
-
-	inline static SafetyHookMid PlayerCarRenderStateHook{};
-	inline static SafetyHookInline RobotDisplayHook{};
-	inline static bool FullCarLogged = false;
-	inline static bool DriverHiddenLogged = false;
-	inline static std::array<std::uint64_t, 24> RobotTraceKeys{};
-	inline static std::size_t RobotTraceCount = 0;
-
-	static bool Active()
-	{
-		// Driver-seat geometry/camera testing must not depend on the current
-		// stereo recovery gate. Keeping it native-game active makes the test
-		// visible on the PC mirror too and prevents temporary host eligibility
-		// changes from turning the car/driver path on and off.
-		return VRDriverSeatCameraEligible(Game::camera());
-	}
-
-	static void PlayerCarRenderState_dest(SafetyHookContext& ctx)
-	{
-		// P0 is observational, including when the legacy cockpit is OFF.
-		if (Settings::VREnabled && Settings::VRCockpitFrameProbe)
-		{
-			auto* player = Game::pl_car();
-			if (player && reinterpret_cast<EVWORK_CAR*>(ctx.ebx) == player)
-			{
-				const auto* camera = Game::camera();
-				OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(
-					camera ? static_cast<std::uint8_t>(camera->cam_mode_34A) : 0xFF);
-			}
-		}
-		if (!Active() || !Settings::VRDriverSeatFullCar)
-			return;
-		EVWORK_CAR* player = Game::pl_car();
-		if (!player || reinterpret_cast<EVWORK_CAR*>(ctx.ebx) != player)
-			return;
-
-		const std::uint32_t originalState = (ctx.eax >> 14) & 3u;
-		// Canonical DispCarModel_Common disassembly shows state 1 takes the
-		// full exterior/body path; state 0 skips those blocks and was the reason
-		// the first prototype made the car disappear.
-		ctx.eax = (ctx.eax & ~0x0000C000u) | 0x00004000u;
-		if (!FullCarLogged)
-		{
-			FullCarLogged = true;
-			spdlog::info(
-				"VR DRIVER SEAT TEST: player car render state {} -> 1 (full model); persistent flags unchanged",
-				originalState);
-		}
-	}
-
-	static void TraceRobotCandidate(EvWorkRobot* robot)
-	{
-		if (!robot || RobotTraceCount >= RobotTraceKeys.size())
-			return;
-		const std::uint64_t key =
-			(static_cast<std::uint64_t>(robot->workId_0) << 32) |
-			static_cast<std::uint32_t>(robot->chrset_8);
-		for (std::size_t i = 0; i < RobotTraceCount; ++i)
-			if (RobotTraceKeys[i] == key)
-				return;
-		RobotTraceKeys[RobotTraceCount++] = key;
-		spdlog::info("VR DRIVER SEAT ROBOT: candidate workId={} chrset={}",
-			robot->workId_0, static_cast<int>(robot->chrset_8));
-	}
-
-	static void __cdecl RobotDisplay_dest(EvWorkRobot* robot)
-	{
-		if (Active() && robot)
-		{
-			TraceRobotCandidate(robot);
-            // Native game tables track selected driver vs heroine chrsets.
-            // Unlike a naked workId, this protects the seated passenger.
-            const int* driverChrsets = Module::exe_ptr<int>(0x2549B0);
-            const int* heroineChrsets = Module::exe_ptr<int>(0x2549C8);
-			if (OutRunVR::DriverSeatOccupant::HideIdentifiedDriver(
-				Settings::VRDriverSeatHideDriver,
-				static_cast<int>(robot->workId_0),
-				static_cast<int>(robot->chrset_8),
-				Settings::VRDriverSeatDriverWorkId.get(),
-				Settings::VRDriverSeatDriverChrset.get(),
-                driverChrsets, heroineChrsets, 6))
-			{
-				if (!DriverHiddenLogged)
-				{
-					DriverHiddenLogged = true;
-					spdlog::info(
-						"VR DRIVER SEAT TEST: hiding configured driver robot workId={} chrset={}; other robots/passenger remain enabled",
-						robot->workId_0, static_cast<int>(robot->chrset_8));
-				}
-				return;
-			}
-		}
-		RobotDisplayHook.ccall<void>(robot);
-	}
-
-public:
-	std::string_view description() override
-	{
-		return "VRDriverSeatRenderTest";
-	}
-
-	bool apply() override
-	{
-        // A rejected second detour used to leave the car-state midhook live
-        // even though HookManager was told installation failed. Either both
-        // gameplay callbacks are active, or neither changes native rendering.
-        return OutRunVR::DriverSeatRenderPass::InstallAtomicCockpitPair(
-            PlayerCarRenderStateHook, RobotDisplayHook,
-            [] { return safetyhook::create_mid(
-                Module::exe_ptr(PlayerCarRenderState_HookAddr),
-                PlayerCarRenderState_dest); },
-            [] { return safetyhook::create_inline(
-                Module::exe_ptr(RobotDisplay_Addr), RobotDisplay_dest); });
-	}
-
-	static VRDriverSeatRenderTest instance;
-};
-VRDriverSeatRenderTest VRDriverSeatRenderTest::instance;
-
-// Canonical PC OR2006C2C.EXE player-car renderer:
-// 0x4697B8 LEA EDX,[ESP+70h]; 0x4697BC PUSH EDX;
-// 0x4697BD CALL 0x409FD0 (load temporary display matrix).
-// Restrict this midhook to the EXACT player-car EBX and live cockpit pose;
-// no physics EVWORK_CAR, camera matrix, resource, texture, PMT or disk writes.
-class VRDriverSeatVehicleScaleRenderHook final : public Hook
-{
-    static constexpr int PlayerCarMatrixCallRva = 0x697BD;
-    inline static SafetyHookMid MatrixCallHook{};
-    inline static bool FirstAppliedLogged = false;
-
-    static void ScalePlayerCarMatrix(SafetyHookContext& ctx)
+    static void ObservePlayerCar(SafetyHookContext& ctx)
     {
-        if (!Settings::VREnabled || !Settings::VRDriverSeatView ||
-            !VRDriverSeatCameraEligible(Game::camera()) ||
-            reinterpret_cast<EVWORK_CAR*>(ctx.ebx) != Game::pl_car() ||
-            !ctx.esp)
+        if (!Settings::VREnabled || !Settings::VRCockpitFrameProbe)
             return;
-
-        const float scale = Settings::VRDriverSeatVehicleScale.get();
-        if (!std::isfinite(scale) || scale == 1.0f)
+        const EVWORK_CAR* player=Game::pl_car();
+        if (!player || reinterpret_cast<EVWORK_CAR*>(ctx.ebx)!=player)
             return;
-        // Before the original call, [ESP] is the pointer PUSHed from EDX
-        // to the caller's own 64-byte stack-local display transform.
-        const auto* args = reinterpret_cast<D3DMATRIX* const*>(ctx.esp);
-        D3DMATRIX* temporaryRenderMatrix = args[0];
-        if (!temporaryRenderMatrix ||
-            !OutRunVR::DriverSeatVehicle::TryScaleModelBasis(
-                *temporaryRenderMatrix, scale))
-            return;
-
-        if (!FirstAppliedLogged)
-        {
-            FirstAppliedLogged = true;
+        const EvWorkCamera* camera=Game::camera();
+        const auto mode=camera
+            ? static_cast<std::uint8_t>(camera->cam_mode_34A) : 0xffu;
+        OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(mode);
+        // Snapshot only read-only model inputs of the verified player.
+        // Do not copy this correction into game camera, physics or HMD view.
+        using namespace OutRunVR::QuestCockpitV2;
+        static_assert(sizeof(D3DMATRIX)==sizeof(Matrix),
+            "Quest and PC vehicle matrix layouts must match");
+        Matrix b0{},f0{},corrected{};
+        std::memcpy(b0.data(),&player->matrix_B0,sizeof(Matrix));
+        std::memcpy(f0.data(),&player->matrix_F0,sizeof(Matrix));
+        const bool valid=mode==1 && IsPlayableCarGameplay() &&
+            !InSceneEffect() && ComputeBodyCorrection(b0,f0,corrected);
+        if (Settings::VRTelemetry && ++Count<=32u)
             spdlog::info(
-                "VR DRIVER SEAT: player-only temporary render matrix scaled {:.2f}; world translation, physics and original PMT unchanged",
-                scale);
-        }
+                "VR COCKPIT V2: player candidate={} cameraMode={} "
+                "matrixFinite={} B0F0hash={:016X} nativeFrame=UNOBSERVED "
+                "ownerAdmitted=0; no game camera/car/occupant modified",
+                Count,mode,valid?1:0,MatrixFingerprint(b0,f0));
     }
-
 public:
-    std::string_view description() override
-    {
-        return "VRDriverSeatVehicleScaleRenderHook";
+    std::string_view description() override {
+        return "QuestCockpitV2PlayerCandidateProbe";
     }
-
-    bool apply() override
-    {
-        // Fail closed for unknown EXE variants instead of detouring nearby
-        // instructions or risk scaling non-player traffic/world geometry.
-        constexpr std::array<std::uint8_t, 5> signature{
-            0xE8, 0x0E, 0x08, 0xFA, 0xFF
-        };
-        const auto* instruction =
-            Module::exe_ptr<std::uint8_t>(PlayerCarMatrixCallRva);
-        if (!std::equal(signature.begin(), signature.end(), instruction))
-        {
-            spdlog::warn(
-                "VR DRIVER SEAT: original player matrix call signature differs, car scale hook not installed");
-            return false;
-        }
-        MatrixCallHook = safetyhook::create_mid(
-            Module::exe_ptr(PlayerCarMatrixCallRva), ScalePlayerCarMatrix);
-        return !!MatrixCallHook;
+    bool validate() override {
+        return Settings::VREnabled && Settings::VRCockpitFrameProbe;
     }
-    static VRDriverSeatVehicleScaleRenderHook instance;
+    void declare_settings() override {
+        Settings::VRCockpitFrameProbe.needs_restart();
+    }
+    bool apply() override {
+        // Same verified original PC player-state callsite as Phase-0.
+        // Probe has zero writes and never forces original EAX render flags.
+        PlayerCarHook=safetyhook::create_mid(
+            Module::exe_ptr(PlayerCarRenderStateRva),ObservePlayerCar);
+        return !!PlayerCarHook;
+    }
+    static QuestCockpitV2PlayerCandidateProbe instance;
 };
-VRDriverSeatVehicleScaleRenderHook
-    VRDriverSeatVehicleScaleRenderHook::instance;
-
-// Canonical EXE+0x4901: PUSH EDX; CALL 0x408C80 (material application).
-// EXE+0x48F2 loads the PMT material table; EXE+0x48F5 multiplies
-// the selected material index by 0x58. This global loop is NOT glass-only.
-class VRDriverSeatGlassMaterialProbe : public Hook
-{
-    static constexpr int ApplyMaterialRva = 0x4901;
-    inline static SafetyHookMid ApplyMaterialHook{};
-    inline static std::array<std::uintptr_t, 32> Seen{};
-    inline static std::size_t Count = 0;
-
-    static void MaterialEntry(SafetyHookContext& ctx)
-    {
-        if (!Settings::VREnabled || !Settings::VRDriverSeatView ||
-            !VRDriverSeatGameplayActive() || !Game::pl_car() ||
-            !ctx.edx || Count >= Seen.size())
-            return;
-        const auto* material = reinterpret_cast<const std::uint32_t*>(ctx.edx);
-        const std::uint32_t attr = material[1];
-        if (!OutRunVR::CockpitGlassProbe::CandidateBlend(attr))
-            return;
-        const auto identity = reinterpret_cast<std::uintptr_t>(material);
-        for (std::size_t i=0; i<Count; ++i)
-            if (Seen[i] == identity)
-                return;
-        Seen[Count++] = identity;
-        spdlog::info(
-            "VR COCKPIT GLASS PROBE (candidate only, ownership unknown): "
-            "material=0x{:X} colorIndex={} attr=0x{:08X} src={} dst={} count={}",
-            identity, material[0], attr, (attr>>8)&15u, (attr>>12)&15u, Count);
-    }
-
-public:
-    std::string_view description() override { return "VRDriverSeatGlassMaterialProbe"; }
-    bool validate() override { return Settings::VRDriverSeatGlassMaterialTrace; }
-    void declare_settings() override { Settings::VRDriverSeatGlassMaterialTrace.needs_restart(); }
-    bool apply() override
-    {
-        // Reject variant or relocated code, never install on an unknown EXE.
-        const auto* p = Module::exe_ptr<std::uint8_t>(ApplyMaterialRva);
-        constexpr std::array<std::uint8_t, 6> signature =
-            { 0x52, 0xE8, 0x79, 0x43, 0x00, 0x00 };
-        if (!std::equal(signature.begin(), signature.end(), p))
-        {
-            spdlog::warn("VR GLASS PROBE: original PMT call signature differs; hook not installed");
-            return false;
-        }
-        ApplyMaterialHook = safetyhook::create_mid(
-            Module::exe_ptr(ApplyMaterialRva), MaterialEntry);
-        return !!ApplyMaterialHook;
-    }
-    static VRDriverSeatGlassMaterialProbe instance;
-};
-VRDriverSeatGlassMaterialProbe VRDriverSeatGlassMaterialProbe::instance;
+QuestCockpitV2PlayerCandidateProbe QuestCockpitV2PlayerCandidateProbe::instance;
 
 
 class RestoreCarBaseShadow : public Hook
@@ -574,7 +234,7 @@ class RestoreCarBaseShadow : public Hook
 		// pl_car() there is not the selected model (or may be null).
 		// Do not borrow a stale gameplay matrix or pass a null matrix.
 		// Until the selector's transform owner is proven, omit its shadow.
-		if (!VRDriverSeatGameplayActive())
+		if (!IsPlayableCarGameplay())
 			return;
 		EVWORK_CAR* car = Game::pl_car();
 		if (!car)
@@ -2584,163 +2244,64 @@ class FixZBufferPrecision : public Hook
 
 	static inline bool allow_znear_override = true;
 
-	static bool DriverSeatCameraActive(EvWorkCamera* camera)
-	{
-		return VRDriverSeatCameraEligible(camera);
-	}
-
-	static bool ApplyDriverSeatCameraOffset(EvWorkCamera* camera,
-		D3DVECTOR& savedPos, D3DVECTOR& savedLook,
-		bool driverSeatFrame)
-	{
-		if (!driverSeatFrame)
-			return false;
-
-		savedPos = camera->cam_pos_F8;
-		savedLook = camera->look_pos_104;
-
-		D3DVECTOR newPos{}, newLook{};
-		if (!VRDriverSeatCameraPose(camera, newPos, newLook))
-			return false;
-
-		const float forward = Settings::VRDriverSeatForward.get();
-		const float right = Settings::VRDriverSeatRight.get();
-		const float up = Settings::VRDriverSeatUp.get();
-
-		// One atomic valid camera pose for view-matrix generation. The
-		// original game camera is restored by CalcCameraMatrix_dest.
-		camera->cam_pos_F8 = newPos;
-		camera->look_pos_104 = newLook;
-
-		static float lastForward = 9999.0f, lastRight = 9999.0f, lastUp = 9999.0f;
-		static int lastMode = -1;
-		const int mode = static_cast<int>(camera->cam_mode_34A);
-		if (mode != lastMode || std::fabs(forward - lastForward) > 0.0001f ||
-			std::fabs(right - lastRight) > 0.0001f || std::fabs(up - lastUp) > 0.0001f)
-		{
-			lastMode = mode;
-			lastForward = forward;
-			lastRight = right;
-			lastUp = up;
-			spdlog::info(
-				"VR DRIVER SEAT CAMERA: native mode={} forward={:.3f} right={:.3f} up={:.3f} applied before CalcCameraMatrix",
-				mode, forward, right, up);
-		}
-		return true;
-	}
-
 	static void CalcCameraMatrix_dest(EvWorkCamera* camera)
-	{
-		if (Settings::VREnabled && Settings::VRCockpitFrameProbe && camera)
-			OutRunVR::QuestCockpitV2::ThreadProbe().OnCamera(
-				static_cast<std::uint8_t>(camera->cam_mode_34A),
-				OutRunVRRenderer::IsCullingCameraSyncedNow(),
-				!OutRunVR::DriverSeatRenderPass::IsWorldOrCockpitPass());
-		// improve z-buffer precision by increasing znear
-		// game default is 0.1 which reduces precision of far objects massively, causing z-fighting and objects not drawing properly
+    {
+        if (Settings::VREnabled && Settings::VRCockpitFrameProbe && camera)
+            OutRunVR::QuestCockpitV2::ThreadProbe().OnCamera(
+                static_cast<std::uint8_t>(camera->cam_mode_34A),
+                OutRunVRRenderer::IsCullingCameraSyncedNow(),
+                OutRunVR::QuestCockpitV2::InSceneEffect());
 
-		// Snapshot camera eligibility once for near-plane and the native
-		// view-matrix transaction. Repeated checks cost redundant camera
-		// basis construction and can disagree during mode transitions.
-		const bool driverSeatFrame = DriverSeatCameraActive(camera);
-		if (allow_znear_override &&
-			(Settings::FixZBufferPrecision || driverSeatFrame))
-		{
-			// In 6DoF VR the player can move their head through the normal third-
-			// person near plane. Keep the 2D precision fix intact outside VR, but
-			// use the dedicated VR near plane during gameplay/goal rendering.
-			if (driverSeatFrame)
-			{
-				// Keep cockpit geometry within 15 cm even during stereo warmup.
-				camera->perspective_znear_BC = std::clamp(
-					OutRunVR::DriverSeatCamera::SafeNearPlane(
-						Settings::VRNearPlane.get(), 0.05f, 0.15f),
-					0.05f, 0.15f);
-			}
-			else if (Settings::VRPositionalTracking &&
-				Settings::VRStereo &&
-				OutRunVR::RuntimeEligibility::MayInjectStereo() &&
-				VRDriverSeatGameplayActive())
-			{
-				camera->perspective_znear_BC =
-						OutRunVR::DriverSeatCamera::SafeNearPlane(
-							Settings::VRNearPlane.get(), 0.03f, 0.50f);
-			}
-			// only set znear to 1 if...
-			else
-			if ((camera->cam_mode_34A == 2 || camera->cam_mode_34A == 0) // ... in third-person or FPV
-				&& camera->cam_mode_timer_364 == 0 // ... not switching cameras
-				&& (*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL)) // ... we're in main game state (not in STATE_START cutscene etc)
-			{
-				camera->perspective_znear_BC = 1.0f;
-			}
-			else
-			{
-				if (camera->cam_mode_timer_364 != 0 || *Game::current_mode != STATE_GAME)
-					camera->perspective_znear_BC = 0.1f; // set znear to 0.1 during camera switch / cutscene
-				else
-				{
-					float in_car_view_znear = 0.25f; // 0.25 seems fine for in-car view, doesn't improve as much as 1.0f but still better than 0.1f
-					auto* pl_car = Game::pl_car();
-					if (pl_car)
-					{
-						if (pl_car->car_kind_11 == 7) // 360SP still shows gap with 0.25
-							in_car_view_znear = 0.2f;
-					}
-
-					camera->perspective_znear_BC = in_car_view_znear;
-				} 
-			}
-		}
-		D3DVECTOR savedPos{}, savedLook{};
-		const bool driverSeatOffset = ApplyDriverSeatCameraOffset(
-			camera, savedPos, savedLook, driverSeatFrame);
-		CalcCameraMatrix.call(camera);
-		if (driverSeatOffset)
-		{
-			// Only the generated native View matrix keeps the offset. Restore the
-			// camera work immediately so the game's smoothing/controller never
-			// feeds the synthetic cockpit position back into the next simulation tick.
-			camera->cam_pos_F8 = savedPos;
-			camera->look_pos_104 = savedLook;
-		}
-	}
+        // Existing R26 Z precision and 6DoF near-plane are unchanged.
+        // The rejected old DriverSeat never displaces the camera in V2.
+        if (allow_znear_override && Settings::FixZBufferPrecision) {
+            if (Settings::VRPositionalTracking &&
+                Settings::VRStereo &&
+                OutRunVR::RuntimeEligibility::MayInjectStereo() &&
+                IsPlayableCarGameplay()) {
+                camera->perspective_znear_BC =
+                    OutRunVR::QuestCockpitV2::SafeNearPlane(
+                        Settings::VRNearPlane.get(),0.03f,0.50f);
+            } else if ((camera->cam_mode_34A==2 || camera->cam_mode_34A==0) &&
+                       camera->cam_mode_timer_364==0 &&
+                       Game::current_mode &&
+                       (*Game::current_mode==STATE_GAME ||
+                        *Game::current_mode==STATE_GOAL)) {
+                camera->perspective_znear_BC=1.0f;
+            } else if (camera->cam_mode_timer_364!=0 ||
+                       !Game::current_mode ||
+                       *Game::current_mode!=STATE_GAME) {
+                camera->perspective_znear_BC=0.1f;
+            } else {
+                float inCarNear=0.25f;
+                const auto* player=Game::pl_car();
+                if (player && player->car_kind_11==7) inCarNear=0.2f;
+                camera->perspective_znear_BC=inCarNear;
+            }
+        }
+        CalcCameraMatrix.call(camera);
+    }
 
 	// hook Clr_SceneEffect so we can reset camera z-near before screen effects are draw
 	inline static SafetyHookInline Clr_SceneEffect = {};
 	static void Clr_SceneEffect_dest(int a1)
-	{
-		// Preserve the caller's suppression state: nested SceneEffect passes
-		// must not re-enable the gameplay near-plane override mid-pass.
-		const bool previousAllowZnearOverride = FixZBufferPrecision::allow_znear_override;
-		FixZBufferPrecision::allow_znear_override = false;
-		// Includes BOTH CalcCameraMatrix calls as well as Clr_SceneEffect:
-		// render effects use the native short near-plane, while only real
-		// world/vehicle passes may move the VR camera into the driver seat.
-		// SceneEffect owns its short near-plane camera only until the original
-		// effect GPU submission returns. Rebuild the *world* view after the
-		// scope closes so a real driver-seat view cannot be replaced by the
-		// temporary unshifted effect camera between world/car draws.
-		EvWorkCamera* camera = Module::exe_ptr<EvWorkCamera>(0x39FE10);
-		const float prev = camera->perspective_znear_BC;
-		OutRunVR::DriverSeatRenderPass::RunSceneEffectThenRestoreView(
-			[&]() {
-				camera->perspective_znear_BC = 0.05f;
-				CalcCameraMatrix_dest(camera);
-				{
-					OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
-						OutRunVR::GameSemantic::RenderScope::SceneEffect);
-					Clr_SceneEffect.call(a1);
-				}
-			},
-			[&]() {
-				// The original effect has finished; the normal view-matrix owner
-				// may now apply the validated native cockpit displacement once.
-				camera->perspective_znear_BC = prev;
-				CalcCameraMatrix_dest(camera);
-			});
-		FixZBufferPrecision::allow_znear_override = previousAllowZnearOverride;
-	}
+    {
+        const bool previousAllow=allow_znear_override;
+        allow_znear_override=false;
+        EvWorkCamera* camera=Module::exe_ptr<EvWorkCamera>(0x39FE10);
+        const float previousNear=camera->perspective_znear_BC;
+        {
+            OutRunVR::QuestCockpitV2::ScopedSceneEffect effect;
+            camera->perspective_znear_BC=0.05f;
+            CalcCameraMatrix_dest(camera);
+            OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+                OutRunVR::GameSemantic::RenderScope::SceneEffect);
+            Clr_SceneEffect.call(a1);
+        }
+        camera->perspective_znear_BC=previousNear;
+        CalcCameraMatrix_dest(camera);
+        allow_znear_override=previousAllow;
+    }
 
 public:
 	std::string_view description() override
@@ -2749,12 +2310,9 @@ public:
 	}
 
 	bool validate() override
-	{
-        // DriverSeatView must still install the game camera hook if the
-        // independent desktop Z-precision tweak was disabled in the INI.
-		return Settings::FixZBufferPrecision ||
-            (Settings::VREnabled && Settings::VRDriverSeatView);
-	}
+    {
+        return Settings::FixZBufferPrecision;
+    }
 
 	void declare_settings() override
 	{

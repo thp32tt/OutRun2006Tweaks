@@ -141,33 +141,7 @@ namespace Settings
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
 	Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
-		"Read-only bounded QuestCockpitV2 Phase-0 diagnostics. Does not enable cockpit rendering; only logging-enabled diagnostic builds show samples." };
-	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,
-		"Experimental test view: reuses the native bumper camera timing/smoothing, shows the full player car, hides the driver robot and offsets the VR camera into the cockpit." };
-    Setting<float> VRDriverSeatVehicleScale{ "VR", "DriverSeatVehicleScale", 1.0f,
-        "Experimental cockpit-only player-car visual model scale. 1.0 preserves stock geometry and is the safe default; affects neither game physics nor original asset bytes. F11 adjustable; applied to the original PC player's stack-local draw matrix only when the cockpit mode is eligible. Not an APK-proven scale.", Range<float>{ 0.85f, 1.35f } };
-    Setting<float> VRDriverSeatGlassOpacity{ "VR", "DriverSeatGlassOpacity", 0.30f,
-        "Requested cockpit glass material opacity (0.10 to 0.90). A live renderer change requires a verified player-windshield material identity; currently diagnostic only and DOES NOT recolor unrelated materials.", Range<float>{ 0.10f, 0.90f } };
-    Setting<bool> VRDriverSeatGlassMaterialTrace{ "VR", "DriverSeatGlassMaterialTrace", true,
-        "Restart-required read-only bounded canonical PMT material probe; logs candidate blend/material IDs, never changes any glass or world opacity." };
-	Setting<bool> VRDriverSeatCarSpaceBasis{ "VR", "DriverSeatCarSpaceBasis", false,
-        "Experimental OPT-IN: align cockpit offsets to player matrix_B0. Quest3 field report 2026-10-17 observed severe cockpit/third-person zoom oscillation; default to the uninterrupted native camera basis to avoid per-frame car-space-to-native fallback switches. Enable only for separate A/B diagnosis." };
-	Setting<int> VRDriverSeatNativeMode{ "VR", "DriverSeatNativeMode", 1,
-		"Native camera mode used as the synchronized base for DriverSeatView. Default 1 is the bumper/in-car camera discovered from the canonical EXE.", Range<int>{ 0, 2 } };
-	Setting<float> VRDriverSeatForward{ "VR", "DriverSeatForward", -1.35f,
-		"Driver-seat camera offset along the native camera forward axis. Positive moves toward the road; negative moves rearward into the cabin.", Range<float>{ -3.0f, 3.0f } };
-	Setting<float> VRDriverSeatRight{ "VR", "DriverSeatRight", -0.32f,
-		"Driver-seat camera offset along the native camera right axis. Negative moves left toward the driver seat.", Range<float>{ -2.0f, 2.0f } };
-	Setting<float> VRDriverSeatUp{ "VR", "DriverSeatUp", 0.65f,
-		"Driver-seat camera vertical offset from the native bumper camera.", Range<float>{ -2.0f, 2.0f } };
-	Setting<bool> VRDriverSeatFullCar{ "VR", "DriverSeatFullCar", true,
-		"While DriverSeatView is active, forces DispCarModel_Common render state 1, the full exterior/body path. The games persistent camera/car flags are not changed." };
-	Setting<bool> VRDriverSeatHideDriver{ "VR", "DriverSeatHideDriver", true,
-		"Hides only the selected driver robot while DriverSeatView is active. Passenger/girlfriend rendering remains untouched." };
-	Setting<int> VRDriverSeatDriverWorkId{ "VR", "DriverSeatDriverWorkId", 0,
-		"Robot workId suppressed as the player driver in DriverSeatView. Candidate workId/chrset pairs are logged so this can be corrected live from F11 without rebuilding.", Range<int>{ 0, 20 } };
-	Setting<int> VRDriverSeatDriverChrset{ "VR", "DriverSeatDriverChrset", -1,
-		"Optional exact driver character set. -1 auto-detects driver-only chrsets from native driver/heroine tables; ambiguous or passenger characters are never hidden. Not hand tracking.", Range<int>{ -1, 4095 } };
+		"Isolated QuestCockpitV2 diagnostic: collects original player B0/F0 and bounded Present correlation. The native game-frame owner is unverified; this does not activate cockpit. Requires restart." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,
