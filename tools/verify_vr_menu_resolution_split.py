@@ -116,6 +116,15 @@ fallback_logic = aspect.split(
     'inline LogicalCanvasCapturePlan PlanTopLeftLogicalCaptureUv(', 1)[1].split(
     'static_assert(IsTopLeftLogicalTheaterState(0x00u));', 1)[0]
 assert 'if (!IsTopLeftLogicalTheaterState(state) ||' in fallback_logic
+
+assert 'constexpr bool ShouldCropFallbackTitleMenu(' in aspect
+assert 'clientGameState, sourceIsSbs, publishedMirrorApplied,' in theater
+assert 'capturedTheaterFullyVisible))' in theater
+assert 'const auto fallbackAuthor43 =' in theater
+assert 'authoredFourThreeApplied =' in theater
+assert 'const float aspect = authoredFourThreeApplied' in theater
+assert 'ShouldCropFallbackTitleMenu(0x20u, false, false, true)' in aspect
+
 assert 'publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;' in theater
 assert '[VR TRACE SUMO_FE LOGICAL CANVAS FULL]' in theater
 assert 'if (!sourceIsSbs && publishedMirrorApplied &&\n            (clientGameState == 0x04u || clientGameState == 0x09u))' in theater
