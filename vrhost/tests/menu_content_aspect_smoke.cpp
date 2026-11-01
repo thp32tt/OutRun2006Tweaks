@@ -230,6 +230,53 @@ int main()
             std::fabs(landscapeSumo.y) > 1.e-5f)
             return 127;
     }
+    // Full menu source path A/B: a QPC-missed frame with the SAME current
+    // physical source must select the identical top-left 1920x1080 pixels
+    // as the published HWND frame. A landscape-window-only heuristic used
+    // to sample the entire 2560x1440 window instead (headset menu offset).
+    {
+        using namespace OutRunVrMenuAspect;
+        const auto actualPhysical = PlanTopLeftLogicalCanvasCrop(
+            0x20u, 2496.f, 2688.f);
+        const auto freshPublishedSource = PlanTopLeftLogicalCaptureUv(
+            0x20u, 440.f, 0.f, 3000.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f,
+            1920.f, 1080.f, true);
+        const auto noReceipt = PlanTopLeftLogicalCaptureUv(
+            0x20u, 440.f, 0.f, 3000.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f);
+        const auto staleOtherProcess = RecentSumoPhysicalCanvasReceipt(
+            0x20u, 133u, 134u, 2496u, 2688u, 9000, 9100, 1000);
+        const auto staleClock = RecentSumoPhysicalCanvasReceipt(
+            0x20u, 133u, 133u, 2496u, 2688u, 9000, 9300, 1000);
+        const auto freshClock = RecentSumoPhysicalCanvasReceipt(
+            0x20u, 133u, 133u, 2496u, 2688u, 9000, 9100, 1000);
+        const auto offscreenSumo = PlanTopLeftLogicalCaptureUv(
+            0x20u, 0.f, 0.f, 2496.f, 2688.f,
+            3440.f, 1440.f, 2496.f, 2688.f,
+            1920.f, 1080.f, true);
+        const auto selector = PlanTopLeftLogicalCaptureUv(
+            0x0Au, 440.f, 0.f, 3000.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f,
+            1920.f, 1080.f, true);
+        const auto near = [](float a, float b) {
+            return std::fabs(a - b) < 1.e-5f;
+        };
+        if (!actualPhysical.crop || !freshPublishedSource.crop ||
+            !noReceipt.crop || !freshClock ||
+            staleOtherProcess || staleClock ||
+            !near(freshPublishedSource.x, 440.f / 3440.f) ||
+            !near(freshPublishedSource.y, 0.f) ||
+            !near(freshPublishedSource.width,
+                (2560.f / 3440.f) * actualPhysical.width) ||
+            !near(freshPublishedSource.height, actualPhysical.height) ||
+            !near(noReceipt.width, 2560.f / 3440.f) ||
+            !offscreenSumo.crop ||
+            !near(offscreenSumo.width, 1920.f / 3440.f) ||
+            !near(offscreenSumo.height, 1080.f / 1440.f) ||
+            selector.crop)
+            return 128;
+    }
     // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
     // in its upper-left. Sample exactly that logical rectangle before the
     // LOCAL-fixed menu projection; never crop Ferrari selector/gameplay or
