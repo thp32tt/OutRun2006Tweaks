@@ -117,6 +117,16 @@ fallback_logic = aspect.split(
     'static_assert(IsTopLeftLogicalTheaterState(0x00u));', 1)[0]
 assert 'if (!IsTopLeftLogicalTheaterState(state) ||' in fallback_logic
 
+# The physical portrait window is a top-left logical raster in SUMO_FE,
+# but the 2560x1440 landscape HWND is a centered fit. Neither branch may
+# infer physical ownership from the OpenXR extent alone.
+assert 'const bool sumoPhysicalPortrait =' in fallback_logic
+assert 'state == 0x20u &&' in fallback_logic
+assert 'std::fabs(clientAspect - physicalAspect) <= 0.025f' in fallback_logic
+assert 'fitWidth = clientWidth * (logicalWidth / physicalWidth);' in fallback_logic
+assert 'fitHeight = clientHeight * (logicalHeight / physicalHeight);' in fallback_logic
+
+
 assert 'constexpr bool ShouldCropFallbackTitleMenu(' in aspect
 assert 'clientGameState, sourceIsSbs, publishedMirrorApplied,' in theater
 assert 'capturedTheaterFullyVisible))' in theater
