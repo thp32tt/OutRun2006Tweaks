@@ -2541,8 +2541,7 @@ namespace
                         << ',' << liveRect.right << ',' << liveRect.bottom
                         << " uv=" << liveUv.x << ',' << liveUv.y
                         << ',' << liveUv.w << ',' << liveUv.h
-                        << " authority=CURRENT_SAME_PID_WIN32_CLIENT_RECT"
-                        << "\\n";
+                        << " authority=CURRENT_SAME_PID_WIN32_CLIENT_RECT\n";
                     OutRunVrEmitFullTrace(trace.str());
                 }
             }
