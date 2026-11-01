@@ -65,6 +65,60 @@ constexpr bool native_raw_swept_source_coverage_regression() {
 }
 static_assert(native_raw_swept_source_coverage_regression(),
               "authentic large-raster native GPU source sweep");
+// Real menu and vehicle-select viewports often have EVEN numbers of GPU
+// capture cells (including 4x3). Paired 2-cell strides used to starve half
+// of those source pixels for the entire session. Check complete coverage
+// over one cycle on full and scissor-clipped authentic source rasters.
+constexpr bool native_raw_even_grid_source_coverage_regression() {
+    constexpr std::uint32_t tw = 512u, th = 288u;
+    for (std::uint32_t mode = 0u; mode != 2u; ++mode) {
+        const std::uint32_t sw = mode ? 3440u : 2048u;
+        const std::uint32_t sh = mode ? 1440u : 864u;
+        const std::uint32_t l = mode ? 300u : 0u;
+        const std::uint32_t t = mode ? 200u : 0u;
+        const std::uint32_t r = mode ? 1900u : sw;
+        const std::uint32_t b = mode ? 900u : sh;
+        constexpr std::uint32_t columns = 4u, rows = 3u;
+        for (std::uint32_t gy = 0u; gy < rows; ++gy) {
+            for (std::uint32_t gx = 0u; gx < columns; ++gx) {
+                const auto px = (std::min)(l + gx * tw + tw / 2u, r - 1u);
+                const auto py = (std::min)(t + gy * th + th / 2u, b - 1u);
+                bool witnessed = false;
+                for (std::uint32_t ordinal = 0u; ordinal < columns * rows;
+                     ++ordinal) {
+                    NativeRawDualTile pair{};
+                    if (!native_raw_swept_dual_draw_tile(
+                            sw, sh, tw, th, {l, t, r, b}, ordinal, pair) ||
+                        !pair.hasSecond ||
+                        !native_raw_source_tiles_disjoint(
+                            pair.first, pair.second, tw, th))
+                        return false;
+                    const auto inside = [=](NativeRawTileOrigin origin) constexpr {
+                        return origin.x <= sw - tw && origin.y <= sh - th &&
+                            px >= origin.x && px - origin.x < tw &&
+                            py >= origin.y && py - origin.y < th;
+                    };
+                    witnessed = witnessed || inside(pair.first) ||
+                        inside(pair.second);
+                    if (ordinal == 0u) {
+                        NativeRawDualTile wrapped{};
+                        if (!native_raw_swept_dual_draw_tile(
+                                sw, sh, tw, th, {l, t, r, b},
+                                columns * rows, wrapped) ||
+                            wrapped.first.x != pair.first.x ||
+                            wrapped.first.y != pair.first.y)
+                            return false;
+                    }
+                }
+                if (!witnessed) return false;
+            }
+        }
+    }
+    return true;
+}
+static_assert(native_raw_even_grid_source_coverage_regression(),
+              "even-grid game Draw GPU source tiles must not starve pixels");
+
 int main() {
     // The same real source-native RT must resolve both PRE and POST tiles.
     for (unsigned samples : {1u, 2u, 4u, 8u, 16u, 32u}) {
@@ -76,6 +130,7 @@ int main() {
         assert(!native_raw_msaa_resolve_required(bad));
     }
     assert(native_raw_swept_source_coverage_regression());
+    assert(native_raw_even_grid_source_coverage_regression());
     // Different D3D9 interface pointers may identify the same canonical
     // game backbuffer. Never accept an unrelated or unavailable IUnknown.
     int drawSurface = 0, presentedSurface = 0, canonical = 0, foreign = 0;

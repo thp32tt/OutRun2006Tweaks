@@ -92,8 +92,13 @@ struct NativeRawDualTile {
             static_cast<std::uint32_t>((std::min)(
                 y, std::uint64_t{sh - th}))};
     };
-    // Odd grids visit every source cell as authentic Draws arrive.
-    const auto firstIndex = (std::uint64_t{ordinal} * 2u) % cells;
+    // One real Draw capture advances one source cell. The prior 2*ordinal
+    // stride skipped every odd-numbered cell on even-size menu/car grids;
+    // the half-grid second tile then skipped the SAME missing cells whenever
+    // the grid size was divisible by four. Use a coprime unit stride so all
+    // genuine raster cells are eventually sampled, without fabricating
+    // pixels or relaxing any source/PRESENT/fence admission.
+    const auto firstIndex = std::uint64_t{ordinal} % cells;
     out.first = sample(firstIndex);
     // Prefer a far second tile, then try nearby real cells if an edge
     // clamp would make the GPU source regions overlap.
