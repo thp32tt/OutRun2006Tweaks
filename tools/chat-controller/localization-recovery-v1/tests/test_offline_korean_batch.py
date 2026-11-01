@@ -58,6 +58,20 @@ class TestOfflineKoreanBatch(unittest.TestCase):
         self.assertEqual(output.getpixel((0,0)),(0,0,0,0))
         self.assertNotEqual(output.getpixel((50,32)),(0,0,0,0))
 
+    def test_explicit_preserve_original_translation_gate(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/"transcriptions.jsonl"
+            rows=[
+                {"index":143,"status":"transcribed_reviewed",
+                 "segments":[{"source":"Song title","korean":"Song title"}]},
+                {"index":152,"status":"transcribed_reviewed",
+                 "segments":[{"source":"PRO.","korean":"PRO."}]},
+                {"index":44,"status":"transcribed_reviewed",
+                 "segments":[{"source":"WIN","korean":"승리"}]}
+            ]
+            path.write_text("\n".join(json.dumps(x,ensure_ascii=False) for x in rows))
+            self.assertEqual(batch.unchanged_translation_qids(path),{"Q143","Q152"})
+
     def test_overlap_hold_is_not_a_second_pass(self):
         image=Image.new("RGBA",(200,100),(0,0,0,0))
         rows=[{"id":"first","english":"First","korean":"첫째","bbox_xyxy":[0,0,85,60]},
