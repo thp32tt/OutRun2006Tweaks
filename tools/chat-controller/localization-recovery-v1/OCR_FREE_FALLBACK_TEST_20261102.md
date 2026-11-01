@@ -23,3 +23,10 @@ Same with `Q044_19CEDB9_BASE_READABLE_FLIPY.png`.
 **Not yet done:** full atlas completeness, C1/C3, texture-neighbor overlap verification, live game runtime acceptance, repeated/automated deployment, full-game release. `RUNTIME_VALIDATION=UNTESTED`.
 
 Existing automation and OCR history remain unchanged; this is an alternate test build path, not permission to mark DDS production PASS.
+
+## Same-task expansion: V2 additional Q057 test, no new score (+0)
+Q057 full source original SHA `81f7f109be08d26f1cda6658b083cf71ec385584126b25a877f69057df199fbf`, matching native DDS SHA `2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481`; six SHA-pinned approved ROI labels were rendered (Target, Hearts, Total Rank×3, Collect the stars!), source pixels outside the approved boxes were unchanged, and the resulting D3D9 native DDS decoder roundtrip was byte-exact. Q057 TEST_ONLY DDS SHA256 `e53e7a2206bc0ac50bb261491fc298415db40d3fa1731a1012f213e9fb61f6a1`.
+
+The updated three-DDS sample package is `/home/chatgpt-runner2/work/OUTRUN_OFFLINE_KOREAN_FAST_TEST_20261102_V2.zip` (12,829,850 bytes, SHA256 `ef32a24b7e99f0d724a90b48fa4e22813fcab2aefae045c8fa622b07fe7b1cc1`). It contains a Korean README and Q044 / Q054 / Q057 DDS in their relative HD GUI texture/load paths, total **19 ROI labels**. This V2 is the preferred test package; V1 was retained unchanged. As before, all content is TEST_ONLY and must not be installed blindly.
+
+Q047 remains HOLD due to a different canonical DDS SHA than the N100 DDS copy in the fallback source directory. Q053 remains HOLD because its original is DXT5 with 13 mip levels; the fallback only serializes original-format, single-mip uncompressed 32-bit DDS and refuses lossy/unsupported conversions. No unsupported codec bypass was attempted.
