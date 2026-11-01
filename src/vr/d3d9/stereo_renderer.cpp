@@ -111,6 +111,10 @@ namespace OutRunVRStereo
 		std::uint64_t R9MainDepthReacquires = 0;
 		std::uint64_t R9FullClearSeeds = 0;
 		std::uint64_t R9MonoBackupDraws = 0;
+		// Skips are valid ONLY after an earlier two-eye draw made the independent
+		// mono restoration history incomplete for this Present.
+		std::uint64_t R9MonoGapSkippedDraws = 0;
+		std::uint64_t R9MonoGapSkippedClears = 0;
 		std::uint64_t R9MonoBackupDrawFailures = 0;
 		std::uint64_t R9MonoFallbackRestores = 0;
 		std::uint64_t R9MonoFallbackRestoreFailures = 0;
@@ -426,7 +430,7 @@ namespace OutRunVRStereo
 				return;
 			R9LastSummaryMs = now;
 			spdlog::info(
-				"VR R9: calls[depth={},rt={},clear={},draw={},present={}] depth[main=0x{:08x},current=0x{:08x},deferred={},transient={},restores={},null={},reacquire={}] frame[seeded={},monoSeeded={},gap={},firstFailures={}] mono[draws={},drawFail={},restores={},restoreFail={},monoOnly={},occSkip={}] depthHistory[main={},mono={}] failures[leftWvp={},leftDraw={},depthState={},compose={}]",
+				"VR R9: calls[depth={},rt={},clear={},draw={},present={}] depth[main=0x{:08x},current=0x{:08x},deferred={},transient={},restores={},null={},reacquire={}] frame[seeded={},monoSeeded={},gap={},firstFailures={}] mono[draws={},gapSkipDraw={},gapSkipClear={},drawFail={},restores={},restoreFail={},monoOnly={},occSkip={}] depthHistory[main={},mono={}] failures[leftWvp={},leftDraw={},depthState={},compose={}]",
 				R9DepthCalls, R9RtCalls, R9ClearCalls, R9DrawCalls, R9PresentCalls,
 				static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(R9MainDepthIdentity)),
 				static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(TrackedDepthStencil)),
@@ -434,7 +438,8 @@ namespace OutRunVRStereo
 				R9NullDepthBinds, R9MainDepthReacquires,
 				R9StereoSeeded ? 1 : 0, R9MonoSeeded ? 1 : 0, R9MonoBackupGap ? 1 : 0,
 				R9FirstFailureCount,
-				R9MonoBackupDraws, R9MonoBackupDrawFailures, R9MonoFallbackRestores,
+				R9MonoBackupDraws, R9MonoGapSkippedDraws, R9MonoGapSkippedClears,
+				R9MonoBackupDrawFailures, R9MonoFallbackRestores,
 				R9MonoFallbackRestoreFailures, R9MonoOnlyDraws, R9OcclusionBackupSkips,
 				R9MainDepthContentSerial, R9MonoDepthContentSerial,
 				FailureCounts[OutRunVR::StereoFailureLeftWvpUploadFailed],
@@ -575,21 +580,34 @@ namespace OutRunVRStereo
 				return hr;
 			}
 
-			if (!R9EnsureMonoResources(device))
+			// A later R30/R29 direct two-eye draw can invalidate the mono history
+			// without an error. A partial Clear cannot repair that missing history,
+			// so never spend a third GPU pass clearing the unusable shadow.
+			// A verified FULL main-target color Clear *can* reseed mono safely.
+			const bool full = ClearCoversStereoBackbuffer(device, count, rects);
+			const bool monoCanReseed = full &&
+				(flags & D3DCLEAR_TARGET) != 0 && !FrameStereoIncomplete;
+			HRESULT monoHr = S_OK;
+			bool monoOk = true;
+			if (R9MonoBackupGap && !monoCanReseed)
 			{
-				R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Clear/mono-resources");
-				return ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+				++R9MonoGapSkippedClears;
 			}
-
-			HRESULT monoHr = E_FAIL;
-			const bool monoOk = R9ReplayMonoClear(device, count, rects, flags, color, z, stencil, monoHr);
+			else
+			{
+				if (!R9EnsureMonoResources(device))
+				{
+					R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Clear/mono-resources");
+					return ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+				}
+				monoOk = R9ReplayMonoClear(device, count, rects, flags, color, z, stencil, monoHr);
+			}
 			const auto before = FrameFailureReason;
 			const HRESULT stereoHr = FrameStereoIncomplete
 				? ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil)
 				: R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
 			R9ObserveLegacyFailure(before, "Clear/legacy-stereo", stereoHr);
 
-			const bool full = ClearCoversStereoBackbuffer(device, count, rects);
 			if (SUCCEEDED(stereoHr) && monoOk && full && (flags & D3DCLEAR_TARGET) != 0 && !FrameStereoIncomplete)
 			{
 				R9StereoSeeded = true;
@@ -659,21 +677,31 @@ namespace OutRunVRStereo
 				return actualDraw();
 			}
 
-			if (!R9EnsureMonoResources(device))
+			if (R9MonoBackupGap)
 			{
-				R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Draw/mono-resources");
-				++R9MonoOnlyDraws;
-				return actualDraw();
+				// R30 has already rendered one object without the mono copy.
+				// Present is forbidden to restore this now-incomplete backup.
+				// Preserve normal R7 left/right drawing; only skip the third draw.
+				++R9MonoGapSkippedDraws;
 			}
-
-			HRESULT monoHr = E_FAIL;
-			if (!R9ReplayMonoDraw(device, actualDraw, monoHr))
+			else
 			{
-				++R9MonoBackupDrawFailures;
-				R9MonoBackupGap = true;
-				R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Draw/mono-shadow", monoHr);
-				++R9MonoOnlyDraws;
-				return actualDraw();
+				// Before any gap, retain R9's full independent recovery shadow.
+				if (!R9EnsureMonoResources(device))
+				{
+					R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Draw/mono-resources");
+					++R9MonoOnlyDraws;
+					return actualDraw();
+				}
+				HRESULT monoHr = E_FAIL;
+				if (!R9ReplayMonoDraw(device, actualDraw, monoHr))
+				{
+					++R9MonoBackupDrawFailures;
+					R9MonoBackupGap = true;
+					R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Draw/mono-shadow", monoHr);
+					++R9MonoOnlyDraws;
+					return actualDraw();
+				}
 			}
 
 			if (LeftDrawMayWriteDepth(device) || LeftDrawMayWriteStencil(device))
