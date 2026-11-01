@@ -69,6 +69,7 @@ try {
         '-DisableDesktopVsync=true','-SkyGlowFactor=0',
         '-PreferD3D9Ex=true','-DirectGpuOnly=false','-DisableDesktopDuplication=false',
         '-VR.Telemetry=true',
+        '-VR.CockpitFrameProbe=true',
         '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
         '-RivalDx11NativeRoute=false','-UIScalingMode=1',
         '-AutoRenderResolution=true','-FollowGameResolution=false',

@@ -57,6 +57,7 @@ $gameArgs = @(
     '-Graphics.TransparencySupersampling=false',
     '-VR.TransparencySupersampling=false',
     '-VR.Telemetry=true',
+        '-VR.CockpitFrameProbe=true',
     '-RivalDx11NativeRoute=false',
     '-AutoRenderResolution=true',
     '-FollowGameResolution=false',
