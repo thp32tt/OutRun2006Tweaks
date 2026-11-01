@@ -636,7 +636,7 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
     // D3D11 enum values remain distinct; malformed ones cannot guide a
     // GPU sample to an unverified source geometry.
     NativeRawFvfRaster defaultState{}, explicitNone{}, explicitFront{};
-    NativeRawFvfRaster explicitBack{}, invalid{};
+    NativeRawFvfRaster explicitBack{}, invalidRaster{};
     if (!native_raw_fvf_raster_from_d3d11(
             false,0u,true,defaultState) ||
         defaultState.cull != NativeRawFvfCull::Back ||
@@ -652,9 +652,9 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
             true,3u,false,explicitBack) ||
         explicitBack.cull != NativeRawFvfCull::Back ||
         native_raw_fvf_raster_from_d3d11(
-            true,0u,false,invalid) ||
+            true,0u,false,invalidRaster) ||
         native_raw_fvf_raster_from_d3d11(
-            true,4u,false,invalid))
+            true,4u,false,invalidRaster))
         return reject(__LINE__);
     NativeRawDrawExtent front{}, back{}, opposite{}, unculled{};
     if (!native_raw_fvf_projected_raster(
@@ -687,7 +687,7 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
         !native_raw_fvf_projected_raster(
             scene,0,0,3440,1440,nativeLeft,&leftHalf,&explicitNone) ||
         nativeLeft.right > leftHalf.right ||
-        !native_raw_fvf_projected_raster(
+        native_raw_fvf_projected_raster(
             scene,0,0,3440,1440,nativeLeft,&leftHalf,&explicitFront) )
         return reject(__LINE__);
     NativeRawDualTile gpu{};
