@@ -29,11 +29,13 @@ namespace outrun::vr::dx11 {
     const std::size_t count = source.assembly == NativeRawFvfAssembly::TriangleList
         ? active / 3u : active - 2u;
     if (!count || count > 8192u) return false;
-    bool found = false;
-    NativeRawDrawExtent firstWindow{};
-    const std::size_t start = static_cast<std::size_t>(ordinal) % count;
-    for (std::size_t step = 0u; step < count; ++step) {
-        const auto t = (start + step) % count;
+    // Use the count of original source triangles that survive the actual
+    // viewport/scissor intersection for GPU capture phasing. Menus and race
+    // meshes can contain thousands of fully clipped valid IA primitives;
+    // their inclusion previously stranded the same RGB crop for hundreds
+    // of authentic Draws. Whole-IA validity above is never relaxed.
+    const auto projected_triangle = [&](std::size_t t,
+                                        NativeRawDrawExtent& triangle) noexcept {
         std::uint32_t indices[3]{};
         for (std::size_t j = 0u; j < 3u; ++j) {
             const auto element = source.assembly == NativeRawFvfAssembly::TriangleList
@@ -43,12 +45,11 @@ namespace outrun::vr::dx11 {
             indices[j] = source.indices
                 ? source.indices[element] : static_cast<std::uint32_t>(element);
         }
-        NativeRawDrawExtent triangle{};
         if (!native_raw_fvf_projected_raster(
                 {source.firstClip, source.vertexStride, source.count,
                  indices, 3u, NativeRawFvfAssembly::TriangleList},
                 vx, vy, vw, vh, triangle))
-            continue; // fully offscreen, depth-clipped or degenerate
+            return false;
         triangle.left = (std::max)(triangle.left,
             (std::max)(admitted.left, assembled.left));
         triangle.top = (std::max)(triangle.top,
@@ -57,17 +58,31 @@ namespace outrun::vr::dx11 {
             (std::min)(admitted.right, assembled.right));
         triangle.bottom = (std::min)(triangle.bottom,
             (std::min)(admitted.bottom, assembled.bottom));
-        if (triangle.right <= triangle.left ||
-            triangle.bottom <= triangle.top) continue;
+        return triangle.right > triangle.left &&
+               triangle.bottom > triangle.top;
+    };
+    std::size_t visibleCount = 0u;
+    for (std::size_t t = 0u; t < count; ++t) {
+        NativeRawDrawExtent triangle{};
+        if (projected_triangle(t, triangle)) ++visibleCount;
+    }
+    if (!visibleCount) return false;
+    bool found = false;
+    NativeRawDrawExtent firstWindow{};
+    const std::size_t start = static_cast<std::size_t>(ordinal) % count;
+    for (std::size_t step = 0u; step < count; ++step) {
+        const auto t = (start + step) % count;
+        NativeRawDrawExtent triangle{};
+        if (!projected_triangle(t, triangle)) continue;
         // Revisit each original source triangle on its own genuine GPU
         // readback grid. Previously every island used ordinal=0, so even
         // hundreds of captured menu/car/race Draws sampled the SAME corner
         // of each large primitive and permanently missed its inner pixels.
-        // A complete pass through all source triangles advances one sample
+        // A complete pass through visible source triangles advances one sample
         // cell within EACH triangle, without projecting any synthetic RGB.
         NativeRawDualTile sampled{};
         const auto sourcePhase =
-            static_cast<std::uint32_t>(ordinal / count);
+            static_cast<std::uint32_t>(ordinal / visibleCount);
         if (!native_raw_swept_dual_draw_tile(
                 sw, sh, tw, th, triangle, sourcePhase, sampled))
             continue;
@@ -100,7 +115,7 @@ namespace outrun::vr::dx11 {
     NativeRawDualTile within{};
     if (native_raw_swept_dual_draw_tile(
             sw, sh, tw, th, firstWindow,
-            static_cast<std::uint32_t>(ordinal / count), within) &&
+            static_cast<std::uint32_t>(ordinal / visibleCount), within) &&
         within.hasSecond) {
         out.second = within.second;
         out.hasSecond = true;

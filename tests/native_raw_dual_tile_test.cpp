@@ -443,6 +443,51 @@ bool native_raw_fvf_large_island_phase_regression() {
             (clipped.hasSecond && clipped.second.x >= 1500u))
             return fail(__LINE__);
     }
+    // Most of a full IA mesh can be outside the viewport. Only TWO
+    // original triangles contribute native GPU pixels. Their capture sweep
+    // must progress after two captures, not after all 32 IA triangles.
+    std::array<std::array<float,4>,96> sparse{};
+    for (auto& vertex : sparse)
+        vertex = {{5.f,5.f,0.5f,1.f}}; // valid but entirely clip-rejected
+    for (std::size_t i = 0u; i < triangles.size(); ++i)
+        sparse[i] = triangles[i];
+    const NativeRawFvfClipSpan sparseIa{
+        sparse.data(), sizeof(sparse[0]), sparse.size()};
+    const auto sparseSample = [&](std::uint32_t turn,
+                                  NativeRawDrawExtent clip,
+                                  NativeRawDualTile& result) {
+        return native_raw_fvf_island_dual_draw_tile(
+            sparseIa,0,0,sw,sh,sw,sh,tw,th,clip,turn,result);
+    };
+    NativeRawDualTile sparse0{}, sparse2{}, clipped0{}, clipped1{};
+    const NativeRawDrawExtent canvas{0,0,3440,1440};
+    if (!sparseSample(0u,canvas,sparse0) ||
+        !sparseSample(2u,canvas,sparse2) ||
+        !sparse0.hasSecond || !sparse2.hasSecond ||
+        (sparse0.first.x == sparse2.first.x &&
+         sparse0.first.y == sparse2.first.y) ||
+        !native_raw_source_tiles_disjoint(
+            sparse2.first,sparse2.second,tw,th))
+        return fail(__LINE__);
+    // When the scissor admits only the left original island, its local
+    // sweep must advance every capture without sampling the excluded right.
+    const NativeRawDrawExtent leftOnly{0,0,1500,1440};
+    if (!sparseSample(0u,leftOnly,clipped0) ||
+        !sparseSample(1u,leftOnly,clipped1) ||
+        (clipped0.first.x == clipped1.first.x &&
+         clipped0.first.y == clipped1.first.y) ||
+        clipped0.first.x >= 1500u || clipped1.first.x >= 1500u ||
+        (clipped1.hasSecond && clipped1.second.x >= 1500u))
+        return fail(__LINE__);
+    // No visible source triangle is NOT an admitted fabricated GPU region.
+    auto allClipped = sparse;
+    for (auto& vertex : allClipped)
+        vertex = {{5.f,5.f,0.5f,1.f}};
+    NativeRawDualTile absent{};
+    if (native_raw_fvf_island_dual_draw_tile(
+            {allClipped.data(),sizeof(allClipped[0]),allClipped.size()},
+            0,0,sw,sh,sw,sh,tw,th,canvas,0u,absent))
+        return fail(__LINE__);
     return true;
 }
 
