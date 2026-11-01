@@ -18,6 +18,12 @@
 #include <cstdint>
 #include <cstddef>
 
+namespace OutRunVRD3D9ExUpgrade
+{
+	bool GetPhysicalTargetExtent(
+		std::uint32_t& width, std::uint32_t& height) noexcept;
+}
+
 namespace Settings
 {
     extern Setting<bool> VRUnifiedEyeMenuSource;
@@ -44,6 +50,54 @@ IDirect3DVertexBuffer9* LetterboxVertex = nullptr;
 IDirect3DDevice9* LetterboxRasterDevice = nullptr; // borrowed, never AddRef
 float LetterboxRasterWidth = 0.0f;
 float LetterboxRasterHeight = 0.0f;
+// The authored menu stays on the logical game canvas, but VR can render that
+// canvas into a taller OpenXR-owned physical D3D9Ex target. Cache both domains
+// so a live eye-extent/reset change cannot replay a 1920x1080 black rail into
+// a 2496x2688 target.
+float LetterboxTargetWidth = 0.0f;
+float LetterboxTargetHeight = 0.0f;
+bool LetterboxPhysicalMapped = false;
+
+static bool ResolveLetterboxTargetExtent(
+	float logicalWidth, float logicalHeight,
+	float& targetWidth, float& targetHeight,
+	bool& physicalMapped) noexcept
+{
+	targetWidth = logicalWidth;
+	targetHeight = logicalHeight;
+	physicalMapped = false;
+	if (!std::isfinite(logicalWidth) || !std::isfinite(logicalHeight) ||
+		logicalWidth < 1.0f || logicalHeight < 1.0f)
+		return false;
+
+	// Front-end theater frames do not run the stereo replay that normally
+	// remaps ScreenOverlay2D. Map these plugin-generated rails here instead.
+	// In-game UILetterboxing=2 keeps the old logical/R30 ownership.
+	if (!Settings::VREnabled || Game::is_in_game())
+		return true;
+
+	std::uint32_t physicalWidth = 0;
+	std::uint32_t physicalHeight = 0;
+	if (!OutRunVRD3D9ExUpgrade::GetPhysicalTargetExtent(
+			physicalWidth, physicalHeight))
+		return true;
+
+	const float candidateWidth = static_cast<float>(physicalWidth);
+	const float candidateHeight = static_cast<float>(physicalHeight);
+	const float scaleX = candidateWidth / logicalWidth;
+	const float scaleY = candidateHeight / logicalHeight;
+	if (!std::isfinite(scaleX) || !std::isfinite(scaleY) ||
+		scaleX <= 0.0f || scaleY <= 0.0f ||
+		scaleX > 8.0f || scaleY > 8.0f)
+		return true;
+
+	targetWidth = candidateWidth;
+	targetHeight = candidateHeight;
+	physicalMapped =
+		std::fabs(targetWidth - logicalWidth) > 0.5f ||
+		std::fabs(targetHeight - logicalHeight) > 0.5f;
+	return true;
+}
 
 void CreateLetterboxVertex()
 {
@@ -59,6 +113,9 @@ void CreateLetterboxVertex()
 	LetterboxRasterDevice = nullptr;
 	LetterboxRasterWidth = 0.0f;
 	LetterboxRasterHeight = 0.0f;
+	LetterboxTargetWidth = 0.0f;
+	LetterboxTargetHeight = 0.0f;
+	LetterboxPhysicalMapped = false;
 	IDirect3DDevice9* d3ddev = Game::D3DDevice();
 	if (!d3ddev || !Game::screen_resolution)
 		return;
@@ -68,6 +125,17 @@ void CreateLetterboxVertex()
 	if (!std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
 		sourceWidth < 1.0f || sourceHeight < 1.0f)
 		return;
+	float targetWidth = sourceWidth;
+	float targetHeight = sourceHeight;
+	bool physicalMapped = false;
+	if (!ResolveLetterboxTargetExtent(
+			sourceWidth, sourceHeight,
+			targetWidth, targetHeight, physicalMapped))
+		return;
+	const float rasterScaleX =
+		physicalMapped ? targetWidth / sourceWidth : 1.0f;
+	const float rasterScaleY =
+		physicalMapped ? targetHeight / sourceHeight : 1.0f;
 	const auto layout = OutRunVR::UI::BuildMenuBarGeometry(
 		sourceWidth, sourceHeight);
 	if (layout.axis == OutRunVR::UI::MenuBarAxis::Invalid)
@@ -79,6 +147,9 @@ void CreateLetterboxVertex()
 		LetterboxRasterDevice = d3ddev;
 		LetterboxRasterWidth = sourceWidth;
 		LetterboxRasterHeight = sourceHeight;
+		LetterboxTargetWidth = targetWidth;
+		LetterboxTargetHeight = targetHeight;
+		LetterboxPhysicalMapped = physicalMapped;
 		return;
 	}
 
@@ -86,7 +157,8 @@ void CreateLetterboxVertex()
 	for (std::size_t i = 0; i < layout.vertices.size(); ++i)
 	{
 		vertices[i] = {
-			layout.vertices[i].x, layout.vertices[i].y,
+			layout.vertices[i].x * rasterScaleX,
+			layout.vertices[i].y * rasterScaleY,
 			0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0)
 		};
 	}
@@ -115,6 +187,17 @@ void CreateLetterboxVertex()
 	LetterboxRasterDevice = d3ddev;
 	LetterboxRasterWidth = sourceWidth;
 	LetterboxRasterHeight = sourceHeight;
+	LetterboxTargetWidth = targetWidth;
+	LetterboxTargetHeight = targetHeight;
+	LetterboxPhysicalMapped = physicalMapped;
+	if (physicalMapped)
+	{
+		spdlog::info(
+			"VR MENU LETTERBOX PHYSICAL MAP: logical={}x{} physical={}x{} "
+			"scale={:.9g},{:.9g} rightRailLogicalX=1680 rightRailPhysicalX={:.9g}",
+			sourceWidth, sourceHeight, targetWidth, targetHeight,
+			rasterScaleX, rasterScaleY, 1680.0f * rasterScaleX);
+	}
 }
 
 class D3DHooks : public Hook
@@ -149,21 +232,35 @@ class D3DHooks : public Hook
 		// publication gap. Gameplay without forced bars avoids this work.
 		IDirect3DDevice9* currentDevice = Game::D3DDevice();
 		const auto* currentSize = Game::screen_resolution;
+		float currentTargetWidth = 0.0f;
+		float currentTargetHeight = 0.0f;
+		bool currentPhysicalMapped = false;
 		const bool validSource = currentDevice && currentSize &&
 			std::isfinite(currentSize->x) && std::isfinite(currentSize->y) &&
-			currentSize->x >= 1.0f && currentSize->y >= 1.0f;
+			currentSize->x >= 1.0f && currentSize->y >= 1.0f &&
+			ResolveLetterboxTargetExtent(
+				static_cast<float>(currentSize->x),
+				static_cast<float>(currentSize->y),
+				currentTargetWidth, currentTargetHeight,
+				currentPhysicalMapped);
 		if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 &&
 			(!Game::is_in_game() || Settings::UILetterboxing == 2) &&
 			validSource &&
 			(currentDevice != LetterboxRasterDevice ||
 			 currentSize->x != LetterboxRasterWidth ||
-			 currentSize->y != LetterboxRasterHeight))
+			 currentSize->y != LetterboxRasterHeight ||
+			 currentTargetWidth != LetterboxTargetWidth ||
+			 currentTargetHeight != LetterboxTargetHeight ||
+			 currentPhysicalMapped != LetterboxPhysicalMapped))
 			CreateLetterboxVertex();
 
 		if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex &&
 			validSource && currentDevice == LetterboxRasterDevice &&
 			currentSize->x == LetterboxRasterWidth &&
-			currentSize->y == LetterboxRasterHeight)
+			currentSize->y == LetterboxRasterHeight &&
+			currentTargetWidth == LetterboxTargetWidth &&
+			currentTargetHeight == LetterboxTargetHeight &&
+			currentPhysicalMapped == LetterboxPhysicalMapped)
 		{
 			IDirect3DDevice9* d3ddev = Game::D3DDevice();
 
@@ -186,9 +283,10 @@ class D3DHooks : public Hook
 			D3DVIEWPORT9 barViewport{};
 			bool overrideViewport = false;
 			const bool validViewportSize =
-				currentSize->x <= 16384.0f && currentSize->y <= 16384.0f &&
-				std::floor(currentSize->x) == currentSize->x &&
-				std::floor(currentSize->y) == currentSize->y;
+				currentTargetWidth <= 16384.0f &&
+				currentTargetHeight <= 16384.0f &&
+				std::floor(currentTargetWidth) == currentTargetWidth &&
+				std::floor(currentTargetHeight) == currentTargetHeight;
 			bool clipStateReady =
 				(!Game::is_in_game() || Settings::UILetterboxing == 2) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorTest)) &&
@@ -205,8 +303,8 @@ class D3DHooks : public Hook
 				barViewport = previousViewport; // Keep the game's Z range.
 				barViewport.X = 0;
 				barViewport.Y = 0;
-				barViewport.Width = static_cast<DWORD>(currentSize->x);
-				barViewport.Height = static_cast<DWORD>(currentSize->y);
+				barViewport.Width = static_cast<DWORD>(currentTargetWidth);
+				barViewport.Height = static_cast<DWORD>(currentTargetHeight);
 				overrideViewport =
 					previousViewport.X != barViewport.X ||
 					previousViewport.Y != barViewport.Y ||
@@ -525,6 +623,9 @@ class D3DHooks : public Hook
 		LetterboxRasterDevice = nullptr;
 		LetterboxRasterWidth = 0.0f;
 		LetterboxRasterHeight = 0.0f;
+		LetterboxTargetWidth = 0.0f;
+		LetterboxTargetHeight = 0.0f;
+		LetterboxPhysicalMapped = false;
 	}
 
 	inline static SafetyHookMid midhook_d3dTemporariesCreate{};

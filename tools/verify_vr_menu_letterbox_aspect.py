@@ -26,7 +26,11 @@ def verify(code: str) -> None:
         "layout.axis == OutRunVR::UI::MenuBarAxis::Invalid",
         "if (!layout.hasBars())",
         "layout.vertices.size()",
-        "layout.vertices[i].x, layout.vertices[i].y",
+        "ResolveLetterboxTargetExtent(",
+        "const float rasterScaleX =",
+        "const float rasterScaleY =",
+        "layout.vertices[i].x * rasterScaleX",
+        "layout.vertices[i].y * rasterScaleY",
         "FAILED(d3ddev->CreateVertexBuffer(",
         "FAILED(candidate->Lock(",
         "candidate->Release();",
@@ -52,6 +56,55 @@ def verify(code: str) -> None:
     assert "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);" in endscene
 
 verify(src)
+
+# Quest 2026-11-02 screenshot/log proof: the floating black rectangle is the
+# original right 4:3 rail (logical x=1680..1920, y=0..1080) drawn unchanged
+# into the physical 2496x2688 VR target. That becomes about 246x579 pixels in
+# the 2560x1440 desktop mirror.
+def verify_vr_frontend_letterbox_physical_map(code: str) -> None:
+    create = code.split("void CreateLetterboxVertex()\n{", 1)[1].split(
+        "\nclass D3DHooks : public Hook", 1)[0]
+    endscene = code.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    for token in (
+        "OutRunVRD3D9ExUpgrade::GetPhysicalTargetExtent(",
+        "if (!Settings::VREnabled || Game::is_in_game())",
+        "LetterboxTargetWidth = targetWidth;",
+        "LetterboxTargetHeight = targetHeight;",
+        "LetterboxPhysicalMapped = physicalMapped;",
+        "layout.vertices[i].x * rasterScaleX",
+        "layout.vertices[i].y * rasterScaleY",
+        "VR MENU LETTERBOX PHYSICAL MAP:",
+    ):
+        assert token in code, token
+    for token in (
+        "currentTargetWidth != LetterboxTargetWidth",
+        "currentTargetHeight != LetterboxTargetHeight",
+        "currentPhysicalMapped != LetterboxPhysicalMapped",
+        "currentTargetWidth == LetterboxTargetWidth",
+        "currentTargetHeight == LetterboxTargetHeight",
+        "currentPhysicalMapped == LetterboxPhysicalMapped",
+        "barViewport.Width = static_cast<DWORD>(currentTargetWidth);",
+        "barViewport.Height = static_cast<DWORD>(currentTargetHeight);",
+    ):
+        assert token in endscene, token
+    assert create.index("ResolveLetterboxTargetExtent(") < create.index(
+        "BuildMenuBarGeometry(") < create.index(
+        "layout.vertices[i].x * rasterScaleX")
+
+    logical_w, logical_h = 1920.0, 1080.0
+    physical_w, physical_h = 2496.0, 2688.0
+    sx, sy = physical_w / logical_w, physical_h / logical_h
+    right_x = 1680.0 * sx
+    right_w = (1920.0 - 1680.0) * sx
+    mapped_h = 1080.0 * sy
+    assert abs(right_x - 2184.0) < 1e-5
+    assert abs(right_w - 312.0) < 1e-5
+    assert abs(mapped_h - 2688.0) < 1e-5
+    assert abs(right_w * (2560.0 / physical_w) - 320.0) < 1e-5
+    assert abs(mapped_h * (1440.0 / physical_h) - 1440.0) < 1e-5
+
+verify_vr_frontend_letterbox_physical_map(src)
 
 # The exact R84 C++ header owns geometry after portrait-menu conversion.
 # Check the compiled header and the live EndScene consumer, not retired
@@ -107,7 +160,8 @@ for old, bad in (
 for old, bad in (
     ("OutRunVR::UI::BuildMenuBarGeometry(", "OutRunVR::UI::BuildLegacySideGeometry("),
     ("if (!layout.hasBars())", "if (layout.hasBars())"),
-    ("layout.vertices[i].x, layout.vertices[i].y", "0.0f, 0.0f"),
+    ("layout.vertices[i].x * rasterScaleX", "0.0f"),
+    ("layout.vertices[i].y * rasterScaleY", "0.0f"),
 ):
     assert old in src, old
     try:
@@ -278,9 +332,15 @@ def verify_live_resize(source: str) -> None:
     for token in ("LetterboxRasterDevice = nullptr;",
                   "LetterboxRasterWidth = 0.0f;",
                   "LetterboxRasterHeight = 0.0f;",
+                  "LetterboxTargetWidth = 0.0f;",
+                  "LetterboxTargetHeight = 0.0f;",
+                  "LetterboxPhysicalMapped = false;",
                   "LetterboxRasterDevice = d3ddev;",
                   "LetterboxRasterWidth = sourceWidth;",
-                  "LetterboxRasterHeight = sourceHeight;"):
+                  "LetterboxRasterHeight = sourceHeight;",
+                  "LetterboxTargetWidth = targetWidth;",
+                  "LetterboxTargetHeight = targetHeight;",
+                  "LetterboxPhysicalMapped = physicalMapped;"):
         assert token in create, token
     assert create.index("if (!layout.hasBars())") < create.index(
         "LetterboxRasterDevice = d3ddev;")
@@ -288,10 +348,16 @@ def verify_live_resize(source: str) -> None:
                   "currentDevice != LetterboxRasterDevice",
                   "currentSize->x != LetterboxRasterWidth",
                   "currentSize->y != LetterboxRasterHeight",
+                  "currentTargetWidth != LetterboxTargetWidth",
+                  "currentTargetHeight != LetterboxTargetHeight",
+                  "currentPhysicalMapped != LetterboxPhysicalMapped",
                   "CreateLetterboxVertex();",
                   "currentDevice == LetterboxRasterDevice",
                   "currentSize->x == LetterboxRasterWidth",
-                  "currentSize->y == LetterboxRasterHeight"):
+                  "currentSize->y == LetterboxRasterHeight",
+                  "currentTargetWidth == LetterboxTargetWidth",
+                  "currentTargetHeight == LetterboxTargetHeight",
+                  "currentPhysicalMapped == LetterboxPhysicalMapped"):
         assert token in endscene, token
     assert endscene.index("CreateLetterboxVertex();") < endscene.index(
         "if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex")
@@ -301,7 +367,10 @@ def verify_live_resize(source: str) -> None:
     for token in ("LetterboxVertex->Release();",
                   "LetterboxRasterDevice = nullptr;",
                   "LetterboxRasterWidth = 0.0f;",
-                  "LetterboxRasterHeight = 0.0f;"):
+                  "LetterboxRasterHeight = 0.0f;",
+                  "LetterboxTargetWidth = 0.0f;",
+                  "LetterboxTargetHeight = 0.0f;",
+                  "LetterboxPhysicalMapped = false;"):
         assert token in release, token
 
 verify_live_resize(src)
@@ -658,15 +727,16 @@ def verify_menu_full_viewport(source: str) -> None:
     restore = body.index("d3ddev->SetViewport(&previousViewport)")
     assert capture < gate < switch < draw_l < draw_r < restore
     for value in (
-        "currentSize->x <= 16384.0f && currentSize->y <= 16384.0f",
-        "std::floor(currentSize->x) == currentSize->x",
-        "std::floor(currentSize->y) == currentSize->y",
+        "currentTargetWidth <= 16384.0f",
+        "currentTargetHeight <= 16384.0f",
+        "std::floor(currentTargetWidth) == currentTargetWidth",
+        "std::floor(currentTargetHeight) == currentTargetHeight",
         "SUCCEEDED(d3ddev->GetViewport(&previousViewport))",
         "barViewport = previousViewport;",
         "barViewport.X = 0;",
         "barViewport.Y = 0;",
-        "barViewport.Width = static_cast<DWORD>(currentSize->x);",
-        "barViewport.Height = static_cast<DWORD>(currentSize->y);",
+        "barViewport.Width = static_cast<DWORD>(currentTargetWidth);",
+        "barViewport.Height = static_cast<DWORD>(currentTargetHeight);",
         "if (overrideViewport)",
         "clipStateReady = SUCCEEDED(d3ddev->SetViewport(&barViewport));",
         "d3ddev->SetViewport(&previousViewport);",
@@ -683,9 +753,9 @@ for good,bad in (
     ("SUCCEEDED(d3ddev->GetViewport(&previousViewport))", "true"),
     ("barViewport.X = 0;", "barViewport.X = previousViewport.X;"),
     ("barViewport.Y = 0;", "barViewport.Y = previousViewport.Y;"),
-    ("barViewport.Width = static_cast<DWORD>(currentSize->x);",
+    ("barViewport.Width = static_cast<DWORD>(currentTargetWidth);",
      "barViewport.Width = previousViewport.Width;"),
-    ("barViewport.Height = static_cast<DWORD>(currentSize->y);",
+    ("barViewport.Height = static_cast<DWORD>(currentTargetHeight);",
      "barViewport.Height = previousViewport.Height;"),
     ("clipStateReady = SUCCEEDED(d3ddev->SetViewport(&barViewport));",
      "clipStateReady = true;"),
