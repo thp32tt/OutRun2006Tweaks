@@ -12,6 +12,8 @@ on:
       - 'src/vr/d3d9/stereo_renderer_r7.inc'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'
       - 'src/vr/game/outrun_renderer.cpp'
+      - 'src/vr/game/quest_cockpit_v2_phase0_probe.hpp'
+      - 'tools/tests/quest_cockpit_v2_phase0_probe_smoke.cpp'
       - 'vrhost/src/main_r23.cpp'
       - 'docs/reviews/dx9ex/automation/**'
   workflow_dispatch:
@@ -28,6 +30,10 @@ jobs:
           ref: ${{ github.sha }}
       - name: Read all available review documents
         run: python3 tools/audit_dx9ex_review_backlog.py
+      - name: QuestCockpitV2 Phase-0 C++17 bounded correlation smoke
+        run: |
+          c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/tests/quest_cockpit_v2_phase0_probe_smoke.cpp -o /tmp/quest-cockpit-v2-p0
+          /tmp/quest-cockpit-v2-p0
       - name: Archive exact-SHA review evidence
         uses: actions/upload-artifact@v4
         with:
