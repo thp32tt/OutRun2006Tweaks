@@ -1,0 +1,31 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261102T0515KST-IDLE",
+  "requested_at_kst": "2026-11-02T05:15:00+09:00",
+  "inventory_checked_at_kst": "2026-11-02T05:16:46+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "policies": {
+    "automation_contract_blob_sha": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "glyph_scale_policy_blob_sha": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "controller_roles_blob_sha": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "inventory": {
+    "source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "method": "Read-only SHA256 inventory via work/C1_QA_20261101_2145_AI2_inventory.py; compare candidate_outputs/A,B with export_evidence and prior N100 C1 QA reports",
+    "candidate_files": 955,
+    "export_evidence_files": 955,
+    "existing_reviewed_distinct_sha": 960,
+    "missing_export_count": 0,
+    "pending_unreviewed_sha_count": 0,
+    "selected_for_review": 0
+  },
+  "result": "IDLE",
+  "new_pass": 0,
+  "new_fail": 0,
+  "new_hold": 0,
+  "remarks": "No unseen exported Korean candidate SHA at inspection; no duplicate re-review, ImageGen, A/B queue modification, DDS, C2/C3, runtime PASS, or VR/FFB/DX11/DXVK change.",
+  "runtime_validation": "UNTESTED",
+  "ai_score_change": 0
+}
