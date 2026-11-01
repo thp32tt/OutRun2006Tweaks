@@ -134,8 +134,13 @@ jobs:
           Copy-Item $vrHostExe.FullName "$dir/outrun-vr-host.exe"
           Copy-Item OutRun2006Tweaks.ini "$dir/OutRun2006Tweaks.ini"
           $env:R26_USER_TEST_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
-          python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["R26_USER_TEST_INI"],encoding="utf-8"); assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getboolean("VR","MirrorFitDesktop") is True; assert p.getboolean("VR","MirrorPreserveAspect") is True; assert p.getint("VR","AntiAliasing") == 2'
-          if ($LASTEXITCODE -ne 0) { throw 'User test package INI is duplicated or does not select the restored rival route' }
+          python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["R26_USER_TEST_INI"],encoding="utf-8"); assert p.getboolean("VR","RivalDx11NativeRoute") is False; assert p.getboolean("VR","DriverSeatCarSpaceBasis") is False; assert p.getboolean("VR","MirrorFitDesktop") is True; assert p.getboolean("VR","MirrorPreserveAspect") is True; assert p.getint("VR","AntiAliasing") == 2; assert abs(p.getfloat("Graphics","ReflectionUpdateRate")-0.25) < 1e-9; assert p.getboolean("Graphics","TransparencySupersampling") is False; assert p.getboolean("VR","TransparencySupersampling") is False; assert p.getboolean("VR","DirectGpuOnly") is True; assert p.getboolean("VR","Telemetry") is True'
+          if ($LASTEXITCODE -ne 0) { throw 'User test package INI lost requested DirectGPU/reflection/transparency profile or telemetry retention' }
+          $launcher = Get-Content tools/Run-DX9ExFocusTest.ps1 -Raw
+          foreach ($needle in @('-DirectGpuOnly=true','-Graphics.ReflectionUpdateRate=0.25','-Graphics.TransparencySupersampling=false','-VR.TransparencySupersampling=false',"OUTRUN_VR_R23_PIXEL_PROBE = '0'")) {
+            if ($launcher -notmatch [regex]::Escape($needle)) { throw "Focus launcher missing required performance override: $needle" }
+          }
+          if ($launcher -match [regex]::Escape("OUTRUN_VR_R23_PIXEL_PROBE = '1'")) { throw 'Focus launcher still enables R23 pixel probe' }
           Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
           Copy-Item tools/RUN_DX9EX_TEST.cmd "$dir/RUN_DX9EX_TEST.cmd"
           Copy-Item tools/Run-DX9ExFocusTest.ps1 "$dir/Run-DX9ExFocusTest.ps1"

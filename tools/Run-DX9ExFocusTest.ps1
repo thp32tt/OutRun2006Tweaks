@@ -51,8 +51,11 @@ $gameArgs = @(
     '-DisableDesktopVsync=true',
     '-SkyGlowFactor=0',
     '-PreferD3D9Ex=true',
-    '-DirectGpuOnly=false',
+    '-DirectGpuOnly=true',
     '-DisableDesktopDuplication=false',
+    '-Graphics.ReflectionUpdateRate=0.25',
+    '-Graphics.TransparencySupersampling=false',
+    '-VR.TransparencySupersampling=false',
     '-RivalDx11NativeRoute=false',
     '-AutoRenderResolution=true',
     '-FollowGameResolution=false',
@@ -76,11 +79,11 @@ Copy-Item (Join-Path $root 'OutRun2006Tweaks.ini') (Join-Path $session 'OutRun20
     'HOST_FULL_TRACE=outrun-vr-host-full-trace.log'
     'GAME_MARKERS=LENS SOURCE/C64/R30/GPU/MATRIX/DRAW_CALL + PIPELINE/FIXEDFN/TARGET/TEXTURE/SHADER_CONSTANTS/STEREO_POSE; PLUS_TIME and GOAL_PERCENT SOURCE/QUEUE/HUD_NODE/D3DX/R62/GPU/MATRIX/EYES; GOAL_TEXT; FRAME_PUBLISH_FULL'
     'HOST_MARKERS=HOST PROJECTION BLIT FULL; XR FRAME FULL; XR EYE FULL with actual FRESH/CACHED submitted view, source frame/pose, QPC, head pose, view-state and reference-space flags'
-    'PIXEL_PROBE=OUTRUN_VR_R23_PIXEL_PROBE=1; 10Hz; L/R 5x3 projection grid with RGB/hash/delta'
-    'PERFORMANCE=INTENTIONALLY_UNTHROTTLED_FOR_DIAGNOSIS'
+    'PIXEL_PROBE=OUTRUN_VR_R23_PIXEL_PROBE=0; disabled for performance validation'
+    'PERFORMANCE=MONO_ELIDE+PARTICLE_FASTPATH; DirectGPU-only; reflection rate 0.25; transparency SS off; telemetry retained'
 ) | Set-Content (Join-Path $session 'FULL_TRACE_CONTRACT.txt') -Encoding UTF8
 
-$env:OUTRUN_VR_R23_PIXEL_PROBE = '1'
+$env:OUTRUN_VR_R23_PIXEL_PROBE = '0'
 Write-Host "Starting DX9Ex variant $variant"
 Write-Host "Test the same short gameplay section, then exit normally."
 
