@@ -110,6 +110,12 @@ assert 'const float menuPhysicalHeight = mirrorBackbufferExtentValid' in theater
 assert 'clientGameState, menuPhysicalWidth, menuPhysicalHeight' in theater
 assert 'publishedLogicalCanvasCrop.width' in theater
 assert 'publishedLogicalCanvasCrop.height' in theater
+# The fallback desktop UV route must share the authored front-end state
+# whitelist with physical XR crop. Otherwise 0x0A-0x0C/goal may lose pixels.
+fallback_logic = aspect.split(
+    'inline LogicalCanvasCapturePlan PlanTopLeftLogicalCaptureUv(', 1)[1].split(
+    'static_assert(IsTopLeftLogicalTheaterState(0x00u));', 1)[0]
+assert 'if (!IsTopLeftLogicalTheaterState(state) ||' in fallback_logic
 assert 'publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;' in theater
 assert '[VR TRACE SUMO_FE LOGICAL CANVAS FULL]' in theater
 assert 'if (!sourceIsSbs && publishedMirrorApplied &&\n            (clientGameState == 0x04u || clientGameState == 0x09u))' in theater
