@@ -90,6 +90,11 @@ assert 'const float theaterScale = !sourceIsSbs &&' in theater
 assert 'clientGameState != 0xFFFFFFFFu' in theater
 assert 'clientGameState == 0x20u' in theater
 assert 'PlanTopLeftLogicalCanvasCrop(' in theater
+assert 'mirrorFrame->backbufferWidth >= 640u' in theater
+assert 'mirrorFrame->backbufferHeight >= 480u' in theater
+assert 'const float menuPhysicalWidth = mirrorBackbufferExtentValid' in theater
+assert 'const float menuPhysicalHeight = mirrorBackbufferExtentValid' in theater
+assert 'clientGameState, menuPhysicalWidth, menuPhysicalHeight' in theater
 assert 'publishedLogicalCanvasCrop.width' in theater
 assert 'publishedLogicalCanvasCrop.height' in theater
 assert 'publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;' in theater

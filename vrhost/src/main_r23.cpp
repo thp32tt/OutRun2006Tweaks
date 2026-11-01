@@ -2485,13 +2485,25 @@ namespace
         // INSIDE the published mirror UV before submitting the LOCAL theater.
         // This is not a 4:3 crop: the entire 16:9 logical selector/menu canvas
         // remains present.
+        const bool mirrorBackbufferExtentValid =
+            mirrorFrame &&
+            mirrorFrame->backbufferWidth >= 640u &&
+            mirrorFrame->backbufferHeight >= 480u &&
+            mirrorFrame->backbufferWidth <= 8192u &&
+            mirrorFrame->backbufferHeight <= 8192u &&
+            static_cast<std::uint64_t>(mirrorFrame->backbufferWidth) *
+                mirrorFrame->backbufferHeight <= 16777216ULL;
+        const float menuPhysicalWidth = mirrorBackbufferExtentValid
+            ? static_cast<float>(mirrorFrame->backbufferWidth)
+            : static_cast<float>(c.projection_.width);
+        const float menuPhysicalHeight = mirrorBackbufferExtentValid
+            ? static_cast<float>(mirrorFrame->backbufferHeight)
+            : static_cast<float>(c.projection_.height);
         const auto publishedLogicalCanvasCrop =
             !sourceIsSbs && publishedMirrorApplied &&
             clientGameState == 0x20u
             ? OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
-                clientGameState,
-                static_cast<float>(c.projection_.width),
-                static_cast<float>(c.projection_.height))
+                clientGameState, menuPhysicalWidth, menuPhysicalHeight)
             : OutRunVrMenuAspect::LogicalCanvasCropPlan{};
         bool publishedLogicalCanvasApplied =
             publishedLogicalCanvasCrop.crop;
@@ -2519,6 +2531,11 @@ namespace
                     << " state=" << clientGameState
                     << " xrPhysical=" << c.projection_.width << 'x'
                     << c.projection_.height
+                    << " frameBackbuffer="
+                    << (mirrorFrame ? mirrorFrame->backbufferWidth : 0u) << 'x'
+                    << (mirrorFrame ? mirrorFrame->backbufferHeight : 0u)
+                    << " cropPhysical=" << menuPhysicalWidth << 'x'
+                    << menuPhysicalHeight
                     << " logical=1920x1080"
                     << " outputUv=" << theaterUv.x << ',' << theaterUv.y
                     << ',' << theaterUv.w << ',' << theaterUv.h
