@@ -1217,20 +1217,23 @@ private:
         // Mirror the same RS cull + front-winding state that owns the real
         // D3D11 Draw. Do not sample fully culled triangles as candidate
         // native RGB pixels; unknown cull modes keep the old sweep.
-        const NativeRawFvfRaster fvfRaster{
-            rasterDesc.CullMode == D3D11_CULL_FRONT
-                ? NativeRawFvfCull::Front
-                : rasterDesc.CullMode == D3D11_CULL_BACK
-                    ? NativeRawFvfCull::Back : NativeRawFvfCull::None,
-            raster && rasterDesc.FrontCounterClockwise != FALSE};
+        NativeRawFvfRaster fvfRaster{};
+        const bool knownNativeCull = native_raw_fvf_raster_from_d3d11(
+            raster.Get() != nullptr,
+            static_cast<std::uint32_t>(rasterDesc.CullMode),
+            rasterDesc.FrontCounterClockwise != FALSE, fvfRaster);
         bool authenticFvfFootprint = false;
-        if (fvfClip.firstClip &&
+        if (fvfClip.firstClip && knownNativeCull &&
             (!raster || (rasterDesc.FillMode == D3D11_FILL_SOLID &&
                          rasterDesc.DepthClipEnable))) {
             NativeRawDrawExtent clipped{};
+            // Clip the ACTUAL polygon against the physical RT/viewport and
+            // live native RS scissor, not only its AABB. A diagonal menu
+            // triangle may cross that box without any GPU raster pixel.
+            // Unknown geometry retains the guarded whole-viewport fallback.
             if (native_raw_fvf_projected_raster(
                     fvfClip, view.TopLeftX, view.TopLeftY,
-                    view.Width, view.Height, clipped, nullptr, &fvfRaster)) {
+                    view.Width, view.Height, clipped, &draw, &fvfRaster)) {
                 const NativeRawDrawExtent intersection{
                     (std::max)(draw.left, clipped.left),
                     (std::max)(draw.top, clipped.top),

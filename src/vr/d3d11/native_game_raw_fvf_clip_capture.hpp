@@ -22,6 +22,29 @@ struct NativeRawFvfRaster {
     NativeRawFvfCull cull = NativeRawFvfCull::None;
     bool frontCounterClockwise = false;
 };
+// Map the ACTUALLY bound D3D11 RS cull mode into the capture raster.
+// A null RS object does not mean CULL_NONE: the D3D11 default state is
+// SOLID, CULL_BACK and FrontCounterClockwise=FALSE. Sampling a culled
+// menu/car triangle as if it colored the GPU loses the sparse real RGB
+// islands. Invalid enum values cannot certify a source clip footprint;
+// callers keep the original GPU viewport sampler in that case.
+[[nodiscard]] constexpr bool native_raw_fvf_raster_from_d3d11(
+    bool rasterStateBound, std::uint32_t cullMode,
+    bool frontCounterClockwise, NativeRawFvfRaster& out) noexcept {
+    out = {};
+    if (!rasterStateBound) {
+        out.cull = NativeRawFvfCull::Back;
+        return true;
+    }
+    switch (cullMode) {
+    case 1u: out.cull = NativeRawFvfCull::None; break; // D3D11_CULL_NONE
+    case 2u: out.cull = NativeRawFvfCull::Front; break; // D3D11_CULL_FRONT
+    case 3u: out.cull = NativeRawFvfCull::Back; break; // D3D11_CULL_BACK
+    default: return false;
+    }
+    out.frontCounterClockwise = frontCounterClockwise;
+    return true;
+}
 struct NativeRawFvfClipSpan {
     const void* firstClip = nullptr;
     std::size_t vertexStride = 0u;

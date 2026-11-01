@@ -632,6 +632,30 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
     const NativeRawFvfRaster cullBack{NativeRawFvfCull::Back,false};
     const NativeRawFvfRaster cullFront{NativeRawFvfCull::Front,false};
     const NativeRawFvfRaster flipped{NativeRawFvfCull::Back,true};
+    // NULL D3D11 RS means DEFAULT BACK CULL, not CULL_NONE. Explicit
+    // D3D11 enum values remain distinct; malformed ones cannot guide a
+    // GPU sample to an unverified source geometry.
+    NativeRawFvfRaster defaultState{}, explicitNone{}, explicitFront{};
+    NativeRawFvfRaster explicitBack{}, invalid{};
+    if (!native_raw_fvf_raster_from_d3d11(
+            false,0u,true,defaultState) ||
+        defaultState.cull != NativeRawFvfCull::Back ||
+        defaultState.frontCounterClockwise ||
+        !native_raw_fvf_raster_from_d3d11(
+            true,1u,false,explicitNone) ||
+        explicitNone.cull != NativeRawFvfCull::None ||
+        !native_raw_fvf_raster_from_d3d11(
+            true,2u,true,explicitFront) ||
+        explicitFront.cull != NativeRawFvfCull::Front ||
+        !explicitFront.frontCounterClockwise ||
+        !native_raw_fvf_raster_from_d3d11(
+            true,3u,false,explicitBack) ||
+        explicitBack.cull != NativeRawFvfCull::Back ||
+        native_raw_fvf_raster_from_d3d11(
+            true,0u,false,invalid) ||
+        native_raw_fvf_raster_from_d3d11(
+            true,4u,false,invalid))
+        return reject(__LINE__);
     NativeRawDrawExtent front{}, back{}, opposite{}, unculled{};
     if (!native_raw_fvf_projected_raster(
             scene,0,0,3440,1440,front,nullptr,&cullBack) ||
@@ -646,6 +670,25 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
          opposite.right != back.right || opposite.bottom != back.bottom) ||
         unculled.left > back.left ||
         unculled.right < front.right)
+        return reject(__LINE__);
+    // The capture callsite now passes the real physical scissor/viewport
+    // to polygon clipping. The left (back-facing) island must not survive
+    // default BACK culling even when its AABB overlaps that scissor.
+    const NativeRawDrawExtent leftHalf{0,0,1720,1440};
+    const NativeRawDrawExtent rightHalf{1720,0,3440,1440};
+    NativeRawDrawExtent nativeDefault{}, nativeLeft{};
+    if (!native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,nativeDefault,&rightHalf,&defaultState) ||
+        nativeDefault.left < rightHalf.left ||
+        nativeDefault.right > rightHalf.right ||
+        native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,nativeLeft,&leftHalf,&defaultState) ||
+        nativeLeft.right != 0 ||
+        !native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,nativeLeft,&leftHalf,&explicitNone) ||
+        nativeLeft.right > leftHalf.right ||
+        !native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,nativeLeft,&leftHalf,&explicitFront) )
         return reject(__LINE__);
     NativeRawDualTile gpu{};
     if (!native_raw_fvf_island_dual_draw_tile(
