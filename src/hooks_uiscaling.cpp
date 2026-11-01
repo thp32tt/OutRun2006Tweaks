@@ -1221,7 +1221,8 @@ class UIScaling : public Hook
         // by D3DXMatrixTransformation2D, its PixelMap result is still in the
         // logical 1920x1080 canvas. Apply the same final virtual->XR mapping
         // here so background/text/custom sprites share one coordinate space.
-        if (!precontained && frontEnd && contained)
+        if (!precontained && frontEnd && contained &&
+            VrFrontEndNeedsPhysicalTargetMap())
         {
             float physicalScaleX = 1.0f, physicalScaleY = 1.0f;
             if (ResolveVrFrontEndVirtualCanvasScale(
@@ -3660,7 +3661,7 @@ class UIScaling : public Hook
         bool physicalized = false;
         float physicalScaleX = 1.0f, physicalScaleY = 1.0f;
         std::uint32_t physicalWidth = 0, physicalHeight = 0;
-        if (Settings::VREnabled && VrFrontEndPhysicalCanvasState() &&
+        if (Settings::VREnabled && VrFrontEndNeedsPhysicalTargetMap() &&
             ResolveVrFrontEndVirtualCanvasScale(
                 true, true, physicalScaleX, physicalScaleY,
                 &physicalWidth, &physicalHeight))

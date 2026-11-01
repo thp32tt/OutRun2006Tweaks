@@ -37,6 +37,11 @@ physical_owner = ui.split('bool VrFrontEndNeedsPhysicalTargetMap() noexcept', 1)
 assert '*Game::current_mode != GameState::STATE_SUMO_FE' in physical_owner
 assert 'pOut, vrFrontEndProducer &&\n                        VrFrontEndNeedsPhysicalTargetMap(),' in ui
 assert 'pOut, originalFrontEndProducer &&\n                    VrFrontEndNeedsPhysicalTargetMap(),' in ui
+assert 'if (!precontained && frontEnd && contained &&\n            VrFrontEndNeedsPhysicalTargetMap())' in ui
+assert 'if (Settings::VREnabled && VrFrontEndNeedsPhysicalTargetMap() &&\n            ResolveVrFrontEndVirtualCanvasScale(' in ui
+# No Sumo-FE custom/multi route may bypass the same physical-map veto.
+assert 'if (!precontained && frontEnd && contained)\n        {' not in ui
+assert 'Settings::VREnabled && VrFrontEndPhysicalCanvasState() &&\n            ResolveVrFrontEndVirtualCanvasScale(' not in ui
 assert 'const float containScale =' not in ui
 assert 'mapped._41 += offsetX;' not in ui
 assert 'mapped._42 += offsetY;' not in ui
