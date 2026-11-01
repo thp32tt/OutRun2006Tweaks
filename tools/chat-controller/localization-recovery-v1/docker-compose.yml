@@ -79,6 +79,12 @@ services:
       OUTRUN_ROI_BRIDGE_ENABLED: "true"
       OUTRUN_ROI_SOURCE_MODE: "direct_visual" # Only SHA-pinned manual visual and exact cross-variant evidence; no OCR-produced inputs
       OUTRUN_ROI_BRIDGE_INTERVAL_SECONDS: "60"
+      # OCR-free low-fidelity DDS TEST_ONLY producer, bounded so N100 stays responsive.
+      # User-managed Portainer pull/build/redeploy required; no DDS auto-installation.
+      OUTRUN_OFFLINE_FALLBACK_ENABLED: "true"
+      OUTRUN_OFFLINE_FALLBACK_INTERVAL_SECONDS: "300"
+      OUTRUN_OFFLINE_FALLBACK_MAX_SOURCES_PER_CYCLE: "1"
+      OUTRUN_OFFLINE_FALLBACK_MIPS: "1"
     ports:
       - "6083:6080"
       - "8788:8787"
