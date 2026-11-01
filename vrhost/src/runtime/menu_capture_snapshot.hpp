@@ -9,6 +9,17 @@ struct Snapshot {
     bool visible = false, fullyVisible = false;
     float x = 0, y = 0, width = 0, height = 0;
 };
+constexpr bool CanUsePublishedMirrorGeometry(
+    bool sourceIsSbs, bool haveFrame, bool samePid,
+    bool presentInFlight) noexcept
+{
+    // Mirror placement is window-layout metadata, not scene-pixel identity.
+    // A Desktop Duplication capture may precede the newest game Present by a
+    // few milliseconds, so do not make stable menu geometry depend on the
+    // strict pixel-QPC correlation used for stereo frame identity.
+    return !sourceIsSbs && haveFrame && samePid && !presentInFlight;
+}
+
 constexpr Snapshot ClipClient(
     std::int64_t l, std::int64_t t, std::int64_t r, std::int64_t b,
     std::uint32_t outputW, std::uint32_t outputH) noexcept {
@@ -29,6 +40,11 @@ constexpr Snapshot ClipClient(
         b <= static_cast<std::int64_t>(outputH);
     return s;
 }
+static_assert(CanUsePublishedMirrorGeometry(false, true, true, false));
+static_assert(!CanUsePublishedMirrorGeometry(true, true, true, false));
+static_assert(!CanUsePublishedMirrorGeometry(false, true, false, false));
+static_assert(!CanUsePublishedMirrorGeometry(false, true, true, true));
+
 constexpr auto Full = ClipClient(160,90,1440,810,1920,1080);
 constexpr auto Partial = ClipClient(-240,90,1040,810,1920,1080);
 static_assert(Full.visible && Full.fullyVisible && Full.width > .66f);

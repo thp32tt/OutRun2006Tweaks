@@ -2459,8 +2459,17 @@ namespace
         UvRect theaterUv = whole;
         bool publishedMirrorApplied = false;
         float publishedMirrorAspect = 0.0f;
-        if (!sourceIsSbs && mirrorFrame &&
-            R23TheaterFrameMatchesCapture(c, *mirrorFrame))
+        const bool publishedMirrorQpcMatched =
+            !sourceIsSbs && mirrorFrame &&
+            R23TheaterFrameMatchesCapture(c, *mirrorFrame);
+        const bool publishedMirrorGeometryEligible =
+            mirrorFrame &&
+            OutRunVrMenuCapture::CanUsePublishedMirrorGeometry(
+                sourceIsSbs, true,
+                mirrorFrame->clientPid == c.gamePid_,
+                (mirrorFrame->flags &
+                    OutRunVR::RenderFramePresentInFlight) != 0);
+        if (publishedMirrorGeometryEligible)
         {
             UvRect publishedUv{};
             RECT publishedRect{};
@@ -2504,15 +2513,20 @@ namespace
                         << publishedRect.bottom
                         << " uv=" << theaterUv.x << ',' << theaterUv.y
                         << ',' << theaterUv.w << ',' << theaterUv.h
-                        << " authority=GAME_PUBLISHED_D3D9_HWND_CLIENT_RECT\n";
+                        << " captureQpcMatch="
+                        << (publishedMirrorQpcMatched ? 1 : 0)
+                        << " authority=GAME_PUBLISHED_D3D9_HWND_CLIENT_RECT"
+                        << "_GEOMETRY_INDEPENDENT_OF_CAPTURE_QPC\n";
                     OutRunVrEmitFullTrace(trace.str());
                 }
             }
         }
-        // The game publishes 440,0..3000,1440, but a QPC-missed
-        // capture reported 0,0..3440,1440 in the 2026-11-01 Quest trace.
-        // Re-read the actual HWND of the same game PID for these frames.
-        // Do not use a future Present receipt to authorize pixel identity.
+        // The 2026-11-01 Quest trace proved that strict Present-QPC
+        // matching alternated the menu geometry between the game's published
+        // 2560x1440 mirror content rect and the full 3440x1440 HWND client.
+        // Keep the completed same-process Frame.v2 mirror rect authoritative
+        // across those small capture/PRESENT skews. Only fall back to the HWND
+        // before usable published mirror metadata exists at all.
         bool liveMirrorApplied = false;
         if (!sourceIsSbs && !publishedMirrorApplied)
         {
