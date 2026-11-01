@@ -113,9 +113,11 @@ assert 'publishedLogicalCanvasCrop.height' in theater
 assert 'publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;' in theater
 assert '[VR TRACE SUMO_FE LOGICAL CANVAS FULL]' in theater
 assert 'if (!sourceIsSbs && publishedMirrorApplied &&\n            (clientGameState == 0x04u || clientGameState == 0x09u))' in theater
-assert 'clientGameState == 0x20u' not in theater.split(
+authored43 = theater.split(
     'bool authoredFourThreeApplied = false;', 1)[1].split(
-    'const auto logicalCanvasCrop =', 1)[0]
+    'const bool mirrorBackbufferExtentValid =', 1)[0]
+assert 'clientGameState == 0x20u' not in authored43
+assert '(clientGameState == 0x04u || clientGameState == 0x09u)' in authored43
 assert host.count('R23RenderWorldLockedMenuProjection(') == 1
 assert host.count('R23RenderTheater(') >= 3
 assert 'HudScale = 0.55' in ini
