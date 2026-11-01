@@ -61,12 +61,14 @@ try {
     $env:OUTRUN_VR_GPU_PROFILE_CENSUS_V2 = if ($debugMode) { '1' } else { '0' }
     $env:OUTRUN_VR_GPU_SCENE = $variant
     $env:OUTRUN_VR_R23_PIXEL_PROBE = '1'
+    $env:OUTRUN_VR_FILE_LOG = '1'
     $argsList = @(
         '-FramerateLimit=0','-FramerateFastLoad=0',
         '-FramerateInterpolation=true','-FramerateUnlockExperimental=true',
         '-FrameCadenceMode=1','-FrameCadenceTargetHz=0',
         '-DisableDesktopVsync=true','-SkyGlowFactor=0',
         '-PreferD3D9Ex=true','-DirectGpuOnly=false','-DisableDesktopDuplication=false',
+        '-VR.Telemetry=true',
         '-ReflectionLateFrameThrottle=false','-DriverSeatView=false',
         '-RivalDx11NativeRoute=false','-UIScalingMode=1',
         '-AutoRenderResolution=true','-FollowGameResolution=false',
@@ -80,6 +82,7 @@ try {
       "OUTRUN_VR_GPU_PROFILE=$env:OUTRUN_VR_GPU_PROFILE",
       "OUTRUN_VR_GPU_PROFILE_CENSUS_V2=$env:OUTRUN_VR_GPU_PROFILE_CENSUS_V2",
       "OUTRUN_VR_R23_PIXEL_PROBE=$env:OUTRUN_VR_R23_PIXEL_PROBE",
+      "OUTRUN_VR_FILE_LOG=$env:OUTRUN_VR_FILE_LOG",
       "runtimeValidation=UNTESTED") | Set-Content -LiteralPath (Join-Path $session 'RUN_CONFIG.txt') -Encoding UTF8
     # Record the actual installed payload, not only a package-label SHA.
     $binaryIdentity = @('dinput8.dll','outrun-vr-host.exe') | ForEach-Object {
