@@ -102,7 +102,19 @@ jobs:
           $inVr = $false
           $enabledPatched = $false
           $patchedIni = foreach ($line in Get-Content $releaseIni) {
-            if ($line -match '^\s*\[([^]]+)\]\s*          if (Test-Path LICENSES.txt) { Copy-Item LICENSES.txt "$dir/LICENSES.txt" }
+            if ($line -match '^\s*\[([^]]+)\]\s*$') {
+              $inVr = ($Matches[1] -ieq 'VR')
+            }
+            if ($inVr -and -not $enabledPatched -and $line -match '^\s*Enabled\s*=') {
+              'Enabled = false'
+              $enabledPatched = $true
+            } else {
+              $line
+            }
+          }
+          if (-not $enabledPatched) { throw 'release INI [VR] Enabled key not found' }
+          $patchedIni | Set-Content $releaseIni -Encoding utf8
+          if (Test-Path LICENSES.txt) { Copy-Item LICENSES.txt "$dir/LICENSES.txt" }
           Copy-Item RELEASE_NOTES_VR_v0.01-beta.md "$dir/README_VR_v0.01_Beta.md"
           Set-Content "$dir/VR_RELEASE_VERSION.txt" 'OutRun 2006 VR v0.01 Beta' -Encoding ascii
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
@@ -143,70 +155,6 @@ jobs:
 
       - name: Publish GitHub prerelease
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release view vr-v0.01-beta --repo $env:GITHUB_REPOSITORY *> $null
-          if ($LASTEXITCODE -eq 0) {
-            gh release delete vr-v0.01-beta --repo $env:GITHUB_REPOSITORY --cleanup-tag --yes
-          }
-          gh release create vr-v0.01-beta release/OutRun2_VR_v0.01_Beta.zip `
-            --repo $env:GITHUB_REPOSITORY `
-            --target $env:GITHUB_SHA `
-            --title 'OutRun 2006 VR v0.01 Beta' `
-            --notes-file RELEASE_NOTES_VR_v0.01-beta.md `
-            --prerelease
-) {
-              $inVr = ($Matches[1] -ieq 'VR')
-            }
-            if ($inVr -and -not $enabledPatched -and $line -match '^\s*Enabled\s*=') {
-              'Enabled = false'
-              $enabledPatched = $true
-            } else {
-              $line
-            }
-          }
-          if (-not $enabledPatched) { throw 'release INI [VR] Enabled key not found' }
-          $patchedIni | Set-Content $releaseIni -Encoding utf8
-          if (Test-Path LICENSES.txt) { Copy-Item LICENSES.txt "$dir/LICENSES.txt" }
-          Copy-Item RELEASE_NOTES_VR_v0.01-beta.md "$dir/README_VR_v0.01_Beta.md"
-          Set-Content "$dir/VR_RELEASE_VERSION.txt" 'OutRun 2006 VR v0.01 Beta' -Encoding ascii
-          Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
-          @(
-            'DirectGpuOnly=true'
-            'Graphics.ReflectionUpdateRate=0.25'
-            'Graphics.TransparencySupersampling=false'
-            'VR.TransparencySupersampling=false'
-            'OUTRUN_VR_R23_PIXEL_PROBE=OFF (default)'
-            'VR.Telemetry=false'
-            'VR.FileLogging=false'
-            'RUNTIME_VALIDATION=USER_CONFIRMED_2026-11-02'
-          ) | Set-Content "$dir/VR_RELEASE_PROFILE.txt" -Encoding ascii
-
-          $env:VR_RELEASE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
-          python -c 'import configparser,os; p=configparser.ConfigParser(strict=True,interpolation=None); p.read(os.environ["VR_RELEASE_INI"],encoding="utf-8"); assert p.getboolean("VR","DirectGpuOnly") is True; assert abs(p.getfloat("Graphics","ReflectionUpdateRate")-0.25)<1e-9; assert p.getboolean("Graphics","TransparencySupersampling") is False; assert p.getboolean("VR","TransparencySupersampling") is False; assert p.getboolean("VR","Telemetry") is False; assert p.getboolean("VR","FileLogging") is False'
-          if ($LASTEXITCODE -ne 0) { throw 'release INI profile mismatch' }
-
-          foreach ($forbidden in @(
-            'RUN_DX9EX_TEST.cmd','Run-DX9ExFocusTest.ps1',
-            'Collect-OutRunVRLogs.ps1','Collect-OutRunVRLogs.cmd')) {
-            if (Test-Path (Join-Path $dir $forbidden)) {
-              throw "diagnostic file leaked into release: $forbidden"
-            }
-          }
-
-          New-Item -ItemType Directory -Force release | Out-Null
-          Compress-Archive -Path "$dir/*" -DestinationPath 'release/OutRun2_VR_v0.01_Beta.zip' -Force
-          Get-FileHash 'release/OutRun2_VR_v0.01_Beta.zip' -Algorithm SHA256
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: OutRun2-VR-v0.01-Beta-${{ github.sha }}
-          path: release/OutRun2_VR_v0.01_Beta.zip
-          if-no-files-found: error
-
-      - name: Publish GitHub prerelease
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
