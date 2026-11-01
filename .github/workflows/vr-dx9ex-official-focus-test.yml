@@ -60,6 +60,10 @@ on:
       - 'vrhost/src/runtime/menu_capture_snapshot.hpp'
       - 'src/vr/ui/vr_mirror_aspect_fit.hpp'
       - 'tools/verify_vr_mirror_aspect_fit.py'
+      - 'src/vr/d3d9/projected_lens_r85_source_policy.hpp'
+      - 'vrhost/tests/projected_sun_ray_smoke.cpp'
+      - 'tools/verify_vr_r26_landscape_visual_recovery.py'
+      - 'tools/verify_dx9ex_r26_projected_flare_fusion.py'
   workflow_dispatch:
 
 jobs:
