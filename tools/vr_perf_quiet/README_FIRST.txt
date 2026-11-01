@@ -14,7 +14,7 @@ CHERRY-PICK: 0b39f432, 36d5882d, 6b75e5cb, 73e1bfc5, 8ee0bc11
 LOG POLICY: OUTRUN_VR_FULL_TRACE=0; OUTRUN_VR_R23_PIXEL_PROBE=0;
  VR.Telemetry=false. Lightweight errors and startup summaries retained.
 QUALITY: OpenXR recommended eye pixels; MSAA2 setting; no game EXE edits.
-REFLECTION: 256 pixels, rate 0.25, native vehicle LOD enabled.
+QUALITY RESTORE: reflection 512 pixels, rate 0.25; vehicle LOD disabled (full-detail vehicles).
 EXCLUDED: unconditional third mono backup removal (previously caused
  blank/white frames before a verified stereo source).
 

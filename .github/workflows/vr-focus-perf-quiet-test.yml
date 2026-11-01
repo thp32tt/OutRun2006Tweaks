@@ -130,6 +130,7 @@ jobs:
             'LOGGING=OFF: game telemetry, host full trace, XR pixel probe'
             'EYE_RESOLUTION=OpenXR recommended per-eye allocation'
             'TRANSPORT=DirectGPU-only for gameplay; menu Desktop Duplication kept'
+            'QUALITY_RESTORE=ReflectionResolution512; ReflectionUpdateRate0.25; DisableVehicleLODs=true'
             'MONO_SHADOW=SAFE until R30 gap; invalid replay skipped, verified full color Clear reseeds'
             'RUNTIME_QUEST_VALIDATION=UNTESTED'
           ) | Set-Content "$dir/BUILD_PROVENANCE.txt" -Encoding UTF8
