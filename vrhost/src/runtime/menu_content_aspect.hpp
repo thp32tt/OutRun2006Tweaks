@@ -133,6 +133,38 @@ namespace OutRunVrMenuAspect
         float aspect = 16.0f / 9.0f;
     };
 
+    // QPC-missed Frame.v2 metadata may still prove the physical D3D9Ex
+    // canvas for a short interval. This is a DIMENSION-only receipt: never
+    // reuse its stale HWND rectangle, pixels or publication identity.
+    // The 100-ms exact capture match remains the only authoritative rect.
+    constexpr bool RecentSumoPhysicalCanvasReceipt(
+        std::uint32_t state, std::uint32_t producerPid,
+        std::uint32_t gamePid, std::uint32_t width,
+        std::uint32_t height, std::int64_t framePresentQpc,
+        std::int64_t nowQpc, std::int64_t qpcFrequency) noexcept
+    {
+        return state == 0x20u && producerPid != 0u &&
+            producerPid == gamePid &&
+            width >= 1920u && height >= 1080u &&
+            width <= 8192u && height <= 8192u &&
+            static_cast<std::uint64_t>(width) * height <= 16777216ULL &&
+            static_cast<std::uint64_t>(width) * 9u <
+                static_cast<std::uint64_t>(height) * 16u &&
+            framePresentQpc > 0 && nowQpc >= framePresentQpc &&
+            qpcFrequency >= 4 &&
+            nowQpc - framePresentQpc <= qpcFrequency / 4;
+    }
+    static_assert(RecentSumoPhysicalCanvasReceipt(
+        0x20u, 123u, 123u, 2496u, 2688u, 9000, 9100, 1000));
+    static_assert(!RecentSumoPhysicalCanvasReceipt(
+        0x20u, 123u, 124u, 2496u, 2688u, 9000, 9100, 1000));
+    static_assert(!RecentSumoPhysicalCanvasReceipt(
+        0x20u, 123u, 123u, 2496u, 2688u, 9000, 9300, 1000));
+    static_assert(!RecentSumoPhysicalCanvasReceipt(
+        0x0Au, 123u, 123u, 2496u, 2688u, 9000, 9100, 1000));
+    static_assert(!RecentSumoPhysicalCanvasReceipt(
+        0x20u, 123u, 123u, 1920u, 1080u, 9000, 9100, 1000));
+
     inline LogicalCanvasCapturePlan PlanTopLeftLogicalCaptureUv(
         std::uint32_t state,
         float clientLeft, float clientTop,
@@ -140,7 +172,8 @@ namespace OutRunVrMenuAspect
         float sourceWidth, float sourceHeight,
         float physicalWidth, float physicalHeight,
         float logicalWidth = 1920.0f,
-        float logicalHeight = 1080.0f) noexcept
+        float logicalHeight = 1080.0f,
+        bool verifiedSumoPhysicalSource = false) noexcept
     {
         // This helper is called by the explicit theater/menu branch with a
         // concrete game-state value. The gameplay recovery call uses the
@@ -194,7 +227,8 @@ namespace OutRunVrMenuAspect
             physicalWidth >= logicalWidth &&
             physicalHeight >= logicalHeight &&
             physicalAspect < logicalAspect - 0.10f &&
-            std::fabs(clientAspect - physicalAspect) <= 0.025f;
+            (verifiedSumoPhysicalSource ||
+                std::fabs(clientAspect - physicalAspect) <= 0.025f);
         if (sumoPhysicalPortrait)
         {
             fitWidth = clientWidth * (logicalWidth / physicalWidth);
