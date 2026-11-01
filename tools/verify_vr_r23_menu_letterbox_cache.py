@@ -84,13 +84,17 @@ def verify(text: str) -> None:
     assert 'publishedMirrorApplied = true;' in theater
     assert 'else if (clientGameState != 0xFFFFFFFFu)' in theater
     assert 'authority=CURRENT_SAME_PID_WIN32_CLIENT_RECT' in theater
-    assert 'mirrorFrame && mirrorFrame->clientPid == c.gamePid_' in theater
+    assert 'const bool publishedMirrorGeometryEligible =' in theater
+    assert 'mirrorFrame->clientPid == c.gamePid_' in theater
+    assert 'CanUsePublishedMirrorGeometry(' in theater
     assert "GetCapturedGameUv(" in theater
     assert "capturedTheaterFullyVisible &&" not in theater
     assert "LOGICAL_CANVAS_CAPTURE_SOURCE_RECT" in theater
     assert "fitPixels=" in theater
-    assert "physicalReceipt=" in theater
-    assert "RecentSumoPhysicalCanvasReceipt(" in theater
+    assert "physicalReceipt=0" in theater
+    assert "[VR TRACE SUMO WHOLE COMPOSITE FULL]" in theater
+    assert "COMPLETE_2D_3D_GAME_MIRROR_NO_LOGICAL_CROP" in theater
+    assert "RecentSumoPhysicalCanvasReceipt(" not in theater
     assert "frame.clientPid != c.gamePid_" in text
     assert "publishedMirrorApplied" in theater
     assert "!publishedMirrorApplied" in theater
