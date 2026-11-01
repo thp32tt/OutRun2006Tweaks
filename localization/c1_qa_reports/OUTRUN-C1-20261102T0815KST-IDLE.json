@@ -1,0 +1,49 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-20261102T0815KST-IDLE",
+  "scheduled_slot_kst": "2026-11-02T08:15:00+09:00",
+  "inventory_checked_at_kst": "2026-11-02T08:16:25+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_branch_head_before": "9da74035cceb205911966e1e242bfeebfbea6d66",
+  "role": "C1",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "method": "read-only work/C1_QA_20261101_2145_AI2_inventory.py executed on N100; deduplicated by PNG byte SHA256 versus historical C1 QA reports",
+    "candidate_png_files": 955,
+    "export_evidence_entries": 955,
+    "prior_reviewed_distinct_sha256": 960,
+    "new_unreviewed_sha256": 0,
+    "candidates_without_export": 0,
+    "checked_at_kst": "2026-11-02T08:16:25+09:00"
+  },
+  "status": "IDLE_NO_NEW_UNREVIEWED_AB_CANDIDATES",
+  "result": {
+    "reviewed_new": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "qa_scope": "No new candidate SHA256 available for visual review; no newly asserted QA PASS/FAIL.",
+  "guards": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "new_dds_generated": false,
+    "c2_c3_or_ingame_pass": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "score": {
+    "lane": "AI 1",
+    "previous_confirmed": 1784,
+    "delta": 0,
+    "new_cumulative": 1784,
+    "ssot": "thp32tt/ai-dev-lab/main/AI_SCOREBOARD.md"
+  },
+  "note": "The count of historical reviewed SHA256 does not represent approved current PNG count. Same-SHA repeat was excluded. This IDLE report does not confer approval."
+}
