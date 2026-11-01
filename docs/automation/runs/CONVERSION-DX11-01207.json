@@ -1,0 +1,151 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01207",
+  "production_id": "CONVERSION-DX11-01207",
+  "event_id": "CONVERSION-DX11-01207-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SCISSOR_VISIBLE_FVF_GPU_SOURCE_PRIMITIVE_ROTATION",
+  "classification": "A_REAL_NATIVE_FVF_VISIBLE_GPU_SOURCE_CAPTURE_REPAIR_AND_B_CI_FAILURE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "5106348137276754b6088ee09a0f8aed07205ede",
+  "implementation_source_sha": "dbabeb9f48a240949a54a2967c3047bc7653a894",
+  "material_result_sha": "dbabeb9f48a240949a54a2967c3047bc7653a894",
+  "validation_bearing_result_sha": "0f67923270c55de0bf71f3ec375d0d6fbcb96833",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "desktop_game_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Real game-authored source D3D9 FVF list/strip/fan triangles are clipped by authentic viewport/scissor. Previously ordinal % total IA count repeatedly selected the same source island when only a few game menu/car/race triangles were visible. New bounded visible primitive indices rotate native D3D11 PRE/POST GPU RGB readback selection over actual clipped drawable triangles, with two-source-island and displaced original IA regression. Original D3D9 Draw/Present/input/FFB, source RT/COM identity, GPU RGB fence, DX9Ex fallback and DXVK freeze remain unchanged. Still partial opt-in diagnostic, not proven full frame.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_FVF_GAME_TRIANGLE_DRAW",
+      "WHOLE_SOURCE_IA_VALIDATION",
+      "D3D11_NATIVE_DRAW",
+      "REAL_SCISSOR_VISIBLE_PRIMITIVE_ROTATION",
+      "D3D11_PRE_POST_GPU_RGB",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_FVF_GAME_SOURCE_IA",
+      "TRUE_SCISSOR_VISIBLE_TRIANGLE_INDEX_CACHE",
+      "ROTATING_NATIVE_GPU_RGB_SOURCE_ISLANDS",
+      "SOURCE_PRESENT_FENCE_AND_FALLBACK"
+    ],
+    "batch_components": [
+      "VISIBLE_CLIPPED_IA_PRIMITIVE_ROTATION",
+      "DISPERSED_SPARSE_SOURCE_TRIANGLE_REGRESSION",
+      "REAL_SOURCE_CXX_COMPILATION_FAILURE_REPAIR",
+      "FAIL_CLOSED_FAST_WORKFLOW_AND_FIVE_EXACT_SHA_GATES"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Fast Structural run 41347893687 SUCCESS compiles and executes native_raw_dual_tile_test at 0f679232; sparse 32-IA/two-visible island and displaced source-IA capture regression; original Win32 Build 41347893835 SUCCESS.",
+      "negative_regression": "Full source IA validation, off-scissor primitive rejection and no-visible IA fail closed; original D3D9 Present/FFB and GPU source RT/fence gates preserved. Compile failure previously masked by compound && was repaired with separate enforced compile/execute lines.",
+      "component_integration": "Actual hooked game FVF Draw selection -> scissor clipped visible-index source selection -> genuine D3D11 GPU PRE/POST RGB source tile -> GPU EVENT fence -> D3D9-authenticated Present; exact SHA 0f679232 five mandatory push workflows SUCCESS. Real desktop game and Quest3/VDXR untested."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY: VISIBLE_FRAME_OUTPUT describes opt-in partial GPU diagnostic RGB on protected original D3D9 Present, NOT an observed full DX11 game frame or Quest3 OpenXR stereo.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC explicitly opt-in default OFF; original D3D9 render/input/FFB/SkyGlow, DX9Ex fallback and frozen DXVK protected."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Advance genuine menu, vehicle selection and race FVF GPU source RGB capture over all actually visible clipped original D3D9 primitives without promoting partial GPU diagnostics to a complete frame.",
+    "acceptance_items": [
+      {
+        "id": "visible_fvf_primitive_rotation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_NATIVE_RGB_SOURCE",
+        "expected_behavior": "The native GPU readback crop rotates over exactly source scissor-visible triangles, including separated nonzero IA offsets."
+      },
+      {
+        "id": "original_gpu_source_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_SOURCE_AND_FFB",
+        "expected_behavior": "Off-scissor/malformed original FVF IA cannot invent GPU RGB or bypass source identity, fence and original D3D9 fallback."
+      },
+      {
+        "id": "five_same_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_WINDOWS_OPENXR_AND_INSPECTOR",
+        "expected_behavior": "All five required push Gate workflows conclude SUCCESS on exact same validation-bearing SHA without conflating runtime gameplay proof."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "visible_fvf_primitive_rotation": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41347893687 SUCCESS; Win32 Build 41347893835 SUCCESS exact SHA 0f679232"
+    },
+    "original_gpu_source_fail_closed": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Fast Structural 41347893687 SUCCESS, no C++ errors, isolated WARP 41347893732 SUCCESS"
+    },
+    "five_same_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "Exact SHA 0f679232: 41347893687,41347893713,41347893835,41347893794,41347893685 all SUCCESS"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41347893687,
+    "Backend Conversion Gate": 41347893713,
+    "Build": 41347893835,
+    "OpenXR VR architecture": 41347893794,
+    "OutRun EXE HUD Inspector CI": 41347893685
+  },
+  "exact_sha_gate_conclusions": [
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS"
+  ],
+  "causal_ci_repairs": [
+    {
+      "commit_sha": "9e154d5fa421904f685ff25a079a2d9047be2dbe",
+      "reason": "Prior 01206 C6 record lacked mandatory acceptance_proof, policy Fast gate failed; historical source/score unchanged",
+      "score_change": 0
+    },
+    {
+      "commit_sha": "0f67923270c55de0bf71f3ec375d0d6fbcb96833",
+      "reason": "Preexisting 01206 test undeclared tile and compound && Fast build false green fixed via real C++ fixture and enforced separate compiler/runtime commands; new SHA genuine compile and five gate success",
+      "score_change": 0
+    }
+  ],
+  "runtime_note": "No actual Windows OutRun game, no HMD, no Quest3/VDXR optical session. Native stereo and full game frame remain unverified. RUNTIME_VALIDATION=UNTESTED.",
+  "score_note": "One independent live GPU source capture integration +1 after exact five-gate build verification; old 01206 doc repair, test compiler/CI correction, C6, retry and readback +0.",
+  "recorded_at": "2026-11-02 KST"
+}
