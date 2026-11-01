@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <shellapi.h>
 #include <filesystem>
+#include <cwchar>
 
 #include "hook_mgr.hpp"
 #include "resource.h"
@@ -45,6 +46,41 @@ namespace Module
 		Game::init();
 	}
 
+	static bool ParseIniBool(const wchar_t* text, bool fallback) noexcept
+	{
+		if (!text || !*text)
+			return fallback;
+		if (!_wcsicmp(text, L"true") || !_wcsicmp(text, L"yes") || !wcscmp(text, L"1"))
+			return true;
+		if (!_wcsicmp(text, L"false") || !_wcsicmp(text, L"no") || !wcscmp(text, L"0"))
+			return false;
+		return fallback;
+	}
+
+	static bool ReadIniBool(const std::filesystem::path& path,
+		const wchar_t* section, const wchar_t* key, bool fallback) noexcept
+	{
+		const wchar_t* fallbackText = fallback ? L"true" : L"false";
+		wchar_t value[16]{};
+		GetPrivateProfileStringW(section, key, fallbackText, value,
+			static_cast<DWORD>(std::size(value)), path.c_str());
+		return ParseIniBool(value, fallback);
+	}
+
+	bool FileLoggingEnabled() noexcept
+	{
+		bool enabled = ReadIniBool(IniPath, L"VR", L"FileLogging", true);
+		if (std::filesystem::exists(UserIniPath))
+			enabled = ReadIniBool(UserIniPath, L"VR", L"FileLogging", enabled);
+
+		wchar_t env[16]{};
+		const DWORD envLen = GetEnvironmentVariableW(
+			L"OUTRUN_VR_FILE_LOG", env, static_cast<DWORD>(std::size(env)));
+		if (envLen > 0 && envLen < std::size(env))
+			enabled = ParseIniBool(env, enabled);
+		return enabled;
+	}
+
 	void to_log()
 	{
 		// Print some info about the users setup to log, can come in useful for debugging issues
@@ -65,14 +101,17 @@ void Plugin_Init()
 	{
 		std::vector<spdlog::sink_ptr> sinks;
 		sinks.push_back(std::make_shared<spdlog::sinks::msvc_sink_mt>(true)); // Print logs to debug output
-		try
+		if (Module::FileLoggingEnabled())
 		{
-			sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(Module::LogPath.string(), true));
-		}
-		catch (const std::exception&)
-		{
-			// spdlog failed to open log file for writing (happens in some WinStore apps)
-			// let's just try to continue instead of crashing
+			try
+			{
+				sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(Module::LogPath.string(), true));
+			}
+			catch (const std::exception&)
+			{
+				// spdlog failed to open log file for writing (happens in some WinStore apps)
+				// let's just try to continue instead of crashing
+			}
 		}
 
 		auto combined_logger = std::make_shared<spdlog::logger>("", begin(sinks), end(sinks));
