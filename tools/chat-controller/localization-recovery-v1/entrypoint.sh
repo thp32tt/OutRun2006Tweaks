@@ -180,7 +180,7 @@ if [[ "${OUTRUN_OFFLINE_FALLBACK_ENABLED:-false}" == "true" ]]; then
           >>/logs/offline-korean.log 2>&1; then
         echo "$(date -Is) offline Korean fallback cycle held/failed; retry later" >>/logs/offline-korean.log
       fi
-      sleep "${OUTRUN_OFFLINE_FALLBACK_INTERVAL_SECONDS:-300}"
+      sleep "${OUTRUN_OFFLINE_FALLBACK_INTERVAL_SECONDS:-60}"
     done
   ) &
 fi
