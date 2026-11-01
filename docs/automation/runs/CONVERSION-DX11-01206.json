@@ -1,0 +1,158 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01206",
+  "production_id": "CONVERSION-DX11-01206",
+  "event_id": "CONVERSION-DX11-01206-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "rollover_events": [
+    "CONVERSION-DX11-01206-E003"
+  ],
+  "rollover_not_retry": true,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:REAL_SOURCE_POLYGON_SCISSOR_GPU_CAPTURE",
+  "classification": "A_SOURCE_VISIBLE_POLYGON_SCISSOR_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_ready": true,
+  "source_base_sha": "cc0e3934492c993b7bffec095f8993da98ec03dd",
+  "implementation_source_sha": "ad77590f5bd99db6d317d6294bfd8c927f842f84",
+  "material_result_sha": "ad77590f5bd99db6d317d6294bfd8c927f842f84",
+  "validation_bearing_result_sha": "cf6c2db465f0b3a4a8b6caa64b72ffa9acf4a02a",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "gameplay_test_performed": false,
+  "desktop_game_test_performed": false,
+  "hmd_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Actual D3D9 game FVF list/strip/fan Draw IA clips against live game viewport AND source scissor polygon half-planes rather than merely intersecting source triangle AABBs. Source-authentic visible triangles phase genuine native D3D11 GPU RGB PRE/POST source crops; negative diagonal-menu false-AABB, positive in-scissor and mixed source Draw regressions are included. Fail-closed geometry, source GPU event/RT/Present identity, DX9Ex fallback and original D3D9 Draw/input/FFB remain unchanged. Diagnostic opt-in is OFF by default; not proven native full-frame nor HMD stereo.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_GAME_FVF_DRAW",
+      "WHOLE_SOURCE_IA_VALIDATION",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_D3D11_DRAW",
+      "ACTUAL_POLYGON_SCISSOR_CLIPPING",
+      "VISIBLE_CLIPPED_GPU_CROP_SELECTION",
+      "D3D11_PRE_POST_GPU_RGB",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_GAME_FVF_IA",
+      "SOURCE_VIEWPORT_SCISSOR_POLYGON",
+      "ONLY_VISIBLE_NATIVE_GPU_RGB_CROP",
+      "ORIGINAL_GAME_PRESENT_IDENTITY"
+    ],
+    "batch_components": [
+      "ACTUAL_FVF_POLYGON_SCISSOR_CLIP",
+      "MIXED_SOURCE_TRIANGLE_GPU_CAPTURE",
+      "ORIGINAL_IA_FAIL_CLOSED_REGRESSION",
+      "EXACT_SHA_CXX_AND_WINDOWS_VALIDATION"
+    ],
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+      "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY: VISIBLE_FRAME_OUTPUT denotes protected original D3D9 Present with opt-in partial native GPU diagnostic RGB, not complete DX11 gameplay nor verified HMD stereo.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in default OFF, original D3D9 render/input/FFB and DX9Ex fallback protected, DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Remove false GPU RGB source-island admission from off-scissor real game triangles while retaining original live source and native Draw-to-Present diagnostics.",
+    "acceptance_items": [
+      {
+        "id": "true_polygon_source_scissor",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GAME_NATIVE_D3D11_RGB",
+        "expected_behavior": "Reject diagonal source primitive whose AABB intersects but actual polygon lies outside source scissor; accept genuine primitive intersecting it."
+      },
+      {
+        "id": "authentic_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_FALLBACK",
+        "expected_behavior": "Malformed or off-scissor source IA cannot fabricate native RGB; original D3D9 Draw/Present, DX9Ex fallback and FFB preserved."
+      },
+      {
+        "id": "mandatory_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_SOURCE_BUILD_OPENXR",
+        "expected_behavior": "Five required GitHub push workflows pass same validation-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "true_polygon_source_scissor": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41342471664 SUCCESS; Backend Conversion Gate 41342471622 SUCCESS"
+    },
+    "authentic_game_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41342471664; OpenXR VR architecture 41342471701 SUCCESS"
+    },
+    "mandatory_exact_sha_gate": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "GitHub Actions 41342471664,41342471622,41342471637,41342471701,41342471628 (all SUCCESS, exact SHA cf6c2db465f0b3a4a8b6caa64b72ffa9acf4a02a)"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41342471664,
+    "Backend Conversion Gate": 41342471622,
+    "Build": 41342471637,
+    "OpenXR VR architecture": 41342471701,
+    "OutRun EXE HUD Inspector CI": 41342471628
+  },
+  "exact_sha_gate_conclusions": [
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS",
+    "SUCCESS"
+  ],
+  "diagnostic_artifact": {
+    "workflow_run": 41342471701,
+    "artifact_id": 13098530797,
+    "artifact_name": "feature-dx11-first-game-frame-cf6c2db465f0b3a4a8b6caa64b72ffa9acf4a02a",
+    "archive_crc_check": "PASS",
+    "inner_sha256_manifest": "12/12 PASS",
+    "readme_warning": "EXPERIMENTAL, opt-in diagnostic, no HMD acceptance"
+  },
+  "causal_ci_repair": {
+    "commit_sha": "cf6c2db465f0b3a4a8b6caa64b72ffa9acf4a02a",
+    "changed_file": "docs/automation/runs/CONVERSION-DX11-01205.json",
+    "reason": "Repair older same-feature 01205 gameplay stage policy aliases LIVE_D3D9_CALLSITE/D3D11_NATIVE_DRAW/VISIBLE_FRAME_OUTPUT; no redundant 01205 source or score.",
+    "score_change": 0
+  },
+  "runtime_note": "Owned Windows OR2006C2C.EXE interactive native DX11 real full-frame and Quest3/VDXR stereo tests not run. RUNTIME_VALIDATION=UNTESTED; partial game source-stage integration is not PLAYABLE acceptance.",
+  "score_note": "01206 source + exact-SHA build verification is one independent +1 outcome only if safely committed to AI 2 scoreboard SSOT; C6, same-task CI fix and rollover +0.",
+  "recorded_at": "2026-11-02 04:46 KST"
+}
