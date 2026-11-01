@@ -1,4 +1,4 @@
-name: R26 Focus Mono-Gap Quiet A-B Measurement Test
+name: R26 Focus Verified Mono Elision 512 Test Build
 
 on:
   push:
@@ -45,11 +45,13 @@ jobs:
           python tools/verify_dx9ex_full_visual_trace_contract.py
           if ($LASTEXITCODE -ne 0) { throw 'One-pass FULL visual trace contract failed' }
 
-      - name: Verify unusable mono gap elision and full-clear reseed
+      - name: Verify bootstrap gap safety and verified DirectGPU full mono elision
         shell: pwsh
         run: |
           python tools/verify_vr_r26_mono_gap_repair.py
           if ($LASTEXITCODE -ne 0) { throw 'R26 mono gap safety contract failed' }
+          python tools/verify_vr_r26_mono_elision.py
+          if ($LASTEXITCODE -ne 0) { throw 'Verified DirectGPU mono-elision contract failed' }
 
       - name: Verify merged performance/quiet profile
         shell: pwsh
@@ -93,12 +95,12 @@ jobs:
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
           cmake --build build-host --config Release --target outrun-vr-host
 
-      - name: Assemble no-full-trace all-optimizations VR test build
+      - name: Assemble 512-quality verified mono-elision VR test build
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $short = $env:GITHUB_SHA.Substring(0,12)
-          $dir = "OutRun2_VR_FOCUS_GAP_PROBE_$short"
+          $dir = "OutRun2_VR_FOCUS_MONO_ELIDE_512_$short"
           New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (!$dll) { throw 'No Win32 game DLL' }
@@ -110,7 +112,7 @@ jobs:
           Copy-Item OutRun2006Tweaks.lods.ini "$dir/OutRun2006Tweaks.lods.ini"
           Copy-Item tools/vr_perf_quiet/Run-VRPerfQuiet.ps1 "$dir/Run-VRPerfQuiet.ps1"
           Copy-Item tools/vr_perf_quiet/RUN_VR_PERF_QUIET.cmd "$dir/RUN_VR_PERF_QUIET.cmd"
-          Copy-Item tools/vr_perf_quiet/README_FIRST.txt "$dir/README_FIRST.txt"
+          Copy-Item tools/vr_perf_quiet/README_MONO_ELIDE.txt "$dir/README_FIRST.txt"
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
           # Verify PE CPU architectures and mandatory runtime log gate.
           $pe = [IO.File]::ReadAllBytes("$dir/dinput8.dll")
@@ -131,14 +133,14 @@ jobs:
             'EYE_RESOLUTION=OpenXR recommended per-eye allocation'
             'TRANSPORT=DirectGPU-only for gameplay; menu Desktop Duplication kept'
             'QUALITY_RESTORE=ReflectionResolution512; ReflectionUpdateRate0.25; DisableVehicleLODs=true'
-            'MONO_SHADOW=SAFE until R30 gap; invalid replay skipped, verified full color Clear reseeds'
+            'MONO_SHADOW=BOOTSTRAP_SAFE+GAP_SKIP; VERIFIED_DIRECTGPU_STEADY_STATE_THIRD_DRAW_CLEAR=ELIDED; 3-FAILURE_REARM'
             'RUNTIME_QUEST_VALIDATION=UNTESTED'
           ) | Set-Content "$dir/BUILD_PROVENANCE.txt" -Encoding UTF8
           Compress-Archive -Path "$dir/*" -DestinationPath "$dir.zip" -Force
           Get-FileHash "$dir.zip" -Algorithm SHA256
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun-VR-FOCUS-GAP-PROBE-${{ github.sha }}
-          path: OutRun2_VR_FOCUS_GAP_PROBE_*.zip
+          name: OutRun-VR-FOCUS-MONO-ELIDE-512-${{ github.sha }}
+          path: OutRun2_VR_FOCUS_MONO_ELIDE_512_*.zip
           retention-days: 21
           if-no-files-found: error

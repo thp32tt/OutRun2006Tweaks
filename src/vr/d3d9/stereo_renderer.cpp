@@ -93,6 +93,13 @@ namespace OutRunVRStereo
 		bool R9StereoSeeded = false;
 		bool R9MonoSeeded = false;
 		bool R9MonoBackupGap = false;
+		// Keep the independent mono recovery shadow only until one complete,
+		// host-ready DirectGPU stereo frame proves steady-state transport.
+		bool R9MonoElisionArmed = false;
+		unsigned R9MonoElisionFailureStreak = 0;
+		std::uint64_t R9MonoElidedDraws = 0;
+		std::uint64_t R9MonoElidedClears = 0;
+		std::uint64_t R9MonoElisionRecoveryCount = 0;
 		bool R9ExpectMainDepthAfterReset = false;
 		std::uint64_t R9MainDepthGeneration = 0;
 		std::uint64_t R9MonoResourceGeneration = 0;
@@ -431,6 +438,7 @@ namespace OutRunVRStereo
 		std::uint64_t R9GapProbePrevFrameSkipped = 0;
 		std::uint64_t R9GapProbeLastActual = 0;
 		std::uint64_t R9GapProbeLastSkipped = 0;
+		std::uint64_t R9GapProbeLastElided = 0;
 		std::uint64_t R9GapProbeLastClearSkipped = 0;
 		std::uint64_t R9GapProbeLastGapFrames = 0;
 		std::uint64_t R9GapProbeLastNoSkipFrames = 0;
@@ -442,7 +450,7 @@ namespace OutRunVRStereo
 			if (stereoRequested)
 			{
 				++R9GapProbeStereoFrames;
-				if (R9MonoBackupGap)
+				if (R9MonoBackupGap && !R9MonoElisionArmed)
 				{
 					++R9GapProbeGapFrames;
 					if (R9MonoGapSkippedDraws == R9GapProbePrevFrameSkipped)
@@ -459,6 +467,7 @@ namespace OutRunVRStereo
 				R9GapProbeLastMs = now;
 				R9GapProbeLastActual = R9MonoBackupDraws;
 				R9GapProbeLastSkipped = R9MonoGapSkippedDraws;
+				R9GapProbeLastElided = R9MonoElidedDraws;
 				R9GapProbeLastClearSkipped = R9MonoGapSkippedClears;
 				R9GapProbeLastGapFrames = R9GapProbeGapFrames;
 				R9GapProbeLastNoSkipFrames = R9GapProbeNoSkipFrames;
@@ -469,6 +478,7 @@ namespace OutRunVRStereo
 				return;
 			const auto actual = R9MonoBackupDraws - R9GapProbeLastActual;
 			const auto skipped = R9MonoGapSkippedDraws - R9GapProbeLastSkipped;
+			const auto elided = R9MonoElidedDraws - R9GapProbeLastElided;
 			const auto clearSkipped =
 				R9MonoGapSkippedClears - R9GapProbeLastClearSkipped;
 			const auto gapFrames = R9GapProbeGapFrames - R9GapProbeLastGapFrames;
@@ -476,21 +486,25 @@ namespace OutRunVRStereo
 				R9GapProbeNoSkipFrames - R9GapProbeLastNoSkipFrames;
 			const auto stereoFrames =
 				R9GapProbeStereoFrames - R9GapProbeLastStereoFrames;
+			const auto totalCandidates = actual + skipped + elided;
 			const double candidateSkipShare =
-				(actual + skipped) != 0
-					? 100.0 * static_cast<double>(skipped) /
-						static_cast<double>(actual + skipped) : 0.0;
+				totalCandidates != 0
+					? 100.0 * static_cast<double>(skipped + elided) /
+						static_cast<double>(totalCandidates) : 0.0;
 			spdlog::info(
-				"VR R26 MONO-GAP SAMPLE: intervalMs={} stereoFrames={} "
-				"monoActual={} gapSkipDraw={} gapSkipClear={} "
-				"gapFrames={} gapFramesWithoutLaterSkip={} "
+				"VR R26 MONO-ELIDE SAMPLE: intervalMs={} stereoFrames={} "
+				"armed={} monoActual={} gapSkipDraw={} monoElidedDraw={} gapSkipClear={} "
+				"monoElidedClear={} recoveries={} gapFrames={} gapFramesWithoutLaterSkip={} "
 				"candidateSkipSharePct={:.2f} "
 				"(Draw share only; NOT GPU-time or FPS gain)",
-				now - R9GapProbeLastMs, stereoFrames, actual, skipped,
-				clearSkipped, gapFrames, noSkipFrames, candidateSkipShare);
+				now - R9GapProbeLastMs, stereoFrames, R9MonoElisionArmed ? 1 : 0,
+				actual, skipped, elided, clearSkipped,
+				R9MonoElidedClears, R9MonoElisionRecoveryCount,
+				gapFrames, noSkipFrames, candidateSkipShare);
 			R9GapProbeLastMs = now;
 			R9GapProbeLastActual = R9MonoBackupDraws;
 			R9GapProbeLastSkipped = R9MonoGapSkippedDraws;
+			R9GapProbeLastElided = R9MonoElidedDraws;
 			R9GapProbeLastClearSkipped = R9MonoGapSkippedClears;
 			R9GapProbeLastGapFrames = R9GapProbeGapFrames;
 			R9GapProbeLastNoSkipFrames = R9GapProbeNoSkipFrames;
@@ -506,15 +520,16 @@ namespace OutRunVRStereo
 				return;
 			R9LastSummaryMs = now;
 			spdlog::info(
-				"VR R9: calls[depth={},rt={},clear={},draw={},present={}] depth[main=0x{:08x},current=0x{:08x},deferred={},transient={},restores={},null={},reacquire={}] frame[seeded={},monoSeeded={},gap={},firstFailures={}] mono[draws={},gapSkipDraw={},gapSkipClear={},drawFail={},restores={},restoreFail={},monoOnly={},occSkip={}] depthHistory[main={},mono={}] failures[leftWvp={},leftDraw={},depthState={},compose={}]",
+				"VR R9: calls[depth={},rt={},clear={},draw={},present={}] depth[main=0x{:08x},current=0x{:08x},deferred={},transient={},restores={},null={},reacquire={}] frame[seeded={},monoSeeded={},gap={},elideArmed={},firstFailures={}] mono[draws={},gapSkipDraw={},gapSkipClear={},elidedDraw={},elidedClear={},recoveries={},drawFail={},restores={},restoreFail={},monoOnly={},occSkip={}] depthHistory[main={},mono={}] failures[leftWvp={},leftDraw={},depthState={},compose={}]",
 				R9DepthCalls, R9RtCalls, R9ClearCalls, R9DrawCalls, R9PresentCalls,
 				static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(R9MainDepthIdentity)),
 				static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(TrackedDepthStencil)),
 				R9DeferredDepth ? 1 : 0, R9TransientDepthBinds, R9MainDepthRestores,
 				R9NullDepthBinds, R9MainDepthReacquires,
 				R9StereoSeeded ? 1 : 0, R9MonoSeeded ? 1 : 0, R9MonoBackupGap ? 1 : 0,
-				R9FirstFailureCount,
+				R9MonoElisionArmed ? 1 : 0, R9FirstFailureCount,
 				R9MonoBackupDraws, R9MonoGapSkippedDraws, R9MonoGapSkippedClears,
+				R9MonoElidedDraws, R9MonoElidedClears, R9MonoElisionRecoveryCount,
 				R9MonoBackupDrawFailures, R9MonoFallbackRestores,
 				R9MonoFallbackRestoreFailures, R9MonoOnlyDraws, R9OcclusionBackupSkips,
 				R9MainDepthContentSerial, R9MonoDepthContentSerial,
@@ -665,7 +680,13 @@ namespace OutRunVRStereo
 				(flags & D3DCLEAR_TARGET) != 0 && !FrameStereoIncomplete;
 			HRESULT monoHr = S_OK;
 			bool monoOk = true;
-			if (R9MonoBackupGap && !monoCanReseed)
+			if (R9MonoElisionArmed)
+			{
+				// Verified DirectGPU steady-state: do not allocate, bind or clear
+				// the independent center-mono shadow at all.
+				++R9MonoElidedClears;
+			}
+			else if (R9MonoBackupGap && !monoCanReseed)
 			{
 				++R9MonoGapSkippedClears;
 			}
@@ -687,8 +708,8 @@ namespace OutRunVRStereo
 			if (SUCCEEDED(stereoHr) && monoOk && full && (flags & D3DCLEAR_TARGET) != 0 && !FrameStereoIncomplete)
 			{
 				R9StereoSeeded = true;
-				R9MonoSeeded = true;
-				R9MonoBackupGap = false;
+				R9MonoSeeded = !R9MonoElisionArmed;
+				R9MonoBackupGap = R9MonoElisionArmed;
 				++R9FullClearSeeds;
 				if ((flags & (D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL)) != 0)
 				{
@@ -753,16 +774,22 @@ namespace OutRunVRStereo
 				return actualDraw();
 			}
 
-			if (R9MonoBackupGap)
+			if (R9MonoElisionArmed)
 			{
-				// R30 has already rendered one object without the mono copy.
-				// Present is forbidden to restore this now-incomplete backup.
-				// Preserve normal R7 left/right drawing; only skip the third draw.
+				// LEFT and RIGHT still render through R7; only the redundant
+				// third center-mono game-state draw is removed.
+				++R9MonoElidedDraws;
+			}
+			else if (R9MonoBackupGap)
+			{
+				// During warmup, retain the narrower gap optimization too.
+				// R30 has already made this mono shadow unrestorable.
 				++R9MonoGapSkippedDraws;
 			}
 			else
 			{
-				// Before any gap, retain R9's full independent recovery shadow.
+				// Before verified DirectGPU and before any gap, retain the full
+				// independent recovery shadow.
 				if (!R9EnsureMonoResources(device))
 				{
 					R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Draw/mono-resources");
@@ -926,9 +953,13 @@ namespace OutRunVRStereo
 				}
 			}
 
-			// Explicit failure-output policy: if no complete SBS frame exists,
-			// restore the independently rendered normal mono frame before Present.
-			if (!composedStereo || FrameStereoIncomplete)
+			// During bootstrap retain the independent mono fallback. Once a
+			// host-ready DirectGPU stereo frame has armed elision, no complete
+			// mono shadow exists; hold the host's last verified stereo projection.
+			const bool holdVerifiedStereo = R9MonoElisionArmed && stereoRequested &&
+				(!composedStereo || FrameStereoIncomplete || FrameRightDrawFailed ||
+				 FrameFailureReason != OutRunVR::StereoFailureNone);
+			if ((!composedStereo || FrameStereoIncomplete) && !R9MonoElisionArmed)
 			{
 				if (R9MonoSeeded && !R9MonoBackupGap &&
 					!R9RestoreMonoBeforePresent(device, R9FailureName(FrameFailureReason)))
@@ -948,7 +979,7 @@ namespace OutRunVRStereo
 			MaybeLogSummary();
 			LARGE_INTEGER presentStart{};
 			QueryPerformanceCounter(&presentStart);
-			if (stereoRequested && (!directOnly || directTransport))
+			if (stereoRequested && !holdVerifiedStereo && (!directOnly || directTransport))
 				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono, pendingFrameId, pendingPoseSequence,
 					presentStart.QuadPart, FrameFailureReason, nullptr, true, directTransport);
 
@@ -978,6 +1009,14 @@ namespace OutRunVRStereo
 
 			if (composedStereo && SUCCEEDED(hr) && !FrameStereoIncomplete)
 			{
+				if (directTransport && HostDirectTransportReady() && !R9MonoElisionArmed)
+				{
+					R9MonoElisionArmed = true;
+					R9MonoElisionFailureStreak = 0;
+					spdlog::info("VR R9 MONO-ELIDE: verified DirectGPU stereo live; third mono Draw/Clear disabled after warmup");
+				}
+				if (R9MonoElisionArmed)
+					R9MonoElisionFailureStreak = 0;
 				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence, pendingFrameId);
 				PublishRenderFrame(OutRunVR::StereoSbsActive, pendingFrameId, pendingPoseSequence,
 					presentStart.QuadPart, OutRunVR::StereoFailureNone, &FrameStereoMetadata, false, directTransport);
@@ -998,12 +1037,24 @@ namespace OutRunVRStereo
 				if (FrameFailureReason != OutRunVR::StereoFailureNone)
 					R9LogFirstFailure("Present/fallback", hr);
 				const std::uint32_t fallback = stereoRequested ? OutRunVR::StereoSbsFallbackMono : OutRunVR::StereoDisabled;
-				PublishStereoState(fallback, false, 0, 0);
+				if (!holdVerifiedStereo)
+					PublishStereoState(fallback, false, 0, 0);
 				// In DirectGPU-only mode, do not overwrite the bounded frame ring
 				// with classic fallback descriptors while the host still needs to
 				// consume/ACK one of the initial shared-eye frames.
-				if (!directOnly || !stereoRequested || directTransport)
+				if (!holdVerifiedStereo && (!directOnly || !stereoRequested || directTransport))
 					PublishRenderFrame(fallback, 0, 0, presentStart.QuadPart, FrameFailureReason, nullptr);
+			}
+
+			// Three consecutive bad frames return to cold-start safety. The bad
+			// frames themselves are never published over the last verified stereo.
+			if (holdVerifiedStereo && R9MonoElisionArmed &&
+				++R9MonoElisionFailureStreak >= 3u)
+			{
+				R9MonoElisionArmed = false;
+				R9MonoElisionFailureStreak = 0;
+				++R9MonoElisionRecoveryCount;
+				spdlog::warn("VR R9 MONO-ELIDE: repeated incomplete stereo; rearming bootstrap mono shadow");
 			}
 
 			OutRunVRRenderer::NotifyGamePresent();
@@ -1030,6 +1081,8 @@ namespace OutRunVRStereo
 			R9StereoSeeded = false;
 			R9MonoSeeded = false;
 			R9MonoBackupGap = false;
+			R9MonoElisionArmed = false;
+			R9MonoElisionFailureStreak = 0;
 			R9ExpectMainDepthAfterReset = true;
 			const HRESULT hr = R9ResetCallbackHook.stdcall<HRESULT>(device, params);
 			if (SUCCEEDED(hr) && IsGameDevice(device) && TrackedDepthStencil)
