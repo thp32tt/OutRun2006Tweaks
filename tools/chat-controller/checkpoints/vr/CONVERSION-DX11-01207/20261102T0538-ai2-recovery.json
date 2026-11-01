@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "ai2_verified_rollover_recovery",
+  "task_id": "CONVERSION-DX11-01207",
+  "production_id": "CONVERSION-DX11-01207",
+  "event_id": "CONVERSION-DX11-01207-E003",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "chat_rollover": 2,
+  "rollover_increases_attempt": false,
+  "target_branch": "vr-dx11-native-r71",
+  "source_material_sha": "dbabeb9f48a240949a54a2967c3047bc7653a894",
+  "validation_bearing_sha": "9e154d5fa421904f685ff25a079a2d9047be2dbe",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "source_change": "Live FVF source polygon/scissor-visible IA primitive cyclic GPU RGB island sweep; tests in src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp, tests/native_raw_dual_tile_test.cpp.",
+  "causal_ci_repair": {
+    "failed_run": 41347456308,
+    "why": "01206 historical acceptance_proof missing, unrelated to new 01207 C++; fixed at 9e154d5 with task tag.",
+    "fast_gate_run": 41347550902,
+    "fast_gate_result": "SUCCESS"
+  },
+  "pending_exact_sha_ci": {
+    "backend": 41347550921,
+    "build": 41347550917,
+    "openxr": 41347550927,
+    "hud": 41347550915
+  },
+  "stage": "SOURCE_IMPLEMENTED_CI_IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "incomplete": [
+    "Confirm five mandatory GitHub Actions SUCCESS on exact 9e154d5 SHA",
+    "Inspect OpenXR VR archive artifact including digest if available",
+    "Record docs/automation/runs/CONVERSION-DX11-01207.json C6 one time only if all required gates succeed",
+    "Update AI scoreboard from latest confirmed SSOT only if new independent 01207 outcome qualifies"
+  ],
+  "next_action": "Inspect pending exact-SHA CI outcomes. If failure, repair only actual failure under same task; do not duplicate source or repeat success. No hardware acceptance."
+}
