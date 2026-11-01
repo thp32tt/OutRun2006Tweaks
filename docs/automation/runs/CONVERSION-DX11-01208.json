@@ -60,7 +60,9 @@
       "DX11:FULL_RESOLUTION_GAME_FRAME",
       "DX11:REAL_GAME_DRAW"
     ],
-    "full_gate_plan": "one_validation_bearing_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY: The PRE/POST native D3D11 GPU RGB islands from clipped real game FVF Draws are experimental opt-in partial pixels on original D3D9 Present; the full native frame, menu/race parity and Quest 3 stereo remain UNTESTED.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC explicit opt-in/default OFF; unknown/malformed W or native scissor/raster state retains original viewport GPU sampling; original D3D9 Draw, input, FFB/SkyGlow and protected DX9Ex fallback unchanged; DXVK frozen."
   },
   "acceptance_results": {
     "homogeneous_eye_plane_clip": {
@@ -99,5 +101,29 @@
   ],
   "runtime_note": "No actual Windows OutRun game or HMD or Quest3/VDXR visual/native stereo runtime validation; source/WARP/CI cannot certify full native game rendering. RUNTIME_VALIDATION=UNTESTED.",
   "score_note": "Independent source implementation and exact five gates +1 only once; repeat, C6/checkpoint and future same-source verification +0. AI1 unchanged.",
-  "recorded_at": "2026-11-02 KST"
+  "recorded_at": "2026-11-02 KST",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Admit authentic game FVF triangles crossing the homogeneous eye plane to native D3D11 PRE/POST GPU RGB captures without treating the partial diagnostic as full-game or HMD validation.",
+    "acceptance_items": [
+      {
+        "id": "crossing_eye_plane_gpu_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_REAL_GAME_GPU_RGB",
+        "expected_behavior": "Finite original D3D9 FVF triangles crossing W sign contribute their clipped screen raster to the real game native GPU capture and D3D9-authenticated Present path."
+      },
+      {
+        "id": "invalid_source_no_promotion",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_INPUT_FFB",
+        "expected_behavior": "W=0, nonfinite IA, behind-camera triangles or unknown raster states cannot promote a fake native frame; retain unchanged source identity, original input/FFB and DX9Ex fallback."
+      },
+      {
+        "id": "same_sha_exact_gates",
+        "category": "integrated_validation",
+        "behavior_area": "BUILD_FAST_OPENXR_HUD",
+        "expected_behavior": "All five mandatory GitHub Actions checked at source-exact SHA; desktop game/Quest3 visual validation kept UNTESTED."
+      }
+    ]
+  }
 }
