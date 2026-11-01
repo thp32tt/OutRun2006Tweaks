@@ -83,7 +83,7 @@ def verify(text: str) -> None:
     assert 'capturedTheaterClient = liveRect;' in theater
     assert 'publishedMirrorApplied = true;' in theater
     assert 'else if (clientGameState != 0xFFFFFFFFu)' in theater
-    assert 'authority=CURRENT_SAME_PID_WIN32_CLIENT_RECT' in theater
+    assert '"CURRENT_SAME_PID_WIN32_CLIENT_RECT"' in theater
     assert 'CURRENT_SAME_PID_WIN32_CLIENT_RECT_CENTERED_16_9_FRONTEND_MIRROR' in theater
     assert 'normalized16x9=' in theater
     assert 'rawClient=' in theater
