@@ -263,6 +263,25 @@ namespace OutRunVrMenuAspect
                 configuredLetterbox, imageMatteVerified);
     }
 
+    // A completed title/menu may lack a time-matched Frame.v2 mirror rect.
+    // The published-rect branch already applies 4:3 to 0x04/0x09; keep
+    // complete-client desktop fallback optically identical. Never crop
+    // 0x20 SUMO (also owns the wide selector), SBS or partial captures.
+    constexpr bool ShouldCropFallbackTitleMenu(
+        std::uint32_t state, bool sourceIsSbs,
+        bool publishedMirrorApplied, bool fullClientVisible) noexcept
+    {
+        return !sourceIsSbs && !publishedMirrorApplied &&
+            fullClientVisible && (state == 0x04u || state == 0x09u);
+    }
+    static_assert(ShouldCropFallbackTitleMenu(0x04u, false, false, true));
+    static_assert(ShouldCropFallbackTitleMenu(0x09u, false, false, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x20u, false, false, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x0Au, false, false, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x04u, false, true, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x04u, true, false, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x04u, false, false, false));
+
     // OutRun may restart with a recycled numeric HWND but a new game PID.
     // A cached 4:3 crop must never be reused for another process.
     // Preserve the bounded INI polling interval within the same process.
