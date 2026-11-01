@@ -7,6 +7,8 @@ on:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
+      - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
+      - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_runtime_smoke.cpp'
       - 'src/hooks_uiscaling.cpp'
       - 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp'

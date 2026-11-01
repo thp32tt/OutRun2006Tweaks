@@ -9,6 +9,7 @@
 #include "vr_shared.hpp"
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/quest_cockpit_v2_runtime.hpp"
+#include "vr/game/quest_cockpit_v2_native_frame.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -19,6 +20,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <utility>
 
 namespace Settings
 {
@@ -160,6 +162,94 @@ static bool IsPlayableCarGameplay() noexcept
         Game::game_start_progress_code && *Game::game_start_progress_code == 65;
 }
 
+// Original retail PC frame-render clock: distinct from Present and XR.
+class QuestCockpitV2NativeFrameProbe final : public Hook
+{
+    static constexpr int FrameEnterRva=0x49050;
+    static constexpr int FrameEndRva=0x48E40;
+    static constexpr int PlayerCallbackRva=0x9F3E0;
+    inline static SafetyHookMid FrameEnterHook{},FrameEndHook{},
+        PlayerCallbackHook{};
+
+    static void OnFrameEnter(SafetyHookContext&)
+    {
+        OutRunVR::QuestCockpitV2::NativeFrameTrace().OnFrameEnter(
+            OutRunVR::QuestCockpitV2::NextVerifiedNativeEpoch());
+    }
+    static void OnFrameEnd(SafetyHookContext&)
+    {
+        OutRunVR::QuestCockpitV2::NativeFrameTrace().OnFrameEnd();
+    }
+    static void OnPlayerCallback(SafetyHookContext&)
+    {
+        OutRunVR::QuestCockpitV2::NativeFrameTrace().OnPlayerCallback();
+    }
+    template<std::size_t N>
+    static bool MatchOriginalRva(int rva,
+        const std::array<std::uint8_t,N>& signature)
+    {
+        // Reject all other executable builds and any previously detoured
+        // entrypoints; never patch an unknown instruction stream.
+        const auto* p=Module::exe_ptr<std::uint8_t>(rva);
+        MEMORY_BASIC_INFORMATION info{};
+        if (!p || VirtualQuery(p,&info,sizeof(info))!=sizeof(info) ||
+            info.State!=MEM_COMMIT || (info.Protect & PAGE_GUARD) ||
+            (info.Protect & PAGE_NOACCESS) ||
+            reinterpret_cast<std::uintptr_t>(p)+N >
+                reinterpret_cast<std::uintptr_t>(info.BaseAddress)+info.RegionSize)
+            return false;
+        return std::equal(signature.begin(),signature.end(),p);
+    }
+public:
+    std::string_view description() override {
+        return "QuestCockpitV2NativeFrameProbe";
+    }
+    bool validate() override {
+        return Settings::VREnabled && Settings::VRCockpitFrameProbe;
+    }
+    bool apply() override {
+        // Prologue bytes were extracted from the user's owned canonical PC
+        // EXE. All three hook owners must be installed or none remain.
+        constexpr std::array<std::uint8_t,24> begin{{
+            0xA1,0x14,0x26,0x7D,0x00,0x83,0xEC,0x30,
+            0x53,0x56,0x33,0xDB,0x83,0xCE,0xFF,0x3B,
+            0xC3,0x75,0x05,0xE8,0xF8,0x5C,0xFC,0xFF
+        }};
+        constexpr std::array<std::uint8_t,24> end{{
+            0x8B,0x0D,0xE8,0x25,0x7D,0x00,0xA1,0xEC,
+            0x25,0x7D,0x00,0x3B,0xC1,0x8B,0x0D,
+            0xF4,0x25,0x7D,0x00,0x75,0x08,0x3B,0x0D,0x10
+        }};
+        constexpr std::array<std::uint8_t,24> player{{
+            0x56,0x8B,0x74,0x24,0x08,0x56,0xE8,0x45,
+            0xC9,0xFC,0xFF,0x68,0xF0,0xE7,0x82,0x00,
+            0x56,0xE8,0x5A,0xB2,0xFF,0xFF,0x83,0xC4
+        }};
+        if (!MatchOriginalRva(FrameEnterRva,begin) ||
+            !MatchOriginalRva(FrameEndRva,end) ||
+            !MatchOriginalRva(PlayerCallbackRva,player)) {
+            spdlog::warn("VR COCKPIT V2 native frame probe unavailable: "
+                "original EXE signatures differ; cockpit remains disabled");
+            return false;
+        }
+        auto first=safetyhook::create_mid(
+            Module::exe_ptr(FrameEnterRva),OnFrameEnter);
+        if(!first)return false;
+        auto last=safetyhook::create_mid(
+            Module::exe_ptr(FrameEndRva),OnFrameEnd);
+        if(!last)return false;
+        auto actor=safetyhook::create_mid(
+            Module::exe_ptr(PlayerCallbackRva),OnPlayerCallback);
+        if(!actor)return false;
+        FrameEnterHook=std::move(first);
+        FrameEndHook=std::move(last);
+        PlayerCallbackHook=std::move(actor);
+        return true;
+    }
+    static QuestCockpitV2NativeFrameProbe instance;
+};
+QuestCockpitV2NativeFrameProbe QuestCockpitV2NativeFrameProbe::instance;
+
 class QuestCockpitV2PlayerCandidateProbe final : public Hook
 {
     static constexpr int PlayerCarRenderStateRva = 0x69764;
@@ -177,6 +267,7 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook
         const auto mode=camera
             ? static_cast<std::uint8_t>(camera->cam_mode_34A) : 0xffu;
         OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(mode);
+        OutRunVR::QuestCockpitV2::NativeFrameTrace().OnPlayerCar();
         // Snapshot only read-only model inputs of the verified player.
         // Do not copy this correction into game camera, physics or HMD view.
         using namespace OutRunVR::QuestCockpitV2;
