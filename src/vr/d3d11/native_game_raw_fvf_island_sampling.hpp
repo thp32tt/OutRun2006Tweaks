@@ -21,7 +21,7 @@ namespace outrun::vr::dx11 {
     out = {};
     NativeRawDrawExtent assembled{};
     if (!native_raw_fvf_projected_raster(
-            source, vx, vy, vw, vh, assembled) ||
+            source, vx, vy, vw, vh, assembled, &admitted) ||
         !sw || !sh || !tw || !th || tw > sw || th > sh ||
         admitted.left >= admitted.right ||
         admitted.top >= admitted.bottom) return false;
@@ -29,8 +29,9 @@ namespace outrun::vr::dx11 {
     const std::size_t count = source.assembly == NativeRawFvfAssembly::TriangleList
         ? active / 3u : active - 2u;
     if (!count || count > 8192u) return false;
-    // Use the count of original source triangles that survive the actual
-    // viewport/scissor intersection for GPU capture phasing. Menus and race
+    // Source-polygon/scissor clipping (not the AABB overlap) determines
+    // which genuine triangles can produce RGB in this game's source target.
+    // Use that visible population for GPU capture phasing. Menus and race
     // meshes can contain thousands of fully clipped valid IA primitives;
     // their inclusion previously stranded the same RGB crop for hundreds
     // of authentic Draws. Whole-IA validity above is never relaxed.
@@ -48,7 +49,7 @@ namespace outrun::vr::dx11 {
         if (!native_raw_fvf_projected_raster(
                 {source.firstClip, source.vertexStride, source.count,
                  indices, 3u, NativeRawFvfAssembly::TriangleList},
-                vx, vy, vw, vh, triangle))
+                vx, vy, vw, vh, triangle, &admitted))
             return false;
         triangle.left = (std::max)(triangle.left,
             (std::max)(admitted.left, assembled.left));

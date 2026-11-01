@@ -34,7 +34,8 @@ struct NativeRawFvfClipSpan {
 [[nodiscard]] inline bool native_raw_fvf_projected_raster(
     NativeRawFvfClipSpan source,
     float viewportX, float viewportY, float viewportW, float viewportH,
-    NativeRawDrawExtent& raster) noexcept {
+    NativeRawDrawExtent& raster,
+    const NativeRawDrawExtent* sourceScissor = nullptr) noexcept {
     raster = {};
     if (!source.firstClip || source.vertexStride < sizeof(float) * 4u ||
         source.vertexStride > 4096u || source.count < 3u ||
@@ -54,16 +55,46 @@ struct NativeRawFvfClipSpan {
     // Bounded diagnostic CPU geometry work; a very large genuine draw
     // always keeps the original viewport GPU-capture schedule.
     if (triangles == 0u || triangles > 8192u) return false;
+    // D3D11 scissor acts on the projected polygon, NOT on its bounding
+    // rectangle: a diagonal primitive can have an overlapping AABB while
+    // every actual pixel is outside the game's live scissor. Work in NDC
+    // with the same source viewport and clip against all four edges.
+    double scissorLeft = -1.0, scissorRight = 1.0;
+    double scissorBottom = -1.0, scissorTop = 1.0;
+    if (sourceScissor) {
+        if (sourceScissor->left >= sourceScissor->right ||
+            sourceScissor->top >= sourceScissor->bottom) return false;
+        const double x0 = 2.0 * (static_cast<double>(sourceScissor->left) -
+            static_cast<double>(viewportX)) / static_cast<double>(viewportW) - 1.0;
+        const double x1 = 2.0 * (static_cast<double>(sourceScissor->right) -
+            static_cast<double>(viewportX)) / static_cast<double>(viewportW) - 1.0;
+        const double y0 = 1.0 - 2.0 * (static_cast<double>(sourceScissor->bottom) -
+            static_cast<double>(viewportY)) / static_cast<double>(viewportH);
+        const double y1 = 1.0 - 2.0 * (static_cast<double>(sourceScissor->top) -
+            static_cast<double>(viewportY)) / static_cast<double>(viewportH);
+        if (!std::isfinite(x0) || !std::isfinite(x1) ||
+            !std::isfinite(y0) || !std::isfinite(y1)) return false;
+        scissorLeft = (std::max)(-1.0, x0);
+        scissorRight = (std::min)(1.0, x1);
+        scissorBottom = (std::max)(-1.0, y0);
+        scissorTop = (std::min)(1.0, y1);
+        if (scissorLeft >= scissorRight ||
+            scissorBottom >= scissorTop) return false;
+    }
     struct Point { double x, y, z; };
     const auto* bytes = static_cast<const std::uint8_t*>(source.firstClip);
-    const auto plane_distance = [](Point p, int plane) noexcept {
+    const auto plane_distance = [&](Point p, int plane) noexcept {
         switch (plane) {
         case 0: return p.x + 1.0;
         case 1: return 1.0 - p.x;
         case 2: return p.y + 1.0;
         case 3: return 1.0 - p.y;
         case 4: return p.z;
-        default: return 1.0 - p.z;
+        case 5: return 1.0 - p.z;
+        case 6: return p.x - scissorLeft;
+        case 7: return scissorRight - p.x;
+        case 8: return p.y - scissorBottom;
+        default: return scissorTop - p.y;
         }
     };
     double minX = (std::numeric_limits<double>::max)();
@@ -72,7 +103,7 @@ struct NativeRawFvfClipSpan {
     double maxY = maxX;
     bool anyVisible = false;
     for (std::size_t triangle = 0u; triangle < triangles; ++triangle) {
-        std::array<Point, 12u> polygon{}, clipped{};
+        std::array<Point, 20u> polygon{}, clipped{};
         for (std::size_t corner = 0u; corner < 3u; ++corner) {
             const auto element =
                 source.assembly == NativeRawFvfAssembly::TriangleList
@@ -100,7 +131,8 @@ struct NativeRawFvfClipSpan {
         // Homogeneous triangle edges remain straight after perspective
         // division for positive W. NDC half-plane clipping preserves their
         // precise screen footprint without interpolating shader attributes.
-        for (int plane = 0; plane < 6 && polygonCount; ++plane) {
+        for (int plane = 0; plane < (sourceScissor ? 10 : 6) &&
+             polygonCount; ++plane) {
             std::size_t nextCount = 0u;
             auto previous = polygon[polygonCount - 1u];
             auto previousDistance = plane_distance(previous, plane);

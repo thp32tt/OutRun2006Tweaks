@@ -479,6 +479,60 @@ bool native_raw_fvf_large_island_phase_regression() {
         clipped0.first.x >= 1500u || clipped1.first.x >= 1500u ||
         (clipped1.hasSecond && clipped1.second.x >= 1500u))
         return fail(__LINE__);
+    // A triangular menu primitive can have an AABB intersecting the
+    // source scissor even though NONE of its pixels fall in that corner.
+    // Scissor must clip the actual polygon before admitting a GPU source
+    // island; a real second primitive inside the same source Draw survives.
+    constexpr std::array<std::array<float,4>,3> cornerMiss{{
+        {{0.0f,0.8f,0.5f,1.f}},{{0.8f,0.0f,0.5f,1.f}},
+        {{0.8f,0.8f,0.5f,1.f}}
+    }};
+    constexpr std::array<std::array<float,4>,3> cornerHit{{
+        {{0.13f,0.13f,0.5f,1.f}},{{0.27f,0.13f,0.5f,1.f}},
+        {{0.20f,0.27f,0.5f,1.f}}
+    }};
+    constexpr NativeRawDrawExtent cornerScissor{550,350,650,450};
+    const NativeRawFvfClipSpan miss{
+        cornerMiss.data(),sizeof(cornerMiss[0]),cornerMiss.size()};
+    const NativeRawFvfClipSpan hit{
+        cornerHit.data(),sizeof(cornerHit[0]),cornerHit.size()};
+    NativeRawDrawExtent aabb{}, clippedPolygon{};
+    if (!native_raw_fvf_projected_raster(
+            miss,0,0,1000,1000,aabb) ||
+        aabb.left >= cornerScissor.right ||
+        aabb.right <= cornerScissor.left ||
+        aabb.top >= cornerScissor.bottom ||
+        aabb.bottom <= cornerScissor.top)
+        return fail(__LINE__); // deliberately intersecting AABB
+    if (native_raw_fvf_projected_raster(
+            miss,0,0,1000,1000,clippedPolygon,&cornerScissor) ||
+        clippedPolygon.right != 0 ||
+        native_raw_fvf_island_dual_draw_tile(
+            miss,0,0,1000,1000,1000,1000,64,64,
+            cornerScissor,0u,tile))
+        return fail(__LINE__);
+    if (!native_raw_fvf_projected_raster(
+            hit,0,0,1000,1000,clippedPolygon,&cornerScissor) ||
+        clippedPolygon.left < cornerScissor.left ||
+        clippedPolygon.right > cornerScissor.right ||
+        clippedPolygon.top < cornerScissor.top ||
+        clippedPolygon.bottom > cornerScissor.bottom)
+        return fail(__LINE__);
+    constexpr std::array<std::array<float,4>,6> mixed{{
+        cornerMiss[0], cornerMiss[1], cornerMiss[2],
+        cornerHit[0], cornerHit[1], cornerHit[2]
+    }};
+    const NativeRawFvfClipSpan mixedSource{
+        mixed.data(),sizeof(mixed[0]),mixed.size()};
+    for (std::uint32_t ordinal = 0u; ordinal < 3u; ++ordinal) {
+        NativeRawDualTile inside{};
+        if (!native_raw_fvf_island_dual_draw_tile(
+                mixedSource,0,0,1000,1000,1000,1000,64,64,
+                cornerScissor,ordinal,inside) ||
+            inside.first.x + 64u <= 550u || inside.first.x >= 650u ||
+            inside.first.y + 64u <= 350u || inside.first.y >= 450u)
+            return fail(__LINE__);
+    }
     // No visible source triangle is NOT an admitted fabricated GPU region.
     auto allClipped = sparse;
     for (auto& vertex : allClipped)
