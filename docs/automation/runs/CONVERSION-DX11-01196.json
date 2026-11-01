@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01196",
+  "production_id": "CONVERSION-DX11-01196",
+  "event_id": "CONVERSION-DX11-01196-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:REAL_GAME_NATIVE_MSAA_PRE_POST_CAPTURE",
+  "classification": "A_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_base_sha": "57078f6e74c13f176174d47606502c1024a38730",
+  "implementation_source_sha": "c5fb45c3da41884374f91873dc17a58f48961832",
+  "material_result_sha": "c5fb45c3da41884374f91873dc17a58f48961832",
+  "validation_bearing_result_sha": "58dd2897af62ff12548175e3fc12f23188221910",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_msaa_capture.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Allow source-authentic 2x/4x/8x/16x/32x D3D11 native game MSAA render target RGB PRE/POST tiles via format-support checked same-device on-GPU full-target ResolveSubresource before bounded staging copy. Keep 1x direct copy, source target/format/dimensions/sample-count invalidation, original D3D9 dirty Present provenance and opt-in fail-closed DX9Ex fallback. Sample count negative/regression cases in native_raw_dual_tile_test.cpp.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_MSAA_GPU_RESOLVE",
+      "REAL_GAME_RGB_PRE_POST_TILE",
+      "ORIGINAL_D3D9_SOURCE_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "REAL_GAME_D3D11_NATIVE_DRAW",
+      "DEVICE_FORMAT_VERIFIED_MSAA_RESOLVE",
+      "SOURCE_ALIGNED_GPU_RGB_PRE_POST_STAGING",
+      "OPT_IN_D3D9_PRESENT_SOURCE_PUBLICATION"
+    ],
+    "batch_components": [
+      "NATIVE_GPU_MSAA_RESOLVE_ADMISSION",
+      "SOURCE_SAMPLE_COUNT_RESOURCE_LIFETIME",
+      "POSITIVE_NEGATIVE_REAL_SOURCE_CAPTURE_TEST"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual native game Draw GPU render-target sample count 2,4,8,16,32 resolves via the same source-owned D3D11 context before bounded RGB PRE/POST tile capture, with local source layout regression; real HMD runtime UNTESTED.",
+      "negative_regression": "Reject sample 0,3,5,6,7,33,64,UINT32_MAX; reject unsupported format/sample target or failed GPU resolve allocation, retain 1x non-MSAA copy and DX9Ex fallback.",
+      "component_integration": "Original D3D9 game Draw -> native D3D11 same-source MSAA target -> format-checked GPU ResolveSubresource -> paired pre/post source tile staging -> original D3D9 dirty-Present projection (opt-in source stage only)."
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_game_raw_msaa_capture.hpp",
+      "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+      "tests/native_raw_dual_tile_test.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; PARTIAL_REAL_GPU_GAME_SOURCE_PIXELS; NO_FULL_MENU_CAR_RACE_VISIBLE_GAME_FRAME_OR_HMD_EVIDENCE",
+    "activation_guard_and_fallback": "RAW opt-in default OFF; malformed RT/source/format/sample or failed staging must reject/fail closed, DX9Ex original Present, game input and FFB preserved."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate source-identical multisample native D3D11 game GPU color with bounded PRE/POST capture and original D3D9 Present while retaining opt-in fail-closed fallback; not a full renderer or HMD claim.",
+    "acceptance_items": [
+      {
+        "id": "game_native_msaa_color",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_GAME_GPU_COLOR",
+        "expected_behavior": "Same-device supported source MSAA render targets have an authentic single-sample GPU resolve for PRE/POST tile staging."
+      },
+      {
+        "id": "source_and_fallback_safety",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_GAME_PRESENT_AND_INPUT",
+        "expected_behavior": "Invalid sample/format/source is rejected without forged RGB, unsafe resource reuse or changes to original fallback/input/FFB."
+      },
+      {
+        "id": "five_exact_sha_validation",
+        "category": "integrated_validation",
+        "behavior_area": "WINDOWS_DX11_OPENXR_HUD_CI",
+        "expected_behavior": "All five mandatory GitHub Actions pass on the exact validation-bearing SHA; Quest runtime remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game_native_msaa_color": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_msaa_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks SUCCESS run 41294096779 and Backend Conversion Gate SUCCESS run 41294096841 at 58dd2897af62ff12548175e3fc12f23188221910"
+    },
+    "source_and_fallback_safety": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_msaa_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Backend Conversion Gate run 41294096841 SUCCESS; Build run 41294096741 SUCCESS at 58dd2897af62ff12548175e3fc12f23188221910"
+    },
+    "five_exact_sha_validation": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_msaa_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "GitHub Actions push success at 58dd2897af62ff12548175e3fc12f23188221910: DX11 Fast 41294096779; Backend 41294096841; Build 41294096741; OpenXR 41294096714; HUD 41294096878"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41294096779,
+    "Backend Conversion Gate": 41294096841,
+    "Build": 41294096741,
+    "OpenXR VR architecture": 41294096714,
+    "OutRun EXE HUD Inspector CI": 41294096878
+  },
+  "ci_repair": {
+    "failed_source_sha": "c5fb45c3da41884374f91873dc17a58f48961832",
+    "failed_backend_run": 41293828814,
+    "cause": "Earlier 01195 C6 record lacked required development_strategy",
+    "repair_commit": "58dd2897af62ff12548175e3fc12f23188221910",
+    "repair_file": "docs/automation/runs/CONVERSION-DX11-01195.json",
+    "note": "Repair an actual acceptance policy failure, no unnecessary C++ change or new task. Validation-bearing SHA includes original material MSAA source via ancestry."
+  },
+  "validation_note": "Required five exact-SHA push Actions SUCCESS at 58dd2897. Source implementation c5fb45c3 included in validation ancestry. C6 docs-only status; no duplicate gate/same-task credit and no real game/Quest runtime evidence.",
+  "actual_runtime_evidence": "NOT_RUN_NO_GAME_DESKTOP_NO_QUEST3_VDXR",
+  "native_gpu_pixels_observed": "UNTESTED",
+  "full_menu_vehicle_race": "INCOMPLETE",
+  "separate_documentation_commit": true
+}
