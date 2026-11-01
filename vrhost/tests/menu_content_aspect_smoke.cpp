@@ -169,6 +169,23 @@ int main()
             std::fabs(fit.aspect - 16.f/9.f) > 1.e-6f)
             return 124;
     }
+    // Fallback crop only applies to authored logical front-end states.
+    // Geometry alone is not proof for vehicle selector, results, gameplay.
+    {
+        using OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv;
+        const auto fitFor = [](std::uint32_t state) {
+            return PlanTopLeftLogicalCaptureUv(
+                state, 0.f, 0.f, 3440.f, 1440.f,
+                3440.f, 1440.f, 2496.f, 2688.f);
+        };
+        if (!fitFor(0x00u).crop || !fitFor(0x04u).crop ||
+            !fitFor(0x09u).crop || !fitFor(0x20u).crop ||
+            fitFor(0x0Au).crop || fitFor(0x0Bu).crop ||
+            fitFor(0x0Cu).crop || fitFor(0x10u).crop ||
+            fitFor(0x22u).crop || fitFor(0x23u).crop ||
+            fitFor(0xFFFFFFFFu).crop)
+            return 125;
+    }
     // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
     // in its upper-left. Sample exactly that logical rectangle before the
     // LOCAL-fixed menu projection; never crop Ferrari selector/gameplay or
