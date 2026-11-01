@@ -26,6 +26,7 @@
 #include "native_game_raw_changed_pixel_window.hpp"
 #include "native_game_raw_gpu_wait.hpp"
 #include "native_game_raw_source_target_identity.hpp"
+#include "native_game_raw_color_write_admission.hpp"
 
 namespace outrun::vr::dx11 {
 // Keep genuine GPU RAW pixel locations SOURCE-COINCIDENT with a game
@@ -861,6 +862,7 @@ public:
         drawPair_.reset();
         if (!captureEpoch_.can_queue(presentingSerial, pending_))
             return;
+        if (!bound_native_source_can_write_rgb(ctx, color)) return;
         if (queue_before_draw(dev, ctx, color) == NativeRawPreviewResult::CopyQueued) {
             // Save the original game RT at the actual source Draw. D3D9 can
             // change its bound RT between Draw and Present; no Present-time
@@ -995,6 +997,39 @@ private:
             ++zeroRgbRearmsThisPresent_;
             ++zeroRgbRetiredCopies_;
         }
+    }
+    // Do not spend the single in-flight RAW PRE/POST GPU capture on
+    // depth-only, alpha-only or unrelated-RT Draws. Those original native
+    // game draws still run normally; only their non-RGB diagnostic copy is
+    // skipped so later menu/car/race RGB Draws can be sampled.
+    [[nodiscard]] static bool bound_native_source_can_write_rgb(
+        ID3D11DeviceContext* ctx, ID3D11Texture2D* color) noexcept {
+        if (!ctx || !color) return false;
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rt0;
+        ctx->OMGetRenderTargets(1u, rt0.GetAddressOf(), nullptr);
+        if (!rt0) return false;
+        Microsoft::WRL::ComPtr<ID3D11Resource> boundResource;
+        rt0->GetResource(boundResource.GetAddressOf());
+        Microsoft::WRL::ComPtr<IUnknown> boundIdentity, sourceIdentity;
+        if (!boundResource ||
+            FAILED(boundResource->QueryInterface(IID_IUnknown,
+                reinterpret_cast<void**>(boundIdentity.GetAddressOf()))) ||
+            FAILED(color->QueryInterface(IID_IUnknown,
+                reinterpret_cast<void**>(sourceIdentity.GetAddressOf()))))
+            return false;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
+        ctx->PSGetShader(pixelShader.GetAddressOf(), nullptr, nullptr);
+        Microsoft::WRL::ComPtr<ID3D11BlendState> blend;
+        ctx->OMGetBlendState(blend.GetAddressOf(), nullptr, nullptr);
+        std::uint8_t colorMask = 0x0fu; // null state: D3D11 RGB+A enabled
+        if (blend) {
+            D3D11_BLEND_DESC desc{};
+            blend->GetDesc(&desc);
+            colorMask = desc.RenderTarget[0].RenderTargetWriteMask;
+        }
+        return native_raw_bound_rgb_capture_admitted({
+            true, boundIdentity.Get() == sourceIdentity.Get(),
+            pixelShader.Get() != nullptr, colorMask});
     }
     // A ResolveSubresource is a full target operation (not a tile copy).
     // Keep its single-sample buffer GPU-only, never present it or alter the

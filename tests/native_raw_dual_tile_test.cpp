@@ -1,5 +1,6 @@
 #include "src/vr/d3d11/native_game_raw_dual_tile.hpp"
 #include "src/vr/d3d11/native_game_raw_color_transport.hpp"
+#include "src/vr/d3d11/native_game_raw_color_write_admission.hpp"
 #include "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp"
 #include "src/vr/d3d11/native_game_raw_present_coverage.hpp"
 #include "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
@@ -124,7 +125,37 @@ static_assert(native_raw_requires_opaque_alpha(true, false));
 static_assert(native_raw_requires_opaque_alpha(true, true));
 static_assert(native_raw_requires_opaque_alpha(false, true));
 static_assert(!native_raw_requires_opaque_alpha(false, false));
+// Source GPU color evidence is per-Draw. An alpha-only/depth-only
+// menu/vehicle Draw must not occupy the single pending RGB sample and
+// starve the later native game Draw which actually writes the source RTV.
+constexpr bool native_raw_source_color_write_selection_regression() {
+    constexpr NativeRawBoundRgbState scene[] = {
+        {true,true,false,0x0fu}, // depth-only: no PS output
+        {true,true,true,0x08u},  // alpha only: no RGB mutation
+        {true,false,true,0x0fu}, // foreign color target
+        {false,false,true,0x0fu},// no bound color target
+        {true,true,true,0x02u},  // real green-only GPU output
+        {true,true,true,0x0fu}   // next real draw (not a second sample)
+    };
+    bool queued = false;
+    unsigned selected = 0u;
+    for (unsigned i = 0u; i < sizeof(scene)/sizeof(scene[0]); ++i)
+        if (!queued && native_raw_bound_rgb_capture_admitted(scene[i])) {
+            queued = true; selected = i;
+        }
+    return queued && selected == 4u &&
+        native_raw_bound_rgb_capture_admitted({true,true,true,0x07u}) &&
+        !native_raw_bound_rgb_capture_admitted({true,true,true,0x08u}) &&
+        !native_raw_bound_rgb_capture_admitted({true,true,true,0x00u}) &&
+        !native_raw_bound_rgb_capture_admitted({true,true,false,0x0fu}) &&
+        !native_raw_bound_rgb_capture_admitted({true,false,true,0x0fu}) &&
+        !native_raw_bound_rgb_capture_admitted({false,true,true,0x0fu});
+}
+static_assert(native_raw_source_color_write_selection_regression(),
+    "RAW PRE/POST must sample an attributable RGB-writing game Draw");
+
 int main() {
+    assert(native_raw_source_color_write_selection_regression());
     {
         constexpr std::uint32_t w=2u,h=2u;
         const std::array<std::uint8_t,16u> pre{};
