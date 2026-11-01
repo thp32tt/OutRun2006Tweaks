@@ -1,0 +1,566 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.v1",
+  "run_key": "OUTRUN-C1-AI2-20261101T2015KST-NEW-SHA8",
+  "reviewed_at_kst": "2026-11-01T20:17:45+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "method": "N100 실제 후보 PNG 8건 신규 SHA 확인, 기존 보고서 SHA 제외, 이미지 export 및 원본 manifest SHA256 검증, native-fit/50% 두 단계 직접 시각검수, RGBA·알파 경계·글자/효과 잘림·승인 번역 및 기울기 확인. FAIL 1건은 마지막 행의 비투명 외곽효과 실제 절단 증빙.",
+  "prior_reviewed_sha_count": 944,
+  "total_pending_before_selection": 12,
+  "results": {
+    "new_sha": 8,
+    "pass": 7,
+    "fail": 1,
+    "hold": 0,
+    "A": 4,
+    "B": 4,
+    "remaining_at_inventory": 4
+  },
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0153-A262703E",
+      "id": "Q201_9e0c103f9fbaba5a",
+      "english": "GOALS",
+      "korean": "골",
+      "candidate_file": "Q201_9e0c103f9fbaba5a_k.png",
+      "candidate_sha256": "961ad73cdd709872b950655d36c43dbf49db99ca1e43b1b027e3fdf09bed5f7e",
+      "export_sha256": "961ad73cdd709872b950655d36c43dbf49db99ca1e43b1b027e3fdf09bed5f7e",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "manifest_source_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "manifest_imagegen_input_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1073,
+        1728,
+        1261,
+        1792
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        21,
+        1830,
+        724
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        188,
+        63
+      ],
+      "half_fit": [
+        94,
+        31
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "GOALS→골. 어두운 회색 글자+검은 테두리 원본 계열을 유지. native/50%에서 골 획 판독, 별도 아트·프레임 없음."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0154-BE23B5CA",
+      "id": "Q046_8aca5cc155e48ab9",
+      "english": "Cloudy Highland",
+      "korean": "클라우디 하이랜드",
+      "candidate_file": "Q046_8aca5cc155e48ab9_k.png",
+      "candidate_sha256": "dccf3c389a7cb0f80f8110685d5d47d63d99a96f448fc4b5b2932301bb51a903",
+      "export_sha256": "dccf3c389a7cb0f80f8110685d5d47d63d99a96f448fc4b5b2932301bb51a903",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_imagegen_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1151,
+        718,
+        1420,
+        855
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        1758,
+        895
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        66,
+        1738,
+        895
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        269,
+        137
+      ],
+      "half_fit": [
+        134,
+        68
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Cloudy Highland→클라우디 하이랜드. 두 줄 유지, 글자 및 받침·파란 외곽선 선명, 경계 잘림 없음."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0155-63B9486D",
+      "id": "Q046_b45e1466e6342b9b",
+      "english": "Ghost Forest",
+      "korean": "고스트 포레스트",
+      "candidate_file": "Q046_b45e1466e6342b9b_k.png",
+      "candidate_sha256": "81ab868ca1960af876e87ef603126323d804acf253343fc3adb07708ab5fc36b",
+      "export_sha256": "81ab868ca1960af876e87ef603126323d804acf253343fc3adb07708ab5fc36b",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_imagegen_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1655,
+        875,
+        1910,
+        1010
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        1748,
+        900
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        17,
+        1673,
+        900
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        255,
+        131
+      ],
+      "half_fit": [
+        127,
+        65
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Ghost Forest→고스트 포레스트. 두 줄 유지, 네이티브/50% 판독 가능, 흰색·남색 외곽 효과 선명."
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0156-D85167C2",
+      "id": "Q044_65bad63fe0353b2b",
+      "english": "Sector1",
+      "korean": "섹터 1",
+      "candidate_file": "Q044_65bad63fe0353b2b_k.png",
+      "candidate_sha256": "ae07383bd3c63cfbc1fe34f8d23ef0f2a6ab9cdc5eeba92395df6173177b6480",
+      "export_sha256": "ae07383bd3c63cfbc1fe34f8d23ef0f2a6ab9cdc5eeba92395df6173177b6480",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_source_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "manifest_imagegen_input_sha256": "fd42d6909b5275979e63e793ec2744a672929f0dbca7b759c62a5da4d76a6d4e",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        202,
+        97,
+        393,
+        166
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2087,
+        754
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        113,
+        23,
+        2041,
+        736
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        191,
+        69
+      ],
+      "half_fit": [
+        95,
+        34
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Sector1→섹터 1. 노랑 글자/짙은 파란 기울기 및 효과 보존, 문자와 숫자 구분 가능."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0156-2C5ADF95",
+      "id": "Q201_87d395647fa5ff82",
+      "english": "STAGES",
+      "korean": "스테이지",
+      "candidate_file": "Q201_87d395647fa5ff82_k.png",
+      "candidate_sha256": "3bf4ef72c2a668361d145bcadf327cdc089b674d878966ed9f5816cbd8e4014c",
+      "export_sha256": "3bf4ef72c2a668361d145bcadf327cdc089b674d878966ed9f5816cbd8e4014c",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "manifest_source_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "manifest_imagegen_input_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1168,
+        1983,
+        1385,
+        2043
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        2172,
+        724
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        0,
+        2128,
+        714
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        180,
+        60
+      ],
+      "half_fit": [
+        90,
+        30
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "STAGES→스테이지. 원본 저대비 회색 효과 계열, 개별 음절 판독, alpha>=32 경계 접촉 없음."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0157-F630360E",
+      "id": "Q046_343e81afc790e636",
+      "english": "Water Falls",
+      "korean": "워터폴스",
+      "candidate_file": "Q046_343e81afc790e636_k.png",
+      "candidate_sha256": "eef1cb0ef609bc212c4affe10a973ee5f1e575c86e88d2b49828e87148c2b4eb",
+      "export_sha256": "eef1cb0ef609bc212c4affe10a973ee5f1e575c86e88d2b49828e87148c2b4eb",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_imagegen_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        813,
+        1190,
+        1020,
+        1330
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        1526,
+        1031
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        33,
+        1508,
+        1010
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        207,
+        140
+      ],
+      "half_fit": [
+        103,
+        70
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Water Falls→워터폴스. 원본 두 줄에서 승인 한글 한 줄로 변경; 해당 차이만 반려 사유 아님. 흰/남색 효과와 가독성 확인."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0158-E02AA2A7",
+      "id": "Q046_3bf8ad1051816806",
+      "english": "National Park",
+      "korean": "내셔널 파크",
+      "candidate_file": "Q046_3bf8ad1051816806_k.png",
+      "candidate_sha256": "c636d7bf64ef0d76c6a23d5aa2904315c174f8b8e9c044f308457e08d71f12ed",
+      "export_sha256": "c636d7bf64ef0d76c6a23d5aa2904315c174f8b8e9c044f308457e08d71f12ed",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_imagegen_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1324,
+        1194,
+        1615,
+        1330
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        1834,
+        857
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        0,
+        1816,
+        857
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 117,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        291,
+        136
+      ],
+      "half_fit": [
+        145,
+        68
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "FAIL",
+      "fail_code": "FAIL_CLIPPED_EFFECT_BOTTOM",
+      "pass_scope": "NONE",
+      "per_glyph_size_and_readability": "PASS_TEXT_BUT_FAIL_EFFECT_CLIPPING",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "National Park→내셔널 파크. 생성 PNG (1834x857) 마지막 y=856에 alpha>=32 픽셀 117개(x=505..621), 최대 alpha 254; 흰색 하단 외곽선이 실제 캔버스 하단에서 잘림. FAIL_CLIPPED_EFFECT_BOTTOM. 단순 underfill이 아님."
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0159-25F16110",
+      "id": "Q046_a7a9e0e694eae316",
+      "english": "Tulip Garden",
+      "korean": "튤립 가든",
+      "candidate_file": "Q046_a7a9e0e694eae316_k.png",
+      "candidate_sha256": "4f37b3785fc8f8c70ef97245ee30ded80eed27962e9aa0d0e2cd9251b75456bd",
+      "export_sha256": "4f37b3785fc8f8c70ef97245ee30ded80eed27962e9aa0d0e2cd9251b75456bd",
+      "candidate_sha_matches_export": true,
+      "source_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_source_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "manifest_imagegen_input_sha256": "3ca447ddebe3035a2a16a70fd36f7805858bba02c6cf9ccd749c80d7a9c59d6c",
+      "source_sha_matches_manifest": true,
+      "source_sha_matches_imagegen_input": true,
+      "bbox_xyxy": [
+        1145,
+        885,
+        1400,
+        1015
+      ],
+      "source_size": [
+        2048,
+        2048
+      ],
+      "candidate_size": [
+        1756,
+        895
+      ],
+      "candidate_mode": "RGBA",
+      "alpha_bbox": [
+        0,
+        25,
+        1468,
+        861
+      ],
+      "alpha_border_ge32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "native_fit": [
+        255,
+        130
+      ],
+      "half_fit": [
+        127,
+        65
+      ],
+      "already_reviewed": false,
+      "producer_export_status": "REWORK_DIMENSIONS",
+      "producer_pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "judgement": "PASS",
+      "fail_code": null,
+      "pass_scope": "C1_KOREAN_LETTERING_LAYER_ONLY",
+      "per_glyph_size_and_readability": "PASS_LAYER_ONLY",
+      "source_bbox_containment": "ACTUAL_UI_COMPOSITE_NOT_TESTED",
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "text_length_difference_ignored": true,
+      "actual_ui_composite": "NOT_TESTED",
+      "protected_art_composite": "NOT_TESTED",
+      "dds": "NOT_CREATED",
+      "C2_C3": "NOT_ASSESSED",
+      "runtime_validation": "UNTESTED",
+      "observations": "Tulip Garden→튤립 가든. 승인 음절 정확, 두 줄 구성, 한국어 글자/음영 선명, 강한 알파 경계 접촉 없음."
+    }
+  ],
+  "limit_scope": "C1 letter layer-only; ImageGen/C2/C3/DDS/game excluded; no A/B queue mutation.",
+  "producer_export_note": "원본 프로듀서 REWORK_DIMENSIONS 및 OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED 유지. PASS는 C1의 간이 QA에 한정, 정식 DDS/게임 승인 아님."
+}
