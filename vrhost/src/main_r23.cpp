@@ -2369,6 +2369,30 @@ namespace
             uv.x + uv.w <= 1.00001f && uv.y + uv.h <= 1.00001f;
     }
 
+    bool R23TheaterFrameMatchesCapture(
+        const StereoCompositor& c,
+        const OutRunVR::SharedRenderFrameState& frame) noexcept
+    {
+        if (frame.presentationMode != OutRunVR::PresentationTheater ||
+            (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+            frame.presentQpc <= 0 || c.lastCapturePresentQpc_ <= 0 ||
+            frame.presentQpc > c.lastCapturePresentQpc_)
+            return false;
+
+        static const std::int64_t maxSkewTicks = []() noexcept {
+            LARGE_INTEGER frequency{};
+            if (!QueryPerformanceFrequency(&frequency) ||
+                frequency.QuadPart <= 0)
+                return std::int64_t{0};
+            // Same 100 ms correlation envelope used by the classic capture
+            // selector. Menu frames have frameId=0, so QPC is their stable
+            // cross-stream identity instead of the gameplay stereo frame ID.
+            return frequency.QuadPart / 10;
+        }();
+        return maxSkewTicks > 0 &&
+            c.lastCapturePresentQpc_ - frame.presentQpc <= maxSkewTicks;
+    }
+
     bool R23RenderTheater(StereoCompositor& c, XrSpace viewSpace,
         XrSpace localSpace, XrTime displayTime, XrCompositionLayerQuad& quad,
         bool sourceIsSbs,
@@ -2387,7 +2411,8 @@ namespace
         UvRect theaterUv = whole;
         bool publishedMirrorApplied = false;
         float publishedMirrorAspect = 0.0f;
-        if (!sourceIsSbs && mirrorFrame)
+        if (!sourceIsSbs && mirrorFrame &&
+            R23TheaterFrameMatchesCapture(c, *mirrorFrame))
         {
             UvRect publishedUv{};
             RECT publishedRect{};
@@ -2478,6 +2503,73 @@ namespace
             }
         }
 
+        // STATE_SUMO_FE is intentionally kept in the original 1920x1080
+        // logical coordinate space on the x86 side. When the game publishes
+        // the exact HWND client rectangle, that rectangle still contains the
+        // full portrait XR backbuffer. Recover the logical top-left fraction
+        // INSIDE the published mirror UV before submitting the LOCAL theater.
+        // This is not a 4:3 crop: the entire 16:9 logical selector/menu canvas
+        // remains present.
+        const bool mirrorBackbufferExtentValid =
+            mirrorFrame &&
+            mirrorFrame->backbufferWidth >= 640u &&
+            mirrorFrame->backbufferHeight >= 480u &&
+            mirrorFrame->backbufferWidth <= 8192u &&
+            mirrorFrame->backbufferHeight <= 8192u &&
+            static_cast<std::uint64_t>(mirrorFrame->backbufferWidth) *
+                mirrorFrame->backbufferHeight <= 16777216ULL;
+        const float menuPhysicalWidth = mirrorBackbufferExtentValid
+            ? static_cast<float>(mirrorFrame->backbufferWidth)
+            : static_cast<float>(c.projection_.width);
+        const float menuPhysicalHeight = mirrorBackbufferExtentValid
+            ? static_cast<float>(mirrorFrame->backbufferHeight)
+            : static_cast<float>(c.projection_.height);
+        const auto publishedLogicalCanvasCrop =
+            !sourceIsSbs && publishedMirrorApplied &&
+            clientGameState == 0x20u
+            ? OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
+                clientGameState, menuPhysicalWidth, menuPhysicalHeight)
+            : OutRunVrMenuAspect::LogicalCanvasCropPlan{};
+        bool publishedLogicalCanvasApplied =
+            publishedLogicalCanvasCrop.crop;
+        if (publishedLogicalCanvasApplied)
+        {
+            const float baseWidth = theaterUv.w;
+            const float baseHeight = theaterUv.h;
+            theaterUv.x += baseWidth * publishedLogicalCanvasCrop.offsetX;
+            theaterUv.y += baseHeight * publishedLogicalCanvasCrop.offsetY;
+            theaterUv.w = baseWidth * publishedLogicalCanvasCrop.width;
+            theaterUv.h = baseHeight * publishedLogicalCanvasCrop.height;
+            publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;
+        }
+
+        if (publishedLogicalCanvasApplied)
+        {
+            static std::uint64_t sumoLogicalHits = 0;
+            const auto hit = ++sumoLogicalHits;
+            if (hit <= 32 || (hit & (hit - 1)) == 0)
+            {
+                std::ostringstream trace;
+                trace
+                    << "[VR TRACE SUMO_FE LOGICAL CANVAS FULL]"
+                    << " hit=" << hit
+                    << " state=" << clientGameState
+                    << " xrPhysical=" << c.projection_.width << 'x'
+                    << c.projection_.height
+                    << " frameBackbuffer="
+                    << (mirrorFrame ? mirrorFrame->backbufferWidth : 0u) << 'x'
+                    << (mirrorFrame ? mirrorFrame->backbufferHeight : 0u)
+                    << " cropPhysical=" << menuPhysicalWidth << 'x'
+                    << menuPhysicalHeight
+                    << " logical=1920x1080"
+                    << " outputUv=" << theaterUv.x << ',' << theaterUv.y
+                    << ',' << theaterUv.w << ',' << theaterUv.h
+                    << " aspect=" << publishedMirrorAspect
+                    << " authority=PUBLISHED_HWND_X_LOGICAL_BACKBUFFER_FRACTION\n";
+                OutRunVrEmitFullTrace(trace.str());
+            }
+        }
+
         const auto logicalCanvasCrop =
             !sourceIsSbs && !publishedMirrorApplied
             ? OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
@@ -2491,9 +2583,11 @@ namespace
                 static_cast<float>(c.projection_.width),
                 static_cast<float>(c.projection_.height))
             : OutRunVrMenuAspect::LogicalCanvasCapturePlan{};
-        const bool logicalCanvasCropApplied =
+        const bool fallbackLogicalCanvasApplied =
             !sourceIsSbs && !publishedMirrorApplied && logicalCanvasCrop.crop;
-        if (logicalCanvasCropApplied)
+        const bool logicalCanvasCropApplied =
+            publishedLogicalCanvasApplied || fallbackLogicalCanvasApplied;
+        if (fallbackLogicalCanvasApplied)
         {
             theaterUv.x = logicalCanvasCrop.x;
             theaterUv.y = logicalCanvasCrop.y;
@@ -2535,6 +2629,36 @@ namespace
                 OutRunVrEmitFullTrace(trace.str());
             }
         }
+        // The published-Frame.v2 path above crops exact TITLE/MENU 4:3.
+        // Its fully visible desktop fallback must use the same authored
+        // content aspect, even when the QPC match missed this Present.
+        // Do not turn the SUMO_FE (0x20) car selector into a 4:3 crop.
+        if (OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
+                clientGameState, sourceIsSbs, publishedMirrorApplied,
+                capturedTheaterFullyVisible))
+        {
+            const float fallbackSourceAspect = fallbackLogicalCanvasApplied
+                ? logicalCanvasCrop.aspect
+                : OutRunVrMenuAspect::PlanCapturedAspect(
+                    c.sourceWidth_, c.sourceHeight_,
+                    theaterUv.w, theaterUv.h, 16.f / 9.f);
+            constexpr float titleAspect = 4.f / 3.f;
+            const auto fallbackAuthor43 =
+                OutRunVrMenuAspect::PlanCenteredContent(
+                    fallbackSourceAspect, titleAspect);
+            if (fallbackAuthor43.crop)
+            {
+                const float baseWidth = theaterUv.w;
+                const float baseHeight = theaterUv.h;
+                theaterUv.x += baseWidth * fallbackAuthor43.offsetX;
+                theaterUv.y += baseHeight * fallbackAuthor43.offsetY;
+                theaterUv.w = baseWidth * fallbackAuthor43.width;
+                theaterUv.h = baseHeight * fallbackAuthor43.height;
+            }
+            authoredFourThreeApplied =
+                fallbackAuthor43.crop ||
+                std::fabs(fallbackSourceAspect - titleAspect) <= 0.001f;
+        }
         if (sourceIsSbs)
             theaterUv.w *= 0.5f;
         if (theaterUv.w <= 0.0f || theaterUv.h <= 0.0f)
@@ -2559,16 +2683,30 @@ namespace
             capturedTheaterClient.right - capturedTheaterClient.left);
         const float theaterHeight = static_cast<float>(
             capturedTheaterClient.bottom - capturedTheaterClient.top);
-        const float aspect = publishedMirrorApplied
+        const float aspect = authoredFourThreeApplied
+            ? 4.f / 3.f
+            : (publishedMirrorApplied
             ? publishedMirrorAspect
             : (logicalCanvasCropApplied
                 ? logicalCanvasCrop.aspect
                 : (theaterWidth > 0.0f && theaterHeight > 0.0f
                 ? theaterWidth / theaterHeight *
                     (sourceIsSbs ? 0.5f : 1.0f)
-                : 16.f / 9.f));
-        quad.size.width = 2.f;
-        quad.size.height = 2.f / aspect;
+                : 16.f / 9.f)));
+
+        // This is the LIVE menu submission path. The old world-locked menu
+        // projection helper is no longer called by the front-end loop, so
+        // MenuScale must be applied here rather than merely cached/validated.
+        // Scale width and height uniformly to preserve the captured source
+        // aspect. Gameplay SBS recovery keeps its established 2m theater.
+        const float theaterScale = !sourceIsSbs &&
+            clientGameState != 0xFFFFFFFFu
+            ? OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState(
+                std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),
+                clientGameState, R23ConfiguredMenuScale)
+            : 1.0f;
+        quad.size.width = 2.f * theaterScale;
+        quad.size.height = quad.size.width / aspect;
 
         // Unlike the LOCAL-fixed 4:3 menu path, the mono recovery theater
         // formerly stretched and recentred an off-output game window's

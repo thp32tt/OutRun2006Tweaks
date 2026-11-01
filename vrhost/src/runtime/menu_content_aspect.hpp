@@ -42,8 +42,10 @@ namespace OutRunVrMenuAspect
 
     // Quest runtime proof: early front-end/title/menu rasters can remain on
     // the game's logical 1920x1080 top-left canvas while the physical D3D9Ex
-    // target follows the taller OpenXR eye extent. Keep selector/advertise/
-    // gameplay/post-race owners out: those have independent verified routes.
+    // target follows the taller OpenXR eye extent. STATE_SUMO_FE is also a
+    // logical-canvas owner now that game-side portrait XR physicalization is
+    // explicitly vetoed for 0x20. This is a 16:9 logical-canvas recovery, NOT
+    // the separate 4:3 title crop; selector pixels inside 1920x1080 survive.
     constexpr bool IsTopLeftLogicalTheaterState(
         std::uint32_t state) noexcept
     {
@@ -57,6 +59,7 @@ namespace OutRunVrMenuAspect
         case 0x06u: // ENTRY
         case 0x08u: // ERROR
         case 0x09u: // MENU
+        case 0x20u: // SUMO_FE: title/main/selector share logical canvas
             return true;
         default:
             return false;
@@ -105,6 +108,7 @@ namespace OutRunVrMenuAspect
 
     static_assert(IsTopLeftLogicalTheaterState(0x04u));
     static_assert(IsTopLeftLogicalTheaterState(0x09u));
+    static_assert(IsTopLeftLogicalTheaterState(0x20u));
     static_assert(!IsTopLeftLogicalTheaterState(0x0Au));
     static_assert(!IsTopLeftLogicalTheaterState(0x10u));
     static_assert(!IsTopLeftLogicalTheaterState(0x17u));
@@ -141,7 +145,7 @@ namespace OutRunVrMenuAspect
         // This helper is called by the explicit theater/menu branch with a
         // concrete game-state value. The gameplay recovery call uses the
         // sentinel and must retain its existing full/fragment path.
-        if (state == 0xFFFFFFFFu ||
+        if (!IsTopLeftLogicalTheaterState(state) ||
             !std::isfinite(clientLeft) || !std::isfinite(clientTop) ||
             !std::isfinite(clientRight) || !std::isfinite(clientBottom) ||
             !std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
@@ -172,9 +176,31 @@ namespace OutRunVrMenuAspect
         float fitWidth = clientWidth;
         float fitHeight = clientHeight;
         const float clientAspect = clientWidth / clientHeight;
-        if (!std::isfinite(clientAspect) || clientAspect <= 0.0f)
+        const float physicalAspect = physicalWidth / physicalHeight;
+        if (!std::isfinite(clientAspect) || clientAspect <= 0.0f ||
+            !std::isfinite(physicalAspect) || physicalAspect <= 0.0f)
             return {};
-        if (clientAspect > logicalAspect)
+
+        // SUMO_FE keeps the original 1920x1080 pixels at the top-left of
+        // the portrait XR backbuffer, not in the centre of that backbuffer.
+        // Only interpret a desktop client as that PHYSICAL portrait source
+        // when its own aspect independently matches the physical extent.
+        // A landscape HWND (e.g. the 2560x1440 mirror from Quest logs)
+        // is a centered 16:9 FIT, and must retain the existing branch below.
+        // Title/menu 0x04/0x09 use game-side physicalization and must never
+        // inherit SUMO's top-left physical-pixel interpretation.
+        const bool sumoPhysicalPortrait =
+            state == 0x20u &&
+            physicalWidth >= logicalWidth &&
+            physicalHeight >= logicalHeight &&
+            physicalAspect < logicalAspect - 0.10f &&
+            std::fabs(clientAspect - physicalAspect) <= 0.025f;
+        if (sumoPhysicalPortrait)
+        {
+            fitWidth = clientWidth * (logicalWidth / physicalWidth);
+            fitHeight = clientHeight * (logicalHeight / physicalHeight);
+        }
+        else if (clientAspect > logicalAspect)
         {
             fitHeight = clientHeight;
             fitWidth = fitHeight * logicalAspect;
@@ -258,6 +284,25 @@ namespace OutRunVrMenuAspect
             ShouldAutoCropVerifiedFourThree(
                 configuredLetterbox, imageMatteVerified);
     }
+
+    // A completed title/menu may lack a time-matched Frame.v2 mirror rect.
+    // The published-rect branch already applies 4:3 to 0x04/0x09; keep
+    // complete-client desktop fallback optically identical. Never crop
+    // 0x20 SUMO (also owns the wide selector), SBS or partial captures.
+    constexpr bool ShouldCropFallbackTitleMenu(
+        std::uint32_t state, bool sourceIsSbs,
+        bool publishedMirrorApplied, bool fullClientVisible) noexcept
+    {
+        return !sourceIsSbs && !publishedMirrorApplied &&
+            fullClientVisible && (state == 0x04u || state == 0x09u);
+    }
+    static_assert(ShouldCropFallbackTitleMenu(0x04u, false, false, true));
+    static_assert(ShouldCropFallbackTitleMenu(0x09u, false, false, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x20u, false, false, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x0Au, false, false, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x04u, false, true, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x04u, true, false, true));
+    static_assert(!ShouldCropFallbackTitleMenu(0x04u, false, false, false));
 
     // OutRun may restart with a recycled numeric HWND but a new game PID.
     // A cached 4:3 crop must never be reused for another process.
@@ -381,19 +426,25 @@ namespace OutRunVrMenuAspect
         return parsed;
     }
 
-    // Every menu state uses full safe optical coverage by default.
-    // Retain the state argument for the original game ABI/callers, but
-    // do not quietly reinstate the old 0.78 car-selector fallback.
+    // Keep non-front-end states at full safe optical coverage. The current
+    // Sumo front-end build keeps title/main/Coast2Coast/car-select under
+    // STATE_SUMO_FE (0x20), so a title-only 0x04/0x09 filter makes MenuScale
+    // inert on the exact Quest runtime that needs it. Applying the same
+    // optical size to 0x20 does NOT enable a 4:3 source crop: selector UV and
+    // source aspect remain governed separately by PlanStateSafeMenuCrop.
     inline float ResolveMenuOpticalCoverageForState(
         const char* requested, std::uint32_t gameState,
         float menuScale = 1.0f) noexcept
     {
-        // Only title/main-menu own this setting. Vehicle selection, pause,
-        // gameplay, results and unknown transitions keep their old policy.
-        // Scale is a fraction of the binocular-safe 4:3 canvas, independent
-        // of desktop pixels, game render extent and XR swapchain resolution.
-        const float defaultCoverage = gameState == 0x04u || gameState == 0x09u
-            ? menuScale : 1.0f;
+        const bool ownsFrontEndOpticalScale =
+            gameState == 0x00u || // SYSTEM / boot-title theater
+            gameState == 0x04u || gameState == 0x09u ||
+            gameState == 0x0Du || // START / loading theater
+            gameState == 0x20u;   // STATE_SUMO_FE runtime owner
+        // Scale is a fraction of the binocular-safe source-aspect canvas,
+        // independent of desktop pixels, render extent and XR resolution.
+        const float defaultCoverage =
+            ownsFrontEndOpticalScale ? menuScale : 1.0f;
         return ResolveMenuOpticalCoverage(requested, defaultCoverage);
     }
 

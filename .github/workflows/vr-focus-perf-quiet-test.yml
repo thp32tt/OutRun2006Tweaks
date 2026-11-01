@@ -1,4 +1,4 @@
-name: R26 Focus Stereo-Only Transactional Safety Repair
+name: R26 Latest Focus + All Safe Perf + Stereo Transactional Test
 
 on:
   push:
@@ -17,11 +17,23 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Verify latest focus visual + perf integration without dropping stereo safety
+        shell: pwsh
+        run: |
+          python tools/verify_vr_latest_focus_full_perf_integration.py
+          if ($LASTEXITCODE -ne 0) { throw 'Latest focus / all performance / stereo safety integration failed' }
+
       - name: Verify XR render target and independent UI contracts
         shell: pwsh
         run: |
           python tools/verify_vr_desktop_source_coordinates.py
           if ($LASTEXITCODE -ne 0) { throw 'XR physical target/logical UI split failed' }
+          python tools/verify_vr_f11_wndproc_shell.py
+          if ($LASTEXITCODE -ne 0) { throw 'Final focus F11 shell regression failed' }
+          python tools/verify_vr_ui_matrix_safety.py
+          if ($LASTEXITCODE -ne 0) { throw 'Final focus UI matrix owner regression failed' }
+          python tools/verify_vr_visual_composition_p0.py
+          if ($LASTEXITCODE -ne 0) { throw 'Final focus visual composition safety failed' }
           python tools/verify_vr_unified_menu_source.py
           if ($LASTEXITCODE -ne 0) { throw 'VR UI reference split failed' }
           python tools/verify_vr_menu_resolution_split.py
@@ -104,7 +116,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $short = $env:GITHUB_SHA.Substring(0,12)
-          $dir = "OutRun2_VR_FOCUS_STEREO_SAFETY_$short"
+          $dir = "OutRun2_VR_LATEST_FOCUS_ALL_PERF_STEREO_SAFETY_$short"
           New-Item -ItemType Directory -Force $dir | Out-Null
           $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
           if (!$dll) { throw 'No Win32 game DLL' }
@@ -131,6 +143,8 @@ jobs:
           if ($parseErrors.Count) { throw "Invalid launcher syntax: $parseErrors" }
           @(
             'BASE_VISUAL_FOCUS_SHA=9e26abe49fc414ae8eeaa9f3bbebe16ab618d385'
+            'LATEST_FOCUS_SHA=486ef5b42c5b86c97462a3c25874f11777871b16'
+            'MERGED_TEST_SAFETY_SHA=0728bc7bdb40e37f34eb022e9d0dbf6b2cb98d58'
             "TEST_SHA=$env:GITHUB_SHA"
             'INTEGRATED=0b39f432,36d5882d,6b75e5cb,73e1bfc5,8ee0bc11'
             'LOGGING=OFF: game telemetry, host full trace, XR pixel probe'
@@ -143,7 +157,7 @@ jobs:
           Get-FileHash "$dir.zip" -Algorithm SHA256
       - uses: actions/upload-artifact@v4
         with:
-          name: OutRun-VR-FOCUS-STEREO-SAFETY-${{ github.sha }}
-          path: OutRun2_VR_FOCUS_STEREO_SAFETY_*.zip
+          name: OutRun-VR-LATEST-FOCUS-ALL-PERF-STEREO-${{ github.sha }}
+          path: OutRun2_VR_LATEST_FOCUS_ALL_PERF_STEREO_SAFETY_*.zip
           retention-days: 21
           if-no-files-found: error

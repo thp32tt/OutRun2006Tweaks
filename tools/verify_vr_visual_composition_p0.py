@@ -3342,10 +3342,10 @@ for label, corrupt in (
 
 
 # Exact lens PMTs are centre-eye projected screen effects. R85 keeps one
-# original source ray, but Quest 2026-11-01 HMD proof shows that an exact
-# 405890 PMT c64 recorded while the game camera is synchronized must be
-# unprojected through the common head inverse before L/R asymmetric-FOV
-# reprojection. A tiny bounded eye translation may remain for shallow depth.
+# original source ray. Quest 2026-11-01 01:23 HMD proof shows that an exact
+# 405890 PMT c64 recorded while the game camera is synchronized already owns
+# the common head rotation; applying head inverse again produces the observed
+# opposite-head counter-lock. A tiny bounded eye translation may remain.
 # Other Clr_SceneEffect variants retain flat/spatial WVP classification.
 def check_exact_scene_effect_raw_wvp(source):
     scope = function_body(source, 'bool R30ExactSceneEffectScope(')
@@ -3387,7 +3387,7 @@ def check_exact_scene_effect_raw_wvp(source):
         '!R30GetExtendedRawWvpForExactSceneEffect(original))',
         'if (screenKind == R30ScreenSpaceKind::ProjectedScreenEffect2D)',
         'GetLatchedHeadInverse(',
-        'exactProjectedLensPmtRaw ? false : recordedCameraSynced',
+        'outerFlareObject ? false : recordedCameraSynced',
         'for (int eye = 0; eye < 2; ++eye)',
         'ProjectionFromFov(',
         'stereo.eyeFov[eye]',
@@ -3397,13 +3397,14 @@ def check_exact_scene_effect_raw_wvp(source):
     for token in (
         'exactProjectedLensPmtRaw',
         'recordedCameraSynced',
-        'exactProjectedLensPmtRaw ? false : recordedCameraSynced',
+        'outerFlareObject ? false : recordedCameraSynced',
         'lensEyeInverse = IdentityMatrix()',
         'R85LensStereoTranslationScale = 0.025f',
-        'pmtHeadUnproject={}',
+        'outerFlareObject={}',
+        'projectedObj=0x{:06X}',
     ):
         require(token, projected,
-                'exact PMT flare must unproject synchronized camera before eye projection')
+                'sun PMTs keep synchronized rotation while outer flare PMTs receive head inverse')
     exact_projected = function_body(
         source, 'bool R30GetExactInlineProjectedLensRawWvp(')
     for token in (

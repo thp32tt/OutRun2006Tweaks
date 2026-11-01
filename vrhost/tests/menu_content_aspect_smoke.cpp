@@ -169,6 +169,67 @@ int main()
             std::fabs(fit.aspect - 16.f/9.f) > 1.e-6f)
             return 124;
     }
+    // Fallback crop only applies to authored logical front-end states.
+    // Geometry alone is not proof for vehicle selector, results, gameplay.
+    {
+        using OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv;
+        const auto fitFor = [](std::uint32_t state) {
+            return PlanTopLeftLogicalCaptureUv(
+                state, 0.f, 0.f, 3440.f, 1440.f,
+                3440.f, 1440.f, 2496.f, 2688.f);
+        };
+        if (!fitFor(0x00u).crop || !fitFor(0x04u).crop ||
+            !fitFor(0x09u).crop || !fitFor(0x20u).crop ||
+            fitFor(0x0Au).crop || fitFor(0x0Bu).crop ||
+            fitFor(0x0Cu).crop || fitFor(0x10u).crop ||
+            fitFor(0x22u).crop || fitFor(0x23u).crop ||
+            fitFor(0xFFFFFFFFu).crop)
+            return 125;
+    }
+    // A timestamp-missed title/menu frame must match published Frame.v2
+    // 4:3 layout, but SUMO wrapper / selector / SBS / fragments stay wide.
+    {
+        using OutRunVrMenuAspect::ShouldCropFallbackTitleMenu;
+        const auto centered = OutRunVrMenuAspect::PlanCenteredContent(
+            16.f / 9.f, 4.f / 3.f);
+        if (!ShouldCropFallbackTitleMenu(0x04u, false, false, true) ||
+            !ShouldCropFallbackTitleMenu(0x09u, false, false, true) ||
+            ShouldCropFallbackTitleMenu(0x20u, false, false, true) ||
+            ShouldCropFallbackTitleMenu(0x0Au, false, false, true) ||
+            ShouldCropFallbackTitleMenu(0x04u, true, false, true) ||
+            ShouldCropFallbackTitleMenu(0x04u, false, true, true) ||
+            ShouldCropFallbackTitleMenu(0x04u, false, false, false) ||
+            !centered.crop ||
+            std::fabs(centered.offsetX - 0.125f) > 1.e-6f ||
+            std::fabs(centered.width - 0.75f) > 1.e-6f)
+            return 126;
+    }
+    // SUMO_FE portrait mirror: the source 1920x1080 is physically top-left.
+    // A landscape 2560x1440 mirror of the same XR target instead remains
+    // an already-centered 16:9 fit. Do not conflate these source geometries.
+    {
+        using OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv;
+        const auto portraitSumo = PlanTopLeftLogicalCaptureUv(
+            0x20u, 1000.f, 0.f, 2337.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f);
+        const auto portraitTitle = PlanTopLeftLogicalCaptureUv(
+            0x04u, 1000.f, 0.f, 2337.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f);
+        const auto landscapeSumo = PlanTopLeftLogicalCaptureUv(
+            0x20u, 440.f, 0.f, 3000.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f);
+        if (!portraitSumo.crop || !portraitTitle.crop ||
+            !landscapeSumo.crop ||
+            std::fabs(portraitSumo.x - 1000.f / 3440.f) > 1.e-5f ||
+            std::fabs(portraitSumo.y) > 1.e-5f ||
+            std::fabs(portraitSumo.width -
+                1337.f * (1920.f / 2496.f) / 3440.f) > 1.e-5f ||
+            std::fabs(portraitSumo.height - 1080.f / 2688.f) > 1.e-5f ||
+            portraitTitle.y < 0.2f ||
+            std::fabs(landscapeSumo.x - 440.f / 3440.f) > 1.e-5f ||
+            std::fabs(landscapeSumo.y) > 1.e-5f)
+            return 127;
+    }
     // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
     // in its upper-left. Sample exactly that logical rectangle before the
     // LOCAL-fixed menu projection; never crop Ferrari selector/gameplay or

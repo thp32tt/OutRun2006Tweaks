@@ -6,6 +6,8 @@ root = Path(__file__).resolve().parents[1]
 routing = (root / "src/overlay/f11_input_routing.hpp").read_text(encoding="utf-8")
 hook = (root / "src/overlay/hooks_overlay.cpp").read_text(encoding="utf-8")
 overlay = (root / "src/overlay/overlay.cpp").read_text(encoding="utf-8")
+game = (root / "src/game_addrs.hpp").read_text(encoding="utf-8")
+renderer = (root / "src/vr/d3d9/stereo_renderer_r7.inc").read_text(encoding="utf-8")
 workflow = (root / ".github/workflows/vr-dx9ex-active.yml").read_text(encoding="utf-8")
 wnd = hook.split("class WndprocHook : public Hook", 1)[1].split("public:", 1)[0]
 shell = overlay.split("void Overlay::render_shell()", 1)[1].split("void Overlay::init()", 1)[0]
@@ -56,6 +58,40 @@ assert shell.index("if (externalVrShell)\n\t\tImGui::SetNextWindowSizeConstraint
     "ImGui::SetNextWindowSize(windowSize, layoutPlacement);")
 assert "ImVec2(maxWidth, maxHeight)" in shell
 assert "tools/verify_vr_f11_wndproc_shell.py" in workflow
+
+# START presentation must use the same original progress gate in telemetry/F11
+# and the final Frame.v2 stereo owner. Without this, early START publishes
+# Gameplay through SharedPose while R7 publishes Theater for the same frame.
+presentation = game.split("inline bool is_vr_gameplay_presentation() noexcept", 1)[1].split(
+    "inline const char* StageNames[]", 1)[0]
+assert "case STATE_START:" in presentation
+assert "Game::game_start_progress_code &&" in presentation
+assert "*Game::game_start_progress_code == 65;" in presentation
+assert presentation.index("case STATE_START:") < presentation.index(
+    "*Game::game_start_progress_code == 65;") < presentation.index("case STATE_WARP:")
+gameplay = renderer.split("bool GameplayActive()", 1)[1].split(
+    "bool HostRenderEligible()", 1)[0]
+assert "if (!Game::is_vr_gameplay_presentation())" in gameplay
+assert "if (Game::is_in_game())" in gameplay
+assert "case GameState::STATE_WARP:" in gameplay
+assert "case GameState::STATE_RESTART:" in gameplay
+assert "case GameState::STATE_GIVEUP:" in gameplay
+assert "case GameState::STATE_LINK_TIMEUP:" in gameplay
+assert "case GameState::STATE_START:" not in gameplay.split("switch (*Game::current_mode)", 1)[1]
+# Destructive controls: unconditional START and the wrong progress value fail.
+for old, bad in (
+    ("return Game::game_start_progress_code &&\n\t\t\t\t*Game::game_start_progress_code == 65;",
+     "return true;"),
+    ("*Game::game_start_progress_code == 65;",
+     "*Game::game_start_progress_code == 64;"),
+):
+    assert old in presentation
+    damaged = presentation.replace(old, bad, 1)
+    assert not (
+        "Game::game_start_progress_code &&" in damaged and
+        "*Game::game_start_progress_code == 65;" in damaged
+    )
+print("PASS START loading/gameplay presentation parity across telemetry, F11 and R7")
 
 def route(opened, dialog, f11, focus, hud_mouse):
     return opened or dialog or f11 or focus or hud_mouse

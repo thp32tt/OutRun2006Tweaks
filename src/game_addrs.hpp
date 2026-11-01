@@ -318,6 +318,11 @@ namespace Game
 		switch (static_cast<GameState>(*Game::current_mode))
 		{
 		case STATE_START:
+			// START owns the race camera only after the original game reaches
+			// progress 65. Before that point the frame is still loading/theater.
+			// Keep telemetry/F11 ownership bit-identical to R7 GameplayActive().
+			return Game::game_start_progress_code &&
+				*Game::game_start_progress_code == 65;
 		case STATE_WARP:
 		case STATE_RESTART:
 		case STATE_GAME:

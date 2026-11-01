@@ -100,3 +100,15 @@ publication only while a stereo-only DirectGPU Present is active. The host
 commits its own fence-verified and metadata-verified stereo candidate and
 holds the only authoritative last-good pair. A lastGoodHeld counter in the
 game log means suppressed fallback publication, NOT confirmed host display.
+
+LATEST FOCUS 486ef5b42c5b86c97462a3c25874f11777871b16 INTEGRATION (2026-11-01)
+Merged all current focus-only source changes through a common ancestor:
+R85 lens flare sun/light vs outer disc pose owner, SUMO FE logical
+portrait backbuffer crop, title/menu 4:3 fallback parity, exact menu
+published-pixel/QPC correlation, menu optical size 0.75, host theater
+crop+aspect tests and new F11/UI gate updates. Retains previously
+integrated R26 performance settings (reflection 256, update rate 0.25,
+AA2, culling union, no transparency SSAA, quiet trace) and stereo-only
+transactional D3D11 left/right snapshot safety repair. The launcher now
+uses MenuScale=0.75 instead of overriding it to 1.00. The FOCUS branch
+and original safe R26 performance packages remain unchanged.
