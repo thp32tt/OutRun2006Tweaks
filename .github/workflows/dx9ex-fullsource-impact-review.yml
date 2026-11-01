@@ -12,6 +12,7 @@ on:
       - 'tools/verify_vr_desktop_source_coordinates.py'
       - 'tools/verify_vr_unified_menu_source.py'
       - 'tools/verify_vr_menu_resolution_split.py'
+      - 'tools/verify_vr_r23_menu_letterbox_cache.py' # Actual LOCAL menu quad + fresh SUMO source-receipt regression.
       - 'tools/verify_vr_f11_font_density.py'
       - 'tools/tests/r26_stage_fixedfn_harness.cpp'
       - 'tools/verify_dx9ex_r84_mainline.py'
@@ -59,6 +60,7 @@ jobs:
           python3 tools/verify_vr_desktop_source_coordinates.py
           python3 tools/verify_vr_unified_menu_source.py
           python3 tools/verify_vr_menu_resolution_split.py
+          python3 tools/verify_vr_r23_menu_letterbox_cache.py
           python3 tools/verify_vr_f11_font_density.py
           python3 tools/verify_vr_r26_landscape_visual_recovery.py
       - name: Verify Win32 clipboard and timer API failure guards
