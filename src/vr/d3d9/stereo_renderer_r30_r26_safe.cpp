@@ -19,6 +19,7 @@
 #include "lens_centre_source_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
 #include "projected_sun_ray.hpp"
+#include "projected_lens_r85_source_policy.hpp"
 #include "stage_extension_eye_plane.hpp"
 #include "f11_screen_2d.hpp"
 #include "hud_1080p_reference.hpp"
@@ -6080,12 +6081,16 @@ namespace OutRunVRStereo
                     };
                 const bool outerFlareObject =
                     isOuterFlareObject(projectedObjectId);
-                // Sun/light family 570002/570006/57000F/570010 keeps the
-                // synchronized game-camera rotation that fixed counter-lock.
-                // Only lens artifacts re-enter the head-inverse world-bearing
-                // path so they stay attached to the sun rather than the HMD.
+                // 2026-11-01 Quest DEBUG C993/PMT exact 0x570006 receipt:
+                // cameraSyncedRecorded=1, cameraSyncedApplied=1 and the
+                // second optical flare followed the headset. Keep the known
+                // good sun 0x570002/0x57000F/0x570010 path unchanged; route
+                // ONLY 0x570006 through the common head inverse, like the
+                // already-working outer flare discs.
                 const bool sourceCameraSynced =
-                    outerFlareObject ? false : recordedCameraSynced;
+                    OutRunVR::LensCentre::R85UseRecordedCameraSync(
+                        projectedObjectId, outerFlareObject,
+                        recordedCameraSynced);
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyeProjection =
@@ -6126,7 +6131,7 @@ namespace OutRunVRStereo
                         spdlog::info(
                             "VR TRACE LENS R85 BUILD: hit={} draw={} pose={} headSeq={} "
                             "cameraSyncedRecorded={} cameraSyncedApplied={} "
-                            "outerFlareObject={} projectedObj=0x{:06X} pmtObj=0x{:06X} "
+                            "outerFlareObject={} innerHeadInverse={} projectedObj=0x{:06X} pmtObj=0x{:06X} "
                             "sourceCallSerial={} sourceObj=0x{:06X} "
                             "sourceSite={} ordinal={} deferredSerial={} deferredObj=0x{:06X} "
                             "deferredOrdinal={} stockT={:.9g},{:.9g},{:.9g} "
@@ -6140,6 +6145,8 @@ namespace OutRunVRStereo
                             recordedCameraSynced ? 1 : 0,
                             sourceCameraSynced ? 1 : 0,
                             outerFlareObject ? 1 : 0,
+                            OutRunVR::LensCentre::R85InnerOpticalFlareNeedsHeadInverse(
+                                projectedObjectId) ? 1 : 0,
                             projectedObjectId, pmtObjectId,
                             sourceReceipt.sourceSerial, sourceReceipt.objectId,
                             static_cast<unsigned>(sourceReceipt.callsite),
@@ -6163,7 +6170,7 @@ namespace OutRunVRStereo
                 {
                     firstAsymmetricFlareRayLogged = true;
                     spdlog::info(
-                        "VR R85 FLARE RAY: sun/light PMTs preserve synchronized game-camera rotation; outer lens artifacts receive common head inverse, then both use L/R asymmetric FOV with shallow 2.5% eye translation");
+                        "VR R85 FLARE RAY: sun PMTs preserve synchronized game-camera rotation; exact inner 570006 and outer optical flare artifacts receive common head inverse, then both use L/R asymmetric FOV with shallow 2.5% eye translation");
                 }
                 return true;
             }
