@@ -7110,12 +7110,15 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // a genuine shader-bound game Draw; no full-frame or XR promotion.
     if (env_raw_visual_opt_in() && s.backend.ready()) {
         auto* gpuContext = s.backend.context();
+        const bool rgbSourceBoundAtDraw =
+            NativeRawVisualPreview::bound_native_source_can_write_rgb(
+                gpuContext, s.backend.color_texture());
         ScopedNativeGameGpuTransferInputs savedInputs(
             gpuContext, s.backend.color_texture());
         ScopedNativeGameGpuTransferOutputs savedOutputs(gpuContext);
         s.rawPreview.begin_real_native_draw(
             game, s.backend.device(), gpuContext,
-            s.backend.color_texture(), s.presents);
+            s.backend.color_texture(), s.presents, rgbSourceBoundAtDraw);
     }
     // One audited submit site for the original game Draw; grouped lists keep
     // primitive order, while strips/fans retain one Draw per source instance.
@@ -8463,12 +8466,16 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // remembered clear color or a previously rendered source frame.
     if (env_raw_visual_opt_in() && s.backend.ready()) {
         auto* gpuContext = s.backend.context();
+        const bool rgbSourceBoundAtDraw =
+            NativeRawVisualPreview::bound_native_source_can_write_rgb(
+                gpuContext, s.backend.color_texture());
         ScopedNativeGameGpuTransferInputs savedInputs(
             gpuContext, s.backend.color_texture());
         ScopedNativeGameGpuTransferOutputs savedOutputs(gpuContext);
         s.rawPreview.begin_real_native_draw(
             reinterpret_cast<IDirect3DDevice9*>(s.sourceGameDevice),
-            s.backend.device(), gpuContext, s.backend.color_texture(), s.presents);
+            s.backend.device(), gpuContext, s.backend.color_texture(), s.presents,
+            rgbSourceBoundAtDraw);
     }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
     else ctx->Draw(static_cast<UINT>(vertices.size()), 0);

@@ -153,6 +153,16 @@ constexpr bool native_raw_source_color_write_selection_regression() {
 }
 static_assert(native_raw_source_color_write_selection_regression(),
     "RAW PRE/POST must sample an attributable RGB-writing game Draw");
+// The protected GPU copy scope intentionally detaches RTV0. Always pass
+// the authentic pre-detach source observation into the later queue site.
+static_assert([]() constexpr {
+    const NativeRawBoundRgbState beforeDetach{true,true,true,0x0fu};
+    const NativeRawBoundRgbState duringCopy{false,false,true,0x0fu};
+    const bool originalSourceRgb =
+        native_raw_bound_rgb_capture_admitted(beforeDetach);
+    return originalSourceRgb &&
+        !native_raw_bound_rgb_capture_admitted(duringCopy);
+}(), "RAW source capture admission must precede OM transfer detachment");
 
 int main() {
     assert(native_raw_source_color_write_selection_regression());

@@ -793,7 +793,7 @@ public:
     void begin_real_native_draw(
         IDirect3DDevice9* game, ID3D11Device* dev,
         ID3D11DeviceContext* ctx, ID3D11Texture2D* color,
-        std::uint64_t presentingSerial) noexcept {
+        std::uint64_t presentingSerial, bool rgbSourceBoundAtDraw) noexcept {
         if (!game || !dev || !ctx || !color ||
             ctx->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE) return;
         if (gameOwner_ != game || gpuOwner_ != dev) {
@@ -862,7 +862,9 @@ public:
         drawPair_.reset();
         if (!captureEpoch_.can_queue(presentingSerial, pending_))
             return;
-        if (!bound_native_source_can_write_rgb(ctx, color)) return;
+        // The source-owned OM state was verified BEFORE output-detach.
+        // Re-querying OM here would always see nullptr (GPU transfer scope).
+        if (!rgbSourceBoundAtDraw) return;
         if (queue_before_draw(dev, ctx, color) == NativeRawPreviewResult::CopyQueued) {
             // Save the original game RT at the actual source Draw. D3D9 can
             // change its bound RT between Draw and Present; no Present-time
@@ -998,6 +1000,10 @@ private:
             ++zeroRgbRetiredCopies_;
         }
     }
+public:
+    // Sample the LIVE OM binding before GPU transfer scopes temporarily
+    // detach RTV/UAV outputs. The capture function must never inspect
+    // OM outputs after ScopedNativeGameGpuTransferOutputs has unbound them.
     // Do not spend the single in-flight RAW PRE/POST GPU capture on
     // depth-only, alpha-only or unrelated-RT Draws. Those original native
     // game draws still run normally; only their non-RGB diagnostic copy is
@@ -1031,6 +1037,7 @@ private:
             true, boundIdentity.Get() == sourceIdentity.Get(),
             pixelShader.Get() != nullptr, colorMask});
     }
+private:
     // A ResolveSubresource is a full target operation (not a tile copy).
     // Keep its single-sample buffer GPU-only, never present it or alter the
     // real native game target; staging is still limited to genuine Draw RGB.
