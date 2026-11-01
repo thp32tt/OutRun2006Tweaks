@@ -2327,7 +2327,7 @@ namespace
         uv = {};
         outputRelativeRect = {};
         if (!c.sourceWidth_ || !c.sourceHeight_ ||
-            frame.clientPid == 0 ||
+            frame.clientPid == 0 || frame.clientPid != c.gamePid_ ||
             (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0)
             return false;
 
@@ -2570,6 +2570,33 @@ namespace
             }
         }
 
+        // The completed game Frame.v2 may outlive the output-capture QPC
+        // match by a few milliseconds. Reuse ONLY its physical source
+        // dimensions (not its old HWND/UV) for the SUMO 0x20 logical crop
+        // when a recent same-process receipt proves a portrait target.
+        // This makes the published and fallback UV sample the same top-left
+        // 1920x1080 raster even if a 2496x2688 D3D9Ex Present was stretched
+        // into a landscape PC mirror. Never infer this from the OpenXR
+        // swapchain alone, nor borrow dimensions after a game restart.
+        LARGE_INTEGER sumoReceiptNow{}, sumoReceiptFrequency{};
+        const bool haveSumoReceiptClock =
+            QueryPerformanceCounter(&sumoReceiptNow) != FALSE &&
+            QueryPerformanceFrequency(&sumoReceiptFrequency) != FALSE;
+        const bool recentSumoPhysicalSource =
+            !sourceIsSbs && !publishedMirrorApplied && mirrorFrame &&
+            mirrorFrame->presentationMode == OutRunVR::PresentationTheater &&
+            haveSumoReceiptClock &&
+            OutRunVrMenuAspect::RecentSumoPhysicalCanvasReceipt(
+                clientGameState, mirrorFrame->clientPid, c.gamePid_,
+                mirrorFrame->backbufferWidth, mirrorFrame->backbufferHeight,
+                mirrorFrame->presentQpc, sumoReceiptNow.QuadPart,
+                sumoReceiptFrequency.QuadPart);
+        const float fallbackPhysicalWidth = recentSumoPhysicalSource
+            ? static_cast<float>(mirrorFrame->backbufferWidth)
+            : static_cast<float>(c.projection_.width);
+        const float fallbackPhysicalHeight = recentSumoPhysicalSource
+            ? static_cast<float>(mirrorFrame->backbufferHeight)
+            : static_cast<float>(c.projection_.height);
         const auto logicalCanvasCrop =
             !sourceIsSbs && !publishedMirrorApplied
             ? OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
@@ -2580,8 +2607,8 @@ namespace
                 static_cast<float>(capturedTheaterClient.bottom),
                 static_cast<float>(c.sourceWidth_),
                 static_cast<float>(c.sourceHeight_),
-                static_cast<float>(c.projection_.width),
-                static_cast<float>(c.projection_.height))
+                fallbackPhysicalWidth, fallbackPhysicalHeight,
+                1920.f, 1080.f, recentSumoPhysicalSource)
             : OutRunVrMenuAspect::LogicalCanvasCapturePlan{};
         const bool fallbackLogicalCanvasApplied =
             !sourceIsSbs && !publishedMirrorApplied && logicalCanvasCrop.crop;
@@ -2624,7 +2651,8 @@ namespace
                     << theaterUv.y * c.sourceHeight_ << ','
                     << theaterUv.w * c.sourceWidth_ << ','
                     << theaterUv.h * c.sourceHeight_
-                    << " authority=CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD"
+                    << " physicalReceipt=" << (recentSumoPhysicalSource ? 1 : 0)
+                    << " authority=LOGICAL_CANVAS_CAPTURE_SOURCE_RECT"
                     << "\n";
                 OutRunVrEmitFullTrace(trace.str());
             }
