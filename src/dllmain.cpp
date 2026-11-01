@@ -115,13 +115,17 @@ void Plugin_Init()
 		}
 
 		auto combined_logger = std::make_shared<spdlog::logger>("", begin(sinks), end(sinks));
+		const bool diagnosticsEnabled = Module::FileLoggingEnabled();
 #ifdef _DEBUG
-		combined_logger->set_level(spdlog::level::debug);
+		combined_logger->set_level(diagnosticsEnabled
+			? spdlog::level::debug : spdlog::level::off);
 #else
-		combined_logger->set_level(spdlog::level::debug);
+		combined_logger->set_level(diagnosticsEnabled
+			? spdlog::level::debug : spdlog::level::off);
 #endif
 		spdlog::set_default_logger(combined_logger);
-		spdlog::flush_on(spdlog::level::debug);
+		if (diagnosticsEnabled)
+			spdlog::flush_on(spdlog::level::debug);
 
 	}
 
