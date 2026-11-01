@@ -642,7 +642,9 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
         !native_raw_fvf_projected_raster(
             scene,0,0,3440,1440,unculled) ||
         front.left < 2900 || back.right > 520 ||
-        (opposite.left != back.left || opposite.top != back.top ||\n         opposite.right != back.right || opposite.bottom != back.bottom) ||\n        unculled.left > back.left ||
+        (opposite.left != back.left || opposite.top != back.top ||
+         opposite.right != back.right || opposite.bottom != back.bottom) ||
+        unculled.left > back.left ||
         unculled.right < front.right)
         return reject(__LINE__);
     NativeRawDualTile gpu{};
