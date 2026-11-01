@@ -856,8 +856,9 @@ for viewport in ((640,480),(1920,1080),(3440,1440),(2496,2688)):
 print("PASS optional front-end D3DX scale/translation containment and five destructive controls")
 
 # 2026-10-31 Quest trace: custom-matrix-multi front-end draws can bypass the
-# D3DX matrix receipt. They must receive the same final logical->physical map,
-# including GameOver/restart 2D transition states, without touching GOAL/GAME.
+# D3DX matrix receipt. Physical mapping remains valid for proven transition
+# owners, but STATE_SUMO_FE is now host-theater-owned and must stop before the
+# portrait XR map. Gameplay/GOAL remain excluded as before.
 def require_multi_frontend_physicalization(source: str) -> None:
     helper = source.split("bool VrFrontEndPhysicalCanvasState() noexcept",1)[1].split(
         "bool ResolveVrFrontEndVirtualCanvasScale(",1)[0]
@@ -869,8 +870,12 @@ def require_multi_frontend_physicalization(source: str) -> None:
         assert "case GameState::STATE_"+excluded+":" not in helper, excluded
     multi = source.split("static void CenterMultiSpriteQuad(",1)[1].split(
         "static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite_hk",1)[0]
+    assert "bool VrFrontEndNeedsPhysicalTargetMap() noexcept" in helper
+    physical_owner = helper.split(
+        "bool VrFrontEndNeedsPhysicalTargetMap() noexcept",1)[1]
+    assert "*Game::current_mode != GameState::STATE_SUMO_FE" in physical_owner
     for token in (
-        "Settings::VREnabled && VrFrontEndPhysicalCanvasState()",
+        "Settings::VREnabled && VrFrontEndNeedsPhysicalTargetMap()",
         "ResolveVrFrontEndVirtualCanvasScale(",
         "transformedX[i] *= physicalScaleX;",
         "transformedY[i] *= physicalScaleY;",
@@ -882,4 +887,4 @@ def require_multi_frontend_physicalization(source: str) -> None:
         "vertices[i * stride] = transformedX[i];")
 
 require_multi_frontend_physicalization(text)
-print("DX9Ex front-end multi-sprite logical->physical mapping PASS; gameplay/GOAL excluded")
+print("DX9Ex front-end multi-sprite physical mapping PASS; SUMO_FE theater-owned, gameplay/GOAL excluded")
