@@ -101,7 +101,7 @@ def main():
    return 0
  ordered=sorted(by_target.values(),key=lambda z:z["target"])
  version=hashlib.sha256(json.dumps([(a["target"],a["sha256"]) for a in ordered]).encode()).hexdigest()[:12]
- archive=root/("OUTRUN_OFFLINE_KOREAN_TEST_ONLY_"+version+".zip")
+ archive=root/("OUTRUN_OFFLINE_KOREAN_"+("PARTIAL_" if args.allow_partial else "")+"TEST_ONLY_"+version+".zip")
  if archive.is_file():
   print(json.dumps({"status":"PACKAGE_ALREADY_PRESENT","path":str(archive),"sha256":sha(archive),"dds":len(ordered)},ensure_ascii=False));return 0
  root.mkdir(parents=True,exist_ok=True)
