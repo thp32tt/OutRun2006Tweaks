@@ -20,6 +20,7 @@
 #include "native_game_raw_color_transport.hpp"
 #include "native_game_raw_upload_transaction.hpp"
 #include "native_game_raw_draw_pair.hpp"
+#include "native_game_raw_msaa_capture.hpp"
 #include "native_game_raw_partial_present_tile.hpp"
 #include "native_game_raw_present_coverage.hpp"
 #include "native_game_raw_changed_pixel_window.hpp"
@@ -119,6 +120,7 @@ public:
     void reset() noexcept {
         staging_.Reset(); baseline_.Reset();
         stagingAlternate_.Reset(); baselineAlternate_.Reset();
+        resolvedColor_.Reset();
         surfaceAlternate_.Reset();
         for (auto& surface : surfaceRemainders_) surface.Reset();
         sourceGameTarget_.Reset();
@@ -130,6 +132,7 @@ public:
         captureFormat_ = DXGI_FORMAT_UNKNOWN;
         captureWidth_ = width; captureHeight_ = height;
         captureTargetWidth_ = captureTargetHeight_ = 0u;
+        captureSampleCount_ = 0u;
         sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
         gameOwner_ = nullptr; gpuOwner_ = nullptr; format_ = D3DFMT_UNKNOWN;
         pending_ = false; quarantined_ = false; lastDraws_ = 0;
@@ -891,11 +894,16 @@ public:
         // D3D11 immediate-context order guarantees this GPU copy follows
         // exactly the original game's native Draw(s). The paired BEFORE copy
         // preceded that draw, using the identical, source-owned GPU box.
+        // Snapshot the authentic game Draw's POST state. A multisampled
+        // target is resolved on the original D3D11 GPU before taking the
+        // exact same bounded source rectangles as the PRE staging copies.
+        ID3D11Texture2D* sample = gpu_readable_source(ctx, color);
+        if (!sample) return false;
         ctx->CopySubresourceRegion(staging_.Get(), 0, 0, 0, 0,
-                                   color, 0, &region_);
+                                   sample, 0, &region_);
         if (alternateActive_)
             ctx->CopySubresourceRegion(stagingAlternate_.Get(), 0, 0, 0, 0,
-                                       color, 0, &regionAlternate_);
+                                       sample, 0, &regionAlternate_);
         ctx->End(event_.Get());
         ctx->Flush();
         pending_ = true;
@@ -986,6 +994,19 @@ private:
             ++zeroRgbRetiredCopies_;
         }
     }
+    // A ResolveSubresource is a full target operation (not a tile copy).
+    // Keep its single-sample buffer GPU-only, never present it or alter the
+    // real native game target; staging is still limited to genuine Draw RGB.
+    ID3D11Texture2D* gpu_readable_source(
+        ID3D11DeviceContext* ctx, ID3D11Texture2D* color) noexcept {
+        if (!ctx || !color) return nullptr;
+        if (captureSampleCount_ == 1u) return color;
+        if (!native_raw_msaa_resolve_required(captureSampleCount_) ||
+            !resolvedColor_) return nullptr;
+        ctx->ResolveSubresource(
+            resolvedColor_.Get(), 0u, color, 0u, captureFormat_);
+        return resolvedColor_.Get();
+    }
     NativeRawPreviewResult queue_before_draw(
         ID3D11Device* dev, ID3D11DeviceContext* ctx,
         ID3D11Texture2D* color) noexcept {
@@ -1003,7 +1024,8 @@ private:
         color->GetDevice(actual.GetAddressOf());
         if (actual.Get() != dev || !width || !height ||
             src.ArraySize != 1u || src.MipLevels != 1u ||
-            src.SampleDesc.Count != 1u || src.Usage != D3D11_USAGE_DEFAULT ||
+            !native_raw_msaa_capture_samples_supported(src.SampleDesc.Count) ||
+            src.Usage != D3D11_USAGE_DEFAULT ||
             src.CPUAccessFlags || !(src.BindFlags & D3D11_BIND_RENDER_TARGET))
             return NativeRawPreviewResult::InvalidNativeColor;
         // GPU copies require a format-compatible staging resource. Do not
@@ -1023,13 +1045,23 @@ private:
                 ? DXGI_FORMAT_R8G8B8A8_UNORM
                 : src.Format == DXGI_FORMAT_B8G8R8A8_TYPELESS
                     ? DXGI_FORMAT_B8G8R8A8_UNORM : src.Format;
-        // One preview can encounter different game-created color targets in
-        // menu -> car -> race. Never reuse a BGRA8 staging texture for an
-        // RGBA8 (or differently typed sRGB) GPU CopySubresourceRegion.
+        // Native menu/car/race render targets may switch sample count
+        // without changing their dimensions. Do not reuse a stale resolve
+        // texture across different source formats/raster/sample layouts.
+        if (native_raw_msaa_resolve_required(src.SampleDesc.Count)) {
+            UINT formatSupport = 0u;
+            if (FAILED(dev->CheckFormatSupport(stagedFormat, &formatSupport)) ||
+                (formatSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)
+                return NativeRawPreviewResult::InvalidNativeColor;
+        }
         if (captureFormat_ != stagedFormat ||
-            captureWidth_ != width || captureHeight_ != height) {
+            captureWidth_ != width || captureHeight_ != height ||
+            captureTargetWidth_ != src.Width ||
+            captureTargetHeight_ != src.Height ||
+            captureSampleCount_ != src.SampleDesc.Count) {
             staging_.Reset(); baseline_.Reset();
             stagingAlternate_.Reset(); baselineAlternate_.Reset();
+            resolvedColor_.Reset();
             // The source target's dimensions can change between menu and
             // race. A previously created D3D9 SYSTEMMEM tile must not be
             // reused with a newly sized native GPU capture.
@@ -1040,6 +1072,22 @@ private:
         }
         captureTargetWidth_ = src.Width;
         captureTargetHeight_ = src.Height;
+        captureSampleCount_ = src.SampleDesc.Count;
+        if (native_raw_msaa_resolve_required(captureSampleCount_) &&
+            !resolvedColor_) {
+            // D3D11 cannot resolve a partial tile. The full GPU temporary
+            // is never exposed as a finished game frame or D3D9 surface.
+            D3D11_TEXTURE2D_DESC resolved = src;
+            resolved.Format = stagedFormat;
+            resolved.SampleDesc.Count = 1u;
+            resolved.SampleDesc.Quality = 0u;
+            resolved.BindFlags = 0u;
+            resolved.CPUAccessFlags = 0u;
+            resolved.MiscFlags = 0u;
+            if (FAILED(dev->CreateTexture2D(
+                    &resolved, nullptr, resolvedColor_.GetAddressOf())))
+                return NativeRawPreviewResult::GpuFailure;
+        }
         sourceByteOrder_ = rgba ? NativeRawColorByteOrder::Rgba
                                 : NativeRawColorByteOrder::Bgra;
         if (!staging_ || !baseline_) {
@@ -1122,20 +1170,24 @@ private:
             ? D3D11_BOX{tiles.second.x, tiles.second.y, 0u,
                         tiles.second.x + width, tiles.second.y + height, 1u}
             : D3D11_BOX{};
+        ID3D11Texture2D* sample = gpu_readable_source(ctx, color);
+        if (!sample) return NativeRawPreviewResult::GpuFailure;
         ctx->CopySubresourceRegion(baseline_.Get(), 0, 0, 0, 0,
-                                   color, 0, &region_);
+                                   sample, 0, &region_);
         if (alternateActive_)
             ctx->CopySubresourceRegion(baselineAlternate_.Get(), 0, 0, 0, 0,
-                                       color, 0, &regionAlternate_);
+                                       sample, 0, &regionAlternate_);
         return NativeRawPreviewResult::CopyQueued;
     }
     Microsoft::WRL::ComPtr<ID3D11Texture2D> staging_, baseline_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> stagingAlternate_, baselineAlternate_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> resolvedColor_;
     D3D11_BOX region_{}, regionAlternate_{};
     bool alternateActive_ = false;
     DXGI_FORMAT captureFormat_ = DXGI_FORMAT_UNKNOWN;
     UINT captureWidth_ = width, captureHeight_ = height;
     UINT captureTargetWidth_ = 0u, captureTargetHeight_ = 0u;
+    UINT captureSampleCount_ = 0u;
     NativeRawColorByteOrder sourceByteOrder_ = NativeRawColorByteOrder::Bgra;
     NativeRawDrawPair drawPair_{};
     Microsoft::WRL::ComPtr<ID3D11Query> event_;

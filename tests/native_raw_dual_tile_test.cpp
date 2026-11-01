@@ -5,6 +5,7 @@
 #include "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
 #include <array>
 #include <cassert>
+#include "src/vr/d3d11/native_game_raw_msaa_capture.hpp"
 using namespace outrun::vr::dx11;
 // Sweep authentic 512x288 paired GPU tiles across a 3440x1440 race
 // source, including interior fragments missed by center/corner anchors.
@@ -65,6 +66,15 @@ constexpr bool native_raw_swept_source_coverage_regression() {
 static_assert(native_raw_swept_source_coverage_regression(),
               "authentic large-raster native GPU source sweep");
 int main() {
+    // The same real source-native RT must resolve both PRE and POST tiles.
+    for (unsigned samples : {1u, 2u, 4u, 8u, 16u, 32u}) {
+        assert(native_raw_msaa_capture_samples_supported(samples));
+        assert(native_raw_msaa_resolve_required(samples) == (samples != 1u));
+    }
+    for (unsigned bad : {0u, 3u, 5u, 6u, 7u, 33u, 64u, 0xffffffffu}) {
+        assert(!native_raw_msaa_capture_samples_supported(bad));
+        assert(!native_raw_msaa_resolve_required(bad));
+    }
     assert(native_raw_swept_source_coverage_regression());
     // Different D3D9 interface pointers may identify the same canonical
     // game backbuffer. Never accept an unrelated or unavailable IUnknown.
