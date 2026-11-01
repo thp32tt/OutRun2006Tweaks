@@ -405,6 +405,42 @@ int main()
         if (unavailableLogicalMenu.crop)
             return 136;
     }
+    // 2026-11-01 Quest DEBUG: published menu HWND is 440,0..3000,1440,
+    // but cached Desktop Duplication geometry sometimes reports the entire
+    // desktop 0,0..3440,1440. A CURRENT, same-PID Win32 client snapshot
+    // must restore the same UV and the same 1920x1080 logical canvas.
+    {
+        using OutRunVrMenuCapture::ClipClient;
+        using OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv;
+        const auto actualGame = ClipClient(
+            440, 0, 3000, 1440, 3440u, 1440u);
+        const auto wrongDesktop = ClipClient(
+            0, 0, 3440, 1440, 3440u, 1440u);
+        const auto qpcMissLiveHwnd = PlanTopLeftLogicalCaptureUv(
+            0x20u, 440.f, 0.f, 3000.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f,
+            1920.f, 1080.f, true);
+        const auto qpcMissDesktop = PlanTopLeftLogicalCaptureUv(
+            0x20u, 0.f, 0.f, 3440.f, 1440.f,
+            3440.f, 1440.f, 2496.f, 2688.f,
+            1920.f, 1080.f, true);
+        const auto close = [](float a, float b) {
+            return std::fabs(a - b) <= 1.e-5f;
+        };
+        if (!actualGame.visible || !actualGame.fullyVisible ||
+            !wrongDesktop.fullyVisible || !qpcMissLiveHwnd.crop ||
+            !qpcMissDesktop.crop ||
+            !close(actualGame.x, 440.f / 3440.f) ||
+            !close(actualGame.width, 2560.f / 3440.f) ||
+            !close(qpcMissLiveHwnd.x, 440.f / 3440.f) ||
+            !close(qpcMissLiveHwnd.y, 0.f) ||
+            !close(qpcMissLiveHwnd.width,
+                (2560.f / 3440.f) * (1920.f / 2496.f)) ||
+            !close(qpcMissLiveHwnd.height, 1080.f / 2688.f) ||
+            close(qpcMissDesktop.x, qpcMissLiveHwnd.x) ||
+            close(qpcMissDesktop.width, qpcMissLiveHwnd.width))
+            return 137;
+    }
     // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
     // in its upper-left. Sample exactly that logical rectangle before the
     // LOCAL-fixed menu projection; never crop Ferrari selector/gameplay or
