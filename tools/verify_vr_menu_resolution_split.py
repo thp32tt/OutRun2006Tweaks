@@ -121,6 +121,21 @@ assert 'if (!IsTopLeftLogicalTheaterState(state) ||' in fallback_logic
 # but the 2560x1440 landscape HWND is a centered fit. Neither branch may
 # infer physical ownership from the OpenXR extent alone.
 assert 'const bool sumoPhysicalPortrait =' in fallback_logic
+
+# Missed-QPC fallback accepts only same-game, short-lived physical EXTENT
+# metadata. Foreign/stale HWND rectangles remain rejected.
+assert 'constexpr bool RecentSumoPhysicalCanvasReceipt(' in aspect
+assert 'producerPid == gamePid' in aspect
+assert 'nowQpc - framePresentQpc <= qpcFrequency / 4;' in aspect
+assert 'bool verifiedSumoPhysicalSource = false' in fallback_logic
+assert '(verifiedSumoPhysicalSource ||' in fallback_logic
+assert 'frame.clientPid != c.gamePid_' in host
+assert 'const bool recentSumoPhysicalSource =' in theater
+assert 'RecentSumoPhysicalCanvasReceipt(' in theater
+assert 'fallbackPhysicalWidth, fallbackPhysicalHeight,' in theater
+assert '1920.f, 1080.f, recentSumoPhysicalSource' in theater
+assert 'physicalReceipt=' in theater
+
 assert 'state == 0x20u &&' in fallback_logic
 assert 'std::fabs(clientAspect - physicalAspect) <= 0.025f' in fallback_logic
 assert 'fitWidth = clientWidth * (logicalWidth / physicalWidth);' in fallback_logic
