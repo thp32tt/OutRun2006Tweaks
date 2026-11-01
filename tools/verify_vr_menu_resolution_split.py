@@ -31,6 +31,12 @@ assert 'case GameState::STATE_SYSTEM:' not in front_end
 assert 'case GameState::STATE_START:' not in front_end
 assert 'case GameState::STATE_SUMO_FE:' in front_end
 assert 'case GameState::STATE_GAME:' not in front_end
+assert 'bool VrFrontEndNeedsPhysicalTargetMap() noexcept' in ui
+physical_owner = ui.split('bool VrFrontEndNeedsPhysicalTargetMap() noexcept', 1)[1].split(
+    'bool ResolveVrFrontEndVirtualCanvasScale(', 1)[0]
+assert '*Game::current_mode != GameState::STATE_SUMO_FE' in physical_owner
+assert 'pOut, vrFrontEndProducer &&\n                        VrFrontEndNeedsPhysicalTargetMap(),' in ui
+assert 'pOut, originalFrontEndProducer &&\n                    VrFrontEndNeedsPhysicalTargetMap(),' in ui
 assert 'const float containScale =' not in ui
 assert 'mapped._41 += offsetX;' not in ui
 assert 'mapped._42 += offsetY;' not in ui
@@ -62,8 +68,27 @@ assert 'gameState == 0x0Du || // START / loading theater' in aspect
 assert 'gameState == 0x20u;   // STATE_SUMO_FE runtime owner' in aspect
 assert 'ownsFrontEndOpticalScale ? menuScale : 1.0f' in aspect
 assert 'cachedMenuScale != R23ConfiguredMenuScale' in host
+
+# Verify the ACTUAL menu call path rather than the retired
+# R23RenderWorldLockedMenuProjection helper. The live front-end loop submits
+# R23RenderTheater(... clientGameState ...), so MenuScale and aspect must be
+# consumed inside that function itself.
+theater = host.split('bool R23RenderTheater(', 1)[1].split(
+    'void R23CopyMatchedViews(', 1)[0]
+assert 'ResolveMenuOpticalCoverageForState(' in theater
+assert 'clientGameState, R23ConfiguredMenuScale)' in theater
+assert 'quad.size.width = 2.f * theaterScale;' in theater
+assert 'quad.size.height = quad.size.width / aspect;' in theater
+assert 'const float theaterScale = !sourceIsSbs &&' in theater
+assert 'clientGameState != 0xFFFFFFFFu' in theater
+assert 'if (!sourceIsSbs && publishedMirrorApplied &&\n            (clientGameState == 0x04u || clientGameState == 0x09u))' in theater
+assert 'clientGameState == 0x20u' not in theater.split(
+    'bool authoredFourThreeApplied = false;', 1)[1].split(
+    'const auto logicalCanvasCrop =', 1)[0]
+assert host.count('R23RenderWorldLockedMenuProjection(') == 1
+assert host.count('R23RenderTheater(') >= 3
 assert 'HudScale = 0.55' in ini
-print('PASS menu logical coordinates / host 4:3 placement / physical XR target are independent; HMD UNTESTED')
+print('PASS live R23RenderTheater owns MenuScale uniformly; SUMO_FE is not destructively forced to 4:3; HMD UNTESTED')
 
 # Same-owner failed refresh must not publish defaults or a partial config.
 owner = host.split('bool R23GameMenuIsLetterboxed(HWND gameWindow) noexcept', 1)[1].split(

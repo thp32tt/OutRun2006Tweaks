@@ -2567,8 +2567,20 @@ namespace
                 ? theaterWidth / theaterHeight *
                     (sourceIsSbs ? 0.5f : 1.0f)
                 : 16.f / 9.f));
-        quad.size.width = 2.f;
-        quad.size.height = 2.f / aspect;
+
+        // This is the LIVE menu submission path. The old world-locked menu
+        // projection helper is no longer called by the front-end loop, so
+        // MenuScale must be applied here rather than merely cached/validated.
+        // Scale width and height uniformly to preserve the captured source
+        // aspect. Gameplay SBS recovery keeps its established 2m theater.
+        const float theaterScale = !sourceIsSbs &&
+            clientGameState != 0xFFFFFFFFu
+            ? OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState(
+                std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),
+                clientGameState, R23ConfiguredMenuScale)
+            : 1.0f;
+        quad.size.width = 2.f * theaterScale;
+        quad.size.height = quad.size.width / aspect;
 
         // Unlike the LOCAL-fixed 4:3 menu path, the mono recovery theater
         // formerly stretched and recentred an off-output game window's

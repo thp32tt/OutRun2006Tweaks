@@ -97,6 +97,19 @@ namespace
     static_assert(static_cast<int>(GameState::STATE_GAME) == 0x10,
         "Gameplay state must remain distinct from the front-end physical canvas");
 
+    // The Sumo wrapper (0x20) is an ownership label for original logical
+    // menu/car-selector composition, not permission to rewrite that finished
+    // 1920x1080 UI into the portrait XR eye target. The x64 host consumes the
+    // game HWND/mirror as a LOCAL theater quad and owns its optical size.
+    // Keeping 0x20 out here prevents the previous 1.30x/2.489y double-map
+    // while retaining front-end containment/provenance above.
+    bool VrFrontEndNeedsPhysicalTargetMap() noexcept
+    {
+        if (!VrFrontEndPhysicalCanvasState() || !Game::current_mode)
+            return false;
+        return *Game::current_mode != GameState::STATE_SUMO_FE;
+    }
+
     bool ResolveVrFrontEndVirtualCanvasScale(
         bool exactFrontEnd, bool containedMode,
         float& scaleX, float& scaleY,
@@ -802,7 +815,9 @@ class UIScaling : public Hook
             const bool physicalized =
                 legacyResult && pOut &&
                 MapVrFrontEndMatrixToPhysical(
-                    pOut, vrFrontEndProducer, vrContainedMode);
+                    pOut, vrFrontEndProducer &&
+                        VrFrontEndNeedsPhysicalTargetMap(),
+                    vrContainedMode);
             if (physicalized && Game::screen_scale &&
                 Game::screen_resolution)
             {
@@ -1000,7 +1015,8 @@ class UIScaling : public Hook
         // change world/selector-car geometry or the XR render resolution.
         if (result && pOut &&
             MapVrFrontEndMatrixToPhysical(
-                pOut, originalFrontEndProducer,
+                pOut, originalFrontEndProducer &&
+                    VrFrontEndNeedsPhysicalTargetMap(),
                 mode == ScalingMode::KeepCentered ||
                     mode == ScalingMode::OnlineArcade))
             publishedPrecontainedMenuMatrix = true;
