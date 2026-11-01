@@ -1047,7 +1047,8 @@ class UIScaling : public Hook
                     "VR TRACE MENU MATRIX FINAL: hit={} state={} mode={} "
                     "partial={} pivot={} precontained={} fill={} "
                     "screenScale={:.9g},{:.9g} screenRes={:.9g},{:.9g} "
-                    "m11={:.9g} m12={:.9g} m21={:.9g} m22={:.9g} tx={:.9g} ty={:.9g}",
+                    "m11={:.9g} m12={:.9g} m21={:.9g} m22={:.9g} tx={:.9g} ty={:.9g} "
+                    "originalGameMode={} selectorBgmKind={}",
                     hit, Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                     static_cast<int>(mode), vrFrontEndPartial ? 1 : 0,
                     vrFrontEndPivot ? 1 : 0,
@@ -1058,7 +1059,9 @@ class UIScaling : public Hook
                     Game::screen_resolution ? Game::screen_resolution->x : 0.0f,
                     Game::screen_resolution ? Game::screen_resolution->y : 0.0f,
                     pOut->_11, pOut->_12, pOut->_21, pOut->_22,
-                    pOut->_41, pOut->_42);
+                    pOut->_41, pOut->_42,
+                    Game::game_mode ? *Game::game_mode : -1,
+                    Game::sel_bgm_kind_buf ? *Game::sel_bgm_kind_buf : -1);
         }
         return result;
 	}
