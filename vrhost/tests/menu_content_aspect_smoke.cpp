@@ -354,9 +354,15 @@ int main()
 
                 // Pixel density is monitor-dependent, but optical menu
                 // size stays MenuScale-owned. No forced 4:3 on SUMO/selector.
-                if (!near(fallback.width * monitor.width,
+                const auto nearPixel = [](float a, float b) {
+                    // Desktop UVs are stored as float; converting normalized
+                    // UV back to screen pixels incurs sub-pixel round-off.
+                    // This is 0.005 PIXEL, not 0.005 UV or an aspect waiver.
+                    return std::fabs(a - b) <= 0.005f;
+                };
+                if (!nearPixel(fallback.width * monitor.width,
                         fit.width * 1920.f / physicalW) ||
-                    !near(fallback.height * monitor.height,
+                    !nearPixel(fallback.height * monitor.height,
                         fit.height * 1080.f / physicalH) ||
                     OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
                         0x20u, false, false, true) ||
