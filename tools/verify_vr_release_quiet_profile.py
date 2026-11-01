@@ -40,6 +40,10 @@ assert 'OutRunVR::Pacing::Enabled() && OutRunVrFileLoggingEnabled()' in r23
 assert 'CheckXr(endResult, "xrEndFrame");\n            if (OutRunVrFileLoggingEnabled())' in r23
 assert 'if (OutRunVrFileLoggingEnabled() &&\n                (lastPipelineTelemetryMs == 0 ||' in r23
 assert 'if (OutRunVrFileLoggingEnabled())\n                timings.MaybeLog();' in r23
+assert 'if (OutRunVrFileLoggingEnabled() &&\n            (R23LastTheaterRefreshLogMs == 0 ||' in r23
+assert 'if (OutRunVrFileLoggingEnabled() &&\n                            (R23LastCachedProjectionLogMs == 0 ||' in r23
+assert 'if (OutRunVrFileLoggingEnabled() &&\n                                (R23LastGameplayFallbackLogMs == 0 ||' in r23
+assert 'if (OutRunVrFileLoggingEnabled() &&\n                (sessionEpoch_.lastLoggedXrHz <= 0.0 ||' in r23
 assert 'Acquire(projection_, image);\n            if (OutRunVrFileLoggingEnabled())' in host
 
 for script in (focus, official):
