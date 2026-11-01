@@ -28,7 +28,7 @@ front_end = ui.split('bool VrFrontEndPhysicalCanvasState() noexcept', 1)[1].spli
     'bool ResolveVrFrontEndVirtualCanvasScale(', 1)[0]
 assert 'STATE_SUMO_FE = 0x20' in game
 assert 'case GameState::STATE_SYSTEM:' not in front_end
-assert 'case GameState::STATE_START:' not in front_end
+assert 'case GameState::STATE_START:' in front_end
 assert 'case GameState::STATE_SUMO_FE:' in front_end
 assert 'case GameState::STATE_GAME:' not in front_end
 assert 'bool VrFrontEndNeedsPhysicalTargetMap() noexcept' in ui
@@ -71,8 +71,8 @@ aspect = (root / 'vrhost/src/runtime/menu_content_aspect.hpp').read_text(encodin
 assert 'gameState == 0x00u || // SYSTEM / boot-title theater' in aspect
 assert 'gameState == 0x0Du || // START / loading theater' in aspect
 assert 'gameState == 0x20u;   // STATE_SUMO_FE runtime owner' in aspect
-assert 'case 0x20u: // SUMO_FE: title/main/selector share logical canvas' in aspect
-assert 'static_assert(IsTopLeftLogicalTheaterState(0x20u));' in aspect
+assert 'case 0x20u: // SUMO_FE: title/main/selector share logical canvas' not in aspect
+assert 'static_assert(!IsTopLeftLogicalTheaterState(0x20u));' in aspect
 assert 'ownsFrontEndOpticalScale ? menuScale : 1.0f' in aspect
 assert 'cachedMenuScale != R23ConfiguredMenuScale' in host
 
@@ -100,47 +100,27 @@ assert 'quad.size.width = 2.f * theaterScale;' in theater
 assert 'quad.size.height = quad.size.width / aspect;' in theater
 assert 'const float theaterScale = !sourceIsSbs &&' in theater
 assert 'clientGameState != 0xFFFFFFFFu' in theater
-assert 'clientGameState == 0x20u' in theater
-assert 'PlanTopLeftLogicalCanvasCrop(' in theater
-assert 'R23TheaterFrameMatchesCapture(c, *mirrorFrame)' in theater
-assert 'mirrorFrame->backbufferWidth >= 640u' in theater
-assert 'mirrorFrame->backbufferHeight >= 480u' in theater
-assert 'const float menuPhysicalWidth = mirrorBackbufferExtentValid' in theater
-assert 'const float menuPhysicalHeight = mirrorBackbufferExtentValid' in theater
-assert 'clientGameState, menuPhysicalWidth, menuPhysicalHeight' in theater
-assert 'publishedLogicalCanvasCrop.width' in theater
-assert 'publishedLogicalCanvasCrop.height' in theater
-# The fallback desktop UV route must share the authored front-end state
-# whitelist with physical XR crop. Otherwise 0x0A-0x0C/goal may lose pixels.
+
+# Quest 23:17 regression: SUMO_FE is a mixed 2D+3D vehicle composition.
+# The complete published mirror must survive; the old 1920/2496 x
+# 1080/2688 host crop moved the 3D car below the sampled source.
+assert '[VR TRACE SUMO WHOLE COMPOSITE FULL]' in theater
+assert 'COMPLETE_2D_3D_GAME_MIRROR_NO_LOGICAL_CROP' in theater
+assert 'const bool publishedLogicalCanvasApplied = false;' in theater
+assert '[VR TRACE SUMO_FE LOGICAL CANVAS FULL]' not in theater
+assert 'publishedLogicalCanvasCrop.width' not in theater
+assert 'publishedLogicalCanvasCrop.height' not in theater
+
+# Pure 2D fallback states retain the bounded logical-canvas helper, while
+# SUMO_FE is explicitly absent from that whitelist.
 fallback_logic = aspect.split(
     'inline LogicalCanvasCapturePlan PlanTopLeftLogicalCaptureUv(', 1)[1].split(
     'static_assert(IsTopLeftLogicalTheaterState(0x00u));', 1)[0]
 assert 'if (!IsTopLeftLogicalTheaterState(state) ||' in fallback_logic
-
-# The physical portrait window is a top-left logical raster in SUMO_FE,
-# but the 2560x1440 landscape HWND is a centered fit. Neither branch may
-# infer physical ownership from the OpenXR extent alone.
-assert 'const bool sumoPhysicalPortrait =' in fallback_logic
-
-# Missed-QPC fallback accepts only same-game, short-lived physical EXTENT
-# metadata. Foreign/stale HWND rectangles remain rejected.
-assert 'constexpr bool RecentSumoPhysicalCanvasReceipt(' in aspect
-assert 'producerPid == gamePid' in aspect
-assert 'nowQpc - framePresentQpc <= qpcFrequency / 4;' in aspect
-assert 'bool verifiedSumoPhysicalSource = false' in fallback_logic
-assert '(verifiedSumoPhysicalSource ||' in fallback_logic
-assert 'frame.clientPid != c.gamePid_' in host
-assert 'const bool recentSumoPhysicalSource =' in theater
-assert 'RecentSumoPhysicalCanvasReceipt(' in theater
+assert 'static_assert(!IsTopLeftLogicalTheaterState(0x20u));' in aspect
 assert 'fallbackPhysicalWidth, fallbackPhysicalHeight,' in theater
-assert '1920.f, 1080.f, recentSumoPhysicalSource' in theater
-assert 'physicalReceipt=' in theater
-
-assert 'state == 0x20u &&' in fallback_logic
-assert 'std::fabs(clientAspect - physicalAspect) <= 0.025f' in fallback_logic
-assert 'fitWidth = clientWidth * (logicalWidth / physicalWidth);' in fallback_logic
-assert 'fitHeight = clientHeight * (logicalHeight / physicalHeight);' in fallback_logic
-
+assert '1920.f, 1080.f, false' in theater
+assert 'physicalReceipt=0' in theater
 
 assert 'constexpr bool ShouldCropFallbackTitleMenu(' in aspect
 assert 'clientGameState, sourceIsSbs, publishedMirrorApplied,' in theater
@@ -150,18 +130,16 @@ assert 'authoredFourThreeApplied =' in theater
 assert 'const float aspect = authoredFourThreeApplied' in theater
 assert 'ShouldCropFallbackTitleMenu(0x20u, false, false, true)' in aspect
 
-assert 'publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;' in theater
-assert '[VR TRACE SUMO_FE LOGICAL CANVAS FULL]' in theater
 assert 'if (!sourceIsSbs && publishedMirrorApplied &&\n            (clientGameState == 0x04u || clientGameState == 0x09u))' in theater
 authored43 = theater.split(
     'bool authoredFourThreeApplied = false;', 1)[1].split(
-    'const bool mirrorBackbufferExtentValid =', 1)[0]
+    '// STATE_SUMO_FE (0x20) is a completed mixed 2D + 3D vehicle', 1)[0]
 assert 'clientGameState == 0x20u' not in authored43
 assert '(clientGameState == 0x04u || clientGameState == 0x09u)' in authored43
 assert host.count('R23RenderWorldLockedMenuProjection(') == 1
 assert host.count('R23RenderTheater(') >= 3
 assert 'HudScale = 0.55' in ini
-print('PASS live R23RenderTheater owns MenuScale uniformly; SUMO_FE is not destructively forced to 4:3; HMD UNTESTED')
+print('PASS live R23RenderTheater preserves SUMO whole-composite ownership; START physical-map owner enabled; HMD UNTESTED')
 
 # Same-owner failed refresh must not publish defaults or a partial config.
 owner = host.split('bool R23GameMenuIsLetterboxed(HWND gameWindow) noexcept', 1)[1].split(

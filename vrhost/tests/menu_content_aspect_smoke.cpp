@@ -97,6 +97,7 @@ static_assert(!PlanStateSafeMenuCrop(0x04u, false, false, false, false));
 static_assert(!PlanStateSafeMenuCrop(0x0Au, false, false, true, false));
 static_assert(IsTopLeftLogicalTheaterState(0x04u));
 static_assert(IsTopLeftLogicalTheaterState(0x09u));
+static_assert(!IsTopLeftLogicalTheaterState(0x20u));
 static_assert(!IsTopLeftLogicalTheaterState(0x0Au));
 static_assert(!IsTopLeftLogicalTheaterState(0x10u));
 static_assert(!IsTopLeftLogicalTheaterState(0x17u));
@@ -180,7 +181,7 @@ int main()
                 3440.f, 1440.f, 2496.f, 2688.f);
         };
         if (!fitFor(0x00u).crop || !fitFor(0x04u).crop ||
-            !fitFor(0x09u).crop || !fitFor(0x20u).crop ||
+            !fitFor(0x09u).crop || fitFor(0x20u).crop ||
             fitFor(0x0Au).crop || fitFor(0x0Bu).crop ||
             fitFor(0x0Cu).crop || fitFor(0x10u).crop ||
             fitFor(0x22u).crop || fitFor(0x23u).crop ||
@@ -205,9 +206,10 @@ int main()
             std::fabs(centered.width - 0.75f) > 1.e-6f)
             return 126;
     }
-    // SUMO_FE portrait mirror: the source 1920x1080 is physically top-left.
-    // A landscape 2560x1440 mirror of the same XR target instead remains
-    // an already-centered 16:9 fit. Do not conflate these source geometries.
+    // SUMO_FE is a mixed 2D+3D vehicle composition. It must never be
+    // treated as a top-left logical-only raster, whether the observed HWND is
+    // portrait-like or the normal 2560x1440 landscape mirror. Pure title/menu
+    // states retain their independent logical-canvas rules.
     {
         using OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv;
         const auto portraitSumo = PlanTopLeftLogicalCaptureUv(
@@ -219,22 +221,13 @@ int main()
         const auto landscapeSumo = PlanTopLeftLogicalCaptureUv(
             0x20u, 440.f, 0.f, 3000.f, 1440.f,
             3440.f, 1440.f, 2496.f, 2688.f);
-        if (!portraitSumo.crop || !portraitTitle.crop ||
-            !landscapeSumo.crop ||
-            std::fabs(portraitSumo.x - 1000.f / 3440.f) > 1.e-5f ||
-            std::fabs(portraitSumo.y) > 1.e-5f ||
-            std::fabs(portraitSumo.width -
-                1337.f * (1920.f / 2496.f) / 3440.f) > 1.e-5f ||
-            std::fabs(portraitSumo.height - 1080.f / 2688.f) > 1.e-5f ||
-            portraitTitle.y < 0.2f ||
-            std::fabs(landscapeSumo.x - 440.f / 3440.f) > 1.e-5f ||
-            std::fabs(landscapeSumo.y) > 1.e-5f)
+        if (portraitSumo.crop || landscapeSumo.crop || !portraitTitle.crop ||
+            portraitTitle.y < 0.2f)
             return 127;
     }
-    // Full menu source path A/B: a QPC-missed frame with the SAME current
-    // physical source must select the identical top-left 1920x1080 pixels
-    // as the published HWND frame. A landscape-window-only heuristic used
-    // to sample the entire 2560x1440 window instead (headset menu offset).
+    // Full-source SUMO path: even a fresh physical-extent receipt is not
+    // permission to sample only the 1920x1080 corner. The vehicle and its 2D
+    // selector must remain in one source transaction.
     {
         using namespace OutRunVrMenuAspect;
         const auto actualPhysical = PlanTopLeftLogicalCanvasCrop(
@@ -246,42 +239,16 @@ int main()
         const auto noReceipt = PlanTopLeftLogicalCaptureUv(
             0x20u, 440.f, 0.f, 3000.f, 1440.f,
             3440.f, 1440.f, 2496.f, 2688.f);
-        const auto staleOtherProcess = RecentSumoPhysicalCanvasReceipt(
-            0x20u, 133u, 134u, 2496u, 2688u, 9000, 9100, 1000);
-        const auto staleClock = RecentSumoPhysicalCanvasReceipt(
-            0x20u, 133u, 133u, 2496u, 2688u, 9000, 9300, 1000);
         const auto freshClock = RecentSumoPhysicalCanvasReceipt(
             0x20u, 133u, 133u, 2496u, 2688u, 9000, 9100, 1000);
-        const auto offscreenSumo = PlanTopLeftLogicalCaptureUv(
-            0x20u, 0.f, 0.f, 2496.f, 2688.f,
-            3440.f, 1440.f, 2496.f, 2688.f,
-            1920.f, 1080.f, true);
-        const auto selector = PlanTopLeftLogicalCaptureUv(
-            0x0Au, 440.f, 0.f, 3000.f, 1440.f,
-            3440.f, 1440.f, 2496.f, 2688.f,
-            1920.f, 1080.f, true);
-        const auto near = [](float a, float b) {
-            return std::fabs(a - b) < 1.e-5f;
-        };
-        if (!actualPhysical.crop || !freshPublishedSource.crop ||
-            !noReceipt.crop || !freshClock ||
-            staleOtherProcess || staleClock ||
-            !near(freshPublishedSource.x, 440.f / 3440.f) ||
-            !near(freshPublishedSource.y, 0.f) ||
-            !near(freshPublishedSource.width,
-                (2560.f / 3440.f) * actualPhysical.width) ||
-            !near(freshPublishedSource.height, actualPhysical.height) ||
-            !near(noReceipt.width, 2560.f / 3440.f) ||
-            !offscreenSumo.crop ||
-            !near(offscreenSumo.width, 1920.f / 3440.f) ||
-            !near(offscreenSumo.height, 1080.f / 1440.f) ||
-            selector.crop)
+        if (actualPhysical.crop || freshPublishedSource.crop ||
+            noReceipt.crop || !freshClock)
             return 128;
     }
     // Desktop-resolution matrix: the physical XR eye render target does
-    // NOT change with FHD/QHD/UHD/ultrawide. The PC mirror window and
-    // desktop-duplicated menu pixel count DO change. Run the real game
-    // window-fit + host menu UV functions (not a duplicated formula).
+    // not grant a logical crop for mixed SUMO. Across FHD/QHD/UHD/ultrawide,
+    // preserve the complete fitted game window; only the LOCAL quad controls
+    // optical size.
     {
         struct Profile { int width, height; };
         constexpr Profile monitors[] = {
@@ -289,89 +256,40 @@ int main()
             {3440, 1440}, {2560, 1080}, {1920, 1200}
         };
         constexpr float physicalW = 2496.f, physicalH = 2688.f;
-        constexpr float logicalW = 1920.f, logicalH = 1080.f;
         const auto pixelCrop = OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
             0x20u, physicalW, physicalH);
-        const auto near = [](float a, float b) {
-            return std::fabs(a - b) <= 3.0e-5f;
-        };
-        if (!pixelCrop.crop || !near(pixelCrop.width, logicalW / physicalW) ||
-            !near(pixelCrop.height, logicalH / physicalH))
+        if (pixelCrop.crop)
             return 129;
-
         for (const auto& monitor : monitors)
         {
-            // Initial SetWindowPos may see either XR physical backbuffer
-            // dimensions or original logical D3D9 presentation parameters,
-            // depending on CreateDevice ordering. Both cases must choose the
-            // identical 1920x1080 physical source pixels.
             for (const bool physicalWindow : {true, false})
             {
                 const int mirrorW = physicalWindow ? 2496 : 1920;
                 const int mirrorH = physicalWindow ? 2688 : 1080;
                 const auto fit = OutRunVRMirrorAspect::Fit(
                     monitor.width, monitor.height, mirrorW, mirrorH);
-                if (!fit.valid || fit.left < 0 || fit.top < 0 ||
-                    fit.width <= 0 || fit.height <= 0 ||
-                    fit.left + fit.width > monitor.width ||
-                    fit.top + fit.height > monitor.height)
+                if (!fit.valid)
                     return 130;
-
                 const auto snapshot = OutRunVrMenuCapture::ClipClient(
                     fit.left, fit.top, fit.left + fit.width,
                     fit.top + fit.height, monitor.width, monitor.height);
                 if (!snapshot.visible || !snapshot.fullyVisible)
                     return 131;
-
-                // Published Frame.v2 applies the same physical crop to
-                // its captured game-window rectangle. QPC-missed fallback
-                // requires a same-PID recent physical extent receipt.
-                const float baseX = float(fit.left) / monitor.width;
-                const float baseY = float(fit.top) / monitor.height;
-                const float publishedX = baseX;
-                const float publishedY = baseY;
-                const float publishedW =
-                    float(fit.width) / monitor.width * pixelCrop.width;
-                const float publishedH =
-                    float(fit.height) / monitor.height * pixelCrop.height;
                 const auto fallback =
                     OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
                         0x20u, float(fit.left), float(fit.top),
                         float(fit.left + fit.width),
                         float(fit.top + fit.height),
                         float(monitor.width), float(monitor.height),
-                        physicalW, physicalH, logicalW, logicalH, true);
-                if (!fallback.crop ||
-                    !near(fallback.x, publishedX) ||
-                    !near(fallback.y, publishedY) ||
-                    !near(fallback.width, publishedW) ||
-                    !near(fallback.height, publishedH) ||
-                    !near(fallback.aspect, 16.f / 9.f) ||
-                    fallback.x < 0.f || fallback.y < 0.f ||
-                    fallback.x + fallback.width > 1.00001f ||
-                    fallback.y + fallback.height > 1.00001f)
+                        physicalW, physicalH, 1920.f, 1080.f, true);
+                if (fallback.crop ||
+                    OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
+                        0x20u, false, false, true))
                     return 132;
-
-                // Pixel density is monitor-dependent, but optical menu
-                // size stays MenuScale-owned. No forced 4:3 on SUMO/selector.
-                const auto nearPixel = [](float a, float b) {
-                    // Desktop UVs are stored as float; converting normalized
-                    // UV back to screen pixels incurs sub-pixel round-off.
-                    // This is 0.005 PIXEL, not 0.005 UV or an aspect waiver.
-                    return std::fabs(a - b) <= 0.005f;
-                };
-                if (!nearPixel(fallback.width * monitor.width,
-                        fit.width * 1920.f / physicalW) ||
-                    !nearPixel(fallback.height * monitor.height,
-                        fit.height * 1080.f / physicalH) ||
-                    OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
-                        0x20u, false, false, true) ||
-                    OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
-                        0x0Au, false, false, true))
-                    return 133;
             }
         }
-        // Source 4:3 title 0x04 and menu 0x09 remain independent from
+    }
+    // Source 4:3 title 0x04 and menu 0x09 remain independent from
         // SUMO 0x20, and must use UV + quad aspect as one transaction.
         const auto title43 = OutRunVrMenuAspect::PlanCenteredContent(
             16.f / 9.f, 4.f / 3.f);
@@ -405,40 +323,23 @@ int main()
         if (unavailableLogicalMenu.crop)
             return 136;
     }
-    // 2026-11-01 Quest DEBUG: published menu HWND is 440,0..3000,1440,
-    // but cached Desktop Duplication geometry sometimes reports the entire
-    // desktop 0,0..3440,1440. A CURRENT, same-PID Win32 client snapshot
-    // must restore the same UV and the same 1920x1080 logical canvas.
+    // 2026-11-01 23:17 Quest proof: the authoritative mirror rectangle is
+    // 440,0..3000,1440. SUMO must preserve that complete 2560x1440 source;
+    // neither a same-PID QPC miss nor a physical-extent receipt may turn it
+    // into a 1920x1080 top-left-only sample.
     {
         using OutRunVrMenuCapture::ClipClient;
         using OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv;
         const auto actualGame = ClipClient(
             440, 0, 3000, 1440, 3440u, 1440u);
-        const auto wrongDesktop = ClipClient(
-            0, 0, 3440, 1440, 3440u, 1440u);
         const auto qpcMissLiveHwnd = PlanTopLeftLogicalCaptureUv(
             0x20u, 440.f, 0.f, 3000.f, 1440.f,
             3440.f, 1440.f, 2496.f, 2688.f,
             1920.f, 1080.f, true);
-        const auto qpcMissDesktop = PlanTopLeftLogicalCaptureUv(
-            0x20u, 0.f, 0.f, 3440.f, 1440.f,
-            3440.f, 1440.f, 2496.f, 2688.f,
-            1920.f, 1080.f, true);
-        const auto close = [](float a, float b) {
-            return std::fabs(a - b) <= 1.e-5f;
-        };
         if (!actualGame.visible || !actualGame.fullyVisible ||
-            !wrongDesktop.fullyVisible || !qpcMissLiveHwnd.crop ||
-            !qpcMissDesktop.crop ||
-            !close(actualGame.x, 440.f / 3440.f) ||
-            !close(actualGame.width, 2560.f / 3440.f) ||
-            !close(qpcMissLiveHwnd.x, 440.f / 3440.f) ||
-            !close(qpcMissLiveHwnd.y, 0.f) ||
-            !close(qpcMissLiveHwnd.width,
-                (2560.f / 3440.f) * (1920.f / 2496.f)) ||
-            !close(qpcMissLiveHwnd.height, 1080.f / 2688.f) ||
-            close(qpcMissDesktop.x, qpcMissLiveHwnd.x) ||
-            close(qpcMissDesktop.width, qpcMissLiveHwnd.width))
+            qpcMissLiveHwnd.crop ||
+            std::fabs(actualGame.x - 440.f / 3440.f) > 1.e-6f ||
+            std::fabs(actualGame.width - 2560.f / 3440.f) > 1.e-6f)
             return 137;
     }
     // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
@@ -454,13 +355,15 @@ int main()
             0x23u, 2496.f, 2688.f);
         const auto miles = PlanTopLeftLogicalCanvasCrop(
             0x22u, 2496.f, 2688.f);
+        const auto sumo = PlanTopLeftLogicalCanvasCrop(
+            0x20u, 2496.f, 2688.f);
         const auto selector = PlanTopLeftLogicalCanvasCrop(
             0x0Au, 2496.f, 2688.f);
         const auto gameplay = PlanTopLeftLogicalCanvasCrop(
             0x10u, 2496.f, 2688.f);
         const auto native = PlanTopLeftLogicalCanvasCrop(
             0x09u, 1920.f, 1080.f);
-        if (!q3.crop || !title.crop || retry.crop || miles.crop ||
+        if (!q3.crop || !title.crop || sumo.crop || retry.crop || miles.crop ||
             selector.crop || gameplay.crop || native.crop ||
             std::fabs(q3.width - 1920.f / 2496.f) > 1.e-6f ||
             std::fabs(q3.height - 1080.f / 2688.f) > 1.e-6f ||

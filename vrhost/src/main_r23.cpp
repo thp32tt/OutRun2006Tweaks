@@ -2609,138 +2609,46 @@ namespace
             }
         }
 
-        // STATE_SUMO_FE is intentionally kept in the original 1920x1080
-        // logical coordinate space on the x86 side. When the game publishes
-        // the exact HWND client rectangle, that rectangle still contains the
-        // full portrait XR backbuffer. Recover the logical top-left fraction
-        // INSIDE the published mirror UV before submitting the LOCAL theater.
-        // This is not a 4:3 crop: the entire 16:9 logical selector/menu canvas
-        // remains present.
-        const bool mirrorBackbufferExtentValid =
-            mirrorFrame && mirrorFrame->clientPid == c.gamePid_ &&
-            mirrorFrame->backbufferWidth >= 640u &&
-            mirrorFrame->backbufferHeight >= 480u &&
-            mirrorFrame->backbufferWidth <= 8192u &&
-            mirrorFrame->backbufferHeight <= 8192u &&
-            static_cast<std::uint64_t>(mirrorFrame->backbufferWidth) *
-                mirrorFrame->backbufferHeight <= 16777216ULL;
-        const float menuPhysicalWidth = mirrorBackbufferExtentValid
-            ? static_cast<float>(mirrorFrame->backbufferWidth)
-            : static_cast<float>(c.projection_.width);
-        const float menuPhysicalHeight = mirrorBackbufferExtentValid
-            ? static_cast<float>(mirrorFrame->backbufferHeight)
-            : static_cast<float>(c.projection_.height);
-        const auto publishedLogicalCanvasCrop =
-            !sourceIsSbs && publishedMirrorApplied &&
-            clientGameState == 0x20u
-            ? OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
-                clientGameState, menuPhysicalWidth, menuPhysicalHeight)
-            : OutRunVrMenuAspect::LogicalCanvasCropPlan{};
-        bool publishedLogicalCanvasApplied =
-            publishedLogicalCanvasCrop.crop;
-        if (publishedLogicalCanvasApplied)
+        // STATE_SUMO_FE (0x20) is a completed mixed 2D + 3D vehicle
+        // composition. Quest 2026-11-01 23:17 proved that applying the old
+        // 1920/2496 x 1080/2688 logical crop changed a valid
+        // 440,0..3000,1440 mirror UV from 0.744186x1 to 0.572451x0.401786,
+        // leaving the physical 3D car below the sampled source. Keep the
+        // complete game-published mirror rectangle and change only LOCAL-quad
+        // optical size. Never crop one ownership domain out of a mixed frame.
+        const bool publishedLogicalCanvasApplied = false;
+        if (!sourceIsSbs && publishedMirrorApplied &&
+            clientGameState == 0x20u)
         {
-            const float baseWidth = theaterUv.w;
-            const float baseHeight = theaterUv.h;
-            theaterUv.x += baseWidth * publishedLogicalCanvasCrop.offsetX;
-            theaterUv.y += baseHeight * publishedLogicalCanvasCrop.offsetY;
-            theaterUv.w = baseWidth * publishedLogicalCanvasCrop.width;
-            theaterUv.h = baseHeight * publishedLogicalCanvasCrop.height;
-            publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;
-        }
-
-        if (publishedLogicalCanvasApplied)
-        {
-            static std::uint64_t sumoLogicalHits = 0;
-            const auto hit = ++sumoLogicalHits;
+            static std::uint64_t sumoCompositeHits = 0;
+            const auto hit = ++sumoCompositeHits;
             if (hit <= 32 || (hit & (hit - 1)) == 0)
             {
                 std::ostringstream trace;
                 trace
-                    << "[VR TRACE SUMO_FE LOGICAL CANVAS FULL]"
+                    << "[VR TRACE SUMO WHOLE COMPOSITE FULL]"
                     << " hit=" << hit
                     << " state=" << clientGameState
-                    << " xrPhysical=" << c.projection_.width << 'x'
-                    << c.projection_.height
-                    << " frameBackbuffer="
-                    << (mirrorFrame ? mirrorFrame->backbufferWidth : 0u) << 'x'
-                    << (mirrorFrame ? mirrorFrame->backbufferHeight : 0u)
-                    << " cropPhysical=" << menuPhysicalWidth << 'x'
-                    << menuPhysicalHeight
-                    << " logical=1920x1080"
+                    << " client=" << capturedTheaterClient.left << ','
+                    << capturedTheaterClient.top << ','
+                    << capturedTheaterClient.right << ','
+                    << capturedTheaterClient.bottom
                     << " outputUv=" << theaterUv.x << ',' << theaterUv.y
                     << ',' << theaterUv.w << ',' << theaterUv.h
                     << " aspect=" << publishedMirrorAspect
-                    << " authority=PUBLISHED_HWND_X_LOGICAL_BACKBUFFER_FRACTION\n";
+                    << " authority=COMPLETE_2D_3D_GAME_MIRROR_NO_LOGICAL_CROP\n";
                 OutRunVrEmitFullTrace(trace.str());
             }
         }
 
-        // The completed game Frame.v2 may outlive the output-capture QPC
-        // match by a few milliseconds. Reuse ONLY its physical source
-        // dimensions (not its old HWND/UV) for the SUMO 0x20 logical crop
-        // when a recent same-process receipt proves a portrait target.
-        // This makes the published and fallback UV sample the same top-left
-        // 1920x1080 raster even if a 2496x2688 D3D9Ex Present was stretched
-        // into a landscape PC mirror. Never infer this from the OpenXR
-        // swapchain alone, nor borrow dimensions after a game restart.
-        LARGE_INTEGER sumoReceiptNow{}, sumoReceiptFrequency{};
-        const bool haveSumoReceiptClock =
-            QueryPerformanceCounter(&sumoReceiptNow) != FALSE &&
-            QueryPerformanceFrequency(&sumoReceiptFrequency) != FALSE;
-        const bool recentSumoPhysicalSource =
-            !sourceIsSbs && !publishedMirrorApplied && mirrorFrame &&
-            mirrorFrame->presentationMode == OutRunVR::PresentationTheater &&
-            haveSumoReceiptClock &&
-            OutRunVrMenuAspect::RecentSumoPhysicalCanvasReceipt(
-                clientGameState, mirrorFrame->clientPid, c.gamePid_,
-                mirrorFrame->backbufferWidth, mirrorFrame->backbufferHeight,
-                mirrorFrame->presentQpc, sumoReceiptNow.QuadPart,
-                sumoReceiptFrequency.QuadPart);
-        // Persist the negative path as well: a missing Frame.v2 QPC/extent
-        // receipt is otherwise indistinguishable from a fixed menu when
-        // only accepted logical-canvas crop traces are present.
-        // Bound at powers of two so long 120-Hz menu sessions stay small.
-        if (clientGameState == 0x20u && !sourceIsSbs)
-        {
-            static std::uint64_t sumoSourceDecisionHits = 0;
-            const auto hit = ++sumoSourceDecisionHits;
-            if (hit <= 16 || (hit & (hit - 1)) == 0)
-            {
-                std::ostringstream trace;
-                trace << "[VR TRACE SUMO THEATER SOURCE DECISION FULL]"
-                    << " hit=" << hit
-                    << " publishedMirror=" << (publishedMirrorApplied ? 1 : 0)
-                    << " liveHwnd=" << (liveMirrorApplied ? 1 : 0)
-                    << " recentPhysical=" << (recentSumoPhysicalSource ? 1 : 0)
-                    << " gamePid=" << c.gamePid_
-                    << " framePid=" << (mirrorFrame ? mirrorFrame->clientPid : 0u)
-                    << " frameExtent="
-                    << (mirrorFrame ? mirrorFrame->backbufferWidth : 0u)
-                    << 'x'
-                    << (mirrorFrame ? mirrorFrame->backbufferHeight : 0u)
-                    << " frameQpc="
-                    << (mirrorFrame ? mirrorFrame->presentQpc : 0)
-                    << " captureQpc=" << c.lastCapturePresentQpc_
-                    << " client="
-                    << capturedTheaterClient.left << ','
-                    << capturedTheaterClient.top << ','
-                    << capturedTheaterClient.right << ','
-                    << capturedTheaterClient.bottom
-                    << " source=" << c.sourceWidth_ << 'x'
-                    << c.sourceHeight_
-                    << " xr=" << c.projection_.width << 'x'
-                    << c.projection_.height
-                    << "\n";
-                OutRunVrEmitFullTrace(trace.str());
-            }
-        }
-        const float fallbackPhysicalWidth = recentSumoPhysicalSource
-            ? static_cast<float>(mirrorFrame->backbufferWidth)
-            : static_cast<float>(c.projection_.width);
-        const float fallbackPhysicalHeight = recentSumoPhysicalSource
-            ? static_cast<float>(mirrorFrame->backbufferHeight)
-            : static_cast<float>(c.projection_.height);
+        // Logical-canvas fallback remains only for pure 2D states admitted by
+        // IsTopLeftLogicalTheaterState(). 0x20 is deliberately excluded above
+        // and therefore keeps its whole mixed composition on both published
+        // and live-HWND paths.
+        const float fallbackPhysicalWidth =
+            static_cast<float>(c.projection_.width);
+        const float fallbackPhysicalHeight =
+            static_cast<float>(c.projection_.height);
         const auto logicalCanvasCrop =
             !sourceIsSbs && !publishedMirrorApplied
             ? OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
@@ -2752,7 +2660,7 @@ namespace
                 static_cast<float>(c.sourceWidth_),
                 static_cast<float>(c.sourceHeight_),
                 fallbackPhysicalWidth, fallbackPhysicalHeight,
-                1920.f, 1080.f, recentSumoPhysicalSource)
+                1920.f, 1080.f, false)
             : OutRunVrMenuAspect::LogicalCanvasCapturePlan{};
         const bool fallbackLogicalCanvasApplied =
             !sourceIsSbs && !publishedMirrorApplied && logicalCanvasCrop.crop;
@@ -2795,7 +2703,7 @@ namespace
                     << theaterUv.y * c.sourceHeight_ << ','
                     << theaterUv.w * c.sourceWidth_ << ','
                     << theaterUv.h * c.sourceHeight_
-                    << " physicalReceipt=" << (recentSumoPhysicalSource ? 1 : 0)
+                    << " physicalReceipt=0"
                     << " authority=LOGICAL_CANVAS_CAPTURE_SOURCE_RECT"
                     << "\n";
                 OutRunVrEmitFullTrace(trace.str());

@@ -156,7 +156,7 @@ def require_frontend_owner(source: str) -> None:
     physical_owner = helper.split(
         "bool VrFrontEndNeedsPhysicalTargetMap() noexcept", 1)[1]
     assert "*Game::current_mode != GameState::STATE_SUMO_FE" in physical_owner
-    for state in ("TITLE", "MENU", "SELECTOR", "SELEXIT", "SELRESET"):
+    for state in ("TITLE", "MENU", "SELECTOR", "SELEXIT", "SELRESET", "START"):
         assert "GameState::STATE_" + state in helper, "frontend missing: " + state
     for excluded in ("GOAL", "GAME"):
         assert "case GameState::STATE_" + excluded + ":" not in helper, "foreign HUD owner: " + excluded
@@ -862,7 +862,7 @@ print("PASS optional front-end D3DX scale/translation containment and five destr
 def require_multi_frontend_physicalization(source: str) -> None:
     helper = source.split("bool VrFrontEndPhysicalCanvasState() noexcept",1)[1].split(
         "bool ResolveVrFrontEndVirtualCanvasScale(",1)[0]
-    for state in ("TITLE","MENU","SELECTOR","SELEXIT","SELRESET",
+    for state in ("TITLE","MENU","SELECTOR","SELEXIT","SELRESET","START",
                   "RESTART","CONTINUE","GAMEOVER","GAMEEXIT",
                   "GAMERESET","SUMOGAMERESET","TRYAGAIN"):
         assert "GameState::STATE_"+state in helper, state

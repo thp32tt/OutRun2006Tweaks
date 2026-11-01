@@ -73,6 +73,12 @@ namespace
         case GameState::STATE_SELECTOR:
         case GameState::STATE_SELEXIT:
         case GameState::STATE_SELRESET:
+        // Quest 2026-11-01 23:17 runtime: STATE_START keeps the authored
+        // 1920x1080 loading raster while the physical D3D9Ex target is
+        // 2496x2688. Map the 2D loading owner once to the physical target so
+        // the later aspect-preserving 2560x1440 PC mirror cancels that
+        // anisotropic target map and preserves square UI pixels.
+        case GameState::STATE_START:
         case GameState::STATE_RESTART:
         case GameState::STATE_CONTINUE:
         case GameState::STATE_GAMEOVER:
@@ -92,6 +98,8 @@ namespace
         }
     }
 
+    static_assert(static_cast<int>(GameState::STATE_START) == 0x0D,
+        "Quest loading owner must remain STATE_START");
     static_assert(static_cast<int>(GameState::STATE_SUMO_FE) == 0x20,
         "Quest runtime front-end owner must remain the Sumo FE state");
     static_assert(static_cast<int>(GameState::STATE_GAME) == 0x10,
