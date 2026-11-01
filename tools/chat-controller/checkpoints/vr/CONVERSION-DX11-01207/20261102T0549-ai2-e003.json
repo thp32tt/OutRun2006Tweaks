@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_ai2_exact_sha_checkpoint",
+  "task_id": "CONVERSION-DX11-01207",
+  "production_id": "CONVERSION-DX11-01207",
+  "event_id": "CONVERSION-DX11-01207-E003",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "attempt": "2/3",
+  "chat_rollover": 2,
+  "rollover_not_retry": true,
+  "target_branch": "vr-dx11-native-r71",
+  "target_head": "0f67923270c55de0bf71f3ec375d0d6fbcb96833",
+  "implementation_sha": "dbabeb9f48a240949a54a2967c3047bc7653a894",
+  "validation_bearing_sha": "0f67923270c55de0bf71f3ec375d0d6fbcb96833",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "LEGACY",
+  "status": "SOURCE_AND_FALSE_GREEN_CI_REPAIR_VERIFIED_PENDING_MANDATORY_GATES",
+  "runtime_validation": "UNTESTED",
+  "owned_real_source_paths": [
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "causal_ci_repairs": [
+    {
+      "sha": "9e154d5fa421904f685ff25a079a2d9047be2dbe",
+      "cause": "prior 01206 acceptance_proof missing"
+    },
+    {
+      "sha": "0f67923270c55de0bf71f3ec375d0d6fbcb96833",
+      "cause": "native_raw_dual_tile_test.cpp missing tile fixture; Fast workflow && compile failure false-green"
+    }
+  ],
+  "exact_sha_gates": {
+    "DX11 Fast Structural Checks": {
+      "run": 41347893687,
+      "status": "SUCCESS"
+    },
+    "Backend Conversion Gate": {
+      "run": 41347893713,
+      "status": "IN_PROGRESS"
+    },
+    "Build": {
+      "run": 41347893835,
+      "status": "IN_PROGRESS",
+      "alternate_success_run": 41347898136
+    },
+    "OpenXR VR architecture": {
+      "run": 41347893794,
+      "status": "SUCCESS"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run": 41347893685,
+      "status": "IN_PROGRESS"
+    }
+  },
+  "artifact": {
+    "source_run": 41347893794,
+    "artifact_id": 13100317323,
+    "name": "feature-dx11-first-game-frame-0f67923270c55de0bf71f3ec375d0d6fbcb96833",
+    "outer_zip_sha256": "4bb83b5d387b2d1ce1197f62fb0db84c99d31b9346c828f8b02ad2dd2bceed7a",
+    "outer_and_inner_zip_crc": "PASS",
+    "inner_sha256_manifest": "12/12 PASS",
+    "identity_source_sha": "0f67923270c55de0bf71f3ec375d0d6fbcb96833",
+    "bundle_runtime_validation": "UNTESTED"
+  },
+  "incomplete": [
+    "Wait for Backend Conversion Gate 41347893713, Build 41347893835, HUD Inspector 41347893685 final SUCCESS on exact SHA",
+    "If all 5 mandatory SUCCESS, write a single C6 docs/automation/runs/CONVERSION-DX11-01207.json with FEATURE_READY acceptance_results",
+    "Re-fetch AI_SCOREBOARD.md latest SSOT and score +1 only if independent achievement uniquely qualifies; never duplicate",
+    "No actual game/HMD runtime test yet. No native playability claim"
+  ],
+  "next_action": "Read latest target HEAD before any write, compare exact SHA and CI conclusions; if HEAD moved, adopt newer material only when same task; avoid duplicate source or changing feature identity."
+}
