@@ -133,7 +133,7 @@ jobs:
             'OUTRUN_VR_R23_PIXEL_PROBE=OFF (default)'
             'VR.Telemetry=false'
             'VR.FileLogging=false'
-            'RUNTIME_VALIDATION=PENDING_USER_2D_VR_ENTRYPOINT_TEST'
+            'RUNTIME_VALIDATION=FOCUS_USER_CONFIRMED_ENTRYPOINT_CI_PASS_PC_RETEST_PENDING'
           ) | Set-Content "$dir/VR_RELEASE_PROFILE.txt" -Encoding ascii
 
           $env:VR_RELEASE_INI = (Resolve-Path "$dir/OutRun2006Tweaks.ini").Path
