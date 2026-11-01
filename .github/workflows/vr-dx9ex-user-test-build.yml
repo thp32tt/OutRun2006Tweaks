@@ -40,6 +40,14 @@ on:
       - 'vrhost/src/main.cpp'
       - 'vrhost/src/main_r23.cpp'
       - 'OutRun2006Tweaks.ini'
+      # Menu capture / physical-source policy changes alter the packaged
+      # host even when the x86 game implementation is unchanged. Always build
+      # exact-SHA TEST+DEBUG artifacts on these changes.
+      - 'vrhost/tests/menu_content_aspect_smoke.cpp'
+      - 'vrhost/src/runtime/menu_content_aspect.hpp'
+      - 'vrhost/src/runtime/menu_capture_snapshot.hpp'
+      - 'src/vr/ui/vr_mirror_aspect_fit.hpp'
+      - 'tools/verify_vr_mirror_aspect_fit.py'
   workflow_dispatch:
 
 jobs:
