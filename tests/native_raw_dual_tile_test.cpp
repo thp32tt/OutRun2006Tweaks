@@ -461,6 +461,35 @@ bool native_raw_fvf_large_island_phase_regression() {
     };
     NativeRawDualTile sparse0{}, sparse2{}, clipped0{}, clipped1{};
     const NativeRawDrawExtent canvas{0,0,3440,1440};
+    // The original IA has 32 valid triangles but only TWO actual
+    // scissor-visible RGB islands. The capture must rotate over the
+    // survivors on every Draw (even after ordinal 2), rather than
+    // repeatedly returning the first real menu/vehicle/race polygon.
+    for (std::uint32_t ordinal = 0u; ordinal < 8u; ++ordinal) {
+        NativeRawDualTile rotating{};
+        if (!sparseSample(ordinal,canvas,rotating) ||
+            (ordinal % 2u == 0u ? rotating.first.x >= 1600u :
+                                   rotating.first.x <= 1800u))
+            return fail(__LINE__);
+    }
+    // Exercise nonzero source IA offsets too: genuine menu triangles can
+    // be scattered among dozens of correctly rejected offscreen ones.
+    auto displaced = sparse;
+    for (std::size_t i = 0u; i < triangles.size(); ++i) {
+        displaced[i] = {{5.f,5.f,0.5f,1.f}};
+        displaced[7u * 3u + i % 3u + (i / 3u) * 20u * 3u] = triangles[i];
+    }
+    const NativeRawFvfClipSpan displacedIa{
+        displaced.data(),sizeof(displaced[0]),displaced.size()};
+    for (std::uint32_t ordinal = 0u; ordinal < 8u; ++ordinal) {
+        NativeRawDualTile rotating{};
+        if (!native_raw_fvf_island_dual_draw_tile(
+                displacedIa,0,0,sw,sh,sw,sh,tw,th,canvas,
+                ordinal,rotating) ||
+            (ordinal % 2u == 0u ? rotating.first.x >= 1600u :
+                                   rotating.first.x <= 1800u))
+            return fail(__LINE__);
+    }
     if (!sparseSample(0u,canvas,sparse0) ||
         !sparseSample(2u,canvas,sparse2) ||
         !sparse0.hasSecond || !sparse2.hasSecond ||

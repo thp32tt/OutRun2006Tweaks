@@ -2,6 +2,7 @@
 // Opt-in source-authentic triangle-island GPU capture guidance; never
 // replaces original D3D9 Draw, COM/RT identity, native GPU RGB or fences.
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include "native_game_raw_fvf_clip_capture.hpp"
@@ -62,19 +63,31 @@ namespace outrun::vr::dx11 {
         return triangle.right > triangle.left &&
                triangle.bottom > triangle.top;
     };
+    // Remember only source IA indices whose actual clipped polygons can
+    // color the admitted game scissor. This 16 KiB stack index table avoids
+    // a second 8192-triangle projection pass and never stores fake pixels.
+    // 8192 is the fail-closed upper bound already proved above.
+    std::array<std::uint16_t, 8192u> visibleIndices{};
     std::size_t visibleCount = 0u;
     for (std::size_t t = 0u; t < count; ++t) {
         NativeRawDrawExtent triangle{};
-        if (projected_triangle(t, triangle)) ++visibleCount;
+        if (projected_triangle(t, triangle))
+            visibleIndices[visibleCount++] = static_cast<std::uint16_t>(t);
     }
     if (!visibleCount) return false;
     bool found = false;
     NativeRawDrawExtent firstWindow{};
-    const std::size_t start = static_cast<std::size_t>(ordinal) % count;
-    for (std::size_t step = 0u; step < count; ++step) {
-        const auto t = (start + step) % count;
+    // Rotate across VISIBLE source primitives, not raw IA count: when
+    // nearly every menu/race triangle is offscreen, ordinal % count
+    // repeatedly selected the same surviving island. The actual native
+    // GPU capture must visit all visible source islands before advancing
+    // the within-triangle pixel sweep.
+    const std::size_t start = static_cast<std::size_t>(ordinal) % visibleCount;
+    for (std::size_t step = 0u; step < visibleCount; ++step) {
+        const auto t = static_cast<std::size_t>(
+            visibleIndices[(start + step) % visibleCount]);
         NativeRawDrawExtent triangle{};
-        if (!projected_triangle(t, triangle)) continue;
+        if (!projected_triangle(t, triangle)) return false;
         // Revisit each original source triangle on its own genuine GPU
         // readback grid. Previously every island used ordinal=0, so even
         // hundreds of captured menu/car/race Draws sampled the SAME corner
