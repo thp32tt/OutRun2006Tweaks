@@ -166,4 +166,23 @@ if [[ "${OUTRUN_ROI_BRIDGE_ENABLED:-true}" == "true" ]]; then
   ) &
 fi
 
+# Bound offline Korean fallback work to one source per loop by default.
+# All generated DDS remain TEST_ONLY under the shared N100 image workspace.
+# Portainer rebuild and redeploy are intentionally left to the user.
+if [[ "${OUTRUN_OFFLINE_FALLBACK_ENABLED:-false}" == "true" ]]; then
+  (
+    while true; do
+      echo "$(date -Is) starting bounded offline Korean fallback cycle" >>/logs/offline-korean.log
+      if ! nice -n 15 timeout --signal=TERM --kill-after=15s 900s \
+        python -u /opt/outrun/app/offline_korean_batch.py --execute \
+          --max-sources "${OUTRUN_OFFLINE_FALLBACK_MAX_SOURCES_PER_CYCLE:-1}" \
+          --mips "${OUTRUN_OFFLINE_FALLBACK_MIPS:-1}" \
+          >>/logs/offline-korean.log 2>&1; then
+        echo "$(date -Is) offline Korean fallback cycle held/failed; retry later" >>/logs/offline-korean.log
+      fi
+      sleep "${OUTRUN_OFFLINE_FALLBACK_INTERVAL_SECONDS:-300}"
+    done
+  ) &
+fi
+
 exec python -m app.controller
