@@ -1,11 +1,13 @@
 #include "src/vr/d3d11/native_game_raw_dual_tile.hpp"
 #include "src/vr/d3d11/native_game_raw_color_transport.hpp"
 #include "src/vr/d3d11/native_game_raw_color_write_admission.hpp"
+#include "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp"
 #include "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp"
 #include "src/vr/d3d11/native_game_raw_present_coverage.hpp"
 #include "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
 #include <array>
 #include <cassert>
+#include <limits>
 #include "src/vr/d3d11/native_game_raw_msaa_capture.hpp"
 using namespace outrun::vr::dx11;
 // Sweep authentic 512x288 paired GPU tiles across a 3440x1440 race
@@ -164,7 +166,47 @@ static_assert([]() constexpr {
         !native_raw_bound_rgb_capture_admitted(duringCopy);
 }(), "RAW source capture admission must precede OM transfer detachment");
 
+
+// FVF menu/HUD triangles on the right edge previously selected GPU readback
+// tiles from the entire 3440x1440 viewport. The native pass-through VS
+// receives these exact clip-space coordinates, so source sampling may focus
+// on the real triangle without altering source Draw, RGB or Present proof.
+bool native_raw_fvf_clip_capture_regression() {
+    constexpr std::array<std::array<float, 4>, 3> verts{{{
+        {0.78f, 0.25f, 0.5f, 1.0f},
+        {0.95f, 0.25f, 0.5f, 1.0f},
+        {0.90f, 0.52f, 0.5f, 1.0f}
+    }}};
+    NativeRawDrawExtent rect{};
+    const NativeRawFvfClipSpan span{verts.data(), sizeof(verts[0]), verts.size()};
+    if (!native_raw_fvf_projected_raster(span, 0, 0, 3440, 1440, rect) ||
+        rect.left < 3000 || rect.right > 3440 ||
+        rect.top < 300 || rect.bottom > 550)
+        return false;
+    NativeRawDualTile source{};
+    if (!native_raw_swept_dual_draw_tile(3440, 1440, 512, 288,
+            rect, 0u, source) || source.first.x < 2500u)
+        return false;
+    auto invalidW = verts;
+    invalidW[1][3] = 0.0f;
+    if (native_raw_fvf_projected_raster(
+            {invalidW.data(), sizeof(invalidW[0]), invalidW.size()},
+            0, 0, 3440, 1440, rect))
+        return false;
+    auto invalidNaN = verts;
+    invalidNaN[2][0] = (std::numeric_limits<float>::quiet_NaN)();
+    if (native_raw_fvf_projected_raster(
+            {invalidNaN.data(), sizeof(invalidNaN[0]), invalidNaN.size()},
+            0, 0, 3440, 1440, rect))
+        return false;
+    if (native_raw_fvf_projected_raster(span, 0, 0, 0, 1440, rect) ||
+        native_raw_fvf_projected_raster({}, 0, 0, 3440, 1440, rect))
+        return false;
+    return true;
+}
+
 int main() {
+    assert(native_raw_fvf_clip_capture_regression());
     assert(native_raw_source_color_write_selection_regression());
     {
         constexpr std::uint32_t w=2u,h=2u;

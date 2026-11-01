@@ -27,6 +27,7 @@
 #include "native_game_raw_gpu_wait.hpp"
 #include "native_game_raw_source_target_identity.hpp"
 #include "native_game_raw_color_write_admission.hpp"
+#include "native_game_raw_fvf_clip_capture.hpp"
 
 namespace outrun::vr::dx11 {
 // Keep genuine GPU RAW pixel locations SOURCE-COINCIDENT with a game
@@ -793,7 +794,8 @@ public:
     void begin_real_native_draw(
         IDirect3DDevice9* game, ID3D11Device* dev,
         ID3D11DeviceContext* ctx, ID3D11Texture2D* color,
-        std::uint64_t presentingSerial, bool rgbSourceBoundAtDraw) noexcept {
+        std::uint64_t presentingSerial, bool rgbSourceBoundAtDraw,
+        NativeRawFvfClipSpan fvfClip = {}) noexcept {
         if (!game || !dev || !ctx || !color ||
             ctx->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE) return;
         if (gameOwner_ != game || gpuOwner_ != dev) {
@@ -865,7 +867,7 @@ public:
         // The source-owned OM state was verified BEFORE output-detach.
         // Re-querying OM here would always see nullptr (GPU transfer scope).
         if (!rgbSourceBoundAtDraw) return;
-        if (queue_before_draw(dev, ctx, color) == NativeRawPreviewResult::CopyQueued) {
+        if (queue_before_draw(dev, ctx, color, fvfClip) == NativeRawPreviewResult::CopyQueued) {
             // Save the original game RT at the actual source Draw. D3D9 can
             // change its bound RT between Draw and Present; no Present-time
             // RT query can reconstruct that identity. Unknown => inset only.
@@ -1053,7 +1055,8 @@ private:
     }
     NativeRawPreviewResult queue_before_draw(
         ID3D11Device* dev, ID3D11DeviceContext* ctx,
-        ID3D11Texture2D* color) noexcept {
+        ID3D11Texture2D* color,
+        NativeRawFvfClipSpan fvfClip) noexcept {
         if (!dev || !ctx || !color || pending_ || quarantined_)
             return NativeRawPreviewResult::GpuFailure;
         D3D11_TEXTURE2D_DESC src{};
@@ -1201,6 +1204,29 @@ private:
                 draw.top=(std::max)(draw.top,std::int64_t{rect.top});
                 draw.right=(std::min)(draw.right,std::int64_t{rect.right});
                 draw.bottom=(std::min)(draw.bottom,std::int64_t{rect.bottom});
+            }
+        }
+        // Real FVF triangles are already converted to D3D11 clip space.
+        // Guide PRE/POST capture towards their authentic screen footprint
+        // instead of rotating only across a full-screen menu/race viewport.
+        // A non-solid native rasterizer or an unknown homogeneous W retains
+        // the established whole-viewport path; never skip the actual Draw.
+        D3D11_RASTERIZER_DESC rasterDesc{};
+        if (raster) raster->GetDesc(&rasterDesc);
+        if (fvfClip.firstClip &&
+            (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID)) {
+            NativeRawDrawExtent clipped{};
+            if (native_raw_fvf_projected_raster(
+                    fvfClip, view.TopLeftX, view.TopLeftY,
+                    view.Width, view.Height, clipped)) {
+                const NativeRawDrawExtent intersection{
+                    (std::max)(draw.left, clipped.left),
+                    (std::max)(draw.top, clipped.top),
+                    (std::min)(draw.right, clipped.right),
+                    (std::min)(draw.bottom, clipped.bottom)};
+                if (intersection.right > intersection.left &&
+                    intersection.bottom > intersection.top)
+                    draw = intersection;
             }
         }
         NativeRawDualTile tiles{};

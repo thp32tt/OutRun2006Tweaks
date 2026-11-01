@@ -8475,7 +8475,18 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         s.rawPreview.begin_real_native_draw(
             reinterpret_cast<IDirect3DDevice9*>(s.sourceGameDevice),
             s.backend.device(), gpuContext, s.backend.color_texture(), s.presents,
-            rgbSourceBoundAtDraw);
+            rgbSourceBoundAtDraw,
+            // Only authentic FVF triangles with a pass-through native VS
+            // can supply exact clip-space geometry. Lines, points and
+            // shader-bound SM3 draws retain full-viewport sampling.
+            (!vertices.empty() &&
+             (topology == D3DPT_TRIANGLELIST ||
+              topology == D3DPT_TRIANGLESTRIP ||
+              topology == D3DPT_TRIANGLEFAN))
+                ? NativeRawFvfClipSpan{
+                      vertices.front().clip, sizeof(NativeVertex),
+                      vertices.size()}
+                : NativeRawFvfClipSpan{});
     }
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
     else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
