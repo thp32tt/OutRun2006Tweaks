@@ -29,7 +29,7 @@ def verify(text: str) -> None:
         "GAME_PUBLISHED_D3D9_HWND_CLIENT_RECT",
         "ORIGINAL_TITLE_MENU_4_3_WITHIN_GAME_HWND",
         "logicalRectVisible=1",
-        "CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD",
+        "LOGICAL_CANVAS_CAPTURE_SOURCE_RECT",
         "c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)",
     )
     for token in required_theater:
@@ -72,8 +72,11 @@ def verify(text: str) -> None:
     # only the exact 1920x1080 logical rectangle itself must be fully visible.
     assert "GetCapturedGameUv(" in theater
     assert "capturedTheaterFullyVisible &&" not in theater
-    assert "CENTERED_LOGICAL_MIRROR_FIT_LOCAL_FIXED_QUAD" in theater
+    assert "LOGICAL_CANVAS_CAPTURE_SOURCE_RECT" in theater
     assert "fitPixels=" in theater
+    assert "physicalReceipt=" in theater
+    assert "RecentSumoPhysicalCanvasReceipt(" in theater
+    assert "frame.clientPid != c.gamePid_" in text
     assert "publishedMirrorApplied" in theater
     assert "!publishedMirrorApplied" in theater
     assert "authoredFourThreeApplied" in theater
