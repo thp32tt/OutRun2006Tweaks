@@ -290,7 +290,13 @@ int main()
         }
     }
     // Source 4:3 title 0x04 and menu 0x09 remain independent from
-        // SUMO 0x20, and must use UV + quad aspect as one transaction.
+    // SUMO 0x20, and must use UV + quad aspect as one transaction.
+    {
+        constexpr float physicalW = 2496.f, physicalH = 2688.f;
+        constexpr float logicalW = 1920.f, logicalH = 1080.f;
+        const auto near = [](float a, float b) {
+            return std::fabs(a - b) <= 3.0e-5f;
+        };
         const auto title43 = OutRunVrMenuAspect::PlanCenteredContent(
             16.f / 9.f, 4.f / 3.f);
         if (!title43.crop || !near(title43.offsetX, 0.125f) ||
