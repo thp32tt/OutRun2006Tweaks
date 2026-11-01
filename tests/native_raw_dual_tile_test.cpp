@@ -387,8 +387,68 @@ bool native_raw_fvf_island_regression() {
                    canvas,0u) && tile.hasSecond;
 }
 
+// A single real Draw can contain TWO large, widely separated source triangles.
+// Repeating the same scene must reach their inner GPU pixels, not just the
+// first 512x288 corner on every revisit of an authentic source island.
+bool native_raw_fvf_large_island_phase_regression() {
+    const auto fail = [](int line) noexcept {
+        std::fprintf(stderr, "FVF phased GPU island regression failed at line %d\\n", line);
+        return false;
+    };
+    constexpr std::array<std::array<float,4>,6> triangles{{
+        {{-0.94f,-0.90f,0.5f,1.f}}, {{-0.18f,-0.90f,0.5f,1.f}},
+        {{-0.56f, 0.85f,0.5f,1.f}},
+        {{ 0.18f,-0.90f,0.5f,1.f}}, {{ 0.94f,-0.90f,0.5f,1.f}},
+        {{ 0.56f, 0.85f,0.5f,1.f}}
+    }};
+    constexpr auto sw=3440u, sh=1440u, tw=512u, th=288u;
+    const NativeRawFvfClipSpan ia{
+        triangles.data(), sizeof(triangles[0]), triangles.size()};
+    const auto sample = [&](std::uint32_t ordinal, NativeRawDualTile& pair,
+                            NativeRawDrawExtent clip = {0,0,3440,1440}) {
+        return native_raw_fvf_island_dual_draw_tile(
+            ia,0,0,sw,sh,sw,sh,tw,th,clip,ordinal,pair);
+    };
+    NativeRawDualTile left0{},right0{},left1{},right1{};
+    if (!sample(0u,left0) || !sample(1u,right0) ||
+        !sample(2u,left1) || !sample(3u,right1))
+        return fail(__LINE__);
+    if (!left0.hasSecond || !right0.hasSecond ||
+        !left1.hasSecond || !right1.hasSecond ||
+        left0.first.x >= 1600u || right0.first.x <= 1800u ||
+        left0.second.x <= 1800u || right0.second.x >= 1600u)
+        return fail(__LINE__);
+    // Both large source islands must advance their OWN real raster origin;
+    // a rotating triangle index by itself is not pixel-coverage progress.
+    if (left0.first.x == left1.first.x &&
+        left0.first.y == left1.first.y) return fail(__LINE__);
+    if (right0.first.x == right1.first.x &&
+        right0.first.y == right1.first.y) return fail(__LINE__);
+    for (std::uint32_t turn = 0; turn < 32u; ++turn) {
+        NativeRawDualTile pair{};
+        if (!sample(turn,pair) || !pair.hasSecond ||
+            !native_raw_source_tiles_disjoint(
+                pair.first,pair.second,tw,th) ||
+            pair.first.x > sw-tw || pair.first.y > sh-th ||
+            pair.second.x > sw-tw || pair.second.y > sh-th)
+            return fail(__LINE__);
+    }
+    // The admitted source scissor can clip away a second primitive.
+    // Sampling must remain in the first real source footprint, never
+    // inventing an off-scissor right island.
+    NativeRawDualTile clipped{};
+    for (std::uint32_t turn : {0u,1u,2u,9u}) {
+        if (!sample(turn,clipped,{0,0,1500,1440}) ||
+            clipped.first.x >= 1500u ||
+            (clipped.hasSecond && clipped.second.x >= 1500u))
+            return fail(__LINE__);
+    }
+    return true;
+}
+
 int main() {
     assert(native_raw_fvf_clip_capture_regression());
+    assert(native_raw_fvf_large_island_phase_regression());
     assert(native_raw_fvf_island_regression());
     assert(native_raw_source_color_write_selection_regression());
     {

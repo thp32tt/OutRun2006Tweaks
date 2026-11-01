@@ -59,26 +59,52 @@ namespace outrun::vr::dx11 {
             (std::min)(admitted.bottom, assembled.bottom));
         if (triangle.right <= triangle.left ||
             triangle.bottom <= triangle.top) continue;
-        NativeRawTileOrigin tile{};
-        if (!native_raw_draw_tile(sw, sh, tw, th, triangle, 0u, tile))
+        // Revisit each original source triangle on its own genuine GPU
+        // readback grid. Previously every island used ordinal=0, so even
+        // hundreds of captured menu/car/race Draws sampled the SAME corner
+        // of each large primitive and permanently missed its inner pixels.
+        // A complete pass through all source triangles advances one sample
+        // cell within EACH triangle, without projecting any synthetic RGB.
+        NativeRawDualTile sampled{};
+        const auto sourcePhase =
+            static_cast<std::uint32_t>(ordinal / count);
+        if (!native_raw_swept_dual_draw_tile(
+                sw, sh, tw, th, triangle, sourcePhase, sampled))
             continue;
         if (!found) {
-            out.first = tile;
+            out.first = sampled.first;
             firstWindow = triangle;
             found = true;
-        } else if (native_raw_source_tiles_disjoint(
-                       out.first, tile, tw, th)) {
-            out.second = tile;
-            out.hasSecond = true;
-            return true;
+        } else {
+            // Prefer independent primitive islands. A large later triangle
+            // may have its first crop overlapping ours but a second genuine
+            // source crop that is physically disjoint; inspect both.
+            if (native_raw_source_tiles_disjoint(
+                    out.first, sampled.first, tw, th)) {
+                out.second = sampled.first;
+                out.hasSecond = true;
+                return true;
+            }
+            if (sampled.hasSecond &&
+                native_raw_source_tiles_disjoint(
+                    out.first, sampled.second, tw, th)) {
+                out.second = sampled.second;
+                out.hasSecond = true;
+                return true;
+            }
         }
     }
     if (!found) return false;
-    // Preserve the existing two-GPU-tile sweep for a single large triangle.
+    // When no OTHER source triangle supplies a disjoint GPU sample, retain
+    // the authentic internal sweep of the selected large first triangle.
     NativeRawDualTile within{};
     if (native_raw_swept_dual_draw_tile(
-            sw, sh, tw, th, firstWindow, ordinal, within) && within.hasSecond)
-        out = within;
+            sw, sh, tw, th, firstWindow,
+            static_cast<std::uint32_t>(ordinal / count), within) &&
+        within.hasSecond) {
+        out.second = within.second;
+        out.hasSecond = true;
+    }
     return true;
 }
 } // namespace outrun::vr::dx11
