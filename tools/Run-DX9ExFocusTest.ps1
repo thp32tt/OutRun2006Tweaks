@@ -56,6 +56,7 @@ $gameArgs = @(
     '-Graphics.ReflectionUpdateRate=0.25',
     '-Graphics.TransparencySupersampling=false',
     '-VR.TransparencySupersampling=false',
+    '-VR.Telemetry=true',
     '-RivalDx11NativeRoute=false',
     '-AutoRenderResolution=true',
     '-FollowGameResolution=false',
@@ -84,6 +85,7 @@ Copy-Item (Join-Path $root 'OutRun2006Tweaks.ini') (Join-Path $session 'OutRun20
 ) | Set-Content (Join-Path $session 'FULL_TRACE_CONTRACT.txt') -Encoding UTF8
 
 $env:OUTRUN_VR_R23_PIXEL_PROBE = '0'
+$env:OUTRUN_VR_FILE_LOG = '1'
 Write-Host "Starting DX9Ex variant $variant"
 Write-Host "Test the same short gameplay section, then exit normally."
 
