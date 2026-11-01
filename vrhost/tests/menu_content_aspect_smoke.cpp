@@ -1,5 +1,6 @@
 #include "runtime/menu_content_aspect.hpp"
 #include "runtime/menu_capture_snapshot.hpp"
+#include "../../src/vr/ui/vr_mirror_aspect_fit.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
 #include "vr/ui/menu_quad_transform.hpp"
 #include <cmath>
@@ -276,6 +277,127 @@ int main()
             !near(offscreenSumo.height, 1080.f / 1440.f) ||
             selector.crop)
             return 128;
+    }
+    // Desktop-resolution matrix: the physical XR eye render target does
+    // NOT change with FHD/QHD/UHD/ultrawide. The PC mirror window and
+    // desktop-duplicated menu pixel count DO change. Run the real game
+    // window-fit + host menu UV functions (not a duplicated formula).
+    {
+        struct Profile { int width, height; };
+        constexpr Profile monitors[] = {
+            {1920, 1080}, {2560, 1440}, {3840, 2160},
+            {3440, 1440}, {2560, 1080}, {1920, 1200}
+        };
+        constexpr float physicalW = 2496.f, physicalH = 2688.f;
+        constexpr float logicalW = 1920.f, logicalH = 1080.f;
+        const auto pixelCrop = OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
+            0x20u, physicalW, physicalH);
+        const auto near = [](float a, float b) {
+            return std::fabs(a - b) <= 3.0e-5f;
+        };
+        if (!pixelCrop.crop || !near(pixelCrop.width, logicalW / physicalW) ||
+            !near(pixelCrop.height, logicalH / physicalH))
+            return 129;
+
+        for (const auto& monitor : monitors)
+        {
+            // Initial SetWindowPos may see either XR physical backbuffer
+            // dimensions or original logical D3D9 presentation parameters,
+            // depending on CreateDevice ordering. Both cases must choose the
+            // identical 1920x1080 physical source pixels.
+            for (const bool physicalWindow : {true, false})
+            {
+                const int mirrorW = physicalWindow ? 2496 : 1920;
+                const int mirrorH = physicalWindow ? 2688 : 1080;
+                const auto fit = OutRunVRMirrorAspect::Fit(
+                    monitor.width, monitor.height, mirrorW, mirrorH);
+                if (!fit.valid || fit.left < 0 || fit.top < 0 ||
+                    fit.width <= 0 || fit.height <= 0 ||
+                    fit.left + fit.width > monitor.width ||
+                    fit.top + fit.height > monitor.height)
+                    return 130;
+
+                const auto snapshot = OutRunVrMenuCapture::ClipClient(
+                    fit.left, fit.top, fit.left + fit.width,
+                    fit.top + fit.height, monitor.width, monitor.height);
+                if (!snapshot.visible || !snapshot.fullyVisible)
+                    return 131;
+
+                // Published Frame.v2 applies the same physical crop to
+                // its captured game-window rectangle. QPC-missed fallback
+                // requires a same-PID recent physical extent receipt.
+                const float baseX = float(fit.left) / monitor.width;
+                const float baseY = float(fit.top) / monitor.height;
+                const float publishedX = baseX;
+                const float publishedY = baseY;
+                const float publishedW =
+                    float(fit.width) / monitor.width * pixelCrop.width;
+                const float publishedH =
+                    float(fit.height) / monitor.height * pixelCrop.height;
+                const auto fallback =
+                    OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
+                        0x20u, float(fit.left), float(fit.top),
+                        float(fit.left + fit.width),
+                        float(fit.top + fit.height),
+                        float(monitor.width), float(monitor.height),
+                        physicalW, physicalH, logicalW, logicalH, true);
+                if (!fallback.crop ||
+                    !near(fallback.x, publishedX) ||
+                    !near(fallback.y, publishedY) ||
+                    !near(fallback.width, publishedW) ||
+                    !near(fallback.height, publishedH) ||
+                    !near(fallback.aspect, 16.f / 9.f) ||
+                    fallback.x < 0.f || fallback.y < 0.f ||
+                    fallback.x + fallback.width > 1.00001f ||
+                    fallback.y + fallback.height > 1.00001f)
+                    return 132;
+
+                // Pixel density is monitor-dependent, but optical menu
+                // size stays MenuScale-owned. No forced 4:3 on SUMO/selector.
+                if (!near(fallback.width * monitor.width,
+                        fit.width * 1920.f / physicalW) ||
+                    !near(fallback.height * monitor.height,
+                        fit.height * 1080.f / physicalH) ||
+                    OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
+                        0x20u, false, false, true) ||
+                    OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
+                        0x0Au, false, false, true))
+                    return 133;
+            }
+        }
+        // Source 4:3 title 0x04 and menu 0x09 remain independent from
+        // SUMO 0x20, and must use UV + quad aspect as one transaction.
+        const auto title43 = OutRunVrMenuAspect::PlanCenteredContent(
+            16.f / 9.f, 4.f / 3.f);
+        if (!title43.crop || !near(title43.offsetX, 0.125f) ||
+            !near(title43.width, 0.75f) ||
+            !OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
+                0x04u, false, false, true) ||
+            !OutRunVrMenuAspect::ShouldCropFallbackTitleMenu(
+                0x09u, false, false, true))
+            return 134;
+
+        // A live UHD-to-FHD desktop change without a game HWND re-fit
+        // leaves much of the old 2006x2160 client off the FHD output.
+        // Preserve the FAIL-CLOSED behavior: do NOT rescale invisible
+        // pixels or claim runtime WM_DISPLAYCHANGE repair here.
+        const auto oldUhd = OutRunVRMirrorAspect::Fit(
+            3840, 2160, 2496, 2688);
+        const auto resized = OutRunVrMenuCapture::ClipClient(
+            oldUhd.left, oldUhd.top,
+            oldUhd.left + oldUhd.width, oldUhd.top + oldUhd.height,
+            1920u, 1080u);
+        if (resized.fullyVisible || !resized.visible)
+            return 135;
+        const auto unavailableLogicalMenu =
+            OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
+                0x20u, float(oldUhd.left), float(oldUhd.top),
+                float(oldUhd.left + oldUhd.width),
+                float(oldUhd.top + oldUhd.height),
+                1920.f, 1080.f, physicalW, physicalH,
+                logicalW, logicalH, true);
+        if (unavailableLogicalMenu.crop)
+            return 136;
     }
     // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
     // in its upper-left. Sample exactly that logical rectangle before the
