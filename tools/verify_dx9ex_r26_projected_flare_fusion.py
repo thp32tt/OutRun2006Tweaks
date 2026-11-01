@@ -69,7 +69,15 @@ assert "exactProjectedLensCameraSynced" in tail
 assert "exactProjectedLensPmtRaw" in tail
 assert "recordedCameraSynced" in tail
 assert "const bool sourceCameraSynced =" in tail
-assert "outerFlareObject ? false : recordedCameraSynced" in tail
+# Inner 0x570006 camera-synchronized raw PMT caused the second lens
+# artifact to follow the headset; retain central sun and outer discs.
+policy=(ROOT/"src/vr/d3d9/projected_lens_r85_source_policy.hpp").read_text()
+assert "R85UseRecordedCameraSync(" in tail
+assert "projectedObjectId, outerFlareObject," in tail
+assert "objectId == 0x570006u" in policy
+assert "static_assert(R85UseRecordedCameraSync(0x570002u, false, true));" in policy
+assert "static_assert(!R85UseRecordedCameraSync(0x570006u, false, true));" in policy
+assert "innerHeadInverse={}" in tail
 assert "CurrentLensAxisOpaquePmt.objectId" in tail
 for obj in ("0x570003u","0x570004u","0x570005u","0x570007u",
             "0x570008u","0x570009u","0x57000Au","0x57000Bu",
