@@ -186,6 +186,24 @@ int main()
             fitFor(0xFFFFFFFFu).crop)
             return 125;
     }
+    // A timestamp-missed title/menu frame must match published Frame.v2
+    // 4:3 layout, but SUMO wrapper / selector / SBS / fragments stay wide.
+    {
+        using OutRunVrMenuAspect::ShouldCropFallbackTitleMenu;
+        const auto centered = OutRunVrMenuAspect::PlanCenteredContent(
+            16.f / 9.f, 4.f / 3.f);
+        if (!ShouldCropFallbackTitleMenu(0x04u, false, false, true) ||
+            !ShouldCropFallbackTitleMenu(0x09u, false, false, true) ||
+            ShouldCropFallbackTitleMenu(0x20u, false, false, true) ||
+            ShouldCropFallbackTitleMenu(0x0Au, false, false, true) ||
+            ShouldCropFallbackTitleMenu(0x04u, true, false, true) ||
+            ShouldCropFallbackTitleMenu(0x04u, false, true, true) ||
+            ShouldCropFallbackTitleMenu(0x04u, false, false, false) ||
+            !centered.crop ||
+            std::fabs(centered.offsetX - 0.125f) > 1.e-6f ||
+            std::fabs(centered.width - 0.75f) > 1.e-6f)
+            return 126;
+    }
     // Quest3 physical 2496x2688 contains the old 1920x1080 theater canvas
     // in its upper-left. Sample exactly that logical rectangle before the
     // LOCAL-fixed menu projection; never crop Ferrari selector/gameplay or
