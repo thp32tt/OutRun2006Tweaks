@@ -70,6 +70,21 @@ def verify(text: str) -> None:
     # Capture remains game-client cropped, so the quad must not contain
     # unrelated desktop pixels. A taller XR client may extend off the monitor;
     # only the exact 1920x1080 logical rectangle itself must be fully visible.
+    # 2026-11-01 real Quest log: QPC-missed menu must use CURRENT
+    # same-process HWND, never the 3440x1440 Desktop Duplication rectangle.
+    assert 'bool R23LiveGameWindowUv(' in text
+    assert 'GetWindowThreadProcessId(hwnd, &ownerPid)' in text
+    assert 'ownerPid != c.gamePid_' in text
+    assert 'GetClientRect(hwnd, &client)' in text
+    assert 'ClientToScreen(hwnd, &tl)' in text
+    assert 'ClientToScreen(hwnd, &br)' in text
+    assert 'if (!clipped.fullyVisible)' in text
+    assert 'R23LiveGameWindowUv(c, liveUv, liveRect)' in theater
+    assert 'capturedTheaterClient = liveRect;' in theater
+    assert 'publishedMirrorApplied = true;' in theater
+    assert 'else if (clientGameState != 0xFFFFFFFFu)' in theater
+    assert 'authority=CURRENT_SAME_PID_WIN32_CLIENT_RECT' in theater
+    assert 'mirrorFrame && mirrorFrame->clientPid == c.gamePid_' in theater
     assert "GetCapturedGameUv(" in theater
     assert "capturedTheaterFullyVisible &&" not in theater
     assert "LOGICAL_CANVAS_CAPTURE_SOURCE_RECT" in theater
