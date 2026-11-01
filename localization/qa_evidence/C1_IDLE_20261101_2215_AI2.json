@@ -1,0 +1,41 @@
+{
+  "schema": "outrun.c1.idle_evidence.v1",
+  "task_id": "OUTRUN-C1-AI2-20261101T2215KST-IDLE",
+  "checked_at_kst": "2026-11-01T22:16:42+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "branch_head_before": "eaf51cded7235bf3677de7e2f66b1c7d9923fc28",
+  "role": "C1",
+  "reviewer": "ChatGPT AI2",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "n100_path": "work/image-src/text_roi_batches",
+    "sources": [
+      "candidate_outputs/A",
+      "candidate_outputs/B",
+      "export_evidence"
+    ],
+    "previous_c1_reviewed_sha_count": 956,
+    "actual_candidate_png_count": 951,
+    "candidates_with_export_evidence_count": 951,
+    "candidate_files_without_export": 0,
+    "new_sha_pending": 0,
+    "selected": 0,
+    "method": "Run work/C1_QA_20261101_2145_AI2_inventory.py on N100 (actual PNG SHA256 vs historical C1 report SHA256 and filename-bound export receipts); compare SHA sets, not count subtraction"
+  },
+  "judgement": "IDLE_NO_UNREVIEWED_CANDIDATES",
+  "records": [],
+  "constraints": {
+    "imagegen_called": false,
+    "producer_queue_mutated": false,
+    "dds_created": false,
+    "c2_c3_pass_claimed": false,
+    "ingame_pass_claimed": false
+  },
+  "point_delta": 0,
+  "notes": "New 22:16:42 KST SHA-dedup inventory after 21:45 IDLE, same unchanged actual inventory. No new review performance, no scoreboard increment. Future generated PNGs are not included unless saved in N100 candidate_outputs and export_evidence at observation time."
+}
