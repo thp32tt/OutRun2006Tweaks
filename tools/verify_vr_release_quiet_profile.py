@@ -18,9 +18,14 @@ host = (root / "vrhost/src/main.cpp").read_text(encoding="utf-8")
 r23 = (root / "vrhost/src/main_r23.cpp").read_text(encoding="utf-8")
 focus = (root / "tools/Run-DX9ExFocusTest.ps1").read_text(encoding="utf-8")
 official = (root / "tools/Run-FocusOfficialTest.ps1").read_text(encoding="utf-8")
+launcher = (root / "Start-OutRun-VR.cmd").read_text(encoding="utf-8")
 
 for token in (
     "bool FileLoggingEnabled() noexcept",
+    "bool ReleasePackageVrLaunchRequested() noexcept",
+    'L"OUTRUN_VR_LAUNCH"',
+    '"VR_RELEASE_VERSION.txt"',
+    "Settings::VREnabled = false;",
     'L"OUTRUN_VR_FILE_LOG"',
     "if (Module::FileLoggingEnabled())",
     "spdlog::level::off",
@@ -50,9 +55,14 @@ for script in (focus, official):
     assert "-VR.Telemetry=true" in script
     assert "OUTRUN_VR_FILE_LOG = '1'" in script
 
+assert 'set "OUTRUN_VR_LAUNCH=1"' in launcher
+assert "-VR.Enabled=true" in launcher
+assert "-VR.AutoLaunchHost=true" in launcher
+assert "-VR.PreferD3D9Ex=true" in launcher
+
 probe = r23.split("bool R23PixelDiagnosticsEnabled() noexcept", 1)[1].split(
     "constexpr UINT R23SourceSamples", 1)[0]
 assert 'std::strcmp(value, "1") == 0' in probe
 assert "return value != nullptr" in probe
 
-print("PASS VR v0.01-beta: file writes, hot-path trace construction, telemetry and pixel probe are quiet by default; diagnostics explicitly opt in")
+print("PASS VR v0.01-beta: direct release EXE is forced to 2D, Start-OutRun-VR.cmd explicitly opts into VR, publishing is manual, and diagnostics stay quiet by default")

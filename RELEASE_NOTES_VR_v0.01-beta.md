@@ -27,7 +27,11 @@
 
 ## 설치
 
-ZIP 내용을 `OR2006C2C.EXE`가 있는 게임 폴더에 덮어씁니다. 게임은 평소처럼 `OR2006C2C.EXE`로 실행하면 OpenXR host가 자동 시작됩니다.
+ZIP 내용을 `OR2006C2C.EXE`가 있는 게임 폴더에 덮어씁니다.
+
+- **일반 2D 실행:** `OR2006C2C.EXE`를 직접 실행합니다. 릴리즈 패키지에서는 VR 훅과 OpenXR host가 활성화되지 않습니다.
+- **VR 실행:** `Start-OutRun-VR.cmd`를 실행합니다. 이 런처만 명시적으로 VR을 활성화하고 OpenXR host를 시작합니다.
+- 기존 `OutRun2006Tweaks.user.ini`에 `VR.Enabled=true`가 남아 있어도 릴리즈판의 EXE 직접 실행은 2D로 강제됩니다.
 
 ## 검증
 

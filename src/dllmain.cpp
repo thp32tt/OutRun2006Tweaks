@@ -81,6 +81,24 @@ namespace Module
 		return enabled;
 	}
 
+	// Release packages are deliberately dual-entrypoint:
+	//   OR2006C2C.exe           -> normal 2D
+	//   Start-OutRun-VR.cmd     -> explicit VR opt-in
+	// Development/test payloads do not contain VR_RELEASE_VERSION.txt and keep
+	// their historical INI-driven behaviour.
+	bool ReleasePackageVrLaunchRequested() noexcept
+	{
+		const auto marker = DllPath.parent_path() / "VR_RELEASE_VERSION.txt";
+		if (GetFileAttributesW(marker.c_str()) == INVALID_FILE_ATTRIBUTES)
+			return true;
+
+		wchar_t env[16]{};
+		const DWORD envLen = GetEnvironmentVariableW(
+			L"OUTRUN_VR_LAUNCH", env, static_cast<DWORD>(std::size(env)));
+		return envLen > 0 && envLen < std::size(env) &&
+			ParseIniBool(env, false);
+	}
+
 	void to_log()
 	{
 		// Print some info about the users setup to log, can come in useful for debugging issues
@@ -154,6 +172,18 @@ void Plugin_Init()
 			// command-line override rather than disabling the entire user INI.
 			spdlog::info("Command-line overrides active: unrelated F11 settings remain writable; overridden keys excluded.");
 		} 
+	}
+
+	// A release package must never enter VR simply because the shipped INI or a
+	// stale OutRun2006Tweaks.user.ini still says Enabled=true. Only the release
+	// launcher sets OUTRUN_VR_LAUNCH=1; direct EXE launch is therefore forced to
+	// the original 2D path before any hook decides whether VR is active.
+	if (!Module::ReleasePackageVrLaunchRequested())
+	{
+		Settings::VREnabled = false;
+		spdlog::info(
+			"VR release entrypoint policy: direct OR2006C2C.exe launch uses 2D; "
+			"use Start-OutRun-VR.cmd for VR.");
 	}
 
 	if (Settings::UseNewInput)
