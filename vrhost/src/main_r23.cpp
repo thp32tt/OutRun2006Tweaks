@@ -2478,6 +2478,56 @@ namespace
             }
         }
 
+        // STATE_SUMO_FE is intentionally kept in the original 1920x1080
+        // logical coordinate space on the x86 side. When the game publishes
+        // the exact HWND client rectangle, that rectangle still contains the
+        // full portrait XR backbuffer. Recover the logical top-left fraction
+        // INSIDE the published mirror UV before submitting the LOCAL theater.
+        // This is not a 4:3 crop: the entire 16:9 logical selector/menu canvas
+        // remains present.
+        const auto publishedLogicalCanvasCrop =
+            !sourceIsSbs && publishedMirrorApplied &&
+            clientGameState == 0x20u
+            ? OutRunVrMenuAspect::PlanTopLeftLogicalCanvasCrop(
+                clientGameState,
+                static_cast<float>(c.projection_.width),
+                static_cast<float>(c.projection_.height))
+            : OutRunVrMenuAspect::LogicalCanvasCropPlan{};
+        bool publishedLogicalCanvasApplied =
+            publishedLogicalCanvasCrop.crop;
+        if (publishedLogicalCanvasApplied)
+        {
+            const float baseWidth = theaterUv.w;
+            const float baseHeight = theaterUv.h;
+            theaterUv.x += baseWidth * publishedLogicalCanvasCrop.offsetX;
+            theaterUv.y += baseHeight * publishedLogicalCanvasCrop.offsetY;
+            theaterUv.w = baseWidth * publishedLogicalCanvasCrop.width;
+            theaterUv.h = baseHeight * publishedLogicalCanvasCrop.height;
+            publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;
+        }
+
+        if (publishedLogicalCanvasApplied)
+        {
+            static std::uint64_t sumoLogicalHits = 0;
+            const auto hit = ++sumoLogicalHits;
+            if (hit <= 32 || (hit & (hit - 1)) == 0)
+            {
+                std::ostringstream trace;
+                trace
+                    << "[VR TRACE SUMO_FE LOGICAL CANVAS FULL]"
+                    << " hit=" << hit
+                    << " state=" << clientGameState
+                    << " xrPhysical=" << c.projection_.width << 'x'
+                    << c.projection_.height
+                    << " logical=1920x1080"
+                    << " outputUv=" << theaterUv.x << ',' << theaterUv.y
+                    << ',' << theaterUv.w << ',' << theaterUv.h
+                    << " aspect=" << publishedMirrorAspect
+                    << " authority=PUBLISHED_HWND_X_LOGICAL_BACKBUFFER_FRACTION\n";
+                OutRunVrEmitFullTrace(trace.str());
+            }
+        }
+
         const auto logicalCanvasCrop =
             !sourceIsSbs && !publishedMirrorApplied
             ? OutRunVrMenuAspect::PlanTopLeftLogicalCaptureUv(
@@ -2491,9 +2541,11 @@ namespace
                 static_cast<float>(c.projection_.width),
                 static_cast<float>(c.projection_.height))
             : OutRunVrMenuAspect::LogicalCanvasCapturePlan{};
-        const bool logicalCanvasCropApplied =
+        const bool fallbackLogicalCanvasApplied =
             !sourceIsSbs && !publishedMirrorApplied && logicalCanvasCrop.crop;
-        if (logicalCanvasCropApplied)
+        const bool logicalCanvasCropApplied =
+            publishedLogicalCanvasApplied || fallbackLogicalCanvasApplied;
+        if (fallbackLogicalCanvasApplied)
         {
             theaterUv.x = logicalCanvasCrop.x;
             theaterUv.y = logicalCanvasCrop.y;

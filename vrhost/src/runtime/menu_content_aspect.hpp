@@ -42,8 +42,10 @@ namespace OutRunVrMenuAspect
 
     // Quest runtime proof: early front-end/title/menu rasters can remain on
     // the game's logical 1920x1080 top-left canvas while the physical D3D9Ex
-    // target follows the taller OpenXR eye extent. Keep selector/advertise/
-    // gameplay/post-race owners out: those have independent verified routes.
+    // target follows the taller OpenXR eye extent. STATE_SUMO_FE is also a
+    // logical-canvas owner now that game-side portrait XR physicalization is
+    // explicitly vetoed for 0x20. This is a 16:9 logical-canvas recovery, NOT
+    // the separate 4:3 title crop; selector pixels inside 1920x1080 survive.
     constexpr bool IsTopLeftLogicalTheaterState(
         std::uint32_t state) noexcept
     {
@@ -57,6 +59,7 @@ namespace OutRunVrMenuAspect
         case 0x06u: // ENTRY
         case 0x08u: // ERROR
         case 0x09u: // MENU
+        case 0x20u: // SUMO_FE: title/main/selector share logical canvas
             return true;
         default:
             return false;
@@ -105,6 +108,7 @@ namespace OutRunVrMenuAspect
 
     static_assert(IsTopLeftLogicalTheaterState(0x04u));
     static_assert(IsTopLeftLogicalTheaterState(0x09u));
+    static_assert(IsTopLeftLogicalTheaterState(0x20u));
     static_assert(!IsTopLeftLogicalTheaterState(0x0Au));
     static_assert(!IsTopLeftLogicalTheaterState(0x10u));
     static_assert(!IsTopLeftLogicalTheaterState(0x17u));

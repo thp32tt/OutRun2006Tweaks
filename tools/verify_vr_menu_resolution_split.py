@@ -71,6 +71,8 @@ aspect = (root / 'vrhost/src/runtime/menu_content_aspect.hpp').read_text(encodin
 assert 'gameState == 0x00u || // SYSTEM / boot-title theater' in aspect
 assert 'gameState == 0x0Du || // START / loading theater' in aspect
 assert 'gameState == 0x20u;   // STATE_SUMO_FE runtime owner' in aspect
+assert 'case 0x20u: // SUMO_FE: title/main/selector share logical canvas' in aspect
+assert 'static_assert(IsTopLeftLogicalTheaterState(0x20u));' in aspect
 assert 'ownsFrontEndOpticalScale ? menuScale : 1.0f' in aspect
 assert 'cachedMenuScale != R23ConfiguredMenuScale' in host
 
@@ -86,6 +88,12 @@ assert 'quad.size.width = 2.f * theaterScale;' in theater
 assert 'quad.size.height = quad.size.width / aspect;' in theater
 assert 'const float theaterScale = !sourceIsSbs &&' in theater
 assert 'clientGameState != 0xFFFFFFFFu' in theater
+assert 'clientGameState == 0x20u' in theater
+assert 'PlanTopLeftLogicalCanvasCrop(' in theater
+assert 'publishedLogicalCanvasCrop.width' in theater
+assert 'publishedLogicalCanvasCrop.height' in theater
+assert 'publishedMirrorAspect = publishedLogicalCanvasCrop.aspect;' in theater
+assert '[VR TRACE SUMO_FE LOGICAL CANVAS FULL]' in theater
 assert 'if (!sourceIsSbs && publishedMirrorApplied &&\n            (clientGameState == 0x04u || clientGameState == 0x09u))' in theater
 assert 'clientGameState == 0x20u' not in theater.split(
     'bool authoredFourThreeApplied = false;', 1)[1].split(
