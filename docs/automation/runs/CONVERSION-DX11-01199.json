@@ -17,7 +17,7 @@
   "causal_repair_source_sha": "c28b5cbf3c2eef4d1d306fa9738503d0ea18ee7f",
   "material_result_sha": "c28b5cbf3c2eef4d1d306fa9738503d0ea18ee7f",
   "validation_bearing_result_sha": "c28b5cbf3c2eef4d1d306fa9738503d0ea18ee7f",
-  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
@@ -56,8 +56,16 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
-    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_ONLY_NO_HMD_OR_DESKTOP_GAME_OBSERVATION",
-    "activation_guard_and_fallback": "RAW opt-in; original D3D9 renderer and DX9Ex game input/FFB retained"
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; VISIBLE_FRAME_OUTPUT is the intended authenticated source-aligned partial RAW GPU RGB present path, NOT a runtime-observed native complete frame. Desktop game and Quest3/VDXR UNTESTED; full menu/car/race DX11 frame remains incomplete.",
+    "activation_guard_and_fallback": "RAW opt-in; original D3D9 renderer and DX9Ex game input/FFB retained",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_NATIVE_GPU_RGB_DRAW_CAPTURE_SELECTION",
+      "ORIGINAL_D3D9_SOURCE_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "blocking_evidence": "Previous RAW PRE/POST admission inspected D3D11 OM RTV AFTER ScopedNativeGameGpuTransferOutputs detached it, giving false negatives even for genuine game RGB Draws. 01199 fixed both FVF and SM3 callsites to snapshot exact RT0/PS/RGB write mask before transfer, C++ tests in native_raw_dual_tile_test.cpp, five exact-SHA CI PASS at c28b5cbf. No runtime observation."
   },
   "required_github_actions": [
     {
@@ -95,5 +103,66 @@
     }
   ],
   "next_feature_action": "Actual matching game desktop RAW opt-in menu/car/race run to establish whether source native GPU RGB Draw pixels are now visibly published, then complete contiguous full-resolution native D3D11 frame before stereo HMD promotion.",
-  "recorded_at": "2026-11-01 KST"
+  "recorded_at": "2026-11-01 KST",
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Prevent an in-flight native RAW GPU color sample from being consumed by game-authored non-RGB draws, and preserve authentic source RGB writes through D3D11 OM transfer detachment to the opt-in original D3D9 Present path.",
+    "acceptance_items": [
+      {
+        "id": "native_rgb_draw_selection",
+        "category": "end_to_end_behavior",
+        "behavior_area": "LIVE_GAME_D3D11_DRAW_CAPTURE",
+        "expected_behavior": "Real bound native source RTV0 with pixel shader and positive RGB write mask can queue a GPU PRE/POST capture after non-color menu passes, while other source Draws continue."
+      },
+      {
+        "id": "source_ownership_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ORIGINAL_D3D9_PRESENT_AND_INPUT",
+        "expected_behavior": "Depth-only, alpha-only, null or foreign target Draws cannot consume source RGB sample; GPU fence, RT identity, original Draw, DX9Ex fallback and input/FFB remain unchanged."
+      },
+      {
+        "id": "five_gate_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "WINDOWS_SOURCE_OPENXR_BACKEND_CI",
+        "expected_behavior": "All five mandatory push CI workflows succeed on the same 01199 material validation SHA; runtime HMD and desktop rendering remain untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_rgb_draw_selection": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_color_write_admission.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "01199 exact material SHA c28b5cbf; DX11 Fast Structural Checks Actions 41307482313 SUCCESS; source game desktop UNTESTED"
+    },
+    "source_ownership_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "01199 exact material SHA c28b5cbf; Build Actions 41307482330 SUCCESS and OpenXR architecture 41307482287 SUCCESS; runtime UNTESTED"
+    },
+    "five_gate_exact_sha": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_color_write_admission.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "01199 exact SHA c28b5cbf push 5/5 Actions SUCCESS: 41307482313,41307482351,41307482330,41307482287,41307482290"
+    }
+  },
+  "exact_sha_gate_runs": {
+    "DX11 Fast Structural Checks": 41307482313,
+    "Backend Conversion Gate": 41307482351,
+    "Build": 41307482330,
+    "OpenXR VR architecture": 41307482287,
+    "OutRun EXE HUD Inspector CI": 41307482290
+  },
+  "validation_note": "01199 five exact-SHA push workflow successes on c28b5cbf are historical and unchanged. 01200 causal CI policy fix restores missing feature contract and explicit source->partial visible path after 41312213558 and 41312213566 policy-only failures. No independent source feature or new score; runtime remains UNTESTED."
 }
