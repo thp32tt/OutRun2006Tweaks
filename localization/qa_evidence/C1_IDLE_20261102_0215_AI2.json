@@ -1,0 +1,45 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa_idle.v1",
+  "task_id": "OUTRUN-C1-AI2-20261102T0215KST-IDLE",
+  "role": "C1",
+  "time_window_kst": "2026-11-02 02:15",
+  "inventory_checked_at_kst": "2026-11-02T02:17:11+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "inventory_base_head": "f1ba415562da758d7368f54bd18df90219c81fb7",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inspection": {
+    "type": "read_only",
+    "candidate_root": "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs",
+    "receipt_root": "/home/chatgpt-runner2/work/image-src/text_roi_batches/export_evidence",
+    "reviewed_sha_source": "/home/chatgpt-runner2/work/C1_QA_*_report.json / *_metrics.json / prior C1 batch reports",
+    "existing_inventory_script": "work/C1_QA_20261101_2145_AI2_inventory.py",
+    "reviewed_sha_count": 960,
+    "candidate_file_count": 955,
+    "candidates_by_role": {
+      "A": 454,
+      "B": 501
+    },
+    "export_filename_record_count": 955,
+    "candidates_missing_export_record": 0,
+    "unseen_candidate_sha_count": 0,
+    "comparison_note": "All 955 candidate files were SHA256 hashed and compared to previously reviewed SHA records. Export evidence matched by filename. This inventory pass did not independently revalidate all export SHA fields."
+  },
+  "results": {
+    "state": "IDLE",
+    "new_sha": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "scope": "No new visual judgement, no ImageGen generation, no A/B queue consumption, no DDS final composition or deployment, no C2/C3 or in-game PASS. Previously reviewed SHA are not revisited.",
+  "score": {
+    "scoreboard_ai": "AI 2",
+    "score_change": 0,
+    "reason": "IDLE inventory only; no new independently verified QA achievement"
+  }
+}
