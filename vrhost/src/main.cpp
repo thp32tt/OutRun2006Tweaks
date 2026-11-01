@@ -1460,6 +1460,14 @@ namespace
             query.Query = D3D11_QUERY_EVENT;
             if (FAILED(device_->CreateQuery(&query, &fence)) || !fence)
             {
+                // CopyResource has already been queued. Without an EVENT
+                // fence it is unsafe to recycle these candidate textures.
+                ReleaseCom(directPendingLeftSrv_);
+                ReleaseCom(directPendingLeft_);
+                ReleaseCom(directPendingRightSrv_);
+                ReleaseCom(directPendingRight_);
+                directPendingWidth_ = directPendingHeight_ = 0;
+                directPendingFormat_ = DXGI_FORMAT_UNKNOWN;
                 directTransportReady_ = false;
                 return false;
             }

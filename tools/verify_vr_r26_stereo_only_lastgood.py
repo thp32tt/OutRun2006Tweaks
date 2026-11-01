@@ -75,6 +75,15 @@ assert "void DiscardPendingDirectStereoSource()" in host
 assert "sourceReady=compositor.PreparePendingDirectStereoSource(before);" in host
 assert "compositor.AcceptPendingDirectStereoSource()" in host
 assert "compositor.DiscardPendingDirectStereoSource();" in host
+# CopyResource may already be queued when CreateQuery fails; never recycle
+# those candidate allocations without a fence.
+candidate=host.split("bool PreparePendingDirectStereoSource(",1)[1].split("bool AcceptPendingDirectStereoSource()",1)[0]
+queryFailure=candidate.split("if (FAILED(device_->CreateQuery(&query, &fence)) || !fence)",1)[1].split("context_->End(fence)",1)[0]
+assert "ReleaseCom(directPendingLeft_);" in queryFailure
+assert "ReleaseCom(directPendingRight_);" in queryFailure
+assert "directTransportReady_ = false;" in queryFailure
+assert "directFrameValid_ = false;" not in candidate
+
 assert "directFrameValid_=false;" not in host.split("bool PrepareDirectStereoSource(",1)[1].split("bool PreparePendingDirectStereoSource(",1)[0]
 assert "if (R9FrameMonoPolicyLatched)" in guard
 assert "R9FrameMonoPolicyLatched = true;" in clear
