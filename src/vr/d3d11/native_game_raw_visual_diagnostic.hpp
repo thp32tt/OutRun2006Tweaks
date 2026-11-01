@@ -28,6 +28,7 @@
 #include "native_game_raw_source_target_identity.hpp"
 #include "native_game_raw_color_write_admission.hpp"
 #include "native_game_raw_fvf_clip_capture.hpp"
+#include "native_game_raw_fvf_island_sampling.hpp"
 
 namespace outrun::vr::dx11 {
 // Keep genuine GPU RAW pixel locations SOURCE-COINCIDENT with a game
@@ -1213,6 +1214,7 @@ private:
         // the established whole-viewport path; never skip the actual Draw.
         D3D11_RASTERIZER_DESC rasterDesc{};
         if (raster) raster->GetDesc(&rasterDesc);
+        bool authenticFvfFootprint = false;
         if (fvfClip.firstClip &&
             (!raster || (rasterDesc.FillMode == D3D11_FILL_SOLID &&
                          rasterDesc.DepthClipEnable))) {
@@ -1226,14 +1228,25 @@ private:
                     (std::min)(draw.right, clipped.right),
                     (std::min)(draw.bottom, clipped.bottom)};
                 if (intersection.right > intersection.left &&
-                    intersection.bottom > intersection.top)
+                    intersection.bottom > intersection.top) {
                     draw = intersection;
+                    authenticFvfFootprint = true;
+                }
             }
         }
         NativeRawDualTile tiles{};
-        if (!native_raw_swept_dual_draw_tile(
+        const auto drawOrdinal = static_cast<std::uint32_t>(capture_);
+        // Two distant game menu/HUD triangles can have an empty merged
+        // raster center. Sample the actual native GPU at both primitive
+        // islands; retain the old viewport sweep for unknown source IA.
+        if (!(authenticFvfFootprint &&
+              native_raw_fvf_island_dual_draw_tile(
+                  fvfClip, view.TopLeftX, view.TopLeftY,
+                  view.Width, view.Height, src.Width, src.Height,
+                  width, height, draw, drawOrdinal, tiles)) &&
+            !native_raw_swept_dual_draw_tile(
                 src.Width, src.Height, width, height, draw,
-                static_cast<std::uint32_t>(capture_), tiles))
+                drawOrdinal, tiles))
             return NativeRawPreviewResult::NoDraw;
         ++capture_;
         region_ = D3D11_BOX{tiles.first.x, tiles.first.y, 0u,

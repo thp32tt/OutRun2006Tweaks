@@ -2,6 +2,7 @@
 #include "src/vr/d3d11/native_game_raw_color_transport.hpp"
 #include "src/vr/d3d11/native_game_raw_color_write_admission.hpp"
 #include "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp"
+#include "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp"
 #include "src/vr/d3d11/native_game_raw_changed_pixel_window.hpp"
 #include "src/vr/d3d11/native_game_raw_present_coverage.hpp"
 #include "src/vr/d3d11/native_game_raw_source_target_identity.hpp"
@@ -327,8 +328,63 @@ bool native_raw_fvf_clip_capture_regression() {
     return true;
 }
 
+// One real FVF Draw can span disjoint left-menu and right-HUD islands.
+// Its merged rectangle can direct BOTH legacy GPU captures to empty space.
+bool native_raw_fvf_island_regression() {
+    constexpr std::array<std::array<float,4>,6> vertices{{
+        {{-0.96f,-0.3f,0.5f,1.f}}, {{-0.84f,-0.3f,0.5f,1.f}},
+        {{-0.9f,0.1f,0.5f,1.f}},
+        {{0.84f,-0.3f,0.5f,1.f}}, {{0.96f,-0.3f,0.5f,1.f}},
+        {{0.9f,0.1f,0.5f,1.f}}
+    }};
+    const NativeRawFvfClipSpan original{
+        vertices.data(),sizeof(vertices[0]),vertices.size()};
+    const NativeRawDrawExtent canvas{0,0,3440,1440};
+    NativeRawDualTile tile{};
+    const auto capture = [&](NativeRawFvfClipSpan span,
+        NativeRawDrawExtent clip, std::uint32_t turn) {
+        return native_raw_fvf_island_dual_draw_tile(
+            span,0,0,3440,1440,3440,1440,512,288,clip,turn,tile);
+    };
+    if (!capture(original,canvas,0u) || !tile.hasSecond ||
+        tile.first.x > 512u || tile.second.x < 2400u ||
+        !native_raw_source_tiles_disjoint(tile.first,tile.second,512,288))
+        return false;
+    if (!capture(original,canvas,1u) || !tile.hasSecond ||
+        tile.first.x < 2400u || tile.second.x > 512u)
+        return false;
+    constexpr std::array<std::uint32_t,6> reversed{{3,4,5,0,1,2}};
+    const NativeRawFvfClipSpan indexed{
+        vertices.data(),sizeof(vertices[0]),vertices.size(),
+        reversed.data(),reversed.size()};
+    if (!capture(indexed,canvas,0u) || !tile.hasSecond ||
+        tile.first.x < 2400u || tile.second.x > 512u)
+        return false;
+    // A scissor that excludes the right polygon cannot sample it.
+    if (!capture(original,{0,0,800,1440},1u) || tile.hasSecond ||
+        tile.first.x > 512u) return false;
+    auto malformed = reversed;
+    malformed[4] = 99u;
+    if (capture({vertices.data(),sizeof(vertices[0]),vertices.size(),
+                 malformed.data(),malformed.size()},canvas,0u))
+        return false;
+    auto invalid = vertices;
+    invalid[4][3] = 0.f;
+    if (capture({invalid.data(),sizeof(invalid[0]),invalid.size()},
+                canvas,0u)) return false;
+    // A large single primitive must still produce two independent GPU
+    // source regions under the original swept sampling algorithm.
+    constexpr std::array<std::array<float,4>,3> broad{{
+        {{-0.9f,-0.9f,0.5f,1.f}},{{0.9f,-0.9f,0.5f,1.f}},
+        {{0.f,0.9f,0.5f,1.f}}
+    }};
+    return capture({broad.data(),sizeof(broad[0]),broad.size()},
+                   canvas,0u) && tile.hasSecond;
+}
+
 int main() {
     assert(native_raw_fvf_clip_capture_regression());
+    assert(native_raw_fvf_island_regression());
     assert(native_raw_source_color_write_selection_regression());
     {
         constexpr std::uint32_t w=2u,h=2u;
