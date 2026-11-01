@@ -107,19 +107,19 @@
     "goal": "Admit authentic game FVF triangles crossing the homogeneous eye plane to native D3D11 PRE/POST GPU RGB captures without treating the partial diagnostic as full-game or HMD validation.",
     "acceptance_items": [
       {
-        "id": "crossing_eye_plane_gpu_source",
+        "id": "homogeneous_eye_plane_clip",
         "category": "end_to_end_behavior",
         "behavior_area": "NATIVE_REAL_GAME_GPU_RGB",
         "expected_behavior": "Finite original D3D9 FVF triangles crossing W sign contribute their clipped screen raster to the real game native GPU capture and D3D9-authenticated Present path."
       },
       {
-        "id": "invalid_source_no_promotion",
+        "id": "source_gpu_tile_and_negative_regression",
         "category": "fallback_regression",
         "behavior_area": "D3D9_SOURCE_INPUT_FFB",
         "expected_behavior": "W=0, nonfinite IA, behind-camera triangles or unknown raster states cannot promote a fake native frame; retain unchanged source identity, original input/FFB and DX9Ex fallback."
       },
       {
-        "id": "same_sha_exact_gates",
+        "id": "five_exact_sha_gates",
         "category": "integrated_validation",
         "behavior_area": "BUILD_FAST_OPENXR_HUD",
         "expected_behavior": "All five mandatory GitHub Actions checked at source-exact SHA; desktop game/Quest3 visual validation kept UNTESTED."
