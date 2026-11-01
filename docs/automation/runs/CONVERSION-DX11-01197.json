@@ -36,7 +36,8 @@
       "D3D11_NATIVE_DRAW",
       "SOURCE_GPU_RAW_PRE_POST_TILE",
       "AUTHENTIC_RASTER_CELL_SWEEP",
-      "ORIGINAL_D3D9_SOURCE_PRESENT"
+      "ORIGINAL_D3D9_SOURCE_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "integration_path": [
       "REAL_GAME_D3D11_GPU_SOURCE",
@@ -59,8 +60,9 @@
       "tests/native_raw_dual_tile_test.cpp"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; PARTIAL_GPU_SOURCE_PIXELS; NOT_FULL_NATIVE_MENU_CAR_RACE_OR_STEREO",
-    "activation_guard_and_fallback": "RAW opt-in default OFF, existing original D3D9 GPU fence/RT/Present safeguards and DX9Ex/input/FFB fallback unchanged."
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY; FULL_NATIVE_FRAME_NOT_ESTABLISHED; VISIBLE_FRAME_OUTPUT is the intended source-aligned original D3D9 Present integration endpoint and NOT a claim of observed runtime output. No game desktop or Quest3 test occurred.",
+    "activation_guard_and_fallback": "RAW opt-in default OFF, existing original D3D9 GPU fence/RT/Present safeguards and DX9Ex/input/FFB fallback unchanged.",
+    "blocking_evidence": "At source base 9a4c31688e1be796f42725139743e7a605ed7071, native_game_raw_dual_tile.hpp used firstIndex=(2*ordinal)%cells, which provably visits only 6/12 cells on a 4x3 authentic menu/car GPU raster. Implementation da70c65b56697dea854960d0a8576f97157022e0 replaces the aliased stride with ordinal%cells and adds compile-time positive/negative even-grid tests in tests/native_raw_dual_tile_test.cpp; five exact-SHA mandatory push CI success on that implementation. No game/HMD display was observed."
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -119,7 +121,7 @@
     "OpenXR VR architecture": 41298017931,
     "OutRun EXE HUD Inspector CI": 41298017911
   },
-  "validation_note": "Five push Actions SUCCESS at implementation exact SHA. C6 is separate docs-only bookkeeping commit; not an additional development outcome. No real game, full frame, stereo or HMD test was run.",
+  "validation_note": "Five push Actions SUCCESS at implementation exact SHA. C6 is separate docs-only bookkeeping commit; not an additional development outcome. No real game, full frame, stereo or HMD test was run. 2026-11-01 follow-up 01198: CI policy regression (41302727057, 41302727049) found missing blocking_evidence and VISIBLE_FRAME_OUTPUT strategy stage in this older C6 record; repaired without altering source SHA, historic 01197 five-gate receipts or scoring.",
   "actual_runtime_evidence": "NOT_RUN_NO_GAME_DESKTOP_NO_QUEST3_VDXR",
   "native_gpu_pixels_observed": "UNTESTED",
   "full_menu_vehicle_race": "INCOMPLETE",
