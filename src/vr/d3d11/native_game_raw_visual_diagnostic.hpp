@@ -1214,6 +1214,15 @@ private:
         // the established whole-viewport path; never skip the actual Draw.
         D3D11_RASTERIZER_DESC rasterDesc{};
         if (raster) raster->GetDesc(&rasterDesc);
+        // Mirror the same RS cull + front-winding state that owns the real
+        // D3D11 Draw. Do not sample fully culled triangles as candidate
+        // native RGB pixels; unknown cull modes keep the old sweep.
+        const NativeRawFvfRaster fvfRaster{
+            rasterDesc.CullMode == D3D11_CULL_FRONT
+                ? NativeRawFvfCull::Front
+                : rasterDesc.CullMode == D3D11_CULL_BACK
+                    ? NativeRawFvfCull::Back : NativeRawFvfCull::None,
+            raster && rasterDesc.FrontCounterClockwise != FALSE};
         bool authenticFvfFootprint = false;
         if (fvfClip.firstClip &&
             (!raster || (rasterDesc.FillMode == D3D11_FILL_SOLID &&
@@ -1221,7 +1230,7 @@ private:
             NativeRawDrawExtent clipped{};
             if (native_raw_fvf_projected_raster(
                     fvfClip, view.TopLeftX, view.TopLeftY,
-                    view.Width, view.Height, clipped)) {
+                    view.Width, view.Height, clipped, nullptr, &fvfRaster)) {
                 const NativeRawDrawExtent intersection{
                     (std::max)(draw.left, clipped.left),
                     (std::max)(draw.top, clipped.top),
@@ -1243,7 +1252,7 @@ private:
               native_raw_fvf_island_dual_draw_tile(
                   fvfClip, view.TopLeftX, view.TopLeftY,
                   view.Width, view.Height, src.Width, src.Height,
-                  width, height, draw, drawOrdinal, tiles)) &&
+                  width, height, draw, drawOrdinal, tiles, &fvfRaster)) &&
             !native_raw_swept_dual_draw_tile(
                 src.Width, src.Height, width, height, draw,
                 drawOrdinal, tiles))

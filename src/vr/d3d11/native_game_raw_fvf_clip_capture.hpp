@@ -14,6 +14,14 @@ namespace outrun::vr::dx11 {
 enum class NativeRawFvfAssembly : std::uint8_t {
     TriangleList, TriangleStrip, TriangleFan
 };
+// Bind source-authentic D3D11 RS face culling to the RAW GPU sampling
+// geometry. This changes only the PRE/POST capture search; the real native
+// Draw and the unmodified D3D9 gameplay/fallback remain authoritative.
+enum class NativeRawFvfCull : std::uint8_t { None, Front, Back };
+struct NativeRawFvfRaster {
+    NativeRawFvfCull cull = NativeRawFvfCull::None;
+    bool frontCounterClockwise = false;
+};
 struct NativeRawFvfClipSpan {
     const void* firstClip = nullptr;
     std::size_t vertexStride = 0u;
@@ -35,7 +43,8 @@ struct NativeRawFvfClipSpan {
     NativeRawFvfClipSpan source,
     float viewportX, float viewportY, float viewportW, float viewportH,
     NativeRawDrawExtent& raster,
-    const NativeRawDrawExtent* sourceScissor = nullptr) noexcept {
+    const NativeRawDrawExtent* sourceScissor = nullptr,
+    const NativeRawFvfRaster* rasterState = nullptr) noexcept {
     raster = {};
     if (!source.firstClip || source.vertexStride < sizeof(float) * 4u ||
         source.vertexStride > 4096u || source.count < 3u ||
@@ -112,7 +121,11 @@ struct NativeRawFvfClipSpan {
                 source.assembly == NativeRawFvfAssembly::TriangleList
                     ? triangle * 3u + corner
                     : source.assembly == NativeRawFvfAssembly::TriangleStrip
-                        ? triangle + corner
+                        // The D3D11 IA swaps the first two vertices on
+                        // odd strips. Without this the cull-facing test
+                        // misses every other real menu/race triangle.
+                        ? triangle + ((triangle & 1u) && corner < 2u
+                                          ? 1u - corner : corner)
                         : corner == 0u ? 0u : triangle + corner;
             const auto vertex = source.indices
                 ? static_cast<std::size_t>(source.indices[element]) : element;
@@ -239,6 +252,16 @@ struct NativeRawFvfClipSpan {
         }
         if (!std::isfinite(area)) return false;
         if (std::abs(area) <= 1.0e-12) continue;
+        if (rasterState && rasterState->cull != NativeRawFvfCull::None) {
+            // Viewport Y reverses the NDC polygon winding. A negative
+            // NDC area is clockwise on the D3D11 screen render target;
+            // FrontCounterClockwise reverses the accepted face.
+            const bool sourceFront = rasterState->frontCounterClockwise
+                ? area > 0.0 : area < 0.0;
+            if ((sourceFront && rasterState->cull == NativeRawFvfCull::Front) ||
+                (!sourceFront && rasterState->cull == NativeRawFvfCull::Back))
+                continue;
+        }
         anyVisible = true;
         for (std::size_t i = 0u; i < polygonCount; ++i) {
             const auto& p = polygon[i];

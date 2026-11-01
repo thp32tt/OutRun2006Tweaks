@@ -18,11 +18,12 @@ namespace outrun::vr::dx11 {
     std::uint32_t sw, std::uint32_t sh,
     std::uint32_t tw, std::uint32_t th,
     NativeRawDrawExtent admitted, std::uint32_t ordinal,
-    NativeRawDualTile& out) noexcept {
+    NativeRawDualTile& out,
+    const NativeRawFvfRaster* rasterState = nullptr) noexcept {
     out = {};
     NativeRawDrawExtent assembled{};
     if (!native_raw_fvf_projected_raster(
-            source, vx, vy, vw, vh, assembled, &admitted) ||
+            source, vx, vy, vw, vh, assembled, &admitted, rasterState) ||
         !sw || !sh || !tw || !th || tw > sw || th > sh ||
         admitted.left >= admitted.right ||
         admitted.top >= admitted.bottom) return false;
@@ -43,14 +44,15 @@ namespace outrun::vr::dx11 {
             const auto element = source.assembly == NativeRawFvfAssembly::TriangleList
                 ? t * 3u + j
                 : source.assembly == NativeRawFvfAssembly::TriangleStrip
-                    ? t + j : j == 0u ? 0u : t + j;
+                    ? t + ((t & 1u) && j < 2u ? 1u - j : j)
+                    : j == 0u ? 0u : t + j;
             indices[j] = source.indices
                 ? source.indices[element] : static_cast<std::uint32_t>(element);
         }
         if (!native_raw_fvf_projected_raster(
                 {source.firstClip, source.vertexStride, source.count,
                  indices, 3u, NativeRawFvfAssembly::TriangleList},
-                vx, vy, vw, vh, triangle, &admitted))
+                vx, vy, vw, vh, triangle, &admitted, rasterState))
             return false;
         triangle.left = (std::max)(triangle.left,
             (std::max)(admitted.left, assembled.left));

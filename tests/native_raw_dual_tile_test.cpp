@@ -611,7 +611,102 @@ bool native_raw_fvf_large_island_phase_regression() {
     return true;
 }
 
+
+bool native_raw_fvf_live_cull_gpu_capture_regression() {
+    const auto reject = [](int line) noexcept {
+        std::fprintf(stderr, "FVF native GPU cull capture failed at %d\\n", line);
+        return false;
+    };
+    // Native game RS front faces are clockwise in screen coordinates
+    // unless FrontCounterClockwise is set. Opposite-facing game triangles
+    // occupy disjoint screen islands, so sampling the wrong face misses
+    // all real GPU-generated RGB even when the Draw succeeds.
+    constexpr std::array<std::array<float,4>,6> positions{{
+        {{-0.95f,-0.10f,0.5f,1.f}}, {{-0.70f,-0.10f,0.5f,1.f}},
+        {{-0.80f, 0.30f,0.5f,1.f}}, // back-facing left island
+        {{ 0.70f, 0.20f,0.5f,1.f}}, {{ 0.80f, 0.40f,0.5f,1.f}},
+        {{ 0.95f, 0.20f,0.5f,1.f}}  // front-facing right island
+    }};
+    const NativeRawFvfClipSpan scene{
+        positions.data(),sizeof(positions[0]),positions.size()};
+    const NativeRawFvfRaster cullBack{NativeRawFvfCull::Back,false};
+    const NativeRawFvfRaster cullFront{NativeRawFvfCull::Front,false};
+    const NativeRawFvfRaster flipped{NativeRawFvfCull::Back,true};
+    NativeRawDrawExtent front{}, back{}, opposite{}, unculled{};
+    if (!native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,front,nullptr,&cullBack) ||
+        !native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,back,nullptr,&cullFront) ||
+        !native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,opposite,nullptr,&flipped) ||
+        !native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,unculled) ||
+        front.left < 2900 || back.right > 520 ||
+        (opposite.left != back.left || opposite.top != back.top ||\n         opposite.right != back.right || opposite.bottom != back.bottom) ||\n        unculled.left > back.left ||
+        unculled.right < front.right)
+        return reject(__LINE__);
+    NativeRawDualTile gpu{};
+    if (!native_raw_fvf_island_dual_draw_tile(
+            scene,0,0,3440,1440,3440,1440,512,288,
+            {0,0,3440,1440},0u,gpu,&cullBack) ||
+        gpu.first.x < 2800u ||
+        !native_raw_fvf_island_dual_draw_tile(
+            scene,0,0,3440,1440,3440,1440,512,288,
+            {0,0,3440,1440},0u,gpu,&cullFront) ||
+        gpu.first.x > 520u)
+        return reject(__LINE__);
+    // The hardware flips triangle-strip winding on each primitive.
+    // Explicitly assembled list and actual strip MUST produce the same
+    // visible two-triangle screen footprint with CullBack enabled.
+    constexpr std::array<std::array<float,4>,4> strip{{
+        {{-0.6f,-0.4f,0.5f,1.f}}, {{-0.3f,0.4f,0.5f,1.f}},
+        {{ 0.0f,-0.4f,0.5f,1.f}}, {{ 0.3f,0.4f,0.5f,1.f}}
+    }};
+    constexpr std::array<std::uint32_t,6> triangleList{{0,1,2,2,1,3}};
+    const NativeRawFvfClipSpan stripSource{
+        strip.data(),sizeof(strip[0]),strip.size(),nullptr,0,
+        NativeRawFvfAssembly::TriangleStrip};
+    const NativeRawFvfClipSpan listSource{
+        strip.data(),sizeof(strip[0]),strip.size(),
+        triangleList.data(),triangleList.size(),
+        NativeRawFvfAssembly::TriangleList};
+    NativeRawDrawExtent stripRaster{}, listRaster{};
+    if (!native_raw_fvf_projected_raster(
+            stripSource,0,0,3440,1440,stripRaster,nullptr,&cullBack) ||
+        !native_raw_fvf_projected_raster(
+            listSource,0,0,3440,1440,listRaster,nullptr,&cullBack) ||
+        stripRaster.left != listRaster.left ||
+        stripRaster.right != listRaster.right ||
+        stripRaster.top != listRaster.top ||
+        stripRaster.bottom != listRaster.bottom)
+        return reject(__LINE__);
+    NativeRawDualTile stripGpu{}, listGpu{};
+    if (!native_raw_fvf_island_dual_draw_tile(
+            stripSource,0,0,3440,1440,3440,1440,512,288,
+            {0,0,3440,1440},1u,stripGpu,&cullBack) ||
+        !native_raw_fvf_island_dual_draw_tile(
+            listSource,0,0,3440,1440,3440,1440,512,288,
+            {0,0,3440,1440},1u,listGpu,&cullBack) ||
+        stripGpu.first.x != listGpu.first.x ||
+        stripGpu.first.y != listGpu.first.y)
+        return reject(__LINE__);
+    // Invalid W and unreferenced vertices must remain fail closed, even
+    // when the other submitted triangle is front-facing.
+    auto invalid = positions;
+    invalid[5][3] = 0.f;
+    if (native_raw_fvf_projected_raster(
+            {invalid.data(),sizeof(invalid[0]),invalid.size()},
+            0,0,3440,1440,front,nullptr,&cullBack))
+        return reject(__LINE__);
+    const NativeRawFvfRaster noCull{NativeRawFvfCull::None,false};
+    if (!native_raw_fvf_projected_raster(
+            scene,0,0,3440,1440,front,nullptr,&noCull) ||
+        front.left != unculled.left || front.right != unculled.right)
+        return reject(__LINE__);
+    return true;
+}
 int main() {
+    assert(native_raw_fvf_live_cull_gpu_capture_regression());
     assert(native_raw_fvf_clip_capture_regression());
     assert(native_raw_fvf_large_island_phase_regression());
     assert(native_raw_fvf_island_regression());
