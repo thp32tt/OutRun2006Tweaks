@@ -62,6 +62,11 @@
       "ORIGINAL_IA_FAIL_CLOSED_REGRESSION",
       "EXACT_SHA_CXX_AND_WINDOWS_VALIDATION"
     ],
+    "acceptance_proof": {
+      "positive_probe": "01206 native_raw_dual_tile_test authentic clipped FVF source polygon/scissor positive and mixed triangle coverage; Fast Structural 41342471664 SUCCESS at prior 01206 validation SHA cf6c2db465f0b3a4a8b6caa64b72ffa9acf4a02a.",
+      "negative_regression": "Polygon bounding rectangle alone cannot admit an off-scissor real source primitive; malformed FVF IA and original D3D9 source device, GPU RGB and Present safety gates remain guarded. Prior 01206 exact-SHA five Actions SUCCESS.",
+      "component_integration": "Live game FVF Draw to native D3D11 actual clipped triangle GPU PRE/POST capture, authentic source RT/Present consumer, protected DX9Ex fallback; original 01206 build verification only, Windows game/Quest3 HMD UNTESTED. CI record-only repair on 01207 +0."
+    },
     "conflict_keys": [
       "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
       "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
