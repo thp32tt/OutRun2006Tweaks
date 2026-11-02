@@ -123,7 +123,7 @@
     "OpenXR VR architecture": 41384093337,
     "OutRun EXE HUD Inspector CI": 41384093351
   },
-  "checkpoint": "C6_RESULT_ONLY_AFTER_EXACT_SHA_PASS",
+  "checkpoint": "C6_STATE",
   "record_type": "C6_RESULT_ONLY",
   "score_note": "No independent full DX11 gameplay capability completion; existing DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME feature remains unfinished. 01214 source + 01213 CI record repair + full gate + C6 count +0, no duplicate AI2 score.",
   "ci_repair_summary": "Initial 01214 0f12dff6 Fast 41383833520/Backend 41383833665 failed policy preflight: inherited 01213 terminal feature record lacked three acceptance_results despite its original five exact-SHA SUCCESS. Exact GitHub proof repaired under same 01214 in 7736b6de; five 01214 mandatory Gates SUCCESS. No CI-skip on material or validation-bearing result; C6 docs-only is separate."
