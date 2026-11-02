@@ -254,6 +254,18 @@ if($QuestCockpitV2FrameOnly -eq 'ON') {
     $env:OUTRUN_VR_FILE_LOG='1'
     Write-Host 'QuestCockpitV2 FRAME-ONLY hook isolation: no cockpit geometry/camera mutation.'
 }
+# On the baseline control, OVERRIDE any stale user.ini options as well.
+# Otherwise a previous experimental config can silently contaminate
+# the no-hooks control run and make the A/B diagnosis invalid.
+if($QuestCockpitV2 -eq 'OFF' -and $QuestCockpitV2FrameOnly -eq 'OFF') {
+    $gameArgs += @(
+        '-VR.QuestCockpitV2Enabled=false',
+        '-VR.QuestCockpitV2OccupantCorrection=false',
+        '-VR.QuestCockpitV2OccupantLod0=false',
+        '-VR.QuestCockpitV2F0RenderScope=false',
+        '-VR.CockpitFrameProbe=false'
+    )
+}
 # Dedicated experimental cockpit launcher. Default stays OFF.
 if($QuestCockpitV2Lod0 -eq 'ON' -and $QuestCockpitV2 -ne 'ON') {
     throw 'Occupant LOD0 requires QuestCockpitV2 ON'

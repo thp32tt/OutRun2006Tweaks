@@ -25,3 +25,5 @@ Original Quest view+0x35 writer remains UNPROVEN: test-only opt-in.
 Normal/F0 scripts keep LOD0 OFF. RUNTIME_VALIDATION=UNTESTED.
 
 2026-11-02 23:24 KST user crash A/B: both normal V2 and F0 exit 0xC0000409 during initialization, prior to first game Present. RUNTIME_VALIDATION=FAILED for that build, not evidence of F0 failure. The follow-up safety patch avoids reading camera/event work and XR state from original ROB/49F3E0 callbacks before the game is in an eligible gameplay frame. This is static risk reduction, not a proven crash resolution. New RUN-QUEST-COCKPIT-V2-DIAG.cmd: test 1 stable VR no cockpit hooks, 2 native hook setup only, 3 V2, then optionally 4 F0 / 5 LOD0. Send the NEW session ZIP from the first failure; if baseline (1) fails, do not attempt other options. New runtime HMD validation remains UNTESTED.
+
+Crash A/B control correctness: diagnostic option 1 explicitly overrides stale OutRun2006Tweaks.user.ini cockpit/frame-probe flags OFF. This makes the no-hooks baseline a valid comparison even after earlier experimental sessions.
