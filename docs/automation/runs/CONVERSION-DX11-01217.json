@@ -7,7 +7,7 @@
   "branch": "vr-dx11-native-r71",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "classification": "A_UNFINISHED_REAL_GAME_NATIVE_SOURCE",
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "043d64999a6bcff5bb8c877ecc64d8773f787b59",
