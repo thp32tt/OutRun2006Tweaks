@@ -570,7 +570,8 @@ if ($backend -eq 'd3d9') {
             # are accepted by the game setting parser. Previously, -VR.X=true
             # was silently ignored here and the host inherited stale INI
             # DirectGpuOnly=true even when the CLASSIC A/B forced it false.
-            if ($argument -match '^-(?:VR\.)?([A-Za-z][A-Za-z0-9]*)=(.*)
+            if ($argument -match '^-(?:VR\.)?([A-Za-z][A-Za-z0-9]*)=(.*)$') {
+                $effectiveVrArguments[$matches[1]] = $matches[2]
             }
         }
         function Get-VrRuntimeValue([string]$key, [string]$fallback) {
