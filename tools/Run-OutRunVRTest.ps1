@@ -291,6 +291,13 @@ if($QuestCockpitV2 -eq 'ON'){
     Write-Host 'QuestCockpitV2 experimental original-mode1: enabled for THIS launch only.'
 }
 if($backend -ne '2d'){
+    # Match v0.01 Beta explicit VR entrypoint. A release VERSION marker
+    # can survive when users unzip a test package over the beta folder.
+    # Its DllMain gate *requires* OUTRUN_VR_LAUNCH=1; cockpit flags do
+    # not bypass it. The standalone test must never silently become 2D.
+    $gameArgs+=@('-VR.Enabled=true','-VR.AutoLaunchHost=true')
+}
+if($backend -ne '2d'){
     # The optional C gameplay preset must not force per-draw HUD inspector
     # overhead. Keep HUD Inspector ON for all existing diagnostic sessions.
     $gameArgs += if($measuredCProduction){'-HudInspector=false'}else{'-HudInspector=true'}
@@ -345,6 +352,8 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "gpuLabSSAAExpectedGate=$(if($gpuLabActive){$GpuLabTransparency}else{'UNSPECIFIED'})"
     "gpuLabSSAAValidation=CHECK_VR_GPU_LAB_SSAA_GATE_AND_DEVICE_LINES"
     "forceVrDisabled=$($backend -eq '2d')"
+    "releaseMarkerPresent=$(Test-Path -LiteralPath (Join-Path $root 'VR_RELEASE_VERSION.txt'))"
+    "vrLaunchExplicit=$($backend -ne '2d')"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"
@@ -353,6 +362,7 @@ $dxvkMode = $backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'
 $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
+$oldVrLaunch = $env:OUTRUN_VR_LAUNCH
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldGpuProfiling = $env:OUTRUN_VR_GPU_PROFILE
 $oldPacingDiagnostics = $env:OUTRUN_VR_PACING_DIAGNOSTICS
@@ -400,9 +410,11 @@ if($backend -ne '2d'){
 }
 
 if($backend -eq '2d'){
+    $env:OUTRUN_VR_LAUNCH='0'
     $env:OUTRUN_VR_FORCE_DISABLED='1'
     Write-Host '2D control isolation: all OpenXR/VR hook installers are disabled for this process.'
 }else{
+    $env:OUTRUN_VR_LAUNCH='1'
     $env:OUTRUN_VR_FORCE_DISABLED=$null
 }
 
@@ -724,6 +736,7 @@ try{
     $env:OUTRUN_VR_GPU_PROFILE=$oldGpuProfiling
     $env:OUTRUN_VR_PACING_DIAGNOSTICS=$oldPacingDiagnostics
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
+    $env:OUTRUN_VR_LAUNCH=$oldVrLaunch
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     $env:OUTRUN_VR_R30_PARTICLE_VB=$oldParticleGpuUpload

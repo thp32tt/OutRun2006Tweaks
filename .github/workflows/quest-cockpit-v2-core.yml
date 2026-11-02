@@ -14,6 +14,8 @@ on:
       - 'tools/tests/quest_cockpit_v2_occupant_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp'
       - 'tools/Run-OutRunVRTest.ps1'
+      - 'Run-QuestCockpitV2-CrashDiag.ps1'
+      - 'RUN-QUEST-COCKPIT-V2-DIAG.cmd'
       - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_runtime_smoke.cpp'
       - 'src/hooks_graphics.cpp'
@@ -78,6 +80,13 @@ jobs:
           assert 'ComputeBodyCorrection(b0,f0,correction)' in hook
           assert 'DriverSeatView =' not in ini
           assert 'VRDriverSeatView' not in settings
+          launcher=Path('tools/Run-OutRunVRTest.ps1').read_text(encoding='utf-8')
+          diag=Path('Run-QuestCockpitV2-CrashDiag.ps1').read_text(encoding='utf-8')
+          assert "$env:OUTRUN_VR_LAUNCH='1'" in launcher
+          assert "'-VR.Enabled=true','-VR.AutoLaunchHost=true'" in launcher
+          assert "VR_RELEASE_VERSION.txt" in launcher
+          assert "Windows Error Reporting" in diag
+          assert "DumpType" in diag and "finally" in diag
           assert 'CockpitFrameProbe = false' in ini
           assert 'QuestCockpitV2Enabled = false' in ini
           assert 'QuestCockpitV2HideDriver = false' in ini
