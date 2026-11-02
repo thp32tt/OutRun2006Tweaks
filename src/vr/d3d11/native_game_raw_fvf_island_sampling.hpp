@@ -38,7 +38,8 @@ namespace outrun::vr::dx11 {
     // their inclusion previously stranded the same RGB crop for hundreds
     // of authentic Draws. Whole-IA validity above is never relaxed.
     const auto projected_triangle = [&](std::size_t t,
-                                        NativeRawDrawExtent& triangle) noexcept {
+                                        NativeRawDrawExtent& triangle,
+                                        NativeRawFvfInteriorSample* interior = nullptr) noexcept {
         std::uint32_t indices[3]{};
         for (std::size_t j = 0u; j < 3u; ++j) {
             const auto element = source.assembly == NativeRawFvfAssembly::TriangleList
@@ -52,7 +53,7 @@ namespace outrun::vr::dx11 {
         if (!native_raw_fvf_projected_raster(
                 {source.firstClip, source.vertexStride, source.count,
                  indices, 3u, NativeRawFvfAssembly::TriangleList},
-                vx, vy, vw, vh, triangle, &admitted, rasterState))
+                vx, vy, vw, vh, triangle, &admitted, rasterState, interior))
             return false;
         triangle.left = (std::max)(triangle.left,
             (std::max)(admitted.left, assembled.left));
@@ -89,7 +90,8 @@ namespace outrun::vr::dx11 {
         const auto t = static_cast<std::size_t>(
             visibleIndices[(start + step) % visibleCount]);
         NativeRawDrawExtent triangle{};
-        if (!projected_triangle(t, triangle)) return false;
+        NativeRawFvfInteriorSample interior{};
+        if (!projected_triangle(t, triangle, &interior)) return false;
         // Revisit each original source triangle on its own genuine GPU
         // readback grid. Previously every island used ordinal=0, so even
         // hundreds of captured menu/car/race Draws sampled the SAME corner
@@ -102,6 +104,36 @@ namespace outrun::vr::dx11 {
         if (!native_raw_swept_dual_draw_tile(
                 sw, sh, tw, th, triangle, sourcePhase, sampled))
             continue;
+        // For sparse diagonal menu/race FVF geometry the bounding-box
+        // sweep can miss the actual filled polygon entirely. Sample one
+        // authentic polygon-interior pixel early in each 8-pass cycle, then
+        // return to the established sweep to cover remaining GPU regions.
+        // Staging copies still use only the REAL native GPU PRE/POST images.
+        if (interior.sparseDiagonal && (sourcePhase % 8u) < 2u) {
+            const auto clampOrigin = [](std::int64_t p,
+                std::uint32_t size, std::uint32_t extent) noexcept {
+                return static_cast<std::uint32_t>((std::max)(
+                    std::int64_t{0}, (std::min)(
+                        p - static_cast<std::int64_t>(size) / 2,
+                        static_cast<std::int64_t>(extent - size))));
+            };
+            const NativeRawTileOrigin centered{
+                clampOrigin(interior.pixelX, tw, sw),
+                clampOrigin(interior.pixelY, th, sh)};
+            const NativeRawDualTile swept = sampled;
+            sampled.first = centered;
+            sampled.hasSecond = false;
+            if (native_raw_source_tiles_disjoint(
+                    centered, swept.first, tw, th)) {
+                sampled.second = swept.first;
+                sampled.hasSecond = true;
+            } else if (swept.hasSecond &&
+                       native_raw_source_tiles_disjoint(
+                           centered, swept.second, tw, th)) {
+                sampled.second = swept.second;
+                sampled.hasSecond = true;
+            }
+        }
         if (!found) {
             out.first = sampled.first;
             firstWindow = triangle;

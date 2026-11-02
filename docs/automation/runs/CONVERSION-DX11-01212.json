@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01212",
+  "production_id": "CONVERSION-DX11-01212",
+  "event_id": "CONVERSION-DX11-01212-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_SPARSE_DIAGONAL_GPU_SOURCE_RGB",
+  "classification": "A_UNFINISHED_USER_VISIBLE_NATIVE_GPU_PIXEL_CAPTURE",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "32851b40f194c7835a7071cdbb4733f51a931f12",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Source-authentic clipped/cull/scissor FVF polygon interior point is preferentially sampled in first two of each eight real D3D11 GPU PRE/POST captures for sparse diagonal menu/vehicle/race triangles, while subsequent source tile sweep, real GPU RGB-delta/fence, original D3D9 Present and DX9Ex/input/FFB fallback remain unchanged. Actual game native pixels and Quest3 remain UNTESTED.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_SOURCE_FVF",
+      "D3D11_NATIVE_GPU_DRAW",
+      "AUTHENTIC_CLIPPED_POLYGON_INTERIOR",
+      "GPU_PRE_POST_RGB_SAMPLING",
+      "D3D9_SOURCE_PRESENT"
+    ],
+    "integration_path": [
+      "SOURCE_NATIVE_FVF_HOMOGENEOUS_CLIP",
+      "NATIVE_GPU_SOURCE_INTERIOR_TILE",
+      "PRESERVED_GPU_COPY_AND_FENCE"
+    ],
+    "batch_components": [
+      "SOURCE_POLYGON_INTERIOR_SCREEN_SAMPLE",
+      "SPARSE_GPU_PREPOST_TILE_ROUTING",
+      "SOURCE_SCISSOR_CULL_NEGATIVE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "shipping source polygon centroid for clipped sparse diagonal triangle routes native PRE/POST tile over source-authentic interior; focused C++ test checks physical anchor",
+      "negative_regression": "real scissor exclusion, zero W, broad triangle legacy sweep and original D3D9 fallback preserved; no CPU sample certifies native GPU RGB",
+      "component_integration": "native_game_raw_fvf_clip_capture.hpp -> native_game_raw_fvf_island_sampling.hpp -> native_game_raw_visual_diagnostic.hpp PRE/POST D3D11 copy"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED does not imply real native GPU RGB or playable menu/car/race frames",
+    "activation_guard_and_fallback": "Opt-in RAW only, original D3D9 game rendering/input/FFB and DX9Ex fallback unchanged; DXVK frozen"
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no genuine game/GPU desktop/Quest3/VDXR test."
+}

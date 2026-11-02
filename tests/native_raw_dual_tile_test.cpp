@@ -825,7 +825,68 @@ bool native_raw_fvf_depth_clip_disabled_gpu_capture_regression() {
     return !native_raw_fvf_projected_raster(
         malformed,0,0,3440,1440,nearOff,nullptr,&depthOff);
 }
+ // Real large diagonal FVF menu/vehicle triangles can fill less than 2% of
+// their giant bounding box. The default corner sweep then captures zero
+// native GPU pixels even though the source Draw covers its interior.
+bool native_raw_fvf_sparse_diagonal_gpu_capture_regression() {
+    constexpr std::array<std::array<float,4>,3> diagonal{{
+        {{-0.95f,-0.94f,0.5f,1.0f}},
+        {{ 0.94f, 0.95f,0.5f,1.0f}},
+        {{ 0.95f, 0.93f,0.5f,1.0f}}
+    }};
+    const NativeRawFvfClipSpan source{
+        diagonal.data(),sizeof(diagonal[0]),diagonal.size()};
+    constexpr std::uint32_t sw=3440u,sh=1440u,tw=512u,th=288u;
+    const NativeRawDrawExtent viewport{0,0,sw,sh};
+    NativeRawDrawExtent bounds{};
+    NativeRawFvfInteriorSample anchor{};
+    if (!native_raw_fvf_projected_raster(
+            source,0,0,sw,sh,bounds,&viewport,nullptr,&anchor) ||
+        !anchor.sparseDiagonal || anchor.pixelX < 1800 ||
+        anchor.pixelX > 2700 || anchor.pixelY < 250 ||
+        anchor.pixelY > 800) return false;
+    NativeRawDualTile first{},late{};
+    if (!native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,viewport,0u,first) ||
+        anchor.pixelX < first.first.x ||
+        anchor.pixelX >= static_cast<std::int64_t>(first.first.x)+tw ||
+        anchor.pixelY < first.first.y ||
+        anchor.pixelY >= static_cast<std::int64_t>(first.first.y)+th)
+        return false;
+    // Later captures continue sweeping authentic source pixels, not a
+    // permanently stationary or fabricated pixel/ROI.
+    if (!native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,viewport,3u,late) ||
+        (late.first.x == first.first.x &&
+         late.first.y == first.first.y)) return false;
+    // Physical source scissor and original cull winding stay authoritative.
+    const NativeRawDrawExtent excluded{0,0,300,150};
+    NativeRawDualTile none{};
+    if (native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,excluded,0u,none))
+        return false;
+    auto invalid=diagonal;
+    invalid[2][3]=0.0f;
+    if (native_raw_fvf_island_dual_draw_tile(
+            {invalid.data(),sizeof(invalid[0]),invalid.size()},
+            0,0,sw,sh,sw,sh,tw,th,viewport,0u,none))
+        return false;
+    // Broad triangles are intentionally NOT replaced by an interior-only
+    // anchor: existing dual-GPU source sweep remains available.
+    constexpr std::array<std::array<float,4>,3> broad{{
+        {{-0.9f,-0.9f,0.5f,1.f}},
+        {{ 0.9f,-0.9f,0.5f,1.f}},
+        {{ 0.f, 0.9f,0.5f,1.f}}
+    }};
+    if (!native_raw_fvf_projected_raster(
+            {broad.data(),sizeof(broad[0]),broad.size()},
+            0,0,sw,sh,bounds,&viewport,nullptr,&anchor) ||
+        anchor.sparseDiagonal) return false;
+    return true;
+}
+
 int main() {
+    assert(native_raw_fvf_sparse_diagonal_gpu_capture_regression());
     assert(native_raw_fvf_depth_clip_disabled_gpu_capture_regression());
     assert(native_raw_fvf_live_cull_gpu_capture_regression());
     assert(native_raw_fvf_clip_capture_regression());

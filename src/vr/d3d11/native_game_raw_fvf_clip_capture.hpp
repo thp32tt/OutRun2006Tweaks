@@ -50,6 +50,12 @@ struct NativeRawFvfRaster {
     out.depthClipEnable = depthClipEnable;
     return true;
 }
+// A source-interior GPU capture center, derived from REAL post-clip triangle
+// vertices. It is a sampling hint only: no CPU point grants pixel evidence.
+struct NativeRawFvfInteriorSample {
+    std::int64_t pixelX{}, pixelY{};
+    bool sparseDiagonal = false;
+};
 struct NativeRawFvfClipSpan {
     const void* firstClip = nullptr;
     std::size_t vertexStride = 0u;
@@ -72,8 +78,10 @@ struct NativeRawFvfClipSpan {
     float viewportX, float viewportY, float viewportW, float viewportH,
     NativeRawDrawExtent& raster,
     const NativeRawDrawExtent* sourceScissor = nullptr,
-    const NativeRawFvfRaster* rasterState = nullptr) noexcept {
+    const NativeRawFvfRaster* rasterState = nullptr,
+    NativeRawFvfInteriorSample* interior = nullptr) noexcept {
     raster = {};
+    if (interior) *interior = {};
     if (!source.firstClip || source.vertexStride < sizeof(float) * 4u ||
         source.vertexStride > 4096u || source.count < 3u ||
         source.count > 1048576u ||
@@ -141,6 +149,9 @@ struct NativeRawFvfClipSpan {
     double maxX = -(std::numeric_limits<double>::max)();
     double maxY = maxX;
     bool anyVisible = false;
+    double largestInteriorArea = 0.0;
+    double interiorPixelX = 0.0, interiorPixelY = 0.0;
+    bool interiorSparseDiagonal = false;
     for (std::size_t triangle = 0u; triangle < triangles; ++triangle) {
         std::array<Point, 20u> polygon{}, clipped{};
         std::array<HomogeneousPoint,20u> homogeneous{}, clippedH{};
@@ -300,6 +311,43 @@ struct NativeRawFvfClipSpan {
                 (!sourceFront && rasterState->cull == NativeRawFvfCull::Back))
                 continue;
         }
+        // A screen-wide but very thin diagonal triangle can have a huge
+        // bounding box whose 512x288 GPU sweep corners contain NO filled
+        // pixels. The arithmetic mean of a clipped convex polygon's vertices
+        // is strictly inside that genuine source polygon, including after
+        // homogeneous W and the actual D3D11 scissor/face clipping.
+        // Prefer an interior tile only for low-fill diagonal footprints;
+        // broad triangles retain their existing rotating GPU source sweep.
+        if (interior && std::abs(area) > largestInteriorArea) {
+            double loX = (std::numeric_limits<double>::max)();
+            double loY = loX;
+            double hiX = -loX, hiY = -loX;
+            double sumX = 0.0, sumY = 0.0;
+            for (std::size_t i = 0u; i < polygonCount; ++i) {
+                const auto& q = polygon[i];
+                loX = (std::min)(loX, q.x);
+                loY = (std::min)(loY, q.y);
+                hiX = (std::max)(hiX, q.x);
+                hiY = (std::max)(hiY, q.y);
+                sumX += q.x;
+                sumY += q.y;
+            }
+            const double boxArea = (hiX - loX) * (hiY - loY);
+            const double centerX = sumX / static_cast<double>(polygonCount);
+            const double centerY = sumY / static_cast<double>(polygonCount);
+            const double x = static_cast<double>(viewportX) +
+                (centerX + 1.0) * static_cast<double>(viewportW) * 0.5;
+            const double y = static_cast<double>(viewportY) +
+                (1.0 - centerY) * static_cast<double>(viewportH) * 0.5;
+            if (!std::isfinite(boxArea) || !std::isfinite(x) ||
+                !std::isfinite(y)) return false;
+            largestInteriorArea = std::abs(area);
+            interiorPixelX = x;
+            interiorPixelY = y;
+            // Twice the polygon's area is stored in 'area'.
+            interiorSparseDiagonal = boxArea > 0.0 &&
+                std::abs(area) < boxArea * 0.25;
+        }
         anyVisible = true;
         for (std::size_t i = 0u; i < polygonCount; ++i) {
             const auto& p = polygon[i];
@@ -333,6 +381,16 @@ struct NativeRawFvfClipSpan {
               static_cast<std::int64_t>(std::floor(t)),
               static_cast<std::int64_t>(std::ceil(r)),
               static_cast<std::int64_t>(std::ceil(b))};
+    if (interior) {
+        if (!std::isfinite(interiorPixelX) || !std::isfinite(interiorPixelY) ||
+            interiorPixelX < -maxCoordinate ||
+            interiorPixelY < -maxCoordinate ||
+            interiorPixelX >= maxCoordinate ||
+            interiorPixelY >= maxCoordinate) return false;
+        interior->pixelX = static_cast<std::int64_t>(std::floor(interiorPixelX));
+        interior->pixelY = static_cast<std::int64_t>(std::floor(interiorPixelY));
+        interior->sparseDiagonal = interiorSparseDiagonal;
+    }
     return raster.right > raster.left && raster.bottom > raster.top;
 }
 } // namespace outrun::vr::dx11
