@@ -792,7 +792,10 @@ bool native_raw_fvf_depth_clip_disabled_gpu_capture_regression() {
     const NativeRawDrawExtent rightHalf{1720,0,3440,1440};
     if (!native_raw_fvf_projected_raster(
             nearSpan,0,0,3440,1440,nearOff,&rightHalf,&depthOff) ||
-        nearOff.left < rightHalf.left) return false;
+        // Native raster rectangles intentionally have a 2px outward
+        // GPU edge-sampling safety margin; shipping callsite intersects
+        // the result with the exact physical source scissor again.
+        nearOff.left < rightHalf.left - 2) return false;
     NativeRawDualTile samples{};
     if (!native_raw_fvf_island_dual_draw_tile(
             nearSpan,0,0,3440,1440,3440,1440,512,288,

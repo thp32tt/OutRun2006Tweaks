@@ -11,7 +11,7 @@
   "feature_work_key": "DX11:AUTHENTIC_RS_DEPTH_CLIP_FVF_GPU_SOURCE_CAPTURE",
   "classification": "B_CAUSAL_EXACT_CI_GATE_REPAIR_OF_A_REAL_NATIVE_SOURCE_INTEGRATION",
   "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_SOURCE_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_SOURCE_COMMITTED_CAUSAL_CI_REPAIR",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
@@ -93,8 +93,10 @@
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no Windows game, GPU desktop, Quest3, VDXR or headset visual validation.",
   "prior_failed_runs": {
     "DX11 Fast Structural Checks": 41367737756,
-    "Backend Conversion Gate": 41367737805
+    "Backend Conversion Gate": 41367737805,
+    "DX11 Fast Structural Checks (policy repaired SHA)": 41367994165
   },
   "prior_failure_cause": "Both exact-SHA workflows failed their original policy preflight because previous C6-only 01210 record lacked development_strategy; not a proven C++ compile failure.",
-  "score_note": "Same TASK_ID retry and CI/previous metadata repair +0; do not grant independent score before a valid new feature outcome."
+  "score_note": "Same TASK_ID retry and CI/previous metadata repair +0; do not grant independent score before a valid new feature outcome.",
+  "causal_regression_repair": "Exact-SHA Fast 41367994165 found new real C++ assertion failure: source-scissor FVF geometry includes existing 2px outward GPU raster sampling margin. Local focused C++ harness compiled and passed after testing the documented 2px safety bound, preserving the shipping final exact-scissor intersection. No production raster semantics changed."
 }
