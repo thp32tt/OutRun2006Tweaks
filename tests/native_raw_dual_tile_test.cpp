@@ -423,6 +423,69 @@ bool native_raw_fvf_island_regression() {
                    canvas,0u) && tile.hasSecond;
 }
 
+// A broad single game triangle also has genuine interior pixels even if
+// both AABB-corner readbacks happen to miss that filled center. Preserve the
+// normal first-source raster sweep, but choose the second GPU copy from the
+// real clipped triangle interior without inventing changed RGB pixels.
+bool native_raw_fvf_broad_interior_second_gpu_capture_regression() {
+    constexpr std::array<std::array<float,4>,3> triangle{{
+        {{-0.94f,-0.91f,0.5f,1.f}},
+        {{ 0.94f,-0.91f,0.5f,1.f}},
+        {{ 0.00f, 0.92f,0.5f,1.f}}
+    }};
+    constexpr auto sw=3440u,sh=1440u,tw=512u,th=288u;
+    const NativeRawFvfClipSpan source{
+        triangle.data(),sizeof(triangle[0]),triangle.size()};
+    const NativeRawDrawExtent canvas{0,0,sw,sh};
+    NativeRawDrawExtent raster{};
+    NativeRawFvfInteriorSample interior{};
+    if (!native_raw_fvf_projected_raster(
+            source,0,0,sw,sh,raster,&canvas,nullptr,&interior) ||
+        interior.sparseDiagonal) return false;
+    const auto contains = [](NativeRawTileOrigin tile,
+                             std::int64_t x, std::int64_t y) noexcept {
+        return x >= tile.x && y >= tile.y &&
+               x < static_cast<std::int64_t>(tile.x)+tw &&
+               y < static_cast<std::int64_t>(tile.y)+th;
+    };
+    bool centerCaptured = false;
+    bool movedPrimary = false;
+    NativeRawDualTile previous{};
+    for (std::uint32_t turn=0u;turn<12u;++turn) {
+        NativeRawDualTile pair{}, legacy{};
+        if (!native_raw_fvf_island_dual_draw_tile(
+                source,0,0,sw,sh,sw,sh,tw,th,canvas,turn,pair) ||
+            !native_raw_swept_dual_draw_tile(
+                sw,sh,tw,th,raster,turn,legacy) ||
+            pair.first.x!=legacy.first.x ||
+            pair.first.y!=legacy.first.y ||
+            !pair.hasSecond ||
+            !native_raw_source_tiles_disjoint(
+                pair.first,pair.second,tw,th) ||
+            pair.second.x>sw-tw || pair.second.y>sh-th)
+            return false;
+        centerCaptured = centerCaptured ||
+            contains(pair.second,interior.pixelX,interior.pixelY);
+        movedPrimary = movedPrimary || (turn &&
+            (pair.first.x!=previous.first.x ||
+             pair.first.y!=previous.first.y));
+        previous = pair;
+    }
+    if (!centerCaptured || !movedPrimary) return false;
+    // Source clipping, not the original broad AABB, is authoritative.
+    const NativeRawDrawExtent outside{0,0,80,80};
+    NativeRawDualTile invalid{};
+    if (native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,outside,0u,invalid))
+        return false;
+    // A malformed source W may not produce a fabricated GPU evidence tile.
+    auto bad = triangle;
+    bad[1][3] = 0.0f;
+    return !native_raw_fvf_island_dual_draw_tile(
+        {bad.data(),sizeof(bad[0]),bad.size()},
+        0,0,sw,sh,sw,sh,tw,th,canvas,0u,invalid);
+}
+
 // A single real Draw can contain TWO large, widely separated source triangles.
 // Repeating the same scene must reach their inner GPU pixels, not just the
 // first 512x288 corner on every revisit of an authentic source island.
@@ -983,6 +1046,7 @@ bool native_raw_fvf_sparse_diagonal_gpu_capture_regression() {
 }
 
 int main() {
+    assert(native_raw_fvf_broad_interior_second_gpu_capture_regression());
     assert(native_raw_fvf_sparse_diagonal_gpu_capture_regression());
     assert(native_raw_fvf_depth_clip_disabled_gpu_capture_regression());
     assert(native_raw_fvf_live_cull_gpu_capture_regression());

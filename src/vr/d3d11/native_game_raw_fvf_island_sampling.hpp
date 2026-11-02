@@ -81,6 +81,7 @@ namespace outrun::vr::dx11 {
     bool found = false;
     NativeRawDrawExtent firstWindow{};
     NativeRawDualTile firstSampled{};
+    NativeRawFvfInteriorSample firstInterior{};
     // Rotate across VISIBLE source primitives, not raw IA count: when
     // nearly every menu/race triangle is offscreen, ordinal % count
     // repeatedly selected the same surviving island. The actual native
@@ -165,6 +166,7 @@ namespace outrun::vr::dx11 {
             out.first = sampled.first;
             firstWindow = triangle;
             firstSampled = sampled;
+            firstInterior = interior;
             found = true;
         } else {
             // A second broad menu/car/race primitive can fill the MIDDLE of
@@ -200,6 +202,35 @@ namespace outrun::vr::dx11 {
         }
     }
     if (!found) return false;
+    // A large single menu/car/race triangle is not necessarily a filled
+    // rectangle. Keep the original source-raster sweep as the FIRST native
+    // PRE/POST capture for broad polygons, but choose a disjoint SECOND copy
+    // from its genuinely clipped triangle interior before trying an AABB
+    // corner. Otherwise both copies can sample empty triangle corners while
+    // a real D3D11 Draw changes RGB in the unsampled polygon center.
+    // This is still sampling only: actual GPU before/after deltas, original
+    // game source RT/scissor and D3D9 Present remain required downstream.
+    if (!firstInterior.sparseDiagonal) {
+        const NativeRawTileOrigin polygonInterior[3]{
+            origin(firstInterior.pixelX, firstInterior.pixelY),
+            origin(firstInterior.alternatePixelX,
+                   firstInterior.alternatePixelY),
+            origin(firstInterior.oppositePixelX,
+                   firstInterior.oppositePixelY)};
+        // Rotate through independently projected real polygon interiors
+        // on subsequent original Draws, retaining the sweep's complete
+        // source-cell progression and deterministic stable ordering.
+        const std::size_t phase =
+            static_cast<std::size_t>(ordinal / visibleCount) % 3u;
+        for (std::size_t step = 0u; step < 3u; ++step) {
+            const auto candidate = polygonInterior[(phase + step) % 3u];
+            if (!native_raw_source_tiles_disjoint(
+                    out.first, candidate, tw, th)) continue;
+            out.second = candidate;
+            out.hasSecond = true;
+            return true;
+        }
+    }
     // With one visible primitive, the sparse polygon-interior tile can
     // replace the first swept GPU copy. Preserve the companion selected
     // alongside that REAL source crop; it may contain independent menu/race
