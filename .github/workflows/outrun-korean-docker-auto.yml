@@ -1,0 +1,83 @@
+name: OutRun Korean GitHub Docker QA
+
+on:
+  schedule:
+    # Daily 02:17 Asia/Seoul. Scheduled workflows run from the default branch.
+    - cron: "17 17 * * *"
+  workflow_dispatch:
+  push:
+    branches: [master, korean-localization-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-korean-docker-auto.yml"
+      - "tools/localization/github_docker_qa.py"
+      - "tools/localization/test_github_docker_qa.py"
+      - "tools/localization/ci/Dockerfile"
+      - "localization/test_packages/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: korean-docker-qa
+  cancel-in-progress: false
+
+jobs:
+  build-test-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout localization asset branch (no N100)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          fetch-depth: 1
+          lfs: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/github_docker_qa.py
+            tools/localization/test_github_docker_qa.py
+            tools/localization/ci/Dockerfile
+            localization/test_packages
+
+      - name: Build lightweight dedicated QA Docker image
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build --pull -t outrun-korean-qa:ci -f tools/localization/ci/Dockerfile tools/localization/ci
+
+      - name: Isolated Docker regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --network none --memory 1536m --cpus 2 --pids-limit 128 \
+            --read-only --tmpfs /tmp:size=64m --user "$(id -u):$(id -g)" \
+            -v "$PWD:/workspace:ro" --entrypoint python outrun-korean-qa:ci \
+            -m unittest discover -s tools/localization -p test_github_docker_qa.py -v
+
+      - name: Build pinned DDS QA package twice and require identical SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/korean-out-1" "$RUNNER_TEMP/korean-out-2"
+          for n in 1 2; do
+            docker run --rm --network none --memory 1536m --cpus 2 --pids-limit 128 \
+              --read-only --tmpfs /tmp:size=64m --user "$(id -u):$(id -g)" \
+              -v "$PWD:/workspace:ro" -v "$RUNNER_TEMP/korean-out-$n:/outputs:rw" \
+              outrun-korean-qa:ci --repo-root /workspace --out /outputs
+          done
+          sha256sum "$RUNNER_TEMP/korean-out-1/OUTRUN_KOREAN_NATIVE_3DDS_STATIC_TEST_ONLY.zip" \
+                    "$RUNNER_TEMP/korean-out-2/OUTRUN_KOREAN_NATIVE_3DDS_STATIC_TEST_ONLY.zip"
+          cmp "$RUNNER_TEMP/korean-out-1/OUTRUN_KOREAN_NATIVE_3DDS_STATIC_TEST_ONLY.zip" \
+              "$RUNNER_TEMP/korean-out-2/OUTRUN_KOREAN_NATIVE_3DDS_STATIC_TEST_ONLY.zip"
+          cmp "$RUNNER_TEMP/korean-out-1/qa_report.json" \
+              "$RUNNER_TEMP/korean-out-2/qa_report.json"
+          echo "Deterministic SHA readback: PASS; visual/gameplay approval NOT granted"
+
+      - name: Publish QA report, previews, and TEST_ONLY DDS ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-korean-gh-docker-test-only-${{ github.run_id }}
+          path: ${{ runner.temp }}/korean-out-1/
+          if-no-files-found: warn
+          retention-days: 21
