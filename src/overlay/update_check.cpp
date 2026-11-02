@@ -124,7 +124,7 @@ void UpdateCheck_Thread(const std::string& currentVersion, const std::string& re
         if (!newerVersion.empty())
         {
             Notifications::instance.add(
-                std::format("A newer version of OutRun2006Tweaks is available ({})\\n---\\nPress {} and click here to visit this fork's release page.",
+                std::format("A newer version of OutRun2006Tweaks is available ({})\n---\nPress {} and click here to visit this fork's release page.",
                     newerVersion, InputManager_ModActionDisplayName(ModAction::OverlayToggle)),
                 20,
                 []() {
