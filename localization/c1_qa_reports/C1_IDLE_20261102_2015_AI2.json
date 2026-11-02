@@ -1,0 +1,47 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261102T2015KST-IDLE",
+  "scheduled_slot_kst": "2026-11-02T20:15:00+09:00",
+  "inventory_checked_at_kst": "2026-11-02T20:17:41+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "reviewer": "ChatGPT AI 2 (C1)",
+  "policy_source_blobs": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "inventory": {
+    "source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "script": "work/C1_QA_20261101_2145_AI2_inventory.py",
+    "method": "Read-only actual A/B candidate PNG SHA256 + producer export evidence; deduplicated against existing C1 reports/metrics/addenda",
+    "candidate_png_files": 955,
+    "producer_export_evidence_entries": 955,
+    "previously_reviewed_distinct_sha256": 960,
+    "new_unreviewed_sha256": 0,
+    "candidates_without_export": 0,
+    "pending": []
+  },
+  "status": "IDLE_NO_NEW_UNREVIEWED_AB_CANDIDATES",
+  "results": {
+    "reviewed_new": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "guards": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_or_ingame_pass_claimed": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "score": {
+    "previous_confirmed_ai2": 2474,
+    "delta": 0,
+    "new_total_ai2": 2474,
+    "reason": "Repeated IDLE scan and evidence logging without a new unique QA decision is +0"
+  }
+}
