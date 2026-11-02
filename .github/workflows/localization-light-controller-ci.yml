@@ -1,0 +1,66 @@
+name: OutRun Portainer Light Controller Test (no Docker)
+
+on:
+  push:
+    branches:
+      - localization-controller-recovery-20260928
+    paths:
+      - ".github/workflows/localization-light-controller-ci.yml"
+      - "tools/chat-controller/localization-recovery-v1/github_actions_light_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/test_github_actions_light_controller.py"
+      - "tools/chat-controller/localization-recovery-v1/Dockerfile.gitops"
+      - "tools/chat-controller/localization-recovery-v1/docker-compose.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-controller:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: localization-controller-recovery-20260928
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/chat-controller/localization-recovery-v1/github_actions_light_controller.py
+            tools/chat-controller/localization-recovery-v1/test_github_actions_light_controller.py
+            tools/chat-controller/localization-recovery-v1/Dockerfile.gitops
+            tools/chat-controller/localization-recovery-v1/docker-compose.yml
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate Python code and light-controller security tests
+        run: |
+          python -m py_compile tools/chat-controller/localization-recovery-v1/github_actions_light_controller.py
+          python -m unittest discover -s tools/chat-controller/localization-recovery-v1 -p test_github_actions_light_controller.py -v
+          python tools/chat-controller/localization-recovery-v1/github_actions_light_controller.py --self-test
+
+      - name: Verify Compose only runs a bounded GitHub API monitor
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check pyyaml
+          python - <<'PY'
+          import pathlib, yaml
+          base = pathlib.Path("tools/chat-controller/localization-recovery-v1")
+          doc=yaml.safe_load((base/"docker-compose.yml").read_text())
+          services=doc["services"]
+          assert len(services)==1
+          s=services["outrun-chat-controller-localization-recovery"]
+          assert s["build"]["dockerfile"]=="Dockerfile.gitops"
+          assert float(s["cpus"]) <= 0.1
+          assert s["mem_limit"]=="96m"
+          assert "OUTRUN_GITHUB_ACTIONS_TOKEN" in s["environment"]
+          assert not s.get("ports"), "Browser/VNC should not start"
+          dockerfile=(base/"Dockerfile.gitops").read_text()
+          assert "pip install" not in dockerfile
+          assert "github_actions_light_controller.py" in dockerfile
+          assert "github_gitops_worker.py" not in dockerfile
+          assert not any(w in dockerfile for w in ["Pillow","playwright","opencv"])
+          print("PORTAINER_LIGHT_CONFIG_VALID")
+          PY
