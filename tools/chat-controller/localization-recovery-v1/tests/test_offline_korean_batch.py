@@ -82,5 +82,60 @@ class TestOfflineKoreanBatch(unittest.TestCase):
         self.assertEqual(held[0]["reason"],"OVERLAPPING_ROI")
         self.assertEqual(outside,0)
 
+    def test_overlap_trim_repositions_full_korean_phrase(self):
+        source=Image.new("RGBA",(200,100),(0,0,0,0))
+        rows=[
+            {"id":"first","english":"first","korean":"첫째","bbox_xyxy":[0,0,85,60]},
+            {"id":"second","english":"second","korean":"둘째","bbox_xyxy":[50,20,150,90]}
+        ]
+        initial,painted,held,_,outside=batch.render(source,rows)
+        self.assertEqual(outside,0)
+        self.assertEqual(len(held),1)
+        new,done,still,changes,outside=batch.overlap_resolver.resolve(
+            source,initial,rows,painted,held,
+            make_glyph=batch.sprite.make_glyph,fontfile=batch.sprite.font_path())
+        self.assertEqual(len(done),2)
+        self.assertEqual(still,[])
+        self.assertEqual(outside,0)
+        self.assertGreater(changes,0)
+        last=done[-1]
+        self.assertEqual(last["resolution"],"TRIM_TO_FREE_RECT")
+        x0,y0,x1,y1=last["placement_bbox"]
+        self.assertGreater(x1-x0,15)
+        self.assertGreater(y1-y0,15)
+        self.assertTrue(50<=x0<x1<=150 and 20<=y0<y1<=90)
+        # New output may only modify free portions of second ROI.
+        self.assertTrue(np.array_equal(
+            np.asarray(new)[:60,:85],np.asarray(initial)[:60,:85]))
+        self.assertTrue(np.array_equal(
+            np.asarray(new)[90:,:],np.asarray(source)[90:,:]))
+
+    def test_overlap_full_coverage_remains_hold(self):
+        source=Image.new("RGBA",(100,100),(0,0,0,0))
+        rows=[{"id":"old","english":"old","korean":"기존","bbox_xyxy":[0,0,90,90]},
+              {"id":"inside","english":"inside","korean":"내부","bbox_xyxy":[20,20,45,45]}]
+        first=[{"id":"old","bbox":[0,0,90,90]}]
+        held=[{"id":"inside","reason":"OVERLAPPING_ROI"}]
+        output,accepted,rejected,changed,outside=batch.overlap_resolver.resolve(
+            source,source.copy(),rows,first,held,
+            make_glyph=batch.sprite.make_glyph,fontfile=batch.sprite.font_path())
+        self.assertEqual(len(accepted),1)
+        self.assertEqual(rejected[0]["reason"],"OVERLAP_FULLY_COVERED")
+        self.assertEqual(changed,0)
+        self.assertEqual(outside,0)
+
+    def test_overlap_clipping_partition_has_no_shared_pixels(self):
+        box=(10,10,100,100)
+        blockers=[(25,25,55,55),(70,40,95,90)]
+        pieces=batch.overlap_resolver.subtract_rectangles(box,blockers)
+        seen=set()
+        for x0,y0,x1,y1 in pieces:
+            for x in range(x0,x1):
+                for y in range(y0,y1):
+                    self.assertNotIn((x,y),seen)
+                    self.assertFalse(any(b[0]<=x<b[2] and b[1]<=y<b[3] for b in blockers))
+                    seen.add((x,y))
+        self.assertEqual(len(seen),8100-900-1250)
+
 if __name__=="__main__":
     unittest.main(verbosity=2)

@@ -15,6 +15,9 @@ HERE = Path(__file__).resolve().parent
 SP = importlib.util.spec_from_file_location("offline_sprite", HERE / "offline_korean_sprite_fallback.py")
 sprite = importlib.util.module_from_spec(SP)
 SP.loader.exec_module(sprite)
+OR = importlib.util.spec_from_file_location("offline_overlap", HERE / "offline_overlap_resolver.py")
+overlap_resolver = importlib.util.module_from_spec(OR)
+OR.loader.exec_module(overlap_resolver)
 HOST = Path("/home/chatgpt-runner2/work")
 IMAGE_ROOT = Path("/data/imagegen") if Path("/data/imagegen/text_roi_batches/production_manifest.json").is_file() else HOST / "image-src"
 SOURCE_ROOT = HOST / "c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified"
@@ -235,7 +238,7 @@ def encode_rgba_dds(readable, orientation, mip_count):
             current=current.resize((max(1,current.width//2),max(1,current.height//2)),Image.Resampling.BOX)
     return bytes(out)
 
-def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mips):
+def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mips, overlap_mode="hold"):
     source_path=entry["source"]
     rows=entry["rows"]
     if entry.get("alias"):
@@ -259,13 +262,17 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
         if previous.get("source_sha256")!=entry["sha"] or previous.get("target_path")!=str(target):
             raise ValueError("EXISTING_REPORT_MISMATCH")
         if not d.is_file():raise ValueError("EXISTING_OUTPUT_MISSING")
+        if previous.get("overlap_mode","hold")!=overlap_mode:
+            raise ValueError("EXISTING_OUTPUT_OVERLAP_MODE_MISMATCH")
         st=d.stat()
         if (st.st_size != previous.get("output_dds_bytes") or
             st.st_mtime_ns != previous.get("output_dds_mtime_ns")):
             if checksum(d)!=previous.get("output_dds_sha256"):
                 raise ValueError("EXISTING_OUTPUT_SHA_MISMATCH")
         return {"source":source_path.name,"status":"ALREADY_VERIFIED",
-                "ready_count":previous.get("painted_count",0)}
+                "ready_count":previous.get("painted_count",0),
+                "trimmed_count":previous.get("trimmed_count",0),
+                "held_count":previous.get("held_count",0)}
     with Image.open(source_path) as im:
         if im.format!="PNG" or im.mode!="RGBA":
             raise ValueError("SOURCE_NOT_RGBA_PNG")
@@ -286,7 +293,13 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
         exact=False
         canonical_status="MISSING_CANONICAL_DDS_RECONSTRUCT_FROM_VERIFIED_PNG"
     # Reported names may point at other variants; never clobber live texture.
+    if overlap_mode not in ("hold","trim"):raise ValueError("INVALID_OVERLAP_MODE")
     output,painted,held,pixels,wrong=render(original,rows,max_opaque_fraction=max_opaque_fraction)
+    if overlap_mode=="trim":
+        output,painted,held,pixels,wrong=overlap_resolver.resolve(
+            original,output,rows,painted,held,
+            make_glyph=sprite.make_glyph,fontfile=sprite.font_path(),
+            max_opaque_fraction=max_opaque_fraction)
     dds_bytes=encode_rgba_dds(output,orientation,mips)
     if not execute:
         return {"source":source_path.name,"status":"DRY_RUN","ready_count":len(painted),
@@ -310,6 +323,8 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
             "target_path":str(target),"source_orientation":orientation,
             "output_encoding":"DDS_RGBA32_UNCOMPRESSED","mip_levels":mips,
             "painted_count":len(painted),"held_count":len(held),"painted":painted,"held":held,
+            "overlap_mode":overlap_mode,
+            "trimmed_count":sum(x.get("resolution")=="TRIM_TO_FREE_RECT" for x in painted),
             "pixels_changed":pixels,"outside_roi_changed_pixels":wrong,
             "output_dds_sha256":checksum(d),"output_png_sha256":checksum(p),
             "output_dds_bytes":d.stat().st_size,"output_dds_mtime_ns":d.stat().st_mtime_ns,
@@ -319,7 +334,9 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
         (root/"report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
         os.replace(root,candidate_dir)
     return {"source":source_path.name,"status":"TEST_ONLY_SAVED","ready_count":len(painted),
-            "held_count":len(held),"target_path":str(target),"canonical":canonical_status}
+            "held_count":len(held),
+            "trimmed_count":sum(x.get("resolution")=="TRIM_TO_FREE_RECT" for x in painted),
+            "target_path":str(target),"canonical":canonical_status}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
@@ -330,6 +347,7 @@ def main():
     p.add_argument("--inventory-only",action="store_true",help="Summarize readiness without rendering or modifying any file")
     p.add_argument("--mips",type=int,default=1)
     p.add_argument("--max-opaque-fraction",type=float,default=1.0)
+    p.add_argument("--overlap-mode",choices=("hold","trim"),default="hold")
     p.add_argument("--manifest",default=str(IMAGE_ROOT/"text_roi_batches/production_manifest.json"))
     p.add_argument("--transcript",default=str(DDS_ROOT/"transcriptions.jsonl"))
     p.add_argument("--source-root",default=str(SOURCE_ROOT))
@@ -385,7 +403,7 @@ def main():
         try:
             r=run_source(e,output_root,Path(args.dds_root),
                          max_opaque_fraction=args.max_opaque_fraction,
-                         execute=args.execute,mips=args.mips)
+                         execute=args.execute,mips=args.mips,overlap_mode=args.overlap_mode)
             results.append(r)
         except Exception as exc:
             hold={"source":e["source"].name,"sha":e["sha"],"status":"HOLD_ERROR",
@@ -395,10 +413,12 @@ def main():
             results.append(hold)
     counted=collections.Counter(r["status"] for r in results)
     summary={"schema":LAST_RUN_SCHEMA,"time_utc":dt.datetime.now(dt.timezone.utc).isoformat(),
-             "dry_run":not args.execute,"total_sources":len(entries),
+             "dry_run":not args.execute,"overlap_mode":args.overlap_mode,"total_sources":len(entries),
              "source_entries_inspected":len(results),"new_attempts":attempted,
              "counts":dict(counted),
              "painted_this_run":sum(r.get("ready_count",0) for r in results if r["status"]=="TEST_ONLY_SAVED"),
+             "trimmed_in_checked_sources":sum(r.get("trimmed_count",0) for r in results),
+             "held_in_checked_sources":sum(r.get("held_count",0) for r in results),
              "results":results,
              "next_step":"Repeat --execute --max-sources 1; already saved files are hash-checked and skipped",
              "runtime_validation":"UNTESTED"}

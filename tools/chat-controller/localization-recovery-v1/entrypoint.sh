@@ -177,6 +177,10 @@ if [[ "${OUTRUN_OFFLINE_FALLBACK_ENABLED:-false}" == "true" ]]; then
         python -u /opt/outrun/app/offline_korean_batch.py --execute \
           --max-sources "${OUTRUN_OFFLINE_FALLBACK_MAX_SOURCES_PER_CYCLE:-1}" \
           --mips "${OUTRUN_OFFLINE_FALLBACK_MIPS:-1}" \
+          --overlap-mode "${OUTRUN_OFFLINE_FALLBACK_OVERLAP_MODE:-hold}" \
+          --output-root "${OUTRUN_OFFLINE_FALLBACK_OUTPUT_ROOT:-/data/imagegen/text_roi_batches/offline_bulk_test_only}" \
+          --overlap-mode "${OUTRUN_OFFLINE_FALLBACK_OVERLAP_MODE:-hold}" \
+          --output-root "${OUTRUN_OFFLINE_FALLBACK_OUTPUT_ROOT:-/data/imagegen/text_roi_batches/offline_bulk_test_only}" \
           >>/logs/offline-korean.log 2>&1; then
         echo "$(date -Is) offline Korean fallback cycle held/failed; retry later" >>/logs/offline-korean.log
       fi
