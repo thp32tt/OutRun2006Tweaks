@@ -59,7 +59,7 @@ jobs:
           assert 'QuestCockpitV2PlayerCandidateProbe' in hook
           assert 'QuestCockpitV2NativeFrameProbe' in hook
           assert 'MatchOriginalRva(FrameEnterRva,begin)' in hook
-          assert 'ComputeBodyCorrection(b0,f0,corrected)' in hook
+          assert 'ComputeBodyCorrection(b0,f0,correction)' in hook
           assert 'DriverSeatView =' not in ini
           assert 'VRDriverSeatView' not in settings
           assert 'CockpitFrameProbe = false' in ini
