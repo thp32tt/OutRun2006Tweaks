@@ -1,3 +1,5 @@
+> **2026-11-03 수정:** 이 문서는 폐기된 GitHub-hosted Docker 실험의 실행 기록입니다. 사용자의 실제 요구는 기존 Portainer Docker가 GitHub의 코드를 가져와 작업하고 GitHub에 결과를 기록하는 방식입니다. 두 GitHub-hosted 자동 워크플로의 schedule/push는 해제했습니다. 현재 실행 설정은 컨트롤러 브랜치 `localization-controller-recovery-20260928`의 `tools/chat-controller/localization-recovery-v1/GITHUB_GITOPS_RUNBOOK_20261103.md`를 참조하세요. 기존 CI의 과거 SUCCESS는 새 Portainer Docker의 배포·실행 성공을 뜻하지 않습니다.
+
 # GitHub-hosted Docker 자동 한글화 QA 전환 — 2026-11-03 KST
 
 ## 실행 결과
