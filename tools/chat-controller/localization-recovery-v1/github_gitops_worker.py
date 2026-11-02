@@ -242,6 +242,7 @@ def one_cycle(home: Path, token: str) -> dict:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--once", action="store_true", help="Perform one bounded cycle")
+    p.add_argument("--home", default=None, help="Optional absolute state path for isolated manual smoke test")
     p.add_argument("--self-test", action="store_true", help="No network smoke test")
     args = p.parse_args()
     if args.self_test:
@@ -251,7 +252,7 @@ def main() -> None:
         assert not os.environ.get("GITOPS_DO_NOT_EXIST")
         print("GITOPS_SELFTEST_PASS")
         return
-    home = Path(os.environ.get("OUTRUN_GITOPS_HOME", "/data/gitops"))
+    home = Path(args.home or os.environ.get("OUTRUN_GITOPS_HOME", "/data/gitops"))
     if not home.is_absolute():
         p.error("OUTRUN_GITOPS_HOME must be absolute")
     token = os.environ.get("OUTRUN_GITHUB_TOKEN", "").strip()
