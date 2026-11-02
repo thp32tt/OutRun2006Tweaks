@@ -1,0 +1,15 @@
+{
+  "status": "READ_ONLY_NOT_RUNTIME_APPROVED",
+  "manifest_total": 1002,
+  "active_roi": 954,
+  "retired_rebalance": 48,
+  "A_B_png_files": 955,
+  "matched_png_files": 954,
+  "unmatched_png_files": 1,
+  "crosswalk_status": {
+    "CANDIDATE_ONLY_QA_UNVERIFIED": 954
+  },
+  "unmatched_samples": [
+    "/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/A/Q104_OutRunMode_FullHD_TextROI_2x_k.png"
+  ]
+}
