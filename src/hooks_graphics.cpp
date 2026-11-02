@@ -355,14 +355,26 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     inline static std::uint64_t TraceCount=0;
     inline static thread_local OutRunVR::QuestCockpitV2::FrameOwner OccupantOwner{};
 
-    static bool ExactOriginalPlayerDriver(EvWorkRobot* robot) noexcept {
-        if(!robot)return false;
-        sEventWork* owner=Game::event(EVENT_ROB01);
-        if(!owner || owner->data<EvWorkRobot>()!=robot ||
-           owner->EventFunc.Disp!=reinterpret_cast<decltype(owner->EventFunc.Disp)>(
-                Module::exe_ptr(OriginalDriverDisplayRva)))
-            return false;
-        return true;
+    static OutRunVR::QuestCockpitV2::OriginalOccupantSlot
+    ExactOriginalCockpitOccupant(EvWorkRobot* robot) noexcept {
+        using namespace OutRunVR::QuestCockpitV2;
+        if(!robot)return OriginalOccupantSlot::None;
+        // Original Quest TLS admits BOTH native event slot 362 and 363.
+        // Original PC: ROB01 is driver; conditionally active ROB02
+        // is passenger. Both use race_robot_driver_display_4879B0.
+        // Never assume a missing ROB02 is open or reuse a stale token.
+        sEventWork* driver=Game::event(EVENT_ROB01);
+        sEventWork* passenger=Game::event(EVENT_ROB02);
+        const auto expected=reinterpret_cast<decltype(driver->EventFunc.Disp)>(
+            Module::exe_ptr(OriginalDriverDisplayRva));
+        const bool d=driver && driver->EventFunc.Disp==expected;
+        const bool p=passenger && passenger->EventFunc.Disp==expected;
+        return ResolveOriginalCockpitWork(
+            reinterpret_cast<std::uintptr_t>(robot),
+            d?reinterpret_cast<std::uintptr_t>(
+                driver->data<EvWorkRobot>()):0u,d,
+            p?reinterpret_cast<std::uintptr_t>(
+                passenger->data<EvWorkRobot>()):0u,p);
     }
     // Actual PC: 0x514E60 is the rob_disp_disp trampoline to Draw::disp
     // at 0x514C30. 0x514C10 is a DIFFERENT function. Old V2 targeted
@@ -388,13 +400,15 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
         const EvWorkCamera* camera=Game::camera();
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
-        const bool exact=ExactOriginalPlayerDriver(robot);
+        const auto slot=ExactOriginalCockpitOccupant(robot);
+        const bool exact=slot!=OriginalOccupantSlot::None;
         const bool enabled=Settings::VRQuestCockpitV2OccupantCorrection;
         static thread_local unsigned ownerSamples=0;
         if(enabled && Settings::VRTelemetry && ++ownerSamples<=48u)
-            spdlog::info("VR COCKPIT V2 OCCUPANT OWNER: sample={} exactROB01={} "
-                "nativeEpoch={} stereo={} cam1={} source=PC_514E60",
-                ownerSamples,exact,frameEpoch,
+            spdlog::info("VR COCKPIT V2 OCCUPANT OWNER: sample={} "
+                "eventSlot={} exactOwner={} nativeEpoch={} stereo={} "
+                "cam1={} source=PC_514E60",
+                ownerSamples,static_cast<unsigned>(slot),exact,frameEpoch,
                 stereo&&stereo->valid?stereo->poseSequence:0,
                 camera&&camera->cam_mode_34A==1);
         const bool eligible=VerifiedPlayerOccupantScope(
@@ -433,8 +447,10 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                             corrected,true);
                         static thread_local unsigned appliedSamples=0;
                         if(Settings::VRTelemetry && ++appliedSamples<=32u)
-                            spdlog::info("VR COCKPIT V2 WXC APPLIED: nativeEpoch={} "
-                                "poseSeq={} count={} player={} correctedHash={:016X}",
+                            spdlog::info("VR COCKPIT V2 WXC APPLIED: eventSlot={} "
+                                "nativeEpoch={} poseSeq={} count={} player={} "
+                                "correctedHash={:016X}",
+                                static_cast<unsigned>(slot),
                                 frameEpoch,stereo->poseSequence,appliedSamples,
                                 sample.playerIdentity,
                                 MatrixFingerprint(work,corrected));

@@ -87,6 +87,9 @@ jobs:
           assert 'PlayerCallbackHook.ccall<void>(player)' in hook
           assert 'auto actor=safetyhook::create_inline(' in hook
           assert 'RobotRva=0x114E60' in hook
+          assert 'Game::event(EVENT_ROB02)' in hook
+          assert 'ResolveOriginalCockpitWork(' in hook
+          assert 'slot!=OriginalOccupantSlot::None' in hook
           assert 'OriginalRobotDrawSignature()' in hook
           assert 'ComposeOccupantModel(work,own->occupantCorrection,corrected)' in hook
           assert '!Settings::VRQuestCockpitV2RawB0Camera)return false' in hook

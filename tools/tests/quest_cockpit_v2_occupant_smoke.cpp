@@ -29,6 +29,16 @@ int main() {
     { ScopedOriginalPlayerF0 scope(f0.data(),false);
       assert(!scope.Active());assert(f0==f0Original);
     }
+    // Original Quest occupant TLS permits two native work tokens.
+    using Slot=OriginalOccupantSlot;
+    assert(ResolveOriginalCockpitWork(0,0,true,0,true)==Slot::None);
+    assert(ResolveOriginalCockpitWork(0x1000,0x1000,true,0x1100,true)==Slot::Driver362);
+    assert(ResolveOriginalCockpitWork(0x1100,0x1000,true,0x1100,true)==Slot::Passenger363);
+    assert(ResolveOriginalCockpitWork(0x1100,0x1000,true,0x1100,false)==Slot::None);
+    assert(ResolveOriginalCockpitWork(0x1000,0x1000,false,0x1100,true)==Slot::None);
+    assert(ResolveOriginalCockpitWork(0x1200,0x1000,true,0x1100,true)==Slot::None);
+    // Duplicate/ambiguous tokens are rejected rather than assigning a role.
+    assert(ResolveOriginalCockpitWork(0x1000,0x1000,true,0x1000,true)==Slot::None);
     const Matrix eye=Identity;
     assert(VerifiedPlayerOccupantScope(true,true,true,true,true,true,true,true,false));
     for(int i=0;i<9;++i){

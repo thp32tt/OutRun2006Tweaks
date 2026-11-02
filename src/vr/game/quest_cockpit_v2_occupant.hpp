@@ -52,6 +52,27 @@ inline bool VerifiedPlayerF0CallOwner(bool trial,bool exactPlayerCar,
     return trial&&exactPlayerCar&&originalFrameActive&&nativeCameraMode1&&
            xrStereoValid&&!sceneEffect&&!reentrant;
 }
+// Quest original native callback at ELF 0x2E32B4/0x2E3374 admits
+// event_state.slots[362].work_token OR slots[363].work_token.
+// PC original event 362 ROB01 = driver, 363 ROB02 = conditional passenger.
+// Both events dispatch the original 0x4879B0 display callback. Never infer
+// identity from equal driver/heroine character tables or zero work IDs.
+enum class OriginalOccupantSlot : std::uint16_t {
+    None=0, Driver362=362, Passenger363=363
+};
+inline OriginalOccupantSlot ResolveOriginalCockpitWork(
+    std::uintptr_t currentWork, std::uintptr_t driverWork,
+    bool driverOriginalDisplay, std::uintptr_t passengerWork,
+    bool passengerOriginalDisplay) noexcept {
+    if(currentWork==0)return OriginalOccupantSlot::None;
+    const bool driver=driverOriginalDisplay && driverWork!=0 &&
+        currentWork==driverWork;
+    const bool passenger=passengerOriginalDisplay && passengerWork!=0 &&
+        currentWork==passengerWork;
+    if(driver==passenger)return OriginalOccupantSlot::None;
+    return driver?OriginalOccupantSlot::Driver362:
+        OriginalOccupantSlot::Passenger363;
+}
 inline bool VerifiedPlayerOccupantScope(bool trial,bool nativeSignature,
     bool activeNativeFrame,bool exactOriginalPlayerRobot,
     bool originalDriverDisplayEntry,bool nativeCameraModeOne,
