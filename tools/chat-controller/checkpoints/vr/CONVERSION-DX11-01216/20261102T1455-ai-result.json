@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "kind": "vr_ai_development_result",
+  "task_id": "CONVERSION-DX11-01216",
+  "production_id": "CONVERSION-DX11-01216",
+  "event_id": "CONVERSION-DX11-01216-E003",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "chat_rollovers": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "FEATURE_READY_SOURCE_STAGE_ONLY",
+  "source_material_sha": "0afcb0cf555599b6153200993280dbde1eac072b",
+  "validation_bearing_result_sha": "8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d",
+  "final_c6_target_sha": "cc0848210874e5eb098eb7e9054219afc2094500",
+  "target_behind_by": 0,
+  "promotion_force": false,
+  "feature_ready": {
+    "scope": "Bounded source GPU capture and causal Backend gate repair; NOT full native visible game frame",
+    "status": "PASS_FEATURE_CI",
+    "acceptance_results": {
+      "second_clipped_source_interior": {
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+          "tests/native_raw_dual_tile_test.cpp"
+        ],
+        "validation_command": "GitHub Actions DX11 Fast 41395402632 success at validation SHA 8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d"
+      },
+      "source_safety_and_fallback": {
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "docs/automation/runs/CONVERSION-DX11-01215.json",
+          "tools/test_dx11_autodev_policy.py"
+        ],
+        "validation_command": "GitHub Actions Backend Conversion Gate 41395402596 success at exact SHA"
+      },
+      "exact_sha_five_gates": {
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+          "tools/test_dx11_autodev_policy.py"
+        ],
+        "validation_command": "DX11 Fast 41395402632, Backend 41395402596, Windows Build 41395402583, OpenXR 41395402575, HUD Inspector 41395402620 all SUCCESS at exact SHA"
+      }
+    }
+  },
+  "all_five_mandatory_ci_success": true,
+  "build_artifact_id": 13118907991,
+  "openxr_feature_artifact_id": 13119482208,
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "unfinished": [
+    "Real hardware game Draw-to-native-visible RGB game frame still unobserved",
+    "Quest3/VDXR live HMD gameplay untested",
+    "Keep R175 shader mismatch original owner 00477 untouched until released"
+  ],
+  "next_action": "Continue same full native game frame feature with actual source Draw to published native menu/race; retain fail-closed opt-in and DX9Ex fallback",
+  "score_change": 0
+}
