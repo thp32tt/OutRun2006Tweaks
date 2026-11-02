@@ -1,0 +1,51 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261103T0315KST-IDLE",
+  "requested_slot_kst": "2026-11-03T03:15:00+09:00",
+  "inventory_checked_at_kst": "2026-11-03T03:16:46+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "branch_head_before_record": "187ede6155e79dcc238ca8c14bd2d5f8e32d0ced",
+  "role": "C1",
+  "reviewer": "ChatGPT AI 2",
+  "policy_source_blobs": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "inventory": {
+    "source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "script": "work/C1_QA_20261101_2145_AI2_inventory.py",
+    "execution": "N100 MCP run_python_file (stdout verified)",
+    "candidate_png_files": 955,
+    "export_evidence_entries": 955,
+    "prior_reviewed_distinct_sha256": 960,
+    "new_unreviewed_sha256": 0,
+    "candidates_without_export": 0,
+    "pending": []
+  },
+  "status": "IDLE_NO_NEW_UNREVIEWED_AB_CANDIDATES",
+  "results": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "quality_decisions_made": false
+  },
+  "guards": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_or_ingame_pass_claimed": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "score": {
+    "previous_confirmed_ai2": 2497,
+    "delta": 0,
+    "new_total_ai2": 2497,
+    "source": "thp32tt/ai-dev-lab@main HEAD a6177a6dbf3a13bce3b5f5c1fbb41235cfedf622",
+    "reason": "IDLE and no new SHA-unique QA verdict; repeated status earns +0."
+  },
+  "note": "Latest N100 candidate inventory checked live; no new distinct PNG hashes since previously reviewed; no image QA conducted."
+}
