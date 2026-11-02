@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01215",
+  "production_id": "CONVERSION-DX11-01215",
+  "event_id": "CONVERSION-DX11-01215-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SPARSE_CLIPPED_FVF_NATIVE_GPU_SOURCE_CAPTURE",
+  "classification": "A_UNFINISHED_NATIVE_GAME_GPU_CAPTURE_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "6ff7fcfbeb857444fc4ab0b1daafdd43d4e08409",
+  "material_result_sha": "3e10488fad45bf0680fce64122c214e9d57fbab1",
+  "validation_bearing_result_sha": "3e10488fad45bf0680fce64122c214e9d57fbab1",
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Retain the real D3D11 native FVF Draw PRE/POST GPU-capture origin inside authentic clipped skinny triangle geometry for all 8 phases: clipped centroid, separated far/opposite polygon interior endpoints and intermediate source positions. Preserve a second disjoint REAL GPU source sample when safe, sweep as fallback, and leave D3D9 Present/source identity/epoch/GPU-fence/input/FFB authority unchanged. Positive/negative regression covers phase 2/3/4/5 authentic interior pixels, phase 0/1 behavior, out-of-scissor, W=0, disjoint physical GPU regions and non-sparse sweep.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_FVF_CLIPPED_POLYGON",
+      "D3D11_GPU_PREPOST_8_PHASE_INTERIOR_SAMPLING",
+      "SOURCE_COINCIDENT_PRESENT_WITH_D3D9_FALLBACK"
+    ],
+    "batch_components": [
+      "CLIPPED_OPPOSITE_POLYGON_INTERIOR_POINT",
+      "ALL_PHASE_AUTHENTIC_GAME_GPU_CAPTURE",
+      "POSITIVE_NEGATIVE_MULTI_PHASE_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Eight-phase clipped skinny original FVF source triangle capture provides interior origin across full GPU sweep cycle; old six AABB phases could sample empty raster.",
+      "negative_regression": "Unknown or invalid homogeneous W, excluded source scissor, overlap and broad non-sparse fallbacks retain original admission.",
+      "component_integration": "native_game_raw_fvf_clip_capture.hpp -> native_game_raw_fvf_island_sampling.hpp -> native_game_raw_visual_diagnostic.hpp PRE/POST GPU copies."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED_ONLY; actual GPU RGB and contiguous menu/car/race plus Quest3/VDXR UNTESTED.",
+    "activation_guard_and_fallback": "RAW diagnostic opt-in; preserve original D3D9 game Draw/Present/input/FFB/SkyGlow and DX9Ex fallback; DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Close sparse clipped source polygon GPU PRE/POST sampling holes across authentic menu/car/race FVF native Draw capture phases without claiming completed full native renderer.",
+    "acceptance_items": [
+      {
+        "id": "source_interior_eight_phase",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_GAME_GPU_SOURCE",
+        "expected_behavior": "Use real clipped polygon center, both distant endpoints and interpolated interior for all eight source capture phases."
+      },
+      {
+        "id": "fallback_and_invalid_source",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_INPUT_AND_SOURCE_IDENTITY",
+        "expected_behavior": "Keep invalid W/scissor, overlapping copies and original game fallbacks fail-closed."
+      },
+      {
+        "id": "full_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "Five mandatory GitHub Actions Gate runs all SUCCESS at validation-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_interior_eight_phase": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41389126411 SUCCESS at exact 3e10488fad45bf0680fce64122c214e9d57fbab1 (native_raw_dual_tile_test source regression)."
+    },
+    "fallback_and_invalid_source": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 41389126411 plus Backend 41389126447 SUCCESS at exact material SHA; original D3D9/FFB source unchanged."
+    },
+    "full_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "Exactly matching SHA 3e10488fad45bf0680fce64122c214e9d57fbab1 GitHub Actions SUCCESS: DX11 Fast 41389126411, Backend Conversion 41389126447, Windows Build 41389126467, OpenXR 41389126454, HUD Inspector 41389126413. Runtime UNTESTED."
+    }
+  },
+  "validation_gate_runs": {
+    "DX11 Fast Structural Checks": 41389126411,
+    "Backend Conversion Gate": 41389126447,
+    "Build (Win32 Release)": 41389126467,
+    "OpenXR VR architecture": 41389126454,
+    "OutRun EXE HUD Inspector CI": 41389126413
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real native menu/car/race GPU RGB/published desktop frame, gamepad session, Quest 3 HMD or VDXR live test at this exact SHA. Never assert gameplay native frame complete on CI evidence.",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "next_source_file": "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+  "real_game_draw_blocker": "Actual matching-SHA real game GPU desktop evidence needed; current code is diagnostic source-stage, not full native game frame.",
+  "next_implementation_action": "Continue integration toward full game native frame and separate L/R OpenXR without regressing original input/FFB and DX9Ex fallback.",
+  "checkpoint": "C6_STATE",
+  "record_type": "C6_RESULT_ONLY",
+  "score_note": "This 01215 source capture integration is a partial slice of unfinished full game-frame feature; no independent completed user-visible renderer or HMD proof, +0. No score for C6, CI or reruns."
+}
