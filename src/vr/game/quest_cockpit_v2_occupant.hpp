@@ -52,6 +52,50 @@ inline bool VerifiedPlayerF0CallOwner(bool trial,bool exactPlayerCar,
     return trial&&exactPlayerCar&&originalFrameActive&&nativeCameraMode1&&
            xrStereoValid&&!sceneEffect&&!reentrant;
 }
+// The Quest original computes B0/F0 correction BEFORE temporarily staging
+// vehicle F0=identity, and holds the original correction for the entire
+// scoped renderer operation (rather than reading a now-mutated car F0).
+// Mirror that ordering only inside the exact synchronous PC player callback.
+// This thread-local scope is NOT an OpenXR frame/eye owner and cannot survive
+// the original callback; a work pointer, native frame epoch and XR pose must
+// ALL match before the original pre-staging matrices may be consumed.
+struct ScopedPreF0SnapshotData {
+    std::uintptr_t playerIdentity=0;
+    std::uint64_t nativeFrame=0, xrPoseSequence=0;
+    Matrix matrixB0{},matrixF0{},correction{};
+};
+inline thread_local const ScopedPreF0SnapshotData* ActivePreF0Snapshot=nullptr;
+class ScopedPreF0Snapshot final {
+    const ScopedPreF0SnapshotData* const previous_;
+    bool admitted_;
+public:
+    ScopedPreF0Snapshot(const ScopedPreF0SnapshotData& snapshot,
+                        bool admitted) noexcept
+        :previous_(ActivePreF0Snapshot),
+         admitted_(admitted && !previous_ &&
+                   snapshot.playerIdentity!=0 && snapshot.nativeFrame!=0 &&
+                   snapshot.xrPoseSequence!=0 &&
+                   FiniteAffine(snapshot.matrixB0) &&
+                   FiniteAffine(snapshot.matrixF0) &&
+                   FiniteAffine(snapshot.correction)) {
+        if(admitted_)ActivePreF0Snapshot=&snapshot;
+    }
+    ~ScopedPreF0Snapshot() noexcept {
+        if(admitted_)ActivePreF0Snapshot=previous_;
+    }
+    ScopedPreF0Snapshot(const ScopedPreF0Snapshot&)=delete;
+    ScopedPreF0Snapshot& operator=(const ScopedPreF0Snapshot&)=delete;
+    bool Active() const noexcept {return admitted_;}
+};
+inline const ScopedPreF0SnapshotData* MatchOriginalPreF0(
+    std::uintptr_t playerIdentity,std::uint64_t nativeFrame,
+    std::uint64_t xrPoseSequence) noexcept {
+    const auto* s=ActivePreF0Snapshot;
+    return s && s->playerIdentity==playerIdentity &&
+        s->nativeFrame==nativeFrame && s->xrPoseSequence==xrPoseSequence
+        ?s:nullptr;
+}
+
 // Quest original native callback at ELF 0x2E32B4/0x2E3374 admits
 // event_state.slots[362].work_token OR slots[363].work_token.
 // PC original event 362 ROB01 = driver, 363 ROB02 = conditional passenger.

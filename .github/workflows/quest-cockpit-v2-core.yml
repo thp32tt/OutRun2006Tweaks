@@ -92,6 +92,11 @@ jobs:
           assert 'slot!=OriginalOccupantSlot::None' in hook
           assert 'OriginalRobotDrawSignature()' in hook
           assert 'ComposeOccupantModel(work,own->occupantCorrection,corrected)' in hook
+          assert 'ScopedPreF0Snapshot preF0Owner(originalMatrices,true)' in hook
+          assert 'MatchOriginalPreF0(' in hook
+          assert 'sample.matrixF0=preF0->matrixF0' in hook
+          assert 'else if(ActivePreF0Snapshot)' in hook
+          assert 'ScopedOriginalPlayerF0 scope(' in hook
           assert '!Settings::VRQuestCockpitV2RawB0Camera)return false' in hook
           assert 'kOriginalModelTableRva=0x418BB0' in hook
           assert 'QuestCockpitV2CameraPose(camera,pose)' in hook

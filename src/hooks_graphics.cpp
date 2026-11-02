@@ -223,8 +223,17 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
             explicit FlagGuard(bool& f) noexcept:flag(f){flag=true;}
             ~FlagGuard() noexcept {flag=false;}
         } marker(F0CallbackActive);
+        // Original Quest: publish pre-identity B0/F0 correction before F0
+        // staging, retain it for original occupant draws nested in this call.
+        // Destructor order first restores F0, then clears the saved owner.
+        const ScopedPreF0SnapshotData originalMatrices{
+            reinterpret_cast<std::uintptr_t>(player),
+            NativeFrameTrace().ActiveEpoch(),xr->poseSequence,b0,f0,C
+        };
+        ScopedPreF0Snapshot preF0Owner(originalMatrices,true);
         ScopedOriginalPlayerF0 scope(
-            reinterpret_cast<float*>(&player->matrix_F0),true);
+            reinterpret_cast<float*>(&player->matrix_F0),
+            preF0Owner.Active());
         static thread_local std::uint32_t trace=0;
         if(Settings::VRCockpitFrameProbe && Settings::VRTelemetry &&
            ++trace<=32u)
@@ -436,6 +445,25 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                 sample.stereoAndPositionValid=true;
                 std::memcpy(sample.matrixB0.data(),&car->matrix_B0,sizeof(Matrix));
                 std::memcpy(sample.matrixF0.data(),&car->matrix_F0,sizeof(Matrix));
+                // During the original player callback, F0 is intentionally
+                // identity. Original Quest occupant rendering must consume
+                // the PRE-identity matrix snapshot/C, not recompute from I.
+                // Reject cross-player/frame/eye aliases to fail closed.
+                const auto* preF0=MatchOriginalPreF0(
+                    sample.playerIdentity,frameEpoch,stereo->poseSequence);
+                if(preF0) {
+                    if(std::memcmp(sample.matrixB0.data(),
+                                   preF0->matrixB0.data(),sizeof(Matrix))!=0) {
+                        RobotHook.ccall<void>(robot);
+                        return;
+                    }
+                    sample.matrixF0=preF0->matrixF0;
+                } else if(ActivePreF0Snapshot) {
+                    // An active snapshot with a different owner, frame or
+                    // pose must never fall through to identity-derived C.
+                    RobotHook.ccall<void>(robot);
+                    return;
+                }
                 if(OccupantOwner.Observe(sample)) {
                     const FrameSnapshot* own=OccupantOwner.Snapshot();
                     Matrix work{},corrected{};

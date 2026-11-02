@@ -29,6 +29,53 @@ int main() {
     { ScopedOriginalPlayerF0 scope(f0.data(),false);
       assert(!scope.Active());assert(f0==f0Original);
     }
+    // Re-derive occupant correction using the original B0/F0 while the
+    // PC player's F0 is staged to identity, as in Quest's renderer TLS.
+    Matrix origB0=Identity;origB0[12]=2.5f;origB0[1]=0.15f;
+    Matrix origF0=Identity;origF0[12]=1.0f;origF0[13]=3.0f;
+    Matrix origC{};
+    assert(ComputeBodyCorrection(origB0,origF0,origC));
+    const ScopedPreF0SnapshotData pre{
+        0x1234u,19u,77u,origB0,origF0,origC
+    };
+    assert(!MatchOriginalPreF0(0x1234u,19u,77u));
+    {
+        ScopedPreF0Snapshot outer(pre,true);
+        assert(outer.Active());
+        assert(MatchOriginalPreF0(0x1234u,19u,77u));
+        assert(!MatchOriginalPreF0(0x1235u,19u,77u));
+        assert(!MatchOriginalPreF0(0x1234u,20u,77u));
+        assert(!MatchOriginalPreF0(0x1234u,19u,78u));
+        ScopedPreF0Snapshot nested(pre,true);
+        assert(!nested.Active());
+        Matrix mutableF0=origF0;
+        {
+            ScopedOriginalPlayerF0 f0Scope(mutableF0.data(),outer.Active());
+            assert(mutableF0==Identity);
+            const auto* s=MatchOriginalPreF0(0x1234u,19u,77u);
+            assert(s && s->matrixF0==origF0);
+            Matrix replay{};
+            assert(ComputeBodyCorrection(s->matrixB0,s->matrixF0,replay));
+            assert(replay==origC);
+            Matrix wrong{};
+            assert(ComputeBodyCorrection(origB0,mutableF0,wrong));
+            assert(wrong!=origC);
+            assert(s->correction==origC);
+        }
+        assert(mutableF0==origF0);
+    }
+    assert(!MatchOriginalPreF0(0x1234u,19u,77u));
+    try{
+        ScopedPreF0Snapshot guard(pre,true);
+        assert(guard.Active());
+        throw 33;
+    }catch(int){}
+    assert(!ActivePreF0Snapshot);
+    auto invalidPre=pre;
+    invalidPre.matrixF0[15]=0.f;
+    {ScopedPreF0Snapshot bad(invalidPre,true);
+        assert(!bad.Active());}
+    assert(!ActivePreF0Snapshot);
     // Original Quest occupant TLS permits two native work tokens.
     using Slot=OriginalOccupantSlot;
     assert(ResolveOriginalCockpitWork(0,0,true,0,true)==Slot::None);
