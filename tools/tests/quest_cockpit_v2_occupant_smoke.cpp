@@ -19,7 +19,7 @@ int main() {
     std::mt19937 rng(0x514e60u);
     std::uniform_real_distribution<float> u(-1.f,1.f);
     for(int n=0;n<1200;++n) {
-        Matrix w=eye,c=eye{},expected{},got{};
+        Matrix w=eye,c=eye,expected{},got{};
         for(int k=0;k<16;++k){w[k]=u(rng);c[k]=u(rng);}
         w[3]=w[7]=w[11]=0.f;w[15]=1.f;
         c[3]=c[7]=c[11]=0.f;c[15]=1.f;
