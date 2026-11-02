@@ -63,8 +63,7 @@ def latest_asset_sha(token: str) -> str:
 
 
 def latest_qa_run(token: str) -> dict:
-    path = ("/actions/workflows/" + WORKFLOW + "/runs?branch=" +
-            urllib.parse.quote(BRANCH, safe="") + "&per_page=5")
+    path = "/actions/workflows/" + WORKFLOW + "/runs?per_page=5"
     obj = api_call(path, token)
     runs = obj.get("workflow_runs", [])
     if not isinstance(runs, list):
@@ -104,7 +103,7 @@ def atomic_json(path: Path, data: dict) -> None:
 
 
 def check_cycle(home: Path, token: str) -> dict:
-    """No N100 image access and no local work; at most 3 small GitHub API calls."""
+    """No N100 image access; see both asset-push and default-branch scheduled runs."""
     home.mkdir(parents=True, exist_ok=True)
     previous_file = home / "last_status.json"
     prior = json.loads(previous_file.read_text(encoding="utf-8")) if previous_file.exists() else {}
