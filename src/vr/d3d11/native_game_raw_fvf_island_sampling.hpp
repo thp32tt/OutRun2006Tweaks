@@ -87,6 +87,20 @@ namespace outrun::vr::dx11 {
     // GPU capture must visit all visible source islands before advancing
     // the within-triangle pixel sweep.
     const std::size_t start = static_cast<std::size_t>(ordinal) % visibleCount;
+    // The same physical source-target clamp is used for sparse-primary
+    // crops and independent polygon centers. This changes sampling ONLY:
+    // native PRE/POST bytes, D3D9 scissor/RT identity and Present remain
+    // mandatory before a real GPU pixel can be published.
+    const auto origin = [&](std::int64_t x, std::int64_t y) noexcept {
+        const auto clamp = [](std::int64_t p, std::uint32_t size,
+                              std::uint32_t extent) noexcept {
+            return static_cast<std::uint32_t>((std::max)(
+                std::int64_t{0}, (std::min)(
+                    p - static_cast<std::int64_t>(size) / 2,
+                    static_cast<std::int64_t>(extent - size))));
+        };
+        return NativeRawTileOrigin{clamp(x, tw, sw), clamp(y, th, sh)};
+    };
     for (std::size_t step = 0u; step < visibleCount; ++step) {
         const auto t = static_cast<std::size_t>(
             visibleIndices[(start + step) % visibleCount]);
@@ -113,17 +127,6 @@ namespace outrun::vr::dx11 {
         // Preserve swept GPU cells as SECONDARY candidates and keep the
         // original D3D9 Present/source/epoch checks authoritative.
         if (interior.sparseDiagonal) {
-            const auto clampOrigin = [](std::int64_t p,
-                std::uint32_t size, std::uint32_t extent) noexcept {
-                return static_cast<std::uint32_t>((std::max)(
-                    std::int64_t{0}, (std::min)(
-                        p - static_cast<std::int64_t>(size) / 2,
-                        static_cast<std::int64_t>(extent - size))));
-            };
-            const auto origin = [&](std::int64_t x, std::int64_t y) noexcept {
-                return NativeRawTileOrigin{
-                    clampOrigin(x, tw, sw), clampOrigin(y, th, sh)};
-            };
             const NativeRawTileOrigin centered = origin(
                 interior.pixelX, interior.pixelY);
             const NativeRawTileOrigin farEnd = origin(
@@ -164,9 +167,23 @@ namespace outrun::vr::dx11 {
             firstSampled = sampled;
             found = true;
         } else {
-            // Prefer independent primitive islands. A large later triangle
-            // may have its first crop overlapping ours but a second genuine
-            // source crop that is physically disjoint; inspect both.
+            // A second broad menu/car/race primitive can fill the MIDDLE of
+            // its clipped triangle but neither corner of its AABB sweep.
+            // Anchor its second PRE/POST source crop at a point obtained from
+            // that actual separately assembled/clipped primitive. This does
+            // not infer RGB: the paired copies still come only from the
+            // already-executed native D3D11 Draw, with the original source
+            // target, epoch and GPU delta checks downstream.
+            // Disjointness is physical, not inferred from primitive indices.
+            const auto secondInterior = origin(interior.pixelX, interior.pixelY);
+            if (native_raw_source_tiles_disjoint(
+                    out.first, secondInterior, tw, th)) {
+                out.second = secondInterior;
+                out.hasSecond = true;
+                return true;
+            }
+            // If both primitive centers overlap, preserve the independent
+            // authentic GPU sweep before falling back to one source crop.
             if (native_raw_source_tiles_disjoint(
                     out.first, sampled.first, tw, th)) {
                 out.second = sampled.first;

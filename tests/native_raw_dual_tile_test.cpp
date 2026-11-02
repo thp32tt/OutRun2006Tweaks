@@ -456,6 +456,37 @@ bool native_raw_fvf_large_island_phase_regression() {
         return fail(__LINE__);
     // Both large source islands must advance their OWN real raster origin;
     // a rotating triangle index by itself is not pixel-coverage progress.
+    // A second independently clipped source triangle contributes a real
+    // GPU interior sample, even when a wide AABB sweep lands on empty
+    // corners. The REAL raster/clipping geometry chooses this position;
+    // no synthetic RGB or invented source Draw is accepted.
+    NativeRawDrawExtent rightRaster{};
+    NativeRawFvfInteriorSample rightInterior{};
+    const NativeRawFvfClipSpan rightPrimitive{
+        triangles.data() + 3u,sizeof(triangles[0]),3u};
+    if (!native_raw_fvf_projected_raster(
+            rightPrimitive,0,0,sw,sh,rightRaster,nullptr,nullptr,
+            &rightInterior)) return fail(__LINE__);
+    const auto containsInterior = [=](NativeRawTileOrigin tile,
+                                      const NativeRawFvfInteriorSample& sample) {
+        return sample.pixelX >= tile.x && sample.pixelY >= tile.y &&
+            sample.pixelX < static_cast<std::int64_t>(tile.x) + tw &&
+            sample.pixelY < static_cast<std::int64_t>(tile.y) + th;
+    };
+    if (!containsInterior(left0.second,rightInterior) ||
+        !containsInterior(left1.second,rightInterior))
+        return fail(__LINE__);
+    // The opposite source island must remain visible in reversed turn order,
+    // and the two sample crops may never overlap physically.
+    NativeRawDrawExtent leftRaster{};
+    NativeRawFvfInteriorSample leftInterior{};
+    if (!native_raw_fvf_projected_raster(
+            {triangles.data(),sizeof(triangles[0]),3u},
+            0,0,sw,sh,leftRaster,nullptr,nullptr,&leftInterior) ||
+        !containsInterior(right0.second,leftInterior) ||
+        !native_raw_source_tiles_disjoint(
+            right0.first,right0.second,tw,th))
+        return fail(__LINE__);
     if (left0.first.x == left1.first.x &&
         left0.first.y == left1.first.y) return fail(__LINE__);
     if (right0.first.x == right1.first.x &&
