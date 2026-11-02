@@ -7,11 +7,26 @@
 
 namespace
 {
-    bool IsVrHookDescription(std::string_view description) noexcept
+    // A disabled VR launch must never install hooks that patch game code or
+    // render state. VR-specific hooks also live in the common hooks_*.cpp
+    // files and use the short "VR" prefix, not only "OpenXRVR".
+    constexpr bool IsVrHookDescription(std::string_view description) noexcept
     {
         return description.starts_with("OpenXRVR") ||
-            description.starts_with("OpenXVRR");
+            description.starts_with("OpenXVRR") ||
+            description.starts_with("VR");
     }
+
+    // Compile-time guard against 2D entrypoint regressions. Both the
+    // release's direct-EXE path and OUTRUN_VR_FORCE_DISABLED require this.
+    static_assert(IsVrHookDescription("OpenXRVRD3D9ExUpgrade"));
+    static_assert(IsVrHookDescription("VRDriverSeatRenderTest"));
+    static_assert(IsVrHookDescription("VRDriverSeatVehicleScaleRenderHook"));
+    static_assert(IsVrHookDescription("VRDriverSeatGlassMaterialProbe"));
+    static_assert(IsVrHookDescription("VRLensFlareProjected2D"));
+    static_assert(IsVrHookDescription("VRHudQueueSemanticBridge"));
+    static_assert(!IsVrHookDescription("UIScaling"));
+    static_assert(!IsVrHookDescription("FixBinkLargeMovies"));
 
     bool VrHooksEnabledForProcess() noexcept
     {
