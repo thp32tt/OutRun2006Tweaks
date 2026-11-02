@@ -1,21 +1,12 @@
-name: OutRun localization Docker build
+# Retired 2026-11-03 by user instruction: no Docker build/execution on GitHub-hosted runner.
+# The existing Portainer stack builds Dockerfile.gitops locally on operator redeploy.
+name: OutRun localization Docker build (retired)
 on:
-  push:
-    branches:
-      - localization-controller-recovery-20260928
-    paths:
-      - 'tools/chat-controller/localization-recovery-v1/**'
-      - '.github/workflows/outrun-localization-docker-build.yml'
   workflow_dispatch:
-
+permissions:
+  contents: read
 jobs:
-  build:
+  notice:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - name: Build localization controller
-        run: |
-          docker build --progress=plain \
-            -t outrun-localization:test \
-            tools/chat-controller/localization-recovery-v1
+      - run: echo "Retired CI Docker build. Existing user Portainer Docker is the execution host."
