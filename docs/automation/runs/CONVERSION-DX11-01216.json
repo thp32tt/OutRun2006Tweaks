@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01216",
+  "production_id": "CONVERSION-DX11-01216",
+  "event_id": "CONVERSION-DX11-01216-E003",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "chat_rollovers": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:SPARSE_CLIPPED_FVF_NATIVE_GPU_SOURCE_CAPTURE",
+  "classification": "A_UNFINISHED_NATIVE_GAME_GPU_CAPTURE_SOURCE_IMPLEMENTATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "e36ffaccb3f40651366c99774f55ddd2725b5be1",
+  "material_result_sha": "0afcb0cf555599b6153200993280dbde1eac072b",
+  "validation_bearing_result_sha": "8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d",
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp",
+    "docs/automation/runs/CONVERSION-DX11-01215.json",
+    "tools/test_dx11_autodev_policy.py"
+  ],
+  "implementation": "The already-committed 01216 native source change computes a disjoint second diagnostic GPU PRE/POST tile from the genuine interior of an independently clipped original live FVF game polygon, even when its broad AABB sweep misses the triangle. Existing clipped W/scissor/RT/source-epoch/GPU-delta/D3D9 Present admission and original game-input/FFB/DX9Ex fail-closed fallback remain mandatory. Causal same-task Backend Gate repair supplies 01215 missing canonical live source path plus 8 negative policy regressions, without changing the 01216 C++ source.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SOURCE_NATIVE_FVF_CLIPPED_POLYGON",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_GPU_PRE_POST_RGB",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "LIVE_D3D9_FVF_SECOND_CLIPPED_POLYGON_INTERIOR",
+      "D3D11_GPU_PREPOST_SECOND_SOURCE_ISLAND",
+      "SOURCE_COINCIDENT_ORIGINAL_D3D9_PRESENT_FALLBACK"
+    ],
+    "batch_components": [
+      "AUTHENTIC_SECOND_CLIPPED_INTERIOR_GPU_SAMPLE",
+      "DISJOINT_NATIVE_GPU_TILE_SELECTION",
+      "CXX_POSITIVE_NEGATIVE_GEOMETRY_REGRESSION",
+      "HISTORICAL_C6_BACKEND_POLICY_CAUSAL_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual separately clipped native game FVF triangle interior can supply physically disjoint second GPU PRE/POST source capture even if sweep corners are empty.",
+      "negative_regression": "Preserve original source W/scissor/RT identity, non-overlap and fallback and reject missing D3D9/native Draw/visible path metadata, forged runtime and CI.",
+      "component_integration": "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp -> native_game_raw_visual_diagnostic.hpp actual GPU PRE/POST -> original D3D9 Present; tests/native_raw_dual_tile_test.cpp plus tools/test_dx11_autodev_policy.py."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY. Original D3D9 Present is the visible endpoint in the ordered source-code pathway; full native game GPU RGB publishing, playable menu/car/race frame and Quest3/VDXR remain UNTESTED.",
+    "activation_guard_and_fallback": "Only explicit RAW diagnostic opt-in; NativeDrawPathActive stays off by default; original D3D9 game Draw/Present/input/FFB and DX9Ex fallback remain authoritative. DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Complete source-backed live-game native D3D11 GPU polygon interior capture across independent clipped original FVF draw islands while preserving fail-closed original D3D9 publication; do not claim full native gameplay.",
+    "acceptance_items": [
+      {
+        "id": "second_clipped_source_interior",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_GAME_GPU_SOURCE",
+        "expected_behavior": "Independently clipped actual game FVF polygon contributes a disjoint real GPU interior origin for the second PRE/POST source crop."
+      },
+      {
+        "id": "source_safety_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_INPUT_AND_SOURCE_IDENTITY",
+        "expected_behavior": "Nonoverlap, source/epoch/scissor, invalid geometry and original D3D9/FFB/fallback remain fail-closed."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GITHUB_WINDOWS_OPENXR_HUD",
+        "expected_behavior": "Five mandatory GitHub Actions workflows pass at same exact validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "second_clipped_source_interior": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks GitHub Actions 41395402632 SUCCESS, source/material 0afcb0cf555599b6153200993280dbde1eac072b and validated 8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d. Clipped source interior & disjoint crop positive regressions; real hardware RGB still UNTESTED."
+    },
+    "source_safety_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp",
+        "tools/test_dx11_autodev_policy.py",
+        "docs/automation/runs/CONVERSION-DX11-01215.json"
+      ],
+      "validation_command": "DX11 Fast 41395402632 and Backend Conversion Gate 41395402596 SUCCESS at exact 8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d; negative policy fixture tests verify original missing path and forged runtime/CI remain rejected."
+    },
+    "exact_sha_five_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp",
+        "tools/test_dx11_autodev_policy.py"
+      ],
+      "validation_command": "GitHub Actions exact SHA 8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d ALL SUCCESS: DX11 Fast 41395402632, Backend 41395402596, Build Win32 Release 41395402583, OpenXR 41395402575, HUD Inspector 41395402620. Build artifact 13118907991 and OpenXR feature artifact 13119482208 verified; runtime UNTESTED."
+    }
+  },
+  "validation_gate_runs": {
+    "DX11 Fast Structural Checks": 41395402632,
+    "Backend Conversion Gate": 41395402596,
+    "Build (Win32 Release)": 41395402583,
+    "OpenXR VR architecture": 41395402575,
+    "OutRun EXE HUD Inspector CI": 41395402620
+  },
+  "build_artifacts": {
+    "outrun2006tweaks": 13118907991,
+    "feature-dx11-first-game-frame": 13119482208
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No measured 01216 native game RGB publication, HMD run or contiguous playable menu/race verification. CI source/Windows compiled output is not proof that full native DX11 gameplay works.",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "next_source_file": "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+  "real_game_draw_blocker": "Still requires matching-SHA real game native GPU RGB and visible frame integration from actual Draw and measured Quest3/VDXR output; R175 TEXCOORD6 original 00477 owner must not be duplicated.",
+  "next_implementation_action": "Continue same DX11 FULL_RESOLUTION_NATIVE_GAME_FRAME feature from actual live source Draw to published native game frame, maintain R175 owner gate, opt-in diagnostics, DX9Ex fallback.",
+  "checkpoint": "C6_STATE",
+  "record_type": "C6_RESULT_ONLY",
+  "score_note": "01216 independently compiled source diagnostic stage is an increment of the unfinished native full game-frame feature, no independently verified playable renderer; score_change=0. No score for causal CI fix, tests, C6, rollover or duplicate gates."
+}
