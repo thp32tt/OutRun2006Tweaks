@@ -1,131 +1,40 @@
+# GitHub-first, existing-Portainer-Docker execution mode (2026-11-03).
+# Same stack/service/container name and persistent volumes as the legacy browser controller.
+# The old Dockerfile, entrypoint.sh, A/B/C1 browser code and source volumes remain untouched.
 services:
   outrun-chat-controller-localization-recovery:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.gitops
     pull_policy: build
     container_name: outrun-chat-controller-localization-recovery
-    restart: unless-stopped # UI/VNC and controlled localization automation stay available
+    restart: unless-stopped
     init: true
-    shm_size: "1g"
-    mem_limit: 4g
-    mem_reservation: 1g
-    cpus: 2.0
+    mem_limit: 768m
+    mem_reservation: 128m
+    cpus: 0.5
+    pids_limit: 64
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:size=64m
     environment:
       TZ: Asia/Seoul
-      CONTROLLER_MODE: "localization"
-      AUTO_SEND: "true" # User explicitly reauthorized controlled Korean automation 2026-10-19
-      OUTRUN_KR_V2_PHASE: "F2" # Working-scope label only; not a game/runtime PASS claim
-      OUTRUN_KR_V2_NO_SEND: "false" # Controlled A/B ROI ImageGen dispatch is explicitly authorized
-      OUTRUN_KR_V2_AUTO_GENERATE: "true"
-      OUTRUN_KR_V2_AUTO_COMPOSE: "false"
-      OUTRUN_KR_V2_AUTO_DEPLOY: "false"
-      # A/B generate from SHA-verified direct visual ROI; C1 remains independent QA, no OCR dispatch.
-      SCHEDULE_MINUTES: "0,10,15,20,30,40,45,50"
-      CHAT_SLOTS: "3" # One Chrome/profile, three persistent tabs: A/B/C1
-      OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
-      OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
-      OUTRUN_AB_BATCH_QUEUE: "false"
-      OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Preserve verified unsplit full-HD A/B ImageGen pipeline
-      OUTRUN_GPT_CHAT_OCR_ENABLED: "false" # Disable both C1 and B/C2 chat OCR submission/collection
-      OUTRUN_PIXEL_OCR_REVIEW_ENABLED: "false" # No repeated OCR pixel-crop reviews
-      OUTRUN_GPT_OCR_RESPONSE_STALL_SECONDS: "600" # 10m stale wait -> retry/skip automatically
-      OUTRUN_GPT_OCR_RESPONSE_POLL_SECONDS: "30" # Browser DOM response collector; independent of A/B/C1 schedule
-      OUTRUN_GPT_OCR_WATCHDOG_SECONDS: "60"
-      # DDS compose/game PASS/deploy remain disabled; only PNG generation + C1 QA is automatic.
-      OUTRUN_AB_BATCH_SIZE: "5"
-      OUTRUN_AB_LIBRARY_FOLDER: "아웃런 한글화 신규" # Existing project Library; no separate folder.
-      OUTRUN_AB_PROJECT_LIBRARY_NAME: "아웃런 한글화 신규"
-      OUTRUN_AB_PROJECT_NAME: "아웃런 한글화 신규"
-      OUTRUN_LIBRARY_MAX_SCAN: "500" # Library grows during long unattended production; keep SHA gate, scan deeper.
-      OUTRUN_LIBRARY_VERIFY_SECONDS: "90" # Never let one Library scan block later A/B/C1 schedule slots.
-      OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
-      CHAT_DAY_ROLLOVER_HOUR: "2"
-      CHATGPT_BASE_URL: "https://chatgpt.com/"
-      CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
-      # Project name is required and verified per fresh A/B chat; optional direct URL.
-      REQUIRE_PROJECT_URL: "false"
-      PREFERRED_THINKING_LEVEL: "High"
-      STRICT_THINKING_LEVEL: "false"
-      FRESH_CHAT_EACH_RUN: "false" # Keep exactly three persistent tabs; no per-run tab churn
-      CHAT_RECYCLE_RUNS: "0" # Fresh chat at each accepted new A/B launch; hold if previous unverified.
-      RETRY_BUTTON_COOLDOWN_SECONDS: "60"
-      VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
-      STATUS_PORT: "8787"
-      # Legacy scheduled-send watchdog stays disabled.
-      WATCHDOG_ENABLED: "false"
-      # Independent Chrome tab recovery; no prompt resend or new task IDs.
-      TAB_HEALTH_CHECK_SECONDS: "30"
-      TAB_HEALTH_PROBE_TIMEOUT_SECONDS: "6"
-      TAB_HEALTH_FAILURE_THRESHOLD: "3"
-      TAB_ERROR_FAILURE_THRESHOLD: "2"
-      TAB_RECOVERY_COOLDOWN_SECONDS: "60"
-      # Full container/browser recycle; credentials and Git checkpoints kept.
-      CHROME_RECYCLE_ENABLED: "false" # Preserve login/session; tab watchdog handles individual failures
-      CHROME_RECYCLE_INTERVAL_MINUTES: "120"
-      CHROME_RECYCLE_BUSY_GRACE_MINUTES: "30"
-      CHROME_RECYCLE_BUSY_PROBE_SECONDS: "8"
-      WATCHDOG_STALL_MINUTES: "15"
-      WATCHDOG_BUSY_STALL_MINUTES: "20"
-      WATCHDOG_CHECK_SECONDS: "30"
-      WATCHDOG_MAX_RESUMES_PER_RUN: "1"
-      WATCHDOG_FORCE_STOP_STALLED: "false"
-      RATE_LIMIT_BACKOFF_SECONDS: "120,300,600,1200"
-      MIN_SEND_GAP_SECONDS: "60"
-      SLOT_DEDUP_SECONDS: "180"
-      OUTRUN_CROP_ENABLED: "false"
-      OUTRUN_CROP_INTERVAL_SECONDS: "60"
-      OUTRUN_CROP_MAX_PER_CYCLE: "10"
-      OUTRUN_ROI_BRIDGE_ENABLED: "true"
-      OUTRUN_ROI_SOURCE_MODE: "direct_visual" # Only SHA-pinned manual visual and exact cross-variant evidence; no OCR-produced inputs
-      OUTRUN_ROI_BRIDGE_INTERVAL_SECONDS: "60"
-      # OCR-free low-fidelity DDS TEST_ONLY producer, bounded so N100 stays responsive.
-      # User-managed Portainer pull/build/redeploy required; no DDS auto-installation.
-      OUTRUN_OFFLINE_FALLBACK_ENABLED: "true"
-      OUTRUN_OFFLINE_FALLBACK_INTERVAL_SECONDS: "60"
-      OUTRUN_OFFLINE_FALLBACK_MAX_SOURCES_PER_CYCLE: "1"
-      OUTRUN_OFFLINE_FALLBACK_MIPS: "1"
-      OUTRUN_OFFLINE_FALLBACK_OVERLAP_MODE: "ink" # First trim, then ink-aware placement or exact duplicate representation
-      OUTRUN_OFFLINE_FALLBACK_OUTPUT_ROOT: "/data/imagegen/text_roi_batches/offline_overlap_v3_ink_test_only" # New TEST_ONLY namespace; v1/v2 files are preserved
-    ports:
-      - "6083:6080"
-      - "8788:8787"
+      OUTRUN_GITOPS_HOME: /data/gitops
+      OUTRUN_GITOPS_POLL_SECONDS: "${OUTRUN_GITOPS_POLL_SECONDS:-3600}"
+      # Optional: fine-grained GitHub PAT, restricted to OutRun2006Tweaks Contents:read/write.
+      # Without token the worker performs read-only QA and preserves local result receipts.
+      OUTRUN_GITHUB_TOKEN: "${OUTRUN_GITHUB_TOKEN:-}"
     volumes:
       - outrun_chat_localization_recovery_data:/data
-      # Shared image workspace. New production consumes only the verified native-ROI manifest;
-      # legacy 986 split tiles may remain archived here but are forbidden as new inputs.
-      # Docker daemon host path must exist; do not silently create an empty bind directory.
-      - type: bind
-        source: /home/chatgpt-runner2/work/image-src
-        target: /data/imagegen
-        bind:
-          create_host_path: false
       - outrun_chat_localization_recovery_logs:/logs
-      - type: bind
-        source: /home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only
-        target: /home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only
-        bind:
-          create_host_path: false
-      - type: bind
-        source: /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012
-        target: /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: /home/chatgpt-runner2/work/c_salvage_text_roi/additional_originals_20261016
-        target: /home/chatgpt-runner2/work/c_salvage_text_roi/additional_originals_20261016
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json
-        target: /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json
-        read_only: true
-        bind:
-          create_host_path: false
+    stop_grace_period: 30s
 
 volumes:
+  # NEVER delete or recreate: old browser session, manifests and N100 controller evidence live here.
   outrun_chat_localization_recovery_data:
     name: outrun_chat_localization_recovery_data
   outrun_chat_localization_recovery_logs:
