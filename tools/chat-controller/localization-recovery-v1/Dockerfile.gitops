@@ -1,7 +1,7 @@
-FROM python:3.12-slim
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_DISABLE_PIP_VERSION_CHECK=1
-RUN python -m pip install --no-cache-dir "Pillow==11.3.0"
+# Existing Portainer Stack: GitHub API dispatch/poll only, NO image processing.
+FROM python:3.12-alpine
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /opt/outrun
-COPY github_gitops_worker.py /opt/outrun/github_gitops_worker.py
-RUN python -m py_compile /opt/outrun/github_gitops_worker.py
-ENTRYPOINT ["python","-u","/opt/outrun/github_gitops_worker.py"]
+COPY github_actions_light_controller.py /opt/outrun/github_actions_light_controller.py
+RUN python -m py_compile /opt/outrun/github_actions_light_controller.py
+ENTRYPOINT ["python","-u","/opt/outrun/github_actions_light_controller.py"]
