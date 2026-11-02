@@ -638,23 +638,23 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
     NativeRawFvfRaster defaultState{}, explicitNone{}, explicitFront{};
     NativeRawFvfRaster explicitBack{}, invalidRaster{};
     if (!native_raw_fvf_raster_from_d3d11(
-            false,0u,true,defaultState) ||
+            false,0u,true,true,defaultState) ||
         defaultState.cull != NativeRawFvfCull::Back ||
         defaultState.frontCounterClockwise ||
         !native_raw_fvf_raster_from_d3d11(
-            true,1u,false,explicitNone) ||
+            true,1u,false,true,explicitNone) ||
         explicitNone.cull != NativeRawFvfCull::None ||
         !native_raw_fvf_raster_from_d3d11(
-            true,2u,true,explicitFront) ||
+            true,2u,true,true,explicitFront) ||
         explicitFront.cull != NativeRawFvfCull::Front ||
         !explicitFront.frontCounterClockwise ||
         !native_raw_fvf_raster_from_d3d11(
-            true,3u,false,explicitBack) ||
+            true,3u,false,true,explicitBack) ||
         explicitBack.cull != NativeRawFvfCull::Back ||
         native_raw_fvf_raster_from_d3d11(
-            true,0u,false,invalidRaster) ||
+            true,0u,false,true,invalidRaster) ||
         native_raw_fvf_raster_from_d3d11(
-            true,4u,false,invalidRaster))
+            true,4u,false,true,invalidRaster))
         return reject(__LINE__);
     NativeRawDrawExtent front{}, back{}, opposite{}, unculled{};
     if (!native_raw_fvf_projected_raster(
@@ -750,7 +750,80 @@ bool native_raw_fvf_live_cull_gpu_capture_regression() {
         return reject(__LINE__);
     return true;
 }
+
+bool native_raw_fvf_depth_clip_disabled_gpu_capture_regression() {
+    // D3D11's live rasterizer drops z near/far planes, NOT x/y, W,
+    // scissor, real IA identity or face culling. Real menu and vehicle
+    // surfaces outside z[0,w] can still produce genuine native RGB.
+    NativeRawFvfRaster defaultRs{}, depthOff{}, depthOn{};
+    if (!native_raw_fvf_raster_from_d3d11(
+            false,0u,false,false,defaultRs) ||
+        !defaultRs.depthClipEnable || // unbound RS uses hardware defaults
+        !native_raw_fvf_raster_from_d3d11(
+            true,1u,false,false,depthOff) ||
+        depthOff.depthClipEnable ||
+        !native_raw_fvf_raster_from_d3d11(
+            true,1u,false,true,depthOn) ||
+        !depthOn.depthClipEnable) return false;
+    const std::array<std::array<float,4>,3> beyondNear{{
+        {{-0.65f,-0.65f,-0.4f,1.f}},
+        {{ 0.65f,-0.65f,-0.4f,1.f}},
+        {{ 0.00f, 0.65f,-0.4f,1.f}}}};
+    const auto nearSpan = NativeRawFvfClipSpan{
+        beyondNear.data(),sizeof(beyondNear[0]),beyondNear.size()};
+    NativeRawDrawExtent nearOff{}, nearOn{};
+    if (native_raw_fvf_projected_raster(
+            nearSpan,0,0,3440,1440,nearOn,nullptr,&depthOn) ||
+        !native_raw_fvf_projected_raster(
+            nearSpan,0,0,3440,1440,nearOff,nullptr,&depthOff) ||
+        nearOff.left >= 1720 || nearOff.right <= 1720)
+        return false;
+    auto beyondFar = beyondNear;
+    for (auto& point : beyondFar) point[2] = 1.4f;
+    const auto farSpan = NativeRawFvfClipSpan{
+        beyondFar.data(),sizeof(beyondFar[0]),beyondFar.size()};
+    if (native_raw_fvf_projected_raster(
+            farSpan,0,0,3440,1440,nearOn,nullptr,&depthOn) ||
+        !native_raw_fvf_projected_raster(
+            farSpan,0,0,3440,1440,nearOff,nullptr,&depthOff))
+        return false;
+    // With z clip disabled, real source-scissor sampling must still follow
+    // the original triangle, not sample the other half of the viewport.
+    const NativeRawDrawExtent rightHalf{1720,0,3440,1440};
+    if (!native_raw_fvf_projected_raster(
+            nearSpan,0,0,3440,1440,nearOff,&rightHalf,&depthOff) ||
+        nearOff.left < rightHalf.left) return false;
+    NativeRawDualTile samples{};
+    if (!native_raw_fvf_island_dual_draw_tile(
+            nearSpan,0,0,3440,1440,3440,1440,512,288,
+            rightHalf,3u,samples,&depthOff) ||
+        samples.first.x + 512u <= 1720u ||
+        (samples.hasSecond &&
+         !native_raw_source_tiles_disjoint(
+             samples.first,samples.second,512,288))) return false;
+    // A triangle straddling W=0 remains clipped at the eye plane even
+    // with depth clip disabled; malformed zero W is never admitted.
+    auto acrossEye = beyondNear;
+    acrossEye[2][3] = -1.0f;
+    const NativeRawFvfClipSpan eyeSpan{
+        acrossEye.data(),sizeof(acrossEye[0]),acrossEye.size()};
+    if (!native_raw_fvf_projected_raster(
+            eyeSpan,0,0,3440,1440,nearOff,nullptr,&depthOff))
+        return false;
+    acrossEye[2][3] = 0.0f;
+    if (native_raw_fvf_projected_raster(
+            eyeSpan,0,0,3440,1440,nearOff,nullptr,&depthOff))
+        return false;
+    // Out-of-range original indexed IA remains fail-closed.
+    constexpr std::array<std::uint32_t,3> badIndex{{0u,1u,9u}};
+    const NativeRawFvfClipSpan malformed{
+        beyondNear.data(),sizeof(beyondNear[0]),beyondNear.size(),
+        badIndex.data(),badIndex.size(),NativeRawFvfAssembly::TriangleList};
+    return !native_raw_fvf_projected_raster(
+        malformed,0,0,3440,1440,nearOff,nullptr,&depthOff);
+}
 int main() {
+    assert(native_raw_fvf_depth_clip_disabled_gpu_capture_regression());
     assert(native_raw_fvf_live_cull_gpu_capture_regression());
     assert(native_raw_fvf_clip_capture_regression());
     assert(native_raw_fvf_large_island_phase_regression());

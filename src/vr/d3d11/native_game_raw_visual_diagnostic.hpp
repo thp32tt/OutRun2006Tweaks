@@ -1221,11 +1221,11 @@ private:
         const bool knownNativeCull = native_raw_fvf_raster_from_d3d11(
             raster.Get() != nullptr,
             static_cast<std::uint32_t>(rasterDesc.CullMode),
-            rasterDesc.FrontCounterClockwise != FALSE, fvfRaster);
+            rasterDesc.FrontCounterClockwise != FALSE,
+            !raster || rasterDesc.DepthClipEnable != FALSE, fvfRaster);
         bool authenticFvfFootprint = false;
         if (fvfClip.firstClip && knownNativeCull &&
-            (!raster || (rasterDesc.FillMode == D3D11_FILL_SOLID &&
-                         rasterDesc.DepthClipEnable))) {
+            (!raster || rasterDesc.FillMode == D3D11_FILL_SOLID)) {
             NativeRawDrawExtent clipped{};
             // Clip the ACTUAL polygon against the physical RT/viewport and
             // live native RS scissor, not only its AABB. A diagonal menu

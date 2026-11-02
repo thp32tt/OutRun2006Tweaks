@@ -21,6 +21,9 @@ enum class NativeRawFvfCull : std::uint8_t { None, Front, Back };
 struct NativeRawFvfRaster {
     NativeRawFvfCull cull = NativeRawFvfCull::None;
     bool frontCounterClockwise = false;
+    // TRUE for unbound/default D3D11 RS; FALSE omits only z clipping.
+    // Hardware always clips x, y and strictly positive homogeneous W.
+    bool depthClipEnable = true;
 };
 // Map the ACTUALLY bound D3D11 RS cull mode into the capture raster.
 // A null RS object does not mean CULL_NONE: the D3D11 default state is
@@ -30,7 +33,8 @@ struct NativeRawFvfRaster {
 // callers keep the original GPU viewport sampler in that case.
 [[nodiscard]] constexpr bool native_raw_fvf_raster_from_d3d11(
     bool rasterStateBound, std::uint32_t cullMode,
-    bool frontCounterClockwise, NativeRawFvfRaster& out) noexcept {
+    bool frontCounterClockwise, bool depthClipEnable,
+    NativeRawFvfRaster& out) noexcept {
     out = {};
     if (!rasterStateBound) {
         out.cull = NativeRawFvfCull::Back;
@@ -43,6 +47,7 @@ struct NativeRawFvfRaster {
     default: return false;
     }
     out.frontCounterClockwise = frontCounterClockwise;
+    out.depthClipEnable = depthClipEnable;
     return true;
 }
 struct NativeRawFvfClipSpan {
@@ -81,6 +86,7 @@ struct NativeRawFvfClipSpan {
         (source.indices && (source.indexCount < 3u ||
                             source.indexCount > 1048576u)))
         return false;
+    const bool depthClipEnable = !rasterState || rasterState->depthClipEnable;
     const auto activeCount = source.indices ? source.indexCount : source.count;
     const auto triangles = source.assembly == NativeRawFvfAssembly::TriangleList
         ? activeCount / 3u : activeCount - 2u;
@@ -193,6 +199,10 @@ struct NativeRawFvfClipSpan {
                 }
             };
             for (unsigned plane = 0u; plane < 7u && polygonCount; ++plane) {
+                // D3D11 DepthClipEnable=FALSE drops only 0<=z<=w.
+                // The eye-plane W and x/y bounds still apply to EVERY Draw.
+                if (!depthClipEnable && (plane == 4u || plane == 5u))
+                    continue;
                 std::size_t nextCount = 0u;
                 auto previous = homogeneous[polygonCount - 1u];
                 auto prevDistance = distance(previous, plane);
@@ -236,6 +246,11 @@ struct NativeRawFvfClipSpan {
         // precise screen footprint without interpolating shader attributes.
         for (int plane = 0; plane < (sourceScissor ? 10 : 6) &&
              polygonCount; ++plane) {
+            // Skip ONLY the D3D11 near/far depth planes when the bound
+            // rasterizer disables depth clipping. Keep XY/scissor clipping,
+            // raster face culling, W bounds and source IA validation.
+            if (!depthClipEnable && (plane == 4 || plane == 5))
+                continue;
             std::size_t nextCount = 0u;
             auto previous = polygon[polygonCount - 1u];
             auto previousDistance = plane_distance(previous, plane);
