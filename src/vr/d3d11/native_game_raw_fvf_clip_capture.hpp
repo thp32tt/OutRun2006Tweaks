@@ -54,6 +54,9 @@ struct NativeRawFvfRaster {
 // vertices. It is a sampling hint only: no CPU point grants pixel evidence.
 struct NativeRawFvfInteriorSample {
     std::int64_t pixelX{}, pixelY{};
+    // Another point strictly inside the SAME clipped authentic polygon.
+    // May guide a second non-overlapping D3D11 GPU PRE/POST readback.
+    std::int64_t alternatePixelX{}, alternatePixelY{};
     bool sparseDiagonal = false;
 };
 struct NativeRawFvfClipSpan {
@@ -151,6 +154,7 @@ struct NativeRawFvfClipSpan {
     bool anyVisible = false;
     double largestInteriorArea = 0.0;
     double interiorPixelX = 0.0, interiorPixelY = 0.0;
+    double alternatePixelX = 0.0, alternatePixelY = 0.0;
     bool interiorSparseDiagonal = false;
     for (std::size_t triangle = 0u; triangle < triangles; ++triangle) {
         std::array<Point, 20u> polygon{}, clipped{};
@@ -341,9 +345,38 @@ struct NativeRawFvfClipSpan {
                 (1.0 - centerY) * static_cast<double>(viewportH) * 0.5;
             if (!std::isfinite(boxArea) || !std::isfinite(x) ||
                 !std::isfinite(y)) return false;
+            // The original center-only RAW crop missed the distant half
+            // of very long diagonal game triangles in the SAME Draw. Pick
+            // the most distant clipped vertex in real viewport pixel units,
+            // then stay strictly inside the convex clipped source polygon.
+            // This is placement only: both captures must still prove real
+            // D3D11 GPU RGB changes, source RT ownership and Present epoch.
+            Point farthest = polygon[0];
+            double farthestDistance = -1.0;
+            for (std::size_t i = 0u; i < polygonCount; ++i) {
+                const auto dx = (polygon[i].x - centerX) *
+                    static_cast<double>(viewportW);
+                const auto dy = (polygon[i].y - centerY) *
+                    static_cast<double>(viewportH);
+                const auto distance = dx * dx + dy * dy;
+                if (!std::isfinite(distance)) return false;
+                if (distance > farthestDistance) {
+                    farthestDistance = distance;
+                    farthest = polygon[i];
+                }
+            }
+            const double nearFarX = centerX * 0.25 + farthest.x * 0.75;
+            const double nearFarY = centerY * 0.25 + farthest.y * 0.75;
+            const double ax = static_cast<double>(viewportX) +
+                (nearFarX + 1.0) * static_cast<double>(viewportW) * 0.5;
+            const double ay = static_cast<double>(viewportY) +
+                (1.0 - nearFarY) * static_cast<double>(viewportH) * 0.5;
+            if (!std::isfinite(ax) || !std::isfinite(ay)) return false;
             largestInteriorArea = std::abs(area);
             interiorPixelX = x;
             interiorPixelY = y;
+            alternatePixelX = ax;
+            alternatePixelY = ay;
             // Twice the polygon's area is stored in 'area'.
             interiorSparseDiagonal = boxArea > 0.0 &&
                 std::abs(area) < boxArea * 0.25;
@@ -386,9 +419,17 @@ struct NativeRawFvfClipSpan {
             interiorPixelX < -maxCoordinate ||
             interiorPixelY < -maxCoordinate ||
             interiorPixelX >= maxCoordinate ||
-            interiorPixelY >= maxCoordinate) return false;
+            interiorPixelY >= maxCoordinate ||
+            !std::isfinite(alternatePixelX) ||
+            !std::isfinite(alternatePixelY) ||
+            alternatePixelX < -maxCoordinate ||
+            alternatePixelY < -maxCoordinate ||
+            alternatePixelX >= maxCoordinate ||
+            alternatePixelY >= maxCoordinate) return false;
         interior->pixelX = static_cast<std::int64_t>(std::floor(interiorPixelX));
         interior->pixelY = static_cast<std::int64_t>(std::floor(interiorPixelY));
+        interior->alternatePixelX = static_cast<std::int64_t>(std::floor(alternatePixelX));
+        interior->alternatePixelY = static_cast<std::int64_t>(std::floor(alternatePixelY));
         interior->sparseDiagonal = interiorSparseDiagonal;
     }
     return raster.right > raster.left && raster.bottom > raster.top;

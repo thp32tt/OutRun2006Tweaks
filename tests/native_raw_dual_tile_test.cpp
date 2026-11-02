@@ -853,20 +853,30 @@ bool native_raw_fvf_sparse_diagonal_gpu_capture_regression() {
         anchor.pixelY < first.first.y ||
         anchor.pixelY >= static_cast<std::int64_t>(first.first.y)+th)
         return false;
-    // A centered sparse-diagonal native GPU capture must keep the genuine
-    // first disjoint source-sweep region as its SECOND GPU capture. The old
-    // fallback dropped this valid region and substituted the sweep's other
-    // region (which could overlap the polygon interior). This is two
-    // independent native source PRE/POST copies, never CPU pixel evidence.
-    NativeRawDualTile sourceSweep{};
-    if (!native_raw_swept_dual_draw_tile(
-            sw,sh,tw,th,bounds,0u,sourceSweep) ||
-        !sourceSweep.hasSecond ||
-        !native_raw_source_tiles_disjoint(
-            first.first,sourceSweep.first,tw,th) ||
+    // One original sparse Draw now captures TWO disjoint authentic clipped
+    // polygon-interior regions at once, not just one interior and an empty
+    // bounding-box corner. The following phase reverses their first/second
+    // order, and later phases still sweep the original source raster.
+    NativeRawDualTile next{};
+    if (!native_raw_source_tiles_disjoint(
+            first.first, {static_cast<std::uint32_t>(
+                (std::max)(std::int64_t{0}, (std::min)(
+                    anchor.alternatePixelX - std::int64_t{tw}/2,
+                    std::int64_t{sw - tw}))),
+                static_cast<std::uint32_t>(
+                (std::max)(std::int64_t{0}, (std::min)(
+                    anchor.alternatePixelY - std::int64_t{th}/2,
+                    std::int64_t{sh - th})))}, tw, th) ||
         !first.hasSecond ||
-        first.second.x != sourceSweep.first.x ||
-        first.second.y != sourceSweep.first.y)
+        anchor.alternatePixelX < first.second.x ||
+        anchor.alternatePixelX >= std::int64_t{first.second.x} + tw ||
+        anchor.alternatePixelY < first.second.y ||
+        anchor.alternatePixelY >= std::int64_t{first.second.y} + th ||
+        !native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,viewport,1u,next) ||
+        !next.hasSecond ||
+        next.first.x != first.second.x || next.first.y != first.second.y ||
+        next.second.x != first.first.x || next.second.y != first.first.y)
         return false;
     bool witnessedSecond = false;
     for (std::uint32_t phase = 0u; phase < 48u; ++phase) {

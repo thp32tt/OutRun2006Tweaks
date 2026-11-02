@@ -106,9 +106,11 @@ namespace outrun::vr::dx11 {
                 sw, sh, tw, th, triangle, sourcePhase, sampled))
             continue;
         // For sparse diagonal menu/race FVF geometry the bounding-box
-        // sweep can miss the actual filled polygon entirely. Sample one
-        // authentic polygon-interior pixel early in each 8-pass cycle, then
-        // return to the established sweep to cover remaining GPU regions.
+        // sweep can miss the actual filled polygon entirely. Sample two
+        // distinct authentic clipped-polygon interior points on the first
+        // two phases of each eight-pass cycle, then continue the original
+        // complete source GPU sweep. Both copies belong to the SAME actual
+        // D3D11 Draw; no CPU-generated RGB or full-frame promotion.
         // Staging copies still use only the REAL native GPU PRE/POST images.
         if (interior.sparseDiagonal && (sourcePhase % 8u) < 2u) {
             const auto clampOrigin = [](std::int64_t p,
@@ -121,16 +123,25 @@ namespace outrun::vr::dx11 {
             const NativeRawTileOrigin centered{
                 clampOrigin(interior.pixelX, tw, sw),
                 clampOrigin(interior.pixelY, th, sh)};
+            const NativeRawTileOrigin alternate{
+                clampOrigin(interior.alternatePixelX, tw, sw),
+                clampOrigin(interior.alternatePixelY, th, sh)};
             const NativeRawDualTile swept = sampled;
-            sampled.first = centered;
+            const bool alternateFirst = (sourcePhase % 8u) == 1u;
+            sampled.first = alternateFirst ? alternate : centered;
             sampled.hasSecond = false;
+            const auto companion = alternateFirst ? centered : alternate;
             if (native_raw_source_tiles_disjoint(
-                    centered, swept.first, tw, th)) {
+                    sampled.first, companion, tw, th)) {
+                sampled.second = companion;
+                sampled.hasSecond = true;
+            } else if (native_raw_source_tiles_disjoint(
+                           sampled.first, swept.first, tw, th)) {
                 sampled.second = swept.first;
                 sampled.hasSecond = true;
             } else if (swept.hasSecond &&
                        native_raw_source_tiles_disjoint(
-                           centered, swept.second, tw, th)) {
+                           sampled.first, swept.second, tw, th)) {
                 sampled.second = swept.second;
                 sampled.hasSecond = true;
             }
