@@ -10,15 +10,15 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:AUTHENTIC_SPARSE_DIAGONAL_GPU_SOURCE_RGB",
   "classification": "A_UNFINISHED_USER_VISIBLE_NATIVE_GPU_PIXEL_CAPTURE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
   "source_base_sha": "32851b40f194c7835a7071cdbb4733f51a931f12",
   "material_result_sha": "55245b3fbc4ac20c48d96253b8735bc06491f559",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "d83404ea097008c24268e964be0fc16137a68f35",
   "score_change": 0,
   "changed_files": [
     "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
@@ -58,10 +58,10 @@
       "DX11:REAL_GAME_DRAW"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "BUILD_VERIFIED does not imply real native GPU RGB or playable menu/car/race frames",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY: source-authentic clipped sparse diagonal GPU PRE/POST tile implemented; native desktop draw/pixel and contiguous menu/car/race image not yet observed, real Quest3/VDXR HMD UNTESTED.",
     "activation_guard_and_fallback": "Opt-in RAW only, original D3D9 game rendering/input/FFB and DX9Ex fallback unchanged; DXVK frozen"
   },
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no genuine game/GPU desktop/Quest3/VDXR test.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no authentic Windows game GPU/desktop, Quest3, VDXR or HMD verification; CI is SOURCE_BUILD_VERIFIED only.",
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
     "goal": "Place real D3D11 game-created RGB sampling on an authentic clipped interior of sparse diagonal FVF source triangles while keeping D3D9 Present/input safe.",
@@ -90,5 +90,45 @@
     "DX11 Fast Structural Checks": 41373365524,
     "Backend Conversion Gate": 41373365443
   },
-  "prior_failure_cause": "Exact-SHA Fast/Backend policy preflight failed because this newly created feature record lacked full LIVE_D3D9_CALLSITE->D3D11_NATIVE_DRAW->VISIBLE_FRAME_OUTPUT path and feature_contract. No proven native C++ failure in these policy preflights."
+  "prior_failure_cause": "Exact-SHA Fast/Backend policy preflight failed because this newly created feature record lacked full LIVE_D3D9_CALLSITE->D3D11_NATIVE_DRAW->VISIBLE_FRAME_OUTPUT path and feature_contract. No proven native C++ failure in these policy preflights.",
+  "checkpoint": "C6_RESULT_ONLY_AFTER_EXACT_SHA_PASS",
+  "record_type": "C6_RESULT_ONLY",
+  "desktop_game_test_performed": false,
+  "acceptance_results": {
+    "native_source_interior": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks run 41373483790 SUCCESS on exact SHA d83404ea097008c24268e964be0fc16137a68f35, native_raw_fvf_sparse_diagonal_gpu_capture_regression()"
+    },
+    "source_safety_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks run 41373483790 SUCCESS on exact SHA d83404ea097008c24268e964be0fc16137a68f35; scissor-excluded and invalid W negative regressions; original D3D9/input/FFB untouched"
+    },
+    "exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "GitHub Actions exact SHA d83404ea097008c24268e964be0fc16137a68f35: DX11 Fast 41373483790, Backend Conversion 41373483767, Windows Build 41373483750, OpenXR 41373483726, HUD Inspector 41373483778 all SUCCESS"
+    }
+  },
+  "validation_gate_runs": {
+    "DX11 Fast Structural Checks": 41373483790,
+    "Backend Conversion Gate": 41373483767,
+    "Build (Win32 Release)": 41373483750,
+    "OpenXR VR architecture": 41373483726,
+    "OutRun EXE HUD Inspector CI": 41373483778
+  },
+  "score_note": "Feature DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME remains unfinished; sparse diagonal diagnostic source stage alone does not warrant independent new score; same-task CI/retry/C6 +0."
 }
