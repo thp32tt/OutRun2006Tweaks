@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01211",
+  "production_id": "CONVERSION-DX11-01211",
+  "event_id": "CONVERSION-DX11-01211-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_RS_DEPTH_CLIP_FVF_GPU_SOURCE_CAPTURE",
+  "classification": "B_CAUSAL_EXACT_CI_GATE_REPAIR_OF_A_REAL_NATIVE_SOURCE_INTEGRATION",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_SOURCE_COMMITTED_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "desktop_game_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "1dba2e99fab458ecb3fc67d184fac8ca3837bcef",
+  "implementation_source_sha": "6b55d113c5d860eca67398d843ad8d2a375bbab6",
+  "material_result_sha": "6b55d113c5d860eca67398d843ad8d2a375bbab6",
+  "validation_bearing_result_sha": null,
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Shipping opt-in native D3D11 FVF RAW game GPU PRE/POST capture now mirrors actual default/explicit bound D3D11 DepthClipEnable. For FALSE, omit only near/far Z planes in genuine homogeneous/W and NDC source polygons while preserving XY/scissor, cull, RT identity, shader/buffer source provenance, original D3D9 draw/FFB and guarded DX9Ex fallback. Regression exercises authentic near/far out-of-range menu/car triangles, 2 GPU tiles, live scissor, W crossing/zero and malformed IA. It does not prove native desktop or stereo game output.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_SOURCE_FVF_TRIANGLE",
+      "D3D11_NATIVE_DRAW",
+      "BOUND_DEPTH_CLIP_DISABLE_TRANSLATION",
+      "SOURCE_SCISSOR_GPU_RGB_CAPTURE",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "REAL_GAME_FVF_CLIP_SPACE_VERTICES",
+      "AUTHENTIC_BOUND_D3D11_DEPTH_CLIP_RASTER",
+      "SOURCE_SCISSOR_NATIVE_GPU_RGB_TILES",
+      "PROTECTED_SOURCE_PRESENT_AND_FALLBACK"
+    ],
+    "batch_components": [
+      "D3D11_RS_DEPTH_CLIP_SOURCE_GEOMETRY",
+      "NATIVE_GPU_TILE_SOURCE_SCISSOR_POSITIVE_NEGATIVE_REGRESSION",
+      "CAUSAL_01210_STRATEGY_GATE_REPAIR"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Shipping native_game_raw_visual_diagnostic.hpp binds real D3D11 RS DepthClipEnable into source GPU PRE/POST capture; native_raw_dual_tile_test.cpp asserts near/far out-of-range authentic triangles contribute correctly when disabled. CI pending.",
+      "negative_regression": "Retain default RS depth clip; x/y scissor, cull, positive W, malformed IA validation and original fallback unchanged; 01210 previously missing required development_strategy repaired with already verified material/CI evidence.",
+      "component_integration": "native_game_raw_fvf_clip_capture.hpp raster state translates live D3D11 descriptor into native_game_raw_visual_diagnostic.hpp direct PRE/POST GPU tile routing; positive/negative C++ regression in tests/native_raw_dual_tile_test.cpp."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY after 5 exact-SHA CI PASS; no claim of actual native game menu/race visual correctness or Quest3 optical evidence until actual game/HMD test.",
+    "activation_guard_and_fallback": "Experimental DX11_RAW_VISUAL_DIAGNOSTIC opt-in/default OFF; keep live original D3D9 Draw/Present/input/FFB/SkyGlow, exact native GPU RGB/RT provenance, FVF IA safety, DX9Ex fallback, DXVK frozen."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Restore source-correct authentic native D3D11 GPU menu/vehicle/race FVF RGB capture for live depth-clip-disabled rasterizer draws, without allowing forged native frame pixels or disabling protected D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_depth_clip_native_gpu_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_REAL_GAME_GPU_RGB",
+        "expected_behavior": "Actual D3D11 bound depth clip state controls original menu/race FVF near and far source clipping before native GPU PRE/POST island capture."
+      },
+      {
+        "id": "source_scissor_w_and_ia_safety",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_INPUT_FFB",
+        "expected_behavior": "No invalid W, malformed index or scissor-excluded triangle may certify native GPU RGB output or replace original game D3D9 Draw/input/FFB."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "BUILD_FAST_OPENXR_HUD",
+        "expected_behavior": "DX11 Fast, Backend, Windows Build, OpenXR and HUD exact same source SHA gates must pass without promoting untested runtime."
+      }
+    ]
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no Windows game, GPU desktop, Quest3, VDXR or headset visual validation.",
+  "prior_failed_runs": {
+    "DX11 Fast Structural Checks": 41367737756,
+    "Backend Conversion Gate": 41367737805
+  },
+  "prior_failure_cause": "Both exact-SHA workflows failed their original policy preflight because previous C6-only 01210 record lacked development_strategy; not a proven C++ compile failure.",
+  "score_note": "Same TASK_ID retry and CI/previous metadata repair +0; do not grant independent score before a valid new feature outcome."
+}

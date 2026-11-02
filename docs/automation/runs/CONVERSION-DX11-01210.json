@@ -4,7 +4,7 @@
   "production_id": "CONVERSION-DX11-01210",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "feature_id": null,
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
@@ -15,5 +15,104 @@
   "record_type": "C6_RESULT_ONLY",
   "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
   "validation_note": "Requester confirmed GitHub CI SUCCESS at the exact validation-bearing SHA. C6 bookkeeping only; no source change, full build or CI rerun. Actual HMD runtime untested.",
-  "preservation_note": "No prior run record exists on the target branch or validation SHA; material_result_sha, feature_contract and acceptance_results were not reconstructed or fabricated."
+  "preservation_note": "No prior run record exists on the target branch or validation SHA; material_result_sha, feature_contract and acceptance_results were not reconstructed or fabricated.",
+  "material_result_sha": "6226dc4c94f2fa02090cd61f2758d483976bbd65",
+  "implementation_source_sha": "6226dc4c94f2fa02090cd61f2758d483976bbd65",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "desktop_game_test_performed": false,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+    "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_SOURCE_FVF_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "ACTUAL_BOUND_D3D11_RS_CULL",
+      "SOURCE_SCISSOR_GPU_CAPTURE",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "AUTHENTIC_GAME_FVF_CLIP_GEOMETRY",
+      "D3D11_DEFAULT_EXPLICIT_RASTER_CULL_TRANSLATION",
+      "GPU_PRE_POST_PIXEL_CAPTURE_WITH_SOURCE_SCISSOR",
+      "EXACT_SOURCE_PRESENT_FALLBACK"
+    ],
+    "batch_components": [
+      "D3D11_DEFAULT_AND_EXPLICIT_CULL_SOURCE_SAMPLING",
+      "SCISSOR_POLYGON_GPU_CAPTURE_TESTS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact-SHA 2f5b4920c53cdaf46e5c201079539cca77a50d22 GitHub DX11 Fast 41362711102 SUCCESS and Windows Build 41362711109 SUCCESS; source raster uses real D3D11 cull state.",
+      "negative_regression": "Invalid RS cull enums, backface GPU samples, scissor-excluded source triangles and invalid IA are rejected; original game source Draw, GPU/RT evidence, input/FFB and fallback remain protected.",
+      "component_integration": "NativeRawFvfRaster mapping in native_game_raw_fvf_clip_capture.hpp consumed by shipping native_game_raw_visual_diagnostic.hpp PRE/POST GPU source sampling and tested with native_raw_dual_tile_test.cpp."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY: D3D11 real GPU RAW preview sampling is partial and opt-in, not complete native menu/race, full frame or Quest 3 HMD evidence.",
+    "activation_guard_and_fallback": "DX11_RAW_VISUAL_DIAGNOSTIC opt-in/default OFF, preserve genuine D3D9 original game Draw/Present, input/FFB/SkyGlow, native GPU source identities, DX9Ex fallback, frozen DXVK."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Use authentic D3D11 bound rasterizer cull and original source scissor in FVF GPU RGB capture of native menu and race triangles while preserving safe original D3D9 rendering.",
+    "acceptance_items": [
+      {
+        "id": "real_raster_cull_capture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_REAL_GAME_GPU_RGB",
+        "expected_behavior": "Authentic default and explicit native RS face winding guides source-aligned FVF PRE/POST GPU RGB capture."
+      },
+      {
+        "id": "scissor_and_invalid_raster_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_INPUT_FFB",
+        "expected_behavior": "A source triangle fully outside scissor or invalid native raster enum cannot become falsely proven native GPU output."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "BUILD_FAST_OPENXR_HUD",
+        "expected_behavior": "All five mandated exact-SHA GitHub Actions succeed on validation SHA; HMD and desktop gameplay remain untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real_raster_cull_capture": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41362711102 SUCCESS on exact 2f5b4920c53cdaf46e5c201079539cca77a50d22; positive cull regression in native_raw_dual_tile_test.cpp"
+    },
+    "scissor_and_invalid_raster_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41362711102 SUCCESS; verified source scissor and invalid raster regression"
+    },
+    "five_exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_clip_capture.hpp",
+        "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "GitHub Actions exact 2f5b4920c53cdaf46e5c201079539cca77a50d22 DX11 Fast 41362711102, Backend 41362711108, Windows Build 41362711109, OpenXR 41362711312, HUD 41362711085 all SUCCESS"
+    }
+  },
+  "historical_result_reconstruction": "Causal 01211 failure repair: reconstruct 01210's omitted mandatory policy/feature metadata only from already verified source commits 6226dc4c.. and 2f5b4920.. and original exact-SHA Actions; preserve original recorded C6 PASS, runtime UNTESTED and score +0."
 }
