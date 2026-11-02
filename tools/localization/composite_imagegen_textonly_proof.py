@@ -15,10 +15,15 @@ except ImportError:
 
 ROOT=Path("/home/chatgpt-runner2/work/image-src/text_roi_batches")
 HD=Path("/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified")
-DEFAULT_OUT=ROOT/"ab_imagegen_composite_v3_test_only_20261102"
+DEFAULT_OUT=ROOT/"ab_imagegen_composite_v4_test_only_20261102"
 SELECTION={
  "Q012": ["Q012_0909e9d5397ec72e"],
  "Q055": ["Q055_dd5213d64f53d429"],
+ "Q089": ["Q089_bc7eeb2a41b011ad"],
+ "Q098": ["Q098_5112ccfe2d458ff6"],
+ "Q104": ["Q104_01e25aa25a681d26"],
+ "Q112": ["Q112_34d7b55a5e6b3ec8"],
+ "Q116": ["Q116_a9da32ccca1ed48a"],
  "Q241": ["Q241_f3aead3fa521f783", "Q241_7157da1bb0c3538d"]
 }
 
@@ -170,7 +175,7 @@ def run(root, hdroot, output, keys):
   reports.append(report);payloads[target]=data
   print(json.dumps({"source":key,"status":report["status"],"dds_sha256":report["output_dds_sha256"],"changed":changed_count,
       "outside":outside,"candidate_border_touch":sum(d["candidate_border_touch"] for d in details)},ensure_ascii=False))
- zip_path=output/"OUTRUN_AB_IMAGEGEN_ALPHA_COMPOSITE_3DDS_TEST_ONLY.zip"
+ zip_path=output/"OUTRUN_AB_IMAGEGEN_ALPHA_COMPOSITE_8DDS_TEST_ONLY.zip"
  if zip_path.exists():raise ValueError("REFUSE_OVERWRITE_ZIP")
  with zipfile.ZipFile(zip_path,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=3) as z:
   def put_deterministic(name,data):
