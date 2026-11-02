@@ -90,6 +90,8 @@ jobs:
           assert "COCKPIT DEVICE DIAG: phase=CREATE_EX_AFTER" in device
           assert "OUTRUN_VR_COCKPIT_DEVICE_DIAG" in device
           assert "QuestCockpitV2DeviceMode" in launcher
+          assert "effectiveVrArguments[$matches[1]] = $matches[2]" in launcher
+          assert r"(?:VR\.)?" in launcher
           assert "QuestCockpitV2ReleaseParity" in launcher
           assert "'-VR.DirectGpuOnly=true'" in launcher
           assert "'-Graphics.ReflectionUpdateRate=0.25'" in launcher

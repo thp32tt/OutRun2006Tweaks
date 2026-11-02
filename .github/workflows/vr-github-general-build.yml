@@ -73,6 +73,21 @@ jobs:
           clean: true
           fetch-depth: 1
 
+      - name: Validate cockpit diagnostics PowerShell syntax
+        if: ${{ github.ref_name == 'vr-quest-cockpit-v2' }}
+        shell: pwsh
+        run: |
+          foreach($file in @('tools/Run-OutRunVRTest.ps1','Run-QuestCockpitV2-CrashDiag.ps1')) {
+            $tokens=$null
+            $parseErrors=$null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Join-Path (Get-Location) $file),[ref]$tokens,[ref]$parseErrors)
+            if($parseErrors.Count -gt 0) {
+              throw "$file parse failure: $(($parseErrors | ForEach-Object Message) -join '; ')"
+            }
+          }
+          Write-Host 'Cockpit test script syntax PASS'
+
       - name: Verify rival known-good source contract
         shell: pwsh
         run: |
