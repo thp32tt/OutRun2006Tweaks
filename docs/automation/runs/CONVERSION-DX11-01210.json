@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01210",
+  "production_id": "CONVERSION-DX11-01210",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "validation_bearing_result_sha": "2f5b4920c53cdaf46e5c201079539cca77a50d22",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "score_change": 0,
+  "record_type": "C6_RESULT_ONLY",
+  "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "validation_note": "Requester confirmed GitHub CI SUCCESS at the exact validation-bearing SHA. C6 bookkeeping only; no source change, full build or CI rerun. Actual HMD runtime untested.",
+  "preservation_note": "No prior run record exists on the target branch or validation SHA; material_result_sha, feature_contract and acceptance_results were not reconstructed or fabricated."
+}
