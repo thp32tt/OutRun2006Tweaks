@@ -95,5 +95,32 @@
   "prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
   "record_type": "C6_RESULT_ONLY",
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no user Windows game GPU/desktop, Quest3 VDXR or HMD test. Not a full native DX11 renderer gameplay pass.",
-  "score_note": "No additional score. Same unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME capability; this material diagnostic correction and C6 do not prove playable end-to-end native renderer."
+  "score_note": "No additional score. Same unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME capability; this material diagnostic correction and C6 do not prove playable end-to-end native renderer.",
+  "acceptance_results": {
+    "authentic_disjoint_gpu_companion": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 41378370477 SUCCESS at exact material SHA b4f7c42455feb07e64d3559ad3afb148ec993ed0; native_raw_fvf_sparse_diagonal_gpu_capture_regression() source-stage C++ tests. Actual-game visible GPU and HMD remain UNTESTED."
+    },
+    "source_safety_and_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "DX11 Fast 41378370477 SUCCESS at b4f7c42455feb07e64d3559ad3afb148ec993ed0; 48-phase source bounds, disjoint second tile, scissor/invalid-W negative regression; original D3D9 and input/FFB code unchanged."
+    },
+    "exact_sha_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+        "tests/native_raw_dual_tile_test.cpp"
+      ],
+      "validation_command": "All five exact source SHA b4f7c42455feb07e64d3559ad3afb148ec993ed0 GitHub runs SUCCESS: Fast 41378370477; Backend 41378370468; Build 41378370459; OpenXR 41378370394; HUD 41378370458. No game/HMD runtime proof."
+    }
+  },
+  "record_note": "2026-11-02 same-task inherited CI policy admission repair during CONVERSION-DX11-01214. Adds factual acceptance_results for previously successful 01213 exact-SHA source-stage; material/validation identity unchanged; no extra implementation or score."
 }
