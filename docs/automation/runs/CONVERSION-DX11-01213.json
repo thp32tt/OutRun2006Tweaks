@@ -10,7 +10,7 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_work_key": "DX11:AUTHENTIC_SPARSE_DIAGONAL_GPU_SOURCE_RGB",
   "classification": "A_UNFINISHED_USER_VISIBLE_NATIVE_GPU_PIXEL_CAPTURE",
-  "status": "BUILD_VERIFIED_SOURCE_STAGE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
@@ -91,7 +91,8 @@
     "OpenXR VR architecture": 41378370394,
     "OutRun EXE HUD Inspector CI": 41378370458
   },
-  "checkpoint": "C6_RESULT_ONLY_AFTER_EXACT_SHA_PASS",
+  "checkpoint": "C6_STATE",
+  "prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
   "record_type": "C6_RESULT_ONLY",
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no user Windows game GPU/desktop, Quest3 VDXR or HMD test. Not a full native DX11 renderer gameplay pass.",
   "score_note": "No additional score. Same unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME capability; this material diagnostic correction and C6 do not prove playable end-to-end native renderer."
