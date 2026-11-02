@@ -57,6 +57,9 @@ struct NativeRawFvfInteriorSample {
     // Another point strictly inside the SAME clipped authentic polygon.
     // May guide a second non-overlapping D3D11 GPU PRE/POST readback.
     std::int64_t alternatePixelX{}, alternatePixelY{};
+    // Far-end pixel inside the same original clipped convex polygon.
+    // Covers the opposite end of a skinny menu/race GPU triangle.
+    std::int64_t oppositePixelX{}, oppositePixelY{};
     bool sparseDiagonal = false;
 };
 struct NativeRawFvfClipSpan {
@@ -155,6 +158,7 @@ struct NativeRawFvfClipSpan {
     double largestInteriorArea = 0.0;
     double interiorPixelX = 0.0, interiorPixelY = 0.0;
     double alternatePixelX = 0.0, alternatePixelY = 0.0;
+    double oppositePixelX = 0.0, oppositePixelY = 0.0;
     bool interiorSparseDiagonal = false;
     for (std::size_t triangle = 0u; triangle < triangles; ++triangle) {
         std::array<Point, 20u> polygon{}, clipped{};
@@ -365,6 +369,30 @@ struct NativeRawFvfClipSpan {
                     farthest = polygon[i];
                 }
             }
+            // Two distinct endpoints of the real clipped polygon are
+            // sampled inside its interior, rather than repeatedly copying
+            // empty corners of a giant diagonal bounding rectangle.
+            Point opposite = polygon[0];
+            double longestSpan = -1.0;
+            for (std::size_t i = 0u; i < polygonCount; ++i) {
+                const double dx = (polygon[i].x - farthest.x) *
+                    static_cast<double>(viewportW);
+                const double dy = (polygon[i].y - farthest.y) *
+                    static_cast<double>(viewportH);
+                const double span = dx * dx + dy * dy;
+                if (!std::isfinite(span)) return false;
+                if (span > longestSpan) {
+                    longestSpan = span;
+                    opposite = polygon[i];
+                }
+            }
+            const double nearOppositeX = centerX * 0.25 + opposite.x * 0.75;
+            const double nearOppositeY = centerY * 0.25 + opposite.y * 0.75;
+            const double ox = static_cast<double>(viewportX) +
+                (nearOppositeX + 1.0) * static_cast<double>(viewportW) * 0.5;
+            const double oy = static_cast<double>(viewportY) +
+                (1.0 - nearOppositeY) * static_cast<double>(viewportH) * 0.5;
+            if (!std::isfinite(ox) || !std::isfinite(oy)) return false;
             const double nearFarX = centerX * 0.25 + farthest.x * 0.75;
             const double nearFarY = centerY * 0.25 + farthest.y * 0.75;
             const double ax = static_cast<double>(viewportX) +
@@ -377,6 +405,8 @@ struct NativeRawFvfClipSpan {
             interiorPixelY = y;
             alternatePixelX = ax;
             alternatePixelY = ay;
+            oppositePixelX = ox;
+            oppositePixelY = oy;
             // Twice the polygon's area is stored in 'area'.
             interiorSparseDiagonal = boxArea > 0.0 &&
                 std::abs(area) < boxArea * 0.25;
@@ -425,11 +455,19 @@ struct NativeRawFvfClipSpan {
             alternatePixelX < -maxCoordinate ||
             alternatePixelY < -maxCoordinate ||
             alternatePixelX >= maxCoordinate ||
-            alternatePixelY >= maxCoordinate) return false;
+            alternatePixelY >= maxCoordinate ||
+            !std::isfinite(oppositePixelX) ||
+            !std::isfinite(oppositePixelY) ||
+            oppositePixelX < -maxCoordinate ||
+            oppositePixelY < -maxCoordinate ||
+            oppositePixelX >= maxCoordinate ||
+            oppositePixelY >= maxCoordinate) return false;
         interior->pixelX = static_cast<std::int64_t>(std::floor(interiorPixelX));
         interior->pixelY = static_cast<std::int64_t>(std::floor(interiorPixelY));
         interior->alternatePixelX = static_cast<std::int64_t>(std::floor(alternatePixelX));
         interior->alternatePixelY = static_cast<std::int64_t>(std::floor(alternatePixelY));
+        interior->oppositePixelX = static_cast<std::int64_t>(std::floor(oppositePixelX));
+        interior->oppositePixelY = static_cast<std::int64_t>(std::floor(oppositePixelY));
         interior->sparseDiagonal = interiorSparseDiagonal;
     }
     return raster.right > raster.left && raster.bottom > raster.top;

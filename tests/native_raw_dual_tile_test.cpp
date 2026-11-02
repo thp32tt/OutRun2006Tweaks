@@ -878,6 +878,33 @@ bool native_raw_fvf_sparse_diagonal_gpu_capture_regression() {
         next.first.x != first.second.x || next.first.y != first.second.y ||
         next.second.x != first.first.x || next.second.y != first.first.y)
         return false;
+    // All eight source phases must take their primary PRE/POST pixels from
+    // inside a REAL clipped polygon, not an often-empty bounding-box corner.
+    // Distinct ends cover both sides of the skinny game menu/race source.
+    const auto contains = [=](NativeRawTileOrigin tile,
+                              std::int64_t x, std::int64_t y) noexcept {
+        return x >= tile.x && y >= tile.y &&
+            x < std::int64_t{tile.x} + tw &&
+            y < std::int64_t{tile.y} + th;
+    };
+    NativeRawDualTile far{}, opposite{}, halfwayFar{}, halfwayOpposite{};
+    if (!native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,viewport,2u,opposite) ||
+        !native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,viewport,3u,halfwayFar) ||
+        !native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,viewport,4u,halfwayOpposite) ||
+        !native_raw_fvf_island_dual_draw_tile(
+            source,0,0,sw,sh,sw,sh,tw,th,viewport,5u,far) ||
+        !contains(opposite.first,anchor.oppositePixelX,anchor.oppositePixelY) ||
+        !contains(far.first,anchor.alternatePixelX,anchor.alternatePixelY) ||
+        !contains(halfwayFar.first,
+                  anchor.pixelX/2 + anchor.alternatePixelX/2,
+                  anchor.pixelY/2 + anchor.alternatePixelY/2) ||
+        !contains(halfwayOpposite.first,
+                  anchor.pixelX/2 + anchor.oppositePixelX/2,
+                  anchor.pixelY/2 + anchor.oppositePixelY/2))
+        return false;
     bool witnessedSecond = false;
     for (std::uint32_t phase = 0u; phase < 48u; ++phase) {
         NativeRawDualTile capture{};

@@ -105,14 +105,14 @@ namespace outrun::vr::dx11 {
         if (!native_raw_swept_dual_draw_tile(
                 sw, sh, tw, th, triangle, sourcePhase, sampled))
             continue;
-        // For sparse diagonal menu/race FVF geometry the bounding-box
-        // sweep can miss the actual filled polygon entirely. Sample two
-        // distinct authentic clipped-polygon interior points on the first
-        // two phases of each eight-pass cycle, then continue the original
-        // complete source GPU sweep. Both copies belong to the SAME actual
-        // D3D11 Draw; no CPU-generated RGB or full-frame promotion.
-        // Staging copies still use only the REAL native GPU PRE/POST images.
-        if (interior.sparseDiagonal && (sourcePhase % 8u) < 2u) {
+        // A sparse menu/race triangle may have almost no pixels in its
+        // screen-wide AABB. In all eight source phases anchor the FIRST
+        // actual D3D11 PRE/POST GPU copy inside the genuine clipped polygon:
+        // center, two distant ends and their interior half-way positions.
+        // The previous six AABB-only phases could repeatedly miss ALL RGB.
+        // Preserve swept GPU cells as SECONDARY candidates and keep the
+        // original D3D9 Present/source/epoch checks authoritative.
+        if (interior.sparseDiagonal) {
             const auto clampOrigin = [](std::int64_t p,
                 std::uint32_t size, std::uint32_t extent) noexcept {
                 return static_cast<std::uint32_t>((std::max)(
@@ -120,30 +120,42 @@ namespace outrun::vr::dx11 {
                         p - static_cast<std::int64_t>(size) / 2,
                         static_cast<std::int64_t>(extent - size))));
             };
-            const NativeRawTileOrigin centered{
-                clampOrigin(interior.pixelX, tw, sw),
-                clampOrigin(interior.pixelY, th, sh)};
-            const NativeRawTileOrigin alternate{
-                clampOrigin(interior.alternatePixelX, tw, sw),
-                clampOrigin(interior.alternatePixelY, th, sh)};
+            const auto origin = [&](std::int64_t x, std::int64_t y) noexcept {
+                return NativeRawTileOrigin{
+                    clampOrigin(x, tw, sw), clampOrigin(y, th, sh)};
+            };
+            const NativeRawTileOrigin centered = origin(
+                interior.pixelX, interior.pixelY);
+            const NativeRawTileOrigin farEnd = origin(
+                interior.alternatePixelX, interior.alternatePixelY);
+            const NativeRawTileOrigin oppositeEnd = origin(
+                interior.oppositePixelX, interior.oppositePixelY);
+            const NativeRawTileOrigin middleFar = origin(
+                interior.pixelX / 2 + interior.alternatePixelX / 2,
+                interior.pixelY / 2 + interior.alternatePixelY / 2);
+            const NativeRawTileOrigin middleOpposite = origin(
+                interior.pixelX / 2 + interior.oppositePixelX / 2,
+                interior.pixelY / 2 + interior.oppositePixelY / 2);
+            const NativeRawTileOrigin anchors[8]{
+                centered, farEnd, oppositeEnd, middleFar, middleOpposite,
+                farEnd, oppositeEnd, centered};
+            const auto phase = sourcePhase % 8u;
             const NativeRawDualTile swept = sampled;
-            const bool alternateFirst = (sourcePhase % 8u) == 1u;
-            sampled.first = alternateFirst ? alternate : centered;
+            sampled.first = anchors[phase];
             sampled.hasSecond = false;
-            const auto companion = alternateFirst ? centered : alternate;
-            if (native_raw_source_tiles_disjoint(
-                    sampled.first, companion, tw, th)) {
-                sampled.second = companion;
+            // A second disjoint genuine polygon interior beats an AABB
+            // corner; if none fits, keep the authentic GPU raster sweep.
+            const NativeRawTileOrigin candidates[5]{
+                phase == 0u ? farEnd : centered,
+                phase == 1u ? centered : farEnd,
+                oppositeEnd, swept.first, swept.second};
+            for (std::size_t c = 0u; c < 5u; ++c) {
+                if (c == 4u && !swept.hasSecond) break;
+                if (!native_raw_source_tiles_disjoint(
+                        sampled.first, candidates[c], tw, th)) continue;
+                sampled.second = candidates[c];
                 sampled.hasSecond = true;
-            } else if (native_raw_source_tiles_disjoint(
-                           sampled.first, swept.first, tw, th)) {
-                sampled.second = swept.first;
-                sampled.hasSecond = true;
-            } else if (swept.hasSecond &&
-                       native_raw_source_tiles_disjoint(
-                           sampled.first, swept.second, tw, th)) {
-                sampled.second = swept.second;
-                sampled.hasSecond = true;
+                break;
             }
         }
         if (!found) {
