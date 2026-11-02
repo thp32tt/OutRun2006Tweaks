@@ -50,8 +50,16 @@
       "DX11:REAL_GAME_DRAW"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "visible_frame_acceptance": "BUILD_VERIFIED_ONLY; actual GPU RGB and contiguous menu/car/race plus Quest3/VDXR UNTESTED.",
-    "activation_guard_and_fallback": "RAW diagnostic opt-in; preserve original D3D9 game Draw/Present/input/FFB/SkyGlow and DX9Ex fallback; DXVK frozen."
+    "visible_frame_acceptance": "SOURCE_STAGE_BUILD_VERIFIED_ONLY (original D3D9 Present is visible endpoint; native captured RGB remains diagnostic and not a proven published native game frame). Actual game GPU RGB, contiguous menu/car/race visuals and Quest3/VDXR UNTESTED.",
+    "activation_guard_and_fallback": "RAW diagnostic opt-in; preserve original D3D9 game Draw/Present/input/FFB/SkyGlow and DX9Ex fallback; DXVK frozen.",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SOURCE_NATIVE_FVF_CLIPPED_POLYGON",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_GPU_PRE_POST_RGB",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "feature_contract": {
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
@@ -112,7 +120,7 @@
     "OpenXR VR architecture": 41389126454,
     "OutRun EXE HUD Inspector CI": 41389126413
   },
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No real native menu/car/race GPU RGB/published desktop frame, gamepad session, Quest 3 HMD or VDXR live test at this exact SHA. Never assert gameplay native frame complete on CI evidence.",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. Canonical live_game_draw_path identifies source callsite -> native Draw diagnostic GPU PRE/POST -> ORIGINAL D3D9 Present, NOT a verified native-frame publication. No matching-SHA actual native visible game RGB or Quest3/VDXR runtime proof.",
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "next_source_file": "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",

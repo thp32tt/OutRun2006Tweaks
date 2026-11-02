@@ -419,3 +419,30 @@ for label, mutate in (
     invalid = copy.deepcopy(historical_01201)
     mutate(invalid)
     assert validate_task(invalid, p), "01201 historical source-stage guard bypassed: " + label
+
+# 01216 backend recovery: 01215 C6 source-stage omitted the ordered live
+# path. The existing source/CI SHA is unchanged and runtime remains UNTESTED.
+historical_01215 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-01215.json").read_text(encoding="utf-8"))
+assert historical_01215["validation_bearing_result_sha"] == "3e10488fad45bf0680fce64122c214e9d57fbab1"
+assert historical_01215["runtime_validation"] == "UNTESTED"
+assert historical_01215["full_dx11_renderer_complete"] is False
+assert historical_01215["gameplay_test_performed"] is False
+assert historical_01215["hmd_test_performed"] is False
+assert "SOURCE_STAGE_BUILD_VERIFIED_ONLY" in historical_01215["development_strategy"]["visible_frame_acceptance"]
+assert "ORIGINAL_D3D9_PRESENT" in historical_01215["development_strategy"]["live_game_draw_path"]
+assert not validate_task(historical_01215, p), validate_task(historical_01215, p)
+for label, mutate in (
+    ("missing live callsite", lambda t: t["development_strategy"]["live_game_draw_path"].remove("LIVE_D3D9_CALLSITE")),
+    ("missing native Draw", lambda t: t["development_strategy"]["live_game_draw_path"].remove("D3D11_NATIVE_DRAW")),
+    ("missing visible endpoint", lambda t: t["development_strategy"]["live_game_draw_path"].remove("VISIBLE_FRAME_OUTPUT")),
+    ("reversed order", lambda t: t["development_strategy"].update(
+        live_game_draw_path=list(reversed(t["development_strategy"]["live_game_draw_path"])))),
+    ("missing positive evidence", lambda t: t["development_strategy"]["acceptance_proof"].update(positive_probe="")),
+    ("unverified feature acceptance", lambda t: t["acceptance_results"]["source_interior_eight_phase"].update(evidence_paths=[])),
+    ("failed full exact gate", lambda t: t.update(automation_validation="FAIL_EXACT_SHA")),
+    ("unverified Quest3/HMD", lambda t: t.update(runtime_validation="PASS")),
+):
+    invalid_01215 = copy.deepcopy(historical_01215)
+    mutate(invalid_01215)
+    assert validate_task(invalid_01215, p), "01215 partial source-stage evidence bypassed: " + label
