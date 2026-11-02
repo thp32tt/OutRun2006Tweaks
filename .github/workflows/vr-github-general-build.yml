@@ -13,6 +13,7 @@ on:
       - 'src/vr/game/quest_cockpit_v2_visibility.hpp'
       - 'RUN-QUEST-COCKPIT-V2-LOD0.cmd'
       - 'RUN-QUEST-COCKPIT-V2-DIAG.cmd'
+      - 'src/vr/d3d9/ex_device_upgrade.cpp'
       - 'Run-QuestCockpitV2-CrashDiag.ps1'
       - 'tools/tests/quest_cockpit_v2_occupant_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'

@@ -14,6 +14,7 @@ on:
       - 'tools/tests/quest_cockpit_v2_occupant_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp'
       - 'tools/Run-OutRunVRTest.ps1'
+      - 'src/vr/d3d9/ex_device_upgrade.cpp'
       - 'Run-QuestCockpitV2-CrashDiag.ps1'
       - 'RUN-QUEST-COCKPIT-V2-DIAG.cmd'
       - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
@@ -84,6 +85,11 @@ jobs:
           diag=Path('Run-QuestCockpitV2-CrashDiag.ps1').read_text(encoding='utf-8')
           assert "$env:OUTRUN_VR_LAUNCH='1'" in launcher
           assert "'-VR.Enabled=true','-VR.AutoLaunchHost=true'" in launcher
+          device=Path('src/vr/d3d9/ex_device_upgrade.cpp').read_text(encoding='utf-8')
+          assert "COCKPIT DEVICE DIAG: phase=CREATE_EX_BEFORE" in device
+          assert "COCKPIT DEVICE DIAG: phase=CREATE_EX_AFTER" in device
+          assert "OUTRUN_VR_COCKPIT_DEVICE_DIAG" in device
+          assert "QuestCockpitV2DeviceMode" in launcher
           assert "QuestCockpitV2ReleaseParity" in launcher
           assert "'-VR.DirectGpuOnly=true'" in launcher
           assert "'-Graphics.ReflectionUpdateRate=0.25'" in launcher

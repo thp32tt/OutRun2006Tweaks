@@ -7,8 +7,9 @@ echo 2 = Native frame hooks only; no cockpit render change
 echo 3 = Full V2 without F0 or LOD0
 echo 4 = V2 + F0 (only after 3 works)
 echo 5 = V2 + LOD0 (only after 3 works)
+echo 6 = CLASSIC D3D9 no cockpit (try this first if option 1 crashed)
 echo.
-choice /c 12345 /n /m "Select [1-5]: "
+choice /c 123456 /n /m "Select [1-6]: "
 set "MODE=%ERRORLEVEL%"
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Run-QuestCockpitV2-CrashDiag.ps1" -Test %MODE%
 set "ERR=%ERRORLEVEL%"

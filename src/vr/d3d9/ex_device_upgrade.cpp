@@ -128,6 +128,18 @@ namespace OutRunVRD3D9ExUpgrade
             return {};
         }
 
+        // Startup breadcrumbs only when the dedicated experimental diagnostic
+        // launcher opts in. Never write detailed traces in the stable profile.
+        bool StartupDeviceDiagnostic() noexcept
+        {
+            static const bool enabled=[]() noexcept {
+                char value[8]{};
+                const DWORD size=GetEnvironmentVariableA(
+                    "OUTRUN_VR_COCKPIT_DEVICE_DIAG",value,sizeof(value));
+                return size>0 && size<sizeof(value) && value[0]=='1';
+            }();
+            return enabled;
+        }
         Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
         std::atomic<bool> FirstUpgradeLogged{false};
         std::atomic<bool> FirstFallbackLogged{false};
@@ -910,6 +922,12 @@ namespace OutRunVRD3D9ExUpgrade
             {
                 if (!device || !params) return D3DERR_INVALIDCALL;
                 *device = nullptr;
+                if (StartupDeviceDiagnostic())
+                    spdlog::info("COCKPIT DEVICE DIAG: phase=CREATE_ENTRY adapter={} type={} windowed={} request={}x{} format={} flags=0x{:08X}",
+                        adapter,static_cast<unsigned>(type),params->Windowed!=FALSE,
+                        params->BackBufferWidth,params->BackBufferHeight,
+                        static_cast<unsigned>(params->BackBufferFormat),
+                        static_cast<unsigned>(behaviorFlags));
 
                 // The VR host can become ready between game INI parsing and
                 // device creation. A zero-wait check here can still allocate
@@ -917,6 +935,9 @@ namespace OutRunVRD3D9ExUpgrade
                 const auto xrSize = ReadyXrEyeSizeAtCreateDevice(
                     ex_, adapter, type, *params);
                 const bool bindVrSource = OutRunVR::EyeExtent::Valid(xrSize);
+                if (StartupDeviceDiagnostic())
+                    spdlog::info("COCKPIT DEVICE DIAG: phase=XR_EXTENT_DONE valid={} eye={}x{}",
+                        bindVrSource,xrSize.width,xrSize.height);
 
                 // D3DPRESENT_PARAMETERS is an in/out contract. Preserve the
                 // game's original request so a failed Ex attempt cannot poison
@@ -954,6 +975,8 @@ namespace OutRunVRD3D9ExUpgrade
                         (behaviorFlags & D3DCREATE_MULTITHREADED) != 0,
                         (behaviorFlags & D3DCREATE_PUREDEVICE) != 0);
                 }
+                if (StartupDeviceDiagnostic())
+                    spdlog::info("COCKPIT DEVICE DIAG: phase=FLAGS_ACCEPTED overlayReady=1");
                 if ((behaviorFlags & D3DCREATE_PUREDEVICE) != 0)
                 {
                     if (!FirstPureDeviceFallbackLogged.exchange(true))
@@ -991,11 +1014,20 @@ namespace OutRunVRD3D9ExUpgrade
                     fullscreenPtr = &fullscreen;
                 }
 
+                if (StartupDeviceDiagnostic())
+                    spdlog::info("COCKPIT DEVICE DIAG: phase=CREATE_EX_BEFORE windowed={} physical={}x{} fullscreenPtr={} exAvailable={}",
+                        params->Windowed!=FALSE,params->BackBufferWidth,params->BackBufferHeight,
+                        fullscreenPtr!=nullptr,ex_!=nullptr);
                 IDirect3DDevice9Ex* deviceEx = nullptr;
                 HRESULT hr = ex_ ? ex_->CreateDeviceEx(adapter, type, focusWindow, behaviorFlags,
                     params, fullscreenPtr, &deviceEx) : E_FAIL;
+                if (StartupDeviceDiagnostic())
+                    spdlog::info("COCKPIT DEVICE DIAG: phase=CREATE_EX_AFTER hr=0x{:08X} deviceEx={}",
+                        static_cast<unsigned>(hr),deviceEx!=nullptr);
                 if (SUCCEEDED(hr) && deviceEx)
                 {
+                    if (StartupDeviceDiagnostic())
+                        spdlog::info("COCKPIT DEVICE DIAG: phase=COMPAT_INSTALL_BEFORE");
                     if (!InstallManagedResourceCompat(deviceEx))
                     {
                         deviceEx->Release();
@@ -1008,6 +1040,8 @@ namespace OutRunVRD3D9ExUpgrade
                         return classicFallback();
                     }
 
+                    if (StartupDeviceDiagnostic())
+                        spdlog::info("COCKPIT DEVICE DIAG: phase=COMPAT_INSTALL_AFTER ok=1");
                     *device = static_cast<IDirect3DDevice9*>(deviceEx);
                     if (bindVrSource)
                     {

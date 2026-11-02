@@ -5,6 +5,7 @@ param(
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Lod0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2ReleaseParity = 'OFF',
+    [ValidateSet('EX','CLASSIC')][string]$QuestCockpitV2DeviceMode = 'EX',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
     [ValidateSet('OFF','ON')]
@@ -265,6 +266,21 @@ if($QuestCockpitV2ReleaseParity -eq 'ON'){
         '-VR.TransparencySupersampling=false'
     )
 }
+# Device A/B after the no-cockpit release-parity control crashed before the
+# first Present. CLASSIC exercises IDirect3D9::CreateDevice without Ex
+# promotion. Keep fallback transport available; do not promote to release.
+if($QuestCockpitV2DeviceMode -eq 'CLASSIC') {
+    if($backend -ne 'd3d9'){throw 'Classic device A/B requires DX9Ex source backend'}
+    $gameArgs=@($gameArgs|Where-Object{
+        $_ -notmatch '^-(VR\.)?(PreferD3D9Ex|DirectGpuOnly|AutoRenderResolution)='
+    })
+    $gameArgs+=@(
+        '-VR.PreferD3D9Ex=false',
+        '-VR.DirectGpuOnly=false',
+        '-VR.AutoRenderResolution=false'
+    )
+    Write-Host 'COCKPIT DEVICE A/B: original classic D3D9 CreateDevice; Ex promotion OFF.'
+}
 # Crash isolation: install original native frame/callback hooks without
 # enabling camera, F0, model correction or any other cockpit modification.
 # This isolates the startup hook lifecycle from actual cockpit rendering.
@@ -384,6 +400,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "releaseMarkerPresent=$(Test-Path -LiteralPath (Join-Path $root 'VR_RELEASE_VERSION.txt'))"
     "vrLaunchExplicit=$($backend -ne '2d')"
     "cockpitReleaseParity=$QuestCockpitV2ReleaseParity"
+    "cockpitDeviceMode=$QuestCockpitV2DeviceMode"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"

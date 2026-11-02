@@ -1,5 +1,5 @@
 param(
-    [ValidateRange(1,5)][int]$Test = 1
+    [ValidateRange(1,6)][int]$Test = 1
 )
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -21,6 +21,7 @@ if($existed){
         }else{$old[$name]=@{Exists=$false}}
     }
 }
+$originalDeviceDiag=$env:OUTRUN_VR_COCKPIT_DEVICE_DIAG
 $originalLog=$env:OUTRUN_VR_FILE_LOG
 $originalLaunch=$env:OUTRUN_VR_LAUNCH
 $exitCode=1
@@ -33,6 +34,7 @@ try{
     New-ItemProperty -LiteralPath $key -Name DumpType -Value 1 -PropertyType DWord -Force | Out-Null
     New-ItemProperty -LiteralPath $key -Name DumpCount -Value 2 -PropertyType DWord -Force | Out-Null
     $env:OUTRUN_VR_FILE_LOG='1'
+    $env:OUTRUN_VR_COCKPIT_DEVICE_DIAG='1'
     $env:OUTRUN_VR_LAUNCH='1'
     Write-Host "Quest cockpit test mode=$Test. WER mini-dump directory: $dumpDir"
     Write-Host "Release marker present: $(Test-Path -LiteralPath (Join-Path $root 'VR_RELEASE_VERSION.txt'))"
@@ -45,6 +47,7 @@ try{
       3 {$launchArgs[($launchArgs.Count-1)]='ON'; Write-Host 'V2 core: no F0/LOD0'}
       4 {$launchArgs[($launchArgs.Count-1)]='ON';$launchArgs+=@('-QuestCockpitV2F0','ON');Write-Host 'V2 + F0 (only after 3 passes)'}
       5 {$launchArgs[($launchArgs.Count-1)]='ON';$launchArgs+=@('-QuestCockpitV2Lod0','ON');Write-Host 'V2 + LOD0 (only after 3 passes)'}
+      6 {$launchArgs+=@('-QuestCockpitV2DeviceMode','CLASSIC');Write-Host 'CLASSIC A/B: no cockpit + original D3D9 device (no Ex promotion)'}
     }
     & powershell.exe @launchArgs
     $exitCode=$LASTEXITCODE
@@ -52,6 +55,7 @@ try{
 finally{
     $env:OUTRUN_VR_LAUNCH=$originalLaunch
     $env:OUTRUN_VR_FILE_LOG=$originalLog
+    $env:OUTRUN_VR_COCKPIT_DEVICE_DIAG=$originalDeviceDiag
     try{
         if(!$existed){Remove-Item -LiteralPath $key -Force -ErrorAction Stop}
         else{
