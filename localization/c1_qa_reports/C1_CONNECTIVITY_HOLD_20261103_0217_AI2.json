@@ -1,0 +1,59 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.connectivity_hold.v1",
+  "run_key": "OUTRUN-C1-AI2-20261103T0215KST-CONNECTIVITY-HOLD",
+  "requested_slot_kst": "2026-11-03T02:15:00+09:00",
+  "checked_at_kst": "2026-11-03T02:17:00+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "branch_head_before_record": "a1978494ab7551b0a846b0ad267a2f2d82bc2e23",
+  "role": "C1",
+  "reviewer": "ChatGPT AI 2",
+  "policy_source_blobs": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "a2886cc26b07e1b7302d52d2ef9fb4ca664533a1",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md": "d1eb1d6cc0f6d0d1ca58ff2e84428a35ccf578c6",
+    "localization/controller_roles.json": "8638b458e60740ed93ddd7f74eb45e8204413812"
+  },
+  "remote_check": {
+    "github_access": "VERIFIED_READ_WRITE_REPOSITORY_PERMISSION",
+    "n100_tools_attempted": [
+      "mcp__n100_server__list_dir",
+      "mcp__n100_server__server_info"
+    ],
+    "error": "NOT_FOUND: Tunnel-client has not been seen for 300 seconds. Ensure tunnel-client is running and connected.",
+    "n100_inventory_verified_this_run": false,
+    "png_opened_this_run": 0,
+    "candidate_sha256_verified_this_run": 0,
+    "unreviewed_sha_count_this_run": null,
+    "availability_status": "UNKNOWN_CONNECTIVITY_HOLD",
+    "prior_snapshot_only": {
+      "source_report": "localization/c1_qa_reports/C1_IDLE_20261102_2015_AI2.json",
+      "at_kst": "2026-11-02T20:17:41+09:00",
+      "candidate_png_files": 955,
+      "previously_reviewed_distinct_sha256": 960,
+      "new_unreviewed_sha256": 0,
+      "note": "Historical verified snapshot only; NOT proof that the current inventory remains empty."
+    }
+  },
+  "results": {
+    "new_sha_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0,
+    "quality_decisions_made": false
+  },
+  "status": "CONNECTIVITY_HOLD_NOT_IDLE",
+  "guards": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_or_ingame_pass_claimed": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "score": {
+    "prior_confirmed_ai2": 2494,
+    "delta": 0,
+    "new_total_ai2": 2494,
+    "reason": "No new independently verified QA decision; outage logging/recheck +0."
+  }
+}
