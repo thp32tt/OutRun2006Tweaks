@@ -64,6 +64,10 @@ jobs:
           assert 'VRDriverSeatView' not in settings
           assert 'CockpitFrameProbe = false' in ini
           assert 'QuestCockpitV2Enabled = false' in ini
+          assert 'QuestCockpitV2HideDriver = false' in ini
+          assert 'QuestCockpitV2RawB0Camera = false' in ini
+          assert '!Settings::VRQuestCockpitV2RawB0Camera)return false' in hook
+          assert 'kOriginalModelTableRva=0x418BB0' in hook
           assert 'QuestCockpitV2CameraPose(camera,pose)' in hook
           assert 'OriginalModeOneAnchor(table,kTableSize,model,anchor)' in hook
           print('QuestCockpitV2 isolated-core contract PASS')

@@ -30,6 +30,8 @@ inline bool OriginalModeOneAnchor(
     destination=local;
     return true;
 }
+// EXPERIMENTAL B0 camera-only A/B. Never the normal QuestCockpitV2 path:
+// the original native mode1 camera calculates the seat from this table.
 // The game's row-vector D3D car basis transforms an original game-unit seat
 // point exactly once. HMD-relative 6DoF is applied later by the existing
 // OpenXR stereo renderer, never multiplied into this owner twice.

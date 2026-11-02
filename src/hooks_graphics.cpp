@@ -49,7 +49,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -267,10 +267,17 @@ static bool QuestCockpitV2Active(const EvWorkCamera* camera) noexcept {
 }
 static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
     OutRunVR::QuestCockpitV2::SeatPose& result) noexcept {
-    if(!QuestCockpitV2Active(camera))return false;
+    if(!QuestCockpitV2Active(camera) ||
+       !Settings::VRQuestCockpitV2RawB0Camera)return false;
+    // Original Quest and PC native mode1 camera already consume the
+    // original per-model seat table plus swing/blend. A second B0-derived
+    // projection drops that motion and may double-transform or jitter.
+    // Raw B0 is intentionally OFF unless explicitly selected for A/B.
     const EVWORK_CAR* car=Game::pl_car();
     if(!car)return false;
-    constexpr std::uintptr_t kOriginalModelTableRva=0x1BA4E0;
+    // Original native camera uses the initialized LIVE table VA 0x818BB0,
+    // not the ROM source VA 0x5BA4E0 (BSS is zero on disk).
+    constexpr std::uintptr_t kOriginalModelTableRva=0x418BB0;
     constexpr std::size_t kTableSize=30u*36u;
     const auto* table=Module::exe_ptr<const std::uint8_t>(
         kOriginalModelTableRva);
