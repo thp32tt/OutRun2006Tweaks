@@ -4,6 +4,7 @@ param(
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2F0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Lod0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
+    [ValidateSet('OFF','ON')][string]$QuestCockpitV2ReleaseParity = 'OFF',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
     [ValidateSet('OFF','ON')]
@@ -236,6 +237,34 @@ if($gpuLabActive){
         -Transparency $GpuLabTransparency -Reflection $GpuLabReflection `
         -SkyGlow $GpuLabSkyGlow -StageCulling $GpuLabCulling -Msaa $msaa)
 }
+# Correctness runner originally used DirectGpuOnly=false, culling=false
+# and HudInspector=true; the known-working v0.01-beta release uses
+# DirectGPU=true, culling=true and no per-draw HUD debug. Crash A/B must
+# compare *the same* graphics policy before blaming cockpit hooks.
+if($QuestCockpitV2ReleaseParity -eq 'ON'){
+    if($backend -ne 'd3d9'){throw 'QuestCockpitV2ReleaseParity requires DX9Ex'}
+    $gameArgs=@($gameArgs|Where-Object{
+        $_ -notmatch '^-(DirectGpuOnly|CullingUnionFov|NormalizeReflectionRate|NearPlane|UIScalingMode)='
+    })
+    $gameArgs+=@(
+        '-VR.DirectGpuOnly=true',
+        '-VR.CullingUnionFov=true',
+        '-VR.CullingUnionMarginDegrees=8.0',
+        '-VR.AutoRenderResolution=true',
+        '-VR.FollowGameResolution=false',
+        '-VR.MirrorFitDesktop=true',
+        '-VR.MirrorPreserveAspect=true',
+        '-VR.UnifiedEyeMenuSource=false',
+        '-VR.AntiAliasing=2',
+        '-VR.Hud1080pReference=true',
+        '-VR.HudResponsiveLayout=true',
+        '-VR.HudScale=0.55',
+        '-VR.MenuScale=0.75',
+        '-Graphics.ReflectionUpdateRate=0.25',
+        '-Graphics.TransparencySupersampling=false',
+        '-VR.TransparencySupersampling=false'
+    )
+}
 # Crash isolation: install original native frame/callback hooks without
 # enabling camera, F0, model correction or any other cockpit modification.
 # This isolates the startup hook lifecycle from actual cockpit rendering.
@@ -300,7 +329,7 @@ if($backend -ne '2d'){
 if($backend -ne '2d'){
     # The optional C gameplay preset must not force per-draw HUD inspector
     # overhead. Keep HUD Inspector ON for all existing diagnostic sessions.
-    $gameArgs += if($measuredCProduction){'-HudInspector=false'}else{'-HudInspector=true'}
+    $gameArgs += if($QuestCockpitV2ReleaseParity -eq 'ON' -or $measuredCProduction){'-HudInspector=false'}else{'-HudInspector=true'}
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
@@ -354,6 +383,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "forceVrDisabled=$($backend -eq '2d')"
     "releaseMarkerPresent=$(Test-Path -LiteralPath (Join-Path $root 'VR_RELEASE_VERSION.txt'))"
     "vrLaunchExplicit=$($backend -ne '2d')"
+    "cockpitReleaseParity=$QuestCockpitV2ReleaseParity"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
 Write-Host "Runtime overrides: $($gameArgs -join ' ')"

@@ -36,16 +36,17 @@ try{
     $env:OUTRUN_VR_LAUNCH='1'
     Write-Host "Quest cockpit test mode=$Test. WER mini-dump directory: $dumpDir"
     Write-Host "Release marker present: $(Test-Path -LiteralPath (Join-Path $root 'VR_RELEASE_VERSION.txt'))"
-    $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,
-            '-TestProfile','CORRECTNESS','-QuestCockpitV2','OFF')
+    $launchArgs=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,
+            '-TestProfile','CORRECTNESS','-QuestCockpitV2ReleaseParity','ON',
+            '-QuestCockpitV2','OFF')
     switch($Test){
       1 {Write-Host 'CONTROL: No cockpit hooks; diagnostic file logging ON'}
-      2 {$args+=@('-QuestCockpitV2FrameOnly','ON'); Write-Host 'FRAME ONLY: original native-hook observer'}
-      3 {$args[($args.Count-1)]='ON'; Write-Host 'V2 core: no F0/LOD0'}
-      4 {$args[($args.Count-1)]='ON';$args+=@('-QuestCockpitV2F0','ON');Write-Host 'V2 + F0 (only after 3 passes)'}
-      5 {$args[($args.Count-1)]='ON';$args+=@('-QuestCockpitV2Lod0','ON');Write-Host 'V2 + LOD0 (only after 3 passes)'}
+      2 {$launchArgs+=@('-QuestCockpitV2FrameOnly','ON'); Write-Host 'FRAME ONLY: original native-hook observer'}
+      3 {$launchArgs[($launchArgs.Count-1)]='ON'; Write-Host 'V2 core: no F0/LOD0'}
+      4 {$launchArgs[($launchArgs.Count-1)]='ON';$launchArgs+=@('-QuestCockpitV2F0','ON');Write-Host 'V2 + F0 (only after 3 passes)'}
+      5 {$launchArgs[($launchArgs.Count-1)]='ON';$launchArgs+=@('-QuestCockpitV2Lod0','ON');Write-Host 'V2 + LOD0 (only after 3 passes)'}
     }
-    & powershell.exe @args
+    & powershell.exe @launchArgs
     $exitCode=$LASTEXITCODE
 }
 finally{

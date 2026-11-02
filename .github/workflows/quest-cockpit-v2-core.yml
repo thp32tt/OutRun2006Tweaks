@@ -84,6 +84,9 @@ jobs:
           diag=Path('Run-QuestCockpitV2-CrashDiag.ps1').read_text(encoding='utf-8')
           assert "$env:OUTRUN_VR_LAUNCH='1'" in launcher
           assert "'-VR.Enabled=true','-VR.AutoLaunchHost=true'" in launcher
+          assert "QuestCockpitV2ReleaseParity" in launcher
+          assert "'-VR.DirectGpuOnly=true'" in launcher
+          assert "'-Graphics.ReflectionUpdateRate=0.25'" in launcher
           assert "VR_RELEASE_VERSION.txt" in launcher
           assert "Windows Error Reporting" in diag
           assert "DumpType" in diag and "finally" in diag
