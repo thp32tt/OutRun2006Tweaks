@@ -1,0 +1,43 @@
+{
+  "schema": "outrun.c1.independent_lightweight_qa.idle.v1",
+  "run_key": "OUTRUN-C1-AI2-20261102T1145KST-IDLE",
+  "scheduled_slot_kst": "2026-11-02T11:45:00+09:00",
+  "inventory_checked_at_kst": "2026-11-02T11:46:53+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_branch_head_before": "f793d1f3819f62e4f526344e444d16528265ed4a",
+  "role": "C1",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inventory": {
+    "source": "N100:/home/chatgpt-runner2/work/image-src/text_roi_batches",
+    "method": "Read-only execution of work/C1_QA_20261101_2145_AI2_inventory.py; SHA256 dedup against C1 reports and export evidence",
+    "candidate_png_files": 955,
+    "export_evidence_entries": 955,
+    "prior_reviewed_distinct_sha256": 960,
+    "new_unreviewed_sha256": 0,
+    "candidates_without_export": 0
+  },
+  "status": "IDLE_NO_NEW_UNREVIEWED_AB_CANDIDATES",
+  "results": {
+    "reviewed_new": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "guards": {
+    "imagegen_called": false,
+    "ab_queue_consumed": false,
+    "dds_written": false,
+    "c2_c3_or_ingame_pass_claimed": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_modified": false
+  },
+  "score": {
+    "delta": 0,
+    "reason": "Repeated no-new-candidate inventory; no independent new QA achievement"
+  }
+}
