@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01213",
+  "production_id": "CONVERSION-DX11-01213",
+  "event_id": "CONVERSION-DX11-01213-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_work_key": "DX11:AUTHENTIC_SPARSE_DIAGONAL_GPU_SOURCE_RGB",
+  "classification": "A_UNFINISHED_USER_VISIBLE_NATIVE_GPU_PIXEL_CAPTURE",
+  "status": "BUILD_VERIFIED_SOURCE_STAGE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "source_base_sha": "a262e0af43b3443e75c7e79c582d43b75cfb2175",
+  "material_result_sha": "b4f7c42455feb07e64d3559ad3afb148ec993ed0",
+  "validation_bearing_result_sha": "b4f7c42455feb07e64d3559ad3afb148ec993ed0",
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Source-authentic sparse diagonal clipped FVF GPU PRE/POST now retains independently sampled sweep companion instead of overwriting it with potentially overlapping tile. Other valid GPU source candidates are checked against actual centered first tile, no non-disjoint second GPU proof. 48-phase positive/negative C++ regression covers source bounds, nonoverlap, authentic sweep fallback. Opt-in RAW only; D3D9 Present, input, FFB, DX9Ex fallback and DXVK freeze preserved.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "AUTHENTIC_SOURCE_FVF_TRIANGLE",
+      "D3D11_NATIVE_DRAW",
+      "SOURCE_POLYGON_INTERIOR_GPU_PREPOST",
+      "ORIGINAL_D3D9_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "SOURCE_NATIVE_FVF_HOMOGENEOUS_CLIP",
+      "NATIVE_GPU_SOURCE_INTERIOR_TILE",
+      "NONOVERLAPPING_PREPOST_GPU_CAPTURE"
+    ],
+    "batch_components": [
+      "SPARSE_INTERIOR_COMPANION_SOURCE_PRESERVATION",
+      "REAL_GPU_TILE_DISJOINT_FALLBACK",
+      "48_PHASE_REAL_SOURCE_GUARD_REGRESSION"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Independent source sweep companion retained as second native GPU PRE/POST tile alongside actual clipped polygon interior",
+      "negative_regression": "All 48 sample phases remain within genuine 3440x1440 source and second tile never overlaps first; invalid W and scissor rejection retained",
+      "component_integration": "native_game_raw_fvf_clip_capture.hpp -> native_game_raw_fvf_island_sampling.hpp -> native_game_raw_visual_diagnostic.hpp real GPU readback"
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED SOURCE STAGE ONLY; no actual game native RGB or menu/car/race visuals proved by this C++/CI stage",
+    "activation_guard_and_fallback": "Opt-in RAW diagnostic only; source D3D9 game/input/FFB and DX9Ex fallback remain authoritative; DXVK frozen"
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Preserve complete source-coincident disjoint GPU PRE/POST sampling for sparse real-game FVF diagonals without degrading original renderer safety",
+    "acceptance_items": [
+      {
+        "id": "authentic_disjoint_gpu_companion",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NATIVE_REAL_GAME_GPU_RGB",
+        "expected_behavior": "Two physical GPU tile candidates from genuine source primitive remain distinct even when selected first tile is centered on clipped sparse diagonal"
+      },
+      {
+        "id": "source_safety_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_SOURCE_INPUT_FFB",
+        "expected_behavior": "No overlapping capture or out-of-bounds tile claims native GPU RGB, original D3D9 rendering/input/FFB remain unchanged"
+      },
+      {
+        "id": "exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "BUILD_FAST_OPENXR_HUD",
+        "expected_behavior": "Five mandatory exact-SHA CI pass, hardware runtime remains separately UNTESTED"
+      }
+    ]
+  },
+  "validation_gate_runs": {
+    "DX11 Fast Structural Checks": 41378370477,
+    "Backend Conversion Gate": 41378370468,
+    "Build (Win32 Release)": 41378370459,
+    "OpenXR VR architecture": 41378370394,
+    "OutRun EXE HUD Inspector CI": 41378370458
+  },
+  "checkpoint": "C6_RESULT_ONLY_AFTER_EXACT_SHA_PASS",
+  "record_type": "C6_RESULT_ONLY",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no user Windows game GPU/desktop, Quest3 VDXR or HMD test. Not a full native DX11 renderer gameplay pass.",
+  "score_note": "No additional score. Same unfinished DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME capability; this material diagnostic correction and C6 do not prove playable end-to-end native renderer."
+}
