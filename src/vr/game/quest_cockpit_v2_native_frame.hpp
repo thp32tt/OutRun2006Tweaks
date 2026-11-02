@@ -52,6 +52,8 @@ public:
         return snapshot;
     }
 };
+// Ready ONLY when the exact retail EXE game-frame callback triad installed.
+inline std::atomic<bool> NativeOriginalHooksReady{false};
 inline std::atomic<std::uint64_t> NativeEpochCounter{0};
 inline thread_local NativeFrameTracker NativeFrameInstance{};
 inline NativeFrameTracker& NativeFrameTrace() noexcept {

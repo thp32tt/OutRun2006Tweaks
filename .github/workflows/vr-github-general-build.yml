@@ -8,6 +8,10 @@ on:
       - 'src/hooks_graphics.cpp'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
       - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
+      - 'src/vr/game/quest_cockpit_v2_seat.hpp'
+      - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
+      - 'RUN-QUEST-COCKPIT-V2.cmd'
+      - 'QUEST-COCKPIT-V2-START-HERE.txt'
       - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_runtime_smoke.cpp'
       - 'src/hooks_uiscaling.cpp'
@@ -145,6 +149,12 @@ jobs:
             'OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd',
             'analyze_outrun_assets.py')) {
             if(Test-Path "tools/$f"){Copy-Item "tools/$f" $pkg}
+          }
+          if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
+            foreach($item in @('RUN-QUEST-COCKPIT-V2.cmd','QUEST-COCKPIT-V2-START-HERE.txt')) {
+              if(!(Test-Path $item)){throw "missing Quest cockpit launcher: $item"}
+              Copy-Item $item $pkg
+            }
           }
           $env:GITHUB_SHA | Set-Content (Join-Path $backend 'SOURCE_SHA.txt') -Encoding ascii
           'ACTIVE_R26_R43_R44' | Set-Content (Join-Path $backend 'VARIANT_ID.txt') -Encoding ascii

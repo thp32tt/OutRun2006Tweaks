@@ -1,5 +1,6 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
+    [ValidateSet('OFF','ON')][string]$QuestCockpitV2 = 'OFF',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
     [ValidateSet('OFF','ON')]
@@ -231,6 +232,20 @@ if($gpuLabActive){
     $gameArgs=@(Set-OutRunVRGpuLabArguments -BaseArgs $gameArgs `
         -Transparency $GpuLabTransparency -Reflection $GpuLabReflection `
         -SkyGlow $GpuLabSkyGlow -StageCulling $GpuLabCulling -Msaa $msaa)
+}
+# Dedicated experimental cockpit launcher. Default stays OFF.
+if($QuestCockpitV2 -eq 'ON'){
+    if($backend -ne 'd3d9') {throw 'QuestCockpitV2 needs the original DX9Ex backend'}
+    $gameArgs += @(
+        '-VR.QuestCockpitV2Enabled=true',
+        '-VR.QuestCockpitV2FullCar=true',
+        '-VR.QuestCockpitV2HideDriver=true',
+        '-VR.CockpitFrameProbe=true',
+        '-VR.Telemetry=true',
+        '-FileLogging=true'
+    )
+    $env:OUTRUN_VR_FILE_LOG='1'
+    Write-Host 'QuestCockpitV2 experimental original-mode1: enabled for THIS launch only.'
 }
 if($backend -ne '2d'){
     # The optional C gameplay preset must not force per-draw HUD inspector

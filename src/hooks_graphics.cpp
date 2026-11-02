@@ -9,6 +9,7 @@
 #include "vr_shared.hpp"
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/quest_cockpit_v2_runtime.hpp"
+#include "vr/game/quest_cockpit_v2_seat.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
@@ -48,6 +49,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -244,68 +246,125 @@ public:
         FrameEnterHook=std::move(first);
         FrameEndHook=std::move(last);
         PlayerCallbackHook=std::move(actor);
+        OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.store(true,std::memory_order_release);
         return true;
     }
     static QuestCockpitV2NativeFrameProbe instance;
 };
 QuestCockpitV2NativeFrameProbe QuestCockpitV2NativeFrameProbe::instance;
 
-class QuestCockpitV2PlayerCandidateProbe final : public Hook
-{
-    static constexpr int PlayerCarRenderStateRva = 0x69764;
-    inline static SafetyHookMid PlayerCarHook{};
-    inline static std::uint64_t Count=0;
-
-    static void ObservePlayerCar(SafetyHookContext& ctx)
-    {
-        if (!Settings::VREnabled || !Settings::VRCockpitFrameProbe)
+// Experimental QuestCockpitV2 mode1 player owner. Original mode1 seat uses
+// the immutable 30x36-byte PC/Quest ROM anchors (15 distinct XYZ pairs).
+// The old native-camera offset, model scale and stale-pose cache stay deleted.
+static bool QuestCockpitV2Active(const EvWorkCamera* camera) noexcept {
+    return OutRunVR::QuestCockpitV2::TrialEligible(
+        Settings::VRQuestCockpitV2Enabled,Settings::VREnabled,
+        IsPlayableCarGameplay(),
+        camera ? static_cast<std::uint8_t>(camera->cam_mode_34A) : 0xff,
+        OutRunVR::QuestCockpitV2::InSceneEffect(), Game::pl_car()!=nullptr)
+        && OutRunVR::QuestCockpitV2::NativeOriginalHooksReady.load(
+            std::memory_order_acquire);
+}
+static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
+    OutRunVR::QuestCockpitV2::SeatPose& result) noexcept {
+    if(!QuestCockpitV2Active(camera))return false;
+    const EVWORK_CAR* car=Game::pl_car();
+    if(!car)return false;
+    constexpr std::uintptr_t kOriginalModelTableRva=0x1BA4E0;
+    constexpr std::size_t kTableSize=30u*36u;
+    const auto* table=Module::exe_ptr<const std::uint8_t>(
+        kOriginalModelTableRva);
+    MEMORY_BASIC_INFORMATION info{};
+    if(!table || VirtualQuery(table,&info,sizeof(info))!=sizeof(info) ||
+       info.State!=MEM_COMMIT || (info.Protect & (PAGE_GUARD|PAGE_NOACCESS)) ||
+       reinterpret_cast<std::uintptr_t>(table)+kTableSize>
+           reinterpret_cast<std::uintptr_t>(info.BaseAddress)+info.RegionSize)
+        return false;
+    using namespace OutRunVR::QuestCockpitV2;
+    const int model=static_cast<int>(car->car_kind_11);
+    Vec3 anchor{};
+    if(!OriginalModeOneAnchor(table,kTableSize,model,anchor))return false;
+    Matrix b0{};
+    static_assert(sizeof(Matrix)==sizeof(D3DMATRIX));
+    std::memcpy(b0.data(),&car->matrix_B0,sizeof(b0));
+    SeatPose pose{};
+    if(!SeatPoseFromCar(b0,anchor,pose))return false;
+    pose.model=static_cast<std::uint8_t>(model);
+    result=pose;return true;
+}
+class QuestCockpitV2PlayerCandidateProbe final : public Hook {
+    static constexpr int PlayerCarRva=0x69764, RobotRva=0x114C10;
+    inline static SafetyHookMid PlayerHook{};
+    inline static SafetyHookInline RobotHook{};
+    inline static std::uint64_t TraceCount=0;
+    static bool IsActualDriver(EvWorkRobot* robot) noexcept {
+        if(!robot || !Settings::VRQuestCockpitV2HideDriver ||
+            robot->workId_0!=0u)return false;
+        const int* drv=Module::exe_ptr<const int>(0x2549B0);
+        const int* hero=Module::exe_ptr<const int>(0x2549C8);
+        bool inDriver=false,inHeroine=false;
+        for(int i=0;i<6;++i){
+            inDriver|=(drv[i]==static_cast<int>(robot->chrset_8));
+            inHeroine|=(hero[i]==static_cast<int>(robot->chrset_8));
+        }
+        return inDriver&&!inHeroine;
+    }
+    static void __cdecl RobotDisplay(EvWorkRobot* robot) {
+        if(QuestCockpitV2Active(Game::camera()) && IsActualDriver(robot))
+            return; // never suppress heroine/ambiguous robot
+        RobotHook.ccall<void>(robot);
+    }
+    static void PlayerState(SafetyHookContext& ctx) {
+        if(!Settings::VREnabled ||
+           (!Settings::VRCockpitFrameProbe && !Settings::VRQuestCockpitV2Enabled))
             return;
-        const EVWORK_CAR* player=Game::pl_car();
-        if (!player || reinterpret_cast<EVWORK_CAR*>(ctx.ebx)!=player)
-            return;
-        const EvWorkCamera* camera=Game::camera();
-        const auto mode=camera
-            ? static_cast<std::uint8_t>(camera->cam_mode_34A) : 0xffu;
-        OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(mode);
-        OutRunVR::QuestCockpitV2::NativeFrameTrace().OnPlayerCar();
-        // Snapshot only read-only model inputs of the verified player.
-        // Do not copy this correction into game camera, physics or HMD view.
-        using namespace OutRunVR::QuestCockpitV2;
-        static_assert(sizeof(D3DMATRIX)==sizeof(Matrix),
-            "Quest and PC vehicle matrix layouts must match");
-        Matrix b0{},f0{},corrected{};
-        std::memcpy(b0.data(),&player->matrix_B0,sizeof(Matrix));
-        std::memcpy(f0.data(),&player->matrix_F0,sizeof(Matrix));
-        const bool valid=mode==1 && IsPlayableCarGameplay() &&
-            !InSceneEffect() && ComputeBodyCorrection(b0,f0,corrected);
-        if (Settings::VRTelemetry && ++Count<=32u)
-            spdlog::info(
-                "VR COCKPIT V2: player candidate={} cameraMode={} "
-                "matrixFinite={} B0F0hash={:016X} nativeFrame=UNOBSERVED "
-                "ownerAdmitted=0; no game camera/car/occupant modified",
-                Count,mode,valid?1:0,MatrixFingerprint(b0,f0));
+        const EVWORK_CAR* car=Game::pl_car();
+        if(!car || reinterpret_cast<EVWORK_CAR*>(ctx.ebx)!=car)return;
+        const EvWorkCamera* cam=Game::camera();
+        const auto mode=cam?
+            static_cast<std::uint8_t>(cam->cam_mode_34A):0xff;
+        if(Settings::VRCockpitFrameProbe){
+            OutRunVR::QuestCockpitV2::ThreadProbe().OnPlayerCar(mode);
+            OutRunVR::QuestCockpitV2::NativeFrameTrace().OnPlayerCar();
+        }
+        if(QuestCockpitV2Active(cam) && Settings::VRQuestCockpitV2FullCar)
+            ctx.eax=(ctx.eax & ~0x0000C000u)|0x00004000u;
+        if(Settings::VRCockpitFrameProbe && Settings::VRTelemetry &&
+           ++TraceCount<=32u){
+            using namespace OutRunVR::QuestCockpitV2;
+            Matrix b0{},f0{},correction{};
+            std::memcpy(b0.data(),&car->matrix_B0,sizeof(b0));
+            std::memcpy(f0.data(),&car->matrix_F0,sizeof(f0));
+            const bool good=ComputeBodyCorrection(b0,f0,correction);
+            spdlog::info("VR COCKPIT V2 SAMPLE: count={} mode={} "
+                "matrixValid={} hash={:016X} frame={} requested={} "
+                "stereoFrameMapping=EXPERIMENTAL",
+                TraceCount,mode,good,MatrixFingerprint(b0,f0),
+                NativeFrameTrace().ActiveEpoch(),
+                Settings::VRQuestCockpitV2Enabled.get());
+        }
     }
 public:
-    std::string_view description() override {
-        return "QuestCockpitV2PlayerCandidateProbe";
-    }
+    std::string_view description() override {return "QuestCockpitV2PlayerCandidateProbe";}
     bool validate() override {
-        return Settings::VREnabled && Settings::VRCockpitFrameProbe;
+        return Settings::VREnabled &&
+            (Settings::VRCockpitFrameProbe || Settings::VRQuestCockpitV2Enabled);
     }
     void declare_settings() override {
         Settings::VRCockpitFrameProbe.needs_restart();
+        Settings::VRQuestCockpitV2Enabled.needs_restart();
     }
     bool apply() override {
-        // Same verified original PC player-state callsite as Phase-0.
-        // Probe has zero writes and never forces original EAX render flags.
-        PlayerCarHook=safetyhook::create_mid(
-            Module::exe_ptr(PlayerCarRenderStateRva),ObservePlayerCar);
-        return !!PlayerCarHook;
+        auto car=safetyhook::create_mid(Module::exe_ptr(PlayerCarRva),PlayerState);
+        if(!car)return false;
+        auto robot=safetyhook::create_inline(Module::exe_ptr(RobotRva),RobotDisplay);
+        if(!robot)return false; // car RAII rollback
+        PlayerHook=std::move(car);RobotHook=std::move(robot);
+        return true;
     }
     static QuestCockpitV2PlayerCandidateProbe instance;
 };
 QuestCockpitV2PlayerCandidateProbe QuestCockpitV2PlayerCandidateProbe::instance;
-
 
 class RestoreCarBaseShadow : public Hook
 {
@@ -2370,6 +2429,27 @@ class FixZBufferPrecision : public Hook
                 camera->perspective_znear_BC=inCarNear;
             }
         }
+        OutRunVR::QuestCockpitV2::SeatPose pose{};
+        const bool seatReady=QuestCockpitV2CameraPose(camera,pose);
+        // Native CalcCameraMatrix consumes a temporary body-space seat
+        // and leaves original simulation work unchanged on every exit.
+        struct ScopedCamera final {
+            EvWorkCamera* c;
+            D3DVECTOR eye{},look{};
+            bool active;
+            ScopedCamera(EvWorkCamera* camera,
+                OutRunVR::QuestCockpitV2::SeatPose seat,bool enabled)
+                :c(camera),active(enabled) {
+                if(active){
+                    eye=c->cam_pos_F8;look=c->look_pos_104;
+                    c->cam_pos_F8={seat.eye.x,seat.eye.y,seat.eye.z};
+                    c->look_pos_104={seat.look.x,seat.look.y,seat.look.z};
+                }
+            }
+            ~ScopedCamera() {
+                if(active){c->cam_pos_F8=eye;c->look_pos_104=look;}
+            }
+        } scoped(camera,pose,seatReady);
         CalcCameraMatrix.call(camera);
     }
 
@@ -2402,7 +2482,8 @@ public:
 
 	bool validate() override
     {
-        return Settings::FixZBufferPrecision;
+        return Settings::FixZBufferPrecision ||
+            (Settings::VREnabled && Settings::VRQuestCockpitV2Enabled);
     }
 
 	void declare_settings() override

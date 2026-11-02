@@ -1,0 +1,12 @@
+OUTRUN 2006 - QUEST COCKPIT V2 EXPERIMENTAL TEST
+Source branch: vr-quest-cockpit-v2 (NOT v0.01-beta release)
+
+1. Unzip this COMPLETE build into a COPY of the game installation containing OR2006C2C.EXE.
+2. Ensure the Quest 3 OpenXR runtime/Virtual Desktop VDXR is active and the wheel has its usual FFB configuration.
+3. Run RUN-QUEST-COCKPIT-V2.cmd to use the native game's original per-model mode-1 seat anchors.
+4. In game select the in-car camera (native view 1). Native view 0/2 remains stock.
+5. If the headset view shakes, becomes inside the vehicle, or the driver/passenger is wrong: exit and run Run-OutRunVRTest.cmd for the safe non-cockpit baseline. No game files are patched.
+6. Use F12 to recenter. Test menu, mode 0, mode 1, mode 2, race, goal; report which screen is wrong.
+7. Attach logs from logs/ and OUTRUNVR_LAUNCH_ERROR.txt only when debugging; normal game defaults have cockpit and telemetry OFF.
+
+Note: Original APK mode-1 table contains 30 car records but 15 distinct XYZ values, repeated for i and i+15. This experimental PCVR port reads the unchanged original game's table. Player-car full-body and strictly qualified driver draw hooks are enabled on the test command only. Render-frame->OpenXR stereo equivalence and Quest3 visual stability are NOT YET verified. No original APK file is distributed.

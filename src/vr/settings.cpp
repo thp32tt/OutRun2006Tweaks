@@ -140,6 +140,12 @@ namespace Settings
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
+    Setting<bool> VRQuestCockpitV2Enabled{ "VR", "QuestCockpitV2Enabled", false,
+        "EXPERIMENTAL Quest mode1 per-car original table cockpit, opt-in only; restart required." };
+    Setting<bool> VRQuestCockpitV2FullCar{ "VR", "QuestCockpitV2FullCar", true,
+        "Opt-in experimental player car complete-body render; only mode1." };
+    Setting<bool> VRQuestCockpitV2HideDriver{ "VR", "QuestCockpitV2HideDriver", true,
+        "Opt-in experimental unambiguous player-driver-only suppression. Passenger preserved." };
 	Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,
 		"Isolated QuestCockpitV2 diagnostic: collects original player B0/F0 and bounded Present correlation. The native game-frame owner is unverified; this does not activate cockpit. Requires restart." };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,

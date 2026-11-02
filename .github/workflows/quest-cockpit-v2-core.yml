@@ -7,6 +7,9 @@ on:
       - '.github/workflows/quest-cockpit-v2-core.yml'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
       - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
+      - 'src/vr/game/quest_cockpit_v2_seat.hpp'
+      - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
+      - 'tools/Run-OutRunVRTest.ps1'
       - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_runtime_smoke.cpp'
       - 'src/hooks_graphics.cpp'
@@ -36,6 +39,12 @@ jobs:
             tools/tests/quest_cockpit_v2_native_frame_smoke.cpp \
             -o /tmp/quest-cockpit-v2-native
           /tmp/quest-cockpit-v2-native
+      - name: Original 30-record model-1 seat anchors and frame trial
+        run: |
+          c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            tools/tests/quest_cockpit_v2_seat_smoke.cpp \
+            -o /tmp/quest-v2-seat
+          /tmp/quest-v2-seat
       - name: Reject removed legacy hooks and unsafe defaults
         run: |
           python3 - <<'PY'
@@ -54,5 +63,8 @@ jobs:
           assert 'DriverSeatView =' not in ini
           assert 'VRDriverSeatView' not in settings
           assert 'CockpitFrameProbe = false' in ini
+          assert 'QuestCockpitV2Enabled = false' in ini
+          assert 'QuestCockpitV2CameraPose(camera,pose)' in hook
+          assert 'OriginalModeOneAnchor(table,kTableSize,model,anchor)' in hook
           print('QuestCockpitV2 isolated-core contract PASS')
           PY
