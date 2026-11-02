@@ -42,10 +42,11 @@
   },
   "score": {
     "ai": "AI 2",
-    "previous_confirmed": 2467,
+    "previous_confirmed": 2468,
     "delta": 0,
-    "new_total": 2467,
-    "reason": "Status-only repeat inventory of existing QA; no new independently completed result"
+    "new_total": 2468,
+    "reason": "No new QA result; status-only activity scores +0. Latest main scoreboard changed concurrently to AI 2 2468 (independent integration plan +1).",
+    "scoreboard_file_sha": "416001b83df18b9fad53f31a39c24c053a584c9d"
   },
   "note": "2026-11-02 18:16:39 KST N100 live inventory returned 955 candidates, 955 export records, 960 reviewed distinct hashes, 0 pending, 0 missing export. No QA PASS was inferred from idle."
 }
