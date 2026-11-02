@@ -3,6 +3,7 @@ param(
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2F0 = 'OFF',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2Lod0 = 'OFF',
+    [ValidateSet('OFF','ON')][string]$QuestCockpitV2FrameOnly = 'OFF',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
     [ValidateSet('OFF','ON')]
@@ -234,6 +235,24 @@ if($gpuLabActive){
     $gameArgs=@(Set-OutRunVRGpuLabArguments -BaseArgs $gameArgs `
         -Transparency $GpuLabTransparency -Reflection $GpuLabReflection `
         -SkyGlow $GpuLabSkyGlow -StageCulling $GpuLabCulling -Msaa $msaa)
+}
+# Crash isolation: install original native frame/callback hooks without
+# enabling camera, F0, model correction or any other cockpit modification.
+# This isolates the startup hook lifecycle from actual cockpit rendering.
+if($QuestCockpitV2FrameOnly -eq 'ON') {
+    if($QuestCockpitV2 -ne 'OFF' -or $backend -ne 'd3d9') {
+        throw 'QuestCockpitV2FrameOnly requires DX9Ex and QuestCockpitV2 OFF.'
+    }
+    $gameArgs += @(
+        '-VR.QuestCockpitV2Enabled=false',
+        '-VR.QuestCockpitV2OccupantCorrection=false',
+        '-VR.QuestCockpitV2F0RenderScope=false',
+        '-VR.CockpitFrameProbe=true',
+        '-VR.Telemetry=true',
+        '-FileLogging=true'
+    )
+    $env:OUTRUN_VR_FILE_LOG='1'
+    Write-Host 'QuestCockpitV2 FRAME-ONLY hook isolation: no cockpit geometry/camera mutation.'
 }
 # Dedicated experimental cockpit launcher. Default stays OFF.
 if($QuestCockpitV2Lod0 -eq 'ON' -and $QuestCockpitV2 -ne 'ON') {

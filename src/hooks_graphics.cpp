@@ -193,6 +193,17 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
         // This 1-argument cdecl wrapper ends POP ESI; RET. It is
         // the nearest bounded original player-render scope on PC.
         NativeFrameTrace().OnPlayerCallback();
+        // Crash isolation: startup/loading may invoke original 49F3E0
+        // before the game camera and XR frame are constructed. Do not
+        // dereference either for an OFF / not-yet-gameplay experiment.
+        if (!Settings::VREnabled || !Settings::VRQuestCockpitV2Enabled ||
+            !Settings::VRQuestCockpitV2F0RenderScope ||
+            !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
+            !NativeFrameTrace().Active() || !IsPlayableCarGameplay() ||
+            !player) {
+            PlayerCallbackHook.ccall<void>(player);
+            return;
+        }
         const EvWorkCamera* camera=Game::camera();
         const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
         const bool admitted=VerifiedPlayerF0CallOwner(
@@ -407,7 +418,23 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     }
     static void __cdecl RobotDisplay(EvWorkRobot* robot) {
         using namespace OutRunVR::QuestCockpitV2;
+        // Original ROB display runs outside races too. Access to event work,
+        // camera, or OpenXR latched frame before game/device initialization
+        // is not safe; let original guest render without probing these.
+        if (!robot || !Settings::VREnabled ||
+            !Settings::VRQuestCockpitV2Enabled ||
+            !Settings::VRQuestCockpitV2OccupantCorrection ||
+            !NativeOriginalHooksReady.load(std::memory_order_acquire) ||
+            !NativeFrameTrace().Active() || InSceneEffect() ||
+            !IsPlayableCarGameplay()) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
         const EvWorkCamera* camera=Game::camera();
+        if(!camera || camera->cam_mode_34A!=1 || !Game::pl_car()) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
         const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
         const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
         const auto slot=ExactOriginalCockpitOccupant(robot);
