@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "vr_ai_development_checkpoint",
+  "task_id": "CONVERSION-DX11-01216",
+  "production_id": "CONVERSION-DX11-01216",
+  "event_id": "CONVERSION-DX11-01216-E003",
+  "event_type": "rollover_resume",
+  "lane": "DX11",
+  "attempt": "2/3",
+  "chat_rollovers": 2,
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_stage": "LEGACY_SOURCE_CI_REPAIR",
+  "target_branch": "vr-dx11-native-r71",
+  "source_base_sha": "e36ffaccb3f40651366c99774f55ddd2725b5be1",
+  "source_material_sha": "0afcb0cf555599b6153200993280dbde1eac072b",
+  "last_committed_target_sha": "8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d",
+  "ci_failure_run": 41394881264,
+  "ci_failure": "Previous 01215 C6 record lacked live_game_draw_path; failed Backend policy before compile",
+  "ci_repair_files": [
+    "docs/automation/runs/CONVERSION-DX11-01215.json",
+    "tools/test_dx11_autodev_policy.py"
+  ],
+  "ci_repair_sha": "8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d",
+  "ci_runs": {
+    "DX11 Fast Structural Checks": 41395402632,
+    "Backend Conversion Gate": 41395402596,
+    "Build (Win32 Release)": 41395402583,
+    "OpenXR VR architecture": 41395402575,
+    "OutRun EXE HUD Inspector CI": 41395402620
+  },
+  "verified_so_far": [
+    "DX11 Fast Structural Checks success at 8551b45b9e3886a381d7be3c0b9c8a84e3f6b92d"
+  ],
+  "unfinished": [
+    "Wait final conclusions for other four exact-SHA CI runs and verify Windows artifact",
+    "If all 5 PASS, record 01216 C6 source-stage proof only at the validation-bearing SHA",
+    "Keep R175 ownership untouched and pursue actual live native visible game frame in same feature"
+  ],
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "native_gameplay_verified": false,
+  "dx9ex_fallback_preserved": true,
+  "score_change": 0
+}
