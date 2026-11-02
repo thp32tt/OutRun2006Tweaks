@@ -15,7 +15,7 @@ except ImportError:
 
 ROOT=Path("/home/chatgpt-runner2/work/image-src/text_roi_batches")
 HD=Path("/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified")
-DEFAULT_OUT=ROOT/"ab_imagegen_composite_v2_test_only_20261102"
+DEFAULT_OUT=ROOT/"ab_imagegen_composite_v3_test_only_20261102"
 SELECTION={
  "Q012": ["Q012_0909e9d5397ec72e"],
  "Q055": ["Q055_dd5213d64f53d429"],
@@ -173,10 +173,15 @@ def run(root, hdroot, output, keys):
  zip_path=output/"OUTRUN_AB_IMAGEGEN_ALPHA_COMPOSITE_3DDS_TEST_ONLY.zip"
  if zip_path.exists():raise ValueError("REFUSE_OVERWRITE_ZIP")
  with zipfile.ZipFile(zip_path,"w",compression=zipfile.ZIP_DEFLATED,compresslevel=3) as z:
+  def put_deterministic(name,data):
+   info=zipfile.ZipInfo(name,date_time=(1980,1,1,0,0,0))
+   info.compress_type=zipfile.ZIP_DEFLATED
+   info.external_attr=(0o100644<<16)
+   z.writestr(info,data,compress_type=zipfile.ZIP_DEFLATED,compresslevel=3)
   for r in reports:
-   z.writestr(r["target_path"],payloads[r["target_path"]])
-   z.writestr("qa_receipts/"+r["source"]+".json",json.dumps(r,ensure_ascii=False,indent=2))
-  z.writestr("TEST_ONLY_MANIFEST.json",json.dumps({"status":"NOT_RUNTIME_APPROVED","dds_count":len(reports),
+   put_deterministic(r["target_path"],payloads[r["target_path"]])
+   put_deterministic("qa_receipts/"+r["source"]+".json",json.dumps(r,ensure_ascii=False,indent=2))
+  put_deterministic("TEST_ONLY_MANIFEST.json",json.dumps({"status":"NOT_RUNTIME_APPROVED","dds_count":len(reports),
     "sources":[r["source"] for r in reports],"no_game_files_written":True},ensure_ascii=False,indent=2))
  with zipfile.ZipFile(zip_path) as z:
   assert z.testzip() is None
