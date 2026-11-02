@@ -15,7 +15,7 @@ except ImportError:
 
 ROOT=Path("/home/chatgpt-runner2/work/image-src/text_roi_batches")
 HD=Path("/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified")
-DEFAULT_OUT=ROOT/"ab_imagegen_composite_test_only_20261102"
+DEFAULT_OUT=ROOT/"ab_imagegen_composite_v2_test_only_20261102"
 SELECTION={
  "Q012": ["Q012_0909e9d5397ec72e"],
  "Q055": ["Q055_dd5213d64f53d429"],
@@ -108,9 +108,13 @@ def run(root, hdroot, output, keys):
    img_path=matches[0]
    with Image.open(img_path) as im:
     cand=im.convert("RGBA")
-   ab=cand.getchannel("A").getbbox()
-   if not ab:raise ValueError("CANDIDATE_EMPTY_ALPHA")
-   touches=(ab[0]==0 or ab[1]==0 or ab[2]==cand.width or ab[3]==cand.height)
+   # Crop visible ink; ImageGen often leaves low-alpha ghost halos.
+   raw_ab=cand.getchannel("A").getbbox()
+   ab=cand.getchannel("A").point(lambda a:255 if a>=16 else 0).getbbox()
+   if not ab:raise ValueError("CANDIDATE_EMPTY_VISIBLE_INK")
+   touches=(raw_ab[0]==0 or raw_ab[1]==0 or raw_ab[2]==cand.width or raw_ab[3]==cand.height)
+   pad=4
+   ab=(max(0,ab[0]-pad),max(0,ab[1]-pad),min(cand.width,ab[2]+pad),min(cand.height,ab[3]+pad))
    letters=cand.crop(ab)
    maxw=bx2-bx1; maxh=by2-by1
    scale=min(maxw/letters.width,maxh/letters.height)
@@ -118,15 +122,15 @@ def run(root, hdroot, output, keys):
    resized=letters.resize((nw,nh),Image.Resampling.LANCZOS)
    px=bx1+(maxw-nw)//2;py=by1+(maxh-nh)//2
    # clear only text's isolated row group, not source art in other rows
+   # Remove old glyph RGB even in fully transparent texels to prevent edge bleed.
    for y in range(g[0],g[1]):
     for x in range(bx1,bx2):
-     old=out.getpixel((x,y))
-     if old[3]:out.putpixel((x,y),(0,0,0,0))
+     out.putpixel((x,y),(0,0,0,0))
    out.alpha_composite(resized,(px,py))
    allowed.append(box)
    details.append(dict(roi_id=r["id"],english=r["english"],korean=r["korean"],roi=r["bbox_xyxy"],
        original_ink_box=box,row_span=list(g),candidate=str(img_path.relative_to(root)),
-       candidate_sha256=sha_path(img_path),candidate_size=cand.size,candidate_alpha_box=ab,
+       candidate_sha256=sha_path(img_path),candidate_size=cand.size,candidate_alpha_box=ab,candidate_raw_alpha_box=raw_ab,
        candidate_border_touch=touches,composed_ink_box=[px,py,px+nw,py+nh],scale=scale))
   if np is not None:
    a=np.asarray(source);b=np.asarray(out)
