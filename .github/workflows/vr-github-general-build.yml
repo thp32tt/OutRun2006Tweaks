@@ -14,6 +14,7 @@ on:
       - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
       - 'RUN-QUEST-COCKPIT-V2.cmd'
       - 'QUEST-COCKPIT-V2-START-HERE.txt'
+      - 'RUN-QUEST-COCKPIT-V2-F0.cmd'
       - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_runtime_smoke.cpp'
       - 'src/hooks_uiscaling.cpp'
@@ -153,7 +154,7 @@ jobs:
             if(Test-Path "tools/$f"){Copy-Item "tools/$f" $pkg}
           }
           if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
-            foreach($item in @('RUN-QUEST-COCKPIT-V2.cmd','QUEST-COCKPIT-V2-START-HERE.txt')) {
+            foreach($item in @('RUN-QUEST-COCKPIT-V2.cmd','RUN-QUEST-COCKPIT-V2-F0.cmd','QUEST-COCKPIT-V2-START-HERE.txt')) {
               if(!(Test-Path $item)){throw "missing Quest cockpit launcher: $item"}
               Copy-Item $item $pkg
             }

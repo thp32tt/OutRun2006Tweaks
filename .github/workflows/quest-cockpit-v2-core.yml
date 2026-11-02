@@ -82,6 +82,10 @@ jobs:
           assert 'QuestCockpitV2HideDriver = false' in ini
           assert 'QuestCockpitV2RawB0Camera = false' in ini
           assert 'QuestCockpitV2OccupantCorrection = false' in ini
+          assert 'QuestCockpitV2F0RenderScope = false' in ini
+          assert 'ScopedOriginalPlayerF0 scope(' in hook
+          assert 'PlayerCallbackHook.ccall<void>(player)' in hook
+          assert 'auto actor=safetyhook::create_inline(' in hook
           assert 'RobotRva=0x114E60' in hook
           assert 'OriginalRobotDrawSignature()' in hook
           assert 'ComposeOccupantModel(work,own->occupantCorrection,corrected)' in hook

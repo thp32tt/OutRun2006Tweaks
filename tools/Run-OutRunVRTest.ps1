@@ -1,6 +1,7 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
     [ValidateSet('OFF','ON')][string]$QuestCockpitV2 = 'OFF',
+    [ValidateSet('OFF','ON')][string]$QuestCockpitV2F0 = 'OFF',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
     [ValidateSet('OFF','ON')]
@@ -234,6 +235,9 @@ if($gpuLabActive){
         -SkyGlow $GpuLabSkyGlow -StageCulling $GpuLabCulling -Msaa $msaa)
 }
 # Dedicated experimental cockpit launcher. Default stays OFF.
+if($QuestCockpitV2F0 -eq 'ON' -and $QuestCockpitV2 -ne 'ON') {
+    throw 'F0 render scope requires QuestCockpitV2 ON'
+}
 if($QuestCockpitV2 -eq 'ON'){
     if($backend -ne 'd3d9') {throw 'QuestCockpitV2 needs the original DX9Ex backend'}
     $gameArgs += @(
@@ -242,6 +246,7 @@ if($QuestCockpitV2 -eq 'ON'){
         '-VR.QuestCockpitV2HideDriver=false',
         '-VR.QuestCockpitV2RawB0Camera=false',
         '-VR.QuestCockpitV2OccupantCorrection=true',
+        ('-VR.QuestCockpitV2F0RenderScope=' + $(if($QuestCockpitV2F0 -eq 'ON'){'true'}else{'false'})),
         '-VR.CockpitFrameProbe=true',
         '-VR.Telemetry=true',
         '-FileLogging=true'

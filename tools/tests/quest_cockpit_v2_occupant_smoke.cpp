@@ -7,6 +7,28 @@
 #include <random>
 using namespace OutRunVR::QuestCockpitV2;
 int main() {
+    // Original F0 gets identity only for exact owner and restores 16/16 bytes.
+    assert(VerifiedPlayerF0CallOwner(true,true,true,true,true,false,false));
+    assert(!VerifiedPlayerF0CallOwner(true,false,true,true,true,false,false));
+    assert(!VerifiedPlayerF0CallOwner(true,true,false,true,true,false,false));
+    assert(!VerifiedPlayerF0CallOwner(true,true,true,false,true,false,false));
+    assert(!VerifiedPlayerF0CallOwner(true,true,true,true,false,false,false));
+    assert(!VerifiedPlayerF0CallOwner(true,true,true,true,true,true,false));
+    assert(!VerifiedPlayerF0CallOwner(true,true,true,true,true,false,true));
+    Matrix f0=Identity;f0[0]=-0.6f;f0[12]=1.7f;f0[13]=2.5f;
+    const auto f0Original=f0;
+    { ScopedOriginalPlayerF0 scope(f0.data(),true);
+      assert(scope.Active());assert(f0==Identity);
+    }
+    assert(f0==f0Original);
+    try {
+        ScopedOriginalPlayerF0 scope(f0.data(),true);
+        assert(f0==Identity);throw 23;
+    }catch(int){}
+    assert(f0==f0Original);
+    { ScopedOriginalPlayerF0 scope(f0.data(),false);
+      assert(!scope.Active());assert(f0==f0Original);
+    }
     const Matrix eye=Identity;
     assert(VerifiedPlayerOccupantScope(true,true,true,true,true,true,true,true,false));
     for(int i=0;i<9;++i){

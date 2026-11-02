@@ -148,6 +148,8 @@ namespace Settings
         "Experimental original player ROB01 display model W*C correction. Exact original 514E60 hook, native frame and XR pose gated; F0 whole-frame parity remains unverified. Default OFF." };
     Setting<bool> VRQuestCockpitV2FullCar{ "VR", "QuestCockpitV2FullCar", true,
         "Opt-in experimental player car complete-body render; only mode1." };
+    Setting<bool> VRQuestCockpitV2F0RenderScope{ "VR", "QuestCockpitV2F0RenderScope", false,
+        "EXPERIMENTAL Quest player F0 identity scope around original PC 49F3E0 car rendering. Enabled only by optional F0 test launcher; original Quest uses full render-frame, not proven equivalent." };
     Setting<bool> VRQuestCockpitV2HideDriver{ "VR", "QuestCockpitV2HideDriver", false,
         "UNVERIFIED driver selection: original PC driver and heroine arrays have identical values. Default OFF until actual event/role owner is proved." };
 	Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,

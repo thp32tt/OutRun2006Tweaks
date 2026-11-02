@@ -25,6 +25,33 @@ inline bool ComposeOccupantModel(const Matrix& work,
     destination=candidate;
     return true;
 }
+// Quest render_frame original matrix_F0 16-float identity staging.
+ // On Windows the validated player callback can own a synchronous
+ // guest-view alias only for the original player car display. This is
+ // experimental: original Quest owns the larger renderer frame.
+class ScopedOriginalPlayerF0 final {
+    float* target_=nullptr;
+    Matrix original_{};
+public:
+    ScopedOriginalPlayerF0(float* target,bool admitted) noexcept {
+        if(!target||!admitted)return;
+        target_=target;
+        std::memcpy(original_.data(),target_,sizeof(Matrix));
+        std::memcpy(target_,Identity.data(),sizeof(Matrix));
+    }
+    ~ScopedOriginalPlayerF0() noexcept {
+        if(target_)std::memcpy(target_,original_.data(),sizeof(Matrix));
+    }
+    ScopedOriginalPlayerF0(const ScopedOriginalPlayerF0&)=delete;
+    ScopedOriginalPlayerF0& operator=(const ScopedOriginalPlayerF0&)=delete;
+    bool Active()const noexcept{return target_!=nullptr;}
+};
+inline bool VerifiedPlayerF0CallOwner(bool trial,bool exactPlayerCar,
+    bool originalFrameActive,bool nativeCameraMode1,bool xrStereoValid,
+    bool sceneEffect,bool reentrant) noexcept {
+    return trial&&exactPlayerCar&&originalFrameActive&&nativeCameraMode1&&
+           xrStereoValid&&!sceneEffect&&!reentrant;
+}
 inline bool VerifiedPlayerOccupantScope(bool trial,bool nativeSignature,
     bool activeNativeFrame,bool exactOriginalPlayerRobot,
     bool originalDriverDisplayEntry,bool nativeCameraModeOne,

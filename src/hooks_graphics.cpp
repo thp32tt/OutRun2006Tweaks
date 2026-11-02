@@ -50,7 +50,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -171,8 +171,9 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     static constexpr int FrameEnterRva=0x49050;
     static constexpr int FrameEndRva=0x48E40;
     static constexpr int PlayerCallbackRva=0x9F3E0;
-    inline static SafetyHookMid FrameEnterHook{},FrameEndHook{},
-        PlayerCallbackHook{};
+    inline static SafetyHookMid FrameEnterHook{},FrameEndHook{};
+    inline static SafetyHookInline PlayerCallbackHook{};
+    inline static thread_local bool F0CallbackActive=false;
 
     static void OnFrameEnter(SafetyHookContext&)
     {
@@ -183,9 +184,55 @@ class QuestCockpitV2NativeFrameProbe final : public Hook
     {
         OutRunVR::QuestCockpitV2::NativeFrameTrace().OnFrameEnd();
     }
-    static void OnPlayerCallback(SafetyHookContext&)
+    static void __cdecl OnPlayerCallback(EVWORK_CAR* player)
     {
-        OutRunVR::QuestCockpitV2::NativeFrameTrace().OnPlayerCallback();
+        using namespace OutRunVR::QuestCockpitV2;
+        // Original 0x49F3E0: push ESI; mov ESI,[ESP+8];
+        // push ESI; call original 0x46BD30 (player car display).
+        // This 1-argument cdecl wrapper ends POP ESI; RET. It is
+        // the nearest bounded original player-render scope on PC.
+        NativeFrameTrace().OnPlayerCallback();
+        const EvWorkCamera* camera=Game::camera();
+        const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
+        const bool admitted=VerifiedPlayerF0CallOwner(
+            Settings::VREnabled && Settings::VRQuestCockpitV2Enabled &&
+               Settings::VRQuestCockpitV2F0RenderScope,
+            player && player==Game::pl_car(),
+            NativeFrameTrace().Active(),camera && camera->cam_mode_34A==1,
+            xr && xr->valid && xr->poseSequence!=0,
+            InSceneEffect(),F0CallbackActive);
+        if(!admitted){
+            PlayerCallbackHook.ccall<void>(player);
+            return;
+        }
+        // The original Quest computes C from immutable B0/F0 BEFORE
+        // substituting F0. The separate native robot draw, if later in
+        // the game frame, recomputes C only after F0 is restored.
+        // Never mutate simulation work across an end-of-frame boundary.
+        Matrix b0{},f0{},C{};
+        std::memcpy(b0.data(),&player->matrix_B0,sizeof(Matrix));
+        std::memcpy(f0.data(),&player->matrix_F0,sizeof(Matrix));
+        if(!ComputeBodyCorrection(b0,f0,C)){
+            PlayerCallbackHook.ccall<void>(player);
+            return;
+        }
+        // Reentrancy blocked; both F0 and TLS owner restored in reverse
+        // order even if the original synchronous callback throws.
+        struct FlagGuard {
+            bool& flag;
+            explicit FlagGuard(bool& f) noexcept:flag(f){flag=true;}
+            ~FlagGuard() noexcept {flag=false;}
+        } marker(F0CallbackActive);
+        ScopedOriginalPlayerF0 scope(
+            reinterpret_cast<float*>(&player->matrix_F0),true);
+        static thread_local std::uint32_t trace=0;
+        if(Settings::VRCockpitFrameProbe && Settings::VRTelemetry &&
+           ++trace<=32u)
+            spdlog::info("VR COCKPIT V2 F0: sample={} originalCar=1 "
+                "nativeFrame={} xrPose={} identityScoped=1 unwindRestore=1 "
+                "QuestFullFrameEquivalence=UNTESTED",
+                trace,NativeFrameTrace().ActiveEpoch(),xr->poseSequence);
+        PlayerCallbackHook.ccall<void>(player);
     }
     template<std::size_t N>
     static bool MatchOriginalRva(int rva,
@@ -241,7 +288,7 @@ public:
         auto last=safetyhook::create_mid(
             Module::exe_ptr(FrameEndRva),OnFrameEnd);
         if(!last)return false;
-        auto actor=safetyhook::create_mid(
+        auto actor=safetyhook::create_inline(
             Module::exe_ptr(PlayerCallbackRva),OnPlayerCallback);
         if(!actor)return false;
         FrameEnterHook=std::move(first);
