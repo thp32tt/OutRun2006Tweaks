@@ -146,6 +146,8 @@ namespace Settings
         "Unsafe developer A/B: add raw B0+table override to original mode1 camera. Native game already calculates seat position. Default OFF; restart required." };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,
         "Experimental original player ROB01 display model W*C correction. Exact original 514E60 hook, native frame and XR pose gated; F0 whole-frame parity remains unverified. Default OFF." };
+    Setting<bool> VRQuestCockpitV2OccupantLod0{ "VR", "QuestCockpitV2OccupantLod0", false,
+        "EXPERIMENTAL original occupant visible/LOD0 scoped at PC 40501D and verified ROB01/ROB02 W*C draw. Quest view flag unproven. Default OFF." };
     Setting<bool> VRQuestCockpitV2FullCar{ "VR", "QuestCockpitV2FullCar", true,
         "Opt-in experimental player car complete-body render; only mode1." };
     Setting<bool> VRQuestCockpitV2F0RenderScope{ "VR", "QuestCockpitV2F0RenderScope", false,

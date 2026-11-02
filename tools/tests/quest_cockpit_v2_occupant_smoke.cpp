@@ -1,4 +1,5 @@
 #include "../../src/vr/game/quest_cockpit_v2_occupant.hpp"
+#include "../../src/vr/game/quest_cockpit_v2_visibility.hpp"
 #include "../../docs/research/quest_cockpit_v2_occupant_model_compose_20261026.hpp"
 #include <cassert>
 #include <cmath>
@@ -7,6 +8,25 @@
 #include <random>
 using namespace OutRunVR::QuestCockpitV2;
 int main() {
+    // Quest original visible/LOD0 flag is strictly per player model scope.
+    assert(!OriginalOccupantLod0Active());
+    { ScopedOriginalOccupantLod0 disabled(false);
+      assert(!disabled.Active() && !OriginalOccupantLod0Active());
+    }
+    { ScopedOriginalOccupantLod0 owner(true);
+      assert(owner.Active() && OriginalOccupantLod0Active());
+      {ScopedOriginalOccupantLod0 reentrant(true);
+       assert(!reentrant.Active() && OriginalOccupantLod0Active());
+      }
+      assert(OriginalOccupantLod0Active());
+    }
+    assert(!OriginalOccupantLod0Active());
+    try{
+        ScopedOriginalOccupantLod0 owner(true);
+        assert(OriginalOccupantLod0Active());
+        throw 35;
+    }catch(int){}
+    assert(!OriginalOccupantLod0Active());
     // Original F0 gets identity only for exact owner and restores 16/16 bytes.
     assert(VerifiedPlayerF0CallOwner(true,true,true,true,true,false,false));
     assert(!VerifiedPlayerF0CallOwner(true,false,true,true,true,false,false));

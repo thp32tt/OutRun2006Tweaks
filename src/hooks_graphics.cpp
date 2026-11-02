@@ -11,6 +11,7 @@
 #include "vr/game/quest_cockpit_v2_runtime.hpp"
 #include "vr/game/quest_cockpit_v2_seat.hpp"
 #include "vr/game/quest_cockpit_v2_occupant.hpp"
+#include "vr/game/quest_cockpit_v2_visibility.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
@@ -50,7 +51,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -485,6 +486,10 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                         // Parent renderer submits rigid and skinned bones from
                         // the original robot work only in this synchronous call.
                         // Original guest work matrix restored on all C++ exits.
+                        // Quest occupant PMT LOD0 is scoped to this verified
+                        // original ROB01/ROB02 native draw only; normal V2 OFF.
+                        ScopedOriginalOccupantLod0 lod0(
+                            Settings::VRQuestCockpitV2OccupantLod0);
                         RobotHook.ccall<void>(robot);
                         return;
                     }
@@ -2318,6 +2323,7 @@ class DisableStageCulling : public Hook
     inline static SafetyHookMid result_gate_hook{};
     inline static bool signature_mismatch_logged = false;
     inline static bool projection_writable = false;
+    inline static bool quest_occupant_lod0_pc_verified = false;
     inline static std::uint64_t scoped_calls = 0;
     inline static std::uint64_t fail_open_calls = 0;
     inline static std::uint64_t first_deferred_report = 0;
@@ -2450,6 +2456,22 @@ class DisableStageCulling : public Hook
         const bool scoped = saved.active;
         RestoreScopedProjection();
 
+        // Original PC 405015 CALL 404B00; 40501D TEST EAX;
+        // 405021 MOV EDX,[ESP+0x1C] / 405025 MOV EAX,[ESI+EDX*4+0x28].
+        // Force visible and LOD0 only inside exact original player ROB draw.
+        // Native mesh[0] existence and queue capacity checks remain intact.
+        if(quest_occupant_lod0_pc_verified &&
+           Settings::VRQuestCockpitV2OccupantLod0 &&
+           OutRunVR::QuestCockpitV2::OriginalOccupantLod0Active() &&
+           !OutRunVR::QuestCockpitV2::InSceneEffect() &&
+           ctx.esp != 0) {
+            const std::int32_t forcedLod=0;
+            std::memcpy(reinterpret_cast<void*>(
+                static_cast<std::uintptr_t>(ctx.esp)+0x1Cu),
+                &forcedLod,sizeof(forcedLod));
+            ctx.eax=1u;
+            return;
+        }
         const bool vr = VrGameplay();
         const int mode = Settings::VRStageCullingMode.get();
         if (vr && mode == 2)
@@ -2517,6 +2539,24 @@ public:
             return false;
         }
 
+        // The original PC caller carries the LOD local in [ESP+0x1C]
+        // only on this exact code version. Never write on mismatched ABI.
+        constexpr std::array<std::uint8_t,8> kPostcallOriginal{
+            0x83,0xC4,0x08,0x85,0xC0,0x74,0x72,0x8B
+        };
+        constexpr std::array<std::uint8_t,8> kLodReadOriginal{
+            0x8B,0x54,0x24,0x1C,0x8B,0x44,0x96,0x28
+        };
+        const auto* post=Module::exe_ptr<const std::uint8_t>(0x501Au);
+        const auto* lod=Module::exe_ptr<const std::uint8_t>(0x5021u);
+        quest_occupant_lod0_pc_verified=
+            post && lod &&
+            std::equal(kPostcallOriginal.begin(),kPostcallOriginal.end(),post) &&
+            std::equal(kLodReadOriginal.begin(),kLodReadOriginal.end(),lod);
+        if(Settings::VRQuestCockpitV2OccupantLod0 &&
+           !quest_occupant_lod0_pc_verified)
+            spdlog::warn("QuestCockpitV2 LOD0 unavailable: original "
+                "40501A/405021 PC stack ABI mismatch");
         projection_writable = ValidateProjectionAddress();
         // Install the after-call restore FIRST. If the pre-call hook fails,
         // no source matrix is ever changed.

@@ -10,6 +10,7 @@ on:
       - 'src/vr/game/quest_cockpit_v2_seat.hpp'
       - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_occupant.hpp'
+      - 'src/vr/game/quest_cockpit_v2_visibility.hpp'
       - 'tools/tests/quest_cockpit_v2_occupant_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp'
       - 'tools/Run-OutRunVRTest.ps1'
@@ -82,6 +83,13 @@ jobs:
           assert 'QuestCockpitV2HideDriver = false' in ini
           assert 'QuestCockpitV2RawB0Camera = false' in ini
           assert 'QuestCockpitV2OccupantCorrection = false' in ini
+          assert 'QuestCockpitV2OccupantLod0 = false' in ini
+          assert 'QuestCockpitV2OccupantLod0' in settings
+          assert 'ScopedOriginalOccupantLod0 lod0(' in hook
+          assert 'OriginalOccupantLod0Active()' in hook
+          assert 'kLodReadOriginal' in hook
+          assert 'static_cast<std::uintptr_t>(ctx.esp)+0x1Cu' in hook
+          assert 'ctx.eax=1u' in hook
           assert 'QuestCockpitV2F0RenderScope = false' in ini
           assert 'ScopedOriginalPlayerF0 scope(' in hook
           assert 'PlayerCallbackHook.ccall<void>(player)' in hook
