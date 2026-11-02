@@ -1,6 +1,6 @@
-# GitHub-first, existing-Portainer-Docker execution mode (2026-11-03).
-# Same stack/service/container name and persistent volumes as the legacy browser controller.
-# The old Dockerfile, entrypoint.sh, A/B/C1 browser code and source volumes remain untouched.
+# Existing Portainer Docker acts ONLY as GitHub Actions dispatcher/status monitor.
+# All heavy Korean localization processing runs directly on GitHub-hosted CPU;
+# the GitHub workflow does not start Docker. Existing named volumes are preserved.
 services:
   outrun-chat-controller-localization-recovery:
     build:
@@ -10,31 +10,30 @@ services:
     container_name: outrun-chat-controller-localization-recovery
     restart: unless-stopped
     init: true
-    mem_limit: 768m
-    mem_reservation: 128m
-    cpus: 0.5
-    pids_limit: 64
     read_only: true
+    mem_limit: 96m
+    mem_reservation: 32m
+    cpus: 0.10
+    pids_limit: 24
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
     tmpfs:
-      - /tmp:size=64m
+      - /tmp:size=16m
     environment:
       TZ: Asia/Seoul
       OUTRUN_GITOPS_HOME: /data/gitops
       OUTRUN_GITOPS_POLL_SECONDS: "${OUTRUN_GITOPS_POLL_SECONDS:-3600}"
-      # Optional: fine-grained GitHub PAT, restricted to OutRun2006Tweaks Contents:read/write.
-      # Without token the worker performs read-only QA and preserves local result receipts.
-      OUTRUN_GITHUB_TOKEN: "${OUTRUN_GITHUB_TOKEN:-}"
+      # Optional fine-grained GitHub Actions:Read and write PAT.
+      # Without it the Docker only observes; GitHub cron/push still runs QA.
+      OUTRUN_GITHUB_ACTIONS_TOKEN: "${OUTRUN_GITHUB_ACTIONS_TOKEN:-}"
     volumes:
       - outrun_chat_localization_recovery_data:/data
       - outrun_chat_localization_recovery_logs:/logs
-    stop_grace_period: 30s
+    stop_grace_period: 20s
 
 volumes:
-  # NEVER delete or recreate: old browser session, manifests and N100 controller evidence live here.
   outrun_chat_localization_recovery_data:
     name: outrun_chat_localization_recovery_data
   outrun_chat_localization_recovery_logs:
