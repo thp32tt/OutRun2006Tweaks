@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01217",
+  "production_id": "CONVERSION-DX11-01217",
+  "event_id": "CONVERSION-DX11-01217-E001",
+  "lane": "DX11",
+  "branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "classification": "A_UNFINISHED_REAL_GAME_NATIVE_SOURCE",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "043d64999a6bcff5bb8c877ecc64d8773f787b59",
+  "validation_bearing_result_sha": "043d64999a6bcff5bb8c877ecc64d8773f787b59",
+  "source_base_sha": "cc0848210874e5eb098eb7e9054219afc2094500",
+  "changed_files": [
+    "src/vr/d3d11/native_game_raw_fvf_island_sampling.hpp",
+    "tests/native_raw_dual_tile_test.cpp"
+  ],
+  "implementation": "Real broad single FVF game polygon: preserve rotating original GPU PRE/POST first source tile; choose physically disjoint second GPU readback from source-authenticated clipped polygon interior before AABB fallback, rotate genuine center/edge interior samples. Source W/scissor/RT, GPU RGB delta, original D3D9 Present epoch, input/FFB, DX9Ex fallback and DXVK freeze remain enforced.",
+  "test_proof": "Positive broad clipped triangle second GPU source ROI and full-range first sweep, rejected offscreen scissor, malformed homogeneous W, disjoint source extents, existing list/strip/sparse/large polygon regressions. Synthetic source geometry tests only; no actual game pixels fabricated.",
+  "gate_results": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 41400789108,
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 41400789095,
+      "conclusion": "success"
+    },
+    "Build (Win32 Release)": {
+      "run_id": 41400789123,
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 41400789115,
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 41400789080,
+      "conclusion": "success"
+    }
+  },
+  "runtime_evidence": {
+    "hmd_test": "UNTESTED",
+    "game_native_draw_count": "UNTESTED",
+    "native_published_frame_count": "UNTESTED",
+    "gameplay_menu_car_race": "UNTESTED"
+  },
+  "next_source_file": "src/vr/d3d11/native_game_raw_visual_diagnostic.hpp",
+  "real_game_draw_blocker": "Genuine game GPU RGB/published full native frame remains without matching real-game runtime evidence; this is opt-in RAW source capture, not full DX11 menu/car/race display.",
+  "score_change": 0,
+  "score_reason": "Same unfinished full-frame feature incremental source+regression stage; CI/C6 not an independent completed/playable renderer.",
+  "record_type": "C6_RESULT_ONLY",
+  "checkpoint": "C6_STATE",
+  "note": "Controller external adoption NOT_VERIFIED. DX11 exact source result is the material SHA above, not this docs-only commit."
+}
