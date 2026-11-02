@@ -30,6 +30,7 @@ COPY crop_to_imagegen_queue.py /opt/outrun/app/crop_to_imagegen_queue.py
 COPY offline_korean_sprite_fallback.py /opt/outrun/app/offline_korean_sprite_fallback.py
 COPY offline_korean_batch.py /opt/outrun/app/offline_korean_batch.py
 COPY offline_overlap_resolver.py /opt/outrun/app/offline_overlap_resolver.py
+COPY offline_overlap_ink_resolver.py /opt/outrun/app/offline_overlap_ink_resolver.py
 COPY offline_korean_packager.py /opt/outrun/app/offline_korean_packager.py
 RUN python -m py_compile /opt/outrun/c_english_crop/*.py /opt/outrun/app/crop_to_imagegen_queue.py /opt/outrun/app/offline_korean_sprite_fallback.py /opt/outrun/app/offline_korean_batch.py /opt/outrun/app/offline_korean_packager.py && tesseract --list-langs 2>&1 | grep -q eng
 COPY chrome-cache-clean.sh /opt/outrun/chrome-cache-clean.sh

@@ -18,6 +18,10 @@ SP.loader.exec_module(sprite)
 OR = importlib.util.spec_from_file_location("offline_overlap", HERE / "offline_overlap_resolver.py")
 overlap_resolver = importlib.util.module_from_spec(OR)
 OR.loader.exec_module(overlap_resolver)
+INK = importlib.util.spec_from_file_location(
+    "offline_overlap_ink", HERE / "offline_overlap_ink_resolver.py")
+ink_resolver = importlib.util.module_from_spec(INK)
+INK.loader.exec_module(ink_resolver)
 HOST = Path("/home/chatgpt-runner2/work")
 IMAGE_ROOT = Path("/data/imagegen") if Path("/data/imagegen/text_roi_batches/production_manifest.json").is_file() else HOST / "image-src"
 SOURCE_ROOT = HOST / "c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified"
@@ -272,6 +276,8 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
         return {"source":source_path.name,"status":"ALREADY_VERIFIED",
                 "ready_count":previous.get("painted_count",0),
                 "trimmed_count":previous.get("trimmed_count",0),
+                "ink_relocated_count":previous.get("ink_relocated_count",0),
+                "represented_count":previous.get("represented_count",0),
                 "held_count":previous.get("held_count",0)}
     with Image.open(source_path) as im:
         if im.format!="PNG" or im.mode!="RGBA":
@@ -293,13 +299,18 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
         exact=False
         canonical_status="MISSING_CANONICAL_DDS_RECONSTRUCT_FROM_VERIFIED_PNG"
     # Reported names may point at other variants; never clobber live texture.
-    if overlap_mode not in ("hold","trim"):raise ValueError("INVALID_OVERLAP_MODE")
+    if overlap_mode not in ("hold","trim","ink"):raise ValueError("INVALID_OVERLAP_MODE")
     output,painted,held,pixels,wrong=render(original,rows,max_opaque_fraction=max_opaque_fraction)
-    if overlap_mode=="trim":
+    represented=[]
+    if overlap_mode in ("trim","ink"):
         output,painted,held,pixels,wrong=overlap_resolver.resolve(
             original,output,rows,painted,held,
             make_glyph=sprite.make_glyph,fontfile=sprite.font_path(),
             max_opaque_fraction=max_opaque_fraction)
+    if overlap_mode=="ink":
+        output,painted,held,represented,pixels,wrong=ink_resolver.resolve(
+            original,output,rows,painted,held,
+            make_glyph=sprite.make_glyph,fontfile=sprite.font_path())
     dds_bytes=encode_rgba_dds(output,orientation,mips)
     if not execute:
         return {"source":source_path.name,"status":"DRY_RUN","ready_count":len(painted),
@@ -324,6 +335,8 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
             "output_encoding":"DDS_RGBA32_UNCOMPRESSED","mip_levels":mips,
             "painted_count":len(painted),"held_count":len(held),"painted":painted,"held":held,
             "overlap_mode":overlap_mode,
+            "represented_count":len(represented),"represented":represented,
+            "ink_relocated_count":sum(x.get("resolution")=="INK_AWARE_RELOCATE" for x in painted),
             "trimmed_count":sum(x.get("resolution")=="TRIM_TO_FREE_RECT" for x in painted),
             "pixels_changed":pixels,"outside_roi_changed_pixels":wrong,
             "output_dds_sha256":checksum(d),"output_png_sha256":checksum(p),
@@ -336,6 +349,8 @@ def run_source(entry, output_root, dds_root, *, max_opaque_fraction, execute, mi
     return {"source":source_path.name,"status":"TEST_ONLY_SAVED","ready_count":len(painted),
             "held_count":len(held),
             "trimmed_count":sum(x.get("resolution")=="TRIM_TO_FREE_RECT" for x in painted),
+            "ink_relocated_count":sum(x.get("resolution")=="INK_AWARE_RELOCATE" for x in painted),
+            "represented_count":len(represented),
             "target_path":str(target),"canonical":canonical_status}
 
 def main():
@@ -347,7 +362,7 @@ def main():
     p.add_argument("--inventory-only",action="store_true",help="Summarize readiness without rendering or modifying any file")
     p.add_argument("--mips",type=int,default=1)
     p.add_argument("--max-opaque-fraction",type=float,default=1.0)
-    p.add_argument("--overlap-mode",choices=("hold","trim"),default="hold")
+    p.add_argument("--overlap-mode",choices=("hold","trim","ink"),default="hold")
     p.add_argument("--manifest",default=str(IMAGE_ROOT/"text_roi_batches/production_manifest.json"))
     p.add_argument("--transcript",default=str(DDS_ROOT/"transcriptions.jsonl"))
     p.add_argument("--source-root",default=str(SOURCE_ROOT))
@@ -419,6 +434,8 @@ def main():
              "painted_this_run":sum(r.get("ready_count",0) for r in results if r["status"]=="TEST_ONLY_SAVED"),
              "trimmed_in_checked_sources":sum(r.get("trimmed_count",0) for r in results),
              "held_in_checked_sources":sum(r.get("held_count",0) for r in results),
+             "ink_relocated_in_checked_sources":sum(r.get("ink_relocated_count",0) for r in results),
+             "duplicates_represented_in_checked_sources":sum(r.get("represented_count",0) for r in results),
              "results":results,
              "next_step":"Repeat --execute --max-sources 1; already saved files are hash-checked and skipped",
              "runtime_validation":"UNTESTED"}

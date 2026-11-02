@@ -150,5 +150,49 @@ class TestOfflineKoreanBatch(unittest.TestCase):
                     seen.add((x,y))
         self.assertEqual(len(seen),8100-900-1250)
 
+    def test_ink_aware_second_pass_preserves_prior_korean_glyphs(self):
+        original=Image.new("RGBA",(260,150),(0,0,0,0))
+        rows=[{"id":"a","english":"First","korean":"첫째","bbox_xyxy":[10,10,185,100]},
+              {"id":"b","english":"Second","korean":"둘째","bbox_xyxy":[90,20,245,130]}]
+        initial,painted,held,_,outside=batch.render(original,rows)
+        self.assertEqual(outside,0)
+        self.assertEqual(len(painted),1)
+        self.assertEqual(len(held),1)
+        new,accepted,remaining,represented,changed,outside=batch.ink_resolver.resolve(
+            original,initial,rows,painted,held,
+            make_glyph=batch.sprite.make_glyph,fontfile=batch.sprite.font_path())
+        self.assertEqual(len(accepted),2)
+        self.assertEqual(remaining,[])
+        self.assertEqual(represented,[])
+        self.assertEqual(accepted[-1]["resolution"],"INK_AWARE_RELOCATE")
+        self.assertGreater(changed,0)
+        self.assertEqual(outside,0)
+        self.assertEqual(new.getpixel((0,0)),original.getpixel((0,0)))
+
+    def test_ink_aware_near_duplicate_not_drawn_twice(self):
+        original=Image.new("RGBA",(150,90),(0,0,0,0))
+        rows=[{"id":"a","english":"GOAL","korean":"골","bbox_xyxy":[10,10,130,70]},
+              {"id":"b","english":"GOAL","korean":"골","bbox_xyxy":[11,11,129,69]}]
+        initial,painted,held,_,_=batch.render(original,rows)
+        new,accepted,remaining,represented,changed,outside=batch.ink_resolver.resolve(
+            original,initial,rows,painted,held,
+            make_glyph=batch.sprite.make_glyph,fontfile=batch.sprite.font_path())
+        self.assertEqual(len(accepted),1)
+        self.assertEqual(len(represented),1)
+        self.assertEqual(remaining,[])
+        self.assertEqual(represented[0]["reason"],"DUPLICATE_TRANSLATION_REPRESENTED")
+        self.assertEqual(outside,0)
+        self.assertTrue(np.array_equal(np.asarray(new),np.asarray(initial)))
+
+    def test_bounded_ink_free_rectangles_not_exponential(self):
+        bbox=(0,0,120,100)
+        blockers=[(i,10,i+3,80) for i in range(0,120,4)]
+        free=batch.ink_resolver.bounded_free_rectangles(bbox,blockers,limit=24)
+        self.assertLessEqual(len(free),24)
+        for x0,y0,x1,y1 in free:
+            self.assertTrue(0<=x0<x1<=120 and 0<=y0<y1<=100)
+            self.assertFalse(any(
+                x0<b[2] and b[0]<x1 and y0<b[3] and b[1]<y1 for b in blockers))
+
 if __name__=="__main__":
     unittest.main(verbosity=2)

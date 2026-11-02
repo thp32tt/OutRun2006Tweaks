@@ -85,8 +85,8 @@ services:
       OUTRUN_OFFLINE_FALLBACK_INTERVAL_SECONDS: "60"
       OUTRUN_OFFLINE_FALLBACK_MAX_SOURCES_PER_CYCLE: "1"
       OUTRUN_OFFLINE_FALLBACK_MIPS: "1"
-      OUTRUN_OFFLINE_FALLBACK_OVERLAP_MODE: "trim" # Auto-relocate overlapping entire Korean labels to free ROI sub-rectangles
-      OUTRUN_OFFLINE_FALLBACK_OUTPUT_ROOT: "/data/imagegen/text_roi_batches/offline_overlap_v2_test_only" # New TEST_ONLY namespace; do not overwrite v1
+      OUTRUN_OFFLINE_FALLBACK_OVERLAP_MODE: "ink" # First trim, then ink-aware placement or exact duplicate representation
+      OUTRUN_OFFLINE_FALLBACK_OUTPUT_ROOT: "/data/imagegen/text_roi_batches/offline_overlap_v3_ink_test_only" # New TEST_ONLY namespace; v1/v2 files are preserved
     ports:
       - "6083:6080"
       - "8788:8787"
