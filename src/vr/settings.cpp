@@ -144,10 +144,10 @@ namespace Settings
         "EXPERIMENTAL Quest mode1 per-car original table cockpit, opt-in only; restart required." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "Unsafe developer A/B: add raw B0+table override to original mode1 camera. Native game already calculates seat position. Default OFF; restart required." };
+    Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,
+        "Experimental original player ROB01 display model W*C correction. Exact original 514E60 hook, native frame and XR pose gated; F0 whole-frame parity remains unverified. Default OFF." };
     Setting<bool> VRQuestCockpitV2FullCar{ "VR", "QuestCockpitV2FullCar", true,
         "Opt-in experimental player car complete-body render; only mode1." };
-    Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,
-        "Experimental Quest APK original driver event362 model W*C correction: native game-frame and stereo-pose guarded, scoped exact restore. Off in all ordinary launches. Needs Quest3 verification." };
     Setting<bool> VRQuestCockpitV2HideDriver{ "VR", "QuestCockpitV2HideDriver", false,
         "UNVERIFIED driver selection: original PC driver and heroine arrays have identical values. Default OFF until actual event/role owner is proved." };
 	Setting<bool> VRCockpitFrameProbe{ "VR", "CockpitFrameProbe", false,

@@ -1,44 +1,58 @@
-// QuestCockpitV2: original Quest Draw::disp_514c30 W * C contract.
-// Strict PC event 362 work-pointer owner; NOT a character ID or guessed workId.
-// The guest model work is lent to synchronous native draw only and restored.
+// Quest native Draw::disp_514c30: original robot work W * B0/F0 correction.
+// Guest work +0x10 is staged only during the synchronous original PC
+// rob_disp_disp_514e60 call; no XR camera, HUD or all-NPC mutation.
+// Exact lifetime verified in Quest ELF 0xD61098..0xD612A4.
 #pragma once
 #include "quest_cockpit_v2_runtime.hpp"
-#include <cmath>
+#include <cstddef>
 #include <cstdint>
+#include <cstring>
 namespace OutRunVR::QuestCockpitV2 {
-inline bool VerifiedDriverWorkOwner(std::uintptr_t currentWork,
-                                    std::uintptr_t slot362Work) noexcept {
-    // Quest native event array slot[362].work_token (0x5A8C in native host
-    // event array, NOT guest RAM). PC guest live cell 0x79F010 mirrors it.
-    return currentWork != 0 && slot362Work != 0 &&
-           currentWork == slot362Work;
-}
-inline bool OriginalOccupantRightCompose(const Matrix& W,const Matrix& C,
-                                        Matrix& output) noexcept {
-    if(!FiniteAffine(W)||!FiniteAffine(C))return false;
-    Matrix result{};
-    for(int r=0;r<4;++r){
-        for(int c=0;c<4;++c){
-            double sum=0.0;
-            for(int k=0;k<4;++k)
-                sum += static_cast<double>(W[4*r+k])*
-                       static_cast<double>(C[4*k+c]);
-            if(!std::isfinite(sum))return false;
-            result[4*r+c]=static_cast<float>(sum);
+inline bool ComposeOccupantModel(const Matrix& work,
+   const Matrix& bodyCorrection, Matrix& destination) noexcept {
+    for(float f:work)if(!std::isfinite(f))return false;
+    for(float f:bodyCorrection)if(!std::isfinite(f))return false;
+    Matrix candidate{};
+    for(std::size_t row=0;row<4;++row) {
+        for(std::size_t col=0;col<4;++col) {
+            double acc=0.;
+            for(std::size_t k=0;k<4;++k)
+                acc+=double(work[row*4+k])*double(bodyCorrection[k*4+col]);
+            candidate[row*4+col]=float(acc);
         }
     }
-    if(!FiniteAffine(result))return false;
-    output=result;
+    for(float f:candidate)if(!std::isfinite(f))return false;
+    destination=candidate;
     return true;
 }
-// Production callsite may be admitted ONLY on exact original PC player
-// event-362 work pointer, and inside one native renderer game-frame with
-// a currently latched stereo pose. The combined game-frame <-> XR
-// equivalence still requires headset evidence. No stale pose reuse.
-inline bool OriginalOccupantPreviewEligible(bool cockpitEnabled,
-    bool nativeViewOne,bool originalPlayerWork,bool originalFrameActive,
-    bool xrStereoPoseLatched,bool sceneEffect) noexcept {
-    return cockpitEnabled && nativeViewOne && originalPlayerWork &&
-           originalFrameActive && xrStereoPoseLatched && !sceneEffect;
+inline bool VerifiedPlayerOccupantScope(bool trial,bool nativeSignature,
+    bool activeNativeFrame,bool exactOriginalPlayerRobot,
+    bool originalDriverDisplayEntry,bool nativeCameraModeOne,
+    bool gameWorld,bool validStereoAndPose,bool sceneEffect) noexcept {
+    return trial && nativeSignature && activeNativeFrame &&
+        exactOriginalPlayerRobot && originalDriverDisplayEntry &&
+        nativeCameraModeOne && gameWorld && validStereoAndPose &&
+        !sceneEffect;
 }
+// Renderer-scoped alias to original robot work only because Windows original
+// PC code reads work+0x10 synchronously inside its owned draw. No simulation
+// writes survive this call, including C++ exception paths.
+class ScopedOriginalRobotWorkMatrix final {
+    float* target_ = nullptr;
+    Matrix original_{};
+public:
+    ScopedOriginalRobotWorkMatrix(float* target,const Matrix& corrected,
+                                  bool admitted) noexcept {
+        if(!admitted||!target)return;
+        target_=target;
+        std::memcpy(original_.data(),target_,sizeof(Matrix));
+        std::memcpy(target_,corrected.data(),sizeof(Matrix));
+    }
+    ~ScopedOriginalRobotWorkMatrix() noexcept {
+        if(target_)std::memcpy(target_,original_.data(),sizeof(Matrix));
+    }
+    ScopedOriginalRobotWorkMatrix(const ScopedOriginalRobotWorkMatrix&)=delete;
+    ScopedOriginalRobotWorkMatrix& operator=(const ScopedOriginalRobotWorkMatrix&)=delete;
+    bool Active()const noexcept{return target_!=nullptr;}
+};
 }

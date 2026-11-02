@@ -9,8 +9,8 @@
 #include "vr_shared.hpp"
 #include "vr/game/quest_cockpit_v2_phase0_probe.hpp"
 #include "vr/game/quest_cockpit_v2_runtime.hpp"
-#include "vr/game/quest_cockpit_v2_occupant.hpp"
 #include "vr/game/quest_cockpit_v2_seat.hpp"
+#include "vr/game/quest_cockpit_v2_occupant.hpp"
 #include "vr/game/quest_cockpit_v2_native_frame.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
@@ -302,94 +302,106 @@ static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
 }
 class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static constexpr int PlayerCarRva=0x69764, RobotRva=0x114E60;
-    static constexpr int DriverEventCellRva=0x39F010; // guest VA 0x79F010
+    static constexpr int OriginalDriverDisplayRva=0x879B0;
     inline static SafetyHookMid PlayerHook{};
     inline static SafetyHookInline RobotHook{};
     inline static std::uint64_t TraceCount=0;
-    inline static std::uint32_t OccupantTrace=0;
-    inline static thread_local bool InCorrectedDriverDraw=false;
+    inline static thread_local OutRunVR::QuestCockpitV2::FrameOwner OccupantOwner{};
 
-    static bool IsOriginalDriverWork(const EvWorkRobot* work) noexcept {
-        if(!work)return false;
-        // The PC game's event-362 work-token shadow is populated from the
-        // native event slot, unlike the two identical driver/heroine char
-        // tables at VA 0x6549B0 and 0x6549C8. Event363 remains unknown.
-        const auto* ptr=Module::exe_ptr<const std::uint32_t>(
-            DriverEventCellRva);
-        return OutRunVR::QuestCockpitV2::VerifiedDriverWorkOwner(
-            reinterpret_cast<std::uintptr_t>(work),
-            ptr?static_cast<std::uintptr_t>(*ptr):0u);
+    static bool ExactOriginalPlayerDriver(EvWorkRobot* robot) noexcept {
+        if(!robot)return false;
+        sEventWork* owner=Game::event(EVENT_ROB01);
+        if(!owner || owner->data<EvWorkRobot>()!=robot ||
+           owner->EventFunc.Disp!=reinterpret_cast<decltype(owner->EventFunc.Disp)>(
+                Module::exe_ptr(OriginalDriverDisplayRva)))
+            return false;
+        return true;
+    }
+    // Actual PC: 0x514E60 is the rob_disp_disp trampoline to Draw::disp
+    // at 0x514C30. 0x514C10 is a DIFFERENT function. Old V2 targeted
+    // 0x514C10 and thus never owned original player model display.
+    static bool OriginalRobotDrawSignature() noexcept {
+        constexpr std::array<std::uint8_t,25> kOriginal{
+            0x8B,0x44,0x24,0x04,0x50,0x8B,0x00,0x8D,0x0C,0x40,
+            0xC1,0xE1,0x05,0x81,0xC1,0xD8,0x77,0x85,0x00,
+            0xE8,0xB8,0xFD,0xFF,0xFF,0xC3
+        };
+        const auto* ptr=Module::exe_ptr<std::uint8_t>(RobotRva);
+        MEMORY_BASIC_INFORMATION mbi{};
+        if(!ptr || VirtualQuery(ptr,&mbi,sizeof(mbi))!=sizeof(mbi) ||
+           mbi.State!=MEM_COMMIT || (mbi.Protect&(PAGE_GUARD|PAGE_NOACCESS)))
+            return false;
+        const auto lo=reinterpret_cast<std::uintptr_t>(ptr);
+        const auto hi=reinterpret_cast<std::uintptr_t>(mbi.BaseAddress)+mbi.RegionSize;
+        if(lo>hi || hi-lo<kOriginal.size())return false;
+        return std::equal(kOriginal.begin(),kOriginal.end(),ptr);
     }
     static void __cdecl RobotDisplay(EvWorkRobot* robot) {
-        const bool gameMode=QuestCockpitV2Active(Game::camera());
-        const bool exactDriver=gameMode && IsOriginalDriverWork(robot);
-        if(exactDriver && Settings::VRQuestCockpitV2HideDriver)
-            return; // only original event-362 work. Never any NPC/heroine.
         using namespace OutRunVR::QuestCockpitV2;
-        const auto* xr=OutRunVRRenderer::GetLatchedStereoFrameView();
-        const bool epoch=NativeFrameTrace().Active();
-        const bool admitted=OriginalOccupantPreviewEligible(
-            gameMode && Settings::VRQuestCockpitV2OccupantCorrection,
-            Game::camera() &&
-              static_cast<std::uint8_t>(Game::camera()->cam_mode_34A)==1u,
-            exactDriver,epoch,xr && xr->valid && xr->poseSequence!=0,
-            InSceneEffect());
-        if(!admitted || InCorrectedDriverDraw) {
-            if(Settings::VRCockpitFrameProbe && Settings::VRTelemetry &&
-               ++OccupantTrace<=32u)
-                spdlog::info("VR COCKPIT V2 OCCUPANT: sample={} "
-                    "driverWork={} nativeFrame={} xrPose={} admitted=0",
-                    OccupantTrace,exactDriver?1:0,
-                    NativeFrameTrace().ActiveEpoch(),
-                    xr?xr->poseSequence:0u);
-            RobotHook.ccall<void>(robot);
-            return;
-        }
-        // Guest work+0x10 is the same 64-byte W consumed by
-        // Quest Draw::disp_514c30. Compute C from original player B0/F0.
-        // Full correction is W * C, never C * W and never HMD view.
-        const EVWORK_CAR* car=Game::pl_car();
-        if(!car){RobotHook.ccall<void>(robot);return;}
-        Matrix b0{},f0{},w{},c{},corrected{};
-        static_assert(sizeof(Matrix)==sizeof(D3DMATRIX));
-        std::memcpy(b0.data(),&car->matrix_B0,sizeof(Matrix));
-        std::memcpy(f0.data(),&car->matrix_F0,sizeof(Matrix));
-        std::memcpy(w.data(),&robot->d3dmatrix10,sizeof(Matrix));
-        if(!ComputeBodyCorrection(b0,f0,c) ||
-           !OriginalOccupantRightCompose(w,c,corrected)) {
-            RobotHook.ccall<void>(robot);
-            return;
-        }
-        // PC 0x514E60 forwards this exact event work to original
-        // 0x514C30, which reads its matrix at +0x10. Original Quest
-        // stages the replacement in a renderer-local copy. Windows PC
-        // hook can only loan this work field across the synchronous
-        // original draw: byte-exact restore on normal or exception exit.
-        struct ScopedWorkMatrix final {
-            EvWorkRobot* work;
-            D3DMATRIX old{};
-            bool& inProgress;
-            explicit ScopedWorkMatrix(EvWorkRobot* w,const Matrix& staged,
-                                     bool& guard)
-                :work(w),inProgress(guard) {
-                inProgress=true;
-                std::memcpy(&old,&work->d3dmatrix10,sizeof(old));
-                std::memcpy(&work->d3dmatrix10,staged.data(),sizeof(old));
+        const EvWorkCamera* camera=Game::camera();
+        const auto* stereo=OutRunVRRenderer::GetLatchedStereoFrameView();
+        const auto frameEpoch=NativeFrameTrace().ActiveEpoch();
+        const bool exact=ExactOriginalPlayerDriver(robot);
+        const bool enabled=Settings::VRQuestCockpitV2OccupantCorrection;
+        static thread_local unsigned ownerSamples=0;
+        if(enabled && Settings::VRTelemetry && ++ownerSamples<=48u)
+            spdlog::info("VR COCKPIT V2 OCCUPANT OWNER: sample={} exactROB01={} "
+                "nativeEpoch={} stereo={} cam1={} source=PC_514E60",
+                ownerSamples,exact,frameEpoch,
+                stereo&&stereo->valid?stereo->poseSequence:0,
+                camera&&camera->cam_mode_34A==1);
+        const bool eligible=VerifiedPlayerOccupantScope(
+            enabled,
+            NativeOriginalHooksReady.load(std::memory_order_acquire),
+            frameEpoch!=0,exact,exact,
+            camera && camera->cam_mode_34A==1,
+            QuestCockpitV2Active(camera),stereo&&stereo->valid &&
+                stereo->poseSequence!=0,InSceneEffect());
+        if(eligible) {
+            const EVWORK_CAR* car=Game::pl_car();
+            if(car) {
+                FrameInput sample{};
+                sample.nativeGameFrame=frameEpoch;
+                sample.xrPoseSequence=stereo->poseSequence;
+                // OpenXR reference-space generation is not yet published here:
+                // still experimental and cannot be called exact Quest parity.
+                sample.xrSpaceGeneration=0;
+                sample.playerIdentity=reinterpret_cast<std::uintptr_t>(car);
+                sample.cameraMode=1;
+                sample.optionRequested=true;
+                sample.gameplay=true;
+                sample.worldPass=true;
+                sample.originalPlayerEventVerified=true;
+                sample.stereoAndPositionValid=true;
+                std::memcpy(sample.matrixB0.data(),&car->matrix_B0,sizeof(Matrix));
+                std::memcpy(sample.matrixF0.data(),&car->matrix_F0,sizeof(Matrix));
+                if(OccupantOwner.Observe(sample)) {
+                    const FrameSnapshot* own=OccupantOwner.Snapshot();
+                    Matrix work{},corrected{};
+                    static_assert(sizeof(robot->d3dmatrix10)==sizeof(Matrix));
+                    std::memcpy(work.data(),&robot->d3dmatrix10,sizeof(Matrix));
+                    if(own&&ComposeOccupantModel(work,own->occupantCorrection,corrected)) {
+                        ScopedOriginalRobotWorkMatrix scoped(
+                            reinterpret_cast<float*>(&robot->d3dmatrix10),
+                            corrected,true);
+                        static thread_local unsigned appliedSamples=0;
+                        if(Settings::VRTelemetry && ++appliedSamples<=32u)
+                            spdlog::info("VR COCKPIT V2 WXC APPLIED: nativeEpoch={} "
+                                "poseSeq={} count={} player={} correctedHash={:016X}",
+                                frameEpoch,stereo->poseSequence,appliedSamples,
+                                sample.playerIdentity,
+                                MatrixFingerprint(work,corrected));
+                        // Parent renderer submits rigid and skinned bones from
+                        // the original robot work only in this synchronous call.
+                        // Original guest work matrix restored on all C++ exits.
+                        RobotHook.ccall<void>(robot);
+                        return;
+                    }
+                }
             }
-            ~ScopedWorkMatrix() noexcept {
-                std::memcpy(&work->d3dmatrix10,&old,sizeof(old));
-                inProgress=false;
-            }
-            ScopedWorkMatrix(const ScopedWorkMatrix&)=delete;
-            ScopedWorkMatrix& operator=(const ScopedWorkMatrix&)=delete;
-        } scope(robot,corrected,InCorrectedDriverDraw);
-        if(Settings::VRCockpitFrameProbe && Settings::VRTelemetry &&
-           ++OccupantTrace<=32u)
-            spdlog::info("VR COCKPIT V2 OCCUPANT: sample={} "
-                "event362=1 nativeFrame={} xrPose={} WtimesC=1 "
-                "F0GuestMutation=0 runtimeValidation=UNTESTED",
-                OccupantTrace,NativeFrameTrace().ActiveEpoch(),
-                xr->poseSequence);
+        }
+        // No player owner, uncertain eye, menu/goal/effect, unknown executable
+        // or invalid B0/F0: exact original rendering unchanged.
         RobotHook.ccall<void>(robot);
     }
     static void PlayerState(SafetyHookContext& ctx) {
@@ -431,31 +443,14 @@ public:
     void declare_settings() override {
         Settings::VRCockpitFrameProbe.needs_restart();
         Settings::VRQuestCockpitV2Enabled.needs_restart();
-        Settings::VRQuestCockpitV2OccupantCorrection.needs_restart();
     }
     bool apply() override {
-        // Canonical PC 0x514E60 is the actual rob_disp_disp wrapper.
-        // Previous V2 used 0x514C10 (different rob_disp wrapper):
-        // refuse ALL installs if this original 24-byte instruction
-        // sequence is not present. Never detour a modded unknown exe.
-        constexpr std::array<std::uint8_t,24> signature{{
-            0x8B,0x44,0x24,0x04,0x50,0x8B,0x00,0x8D,
-            0x0C,0x40,0xC1,0xE1,0x05,0x81,0xC1,0xD8,
-            0x77,0x85,0x00,0xE8,0xB8,0xFD,0xFF,0xFF
-        }};
-        const auto* instr=Module::exe_ptr<std::uint8_t>(RobotRva);
-        MEMORY_BASIC_INFORMATION mem{};
-        if(!instr || VirtualQuery(instr,&mem,sizeof(mem))!=sizeof(mem) ||
-           mem.State!=MEM_COMMIT || (mem.Protect & (PAGE_GUARD|PAGE_NOACCESS)) ||
-           reinterpret_cast<std::uintptr_t>(instr)+signature.size()>
-               reinterpret_cast<std::uintptr_t>(mem.BaseAddress)+mem.RegionSize ||
-           !std::equal(signature.begin(),signature.end(),instr)) {
-            spdlog::warn("VR COCKPIT V2: original 0x514E60 "
-                "rob_disp_disp signature mismatch; no model hooks installed");
-            return false;
-        }
         auto car=safetyhook::create_mid(Module::exe_ptr(PlayerCarRva),PlayerState);
         if(!car)return false;
+        if(!OriginalRobotDrawSignature()) {
+            spdlog::warn("QuestCockpitV2: exact PC rob_disp_disp_514E60 signature mismatch; render hooks not installed");
+            return false;
+        }
         auto robot=safetyhook::create_inline(Module::exe_ptr(RobotRva),RobotDisplay);
         if(!robot)return false; // car RAII rollback
         PlayerHook=std::move(car);RobotHook=std::move(robot);

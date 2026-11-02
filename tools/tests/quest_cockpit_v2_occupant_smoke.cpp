@@ -1,45 +1,54 @@
 #include "../../src/vr/game/quest_cockpit_v2_occupant.hpp"
+#include "../../docs/research/quest_cockpit_v2_occupant_model_compose_20261026.hpp"
 #include <cassert>
 #include <cmath>
+#include <cstring>
 #include <limits>
 #include <random>
 using namespace OutRunVR::QuestCockpitV2;
-int main(){
-    assert(VerifiedDriverWorkOwner(0x7A1234,0x7A1234));
-    assert(!VerifiedDriverWorkOwner(0,0));
-    assert(!VerifiedDriverWorkOwner(0x7A1234,0x7A12AC));
-    assert(OriginalOccupantPreviewEligible(true,true,true,true,true,false));
-    assert(!OriginalOccupantPreviewEligible(true,true,true,true,false,false));
-    assert(!OriginalOccupantPreviewEligible(true,true,true,false,true,false));
-    assert(!OriginalOccupantPreviewEligible(true,true,true,true,true,true));
-    Matrix W=Identity,C=Identity,out{},wrong{};
-    W[12]=3;W[13]=4;W[14]=5;
-    C[0]=-1;C[5]=-1;C[10]=-1;
-    assert(OriginalOccupantRightCompose(W,C,out));
-    assert(out[12]==-3 && out[13]==-4 && out[14]==-5);
-    // The opposite C * W keeps translation positive. Noncommuting witness.
-    for(int i=0;i<4;++i)for(int j=0;j<4;++j)
-        for(int k=0;k<4;++k)
-            wrong[i*4+j]+=C[i*4+k]*W[k*4+j];
-    assert(wrong[12]==3 && wrong[13]==4 && wrong[14]==5);
-    assert(out[12]!=wrong[12]);
-    std::mt19937 gen{0x126362};
-    std::uniform_real_distribution<float> v{-2,2};
-    for(int i=0;i<1000;++i) {
-        Matrix a=Identity,b=Identity,o{};
-        for(int r=0;r<3;++r)for(int c=0;c<3;++c){
-            a[r*4+c]=v(gen);b[r*4+c]=v(gen);
-        }
-        for(int k=0;k<3;++k){a[12+k]=v(gen);b[12+k]=v(gen);}
-        assert(OriginalOccupantRightCompose(a,b,o));
-        for(int r=0;r<4;++r)for(int c=0;c<4;++c){
-            double expected=0;
-            for(int k=0;k<4;++k)expected+=double(a[r*4+k])*b[k*4+c];
-            assert(std::fabs(o[4*r+c]-expected)<0.00003);
-        }
-        Matrix invalid=a;invalid[0]=std::numeric_limits<float>::quiet_NaN();
-        const Matrix saved=o;
-        assert(!OriginalOccupantRightCompose(invalid,b,o));
-        assert(o==saved);
+int main() {
+    const Matrix eye=Identity;
+    assert(VerifiedPlayerOccupantScope(true,true,true,true,true,true,true,true,false));
+    for(int i=0;i<9;++i){
+        bool flags[9]{true,true,true,true,true,true,true,true,false};
+        flags[i]=i==8?true:false;
+        assert(!VerifiedPlayerOccupantScope(flags[0],flags[1],flags[2],
+            flags[3],flags[4],flags[5],flags[6],flags[7],flags[8]));
     }
+    // Non-commuting 4x4 matrices and actual original research comparator.
+    std::mt19937 rng(0x514e60u);
+    std::uniform_real_distribution<float> u(-1.f,1.f);
+    for(int n=0;n<1200;++n) {
+        Matrix w=eye,c=eye{},expected{},got{};
+        for(int k=0;k<16;++k){w[k]=u(rng);c[k]=u(rng);}
+        w[3]=w[7]=w[11]=0.f;w[15]=1.f;
+        c[3]=c[7]=c[11]=0.f;c[15]=1.f;
+        assert(quest_cockpit_research::ComposeOccupantModelRightCorrection(
+            w,c,expected));
+        assert(ComposeOccupantModel(w,c,got));
+        for(int k=0;k<16;++k)
+            assert(std::fabs(expected[k]-got[k])<1.e-5f);
+        Matrix work=w;
+        {ScopedOriginalRobotWorkMatrix scope(work.data(),got,true);
+            assert(scope.Active());
+            assert(std::memcmp(work.data(),got.data(),sizeof(Matrix))==0);
+        }
+        assert(work==w);
+        try {
+            ScopedOriginalRobotWorkMatrix scope(work.data(),got,true);
+            throw 47;
+        }catch(int){}
+        assert(work==w);
+        {ScopedOriginalRobotWorkMatrix scope(work.data(),got,false);
+            assert(!scope.Active());}
+        assert(work==w);
+        auto invalid=c;invalid[0]=std::numeric_limits<float>::quiet_NaN();
+        const auto before=got;
+        assert(!ComposeOccupantModel(w,invalid,got));assert(got==before);
+    }
+    Matrix translated=eye;translated[12]=7.f;
+    Matrix reflection=eye;reflection[5]=-1.f;
+    Matrix out{};
+    assert(ComposeOccupantModel(translated,reflection,out));
+    assert(out[13]==0.f&&out[12]==7.f&&out[5]==-1.f);
 }
