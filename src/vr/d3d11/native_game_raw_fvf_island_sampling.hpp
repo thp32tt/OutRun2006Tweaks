@@ -80,6 +80,7 @@ namespace outrun::vr::dx11 {
     if (!visibleCount) return false;
     bool found = false;
     NativeRawDrawExtent firstWindow{};
+    NativeRawDualTile firstSampled{};
     // Rotate across VISIBLE source primitives, not raw IA count: when
     // nearly every menu/race triangle is offscreen, ordinal % count
     // repeatedly selected the same surviving island. The actual native
@@ -137,6 +138,7 @@ namespace outrun::vr::dx11 {
         if (!found) {
             out.first = sampled.first;
             firstWindow = triangle;
+            firstSampled = sampled;
             found = true;
         } else {
             // Prefer independent primitive islands. A large later triangle
@@ -158,15 +160,38 @@ namespace outrun::vr::dx11 {
         }
     }
     if (!found) return false;
-    // When no OTHER source triangle supplies a disjoint GPU sample, retain
-    // the authentic internal sweep of the selected large first triangle.
+    // With one visible primitive, the sparse polygon-interior tile can
+    // replace the first swept GPU copy. Preserve the companion selected
+    // alongside that REAL source crop; it may contain independent menu/race
+    // RGB outside the 512x288 interior capture. The old fallback silently
+    // threw this copy away and used the sweep's SECOND tile, which could
+    // overlap the newly centered FIRST tile.
+    if (firstSampled.hasSecond &&
+        native_raw_source_tiles_disjoint(
+            out.first, firstSampled.second, tw, th)) {
+        out.second = firstSampled.second;
+        out.hasSecond = true;
+        return true;
+    }
+    // A non-sparse primitive or a narrow scissor can still have a second
+    // genuine swept GPU crop. Test BOTH physical candidates relative to
+    // the ACTUAL selected first tile, not relative to the sweep's discarded
+    // first tile. Never advertise overlapping PRE/POST GPU regions as
+    // independent evidence; one valid tile remains useful.
     NativeRawDualTile within{};
     if (native_raw_swept_dual_draw_tile(
             sw, sh, tw, th, firstWindow,
-            static_cast<std::uint32_t>(ordinal / visibleCount), within) &&
-        within.hasSecond) {
-        out.second = within.second;
-        out.hasSecond = true;
+            static_cast<std::uint32_t>(ordinal / visibleCount), within)) {
+        if (native_raw_source_tiles_disjoint(
+                out.first, within.first, tw, th)) {
+            out.second = within.first;
+            out.hasSecond = true;
+        } else if (within.hasSecond &&
+                   native_raw_source_tiles_disjoint(
+                       out.first, within.second, tw, th)) {
+            out.second = within.second;
+            out.hasSecond = true;
+        }
     }
     return true;
 }

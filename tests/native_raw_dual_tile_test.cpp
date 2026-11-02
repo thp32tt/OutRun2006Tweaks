@@ -853,6 +853,35 @@ bool native_raw_fvf_sparse_diagonal_gpu_capture_regression() {
         anchor.pixelY < first.first.y ||
         anchor.pixelY >= static_cast<std::int64_t>(first.first.y)+th)
         return false;
+    // A centered sparse-diagonal native GPU capture must keep the genuine
+    // first disjoint source-sweep region as its SECOND GPU capture. The old
+    // fallback dropped this valid region and substituted the sweep's other
+    // region (which could overlap the polygon interior). This is two
+    // independent native source PRE/POST copies, never CPU pixel evidence.
+    NativeRawDualTile sourceSweep{};
+    if (!native_raw_swept_dual_draw_tile(
+            sw,sh,tw,th,bounds,0u,sourceSweep) ||
+        !sourceSweep.hasSecond ||
+        !native_raw_source_tiles_disjoint(
+            first.first,sourceSweep.first,tw,th) ||
+        !first.hasSecond ||
+        first.second.x != sourceSweep.first.x ||
+        first.second.y != sourceSweep.first.y)
+        return false;
+    bool witnessedSecond = false;
+    for (std::uint32_t phase = 0u; phase < 48u; ++phase) {
+        NativeRawDualTile capture{};
+        if (!native_raw_fvf_island_dual_draw_tile(
+                source,0,0,sw,sh,sw,sh,tw,th,viewport,phase,capture) ||
+            capture.first.x > sw-tw || capture.first.y > sh-th ||
+            (capture.hasSecond &&
+             (capture.second.x > sw-tw || capture.second.y > sh-th ||
+              !native_raw_source_tiles_disjoint(
+                  capture.first,capture.second,tw,th))))
+            return false;
+        witnessedSecond = witnessedSecond || capture.hasSecond;
+    }
+    if (!witnessedSecond) return false;
     // Later captures continue sweeping authentic source pixels, not a
     // permanently stationary or fabricated pixel/ROI.
     if (!native_raw_fvf_island_dual_draw_tile(
