@@ -10,3 +10,5 @@ Source branch: vr-quest-cockpit-v2 (NOT v0.01-beta release)
 7. Attach logs from logs/ and OUTRUNVR_LAUNCH_ERROR.txt only when debugging; normal game defaults have cockpit and telemetry OFF.
 
 Note: Original APK mode-1 table contains 30 car records but 15 distinct XYZ values, repeated for i and i+15. This experimental PCVR port reads the unchanged original game's table. Player-car full-body is enabled in mode1. Driver hiding is OFF because the PC driver/heroine character tables are identical and do not prove role. The extra raw B0 camera is OFF and is only for unsafe developer A/B. Render-frame->OpenXR stereo equivalence and Quest3 visual stability are NOT YET verified. No original APK file is distributed.
+
+IMPORTANT: Quest3 preview script now enables QuestCockpitV2OccupantCorrection=true FOR THIS LAUNCH ONLY. It does not modify the original game on disk. If no original native game frame or stereo pose is available, it safely skips correction and leaves the model original. The original Quest vehicle F0 identity staging is NOT yet integrated in native PC car display, so exact visual parity is still not verified. Do not release this as stable.

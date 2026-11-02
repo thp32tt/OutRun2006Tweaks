@@ -10,6 +10,8 @@ on:
       - 'src/vr/game/quest_cockpit_v2_seat.hpp'
       - 'tools/tests/quest_cockpit_v2_seat_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp'
+      - 'tools/tests/quest_cockpit_v2_occupant_smoke.cpp'
+      - 'src/vr/game/quest_cockpit_v2_occupant.hpp'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_runtime_smoke.cpp'
@@ -52,6 +54,12 @@ jobs:
             tools/tests/quest_cockpit_v2_arm64_reference_parity.cpp \
             -o /tmp/quest-v2-arm64-parity
           /tmp/quest-v2-arm64-parity
+      - name: Original Quest driver event362 + W times C 1000-matrix regression
+        run: |
+          c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            tools/tests/quest_cockpit_v2_occupant_smoke.cpp \
+            -o /tmp/quest-v2-occupant
+          /tmp/quest-v2-occupant
       - name: Reject removed legacy hooks and unsafe defaults
         run: |
           python3 - <<'PY'
@@ -72,6 +80,11 @@ jobs:
           assert 'CockpitFrameProbe = false' in ini
           assert 'QuestCockpitV2Enabled = false' in ini
           assert 'QuestCockpitV2HideDriver = false' in ini
+          assert 'QuestCockpitV2OccupantCorrection = false' in ini
+          assert 'RobotRva=0x114E60' in hook
+          assert 'DriverEventCellRva=0x39F010' in hook
+          assert 'OriginalOccupantRightCompose(w,c,corrected)' in hook
+          assert '0x8B,0x44,0x24,0x04,0x50' in hook
           assert 'QuestCockpitV2RawB0Camera = false' in ini
           assert '!Settings::VRQuestCockpitV2RawB0Camera)return false' in hook
           assert 'kOriginalModelTableRva=0x418BB0' in hook

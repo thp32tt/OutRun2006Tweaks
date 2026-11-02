@@ -240,6 +240,7 @@ if($QuestCockpitV2 -eq 'ON'){
         '-VR.QuestCockpitV2Enabled=true',
         '-VR.QuestCockpitV2FullCar=true',
         '-VR.QuestCockpitV2HideDriver=false',
+        '-VR.QuestCockpitV2OccupantCorrection=true',
         '-VR.QuestCockpitV2RawB0Camera=false',
         '-VR.CockpitFrameProbe=true',
         '-VR.Telemetry=true',
