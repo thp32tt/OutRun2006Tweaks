@@ -31,11 +31,20 @@
 ## 남은 자산 이관 및 품질 게이트
 
 - 전체 활성 번역 ROI 954, 기존 A/B 고품질 PNG 955개 (활성 954개와 정확히 매칭되는 954개, 레거시 1개 제외).
-- GitHub에 **실제 이관 및 SHA 검증 완료된 현재 파일은 Q012 1개**. 나머지 953개는 N100에 있으므로 GitHub에서 임의 생성/대체하지 않는다.
-- 게임 원본 108개 전부가 GitHub 체크아웃에서 확보된 것은 아니다. 여러 ROI가 공유 DDS 아틀라스를 구성하면 *각 ROI를 별도 독립 DDS로 덮어쓰지 않고* 리뷰된 소스/마스크를 함께 검증해 한 번에 합성한다.
+- **2026-11-03 20:55 KST GitHub 트리 재조회:** A 229개 + B 242개 = **471개 이관**, 활성 954개 중 **483개 미이관**. Q012 1개라는 이전 기록은 최초 실증 시점의 이력이며 현재 수치가 아니다. 이관된 PNG는 변경 없이 보존하고 누락분은 HOLD한다.
+- **2026-11-03 SOURCE_INFO.json 확인:** 활성 원본 DDS **104/104 SHA 검증 완료**, 미해결 0. 108개 원본 PNG 중 4개는 활성 ROI 대상이 아니다. 이는 DDS 포맷/방향/ROI 합성 검증이나 게임 RELEASE 승인을 의미하지 않는다. 여러 ROI가 공유 DDS 아틀라스를 구성하면 *각 ROI를 별도 독립 DDS로 덮어쓰지 않고* 리뷰된 소스/마스크를 함께 검증해 한 번에 합성한다.
 - 민감하거나 소유권 불명확한 원본 게임 자산을 무조건 공개 업로드하지 않는다. 후보 PNG·메타의 일회성 GitHub 이관과 원본 DDS SHA 검증을 완료한 범위부터 점진적으로 처리한다.
 - UI 2줄 텍스트/타 이미지 침범/알파/외곽선/FLIP-Y/RAW 확인 후 실제 게임 PASS 전에는 RELEASE 불가.
 
 ## 기존 경로의 중지
 - `.github/workflows/outrun-korean-new-dds-production.yml`의 일반 폰트 기반 정기 실행·Push 트리거 제거. 이전 실행 결과 41561475752는 **우선 채택 금지** (TEST_ONLY 이력).
 - A/B 원본을 다시 자체 폰트로 덮어쓰거나 A/B보다 앞에 두지 말 것.
+
+## 2026-11-03 20:55 KST — 실제 다중 ROI QA 및 안전 수정
+
+- 이전 다중 아틀라스 GitHub Actions [41626701567](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41626701567) SUCCESS: **421개 이관 기준**, 14개 DDS / 49개 ROI TEST_ONLY, ZIP SHA256 `bf440523bb1bf3737f820781e1d90bb1b7af95af4795a8d29ca80d408555b58c`. 실제 QA artifact 13228145217의 `qa_report.json` 확인. 새로 이관된 50개 B PNG는 해당 이전 실행에 포함되지 않는다.
+- QA 원인: 50개 아틀라스는 방향 미검증으로 HOLD, 2개는 원본 DDS 포맷 미지원(BC 압축 또는 mip), 생성된 아틀라스 내부에도 겹침·후보 경계 접촉 HOLD가 있다. **방향 추정, BC 재인코딩, 폰트 대체, RELEASE 자동 승격 금지**.
+- 안전 수정 커밋 `49896327f0c167b6f0eb41c424790cef3e314568`: 플랫폼별 동일 파일명 미리보기 덮어쓰기 방지, 전체 누락 ROI별 HOLD 기록, 원본 후보 symlink 거부. 커밋 `1f990ffe0a39c0242d58994746550c9253aeb3ef`: 겹치는 ROI가 있으면 한쪽만 먼저 칠하지 않고 **관련 ROI 전부 HOLD**.
+- `outrun-hd-korean-completion.yml`의 **Nanum 폰트 fallback 워크플로는 커밋 `9244bbbab3b5052787a84912fe4eb5b0ad45a0a9`에서 퇴역**: Push/스케줄 트리거 제거, 수동 실행도 DDS를 생성하지 않는다. 과거 실행 artifact는 고품질 A/B 채택 대상이 아니다.
+- 신규 GitHub 전용 빠른 안전 CI `outrun-ab-multi-atlas-safety-tests.yml`: [41631295554](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/41631295554) SUCCESS, 합성/겹침/경계/경로/폰트 금지 등 **9/9 합성 회귀 테스트 PASS**. 최신 471개 PNG 전체 DDS 재빌드는 별도 다중 아틀라스 Actions 완료 및 QA artifact 재검증 전까지 **UNTESTED/HOLD**.
+- Portainer 재배포나 게임 설치를 요청할 단계가 아니다. C1/C3 독립 시각검수와 실제 게임 테스트는 여전히 UNTESTED. 기존 104-DDS v3 백업과 원본을 덮어쓰지 않는다.
