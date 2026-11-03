@@ -1,0 +1,65 @@
+name: OutRun DDS Source Discovery (GitHub only)
+
+on:
+  schedule:
+    - cron: "17 20 * * *" # 05:17 KST
+  workflow_dispatch:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-dds-source-discovery.yml"
+      - "tools/localization/github_dds_source_discovery.py"
+      - "localization/automation_inputs/candidate_outputs/**"
+      - "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
+
+permissions:
+  contents: read
+concurrency:
+  group: outrun-dds-source-discovery
+  cancel-in-progress: false
+
+jobs:
+  search-github-dds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout active A/B roster only (NO Docker or N100)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/localization/github_dds_source_discovery.py
+            /localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
+            /localization/automation_inputs/candidate_outputs
+
+      - name: Prepare minimal Git sparse source patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '/tools/localization/github_dds_source_discovery.py'
+            echo '/localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv'
+            echo '/localization/automation_inputs/candidate_outputs'
+            python tools/localization/github_dds_source_discovery.py --repo-root . --list-only
+          } > "$RUNNER_TEMP/dds-sparse-paths"
+          git sparse-checkout set --no-cone --stdin < "$RUNNER_TEMP/dds-sparse-paths"
+
+      - name: Verify precise source DDS SHA and header
+        run: |
+          set -euo pipefail
+          python tools/localization/github_dds_source_discovery.py \
+            --repo-root . --out "$RUNNER_TEMP/dds-source-audit.json"
+          cat "$RUNNER_TEMP/dds-source-audit.json" | python -c \
+            'import json,sys; d=json.load(sys.stdin); assert d["release_approved"] is False; assert d["imported_translation_rows"] >= 1'
+
+      - name: Save exact-source versus HD-candidate audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-dds-source-discovery-${{ github.run_id }}
+          path: ${{ runner.temp }}/dds-source-audit.json
+          if-no-files-found: warn
+          retention-days: 21
