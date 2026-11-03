@@ -44,7 +44,7 @@ def load_cross(path):
   if not re.fullmatch(r"Q\d{3}_[0-9a-f]{16}(?:_RB_B)?",r["roi_id"]):raise ValueError("INVALID_ROI_ID")
   if r["roles"] not in ("A","B"):raise ValueError("INVALID_ROLE")
   m=re.fullmatch(r"/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/([AB])/([A-Za-z0-9_-]+\.png)",r["candidate_paths"])
-  if not m or m.group(1)!=r["roles"] or m.group(2) not in (r["roi_id"]+"_k.png",r["roi_id"]+"_source_k.png"):
+  if not m or m.group(1)!=r["roles"] or m.group(2) not in (r["roi_id"].removesuffix("_RB_B")+"_k.png",r["roi_id"].removesuffix("_RB_B")+"_source_k.png"):
    raise ValueError("UNSAFE_OR_AMBIGUOUS_CANDIDATE:"+r["roi_id"])
   r["_candidate_rel"]=f"{CANDIDATES}/{m.group(1)}/{m.group(2)}"
   box=json.loads(r["bbox_xyxy"])
