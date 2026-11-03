@@ -15,6 +15,7 @@ ORIGINAL="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"
 CANDIDATES="localization/automation_inputs/candidate_outputs"
 ZIPNAME="OUTRUN_AB_IMAGEGEN_MULTI_ATLAS_TEST_ONLY.zip"
 MASKS=(0x00ff0000,0x0000ff00,0x000000ff,0xff000000)
+MASKS_RGBA=(0x000000ff,0x0000ff00,0x00ff0000,0xff000000)
 ORIENTATIONS={
 "D6DC1380":"NORMAL","19CEDB9":"FLIPY","FF2462BB":"FLIPY",
 "568D3696":"FLIPY","FA7BBB13":"FLIPY","39229D64":"FLIPY",
@@ -61,12 +62,12 @@ def native_image(b):
      struct.unpack_from("<I",b,80)[0]!=65 or
      struct.unpack_from("<I",b,88)[0]!=32 or
      struct.unpack_from("<I",b,28)[0]!=1 or
-     struct.unpack_from("<IIII",b,92)!=MASKS or
+     struct.unpack_from("<IIII",b,92) not in (MASKS,MASKS_RGBA) or
      b[84:88]!=bytes(4) or len(b)!=128+width*height*4):
   raise ValueError("DDS_NOT_32_BGRA_MIP1:"+json.dumps({"size":[width,height],"mip":struct.unpack_from("<I",b,28)[0],"pf_size":struct.unpack_from("<I",b,76)[0],"pf_flags":struct.unpack_from("<I",b,80)[0],"depth":struct.unpack_from("<I",b,88)[0],"masks":list(struct.unpack_from("<IIII",b,92)),"payload":len(b)-128},separators=(",",":")))
  with Image.open(io.BytesIO(b)) as im:
   image=im.convert("RGBA")
- if image.size!=(width,height) or image.tobytes("raw","BGRA")!=b[128:]:
+ if image.size!=(width,height) or image.tobytes("raw","BGRA" if struct.unpack_from("<IIII",b,92)==MASKS else "RGBA")!=b[128:]:
   raise ValueError("DDS_ORIGINAL_PIXELS_DIFFER")
  return image
 
@@ -142,7 +143,7 @@ def process_atlas(raw,rows,repo,orientation):
  if any(ImageChops.multiply(v,ImageOps.invert(mask)).getbbox() for v in diffs.split()):
   raise ValueError("SOURCE_PROTECTED_PIXELS_CHANGED")
  native=result if orientation=="NORMAL" else ImageOps.flip(result)
- data=raw[:128]+native.tobytes("raw","BGRA")
+ data=raw[:128]+native.tobytes("raw","BGRA" if struct.unpack_from("<IIII",raw,92)==MASKS else "RGBA")
  if data[:128]!=raw[:128] or len(data)!=len(raw) or data==raw:
   raise ValueError("DDS_HEADER_OR_NOOP_ERROR")
  restored=native_image(data)
