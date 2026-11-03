@@ -1,0 +1,60 @@
+name: OutRun Recover Exact Original DDS from Drive-Verified PNG
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - ".github/workflows/outrun-recover-original-hd-dds.yml"
+      - "tools/localization/github_rebuild_original_dds_from_png.py"
+      - "localization/automation_inputs/drive_verified_original_hd_png/**"
+
+permissions:
+  contents: read
+concurrency:
+  group: outrun-source-dds-sha-recovery
+  cancel-in-progress: false
+
+jobs:
+  verify-original-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout only original PNG and existing DDS header (no N100, no Docker)
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/localization/github_rebuild_original_dds_from_png.py
+            /localization/automation_inputs/drive_verified_original_hd_png
+            /localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds
+            /localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install DDS decoder
+        run: python -m pip install --disable-pip-version-check "Pillow==11.3.0"
+
+      - name: Reconstruct only SHA-identical original DDS; HOLD differing source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/localization/github_rebuild_original_dds_from_png.py \
+            --repo-root . --out "$RUNNER_TEMP/recovered-1"
+          python tools/localization/github_rebuild_original_dds_from_png.py \
+            --repo-root . --out "$RUNNER_TEMP/recovered-2"
+          diff -r "$RUNNER_TEMP/recovered-1" "$RUNNER_TEMP/recovered-2"
+          echo "Never auto-install or mark RELEASE; verified bytes only"
+
+      - name: Publish exact recovered DDS and reasoned HOLD report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outrun-exact-dds-recovery-${{ github.run_id }}
+          path: ${{ runner.temp }}/recovered-1/
+          if-no-files-found: warn
+          retention-days: 21
