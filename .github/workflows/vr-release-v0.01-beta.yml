@@ -132,7 +132,7 @@ jobs:
           $patchedIni | Set-Content $releaseIni -Encoding utf8
           if (Test-Path LICENSES.txt) { Copy-Item LICENSES.txt "$dir/LICENSES.txt" }
           Copy-Item RELEASE_NOTES_VR_v0.01-beta.md "$dir/README_VR_v0.01_Beta.md"
-          Set-Content "$dir/VR_RELEASE_VERSION.txt" 'OutRun 2006 VR v0.01 Beta' -Encoding ascii
+          Set-Content "$dir/VR_RELEASE_VERSION.txt" 'OutRun 2006 VR v0.01 Beta (crash fix)' -Encoding ascii
           Set-Content "$dir/SOURCE_SHA.txt" $env:GITHUB_SHA -Encoding ascii
           @(
             'DirectExeMode=2D'
@@ -147,6 +147,7 @@ jobs:
             'OUTRUN_VR_R23_PIXEL_PROBE=OFF (default)'
             'VR.Telemetry=false'
             'VR.FileLogging=false'
+            'GitHubReleaseUpdatePolling=REMOVED'
             'RUNTIME_VALIDATION=FOCUS_USER_CONFIRMED_ENTRYPOINT_CI_PASS_PC_RETEST_PENDING'
           ) | Set-Content "$dir/VR_RELEASE_PROFILE.txt" -Encoding ascii
 
@@ -191,19 +192,60 @@ jobs:
           path: release/OutRun2_VR_v0.01_Beta.zip
           if-no-files-found: error
 
-      - name: Publish GitHub prerelease
+      - name: Publish corrected beta with numeric tag and preserved legacy link
         if: "${{ (github.event_name == 'workflow_dispatch' && inputs.publish == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, 'release(vr): v0.01-beta publish')) }}"
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view vr-v0.01-beta --repo $env:GITHUB_REPOSITORY *> $null
+          $ErrorActionPreference = 'Stop'
+          $repo = $env:GITHUB_REPOSITORY
+          $numericTag = 'v0.01'
+          $legacyTag = 'vr-v0.01-beta'
+          $assetPath = 'release/OutRun2_VR_v0.01_Beta.zip'
+          $assetName = 'OutRun2_VR_v0.01_Beta.zip'
+          $notesPath = 'RELEASE_NOTES_VR_v0.01-beta.md'
+          $releaseTitle = 'OutRun 2006 VR v0.01 Beta (crash fix)'
+          if (!(Test-Path $assetPath)) { throw 'Verified release package missing' }
+          $expectedLength = (Get-Item $assetPath).Length
+          $expectedHash = (Get-FileHash $assetPath -Algorithm SHA256).Hash.ToLowerInvariant()
+
+          # Canonical numeric release: legacy stoi parsers can read v0.01.
+          # It stays a prerelease, so /releases/latest continues returning v0.2.
+          gh release view $numericTag --repo $repo *> $null
           if ($LASTEXITCODE -eq 0) {
-            gh release delete vr-v0.01-beta --repo $env:GITHUB_REPOSITORY --cleanup-tag --yes
+            gh release upload $numericTag $assetPath --clobber --repo $repo
+            if ($LASTEXITCODE -ne 0) { throw 'Canonical beta upload failed' }
+            gh release edit $numericTag --repo $repo --prerelease --title $releaseTitle --notes-file $notesPath
+            if ($LASTEXITCODE -ne 0) { throw 'Canonical beta metadata update failed' }
+          } else {
+            gh release create $numericTag $assetPath --repo $repo --target $env:GITHUB_SHA --title $releaseTitle --notes-file $notesPath --prerelease --latest=false
+            if ($LASTEXITCODE -ne 0) { throw 'Canonical numeric-tag beta creation failed' }
           }
-          gh release create vr-v0.01-beta release/OutRun2_VR_v0.01_Beta.zip `
-            --repo $env:GITHUB_REPOSITORY `
-            --target $env:GITHUB_SHA `
-            --title 'OutRun 2006 VR v0.01 Beta' `
-            --notes-file RELEASE_NOTES_VR_v0.01-beta.md `
-            --prerelease
+
+          # Keep links shared before this fix working: update the old asset
+          # instead of deleting the release, tag or its download URL.
+          gh release view $legacyTag --repo $repo *> $null
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy release missing; refusing to delete user-facing link' }
+          gh release upload $legacyTag $assetPath --clobber --repo $repo
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy beta asset replacement failed' }
+          gh release edit $legacyTag --repo $repo --prerelease --title 'OutRun 2006 VR v0.01 Beta (legacy download link)' --notes-file $notesPath
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy beta metadata edit failed' }
+
+          foreach ($tag in @($numericTag, $legacyTag)) {
+            $release = gh api "repos/$repo/releases/tags/$tag" | ConvertFrom-Json
+            if ($LASTEXITCODE -ne 0) { throw "Readback failed for $tag" }
+            if (-not $release.prerelease) { throw "$tag must remain a prerelease" }
+            $matching = @($release.assets | Where-Object { $_.name -eq $assetName })
+            if ($matching.Count -ne 1) { throw "$tag release ZIP missing or duplicated" }
+            if ($matching[0].size -ne $expectedLength) { throw "$tag release ZIP size mismatch" }
+            if ($matching[0].digest -and $matching[0].digest -ne "sha256:$expectedHash") {
+              throw "$tag release ZIP SHA256 mismatch"
+            }
+            Write-Host "PUBLISHED_VERIFIED tag=$tag id=$($release.id) asset=$assetName sha256=$expectedHash source=$env:GITHUB_SHA"
+          }
+          $latest = gh api "repos/$repo/releases/latest" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0 -or $latest.tag_name -ne 'v0.2') {
+            throw 'Legacy executable safety: /releases/latest is not the expected numeric v0.2'
+          }
+          Write-Host 'LEGACY_CLIENT_LATEST_SAFE=v0.2'

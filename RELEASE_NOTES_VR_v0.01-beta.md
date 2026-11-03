@@ -2,6 +2,16 @@
 
 v0.01 Beta 공개 베타입니다. 2026-11-02 Quest 3 + Virtual Desktop/VDXR에서 기존 DX9Ex Focus 렌더링 경로는 정상 동작이 확인됐고, 사용자 요청에 따라 2D/VR 선택 실행 구조를 포함해 게시합니다. 새 **직접 EXE 2D / CMD VR 진입점은 CI/정적 검증을 통과했으며 사용자 PC 실기 확인은 후속 검증 항목**입니다.
 
+## 2026-11-03 안정성 수정 / Stability hotfix
+
+- **게임 실행 중 GitHub 릴리즈 자동 확인 및 백그라운드 스레드를 완전히 제거**했습니다. 기존 업데이트 확인 코드가 비숫자 태그 `vr-v0.01-beta`를 정수로 변환하다 처리되지 않은 C++ 예외를 발생시키는 문제를 수정합니다.
+- Windows의 `SetUnhandledExceptionFilter` 기계어를 직접 변경하지 않도록 수정했습니다.
+- 직접 EXE로 실행하는 2D 경로에서 VR 전용 훅 설치를 차단합니다.
+- 수정 소스에 대한 GitHub Windows 빌드/정적 검증 성공. 새 패키지의 Quest 3 실기 검증은 아직 수행되지 않았으며 VR 베타 상태를 유지합니다.
+- **숫자 태그 `v0.01`이 공식 베타 다운로드 주소**입니다. 예전 `vr-v0.01-beta` 링크도 동일한 수정 ZIP으로 교체해 유지합니다. 두 릴리즈 모두 Pre-release이므로 구형 클라이언트의 `/releases/latest`는 숫자 태그 `v0.2`를 반환합니다.
+
+**English:** This beta hotfix removes automatic GitHub release polling and its detached worker, preventing an unhandled exception when the GitHub latest release tag is nonnumeric. It also isolates VR hooks from direct 2D launches and stops patching Windows exception-handler API code. GitHub builds pass; HMD runtime remains **UNTESTED**. The canonical beta tag is `v0.01`; the former `vr-v0.01-beta` link is retained with the corrected package.
+
 ## 중요 조작: F12 리센터
 
 - **VR 화면의 정면이 어긋나거나 메뉴/게임 화면 방향이 현재 착석 방향과 맞지 않으면, 원하는 정면을 바라본 상태에서 `F12`를 누르세요.**
