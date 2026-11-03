@@ -60,6 +60,15 @@ jobs:
           assert 'if(OutRunVR::DirectGpuHold::PublishPrePresentMono(' in source
           assert 'stereoRequested,directTransport,directOnlyHold))' in source
           assert 'if(stereoRequested&&!directTransport)' not in source
+          # Prior Windows builds were blocked by missing documented FFB
+          # provenance, not by C++ code. Keep these legacy verifications,
+          # never delete or bypass the original wheel-FFB check.
+          for rel, marker in (
+              ('docs/reverse/LINDBERGH_FFB_MAP.md','0x08105A48'),
+              ('docs/reverse/C2C_STAGE_FFB_MAP.md','surface'),
+              ('docs/reverse/FFB_MODEL_MODES.md','FFB')):
+              document = Path(rel)
+              assert document.is_file() and marker in document.read_text(encoding='utf-8'), rel
           PY
       - name: Native original frame-render correlation state regression
         run: |
