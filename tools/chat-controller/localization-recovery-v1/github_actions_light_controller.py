@@ -21,7 +21,7 @@ from pathlib import Path
 
 REPO = "thp32tt/OutRun2006Tweaks"
 BRANCH = "korean-localization-recovery-20260928"
-WORKFLOW = "outrun-ab-imagegen-native.yml"
+WORKFLOW = "outrun-ab-multi-atlas.yml"
 API = "https://api.github.com/repos/" + REPO
 EXPECTED_SHA = re.compile(r"^[0-9a-f]{40}$")
 MAX_REMOTE_BYTES = 512 * 1024
@@ -63,7 +63,7 @@ def latest_asset_sha(token: str) -> str:
 
 
 def latest_qa_run(token: str) -> dict:
-    path = "/actions/workflows/" + WORKFLOW + "/runs?per_page=5"
+    path = "/actions/workflows/" + WORKFLOW + "/runs?branch=" + urllib.parse.quote(BRANCH, safe="") + "&per_page=20"
     obj = api_call(path, token)
     runs = obj.get("workflow_runs", [])
     if not isinstance(runs, list):
@@ -158,9 +158,9 @@ def main() -> None:
     if not home.is_absolute():
         p.error("home must be an absolute path")
     token = os.environ.get("OUTRUN_GITHUB_ACTIONS_TOKEN", "").strip()
-    poll = int(os.environ.get("OUTRUN_GITOPS_POLL_SECONDS", "3600"))
-    if not 1800 <= poll <= 86400:
-        p.error("poll must be 1800..86400 seconds")
+    poll = int(os.environ.get("OUTRUN_GITOPS_POLL_SECONDS", "900"))
+    if not 600 <= poll <= 86400:
+        p.error("poll must be 600..86400 seconds")
     while True:
         try:
             result = check_cycle(home, token)
