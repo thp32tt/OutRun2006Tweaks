@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - name: Checkout only the pinned source plan and HD source destination
+      - name: Checkout pinned plan, exact candidates and HD source destination
         uses: actions/checkout@v4
         with:
           ref: korean-localization-recovery-20260928
@@ -32,24 +32,30 @@ jobs:
           sparse-checkout: |
             /.github/workflows/sync-hd-localization-source.yml
             /localization/automation_inputs/hd_original_png_source_plan.json
+            /localization/graphics/hd_candidates
             /localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
 
-      - name: Download all 104 active HD DDS from the pinned upstream commit and SHA-verify
+      - name: Resolve all 104 source DDS by exact SHA only
         shell: bash
         env:
           SOURCE_REPO: Sonic-TV/OR2006Sprites
           SOURCE_COMMIT: a95efe01d1f136514cef94b0d9e9fd61df021754
           SOURCE_PLAN: localization/automation_inputs/hd_original_png_source_plan.json
           DEST_ROOT: localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
+          CANDIDATE_ROOT: localization/graphics/hd_candidates
         run: |
           set -euo pipefail
           python - <<'PY'
-          import hashlib, json, os, pathlib, urllib.parse, urllib.request
+          import hashlib, json, os, pathlib, urllib.error, urllib.parse, urllib.request
+
+          def digest(raw):
+              return hashlib.sha256(raw).hexdigest()
 
           source_repo=os.environ["SOURCE_REPO"]
           source_commit=os.environ["SOURCE_COMMIT"]
           plan_path=pathlib.Path(os.environ["SOURCE_PLAN"])
           dest_root=pathlib.Path(os.environ["DEST_ROOT"])
+          candidate_root=pathlib.Path(os.environ["CANDIDATE_ROOT"])
           plan=json.loads(plan_path.read_text(encoding="utf-8"))
           entries=plan.get("entries")
           if not isinstance(entries,list):
@@ -69,47 +75,95 @@ jobs:
               raise SystemExit(f"ACTIVE_HD_SOURCE_TARGET_COUNT_CHANGED:{len(targets)}")
 
           verified=[]
+          unresolved=[]
           for n,(target,expected) in enumerate(sorted(targets.items()),1):
-              rel=target.removeprefix("textures/load/")
-              encoded=urllib.parse.quote(rel,safe="/")
-              url=f"https://raw.githubusercontent.com/{source_repo}/{source_commit}/Release/{encoded}"
-              req=urllib.request.Request(url,headers={"User-Agent":"OutRun-HD-localization-source-sync"})
-              with urllib.request.urlopen(req,timeout=90) as response:
-                  raw=response.read()
-              actual=hashlib.sha256(raw).hexdigest()
-              if actual!=expected:
-                  raise SystemExit(f"UPSTREAM_SHA_MISMATCH:{target}:{actual}:{expected}")
               dest=dest_root/target
-              if dest.is_symlink():
-                  raise SystemExit("REFUSE_SYMLINK_SOURCE:"+target)
-              if dest.is_file():
-                  old=hashlib.sha256(dest.read_bytes()).hexdigest()
-                  if old!=expected:
-                      raise SystemExit(f"EXISTING_SOURCE_SHA_CONFLICT:{target}:{old}:{expected}")
-              else:
-                  dest.parent.mkdir(parents=True,exist_ok=True)
-                  dest.write_bytes(raw)
-              if hashlib.sha256(dest.read_bytes()).hexdigest()!=expected:
-                  raise SystemExit("SOURCE_WRITE_READBACK_MISMATCH:"+target)
-              verified.append({"target":target,"sha256":expected,"bytes":len(raw)})
-              print(f"HD_SOURCE_OK {n:03d}/104 {target} {expected}")
+              candidate=candidate_root/target
+              chosen=None
+              source_kind=None
 
-          info={
-              "schema":"outrun.hd-source-pinned-upstream.v2",
+              if dest.is_symlink() or candidate.is_symlink():
+                  raise SystemExit("REFUSE_SOURCE_SYMLINK:"+target)
+
+              if dest.is_file():
+                  raw=dest.read_bytes()
+                  if digest(raw)==expected:
+                      chosen=raw
+                      source_kind="EXISTING_HD_SOURCE_SHA_EXACT"
+                  else:
+                      raise SystemExit("EXISTING_SOURCE_SHA_CONFLICT:"+target+":"+digest(raw)+":"+expected)
+
+              if chosen is None and candidate.is_file():
+                  raw=candidate.read_bytes()
+                  if digest(raw)==expected:
+                      chosen=raw
+                      source_kind="HD_CANDIDATE_SHA_EXACT"
+
+              upstream_actual=None
+              if chosen is None:
+                  rel=target.removeprefix("textures/load/")
+                  encoded=urllib.parse.quote(rel,safe="/")
+                  url=f"https://raw.githubusercontent.com/{source_repo}/{source_commit}/Release/{encoded}"
+                  try:
+                      req=urllib.request.Request(url,headers={"User-Agent":"OutRun-HD-localization-source-sync"})
+                      with urllib.request.urlopen(req,timeout=90) as response:
+                          raw=response.read()
+                      upstream_actual=digest(raw)
+                      if upstream_actual==expected:
+                          chosen=raw
+                          source_kind="PINNED_UPSTREAM_RELEASE_SHA_EXACT"
+                  except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
+                      upstream_actual="FETCH_ERROR:"+str(exc)[:120]
+
+              if chosen is None:
+                  candidate_actual=digest(candidate.read_bytes()) if candidate.is_file() else None
+                  unresolved.append({
+                      "target":target,
+                      "expected":expected,
+                      "candidate_sha256":candidate_actual,
+                      "upstream_release_sha256":upstream_actual,
+                  })
+                  print("HD_SOURCE_HOLD",json.dumps(unresolved[-1],sort_keys=True))
+                  continue
+
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              if not dest.is_file():
+                  dest.write_bytes(chosen)
+              if digest(dest.read_bytes())!=expected:
+                  raise SystemExit("SOURCE_WRITE_READBACK_MISMATCH:"+target)
+              verified.append({
+                  "target":target,
+                  "sha256":expected,
+                  "bytes":len(chosen),
+                  "source_kind":source_kind,
+              })
+              print(f"HD_SOURCE_OK {n:03d}/104 {source_kind} {target} {expected}")
+
+          summary={
+              "schema":"outrun.hd-source-pinned-resolver.v3",
               "package":"OR2-HD-GUI-v0.25.10a",
               "upstream_repo":source_repo,
               "upstream_commit":source_commit,
-              "active_target_count":len(verified),
+              "active_target_count":len(targets),
+              "verified_count":len(verified),
+              "unresolved_count":len(unresolved),
               "source_plan":str(plan_path),
-              "source_plan_sha256":hashlib.sha256(plan_path.read_bytes()).hexdigest(),
-              "verification":"All active localization DDS are byte downloaded from the pinned upstream commit and SHA256-matched to hd_original_png_source_plan.json before commit.",
+              "source_plan_sha256":digest(plan_path.read_bytes()),
               "runtime_validation":"UNTESTED",
               "files":verified,
+              "unresolved":unresolved,
           }
           dest_root.mkdir(parents=True,exist_ok=True)
           (dest_root/"SOURCE_INFO.json").write_text(
-              json.dumps(info,ensure_ascii=False,sort_keys=True,indent=2)+"\n",
+              json.dumps(summary,ensure_ascii=False,sort_keys=True,indent=2)+"\n",
               encoding="utf-8")
+          print("HD_SOURCE_SUMMARY",json.dumps({
+              "verified":len(verified),"unresolved":len(unresolved)
+          },sort_keys=True))
+          if unresolved:
+              raise SystemExit("HD_SOURCE_UNRESOLVED_"+str(len(unresolved)))
+          if len(verified)!=104:
+              raise SystemExit("HD_SOURCE_VERIFIED_COUNT_"+str(len(verified)))
           print("HD_SOURCE_COMPLETE_104")
           PY
 
@@ -144,5 +198,5 @@ jobs:
         if: always()
         run: |
           echo "Pinned upstream: Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754"
+          echo "Exact GitHub hd_candidates are allowed only when their full SHA256 equals source plan."
           echo "Expected active HD DDS: 104"
-          echo "The hd_source push automatically triggers outrun-ab-multi-atlas.yml."
