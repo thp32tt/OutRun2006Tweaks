@@ -1,101 +1,19 @@
-name: OutRun HD Korean Localization Completion (GitHub CPU)
-
+# Retired 2026-11-03: user forbids generating any new generic-font fallback DDS.
+# Historical hybrid code/artifacts are NOT approved A/B ImageGen output.
+# This workflow has no push or schedule triggers and cannot produce DDS.
+name: OutRun HD Hybrid Font-Fallback Workflow (RETIRED)
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - korean-localization-recovery-20260928
-    paths:
-      - ".github/workflows/outrun-hd-korean-completion.yml"
-      - "tools/localization/github_hd_hybrid_completion.py"
-      - "tools/localization/test_github_hd_hybrid_completion.py"
-      - "localization/automation_inputs/hd_original_png_source_plan.json"
-      - "localization/automation_inputs/candidate_outputs/**"
-      - "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
-      - "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/**"
 
 permissions:
   contents: read
 
-concurrency:
-  group: outrun-hd-korean-completion
-  cancel-in-progress: true
-
 jobs:
-  build-complete-test-package:
+  no-font-fallback:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 2
     steps:
-      - name: Checkout only HD localization sources, A/B candidates and completion code
-        uses: actions/checkout@v4
-        with:
-          ref: korean-localization-recovery-20260928
-          filter: blob:none
-          fetch-depth: 1
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /tools/localization/github_hd_hybrid_completion.py
-            /tools/localization/test_github_hd_hybrid_completion.py
-            /localization/automation_inputs/hd_original_png_source_plan.json
-            /localization/automation_inputs/candidate_outputs
-            /localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
-            /localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a
-
-      - name: Setup GitHub-native Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install deterministic TEST_ONLY renderer dependencies
-        shell: bash
+      - name: Retired workflow - no rendering, no Docker, no DDS
         run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends fonts-nanum
-          python -m pip install --disable-pip-version-check "Pillow==11.3.0" "numpy==2.3.4"
-
-      - name: Unit tests for overlap accounting, A/B containment and DDS roundtrip
-        run: python -m unittest discover -s tools/localization -p test_github_hd_hybrid_completion.py -v
-
-      - name: Build complete HD Korean TEST_ONLY package twice deterministically
-        shell: bash
-        run: |
-          set -euo pipefail
-          python tools/localization/github_hd_hybrid_completion.py \
-            --repo-root . --out "$RUNNER_TEMP/hd-korean-one"
-          python tools/localization/github_hd_hybrid_completion.py \
-            --repo-root . --out "$RUNNER_TEMP/hd-korean-two"
-          cmp "$RUNNER_TEMP/hd-korean-one/OUTRUN_HD_KOREAN_HYBRID_TEST_ONLY.zip" \
-              "$RUNNER_TEMP/hd-korean-two/OUTRUN_HD_KOREAN_HYBRID_TEST_ONLY.zip"
-          cmp "$RUNNER_TEMP/hd-korean-one/qa_report.json" \
-              "$RUNNER_TEMP/hd-korean-two/qa_report.json"
-          python - <<'PY'
-          import json, os, pathlib
-          report=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"hd-korean-one/qa_report.json").read_text(encoding="utf-8"))
-          assert report["source_dds_verified"] == 104, report["source_dds_verified"]
-          assert report["output_dds_count"] == 104, report["output_dds_count"]
-          assert report["active_roi_total"] == 954
-          assert report["translation_coverage_accounted"] == 954
-          assert report["translation_coverage_complete"] is True
-          assert report["fallback_hold_count"] == 0
-          print(json.dumps({
-            "HD_DDS":report["output_dds_count"],
-            "ROI_COVERAGE":report["translation_coverage_accounted"],
-            "AB_IMPORTED":report["ab_candidate_imported_count"],
-            "AB_APPLIED":report["ab_candidate_applied_count"],
-            "AB_PENDING_IMPORT":report["ab_candidate_pending_import"],
-            "AB_HOLDS":report["ab_candidate_hold_count"],
-            "ZIP_SHA256":report["zip_sha256"],
-            "RUNTIME":report["runtime_validation"],
-          },ensure_ascii=False,sort_keys=True))
-          PY
-          sha256sum "$RUNNER_TEMP/hd-korean-one/OUTRUN_HD_KOREAN_HYBRID_TEST_ONLY.zip"
-
-      - name: Upload complete TEST_ONLY HD Korean DDS package and QA evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: outrun-hd-korean-completion-${{ github.run_id }}
-          path: ${{ runner.temp }}/hd-korean-one/
-          retention-days: 21
-          if-no-files-found: warn
+          echo "::notice title=FONT_FALLBACK_RETIRED::Only existing A/B ImageGen PNG may be composited. Use outrun-ab-multi-atlas.yml; all missing or unsafe ROI remain HOLD."
+          echo "release_approved=false; runtime_validation=UNTESTED; no DDS generated."
