@@ -10,7 +10,8 @@ on:
       - "localization/automation_inputs/drive_verified_original_hd_png/**"
 
 permissions:
-  contents: read
+  contents: write
+  actions: write
 concurrency:
   group: outrun-source-dds-sha-recovery
   cancel-in-progress: false
@@ -31,6 +32,8 @@ jobs:
             /localization/automation_inputs/drive_verified_original_hd_png
             /localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds
             /localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds
+            /localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds
+            /localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds
 
       - uses: actions/setup-python@v5
         with:
@@ -49,6 +52,55 @@ jobs:
             --repo-root . --out "$RUNNER_TEMP/recovered-2"
           diff -r "$RUNNER_TEMP/recovered-1" "$RUNNER_TEMP/recovered-2"
           echo "Never auto-install or mark RELEASE; verified bytes only"
+
+
+      - name: Publish SHA-exact originals to GitHub and dispatch A/B native QA
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSET_BRANCH: korean-localization-recovery-20260928
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, pathlib
+          root=pathlib.Path(".")
+          out=pathlib.Path(os.environ["RUNNER_TEMP"])/"recovered-1"
+          report=json.loads((out/"recovery_report.json").read_text(encoding="utf-8"))
+          assert report["exact_recovered_count"] == 2, "REQUIRED_SOURCES_NOT_EXACT"
+          for item in report["records"]:
+              assert item["status"] == "EXACT_ORIGINAL_DDS_RECOVERED", item
+              target=pathlib.Path("localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a")/item["target"]
+              source=out/item["target"]
+              b=source.read_bytes()
+              assert hashlib.sha256(b).hexdigest()==item["source_dds_sha256"]
+              if target.is_file():
+                  assert target.read_bytes()==b,"REFUSE_TO_OVERWRITE_DIFFERENT_SOURCE"
+              else:
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(b)
+              assert hashlib.sha256(target.read_bytes()).hexdigest()==item["source_dds_sha256"]
+              print("SHA_EXACT_GITHUB_STAGE",item["id"],item["source_dds_sha256"])
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --sparse \
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds \
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds
+          if git diff --cached --quiet; then
+            echo 'EXACT_SOURCE_ALREADY_COMMITTED'
+          else
+            git diff --cached --check
+            git commit -m 'assets(localization): restore SHA-exact original Q046 Q047 DDS from verified HD PNG'
+            done_push=0
+            for attempt in 1 2 3 4; do
+              if git push origin "HEAD:$ASSET_BRANCH"; then done_push=1;break;fi
+              git fetch origin "$ASSET_BRANCH"
+              git rebase "origin/$ASSET_BRANCH"
+            done
+            if [ "$done_push" != 1 ];then echo 'GITHUB_PUSH_FAILED' >&2;exit 1;fi
+          fi
+          gh workflow run outrun-ab-multi-atlas.yml --ref "$ASSET_BRANCH"
+          echo 'SHA-exact DDS committed, multi-atlas QA dispatched'
 
       - name: Publish exact recovered DDS and reasoned HOLD report
         if: always()
