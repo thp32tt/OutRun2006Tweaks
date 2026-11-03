@@ -7,11 +7,20 @@
 
 namespace
 {
-    bool IsVrHookDescription(std::string_view description) noexcept
+    // Hook names prefixed with VR are part of the same optional VR domain.
+    // Never install them during a direct 2D launch or explicit VR disable.
+    constexpr bool IsVrHookDescription(std::string_view description) noexcept
     {
         return description.starts_with("OpenXRVR") ||
-            description.starts_with("OpenXVRR");
+            description.starts_with("OpenXVRR") ||
+            description.starts_with("VR");
     }
+
+    static_assert(IsVrHookDescription("OpenXRVRRenderer"));
+    static_assert(IsVrHookDescription("VRDriverSeatRenderTest"));
+    static_assert(IsVrHookDescription("VRLensFlareProjected2D"));
+    static_assert(IsVrHookDescription("VRHudQueueSemanticBridge"));
+    static_assert(!IsVrHookDescription("UIScaling"));
 
     bool VrHooksEnabledForProcess() noexcept
     {

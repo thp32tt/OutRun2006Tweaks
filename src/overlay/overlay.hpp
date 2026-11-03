@@ -69,7 +69,6 @@ public:
 	inline static bool NotifyOnlineEnable = true;
 	inline static int NotifyOnlineUpdateTime = 20;
 	inline static int NotifyHideMode = 1;
-	inline static bool NotifyUpdateCheck = true;
 
 	enum NotifyHideModes
 	{
