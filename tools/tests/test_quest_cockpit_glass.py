@@ -93,6 +93,26 @@ class GlassTests(unittest.TestCase):
             self.assertFalse(journal.exists())
             self.assertEqual(backup.read_bytes(),b"existing user backup")
 
+    def test_brightness_to_tint_and_off_restores_original(self):
+        for percent, alpha in ((0,.90),(50,.50),(75,.30),(100,.10)):
+            self.assertAlmostEqual(m.opacity_from_brightness(percent),alpha)
+        for value in (-1,101,float("nan"),float("inf"),True):
+            with self.assertRaises(ValueError):
+                m.opacity_from_brightness(value)
+        with tempfile.TemporaryDirectory() as d:
+            name=Path(d)/"obj_plcar_360sp_pmt.sz"
+            original=zlib.compress(fixture())
+            name.write_bytes(original)
+            _,backup=m.install_in_place(name,m.opacity_from_brightness(100))
+            self.assertAlmostEqual(struct.unpack_from(
+                "<f",m.unpack(name.read_bytes())[0],580)[0],.10,places=5)
+            m.install_in_place(name,m.opacity_from_brightness(0))
+            self.assertAlmostEqual(struct.unpack_from(
+                "<f",m.unpack(name.read_bytes())[0],580)[0],.90,places=5)
+            m.restore_in_place(name)
+            self.assertEqual(name.read_bytes(),original)
+            self.assertEqual(backup.read_bytes(),original)
+
     def test_selection_and_recovery(self):
         orig=fixture()
         name="obj_plcar_360sp_pmt.sz"

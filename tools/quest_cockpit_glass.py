@@ -102,6 +102,14 @@ def patch_bytes(payload, name, opacity, selection=None):
         raise ValueError("non-glass data changed")
     return (zlib.compress(modified,9) if packed else bytes(modified)),hits
 
+def opacity_from_brightness(percent):
+    """Adjust dark PMT alpha (not scene exposure): 0=dark, 100=clear."""
+    if (isinstance(percent, bool) or not isinstance(percent, (int, float)) or
+            not math.isfinite(percent) or not 0 <= percent <= 100):
+        raise ValueError("brightness must be finite 0..100")
+    return round(0.90 - 0.008 * percent, 4)
+
+
 def sha256(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -196,10 +204,17 @@ def main():
     mode=a.add_mutually_exclusive_group()
     mode.add_argument("--in-place",action="store_true",help="apply with original-byte backup and SHA journal")
     mode.add_argument("--restore",action="store_true",help="restore verified backup of in-place glass edit")
-    a.add_argument("--opacity",type=float,default=0.30)
+    shade=a.add_mutually_exclusive_group()
+    shade.add_argument("--opacity",type=float,help="direct alpha 0.10..0.90")
+    shade.add_argument("--brightness",type=float,
+                       help="0 dark / 100 clearer: change player-car dark-tint alpha only")
     a.add_argument("--only",action="append",default=[],help="object:material; repeat for verified glass")
     a.add_argument("--dry-run",action="store_true")
     opts=a.parse_args()
+    if opts.restore and (opts.brightness is not None or opts.opacity is not None):
+        raise ValueError("OFF restore cannot also apply brightness/opacity")
+    opacity=(opacity_from_brightness(opts.brightness) if opts.brightness is not None
+             else opts.opacity if opts.opacity is not None else 0.30)
     if opts.in_place or opts.restore:
         if opts.output is not None:
             raise ValueError("in-place/restore must not specify an output file")
@@ -225,13 +240,13 @@ def main():
     if opts.in_place:
         if opts.dry_run:
             original,_,_,_,_=verified_original(opts.source)
-            _,hits=patch_bytes(original,opts.source.name,opts.opacity,select)
+            _,hits=patch_bytes(original,opts.source.name,opacity,select)
             print(f"validated {len(hits)} candidate materials; no files changed")
         else:
-            hits,backup=install_in_place(opts.source,opts.opacity,select)
+            hits,backup=install_in_place(opts.source,opacity,select)
             print(f"installed glass alpha for {len(hits)} candidate materials; original backup: {backup}")
         return
-    payload,hits=patch_bytes(opts.source.read_bytes(),opts.source.name,opts.opacity,select)
+    payload,hits=patch_bytes(opts.source.read_bytes(),opts.source.name,opacity,select)
     for obj,mat,ci,_,rgba,blend in hits:
         print(f"glass candidate: object={obj} material={mat} color={ci} alpha={rgba[3]:.4f} blend={blend} -> {opts.opacity:.3f}")
     if not opts.dry_run:

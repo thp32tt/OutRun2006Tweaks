@@ -19,6 +19,10 @@ on:
       - 'RUN-QUEST-COCKPIT-V2-DIAG.cmd'
       - 'tools/tests/quest_cockpit_v2_native_frame_smoke.cpp'
       - 'tools/tests/quest_cockpit_v2_runtime_smoke.cpp'
+      - 'tools/quest_cockpit_glass.py'
+      - 'tools/tests/test_quest_cockpit_glass.py'
+      - 'QuestCockpitV2-GlassControl.ps1'
+      - 'RUN-QUEST-COCKPIT-V2-GLASS.cmd'
       - 'src/hooks_graphics.cpp'
       - 'src/vr/settings.cpp'
       - 'OutRun2006Tweaks.ini'
@@ -64,6 +68,8 @@ jobs:
             tools/tests/quest_cockpit_v2_occupant_smoke.cpp \
             -o /tmp/quest-v2-occupant
           /tmp/quest-v2-occupant
+      - name: Reversible glass tint brightness ON/OFF synthetic tests
+        run: python3 -m unittest discover -s tools/tests -p test_quest_cockpit_glass.py -v
       - name: Reject removed legacy hooks and unsafe defaults
         run: |
           python3 - <<'PY'

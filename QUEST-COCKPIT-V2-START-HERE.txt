@@ -34,3 +34,19 @@ Crash A/B control correctness: diagnostic option 1 explicitly overrides stale Ou
 2026-11-03 configuration parity: original test CORRECTNESS had DirectGpuOnly=false / CullingUnionFov=false / HudInspector=true. The known-working beta release uses true / true / false. Dedicated crash diagnostic now passes QuestCockpitV2ReleaseParity ON so the baseline, native-hook-only and cockpit trials share the same graphics options as the release, except temporary opt-in file logging and original VR camera experiment options. This is a test-contract fix, not a proven solution for 0xC0000409.
 
 2026-11-03 no-cockpit release-parity practical test e1cbe92: hook installer V2NativeFrameProbe/PlayerCandidateProbe both SKIPPED; source identities match stable for ex_device_upgrade.cpp, ex_device_upgrade_r15.cpp and dllmain.cpp. VR.Enabled TRUE, CreateDevice flags 0x40 and XR eye 2496x2688 accepted, process 0xC0000409 before CreateDeviceEx result or D3D9 Present. WER dump is NOT contained in the uploaded ZIP. Next diagnostic option 6: CLASSIC IDirect3D9 CreateDevice (no Ex promotion, DirectGPU off) with V2 off to isolate Ex/device setup from host and game. New opt-in COCKPIT DEVICE DIAG startup phase logs wrap CreateDeviceEx and compatibility installation for option 1 vs 6. No claim of root cause or successful resolution; actual user Windows crash dump needed for faulting instruction/call stack.
+
+2026-11-03 GLASS BRIGHTNESS ON/OFF (EXPERIMENTAL, user-owned PMT file):
+Run RUN-QUEST-COCKPIT-V2-GLASS.cmd AFTER CLOSING the game. Select a
+real installed obj_plcar_*_pmt.sz player model that the PC game loads.
+Brightness 0 means DARK tint (alpha 0.90); 100 means CLEARER (0.10).
+Click ON to apply; OFF restores original exact bytes from an exclusive
+SHA-guarded backup/journal. Existing files are never guessed or auto-
+selected. A missing/unsupported/modified model is refused. No original
+APK/PMT data is redistributed. This changes material-file dark tint,
+not physical window geometry, ambient light or OpenXR exposure.
+REA verifies per-draw 0.25 opacity when native glass predicates hold,
+but the real PC material/polygon ownership remains unproven. The actual
+game may load a packed bank instead of loose PMTs; then changing a
+loose file will NOT change the visible windshield. It is NOT a live
+F11 setting or verified Quest 3 visual pass. The VR render path and
+default FFB/graphics settings remain unchanged.
