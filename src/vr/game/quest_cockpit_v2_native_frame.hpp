@@ -51,7 +51,7 @@ public:
             // Preserve balanced end accounting without indexing past
             // the bounded stack. No cockpit admission until fully unwound.
             rejectUntilEmpty_=true;window_.overflow=true;
-            if(overflowDepth_<std::numeric_limits<std::uint32_t>::max())
+            if(overflowDepth_<(std::numeric_limits<std::uint32_t>::max)())
                 ++overflowDepth_;
             else saturated_=true;
         } else {
