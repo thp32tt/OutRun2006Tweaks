@@ -186,11 +186,12 @@ jobs:
             if(Test-Path "tools/$f"){Copy-Item "tools/$f" $pkg}
           }
           if($env:GITHUB_REF_NAME -eq 'vr-quest-cockpit-v2') {
-            foreach($item in @('RUN-QUEST-COCKPIT-V2.cmd','RUN-QUEST-COCKPIT-V2-F0.cmd','RUN-QUEST-COCKPIT-V2-LOD0.cmd','RUN-QUEST-COCKPIT-V2-DIAG.cmd','Run-QuestCockpitV2-CrashDiag.ps1','QUEST-COCKPIT-V2-START-HERE.txt','RUN-QUEST-COCKPIT-V2-GLASS.cmd','QuestCockpitV2-GlassControl.ps1')) {
+            foreach($item in @('RUN-QUEST-COCKPIT-V2.cmd','RUN-QUEST-COCKPIT-V2-F0.cmd','RUN-QUEST-COCKPIT-V2-LOD0.cmd','RUN-QUEST-COCKPIT-V2-DIAG.cmd','Run-QuestCockpitV2-CrashDiag.ps1','QUEST-COCKPIT-V2-START-HERE.txt')) {
               if(!(Test-Path $item)){throw "missing Quest cockpit launcher: $item"}
               Copy-Item $item $pkg
             }
-            Copy-Item 'tools/quest_cockpit_glass.py' (Join-Path $pkg 'quest_cockpit_glass.py')
+            # The superseded PMT file editor stays source-only. Packaged
+            # cockpit glass controls are now F11 live hooks, never disk edits.
           }
           $env:GITHUB_SHA | Set-Content (Join-Path $backend 'SOURCE_SHA.txt') -Encoding ascii
           'ACTIVE_R26_R43_R44' | Set-Content (Join-Path $backend 'VARIANT_ID.txt') -Encoding ascii
