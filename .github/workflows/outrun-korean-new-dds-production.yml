@@ -1,72 +1,14 @@
-name: OutRun Korean New DDS Production (GitHub CPU)
-
+# Disabled: source-blind font fallback violates A/B ImageGen priority.
+# No automated generation or upload of generic-font DDS.
+name: OutRun Korean Native Font Fallback (retired)
 on:
-  schedule:
-    # Daily 02:37 KST; never use N100 to process DDS.
-    - cron: "37 17 * * *"
   workflow_dispatch:
-  push:
-    branches:
-      - korean-localization-recovery-20260928
-    paths:
-      - ".github/workflows/outrun-korean-new-dds-production.yml"
-      - "tools/localization/github_native_korean_production.py"
-      - "tools/localization/test_github_native_korean_production.py"
-      - "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
-      - "localization/graphics/hd_source/**"
-
 permissions:
   contents: read
-
-concurrency:
-  group: outrun-korean-new-dds-production
-  cancel-in-progress: false
-
 jobs:
-  build-existing-github-sources:
+  reject-font-fallback:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
     steps:
-      - name: Checkout existing source DDS and 954 Korean translation rows
-        uses: actions/checkout@v4
-        with:
-          ref: korean-localization-recovery-20260928
-          lfs: false
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
-            localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv
-            tools/localization/github_native_korean_production.py
-            tools/localization/test_github_native_korean_production.py
-
-      - name: Native Python on GitHub-hosted runner, no Docker
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Korean font and Pillow
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends fonts-nanum
-          python -m pip install --disable-pip-version-check "Pillow==11.3.0"
-
-      - name: Run synthetic native DDS and art-protection tests
-        run: python -m unittest discover -s tools/localization -p test_github_native_korean_production.py -v
-
-      - name: Produce NEW Korean DDS candidates from exact SHA-pinned GitHub originals
-        shell: bash
-        run: |
-          set -euo pipefail
-          python tools/localization/github_native_korean_production.py \
-            --repo-root . \
-            --out "$RUNNER_TEMP/korean-native-new" \
-            --max-sources 18
-
-      - name: Publish newly generated DDS TEST_ONLY previews and QA report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: outrun-new-korean-dds-${{ github.run_id }}
-          path: ${{ runner.temp }}/korean-native-new/
-          if-no-files-found: warn
-          retention-days: 21
+      - run: |
+          echo "HOLD: A/B ImageGen PNG is the mandatory source for localization."
+          echo "Generic font output must never replace A/B artwork."
