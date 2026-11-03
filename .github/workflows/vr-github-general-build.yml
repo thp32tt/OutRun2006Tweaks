@@ -2,7 +2,7 @@ name: VR GitHub General Test Build
 
 on:
   push:
-    branches: [ vr-dx11-focus-rebase-20261103 ]
+    branches: [ vr-dx11-focus-rebase-20261103, vr-dx11-native-r71 ]
     paths:
       - '.github/workflows/vr-github-general-build.yml'
       - 'src/hooks_graphics.cpp'
@@ -23,6 +23,9 @@ on:
       - 'vrhost/**'
       - 'CMakeLists.txt'
       - 'cmake.toml'
+      - 'src/vr/core/transport.hpp'
+      - 'src/vr/d3d11/**'
+      - 'tools/dx11_native_transport_probe.cpp'
 
 permissions:
   contents: read
