@@ -1,0 +1,29 @@
+{
+  "schema": "outrun.ab-imagegen-input-registry.v1",
+  "policy": "A/B ImageGen original PNG mandatory; no font rendering fallback",
+  "source": "2026-11-02 existing A/B production manifest and Q012 independent native pilot",
+  "runtime_validation": "UNTESTED",
+  "entries": [
+    {
+      "roi_id": "Q012_0909e9d5397ec72e",
+      "role": "B",
+      "candidate": "localization/automation_inputs/candidate_outputs/B/Q012_0909e9d5397ec72e_source_k.png",
+      "candidate_sha256": "f88974af1876c6cf4ef21339dcd7c61ec1203165890773033b66c131e82ca75b",
+      "target_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "original_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+      "orientation": "NORMAL",
+      "native_ink_box": [
+        8,
+        10,
+        248,
+        44
+      ],
+      "readable_source_dimensions": [
+        256,
+        64
+      ],
+      "source_hd_png_sha256": "bfabe98fb448814401f1c4c5bb6ae0cbb2c8ef81bbf9ec4b6457fdcc795ab2e8",
+      "status": "AB_CANDIDATE_EXACT_BYTES_IMPORTED_VISUAL_REVIEW_REQUIRED"
+    }
+  ]
+}
