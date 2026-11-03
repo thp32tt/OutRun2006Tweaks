@@ -1,0 +1,112 @@
+# Selectable Wheel FFB Models
+
+The standalone FFB branch exposes several force models through one DirectInput COM output owner. Device selection, focus-loss safety, actuator shutdown, response correction, slew limiting, soft saturation, reconnect handling and the hard DirectInput cap are shared by every model. Hardware periodic transport remains a live model/user choice: Arcade Original can request Sine, PS2 Original can request Triangle, and the core falls back to ConstantForce when a required periodic effect is unavailable. The shared compatibility wrapper does not overwrite that choice.
+
+## Model 0 — Modern DD Physics
+
+The existing DD-oriented model:
+
+- front-slip/yaw Physics SAT with Natural SAT fallback;
+- brush-like pneumatic trail collapse plus geometric mechanical/caster trail and a small separate residual aligning moment at high slip;
+- dynamic damping and grip-loss release;
+- stage-aware four-wheel road texture;
+- modern collision, gear and optional engine haptics.
+
+This remains the default. The two **MOZA R3** Modern presets intentionally default hardware periodic effects **off**, using the ConstantForce road/slip fallback because the R3 compatibility work found that reported Sine support can be physically weak. This is a preset default, not a global lock: the F11 periodic switch remains live.
+
+## Model 1 — Arcade Original (Lindbergh-derived)
+
+This is a reconstruction of the **observed drive-board semantics** from the public `Boomslangnz/FFBArcadePlugin` `OutRun2Real.cpp` path. It must not be described as an official Sega protocol specification.
+
+The reference path intercepts the Lindbergh routine at `0x08105A48`. Observed effect-code handling:
+
+| code | observed plugin interpretation | PC reconstruction |
+| ---: | --- | --- |
+| `0x0B` | hard right-wall impact | directional ConstantForce |
+| `0x1B` | hard left-wall impact | opposite directional ConstantForce |
+| `0x02` | grass/sand | rough-surface vibration |
+| `0x10` | side-rail / one directional group | one-sided rough-surface ConstantForce |
+| `0x04` | rough surface -> road, one side | ~80 ms directional transition (5 C2C ticks) |
+| `0x14` | opposite rough -> road transition | ~80 ms opposite transition (5 C2C ticks) |
+| `0x00` | grass/sand/rough state, opposite group | one-sided rough-surface ConstantForce |
+
+The public plugin also applies a spring for non-`0x7B` drive-board requests. Its rough-surface call is `Sine(70, 80, strength)`; the plugin API names the first argument `period` and copies it to SDL's periodic period field, so the PC host translates 70 ms to about 14.286 Hz rather than treating 70 as Hz. Gear changes while moving call `Sine(240, 320, 0.10)`: the PC reconstruction synthesizes one ~240 ms (~4.167 Hz) cycle and treats F11 Gear Shift as a host scaler, with 1.00 preserving the observed 0.10 source amplitude.
+
+C2C does not expose the Lindbergh drive-board packet stream, so this branch reconstructs the event semantics from C2C-native signals:
+
+- four per-wheel surface masks and the original `sub_1149C0` roughness LUT;
+- left/right non-water rough-surface grouping;
+- rough -> road transitions; the OutRun2Real profile's `FeedbackLength=80` maps to five C2C 60 Hz ticks (~83.3 ms), and while the 0x04/0x14 transition is active it owns the directional surface output instead of summing/cancelling against a simultaneous sustained 0x10/0x00 reconstruction;
+- a dedicated C2C course-collision witness: the course solver reloads EVWORK_CAR field_283 to 30 and field_coli_281/field_282 carry side/intensity-related state. A rising high timer edge now owns wall/course impacts; the broader field_8 bit 0x1000 remains available for vehicle/other impacts, with severe speed-drop only as emergency fallback;
+- C2C gear changes.
+
+Modern inferred Physics SAT and inferred tire-slip chatter are disabled in this mode. The centering backbone is the shared DirectInput condition/spring path. Road Detail and Collision are explicit PC host scalers around the reconstructed `SpeedStrength` source; both Arcade shortcuts set them to 1.00 for one-to-one source amplitude before common Overall Strength. The **Use Arcade Original** shortcut restores the public OutRun2Real profile baseline: `SpringStrength=50` maps to a 0.50 condition coefficient with 1.00 saturation, while `EnableDamper=0` maps to zero Dynamic Damping. F11 can still override those values explicitly after loading the shortcut.
+
+OutRun2Real creates its infinite Spring and ConstantForce in separate SDL haptic effect slots. A 0x7B wall/rail/surface event therefore does not implicitly cancel the already-running Spring. Arcade Original mirrors that coexistence: the servo-style condition backbone remains active through the ~80 ms directional event instead of being blanked for five C2C ticks.
+
+The Lindbergh plugin's speed-strength staircase is retained as a comparative shape. Its thresholds were defined in a different speed scale, so C2C uses the same ten-step structure after scaling `speedRaw / 2`; this is a porting approximation, not a claim that the raw speed units are identical. Modern DD still clamps its own `speedNorm` to 0..1, while Arcade preserves 0..1.25 headroom so the reference final >500 / 100% strength band remains reachable. Captured C2C telemetry reaches `speedRaw ~= 2.239`, i.e. Arcade normalized speed ~=1.12.
+
+## Legacy Model 2 migration
+
+Model value `2` is reserved only for backward compatibility. It is rewritten to
+Model 0 (Modern DD) at load/runtime and is not selectable, named, or assigned its
+own force/event behavior. MOZA R3 model changes still apply the tested polarity
+default, while both Reverse controls remain manually editable until the next
+model change.
+
+## Model 3 — PS2 Original topology (Experimental)
+
+The PS2 reverse map verifies distinct:
+
+- condition-force download/update;
+- constant-force download/update;
+- periodic-force download/update;
+- start/stop/destroy;
+- overall force gain;
+- Logitech enumerate/open/device-property flow.
+
+The retail path is now decoded beyond topology for several fields: the Type-7 Spring coefficient/dynamic saturation, Type-8 Damper coefficient/saturation, the directional ConstantForce output cap, and the Type-4 periodic raw period/direction/phase/offset are backed by direct SLPM evidence. The PC translation uses those verified envelopes where possible.
+
+Still unresolved are the gameplay meanings of the retail ConstantForce source globals, additional vehicle-state/activation shaping around the periodic envelope, some effect-manager slot semantics, and the raw period field's physical unit. Therefore:
+
+- Condition/Spring and Damper parameters use recovered retail values with explicit user scaling;
+- PS2 Host Gain is a separate PC/DD transport multiplier: 1.00x is the recovered retail-reference translation, while the F11 PS2 shortcut starts at 2.00x for modern DD hardware (adjustable through 2.50x). It scales Spring/Damper/Triangle/ConstantForce-fallback transport together without changing the recovered retail formulas; normal DirectInput caps still apply;
+- the PS2 road periodic uses the recovered Type-4/Triangle shape, raw period curve, four-wheel surface-envelope family, verified 1.25 vehicle-state envelope boost, `min(field_1C4,1)` factor, magnitude scale `50`, and raw start threshold `27`; the car-field labels behind the boost remain intentionally unnamed;
+- F11 Road Detail `1.00` is the one-to-one host scaler around that recovered periodic envelope before Overall Strength and DD safety;
+- the recovered directional ConstantForce transport/cap remains documented, but PS2 Original emits no C2C collision force because no verified non-zero retail caller has been recovered;
+- no PS2 gear-shift pulse is synthesized without a verified retail caller;
+- all output still passes through the shared modern DD safety layer.
+
+The mode remains **Experimental** until those event/source mappings and remaining units are recovered and hardware-tested.
+
+## Why Xbox is not a selectable wheel model
+
+The reconstructed Xbox `CalcVibrationValues()` path is controller-rumble logic rather than a verified steering-wheel FFB implementation. Its two motor envelopes remain available only as diagnostic witnesses and are not offered as a wheel FFB model.
+
+## F11 selection
+
+`F11 -> Force Feedback -> FFB Model`:
+
+1. Modern DD Physics
+2. Arcade Original (Lindbergh-derived)
+3. PS2 Original topology (Experimental)
+
+Named FFB profiles include the selected model. Device identity, wheel response correction and diagnostics remain global/wheel-specific as before.
+
+
+### Cabinet steering-hardware scope
+
+Do not generalize one OutRun 2 cabinet steering mechanism to every cabinet variant. The SEGA motorized SPG-2500 handle assembly used by motor-FFB Twin/Deluxe-family documentation lists a 500 W servo motor, pulleys/gears, timing belt and steering VR, while DRIVE BOARD TEST actively rolls the wheel left/right and exposes MOTOR POWER steering-resistance levels with 80% as the default. A separate UK HAPP Upright service path explicitly documents mechanical spring replacement. The latter is a different handle/cabinet variant and must not be used as evidence that the motorized OutRun2Real/Lindbergh target had a passive centering spring.
+
+For Arcade Original, the target remains the motorized drive-board feel represented by OutRun2Real: a continuously available condition/centering backbone plus drive-board event codes. The 0.50 condition coefficient is therefore a host translation of the motorized cabinet's active steering resistance, not a claim about a physical coil spring in the SPG-2500 mechanism.
+
+
+## R7 — 100-cycle review implementation
+
+R7 applies confirmed/actionable findings from review cycles C0049-C0148 while leaving research-gated assumptions unchanged. Current MOZA R3 presets are no longer reclassified by an every-physics-tick legacy signature matcher. Named FFB profiles now load from a canonical baseline before stored values are overlaid, so a partial/older profile cannot inherit model-owned values from whichever profile was active before it.
+
+R13 removes the old slip-dependent mechanical/caster multiplier: steering geometry now stays geometric while front-tire force, pneumatic-trail collapse and a small residual aligning moment shape high-slip torque. Front-slip filtering uses a normalized distance-based relaxation law at the fixed 60 Hz physics rate, and the body-slip recovery cue is capped at 20% and magnitude-limited to the current front-slip SAT, so it can unload but cannot reverse steering torque before front-slip itself changes sign. Counter-torque still crosses zero before changing direction, while the bounded four-tick build assist reduces the long reversal tail. Authoritative course/vehicle collision edges may retrigger after the real output window instead of waiting for the old 90-frame heuristic debounce; Arcade collision strength is latched at impact, and near-neutral/head-on impacts do not invent a steering side.
+
+Surface classification separates proven primary material-0x14 road sections from curb/off-road roughness: Deep Lake 419..458, Tulip Garden 54..70 and Floral Village 510..533. Floral retains its tested 0.60 Road Detail comfort scale; the other two keep normal Road Detail but do not receive curb SAT/damper unloading or fixed-strength curb promotion. Snow attenuation is keyed to the proven 0x800000 primary material rather than the entire stage, and a 0x800000 <-> 0x2 primary-road transition cannot arm the snow-curb latch. Arcade rough-event reconstruction also excludes these proven primary rough-road contacts instead of treating every roughness >=0.60 sample as grass/sand.
+
+DirectInput effect metadata is now advisory for Spring, Damper and Periodic effects. The runtime creates zero-output effects and validates Start/SetParameters safely; a working effect is accepted even when old driver metadata omits the live-update flag. Road and tyre-slip hardware periodics are independent, so one missing channel falls back to ConstantForce without discarding the other. The MOZA/R3 ConstantForce compatibility transport uses separate 10 Hz road and 12 Hz tyre-slip carrier ceilings instead of collapsing both onto 15 Hz. Diagnostic summary telemetry is 5 Hz and deep SAT/basis detail 1 Hz to reduce synchronous log/flush disturbance during hardware testing.
