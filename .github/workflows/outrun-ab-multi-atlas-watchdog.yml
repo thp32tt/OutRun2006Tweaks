@@ -1,0 +1,52 @@
+name: OutRun A/B DDS 30min dispatch watchdog (GitHub lightweight)
+
+on:
+  schedule:
+    # Twice hourly in UTC; actual GitHub start can be delayed.
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/outrun-ab-multi-atlas-watchdog.yml"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: outrun-ab-multi-atlas-watchdog
+  cancel-in-progress: false
+
+jobs:
+  check-and-dispatch:
+    if: github.repository == 'thp32tt/OutRun2006Tweaks'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check asset HEAD and run status; only dispatch work not already successful
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          repo="thp32tt/OutRun2006Tweaks"
+          branch="korean-localization-recovery-20260928"
+          workflow="outrun-ab-multi-atlas.yml"
+          sha="$(gh api "repos/$repo/branches/$branch" --jq '.commit.sha')"
+          [[ "$sha" =~ ^[a-f0-9]{40}$ ]]
+          runs="$(gh api "repos/$repo/actions/workflows/$workflow/runs?branch=$branch&per_page=30")"
+          decision="$(printf '%s' "$runs" | jq -er --arg sha "$sha" '
+            [.workflow_runs[] | select(.head_sha == $sha)] as $same |
+            if any($same[]; .status == "completed" and .conclusion == "success") then "UP_TO_DATE"
+            elif any($same[]; (.status == "queued" or .status == "in_progress" or .status == "pending" or .status == "waiting" or .status == "requested")) then "ALREADY_RUNNING"
+            elif ([$same[] | select(.conclusion == "failure" or .conclusion == "timed_out")] | length) >= 2 then "HOLD_RETRY_LIMIT"
+            else "DISPATCH"
+            end')"
+          echo "Asset SHA: $sha"
+          echo "Decision: $decision"
+          echo "Note: successful TEST_ONLY builds may still hold unsafe ROIs; unchanged inputs cannot clear those holds."
+          if [[ "$decision" == "DISPATCH" ]]; then
+            gh workflow run "$workflow" --repo "$repo" --ref "$branch"
+            echo "DISPATCHED_TO_GITHUB_ACTIONS"
+          fi
