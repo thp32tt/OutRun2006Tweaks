@@ -21,7 +21,7 @@ from pathlib import Path
 
 REPO = "thp32tt/OutRun2006Tweaks"
 BRANCH = "korean-localization-recovery-20260928"
-WORKFLOW = "outrun-korean-github-compute.yml"
+WORKFLOW = "outrun-ab-imagegen-native.yml"
 API = "https://api.github.com/repos/" + REPO
 EXPECTED_SHA = re.compile(r"^[0-9a-f]{40}$")
 MAX_REMOTE_BYTES = 512 * 1024
