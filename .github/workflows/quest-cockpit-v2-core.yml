@@ -151,6 +151,11 @@ jobs:
           assert 'RawB0Camera is retired' in hook
           assert 'NativeSeatOffset(' in hook
           assert 'QuestCockpitV2CameraPose(camera,pose)' in hook
-          assert 'OriginalModeOneAnchor(table,kTableSize,model,anchor)' in hook
+          # Native per-model camera table belongs to the original PC game;
+          # the old raw-B0 double transform must never be reintroduced.
+          assert 'OriginalModeOneAnchor(table,kTableSize,model,anchor)' not in hook
+          assert 'RawB0Camera is retired' in hook
+          assert 'Settings::VRQuestCockpitV2SeatBack.get()' in hook
+          assert 'Settings::VRQuestCockpitV2SeatDown.get()' in hook
           print('QuestCockpitV2 isolated-core contract PASS')
           PY
