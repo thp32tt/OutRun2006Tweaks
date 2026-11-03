@@ -103,6 +103,8 @@ class MultiAtlasTest(unittest.TestCase):
    self.assertTrue(m.imported_candidate(root,row))
    (root/"alias.png").symlink_to(root/"candidate.png")
    self.assertFalse(m.imported_candidate(root,{"_candidate_rel":"alias.png"}))
+ def test_q047_orientation_is_exact_source_pinned(self):
+  self.assertEqual(m.ORIENTATIONS["AD720950"],"FLIPY")
  def test_no_font_regeneration(self):
   s=src.read_text()
   for term in ("ImageFont","truetype(","draw.text(","font_path"):
