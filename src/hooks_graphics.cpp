@@ -330,7 +330,7 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
     const auto* material=reinterpret_cast<const std::uint32_t*>(ctx.edx);
     if(!Memory(object,0x3C)||!Memory(material,0x58))return;
     const auto* materials=reinterpret_cast<const std::uint8_t*>(object[0x34/4]);
-    const auto* colors=reinterpret_cast<std::uint8_t*>(object[0x38/4]);
+    auto* colors=reinterpret_cast<std::uint8_t*>(object[0x38/4]);
     const auto* info=reinterpret_cast<const std::uint8_t*>(object[0x18/4]);
     if(!Memory(info,0x34))return;
     std::uint32_t nMaterials=0,nColors=0;
@@ -370,7 +370,7 @@ static void OnMaterialBefore(SafetyHookContext& ctx) noexcept {
         }
     }
     DWORD alphaBlend=FALSE;
-    const auto* device=Game::D3DDevice_ptr?*Game::D3DDevice_ptr:nullptr;
+    auto* device=Game::D3DDevice_ptr?*Game::D3DDevice_ptr:nullptr;
     const bool alphaPass=device &&
         SUCCEEDED(device->GetRenderState(D3DRS_ALPHABLENDENABLE,&alphaBlend)) &&
         alphaBlend!=FALSE;
