@@ -36,7 +36,7 @@ def safe_texture(s):
  p=PurePosixPath(s)
  return (isinstance(s,str) and s.startswith("textures/load/") and "\\" not in s and
          ":" not in s and not p.is_absolute() and ".." not in p.parts and
-         len(p.parts)==4 and p.suffix.lower()==".dds" and
+         (len(p.parts)==4 or (len(p.parts)==5 and p.parts[2] in ("Keyboard","PlayStation","Switch","Xbox"))) and p.suffix.lower()==".dds" and
          all(re.fullmatch("[A-Za-z0-9_.-]+",x) for x in p.parts))
 def read_rows(path):
  with path.open(encoding="utf-8-sig",newline="") as f:rows=list(csv.DictReader(f))
