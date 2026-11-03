@@ -99,12 +99,23 @@ def prepare_candidate(b):
 def intersects(a,b):
  return a[0]<b[2] and b[0]<a[2] and a[1]<b[3] and b[1]<a[3]
 
+def conflicting_rois(rows):
+ conflicts=set()
+ for i,row in enumerate(rows):
+  for other in rows[i+1:]:
+   if intersects(row["_bbox"],other["_bbox"]):
+    conflicts.update((row["roi_id"],other["roi_id"]))
+ return conflicts
+
 def process_atlas(raw,rows,repo,orientation):
  readable=native_image(raw)
  if orientation=="FLIPY":readable=ImageOps.flip(readable)
  result=readable.copy();used=[];painted=[];holds=[]
+ conflicts=conflicting_rois(rows)
  for row in sorted(rows,key=lambda r:(r["_bbox"][1],r["_bbox"][0],r["roi_id"])):
   rid=row["roi_id"]
+  if rid in conflicts:
+   holds.append({"roi_id":rid,"reason":"ROI_OVERLAP_NEEDS_MANUAL_QA"});continue
   path=repo/row["_candidate_rel"]
   if not imported_candidate(repo,row):
    holds.append({"roi_id":rid,"reason":"AB_PNG_NOT_YET_IMPORTED"});continue

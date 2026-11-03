@@ -48,8 +48,20 @@ class MultiAtlasTest(unittest.TestCase):
     {"roi_id":"Q044_fedcba0987654321","english":"WIN","korean":"승리",
      "_bbox":[3,7,101,40],"_candidate_rel":p.name}]
    data,_,painted,holds=m.process_atlas(fake_native(),rows,Path(d),"NORMAL")
-   self.assertEqual(len(painted),1)
-   self.assertEqual(holds[0]["reason"],"ROI_OVERLAP_NEEDS_MANUAL_QA")
+   self.assertIsNone(data)
+   self.assertFalse(painted)
+   self.assertEqual(len(holds),2)
+   self.assertTrue(all(h["reason"]=="ROI_OVERLAP_NEEDS_MANUAL_QA" for h in holds))
+ def test_overlap_with_unimported_roi_still_holds_existing_candidate(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d)/"candidate.png";make_candidate(p)
+   rows=[{"roi_id":"Q044_1234567890abcdef","_bbox":[3,7,101,40],"_candidate_rel":p.name},
+    {"roi_id":"Q044_fedcba0987654321","_bbox":[20,7,110,40],"_candidate_rel":"missing.png"}]
+   data,_,painted,holds=m.process_atlas(fake_native(),rows,Path(d),"NORMAL")
+   self.assertIsNone(data)
+   self.assertFalse(painted)
+   self.assertEqual({h["roi_id"] for h in holds},{r["roi_id"] for r in rows})
+   self.assertTrue(all(h["reason"]=="ROI_OVERLAP_NEEDS_MANUAL_QA" for h in holds))
  def test_missing_input_is_held(self):
   with tempfile.TemporaryDirectory() as d:
    rows=[{"roi_id":"Q044_1234567890abcdef","_bbox":[3,7,101,40],
