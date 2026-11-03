@@ -10,7 +10,7 @@ on:
       - "tools/localization/github_ab_imagegen_native_production.py"
       - "tools/localization/test_github_ab_imagegen_native_production.py"
       - "localization/automation_inputs/ab_imagegen_registry.json"
-      - "localization/automation_inputs/candidate_outputs/**"
+      # Bulk A/B PNG import alone does not re-run DDS QA; registry approval triggers it.
       - "localization/graphics/hd_source/**"
       - "localization/test_packages/ab_preparation_20261102/ab_roi_crosswalk.csv"
 
