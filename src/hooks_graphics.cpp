@@ -418,6 +418,12 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     }
     static void __cdecl RobotDisplay(EvWorkRobot* robot) {
         using namespace OutRunVR::QuestCockpitV2;
+        // Nested original draws already see the outer scoped corrected W.
+        // Let the original draw run, but never correct/stage it a second time.
+        if(OriginalRobotCorrectionActive()) {
+            RobotHook.ccall<void>(robot);
+            return;
+        }
         // Original ROB display runs outside races too. Access to event work,
         // camera, or OpenXR latched frame before game/device initialization
         // is not safe; let original guest render without probing these.
@@ -498,6 +504,13 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
                     static_assert(sizeof(robot->d3dmatrix10)==sizeof(Matrix));
                     std::memcpy(work.data(),&robot->d3dmatrix10,sizeof(Matrix));
                     if(own&&ComposeOccupantModel(work,own->occupantCorrection,corrected)) {
+                        // Keep the recursion gate until AFTER scoped work
+                        // restoration (reverse destructor order).
+                        ScopedOriginalRobotCorrectionOwner correctionOwner(true);
+                        if(!correctionOwner.Active()) {
+                            RobotHook.ccall<void>(robot);
+                            return;
+                        }
                         ScopedOriginalRobotWorkMatrix scoped(
                             reinterpret_cast<float*>(&robot->d3dmatrix10),
                             corrected,true);

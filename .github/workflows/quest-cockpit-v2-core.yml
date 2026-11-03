@@ -120,6 +120,8 @@ jobs:
           assert 'slot!=OriginalOccupantSlot::None' in hook
           assert 'OriginalRobotDrawSignature()' in hook
           assert 'ComposeOccupantModel(work,own->occupantCorrection,corrected)' in hook
+          assert 'if(OriginalRobotCorrectionActive())' in hook
+          assert 'ScopedOriginalRobotCorrectionOwner correctionOwner(true)' in hook
           assert 'ScopedPreF0Snapshot preF0Owner(originalMatrices,true)' in hook
           assert 'MatchOriginalPreF0(' in hook
           assert 'sample.matrixF0=preF0->matrixF0' in hook

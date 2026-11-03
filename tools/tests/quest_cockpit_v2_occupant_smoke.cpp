@@ -8,6 +8,24 @@
 #include <random>
 using namespace OutRunVR::QuestCockpitV2;
 int main() {
+    // Nested original robot display must never compound W*C in-place.
+    assert(!OriginalRobotCorrectionActive());
+    { ScopedOriginalRobotCorrectionOwner disabled(false);
+      assert(!disabled.Active() && !OriginalRobotCorrectionActive()); }
+    { ScopedOriginalRobotCorrectionOwner outer(true);
+      assert(outer.Active() && OriginalRobotCorrectionActive());
+      { ScopedOriginalRobotCorrectionOwner nested(true);
+        assert(!nested.Active() && OriginalRobotCorrectionActive());
+      }
+      assert(OriginalRobotCorrectionActive());
+    }
+    assert(!OriginalRobotCorrectionActive());
+    try {
+        ScopedOriginalRobotCorrectionOwner outer(true);
+        assert(OriginalRobotCorrectionActive());
+        throw 61;
+    } catch(int) {}
+    assert(!OriginalRobotCorrectionActive());
     // Quest original visible/LOD0 flag is strictly per player model scope.
     assert(!OriginalOccupantLod0Active());
     { ScopedOriginalOccupantLod0 disabled(false);

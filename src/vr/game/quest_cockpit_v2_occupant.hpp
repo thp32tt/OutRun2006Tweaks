@@ -126,6 +126,29 @@ inline bool VerifiedPlayerOccupantScope(bool trial,bool nativeSignature,
         nativeCameraModeOne && gameWorld && validStereoAndPose &&
         !sceneEffect;
 }
+// Recursion in the original PC robot display may revisit this hook while
+// the first draw has borrowed work+0x10. Never multiply W*C twice or let
+// nested work writes defeat the outer RAII restore.
+inline thread_local bool OriginalRobotCorrectionInFlight=false;
+inline bool OriginalRobotCorrectionActive() noexcept {
+    return OriginalRobotCorrectionInFlight;
+}
+class ScopedOriginalRobotCorrectionOwner final {
+    bool active_=false;
+public:
+    explicit ScopedOriginalRobotCorrectionOwner(bool admitted) noexcept
+        :active_(admitted && !OriginalRobotCorrectionInFlight) {
+        if(active_)OriginalRobotCorrectionInFlight=true;
+    }
+    ~ScopedOriginalRobotCorrectionOwner() noexcept {
+        if(active_)OriginalRobotCorrectionInFlight=false;
+    }
+    ScopedOriginalRobotCorrectionOwner(
+        const ScopedOriginalRobotCorrectionOwner&)=delete;
+    ScopedOriginalRobotCorrectionOwner& operator=(
+        const ScopedOriginalRobotCorrectionOwner&)=delete;
+    bool Active() const noexcept {return active_;}
+};
 // Renderer-scoped alias to original robot work only because Windows original
 // PC code reads work+0x10 synchronously inside its owned draw. No simulation
 // writes survive this call, including C++ exception paths.
