@@ -291,14 +291,18 @@ static bool HasDeferredOwner(const SafetyHookContext& ctx,
     };
     for(std::size_t i=0;i<TokenCount;++i){
         const auto& t=Tokens[i];
-        if(t.epoch!=epoch||!Memory(t.entry,sizeof(DrawEntry))||
+        // Hot renderer path: compare three live register values FIRST.
+        // VirtualQuery for every historical player queue token on every
+        // unrelated stage draw would badly inflate frame time.
+        if(t.epoch!=epoch||
+           !valueInContext(reinterpret_cast<std::uintptr_t>(t.entry)))
+            continue;
+        if(!Memory(t.entry,sizeof(DrawEntry))||
            t.node!=t.entry->CullNode_18)continue;
         std::uint32_t currentId=0;
         std::memcpy(&currentId,
             reinterpret_cast<const char*>(t.entry)+0x38,sizeof(currentId));
-        if(currentId!=t.id)continue;
-        if(valueInContext(reinterpret_cast<std::uintptr_t>(t.entry)))
-            return true;
+        if(currentId==t.id)return true;
     }
     return false;
 }
