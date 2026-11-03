@@ -39,6 +39,18 @@ int main() {
       assert(OriginalOccupantLod0Active());
     }
     assert(!OriginalOccupantLod0Active());
+    // Passenger slot 363 keeps LOD0 active THROUGH the corrected W*C
+    // renderer and preserves it if correction falls back to original.
+    { ScopedOriginalOccupantLod0 passengerVisible(true);
+      assert(passengerVisible.Active() && OriginalOccupantLod0Active());
+      { ScopedOriginalRobotCorrectionOwner correction(true);
+        assert(correction.Active() && OriginalOccupantLod0Active());
+        ScopedOriginalOccupantLod0 optionalInnerLod(true);
+        assert(!optionalInnerLod.Active() && OriginalOccupantLod0Active());
+      }
+      assert(!OriginalRobotCorrectionActive() && OriginalOccupantLod0Active());
+    }
+    assert(!OriginalOccupantLod0Active());
     try{
         ScopedOriginalOccupantLod0 owner(true);
         assert(OriginalOccupantLod0Active());

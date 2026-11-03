@@ -147,6 +147,9 @@ jobs:
           assert 'RemoveGlassReflectionFlags(' in hook
           assert 'RemoveGlassReflectionLayer(' in hook
           assert 'OriginalPassengerForceVisible' in hook
+          assert 'ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);' in hook
+          assert 'const bool passengerLod0=' in hook
+          assert 'if(action==CockpitOccupantRender::OriginalPassengerForceVisible){' not in hook
           assert 'NativeSeatOffset(' in hook
           assert 'QuestCockpitV2RawB0Camera = false' in ini
           assert 'QuestCockpitV2OccupantCorrection = false' in ini

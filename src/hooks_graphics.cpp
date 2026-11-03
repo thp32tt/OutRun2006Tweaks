@@ -830,14 +830,14 @@ class QuestCockpitV2PlayerCandidateProbe final : public Hook {
             Settings::VRQuestCockpitV2HideDriver,
             Settings::VRQuestCockpitV2PassengerVisible);
         if(action==CockpitOccupantRender::SuppressDriver)return;
-        if(action==CockpitOccupantRender::OriginalPassengerForceVisible){
-            // The attached HMD trace shows BOTH 362 and 363 W*C applied
-            // yet neither character visible. Keep passenger's original PC
-            // animation/world matrix; force only its near-seat visible LOD0.
-            ScopedOriginalOccupantLod0 passengerVisible(true);
-            RobotHook.ccall<void>(robot);
-            return;
-        }
+        // Quest event 363 is a full occupant: it needs the SAME scoped W*C
+        // correction as event 362, not an early exit to an uncorrected
+        // passenger matrix. Keep the passenger visible/LOD0 scope alive
+        // through both the corrected path and every fail-closed original
+        // fallback; never force this scope on NPCs, driver, or GOAL.
+        const bool passengerLod0=
+            action==CockpitOccupantRender::OriginalPassengerForceVisible;
+        ScopedOriginalOccupantLod0 passengerVisible(passengerLod0);
         if(!Settings::VRQuestCockpitV2OccupantCorrection) {
             RobotHook.ccall<void>(robot);
             return;
