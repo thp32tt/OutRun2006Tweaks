@@ -41,7 +41,7 @@ def load_cross(path):
   if not re.fullmatch(r"[0-9a-f]{64}",r["source_dds_sha256"]):raise ValueError("DDS_SHA_NOT_PINNED")
   if r["candidate_status"]!="CANDIDATE_ONLY_QA_UNVERIFIED" or r["candidate_count"]!="1":
    raise ValueError("CANDIDATE_STATUS_CHANGED")
-  if not re.fullmatch(r"Q\d{3}_[0-9a-f]{16}",r["roi_id"]):raise ValueError("INVALID_ROI_ID")
+  if not re.fullmatch(r"Q\d{3}_[0-9a-f]{16}(?:_RB_B)?",r["roi_id"]):raise ValueError("INVALID_ROI_ID")
   if r["roles"] not in ("A","B"):raise ValueError("INVALID_ROLE")
   m=re.fullmatch(r"/home/chatgpt-runner2/work/image-src/text_roi_batches/candidate_outputs/([AB])/([A-Za-z0-9_-]+\.png)",r["candidate_paths"])
   if not m or m.group(1)!=r["roles"] or m.group(2) not in (r["roi_id"]+"_k.png",r["roi_id"]+"_source_k.png"):
