@@ -3,7 +3,7 @@ Source branch: vr-quest-cockpit-v2 (NOT v0.01-beta release)
 
 1. Unzip this COMPLETE build into a COPY of the game installation containing OR2006C2C.EXE.
 2. Ensure the Quest 3 OpenXR runtime/Virtual Desktop VDXR is active and the wheel has its usual FFB configuration.
-3. Run RUN-QUEST-COCKPIT-V2.cmd. The ORIGINAL native game's mode-1 camera already consumes the per-model seat table; no additional B0 camera offset is applied by default.
+3. Run RUN-QUEST-COCKPIT-V2.cmd. The Quest APK actually uses a SECOND original 30-profile VR seat table (guest 0x5B2F68); the dedicated launcher now enables this native profile A/B by default. The difference to the stock 30x36 view1 seat is applied ONCE, in the original camera's current yaw basis, with no extra raw B0 transform.
    Normal, F0 and LOD0 experimental launchers now enable QuestCockpitV2ReleaseParity=ON. This matches the stable beta's graphics settings for cockpit A/B, avoiding the previous CORRECTNESS-only DirectGPU/culling/HUD Inspector mismatch. The diagnostic batch keeps no-cockpit controls.
 4. In game select the in-car camera (native view 1). Native view 0/2 remains stock.
 5. If the headset view shakes, becomes inside the vehicle, or the driver/passenger is wrong: exit and run Run-OutRunVRTest.cmd for the safe non-cockpit baseline. No game files are patched.
@@ -128,3 +128,31 @@ are NOT globally disabled. A physically separate unclassified
 reflection-only mesh/pass may remain; that requires exact mesh ID
 and HMD visual probe, not guessed skip. Runtime HMD validation
 remains UNTESTED.
+
+2026-11-04 QUEST NATIVE VR SEAT PROFILE IMPLEMENTATION (EXPERIMENTAL):
+- New F11 live switch VR.QuestCockpitV2NativeSeatProfile=true. Only
+  when QuestCockpitV2Enabled=true, gameplay, view1 and native frame
+  admitted. OFF restores unmodified view1 camera when manual offsets
+  SeatBack/Down/Right are also zero.
+- Original Quest ARM64 ELF run_game::$_2 is verified to read a distinct
+  30-profile, 0x128-stride guest table at PE 0x5B2F68; each record XYZ
+  lies at +0x4C/+0x50/+0x54. User's canonical PC PE stores the identical
+  30-way address layout at 0x5B0CB8..0x5B2F68; code checks pointers
+  and reads runtime original game bytes in-memory. No game data or APK
+  assets distributed. DO NOT collapse records 0..29 to 15.
+- Apply (original profile XYZ - original 30x36 view1 anchor XYZ) in the
+  already-smoothed native camera yaw basis; preserve CalcCameraMatrix
+  entry/exit originals, F12/recenter, XR per-eye and existing world draw.
+  Do not apply the Quest separate +0.32/+0.55 and -0.32/-0.55 native
+  pose-composition constants to an already positioned PC OpenXR camera;
+  the full pose consumer is not yet implemented/visually validated.
+  No extra car B0 camera transform, persistent global memory patch or
+  test-only auto logging in normal gameplay.
+- Keep SeatBack/Down/Right=0.0 by default; these are optional manual
+  adjustments ON TOP of the native profile. For safety, if guest pointer
+  addresses, profile data or original camera basis fail validation, use
+  unchanged original game camera for that frame.
+- HMD VISUAL PARITY with Quest APK is UNTESTED. This is a first
+  integrated original-profile test, not a claim of exact Quest runtime
+  dynamic pose matching. Use F11 native-seat-profile OFF for A/B if the
+  view is too low/back or unexpectedly displaced.

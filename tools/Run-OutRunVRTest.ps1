@@ -326,8 +326,10 @@ if($QuestCockpitV2 -eq 'ON'){
         '-VR.QuestCockpitV2FullCar=true',
         '-VR.QuestCockpitV2HideDriver=true',
         '-VR.QuestCockpitV2RawB0Camera=false',
-        # Quest and PC guest both load the SAME per-model mode1 table. Do not
-        # carry prior hand-tuned -0.35/-0.18 camera shifts from user.ini.
+        '-VR.QuestCockpitV2NativeSeatProfile=true',
+        # Quest APK uses a SECOND original 30x296 VR profile table at
+        # PE 0x5B2F68, distinct from native 30x36 view1 camera anchors.
+        # Use the original profile-vs-view1 delta once; no stale tuning.
         '-VR.QuestCockpitV2SeatBack=0.0',
         '-VR.QuestCockpitV2SeatDown=0.0',
         '-VR.QuestCockpitV2SeatRight=0.0',

@@ -52,7 +52,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRCockpitFrameProbe;
-    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff;
+    extern Setting<bool> VRQuestCockpitV2Enabled,VRQuestCockpitV2FullCar,VRQuestCockpitV2HideDriver,VRQuestCockpitV2RawB0Camera,VRQuestCockpitV2OccupantCorrection,VRQuestCockpitV2F0RenderScope,VRQuestCockpitV2OccupantLod0,VRQuestCockpitV2NativeSeatProfile,VRQuestCockpitV2GlassEnabled,VRQuestCockpitV2GlassHidden,VRQuestCockpitV2PassengerVisible,VRQuestCockpitV2GlassReflectionOff;
     extern Setting<float> VRQuestCockpitV2SeatBack,VRQuestCockpitV2SeatDown,VRQuestCockpitV2SeatRight;
     extern Setting<float> VRQuestCockpitV2GlassBrightness;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
@@ -656,9 +656,10 @@ public:
 };
 QuestCockpitV2NativeFrameProbe QuestCockpitV2NativeFrameProbe::instance;
 
-// Experimental QuestCockpitV2 mode1 player owner. Original mode1 seat uses
-// the immutable 30x36-byte PC/Quest ROM anchors (15 distinct XYZ pairs).
-// The old native-camera offset, model scale and stale-pose cache stay deleted.
+// QuestCockpitV2 mode1 camera: keep original game eye/swing/blend, but
+// opt-in experimental native Quest 30-profile table delta in camera basis.
+// Do not confuse the 30x36 PC camera anchors with the 30x296 VR profiles.
+// The rejected full-car B0 camera and stale-pose cache remain retired.
 static bool QuestCockpitV2Active(const EvWorkCamera* camera) noexcept {
     return OutRunVR::QuestCockpitV2::TrialEligible(
         Settings::VRQuestCockpitV2Enabled,Settings::VREnabled,
@@ -671,9 +672,10 @@ static bool QuestCockpitV2Active(const EvWorkCamera* camera) noexcept {
 static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
     OutRunVR::QuestCockpitV2::SeatPose& result) noexcept {
     if(!QuestCockpitV2Active(camera)||!camera)return false;
-    // The Quest and original PC mode1 camera already apply the original
-    // per-car 30x36 camera ROM record, swing and interpolation. Never
-    // transform that camera a second time with car B0 (HMD shake).
+    // The PC mode1 camera uses the 30x36 car view1 anchor. Quest APK
+    // separately substitutes 30x296 guest profile XYZ into its camera.
+    // Adapt only the local anchor delta after the existing PC camera,
+    // never multiply camera by raw car B0 (reported HMD shaking).
     if(Settings::VRQuestCockpitV2RawB0Camera){
         static bool warned=false;
         if(!warned){
@@ -682,11 +684,11 @@ static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
                 "preserving native camera and using offset-only seat");
         }
     }
-    // Quest ELF 119275C..1192790 copies original model[0..2] into both
-    // eye/look temporary vectors. The retail PC 485590 already performs
-    // the same operation, then original eye_swing/view_blend/ground clip.
-    // VERIFY the initialized LIVE 30x36-byte table but NEVER reapply
-    // model->B0 or treat those game units as OpenXR metres.
+    // Quest ELF 119275C..1192790 starts from the 30x36 model view1
+    // anchors, *but* run_game::$_2 supplies a second XYZ from profiles.
+    // Read both ORIGINAL tables; retain PC original swing/interpolation,
+    // apply only the profile difference at original CalcCameraMatrix.
+    // These are original game units, NOT metres for the XR host.
     const auto* car=Game::pl_car();
     if(!car)return false;
     const int model=static_cast<int>(
@@ -697,24 +699,51 @@ static bool QuestCockpitV2CameraPose(const EvWorkCamera* camera,
     OutRunVR::QuestCockpitV2::Vec3 verifiedOriginalSeat{};
     if(!OutRunVR::QuestCockpitV2::OriginalModeOneAnchor(
         table,kTableBytes,model,verifiedOriginalSeat))return false;
-    static thread_local std::uint32_t loggedModels=0;
-    if(Settings::VRTelemetry&&model>=0&&model<30&&
-       (loggedModels&(1u<<model))==0u) {
-        loggedModels|=1u<<model;
-        spdlog::info("VR QUEST REA SEAT: model={} nativeAnchorXYZ=({:.4f},{:.4f},{:.4f}) "
-            "source=PC_live_818BB0/Quest_119275C overlay=none",
-            model,verifiedOriginalSeat.x,verifiedOriginalSeat.y,
-            verifiedOriginalSeat.z);
-    }
     const float back=Settings::VRQuestCockpitV2SeatBack.get();
     const float down=Settings::VRQuestCockpitV2SeatDown.get();
     const float right=Settings::VRQuestCockpitV2SeatRight.get();
-    if(back==0.f&&down==0.f&&right==0.f)
-        return false; // exact original per-car camera, nothing staged
+    const OutRunVR::QuestCockpitV2::Vec3 nativeEye{
+        camera->cam_pos_F8.x,camera->cam_pos_F8.y,camera->cam_pos_F8.z};
+    const OutRunVR::QuestCockpitV2::Vec3 nativeLook{
+        camera->look_pos_104.x,camera->look_pos_104.y,camera->look_pos_104.z};
+    if(Settings::VRQuestCockpitV2NativeSeatProfile) {
+        // Original PC guest profile records and pointers are adjacent in
+        // retail .rdata: [0x5B0CB8..0x5B2F68) and [0x5B2F68..].
+        // Quest ARM64 run_game::$_2 resolves this 30-way pointer table,
+        // then reads each record at offsets +4C/+50/+54 (NOT view1 table).
+        constexpr std::size_t kCount=30u,kStride=0x128u;
+        const auto* profiles=Module::exe_ptr<const std::uint8_t>(0x1B0CB8);
+        const auto* pointers=Module::exe_ptr<const std::uint8_t>(0x1B2F68);
+        if(!QuestCockpitGlassLive::Memory(profiles,kCount*kStride)||
+           !QuestCockpitGlassLive::Memory(pointers,kCount*sizeof(std::uint32_t)))
+            return false;
+        OutRunVR::QuestCockpitV2::Vec3 originalQuestProfile{};
+        if(!OutRunVR::QuestCockpitV2::OriginalQuestVrProfileAnchor(
+            pointers,kCount*sizeof(std::uint32_t),
+            profiles,kCount*kStride,model,originalQuestProfile))
+            return false; // Unrecognized guest build: leave native camera.
+        static thread_local std::uint32_t loggedProfiles=0;
+        if(Settings::VRTelemetry&&model>=0&&model<30&&
+           (loggedProfiles&(1u<<model))==0u) {
+            loggedProfiles|=1u<<model;
+            spdlog::info("VR QUEST REA PROFILE: model={} mode1XYZ=({:.3f},{:.3f},{:.3f}) "
+                "nativeProfileXYZ=({:.3f},{:.3f},{:.3f}) owner=PC_guest_5B2F68; "
+                "method=POST_NATIVE_DELTA_ONLY no_extra_B0",
+                model,verifiedOriginalSeat.x,verifiedOriginalSeat.y,
+                verifiedOriginalSeat.z,originalQuestProfile.x,
+                originalQuestProfile.y,originalQuestProfile.z);
+        }
+        if(!OutRunVR::QuestCockpitV2::NativeVrProfilePose(
+            nativeEye,nativeLook,verifiedOriginalSeat,originalQuestProfile,
+            back,down,right,result))return false;
+        result.model=static_cast<std::uint8_t>(model);
+        return true;
+    }
+    // Explicit A/B disable reverts to original mode1, optional legacy
+    // tuning remains available and never restores the retired raw-B0 path.
+    if(back==0.f&&down==0.f&&right==0.f)return false;
     return OutRunVR::QuestCockpitV2::NativeSeatOffset(
-        {camera->cam_pos_F8.x,camera->cam_pos_F8.y,camera->cam_pos_F8.z},
-        {camera->look_pos_104.x,camera->look_pos_104.y,camera->look_pos_104.z},
-        back,down,right,result);
+        nativeEye,nativeLook,back,down,right,result);
 }
 class QuestCockpitV2PlayerCandidateProbe final : public Hook {
     static constexpr int PlayerCarRva=0x69764, RobotRva=0x114E60;

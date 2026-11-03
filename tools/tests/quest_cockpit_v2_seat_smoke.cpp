@@ -49,6 +49,104 @@ int main(){
     assert(!NativeSeatOffset({0,0,0},{0,0,0},.35f,.18f,0,offset));
     assert(near(offset.eye.x,beforeOffset.eye.x));
     assert(!NativeSeatOffset({0,0,0},{0,0,1},3.f,.18f,0,offset));
+
+    // Quest native run_game::$_2 30-way guest profile addresses must be
+    // checked. This is NOT 15 copies of the old view1 camera table.
+    constexpr std::size_t kStride=0x128u,kCount=30u;
+    const std::array<Vec3,kCount> questXYZ{{
+        {-.353f,.627f,-.390f},{-.331f,.688f,-.258f},
+        {-.357f,.635f,-.396f},{-.319f,.673f,-.244f},
+        {-.345f,.773f,-.019f},{-.325f,.698f,-.472f},
+        {-.330f,.620f,-.400f},{-.365f,.679f,-.442f},
+        {-.351f,.674f,-.458f},{-.331f,.766f,.035f},
+        {-.353f,.650f,-.340f},{-.320f,.640f,-.340f},
+        {-.351f,.750f,-.458f},{-.351f,.770f,.000f},
+        {-.351f,.674f,-.025f},{-.353f,.627f,-.450f},
+        {-.331f,.688f,-.258f},{-.357f,.635f,-.396f},
+        {-.319f,.673f,-.244f},{-.345f,.773f,-.050f},
+        {-.325f,.698f,-.472f},{-.330f,.620f,-.400f},
+        {-.365f,.679f,-.350f},{-.351f,.674f,-.458f},
+        {-.331f,.766f,.035f},{-.353f,.650f,-.340f},
+        {-.320f,.640f,-.340f},{-.351f,.720f,-.410f},
+        {-.351f,.770f,.000f},{-.351f,.750f,-.025f}
+    }};
+    std::array<std::uint8_t,kCount*kStride> records{};
+    std::array<std::uint8_t,kCount*4u> guestPointers{};
+    for(std::size_t i=0;i<kCount;++i) {
+        const std::uint32_t va=0x5b0cb8u+std::uint32_t(i*kStride);
+        std::memcpy(guestPointers.data()+4u*i,&va,4u);
+        std::memcpy(records.data()+i*kStride+0x4cu,
+                    &questXYZ[i],sizeof(Vec3));
+    }
+    Vec3 fetched{};
+    for(int i=0;i<30;++i) {
+        assert(OriginalQuestVrProfileAnchor(guestPointers.data(),
+            guestPointers.size(),records.data(),records.size(),i,fetched));
+        assert(near(fetched.x,questXYZ[std::size_t(i)].x));
+        assert(near(fetched.y,questXYZ[std::size_t(i)].y));
+        assert(near(fetched.z,questXYZ[std::size_t(i)].z));
+    }
+    assert(!near(questXYZ[0].z,questXYZ[15].z));
+    assert(!near(questXYZ[7].z,questXYZ[22].z));
+    assert(!near(questXYZ[12].y,questXYZ[27].y));
+    const Vec3 oldFetch=fetched;
+    assert(!OriginalQuestVrProfileAnchor(guestPointers.data(),
+        guestPointers.size(),records.data(),records.size(),-1,fetched));
+    assert(!OriginalQuestVrProfileAnchor(guestPointers.data(),
+        guestPointers.size(),records.data(),records.size(),30,fetched));
+    assert(!OriginalQuestVrProfileAnchor(nullptr,
+        guestPointers.size(),records.data(),records.size(),0,fetched));
+    assert(!OriginalQuestVrProfileAnchor(guestPointers.data(),
+        guestPointers.size()-1,records.data(),records.size(),0,fetched));
+    assert(!OriginalQuestVrProfileAnchor(guestPointers.data(),
+        guestPointers.size(),records.data(),records.size()-1,0,fetched));
+    assert(near(fetched.z,oldFetch.z));
+    const std::uint32_t corrupt=0u;
+    std::memcpy(guestPointers.data()+4u*29u,&corrupt,4u);
+    assert(!OriginalQuestVrProfileAnchor(guestPointers.data(),
+        guestPointers.size(),records.data(),records.size(),29,fetched));
+    records[0x4cu+4u]=0xff; records[0x4cu+5u]=0xff;
+    records[0x4cu+6u]=0xff; records[0x4cu+7u]=0x7f;
+    assert(!OriginalQuestVrProfileAnchor(guestPointers.data(),
+        guestPointers.size(),records.data(),records.size(),0,fetched));
+    // No raw B0 is used: the source view1 camera remains the same and
+    // only its profile delta is applied ONCE, atomically to eye and look.
+    SeatPose profilePose{};
+    assert(NativeVrProfilePose({0.f,.99f,0.f},{0.f,.99f,10.f},
+        {-.353f,.99f,-.345f},questXYZ[0],
+        0.f,0.f,0.f,profilePose));
+    assert(near(profilePose.eye.x,0.f));
+    assert(near(profilePose.eye.y,.627f));
+    assert(near(profilePose.eye.z,-.045f));
+    assert(near(profilePose.look.y,.627f));
+    assert(near(profilePose.look.z,9.955f));
+    const auto profileBefore=profilePose;
+    assert(!NativeVrProfilePose({0.f,.99f,0.f},{0.f,.99f,0.f},
+        {-.353f,.99f,-.345f},questXYZ[0],0.f,0.f,0.f,profilePose));
+    assert(near(profilePose.eye.y,profileBefore.eye.y));
+    // A 90-degree yaw rotates X/Z seat delta; no extra translated car B0.
+    assert(NativeVrProfilePose({10.f,1.f,20.f},{20.f,1.f,20.f},
+        {0.f,1.f,0.f},{-.2f,.7f,-.4f},
+        0.f,0.f,0.f,profilePose));
+    assert(near(profilePose.eye.x,9.6f));
+    assert(near(profilePose.eye.y,.7f));
+    assert(near(profilePose.eye.z,20.2f));
+    assert(near(profilePose.look.x,19.6f));
+    // User back/down/right remain optional on TOP of native Quest seat.
+    assert(NativeVrProfilePose({0.f,.99f,0.f},{0.f,.99f,10.f},
+        {-.353f,.99f,-.345f},questXYZ[0],
+        .1f,.1f,.05f,profilePose));
+    assert(near(profilePose.eye.x,.05f));
+    assert(near(profilePose.eye.y,.527f));
+    assert(near(profilePose.eye.z,-.145f));
+    assert(!NativeVrProfilePose({0.f,.99f,0.f},{0.f,.99f,10.f},
+        {-.353f,.99f,-.345f},questXYZ[0],
+        -1.f,0.f,0.f,profilePose));
+    assert(!NativeVrProfilePose({0.f,.99f,0.f},{0.f,.99f,10.f},
+        {-.353f,.99f,-.345f},
+        {-.353f,std::numeric_limits<float>::quiet_NaN(),-.345f},
+        0.f,0.f,0.f,profilePose));
+    assert(near(profilePose.eye.y,.527f));
     assert(TrialEligible(true,true,true,1,false,true));
     assert(!TrialEligible(true,true,true,2,false,true));
     assert(!TrialEligible(true,true,true,1,true,true));

@@ -141,13 +141,15 @@ namespace Settings
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
     Setting<bool> VRQuestCockpitV2Enabled{ "VR", "QuestCockpitV2Enabled", false,
-        "EXPERIMENTAL Quest mode1 per-car original table cockpit, opt-in only; restart required." };
+        "EXPERIMENTAL Quest mode1 car camera + 30-car native VR seat profile; opt-in only; restart required." };
+    Setting<bool> VRQuestCockpitV2NativeSeatProfile{ "VR", "QuestCockpitV2NativeSeatProfile", true,
+        "Quest native 30-car cockpit-profile seat XYZ (0x5B2F68) replaces PC view1 anchor by a camera-basis delta. Avoids raw-B0 HMD shake. F11 A/B OFF restores original view1; experimental cockpit only." };
     Setting<bool> VRQuestCockpitV2RawB0Camera{ "VR", "QuestCockpitV2RawB0Camera", false,
         "DEPRECATED, ignored: raw B0 second camera transform caused severe HMD jitter; native mode1 camera is now preserved." };
     Setting<float> VRQuestCockpitV2SeatBack{ "VR", "QuestCockpitV2SeatBack", 0.0f,
-        "Native camera-relative seat backward shift in game units, without B0 recalc. F11 live.",Range<float>{0.f,1.2f} };
+        "Optional additive backward tuning AFTER Quest native VR seat profile in game units. F11 live.",Range<float>{0.f,1.2f} };
     Setting<float> VRQuestCockpitV2SeatDown{ "VR", "QuestCockpitV2SeatDown", 0.0f,
-        "Native camera-relative seat down shift in game units. F11 live.",Range<float>{0.f,0.8f} };
+        "Optional additive downward tuning AFTER Quest native VR seat profile in game units. F11 live.",Range<float>{0.f,0.8f} };
     Setting<float> VRQuestCockpitV2SeatRight{ "VR", "QuestCockpitV2SeatRight", 0.f,
         "Native camera-relative seat sideways shift in game units. F11 live.",Range<float>{-0.6f,0.6f} };
     Setting<bool> VRQuestCockpitV2OccupantCorrection{ "VR", "QuestCockpitV2OccupantCorrection", false,

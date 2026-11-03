@@ -121,8 +121,12 @@ jobs:
           assert 'QuestCockpitV2PassengerVisible = true' in ini
           assert 'QuestCockpitV2GlassHidden = false' in ini
           assert 'QuestCockpitV2GlassReflectionOff = true' in ini
+          assert 'QuestCockpitV2NativeSeatProfile = true' in ini
+          assert 'NativeVrProfilePose(' in hook
+          assert 'OriginalQuestVrProfileAnchor(' in hook
           assert 'QuestCockpitV2SeatBack = 0.0' in ini
           assert 'QuestCockpitV2SeatDown = 0.0' in ini
+          assert "'-VR.QuestCockpitV2NativeSeatProfile=true'" in launcher
           assert "'-VR.QuestCockpitV2SeatBack=0.0'" in launcher
           assert "'-VR.QuestCockpitV2SeatDown=0.0'" in launcher
           assert 'RemoveGlassReflectionFlags(' in hook
