@@ -4297,8 +4297,13 @@ namespace outrun::vr::dx11
         }
 
         OutRunVR::DrawState::RenderStateSnapshot source{};
-        const bool captured =
-            OutRunVRStereo::CaptureTrackedRenderStateSnapshot(device, source);
+        // Focus R26+HUD does not publish the older DX11 branch's tracked
+        // render-state snapshot API. Inventing D3D9 state here would produce
+        // a false native-Draw readiness proof. Until a scope-safe snapshot
+        // bridge is implemented, the passive census is explicitly incomplete.
+        // The original Focus game Draw and all VR fallback behavior remain
+        // authoritative; isolated native WARP tests are independent.
+        const bool captured = false;
 
         const bool blendStateObserved =
             captured && source.complete && source.alphaBlendEnable != FALSE;
