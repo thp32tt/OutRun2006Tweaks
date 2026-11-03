@@ -3,7 +3,9 @@
 // BeginScene, EndScene and Present; this tracer NEVER admits cockpit gameplay.
 #pragma once
 #include <atomic>
+#include <array>
 #include <cstdint>
+#include <limits>
 
 namespace OutRunVR::QuestCockpitV2 {
 struct NativeWindow {
@@ -14,21 +16,47 @@ struct NativeWindow {
 };
 
 class NativeFrameTracker final {
+    // An original PC render callback may recurse. A single active epoch
+    // would retain the child's identity after its return and could alias
+    // the parent's car/robot work with the wrong XR/native frame.
+    static constexpr std::size_t MaxNestedFrames=32u;
     NativeWindow window_{};
-    std::uint64_t ordinal_=0, activeEpoch_=0;
-    std::uint32_t depth_=0;
+    std::uint64_t ordinal_=0;
+    std::array<std::uint64_t,MaxNestedFrames> epochs_{};
+    std::uint32_t depth_=0, overflowDepth_=0;
+    bool rejectUntilEmpty_=false, saturated_=false;
     void Bump(std::uint32_t& n) noexcept {
         if(n<4096u)++n; else window_.overflow=true;
     }
 public:
-    void Clear() noexcept {window_={};activeEpoch_=0;depth_=0;}
-    bool Active() const noexcept {return depth_>0 && activeEpoch_!=0;}
-    std::uint64_t ActiveEpoch() const noexcept {return Active()?activeEpoch_:0;}
+    void Clear() noexcept {
+        window_={};epochs_.fill(0);depth_=overflowDepth_=0;
+        rejectUntilEmpty_=saturated_=false;
+    }
+    bool Active() const noexcept {
+        return !rejectUntilEmpty_ && !saturated_ &&
+            overflowDepth_==0 && depth_>0 && epochs_[depth_-1]!=0;
+    }
+    std::uint64_t ActiveEpoch() const noexcept {
+        return Active()?epochs_[depth_-1]:0;
+    }
     void OnFrameEnter(std::uint64_t epoch) noexcept {
         Bump(window_.enters);
-        if(depth_>0) Bump(window_.nestedEntries);
-        if(depth_<4096u)++depth_; else window_.overflow=true;
-        activeEpoch_=epoch;
+        if(depth_ || overflowDepth_)Bump(window_.nestedEntries);
+        if(epoch==0) {
+            // Never treat a missing native frame as a usable owner.
+            rejectUntilEmpty_=true;window_.overflow=true;
+        }
+        if(overflowDepth_ || depth_==MaxNestedFrames) {
+            // Preserve balanced end accounting without indexing past
+            // the bounded stack. No cockpit admission until fully unwound.
+            rejectUntilEmpty_=true;window_.overflow=true;
+            if(overflowDepth_<std::numeric_limits<std::uint32_t>::max())
+                ++overflowDepth_;
+            else saturated_=true;
+        } else {
+            epochs_[depth_++]=epoch;
+        }
         if(window_.firstEpoch==0)window_.firstEpoch=epoch;
         window_.lastEpoch=epoch;
     }
@@ -41,14 +69,27 @@ public:
         Bump(window_.playerCars);
     }
     void OnFrameEnd() noexcept {
-        if(!Active()) {Bump(window_.unmatchedEnds);return;}
-        Bump(window_.ends);
-        if(--depth_==0)activeEpoch_=0;
+        // A suppressed frame is still a real unmatched-to-Active frame.
+        // Pop it before the parent so its epoch cannot leak outward.
+        if(overflowDepth_>0) {
+            Bump(window_.ends);
+            --overflowDepth_;
+        } else if(depth_>0) {
+            Bump(window_.ends);
+            epochs_[--depth_]=0;
+        } else {
+            Bump(window_.unmatchedEnds);
+            return;
+        }
+        if(depth_==0 && overflowDepth_==0 && !saturated_)
+            rejectUntilEmpty_=false;
     }
     NativeWindow OnPresent() noexcept {
         NativeWindow snapshot=window_;
         snapshot.ordinal=++ordinal_;
         window_={};
+        // Present is not the original native frame boundary: retain
+        // any active stack and failure-to-admit state across Present.
         return snapshot;
     }
 };
