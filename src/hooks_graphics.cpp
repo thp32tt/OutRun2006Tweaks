@@ -280,17 +280,13 @@ static bool HasDeferredOwner(const SafetyHookContext& ctx,
     std::uint64_t epoch) noexcept
 {
     if(TooMany||!TokenCount||!epoch)return false;
-    const std::uintptr_t regs[]{
-        ctx.eax,ctx.ebx,ctx.ecx,ctx.edx,ctx.esi,ctx.edi,ctx.ebp};
+    // Do NOT scan arbitrary stack words: an old player descriptor can
+    // survive there while the renderer is processing a scenery/traffic draw.
+    // Deferred admission is fail-closed unless the current entry is still
+    // held by one of the original x86 callee-saved live registers.
+    const std::uintptr_t liveEntryRegisters[]{ctx.ebx,ctx.edi,ctx.ebp};
     const auto valueInContext=[&](std::uintptr_t addr) noexcept {
-        for(auto value:regs)if(value==addr)return true;
-        // Original draw_404700 retains a queue-entry pointer on its stack.
-        // Compare pointer VALUES only, never guessed descriptor field offsets.
-        if(Memory(reinterpret_cast<const void*>(ctx.esp),32*sizeof(std::uint32_t))){
-            const auto* words=reinterpret_cast<const std::uint32_t*>(ctx.esp);
-            for(unsigned i=0;i<32;++i)
-                if(static_cast<std::uintptr_t>(words[i])==addr)return true;
-        }
+        for(auto value:liveEntryRegisters)if(value==addr)return true;
         return false;
     };
     for(std::size_t i=0;i<TokenCount;++i){
