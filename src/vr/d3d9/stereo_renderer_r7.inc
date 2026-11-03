@@ -22,6 +22,7 @@
 #include "vr/ipc/xr_eye_extent.hpp"
 #include "vr/ui/vr_mirror_aspect_fit.hpp"
 #include "vr/state/state_block_tracker.hpp"
+#include "vr/d3d9/direct_gpu_hold_policy.hpp"
 
 // True-stereo D3D9 renderer.
 //
@@ -2124,7 +2125,8 @@ if(WaitForEventQuery(slot.fence,1,0u))
 
 			// Never advertise DirectGPU handles before their event query completes.
 			// The classic path keeps its existing pre-Present correlation marker.
-			if(stereoRequested&&!directTransport)
+			if(OutRunVR::DirectGpuHold::PublishPrePresentMono(
+					stereoRequested,directTransport,directOnlyHold))
 				PublishRenderFrame(OutRunVR::StereoSbsFallbackMono,pendingFrameId,pendingPoseSequence,presentStart.QuadPart,FrameFailureReason,nullptr,true,false);
 
 			const HRESULT hr=PresentHook.stdcall<HRESULT>(device,sourceRect,destRect,destWindowOverride,dirtyRegion);

@@ -5,6 +5,9 @@ on:
     branches: [ vr-quest-cockpit-v2 ]
     paths:
       - '.github/workflows/quest-cockpit-v2-core.yml'
+      - 'src/vr/d3d9/stereo_renderer_r7.inc'
+      - 'src/vr/d3d9/direct_gpu_hold_policy.hpp'
+      - 'tools/tests/direct_gpu_hold_smoke.cpp'
       - 'src/vr/game/quest_cockpit_v2_runtime.hpp'
       - 'src/vr/game/quest_cockpit_v2_native_frame.hpp'
       - 'src/vr/game/quest_cockpit_v2_glass_hook.hpp'
@@ -46,6 +49,18 @@ jobs:
             tools/tests/quest_cockpit_v2_runtime_smoke.cpp \
             -o /tmp/quest-cockpit-v2-runtime
           /tmp/quest-cockpit-v2-runtime
+      - name: DirectGPU deferred-frame must not overwrite safe stereo with mono
+        run: |
+          c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            tools/tests/direct_gpu_hold_smoke.cpp -o /tmp/direct-gpu-hold
+          /tmp/direct-gpu-hold
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path('src/vr/d3d9/stereo_renderer_r7.inc').read_text(encoding='utf-8')
+          assert 'if(OutRunVR::DirectGpuHold::PublishPrePresentMono(' in source
+          assert 'stereoRequested,directTransport,directOnlyHold))' in source
+          assert 'if(stereoRequested&&!directTransport)' not in source
+          PY
       - name: Native original frame-render correlation state regression
         run: |
           c++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
