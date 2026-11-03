@@ -290,6 +290,7 @@ void InitExceptionHandler()
 
     SetUnhandledExceptionFilter(CustomUnhandledExceptionFilter);
 
-    // Now stub out SetUnhandledExceptionFilter so NO ONE ELSE can set it!
-    Memory::VP::Patch(&SetUnhandledExceptionFilter, { 0xC2, 0x04, 0x00 });
+    // Register with the documented Win32 API without patching its code.
+    // Rewriting SetUnhandledExceptionFilter interferes with other
+    // exception handlers and Windows Error Reporting.
 }

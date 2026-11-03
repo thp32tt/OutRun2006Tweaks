@@ -79,7 +79,6 @@ class OverlaySettingsWindow : public OverlayWindow
 			static const char* items[]{ "Never Hide", "Online Race", "Any Race" };
 			changed |= ImGui::Combo("Hide During", &Overlay::NotifyHideMode, items, IM_ARRAYSIZE(items));
 		}
-		changed |= ImGui::Checkbox("Check for Updates", &Overlay::NotifyUpdateCheck);
 
 		return changed;
 	}

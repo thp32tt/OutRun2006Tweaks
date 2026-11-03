@@ -7,11 +7,20 @@
 
 namespace
 {
-    bool IsVrHookDescription(std::string_view description) noexcept
+    // Optional VR hook ownership also covers the shorter "VR" prefix.
+    // Keep these code patches off the original 2D execution path.
+    constexpr bool IsVrHookDescription(std::string_view description) noexcept
     {
         return description.starts_with("OpenXRVR") ||
-            description.starts_with("OpenXVRR");
+            description.starts_with("OpenXVRR") ||
+            description.starts_with("VR");
     }
+
+    static_assert(IsVrHookDescription("OpenXRVRRenderer"));
+    static_assert(IsVrHookDescription("VRDriverSeatRenderTest"));
+    static_assert(IsVrHookDescription("VRLensFlareProjected2D"));
+    static_assert(IsVrHookDescription("VRHudQueueSemanticBridge"));
+    static_assert(!IsVrHookDescription("UIScaling"));
 
     bool VrHooksEnabledForProcess() noexcept
     {
