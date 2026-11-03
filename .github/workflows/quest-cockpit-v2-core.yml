@@ -93,6 +93,11 @@ jobs:
           assert "effectiveVrArguments[$matches[1]] = $matches[2]" in launcher
           assert r"(?:VR\.)?" in launcher
           assert "QuestCockpitV2ReleaseParity" in launcher
+          for script in ('RUN-QUEST-COCKPIT-V2.cmd',
+                         'RUN-QUEST-COCKPIT-V2-F0.cmd',
+                         'RUN-QUEST-COCKPIT-V2-LOD0.cmd'):
+              launcher_script=Path(script).read_text(encoding='utf-8')
+              assert '-QuestCockpitV2ReleaseParity ON' in launcher_script, script
           assert "'-VR.DirectGpuOnly=true'" in launcher
           assert "'-Graphics.ReflectionUpdateRate=0.25'" in launcher
           assert "VR_RELEASE_VERSION.txt" in launcher

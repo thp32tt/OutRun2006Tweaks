@@ -4,6 +4,7 @@ Source branch: vr-quest-cockpit-v2 (NOT v0.01-beta release)
 1. Unzip this COMPLETE build into a COPY of the game installation containing OR2006C2C.EXE.
 2. Ensure the Quest 3 OpenXR runtime/Virtual Desktop VDXR is active and the wheel has its usual FFB configuration.
 3. Run RUN-QUEST-COCKPIT-V2.cmd. The ORIGINAL native game's mode-1 camera already consumes the per-model seat table; no additional B0 camera offset is applied by default.
+   Normal, F0 and LOD0 experimental launchers now enable QuestCockpitV2ReleaseParity=ON. This matches the stable beta's graphics settings for cockpit A/B, avoiding the previous CORRECTNESS-only DirectGPU/culling/HUD Inspector mismatch. The diagnostic batch keeps no-cockpit controls.
 4. In game select the in-car camera (native view 1). Native view 0/2 remains stock.
 5. If the headset view shakes, becomes inside the vehicle, or the driver/passenger is wrong: exit and run Run-OutRunVRTest.cmd for the safe non-cockpit baseline. No game files are patched.
 6. Use F12 to recenter. Test menu, mode 0, mode 1, mode 2, race, goal; report which screen is wrong.
