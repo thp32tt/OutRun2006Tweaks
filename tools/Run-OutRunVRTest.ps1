@@ -336,7 +336,8 @@ if($QuestCockpitV2 -eq 'ON'){
         ('-VR.Telemetry=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'})),
         ('-FileLogging=' + $(if($QuestCockpitV2Diagnostics -eq 'ON'){'true'}else{'false'}))
     )
-    $env:OUTRUN_VR_FILE_LOG=if($QuestCockpitV2Diagnostics -eq 'ON'){'1'}else{'0'}
+    if($QuestCockpitV2Diagnostics -eq 'ON') { $env:OUTRUN_VR_FILE_LOG='1' }
+    else { $env:OUTRUN_VR_FILE_LOG='0' }
     Write-Host "QuestCockpitV2 mode1 active; detailed diagnostics=$QuestCockpitV2Diagnostics."
 }
 if($backend -ne '2d'){
